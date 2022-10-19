@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Dict, Iterable, Optional
+from typing import Any, ClassVar, Dict, Sequence, List, Iterator, Optional
 from typing import overload
 import klayout.rdb as rdb
 import klayout.tl as tl
@@ -104,10 +104,21 @@ class Box:
 
         @return The intersection box
         """
+    def __copy__(self) -> Box:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, box: object) -> bool:
         r"""
         @brief Returns true if this box is equal to the other box
         Returns true, if this box and the given box are equal 
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given box. This method enables boxes as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -178,6 +189,42 @@ class Box:
         r"""
         @brief Returns true if this box is not equal to the other box
         Returns true, if this box and the given box are not equal 
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing this box
+
+        This string can be turned into a box again by using \from_s
+        """
+    @overload
+    def __rmul__(self, box: Box) -> Box:
+        r"""
+        @brief Returns the convolution product from this box with another box
+
+
+        The * operator convolves the firstbox with the one given as 
+        the second argument. The box resulting from "convolution" is the
+        outer boundary of the union set formed by placing 
+        the second box at every point of the first. In other words,
+        the returned box of (p1,p2)*(q1,q2) is (p1+q1,p2+q2).
+
+        @param box The box to convolve with this box.
+
+        @return The convolved box
+        """
+    @overload
+    def __rmul__(self, scale_factor: float) -> Box:
+        r"""
+        @brief Returns the scaled box
+
+
+        The * operator scales the box with the given factor and returns the result.
+
+        This method has been introduced in version 0.22.
+
+        @param scale_factor The scaling factor
+
+        @return The scaled box
         """
     def __str__(self) -> str:
         r"""
@@ -580,10 +627,21 @@ class DBox:
 
         @return The intersection box
         """
+    def __copy__(self) -> DBox:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, box: object) -> bool:
         r"""
         @brief Returns true if this box is equal to the other box
         Returns true, if this box and the given box are equal 
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given box. This method enables boxes as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -654,6 +712,42 @@ class DBox:
         r"""
         @brief Returns true if this box is not equal to the other box
         Returns true, if this box and the given box are not equal 
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing this box
+
+        This string can be turned into a box again by using \from_s
+        """
+    @overload
+    def __rmul__(self, box: DBox) -> DBox:
+        r"""
+        @brief Returns the convolution product from this box with another box
+
+
+        The * operator convolves the firstbox with the one given as 
+        the second argument. The box resulting from "convolution" is the
+        outer boundary of the union set formed by placing 
+        the second box at every point of the first. In other words,
+        the returned box of (p1,p2)*(q1,q2) is (p1+q1,p2+q2).
+
+        @param box The box to convolve with this box.
+
+        @return The convolved box
+        """
+    @overload
+    def __rmul__(self, scale_factor: float) -> DBox:
+        r"""
+        @brief Returns the scaled box
+
+
+        The * operator scales the box with the given factor and returns the result.
+
+        This method has been introduced in version 0.22.
+
+        @param scale_factor The scaling factor
+
+        @return The scaled box
         """
     def __str__(self) -> str:
         r"""
@@ -1001,6 +1095,14 @@ class Cell:
 
     This method has been introduced in version 0.23.
     """
+    def __copy__(self) -> Cell:
+        r"""
+        @brief Creates a copy of the cell
+
+        This method will create a copy of the cell. The new cell will be member of the same layout the original cell was member of. The copy will inherit all shapes and instances, but get a different cell_index and a modified name as duplicate cell names are not allowed in the same layout.
+
+        This method has been introduced in version 0.27.
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -1188,7 +1290,7 @@ class Cell:
 
         This variant has been added in version 0.25.
         """
-    def called_cells(self) -> Iterable[int]:
+    def called_cells(self) -> List[int]:
         r"""
         @brief Gets a list of all called cells
 
@@ -1199,7 +1301,7 @@ class Cell:
 
         @return A list of cell indices.
         """
-    def caller_cells(self) -> Iterable[int]:
+    def caller_cells(self) -> List[int]:
         r"""
         @brief Gets a list of all caller cells
 
@@ -1225,7 +1327,7 @@ class Cell:
         This method has been introduced in version 0.23.
         """
     @overload
-    def change_pcell_parameters(self, instance: Instance, parameters: Iterable[Any]) -> Instance:
+    def change_pcell_parameters(self, instance: Instance, parameters: Sequence[Any]) -> Instance:
         r"""
         @brief Changes the parameters for an individual PCell instance
         @return The new instance (the old may be invalid)
@@ -1346,7 +1448,7 @@ class Cell:
 
         This method has been added in version 0.23.
         """
-    def copy_tree(self, source_cell: Cell) -> Iterable[int]:
+    def copy_tree(self, source_cell: Cell) -> List[int]:
         r"""
         @brief Copies the cell tree of the given cell into this cell
         @param source_cell The cell from where to copy the cell tree
@@ -1456,20 +1558,20 @@ class Cell:
 
         This method has been introduced in version 0.27.
         """
-    def each_child_cell(self) -> Iterable[int]:
+    def each_child_cell(self) -> Iterator[int]:
         r"""
         @brief Iterates over all child cells
 
         This iterator will report the child cell indices, not every instance.
         """
-    def each_inst(self) -> Iterable[Instance]:
+    def each_inst(self) -> Iterator[Instance]:
         r"""
         @brief Iterates over all child instances (which may actually be instance arrays)
 
         Starting with version 0.15, this iterator delivers \Instance objects rather than \CellInstArray objects.
         """
     @overload
-    def each_overlapping_inst(self, b: Box) -> Iterable[Instance]:
+    def each_overlapping_inst(self, b: Box) -> Iterator[Instance]:
         r"""
         @brief Gets the instances overlapping the given rectangle
 
@@ -1481,7 +1583,7 @@ class Cell:
         Starting with version 0.15, this iterator delivers \Instance objects rather than \CellInstArray objects.
         """
     @overload
-    def each_overlapping_inst(self, b: DBox) -> Iterable[Instance]:
+    def each_overlapping_inst(self, b: DBox) -> Iterator[Instance]:
         r"""
         @brief Gets the instances overlapping the given rectangle, with the rectangle in micrometer units
 
@@ -1493,7 +1595,7 @@ class Cell:
         This variant has been introduced in version 0.25.
         """
     @overload
-    def each_overlapping_shape(self, layer_index: int, box: Box) -> Iterable[Shape]:
+    def each_overlapping_shape(self, layer_index: int, box: Box) -> Iterator[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer that overlap the given box
 
@@ -1504,7 +1606,7 @@ class Cell:
         This convenience method has been introduced in version 0.16.
         """
     @overload
-    def each_overlapping_shape(self, layer_index: int, box: DBox) -> Iterable[Shape]:
+    def each_overlapping_shape(self, layer_index: int, box: DBox) -> Iterator[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer that overlap the given box, with the box given in micrometer units
 
@@ -1515,7 +1617,7 @@ class Cell:
         This convenience method has been introduced in version 0.16.
         """
     @overload
-    def each_overlapping_shape(self, layer_index: int, box: Box, flags: int) -> Iterable[Shape]:
+    def each_overlapping_shape(self, layer_index: int, box: Box, flags: int) -> Iterator[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer that overlap the given box
 
@@ -1524,7 +1626,7 @@ class Cell:
         @param layer_index The layer on which to run the query
         """
     @overload
-    def each_overlapping_shape(self, layer_index: int, box: DBox, flags: int) -> Iterable[Shape]:
+    def each_overlapping_shape(self, layer_index: int, box: DBox, flags: int) -> Iterator[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer that overlap the given box, with the box given in micrometer units
 
@@ -1532,21 +1634,21 @@ class Cell:
         @param box The box by which to query the shapes as a \DBox object in micrometer units
         @param layer_index The layer on which to run the query
         """
-    def each_parent_cell(self) -> Iterable[int]:
+    def each_parent_cell(self) -> Iterator[int]:
         r"""
         @brief Iterates over all parent cells
 
         This iterator will iterate over the parent cells, just returning their
         cell index.
         """
-    def each_parent_inst(self) -> Iterable[ParentInstArray]:
+    def each_parent_inst(self) -> Iterator[ParentInstArray]:
         r"""
         @brief Iterates over the parent instance list (which may actually be instance arrays)
 
         The parent instances are basically inversions of the instances. Using parent instances it is possible to determine how a specific cell is called from where.
         """
     @overload
-    def each_shape(self, layer_index: int) -> Iterable[Shape]:
+    def each_shape(self, layer_index: int) -> Iterator[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer
 
@@ -1556,7 +1658,7 @@ class Cell:
         This convenience method has been introduced in version 0.16.
         """
     @overload
-    def each_shape(self, layer_index: int, flags: int) -> Iterable[Shape]:
+    def each_shape(self, layer_index: int, flags: int) -> Iterator[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer
 
@@ -1566,7 +1668,7 @@ class Cell:
         This iterator is equivalent to 'shapes(layer).each'.
         """
     @overload
-    def each_touching_inst(self, b: Box) -> Iterable[Instance]:
+    def each_touching_inst(self, b: Box) -> Iterator[Instance]:
         r"""
         @brief Gets the instances touching the given rectangle
 
@@ -1578,7 +1680,7 @@ class Cell:
         Starting with version 0.15, this iterator delivers \Instance objects rather than \CellInstArray objects.
         """
     @overload
-    def each_touching_inst(self, b: DBox) -> Iterable[Instance]:
+    def each_touching_inst(self, b: DBox) -> Iterator[Instance]:
         r"""
         @brief Gets the instances touching the given rectangle, with the rectangle in micrometer units
 
@@ -1590,7 +1692,7 @@ class Cell:
         This variant has been introduced in version 0.25.
         """
     @overload
-    def each_touching_shape(self, layer_index: int, box: Box) -> Iterable[Shape]:
+    def each_touching_shape(self, layer_index: int, box: Box) -> Iterator[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer that touch the given box
 
@@ -1601,7 +1703,7 @@ class Cell:
         This convenience method has been introduced in version 0.16.
         """
     @overload
-    def each_touching_shape(self, layer_index: int, box: DBox) -> Iterable[Shape]:
+    def each_touching_shape(self, layer_index: int, box: DBox) -> Iterator[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer that touch the given box, with the box given in micrometer units
 
@@ -1612,7 +1714,7 @@ class Cell:
         This convenience method has been introduced in version 0.16.
         """
     @overload
-    def each_touching_shape(self, layer_index: int, box: Box, flags: int) -> Iterable[Shape]:
+    def each_touching_shape(self, layer_index: int, box: Box, flags: int) -> Iterator[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer that touch the given box
 
@@ -1621,7 +1723,7 @@ class Cell:
         @param layer_index The layer on which to run the query
         """
     @overload
-    def each_touching_shape(self, layer_index: int, box: DBox, flags: int) -> Iterable[Shape]:
+    def each_touching_shape(self, layer_index: int, box: DBox, flags: int) -> Iterator[Shape]:
         r"""
         @brief Iterates over all shapes of a given layer that touch the given box, with the box given in micrometer units
 
@@ -1978,7 +2080,7 @@ class Cell:
 
         This method has been added in version 0.23.
         """
-    def move_tree(self, source_cell: Cell) -> Iterable[int]:
+    def move_tree(self, source_cell: Cell) -> List[int]:
         r"""
         @brief Moves the cell tree of the given cell into this cell
         @param source_cell The cell from where to move the cell tree
@@ -2092,7 +2194,7 @@ class Cell:
         This method has been introduced in version 0.25.
         """
     @overload
-    def pcell_parameters(self) -> Iterable[Any]:
+    def pcell_parameters(self) -> List[Any]:
         r"""
         @brief Returns the PCell parameters for a pcell variant
         If the cell is a PCell variant, this method returns a list of
@@ -2103,7 +2205,7 @@ class Cell:
         This method has been introduced in version 0.22.
         """
     @overload
-    def pcell_parameters(self, instance: Instance) -> Iterable[Any]:
+    def pcell_parameters(self, instance: Instance) -> List[Any]:
         r"""
         @brief Returns the PCell parameters for a pcell instance
         If the given instance is a PCell instance, this method returns a list of
@@ -2610,6 +2712,10 @@ class Instance:
 
     This method has been introduced in version 0.23.
     """
+    def __copy__(self) -> Instance:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, b: object) -> bool:
         r"""
         @brief Tests for equality of two Instance objects
@@ -2625,6 +2731,11 @@ class Instance:
         r"""
         @brief Creates a new object of this class
         """
+    def __len__(self) -> int:
+        r"""
+        @brief Gets the number of single instances in the instance array
+        If the instance represents a single instance, the count is 1. Otherwise it is na*nb.
+        """
     def __lt__(self, b: Instance) -> bool:
         r"""
         @brief Provides an order criterion for two Instance objects
@@ -2635,27 +2746,23 @@ class Instance:
         @brief Tests for inequality of two Instance objects
         Warning: this operator returns true if both objects refer to the same instance, not just identical ones.
         """
+    def __repr__(self) -> str:
+        r"""
+        @brief Creates a string showing the contents of the reference
+
+        This method has been introduced with version 0.16.
+        """
     def __setitem__(self, key: Any, value: Any) -> None:
         r"""
         @brief Sets the user property with the given key or, if available, the PCell parameter with the name given by the key
         Setting the PCell parameter has priority over the user property.
         This method has been introduced in version 0.25.
         """
-    @overload
     def __str__(self) -> str:
         r"""
         @brief Creates a string showing the contents of the reference
 
         This method has been introduced with version 0.16.
-        """
-    @overload
-    def __str__(self, with_cellname: bool) -> str:
-        r"""
-        @brief Creates a string showing the contents of the reference
-
-        Passing true to with_cellname makes the string contain the cellname instead of the cell index
-
-        This method has been introduced with version 0.23.
         """
     def _create(self) -> None:
         r"""
@@ -2720,7 +2827,7 @@ class Instance:
         This method has been introduced in version 0.24.
         """
     @overload
-    def change_pcell_parameters(self, params: Iterable[Any]) -> None:
+    def change_pcell_parameters(self, params: Sequence[Any]) -> None:
         r"""
         @brief Changes the parameters of a PCell instance to the list of parameters
 
@@ -2863,7 +2970,7 @@ class Instance:
 
         This method has been introduced in version 0.25.
         """
-    def pcell_parameters(self) -> Iterable[Any]:
+    def pcell_parameters(self) -> List[Any]:
         r"""
         @brief Gets the parameters of a PCell instance as a list of values
         @return A list of values
@@ -2998,6 +3105,10 @@ class ParentInstArray:
 
     See @<a href="/programming/database_api.xml">The Database API@</a> for more details about the database objects.
     """
+    def __copy__(self) -> ParentInstArray:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -3134,9 +3245,20 @@ class CellInstArray:
 
     This method was introduced in version 0.22.
     """
+    def __copy__(self) -> CellInstArray:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Compares two arrays for equality
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given cell instance. This method enables cell instances as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -3183,6 +3305,11 @@ class CellInstArray:
 
         Starting with version 0.25 the displacements are of vector type.
         """
+    def __len__(self) -> int:
+        r"""
+        @brief Gets the number of single instances in the array
+        If the instance represents a single instance, the count is 1. Otherwise it is na*nb. Starting with version 0.27, there may be iterated instances for which the size is larger than 1, but \is_regular_array? will return false. In this case, use \each_trans or \each_cplx_trans to retrieve the individual placements of the iterated instance.
+        """
     def __lt__(self, other: CellInstArray) -> bool:
         r"""
         @brief Compares two arrays for 'less'
@@ -3191,6 +3318,12 @@ class CellInstArray:
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Compares two arrays for inequality
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts the array to a string
+
+        This method was introduced in version 0.22.
         """
     def __str__(self) -> str:
         r"""
@@ -3253,7 +3386,7 @@ class CellInstArray:
         r"""
         @brief Creates a copy of self
         """
-    def each_cplx_trans(self) -> Iterable[ICplxTrans]:
+    def each_cplx_trans(self) -> Iterator[ICplxTrans]:
         r"""
         @brief Gets the complex transformations represented by this instance
         For a single instance, this iterator will deliver the single, complex transformation. For array instances, the iterator will deliver each complex transformation of the expanded array.
@@ -3261,7 +3394,7 @@ class CellInstArray:
 
         This method has been introduced in version 0.25.
         """
-    def each_trans(self) -> Iterable[Trans]:
+    def each_trans(self) -> Iterator[Trans]:
         r"""
         @brief Gets the simple transformations represented by this instance
         For a single instance, this iterator will deliver the single, simple transformation. For array instances, the iterator will deliver each simple transformation of the expanded array.
@@ -3387,9 +3520,20 @@ class DCellInstArray:
     @brief Gets the transformation of the first instance in the array
     The transformation returned is only valid if the array does not represent a complex transformation array@brief Sets the transformation of the instance or the first instance in the array
     """
+    def __copy__(self) -> DCellInstArray:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Compares two arrays for equality
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given cell instance. This method enables cell instances as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -3432,6 +3576,11 @@ class DCellInstArray:
         @param na The number of placements in the 'a' axis
         @param nb The number of placements in the 'b' axis
         """
+    def __len__(self) -> int:
+        r"""
+        @brief Gets the number of single instances in the array
+        If the instance represents a single instance, the count is 1. Otherwise it is na*nb. Starting with version 0.27, there may be iterated instances for which the size is larger than 1, but \is_regular_array? will return false. In this case, use \each_trans or \each_cplx_trans to retrieve the individual placements of the iterated instance.
+        """
     def __lt__(self, other: DCellInstArray) -> bool:
         r"""
         @brief Compares two arrays for 'less'
@@ -3440,6 +3589,10 @@ class DCellInstArray:
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Compares two arrays for inequality
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts the array to a string
         """
     def __str__(self) -> str:
         r"""
@@ -3500,13 +3653,13 @@ class DCellInstArray:
         r"""
         @brief Creates a copy of self
         """
-    def each_cplx_trans(self) -> Iterable[DCplxTrans]:
+    def each_cplx_trans(self) -> Iterator[DCplxTrans]:
         r"""
         @brief Gets the complex transformations represented by this instance
         For a single instance, this iterator will deliver the single, complex transformation. For array instances, the iterator will deliver each complex transformation of the expanded array.
         This iterator is a generalization of \each_trans for general complex transformations.
         """
-    def each_trans(self) -> Iterable[DTrans]:
+    def each_trans(self) -> Iterator[DTrans]:
         r"""
         @brief Gets the simple transformations represented by this instance
         For a single instance, this iterator will deliver the single, simple transformation. For array instances, the iterator will deliver each simple transformation of the expanded array.
@@ -3618,6 +3771,10 @@ class CellMapping:
 
     This constant has been introduced in version 0.25.
     """
+    def __copy__(self) -> CellMapping:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -3683,7 +3840,7 @@ class CellMapping:
         r"""
         @brief Creates a copy of self
         """
-    def for_multi_cells(self, layout_a: Layout, cell_indexes_a: Iterable[int], layout_b: Layout, cell_indexes_b: Iterable[int]) -> None:
+    def for_multi_cells(self, layout_a: Layout, cell_indexes_a: Sequence[int], layout_b: Layout, cell_indexes_b: Sequence[int]) -> None:
         r"""
         @brief Initializes the cell mapping for top-level identity
 
@@ -3698,7 +3855,7 @@ class CellMapping:
 
         This method has been introduced in version 0.27.
         """
-    def for_multi_cells_full(self, layout_a: Layout, cell_indexes_a: Iterable[int], layout_b: Layout, cell_indexes_b: Iterable[int]) -> Iterable[int]:
+    def for_multi_cells_full(self, layout_a: Layout, cell_indexes_a: Sequence[int], layout_b: Layout, cell_indexes_b: Sequence[int]) -> List[int]:
         r"""
         @brief Initializes the cell mapping for top-level identity
 
@@ -3726,7 +3883,7 @@ class CellMapping:
 
         This method has been introduced in version 0.23.
         """
-    def for_single_cell_full(self, layout_a: Layout, cell_index_a: int, layout_b: Layout, cell_index_b: int) -> Iterable[int]:
+    def for_single_cell_full(self, layout_a: Layout, cell_index_a: int, layout_b: Layout, cell_index_b: int) -> List[int]:
         r"""
         @brief Initializes the cell mapping for top-level identity
 
@@ -3753,7 +3910,7 @@ class CellMapping:
 
         This method has been introduced in version 0.23.
         """
-    def from_geometry_full(self, layout_a: Layout, cell_index_a: int, layout_b: Layout, cell_index_b: int) -> Iterable[int]:
+    def from_geometry_full(self, layout_a: Layout, cell_index_a: int, layout_b: Layout, cell_index_b: int) -> List[int]:
         r"""
         @brief Initializes the cell mapping using the geometrical identity in full mapping mode
 
@@ -3784,7 +3941,7 @@ class CellMapping:
 
         This method has been introduced in version 0.23.
         """
-    def from_names_full(self, layout_a: Layout, cell_index_a: int, layout_b: Layout, cell_index_b: int) -> Iterable[int]:
+    def from_names_full(self, layout_a: Layout, cell_index_a: int, layout_b: Layout, cell_index_b: int) -> List[int]:
         r"""
         @brief Initializes the cell mapping using the name identity in full mapping mode
 
@@ -3883,6 +4040,10 @@ class CompoundRegionOperationNode:
             r"""
             @brief Compares two enums for inequality
             """
+        def __repr__(self) -> str:
+            r"""
+            @brief Gets the symbolic string from an enum
+            """
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
@@ -3943,6 +4104,10 @@ class CompoundRegionOperationNode:
             r"""
             @brief Compares two enums for inequality
             """
+        def __repr__(self) -> str:
+            r"""
+            @brief Gets the symbolic string from an enum
+            """
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
@@ -3998,6 +4163,10 @@ class CompoundRegionOperationNode:
         def __ne__(self, other: object) -> bool:
             r"""
             @brief Compares two enums for inequality
+            """
+        def __repr__(self) -> str:
+            r"""
+            @brief Gets the symbolic string from an enum
             """
         def __str__(self) -> str:
             r"""
@@ -4063,6 +4232,10 @@ class CompoundRegionOperationNode:
             r"""
             @brief Compares two enums for inequality
             """
+        def __repr__(self) -> str:
+            r"""
+            @brief Gets the symbolic string from an enum
+            """
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
@@ -4119,6 +4292,10 @@ class CompoundRegionOperationNode:
             r"""
             @brief Compares two enums for inequality
             """
+        def __repr__(self) -> str:
+            r"""
+            @brief Gets the symbolic string from an enum
+            """
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
@@ -4162,7 +4339,7 @@ class CompoundRegionOperationNode:
         This node renders the input if the specified bounding box parameter of the input shape is between pmin and pmax (exclusively). If 'inverse' is set to true, the input shape is returned if the parameter is less than pmin (exclusively) or larger than pmax (inclusively).
         """
     @classmethod
-    def new_case(cls, inputs: Iterable[CompoundRegionOperationNode]) -> CompoundRegionOperationNode:
+    def new_case(cls, inputs: Sequence[CompoundRegionOperationNode]) -> CompoundRegionOperationNode:
         r"""
         @brief Creates a 'switch ladder' (case statement) compound operation node.
 
@@ -4321,12 +4498,12 @@ class CompoundRegionOperationNode:
         @brief Creates a node providing a isolated polygons (space between different polygons) check.
         """
     @classmethod
-    def new_join(cls, inputs: Iterable[CompoundRegionOperationNode]) -> CompoundRegionOperationNode:
+    def new_join(cls, inputs: Sequence[CompoundRegionOperationNode]) -> CompoundRegionOperationNode:
         r"""
         @brief Creates a node that joins the inputs.
         """
     @classmethod
-    def new_logical_boolean(cls, op: CompoundRegionOperationNode.LogicalOp, invert: bool, inputs: Iterable[CompoundRegionOperationNode]) -> CompoundRegionOperationNode:
+    def new_logical_boolean(cls, op: CompoundRegionOperationNode.LogicalOp, invert: bool, inputs: Sequence[CompoundRegionOperationNode]) -> CompoundRegionOperationNode:
         r"""
         @brief Creates a node representing a logical boolean operation between the inputs.
 
@@ -4351,15 +4528,15 @@ class CompoundRegionOperationNode:
         """
     @overload
     @classmethod
-    def new_minkowski_sum(cls, input: CompoundRegionOperationNode, p: Iterable[Point]) -> CompoundRegionOperationNode:
-        r"""
-        @brief Creates a node providing a Minkowski sum with a point sequence forming a contour.
-        """
-    @overload
-    @classmethod
     def new_minkowski_sum(cls, input: CompoundRegionOperationNode, p: Polygon) -> CompoundRegionOperationNode:
         r"""
         @brief Creates a node providing a Minkowski sum with a polygon.
+        """
+    @overload
+    @classmethod
+    def new_minkowski_sum(cls, input: CompoundRegionOperationNode, p: Sequence[Point]) -> CompoundRegionOperationNode:
+        r"""
+        @brief Creates a node providing a Minkowski sum with a point sequence forming a contour.
         """
     @classmethod
     def new_notch_check(cls, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Region.Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., negative: Optional[bool] = ...) -> CompoundRegionOperationNode:
@@ -4554,6 +4731,10 @@ class TrapezoidDecompositionMode:
     r"""
     @brief Indicates vertical trapezoid decomposition.
     """
+    def __copy__(self) -> TrapezoidDecompositionMode:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Compares two enums
@@ -4575,6 +4756,10 @@ class TrapezoidDecompositionMode:
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Compares two enums for inequality
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Gets the symbolic string from an enum
         """
     def __str__(self) -> str:
         r"""
@@ -4664,6 +4849,10 @@ class PreferredOrientation:
     r"""
     @brief Indicates vertical trapezoid decomposition.
     """
+    def __copy__(self) -> PreferredOrientation:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Compares two enums
@@ -4685,6 +4874,10 @@ class PreferredOrientation:
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Compares two enums for inequality
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Gets the symbolic string from an enum
         """
     def __str__(self) -> str:
         r"""
@@ -4765,10 +4958,6 @@ class DeepShapeStore:
 
     This class has been introduced in version 0.26.
     """
-    instance_count: ClassVar[int]
-    r"""
-    @hide
-    """
     max_area_ratio: float
     r"""
     @brief Gets the max. area ratio.
@@ -4821,6 +5010,11 @@ class DeepShapeStore:
     @brief Gets the number of threads.
     @brief Sets the number of threads to allocate for the hierarchical processor
     """
+    @classmethod
+    def instance_count(cls) -> int:
+        r"""
+        @hide
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -4862,7 +5056,7 @@ class DeepShapeStore:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
-    def add_breakout_cell(self, layout_index: int, cell_index: Iterable[int]) -> None:
+    def add_breakout_cell(self, layout_index: int, cell_index: Sequence[int]) -> None:
         r"""
         @brief Adds a cell indexe to the breakout cell list for the given layout inside the store
         See \clear_breakout_cells for an explanation of breakout cells.
@@ -4878,7 +5072,7 @@ class DeepShapeStore:
         This method has been added in version 0.26.1
         """
     @overload
-    def add_breakout_cells(self, layout_index: int, cells: Iterable[int]) -> None:
+    def add_breakout_cells(self, layout_index: int, cells: Sequence[int]) -> None:
         r"""
         @brief Adds cell indexes to the breakout cell list for the given layout inside the store
         See \clear_breakout_cells for an explanation of breakout cells.
@@ -4940,7 +5134,7 @@ class DeepShapeStore:
         This method has been added in version 0.26.1
         """
     @overload
-    def set_breakout_cells(self, layout_index: int, cells: Iterable[int]) -> None:
+    def set_breakout_cells(self, layout_index: int, cells: Sequence[int]) -> None:
         r"""
         @brief Sets the breakout cell list (as cell indexes) for the given layout inside the store
         See \clear_breakout_cells for an explanation of breakout cells.
@@ -5009,10 +5203,21 @@ class Edge:
 
         This method has been added in version 0.23.
         """
+    def __copy__(self) -> Edge:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, e: object) -> bool:
         r"""
         @brief Equality test
         @param e The object to compare against
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given edge. This method enables edges as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -5062,6 +5267,22 @@ class Edge:
         r"""
         @brief Inequality test
         @param e The object to compare against
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the edge
+        """
+    def __rmul__(self, scale_factor: float) -> Edge:
+        r"""
+        @brief Scale edge
+
+        The * operator scales self with the given factor.
+
+        This method has been introduced in version 0.22.
+
+        @param scale_factor The scaling factor
+
+        @return The scaled edge
         """
     def __str__(self) -> str:
         r"""
@@ -5583,10 +5804,21 @@ class DEdge:
 
         This method has been added in version 0.23.
         """
+    def __copy__(self) -> DEdge:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, e: object) -> bool:
         r"""
         @brief Equality test
         @param e The object to compare against
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given edge. This method enables edges as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -5636,6 +5868,22 @@ class DEdge:
         r"""
         @brief Inequality test
         @param e The object to compare against
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the edge
+        """
+    def __rmul__(self, scale_factor: float) -> DEdge:
+        r"""
+        @brief Scale edge
+
+        The * operator scales self with the given factor.
+
+        This method has been introduced in version 0.22.
+
+        @param scale_factor The scaling factor
+
+        @return The scaled edge
         """
     def __str__(self) -> str:
         r"""
@@ -6137,10 +6385,21 @@ class EdgePair:
 
         This method has been added in version 0.23.
         """
+    def __copy__(self) -> EdgePair:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, box: object) -> bool:
         r"""
         @brief Equality
         Returns true, if this edge pair and the given one are equal
+
+        This method has been introduced in version 0.25.
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given edge pair. This method enables edge pairs as hash keys.
 
         This method has been introduced in version 0.25.
         """
@@ -6179,6 +6438,10 @@ class EdgePair:
         Returns true, if this edge pair and the given one are not equal
 
         This method has been introduced in version 0.25.
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the edge pair
         """
     def __str__(self) -> str:
         r"""
@@ -6367,10 +6630,21 @@ class DEdgePair:
 
         This method has been added in version 0.23.
         """
+    def __copy__(self) -> DEdgePair:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, box: object) -> bool:
         r"""
         @brief Equality
         Returns true, if this edge pair and the given one are equal
+
+        This method has been introduced in version 0.25.
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given edge pair. This method enables edge pairs as hash keys.
 
         This method has been introduced in version 0.25.
         """
@@ -6409,6 +6683,10 @@ class DEdgePair:
         Returns true, if this edge pair and the given one are not equal
 
         This method has been introduced in version 0.25.
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the edge pair
         """
     def __str__(self) -> str:
         r"""
@@ -6576,6 +6854,10 @@ class EdgePairs(ShapeCollection):
 
         This method has been introduced in version 0.24.
         """
+    def __copy__(self) -> EdgePairs:
+        r"""
+        @brief Creates a copy of self
+        """
     def __getitem__(self, n: int) -> EdgePair:
         r"""
         @brief Returns the nth edge pair
@@ -6602,7 +6884,7 @@ class EdgePairs(ShapeCollection):
         This constructor creates an empty edge pair collection.
         """
     @overload
-    def __init__(self, array: Iterable[EdgePair]) -> None:
+    def __init__(self, array: Sequence[EdgePair]) -> None:
         r"""
         @brief Constructor from an edge pair array
 
@@ -6709,17 +6991,19 @@ class EdgePairs(ShapeCollection):
 
         This constructor has been introduced in version 0.26.
         """
-    @overload
-    def __str__(self) -> str:
+    def __iter__(self) -> Iterator[EdgePair]:
+        r"""
+        @brief Returns each edge pair of the edge pair collection
+        """
+    def __repr__(self) -> str:
         r"""
         @brief Converts the edge pair collection to a string
         The length of the output is limited to 20 edge pairs to avoid giant strings on large regions. For full output use "to_s" with a maximum count parameter.
         """
-    @overload
-    def __str__(self, max_count: int) -> str:
+    def __str__(self) -> str:
         r"""
         @brief Converts the edge pair collection to a string
-        This version allows specification of the maximum number of edge pairs contained in the string.
+        The length of the output is limited to 20 edge pairs to avoid giant strings on large regions. For full output use "to_s" with a maximum count parameter.
         """
     def _create(self) -> None:
         r"""
@@ -6794,7 +7078,7 @@ class EdgePairs(ShapeCollection):
         r"""
         @brief Creates a copy of self
         """
-    def each(self) -> Iterable[EdgePair]:
+    def each(self) -> Iterator[EdgePair]:
         r"""
         @brief Returns each edge pair of the edge pair collection
         """
@@ -7276,6 +7560,10 @@ class EdgeProcessor:
     r"""
     @brief boolean method's mode value for XOR operation
     """
+    def __copy__(self) -> EdgeProcessor:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -7321,7 +7609,7 @@ class EdgeProcessor:
         r"""
         @brief Assigns another object to self
         """
-    def boolean_e2e(self, a: Iterable[Edge], b: Iterable[Edge], mode: int) -> Iterable[Edge]:
+    def boolean_e2e(self, a: Sequence[Edge], b: Sequence[Edge], mode: int) -> List[Edge]:
         r"""
         @brief Boolean operation for a set of given edges, creating edges
 
@@ -7339,7 +7627,7 @@ class EdgeProcessor:
         @param mode The boolean mode (one of the Mode.. values)
         @return The output edges
         """
-    def boolean_e2p(self, a: Iterable[Edge], b: Iterable[Edge], mode: int, resolve_holes: bool, min_coherence: bool) -> Iterable[Polygon]:
+    def boolean_e2p(self, a: Sequence[Edge], b: Sequence[Edge], mode: int, resolve_holes: bool, min_coherence: bool) -> List[Polygon]:
         r"""
         @brief Boolean operation for a set of given edges, creating polygons
 
@@ -7358,7 +7646,7 @@ class EdgeProcessor:
         @param min_coherence true, if touching corners should be resolved into less connected contours
         @return The output polygons
         """
-    def boolean_p2e(self, a: Iterable[Polygon], b: Iterable[Polygon], mode: int) -> Iterable[Edge]:
+    def boolean_p2e(self, a: Sequence[Polygon], b: Sequence[Polygon], mode: int) -> List[Edge]:
         r"""
         @brief Boolean operation for a set of given polygons, creating edges
 
@@ -7376,7 +7664,7 @@ class EdgeProcessor:
         @param mode The boolean mode
         @return The output edges
         """
-    def boolean_p2p(self, a: Iterable[Polygon], b: Iterable[Polygon], mode: int, resolve_holes: bool, min_coherence: bool) -> Iterable[Polygon]:
+    def boolean_p2p(self, a: Sequence[Polygon], b: Sequence[Polygon], mode: int, resolve_holes: bool, min_coherence: bool) -> List[Polygon]:
         r"""
         @brief Boolean operation for a set of given polygons, creating polygons
 
@@ -7415,7 +7703,7 @@ class EdgeProcessor:
 
         This method has been introduced in version 0.23.
         """
-    def merge_p2e(self, in_: Iterable[Polygon], min_wc: int) -> Iterable[Edge]:
+    def merge_p2e(self, in_: Sequence[Polygon], min_wc: int) -> List[Edge]:
         r"""
         @brief Merge the given polygons 
 
@@ -7434,7 +7722,7 @@ class EdgeProcessor:
         @param min_wc The minimum wrap count for output (0: all polygons, 1: at least two overlapping)
         @return The output edges
         """
-    def merge_p2p(self, in_: Iterable[Polygon], min_wc: int, resolve_holes: bool, min_coherence: bool) -> Iterable[Polygon]:
+    def merge_p2p(self, in_: Sequence[Polygon], min_wc: int, resolve_holes: bool, min_coherence: bool) -> List[Polygon]:
         r"""
         @brief Merge the given polygons 
 
@@ -7455,7 +7743,7 @@ class EdgeProcessor:
         @return The output polygons
         """
     @overload
-    def simple_merge_e2e(self, in_: Iterable[Edge]) -> Iterable[Edge]:
+    def simple_merge_e2e(self, in_: Sequence[Edge]) -> List[Edge]:
         r"""
         @brief Merge the given edges in a simple "non-zero wrapcount" fashion
 
@@ -7474,7 +7762,7 @@ class EdgeProcessor:
         @return The output edges
         """
     @overload
-    def simple_merge_e2e(self, in_: Iterable[Edge], mode: int) -> Iterable[Edge]:
+    def simple_merge_e2e(self, in_: Sequence[Edge], mode: int) -> List[Edge]:
         r"""
         @brief Merge the given polygons and specify the merge mode
 
@@ -7496,7 +7784,7 @@ class EdgeProcessor:
         @return The output edges
         """
     @overload
-    def simple_merge_e2p(self, in_: Iterable[Edge], resolve_holes: bool, min_coherence: bool) -> Iterable[Polygon]:
+    def simple_merge_e2p(self, in_: Sequence[Edge], resolve_holes: bool, min_coherence: bool) -> List[Polygon]:
         r"""
         @brief Merge the given edges in a simple "non-zero wrapcount" fashion into polygons
 
@@ -7516,7 +7804,7 @@ class EdgeProcessor:
         @return The output polygons
         """
     @overload
-    def simple_merge_e2p(self, in_: Iterable[Edge], resolve_holes: bool, min_coherence: bool, mode: int) -> Iterable[Polygon]:
+    def simple_merge_e2p(self, in_: Sequence[Edge], resolve_holes: bool, min_coherence: bool, mode: int) -> List[Polygon]:
         r"""
         @brief Merge the given polygons and specify the merge mode
 
@@ -7539,7 +7827,7 @@ class EdgeProcessor:
         @return The output polygons
         """
     @overload
-    def simple_merge_p2e(self, in_: Iterable[Polygon]) -> Iterable[Edge]:
+    def simple_merge_p2e(self, in_: Sequence[Polygon]) -> List[Edge]:
         r"""
         @brief Merge the given polygons in a simple "non-zero wrapcount" fashion
 
@@ -7560,7 +7848,7 @@ class EdgeProcessor:
         @return The output edges
         """
     @overload
-    def simple_merge_p2e(self, in_: Iterable[Polygon], mode: int) -> Iterable[Edge]:
+    def simple_merge_p2e(self, in_: Sequence[Polygon], mode: int) -> List[Edge]:
         r"""
         @brief Merge the given polygons and specify the merge mode
 
@@ -7584,7 +7872,7 @@ class EdgeProcessor:
         @return The output edges
         """
     @overload
-    def simple_merge_p2p(self, in_: Iterable[Polygon], resolve_holes: bool, min_coherence: bool) -> Iterable[Polygon]:
+    def simple_merge_p2p(self, in_: Sequence[Polygon], resolve_holes: bool, min_coherence: bool) -> List[Polygon]:
         r"""
         @brief Merge the given polygons in a simple "non-zero wrapcount" fashion into polygons
 
@@ -7606,7 +7894,7 @@ class EdgeProcessor:
         @return The output polygons
         """
     @overload
-    def simple_merge_p2p(self, in_: Iterable[Polygon], resolve_holes: bool, min_coherence: bool, mode: int) -> Iterable[Polygon]:
+    def simple_merge_p2p(self, in_: Sequence[Polygon], resolve_holes: bool, min_coherence: bool, mode: int) -> List[Polygon]:
         r"""
         @brief Merge the given polygons and specify the merge mode
 
@@ -7631,7 +7919,7 @@ class EdgeProcessor:
         @return The output polygons
         """
     @overload
-    def size_p2e(self, in_: Iterable[Polygon], d: int, mode: int) -> Iterable[Edge]:
+    def size_p2e(self, in_: Sequence[Polygon], d: int, mode: int) -> List[Edge]:
         r"""
         @brief Size the given polygons (isotropic)
 
@@ -7645,7 +7933,7 @@ class EdgeProcessor:
         @return The output edges
         """
     @overload
-    def size_p2e(self, in_: Iterable[Polygon], dx: int, dy: int, mode: int) -> Iterable[Edge]:
+    def size_p2e(self, in_: Sequence[Polygon], dx: int, dy: int, mode: int) -> List[Edge]:
         r"""
         @brief Size the given polygons 
 
@@ -7669,7 +7957,7 @@ class EdgeProcessor:
         @return The output edges
         """
     @overload
-    def size_p2p(self, in_: Iterable[Polygon], d: int, mode: int, resolve_holes: bool, min_coherence: bool) -> Iterable[Polygon]:
+    def size_p2p(self, in_: Sequence[Polygon], d: int, mode: int, resolve_holes: bool, min_coherence: bool) -> List[Polygon]:
         r"""
         @brief Size the given polygons into polygons (isotropic)
 
@@ -7685,7 +7973,7 @@ class EdgeProcessor:
         @return The output polygons
         """
     @overload
-    def size_p2p(self, in_: Iterable[Polygon], dx: int, dy: int, mode: int, resolve_holes: bool, min_coherence: bool) -> Iterable[Polygon]:
+    def size_p2p(self, in_: Sequence[Polygon], dx: int, dy: int, mode: int, resolve_holes: bool, min_coherence: bool) -> List[Polygon]:
         r"""
         @brief Size the given polygons into polygons
 
@@ -7796,6 +8084,10 @@ class Edges(ShapeCollection):
 
         This method has been introduced in version 0.24.
         """
+    def __copy__(self) -> Edges:
+        r"""
+        @brief Creates a copy of self
+        """
     def __getitem__(self, n: int) -> Edge:
         r"""
         @brief Returns the nth edge of the collection
@@ -7844,14 +8136,14 @@ class Edges(ShapeCollection):
         This constructor creates an empty edge collection.
         """
     @overload
-    def __init__(self, array: Iterable[Edge]) -> None:
+    def __init__(self, array: Sequence[Edge]) -> None:
         r"""
         @brief Constructor from an edge array
 
         This constructor creates an edge collection from an array of edges.
         """
     @overload
-    def __init__(self, array: Iterable[Polygon]) -> None:
+    def __init__(self, array: Sequence[Polygon]) -> None:
         r"""
         @brief Constructor from a polygon array
 
@@ -8058,6 +8350,10 @@ class Edges(ShapeCollection):
 
         This method has been introduced in version 0.24.
         """
+    def __iter__(self) -> Iterator[Edge]:
+        r"""
+        @brief Returns each edge of the region
+        """
     def __ixor__(self, other: Edges) -> Edges:
         r"""
         @brief Performs the boolean XOR between self and the other edge collection
@@ -8075,17 +8371,15 @@ class Edges(ShapeCollection):
 
         The boolean OR is implemented by merging the edges of both edge sets. To simply join the edge collections without merging, the + operator is more efficient.
         """
-    @overload
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         r"""
         @brief Converts the edge collection to a string
         The length of the output is limited to 20 edges to avoid giant strings on large regions. For full output use "to_s" with a maximum count parameter.
         """
-    @overload
-    def __str__(self, max_count: int) -> str:
+    def __str__(self) -> str:
         r"""
         @brief Converts the edge collection to a string
-        This version allows specification of the maximum number of edges contained in the string.
+        The length of the output is limited to 20 edges to avoid giant strings on large regions. For full output use "to_s" with a maximum count parameter.
         """
     @overload
     def __sub__(self, other: Edges) -> Edges:
@@ -8209,11 +8503,11 @@ class Edges(ShapeCollection):
         r"""
         @brief Creates a copy of self
         """
-    def each(self) -> Iterable[Edge]:
+    def each(self) -> Iterator[Edge]:
         r"""
         @brief Returns each edge of the region
         """
-    def each_merged(self) -> Iterable[Edge]:
+    def each_merged(self) -> Iterator[Edge]:
         r"""
         @brief Returns each edge of the region
 
@@ -8227,6 +8521,30 @@ class Edges(ShapeCollection):
         After calling this method, the edge collection will report the progress through a progress bar while expensive operations are running.
         The label is a text which is put in front of the progress bar.
         Using a progress bar will imply a performance penalty of a few percent typically.
+        """
+    def enclosed_check(self, other: Edges, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Region.Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ...) -> EdgePairs:
+        r"""
+        Note: This is an alias of 'inside_check'.
+        @brief Performs an inside check with options
+        @param d The minimum distance for which the edges are checked
+        @param other The other edge collection against which to check
+        @param whole_edges If true, deliver the whole edges
+        @param metrics Specify the metrics type
+        @param ignore_angle The threshold angle above which no check is performed
+        @param min_projection The lower threshold of the projected length of one edge onto another
+        @param max_projection The upper threshold of the projected length of one edge onto another
+
+        If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
+
+        "metrics" can be one of the constants \Euclidian, \Square or \Projection. See there for a description of these constants.
+        Use nil for this value to select the default (Euclidian metrics).
+
+        "ignore_angle" specifies the angle threshold of two edges. If two edges form an angle equal or above the given value, they will not contribute in the check. Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.
+        Use nil for this value to select the default.
+
+        "min_projection" and "max_projection" allow selecting edges by their projected value upon each other. It is sufficient if the projection of one edge on the other matches the specified condition. The projected length must be larger or equal to "min_projection" and less than "max_projection". If you don't want to specify one threshold, pass nil to the respective value.
+
+        The 'enclosed_check' alias was introduced in version 0.27.5.
         """
     def enclosing_check(self, other: Edges, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Region.Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ...) -> EdgePairs:
         r"""
@@ -8365,7 +8683,7 @@ class Edges(ShapeCollection):
         This method has been introduced in version 0.25.
         """
     @overload
-    def insert(self, edges: Iterable[Edge]) -> None:
+    def insert(self, edges: Sequence[Edge]) -> None:
         r"""
         @brief Inserts all edges from the array into this edge collection
         """
@@ -8391,7 +8709,7 @@ class Edges(ShapeCollection):
         Inserts the edges that form the contour of the simple polygon into the edge collection.
         """
     @overload
-    def insert(self, polygons: Iterable[Polygon]) -> None:
+    def insert(self, polygons: Sequence[Polygon]) -> None:
         r"""
         @brief Inserts all polygons from the array into this edge collection
         """
@@ -9052,23 +9370,30 @@ class TextGenerator:
 
     This class has been introduced in version 0.25.
     """
-    default_generator: ClassVar[TextGenerator]
-    r"""
-    @brief Gets the default text generator (a standard font)
-    This method delivers the default generator or nil if no such generator is installed.
-    """
-    font_paths: ClassVar[Iterable[str]]
-    r"""
-    @brief Gets the paths where to look for font files
-    See \set_font_paths for a description of this function.
+    @classmethod
+    def default_generator(cls) -> TextGenerator:
+        r"""
+        @brief Gets the default text generator (a standard font)
+        This method delivers the default generator or nil if no such generator is installed.
+        """
+    @classmethod
+    def font_paths(cls) -> List[str]:
+        r"""
+        @brief Gets the paths where to look for font files
+        See \set_font_paths for a description of this function.
 
-    This method has been introduced in version 0.27.4.
-    """
-    generators: ClassVar[Iterable[TextGenerator]]
-    r"""
-    @brief Gets the generators registered in the system
-    This method delivers a list of generator objects that can be used to create texts.
-    """
+        This method has been introduced in version 0.27.4.
+        """
+    @classmethod
+    def generators(cls) -> List[TextGenerator]:
+        r"""
+        @brief Gets the generators registered in the system
+        This method delivers a list of generator objects that can be used to create texts.
+        """
+    def __copy__(self) -> TextGenerator:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -9193,7 +9518,7 @@ class TextGenerator:
         @brief Gets the name of the generator
         The generator's name is the basic key by which the generator is identified.
         """
-    def set_font_paths(self, arg0: Iterable[str]) -> None:
+    def set_font_paths(self, arg0: Sequence[str]) -> None:
         r"""
         @brief Sets the paths where to look for font files
         This function sets the paths where to look for font files. After setting such a path, each font found will render a specific generator. The generator can be found under the font file's name. As the text generator is also the basis for the Basic.TEXT PCell, using this function also allows configuring custom fonts for this library cell.
@@ -9232,6 +9557,10 @@ class Connectivity:
     The connectivity object also manages the global nets. Global nets are substrate for example and they are propagated automatically from subcircuits to circuits. Global nets are defined by name and are managed through IDs. To get the name for a given ID, use \global_net_name.
     This class has been introduced in version 0.26.
     """
+    def __copy__(self) -> Connectivity:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -9311,6 +9640,10 @@ class InstElement:
 
     This objects are used to reference a single instance in a instantiation path. The object is composed of a \CellInstArray object (accessible through the \cell_inst accessor) that describes the basic instance, which may be an array. The particular instance within the array can be further retrieved using the \array_member_trans, \specific_trans or \specific_cplx_trans methods.
     """
+    def __copy__(self) -> InstElement:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, b: object) -> bool:
         r"""
         @brief Equality of two InstElement objects
@@ -9473,6 +9806,10 @@ class LayerMapping:
 
     This class has been introduced in version 0.23.
     """
+    def __copy__(self) -> LayerMapping:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -9532,7 +9869,7 @@ class LayerMapping:
         The layer mapping is created by looking up each layer of layout_b in layout_a. All layers with matching specifications (\LayerInfo) are mapped. Layouts without a layer/datatype/name specification will not be mapped.
         \create_full is a version of this method which creates new layers in layout_a if no corresponding layer is found.
         """
-    def create_full(self, layout_a: Layout, layout_b: Layout) -> Iterable[int]:
+    def create_full(self, layout_a: Layout, layout_b: Layout) -> List[int]:
         r"""
         @brief Initialize the layer mapping from two layouts
 
@@ -9609,12 +9946,23 @@ class LayerInfo:
     @brief Set the layer name
     The name is set on OASIS input for example, if the layer has a name.
     """
+    def __copy__(self) -> LayerInfo:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, b: object) -> bool:
         r"""
         @brief Compares two layer info objects
         @return True, if both are equal
 
         This method was added in version 0.18.
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given layer info object. This method enables layer info objects as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -9660,16 +10008,6 @@ class LayerInfo:
         @return True, if both are not equal
 
         This method was added in version 0.18.
-        """
-    def __str__(self, as_target: Optional[bool] = ...) -> str:
-        r"""
-        @brief Convert the layer info object to a string
-        @return The string
-
-        If 'as_target' is true, wildcard and relative specifications are formatted such such.
-
-        This method was added in version 0.18.
-        The 'as_target' argument has been added in version 0.26.5.
         """
     def _create(self) -> None:
         r"""
@@ -9796,6 +10134,10 @@ class LayoutMetaInfo:
     @brief Gets the value of the layout meta info object
     @brief Sets the value of the layout meta info object
     """
+    def __copy__(self) -> LayoutMetaInfo:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self, name: str, value: str, description: Optional[str] = ...) -> None:
         r"""
         @brief Creates a layout meta info object
@@ -9907,6 +10249,10 @@ class Layout:
 
     This method has been introduced in version 0.27.
     """
+    def __copy__(self) -> Layout:
+        r"""
+        @brief Creates a copy of self
+        """
     @overload
     def __init__(self) -> None:
         r"""
@@ -9978,13 +10324,6 @@ class Layout:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
-    def add_cell(self, name: str) -> int:
-        r"""
-        @brief Adds a cell with the given name
-        @return The index of the newly created cell.
-
-        From version 0.23 on this method is deprecated because another method exists which is more convenient because is returns a \Cell object (\create_cell).
-        """
     def add_lib_cell(self, library: Library, lib_cell_index: int) -> int:
         r"""
         @brief Imports a cell from the library
@@ -10005,7 +10344,7 @@ class Layout:
         This method has been introduced in version 0.25.
         """
     @overload
-    def add_pcell_variant(self, pcell_id: int, parameters: Iterable[Any]) -> int:
+    def add_pcell_variant(self, pcell_id: int, parameters: Sequence[Any]) -> int:
         r"""
         @brief Creates a PCell variant for the given PCell ID with the given parameters
         @return The cell index of the pcell variant proxy cell
@@ -10022,7 +10361,7 @@ class Layout:
         This method has been introduced in version 0.22.
         """
     @overload
-    def add_pcell_variant(self, library: Library, pcell_id: int, parameters: Iterable[Any]) -> int:
+    def add_pcell_variant(self, library: Library, pcell_id: int, parameters: Sequence[Any]) -> int:
         r"""
         @brief Creates a PCell variant for a PCell located in an external library
         @return The cell index of the new proxy cell in this layout
@@ -10082,7 +10421,6 @@ class Layout:
         r"""
         @brief Assigns another object to self
         """
-    @overload
     def begin_shapes(self, cell: Cell, layer: int) -> RecursiveShapeIterator:
         r"""
         @brief Delivers a recursive shape iterator for the shapes below the given cell on the given layer
@@ -10096,152 +10434,6 @@ class Layout:
         This method is deprecated. Use \Cell#begin_shapes_rec instead.
 
         This method has been added in version 0.24.
-        """
-    @overload
-    def begin_shapes(self, cell_index: int, layer: int) -> RecursiveShapeIterator:
-        r"""
-        @brief Delivers a recursive shape iterator for the shapes below the given cell on the given layer
-        @param cell_index The index of the initial (top) cell
-        @param layer The layer from which to get the shapes
-        @return A suitable iterator
-
-        For details see the description of the \RecursiveShapeIterator class.
-
-        This method is deprecated. Use \Cell#begin_shapes_rec instead.
-
-        This method has been added in version 0.18.
-        """
-    @overload
-    def begin_shapes_overlapping(self, cell: Cell, layer: int, region: DBox) -> RecursiveShapeIterator:
-        r"""
-        @brief Delivers a recursive shape iterator for the shapes below the given cell on the given layer using a region search, the region given in micrometer units
-        @param cell The cell object for the starting cell
-        @param layer The layer from which to get the shapes
-        @param region The search region as a \DBox object in micrometer units
-        @return A suitable iterator
-
-        For details see the description of the \RecursiveShapeIterator class.
-        This version gives an iterator delivering shapes whose bounding box overlaps the given region.
-        It is convenience overload which takes a cell object instead of a cell index.
-
-        This method is deprecated. Use \Cell#begin_shapes_rec_overlapping instead.
-
-        This variant has been added in version 0.25.
-        """
-    @overload
-    def begin_shapes_overlapping(self, cell_index: int, layer: int, region: Box) -> RecursiveShapeIterator:
-        r"""
-        @brief Delivers a recursive shape iterator for the shapes below the given cell on the given layer using a region search
-        @param cell_index The index of the starting cell
-        @param layer The layer from which to get the shapes
-        @param region The search region
-        @return A suitable iterator
-
-        For details see the description of the \RecursiveShapeIterator class.
-        This version gives an iterator delivering shapes whose bounding box overlaps the given region.
-
-        This method is deprecated. Use \Cell#begin_shapes_rec_overlapping instead.
-
-        This method has been added in version 0.18.
-        """
-    @overload
-    def begin_shapes_overlapping(self, cell_index: int, layer: int, region: DBox) -> RecursiveShapeIterator:
-        r"""
-        @brief Delivers a recursive shape iterator for the shapes below the given cell on the given layer using a region search, the region given in micrometer units
-        @param cell_index The index of the starting cell
-        @param layer The layer from which to get the shapes
-        @param region The search region as a \DBox object in micrometer units
-        @return A suitable iterator
-
-        For details see the description of the \RecursiveShapeIterator class.
-        This version gives an iterator delivering shapes whose bounding box overlaps the given region.
-
-        This method is deprecated. Use \Cell#begin_shapes_rec_overlapping instead.
-
-        This variant has been added in version 0.25.
-        """
-    @overload
-    def begin_shapes_overlapping(self, cell_index: Cell, layer: int, region: Box) -> RecursiveShapeIterator:
-        r"""
-        @brief Delivers a recursive shape iterator for the shapes below the given cell on the given layer using a region search
-        @param cell The cell object for the starting cell
-        @param layer The layer from which to get the shapes
-        @param region The search region
-        @return A suitable iterator
-
-        For details see the description of the \RecursiveShapeIterator class.
-        This version gives an iterator delivering shapes whose bounding box overlaps the given region.
-        It is convenience overload which takes a cell object instead of a cell index.
-
-        This method is deprecated. Use \Cell#begin_shapes_rec_overlapping instead.
-
-        This method has been added in version 0.24.
-        """
-    @overload
-    def begin_shapes_touching(self, cell: Cell, layer: int, region: Box) -> RecursiveShapeIterator:
-        r"""
-        @brief Delivers a recursive shape iterator for the shapes below the given cell on the given layer using a region search
-        @param cell The cell object for the starting cell
-        @param layer The layer from which to get the shapes
-        @param region The search region
-        @return A suitable iterator
-
-        For details see the description of the \RecursiveShapeIterator class.
-        This version gives an iterator delivering shapes whose bounding box touches the given region.
-        It is convenience overload which takes a cell object instead of a cell index.
-
-        This method is deprecated. Use \Cell#begin_shapes_rec_touching instead.
-
-        This method has been added in version 0.24.
-        """
-    @overload
-    def begin_shapes_touching(self, cell: Cell, layer: int, region: DBox) -> RecursiveShapeIterator:
-        r"""
-        @brief Delivers a recursive shape iterator for the shapes below the given cell on the given layer using a region search, the region given in micrometer units
-        @param cell The cell object for the starting cell
-        @param layer The layer from which to get the shapes
-        @param region The search region as a \DBox object in micrometer units
-        @return A suitable iterator
-
-        For details see the description of the \RecursiveShapeIterator class.
-        This version gives an iterator delivering shapes whose bounding box touches the given region.
-        It is convenience overload which takes a cell object instead of a cell index.
-
-        This method is deprecated. Use \Cell#begin_shapes_rec_touching instead.
-
-        This variant has been added in version 0.25.
-        """
-    @overload
-    def begin_shapes_touching(self, cell_index: int, layer: int, region: Box) -> RecursiveShapeIterator:
-        r"""
-        @brief Delivers a recursive shape iterator for the shapes below the given cell on the given layer using a region search
-        @param cell_index The index of the starting cell
-        @param layer The layer from which to get the shapes
-        @param region The search region
-        @return A suitable iterator
-
-        For details see the description of the \RecursiveShapeIterator class.
-        This version gives an iterator delivering shapes whose bounding box touches the given region.
-
-        This method is deprecated. Use \Cell#begin_shapes_rec_touching instead.
-
-        This method has been added in version 0.18.
-        """
-    @overload
-    def begin_shapes_touching(self, cell_index: int, layer: int, region: DBox) -> RecursiveShapeIterator:
-        r"""
-        @brief Delivers a recursive shape iterator for the shapes below the given cell on the given layer using a region search, the region given in micrometer units
-        @param cell_index The index of the starting cell
-        @param layer The layer from which to get the shapes
-        @param region The search region as a \DBox object in micrometer units
-        @return A suitable iterator
-
-        For details see the description of the \RecursiveShapeIterator class.
-        This version gives an iterator delivering shapes whose bounding box touches the given region.
-
-        This method is deprecated. Use \Cell#begin_shapes_rec_touching instead.
-
-        This variant has been added in version 0.25.
         """
     @overload
     def cell(self, i: int) -> Cell:
@@ -10264,12 +10456,6 @@ class Layout:
         If name is not a valid cell name, this method will return "nil".
         This method has been introduced in version 0.23 and replaces \cell_by_name.
         """
-    def cell_by_name(self, name: str) -> int:
-        r"""
-        @brief Gets the cell index for a given name
-        Returns the cell index for the cell with the given name. If no cell with this name exists, an exception is thrown.
-        From version 0.23 on, a version of the \cell method is provided which returns a \Cell object for the cell with the given name or "nil" if the name is not valid. This method replaces \cell_by_name and \has_cell?
-        """
     def cell_name(self, index: int) -> str:
         r"""
         @brief Gets the name for a cell with the given index
@@ -10282,7 +10468,7 @@ class Layout:
         @return The number of cells (the maximum cell index)
         """
     @overload
-    def cells(self, name_filter: str) -> Iterable[Cell]:
+    def cells(self, name_filter: str) -> List[Cell]:
         r"""
         @brief Gets the cell objects for a given name filter
 
@@ -10291,7 +10477,7 @@ class Layout:
 
         This method has been introduced in version 0.27.3.
         """
-    def cleanup(self, cell_indexes_to_keep: Optional[Iterable[int]] = ...) -> None:
+    def cleanup(self, cell_indexes_to_keep: Optional[Sequence[int]] = ...) -> None:
         r"""
         @brief Cleans up the layout
         This method will remove proxy objects that are no longer in use. After changing PCell parameters such proxy objects may still be present in the layout and are cached for later reuse. Usually they are cleaned up automatically, but in a scripting context it may be useful to clean up these cells explicitly.
@@ -10461,7 +10647,7 @@ class Layout:
 
         This method has been introduced in version 0.20.
         """
-    def delete_cells(self, cell_index_list: Iterable[int]) -> None:
+    def delete_cells(self, cell_index_list: Sequence[int]) -> None:
         r"""
         @brief Deletes multiple cells
 
@@ -10499,11 +10685,11 @@ class Layout:
         r"""
         @brief Creates a copy of self
         """
-    def each_cell(self) -> Iterable[Cell]:
+    def each_cell(self) -> Iterator[Cell]:
         r"""
         @brief Iterates the unsorted cell list
         """
-    def each_cell_bottom_up(self) -> Iterable[int]:
+    def each_cell_bottom_up(self) -> Iterator[int]:
         r"""
         @brief Iterates the bottom-up sorted cell list
 
@@ -10512,7 +10698,7 @@ class Layout:
         The bottom-up iterator does not deliver cells but cell
         indices actually.
         """
-    def each_cell_top_down(self) -> Iterable[int]:
+    def each_cell_top_down(self) -> Iterator[int]:
         r"""
         @brief Iterates the top-down sorted cell list
 
@@ -10523,14 +10709,14 @@ class Layout:
         indices actually.
         @brief begin iterator of the top-down sorted cell list
         """
-    def each_meta_info(self) -> Iterable[LayoutMetaInfo]:
+    def each_meta_info(self) -> Iterator[LayoutMetaInfo]:
         r"""
         @brief Iterates over the meta information of the layout
         See \LayoutMetaInfo for details about layouts and meta information.
 
         This method has been introduced in version 0.25.
         """
-    def each_top_cell(self) -> Iterable[int]:
+    def each_top_cell(self) -> Iterator[int]:
         r"""
         @brief Iterates the top cells
         A layout may have an arbitrary number of top cells. The usual case however is that there is one top cell.
@@ -10769,14 +10955,14 @@ class Layout:
 
         This method has been introduced in version 0.23.
         """
-    def layer_indexes(self) -> Iterable[int]:
+    def layer_indexes(self) -> List[int]:
         r"""
         @brief Gets a list of valid layer's indices
         This method returns an array with layer indices representing valid layers.
 
         This method has been introduced in version 0.19.
         """
-    def layer_infos(self) -> Iterable[LayerInfo]:
+    def layer_infos(self) -> List[LayerInfo]:
         r"""
         @brief Gets a list of valid layer's properties
         The method returns an array with layer properties representing valid layers.
@@ -10833,7 +11019,7 @@ class Layout:
 
         This method has been added in version 0.26.8.
         """
-    def multi_clip(self, cell: int, boxes: Iterable[Box]) -> Iterable[int]:
+    def multi_clip(self, cell: int, boxes: Sequence[Box]) -> List[int]:
         r"""
         @brief Clips the given cell by the given rectangles and produce new cells with the clips, one for each rectangle.
         @param cell The cell index of the cell to clip
@@ -10844,7 +11030,7 @@ class Layout:
 
         This method has been added in version 0.21.
         """
-    def multi_clip_into(self, cell: int, target: Layout, boxes: Iterable[Box]) -> Iterable[int]:
+    def multi_clip_into(self, cell: int, target: Layout, boxes: Sequence[Box]) -> List[int]:
         r"""
         @brief Clips the given cell by the given rectangles and produce new cells with the clips, one for each rectangle.
         @param cell The cell index of the cell to clip
@@ -10892,21 +11078,21 @@ class Layout:
 
         This method has been introduced in version 0.22.
         """
-    def pcell_ids(self) -> Iterable[int]:
+    def pcell_ids(self) -> List[int]:
         r"""
         @brief Gets the IDs of the PCells registered in the layout
         Returns an array of PCell IDs.
 
         This method has been introduced in version 0.24.
         """
-    def pcell_names(self) -> Iterable[str]:
+    def pcell_names(self) -> List[str]:
         r"""
         @brief Gets the names of the PCells registered in the layout
         Returns an array of PCell names.
 
         This method has been introduced in version 0.24.
         """
-    def properties(self, properties_id: int) -> Iterable[Any]:
+    def properties(self, properties_id: int) -> List[Any]:
         r"""
         @brief Gets the properties set for a given properties ID
 
@@ -10916,7 +11102,7 @@ class Layout:
         @param properties_id The properties ID to get the properties for
         @return The array of variants (see \properties_id)
         """
-    def properties_id(self, properties: Iterable[Any]) -> int:
+    def properties_id(self, properties: Sequence[Any]) -> int:
         r"""
         @brief Gets the properties ID for a given properties set
 
@@ -11080,7 +11266,7 @@ class Layout:
 
         This method has been introduced in version 0.23.
         """
-    def top_cells(self) -> Iterable[Cell]:
+    def top_cells(self) -> List[Cell]:
         r"""
         @brief Returns the top cell objects
         @return The \Cell objects of the top cells
@@ -11149,16 +11335,6 @@ class Layout:
         This version automatically determines the compression mode from the file name. The file is written with zlib compression if the suffix is ".gz" or ".gzip".
 
         This variant has been introduced in version 0.23.
-        """
-    @overload
-    def write(self, filename: str, gzip: bool, options: SaveLayoutOptions) -> None:
-        r"""
-        @brief Writes the layout to a stream file
-        @param filename The file to which to write the layout
-        @param gzip Ignored
-        @param options The option set to use for writing. See \SaveLayoutOptions for details
-
-        Starting with version 0.23, this variant is deprecated since the more convenient variant with two parameters automatically determines the compression mode from the file name. The gzip parameter is ignored staring with version 0.23.
         """
 
 class SaveLayoutOptions:
@@ -11514,6 +11690,10 @@ class SaveLayoutOptions:
 
     This method was introduced in version 0.23.
     """
+    def __copy__(self) -> SaveLayoutOptions:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Default constructor
@@ -12211,7 +12391,7 @@ class LayoutQuery:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
-    def each(self, layout: Layout, context: Optional[tl.ExpressionContext] = ...) -> Iterable[LayoutQueryIterator]:
+    def each(self, layout: Layout, context: Optional[tl.ExpressionContext] = ...) -> Iterator[LayoutQueryIterator]:
         r"""
         @brief Executes the query and delivered the results iteratively.
         The argument to the block is a \LayoutQueryIterator object which can be asked for specific results.
@@ -12229,7 +12409,7 @@ class LayoutQuery:
 
         The context argument allows supplying an expression execution context. This context can be used for example to supply variables for the execution. It has been added in version 0.26.
         """
-    def property_names(self) -> Iterable[str]:
+    def property_names(self) -> List[str]:
         r"""
         @brief Gets a list of property names available.
         The list of properties available from the query depends on the nature of the query. This method allows detection of the properties available. Within the query, all of these properties can be obtained from the query iterator using \LayoutQueryIterator#get.
@@ -12318,6 +12498,10 @@ class LayoutToNetlist:
         def __ne__(self, other: object) -> bool:
             r"""
             @brief Compares two enums for inequality
+            """
+        def __repr__(self) -> str:
+            r"""
+            @brief Gets the symbolic string from an enum
             """
         def __str__(self) -> str:
             r"""
@@ -12482,7 +12666,7 @@ class LayoutToNetlist:
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
     @overload
-    def antenna_check(self, gate: Region, metal: Region, ratio: float, diodes: Optional[Iterable[Any]] = ..., texts: Optional[Texts] = ...) -> Region:
+    def antenna_check(self, gate: Region, metal: Region, ratio: float, diodes: Optional[Sequence[Any]] = ..., texts: Optional[Texts] = ...) -> Region:
         r"""
         @brief Runs an antenna check on the extracted clusters
 
@@ -12524,7 +12708,7 @@ class LayoutToNetlist:
         The 'texts' parameter has been added in version 0.27.11.
         """
     @overload
-    def antenna_check(self, gate: Region, gate_perimeter_factor: float, metal: Region, metal_perimeter_factor: float, ratio: float, diodes: Optional[Iterable[Any]] = ..., texts: Optional[Texts] = ...) -> Region:
+    def antenna_check(self, gate: Region, gate_perimeter_factor: float, metal: Region, metal_perimeter_factor: float, ratio: float, diodes: Optional[Sequence[Any]] = ..., texts: Optional[Texts] = ...) -> Region:
         r"""
         @brief Runs an antenna check on the extracted clusters taking the perimeter into account
 
@@ -12539,7 +12723,7 @@ class LayoutToNetlist:
         This variant has been introduced in version 0.26.6.
         """
     @overload
-    def antenna_check(self, gate: Region, gate_area_factor: float, gate_perimeter_factor: float, metal: Region, metal_area_factor: float, metal_perimeter_factor: float, ratio: float, diodes: Optional[Iterable[Any]] = ..., texts: Optional[Texts] = ...) -> Region:
+    def antenna_check(self, gate: Region, gate_area_factor: float, gate_perimeter_factor: float, metal: Region, metal_area_factor: float, metal_perimeter_factor: float, ratio: float, diodes: Optional[Sequence[Any]] = ..., texts: Optional[Texts] = ...) -> Region:
         r"""
         @brief Runs an antenna check on the extracted clusters taking the perimeter into account and providing an area factor
 
@@ -12627,7 +12811,7 @@ class LayoutToNetlist:
         @param cell_name_prefix Chooses recursive mode if non-null
         @param device_cell_name_prefix See above
         """
-    def build_nets(self, nets: Iterable[Net], cmap: CellMapping, target: Layout, lmap: Dict[int, Region], net_cell_name_prefix: Optional[Any] = ..., netname_prop: Optional[Any] = ..., hier_mode: Optional[LayoutToNetlist.BuildNetHierarchyMode] = ..., circuit_cell_name_prefix: Optional[Any] = ..., device_cell_name_prefix: Optional[Any] = ...) -> None:
+    def build_nets(self, nets: Sequence[Net], cmap: CellMapping, target: Layout, lmap: Dict[int, Region], net_cell_name_prefix: Optional[Any] = ..., netname_prop: Optional[Any] = ..., hier_mode: Optional[LayoutToNetlist.BuildNetHierarchyMode] = ..., circuit_cell_name_prefix: Optional[Any] = ..., device_cell_name_prefix: Optional[Any] = ...) -> None:
         r"""
         @brief Like \build_all_nets, but with the ability to select some nets.
         """
@@ -12641,7 +12825,7 @@ class LayoutToNetlist:
         CAUTION: this function may create new cells in 'layout'. Use \const_cell_mapping_into if you want to use the target layout's hierarchy and not modify it.
         """
     @overload
-    def cell_mapping_into(self, layout: Layout, cell: Cell, nets: Iterable[Net], with_device_cells: Optional[bool] = ...) -> CellMapping:
+    def cell_mapping_into(self, layout: Layout, cell: Cell, nets: Sequence[Net], with_device_cells: Optional[bool] = ...) -> CellMapping:
         r"""
         @brief Creates a cell mapping for copying shapes from the internal layout to the given target layout.
         This version will only create cells which are required to represent the nets from the 'nets' argument.
@@ -12831,7 +13015,7 @@ class LayoutToNetlist:
         This method has been introduced in version 0.27 and replaces the arguments of \extract_netlist.
         """
     @overload
-    def join_nets(self, net_names: Iterable[str]) -> None:
+    def join_nets(self, net_names: Sequence[str]) -> None:
         r"""
         @brief Specifies another name list for explicit joining of nets for the top level cell.
         Use this method to join nets from the set of net names. All these nets will be connected together forming a single net.
@@ -12842,7 +13026,7 @@ class LayoutToNetlist:
         Explicit net joining has been introduced in version 0.27.
         """
     @overload
-    def join_nets(self, cell_pattern: str, net_names: Iterable[str]) -> None:
+    def join_nets(self, cell_pattern: str, net_names: Sequence[str]) -> None:
         r"""
         @brief Specifies another name list for explicit joining of nets for the cells from the given cell pattern.
         This method allows applying explicit net joining for specific cells, not only for the top cell.
@@ -12875,7 +13059,7 @@ class LayoutToNetlist:
         r"""
         @brief Gets the name of the given layer
         """
-    def layer_names(self) -> Iterable[str]:
+    def layer_names(self) -> List[str]:
         r"""
         @brief Returns a list of names of the layer kept inside the LayoutToNetlist object.
         """
@@ -12934,7 +13118,7 @@ class LayoutToNetlist:
         @brief gets the netlist extracted (0 if no extraction happened yet)
         """
     @overload
-    def probe_net(self, of_layer: Region, point: DPoint, sc_path_out: Optional[Iterable[SubCircuit]] = ..., initial_circuit: Optional[Circuit] = ...) -> Net:
+    def probe_net(self, of_layer: Region, point: DPoint, sc_path_out: Optional[Sequence[SubCircuit]] = ..., initial_circuit: Optional[Circuit] = ...) -> Net:
         r"""
         @brief Finds the net by probing a specific location on the given layer
 
@@ -12959,7 +13143,7 @@ class LayoutToNetlist:
         The \sc_path_out and \initial_circuit parameters have been added in version 0.27.
         """
     @overload
-    def probe_net(self, of_layer: Region, point: Point, sc_path_out: Optional[Iterable[SubCircuit]] = ..., initial_circuit: Optional[Circuit] = ...) -> Net:
+    def probe_net(self, of_layer: Region, point: Point, sc_path_out: Optional[Sequence[SubCircuit]] = ..., initial_circuit: Optional[Circuit] = ...) -> Net:
         r"""
         @brief Finds the net by probing a specific location on the given layer
         See the description of the other \probe_net variant.
@@ -12970,6 +13154,12 @@ class LayoutToNetlist:
         """
     def read(self, path: str) -> None:
         r"""
+        @brief Reads the extracted netlist from the file.
+        This method employs the native format of KLayout.
+        """
+    def read_l2n(self, path: str) -> None:
+        r"""
+        Note: This is an alias of 'read'.
         @brief Reads the extracted netlist from the file.
         This method employs the native format of KLayout.
         """
@@ -13008,6 +13198,12 @@ class LayoutToNetlist:
         """
     def write(self, path: str, short_format: Optional[bool] = ...) -> None:
         r"""
+        @brief Writes the extracted netlist to a file.
+        This method employs the native format of KLayout.
+        """
+    def write_l2n(self, path: str, short_format: Optional[bool] = ...) -> None:
+        r"""
+        Note: This is an alias of 'write'.
         @brief Writes the extracted netlist to a file.
         This method employs the native format of KLayout.
         """
@@ -13158,27 +13354,27 @@ class Library:
     @brief Returns the libraries' description text
     @brief Sets the libraries' description text
     """
-    library_ids: ClassVar[Iterable[int]]
+    technology: None
     r"""
-    @brief Returns a list of valid library IDs.
-    See \library_names for the reasoning behind this method.
-    This method has been introduced in version 0.27.
-    """
-    library_names: ClassVar[Iterable[str]]
-    r"""
-    @brief Returns a list of the names of all libraries registered in the system.
-
-    NOTE: starting with version 0.27, the name of a library does not need to be unique if libraries are associated with specific technologies. This method will only return the names and it's not possible not unambiguously derive the library object. It is recommended to use \library_ids and \library_by_id to obtain the library unambiguously.
-    """
-    technology: str
-    r"""
-    @brief Returns name of the technology the library is associated with
-    If this attribute is a non-empty string, this library is only offered for selection if the current layout uses this technology.
-
-    This attribute has been introduced in version 0.25. In version 0.27 this attribute is deprecated as a library can now be associated with multiple technologies.@brief sets the name of the technology the library is associated with
+    WARNING: This variable can only be set, not retrieved.
+    @brief sets the name of the technology the library is associated with
 
     See \technology for details. This attribute has been introduced in version 0.25. In version 0.27, a library can be associated with multiple technologies and this method will revert the selection to a single one. Passing an empty string is equivalent to \clear_technologies.
     """
+    @classmethod
+    def library_ids(cls) -> List[int]:
+        r"""
+        @brief Returns a list of valid library IDs.
+        See \library_names for the reasoning behind this method.
+        This method has been introduced in version 0.27.
+        """
+    @classmethod
+    def library_names(cls) -> List[str]:
+        r"""
+        @brief Returns a list of the names of all libraries registered in the system.
+
+        NOTE: starting with version 0.27, the name of a library does not need to be unique if libraries are associated with specific technologies. This method will only return the names and it's not possible not unambiguously derive the library object. It is recommended to use \library_ids and \library_by_id to obtain the library unambiguously.
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new, empty library
@@ -13308,7 +13504,7 @@ class Library:
 
         The technology specific behaviour has been introduced in version 0.27.
         """
-    def technologies(self) -> Iterable[str]:
+    def technologies(self) -> List[str]:
         r"""
         @brief Gets the list of technologies this library is associated with.
         This method has been introduced in version 0.27
@@ -13363,16 +13559,16 @@ class PCellDeclaration_Native:
     def can_create_from_shape(self, arg0: Layout, arg1: Shape, arg2: int) -> bool:
         r"""
         """
-    def coerce_parameters(self, arg0: Layout, arg1: Iterable[Any]) -> Iterable[Any]:
+    def coerce_parameters(self, arg0: Layout, arg1: Sequence[Any]) -> List[Any]:
         r"""
         """
-    def display_text(self, arg0: Iterable[Any]) -> str:
+    def display_text(self, arg0: Sequence[Any]) -> str:
         r"""
         """
-    def get_layers(self, arg0: Iterable[Any]) -> Iterable[LayerInfo]:
+    def get_layers(self, arg0: Sequence[Any]) -> List[LayerInfo]:
         r"""
         """
-    def get_parameters(self) -> Iterable[PCellParameterDeclaration]:
+    def get_parameters(self) -> List[PCellParameterDeclaration]:
         r"""
         """
     def id(self) -> int:
@@ -13389,10 +13585,10 @@ class PCellDeclaration_Native:
         r"""
         @brief Gets the name of the PCell
         """
-    def parameters_from_shape(self, arg0: Layout, arg1: Shape, arg2: int) -> Iterable[Any]:
+    def parameters_from_shape(self, arg0: Layout, arg1: Shape, arg2: int) -> List[Any]:
         r"""
         """
-    def produce(self, arg0: Layout, arg1: Iterable[int], arg2: Iterable[Any], arg3: Cell) -> None:
+    def produce(self, arg0: Layout, arg1: Sequence[int], arg2: Sequence[Any], arg3: Cell) -> None:
         r"""
         """
     def transformation_from_shape(self, arg0: Layout, arg1: Shape, arg2: int) -> Trans:
@@ -13427,6 +13623,10 @@ class PCellDeclaration(PCellDeclaration_Native):
 
     This class has been introduced in version 0.22.
     """
+    def __copy__(self) -> PCellDeclaration:
+        r"""
+        @brief Creates a copy of self
+        """
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -13482,7 +13682,7 @@ class PCellDeclaration(PCellDeclaration_Native):
         @param layer The layer index (in layout) of the shape
         KLayout offers a way to convert a shape into a PCell. To test whether the PCell can be created from a shape, it will call this method. If this method returns true, KLayout will use \parameters_from_shape and \transformation_from_shape to derive the parameters and instance transformation for the new PCell instance that will replace the shape.
         """
-    def coerce_parameters(self, layout: Layout, input: Iterable[Any]) -> Iterable[Any]:
+    def coerce_parameters(self, layout: Layout, input: Sequence[Any]) -> List[Any]:
         r"""
         @brief Modifies the parameters to match the requirements
         @param layout The layout object in which the PCell will be produced
@@ -13498,12 +13698,12 @@ class PCellDeclaration(PCellDeclaration_Native):
         It can raise an exception to indicate that something is not correct.
         """
     @overload
-    def display_text(self, arg0: Iterable[Any]) -> str:
+    def display_text(self, arg0: Sequence[Any]) -> str:
         r"""
         @hide
         """
     @overload
-    def display_text(self, parameters: Iterable[Any]) -> str:
+    def display_text(self, parameters: Sequence[Any]) -> str:
         r"""
         @brief Returns the display text for this PCell given a certain parameter set
         Reimplement this method to create a distinct display text for a PCell variant with 
@@ -13513,7 +13713,7 @@ class PCellDeclaration(PCellDeclaration_Native):
         r"""
         @brief Creates a copy of self
         """
-    def get_layers(self, parameters: Iterable[Any]) -> Iterable[LayerInfo]:
+    def get_layers(self, parameters: Sequence[Any]) -> List[LayerInfo]:
         r"""
         @brief Returns a list of layer declarations
         Reimplement this method to return a list of layers this PCell wants to create.
@@ -13523,17 +13723,17 @@ class PCellDeclaration(PCellDeclaration_Native):
         This method receives the PCell parameters which allows it to deduce layers
         from the parameters.
         """
-    def get_parameters(self) -> Iterable[PCellParameterDeclaration]:
+    def get_parameters(self) -> List[PCellParameterDeclaration]:
         r"""
         @hide
         """
     @overload
-    def parameters_from_shape(self, arg0: Layout, arg1: Shape, arg2: int) -> Iterable[Any]:
+    def parameters_from_shape(self, arg0: Layout, arg1: Shape, arg2: int) -> List[Any]:
         r"""
         @hide
         """
     @overload
-    def parameters_from_shape(self, layout: Layout, shape: Shape, layer: int) -> Iterable[Any]:
+    def parameters_from_shape(self, layout: Layout, shape: Shape, layer: int) -> List[Any]:
         r"""
         @brief Gets the parameters for the PCell which can replace the given shape
         @param layout The layout the shape lives in
@@ -13542,12 +13742,12 @@ class PCellDeclaration(PCellDeclaration_Native):
         KLayout offers a way to convert a shape into a PCell. If \can_create_from_shape returns true, it will use this method to derive the parameters for the PCell instance that will replace the shape. See also \transformation_from_shape and \can_create_from_shape.
         """
     @overload
-    def produce(self, arg0: Layout, arg1: Iterable[int], arg2: Iterable[Any], arg3: Cell) -> None:
+    def produce(self, arg0: Layout, arg1: Sequence[int], arg2: Sequence[Any], arg3: Cell) -> None:
         r"""
         @hide
         """
     @overload
-    def produce(self, layout: Layout, layer_ids: Iterable[int], parameters: Iterable[Any], cell: Cell) -> None:
+    def produce(self, layout: Layout, layer_ids: Sequence[int], parameters: Sequence[Any], cell: Cell) -> None:
         r"""
         @brief The production callback
         @param layout The layout object where the cell resides
@@ -13662,6 +13862,10 @@ class PCellParameterDeclaration:
     @brief Sets the unit string
     The unit string is shown right to the edit fields for numeric parameters.
     """
+    def __copy__(self) -> PCellParameterDeclaration:
+        r"""
+        @brief Creates a copy of self
+        """
     @overload
     def __init__(self, name: str, type: int, description: str) -> None:
         r"""
@@ -13737,11 +13941,11 @@ class PCellParameterDeclaration:
         r"""
         @brief Assigns another object to self
         """
-    def choice_descriptions(self) -> Iterable[str]:
+    def choice_descriptions(self) -> List[str]:
         r"""
         @brief Returns a list of choice descriptions
         """
-    def choice_values(self) -> Iterable[Any]:
+    def choice_values(self) -> List[Any]:
         r"""
         @brief Returns a list of choice values
         """
@@ -13921,6 +14125,10 @@ class Matrix2d:
         @param m The other matrix.
         @return The (element-wise) sum of self+m
         """
+    def __copy__(self) -> Matrix2d:
+        r"""
+        @brief Creates a copy of self
+        """
     @overload
     def __init__(self) -> None:
         r"""
@@ -13973,6 +14181,14 @@ class Matrix2d:
         @return The matrix product self*m
         """
     @overload
+    def __mul__(self, p: DPoint) -> DPoint:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point with this matrix.
+        @param p The point to transform.
+        @return The transformed point
+        """
+    @overload
     def __mul__(self, p: DPolygon) -> DPolygon:
         r"""
         @brief Transforms a polygon with this matrix.
@@ -13988,6 +14204,63 @@ class Matrix2d:
         """
     @overload
     def __mul__(self, v: DVector) -> DVector:
+        r"""
+        @brief Transforms a vector with this matrix.
+        @param v The vector to transform.
+        @return The transformed vector
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert the matrix to a string.
+        @return The string representing this matrix
+        """
+    @overload
+    def __rmul__(self, box: DBox) -> DBox:
+        r"""
+        @brief Transforms a box with this matrix.
+        @param box The box to transform.
+        @return The transformed box
+
+        Please note that the box remains a box, even though the matrix supports shear and rotation. The returned box will be the bounding box of the sheared and rotated rectangle.
+        """
+    @overload
+    def __rmul__(self, e: DEdge) -> DEdge:
+        r"""
+        @brief Transforms an edge with this matrix.
+        @param e The edge to transform.
+        @return The transformed edge
+        """
+    @overload
+    def __rmul__(self, m: Matrix2d) -> Matrix2d:
+        r"""
+        @brief Product of two matrices.
+        @param m The other matrix.
+        @return The matrix product self*m
+        """
+    @overload
+    def __rmul__(self, p: DPoint) -> DPoint:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point with this matrix.
+        @param p The point to transform.
+        @return The transformed point
+        """
+    @overload
+    def __rmul__(self, p: DPolygon) -> DPolygon:
+        r"""
+        @brief Transforms a polygon with this matrix.
+        @param p The polygon to transform.
+        @return The transformed polygon
+        """
+    @overload
+    def __rmul__(self, p: DSimplePolygon) -> DSimplePolygon:
+        r"""
+        @brief Transforms a simple polygon with this matrix.
+        @param p The simple polygon to transform.
+        @return The transformed simple polygon
+        """
+    @overload
+    def __rmul__(self, v: DVector) -> DVector:
         r"""
         @brief Transforms a vector with this matrix.
         @param v The vector to transform.
@@ -14163,6 +14436,10 @@ class IMatrix2d:
         @param m The other matrix.
         @return The (element-wise) sum of self+m
         """
+    def __copy__(self) -> IMatrix2d:
+        r"""
+        @brief Creates a copy of self
+        """
     @overload
     def __init__(self) -> None:
         r"""
@@ -14215,6 +14492,14 @@ class IMatrix2d:
         @return The matrix product self*m
         """
     @overload
+    def __mul__(self, p: Point) -> Point:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point with this matrix.
+        @param p The point to transform.
+        @return The transformed point
+        """
+    @overload
     def __mul__(self, p: Polygon) -> Polygon:
         r"""
         @brief Transforms a polygon with this matrix.
@@ -14230,6 +14515,63 @@ class IMatrix2d:
         """
     @overload
     def __mul__(self, v: Vector) -> Vector:
+        r"""
+        @brief Transforms a vector with this matrix.
+        @param v The vector to transform.
+        @return The transformed vector
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert the matrix to a string.
+        @return The string representing this matrix
+        """
+    @overload
+    def __rmul__(self, box: Box) -> Box:
+        r"""
+        @brief Transforms a box with this matrix.
+        @param box The box to transform.
+        @return The transformed box
+
+        Please note that the box remains a box, even though the matrix supports shear and rotation. The returned box will be the bounding box of the sheared and rotated rectangle.
+        """
+    @overload
+    def __rmul__(self, e: Edge) -> Edge:
+        r"""
+        @brief Transforms an edge with this matrix.
+        @param e The edge to transform.
+        @return The transformed edge
+        """
+    @overload
+    def __rmul__(self, m: IMatrix2d) -> IMatrix2d:
+        r"""
+        @brief Product of two matrices.
+        @param m The other matrix.
+        @return The matrix product self*m
+        """
+    @overload
+    def __rmul__(self, p: Point) -> Point:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point with this matrix.
+        @param p The point to transform.
+        @return The transformed point
+        """
+    @overload
+    def __rmul__(self, p: Polygon) -> Polygon:
+        r"""
+        @brief Transforms a polygon with this matrix.
+        @param p The polygon to transform.
+        @return The transformed polygon
+        """
+    @overload
+    def __rmul__(self, p: SimplePolygon) -> SimplePolygon:
+        r"""
+        @brief Transforms a simple polygon with this matrix.
+        @param p The simple polygon to transform.
+        @return The transformed simple polygon
+        """
+    @overload
+    def __rmul__(self, v: Vector) -> Vector:
         r"""
         @brief Transforms a vector with this matrix.
         @param v The vector to transform.
@@ -14475,6 +14817,10 @@ class Matrix3d:
         @param m The other matrix.
         @return The (element-wise) sum of self+m
         """
+    def __copy__(self) -> Matrix3d:
+        r"""
+        @brief Creates a copy of self
+        """
     @overload
     def __init__(self) -> None:
         r"""
@@ -14530,6 +14876,14 @@ class Matrix3d:
         @return The matrix product self*m
         """
     @overload
+    def __mul__(self, p: DPoint) -> DPoint:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point with this matrix.
+        @param p The point to transform.
+        @return The transformed point
+        """
+    @overload
     def __mul__(self, p: DPolygon) -> DPolygon:
         r"""
         @brief Transforms a polygon with this matrix.
@@ -14545,6 +14899,63 @@ class Matrix3d:
         """
     @overload
     def __mul__(self, v: DVector) -> DVector:
+        r"""
+        @brief Transforms a vector with this matrix.
+        @param v The vector to transform.
+        @return The transformed vector
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert the matrix to a string.
+        @return The string representing this matrix
+        """
+    @overload
+    def __rmul__(self, box: DBox) -> DBox:
+        r"""
+        @brief Transforms a box with this matrix.
+        @param box The box to transform.
+        @return The transformed box
+
+        Please note that the box remains a box, even though the matrix supports shear and rotation. The returned box will be the bounding box of the sheared and rotated rectangle.
+        """
+    @overload
+    def __rmul__(self, e: DEdge) -> DEdge:
+        r"""
+        @brief Transforms an edge with this matrix.
+        @param e The edge to transform.
+        @return The transformed edge
+        """
+    @overload
+    def __rmul__(self, m: Matrix3d) -> Matrix3d:
+        r"""
+        @brief Product of two matrices.
+        @param m The other matrix.
+        @return The matrix product self*m
+        """
+    @overload
+    def __rmul__(self, p: DPoint) -> DPoint:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point with this matrix.
+        @param p The point to transform.
+        @return The transformed point
+        """
+    @overload
+    def __rmul__(self, p: DPolygon) -> DPolygon:
+        r"""
+        @brief Transforms a polygon with this matrix.
+        @param p The polygon to transform.
+        @return The transformed polygon
+        """
+    @overload
+    def __rmul__(self, p: DSimplePolygon) -> DSimplePolygon:
+        r"""
+        @brief Transforms a simple polygon with this matrix.
+        @param p The simple polygon to transform.
+        @return The transformed simple polygon
+        """
+    @overload
+    def __rmul__(self, v: DVector) -> DVector:
         r"""
         @brief Transforms a vector with this matrix.
         @param v The vector to transform.
@@ -14592,7 +15003,7 @@ class Matrix3d:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
-    def adjust(self, landmarks_before: Iterable[DPoint], landmarks_after: Iterable[DPoint], flags: int, fixed_point: int) -> None:
+    def adjust(self, landmarks_before: Sequence[DPoint], landmarks_after: Sequence[DPoint], flags: int, fixed_point: int) -> None:
         r"""
         @brief Adjust a 3d matrix to match the given set of landmarks
 
@@ -14770,6 +15181,10 @@ class IMatrix3d:
         @param m The other matrix.
         @return The (element-wise) sum of self+m
         """
+    def __copy__(self) -> IMatrix3d:
+        r"""
+        @brief Creates a copy of self
+        """
     @overload
     def __init__(self) -> None:
         r"""
@@ -14825,6 +15240,14 @@ class IMatrix3d:
         @return The matrix product self*m
         """
     @overload
+    def __mul__(self, p: Point) -> Point:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point with this matrix.
+        @param p The point to transform.
+        @return The transformed point
+        """
+    @overload
     def __mul__(self, p: Polygon) -> Polygon:
         r"""
         @brief Transforms a polygon with this matrix.
@@ -14840,6 +15263,63 @@ class IMatrix3d:
         """
     @overload
     def __mul__(self, v: Vector) -> Vector:
+        r"""
+        @brief Transforms a vector with this matrix.
+        @param v The vector to transform.
+        @return The transformed vector
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert the matrix to a string.
+        @return The string representing this matrix
+        """
+    @overload
+    def __rmul__(self, box: Box) -> Box:
+        r"""
+        @brief Transforms a box with this matrix.
+        @param box The box to transform.
+        @return The transformed box
+
+        Please note that the box remains a box, even though the matrix supports shear and rotation. The returned box will be the bounding box of the sheared and rotated rectangle.
+        """
+    @overload
+    def __rmul__(self, e: Edge) -> Edge:
+        r"""
+        @brief Transforms an edge with this matrix.
+        @param e The edge to transform.
+        @return The transformed edge
+        """
+    @overload
+    def __rmul__(self, m: IMatrix3d) -> IMatrix3d:
+        r"""
+        @brief Product of two matrices.
+        @param m The other matrix.
+        @return The matrix product self*m
+        """
+    @overload
+    def __rmul__(self, p: Point) -> Point:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point with this matrix.
+        @param p The point to transform.
+        @return The transformed point
+        """
+    @overload
+    def __rmul__(self, p: Polygon) -> Polygon:
+        r"""
+        @brief Transforms a polygon with this matrix.
+        @param p The polygon to transform.
+        @return The transformed polygon
+        """
+    @overload
+    def __rmul__(self, p: SimplePolygon) -> SimplePolygon:
+        r"""
+        @brief Transforms a simple polygon with this matrix.
+        @param p The simple polygon to transform.
+        @return The transformed simple polygon
+        """
+    @overload
+    def __rmul__(self, v: Vector) -> Vector:
         r"""
         @brief Transforms a vector with this matrix.
         @param v The vector to transform.
@@ -14979,6 +15459,10 @@ class NetlistObject:
 
     This class has been introduced in version 0.26.2
     """
+    def __copy__(self) -> NetlistObject:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -15032,7 +15516,7 @@ class NetlistObject:
         r"""
         @brief Gets the property value for the given key or nil if there is no value with this key.
         """
-    def property_keys(self) -> Iterable[Any]:
+    def property_keys(self) -> List[Any]:
         r"""
         @brief Gets the keys for the properties stored in this object.
         """
@@ -15129,6 +15613,10 @@ class DeviceReconnectedTerminal:
     See the class description for details.@brief The setter for the abstract's connected terminal.
     See the class description for details.
     """
+    def __copy__(self) -> DeviceReconnectedTerminal:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -15198,6 +15686,10 @@ class DeviceAbstractRef:
     See the class description for details.@brief The setter for the relative transformation of the instance.
     See the class description for details.
     """
+    def __copy__(self) -> DeviceAbstractRef:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -15377,12 +15869,12 @@ class Device(NetlistObject):
         @brief Disconnects the given terminal from any net.
         This version accepts a terminal name. If the name is not a valid terminal name, an exception is raised.
         """
-    def each_combined_abstract(self) -> Iterable[DeviceAbstractRef]:
+    def each_combined_abstract(self) -> Iterator[DeviceAbstractRef]:
         r"""
         @brief Iterates over the combined device specifications.
         This feature applies to combined devices. This iterator will deliver all device abstracts present in addition to the default device abstract.
         """
-    def each_reconnected_terminal_for(self, terminal_id: int) -> Iterable[DeviceReconnectedTerminal]:
+    def each_reconnected_terminal_for(self, terminal_id: int) -> Iterator[DeviceReconnectedTerminal]:
         r"""
         @brief Iterates over the reconnected terminal specifications for a given outer terminal.
         This feature applies to combined devices. This iterator will deliver all device-to-abstract terminal reroutings.
@@ -15455,6 +15947,10 @@ class DeviceAbstract:
     @brief Sets the name of the device abstract.
     Device names are used to name a device abstract inside a netlist file. Device names should be unique within a netlist.
     """
+    def __copy__(self) -> DeviceAbstract:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -15653,6 +16149,10 @@ class NetTerminalRef:
 
     This class has been added in version 0.26.
     """
+    def __copy__(self) -> NetTerminalRef:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -15731,6 +16231,10 @@ class NetPinRef:
 
     This class has been added in version 0.26.
     """
+    def __copy__(self) -> NetPinRef:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -15800,6 +16304,10 @@ class NetSubcircuitPinRef:
 
     This class has been added in version 0.26.
     """
+    def __copy__(self) -> NetSubcircuitPinRef:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -15890,6 +16398,20 @@ class Net(NetlistObject):
     See \name= for details about the name.@brief Sets the name of the net.
     The name of the net is used for naming the net in schematic files for example. The name of the net has to be unique.
     """
+    def __repr__(self) -> str:
+        r"""
+        Note: This is an alias of 'qname'.
+        @brief Gets the qualified name.
+        The qualified name is like the expanded name, but the circuit's name is preceded
+        (i.e. 'CIRCUIT:NET') if available.
+        """
+    def __str__(self) -> str:
+        r"""
+        Note: This is an alias of 'qname'.
+        @brief Gets the qualified name.
+        The qualified name is like the expanded name, but the circuit's name is preceded
+        (i.e. 'CIRCUIT:NET') if available.
+        """
     def _assign(self, other: NetlistObject) -> None:
         r"""
         @brief Assigns another object to self
@@ -15943,17 +16465,17 @@ class Net(NetlistObject):
         r"""
         @brief Clears the net.
         """
-    def each_pin(self) -> Iterable[NetPinRef]:
+    def each_pin(self) -> Iterator[NetPinRef]:
         r"""
         @brief Iterates over all outgoing pins the net connects.
         Pin connections are described by \NetPinRef objects. Pin connections are connections to outgoing pins of the circuit the net lives in.
         """
-    def each_subcircuit_pin(self) -> Iterable[NetSubcircuitPinRef]:
+    def each_subcircuit_pin(self) -> Iterator[NetSubcircuitPinRef]:
         r"""
         @brief Iterates over all subcircuit pins the net connects.
         Subcircuit pin connections are described by \NetSubcircuitPinRef objects. These are connections to specific pins of subcircuits.
         """
-    def each_terminal(self) -> Iterable[NetTerminalRef]:
+    def each_terminal(self) -> Iterator[NetTerminalRef]:
         r"""
         @brief Iterates over all terminals the net connects.
         Terminals connect devices. Terminal connections are described by \NetTerminalRef objects.
@@ -15999,6 +16521,13 @@ class Net(NetlistObject):
         r"""
         @brief Returns the number of terminals connected by this net.
         """
+    def to_s(self) -> str:
+        r"""
+        Note: This is an alias of 'qname'.
+        @brief Gets the qualified name.
+        The qualified name is like the expanded name, but the circuit's name is preceded
+        (i.e. 'CIRCUIT:NET') if available.
+        """
 
 class DeviceTerminalDefinition:
     r"""
@@ -16015,6 +16544,10 @@ class DeviceTerminalDefinition:
     r"""
     @brief Gets the name of the terminal.@brief Sets the name of the terminal.
     """
+    def __copy__(self) -> DeviceTerminalDefinition:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self, name: str, description: Optional[str] = ...) -> None:
         r"""
         @brief Creates a new terminal definition.
@@ -16097,6 +16630,10 @@ class DeviceParameterDefinition:
     r"""
     @brief Gets the name of the parameter.@brief Sets the name of the parameter.
     """
+    def __copy__(self) -> DeviceParameterDefinition:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self, name: str, description: Optional[str] = ..., default_value: Optional[float] = ..., is_primary: Optional[bool] = ..., si_scaling: Optional[float] = ...) -> None:
         r"""
         @brief Creates a new parameter definition.
@@ -16193,6 +16730,10 @@ class EqualDeviceParameters:
         r"""
         @brief Combines two parameters for comparison.
         The '+' operator will join the parameter comparers and produce one that checks the combined parameters.
+        """
+    def __copy__(self) -> EqualDeviceParameters:
+        r"""
+        @brief Creates a copy of self
         """
     def __iadd__(self, other: EqualDeviceParameters) -> EqualDeviceParameters:
         r"""
@@ -16328,6 +16869,10 @@ class GenericDeviceCombiner:
 
     This class has been added in version 0.27.3.
     """
+    def __copy__(self) -> GenericDeviceCombiner:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -16454,6 +16999,10 @@ class DeviceClass:
 
     This method has been moved from 'GenericDeviceClass' to 'DeviceClass' in version 0.27.3.
     """
+    def __copy__(self) -> DeviceClass:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -16597,7 +17146,7 @@ class DeviceClass:
 
         This method has been introduced in version 0.27.3.
         """
-    def parameter_definitions(self) -> Iterable[DeviceParameterDefinition]:
+    def parameter_definitions(self) -> List[DeviceParameterDefinition]:
         r"""
         @brief Gets the list of parameter definitions of the device.
         See the \DeviceParameterDefinition class description for details.
@@ -16612,7 +17161,7 @@ class DeviceClass:
         @brief Gets the terminal definition object for a given ID.
         Terminal definition IDs are used in some places to reference a specific terminal of a device. This method obtains the corresponding definition object.
         """
-    def terminal_definitions(self) -> Iterable[DeviceTerminalDefinition]:
+    def terminal_definitions(self) -> List[DeviceTerminalDefinition]:
         r"""
         @brief Gets the list of terminal definitions of the device.
         See the \DeviceTerminalDefinition class description for details.
@@ -16782,33 +17331,33 @@ class Circuit(NetlistObject):
         r"""
         @brief Disconnects the given pin from any net.
         """
-    def each_child(self) -> Iterable[Circuit]:
+    def each_child(self) -> Iterator[Circuit]:
         r"""
         @brief Iterates over the child circuits of this circuit
         Child circuits are the ones that are referenced from this circuit via subcircuits.
         """
-    def each_device(self) -> Iterable[Device]:
+    def each_device(self) -> Iterator[Device]:
         r"""
         @brief Iterates over the devices of the circuit
         """
-    def each_net(self) -> Iterable[Net]:
+    def each_net(self) -> Iterator[Net]:
         r"""
         @brief Iterates over the nets of the circuit
         """
-    def each_parent(self) -> Iterable[Circuit]:
+    def each_parent(self) -> Iterator[Circuit]:
         r"""
         @brief Iterates over the parent circuits of this circuit
         Child circuits are the ones that are referencing this circuit via subcircuits.
         """
-    def each_pin(self) -> Iterable[Pin]:
+    def each_pin(self) -> Iterator[Pin]:
         r"""
         @brief Iterates over the pins of the circuit
         """
-    def each_ref(self) -> Iterable[SubCircuit]:
+    def each_ref(self) -> Iterator[SubCircuit]:
         r"""
         @brief Iterates over the subcircuit objects referencing this circuit
         """
-    def each_subcircuit(self) -> Iterable[SubCircuit]:
+    def each_subcircuit(self) -> Iterator[SubCircuit]:
         r"""
         @brief Iterates over the subcircuits of the circuit
         """
@@ -16857,7 +17406,7 @@ class Circuit(NetlistObject):
         r"""
         @brief Gets the netlist object the circuit lives in
         """
-    def nets_by_name(self, name_pattern: str) -> Iterable[Net]:
+    def nets_by_name(self, name_pattern: str) -> List[Net]:
         r"""
         @brief Gets the net objects for a given name filter.
         The name filter is a glob pattern. This method will return all \Net objects matching the glob pattern.
@@ -16941,9 +17490,18 @@ class Netlist:
     @brief Sets a value indicating whether the netlist names are case sensitive
     This method has been added in version 0.27.3.
     """
+    def __copy__(self) -> Netlist:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts the netlist to a string representation.
+        This method is intended for test purposes mainly.
         """
     def __str__(self) -> str:
         r"""
@@ -17021,7 +17579,7 @@ class Netlist:
         @brief Gets the circuit object for a given name.
         If the name is not a valid circuit name, nil is returned.
         """
-    def circuits_by_name(self, name_pattern: str) -> Iterable[Circuit]:
+    def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
         r"""
         @brief Gets the circuit objects for a given name filter.
         The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
@@ -17043,21 +17601,21 @@ class Netlist:
         r"""
         @brief Creates a copy of self
         """
-    def each_circuit(self) -> Iterable[Circuit]:
+    def each_circuit(self) -> Iterator[Circuit]:
         r"""
         @brief Iterates over the circuits of the netlist
         """
-    def each_circuit_bottom_up(self) -> Iterable[Circuit]:
+    def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
         @brief Iterates over the circuits bottom-up
         Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
         """
-    def each_circuit_top_down(self) -> Iterable[Circuit]:
+    def each_circuit_top_down(self) -> Iterator[Circuit]:
         r"""
         @brief Iterates over the circuits top-down
         Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
         """
-    def each_device_class(self) -> Iterable[DeviceClass]:
+    def each_device_class(self) -> Iterator[DeviceClass]:
         r"""
         @brief Iterates over the device classes of the netlist
         """
@@ -17078,7 +17636,7 @@ class Netlist:
         @brief Flattens circuits matching a certain pattern
         This method will substitute all instances (subcircuits) of all circuits with names matching the given name pattern. The name pattern is a glob expression. For example, 'flatten_circuit("np*")' will flatten all circuits with names starting with 'np'.
         """
-    def flatten_circuits(self, arg0: Iterable[Circuit]) -> None:
+    def flatten_circuits(self, arg0: Sequence[Circuit]) -> None:
         r"""
         @brief Flattens all given circuits of the netlist
         This method is equivalent to calling \flatten_circuit for all given circuits, but more efficient.
@@ -17163,6 +17721,10 @@ class NetlistSpiceWriterDelegate:
 
     This class has been introduced in version 0.26.
     """
+    def __copy__(self) -> NetlistSpiceWriterDelegate:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -17374,6 +17936,10 @@ class NetlistSpiceWriter(NetlistWriter):
     @brief Sets a value indicating whether to embed comments for position etc. (true) or not (false).
     The default is to embed comments.
     """
+    def __copy__(self) -> NetlistSpiceWriter:
+        r"""
+        @brief Creates a copy of self
+        """
     @overload
     def __init__(self) -> None:
         r"""
@@ -17491,11 +18057,15 @@ class ParseElementComponentsData:
     @brief Gets the (named) numerical parameters
     @brief Sets the (named) numerical parameters
     """
-    strings: Iterable[str]
+    strings: List[str]
     r"""
     @brief Gets the string parameters
     @brief Sets the string parameters
     """
+    def __copy__(self) -> ParseElementComponentsData:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -17558,7 +18128,7 @@ class ParseElementData:
     @brief Gets the model name
     @brief Sets the model name
     """
-    net_names: Iterable[str]
+    net_names: List[str]
     r"""
     @brief Gets the net names
     @brief Sets the net names
@@ -17573,6 +18143,10 @@ class ParseElementData:
     @brief Gets the value
     @brief Sets the value
     """
+    def __copy__(self) -> ParseElementData:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -17632,6 +18206,10 @@ class NetlistSpiceReaderDelegate:
 
     This class has been introduced in version 0.26.
     """
+    def __copy__(self) -> NetlistSpiceReaderDelegate:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -17696,12 +18274,12 @@ class NetlistSpiceReaderDelegate:
         @brief Creates a copy of self
         """
     @overload
-    def element(self, arg0: Circuit, arg1: str, arg2: str, arg3: str, arg4: float, arg5: Iterable[Net], arg6: Dict[str, float]) -> bool:
+    def element(self, arg0: Circuit, arg1: str, arg2: str, arg3: str, arg4: float, arg5: Sequence[Net], arg6: Dict[str, float]) -> bool:
         r"""
         @hide
         """
     @overload
-    def element(self, circuit: Circuit, element: str, name: str, model: str, value: float, nets: Iterable[Net], parameters: Dict[str, float]) -> bool:
+    def element(self, circuit: Circuit, element: str, name: str, model: str, value: float, nets: Sequence[Net], parameters: Dict[str, float]) -> bool:
         r"""
         @brief Makes a device from an element line
         @param circuit The circuit that is currently read.
@@ -18253,7 +18831,7 @@ class NetlistComparer:
         This method will perform the actual netlist compare using the given logger. It will return true if both netlists are identical. If the comparer has been configured with \same_nets or similar methods, the objects given there must be located inside 'circuit_a' and 'circuit_b' respectively.
         """
     @overload
-    def equivalent_pins(self, circuit_b: Circuit, pin_ids: Iterable[int]) -> None:
+    def equivalent_pins(self, circuit_b: Circuit, pin_ids: Sequence[int]) -> None:
         r"""
         @brief Marks several pins of the given circuit as equivalent (i.e. they can be swapped).
         Only circuits from the second input can be given swappable pins. This will imply the same swappable pins on the equivalent circuit of the first input. This version is a generic variant of the two-pin version of this method.
@@ -18318,12 +18896,12 @@ class NetlistComparer:
 
         This variant has been added in version 0.27.3.
         """
-    def unmatched_circuits_a(self, a: Netlist, b: Netlist) -> Iterable[Circuit]:
+    def unmatched_circuits_a(self, a: Netlist, b: Netlist) -> List[Circuit]:
         r"""
         @brief Returns a list of circuits in A for which there is not corresponding circuit in B
         This list can be used to flatten these circuits so they do not participate in the compare process.
         """
-    def unmatched_circuits_b(self, a: Netlist, b: Netlist) -> Iterable[Circuit]:
+    def unmatched_circuits_b(self, a: Netlist, b: Netlist) -> List[Circuit]:
         r"""
         @brief Returns a list of circuits in B for which there is not corresponding circuit in A
         This list can be used to flatten these circuits so they do not participate in the compare process.
@@ -18565,6 +19143,10 @@ class NetlistCrossReference(NetlistCompareLogger):
             r"""
             @brief Compares two enums for inequality
             """
+        def __repr__(self) -> str:
+            r"""
+            @brief Gets the symbolic string from an enum
+            """
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
@@ -18657,42 +19239,42 @@ class NetlistCrossReference(NetlistCompareLogger):
         r"""
         @hide
         """
-    def each_circuit_pair(self) -> Iterable[NetlistCrossReference.CircuitPairData]:
+    def each_circuit_pair(self) -> Iterator[NetlistCrossReference.CircuitPairData]:
         r"""
         @brief Delivers the circuit pairs and their status.
         See the class description for details.
         """
-    def each_device_pair(self, circuit_pair: NetlistCrossReference.CircuitPairData) -> Iterable[NetlistCrossReference.DevicePairData]:
+    def each_device_pair(self, circuit_pair: NetlistCrossReference.CircuitPairData) -> Iterator[NetlistCrossReference.DevicePairData]:
         r"""
         @brief Delivers the device pairs and their status for the given circuit pair.
         See the class description for details.
         """
-    def each_net_pair(self, circuit_pair: NetlistCrossReference.CircuitPairData) -> Iterable[NetlistCrossReference.NetPairData]:
+    def each_net_pair(self, circuit_pair: NetlistCrossReference.CircuitPairData) -> Iterator[NetlistCrossReference.NetPairData]:
         r"""
         @brief Delivers the net pairs and their status for the given circuit pair.
         See the class description for details.
         """
-    def each_net_pin_pair(self, net_pair: NetlistCrossReference.NetPairData) -> Iterable[NetlistCrossReference.NetPinRefPair]:
+    def each_net_pin_pair(self, net_pair: NetlistCrossReference.NetPairData) -> Iterator[NetlistCrossReference.NetPinRefPair]:
         r"""
         @brief Delivers the pin pairs for the given net pair.
         For the net pair, lists the pin pairs identified on this net.
         """
-    def each_net_subcircuit_pin_pair(self, net_pair: NetlistCrossReference.NetPairData) -> Iterable[NetlistCrossReference.NetSubcircuitPinRefPair]:
+    def each_net_subcircuit_pin_pair(self, net_pair: NetlistCrossReference.NetPairData) -> Iterator[NetlistCrossReference.NetSubcircuitPinRefPair]:
         r"""
         @brief Delivers the subcircuit pin pairs for the given net pair.
         For the net pair, lists the subcircuit pin pairs identified on this net.
         """
-    def each_net_terminal_pair(self, net_pair: NetlistCrossReference.NetPairData) -> Iterable[NetlistCrossReference.NetTerminalRefPair]:
+    def each_net_terminal_pair(self, net_pair: NetlistCrossReference.NetPairData) -> Iterator[NetlistCrossReference.NetTerminalRefPair]:
         r"""
         @brief Delivers the device terminal pairs for the given net pair.
         For the net pair, lists the device terminal pairs identified on this net.
         """
-    def each_pin_pair(self, circuit_pair: NetlistCrossReference.CircuitPairData) -> Iterable[NetlistCrossReference.PinPairData]:
+    def each_pin_pair(self, circuit_pair: NetlistCrossReference.CircuitPairData) -> Iterator[NetlistCrossReference.PinPairData]:
         r"""
         @brief Delivers the pin pairs and their status for the given circuit pair.
         See the class description for details.
         """
-    def each_subcircuit_pair(self, circuit_pair: NetlistCrossReference.CircuitPairData) -> Iterable[NetlistCrossReference.SubCircuitPairData]:
+    def each_subcircuit_pair(self, circuit_pair: NetlistCrossReference.CircuitPairData) -> Iterator[NetlistCrossReference.SubCircuitPairData]:
         r"""
         @brief Delivers the subcircuit pairs and their status for the given circuit pair.
         See the class description for details.
@@ -19498,6 +20080,10 @@ class DeviceClassFactory:
 
     This class has been introduced in version 0.27.3.
     """
+    def __copy__(self) -> DeviceClassFactory:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -19593,6 +20179,10 @@ class NetlistDeviceExtractorError:
     @brief Gets the message text.
     @brief Sets the message text.
     """
+    def __copy__(self) -> NetlistDeviceExtractorError:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -19652,6 +20242,10 @@ class NetlistDeviceExtractorLayerDefinition:
 
     This class has been introduced in version 0.26.
     """
+    def __copy__(self) -> NetlistDeviceExtractorLayerDefinition:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -19780,11 +20374,11 @@ class DeviceExtractorBase:
 
         This method has been added in version 0.27.3.
         """
-    def each_error(self) -> Iterable[NetlistDeviceExtractorError]:
+    def each_error(self) -> Iterator[NetlistDeviceExtractorError]:
         r"""
         @brief Iterates over all errors collected in the device extractor.
         """
-    def each_layer_definition(self) -> Iterable[NetlistDeviceExtractorLayerDefinition]:
+    def each_layer_definition(self) -> Iterator[NetlistDeviceExtractorLayerDefinition]:
         r"""
         @brief Iterates over all layer definitions.
         """
@@ -19944,7 +20538,7 @@ class GenericDeviceExtractor(DeviceExtractorBase):
         r"""
         @brief Issues an error with the given category name and description, message and database-unit polygon geometry
         """
-    def extract_devices(self, layer_geometry: Iterable[Region]) -> None:
+    def extract_devices(self, layer_geometry: Sequence[Region]) -> None:
         r"""
         @brief Extracts the devices from the given shape cluster.
 
@@ -19957,7 +20551,7 @@ class GenericDeviceExtractor(DeviceExtractorBase):
         terminals by which the nets extracted in the network extraction step connect
         to the new devices.
         """
-    def get_connectivity(self, layout: Layout, layers: Iterable[int]) -> Connectivity:
+    def get_connectivity(self, layout: Layout, layers: Sequence[int]) -> Connectivity:
         r"""
         @brief Gets the connectivity object used to extract the device geometry.
         This method shall raise an error, if the input layer are not properly defined (e.g.
@@ -20737,10 +21331,21 @@ class Path:
 
         This method has been added in version 0.23.
         """
+    def __copy__(self) -> Path:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, p: object) -> bool:
         r"""
         @brief Equality test
         @param p The object to compare against
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given polygon. This method enables polygons as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -20755,7 +21360,7 @@ class Path:
         This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dpath'.
         """
     @overload
-    def __init__(self, pts: Iterable[Point], width: int) -> None:
+    def __init__(self, pts: Sequence[Point], width: int) -> None:
         r"""
         @brief Constructor given the points of the path's spine and the width
 
@@ -20764,7 +21369,7 @@ class Path:
         @param width The width of the path
         """
     @overload
-    def __init__(self, pts: Iterable[Point], width: int, bgn_ext: int, end_ext: int) -> None:
+    def __init__(self, pts: Sequence[Point], width: int, bgn_ext: int, end_ext: int) -> None:
         r"""
         @brief Constructor given the points of the path's spine, the width and the extensions
 
@@ -20775,7 +21380,7 @@ class Path:
         @param end_ext The end extension of the path
         """
     @overload
-    def __init__(self, pts: Iterable[Point], width: int, bgn_ext: int, end_ext: int, round: bool) -> None:
+    def __init__(self, pts: Sequence[Point], width: int, bgn_ext: int, end_ext: int, round: bool) -> None:
         r"""
         @brief Constructor given the points of the path's spine, the width, the extensions and the round end flag
 
@@ -20803,6 +21408,17 @@ class Path:
         r"""
         @brief Inequality test
         @param p The object to compare against
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert to a string
+        """
+    def __rmul__(self, f: float) -> Path:
+        r"""
+        @brief Scaling by some factor
+
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and if necessary rounded.
         """
     def __str__(self) -> str:
         r"""
@@ -20863,7 +21479,7 @@ class Path:
         r"""
         @brief Creates a copy of self
         """
-    def each_point(self) -> Iterable[Point]:
+    def each_point(self) -> Iterator[Point]:
         r"""
         @brief Get the points that make up the path's spine
         """
@@ -21064,10 +21680,21 @@ class DPath:
 
         This method has been added in version 0.23.
         """
+    def __copy__(self) -> DPath:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, p: object) -> bool:
         r"""
         @brief Equality test
         @param p The object to compare against
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given polygon. This method enables polygons as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -21082,7 +21709,7 @@ class DPath:
         This constructor has been introduced in version 0.25 and replaces the previous static method 'from_ipath'.
         """
     @overload
-    def __init__(self, pts: Iterable[DPoint], width: float) -> None:
+    def __init__(self, pts: Sequence[DPoint], width: float) -> None:
         r"""
         @brief Constructor given the points of the path's spine and the width
 
@@ -21091,7 +21718,7 @@ class DPath:
         @param width The width of the path
         """
     @overload
-    def __init__(self, pts: Iterable[DPoint], width: float, bgn_ext: float, end_ext: float) -> None:
+    def __init__(self, pts: Sequence[DPoint], width: float, bgn_ext: float, end_ext: float) -> None:
         r"""
         @brief Constructor given the points of the path's spine, the width and the extensions
 
@@ -21102,7 +21729,7 @@ class DPath:
         @param end_ext The end extension of the path
         """
     @overload
-    def __init__(self, pts: Iterable[DPoint], width: float, bgn_ext: float, end_ext: float, round: bool) -> None:
+    def __init__(self, pts: Sequence[DPoint], width: float, bgn_ext: float, end_ext: float, round: bool) -> None:
         r"""
         @brief Constructor given the points of the path's spine, the width, the extensions and the round end flag
 
@@ -21130,6 +21757,17 @@ class DPath:
         r"""
         @brief Inequality test
         @param p The object to compare against
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert to a string
+        """
+    def __rmul__(self, f: float) -> DPath:
+        r"""
+        @brief Scaling by some factor
+
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and if necessary rounded.
         """
     def __str__(self) -> str:
         r"""
@@ -21190,7 +21828,7 @@ class DPath:
         r"""
         @brief Creates a copy of self
         """
-    def each_point(self) -> Iterable[DPoint]:
+    def each_point(self) -> Iterator[DPoint]:
         r"""
         @brief Get the points that make up the path's spine
         """
@@ -21380,10 +22018,21 @@ class DPoint:
 
         Starting with version 0.25, this method expects a vector argument.
         """
+    def __copy__(self) -> DPoint:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, p: object) -> bool:
         r"""
         @brief Equality test operator
 
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given point. This method enables points as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     def __imul__(self, f: float) -> DPoint:
         r"""
@@ -21453,10 +22102,22 @@ class DPoint:
 
         This method has been added in version 0.23.
         """
+    def __repr__(self) -> str:
+        r"""
+        @brief String conversion
+        """
+    def __rmul__(self, f: float) -> DPoint:
+        r"""
+        @brief Scaling by some factor
+
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and if necessary rounded.
+        """
     def __str__(self) -> str:
         r"""
         @brief String conversion
         """
+    @overload
     def __sub__(self, p: DPoint) -> DVector:
         r"""
         @brief Subtract one point from another
@@ -21465,6 +22126,16 @@ class DPoint:
         Subtract point p from self by subtracting the coordinates. This renders a vector.
 
         Starting with version 0.25, this method renders a vector.
+        """
+    @overload
+    def __sub__(self, v: DVector) -> DPoint:
+        r"""
+        @brief Subtract one vector from a point
+
+
+        Subtract vector v from from self by subtracting the coordinates. This renders a point.
+
+        This method has been added in version 0.27.
         """
     def __truediv__(self, d: float) -> DPoint:
         r"""
@@ -21607,10 +22278,21 @@ class Point:
 
         Starting with version 0.25, this method expects a vector argument.
         """
+    def __copy__(self) -> Point:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, p: object) -> bool:
         r"""
         @brief Equality test operator
 
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given point. This method enables points as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     def __imul__(self, f: float) -> Point:
         r"""
@@ -21680,10 +22362,22 @@ class Point:
 
         This method has been added in version 0.23.
         """
+    def __repr__(self) -> str:
+        r"""
+        @brief String conversion
+        """
+    def __rmul__(self, f: float) -> Point:
+        r"""
+        @brief Scaling by some factor
+
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and if necessary rounded.
+        """
     def __str__(self) -> str:
         r"""
         @brief String conversion
         """
+    @overload
     def __sub__(self, p: Point) -> Vector:
         r"""
         @brief Subtract one point from another
@@ -21692,6 +22386,16 @@ class Point:
         Subtract point p from self by subtracting the coordinates. This renders a vector.
 
         Starting with version 0.25, this method renders a vector.
+        """
+    @overload
+    def __sub__(self, v: Vector) -> Point:
+        r"""
+        @brief Subtract one vector from a point
+
+
+        Subtract vector v from from self by subtracting the coordinates. This renders a point.
+
+        This method has been added in version 0.27.
         """
     def __truediv__(self, d: float) -> Point:
         r"""
@@ -21845,10 +22549,21 @@ class SimplePolygon:
 
         This method has been added in version 0.23.
         """
+    def __copy__(self) -> SimplePolygon:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, p: object) -> bool:
         r"""
         @brief Returns a value indicating whether self is equal to p
         @param p The object to compare against
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given polygon. This method enables polygons as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -21870,7 +22585,7 @@ class SimplePolygon:
         This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dpoly'.
         """
     @overload
-    def __init__(self, pts: Iterable[Point], raw: Optional[bool] = ...) -> None:
+    def __init__(self, pts: Sequence[Point], raw: Optional[bool] = ...) -> None:
         r"""
         @brief Constructor given the points of the simple polygon
 
@@ -21901,6 +22616,16 @@ class SimplePolygon:
         r"""
         @brief Returns a value indicating whether self is not equal to p
         @param p The object to compare against
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+    def __rmul__(self, f: float) -> SimplePolygon:
+        r"""
+        @brief Scales the polygon by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and if necessary rounded.
         """
     def __str__(self) -> str:
         r"""
@@ -21978,15 +22703,15 @@ class SimplePolygon:
         r"""
         @brief Creates a copy of self
         """
-    def each_edge(self) -> Iterable[Edge]:
+    def each_edge(self) -> Iterator[Edge]:
         r"""
         @brief Iterates over the edges that make up the simple polygon
         """
-    def each_point(self) -> Iterable[Point]:
+    def each_point(self) -> Iterator[Point]:
         r"""
         @brief Iterates over the points that make up the simple polygon
         """
-    def extract_rad(self) -> Iterable[Any]:
+    def extract_rad(self) -> List[Any]:
         r"""
         @brief Extracts the corner radii from a rounded polygon
 
@@ -22060,7 +22785,7 @@ class SimplePolygon:
         This method was introduced in version 0.22.
         """
     @overload
-    def minkowski_sum(self, c: Iterable[Point], resolve_holes: bool) -> Polygon:
+    def minkowski_sum(self, c: Sequence[Point], resolve_holes: bool) -> Polygon:
         r"""
         @brief Computes the Minkowski sum of a polygon and a contour of points (a trace)
 
@@ -22176,7 +22901,7 @@ class SimplePolygon:
 
         This method was introduced in version 0.22 for integer coordinates and in 0.25 for all coordinate types.
         """
-    def set_points(self, pts: Iterable[Point], raw: Optional[bool] = ...) -> None:
+    def set_points(self, pts: Sequence[Point], raw: Optional[bool] = ...) -> None:
         r"""
         @brief Sets the points of the simple polygon
 
@@ -22187,7 +22912,7 @@ class SimplePolygon:
 
         This method has been added in version 0.24.
         """
-    def split(self) -> Iterable[SimplePolygon]:
+    def split(self) -> List[SimplePolygon]:
         r"""
         @brief Splits the polygon into two or more parts
         This method will break the polygon into parts. The exact breaking algorithm is unspecified, the result are smaller polygons of roughly equal number of points and 'less concave' nature. Usually the returned polygon set consists of two polygons, but there can be more. The merged region of the resulting polygons equals the original polygon with the exception of small snapping effects at new vertexes.
@@ -22350,10 +23075,21 @@ class DSimplePolygon:
 
         This method has been added in version 0.23.
         """
+    def __copy__(self) -> DSimplePolygon:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, p: object) -> bool:
         r"""
         @brief Returns a value indicating whether self is equal to p
         @param p The object to compare against
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given polygon. This method enables polygons as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -22374,7 +23110,7 @@ class DSimplePolygon:
         This constructor has been introduced in version 0.25 and replaces the previous static method 'from_ipoly'.
         """
     @overload
-    def __init__(self, pts: Iterable[DPoint], raw: Optional[bool] = ...) -> None:
+    def __init__(self, pts: Sequence[DPoint], raw: Optional[bool] = ...) -> None:
         r"""
         @brief Constructor given the points of the simple polygon
 
@@ -22405,6 +23141,16 @@ class DSimplePolygon:
         r"""
         @brief Returns a value indicating whether self is not equal to p
         @param p The object to compare against
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+    def __rmul__(self, f: float) -> DSimplePolygon:
+        r"""
+        @brief Scales the polygon by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and if necessary rounded.
         """
     def __str__(self) -> str:
         r"""
@@ -22482,15 +23228,15 @@ class DSimplePolygon:
         r"""
         @brief Creates a copy of self
         """
-    def each_edge(self) -> Iterable[DEdge]:
+    def each_edge(self) -> Iterator[DEdge]:
         r"""
         @brief Iterates over the edges that make up the simple polygon
         """
-    def each_point(self) -> Iterable[DPoint]:
+    def each_point(self) -> Iterator[DPoint]:
         r"""
         @brief Iterates over the points that make up the simple polygon
         """
-    def extract_rad(self) -> Iterable[Any]:
+    def extract_rad(self) -> List[Any]:
         r"""
         @brief Extracts the corner radii from a rounded polygon
 
@@ -22632,7 +23378,7 @@ class DSimplePolygon:
 
         This method was introduced in version 0.22 for integer coordinates and in 0.25 for all coordinate types.
         """
-    def set_points(self, pts: Iterable[DPoint], raw: Optional[bool] = ...) -> None:
+    def set_points(self, pts: Sequence[DPoint], raw: Optional[bool] = ...) -> None:
         r"""
         @brief Sets the points of the simple polygon
 
@@ -22643,7 +23389,7 @@ class DSimplePolygon:
 
         This method has been added in version 0.24.
         """
-    def split(self) -> Iterable[DSimplePolygon]:
+    def split(self) -> List[DSimplePolygon]:
         r"""
         @brief Splits the polygon into two or more parts
         This method will break the polygon into parts. The exact breaking algorithm is unspecified, the result are smaller polygons of roughly equal number of points and 'less concave' nature. Usually the returned polygon set consists of two polygons, but there can be more. The merged region of the resulting polygons equals the original polygon with the exception of small snapping effects at new vertexes.
@@ -22869,10 +23615,21 @@ class Polygon:
 
         This method has been added in version 0.23.
         """
+    def __copy__(self) -> Polygon:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, p: object) -> bool:
         r"""
         @brief Returns a value indicating whether the polygons are equal
         @param p The object to compare against
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given polygon. This method enables polygons as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -22901,7 +23658,7 @@ class Polygon:
         This method was introduced in version 0.22.
         """
     @overload
-    def __init__(self, pts: Iterable[Point], raw: Optional[bool] = ...) -> None:
+    def __init__(self, pts: Sequence[Point], raw: Optional[bool] = ...) -> None:
         r"""
         @brief Creates a polygon from a point array for the hull
 
@@ -22926,6 +23683,16 @@ class Polygon:
         r"""
         @brief Returns a value indicating whether the polygons are not equal
         @param p The object to compare against
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+    def __rmul__(self, f: float) -> Polygon:
+        r"""
+        @brief Scales the polygon by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and if necessary rounded.
         """
     def __str__(self) -> str:
         r"""
@@ -22994,7 +23761,7 @@ class Polygon:
         This method was introduced in version 0.23.
         """
     @overload
-    def assign_hole(self, n: int, p: Iterable[Point], raw: Optional[bool] = ...) -> None:
+    def assign_hole(self, n: int, p: Sequence[Point], raw: Optional[bool] = ...) -> None:
         r"""
         @brief Sets the points of the given hole of the polygon
         @param n The index of the hole to which the points should be assigned
@@ -23005,7 +23772,7 @@ class Polygon:
         This method was introduced in version 0.18.
         The 'raw' argument was added in version 0.24.
         """
-    def assign_hull(self, p: Iterable[Point], raw: Optional[bool] = ...) -> None:
+    def assign_hull(self, p: Sequence[Point], raw: Optional[bool] = ...) -> None:
         r"""
         @brief Sets the points of the hull of polygon
         @param p An array of points to assign to the polygon's hull
@@ -23035,7 +23802,7 @@ class Polygon:
 
         This method was introduced in version 0.18.
         """
-    def decompose_convex(self, preferred_orientation: Optional[int] = ...) -> Iterable[SimplePolygon]:
+    def decompose_convex(self, preferred_orientation: Optional[int] = ...) -> List[SimplePolygon]:
         r"""
         @brief Decomposes the polygon into convex pieces
 
@@ -23047,7 +23814,7 @@ class Polygon:
 
         This method was introduced in version 0.25.
         """
-    def decompose_trapezoids(self, mode: Optional[int] = ...) -> Iterable[SimplePolygon]:
+    def decompose_trapezoids(self, mode: Optional[int] = ...) -> List[SimplePolygon]:
         r"""
         @brief Decomposes the polygon into trapezoids
 
@@ -23063,14 +23830,14 @@ class Polygon:
         @brief Creates a copy of self
         """
     @overload
-    def each_edge(self) -> Iterable[Edge]:
+    def each_edge(self) -> Iterator[Edge]:
         r"""
         @brief Iterates over the edges that make up the polygon
 
         This iterator will deliver all edges, including those of the holes. Hole edges are oriented counterclockwise while hull edges are oriented clockwise.
         """
     @overload
-    def each_edge(self, contour: int) -> Iterable[Edge]:
+    def each_edge(self, contour: int) -> Iterator[Edge]:
         r"""
         @brief Iterates over the edges of one contour of the polygon
 
@@ -23081,16 +23848,16 @@ class Polygon:
 
         This method was introduced in version 0.24.
         """
-    def each_point_hole(self, n: int) -> Iterable[Point]:
+    def each_point_hole(self, n: int) -> Iterator[Point]:
         r"""
         @brief Iterates over the points that make up the nth hole
         The hole number must be less than the number of holes (see \holes)
         """
-    def each_point_hull(self) -> Iterable[Point]:
+    def each_point_hull(self) -> Iterator[Point]:
         r"""
         @brief Iterates over the points that make up the hull
         """
-    def extract_rad(self) -> Iterable[Any]:
+    def extract_rad(self) -> List[Any]:
         r"""
         @brief Extracts the corner radii from a rounded polygon
 
@@ -23133,7 +23900,7 @@ class Polygon:
         This method was introduced in version 0.23.
         """
     @overload
-    def insert_hole(self, p: Iterable[Point], raw: Optional[bool] = ...) -> None:
+    def insert_hole(self, p: Sequence[Point], raw: Optional[bool] = ...) -> None:
         r"""
         @brief Inserts a hole with the given points
         @param p An array of points to insert as a new hole
@@ -23192,18 +23959,6 @@ class Polygon:
         This method was introduced in version 0.22.
         """
     @overload
-    def minkowski_sum(self, b: Iterable[Point], resolve_holes: bool) -> Polygon:
-        r"""
-        @brief Computes the Minkowski sum of the polygon and a contour of points (a trace)
-
-        @param b The contour (a series of points forming the trace).
-        @param resolve_holes If true, the output polygon will not contain holes, but holes are resolved by joining the holes with the hull.
-
-        @return The new polygon representing the Minkowski sum of self and the contour.
-
-        This method was introduced in version 0.22.
-        """
-    @overload
     def minkowski_sum(self, b: Polygon, resolve_holes: bool) -> Polygon:
         r"""
         @brief Computes the Minkowski sum of the polygon and a polygon
@@ -23212,6 +23967,18 @@ class Polygon:
         @param resolve_holes If true, the output polygon will not contain holes, but holes are resolved by joining the holes with the hull.
 
         @return The new polygon representing the Minkowski sum of self and p.
+
+        This method was introduced in version 0.22.
+        """
+    @overload
+    def minkowski_sum(self, b: Sequence[Point], resolve_holes: bool) -> Polygon:
+        r"""
+        @brief Computes the Minkowski sum of the polygon and a contour of points (a trace)
+
+        @param b The contour (a series of points forming the trace).
+        @param resolve_holes If true, the output polygon will not contain holes, but holes are resolved by joining the holes with the hull.
+
+        @return The new polygon representing the Minkowski sum of self and the contour.
 
         This method was introduced in version 0.22.
         """
@@ -23454,7 +24221,7 @@ class Polygon:
 
         This method was introduced in version 0.23. The 'keep_hv' optional parameter was added in version 0.27.
         """
-    def split(self) -> Iterable[Polygon]:
+    def split(self) -> List[Polygon]:
         r"""
         @brief Splits the polygon into two or more parts
         This method will break the polygon into parts. The exact breaking algorithm is unspecified, the result are smaller polygons of roughly equal number of points and 'less concave' nature. Usually the returned polygon set consists of two polygons, but there can be more. The merged region of the resulting polygons equals the original polygon with the exception of small snapping effects at new vertexes.
@@ -23557,20 +24324,6 @@ class Polygon:
         With version 0.25, the original 'transformed_cplx' method is deprecated and 'transformed' takes both simple and complex transformations.
         """
     @overload
-    def transformed(self, t: ICplxTrans) -> Polygon:
-        r"""
-        @brief Transforms the polygon with a complex transformation
-
-        Transforms the polygon with the given complex transformation.
-        Does not modify the polygon but returns the transformed polygon.
-
-        @param t The transformation to apply.
-
-        @return The transformed polygon (in this case an integer coordinate polygon).
-
-        This method was introduced in version 0.18.
-        """
-    @overload
     def transformed(self, t: Trans) -> Polygon:
         r"""
         @brief Transforms the polygon
@@ -23649,10 +24402,21 @@ class DPolygon:
 
         This method has been added in version 0.23.
         """
+    def __copy__(self) -> DPolygon:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, p: object) -> bool:
         r"""
         @brief Returns a value indicating whether the polygons are equal
         @param p The object to compare against
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given polygon. This method enables polygons as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -23681,7 +24445,7 @@ class DPolygon:
         This method was introduced in version 0.22.
         """
     @overload
-    def __init__(self, pts: Iterable[DPoint], raw: Optional[bool] = ...) -> None:
+    def __init__(self, pts: Sequence[DPoint], raw: Optional[bool] = ...) -> None:
         r"""
         @brief Creates a polygon from a point array for the hull
 
@@ -23706,6 +24470,16 @@ class DPolygon:
         r"""
         @brief Returns a value indicating whether the polygons are not equal
         @param p The object to compare against
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
+    def __rmul__(self, f: float) -> DPolygon:
+        r"""
+        @brief Scales the polygon by some factor
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and if necessary rounded.
         """
     def __str__(self) -> str:
         r"""
@@ -23774,7 +24548,7 @@ class DPolygon:
         This method was introduced in version 0.23.
         """
     @overload
-    def assign_hole(self, n: int, p: Iterable[DPoint], raw: Optional[bool] = ...) -> None:
+    def assign_hole(self, n: int, p: Sequence[DPoint], raw: Optional[bool] = ...) -> None:
         r"""
         @brief Sets the points of the given hole of the polygon
         @param n The index of the hole to which the points should be assigned
@@ -23785,7 +24559,7 @@ class DPolygon:
         This method was introduced in version 0.18.
         The 'raw' argument was added in version 0.24.
         """
-    def assign_hull(self, p: Iterable[DPoint], raw: Optional[bool] = ...) -> None:
+    def assign_hull(self, p: Sequence[DPoint], raw: Optional[bool] = ...) -> None:
         r"""
         @brief Sets the points of the hull of polygon
         @param p An array of points to assign to the polygon's hull
@@ -23820,14 +24594,14 @@ class DPolygon:
         @brief Creates a copy of self
         """
     @overload
-    def each_edge(self) -> Iterable[DEdge]:
+    def each_edge(self) -> Iterator[DEdge]:
         r"""
         @brief Iterates over the edges that make up the polygon
 
         This iterator will deliver all edges, including those of the holes. Hole edges are oriented counterclockwise while hull edges are oriented clockwise.
         """
     @overload
-    def each_edge(self, contour: int) -> Iterable[DEdge]:
+    def each_edge(self, contour: int) -> Iterator[DEdge]:
         r"""
         @brief Iterates over the edges of one contour of the polygon
 
@@ -23838,16 +24612,16 @@ class DPolygon:
 
         This method was introduced in version 0.24.
         """
-    def each_point_hole(self, n: int) -> Iterable[DPoint]:
+    def each_point_hole(self, n: int) -> Iterator[DPoint]:
         r"""
         @brief Iterates over the points that make up the nth hole
         The hole number must be less than the number of holes (see \holes)
         """
-    def each_point_hull(self) -> Iterable[DPoint]:
+    def each_point_hull(self) -> Iterator[DPoint]:
         r"""
         @brief Iterates over the points that make up the hull
         """
-    def extract_rad(self) -> Iterable[Any]:
+    def extract_rad(self) -> List[Any]:
         r"""
         @brief Extracts the corner radii from a rounded polygon
 
@@ -23890,7 +24664,7 @@ class DPolygon:
         This method was introduced in version 0.23.
         """
     @overload
-    def insert_hole(self, p: Iterable[DPoint], raw: Optional[bool] = ...) -> None:
+    def insert_hole(self, p: Sequence[DPoint], raw: Optional[bool] = ...) -> None:
         r"""
         @brief Inserts a hole with the given points
         @param p An array of points to insert as a new hole
@@ -24123,7 +24897,7 @@ class DPolygon:
 
         This method has been introduced in version 0.23.
         """
-    def split(self) -> Iterable[DPolygon]:
+    def split(self) -> List[DPolygon]:
         r"""
         @brief Splits the polygon into two or more parts
         This method will break the polygon into parts. The exact breaking algorithm is unspecified, the result are smaller polygons of roughly equal number of points and 'less concave' nature. Usually the returned polygon set consists of two polygons, but there can be more. The merged region of the resulting polygons equals the original polygon with the exception of small snapping effects at new vertexes.
@@ -24288,6 +25062,10 @@ class LayerMap:
 
     The LayerMap class has been introduced in version 0.18. Target layer have been introduced in version 0.20. 1:n mapping and unmapping has been introduced in version 0.27.
     """
+    def __copy__(self) -> LayerMap:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -24354,13 +25132,7 @@ class LayerMap:
         @param layer The physical layer specified with an \LayerInfo object.
         @return True, if the layer is mapped.
         """
-    def logical(self, layer: LayerInfo) -> int:
-        r"""
-        @brief Returns the logical layer (the layer index in the layout object) for a given physical layer.n@param layer The physical layer specified with an \LayerInfo object.
-        @return The logical layer index or -1 if the layer is not mapped.
-        This method is deprecated with version 0.27 as in this version, layers can be mapped to multiple targets which this method can't capture. Use \logicals instead.
-        """
-    def logicals(self, layer: LayerInfo) -> Iterable[int]:
+    def logicals(self, layer: LayerInfo) -> List[int]:
         r"""
         @brief Returns the logical layers for a given physical layer.n@param layer The physical layer specified with an \LayerInfo object.
         @return This list of logical layers this physical layer as mapped to or empty if there is no mapping.
@@ -24593,6 +25365,10 @@ class LoadLayoutOptions:
         def __ne__(self, other: object) -> bool:
             r"""
             @brief Compares two enums for inequality
+            """
+        def __repr__(self) -> str:
+            r"""
+            @brief Gets the symbolic string from an enum
             """
         def __str__(self) -> str:
             r"""
@@ -24975,7 +25751,7 @@ class LoadLayoutOptions:
 
     This method has been added in version 0.26.2.
     """
-    mag_library_paths: Iterable[str]
+    mag_library_paths: List[str]
     r"""
     @brief Gets the locations where to look up libraries (in this order)
     See \mag_library_paths= method for a description of this attribute.
@@ -25027,6 +25803,10 @@ class LoadLayoutOptions:
     @param enabled True, if text objects should be read.
     Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration.
     """
+    def __copy__(self) -> LoadLayoutOptions:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -25268,7 +26048,7 @@ class RecursiveInstanceIterator:
     See \region for a description of this attribute.
     Setting a simple region will reset the complex region to a rectangle and reset the iterator to the beginning of the sequence.
     """
-    targets: Iterable[int]
+    targets: List[int]
     r"""
     @brief Gets the list of target cells
     See \targets= for a description of the target cell concept. This method returns a list of cell indexes of the selected target cells.@brief Specifies the target cells.
@@ -25278,6 +26058,10 @@ class RecursiveInstanceIterator:
 
     This method will also reset the iterator.
     """
+    def __copy__(self) -> RecursiveInstanceIterator:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Comparison of iterators - equality
@@ -25458,7 +26242,7 @@ class RecursiveInstanceIterator:
         @brief Increments the iterator
         This moves the iterator to the next instance inside the search scope.
         """
-    def path(self) -> Iterable[InstElement]:
+    def path(self) -> List[InstElement]:
         r"""
         @brief Gets the instantiation path of the instance addressed currently
 
@@ -25485,7 +26269,7 @@ class RecursiveInstanceIterator:
         This method will also reset the iterator.
         """
     @overload
-    def select_cells(self, cells: Iterable[int]) -> None:
+    def select_cells(self, cells: Sequence[int]) -> None:
         r"""
         @brief Unselects the given cells.
 
@@ -25526,7 +26310,7 @@ class RecursiveInstanceIterator:
         This method will also reset the iterator.
         """
     @overload
-    def unselect_cells(self, cells: Iterable[int]) -> None:
+    def unselect_cells(self, cells: Sequence[int]) -> None:
         r"""
         @brief Unselects the given cells.
 
@@ -25696,6 +26480,10 @@ class RecursiveShapeIterator:
     The flags must be specified before the shapes are being retrieved.
     Settings the shapes flags will reset the iterator.
     """
+    def __copy__(self) -> RecursiveShapeIterator:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Comparison of iterators - equality
@@ -25715,7 +26503,7 @@ class RecursiveShapeIterator:
         This constructor has been introduced in version 0.23.
         """
     @overload
-    def __init__(self, layout: Layout, cell: Cell, layers: Iterable[int]) -> None:
+    def __init__(self, layout: Layout, cell: Cell, layers: Sequence[int]) -> None:
         r"""
         @brief Creates a recursive, multi-layer shape iterator.
         @param layout The layout which shall be iterated
@@ -25761,7 +26549,7 @@ class RecursiveShapeIterator:
         This constructor has been introduced in version 0.25. The 'overlapping' parameter has been made optional in version 0.27.
         """
     @overload
-    def __init__(self, layout: Layout, cell: Cell, layers: Iterable[int], box: Box, overlapping: Optional[bool] = ...) -> None:
+    def __init__(self, layout: Layout, cell: Cell, layers: Sequence[int], box: Box, overlapping: Optional[bool] = ...) -> None:
         r"""
         @brief Creates a recursive, multi-layer shape iterator with a region.
         @param layout The layout which shall be iterated
@@ -25778,7 +26566,7 @@ class RecursiveShapeIterator:
         This constructor has been introduced in version 0.23. The 'overlapping' parameter has been made optional in version 0.27.
         """
     @overload
-    def __init__(self, layout: Layout, cell: Cell, layers: Iterable[int], region: Region, overlapping: Optional[bool] = ...) -> None:
+    def __init__(self, layout: Layout, cell: Cell, layers: Sequence[int], region: Region, overlapping: Optional[bool] = ...) -> None:
         r"""
         @brief Creates a recursive, multi-layer shape iterator with a region.
         @param layout The layout which shall be iterated
@@ -25924,7 +26712,7 @@ class RecursiveShapeIterator:
         @brief Increments the iterator
         This moves the iterator to the next shape inside the search scope.
         """
-    def path(self) -> Iterable[InstElement]:
+    def path(self) -> List[InstElement]:
         r"""
         @brief Gets the instantiation path of the shape addressed currently
 
@@ -25959,7 +26747,7 @@ class RecursiveShapeIterator:
         This method has been introduced in version 0.23.
         """
     @overload
-    def select_cells(self, cells: Iterable[int]) -> None:
+    def select_cells(self, cells: Sequence[int]) -> None:
         r"""
         @brief Unselects the given cells.
 
@@ -26018,7 +26806,7 @@ class RecursiveShapeIterator:
         This method has been introduced in version 0.23.
         """
     @overload
-    def unselect_cells(self, cells: Iterable[int]) -> None:
+    def unselect_cells(self, cells: Sequence[int]) -> None:
         r"""
         @brief Unselects the given cells.
 
@@ -26132,6 +26920,10 @@ class Region(ShapeCollection):
             r"""
             @brief Compares two enums for inequality
             """
+        def __repr__(self) -> str:
+            r"""
+            @brief Gets the symbolic string from an enum
+            """
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
@@ -26204,6 +26996,10 @@ class Region(ShapeCollection):
             r"""
             @brief Compares two enums for inequality
             """
+        def __repr__(self) -> str:
+            r"""
+            @brief Gets the symbolic string from an enum
+            """
         def __str__(self) -> str:
             r"""
             @brief Gets the symbolic string from an enum
@@ -26259,6 +27055,10 @@ class Region(ShapeCollection):
         def __ne__(self, other: object) -> bool:
             r"""
             @brief Compares two enums for inequality
+            """
+        def __repr__(self) -> str:
+            r"""
+            @brief Gets the symbolic string from an enum
             """
         def __str__(self) -> str:
             r"""
@@ -26410,6 +27210,10 @@ class Region(ShapeCollection):
 
         This method will compute the boolean AND (intersection) between two regions. The result is often but not necessarily always merged.
         """
+    def __copy__(self) -> Region:
+        r"""
+        @brief Creates a copy of self
+        """
     def __getitem__(self, n: int) -> Polygon:
         r"""
         @brief Returns the nth polygon of the region
@@ -26443,7 +27247,7 @@ class Region(ShapeCollection):
         This constructor creates an empty region.
         """
     @overload
-    def __init__(self, array: Iterable[Polygon]) -> None:
+    def __init__(self, array: Sequence[Polygon]) -> None:
         r"""
         @brief Constructor from a polygon array
 
@@ -26611,6 +27415,12 @@ class Region(ShapeCollection):
 
         This method will compute the boolean NOT (intersection) between two regions. The result is often but not necessarily always merged.
         """
+    def __iter__(self) -> Iterator[Polygon]:
+        r"""
+        @brief Returns each polygon of the region
+
+        This returns the raw polygons (not merged polygons if merged semantics is enabled).
+        """
     def __ixor__(self, other: Region) -> Region:
         r"""
         @brief Performs the boolean XOR between self and the other region
@@ -26627,17 +27437,15 @@ class Region(ShapeCollection):
 
         The boolean OR is implemented by merging the polygons of both regions. To simply join the regions without merging, the + operator is more efficient.
         """
-    @overload
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         r"""
         @brief Converts the region to a string
         The length of the output is limited to 20 polygons to avoid giant strings on large regions. For full output use "to_s" with a maximum count parameter.
         """
-    @overload
-    def __str__(self, max_count: int) -> str:
+    def __str__(self) -> str:
         r"""
         @brief Converts the region to a string
-        This version allows specification of the maximum number of polygons contained in the string.
+        The length of the output is limited to 20 polygons to avoid giant strings on large regions. For full output use "to_s" with a maximum count parameter.
         """
     def __sub__(self, other: Region) -> Region:
         r"""
@@ -26649,7 +27457,7 @@ class Region(ShapeCollection):
         """
     def __xor__(self, other: Region) -> Region:
         r"""
-        @brief Returns the boolean NOT between self and the other region
+        @brief Returns the boolean XOR between self and the other region
 
         @return The result of the boolean XOR operation
 
@@ -26692,7 +27500,7 @@ class Region(ShapeCollection):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
-    def andnot(self, other: Region) -> Iterable[Region]:
+    def andnot(self, other: Region) -> List[Region]:
         r"""
         @brief Returns the boolean AND and NOT between self and the other region
 
@@ -26849,13 +27657,13 @@ class Region(ShapeCollection):
         r"""
         @brief Creates a copy of self
         """
-    def each(self) -> Iterable[Polygon]:
+    def each(self) -> Iterator[Polygon]:
         r"""
         @brief Returns each polygon of the region
 
         This returns the raw polygons (not merged polygons if merged semantics is enabled).
         """
-    def each_merged(self) -> Iterable[Polygon]:
+    def each_merged(self) -> Iterator[Polygon]:
         r"""
         @brief Returns each merged polygon of the region
 
@@ -26876,6 +27684,43 @@ class Region(ShapeCollection):
         After calling this method, the region will report the progress through a progress bar while expensive operations are running.
         The label is a text which is put in front of the progress bar.
         Using a progress bar will imply a performance penalty of a few percent typically.
+        """
+    def enclosed_check(self, other: Region, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Region.Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ...) -> EdgePairs:
+        r"""
+        Note: This is an alias of 'inside_check'.
+        @brief Performs an inside check with options
+        @param d The minimum distance for which the polygons are checked
+        @param other The other region against which to check
+        @param whole_edges If true, deliver the whole edges
+        @param metrics Specify the metrics type
+        @param ignore_angle The angle above which no check is performed
+        @param min_projection The lower threshold of the projected length of one edge onto another
+        @param max_projection The upper limit of the projected length of one edge onto another
+        @param opposite_filter Specifies a filter mode for errors happening on opposite sides of inputs shapes
+        @param rect_filter Specifies an error filter for rectangular input shapes
+        @param negative Negative output from the first input
+
+        If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
+
+        "metrics" can be one of the constants \Euclidian, \Square or \Projection. See there for a description of these constants.
+        Use nil for this value to select the default (Euclidian metrics).
+
+        "ignore_angle" specifies the angle limit of two edges. If two edges form an angle equal or above the given value, they will not contribute in the check. Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.
+        Use nil for this value to select the default.
+
+        "min_projection" and "max_projection" allow selecting edges by their projected value upon each other. It is sufficient if the projection of one edge on the other matches the specified condition. The projected length must be larger or equal to "min_projection" and less than "max_projection". If you don't want to specify one limit, pass nil to the respective value.
+
+        "shielded" controls whether shielding is applied. Shielding means that rule violations are not detected 'through' other features. Measurements are only made where the opposite edge is unobstructed.
+        Shielding often is not optional as a rule violation in shielded case automatically comes with rule violations between the original and the shielding features. If not necessary, shielding can be disabled by setting this flag to false. In general, this will improve performance somewhat.
+
+        "opposite_filter" specifies whether to require or reject errors happening on opposite sides of a figure. "rect_filter" allows suppressing specific error configurations on rectangular input figures.
+
+        If "negative" is true, only edges from the first input are output as pseudo edge-pairs where the distance is larger or equal to the limit. This is a way to flag the parts of the first input where the distance to the second input is bigger. Note that only the first input's edges are output. The output is still edge pairs, but each edge pair contains one edge from the original input and the reverse version of the edge as the second edge.
+
+        Merged semantics applies for the input of this method (see \merged_semantics= for a description of this concept)
+
+        The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27. The interpretation of the 'negative' flag has been restriced to first-layout only output in 0.27.1.
+        The 'enclosed_check' alias was introduced in version 0.27.5.
         """
     def enclosing_check(self, other: Region, d: int, whole_edges: Optional[bool] = ..., metrics: Optional[Region.Metrics] = ..., ignore_angle: Optional[Any] = ..., min_projection: Optional[Any] = ..., max_projection: Optional[Any] = ..., shielded: Optional[bool] = ..., opposite_filter: Optional[Region.OppositeFilter] = ..., rect_filter: Optional[Region.RectFilter] = ..., negative: Optional[bool] = ...) -> EdgePairs:
         r"""
@@ -27027,7 +27872,7 @@ class Region(ShapeCollection):
         If merge semantics is not enabled, the hull may also enclose holes if the polygons are taken from a hole-less representation (i.e. GDS2 file). Use explicit merge (\merge method) in order to merge the polygons and detect holes.
         """
     @overload
-    def insert(self, array: Iterable[Polygon]) -> None:
+    def insert(self, array: Sequence[Polygon]) -> None:
         r"""
         @brief Inserts all polygons from the array into this region
         """
@@ -27346,7 +28191,7 @@ class Region(ShapeCollection):
         The resulting polygons are not merged. In order to remove overlaps, use the \merge or \merged method.Merged semantics applies for the input of this method (see \merged_semantics= for a description of this concept)
         """
     @overload
-    def minkowski_sum(self, b: Iterable[Point]) -> Region:
+    def minkowski_sum(self, b: Sequence[Point]) -> Region:
         r"""
         @brief Compute the Minkowski sum of the region and a contour of points (a trace)
 
@@ -28086,7 +28931,7 @@ class Region(ShapeCollection):
 
         The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27.
         """
-    def split_covering(self, other: Region, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> Iterable[Region]:
+    def split_covering(self, other: Region, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> List[Region]:
         r"""
         @brief Returns the polygons of this region which are completely covering polygons from the other region and the ones which are not at the same time
 
@@ -28097,7 +28942,7 @@ class Region(ShapeCollection):
 
         This method has been introduced in version 0.27.
         """
-    def split_inside(self, other: Region) -> Iterable[Region]:
+    def split_inside(self, other: Region) -> List[Region]:
         r"""
         @brief Returns the polygons of this region which are completely inside polygons from the other region and the ones which are not at the same time
 
@@ -28109,7 +28954,7 @@ class Region(ShapeCollection):
         This method has been introduced in version 0.27.
         """
     @overload
-    def split_interacting(self, other: Edges, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> Iterable[Region]:
+    def split_interacting(self, other: Edges, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> List[Region]:
         r"""
         @brief Returns the polygons of this region which are interacting with edges from the other edge collection and the ones which are not at the same time
 
@@ -28121,7 +28966,7 @@ class Region(ShapeCollection):
         This method has been introduced in version 0.27.
         """
     @overload
-    def split_interacting(self, other: Region, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> Iterable[Region]:
+    def split_interacting(self, other: Region, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> List[Region]:
         r"""
         @brief Returns the polygons of this region which are interacting with polygons from the other region and the ones which are not at the same time
 
@@ -28133,7 +28978,7 @@ class Region(ShapeCollection):
         This method has been introduced in version 0.27.
         """
     @overload
-    def split_interacting(self, other: Texts, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> Iterable[Region]:
+    def split_interacting(self, other: Texts, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> List[Region]:
         r"""
         @brief Returns the polygons of this region which are interacting with texts from the other text collection and the ones which are not at the same time
 
@@ -28144,7 +28989,7 @@ class Region(ShapeCollection):
 
         This method has been introduced in version 0.27.
         """
-    def split_outside(self, other: Region) -> Iterable[Region]:
+    def split_outside(self, other: Region) -> List[Region]:
         r"""
         @brief Returns the polygons of this region which are completely outside polygons from the other region and the ones which are not at the same time
 
@@ -28155,7 +29000,7 @@ class Region(ShapeCollection):
 
         This method has been introduced in version 0.27.
         """
-    def split_overlapping(self, other: Region, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> Iterable[Region]:
+    def split_overlapping(self, other: Region, min_count: Optional[int] = ..., max_count: Optional[int] = ...) -> List[Region]:
         r"""
         @brief Returns the polygons of this region which are overlapping with polygons from the other region and the ones which are not at the same time
 
@@ -28699,6 +29544,17 @@ class Shape:
 
     This method has been introduced in version 0.23.
     """
+    box_dcenter: None
+    r"""
+    WARNING: This variable can only be set, not retrieved.
+    Note: This is an alias of 'box_center'.
+    @brief Sets the center of the box with the point being given in micrometer units
+
+    Applies to boxes only. Changes the center of the box and throws an exception if the shape is not a box.
+    Translation from micrometer units to database units is done internally.
+
+    This method has been introduced in version 0.25.
+    """
     box_dheight: float
     r"""
     @brief Returns the height of the box in micrometer units
@@ -28710,6 +29566,28 @@ class Shape:
 
     Applies to boxes only. Changes the height of the box to the value given in micrometer units and throws an exception if the shape is not a box.
     Translation to database units happens internally.
+
+    This method has been introduced in version 0.25.
+    """
+    box_dp1: None
+    r"""
+    WARNING: This variable can only be set, not retrieved.
+    Note: This is an alias of 'box_p1'.
+    @brief Sets the lower left corner of the box with the point being given in micrometer units
+
+    Applies to boxes only. Changes the lower left point of the box and throws an exception if the shape is not a box.
+    Translation from micrometer units to database units is done internally.
+
+    This method has been introduced in version 0.25.
+    """
+    box_dp2: None
+    r"""
+    WARNING: This variable can only be set, not retrieved.
+    Note: This is an alias of 'box_p2'.
+    @brief Sets the upper right corner of the box with the point being given in micrometer units
+
+    Applies to boxes only. Changes the upper right point of the box and throws an exception if the shape is not a box.
+    Translation from micrometer units to database units is done internally.
 
     This method has been introduced in version 0.25.
     """
@@ -28790,6 +29668,69 @@ class Shape:
     Both the current and the target cell must reside in the same layout.
 
     This method has been introduced in version 0.23.
+    """
+    dbox: None
+    r"""
+    WARNING: This variable can only be set, not retrieved.
+    Note: This is an alias of 'box'.
+    @brief Replaces the shape by the given box (in micrometer units)
+    This method replaces the shape by the given box, like \box= with a \Box argument does. This version translates the box from micrometer units to database units internally.
+
+    This method has been introduced in version 0.25.
+    """
+    dedge: None
+    r"""
+    WARNING: This variable can only be set, not retrieved.
+    Note: This is an alias of 'edge'.
+    @brief Replaces the shape by the given edge (in micrometer units)
+    This method replaces the shape by the given edge, like \edge= with a \Edge argument does. This version translates the edge from micrometer units to database units internally.
+
+    This method has been introduced in version 0.25.
+    """
+    dedge_pair: None
+    r"""
+    WARNING: This variable can only be set, not retrieved.
+    Note: This is an alias of 'edge_pair'.
+    @brief Replaces the shape by the given edge pair (in micrometer units)
+    This method replaces the shape by the given edge pair, like \edge_pair= with a \EdgePair argument does. This version translates the edge pair from micrometer units to database units internally.
+
+    This method has been introduced in version 0.26.
+    """
+    dpath: None
+    r"""
+    WARNING: This variable can only be set, not retrieved.
+    Note: This is an alias of 'path'.
+    @brief Replaces the shape by the given path (in micrometer units)
+    This method replaces the shape by the given path, like \path= with a \Path argument does. This version translates the path from micrometer units to database units internally.
+
+    This method has been introduced in version 0.25.
+    """
+    dpolygon: None
+    r"""
+    WARNING: This variable can only be set, not retrieved.
+    Note: This is an alias of 'polygon'.
+    @brief Replaces the shape by the given polygon (in micrometer units)
+    This method replaces the shape by the given polygon, like \polygon= with a \Polygon argument does. This version translates the polygon from micrometer units to database units internally.
+
+    This method has been introduced in version 0.25.
+    """
+    dsimple_polygon: None
+    r"""
+    WARNING: This variable can only be set, not retrieved.
+    Note: This is an alias of 'simple_polygon'.
+    @brief Replaces the shape by the given simple polygon (in micrometer units)
+    This method replaces the shape by the given text, like \simple_polygon= with a \SimplePolygon argument does. This version translates the polygon from micrometer units to database units internally.
+
+    This method has been introduced in version 0.25.
+    """
+    dtext: None
+    r"""
+    WARNING: This variable can only be set, not retrieved.
+    Note: This is an alias of 'text'.
+    @brief Replaces the shape by the given text (in micrometer units)
+    This method replaces the shape by the given text, like \text= with a \Text argument does. This version translates the text from micrometer units to database units internally.
+
+    This method has been introduced in version 0.25.
     """
     edge: Any
     r"""
@@ -28963,6 +29904,15 @@ class Shape:
 
     This method has been introduced in version 0.22.
     """
+    text_dpos: None
+    r"""
+    WARNING: This variable can only be set, not retrieved.
+    Note: This is an alias of 'text_pos'.
+    @brief Sets the text's position in micrometer units
+    Applies to texts only. Will throw an exception if the object is not a text.
+
+    This method has been added in version 0.25.
+    """
     text_dsize: float
     r"""
     @brief Gets the text size in micrometer units
@@ -28971,6 +29921,15 @@ class Shape:
 
     This method has been introduced in version 0.25.@brief Sets the text size in micrometer units
 
+    Applies to texts only. Will throw an exception if the object is not a text.
+
+    This method has been introduced in version 0.25.
+    """
+    text_dtrans: None
+    r"""
+    WARNING: This variable can only be set, not retrieved.
+    Note: This is an alias of 'text_trans'.
+    @brief Sets the text transformation in micrometer units
     Applies to texts only. Will throw an exception if the object is not a text.
 
     This method has been introduced in version 0.25.
@@ -29065,6 +30024,10 @@ class Shape:
 
     This method has been introduced in version 0.23.
     """
+    def __copy__(self) -> Shape:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Equality operator
@@ -29079,6 +30042,12 @@ class Shape:
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Inequality operator
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Create a string showing the contents of the reference
+
+        This method has been introduced with version 0.16.
         """
     def __str__(self) -> str:
         r"""
@@ -29154,7 +30123,7 @@ class Shape:
         r"""
         @brief Returns the bounding box of the shape
         """
-    def box_dcenter(self) -> DPoint:
+    def box_dcenter_(self) -> DPoint:
         r"""
         @brief Returns the center of the box as a \DPoint object in micrometer units
 
@@ -29163,7 +30132,7 @@ class Shape:
 
         This method has been introduced in version 0.25.
         """
-    def box_dp1(self) -> DPoint:
+    def box_dp1_(self) -> DPoint:
         r"""
         @brief Returns the lower left point of the box as a \DPoint object in micrometer units
 
@@ -29172,7 +30141,7 @@ class Shape:
 
         This method has been introduced in version 0.25.
         """
-    def box_dp2(self) -> DPoint:
+    def box_dp2_(self) -> DPoint:
         r"""
         @brief Returns the upper right point of the box as a \DPoint object in micrometer units
 
@@ -29191,21 +30160,21 @@ class Shape:
         @brief Returns the bounding box of the shape in micrometer units
         This method has been added in version 0.25.
         """
-    def dbox(self) -> Any:
+    def dbox_(self) -> Any:
         r"""
         @brief Gets the box object in micrometer units
         See \box for a description of this method. This method returns the box after translation to micrometer units.
 
         This method has been added in version 0.25.
         """
-    def dedge(self) -> Any:
+    def dedge_(self) -> Any:
         r"""
         @brief Returns the edge object as a \DEdge object in micrometer units
         See \edge for a description of this method. This method returns the edge after translation to micrometer units.
 
         This method has been added in version 0.25.
         """
-    def dedge_pair(self) -> Any:
+    def dedge_pair_(self) -> Any:
         r"""
         @brief Returns the edge pair object as a \DEdgePair object in micrometer units
         See \edge_pair for a description of this method. This method returns the edge pair after translation to micrometer units.
@@ -29228,7 +30197,7 @@ class Shape:
 
         This method has been introduced in version 0.22.
         """
-    def dpath(self) -> Any:
+    def dpath_(self) -> Any:
         r"""
         @brief Returns the path object as a \DPath object in micrometer units
         See \path for a description of this method. This method returns the path after translation to micrometer units.
@@ -29243,7 +30212,7 @@ class Shape:
 
         This method has been added in version 0.25.
         """
-    def dpolygon(self) -> Any:
+    def dpolygon_(self) -> Any:
         r"""
         @brief Returns the polygon object in micrometer units
 
@@ -29251,7 +30220,7 @@ class Shape:
 
         This method has been introduced in version 0.25.
         """
-    def dsimple_polygon(self) -> Any:
+    def dsimple_polygon_(self) -> Any:
         r"""
         @brief Returns the simple polygon object in micrometer units
 
@@ -29259,7 +30228,7 @@ class Shape:
 
         This method has been introduced in version 0.25.
         """
-    def dtext(self) -> Any:
+    def dtext_(self) -> Any:
         r"""
         @brief Returns the path object as a \DText object in micrometer units
         See \text for a description of this method. This method returns the text after translation to micrometer units.
@@ -29271,7 +30240,7 @@ class Shape:
         @brief Creates a copy of self
         """
     @overload
-    def each_dedge(self) -> Iterable[DEdge]:
+    def each_dedge(self) -> Iterator[DEdge]:
         r"""
         @brief Iterates over the edges of the object and returns edges in micrometer units
 
@@ -29280,7 +30249,7 @@ class Shape:
         This method has been introduced in version 0.25.
         """
     @overload
-    def each_dedge(self, contour: int) -> Iterable[DEdge]:
+    def each_dedge(self, contour: int) -> Iterator[DEdge]:
         r"""
         @brief Iterates over the edges of a single contour of the object and returns edges in micrometer units
 
@@ -29288,7 +30257,7 @@ class Shape:
 
         This method has been introduced in version 0.25.
         """
-    def each_dpoint(self) -> Iterable[DPoint]:
+    def each_dpoint(self) -> Iterator[DPoint]:
         r"""
         @brief Iterates over all points of the object and returns points in micrometer units
 
@@ -29296,7 +30265,7 @@ class Shape:
 
         This method has been introduced in version 0.25.
         """
-    def each_dpoint_hole(self, hole_index: int) -> Iterable[DPoint]:
+    def each_dpoint_hole(self, hole_index: int) -> Iterator[DPoint]:
         r"""
         @brief Iterates over a hole contour of the object and returns points in micrometer units
 
@@ -29304,7 +30273,7 @@ class Shape:
 
         This method has been introduced in version 0.25.
         """
-    def each_dpoint_hull(self) -> Iterable[DPoint]:
+    def each_dpoint_hull(self) -> Iterator[DPoint]:
         r"""
         @brief Iterates over the hull contour of the object and returns points in micrometer units
 
@@ -29313,7 +30282,7 @@ class Shape:
         This method has been introduced in version 0.25.
         """
     @overload
-    def each_edge(self) -> Iterable[Edge]:
+    def each_edge(self) -> Iterator[Edge]:
         r"""
         @brief Iterates over the edges of the object
 
@@ -29322,7 +30291,7 @@ class Shape:
         It will throw an exception if the object is not a polygon.
         """
     @overload
-    def each_edge(self, contour: int) -> Iterable[Edge]:
+    def each_edge(self, contour: int) -> Iterator[Edge]:
         r"""
         @brief Iterates over the edges of a single contour of the object
         @param contour The contour number (0 for hull, 1 for first hole ...)
@@ -29334,14 +30303,14 @@ class Shape:
 
         This method was introduced in version 0.24.
         """
-    def each_point(self) -> Iterable[Point]:
+    def each_point(self) -> Iterator[Point]:
         r"""
         @brief Iterates over all points of the object
 
         This method applies to paths and delivers all points of the path's center line.
         It will throw an exception for other objects.
         """
-    def each_point_hole(self, hole_index: int) -> Iterable[Point]:
+    def each_point_hole(self, hole_index: int) -> Iterator[Point]:
         r"""
         @brief Iterates over the points of a hole contour
 
@@ -29351,7 +30320,7 @@ class Shape:
 
         @param hole The hole index (see holes () method)
         """
-    def each_point_hull(self) -> Iterable[Point]:
+    def each_point_hull(self) -> Iterator[Point]:
         r"""
         @brief Iterates over the hull contour of the object
 
@@ -29480,7 +30449,7 @@ class Shape:
 
         This method has been introduced in version 0.22.
         """
-    def text_dpos(self) -> DVector:
+    def text_dpos_(self) -> DVector:
         r"""
         @brief Gets the text's position in micrometer units
 
@@ -29488,7 +30457,7 @@ class Shape:
 
         This method has been added in version 0.25.
         """
-    def text_dtrans(self) -> DTrans:
+    def text_dtrans_(self) -> DTrans:
         r"""
         @brief Gets the text transformation in micrometer units
 
@@ -29587,6 +30556,10 @@ class ShapeProcessor:
 
     The shape processor implements the boolean and edge set operations (size, merge). Because the shape processor might allocate resources which can be reused in later operations, it is implemented as an object that can be used several times. The shape processor is similar to the \EdgeProcessor. The latter is specialized on handling polygons and edges directly. 
     """
+    def __copy__(self) -> ShapeProcessor:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -29633,7 +30606,7 @@ class ShapeProcessor:
         @brief Assigns another object to self
         """
     @overload
-    def boolean(self, in_a: Iterable[Shape], in_b: Iterable[Shape], mode: int) -> Iterable[Edge]:
+    def boolean(self, in_a: Sequence[Shape], in_b: Sequence[Shape], mode: int) -> List[Edge]:
         r"""
         @brief Boolean operation on two given shape sets into an edge set
 
@@ -29647,7 +30620,7 @@ class ShapeProcessor:
         @param mode The boolean operation (see \EdgeProcessor)
         """
     @overload
-    def boolean(self, in_a: Iterable[Shape], trans_a: Iterable[CplxTrans], in_b: Iterable[Shape], trans_b: Iterable[CplxTrans], mode: int) -> Iterable[Edge]:
+    def boolean(self, in_a: Sequence[Shape], trans_a: Sequence[CplxTrans], in_b: Sequence[Shape], trans_b: Sequence[CplxTrans], mode: int) -> List[Edge]:
         r"""
         @brief Boolean operation on two given shape sets into an edge set
 
@@ -29680,7 +30653,7 @@ class ShapeProcessor:
         @param min_coherence true, if minimum polygons should be created for touching corners
         """
     @overload
-    def boolean_to_polygon(self, in_a: Iterable[Shape], in_b: Iterable[Shape], mode: int, resolve_holes: bool, min_coherence: bool) -> Iterable[Polygon]:
+    def boolean_to_polygon(self, in_a: Sequence[Shape], in_b: Sequence[Shape], mode: int, resolve_holes: bool, min_coherence: bool) -> List[Polygon]:
         r"""
         @brief Boolean operation on two given shape sets into a polygon set
 
@@ -29696,7 +30669,7 @@ class ShapeProcessor:
         @param min_coherence true, if minimum polygons should be created for touching corners
         """
     @overload
-    def boolean_to_polygon(self, in_a: Iterable[Shape], trans_a: Iterable[CplxTrans], in_b: Iterable[Shape], trans_b: Iterable[CplxTrans], mode: int, resolve_holes: bool, min_coherence: bool) -> Iterable[Polygon]:
+    def boolean_to_polygon(self, in_a: Sequence[Shape], trans_a: Sequence[CplxTrans], in_b: Sequence[Shape], trans_b: Sequence[CplxTrans], mode: int, resolve_holes: bool, min_coherence: bool) -> List[Polygon]:
         r"""
         @brief Boolean operation on two given shape sets into a polygon set
 
@@ -29716,7 +30689,7 @@ class ShapeProcessor:
         @brief Creates a copy of self
         """
     @overload
-    def merge(self, in_: Iterable[Shape], min_wc: int) -> Iterable[Edge]:
+    def merge(self, in_: Sequence[Shape], min_wc: int) -> List[Edge]:
         r"""
         @brief Merge the given shapes
 
@@ -29729,7 +30702,7 @@ class ShapeProcessor:
         @param min_wc The minimum wrap count for output (0: all polygons, 1: at least two overlapping)
         """
     @overload
-    def merge(self, in_: Iterable[Shape], trans: Iterable[CplxTrans], min_wc: int) -> Iterable[Edge]:
+    def merge(self, in_: Sequence[Shape], trans: Sequence[CplxTrans], min_wc: int) -> List[Edge]:
         r"""
         @brief Merge the given shapes
 
@@ -29757,7 +30730,7 @@ class ShapeProcessor:
         @param min_coherence true, if minimum polygons should be created for touching corners
         """
     @overload
-    def merge_to_polygon(self, in_: Iterable[Shape], min_wc: int, resolve_holes: bool, min_coherence: bool) -> Iterable[Polygon]:
+    def merge_to_polygon(self, in_: Sequence[Shape], min_wc: int, resolve_holes: bool, min_coherence: bool) -> List[Polygon]:
         r"""
         @brief Merge the given shapes
 
@@ -29772,7 +30745,7 @@ class ShapeProcessor:
         @param min_coherence true, if minimum polygons should be created for touching corners
         """
     @overload
-    def merge_to_polygon(self, in_: Iterable[Shape], trans: Iterable[CplxTrans], min_wc: int, resolve_holes: bool, min_coherence: bool) -> Iterable[Polygon]:
+    def merge_to_polygon(self, in_: Sequence[Shape], trans: Sequence[CplxTrans], min_wc: int, resolve_holes: bool, min_coherence: bool) -> List[Polygon]:
         r"""
         @brief Merge the given shapes
 
@@ -29786,7 +30759,7 @@ class ShapeProcessor:
         @param min_coherence true, if minimum polygons should be created for touching corners
         """
     @overload
-    def size(self, in_: Iterable[Shape], d: int, mode: int) -> Iterable[Edge]:
+    def size(self, in_: Sequence[Shape], d: int, mode: int) -> List[Edge]:
         r"""
         @brief Size the given shapes
 
@@ -29800,7 +30773,7 @@ class ShapeProcessor:
         @param mode The sizing mode (see \EdgeProcessor)
         """
     @overload
-    def size(self, in_: Iterable[Shape], dx: int, dy: int, mode: int) -> Iterable[Edge]:
+    def size(self, in_: Sequence[Shape], dx: int, dy: int, mode: int) -> List[Edge]:
         r"""
         @brief Size the given shapes
 
@@ -29815,7 +30788,7 @@ class ShapeProcessor:
         @param mode The sizing mode (see \EdgeProcessor)
         """
     @overload
-    def size(self, in_: Iterable[Shape], trans: Iterable[CplxTrans], d: int, mode: int) -> Iterable[Edge]:
+    def size(self, in_: Sequence[Shape], trans: Sequence[CplxTrans], d: int, mode: int) -> List[Edge]:
         r"""
         @brief Size the given shapes
 
@@ -29828,7 +30801,7 @@ class ShapeProcessor:
         @param mode The sizing mode (see \EdgeProcessor)
         """
     @overload
-    def size(self, in_: Iterable[Shape], trans: Iterable[CplxTrans], dx: int, dy: int, mode: int) -> Iterable[Edge]:
+    def size(self, in_: Sequence[Shape], trans: Sequence[CplxTrans], dx: int, dy: int, mode: int) -> List[Edge]:
         r"""
         @brief Size the given shapes
 
@@ -29877,7 +30850,7 @@ class ShapeProcessor:
         @param min_coherence true, if minimum polygons should be created for touching corners
         """
     @overload
-    def size_to_polygon(self, in_: Iterable[Shape], d: int, mode: int, resolve_holes: bool, min_coherence: bool) -> Iterable[Polygon]:
+    def size_to_polygon(self, in_: Sequence[Shape], d: int, mode: int, resolve_holes: bool, min_coherence: bool) -> List[Polygon]:
         r"""
         @brief Size the given shapes
 
@@ -29893,7 +30866,7 @@ class ShapeProcessor:
         @param min_coherence true, if minimum polygons should be created for touching corners
         """
     @overload
-    def size_to_polygon(self, in_: Iterable[Shape], dx: int, dy: int, mode: int, resolve_holes: bool, min_coherence: bool) -> Iterable[Polygon]:
+    def size_to_polygon(self, in_: Sequence[Shape], dx: int, dy: int, mode: int, resolve_holes: bool, min_coherence: bool) -> List[Polygon]:
         r"""
         @brief Size the given shapes
 
@@ -29910,7 +30883,7 @@ class ShapeProcessor:
         @param min_coherence true, if minimum polygons should be created for touching corners
         """
     @overload
-    def size_to_polygon(self, in_: Iterable[Shape], trans: Iterable[CplxTrans], d: int, mode: int, resolve_holes: bool, min_coherence: bool) -> Iterable[Polygon]:
+    def size_to_polygon(self, in_: Sequence[Shape], trans: Sequence[CplxTrans], d: int, mode: int, resolve_holes: bool, min_coherence: bool) -> List[Polygon]:
         r"""
         @brief Size the given shapes
 
@@ -29925,7 +30898,7 @@ class ShapeProcessor:
         @param min_coherence true, if minimum polygons should be created for touching corners
         """
     @overload
-    def size_to_polygon(self, in_: Iterable[Shape], trans: Iterable[CplxTrans], dx: int, dy: int, mode: int, resolve_holes: bool, min_coherence: bool) -> Iterable[Polygon]:
+    def size_to_polygon(self, in_: Sequence[Shape], trans: Sequence[CplxTrans], dx: int, dy: int, mode: int, resolve_holes: bool, min_coherence: bool) -> List[Polygon]:
         r"""
         @brief Size the given shapes
 
@@ -29995,9 +30968,25 @@ class Shapes:
     r"""
     @brief Indicates that user objects shall be retrieved
     """
+    def __copy__(self) -> Shapes:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
+        """
+    def __iter__(self) -> Iterator[Shape]:
+        r"""
+        @brief Gets all shapes
+
+        This call is equivalent to each(SAll). This convenience method has been introduced in version 0.16
+        """
+    def __len__(self) -> int:
+        r"""
+        @brief Gets the number of shapes in this container
+        This method was introduced in version 0.16
+        @return The number of shapes in this container
         """
     def _create(self) -> None:
         r"""
@@ -30054,21 +31043,21 @@ class Shapes:
         @brief Creates a copy of self
         """
     @overload
-    def each(self) -> Iterable[Shape]:
+    def each(self) -> Iterator[Shape]:
         r"""
         @brief Gets all shapes
 
         This call is equivalent to each(SAll). This convenience method has been introduced in version 0.16
         """
     @overload
-    def each(self, flags: int) -> Iterable[Shape]:
+    def each(self, flags: int) -> Iterator[Shape]:
         r"""
         @brief Gets all shapes
 
         @param flags An "or"-ed combination of the S... constants
         """
     @overload
-    def each_overlapping(self, region: Box) -> Iterable[Shape]:
+    def each_overlapping(self, region: Box) -> Iterator[Shape]:
         r"""
         @brief Gets all shapes that overlap the search box (region)
         @param region The rectangular search region
@@ -30076,7 +31065,7 @@ class Shapes:
         This call is equivalent to each_overlapping(SAll,region). This convenience method has been introduced in version 0.16
         """
     @overload
-    def each_overlapping(self, region: DBox) -> Iterable[Shape]:
+    def each_overlapping(self, region: DBox) -> Iterator[Shape]:
         r"""
         @brief Gets all shapes that overlap the search box (region) where the search box is given in micrometer units
         @param region The rectangular search region as a \DBox object in micrometer units
@@ -30085,7 +31074,7 @@ class Shapes:
         This method was introduced in version 0.25
         """
     @overload
-    def each_overlapping(self, flags: int, region: Box) -> Iterable[Shape]:
+    def each_overlapping(self, flags: int, region: Box) -> Iterator[Shape]:
         r"""
         @brief Gets all shapes that overlap the search box (region)
         This method was introduced in version 0.16
@@ -30094,7 +31083,7 @@ class Shapes:
         @param region The rectangular search region
         """
     @overload
-    def each_overlapping(self, flags: int, region: DBox) -> Iterable[Shape]:
+    def each_overlapping(self, flags: int, region: DBox) -> Iterator[Shape]:
         r"""
         @brief Gets all shapes that overlap the search box (region) where the search box is given in micrometer units
         @param flags An "or"-ed combination of the S... constants
@@ -30103,7 +31092,7 @@ class Shapes:
         This method was introduced in version 0.25
         """
     @overload
-    def each_touching(self, region: Box) -> Iterable[Shape]:
+    def each_touching(self, region: Box) -> Iterator[Shape]:
         r"""
         @brief Gets all shapes that touch the search box (region)
         @param region The rectangular search region
@@ -30111,7 +31100,7 @@ class Shapes:
         This call is equivalent to each_touching(SAll,region). This convenience method has been introduced in version 0.16
         """
     @overload
-    def each_touching(self, region: DBox) -> Iterable[Shape]:
+    def each_touching(self, region: DBox) -> Iterator[Shape]:
         r"""
         @brief Gets all shapes that touch the search box (region) where the search box is given in micrometer units
         @param region The rectangular search region as a \DBox object in micrometer units
@@ -30120,7 +31109,7 @@ class Shapes:
         This method was introduced in version 0.25
         """
     @overload
-    def each_touching(self, flags: int, region: Box) -> Iterable[Shape]:
+    def each_touching(self, flags: int, region: Box) -> Iterator[Shape]:
         r"""
         @brief Gets all shapes that touch the search box (region)
         This method was introduced in version 0.16
@@ -30129,7 +31118,7 @@ class Shapes:
         @param region The rectangular search region
         """
     @overload
-    def each_touching(self, flags: int, region: DBox) -> Iterable[Shape]:
+    def each_touching(self, flags: int, region: DBox) -> Iterator[Shape]:
         r"""
         @brief Gets all shapes that touch the search box (region) where the search box is given in micrometer units
         @param flags An "or"-ed combination of the S... constants
@@ -31026,12 +32015,6 @@ class Technology:
     @brief Gets the flag indicating whether to add other layers to the layer properties
     @brief Sets the flag indicating whether to add other layers to the layer properties
     """
-    clear_technologies: ClassVar[None]
-    r"""
-    @brief Clears all technologies
-
-    This method has been introduced in version 0.26.
-    """
     dbu: float
     r"""
     @brief Gets the default database unit
@@ -31118,16 +32101,29 @@ class Technology:
 
     See \save_layout_options for a description of this property.
     """
-    technologies_to_xml: ClassVar[str]
-    r"""
-    @brief Returns a XML representation of all technologies registered in the system
+    @classmethod
+    def clear_technologies(cls) -> None:
+        r"""
+        @brief Clears all technologies
 
-    \technologies_from_xml can be used to restore the technology definitions. This method is provided mainly as a substitute for the pre-0.25 way of accessing technology data through the 'technology-data' configuration parameter. This method will return the equivalent string.
-    """
-    technology_names: ClassVar[Iterable[str]]
-    r"""
-    @brief Gets a list of technology names defined in the system
-    """
+        This method has been introduced in version 0.26.
+        """
+    @classmethod
+    def technologies_to_xml(cls) -> str:
+        r"""
+        @brief Returns a XML representation of all technologies registered in the system
+
+        \technologies_from_xml can be used to restore the technology definitions. This method is provided mainly as a substitute for the pre-0.25 way of accessing technology data through the 'technology-data' configuration parameter. This method will return the equivalent string.
+        """
+    @classmethod
+    def technology_names(cls) -> List[str]:
+        r"""
+        @brief Gets a list of technology names defined in the system
+        """
+    def __copy__(self) -> Technology:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -31187,7 +32183,7 @@ class Technology:
         @brief Gets the technology component with the given name
         The names are unique system identifiers. For all names, use \component_names.
         """
-    def component_names(self) -> Iterable[str]:
+    def component_names(self) -> List[str]:
         r"""
         @brief Gets the names of all components available for \component
         """
@@ -31339,12 +32335,23 @@ class Text:
 
         This method has been added in version 0.23.
         """
+    def __copy__(self) -> Text:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, text: object) -> bool:
         r"""
         @brief Equality
 
 
         Return true, if this text object and the given text are equal 
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given text object. This method enables texts as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -31397,6 +32404,10 @@ class Text:
 
 
         Return true, if this text object and the given text are not equal 
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert to a string
         """
     def __str__(self) -> str:
         r"""
@@ -31634,12 +32645,23 @@ class DText:
 
         This method has been added in version 0.23.
         """
+    def __copy__(self) -> DText:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, text: object) -> bool:
         r"""
         @brief Equality
 
 
         Return true, if this text object and the given text are equal 
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given text object. This method enables texts as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -31693,6 +32715,10 @@ class DText:
 
 
         Return true, if this text object and the given text are not equal 
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert to a string
         """
     def __str__(self) -> str:
         r"""
@@ -31874,6 +32900,17 @@ class Texts(ShapeCollection):
 
         This operator adds the texts of the other collection to self and returns a new combined set.
         """
+    def __and__(self, other: Region) -> Texts:
+        r"""
+        Note: This is an alias of 'interacting'.
+        @brief Returns the texts from this text collection which are inside or on the edge of polygons from the given region
+
+        @return A new text collection containing the texts inside or on the edge of polygons from the region
+        """
+    def __copy__(self) -> Texts:
+        r"""
+        @brief Creates a copy of self
+        """
     def __getitem__(self, n: int) -> Text:
         r"""
         @brief Returns the nth text
@@ -31898,7 +32935,7 @@ class Texts(ShapeCollection):
         This constructor creates an empty text collection.
         """
     @overload
-    def __init__(self, array: Iterable[Text]) -> None:
+    def __init__(self, array: Sequence[Text]) -> None:
         r"""
         @brief Constructor from an text array
 
@@ -31987,17 +33024,26 @@ class Texts(ShapeCollection):
         r = RBA::Texts::new(layout.begin_shapes(cell, layer), RBA::ICplxTrans::new(layout.dbu / dbu))
         @/code
         """
-    @overload
+    def __iter__(self) -> Iterator[Text]:
+        r"""
+        @brief Returns each text of the text collection
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts the text collection to a string
+        The length of the output is limited to 20 texts to avoid giant strings on large collections. For full output use "to_s" with a maximum count parameter.
+        """
     def __str__(self) -> str:
         r"""
         @brief Converts the text collection to a string
         The length of the output is limited to 20 texts to avoid giant strings on large collections. For full output use "to_s" with a maximum count parameter.
         """
-    @overload
-    def __str__(self, max_count: int) -> str:
+    def __sub__(self, other: Region) -> Texts:
         r"""
-        @brief Converts the text collection to a string
-        This version allows specification of the maximum number of texts contained in the string.
+        Note: This is an alias of 'not_interacting'.
+        @brief Returns the texts from this text collection which are not inside or on the edge of polygons from the given region
+
+        @return A new text collection containing the texts not inside or on the edge of polygons from the region
         """
     def _create(self) -> None:
         r"""
@@ -32070,7 +33116,7 @@ class Texts(ShapeCollection):
         r"""
         @brief Creates a copy of self
         """
-    def each(self) -> Iterable[Text]:
+    def each(self) -> Iterator[Text]:
         r"""
         @brief Returns each text of the text collection
         """
@@ -32324,6 +33370,10 @@ class TileOutputReceiverBase:
     @hide
     @alias TileOutputReceiver
     """
+    def __copy__(self) -> TileOutputReceiverBase:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -33022,9 +34072,20 @@ class Trans:
 
         This method has been added in version 0.23.
         """
+    def __copy__(self) -> Trans:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Tests for equality
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given transformation. This method enables transformations as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -33108,6 +34169,73 @@ class Trans:
         @brief Provides a 'less' criterion for sorting
         This method is provided to implement a sorting order. The definition of 'less' is opaque and might change in future versions.
         """
+    @overload
+    def __mul__(self, box: Box) -> Box:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a box
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, edge: Edge) -> Edge:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms an edge
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, p: Point) -> Point:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point
+
+        The "trans" method or the * operator transforms the given point.
+        q = t(p)
+
+        The * operator has been introduced in version 0.25.
+
+        @param p The point to transform
+        @return The transformed point
+        """
+    @overload
+    def __mul__(self, path: Path) -> Path:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a path
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, polygon: Polygon) -> Polygon:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a polygon
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
     def __mul__(self, t: Trans) -> Trans:
         r"""
         @brief Returns the concatenated transformation
@@ -33117,9 +34245,143 @@ class Trans:
         @param t The transformation to apply before
         @return The modified transformation
         """
+    @overload
+    def __mul__(self, text: Text) -> Text:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a text
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, v: Vector) -> Vector:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a vector
+
+        The "trans" method or the * operator transforms the given vector.
+        w = t(v)
+
+        Vector transformation has been introduced in version 0.25.
+
+        @param v The vector to transform
+        @return The transformed vector
+        """
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Tests for inequality
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief String conversion
+        """
+    @overload
+    def __rmul__(self, box: Box) -> Box:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a box
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, edge: Edge) -> Edge:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms an edge
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, p: Point) -> Point:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point
+
+        The "trans" method or the * operator transforms the given point.
+        q = t(p)
+
+        The * operator has been introduced in version 0.25.
+
+        @param p The point to transform
+        @return The transformed point
+        """
+    @overload
+    def __rmul__(self, path: Path) -> Path:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a path
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, polygon: Polygon) -> Polygon:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a polygon
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, t: Trans) -> Trans:
+        r"""
+        @brief Returns the concatenated transformation
+
+        The * operator returns self*t ("t is applied before this transformation").
+
+        @param t The transformation to apply before
+        @return The modified transformation
+        """
+    @overload
+    def __rmul__(self, text: Text) -> Text:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a text
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, v: Vector) -> Vector:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a vector
+
+        The "trans" method or the * operator transforms the given vector.
+        w = t(v)
+
+        Vector transformation has been introduced in version 0.25.
+
+        @param v The vector to transform
+        @return The transformed vector
         """
     def __str__(self) -> str:
         r"""
@@ -33417,9 +34679,20 @@ class DTrans:
 
         This method has been added in version 0.23.
         """
+    def __copy__(self) -> DTrans:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Tests for equality
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given transformation. This method enables transformations as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -33503,6 +34776,73 @@ class DTrans:
         @brief Provides a 'less' criterion for sorting
         This method is provided to implement a sorting order. The definition of 'less' is opaque and might change in future versions.
         """
+    @overload
+    def __mul__(self, box: DBox) -> DBox:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a box
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, edge: DEdge) -> DEdge:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms an edge
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, p: DPoint) -> DPoint:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point
+
+        The "trans" method or the * operator transforms the given point.
+        q = t(p)
+
+        The * operator has been introduced in version 0.25.
+
+        @param p The point to transform
+        @return The transformed point
+        """
+    @overload
+    def __mul__(self, path: DPath) -> DPath:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a path
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, polygon: DPolygon) -> DPolygon:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a polygon
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
     def __mul__(self, t: DTrans) -> DTrans:
         r"""
         @brief Returns the concatenated transformation
@@ -33512,9 +34852,143 @@ class DTrans:
         @param t The transformation to apply before
         @return The modified transformation
         """
+    @overload
+    def __mul__(self, text: DText) -> DText:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a text
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, v: DVector) -> DVector:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a vector
+
+        The "trans" method or the * operator transforms the given vector.
+        w = t(v)
+
+        Vector transformation has been introduced in version 0.25.
+
+        @param v The vector to transform
+        @return The transformed vector
+        """
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Tests for inequality
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief String conversion
+        """
+    @overload
+    def __rmul__(self, box: DBox) -> DBox:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a box
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, edge: DEdge) -> DEdge:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms an edge
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, p: DPoint) -> DPoint:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point
+
+        The "trans" method or the * operator transforms the given point.
+        q = t(p)
+
+        The * operator has been introduced in version 0.25.
+
+        @param p The point to transform
+        @return The transformed point
+        """
+    @overload
+    def __rmul__(self, path: DPath) -> DPath:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a path
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, polygon: DPolygon) -> DPolygon:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a polygon
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, t: DTrans) -> DTrans:
+        r"""
+        @brief Returns the concatenated transformation
+
+        The * operator returns self*t ("t is applied before this transformation").
+
+        @param t The transformation to apply before
+        @return The modified transformation
+        """
+    @overload
+    def __rmul__(self, text: DText) -> DText:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a text
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, v: DVector) -> DVector:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a vector
+
+        The "trans" method or the * operator transforms the given vector.
+        w = t(v)
+
+        Vector transformation has been introduced in version 0.25.
+
+        @param v The vector to transform
+        @return The transformed vector
         """
     def __str__(self) -> str:
         r"""
@@ -33812,9 +35286,20 @@ class DCplxTrans:
 
         This method has been added in version 0.23.
         """
+    def __copy__(self) -> DCplxTrans:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Tests for equality
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given transformation. This method enables transformations as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -33941,6 +35426,86 @@ class DCplxTrans:
         This method is provided to implement a sorting order. The definition of 'less' is opaque and might change in future versions.
         """
     @overload
+    def __mul__(self, box: DBox) -> DBox:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a box
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, edge: DEdge) -> DEdge:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms an edge
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, p: DPoint) -> DPoint:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point
+
+        The "trans" method or the * operator transforms the given point.
+        q = t(p)
+
+        The * operator has been introduced in version 0.25.
+
+        @param p The point to transform
+        @return The transformed point
+        """
+    @overload
+    def __mul__(self, p: DVector) -> DVector:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a vector
+
+        The "trans" method or the * operator transforms the given vector.
+        w = t(v)
+
+        Vector transformation has been introduced in version 0.25.
+
+        @param v The vector to transform
+        @return The transformed vector
+        """
+    @overload
+    def __mul__(self, path: DPath) -> DPath:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a path
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, polygon: DPolygon) -> DPolygon:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a polygon
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
     def __mul__(self, t: CplxTrans) -> CplxTrans:
         r"""
         @brief Multiplication (concatenation) of transformations
@@ -33960,9 +35525,139 @@ class DCplxTrans:
         @param t The transformation to apply before
         @return The modified transformation
         """
+    @overload
+    def __mul__(self, text: DText) -> DText:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a text
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.25.
+        """
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Tests for inequality
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief String conversion
+        """
+    @overload
+    def __rmul__(self, box: DBox) -> DBox:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a box
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, edge: DEdge) -> DEdge:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms an edge
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, p: DPoint) -> DPoint:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point
+
+        The "trans" method or the * operator transforms the given point.
+        q = t(p)
+
+        The * operator has been introduced in version 0.25.
+
+        @param p The point to transform
+        @return The transformed point
+        """
+    @overload
+    def __rmul__(self, p: DVector) -> DVector:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a vector
+
+        The "trans" method or the * operator transforms the given vector.
+        w = t(v)
+
+        Vector transformation has been introduced in version 0.25.
+
+        @param v The vector to transform
+        @return The transformed vector
+        """
+    @overload
+    def __rmul__(self, path: DPath) -> DPath:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a path
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, polygon: DPolygon) -> DPolygon:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a polygon
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, t: CplxTrans) -> CplxTrans:
+        r"""
+        @brief Multiplication (concatenation) of transformations
+
+        The * operator returns self*t ("t is applied before this transformation").
+
+        @param t The transformation to apply before
+        @return The modified transformation
+        """
+    @overload
+    def __rmul__(self, t: DCplxTrans) -> DCplxTrans:
+        r"""
+        @brief Returns the concatenated transformation
+
+        The * operator returns self*t ("t is applied before this transformation").
+
+        @param t The transformation to apply before
+        @return The modified transformation
+        """
+    @overload
+    def __rmul__(self, text: DText) -> DText:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a text
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.25.
         """
     def __str__(self) -> str:
         r"""
@@ -34316,9 +36011,20 @@ class CplxTrans:
 
         This method has been added in version 0.23.
         """
+    def __copy__(self) -> CplxTrans:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Tests for equality
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given transformation. This method enables transformations as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -34445,6 +36151,86 @@ class CplxTrans:
         This method is provided to implement a sorting order. The definition of 'less' is opaque and might change in future versions.
         """
     @overload
+    def __mul__(self, box: Box) -> DBox:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a box
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, edge: Edge) -> DEdge:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms an edge
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, p: Point) -> DPoint:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point
+
+        The "trans" method or the * operator transforms the given point.
+        q = t(p)
+
+        The * operator has been introduced in version 0.25.
+
+        @param p The point to transform
+        @return The transformed point
+        """
+    @overload
+    def __mul__(self, p: Vector) -> DVector:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a vector
+
+        The "trans" method or the * operator transforms the given vector.
+        w = t(v)
+
+        Vector transformation has been introduced in version 0.25.
+
+        @param v The vector to transform
+        @return The transformed vector
+        """
+    @overload
+    def __mul__(self, path: Path) -> DPath:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a path
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, polygon: Polygon) -> DPolygon:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a polygon
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
     def __mul__(self, t: CplxTrans) -> CplxTrans:
         r"""
         @brief Returns the concatenated transformation
@@ -34474,9 +36260,149 @@ class CplxTrans:
         @param t The transformation to apply before
         @return The modified transformation
         """
+    @overload
+    def __mul__(self, text: Text) -> DText:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a text
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.25.
+        """
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Tests for inequality
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief String conversion
+        """
+    @overload
+    def __rmul__(self, box: Box) -> DBox:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a box
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, edge: Edge) -> DEdge:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms an edge
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, p: Point) -> DPoint:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point
+
+        The "trans" method or the * operator transforms the given point.
+        q = t(p)
+
+        The * operator has been introduced in version 0.25.
+
+        @param p The point to transform
+        @return The transformed point
+        """
+    @overload
+    def __rmul__(self, p: Vector) -> DVector:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a vector
+
+        The "trans" method or the * operator transforms the given vector.
+        w = t(v)
+
+        Vector transformation has been introduced in version 0.25.
+
+        @param v The vector to transform
+        @return The transformed vector
+        """
+    @overload
+    def __rmul__(self, path: Path) -> DPath:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a path
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, polygon: Polygon) -> DPolygon:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a polygon
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, t: CplxTrans) -> CplxTrans:
+        r"""
+        @brief Returns the concatenated transformation
+
+        The * operator returns self*t ("t is applied before this transformation").
+
+        @param t The transformation to apply before
+        @return The modified transformation
+        """
+    @overload
+    def __rmul__(self, t: ICplxTrans) -> CplxTrans:
+        r"""
+        @brief Multiplication (concatenation) of transformations
+
+        The * operator returns self*t ("t is applied before this transformation").
+
+        @param t The transformation to apply before
+        @return The modified transformation
+        """
+    @overload
+    def __rmul__(self, t: VCplxTrans) -> DCplxTrans:
+        r"""
+        @brief Multiplication (concatenation) of transformations
+
+        The * operator returns self*t ("t is applied before this transformation").
+
+        @param t The transformation to apply before
+        @return The modified transformation
+        """
+    @overload
+    def __rmul__(self, text: Text) -> DText:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a text
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.25.
         """
     def __str__(self) -> str:
         r"""
@@ -34831,9 +36757,20 @@ class ICplxTrans:
 
         This method has been added in version 0.23.
         """
+    def __copy__(self) -> ICplxTrans:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Tests for equality
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given transformation. This method enables transformations as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -34960,6 +36897,86 @@ class ICplxTrans:
         This method is provided to implement a sorting order. The definition of 'less' is opaque and might change in future versions.
         """
     @overload
+    def __mul__(self, box: Box) -> Box:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a box
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, edge: Edge) -> Edge:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms an edge
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, p: Point) -> Point:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point
+
+        The "trans" method or the * operator transforms the given point.
+        q = t(p)
+
+        The * operator has been introduced in version 0.25.
+
+        @param p The point to transform
+        @return The transformed point
+        """
+    @overload
+    def __mul__(self, p: Vector) -> Vector:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a vector
+
+        The "trans" method or the * operator transforms the given vector.
+        w = t(v)
+
+        Vector transformation has been introduced in version 0.25.
+
+        @param v The vector to transform
+        @return The transformed vector
+        """
+    @overload
+    def __mul__(self, path: Path) -> Path:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a path
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, polygon: Polygon) -> Polygon:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a polygon
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
     def __mul__(self, t: ICplxTrans) -> ICplxTrans:
         r"""
         @brief Returns the concatenated transformation
@@ -34979,9 +36996,139 @@ class ICplxTrans:
         @param t The transformation to apply before
         @return The modified transformation
         """
+    @overload
+    def __mul__(self, text: Text) -> Text:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a text
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.25.
+        """
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Tests for inequality
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief String conversion
+        """
+    @overload
+    def __rmul__(self, box: Box) -> Box:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a box
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, edge: Edge) -> Edge:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms an edge
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, p: Point) -> Point:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point
+
+        The "trans" method or the * operator transforms the given point.
+        q = t(p)
+
+        The * operator has been introduced in version 0.25.
+
+        @param p The point to transform
+        @return The transformed point
+        """
+    @overload
+    def __rmul__(self, p: Vector) -> Vector:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a vector
+
+        The "trans" method or the * operator transforms the given vector.
+        w = t(v)
+
+        Vector transformation has been introduced in version 0.25.
+
+        @param v The vector to transform
+        @return The transformed vector
+        """
+    @overload
+    def __rmul__(self, path: Path) -> Path:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a path
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, polygon: Polygon) -> Polygon:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a polygon
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, t: ICplxTrans) -> ICplxTrans:
+        r"""
+        @brief Returns the concatenated transformation
+
+        The * operator returns self*t ("t is applied before this transformation").
+
+        @param t The transformation to apply before
+        @return The modified transformation
+        """
+    @overload
+    def __rmul__(self, t: VCplxTrans) -> VCplxTrans:
+        r"""
+        @brief Multiplication (concatenation) of transformations
+
+        The * operator returns self*t ("t is applied before this transformation").
+
+        @param t The transformation to apply before
+        @return The modified transformation
+        """
+    @overload
+    def __rmul__(self, text: Text) -> Text:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a text
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.25.
         """
     def __str__(self) -> str:
         r"""
@@ -35338,9 +37485,20 @@ class VCplxTrans:
 
         This method has been added in version 0.23.
         """
+    def __copy__(self) -> VCplxTrans:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Tests for equality
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given transformation. This method enables transformations as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     @overload
     def __init__(self) -> None:
@@ -35461,6 +37619,86 @@ class VCplxTrans:
         This method is provided to implement a sorting order. The definition of 'less' is opaque and might change in future versions.
         """
     @overload
+    def __mul__(self, box: DBox) -> Box:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a box
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, edge: DEdge) -> Edge:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms an edge
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, p: DPoint) -> Point:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point
+
+        The "trans" method or the * operator transforms the given point.
+        q = t(p)
+
+        The * operator has been introduced in version 0.25.
+
+        @param p The point to transform
+        @return The transformed point
+        """
+    @overload
+    def __mul__(self, p: DVector) -> Vector:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a vector
+
+        The "trans" method or the * operator transforms the given vector.
+        w = t(v)
+
+        Vector transformation has been introduced in version 0.25.
+
+        @param v The vector to transform
+        @return The transformed vector
+        """
+    @overload
+    def __mul__(self, path: DPath) -> Path:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a path
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __mul__(self, polygon: DPolygon) -> Polygon:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a polygon
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
     def __mul__(self, t: CplxTrans) -> ICplxTrans:
         r"""
         @brief Multiplication (concatenation) of transformations
@@ -35490,9 +37728,149 @@ class VCplxTrans:
         @param t The transformation to apply before
         @return The modified transformation
         """
+    @overload
+    def __mul__(self, text: DText) -> Text:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a text
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.25.
+        """
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Tests for inequality
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief String conversion
+        """
+    @overload
+    def __rmul__(self, box: DBox) -> Box:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a box
+
+        't*box' or 't.trans(box)' is equivalent to box.transformed(t).
+
+        @param box The box to transform
+        @return The transformed box
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, edge: DEdge) -> Edge:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms an edge
+
+        't*edge' or 't.trans(edge)' is equivalent to edge.transformed(t).
+
+        @param edge The edge to transform
+        @return The transformed edge
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, p: DPoint) -> Point:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a point
+
+        The "trans" method or the * operator transforms the given point.
+        q = t(p)
+
+        The * operator has been introduced in version 0.25.
+
+        @param p The point to transform
+        @return The transformed point
+        """
+    @overload
+    def __rmul__(self, p: DVector) -> Vector:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a vector
+
+        The "trans" method or the * operator transforms the given vector.
+        w = t(v)
+
+        Vector transformation has been introduced in version 0.25.
+
+        @param v The vector to transform
+        @return The transformed vector
+        """
+    @overload
+    def __rmul__(self, path: DPath) -> Path:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a path
+
+        't*path' or 't.trans(path)' is equivalent to path.transformed(t).
+
+        @param path The path to transform
+        @return The transformed path
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, polygon: DPolygon) -> Polygon:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a polygon
+
+        't*polygon' or 't.trans(polygon)' is equivalent to polygon.transformed(t).
+
+        @param polygon The polygon to transform
+        @return The transformed polygon
+
+        This convenience method has been introduced in version 0.25.
+        """
+    @overload
+    def __rmul__(self, t: CplxTrans) -> ICplxTrans:
+        r"""
+        @brief Multiplication (concatenation) of transformations
+
+        The * operator returns self*t ("t is applied before this transformation").
+
+        @param t The transformation to apply before
+        @return The modified transformation
+        """
+    @overload
+    def __rmul__(self, t: DCplxTrans) -> VCplxTrans:
+        r"""
+        @brief Multiplication (concatenation) of transformations
+
+        The * operator returns self*t ("t is applied before this transformation").
+
+        @param t The transformation to apply before
+        @return The modified transformation
+        """
+    @overload
+    def __rmul__(self, t: VCplxTrans) -> VCplxTrans:
+        r"""
+        @brief Returns the concatenated transformation
+
+        The * operator returns self*t ("t is applied before this transformation").
+
+        @param t The transformation to apply before
+        @return The modified transformation
+        """
+    @overload
+    def __rmul__(self, text: DText) -> Text:
+        r"""
+        Note: This is an alias of 'trans'.
+        @brief Transforms a text
+
+        't*text' or 't.trans(text)' is equivalent to text.transformed(t).
+
+        @param text The text to transform
+        @return The transformed text
+
+        This convenience method has been introduced in version 0.25.
         """
     def __str__(self) -> str:
         r"""
@@ -35747,6 +38125,10 @@ class Utils:
 
     This class has been introduced in version 0.27.
     """
+    def __copy__(self) -> Utils:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -35797,21 +38179,21 @@ class Utils:
         @brief Creates a copy of self
         """
     @overload
-    def spline_interpolation(self, control_points: Iterable[DPoint], degree: int, knots: Iterable[float], relative_accuracy: float, absolute_accuracy: float) -> Iterable[DPoint]:
+    def spline_interpolation(self, control_points: Sequence[DPoint], degree: int, knots: Sequence[float], relative_accuracy: float, absolute_accuracy: float) -> List[DPoint]:
         r"""
         @brief This function computes the Spline curve for a given set of control points (point, weight), degree and knots.
 
         This is the version for non-rational splines. It lacks the weight vector.
         """
     @overload
-    def spline_interpolation(self, control_points: Iterable[Point], degree: int, knots: Iterable[float], relative_accuracy: float, absolute_accuracy: float) -> Iterable[Point]:
+    def spline_interpolation(self, control_points: Sequence[Point], degree: int, knots: Sequence[float], relative_accuracy: float, absolute_accuracy: float) -> List[Point]:
         r"""
         @brief This function computes the Spline curve for a given set of control points (point, weight), degree and knots.
 
         This is the version for integer-coordinate points for non-rational splines.
         """
     @overload
-    def spline_interpolation(self, control_points: Iterable[DPoint], weights: Iterable[float], degree: int, knots: Iterable[float], relative_accuracy: float, absolute_accuracy: float) -> Iterable[DPoint]:
+    def spline_interpolation(self, control_points: Sequence[DPoint], weights: Sequence[float], degree: int, knots: Sequence[float], relative_accuracy: float, absolute_accuracy: float) -> List[DPoint]:
         r"""
         @brief This function computes the Spline curve for a given set of control points (point, weight), degree and knots.
 
@@ -35833,7 +38215,7 @@ class Utils:
         The return value is a list of points forming a path which approximates the spline curve.
         """
     @overload
-    def spline_interpolation(self, control_points: Iterable[Point], weights: Iterable[float], degree: int, knots: Iterable[float], relative_accuracy: float, absolute_accuracy: float) -> Iterable[Point]:
+    def spline_interpolation(self, control_points: Sequence[Point], weights: Sequence[float], degree: int, knots: Sequence[float], relative_accuracy: float, absolute_accuracy: float) -> List[Point]:
         r"""
         @brief This function computes the Spline curve for a given set of control points (point, weight), degree and knots.
 
@@ -35882,10 +38264,21 @@ class DVector:
 
         Adds vector v to self by adding the coordinates.
         """
+    def __copy__(self) -> DVector:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, v: object) -> bool:
         r"""
         @brief Equality test operator
 
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given vector. This method enables vectors as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     def __imul__(self, f: float) -> DVector:
         r"""
@@ -35932,12 +38325,21 @@ class DVector:
         This operator is provided to establish a sorting
         order
         """
+    @overload
     def __mul__(self, f: float) -> DVector:
         r"""
         @brief Scaling by some factor
 
 
         Returns the scaled object. All coordinates are multiplied with the given factor and if necessary rounded.
+        """
+    @overload
+    def __mul__(self, v: DVector) -> float:
+        r"""
+        @brief Computes the scalar product between self and the given vector
+
+
+        The scalar product of a and b is defined as: vp = ax*bx+ay*by.
         """
     def __ne__(self, v: object) -> bool:
         r"""
@@ -35950,6 +38352,26 @@ class DVector:
 
 
         Returns a new vector with -x,-y.
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief String conversion
+        """
+    @overload
+    def __rmul__(self, f: float) -> DVector:
+        r"""
+        @brief Scaling by some factor
+
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and if necessary rounded.
+        """
+    @overload
+    def __rmul__(self, v: DVector) -> float:
+        r"""
+        @brief Computes the scalar product between self and the given vector
+
+
+        The scalar product of a and b is defined as: vp = ax*bx+ay*by.
         """
     def __str__(self) -> str:
         r"""
@@ -36006,6 +38428,12 @@ class DVector:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+    def abs(self) -> float:
+        r"""
+        Note: This is an alias of 'length'.
+        @brief Returns the length of the vector
+        'abs' is an alias provided for compatibility with the former point type.
+        """
     def assign(self, other: DVector) -> None:
         r"""
         @brief Assigns another object to self
@@ -36039,6 +38467,12 @@ class DVector:
 
 
         @return 1 if the scalar product is positive, 0 if it is zero and -1 if it is negative.
+        """
+    def sq_abs(self) -> float:
+        r"""
+        Note: This is an alias of 'sq_length'.
+        @brief The square length of the vector
+        'sq_abs' is an alias provided for compatibility with the former point type.
         """
     def sq_length(self) -> float:
         r"""
@@ -36118,10 +38552,21 @@ class Vector:
 
         Adds vector v to self by adding the coordinates.
         """
+    def __copy__(self) -> Vector:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, v: object) -> bool:
         r"""
         @brief Equality test operator
 
+        """
+    def __hash__(self) -> int:
+        r"""
+        @brief Computes a hash value
+        Returns a hash value for the given vector. This method enables vectors as hash keys.
+
+        This method has been introduced in version 0.25.
         """
     def __imul__(self, f: float) -> Vector:
         r"""
@@ -36168,12 +38613,21 @@ class Vector:
         This operator is provided to establish a sorting
         order
         """
+    @overload
     def __mul__(self, f: float) -> Vector:
         r"""
         @brief Scaling by some factor
 
 
         Returns the scaled object. All coordinates are multiplied with the given factor and if necessary rounded.
+        """
+    @overload
+    def __mul__(self, v: Vector) -> int:
+        r"""
+        @brief Computes the scalar product between self and the given vector
+
+
+        The scalar product of a and b is defined as: vp = ax*bx+ay*by.
         """
     def __ne__(self, v: object) -> bool:
         r"""
@@ -36186,6 +38640,26 @@ class Vector:
 
 
         Returns a new vector with -x,-y.
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief String conversion
+        """
+    @overload
+    def __rmul__(self, f: float) -> Vector:
+        r"""
+        @brief Scaling by some factor
+
+
+        Returns the scaled object. All coordinates are multiplied with the given factor and if necessary rounded.
+        """
+    @overload
+    def __rmul__(self, v: Vector) -> int:
+        r"""
+        @brief Computes the scalar product between self and the given vector
+
+
+        The scalar product of a and b is defined as: vp = ax*bx+ay*by.
         """
     def __str__(self) -> str:
         r"""
@@ -36242,6 +38716,12 @@ class Vector:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+    def abs(self) -> float:
+        r"""
+        Note: This is an alias of 'length'.
+        @brief Returns the length of the vector
+        'abs' is an alias provided for compatibility with the former point type.
+        """
     def assign(self, other: Vector) -> None:
         r"""
         @brief Assigns another object to self
@@ -36275,6 +38755,12 @@ class Vector:
 
 
         @return 1 if the scalar product is positive, 0 if it is zero and -1 if it is negative.
+        """
+    def sq_abs(self) -> float:
+        r"""
+        Note: This is an alias of 'sq_length'.
+        @brief The square length of the vector
+        'sq_abs' is an alias provided for compatibility with the former point type.
         """
     def sq_length(self) -> float:
         r"""
@@ -36419,7 +38905,7 @@ class LEFDEFReaderConfiguration:
     The setter is \layer_map=. \create_other_layers= is available to control whether layers not specified in the layer mapping table shall be created automatically.@brief Sets the layer map to be used for the LEF/DEF reader
     See \layer_map for details.
     """
-    lef_files: Iterable[str]
+    lef_files: List[str]
     r"""
     @brief Gets the list technology LEF files to additionally import
     Returns a list of path names for technology LEF files to read in addition to the primary file. Relative paths are resolved relative to the file to read or relative to the technology base path.
@@ -36469,7 +38955,7 @@ class LEFDEFReaderConfiguration:
     r"""
     @hide@hide
     """
-    macro_layout_files: Iterable[str]
+    macro_layout_files: List[str]
     r"""
     @brief Gets the list of layout files to read for substituting macros in DEF
     These files play the same role than the macro layouts (see \macro_layouts), except that this property specifies a list of file names. The given files are loaded automatically to resolve macro layouts instead of LEF geometry. See \macro_resolution_mode for details when this happens. Relative paths are resolved relative to the DEF file to read or relative to the technology base path.
@@ -36484,7 +38970,7 @@ class LEFDEFReaderConfiguration:
 
     This property has been added in version 0.27.1.
     """
-    macro_layouts: Iterable[Layout]
+    macro_layouts: List[Layout]
     r"""
     @brief Gets the layout objects used for resolving LEF macros in the DEF reader.
     The DEF reader can either use LEF geometry or use a separate source of layouts for the LEF macros. The \macro_resolution_mode controls whether to use LEF geometry. If LEF geometry is not used, the DEF reader will look up macro cells from the \macro_layouts and pull cell layouts from there.
@@ -36812,6 +39298,10 @@ class LEFDEFReaderConfiguration:
     r"""
     @hide@hide
     """
+    def __copy__(self) -> LEFDEFReaderConfiguration:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -37146,6 +39636,10 @@ class NetTracerTechnology(TechnologyComponent):
 
     This class has been introduced in version 0.25.
     """
+    def __copy__(self) -> NetTracerTechnology:
+        r"""
+        @brief Creates a copy of self
+        """
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -37223,6 +39717,10 @@ class NetElement:
 
     This class has been introduced in version 0.25.
     """
+    def __copy__(self) -> NetElement:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -37335,6 +39833,10 @@ class NetTracer:
 
     This method has been introduced in version 0.26.4.
     """
+    def __copy__(self) -> NetTracer:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -37388,7 +39890,7 @@ class NetTracer:
         r"""
         @brief Creates a copy of self
         """
-    def each_element(self) -> Iterable[NetElement]:
+    def each_element(self) -> Iterator[NetElement]:
         r"""
         @brief Iterates over the elements found during extraction
         The elements are available only after the extraction has been performed.

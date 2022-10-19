@@ -872,7 +872,7 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
     if (! strict) {
       return 0;
     } else {
-      throw tl::Exception (tl::to_string (tr ("No overload with matching arguments")));
+      throw tl::TypeError (tl::to_string (tr ("No overload with matching arguments")));
     }
   }
 
@@ -880,7 +880,7 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
     if (! strict) {
       return 0;
     } else {
-      throw tl::Exception (tl::to_string (tr ("Ambiguous overload variants - multiple method declarations match arguments")));
+      throw tl::TypeError (tl::to_string (tr ("Ambiguous overload variants - multiple method declarations match arguments")));
     }
   }
 
@@ -2731,8 +2731,18 @@ PythonModule::make_classes (const char *mod_name)
           } else if (name == "__mul__") {
             // Adding right multiplication
             // Rationale: if pyaObj * x works, so should x * pyaObj
-            add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is also available as '__mul__'")));
-            alt_names.push_back ("__rmul__");
+            // But this should only apply if the multiplication is commutative
+            // There are a few exceptions:
+            // Trans
+            if ((*c)->name ().find("Trans") == std::string::npos){  // not found
+              add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is also available as '__rmul__'")));
+              alt_names.push_back ("__rmul__");
+            }
+          } else if (name == "dup" && m_first->compatible_with_num_args (0) ) {
+            // If the object supports the dup method, then it is a good
+            // idea to define the __copy__ method.
+            add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method also implements '__copy__'")));
+            alt_names.push_back ("__copy__");
           }
 
           for (std::vector <std::string>::const_iterator an = alt_names.begin (); an != alt_names.end (); ++an) {

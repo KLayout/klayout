@@ -1,8 +1,12 @@
-from typing import Any, ClassVar, Dict, Iterable, Optional
+from typing import Any, ClassVar, Dict, Sequence, List, Iterator, Optional
 from typing import overload
 class EmptyClass:
     r"""
     """
+    def __copy__(self) -> EmptyClass:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -64,6 +68,10 @@ class Value:
     @brief Gets the actual value.
     @brief Set the actual value.
     """
+    def __copy__(self) -> Value:
+        r"""
+        @brief Creates a copy of self
+        """
     @overload
     def __init__(self) -> None:
         r"""
@@ -74,6 +82,10 @@ class Value:
         r"""
         @brief Constructs a non-nil object with the given value.
         This constructor has been introduced in version 0.22.
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert this object to a string
         """
     def __str__(self) -> str:
         r"""
@@ -148,14 +160,16 @@ class Interpreter:
 
     This class was introduced in version 0.27.5.
     """
-    python_interpreter: ClassVar[Interpreter]
-    r"""
-    @brief Gets the instance of the Python interpreter
-    """
-    ruby_interpreter: ClassVar[Interpreter]
-    r"""
-    @brief Gets the instance of the Ruby interpreter
-    """
+    @classmethod
+    def python_interpreter(cls) -> Interpreter:
+        r"""
+        @brief Gets the instance of the Python interpreter
+        """
+    @classmethod
+    def ruby_interpreter(cls) -> Interpreter:
+        r"""
+        @brief Gets the instance of the Ruby interpreter
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -279,6 +293,10 @@ class ArgType:
     TypeVoidPtr: ClassVar[int]
     r"""
     """
+    def __copy__(self) -> ArgType:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, arg0: object) -> bool:
         r"""
         @brief Equality of two types
@@ -290,6 +308,10 @@ class ArgType:
     def __ne__(self, arg0: object) -> bool:
         r"""
         @brief Inequality of two types
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert to a string
         """
     def __str__(self) -> str:
         r"""
@@ -413,6 +435,10 @@ class MethodOverload:
     r"""
     @hide
     """
+    def __copy__(self) -> MethodOverload:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -539,11 +565,11 @@ class Method:
         r"""
         @brief The documentation string for this method
         """
-    def each_argument(self) -> Iterable[ArgType]:
+    def each_argument(self) -> Iterator[ArgType]:
         r"""
         @brief Iterate over all arguments of this method
         """
-    def each_overload(self) -> Iterable[MethodOverload]:
+    def each_overload(self) -> Iterator[MethodOverload]:
         r"""
         @brief This iterator delivers the synonyms (overloads).
 
@@ -608,10 +634,11 @@ class Class:
     r"""
     @hide
     """
-    each_class: ClassVar[Iterable[Class]]
-    r"""
-    @brief Iterate over all classes
-    """
+    @classmethod
+    def each_class(cls) -> Iterator[Class]:
+        r"""
+        @brief Iterate over all classes
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -673,11 +700,11 @@ class Class:
         r"""
         @brief The documentation string for this class
         """
-    def each_child_class(self) -> Iterable[Class]:
+    def each_child_class(self) -> Iterator[Class]:
         r"""
         @brief Iterate over all child classes defined within this class
         """
-    def each_method(self) -> Iterable[Method]:
+    def each_method(self) -> Iterator[Method]:
         r"""
         @brief Iterate over all methods of this class
         """
@@ -801,15 +828,24 @@ class Timer:
 
     This class has been introduced in version 0.23.
     """
-    memory_size: ClassVar[int]
-    r"""
-    @brief Gets the current memory usage of the process in Bytes
+    @classmethod
+    def memory_size(cls) -> int:
+        r"""
+        @brief Gets the current memory usage of the process in Bytes
 
-    This method has been introduced in version 0.27.
-    """
+        This method has been introduced in version 0.27.
+        """
+    def __copy__(self) -> Timer:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Produces a string with the currently elapsed times
         """
     def __str__(self) -> str:
         r"""
@@ -1229,6 +1265,10 @@ class ExpressionContext:
 
     This class has been introduced in version 0.26 when \Expression was separated into the execution and context part.
     """
+    def __copy__(self) -> ExpressionContext:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -1384,6 +1424,10 @@ class GlobPattern:
     @brief Sets a value indicating whether trailing characters are allowed.
     If this predicate is false, the glob pattern needs to match the full subject string. If true, the match function will ignore trailing characters and return true if the front part of the subject string matches.
     """
+    def __copy__(self) -> GlobPattern:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self, pattern: str) -> None:
         r"""
         @brief Creates a new glob pattern match object
@@ -1444,6 +1488,10 @@ class ExecutableBase:
     @hide
     @alias Executable
     """
+    def __copy__(self) -> ExecutableBase:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class

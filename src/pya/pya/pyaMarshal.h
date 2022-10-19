@@ -43,7 +43,7 @@ class PYAObjectBase;
  *  @param arg The argument to serialize (a Python object)
  *  @param heap A heap for temporary objects
  *
- *  The heap collects objects created while filling the buffer. 
+ *  The heap collects objects created while filling the buffer.
  *  The stack must persist as long as the serial buffer is used.
  */
 void
@@ -84,4 +84,3 @@ void correct_constness (PyObject *obj, bool const_required);
 }
 
 #endif
-

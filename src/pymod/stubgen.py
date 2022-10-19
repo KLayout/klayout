@@ -192,7 +192,9 @@ _type_dict[ktl.ArgType.TypeVoid] = "None"
 _type_dict[ktl.ArgType.TypeVoidPtr] = "None"
 
 
-def _translate_type(arg_type: ktl.ArgType, within_class: ktl.Class) -> str:
+def _translate_type(
+    arg_type: ktl.ArgType, within_class: ktl.Class, is_return=False
+) -> str:
     """Translates klayout's C-type to a type in Python.
 
     This function is equivalent to the `type_to_s` in `pyaModule.cc`.
@@ -205,16 +207,19 @@ def _translate_type(arg_type: ktl.ArgType, within_class: ktl.Class) -> str:
         else:
             py_str = qualified_name(arg_type.cls())
     elif arg_type.type() == ktl.ArgType.TypeMap:
-        inner_key = _translate_type(arg_type.inner_k(), within_class)
-        inner_val = _translate_type(arg_type.inner(), within_class)
+        inner_key = _translate_type(arg_type.inner_k(), within_class, is_return)
+        inner_val = _translate_type(arg_type.inner(), within_class, is_return)
         py_str = f"Dict[{inner_key}, {inner_val}]"
     elif arg_type.type() == ktl.ArgType.TypeVector:
-        py_str = f"Iterable[{_translate_type(arg_type.inner(), within_class)}]"
+        if is_return:
+            py_str = f"List[{_translate_type(arg_type.inner(), within_class, is_return)}]"
+        else:
+            py_str = f"Sequence[{_translate_type(arg_type.inner(), within_class, is_return)}]"
     else:
         py_str = _type_dict[arg_type.type()]
 
     if arg_type.is_iter():
-        py_str = f"Iterable[{py_str}]"
+        py_str = f"Iterator[{py_str}]"
     if arg_type.has_default():
         py_str = f"Optional[{py_str}] = ..."
     return py_str
@@ -324,7 +329,7 @@ def get_c_methods(c: ktl.Class) -> List[_Method]:
         for ms in m.each_overload():
             if ms.name() == m.primary_name():
                 return ms
-        raise ("Primary synonym not found for method " + m.name())
+        raise RuntimeError("Primary synonym not found for method " + m.name())
 
     for m in c.each_method():
         if m.is_signal():
@@ -346,17 +351,35 @@ def get_c_methods(c: ktl.Class) -> List[_Method]:
         )
         is_setter = (num_args == 1) and method_def.is_setter()
         is_classvar = (num_args == 0) and (m.is_static() and not m.is_constructor())
-        method_list.append(
-            _Method(
-                name=method_def.name(),
-                is_setter=is_setter,
-                is_getter=is_getter or is_classvar,
-                is_classmethod=m.is_constructor(),
-                is_classvar=is_classvar,
-                doc=m.doc(),
-                m=m,
+        is_const = m.is_const()
+
+        # static methods without arguments which start with a capital letter are treated as constants
+        # (rule from pyaModule.cc)
+        if is_classvar and m.name()[0].isupper():
+            is_getter = True
+
+        for method_synonym in m.each_overload():
+            if method_synonym.deprecated():
+                # method synonyms that start with # (pound) sign
+                continue
+            if method_synonym.name() == method_def.name():
+                doc = m.doc()
+            else:
+                doc = (
+                    f"Note: This is an alias of '{translate_methodname(method_def.name())}'.\n"
+                    + m.doc()
+                )
+            method_list.append(
+                _Method(
+                    name=method_synonym.name(),
+                    is_setter=is_setter,
+                    is_getter=is_getter,
+                    is_classmethod=m.is_constructor() or is_classvar,
+                    is_classvar=is_classvar,
+                    doc=doc,
+                    m=m,
+                )
             )
-        )
 
         # print(f"{m.name()}: {m.is_static()=}, {m.is_constructor()=}, {m.is_const_object()=}")
     return method_list
@@ -364,7 +387,7 @@ def get_c_methods(c: ktl.Class) -> List[_Method]:
 
 def get_py_child_classes(c: ktl.Class):
     for c_child in c.each_child_class():
-        return c_child
+        yield c_child
 
 
 def get_py_methods(
@@ -390,10 +413,13 @@ def get_py_methods(
                 return m
         return None
 
-    translate_type = functools.partial(_translate_type, within_class=c)
+    translate_arg_type = functools.partial(_translate_type, within_class=c, is_return=False)
+    translate_ret_type = functools.partial(_translate_type, within_class=c, is_return=True)
 
-    def _get_arglist(m: ktl.Method, self_str) -> List[Tuple[str, ktl.ArgType]]:
-        args = [(self_str, None)]
+    def _get_arglist(
+        m: ktl.Method, self_str: str
+    ) -> List[Tuple[str, Optional[ktl.ArgType]]]:
+        args: List[Tuple[str, Optional[ktl.ArgType]]] = [(self_str, None)]
         for i, a in enumerate(m.each_argument()):
             argname = a.name()
             if is_reserved_word(argname):
@@ -417,7 +443,7 @@ def get_py_methods(
         new_arglist: List[Tuple[str, Optional[str]]] = []
         for argname, a in arg_list:
             if a:
-                new_arglist.append((argname, translate_type(a)))
+                new_arglist.append((argname, translate_arg_type(a)))
             else:
                 new_arglist.append((argname, None))
         return _format_args(new_arglist)
@@ -425,7 +451,7 @@ def get_py_methods(
     # Extract all properties (methods that have getters and/or setters)
     properties: List[Stub] = list()
     for m in copy(_c_methods):
-        ret_type = translate_type(m.m.ret_type())
+        ret_type = translate_ret_type(m.m.ret_type())
         if m.is_getter:
             m_setter = find_setter(c_methods, m.name)
             if m_setter is not None:  # full property
@@ -476,10 +502,27 @@ def get_py_methods(
         if m.is_setter:
             _c_methods.remove(m)
 
-    def get_altnames(c_name: str):
+    def get_altnames(c_name: str, m: _Method):
+        args = list(m.m.each_argument())
+        ret = m.m.ret_type()
+        num_args = len(args)
         names = [c_name]
-        if c_name == "to_s":
+        if c_name == "to_s" and num_args == 0:
             names.append("__str__")
+            # Only works if GSI_ALIAS_INSPECT is activated
+            names.append("__repr__")
+        elif c_name == "hash" and num_args == 0:
+            names.append("__hash__")
+        elif c_name == "inspect" and num_args == 0:
+            names.append("__repr__")
+        elif c_name == "size" and num_args == 0:
+            names.append("__len__")
+        elif c_name == "each" and num_args == 0 and ret.is_iter():
+            names.append("__iter__")
+        elif c_name == "__mul__" and "Trans" not in c_name:
+            names.append("__rmul__")
+        elif c_name == "dup" and num_args == 0:
+            names.append("__copy__")
         return names
 
     # Extract all classmethods
@@ -491,8 +534,8 @@ def get_py_methods(
             if translate_methodname(m.name) == "__init__":
                 continue
             decorator = "@classmethod"
-            ret_type = translate_type(m.m.ret_type())
-            for name in get_altnames(m.name):
+            ret_type = translate_ret_type(m.m.ret_type())
+            for name in get_altnames(m.name, m):
                 classmethods.append(
                     MethodStub(
                         decorator=decorator,
@@ -515,9 +558,10 @@ def get_py_methods(
         if translated_name == "__init__":
             ret_type = "None"
         else:
-            ret_type = translate_type(m.m.ret_type())
+            ret_type = translate_ret_type(m.m.ret_type())
 
         arg_list = _get_arglist(m.m, "self")
+        # TODO: fix type errors
         # Exceptions:
         # For X.__eq__(self, a:X), treat second argument as type object instead of X
         if translated_name in ("__eq__", "__ne__"):
@@ -525,19 +569,20 @@ def get_py_methods(
         # X._assign(self, other:X), mypy complains if _assign is defined at base class.
         # We can't specialize other in this case.
         elif translated_name in ("_assign", "assign"):
+            assert arg_list[1][1] is not None
             assert arg_list[1][1].type() == ktl.ArgType.TypeObject
             arg_list[1] = arg_list[1][0], superclass(arg_list[1][1].cls())
         else:
             new_arg_list = []
             for argname, a in arg_list:
                 if a:
-                    new_arg_list.append((argname, translate_type(a)))
+                    new_arg_list.append((argname, translate_arg_type(a)))
                 else:
                     new_arg_list.append((argname, a))
             arg_list = new_arg_list
         formatted_args = _format_args(arg_list)
 
-        for name in get_altnames(translated_name):
+        for name in get_altnames(translated_name, m):
             boundmethods.append(
                 MethodStub(
                     decorator=decorator,
@@ -595,6 +640,7 @@ def get_class_stub(
         _cstub.child_stubs.append(stub)
     return _cstub
 
+
 def get_classes(module: str) -> List[ktl.Class]:
     _classes = []
     for c in ktl.Class.each_class():
@@ -603,7 +649,8 @@ def get_classes(module: str) -> List[ktl.Class]:
         _classes.append(c)
     return _classes
 
-def get_module_stubs(module:str) -> List[ClassStub]:
+
+def get_module_stubs(module: str) -> List[ClassStub]:
     _stubs = []
     _classes = get_classes(module)
     for c in _classes:
@@ -613,7 +660,7 @@ def get_module_stubs(module:str) -> List[ClassStub]:
 
 
 def print_db():
-    print("from typing import Any, ClassVar, Dict, Iterable, Optional")
+    print("from typing import Any, ClassVar, Dict, Sequence, List, Iterator, Optional")
     print("from typing import overload")
     print("import klayout.rdb as rdb")
     print("import klayout.tl as tl")
@@ -622,14 +669,15 @@ def print_db():
 
 
 def print_rdb():
-    print("from typing import Any, ClassVar, Dict, Iterable, Optional")
+    print("from typing import Any, ClassVar, Dict, Sequence, List, Iterator, Optional")
     print("from typing import overload")
     print("import klayout.db as db")
     for stub in get_module_stubs("rdb"):
         print(stub.format_stub(include_docstring=True) + "\n")
 
+
 def print_tl():
-    print("from typing import Any, ClassVar, Dict, Iterable, Optional")
+    print("from typing import Any, ClassVar, Dict, Sequence, List, Iterator, Optional")
     print("from typing import overload")
     for stub in get_module_stubs("tl"):
         print(stub.format_stub(include_docstring=True) + "\n")

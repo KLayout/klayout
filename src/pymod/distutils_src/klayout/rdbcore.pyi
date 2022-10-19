@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Dict, Iterable, Optional
+from typing import Any, ClassVar, Dict, Sequence, List, Iterator, Optional
 from typing import overload
 import klayout.db as db
 class RdbReference:
@@ -19,6 +19,10 @@ class RdbReference:
     @return The transformation
     @brief Sets the transformation for this reference
     """
+    def __copy__(self) -> RdbReference:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self, trans: db.DCplxTrans, parent_cell_id: int) -> None:
         r"""
         @brief Creates a reference with a given transformation and parent cell ID
@@ -136,13 +140,13 @@ class RdbCell:
 
         This method has been introduced in version 0.23.
         """
-    def each_item(self) -> Iterable[RdbItem]:
+    def each_item(self) -> Iterator[RdbItem]:
         r"""
         @brief Iterates over all items inside the database which are associated with this cell
 
         This method has been introduced in version 0.23.
         """
-    def each_reference(self) -> Iterable[RdbReference]:
+    def each_reference(self) -> Iterator[RdbReference]:
         r"""
         @brief Iterates over all references
         """
@@ -236,13 +240,13 @@ class RdbCategory:
 
         This method has been introduced in version 0.23.
         """
-    def each_item(self) -> Iterable[RdbItem]:
+    def each_item(self) -> Iterator[RdbItem]:
         r"""
         @brief Iterates over all items inside the database which are associated with this category
 
         This method has been introduced in version 0.23.
         """
-    def each_sub_category(self) -> Iterable[RdbCategory]:
+    def each_sub_category(self) -> Iterator[RdbCategory]:
         r"""
         @brief Iterates over all sub-categories
         """
@@ -368,6 +372,10 @@ class RdbItemValue:
 
     This variant has been introduced in version 0.24
     """
+    def __copy__(self) -> RdbItemValue:
+        r"""
+        @brief Creates a copy of self
+        """
     @overload
     def __init__(self, b: db.DBox) -> None:
         r"""
@@ -413,6 +421,12 @@ class RdbItemValue:
         @brief Creates a value representing a DText object
 
         This method has been introduced in version 0.22.
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts a value to a string
+        The string can be used by the string constructor to create another object from it.
+        @return The string
         """
     def __str__(self) -> str:
         r"""
@@ -696,7 +710,7 @@ class RdbItem:
 
         This method has been introduced in version 0.23.
         """
-    def each_value(self) -> Iterable[RdbItemValue]:
+    def each_value(self) -> Iterator[RdbItemValue]:
         r"""
         @brief Iterates over all values
         """
@@ -892,7 +906,7 @@ class ReportDatabase:
         @param iter The iterator (a \RecursiveShapeIterator object) from which to take the items
         """
     @overload
-    def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, array: Iterable[db.EdgePair]) -> None:
+    def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, array: Sequence[db.EdgePair]) -> None:
         r"""
         @brief Creates new edge pair items for the given cell/category combination
         For each edge pair a single item will be created. The value of the item will be this edge pair.
@@ -906,7 +920,7 @@ class ReportDatabase:
         @param edge_pairs The list of edge_pairs for which the items are created
         """
     @overload
-    def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, array: Iterable[db.Edge]) -> None:
+    def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, array: Sequence[db.Edge]) -> None:
         r"""
         @brief Creates new edge items for the given cell/category combination
         For each edge a single item will be created. The value of the item will be this edge.
@@ -920,7 +934,7 @@ class ReportDatabase:
         @param edges The list of edges for which the items are created
         """
     @overload
-    def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, array: Iterable[db.Polygon]) -> None:
+    def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, array: Sequence[db.Polygon]) -> None:
         r"""
         @brief Creates new polygon items for the given cell/category combination
         For each polygon a single item will be created. The value of the item will be this polygon.
@@ -995,29 +1009,29 @@ class ReportDatabase:
         @param shapes The shape container from which to take the items
         @param trans The transformation to apply
         """
-    def each_category(self) -> Iterable[RdbCategory]:
+    def each_category(self) -> Iterator[RdbCategory]:
         r"""
         @brief Iterates over all top-level categories
         """
-    def each_cell(self) -> Iterable[RdbCell]:
+    def each_cell(self) -> Iterator[RdbCell]:
         r"""
         @brief Iterates over all cells
         """
-    def each_item(self) -> Iterable[RdbItem]:
+    def each_item(self) -> Iterator[RdbItem]:
         r"""
         @brief Iterates over all items inside the database
         """
-    def each_item_per_category(self, category_id: int) -> Iterable[RdbItem]:
+    def each_item_per_category(self, category_id: int) -> Iterator[RdbItem]:
         r"""
         @brief Iterates over all items inside the database which are associated with the given category
         @param category_id The ID of the category for which all associated items should be retrieved
         """
-    def each_item_per_cell(self, cell_id: int) -> Iterable[RdbItem]:
+    def each_item_per_cell(self, cell_id: int) -> Iterator[RdbItem]:
         r"""
         @brief Iterates over all items inside the database which are associated with the given cell
         @param cell_id The ID of the cell for which all associated items should be retrieved
         """
-    def each_item_per_cell_and_category(self, cell_id: int, category_id: int) -> Iterable[RdbItem]:
+    def each_item_per_cell_and_category(self, cell_id: int, category_id: int) -> Iterator[RdbItem]:
         r"""
         @brief Iterates over all items inside the database which are associated with the given cell and category
         @param cell_id The ID of the cell for which all associated items should be retrieved
@@ -1129,7 +1143,7 @@ class ReportDatabase:
 
         This method has been added in version 0.24.
         """
-    def variants(self, name: str) -> Iterable[int]:
+    def variants(self, name: str) -> List[int]:
         r"""
         @brief Gets the variants for a given cell name
         @param name The basic name of the cell

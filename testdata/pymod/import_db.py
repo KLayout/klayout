@@ -41,6 +41,19 @@ class BasicTest(unittest.TestCase):
     v.read(os.path.join(os.path.dirname(__file__), "..", "gds", "t10.gds"))
     self.assertEqual(v.top_cell().name, "RINGO")
 
+  def test_4(self):
+    class RMulObject:
+      def __init__(self, factor):
+        self.factor = factor
+      def __rmul__(self, point):
+        return point * self.factor
+      def __radd__(self, point):
+        return point + db.Vector(1,1) * self.factor
+
+    p = db.Point(1, 0)
+    fac2 = RMulObject(2)
+    self.assertEqual(p * 2, p * fac2)  # p.__mul__(fac2) should return NotImplemented, which will call fac2.__rmul__(p)
+    self.assertEqual(db.Point(3,2), p + fac2)
 # run unit tests
 if __name__ == '__main__':
   suite = unittest.TestSuite()
@@ -48,5 +61,3 @@ if __name__ == '__main__':
 
   if not unittest.TextTestRunner(verbosity = 1).run(suite).wasSuccessful():
     sys.exit(1)
-
-

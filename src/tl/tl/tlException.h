@@ -36,13 +36,13 @@ namespace tl
 /**
  *  @brief The unspecific exception class
  *
- *  This class is the base class for all exceptions in this 
- *  framework. It does not carry further information except 
- *  a message string that can be created through different 
+ *  This class is the base class for all exceptions in this
+ *  framework. It does not carry further information except
+ *  a message string that can be created through different
  *  constructor methods.
  */
 
-class TL_PUBLIC Exception 
+class TL_PUBLIC Exception
 {
 public:
   Exception (const std::string &msg)
@@ -134,6 +134,15 @@ private:
 };
 
 /**
+ *  @brief An exception thrown when the wrong type is provided as argument.
+ */
+struct TL_PUBLIC TypeError
+  : public Exception
+{
+  using Exception::Exception;
+};
+
+/**
  *  @brief A "neutral" exception thrown to terminate some operation
  *  This exception is not shown.
  */
@@ -159,4 +168,3 @@ struct TL_PUBLIC InternalException
 } // namespace tl
 
 #endif
-

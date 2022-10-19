@@ -750,7 +750,7 @@ extern Class<db::ShapeCollection> decl_dbShapeCollection;
 
 
 Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
-  constructor ("new", &new_v, 
+  constructor ("new", &new_v,
     "@brief Default constructor\n"
     "\n"
     "This constructor creates an empty region.\n"
@@ -796,8 +796,8 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@code\n"
     "layout = ... # a layout\n"
-    "cell   = ... # the index of the initial cell\n" 
-    "layer  = ... # the index of the layer from where to take the shapes from\n" 
+    "cell   = ... # the index of the initial cell\n"
+    "layer  = ... # the index of the layer from where to take the shapes from\n"
     "r = RBA::Region::new(layout.begin_shapes(cell, layer))\n"
     "@/code\n"
   ) +
@@ -812,8 +812,8 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "@code\n"
     "layout = ... # a layout\n"
-    "cell   = ... # the index of the initial cell\n" 
-    "layer  = ... # the index of the layer from where to take the shapes from\n" 
+    "cell   = ... # the index of the initial cell\n"
+    "layer  = ... # the index of the layer from where to take the shapes from\n"
     "dbu    = 0.1 # the target database unit\n"
     "r = RBA::Region::new(layout.begin_shapes(cell, layer), RBA::ICplxTrans::new(layout.dbu / dbu))\n"
     "@/code\n"
@@ -923,11 +923,11 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "as single regions and artificial edges such as cut-lines will not be considered.\n"
     "Merged semantics thus is equivalent to considering coherent areas rather than\n"
     "single polygons\n"
-  ) + 
+  ) +
   method ("merged_semantics?", &db::Region::merged_semantics,
     "@brief Gets a flag indicating whether merged semantics is enabled\n"
     "See \\merged_semantics= for a description of this attribute.\n"
-  ) + 
+  ) +
   method ("strict_handling=", &db::Region::set_strict_handling, gsi::arg ("f"),
     "@brief Enables or disables strict handling\n"
     "\n"
@@ -939,7 +939,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "Strict handling is disabled by default and optimization is in place.\n"
     "\n"
     "This method has been introduced in version 0.23.2."
-  ) + 
+  ) +
   method ("strict_handling?", &db::Region::strict_handling,
     "@brief Gets a flag indicating whether merged semantics is enabled\n"
     "See \\strict_handling= for a description of this attribute.\n"
@@ -955,11 +955,11 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "created which touch at a corner).\n"
     "\n"
     "The default setting is maximum coherence (min_coherence = false).\n"
-  ) + 
+  ) +
   method ("min_coherence?", &db::Region::min_coherence,
     "@brief Gets a flag indicating whether minimum coherence is selected\n"
     "See \\min_coherence= for a description of this attribute.\n"
-  ) + 
+  ) +
   method_ext ("complex_op", &complex_op, gsi::arg ("node"),
     "@brief Executes a complex operation (see \\CompoundRegionOperationNode for details)\n"
     "\n"
@@ -1335,7 +1335,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "of these boxes for example.\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
-  ) + 
+  ) +
   method_ext ("extents", &extents1, gsi::arg ("d"),
     "@brief Returns a region with the enlarged bounding boxes of the polygons\n"
     "This method will return a region consisting of the bounding boxes of the polygons enlarged by the given distance d.\n"
@@ -1344,7 +1344,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "of these boxes for example.\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
-  ) + 
+  ) +
   method_ext ("extents", &extents2, gsi::arg ("dx"), gsi::arg ("dy"),
     "@brief Returns a region with the enlarged bounding boxes of the polygons\n"
     "This method will return a region consisting of the bounding boxes of the polygons enlarged by the given distance dx in x direction and dy in y direction.\n"
@@ -1353,7 +1353,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "of these boxes for example.\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
-  ) + 
+  ) +
   method_ext ("extent_refs", &extent_refs,
     "@hide\n"
     "This method is provided for DRC implementation.\n"
@@ -1536,7 +1536,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "r.merge(false, 1)\n"
     "# r now is (50,-50;50,100;100,100;100,-50)\n"
     "@/code\n"
-  ) + 
+  ) +
   method ("size", (db::Region & (db::Region::*) (db::Coord, unsigned int)) &db::Region::size, gsi::arg ("d"), gsi::arg ("mode"),
     "@brief Isotropic sizing (biasing)\n"
     "\n"
@@ -1545,7 +1545,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This method is equivalent to \"size(d, d, mode)\".\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
-  ) + 
+  ) +
   method_ext ("size", size_ext, gsi::arg ("d"),
     "@brief Isotropic sizing (biasing)\n"
     "\n"
@@ -1554,7 +1554,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This method is equivalent to \"size(d, d, 2)\".\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
-  ) + 
+  ) +
   method ("sized", (db::Region (db::Region::*) (db::Coord, db::Coord, unsigned int) const) &db::Region::sized, gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("mode"),
     "@brief Returns the anisotropically sized region\n"
     "\n"
@@ -1563,7 +1563,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This method is returns the sized region (see \\size), but does not modify self.\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
-  ) + 
+  ) +
   method ("sized", (db::Region (db::Region::*) (db::Coord, unsigned int) const) &db::Region::sized, gsi::arg ("d"), gsi::arg ("mode"),
     "@brief Returns the isotropically sized region\n"
     "\n"
@@ -1572,7 +1572,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This method is returns the sized region (see \\size), but does not modify self.\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
-  ) + 
+  ) +
   method_ext ("sized", sized_ext, gsi::arg ("d"),
     "@brief Isotropic sizing (biasing)\n"
     "\n"
@@ -1581,7 +1581,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This method is equivalent to \"sized(d, d, 2)\".\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
-  ) + 
+  ) +
   method_ext ("andnot", &andnot, gsi::arg ("other"),
     "@brief Returns the boolean AND and NOT between self and the other region\n"
     "\n"
@@ -1599,7 +1599,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method will compute the boolean AND (intersection) between two regions. "
     "The result is often but not necessarily always merged.\n"
-  ) + 
+  ) +
   method ("&=", &db::Region::operator&=, gsi::arg ("other"),
     "@brief Performs the boolean AND between self and the other region\n"
     "\n"
@@ -1607,7 +1607,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method will compute the boolean AND (intersection) between two regions. "
     "The result is often but not necessarily always merged.\n"
-  ) + 
+  ) +
   method ("-", &db::Region::operator-, gsi::arg ("other"),
     "@brief Returns the boolean NOT between self and the other region\n"
     "\n"
@@ -1615,7 +1615,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method will compute the boolean NOT (intersection) between two regions. "
     "The result is often but not necessarily always merged.\n"
-  ) + 
+  ) +
   method ("-=", &db::Region::operator-=, gsi::arg ("other"),
     "@brief Performs the boolean NOT between self and the other region\n"
     "\n"
@@ -1623,15 +1623,15 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method will compute the boolean NOT (intersection) between two regions. "
     "The result is often but not necessarily always merged.\n"
-  ) + 
+  ) +
   method ("^", &db::Region::operator^, gsi::arg ("other"),
-    "@brief Returns the boolean NOT between self and the other region\n"
+    "@brief Returns the boolean XOR between self and the other region\n"
     "\n"
     "@return The result of the boolean XOR operation\n"
     "\n"
     "This method will compute the boolean XOR (intersection) between two regions. "
     "The result is often but not necessarily always merged.\n"
-  ) + 
+  ) +
   method ("^=", &db::Region::operator^=, gsi::arg ("other"),
     "@brief Performs the boolean XOR between self and the other region\n"
     "\n"
@@ -1639,7 +1639,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method will compute the boolean XOR (intersection) between two regions. "
     "The result is often but not necessarily always merged.\n"
-  ) + 
+  ) +
   method ("\\|", &db::Region::operator|, gsi::arg ("other"),
     "@brief Returns the boolean OR between self and the other region\n"
     "\n"
@@ -1647,7 +1647,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "The boolean OR is implemented by merging the polygons of both regions. To simply join the regions "
     "without merging, the + operator is more efficient."
-  ) + 
+  ) +
   method ("\\|=", &db::Region::operator|=, gsi::arg ("other"),
     "@brief Performs the boolean OR between self and the other region\n"
     "\n"
@@ -1655,7 +1655,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "The boolean OR is implemented by merging the polygons of both regions. To simply join the regions "
     "without merging, the + operator is more efficient."
-  ) + 
+  ) +
   method ("+", &db::Region::operator+, gsi::arg ("other"),
     "@brief Returns the combined region of self and the other region\n"
     "\n"
@@ -1663,7 +1663,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This operator adds the polygons of the other region to self and returns a new combined region. "
     "This usually creates unmerged regions and polygons may overlap. Use \\merge if you want to ensure the result region is merged.\n"
-  ) + 
+  ) +
   method ("+=", &db::Region::operator+=, gsi::arg ("other"),
     "@brief Adds the polygons of the other region to self\n"
     "\n"
@@ -1671,7 +1671,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This operator adds the polygons of the other region to self. "
     "This usually creates unmerged regions and polygons may overlap. Use \\merge if you want to ensure the result region is merged.\n"
-  ) + 
+  ) +
   method ("covering", &db::Region::selected_enclosing, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which are completely covering polygons from the other region\n"
     "\n"
@@ -1732,14 +1732,14 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@return A new region containing the polygons which are inside polygons from the other region\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
-  ) + 
+  ) +
   method ("not_inside", &db::Region::selected_not_inside, gsi::arg ("other"),
     "@brief Returns the polygons of this region which are not completely inside polygons from the other region\n"
     "\n"
     "@return A new region containing the polygons which are not inside polygons from the other region\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
-  ) + 
+  ) +
   method_ext ("split_inside", &split_inside, gsi::arg ("other"),
     "@brief Returns the polygons of this region which are completely inside polygons from the other region and the ones which are not at the same time\n"
     "\n"
@@ -1756,28 +1756,28 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@return The region after the polygons have been selected (self)\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
-  ) + 
+  ) +
   method ("select_not_inside", &db::Region::select_not_inside, gsi::arg ("other"),
     "@brief Selects the polygons of this region which are not completely inside polygons from the other region\n"
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
-  ) + 
+  ) +
   method ("outside", &db::Region::selected_outside, gsi::arg ("other"),
     "@brief Returns the polygons of this region which are completely outside polygons from the other region\n"
     "\n"
     "@return A new region containing the polygons which are outside polygons from the other region\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
-  ) + 
+  ) +
   method ("not_outside", &db::Region::selected_not_outside, gsi::arg ("other"),
     "@brief Returns the polygons of this region which are not completely outside polygons from the other region\n"
     "\n"
     "@return A new region containing the polygons which are not outside polygons from the other region\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
-  ) + 
+  ) +
   method_ext ("split_outside", &split_outside, gsi::arg ("other"),
     "@brief Returns the polygons of this region which are completely outside polygons from the other region and the ones which are not at the same time\n"
     "\n"
@@ -1794,14 +1794,14 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@return The region after the polygons have been selected (self)\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
-  ) + 
+  ) +
   method ("select_not_outside", &db::Region::select_not_outside, gsi::arg ("other"),
     "@brief Selects the polygons of this region which are not completely outside polygons from the other region\n"
     "\n"
     "@return The region after the polygons have been selected (self)\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
-  ) + 
+  ) +
   method ("interacting", (db::Region (db::Region::*) (const db::Region &, size_t, size_t) const) &db::Region::selected_interacting, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which overlap or touch polygons from the other region\n"
     "\n"
@@ -2012,7 +2012,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
     "\n"
     "The count options have been introduced in version 0.27."
-  ) + 
+  ) +
   method ("not_overlapping", &db::Region::selected_not_overlapping, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which do not overlap polygons from the other region\n"
     "\n"
@@ -2121,7 +2121,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "possibilities of the edge collection.\n"
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
-  ) + 
+  ) +
   factory_ext ("decompose_convex", &decompose_convex<db::Shapes>, gsi::arg ("preferred_orientation", po_any (), "\\Polygon#PO_any"),
     "@brief Decomposes the region into convex pieces.\n"
     "\n"
@@ -2158,7 +2158,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   method ("swap", &db::Region::swap, gsi::arg ("other"),
     "@brief Swap the contents of this region with the contents of another region\n"
     "This method is useful to avoid excessive memory allocation in some cases. "
-    "For managed memory languages such as Ruby, those cases will be rare. " 
+    "For managed memory languages such as Ruby, those cases will be rare. "
   ) +
   method ("holes", &db::Region::holes,
     "@brief Returns the holes of the region\n"
@@ -3091,4 +3091,3 @@ gsi::EnumIn<db::Region, db::OppositeFilter> decl_Region_OppositeFilter ("db", "O
 gsi::ClassExt<db::Region> inject_OppositeFilter_in_parent (decl_Region_OppositeFilter.defs ());
 
 }
-

@@ -2779,7 +2779,6 @@ public:
       }
 
       std::string name = mt->name (mid);
-      std::string raw_name = name;
 
       //  does this method hide a property? -> append "_" in that case
       std::pair<bool, size_t> t = mt->find_property (mt->is_static (mid), name);

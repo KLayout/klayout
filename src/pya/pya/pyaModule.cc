@@ -37,416 +37,6 @@
 namespace pya
 {
 
-// -------------------------------------------------------------------
-//  The lookup table for the method overload resolution
-
-/**
- *  @brief A single entry in the method table
- *  This class provides an entry for one name. It provides flags
- *  (ctor, static, protected) for the method and a list of implementations
- *  (gsi::MethodBase objects)
- */
-class MethodTableEntry
-{
-public:
-  typedef std::vector<const gsi::MethodBase *>::const_iterator method_iterator;
-
-  MethodTableEntry (const std::string &name, bool st, bool prot)
-    : m_name (name), m_is_static (st), m_is_protected (prot)
-  { }
-
-  const std::string &name () const
-  {
-    return m_name;
-  }
-
-  bool is_static () const
-  {
-    return m_is_static;
-  }
-
-  bool is_protected () const
-  {
-    return m_is_protected;
-  }
-
-  void add (const gsi::MethodBase *m)
-  {
-    m_methods.push_back (m);
-  }
-
-  void finish ()
-  {
-    //  remove duplicate entries in the method list
-    std::vector<const gsi::MethodBase *> m = m_methods;
-    std::sort(m.begin (), m.end ());
-    m_methods.assign (m.begin (), std::unique (m.begin (), m.end ()));
-  }
-
-  method_iterator begin () const
-  {
-    return m_methods.begin ();
-  }
-
-  method_iterator end () const
-  {
-    return m_methods.end ();
-  }
-
-private:
-  std::string m_name;
-  bool m_is_static : 1;
-  bool m_is_protected : 1;
-  std::vector<const gsi::MethodBase *> m_methods;
-};
-
-/**
- *  @brief The method table for a class
- *  The method table will provide the methods associated with a native method, i.e.
- *  a certain name. It only provides the methods, not a overload resolution strategy.
- */
-class MethodTable
-{
-public:
-  /**
-   *  @brief Constructor
-   *  This constructor will create a method table for the given class and register
-   *  this table under this class.
-   */
-  MethodTable (const gsi::ClassBase *cls_decl)
-    : m_method_offset (0), m_property_offset (0), mp_cls_decl (cls_decl)
-  {
-    //  signals are translated into the setters and getters
-    for (gsi::ClassBase::method_iterator m = cls_decl->begin_methods (); m != cls_decl->end_methods (); ++m) {
-      if ((*m)->is_signal ()) {
-        for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
-          add_getter (syn->name, *m);
-          add_setter (syn->name, *m);
-        }
-      }
-    }
-
-    //  first add getters and setters
-    for (gsi::ClassBase::method_iterator m = cls_decl->begin_methods (); m != cls_decl->end_methods (); ++m) {
-      if (! (*m)->is_callback ()) {
-        for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
-          if (syn->is_getter) {
-            add_getter (syn->name, *m);
-          } else if (syn->is_setter) {
-            add_setter (syn->name, *m);
-          }
-        }
-      }
-    }
-
-    //  then add normal methods - on name clash with properties make them a getter
-    for (gsi::ClassBase::method_iterator m = cls_decl->begin_methods (); m != cls_decl->end_methods (); ++m) {
-      if (! (*m)->is_callback () && ! (*m)->is_signal ()) {
-        for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
-          if (! syn->is_getter && ! syn->is_setter) {
-            if ((*m)->end_arguments () - (*m)->begin_arguments () == 0 && find_property ((*m)->is_static (), syn->name).first) {
-              add_getter (syn->name, *m);
-            } else {
-              add_method (syn->name, *m);
-            }
-          }
-        }
-      }
-    }
-
-    if (cls_decl->base ()) {
-      const MethodTable *base_mt = method_table_by_class (cls_decl->base ());
-      tl_assert (base_mt);
-      m_method_offset = base_mt->top_mid ();
-      m_property_offset = base_mt->top_property_mid ();
-    }
-  }
-
-  /**
-   *  @brief Returns the lowest method ID within the space of this table
-   *  Method IDs below this one are reserved for base class methods
-   */
-  size_t bottom_mid () const
-  {
-    return m_method_offset;
-  }
-
-  /**
-   *  @brief Returns the topmost + 1 method ID.
-   */
-  size_t top_mid () const
-  {
-    return m_method_offset + m_table.size ();
-  }
-
-  /**
-   *  @brief Returns the lowest property method ID within the space of this table
-   *  Method IDs below this one are reserved for base class methods
-   */
-  size_t bottom_property_mid () const
-  {
-    return m_property_offset;
-  }
-
-  /**
-   *  @brief Returns the topmost + 1 property method ID.
-   */
-  size_t top_property_mid () const
-  {
-    return m_property_offset + m_property_table.size ();
-  }
-
-  /**
-   *  @brief Find a method with the given name and static flag
-   *  Returns true or false in the first part (true, if found) and
-   *  the MID in the second part.
-   */
-  std::pair<bool, size_t> find_method (bool st, const std::string &name) const
-  {
-    std::map <std::pair<bool, std::string>, size_t>::const_iterator t = m_name_map.find (std::make_pair (st, name));
-    if (t != m_name_map.end ()) {
-      return std::make_pair (true, t->second + m_method_offset);
-    } else {
-      return std::make_pair (false, 0);
-    }
-  }
-
-  /**
-   *  @brief Find a property with the given name and static flag
-   *  Returns true or false in the first part (true, if found) and
-   *  the MID in the second part.
-   */
-  std::pair<bool, size_t> find_property (bool st, const std::string &name) const
-  {
-    std::map <std::pair<bool, std::string>, size_t>::const_iterator t = m_property_name_map.find (std::make_pair (st, name));
-    if (t != m_property_name_map.end ()) {
-      return std::make_pair (true, t->second + m_property_offset);
-    } else {
-      return std::make_pair (false, 0);
-    }
-  }
-
-  /**
-   *  @brief Adds a method to the table
-   */
-  void add_method (const std::string &name, const gsi::MethodBase *mb)
-  {
-    bool st = mb->is_static ();
-
-    std::map<std::pair<bool, std::string>, size_t>::iterator n = m_name_map.find (std::make_pair (st, name));
-    if (n == m_name_map.end ()) {
-
-      m_name_map.insert (std::make_pair (std::make_pair(st, name), m_table.size ()));
-      m_table.push_back (MethodTableEntry (name, mb->is_static (), mb->is_protected ()));
-      m_table.back ().add (mb);
-
-    } else {
-
-      if (m_table [n->second].is_protected () != mb->is_protected ()) {
-        tl::warn << "Class " << mp_cls_decl->name () << ": method '" << name << " is both a protected and non-protected";
-      }
-
-      m_table [n->second].add (mb);
-
-    }
-  }
-
-  /**
-   *  @brief Adds a setter with the given name
-   */
-  void add_setter (const std::string &name, const gsi::MethodBase *setter)
-  {
-    bool st = setter->is_static ();
-
-    std::map<std::pair<bool, std::string>, size_t>::iterator n = m_property_name_map.find (std::make_pair (st, name));
-    if (n == m_property_name_map.end ()) {
-
-      m_property_name_map.insert (std::make_pair (std::make_pair(st, name), m_property_table.size ()));
-      m_property_table.push_back (std::make_pair (MethodTableEntry (name, st, false), MethodTableEntry (name, st, false)));
-      m_property_table.back ().first.add (setter);
-
-    } else {
-
-      m_property_table [n->second].first.add (setter);
-
-    }
-  }
-
-  /**
-   *  @brief Adds a getter with the given name
-   */
-  void add_getter (const std::string &name, const gsi::MethodBase *getter)
-  {
-    bool st = getter->is_static ();
-
-    std::map<std::pair<bool, std::string>, size_t>::iterator n = m_property_name_map.find (std::make_pair (st, name));
-    if (n == m_property_name_map.end ()) {
-
-      m_property_name_map.insert (std::make_pair (std::make_pair(st, name), m_property_table.size ()));
-      m_property_table.push_back (std::make_pair (MethodTableEntry (name, st, false), MethodTableEntry (name, st, false)));
-      m_property_table.back ().second.add (getter);
-
-    } else {
-
-      m_property_table [n->second].second.add (getter);
-
-    }
-  }
-
-  /**
-   *  @brief Returns true if the method with the given ID is static
-   */
-  bool is_static (size_t mid) const
-  {
-    return m_table [mid - m_method_offset].is_static ();
-  }
-
-  /**
-   *  @brief Returns true if the method with the given ID is protected
-   */
-  bool is_protected (size_t mid) const
-  {
-    return m_table [mid - m_method_offset].is_protected ();
-  }
-
-  /**
-   *  @brief Returns the name of the method with the given ID
-   */
-  const std::string &name (size_t mid) const
-  {
-    return m_table [mid - m_method_offset].name ();
-  }
-
-  /**
-   *  @brief Returns the name of the property with the given ID
-   */
-  const std::string &property_name (size_t mid) const
-  {
-    return m_property_table [mid - m_property_offset].first.name ();
-  }
-
-  /**
-   *  @brief Begins iteration of the overload variants for setter of property ID mid
-   */
-  MethodTableEntry::method_iterator begin_setters (size_t mid) const
-  {
-    return m_property_table[mid - m_property_offset].first.begin ();
-  }
-
-  /**
-   *  @brief Ends iteration of the overload variants for setter of property ID mid
-   */
-  MethodTableEntry::method_iterator end_setters (size_t mid) const
-  {
-    return m_property_table[mid - m_property_offset].first.end ();
-  }
-
-  /**
-   *  @brief Begins iteration of the overload variants for getter of property ID mid
-   */
-  MethodTableEntry::method_iterator begin_getters (size_t mid) const
-  {
-    return m_property_table[mid - m_property_offset].second.begin ();
-  }
-
-  /**
-   *  @brief Ends iteration of the overload variants for getter of property ID mid
-   */
-  MethodTableEntry::method_iterator end_getters (size_t mid) const
-  {
-    return m_property_table[mid - m_property_offset].second.end ();
-  }
-
-  /**
-   *  @brief Begins iteration of the overload variants for method ID mid
-   */
-  MethodTableEntry::method_iterator begin (size_t mid) const
-  {
-    return m_table[mid - m_method_offset].begin ();
-  }
-
-  /**
-   *  @brief Ends iteration of the overload variants for method ID mid
-   */
-  MethodTableEntry::method_iterator end (size_t mid) const
-  {
-    return m_table[mid - m_method_offset].end ();
-  }
-
-  /**
-   *  @brief Finishes construction of the table
-   *  This method must be called after the add_method calls have been used
-   *  to fill the table. It will remove duplicate entries and clean up memory.
-   */
-  void finish ()
-  {
-    for (std::vector<MethodTableEntry>::iterator m = m_table.begin (); m != m_table.end (); ++m) {
-      m->finish ();
-    }
-    for (std::vector<std::pair<MethodTableEntry, MethodTableEntry> >::iterator m = m_property_table.begin (); m != m_property_table.end (); ++m) {
-      m->first.finish ();
-      m->second.finish ();
-    }
-  }
-
-  /**
-   *  @brief Obtain a method table for a given class
-   */
-  static MethodTable *method_table_by_class (const gsi::ClassBase *cls_decl);
-
-private:
-  size_t m_method_offset;
-  size_t m_property_offset;
-  const gsi::ClassBase *mp_cls_decl;
-  std::map<std::pair<bool, std::string>, size_t> m_name_map;
-  std::map<std::pair<bool, std::string>, size_t> m_property_name_map;
-  std::vector<MethodTableEntry> m_table;
-  std::vector<std::pair<MethodTableEntry, MethodTableEntry> > m_property_table;
-};
-
-struct PythonClassClientData
-  : public gsi::PerClassClientSpecificData
-{
-  PythonClassClientData (const gsi::ClassBase *_cls, PyTypeObject *_py_type, PyTypeObject *_py_type_static)
-    : py_type_object (_py_type), py_type_object_static (_py_type_static), method_table (_cls)
-  {
-    //  .. nothing yet ..
-  }
-
-  PyTypeObject *py_type_object;
-  PyTypeObject *py_type_object_static;
-  MethodTable method_table;
-
-  static PyTypeObject *py_type (const gsi::ClassBase &cls_decl, bool as_static)
-  {
-    PythonClassClientData *cd = dynamic_cast<PythonClassClientData *>(cls_decl.data (gsi::ClientIndex::Python));
-    return cd ? (as_static ? cd->py_type_object_static : cd->py_type_object) : 0;
-  }
-
-  static void initialize (const gsi::ClassBase &cls_decl, PyTypeObject *py_type, bool as_static)
-  {
-    PythonClassClientData *cd = dynamic_cast<PythonClassClientData *>(cls_decl.data (gsi::ClientIndex::Python));
-    if (cd) {
-      if (as_static) {
-        cd->py_type_object_static = py_type;
-      } else {
-        cd->py_type_object = py_type;
-      }
-    } else {
-      cls_decl.set_data (gsi::ClientIndex::Python, new PythonClassClientData (&cls_decl, as_static ? NULL : py_type, as_static ? py_type : NULL));
-    }
-  }
-};
-
-/**
- *  @brief Obtains a method table for a given class
- */
-MethodTable *MethodTable::method_table_by_class (const gsi::ClassBase *cls_decl)
-{
-  PythonClassClientData *cd = dynamic_cast<PythonClassClientData *>(cls_decl->data (gsi::ClientIndex::Python));
-  return cd ? &cd->method_table : 0;
-}
-
 // --------------------------------------------------------------------------
 //  Some utilities
 
@@ -547,7 +137,7 @@ static std::string extract_python_name (const std::string &name)
     #else
     return "__truediv__";
     #endif
-  } else if (name == "*") {
+  } else if (name == "*" || name == "*!") {
     return "__mul__";
   } else if (name == "%") {
     return "__mod__";
@@ -623,6 +213,573 @@ static std::string extract_python_name (const std::string &name)
     return name;
 
   }
+}
+
+// -------------------------------------------------------------------
+//  The lookup table for the method overload resolution
+
+/**
+ *  @brief A single entry in the method table
+ *  This class provides an entry for one name. It provides flags
+ *  (ctor, static, protected) for the method and a list of implementations
+ *  (gsi::MethodBase objects)
+ */
+class MethodTableEntry
+{
+public:
+  typedef std::vector<const gsi::MethodBase *>::const_iterator method_iterator;
+
+  MethodTableEntry (const std::string &name, bool st, bool prot)
+    : m_name (name), m_is_static (st), m_is_protected (prot), m_is_enabled (true)
+  { }
+
+  const std::string &name () const
+  {
+    return m_name;
+  }
+
+  void set_name (const std::string &n)
+  {
+    m_name = n;
+  }
+
+  void set_enabled (bool en)
+  {
+    m_is_enabled = en;
+  }
+
+  bool is_enabled () const
+  {
+    return m_is_enabled;
+  }
+
+  bool is_static () const
+  {
+    return m_is_static;
+  }
+
+  bool is_protected () const
+  {
+    return m_is_protected;
+  }
+
+  void add (const gsi::MethodBase *m)
+  {
+    m_methods.push_back (m);
+  }
+
+  void finish ()
+  {
+    //  remove duplicate entries in the method list
+    std::vector<const gsi::MethodBase *> m = m_methods;
+    std::sort(m.begin (), m.end ());
+    m_methods.assign (m.begin (), std::unique (m.begin (), m.end ()));
+  }
+
+  method_iterator begin () const
+  {
+    return m_methods.begin ();
+  }
+
+  method_iterator end () const
+  {
+    return m_methods.end ();
+  }
+
+private:
+  std::string m_name;
+  bool m_is_static : 1;
+  bool m_is_protected : 1;
+  bool m_is_enabled : 1;
+  std::vector<const gsi::MethodBase *> m_methods;
+};
+
+/**
+ *  @brief The method table for a class
+ *  The method table will provide the methods associated with a native method, i.e.
+ *  a certain name. It only provides the methods, not a overload resolution strategy.
+ */
+class MethodTable
+{
+public:
+  /**
+   *  @brief Constructor
+   *  This constructor will create a method table for the given class and register
+   *  this table under this class.
+   */
+  MethodTable (const gsi::ClassBase *cls_decl, PythonModule *module)
+    : m_method_offset (0), m_property_offset (0), mp_cls_decl (cls_decl), mp_module (module)
+  {
+    if (cls_decl->base ()) {
+      const MethodTable *base_mt = method_table_by_class (cls_decl->base ());
+      tl_assert (base_mt);
+      m_method_offset = base_mt->top_mid ();
+      m_property_offset = base_mt->top_property_mid ();
+    }
+
+    //  signals are translated into the setters and getters
+    for (gsi::ClassBase::method_iterator m = cls_decl->begin_methods (); m != cls_decl->end_methods (); ++m) {
+      if ((*m)->is_signal ()) {
+        for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
+          add_getter (syn->name, *m);
+          add_setter (syn->name, *m);
+        }
+      }
+    }
+
+    //  first add getters and setters
+    for (gsi::ClassBase::method_iterator m = cls_decl->begin_methods (); m != cls_decl->end_methods (); ++m) {
+      if (! (*m)->is_callback ()) {
+        for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
+          if (syn->is_getter) {
+            add_getter (syn->name, *m);
+          } else if (syn->is_setter) {
+            add_setter (syn->name, *m);
+          }
+        }
+      }
+    }
+
+    //  then add normal methods - on name clash with properties make them a getter
+    for (gsi::ClassBase::method_iterator m = cls_decl->begin_methods (); m != cls_decl->end_methods (); ++m) {
+      if (! (*m)->is_callback () && ! (*m)->is_signal ()) {
+        for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
+          if (! syn->is_getter && ! syn->is_setter) {
+            if ((*m)->end_arguments () - (*m)->begin_arguments () == 0 && find_property ((*m)->is_static (), syn->name).first) {
+              add_getter (syn->name, *m);
+            } else {
+              add_method (syn->name, *m);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   *  @brief Returns the lowest method ID within the space of this table
+   *  Method IDs below this one are reserved for base class methods
+   */
+  size_t bottom_mid () const
+  {
+    return m_method_offset;
+  }
+
+  /**
+   *  @brief Returns the topmost + 1 method ID.
+   */
+  size_t top_mid () const
+  {
+    return m_method_offset + m_table.size ();
+  }
+
+  /**
+   *  @brief Returns the lowest property method ID within the space of this table
+   *  Method IDs below this one are reserved for base class methods
+   */
+  size_t bottom_property_mid () const
+  {
+    return m_property_offset;
+  }
+
+  /**
+   *  @brief Returns the topmost + 1 property method ID.
+   */
+  size_t top_property_mid () const
+  {
+    return m_property_offset + m_property_table.size ();
+  }
+
+  /**
+   *  @brief Find a method with the given name and static flag
+   *  Returns true or false in the first part (true, if found) and
+   *  the MID in the second part.
+   */
+  std::pair<bool, size_t> find_method (bool st, const std::string &name) const
+  {
+    std::map <std::pair<bool, std::string>, size_t>::const_iterator t = m_name_map.find (std::make_pair (st, name));
+    if (t != m_name_map.end ()) {
+      return std::make_pair (true, t->second + m_method_offset);
+    } else {
+      return std::make_pair (false, 0);
+    }
+  }
+
+  /**
+   *  @brief Find a property with the given name and static flag
+   *  Returns true or false in the first part (true, if found) and
+   *  the MID in the second part.
+   */
+  std::pair<bool, size_t> find_property (bool st, const std::string &name) const
+  {
+    std::map <std::pair<bool, std::string>, size_t>::const_iterator t = m_property_name_map.find (std::make_pair (st, name));
+    if (t != m_property_name_map.end ()) {
+      return std::make_pair (true, t->second + m_property_offset);
+    } else {
+      return std::make_pair (false, 0);
+    }
+  }
+
+  /**
+   *  @brief Adds a method to the table
+   */
+  void add_method (const std::string &name, const gsi::MethodBase *mb)
+  {
+    if (name == "to_s" && mb->compatible_with_num_args (0)) {
+
+      add_method_basic (name, mb);
+
+      //  The str method is also routed via the tp_str implementation
+      add_method_basic ("__str__", mb);
+
+#if defined(GSI_ALIAS_INSPECT)
+      //  also alias to "__repr__" unless there is an explicit "inspect" method
+      bool alias_inspect = true;
+      for (gsi::ClassBase::method_iterator m = mp_cls_decl->begin_methods (); m != mp_cls_decl->end_methods () && alias_inspect; ++m) {
+        if (! (*m)->is_callback () && ! (*m)->is_signal ()) {
+          for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms () && alias_inspect; ++syn) {
+            if (! syn->is_getter && ! syn->is_setter && syn->name == "inspect") {
+              alias_inspect = false;
+            }
+          }
+        }
+      }
+#else
+      bool alias_inspect = false;
+#endif
+      if (alias_inspect) {
+        add_method_basic ("__repr__", mb);
+        mp_module->add_python_doc (mb, tl::to_string (tr ("This method is also available as 'str(object)' and 'repr(object)'")));
+      } else {
+        mp_module->add_python_doc (mb, tl::to_string (tr ("This method is also available as 'str(object)'")));
+      }
+
+    } else if (name == "hash" && mb->compatible_with_num_args (0)) {
+
+      //  The hash method is also routed via the tp_hash implementation
+      add_method_basic ("__hash__", mb);
+
+      add_method_basic (name, mb);
+      mp_module->add_python_doc (mb, tl::to_string (tr ("This method is also available as 'hash(object)'")));
+
+    } else if (name == "inspect" && mb->compatible_with_num_args (0)) {
+
+      //  The str method is also routed via the tp_str implementation
+      add_method_basic ("__repr__", mb);
+
+      add_method_basic (name, mb);
+      mp_module->add_python_doc (mb, tl::to_string (tr ("This method is also available as 'repr(object)'")));
+
+    } else if (name == "size" && mb->compatible_with_num_args (0)) {
+
+      //  The size method is also routed via the sequence methods protocol if there
+      //  is a [] function
+      add_method_basic ("__len__", mb);
+
+      add_method_basic (name, mb);
+      mp_module->add_python_doc (mb, tl::to_string (tr ("This method is also available as 'len(object)'")));
+
+    } else if (name == "each" && mb->compatible_with_num_args (0) && mb->ret_type ().is_iter ()) {
+
+      //  each makes the object iterable
+      add_method_basic ("__iter__", mb);
+
+      add_method_basic (name, mb);
+      mp_module->add_python_doc (mb, tl::to_string (tr ("This method enables iteration of the object")));
+
+    } else if (name == "dup" && mb->compatible_with_num_args (0)) {
+
+      //  If the object supports the dup method, then it is a good
+      //  idea to define the __copy__ method.
+      add_method_basic ("__copy__", mb);
+
+      add_method_basic (name, mb);
+      mp_module->add_python_doc (mb, tl::to_string (tr ("This method also implements '__copy__'")));
+
+    } else {
+
+      std::string py_name = extract_python_name (name);
+      if (py_name.empty ()) {
+
+        //  drop non-standard names
+        if (tl::verbosity () >= 20) {
+          tl::warn << tl::to_string (tr ("Class ")) << mp_cls_decl->name () << ": " << tl::to_string (tr ("no Python mapping for method ")) << name;
+        }
+
+        add_method_basic (name, mb, false);
+        mp_module->add_python_doc (mb, tl::to_string (tr ("This method is not available for Python")));
+
+      } else {
+
+        add_method_basic (py_name, mb);
+
+        if (name == "*") {
+          //  Supply a commutative multiplication version unless the operator is "*!"
+          add_method_basic ("__rmul__", mb);
+          mp_module->add_python_doc (mb, tl::to_string (tr ("This method also implements '__rmul__'")));
+        }
+
+      }
+
+    }
+  }
+
+  /**
+   *  @brief Adds a setter with the given name
+   */
+  void add_setter (const std::string &name, const gsi::MethodBase *setter)
+  {
+    bool st = setter->is_static ();
+
+    std::map<std::pair<bool, std::string>, size_t>::iterator n = m_property_name_map.find (std::make_pair (st, name));
+    if (n == m_property_name_map.end ()) {
+
+      m_property_name_map.insert (std::make_pair (std::make_pair(st, name), m_property_table.size ()));
+      m_property_table.push_back (std::make_pair (MethodTableEntry (name, st, false), MethodTableEntry (name, st, false)));
+      m_property_table.back ().first.add (setter);
+
+    } else {
+
+      m_property_table [n->second].first.add (setter);
+
+    }
+  }
+
+  /**
+   *  @brief Adds a getter with the given name
+   */
+  void add_getter (const std::string &name, const gsi::MethodBase *getter)
+  {
+    bool st = getter->is_static ();
+
+    std::map<std::pair<bool, std::string>, size_t>::iterator n = m_property_name_map.find (std::make_pair (st, name));
+    if (n == m_property_name_map.end ()) {
+
+      m_property_name_map.insert (std::make_pair (std::make_pair(st, name), m_property_table.size ()));
+      m_property_table.push_back (std::make_pair (MethodTableEntry (name, st, false), MethodTableEntry (name, st, false)));
+      m_property_table.back ().second.add (getter);
+
+    } else {
+
+      m_property_table [n->second].second.add (getter);
+
+    }
+  }
+
+  /**
+   *  @brief Returns true if the method is enabled
+   */
+  bool is_enabled (size_t mid) const
+  {
+    return m_table [mid - m_method_offset].is_enabled ();
+  }
+
+  /**
+   *  @brief Enables or disables a method
+   */
+  void set_enabled (size_t mid, bool en)
+  {
+    m_table [mid - m_method_offset].set_enabled (en);
+  }
+
+  /**
+   *  @brief Returns true if the method with the given ID is static
+   */
+  bool is_static (size_t mid) const
+  {
+    return m_table [mid - m_method_offset].is_static ();
+  }
+
+  /**
+   *  @brief Returns true if the method with the given ID is protected
+   */
+  bool is_protected (size_t mid) const
+  {
+    return m_table [mid - m_method_offset].is_protected ();
+  }
+
+  /**
+   *  @brief Renames a method
+   */
+  void rename (size_t mid, const std::string &new_name)
+  {
+    std::string old_name = name (mid);
+    bool st = is_static (mid);
+
+    m_table [mid - m_method_offset].set_name (new_name);
+
+    auto nm = m_name_map.find (std::make_pair (st, old_name));
+    if (nm != m_name_map.end ()) {
+      m_name_map.erase (nm);
+      m_name_map.insert (std::make_pair (std::make_pair (st, new_name), mid));
+    }
+  }
+
+  /**
+   *  @brief Returns the name of the method with the given ID
+   */
+  const std::string &name (size_t mid) const
+  {
+    return m_table [mid - m_method_offset].name ();
+  }
+
+  /**
+   *  @brief Returns the name of the property with the given ID
+   */
+  const std::string &property_name (size_t mid) const
+  {
+    return m_property_table [mid - m_property_offset].first.name ();
+  }
+
+  /**
+   *  @brief Begins iteration of the overload variants for setter of property ID mid
+   */
+  MethodTableEntry::method_iterator begin_setters (size_t mid) const
+  {
+    return m_property_table[mid - m_property_offset].first.begin ();
+  }
+
+  /**
+   *  @brief Ends iteration of the overload variants for setter of property ID mid
+   */
+  MethodTableEntry::method_iterator end_setters (size_t mid) const
+  {
+    return m_property_table[mid - m_property_offset].first.end ();
+  }
+
+  /**
+   *  @brief Begins iteration of the overload variants for getter of property ID mid
+   */
+  MethodTableEntry::method_iterator begin_getters (size_t mid) const
+  {
+    return m_property_table[mid - m_property_offset].second.begin ();
+  }
+
+  /**
+   *  @brief Ends iteration of the overload variants for getter of property ID mid
+   */
+  MethodTableEntry::method_iterator end_getters (size_t mid) const
+  {
+    return m_property_table[mid - m_property_offset].second.end ();
+  }
+
+  /**
+   *  @brief Begins iteration of the overload variants for method ID mid
+   */
+  MethodTableEntry::method_iterator begin (size_t mid) const
+  {
+    return m_table[mid - m_method_offset].begin ();
+  }
+
+  /**
+   *  @brief Ends iteration of the overload variants for method ID mid
+   */
+  MethodTableEntry::method_iterator end (size_t mid) const
+  {
+    return m_table[mid - m_method_offset].end ();
+  }
+
+  /**
+   *  @brief Finishes construction of the table
+   *  This method must be called after the add_method calls have been used
+   *  to fill the table. It will remove duplicate entries and clean up memory.
+   */
+  void finish ()
+  {
+    for (std::vector<MethodTableEntry>::iterator m = m_table.begin (); m != m_table.end (); ++m) {
+      m->finish ();
+    }
+    for (std::vector<std::pair<MethodTableEntry, MethodTableEntry> >::iterator m = m_property_table.begin (); m != m_property_table.end (); ++m) {
+      m->first.finish ();
+      m->second.finish ();
+    }
+  }
+
+  /**
+   *  @brief Obtain a method table for a given class
+   */
+  static MethodTable *method_table_by_class (const gsi::ClassBase *cls_decl);
+
+private:
+  size_t m_method_offset;
+  size_t m_property_offset;
+  const gsi::ClassBase *mp_cls_decl;
+  std::map<std::pair<bool, std::string>, size_t> m_name_map;
+  std::map<std::pair<bool, std::string>, size_t> m_property_name_map;
+  std::vector<MethodTableEntry> m_table;
+  std::vector<std::pair<MethodTableEntry, MethodTableEntry> > m_property_table;
+  PythonModule *mp_module;
+
+  void add_method_basic (const std::string &name, const gsi::MethodBase *mb, bool enabled = true)
+  {
+    bool st = mb->is_static ();
+
+    std::map<std::pair<bool, std::string>, size_t>::iterator n = m_name_map.find (std::make_pair (st, name));
+    if (n == m_name_map.end ()) {
+
+      m_name_map.insert (std::make_pair (std::make_pair (st, name), m_table.size ()));
+      m_table.push_back (MethodTableEntry (name, st, mb->is_protected ()));
+      if (! enabled) {
+        m_table.back ().set_enabled (false);
+      }
+      m_table.back ().add (mb);
+
+    } else {
+
+      if (m_table [n->second].is_protected () != mb->is_protected ()) {
+        tl::warn << "Class " << mp_cls_decl->name () << ": method '" << name << " is both a protected and non-protected";
+      }
+
+      m_table [n->second].add (mb);
+      if (! enabled) {
+        m_table [n->second].set_enabled (false);
+      }
+
+    }
+  }
+};
+
+struct PythonClassClientData
+  : public gsi::PerClassClientSpecificData
+{
+  PythonClassClientData (const gsi::ClassBase *_cls, PyTypeObject *_py_type, PyTypeObject *_py_type_static, PythonModule *module)
+    : py_type_object (_py_type), py_type_object_static (_py_type_static), method_table (_cls, module)
+  {
+    //  .. nothing yet ..
+  }
+
+  PyTypeObject *py_type_object;
+  PyTypeObject *py_type_object_static;
+  MethodTable method_table;
+
+  static PyTypeObject *py_type (const gsi::ClassBase &cls_decl, bool as_static)
+  {
+    PythonClassClientData *cd = dynamic_cast<PythonClassClientData *>(cls_decl.data (gsi::ClientIndex::Python));
+    return cd ? (as_static ? cd->py_type_object_static : cd->py_type_object) : 0;
+  }
+
+  static void initialize (const gsi::ClassBase &cls_decl, PyTypeObject *py_type, bool as_static, PythonModule *module)
+  {
+    PythonClassClientData *cd = dynamic_cast<PythonClassClientData *>(cls_decl.data (gsi::ClientIndex::Python));
+    if (cd) {
+      if (as_static) {
+        cd->py_type_object_static = py_type;
+      } else {
+        cd->py_type_object = py_type;
+      }
+    } else {
+      cls_decl.set_data (gsi::ClientIndex::Python, new PythonClassClientData (&cls_decl, as_static ? NULL : py_type, as_static ? py_type : NULL, module));
+    }
+  }
+};
+
+/**
+ *  @brief Obtains a method table for a given class
+ */
+MethodTable *MethodTable::method_table_by_class (const gsi::ClassBase *cls_decl)
+{
+  PythonClassClientData *cd = dynamic_cast<PythonClassClientData *>(cls_decl->data (gsi::ClientIndex::Python));
+  return cd ? &cd->method_table : 0;
 }
 
 // --------------------------------------------------------------------------
@@ -2489,7 +2646,7 @@ public:
       type->tp_getattro = PyObject_GenericGetAttr;
     }
 
-    PythonClassClientData::initialize (*cls, type, as_static);
+    PythonClassClientData::initialize (*cls, type, as_static, mp_module);
 
     mp_module->register_class (cls);
 
@@ -2614,324 +2771,226 @@ public:
     //  collect the names which have been disambiguated static/non-static wise
     std::vector<std::string> disambiguated_names;
 
-    //  check, whether there is an "inspect" method
-    bool has_inspect = false;
-    for (size_t mid = mt->bottom_mid (); mid < mt->top_mid () && ! has_inspect; ++mid) {
-      has_inspect = (mt->name (mid) == "inspect");
-    }
-
     //  produce the methods now
     for (size_t mid = mt->bottom_mid (); mid < mt->top_mid (); ++mid) {
 
+      if (! mt->is_enabled (mid)) {
+        continue;
+      }
+
       std::string name = mt->name (mid);
+      std::string raw_name = name;
 
-      //  extract a suitable Python name
-      name = extract_python_name (name);
+      //  does this method hide a property? -> append "_" in that case
+      std::pair<bool, size_t> t = mt->find_property (mt->is_static (mid), name);
+      if (t.first) {
+        name += "_";
+      }
 
-      //  cannot extract a Python name
-      if (name.empty ()) {
+      //  needs static/non-static disambiguation?
+      t = mt->find_method (! mt->is_static (mid), name);
+      if (t.first) {
+
+        disambiguated_names.push_back (name);
+        if (mt->is_static (mid)) {
+          name = "_class_" + name;
+        } else {
+          name = "_inst_" + name;
+        }
+
+        mp_module->add_python_doc (*cls, mt, int (mid), tl::sprintf (tl::to_string (tr ("This attribute is available as '%s' in Python")), name));
+
+      } else if (is_reserved_word (name)) {
 
         //  drop non-standard names
         if (tl::verbosity () >= 20) {
-          tl::warn << tl::to_string (tr ("Class ")) << cls->name () << ": " << tl::to_string (tr ("no Python mapping for method ")) << mt->name (mid);
+          tl::warn << tl::to_string (tr ("Class ")) << cls->name () << ": " << tl::to_string (tr ("no Python mapping for method (reserved word) ")) << name;
         }
 
-        mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method is not available for Python")));
+        name += "_";
 
-      } else {
+        mt->rename (mid, name);
+        mp_module->add_python_doc (*cls, mt, int (mid), tl::sprintf (tl::to_string (tr ("This attribute is available as '%s' in Python")), name));
 
-        std::string raw_name = name;
+      }
 
-        //  does this method hide a property? -> append "_" in that case
-        std::pair<bool, size_t> t = mt->find_property (mt->is_static (mid), name);
-        if (t.first) {
-          name += "_";
+      //  create documentation
+      std::string doc;
+      for (MethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
+        if (! doc.empty ()) {
+          doc = "\n\n";
         }
+        doc += (*m)->doc ();
+      }
 
-        //  needs static/non-static disambiguation?
-        t = mt->find_method (! mt->is_static (mid), name);
-        if (t.first) {
+      const gsi::MethodBase *m_first = *mt->begin (mid);
 
-          disambiguated_names.push_back (name);
-          if (mt->is_static (mid)) {
-            name = "_class_" + name;
-          } else {
-            name = "_inst_" + name;
-          }
+      tl_assert (mid < sizeof (method_adaptors) / sizeof (method_adaptors[0]));
+      if (! mt->is_static (mid)) {  //  Bound methods
 
-        } else if (is_reserved_word (name)) {
-
-          //  drop non-standard names
-          if (tl::verbosity () >= 20) {
-            tl::warn << tl::to_string (tr ("Class ")) << cls->name () << ": " << tl::to_string (tr ("no Python mapping for method (reserved word) ")) << name;
-          }
-
-          name += "_";
-
-        }
-
-        if (name != raw_name) {
-          mp_module->add_python_doc (*cls, mt, int (mid), tl::sprintf (tl::to_string (tr ("This attribute is available as '%s' in Python")), name));
-        }
-
-        //  create documentation
-        std::string doc;
-        for (MethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
-          if (! doc.empty ()) {
-            doc = "\n\n";
-          }
-          doc += (*m)->doc ();
-        }
-
-        const gsi::MethodBase *m_first = *mt->begin (mid);
-
-        tl_assert (mid < sizeof (method_adaptors) / sizeof (method_adaptors[0]));
-        if (! mt->is_static (mid)) {  //  Bound methods
-
-          if (! as_static) {
-
-            std::vector<std::string> alt_names;
-
-            if (name == "to_s" && m_first->compatible_with_num_args (0)) {
-
-              //  The str method is also routed via the tp_str implementation
-              alt_names.push_back ("__str__");
-#if GSI_ALIAS_INSPECT
-              bool alias_inspect = ! has_inspect;
-#else
-              bool alias_inspect = false;
-#endif
-              if (alias_inspect) {
-                mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method is also available as 'str(object)' and 'repr(object)'")));
-                alt_names.push_back ("__repr__");
-              } else {
-                mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method is also available as 'str(object)'")));
-              }
-
-            } else if (name == "hash" && m_first->compatible_with_num_args (0)) {
-
-              //  The hash method is also routed via the tp_hash implementation
-              alt_names.push_back ("__hash__");
-              mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method is also available as 'hash(object)'")));
-
-            } else if (name == "inspect" && m_first->compatible_with_num_args (0)) {
-
-              //  The str method is also routed via the tp_str implementation
-              mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method is also available as 'repr(object)'")));
-              alt_names.push_back ("__repr__");
-
-            } else if (name == "size" && m_first->compatible_with_num_args (0)) {
-
-              //  The size method is also routed via the sequence methods protocol if there
-              //  is a [] function
-              mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method is also available as 'len(object)'")));
-              alt_names.push_back ("__len__");
-
-            } else if (name == "each" && m_first->compatible_with_num_args (0) && m_first->ret_type ().is_iter ()) {
-
-              //  each makes the object iterable
-              mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method enables iteration of the object")));
-              alt_names.push_back ("__iter__");
-
-            } else if (name == "__mul__") {
-
-              //  Adding right multiplication
-              //  Rationale: if pyaObj * x works, so should x * pyaObj
-              //  But this should only apply if the multiplication is commutative
-              //  There are a few exceptions like Trans * Trans, so we support this case only if 
-              //  the second argument is double (scaling).
-              gsi::ArgType double_argtype;
-              double_argtype.template init<double> ();
-              if (m_first->arg (0) == double_argtype) {
-                add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method is also available as '__rmul__'")));
-                alt_names.push_back ("__rmul__");
-              }
-
-            } else if (name == "dup" && m_first->compatible_with_num_args (0) ) {
-
-              //  If the object supports the dup method, then it is a good
-              //  idea to define the __copy__ method.
-              add_python_doc (**c, mt, int (mid), tl::to_string (tr ("This method also implements '__copy__'")));
-              alt_names.push_back ("__copy__");
-
-            }
-
-            for (std::vector <std::string>::const_iterator an = alt_names.begin (); an != alt_names.end (); ++an) {
-
-              //  needs registration under an alternative name to enable special protocols
-
-              PyMethodDef *method = mp_module->make_method_def ();
-              method->ml_name = mp_module->make_string (*an);
-              method->ml_meth = (PyCFunction) method_adaptors[mid];
-              method->ml_doc = mp_module->make_string (doc);
-              method->ml_flags = METH_VARARGS;
-
-              PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
-              set_type_attr (type, *an, attr);
-
-            }
-
-            PyMethodDef *method = mp_module->make_method_def ();
-            method->ml_name = mp_module->make_string (name);
-            method->ml_meth = (PyCFunction) method_adaptors[mid];
-            method->ml_doc = mp_module->make_string (doc);
-            method->ml_flags = METH_VARARGS;
-
-            PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
-            set_type_attr (type, name, attr);
-
-          }
-
-        } else if (isupper (name [0]) || m_first->is_const ()) {
-
-          if ((mt->end (mid) - mt->begin (mid)) == 1 && m_first->begin_arguments () == m_first->end_arguments ()) {
-
-            //  static methods without arguments which start with a capital letter are treated as constants
-            PYAStaticAttributeDescriptorObject *desc = PYAStaticAttributeDescriptorObject::create (mp_module->make_string (name));
-            desc->type = type;
-            desc->getter = method_adaptors[mid];
-
-            PythonRef attr (desc);
-            set_type_attr (type, name, attr);
-
-          } else if (tl::verbosity () >= 20) {
-            tl::warn << "Upper case method name encountered which cannot be used as a Python constant (more than one overload or at least one argument): " << cls->name () << "." << name;
-            mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This attribute is not available for Python")));
-          }
-
-        } else if (! as_static) {  //  Class methods
-
-          if (m_first->ret_type ().type () == gsi::T_object && m_first->ret_type ().pass_obj () && name == "new") {
-
-            //  The constructor is also routed via the pya_object_init implementation
-            mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method is the default initializer of the object")));
-
-            PyMethodDef *method = mp_module->make_method_def ();
-            method->ml_name = "__init__";
-            method->ml_meth = (PyCFunction) method_init_adaptors[mid];
-            method->ml_doc = mp_module->make_string (doc);
-            method->ml_flags = METH_VARARGS;
-
-            PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
-            set_type_attr (type, method->ml_name, attr);
-
-          }
+        if (! as_static) {
 
           PyMethodDef *method = mp_module->make_method_def ();
           method->ml_name = mp_module->make_string (name);
           method->ml_meth = (PyCFunction) method_adaptors[mid];
           method->ml_doc = mp_module->make_string (doc);
-          method->ml_flags = METH_VARARGS | METH_CLASS;
+          method->ml_flags = METH_VARARGS;
 
-          PythonRef attr = PythonRef (PyDescr_NewClassMethod (type, method));
+          PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
           set_type_attr (type, name, attr);
 
         }
 
+      } else if (isupper (name [0]) || m_first->is_const ()) {
+
+        if ((mt->end (mid) - mt->begin (mid)) == 1 && m_first->begin_arguments () == m_first->end_arguments ()) {
+
+          //  static methods without arguments which start with a capital letter are treated as constants
+          PYAStaticAttributeDescriptorObject *desc = PYAStaticAttributeDescriptorObject::create (mp_module->make_string (name));
+          desc->type = type;
+          desc->getter = method_adaptors[mid];
+
+          PythonRef attr (desc);
+          set_type_attr (type, name, attr);
+
+        } else if (tl::verbosity () >= 20) {
+          tl::warn << "Upper case method name encountered which cannot be used as a Python constant (more than one overload or at least one argument): " << cls->name () << "." << name;
+          mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This attribute is not available for Python")));
+        }
+
+      } else if (! as_static) {  //  Class methods
+
+        if (m_first->ret_type ().type () == gsi::T_object && m_first->ret_type ().pass_obj () && name == "new") {
+
+          //  The constructor is also routed via the pya_object_init implementation
+          mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method is the default initializer of the object")));
+
+          PyMethodDef *method = mp_module->make_method_def ();
+          method->ml_name = "__init__";
+          method->ml_meth = (PyCFunction) method_init_adaptors[mid];
+          method->ml_doc = mp_module->make_string (doc);
+          method->ml_flags = METH_VARARGS;
+
+          PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
+          set_type_attr (type, method->ml_name, attr);
+
+        }
+
+        PyMethodDef *method = mp_module->make_method_def ();
+        method->ml_name = mp_module->make_string (name);
+        method->ml_meth = (PyCFunction) method_adaptors[mid];
+        method->ml_doc = mp_module->make_string (doc);
+        method->ml_flags = METH_VARARGS | METH_CLASS;
+
+        PythonRef attr = PythonRef (PyDescr_NewClassMethod (type, method));
+        set_type_attr (type, name, attr);
+
       }
 
-      if (! as_static) {
+    }
 
-        //  Complete the comparison operators if necessary.
-        //  Unlike Ruby, Python does not automatically implement != from == for example.
-        //  We assume that "==" and "<" are the minimum requirements for full comparison
-        //  and "==" is the minimum requirement for equality. Hence:
-        //    * If "==" is given, but no "!=", synthesize
-        //        "a != b" by "!a == b"
-        //    * If "==" and "<" are given, synthesize if required
-        //        "a <= b" by "a < b || a == b"
-        //        "a > b" by "!(a < b || a == b)"  (could be b < a, but this avoids having to switch arguments)
-        //        "a >= b" by "!a < b"
+    if (! as_static) {
 
-        bool has_eq = mt->find_method (false, "==").first;
-        bool has_ne = mt->find_method (false, "!=").first;
-        bool has_lt = mt->find_method (false, "<").first;
-        bool has_le = mt->find_method (false, "<=").first;
-        bool has_gt = mt->find_method (false, ">").first;
-        bool has_ge = mt->find_method (false, ">=").first;
-        bool has_cmp = mt->find_method (false, "<=>").first;
+      //  Complete the comparison operators if necessary.
+      //  Unlike Ruby, Python does not automatically implement != from == for example.
+      //  We assume that "==" and "<" are the minimum requirements for full comparison
+      //  and "==" is the minimum requirement for equality. Hence:
+      //    * If "==" is given, but no "!=", synthesize
+      //        "a != b" by "!a == b"
+      //    * If "==" and "<" are given, synthesize if required
+      //        "a <= b" by "a < b || a == b"
+      //        "a > b" by "!(a < b || a == b)"  (could be b < a, but this avoids having to switch arguments)
+      //        "a >= b" by "!a < b"
 
-        if (! has_cmp && has_eq) {
+      bool has_eq = mt->find_method (false, "==").first;
+      bool has_ne = mt->find_method (false, "!=").first;
+      bool has_lt = mt->find_method (false, "<").first;
+      bool has_le = mt->find_method (false, "<=").first;
+      bool has_gt = mt->find_method (false, ">").first;
+      bool has_ge = mt->find_method (false, ">=").first;
+      bool has_cmp = mt->find_method (false, "<=>").first;
 
-          if (! has_ne) {
+      if (! has_cmp && has_eq) {
 
-            //  Add a definition for "__ne__"
-            PyMethodDef *method = mp_module->make_method_def ();
-            method->ml_name = "__ne__";
-            method->ml_meth = &object_default_ne_impl;
-            method->ml_flags = METH_VARARGS;
+        if (! has_ne) {
 
-            PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
-            set_type_attr (type, method->ml_name, attr);
+          //  Add a definition for "__ne__"
+          PyMethodDef *method = mp_module->make_method_def ();
+          method->ml_name = "__ne__";
+          method->ml_meth = &object_default_ne_impl;
+          method->ml_flags = METH_VARARGS;
 
-          }
+          PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
+          set_type_attr (type, method->ml_name, attr);
 
-          if (has_lt && ! has_le) {
+        }
 
-            //  Add a definition for "__le__"
-            PyMethodDef *method = mp_module->make_method_def ();
-            method->ml_name = "__le__";
-            method->ml_meth = &object_default_le_impl;
-            method->ml_flags = METH_VARARGS;
+        if (has_lt && ! has_le) {
 
-            PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
-            set_type_attr (type, method->ml_name, attr);
+          //  Add a definition for "__le__"
+          PyMethodDef *method = mp_module->make_method_def ();
+          method->ml_name = "__le__";
+          method->ml_meth = &object_default_le_impl;
+          method->ml_flags = METH_VARARGS;
 
-          }
+          PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
+          set_type_attr (type, method->ml_name, attr);
 
-          if (has_lt && ! has_gt) {
+        }
 
-            //  Add a definition for "__gt__"
-            PyMethodDef *method = mp_module->make_method_def ();
-            method->ml_name = "__gt__";
-            method->ml_meth = &object_default_gt_impl;
-            method->ml_flags = METH_VARARGS;
+        if (has_lt && ! has_gt) {
 
-            PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
-            set_type_attr (type, method->ml_name, attr);
+          //  Add a definition for "__gt__"
+          PyMethodDef *method = mp_module->make_method_def ();
+          method->ml_name = "__gt__";
+          method->ml_meth = &object_default_gt_impl;
+          method->ml_flags = METH_VARARGS;
 
-          }
+          PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
+          set_type_attr (type, method->ml_name, attr);
 
-          if (has_lt && ! has_ge) {
+        }
 
-            //  Add a definition for "__ge__"
-            PyMethodDef *method = mp_module->make_method_def ();
-            method->ml_name = "__ge__";
-            method->ml_meth = &object_default_ge_impl;
-            method->ml_flags = METH_VARARGS;
+        if (has_lt && ! has_ge) {
 
-            PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
-            set_type_attr (type, method->ml_name, attr);
+          //  Add a definition for "__ge__"
+          PyMethodDef *method = mp_module->make_method_def ();
+          method->ml_name = "__ge__";
+          method->ml_meth = &object_default_ge_impl;
+          method->ml_flags = METH_VARARGS;
 
-          }
+          PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
+          set_type_attr (type, method->ml_name, attr);
 
         }
 
       }
 
-      //  install the static/non-static dispatcher descriptor
+    }
 
-      for (std::vector<std::string>::const_iterator a = disambiguated_names.begin (); a != disambiguated_names.end (); ++a) {
+    //  install the static/non-static dispatcher descriptor
 
-        PyObject *attr_inst = PyObject_GetAttrString ((PyObject *) type, ("_inst_" + *a).c_str ());
-        PyObject *attr_class = PyObject_GetAttrString ((PyObject *) type, ("_class_" + *a).c_str ());
-        if (attr_inst == NULL || attr_class == NULL) {
+    for (std::vector<std::string>::const_iterator a = disambiguated_names.begin (); a != disambiguated_names.end (); ++a) {
 
-          //  some error -> don't install the disambiguator
-          Py_XDECREF (attr_inst);
-          Py_XDECREF (attr_class);
-          PyErr_Clear ();
+      PyObject *attr_inst = PyObject_GetAttrString ((PyObject *) type, ("_inst_" + *a).c_str ());
+      PyObject *attr_class = PyObject_GetAttrString ((PyObject *) type, ("_class_" + *a).c_str ());
+      if (attr_inst == NULL || attr_class == NULL) {
 
-          tl::warn << "Unable to install a static/non-static disambiguator for " << *a << " in class " << (*c)->name ();
+        //  some error -> don't install the disambiguator
+        Py_XDECREF (attr_inst);
+        Py_XDECREF (attr_class);
+        PyErr_Clear ();
 
-        } else {
-
-          PyObject *desc = PYAAmbiguousMethodDispatcher::create (attr_inst, attr_class);
-          PythonRef name (c2python (*a));
-          //  Note: we use GenericSetAttr since that one allows us setting attributes on built-in types
-          PyObject_GenericSetAttr ((PyObject *) type, name.get (), desc);
-
+        if (tl::verbosity () >= 20) {
+          tl::warn << "Unable to install a static/non-static disambiguator for " << *a << " in class " << cls->name ();
         }
+
+      } else {
+
+        PyObject *desc = PYAAmbiguousMethodDispatcher::create (attr_inst, attr_class);
+        PythonRef name (c2python (*a));
+        //  Note: we use GenericSetAttr since that one allows us setting attributes on built-in types
+        PyObject_GenericSetAttr ((PyObject *) type, name.get (), desc);
 
       }
 

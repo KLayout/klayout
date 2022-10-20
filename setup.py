@@ -932,5 +932,5 @@ if __name__ == "__main__":
         include_package_data=True,
         ext_modules=[_tl, _gsi, _pya, _rba, _db, _lib, _rdb, _lym, _laybasic, _layview, _ant, _edt, _img] 
             + db_plugins 
-            + [tl, db, lib, rdb, lay])
+            + [tl, db, lib, rdb, lay]
     )

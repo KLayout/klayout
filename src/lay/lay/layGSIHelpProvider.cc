@@ -149,6 +149,8 @@ full_name (const gsi::MethodBase::MethodSynonym &syn)
     return syn.name + "?";
   } else if (syn.is_setter) {
     return syn.name + "=";
+  } else if (syn.name == "*!") {
+    return "*";
   } else {
     return syn.name;
   }

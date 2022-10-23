@@ -541,7 +541,11 @@ public:
 
           PyMethodDef *method = mp_module->make_method_def ();
           method->ml_name = mp_module->make_string (name);
-          method->ml_meth = (PyCFunction) get_method_adaptor (mid);
+          if (mt->is_init (mid)) {
+            method->ml_meth = (PyCFunction) get_method_init_adaptor (mid);
+          } else {
+            method->ml_meth = (PyCFunction) get_method_adaptor (mid);
+          }
           method->ml_doc = mp_module->make_string (doc);
           method->ml_flags = METH_VARARGS;
 
@@ -568,22 +572,6 @@ public:
         }
 
       } else if (! as_static) {  //  Class methods
-
-        if (m_first->ret_type ().type () == gsi::T_object && m_first->ret_type ().pass_obj () && name == "new") {
-
-          //  The constructor is also routed via the pya_object_init implementation
-          mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This method is the default initializer of the object")));
-
-          PyMethodDef *method = mp_module->make_method_def ();
-          method->ml_name = "__init__";
-          method->ml_meth = (PyCFunction) get_method_init_adaptor (mid);
-          method->ml_doc = mp_module->make_string (doc);
-          method->ml_flags = METH_VARARGS;
-
-          PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
-          set_type_attr (type, method->ml_name, attr);
-
-        }
 
         PyMethodDef *method = mp_module->make_method_def ();
         method->ml_name = mp_module->make_string (name);

@@ -35,7 +35,7 @@ namespace pya
 //  MethodTableEntry implementation
 
 MethodTableEntry::MethodTableEntry (const std::string &name, bool st, bool prot)
-  : m_name (name), m_is_static (st), m_is_protected (prot), m_is_enabled (true)
+  : m_name (name), m_is_static (st), m_is_protected (prot), m_is_enabled (true), m_is_init (false)
 { }
 
 const std::string &
@@ -60,6 +60,18 @@ bool
 MethodTableEntry::is_enabled () const
 {
   return m_is_enabled;
+}
+
+void
+MethodTableEntry::set_init (bool f)
+{
+  m_is_init = f;
+}
+
+bool
+MethodTableEntry::is_init () const
+{
+  return m_is_init;
 }
 
 bool
@@ -139,16 +151,28 @@ MethodTable::MethodTable (const gsi::ClassBase *cls_decl, PythonModule *module)
 
   //  then add normal methods - on name clash with properties make them a getter
   for (gsi::ClassBase::method_iterator m = cls_decl->begin_methods (); m != cls_decl->end_methods (); ++m) {
+
     if (! (*m)->is_callback () && ! (*m)->is_signal ()) {
+
+      bool st = (*m)->is_static ();
+
       for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
         if (! syn->is_getter && ! syn->is_setter) {
-          if ((*m)->end_arguments () - (*m)->begin_arguments () == 0 && find_property ((*m)->is_static (), syn->name).first) {
+          if ((*m)->end_arguments () - (*m)->begin_arguments () == 0 && is_property_setter (st, syn->name) && ! is_property_getter (st, syn->name)) {
             add_getter (syn->name, *m);
           } else {
+            if (syn->is_predicate && std::string (syn->name, 0, 3) == "is_") {
+              std::string n = std::string (syn->name, 3, std::string::npos);
+              if (is_property_setter (st, n) && ! is_property_getter (st, n)) {
+                //  synthesize a getter from is_...? predicates (e.g. is_empty? -> empty getter)
+                add_getter (n, *m);
+              }
+            }
             add_method (syn->name, *m);
           }
         }
       }
+
     }
   }
 }
@@ -197,6 +221,26 @@ MethodTable::find_property (bool st, const std::string &name) const
   } else {
     return std::make_pair (false, 0);
   }
+}
+
+bool
+MethodTable::is_property_setter (bool st, const std::string &name)
+{
+  std::pair<bool, size_t> p = find_property (st, name);
+  if (! p.first) {
+    return false;
+  }
+  return (begin_setters (p.second) != end_setters (p.second));
+}
+
+bool
+MethodTable::is_property_getter (bool st, const std::string &name)
+{
+  std::pair<bool, size_t> p = find_property (st, name);
+  if (! p.first) {
+    return false;
+  }
+  return (begin_getters (p.second) != end_getters (p.second));
 }
 
 /**
@@ -324,7 +368,14 @@ static std::string extract_python_name (const std::string &name)
 void
 MethodTable::add_method (const std::string &name, const gsi::MethodBase *mb)
 {
-  if (name == "to_s" && mb->compatible_with_num_args (0)) {
+  if (name == "new" && mb->ret_type ().type () == gsi::T_object && mb->ret_type ().pass_obj ()) {
+
+    add_method_basic (name, mb);
+
+    add_method_basic ("__init__", mb, true /*enabled*/, true /*constructor*/);
+    mp_module->add_python_doc (mb, tl::to_string (tr ("This method is the default initializer of the object")));
+
+  } else if (name == "to_s" && mb->compatible_with_num_args (0)) {
 
     add_method_basic (name, mb);
 
@@ -474,6 +525,18 @@ MethodTable::set_enabled (size_t mid, bool en)
 }
 
 bool
+MethodTable::is_init(size_t mid) const
+{
+  return m_table [mid - m_method_offset].is_init ();
+}
+
+void
+MethodTable::set_init (size_t mid, bool f)
+{
+  m_table [mid - m_method_offset].set_init (f);
+}
+
+bool
 MethodTable::is_static (size_t mid) const
 {
   return m_table [mid - m_method_offset].is_static ();
@@ -561,9 +624,9 @@ MethodTable::finish ()
 }
 
 void
-MethodTable::add_method_basic (const std::string &name, const gsi::MethodBase *mb, bool enabled)
+MethodTable::add_method_basic (const std::string &name, const gsi::MethodBase *mb, bool enabled, bool init)
 {
-  bool st = mb->is_static ();
+  bool st = mb->is_static () && ! init;
 
   std::map<std::pair<bool, std::string>, size_t>::iterator n = m_name_map.find (std::make_pair (st, name));
   if (n == m_name_map.end ()) {
@@ -572,6 +635,9 @@ MethodTable::add_method_basic (const std::string &name, const gsi::MethodBase *m
     m_table.push_back (MethodTableEntry (name, st, mb->is_protected ()));
     if (! enabled) {
       m_table.back ().set_enabled (false);
+    }
+    if (init) {
+      m_table.back ().set_init (true);
     }
     m_table.back ().add (mb);
 
@@ -584,6 +650,9 @@ MethodTable::add_method_basic (const std::string &name, const gsi::MethodBase *m
     m_table [n->second].add (mb);
     if (! enabled) {
       m_table [n->second].set_enabled (false);
+    }
+    if (init) {
+      tl_assert (m_table [n->second].is_init ());
     }
 
   }
@@ -626,168 +695,6 @@ PythonClassClientData::initialize (const gsi::ClassBase &cls_decl, PyTypeObject 
     cls_decl.set_data (gsi::ClientIndex::Python, new PythonClassClientData (&cls_decl, as_static ? NULL : py_type, as_static ? py_type : NULL, module));
   }
 }
-
-// --------------------------------------------------------------------------
-//  The PythonModule implementation
-
-std::map<const gsi::MethodBase *, std::string> PythonModule::m_python_doc;
-std::vector<const gsi::ClassBase *> PythonModule::m_classes;
-
-const std::string pymod_name ("klayout");
-
-PythonModule::PythonModule ()
-  : mp_mod_def (0)
-{
-  //  .. nothing yet ..
-}
-
-PythonModule::~PythonModule ()
-{
-  PYAObjectBase::clear_callbacks_cache ();
-
-  //  the Python objects were probably deleted by Python itself as it exited -
-  //  don't try to delete them again.
-  mp_module.release ();
-
-  while (!m_methods_heap.empty ()) {
-    delete m_methods_heap.back ();
-    m_methods_heap.pop_back ();
-  }
-
-  while (!m_getseters_heap.empty ()) {
-    delete m_getseters_heap.back ();
-    m_getseters_heap.pop_back ();
-  }
-
-  if (mp_mod_def) {
-    delete[] mp_mod_def;
-    mp_mod_def = 0;
-  }
-}
-
-PyObject *
-PythonModule::module ()
-{
-  return mp_module.get ();
-}
-
-PyObject *
-PythonModule::take_module ()
-{
-  return mp_module.release ();
-}
-
-void
-PythonModule::init (const char *mod_name, const char *description)
-{
-  //  create a (standalone) Python interpreter if we don't have one yet
-  //  NOTE: Python itself will take care to remove this instance in this case.
-  if (! pya::PythonInterpreter::instance ()) {
-    new pya::PythonInterpreter (false);
-  }
-
-  //  do some checks before we create the module
-  tl_assert (mod_name != 0);
-  tl_assert (mp_module.get () == 0);
-
-  m_mod_name = pymod_name + "." + mod_name;
-  m_mod_description = description;
-
-  PyObject *module = 0;
-
-#if PY_MAJOR_VERSION < 3
-
-  static PyMethodDef module_methods[] = {
-    {NULL}  // Sentinel
-  };
-
-  module = Py_InitModule3 (m_mod_name.c_str (), module_methods, m_mod_description.c_str ());
-
-#else
-
-  struct PyModuleDef mod_def = {
-     PyModuleDef_HEAD_INIT,
-     m_mod_name.c_str (),
-     NULL,     // module documentation
-     -1,       // size of per-interpreter state of the module,
-               // if the module keeps state in global variables.
-     NULL
-  };
-
-  tl_assert (! mp_mod_def);
-
-  //  prepare a persistent structure with the module definition
-  //  and pass this one to PyModule_Create
-  mp_mod_def = new char[sizeof (PyModuleDef)];
-  memcpy ((void *) mp_mod_def, (const void *) &mod_def, sizeof (PyModuleDef));
-
-  module = PyModule_Create ((PyModuleDef *) mp_mod_def);
-
-#endif
-
-  mp_module = PythonRef (module);
-}
-
-void
-PythonModule::init (const char *mod_name, PyObject *module)
-{
-  //  do some checks before we create the module
-  tl_assert (mp_module.get () == 0);
-
-  m_mod_name = mod_name;
-  mp_module = PythonRef (module);
-}
-
-PyMethodDef *
-PythonModule::make_method_def ()
-{
-  static PyMethodDef md = { };
-  m_methods_heap.push_back (new PyMethodDef (md));
-  return m_methods_heap.back ();
-}
-
-PyGetSetDef *
-PythonModule::make_getset_def ()
-{
-  static PyGetSetDef gsd = { };
-  m_getseters_heap.push_back (new PyGetSetDef (gsd));
-  return m_getseters_heap.back ();
-}
-
-char *
-PythonModule::make_string (const std::string &s)
-{
-  m_string_heap.push_back (s);
-  return const_cast<char *> (m_string_heap.back ().c_str ());
-}
-
-void
-PythonModule::add_python_doc (const gsi::ClassBase & /*cls*/, const MethodTable *mt, int mid, const std::string &doc)
-{
-  for (MethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
-    std::string &doc_string = m_python_doc [*m];
-    doc_string += doc;
-    doc_string += "\n\n";
-  }
-}
-
-void
-PythonModule::add_python_doc (const gsi::MethodBase *m, const std::string &doc)
-{
-  m_python_doc [m] += doc;
-}
-
-std::string
-PythonModule::python_doc (const gsi::MethodBase *method)
-{
-  std::map<const gsi::MethodBase *, std::string>::const_iterator d = m_python_doc.find (method);
-  if (d != m_python_doc.end ()) {
-    return d->second;
-  } else {
-    return std::string ();
-  }
-}
-
 
 }
 

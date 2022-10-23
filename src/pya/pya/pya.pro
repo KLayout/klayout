@@ -11,13 +11,16 @@ SOURCES = \
   pyaConvert.cc \
   pyaHelpers.cc \
   pyaInspector.cc \
+  pyaInternal.cc \
+  pyaCallables.cc \
   pyaMarshal.cc \
   pyaObject.cc \
   pyaRefs.cc \
   pyaUtils.cc \
   pyaModule.cc \
   pyaSignalHandler.cc \
-  pyaStatusChangedListener.cc
+  pyaStatusChangedListener.cc \
+  gsiDeclPya.cc
 
 HEADERS += \
   pya.h \
@@ -25,6 +28,8 @@ HEADERS += \
   pyaConvert.h \
   pyaHelpers.h \
   pyaInspector.h \
+  pyaInternal.h \
+  pyaCallables.h \
   pyaMarshal.h \
   pyaObject.h \
   pyaRefs.h \

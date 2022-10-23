@@ -67,8 +67,10 @@ public:
   void set_enabled (bool en);
   bool is_enabled () const;
 
-  bool is_static () const;
+  void set_init(bool f);
+  bool is_init () const;
 
+  bool is_static () const;
   bool is_protected () const;
 
   void add (const gsi::MethodBase *m);
@@ -78,11 +80,17 @@ public:
   method_iterator begin () const;
   method_iterator end () const;
 
+  const std::vector<const gsi::MethodBase *> &methods () const
+  {
+    return m_methods;
+  }
+
 private:
   std::string m_name;
   bool m_is_static : 1;
   bool m_is_protected : 1;
   bool m_is_enabled : 1;
+  bool m_is_init : 1;
   std::vector<const gsi::MethodBase *> m_methods;
 };
 
@@ -162,6 +170,16 @@ public:
   void set_enabled (size_t mid, bool en);
 
   /**
+   *  @brief Returns true if the method is an initializer
+   */
+  bool is_init (size_t mid) const;
+
+  /**
+   *  @brief Sets initializer
+   */
+  void set_init (size_t mid, bool f);
+
+  /**
    *  @brief Returns true if the method with the given ID is static
    */
   bool is_static (size_t mid) const;
@@ -228,6 +246,22 @@ public:
    */
   static MethodTable *method_table_by_class (const gsi::ClassBase *cls_decl);
 
+  /**
+   *  @brief Gets the method table
+   */
+  const std::vector<MethodTableEntry> &method_table () const
+  {
+    return m_table;
+  }
+
+  /**
+   *  @brief Gets the property table
+   */
+  const std::vector<std::pair<MethodTableEntry, MethodTableEntry> > &property_table () const
+  {
+    return m_property_table;
+  }
+
 private:
   size_t m_method_offset;
   size_t m_property_offset;
@@ -238,7 +272,9 @@ private:
   std::vector<std::pair<MethodTableEntry, MethodTableEntry> > m_property_table;
   PythonModule *mp_module;
 
-  void add_method_basic (const std::string &name, const gsi::MethodBase *mb, bool enabled = true);
+  void add_method_basic (const std::string &name, const gsi::MethodBase *mb, bool enabled = true, bool init = false);
+  bool is_property_setter (bool st, const std::string &name);
+  bool is_property_getter (bool st, const std::string &name);
 };
 
 struct PythonClassClientData

@@ -24,9 +24,26 @@
 
 #include "gsiDecl.h"
 #include "pyaInternal.h"
+#include "pya.h"
 
 namespace gsi
 {
+
+static const pya::MethodTableEntry *getter (std::pair<const pya::MethodTableEntry *, const pya::MethodTableEntry *> *p)
+{
+  return p->second;
+}
+
+static const pya::MethodTableEntry *setter (std::pair<const pya::MethodTableEntry *, const pya::MethodTableEntry *> *p)
+{
+  return p->first;
+}
+
+gsi::Class<std::pair<const pya::MethodTableEntry *, const pya::MethodTableEntry *> > decl_PythonGetterSetterPair ("tl", "PythonGetterSetterPair",
+  gsi::method_ext ("getter", &getter, "@brief Gets the getter function") +
+  gsi::method_ext ("setter", &setter, "@brief Gets the setter function"),
+  "@hide"
+);
 
 gsi::Class<pya::MethodTableEntry> decl_PythonFunction ("tl", "PythonFunction",
   gsi::method ("methods", &pya::MethodTableEntry::methods, "@brief Gets the list of methods bound to this Python function") +
@@ -74,6 +91,12 @@ static
 gsi::ClassExt<gsi::ClassBase> class_base_ext (
   gsi::method_ext ("python_methods", &get_python_methods, gsi::arg ("static"), "@brief Gets the Python methods (static or non-static)") +
   gsi::method_ext ("python_properties", &get_python_properties, gsi::arg ("static"), "@brief Gets the Python properties (static or non-static) as a list of getter/setter pairs\nNote that if a getter or setter is not available the list of Python functions for this part is empty."),
+  "@hide"
+);
+
+static
+gsi::ClassExt<gsi::MethodBase> method_base_ext (
+  gsi::method_ext ("python_methods", &pya::PythonInterpreter::python_doc, "@brief Gets the Python specific documentation"),
   "@hide"
 );
 

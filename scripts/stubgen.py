@@ -310,9 +310,9 @@ def get_py_methods(
             ret_type = translate_ret_type(getter.ret_type())
             doc = getter.doc()
             properties.append(
-                MethodStub(
-                    decorator="@property",
-                    signature=f"def {name}(self) -> ClassVar[{ret_type}]",
+                PropertyStub(
+                    decorator="",
+                    signature=f"{name}: ClassVar[{ret_type}]",
                     name=name,
                     docstring=doc,
                 )

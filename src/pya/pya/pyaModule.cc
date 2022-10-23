@@ -386,23 +386,23 @@ public:
 
     //  produce the properties
 
-    if (! as_static) {
+    for (size_t mid = mt->bottom_property_mid (); mid < mt->top_property_mid (); ++mid) {
 
-      for (size_t mid = mt->bottom_property_mid (); mid < mt->top_property_mid (); ++mid) {
+      MethodTableEntry::method_iterator begin_setters = mt->begin_setters (mid);
+      MethodTableEntry::method_iterator end_setters = mt->end_setters (mid);
+      MethodTableEntry::method_iterator begin_getters = mt->begin_getters (mid);
+      MethodTableEntry::method_iterator end_getters = mt->end_getters (mid);
+      int setter_mid = begin_setters != end_setters ? int (mid) : -1;
+      int getter_mid = begin_getters != end_getters ? int (mid) : -1;
 
-        MethodTableEntry::method_iterator begin_setters = mt->begin_setters (mid);
-        MethodTableEntry::method_iterator end_setters = mt->end_setters (mid);
-        MethodTableEntry::method_iterator begin_getters = mt->begin_getters (mid);
-        MethodTableEntry::method_iterator end_getters = mt->end_getters (mid);
-        int setter_mid = begin_setters != end_setters ? int (mid) : -1;
-        int getter_mid = begin_getters != end_getters ? int (mid) : -1;
+      bool is_static = false;
+      if (begin_setters != end_setters) {
+        is_static = (*begin_setters)->is_static ();
+      } else if (begin_getters != end_getters) {
+        is_static = (*begin_getters)->is_static ();
+      }
 
-        bool is_static = false;
-        if (begin_setters != end_setters) {
-          is_static = (*begin_setters)->is_static ();
-        } else if (begin_getters != end_getters) {
-          is_static = (*begin_getters)->is_static ();
-        }
+      if (! as_static || is_static) {
 
         const std::string &name = mt->property_name (mid);
 
@@ -479,65 +479,63 @@ public:
 
     }
 
-    //  collect the names which have been disambiguated static/non-static wise
-    std::vector<std::string> disambiguated_names;
+    if (! as_static) {
 
-    //  produce the methods now
-    for (size_t mid = mt->bottom_mid (); mid < mt->top_mid (); ++mid) {
+      //  collect the names which have been disambiguated static/non-static wise
+      std::vector<std::string> disambiguated_names;
 
-      if (! mt->is_enabled (mid)) {
-        continue;
-      }
+      //  produce the methods now
+      for (size_t mid = mt->bottom_mid (); mid < mt->top_mid (); ++mid) {
 
-      std::string name = mt->name (mid);
-
-      //  does this method hide a property? -> append "_" in that case
-      std::pair<bool, size_t> t = mt->find_property (mt->is_static (mid), name);
-      if (t.first) {
-        name += "_";
-      }
-
-      //  needs static/non-static disambiguation?
-      t = mt->find_method (! mt->is_static (mid), name);
-      if (t.first) {
-
-        disambiguated_names.push_back (name);
-        if (mt->is_static (mid)) {
-          name = "_class_" + name;
-        } else {
-          name = "_inst_" + name;
+        if (! mt->is_enabled (mid)) {
+          continue;
         }
 
-        mp_module->add_python_doc (*cls, mt, int (mid), tl::sprintf (tl::to_string (tr ("This attribute is available as '%s' in Python")), name));
+        std::string name = mt->name (mid);
 
-      } else if (is_reserved_word (name)) {
-
-        //  drop non-standard names
-        if (tl::verbosity () >= 20) {
-          tl::warn << tl::to_string (tr ("Class ")) << cls->name () << ": " << tl::to_string (tr ("no Python mapping for method (reserved word) ")) << name;
+        //  does this method hide a property? -> append "_" in that case
+        std::pair<bool, size_t> t = mt->find_property (mt->is_static (mid), name);
+        if (t.first) {
+          name += "_";
         }
 
-        name += "_";
+        //  needs static/non-static disambiguation?
+        t = mt->find_method (! mt->is_static (mid), name);
+        if (t.first) {
 
-        mt->rename (mid, name);
-        mp_module->add_python_doc (*cls, mt, int (mid), tl::sprintf (tl::to_string (tr ("This attribute is available as '%s' in Python")), name));
+          disambiguated_names.push_back (name);
+          if (mt->is_static (mid)) {
+            name = "_class_" + name;
+          } else {
+            name = "_inst_" + name;
+          }
 
-      }
+          mp_module->add_python_doc (*cls, mt, int (mid), tl::sprintf (tl::to_string (tr ("This attribute is available as '%s' in Python")), name));
 
-      //  create documentation
-      std::string doc;
-      for (MethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
-        if (! doc.empty ()) {
-          doc = "\n\n";
+        } else if (is_reserved_word (name)) {
+
+          //  drop non-standard names
+          if (tl::verbosity () >= 20) {
+            tl::warn << tl::to_string (tr ("Class ")) << cls->name () << ": " << tl::to_string (tr ("no Python mapping for method (reserved word) ")) << name;
+          }
+
+          name += "_";
+
+          mt->rename (mid, name);
+          mp_module->add_python_doc (*cls, mt, int (mid), tl::sprintf (tl::to_string (tr ("This attribute is available as '%s' in Python")), name));
+
         }
-        doc += (*m)->doc ();
-      }
 
-      const gsi::MethodBase *m_first = *mt->begin (mid);
+        //  create documentation
+        std::string doc;
+        for (MethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
+          if (! doc.empty ()) {
+            doc = "\n\n";
+          }
+          doc += (*m)->doc ();
+        }
 
-      if (! mt->is_static (mid)) {  //  Bound methods
-
-        if (! as_static) {
+        if (! mt->is_static (mid)) {  //  Bound methods
 
           PyMethodDef *method = mp_module->make_method_def ();
           method->ml_name = mp_module->make_string (name);
@@ -552,41 +550,20 @@ public:
           PythonRef attr = PythonRef (PyDescr_NewMethod (type, method));
           set_type_attr (type, name, attr);
 
-        }
+        } else {  //  Class methods
 
-      } else if (isupper (name [0]) || m_first->is_const ()) {
+          PyMethodDef *method = mp_module->make_method_def ();
+          method->ml_name = mp_module->make_string (name);
+          method->ml_meth = (PyCFunction) get_method_adaptor (mid);
+          method->ml_doc = mp_module->make_string (doc);
+          method->ml_flags = METH_VARARGS | METH_CLASS;
 
-        if ((mt->end (mid) - mt->begin (mid)) == 1 && m_first->begin_arguments () == m_first->end_arguments ()) {
-
-          //  static methods without arguments which start with a capital letter are treated as constants
-          PYAStaticAttributeDescriptorObject *desc = PYAStaticAttributeDescriptorObject::create (mp_module->make_string (name));
-          desc->type = type;
-          desc->getter = get_method_adaptor (mid);
-
-          PythonRef attr (desc);
+          PythonRef attr = PythonRef (PyDescr_NewClassMethod (type, method));
           set_type_attr (type, name, attr);
 
-        } else if (tl::verbosity () >= 20) {
-          tl::warn << "Upper case method name encountered which cannot be used as a Python constant (more than one overload or at least one argument): " << cls->name () << "." << name;
-          mp_module->add_python_doc (*cls, mt, int (mid), tl::to_string (tr ("This attribute is not available for Python")));
         }
 
-      } else if (! as_static) {  //  Class methods
-
-        PyMethodDef *method = mp_module->make_method_def ();
-        method->ml_name = mp_module->make_string (name);
-        method->ml_meth = (PyCFunction) get_method_adaptor (mid);
-        method->ml_doc = mp_module->make_string (doc);
-        method->ml_flags = METH_VARARGS | METH_CLASS;
-
-        PythonRef attr = PythonRef (PyDescr_NewClassMethod (type, method));
-        set_type_attr (type, name, attr);
-
       }
-
-    }
-
-    if (! as_static) {
 
       //  Complete the comparison operators if necessary.
       //  Unlike Ruby, Python does not automatically implement != from == for example.
@@ -663,44 +640,44 @@ public:
 
       }
 
-    }
+      //  install the static/non-static dispatcher descriptor
 
-    //  install the static/non-static dispatcher descriptor
+      std::sort (disambiguated_names.begin (), disambiguated_names.end ());
+      disambiguated_names.erase (std::unique (disambiguated_names.begin (), disambiguated_names.end ()), disambiguated_names.end ());
 
-    std::sort (disambiguated_names.begin (), disambiguated_names.end ());
-    disambiguated_names.erase (std::unique (disambiguated_names.begin (), disambiguated_names.end ()), disambiguated_names.end ());
+      for (std::vector<std::string>::const_iterator a = disambiguated_names.begin (); a != disambiguated_names.end (); ++a) {
 
-    for (std::vector<std::string>::const_iterator a = disambiguated_names.begin (); a != disambiguated_names.end (); ++a) {
-
-      std::pair<bool, size_t> pa;
-      pa = mt->find_method (true, *a);
-      if (pa.first) {
-        mt->alias (pa.second, "_class_" + *a);
-      }
-      pa = mt->find_method (false, *a);
-      if (pa.first) {
-        mt->alias (pa.second, "_inst_" + *a);
-      }
-
-      PyObject *attr_inst = PyObject_GetAttrString ((PyObject *) type, ("_inst_" + *a).c_str ());
-      PyObject *attr_class = PyObject_GetAttrString ((PyObject *) type, ("_class_" + *a).c_str ());
-      if (attr_inst == NULL || attr_class == NULL) {
-
-        //  some error -> don't install the disambiguator
-        Py_XDECREF (attr_inst);
-        Py_XDECREF (attr_class);
-        PyErr_Clear ();
-
-        if (tl::verbosity () >= 20) {
-          tl::warn << "Unable to install a static/non-static disambiguator for " << *a << " in class " << cls->name ();
+        std::pair<bool, size_t> pa;
+        pa = mt->find_method (true, *a);
+        if (pa.first) {
+          mt->alias (pa.second, "_class_" + *a);
+        }
+        pa = mt->find_method (false, *a);
+        if (pa.first) {
+          mt->alias (pa.second, "_inst_" + *a);
         }
 
-      } else {
+        PyObject *attr_inst = PyObject_GetAttrString ((PyObject *) type, ("_inst_" + *a).c_str ());
+        PyObject *attr_class = PyObject_GetAttrString ((PyObject *) type, ("_class_" + *a).c_str ());
+        if (attr_inst == NULL || attr_class == NULL) {
 
-        PyObject *desc = PYAAmbiguousMethodDispatcher::create (attr_inst, attr_class);
-        PythonRef name (c2python (*a));
-        //  Note: we use GenericSetAttr since that one allows us setting attributes on built-in types
-        PyObject_GenericSetAttr ((PyObject *) type, name.get (), desc);
+          //  some error -> don't install the disambiguator
+          Py_XDECREF (attr_inst);
+          Py_XDECREF (attr_class);
+          PyErr_Clear ();
+
+          if (tl::verbosity () >= 20) {
+            tl::warn << "Unable to install a static/non-static disambiguator for " << *a << " in class " << cls->name ();
+          }
+
+        } else {
+
+          PyObject *desc = PYAAmbiguousMethodDispatcher::create (attr_inst, attr_class);
+          PythonRef name (c2python (*a));
+          //  Note: we use GenericSetAttr since that one allows us setting attributes on built-in types
+          PyObject_GenericSetAttr ((PyObject *) type, name.get (), desc);
+
+        }
 
       }
 

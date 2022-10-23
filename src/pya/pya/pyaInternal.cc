@@ -28,6 +28,8 @@
 
 #include "tlLog.h"
 
+#include <cctype>
+
 namespace pya
 {
 
@@ -155,10 +157,14 @@ MethodTable::MethodTable (const gsi::ClassBase *cls_decl, PythonModule *module)
     if (! (*m)->is_callback () && ! (*m)->is_signal ()) {
 
       bool st = (*m)->is_static ();
+      bool no_args = ((*m)->end_arguments () == (*m)->begin_arguments ());
 
       for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
         if (! syn->is_getter && ! syn->is_setter) {
-          if ((*m)->end_arguments () - (*m)->begin_arguments () == 0 && is_property_setter (st, syn->name) && ! is_property_getter (st, syn->name)) {
+          if (no_args && is_property_setter (st, syn->name) && ! is_property_getter (st, syn->name)) {
+            add_getter (syn->name, *m);
+          } else if (st && no_args && (isupper (syn->name [0]) || (*m)->is_const ())) {
+            //  static methods without arguments which start with a capital letter are treated as constants
             add_getter (syn->name, *m);
           } else {
             if (syn->is_predicate && std::string (syn->name, 0, 3) == "is_") {

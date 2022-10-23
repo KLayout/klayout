@@ -70,103 +70,6 @@ def is_reserved_word(name: str) -> bool:
     return name in wordlist
 
 
-def translate_methodname(name: str) -> str:
-    """
-    Should be the same as pyaModule.cc:extract_python_name function
-    *  The name string encodes some additional information, specifically:
-    *    "*..."      The method is protected
-    *    "x|y"       Aliases (synonyms)
-    *    "x|#y"      y is deprecated
-    *    "x="        x is a setter
-    *    ":x"        x is a getter
-    *    "x?"        x is a predicate
-    *  Backslashes can be used to escape the special characters, like "*" and "|".
-    """
-    if name == "new":
-        new_name = "__init__"
-    elif name == "++":
-        new_name = "inc"
-    elif name == "--":
-        new_name = "dec"
-    elif name == "()":
-        new_name = "call"
-    elif name == "!":
-        new_name = "not"
-    elif name == "==":
-        new_name = "__eq__"
-    elif name == "!=":
-        new_name = "__ne__"
-    elif name == "<":
-        new_name = "__lt__"
-    elif name == "<=":
-        new_name = "__le__"
-    elif name == ">":
-        new_name = "__gt__"
-    elif name == ">=":
-        new_name = "__ge__"
-    elif name == "<=>":
-        new_name = "__cmp__"
-    elif name == "+":
-        new_name = "__add__"
-    elif name == "+@":
-        new_name = "__pos__"
-    elif name == "-":
-        new_name = "__sub__"
-    elif name == "-@":
-        new_name = "__neg__"
-    elif name == "/":
-        new_name = "__truediv__"
-    elif name == "*":
-        new_name = "__mul__"
-    elif name == "%":
-        new_name = "__mod__"
-    elif name == "<<":
-        new_name = "__lshift__"
-    elif name == ">>":
-        new_name = "__rshift__"
-    elif name == "~":
-        new_name = "__invert__"
-    elif name == "&":
-        new_name = "__and__"
-    elif name == "|":
-        new_name = "__or__"
-    elif name == "^":
-        new_name = "__xor__"
-    elif name == "+=":
-        new_name = "__iadd__"
-    elif name == "-=":
-        new_name = "__isub__"
-    elif name == "/=":
-        new_name = "__itruediv__"
-    elif name == "*=":
-        new_name = "__imul__"
-    elif name == "%=":
-        new_name = "__imod__"
-    elif name == "<<=":
-        new_name = "__ilshift__"
-    elif name == ">>=":
-        new_name = "__irshift__"
-    elif name == "&=":
-        new_name = "__iand__"
-    elif name == "|=":
-        new_name = "__ior__"
-    elif name == "^=":
-        new_name = "__ixor__"
-    elif name == "[]":
-        new_name = "__getitem__"
-    elif name == "[]=":
-        new_name = "__setitem__"
-    else:
-        # Ignore other conversions for now.
-        if name.startswith("*"):
-            print(name)
-        new_name = name
-    if is_reserved_word(new_name):
-        new_name = new_name + "_"
-
-    return new_name
-
-
 _type_dict = dict()
 
 _type_dict[ktl.ArgType.TypeBool] = "bool"
@@ -181,6 +84,7 @@ _type_dict[ktl.ArgType.TypeLongLong] = "int"
 _type_dict[ktl.ArgType.TypeSChar] = "str"
 _type_dict[ktl.ArgType.TypeShort] = "int"
 _type_dict[ktl.ArgType.TypeString] = "str"
+_type_dict[ktl.ArgType.TypeByteArray] = "bytes"
 _type_dict[ktl.ArgType.TypeUChar] = "str"
 _type_dict[ktl.ArgType.TypeUInt] = "int"
 _type_dict[ktl.ArgType.TypeULong] = "int"
@@ -223,17 +127,6 @@ def _translate_type(
     if arg_type.has_default():
         py_str = f"Optional[{py_str}] = ..."
     return py_str
-
-
-@dataclass
-class _Method:
-    name: str
-    is_setter: bool
-    is_getter: bool
-    is_classvar: bool
-    is_classmethod: bool
-    doc: str
-    m: ktl.Method
 
 
 @dataclass
@@ -317,74 +210,6 @@ class ClassStub(Stub):
     indent_docstring: bool = True
 
 
-def get_c_methods(c: ktl.Class) -> List[_Method]:
-    """
-    Iterates over all methods defined in the C API, sorting
-    properties, class methods and bound methods.
-    """
-    method_list: List[_Method] = list()
-    setters = set()
-
-    def primary_synonym(m: ktl.Method) -> ktl.MethodOverload:
-        for ms in m.each_overload():
-            if ms.name() == m.primary_name():
-                return ms
-        raise RuntimeError("Primary synonym not found for method " + m.name())
-
-    for m in c.each_method():
-        if m.is_signal():
-            # ignore signals as they do not have arguments and are neither setters nor getters.
-            continue
-
-        method_def = primary_synonym(m)
-        if method_def.is_setter():
-            setters.add(method_def.name())
-
-    for m in c.each_method():
-        num_args = len([True for a in m.each_argument()])
-        method_def = primary_synonym(m)
-
-        # extended definition of "getter" for Python
-        is_getter = (num_args == 0) and (
-            method_def.is_getter()
-            or (not method_def.is_setter() and method_def.name() in setters)
-        )
-        is_setter = (num_args == 1) and method_def.is_setter()
-        is_classvar = (num_args == 0) and (m.is_static() and not m.is_constructor())
-        is_const = m.is_const()
-
-        # static methods without arguments which start with a capital letter are treated as constants
-        # (rule from pyaModule.cc)
-        if is_classvar and m.name()[0].isupper():
-            is_getter = True
-
-        for method_synonym in m.each_overload():
-            if method_synonym.deprecated():
-                # method synonyms that start with # (pound) sign
-                continue
-            if method_synonym.name() == method_def.name():
-                doc = m.doc()
-            else:
-                doc = (
-                    f"Note: This is an alias of '{translate_methodname(method_def.name())}'.\n"
-                    + m.doc()
-                )
-            method_list.append(
-                _Method(
-                    name=method_synonym.name(),
-                    is_setter=is_setter,
-                    is_getter=is_getter,
-                    is_classmethod=m.is_constructor() or is_classvar,
-                    is_classvar=is_classvar,
-                    doc=doc,
-                    m=m,
-                )
-            )
-
-        # print(f"{m.name()}: {m.is_static()=}, {m.is_constructor()=}, {m.is_const_object()=}")
-    return method_list
-
-
 def get_py_child_classes(c: ktl.Class):
     for c_child in c.each_child_class():
         yield c_child
@@ -393,25 +218,6 @@ def get_py_child_classes(c: ktl.Class):
 def get_py_methods(
     c: ktl.Class,
 ) -> List[Stub]:
-    c_methods = get_c_methods(c)
-
-    # extract properties
-    _c_methods = copy(c_methods)
-
-    # Helper functions
-    def find_setter(c_methods: List[_Method], name: str):
-        """Finds a setter method in c_methods list with a given name.f"""
-        for m in c_methods:
-            if m.name == name and m.is_setter:
-                return m
-        return None
-
-    def find_getter(c_methods: List[_Method], name: str):
-        """Finds a getter method in c_methods list with a given name.f"""
-        for m in c_methods:
-            if m.name == name and m.is_getter:
-                return m
-        return None
 
     translate_arg_type = functools.partial(_translate_type, within_class=c, is_return=False)
     translate_ret_type = functools.partial(_translate_type, within_class=c, is_return=True)
@@ -448,164 +254,145 @@ def get_py_methods(
                 new_arglist.append((argname, None))
         return _format_args(new_arglist)
 
-    # Extract all properties (methods that have getters and/or setters)
+    # Collect all properties here
     properties: List[Stub] = list()
-    for m in copy(_c_methods):
-        ret_type = translate_ret_type(m.m.ret_type())
-        if m.is_getter:
-            m_setter = find_setter(c_methods, m.name)
-            if m_setter is not None:  # full property
-                doc = m.doc + m_setter.doc
-                properties.append(
-                    PropertyStub(
-                        decorator="",
-                        signature=f"{translate_methodname(m.name)}: {ret_type}",
-                        name=f"{translate_methodname(m.name)}",
-                        docstring=doc,
-                    )
-                )
-                # _c_methods.remove(m_setter)
-            elif m.is_classvar:
-                properties.append(
-                    PropertyStub(
-                        decorator="",
-                        signature=f"{translate_methodname(m.name)}: ClassVar[{ret_type}]",
-                        name=f"{translate_methodname(m.name)}",
-                        docstring=m.doc,
-                    )
-                )
-            else:  # only getter
-                properties.append(
-                    MethodStub(
-                        decorator="@property",
-                        signature=f"def {translate_methodname(m.name)}(self) -> {ret_type}",
-                        name=f"{translate_methodname(m.name)}",
-                        docstring=m.doc,
-                    )
-                )
-            _c_methods.remove(m)
-        elif m.is_setter and not find_getter(
-            c_methods, m.name
-        ):  # include setter-only properties as full properties
-            doc = "WARNING: This variable can only be set, not retrieved.\n" + m.doc
+
+    # Extract all instance properties
+    for f in c.python_properties(False): 
+        name = f.getter().name()
+        getter = None
+        if len(f.getter().methods()) > 0:
+            getter = f.getter().methods()[0]
+        setter = None
+        if len(f.setter().methods()) > 0:
+            setter = f.setter().methods()[0]
+        if getter and setter: 
+            # Full property
+            ret_type = translate_ret_type(getter.ret_type())
+            doc = "Getter:\n" + getter.doc() + "\nSetter:\n" + setter.doc()
             properties.append(
                 PropertyStub(
                     decorator="",
-                    signature=f"{translate_methodname(m.name)}: {ret_type}",
-                    name=f"{translate_methodname(m.name)}",
+                    signature=f"{name}: {ret_type}",
+                    name=name,
                     docstring=doc,
                 )
             )
-            _c_methods.remove(m)
+        elif getter:
+            # Only getter
+            ret_type = translate_ret_type(getter.ret_type())
+            doc = getter.doc()
+            properties.append(
+                MethodStub(
+                    decorator="@property",
+                    signature=f"def {name}(self) -> {ret_type}",
+                    name=name,
+                    docstring=doc,
+                )
+            )
+        elif setter:
+            # Only setter
+            doc = "WARNING: This variable can only be set, not retrieved.\n" + setter.doc()
+            properties.append(
+                MethodStub(
+                    decorator="@property",
+                    signature=f"def {name}(self) -> None",
+                    name=name,
+                    docstring=doc,
+                )
+            )
 
-    for m in copy(_c_methods):
-        if m.is_setter:
-            _c_methods.remove(m)
-
-    def get_altnames(c_name: str, m: _Method):
-        args = list(m.m.each_argument())
-        ret = m.m.ret_type()
-        num_args = len(args)
-        names = [c_name]
-        if c_name == "to_s" and num_args == 0:
-            names.append("__str__")
-            # Only works if GSI_ALIAS_INSPECT is activated
-            names.append("__repr__")
-        elif c_name == "hash" and num_args == 0:
-            names.append("__hash__")
-        elif c_name == "inspect" and num_args == 0:
-            names.append("__repr__")
-        elif c_name == "size" and num_args == 0:
-            names.append("__len__")
-        elif c_name == "each" and num_args == 0 and ret.is_iter():
-            names.append("__iter__")
-        elif c_name == "__mul__" and "Trans" not in c_name:
-            names.append("__rmul__")
-        elif c_name == "dup" and num_args == 0:
-            names.append("__copy__")
-        return names
+    # Extract all class properties (TODO: setters not supported currently)
+    for f in c.python_properties(True): 
+        name = f.getter().name()
+        if len(f.getter().methods()) > 0:
+            getter = f.getter().methods()[0]
+            ret_type = translate_ret_type(getter.ret_type())
+            doc = getter.doc()
+            properties.append(
+                MethodStub(
+                    decorator="@property",
+                    signature=f"def {name}(self) -> ClassVar[{ret_type}]",
+                    name=name,
+                    docstring=doc,
+                )
+            )
 
     # Extract all classmethods
     classmethods: List[Stub] = list()
-    for m in copy(_c_methods):
-        if m.is_classmethod:
-            # Exception: if it is an __init__ constructor, ignore.
-            # Will be treated by the bound method logic below.
-            if translate_methodname(m.name) == "__init__":
-                continue
-            decorator = "@classmethod"
-            ret_type = translate_ret_type(m.m.ret_type())
-            for name in get_altnames(m.name, m):
-                classmethods.append(
-                    MethodStub(
-                        decorator=decorator,
-                        signature=f"def {translate_methodname(name)}({format_args(m.m, 'cls')}) -> {ret_type}",
-                        name=f"{translate_methodname(name)}",
-                        docstring=m.doc,
-                    )
+
+    for f in c.python_methods(True): 
+
+        name = f.name()
+
+        decorator = ""
+        if len(f.methods()) > 1:
+            decorator = "@overload\n"
+        decorator += "@classmethod"
+
+        for m in f.methods():
+            ret_type = translate_ret_type(m.ret_type())
+            classmethods.append(
+                MethodStub(
+                    decorator=decorator,
+                    signature=f"def {name}({format_args(m, 'cls')}) -> {ret_type}",
+                    name=name,
+                    docstring=m.doc(),
                 )
-            _c_methods.remove(m)
+            )
 
     # Extract bound methods
     boundmethods: List[Stub] = list()
-    for m in copy(_c_methods):
+
+    for f in c.python_methods(False): 
+
+        name = f.name()
+
         decorator = ""
+        if len(f.methods()) > 1:
+            decorator = "@overload\n"
 
-        translated_name = translate_methodname(m.name)
-        if translated_name in [s.name for s in properties]:
-            translated_name += "_"
+        for m in f.methods():
 
-        if translated_name == "__init__":
-            ret_type = "None"
-        else:
-            ret_type = translate_ret_type(m.m.ret_type())
+            if name == "__init__":
+                ret_type = "None"
+            else:
+                ret_type = translate_ret_type(m.ret_type())
 
-        arg_list = _get_arglist(m.m, "self")
-        # TODO: fix type errors
-        # Exceptions:
-        # For X.__eq__(self, a:X), treat second argument as type object instead of X
-        if translated_name in ("__eq__", "__ne__"):
-            arg_list[1] = arg_list[1][0], "object"
-        # X._assign(self, other:X), mypy complains if _assign is defined at base class.
-        # We can't specialize other in this case.
-        elif translated_name in ("_assign", "assign"):
-            assert arg_list[1][1] is not None
-            assert arg_list[1][1].type() == ktl.ArgType.TypeObject
-            arg_list[1] = arg_list[1][0], superclass(arg_list[1][1].cls())
-        else:
-            new_arg_list = []
-            for argname, a in arg_list:
-                if a:
-                    new_arg_list.append((argname, translate_arg_type(a)))
-                else:
-                    new_arg_list.append((argname, a))
-            arg_list = new_arg_list
-        formatted_args = _format_args(arg_list)
+            arg_list = _get_arglist(m, "self")
+            # TODO: fix type errors
+            # Exceptions:
+            # For X.__eq__(self, a:X), treat second argument as type object instead of X
+            if name in ("__eq__", "__ne__"):
+                arg_list[1] = arg_list[1][0], "object"
+            # X._assign(self, other:X), mypy complains if _assign is defined at base class.
+            # We can't specialize other in this case.
+            elif name in ("_assign", "assign"):
+                assert arg_list[1][1] is not None
+                assert arg_list[1][1].type() == ktl.ArgType.TypeObject
+                arg_list[1] = arg_list[1][0], superclass(arg_list[1][1].cls())
+            else:
+                new_arg_list = []
+                for argname, a in arg_list:
+                    if a:
+                        new_arg_list.append((argname, translate_arg_type(a)))
+                    else:
+                        new_arg_list.append((argname, a))
+                arg_list = new_arg_list
+            formatted_args = _format_args(arg_list)
 
-        for name in get_altnames(translated_name, m):
             boundmethods.append(
                 MethodStub(
                     decorator=decorator,
                     signature=f"def {name}({formatted_args}) -> {ret_type}",
-                    name=f"{name}",
-                    docstring=m.doc,
+                    name=name,
+                    docstring=m.doc(),
                 )
             )
-        _c_methods.remove(m)
 
-    def add_overload_decorator(stublist: List[Stub]):
-        stubnames = [stub.name for stub in stublist]
-        for stub in stublist:
-            has_duplicate = stubnames.count(stub.name) > 1
-            if has_duplicate:
-                stub.decorator = "@overload\n" + stub.decorator
-        return stublist
-
-    boundmethods = sorted(set(boundmethods))  # sometimes duplicate methods are defined.
-    add_overload_decorator(boundmethods)
-    properties = sorted(set(properties))
+    boundmethods = sorted(boundmethods)
+    properties = sorted(properties)
     classmethods = sorted(classmethods)
-    add_overload_decorator(classmethods)
 
     return_list: List[Stub] = properties + classmethods + boundmethods
 
@@ -659,90 +446,20 @@ def get_module_stubs(module: str) -> List[ClassStub]:
     return _stubs
 
 
-def print_db():
+def print_mod(module, dependencies):
     print("from typing import Any, ClassVar, Dict, Sequence, List, Iterator, Optional")
     print("from typing import overload")
-    print("import klayout.rdb as rdb")
-    print("import klayout.tl as tl")
-    for stub in get_module_stubs("db"):
+    for dep in dependencies:
+      print(f"import klayout.{dep} as {dep}")
+    for stub in get_module_stubs(module):
         print(stub.format_stub(include_docstring=True) + "\n")
-
-
-def print_rdb():
-    print("from typing import Any, ClassVar, Dict, Sequence, List, Iterator, Optional")
-    print("from typing import overload")
-    print("import klayout.db as db")
-    for stub in get_module_stubs("rdb"):
-        print(stub.format_stub(include_docstring=True) + "\n")
-
-
-def print_tl():
-    print("from typing import Any, ClassVar, Dict, Sequence, List, Iterator, Optional")
-    print("from typing import overload")
-    for stub in get_module_stubs("tl"):
-        print(stub.format_stub(include_docstring=True) + "\n")
-
-
-def test_v1():
-    db_classes = get_classes("db")
-    for c in db_classes:
-        if c.name() != "Region":
-            continue
-        print(
-            get_class_stub(c, ignore=db_classes, module="db").format_stub(
-                include_docstring=False
-            )
-        )
-
-
-def test_v2():
-    db_classes = get_classes("db")
-    for c in db_classes:
-        if c.name() != "DPoint":
-            continue
-        print(
-            get_class_stub(c, ignore=db_classes, module="db").format_stub(
-                include_docstring=True
-            )
-        )
-
-
-def test_v3():
-    db_classes = get_classes("db")
-    for c in db_classes:
-        if c.name() != "Instance":
-            continue
-        print(
-            get_class_stub(c, ignore=db_classes, module="db").format_stub(
-                include_docstring=False
-            )
-        )
-
-
-def test_v4():
-    db_classes = get_classes("db")
-    for c in db_classes:
-        if c.name() != "Region":
-            continue
-        for cclass in get_py_child_classes(c):
-            print(
-                get_class_stub(cclass, ignore=db_classes, module="db").format_stub(
-                    include_docstring=False
-                )
-            )
 
 
 if __name__ == "__main__":
     if len(argv) < 2:
-        print("Specity module in argument: 'db', 'rdb', 'tl'")
+        print("Specity module in argument")
         exit(1)
-    if argv[1] == "db":
-        print_db()
-    elif argv[1] == "rdb":
-        print_rdb()
-    elif argv[1] == "tl":
-        print_tl()
+    if len(argv) == 2:
+        print_mod(argv[1], [])
     else:
-        # print_rdb()
-        # test_v4()
-        print("Wrong arguments")
+        print_mod(argv[1], argv[2].split(","))

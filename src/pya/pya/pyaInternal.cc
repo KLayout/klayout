@@ -549,6 +549,18 @@ MethodTable::is_protected (size_t mid) const
 }
 
 void
+MethodTable::alias (size_t mid, const std::string &new_name)
+{
+  bool st = is_static (mid);
+  auto nm = m_name_map.find (std::make_pair (st, new_name));
+  tl_assert (nm == m_name_map.end ());
+
+  m_table.push_back (m_table [mid - m_method_offset]);
+  m_table.back ().set_name (new_name);
+  m_name_map.insert (std::make_pair (std::make_pair (st, new_name), m_table.size () - 1 - m_method_offset));
+}
+
+void
 MethodTable::rename (size_t mid, const std::string &new_name)
 {
   std::string old_name = name (mid);

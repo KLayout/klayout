@@ -190,6 +190,11 @@ public:
   bool is_protected (size_t mid) const;
 
   /**
+   *  @brief Creates an alias for the given method
+   */
+  void alias (size_t mid, const std::string &new_name);
+
+  /**
    *  @brief Renames a method
    */
   void rename (size_t mid, const std::string &new_name);

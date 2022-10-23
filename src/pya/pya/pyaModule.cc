@@ -667,7 +667,20 @@ public:
 
     //  install the static/non-static dispatcher descriptor
 
+    std::sort (disambiguated_names.begin (), disambiguated_names.end ());
+    disambiguated_names.erase (std::unique (disambiguated_names.begin (), disambiguated_names.end ()), disambiguated_names.end ());
+
     for (std::vector<std::string>::const_iterator a = disambiguated_names.begin (); a != disambiguated_names.end (); ++a) {
+
+      std::pair<bool, size_t> pa;
+      pa = mt->find_method (true, *a);
+      if (pa.first) {
+        mt->alias (pa.second, "_class_" + *a);
+      }
+      pa = mt->find_method (false, *a);
+      if (pa.first) {
+        mt->alias (pa.second, "_inst_" + *a);
+      }
 
       PyObject *attr_inst = PyObject_GetAttrString ((PyObject *) type, ("_inst_" + *a).c_str ());
       PyObject *attr_class = PyObject_GetAttrString ((PyObject *) type, ("_class_" + *a).c_str ());

@@ -614,7 +614,7 @@ push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, PyObject *args
     }
 
     ex.set_basic_msg (msg);
-    throw ex;
+    throw;
 
   } catch (...) {
 

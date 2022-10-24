@@ -3199,14 +3199,6 @@ class Instance:
         The bounding box incorporates all instances that the array represents. It gives the overall extension of the child cell as seen in the calling cell (or all array members if the instance forms an array) for the given layer. If the layer is empty in this cell and all it's children', an empty bounding box will be returned. 
         This method has been introduced in version 0.25. 'bbox' is the preferred synonym for it since version 0.28.
         """
-    def cell(self) -> Cell:
-        r"""
-        @brief Gets the \Cell object of the cell this instance refers to
-
-        This is the const version of the \cell method. It will return a const \Cell object and itself can be called on a const \Instance object.
-
-        This variant has been introduced in version 0.25.
-        """
     def change_pcell_parameter(self, name: str, value: Any) -> None:
         r"""
         @brief Changes a single parameter of a PCell instance to the given value
@@ -3385,14 +3377,6 @@ class Instance:
         @brief Gets the layout this instance is contained in
 
         This const version of the method has been introduced in version 0.25.
-        """
-    def parent_cell(self) -> Cell:
-        r"""
-        @brief Gets the cell this instance is contained in
-
-        Returns nil if the instance does not live inside a cell.
-
-        This const version of the \parent_cell method has been introduced in version 0.25.
         """
     def pcell_declaration(self) -> PCellDeclaration_Native:
         r"""
@@ -14900,22 +14884,6 @@ class SaveLayoutOptions:
         r"""
         @brief Assigns another object to self
         """
-    def cif_blank_separator(self) -> bool:
-        r"""
-        @brief Gets a flag indicating whether blanks shall be used as x/y separator characters
-        See \cif_blank_separator= method for a description of that property.
-        This property has been added in version 0.23.10.
-
-        The predicate version (cif_blank_separator?) has been added in version 0.25.1.
-        """
-    def cif_dummy_calls(self) -> bool:
-        r"""
-        @brief Gets a flag indicating whether dummy calls shall be written
-        See \cif_dummy_calls= method for a description of that property.
-        This property has been added in version 0.23.10.
-
-        The predicate version (cif_blank_separator?) has been added in version 0.25.1.
-        """
     def clear_cells(self) -> None:
         r"""
         @brief Clears all cells to be saved
@@ -14952,24 +14920,6 @@ class SaveLayoutOptions:
     def dup(self) -> SaveLayoutOptions:
         r"""
         @brief Creates a copy of self
-        """
-    def gds2_no_zero_length_paths(self) -> bool:
-        r"""
-        @brief Gets a value indicating whether zero-length paths are eliminated
-
-        This property has been added in version 0.23.
-        """
-    def gds2_write_cell_properties(self) -> bool:
-        r"""
-        @brief Gets a value indicating whether cell properties are written
-
-        This property has been added in version 0.23.
-        """
-    def gds2_write_file_properties(self) -> bool:
-        r"""
-        @brief Gets a value indicating whether layout properties are written
-
-        This property has been added in version 0.24.
         """
     def is_const_object(self) -> bool:
         r"""
@@ -23553,18 +23503,6 @@ class LoadLayoutOptions:
         r"""
         @brief Creates a copy of self
         """
-    def dxf_keep_other_cells(self) -> bool:
-        r"""
-        @brief If this option is true, all cells are kept, not only the top cell and it's children
-
-        This property has been added in version 0.21.15.
-        """
-    def dxf_render_texts_as_polygons(self) -> bool:
-        r"""
-        @brief If this option is true, text objects are rendered as polygons
-
-        This property has been added in version 0.21.15.
-        """
     def dxf_select_all_layers(self) -> None:
         r"""
         @brief Selects all layers and disables the layer map
@@ -23582,18 +23520,6 @@ class LoadLayoutOptions:
         @param create_other_layers The flag indicating whether other layers will be created as well. Set to false to read only the layers in the layer map.
 
         This method has been added in version 0.25 and replaces the respective global option in \LoadLayoutOptions in a format-specific fashion.
-        """
-    def gds2_allow_big_records(self) -> bool:
-        r"""
-        @brief Gets a value specifying whether to allow big records with a length of 32768 to 65535 bytes.
-        See \gds2_allow_big_records= method for a description of this property.
-        This property has been added in version 0.18.
-        """
-    def gds2_allow_multi_xy_records(self) -> bool:
-        r"""
-        @brief Gets a value specifying whether to allow big polygons with multiple XY records.
-        See \gds2_allow_multi_xy_records= method for a description of this property.
-        This property has been added in version 0.18.
         """
     def is_const_object(self) -> bool:
         r"""
@@ -28839,12 +28765,6 @@ class Shape:
         r"""
         @brief Returns the bounding box of the shape
         """
-    def box(self) -> Any:
-        r"""
-        @brief Gets the box object
-
-        Starting with version 0.23, this method returns nil, if the shape does not represent a box.
-        """
     def create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -28988,18 +28908,6 @@ class Shape:
         This method applies to polygons and delivers all points of the polygon hull contour.
         It will throw an exception for other objects.
         """
-    def edge(self) -> Any:
-        r"""
-        @brief Returns the edge object
-
-        Starting with version 0.23, this method returns nil, if the shape does not represent an edge.
-        """
-    def edge_pair(self) -> Any:
-        r"""
-        @brief Returns the edge pair object
-
-        This method has been introduced in version 0.26.
-        """
     def has_prop_id(self) -> bool:
         r"""
         @brief Returns true, if the shape has properties, i.e. has a properties ID
@@ -29079,12 +28987,6 @@ class Shape:
 
         This method has been introduced in version 0.22.
         """
-    def path(self) -> Any:
-        r"""
-        @brief Returns the path object
-
-        Starting with version 0.23, this method returns nil, if the shape does not represent a path.
-        """
     def path_dlength(self) -> float:
         r"""
         @brief Returns the length of the path in micrometer units
@@ -29112,14 +29014,6 @@ class Shape:
 
         This method has been added in version 0.23.
         """
-    def polygon(self) -> Any:
-        r"""
-        @brief Returns the polygon object
-
-        Returns the polygon object that this shape refers to or converts the object to a polygon. Paths, boxes and simple polygons are converted to polygons. For paths this operation renders the path's hull contour.
-
-        Starting with version 0.23, this method returns nil, if the shape does not represent a geometrical primitive that can be converted to a polygon.
-        """
     def property(self, key: Any) -> Any:
         r"""
         @brief Gets the user property with the given key
@@ -29141,19 +29035,6 @@ class Shape:
         This reference can be nil, if the Shape object is not referring to an actual shape.
 
         This method has been introduced in version 0.22.
-        """
-    def simple_polygon(self) -> Any:
-        r"""
-        @brief Returns the simple polygon object
-
-        Returns the simple polygon object that this shape refers to or converts the object to a simple polygon. Paths, boxes and polygons are converted to simple polygons. Polygons with holes will have their holes removed but introducing cut lines that connect the hole contours with the outer contour. 
-        Starting with version 0.23, this method returns nil, if the shape does not represent a geometrical primitive that can be converted to a simple polygon.
-        """
-    def text(self) -> Any:
-        r"""
-        @brief Returns the text object
-
-        Starting with version 0.23, this method returns nil, if the shape does not represent a text.
         """
     def to_s(self) -> str:
         r"""
@@ -49857,13 +49738,6 @@ class LEFDEFReaderConfiguration:
         r"""
         @brief Creates a copy of self
         """
-    def fills_datatype(self, mask: int) -> int:
-        r"""
-        @brief Gets the fill geometry layer datatype value per mask.
-        See \produce_via_geometry for details about the layer production rules.The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...).
-
-        Mask specific rules have been introduced in version 0.27.
-        """
     def fills_suffix_per_mask(self, mask: int) -> str:
         r"""
         @brief Gets the fill geometry layer name suffix per mask.
@@ -49877,13 +49751,6 @@ class LEFDEFReaderConfiguration:
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
         """
-    def lef_pins_datatype(self, mask: int) -> int:
-        r"""
-        @brief Gets the LEF pin geometry layer datatype value per mask.
-        See \produce_via_geometry for details about the layer production rules.The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...).
-
-        Mask specific rules have been introduced in version 0.27.
-        """
     def lef_pins_suffix_per_mask(self, mask: int) -> str:
         r"""
         @brief Gets the LEF pin geometry layer name suffix per mask.
@@ -49891,23 +49758,9 @@ class LEFDEFReaderConfiguration:
 
         Mask specific rules have been introduced in version 0.27.
         """
-    def pins_datatype(self, mask: int) -> int:
-        r"""
-        @brief Gets the pin geometry layer datatype value per mask.
-        See \produce_via_geometry for details about the layer production rules.The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...).
-
-        Mask specific rules have been introduced in version 0.27.
-        """
     def pins_suffix_per_mask(self, mask: int) -> str:
         r"""
         @brief Gets the pin geometry layer name suffix per mask.
-        See \produce_via_geometry for details about the layer production rules.The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...).
-
-        Mask specific rules have been introduced in version 0.27.
-        """
-    def routing_datatype(self, mask: int) -> int:
-        r"""
-        @brief Gets the routing geometry layer datatype value per mask.
         See \produce_via_geometry for details about the layer production rules.The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...).
 
         Mask specific rules have been introduced in version 0.27.
@@ -50005,25 +49858,10 @@ class LEFDEFReaderConfiguration:
 
         Mask specific rules have been introduced in version 0.27.
         """
-    def special_routing_datatype(self, mask: int) -> int:
-        r"""
-        @brief Gets the special routing geometry layer datatype value per mask.
-        See \produce_via_geometry for details about the layer production rules.The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...).
-
-        Mask specific rules have been introduced in version 0.27.
-        """
     def special_routing_suffix_per_mask(self, mask: int) -> str:
         r"""
         @brief Gets the special routing geometry layer name suffix per mask.
         See \produce_via_geometry for details about the layer production rules.The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...).
-
-        Mask specific rules have been introduced in version 0.27.
-        """
-    def via_geometry_datatype(self, mask: int) -> int:
-        r"""
-        @brief Gets the via geometry layer datatype value per mask.
-        See \produce_via_geometry for details about this property.
-        The mask number is a zero-based mask index (0: MASK 1, 1: MASK 2 ...).
 
         Mask specific rules have been introduced in version 0.27.
         """

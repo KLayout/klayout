@@ -1688,12 +1688,6 @@ class LayerProperties:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
-    def animation(self, real: bool) -> int:
-        r"""
-        @brief Gets the animation state
-
-        The animation state is an integer either being 0 (static), 1 (scrolling), 2 (blinking) or 3 (inversely blinking)
-        """
     def assign(self, other: LayerProperties) -> None:
         r"""
         @brief Assigns another object to self
@@ -1754,14 +1748,6 @@ class LayerProperties:
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
-        """
-    def dither_pattern(self, real: bool) -> int:
-        r"""
-        @brief Gets the dither pattern index
-
-        This method may deliver an invalid dither pattern index if it is not set.
-
-        @param real Set to true to return the real instead of local value
         """
     def dup(self) -> LayerProperties:
         r"""
@@ -1842,22 +1828,6 @@ class LayerProperties:
 
         This method has been introduced in version 0.25.
         """
-    def fill_brightness(self, real: bool) -> int:
-        r"""
-        @brief Gets the fill brightness value
-
-        If the brightness is not set, this method may return an invalid value
-
-        @param real Set to true to return the real instead of local value
-        """
-    def fill_color(self, real: bool) -> int:
-        r"""
-        @brief Gets the fill color
-
-        This method may return an invalid color if the color is not set.
-
-        @param real Set to true to return the real instead of local value
-        """
     def flat(self) -> LayerProperties:
         r"""
         @brief Returns the "flattened" (effective) layer properties entry for this node
@@ -1865,22 +1835,6 @@ class LayerProperties:
         This method returns a \LayerProperties object that is not embedded into a hierarchy.
         This object represents the effective layer properties for the given node. In particular, all 'local' properties are identical to the 'real' properties. Such an object can be used as a basis for manipulations.
         This method has been introduced in version 0.22.
-        """
-    def frame_brightness(self, real: bool) -> int:
-        r"""
-        @brief Gets the frame brightness value
-
-        If the brightness is not set, this method may return an invalid value
-
-        @param real Set to true to return the real instead of local value
-        """
-    def frame_color(self, real: bool) -> int:
-        r"""
-        @brief Gets the frame color
-
-        This method may return an invalid color if the color is not set.
-
-        @param real Set to true to return the real instead of local value
         """
     @overload
     def has_dither_pattern(self) -> bool:
@@ -2000,21 +1954,6 @@ class LayerProperties:
 
         This is the index of the actual layer used. The source specification given by \source_layer, \source_datatype, \source_name is evaluated and the corresponding layer is looked up in the layout object. If a \source_layer_index is specified, this layer index is taken as the layer index to use.
         """
-    def line_style(self, real: bool) -> int:
-        r"""
-        @brief Gets the line style index
-
-        This method may deliver an invalid line style index if it is not set (see \has_line_style?).
-
-        @param real Set to true to return the real instead of local value
-        This method has been introduced in version 0.25.
-        """
-    def lower_hier_level(self, real: bool) -> int:
-        r"""
-        @brief Gets the lower hierarchy level shown
-
-        This is the hierarchy level at which the drawing starts. This property is only meaningful, if \has_lower_hier_level is true. The hierarchy level can be relative in which case, 0 refers to the context cell's level. A mode can be specified for the hierarchy level which is 0 for absolute, 1 for minimum of specified level and set level and 2 for maximum of specified level and set level. 
-        """
     @overload
     def lower_hier_level_mode(self) -> int:
         r"""
@@ -2052,10 +1991,6 @@ class LayerProperties:
 
         This method has been introduced in version 0.19.
         """
-    def marked(self, real: bool) -> bool:
-        r"""
-        @brief Gets the marked state
-        """
     @overload
     def set_lower_hier_level(self, level: int, relative: bool) -> None:
         r"""
@@ -2091,73 +2026,6 @@ class LayerProperties:
         If this method is called, the upper hierarchy level is enabled. See \upper_hier_level for a description of this property.
 
         This method has been introduced in version 0.20.
-        """
-    def source(self, real: bool) -> str:
-        r"""
-        @brief Gets the source specification 
-
-        This method delivers the source specification as a string
-
-        @param real Set to true to return the computed instead of local value
-        """
-    def source_cellview(self, real: bool) -> int:
-        r"""
-        @brief Gets the cellview index that this layer refers to
-
-        If "real" is true, the effective value is returned.
-        """
-    def source_datatype(self, real: bool) -> int:
-        r"""
-        @brief Gets the stream datatype that the shapes are taken from
-
-        If the datatype is positive, the actual layer is looked up by this stream datatype. If a name or layer index is specified, the stream datatype is not used.
-
-        If "real" is true, the effective value is returned.
-        """
-    def source_layer(self, real: bool) -> int:
-        r"""
-        @brief Gets the stream layer that the shapes are taken from
-
-        If the layer is positive, the actual layer is looked up by this stream layer. If a name or layer index is specified, the stream layer is not used.
-
-        If "real" is true, the effective value is returned.
-        """
-    def source_layer_index(self, real: bool) -> int:
-        r"""
-        @brief Gets the layer index that the shapes are taken from
-
-        If the layer index is positive, the shapes drawn are taken from this layer rather than searched for by layer and datatype. This property is stronger than the layer/datatype or name specification.
-
-        A different method is \layer_index which indicates the ID of the layer actually used. While "source_layer_index" is one of several ways to address the layer drawn, "layer_index" is the ID (index) of the layer matching the source specification and is >= 0 if such a layer is found.
-
-        If "real" is true, the effective value is returned.
-        """
-    def source_name(self, real: bool) -> str:
-        r"""
-        @brief Gets the stream name that the shapes are taken from
-
-        If the name is non-empty, the actual layer is looked up by this stream layer name. If a layer index (see \layer_index) is specified, the stream datatype is not used.
-        A name is only meaningful for OASIS files.
-
-        If "real" is true, the effective value is returned.
-        """
-    def trans(self, real: bool) -> List[db.DCplxTrans]:
-        r"""
-        @brief Gets the transformations that the layer is transformed with
-
-        The transformations returned by this accessor is the one used for displaying this layer. The layout is transformed with each of these transformations before it is drawn.
-
-        If "real" is true, the effective value is returned.
-        """
-    def transparent(self, real: bool) -> bool:
-        r"""
-        @brief Gets the transparency state
-        """
-    def upper_hier_level(self, real: bool) -> int:
-        r"""
-        @brief Gets the upper hierarchy level shown
-
-        This is the hierarchy level at which the drawing starts. This property is only meaningful, if \has_upper_hier_level is true. The hierarchy level can be relative in which case, 0 refers to the context cell's level. A mode can be specified for the hierarchy level which is 0 for absolute, 1 for minimum of specified level and set level and 2 for maximum of specified level and set level. 
         """
     @overload
     def upper_hier_level_mode(self) -> int:
@@ -2195,24 +2063,6 @@ class LayerProperties:
         See \upper_hier_level for a description of this property.
 
         This method has been introduced in version 0.19.
-        """
-    def valid(self, real: bool) -> bool:
-        r"""
-        @brief Gets the validity state
-        """
-    def visible(self, real: bool) -> bool:
-        r"""
-        @brief Gets the visibility state
-        """
-    def width(self, real: bool) -> int:
-        r"""
-        @brief Gets the line width
-        """
-    def xfill(self, real: bool) -> bool:
-        r"""
-        @brief Gets a value indicating whether shapes are drawn with a cross
-
-        This attribute has been introduced in version 0.25.
         """
 
 class LayerPropertiesNode(LayerProperties):
@@ -12874,14 +12724,6 @@ class MainWindow(QMainWindow_Native):
         If 'cat' is given, this category will be selected in the category tab. If 'add' is true, the 'new macro' dialog will be opened.
 
         This method has been introduced in version 0.26.
-        """
-    def synchronous(self, sync_mode: bool) -> None:
-        r"""
-        @brief Puts the main window into synchronous mode
-
-        @param sync_mode 'true' if the application should behave synchronously
-
-        In synchronous mode, an application is allowed to block on redraw. While redrawing, no user interactions are possible. Although this is not desirable for smooth operation, it can be beneficial for test or automation purposes, i.e. if a screenshot needs to be produced once the application has finished drawing.
         """
     def view(self, n: int) -> LayoutView:
         r"""

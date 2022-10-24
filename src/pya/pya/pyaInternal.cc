@@ -715,6 +715,15 @@ MethodTable::finish ()
 {
   for (std::vector<MethodTableEntry>::iterator m = m_table.begin (); m != m_table.end (); ++m) {
     m->finish ();
+    if (m->is_enabled ()) {
+      //  disable methods which are also present as properties
+      if (m_property_name_map.find (std::make_pair (m->is_static (), m->name ())) != m_property_name_map.end ()) {
+        m->set_enabled (false);
+        for (auto i = m->begin (); i != m->end (); ++i) {
+          mp_module->add_python_doc (*i, tl::to_string (tr ("This method is not available for Python")));
+        }
+      }
+    }
   }
   for (std::vector<std::pair<MethodTableEntry, MethodTableEntry> >::iterator m = m_property_table.begin (); m != m_property_table.end (); ++m) {
     m->first.finish ();

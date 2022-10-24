@@ -539,7 +539,7 @@ MethodTable::add_setter (const std::string &name, const gsi::MethodBase *setter)
     std::string new_name = name + "_";
 
     add_setter_basic (new_name, setter);
-    mp_module->add_python_doc (setter, tl::sprintf (tl::to_string (tr ("This attribute setter is available as '%s' in Python")), new_name));
+    mp_module->add_python_doc (setter, tl::sprintf (tl::to_string (tr ("This member is available as '%s' in Python")), new_name));
 
   } else {
     add_setter_basic (name, setter);
@@ -573,7 +573,7 @@ MethodTable::add_getter (const std::string &name, const gsi::MethodBase *getter)
     std::string new_name = name + "_";
 
     add_getter_basic (new_name, getter);
-    mp_module->add_python_doc (getter, tl::sprintf (tl::to_string (tr ("This attribute getter is available as '%s' in Python")), new_name));
+    mp_module->add_python_doc (getter, tl::sprintf (tl::to_string (tr ("This member is available as '%s' in Python")), new_name));
 
   } else {
     add_getter_basic (name, getter);
@@ -719,9 +719,6 @@ MethodTable::finish ()
       //  disable methods which are also present as properties
       if (m_property_name_map.find (std::make_pair (m->is_static (), m->name ())) != m_property_name_map.end ()) {
         m->set_enabled (false);
-        for (auto i = m->begin (); i != m->end (); ++i) {
-          mp_module->add_python_doc (*i, tl::to_string (tr ("This method is not available for Python")));
-        }
       }
     }
   }

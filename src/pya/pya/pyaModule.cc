@@ -191,16 +191,16 @@ void
 PythonModule::add_python_doc (const gsi::ClassBase & /*cls*/, const MethodTable *mt, int mid, const std::string &doc)
 {
   for (MethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
-    std::string &doc_string = m_python_doc [*m];
-    doc_string += doc;
-    doc_string += "\n\n";
+    add_python_doc (*m, doc);
   }
 }
 
 void
 PythonModule::add_python_doc (const gsi::MethodBase *m, const std::string &doc)
 {
-  m_python_doc [m] += doc;
+  std::string &doc_string = m_python_doc [m];
+  doc_string += doc;
+  doc_string += ".\n\n";
 }
 
 std::string
@@ -394,7 +394,7 @@ public:
             doc += "\n\n";
           }
           doc += (*m)->doc ();
-          mp_module->add_python_doc (*m, tl::sprintf (tl::to_string (tr ("The object exposes a readable attribute '%s'. This is the getter.\n\n")), name));
+          mp_module->add_python_doc (*m, tl::sprintf (tl::to_string (tr ("The object exposes a readable attribute '%s'. This is the getter")), name));
         }
 
         for (MethodTableEntry::method_iterator m = begin_setters; m != end_setters; ++m) {
@@ -402,7 +402,7 @@ public:
             doc += "\n\n";
           }
           doc += (*m)->doc ();
-          mp_module->add_python_doc (*m, tl::sprintf (tl::to_string (tr ("The object exposes a writable attribute '%s'. This is the setter.\n\n")), name));
+          mp_module->add_python_doc (*m, tl::sprintf (tl::to_string (tr ("The object exposes a writable attribute '%s'. This is the setter")), name));
         }
 
         PythonRef attr;

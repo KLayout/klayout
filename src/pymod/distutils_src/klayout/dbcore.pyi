@@ -27898,11 +27898,12 @@ class Shape:
     TUserObject: ClassVar[int]
     r"""
     """
-    box: bool
+    box: Any
     r"""
     Getter:
-    @brief Returns true if the shape is a box
+    @brief Gets the box object
 
+    Starting with version 0.23, this method returns nil, if the shape does not represent a box.
     Setter:
     @brief Replaces the shape by the given box (in micrometer units)
     This method replaces the shape by the given box, like \box= with a \Box argument does. This version translates the box from micrometer units to database units internally.
@@ -28194,21 +28195,22 @@ class Shape:
 
     This method has been introduced in version 0.25.
     """
-    edge: bool
+    edge: Any
     r"""
     Getter:
-    @brief Returns true, if the object is an edge
+    @brief Returns the edge object
 
+    Starting with version 0.23, this method returns nil, if the shape does not represent an edge.
     Setter:
     @brief Replaces the shape by the given edge (in micrometer units)
     This method replaces the shape by the given edge, like \edge= with a \Edge argument does. This version translates the edge from micrometer units to database units internally.
 
     This method has been introduced in version 0.25.
     """
-    edge_pair: bool
+    edge_pair: Any
     r"""
     Getter:
-    @brief Returns true, if the object is an edge pair
+    @brief Returns the edge pair object
 
     This method has been introduced in version 0.26.
     Setter:
@@ -28244,11 +28246,12 @@ class Shape:
 
     This method has been added in version 0.23.
     """
-    path: bool
+    path: Any
     r"""
     Getter:
-    @brief Returns true, if the shape is a path
+    @brief Returns the path object
 
+    Starting with version 0.23, this method returns nil, if the shape does not represent a path.
     Setter:
     @brief Replaces the shape by the given path object
     This method replaces the shape by the given path object. This method can only be called for editable layouts. It does not change the user properties of the shape.
@@ -28338,12 +28341,15 @@ class Shape:
 
     This method has been introduced in version 0.23.
     """
-    polygon: bool
+    polygon: Any
     r"""
     Getter:
-    @brief Returns true, if the shape is a polygon
+    @brief Returns the polygon object
 
-    This method returns true only if the object is a polygon or a simple polygon. Other objects can convert to polygons, for example paths, so it may be possible to use the \polygon method also if is_polygon? does not return true.
+    Returns the polygon object that this shape refers to or converts the object to a polygon. Paths, boxes and simple polygons are converted to polygons. For paths this operation renders the path's hull contour.
+
+    Starting with version 0.23, this method returns nil, if the shape does not represent a geometrical primitive that can be converted to a polygon.
+
     Setter:
     @brief Replaces the shape by the given polygon object
     This method replaces the shape by the given polygon object. This method can only be called for editable layouts. It does not change the user properties of the shape.
@@ -28379,12 +28385,14 @@ class Shape:
 
     This method has been introduced in version 0.23.
     """
-    simple_polygon: bool
+    simple_polygon: Any
     r"""
     Getter:
-    @brief Returns true, if the shape is a simple polygon
+    @brief Returns the simple polygon object
 
-    This method returns true only if the object is a simple polygon. The simple polygon identity is contained in the polygon identity, so usually it is sufficient to use \is_polygon? and \polygon instead of specifically handle simply polygons. This method is provided only for specific optimisation purposes.
+    Returns the simple polygon object that this shape refers to or converts the object to a simple polygon. Paths, boxes and polygons are converted to simple polygons. Polygons with holes will have their holes removed but introducing cut lines that connect the hole contours with the outer contour. 
+    Starting with version 0.23, this method returns nil, if the shape does not represent a geometrical primitive that can be converted to a simple polygon.
+
     Setter:
     @brief Replaces the shape by the given simple polygon object
     This method replaces the shape by the given simple polygon object. This method can only be called for editable layouts. It does not change the user properties of the shape.
@@ -28392,11 +28400,12 @@ class Shape:
 
     This method has been introduced in version 0.22.
     """
-    text: bool
+    text: Any
     r"""
     Getter:
-    @brief Returns true, if the object is a text
+    @brief Returns the text object
 
+    Starting with version 0.23, this method returns nil, if the shape does not represent a text.
     Setter:
     @brief Replaces the shape by the given text object
     This method replaces the shape by the given text object. This method can only be called for editable layouts. It does not change the user properties of the shape.

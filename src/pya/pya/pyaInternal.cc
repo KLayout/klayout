@@ -167,19 +167,33 @@ MethodTable::MethodTable (const gsi::ClassBase *cls_decl, PythonModule *module)
             //  static methods without arguments which start with a capital letter are treated as constants
             add_getter (syn->name, *m);
           } else {
-            if (syn->is_predicate && std::string (syn->name, 0, 3) == "is_") {
-              std::string n = std::string (syn->name, 3, std::string::npos);
-              if (is_property_setter (st, n) && ! is_property_getter (st, n)) {
-                //  synthesize a getter from is_...? predicates (e.g. is_empty? -> empty getter)
-                add_getter (n, *m);
-              }
-            }
             add_method (syn->name, *m);
           }
         }
       }
 
     }
+  }
+
+  //  synthesize a getter from is_...? predicates (e.g. is_empty? -> empty getter)
+  for (gsi::ClassBase::method_iterator m = cls_decl->begin_methods (); m != cls_decl->end_methods (); ++m) {
+
+    if (! (*m)->is_callback () && ! (*m)->is_signal ()) {
+
+      bool st = (*m)->is_static ();
+      bool no_args = ((*m)->end_arguments () == (*m)->begin_arguments ());
+
+      for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
+        if (no_args && ! syn->is_getter && ! syn->is_setter && syn->is_predicate && std::string (syn->name, 0, 3) == "is_") {
+          std::string n = std::string (syn->name, 3, std::string::npos);
+          if (is_property_setter (st, n) && ! is_property_getter (st, n)) {
+            add_getter (n, *m);
+          }
+        }
+      }
+
+    }
+
   }
 }
 

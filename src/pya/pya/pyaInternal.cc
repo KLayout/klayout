@@ -250,6 +250,45 @@ MethodTable::is_property_getter (bool st, const std::string &name)
 }
 
 /**
+ *  @brief Returns true, if the name is a reserved keyword
+ */
+static bool is_reserved_word (const std::string &name)
+{
+  return (name == "and" ||
+          name == "del" ||
+          name == "from" ||
+          name == "not" ||
+          name == "while" ||
+          name == "as" ||
+          name == "elif" ||
+          name == "global" ||
+          name == "or" ||
+          name == "with" ||
+          name == "assert" ||
+          name == "else" ||
+          name == "if" ||
+          name == "pass" ||
+          name == "yield" ||
+          name == "break" ||
+          name == "except" ||
+          name == "import" ||
+          name == "print" ||
+          name == "class" ||
+          name == "exec" ||
+          name == "in" ||
+          name == "raise" ||
+          name == "continue" ||
+          name == "finally" ||
+          name == "is" ||
+          name == "return" ||
+          name == "def" ||
+          name == "for" ||
+          name == "lambda" ||
+          name == "try" ||
+          name == "None");
+}
+
+/**
  *  @brief Extracts the Python name from a generic name
  *
  *  Returns an empty string if no Python name could be generated.
@@ -374,7 +413,19 @@ static std::string extract_python_name (const std::string &name)
 void
 MethodTable::add_method (const std::string &name, const gsi::MethodBase *mb)
 {
-  if (name == "new" && mb->ret_type ().type () == gsi::T_object && mb->ret_type ().pass_obj ()) {
+  if (is_reserved_word (name)) {
+
+    //  drop non-standard names
+    if (tl::verbosity () >= 20) {
+      tl::warn << tl::to_string (tr ("Class ")) << mp_cls_decl->name () << ": " << tl::to_string (tr ("no Python mapping for method (reserved word) ")) << name;
+    }
+
+    std::string new_name = name + "_";
+
+    add_method_basic (new_name, mb);
+    mp_module->add_python_doc (mb, tl::sprintf (tl::to_string (tr ("This attribute is available as '%s' in Python")), new_name));
+
+  } else if (name == "new" && mb->ret_type ().type () == gsi::T_object && mb->ret_type ().pass_obj ()) {
 
     add_method_basic (name, mb);
 
@@ -483,6 +534,21 @@ MethodTable::add_method (const std::string &name, const gsi::MethodBase *mb)
 void
 MethodTable::add_setter (const std::string &name, const gsi::MethodBase *setter)
 {
+  if (is_reserved_word (name)) {
+
+    std::string new_name = name + "_";
+
+    add_setter_basic (new_name, setter);
+    mp_module->add_python_doc (setter, tl::sprintf (tl::to_string (tr ("This attribute setter is available as '%s' in Python")), new_name));
+
+  } else {
+    add_setter_basic (name, setter);
+  }
+}
+
+void
+MethodTable::add_setter_basic (const std::string &name, const gsi::MethodBase *setter)
+{
   bool st = setter->is_static ();
 
   std::map<std::pair<bool, std::string>, size_t>::iterator n = m_property_name_map.find (std::make_pair (st, name));
@@ -501,6 +567,21 @@ MethodTable::add_setter (const std::string &name, const gsi::MethodBase *setter)
 
 void
 MethodTable::add_getter (const std::string &name, const gsi::MethodBase *getter)
+{
+  if (is_reserved_word (name)) {
+
+    std::string new_name = name + "_";
+
+    add_getter_basic (new_name, getter);
+    mp_module->add_python_doc (getter, tl::sprintf (tl::to_string (tr ("This attribute getter is available as '%s' in Python")), new_name));
+
+  } else {
+    add_getter_basic (name, getter);
+  }
+}
+
+void
+MethodTable::add_getter_basic (const std::string &name, const gsi::MethodBase *getter)
 {
   bool st = getter->is_static ();
 

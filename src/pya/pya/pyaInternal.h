@@ -278,6 +278,8 @@ private:
   PythonModule *mp_module;
 
   void add_method_basic (const std::string &name, const gsi::MethodBase *mb, bool enabled = true, bool init = false);
+  void add_setter_basic (const std::string &name, const gsi::MethodBase *setter);
+  void add_getter_basic (const std::string &name, const gsi::MethodBase *getter);
   bool is_property_setter (bool st, const std::string &name);
   bool is_property_getter (bool st, const std::string &name);
 };

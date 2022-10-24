@@ -54,49 +54,6 @@ set_type_attr (PyTypeObject *type, const std::string &name, PythonRef &attr)
 }
 
 // --------------------------------------------------------------------------
-//  Name conversion helpers
-
-/**
- *  @brief Returns true, if the name is a reserved keyword
- */
-static bool is_reserved_word (const std::string &name)
-{
-  return (name == "and" ||
-          name == "del" ||
-          name == "from" ||
-          name == "not" ||
-          name == "while" ||
-          name == "as" ||
-          name == "elif" ||
-          name == "global" ||
-          name == "or" ||
-          name == "with" ||
-          name == "assert" ||
-          name == "else" ||
-          name == "if" ||
-          name == "pass" ||
-          name == "yield" ||
-          name == "break" ||
-          name == "except" ||
-          name == "import" ||
-          name == "print" ||
-          name == "class" ||
-          name == "exec" ||
-          name == "in" ||
-          name == "raise" ||
-          name == "continue" ||
-          name == "finally" ||
-          name == "is" ||
-          name == "return" ||
-          name == "def" ||
-          name == "for" ||
-          name == "lambda" ||
-          name == "try" ||
-          name == "None");
-}
-
-
-// --------------------------------------------------------------------------
 //  The PythonModule implementation
 
 std::map<const gsi::MethodBase *, std::string> PythonModule::m_python_doc;
@@ -510,18 +467,6 @@ public:
             name = "_inst_" + name;
           }
 
-          mp_module->add_python_doc (*cls, mt, int (mid), tl::sprintf (tl::to_string (tr ("This attribute is available as '%s' in Python")), name));
-
-        } else if (is_reserved_word (name)) {
-
-          //  drop non-standard names
-          if (tl::verbosity () >= 20) {
-            tl::warn << tl::to_string (tr ("Class ")) << cls->name () << ": " << tl::to_string (tr ("no Python mapping for method (reserved word) ")) << name;
-          }
-
-          name += "_";
-
-          mt->rename (mid, name);
           mp_module->add_python_doc (*cls, mt, int (mid), tl::sprintf (tl::to_string (tr ("This attribute is available as '%s' in Python")), name));
 
         }

@@ -888,10 +888,10 @@ LayoutViewConfigPage4::update ()
 #endif
 
     QPainter painter (&img);
-    painter.setPen (QPen (palette ().color (QPalette::Active, QPalette::Text), 1.0 / dpr));
-    painter.setBrush (QBrush (color));
-    QRectF r (0, 0, w - painter.pen ().widthF (), h - painter.pen ().widthF ());
-    painter.drawRect (r);
+    QRectF r (0.0, 0.0, w, h);
+    painter.fillRect (r, QBrush (palette ().color (QPalette::Active, QPalette::ButtonText)));
+    r = QRectF (1.0, 1.0, w - 2.0, h - 2.0);
+    painter.fillRect (r, QBrush (color));
     painter.setFont (font ());
     painter.setPen (QPen (text_color));
     painter.drawText (r, Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine, text);
@@ -1476,6 +1476,10 @@ LayoutViewConfigPage7::setup (lay::Dispatcher *root)
   root->config_get (cfg_bitmap_oversampling, oversampling);
   mp_ui->oversampling->setCurrentIndex (oversampling - 1);
 
+  bool highres_mode = false;
+  root->config_get (cfg_highres_mode, highres_mode);
+  mp_ui->highres_mode->setChecked (highres_mode);
+
   int default_font_size = 0;
   root->config_get (cfg_default_font_size, default_font_size);
   mp_ui->default_font_size->setCurrentIndex (default_font_size);
@@ -1499,6 +1503,7 @@ void
 LayoutViewConfigPage7::commit (lay::Dispatcher *root)
 {
   root->config_set (cfg_bitmap_oversampling, mp_ui->oversampling->currentIndex () + 1);
+  root->config_set (cfg_highres_mode, mp_ui->highres_mode->isChecked ());
   root->config_set (cfg_default_font_size, mp_ui->default_font_size->currentIndex ());
   root->config_set (cfg_global_trans, db::DCplxTrans (db::DFTrans (mp_ui->global_trans->currentIndex ())).to_string ());
   root->config_set (cfg_initial_hier_depth, mp_ui->def_depth->value ());

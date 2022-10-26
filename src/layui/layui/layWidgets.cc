@@ -860,6 +860,40 @@ const char *color_icon =
   "xxxxE44ExxD33Dxxxx"
   "xxxxxeexxxxddxxxxx";
 
+const char *color_icon_2x =
+  "xxxxxxxxxxaaaaxxxxxxxxbbbbxxxxxxxxxx"
+  "xxxxxxxxxA0000AxxxxxxB1111Bxxxxxxxxx"
+  "xxxxxxxxA000000AxxxxB111111Bxxxxxxxx"
+  "xxxxxxxA00000000AxxB11111111Bxxxxxxx"
+  "xxxxxxa0000000000ab1111111111bxxxxxx"
+  "xxxxxxa0000000000ab1111111111bxxxxxx"
+  "xxxxxxa0000000000ab1111111111bxxxxxx"
+  "xxxxxxa0000000000ab1111111111bxxxxxx"
+  "xxxxxxxA00000000AxxB11111111Bxxxxxxx"
+  "xxxxxxxxA000000AxxxxB111111Bxxxxxxxx"
+  "xxxxffffxA0000AxxxxxxB1111Bxccccxxxx"
+  "xxxF5555FxaaaaxxxxxxxxbbbbxC2222Cxxx"
+  "xxF555555FxxxxxxxxxxxxxxxxC222222Cxx"
+  "xF55555555FxxxxxxxxxxxxxxC22222222Cx"
+  "f5555555555fxxxxxxxxxxxxc2222222222c"
+  "f5555555555fxxxxxxxxxxxxc2222222222c"
+  "f5555555555fxxxxxxxxxxxxc2222222222c"
+  "f5555555555fxxxxxxxxxxxxc2222222222c"
+  "xF55555555FxxxxxxxxxxxxxxC22222222Cx"
+  "xxF555555FxxxxxxxxxxxxxxxxC222222Cxx"
+  "xxxF5555FxeeeexxxxxxxxddddxC2222Cxxx"
+  "xxxxffffxE4444ExxxxxxD3333Dxccccxxxx"
+  "xxxxxxxxE444444ExxxxD333333Dxxxxxxxx"
+  "xxxxxxxE44444444ExxD33333333Dxxxxxxx"
+  "xxxxxxe4444444444ed3333333333dxxxxxx"
+  "xxxxxxe4444444444ed3333333333dxxxxxx"
+  "xxxxxxe4444444444ed3333333333dxxxxxx"
+  "xxxxxxe4444444444ed3333333333dxxxxxx"
+  "xxxxxxxE44444444ExxD33333333Dxxxxxxx"
+  "xxxxxxxxE444444ExxxxD333333Dxxxxxxxx"
+  "xxxxxxxxxE4444ExxxxxxD3333Dxxxxxxxxx"
+  "xxxxxxxxxxeeeexxxxxxxxddddxxxxxxxxxx";
+
 void
 ColorButton::build_color_menu (QMenu *menu, QObject *receiver, const char *browse_slot, const char *selected_slot)
 {
@@ -898,10 +932,18 @@ ColorButton::build_color_menu (QMenu *menu, QObject *receiver, const char *brows
           codes.insert (std::make_pair ('A' + j, c));
         }
 
-        QImage icon (18, 16, QImage::Format_ARGB32);
-        const char *cp = color_icon;
-        for (int y = 0; y < 16; ++y) {
-          for (int x = 0; x < 18; ++x) {
+        int dpr = 1;
+#if QT_VERSION >= 0x50000
+        dpr = (menu->devicePixelRatio () >= 2.0) ? 2 : 1;
+#endif
+
+        QImage icon (18 * dpr, 16 * dpr, QImage::Format_ARGB32);
+#if QT_VERSION >= 0x50000
+        icon.setDevicePixelRatio (menu->devicePixelRatio ());
+#endif
+        const char *cp = dpr > 1 ? color_icon_2x : color_icon;
+        for (int y = 0; y < icon.height (); ++y) {
+          for (int x = 0; x < icon.width (); ++x) {
             icon.setPixel (x, y, codes [*cp].rgba ());
             ++cp;
           }
@@ -915,6 +957,9 @@ ColorButton::build_color_menu (QMenu *menu, QObject *receiver, const char *brows
       std::string name = tl::sprintf ("#%d", i + 1);
 
       QPixmap icon (16, 16);
+#if QT_VERSION >= 0x50000
+      icon.setDevicePixelRatio (menu->devicePixelRatio ());
+#endif
       icon.fill (color);
 
       submenu->addAction (QIcon (icon), tl::to_qstring (name), receiver, selected_slot)->setData (QVariant (color));
@@ -949,7 +994,16 @@ ColorButton::set_color_internal (QColor c)
 
   QPushButton::setIconSize (QSize (rt.width (), rt.height ()));
 
-  QPixmap pixmap (rt.width (), rt.height ());
+#if QT_VERSION >= 0x050000
+  double dpr = devicePixelRatio ();
+#else
+  double dpr = 1.0;
+#endif
+
+  QPixmap pixmap (rt.width () * dpr, rt.height () * dpr);
+#if QT_VERSION >= 0x50000
+  pixmap.setDevicePixelRatio (dpr);
+#endif
   pixmap.fill (QColor (0, 0, 0, 0));
 
   QColor text_color = palette ().color (QPalette::Active, QPalette::Text);
@@ -959,13 +1013,13 @@ ColorButton::set_color_internal (QColor c)
   if (! m_color.isValid ()) {
 
     pxpainter.setFont (font ());
-    QRect r (0, 0, pixmap.width () - 1, pixmap.height () - 1);
+    QRectF r (0, 0, rt.width () - pxpainter.pen ().widthF (), rt.height () - pxpainter.pen ().widthF ());
     pxpainter.drawText (r, Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine, QObject::tr ("Auto"));
 
   } else {
 
     pxpainter.setBrush (QBrush (c));
-    QRect r (0, 0, pixmap.width () - 1, pixmap.height () - 1);
+    QRectF r (0, 0, rt.width () - pxpainter.pen ().widthF (), rt.height () - pxpainter.pen ().widthF ());
     pxpainter.drawRect (r);
 
   }

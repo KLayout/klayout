@@ -63,8 +63,8 @@ TwoColorWidget::TwoColorWidget (QWidget *parent)
   mp_lock->setIconSize (QSize (16, 16));
 
   QIcon icon;
-  icon.addFile (":/locked_16.png", QSize (), QIcon::Normal, QIcon::On);
-  icon.addFile (":/unlocked_16.png", QSize (), QIcon::Normal, QIcon::Off);
+  icon.addFile (":/locked_16px.png", QSize (), QIcon::Normal, QIcon::On);
+  icon.addFile (":/unlocked_16px.png", QSize (), QIcon::Normal, QIcon::Off);
   mp_lock->setIcon (icon);
 
   connect (mp_left, SIGNAL (color_changed (QColor)), this, SLOT (lcolor_changed (QColor)));

@@ -76,6 +76,7 @@
     <li><b>X:</b> The horizontal extension of the ruler in micron units.</li>
     <li><b>Y:</b> The vertical extension of the ruler in micron units.</li>
     <li><b>A:</b> The area enclosed by the ruler (if it was a box) in square millimeters.</li>
+    <li><b>G:</b> The angle enclosed by the first and last segment of the ruler (used for angle measurement rulers).</li>
   </ul>
 
 </doc>

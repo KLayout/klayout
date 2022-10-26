@@ -47,12 +47,10 @@ public:
   InstPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
   ~InstPropertiesPage ();
 
-  virtual void back ();
-  virtual void front ();
-  virtual bool at_begin () const;
-  virtual bool at_end () const;
-  virtual void operator-- ();
-  virtual void operator++ ();
+  virtual size_t count () const;
+  virtual void select_entries (const std::vector<size_t> &entries);
+  virtual std::string description (size_t entry) const;
+  virtual std::string description () const;
   virtual void leave ();
 
 private:
@@ -61,7 +59,7 @@ private:
 
 protected:
   std::vector<edt::Service::obj_iterator> m_selection_ptrs;
-  unsigned int m_index;
+  std::vector<size_t> m_indexes;
   edt::Service *mp_service;
   bool m_enable_cb_callback;
   db::properties_id_type m_prop_id;

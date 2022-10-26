@@ -43,15 +43,14 @@ namespace edt
 // -------------------------------------------------------------------------
 //  ShapePropertiesPage implementation
 
-ShapePropertiesPage::ShapePropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
+ShapePropertiesPage::ShapePropertiesPage (const std::string &description, edt::Service *service, db::Manager *manager, QWidget *parent)
   : lay::PropertiesPage (parent, manager, service),
-    mp_service (service), m_enable_cb_callback (true)
+    m_description (description), mp_service (service), m_enable_cb_callback (true)
 {
   m_selection_ptrs.reserve (service->selection ().size ());
   for (edt::Service::obj_iterator s = service->selection ().begin (); s != service->selection ().end (); ++s) {
     m_selection_ptrs.push_back (s);
   }
-  m_index = 0;
   m_prop_id = 0;
   mp_service->clear_highlights ();
 }
@@ -73,43 +72,78 @@ ShapePropertiesPage::setup ()
   m_enable_cb_callback = true;
 }
 
-void 
-ShapePropertiesPage::back ()
+size_t
+ShapePropertiesPage::count () const
 {
-  m_index = (unsigned int) m_selection_ptrs.size ();
+  return m_selection_ptrs.size ();
 }
 
-void 
-ShapePropertiesPage::front ()
+void
+ShapePropertiesPage::select_entries (const std::vector<size_t> &entries)
 {
-  m_index = 0;
+  m_indexes = entries;
 }
 
-bool 
-ShapePropertiesPage::at_begin () const
+lay::LayoutViewBase *
+ShapePropertiesPage::view () const
 {
-  return (m_index == 0);
+  return mp_service->view ();
 }
 
-bool 
-ShapePropertiesPage::at_end () const
+const db::Shape &
+ShapePropertiesPage::shape (size_t entry) const
 {
-  return (m_index == m_selection_ptrs.size ());
+  return m_selection_ptrs [entry]->shape ();
 }
 
-void 
-ShapePropertiesPage::operator-- ()
+double
+ShapePropertiesPage::dbu (size_t entry) const
 {
-  --m_index;
+  unsigned int cv_index = m_selection_ptrs [entry]->cv_index ();
+  return view ()->cellview (cv_index)->layout ().dbu ();
 }
 
-void 
-ShapePropertiesPage::operator++ ()
+std::string
+ShapePropertiesPage::description (size_t entry) const
 {
-  ++m_index;
+  unsigned int cv_index = m_selection_ptrs [entry]->cv_index ();
+  unsigned int layer = m_selection_ptrs [entry]->layer ();
+
+  if (view ()->cellview (cv_index).is_valid ()) {
+    const db::LayerProperties &lp = view ()->cellview (cv_index)->layout ().get_properties (layer);
+    if (view ()->cellviews () > 1) {
+      return lp.to_string () + "@" + tl::to_string (cv_index + 1);
+    } else {
+      return lp.to_string ();
+    }
+  }
+
+  return std::string ();
 }
 
-void 
+QIcon
+ShapePropertiesPage::icon (size_t entry, int w, int h) const
+{
+  int cv_index = m_selection_ptrs [entry]->cv_index ();
+  int layer = m_selection_ptrs [entry]->layer ();
+
+  auto *view = mp_service->view ();
+  for (auto lp = view->begin_layers (view->current_layer_list ()); ! lp.at_end (); ++lp) {
+    const lay::LayerPropertiesNode *ln = lp.operator-> ();
+    if (ln->cellview_index () == cv_index && ln->layer_index () == layer) {
+      return QIcon (QPixmap::fromImage (view->icon_for_layer (lp, w, h).to_image ()));
+    }
+  }
+
+  return QIcon ();
+}
+std::string
+ShapePropertiesPage::description () const
+{
+  return m_description;
+}
+
+void
 ShapePropertiesPage::leave ()
 {
   mp_service->clear_highlights ();
@@ -130,8 +164,8 @@ ShapePropertiesPage::abs_trans () const
 db::ICplxTrans
 ShapePropertiesPage::trans () const
 {
-  if (abs_trans ()) {
-    return m_selection_ptrs[m_index]->trans ();
+  if (abs_trans () && ! m_indexes.empty ()) {
+    return m_selection_ptrs[m_indexes.front ()]->trans ();
   } else {
     return db::ICplxTrans ();
   }
@@ -154,7 +188,7 @@ END_PROTECTED
 void 
 ShapePropertiesPage::update ()
 {
-  mp_service->highlight (m_index);
+  mp_service->highlight (m_indexes);
 
   update_shape ();
 }
@@ -179,12 +213,16 @@ ShapePropertiesPage::recompute_selection_ptrs (const std::vector<lay::ObjectInst
 void 
 ShapePropertiesPage::do_apply (bool current_only, bool relative)
 {
+  if (m_indexes.empty ()) {
+    return;
+  }
+
   std::unique_ptr<ChangeApplicator> applicator;
 
-  unsigned int cv_index = m_selection_ptrs [m_index]->cv_index ();
+  unsigned int cv_index = m_selection_ptrs [m_indexes.front ()]->cv_index ();
 
   {
-    edt::Service::obj_iterator pos = m_selection_ptrs [m_index];
+    edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
     tl_assert (! pos->is_cell_inst ());
 
     const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
@@ -213,7 +251,7 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative)
   //  But it avoids issues with duplicate selections of the same shape which may happen when
   //  a shape is selected multiple times through different hierarchy branches.
 
-  db::Shape current = m_selection_ptrs [m_index]->shape ();
+  db::Shape current = m_selection_ptrs [m_indexes.front ()]->shape ();
 
   std::vector<lay::ObjectInstPath> new_sel;
   new_sel.reserve (m_selection_ptrs.size ());
@@ -227,11 +265,10 @@ ShapePropertiesPage::do_apply (bool current_only, bool relative)
 
   try {
 
-    for (std::vector<edt::Service::obj_iterator>::const_iterator p = m_selection_ptrs.begin (); p != m_selection_ptrs.end (); ++p) {
+    for (auto i = m_indexes.begin (); i != m_indexes.end (); ++i) {
 
-      size_t index = p - m_selection_ptrs.begin ();
-
-      edt::Service::obj_iterator pos = *p;
+      size_t index = *i;
+      edt::Service::obj_iterator pos = m_selection_ptrs [*i];
 
       //  only update objects from the same layout - this is not practical limitation but saves a lot of effort for
       //  managing different property id's etc.
@@ -329,7 +366,11 @@ ShapePropertiesPage::apply_to_all (bool relative)
 void 
 ShapePropertiesPage::update_shape ()
 {
-  edt::Service::obj_iterator pos = m_selection_ptrs [m_index];
+  if (m_indexes.empty ()) {
+    return;
+  }
+
+  edt::Service::obj_iterator pos = m_selection_ptrs [m_indexes.front ()];
 
   const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
   double dbu = cv->layout ().dbu ();
@@ -361,15 +402,23 @@ ShapePropertiesPage::update_shape ()
 void
 ShapePropertiesPage::show_inst ()
 {
+  if (m_indexes.empty ()) {
+    return;
+  }
+
   InstantiationForm inst_form (this);
-  inst_form.show (mp_service->view (), *m_selection_ptrs [m_index]);
+  inst_form.show (mp_service->view (), *m_selection_ptrs [m_indexes.front ()]);
 }
 
 void
 ShapePropertiesPage::show_props ()
 {
+  if (m_indexes.empty ()) {
+    return;
+  }
+
   lay::UserPropertiesForm props_form (this);
-  if (props_form.show (mp_service->view (), m_selection_ptrs [m_index]->cv_index (), m_prop_id)) {
+  if (props_form.show (mp_service->view (), m_selection_ptrs [m_indexes.front ()]->cv_index (), m_prop_id)) {
     emit edited ();
   }
 }
@@ -384,7 +433,7 @@ ShapePropertiesPage::readonly ()
 //  PolygonPropertiesPage implementation
 
 PolygonPropertiesPage::PolygonPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
-  : ShapePropertiesPage (service, manager, parent), m_in_text_changed (false)
+  : ShapePropertiesPage (tl::to_string (tr ("Polygons")), service, manager, parent), m_in_text_changed (false)
 {
   setupUi (this);
   setup ();
@@ -405,7 +454,34 @@ PolygonPropertiesPage::PolygonPropertiesPage (edt::Service *service, db::Manager
   }
 }
 
-void 
+static size_t count_polygon_points (const db::Shape &sh)
+{
+  size_t n = 0;
+  for (auto pt = sh.begin_hull (); pt != sh.end_hull (); ++pt) {
+    ++n;
+  }
+  return n;
+}
+
+std::string
+PolygonPropertiesPage::description (size_t entry) const
+{
+  const db::Shape &sh = shape (entry);
+
+  size_t npts = count_polygon_points (sh);
+  if (sh.holes () == 0 && npts > 4) {
+    return ShapePropertiesPage::description (entry) + " - " + tl::sprintf (tl::to_string (tr ("Polygon(%d points)")), npts);
+  } else if (sh.holes () > 0) {
+    return ShapePropertiesPage::description (entry) + " - " + tl::sprintf (tl::to_string (tr ("Polygon(%d points, %d holes)")), npts, sh.holes ());
+  } else {
+    db::Polygon poly;
+    sh.polygon (poly);
+    db::CplxTrans dbu_trans (dbu (entry));
+    return ShapePropertiesPage::description (entry) + " - " + tl::sprintf (tl::to_string (tr ("Polygon%s")), (dbu_trans * poly).to_string ());
+  }
+}
+
+void
 PolygonPropertiesPage::do_update (const db::Shape &shape, double dbu, const std::string &lname)
 {
   layer_lbl->setText (tl::to_qstring (lname));
@@ -536,7 +612,7 @@ PolygonPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Sha
 static bool s_coordinateMode = true;
 
 BoxPropertiesPage::BoxPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
-  : ShapePropertiesPage (service, manager, parent),
+  : ShapePropertiesPage (tl::to_string (tr ("Boxes")), service, manager, parent),
     m_recursion_sentinel (false), m_tab_index (0), m_dbu (1.0), m_lr_swapped (false), m_tb_swapped (false)
 {
   setupUi (this);
@@ -571,6 +647,14 @@ BoxPropertiesPage::BoxPropertiesPage (edt::Service *service, db::Manager *manage
 
   connect (inst_pb, SIGNAL (clicked ()), this, SLOT (show_inst ()));
   connect (prop_pb, SIGNAL (clicked ()), this, SLOT (show_props ()));
+}
+
+std::string
+BoxPropertiesPage::description (size_t entry) const
+{
+  const db::Shape &sh = shape (entry);
+  db::CplxTrans dbu_trans (dbu (entry));
+  return ShapePropertiesPage::description (entry) + " - " + tl::sprintf (tl::to_string (tr ("Box%s")), (dbu_trans * sh.box ()).to_string ());
 }
 
 void 
@@ -773,7 +857,7 @@ BoxPropertiesPage::changed ()
 //  TextPropertiesPage implementation
 
 TextPropertiesPage::TextPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
-  : ShapePropertiesPage (service, manager, parent)
+  : ShapePropertiesPage (tl::to_string (tr ("Texts")), service, manager, parent)
 {
   setupUi (this);
   setup ();
@@ -804,7 +888,17 @@ TextPropertiesPage::TextPropertiesPage (edt::Service *service, db::Manager *mana
   }
 }
 
-void 
+std::string
+TextPropertiesPage::description (size_t entry) const
+{
+  const db::Shape &sh = shape (entry);
+  db::Text text;
+  sh.text (text);
+  db::CplxTrans dbu_trans (dbu (entry));
+  return ShapePropertiesPage::description (entry) + " - " + tl::sprintf (tl::to_string (tr ("Text%s")), (dbu_trans * text).to_string ());
+}
+
+void
 TextPropertiesPage::do_update (const db::Shape &shape, double dbu, const std::string &lname)
 {
   layer_lbl->setText (tl::to_qstring (lname));
@@ -907,7 +1001,7 @@ TextPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape 
 //  PathPropertiesPage implementation
 
 PathPropertiesPage::PathPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
-  : ShapePropertiesPage (service, manager, parent), m_in_text_changed (false)
+  : ShapePropertiesPage (tl::to_string (tr ("Paths")), service, manager, parent), m_in_text_changed (false)
 {
   setupUi (this);
   setup ();
@@ -926,6 +1020,34 @@ PathPropertiesPage::PathPropertiesPage (edt::Service *service, db::Manager *mana
   start_ext_le->setReadOnly (true);
   end_ext_le->setReadOnly (true);
   round_cb->setEnabled (false);
+}
+
+static size_t count_path_points (const db::Shape &sh)
+{
+  size_t n = 0;
+  for (auto pt = sh.begin_point (); pt != sh.end_point (); ++pt) {
+    ++n;
+  }
+  return n;
+}
+
+static std::string path_description (const db::Shape &sh, double dbu)
+{
+  size_t npts = count_path_points (sh);
+  if (npts > 4) {
+    return tl::sprintf (tl::to_string (tr ("Path(%d points, w=%.12g)")), npts, sh.path_width () * dbu);
+  } else {
+    db::CplxTrans dbu_trans (dbu);
+    db::Path path;
+    sh.path (path);
+    return tl::sprintf (tl::to_string (tr ("Path%s")), (dbu_trans * path).to_string ());
+  }
+}
+
+std::string
+PathPropertiesPage::description (size_t entry) const
+{
+  return ShapePropertiesPage::description (entry) + " - " + path_description (shape (entry), dbu (entry));
 }
 
 void
@@ -974,7 +1096,7 @@ PathPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape 
 //  EditablePathPropertiesPage implementation
 
 EditablePathPropertiesPage::EditablePathPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
-  : ShapePropertiesPage (service, manager, parent), m_in_text_changed (false)
+  : ShapePropertiesPage (tl::to_string (tr ("Paths")), service, manager, parent), m_in_text_changed (false)
 {
   setupUi (this);
   setup ();
@@ -1024,6 +1146,12 @@ EditablePathPropertiesPage::text_changed ()
     //  ignore exceptions
   }
   m_in_text_changed = false;
+}
+
+std::string
+EditablePathPropertiesPage::description (size_t entry) const
+{
+  return ShapePropertiesPage::description (entry) + " - " + path_description (shape (entry), dbu (entry));
 }
 
 void

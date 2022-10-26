@@ -295,6 +295,30 @@ Class<db::NetlistDeviceExtractor> decl_dbNetlistDeviceExtractor ("db", "DeviceEx
   "This class has been introduced in version 0.26."
 );
 
+template <class Shape>
+static void
+define_terminal_by_names (GenericDeviceExtractor *extractor, db::Device *device, const std::string &terminal_name, const std::string &layer_name, const Shape &shape)
+{
+  if (! extractor->device_class ()) {
+    throw tl::Exception (tl::to_string (tr ("No device class registered yet")));
+  }
+
+  size_t terminal_id = extractor->device_class ()->terminal_id_for_name (terminal_name);
+
+  size_t layer_id = std::numeric_limits<size_t>::max ();
+  for (auto l = extractor->begin_layer_definitions (); l != extractor->end_layer_definitions (); ++l) {
+    if (l->name == layer_name) {
+      layer_id = l->index;
+    }
+  }
+
+  if (layer_id == std::numeric_limits<size_t>::max ()) {
+    throw tl::Exception (tl::to_string (tr ("Not a valid layer name: ")) + layer_name);
+  }
+
+  extractor->define_terminal (device, terminal_id, layer_id, shape);
+}
+
 Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceExtractor, "db", "GenericDeviceExtractor",
   gsi::callback ("setup", &GenericDeviceExtractor::setup, &GenericDeviceExtractor::cb_setup,
     "@brief Sets up the extractor.\n"
@@ -391,6 +415,27 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
    "\n"
    "This version produces a point-like terminal. Note that the point is\n"
    "specified in database units.\n"
+  ) +
+  gsi::method_ext ("define_terminal", &define_terminal_by_names<db::Polygon>,
+    gsi::arg ("device"), gsi::arg ("terminal_name"), gsi::arg ("layer_name"), gsi::arg ("shape"),
+   "@brief Defines a device terminal using names for terminal and layer.\n"
+   "\n"
+   "This convenience version of the ID-based \\define_terminal methods allows using names for terminal and layer.\n"
+   "It has been introduced in version 0.28."
+  ) +
+  gsi::method_ext ("define_terminal", &define_terminal_by_names<db::Box>,
+    gsi::arg ("device"), gsi::arg ("terminal_name"), gsi::arg ("layer_name"), gsi::arg ("shape"),
+   "@brief Defines a device terminal using names for terminal and layer.\n"
+   "\n"
+   "This convenience version of the ID-based \\define_terminal methods allows using names for terminal and layer.\n"
+   "It has been introduced in version 0.28."
+  ) +
+  gsi::method_ext ("define_terminal", &define_terminal_by_names<db::Point>,
+    gsi::arg ("device"), gsi::arg ("terminal_name"), gsi::arg ("layer_name"), gsi::arg ("point"),
+   "@brief Defines a device terminal using names for terminal and layer.\n"
+   "\n"
+   "This convenience version of the ID-based \\define_terminal methods allows using names for terminal and layer.\n"
+   "It has been introduced in version 0.28."
   ) +
   gsi::method ("dbu", &GenericDeviceExtractor::dbu,
    "@brief Gets the database unit\n"

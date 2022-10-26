@@ -63,7 +63,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>:/run.png</normaloff>:/run.png</iconset>
+          <normaloff>:/run_16px.png</normaloff>:/run_16px.png</iconset>
         </property>
         <property name="shortcut">
          <string>F5</string>

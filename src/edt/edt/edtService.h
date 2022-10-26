@@ -105,10 +105,10 @@ public:
    */
   void restore_highlights ();
 
-  /** 
-   *  @brief Highlight a certain object
+  /**
+   *  @brief Highlights a group of objects
    */
-  void highlight (unsigned int n);
+  void highlight (const std::vector<size_t> &n);
 
   /** 
    *  @brief "delete" operation
@@ -616,6 +616,10 @@ private:
   bool m_indicate_secondary_selection;
   unsigned long m_seq;
 
+  //  selective highlights
+  bool m_highlights_selected;
+  std::set<size_t> m_selected_highlights;
+
   //  Deferred method to update the selection
   tl::DeferredMethod<edt::Service> dm_selection_to_view;
 
@@ -645,6 +649,11 @@ private:
    *  @brief Display the status bar message for the given selection
    */
   void display_status (bool transient);
+
+  /**
+   *  @brief Apply highlight selection
+   */
+  void apply_highlights ();
 
 private:
   void copy_selected (unsigned int inst_mode);

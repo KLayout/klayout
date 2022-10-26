@@ -5,6 +5,7 @@
 
   <title>Doing Measurements</title>
   <keyword name="Rulers"/>
+  <keyword name="Measure"/>
 
   <p>
   A measurement can be performed by clicking on the ruler icon in the 
@@ -21,6 +22,32 @@
   position. This feature will look for edges in the vicinity of the 
   ruler and set the ruler to connect the neighboring edges. The ruler
   is attached perpendicular to the edge next to the initial point.
+  </p>
+
+  <p>
+  You can mark a position with a single click by selecting the "Cross"
+  ruler type. Clicking at a location will place such a ruler. The ruler
+  shows the x and y coordinate.
+  </p>
+
+  <p>
+  The "Multi-Ruler" allows concatenating multiple rulers into a single
+  object. Click and the first point to start such a ruler. Then click
+  on more points to add new segments to the ruler. Each segment is shown
+  as an individual ruler with tick marks and a length. Finish the sequence
+  with a double-click.
+  </p>
+
+  <p>
+  The "Angle" ruler allows angle measurements. Three clicks are required
+  to define a "V" like arrangement of two rulers. The angle enclosed by the two lines forming the "V"
+  is shown in the ruler.
+  <p>
+
+  <p>
+  Another special ruler, the "Radius" ruler is also a three-click type.
+  Specify three points to define a circle. The ruler shows the radius
+  of this circle and the circle outline.
   </p>
 
   <p>
@@ -52,7 +79,7 @@
 
   <p>
   Rulers can be moved by selecting "Move" mode with the speedbar buttons
-  in the toolbar or "Move" from the "Mode" submenu in the "Edit" menu. Then
+  in the toolbar or "Move" from the "Mode" sub-menu in the "Edit" menu. Then
   left-click and drag the ruler or the ruler end point that should be changed.
   </p>
 

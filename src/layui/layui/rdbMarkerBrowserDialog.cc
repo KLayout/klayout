@@ -25,6 +25,7 @@
 #include "rdbMarkerBrowserDialog.h"
 #include "rdb.h"
 #include "rdbReader.h"
+#include "rdbUtils.h"
 #include "tlProgress.h"
 #include "layLayoutViewBase.h"
 #include "tlExceptions.h"
@@ -790,11 +791,7 @@ MarkerBrowserDialog::scan_layer ()
           
           for (db::ShapeIterator shape = cell.shapes ((*l)->layer_index ()).begin (db::ShapeIterator::All); ! shape.at_end (); ++shape) {
 
-            std::unique_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (*shape, db::CplxTrans (layout.dbu ())));
-            if (value.get ()) {
-              rdb::Item *item = rdb->create_item (rdb_cell->id (), cat->id ());
-              item->values ().add (value.release ());
-            }
+            rdb::create_item_from_shape (rdb.get (), rdb_cell->id (), cat->id (), db::CplxTrans (layout.dbu ()), *shape);
 
             ++progress;
 
@@ -869,11 +866,7 @@ MarkerBrowserDialog::scan_layer_flat ()
       db::RecursiveShapeIterator shape (layout, *cv.cell (), (*l)->layer_index ());
       while (! shape.at_end ()) {
 
-        std::unique_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (*shape, db::CplxTrans (layout.dbu ()) * shape.trans ()));
-        if (value.get ()) {
-          rdb::Item *item = rdb->create_item (rdb_top_cell->id (), cat->id ());
-          item->values ().add (value.release ());
-        }
+        rdb::create_item_from_shape (rdb.get (), rdb_top_cell->id (), cat->id (), db::CplxTrans (layout.dbu ()) * shape.trans (), *shape);
 
         ++progress;
         ++shape;

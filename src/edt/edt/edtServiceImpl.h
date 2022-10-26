@@ -90,7 +90,7 @@ public:
   PolygonService (db::Manager *manager, lay::LayoutViewBase *view);
   
 #if defined(HAVE_QT)
-  virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+  virtual std::vector<lay::PropertiesPage *> properties_pages (db::Manager *manager, QWidget *parent);
 #endif
   virtual void do_delete ();
   virtual void do_begin_edit (const db::DPoint &p);
@@ -123,7 +123,7 @@ public:
   BoxService (db::Manager *manager, lay::LayoutViewBase *view);
   
 #if defined(HAVE_QT)
-  virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+  virtual std::vector<lay::PropertiesPage *> properties_pages (db::Manager *manager, QWidget *parent);
 #endif
   virtual void do_begin_edit (const db::DPoint &p);
   virtual void do_mouse_move (const db::DPoint &p);
@@ -151,7 +151,7 @@ public:
   ~TextService ();
   
 #if defined(HAVE_QT)
-  virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+  virtual std::vector<lay::PropertiesPage *> properties_pages (db::Manager *manager, QWidget *parent);
 #endif
   virtual void do_begin_edit (const db::DPoint &p);
   virtual void do_mouse_transform (const db::DPoint &p, db::DFTrans trans);
@@ -185,7 +185,7 @@ public:
   ~PathService ();
   
 #if defined(HAVE_QT)
-  virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+  virtual std::vector<lay::PropertiesPage *> properties_pages (db::Manager *manager, QWidget *parent);
 #endif
   virtual void do_begin_edit (const db::DPoint &p);
   virtual void do_mouse_move (const db::DPoint &p);
@@ -223,7 +223,7 @@ public:
   InstService (db::Manager *manager, lay::LayoutViewBase *view);
   
 #if defined(HAVE_QT)
-  virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+  virtual std::vector<lay::PropertiesPage *> properties_pages (db::Manager *manager, QWidget *parent);
 #endif
   virtual void do_begin_edit (const db::DPoint &p);
   virtual void do_mouse_move_inactive (const db::DPoint &p);

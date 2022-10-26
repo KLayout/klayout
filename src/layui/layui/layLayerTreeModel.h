@@ -123,17 +123,17 @@ public:
   QModelIndex index (lay::LayerPropertiesConstIterator iter, int column) const;
 
   /**
-   *  @brief Convert a QModelIndex to an iterator
+   *  @brief Converts a QModelIndex to an iterator
    */
   lay::LayerPropertiesConstIterator iterator (const QModelIndex &index) const;
 
   /**
-   *  @brief Get a flag indicating that an entry is hidden
+   *  @brief Gets a flag indicating that an entry is hidden
    */
   bool is_hidden (const QModelIndex &index) const;
 
   /**
-   *  @brief Set the animation phase
+   *  @brief Sets the animation phase
    */
   void set_phase (unsigned int ph);
 

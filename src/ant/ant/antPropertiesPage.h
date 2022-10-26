@@ -43,29 +43,33 @@ public:
   PropertiesPage (ant::Service *rulers, db::Manager *manager, QWidget *parent);
   ~PropertiesPage ();
 
-  virtual void back ();
-  virtual void front ();
-  virtual bool at_begin () const;
-  virtual bool at_end () const;
-  virtual void operator-- ();
-  virtual void operator++ ();
+  virtual size_t count () const;
+  virtual void select_entries (const std::vector<size_t> &entries);
+  virtual std::string description (size_t entry) const;
+  virtual std::string description () const;
   virtual void update ();
   virtual void leave ();
   virtual bool readonly ();
-  virtual void apply (); 
+  virtual void apply ();
 
 private slots:
   void swap_points_clicked ();
   void snap_to_layout_clicked ();
+  void something_changed ();
 
 private:
   std::vector <ant::Service::obj_iterator> m_selection;
-  std::vector <ant::Service::obj_iterator>::iterator m_pos;
+  size_t m_index;
   ant::Service *mp_rulers;
   bool m_enable_cb_callback;
+  bool m_in_something_changed;
 
   const ant::Object &current () const;
-  void get_points(db::DPoint &p1, db::DPoint &p2);
+  void get_points (db::DPoint &p1, db::DPoint &p2);
+  void get_point (db::DPoint &p);
+  void get_points (ant::Object::point_list &points);
+  void update_with (const ant::Object &obj);
+  void get_object (ant::Object &obj);
 };
 
 }

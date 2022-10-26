@@ -209,4 +209,27 @@
   subversion equivalent.
   </p>
 
+  <h2>Installation Hooks</h2>
+
+  <p>
+  Scripts can register an event through <class_doc href="Application#on_salt_changed"/> which 
+  indicates that packages have been installed or uninstalled.
+  </p>
+
+  <p>
+  Packages itself can supply special scripts which are executed after a package was installed
+  or before a package is uninstalled:
+  </p>
+
+  <ul>
+    <li><tt>_install.lym</tt>: if present, this script is executed after the package is installed.</li>
+    <li><tt>_uninstall.lym</tt>: if present, this script is executed before the package is uninstalled.</li>
+  </ul>
+
+  <p>
+  Both scripts need to be stored in the same location as "grain.xml" and have to use 
+  "lym" format. This is the generic XML script format KLayout employs as an interpreter-agnostic
+  script representation.
+  </p>
+
 </doc>

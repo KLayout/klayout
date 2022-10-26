@@ -860,9 +860,11 @@ public:
    *  @brief Add a value in a generic way
    */
   template <class V>
-  void add_value (const V &v)
+  ValueBase *add_value (const V &v, id_type tag_id = 0)
   {
-    values ().add (new Value<V> (v));
+    ValueBase *value = new Value<V> (v);
+    values ().add (value, tag_id);
+    return value;
   }
 
   /**

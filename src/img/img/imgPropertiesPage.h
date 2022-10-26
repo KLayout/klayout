@@ -50,12 +50,10 @@ public:
   PropertiesPage (QWidget *parent);
   ~PropertiesPage ();
 
-  virtual void back ();
-  virtual void front ();
-  virtual bool at_begin () const;
-  virtual bool at_end () const;
-  virtual void operator-- ();
-  virtual void operator++ ();
+  virtual size_t count () const;
+  virtual void select_entries (const std::vector<size_t> &entries);
+  virtual std::string description (size_t entry) const;
+  virtual std::string description () const;
   virtual void update ();
   virtual void leave ();
   virtual bool readonly ();
@@ -91,7 +89,7 @@ private slots:
 
 private:
   std::vector <img::Service::obj_iterator> m_selection;
-  std::vector <img::Service::obj_iterator>::iterator m_pos;
+  size_t m_index;
   img::Service *mp_service;
   img::Object *mp_direct_image;
   bool m_no_signals;

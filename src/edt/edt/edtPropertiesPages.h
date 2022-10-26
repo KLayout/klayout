@@ -46,15 +46,14 @@ class ShapePropertiesPage
 Q_OBJECT
 
 public:
-  ShapePropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
+  ShapePropertiesPage (const std::string &description, edt::Service *service, db::Manager *manager, QWidget *parent);
   ~ShapePropertiesPage ();
 
-  virtual void back ();
-  virtual void front ();
-  virtual bool at_begin () const;
-  virtual bool at_end () const;
-  virtual void operator-- ();
-  virtual void operator++ ();
+  virtual size_t count () const;
+  virtual void select_entries (const std::vector<size_t> &entries);
+  virtual std::string description (size_t entry) const;
+  virtual QIcon icon (size_t entry, int w, int h) const;
+  virtual std::string description () const;
   virtual void leave ();
 
 protected:
@@ -69,8 +68,9 @@ private:
   void recompute_selection_ptrs (const std::vector<lay::ObjectInstPath> &new_sel);
 
 protected:
+  std::string m_description;
   std::vector<edt::Service::obj_iterator> m_selection_ptrs;
-  unsigned int m_index;
+  std::vector<size_t> m_indexes;
   edt::Service *mp_service;
   bool m_enable_cb_callback;
   db::properties_id_type m_prop_id;
@@ -83,6 +83,9 @@ protected:
   bool abs_trans () const;
   db::ICplxTrans trans () const;
   void setup ();
+  lay::LayoutViewBase *view () const;
+  const db::Shape &shape (size_t entry) const;
+  double dbu (size_t entry) const;
 
 public slots:
   void show_inst ();
@@ -101,6 +104,7 @@ Q_OBJECT
 public:
   PolygonPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
 
+  virtual std::string description (size_t entry) const;
   virtual void do_update (const db::Shape &shape, double dbu, const std::string &lname);
   virtual ChangeApplicator *create_applicator (db::Shapes &shapes, const db::Shape &shape, double dbu);
 
@@ -124,6 +128,7 @@ Q_OBJECT
 public:
   BoxPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
 
+  virtual std::string description (size_t entry) const;
   virtual void do_update (const db::Shape &shape, double dbu, const std::string &lname);
   virtual ChangeApplicator *create_applicator (db::Shapes &shapes, const db::Shape &shape, double dbu);
 
@@ -153,6 +158,7 @@ Q_OBJECT
 public:
   TextPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
 
+  virtual std::string description (size_t entry) const;
   virtual void do_update (const db::Shape &shape, double dbu, const std::string &lname);
   virtual ChangeApplicator *create_applicator (db::Shapes &shapes, const db::Shape &shape, double dbu);
 
@@ -170,6 +176,7 @@ Q_OBJECT
 public:
   PathPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
 
+  virtual std::string description (size_t entry) const;
   virtual void do_update (const db::Shape &shape, double dbu, const std::string &lname);
   virtual ChangeApplicator *create_applicator (db::Shapes &shapes, const db::Shape &shape, double dbu);
 
@@ -190,6 +197,7 @@ Q_OBJECT
 public:
   EditablePathPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
 
+  virtual std::string description (size_t entry) const;
   virtual void do_update (const db::Shape &shape, double dbu, const std::string &lname);
   virtual ChangeApplicator *create_applicator (db::Shapes &shapes, const db::Shape &shape, double dbu);
 

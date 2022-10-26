@@ -672,6 +672,8 @@ ApplicationBase::init_app ()
       }
     }
 
+    sc->salt_changed_event.add (this, &ApplicationBase::salt_changed);
+
   }
 
   if (tc) {
@@ -850,6 +852,14 @@ ApplicationBase::add_macro_category (const std::string &name, const std::string 
   if (mc) {
     mc->add_macro_category (name, description, folders);
   }
+}
+
+void
+ApplicationBase::salt_changed ()
+{
+BEGIN_PROTECTED_SILENT
+  salt_changed_event ();
+END_PROTECTED_SILENT
 }
 
 ApplicationBase::~ApplicationBase ()

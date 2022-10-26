@@ -29,6 +29,7 @@
 #include "layEditable.h"
 
 #include <QFrame>
+#include <QIcon>
 
 namespace db
 {
@@ -69,80 +70,54 @@ public:
   virtual ~PropertiesPage ();
 
   /**
-   *  @brief Move the current pointer to the end of the selected objects list
-   *
-   *  Must be implemented by the Editable function and must set the 
-   *  selected object pointer to past-the-end of the list. at_end () must 
-   *  return true after this.
+   *  @brief Gets the number of entries represented by this page
    */
-  virtual void back () = 0;
+  virtual size_t count () const = 0;
 
   /**
-   *  @brief A helper function for the dialog that additionally reports
-   *  if there are any elements in the selection
+   *  @brief Selects the entries with the given indexes
+   *
+   *  If multiple indexes are selected, the properties page shows
+   *  all items with different values as "leave as is". Items with
+   *  same value are shown with the given value.
    */
-  bool back_checked () 
+  virtual void select_entries (const std::vector<size_t> &entries) = 0;
+
+  /**
+   *  @brief Convenience function to select a specific entry
+   */
+  void select_entry (size_t entry)
   {
-    back ();
-    return ! at_begin ();
+    std::vector<size_t> entries;
+    entries.push_back (entry);
+    select_entries (entries);
   }
 
   /**
-   *  @brief Move the current pointer to the beginning of the selected objects list
-   *
-   *  Must be implemented by the Editable function and must set the 
-   *  selected object pointer to the beginning of the list. at_begin () must 
-   *  return true after this.
-   *  This method must return true, if there are any elements in the selection
-   *  - i.e. operator++ () will be successful afterwards.
+   *  @brief Gets a description text for the nth entry
    */
-  virtual void front () = 0;
+  virtual std::string description (size_t entry) const = 0;
 
   /**
-   *  @brief A helper function for the dialog that additionally reports
-   *  if there are any elements in the selection
+   *  @brief Gets the icon for the nth entry
    */
-  bool front_checked () 
+  virtual QIcon icon (size_t /*entry*/, int /*w*/, int /*h*/) const
   {
-    front ();
-    return ! at_end ();
+    return QIcon ();
   }
 
   /**
-   *  @brief Tell if the current object references the first one
-   *
-   *  Must be implemented by the Editable function and must return
-   *  true if the current object is the first one - i.e. if an
-   *  operator-- would render the status invalid.
-   *  If no object is referenced, this method and at_end () must return true.
+   *  @brief Gets a description text for the whole group
    */
-  virtual bool at_begin () const = 0;
+  virtual std::string description () const = 0;
 
   /**
-   *  @brief Tell if the current object references past the last one
-   *
-   *  If the current object pointer is past the end of the selected
-   *  object space, 
+   *  @brief Gets the icon associated with the whole group
    */
-  virtual bool at_end () const = 0;
-
-  /**
-   *  @brief Step one element back 
-   *
-   *  This method is supposed to move the current pointer one position
-   *  back. If at_begin () was true before, the result may be unpredictable.
-   *  The dialog will call update () to update the display accordingly.
-   */
-  virtual void operator-- () = 0;
-
-  /**
-   *  @brief Advance one element
-   *
-   *  This method is supposed to move the current pointer one position
-   *  forward. If at_end () was true before, the result may be unpredictable.
-   *  The dialog will call update () to update the display accordingly.
-   */
-  virtual void operator++ () = 0;
+  virtual QIcon icon (int /*w*/, int /*h*/) const
+  {
+    return QIcon ();
+  }
 
   /**
    *  @brief Update the display
@@ -176,7 +151,7 @@ public:
   /** 
    *  @brief Apply any changes to the current object
    *
-   *  Apply any changes to the current object. If nothing was 
+   *  Apply any changes to the current objects. If nothing was
    *  changed, the object may be left untouched.
    *  The dialog will start a transaction on the manager object.
    */

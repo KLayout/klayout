@@ -32,7 +32,7 @@ class EXT_TestClass < TestBase
 
     tracer = RBA::NetTracer::new
     
-    tech = RBA::NetTracerTechnology::new
+    tech = RBA::NetTracerConnectivity::new
     tech.connection("1/0", "2/0", "3/0")
 
     tracer.trace(tech, ly, ly.top_cell, RBA::Point::new(7000, 1500), ly.find_layer(1, 0))
@@ -77,7 +77,7 @@ class EXT_TestClass < TestBase
 
     tracer = RBA::NetTracer::new
     
-    tech = RBA::NetTracerTechnology::new
+    tech = RBA::NetTracerConnectivity::new
     tech.connection("1/0", "2/0", "3/0")
 
     tracer.trace(tech, ly, ly.top_cell, RBA::Point::new(7000, 1500), ly.find_layer(1, 0), RBA::Point::new(6000, -6000), ly.find_layer(3, 0))
@@ -122,7 +122,7 @@ class EXT_TestClass < TestBase
 
     tracer = RBA::NetTracer::new
     
-    tech = RBA::NetTracerTechnology::new
+    tech = RBA::NetTracerConnectivity::new
     tech.connection("1/0", "3/0")
 
     tracer.trace(tech, ly, ly.top_cell, RBA::Point::new(7000, 1500), ly.find_layer(1, 0))

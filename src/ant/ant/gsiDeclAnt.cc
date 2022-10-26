@@ -48,6 +48,8 @@ static int outline_yx ()        { return int (ant::Object::OL_yx); }
 static int outline_diag_yx ()   { return int (ant::Object::OL_diag_yx); }
 static int outline_box ()       { return int (ant::Object::OL_box); }
 static int outline_ellipse ()   { return int (ant::Object::OL_ellipse); }
+static int outline_angle ()     { return int (ant::Object::OL_angle); }
+static int outline_radius ()    { return int (ant::Object::OL_radius); }
 
 static int angle_any ()         { return int (lay::AC_Any); }
 static int angle_diagonal ()    { return int (lay::AC_Diagonal); }
@@ -234,6 +236,13 @@ static AnnotationRef create_measure_ruler (lay::LayoutViewBase *view, const db::
   } else {
     return AnnotationRef ();
   }
+}
+
+static AnnotationRef *ant_from_s (const std::string &s)
+{
+  std::unique_ptr<AnnotationRef> aref (new AnnotationRef ());
+  aref->from_string (s.c_str ());
+  return aref.release ();
 }
 
 static int get_style (const AnnotationRef *obj)
@@ -425,6 +434,16 @@ static int ruler_mode_auto_metric ()
   return ant::Template::RulerAutoMetric;
 }
 
+static int ruler_mode_three_clicks ()
+{
+  return ant::Template::RulerThreeClicks;
+}
+
+static int ruler_mode_multi_segment ()
+{
+  return ant::Template::RulerMultiSegment;
+}
+
 static void register_annotation_template (const ant::Object &a, const std::string &title, int mode)
 {
   ant::Template t = ant::Template::from_object (a, title, mode);
@@ -496,68 +515,80 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
   ) +
   gsi::method ("RulerModeSingleClick", &gsi::ruler_mode_single_click,
     "@brief Specifies single-click ruler mode for the \\register_template method\n"
-    "In single click-mode, a ruler can be placed with a single click and p1 will be == p2."
+    "In single click-mode, a ruler can be placed with a single click and p1 will be == p2.\n"
     "\n"
     "This constant has been introduced in version 0.25"
   ) +
   gsi::method ("RulerModeAutoMetric", &gsi::ruler_mode_auto_metric,
     "@brief Specifies auto-metric ruler mode for the \\register_template method\n"
-    "In auto-metric mode, a ruler can be placed with a single click and p1/p2 will be determined from the neighborhood."
+    "In auto-metric mode, a ruler can be placed with a single click and p1/p2 will be determined from the neighborhood.\n"
     "\n"
     "This constant has been introduced in version 0.25"
   ) +
-  gsi::method ("StyleRuler|#style_ruler", &gsi::style_ruler,
+  gsi::method ("RulerThreeClicks", &gsi::ruler_mode_three_clicks,
+    "@brief Specifies three-click ruler mode for the \\register_template method\n"
+    "In this ruler mode, two segments are created for angle and circle radius measurements. Three mouse clicks are required.\n"
+    "\n"
+    "This constant has been introduced in version 0.28"
+  ) +
+  gsi::method ("RulerMultiSegment", &gsi::ruler_mode_multi_segment,
+    "@brief Specifies multi-segment mode\n"
+    "In multi-segment mode, multiple segments can be created. The ruler is finished with a double click.\n"
+    "\n"
+    "This constant has been introduced in version 0.28"
+  ) +
+  gsi::method ("StyleRuler", &gsi::style_ruler,
     "@brief Gets the ruler style code for use the \\style method\n"
     "When this style is specified, the annotation will show a ruler with "
     "some ticks at distances indicating a decade of units and a suitable "
     "subdivision into minor ticks at intervals of 1, 2 or 5 units."
   ) +
-  gsi::method ("StyleArrowEnd|#style_arrow_end", &gsi::style_arrow_end,
+  gsi::method ("StyleArrowEnd", &gsi::style_arrow_end,
     "@brief Gets the end arrow style code for use the \\style method\n"
     "When this style is specified, an arrow is drawn pointing from the start to the end point."
   ) +
-  gsi::method ("StyleArrowStart|#style_arrow_start", &gsi::style_arrow_start,
+  gsi::method ("StyleArrowStart", &gsi::style_arrow_start,
     "@brief Gets the start arrow style code for use the \\style method\n"
     "When this style is specified, an arrow is drawn pointing from the end to the start point."
   ) +
-  gsi::method ("StyleArrowBoth|#style_arrow_both", &gsi::style_arrow_both,
+  gsi::method ("StyleArrowBoth", &gsi::style_arrow_both,
     "@brief Gets the both arrow ends style code for use the \\style method\n"
     "When this style is specified, a two-headed arrow is drawn."
   ) +
-  gsi::method ("StyleLine|#style_line", &gsi::style_line,
+  gsi::method ("StyleLine", &gsi::style_line,
     "@brief Gets the line style code for use with the \\style method\n"
     "When this style is specified, a plain line is drawn."
   ) +
-  gsi::method ("StyleCrossStart|#style_cross_start", &gsi::style_cross_start,
+  gsi::method ("StyleCrossStart", &gsi::style_cross_start,
     "@brief Gets the line style code for use with the \\style method\n"
     "When this style is specified, a cross is drawn at the start point.\n"
     "\n"
     "This constant has been added in version 0.26."
   ) +
-  gsi::method ("StyleCrossEnd|#style_cross_end", &gsi::style_cross_end,
+  gsi::method ("StyleCrossEnd", &gsi::style_cross_end,
     "@brief Gets the line style code for use with the \\style method\n"
     "When this style is specified, a cross is drawn at the end point.\n"
     "\n"
     "This constant has been added in version 0.26."
   ) +
-  gsi::method ("StyleCrossBoth|#style_cross_both", &gsi::style_cross_both,
+  gsi::method ("StyleCrossBoth", &gsi::style_cross_both,
     "@brief Gets the line style code for use with the \\style method\n"
     "When this style is specified, a cross is drawn at both points.\n"
     "\n"
     "This constant has been added in version 0.26."
   ) +
-  gsi::method ("OutlineDiag|#outline_diag", &gsi::outline_diag,
+  gsi::method ("OutlineDiag", &gsi::outline_diag,
     "@brief Gets the diagonal output code for use with the \\outline method\n"
     "When this outline style is specified, a line connecting start and "
     "end points in the given style (ruler, arrow or plain line) is drawn."
   ) +
-  gsi::method ("OutlineXY|#outline_xy", &gsi::outline_xy,
+  gsi::method ("OutlineXY", &gsi::outline_xy,
     "@brief Gets the xy outline code for use with the \\outline method\n"
     "When this outline style is specified, two lines are drawn: one horizontal from left "
     "to right and attached to the end of that a line from the bottom to the top. The lines "
     "are drawn in the specified style (see \\style method)."
   ) +
-  gsi::method ("OutlineDiagXY|#outline_diag_xy", &gsi::outline_diag_xy,
+  gsi::method ("OutlineDiagXY", &gsi::outline_diag_xy,
     "@brief Gets the xy plus diagonal outline code for use with the \\outline method\n"
     "@brief outline_xy code used by the \\outline method\n"
     "When this outline style is specified, three lines are drawn: one horizontal from left "
@@ -565,53 +596,65 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
     "is drawn connecting the start and end points directly. The lines "
     "are drawn in the specified style (see \\style method)."
   ) +
-  gsi::method ("OutlineYX|#outline_yx", &gsi::outline_yx ,
+  gsi::method ("OutlineYX", &gsi::outline_yx ,
     "@brief Gets the yx outline code for use with the \\outline method\n"
     "When this outline style is specified, two lines are drawn: one vertical from bottom "
     "to top and attached to the end of that a line from the left to the right. The lines "
     "are drawn in the specified style (see \\style method)."
   ) +
-  gsi::method ("OutlineDiagYX|#outline_diag_yx", &gsi::outline_diag_yx ,
+  gsi::method ("OutlineDiagYX", &gsi::outline_diag_yx ,
     "@brief Gets the yx plus diagonal outline code for use with the \\outline method\n"
     "When this outline style is specified, three lines are drawn: one vertical from bottom "
     "to top and attached to the end of that a line from the left to the right. Another line "
     "is drawn connecting the start and end points directly. The lines "
     "are drawn in the specified style (see \\style method)."
   ) +
-  gsi::method ("OutlineBox|#outline_box", &gsi::outline_box,
+  gsi::method ("OutlineBox", &gsi::outline_box,
     "@brief Gets the box outline code for use with the \\outline method\n"
     "When this outline style is specified, a box is drawn with the corners specified by the "
     "start and end point. All box edges are drawn in the style specified with the \\style "
     "attribute."
   ) +
-  gsi::method ("OutlineEllipse|#outline_ellipse", &gsi::outline_ellipse,
+  gsi::method ("OutlineEllipse", &gsi::outline_ellipse,
     "@brief Gets the ellipse outline code for use with the \\outline method\n"
     "When this outline style is specified, an ellipse is drawn with the extensions specified by the "
     "start and end point. The contour drawn as a line.\n"
     "\n"
     "This constant has been introduced in version 0.26."
   ) +
-  gsi::method ("AngleAny|#angle_any", &gsi::angle_any,
+  gsi::method ("OutlineAngle", &gsi::outline_angle,
+    "@brief Gets the angle measurement ruler outline code for use with the \\outline method\n"
+    "When this outline style is specified, the ruler is drawn to indicate the angle between the first and last segment.\n"
+    "\n"
+    "This constant has been introduced in version 0.28."
+  ) +
+  gsi::method ("OutlineRadius", &gsi::outline_radius,
+    "@brief Gets the radius measurement ruler outline code for use with the \\outline method\n"
+    "When this outline style is specified, the ruler is drawn to indicate a radius defined by at least three points of the ruler.\n"
+    "\n"
+    "This constant has been introduced in version 0.28."
+  ) +
+  gsi::method ("AngleAny", &gsi::angle_any,
     "@brief Gets the any angle code for use with the \\angle_constraint method\n"
     "If this value is specified for the angle constraint, all angles will be allowed."
   ) +
-  gsi::method ("AngleDiagonal|#angle_diagonal", &gsi::angle_diagonal,
+  gsi::method ("AngleDiagonal", &gsi::angle_diagonal,
     "@brief Gets the diagonal angle code for use with the \\angle_constraint method\n"
     "If this value is specified for the angle constraint, only multiples of 45 degree are allowed."
   ) +
-  gsi::method ("AngleOrtho|#angle_ortho", &gsi::angle_ortho,
+  gsi::method ("AngleOrtho", &gsi::angle_ortho,
     "@brief Gets the ortho angle code for use with the \\angle_constraint method\n"
     "If this value is specified for the angle constraint, only multiples of 90 degree are allowed."
   ) +
-  gsi::method ("AngleHorizontal|#angle_horizontal", &gsi::angle_horizontal,
+  gsi::method ("AngleHorizontal", &gsi::angle_horizontal,
     "@brief Gets the horizontal angle code for use with the \\angle_constraint method\n"
     "If this value is specified for the angle constraint, only horizontal rulers are allowed."
   ) +
-  gsi::method ("AngleVertical|#angle_vertical", &gsi::angle_vertical,
+  gsi::method ("AngleVertical", &gsi::angle_vertical,
     "@brief Gets the vertical angle code for use with the \\angle_constraint method\n"
     "If this value is specified for the angle constraint, only vertical rulers are allowed."
   ) +
-  gsi::method ("AngleGlobal|#angle_global", &gsi::angle_global,
+  gsi::method ("AngleGlobal", &gsi::angle_global,
     "@brief Gets the global angle code for use with the \\angle_constraint method.\n"
     "This code will tell the ruler or marker to use the angle constraint defined globally."
   ) +
@@ -704,27 +747,80 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  gsi::method ("p1", (const db::DPoint & (AnnotationRef::*) () const) &AnnotationRef::p1,
+  gsi::method ("points", &AnnotationRef::points,
+    "@brief Gets the points of the ruler\n"
+    "A single-segmented ruler has two points. Rulers with more points "
+    "have more segments correspondingly. Note that the point list may have one point "
+    "only (single-point ruler) or may even be empty.\n"
+    "\n"
+    "Use \\points= to set the segment points. Use \\segments to get the number of "
+    "segments and \\seg_p1 and \\seg_p2 to get the first and second point of one segment.\n"
+    "\n"
+    "Multi-segmented rulers have been introduced in version 0.28"
+  ) +
+  gsi::method ("points=", &AnnotationRef::set_points, gsi::arg ("points"),
+    "@brief Sets the points for a (potentially) multi-segmented ruler\n"
+    "See \\points for a description of multi-segmented rulers. "
+    "The list of points passed to this method is cleaned from duplicates before being "
+    "stored inside the ruler.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method ("segments", &AnnotationRef::segments,
+    "@brief Gets the number of segments.\n"
+    "This method returns the number of segments the ruler is made up. Even though the "
+    "ruler can be one or even zero points, the number of segments is at least 1.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method ("seg_p1", &AnnotationRef::seg_p1, gsi::arg ("segment_index"),
+    "@brief Gets the first point of the given segment.\n"
+    "The segment is indicated by the segment index which is a number between 0 and \\segments-1.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method ("seg_p2", &AnnotationRef::seg_p2, gsi::arg ("segment_index"),
+    "@brief Gets the second point of the given segment.\n"
+    "The segment is indicated by the segment index which is a number between 0 and \\segments-1.\n"
+    "The second point of a segment is also the first point of the following segment if there is one.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method ("p1", (db::DPoint (AnnotationRef::*) () const) &AnnotationRef::p1,
     "@brief Gets the first point of the ruler or marker\n"
     "The points of the ruler or marker are always given in micron units in floating-point "
     "coordinates.\n"
+    "\n"
+    "This method is provided for backward compatibility. Starting with version 0.28, rulers can "
+    "be multi-segmented. Use \\points or \\seg_p1 to retrieve the points of the ruler segments.\n"
+    "\n"
     "@return The first point\n"
   ) +
-  gsi::method ("p2", (const db::DPoint & (AnnotationRef::*) () const) &AnnotationRef::p2,
+  gsi::method ("p2", (db::DPoint (AnnotationRef::*) () const) &AnnotationRef::p2,
     "@brief Gets the second point of the ruler or marker\n"
     "The points of the ruler or marker are always given in micron units in floating-point "
     "coordinates.\n"
+    "\n"
+    "This method is provided for backward compatibility. Starting with version 0.28, rulers can "
+    "be multi-segmented. Use \\points or \\seg_p1 to retrieve the points of the ruler segments.\n"
+    "\n"
     "@return The second point\n"
   ) +
   gsi::method ("p1=", (void (AnnotationRef::*) (const db::DPoint &)) &AnnotationRef::p1, gsi::arg ("point"),
     "@brief Sets the first point of the ruler or marker\n"
     "The points of the ruler or marker are always given in micron units in floating-point "
     "coordinates.\n"
+    "\n"
+    "This method is provided for backward compatibility. Starting with version 0.28, rulers can "
+    "be multi-segmented. Use \\points= to specify the ruler segments.\n"
   ) +
   gsi::method ("p2=", (void (AnnotationRef::*) (const db::DPoint &)) &AnnotationRef::p2, gsi::arg ("point"),
     "@brief Sets the second point of the ruler or marker\n"
     "The points of the ruler or marker are always given in micron units in floating-point "
     "coordinates.\n"
+    "\n"
+    "This method is provided for backward compatibility. Starting with version 0.28, rulers can "
+    "be multi-segmented. Use \\points= to specify the ruler segments.\n"
   ) +
   gsi::method ("box", &AnnotationRef::box,
     "@brief Gets the bounding box of the object (not including text)\n"
@@ -924,14 +1020,17 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
     "@brief Returns the angle constraint attribute\n"
     "See \\angle_constraint= for a more detailed description."
   ) +
-  gsi::method ("text_x", (std::string (AnnotationRef::*)() const) &AnnotationRef::text_x,
-    "@brief Returns the formatted text for the x-axis label"
+  gsi::method ("text_x", (std::string (AnnotationRef::*)(size_t index) const) &AnnotationRef::text_x, gsi::arg ("index", 0),
+    "@brief Returns the formatted text for the x-axis label\n"
+    "The index parameter indicates which segment to use (0 is the first one). It has been added in version 0.28.\n"
   ) +
-  gsi::method ("text_y", (std::string (AnnotationRef::*)() const) &AnnotationRef::text_y,
-    "@brief Returns the formatted text for the y-axis label"
+  gsi::method ("text_y", (std::string (AnnotationRef::*)(size_t index) const) &AnnotationRef::text_y, gsi::arg ("index", 0),
+    "@brief Returns the formatted text for the y-axis label\n"
+    "The index parameter indicates which segment to use (0 is the first one). It has been added in version 0.28.\n"
   ) +
-  gsi::method ("text", (std::string (AnnotationRef::*)() const) &AnnotationRef::text,
-    "@brief Returns the formatted text for the main label"
+  gsi::method ("text", (std::string (AnnotationRef::*)(size_t index) const) &AnnotationRef::text, gsi::arg ("index", 0),
+    "@brief Returns the formatted text for the main label\n"
+    "The index parameter indicates which segment to use (0 is the first one). It has been added in version 0.28.\n"
   ) +
   gsi::method ("id", (int (AnnotationRef::*)() const) &AnnotationRef::id,
     "@brief Returns the annotation's ID"
@@ -952,6 +1051,12 @@ gsi::Class<AnnotationRef> decl_Annotation (decl_BasicAnnotation, "lay", "Annotat
     "@brief Returns the string representation of the ruler"
     "\n"
     "This method was introduced in version 0.19."
+  ) +
+  gsi::constructor ("from_s", &ant_from_s, gsi::arg ("s"),
+    "@brief Creates a ruler from a string representation\n"
+    "This function creates a ruler from the string returned by \\to_s.\n"
+    "\n"
+    "This method was introduced in version 0.28."
   ) +
   gsi::method ("==", &AnnotationRef::operator==, gsi::arg ("other"),
     "@brief Equality operator\n"

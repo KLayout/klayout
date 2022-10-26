@@ -368,9 +368,9 @@ public:
    *  by the caller. The return value is 0 if the Editable object does
    *  not support a properties page.
    */
-  virtual lay::PropertiesPage *properties_page (db::Manager * /*manager*/, QWidget * /*parent*/)
+  virtual std::vector<lay::PropertiesPage *> properties_pages (db::Manager * /*manager*/, QWidget * /*parent*/)
   {
-    return 0;
+    return std::vector<lay::PropertiesPage *> ();
   }
 #endif
 

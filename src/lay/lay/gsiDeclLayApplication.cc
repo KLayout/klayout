@@ -24,6 +24,7 @@
 #include "layMainWindow.h"
 #include "laySignalHandler.h"
 #include "gsiDecl.h"
+#include "gsiSignals.h"
 #include "tlArch.h"
 
 #if defined(HAVE_QTBINDINGS)
@@ -243,6 +244,14 @@ static gsi::Methods application_methods ()
       "\n"
       "There is exactly one instance of the application. This instance can be obtained with this "
       "method."
+    ) +
+    event<C> ("on_salt_changed", &C::salt_changed_event,
+      "@brief This event is triggered when the package status changes.\n"
+      "\n"
+      "Register to this event if you are interested in package changes - i.e. installation or removal of packages or "
+      "package updates.\n"
+      "\n"
+      "This event has been introduced in version 0.28."
     )
   ;
 }

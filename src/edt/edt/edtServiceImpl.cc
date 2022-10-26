@@ -381,10 +381,12 @@ PolygonService::PolygonService (db::Manager *manager, lay::LayoutViewBase *view)
 }
 
 #if defined(HAVE_QT)
-lay::PropertiesPage *
-PolygonService::properties_page (db::Manager *manager, QWidget *parent)
+std::vector<lay::PropertiesPage *>
+PolygonService::properties_pages (db::Manager *manager, QWidget *parent)
 {
-  return new edt::PolygonPropertiesPage (this, manager, parent);
+  std::vector<lay::PropertiesPage *> pages;
+  pages.push_back (new edt::PolygonPropertiesPage (this, manager, parent));
+  return pages;
 }
 #endif
 
@@ -712,10 +714,12 @@ BoxService::BoxService (db::Manager *manager, lay::LayoutViewBase *view)
 }
   
 #if defined(HAVE_QT)
-lay::PropertiesPage *
-BoxService::properties_page (db::Manager *manager, QWidget *parent)
+std::vector<lay::PropertiesPage *>
+BoxService::properties_pages (db::Manager *manager, QWidget *parent)
 {
-  return new edt::BoxPropertiesPage (this, manager, parent);
+  std::vector<lay::PropertiesPage *> pages;
+  pages.push_back (new edt::BoxPropertiesPage (this, manager, parent));
+  return pages;
 }
 #endif
 
@@ -812,10 +816,12 @@ TextService::~TextService ()
 }
 
 #if defined(HAVE_QT)
-lay::PropertiesPage *
-TextService::properties_page (db::Manager *manager, QWidget *parent)
+std::vector<lay::PropertiesPage *>
+TextService::properties_pages (db::Manager *manager, QWidget *parent)
 {
-  return new edt::TextPropertiesPage (this, manager, parent);
+  std::vector<lay::PropertiesPage *> pages;
+  pages.push_back (new edt::TextPropertiesPage (this, manager, parent));
+  return pages;
 }
 #endif
 
@@ -1004,14 +1010,16 @@ PathService::~PathService ()
 }
 
 #if defined(HAVE_QT)
-lay::PropertiesPage *
-PathService::properties_page (db::Manager *manager, QWidget *parent)
+std::vector<lay::PropertiesPage *>
+PathService::properties_pages (db::Manager *manager, QWidget *parent)
 {
+  std::vector<lay::PropertiesPage *> pages;
   if (view ()->is_editable ()) {
-    return new edt::EditablePathPropertiesPage (this, manager, parent);
+    pages.push_back (new edt::EditablePathPropertiesPage (this, manager, parent));
   } else {
-    return new edt::PathPropertiesPage (this, manager, parent);
+    pages.push_back (new edt::PathPropertiesPage (this, manager, parent));
   }
+  return pages;
 }
 #endif
 
@@ -1246,10 +1254,12 @@ InstService::InstService (db::Manager *manager, lay::LayoutViewBase *view)
 }
 
 #if defined(HAVE_QT)
-lay::PropertiesPage *
-InstService::properties_page (db::Manager *manager, QWidget *parent)
+std::vector<lay::PropertiesPage *>
+InstService::properties_pages (db::Manager *manager, QWidget *parent)
 {
-  return new edt::InstPropertiesPage (this, manager, parent);
+  std::vector<lay::PropertiesPage *> pages;
+  pages.push_back (new edt::InstPropertiesPage (this, manager, parent));
+  return pages;
 }
 #endif
 

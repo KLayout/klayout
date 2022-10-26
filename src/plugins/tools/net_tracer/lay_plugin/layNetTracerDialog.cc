@@ -92,13 +92,78 @@ NetTracerDialog::NetTracerDialog (lay::Dispatcher *root, LayoutViewBase *view)
 
   view->layer_list_changed_event.add (this, &NetTracerDialog::layer_list_changed);
 
+  attach_events ();
   update_info ();
+  update_list_of_stacks ();
 }
 
 NetTracerDialog::~NetTracerDialog ()
 {
   clear_markers ();
   clear_nets ();
+}
+
+void
+NetTracerDialog::attach_events ()
+{
+  detach_from_all_events ();
+
+  mp_view->layer_list_changed_event.add (this, &NetTracerDialog::layer_list_changed);
+
+  db::Technologies::instance ()->technology_changed_event.add (this, &NetTracerDialog::update_list_of_stacks_with_technology);
+  db::Technologies::instance ()->technologies_changed_event.add (this, &NetTracerDialog::update_list_of_stacks);
+
+  mp_view->cellviews_changed_event.add (this, &NetTracerDialog::update_list_of_stacks);
+  mp_view->apply_technology_event.add (this, &NetTracerDialog::update_list_of_stacks_with_cellview);
+}
+
+void
+NetTracerDialog::update_list_of_stacks_with_technology (db::Technology *)
+{
+  update_list_of_stacks ();
+}
+
+void
+NetTracerDialog::update_list_of_stacks_with_cellview (int)
+{
+  update_list_of_stacks ();
+}
+
+void
+NetTracerDialog::update_list_of_stacks ()
+{
+  QString current_name = stack_selector->currentText ();
+
+  std::set<QString> names;
+  for (unsigned int cvi = 0; cvi < mp_view->cellviews (); ++cvi) {
+    const db::Technology *tech = mp_view->cellview (cvi)->technology ();
+    if (tech) {
+      const db::NetTracerTechnologyComponent *tech_component = dynamic_cast <const db::NetTracerTechnologyComponent *> (tech->component_by_name (db::net_tracer_component_name ()));
+      if (tech_component) {
+        for (auto d = tech_component->begin (); d != tech_component->end (); ++d) {
+          names.insert (tl::to_qstring (d->name ()));
+        }
+      }
+    }
+  }
+
+  stack_selector->clear ();
+
+  int current_index = 0;
+  int i = 0;
+  for (auto n = names.begin (); n != names.end (); ++n, ++i) {
+    if (n->isEmpty ()) {
+      stack_selector->addItem (tr ("(default)"), QVariant (*n));
+    } else {
+      stack_selector->addItem (*n, QVariant (*n));
+    }
+    if (*n == current_name) {
+      current_index = i;
+    }
+  }
+
+  stack_selector->setVisible (stack_selector->count () >= 2);
+  stack_selector->setCurrentIndex (current_index);
 }
 
 void
@@ -290,14 +355,27 @@ NetTracerDialog::get_net_tracer_setup (const lay::CellView &cv, db::NetTracerDat
   if (! tech) {
     return false;
   }
+
   const db::NetTracerTechnologyComponent *tech_component = dynamic_cast <const db::NetTracerTechnologyComponent *> (tech->component_by_name (db::net_tracer_component_name ()));
   if (! tech_component) {
     return false;
   }
 
-  //  Set up the net tracer environment
-  data = tech_component->get_tracer_data (cv->layout ());
+  std::string stack_name = tl::to_string (stack_selector->itemData (stack_selector->currentIndex ()).toString ());
 
+  const db::NetTracerConnectivity *connectivity = 0;
+  for (auto d = tech_component->begin (); d != tech_component->end () && ! connectivity; ++d) {
+    if (d->name () == stack_name) {
+      connectivity = d.operator-> ();
+    }
+  }
+
+  if (! connectivity) {
+    return false;
+  }
+
+  //  Set up the net tracer environment
+  data = connectivity->get_tracer_data (cv->layout ());
   return true;
 }
 
@@ -545,6 +623,7 @@ NetTracerDialog::configure (const std::string &name, const std::string &value)
     update_highlights ();
     adjust_view ();
     update_info ();
+    update_list_of_stacks ();
   }
 
   return taken;
@@ -1243,6 +1322,7 @@ BEGIN_PROTECTED
   lay::TechComponentSetupDialog dialog (this, &tech, db::net_tracer_component_name ());
   if (dialog.exec ()) {
     *db::Technologies::instance ()->technology_by_name (tech.name ()) = tech;
+    update_list_of_stacks ();
   }
 
 END_PROTECTED

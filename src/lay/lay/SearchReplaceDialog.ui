@@ -171,7 +171,7 @@ p, li { white-space: pre-wrap; }
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>:/run.png</normaloff>:/run.png</iconset>
+                 <normaloff>:/run_16px.png</normaloff>:/run_16px.png</iconset>
                </property>
                <property name="autoDefault">
                 <bool>true</bool>
@@ -280,7 +280,7 @@ p, li { white-space: pre-wrap; }
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>:/run.png</normaloff>:/run.png</iconset>
+                 <normaloff>:/run_16px.png</normaloff>:/run_16px.png</iconset>
                </property>
                <property name="autoDefault">
                 <bool>true</bool>
@@ -454,7 +454,7 @@ p, li { white-space: pre-wrap; }
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>:/run.png</normaloff>:/run.png</iconset>
+                  <normaloff>:/run_16px.png</normaloff>:/run_16px.png</iconset>
                 </property>
                 <property name="autoDefault">
                  <bool>true</bool>
@@ -642,7 +642,7 @@ p, li { white-space: pre-wrap; }
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>:/run.png</normaloff>:/run.png</iconset>
+                  <normaloff>:/run_16px.png</normaloff>:/run_16px.png</iconset>
                 </property>
                 <property name="autoDefault">
                  <bool>true</bool>

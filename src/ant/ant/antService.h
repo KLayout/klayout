@@ -350,7 +350,7 @@ public:
   /**
    *  @brief Create the properties page
    */
-  virtual lay::PropertiesPage *properties_page (db::Manager *manager, QWidget *parent);
+  virtual std::vector<lay::PropertiesPage *> properties_pages (db::Manager *manager, QWidget *parent);
 #endif
 
   /**
@@ -545,6 +545,8 @@ private:
   ant::Object m_original;
   //  The current move mode
   MoveMode m_move_mode;
+  //  The currently moving segment
+  size_t m_seg_index;
   //  The ruler template
   std::vector<ant::Template> m_ruler_templates;
   unsigned int m_current_template;
@@ -566,6 +568,7 @@ private:
   virtual bool mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio);
   virtual bool mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio);
   virtual bool mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
+  virtual bool mouse_double_click_event (const db::DPoint &p, unsigned int buttons, bool prio);
   virtual void deactivated ();
 
   /**
@@ -584,6 +587,11 @@ private:
    *  @brief Limit the number of rulers to this number
    */
   void reduce_rulers (int num);
+
+  /**
+   *  @brief Finishes drawing mode and creates the ruler
+   */
+  void finish_drawing ();
 
   /**
    *  @brief Delete the selected rulers

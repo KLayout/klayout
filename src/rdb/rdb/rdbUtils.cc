@@ -34,7 +34,7 @@ namespace rdb
 {
 
 void
-scan_layer (rdb::Category *cat, const db::Layout &layout, unsigned int layer, const db::Cell *from, int levels)
+scan_layer (rdb::Category *cat, const db::Layout &layout, unsigned int layer, const db::Cell *from, int levels, bool with_properties)
 {
   rdb::Database *rdb = cat->database ();
   if (! rdb) {
@@ -78,7 +78,7 @@ scan_layer (rdb::Category *cat, const db::Layout &layout, unsigned int layer, co
       
       }
 
-      create_items_from_shapes (rdb, rdb_cell->id (), cat->id (), db::CplxTrans (layout.dbu ()), cell.shapes (layer));
+      create_items_from_shapes (rdb, rdb_cell->id (), cat->id (), db::CplxTrans (layout.dbu ()), cell.shapes (layer), with_properties);
 
     }
 
@@ -92,8 +92,8 @@ class CreateItemsRecursiveReceiver
   : public db::RecursiveShapeReceiver
 {
 public:
-  CreateItemsRecursiveReceiver (rdb::Category *cat, const db::CplxTrans &trans, rdb::Cell *cell)
-    : mp_cat (cat), mp_rdb (cat->database ()), m_trans (trans), mp_rdb_cell (cell)
+  CreateItemsRecursiveReceiver (rdb::Category *cat, const db::CplxTrans &trans, rdb::Cell *cell, bool with_properties)
+    : mp_cat (cat), mp_rdb (cat->database ()), m_trans (trans), mp_rdb_cell (cell), m_with_properties (with_properties)
   {
     //  just in case the iterator is non-hierarchical
     if (cell) {
@@ -159,7 +159,7 @@ public:
   virtual void shape (const db::RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans & /*always_apply*/, const db::ICplxTrans & /*trans*/, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
   {
     tl_assert (! m_cell_stack.empty ());
-    create_item_from_shape (mp_rdb, m_cell_stack.back ()->id (), mp_cat->id (), m_trans, shape);
+    create_item_from_shape (mp_rdb, m_cell_stack.back ()->id (), mp_cat->id (), m_trans, shape, m_with_properties);
   }
 
 public:
@@ -169,6 +169,7 @@ public:
   std::map<db::cell_index_type, const rdb::Cell *> m_id_to_cell;
   db::CplxTrans m_trans;
   rdb::Cell *mp_rdb_cell;
+  bool m_with_properties;
 
   const rdb::Cell *cell_for_id (const db::Layout *layout, db::cell_index_type ci)
   {
@@ -187,8 +188,8 @@ class CreateItemsFlatReceiver
   : public db::RecursiveShapeReceiver
 {
 public:
-  CreateItemsFlatReceiver (rdb::Category *cat, const db::CplxTrans &trans, rdb::Cell *cell)
-    : mp_cat (cat), mp_rdb (cat->database ()), m_trans (trans), mp_rdb_cell (cell)
+  CreateItemsFlatReceiver (rdb::Category *cat, const db::CplxTrans &trans, rdb::Cell *cell, bool with_properties)
+    : mp_cat (cat), mp_rdb (cat->database ()), m_trans (trans), mp_rdb_cell (cell), m_with_properties (with_properties)
   {
     //  .. nothing yet ..
   }
@@ -211,7 +212,7 @@ public:
 
   virtual void shape (const db::RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans & /*always_apply*/, const db::ICplxTrans &trans, const db::Box & /*region*/, const box_tree_type * /*complex_region*/)
   {
-    create_item_from_shape (mp_rdb, mp_rdb_cell->id (), mp_cat->id (), m_trans * trans, shape);
+    create_item_from_shape (mp_rdb, mp_rdb_cell->id (), mp_cat->id (), m_trans * trans, shape, m_with_properties);
   }
 
 public:
@@ -219,23 +220,24 @@ public:
   rdb::Database *mp_rdb;
   db::CplxTrans m_trans;
   const rdb::Cell *mp_rdb_cell;
+  bool m_with_properties;
 };
 
 }
 
 void
-scan_layer (rdb::Category *cat, const db::RecursiveShapeIterator &iter, bool flat)
+scan_layer (rdb::Category *cat, const db::RecursiveShapeIterator &iter, bool flat, bool with_properties)
 {
   if (! iter.top_cell () || ! iter.layout ()) {
     return;
   }
 
   db::CplxTrans trans (iter.layout ()->dbu ());
-  scan_layer (cat, 0, trans, iter, flat);
+  scan_layer (cat, 0, trans, iter, flat, with_properties);
 }
 
 void
-scan_layer (rdb::Category *cat, rdb::Cell *cell, const db::CplxTrans &trans, const db::RecursiveShapeIterator &iter, bool flat)
+scan_layer (rdb::Category *cat, rdb::Cell *cell, const db::CplxTrans &trans, const db::RecursiveShapeIterator &iter, bool flat, bool with_properties)
 {
   if (! cat->database ()) {
     return;
@@ -243,9 +245,9 @@ scan_layer (rdb::Category *cat, rdb::Cell *cell, const db::CplxTrans &trans, con
 
   std::unique_ptr<db::RecursiveShapeReceiver> rec;
   if (flat) {
-    rec.reset (new CreateItemsFlatReceiver (cat, trans, cell));
+    rec.reset (new CreateItemsFlatReceiver (cat, trans, cell, with_properties));
   } else {
-    rec.reset (new CreateItemsRecursiveReceiver (cat, trans, cell));
+    rec.reset (new CreateItemsRecursiveReceiver (cat, trans, cell, with_properties));
   }
 
   db::RecursiveShapeIterator (iter).push (rec.get ());
@@ -253,37 +255,47 @@ scan_layer (rdb::Category *cat, rdb::Cell *cell, const db::CplxTrans &trans, con
 
 // ------------------------------------------------------------------------------------------------------------
 
-void create_items_from_iterator (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::RecursiveShapeIterator &iter)
+void create_items_from_iterator (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::RecursiveShapeIterator &iter, bool with_properties)
 {
   tl_assert (iter.layout ());
   double dbu = iter.layout ()->dbu ();
 
   for (db::RecursiveShapeIterator i = iter; !i.at_end (); ++i) {
-    std::unique_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (*i, db::CplxTrans (dbu) * i.trans ()));
-    if (value.get ()) {
-      rdb::Item *item = db->create_item (cell_id, cat_id);
-      item->values ().add (value.release ());
-    }
+    create_item_from_shape (db, cell_id, cat_id, db::CplxTrans (dbu) * i.trans (), *i, with_properties);
   }
 }
 
-void create_items_from_shapes (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const db::Shapes &shapes)
+void create_items_from_shapes (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const db::Shapes &shapes, bool with_properties)
 {
   for (db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::All); !s.at_end (); ++s) {
-    std::unique_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (*s, trans));
-    if (value.get ()) {
-      rdb::Item *item = db->create_item (cell_id, cat_id);
-      item->values ().add (value.release ());
-    }
+    create_item_from_shape (db, cell_id, cat_id, trans, *s, with_properties);
   }
 }
 
-void create_item_from_shape (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const db::Shape &shape)
+void create_item_from_shape (rdb::Database *db, rdb::id_type cell_id, rdb::id_type cat_id, const db::CplxTrans &trans, const db::Shape &shape, bool with_properties)
 {
   std::unique_ptr<rdb::ValueBase> value (rdb::ValueBase::create_from_shape (shape, trans));
-  if (value.get ()) {
-    rdb::Item *item = db->create_item (cell_id, cat_id);
-    item->values ().add (value.release ());
+  if (! value.get ()) {
+    return;
+  }
+
+  rdb::Item *item = db->create_item (cell_id, cat_id);
+  item->values ().add (value.release ());
+
+  //  translate properties
+  if (with_properties && shape.has_prop_id () && shape.shapes () && shape.shapes ()->cell ()) {
+
+    const db::Layout *layout = shape.shapes ()->cell ()->layout ();
+    if (layout) {
+
+      auto ps = layout->properties_repository ().properties (shape.prop_id ());
+      for (auto i = ps.begin (); i != ps.end (); ++i) {
+        id_type tag_id = db->tags ().tag (layout->properties_repository ().prop_name (i->first).to_string (), true /*user tag*/).id ();
+        add_item_value (item, i->second, trans, tag_id);
+      }
+
+    }
+
   }
 }
 
@@ -317,50 +329,101 @@ void create_items_from_edge_pairs (rdb::Database *db, rdb::id_type cell_id, rdb:
   }
 }
 
-void add_item_value (rdb::Item *item, const tl::Variant &v, double dbu)
+ValueBase *add_item_value (rdb::Item *item, const tl::Variant &v, const db::CplxTrans &trans, rdb::id_type tag_id)
 {
-  if (dbu > 0 && v.is_user<db::Box> ()) {
-    item->add_value (db::CplxTrans (dbu) * v.to_user<db::Box> ());
-  } else if (dbu > 0 && v.is_user<db::Point> ()) {
-    db::DPoint p = db::CplxTrans (dbu) * v.to_user<db::Point> ();
-    item->add_value (db::DEdge (p, p));
-  } else if (dbu > 0 && v.is_user<db::Polygon> ()) {
-    item->add_value (db::CplxTrans (dbu) * v.to_user<db::Polygon> ());
-  } else if (dbu > 0 && v.is_user<db::SimplePolygon> ()) {
+  if (v.is_user<db::Box> ()) {
+    return item->add_value (trans * v.to_user<db::Box> (), tag_id);
+  } else if (v.is_user<db::Point> ()) {
+    db::DPoint p = trans * v.to_user<db::Point> ();
+    return item->add_value (db::DEdge (p, p), tag_id);
+  } else if (v.is_user<db::Polygon> ()) {
+    return item->add_value (trans * v.to_user<db::Polygon> (), tag_id);
+  } else if (v.is_user<db::SimplePolygon> ()) {
     db::DPolygon p;
-    db::DSimplePolygon sp = db::CplxTrans (dbu) * v.to_user<db::SimplePolygon> ();
+    db::DSimplePolygon sp = trans * v.to_user<db::SimplePolygon> ();
     p.assign_hull (sp.begin_hull (), sp.end_hull ());
-    item->add_value (p);
-  } else if (dbu > 0 && v.is_user<db::Edge> ()) {
-    item->add_value (db::CplxTrans (dbu) * v.to_user<db::Edge> ());
-  } else if (dbu > 0 && v.is_user<db::EdgePair> ()) {
-    item->add_value (db::CplxTrans (dbu) * v.to_user<db::EdgePair> ());
-  } else if (dbu > 0 && v.is_user<db::Path> ()) {
-    item->add_value (db::CplxTrans (dbu) * v.to_user<db::Path> ());
-  } else if (dbu > 0 && v.is_user<db::Text> ()) {
-    item->add_value (db::CplxTrans (dbu) * v.to_user<db::Text> ());
+    return item->add_value (p, tag_id);
+  } else if (v.is_user<db::Edge> ()) {
+    return item->add_value (trans * v.to_user<db::Edge> (), tag_id);
+  } else if (v.is_user<db::EdgePair> ()) {
+    return item->add_value (trans * v.to_user<db::EdgePair> (), tag_id);
+  } else if (v.is_user<db::Path> ()) {
+    return item->add_value (trans * v.to_user<db::Path> (), tag_id);
+  } else if (v.is_user<db::Text> ()) {
+    return item->add_value (trans * v.to_user<db::Text> (), tag_id);
   } else if (v.is_user<db::DBox> ()) {
-    item->add_value (v.to_user<db::DBox> ());
+    return item->add_value (v.to_user<db::DBox> (), tag_id);
   } else if (v.is_user<db::DPoint> ()) {
     db::DPoint p = v.to_user<db::DPoint> ();
-    item->add_value (db::DEdge (p, p));
+    return item->add_value (db::DEdge (p, p), tag_id);
   } else if (v.is_user<db::DPolygon> ()) {
-    item->add_value (v.to_user<db::DPolygon> ());
+    return item->add_value (v.to_user<db::DPolygon> (), tag_id);
   } else if (v.is_user<db::DSimplePolygon> ()) {
     db::DPolygon p;
     db::DSimplePolygon sp = v.to_user<db::DSimplePolygon> ();
     p.assign_hull (sp.begin_hull (), sp.end_hull ());
-    item->add_value (p);
+    return item->add_value (p, tag_id);
   } else if (v.is_user<db::DEdge> ()) {
-    item->add_value (v.to_user<db::DEdge> ());
+    return item->add_value (v.to_user<db::DEdge> (), tag_id);
   } else if (v.is_user<db::DEdgePair> ()) {
-    item->add_value (v.to_user<db::DEdgePair> ());
+    return item->add_value (v.to_user<db::DEdgePair> (), tag_id);
   } else if (v.is_user<db::DPath> ()) {
-    item->add_value (v.to_user<db::DPath> ());
+    return item->add_value (v.to_user<db::DPath> (), tag_id);
   } else if (v.is_user<db::DText> ()) {
-    item->add_value (v.to_user<db::DText> ());
+    return item->add_value (v.to_user<db::DText> (), tag_id);
+  } else if (v.is_double () || v.is_long () || v.is_ulong () || v.is_longlong () || v.is_ulonglong ()) {
+    return item->add_value (v.to_double (), tag_id);
   } else {
-    item->add_value (std::string (v.to_string ()));
+    return item->add_value (std::string (v.to_string ()), tag_id);
+  }
+}
+
+ValueBase *add_item_value(rdb::Item *item, const tl::Variant &v, double dbu, rdb::id_type tag_id)
+{
+  if (dbu > 0 && v.is_user<db::Box> ()) {
+    return item->add_value (db::CplxTrans (dbu) * v.to_user<db::Box> (), tag_id);
+  } else if (dbu > 0 && v.is_user<db::Point> ()) {
+    db::DPoint p = db::CplxTrans (dbu) * v.to_user<db::Point> ();
+    return item->add_value (db::DEdge (p, p), tag_id);
+  } else if (dbu > 0 && v.is_user<db::Polygon> ()) {
+    return item->add_value (db::CplxTrans (dbu) * v.to_user<db::Polygon> (), tag_id);
+  } else if (dbu > 0 && v.is_user<db::SimplePolygon> ()) {
+    db::DPolygon p;
+    db::DSimplePolygon sp = db::CplxTrans (dbu) * v.to_user<db::SimplePolygon> ();
+    p.assign_hull (sp.begin_hull (), sp.end_hull ());
+    return item->add_value (p, tag_id);
+  } else if (dbu > 0 && v.is_user<db::Edge> ()) {
+    return item->add_value (db::CplxTrans (dbu) * v.to_user<db::Edge> (), tag_id);
+  } else if (dbu > 0 && v.is_user<db::EdgePair> ()) {
+    return item->add_value (db::CplxTrans (dbu) * v.to_user<db::EdgePair> (), tag_id);
+  } else if (dbu > 0 && v.is_user<db::Path> ()) {
+    return item->add_value (db::CplxTrans (dbu) * v.to_user<db::Path> (), tag_id);
+  } else if (dbu > 0 && v.is_user<db::Text> ()) {
+    return item->add_value (db::CplxTrans (dbu) * v.to_user<db::Text> (), tag_id);
+  } else if (v.is_user<db::DBox> ()) {
+    return item->add_value (v.to_user<db::DBox> (), tag_id);
+  } else if (v.is_user<db::DPoint> ()) {
+    db::DPoint p = v.to_user<db::DPoint> ();
+    return item->add_value (db::DEdge (p, p), tag_id);
+  } else if (v.is_user<db::DPolygon> ()) {
+    return item->add_value (v.to_user<db::DPolygon> (), tag_id);
+  } else if (v.is_user<db::DSimplePolygon> ()) {
+    db::DPolygon p;
+    db::DSimplePolygon sp = v.to_user<db::DSimplePolygon> ();
+    p.assign_hull (sp.begin_hull (), sp.end_hull ());
+    return item->add_value (p, tag_id);
+  } else if (v.is_user<db::DEdge> ()) {
+    return item->add_value (v.to_user<db::DEdge> (), tag_id);
+  } else if (v.is_user<db::DEdgePair> ()) {
+    return item->add_value (v.to_user<db::DEdgePair> (), tag_id);
+  } else if (v.is_user<db::DPath> ()) {
+    return item->add_value (v.to_user<db::DPath> (), tag_id);
+  } else if (v.is_user<db::DText> ()) {
+    return item->add_value (v.to_user<db::DText> (), tag_id);
+  } else if (v.is_double () || v.is_long () || v.is_ulong () || v.is_longlong () || v.is_ulonglong ()) {
+    return item->add_value (v.to_double (), tag_id);
+  } else {
+    return item->add_value (std::string (v.to_string ()), tag_id);
   }
 }
 

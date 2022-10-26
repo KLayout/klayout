@@ -58,13 +58,13 @@ SaltController::initialized (lay::Dispatcher * /*root*/)
     connect (m_file_watcher, SIGNAL (fileRemoved (const QString &)), this, SLOT (file_watcher_triggered ()));
   }
 
-  connect (&m_salt, SIGNAL (collections_changed ()), this, SIGNAL (salt_changed ()));
+  connect (&m_salt, SIGNAL (collections_changed ()), this, SLOT (emit_salt_changed ()));
 }
 
 void
 SaltController::uninitialize (lay::Dispatcher * /*root*/)
 {
-  disconnect (&m_salt, SIGNAL (collections_changed ()), this, SIGNAL (salt_changed ()));
+  disconnect (&m_salt, SIGNAL (collections_changed ()), this, SLOT (emit_salt_changed ()));
 
   if (m_file_watcher) {
     disconnect (m_file_watcher, SIGNAL (fileChanged (const QString &)), this, SLOT (file_watcher_triggered ()));
@@ -168,7 +168,7 @@ void
 SaltController::sync_files ()
 {
   tl::log << tl::to_string (tr ("Detected file system change in packages - updating"));
-  emit salt_changed ();
+  emit_salt_changed ();
 }
 
 bool
@@ -240,6 +240,13 @@ void
 SaltController::file_watcher_triggered ()
 {
   dm_sync_files ();
+}
+
+void
+SaltController::emit_salt_changed ()
+{
+  salt_changed_event ();
+  emit salt_changed ();
 }
 
 void

@@ -67,8 +67,8 @@ class ResistorExtractor < RBA::GenericDeviceExtractor
         device.set_parameter(RBA::DeviceClassResistor::PARAM_L, l)
         device.set_parameter(RBA::DeviceClassResistor::PARAM_P, 2*l+2*w)
         device.set_parameter(RBA::DeviceClassResistor::PARAM_W, w)
-        define_terminal(device, RBA::DeviceClassResistor::TERMINAL_A, 0, terminals[0]);
-        define_terminal(device, RBA::DeviceClassResistor::TERMINAL_B, 0, terminals[1]);
+        define_terminal(device, "A", "C", terminals[0]);
+        define_terminal(device, "B", "C", terminals[1]);
       end
     end
   end

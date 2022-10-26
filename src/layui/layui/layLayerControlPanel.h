@@ -209,6 +209,16 @@ public:
   void set_phase (int phase);
 
   /**
+   *  @brief Sets highres mode
+   */
+  void set_highres_mode (bool hrm);
+
+  /**
+   *  @brief Sets oversampling mode
+   */
+  void set_oversampling (int os);
+
+  /**
    *  @brief Tell, if the model has been updated already (true) or if it is still under construction (false)
    */
   bool model_updated ();
@@ -347,6 +357,8 @@ private:
   bool m_in_update;
   std::vector<size_t> m_new_sel;
   int m_phase;
+  int m_oversampling;
+  bool m_hrm;
   tl::DeferredMethod<LayerControlPanel> m_do_update_content_dm;
   std::set<unsigned int> m_expanded;
   bool m_no_stipples;

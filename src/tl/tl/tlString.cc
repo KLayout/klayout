@@ -256,7 +256,7 @@ std::string to_lower_case (const std::string &s)
 
 std::string to_local (const std::string &s)
 {
-  std::unique_ptr<char> buffer (new char [MB_CUR_MAX]); //  MB_CUR_MAX isn't a constant
+  std::unique_ptr<char []> buffer (new char [MB_CUR_MAX]); //  MB_CUR_MAX isn't a constant
   std::string ls;
 
   std::wstring ws = to_wstring (s);

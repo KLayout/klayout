@@ -26,6 +26,7 @@
 #include "tlLog.h"
 #include "tlInternational.h"
 #include "tlWebDAV.h"
+#include "lymMacro.h"
 
 #include <QFileInfo>
 #include <QDir>
@@ -281,6 +282,21 @@ Salt::remove_grain (const SaltGrain &grain)
 
   QString name = tl::to_qstring (grain.name ());
   tl::info << QObject::tr ("Removing package '%1' ..").arg (name);
+
+  //  Execute "_uninstall.lym" if it exists
+  try {
+    QFile uninstall_lym (QDir (tl::to_qstring (grain.path ())).absoluteFilePath (tl::to_qstring ("_uninstall.lym")));
+    if (uninstall_lym.exists ()) {
+      lym::Macro uninstall;
+      uninstall.load_from (tl::to_string (uninstall_lym.fileName ()));
+      uninstall.set_file_path (tl::to_string (uninstall_lym.fileName ()));
+      uninstall.run ();
+    }
+  } catch (tl::Exception &ex) {
+    //  Errors in the uninstallation script are only logged, but do not prevent uninstallation
+    tl::error << ex.msg ();
+  }
+
   bool res = remove_from_collection (m_root, grain.name ());
   if (res) {
     tl::info << QObject::tr ("Package '%1' removed.").arg (name);
@@ -493,9 +509,24 @@ Salt::create_grain (const SaltGrain &templ, SaltGrain &target, double timeout, t
 
   if (res) {
 
-    tl::info << QObject::tr ("Package '%1' installed").arg (tl::to_qstring (target.name ()));
     target.set_installed_time (QDateTime::currentDateTime ());
     target.save ();
+
+    //  Execute "_install.lym" if it exists
+    try {
+      QFile install_lym (QDir (tl::to_qstring (target.path ())).absoluteFilePath (tl::to_qstring ("_install.lym")));
+      if (install_lym.exists ()) {
+        lym::Macro install;
+        install.load_from (tl::to_string (install_lym.fileName ()));
+        install.set_file_path (tl::to_string (install_lym.fileName ()));
+        install.run ();
+      }
+    } catch (tl::Exception &ex) {
+      //  Errors in the installation script are only logged, but do not prevent installation
+      tl::error << ex.msg ();
+    }
+
+    tl::info << QObject::tr ("Package '%1' installed").arg (tl::to_qstring (target.name ()));
 
     //  NOTE: this is a bit brute force .. we could as well try to insert the new grain into the existing structure
     refresh ();

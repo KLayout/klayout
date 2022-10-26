@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>791</width>
-    <height>385</height>
+    <height>403</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,7 +32,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Oversampling</string>
+      <string>Display Quality</string>
      </property>
      <layout class="QGridLayout">
       <property name="leftMargin">
@@ -53,7 +53,14 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Use oversampling:  </string>
+         <string>Oversampling mode</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="3">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>High resolution mode utilizes the full pixel density on high-DPI displays. Features may look small but rich in details.</string>
         </property>
        </widget>
       </item>
@@ -96,6 +103,13 @@
         </property>
         <property name="wordWrap">
          <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="3">
+       <widget class="QCheckBox" name="highres_mode">
+        <property name="text">
+         <string>High resolution mode enabled</string>
         </property>
        </widget>
       </item>

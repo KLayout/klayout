@@ -160,7 +160,7 @@ protected:
     ops[0] = lay::ViewOp (cursor_color (canvas), lay::ViewOp::Copy, solid_style, 0, 0, lay::ViewOp::Rect, lw, 0);
     lay::CanvasPlane *arrow_plane = canvas.plane (ops);
 
-    ops[0] = lay::ViewOp (cursor_color (canvas), lay::ViewOp::Copy, m_solid ? solid_style : dashed_style, 1, 0, lay::ViewOp::Rect, lw, 0);
+    ops[0] = lay::ViewOp (cursor_color (canvas), lay::ViewOp::Copy, m_solid ? solid_style : dashed_style, 0, 0, lay::ViewOp::Rect, lw, 0);
     lay::CanvasPlane *edge_plane = canvas.plane (ops);
 
     lay::Renderer &r = canvas.renderer ();

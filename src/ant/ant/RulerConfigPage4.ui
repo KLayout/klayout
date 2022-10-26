@@ -89,7 +89,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
+            <iconset resource="../../icons/icons.qrc">
              <normaloff>:/up_16px.png</normaloff>:/up_16px.png</iconset>
            </property>
           </widget>
@@ -103,7 +103,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
+            <iconset resource="../../icons/icons.qrc">
              <normaloff>:/add_16px.png</normaloff>:/add_16px.png</iconset>
            </property>
           </widget>
@@ -117,7 +117,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
+            <iconset resource="../../icons/icons.qrc">
              <normaloff>:/del_16px.png</normaloff>:/del_16px.png</iconset>
            </property>
           </widget>
@@ -131,7 +131,7 @@
             <string>...</string>
            </property>
            <property name="icon">
-            <iconset resource="../../lay/lay/layResources.qrc">
+            <iconset resource="../../icons/icons.qrc">
              <normaloff>:/down_16px.png</normaloff>:/down_16px.png</iconset>
            </property>
           </widget>
@@ -574,6 +574,16 @@
              <string>Ellipse</string>
             </property>
            </item>
+           <item>
+            <property name="text">
+             <string>Angle measurement</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Radius measurement</string>
+            </property>
+           </item>
           </widget>
          </item>
          <item row="7" column="0">
@@ -833,6 +843,16 @@
              <string>Auto measure (points will be set automatically)</string>
             </property>
            </item>
+           <item>
+            <property name="text">
+             <string>Angle measurement (three mouse clicks)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Multi-segment (finish with double click)</string>
+            </property>
+           </item>
           </widget>
          </item>
          <item row="9" column="0">
@@ -866,7 +886,7 @@
   <tabstop>t_snap_cbx</tabstop>
  </tabstops>
  <resources>
-  <include location="../../lay/lay/layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

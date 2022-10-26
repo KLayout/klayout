@@ -131,137 +131,6 @@ std::string ImageCacheEntry::to_string () const
 
 // ----------------------------------------------------------------------------
 
-static void 
-blowup (const tl::PixelBuffer &src, tl::PixelBuffer &dest, unsigned int os)
-{
-  unsigned int ymax = src.height ();
-  unsigned int xmax = src.width ();
-
-  for (unsigned int y = 0; y < ymax; ++y) {
-    for (unsigned int i = 0; i < os; ++i) {
-      const uint32_t *psrc = (const uint32_t *) src.scan_line (y);
-      uint32_t *pdest = (uint32_t *) dest.scan_line (y * os + i);
-      for (unsigned int x = 0; x < xmax; ++x) {
-        for (unsigned int j = 0; j < os; ++j) {
-          *pdest++ = *psrc;
-        }
-        ++psrc;
-      }
-    }
-  }
-}
-
-static void 
-subsample (const tl::PixelBuffer &src, tl::PixelBuffer &dest, unsigned int os, double g)
-{
-  //  TODO: this is probably not compatible with the endianess of SPARC ..
-  
-  //  LUT's for combining the RGB channels
-
-  //  forward transformation table
-  unsigned short lut1[256];
-  for (unsigned int i = 0; i < 256; ++i) {
-    double f = (65536 / (os * os)) - 1;
-    lut1[i] = (unsigned short)std::min (f, std::max (0.0, floor (0.5 + pow (i / 255.0, g) * f)));
-  } 
-
-  //  backward transformation table
-  unsigned char lut2[65536];
-  for (unsigned int i = 0; i < 65536; ++i) {
-    double f = os * os * ((65536 / (os * os)) - 1);
-    lut2[i] = (unsigned char)std::min (255.0, std::max (0.0, floor (0.5 + pow (i / f, 1.0 / g) * 255.0)));
-  } 
-
-  //  LUT's for alpha channel
-
-  //  forward transformation table
-  unsigned short luta1[256];
-  for (unsigned int i = 0; i < 256; ++i) {
-    double f = (65536 / (os * os)) - 1;
-    luta1[i] = (unsigned short)std::min (f, std::max (0.0, floor (0.5 + (i / 255.0) * f)));
-  }
-
-  //  backward transformation table
-  unsigned char luta2[65536];
-  for (unsigned int i = 0; i < 65536; ++i) {
-    double f = os * os * ((65536 / (os * os)) - 1);
-    luta2[i] = (unsigned char)std::min (255.0, std::max (0.0, floor (0.5 + (i / f) * 255.0)));
-  }
-
-  unsigned int ymax = dest.height ();
-  unsigned int xmax = dest.width ();
-
-  unsigned short *buffer = new unsigned short[xmax * 4];
-
-  for (unsigned int y = 0; y < ymax; ++y) {
-
-    {
-
-      const unsigned char *psrc = (const unsigned char *) src.scan_line (y * os);
-      unsigned short *pdest = buffer;
-
-      for (unsigned int x = 0; x < xmax; ++x) {
-
-        pdest[0] = lut1[psrc[0]];
-        pdest[1] = lut1[psrc[1]];
-        pdest[2] = lut1[psrc[2]];
-        pdest[3] = luta1[psrc[3]];
-        psrc += 4;
-
-        for (unsigned int j = os; j > 1; j--) {
-          pdest[0] += lut1[psrc[0]];
-          pdest[1] += lut1[psrc[1]];
-          pdest[2] += lut1[psrc[2]];
-          pdest[3] += luta1[psrc[3]];
-          psrc += 4;
-        }
-
-        pdest += 4;
-
-      }
-
-    }
-
-    for (unsigned int i = 1; i < os; ++i) {
-
-      const unsigned char *psrc = (const unsigned char *) src.scan_line (y * os + i);
-      unsigned short *pdest = buffer;
-
-      for (unsigned int x = 0; x < xmax; ++x) {
-
-        for (unsigned int j = os; j > 0; j--) {
-          pdest[0] += lut1[psrc[0]];
-          pdest[1] += lut1[psrc[1]];
-          pdest[2] += lut1[psrc[2]];
-          pdest[3] += luta1[psrc[3]];
-          psrc += 4;
-        }
-
-        pdest += 4;
-
-      }
-
-    }
-
-    {
-
-      unsigned char *pdest = (unsigned char *) dest.scan_line (y);
-      const unsigned short *psrc = buffer;
-
-      for (unsigned int x = 0; x < xmax; ++x) {
-        *pdest++ = lut2[*psrc++];
-        *pdest++ = lut2[*psrc++];
-        *pdest++ = lut2[*psrc++];
-        *pdest++ = luta2[*psrc++];
-      }
-
-    }
-
-  }
-
-  delete[] buffer;
-}
-
 void 
 invert (unsigned char *data, unsigned int width, unsigned int height)
 {
@@ -281,6 +150,7 @@ LayoutCanvas::LayoutCanvas (lay::LayoutViewBase *view)
     mp_image_fg (0),
     m_background (0), m_foreground (0), m_active (0),
     m_oversampling (1),
+    m_hrm (false),
     m_need_redraw (false),
     m_redraw_clearing (false),
     m_redraw_force_update (true),
@@ -328,19 +198,15 @@ LayoutCanvas::~LayoutCanvas ()
   clear_fg_bitmaps ();
 }
 
-#if defined(HAVE_QT) && QT_VERSION >= 0x050000
 double
-LayoutCanvas::dpr ()
+LayoutCanvas::resolution () const
 {
-  return widget () ? widget ()->devicePixelRatio () : 1.0;
+  if (m_hrm) {
+    return 1.0 / m_oversampling;
+  } else {
+    return 1.0 / (m_oversampling * dpr ());
+  }
 }
-#else
-double
-LayoutCanvas::dpr ()
-{
-  return 1.0;
-}
-#endif
 
 #if defined(HAVE_QT)
 void
@@ -405,6 +271,26 @@ LayoutCanvas::set_oversampling (unsigned int os)
     m_viewport_l.set_size (m_viewport.width () * m_oversampling, m_viewport.height () * m_oversampling);
     do_redraw_all ();
   }
+}
+
+void
+LayoutCanvas::set_highres_mode (bool hrm)
+{
+  if (hrm != m_hrm) {
+    m_image_cache.clear ();
+    m_hrm = hrm;
+    do_redraw_all ();
+  }
+}
+
+double
+LayoutCanvas::dpr () const
+{
+#if defined(HAVE_QT) && QT_VERSION >= 0x50000
+  return widget () ? widget ()->devicePixelRatio () : 1.0;
+#else
+  return 1.0;
+#endif
 }
 
 void 
@@ -477,7 +363,7 @@ LayoutCanvas::prepare_drawing ()
 {
   if (m_need_redraw) {
 
-    BitmapViewObjectCanvas::set_size (m_viewport_l.width (), m_viewport_l.height (), 1.0 / double (m_oversampling * dpr ()));
+    BitmapViewObjectCanvas::set_size (m_viewport_l.width (), m_viewport_l.height (), resolution ());
 
     if (! mp_image ||
         (unsigned int) mp_image->width () != m_viewport_l.width () || 
@@ -513,7 +399,7 @@ LayoutCanvas::prepare_drawing ()
         ++c;
       }
 
-      mp_redraw_thread->commit (m_layers, m_viewport_l, 1.0 / double (m_oversampling * dpr ()));
+      mp_redraw_thread->commit (m_layers, m_viewport_l, resolution ());
 
       if (tl::verbosity () >= 20) {
         tl::info << "Restored image from cache";
@@ -563,7 +449,7 @@ LayoutCanvas::prepare_drawing ()
       }
 
       if (m_redraw_clearing) {
-        mp_redraw_thread->start (mp_view->synchronous () ? 0 : mp_view->drawing_workers (), m_layers, m_viewport_l, 1.0 / double (m_oversampling * dpr ()), m_redraw_force_update);
+        mp_redraw_thread->start (mp_view->synchronous () ? 0 : mp_view->drawing_workers (), m_layers, m_viewport_l, resolution (), m_redraw_force_update);
       } else {
         mp_redraw_thread->restart (m_need_redraw_layer);
       }
@@ -634,7 +520,7 @@ LayoutCanvas::paint_event ()
       }
 
       //  render the main bitmaps
-      to_image (scaled_view_ops (m_oversampling * dpr ()), dither_pattern (), line_styles (), m_oversampling * dpr (), background_color (), foreground_color (), active_color (), this, *mp_image, m_viewport_l.width (), m_viewport_l.height ());
+      to_image (scaled_view_ops (1.0 / resolution ()), dither_pattern (), line_styles (), 1.0 / resolution (), background_color (), foreground_color (), active_color (), this, *mp_image, m_viewport_l.width (), m_viewport_l.height ());
 
       if (mp_image_fg) {
         delete mp_image_fg;
@@ -664,7 +550,7 @@ LayoutCanvas::paint_event ()
       if (fg_bitmaps () > 0) {
 
         tl::PixelBuffer full_image (*mp_image);
-        bitmaps_to_image (fg_view_op_vector (), fg_bitmap_vector (), dither_pattern (), line_styles (), m_oversampling * dpr (), &full_image, m_viewport_l.width (), m_viewport_l.height (), false, &m_mutex);
+        bitmaps_to_image (fg_view_op_vector (), fg_bitmap_vector (), dither_pattern (), line_styles (), 1.0 / resolution (), &full_image, m_viewport_l.width (), m_viewport_l.height (), false, &m_mutex);
 
         //  render the foreground parts ..
         if (m_oversampling == 1) {
@@ -672,7 +558,7 @@ LayoutCanvas::paint_event ()
         } else {
           tl::PixelBuffer subsampled_image (m_viewport.width (), m_viewport.height ());
           subsampled_image.set_transparent (mp_image->transparent ());
-          subsample (full_image, subsampled_image, m_oversampling, m_gamma);
+          full_image.subsample (subsampled_image, m_oversampling, m_gamma);
           *mp_image_fg = subsampled_image;
         }
 
@@ -684,7 +570,7 @@ LayoutCanvas::paint_event ()
 
         tl::PixelBuffer subsampled_image (m_viewport.width (), m_viewport.height ());
         subsampled_image.set_transparent (mp_image->transparent ());
-        subsample (*mp_image, subsampled_image, m_oversampling, m_gamma);
+        mp_image->subsample (subsampled_image, m_oversampling, m_gamma);
         *mp_image_fg = subsampled_image;
 
       }
@@ -711,7 +597,7 @@ LayoutCanvas::paint_event ()
       full_image.set_transparent (true);
       full_image.fill (0);
 
-      bitmaps_to_image (fg_view_op_vector (), fg_bitmap_vector (), dither_pattern (), line_styles (), m_oversampling * dpr (), &full_image, m_viewport_l.width (), m_viewport_l.height (), false, &m_mutex);
+      bitmaps_to_image (fg_view_op_vector (), fg_bitmap_vector (), dither_pattern (), line_styles (), 1.0 / resolution (), &full_image, m_viewport_l.width (), m_viewport_l.height (), false, &m_mutex);
 
       //  render the foreground parts ..
       if (m_oversampling == 1) {
@@ -723,7 +609,7 @@ LayoutCanvas::paint_event ()
       } else {
         tl::PixelBuffer subsampled_image (m_viewport.width (), m_viewport.height ());
         subsampled_image.set_transparent (true);
-        subsample (full_image, subsampled_image, m_oversampling, m_gamma);
+        full_image.subsample (subsampled_image, m_oversampling, m_gamma);
         QImage img = subsampled_image.to_image ();
 #if QT_VERSION >= 0x050000
         img.setDevicePixelRatio (dpr ());
@@ -799,9 +685,9 @@ public:
   {
     if (mp_image_l) {
       unsigned int os = mp_image_l->width () / width;
-      blowup (*mp_image, *mp_image_l, os);
+      mp_image->blowup (*mp_image_l, os);
       bitmaps_to_image (fg_view_op_vector (), fg_bitmap_vector (), dp, ls, 1.0 / resolution (), mp_image_l, mp_image_l->width (), mp_image_l->height (), false, 0);
-      subsample (*mp_image_l, *mp_image, os, m_gamma);
+      mp_image_l->subsample (*mp_image, os, m_gamma);
     } else {
       bitmaps_to_image (fg_view_op_vector (), fg_bitmap_vector (), dp, ls, 1.0 / resolution (), mp_image, width, height, false, 0);
     }
@@ -812,7 +698,7 @@ public:
   {
     if (mp_image_l && mp_image->width () > 0) {
       unsigned int os = mp_image_l->width () / mp_image->width ();
-      subsample (*mp_image_l, *mp_image, os, m_gamma);
+      mp_image_l->subsample (*mp_image, os, m_gamma);
     }
   }
 
@@ -986,13 +872,13 @@ LayoutCanvas::screenshot ()
   tl::PixelBuffer img (m_viewport.width (), m_viewport.height ());
   img.fill (m_background);
 
-  DetachedViewObjectCanvas vo_canvas (background_color (), foreground_color (), active_color (), m_viewport_l.width (), m_viewport_l.height (), 1.0 / double (m_oversampling * dpr ()), &img);
+  DetachedViewObjectCanvas vo_canvas (background_color (), foreground_color (), active_color (), m_viewport_l.width (), m_viewport_l.height (), resolution (), &img);
 
   //  and paint the background objects. It uses "img" to paint on.
   do_render_bg (m_viewport_l, vo_canvas);
 
   //  paint the layout bitmaps
-  to_image (scaled_view_ops (m_oversampling * dpr ()), dither_pattern (), line_styles (), m_oversampling * dpr (), background_color (), foreground_color (), active_color (), this, *vo_canvas.bg_image (), m_viewport_l.width (), m_viewport_l.height ());
+  to_image (scaled_view_ops (1.0 / resolution ()), dither_pattern (), line_styles (), 1.0 / resolution (), background_color (), foreground_color (), active_color (), this, *vo_canvas.bg_image (), m_viewport_l.width (), m_viewport_l.height ());
 
   //  subsample current image to provide the background for the foreground objects
   vo_canvas.make_background ();

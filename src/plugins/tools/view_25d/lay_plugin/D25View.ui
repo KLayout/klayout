@@ -71,8 +71,8 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../lay/lay/layResources.qrc">
-          <normaloff>:/run.png</normaloff>:/run.png</iconset>
+         <iconset resource="../../../../icons/icons.qrc">
+          <normaloff>:/run_16px.png</normaloff>:/run_16px.png</iconset>
         </property>
         <property name="autoRaise">
          <bool>true</bool>
@@ -260,7 +260,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../lay/lay/layResources.qrc">
+         <iconset resource="../../../../icons/icons.qrc">
           <normaloff>:/fit_left_24px.png</normaloff>:/fit_left_24px.png</iconset>
         </property>
         <property name="iconSize">
@@ -280,7 +280,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../lay/lay/layResources.qrc">
+         <iconset resource="../../../../icons/icons.qrc">
           <normaloff>:/fit_front_24px.png</normaloff>:/fit_front_24px.png</iconset>
         </property>
         <property name="iconSize">
@@ -300,7 +300,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../lay/lay/layResources.qrc">
+         <iconset resource="../../../../icons/icons.qrc">
           <normaloff>:/fit_right_24px.png</normaloff>:/fit_right_24px.png</iconset>
         </property>
         <property name="iconSize">
@@ -320,7 +320,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../lay/lay/layResources.qrc">
+         <iconset resource="../../../../icons/icons.qrc">
           <normaloff>:/fit_back_24px.png</normaloff>:/fit_back_24px.png</iconset>
         </property>
         <property name="iconSize">
@@ -340,7 +340,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../lay/lay/layResources.qrc">
+         <iconset resource="../../../../icons/icons.qrc">
           <normaloff>:/fit_top_24px.png</normaloff>:/fit_top_24px.png</iconset>
         </property>
         <property name="iconSize">
@@ -360,7 +360,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../lay/lay/layResources.qrc">
+         <iconset resource="../../../../icons/icons.qrc">
           <normaloff>:/fit_bottom_24px.png</normaloff>:/fit_bottom_24px.png</iconset>
         </property>
         <property name="iconSize">
@@ -628,7 +628,7 @@ See here for more information: &lt;a href=&quot;int:/about/25d_view.xml&quot;&gt
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../../lay/lay/layResources.qrc"/>
+  <include location="../../../../icons/icons.qrc"/>
  </resources>
  <connections>
   <connection>

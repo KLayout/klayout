@@ -32,8 +32,26 @@
 namespace ant
 {
 
+static void
+clean_points_impl (ant::Object::point_list &points)
+{
+  auto wp = points.begin ();
+  auto p = points.begin ();
+  while (p != points.end ()) {
+    auto pp = p + 1;
+    while (pp != points.end () && *pp == *p) {
+      ++pp;
+    }
+    *wp++ = *p;
+    p = pp;
+  }
+
+  points.erase (wp, points.end ());
+}
+
+
 Object::Object ()
-  : m_p1 (), m_p2 (), m_id (-1),
+  : m_id (-1),
     m_fmt_x ("$X"), m_fmt_y ("$Y"), m_fmt ("$D"),
     m_style (STY_ruler), m_outline (OL_diag),
     m_snap (true), m_angle_constraint (lay::AC_Global),
@@ -45,8 +63,8 @@ Object::Object ()
   //  .. nothing yet ..
 }
 
-Object::Object (const db::DPoint &p1, const db::DPoint &p2, int id, const std::string &fmt_x, const std::string &fmt_y, const std::string &fmt, style_type style, outline_type outline, bool snap, lay::angle_constraint_type angle_constraint)
-  : m_p1 (p1), m_p2 (p2), m_id (id),
+Object::Object (const db::DPoint &_p1, const db::DPoint &_p2, int id, const std::string &fmt_x, const std::string &fmt_y, const std::string &fmt, style_type style, outline_type outline, bool snap, lay::angle_constraint_type angle_constraint)
+  : m_id (id),
     m_fmt_x (fmt_x), m_fmt_y (fmt_y), m_fmt (fmt),
     m_style (style), m_outline (outline),
     m_snap (snap), m_angle_constraint (angle_constraint),
@@ -55,11 +73,25 @@ Object::Object (const db::DPoint &p1, const db::DPoint &p2, int id, const std::s
     m_xlabel_xalign (AL_auto), m_xlabel_yalign (AL_auto),
     m_ylabel_xalign (AL_auto), m_ylabel_yalign (AL_auto)
 {
-  //  .. nothing else ..
+  p1 (_p1);
+  p2 (_p2);
 }
 
-Object::Object (const db::DPoint &p1, const db::DPoint &p2, int id, const ant::Template &t)
-  : m_p1 (p1), m_p2 (p2), m_id (id),
+Object::Object (const Object::point_list &pts, int id, const std::string &fmt_x, const std::string &fmt_y, const std::string &fmt, style_type style, outline_type outline, bool snap, lay::angle_constraint_type angle_constraint)
+  : m_id (id),
+    m_fmt_x (fmt_x), m_fmt_y (fmt_y), m_fmt (fmt),
+    m_style (style), m_outline (outline),
+    m_snap (snap), m_angle_constraint (angle_constraint),
+    m_main_position (POS_auto),
+    m_main_xalign (AL_auto), m_main_yalign (AL_auto),
+    m_xlabel_xalign (AL_auto), m_xlabel_yalign (AL_auto),
+    m_ylabel_xalign (AL_auto), m_ylabel_yalign (AL_auto)
+{
+  set_points (pts);
+}
+
+Object::Object (const db::DPoint &_p1, const db::DPoint &_p2, int id, const ant::Template &t)
+  : m_id (id),
     m_fmt_x (t.fmt_x ()), m_fmt_y (t.fmt_y ()), m_fmt (t.fmt ()),
     m_style (t.style ()), m_outline (t.outline ()),
     m_snap (t.snap ()), m_angle_constraint (t.angle_constraint ()),
@@ -69,11 +101,26 @@ Object::Object (const db::DPoint &p1, const db::DPoint &p2, int id, const ant::T
     m_xlabel_xalign (t.xlabel_xalign ()), m_xlabel_yalign (t.xlabel_yalign ()),
     m_ylabel_xalign (t.ylabel_xalign ()), m_ylabel_yalign (t.ylabel_yalign ())
 {
-  //  .. nothing else ..
+  p1 (_p1);
+  p2 (_p2);
+}
+
+Object::Object (const Object::point_list &pts, int id, const ant::Template &t)
+  : m_points (pts), m_id (id),
+    m_fmt_x (t.fmt_x ()), m_fmt_y (t.fmt_y ()), m_fmt (t.fmt ()),
+    m_style (t.style ()), m_outline (t.outline ()),
+    m_snap (t.snap ()), m_angle_constraint (t.angle_constraint ()),
+    m_category (t.category ()),
+    m_main_position (t.main_position ()),
+    m_main_xalign (t.main_xalign ()), m_main_yalign (t.main_yalign ()),
+    m_xlabel_xalign (t.xlabel_xalign ()), m_xlabel_yalign (t.xlabel_yalign ()),
+    m_ylabel_xalign (t.ylabel_xalign ()), m_ylabel_yalign (t.ylabel_yalign ())
+{
+  clean_points_impl (m_points);
 }
 
 Object::Object (const ant::Object &d)
-  : m_p1 (d.m_p1), m_p2 (d.m_p2), m_id (d.m_id),
+  : m_points (d.m_points), m_id (d.m_id),
     m_fmt_x (d.m_fmt_x), m_fmt_y (d.m_fmt_y), m_fmt (d.m_fmt),
     m_style (d.m_style), m_outline (d.m_outline),
     m_snap (d.m_snap), m_angle_constraint (d.m_angle_constraint),
@@ -90,8 +137,7 @@ Object &
 Object::operator= (const ant::Object &d)
 {
   if (this != &d) {
-    m_p1 = d.m_p1;
-    m_p2 = d.m_p2;
+    m_points = d.m_points;
     m_id = d.m_id;
     m_fmt_x = d.m_fmt_x;
     m_fmt_y = d.m_fmt_y;
@@ -119,11 +165,8 @@ Object::operator< (const ant::Object &b) const
   if (m_id != b.m_id) {
     return m_id < b.m_id;
   }
-  if (m_p1 != b.m_p1) {
-    return m_p1 < b.m_p1;
-  }
-  if (m_p2 != b.m_p2) {
-    return m_p2 < b.m_p2;
+  if (m_points != b.m_points) {
+    return m_points < b.m_points;
   }
   if (m_fmt_x != b.m_fmt_x) {
     return m_fmt_x < b.m_fmt_x;
@@ -187,7 +230,7 @@ Object::equals (const db::DUserObjectBase *d) const
 bool 
 Object::operator== (const ant::Object &d) const
 {
-  return m_p1 == d.m_p1 && m_p2 == d.m_p2 && m_id == d.m_id && 
+  return m_points == d.m_points && m_id == d.m_id &&
          m_fmt_x == d.m_fmt_x && m_fmt_y == d.m_fmt_y && m_fmt == d.m_fmt &&
          m_style == d.m_style && m_outline == d.m_outline && 
          m_snap == d.m_snap && m_angle_constraint == d.m_angle_constraint &&
@@ -197,6 +240,129 @@ Object::operator== (const ant::Object &d) const
          m_xlabel_xalign == d.m_xlabel_xalign && m_xlabel_yalign == d.m_xlabel_yalign &&
          m_ylabel_xalign == d.m_ylabel_xalign && m_ylabel_yalign == d.m_ylabel_yalign
     ;
+}
+
+void
+Object::clean_points ()
+{
+  auto new_points = m_points;
+  clean_points_impl (new_points);
+  set_points_exact (std::move (new_points));
+}
+
+void
+Object::set_points (const point_list &points)
+{
+  auto new_points = points;
+  clean_points_impl (new_points);
+  set_points_exact (std::move (new_points));
+}
+
+void
+Object::set_points_exact (const point_list &points)
+{
+  if (m_points != points) {
+    m_points = points;
+    property_changed ();
+  }
+}
+
+void
+Object::set_points_exact (point_list &&points)
+{
+  if (m_points != points) {
+    m_points.swap (points);
+    property_changed ();
+  }
+}
+
+db::DPoint
+Object::seg_p1 (size_t seg_index) const
+{
+  if (seg_index == std::numeric_limits<size_t>::max ()) {
+    return p1 ();
+  } else if (seg_index < m_points.size ()) {
+    return m_points[seg_index];
+  } else if (m_points.empty ()) {
+    return db::DPoint ();
+  } else {
+    return m_points.back ();
+  }
+}
+
+db::DPoint
+Object::seg_p2 (size_t seg_index) const
+{
+  if (seg_index == std::numeric_limits<size_t>::max ()) {
+    return p2 ();
+  } else if (seg_index + 1 < m_points.size ()) {
+    return m_points[seg_index + 1];
+  } else if (m_points.empty ()) {
+    return db::DPoint ();
+  } else {
+    return m_points.back ();
+  }
+}
+
+void
+Object::seg_p1 (size_t seg_index, const db::DPoint &p)
+{
+  if (seg_index == std::numeric_limits<size_t>::max ()) {
+    p1 (p);
+  } else if (seg_index < m_points.size ()) {
+    m_points[seg_index] = p;
+  } else if (! m_points.empty ()) {
+    m_points.back () = p;
+  }
+}
+
+void
+Object::seg_p2 (size_t seg_index, const db::DPoint &p)
+{
+  if (seg_index == std::numeric_limits<size_t>::max ()) {
+    p2 (p);
+  } else if (seg_index + 1 < m_points.size ()) {
+    m_points[seg_index + 1] = p;
+  } else if (! m_points.empty ()) {
+    m_points.back () = p;
+  }
+}
+
+void
+Object::p1 (const db::DPoint &p)
+{
+  if (! p1 ().equal (p)) {
+    if (m_points.size () < 1) {
+      m_points.push_back (p);
+    } else {
+      m_points.front () = p;
+      //  makes sure there is only one point if p1 == p2
+      if (m_points.size () == 2 && m_points.back () == m_points.front ()) {
+        m_points.pop_back ();
+      }
+    }
+    property_changed ();
+  }
+}
+
+void
+Object::p2 (const db::DPoint &p)
+{
+  if (! p2 ().equal (p)) {
+    if (m_points.size () < 2) {
+      if (m_points.empty ()) {
+        m_points.push_back (db::DPoint ());
+      }
+      m_points.push_back (p);
+    } else {
+      m_points.back () = p;
+    }
+    //  makes sure there is only one point if p1 == p2
+    if (m_points.size () == 2 && m_points.back () == m_points.front ()) {
+      m_points.pop_back ();
+    }
+    property_changed ();
+  }
 }
 
 bool 
@@ -226,7 +392,11 @@ Object::clone () const
 db::DBox 
 Object::box () const
 {
-  return db::DBox (m_p1, m_p2);
+  db::DBox bx;
+  for (auto d = m_points.begin (); d != m_points.end (); ++d) {
+    bx += *d;
+  }
+  return bx;
 }
 
 class AnnotationEval
@@ -245,38 +415,12 @@ private:
   db::DFTrans m_trans;
 };
 
-static double 
-delta_x (const Object &obj, const db::DFTrans &t)
-{
-  double dx = ((t * obj.p2 ()).x () - (t * obj.p1 ()).x ());
-
-  //  avoid "almost 0" outputs
-  if (fabs (dx) < 1e-5 /*micron*/) {
-    dx = 0;
-  }
-
-  return dx;
-}
-
-static double 
-delta_y (const Object &obj, const db::DFTrans &t)
-{
-  double dy = ((t * obj.p2 ()).y () - (t * obj.p1 ()).y ());
-
-  //  avoid "almost 0" outputs
-  if (fabs (dy) < 1e-5 /*micron*/) {
-    dy = 0;
-  }
-
-  return dy;
-}
-
 class AnnotationEvalFunction
   : public tl::EvalFunction
 {
 public:
-  AnnotationEvalFunction (char function, const AnnotationEval *eval)
-    : m_function (function), mp_eval (eval)
+  AnnotationEvalFunction (char function, const AnnotationEval *eval, size_t index)
+    : m_function (function), mp_eval (eval), m_index (index)
   {
     // .. nothing yet ..
   }
@@ -301,36 +445,82 @@ public:
     } else if (m_function == 'Y') {
       out = delta_y (obj, trans);
     } else if (m_function == 'U') {
-      out = (trans * obj.p1 ()).x ();
+      out = (trans * p1 (obj)).x ();
     } else if (m_function == 'V') {
-      out = (trans * obj.p1 ()).y ();
+      out = (trans * p1 (obj)).y ();
     } else if (m_function == 'P') {
-      out = (trans * obj.p2 ()).x ();
+      out = (trans * p2 (obj)).x ();
     } else if (m_function == 'Q') {
-      out = (trans * obj.p2 ()).y ();
+      out = (trans * p2 (obj)).y ();
+    } else if (m_function == 'G') {
+      double r, a1, a2;
+      db::DPoint c;
+      if (obj.compute_angle_parameters (r, c, a1, a2)) {
+        out = tl::Variant ((a2 - a1) * 180.0 / M_PI);
+      } else {
+        out = tl::Variant ();
+      }
     } else {
       out = tl::Variant ();
     }
   }
 
+  db::DPoint p1 (const Object &obj) const
+  {
+    return obj.seg_p1 (m_index);
+  }
+
+  db::DPoint p2 (const Object &obj) const
+  {
+    return obj.seg_p2 (m_index);
+  }
+
+  double
+  delta_x (const Object &obj, const db::DFTrans &t) const
+  {
+    double dx = ((t * p2 (obj)).x () - (t * p1 (obj)).x ());
+
+    //  avoid "almost 0" outputs
+    if (fabs (dx) < 1e-5 /*micron*/) {
+      dx = 0;
+    }
+
+    return dx;
+  }
+
+  double
+  delta_y (const Object &obj, const db::DFTrans &t) const
+  {
+    double dy = ((t * p2 (obj)).y () - (t * p1 (obj)).y ());
+
+    //  avoid "almost 0" outputs
+    if (fabs (dy) < 1e-5 /*micron*/) {
+      dy = 0;
+    }
+
+    return dy;
+  }
+
 private:
   char m_function;
   const AnnotationEval *mp_eval;
+  size_t m_index;
 };
 
 std::string 
-Object::formatted (const std::string &fmt, const db::DFTrans &t) const
+Object::formatted (const std::string &fmt, const db::DFTrans &t, size_t index) const
 {
   AnnotationEval eval (*this, t);
-  eval.define_function ("L", new AnnotationEvalFunction('L', &eval)); // manhattan length
-  eval.define_function ("D", new AnnotationEvalFunction('D', &eval)); // euclidian distance
-  eval.define_function ("X", new AnnotationEvalFunction('X', &eval)); // x delta
-  eval.define_function ("Y", new AnnotationEvalFunction('Y', &eval)); // y delta
-  eval.define_function ("U", new AnnotationEvalFunction('U', &eval)); // p1.x
-  eval.define_function ("V", new AnnotationEvalFunction('V', &eval)); // p1.y
-  eval.define_function ("P", new AnnotationEvalFunction('P', &eval)); // p2.x
-  eval.define_function ("Q", new AnnotationEvalFunction('Q', &eval)); // p2.y
-  eval.define_function ("A", new AnnotationEvalFunction('A', &eval)); // area mm2
+  eval.define_function ("L", new AnnotationEvalFunction('L', &eval, index)); // manhattan length
+  eval.define_function ("D", new AnnotationEvalFunction('D', &eval, index)); // euclidian distance
+  eval.define_function ("X", new AnnotationEvalFunction('X', &eval, index)); // x delta
+  eval.define_function ("Y", new AnnotationEvalFunction('Y', &eval, index)); // y delta
+  eval.define_function ("U", new AnnotationEvalFunction('U', &eval, index)); // p1.x
+  eval.define_function ("V", new AnnotationEvalFunction('V', &eval, index)); // p1.y
+  eval.define_function ("P", new AnnotationEvalFunction('P', &eval, index)); // p2.x
+  eval.define_function ("Q", new AnnotationEvalFunction('Q', &eval, index)); // p2.y
+  eval.define_function ("A", new AnnotationEvalFunction('A', &eval, index)); // area mm2
+  eval.define_function ("G", new AnnotationEvalFunction('G', &eval, index)); // angle (if applicable)
   return eval.interpolate (fmt);
 }
 
@@ -343,6 +533,9 @@ Object::class_name () const
 void 
 Object::from_string (const char *s, const char * /*base_dir*/)
 {
+  m_points.clear ();
+  point_list new_points;
+
   tl::Extractor ex (s);
   while (! ex.at_end ()) {
 
@@ -407,6 +600,14 @@ Object::from_string (const char *s, const char * /*base_dir*/)
       db::DPoint p (p2 ());
       p.set_y (q);
       p2 (p);
+
+    } else if (ex.test ("pt=")) {
+
+      double x = 0.0, y = 0.0;
+      ex.read (x);
+      ex.expect (":");
+      ex.read (y);
+      new_points.push_back (db::DPoint (x, y));
 
     } else if (ex.test ("position=")) {
 
@@ -518,6 +719,10 @@ Object::from_string (const char *s, const char * /*base_dir*/)
     ex.test (",");
 
   }
+
+  if (! new_points.empty ()) {
+    set_points (new_points);
+  }
 }
 
 std::string 
@@ -529,18 +734,28 @@ Object::to_string () const
   r += tl::to_string (id ());
   r += ",";
 
-  r += "x1=";
-  r += tl::to_string (p1 ().x ());
-  r += ",";
-  r += "y1=";
-  r += tl::to_string (p1 ().y ());
-  r += ",";
-  r += "x2=";
-  r += tl::to_string (p2 ().x ());
-  r += ",";
-  r += "y2=";
-  r += tl::to_string (p2 ().y ());
-  r += ",";
+  if (m_points.size () > 2) {
+    for (auto p = m_points.begin (); p != m_points.end (); ++p) {
+      r += "pt=";
+      r += tl::to_string (p->x ());
+      r += ":";
+      r += tl::to_string (p->y ());
+      r += ",";
+    }
+  } else {
+    r += "x1=";
+    r += tl::to_string (p1 ().x ());
+    r += ",";
+    r += "y1=";
+    r += tl::to_string (p1 ().y ());
+    r += ",";
+    r += "x2=";
+    r += tl::to_string (p2 ().x ());
+    r += ",";
+    r += "y2=";
+    r += tl::to_string (p2 ().y ());
+    r += ",";
+  }
 
   r += "category=";
   r += tl::to_word_or_quoted_string (category ());
@@ -600,6 +815,117 @@ Object::to_string () const
   r += acc.to_string (angle_constraint ());
 
   return r;
+}
+
+bool
+Object::compute_interpolating_circle (double &radius, db::DPoint &center, double &start_angle, double &stop_angle) const
+{
+  if (m_points.size () < 2) {
+    return false;
+  }
+
+  double d = m_points.back ().distance (m_points.front ()) * 0.5;
+  if (d < db::epsilon) {
+    return false;
+  }
+
+  db::DVector n = m_points.back () - m_points.front ();
+  db::DPoint m = m_points.front () + n * 0.5;
+  n = db::DVector (n.y (), -n.x ()) * (0.5 / d);
+
+  double nom = 0.0;
+  double div = 0.0;
+
+  for (size_t i = 1; i + 1 < m_points.size (); ++i) {
+    db::DVector p = m_points [i] - m;
+    double pn = db::sprod (p, n);
+    div += pn * pn;
+    nom += pn * (p.sq_double_length () - d * d);
+  }
+
+  if (div < db::epsilon) {
+    return false;
+  }
+
+  double l = 0.5 * nom / div;
+  radius = sqrt (l * l + d * d);
+  center = m + n * l;
+
+  double a = atan2 (-n.y (), -n.x ());
+  double da = atan2 (d, l);
+
+  if (fabs (l) < db::epsilon) {
+
+    start_angle = 0.0;
+    stop_angle = M_PI * 2.0;
+
+  } else if (l < 0.0) {
+
+    stop_angle = a + da;
+    start_angle = stop_angle + 2.0 * (M_PI - da);
+
+  } else {
+
+    start_angle = a - da;
+    stop_angle = a + da;
+
+  }
+
+  while (stop_angle < start_angle - db::epsilon) {
+    stop_angle += M_PI * 2.0;
+  }
+
+  return true;
+}
+
+bool
+Object::compute_angle_parameters (double &radius, db::DPoint &center, double &start_angle, double &stop_angle) const
+{
+  if (m_points.size () < 3) {
+    return false;
+  }
+
+  db::DPoint p1 = m_points.front (), p2 = m_points.back ();
+
+  db::DVector pc;
+  for (size_t i = 1; i + 1 < m_points.size (); ++i) {
+    pc += m_points[i] - db::DPoint ();
+  }
+  center = db::DPoint () + pc * (1.0 / double (m_points.size () - 2));
+
+  db::DVector v1 (p1 - center);
+  if (v1.double_length () < db::epsilon) {
+    return false;
+  }
+
+  db::DVector v2 (p2 - center);
+  if (v2.double_length () < db::epsilon) {
+    return false;
+  }
+
+  radius = std::min (v1.double_length (), v2.double_length ());
+
+  v1 *= 1.0 / v1.double_length ();
+  v2 *= 1.0 / v2.double_length ();
+
+  if (db::vprod_sign (v1, v2) == 0) {
+    return false;
+  }
+
+  start_angle = 0.0;
+  stop_angle = 0.0;
+  start_angle = atan2 (v1.y (), v1.x ());
+  stop_angle = atan2 (v2.y (), v2.x ());
+
+  if (db::vprod_sign (v1, v2) < 0) {
+    std::swap (stop_angle, start_angle);
+  }
+
+  while (stop_angle < start_angle - db::epsilon) {
+    stop_angle += M_PI * 2.0;
+  }
+
+  return true;
 }
 
 void

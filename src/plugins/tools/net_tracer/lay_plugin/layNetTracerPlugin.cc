@@ -22,7 +22,7 @@
 
 #include "dbNetTracerIO.h"
 
-#include "layNetTracerIO.h"
+#include "layNetTracerTechComponentEditor.h"
 #include "layNetTracerDialog.h"
 #include "layNetTracerConfig.h"
 

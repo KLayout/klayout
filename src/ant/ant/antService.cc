@@ -32,6 +32,7 @@
 #include "laybasicConfig.h"
 #include "layConverters.h"
 #include "layLayoutCanvas.h"
+#include "layFixedFont.h"
 #if defined(HAVE_QT)
 #  include "layProperties.h"
 #endif
@@ -43,6 +44,10 @@
 
 namespace ant
 {
+
+double angle_ruler_radius_factor = 0.9;
+double ruler_tick_length = 8.0;
+double ruler_arrow_width = 8.0;
 
 // -------------------------------------------------------------
 //  Convert buttons to an angle constraint
@@ -113,6 +118,8 @@ tick_spacings (double d, double min_d, int &minor_ticks, double &ticks)
  *  @param pos The position where to draw the text
  *  @param bitmap The bitmap to draw the ruler on
  *  @param renderer The renderer object
+ *  @param first_segment True, if we're drawing the first segment
+ *  @param last_segment True, if we're drawing the last segment
  */
 void 
 draw_ruler (const db::DPoint &q1,
@@ -123,10 +130,13 @@ draw_ruler (const db::DPoint &q1,
             bool right,
             ant::Object::style_type style,
             lay::CanvasPlane *bitmap,
-            lay::Renderer &renderer)
+            lay::Renderer &renderer,
+            bool first_segment,
+            bool last_segment,
+            bool no_line = false)
 {
-  double arrow_width = 8 / renderer.resolution ();
-  double arrow_length = 12 / renderer.resolution ();
+  double arrow_width = ruler_arrow_width / renderer.resolution ();
+  double arrow_length = 1.5 * arrow_width;
   double sel_width = 2 / renderer.resolution ();
 
   if (length_u < 1e-5 /*micron*/ && style != ant::Object::STY_cross_both && style != ant::Object::STY_cross_end && style != ant::Object::STY_cross_start) {
@@ -145,7 +155,7 @@ draw_ruler (const db::DPoint &q1,
   } else {
 
     //  compute the tick distribution
-    double tick_length = (style == ant::Object::STY_ruler ? 8 : 0) / renderer.resolution ();
+    double tick_length = (style == ant::Object::STY_ruler ? ruler_tick_length : 0) / renderer.resolution ();
 
     double ticks = -1.0;
     int minor_ticks = -1;
@@ -157,12 +167,14 @@ draw_ruler (const db::DPoint &q1,
     //  normal and unit vector
     
     double len = q1.double_distance (q2);
-    if ((style == ant::Object::STY_arrow_end || style == ant::Object::STY_arrow_start) && len < double (arrow_length) * 1.2) {
-      arrow_length = len / 1.2;
-      arrow_width = arrow_length * 2.0 / 3.0;
-    } else if (style == ant::Object::STY_arrow_both && len < double (arrow_length) * 2.4) {
-      arrow_length = len / 2.4;
-      arrow_width = arrow_length * 2.0 / 3.0;
+    if (! no_line && len < double (arrow_length) * 2.4) {
+      if ((style == ant::Object::STY_arrow_end || style == ant::Object::STY_arrow_start)) {
+        arrow_length = len / 1.2;
+        arrow_width = arrow_length * 2.0 / 3.0;
+      } else if (style == ant::Object::STY_arrow_both) {
+        arrow_length = len / 2.4;
+        arrow_width = arrow_length * 2.0 / 3.0;
+      }
     }
     
     db::DVector qq (q2.y () - q1.y (), q1.x () - q2.x ());
@@ -182,37 +194,53 @@ draw_ruler (const db::DPoint &q1,
       qu = db::DVector (1.0, 0.0);
     }
       
-    //  produce polygon stuff
+    //  produce line in selected and unselected mode
       
-    if (sel && style != ant::Object::STY_none) {
+    if (! no_line && style != ant::Object::STY_none) {
 
-      db::DVector qw = qq * (sel_width * 0.5);
-      
-      db::DVector dq1, dq2;
-      if (style == ant::Object::STY_arrow_both || style == ant::Object::STY_arrow_start) {
-        dq1 = qu * (arrow_length - 1);
-      } else if (style == ant::Object::STY_cross_both || style == ant::Object::STY_cross_start) {
-        dq1 = qu * (sel_width * 0.5);
-      }
-      if (style == ant::Object::STY_arrow_both || style == ant::Object::STY_arrow_end) {
-        dq2 = qu * -(arrow_length - 1);
-      } else if (style == ant::Object::STY_cross_both || style == ant::Object::STY_cross_end) {
-        dq2 = qu * -(sel_width * 0.5);
+      if (sel) {
+
+        db::DVector qw = qq * (sel_width * 0.5);
+
+        db::DVector dq1, dq2;
+        if (! first_segment) {
+          //  no start indicator if not first segment
+        } else if (style == ant::Object::STY_arrow_both || style == ant::Object::STY_arrow_start) {
+          dq1 = qu * (arrow_length - 1);
+        } else if (style == ant::Object::STY_cross_both || style == ant::Object::STY_cross_start) {
+          dq1 = qu * (sel_width * 0.5);
+        }
+        if (! last_segment) {
+          //  no end indicator if not last segment
+        } else if (style == ant::Object::STY_arrow_both || style == ant::Object::STY_arrow_end) {
+          dq2 = qu * -(arrow_length - 1);
+        } else if (style == ant::Object::STY_cross_both || style == ant::Object::STY_cross_end) {
+          dq2 = qu * -(sel_width * 0.5);
+        }
+
+        db::DPolygon p;
+        db::DPoint points[] = {
+          db::DPoint (q1 + dq1 + qw),
+          db::DPoint (q2 + dq2 + qw),
+          db::DPoint (q2 + dq2 - qw),
+          db::DPoint (q1 + dq1 - qw),
+        };
+        p.assign_hull (points, points + sizeof (points) / sizeof (points [0]));
+        renderer.draw (p, bitmap, bitmap, 0, 0);
+
+      } else {
+
+        renderer.draw (db::DEdge (q1, q2), 0, bitmap, 0, 0);
+
       }
 
-      db::DPolygon p;
-      db::DPoint points[] = {
-        db::DPoint (q1 + dq1 + qw),
-        db::DPoint (q2 + dq2 + qw),
-        db::DPoint (q2 + dq2 - qw),
-        db::DPoint (q1 + dq1 - qw),
-      };
-      p.assign_hull (points, points + sizeof (points) / sizeof (points [0]));
-      renderer.draw (p, bitmap, bitmap, 0, 0);
-      
     }
 
-    if (style == ant::Object::STY_arrow_end || style == ant::Object::STY_arrow_both) {
+    if (! last_segment) {
+
+      //  no end indicator if not last segment
+
+    } else if (style == ant::Object::STY_arrow_end || style == ant::Object::STY_arrow_both) {
 
       db::DPolygon p;
       db::DPoint points[] = {
@@ -239,7 +267,11 @@ draw_ruler (const db::DPoint &q1,
 
     }
     
-    if (style == ant::Object::STY_arrow_start || style == ant::Object::STY_arrow_both) {
+    if (! first_segment) {
+
+      //  no start indicator if not first segment
+
+    } else if (style == ant::Object::STY_arrow_start || style == ant::Object::STY_arrow_both) {
 
       db::DPolygon p;
       db::DPoint points[] = {
@@ -266,12 +298,6 @@ draw_ruler (const db::DPoint &q1,
 
     }
 
-    //  produce edge and text stuff
-    
-    if (! sel && style != ant::Object::STY_none) {
-      renderer.draw (db::DEdge (q1, q2), 0, bitmap, 0, 0);
-    }
-    
     //  create three tick vectors in tv_text, tv_short and tv_long
 
     double tf = tick_length;
@@ -340,8 +366,8 @@ draw_text (const db::DPoint &q1,
     return;
   }
 
-  double arrow_width = 8 / renderer.resolution ();
-  double arrow_length = 12 / renderer.resolution ();
+  double arrow_width = ruler_arrow_width / renderer.resolution ();
+  double arrow_length = 1.5 * arrow_width;
 
   //  Currently, "auto" means p2.
   if (pos == ant::Object::POS_auto) {
@@ -360,7 +386,7 @@ draw_text (const db::DPoint &q1,
   } else {
 
     //  compute the tick distribution
-    double tick_length = (style == ant::Object::STY_ruler ? 8 : 0) / renderer.resolution ();
+    double tick_length = (style == ant::Object::STY_ruler ? ruler_tick_length : 0) / renderer.resolution ();
 
     //  normal and unit vector
 
@@ -487,9 +513,12 @@ draw_text (const db::DPoint &q1,
  *
  *  @param q1 The first point in pixel space
  *  @param q2 The second point in pixel space
+ *  @param length_u The "typical dimension" - used to simplify for very small ellipses
  *  @param sel True to draw ruler in "selected" mode
  *  @param bitmap The bitmap to draw the ruler on
  *  @param renderer The renderer object
+ *  @param start_angle The starting angle (in radians)
+ *  @param stop_angle The stop angle (in radians)
  */
 void
 draw_ellipse (const db::DPoint &q1,
@@ -497,7 +526,9 @@ draw_ellipse (const db::DPoint &q1,
               double length_u,
               bool sel,
               lay::CanvasPlane *bitmap,
-              lay::Renderer &renderer)
+              lay::Renderer &renderer,
+              double start_angle = 0.0,
+              double stop_angle = 2.0 * M_PI)
 {
   double sel_width = 2 / renderer.resolution ();
 
@@ -516,51 +547,30 @@ draw_ellipse (const db::DPoint &q1,
 
   } else {
 
-    int npoints = 200;
-
-    //  produce polygon stuff
+    int npoints = int (floor (200 * abs (stop_angle - start_angle) / (2.0 * M_PI)));
 
     double rx = fabs ((q2 - q1).x () * 0.5);
     double ry = fabs ((q2 - q1).y () * 0.5);
     db::DPoint c = q1 + (q2 - q1) * 0.5;
 
-    db::DPolygon p;
-
     std::vector<db::DPoint> pts;
-    pts.reserve (npoints);
+    pts.reserve (npoints + 1);
 
-    if (sel) {
-      rx += sel_width * 0.5;
-      ry += sel_width * 0.5;
-    }
-
-    double da = M_PI * 2.0 / double (npoints);
-    for (int i = 0; i < npoints; ++i) {
-      double a = da * i;
+    double da = fabs (stop_angle - start_angle) / double (npoints);
+    for (int i = 0; i < npoints + 1; ++i) {
+      double a = da * i + start_angle;
       pts.push_back (c + db::DVector (rx * cos (a), ry * sin (a)));
     }
 
-    p.assign_hull (pts.begin (), pts.end ());
-
     if (sel) {
 
-      pts.clear ();
-
-      rx -= sel_width;
-      ry -= sel_width;
-      for (int i = 0; i < npoints; ++i) {
-        double a = da * i;
-        pts.push_back (c + db::DVector (rx * cos (a), ry * sin (a)));
-      }
-
-      p.insert_hole (pts.begin (), pts.end ());
-
+      db::DPath p (pts.begin (), pts.end (), sel_width);
       renderer.draw (p, bitmap, bitmap, 0, 0);
 
     } else {
 
-      for (db::DPolygon::polygon_edge_iterator e = p.begin_edge (); ! e.at_end (); ++e) {
-        renderer.draw (*e, 0, bitmap, 0, 0);
+      for (size_t i = 0; i + 1 < pts.size (); ++i) {
+        renderer.draw (db::DEdge (pts [i], pts [i + 1]), 0, bitmap, 0, 0);
       }
 
     }
@@ -570,21 +580,26 @@ draw_ellipse (const db::DPoint &q1,
 }
 
 void
-draw_ruler (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
+draw_ruler_segment (const ant::Object &ruler, size_t index, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
 {
+  bool last_segment = (index == ruler.segments () - 1 || index == std::numeric_limits<size_t>::max ());
+  bool first_segment = (index == 0 || index == std::numeric_limits<size_t>::max ());
+
+  db::DPoint p1 = ruler.seg_p1 (index), p2 = ruler.seg_p2 (index);
+
   //  round the starting point, shift both, and round the end point 
-  std::pair <db::DPoint, db::DPoint> v = lay::snap (trans * ruler.p1 (), trans * ruler.p2 ());
+  std::pair <db::DPoint, db::DPoint> v = lay::snap (trans * p1, trans * p2);
   db::DPoint q1 = v.first;
   db::DPoint q2 = v.second;
   
   bool xy_swapped = ((trans.rot () % 2) != 0);
-  double lu = ruler.p1 ().double_distance (ruler.p2 ());
+  double lu = p1.double_distance (p2);
   int min_tick_spc = int (0.5 + 20 / renderer.resolution ());  //  min tick spacing in canvas units
   double mu = double (min_tick_spc) / trans.ctrans (1.0);
 
   if (ruler.outline () == Object::OL_diag) {
-    draw_ruler (q1, q2, lu, mu, sel, q2.x () < q1.x (), ruler.style (), bitmap, renderer);
-    draw_text (q1, q2, lu, ruler.text (), q2.x () < q1.x (), ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+    draw_ruler (q1, q2, lu, mu, sel, q2.x () < q1.x (), ruler.style (), bitmap, renderer, first_segment, last_segment);
+    draw_text (q1, q2, lu, ruler.text (index), q2.x () < q1.x (), ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
   }
 
   if ((!xy_swapped && (ruler.outline () == Object::OL_xy || ruler.outline () == Object::OL_diag_xy)) ||
@@ -593,13 +608,13 @@ draw_ruler (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay
     bool r = (q2.x () > q1.x ()) ^ (q2.y () < q1.y ());
 
     if (ruler.outline () == Object::OL_diag_xy || ruler.outline () == Object::OL_diag_yx) {
-      draw_ruler (q1, q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer);
-      draw_text (q1, q2, lu, ruler.text (), !r, ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+      draw_ruler (q1, q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer, first_segment, last_segment);
+      draw_text (q1, q2, lu, ruler.text (index), !r, ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
     }
-    draw_ruler (q1, db::DPoint (q2.x (), q1.y ()), lu, mu, sel, r, ruler.style (), bitmap, renderer);
-    draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
-    draw_ruler (db::DPoint (q2.x (), q1.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer);
-    draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
+    draw_ruler (q1, db::DPoint (q2.x (), q1.y ()), lu, mu, sel, r, ruler.style (), bitmap, renderer, false, false);
+    draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
+    draw_ruler (db::DPoint (q2.x (), q1.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer, false, false);
+    draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
 
   }
 
@@ -609,49 +624,265 @@ draw_ruler (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay
     bool r = (q2.x () > q1.x ()) ^ (q2.y () > q1.y ());
 
     if (ruler.outline () == Object::OL_diag_xy || ruler.outline () == Object::OL_diag_yx) {
-      draw_ruler (q1, q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer);
-      draw_text (q1, q2, lu, ruler.text (), !r, ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+      draw_ruler (q1, q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer, first_segment, last_segment);
+      draw_text (q1, q2, lu, ruler.text (index), !r, ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
     }
-    draw_ruler (q1, db::DPoint (q1.x (), q2.y ()), lu, mu, sel, r, ruler.style (), bitmap, renderer);
-    draw_text (q1, db::DPoint (q1.x (), q2.y ()), lu, ruler.text_y (trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
-    draw_ruler (db::DPoint (q1.x (), q2.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer);
-    draw_text (db::DPoint (q1.x (), q2.y ()), q2, lu, ruler.text_x (trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
-
-  }
-
-  if (ruler.outline () == Object::OL_box) {
-
-    bool r = (q2.x () > q1.x ()) ^ (q2.y () < q1.y ());
-
-    draw_ruler (q1, db::DPoint (q2.x (), q1.y ()), lu, mu, sel, r, ruler.style (), bitmap, renderer);
-    draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
-    draw_ruler (db::DPoint (q2.x (), q1.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer);
-    draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
-    draw_ruler (q1, db::DPoint (q1.x (), q2.y ()), lu, mu, sel, !r, ruler.style (), bitmap, renderer);
-    draw_ruler (db::DPoint (q1.x (), q2.y ()), q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer);
-    draw_text (q1, q2, lu, ruler.text (), !r, ant::Object::STY_none, ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
-
-  } else if (ruler.outline () == Object::OL_ellipse) {
-
-    bool r = (q2.x () > q1.x ()) ^ (q2.y () < q1.y ());
-
-    draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (trans.fp_trans ()), r, ant::Object::STY_none, ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
-    draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (trans.fp_trans ()), r, ant::Object::STY_none, ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
-    draw_text (q1, q2, lu, ruler.text (), !r, ant::Object::STY_none, ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
-
-    draw_ellipse (q1, q2, lu, sel, bitmap, renderer);
+    draw_ruler (q1, db::DPoint (q1.x (), q2.y ()), lu, mu, sel, r, ruler.style (), bitmap, renderer, false, false);
+    draw_text (q1, db::DPoint (q1.x (), q2.y ()), lu, ruler.text_y (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
+    draw_ruler (db::DPoint (q1.x (), q2.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer, false, false);
+    draw_text (db::DPoint (q1.x (), q2.y ()), q2, lu, ruler.text_x (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
 
   }
 }
 
-static bool
-is_selected (const ant::Object &ruler, const db::DPoint &pos, double enl, double &distance)
+void
+draw_ruler_box (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
 {
-  if (ruler.outline () == ant::Object::OL_ellipse) {
+  db::DPoint p1 = ruler.p1 (), p2 = ruler.p2 ();
+
+  //  round the starting point, shift both, and round the end point
+  std::pair <db::DPoint, db::DPoint> v = lay::snap (trans * p1, trans * p2);
+  db::DPoint q1 = v.first;
+  db::DPoint q2 = v.second;
+
+  double lu = p1.double_distance (p2);
+  int min_tick_spc = int (0.5 + 20 / renderer.resolution ());  //  min tick spacing in canvas units
+  double mu = double (min_tick_spc) / trans.ctrans (1.0);
+
+  bool r = (q2.x () > q1.x ()) ^ (q2.y () < q1.y ());
+
+  size_t index = std::numeric_limits<size_t>::max ();
+  draw_ruler (q1, db::DPoint (q2.x (), q1.y ()), lu, mu, sel, r, ruler.style (), bitmap, renderer, true, true);
+  draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
+  draw_ruler (db::DPoint (q2.x (), q1.y ()), q2, lu, mu, sel, r, ruler.style (), bitmap, renderer, true, true);
+  draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (index, trans.fp_trans ()), r, ruler.style (), ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
+  draw_ruler (q1, db::DPoint (q1.x (), q2.y ()), lu, mu, sel, !r, ruler.style (), bitmap, renderer, true, true);
+  draw_ruler (db::DPoint (q1.x (), q2.y ()), q2, lu, mu, sel, !r, ruler.style (), bitmap, renderer, true, true);
+  draw_text (q1, q2, lu, ruler.text (index), !r, ant::Object::STY_none, ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+}
+
+void
+draw_ruler_ellipse (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
+{
+  db::DPoint p1 = ruler.p1 (), p2 = ruler.p2 ();
+
+  //  round the starting point, shift both, and round the end point
+  std::pair <db::DPoint, db::DPoint> v = lay::snap (trans * p1, trans * p2);
+  db::DPoint q1 = v.first;
+  db::DPoint q2 = v.second;
+
+  double lu = p1.double_distance (p2);
+
+  bool r = (q2.x () > q1.x ()) ^ (q2.y () < q1.y ());
+
+  size_t index = std::numeric_limits<size_t>::max ();
+  draw_text (q1, db::DPoint (q2.x (), q1.y ()), lu, ruler.text_x (index, trans.fp_trans ()), r, ant::Object::STY_none, ant::Object::POS_center, ruler.xlabel_xalign (), ruler.xlabel_yalign (), bitmap, renderer);
+  draw_text (db::DPoint (q2.x (), q1.y ()), q2, lu, ruler.text_y (index, trans.fp_trans ()), r, ant::Object::STY_none, ant::Object::POS_center, ruler.ylabel_xalign (), ruler.ylabel_yalign (), bitmap, renderer);
+  draw_text (q1, q2, lu, ruler.text (index), !r, ant::Object::STY_none, ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+
+  draw_ellipse (q1, q2, lu, sel, bitmap, renderer);
+}
+
+void
+draw_ruler_radius (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
+{
+  //  draw crosses for the support points
+  for (auto p = ruler.points ().begin (); p != ruler.points ().end (); ++p) {
+    ant::Object supp (*p, *p, 0, std::string (), std::string (), std::string (), ant::Object::STY_cross_start, ant::Object::OL_diag, false, lay::AC_Global);
+    draw_ruler_segment (supp, 0, trans, sel, bitmap, renderer);
+  }
+
+  double radius = 0.0;
+  double start_angle = 0.0, stop_angle = 0.0;
+  db::DPoint center;
+
+  //  circle interpolation
+  if (ruler.compute_interpolating_circle (radius, center, start_angle, stop_angle)) {
+
+    //  draw circle segment
+    db::DVector rr (radius, radius);
+    std::pair <db::DPoint, db::DPoint> v = lay::snap (trans * (center - rr), trans * (center + rr));
+    draw_ellipse (v.first, v.second, radius * 2.0, sel, bitmap, renderer, start_angle, stop_angle);
+
+    double a = 0.5 * (start_angle + stop_angle);
+    db::DPoint rc = center + db::DVector (cos (a), sin (a)) * radius;
+
+#if 0
+    //  draw a center marker
+    ant::Object center_loc (center, center, 0, std::string (), ruler.fmt_x (), ruler.fmt_y (), ant::Object::STY_cross_start, ant::Object::OL_diag, false, lay::AC_Global);
+    draw_ruler_segment (center_loc, 0, trans, sel, bitmap, renderer);
+#endif
+
+    //  draw the radius ruler
+    ant::Object radius = ruler;
+    radius.outline (ant::Object::OL_diag);
+    ant::Object::point_list pts;
+    pts.push_back (center);
+    pts.push_back (rc);
+    radius.set_points (pts);
+    draw_ruler_segment (radius, 0, trans, sel, bitmap, renderer);
+
+  }
+}
+
+void
+draw_ruler_angle (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
+{
+  //  draw guiding segments in diag/plain line mode
+
+  for (int p = 0; p < 2; ++p) {
+
+    auto p1 = (p == 0 ? ruler.p1 () : ruler.seg_p1 (ruler.segments () - 1));
+    auto p2 = (p == 0 ? ruler.seg_p2 (0) : ruler.p2 ());
+
+    auto v = lay::snap (trans * p1, trans * p2);
+    auto q1 = v.first;
+    auto q2 = v.second;
+
+    double lu = p1.double_distance (p2);
+
+    draw_ruler (q1, q2, lu, 0.0, sel, false, ant::Object::STY_line, bitmap, renderer, true, true);
+
+  }
+
+  double radius = 0.0, start_angle = 0.0, stop_angle = 0.0;
+  db::DPoint center;
+
+  if (! ruler.compute_angle_parameters (radius, center, start_angle, stop_angle)) {
+    return;
+  }
+
+  double circle_radius = angle_ruler_radius_factor * radius;
+
+  //  draw decorations at start/end
+
+  for (int p = 0; p < 2; ++p) {
+
+    double a = (p == 0 ? start_angle : stop_angle);
+
+    db::DPoint p1 = center + db::DVector (cos (a), sin (a)) * circle_radius;
+
+    auto v = lay::snap (trans * p1, trans * p1);
+    db::DVector vn = db::DVector (-sin (a), cos (a));
+    auto q1 = v.first + vn * (p == 0 ? 0.0 : -1.0);
+    auto q2 = v.second + vn * (p == 0 ? 1.0 : 0.0);
+
+    double lu = abs (circle_radius * (stop_angle - start_angle));
+
+    draw_ruler (q1, q2, lu, 0.0, sel, false, ruler.style (), bitmap, renderer, p == 0, p != 0, true);
+
+  }
+
+  db::DVector rr (circle_radius, circle_radius);
+  std::pair <db::DPoint, db::DPoint> v = lay::snap (trans * (center - rr), trans * (center + rr));
+  draw_ellipse (v.first, v.second, radius * 2.0, sel, bitmap, renderer, start_angle, stop_angle);
+
+  if (ruler.style () == ant::Object::STY_ruler) {
+
+    //  draw ticks if required - minor at 5 degree, major at 10 degree
+
+    double tick_length = ruler_tick_length / renderer.resolution ();
+
+    double da = 5.0 / 180.0 * M_PI;
+    unsigned int major_ticks = 2;
+
+    double n = floor (db::epsilon + std::min (2 * M_PI, stop_angle - start_angle) / da);
+    unsigned int ticks = (unsigned int) std::max (1.0, n);
+
+    for (unsigned int i = 0; i <= ticks; ++i) {
+
+      double l = tick_length * ((i % major_ticks) == 0 ? 1.0 : 0.5);
+
+      double a = start_angle + i * da;
+      db::DVector tv (cos (a), sin (a));
+      db::DPoint p1 = center + tv * circle_radius;
+
+      auto v = lay::snap (trans * p1, trans * p1);
+      auto q1 = v.first;
+      auto q2 = v.second + tv * l;
+
+      renderer.draw (db::DEdge (q1, q2), 0, bitmap, 0, 0);
+
+    }
+
+  }
+
+  {
+    double ta = 0.5 * (stop_angle + start_angle);
+
+    db::DPoint tp = center + db::DVector (cos (ta), sin (ta)) * circle_radius;
+    db::DVector tv = db::DVector (-sin (ta), cos (ta));
+
+    auto v = lay::snap (trans * tp, trans * tp);
+    auto q1 = v.first + tv;
+    auto q2 = v.second - tv;
+
+    double lu = abs (circle_radius * (stop_angle - start_angle));
+
+    draw_text (q1, q2, lu, ruler.text (0), false, ruler.style (), ruler.main_position (), ruler.main_xalign (), ruler.main_yalign (), bitmap, renderer);
+
+  }
+}
+
+void
+draw_ruler (const ant::Object &ruler, const db::DCplxTrans &trans, bool sel, lay::CanvasPlane *bitmap, lay::Renderer &renderer)
+{
+  if (ruler.outline () == Object::OL_box) {
+    draw_ruler_box (ruler, trans, sel, bitmap, renderer);
+  } else if (ruler.outline () == Object::OL_ellipse) {
+    draw_ruler_ellipse (ruler, trans, sel, bitmap, renderer);
+  } else if (ruler.outline () == Object::OL_angle) {
+    draw_ruler_angle (ruler, trans, sel, bitmap, renderer);
+  } else if (ruler.outline () == Object::OL_radius) {
+    draw_ruler_radius (ruler, trans, sel, bitmap, renderer);
+  } else {
+    //  other outline styles support segments, so paint them individually
+    for (size_t index = 0; index < ruler.segments (); ++index) {
+      draw_ruler_segment (ruler, index, trans, sel, bitmap, renderer);
+    }
+  }
+}
+
+static bool
+is_selected_by_circle_segment (const ant::Object &ruler, const db::DPoint &pos, double enl, double &distance)
+{
+  double r = 0.0, a1 = 0.0, a2 = 0.0;
+  db::DPoint c;
+
+  bool good;
+  if (ruler.outline () == ant::Object::OL_angle) {
+    good = ruler.compute_angle_parameters (r, c, a1, a2);
+    r *= angle_ruler_radius_factor;
+  } else {
+    good = ruler.compute_interpolating_circle (r, c, a1, a2);
+  }
+  if (good && fabs (pos.distance (c) - r) < enl) {
+
+    double a = atan2 ((pos - c).y (), (pos - c).x ()) - 2 * M_PI;
+    while (a < a1 - db::epsilon) {
+      a += 2 * M_PI;
+    }
+    if (a < a2 + db::epsilon) {
+      distance = std::min (distance, fabs (pos.distance (c) - r));
+      return true;
+    }
+
+  }
+
+  return false;
+}
+
+static bool
+is_selected (const ant::Object &ruler, size_t index, const db::DPoint &pos, double enl, double &distance)
+{
+  ant::Object::outline_type outline = ruler.outline ();
+
+  db::DPoint p1 = ruler.seg_p1 (index), p2 = ruler.seg_p2 (index);
+  db::DBox b (p1, p2);
+
+  if (outline == ant::Object::OL_ellipse) {
 
     //  special handling of the (non-degenerated) ellipse case
-    db::DBox b (ruler.p1 (), ruler.p2 ());
-
     if (b.height () > 1e-6 && b.width () > 1e-6) {
 
       double dx = (pos.x () - b.center ().x ()) / (b.width () * 0.5);
@@ -663,7 +894,7 @@ is_selected (const ant::Object &ruler, const db::DPoint &pos, double enl, double
         db::DPoint ref = b.center () + db::DVector (dx * b.width () * 0.5 / dd, dy * b.height () * 0.5 / dd);
         double d = ref.distance (pos);
         if (d < enl) {
-          distance = d;
+          distance = std::min (distance, d);
           return true;
         }
       }
@@ -673,8 +904,6 @@ is_selected (const ant::Object &ruler, const db::DPoint &pos, double enl, double
     }
 
   }
-
-  db::DBox b (ruler.p1 (), ruler.p2 ());
 
   //  enlarge this box by some pixels
   b.enlarge (db::DVector (enl, enl));
@@ -686,30 +915,32 @@ is_selected (const ant::Object &ruler, const db::DPoint &pos, double enl, double
   db::DEdge edges[4];
   unsigned int nedges = 0;
 
-  if (ruler.outline () == ant::Object::OL_diag ||
-      ruler.outline () == ant::Object::OL_diag_xy ||
-      ruler.outline () == ant::Object::OL_diag_yx) {
-    edges [nedges++] = db::DEdge (ruler.p1 (), ruler.p2 ());
+  if (outline == ant::Object::OL_diag ||
+      outline == ant::Object::OL_angle ||
+      outline == ant::Object::OL_radius ||
+      outline == ant::Object::OL_diag_xy ||
+      outline == ant::Object::OL_diag_yx) {
+    edges [nedges++] = db::DEdge (p1, p2);
   }
-  if (ruler.outline () == ant::Object::OL_xy ||
-      ruler.outline () == ant::Object::OL_diag_xy ||
-      ruler.outline () == ant::Object::OL_box ||
-      ruler.outline () == ant::Object::OL_ellipse) {
-    edges [nedges++] = db::DEdge (ruler.p1 (), db::DPoint (ruler.p2 ().x (), ruler.p1 ().y ()));
-    edges [nedges++] = db::DEdge (db::DPoint (ruler.p2 ().x (), ruler.p1 ().y ()), ruler.p2 ());
+  if (outline == ant::Object::OL_xy ||
+      outline == ant::Object::OL_diag_xy ||
+      outline == ant::Object::OL_box ||
+      outline == ant::Object::OL_ellipse) {
+    edges [nedges++] = db::DEdge (p1, db::DPoint (p2.x (), p1.y ()));
+    edges [nedges++] = db::DEdge (db::DPoint (p2.x (), p1.y ()), p2);
   }
-  if (ruler.outline () == ant::Object::OL_yx ||
-      ruler.outline () == ant::Object::OL_diag_yx ||
-      ruler.outline () == ant::Object::OL_box ||
-      ruler.outline () == ant::Object::OL_ellipse) {
-    edges [nedges++] = db::DEdge (ruler.p1 (), db::DPoint (ruler.p1 ().x (), ruler.p2 ().y ()));
-    edges [nedges++] = db::DEdge (db::DPoint (ruler.p1 ().x (), ruler.p2 ().y ()), ruler.p2 ());
+  if (outline == ant::Object::OL_yx ||
+      outline == ant::Object::OL_diag_yx ||
+      outline == ant::Object::OL_box ||
+      outline == ant::Object::OL_ellipse) {
+    edges [nedges++] = db::DEdge (p1, db::DPoint (p1.x (), p2.y ()));
+    edges [nedges++] = db::DEdge (db::DPoint (p1.x (), p2.y ()), p2);
   }
 
   for (unsigned int i = 0; i < nedges; ++i) {
     double d = edges [i].distance_abs (pos);
     if (d <= enl) {
-      distance = d;
+      distance = std::min (distance, d);
       return true;
     }
   }
@@ -718,9 +949,30 @@ is_selected (const ant::Object &ruler, const db::DPoint &pos, double enl, double
 }
 
 static bool
+is_selected (const ant::Object &ruler, const db::DPoint &pos, double enl, double &distance)
+{
+  distance = std::numeric_limits<double>::max ();
+  bool any = false;
+
+  if (ruler.outline () == ant::Object::OL_box || ruler.outline () == ant::Object::OL_ellipse) {
+    return is_selected (ruler, std::numeric_limits<size_t>::max (), pos, enl, distance);
+  } else if (ruler.outline () == ant::Object::OL_angle || ruler.outline () == ant::Object::OL_radius) {
+    any = is_selected_by_circle_segment (ruler, pos, enl, distance);
+  }
+
+  for (size_t index = 0; index < ruler.segments (); ++index) {
+    //  NOTE: we check *all* since distance is updated herein.
+    if (is_selected (ruler, index, pos, enl, distance)) {
+      any = true;
+    }
+  }
+  return any;
+}
+
+static bool
 is_selected (const ant::Object &ruler, const db::DBox &box, double /*enl*/)
 {
-  return (box.contains (ruler.p1 ()) && box.contains (ruler.p2 ()));
+  return ruler.box ().inside (box);
 }
 
 
@@ -802,6 +1054,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     mp_transient_ruler (0),
     m_drawing (false), m_current (),
     m_move_mode (MoveNone),
+    m_seg_index (0),
     m_current_template (0)
 { 
   mp_view->annotations_changed_event.add (this, &Service::annotations_changed);
@@ -1018,29 +1271,28 @@ Service::insert_ruler (const ant::Object &ruler, bool limit_number)
   return new_id;
 }
 
-/**
- *  @brief Helper function to determine which move mode to choose given a certain search box and ant::Object
- */
 static bool
-dragging_what (const ant::Object *robj, const db::DBox &search_dbox, ant::Service::MoveMode &mode, db::DPoint &p1)
+dragging_what_seg (const ant::Object *robj, const db::DBox &search_dbox, ant::Service::MoveMode &mode, db::DPoint &p1, size_t index)
 {
+  ant::Object::outline_type outline = robj->outline ();
+
   db::DPoint p12, p21;
   bool has_p12 = false, has_p21 = false;
 
-  db::DPoint p11 = robj->p1 (), p22 = robj->p2 ();
+  db::DPoint p11 = robj->seg_p1 (index), p22 = robj->seg_p2 (index);
   db::DPoint c = p11 + (p22 - p11) * 0.5;
-  
-  if (robj->outline () == ant::Object::OL_xy || robj->outline () == ant::Object::OL_diag_xy || robj->outline () == ant::Object::OL_box) {
-    p12 = db::DPoint (robj->p2 ().x (), robj->p1 ().y ());
+
+  if (outline == ant::Object::OL_xy || outline== ant::Object::OL_diag_xy || outline == ant::Object::OL_box) {
+    p12 = db::DPoint (p22.x (), p11.y ());
     has_p12 = true;
   }
 
-  if (robj->outline () == ant::Object::OL_yx || robj->outline () == ant::Object::OL_diag_yx || robj->outline () == ant::Object::OL_box) {
-    p21 = db::DPoint (robj->p1 ().x (), robj->p2 ().y ());
+  if (outline == ant::Object::OL_yx || outline == ant::Object::OL_diag_yx || outline == ant::Object::OL_box) {
+    p21 = db::DPoint (p11.x (), p22.y ());
     has_p21 = true;
   }
- 
-  if (robj->outline () == ant::Object::OL_ellipse) {
+
+  if (outline == ant::Object::OL_ellipse) {
     db::DVector d = (p22 - p11) * 0.5;
     p12 = c + db::DVector (d.x (), -d.y ());
     p21 = c + db::DVector (-d.x (), d.y ());
@@ -1050,7 +1302,7 @@ dragging_what (const ant::Object *robj, const db::DBox &search_dbox, ant::Servic
 
   //  HINT: this was implemented returning a std::pair<MoveMode, db::DPoint>, but
   //  I was not able to get it to work in gcc 4.1.2 in -O3 mode ...
-  
+
   if (search_dbox.contains (p11)) {
     p1 = p11;
     mode = ant::Service::MoveP1;
@@ -1091,18 +1343,28 @@ dragging_what (const ant::Object *robj, const db::DBox &search_dbox, ant::Servic
     mode = ant::Service::MoveP2Y;
     return true;
   }
-  if ((robj->outline () == ant::Object::OL_diag || robj->outline () == ant::Object::OL_diag_xy || robj->outline () == ant::Object::OL_diag_yx)
-    && db::DEdge (p11, p22).distance_abs (search_dbox.center ()) <= search_dbox.width () * 0.5) {
-    p1 = search_dbox.center ();
-    mode = ant::Service::MoveRuler;
-    return true;
+
+  return false;
+}
+
+/**
+ *  @brief Helper function to determine which move mode to choose given a certain search box and ant::Object
+ */
+static bool
+dragging_what (const ant::Object *robj, const db::DBox &search_dbox, ant::Service::MoveMode &mode, db::DPoint &p1, size_t &index)
+{
+  ant::Object::outline_type outline = robj->outline ();
+
+  if (outline == ant::Object::OL_box || outline == ant::Object::OL_ellipse) {
+    index = std::numeric_limits<size_t>::max ();
+    return dragging_what_seg (robj, search_dbox, mode, p1, index);
   }
-  if ((robj->outline () == ant::Object::OL_box || robj->outline () == ant::Object::OL_ellipse) && search_dbox.inside (db::DBox (p11, p22))) {
-    p1 = search_dbox.center ();
-    mode = ant::Service::MoveRuler;
-    return true;
+
+  for (index = 0; index < robj->segments (); ++index) {
+    if (dragging_what_seg (robj, search_dbox, mode, p1, index)) {
+      return true;
+    }
   }
-  
   return false;
 }
 
@@ -1129,6 +1391,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
   } else if (mode == lay::Editable::Partial) {
   
     m_move_mode = MoveNone;
+    m_seg_index = 0;
 
     //  compute search box
     double l = catch_distance ();
@@ -1160,7 +1423,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
       const ant::Object *robj = dynamic_cast <const ant::Object *> ((*ri).ptr ());
       if (robj && (! robj_min || robj == robj_min)) {
         
-        if (dragging_what (robj, search_dbox, m_move_mode, m_p1) && m_move_mode != MoveRuler) {
+        if (dragging_what (robj, search_dbox, m_move_mode, m_p1, m_seg_index) && m_move_mode != MoveRuler) {
           
           //  found anything: make the moved ruler the selection
           clear_selection ();
@@ -1217,7 +1480,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
       const ant::Object *robj = dynamic_cast <const ant::Object *> ((*r).ptr ());
       if (robj && (! robj_min || robj == robj_min)) {
 
-        if (dragging_what (robj, search_dbox, m_move_mode, m_p1)) {
+        if (dragging_what (robj, search_dbox, m_move_mode, m_p1, m_seg_index)) {
 
           //  found anything: make the moved ruler the selection
           clear_selection ();
@@ -1284,50 +1547,50 @@ Service::move (const db::DPoint &p, lay::angle_constraint_type ac)
 
   if (m_move_mode == MoveP1) {
     
-    m_current.p1 (snap2 (m_p1, p, &m_current, ac).second);
+    m_current.seg_p1 (m_seg_index, snap2 (m_p1, p, &m_current, ac).second);
     m_rulers [0]->redraw ();
 
   } else if (m_move_mode == MoveP2) {
     
-    m_current.p2 (snap2 (m_p1, p, &m_current, ac).second);
+    m_current.seg_p2 (m_seg_index, snap2 (m_p1, p, &m_current, ac).second);
     m_rulers [0]->redraw ();
 
   } else if (m_move_mode == MoveP12) {
     
     db::DPoint p12 = snap2 (m_p1, p, &m_current, ac).second;
-    m_current.p1 (db::DPoint (m_current.p1 ().x(), p12.y ()));
-    m_current.p2 (db::DPoint (p12.x (), m_current.p2 ().y ()));
+    m_current.seg_p1 (m_seg_index, db::DPoint (m_current.seg_p1 (m_seg_index).x(), p12.y ()));
+    m_current.seg_p2 (m_seg_index, db::DPoint (p12.x (), m_current.seg_p2 (m_seg_index).y ()));
     m_rulers [0]->redraw ();
 
   } else if (m_move_mode == MoveP21) {
     
     db::DPoint p21 = snap2 (m_p1, p, &m_current, ac).second;
-    m_current.p1 (db::DPoint (p21.x (), m_current.p1 ().y ()));
-    m_current.p2 (db::DPoint (m_current.p2 ().x(), p21.y ()));
+    m_current.seg_p1 (m_seg_index, db::DPoint (p21.x (), m_current.seg_p1 (m_seg_index).y ()));
+    m_current.seg_p2 (m_seg_index, db::DPoint (m_current.seg_p2 (m_seg_index).x(), p21.y ()));
     m_rulers [0]->redraw ();
 
   } else if (m_move_mode == MoveP1X) {
     
     db::DPoint pc = snap2 (m_p1, p, &m_current, ac).second;
-    m_current.p1 (db::DPoint (pc.x (), m_current.p1 ().y ()));
+    m_current.seg_p1 (m_seg_index, db::DPoint (pc.x (), m_current.seg_p1 (m_seg_index).y ()));
     m_rulers [0]->redraw ();
 
   } else if (m_move_mode == MoveP2X) {
     
     db::DPoint pc = snap2 (m_p1, p, &m_current, ac).second;
-    m_current.p2 (db::DPoint (pc.x (), m_current.p2 ().y ()));
+    m_current.seg_p2 (m_seg_index, db::DPoint (pc.x (), m_current.seg_p2 (m_seg_index).y ()));
     m_rulers [0]->redraw ();
 
   } else if (m_move_mode == MoveP1Y) {
     
     db::DPoint pc = snap2 (m_p1, p, &m_current, ac).second;
-    m_current.p1 (db::DPoint (m_current.p1 ().x (), pc.y ()));
+    m_current.seg_p1 (m_seg_index, db::DPoint (m_current.seg_p1 (m_seg_index).x (), pc.y ()));
     m_rulers [0]->redraw ();
 
   } else if (m_move_mode == MoveP2Y) {
     
     db::DPoint pc = snap2 (m_p1, p, &m_current, ac).second;
-    m_current.p2 (db::DPoint (m_current.p2 ().x (), pc.y ()));
+    m_current.seg_p2 (m_seg_index, db::DPoint (m_current.seg_p2 (m_seg_index).x (), pc.y ()));
     m_rulers [0]->redraw ();
 
   } else if (m_move_mode == MoveRuler) {
@@ -1418,6 +1681,7 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
     } else if (m_move_mode != MoveNone) {
 
       //  replace the ruler that was moved
+      m_current.clean_points ();
       mp_view->annotation_shapes ().replace (m_selected.begin ()->first, db::DUserObject (new ant::Object (m_current)));
       annotation_changed_event (m_current.id ());
 
@@ -1504,10 +1768,51 @@ Service::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio
   return mouse_click_event (p, buttons, prio);
 }
 
-bool 
+void
+Service::finish_drawing ()
+{
+  //  create the ruler object
+
+  //  begin the transaction
+  if (manager ()) {
+    tl_assert (! manager ()->transacting ());
+    manager ()->transaction (tl::to_string (tr ("Create ruler")));
+  }
+
+  show_message ();
+
+  insert_ruler (ant::Object (m_current.points (), 0, current_template ()), true);
+
+  //  stop dragging
+  drag_cancel ();
+  clear_transient_selection ();
+
+  //  end the transaction
+  if (manager ()) {
+    manager ()->commit ();
+  }
+}
+
+bool
+Service::mouse_double_click_event (const db::DPoint & /*p*/, unsigned int buttons, bool prio)
+{
+  if (m_drawing && prio && (buttons & lay::LeftButton) != 0) {
+
+    //  ends the current ruler (specifically in multi-segment mode)
+    finish_drawing ();
+    return true;
+
+  }
+
+  return false;
+}
+
+bool
 Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio) 
 {
   if (prio && (buttons & lay::LeftButton) != 0) {
+
+    const ant::Template &tpl = current_template ();
 
     if (! m_drawing) {
 
@@ -1520,8 +1825,6 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
       //  set the maximum number of rulers minus 1 to account for the new ruler
       //  and clear surplus rulers
       reduce_rulers (m_max_number_of_rulers - 1);
-
-      const ant::Template &tpl = current_template ();
 
       //  create and start dragging the ruler
       
@@ -1592,7 +1895,13 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
         m_p1 = snap1 (p, m_obj_snap && tpl.snap ()).second;
 
-        m_current = ant::Object (m_p1, m_p1, 0, tpl);
+        //  NOTE: generating the ruler this way makes sure we have two points
+        ant::Object::point_list pts;
+        m_current = ant::Object (pts, 0, tpl);
+        pts.push_back (m_p1);
+        pts.push_back (m_p1);
+        m_current.set_points_exact (pts);
+
         show_message ();
 
         if (mp_active_ruler) {
@@ -1606,29 +1915,29 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
       }
 
+    } else if (tpl.mode () == ant::Template::RulerMultiSegment || tpl.mode () == ant::Template::RulerThreeClicks) {
+
+      ant::Object::point_list pts = m_current.points ();
+      tl_assert (! pts.empty ());
+
+      if (tpl.mode () == ant::Template::RulerThreeClicks && pts.size () == 3) {
+
+        finish_drawing ();
+
+      } else {
+
+        //  add a new point
+        m_p1 = pts.back ();
+
+        pts.push_back (m_p1);
+        m_current.set_points_exact (pts);
+
+      }
+
     } else {
 
-      //  create the ruler object
+      finish_drawing ();
 
-      //  begin the transaction
-      if (manager ()) {
-        tl_assert (! manager ()->transacting ());
-        manager ()->transaction (tl::to_string (tr ("Create ruler")));
-      }
-
-      show_message ();
-
-      insert_ruler (ant::Object (m_current.p1 (), m_current.p2 (), 0, current_template ()), true);
-
-      //  stop dragging
-      drag_cancel ();
-      clear_transient_selection ();
-
-      //  end the transaction
-      if (manager ()) {
-        manager ()->commit ();
-      }
-      
     }
 
     return true;
@@ -1675,7 +1984,14 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
 
     set_cursor (lay::Cursor::cross);
 
-    m_current.p2 (snap2 (m_p1, p, mp_active_ruler->ruler (), ac_from_buttons (buttons)).second);
+    //  NOTE: we use the direct access path so we do not encounter cleanup by the p1 and p2 setters
+    //  otherwise we risk manipulating p1 too.
+    ant::Object::point_list pts = m_current.points ();
+    if (! pts.empty ()) {
+      pts.back () = snap2 (m_p1, p, mp_active_ruler->ruler (), ac_from_buttons (buttons)).second;
+    }
+    m_current.set_points_exact (pts);
+
     mp_active_ruler->redraw ();
     show_message ();
 
@@ -2180,17 +2496,23 @@ Service::display_status (bool transient)
     if (! transient) {
       msg = tl::to_string (tr ("selected: "));
     }
-    msg += tl::sprintf (tl::to_string (tr ("annotation(d=%s x=%s y=%s)")), ruler->text (), ruler->text_x (), ruler->text_y ());
+    if (ruler->segments () > 1) {
+      msg += tl::sprintf (tl::to_string (tr ("annotation(d=%s x=%s y=%s ...)")), ruler->text (0), ruler->text_x (0), ruler->text_y (0));
+    } else {
+      msg += tl::sprintf (tl::to_string (tr ("annotation(d=%s x=%s y=%s)")), ruler->text (0), ruler->text_x (0), ruler->text_y (0));
+    }
     view ()->message (msg);
 
   }
 }
 
 #if defined(HAVE_QT)
-lay::PropertiesPage *
-Service::properties_page (db::Manager *manager, QWidget *parent)
+std::vector<lay::PropertiesPage *>
+Service::properties_pages (db::Manager *manager, QWidget *parent)
 {
-  return new PropertiesPage (this, manager, parent);
+  std::vector<lay::PropertiesPage *> pages;
+  pages.push_back (new PropertiesPage (this, manager, parent));
+  return pages;
 }
 #endif
 

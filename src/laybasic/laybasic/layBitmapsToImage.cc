@@ -311,15 +311,22 @@ render_scanline_cross (const uint32_t *dp, unsigned int ds, const lay::Bitmap *p
     return;
   }
 
-  if (pixels > 15) {
-    pixels = 15;
+  //  NOTE: hardcoded bar/width ratio for crosses.
+  unsigned int lw = std::max (std::min ((unsigned int) 6, pixels / 9), (unsigned int) 1);
+
+  const int max_pixels = 31;
+  if (pixels > max_pixels) {
+    pixels = max_pixels;
   }
 
   const uint32_t *dm = dp;
   unsigned int px1 = (pixels - 1) / 2;
   unsigned int px2 = (pixels - 1) - px1;
 
-  const uint32_t *ps[16];
+  unsigned int spx1 = (lw - 1) / 2;
+  unsigned int spx2 = (lw - 1) - spx1;
+
+  const uint32_t *ps[max_pixels + 1];
   for (unsigned int p = 0; p < pixels; ++p) {
     if (y + p < px1) {
       ps[p] = pbitmap->scanline (0);
@@ -330,56 +337,94 @@ render_scanline_cross (const uint32_t *dp, unsigned int ds, const lay::Bitmap *p
     }
   }
 
-  uint32_t d, dd = 0, dn;
-  dn = *(ps[px1]++);
+  uint32_t *dpp = data;
+  for (unsigned int i = (w + lay::wordlen - 1) / lay::wordlen; i > 0; --i) {
+    *dpp++ = 0;
+  }
 
-  unsigned int x = w;
-  while (true) {
+  for (unsigned int o = 0; o < pixels; ++o) {
 
-    d = dn;
+    dpp = data;
 
-    dn = 0;
-    if (x > lay::wordlen) {
-      dn = *(ps[px1]++);
-    }
-
-    uint32_t d0 = d;
-    if (d0 != 0) {
-      for (unsigned int p = 1; p <= px1; ++p) {
-        d |= (d0 >> p);
-      }
-      for (unsigned int p = 1; p <= px2; ++p) {
-        d |= (d0 << p);
-      }
-    }
-    if (dn != 0) {
-      for (unsigned int p = 1; p <= px1; ++p) {
-        d |= (dn << (32 - p));
-      }
-    }
-    if (dd != 0) {
-      for (unsigned int p = 1; p <= px2; ++p) {
-        d |= (dd >> (32 - p));
-      }
-    }
-    for (unsigned int p = 0; p < px1; ++p) {
-      d |= *(ps[p]++);
-    }
-    for (unsigned int p = px1 + 1; p < pixels; ++p) {
-      d |= *(ps[p]++);
-    }
-
-    dd = d0;
-
-    *data++ = d & *dm++;
-    if (dm == dp + ds) {
-      dm = dp;
-    }
-
-    if (x > lay::wordlen) {
-      x -= lay::wordlen;
+    unsigned int bpx1 = 0, bpx2 = 0;
+    if (o >= px1 - spx1 && o <= px1 + spx2) {
+      bpx1 = px1;
+      bpx2 = px2;
     } else {
-      break;
+      bpx1 = spx1;
+      bpx2 = spx2;
+    }
+
+    if (bpx1 > 0 || bpx2 > 0) {
+
+      uint32_t d, dd = 0, dn;
+      dn = *(ps[o]++);
+
+      unsigned int x = w;
+      while (true) {
+
+        d = dn;
+
+        dn = 0;
+        if (x > lay::wordlen) {
+          dn = *(ps[o]++);
+        }
+
+        uint32_t d0 = d;
+        if (d0 != 0) {
+          for (unsigned int p = 1; p <= bpx1; ++p) {
+            d |= (d0 >> p);
+          }
+          for (unsigned int p = 1; p <= bpx2; ++p) {
+            d |= (d0 << p);
+          }
+        }
+        if (dn != 0) {
+          for (unsigned int p = 1; p <= bpx1; ++p) {
+            d |= (dn << (32 - p));
+          }
+        }
+        if (dd != 0) {
+          for (unsigned int p = 1; p <= bpx2; ++p) {
+            d |= (dd >> (32 - p));
+          }
+        }
+
+        dd = d0;
+
+        *dpp++ |= d & *dm++;
+        if (dm == dp + ds) {
+          dm = dp;
+        }
+
+        if (x > lay::wordlen) {
+          x -= lay::wordlen;
+        } else {
+          break;
+        }
+
+      }
+
+    } else {
+
+      unsigned int x = w;
+      while (true) {
+
+        uint32_t d = *(ps[o]++);
+
+        *dpp++ |= d & *dm++;
+        if (dm == dp + ds) {
+          dm = dp;
+        }
+
+        if (x > lay::wordlen) {
+          x -= lay::wordlen;
+        } else {
+          break;
+        }
+
+      }
+
     }
 
   }

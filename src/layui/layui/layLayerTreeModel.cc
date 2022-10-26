@@ -24,7 +24,6 @@
 
 #include "layLayerTreeModel.h"
 #include "layLayoutViewBase.h"
-#include "layBitmapsToImage.h"
 #include "dbLayoutUtils.h"
 #include "tlLog.h"
 #include "tlTimer.h"
@@ -182,7 +181,8 @@ EmptyWithinViewCache::determine_empty_layers (const db::Layout *layout, unsigned
 LayerTreeModel::LayerTreeModel (QWidget *parent, lay::LayoutViewBase *view)
   : QAbstractItemModel (parent), 
     mp_parent (parent), mp_view (view), m_filter_mode (false), m_id_start (0), m_id_end (0),
-    m_phase ((unsigned int) -1), m_test_shapes_in_view (false), m_hide_empty_layers (false)
+    m_phase ((unsigned int) -1),
+    m_test_shapes_in_view (false), m_hide_empty_layers (false)
 {
   // .. nothing yet ..
 }
@@ -620,170 +620,11 @@ LayerTreeModel::empty_within_view_predicate (const QModelIndex &index) const
   }
 }
 
-/**
- *  @brief A helper function to create an image from a single bitmap
- */
-static void
-single_bitmap_to_image (const lay::ViewOp &view_op, lay::Bitmap &bitmap,
-                        tl::PixelBuffer *pimage, const lay::DitherPattern &dither_pattern, const lay::LineStyles &line_styles,
-                        double dpr, unsigned int width, unsigned int height)
-{
-  std::vector <lay::ViewOp> view_ops;
-  view_ops.push_back (view_op);
-
-  std::vector <lay::Bitmap *> pbitmaps;
-  pbitmaps.push_back (&bitmap);
-
-  lay::bitmaps_to_image (view_ops, pbitmaps, dither_pattern, line_styles, dpr, pimage, width, height, false, 0);
-}
-
-LAYUI_PUBLIC
 QIcon
 LayerTreeModel::icon_for_layer (const lay::LayerPropertiesConstIterator &iter, lay::LayoutViewBase *view, unsigned int w, unsigned int h, double dpr, unsigned int di_off, bool no_state)
 {
-  h = std::max ((unsigned int) 16, h) * dpr + 0.5;
-  w = std::max ((unsigned int) 16, w) * dpr + 0.5;
-
-  tl::color_t def_color   = 0x808080;
-  tl::color_t fill_color  = iter->has_fill_color (true)  ? iter->eff_fill_color (true)  : def_color;
-  tl::color_t frame_color = iter->has_frame_color (true) ? iter->eff_frame_color (true) : def_color;
-
-  tl::PixelBuffer image (w, h);
-  image.set_transparent (true);
-  image.fill (view->background_color ().rgb ());
-
-  //  upper scanline is a dummy one
-  uint32_t *sl0 = (uint32_t *) image.scan_line (0);
-  uint32_t transparent = QColor (Qt::transparent).rgba ();
-  for (size_t i = 0; i < w; ++i) {
-    *sl0++ = transparent;
-  }
-
-  //  TODO: adjust the resolution according to the oversampling mode
-  lay::Bitmap fill (w, h, 1.0);
-  lay::Bitmap frame (w, h, 1.0);
-  lay::Bitmap text (w, h, 1.0);
-  lay::Bitmap vertex (w, h, 1.0);
-
-  unsigned int wp = w - 1;
-
-  if (! no_state && ! iter->visible (true)) {
-
-    wp = w / 4;
-
-    //  Show the arrow if it is invisible also locally.
-    if (! iter->visible (false)) {
-
-      unsigned int aw = h / 4;
-      unsigned int ap = w / 2 - 1;
-      for (unsigned int i = 0; i <= aw; ++i) {
-        text.fill (h / 2 - 1 - i, ap, ap + aw - i + 1);
-        text.fill (h / 2 - 1 + i, ap, ap + aw - i + 1);
-      }
-
-    }
-
-  }
-
-  if (! no_state && view->no_stipples ()) {
-    //  Show a partial stipple pattern only for "no stipple" mode
-    for (unsigned int i = 1; i < h - 2; ++i) {
-      fill.fill (i, w - 1 - w / 4, w);
-    }
-  } else {
-    for (unsigned int i = 1; i < h - 2; ++i) {
-      fill.fill (i, w - 1 - wp, w);
-    }
-  }
-
-  int lw = iter->width (true);
-  if (lw < 0) {
-    //  default line width is 0 for parents and 1 for leafs
-    lw = iter->has_children () ? 0 : 1;
-  }
-  lw = lw * dpr + 0.5;
-
-  int p0 = lw / 2;
-  p0 = std::max (0, std::min (int (w / 4 - 1), p0));
-
-  int p1 = (lw - 1) / 2;
-  p1 = std::max (0, std::min (int (w / 4 - 1), p1));
-
-  int p0x = p0, p1x = p1;
-  unsigned int ddx = 0;
-  unsigned int ddy = h - 2 - p1 - p0;
-  if (iter->xfill (true)) {
-    ddx = wp - p0 - p1 - 1;
-  }
-  unsigned int d = ddx / 2;
-
-  frame.fill (p0, w - 1 - (wp - p1), w);
-  frame.fill (h - 2 - p1, w - 1 - (wp - p1), w);
-
-  for (unsigned int i = p0; i < h - 2; ++i) {
-
-    frame.fill (i, w - 1 - p0, w - p0);
-    frame.fill (i, w - 1 - (wp - p1), w - (wp - p1));
-    frame.fill (i, w - 1 - p0x, w - p0x);
-    frame.fill (i, w - 1 - (wp - p1x), w - (wp - p1x));
-
-    while (d < ddx) {
-      d += ddy;
-      frame.fill (i, w - 1 - p0x, w - p0x);
-      frame.fill (i, w - 1 - (wp - p1x), w - (wp - p1x));
-      ++p0x;
-      ++p1x;
-    }
-
-    if (d >= ddx) {
-      d -= ddx;
-    }
-
-  }
-
-  if (! no_state && ! iter->valid (true)) {
-
-    unsigned int bp = w - 1 - ((w * 7) / 8 - 1);
-    unsigned int be = bp + h / 2;
-    unsigned int bw = h / 4 - 1;
-    unsigned int by = h / 2 - 1;
-
-    for (unsigned int i = 0; i < bw + 2; ++i) {
-      fill.clear (by - i, bp - 1, be);
-      fill.clear (by + i, bp - 1, be);
-    }
-
-    for (unsigned int i = 0; i < bw; ++i) {
-      text.fill (by - i, bp + bw - i - 1, bp + bw - i + 1);
-      text.fill (by - i - 1, bp + bw - i - 1, bp + bw - i + 1);
-      text.fill (by - i, bp + bw + i, bp + bw + i + 2);
-      text.fill (by - i - 1, bp + bw + i, bp + bw + i + 2);
-      text.fill (by + i, bp + bw - i - 1, bp + bw - i + 1);
-      text.fill (by + i + 1, bp + bw - i - 1, bp + bw - i + 1);
-      text.fill (by + i, bp + bw + i, bp + bw + i + 2);
-      text.fill (by + i + 1, bp + bw + i, bp + bw + i + 2);
-    }
-
-  }
-
-  vertex.fill (h / 2 - 1, w - 1 - wp / 2, w - wp / 2);
-
-  lay::ViewOp::Mode mode = lay::ViewOp::Copy;
-
-  //  create fill
-  single_bitmap_to_image (lay::ViewOp (fill_color, mode, 0, iter->eff_dither_pattern (true), di_off), fill, &image, view->dither_pattern (), view->line_styles (), dpr, w, h);
-  //  create frame
-  if (lw == 0) {
-    single_bitmap_to_image (lay::ViewOp (frame_color, mode, 0 /*solid line*/, 2 /*dotted*/, 0), frame, &image, view->dither_pattern (), view->line_styles (), dpr, w, h);
-  } else {
-    single_bitmap_to_image (lay::ViewOp (frame_color, mode, iter->eff_line_style (true), 0, 0, lay::ViewOp::Rect, lw), frame, &image, view->dither_pattern (), view->line_styles (), dpr, w, h);
-  }
-  //  create text
-  single_bitmap_to_image (lay::ViewOp (frame_color, mode, 0, 0, 0), text, &image, view->dither_pattern (), view->line_styles (), dpr, w, h);
-  //  create vertex
-  single_bitmap_to_image (lay::ViewOp (frame_color, mode, 0, 0, 0, lay::ViewOp::Cross, iter->marked (true) ? 9/*mark size*/ : 0), vertex, &image, view->dither_pattern (), view->line_styles (), dpr, w, h);
-
-  QPixmap pixmap = QPixmap::fromImage (image.to_image ());
+  QImage img = view->icon_for_layer (iter, w, h, dpr, di_off, no_state).to_image_copy ();
+  QPixmap pixmap = QPixmap::fromImage (std::move (img));
 #if QT_VERSION >= 0x050000
   pixmap.setDevicePixelRatio (dpr);
 #endif

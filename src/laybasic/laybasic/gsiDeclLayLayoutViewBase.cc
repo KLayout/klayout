@@ -1603,6 +1603,17 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutVi
     "Returns an array of \\LayerPropertiesIterator objects pointing to the currently selected layers. "
     "If no layer view is selected currently, an empty array is returned.\n"
   ) +
+  gsi::method ("icon_for_layer", &lay::LayoutViewBase::icon_for_layer, gsi::arg ("iter"), gsi::arg ("w"), gsi::arg ("h"), gsi::arg ("dpr"), gsi::arg ("di_off", 0), gsi::arg ("no_state", false),
+    "@brief Creates an icon pixmap for the given layer.\n"
+    "\n"
+    "The icon will have size w times h pixels multiplied by the device pixel ratio (dpr). The dpr is "
+    "The number of physical pixels per logical pixels on high-DPI displays.\n"
+    "\n"
+    "'di_off' will shift the dither pattern by the given number of (physical) pixels. "
+    "If 'no_state' is true, the icon will not reflect visibility or validity states but rather the display style.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
   gsi::event ("on_active_cellview_changed", static_cast<tl::Event (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::active_cellview_changed_event),
     "@brief An event indicating that the active cellview has changed\n"
     "\n"
@@ -1630,6 +1641,14 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutVi
     "\n"
     "Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods "
     "(add_cellview_observer/remove_cellview_observer) have been removed in 0.25.\n"
+  ) +
+  gsi::event ("on_apply_technology", static_cast<tl::event<int> (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::apply_technology_event), gsi::arg ("cellview_index"),
+    "@brief An event indicating that a cellview has requested a new technology\n"
+    "\n"
+    "If the technology of a cellview is changed, this event is triggered.\n"
+    "The integer parameter of this event will indicate the cellview that has changed.\n"
+    "\n"
+    "This event has been introduced in version 0.28.\n"
   ) +
   gsi::event ("on_file_open", static_cast<tl::Event (lay::LayoutViewBase::*)> (&lay::LayoutViewBase::file_open_event),
     "@brief An event indicating that a file was opened\n"

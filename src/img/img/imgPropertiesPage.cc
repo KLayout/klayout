@@ -44,7 +44,7 @@ PropertiesPage::PropertiesPage (img::Service *service, db::Manager *manager, QWi
   : lay::PropertiesPage (parent, manager, service), mp_service (service), mp_direct_image (0)
 {
   mp_service->get_selection (m_selection);
-  m_pos = m_selection.begin ();
+  m_index = 0;
 
   mp_service->clear_highlights ();
 
@@ -107,10 +107,12 @@ PropertiesPage::init ()
 
   colors->set_color (std::make_pair (QColor (), QColor ()));
   colors->setEnabled (false);
+  value_le->setEnabled (false);
 
   connect (browse_pb, SIGNAL (clicked ()), this, SLOT (browse ()));
   connect (colors, SIGNAL (color_changed (std::pair<QColor, QColor>)), false_color_control, SLOT (set_current_color (std::pair<QColor, QColor>)));
   connect (false_color_control, SIGNAL (selection_changed (std::pair<QColor, QColor>)), colors, SLOT (set_color (std::pair<QColor, QColor>)));
+  connect (false_color_control, SIGNAL (selection_changed (std::pair<QColor, QColor>)), this, SLOT (color_mapping_changed ()));
   connect (false_color_control, SIGNAL (color_mapping_changed ()), this, SLOT (color_mapping_changed ()));
 
   connect (brightness_slider, SIGNAL (valueChanged (int)), this, SLOT (brightness_slider_changed (int)));
@@ -154,44 +156,40 @@ PropertiesPage::invalidate ()
   }
 }
 
-void 
-PropertiesPage::back ()
+size_t
+PropertiesPage::count () const
 {
-  m_pos = m_selection.end ();
+  return m_selection.size ();
+}
+
+void
+PropertiesPage::select_entries (const std::vector<size_t> &entries)
+{
+  tl_assert (entries.size () == 1);
+  m_index = entries.front ();
   invalidate ();
 }
 
-void 
-PropertiesPage::front ()
+std::string
+PropertiesPage::description (size_t entry) const
 {
-  m_pos = m_selection.begin ();
-  invalidate ();
+  const img::Object *obj = dynamic_cast <const img::Object *> (m_selection [entry]->ptr ());
+  if (! obj) {
+    return std::string ("nil");
+  }
+
+  std::string d = tl::to_string (tr ("Image"));
+  if (! obj->filename ().empty ()) {
+    d += "[" + tl::filename (obj->filename ()) + "]";
+  }
+  d += tl::sprintf ("(%dx%d)", obj->width (), obj->height ());
+  return d;
 }
 
-bool 
-PropertiesPage::at_begin () const
+std::string
+PropertiesPage::description () const
 {
-  return (m_pos == m_selection.begin ());
-}
-
-bool 
-PropertiesPage::at_end () const
-{
-  return (m_pos == m_selection.end ());
-}
-
-void 
-PropertiesPage::operator-- ()
-{
-  --m_pos;
-  invalidate ();
-}
-
-void 
-PropertiesPage::operator++ ()
-{
-  ++m_pos;
-  invalidate ();
+  return tl::to_string (tr ("Images"));
 }
 
 void
@@ -378,11 +376,11 @@ PropertiesPage::update ()
 
   if (mp_service) {
 
-    mp_service->highlight (std::distance (m_selection.begin (), m_pos));
+    mp_service->highlight (m_index);
 
     //  create a local copy in which we can apply modifications
     if (! mp_direct_image) {
-      const img::Object *image = dynamic_cast <const img::Object *> ((*m_pos)->ptr ());
+      const img::Object *image = dynamic_cast <const img::Object *> (m_selection [m_index]->ptr ());
       mp_direct_image = new img::Object (*image);
     }
 
@@ -908,7 +906,7 @@ PropertiesPage::apply ()
   mp_direct_image->set_data_mapping (dm);
 
   if (mp_service) {
-    mp_service->change_image (*m_pos, *mp_direct_image);
+    mp_service->change_image (m_selection [m_index], *mp_direct_image);
   }
 }
 

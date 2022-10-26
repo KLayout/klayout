@@ -321,10 +321,20 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
 
     }
 
+  } else if (meth && mt->fallback_not_implemented (mid)) {
+
+    //  one candidate, but needs checking whether compatibility is given - this avoid having to route NotImplemented over TypeError exceptions later
+    int i = 0;
+    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); i < argc && a != meth->end_arguments (); ++a, ++i) {
+      if (! test_arg (*a, PyTuple_GetItem (args, i), true /*loose*/)) {
+        return 0;
+      }
+    }
+
   }
 
   if (! meth) {
-    if (! strict) {
+    if (! strict || mt->fallback_not_implemented (mid)) {
       return 0;
     } else {
       throw tl::TypeError (tl::to_string (tr ("No overload with matching arguments")));
@@ -332,7 +342,7 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
   }
 
   if (candidates > 1) {
-    if (! strict) {
+    if (! strict || mt->fallback_not_implemented (mid)) {
       return 0;
     } else {
       throw tl::TypeError (tl::to_string (tr ("Ambiguous overload variants - multiple method declarations match arguments")));
@@ -396,6 +406,19 @@ object_assign (PyObject *self, PyObject *args)
 
   Py_INCREF (self);
   return self;
+}
+
+/**
+ *  @brief Default implementation of "__deepcopy__"
+ */
+PyObject *
+object_default_deepcopy_impl (PyObject *self, PyObject * /*args*/)
+{
+  PyObject *copy_method = PyObject_GetAttrString (self, "__copy__");
+  tl_assert (copy_method != NULL);
+
+  PythonRef empty_args (PyTuple_New (0));
+  return PyObject_Call (copy_method, empty_args.get (), NULL);
 }
 
 /**
@@ -637,6 +660,11 @@ method_adaptor (int mid, PyObject *self, PyObject *args)
   PYA_TRY
 
     const gsi::MethodBase *meth = match_method (mid, self, args, true);
+
+    //  method is not implemented
+    if (! meth) {
+      Py_RETURN_NOTIMPLEMENTED;
+    }
 
     //  handle special methods
     if (meth->smt () != gsi::MethodBase::None) {

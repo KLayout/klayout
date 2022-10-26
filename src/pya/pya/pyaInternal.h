@@ -67,6 +67,9 @@ public:
   void set_enabled (bool en);
   bool is_enabled () const;
 
+  void set_fallback_not_implemented (bool en);
+  bool fallback_not_implemented () const;
+
   void set_init(bool f);
   bool is_init () const;
 
@@ -91,6 +94,7 @@ private:
   bool m_is_protected : 1;
   bool m_is_enabled : 1;
   bool m_is_init : 1;
+  bool m_fallback_not_implemented : 1;
   std::vector<const gsi::MethodBase *> m_methods;
 };
 
@@ -168,6 +172,16 @@ public:
    *  @brief Enables or disables a method
    */
   void set_enabled (size_t mid, bool en);
+
+  /**
+   *  @brief Returns true if the method has a NotImplemented fallback
+   */
+  bool fallback_not_implemented (size_t mid) const;
+
+  /**
+   *  @brief Sets a value indicating that the method has a fallback to NotImplemented for non-matching arguments
+   */
+  void set_fallback_not_implemented (size_t mid, bool f);
 
   /**
    *  @brief Returns true if the method is an initializer
@@ -277,7 +291,7 @@ private:
   std::vector<std::pair<MethodTableEntry, MethodTableEntry> > m_property_table;
   PythonModule *mp_module;
 
-  void add_method_basic (const std::string &name, const gsi::MethodBase *mb, bool enabled = true, bool init = false);
+  void add_method_basic (const std::string &name, const gsi::MethodBase *mb, bool enabled = true, bool init = false, bool fallback_not_implemented = false);
   void add_setter_basic (const std::string &name, const gsi::MethodBase *setter);
   void add_getter_basic (const std::string &name, const gsi::MethodBase *getter);
   bool is_property_setter (bool st, const std::string &name);

@@ -484,7 +484,10 @@ public:
 
           PyMethodDef *method = mp_module->make_method_def ();
           method->ml_name = mp_module->make_string (name);
-          if (mt->is_init (mid)) {
+          if (name == "__deepcopy__") {
+            //  Special handling needed as the memo argument needs to be ignored
+            method->ml_meth = &object_default_deepcopy_impl;
+          } else if (mt->is_init (mid)) {
             method->ml_meth = (PyCFunction) get_method_init_adaptor (mid);
           } else {
             method->ml_meth = (PyCFunction) get_method_adaptor (mid);

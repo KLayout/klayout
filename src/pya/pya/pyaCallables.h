@@ -37,6 +37,7 @@ PyObject *object_default_ne_impl (PyObject *self, PyObject *args);
 PyObject *object_default_ge_impl (PyObject *self, PyObject *args);
 PyObject *object_default_le_impl (PyObject *self, PyObject *args);
 PyObject *object_default_gt_impl (PyObject *self, PyObject *args);
+PyObject *object_default_deepcopy_impl (PyObject *self, PyObject *args);
 
 typedef PyObject *(*py_func_ptr_t) (PyObject *, PyObject *);
 

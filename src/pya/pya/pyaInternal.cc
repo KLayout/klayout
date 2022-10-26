@@ -37,7 +37,7 @@ namespace pya
 //  MethodTableEntry implementation
 
 MethodTableEntry::MethodTableEntry (const std::string &name, bool st, bool prot)
-  : m_name (name), m_is_static (st), m_is_protected (prot), m_is_enabled (true), m_is_init (false)
+  : m_name (name), m_is_static (st), m_is_protected (prot), m_is_enabled (true), m_is_init (false), m_fallback_not_implemented (false)
 { }
 
 const std::string &
@@ -62,6 +62,18 @@ bool
 MethodTableEntry::is_enabled () const
 {
   return m_is_enabled;
+}
+
+void
+MethodTableEntry::set_fallback_not_implemented (bool f)
+{
+  m_fallback_not_implemented = f;
+}
+
+bool
+MethodTableEntry::fallback_not_implemented () const
+{
+  return m_fallback_not_implemented;
 }
 
 void
@@ -424,6 +436,40 @@ static std::string extract_python_name (const std::string &name)
   }
 }
 
+/**
+ *  @brief Returns true, if the method with the given name shall fallback to NotImplemented
+ */
+static bool is_method_with_fallback (const std::string &name)
+{
+  if (name == "+") {
+    return true;
+  } else if (name == "-") {
+    return true;
+  } else if (name == "/") {
+    #if PY_MAJOR_VERSION < 3
+    return false;
+    #else
+    return true;
+    #endif
+  } else if (name == "*") {
+    return true;
+  } else if (name == "%") {
+    return true;
+  } else if (name == "<<") {
+    return true;
+  } else if (name == ">>") {
+    return true;
+  } else if (name == "&") {
+    return true;
+  } else if (name == "|") {
+    return true;
+  } else if (name == "^") {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 void
 MethodTable::add_method (const std::string &name, const gsi::MethodBase *mb)
 {
@@ -511,11 +557,12 @@ MethodTable::add_method (const std::string &name, const gsi::MethodBase *mb)
   } else if (name == "dup" && mb->compatible_with_num_args (0)) {
 
     //  If the object supports the dup method, then it is a good
-    //  idea to define the __copy__ method.
+    //  idea to define the __copy__ and __deepcopy__ method.
     add_method_basic ("__copy__", mb);
+    add_method_basic ("__deepcopy__", mb);
 
     add_method_basic (name, mb);
-    mp_module->add_python_doc (mb, tl::to_string (tr ("This method also implements '__copy__'")));
+    mp_module->add_python_doc (mb, tl::to_string (tr ("This method also implements '__copy__' and '__deepcopy__'")));
 
   } else {
 
@@ -532,7 +579,8 @@ MethodTable::add_method (const std::string &name, const gsi::MethodBase *mb)
 
     } else {
 
-      add_method_basic (py_name, mb);
+      bool fb = is_method_with_fallback (name);
+      add_method_basic (py_name, mb, true, false, fb);
 
       if (name == "*") {
         //  Supply a commutative multiplication version unless the operator is "*!"
@@ -623,6 +671,18 @@ void
 MethodTable::set_enabled (size_t mid, bool en)
 {
   m_table [mid - m_method_offset].set_enabled (en);
+}
+
+bool
+MethodTable::fallback_not_implemented (size_t mid) const
+{
+  return m_table [mid - m_method_offset].fallback_not_implemented ();
+}
+
+void
+MethodTable::set_fallback_not_implemented (size_t mid, bool f)
+{
+  m_table [mid - m_method_offset].set_fallback_not_implemented (f);
 }
 
 bool
@@ -743,7 +803,7 @@ MethodTable::finish ()
 }
 
 void
-MethodTable::add_method_basic (const std::string &name, const gsi::MethodBase *mb, bool enabled, bool init)
+MethodTable::add_method_basic (const std::string &name, const gsi::MethodBase *mb, bool enabled, bool init, bool fallback_not_implemented)
 {
   bool st = mb->is_static () && ! init;
 
@@ -757,6 +817,9 @@ MethodTable::add_method_basic (const std::string &name, const gsi::MethodBase *m
     }
     if (init) {
       m_table.back ().set_init (true);
+    }
+    if (fallback_not_implemented) {
+      m_table.back ().set_fallback_not_implemented (true);
     }
     m_table.back ().add (mb);
 
@@ -772,6 +835,9 @@ MethodTable::add_method_basic (const std::string &name, const gsi::MethodBase *m
     }
     if (init) {
       tl_assert (m_table [n->second].is_init ());
+    }
+    if (fallback_not_implemented) {
+      m_table.back ().set_fallback_not_implemented (true);
     }
 
   }

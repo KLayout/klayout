@@ -506,3 +506,12 @@ TEST(33)
   opt.polyline_mode = 2;
   run_test (_this, "t33.dxf.gz", "t33e_au.gds.gz", opt);
 }
+
+//  issue #1173
+TEST(34)
+{
+  db::DXFReaderOptions opt;
+  opt.polyline_mode = 3;
+
+  run_test_public (_this, "issue_1173.dxf", "issue_1173_au.gds.gz", opt);
+}

@@ -61,6 +61,7 @@ public:
     t_layer,    //  a layer (value is a db::LayerProperties object)
     t_shape,    //  a shape (a db::Point, db::Box, db::Polygon, db::Edge or db::Path) rendering a guiding shape
     t_list,     //  a list of strings
+    t_callback, //  callback only (button)
     t_none      //  no specific type 
   };
 
@@ -324,6 +325,174 @@ public:
 };
 
 /**
+ *  @brief Represents the dynamic state of a single parameter
+ */
+class DB_PUBLIC ParameterState
+{
+public:
+  /**
+   *  @brief Parameterized constructor
+   */
+  ParameterState ()
+    : m_value (), m_visible (true), m_enabled (true),
+      m_value_changed (false), m_visible_changed (false), m_enabled_changed (false)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Gets the value
+   */
+  const tl::Variant &value () const
+  {
+    return m_value;
+  }
+
+  /**
+   *  @brief Sets the value
+   */
+  void set_value (const tl::Variant &v)
+  {
+    if (m_value != v) {
+      m_value = v;
+      m_value_changed = true;
+    }
+  }
+
+  /**
+   *  @brief Gets a value indicating wheter the value has changed
+   */
+  bool value_changed () const
+  {
+    return m_value_changed;
+  }
+
+  /**
+   *  @brief Gets the visibility state
+   */
+  bool is_visible () const
+  {
+    return m_visible;
+  }
+
+  /**
+   *  @brief Sets the visibility
+   */
+  void set_visible (bool v)
+  {
+    if (m_visible != v) {
+      m_visible = v;
+      m_visible_changed = true;
+    }
+  }
+
+  /**
+   *  @brief Gets a value indicating wheter the visibility has changed
+   */
+  bool visible_changed () const
+  {
+    return m_visible_changed;
+  }
+
+  /**
+   *  @brief Gets the enabled state
+   */
+  bool is_enabled () const
+  {
+    return m_enabled;
+  }
+
+  /**
+   *  @brief Sets the enabled state
+   */
+  void set_enabled (bool v)
+  {
+    if (m_enabled != v) {
+      m_enabled = v;
+      m_enabled_changed = true;
+    }
+  }
+
+  /**
+   *  @brief Gets a value indicating wheter the enabled state has changed
+   */
+  bool enabled_changed () const
+  {
+    return m_enabled_changed;
+  }
+
+  /**
+   *  @brief Resets the modified flags
+   */
+  void reset ()
+  {
+    m_enabled_changed = m_visible_changed = m_value_changed = false;
+  }
+
+private:
+  tl::Variant m_value;
+  bool m_visible, m_enabled;
+  bool m_value_changed, m_visible_changed, m_enabled_changed;
+};
+
+/**
+ *  @brief Represents the state of call parameters for the callback implementation
+ */
+class DB_PUBLIC ParameterStates
+{
+public:
+  /**
+   *  @brief Default constructor
+   */
+  ParameterStates ()
+    : m_states ()
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Sets a parameter from a given state
+   */
+  void set_parameter (const std::string &name, const ParameterState &ps)
+  {
+    m_states [name] = ps;
+  }
+
+  /**
+   *  @brief Gets the parameter state for the parameter with the given name
+   *
+   *  If the name is not a valid parameter name, the behavior is undefined.
+   */
+  ParameterState &parameter (const std::string &name)
+  {
+    return m_states [name];
+  }
+
+  /**
+   *  @brief Gets the parameter state for the parameter with the given name
+   *
+   *  If the name is not a valid parameter name, the behavior is undefined.
+   */
+  const ParameterState &parameter (const std::string &name) const
+  {
+    return const_cast<ParameterStates *> (this)->parameter (name);
+  }
+
+  /**
+   *  @brief Resets the modified flags
+   */
+  void reset ()
+  {
+    for (auto p = m_states.begin (); p != m_states.end (); ++p) {
+      p->second.reset ();
+    }
+  }
+
+public:
+  std::map<std::string, ParameterState> m_states;
+};
+
+/**
  *  @brief A declaration for a PCell
  */
 class DB_PUBLIC PCellDeclaration
@@ -374,7 +543,25 @@ public:
   }
 
   /**
-   *  @brief Produce a layout for the given parameter set and using the given layers.
+   *  @brief Callback on parameter change
+   *
+   *  This method allows implementing dynamic behavior on the change of a parameter value.
+   *  A ParameterStatus object is supplied that allows changing parameter enabled status, visibility and value.
+   *  The callback also acts as receiver for t_callback type parameters which only present a button.
+   *
+   *  The callback function receives the name of the parameter that was changed.
+   *  On some occasions, the callback is called unspecifically, for example for the initialization.
+   *  In that case, the parameter name is empty.
+   *
+   *  Exceptions from this implementation are ignored.
+   */
+  virtual void callback (const db::Layout & /*layout*/, const std::string & /*name*/, ParameterStates & /*states*/) const
+  {
+    //  the default implementation does nothing
+  }
+
+  /**
+   *  @brief Produces a layout for the given parameter set and using the given layers.
    *
    *  A reimplementation of that method should produce the desired layout for the given parameter set.
    *  The layout shall be put into the given cell. This code may create cell instances to other cells 

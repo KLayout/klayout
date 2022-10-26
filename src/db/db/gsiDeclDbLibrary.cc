@@ -634,6 +634,11 @@ static unsigned int pd_type_list ()
   return (unsigned int) db::PCellParameterDeclaration::t_list;
 }
 
+static unsigned int pd_type_callback ()
+{
+  return (unsigned int) db::PCellParameterDeclaration::t_callback;
+}
+
 static unsigned int pd_type_none ()
 {
   return (unsigned int) db::PCellParameterDeclaration::t_none;
@@ -763,7 +768,8 @@ Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCel
   gsi::method ("TypeList", &pd_type_list, "@brief Type code: a list of variants") +
   gsi::method ("TypeLayer", &pd_type_layer, "@brief Type code: a layer (a \\LayerInfo object)") +
   gsi::method ("TypeShape", &pd_type_shape, "@brief Type code: a guiding shape (Box, Edge, Point, Polygon or Path)") +
-  gsi::method ("TypeNone", &pd_type_none, "@brief Type code: unspecific type") 
+  gsi::method ("TypeCallback", &pd_type_callback, "@brief Type code: a button triggering a callback") +
+  gsi::method ("TypeNone", &pd_type_none, "@brief Type code: unspecific type")
   ,
   "@brief A PCell parameter declaration\n"
   "\n"

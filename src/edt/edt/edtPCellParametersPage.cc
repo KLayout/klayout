@@ -238,13 +238,15 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
   mp_pcell_decl.reset (const_cast<db::PCellDeclaration *> (pcell_decl));  //  no const weak_ptr ...
   mp_view = view;
   m_cv_index = cv_index;
-  m_parameters = parameters;
+  m_states = db::ParameterStates ();
+  m_initial_parameters.clear ();
 
   if (mp_parameters_area) {
     delete mp_parameters_area;
   }
 
   m_widgets.clear ();
+  m_all_widgets.clear ();
 
   mp_parameters_area = new QScrollArea (this);
   mp_parameters_area->setFrameShape (QFrame::NoFrame);
@@ -276,7 +278,23 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
   const std::vector<db::PCellParameterDeclaration> &pcp = pcell_decl->parameter_declarations ();
   for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pcp.begin (); p != pcp.end (); ++p, ++r) {
 
-    if (p->is_hidden () || p->get_type () == db::PCellParameterDeclaration::t_shape) {
+    tl::Variant value;
+    if (r < int (parameters.size ())) {
+      value = parameters [r];
+    } else {
+      value = p->get_default ();
+    }
+
+    m_initial_parameters.push_back (value);
+
+    db::ParameterState &ps = m_states.parameter (p->get_name ());
+    ps.set_value (value);
+    ps.set_enabled (! p->is_readonly ());
+    ps.set_visible (! p->is_hidden ());
+
+    m_all_widgets.push_back (std::vector<QWidget *> ());
+
+    if (p->get_type () == db::PCellParameterDeclaration::t_shape) {
       m_widgets.push_back (0);
       continue;
     }
@@ -324,13 +342,10 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
 
     } 
 
-    inner_grid->addWidget (new QLabel (tl::to_qstring (description), inner_frame), row, 0);
-
-    tl::Variant value;
-    if (r < int (parameters.size ())) {
-      value = parameters [r];
-    } else {
-      value = p->get_default ();
+    if (p->get_type () != db::PCellParameterDeclaration::t_callback) {
+      QLabel *l = new QLabel (tl::to_qstring (description), inner_frame);
+      inner_grid->addWidget (l, row, 0);
+      m_all_widgets.back ().push_back (l);
     }
 
     if (p->get_choices ().empty ()) {
@@ -347,7 +362,6 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
           f->setFrameShape (QFrame::NoFrame);
 
           QLineEdit *le = new QLineEdit (f);
-          le->setEnabled (! p->is_readonly ());
           hb->addWidget (le);
           le->setMaximumWidth (150);
           le->setObjectName (tl::to_qstring (p->get_name ()));
@@ -358,8 +372,24 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
           ul->setText (tl::to_qstring (p->get_unit ()));
 
           inner_grid->addWidget (f, row, 1);
+          m_all_widgets.back ().push_back (f);
 
           connect (le, SIGNAL (editingFinished ()), this, SLOT (parameter_changed ()));
+        }
+        break;
+
+      case db::PCellParameterDeclaration::t_callback:
+        {
+          QPushButton *pb = new QPushButton (inner_frame);
+          pb->setObjectName (tl::to_qstring (p->get_name ()));
+          pb->setText (tl::to_qstring (description));
+          pb->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Preferred);
+          m_widgets.push_back (pb);
+
+          inner_grid->addWidget (pb, row, 1);
+          m_all_widgets.back ().push_back (pb);
+
+          connect (pb, SIGNAL (clicked ()), this, SLOT (parameter_changed ()));
         }
         break;
 
@@ -368,10 +398,10 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
       case db::PCellParameterDeclaration::t_list:
         {
           QLineEdit *le = new QLineEdit (inner_frame);
-          le->setEnabled (! p->is_readonly ());
           le->setObjectName (tl::to_qstring (p->get_name ()));
           m_widgets.push_back (le);
           inner_grid->addWidget (le, row, 1);
+          m_all_widgets.back ().push_back (le);
 
           connect (le, SIGNAL (editingFinished ()), this, SLOT (parameter_changed ()));
         }
@@ -380,12 +410,12 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
       case db::PCellParameterDeclaration::t_layer:
         {
           lay::LayerSelectionComboBox *ly = new lay::LayerSelectionComboBox (inner_frame);
-          ly->setEnabled (! p->is_readonly ());
           ly->set_no_layer_available (true);
           ly->set_view (mp_view, m_cv_index, true /*all layers*/);
           ly->setObjectName (tl::to_qstring (p->get_name ()));
           m_widgets.push_back (ly);
           inner_grid->addWidget (ly, row, 1);
+          m_all_widgets.back ().push_back (ly);
 
           connect (ly, SIGNAL (activated (int)), this, SLOT (parameter_changed ()));
         }
@@ -396,10 +426,10 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
           QCheckBox *cbx = new QCheckBox (inner_frame);
           //  this makes the checkbox not stretch over the full width - better when navigating with tab
           cbx->setSizePolicy (QSizePolicy (QSizePolicy::Fixed, QSizePolicy::Preferred));
-          cbx->setEnabled (! p->is_readonly ());
           cbx->setObjectName (tl::to_qstring (p->get_name ()));
           m_widgets.push_back (cbx);
           inner_grid->addWidget (cbx, row, 1);
+          m_all_widgets.back ().push_back (cbx);
 
           connect (cbx, SIGNAL (stateChanged (int)), this, SLOT (parameter_changed ()));
         }
@@ -426,15 +456,13 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
 
       connect (cb, SIGNAL (activated (int)), this, SLOT (parameter_changed ()));
 
-      cb->setEnabled (! p->is_readonly ());
       cb->setMinimumContentsLength (30);
       cb->setSizeAdjustPolicy (QComboBox::AdjustToMinimumContentsLengthWithIcon);
       m_widgets.push_back (cb);
       inner_grid->addWidget (cb, row, 1);
+      m_all_widgets.back ().push_back (cb);
 
     }
-
-    set_value (*p, m_widgets.back (), value);
 
     ++row;
     if (inner_frame == main_frame) {
@@ -443,10 +471,62 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
 
   }
 
+  //  initial callback
+
+  try {
+    mp_pcell_decl->callback (mp_view->cellview (m_cv_index)->layout (), std::string (), m_states);
+  } catch (tl::Exception &ex) {
+    //  potentially caused by script errors in callback implementation
+    tl::error << ex.msg ();
+  } catch (std::runtime_error &ex) {
+    tl::error << ex.what ();
+  } catch (...) {
+    //  ignore other errors
+  }
+
+  update_widgets_from_states (m_states);
+  m_states.reset ();
+
   mp_parameters_area->setWidget (main_frame);
   main_frame->show ();
 
   update_current_parameters ();
+}
+
+void
+PCellParametersPage::update_widgets_from_states (const db::ParameterStates &states)
+{
+  if (! mp_pcell_decl) {
+    return;
+  }
+
+  bool update_needed = false;
+
+  size_t i = 0;
+  const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_decl->parameter_declarations ();
+  for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pcp.begin (); p != pcp.end (); ++p, ++i) {
+
+    const std::string &name = p->get_name ();
+    const db::ParameterState &ps = states.parameter (name);
+
+    if (ps.value_changed ()) {
+      update_needed = true;
+      set_value (*p, m_widgets [i], ps.value ());
+    }
+
+    if (ps.enabled_changed ()) {
+      m_widgets [i]->setEnabled (ps.is_enabled ());
+    }
+
+    if (ps.visible_changed ()) {
+      for (auto w = m_all_widgets [i].begin (); w != m_all_widgets [i].end (); ++w) {
+        (*w)->setVisible (ps.is_enabled ());
+      }
+    }
+
+  }
+
+  mp_update_frame->setVisible (update_needed);
 }
 
 PCellParametersPage::State
@@ -483,9 +563,51 @@ PCellParametersPage::set_state (const State &s)
   }
 }
 
-void  
+void
 PCellParametersPage::parameter_changed ()
 {
+  if (! mp_pcell_decl) {
+    return;
+  }
+  if (! mp_view->cellview (m_cv_index).is_valid ()) {
+    return;
+  }
+
+  const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_decl->parameter_declarations ();
+  const db::PCellParameterDeclaration *pd = 0;
+  for (auto w = m_widgets.begin (); w != m_widgets.end (); ++w) {
+    if (*w == sender ()) {
+      pd = &pcp [w - m_widgets.begin ()];
+      break;
+    }
+  }
+
+  try {
+
+    db::ParameterStates states = m_states;
+    states.reset ();
+
+    bool edit_error = false;
+    get_parameters_internal (states, edit_error);
+    if (! edit_error) {
+
+      mp_pcell_decl->callback (mp_view->cellview (m_cv_index)->layout (), pd ? pd->get_name () : std::string (), states);
+
+      update_widgets_from_states (states);
+      states.reset ();
+      m_states = states;
+
+    }
+
+  } catch (tl::Exception &ex) {
+    //  potentially caused by script errors in callback implementation
+    tl::error << ex.msg ();
+  } catch (std::runtime_error &ex) {
+    tl::error << ex.what ();
+  } catch (...) {
+    //  ignore other errors
+  }
+
   dm_parameter_changed ();
 }
 
@@ -493,9 +615,10 @@ void
 PCellParametersPage::do_parameter_changed ()
 {
   //  does a coerce and update
-  bool ok = false;
-  std::vector<tl::Variant> parameters = get_parameters (&ok);
-  if (ok && ! lazy_evaluation ()) {
+  bool edit_error = false;
+  db::ParameterStates states = m_states;
+  get_parameters_internal (states, edit_error);
+  if (! edit_error && ! lazy_evaluation ()) {
     emit edited ();
   }
 }
@@ -521,6 +644,125 @@ PCellParametersPage::update_current_parameters ()
   return ok;
 }
 
+void
+PCellParametersPage::get_parameters_internal (db::ParameterStates &states, bool &edit_error)
+{
+  edit_error = true;
+
+  int r = 0;
+  const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_decl->parameter_declarations ();
+  for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pcp.begin (); p != pcp.end (); ++p, ++r) {
+
+    db::ParameterState &ps = states.parameter (p->get_name ());
+
+    if (! ps.is_visible () || ! ps.is_enabled () || p->get_type () == db::PCellParameterDeclaration::t_shape) {
+      continue;
+    }
+
+    if (p->get_choices ().empty ()) {
+
+      switch (p->get_type ()) {
+
+      case db::PCellParameterDeclaration::t_int:
+        {
+          QLineEdit *le = dynamic_cast<QLineEdit *> (m_widgets [r]);
+          if (le) {
+
+            try {
+
+              int v = 0;
+              tl::from_string_ext (tl::to_string (le->text ()), v);
+
+              ps.set_value (tl::Variant (v));
+              lay::indicate_error (le, (tl::Exception *) 0);
+
+            } catch (tl::Exception &ex) {
+
+              lay::indicate_error (le, &ex);
+              edit_error = false;
+
+            }
+
+          }
+        }
+        break;
+
+      case db::PCellParameterDeclaration::t_double:
+        {
+          QLineEdit *le = dynamic_cast<QLineEdit *> (m_widgets [r]);
+          if (le) {
+
+            try {
+
+              double v = 0;
+              tl::from_string_ext (tl::to_string (le->text ()), v);
+
+              ps.set_value (tl::Variant (v));
+              lay::indicate_error (le, (tl::Exception *) 0);
+
+            } catch (tl::Exception &ex) {
+
+              lay::indicate_error (le, &ex);
+              edit_error = false;
+
+            }
+
+          }
+        }
+        break;
+
+      case db::PCellParameterDeclaration::t_string:
+        {
+          QLineEdit *le = dynamic_cast<QLineEdit *> (m_widgets [r]);
+          if (le) {
+            ps.set_value (tl::Variant (tl::to_string (le->text ())));
+          }
+        }
+        break;
+
+      case db::PCellParameterDeclaration::t_list:
+        {
+          QLineEdit *le = dynamic_cast<QLineEdit *> (m_widgets [r]);
+          if (le) {
+            std::vector<std::string> values = tl::split (tl::to_string (le->text ()), ",");
+            ps.set_value (tl::Variant (values.begin (), values.end ()));
+          }
+        }
+        break;
+
+      case db::PCellParameterDeclaration::t_layer:
+        {
+          lay::LayerSelectionComboBox *ly = dynamic_cast<lay::LayerSelectionComboBox *> (m_widgets [r]);
+          if (ly) {
+            ps.set_value (tl::Variant (ly->current_layer_props ()));
+          }
+        }
+        break;
+      case db::PCellParameterDeclaration::t_boolean:
+        {
+          QCheckBox *cbx = dynamic_cast<QCheckBox *> (m_widgets [r]);
+          if (cbx) {
+            ps.set_value (tl::Variant (cbx->isChecked ()));
+          }
+        }
+        break;
+
+      default:
+        break;
+      }
+
+    } else {
+
+      QComboBox *cb = dynamic_cast<QComboBox*> (m_widgets [r]);
+      if (cb && cb->currentIndex () >= 0 && cb->currentIndex () < int (p->get_choices ().size ())) {
+        ps.set_value (p->get_choices () [cb->currentIndex ()]);
+      }
+
+    }
+
+  }
+}
+
 std::vector<tl::Variant> 
 PCellParametersPage::get_parameters (bool *ok)
 {
@@ -532,130 +774,17 @@ PCellParametersPage::get_parameters (bool *ok)
       throw tl::Exception (tl::to_string (tr ("PCell no longer valid.")));
     }
 
-    bool edit_error = true;
+    bool edit_error = false;
 
-    int r = 0;
+    db::ParameterStates states = m_states;
+    get_parameters_internal (states, edit_error);
+
     const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_decl->parameter_declarations ();
-    for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pcp.begin (); p != pcp.end (); ++p, ++r) {
-
-      if (p->is_hidden () || p->get_type () == db::PCellParameterDeclaration::t_shape) {
-
-        if (r < (int) m_parameters.size ()) {
-          parameters.push_back (m_parameters [r]);
-        } else {
-          parameters.push_back (p->get_default ());
-        }
-
-      } else {
-
-        parameters.push_back (tl::Variant ());
-
-        if (p->get_choices ().empty ()) {
-
-          switch (p->get_type ()) {
-
-          case db::PCellParameterDeclaration::t_int:
-            {
-              QLineEdit *le = dynamic_cast<QLineEdit *> (m_widgets [r]);
-              if (le) {
-
-                try {
-
-                  int v = 0;
-                  tl::from_string_ext (tl::to_string (le->text ()), v);
-
-                  parameters.back () = tl::Variant (v);
-                  lay::indicate_error (le, (tl::Exception *) 0);
-
-                } catch (tl::Exception &ex) {
-
-                  lay::indicate_error (le, &ex);
-                  edit_error = false;
-
-                }
-
-              }
-            }
-            break;
-
-          case db::PCellParameterDeclaration::t_double:
-            {
-              QLineEdit *le = dynamic_cast<QLineEdit *> (m_widgets [r]);
-              if (le) {
-
-                try {
-
-                  double v = 0;
-                  tl::from_string_ext (tl::to_string (le->text ()), v);
-
-                  parameters.back () = tl::Variant (v);
-                  lay::indicate_error (le, (tl::Exception *) 0);
-
-                } catch (tl::Exception &ex) {
-
-                  lay::indicate_error (le, &ex);
-                  edit_error = false;
-
-                }
-
-              }
-            }
-            break;
-
-          case db::PCellParameterDeclaration::t_string:
-            {
-              QLineEdit *le = dynamic_cast<QLineEdit *> (m_widgets [r]);
-              if (le) {
-                parameters.back () = tl::Variant (tl::to_string (le->text ()));
-              }
-            }
-            break;
-
-          case db::PCellParameterDeclaration::t_list:
-            {
-              QLineEdit *le = dynamic_cast<QLineEdit *> (m_widgets [r]);
-              if (le) {
-                std::vector<std::string> values = tl::split (tl::to_string (le->text ()), ",");
-                parameters.back () = tl::Variant (values.begin (), values.end ());
-              }
-            }
-            break;
-
-          case db::PCellParameterDeclaration::t_layer:
-            {
-              lay::LayerSelectionComboBox *ly = dynamic_cast<lay::LayerSelectionComboBox *> (m_widgets [r]);
-              if (ly) {
-                parameters.back () = tl::Variant (ly->current_layer_props ());
-              }
-            }
-            break;
-          case db::PCellParameterDeclaration::t_boolean:
-            {
-              QCheckBox *cbx = dynamic_cast<QCheckBox *> (m_widgets [r]);
-              if (cbx) {
-                parameters.back () = tl::Variant (cbx->isChecked ());
-              }
-            }
-            break;
-
-          default:
-            break;
-          }
-
-        } else {
-
-          QComboBox *cb = dynamic_cast<QComboBox*> (m_widgets [r]);
-          if (cb && cb->currentIndex () >= 0 && cb->currentIndex () < int (p->get_choices ().size ())) {
-            parameters.back () = p->get_choices () [cb->currentIndex ()];
-          }
-
-        }
-
-      }
-
+    for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pcp.begin (); p != pcp.end (); ++p) {
+      parameters.push_back (states.parameter (p->get_name ()).value ());
     }
 
-    if (! edit_error) {
+    if (edit_error) {
       throw tl::Exception (tl::to_string (tr ("There are errors. See the highlighted edit fields for details.")));
     }
 
@@ -698,7 +827,34 @@ PCellParametersPage::get_parameters (bool *ok)
 void
 PCellParametersPage::set_parameters (const std::vector<tl::Variant> &parameters)
 {
-  m_parameters = parameters;
+  if (! mp_pcell_decl) {
+    return;
+  }
+
+  size_t r = 0;
+  const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_decl->parameter_declarations ();
+  for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pcp.begin (); p != pcp.end (); ++p, ++r) {
+    db::ParameterState &ps = m_states.parameter (p->get_name ());
+    if (r < parameters.size ()) {
+      ps.set_value (parameters [r]);
+    } else {
+      ps.set_value (p->get_default ());
+    }
+  }
+
+  try {
+    if (mp_view->cellview (m_cv_index).is_valid ()) {
+      mp_pcell_decl->callback (mp_view->cellview (m_cv_index)->layout (), std::string (), m_states);
+    }
+  } catch (tl::Exception &ex) {
+    //  potentially caused by script errors in callback implementation
+    tl::error << ex.msg ();
+  } catch (std::runtime_error &ex) {
+    tl::error << ex.what ();
+  } catch (...) {
+    //  ignore other errors
+  }
+
   set_parameters_internal (parameters, false);
 }
 

@@ -103,12 +103,10 @@ public:
 
   /**
    *  @brief Gets the initial parameters
-   *
-   *  The initial parameters are the ones present on "setup".
    */
   const std::vector<tl::Variant> &initial_parameters () const
   {
-    return m_parameters;
+    return m_initial_parameters;
   }
 
   /**
@@ -141,18 +139,21 @@ private:
   QFrame *mp_error_frame, *mp_update_frame;
   tl::weak_ptr<db::PCellDeclaration> mp_pcell_decl;
   std::vector<QWidget *> m_widgets;
+  std::vector<std::vector<QWidget *> > m_all_widgets;
   lay::LayoutViewBase *mp_view;
   int m_cv_index;
-  db::pcell_parameters_type m_parameters;
   bool m_dense;
   tl::DeferredMethod<PCellParametersPage> dm_parameter_changed;
-  std::vector<tl::Variant> m_current_parameters;
+  std::vector<tl::Variant> m_current_parameters, m_initial_parameters;
+  db::ParameterStates m_states;
 
   void init ();
   void do_parameter_changed ();
   bool lazy_evaluation ();
   void set_parameters_internal (const  std::vector<tl::Variant> &values, bool tentatively);
   bool update_current_parameters ();
+  void update_widgets_from_states (const db::ParameterStates &states);
+  void get_parameters_internal (db::ParameterStates &states, bool &edit_error);
 };
 
 }

@@ -65,7 +65,7 @@ ObjectInstPath::is_valid (lay::LayoutViewBase *view) const
   }
 
   if (! is_cell_inst ()) {
-    if (! ly.is_valid_layer (layer ())) {
+    if (! ly.is_valid_layer (layer ()) && layer () != ly.guiding_shape_layer ()) {
       return false;
     }
     if (! ly.cell (ci).shapes (layer ()).is_valid (shape ())) {

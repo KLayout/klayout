@@ -27,6 +27,80 @@
 namespace db
 {
 
+// -----------------------------------------------------------------------------------------
+//  ParameterStates implementation
+
+ParameterStates::ParameterStates ()
+  : m_states ()
+{
+  //  .. nothing yet ..
+}
+
+ParameterStates::ParameterStates (const ParameterStates &other)
+  : m_states (other.m_states)
+{
+  //  .. nothing yet ..
+}
+
+ParameterStates::ParameterStates (ParameterStates &&other)
+  : m_states (std::move (other.m_states))
+{
+  //  .. nothing yet ..
+}
+
+ParameterStates &
+ParameterStates::operator= (const ParameterStates &other)
+{
+  if (this != &other) {
+    m_states = other.m_states;
+  }
+  return *this;
+}
+
+void
+ParameterStates::set_parameter (const std::string &name, const ParameterState &ps)
+{
+  m_states [name] = ps;
+}
+
+ParameterState &
+ParameterStates::parameter (const std::string &name)
+{
+  return m_states [name];
+}
+
+const ParameterState &
+ParameterStates::parameter (const std::string &name) const
+{
+  auto i = m_states.find (name);
+  if (i == m_states.end ()) {
+    static ParameterState empty;
+    return empty;
+  } else {
+    return i->second;
+  }
+}
+
+bool
+ParameterStates::has_parameter (const std::string &name) const
+{
+  return m_states.find (name) != m_states.end ();
+}
+
+bool
+ParameterStates::values_are_equal (const db::ParameterStates &other) const
+{
+  auto i = m_states.begin (), j = other.m_states.begin ();
+  while (i != m_states.end () && j != other.m_states.end () && i->first == j->first && i->second.value () == j->second.value ()) {
+    ++i; ++j;
+  }
+  return i == m_states.end () && j == other.m_states.end ();
+}
+
+
+// -----------------------------------------------------------------------------------------
+//  PCellDeclaration implementation
+
 PCellDeclaration::PCellDeclaration ()
   : m_ref_count (0), m_id (0), mp_layout (0), m_has_parameter_declarations (false)
 { 

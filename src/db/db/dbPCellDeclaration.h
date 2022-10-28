@@ -334,8 +334,7 @@ public:
    *  @brief Parameterized constructor
    */
   ParameterState ()
-    : m_value (), m_visible (true), m_enabled (true),
-      m_value_changed (false), m_visible_changed (false), m_enabled_changed (false)
+    : m_value (), m_visible (true), m_enabled (true)
   {
     //  .. nothing yet ..
   }
@@ -353,18 +352,7 @@ public:
    */
   void set_value (const tl::Variant &v)
   {
-    if (m_value != v) {
-      m_value = v;
-      m_value_changed = true;
-    }
-  }
-
-  /**
-   *  @brief Gets a value indicating wheter the value has changed
-   */
-  bool value_changed () const
-  {
-    return m_value_changed;
+    m_value = v;
   }
 
   /**
@@ -380,18 +368,7 @@ public:
    */
   void set_visible (bool v)
   {
-    if (m_visible != v) {
-      m_visible = v;
-      m_visible_changed = true;
-    }
-  }
-
-  /**
-   *  @brief Gets a value indicating wheter the visibility has changed
-   */
-  bool visible_changed () const
-  {
-    return m_visible_changed;
+    m_visible = v;
   }
 
   /**
@@ -407,32 +384,12 @@ public:
    */
   void set_enabled (bool v)
   {
-    if (m_enabled != v) {
-      m_enabled = v;
-      m_enabled_changed = true;
-    }
-  }
-
-  /**
-   *  @brief Gets a value indicating wheter the enabled state has changed
-   */
-  bool enabled_changed () const
-  {
-    return m_enabled_changed;
-  }
-
-  /**
-   *  @brief Resets the modified flags
-   */
-  void reset ()
-  {
-    m_enabled_changed = m_visible_changed = m_value_changed = false;
+    m_enabled = v;
   }
 
 private:
   tl::Variant m_value;
   bool m_visible, m_enabled;
-  bool m_value_changed, m_visible_changed, m_enabled_changed;
 };
 
 /**
@@ -444,49 +401,51 @@ public:
   /**
    *  @brief Default constructor
    */
-  ParameterStates ()
-    : m_states ()
-  {
-    //  .. nothing yet ..
-  }
+  ParameterStates ();
+
+  /**
+   *  @brief Copy constructor
+   */
+  ParameterStates (const ParameterStates &other);
+
+  /**
+   *  @brief Move constructor
+   */
+  ParameterStates (ParameterStates &&other);
+
+  /**
+   *  @brief Assignment
+   */
+  ParameterStates &operator= (const ParameterStates &other);
 
   /**
    *  @brief Sets a parameter from a given state
    */
-  void set_parameter (const std::string &name, const ParameterState &ps)
-  {
-    m_states [name] = ps;
-  }
+  void set_parameter (const std::string &name, const ParameterState &ps);
 
   /**
    *  @brief Gets the parameter state for the parameter with the given name
    *
    *  If the name is not a valid parameter name, the behavior is undefined.
    */
-  ParameterState &parameter (const std::string &name)
-  {
-    return m_states [name];
-  }
+  ParameterState &parameter (const std::string &name);
 
   /**
    *  @brief Gets the parameter state for the parameter with the given name
    *
    *  If the name is not a valid parameter name, the behavior is undefined.
    */
-  const ParameterState &parameter (const std::string &name) const
-  {
-    return const_cast<ParameterStates *> (this)->parameter (name);
-  }
+  const ParameterState &parameter (const std::string &name) const;
 
   /**
-   *  @brief Resets the modified flags
+   *  @brief Gets a value indicating whether a parameter with that name is present
    */
-  void reset ()
-  {
-    for (auto p = m_states.begin (); p != m_states.end (); ++p) {
-      p->second.reset ();
-    }
-  }
+  bool has_parameter (const std::string &name) const;
+
+  /**
+   *  @brief Returns true, if the values of the parameter states are equal
+   */
+  bool values_are_equal (const db::ParameterStates &other) const;
 
 public:
   std::map<std::string, ParameterState> m_states;

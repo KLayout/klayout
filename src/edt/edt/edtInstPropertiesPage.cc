@@ -555,7 +555,7 @@ InstPropertiesPage::create_applicator (db::Cell & /*cell*/, const db::Instance &
       tl_assert (mp_pcell_parameters);
 
       std::vector<tl::Variant> param = mp_pcell_parameters->get_parameters (0);
-      const std::vector<tl::Variant> &initial_param = mp_pcell_parameters->initial_parameters ();
+      std::vector<tl::Variant> initial_param = mp_pcell_parameters->initial_parameters ();
 
       const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_parameters->pcell_decl ()->parameter_declarations ();
       for (std::vector<db::PCellParameterDeclaration>::const_iterator pd = pcp.begin (); pd != pcp.end (); ++pd) {

@@ -93,7 +93,7 @@ public:
   void set_state (const State &s);
 
   /**
-   *  @brief Get the current parameters
+   *  @brief Gets the current parameters
    *
    *  *ok is set to true, if there is no error. In case of an error it's set to false.
    *  The error is indicated in the error label in the editor page.
@@ -102,11 +102,24 @@ public:
   std::vector<tl::Variant> get_parameters (bool *ok = 0);
 
   /**
+   *  @brief Gets the current parameters into a ParameterStates object
+   *
+   *  *ok is set to true, if there is no error. In case of an error it's set to false.
+   *  The error is indicated in the error label in the editor page.
+   *  If ok is null, an exception is thrown.
+   *
+   *  The value fields of the ParameterState members is set to the parameter value.
+   *  The other attributes are not changed. Parameters not present inside the
+   *  ParameterStates object are created with their corresponding name.
+   */
+  void get_parameters (db::ParameterStates &states, bool *ok = 0);
+
+  /**
    *  @brief Gets the initial parameters
    */
-  const std::vector<tl::Variant> &initial_parameters () const
+  std::vector<tl::Variant> initial_parameters () const
   {
-    return m_initial_parameters;
+    return parameter_from_states (m_initial_states);
   }
 
   /**
@@ -144,16 +157,18 @@ private:
   int m_cv_index;
   bool m_dense;
   tl::DeferredMethod<PCellParametersPage> dm_parameter_changed;
-  std::vector<tl::Variant> m_current_parameters, m_initial_parameters;
+  db::ParameterStates m_current_states, m_initial_states;
   db::ParameterStates m_states;
 
   void init ();
   void do_parameter_changed ();
   bool lazy_evaluation ();
-  void set_parameters_internal (const  std::vector<tl::Variant> &values, bool tentatively);
+  void set_parameters_internal (const db::ParameterStates &states, bool tentatively);
   bool update_current_parameters ();
   void update_widgets_from_states (const db::ParameterStates &states);
   void get_parameters_internal (db::ParameterStates &states, bool &edit_error);
+  std::vector<tl::Variant> parameter_from_states (const db::ParameterStates &states) const;
+  void states_from_parameters (db::ParameterStates &states, const std::vector<tl::Variant> &parameters);
 };
 
 }

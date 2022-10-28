@@ -239,7 +239,6 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
   mp_view = view;
   m_cv_index = cv_index;
   m_states = db::ParameterStates ();
-  m_initial_parameters.clear ();
 
   if (mp_parameters_area) {
     delete mp_parameters_area;
@@ -284,8 +283,6 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
     } else {
       value = p->get_default ();
     }
-
-    m_initial_parameters.push_back (value);
 
     db::ParameterState &ps = m_states.parameter (p->get_name ());
     ps.set_value (value);
@@ -484,49 +481,13 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
     //  ignore other errors
   }
 
+  m_initial_states = m_states;
   update_widgets_from_states (m_states);
-  m_states.reset ();
 
   mp_parameters_area->setWidget (main_frame);
   main_frame->show ();
 
   update_current_parameters ();
-}
-
-void
-PCellParametersPage::update_widgets_from_states (const db::ParameterStates &states)
-{
-  if (! mp_pcell_decl) {
-    return;
-  }
-
-  bool update_needed = false;
-
-  size_t i = 0;
-  const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_decl->parameter_declarations ();
-  for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pcp.begin (); p != pcp.end (); ++p, ++i) {
-
-    const std::string &name = p->get_name ();
-    const db::ParameterState &ps = states.parameter (name);
-
-    if (ps.value_changed ()) {
-      update_needed = true;
-      set_value (*p, m_widgets [i], ps.value ());
-    }
-
-    if (ps.enabled_changed ()) {
-      m_widgets [i]->setEnabled (ps.is_enabled ());
-    }
-
-    if (ps.visible_changed ()) {
-      for (auto w = m_all_widgets [i].begin (); w != m_all_widgets [i].end (); ++w) {
-        (*w)->setVisible (ps.is_enabled ());
-      }
-    }
-
-  }
-
-  mp_update_frame->setVisible (update_needed);
 }
 
 PCellParametersPage::State
@@ -585,16 +546,17 @@ PCellParametersPage::parameter_changed ()
   try {
 
     db::ParameterStates states = m_states;
-    states.reset ();
 
     bool edit_error = false;
+    //  Silent and without coerce - this will be done later in do_parameter_changed().
+    //  This is just about providing the inputs for the callback.
     get_parameters_internal (states, edit_error);
+
     if (! edit_error) {
 
       mp_pcell_decl->callback (mp_view->cellview (m_cv_index)->layout (), pd ? pd->get_name () : std::string (), states);
 
       update_widgets_from_states (states);
-      states.reset ();
       m_states = states;
 
     }
@@ -614,11 +576,10 @@ PCellParametersPage::parameter_changed ()
 void
 PCellParametersPage::do_parameter_changed ()
 {
-  //  does a coerce and update
-  bool edit_error = false;
+  bool ok = true;
   db::ParameterStates states = m_states;
-  get_parameters_internal (states, edit_error);
-  if (! edit_error && ! lazy_evaluation ()) {
+  get_parameters (states, &ok);   //  includes coerce
+  if (ok && ! lazy_evaluation ()) {
     emit edited ();
   }
 }
@@ -634,10 +595,11 @@ PCellParametersPage::update_button_pressed ()
 bool
 PCellParametersPage::update_current_parameters ()
 {
-  bool ok = false;
-  std::vector<tl::Variant> parameters = get_parameters (&ok);
+  bool ok = true;
+  db::ParameterStates states = m_states;
+  get_parameters (states, &ok);   //  includes coerce
   if (ok) {
-    m_current_parameters = parameters;
+    m_current_states = states;
     mp_update_frame->hide ();
   }
 
@@ -647,7 +609,7 @@ PCellParametersPage::update_current_parameters ()
 void
 PCellParametersPage::get_parameters_internal (db::ParameterStates &states, bool &edit_error)
 {
-  edit_error = true;
+  edit_error = false;
 
   int r = 0;
   const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_decl->parameter_declarations ();
@@ -679,7 +641,7 @@ PCellParametersPage::get_parameters_internal (db::ParameterStates &states, bool 
             } catch (tl::Exception &ex) {
 
               lay::indicate_error (le, &ex);
-              edit_error = false;
+              edit_error = true;
 
             }
 
@@ -703,7 +665,7 @@ PCellParametersPage::get_parameters_internal (db::ParameterStates &states, bool 
             } catch (tl::Exception &ex) {
 
               lay::indicate_error (le, &ex);
-              edit_error = false;
+              edit_error = true;
 
             }
 
@@ -763,11 +725,9 @@ PCellParametersPage::get_parameters_internal (db::ParameterStates &states, bool 
   }
 }
 
-std::vector<tl::Variant> 
-PCellParametersPage::get_parameters (bool *ok)
+void
+PCellParametersPage::get_parameters (db::ParameterStates &states, bool *ok)
 {
-  std::vector<tl::Variant> parameters;
-
   try {
 
     if (! mp_pcell_decl) {
@@ -776,23 +736,25 @@ PCellParametersPage::get_parameters (bool *ok)
 
     bool edit_error = false;
 
-    db::ParameterStates states = m_states;
     get_parameters_internal (states, edit_error);
-
-    const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_decl->parameter_declarations ();
-    for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pcp.begin (); p != pcp.end (); ++p) {
-      parameters.push_back (states.parameter (p->get_name ()).value ());
-    }
 
     if (edit_error) {
       throw tl::Exception (tl::to_string (tr ("There are errors. See the highlighted edit fields for details.")));
     }
 
-    //  coerce the parameters
+    //  coerces the parameters and writes the changed values back
     if (mp_view->cellview (m_cv_index).is_valid ()) {
+
+      auto parameters = parameter_from_states (states);
+      auto before_coerce = parameters;
       mp_pcell_decl->coerce_parameters (mp_view->cellview (m_cv_index)->layout (), parameters);
+
+      if (parameters != before_coerce) {
+        states_from_parameters (states, parameters);
+        set_parameters_internal (states, lazy_evaluation ());
+      }
+
     }
-    set_parameters_internal (parameters, lazy_evaluation ());
 
     if (ok) {
       *ok = true;
@@ -820,8 +782,15 @@ PCellParametersPage::get_parameters (bool *ok)
     }
 
   }
+}
 
-  return parameters;
+std::vector<tl::Variant>
+PCellParametersPage::get_parameters (bool *ok)
+{
+  db::ParameterStates states = m_states;
+  get_parameters (states, ok);
+
+  return parameter_from_states (states);
 }
 
 void
@@ -831,16 +800,7 @@ PCellParametersPage::set_parameters (const std::vector<tl::Variant> &parameters)
     return;
   }
 
-  size_t r = 0;
-  const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_decl->parameter_declarations ();
-  for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pcp.begin (); p != pcp.end (); ++p, ++r) {
-    db::ParameterState &ps = m_states.parameter (p->get_name ());
-    if (r < parameters.size ()) {
-      ps.set_value (parameters [r]);
-    } else {
-      ps.set_value (p->get_default ());
-    }
-  }
+  states_from_parameters (m_states, parameters);
 
   try {
     if (mp_view->cellview (m_cv_index).is_valid ()) {
@@ -855,11 +815,39 @@ PCellParametersPage::set_parameters (const std::vector<tl::Variant> &parameters)
     //  ignore other errors
   }
 
-  set_parameters_internal (parameters, false);
+  m_initial_states = m_states;
+  set_parameters_internal (m_states, false);
 }
 
 void
-PCellParametersPage::set_parameters_internal (const std::vector<tl::Variant> &parameters, bool tentatively)
+PCellParametersPage::update_widgets_from_states (const db::ParameterStates &states)
+{
+  if (! mp_pcell_decl) {
+    return;
+  }
+
+  size_t i = 0;
+  const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_decl->parameter_declarations ();
+  for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pcp.begin (); p != pcp.end () && i < m_widgets.size (); ++p, ++i) {
+
+    const std::string &name = p->get_name ();
+    const db::ParameterState &ps = states.parameter (name);
+
+    if (m_widgets [i]) {
+      m_widgets [i]->setEnabled (ps.is_enabled ());
+    }
+
+    for (auto w = m_all_widgets [i].begin (); w != m_all_widgets [i].end (); ++w) {
+      (*w)->setVisible (ps.is_visible ());
+    }
+
+  }
+
+  set_parameters_internal (states, lazy_evaluation ());
+}
+
+void
+PCellParametersPage::set_parameters_internal (const db::ParameterStates &states, bool tentatively)
 {
   if (! mp_pcell_decl) {
     return;
@@ -869,8 +857,8 @@ PCellParametersPage::set_parameters_internal (const std::vector<tl::Variant> &pa
   size_t r = 0;
   const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_decl->parameter_declarations ();
   for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pcp.begin (); p != pcp.end (); ++p, ++r) {
-    if (r < parameters.size () && m_widgets [r]) {
-      set_value (*p, m_widgets [r], parameters [r]);
+    if (m_widgets [r]) {
+      set_value (*p, m_widgets [r], states.parameter (p->get_name ()).value ());
     }
   }
 
@@ -879,12 +867,51 @@ PCellParametersPage::set_parameters_internal (const std::vector<tl::Variant> &pa
   bool update_needed = false;
 
   if (! tentatively) {
-    m_current_parameters = parameters;
+    m_current_states = states;
   } else {
-    update_needed = (m_current_parameters != parameters);
+    update_needed = ! m_current_states.values_are_equal (states);
   }
 
   mp_update_frame->setVisible (update_needed);
+}
+
+std::vector<tl::Variant>
+PCellParametersPage::parameter_from_states (const db::ParameterStates &states) const
+{
+  std::vector<tl::Variant> parameters;
+  if (mp_pcell_decl) {
+
+    const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_decl->parameter_declarations ();
+    for (auto p = pcp.begin (); p != pcp.end (); ++p) {
+      if (! states.has_parameter (p->get_name ())) {
+        parameters.push_back (p->get_default ());
+      } else {
+        parameters.push_back (states.parameter (p->get_name ()).value ());
+      }
+    }
+
+  }
+
+  return parameters;
+}
+
+void
+PCellParametersPage::states_from_parameters (db::ParameterStates &states, const std::vector<tl::Variant> &parameters)
+{
+  if (! mp_pcell_decl) {
+    return;
+  }
+
+  size_t r = 0;
+  const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_decl->parameter_declarations ();
+  for (std::vector<db::PCellParameterDeclaration>::const_iterator p = pcp.begin (); p != pcp.end (); ++p, ++r) {
+    db::ParameterState &ps = states.parameter (p->get_name ());
+    if (r < parameters.size ()) {
+      ps.set_value (parameters [r]);
+    } else {
+      ps.set_value (p->get_default ());
+    }
+  }
 }
 
 }

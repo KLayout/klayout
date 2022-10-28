@@ -276,15 +276,16 @@ static db::pcell_parameters_type coerce_parameters_native (const db::PCellDeclar
 
 //  Provide a binding for db::PCellDeclaration for native PCell implementations
 Class<db::PCellDeclaration> decl_PCellDeclaration_Native ("db", "PCellDeclaration_Native",
-  gsi::method_ext ("get_layers", &get_layer_declarations_native) +
+  gsi::method_ext ("get_layers", &get_layer_declarations_native, gsi::arg ("parameters")) +
   gsi::method ("get_parameters", &db::PCellDeclaration::get_parameter_declarations) +
-  gsi::method ("produce", &db::PCellDeclaration::produce) +
-  gsi::method_ext ("coerce_parameters", &coerce_parameters_native) +
-  gsi::method ("can_create_from_shape", &db::PCellDeclaration::can_create_from_shape) +
-  gsi::method ("parameters_from_shape", &db::PCellDeclaration::parameters_from_shape) +
-  gsi::method ("transformation_from_shape", &db::PCellDeclaration::transformation_from_shape) +
+  gsi::method ("produce", &db::PCellDeclaration::produce, gsi::arg ("layout"), gsi::arg ("layers"), gsi::arg ("parameters"), gsi::arg ("cell")) +
+  gsi::method ("callback", &db::PCellDeclaration::callback, gsi::arg ("layout"), gsi::arg ("name"), gsi::arg ("states")) +
+  gsi::method_ext ("coerce_parameters", &coerce_parameters_native, gsi::arg ("layout"), gsi::arg ("parameters")) +
+  gsi::method ("can_create_from_shape", &db::PCellDeclaration::can_create_from_shape, gsi::arg ("layout"), gsi::arg ("shape"), gsi::arg ("layer")) +
+  gsi::method ("parameters_from_shape", &db::PCellDeclaration::parameters_from_shape, gsi::arg ("layout"), gsi::arg ("shape"), gsi::arg ("layer")) +
+  gsi::method ("transformation_from_shape", &db::PCellDeclaration::transformation_from_shape, gsi::arg ("layout"), gsi::arg ("shape"), gsi::arg ("layer")) +
   gsi::method ("wants_lazy_evaluation", &db::PCellDeclaration::wants_lazy_evaluation) +
-  gsi::method ("display_text", &db::PCellDeclaration::get_display_name) +
+  gsi::method ("display_text", &db::PCellDeclaration::get_display_name, gsi::arg ("parameters")) +
   gsi::method ("layout", &db::PCellDeclaration::layout,
     "@brief Gets the Layout object the PCell is registered in or nil if it is not registered yet.\n"
     "This attribute has been added in version 0.27.5."
@@ -297,6 +298,56 @@ Class<db::PCellDeclaration> decl_PCellDeclaration_Native ("db", "PCellDeclaratio
     "@brief Gets the name of the PCell\n"
   ),
   "@hide\n@alias PCellDeclaration\n"
+);
+
+//  Provide a binding for db::ParameterState for native PCell implementations
+Class<db::ParameterState> decl_PCellParameterState ("db", "PCellParameterState",
+  gsi::method("value=", &db::ParameterState::set_value, gsi::arg ("v"),
+    "@brief Sets the value of the parameter\n"
+  ) +
+  gsi::method("value", &db::ParameterState::value,
+    "@brief Gets the value of the parameter\n"
+  ) +
+  gsi::method("visible=", &db::ParameterState::set_visible, gsi::arg ("f"),
+    "@brief Sets a value indicating whether the parameter is visible in the parameter form\n"
+  ) +
+  gsi::method("is_visible?", &db::ParameterState::is_visible,
+    "@brief Gets a value indicating whether the parameter is visible in the parameter form\n"
+  ) +
+  gsi::method("enabled=", &db::ParameterState::set_enabled, gsi::arg ("f"),
+    "@brief Sets a value indicating whether the parameter is enabled in the parameter form\n"
+  ) +
+  gsi::method("is_enabled?", &db::ParameterState::is_enabled,
+    "@brief Gets a value indicating whether the parameter is enabled in the parameter form\n"
+  ),
+  "@brief Provides access to the attributes of a single parameter within \\PCellParameterStates.\n"
+  "\n"
+  "See \\PCellParameterStates for details about this feature.\n"
+  "\n"
+  "This class has been introduced in version 0.28."
+);
+
+//  Provide a binding for db::ParameterStates for native PCell implementations
+Class<db::ParameterStates> decl_PCellParameterStates ("db", "PCellParameterStates",
+  gsi::method ("has_parameter?", &db::ParameterStates::has_parameter, gsi::arg ("name"),
+    "@brief Gets a value indicating whether a parameter with that name exists\n"
+  ) +
+  gsi::method ("parameter", static_cast<db::ParameterState & (db::ParameterStates::*) (const std::string &name)> (&db::ParameterStates::parameter), gsi::arg ("name"),
+    "@brief Gets the parameter by name\n"
+    "\n"
+    "This will return a \\PCellParameterState object that can be used to manipulate the "
+    "parameter state."
+  ),
+  "@brief Provides access to the parameter states inside a 'callback' implementation of a PCell\n"
+  "\n"
+  "Example: enables or disables a parameter 'n' based on the value:\n"
+  "\n"
+  "@code\n"
+  "n_param = states.parameter(\"n\")\n"
+  "n_param.enabled = n_param.value > 1.0\n"
+  "@/code\n"
+  "\n"
+  "This class has been introduced in version 0.28."
 );
 
 class PCellDeclarationImpl
@@ -356,6 +407,20 @@ public:
     }
     if (! output.empty ()) {
       parameters = output;
+    }
+  }
+
+  virtual void callback_fb (const db::Layout &layout, const std::string &name, db::ParameterStates &states) const
+  {
+    db::PCellDeclaration::callback (layout, name, states);
+  }
+
+  virtual void callback (const db::Layout &layout, const std::string &name, db::ParameterStates &states) const
+  {
+    if (cb_callback.can_issue ()) {
+      cb_callback.issue<db::PCellDeclaration, const db::Layout &, const std::string &, db::ParameterStates &> (&db::PCellDeclaration::callback, layout, name, states);
+    } else {
+      db::PCellDeclaration::callback (layout, name, states);
     }
   }
 
@@ -451,6 +516,7 @@ public:
   gsi::Callback cb_transformation_from_shape;
   gsi::Callback cb_wants_lazy_evaluation;
   gsi::Callback cb_coerce_parameters;
+  gsi::Callback cb_callback;
   gsi::Callback cb_get_display_name;
 };
 
@@ -458,6 +524,7 @@ Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native,
   //  fallback implementations to reroute Ruby calls to the base class:
   gsi::method ("get_parameters", &PCellDeclarationImpl::get_parameter_declarations_fb, "@hide") +
   gsi::method ("produce", &PCellDeclarationImpl::produce_fb, "@hide") +
+  gsi::method ("callback", &PCellDeclarationImpl::callback_fb, "@hide") +
   gsi::method ("can_create_from_shape", &PCellDeclarationImpl::can_create_from_shape_fb, "@hide") +
   gsi::method ("parameters_from_shape", &PCellDeclarationImpl::parameters_from_shape_fb, "@hide") +
   gsi::method ("transformation_from_shape", &PCellDeclarationImpl::transformation_from_shape_fb, "@hide") +
@@ -492,6 +559,25 @@ Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native,
     "the parameters against layout properties.\n"
     "\n"
     "It can raise an exception to indicate that something is not correct.\n"
+  ) +
+  gsi::callback ("callback", &PCellDeclarationImpl::callback, &PCellDeclarationImpl::cb_callback, gsi::arg ("layout"), gsi::arg ("name"), gsi::arg ("states"),
+    "@brief Indicates a parameter change and allows implementing actions based on the parameter value\n"
+    "@param layout The layout object in which the PCell will be produced\n"
+    "@param name The name of the parameter which has changed or an empty string if all parameters need to be considered\n"
+    "@param states A \\PCellParameterStates object which can be used to manipulate the parameter states\n"
+    "This method may be reimplemented to implement parameter-specific actions upon value change or button callbacks. "
+    "Whenever the value of a parameter is changed in the PCell parameter form, this method is called with the name of the parameter "
+    "in 'name'. The implementation can manipulate values or states (enabled, visible) or parameters using the "
+    "\\PCellParameterStates object passed in 'states'.\n"
+    "\n"
+    "Initially, this method will be called with an empty parameter name to indicate a global change. The implementation "
+    "may then consolidate all states. The initial state is build from the 'readonly' (disabled) or 'hidden' (invisible) parameter "
+    "declarations.\n"
+    "\n"
+    "This method is also called when a button-type parameter is present and the button is pressed. In this case the parameter "
+    "name is the name of the button.\n"
+    "\n"
+    "This feature has been introduced in version 0.28."
   ) +
   gsi::callback ("produce", &PCellDeclarationImpl::produce, &PCellDeclarationImpl::cb_produce, gsi::arg ("layout"), gsi::arg ("layer_ids"), gsi::arg ("parameters"), gsi::arg ("cell"),
     "@brief The production callback\n"
@@ -768,7 +854,7 @@ Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCel
   gsi::method ("TypeList", &pd_type_list, "@brief Type code: a list of variants") +
   gsi::method ("TypeLayer", &pd_type_layer, "@brief Type code: a layer (a \\LayerInfo object)") +
   gsi::method ("TypeShape", &pd_type_shape, "@brief Type code: a guiding shape (Box, Edge, Point, Polygon or Path)") +
-  gsi::method ("TypeCallback", &pd_type_callback, "@brief Type code: a button triggering a callback") +
+  gsi::method ("TypeCallback", &pd_type_callback, "@brief Type code: a button triggering a callback\n\nThis code has been introduced in version 0.28.") +
   gsi::method ("TypeNone", &pd_type_none, "@brief Type code: unspecific type")
   ,
   "@brief A PCell parameter declaration\n"

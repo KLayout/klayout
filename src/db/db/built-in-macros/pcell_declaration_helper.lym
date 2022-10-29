@@ -295,7 +295,7 @@ module RBA
 
     # A helper method to access the nth parameter
     
-    def _param(nth)
+    def _get_param(nth)
       if @param_states
         if @param_states.size &lt;= nth
           return RBA::PCellParameterState::new
@@ -322,12 +322,9 @@ module RBA
     
     # A helper method to access the nth layer
     
-    def _layer(nth)
+    def _get_layer(nth)
       @layers || raise("No layer index available - layers can be used only inside 'produce_impl'.")
-      while @param_values.size &lt;= nth
-        @param_values &lt;&lt; nil
-      end
-      @param_values[nth]
+      @layers[nth]
     end
     
     # define a parameter
@@ -355,11 +352,11 @@ module RBA
     
       # create accessor methods for the parameters
       param_index = @param_decls.length
-      self.instance_eval("def #{name.to_s}; self._param(#{param_index}); end")
+      self.instance_eval("def #{name.to_s}; self._get_param(#{param_index}); end")
       self.instance_eval("def set_#{name.to_s}(v); self._set_param(#{param_index}, v); end")
       self.instance_eval("def #{name.to_s}=(v); self._set_param(#{param_index}, v); end")
       if type == TypeLayer
-        self.instance_eval("def #{name.to_s}_layer; self._layer(#{@layer_param_index.length}); end")
+        self.instance_eval("def #{name.to_s}_layer; self._get_layer(#{@layer_param_index.length}); end")
         @layer_param_index.push(param_index)
       end
       

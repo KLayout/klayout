@@ -331,10 +331,20 @@ class DB_PUBLIC ParameterState
 {
 public:
   /**
+   *  @brief A enum describing the icon type
+   */
+  enum Icon {
+    NoIcon = 0,
+    InfoIcon = 1,
+    ErrorIcon = 2,
+    WarningIcon = 3
+  };
+
+  /**
    *  @brief Parameterized constructor
    */
   ParameterState ()
-    : m_value (), m_visible (true), m_enabled (true)
+    : m_value (), m_visible (true), m_enabled (true), m_readonly (false), m_icon (NoIcon)
   {
     //  .. nothing yet ..
   }
@@ -387,9 +397,59 @@ public:
     m_enabled = v;
   }
 
+  /**
+   *  @brief Gets a value indicating whether the parameter is read-only
+   */
+  bool is_readonly () const
+  {
+    return m_readonly;
+  }
+
+  /**
+   *  @brief Sets a value indicating whether the parameter is read-only
+   */
+  void set_readonly (bool f)
+  {
+    m_readonly = f;
+  }
+
+  /**
+   *  @brief Gets the tooltip for the parameter
+   */
+  const std::string &tooltip () const
+  {
+    return m_tooltip;
+  }
+
+  /**
+   *  @brief Sets the tooltip
+   */
+  void set_tooltip (const std::string &s)
+  {
+    m_tooltip = s;
+  }
+
+  /**
+   *  @brief Gets the icon
+   */
+  Icon icon () const
+  {
+    return m_icon;
+  }
+
+  /**
+   *  @brief Sets the icon
+   */
+  void set_icon (Icon i)
+  {
+    m_icon = i;
+  }
+
 private:
   tl::Variant m_value;
-  bool m_visible, m_enabled;
+  bool m_visible, m_enabled, m_readonly;
+  std::string m_tooltip;
+  Icon m_icon;
 };
 
 /**

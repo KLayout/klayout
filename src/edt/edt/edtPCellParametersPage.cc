@@ -149,7 +149,7 @@ static void set_value (const db::PCellParameterDeclaration &p, QWidget *widget, 
 }
 
 PCellParametersPage::PCellParametersPage (QWidget *parent, bool dense)
-  : QFrame (parent), m_dense (dense), dm_parameter_changed (this, &PCellParametersPage::do_parameter_changed)
+  : QFrame (parent), m_dense (dense), m_show_parameter_names (false), dm_parameter_changed (this, &PCellParametersPage::do_parameter_changed)
 {
   init ();
 }
@@ -170,7 +170,7 @@ PCellParametersPage::init ()
   frame_layout->setContentsMargins (0, 0, 0, 0);
   setLayout (frame_layout);
 
-  mp_update_frame = new QFrame ();
+  mp_update_frame = new QFrame (this);
   mp_update_frame->setFrameShape (QFrame::NoFrame);
   frame_layout->addWidget (mp_update_frame, 0, 0, 1, 1);
 
@@ -197,7 +197,7 @@ PCellParametersPage::init ()
 
   update_frame_layout->setColumnStretch (2, 1);
 
-  mp_error_frame = new QFrame ();
+  mp_error_frame = new QFrame (this);
   mp_error_frame->setFrameShape (QFrame::NoFrame);
   frame_layout->addWidget (mp_error_frame, 1, 0, 1, 1);
 
@@ -224,6 +224,13 @@ PCellParametersPage::init ()
   error_frame_layout->addWidget (mp_error_label, 1, 1, 1, 2);
 
   error_frame_layout->setColumnStretch (2, 1);
+
+  mp_show_parameter_names_cb = new QCheckBox (this);
+  mp_show_parameter_names_cb->setText (tr ("Show parameter names"));
+  mp_show_parameter_names_cb->setChecked (m_show_parameter_names);
+  frame_layout->addWidget (mp_show_parameter_names_cb, 3, 0, 1, 1);
+
+  connect (mp_show_parameter_names_cb, SIGNAL (clicked (bool)), this, SLOT (show_parameter_names (bool)));
 }
 
 bool
@@ -233,18 +240,32 @@ PCellParametersPage::lazy_evaluation ()
 }
 
 void
+PCellParametersPage::show_parameter_names (bool f)
+{
+  if (m_show_parameter_names == f) {
+    return;
+  }
+
+  m_show_parameter_names = f;
+  mp_show_parameter_names_cb->setChecked (f);
+  setup (mp_view, m_cv_index, mp_pcell_decl.get (), get_parameters ());
+}
+
+void
 PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::PCellDeclaration *pcell_decl, const db::pcell_parameters_type &parameters)
 {
   mp_pcell_decl.reset (const_cast<db::PCellDeclaration *> (pcell_decl));  //  no const weak_ptr ...
   mp_view = view;
   m_cv_index = cv_index;
   m_states = db::ParameterStates ();
+  m_initial_states = db::ParameterStates ();
 
   if (mp_parameters_area) {
     delete mp_parameters_area;
   }
 
   m_widgets.clear ();
+  m_icon_widgets.clear ();
   m_all_widgets.clear ();
 
   mp_parameters_area = new QScrollArea (this);
@@ -269,6 +290,12 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
   QWidget *main_frame = inner_frame;
   QGridLayout *main_grid = inner_grid;
 
+  if (! mp_pcell_decl) {
+    mp_parameters_area->setWidget (main_frame);
+    update_current_parameters ();
+    return;
+  }
+
   int main_row = 0;
   int row = 0;
   std::string group_title;
@@ -286,13 +313,14 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
 
     db::ParameterState &ps = m_states.parameter (p->get_name ());
     ps.set_value (value);
-    ps.set_enabled (! p->is_readonly ());
+    ps.set_readonly (p->is_readonly ());
     ps.set_visible (! p->is_hidden ());
 
     m_all_widgets.push_back (std::vector<QWidget *> ());
 
     if (p->get_type () == db::PCellParameterDeclaration::t_shape) {
       m_widgets.push_back (0);
+      m_icon_widgets.push_back (0);
       continue;
     }
 
@@ -312,7 +340,7 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
         //  create a new group
         QGroupBox *gb = new QGroupBox (main_frame);
         gb->setTitle (tl::to_qstring (gt));
-        main_grid->addWidget (gb, main_row, 0, 1, 2);
+        main_grid->addWidget (gb, main_row, 0, 1, 3);
         
         inner_grid = new QGridLayout (gb);
         if (m_dense) {
@@ -339,10 +367,28 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
 
     } 
 
+    QLabel *icon_label = new QLabel (QString (), inner_frame);
+    inner_grid->addWidget (icon_label, row, 0);
+    m_icon_widgets.push_back (icon_label);
+    m_all_widgets.back ().push_back (icon_label);
+
     if (p->get_type () != db::PCellParameterDeclaration::t_callback) {
-      QLabel *l = new QLabel (tl::to_qstring (description), inner_frame);
-      inner_grid->addWidget (l, row, 0);
+
+      std::string leader;
+      if (m_show_parameter_names) {
+        leader = tl::sprintf ("[%s] ", p->get_name ());
+      }
+
+      QLabel *l = new QLabel (tl::to_qstring (leader + description), inner_frame);
+      inner_grid->addWidget (l, row, 1);
       m_all_widgets.back ().push_back (l);
+
+    } else if (m_show_parameter_names) {
+
+      QLabel *l = new QLabel (tl::to_qstring (tl::sprintf ("[%s]", p->get_name ())), inner_frame);
+      inner_grid->addWidget (l, row, 1);
+      m_all_widgets.back ().push_back (l);
+
     }
 
     if (p->get_choices ().empty ()) {
@@ -368,7 +414,7 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
           hb->addWidget (ul, 1);
           ul->setText (tl::to_qstring (p->get_unit ()));
 
-          inner_grid->addWidget (f, row, 1);
+          inner_grid->addWidget (f, row, 2);
           m_all_widgets.back ().push_back (f);
 
           connect (le, SIGNAL (editingFinished ()), this, SLOT (parameter_changed ()));
@@ -383,7 +429,7 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
           pb->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Preferred);
           m_widgets.push_back (pb);
 
-          inner_grid->addWidget (pb, row, 1);
+          inner_grid->addWidget (pb, row, 2);
           m_all_widgets.back ().push_back (pb);
 
           connect (pb, SIGNAL (clicked ()), this, SLOT (parameter_changed ()));
@@ -397,7 +443,7 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
           QLineEdit *le = new QLineEdit (inner_frame);
           le->setObjectName (tl::to_qstring (p->get_name ()));
           m_widgets.push_back (le);
-          inner_grid->addWidget (le, row, 1);
+          inner_grid->addWidget (le, row, 2);
           m_all_widgets.back ().push_back (le);
 
           connect (le, SIGNAL (editingFinished ()), this, SLOT (parameter_changed ()));
@@ -411,7 +457,7 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
           ly->set_view (mp_view, m_cv_index, true /*all layers*/);
           ly->setObjectName (tl::to_qstring (p->get_name ()));
           m_widgets.push_back (ly);
-          inner_grid->addWidget (ly, row, 1);
+          inner_grid->addWidget (ly, row, 2);
           m_all_widgets.back ().push_back (ly);
 
           connect (ly, SIGNAL (activated (int)), this, SLOT (parameter_changed ()));
@@ -425,7 +471,7 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
           cbx->setSizePolicy (QSizePolicy (QSizePolicy::Fixed, QSizePolicy::Preferred));
           cbx->setObjectName (tl::to_qstring (p->get_name ()));
           m_widgets.push_back (cbx);
-          inner_grid->addWidget (cbx, row, 1);
+          inner_grid->addWidget (cbx, row, 2);
           m_all_widgets.back ().push_back (cbx);
 
           connect (cbx, SIGNAL (stateChanged (int)), this, SLOT (parameter_changed ()));
@@ -456,7 +502,7 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
       cb->setMinimumContentsLength (30);
       cb->setSizeAdjustPolicy (QComboBox::AdjustToMinimumContentsLengthWithIcon);
       m_widgets.push_back (cb);
-      inner_grid->addWidget (cb, row, 1);
+      inner_grid->addWidget (cb, row, 2);
       m_all_widgets.back ().push_back (cb);
 
     }
@@ -499,6 +545,8 @@ PCellParametersPage::get_state ()
   s.vScrollPosition = mp_parameters_area->verticalScrollBar ()->value ();
   s.hScrollPosition = mp_parameters_area->horizontalScrollBar ()->value ();
 
+  s.show_parameter_names = m_show_parameter_names;
+
   if (focusWidget ()) {
     s.focusWidget = focusWidget ()->objectName ();
   }
@@ -513,6 +561,10 @@ PCellParametersPage::set_state (const State &s)
 
     mp_parameters_area->verticalScrollBar ()->setValue (s.vScrollPosition);
     mp_parameters_area->horizontalScrollBar ()->setValue (s.hScrollPosition);
+
+    if (s.show_parameter_names != m_show_parameter_names) {
+      show_parameter_names (s.show_parameter_names);
+    }
 
     if (! s.focusWidget.isEmpty ()) {
       QWidget *c = findChild<QWidget *> (s.focusWidget);
@@ -617,7 +669,7 @@ PCellParametersPage::get_parameters_internal (db::ParameterStates &states, bool 
 
     db::ParameterState &ps = states.parameter (p->get_name ());
 
-    if (! ps.is_visible () || ! ps.is_enabled () || p->get_type () == db::PCellParameterDeclaration::t_shape) {
+    if (! ps.is_visible () || ! ps.is_enabled () || ps.is_readonly () || p->get_type () == db::PCellParameterDeclaration::t_shape) {
       continue;
     }
 
@@ -834,11 +886,43 @@ PCellParametersPage::update_widgets_from_states (const db::ParameterStates &stat
     const db::ParameterState &ps = states.parameter (name);
 
     if (m_widgets [i]) {
-      m_widgets [i]->setEnabled (ps.is_enabled ());
+      m_widgets [i]->setEnabled (ps.is_enabled () && ! ps.is_readonly ());
     }
 
     for (auto w = m_all_widgets [i].begin (); w != m_all_widgets [i].end (); ++w) {
+      if (*w != m_widgets [i]) {
+        (*w)->setEnabled (ps.is_enabled ());
+      }
       (*w)->setVisible (ps.is_visible ());
+      (*w)->setToolTip (tl::to_qstring (ps.tooltip ()));
+    }
+
+    if (m_icon_widgets [i]) {
+
+      static QPixmap error (":/error_16px@2x.png");
+      static QPixmap info (":/info_16px@2x.png");
+      static QPixmap warning (":/warn_16px@2x.png");
+
+      switch (ps.icon ()) {
+      case db::ParameterState::NoIcon:
+      default:
+        m_icon_widgets [i]->setPixmap (QPixmap ());
+        m_icon_widgets [i]->hide ();
+        break;
+      case db::ParameterState::InfoIcon:
+        m_icon_widgets [i]->setPixmap (info);
+        m_icon_widgets [i]->show ();
+        break;
+      case db::ParameterState::WarningIcon:
+        m_icon_widgets [i]->setPixmap (warning);
+        m_icon_widgets [i]->show ();
+        break;
+      case db::ParameterState::ErrorIcon:
+        m_icon_widgets [i]->setPixmap (error);
+        m_icon_widgets [i]->show ();
+        break;
+      }
+
     }
 
   }

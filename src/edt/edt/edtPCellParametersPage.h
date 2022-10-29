@@ -32,6 +32,7 @@
 #include <QScrollArea>
 #include <QLabel>
 #include <QToolButton>
+#include <QCheckBox>
 
 namespace lay
 {
@@ -52,9 +53,10 @@ Q_OBJECT
 public:
   struct State
   {
-    State () : valid (false), hScrollPosition (0), vScrollPosition (0) { }
+    State () : valid (false), show_parameter_names (false), hScrollPosition (0), vScrollPosition (0) { }
 
     bool valid;
+    bool show_parameter_names;
     int hScrollPosition;
     int vScrollPosition;
     QString focusWidget;
@@ -138,6 +140,9 @@ public:
 signals:
   void edited ();
 
+public slots:
+  void show_parameter_names (bool f);
+
 private slots:
   void parameter_changed ();
   void update_button_pressed ();
@@ -150,12 +155,14 @@ private:
   QLabel *mp_changed_icon;
   QToolButton *mp_update_button;
   QFrame *mp_error_frame, *mp_update_frame;
+  QCheckBox *mp_show_parameter_names_cb;
   tl::weak_ptr<db::PCellDeclaration> mp_pcell_decl;
   std::vector<QWidget *> m_widgets;
+  std::vector<QLabel *> m_icon_widgets;
   std::vector<std::vector<QWidget *> > m_all_widgets;
   lay::LayoutViewBase *mp_view;
   int m_cv_index;
-  bool m_dense;
+  bool m_dense, m_show_parameter_names;
   tl::DeferredMethod<PCellParametersPage> dm_parameter_changed;
   db::ParameterStates m_current_states, m_initial_states;
   db::ParameterStates m_states;

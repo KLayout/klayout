@@ -23,6 +23,7 @@
 
 
 #include "gsiDecl.h"
+#include "gsiEnums.h"
 #include "dbLayout.h"
 #include "dbLibrary.h"
 #include "dbPCellDeclaration.h"
@@ -319,6 +320,26 @@ Class<db::ParameterState> decl_PCellParameterState ("db", "PCellParameterState",
   ) +
   gsi::method("is_enabled?", &db::ParameterState::is_enabled,
     "@brief Gets a value indicating whether the parameter is enabled in the parameter form\n"
+  ) +
+  gsi::method("readonly=", &db::ParameterState::set_readonly, gsi::arg ("f"),
+    "@brief Sets a value indicating whether the parameter is made read-only (not editable) in the parameter form\n"
+  ) +
+  gsi::method("is_readonly?", &db::ParameterState::is_readonly,
+    "@brief Gets a value indicating whether the parameter is read-only (not editable) in the parameter form\n"
+  ) +
+  gsi::method("tooltip=", &db::ParameterState::set_tooltip, gsi::arg ("s"),
+    "@brief Sets the tool tip text\n"
+    "\n"
+    "The tool tip is shown when hovering over the parameter label or edit field."
+  ) +
+  gsi::method("tooltip", &db::ParameterState::tooltip,
+    "@brief Gets the tool tip text\n"
+  ) +
+  gsi::method("icon=", &db::ParameterState::set_icon, gsi::arg ("i"),
+    "@brief Sets the icon for the parameter\n"
+  ) +
+  gsi::method("tooltip", &db::ParameterState::tooltip,
+    "@brief Gets the icon for the parameter\n"
   ),
   "@brief Provides access to the attributes of a single parameter within \\PCellParameterStates.\n"
   "\n"
@@ -326,6 +347,27 @@ Class<db::ParameterState> decl_PCellParameterState ("db", "PCellParameterState",
   "\n"
   "This class has been introduced in version 0.28."
 );
+
+gsi::EnumIn<db::ParameterState, db::ParameterState::Icon> decl_PCellParameterState_Icon ("db", "ParameterStateIcon",
+  gsi::enum_const ("NoIcon", db::ParameterState::NoIcon,
+    "@brief No icon is shown for the parameter\n"
+  ) +
+  gsi::enum_const ("InfoIcon", db::ParameterState::InfoIcon,
+    "@brief A general 'information' icon is shown\n"
+  ) +
+  gsi::enum_const ("ErrorIcon", db::ParameterState::ErrorIcon,
+    "@brief An icon indicating an error is shown\n"
+  ) +
+  gsi::enum_const ("WarningIcon", db::ParameterState::WarningIcon,
+    "@brief An icon indicating a warning is shown\n"
+  ),
+  "@brief This enum specifies the icon shown next to the parameter in PCell parameter list.\n"
+  "\n"
+  "This enum was introduced in version 0.28.\n"
+);
+
+//  Inject the NetlistCrossReference::Status declarations into NetlistCrossReference:
+gsi::ClassExt<db::ParameterState> inject_PCellParameterState_Icon_in_parent (decl_PCellParameterState_Icon.defs ());
 
 //  Provide a binding for db::ParameterStates for native PCell implementations
 Class<db::ParameterStates> decl_PCellParameterStates ("db", "PCellParameterStates",

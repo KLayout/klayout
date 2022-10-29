@@ -59,7 +59,6 @@
          <font>
           <family>Sans Serif</family>
           <pointsize>12</pointsize>
-          <weight>75</weight>
           <italic>false</italic>
           <bold>true</bold>
           <underline>false</underline>
@@ -731,7 +730,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../../lay/lay/layResources.qrc">:/warn_16px@2x.png</pixmap>
+                <pixmap resource="../../icons/icons.qrc">:/warn_16px@2x.png</pixmap>
                </property>
                <property name="alignment">
                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -899,7 +898,7 @@
   <tabstop>inst_pb</tabstop>
  </tabstops>
  <resources>
-  <include location="../../lay/lay/layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

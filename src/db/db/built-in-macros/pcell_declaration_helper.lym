@@ -157,6 +157,53 @@ It is supposed to adjust parameters to render a consistent parameter set and to 
 parameter range errors. This method is called for example inside the PCell user interface to 
 compute the actual parameters when "Apply" is pressed.
 
+@method callback_impl(name)
+
+@brief Provides a callback on a parameter change
+
+This method applies to user interface changes only. Whenever a parameter is changed
+on the parameter page, this method is called with the name of the parameter.
+
+On some occasions, this method called to establish a configuration unspecifically.
+In this case, the name is an empty string - indicating "all parameters may have changed".
+
+This method can change the state of this or any other parameter. For this, the 
+state objects are supplied instead of the parameter values. For example to enable 
+parameter "b" when a boolean parameter "a" is true, use the following code:
+
+@code
+def callback_impl(name)
+  if name == "a" || name == ""
+    b.enabled = a.value
+  end
+end
+@/code
+
+The "enabled" attribute of the \\PCellParameterState object indicates whether the
+parameter is enabled in the user interface. "a.value" delivers the value of the 
+(boolean type assumed) parameter "a".
+
+Note that the above code also checks for empty name to consider the case of a
+global refresh.
+
+Further useful attributes of the parameters are:
+
+@ul
+  @li 
+    @b enabled @/b: the parameter entry is grayed out if false
+  @/li
+  @li 
+    @b readonly @/b: the parameter cannot be edited (less strict than enabled)
+  @/li
+  @li 
+    @b visible @/b: the parameter entry is not visible if false
+  @/li
+  @li 
+    @b icon @/b: Sets an icon in front of the parameter indicating an error or a 
+      warning (use \\PCellParameterState#WarningIcon or \\PCellParameterState#ErrorIcon).
+  @/li
+@/ul
+
 @method can_create_from_shape_impl
 
 @brief Returns true if the PCell can be created from the given shape
@@ -227,12 +274,13 @@ module RBA
     def initialize
       @param_decls = []
       @param_values = nil
+      @param_states = nil
       @layout = nil
       @shape = nil
       @layer = nil
       @cell = nil
       @layer_param_index = []
-      @layers = []
+      @layers = nil
     end
     
     # provide accessors for the current layout and cell (for prod)
@@ -244,6 +292,43 @@ module RBA
     def _layout; @layout; end
     def _cell; @cell; end
     def _shape; @shape; end
+
+    # A helper method to access the nth parameter
+    
+    def _param(nth)
+      if @param_states
+        if @param_states.size &lt;= nth
+          return RBA::PCellParameterState::new
+        else
+          return @param_states[nth]
+        end
+      else
+        @param_values || raise("No parameters available.")
+        while @param_values.size &lt;= nth
+          @param_values &lt;&lt; nil
+        end
+        return @param_values[nth]
+      end
+    end
+    
+    # A helper method to set the nth parameter
+    
+    def _set_param(nth, value)
+      @param_values || raise("Cannot set parameter - inside 'callback_impl' use 'param_name.value = ...' to set the parameter's value.")
+      if @param_values.size &gt; nth
+        @param_values[nth] = value
+      end
+    end
+    
+    # A helper method to access the nth layer
+    
+    def _layer(nth)
+      @layers || raise("No layer index available - layers can be used only inside 'produce_impl'.")
+      while @param_values.size &lt;= nth
+        @param_values &lt;&lt; nil
+      end
+      @param_values[nth]
+    end
     
     # define a parameter
     #   name         -&gt; the short name of the parameter
@@ -270,11 +355,11 @@ module RBA
     
       # create accessor methods for the parameters
       param_index = @param_decls.length
-      self.instance_eval("def #{name.to_s}; @param_values[#{param_index}]; end")
-      self.instance_eval("def set_#{name.to_s}(v); @param_values[#{param_index}] = v; end")
-      self.instance_eval("def #{name.to_s}=(v); @param_values[#{param_index}] = v; end")
+      self.instance_eval("def #{name.to_s}; self._param(#{param_index}); end")
+      self.instance_eval("def set_#{name.to_s}(v); self._set_param(#{param_index}, v); end")
+      self.instance_eval("def #{name.to_s}=(v); self._set_param(#{param_index}, v); end")
       if type == TypeLayer
-        self.instance_eval("def #{name.to_s}_layer; @layers[#{@layer_param_index.length}]; end")
+        self.instance_eval("def #{name.to_s}_layer; self._layer(#{@layer_param_index.length}); end")
         @layer_param_index.push(param_index)
       end
       
@@ -307,8 +392,11 @@ module RBA
     # implementation of display_text
     def display_text(parameters)
       @param_values = parameters
-      text = display_text_impl
-      @param_values = nil
+      begin
+        text = display_text_impl
+      ensure
+        @param_values = nil
+      end
       text
     end
     
@@ -326,9 +414,28 @@ module RBA
     def coerce_parameters(layout, parameters)
       @param_values = parameters
       @layout = layout
-      coerce_parameters_impl
-      @layout = nil
-      @param_values
+      ret = parameters
+      begin
+        coerce_parameters_impl
+      ensure
+        @layout = nil
+        ret = @param_values
+        @param_values = nil
+      end
+      ret
+    end
+
+    # parameter change callback
+    def callback(layout, name, states)
+      @param_values = nil
+      @param_states = states
+      @layout = layout
+      begin
+        callback_impl(name)
+      ensure
+        @param_states = nil
+        @layout = nil
+      end
     end
 
     # produce the layout    
@@ -337,22 +444,29 @@ module RBA
       @cell = cell
       @param_values = parameters
       @layout = layout
-      produce_impl
-      @layers = nil
-      @cell = nil
-      @param_values = nil
-      @layout = nil
+      begin
+        produce_impl
+      ensure
+        @layers = nil
+        @cell = nil
+        @param_values = nil
+        @layout = nil
+      end
     end
 
     # produce a helper for can_create_from_shape
     def can_create_from_shape(layout, shape, layer)
+      ret = false
       @layout = layout
       @shape = shape
       @layer = layer
-      ret = can_create_from_shape_impl
-      @layout = nil
-      @shape = nil
-      @layer = nil
+      begin
+        ret = can_create_from_shape_impl
+      ensure
+        @layout = nil
+        @shape = nil
+        @layer = nil
+      end
       ret
     end
     
@@ -361,10 +475,13 @@ module RBA
       @layout = layout
       @shape = shape
       @layer = layer
-      t = transformation_from_shape_impl
-      @layout = nil
-      @shape = nil
-      @layer = nil
+      begin
+        t = transformation_from_shape_impl
+      ensure
+        @layout = nil
+        @shape = nil
+        @layer = nil
+      end
       t
     end
     
@@ -375,10 +492,13 @@ module RBA
       @layout = layout
       @shape = shape
       @layer = layer
-      parameters_from_shape_impl
-      @layout = nil
-      @shape = nil
-      @layer = nil
+      begin
+        parameters_from_shape_impl
+      ensure
+        @layout = nil
+        @shape = nil
+        @layer = nil
+      end
       @param_values
     end
     
@@ -389,6 +509,10 @@ module RBA
    
     # default implementation 
     def coerce_parameters_impl
+    end
+    
+    # default implementation 
+    def callback_impl(name)
     end
     
     # default implementation

@@ -295,12 +295,12 @@ module RBA
 
     # A helper method to access the nth parameter
     
-    def _get_param(nth)
+    def _get_param(nth, name)
       if @param_states
         if @param_states.size &lt;= nth
           return RBA::PCellParameterState::new
         else
-          return @param_states[nth]
+          return @param_states.parameter(name)
         end
       else
         @param_values || raise("No parameters available.")
@@ -349,10 +349,14 @@ module RBA
     #   param_{name}_layer
 
     def param(name, type, description, args = {})
+
+      if name !~ /^[_A-Za-z]\w*$/
+        raise "Invalid parameter name #{name} (needs to be a word)"
+      end
     
       # create accessor methods for the parameters
       param_index = @param_decls.length
-      self.instance_eval("def #{name.to_s}; self._get_param(#{param_index}); end")
+      self.instance_eval("def #{name.to_s}; self._get_param(#{param_index}, '#{name}'); end")
       self.instance_eval("def set_#{name.to_s}(v); self._set_param(#{param_index}, v); end")
       self.instance_eval("def #{name.to_s}=(v); self._set_param(#{param_index}, v); end")
       if type == TypeLayer

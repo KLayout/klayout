@@ -297,7 +297,7 @@ module RBA
     
     def _get_param(nth, name)
       if @param_states
-        if @param_states.size &lt;= nth
+        if ! @param_states.has_parameter?(name)
           return RBA::PCellParameterState::new
         else
           return @param_states.parameter(name)

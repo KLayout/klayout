@@ -605,12 +605,8 @@ PCellParametersPage::parameter_changed ()
     get_parameters_internal (states, edit_error);
 
     if (! edit_error) {
-
       mp_pcell_decl->callback (mp_view->cellview (m_cv_index)->layout (), pd ? pd->get_name () : std::string (), states);
-
-      update_widgets_from_states (states);
       m_states = states;
-
     }
 
   } catch (tl::Exception &ex) {
@@ -631,6 +627,7 @@ PCellParametersPage::do_parameter_changed ()
   bool ok = true;
   db::ParameterStates states = m_states;
   get_parameters (states, &ok);   //  includes coerce
+  update_widgets_from_states (states);
   if (ok && ! lazy_evaluation ()) {
     emit edited ();
   }
@@ -893,7 +890,9 @@ PCellParametersPage::update_widgets_from_states (const db::ParameterStates &stat
       if (*w != m_widgets [i]) {
         (*w)->setEnabled (ps.is_enabled ());
       }
-      (*w)->setVisible (ps.is_visible ());
+      if (*w != m_icon_widgets [i]) {
+        (*w)->setVisible (ps.is_visible ());
+      }
       (*w)->setToolTip (tl::to_qstring (ps.tooltip ()));
     }
 

@@ -883,7 +883,13 @@ PCellParametersPage::update_widgets_from_states (const db::ParameterStates &stat
     const db::ParameterState &ps = states.parameter (name);
 
     if (m_widgets [i]) {
-      m_widgets [i]->setEnabled (ps.is_enabled () && ! ps.is_readonly ());
+      QLineEdit *le = dynamic_cast<QLineEdit *> (m_widgets [i]);
+      if (le) {
+        le->setEnabled (ps.is_enabled ());
+        le->setReadOnly (ps.is_readonly ());
+      } else {
+        m_widgets [i]->setEnabled (ps.is_enabled () && ! ps.is_readonly ());
+      }
     }
 
     for (auto w = m_all_widgets [i].begin (); w != m_all_widgets [i].end (); ++w) {

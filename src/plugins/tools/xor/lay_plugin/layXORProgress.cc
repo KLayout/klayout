@@ -202,13 +202,13 @@ public:
 
                 } else {
 
-                  int y2 = m_pixmap_size - 1 - (iy * m_pixmap_size + m_pixmap_size / 2) / ny;
-                  int y1 = m_pixmap_size - 1 - ((iy + 1) * m_pixmap_size + m_pixmap_size / 2) / ny;
-                  int x1 = (ix * m_pixmap_size + m_pixmap_size / 2) / nx;
-                  int x2 = ((ix + 1) * m_pixmap_size + m_pixmap_size / 2) / nx;
+                  int y2 = std::min (m_pixmap_size - 1, m_pixmap_size - 1 - (iy * m_pixmap_size + ny / 2) / ny);
+                  int y1 = std::max (0, m_pixmap_size - 1 - ((iy + 1) * m_pixmap_size + ny / 2) / ny);
+                  int x1 = std::max (0, (ix * m_pixmap_size + nx / 2) / nx);
+                  int x2 = std::min (m_pixmap_size - 1, ((ix + 1) * m_pixmap_size + nx / 2) / nx);
 
                   //  "draw" the field
-                  for (int y = y1; y <= y2 && y >= 0 && y < m_pixmap_size; ++y) {
+                  for (int y = y1; y <= y2; ++y) {
                     *((uint32_t *) img->scanLine (y)) &= (((1 << x1) - 1) | ~((1 << (x2 + 1)) - 1));
                   }
 
@@ -319,8 +319,8 @@ public:
         grad.setColorAt (0.0, QColor (248, 248, 248));
         grad.setColorAt (1.0, QColor (224, 224, 224));
         painter.setBrush (QBrush (grad));
-        painter.setPen (QPen (Qt::black));
-        painter.drawRect (QRect (QPoint (x, y - 2), QSize (m_pixmap_size + 3, m_pixmap_size + 3)));
+        painter.setPen (QPen (Qt::black, 1.0, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+        painter.drawRect (QRectF (QPointF (x + 1, y - 1), QSizeF (m_pixmap_size + 2, m_pixmap_size + 2)));
 
         painter.setBackgroundMode (Qt::TransparentMode);
         painter.setPen (QColor (128, 255, 128));

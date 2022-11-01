@@ -1702,7 +1702,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
 
       std::vector<double> knots;
       std::vector<std::pair<db::DPoint, double> > control_points;
-      db::DPoint pc;
+      std::vector<double> weights;
       double ex = 0.0, ey = 0.0, ez = 1.0;
 
       std::string layer;
@@ -1741,12 +1741,7 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
         } else if (g == 40) {
           knots.push_back (read_double ());
         } else if (g == 41) {
-
-          //  weight of the control point
-          if (! control_points.empty ()) {
-            control_points.back ().second = read_double ();
-          }
-
+          weights.push_back (read_double ());
         } else if (g == 210) {
           ex = read_double ();
         } else if (g == 220) {
@@ -1756,6 +1751,10 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
         } else {
           skip_value (g);
         }
+      }
+
+      for (size_t i = 0; i < weights.size () && i < control_points.size (); ++i) {
+        control_points [i].second = weights [i];
       }
 
       db::DCplxTrans tt = global_trans (offset, ex, ey, ez);

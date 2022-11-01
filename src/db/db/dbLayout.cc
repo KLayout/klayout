@@ -795,6 +795,8 @@ Layout::delete_cells (const std::set<cell_index_type> &cells_to_delete)
     }
   }
 
+  db::LayoutLocker locker (this);
+
   //  Clear all instances
   for (std::set<cell_index_type>::const_iterator c = cells_to_delete.begin (); c != cells_to_delete.end (); ++c) {
 

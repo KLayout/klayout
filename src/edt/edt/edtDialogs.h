@@ -43,6 +43,7 @@
 #include "ui_MakeCellOptionsDialog.h"
 #include "ui_MakeArrayOptionsDialog.h"
 #include "ui_RoundCornerOptionsDialog.h"
+#include "ui_AreaAndPerimeterDialog.h"
 
 namespace lay
 {
@@ -203,6 +204,22 @@ private:
   double m_router_extracted, m_rinner_extracted;
   unsigned int m_npoints_extracted;
   bool m_has_extracted;
+};
+
+/**
+ *  @brief Result dialog for "area and perimeter"
+ */
+class AreaAndPerimeterDialog
+  : public QDialog,
+    private Ui::AreaAndPerimeterDialog
+{
+Q_OBJECT
+
+public:
+  AreaAndPerimeterDialog (QWidget *parent);
+  ~AreaAndPerimeterDialog ();
+
+  bool exec_dialog (double area, double perimeter);
 };
 
 } // namespace edt

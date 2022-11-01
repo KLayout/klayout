@@ -27,7 +27,8 @@ DEFINES += MAKE_EDT_LIBRARY
     RoundCornerOptionsDialog.ui \
     TextPropertiesPage.ui \
     DistributeOptionsDialog.ui \
-    EditorOptionsInstPCellParam.ui
+    EditorOptionsInstPCellParam.ui \
+    AreaAndPerimeterDialog.ui
 
 }
 

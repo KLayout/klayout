@@ -683,6 +683,29 @@ BEGIN_PROTECTED;
 END_PROTECTED;
 }
 
+// --------------------------------------------------------------------------------
+//  AreaAndPerimeterDialog implementation
+
+AreaAndPerimeterDialog::AreaAndPerimeterDialog (QWidget *parent)
+  : QDialog (parent)
+{
+  setupUi (this);
+}
+
+AreaAndPerimeterDialog::~AreaAndPerimeterDialog ()
+{
+  //  .. nothing yet ..
+}
+
+bool
+AreaAndPerimeterDialog::exec_dialog (double area, double perimeter)
+{
+  area_le->setText (tl::to_qstring (tl::sprintf ("%.12g", area)));
+  perimeter_le->setText (tl::to_qstring (tl::sprintf ("%.12g", perimeter)));
+
+  return exec () != 0;
+}
+
 }
 
 #endif

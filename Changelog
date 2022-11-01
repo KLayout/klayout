@@ -2,6 +2,14 @@
 * Bugfix: %GITHUB%/issues/1173 DXF SPLINE implementation not compatible with ezdxf
 * Bugfix: %GITHUB%/issues/1167 delete_cells slow in some cases
 * Bugfix: %GITHUB%/issues/1164 Deleting cells: 'basic_string: construction from null is not valid'
+* Bugfix: %GITHUB%/issues/1145 Crash when clearing a Shapes container by script while a shape is selected
+* Bugfix: %GITHUB%/issues/1144 Copy layer not choosing the right "new" target layer sometimes
+* Bugfix: %GITHUB%/issues/1143 DBU not taken from technology by default
+* Bugfix: %GITHUB%/issues/1097 Change oasis writer defaults to strict + cblocks, discourage the usage of oas.gz 
+* Bugfix: Incorrect behavior of some deep-mode DRC functions
+  - deep edges "and" with Region: incorrect behavior if region is empty or non-deep
+  - deep edges "inside_part" with Region: incorrect behavior if region is empty or non-deep
+  - deep edges "outside_part" with Region: incorrect behavior if region is empty or non-deep
 * Enhancement: Python include files are now provided for the Python package. This will add type information to the methods.
 
 0.27.11          (2022-08-10):

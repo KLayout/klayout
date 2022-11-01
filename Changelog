@@ -1,3 +1,9 @@
+0.27.12          (2022-11-01):
+* Bugfix: %GITHUB%/issues/1173 DXF SPLINE implementation not compatible with ezdxf
+* Bugfix: %GITHUB%/issues/1167 delete_cells slow in some cases
+* Bugfix: %GITHUB%/issues/1164 Deleting cells: 'basic_string: construction from null is not valid'
+* Enhancement: Python include files are now provided for the Python package. This will add type information to the methods.
+
 0.27.11          (2022-08-10):
 * Bugfix: %GITHUB%/issues/1098 Normalize zero dimension when generating regular array instance
 * Enhancement: %GITHUB%/issues/1103 Add setting to disable Save Needed dialog box

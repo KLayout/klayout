@@ -911,6 +911,7 @@ class ErrorCatchingEdgeSink
   //  TODO: we should not use exceptions to indicate a condition, but right now, there is no good alternative
   //  and this is considered an error anyway.
   virtual void put (const db::Edge &) { throw OddPolygonException (); }
+  virtual void put (const db::Edge &, int) { }
   virtual void crossing_edge (const db::Edge &) { throw OddPolygonException (); }
 };
 

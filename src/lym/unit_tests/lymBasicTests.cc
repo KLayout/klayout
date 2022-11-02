@@ -53,12 +53,12 @@ private:
   std::string m_text;
 };
 
+#if defined(HAVE_RUBY)
+
 static std::string np (const std::string &s)
 {
   return tl::replaced (s, "\\", "/");
 }
-
-#if defined(HAVE_RUBY)
 
 TEST(1_BasicRuby)
 {

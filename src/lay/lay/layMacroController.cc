@@ -328,6 +328,10 @@ MacroController::drop_url (const std::string &path_or_url)
 void
 MacroController::show_editor (const std::string &cat, bool force_add)
 {
+  if (macro_categories ().empty ()) {
+    throw tl::Exception (tl::to_string (QObject::tr ("Application has not been compiled with scripting support - no macro IDE available")));
+  }
+
   if (mp_macro_editor) {
     mp_macro_editor->show (cat, force_add);
   }

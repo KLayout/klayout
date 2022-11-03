@@ -79,20 +79,28 @@ LIBS += -L$$LIBDIR -lklayout_db
 
 !msvc {
 
-  # Some standard compiler warnings on
   QMAKE_CXXFLAGS_WARN_ON += \
       -pedantic \
       -Woverloaded-virtual \
-      -Wsign-promo \
       -Wsynth \
       -Wno-deprecated \
       -Wno-long-long \
       -Wno-strict-aliasing \
       -Wno-deprecated-declarations \
-      -Wno-reserved-user-defined-literal \
 
-  # because we use unordered_map/unordered_set:
-  QMAKE_CXXFLAGS += -std=c++11
+  # too noisy on Qt:
+  # QMAKE_CXXFLAGS_WARN_ON += \
+  #     -Wsign-promo \
+  #     -Wno-reserved-user-defined-literal \
+  #
+
+  lessThan(QT_MAJOR_VERSION, 6) {
+    # because we use unordered_map/unordered_set:
+    QMAKE_CXXFLAGS += -std=c++11
+  } else {
+    # because we use unordered_map/unordered_set:
+    QMAKE_CXXFLAGS += -std=c++17
+  }
 
   # Python is somewhat sloppy and relies on the compiler initializing fields
   # of strucs to 0:

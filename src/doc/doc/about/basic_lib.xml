@@ -83,7 +83,7 @@
   <p>
   Custom fonts are installed by copying the font file to a folder named "fonts" 
   in one of the places in KLayout's path. The standard font can be found in 
-  "src/std_font.gds" in the source package.
+  "src/db/db/std_font.gds" in the source package.
   </p>
 
   <h2>CIRCLE and ELLIPSE</h2>

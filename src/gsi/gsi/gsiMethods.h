@@ -524,7 +524,7 @@ public:
     //  .. nothing yet ..
   }
 
-#if !defined(NDEBUG)
+#if defined(TRACE_METHOD_CALLS)
 
 public:
   /**

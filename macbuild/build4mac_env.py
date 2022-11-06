@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #===============================================================================
@@ -32,30 +32,13 @@ else:
 del System, Node, Release, MacVersion, Machine, Processor
 
 #-----------------------------------------------------
-# [1] Qt6 or Qt5
+# [1] Qt5 or Qt6
 #-----------------------------------------------------
-Qts  = [ 'Qt6MacPorts', 'Qt6Brew' ]
-Qts += [ 'Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3' ]
+Qts  = [ 'Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3' ]
+Qts += [ 'Qt6MacPorts', 'Qt6Brew' ]
 
 #-----------------------------------------------------
-# Whereabout of different components of Qt6
-#-----------------------------------------------------
-# Qt6 from MacPorts (https://www.macports.org/)
-#   install with 'sudo port install [qt6|qt6-qttools]'
-# [Key Type Name] = 'Qt6MacPorts'
-Qt6MacPorts = { 'qmake' : '/opt/local/libexec/qt6/bin/qmake',
-                'deploy': '/opt/local/libexec/qt6/bin/macdeployqt'
-              }
-
-# Qt6 from Homebrew (https://brew.sh/)
-#   install with 'brew install qt6'
-# [Key Type Name] = 'Qt6Brew'
-Qt6Brew = { 'qmake' : '%s/opt/qt@6/bin/qmake' % DefaultHomebrewRoot,
-            'deploy': '%s/opt/qt@6/bin/macdeployqt' % DefaultHomebrewRoot
-          }
-
-#-----------------------------------------------------
-# Whereabout of different components of Qt5
+# Whereabouts of different components of Qt5
 #-----------------------------------------------------
 # Qt5 from MacPorts (https://www.macports.org/)
 #   install with 'sudo port install [qt5|qt5-qttools]'
@@ -79,6 +62,23 @@ Qt5Ana3 = { 'qmake' : '/Applications/anaconda3/bin/qmake',
             'deploy': '/Applications/anaconda3/bin/macdeployqt'
           }
 
+#-------------------------------------------------------------------------
+# Whereabouts of different components of Qt6    *+*+*+ EXPERIMENTAL *+*+*+
+#-------------------------------------------------------------------------
+# Qt6 from MacPorts (https://www.macports.org/)
+#   install with 'sudo port install [qt6|qt6-qttools]'
+# [Key Type Name] = 'Qt6MacPorts'
+Qt6MacPorts = { 'qmake' : '/opt/local/libexec/qt6/bin/qmake',
+                'deploy': '/opt/local/libexec/qt6/bin/macdeployqt'
+              }
+
+# Qt6 from Homebrew (https://brew.sh/)
+#   install with 'brew install qt6'
+# [Key Type Name] = 'Qt6Brew'
+Qt6Brew = { 'qmake' : '%s/opt/qt@6/bin/qmake' % DefaultHomebrewRoot,
+            'deploy': '%s/opt/qt@6/bin/macdeployqt' % DefaultHomebrewRoot
+          }
+
 #-----------------------------------------------------
 # [2] Ruby
 #-----------------------------------------------------
@@ -89,7 +89,7 @@ RubyExt  = [ 'Ruby31MacPorts', 'Ruby31Brew', 'RubyAnaconda3' ]
 Rubies   = RubyNil + RubySys + RubyExt
 
 #-----------------------------------------------------
-# Whereabout of different components of Ruby
+# Whereabouts of different components of Ruby
 #-----------------------------------------------------
 # Bundled with Yosemite (10.10)
 #   !!! Yosemite is no longer supported (KLayout 0.26 ~) but remains here to keep the record of
@@ -225,7 +225,7 @@ PythonExt  = [ 'Python38MacPorts', 'Python38Brew', 'Python39Brew', 'PythonAnacon
 Pythons    = PythonNil + PythonSys + PythonExt
 
 #-----------------------------------------------------
-# Whereabout of different components of Python
+# Whereabouts of different components of Python
 #-----------------------------------------------------
 # Bundled with Yosemite (10.10)
 #   !!! Yosemite is no longer supported but remains here to keep the record of the directory structure

@@ -1,7 +1,6 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function  # to use print() of Python 3 in Python >= 2.7
 import sys
 import os
 import shutil
@@ -71,23 +70,28 @@ def Get_Build_Target_Dict():
 # @return a dictionary; key=mnemonic, value=build option list
 #------------------------------------------------------------------------------
 def Get_Build_Options( targetDic ):
+    if QtType == 5:
+        qtType = "Qt5"
+    else:
+        qtType = "Qt6"
+
     buildOp = dict()
     for key in targetDic.keys():
         target = targetDic[key]
         if target == "std": # use 'Qt5MacPorts' that provides Qt 5.15.2~ to run on "Big Sur", too
-            buildOp["std"]     = [ '-q', 'Qt5MacPorts', '-r', 'sys',  '-p', 'sys'    ]
+            buildOp["std"]     = [ '-q', '%sMacPorts' % qtType, '-r', 'sys',  '-p', 'sys'    ]
         elif target == "ports":
-            buildOp["ports"]   = [ '-q', 'Qt5MacPorts', '-r', 'MP31', '-p', 'MP38'   ]
+            buildOp["ports"]   = [ '-q', '%sMacPorts' % qtType, '-r', 'MP31', '-p', 'MP38'   ]
         elif target == "brew":
-            buildOp["brew"]    = [ '-q', 'Qt5Brew',     '-r', 'HB31', '-p', 'HB38'   ]
+            buildOp["brew"]    = [ '-q', '%sBrew' % qtType,     '-r', 'HB31', '-p', 'HB38'   ]
         elif target == "brewHW":
-            buildOp["brewHW"]  = [ '-q', 'Qt5Brew',     '-r', 'sys',  '-p', 'HB38'   ]
+            buildOp["brewHW"]  = [ '-q', '%sBrew' % qtType,     '-r', 'sys',  '-p', 'HB38'   ]
         elif target == "ana3":
-            buildOp["ana3"]    = [ '-q', 'Qt5Ana3',     '-r', 'Ana3', '-p', 'Ana3'   ]
+            buildOp["ana3"]    = [ '-q', '%sAna3' % qtType,     '-r', 'Ana3', '-p', 'Ana3'   ]
         elif target == "brewA":
-            buildOp["brewA"]   = [ '-q', 'Qt5Brew',     '-r', 'HB31', '-p', 'HBAuto' ]
+            buildOp["brewA"]   = [ '-q', '%sBrew' % qtType,     '-r', 'HB31', '-p', 'HBAuto' ]
         elif target == "brewAHW":
-            buildOp["brewAHW"] = [ '-q', 'Qt5Brew',     '-r', 'sys',  '-p', 'HBAuto' ]
+            buildOp["brewAHW"] = [ '-q', '%sBrew' % qtType,     '-r', 'sys',  '-p', 'HBAuto' ]
 
     if WithPymod:
         buildOp["ports"] = buildOp["ports"] + ['--buildPymod']
@@ -104,23 +108,28 @@ def Get_Build_Options( targetDic ):
 # @return a dictionary; key=mnemonic, value=".macQAT" directory
 #------------------------------------------------------------------------------
 def Get_QAT_Directory( targetDic, platform ):
+    if QtType == 5:
+        qtType = "qt5"
+    else:
+        qtType = "qt6"
+
     dirQAT = dict()
     for key in targetDic.keys():
         target = targetDic[key]
         if target == "std":
-            dirQAT["std"]       = 'qt5MP.build.macos-%s-release-RsysPsys.macQAT' % platform
+            dirQAT["std"]       = '%sMP.build.macos-%s-release-RsysPsys.macQAT' % (qtType, platform)
         elif target == "ports":
-            dirQAT["ports"]     = 'qt5MP.build.macos-%s-release-Rmp31Pmp38.macQAT' % platform
+            dirQAT["ports"]     = '%sMP.build.macos-%s-release-Rmp31Pmp38.macQAT' % (qtType, platform)
         elif target == "brew":
-            dirQAT["brew"]      = 'qt5Brew.build.macos-%s-release-Rhb31Phb38.macQAT' % platform
+            dirQAT["brew"]      = '%sBrew.build.macos-%s-release-Rhb31Phb38.macQAT' % (qtType, platform)
         elif target == "brewHW":
-            dirQAT["brewHW"]    = 'qt5Brew.build.macos-%s-release-RsysPhb38.macQAT' % platform
+            dirQAT["brewHW"]    = '%sBrew.build.macos-%s-release-RsysPhb38.macQAT' % (qtType, platform)
         elif target == "ana3":
-            dirQAT["ana3"]      = 'qt5Ana3.build.macos-%s-release-Rana3Pana3.macQAT' % platform
+            dirQAT["ana3"]      = '%sAna3.build.macos-%s-release-Rana3Pana3.macQAT' % (qtType, platform)
         elif target == "brewA":
-            dirQAT["brewA"]     = 'qt5Brew.build.macos-%s-release-Rhb31Phbauto.macQAT' % platform
+            dirQAT["brewA"]     = '%sBrew.build.macos-%s-release-Rhb31Phbauto.macQAT' % (qtType, platform)
         elif target == "brewAHW":
-            dirQAT["brewAHW"]   = 'qt5Brew.build.macos-%s-release-RsysPhbauto.macQAT' % platform
+            dirQAT["brewAHW"]   = '%sBrew.build.macos-%s-release-RsysPhbauto.macQAT' % (qtType, platform)
     return dirQAT
 
 #------------------------------------------------------------------------------
@@ -134,6 +143,11 @@ def Get_QAT_Directory( targetDic, platform ):
 # @return a dictionary; key=mnemonic, value=build option list
 #------------------------------------------------------------------------------
 def Get_Package_Options( targetDic, platform, srlDMG, makeflag ):
+    if QtType == 5:
+        qtType = "qt5"
+    else:
+        qtType = "qt6"
+
     if makeflag:
         flag = '-m'
     else:
@@ -143,25 +157,25 @@ def Get_Package_Options( targetDic, platform, srlDMG, makeflag ):
     for key in targetDic.keys():
         target = targetDic[key]
         if target == "std":
-            packOp["std"]       = [ '-p', 'ST-qt5MP.pkg.macos-%s-release-RsysPsys' % platform,
+            packOp["std"]       = [ '-p', 'ST-%sMP.pkg.macos-%s-release-RsysPsys' % (qtType, platform),
                                     '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "ports":
-            packOp["ports"]     = [ '-p', 'LW-qt5MP.pkg.macos-%s-release-Rmp31Pmp38' % platform,
+            packOp["ports"]     = [ '-p', 'LW-%sMP.pkg.macos-%s-release-Rmp31Pmp38' % (qtType, platform),
                                     '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "brew":
-            packOp["brew"]      = [ '-p', 'LW-qt5Brew.pkg.macos-%s-release-Rhb31Phb38' % platform,
+            packOp["brew"]      = [ '-p', 'LW-%sBrew.pkg.macos-%s-release-Rhb31Phb38' % (qtType, platform),
                                     '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "brewHW":
-            packOp["brewHW"]    = [ '-p', 'HW-qt5Brew.pkg.macos-%s-release-RsysPhb38' % platform,
+            packOp["brewHW"]    = [ '-p', 'HW-%sBrew.pkg.macos-%s-release-RsysPhb38' % (qtType, platform),
                                     '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "ana3":
-            packOp["ana3"]      = [ '-p', 'LW-qt5Ana3.pkg.macos-%s-release-Rana3Pana3' % platform,
+            packOp["ana3"]      = [ '-p', 'LW-%sAna3.pkg.macos-%s-release-Rana3Pana3' % (qtType, platform),
                                     '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "brewA":
-            packOp["brewA"]     = [ '-p', 'LW-qt5Brew.pkg.macos-%s-release-Rhb31Phbauto' % platform,
+            packOp["brewA"]     = [ '-p', 'LW-%sBrew.pkg.macos-%s-release-Rhb31Phbauto' % (qtType, platform),
                                     '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "brewAHW":
-            packOp["brewAHW"]   = [ '-p', 'HW-qt5Brew.pkg.macos-%s-release-RsysPhbauto' % platform,
+            packOp["brewAHW"]   = [ '-p', 'HW-%sBrew.pkg.macos-%s-release-RsysPhbauto' % (qtType, platform),
                                     '-s', '%d' % srlDMG, '%s' % flag ]
     return packOp
 
@@ -170,6 +184,7 @@ def Get_Package_Options( targetDic, platform, srlDMG, makeflag ):
 #------------------------------------------------------------------------------
 def Parse_CommandLine_Arguments():
     global Usage     # usage
+    global QtType    # Qt type
     global Target    # target list
     global Build     # operation flag
     global WithPymod # operation flag
@@ -197,8 +212,10 @@ def Parse_CommandLine_Arguments():
     Usage += "$ [python] nightlyBuild.py\n"
     Usage += "   option & argument : comment on option if any                            | default value\n"
     Usage += "   ------------------------------------------------------------------------+--------------\n"
+    Usage += "   [--qt <type>] : 5='qt5', 6='qt6' (migration to Qt6 is ongoing)          | 5\n"
     Usage += "   [--target <list>] : 0='std', 1='ports', 2='brew', 3='brewHW', 4='ana3', | '%s'\n" % targetopt
     Usage += "                       5='brewA', 6='brewAHW'                              | \n"
+    Usage += "                       * with --qt=6, use --target='2,3' (4 is ignored)    | \n"
     Usage += "   [--build] : build and deploy                                            | disabled\n"
     Usage += "   [--pymod] : build and deploy Pymod, too                                 | disabled\n"
     Usage += "   [--test]  : run the QA Test                                             | disabled\n"
@@ -216,11 +233,15 @@ def Parse_CommandLine_Arguments():
     Usage += "          (3) $ ./nightlyBuild.py  --test                                  | \n"
     Usage += "          (4) $ ./nightlyBuild.py  --check (confirm the QA Test results)   | \n"
     Usage += "          (5) $ ./nightlyBuild.py  --makedmg  1                            | \n"
-    Usage += "          (6) $ ./nightlyBuild.py  --upload  '0.27.10'                     | \n"
+    Usage += "          (6) $ ./nightlyBuild.py  --upload  '0.27.11'                     | \n"
     Usage += "          (7) $ ./nightlyBuild.py  --cleandmg 1                            | \n"
     Usage += "---------------------------------------------------------------------------+----------------------\n"
 
     p = optparse.OptionParser( usage=Usage )
+    p.add_option( '--qt',
+                    dest='qt_type',
+                    help='Qt5 or Qt6 (5)' )
+
     p.add_option( '--target',
                     dest='targets',
                     help='build target list' )
@@ -267,7 +288,8 @@ def Parse_CommandLine_Arguments():
                     default=False,
                     help='check usage' )
 
-    p.set_defaults( targets    = "%s" % targetopt,
+    p.set_defaults( qt_type    = "5",
+                    targets    = "%s" % targetopt,
                     build      = False,
                     with_pymod = False,
                     qa_test    = False,
@@ -285,6 +307,12 @@ def Parse_CommandLine_Arguments():
     myPlatform = Test_My_Platform( ['Catalina', 'BigSur', 'Monterey' ] )
     if myPlatform == "":
         print( "! Current platform is not ['Catalina', 'BigSur', 'Monterey' ]" )
+        print(Usage)
+        quit()
+
+    QtType = int(opt.qt_type)
+    if not QtType in [5, 6]:
+        print( "! Invalid Qt type <%d>" % QtType )
         print(Usage)
         quit()
 
@@ -332,6 +360,9 @@ def Build_Deploy():
     buildOp   = Get_Build_Options( Get_Build_Target_Dict() )
 
     for key in Target:
+        if key == 4 and QtType == 6: # anaconda3 does not provide Qt6 so far
+            continue
+
         command1 = [ pyBuilder ] + buildOp[key]
         if key in [ "std", "brewHW", "brewAHW" ] :
             command2 = [ pyBuilder ] + buildOp[key] + ['-y']
@@ -380,6 +411,9 @@ def Run_QATest( exclude ):
     dirQAT      = Get_QAT_Directory( Get_Build_Target_Dict(), myPlatform )
 
     for key in Target:
+        if key == 4 and QtType == 6: # anaconda3 does not provide Qt6 so far
+            continue
+
         command1 = [ pyRunnerQAT ] + [ '--run', '--exclude', '%s' % exclude ]
         print( dirQAT[key], command1 )
         #continue
@@ -412,6 +446,9 @@ def Check_QATest_Results( lines ):
     dirQAT      = Get_QAT_Directory( Get_Build_Target_Dict(), myPlatform )
 
     for key in Target:
+        if key == 4 and QtType == 6: # anaconda3 does not provide Qt6 so far
+            continue
+
         os.chdir( dirQAT[key] )
         logfile  = glob.glob( "*.log" )
         command1 = [ tailCommand ] + [ '-n', '%d' % lines ] + logfile
@@ -450,6 +487,9 @@ def DMG_Make( srlDMG ):
     os.mkdir( stashDMG )
 
     for key in Target:
+        if key == 4 and QtType == 6: # anaconda3 does not provide Qt6 so far
+            continue
+
         command1 = [ pyDMGmaker ] + packOp[key]
         print(command1)
         #continue
@@ -487,6 +527,9 @@ def DMG_Clean( srlDMG ):
         shutil.rmtree( stashDMG )
 
     for key in Target:
+        if key == 4 and QtType == 6: # anaconda3 does not provide Qt6 so far
+            continue
+
         command1 = [ pyDMGmaker ] + packOp[key]
         print(command1)
         #continue

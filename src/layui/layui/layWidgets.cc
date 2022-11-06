@@ -210,9 +210,13 @@ DitherPatternSelectionButton::update_menu ()
     lay::DitherPattern patterns;
 
     std::string s;
-    lay::Dispatcher::instance ()->config_get (cfg_stipple_palette, s);
-    lay::StipplePalette palette;
-    palette.from_string (s);
+    if (lay::Dispatcher::instance ()) {
+      lay::Dispatcher::instance ()->config_get (cfg_stipple_palette, s);
+    }
+    lay::StipplePalette palette = lay::StipplePalette::default_palette ();
+    if (! s.empty ()) {
+      palette.from_string (s);
+    }
 
     //  fill the list of stipple palette items
     for (unsigned int i = 0; i < palette.stipples (); ++i) {
@@ -910,9 +914,13 @@ ColorButton::build_color_menu (QMenu *menu, QObject *receiver, const char *brows
   try {
 
     std::string s;
-    lay::Dispatcher::instance ()->config_get (cfg_color_palette, s);
-    lay::ColorPalette palette;
-    palette.from_string (s);
+    if (lay::Dispatcher::instance ()) {
+      lay::Dispatcher::instance ()->config_get (cfg_color_palette, s);
+    }
+    lay::ColorPalette palette = lay::ColorPalette::default_palette ();
+    if (! s.empty ()) {
+      palette.from_string (s);
+    }
 
     QMenu *submenu = 0;
 

@@ -1414,7 +1414,7 @@ get_merged_shapes_of_net (const db::hier_clusters<db::NetShape> &clusters, db::c
       db::PolygonRef::polygon_edge_iterator e = pr.begin_edge ();
       if (! e.at_end ()) {
         //  pick one reference point for the label
-        if (! any_ref && (*e).p1 () < ref) {
+        if (! any_ref || (*e).p1 () < ref) {
           ref = (*e).p1 ();
           any_ref = true;
         }

@@ -158,7 +158,7 @@
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset resource="../../lay/lay/layResources.qrc">
+                <iconset resource="../../icons/icons.qrc">
                  <normaloff>:/find_16px.png</normaloff>:/find_16px.png</iconset>
                </property>
                <property name="autoRaise">
@@ -549,7 +549,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../lay/lay/layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>

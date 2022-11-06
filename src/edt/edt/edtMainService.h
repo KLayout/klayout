@@ -48,6 +48,7 @@ class Service;
 class EditorOptionsPages;
 class EditorOptionsPage;
 class RoundCornerOptionsDialog;
+class AreaAndPerimeterDialog;
 class MakeCellOptionsDialog;
 class MakeArrayOptionsDialog;
 class AlignOptionsDialog;
@@ -103,6 +104,11 @@ public:
    *  @brief Round corners on selection
    */
   void cm_round_corners ();
+
+  /**
+   *  @brief Show area and perimeter of selection
+   */
+  void cm_area_perimeter ();
 
   /**
    *  @brief Convert selection to PCell
@@ -223,6 +229,7 @@ private:
   bool m_undo_before_apply;
 #if defined(HAVE_QT)
   edt::RoundCornerOptionsDialog *mp_round_corners_dialog;
+  edt::AreaAndPerimeterDialog *mp_area_and_perimeter_dialog;
   edt::AlignOptionsDialog *mp_align_options_dialog;
   edt::DistributeOptionsDialog *mp_distribute_options_dialog;
   lay::FlattenInstOptionsDialog *mp_flatten_inst_options_dialog;
@@ -234,6 +241,7 @@ private:
   void check_no_guiding_shapes ();
 #if defined(HAVE_QT)
   edt::RoundCornerOptionsDialog *round_corners_dialog ();
+  edt::AreaAndPerimeterDialog *area_and_perimeter_dialog ();
   edt::AlignOptionsDialog *align_options_dialog ();
   edt::DistributeOptionsDialog *distribute_options_dialog ();
   lay::FlattenInstOptionsDialog *flatten_inst_options_dialog ();

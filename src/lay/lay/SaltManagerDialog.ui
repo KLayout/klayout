@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="mode_tab">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -217,6 +217,12 @@
               </property>
               <item>
                <widget class="QLabel" name="label_6">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>1</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="font">
                  <font>
                   <bold>true</bold>
@@ -224,6 +230,19 @@
                 </property>
                 <property name="text">
                  <string>Details</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="detailed_view">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>More details</string>
                 </property>
                </widget>
               </item>
@@ -515,6 +534,12 @@
               </property>
               <item>
                <widget class="QLabel" name="label_9">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>1</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="font">
                  <font>
                   <bold>true</bold>
@@ -522,6 +547,13 @@
                 </property>
                 <property name="text">
                  <string>Details</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="detailed_view2">
+                <property name="text">
+                 <string>More details</string>
                 </property>
                </widget>
               </item>
@@ -935,8 +967,21 @@
            <property name="bottomMargin">
             <number>0</number>
            </property>
+           <item row="1" column="0" colspan="3">
+            <widget class="lay::SaltGrainDetailsTextWidget" name="details_text">
+             <property name="openExternalLinks">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="0">
             <widget class="QLabel" name="label">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>1</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="font">
               <font>
                <bold>true</bold>
@@ -947,7 +992,7 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
+           <item row="0" column="2">
             <widget class="QToolButton" name="edit_button">
              <property name="toolTip">
               <string>Edit Package Details</string>
@@ -964,10 +1009,10 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="0" colspan="2">
-            <widget class="lay::SaltGrainDetailsTextWidget" name="details_text">
-             <property name="openExternalLinks">
-              <bool>true</bool>
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="detailed_view3">
+             <property name="text">
+              <string>More details</string>
              </property>
             </widget>
            </item>
@@ -1157,20 +1202,33 @@
    <class>lay::SaltGrainDetailsTextWidget</class>
    <extends>QTextBrowser</extends>
    <header>laySaltGrainDetailsTextWidget.h</header>
+   <slots>
+    <slot>show_detailed_view(bool)</slot>
+   </slots>
   </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>mode_tab</tabstop>
+  <tabstop>mark_new_button</tabstop>
+  <tabstop>search_new_edit</tabstop>
+  <tabstop>salt_mine_view_new</tabstop>
+  <tabstop>detailed_view</tabstop>
+  <tabstop>toolButton</tabstop>
+  <tabstop>details_new_text</tabstop>
+  <tabstop>mark_update_button</tabstop>
+  <tabstop>search_update_edit</tabstop>
+  <tabstop>salt_mine_view_update</tabstop>
+  <tabstop>detailed_view2</tabstop>
+  <tabstop>toolButton_2</tabstop>
+  <tabstop>details_update_text</tabstop>
   <tabstop>search_installed_edit</tabstop>
   <tabstop>salt_view</tabstop>
-  <tabstop>details_text</tabstop>
+  <tabstop>detailed_view3</tabstop>
   <tabstop>edit_button</tabstop>
-  <tabstop>search_new_edit</tabstop>
-  <tabstop>mark_new_button</tabstop>
-  <tabstop>salt_mine_view_new</tabstop>
-  <tabstop>details_new_text</tabstop>
-  <tabstop>toolButton</tabstop>
+  <tabstop>details_text</tabstop>
+  <tabstop>create_button</tabstop>
   <tabstop>apply_new_button</tabstop>
+  <tabstop>apply_update_button</tabstop>
   <tabstop>scrollArea</tabstop>
  </tabstops>
  <resources>
@@ -1190,6 +1248,54 @@
     <hint type="destinationlabel">
      <x>653</x>
      <y>432</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>detailed_view</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>details_new_text</receiver>
+   <slot>show_detailed_view(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>588</x>
+     <y>57</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>578</x>
+     <y>121</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>detailed_view2</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>details_update_text</receiver>
+   <slot>show_detailed_view(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>616</x>
+     <y>58</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>615</x>
+     <y>96</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>detailed_view3</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>details_text</receiver>
+   <slot>show_detailed_view(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>602</x>
+     <y>58</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>603</x>
+     <y>91</y>
     </hint>
    </hints>
   </connection>

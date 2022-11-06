@@ -55,6 +55,9 @@ public:
 protected:
   virtual QVariant loadResource (int type, const QUrl &url);
 
+public slots:
+  void show_detailed_view (bool f);
+
 private slots:
   void open_link (const QUrl &url);
 
@@ -62,6 +65,7 @@ private:
   std::unique_ptr<lay::SaltGrain> mp_grain;
 
   QString details_text ();
+  bool m_detailed_view;
 };
 
 }

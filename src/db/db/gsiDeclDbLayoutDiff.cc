@@ -248,6 +248,26 @@ public:
     end_edge_differences_event ();
   }
 
+  virtual void begin_edge_pair_differences ()
+  {
+    begin_edge_pair_differences_event ();
+  }
+
+  virtual void detailed_diff (const db::PropertiesRepository & /*pr*/, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &a, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &b)
+  {
+    for (std::vector <std::pair <db::EdgePair, db::properties_id_type> >::const_iterator i = a.begin (); i != a.end (); ++i) {
+      edge_pair_in_a_only_event (i->first, i->second);
+    }
+    for (std::vector <std::pair <db::EdgePair, db::properties_id_type> >::const_iterator i = b.begin (); i != b.end (); ++i) {
+      edge_pair_in_b_only_event (i->first, i->second);
+    }
+  }
+
+  virtual void end_edge_pair_differences ()
+  {
+    end_edge_pair_differences_event ();
+  }
+
   virtual void begin_text_differences ()
   {
     begin_text_differences_event ();
@@ -353,6 +373,10 @@ public:
   tl::event<const db::Edge & /*anotb*/, db::properties_id_type /*prop_id*/> edge_in_a_only_event;
   tl::event<const db::Edge & /*bnota*/, db::properties_id_type /*prop_id*/> edge_in_b_only_event;
   tl::Event end_edge_differences_event;
+  tl::Event begin_edge_pair_differences_event;
+  tl::event<const db::EdgePair & /*anotb*/, db::properties_id_type /*prop_id*/> edge_pair_in_a_only_event;
+  tl::event<const db::EdgePair & /*bnota*/, db::properties_id_type /*prop_id*/> edge_pair_in_b_only_event;
+  tl::Event end_edge_pair_differences_event;
   tl::Event begin_text_differences_event;
   tl::event<const db::Text & /*anotb*/, db::properties_id_type /*prop_id*/> text_in_a_only_event;
   tl::event<const db::Text & /*bnota*/, db::properties_id_type /*prop_id*/> text_in_b_only_event;
@@ -670,6 +694,29 @@ gsi::Class<LayoutDiff> decl_LayoutDiff ("db", "LayoutDiff",
   ) +
   gsi::event ("on_end_edge_differences", &LayoutDiff::end_edge_differences_event,
     "@brief This signal indicates the end of sequence of edge differences\n"
+  ) +
+  gsi::event ("on_begin_edge_pair_differences", &LayoutDiff::begin_edge_pair_differences_event,
+    "@brief This signal indicates differences in the edge pairs on the current layer\n"
+    "The current layer is indicated by the \\begin_layer_event signal or can be obtained from the diff object "
+    "through \\LayoutDiff#layer_info_a, \\LayoutDiff#layer_index_a, \\LayoutDiff#layer_info_b and \\LayoutDiff#layer_index_b. "
+    "In verbose mode (see \\Verbose flag) more signals will be emitted for edge pairs that are different between the two layouts."
+    "\n"
+    "This event has been introduced in version 0.28."
+  ) +
+  gsi::event ("on_edge_pair_in_a_only", &LayoutDiff::edge_pair_in_a_only_event, gsi::arg ("anotb"), gsi::arg ("prop_id"),
+    "@brief This signal indicates an edge pair that is present in the first layout only"
+    "\n"
+    "This event has been introduced in version 0.28."
+  ) +
+  gsi::event ("on_edge_pair_in_b_only", &LayoutDiff::edge_pair_in_b_only_event, gsi::arg ("bnota"), gsi::arg ("prop_id"),
+    "@brief This signal indicates an edge pair that is present in the second layout only"
+    "\n"
+    "This event has been introduced in version 0.28."
+  ) +
+  gsi::event ("on_end_edge_pair_differences", &LayoutDiff::end_edge_pair_differences_event,
+    "@brief This signal indicates the end of sequence of edge pair differences\n"
+    "\n"
+    "This event has been introduced in version 0.28."
   ) +
   gsi::event ("on_begin_text_differences", &LayoutDiff::begin_text_differences_event,
     "@brief This signal indicates differences in the texts on the current layer\n"

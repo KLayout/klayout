@@ -4712,6 +4712,25 @@ CODE
     # p = fill_pattern("FILL_CELL").shape(1, 0, box(0.0, 0.0, 1.0, 1.0))
     # @/code
     #
+    # The "shape" method takes several forms:
+    #
+    # @ul
+    #   @li @tt shape(layer, object, object ...) @/tt (1) @/li
+    #   @li @tt shape(layer, datatype, object, object ...) @/tt (2) @/li
+    #   @li @tt shape(name, object, object ...) @/tt (3) @/li 
+    #   @li @tt shape(layer_info, object, object ...) @/tt (4) @/li
+    # @/ul
+    #
+    # The first form takes a GDS2 layer number. The datatype is assumed to be 0.
+    # The second form takes a GDS layer and datatype number.
+    # The third form takes a layer name for layout systems with named layers
+    # (like Magic, CIF or DXF).
+    # The forth form takes a RBA::LayerInfo object to specify the layer. 
+    # All forms take one to many geometry objects which are written to the respective layer.
+    # Geometry objects can either be created using the generator functions
+    # (\global#box, \global#polygon, \global#path). The core classes RBA::DBox, RBA::DPolygon, RBA::DPath or
+    # RBA::DText are also accepted as geometry objects.
+    #
     # The fill pattern can be given a reference point which is used for placing the pattern. The reference point
     # is the one which is aligned with the pattern origin. The following code will assign (-0.5, -0.5) as the reference
     # point for the 1x1 micron rectangle. Hence the reference point is a little below and left of the rectangle which 

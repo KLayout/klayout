@@ -342,6 +342,8 @@ public:
     menu_entries.push_back (lay::menu_item ("edt::sel_make_cell_variants", "make_cell_variants:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Make Cell Variants"))));
     menu_entries.push_back (lay::menu_item ("edt::sel_convert_to_pcell", "convert_to_pcell:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Convert To PCell"))));
     menu_entries.push_back (lay::menu_item ("edt::sel_convert_to_cell", "convert_to_cell:edit_mode", "edit_menu.selection_menu.end", tl::to_string (tr ("Convert To Static Cell"))));
+    menu_entries.push_back (lay::separator ("hier_group:edit_info", "edit_menu.selection_menu.end"));
+    menu_entries.push_back (lay::menu_item ("edt::sel_area_perimeter", "area_perimeter", "edit_menu.selection_menu.end", tl::to_string (tr ("Area and Perimeter"))));
 
     menu_entries.push_back (lay::menu_item ("edt::combine_mode", "combine_mode:edit_mode", "@toolbar.end_modes", tl::to_string (tr ("Combine{Select background combination mode}"))));
   }

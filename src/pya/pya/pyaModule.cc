@@ -408,19 +408,19 @@ struct PythonClassClientData
   : public gsi::PerClassClientSpecificData
 {
   PythonClassClientData (const gsi::ClassBase *_cls, PyTypeObject *_py_type, PyTypeObject *_py_type_static)
-    : py_type_object (_py_type), py_type_object_static (_py_type_static), method_table (_cls)
+    : py_type_object ((PyObject *) _py_type), py_type_object_static ((PyObject *) _py_type_static), method_table (_cls)
   {
     //  .. nothing yet ..
   }
 
-  PyTypeObject *py_type_object;
-  PyTypeObject *py_type_object_static;
+  PythonPtr py_type_object;
+  PythonPtr py_type_object_static;
   MethodTable method_table;
 
   static PyTypeObject *py_type (const gsi::ClassBase &cls_decl, bool as_static)
   {
     PythonClassClientData *cd = dynamic_cast<PythonClassClientData *>(cls_decl.data (gsi::ClientIndex::Python));
-    return cd ? (as_static ? cd->py_type_object_static : cd->py_type_object) : 0;
+    return (PyTypeObject *) (cd ? (as_static ? cd->py_type_object_static.get () : cd->py_type_object.get ()) : 0);
   }
 
   static void initialize (const gsi::ClassBase &cls_decl, PyTypeObject *py_type, bool as_static)
@@ -428,9 +428,9 @@ struct PythonClassClientData
     PythonClassClientData *cd = dynamic_cast<PythonClassClientData *>(cls_decl.data (gsi::ClientIndex::Python));
     if (cd) {
       if (as_static) {
-        cd->py_type_object_static = py_type;
+        cd->py_type_object_static = (PyObject *) py_type;
       } else {
-        cd->py_type_object = py_type;
+        cd->py_type_object = (PyObject *) py_type;
       }
     } else {
       cls_decl.set_data (gsi::ClientIndex::Python, new PythonClassClientData (&cls_decl, as_static ? NULL : py_type, as_static ? py_type : NULL));
@@ -2475,7 +2475,11 @@ public:
 
     PyTypeObject *type = (PyTypeObject *) PyObject_Call ((PyObject *) &PyType_Type, args.get (), NULL);
     if (type == NULL) {
-      check_error ();
+      try {
+      	check_error ();
+      } catch (tl::Exception &ex) {
+	tl::error << ex.msg ();
+      }
       tl_assert (false);
     }
 

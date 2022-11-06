@@ -14,10 +14,10 @@ to_fill = extent - l1
 fp1 = fill_pattern("FP1").shape(10, 0, box(0, 0, 800.nm, 800.nm)).origin(-100.nm, -100.nm)
 to_fill = to_fill.fill_with_left(fp1, hstep(1.um), vstep(200.nm, 1.um), multi_origin)
 
-fp2 = fill_pattern("FP2").shape(10, 0, box(0, 0, 400.nm, 400.nm)).origin(-50.nm, -50.nm)
+fp2 = fill_pattern("FP2").shape(10, box(0, 0, 400.nm, 400.nm)).origin(-50.nm, -50.nm)
 to_fill = to_fill.fill_with_left(fp2, hstep(0.5.um), vstep(100.nm, 0.5.um), multi_origin)
 
-fp3 = fill_pattern("FP3").shape(10, 0, box(0, 0, 200.nm, 200.nm)).origin(-25.nm, -25.nm)
+fp3 = fill_pattern("FP3").shape(RBA::LayerInfo::new(10, 0), box(0, 0, 200.nm, 200.nm)).origin(-25.nm, -25.nm)
 to_fill = to_fill.fill_with_left(fp3, hstep(0.25.um), vstep(50.nm, 0.25.um), multi_origin)
 
 to_fill.output(100, 0)

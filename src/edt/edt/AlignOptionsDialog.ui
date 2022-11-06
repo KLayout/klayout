@@ -26,7 +26,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../../lay/lay/layResources.qrc">
+         <iconset resource="../../icons/icons.qrc">
           <normaloff>:/align_none_32px.png</normaloff>:/align_none_32px.png</iconset>
         </property>
         <property name="iconSize">
@@ -43,7 +43,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../../lay/lay/layResources.qrc">
+         <iconset resource="../../icons/icons.qrc">
           <normaloff>:/align_left_32px.png</normaloff>:/align_left_32px.png</iconset>
         </property>
         <property name="iconSize">
@@ -60,7 +60,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../../lay/lay/layResources.qrc">
+         <iconset resource="../../icons/icons.qrc">
           <normaloff>:/align_hcenter_32px.png</normaloff>:/align_hcenter_32px.png</iconset>
         </property>
         <property name="iconSize">
@@ -77,7 +77,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../../lay/lay/layResources.qrc">
+         <iconset resource="../../icons/icons.qrc">
           <normaloff>:/align_right_32px.png</normaloff>:/align_right_32px.png</iconset>
         </property>
         <property name="iconSize">
@@ -204,7 +204,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../../lay/lay/layResources.qrc">
+         <iconset resource="../../icons/icons.qrc">
           <normaloff>:/align_none_32px.png</normaloff>:/align_none_32px.png</iconset>
         </property>
         <property name="iconSize">
@@ -221,7 +221,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../../lay/lay/layResources.qrc">
+         <iconset resource="../../icons/icons.qrc">
           <normaloff>:/align_top_32px.png</normaloff>:/align_top_32px.png</iconset>
         </property>
         <property name="iconSize">
@@ -238,7 +238,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../../lay/lay/layResources.qrc">
+         <iconset resource="../../icons/icons.qrc">
           <normaloff>:/align_vcenter_32px.png</normaloff>:/align_vcenter_32px.png</iconset>
         </property>
         <property name="iconSize">
@@ -308,7 +308,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../../lay/lay/layResources.qrc">
+         <iconset resource="../../icons/icons.qrc">
           <normaloff>:/align_bottom_32px.png</normaloff>:/align_bottom_32px.png</iconset>
         </property>
         <property name="iconSize">
@@ -432,7 +432,7 @@
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
-  <include location="../../lay/lay/layResources.qrc"/>
+  <include location="../../icons/icons.qrc"/>
  </resources>
  <connections>
   <connection>

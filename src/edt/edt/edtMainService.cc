@@ -25,6 +25,7 @@
 #include "dbPolygonTools.h"
 #include "dbLibrary.h"
 #include "dbLibraryManager.h"
+#include "dbRegion.h"
 #include "tlExceptions.h"
 #include "layLayoutView.h"
 #include "laySelector.h"
@@ -82,6 +83,7 @@ MainService::MainService (db::Manager *manager, lay::LayoutViewBase *view, lay::
 {
 #if defined(HAVE_QT)
   mp_round_corners_dialog = 0;
+  mp_area_and_perimeter_dialog = 0;
   mp_align_options_dialog = 0;
   mp_distribute_options_dialog = 0;
   mp_flatten_inst_options_dialog = 0;
@@ -104,6 +106,15 @@ MainService::round_corners_dialog ()
     mp_round_corners_dialog = new edt::RoundCornerOptionsDialog (lay::widget_from_view (view ()));
   }
   return mp_round_corners_dialog;
+}
+
+edt::AreaAndPerimeterDialog *
+MainService::area_and_perimeter_dialog ()
+{
+  if (! mp_area_and_perimeter_dialog) {
+    mp_area_and_perimeter_dialog = new edt::AreaAndPerimeterDialog (lay::widget_from_view (view ()));
+  }
+  return mp_area_and_perimeter_dialog;
 }
 
 edt::AlignOptionsDialog *
@@ -168,6 +179,8 @@ MainService::menu_activated (const std::string &symbol)
     cm_tap ();
   } else if (symbol == "edt::sel_round_corners") {
     cm_round_corners ();
+  } else if (symbol == "edt::sel_area_perimeter") {
+    cm_area_perimeter ();
   } else if (symbol == "edt::sel_convert_to_pcell") {
     cm_convert_to_pcell ();
   } else if (symbol == "edt::sel_convert_to_cell") {
@@ -1346,6 +1359,67 @@ MainService::cm_convert_to_pcell ()
   }
 }
 
+void MainService::cm_area_perimeter ()
+{
+#if ! defined(HAVE_QT)
+  tl_assert (false); // see TODO
+#endif
+
+  double dbu = 0.0;
+
+  std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
+
+  db::Region region;
+
+  //  get (common) cellview index of the primary selection
+  for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
+
+    for (edt::Service::obj_iterator s = (*es)->selection ().begin (); s != (*es)->selection ().end (); ++s) {
+
+      if (s->is_cell_inst ()) {
+        continue;
+      }
+
+      db::Polygon poly;
+      if (!s->shape ().polygon (poly)) {
+        continue;
+      }
+
+      double shape_dbu = view ()->cellview (s->cv_index ())->layout ().dbu ();
+
+      if (dbu == 0.0) {
+        //  first CV is used for reference DBU
+        dbu = shape_dbu;
+      }
+
+      if (fabs (shape_dbu - dbu) < db::epsilon) {
+        region.insert (s->trans () * poly);
+      } else {
+        region.insert ((db::ICplxTrans (shape_dbu / dbu) * s->trans ()) * poly);
+      }
+
+    }
+
+  }
+
+#if defined(HAVE_QT)
+  if (region.count () > 100000) {
+    if (QMessageBox::warning (lay::widget_from_view (view ()), tr ("Warning: Big Selection"),
+                                    tr ("The selection contains many shapes. Area and perimeter computation may take a long time.\nContinue anyway?"),
+                                    QMessageBox::Yes, QMessageBox::No) == QMessageBox::No) {
+      return;
+    }
+  }
+#endif
+
+  double area = region.area () * dbu * dbu;
+  double perimeter = region.perimeter () * dbu;
+
+#if defined(HAVE_QT)
+  area_and_perimeter_dialog ()->exec_dialog (area, perimeter);
+#endif
+}
+
 static bool extract_rad (std::vector <db::Polygon> &poly, double &rinner, double &router, unsigned int &n)
 {
   std::vector <db::Point> new_pts;
@@ -1356,7 +1430,7 @@ static bool extract_rad (std::vector <db::Polygon> &poly, double &rinner, double
     db::Polygon new_poly;
 
     new_pts.clear ();
-    if (! extract_rad_from_contour (p->begin_hull (), p->end_hull (), rinner, router, n, &new_pts) && 
+    if (! extract_rad_from_contour (p->begin_hull (), p->end_hull (), rinner, router, n, &new_pts) &&
         ! extract_rad_from_contour (p->begin_hull (), p->end_hull (), rinner, router, n, &new_pts, true)) {
       //  ultimate fallback: assign original contour
       new_poly.assign_hull (p->begin_hull (), p->end_hull (), false /*don't compress*/);
@@ -1368,7 +1442,7 @@ static bool extract_rad (std::vector <db::Polygon> &poly, double &rinner, double
     for (unsigned int h = 0; h < p->holes (); ++h) {
 
       new_pts.clear ();
-      if (! extract_rad_from_contour (p->begin_hole (h), p->end_hole (h), rinner, router, n, &new_pts) && 
+      if (! extract_rad_from_contour (p->begin_hole (h), p->end_hole (h), rinner, router, n, &new_pts) &&
           ! extract_rad_from_contour (p->begin_hole (h), p->end_hole (h), rinner, router, n, &new_pts, true)) {
         //  ultimate fallback: assign original contour
         new_poly.insert_hole (p->begin_hole (h), p->end_hole (h), false /*don't compress*/);

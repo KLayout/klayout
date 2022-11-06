@@ -125,6 +125,11 @@ public:
   virtual void put (const db::Edge &e);
 
   /**
+   *  @brief Implementation of the EdgeSink interface
+   */
+  virtual void put (const db::Edge & /*e*/, int /*tag*/) { }
+
+  /**
    *  @brief Sets the way how holes are resolved dynamically
    *
    *  This property should not be changed why polygons are created (between start and flush)
@@ -260,6 +265,11 @@ public:
    *  @brief Implementation of the EdgeSink interface
    */
   virtual void put (const db::Edge &e);
+
+  /**
+   *  @brief Implementation of the EdgeSink interface
+   */
+  virtual void put (const db::Edge & /*e*/, int /*tag*/) { }
 
 private:
   db::Coord m_y;

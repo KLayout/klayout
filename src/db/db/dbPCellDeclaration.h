@@ -61,6 +61,7 @@ public:
     t_layer,    //  a layer (value is a db::LayerProperties object)
     t_shape,    //  a shape (a db::Point, db::Box, db::Polygon, db::Edge or db::Path) rendering a guiding shape
     t_list,     //  a list of strings
+    t_callback, //  callback only (button)
     t_none      //  no specific type 
   };
 
@@ -324,6 +325,193 @@ public:
 };
 
 /**
+ *  @brief Represents the dynamic state of a single parameter
+ */
+class DB_PUBLIC ParameterState
+{
+public:
+  /**
+   *  @brief A enum describing the icon type
+   */
+  enum Icon {
+    NoIcon = 0,
+    InfoIcon = 1,
+    ErrorIcon = 2,
+    WarningIcon = 3
+  };
+
+  /**
+   *  @brief Parameterized constructor
+   */
+  ParameterState ()
+    : m_value (), m_visible (true), m_enabled (true), m_readonly (false), m_icon (NoIcon)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Gets the value
+   */
+  const tl::Variant &value () const
+  {
+    return m_value;
+  }
+
+  /**
+   *  @brief Sets the value
+   */
+  void set_value (const tl::Variant &v)
+  {
+    m_value = v;
+  }
+
+  /**
+   *  @brief Gets the visibility state
+   */
+  bool is_visible () const
+  {
+    return m_visible;
+  }
+
+  /**
+   *  @brief Sets the visibility
+   */
+  void set_visible (bool v)
+  {
+    m_visible = v;
+  }
+
+  /**
+   *  @brief Gets the enabled state
+   */
+  bool is_enabled () const
+  {
+    return m_enabled;
+  }
+
+  /**
+   *  @brief Sets the enabled state
+   */
+  void set_enabled (bool v)
+  {
+    m_enabled = v;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the parameter is read-only
+   */
+  bool is_readonly () const
+  {
+    return m_readonly;
+  }
+
+  /**
+   *  @brief Sets a value indicating whether the parameter is read-only
+   */
+  void set_readonly (bool f)
+  {
+    m_readonly = f;
+  }
+
+  /**
+   *  @brief Gets the tooltip for the parameter
+   */
+  const std::string &tooltip () const
+  {
+    return m_tooltip;
+  }
+
+  /**
+   *  @brief Sets the tooltip
+   */
+  void set_tooltip (const std::string &s)
+  {
+    m_tooltip = s;
+  }
+
+  /**
+   *  @brief Gets the icon
+   */
+  Icon icon () const
+  {
+    return m_icon;
+  }
+
+  /**
+   *  @brief Sets the icon
+   */
+  void set_icon (Icon i)
+  {
+    m_icon = i;
+  }
+
+private:
+  tl::Variant m_value;
+  bool m_visible, m_enabled, m_readonly;
+  std::string m_tooltip;
+  Icon m_icon;
+};
+
+/**
+ *  @brief Represents the state of call parameters for the callback implementation
+ */
+class DB_PUBLIC ParameterStates
+{
+public:
+  /**
+   *  @brief Default constructor
+   */
+  ParameterStates ();
+
+  /**
+   *  @brief Copy constructor
+   */
+  ParameterStates (const ParameterStates &other);
+
+  /**
+   *  @brief Move constructor
+   */
+  ParameterStates (ParameterStates &&other);
+
+  /**
+   *  @brief Assignment
+   */
+  ParameterStates &operator= (const ParameterStates &other);
+
+  /**
+   *  @brief Sets a parameter from a given state
+   */
+  void set_parameter (const std::string &name, const ParameterState &ps);
+
+  /**
+   *  @brief Gets the parameter state for the parameter with the given name
+   *
+   *  If the name is not a valid parameter name, the behavior is undefined.
+   */
+  ParameterState &parameter (const std::string &name);
+
+  /**
+   *  @brief Gets the parameter state for the parameter with the given name
+   *
+   *  If the name is not a valid parameter name, the behavior is undefined.
+   */
+  const ParameterState &parameter (const std::string &name) const;
+
+  /**
+   *  @brief Gets a value indicating whether a parameter with that name is present
+   */
+  bool has_parameter (const std::string &name) const;
+
+  /**
+   *  @brief Returns true, if the values of the parameter states are equal
+   */
+  bool values_are_equal (const db::ParameterStates &other) const;
+
+public:
+  std::map<std::string, ParameterState> m_states;
+};
+
+/**
  *  @brief A declaration for a PCell
  */
 class DB_PUBLIC PCellDeclaration
@@ -374,7 +562,25 @@ public:
   }
 
   /**
-   *  @brief Produce a layout for the given parameter set and using the given layers.
+   *  @brief Callback on parameter change
+   *
+   *  This method allows implementing dynamic behavior on the change of a parameter value.
+   *  A ParameterStatus object is supplied that allows changing parameter enabled status, visibility and value.
+   *  The callback also acts as receiver for t_callback type parameters which only present a button.
+   *
+   *  The callback function receives the name of the parameter that was changed.
+   *  On some occasions, the callback is called unspecifically, for example for the initialization.
+   *  In that case, the parameter name is empty.
+   *
+   *  Exceptions from this implementation are ignored.
+   */
+  virtual void callback (const db::Layout & /*layout*/, const std::string & /*name*/, ParameterStates & /*states*/) const
+  {
+    //  the default implementation does nothing
+  }
+
+  /**
+   *  @brief Produces a layout for the given parameter set and using the given layers.
    *
    *  A reimplementation of that method should produce the desired layout for the given parameter set.
    *  The layout shall be put into the given cell. This code may create cell instances to other cells 

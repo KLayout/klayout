@@ -34,20 +34,35 @@
 
   <p>
   Before nets can be extracted, a layer stack must be specified. Press "Layer Stack" on the user interface to open the 
-  layer stack dialog. Layers must be specified in the "layer/datatype" notation. The 
+  layer stack dialog or use "Edit Layer Stack" in the "Tools" menu. Layers must be specified in the "layer/datatype" notation. The 
   via specification is optional. If no via layer is specified, both metal layer shapes are required to touch in order to form a 
   connection. If a via layer is specified, a via shape must be present to form the connection.
   </p>
 
   <p>
-  KLayout allows specification of symbolic layers and to use boolean expressions. That way it is possible to 
+  The layer stack (also referred to as "Connectivity") is also a technology component. This means
+  if you select a technology for layout, the technology specific stack is selected. To edit the stack
+  for all technologies, use the Technology Manager ("Tools/Manage Technologies") and use the 
+  "Connectivity" section from the technologies.
+  </p>
+
+  <p>
+  A connectivity definition can specify multiple stacks, out of which one has to be selected.
+  This is useful, if your technology setup features multiple routing metal schemes for example.
+  You do not need to setup different technologies for each scheme. If you have declared multiple
+  stacks, you can choose one in the "Trace Net" dialog in the drop-down button right of the 
+  "Layer Stack" and the "Configuration" button at the bottom left.
+  </p>
+
+  <p>
+  Within the stack definition, KLayout allows specification of symbolic layers and to use boolean expressions. That way it is possible to 
   assign meaningful names to layers (i.e. "POLY" or "VIA1") and to use derived layers (i.e. "ACTIVE-POLY" for
   the source and drain regions of a CMOS transistor). Read more about these features in <link href="/about/connectivity.xml"/>
   and <link href="/about/symbolic_layers.xml"/>.
   </p>
 
   <p>
-  If a layer stack has been defined, a net can be traced by pressing the "Trace Net" button and clicking on a point in the
+  Once a layer stack has been defined and selected, a net can be traced by pressing the "Trace Net" button and clicking on a point in the
   layout. Starting from shapes found under this point, the net is extracted and listed in the net list on the left side of the 
   net tracing dialog. If "Lock" is checked, another net can be traced by clicking at another point without having to press
   the "Trace Net" button again.

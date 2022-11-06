@@ -36,14 +36,15 @@ namespace lay
 {
 
 SaltGrainDetailsTextWidget::SaltGrainDetailsTextWidget (QWidget *w)
-  : QTextBrowser (w), mp_grain ()
+  : QTextBrowser (w), mp_grain (), m_detailed_view (false)
 {
   setOpenLinks (false);
   setOpenExternalLinks (false);
   connect (this, SIGNAL (anchorClicked (const QUrl &)), this, SLOT (open_link (const QUrl &)));
 }
 
-void SaltGrainDetailsTextWidget::set_grain (const SaltGrain *g)
+void
+SaltGrainDetailsTextWidget::set_grain (const SaltGrain *g)
 {
   if (g) {
     mp_grain.reset (new SaltGrain (*g));
@@ -51,6 +52,15 @@ void SaltGrainDetailsTextWidget::set_grain (const SaltGrain *g)
     mp_grain.reset (0);
   }
   setHtml (details_text ());
+}
+
+void
+SaltGrainDetailsTextWidget::show_detailed_view (bool f)
+{
+  if (m_detailed_view != f) {
+    m_detailed_view = f;
+    setHtml (details_text ());
+  }
 }
 
 void
@@ -276,32 +286,36 @@ SaltGrainDetailsTextWidget::details_text ()
     stream << "<h3>" << QObject::tr ("Screenshot") << "</h3><p><img src=\":/screenshot\"/></p>";
   }
 
-  stream << "<br/>";
-  stream << "<h3>" << QObject::tr ("Installation") << "</h3>";
+  if (m_detailed_view) {
 
-  if (! g->url ().empty ()) {
-    stream << "<p><b>" << QObject::tr ("Download URL: ") << "</b>" << tl::to_qstring (tl::escaped_to_html (g->url ())) << "</p>";
-  }
-  if (! g->path ().empty () && ! g->installed_time ().isNull ()) {
-    stream << "<p><b>" << QObject::tr ("Installed: ") << "</b>" << g->installed_time ().toString () << "</p>";
-  }
-  if (! g->dependencies ().empty ()) {
-    stream << "<p><b>" << QObject::tr ("Depends on: ") << "</b><br/>";
-    for (std::vector<lay::SaltGrainDependency>::const_iterator d = g->dependencies ().begin (); d != g->dependencies ().end (); ++d) {
-      stream << "&nbsp;&nbsp;&nbsp;&nbsp;" << tl::to_qstring (tl::escaped_to_html (d->name)) << " ";
-      stream << tl::to_qstring (tl::escaped_to_html (d->version));
-      if (! d->url.empty ()) {
-        stream << " - ";
-        stream << "[" << tl::to_qstring (tl::escaped_to_html (d->url)) << "]<br/>";
-      }
+    stream << "<br/>";
+    stream << "<h3>" << QObject::tr ("Installation") << "</h3>";
+
+    if (! g->url ().empty ()) {
+      stream << "<p><b>" << QObject::tr ("Download URL: ") << "</b>" << tl::to_qstring (tl::escaped_to_html (g->url ())) << "</p>";
     }
-    stream << "</p>";
-  }
+    if (! g->path ().empty () && ! g->installed_time ().isNull ()) {
+      stream << "<p><b>" << QObject::tr ("Installed: ") << "</b>" << g->installed_time ().toString () << "</p>";
+    }
+    if (! g->dependencies ().empty ()) {
+      stream << "<p><b>" << QObject::tr ("Depends on: ") << "</b><br/>";
+      for (std::vector<lay::SaltGrainDependency>::const_iterator d = g->dependencies ().begin (); d != g->dependencies ().end (); ++d) {
+        stream << "&nbsp;&nbsp;&nbsp;&nbsp;" << tl::to_qstring (tl::escaped_to_html (d->name)) << " ";
+        stream << tl::to_qstring (tl::escaped_to_html (d->version));
+        if (! d->url.empty ()) {
+          stream << " - ";
+          stream << "[" << tl::to_qstring (tl::escaped_to_html (d->url)) << "]<br/>";
+        }
+      }
+      stream << "</p>";
+    }
 
-  if (! g->path ().empty ()) {
-    stream << "<p><b>" << QObject::tr ("Installed files: ") << "</b></p><p>";
-    produce_listing (stream, QDir (tl::to_qstring (g->path ())), 0);
-    stream << "</p>";
+    if (! g->path ().empty ()) {
+      stream << "<p><b>" << QObject::tr ("Installed files: ") << "</b></p><p>";
+      produce_listing (stream, QDir (tl::to_qstring (g->path ())), 0);
+      stream << "</p>";
+    }
+
   }
 
   stream << "</td></tr></table>";

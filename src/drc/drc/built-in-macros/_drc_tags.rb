@@ -256,6 +256,10 @@ module DRC
           else
             raise("Argument ##{ai+1} not understood for FillCell#shape")
           end
+        elsif a.is_a?(RBA::LayerInfo)
+          layer = a.layer
+          datatype = a.datatype
+          name = a.name
         elsif a.is_a?(String)
           if !name
             name = a

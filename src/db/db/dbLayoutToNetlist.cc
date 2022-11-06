@@ -1409,19 +1409,15 @@ get_merged_shapes_of_net (const db::hier_clusters<db::NetShape> &clusters, db::c
 
   size_t p = 0;
   for (db::recursive_cluster_shape_iterator<db::NetShape> rci (clusters, layer_id, ci, cid); !rci.at_end (); ++rci) {
-    if (p == 0) {
-      db::PolygonRef pr = (rci.trans () * rci->polygon_ref ());
-      db::PolygonRef::polygon_edge_iterator e = pr.begin_edge ();
-      if (! e.at_end ()) {
-        //  pick one reference point for the label
-        if (! any_ref || (*e).p1 () < ref) {
-          ref = (*e).p1 ();
-          any_ref = true;
-        }
-        ep.insert (pr, ++p);
+    db::PolygonRef pr = (rci.trans () * rci->polygon_ref ());
+    db::PolygonRef::polygon_edge_iterator e = pr.begin_edge ();
+    if (! e.at_end ()) {
+      //  pick one reference point for the label
+      if (! any_ref || (*e).p1 () < ref) {
+        ref = (*e).p1 ();
+        any_ref = true;
       }
-    } else {
-      ep.insert (rci.trans () * rci->polygon_ref (), ++p);
+      ep.insert (pr, ++p);
     }
   }
 

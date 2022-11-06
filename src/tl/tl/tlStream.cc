@@ -212,9 +212,9 @@ InputStream::InputStream (const std::string &abstract_path)
 
     QByteArray data;
 #if QT_VERSION >= 0x60000
-      if (res.compressionAlgorithm () == QResource::ZlibCompression) {
+    if (res.compressionAlgorithm () == QResource::ZlibCompression) {
 #else
-      if (res.isCompressed ()) {
+    if (res.isCompressed ()) {
 #endif
       data = qUncompress ((const unsigned char *)res.data (), (int)res.size ());
     } else {

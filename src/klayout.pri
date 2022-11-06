@@ -130,6 +130,11 @@ equals(HAVE_CRONOLOGY, "1") {
   INCLUDEPATH += $$CRONOLOGY_INCLUDE
 }
 
+!lessThan(QT_MAJOR_VERSION, 6) {
+  # internal resource readers to not support zstd so far
+  QMAKE_RESOURCE_FLAGS += --compress-algo zlib
+}
+
 msvc {
 
   QMAKE_CXXFLAGS += \

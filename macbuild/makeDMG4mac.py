@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #=============================================================================================
@@ -11,7 +11,6 @@
 #   1) https://el-tramo.be/guides/fancy-dmg/
 #   2) https://github.com/andreyvit/create-dmg.git
 #=============================================================================================
-from __future__ import print_function  # to use print() of Python 3 in Python >= 2.7
 from time import sleep
 import sys
 import os
@@ -77,7 +76,7 @@ def SetGlobals():
     Usage  = "\n"
     Usage += "---------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'makeDMG4mac.py' >>\n"
-    Usage += "       for making a DMG file of KLayout 0.27.10 or later on different Apple macOS / Mac OSX platforms.\n"
+    Usage += "       for making a DMG file of KLayout 0.27.11 or later on different Apple macOS / Mac OSX platforms.\n"
     Usage += "\n"
     Usage += "$ [python] ./makeDMG4mac.py\n"
     Usage += "   option & argument    : descriptions                                               | default value\n"
@@ -137,7 +136,7 @@ def SetGlobals():
         sys.exit(1)
 
     if not Machine == "x86_64":
-        if Machine == "arm64" and (Platform == "Monterey" or Platform == "BigSur"): # with an Apple Silicon Chip
+        if Machine == "arm64" and Platform in ["Monterey", "BigSur"]: # with an Apple Silicon Chip
             print("")
             print( "### Your Mac equips an Apple Silicon Chip ###" )
             print("")
@@ -159,7 +158,7 @@ def SetGlobals():
     RubyPythonID      = ""
     KLVersion         = GetKLayoutVersionFrom( "./version.sh" )
     OccupiedDS        = -1
-    BackgroundPNG     = "KLayoutDMG-Back.png"
+    BackgroundPNG     = None
     VolumeIcons       = "KLayoutHDD.icns"
     AppleScriptDMG    = "macbuild/Resources/KLayoutDMG.applescript"
     WorkDMG           = "work-KLayout.dmg"
@@ -200,8 +199,12 @@ def SetGlobals():
 #     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb31Phb38
 #     * LW-qt5MP.pkg.macos-Catalina-release-Rmp31Pmp38
 #
+#     * ST-qt6MP.pkg.macos-Catalina-release-RsysPsys
+#     * LW-qt6Brew.pkg.macos-Catalina-release-Rhb31Phb38
+#     * LW-qt6MP.pkg.macos-Catalina-release-Rmp31Pmp38
+#
 # Generated DMG will be, for example,
-#     (1) ---> ST-klayout-0.26.1-macOS-Catalina-1-qt5MP-RsysPsys.dmg
+#     (1) ---> ST-klayout-0.27.11-macOS-Catalina-1-qt5MP-RsysPsys.dmg
 #
 # @return on success, positive integer in [MB] that tells approx. occupied disc space;
 #         on failure, -1
@@ -217,6 +220,7 @@ def CheckPkgDirectory():
     global PackagePrefix
     global QtIdentification
     global RubyPythonID
+    global BackgroundPNG
     global LatestOSMacPorts
     global LatestOSHomebrew
     global LatestOSAnaconda3
@@ -238,14 +242,17 @@ def CheckPkgDirectory():
 
     #-----------------------------------------------------------------------------
     # [2] Identify (Qt, Ruby, Python) from PkgDir
-    #
     #     * ST-qt5MP.pkg.macos-Catalina-release-RsysPsys
     #     * LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
     #     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb31Phb38
     #     * HW-qt5Brew.pkg.macos-Catalina-release-RsysPhb38
     #     * EX-qt5MP.pkg.macos-Catalina-release-Rmp31Pmp38
+    #
+    #     * ST-qt6MP.pkg.macos-Catalina-release-RsysPsys
+    #     * LW-qt6MP.pkg.macos-Catalina-release-Rmp31Pmp38
+    #     * LW-qt6Brew.pkg.macos-Catalina-release-Rhb31Phb38
     #-----------------------------------------------------------------------------
-    patQRP = u'(ST|LW|HW|EX)([-])(qt5[0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-]release[-])([0-9A-Za-z]+)'
+    patQRP = u'(ST|LW|HW|EX)([-])([qt5|qt6][0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-]release[-])([0-9A-Za-z]+)'
     regQRP = re.compile(patQRP)
     if not regQRP.match(PkgDir):
         print( "! Cannot identify (Qt, Ruby, Python) from the package directory name" )
@@ -259,24 +266,31 @@ def CheckPkgDirectory():
         PackagePrefix    = pkgdirComponents[0]
         QtIdentification = pkgdirComponents[2]
         RubyPythonID     = pkgdirComponents[5]
+        if QtIdentification.find('qt5') == 0:
+            BackgroundPNG = "KLayoutDMG-BackQt5.png"
+        elif QtIdentification.find('qt6') == 0:
+            BackgroundPNG = "KLayoutDMG-BackQt6.png"
+        else:
+            BackgroundPNG = None
+            raise Exception( "! neither qt5 nor qt6" )
 
         #-----------------------------------------------------------------------------
         # [3] Check if the "LatestOS" with MacPorts / Homebrew / Anaconda3
         #-----------------------------------------------------------------------------
         LatestOSMacPorts   = Platform == LatestOS
         LatestOSMacPorts  &= PackagePrefix == "LW"
-        LatestOSMacPorts  &= QtIdentification == "qt5MP"
-        LatestOSMacPorts  &= RubyPythonID == "Rmp31Pmp38"
+        LatestOSMacPorts  &= QtIdentification in ["qt5MP", "qt6MP"]
+        LatestOSMacPorts  &= RubyPythonID in ["Rmp31Pmp38"]
 
         LatestOSHomebrew   = Platform == LatestOS
         LatestOSHomebrew  &= PackagePrefix == "LW"
-        LatestOSHomebrew  &= QtIdentification == "qt5Brew"
-        LatestOSHomebrew  &= RubyPythonID == "Rhb31Phb38" or RubyPythonID == "Rhb31Phbauto"
+        LatestOSHomebrew  &= QtIdentification in ["qt5Brew", "qt6Brew"]
+        LatestOSHomebrew  &= RubyPythonID in ["Rhb31Phb38", "Rhb31Phb39", "Rhb31Phbauto"]
 
         LatestOSAnaconda3  = Platform == LatestOS
         LatestOSAnaconda3 &= PackagePrefix == "LW"
-        LatestOSAnaconda3 &= QtIdentification == "qt5Ana3"
-        LatestOSAnaconda3 &= RubyPythonID == "Rana3Pana3"
+        LatestOSAnaconda3 &= QtIdentification in ["qt5Ana3"]
+        LatestOSAnaconda3 &= RubyPythonID in ["Rana3Pana3"]
 
         if LatestOSMacPorts:
             mydic  = DicLightWeight["ports"]

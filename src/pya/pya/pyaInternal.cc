@@ -867,7 +867,7 @@ PythonClassClientData::py_type (const gsi::ClassBase &cls_decl, bool as_static)
 }
 
 void
-PythonClassClientData::initialize (const gsi::ClassBase &cls_decl, PyTypeObject *py_type, bool as_static)
+PythonClassClientData::initialize (const gsi::ClassBase &cls_decl, PyTypeObject *py_type, bool as_static, PythonModule *module)
 {
   PythonClassClientData *cd = dynamic_cast<PythonClassClientData *>(cls_decl.data (gsi::ClientIndex::Python));
   if (cd) {
@@ -877,7 +877,7 @@ PythonClassClientData::initialize (const gsi::ClassBase &cls_decl, PyTypeObject 
       cd->py_type_object = (PyObject *) py_type;
     }
   } else {
-    cls_decl.set_data (gsi::ClientIndex::Python, new PythonClassClientData (&cls_decl, as_static ? NULL : py_type, as_static ? py_type : NULL));
+    cls_decl.set_data (gsi::ClientIndex::Python, new PythonClassClientData (&cls_decl, as_static ? NULL : py_type, as_static ? py_type : NULL, module));
   }
 }
 

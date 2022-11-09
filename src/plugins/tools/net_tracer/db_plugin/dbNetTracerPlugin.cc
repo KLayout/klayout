@@ -88,30 +88,27 @@ template <class Value>
 struct FallbackXMLWriteAdaptor
 {
   FallbackXMLWriteAdaptor (void (db::NetTracerConnectivity::*member) (const Value &), void (db::NetTracerConnectivity::*clear) ())
-    : mp_member (member), mp_clear (clear), mp_stack (0)
+    : mp_member (member), mp_clear (clear)
   {
     // .. nothing yet ..
   }
 
   void operator () (db::NetTracerTechnologyComponent &owner, tl::XMLReaderState &reader) const
   {
-    if (! mp_stack) {
-      mp_stack = const_cast<db::NetTracerConnectivity *> (get_default (owner));
-      if (! mp_stack) {
-        owner.push_back (db::NetTracerConnectivity ());
-        mp_stack = (owner.end () - 1).operator-> ();
-      }
-      (mp_stack->*mp_clear) ();
+    db::NetTracerConnectivity *stack = const_cast<db::NetTracerConnectivity *> (get_default (owner));
+    if (! stack) {
+      owner.push_back (db::NetTracerConnectivity ());
+      stack = (owner.end () - 1).operator-> ();
     }
+    (stack->*mp_clear) ();
 
     tl::XMLObjTag<Value> tag;
-    (mp_stack->*mp_member) (*reader.back (tag));
+    (stack->*mp_member) (*reader.back (tag));
   }
 
 private:
   void (db::NetTracerConnectivity::*mp_member) (const Value &);
   void (db::NetTracerConnectivity::*mp_clear) ();
-  mutable db::NetTracerConnectivity *mp_stack;
 };
 
 template <class Value, class Iter>

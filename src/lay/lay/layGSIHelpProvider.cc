@@ -149,6 +149,8 @@ full_name (const gsi::MethodBase::MethodSynonym &syn)
     return syn.name + "?";
   } else if (syn.is_setter) {
     return syn.name + "=";
+  } else if (syn.name == "*!") {
+    return "*";
   } else {
     return syn.name;
   }
@@ -1411,7 +1413,7 @@ GSIHelpProvider::produce_class_doc (const std::string &cls) const
     if (! pydoc.empty ()) {
       os << "<p><b>";
       os << tl::to_string (QObject::tr ("Python specific notes: "));
-      os << "</b><br/>" << escape_xml (pydoc) << "</p>" << std::endl;
+      os << "</b><br/>" << tl::replaced (escape_xml (pydoc), "\n\n", "<br/>") << "</p>" << std::endl;
     }
 
     os << "</td></tr>";

@@ -45,7 +45,6 @@ namespace gsi
 namespace pya
 {
 
-class PYAObjectBase;
 class Callee;
 class StatusChangedListener;
 

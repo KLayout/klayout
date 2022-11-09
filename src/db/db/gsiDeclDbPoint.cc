@@ -33,7 +33,7 @@ namespace gsi
 //  point binding
 
 template <class C>
-struct point_defs 
+struct point_defs
 {
   typedef typename C::coord_type coord_type;
 
@@ -140,6 +140,14 @@ struct point_defs
       "Subtract point p from self by subtracting the coordinates. This renders a vector.\n"
       "\n"
       "Starting with version 0.25, this method renders a vector."
+    ) +
+    method ("-", (C (C::*) (const db::vector<coord_type> &) const) &C::subtract, gsi::arg ("v"),
+      "@brief Subtract one vector from a point\n"
+      "\n"
+      "\n"
+      "Subtract vector v from from self by subtracting the coordinates. This renders a point.\n"
+      "\n"
+      "This method has been added in version 0.27."
     ) +
     method ("<", &C::less, gsi::arg ("p"),
       "@brief \"less\" comparison operator\n"

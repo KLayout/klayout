@@ -1,5 +1,11 @@
 #!/bin/bash -e
 
+# Generates LVS and DRC documentation
+#
+# Run this script from a valid build below the repository root, e.g.
+# <repo-root>/build-debug. It needs to have a "klayout" binary in 
+# current directory.
+
 inst=$(realpath $(dirname $0))
 scripts=${inst}/drc_lvs_doc
 ld=$(realpath .)

@@ -1,6 +1,7 @@
 
 TARGET = tlcore
 REALMODULE = tl
+PYI = tlcore.pyi
 
 include($$PWD/../pymod.pri)
 

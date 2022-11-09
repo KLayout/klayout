@@ -1,6 +1,7 @@
 
 TARGET = rdbcore
 REALMODULE = rdb
+PYI = rdbcore.pyi
 
 include($$PWD/../pymod.pri)
 

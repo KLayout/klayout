@@ -45,14 +45,14 @@ long python2c_func<long>::operator() (PyObject *rval)
 #if PY_MAJOR_VERSION < 3
   if (PyInt_Check (rval)) {
     return PyInt_AsLong (rval);
-  } else 
+  } else
 #endif
   if (PyLong_Check (rval)) {
     return PyLong_AsLong (rval);
   } else if (PyFloat_Check (rval)) {
     return (long) (PyFloat_AsDouble (rval));
   } else {
-    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to an integer")));
+    throw tl::TypeError (tl::to_string (tr ("Value cannot be converted to an integer")));
   }
 }
 
@@ -68,14 +68,14 @@ char python2c_func<char>::operator() (PyObject *rval)
 #if PY_MAJOR_VERSION < 3
   if (PyInt_Check (rval)) {
     return char (PyInt_AsLong (rval));
-  } else 
+  } else
 #endif
   if (PyLong_Check (rval)) {
     return char (PyLong_AsLong (rval));
   } else if (PyFloat_Check (rval)) {
     return char (PyFloat_AsDouble (rval));
   } else {
-    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to a character")));
+    throw tl::TypeError (tl::to_string (tr ("Value cannot be converted to a character")));
   }
 }
 
@@ -85,14 +85,14 @@ unsigned long python2c_func<unsigned long>::operator() (PyObject *rval)
 #if PY_MAJOR_VERSION < 3
   if (PyInt_Check (rval)) {
     return PyInt_AsUnsignedLongMask (rval);
-  } else 
+  } else
 #endif
   if (PyLong_Check (rval)) {
     return PyLong_AsUnsignedLongMask (rval);
   } else if (PyFloat_Check (rval)) {
     return (unsigned long) (PyFloat_AsDouble (rval));
   } else {
-    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to an integer")));
+    throw tl::TypeError (tl::to_string (tr ("Value cannot be converted to an integer")));
   }
 }
 
@@ -102,14 +102,14 @@ long long python2c_func<long long>::operator() (PyObject *rval)
 #if PY_MAJOR_VERSION < 3
   if (PyInt_Check (rval)) {
     return PyInt_AsLong (rval);
-  } else 
+  } else
 #endif
   if (PyLong_Check (rval)) {
     return PyLong_AsLongLong (rval);
   } else if (PyFloat_Check (rval)) {
     return (long long) (PyFloat_AsDouble (rval));
   } else {
-    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to an integer")));
+    throw tl::TypeError (tl::to_string (tr ("Value cannot be converted to an integer")));
   }
 }
 
@@ -119,14 +119,14 @@ unsigned long long python2c_func<unsigned long long>::operator() (PyObject *rval
 #if PY_MAJOR_VERSION < 3
   if (PyInt_Check (rval)) {
     return PyInt_AsUnsignedLongMask (rval);
-  } else 
+  } else
 #endif
   if (PyLong_Check (rval)) {
     return PyLong_AsUnsignedLongLongMask (rval);
   } else if (PyFloat_Check (rval)) {
     return (unsigned long long) (PyFloat_AsDouble (rval));
   } else {
-    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to an integer")));
+    throw tl::TypeError (tl::to_string (tr ("Value cannot be converted to an integer")));
   }
 }
 
@@ -138,14 +138,14 @@ __int128 python2c_func<__int128>::operator() (PyObject *rval)
 #if PY_MAJOR_VERSION < 3
   if (PyInt_Check (rval)) {
     return PyInt_AsLong (rval);
-  } else 
+  } else
 #endif
   if (PyLong_Check (rval)) {
     return PyLong_AsLongLong (rval);
   } else if (PyFloat_Check (rval)) {
     return PyFloat_AsDouble (rval);
   } else {
-    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to an integer")));
+    throw tl::TypeError (tl::to_string (tr ("Value cannot be converted to an integer")));
   }
 }
 #endif
@@ -156,14 +156,14 @@ double python2c_func<double>::operator() (PyObject *rval)
 #if PY_MAJOR_VERSION < 3
   if (PyInt_Check (rval)) {
     return PyInt_AsLong (rval);
-  } else 
+  } else
 #endif
   if (PyLong_Check (rval)) {
     return PyLong_AsLongLong (rval);
   } else if (PyFloat_Check (rval)) {
     return PyFloat_AsDouble (rval);
   } else {
-    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to a floating-point value")));
+    throw tl::TypeError (tl::to_string (tr ("Value cannot be converted to a floating-point value")));
   }
 }
 
@@ -173,11 +173,11 @@ std::string python2c_func<std::string>::operator() (PyObject *rval)
 #if PY_MAJOR_VERSION < 3
   if (PyString_Check (rval)) {
     return std::string (PyString_AsString (rval), PyString_Size (rval));
-  } else 
+  } else
 #else
   if (PyBytes_Check (rval)) {
     return std::string (PyBytes_AsString (rval), PyBytes_Size (rval));
-  } else 
+  } else
 #endif
   if (PyUnicode_Check (rval)) {
     PythonRef ba (PyUnicode_AsUTF8String (rval));
@@ -188,7 +188,7 @@ std::string python2c_func<std::string>::operator() (PyObject *rval)
   } else if (PyByteArray_Check (rval)) {
     return std::string (PyByteArray_AsString (rval), PyByteArray_Size (rval));
   } else {
-    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to a string")));
+    throw tl::TypeError (tl::to_string (tr ("Value cannot be converted to a string")));
   }
 }
 
@@ -224,7 +224,7 @@ std::vector<char> python2c_func<std::vector<char> >::operator() (PyObject *rval)
     Py_ssize_t sz = PyByteArray_Size (rval);
     return std::vector<char> (cp, cp + sz);
   } else {
-    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to a byte array")));
+    throw tl::TypeError (tl::to_string (tr ("Value cannot be converted to a byte array")));
   }
 }
 
@@ -235,11 +235,11 @@ QByteArray python2c_func<QByteArray>::operator() (PyObject *rval)
 #if PY_MAJOR_VERSION < 3
   if (PyString_Check (rval)) {
     return QByteArray (PyString_AsString (rval), PyString_Size (rval));
-  } else 
+  } else
 #else
   if (PyBytes_Check (rval)) {
     return QByteArray (PyBytes_AsString (rval), PyBytes_Size (rval));
-  } else 
+  } else
 #endif
   if (PyUnicode_Check (rval)) {
     PythonRef ba (PyUnicode_AsUTF8String (rval));
@@ -250,7 +250,7 @@ QByteArray python2c_func<QByteArray>::operator() (PyObject *rval)
   } else if (PyByteArray_Check (rval)) {
     return QByteArray (PyByteArray_AsString (rval), PyByteArray_Size (rval));
   } else {
-    throw tl::Exception (tl::to_string (tr ("Value cannot be converted to a byte array")));
+    throw tl::TypeError (tl::to_string (tr ("Value cannot be converted to a byte array")));
   }
 }
 
@@ -325,13 +325,13 @@ tl::Variant python2c_func<tl::Variant>::operator() (PyObject *rval)
     return r;
 
   } else {
-    
+
     const gsi::ClassBase *cls = PythonModule::cls_for_type (Py_TYPE (rval));
     if (cls) {
 
       PYAObjectBase *p = PYAObjectBase::from_pyobject (rval);
 
-      //  employ the tl::Variant binding capabilities of the Expression binding to derive the 
+      //  employ the tl::Variant binding capabilities of the Expression binding to derive the
       //  variant value.
 
       void *obj = p->obj ();
@@ -519,7 +519,7 @@ PyObject *c2python_func<const tl::Variant &>::operator() (const tl::Variant &c)
       PyDict_SetItem (ret, c2python (i->first), c2python (i->second));
     }
     return ret;
-    
+
   } else if (c.is_list ()) {
 
     PyObject *ret = PyList_New (c.get_list ().size ());
@@ -619,4 +619,3 @@ PyObject *c2python_func<const QString &>::operator() (const QString &qs)
 #endif
 
 }
-

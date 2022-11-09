@@ -304,7 +304,7 @@ struct trans_defs
       "\n"
       "This convenience method has been introduced in version 0.25."
     ) +
-    method ("*", &C::concat, arg ("t"),
+    method ("*!", &C::concat, arg ("t"),
       "@brief Returns the concatenated transformation\n"
       "\n"
       "The * operator returns self*t (\"t is applied before this transformation\").\n"
@@ -829,7 +829,7 @@ struct cplx_trans_defs
       "\n"
       "This convenience method has been introduced in version 0.25."
     ) +
-    method ("*", (C (C::*) (const C &c) const) &C::concat_same, arg ("t"),
+    method ("*!", (C (C::*) (const C &c) const) &C::concat_same, arg ("t"),
       "@brief Returns the concatenated transformation\n"
       "\n"
       "The * operator returns self*t (\"t is applied before this transformation\").\n"
@@ -1047,7 +1047,7 @@ Class<db::DCplxTrans> decl_DCplxTrans ("db", "DCplxTrans",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method ("*", (db::CplxTrans (db::DCplxTrans::*) (const db::CplxTrans &) const) &db::DCplxTrans::concat, gsi::arg ("t"),
+  method ("*!", (db::CplxTrans (db::DCplxTrans::*) (const db::CplxTrans &) const) &db::DCplxTrans::concat, gsi::arg ("t"),
     "@brief Multiplication (concatenation) of transformations\n"
     "\n"
     "The * operator returns self*t (\"t is applied before this transformation\").\n"
@@ -1126,7 +1126,7 @@ Class<db::CplxTrans> decl_CplxTrans ("db", "CplxTrans",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method ("*", (db::DCplxTrans (db::CplxTrans::*) (const db::VCplxTrans &) const) &db::CplxTrans::concat, gsi::arg ("t"),
+  method ("*!", (db::DCplxTrans (db::CplxTrans::*) (const db::VCplxTrans &) const) &db::CplxTrans::concat, gsi::arg ("t"),
     "@brief Multiplication (concatenation) of transformations\n"
     "\n"
     "The * operator returns self*t (\"t is applied before this transformation\").\n"
@@ -1134,7 +1134,7 @@ Class<db::CplxTrans> decl_CplxTrans ("db", "CplxTrans",
     "@param t The transformation to apply before\n"
     "@return The modified transformation\n"
   ) +
-  method ("*", (db::CplxTrans (db::CplxTrans::*) (const db::ICplxTrans &) const) &db::CplxTrans::concat, gsi::arg ("t"),
+  method ("*!", (db::CplxTrans (db::CplxTrans::*) (const db::ICplxTrans &) const) &db::CplxTrans::concat, gsi::arg ("t"),
     "@brief Multiplication (concatenation) of transformations\n"
     "\n"
     "The * operator returns self*t (\"t is applied before this transformation\").\n"
@@ -1216,7 +1216,7 @@ Class<db::ICplxTrans> decl_ICplxTrans ("db", "ICplxTrans",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method ("*", (db::VCplxTrans (db::ICplxTrans::*) (const db::VCplxTrans &) const) &db::ICplxTrans::concat, gsi::arg ("t"),
+  method ("*!", (db::VCplxTrans (db::ICplxTrans::*) (const db::VCplxTrans &) const) &db::ICplxTrans::concat, gsi::arg ("t"),
     "@brief Multiplication (concatenation) of transformations\n"
     "\n"
     "The * operator returns self*t (\"t is applied before this transformation\").\n"
@@ -1288,7 +1288,7 @@ Class<db::VCplxTrans> decl_VCplxTrans ("db", "VCplxTrans",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  method ("*", (db::VCplxTrans (db::VCplxTrans::*) (const db::DCplxTrans &) const) &db::VCplxTrans::concat, gsi::arg ("t"),
+  method ("*!", (db::VCplxTrans (db::VCplxTrans::*) (const db::DCplxTrans &) const) &db::VCplxTrans::concat, gsi::arg ("t"),
     "@brief Multiplication (concatenation) of transformations\n"
     "\n"
     "The * operator returns self*t (\"t is applied before this transformation\").\n"
@@ -1296,7 +1296,7 @@ Class<db::VCplxTrans> decl_VCplxTrans ("db", "VCplxTrans",
     "@param t The transformation to apply before\n"
     "@return The modified transformation\n"
   ) +
-  method ("*", (db::ICplxTrans (db::VCplxTrans::*) (const db::CplxTrans &) const) &db::VCplxTrans::concat, gsi::arg ("t"),
+  method ("*!", (db::ICplxTrans (db::VCplxTrans::*) (const db::CplxTrans &) const) &db::VCplxTrans::concat, gsi::arg ("t"),
     "@brief Multiplication (concatenation) of transformations\n"
     "\n"
     "The * operator returns self*t (\"t is applied before this transformation\").\n"

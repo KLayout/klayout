@@ -48,5 +48,3 @@ if __name__ == '__main__':
 
   if not unittest.TextTestRunner(verbosity = 1).run(suite).wasSuccessful():
     sys.exit(1)
-
-

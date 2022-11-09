@@ -199,6 +199,9 @@ private:
         for (gsi::MethodBase::synonym_iterator syn = (*m)->begin_synonyms (); syn != (*m)->end_synonyms (); ++syn) {
           if (syn->is_setter) {
             add_method (syn->name + "=", *m);
+          } else if (syn->name == "*!") {
+            //  non-commutative multiplication
+            add_method ("*", *m);
           } else {
             add_method (syn->name, *m);
           }

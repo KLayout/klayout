@@ -37,7 +37,7 @@ namespace gsi
 //  db::Library binding
 
 /**
- *  @brief A basic implementation of the library 
+ *  @brief A basic implementation of the library
  */
 static db::Library *new_lib ()
 {
@@ -173,15 +173,15 @@ LibraryClass decl_Library ("db", "Library",
     "\n"
     "This method has been introduced in version 0.25.\n"
   ) +
-  gsi::method ("name", &db::Library::get_name, 
+  gsi::method ("name", &db::Library::get_name,
     "@brief Returns the libraries' name\n"
     "The name is set when the library is registered and cannot be changed\n"
   ) +
-  gsi::method ("id", &db::Library::get_id, 
+  gsi::method ("id", &db::Library::get_id,
     "@brief Returns the library's ID\n"
     "The ID is set when the library is registered and cannot be changed \n"
   ) +
-  gsi::method ("description", &db::Library::get_description, 
+  gsi::method ("description", &db::Library::get_description,
     "@brief Returns the libraries' description text\n"
   ) +
   gsi::method ("description=", &db::Library::set_description, gsi::arg ("description"),
@@ -232,7 +232,7 @@ LibraryClass decl_Library ("db", "Library",
   gsi::method ("layout_const", (const db::Layout &(db::Library::*)() const) &db::Library::layout,
     "@brief The layout object where the cells reside that this library defines (const version)\n"
   ) +
-  gsi::method ("layout", (db::Layout &(db::Library::*)()) &db::Library::layout, 
+  gsi::method ("layout", (db::Layout &(db::Library::*)()) &db::Library::layout,
     "@brief The layout object where the cells reside that this library defines\n"
   ) +
   gsi::method ("refresh", &db::Library::refresh,
@@ -396,7 +396,7 @@ class PCellDeclarationImpl
   : public db::PCellDeclaration
 {
 public:
-  //  dummy implementation to provide the signature 
+  //  dummy implementation to provide the signature
   virtual std::vector<db::LayerProperties> get_layer_declarations_impl (const db::pcell_parameters_type &) const
   {
     return std::vector<db::LayerProperties> ();
@@ -433,7 +433,7 @@ public:
     }
   }
 
-  //  dummy implementation to provide the signature 
+  //  dummy implementation to provide the signature
   virtual db::pcell_parameters_type coerce_parameters_impl (const db::Layout & /*layout*/, const db::pcell_parameters_type &input) const
   {
     return input;
@@ -581,7 +581,7 @@ Class<PCellDeclarationImpl> decl_PCellDeclaration (decl_PCellDeclaration_Native,
     "This method receives the PCell parameters which allows it to deduce layers\n"
     "from the parameters."
   ) +
-  gsi::callback ("get_parameters", &PCellDeclarationImpl::get_parameter_declarations, &PCellDeclarationImpl::cb_get_parameter_declarations, 
+  gsi::callback ("get_parameters", &PCellDeclarationImpl::get_parameter_declarations, &PCellDeclarationImpl::cb_get_parameter_declarations,
     "@brief Returns a list of parameter declarations\n"
     "Reimplement this method to return a list of parameters used in that PCell \n"
     "implementation. A parameter declaration is a PCellParameterDeclaration object\n"
@@ -824,33 +824,33 @@ Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCel
     "@param default The default (initial) value\n"
     "@param unit The unit string\n"
   ) +
-  gsi::method ("name", &db::PCellParameterDeclaration::get_name, 
+  gsi::method ("name", &db::PCellParameterDeclaration::get_name,
     "@brief Gets the name\n"
   ) +
   gsi::method ("name=", &db::PCellParameterDeclaration::set_name, gsi::arg ("value"),
     "@brief Sets the name\n"
   ) +
-  gsi::method ("unit", &db::PCellParameterDeclaration::get_unit, 
+  gsi::method ("unit", &db::PCellParameterDeclaration::get_unit,
     "@brief Gets the unit string\n"
   ) +
   gsi::method ("unit=", &db::PCellParameterDeclaration::set_unit, gsi::arg ("unit"),
     "@brief Sets the unit string\n"
     "The unit string is shown right to the edit fields for numeric parameters.\n"
   ) +
-  gsi::method_ext ("type", &get_type, 
+  gsi::method_ext ("type", &get_type,
     "@brief Gets the type\n"
     "The type is one of the T... constants."
   ) +
   gsi::method_ext ("type=", &set_type, gsi::arg ("type"),
     "@brief Sets the type\n"
   ) +
-  gsi::method ("description", &db::PCellParameterDeclaration::get_description, 
+  gsi::method ("description", &db::PCellParameterDeclaration::get_description,
     "@brief Gets the description text\n"
   ) +
   gsi::method ("description=", &db::PCellParameterDeclaration::set_description, gsi::arg ("description"),
     "@brief Sets the description\n"
   ) +
-  gsi::method ("hidden?", &db::PCellParameterDeclaration::is_hidden, 
+  gsi::method ("hidden?", &db::PCellParameterDeclaration::is_hidden,
     "@brief Returns true, if the parameter is a hidden parameter that should not be shown in the user interface\n"
     "By making a parameter hidden, it is possible to create internal parameters which cannot be\n"
     "edited.\n"
@@ -858,7 +858,7 @@ Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCel
   gsi::method ("hidden=", &db::PCellParameterDeclaration::set_hidden, gsi::arg ("flag"),
     "@brief Makes the parameter hidden if this attribute is set to true\n"
   ) +
-  gsi::method ("readonly?", &db::PCellParameterDeclaration::is_readonly, 
+  gsi::method ("readonly?", &db::PCellParameterDeclaration::is_readonly,
     "@brief Returns true, if the parameter is a read-only parameter\n"
     "By making a parameter read-only, it is shown but cannot be\n"
     "edited.\n"
@@ -866,7 +866,7 @@ Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCel
   gsi::method ("readonly=", &db::PCellParameterDeclaration::set_readonly, gsi::arg ("flag"),
     "@brief Makes the parameter read-only if this attribute is set to true\n"
   ) +
-  gsi::method_ext ("clear_choices", &clear_choices, 
+  gsi::method_ext ("clear_choices", &clear_choices,
     "@brief Clears the list of choices\n"
   ) +
   gsi::method_ext ("add_choice", &add_choice, gsi::arg ("description"), gsi::arg ("value"),
@@ -875,13 +875,13 @@ Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCel
     "choices. If choices are defined, KLayout will show a drop-down box instead of an\n"
     "entry field in the parameter user interface.\n"
   ) +
-  gsi::method ("choice_values", &db::PCellParameterDeclaration::get_choices, 
+  gsi::method ("choice_values", &db::PCellParameterDeclaration::get_choices,
     "@brief Returns a list of choice values\n"
   ) +
-  gsi::method ("choice_descriptions", &db::PCellParameterDeclaration::get_choice_descriptions, 
+  gsi::method ("choice_descriptions", &db::PCellParameterDeclaration::get_choice_descriptions,
     "@brief Returns a list of choice descriptions\n"
   ) +
-  gsi::method ("default", &db::PCellParameterDeclaration::get_default, 
+  gsi::method ("default", &db::PCellParameterDeclaration::get_default,
     "@brief Gets the default value\n"
   ) +
   gsi::method ("default=", &db::PCellParameterDeclaration::set_default, gsi::arg ("value"),
@@ -910,4 +910,3 @@ Class<db::PCellParameterDeclaration> decl_PCellParameterDeclaration ("db", "PCel
 );
 
 }
-

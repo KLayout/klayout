@@ -1,6 +1,7 @@
 
 TARGET = laycore
 REALMODULE = lay
+PYI = laycore.pyi
 
 include($$PWD/../pymod.pri)
 

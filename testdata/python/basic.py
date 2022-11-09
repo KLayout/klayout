@@ -21,6 +21,7 @@ import unittest
 import os
 import sys
 import gc
+import copy
 
 # Set this to True to disable some tests involving exceptions
 leak_check = "TEST_LEAK_CHECK" in os.environ
@@ -3073,6 +3074,36 @@ class BasicTest(unittest.TestCase):
     go = None
     self.assertEqual(pya.GObject.g_inst_count(), gc)
 
+  # fallback to __rmul__ for not implemented __mul__
+
+  def test_90(self):
+    class RMulObject:
+      def __init__(self, factor):
+        self.factor = factor
+      def __rmul__(self, point):
+        return point * self.factor
+      def __radd__(self, point):
+        return point + pya.Vector(1,1) * self.factor
+
+    p = pya.Point(1, 0)
+    fac2 = RMulObject(2)
+    self.assertEqual(p * 2, p * fac2)  # p.__mul__(fac2) should return NotImplemented, which will call fac2.__rmul__(p)
+    self.assertEqual(pya.Point(3,2), p + fac2)
+
+  # copy and deepcopy
+
+  def test_91(self):
+
+    p = pya.Point(1, 0)
+    pc = copy.copy(p)
+    pdc = copy.deepcopy(p)
+
+    pdc.x = 4
+    pc.x = 3
+    p.x = 2
+    self.assertEqual(p.x, 2)
+    self.assertEqual(pc.x, 3)
+    self.assertEqual(pdc.x, 4)
 
 # run unit tests
 if __name__ == '__main__':

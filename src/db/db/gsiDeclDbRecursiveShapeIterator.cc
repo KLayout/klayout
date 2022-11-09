@@ -523,6 +523,13 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
     "The flags must be specified before the shapes are being retrieved.\n"
     "Settings the shapes flags will reset the iterator.\n"
   ) +
+  gsi::method ("shape_flags", (unsigned int (db::RecursiveShapeIterator::*)() const) &db::RecursiveShapeIterator::shape_flags,
+    "@brief Gets the shape selection flags\n"
+    "\n"
+    "See \\shape_flags= for a description of that property.\n"
+    "\n"
+    "This getter has been introduced in version 0.28.\n"
+  ) +
   gsi::method ("trans|#itrans", &db::RecursiveShapeIterator::trans,
     "@brief Gets the current transformation by which the shapes must be transformed into the initial cell\n"
     "\n"

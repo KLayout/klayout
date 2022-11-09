@@ -49,6 +49,18 @@ msvc {
 }
 INSTALLS = lib_target
 
+!equals(PYI, "") {
+
+  msvc {
+    QMAKE_POST_LINK += && $(COPY) $$shell_path($$PWD/distutils_src/klayout/$$PYI) $$shell_path($$DESTDIR_PYMOD)
+  } else {
+    QMAKE_POST_LINK += && $(MKDIR) $$DESTDIR_PYMOD/$$REALMODULE && $(COPY) $$PWD/distutils_src/klayout/$$PYI $$DESTDIR_PYMOD
+  }
+
+  POST_TARGETDEPS += $$PWD/distutils_src/klayout/$$PYI
+
+}
+
 !equals(REALMODULE, "") {
 
   msvc {

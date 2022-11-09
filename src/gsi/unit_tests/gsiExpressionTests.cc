@@ -589,3 +589,12 @@ TEST(10)
   EXPECT_EQ (v.to_string (), std::string ("2"));
 }
 
+TEST(11)
+{
+  tl::Eval e;
+  tl::Variant v;
+
+  //  mapping of *! to *:
+  v = e.parse ("var b = Trans.new(1)*Trans.new(Vector.new(10, 20))").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("r90 -20,10"));
+}

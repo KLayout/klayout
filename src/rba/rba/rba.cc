@@ -1556,6 +1556,17 @@ rba_add_path (const std::string &path)
   }
 }
 
+static std::string
+ruby_name (const std::string &n)
+{
+  if (n == "*!") {
+    //  non-commutative multiplication
+    return "*";
+  } else {
+    return n;
+  }
+}
+
 namespace
 {
 
@@ -1672,7 +1683,7 @@ public:
               } else if (syn->is_setter) {
                 mt->add_method (syn->name + "=", *m);
               } else {
-                mt->add_method (syn->name, *m);
+                mt->add_method (ruby_name (syn->name), *m);
               }
             }
 
@@ -1709,7 +1720,7 @@ public:
 
             } else {
 
-              mt->add_method (syn->name, *m);
+              mt->add_method (ruby_name (syn->name), *m);
 
             }
           }

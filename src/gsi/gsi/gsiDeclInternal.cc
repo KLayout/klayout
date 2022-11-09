@@ -49,6 +49,7 @@ static int t_double () { return T_double; }
 static int t_float () { return T_float; }
 static int t_var () { return T_var; }
 static int t_string () { return T_string; }
+static int t_byte_array () { return T_byte_array; }
 static int t_void_ptr () { return T_void_ptr; }
 static int t_object () { return T_object; }
 static int t_vector () { return T_vector; }
@@ -77,30 +78,31 @@ static tl::Variant default_value (const ArgType *t)
 }
 
 Class<ArgType> decl_ArgType ("tl", "ArgType",
-  gsi::method ("TypeVoid|#t_void", &t_void) +
-  gsi::method ("TypeBool|#t_bool", &t_bool) +
-  gsi::method ("TypeChar|#t_char", &t_char) +
-  gsi::method ("TypeSChar|#t_schar", &t_schar) +
-  gsi::method ("TypeUChar|#t_uchar", &t_uchar) +
-  gsi::method ("TypeShort|#t_short", &t_short) +
-  gsi::method ("TypeUShort|#t_ushort", &t_ushort) +
-  gsi::method ("TypeInt|#t_int", &t_int) +
-  gsi::method ("TypeUInt|#t_uint", &t_uint) +
-  gsi::method ("TypeLong|#t_long", &t_long) +
-  gsi::method ("TypeULong|#t_ulong", &t_ulong) +
-  gsi::method ("TypeLongLong|#t_longlong", &t_longlong) +
-  gsi::method ("TypeULongLong|#t_ulonglong", &t_ulonglong) +
+  gsi::method ("TypeVoid", &t_void) +
+  gsi::method ("TypeBool", &t_bool) +
+  gsi::method ("TypeChar", &t_char) +
+  gsi::method ("TypeSChar", &t_schar) +
+  gsi::method ("TypeUChar", &t_uchar) +
+  gsi::method ("TypeShort", &t_short) +
+  gsi::method ("TypeUShort", &t_ushort) +
+  gsi::method ("TypeInt", &t_int) +
+  gsi::method ("TypeUInt", &t_uint) +
+  gsi::method ("TypeLong", &t_long) +
+  gsi::method ("TypeULong", &t_ulong) +
+  gsi::method ("TypeLongLong", &t_longlong) +
+  gsi::method ("TypeULongLong", &t_ulonglong) +
 #if defined(HAVE_64BIT_COORD)
   gsi::method ("TypeInt128|#t_int128", &t_int128) +
 #endif
-  gsi::method ("TypeDouble|#t_double", &t_double) +
-  gsi::method ("TypeFloat|#t_float", &t_float) +
-  gsi::method ("TypeVar|#t_var", &t_var) +
-  gsi::method ("TypeString|#t_string", &t_string) +
-  gsi::method ("TypeVoidPtr|#t_void_ptr", &t_void_ptr) +
-  gsi::method ("TypeObject|#t_object", &t_object) +
-  gsi::method ("TypeVector|#t_vector", &t_vector) +
-  gsi::method ("TypeMap|#t_map", &t_map) +
+  gsi::method ("TypeDouble", &t_double) +
+  gsi::method ("TypeFloat", &t_float) +
+  gsi::method ("TypeVar", &t_var) +
+  gsi::method ("TypeByteArray", &t_byte_array) +
+  gsi::method ("TypeString", &t_string) +
+  gsi::method ("TypeVoidPtr", &t_void_ptr) +
+  gsi::method ("TypeObject", &t_object) +
+  gsi::method ("TypeVector", &t_vector) +
+  gsi::method ("TypeMap", &t_map) +
   gsi::method_ext ("type", &type,
     "@brief Return the basic type (see t_.. constants)\n"
   ) +

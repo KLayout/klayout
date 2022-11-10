@@ -274,13 +274,18 @@ HelpSource::initialize_index ()
     bool ok = false;
 
     const QString help_index_cache_file = QString::fromUtf8 ("help-index.xml");
-    std::string per_user_cache_file = tl::to_string (QDir (tl::to_qstring (lay::ApplicationBase::instance ()->appdata_path ())).absoluteFilePath (help_index_cache_file));
+    std::string per_user_cache_file;
+    if (! lay::ApplicationBase::instance ()->appdata_path ().empty ()) {
+      per_user_cache_file = tl::to_string (QDir (tl::to_qstring (lay::ApplicationBase::instance ()->appdata_path ())).absoluteFilePath (help_index_cache_file));
+    }
 
     //  Try to obtain the help index from the installation or application path
 
     std::vector<std::string> cache_files;
     cache_files.push_back (tl::to_string (QDir (tl::to_qstring (lay::ApplicationBase::instance ()->inst_path ())).absoluteFilePath (help_index_cache_file)));
-    cache_files.push_back (per_user_cache_file);
+    if (! per_user_cache_file.empty ()) {
+      cache_files.push_back (per_user_cache_file);
+    }
 
     for (std::vector<std::string>::const_iterator c = cache_files.begin (); ! ok && c != cache_files.end (); ++c) {
 
@@ -307,7 +312,7 @@ HelpSource::initialize_index ()
 
     }
 
-    if (! ok) {
+    if (! ok && ! per_user_cache_file.empty ()) {
       //  If no index is found, create one in "per_user_cache_file"
       produce_index_file (per_user_cache_file);
     }

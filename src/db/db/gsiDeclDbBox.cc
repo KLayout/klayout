@@ -96,9 +96,19 @@ struct box_defs
     return box->enlarge (vector_type (x, y));
   }
 
+  static C &enlarge1 (C *box, coord_type s)
+  {
+    return box->enlarge (vector_type (s, s));
+  }
+
   static C enlarged (const C *box, coord_type x, coord_type y)
   {
     return box->enlarged (vector_type (x, y));
+  }
+
+  static C enlarged1 (const C *box, coord_type s)
+  {
+    return box->enlarged (vector_type (s, s));
   }
 
   static C &move (C *box, coord_type x, coord_type y)
@@ -371,7 +381,7 @@ struct box_defs
       "This is a convenience method which takes two values instead of a Point object.\n"
       "This method has been introduced in version 0.23.\n"
       "\n"
-      "@return The enlarged box.\n"
+      "@return The moved box.\n"
     ) +
     method ("move", &C::move, gsi::arg ("distance"),
       "@brief Moves the box by a certain distance\n"
@@ -400,8 +410,16 @@ struct box_defs
       "@brief Enlarges the box by a certain amount.\n"
       "\n"
       "\n"
-      "This is a convenience method which takes two values instead of a Point object.\n"
+      "This is a convenience method which takes two values instead of a Vector object.\n"
       "This method has been introduced in version 0.23.\n"
+      "\n"
+      "@return A reference to this box.\n"
+    ) +
+    method_ext ("enlarge", &box_defs<C>::enlarge1, gsi::arg ("d"),
+      "@brief Enlarges the box by a certain amount on all sides.\n"
+      "\n"
+      "This is a convenience method which takes one values instead of two values. It will apply the given enlargement in both directions.\n"
+      "This method has been introduced in version 0.28.\n"
       "\n"
       "@return A reference to this box.\n"
     ) +
@@ -409,8 +427,16 @@ struct box_defs
       "@brief Enlarges the box by a certain amount.\n"
       "\n"
       "\n"
-      "This is a convenience method which takes two values instead of a Point object.\n"
+      "This is a convenience method which takes two values instead of a Vector object.\n"
       "This method has been introduced in version 0.23.\n"
+      "\n"
+      "@return The enlarged box.\n"
+    ) +
+    method_ext ("enlarged", &box_defs<C>::enlarged1, gsi::arg ("d"),
+      "@brief Enlarges the box by a certain amount on all sides.\n"
+      "\n"
+      "This is a convenience method which takes one values instead of two values. It will apply the given enlargement in both directions.\n"
+      "This method has been introduced in version 0.28.\n"
       "\n"
       "@return The enlarged box.\n"
     ) +

@@ -175,7 +175,9 @@ private:
 struct TL_PUBLIC TypeError
   : public Exception
 {
-  using Exception::Exception;
+  TypeError (const std::string &msg)
+    : Exception (msg)
+  { }
 };
 
 /**

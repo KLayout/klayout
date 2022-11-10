@@ -29,6 +29,15 @@ class DBBox_TestClass < TestBase
   # DBox basics
   def test_1_DBox
 
+    a = RBA::DBox::new( 20 )
+    assert_equal( a.to_s, "(-10,-10;10,10)" )
+
+    a = RBA::DBox::new( 21 )
+    assert_equal( a.to_s, "(-10.5,-10.5;10.5,10.5)" )
+
+    a = RBA::DBox::new( 20, 40 )
+    assert_equal( a.to_s, "(-10,-20;10,20)" )
+
     a = RBA::DBox::new( -10, 21, 11, 17 )
     assert_equal( a.to_s, "(-10,17;11,21)" )
     assert_equal( RBA::DBox::from_s(a.to_s).to_s, a.to_s )
@@ -232,6 +241,15 @@ class DBBox_TestClass < TestBase
 
   # Box basics
   def test_1_Box
+
+    a = RBA::Box::new( 20 )
+    assert_equal( a.to_s, "(-10,-10;10,10)" )
+
+    a = RBA::Box::new( 21 )
+    assert_equal( a.to_s, "(-10,-10;10,10)" )
+
+    a = RBA::Box::new( 20, 40 )
+    assert_equal( a.to_s, "(-10,-20;10,20)" )
 
     a = RBA::Box::new( -10, 21, 11, 17 )
     assert_equal( a.to_s, "(-10,17;11,21)" )

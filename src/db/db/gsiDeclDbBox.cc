@@ -59,6 +59,16 @@ struct box_defs
     return new C ();
   }
 
+  static C *new_sq (coord_type s)
+  {
+    return new C (-s / 2, -s / 2, s / 2, s / 2);
+  }
+
+  static C *new_wh (coord_type w, coord_type h)
+  {
+    return new C (-w / 2, -h / 2, w / 2, h / 2);
+  }
+
   static C *new_lbrt (coord_type l, coord_type b, coord_type r, coord_type t)
   {
     return new C (l, b, r, t);
@@ -120,6 +130,20 @@ struct box_defs
       "Empty boxes don't modify a box when joined with it. The intersection between an empty and any other "
       "box is also an empty box. The width, height, p1 and p2 attributes of an empty box are undefined. "
       "Use \\empty? to get a value indicating whether the box is empty.\n"
+    ) +
+    constructor ("new", &new_sq,
+      "@brief Creates a square with the given dimensions centered around the origin\n"
+      "\n"
+      "Note that for integer-unit boxes, the dimension has to be an even number to avoid rounding.\n"
+      "\n"
+      "This convenience constructor has been introduced in version 0.28."
+    ) +
+    constructor ("new", &new_wh,
+      "@brief Creates a rectangle with given width and height, centered around the origin\n"
+      "\n"
+      "Note that for integer-unit boxes, the dimensions have to be an even number to avoid rounding.\n"
+      "\n"
+      "This convenience constructor has been introduced in version 0.28."
     ) +
     constructor ("new", &new_lbrt, gsi::arg ("left"), gsi::arg ("bottom"), gsi::arg ("right"), gsi::arg ("top"),
       "@brief Creates a box with four coordinates\n"

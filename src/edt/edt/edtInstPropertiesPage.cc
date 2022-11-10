@@ -78,6 +78,7 @@ InstPropertiesPage::InstPropertiesPage (edt::Service *service, db::Manager *mana
 
     connect (lib_cbx, SIGNAL (activated (int)), this, SIGNAL (edited ()));
     connect (cell_name_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
+    array_grp->setCheckable (true);
     connect (array_grp, SIGNAL (clicked ()), this, SIGNAL (edited ()));
     connect (rows_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
     connect (columns_le, SIGNAL (editingFinished ()), this, SIGNAL (edited ()));
@@ -106,7 +107,7 @@ InstPropertiesPage::InstPropertiesPage (edt::Service *service, db::Manager *mana
     angle_le->setReadOnly (true);
     mag_le->setReadOnly (true);
     lib_cbx->setEnabled (false);
-    array_grp->setEnabled (false);
+    array_grp->setCheckable (false);
     mirror_cbx->setEnabled (false);
 
   }
@@ -369,7 +370,12 @@ InstPropertiesPage::update ()
 
   if (pos->back ().inst_ptr.is_regular_array (rowv, columnv, rows, columns)) {
 
-    array_grp->setChecked (true);
+    if (readonly ()) {
+      array_grp->setEnabled (true);
+    } else {
+      array_grp->setChecked (true);
+    }
+
     rows_le->setText (tl::to_qstring (tl::to_string (rows)));
     columns_le->setText (tl::to_qstring (tl::to_string (columns)));
     row_x_le->setText (tl::to_qstring (coord_to_string ((gt * rowv).x (), dbu, du)));
@@ -390,7 +396,12 @@ InstPropertiesPage::update ()
 
   } else {
 
-    array_grp->setChecked (false);
+    if (readonly ()) {
+      array_grp->setEnabled (false);
+    } else {
+      array_grp->setChecked (false);
+    }
+
     rows_le->setText (QString ());
     columns_le->setText (QString ());
     row_x_le->setText (QString ());

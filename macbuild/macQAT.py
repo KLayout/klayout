@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #===============================================================================
@@ -10,12 +10,10 @@
 #
 #  This script must be copied to a "*.macQAT/" directory to run.
 #===============================================================================
-from __future__ import print_function  # to use print() of Python 3 in Python >= 2.7
 import sys
 import os
 import datetime
 from   time import sleep
-import six
 import platform
 import optparse
 import subprocess
@@ -201,15 +199,10 @@ def ExportEnvVariables():
 # @param[in] logfile  log file name
 #-------------------------------------------------------------------------------
 def RunTester( command, logfile="" ):
-    if six.PY3:
-        proc = subprocess.Popen( command.split(),
-                                    stdout=subprocess.PIPE,   \
-                                    stderr=subprocess.STDOUT, \
-                                    universal_newlines=True )
-    else:
-        proc = subprocess.Popen( command.split(),
-                                    stdout=subprocess.PIPE,   \
-                                    stderr=subprocess.STDOUT )
+    proc = subprocess.Popen( command.split(),
+                             stdout=subprocess.PIPE,   \
+                             stderr=subprocess.STDOUT, \
+                             universal_newlines=True )
 
     if not logfile == "":
         with proc.stdout, open( logfile, 'w' ) as file:

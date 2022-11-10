@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #========================================================================================
@@ -10,7 +10,6 @@
 #
 # This file is imported by 'build4mac.py' script.
 #========================================================================================
-from __future__ import print_function  # to use print() of Python 3 in Python >= 2.7
 import sys
 import os
 import re

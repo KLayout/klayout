@@ -343,7 +343,7 @@ class Config(object):
             bits = os.getenv("KLAYOUT_BITS")
             if bits:
                 args += [
-                    quote_path("/LIBPATH:" + os.path.join(bits, "zlib", "libraries")),
+                    quote_path("/LIBPATH:" + os.path.join(bits, "zlib", "lib")),
                     quote_path("/LIBPATH:" + os.path.join(bits, "ptw", "libraries")),
                     quote_path("/LIBPATH:" + os.path.join(bits, "png", "libraries")),
                     quote_path("/LIBPATH:" + os.path.join(bits, "expat", "libraries")),

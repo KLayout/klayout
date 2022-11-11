@@ -1000,7 +1000,7 @@ CODE
               args = args.select do |a|
                 if a.is_a?(DRCBothEdges)
                   if !self.data.is_a?(RBA::EdgePairs)
-                    raise("'both' keyword only available for edge pair layers")
+                    raise("'both' keyword is only available for edge pair layers")
                   end
                   f = :with_#{f}_both
                   false
@@ -1018,11 +1018,10 @@ CODE
               if a.is_a?(Range)
                 DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a.begin, a.end, #{inv.inspect}))
               elsif a.is_a?(DRCOrthoEdges) || a.is_a?(DRCDiagonalOnlyEdges) || a.is_a?(DRCDiagonalEdges)
-                if self.data.is_a?(RBA::Edges)
-                  DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a.e_value, #{inv.inspect}))
-                else
-                  DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a.ep_value, #{inv.inspect}))
+                if self.data.is_a?(RBA::Region)
+                  raise("'ortho', 'diagonal' or 'diagonal_only' keyword is only available for edge or edge pair layers")
                 end
+                DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a.value, #{inv.inspect}))
               else
                 DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a, #{inv.inspect}))
               end

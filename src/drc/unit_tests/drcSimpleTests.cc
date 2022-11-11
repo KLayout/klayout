@@ -1328,3 +1328,13 @@ TEST(55d_drccount)
   run_test (_this, "55", true);
 }
 
+TEST(56_angle_classes)
+{
+  run_test (_this, "56", false);
+}
+
+TEST(56d_angle_classes)
+{
+  run_test (_this, "56", true);
+}
+

@@ -1,0 +1,31 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+
+l1.output(1, 0)
+
+l1e = l1.edges
+l1e.with_angle(ortho).output(100, 0)
+l1e.without_angle(ortho).output(101, 0)
+l1e.with_angle(diagonal).output(102, 0)
+l1e.without_angle(diagonal).output(103, 0)
+l1e.with_angle(diagonal_only).output(104, 0)
+l1e.without_angle(diagonal_only).output(105, 0)
+
+l1ee = l1.width(100.um, projection)
+l1ee.output(10, 0)
+
+l1ee.with_angle(ortho).output(200, 0)
+l1ee.without_angle(ortho).output(201, 0)
+l1ee.with_angle(diagonal).output(202, 0)
+l1ee.without_angle(diagonal).output(203, 0)
+l1ee.with_angle(diagonal_only).output(204, 0)
+l1ee.without_angle(diagonal_only).output(205, 0)
+l1ee.with_angle(ortho, both).output(210, 0)
+

@@ -699,7 +699,7 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "edge pairs not fulfilling this criterion are returned.\n"
     "\n"
     "This version allows specifying an edge type instead of an angle. Edge types include multiple distinct orientations "
-    "and are specified using one of the \\OrthoEdges, \\DiagonalEgdes or \\OrthoDiagonalEdges types.\n"
+    "and are specified using one of the \\Edges#OrthoEdges, \\Edges#DiagonalEgdes or \\Edges#OrthoDiagonalEdges types.\n"
     "\n"
     "This method has been added in version 0.28.\n"
   ) +
@@ -735,7 +735,7 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "edge pairs not fulfilling this criterion are returned.\n"
     "\n"
     "This version allows specifying an edge type instead of an angle. Edge types include multiple distinct orientations "
-    "and are specified using one of the \\OrthoEdges, \\DiagonalEgdes or \\OrthoDiagonalEdges types.\n"
+    "and are specified using one of the \\Edges#OrthoEdges, \\Edges#DiagonalEgdes or \\Edges#OrthoDiagonalEdges types.\n"
     "\n"
     "This method has been added in version 0.28.\n"
   ) +
@@ -874,23 +874,5 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
   "\n"
   "This class has been introduced in version 0.23.\n"
 );
-
-gsi::EnumIn<db::EdgePairs, db::SpecialEdgeOrientationFilter::FilterType> decl_EdgePairsEdgeFilterType ("db", "EdgeType",
-  gsi::enum_const ("OrthoEdges", db::SpecialEdgeOrientationFilter::Ortho,
-    "@brief Horizontal and vertical edges are selected\n"
-  ) +
-  gsi::enum_const ("DiagonalEdges", db::SpecialEdgeOrientationFilter::Diagonal,
-    "@brief Diagonal edges are selected (-45 and 45 degree)\n"
-  ) +
-  gsi::enum_const ("OrthoDiagonalEdges", db::SpecialEdgeOrientationFilter::OrthoDiagonal,
-    "@brief Diagonal or orthogonal edges are selected (0, 90, -45 and 45 degree)\n"
-  ),
-  "@brief This enum specifies the the edge type for edge angle filters.\n"
-  "\n"
-  "This enum was introduced in version 0.28.\n"
-);
-
-//  Inject the db::SpecialEdgeOrientationFilter::FilterType declarations into EdgePairs:
-gsi::ClassExt<db::EdgePairs> decl_EdgePairsEdgeFilterType_into_parent (decl_EdgePairsEdgeFilterType.defs ());
 
 }

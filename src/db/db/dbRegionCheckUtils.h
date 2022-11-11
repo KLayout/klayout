@@ -310,6 +310,7 @@ class DB_PUBLIC poly2poly_check
 {
 public:
   typedef typename PolygonType::box_type box_type;
+  typedef typename PolygonType::edge_type edge_type;
 
   poly2poly_check (Edge2EdgeCheckBase &output);
   poly2poly_check ();
@@ -321,6 +322,8 @@ public:
   void connect (Edge2EdgeCheckBase &output);
   void enter (const PolygonType &o, size_t p);
   void enter (const PolygonType &o, size_t p, const box_type &search_box);
+  void enter (const edge_type &o, size_t p);
+  void enter (const edge_type &o, size_t p, const box_type &search_box);
   void process ();
 
 private:

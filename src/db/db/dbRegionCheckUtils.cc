@@ -468,6 +468,14 @@ poly2poly_check<PolygonType>::enter (const PolygonType &o, size_t p)
   }
 }
 
+template <class PolygonType>
+void
+poly2poly_check<PolygonType>::enter (const poly2poly_check<PolygonType>::edge_type &e, size_t p)
+{
+  m_edge_heap.push_back (e);
+  m_scanner.insert (& m_edge_heap.back (), p);
+}
+
 //  TODO: move to generic header
 static bool interact (const db::Box &box, const db::Edge &e)
 {
@@ -493,6 +501,16 @@ poly2poly_check<PolygonType>::enter (const PolygonType &o, size_t p, const poly2
       m_edge_heap.push_back (*e);
       m_scanner.insert (& m_edge_heap.back (), p);
     }
+  }
+}
+
+template <class PolygonType>
+void
+poly2poly_check<PolygonType>::enter (const poly2poly_check<PolygonType>::edge_type &e, size_t p, const poly2poly_check<PolygonType>::box_type &box)
+{
+  if (! box.empty () && interact (box, e)) {
+    m_edge_heap.push_back (e);
+    m_scanner.insert (& m_edge_heap.back (), p);
   }
 }
 

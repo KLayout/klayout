@@ -252,8 +252,15 @@ namespace std
     h = hfunc_coord (o.bgn_ext (), h);
     h = hfunc_coord (o.end_ext (), h);
     h = hfunc_coord (o.width (), h);
+    //  NOTE: using too many points for the hash function just slows down the code.
+    unsigned int n = 20;
     for (typename db::path<C>::iterator p = o.begin (); p != o.end (); ++p) {
-      h = hfunc (*p, h);
+      if (--n == 0) {
+        h = hfunc (o.points (), h);
+        break;
+      } else {
+        h = hfunc (*p, h);
+      }
     }
     return h;
   }
@@ -280,8 +287,15 @@ namespace std
   template <class C>
   size_t hfunc (const db::polygon_contour<C> &o, size_t h)
   {
+    //  NOTE: using too many points for the hash function just slows down the code.
+    unsigned int n = 20;
     for (typename db::polygon_contour<C>::simple_iterator i = o.begin (); i != o.end (); ++i) {
-      h = hfunc (*i, h);
+      if (--n == 0) {
+        h = hfunc (o.size (), h);
+        break;
+      } else {
+        h = hfunc (*i, h);
+      }
     }
     return h;
   }
@@ -309,8 +323,15 @@ namespace std
   size_t hfunc (const db::polygon<C> &o, size_t h)
   {
     h = hfunc (o.hull (), h);
+    //  NOTE: using too many points for the hash function just slows down the code.
+    unsigned int n = 20;
     for (size_t i = 0; i < o.holes (); ++i) {
-      h = hfunc (o.hole (int (i)), h);
+      if (--n == 0) {
+        h = hfunc (o.holes (), h);
+        break;
+      } else {
+        h = hfunc (o.hole (int (i)), h);
+      }
     }
     return h;
   }

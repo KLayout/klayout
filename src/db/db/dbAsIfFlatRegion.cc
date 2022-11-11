@@ -1037,7 +1037,11 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
 {
 #if defined(USE_LOCAL_PROCESSOR)
 
-  db::RegionIterator polygons (begin_merged ());
+  bool needs_merged_primary = different_polygons || options.needs_merged ();
+needs_merged_primary = true; // @@@
+
+  db::RegionIterator polygons (needs_merged_primary ? begin_merged () : begin ());
+  bool primary_is_merged = ! merged_semantics () || needs_merged_primary || is_merged ();
 
   EdgeRelationFilter check (rel, d, options.metrics);
   check.set_include_zero (false);
@@ -1059,9 +1063,12 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   if (other == subject_regionptr () || other == foreign_regionptr ()) {
     foreign.push_back (other == foreign_regionptr ());
     others.push_back (begin_merged ());
+    other_is_merged = primary_is_merged;
   } else {
     foreign.push_back (false);
-    if (options.whole_edges) {
+    if (! other->merged_semantics ()) {
+      other_is_merged = true;
+    } else if (options.whole_edges) {
       //  NOTE: whole edges needs both inputs merged
       others.push_back (other->begin_merged ());
       other_is_merged = true;
@@ -1072,7 +1079,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
     has_other = true;
   }
 
-  db::check_local_operation<db::Polygon, db::Polygon> op (check, different_polygons, has_other, other_is_merged, options);
+  db::check_local_operation<db::Polygon, db::Polygon> op (check, different_polygons, primary_is_merged, has_other, other_is_merged, options);
 
   std::unique_ptr<FlatEdgePairs> output (new FlatEdgePairs ());
   std::vector<db::Shapes *> results;

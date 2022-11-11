@@ -122,8 +122,8 @@ static bool shields_interaction (const db::EdgePair &ep, const P &poly)
 }
 
 template <class TS, class TI>
-check_local_operation<TS, TI>::check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options)
-  : m_check (check), m_different_polygons (different_polygons), m_has_other (has_other), m_other_is_merged (other_is_merged), m_options (options)
+check_local_operation<TS, TI>::check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool is_merged, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options)
+  : m_check (check), m_different_polygons (different_polygons), m_is_merged (is_merged), m_has_other (has_other), m_other_is_merged (other_is_merged), m_options (options)
 {
   //  .. nothing yet ..
 }
@@ -208,12 +208,15 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
   edge2edge_check_negative_or_positive<std::unordered_set<db::EdgePair> > edge_check (m_check, result, intra_polygon_result, m_options.negative, m_different_polygons, m_has_other, m_options.shielded, symmetric_edge_pairs);
   poly2poly_check<TS> poly_check (edge_check);
 
-  std::list<TS> heap;
   std::unordered_set<TI> polygons;
+  std::unordered_set<TS> spolygons;
+
+  db::EdgeProcessor ep;
+  ep.set_base_verbosity (50);
 
   std::set<unsigned int> ids;
-  for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-    for (typename shape_interactions<TS, TI>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+  for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+    for (auto j = i->second.begin (); j != i->second.end (); ++j) {
       ids.insert (*j);
     }
   }
@@ -226,13 +229,13 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
     db::Vector e (edge_check.distance (), edge_check.distance ());
 
     db::Box subject_box;
-    for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (auto i = interactions.begin (); i != interactions.end (); ++i) {
       subject_box += db::box_convert<TS> () (interactions.subject_shape (i->first));
     }
 
     if (edge_check.requires_different_layers ()) {
       db::Box intruder_box;
-      for (std::set<unsigned int>::const_iterator id = ids.begin (); id != ids.end (); ++id) {
+      for (auto id = ids.begin (); id != ids.end (); ++id) {
         intruder_box += db::box_convert<TI> () (interactions.intruder_shape (*id).second);
       }
       common_box = subject_box.enlarged (e) & intruder_box.enlarged (e);
@@ -245,14 +248,50 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
   if (m_has_other) {
 
     size_t n = 0;
-    for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      const TS &subject = interactions.subject_shape (i->first);
-      if (! take_all) {
-        poly_check.enter (subject, n, common_box);
-      } else {
-        poly_check.enter (subject, n);
+
+    if (m_is_merged || (interactions.size () == 1 && interactions.subject_shape (interactions.begin ()->first).is_box ())) {
+
+      for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+        const TS &subject = interactions.subject_shape (i->first);
+        if (! take_all) {
+          poly_check.enter (subject, n, common_box);
+        } else {
+          poly_check.enter (subject, n);
+        }
+        n += 2;
       }
-      n += 2;
+
+    } else {
+
+      //  merge needed for the subject shapes
+
+      ep.clear ();
+      size_t nn = 0;
+
+      for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+        const TS &is = interactions.subject_shape (i->first);
+        for (typename TS::polygon_edge_iterator e = is.begin_edge (); ! e.at_end (); ++e) {
+          ep.insert (*e, nn);
+        }
+        ++nn;
+      }
+
+      spolygons.clear ();
+
+      db::polygon_ref_generator<TS> ps (layout, spolygons);
+      db::PolygonGenerator pg (ps, false /*don't resolve holes*/, false);
+      db::SimpleMerge op (1 /*wc>0*/);
+      ep.process (pg, op);
+
+      for (auto o = spolygons.begin (); o != spolygons.end (); ++o) {
+        if (! take_all) {
+          poly_check.enter (*o, n, common_box);
+        } else {
+          poly_check.enter (*o, n);
+        }
+        n += 2;
+      }
+
     }
 
     //  merge the intruders to remove inner edges
@@ -266,20 +305,19 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
       //  NOTE: this local merge is not necessarily giving the same results than a global merge before running
       //  the processor. Reason: the search range is limited, hence not all necessary components may have been
       //  captured.
-      db::EdgeProcessor ep;
-      ep.set_base_verbosity (50);
 
       ep.clear ();
-      size_t i = 0;
+      size_t nn = 0;
 
-      for (std::set<unsigned int>::const_iterator id = ids.begin (); id != ids.end (); ++id) {
+      for (auto id = ids.begin (); id != ids.end (); ++id) {
         const TI &is = interactions.intruder_shape (*id).second;
-        for (typename TI::polygon_edge_iterator e = is.begin_edge (); ! e.at_end (); ++e) {
-          ep.insert (*e, i);
+        for (auto e = is.begin_edge (); ! e.at_end (); ++e) {
+          ep.insert (*e, nn);
         }
-        ++i;
+        ++nn;
       }
 
+// @@@ Use edges directly
       polygons.clear ();
 
       db::polygon_ref_generator<TI> ps (layout, polygons);
@@ -288,7 +326,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
       ep.process (pg, op);
 
       n = 1;
-      for (typename std::unordered_set<TI>::const_iterator o = polygons.begin (); o != polygons.end (); ++o) {
+      for (auto o = polygons.begin (); o != polygons.end (); ++o) {
         if (! take_all) {
           poly_check.enter (*o, n, common_box);
         } else {
@@ -300,7 +338,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
     } else {
 
       n = 1;
-      for (std::set<unsigned int>::const_iterator id = ids.begin (); id != ids.end (); ++id) {
+      for (auto id = ids.begin (); id != ids.end (); ++id) {
         if (! take_all) {
           poly_check.enter (interactions.intruder_shape (*id).second, n, common_box);
         } else {
@@ -313,34 +351,155 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
 
   } else {
 
-    //  NOTE: we need to eliminate identical shapes from intruders and subjects because those will shield
+    if (m_is_merged || (interactions.size () == 1 && ids.empty () && interactions.subject_shape (interactions.begin ()->first).is_box ())) {
 
-    size_t n = 0;
+      //  no merge required
 
-    for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-      //  we can't directly insert because TS may be != TI
-      const TS &ts = interactions.subject_shape (i->first);
-      insert_into_hash (polygons, ts);
-      if (! take_all) {
-        poly_check.enter (ts, n, common_box);
-      } else {
-        poly_check.enter (ts, n);
-      }
-      n += 2;
-    }
+      //  NOTE: we need to eliminate identical shapes from intruders and subjects because those will shield
 
-    n = 1;
+      size_t n = 0;
+      std::unordered_set<TI> subjects;
 
-    for (std::set<unsigned int>::const_iterator id = ids.begin (); id != ids.end (); ++id) {
-      const TI &ti = interactions.intruder_shape (*id).second;
-      if (polygons.find (ti) == polygons.end ()) {
+      for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+        //  we can't directly insert because TS may be != TI
+        const TS &ts = interactions.subject_shape (i->first);
+        insert_into_hash (subjects, ts);
         if (! take_all) {
-          poly_check.enter (ti, n, common_box);
+          poly_check.enter (ts, n, common_box);
         } else {
-          poly_check.enter (ti, n);
+          poly_check.enter (ts, n);
         }
         n += 2;
       }
+
+      n = 1;
+
+      for (auto id = ids.begin (); id != ids.end (); ++id) {
+        const TI &ti = interactions.intruder_shape (*id).second;
+        if (subjects.find (ti) == subjects.end ()) {
+          if (! take_all) {
+            poly_check.enter (ti, n, common_box);
+          } else {
+            poly_check.enter (ti, n);
+          }
+        }
+      }
+
+    } else if (ids.empty ()) {
+
+      //  merge needed for the subject shapes - no intruders present so this is the simple case
+
+      size_t n = 0;
+
+      ep.clear ();
+      size_t nn = 0;
+
+      for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+        const TS &ts = interactions.subject_shape (i->first);
+        for (auto e = ts.begin_edge (); ! e.at_end (); ++e) {
+          ep.insert (*e, nn);
+        }
+        ++nn;
+      }
+
+// @@@ Use edges directly
+      spolygons.clear ();
+
+      db::polygon_ref_generator<TS> ps (layout, spolygons);
+      db::PolygonGenerator pg (ps, false /*don't resolve holes*/, false);
+      db::SimpleMerge op (1 /*wc>0*/);
+      ep.process (pg, op);
+
+      for (auto o = spolygons.begin (); o != spolygons.end (); ++o) {
+        if (! take_all) {
+          poly_check.enter (*o, n, common_box);
+        } else {
+          poly_check.enter (*o, n);
+        }
+        n += 2;
+      }
+
+    } else {
+
+      //  merge needed for the subject and intruder shapes - we merge both and then
+      //  separate edges into those from the subject and those from intruder shapes.
+
+      ep.clear ();
+      size_t nn = 0;
+
+      for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+        const TS &ts = interactions.subject_shape (i->first);
+        for (auto e = ts.begin_edge (); ! e.at_end (); ++e) {
+          ep.insert (*e, nn);
+        }
+        ++nn;
+      }
+
+      for (auto id = ids.begin (); id != ids.end (); ++id) {
+        const TI &ti = interactions.intruder_shape (*id).second;
+        for (auto e = ti.begin_edge (); ! e.at_end (); ++e) {
+          ep.insert (*e, nn);
+        }
+        ++nn;
+      }
+
+      std::vector<typename TS::edge_type> edges;
+
+      db::EdgeContainer ee (edges);
+      db::SimpleMerge op (1 /*wc>0*/);
+      ep.process (ee, op);
+      ep.clear ();
+
+      std::vector<typename TS::edge_type> subject_edges;
+
+      size_t sz = 0;
+      for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+        const TS &ts = interactions.subject_shape (i->first);
+        sz += ts.vertices ();
+      }
+
+      subject_edges.reserve (sz);
+
+      for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+        const TS &ts = interactions.subject_shape (i->first);
+        for (auto e = ts.begin_edge (); ! e.at_end (); ++e) {
+          subject_edges.push_back (*e);
+        }
+      }
+
+      for (size_t n = 0; n <= 1; ++n) {
+
+        std::set<typename TI::edge_type> partial_edges;
+
+        EdgeBooleanClusterCollector<std::set<typename TI::edge_type> > cluster_collector (&partial_edges, n == 0 ? db::EdgeAnd : db::EdgeNot);
+
+        db::box_scanner<typename TI::edge_type, size_t> scanner;
+        scanner.reserve (edges.size () + subject_edges.size ());
+
+        for (auto i = edges.begin (); i != edges.end (); ++i) {
+          if (! i->is_degenerate ()) {
+            scanner.insert (i.operator-> (), 0);
+          }
+        }
+
+        for (auto i = subject_edges.begin (); i != subject_edges.end (); ++i) {
+          if (! i->is_degenerate ()) {
+            scanner.insert (i.operator-> (), 1);
+          }
+        }
+
+        scanner.process (cluster_collector, 1, db::box_convert<typename TI::edge_type> ());
+
+        for (auto e = partial_edges.begin (); e != partial_edges.end (); ++e) {
+          if (! take_all) {
+            poly_check.enter (*e, n, common_box);
+          } else {
+            poly_check.enter (*e, n);
+          }
+        }
+
+      }
+
     }
 
   }

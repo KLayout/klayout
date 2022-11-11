@@ -247,6 +247,76 @@ private:
 };
 
 /**
+ *  @brief An edge orientation filter for use with Edges::filter or Edges::filtered
+ *
+ *  This filter renders edges with special orientations.
+ */
+
+struct DB_PUBLIC SpecialEdgeOrientationFilter
+  : public EdgeFilterBase
+{
+  enum FilterType {
+    Ortho = 0,          //  0 and 90 degree
+    Diagonal = 1,       //  -45 and 45 degree
+    OrthoDiagonal = 2   //  both Ortho and Diagonal
+  };
+
+  /**
+   *  @brief Constructor
+   *
+   *  @param type The type of filter
+   */
+  SpecialEdgeOrientationFilter (FilterType type, bool inverse);
+
+  /**
+   *  @brief Returns true if the edge orientation matches the criterion
+   */
+  virtual bool selected (const db::Edge &edge) const;
+
+  /**
+   *  @brief Returns true if all edge orientations match the criterion
+   */
+  virtual bool selected (const std::unordered_set<db::Edge> &edges) const
+  {
+    for (std::unordered_set<db::Edge>::const_iterator e = edges.begin (); e != edges.end (); ++e) {
+      if (! selected (*e)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   *  @brief This filter is not isotropic
+   */
+  virtual const TransformationReducer *vars () const
+  {
+    return &m_vars;
+  }
+
+  /**
+   *  @brief Requires merged input
+   */
+  virtual bool requires_raw_input () const
+  {
+    return false;
+  }
+
+  /**
+   *  @brief Wants to build variants
+   */
+  virtual bool wants_variants () const
+  {
+    return true;
+  }
+
+private:
+  FilterType m_type;
+  bool m_inverse;
+  db::OrthogonalTransformationReducer m_vars;
+};
+
+/**
  *  @brief A predicate defining edge a interacts with b
  */
 DB_PUBLIC bool edge_interacts (const db::Edge &a, const db::Edge &b);

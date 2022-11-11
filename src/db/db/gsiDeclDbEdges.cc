@@ -212,6 +212,12 @@ static db::Edges with_angle2 (const db::Edges *r, double amin, double amax, bool
   return r->filtered (f);
 }
 
+static db::Edges with_angle3 (const db::Edges *r, db::SpecialEdgeOrientationFilter::FilterType type, bool inverse)
+{
+  db::SpecialEdgeOrientationFilter f (type, inverse);
+  return r->filtered (f);
+}
+
 static db::EdgePairs width2 (const db::Edges *r, db::Edges::coord_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection)
 {
   return r->width_check (d, db::EdgesCheckOptions (whole_edges,
@@ -609,13 +615,13 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "This method has been introduced in version 0.26."
   ) +
   method_ext ("with_length", with_length1, gsi::arg ("length"), gsi::arg ("inverse"),
-    "@brief Filter the edges by length\n"
+    "@brief Filters the edges by length\n"
     "Filters the edges in the edge collection by length. If \"inverse\" is false, only "
     "edges which have the given length are returned. If \"inverse\" is true, "
     "edges not having the given length are returned.\n"
   ) +
   method_ext ("with_length", with_length2, gsi::arg ("min_length"), gsi::arg ("max_length"), gsi::arg ("inverse"),
-    "@brief Filter the edges by length\n"
+    "@brief Filters the edges by length\n"
     "Filters the edges in the edge collection by length. If \"inverse\" is false, only "
     "edges which have a length larger or equal to \"min_length\" and less than \"max_length\" are "
     "returned. If \"inverse\" is true, "
@@ -625,7 +631,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "If you don't want to specify a lower or upper limit, pass nil to that parameter.\n"
   ) +
   method_ext ("with_angle", with_angle1, gsi::arg ("angle"), gsi::arg ("inverse"),
-    "@brief Filter the edges by orientation\n"
+    "@brief Filters the edges by orientation\n"
     "Filters the edges in the edge collection by orientation. If \"inverse\" is false, only "
     "edges which have the given angle to the x-axis are returned. If \"inverse\" is true, "
     "edges not having the given angle are returned.\n"
@@ -637,7 +643,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "@/code\n"
   ) +
   method_ext ("with_angle", with_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
-    "@brief Filter the edges by orientation\n"
+    "@brief Filters the edges by orientation\n"
     "Filters the edges in the edge collection by orientation. If \"inverse\" is false, only "
     "edges which have an angle to the x-axis larger or equal to \"min_angle\" (depending on \"include_min_angle\") and equal or less than \"max_angle\" (depending on \"include_max_angle\") are "
     "returned. If \"inverse\" is true, "
@@ -647,6 +653,17 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "minimum angle itself is not included. Same for \"include_max_angle\" where the default is false, meaning the maximum angle is not included in the range.\n"
     "\n"
     "The two \"include..\" arguments have been added in version 0.27."
+  ) +
+  method_ext ("with_angle", with_angle3, gsi::arg ("type"), gsi::arg ("inverse"),
+    "@brief Filters the edges by orientation type\n"
+    "Filters the edges in the edge collection by orientation. If \"inverse\" is false, only "
+    "edges which have an angle of the given type are returned. If \"inverse\" is true, "
+    "edges which do not conform to this criterion are returned.\n"
+    "\n"
+    "This version allows specifying an edge type instead of an angle. Edge types include multiple distinct orientations "
+    "and are specified using one of the \\OrthoEdges, \\DiagonalEgdes or \\OrthoDiagonalEdges types.\n"
+    "\n"
+    "This method has been added in version 0.28.\n"
   ) +
   method ("insert", (void (db::Edges::*)(const db::Edge &)) &db::Edges::insert, gsi::arg ("edge"),
     "@brief Inserts an edge\n"
@@ -1748,6 +1765,24 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
   "\n\n"
   "This class has been introduced in version 0.23.\n"
 );
+
+gsi::EnumIn<db::Edges, db::SpecialEdgeOrientationFilter::FilterType> decl_EdgesEdgeFilterType ("db", "EdgeType",
+  gsi::enum_const ("OrthoEdges", db::SpecialEdgeOrientationFilter::Ortho,
+    "@brief Horizontal and vertical edges are selected\n"
+  ) +
+  gsi::enum_const ("DiagonalEdges", db::SpecialEdgeOrientationFilter::Diagonal,
+    "@brief Diagonal edges are selected (-45 and 45 degree)\n"
+  ) +
+  gsi::enum_const ("OrthoDiagonalEdges", db::SpecialEdgeOrientationFilter::OrthoDiagonal,
+    "@brief Diagonal or orthogonal edges are selected (0, 90, -45 and 45 degree)\n"
+  ),
+  "@brief This enum specifies the the edge type for edge angle filters.\n"
+  "\n"
+  "This enum was introduced in version 0.28.\n"
+);
+
+//  Inject the db::SpecialEdgeOrientationFilter::FilterType declarations into Edges:
+gsi::ClassExt<db::Edges> decl_EdgesEdgeFilterType_into_parent (decl_EdgesEdgeFilterType.defs ());
 
 }
 

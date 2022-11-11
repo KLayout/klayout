@@ -864,7 +864,10 @@ CODE
     # @synopsis layer.with_angle(min .. max)
     # @synopsis layer.with_angle(value)
     # @synopsis layer.with_angle(min, max)
-    # @synopsis edge_pair_layer.with_angle(min, max [, both])
+    # @synopsis layer.with_angle(ortho)
+    # @synopsis layer.with_angle(diagonal)
+    # @synopsis layer.with_angle(diagonal_only)
+    # @synopsis edge_pair_layer.with_angle(... [, both])
     #
     # When called on an edge layer, the method selects edges by their angle, 
     # measured against the horizontal axis in the mathematical sense. 
@@ -876,7 +879,7 @@ CODE
     # The first version of this method selects
     # edges with a angle larger or equal to min and less than max (but not equal).
     # The second version selects edges with exactly the given angle. The third
-    # version is identical to the first one. 
+    # version is identical to the first one.
     #
     # When called on an edge pair layer, this method selects edge pairs with one or both edges
     # meeting the angle criterion. In this case an additional argument is accepted which can be
@@ -907,6 +910,17 @@ CODE
     #   @/tr
     # @/table
     #
+    # Specifying "ortho", "diagonal" or "diagonal_only" instead of the angle values will select
+    # 0 and 90 degree edges (ortho), -45 and 45 degree edges (diagonal_only) and both types (diagonal).
+    # This simplifies the implementation of selectors for manhattan or half-manhattan features:
+    #
+    # @code
+    # ortho_edges = edges.with_angle(ortho)
+    #
+    # # which is equivalent to, but more efficient as:
+    # ortho_edges = edges.with_angle(0) + edges.with_angle(90)
+    # @/code
+    #
     # Note that in former versions, with_angle could be used on polygon layers selecting corners with specific angles.
     # This feature has been deprecated. Use \corners instead.
 
@@ -916,11 +930,16 @@ CODE
     # @synopsis layer.without_angle(min .. max)
     # @synopsis layer.without_angle(value)
     # @synopsis layer.without_angle(min, max)
-    # @synopsis edge_pair_layer.without_angle(min, max [, both])
+    # @synopsis layer.without_angle(ortho)
+    # @synopsis layer.without_angle(diagonal)
+    # @synopsis layer.without_angle(diagonal_only)
+    # @synopsis edge_pair_layer.without_angle(... [, both])
     #
     # The method basically is the inverse of \with_angle. It selects all edges
     # of the edge layer or corners of the polygons which do not have the given angle (second form) or whose angle
-    # is not inside the given interval (first and third form). When called on edge pairs, it selects
+    # is not inside the given interval (first and third form) or of the given type (other forms).
+    # 
+    # When called on edge pairs, it selects
     # edge pairs by the angles of their edges.
     #
     # A note on the "both" modifier (without_angle called on edge pairs): "both" means that
@@ -998,6 +1017,12 @@ CODE
               a = args[0]
               if a.is_a?(Range)
                 DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a.begin, a.end, #{inv.inspect}))
+              elsif a.is_a?(DRCOrthoEdges) || a.is_a?(DRCDiagonalOnlyEdges) || a.is_a?(DRCDiagonalEdges)
+                if self.data.is_a?(RBA::Edges)
+                  DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a.e_value, #{inv.inspect}))
+                else
+                  DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a.ep_value, #{inv.inspect}))
+                end
               else
                 DRCLayer::new(@engine, @engine._tcmd(self.data, 0, result_class, f, a, #{inv.inspect}))
               end

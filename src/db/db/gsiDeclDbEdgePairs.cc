@@ -22,6 +22,7 @@
 
 
 #include "gsiDecl.h"
+#include "gsiEnums.h"
 
 #include "dbEdgePairs.h"
 #include "dbEdges.h"
@@ -232,6 +233,13 @@ static db::EdgePairs with_angle2 (const db::EdgePairs *r, double amin, double am
   return r->filtered (ef);
 }
 
+static db::EdgePairs with_angle3 (const db::EdgePairs *r, db::SpecialEdgeOrientationFilter::FilterType type, bool inverse)
+{
+  db::SpecialEdgeOrientationFilter f (type, inverse);
+  db::EdgeFilterBasedEdgePairFilter ef (&f, true /*one must match*/);
+  return r->filtered (ef);
+}
+
 static db::EdgePairs with_angle_both1 (const db::EdgePairs *r, double a, bool inverse)
 {
   db::EdgeOrientationFilter f (a, inverse);
@@ -242,6 +250,13 @@ static db::EdgePairs with_angle_both1 (const db::EdgePairs *r, double a, bool in
 static db::EdgePairs with_angle_both2 (const db::EdgePairs *r, double amin, double amax, bool inverse, bool include_amin, bool include_amax)
 {
   db::EdgeOrientationFilter f (amin, include_amin, amax, include_amax, inverse);
+  db::EdgeFilterBasedEdgePairFilter ef (&f, false /*both must match*/);
+  return r->filtered (ef);
+}
+
+static db::EdgePairs with_angle_both3 (const db::EdgePairs *r, db::SpecialEdgeOrientationFilter::FilterType type, bool inverse)
+{
+  db::SpecialEdgeOrientationFilter f (type, inverse);
   db::EdgeFilterBasedEdgePairFilter ef (&f, false /*both must match*/);
   return r->filtered (ef);
 }
@@ -677,6 +692,17 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "This method has been added in version 0.27.1.\n"
   ) +
+  method_ext ("with_angle", with_angle3, gsi::arg ("type"), gsi::arg ("inverse"),
+    "@brief Filter the edge pairs by orientation of their edges\n"
+    "Filters the edge pairs in the edge pair collection by orientation. If \"inverse\" is false, only "
+    "edge pairs with at least one edge having an angle of the given type are returned. If \"inverse\" is true, "
+    "edge pairs not fulfilling this criterion are returned.\n"
+    "\n"
+    "This version allows specifying an edge type instead of an angle. Edge types include multiple distinct orientations "
+    "and are specified using one of the \\OrthoEdges, \\DiagonalEgdes or \\OrthoDiagonalEdges types.\n"
+    "\n"
+    "This method has been added in version 0.28.\n"
+  ) +
   method_ext ("with_angle_both", with_angle_both1, gsi::arg ("angle"), gsi::arg ("inverse"),
     "@brief Filter the edge pairs by orientation of both of their edges\n"
     "Filters the edge pairs in the edge pair collection by orientation. If \"inverse\" is false, only "
@@ -701,6 +727,17 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "minimum angle itself is not included. Same for \"include_max_angle\" where the default is false, meaning the maximum angle is not included in the range.\n"
     "\n"
     "This method has been added in version 0.27.1.\n"
+  ) +
+  method_ext ("with_angle_both", with_angle_both3, gsi::arg ("type"), gsi::arg ("inverse"),
+    "@brief Filter the edge pairs by orientation of their edges\n"
+    "Filters the edge pairs in the edge pair collection by orientation. If \"inverse\" is false, only "
+    "edge pairs with both edges having an angle of the given type are returned. If \"inverse\" is true, "
+    "edge pairs not fulfilling this criterion are returned.\n"
+    "\n"
+    "This version allows specifying an edge type instead of an angle. Edge types include multiple distinct orientations "
+    "and are specified using one of the \\OrthoEdges, \\DiagonalEgdes or \\OrthoDiagonalEdges types.\n"
+    "\n"
+    "This method has been added in version 0.28.\n"
   ) +
   method_ext ("with_area", with_area1, gsi::arg ("area"), gsi::arg ("inverse"),
     "@brief Filters the edge pairs by the enclosed area\n"
@@ -837,5 +874,23 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
   "\n"
   "This class has been introduced in version 0.23.\n"
 );
+
+gsi::EnumIn<db::EdgePairs, db::SpecialEdgeOrientationFilter::FilterType> decl_EdgePairsEdgeFilterType ("db", "EdgeType",
+  gsi::enum_const ("OrthoEdges", db::SpecialEdgeOrientationFilter::Ortho,
+    "@brief Horizontal and vertical edges are selected\n"
+  ) +
+  gsi::enum_const ("DiagonalEdges", db::SpecialEdgeOrientationFilter::Diagonal,
+    "@brief Diagonal edges are selected (-45 and 45 degree)\n"
+  ) +
+  gsi::enum_const ("OrthoDiagonalEdges", db::SpecialEdgeOrientationFilter::OrthoDiagonal,
+    "@brief Diagonal or orthogonal edges are selected (0, 90, -45 and 45 degree)\n"
+  ),
+  "@brief This enum specifies the the edge type for edge angle filters.\n"
+  "\n"
+  "This enum was introduced in version 0.28.\n"
+);
+
+//  Inject the db::SpecialEdgeOrientationFilter::FilterType declarations into EdgePairs:
+gsi::ClassExt<db::EdgePairs> decl_EdgePairsEdgeFilterType_into_parent (decl_EdgePairsEdgeFilterType.defs ());
 
 }

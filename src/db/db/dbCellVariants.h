@@ -70,6 +70,16 @@ struct DB_PUBLIC OrientationReducer
 };
 
 /**
+ *  @brief A reducer for invariance against orthogonal transformations (rotations of multiple of 90 degree)
+ */
+struct DB_PUBLIC OrthogonalTransformationReducer
+  : public TransformationReducer
+{
+  db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
+  db::Trans reduce (const db::Trans &trans) const;
+};
+
+/**
  *  @brief A magnification reducer
  *
  *  This reducer incarnation reduces the transformation to it's scaling part.

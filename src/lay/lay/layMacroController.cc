@@ -262,7 +262,7 @@ MacroController::drop_url (const std::string &path_or_url)
   macro->load_from (path);
   macro->set_file_path (path);
 
-  if (macro->is_autorun () || macro->show_in_menu ()) {
+  if ((macro->is_autorun () || macro->show_in_menu ()) && ! lay::ApplicationBase::instance ()->appdata_path ().empty ()) {
 
     //  install macro permanently
     if (QMessageBox::question (mp_mw,

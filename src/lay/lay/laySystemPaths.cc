@@ -40,8 +40,9 @@ namespace lay
 std::string 
 get_appdata_path ()
 {
-  if (tl::has_env ("KLAYOUT_HOME")) {
-    return tl::get_env ("KLAYOUT_HOME");
+  const char *klayout_home_env = "KLAYOUT_HOME";
+  if (tl::has_env (klayout_home_env)) {
+    return tl::get_env (klayout_home_env);
   }
 
   QDir appdata_dir = QDir::homePath ();
@@ -105,11 +106,18 @@ get_klayout_path ()
     std::vector<std::string> klayout_path;
 
     //  generate the klayout path: the first component is always the appdata path
-    klayout_path.push_back (get_appdata_path ());
+    std::string adp = get_appdata_path ();
+    if (! adp.empty ()) {
+      klayout_path.push_back (adp);
+    }
 
-    std::string env = tl::get_env ("KLAYOUT_PATH");
-    if (! env.empty ()) {
-      split_path (env, klayout_path);
+    const char *klayout_path_env = "KLAYOUT_PATH";
+
+    if (tl::has_env (klayout_path_env)) {
+      std::string env = tl::get_env (klayout_path_env);
+      if (! env.empty ()) {
+        split_path (env, klayout_path);
+      }
     } else {
       klayout_path.push_back (tl::get_inst_path ());
     }

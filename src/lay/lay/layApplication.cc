@@ -258,7 +258,10 @@ ApplicationBase::parse_cmd (int &argc, char **argv)
       }
     }
 
-    m_config_file_to_write = tl::to_string (QDir (tl::to_qstring (m_appdata_path)).absoluteFilePath (QString::fromUtf8 ("klayoutrc")));
+    m_config_file_to_write.clear ();
+    if (! m_appdata_path.empty ()) {
+      m_config_file_to_write = tl::to_string (QDir (tl::to_qstring (m_appdata_path)).absoluteFilePath (QString::fromUtf8 ("klayoutrc")));
+    }
 
     //  Hint: the order is reverse in the sense that the first one wins ...
     for (std::vector <std::string>::const_iterator p = m_klayout_path.end (); p != m_klayout_path.begin (); ) {
@@ -733,10 +736,12 @@ ApplicationBase::init_app ()
     std::vector<std::string> global_modules = scan_global_modules ();
     m_load_macros.insert (m_load_macros.begin (), global_modules.begin (), global_modules.end ());
 
+    size_t local_folders = (lay::get_appdata_path ().empty () ? 0 : 1);
+
     for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
-      if (p == m_klayout_path.begin ()) {
+      if (p - m_klayout_path.begin () < local_folders) {
         mc->add_path (*p, tl::to_string (QObject::tr ("Local")), std::string (), false);
-      } else if (m_klayout_path.size () == 2) {
+      } else if (m_klayout_path.size () == 1 + local_folders) {
         mc->add_path (*p, tl::to_string (QObject::tr ("Global")), std::string (), true);
       } else {
         mc->add_path (*p, tl::to_string (QObject::tr ("Global")) + " - " + *p, std::string (), true);

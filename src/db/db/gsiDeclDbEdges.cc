@@ -639,7 +639,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "This will select horizontal edges:\n"
     "\n"
     "@code\n"
-    "horizontal = edges.with_orientation(0, false)\n"
+    "horizontal = edges.with_angle(0, false)\n"
     "@/code\n"
   ) +
   method_ext ("with_angle", with_angle2, gsi::arg ("min_angle"), gsi::arg ("max_angle"), gsi::arg ("inverse"), gsi::arg ("include_min_angle", true), gsi::arg ("include_max_angle", false),
@@ -661,7 +661,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "edges which do not conform to this criterion are returned.\n"
     "\n"
     "This version allows specifying an edge type instead of an angle. Edge types include multiple distinct orientations "
-    "and are specified using one of the \\OrthoEdges, \\DiagonalEgdes or \\OrthoDiagonalEdges types.\n"
+    "and are specified using one of the \\OrthoEdges, \\DiagonalEdges or \\OrthoDiagonalEdges types.\n"
     "\n"
     "This method has been added in version 0.28.\n"
   ) +

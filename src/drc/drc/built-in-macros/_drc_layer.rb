@@ -896,6 +896,10 @@ CODE
     # @/code
     #
     # A method delivering all objects not matching the angle criterion is \without_angle.
+    # Note that for edge pairs, in order to get the inverse result, you have to add or drop "both"
+    # on \without_angle. This is because \without_angle without both returns edge pairs where
+    # one edge does not match the criterion. The logical opposite of "one edge matches" however is 
+    # "both edges do not match".
     #
     # The following images demonstrate some use cases of \with_angle and \without_angle:
     #

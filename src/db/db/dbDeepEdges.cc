@@ -1200,8 +1200,9 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
           out = & to_commit [c->cell_index ()][v->first];
         }
 
+        PolygonRefToShapesGenerator prgen (&layout, out);
         for (db::Shapes::shape_iterator si = c->shapes (edges.layer ()).begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
-          out->insert (extended_edge (si->edge ().transformed (v->first), ext_b, ext_e, ext_o, ext_i).transformed (v->first.inverted ()));
+          prgen.put (extended_edge (si->edge ().transformed (v->first), ext_b, ext_e, ext_o, ext_i).transformed (v->first.inverted ()));
         }
 
       }

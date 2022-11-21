@@ -1,0 +1,18 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+
+l1.output(1, 0)
+
+l1e = l1.edges
+l1e.with_angle(ortho).extended_out(1.dbu).merged.output(100, 0)
+l1e.with_angle(diagonal_only).extended_in(1.dbu).merged.output(101, 0)
+l1e.with_angle(diagonal).extended(1.dbu, 2.dbu, 3.dbu, 4.dbu).merged.output(102, 0)
+
+

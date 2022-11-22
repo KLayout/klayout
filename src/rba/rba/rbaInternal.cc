@@ -54,7 +54,7 @@ public:
   void mark_this ();
 
 private:
-  std::set<VALUE> m_objects;
+  std::map<VALUE, size_t> m_objects;
 
   static VALUE m_klass;
   static VALUE m_instance;
@@ -84,20 +84,31 @@ LockedObjectVault::~LockedObjectVault ()
 void
 LockedObjectVault::add (VALUE object)
 {
-  m_objects.insert (object);
+  auto i = m_objects.find (object);
+  if (i != m_objects.end ()) {
+    i->second += 1;
+  } else {
+    m_objects.insert (std::make_pair (object, size_t (1)));
+  }
 }
 
 void
 LockedObjectVault::remove (VALUE object)
 {
-  m_objects.erase (object);
+  auto i = m_objects.find (object);
+  if (i != m_objects.end ()) {
+    i->second -= 1;
+    if (i->second == 0) {
+      m_objects.erase (i);
+    }
+  }
 }
 
 void
 LockedObjectVault::mark_this ()
 {
-  for (std::set<VALUE>::iterator o = m_objects.begin (); o != m_objects.end (); ++o) {
-    rb_gc_mark (*o);
+  for (auto o = m_objects.begin (); o != m_objects.end (); ++o) {
+    rb_gc_mark (o->first);
   }
 }
 

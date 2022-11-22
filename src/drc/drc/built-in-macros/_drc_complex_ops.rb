@@ -232,15 +232,15 @@ class DRCOpNode
   attr_accessor :description
   attr_accessor :engine
   
-  def initialize(engine, node = nil)
-    @node = node
+  def initialize(engine, &factory)
+    @factory = factory
     self.engine = engine
     self.description = "Basic"
   end
   
   def create_node(cache)
     n = cache[self.object_id]
-    if !n
+    if !n || n.destroyed?
       n = self.do_create_node(cache)
       cache[self.object_id] = n
     end
@@ -248,7 +248,7 @@ class DRCOpNode
   end
   
   def do_create_node(cache)
-    @node
+    @factory.call
   end
   
   def dump(indent)
@@ -362,8 +362,8 @@ CODE
         return self.inverted
       else
         # TODO: what if the expression isn't region?
-        empty = RBA::CompoundRegionOperationNode::new_empty(RBA::CompoundRegionOperationNode::ResultType::Region)
-        DRCOpNodeCase::new(@engine, [ self, DRCOpNode::new(@engine, empty), @engine.primary ])
+        empty = DRCOpNode::new(@engine) { RBA::CompoundRegionOperationNode::new_empty(RBA::CompoundRegionOperationNode::ResultType::Region) }
+        DRCOpNodeCase::new(@engine, [ self, empty, @engine.primary ])
       end
     end
   end

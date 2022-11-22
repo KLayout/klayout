@@ -476,7 +476,7 @@ module DRC
 
         layer.requires_region
 
-        res = DRCOpNode::new(self, RBA::CompoundRegionOperationNode::new_secondary(layer.data))
+        res = DRCOpNode::new(self) { RBA::CompoundRegionOperationNode::new_secondary(layer.data) }
         res.description = "secondary"
         return res
 
@@ -493,7 +493,7 @@ module DRC
     # is called on.
     
     def primary
-      res = DRCOpNode::new(self, RBA::CompoundRegionOperationNode::new_primary)
+      res = DRCOpNode::new(self) { RBA::CompoundRegionOperationNode::new_primary }
       res.description = "primary"
       return res
     end
@@ -520,7 +520,7 @@ module DRC
     # @/code
     
     def foreign
-      res = DRCOpNode::new(self, RBA::CompoundRegionOperationNode::new_foreign)
+      res = DRCOpNode::new(self) { RBA::CompoundRegionOperationNode::new_foreign }
       res.description = "foreign"
       return res
     end
@@ -1555,10 +1555,12 @@ CODE
 
     def _make_node(arg)
       if arg.is_a?(DRCLayer)
-        arg = DRCOpNode::new(self, RBA::CompoundRegionOperationNode::new_secondary(arg.data))
-        arg.description = "secondary"
+        node = DRCOpNode::new(self) { RBA::CompoundRegionOperationNode::new_secondary(arg.data) }
+        node.description = "secondary"
+        return node
+      else
+        return arg
       end
-      arg
     end
 
   end

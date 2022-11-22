@@ -159,90 +159,6 @@ gc_unlock_object (VALUE value)
 }
 
 // --------------------------------------------------------------------------
-
-/**
- *  @brief A final finalizer
- *  Final destruction of finalized objects is delegated to this class.
- *  It's main purpose is to temporarily disable C++ destruction while
- *  in a callback. Deleting C++ objects in a callback leads to unpredictable
- *  side effects and must be avoided.
- */
-class InternalGC
-{
-public:
-  InternalGC ()
-    : m_enabled (true)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Enables or disables the GC
-   *  Returns the previous state
-   */
-  bool enable (bool e)
-  {
-    std::swap (e, m_enabled);
-    return e;
-  }
-
-  /**
-   *  @brief Queues (if disabled) or deletes the given object (plus all queued ones) if enabled
-   */
-  void destroy_maybe (const gsi::ClassBase *cls, void *obj)
-  {
-    if (! m_enabled) {
-      m_queue.push_back (std::make_pair (cls, obj));
-    } else {
-      m_queue.clear ();
-      cls->destroy (obj);
-      for (std::vector<std::pair<const gsi::ClassBase *, void *> >::const_iterator q = m_queue.begin (); q != m_queue.end (); ++q) {
-        q->first->destroy (q->second);
-      }
-    }
-  }
-
-private:
-  std::vector<std::pair<const gsi::ClassBase *, void *> > m_queue;
-  bool m_enabled;
-};
-
-static InternalGC s_gc;
-
-/**
- *  @brief Destroys the object through the internal GC
- */
-inline void destroy_object (const gsi::ClassBase *cls, void *obj)
-{
-  s_gc.destroy_maybe (cls, obj);
-}
-
-/**
- *  @brief A GC disabler
- *  By instantiating this object, the gc is disabled while the object is alive.
- *  Specifically in callbacks it's important to disable the GC to avoid undesired
- *  side effects.
- */
-class GCDisabler
-{
-public:
-  GCDisabler (InternalGC *gc = 0)
-    : mp_gc (gc ? gc : &s_gc)
-  {
-    m_was_enabled = mp_gc->enable (false);
-  }
-
-  ~GCDisabler()
-  {
-    mp_gc->enable (m_was_enabled);
-  }
-
-private:
-  bool m_was_enabled;
-  InternalGC *mp_gc;
-};
-
-// --------------------------------------------------------------------------
 //  Proxy implementation
 
 Proxy::Proxy (const gsi::ClassBase *_cls_decl)
@@ -309,8 +225,6 @@ bool Proxy::can_call () const
 void
 Proxy::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
 {
-  GCDisabler gc_disabler;
-
   tl_assert (id < int (m_cbfuncs.size ()) && id >= 0);
 
   const gsi::MethodBase *meth = m_cbfuncs [id].method;
@@ -635,7 +549,7 @@ Proxy::set (void *obj, bool owned, bool const_ref, bool can_destroy, VALUE self)
       //  Destroy the object if we are owner. We don't destroy the object if it was locked
       //  (either because we are not owner or from C++ side using keep())
       if (prev_owned) {
-        destroy_object (cls, prev_obj);
+        cls->destroy (prev_obj);
       }
 
     }
@@ -891,8 +805,6 @@ SignalHandler::define_class (VALUE module, const char *name)
 
 void SignalHandler::call (const gsi::MethodBase *meth, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
 {
-  GCDisabler gc_disabler;
-
   VALUE argv = rb_ary_new2 (long (std::distance (meth->begin_arguments (), meth->end_arguments ())));
   RB_GC_GUARD (argv);
 

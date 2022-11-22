@@ -1001,6 +1001,10 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
     const gsi::ClassBase *cls_decl;
     Proxy *p = 0;
 
+    //  this prevents side effects of callbacks raised from within the called functions -
+    //  if these trigger the GC, self is protected from destruction herein.
+    GCLocker gc_locker (self);
+
     if (TYPE (self) == T_CLASS) {
       //  we have a static method
       cls_decl = find_cclass (self);

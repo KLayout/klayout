@@ -252,6 +252,31 @@ void gc_lock_object (VALUE value);
 void gc_unlock_object (VALUE value);
 
 /**
+ *  @brief A Locker for the object based on the RIIA pattern
+ */
+class GCLocker
+{
+public:
+  GCLocker (VALUE value)
+    : m_value (value)
+  {
+    gc_lock_object (m_value);
+  }
+
+  ~GCLocker ()
+  {
+    gc_unlock_object (m_value);
+  }
+
+private:
+  GCLocker ();
+  GCLocker (const GCLocker &other);
+  GCLocker &operator= (const GCLocker &other);
+
+  VALUE m_value;
+};
+
+/**
  *  @brief Makes the locked object vault required for gc_lock_object and gc_unlock_object
  *
  *  This function needs to be called by the interpreter initially.

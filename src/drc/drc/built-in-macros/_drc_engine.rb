@@ -2125,7 +2125,7 @@ CODE
       t = RBA::Timer::new
       t.start
       self._process_events
-      GC.start # force a garbage collection before the operation to free unused memory
+      ## GC.start # force a garbage collection before the operation to free unused memory
       res = yield
       t.stop
 
@@ -2521,7 +2521,7 @@ CODE
         end
 
         # force garbage collection
-        GC.start
+        ## GC.start
 
       end
 
@@ -2540,7 +2540,7 @@ CODE
         @drc_progress = nil
       end
 
-      GC.start
+      ## GC.start
 
     end
 

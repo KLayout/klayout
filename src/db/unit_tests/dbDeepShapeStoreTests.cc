@@ -73,6 +73,7 @@ static size_t shapes_in_top (const db::Layout &layout, unsigned int layer)
 TEST(2_RefCounting)
 {
   db::DeepShapeStore store;
+  store.set_keep_layouts (false);
   db::Layout layout;
 
   unsigned int l1 = layout.insert_layer ();

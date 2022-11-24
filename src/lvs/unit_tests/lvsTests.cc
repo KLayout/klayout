@@ -160,7 +160,7 @@ TEST(19_private)
 TEST(20_private)
 {
   // test_is_long_runner ();
-  run_test (_this, "test_20.lylvs", "test_20.cir.gz", "test_20.gds.gz", true, "test_20b_2.lvsdb");
+  run_test (_this, "test_20.lylvs", "test_20.cir.gz", "test_20.gds.gz", true, "test_20b_3.lvsdb");
 }
 
 TEST(21_private)

@@ -30,6 +30,8 @@
 
 static void run_test (tl::TestBase *_this, const std::string &number, bool deep)
 {
+  std::string force_gc = "true";
+
   std::string rs = tl::testdata ();
   rs += "/drc/drcGenericTests_" + number + ".drc";
 
@@ -45,10 +47,11 @@ static void run_test (tl::TestBase *_this, const std::string &number, bool deep)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = %s\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
         "$drc_test_deep = %s\n"
-      , input, output, deep ? "true" : "false")
+      , force_gc, input, output, deep ? "true" : "false")
     );
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);

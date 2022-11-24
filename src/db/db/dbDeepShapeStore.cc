@@ -426,13 +426,13 @@ static unsigned int init_layer (db::Layout &layout, const db::RecursiveShapeIter
 }
 
 DeepShapeStore::DeepShapeStore ()
-  : m_keep_layouts (false)
+  : m_keep_layouts (true)
 {
   ++s_instance_count;
 }
 
 DeepShapeStore::DeepShapeStore (const std::string &topcell_name, double dbu)
-  : m_keep_layouts (false)
+  : m_keep_layouts (true)
 {
   ++s_instance_count;
 

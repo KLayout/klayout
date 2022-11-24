@@ -42,6 +42,7 @@ TEST(1)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = nil\n"
         "$drc_test_target = '%s'\n"
       , output)
@@ -82,6 +83,7 @@ TEST(2)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -122,6 +124,7 @@ TEST(3_Flat)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -162,6 +165,7 @@ TEST(4_Hierarchical)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -202,6 +206,7 @@ TEST(5_FlatAntenna)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -242,6 +247,7 @@ TEST(5_FlatAntennaIncremental)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -282,6 +288,7 @@ TEST(6_HierarchicalAntenna)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -322,6 +329,7 @@ TEST(7_AntennaWithDiodes)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -362,6 +370,7 @@ TEST(8_TextsAndPolygons)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -427,6 +436,7 @@ TEST(9_NetlistExtraction)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
         "$drc_test_target_simplified = '%s'\n"
@@ -471,6 +481,7 @@ TEST(10_NetlistExtractionFlat)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
         "$drc_test_target_simplified = '%s'\n"
@@ -515,6 +526,7 @@ TEST(11_CustomDevices)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
         "$drc_test_target_simplified = '%s'\n"
@@ -555,6 +567,7 @@ TEST(12_NetlistJoinLabels)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
         "$drc_test_target_simplified = nil\n"
@@ -591,6 +604,7 @@ TEST(13a_KissingCorners)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -634,6 +648,7 @@ TEST(13b_KissingCornersDeep)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -681,6 +696,7 @@ TEST(14_SwitchingTargets)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
         "$drc_test_target2 = '%s'\n"
@@ -732,6 +748,7 @@ TEST(15_issue548)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -773,6 +790,7 @@ TEST(16_issue570)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -814,6 +832,7 @@ TEST(17_issue570)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -854,6 +873,7 @@ TEST(18_forget)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -894,6 +914,7 @@ TEST(19_shielding)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -934,6 +955,7 @@ TEST(20_interact_with_count)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -974,6 +996,7 @@ TEST(21_breaking)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -1014,6 +1037,7 @@ TEST(22_opposite_filter)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -1054,6 +1078,7 @@ TEST(23_rect_filter)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -1094,6 +1119,7 @@ TEST(24_enclosing)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
       , input, output)
@@ -1119,6 +1145,8 @@ TEST(24_enclosing)
 
 static void run_test (tl::TestBase *_this, const std::string &number, bool deep, bool oasis = false)
 {
+  std::string force_gc = "true";
+
   std::string rs = tl::testdata ();
   rs += "/drc/drcSimpleTests_" + number + ".drc";
 
@@ -1134,10 +1162,11 @@ static void run_test (tl::TestBase *_this, const std::string &number, bool deep,
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = '%s'\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
         "$drc_test_deep = %s\n"
-      , input, output, deep ? "true" : "false")
+      , force_gc, input, output, deep ? "true" : "false")
     );
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);

@@ -36,6 +36,7 @@ TEST(1)
 
   lym::Macro drc;
   drc.set_text (tl::sprintf (
+      "force_gc true\n"
       "source('%s', \"TOP\")\n"
       "target('%s', \"TOP\")\n"
       "l1 = input(1, 0)\n"
@@ -70,6 +71,7 @@ TEST(2)
 {
   lym::Macro drc;
   drc.set_text (
+    "force_gc true\n"
     "dbu 0.001\n"
     "def compare(a, b, ex)\n"
     "  a = a.to_s\n"

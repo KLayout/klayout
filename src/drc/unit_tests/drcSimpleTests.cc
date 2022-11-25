@@ -1338,3 +1338,12 @@ TEST(56d_angle_classes)
   run_test (_this, "56", true);
 }
 
+TEST(57_issue_1190)
+{
+  run_test (_this, "57", false);
+}
+
+TEST(57d_issue_1190)
+{
+  run_test (_this, "57", true);
+}

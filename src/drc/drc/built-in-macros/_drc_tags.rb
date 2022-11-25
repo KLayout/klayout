@@ -16,8 +16,29 @@ module DRC
     end
   end
   
-  # A wrapper for the "both edges" flag for EdgePair#with_length or EdgePair#with_angle
+  # A wrapper for the "both edges" flag for EdgePairs#with_length or EdgePairs#with_angle
   class DRCBothEdges
+  end
+  
+  # A wrapper for the "ortho edges" flag for Edges#with_angle or EdgePairs#with_angle
+  class DRCOrthoEdges
+    def value
+      RBA::Edges::OrthoEdges
+    end
+  end
+  
+  # A wrapper for the "diagonal only edges" flag for Edges#with_angle or EdgePairs#with_angle
+  class DRCDiagonalOnlyEdges
+    def value
+      RBA::Edges::DiagonalEdges
+    end
+  end
+  
+  # A wrapper for the "diagonal edges" flag for Edges#with_angle or EdgePairs#with_angle
+  class DRCDiagonalEdges
+    def value
+      RBA::Edges::OrthoDiagonalEdges
+    end
   end
   
   # A wrapper for the padding modes of with_density

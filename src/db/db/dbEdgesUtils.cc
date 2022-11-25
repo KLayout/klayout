@@ -275,6 +275,73 @@ EdgeOrientationFilter::selected (const db::Edge &edge) const
 }
 
 // -------------------------------------------------------------------------------------------------------------
+//  SpecialEdgeOrientationFilter implementation
+
+SpecialEdgeOrientationFilter::SpecialEdgeOrientationFilter (FilterType type, bool inverse)
+  : m_type (type), m_inverse (inverse)
+{
+  //  .. nothing yet ..
+}
+
+static EdgeAngleChecker s_ortho_checkers [] = {
+  EdgeAngleChecker (0.0, true, 0.0, true),
+  EdgeAngleChecker (90.0, true, 90.0, true)
+};
+
+static EdgeAngleChecker s_diagonal_checkers [] = {
+  EdgeAngleChecker (-45.0, true, -45.0, true),
+  EdgeAngleChecker (45.0, true, 45.0, true)
+};
+
+static EdgeAngleChecker s_orthodiagonal_checkers [] = {
+  EdgeAngleChecker (-45.0, true, -45.0, true),
+  EdgeAngleChecker (0.0, true, 0.0, true),
+  EdgeAngleChecker (45.0, true, 45.0, true),
+  EdgeAngleChecker (90.0, true, 90.0, true)
+};
+
+bool
+SpecialEdgeOrientationFilter::selected (const db::Edge &edge) const
+{
+  const EdgeAngleChecker *eb, *ee;
+
+  switch (m_type) {
+  case Ortho:
+    eb = s_ortho_checkers;
+    ee = s_ortho_checkers + sizeof (s_ortho_checkers) / sizeof (s_ortho_checkers [0]);
+    break;
+  case Diagonal:
+    eb = s_diagonal_checkers;
+    ee = s_diagonal_checkers + sizeof (s_diagonal_checkers) / sizeof (s_diagonal_checkers [0]);
+    break;
+  case OrthoDiagonal:
+  default:
+    eb = s_orthodiagonal_checkers;
+    ee = s_orthodiagonal_checkers + sizeof (s_orthodiagonal_checkers) / sizeof (s_orthodiagonal_checkers [0]);
+    break;
+  }
+
+  db::Vector en, ev;
+  en = db::Vector (edge.ortho_length (), 0);
+
+  //  NOTE: this edge normalization confines the angle to a range between (-90 .. 90] (-90 excluded).
+  //  A horizontal edge has 0 degree, a vertical one has 90 degree.
+  if (edge.dx () < 0 || (edge.dx () == 0 && edge.dy () < 0)) {
+    ev = -edge.d ();
+  } else {
+    ev = edge.d ();
+  }
+
+  for (auto ec = eb; ec != ee; ++ec) {
+    if ((*ec) (en, ev)) {
+      return ! m_inverse;
+    }
+  }
+
+  return m_inverse;
+}
+
+// -------------------------------------------------------------------------------------------------------------
 //  Edge to Edge relation implementation
 
 bool edge_interacts (const db::Edge &a, const db::Edge &b)

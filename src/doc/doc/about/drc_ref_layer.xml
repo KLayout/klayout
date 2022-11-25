@@ -3290,7 +3290,10 @@ Shielding is enabled by default, but can be switched off with the "transparent" 
 <li><tt>layer.with_angle(min .. max)</tt></li>
 <li><tt>layer.with_angle(value)</tt></li>
 <li><tt>layer.with_angle(min, max)</tt></li>
-<li><tt>edge_pair_layer.with_angle(min, max [, both])</tt></li>
+<li><tt>layer.with_angle(ortho)</tt></li>
+<li><tt>layer.with_angle(diagonal)</tt></li>
+<li><tt>layer.with_angle(diagonal_only)</tt></li>
+<li><tt>edge_pair_layer.with_angle(... [, both])</tt></li>
 </ul>
 <p>
 When called on an edge layer, the method selects edges by their angle, 
@@ -3303,7 +3306,7 @@ an angle of 90 degee. The angle range is from -90 (exclusive) to 90 degree (incl
 The first version of this method selects
 edges with a angle larger or equal to min and less than max (but not equal).
 The second version selects edges with exactly the given angle. The third
-version is identical to the first one. 
+version is identical to the first one.
 </p><p>
 When called on an edge pair layer, this method selects edge pairs with one or both edges
 meeting the angle criterion. In this case an additional argument is accepted which can be
@@ -3320,6 +3323,10 @@ ep2 = edge_pairs.with_angle(90, both)
 </pre>
 </p><p>
 A method delivering all objects not matching the angle criterion is <a href="#without_angle">without_angle</a>.
+Note that for edge pairs, in order to get the inverse result, you have to add or drop "both"
+on <a href="#without_angle">without_angle</a>. This is because <a href="#without_angle">without_angle</a> without both returns edge pairs where
+one edge does not match the criterion. The logical opposite of "one edge matches" however is 
+"both edges do not match".
 </p><p>
 The following images demonstrate some use cases of <a href="#with_angle">with_angle</a> and <a href="#without_angle:">without_angle:</a>
 </p><p>
@@ -3333,6 +3340,17 @@ The following images demonstrate some use cases of <a href="#with_angle">with_an
 <td><img src="/images/drc_with_angle4.png"/></td>
 </tr>
 </table>
+</p><p>
+Specifying "ortho", "diagonal" or "diagonal_only" instead of the angle values will select
+0 and 90 degree edges (ortho), -45 and 45 degree edges (diagonal_only) and both types (diagonal).
+This simplifies the implementation of selectors for manhattan or half-manhattan features:
+</p><p>
+<pre>
+ortho_edges = edges.with_angle(ortho)
+
+# which is equivalent to, but more efficient as:
+ortho_edges = edges.with_angle(0) + edges.with_angle(90)
+</pre>
 </p><p>
 Note that in former versions, with_angle could be used on polygon layers selecting corners with specific angles.
 This feature has been deprecated. Use <a href="#corners">corners</a> instead.
@@ -3663,12 +3681,17 @@ This method is available for polygon layers only.
 <li><tt>layer.without_angle(min .. max)</tt></li>
 <li><tt>layer.without_angle(value)</tt></li>
 <li><tt>layer.without_angle(min, max)</tt></li>
-<li><tt>edge_pair_layer.without_angle(min, max [, both])</tt></li>
+<li><tt>layer.without_angle(ortho)</tt></li>
+<li><tt>layer.without_angle(diagonal)</tt></li>
+<li><tt>layer.without_angle(diagonal_only)</tt></li>
+<li><tt>edge_pair_layer.without_angle(... [, both])</tt></li>
 </ul>
 <p>
 The method basically is the inverse of <a href="#with_angle">with_angle</a>. It selects all edges
 of the edge layer or corners of the polygons which do not have the given angle (second form) or whose angle
-is not inside the given interval (first and third form). When called on edge pairs, it selects
+is not inside the given interval (first and third form) or of the given type (other forms).
+</p><p>
+When called on edge pairs, it selects
 edge pairs by the angles of their edges.
 </p><p>
 A note on the "both" modifier (without_angle called on edge pairs): "both" means that

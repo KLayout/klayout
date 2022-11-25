@@ -474,6 +474,19 @@ class DBEdges_TestClass < TestBase
     assert_equal(r.with_length(100, 200, true).to_s, "(100,0;100,50)")
     assert_equal(r.with_length(nil, 100, false).to_s, "(100,0;100,50)")
 
+    r = RBA::Edges::new
+    r.insert(RBA::Edge::new(0, 0, 100, 0))
+    r.insert(RBA::Edge::new(100, 0, 100, 50))
+    r.insert(RBA::Edge::new(0, 0, 100, 100))
+    r.insert(RBA::Edge::new(0, 0, 100, -100))
+    r.insert(RBA::Edge::new(0, 0, 100, 120))
+    assert_equal(r.with_angle(RBA::Edges::OrthoEdges, false).to_s, "(0,0;100,0);(100,0;100,50)")
+    assert_equal(r.with_angle(RBA::Edges::OrthoEdges, true).to_s, "(0,0;100,100);(0,0;100,-100);(0,0;100,120)")
+    assert_equal(r.with_angle(RBA::Edges::DiagonalEdges, false).to_s, "(0,0;100,100);(0,0;100,-100)")
+    assert_equal(r.with_angle(RBA::Edges::DiagonalEdges, true).to_s, "(0,0;100,0);(100,0;100,50);(0,0;100,120)")
+    assert_equal(r.with_angle(RBA::Edges::OrthoDiagonalEdges, false).to_s, "(0,0;100,0);(100,0;100,50);(0,0;100,100);(0,0;100,-100)")
+    assert_equal(r.with_angle(RBA::Edges::OrthoDiagonalEdges, true).to_s, "(0,0;100,120)")
+
   end
 
   # interact

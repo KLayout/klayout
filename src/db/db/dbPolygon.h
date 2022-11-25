@@ -3076,6 +3076,7 @@ public:
   typedef typename Poly::coord_type coord_type;
   typedef typename Poly::point_type point_type;
   typedef typename Poly::box_type box_type;
+  typedef typename Poly::edge_type edge_type;
   typedef Trans trans_type;
   typedef Poly polygon_type;
   typedef db::polygon_edge_iterator<Poly, trans_type> polygon_edge_iterator;

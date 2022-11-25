@@ -77,6 +77,18 @@ module DRC
       DRCBothEdges::new
     end
     
+    def ortho
+      DRCOrthoEdges::new
+    end
+    
+    def diagonal_only
+      DRCDiagonalOnlyEdges::new
+    end
+    
+    def diagonal
+      DRCDiagonalEdges::new
+    end
+    
     def shift(x, y)
       self._context("shift") do
         RBA::DCplxTrans::new(RBA::DVector::new(_make_value(x) * self.dbu, _make_value(y) * self.dbu))

@@ -303,6 +303,27 @@ class DBEdgePairs_TestClass < TestBase
     assert_equal(r1.with_internal_angle(0, 45, false, true, true).to_s, "(0,0;0,10)/(10,20;10,0);(0,0;0,10)/(20,10;30,0)")
     assert_equal(r1.with_internal_angle(0, 45, true, true, true).to_s, "")
 
+    ep1 = RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 10), RBA::Edge::new(10, 0, 20, 0))
+    ep2 = RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 10), RBA::Edge::new(10, 0, 20, 10))
+    ep3 = RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 20), RBA::Edge::new(10, 20, 10, 0))
+    ep4 = RBA::EdgePair::new(RBA::Edge::new(0, 0, 0, 10), RBA::Edge::new(10, 0, 15, 10))
+
+    r = RBA::EdgePairs::new([ ep1, ep2, ep3, ep4 ])
+
+    assert_equal(r.with_angle(RBA::Edges::OrthoEdges, false).to_s, "(0,0;0,10)/(10,0;20,0);(0,0;0,10)/(10,0;20,10);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;15,10)")
+    assert_equal(r.with_angle(RBA::Edges::OrthoEdges, true).to_s, "(0,0;0,10)/(10,0;20,10);(0,0;0,10)/(10,0;15,10)")
+    assert_equal(r.with_angle(RBA::Edges::DiagonalEdges, false).to_s, "(0,0;0,10)/(10,0;20,10)")
+    assert_equal(r.with_angle(RBA::Edges::DiagonalEdges, true).to_s, "(0,0;0,10)/(10,0;20,0);(0,0;0,10)/(10,0;20,10);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;15,10)")
+    assert_equal(r.with_angle(RBA::Edges::OrthoDiagonalEdges, false).to_s, "(0,0;0,10)/(10,0;20,0);(0,0;0,10)/(10,0;20,10);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;15,10)")
+    assert_equal(r.with_angle(RBA::Edges::OrthoDiagonalEdges, true).to_s, "(0,0;0,10)/(10,0;15,10)")
+
+    assert_equal(r.with_angle_both(RBA::Edges::OrthoEdges, false).to_s, "(0,0;0,10)/(10,0;20,0);(0,0;0,20)/(10,20;10,0)")
+    assert_equal(r.with_angle_both(RBA::Edges::OrthoEdges, true).to_s, "")
+    assert_equal(r.with_angle_both(RBA::Edges::DiagonalEdges, false).to_s, "")
+    assert_equal(r.with_angle_both(RBA::Edges::DiagonalEdges, true).to_s, "(0,0;0,10)/(10,0;20,0);(0,0;0,20)/(10,20;10,0);(0,0;0,10)/(10,0;15,10)")
+    assert_equal(r.with_angle_both(RBA::Edges::OrthoDiagonalEdges, false).to_s, "(0,0;0,10)/(10,0;20,0);(0,0;0,10)/(10,0;20,10);(0,0;0,20)/(10,20;10,0)")
+    assert_equal(r.with_angle_both(RBA::Edges::OrthoDiagonalEdges, true).to_s, "")
+
   end
 
 end

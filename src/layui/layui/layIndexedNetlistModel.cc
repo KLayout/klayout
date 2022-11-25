@@ -225,13 +225,13 @@ static size_t index_from_attr (const std::pair<const Attr *, const Attr *> &attr
 size_t
 SingleIndexedNetlistModel::circuit_count () const
 {
-  return mp_netlist->circuit_count ();
+  return mp_netlist ? mp_netlist->circuit_count () : 0;
 }
 
 size_t
 SingleIndexedNetlistModel::top_circuit_count () const
 {
-  return mp_netlist->top_circuit_count ();
+  return mp_netlist ? mp_netlist->top_circuit_count () : 0;
 }
 
 size_t

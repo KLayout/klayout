@@ -45,6 +45,26 @@ db::Trans OrientationReducer::reduce (const db::Trans &trans) const
 
 // ------------------------------------------------------------------------------------------
 
+db::ICplxTrans OrthogonalTransformationReducer::reduce (const db::ICplxTrans &trans) const
+{
+  if (trans.is_ortho ()) {
+    return db::ICplxTrans ();
+  } else {
+    db::ICplxTrans res;
+    double a = trans.angle ();
+    double a90 = floor (a / 90.0 + 0.5) * 90.0;
+    res.angle (a - a90);
+    return res;
+  }
+}
+
+db::Trans OrthogonalTransformationReducer::reduce (const db::Trans &trans) const
+{
+  return db::Trans ();
+}
+
+// ------------------------------------------------------------------------------------------
+
 db::ICplxTrans MagnificationReducer::reduce (const db::ICplxTrans &trans) const
 {
   return db::ICplxTrans (trans.mag ());

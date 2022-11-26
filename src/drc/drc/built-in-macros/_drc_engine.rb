@@ -29,6 +29,8 @@ module DRC
 
       cv = RBA::CellView::active
 
+      @time = Time::now
+      @force_gc = ($drc_force_gc == true)   # for testing, $drc_force_gc can be set to true
       @generator = ""
       @rdb_index = nil
       @l2ndb_index = nil
@@ -71,6 +73,11 @@ module DRC
 
       @in_context = nil
 
+    end
+
+    # for testing
+    def force_gc(f)
+      @force_gc = f
     end
 
     def both
@@ -2137,7 +2144,10 @@ CODE
       t = RBA::Timer::new
       t.start
       self._process_events
-      GC.start # force a garbage collection before the operation to free unused memory
+      if @force_gc || Time::now - @time > 0.5
+        GC.start    # force a garbage collection before the operation to free unused memory
+        @time = Time::now
+      end
       res = yield
       t.stop
 

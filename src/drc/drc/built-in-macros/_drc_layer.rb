@@ -4250,11 +4250,13 @@ CODE
       tp.output("res", res)
       tp.input("input", self.data)
       tp.threads = (@engine.threads || 1)
+
       if tile_boundary
-        tp.input("boundary", tile_boundary.data)
+        boundary = tile_boundary.data
       else
-        tp.input("boundary", RBA::Region::new(self.data.bbox))
+        boundary = RBA::Region::new(self.data.bbox)
       end
+      tp.input("boundary", boundary)
 
       tp.var("vmin", limits[0] || 0.0)
       tp.var("vmax", limits[1] || 1.0)

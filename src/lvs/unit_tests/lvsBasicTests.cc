@@ -40,6 +40,8 @@ TEST(1)
 
   lym::Macro lvs;
   lvs.set_text (tl::sprintf (
+      "$drc_force_gc = true\n"
+      "\n"
       "source('%s', 'INVERTER')\n"
       "\n"
       "deep\n"

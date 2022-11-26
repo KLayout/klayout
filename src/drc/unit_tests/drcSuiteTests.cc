@@ -27,6 +27,8 @@
 
 void runtest (tl::TestBase *_this, int mode)
 {
+  std::string force_gc = "true";
+
   std::string rs = tl::testdata ();
   rs += "/drc/drcSuiteTests.drc";
 
@@ -44,10 +46,11 @@ void runtest (tl::TestBase *_this, int mode)
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = %s\n"
         "$drc_test_source = '%s'\n"
         "$drc_test_target = '%s'\n"
         "$drc_test_mode = %d\n"
-      , input, output, mode)
+      , force_gc, input, output, mode)
     );
     config.set_interpreter (lym::Macro::Ruby);
     EXPECT_EQ (config.run (), 0);

@@ -53,6 +53,7 @@ void run_test (tl::TestBase *_this, const std::string &suffix, const std::string
     //  Set some variables
     lym::Macro config;
     config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
         "$lvs_test_source = '%s'\n"
         "$lvs_test_target_lvsdb = '%s'\n"
         "$lvs_test_target_cir = '%s'\n"

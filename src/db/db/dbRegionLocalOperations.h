@@ -351,6 +351,24 @@ public:
 
 typedef pull_with_text_local_operation<db::PolygonRef, db::TextRef, db::TextRef> PullWithTextLocalOperation;
 
+template <class TS, class TI, class TR>
+class contained_local_operation
+  : public local_operation<TS, TI, TR>
+{
+public:
+  contained_local_operation (InteractingOutputMode output_mode);
+
+  virtual db::Coord dist () const;
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
+  virtual std::string description () const;
+
+private:
+  InteractingOutputMode m_output_mode;
+};
+
+typedef contained_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> ContainedLocalOperation;
+
 } // namespace db
 
 #endif

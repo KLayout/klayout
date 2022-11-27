@@ -1550,13 +1550,6 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
   return res.release ();
 }
 
-RegionDelegate *
-DeepRegion::in (const Region &other, bool invert) const
-{
-  //  TODO: this can be optimized maybe ...
-  return db::AsIfFlatRegion::in (other, invert);
-}
-
 template <class TR, class Output>
 static
 Output *region_cop_impl (DeepRegion *region, db::CompoundRegionOperationNode &node)
@@ -1794,6 +1787,43 @@ private:
   DeepLayer m_dl1, m_dl2;
 };
 
+}
+
+RegionDelegate *
+DeepRegion::in (const Region &other, bool invert) const
+{
+  //  TODO: we could offer in_and_not_it (both at once)
+  InteractingOutputMode output_mode = invert ? Negative : Positive;
+  return in_and_out (other, output_mode).first;
+}
+
+std::pair<RegionDelegate *, RegionDelegate *>
+DeepRegion::in_and_out (const Region &other, InteractingOutputMode output_mode) const
+{
+  std::unique_ptr<db::DeepRegion> dr_holder;
+  const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
+  if (! other_deep) {
+    //  if the other region isn't deep, turn into a top-level only deep region to facilitate re-hierarchization
+    dr_holder.reset (new db::DeepRegion (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
+  }
+
+  const db::DeepLayer &polygons = merged_deep_layer ();
+  const db::DeepLayer &other_polygons = other_deep->merged_deep_layer ();
+
+  db::ContainedLocalOperation op (output_mode);
+
+  db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell (), polygons.breakout_cells (), other_polygons.breakout_cells ());
+  proc.set_description (progress_desc ());
+  proc.set_report_progress (report_progress ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (polygons.store ()->threads ());
+
+  InteractingResultHolder orh (output_mode, merged_semantics (), polygons);
+
+  proc.run (&op, polygons.layer (), other_polygons.layer (), orh.layers ());
+
+  return orh.result_pair ();
 }
 
 std::pair<RegionDelegate *, RegionDelegate *>

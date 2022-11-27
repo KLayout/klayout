@@ -887,6 +887,11 @@ TEST(14_Interacting)
   db::Region r6r = r6;
   r6r.set_merged_semantics (false);
 
+  db::Edges r1e = r1.edges ();
+  db::Edges r1ef = r1f.edges ();
+  db::Edges r1er = r1r.edges ();
+  r1er.set_merged_semantics (false);
+
   {
     db::Layout target;
     unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
@@ -956,11 +961,6 @@ TEST(14_Interacting)
     CHECKPOINT();
     db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au14a.gds");
   }
-
-  db::Edges r1e = r1.edges ();
-  db::Edges r1ef = r1f.edges ();
-  db::Edges r1er = r1r.edges ();
-  r1er.set_merged_semantics (false);
 
   {
     db::Layout target;
@@ -1469,6 +1469,16 @@ TEST(25_Pull)
   db::Region r6r = r6;
   r6r.set_merged_semantics (false);
 
+  db::Edges r1e = r1.edges ();
+  db::Edges r1ef = r1f.edges ();
+  db::Edges r1er = r1r.edges ();
+  r1er.set_merged_semantics (false);
+
+  db::Edges r6e = r6.edges ();
+  db::Edges r6ef = r6f.edges ();
+  db::Edges r6er = r6r.edges ();
+  r6er.set_merged_semantics (false);
+
   {
     db::Layout target;
     unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
@@ -1506,16 +1516,6 @@ TEST(25_Pull)
     CHECKPOINT();
     db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au25a.gds");
   }
-
-  db::Edges r1e = r1.edges ();
-  db::Edges r1ef = r1f.edges ();
-  db::Edges r1er = r1r.edges ();
-  r1er.set_merged_semantics (false);
-
-  db::Edges r6e = r6.edges ();
-  db::Edges r6ef = r6f.edges ();
-  db::Edges r6er = r6r.edges ();
-  r6er.set_merged_semantics (false);
 
   {
     db::Layout target;

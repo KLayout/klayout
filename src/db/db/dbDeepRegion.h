@@ -142,6 +142,7 @@ public:
 
   void set_is_merged (bool f);
 
+  bool merged_polygons_available () const;
   const DeepLayer &merged_deep_layer () const;
 
 protected:

@@ -555,6 +555,12 @@ DeepRegion::merged_deep_layer () const
   }
 }
 
+bool
+DeepRegion::merged_polygons_available () const
+{
+  return m_is_merged || m_merged_polygons_valid;
+}
+
 void
 DeepRegion::ensure_merged_polygons_valid () const
 {
@@ -1169,7 +1175,7 @@ public:
 EdgesDelegate *
 DeepRegion::edges (const EdgeFilterBase *filter) const
 {
-  if (! filter && merged_semantics ()) {
+  if (! filter && merged_semantics () && ! merged_polygons_available ()) {
 
     //  Hierarchical edge detector - no pre-merge required
 

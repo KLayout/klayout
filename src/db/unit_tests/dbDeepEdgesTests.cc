@@ -1182,3 +1182,113 @@ TEST(19_AndNotWithEdges)
   EXPECT_EQ (db::compare (eflat.andnot (ee).second, "(1500,2000;1500,2100);(1100,0;1100,1000);(0,0;0,1000);(100,0;100,3000);(1800,2500;1800,3500);(-1500,0;-1500,1000);(1700,1500;1600,2500)"), true);
 }
 
+TEST(20_in)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l31.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));  //  empty
+
+  db::Edges e1 = db::Edges ((db::Region (db::RecursiveShapeIterator (ly, top_cell, l1), dss)).edges ());
+  db::Edges e2 = db::Edges ((db::Region (db::RecursiveShapeIterator (ly, top_cell, l2), dss)).edges ());
+  db::Edges e3 = db::Edges ((db::Region (db::RecursiveShapeIterator (ly, top_cell, l3), dss)).edges ());
+
+  db::Edges e1r = e1;
+  e1r.set_merged_semantics (false);
+  db::Edges e2r = e2;
+  e2r.set_merged_semantics (false);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), e1);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), e2);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), e2.in (e1));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e2.in (e1, true));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), e2.in (e3));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), e2.in (e3, true));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), e3.in (e1));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (15, 0)), e3.in (e1, true));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), e2r.in (e1));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), e2r.in (e1, true));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), e2.in (e1r));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), e2.in (e1r, true));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), e2r.in (e1r));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), e2r.in (e1r, true));
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au20.gds");
+}
+
+TEST(20_in_and_out)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l31.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));  //  empty
+
+  db::Edges e1 = db::Edges ((db::Region (db::RecursiveShapeIterator (ly, top_cell, l1), dss)).edges ());
+  db::Edges e2 = db::Edges ((db::Region (db::RecursiveShapeIterator (ly, top_cell, l2), dss)).edges ());
+  db::Edges e3 = db::Edges ((db::Region (db::RecursiveShapeIterator (ly, top_cell, l3), dss)).edges ());
+
+  db::Edges e1r = e1;
+  e1r.set_merged_semantics (false);
+  db::Edges e2r = e2;
+  e2r.set_merged_semantics (false);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), e1);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), e2);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), e2.in_and_out (e1).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), e2.in_and_out (e1).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), e2.in_and_out (e3).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), e2.in_and_out (e3).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), e3.in_and_out (e1).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (15, 0)), e3.in_and_out (e1).second);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), e2r.in_and_out (e1).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), e2r.in_and_out (e1).second);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), e2.in_and_out (e1r).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), e2.in_and_out (e1r).second);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), e2r.in_and_out (e1r).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), e2r.in_and_out (e1r).second);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au20.gds");
+}
+

@@ -925,7 +925,7 @@ contained_local_operation<TS, TI, TR>::contained_local_operation (InteractingOut
 template <class TS, class TI, class TR>
 db::Coord contained_local_operation<TS, TI, TR>::dist () const
 {
-  return 0;
+  return 1;   // touching included for degenerated polygons and edges
 }
 
 template <class TS, class TI, class TR>

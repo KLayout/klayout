@@ -530,6 +530,28 @@ AsIfFlatEdges::in (const Edges &other, bool invert) const
   return new_region.release ();
 }
 
+std::pair<EdgesDelegate *, EdgesDelegate *>
+AsIfFlatEdges::in_and_out (const Edges &other) const
+{
+  std::set <db::Edge> op;
+  for (EdgesIterator o (other.begin_merged ()); ! o.at_end (); ++o) {
+    op.insert (*o);
+  }
+
+  std::unique_ptr<FlatEdges> in (new FlatEdges (false));
+  std::unique_ptr<FlatEdges> out (new FlatEdges (false));
+
+  for (EdgesIterator o (begin_merged ()); ! o.at_end (); ++o) {
+    if (op.find (*o) != op.end ()) {
+      in->insert (*o);
+    } else {
+      out->insert (*o);
+    }
+  }
+
+  return std::make_pair (in.release (), out.release ());
+}
+
 size_t
 AsIfFlatEdges::count () const
 {

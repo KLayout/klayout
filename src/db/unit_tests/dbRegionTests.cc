@@ -1095,15 +1095,25 @@ TEST(19)
   r2.insert (db::Box (db::Point (0, 0), db::Point (20, 30)));
 
   EXPECT_EQ (r1.in (r2, false).to_string (), "(0,0;0,30;20,30;20,0)");
+  EXPECT_EQ (r1.in_and_out (r2).first.to_string (), "(0,0;0,30;20,30;20,0)");
   EXPECT_EQ (r1.in (r2, true).to_string (), "");
+  EXPECT_EQ (r1.in (r1, false).to_string (), "(0,0;0,30;20,30;20,0)");
+  EXPECT_EQ (r1.in (r1, true).to_string (), "");
+  EXPECT_EQ (r1.in_and_out (r2).second.to_string (), "");
   EXPECT_EQ (r2.in (r1, true).to_string (), "");
 
   r1.set_merged_semantics (false);
   r2.set_merged_semantics (false);
 
   EXPECT_EQ (db::compare (r1.in (r2, false), "(0,0;0,20;20,20;20,0);(0,0;0,30;20,30;20,0)"), true);
+  EXPECT_EQ (db::compare (r1.in_and_out (r2).first, "(0,0;0,20;20,20;20,0);(0,0;0,30;20,30;20,0)"), true);
   EXPECT_EQ (r1.in (r2, true).to_string (), "(0,0;0,20;10,20;10,0)");
+  EXPECT_EQ (r1.in_and_out (r2).second.to_string (), "(0,0;0,20;10,20;10,0)");
   EXPECT_EQ (r2.in (r1, true).to_string (), "(0,0;0,10;20,10;20,0)");
+  EXPECT_EQ (r1.in (db::Region (), false).to_string (), "");
+  EXPECT_EQ (db::compare (r1.in (db::Region (), true), "(0,0;0,20;10,20;10,0);(0,0;0,20;20,20;20,0);(0,0;0,30;20,30;20,0)"), true);
+  EXPECT_EQ (db::Region ().in (r1, false).to_string (), "");
+  EXPECT_EQ (db::Region ().in (r1, true).to_string (), "");
 }
 
 TEST(20)

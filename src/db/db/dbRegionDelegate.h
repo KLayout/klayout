@@ -308,6 +308,7 @@ public:
   virtual RegionDelegate *pull_overlapping (const Region &other) const = 0;
   virtual TextsDelegate *pull_interacting (const Texts &other) const = 0;
   virtual RegionDelegate *in (const Region &other, bool invert) const = 0;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> in_and_out (const Region &other) const = 0;
 
   virtual const db::Polygon *nth (size_t n) const = 0;
   virtual bool has_valid_polygons () const = 0;

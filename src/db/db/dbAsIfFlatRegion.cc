@@ -148,25 +148,6 @@ AsIfFlatRegion::edges (const EdgeFilterBase *filter) const
   return result.release ();
 }
 
-RegionDelegate *
-AsIfFlatRegion::in (const Region &other, bool invert) const
-{
-  std::set <db::Polygon> op;
-  for (RegionIterator o (other.begin_merged ()); ! o.at_end (); ++o) {
-    op.insert (*o);
-  }
-
-  std::unique_ptr<FlatRegion> new_region (new FlatRegion (false));
-
-  for (RegionIterator o (begin_merged ()); ! o.at_end (); ++o) {
-    if ((op.find (*o) == op.end ()) == invert) {
-      new_region->insert (*o);
-    }
-  }
-
-  return new_region.release ();
-}
-
 bool
 AsIfFlatRegion::is_box () const
 {
@@ -398,6 +379,56 @@ private:
   std::vector<db::Shapes *> m_results;
 };
 
+}
+
+std::pair<RegionDelegate *, RegionDelegate *>
+AsIfFlatRegion::in_and_out_generic (const Region &other, InteractingOutputMode output_mode) const
+{
+  OutputPairHolder oph (output_mode, merged_semantics ());
+
+  if (output_mode == None) {
+    return oph.region_pair ();
+  }
+
+  //  shortcut
+  if (empty ()) {
+    if (output_mode == Positive || output_mode == Negative) {
+      return std::make_pair (clone (), (RegionDelegate *) 0);
+    } else {
+      return std::make_pair (clone (), clone ());
+    }
+  } else if (other.empty ()) {
+    if (output_mode == Positive) {
+      return std::make_pair (new EmptyRegion (), (RegionDelegate *) 0);
+    } else if (output_mode == Negative) {
+      return std::make_pair (clone (), (RegionDelegate *) 0);
+    } else {
+      return std::make_pair (new EmptyRegion (), clone ());
+    }
+  }
+
+  std::set <db::Polygon> op;
+  for (RegionIterator o (other.begin_merged ()); ! o.at_end (); ++o) {
+    op.insert (*o);
+  }
+
+  std::unique_ptr<FlatRegion> new_region (new FlatRegion (false));
+
+  for (RegionIterator o (begin_merged ()); ! o.at_end (); ++o) {
+    if (op.find (*o) != op.end ()) {
+      if (output_mode == Positive || output_mode == PositiveAndNegative) {
+        oph.results () [0]->insert (*o);
+      }
+    } else {
+      if (output_mode == Negative) {
+        oph.results () [0]->insert (*o);
+      } else if (output_mode == PositiveAndNegative) {
+        oph.results () [1]->insert (*o);
+      }
+    }
+  }
+
+  return oph.region_pair ();
 }
 
 std::pair<RegionDelegate *, RegionDelegate *>

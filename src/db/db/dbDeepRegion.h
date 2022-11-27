@@ -133,8 +133,6 @@ public:
   virtual RegionDelegate *sized (coord_type d, unsigned int mode) const;
   virtual RegionDelegate *sized (coord_type dx, coord_type dy, unsigned int mode) const;
 
-  virtual RegionDelegate *in (const Region &other, bool invert) const;
-
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
 
   virtual DeepShapeCollectionDelegateBase *deep ()
@@ -155,10 +153,10 @@ protected:
   virtual std::pair<RegionDelegate *, RegionDelegate *> selected_interacting_generic (const Region &other, int mode, bool touching, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const;
   virtual std::pair<RegionDelegate *, RegionDelegate *> selected_interacting_generic (const Edges &other, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const;
   virtual std::pair<RegionDelegate *, RegionDelegate *> selected_interacting_generic (const Texts &other, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const;
-  virtual std::pair<RegionDelegate *, RegionDelegate *> in_and_out (const Region &other, InteractingOutputMode output_mode) const;
   virtual RegionDelegate *pull_generic (const Region &other, int mode, bool touching) const;
   virtual EdgesDelegate *pull_generic (const Edges &other) const;
   virtual TextsDelegate *pull_generic (const Texts &other) const;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> in_and_out_generic (const Region &other, InteractingOutputMode output_mode) const;
 
 private:
   friend class DeepEdges;

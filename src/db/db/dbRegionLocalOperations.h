@@ -368,6 +368,8 @@ private:
 };
 
 typedef contained_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> ContainedLocalOperation;
+//  the implementation is type-agnostic and can be used for edges too
+typedef contained_local_operation<db::Edge, db::Edge, db::Edge> ContainedEdgesLocalOperation;
 
 } // namespace db
 

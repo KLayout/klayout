@@ -34,6 +34,7 @@
 #include "dbLayoutUtils.h"
 #include "dbLocalOperation.h"
 #include "dbLocalOperationUtils.h"
+#include "dbRegionLocalOperations.h"  //  for db::ContainedEdgesLocalOperation
 #include "dbHierProcessor.h"
 #include "dbEmptyEdges.h"
 
@@ -1741,8 +1742,62 @@ EdgesDelegate *DeepEdges::pull_generic (const Edges &other) const
 
 EdgesDelegate *DeepEdges::in (const Edges &other, bool invert) const
 {
-  //  TODO: is there a cheaper way?
-  return AsIfFlatEdges::in (other, invert);
+  std::unique_ptr<db::DeepEdges> dr_holder;
+  const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
+  if (! other_deep) {
+    //  if the other edge collection isn't deep, turn into a top-level only deep edge collection to facilitate re-hierarchization
+    dr_holder.reset (new db::DeepEdges (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
+  }
+
+  const db::DeepLayer &edges = merged_deep_layer ();
+
+  DeepLayer dl_out (edges.derived ());
+
+  std::vector<unsigned int> output_layers;
+  output_layers.reserve (1);
+  output_layers.push_back (dl_out.layer ());
+
+  db::ContainedEdgesLocalOperation op (invert ? Negative : Positive);
+
+  db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (edges.store ()->threads ());
+
+  proc.run (&op, edges.layer (), other_deep->merged_deep_layer ().layer (), output_layers);
+
+  return new db::DeepEdges (dl_out);
+}
+
+std::pair<EdgesDelegate *, EdgesDelegate *> DeepEdges::in_and_out (const Edges &other) const
+{
+  std::unique_ptr<db::DeepEdges> dr_holder;
+  const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
+  if (! other_deep) {
+    //  if the other edge collection isn't deep, turn into a top-level only deep edge collection to facilitate re-hierarchization
+    dr_holder.reset (new db::DeepEdges (other, const_cast<db::DeepShapeStore &> (*deep_layer ().store ())));
+    other_deep = dr_holder.get ();
+  }
+
+  const db::DeepLayer &edges = merged_deep_layer ();
+
+  DeepLayer dl_out (edges.derived ());
+  DeepLayer dl_out2 (edges.derived ());
+
+  std::vector<unsigned int> output_layers;
+  output_layers.reserve (2);
+  output_layers.push_back (dl_out.layer ());
+  output_layers.push_back (dl_out2.layer ());
+
+  db::ContainedEdgesLocalOperation op (PositiveAndNegative);
+
+  db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
+  proc.set_base_verbosity (base_verbosity ());
+  proc.set_threads (edges.store ()->threads ());
+
+  proc.run (&op, edges.layer (), other_deep->merged_deep_layer ().layer (), output_layers);
+
+  return std::make_pair (new db::DeepEdges (dl_out), new db::DeepEdges (dl_out2));
 }
 
 namespace

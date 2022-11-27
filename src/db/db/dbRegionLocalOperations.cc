@@ -986,6 +986,7 @@ std::string contained_local_operation<TS, TI, TR>::description () const
 //  explicit instantiations
 template class DB_PUBLIC contained_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC contained_local_operation<db::Polygon, db::Polygon, db::Polygon>;
+template class DB_PUBLIC contained_local_operation<db::Edge, db::Edge, db::Edge>;
 
 // ---------------------------------------------------------------------------------------------------------------
 

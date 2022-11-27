@@ -156,6 +156,7 @@ public:
   virtual RegionDelegate *extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, coord_type ext_i, bool join) const;
 
   virtual EdgesDelegate *in (const Edges &, bool) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> in_and_out (const Edges &) const;
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
 

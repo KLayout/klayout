@@ -1789,16 +1789,8 @@ private:
 
 }
 
-RegionDelegate *
-DeepRegion::in (const Region &other, bool invert) const
-{
-  //  TODO: we could offer in_and_not_it (both at once)
-  InteractingOutputMode output_mode = invert ? Negative : Positive;
-  return in_and_out (other, output_mode).first;
-}
-
 std::pair<RegionDelegate *, RegionDelegate *>
-DeepRegion::in_and_out (const Region &other, InteractingOutputMode output_mode) const
+DeepRegion::in_and_out_generic (const Region &other, InteractingOutputMode output_mode) const
 {
   std::unique_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());

@@ -434,7 +434,7 @@ AsIfFlatRegion::in_and_out_generic (const Region &other, InteractingOutputMode o
 std::pair<RegionDelegate *, RegionDelegate *>
 AsIfFlatRegion::selected_interacting_generic (const Edges &other, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const
 {
-  OutputPairHolder oph (output_mode, merged_semantics ());
+  OutputPairHolder oph (output_mode, merged_semantics () || is_merged ());
 
   if (output_mode == None) {
     return oph.region_pair ();
@@ -485,7 +485,7 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, InteractingOut
 std::pair<RegionDelegate *, RegionDelegate *>
 AsIfFlatRegion::selected_interacting_generic (const Texts &other, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const
 {
-  OutputPairHolder oph (output_mode, merged_semantics ());
+  OutputPairHolder oph (output_mode, merged_semantics () || is_merged ());
 
   if (output_mode == None) {
     return oph.region_pair ();
@@ -531,7 +531,7 @@ AsIfFlatRegion::selected_interacting_generic (const Texts &other, InteractingOut
 std::pair<RegionDelegate *, RegionDelegate *>
 AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, bool touching, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const
 {
-  OutputPairHolder oph (output_mode, merged_semantics ());
+  OutputPairHolder oph (output_mode, merged_semantics () || is_merged ());
 
   if (output_mode == None) {
     return oph.region_pair ();
@@ -611,7 +611,7 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
   std::vector<generic_shape_iterator<db::Edge> > others;
   others.push_back (other.begin_merged ());
 
-  std::unique_ptr<FlatEdges> output (new FlatEdges (merged_semantics ()));
+  std::unique_ptr<FlatEdges> output (new FlatEdges (other.merged_semantics () || other.is_merged ()));
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_edges ());
 
@@ -720,7 +720,7 @@ AsIfFlatRegion::pull_generic (const Region &other, int mode, bool touching) cons
   std::vector<generic_shape_iterator<db::Polygon> > others;
   others.push_back (other.begin_merged ());
 
-  std::unique_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
+  std::unique_ptr<FlatRegion> output (new FlatRegion (other.merged_semantics () || other.is_merged ()));
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_polygons ());
 

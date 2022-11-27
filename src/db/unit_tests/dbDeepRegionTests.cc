@@ -880,8 +880,6 @@ TEST(14_Interacting)
   db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
   db::Region r6 (db::RecursiveShapeIterator (ly, top_cell, l6), dss);
   db::Region r1f (db::RecursiveShapeIterator (ly, top_cell, l1));
-  db::Region r2f (db::RecursiveShapeIterator (ly, top_cell, l2));
-  db::Region r6f (db::RecursiveShapeIterator (ly, top_cell, l6));
   db::Region r1r = r1;
   r1r.set_merged_semantics (false);
   db::Region r2r = r2;
@@ -947,12 +945,13 @@ TEST(14_Interacting)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (66, 0)), r6r.selected_overlapping (r1r));
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (67, 0)), r6r.selected_not_overlapping (r1r));
 
-    EXPECT_EQ (r2.selected_interacting (r1).is_merged (), false);
-    EXPECT_EQ (r2.selected_interacting (r1.merged ()).is_merged (), true);
-    EXPECT_EQ (r2.selected_inside (r1).is_merged (), true);
+    EXPECT_EQ (r2.selected_interacting (r1).is_merged (), true);
     EXPECT_EQ (r2r.selected_interacting (r1).is_merged (), false);
-    EXPECT_EQ (r2.selected_interacting (r1r).is_merged (), false);
-    EXPECT_EQ (r2r.selected_interacting (r1r).is_merged (), false);
+    EXPECT_EQ (r2r.selected_interacting (r1.merged ()).is_merged (), false);
+    EXPECT_EQ (r2.selected_interacting (r1r).is_merged (), true);
+    EXPECT_EQ (r2.selected_inside (r1).is_merged (), true);
+    EXPECT_EQ (r2r.selected_inside (r1).is_merged (), false);
+    EXPECT_EQ (r2.selected_inside (r1).is_merged (), true);
 
     CHECKPOINT();
     db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au14a.gds");
@@ -976,8 +975,8 @@ TEST(14_Interacting)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 0)), r6r.selected_interacting (r1er));
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (33, 0)), r6r.selected_not_interacting (r1er));
 
-    EXPECT_EQ (r6.selected_interacting (r1e).is_merged (), false);
-    EXPECT_EQ (r6.selected_interacting (r1er).is_merged (), false);
+    EXPECT_EQ (r6.selected_interacting (r1e).is_merged (), true);
+    EXPECT_EQ (r6.selected_interacting (r1er).is_merged (), true);
     EXPECT_EQ (r6r.selected_interacting (r1e).is_merged (), false);
     EXPECT_EQ (r6r.selected_interacting (r1er).is_merged (), false);
 
@@ -1499,8 +1498,8 @@ TEST(25_Pull)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (62, 0)), r2r.pull_overlapping (r6r));
 
     EXPECT_EQ (r2.pull_inside (r6).is_merged (), true);
-    EXPECT_EQ (r2.pull_interacting (r6).is_merged (), false);
-    EXPECT_EQ (r2r.pull_interacting (r6).is_merged (), false);
+    EXPECT_EQ (r2.pull_interacting (r6).is_merged (), true);
+    EXPECT_EQ (r2r.pull_interacting (r6).is_merged (), true);
     EXPECT_EQ (r2.pull_interacting (r6r).is_merged (), false);
     EXPECT_EQ (r2r.pull_interacting (r6r).is_merged (), false);
 

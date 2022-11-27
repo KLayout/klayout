@@ -1840,7 +1840,8 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
 
   const db::DeepLayer &polygons = merged_deep_layer ();
   //  NOTE: on "inside" or with counting, the other polygons must be merged
-  const db::DeepLayer &other_polygons = (mode < 0 || counting) ? other_deep->merged_deep_layer () : other_deep->deep_layer ();
+  bool other_needs_merged = (mode < 0 || counting);
+  const db::DeepLayer &other_polygons = other_needs_merged ? other_deep->merged_deep_layer () : other_deep->deep_layer ();
 
   db::InteractingLocalOperation op (mode, touching, output_mode, min_count, max_count, true);
 
@@ -1854,7 +1855,7 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
     proc.set_max_vertex_count (polygons.store ()->max_vertex_count ());
   }
 
-  bool result_is_merged = (! split_after && ((mode < 0 && other.merged_semantics ()) || other.is_merged ()) && (merged_semantics () || is_merged ()));
+  bool result_is_merged = (! split_after && (merged_semantics () || is_merged ()));
   InteractingResultHolder orh (output_mode, result_is_merged, polygons);
 
   proc.run (&op, polygons.layer (), other_polygons.layer (), orh.layers ());
@@ -1892,7 +1893,7 @@ DeepRegion::selected_interacting_generic (const Edges &other, InteractingOutputM
     proc.set_max_vertex_count (polygons.store ()->max_vertex_count ());
   }
 
-  bool result_is_merged = (! split_after && other.is_merged () && (merged_semantics () || is_merged ()));
+  bool result_is_merged = (! split_after && (merged_semantics () || is_merged ()));
   InteractingResultHolder orh (output_mode, result_is_merged, polygons);
 
   proc.run (&op, polygons.layer (), counting ? other_deep->merged_deep_layer ().layer () : other_deep->deep_layer ().layer (), orh.layers ());
@@ -1935,9 +1936,7 @@ DeepRegion::pull_generic (const Region &other, int mode, bool touching) const
   proc.run (&op, polygons.layer (), other_polygons.layer (), dl_out.layer ());
 
   db::DeepRegion *res = new db::DeepRegion (dl_out);
-  if (! split_after && ((mode < 0 && merged_semantics ()) || is_merged ()) && (other.merged_semantics () || other.is_merged ())) {
-    res->set_is_merged (true);
-  }
+  res->set_is_merged (! split_after && (other.merged_semantics () || other.is_merged ()));
   return res;
 }
 
@@ -1998,9 +1997,7 @@ DeepRegion::pull_generic (const Texts &other) const
   proc.set_threads (polygons.store ()->threads ());
   proc.run (&op, polygons.layer (), other_texts.layer (), dl_out.layer ());
 
-  db::DeepTexts *res = new db::DeepTexts (dl_out);
-  res->set_is_merged (is_merged ());
-  return res;
+  return new db::DeepTexts (dl_out);
 }
 
 

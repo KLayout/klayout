@@ -939,9 +939,6 @@ void contained_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*lay
     tl_assert (results.size () == 2);
   }
 
-  db::EdgeProcessor ep;
-  ep.set_base_verbosity (50);
-
   std::set<TI> others;
   for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
     for (typename shape_interactions<TS, TI>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {

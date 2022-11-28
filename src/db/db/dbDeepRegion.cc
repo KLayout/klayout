@@ -1933,12 +1933,22 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
       return std::make_pair (clone (), (RegionDelegate *) 0);
     }
   } else if (other.empty ()) {
-    if (output_mode == PositiveAndNegative) {
-      return std::make_pair (new DeepRegion (deep_layer ().derived ()), clone ());
-    } else if (output_mode == Negative) {
-      return std::make_pair (clone (), (RegionDelegate *) 0);
+    if (mode > 0 /*outside*/) {
+      if (output_mode == PositiveAndNegative) {
+        return std::make_pair (clone (), new DeepRegion (deep_layer ().derived ()));
+      } else if (output_mode == Negative) {
+        return std::make_pair (new DeepRegion (deep_layer ().derived ()), (RegionDelegate *) 0);
+      } else {
+        return std::make_pair (clone (), (RegionDelegate *) 0);
+      }
     } else {
-      return std::make_pair (new DeepRegion (deep_layer ().derived ()), (RegionDelegate *) 0);
+      if (output_mode == PositiveAndNegative) {
+        return std::make_pair (new DeepRegion (deep_layer ().derived ()), clone ());
+      } else if (output_mode == Negative) {
+        return std::make_pair (clone (), (RegionDelegate *) 0);
+      } else {
+        return std::make_pair (new DeepRegion (deep_layer ().derived ()), (RegionDelegate *) 0);
+      }
     }
   }
 

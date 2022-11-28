@@ -856,6 +856,10 @@ DeepRegion::is_box () const
 size_t
 DeepRegion::count () const
 {
+  if (empty ()) {
+    return 0;
+  }
+
   size_t n = 0;
 
   const db::Layout &layout = deep_layer ().layout ();
@@ -870,6 +874,10 @@ DeepRegion::count () const
 size_t
 DeepRegion::hier_count () const
 {
+  if (empty ()) {
+    return 0;
+  }
+
   size_t n = 0;
 
   const db::Layout &layout = deep_layer ().layout ();
@@ -883,6 +891,10 @@ DeepRegion::hier_count () const
 DeepRegion::area_type
 DeepRegion::area (const db::Box &box) const
 {
+  if (empty ()) {
+    return 0;
+  }
+
   if (box.empty ()) {
 
     const db::DeepLayer &polygons = merged_deep_layer ();
@@ -916,6 +928,10 @@ DeepRegion::area (const db::Box &box) const
 DeepRegion::perimeter_type
 DeepRegion::perimeter (const db::Box &box) const
 {
+  if (empty ()) {
+    return 0;
+  }
+
   if (box.empty ()) {
 
     const db::DeepLayer &polygons = merged_deep_layer ();
@@ -961,6 +977,10 @@ DeepRegion::to_string (size_t nmax) const
 EdgePairsDelegate *
 DeepRegion::grid_check (db::Coord gx, db::Coord gy) const
 {
+  if (empty ()) {
+    return new EmptyEdgePairs ();
+  }
+
   if (gx < 0 || gy < 0) {
     throw tl::Exception (tl::to_string (tr ("Grid check requires a positive grid value")));
   }
@@ -1019,6 +1039,10 @@ DeepRegion::grid_check (db::Coord gx, db::Coord gy) const
 EdgePairsDelegate *
 DeepRegion::angle_check (double min, double max, bool inverse) const
 {
+  if (empty ()) {
+    return new DeepEdgePairs (deep_layer ().derived ());
+  }
+
   const db::DeepLayer &polygons = merged_deep_layer ();
   db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
@@ -1043,6 +1067,10 @@ DeepRegion::angle_check (double min, double max, bool inverse) const
 RegionDelegate *
 DeepRegion::snapped (db::Coord gx, db::Coord gy)
 {
+  if (empty ()) {
+    return clone ();
+  }
+
   if (gx < 0 || gy < 0) {
     throw tl::Exception (tl::to_string (tr ("Snapping requires a positive grid value")));
   }
@@ -1053,7 +1081,7 @@ DeepRegion::snapped (db::Coord gx, db::Coord gy)
   }
 
   if (! gx) {
-    return this;
+    return clone ();
   }
 
   const db::DeepLayer &polygons = merged_deep_layer ();
@@ -1175,6 +1203,10 @@ public:
 EdgesDelegate *
 DeepRegion::edges (const EdgeFilterBase *filter) const
 {
+  if (empty ()) {
+    return new db::DeepEdges (deep_layer ().derived ());
+  }
+
   if (! filter && merged_semantics () && ! merged_polygons_available ()) {
 
     //  Hierarchical edge detector - no pre-merge required
@@ -1257,6 +1289,10 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
 RegionDelegate *
 DeepRegion::process_in_place (const PolygonProcessorBase &filter)
 {
+  if (empty ()) {
+    return this;
+  }
+
   //  TODO: implement to be really in-place
   return processed (filter);
 }
@@ -1264,24 +1300,40 @@ DeepRegion::process_in_place (const PolygonProcessorBase &filter)
 EdgesDelegate *
 DeepRegion::processed_to_edges (const PolygonToEdgeProcessorBase &filter) const
 {
+  if (empty ()) {
+    return new db::DeepEdges (deep_layer ().derived ());
+  }
+
   return shape_collection_processed_impl<db::Polygon, db::Edge, db::DeepEdges> (filter.requires_raw_input () ? deep_layer () : merged_deep_layer (), filter);
 }
 
 EdgePairsDelegate *
 DeepRegion::processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &filter) const
 {
+  if (empty ()) {
+    return new db::DeepEdgePairs (deep_layer ().derived ());
+  }
+
   return shape_collection_processed_impl<db::Polygon, db::EdgePair, db::DeepEdgePairs> (filter.requires_raw_input () ? deep_layer () : merged_deep_layer (), filter);
 }
 
 RegionDelegate *
 DeepRegion::processed (const PolygonProcessorBase &filter) const
 {
+  if (empty ()) {
+    return clone ();
+  }
+
   return shape_collection_processed_impl<db::Polygon, db::Polygon, db::DeepRegion> (filter.requires_raw_input () ? deep_layer () : merged_deep_layer (), filter);
 }
 
 RegionDelegate *
 DeepRegion::filter_in_place (const PolygonFilterBase &filter)
 {
+  if (empty ()) {
+    return this;
+  }
+
   //  TODO: implement to be really in-place
   *this = *apply_filter (filter);
   return this;
@@ -1290,6 +1342,10 @@ DeepRegion::filter_in_place (const PolygonFilterBase &filter)
 RegionDelegate *
 DeepRegion::filtered (const PolygonFilterBase &filter) const
 {
+  if (empty ()) {
+    return clone ();
+  }
+
   return apply_filter (filter);
 }
 
@@ -1372,6 +1428,10 @@ DeepRegion::apply_filter (const PolygonFilterBase &filter) const
 RegionDelegate *
 DeepRegion::merged_in_place ()
 {
+  if (empty ()) {
+    return this;
+  }
+
   ensure_merged_polygons_valid ();
 
   //  NOTE: this makes both layers share the same resource
@@ -1384,12 +1444,17 @@ DeepRegion::merged_in_place ()
 RegionDelegate *
 DeepRegion::merged_in_place (bool min_coherence, unsigned int min_wc)
 {
+  //  TODO: implement to be really in-place
   return merged (min_coherence, min_wc);
 }
 
 RegionDelegate *
 DeepRegion::merged () const
 {
+  if (empty ()) {
+    return clone ();
+  }
+
   ensure_merged_polygons_valid ();
 
   db::Layout &layout = const_cast<db::Layout &> (m_merged_polygons.layout ());
@@ -1408,6 +1473,10 @@ DeepRegion::merged () const
 RegionDelegate *
 DeepRegion::merged (bool min_coherence, unsigned int min_wc) const
 {
+  if (empty ()) {
+    return clone ();
+  }
+
   tl::SelfTimer timer (tl::verbosity () > base_verbosity (), "Ensure merged polygons");
 
   db::Layout &layout = const_cast<db::Layout &> (deep_layer ().layout ());
@@ -1642,6 +1711,12 @@ DeepRegion::cop_to_edges (db::CompoundRegionOperationNode &node)
 EdgePairsDelegate *
 DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const
 {
+  if (empty ()) {
+    return new db::DeepEdgePairs (deep_layer ().derived ());
+  } else if (other && ! is_subject_regionptr (other) && other->empty () && ! options.negative) {
+    return new db::DeepEdgePairs (deep_layer ().derived ());
+  }
+
   const db::DeepRegion *other_deep = 0;
   unsigned int other_layer = 0;
   bool other_is_merged = true;
@@ -1705,6 +1780,10 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 EdgePairsDelegate *
 DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options) const
 {
+  if (empty ()) {
+    return new db::DeepEdgePairs (deep_layer ().derived ());
+  }
+
   const db::DeepLayer &polygons = merged_deep_layer ();
 
   EdgeRelationFilter check (rel, d, options.metrics);
@@ -1798,6 +1877,24 @@ private:
 std::pair<RegionDelegate *, RegionDelegate *>
 DeepRegion::in_and_out_generic (const Region &other, InteractingOutputMode output_mode) const
 {
+  if (output_mode == None) {
+    return std::pair<RegionDelegate *, RegionDelegate *> ((RegionDelegate *) 0, (RegionDelegate *) 0);
+  } else if (empty ()) {
+    if (output_mode == PositiveAndNegative) {
+      return std::make_pair (clone (), clone ());
+    } else {
+      return std::make_pair (clone (), (RegionDelegate *) 0);
+    }
+  } else if (other.empty ()) {
+    if (output_mode == PositiveAndNegative) {
+      return std::make_pair (new DeepRegion (deep_layer ().derived ()), clone ());
+    } else if (output_mode == Negative) {
+      return std::make_pair (clone (), (RegionDelegate *) 0);
+    } else {
+      return std::make_pair (new DeepRegion (deep_layer ().derived ()), (RegionDelegate *) 0);
+    }
+  }
+
   std::unique_ptr<db::DeepRegion> dr_holder;
   const db::DeepRegion *other_deep = dynamic_cast<const db::DeepRegion *> (other.delegate ());
   if (! other_deep) {
@@ -1828,7 +1925,21 @@ std::pair<RegionDelegate *, RegionDelegate *>
 DeepRegion::selected_interacting_generic (const Region &other, int mode, bool touching, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const
 {
   if (output_mode == None) {
-    return std::pair<RegionDelegate *, RegionDelegate *> (0, 0);
+    return std::pair<RegionDelegate *, RegionDelegate *> ((RegionDelegate *) 0, (RegionDelegate *) 0);
+  } else if (empty ()) {
+    if (output_mode == PositiveAndNegative) {
+      return std::make_pair (clone (), clone ());
+    } else {
+      return std::make_pair (clone (), (RegionDelegate *) 0);
+    }
+  } else if (other.empty ()) {
+    if (output_mode == PositiveAndNegative) {
+      return std::make_pair (new DeepRegion (deep_layer ().derived ()), clone ());
+    } else if (output_mode == Negative) {
+      return std::make_pair (clone (), (RegionDelegate *) 0);
+    } else {
+      return std::make_pair (new DeepRegion (deep_layer ().derived ()), (RegionDelegate *) 0);
+    }
   }
 
   bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
@@ -1872,6 +1983,24 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
 std::pair<RegionDelegate *, RegionDelegate *>
 DeepRegion::selected_interacting_generic (const Edges &other, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const
 {
+  if (output_mode == None) {
+    return std::pair<RegionDelegate *, RegionDelegate *> ((RegionDelegate *) 0, (RegionDelegate *) 0);
+  } else if (empty ()) {
+    if (output_mode == PositiveAndNegative) {
+      return std::make_pair (clone (), clone ());
+    } else {
+      return std::make_pair (clone (), (RegionDelegate *) 0);
+    }
+  } else if (other.empty ()) {
+    if (output_mode == PositiveAndNegative) {
+      return std::make_pair (new DeepRegion (deep_layer ().derived ()), clone ());
+    } else if (output_mode == Negative) {
+      return std::make_pair (clone (), (RegionDelegate *) 0);
+    } else {
+      return std::make_pair (new DeepRegion (deep_layer ().derived ()), (RegionDelegate *) 0);
+    }
+  }
+
   bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   //  with these flag set to true, the resulting polygons are broken again.
@@ -1910,6 +2039,12 @@ DeepRegion::selected_interacting_generic (const Edges &other, InteractingOutputM
 RegionDelegate *
 DeepRegion::pull_generic (const Region &other, int mode, bool touching) const
 {
+  if (empty ()) {
+    return clone ();
+  } else if (other.empty ()) {
+    return new DeepRegion (deep_layer ().derived ());
+  }
+
   //  with these flag set to true, the resulting polygons are broken again.
   bool split_after = false;
 
@@ -1949,6 +2084,10 @@ DeepRegion::pull_generic (const Region &other, int mode, bool touching) const
 EdgesDelegate *
 DeepRegion::pull_generic (const Edges &other) const
 {
+  if (empty () || other.empty ()) {
+    return new DeepEdges (deep_layer ().derived ());
+  }
+
   std::unique_ptr<db::DeepEdges> dr_holder;
   const db::DeepEdges *other_deep = dynamic_cast<const db::DeepEdges *> (other.delegate ());
   if (! other_deep) {
@@ -1980,6 +2119,10 @@ DeepRegion::pull_generic (const Edges &other) const
 TextsDelegate *
 DeepRegion::pull_generic (const Texts &other) const
 {
+  if (empty () || other.empty ()) {
+    return new DeepTexts (deep_layer ().derived ());
+  }
+
   std::unique_ptr<db::DeepTexts> dr_holder;
   const db::DeepTexts *other_deep = dynamic_cast<const db::DeepTexts *> (other.delegate ());
   if (! other_deep) {
@@ -2010,6 +2153,24 @@ DeepRegion::pull_generic (const Texts &other) const
 std::pair<RegionDelegate *, RegionDelegate *>
 DeepRegion::selected_interacting_generic (const Texts &other, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const
 {
+  if (output_mode == None) {
+    return std::pair<RegionDelegate *, RegionDelegate *> ((RegionDelegate *) 0, (RegionDelegate *) 0);
+  } else if (empty ()) {
+    if (output_mode == PositiveAndNegative) {
+      return std::make_pair (clone (), clone ());
+    } else {
+      return std::make_pair (clone (), (RegionDelegate *) 0);
+    }
+  } else if (other.empty ()) {
+    if (output_mode == PositiveAndNegative) {
+      return std::make_pair (new DeepRegion (deep_layer ().derived ()), clone ());
+    } else if (output_mode == Negative) {
+      return std::make_pair (clone (), (RegionDelegate *) 0);
+    } else {
+      return std::make_pair (new DeepRegion (deep_layer ().derived ()), (RegionDelegate *) 0);
+    }
+  }
+
   //  with these flag set to true, the resulting polygons are broken again.
   bool split_after = false;
 

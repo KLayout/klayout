@@ -1,3 +1,9 @@
+0.27.13          (2022-11-30):
+* Bugfixes: 
+  - selection did not work in non-editable mode
+  - partial selection did not work for guiding shapes
+  - compile issue: NDEBUG is not usable after ruby.h
+
 0.27.12          (2022-11-01):
 * Bugfix: %GITHUB%/issues/1173 DXF SPLINE implementation not compatible with ezdxf
 * Bugfix: %GITHUB%/issues/1167 delete_cells slow in some cases

@@ -178,7 +178,7 @@ RubyMonterey    = { 'exe':  '/System/Library/Frameworks/Ruby.framework/Versions/
 #  install with 'sudo port install ruby31'
 # [Key Type Name] = 'MP31'
 Ruby31MacPorts  = { 'exe': '/opt/local/bin/ruby3.1',
-                    'inc': '/opt/local/include/ruby-3.1.2',
+                    'inc': '/opt/local/include/ruby-3.1.3',
                     'lib': '/opt/local/lib/libruby.3.1.dylib'
                   }
 

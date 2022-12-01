@@ -560,6 +560,25 @@ else
 fi
 echo "    Installation target: $BIN"
 echo "    Build directory: $BUILD"
+echo ""
+echo "    Build flags:"
+echo "      HAVE_RUBY=$HAVE_RUBY"
+echo "      HAVE_PYTHON=$HAVE_PYTHON"
+echo "      HAVE_QTBINDINGS=$HAVE_QTBINDINGS"
+echo "      HAVE_QT=$HAVE_QT"
+echo "      HAVE_QT_UITOOLS=$HAVE_QT_UITOOLS"
+echo "      HAVE_QT_NETWORK=$HAVE_QT_NETWORK"
+echo "      HAVE_QT_SQL=$HAVE_QT_SQL"
+echo "      HAVE_QT_SVG=$HAVE_QT_SVG"
+echo "      HAVE_QT_PRINTSUPPORT=$HAVE_QT_PRINTSUPPORT"
+echo "      HAVE_QT_MULTIMEDIA=$HAVE_QT_MULTIMEDIA"
+echo "      HAVE_QT_DESIGNER=$HAVE_QT_DESIGNER"
+echo "      HAVE_QT_XML=$HAVE_QT_XML"
+echo "      HAVE_64BIT_COORD=$HAVE_64BIT_COORD"
+echo "      HAVE_CURL=$HAVE_CURL"
+echo "      HAVE_PNG=$HAVE_PNG"
+echo "      HAVE_EXPAT=$HAVE_EXPAT"
+echo "      RPATH=$RPATH"
 
 mkdir -p $BUILD
 
@@ -674,6 +693,7 @@ if [ $BUILD_EXPERT = 1 ]; then
     QMAKE_CXXFLAGS="$CXXFLAGS"
     QMAKE_CXXFLAGS_RELEASE=
     QMAKE_CXXFLAGS_DEBUG=
+    QMAKE_LIBS="$LIBS"
     QMAKE_LFLAGS="$LDFLAGS"
     QMAKE_LFLAGS_RELEASE=
     QMAKE_LFLAGS_DEBUG=

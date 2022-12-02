@@ -916,6 +916,81 @@ template class DB_PUBLIC interacting_local_operation<db::Polygon, db::Polygon, d
 // ---------------------------------------------------------------------------------------------------------------
 
 template <class TS, class TI, class TR>
+contained_local_operation<TS, TI, TR>::contained_local_operation (InteractingOutputMode output_mode)
+  : m_output_mode (output_mode)
+{
+  //  .. nothing yet ..
+}
+
+template <class TS, class TI, class TR>
+db::Coord contained_local_operation<TS, TI, TR>::dist () const
+{
+  return 1;   // touching included for degenerated polygons and edges
+}
+
+template <class TS, class TI, class TR>
+void contained_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+{
+  if (m_output_mode == None) {
+    return;
+  } else if (m_output_mode == Positive || m_output_mode == Negative) {
+    tl_assert (results.size () == 1);
+  } else {
+    tl_assert (results.size () == 2);
+  }
+
+  std::set<TI> others;
+  for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    for (typename shape_interactions<TS, TI>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+      others.insert (interactions.intruder_shape (*j).second);
+    }
+  }
+
+  for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    const TS &subject = interactions.subject_shape (i->first);
+    if (others.find (subject) != others.end ()) {
+      if (m_output_mode == Positive || m_output_mode == PositiveAndNegative) {
+        results [0].insert (subject);
+      }
+    } else {
+      if (m_output_mode == Negative) {
+        results [0].insert (subject);
+      } else if (m_output_mode == PositiveAndNegative) {
+        results [1].insert (subject);
+      }
+    }
+  }
+}
+
+template <class TS, class TI, class TR>
+OnEmptyIntruderHint
+contained_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
+{
+  if (m_output_mode == Positive) {
+    return OnEmptyIntruderHint::Drop;
+  } else if (m_output_mode == Negative) {
+    return OnEmptyIntruderHint::Copy;
+  } else if (m_output_mode == PositiveAndNegative) {
+    return OnEmptyIntruderHint::CopyToSecond;
+  } else {
+    return OnEmptyIntruderHint::Ignore;
+  }
+}
+
+template <class TS, class TI, class TR>
+std::string contained_local_operation<TS, TI, TR>::description () const
+{
+  return tl::to_string (tr ("Select polygons contained in other region"));
+}
+
+//  explicit instantiations
+template class DB_PUBLIC contained_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC contained_local_operation<db::Polygon, db::Polygon, db::Polygon>;
+template class DB_PUBLIC contained_local_operation<db::Edge, db::Edge, db::Edge>;
+
+// ---------------------------------------------------------------------------------------------------------------
+
+template <class TS, class TI, class TR>
 pull_local_operation<TS, TI, TR>::pull_local_operation (int mode, bool touching)
   : m_mode (mode), m_touching (touching)
 {

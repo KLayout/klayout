@@ -148,25 +148,6 @@ AsIfFlatRegion::edges (const EdgeFilterBase *filter) const
   return result.release ();
 }
 
-RegionDelegate *
-AsIfFlatRegion::in (const Region &other, bool invert) const
-{
-  std::set <db::Polygon> op;
-  for (RegionIterator o (other.begin_merged ()); ! o.at_end (); ++o) {
-    op.insert (*o);
-  }
-
-  std::unique_ptr<FlatRegion> new_region (new FlatRegion (false));
-
-  for (RegionIterator o (begin_merged ()); ! o.at_end (); ++o) {
-    if ((op.find (*o) == op.end ()) == invert) {
-      new_region->insert (*o);
-    }
-  }
-
-  return new_region.release ();
-}
-
 bool
 AsIfFlatRegion::is_box () const
 {
@@ -401,9 +382,59 @@ private:
 }
 
 std::pair<RegionDelegate *, RegionDelegate *>
-AsIfFlatRegion::selected_interacting_generic (const Edges &other, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const
+AsIfFlatRegion::in_and_out_generic (const Region &other, InteractingOutputMode output_mode) const
 {
   OutputPairHolder oph (output_mode, merged_semantics ());
+
+  if (output_mode == None) {
+    return oph.region_pair ();
+  }
+
+  //  shortcut
+  if (empty ()) {
+    if (output_mode == Positive || output_mode == Negative) {
+      return std::make_pair (clone (), (RegionDelegate *) 0);
+    } else {
+      return std::make_pair (clone (), clone ());
+    }
+  } else if (other.empty ()) {
+    if (output_mode == Positive) {
+      return std::make_pair (new EmptyRegion (), (RegionDelegate *) 0);
+    } else if (output_mode == Negative) {
+      return std::make_pair (clone (), (RegionDelegate *) 0);
+    } else {
+      return std::make_pair (new EmptyRegion (), clone ());
+    }
+  }
+
+  std::set <db::Polygon> op;
+  for (RegionIterator o (other.begin_merged ()); ! o.at_end (); ++o) {
+    op.insert (*o);
+  }
+
+  std::unique_ptr<FlatRegion> new_region (new FlatRegion (false));
+
+  for (RegionIterator o (begin_merged ()); ! o.at_end (); ++o) {
+    if (op.find (*o) != op.end ()) {
+      if (output_mode == Positive || output_mode == PositiveAndNegative) {
+        oph.results () [0]->insert (*o);
+      }
+    } else {
+      if (output_mode == Negative) {
+        oph.results () [0]->insert (*o);
+      } else if (output_mode == PositiveAndNegative) {
+        oph.results () [1]->insert (*o);
+      }
+    }
+  }
+
+  return oph.region_pair ();
+}
+
+std::pair<RegionDelegate *, RegionDelegate *>
+AsIfFlatRegion::selected_interacting_generic (const Edges &other, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const
+{
+  OutputPairHolder oph (output_mode, merged_semantics () || is_merged ());
 
   if (output_mode == None) {
     return oph.region_pair ();
@@ -454,7 +485,7 @@ AsIfFlatRegion::selected_interacting_generic (const Edges &other, InteractingOut
 std::pair<RegionDelegate *, RegionDelegate *>
 AsIfFlatRegion::selected_interacting_generic (const Texts &other, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const
 {
-  OutputPairHolder oph (output_mode, merged_semantics ());
+  OutputPairHolder oph (output_mode, merged_semantics () || is_merged ());
 
   if (output_mode == None) {
     return oph.region_pair ();
@@ -500,7 +531,7 @@ AsIfFlatRegion::selected_interacting_generic (const Texts &other, InteractingOut
 std::pair<RegionDelegate *, RegionDelegate *>
 AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, bool touching, InteractingOutputMode output_mode, size_t min_count, size_t max_count) const
 {
-  OutputPairHolder oph (output_mode, merged_semantics ());
+  OutputPairHolder oph (output_mode, merged_semantics () || is_merged ());
 
   if (output_mode == None) {
     return oph.region_pair ();
@@ -580,7 +611,7 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
   std::vector<generic_shape_iterator<db::Edge> > others;
   others.push_back (other.begin_merged ());
 
-  std::unique_ptr<FlatEdges> output (new FlatEdges (merged_semantics ()));
+  std::unique_ptr<FlatEdges> output (new FlatEdges (other.merged_semantics () || other.is_merged ()));
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_edges ());
 
@@ -689,7 +720,7 @@ AsIfFlatRegion::pull_generic (const Region &other, int mode, bool touching) cons
   std::vector<generic_shape_iterator<db::Polygon> > others;
   others.push_back (other.begin_merged ());
 
-  std::unique_ptr<FlatRegion> output (new FlatRegion (merged_semantics ()));
+  std::unique_ptr<FlatRegion> output (new FlatRegion (other.merged_semantics () || other.is_merged ()));
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_polygons ());
 

@@ -2443,6 +2443,13 @@ CODE
     # @/table
     
     # %DRC%
+    # @name in_and_out
+    # @brief Selects shapes or regions of self which are and which are not contained in the other layer
+    # @synopsis (in, not_in) = layer.in_and_out(other)
+    # This method is equivalent to calling \in and \not_in, but more
+    # efficient as it delivers both results in a single call.
+
+    # %DRC%
     # @name interacting
     # @brief Selects shapes or regions of self which touch or overlap shapes from the other region
     # @synopsis layer.interacting(other)
@@ -2837,6 +2844,24 @@ CODE
           else
             DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :#{f}, other.data, *minmax_count(*args)))
           end
+
+        end
+
+      end
+CODE
+    end
+    
+    %w(in_and_out).each do |f|
+      eval <<"CODE"
+      def #{f}(other, *args)
+
+        @engine._context("#{f}") do
+
+          requires_same_type(other)
+          requires_edges_or_region
+
+          res = @engine._tcmd_a2(self.data, 0, self.data.class, self.data.class, :#{f}, other.data)
+          [ DRCLayer::new(@engine, res[0]), DRCLayer::new(@engine, res[1]) ]
 
         end
 

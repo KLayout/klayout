@@ -422,7 +422,8 @@ void MacroCollection::scan ()
       }
     }
 
-    std::vector<std::string> dirs = tl::dir_entries (p, false /*with_files*/, true /*with_dirs*/, true /*without_dotfiles*/);
+    //  NOTE: we add files to capture symlinks to directories
+    std::vector<std::string> dirs = tl::dir_entries (p, true /*with_files*/, true /*with_dirs*/, true /*without_dotfiles*/);
     for (auto f = dirs.begin (); f != dirs.end (); ++f) {
 
       std::string fp = tl::combine_path (p, *f);

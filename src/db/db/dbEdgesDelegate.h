@@ -333,6 +333,7 @@ public:
   virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_inside_pair (const Edges &other) const = 0;
 
   virtual EdgesDelegate *in (const Edges &other, bool invert) const = 0;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> in_and_out (const Edges &) const = 0;
 
   virtual const db::Edge *nth (size_t n) const = 0;
   virtual bool has_valid_edges () const = 0;

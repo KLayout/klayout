@@ -265,7 +265,15 @@ public:
     return pull_generic (other, 0, false);
   }
 
-  virtual RegionDelegate *in (const Region &other, bool invert) const;
+  virtual RegionDelegate *in (const Region &other, bool invert) const
+  {
+    return in_and_out_generic (other, invert ? Negative : Positive).first;
+  }
+
+  virtual std::pair<RegionDelegate *, RegionDelegate *> in_and_out (const Region &other) const
+  {
+    return in_and_out_generic (other, PositiveAndNegative);
+  }
 
   virtual bool equals (const Region &other) const;
   virtual bool less (const Region &other) const;
@@ -284,6 +292,7 @@ protected:
   virtual RegionDelegate *pull_generic (const Region &other, int mode, bool touching) const;
   virtual EdgesDelegate *pull_generic (const Edges &other) const;
   virtual TextsDelegate *pull_generic (const Texts &other) const;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> in_and_out_generic (const Region &other, InteractingOutputMode output_mode) const;
 
   template <class Trans>
   static void produce_markers_for_grid_check (const db::Polygon &poly, const Trans &tr, db::Coord gx, db::Coord gy, db::Shapes &shapes);

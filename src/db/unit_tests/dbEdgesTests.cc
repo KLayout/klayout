@@ -1121,6 +1121,42 @@ TEST(27)
   EXPECT_EQ (db::compare (e.selected_outside_differential (ee).second, "(1100,-1000;1100,2000);(1200,-1000;1200,0);(1300,-800;1300,-200);(1400,1000;1400,1100);(1500,1000;1500,2100);(1600,-800;1600,-200);(1900,1000;1900,2000)"), true);
 }
 
+//  Edges::in and Edges:in_and_out
+TEST(28)
+{
+  db::Edges e;
+  e.insert (db::Edge (0, 0, 0, 1000));
+  e.insert (db::Edge (0, 1000, 0, 2000));
+  e.insert (db::Edge (100, 0, 100, 1000));
+
+  db::Edges ee;
+  ee.insert (db::Edge (0, 0, 0, 2000));
+  ee.insert (db::Edge (100, 1000, 0, 2000));
+  ee.insert (db::Edge (100, 0, 100, 1000));
+
+  EXPECT_EQ (db::compare (e.in (db::Edges ()), ""), true);
+  EXPECT_EQ (db::compare (e.in (db::Edges (), true), "(0,0;0,1000);(0,1000;0,2000);(100,0;100,1000)"), true);
+  EXPECT_EQ (db::compare (e.in_and_out (db::Edges ()).first, ""), true);
+  EXPECT_EQ (db::compare (e.in_and_out (db::Edges ()).second, "(0,0;0,1000);(0,1000;0,2000);(100,0;100,1000)"), true);
+  EXPECT_EQ (db::compare (db::Edges ().in (ee), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().in (ee, true), ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().in_and_out (ee).first, ""), true);
+  EXPECT_EQ (db::compare (db::Edges ().in_and_out (ee).second, ""), true);
+  EXPECT_EQ (db::compare (e.in (ee), "(0,0;0,2000);(100,0;100,1000)"), true);
+  EXPECT_EQ (db::compare (e.in (ee, true), ""), true);
+  EXPECT_EQ (db::compare (e.in_and_out (ee).first, "(0,0;0,2000);(100,0;100,1000)"), true);
+  EXPECT_EQ (db::compare (e.in_and_out (ee).second, ""), true);
+  EXPECT_EQ (db::compare (ee.in (e, true), "(100,1000;0,2000)"), true);
+  EXPECT_EQ (db::compare (ee.in_and_out (e).second, "(100,1000;0,2000)"), true);
+
+  e.set_merged_semantics (false);
+  ee.set_merged_semantics (false);
+
+  EXPECT_EQ (db::compare (e.in (ee), "(100,0;100,1000)"), true);
+  EXPECT_EQ (db::compare (e.in (ee, true), "(0,0;0,1000);(0,1000;0,2000)"), true);
+  EXPECT_EQ (db::compare (ee.in (e, true), "(0,0;0,2000);(100,1000;0,2000)"), true);
+}
+
 //  GitHub issue #72 (Edges/Region NOT issue)
 TEST(100)
 {

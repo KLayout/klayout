@@ -1376,3 +1376,13 @@ TEST(57d_issue_1190)
 {
   run_test (_this, "57", true);
 }
+
+TEST(58_in_and_out)
+{
+  run_test (_this, "58", false);
+}
+
+TEST(58d_in_and_out)
+{
+  run_test (_this, "58", true);
+}

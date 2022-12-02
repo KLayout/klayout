@@ -1342,6 +1342,44 @@ The following image shows the effect of the "in" method (input1: red, input2: bl
 </tr>
 </table>
 </p>
+<a name="in_and_out"/><h2>"in_and_out" - Selects shapes or regions of self which are and which are not contained in the other layer</h2>
+<keyword name="in_and_out"/>
+<p>Usage:</p>
+<ul>
+<li><tt>(in, not_in) = layer.in_and_out(other)</tt></li>
+</ul>
+<p>
+This method is equivalent to calling <a href="#in">in</a> and <a href="#not_in">not_in</a>, but more
+efficient as it delivers both results in a single call.
+</p><p>
+This method is available for polygon, text and edge layers. Edges can be selected
+with respect to other edges or polygons. Texts can be selected with respect to 
+polygons. Polygons can be selected with respect to edges, texts and other polygons.
+</p><p>
+The following image shows the effect of the "interacting" method (input1: red, input2: blue):
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_interacting.png"/></td>
+</tr>
+</table>
+</p><p>
+If a single count is given, shapes from self are selected only if they do interact at least with the given
+number of (different) shapes from the other layer. If a min and max count is given, shapes from  
+self are selected only if they interact with min_count or more, but a maximum of max_count different shapes
+from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_interacting2.png"/></td>
+<td><img src="/images/drc_interacting3.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_interacting4.png"/></td>
+<td><img src="/images/drc_interacting5.png"/></td>
+</tr>
+</table>
+</p>
 <a name="insert"/><h2>"insert" - Inserts one or many objects into the layer</h2>
 <keyword name="insert"/>
 <p>Usage:</p>
@@ -1445,50 +1483,6 @@ method computing both inside and outside part in a single call.
 <table>
 <tr>
 <td><img src="/images/drc_inside_part.png"/></td>
-</tr>
-</table>
-</p>
-<a name="interacting"/><h2>"interacting" - Selects shapes or regions of self which touch or overlap shapes from the other region</h2>
-<keyword name="interacting"/>
-<p>Usage:</p>
-<ul>
-<li><tt>layer.interacting(other)</tt></li>
-<li><tt>layer.interacting(other, min_count)</tt></li>
-<li><tt>layer.interacting(other, min_count, max_count)</tt></li>
-<li><tt>layer.interacting(other, min_count .. max_count)</tt></li>
-</ul>
-<p>
-This method selects all shapes or regions from self which touch or overlap shapes from the other
-region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
-otherwise individual shapes are selected.
-It returns a new layer containing the selected shapes. A version which modifies self
-is <a href="#select_interacting">select_interacting</a>.
-</p><p>
-This method is available for polygon, text and edge layers. Edges can be selected
-with respect to other edges or polygons. Texts can be selected with respect to 
-polygons. Polygons can be selected with respect to edges, texts and other polygons.
-</p><p>
-The following image shows the effect of the "interacting" method (input1: red, input2: blue):
-</p><p>
-<table>
-<tr>
-<td><img src="/images/drc_interacting.png"/></td>
-</tr>
-</table>
-</p><p>
-If a single count is given, shapes from self are selected only if they do interact at least with the given
-number of (different) shapes from the other layer. If a min and max count is given, shapes from  
-self are selected only if they interact with min_count or more, but a maximum of max_count different shapes
-from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
-</p><p>
-<table>
-<tr>
-<td><img src="/images/drc_interacting2.png"/></td>
-<td><img src="/images/drc_interacting3.png"/></td>
-</tr>
-<tr>
-<td><img src="/images/drc_interacting4.png"/></td>
-<td><img src="/images/drc_interacting5.png"/></td>
 </tr>
 </table>
 </p>

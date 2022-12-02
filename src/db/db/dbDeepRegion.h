@@ -133,8 +133,6 @@ public:
   virtual RegionDelegate *sized (coord_type d, unsigned int mode) const;
   virtual RegionDelegate *sized (coord_type dx, coord_type dy, unsigned int mode) const;
 
-  virtual RegionDelegate *in (const Region &other, bool invert) const;
-
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
 
   virtual DeepShapeCollectionDelegateBase *deep ()
@@ -144,6 +142,7 @@ public:
 
   void set_is_merged (bool f);
 
+  bool merged_polygons_available () const;
   const DeepLayer &merged_deep_layer () const;
 
 protected:
@@ -158,6 +157,7 @@ protected:
   virtual RegionDelegate *pull_generic (const Region &other, int mode, bool touching) const;
   virtual EdgesDelegate *pull_generic (const Edges &other) const;
   virtual TextsDelegate *pull_generic (const Texts &other) const;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> in_and_out_generic (const Region &other, InteractingOutputMode output_mode) const;
 
 private:
   friend class DeepEdges;

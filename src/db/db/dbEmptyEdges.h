@@ -115,6 +115,7 @@ public:
   virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_inside_pair (const Edges &) const { return std::make_pair (new EmptyEdges (), new EmptyEdges ()); }
 
   virtual EdgesDelegate *in (const Edges &, bool) const { return new EmptyEdges (); }
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> in_and_out (const Edges &) const { return std::make_pair (new EmptyEdges (), new EmptyEdges ()); }
 
   virtual const db::Edge *nth (size_t) const { tl_assert (false); }
   virtual bool has_valid_edges () const { return true; }

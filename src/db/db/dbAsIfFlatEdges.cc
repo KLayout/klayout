@@ -514,6 +514,12 @@ AsIfFlatEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, c
 EdgesDelegate *
 AsIfFlatEdges::in (const Edges &other, bool invert) const
 {
+  if (other.empty ()) {
+    return invert ? clone () : new EmptyEdges ();
+  } else if (empty ()) {
+    return new EmptyEdges ();
+  }
+
   std::set <db::Edge> op;
   for (EdgesIterator o (other.begin_merged ()); ! o.at_end (); ++o) {
     op.insert (*o);
@@ -528,6 +534,34 @@ AsIfFlatEdges::in (const Edges &other, bool invert) const
   }
 
   return new_region.release ();
+}
+
+std::pair<EdgesDelegate *, EdgesDelegate *>
+AsIfFlatEdges::in_and_out (const Edges &other) const
+{
+  if (other.empty ()) {
+    return std::make_pair (new EmptyEdges (), clone ());
+  } else if (empty ()) {
+    return std::make_pair (new EmptyEdges (), new EmptyEdges ());
+  }
+
+  std::set <db::Edge> op;
+  for (EdgesIterator o (other.begin_merged ()); ! o.at_end (); ++o) {
+    op.insert (*o);
+  }
+
+  std::unique_ptr<FlatEdges> in (new FlatEdges (false));
+  std::unique_ptr<FlatEdges> out (new FlatEdges (false));
+
+  for (EdgesIterator o (begin_merged ()); ! o.at_end (); ++o) {
+    if (op.find (*o) != op.end ()) {
+      in->insert (*o);
+    } else {
+      out->insert (*o);
+    }
+  }
+
+  return std::make_pair (in.release (), out.release ());
 }
 
 size_t

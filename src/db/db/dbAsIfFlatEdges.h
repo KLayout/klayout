@@ -204,6 +204,7 @@ public:
   virtual std::pair<EdgesDelegate *, EdgesDelegate *> selected_inside_pair (const Region &other) const;
 
   virtual EdgesDelegate *in (const Edges &, bool) const;
+  virtual std::pair<EdgesDelegate *, EdgesDelegate *> in_and_out (const Edges &) const;
 
   virtual bool equals (const Edges &other) const;
   virtual bool less (const Edges &other) const;

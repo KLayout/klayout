@@ -44,6 +44,15 @@
 namespace gsi
 {
 
+static inline std::vector<db::Region> as_2region_vector (const std::pair<db::Region, db::Region> &rp)
+{
+  std::vector<db::Region> res;
+  res.reserve (2);
+  res.push_back (db::Region (const_cast<db::Region &> (rp.first).take_delegate ()));
+  res.push_back (db::Region (const_cast<db::Region &> (rp.second).take_delegate ()));
+  return res;
+}
+
 static db::Region *new_v ()
 {
   return new db::Region ();
@@ -430,6 +439,11 @@ static db::Region not_in (const db::Region *r, const db::Region &other)
   return r->in (other, true);
 }
 
+static std::vector<db::Region> in_and_out (const db::Region *r, const db::Region &other)
+{
+  return as_2region_vector (r->in_and_out (other));
+}
+
 static db::Region rectangles (const db::Region *r)
 {
   db::RectangleFilter f (false, false);
@@ -603,15 +617,6 @@ static db::EdgePairs separation2 (const db::Region *r, const db::Region &other, 
                                             rect_filter,
                                             negative)
                              );
-}
-
-static inline std::vector<db::Region> as_2region_vector (const std::pair<db::Region, db::Region> &rp)
-{
-  std::vector<db::Region> res;
-  res.reserve (2);
-  res.push_back (db::Region (const_cast<db::Region &> (rp.first).take_delegate ()));
-  res.push_back (db::Region (const_cast<db::Region &> (rp.second).take_delegate ()));
-  return res;
 }
 
 static std::vector<db::Region> andnot (const db::Region *r, const db::Region &other)
@@ -2186,15 +2191,23 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "are taken from a hole-less representation (i.e. GDS2 file). Use explicit merge (\\merge method) "
     "in order to merge the polygons and detect holes.\n"
   ) +
-  method_ext ("members_of|#in", &in, gsi::arg ("other"),
+  method_ext ("members_of|in", &in, gsi::arg ("other"),
     "@brief Returns all polygons which are members of the other region\n"
     "This method returns all polygons in self which can be found in the other region as well with exactly the same "
     "geometry."
   ) +
-  method_ext ("not_members_of|#not_in", &not_in, gsi::arg ("other"),
+  method_ext ("not_members_of|not_in", &not_in, gsi::arg ("other"),
     "@brief Returns all polygons which are not members of the other region\n"
     "This method returns all polygons in self which can not be found in the other region with exactly the same "
     "geometry."
+  ) +
+  method_ext ("in_and_out", &in_and_out, gsi::arg ("other"),
+    "@brief Returns all polygons which are members and not members of the other region\n"
+    "This method is equivalent to calling \\members_of and \\not_members_of, but delivers both results at the same time and "
+    "is more efficient than two separate calls. "
+    "The first element returned is the \\members_of part, the second is the \\not_members_of part.\n"
+    "\n"
+    "This method has been introduced in version 0.28.\n"
   ) +
   method_ext ("rectangles", &rectangles,
     "@brief Returns all polygons which are rectangles\n"

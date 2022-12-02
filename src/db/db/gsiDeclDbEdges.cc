@@ -35,7 +35,16 @@
 namespace gsi
 {
 
-static db::Edges *new_v () 
+static inline std::vector<db::Edges> as_2edges_vector (const std::pair<db::Edges, db::Edges> &rp)
+{
+  std::vector<db::Edges> res;
+  res.reserve (2);
+  res.push_back (db::Edges (const_cast<db::Edges &> (rp.first).take_delegate ()));
+  res.push_back (db::Edges (const_cast<db::Edges &> (rp.second).take_delegate ()));
+  return res;
+}
+
+static db::Edges *new_v ()
 {
   return new db::Edges ();
 }
@@ -164,6 +173,11 @@ static db::Edges in (const db::Edges *r, const db::Edges &other)
 static db::Edges not_in (const db::Edges *r, const db::Edges &other)
 {
   return r->in (other, true);
+}
+
+static std::vector<db::Edges> in_and_out (const db::Edges *r, const db::Edges &other)
+{
+  return as_2edges_vector (r->in_and_out (other));
 }
 
 static db::Edges &move_p (db::Edges *r, const db::Vector &p)
@@ -375,15 +389,6 @@ static db::Edges *new_texts_as_dots2 (const db::RecursiveShapeIterator &si, db::
 static size_t id (const db::Edges *e)
 {
   return tl::id_of (e->delegate ());
-}
-
-static inline std::vector<db::Edges> as_2edges_vector (const std::pair<db::Edges, db::Edges> &rp)
-{
-  std::vector<db::Edges> res;
-  res.reserve (2);
-  res.push_back (db::Edges (const_cast<db::Edges &> (rp.first).take_delegate ()));
-  res.push_back (db::Edges (const_cast<db::Edges &> (rp.second).take_delegate ()));
-  return res;
 }
 
 static std::vector<db::Edges> andnot_with_edges (const db::Edges *r, const db::Edges &other)
@@ -1633,15 +1638,23 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= of merged semantics)\n"
   ) +
-  method_ext ("members_of|#in", &in, gsi::arg ("other"),
+  method_ext ("members_of|in", &in, gsi::arg ("other"),
     "@brief Returns all edges which are members of the other edge collection\n"
     "This method returns all edges in self which can be found in the other edge collection as well with exactly the same "
     "geometry."
   ) +
-  method_ext ("not_members_of|#not_in", &not_in, gsi::arg ("other"),
+  method_ext ("not_members_of|not_in", &not_in, gsi::arg ("other"),
     "@brief Returns all edges which are not members of the other edge collection\n"
     "This method returns all edges in self which can not be found in the other edge collection with exactly the same "
     "geometry."
+  ) +
+  method_ext ("in_and_out", &in_and_out, gsi::arg ("other"),
+    "@brief Returns all polygons which are members and not members of the other region\n"
+    "This method is equivalent to calling \\members_of and \\not_members_of, but delivers both results at the same time and "
+    "is more efficient than two separate calls. "
+    "The first element returned is the \\members_of part, the second is the \\not_members_of part.\n"
+    "\n"
+    "This method has been introduced in version 0.28.\n"
   ) +
   method_ext ("is_deep?", &is_deep,
     "@brief Returns true if the edge collection is a deep (hierarchical) one\n"

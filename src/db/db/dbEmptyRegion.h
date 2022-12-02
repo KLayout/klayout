@@ -133,6 +133,7 @@ public:
   virtual TextsDelegate *pull_interacting (const Texts &) const  { return new EmptyTexts (); }
   virtual RegionDelegate *pull_overlapping (const Region &) const  { return new EmptyRegion (); }
   virtual RegionDelegate *in (const Region &, bool) const { return new EmptyRegion (); }
+  virtual std::pair<RegionDelegate *, RegionDelegate *> in_and_out (const Region &) const { return std::make_pair (new EmptyRegion (), new EmptyRegion ()); }
 
   virtual bool has_valid_polygons () const { return true; }
   virtual bool has_valid_merged_polygons () const { return true; }

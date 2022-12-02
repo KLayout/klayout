@@ -1,0 +1,27 @@
+
+source $drc_test_source
+target $drc_test_target
+
+if $drc_test_deep
+  deep
+end
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+l1.output(1, 0)
+l2.output(2, 0)
+
+l1e = l1.edges
+l2e = l2.edges
+
+l2.in(l1).output(10, 0)
+l2.not_in(l1).output(11, 0)
+l2.in_and_out(l1).first.output(12, 0)
+l2.in_and_out(l1).last.output(13, 0)
+
+l2e.in(l1e).output(20, 0)
+l2e.not_in(l1e).output(21, 0)
+l2e.in_and_out(l1e).first.output(22, 0)
+l2e.in_and_out(l1e).last.output(23, 0)
+

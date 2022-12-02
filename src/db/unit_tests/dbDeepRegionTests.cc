@@ -880,14 +880,17 @@ TEST(14_Interacting)
   db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
   db::Region r6 (db::RecursiveShapeIterator (ly, top_cell, l6), dss);
   db::Region r1f (db::RecursiveShapeIterator (ly, top_cell, l1));
-  db::Region r2f (db::RecursiveShapeIterator (ly, top_cell, l2));
-  db::Region r6f (db::RecursiveShapeIterator (ly, top_cell, l6));
   db::Region r1r = r1;
   r1r.set_merged_semantics (false);
   db::Region r2r = r2;
   r2r.set_merged_semantics (false);
   db::Region r6r = r6;
   r6r.set_merged_semantics (false);
+
+  db::Edges r1e = r1.edges ();
+  db::Edges r1ef = r1f.edges ();
+  db::Edges r1er = r1r.edges ();
+  r1er.set_merged_semantics (false);
 
   {
     db::Layout target;
@@ -947,21 +950,17 @@ TEST(14_Interacting)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (66, 0)), r6r.selected_overlapping (r1r));
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (67, 0)), r6r.selected_not_overlapping (r1r));
 
-    EXPECT_EQ (r2.selected_interacting (r1).is_merged (), false);
-    EXPECT_EQ (r2.selected_interacting (r1.merged ()).is_merged (), true);
-    EXPECT_EQ (r2.selected_inside (r1).is_merged (), true);
+    EXPECT_EQ (r2.selected_interacting (r1).is_merged (), true);
     EXPECT_EQ (r2r.selected_interacting (r1).is_merged (), false);
-    EXPECT_EQ (r2.selected_interacting (r1r).is_merged (), false);
-    EXPECT_EQ (r2r.selected_interacting (r1r).is_merged (), false);
+    EXPECT_EQ (r2r.selected_interacting (r1.merged ()).is_merged (), false);
+    EXPECT_EQ (r2.selected_interacting (r1r).is_merged (), true);
+    EXPECT_EQ (r2.selected_inside (r1).is_merged (), true);
+    EXPECT_EQ (r2r.selected_inside (r1).is_merged (), false);
+    EXPECT_EQ (r2.selected_inside (r1).is_merged (), true);
 
     CHECKPOINT();
     db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au14a.gds");
   }
-
-  db::Edges r1e = r1.edges ();
-  db::Edges r1ef = r1f.edges ();
-  db::Edges r1er = r1r.edges ();
-  r1er.set_merged_semantics (false);
 
   {
     db::Layout target;
@@ -976,8 +975,8 @@ TEST(14_Interacting)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 0)), r6r.selected_interacting (r1er));
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (33, 0)), r6r.selected_not_interacting (r1er));
 
-    EXPECT_EQ (r6.selected_interacting (r1e).is_merged (), false);
-    EXPECT_EQ (r6.selected_interacting (r1er).is_merged (), false);
+    EXPECT_EQ (r6.selected_interacting (r1e).is_merged (), true);
+    EXPECT_EQ (r6.selected_interacting (r1er).is_merged (), true);
     EXPECT_EQ (r6r.selected_interacting (r1e).is_merged (), false);
     EXPECT_EQ (r6r.selected_interacting (r1er).is_merged (), false);
 
@@ -1470,6 +1469,16 @@ TEST(25_Pull)
   db::Region r6r = r6;
   r6r.set_merged_semantics (false);
 
+  db::Edges r1e = r1.edges ();
+  db::Edges r1ef = r1f.edges ();
+  db::Edges r1er = r1r.edges ();
+  r1er.set_merged_semantics (false);
+
+  db::Edges r6e = r6.edges ();
+  db::Edges r6ef = r6f.edges ();
+  db::Edges r6er = r6r.edges ();
+  r6er.set_merged_semantics (false);
+
   {
     db::Layout target;
     unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
@@ -1499,24 +1508,14 @@ TEST(25_Pull)
     target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (62, 0)), r2r.pull_overlapping (r6r));
 
     EXPECT_EQ (r2.pull_inside (r6).is_merged (), true);
-    EXPECT_EQ (r2.pull_interacting (r6).is_merged (), false);
-    EXPECT_EQ (r2r.pull_interacting (r6).is_merged (), false);
+    EXPECT_EQ (r2.pull_interacting (r6).is_merged (), true);
+    EXPECT_EQ (r2r.pull_interacting (r6).is_merged (), true);
     EXPECT_EQ (r2.pull_interacting (r6r).is_merged (), false);
     EXPECT_EQ (r2r.pull_interacting (r6r).is_merged (), false);
 
     CHECKPOINT();
     db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au25a.gds");
   }
-
-  db::Edges r1e = r1.edges ();
-  db::Edges r1ef = r1f.edges ();
-  db::Edges r1er = r1r.edges ();
-  r1er.set_merged_semantics (false);
-
-  db::Edges r6e = r6.edges ();
-  db::Edges r6ef = r6f.edges ();
-  db::Edges r6er = r6r.edges ();
-  r6er.set_merged_semantics (false);
 
   {
     db::Layout target;
@@ -1800,7 +1799,7 @@ TEST(30a_interact_with_count_region)
   EXPECT_EQ (r.selected_interacting (rr2, 2, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_interacting (rr2, 4, 5).to_string (), "");
 
-  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
   EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
@@ -1891,7 +1890,7 @@ TEST(30b_interact_with_count_edge)
   EXPECT_EQ (r.selected_interacting (rr2, 2, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_interacting (rr2, 4, 5).to_string (), "");
 
-  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
   EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
@@ -1981,7 +1980,7 @@ TEST(30c_interact_with_count_text)
   EXPECT_EQ (r.selected_interacting (rr2, 2, 5).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_interacting (rr2, 4, 5).to_string (), "");
 
-  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
+  EXPECT_EQ (r.selected_not_interacting (empty).to_string (), "(0,0;0,200;100,200;100,0);(-100,-100;-100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_not_interacting (rr).to_string (), "");
   EXPECT_EQ (r.selected_not_interacting (rr, 0, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
   EXPECT_EQ (r.selected_not_interacting (rr, 1, 2).to_string (), "(-100,-100;-100,0;0,0;0,200;100,200;100,0;0,0;0,-100)");
@@ -2016,6 +2015,115 @@ TEST(30c_interact_with_count_text)
   EXPECT_EQ (r.selected_not_interacting (rr, 2, 4).to_string (), "");
   EXPECT_EQ (db::compare (r.selected_not_interacting (rr, 2, 1), "(-100,-100;-100,0;0,0;0,-100);(0,0;0,200;100,200;100,0)"), true);
   EXPECT_EQ (r.selected_not_interacting (rr, 3, 4).to_string (), "(0,0;0,200;100,200;100,0)");
+}
+
+TEST(31_in)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l31.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));  //  empty
+
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+  db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+  db::Region r3 (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
+  db::Region r1r = r1;
+  r1r.set_merged_semantics (false);
+  db::Region r2r = r2;
+  r2r.set_merged_semantics (false);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r1);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r2.in (r1));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r2.in (r1, true));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r2.in (r3, false));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), r2.in (r3, true));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), r3.in (r1, false));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (15, 0)), r3.in (r1, true));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r2r.in (r1));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r2r.in (r1, true));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), r2.in (r1r));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), r2.in (r1r, true));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), r2r.in (r1r));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), r2r.in (r1r, true));
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au31.gds");
+}
+
+TEST(31_in_and_out)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_l31.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));  //  empty
+
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+  db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+  db::Region r3 (db::RecursiveShapeIterator (ly, top_cell, l3), dss);
+
+  db::Region r1r = r1;
+  r1r.set_merged_semantics (false);
+  db::Region r2r = r2;
+  r2r.set_merged_semantics (false);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r1);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r2.in_and_out (r1).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r2.in_and_out (r1).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r2.in_and_out (r3).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), r2.in_and_out (r3).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), r3.in_and_out (r1).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (15, 0)), r3.in_and_out (r1).second);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r2r.in_and_out (r1).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r2r.in_and_out (r1).second);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), r2.in_and_out (r1r).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), r2.in_and_out (r1r).second);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), r2r.in_and_out (r1r).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), r2r.in_and_out (r1r).second);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au31.gds");
 }
 
 TEST(100_Integration)

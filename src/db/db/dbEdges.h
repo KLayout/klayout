@@ -1391,6 +1391,19 @@ public:
   }
 
   /**
+   *  @brief Returns all edges which are in the other edge set and which are not.
+   *
+   *  This method is equivalent to calling in with invert = false and true, but more efficient.
+   *
+   *  Merged semantics applies.
+   */
+  std::pair<Edges, Edges> in_and_out (const Edges &other) const
+  {
+    std::pair<db::EdgesDelegate *, db::EdgesDelegate *> p = mp_delegate->in_and_out (other);
+    return std::pair<Edges, Edges> (Edges (p.first), Edges (p.second));
+  }
+
+  /**
    *  @brief Returns the nth edge
    *
    *  This operation is available only for flat regions - i.e. such for which "has_valid_edges" is true.

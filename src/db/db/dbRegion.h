@@ -1603,6 +1603,19 @@ public:
   }
 
   /**
+   *  @brief Returns all polygons which are in the other region plus the ones which are not
+   *
+   *  This method is similar to calling in with inverse = false and true, but more efficient.
+   *
+   *  Merged semantics applies.
+   */
+  std::pair<Region, Region> in_and_out (const Region &other) const
+  {
+    std::pair<db::RegionDelegate *, db::RegionDelegate *> p = mp_delegate->in_and_out (other);
+    return std::pair<Region, Region> (Region (p.first), Region (p.second));
+  }
+
+  /**
    *  @brief Round corners (in-place)
    *
    *  @param rinner The inner radius in DBU units

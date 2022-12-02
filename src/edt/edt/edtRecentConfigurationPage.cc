@@ -69,7 +69,7 @@ RecentConfigurationPage::init ()
   }
   mp_tree_widget->setHeaderLabels (column_labels);
 
-  update_list (get_stored_values ());
+  update_list ();
 }
 
 RecentConfigurationPage::~RecentConfigurationPage ()
@@ -314,11 +314,17 @@ RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std
 void
 RecentConfigurationPage::layers_changed (int)
 {
-  update_list (get_stored_values ());
+  dm_update_list ();
 }
 
 void
 RecentConfigurationPage::technology_changed (const std::string &)
+{
+  dm_update_list ();
+}
+
+void
+RecentConfigurationPage::update_list ()
 {
   update_list (get_stored_values ());
 }

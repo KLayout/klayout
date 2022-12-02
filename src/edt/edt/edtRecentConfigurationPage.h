@@ -27,6 +27,7 @@
 
 #include "layEditorOptionsPage.h"
 #include "tlObject.h"
+#include "tlDeferredExecution.h"
 
 #include <list>
 #include <QTreeWidget>
@@ -79,7 +80,7 @@ public:
 
   template <class Iter>
   RecentConfigurationPage (lay::LayoutViewBase *view, lay::Dispatcher *dispatcher, const std::string &recent_cfg_name, Iter begin_cfg, Iter end_cfg)
-    : EditorOptionsPage (view, dispatcher), m_recent_cfg_name (recent_cfg_name), m_cfg (begin_cfg, end_cfg)
+    : EditorOptionsPage (view, dispatcher), m_recent_cfg_name (recent_cfg_name), m_cfg (begin_cfg, end_cfg), dm_update_list (this, &RecentConfigurationPage::update_list)
   {
     init ();
   }
@@ -99,9 +100,11 @@ private:
   std::string m_recent_cfg_name;
   std::list<ConfigurationDescriptor> m_cfg;
   QTreeWidget *mp_tree_widget;
+  tl::DeferredMethod<RecentConfigurationPage> dm_update_list;
 
   void init ();
   void update_list (const std::list<std::vector<std::string> > &stored_values);
+  void update_list ();
   std::list<std::vector<std::string> > get_stored_values () const;
   void set_stored_values (const std::list<std::vector<std::string> > &values) const;
   void render_to (QTreeWidgetItem *item, int column, const std::vector<std::string> &values, RecentConfigurationPage::ConfigurationRendering rendering);

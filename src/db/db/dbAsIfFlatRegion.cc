@@ -581,7 +581,8 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
   proc.set_report_progress (report_progress ());
 
   std::vector<generic_shape_iterator<db::Polygon> > others;
-  others.push_back ((mode < 0 || counting) ? other.begin_merged () : other.begin ());
+  //  NOTE: with counting the other region needs to be merged
+  others.push_back (counting ? other.begin_merged () : other.begin ());
 
   proc.run_flat (polygons, others, std::vector<bool> (), &op, oph.results ());
 

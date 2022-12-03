@@ -1952,6 +1952,7 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
     }
   }
 
+  min_count = std::max (size_t (1), min_count);
   bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   //  with these flag set to true, the resulting polygons are broken again.
@@ -1966,9 +1967,8 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
   }
 
   const db::DeepLayer &polygons = merged_deep_layer ();
-  //  NOTE: on "inside" or with counting, the other polygons must be merged
-  bool other_needs_merged = (mode < 0 || counting);
-  const db::DeepLayer &other_polygons = other_needs_merged ? other_deep->merged_deep_layer () : other_deep->deep_layer ();
+  //  NOTE: with counting, the other polygons must be merged
+  const db::DeepLayer &other_polygons = counting ? other_deep->merged_deep_layer () : other_deep->deep_layer ();
 
   db::InteractingLocalOperation op (mode, touching, output_mode, min_count, max_count, true);
 
@@ -2011,6 +2011,7 @@ DeepRegion::selected_interacting_generic (const Edges &other, InteractingOutputM
     }
   }
 
+  min_count = std::max (size_t (1), min_count);
   bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   //  with these flag set to true, the resulting polygons are broken again.
@@ -2180,6 +2181,8 @@ DeepRegion::selected_interacting_generic (const Texts &other, InteractingOutputM
       return std::make_pair (new DeepRegion (deep_layer ().derived ()), (RegionDelegate *) 0);
     }
   }
+
+  min_count = std::max (size_t (1), min_count);
 
   //  with these flag set to true, the resulting polygons are broken again.
   bool split_after = false;

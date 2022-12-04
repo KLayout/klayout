@@ -35,11 +35,15 @@ TEST(1)
   EXPECT_EQ (ep == db::EdgePair (db::Edge (), db::Edge ()), true);
   EXPECT_EQ (ep != db::EdgePair (db::Edge (), db::Edge ()), false);
   EXPECT_EQ (ep < db::EdgePair (db::Edge (), db::Edge ()), false);
+  EXPECT_EQ (ep.area (), db::EdgePair::area_type (0));
+  EXPECT_EQ (ep.perimeter (), db::EdgePair::perimeter_type (0));
 
   ep = db::EdgePair (db::Edge (db::Point (10, 30), db::Point (15, 30)), db::Edge (db::Point (0, 30), db::Point (0, 40)));
   EXPECT_EQ (ep.to_string (), "(10,30;15,30)/(0,30;0,40)");
   EXPECT_EQ (ep.normalized ().to_string (), "(15,30;10,30)/(0,30;0,40)");
   EXPECT_EQ (ep.normalized ().normalized ().to_string (), "(15,30;10,30)/(0,30;0,40)");
+  EXPECT_EQ (ep.area (), db::EdgePair::area_type (50));  // weird orientation :(
+  EXPECT_EQ (ep.perimeter (), db::EdgePair::perimeter_type (15));
 
   ep = db::EdgePair (db::Edge (db::Point (1, 2), db::Point (11, 12)), db::Edge (db::Point (-5, 5), db::Point (5, 15)));
   EXPECT_EQ (ep.to_string (), "(1,2;11,12)/(-5,5;5,15)");

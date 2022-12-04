@@ -1394,7 +1394,7 @@ public:
   {
     tl_assert (m_type == Point);
     if (m_stable) {
-      return m_with_props ? &**(((ppoint_iter_type *) m_generic.iter)) : &**(((ppoint_iter_type *) m_generic.iter));
+      return m_with_props ? &**(((ppoint_iter_type *) m_generic.iter)) : &**(((point_iter_type *) m_generic.iter));
     } else {
       return m_with_props ? m_generic.ppoint : m_generic.point;
     }

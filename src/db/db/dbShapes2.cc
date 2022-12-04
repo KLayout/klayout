@@ -965,6 +965,8 @@ template class layer_class<db::Shape::edge_type, db::unstable_layer_tag>;
 template class layer_class<db::object_with_properties<db::Shape::edge_type>, db::unstable_layer_tag>;
 template class layer_class<db::Shape::edge_pair_type, db::unstable_layer_tag>;
 template class layer_class<db::object_with_properties<db::Shape::edge_pair_type>, db::unstable_layer_tag>;
+template class layer_class<db::Shape::point_type, db::unstable_layer_tag>;
+template class layer_class<db::object_with_properties<db::Shape::point_type>, db::unstable_layer_tag>;
 template class layer_class<db::Shape::text_type, db::unstable_layer_tag>;
 template class layer_class<db::object_with_properties<db::Shape::text_type>, db::unstable_layer_tag>;
 template class layer_class<db::Shape::text_ref_type, db::unstable_layer_tag>;

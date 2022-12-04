@@ -31,6 +31,8 @@ class DBEdgePair_TestClass < TestBase
     ep = RBA::EdgePair::new
     assert_equal(ep.to_s, "(0,0;0,0)/(0,0;0,0)")
 
+    assert_equal(ep.to_s, "(0,0;0,0)/(0,0;0,0)")
+
     ep.first = RBA::Edge::new(0, 0, 10, 20)
     assert_equal(ep.to_s, "(0,0;10,20)/(0,0;0,0)")
 
@@ -56,6 +58,18 @@ class DBEdgePair_TestClass < TestBase
     assert_equal(ep.polygon(0).class.to_s, "RBA::Polygon")
     assert_equal(ep.simple_polygon(0).to_s, "(-10,0;-10,30;0,0;10,20)")
     assert_equal(ep.simple_polygon(0).class.to_s, "RBA::SimplePolygon")
+
+    ep = RBA::EdgePair::new(RBA::Edge::new(0, 0, 10, 0), RBA::Edge::new(0, 20, 0, 0))
+  
+    assert_equal(ep.perimeter, 30)
+    assert_equal(ep.area, 100)
+    assert_equal(ep.simple_polygon(0).area, 100)
+
+    ep = RBA::EdgePair::new(RBA::Edge::new(0, 0, 10, 0), RBA::Edge::new(0, 0, 0, 20))
+  
+    assert_equal(ep.perimeter, 30)
+    assert_equal(ep.area, 0)
+    assert_equal(ep.simple_polygon(0).area, 0)
 
   end
 
@@ -91,6 +105,18 @@ class DBEdgePair_TestClass < TestBase
     assert_equal(ep.polygon(0).class.to_s, "RBA::DPolygon")
     assert_equal(ep.simple_polygon(0).to_s, "(-10,0;-10,30;0,0;10,20)")
     assert_equal(ep.simple_polygon(0).class.to_s, "RBA::DSimplePolygon")
+
+    ep = RBA::DEdgePair::new(RBA::DEdge::new(0, 0, 10, 0), RBA::DEdge::new(0, 20, 0, 0))
+  
+    assert_equal(ep.perimeter, 30)
+    assert_equal(ep.area, 100)
+    assert_equal(ep.simple_polygon(0).area, 100)
+
+    ep = RBA::DEdgePair::new(RBA::DEdge::new(0, 0, 10, 0), RBA::DEdge::new(0, 0, 0, 20))
+  
+    assert_equal(ep.perimeter, 30)
+    assert_equal(ep.area, 0)
+    assert_equal(ep.simple_polygon(0).area, 0)
 
   end
 

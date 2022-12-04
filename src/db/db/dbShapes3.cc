@@ -152,6 +152,7 @@ template DB_PUBLIC layer<db::Shape::short_box_array_type, db::stable_layer_tag> 
 template DB_PUBLIC layer<db::object_with_properties<db::Shape::short_box_array_type>, db::stable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::short_box_array_type>, db::stable_layer_tag> ();
 template DB_PUBLIC layer<db::Shape::user_object_type, db::stable_layer_tag> &Shapes::get_layer<db::Shape::user_object_type, db::stable_layer_tag> ();
 template DB_PUBLIC layer<db::object_with_properties<db::Shape::user_object_type>, db::stable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::user_object_type>, db::stable_layer_tag> ();
+
 template DB_PUBLIC layer<db::Shape::polygon_type, db::unstable_layer_tag> &Shapes::get_layer<db::Shape::polygon_type, db::unstable_layer_tag> ();
 template DB_PUBLIC layer<db::object_with_properties<db::Shape::polygon_type>, db::unstable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::polygon_type>, db::unstable_layer_tag> ();
 template DB_PUBLIC layer<db::Shape::simple_polygon_type, db::unstable_layer_tag> &Shapes::get_layer<db::Shape::simple_polygon_type, db::unstable_layer_tag> ();
@@ -174,6 +175,8 @@ template DB_PUBLIC layer<db::Shape::edge_type, db::unstable_layer_tag> &Shapes::
 template DB_PUBLIC layer<db::object_with_properties<db::Shape::edge_type>, db::unstable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::edge_type>, db::unstable_layer_tag> ();
 template DB_PUBLIC layer<db::Shape::edge_pair_type, db::unstable_layer_tag> &Shapes::get_layer<db::Shape::edge_pair_type, db::unstable_layer_tag> ();
 template DB_PUBLIC layer<db::object_with_properties<db::Shape::edge_pair_type>, db::unstable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::edge_pair_type>, db::unstable_layer_tag> ();
+template DB_PUBLIC layer<db::Shape::point_type, db::unstable_layer_tag> &Shapes::get_layer<db::Shape::point_type, db::unstable_layer_tag> ();
+template DB_PUBLIC layer<db::object_with_properties<db::Shape::point_type>, db::unstable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::point_type>, db::unstable_layer_tag> ();
 template DB_PUBLIC layer<db::Shape::text_type, db::unstable_layer_tag> &Shapes::get_layer<db::Shape::text_type, db::unstable_layer_tag> ();
 template DB_PUBLIC layer<db::object_with_properties<db::Shape::text_type>, db::unstable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::text_type>, db::unstable_layer_tag> ();
 template DB_PUBLIC layer<db::Shape::text_ref_type, db::unstable_layer_tag> &Shapes::get_layer<db::Shape::text_ref_type, db::unstable_layer_tag> ();
@@ -231,6 +234,7 @@ template DB_PUBLIC const layer<db::Shape::short_box_array_type, db::stable_layer
 template DB_PUBLIC const layer<db::object_with_properties<db::Shape::short_box_array_type>, db::stable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::short_box_array_type>, db::stable_layer_tag> () const;
 template DB_PUBLIC const layer<db::Shape::user_object_type, db::stable_layer_tag> &Shapes::get_layer<db::Shape::user_object_type, db::stable_layer_tag> () const;
 template DB_PUBLIC const layer<db::object_with_properties<db::Shape::user_object_type>, db::stable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::user_object_type>, db::stable_layer_tag> () const;
+
 template DB_PUBLIC const layer<db::Shape::polygon_type, db::unstable_layer_tag> &Shapes::get_layer<db::Shape::polygon_type, db::unstable_layer_tag> () const;
 template DB_PUBLIC const layer<db::object_with_properties<db::Shape::polygon_type>, db::unstable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::polygon_type>, db::unstable_layer_tag> () const;
 template DB_PUBLIC const layer<db::Shape::simple_polygon_type, db::unstable_layer_tag> &Shapes::get_layer<db::Shape::simple_polygon_type, db::unstable_layer_tag> () const;
@@ -253,6 +257,8 @@ template DB_PUBLIC const layer<db::Shape::edge_type, db::unstable_layer_tag> &Sh
 template DB_PUBLIC const layer<db::object_with_properties<db::Shape::edge_type>, db::unstable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::edge_type>, db::unstable_layer_tag> () const;
 template DB_PUBLIC const layer<db::Shape::edge_pair_type, db::unstable_layer_tag> &Shapes::get_layer<db::Shape::edge_pair_type, db::unstable_layer_tag> () const;
 template DB_PUBLIC const layer<db::object_with_properties<db::Shape::edge_pair_type>, db::unstable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::edge_pair_type>, db::unstable_layer_tag> () const;
+template DB_PUBLIC const layer<db::Shape::point_type, db::unstable_layer_tag> &Shapes::get_layer<db::Shape::point_type, db::unstable_layer_tag> () const;
+template DB_PUBLIC const layer<db::object_with_properties<db::Shape::point_type>, db::unstable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::point_type>, db::unstable_layer_tag> () const;
 template DB_PUBLIC const layer<db::Shape::text_type, db::unstable_layer_tag> &Shapes::get_layer<db::Shape::text_type, db::unstable_layer_tag> () const;
 template DB_PUBLIC const layer<db::object_with_properties<db::Shape::text_type>, db::unstable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::text_type>, db::unstable_layer_tag> () const;
 template DB_PUBLIC const layer<db::Shape::text_ref_type, db::unstable_layer_tag> &Shapes::get_layer<db::Shape::text_ref_type, db::unstable_layer_tag> () const;

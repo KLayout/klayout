@@ -28,6 +28,7 @@
 #include "dbCommon.h"
 
 #include "dbTypes.h"
+#include "dbObjectTag.h"
 #include "tlString.h"
 #include "tlTypeTraits.h"
 #include "tlVector.h"
@@ -37,6 +38,9 @@
 namespace db {
 
 template <class C> class vector;
+template <class C, class R = C> struct box;
+template <class C> class generic_repository;
+class ArrayRepository;
 
 /**
  *  @brief A point class
@@ -51,6 +55,9 @@ public:
   typedef db::vector<C> vector_type;
   typedef typename coord_traits::distance_type distance_type; 
   typedef typename coord_traits::area_type area_type; 
+  typedef db::object_tag< point<C> > tag;
+  typedef db::box<C> box_type;
+  typedef db::point<C> point_type;
 
   /** 
    *  @brief Default constructor
@@ -320,6 +327,24 @@ public:
    *  @brief Fuzzy "less" comparison of points
    */
   bool less (const point<C> &p) const;
+
+  /**
+   *  @brief The (dummy) translation operator
+   */
+  void translate (const point<C> &d, db::generic_repository<C> &, db::ArrayRepository &)
+  {
+    *this = d;
+  }
+
+  /**
+   *  @brief The (dummy) translation operator
+   */
+  template <class T>
+  void translate (const point<C> &d, const T &t, db::generic_repository<C> &, db::ArrayRepository &)
+  {
+    *this = d;
+    transform (t);
+  }
 
 private:
   C m_x, m_y;

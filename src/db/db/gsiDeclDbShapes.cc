@@ -454,6 +454,7 @@ static unsigned int s_regions ()             { return db::ShapeIterator::Regions
 static unsigned int s_boxes ()               { return db::ShapeIterator::Boxes; }
 static unsigned int s_edges ()               { return db::ShapeIterator::Edges; }
 static unsigned int s_edge_pairs ()          { return db::ShapeIterator::EdgePairs; }
+static unsigned int s_points ()              { return db::ShapeIterator::Points; }
 static unsigned int s_paths ()               { return db::ShapeIterator::Paths; }
 static unsigned int s_texts ()               { return db::ShapeIterator::Texts; }
 static unsigned int s_user_objects ()        { return db::ShapeIterator::UserObjects; }
@@ -875,6 +876,25 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "\n"
     "This variant has been introduced in version 0.26.\n"
   ) +
+  gsi::method_ext ("replace", &replace<db::Point>, gsi::arg ("shape"), gsi::arg ("point"),
+    "@brief Replaces the given shape with an point object\n"
+    "\n"
+    "This method replaces the given shape with the "
+    "object specified. It does not change the property Id. To change the property Id, "
+    "use the \\replace_prop_id method. To replace a shape and discard the property Id, erase the "
+    "shape and insert a new shape."
+    "\n"
+    "This variant has been introduced in version 0.28."
+  ) +
+  gsi::method_ext ("replace", &dreplace<db::DPoint>, gsi::arg ("shape"), gsi::arg ("point"),
+    "@brief Replaces the given shape with an point given in micrometer units\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "\n"
+    "This method behaves like the \\replace version with an \\Point argument, except that it will "
+    "internally translate the point from micrometer to database units.\n"
+    "\n"
+    "This variant has been introduced in version 0.28."
+  ) +
   gsi::method_ext ("replace", &replace<db::Text>, gsi::arg ("shape"), gsi::arg ("text"),
     "@brief Replaces the given shape with a text object\n"
     "@return A reference to the new shape (a \\Shape object)\n"
@@ -988,6 +1008,19 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "internally translate the edge pair from micrometer to database units.\n"
     "\n"
     "This variant has been introduced in version 0.26."
+  ) +
+  gsi::method_ext ("insert|#insert_point", &insert<db::Point>, gsi::arg ("point"),
+    "@brief Inserts an point into the shapes list\n"
+    "\n"
+    "This variant has been introduced in version 0.28.\n"
+  ) +
+  gsi::method_ext ("insert", &dinsert<db::DPoint>, gsi::arg ("point"),
+    "@brief Inserts a micrometer-unit point into the shapes list\n"
+    "@return A reference to the new shape (a \\Shape object)\n"
+    "This method behaves like the \\insert version with a \\Point argument, except that it will "
+    "internally translate the point from micrometer to database units.\n"
+    "\n"
+    "This variant has been introduced in version 0.28.\n"
   ) +
   gsi::method_ext ("insert|#insert_text", &insert<db::Text>, gsi::arg ("text"),
     "@brief Inserts a text into the shapes list\n"
@@ -1284,6 +1317,11 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
   ) +
   gsi::method ("SEdgePairs|#s_edge_pairs", &s_edge_pairs,
     "@brief Indicates that edge pairs shall be retrieved"
+  ) +
+  gsi::method ("SPoints|#s_points", &s_points,
+    "@brief Indicates that points shall be retrieved"
+    "\n"
+    "This constant has been added in version 0.28."
   ) +
   gsi::method ("SPaths|#s_paths", &s_paths,
     "@brief Indicates that paths shall be retrieved"

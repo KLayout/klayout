@@ -63,6 +63,7 @@ public:
   typedef db::coord_traits<C> coord_traits;
   typedef typename coord_traits::distance_type distance_type; 
   typedef typename coord_traits::area_type area_type; 
+  typedef typename coord_traits::perimeter_type perimeter_type;
   typedef db::object_tag< edge_pair<C> > tag;
 
   /**
@@ -377,6 +378,30 @@ public:
   const box_type bbox () const
   {
     return box_type (m_first.p1 (), m_first.p2 ()) + box_type (m_second.p1 (), m_second.p2 ());
+  }
+
+  /**
+   *  @brief Gets the perimeter of the edge pair
+   *
+   *  The perimeter is defined by then sum of the lengths of the edges ("active perimeter")
+   */
+  perimeter_type perimeter () const
+  {
+    return m_first.length () + m_second.length ();
+  }
+
+  /**
+   *  @brief Gets the area of the edge pair
+   *
+   *  This is the area covered between the edges.
+   */
+  area_type area () const
+  {
+    vector_type v12 = m_first.p2 () - m_first.p1 ();
+    vector_type v13 = m_second.p1 () - m_first.p1 ();
+    vector_type v14 = m_second.p2 () - m_first.p1 ();
+    area_type a = (db::vprod (v12, v13) + db::vprod (v13, v14)) / 2;
+    return a < 0 ? -a : a;
   }
 
   /**

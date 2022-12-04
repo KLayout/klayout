@@ -95,6 +95,8 @@ db::properties_id_type Shape::prop_id () const
         return (**((pedge_iter_type *) m_generic.iter)).properties_id ();
       case EdgePair:
         return (**((pedge_pair_iter_type *) m_generic.iter)).properties_id ();
+      case Point:
+        return (**((ppoint_iter_type *) m_generic.iter)).properties_id ();
       case Path:
         return (**((ppath_iter_type *) m_generic.iter)).properties_id ();
       case PathRef:
@@ -144,6 +146,8 @@ db::properties_id_type Shape::prop_id () const
         return m_generic.pedge->properties_id ();
       case EdgePair:
         return m_generic.pedge_pair->properties_id ();
+      case Point:
+        return m_generic.ppoint->properties_id ();
       case Path:
         return m_generic.ppath->properties_id ();
       case PathRef:
@@ -564,6 +568,9 @@ Shape::box_type Shape::box () const
     return m_trans * basic_ptr (box_array_type::tag ())->object ();
   } else if (m_type == ShortBoxArrayMember) {
     return m_trans * basic_ptr (short_box_array_type::tag ())->object ();
+  } else if (m_type == Point) {
+    point_type pt = point ();
+    return m_trans * box_type (pt, pt);
   } else {
     raise_no_box ();
   }
@@ -614,6 +621,12 @@ Shape::perimeter_type Shape::perimeter () const
       const short_box_array_type *arr = basic_ptr (short_box_array_type::tag ());
       return arr->size () * arr->object ().perimeter ();
     }
+  case Point:
+    return 0;
+  case Edge:
+    return edge ().length ();
+  case EdgePair:
+    return edge_pair ().perimeter ();
   case Box:
   case ShortBox:
   case BoxArrayMember:
@@ -629,6 +642,9 @@ size_t Shape::array_size () const
   switch (m_type) {
   case Null:
     return 0;
+  case Point:
+  case Edge:
+  case EdgePair:
   case Polygon:
   case PolygonRef:
   case PolygonPtrArrayMember:
@@ -681,6 +697,11 @@ Shape::area_type Shape::area () const
   switch (m_type) {
   case Null:
     return area_type ();
+  case Point:
+  case Edge:
+    return 0;
+  case EdgePair:
+    return edge_pair ().area ();
   case Polygon:
     return polygon ().area ();
   case PolygonRef:
@@ -761,6 +782,8 @@ Shape::box_type Shape::bbox () const
     return box_type (edge ().p1 (), edge ().p2 ());
   case EdgePair:
     return edge_pair ().bbox ();
+  case Point:
+    return box_type (point (), point ());
   case Path:
     return path ().box ();
   case PathRef:
@@ -834,6 +857,9 @@ Shape::to_string () const
     break;
   case EdgePair:
     r = "edge_pair " + edge_pair ().to_string ();
+    break;
+  case Point:
+    r = "point " + point ().to_string ();
     break;
   case Path:
   case PathRef:

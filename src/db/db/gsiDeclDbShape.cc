@@ -709,6 +709,26 @@ static tl::Variant get_dedge_pair (const db::Shape *s)
   }
 }
 
+static tl::Variant get_point (const db::Shape *s)
+{
+  db::Shape::point_type p;
+  if (s->point (p)) {
+    return tl::Variant (p);
+  } else {
+    return tl::Variant ();
+  }
+}
+
+static tl::Variant get_dpoint (const db::Shape *s)
+{
+  db::Shape::point_type p;
+  if (s->point (p)) {
+    return tl::Variant (db::CplxTrans (shape_dbu (s)) * p);
+  } else {
+    return tl::Variant ();
+  }
+}
+
 static tl::Variant get_text (const db::Shape *s)
 {
   db::Shape::text_type p;
@@ -1108,6 +1128,7 @@ static int t_simplePolygonPtrArray ()       { return db::Shape::SimplePolygonPtr
 static int t_simplePolygonPtrArrayMember () { return db::Shape::SimplePolygonPtrArrayMember; }
 static int t_edge ()                        { return db::Shape::Edge; }
 static int t_edge_pair ()                   { return db::Shape::EdgePair; }
+static int t_point ()                       { return db::Shape::Point; }
 static int t_path ()                        { return db::Shape::Path; }
 static int t_pathRef ()                     { return db::Shape::PathRef; }
 static int t_pathPtrArray ()                { return db::Shape::PathPtrArray; }
@@ -1249,6 +1270,22 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "This version translates the edge from micrometer units to database units internally.\n"
     "\n"
     "This method has been introduced in version 0.25."
+  ) +
+  gsi::method_ext ("point=", &set_shape<db::Point>, gsi::arg("point"),
+    "@brief Replaces the shape by the given point\n"
+    "This method replaces the shape by the given point. This method can only be called "
+    "for editable layouts. It does not change the user properties of the shape.\n"
+    "Calling this method will invalidate any iterators. It should not be called inside a "
+    "loop iterating over shapes.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
+  ) +
+  gsi::method_ext ("point=|dpoint=", &set_dshape<db::DPoint>, gsi::arg("point"),
+    "@brief Replaces the shape by the given point (in micrometer units)\n"
+    "This method replaces the shape by the given point, like \\point= with a \\Point argument does. "
+    "This version translates the point from micrometer units to database units internally.\n"
+    "\n"
+    "This method has been introduced in version 0.28."
   ) +
   gsi::method_ext ("edge_pair=", &set_shape<db::EdgePair>, gsi::arg("edge_pair"),
     "@brief Replaces the shape by the given edge pair\n"
@@ -1760,6 +1797,23 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "This method has been added in version 0.26.\n"
   ) +
+  gsi::method ("is_point?", &db::Shape::is_point,
+    "@brief Returns true, if the object is an point\n"
+    "\n"
+    "This method has been introduced in version 0.28.\n"
+  ) +
+  gsi::method_ext ("point", &get_point,
+    "@brief Returns the point object\n"
+    "\n"
+    "This method has been introduced in version 0.28.\n"
+  ) +
+  gsi::method_ext ("dpoint", &get_dpoint,
+    "@brief Returns the point object as a \\DPoint object in micrometer units\n"
+    "See \\point for a description of this method. This method returns the point after translation to "
+    "micrometer units.\n"
+    "\n"
+    "This method has been introduced in version 0.28.\n"
+  ) +
   gsi::method ("is_text?", &db::Shape::is_text,
     "@brief Returns true, if the object is a text\n"
   ) +
@@ -2057,6 +2111,7 @@ Class<db::Shape> decl_Shape ("db", "Shape",
   gsi::method ("TSimplePolygonPtrArrayMember|#t_simple_polygon_ptr_array_member", &t_simplePolygonPtrArrayMember) +
   gsi::method ("TEdge|#t_edge", &t_edge) +
   gsi::method ("TEdgePair|#t_edge_pair", &t_edge_pair) +
+  gsi::method ("TPoint|#t_point", &t_point) +
   gsi::method ("TPath|#t_path", &t_path) +
   gsi::method ("TPathRef|#t_path_ref", &t_pathRef) +
   gsi::method ("TPathPtrArray|#t_path_ptr_array", &t_pathPtrArray) +

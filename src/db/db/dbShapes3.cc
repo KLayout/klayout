@@ -134,6 +134,8 @@ template DB_PUBLIC layer<db::Shape::edge_type, db::stable_layer_tag> &Shapes::ge
 template DB_PUBLIC layer<db::object_with_properties<db::Shape::edge_type>, db::stable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::edge_type>, db::stable_layer_tag> ();
 template DB_PUBLIC layer<db::Shape::edge_pair_type, db::stable_layer_tag> &Shapes::get_layer<db::Shape::edge_pair_type, db::stable_layer_tag> ();
 template DB_PUBLIC layer<db::object_with_properties<db::Shape::edge_pair_type>, db::stable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::edge_pair_type>, db::stable_layer_tag> ();
+template DB_PUBLIC layer<db::Shape::point_type, db::stable_layer_tag> &Shapes::get_layer<db::Shape::point_type, db::stable_layer_tag> ();
+template DB_PUBLIC layer<db::object_with_properties<db::Shape::point_type>, db::stable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::point_type>, db::stable_layer_tag> ();
 template DB_PUBLIC layer<db::Shape::text_type, db::stable_layer_tag> &Shapes::get_layer<db::Shape::text_type, db::stable_layer_tag> ();
 template DB_PUBLIC layer<db::object_with_properties<db::Shape::text_type>, db::stable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::text_type>, db::stable_layer_tag> ();
 template DB_PUBLIC layer<db::Shape::text_ref_type, db::stable_layer_tag> &Shapes::get_layer<db::Shape::text_ref_type, db::stable_layer_tag> ();
@@ -211,6 +213,8 @@ template DB_PUBLIC const layer<db::Shape::edge_type, db::stable_layer_tag> &Shap
 template DB_PUBLIC const layer<db::object_with_properties<db::Shape::edge_type>, db::stable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::edge_type>, db::stable_layer_tag> () const;
 template DB_PUBLIC const layer<db::Shape::edge_pair_type, db::stable_layer_tag> &Shapes::get_layer<db::Shape::edge_pair_type, db::stable_layer_tag> () const;
 template DB_PUBLIC const layer<db::object_with_properties<db::Shape::edge_pair_type>, db::stable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::edge_pair_type>, db::stable_layer_tag> () const;
+template DB_PUBLIC const layer<db::Shape::point_type, db::stable_layer_tag> &Shapes::get_layer<db::Shape::point_type, db::stable_layer_tag> () const;
+template DB_PUBLIC const layer<db::object_with_properties<db::Shape::point_type>, db::stable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::point_type>, db::stable_layer_tag> () const;
 template DB_PUBLIC const layer<db::Shape::text_type, db::stable_layer_tag> &Shapes::get_layer<db::Shape::text_type, db::stable_layer_tag> () const;
 template DB_PUBLIC const layer<db::object_with_properties<db::Shape::text_type>, db::stable_layer_tag> &Shapes::get_layer<db::object_with_properties<db::Shape::text_type>, db::stable_layer_tag> () const;
 template DB_PUBLIC const layer<db::Shape::text_ref_type, db::stable_layer_tag> &Shapes::get_layer<db::Shape::text_ref_type, db::stable_layer_tag> () const;
@@ -315,6 +319,8 @@ Shapes::is_valid (const Shapes::shape_type &shape) const
     return is_valid_shape_by_tag (shape_type::edge_type::tag (), shape);
   case shape_type::EdgePair:
     return is_valid_shape_by_tag (shape_type::edge_pair_type::tag (), shape);
+  case shape_type::Point:
+    return is_valid_shape_by_tag (shape_type::point_type::tag (), shape);
   case shape_type::Path:
     return is_valid_shape_by_tag (shape_type::path_type::tag (), shape);
   case shape_type::PathRef:
@@ -478,6 +484,9 @@ Shapes::erase_shape (const Shapes::shape_type &shape)
   case shape_type::EdgePair:
     erase_shape_by_tag (shape_type::edge_pair_type::tag (), shape);
     break;
+  case shape_type::Point:
+    erase_shape_by_tag (shape_type::point_type::tag (), shape);
+    break;
   case shape_type::Path:
     erase_shape_by_tag (shape_type::path_type::tag (), shape);
     break;
@@ -570,6 +579,9 @@ Shapes::erase_shapes (const std::vector<Shapes::shape_type> &shapes)
     case shape_type::Edge:
       erase_shapes_by_tag (shape_type::edge_type::tag (), s, snext);
       break;
+    case shape_type::Point:
+      erase_shapes_by_tag (shape_type::point_type::tag (), s, snext);
+      break;
     case shape_type::EdgePair:
       erase_shapes_by_tag (shape_type::edge_pair_type::tag (), s, snext);
       break;
@@ -624,6 +636,5 @@ Shapes::erase_shapes (const std::vector<Shapes::shape_type> &shapes)
 
   }
 }
-
 
 }

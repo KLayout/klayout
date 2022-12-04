@@ -641,6 +641,9 @@ ShapeIterator::advance_generic (int mode)
     case EdgePair:
       if (advance_shape<edge_pair_type, StableTag, RegionTag> (mode)) return;
       break;
+    case Point:
+      if (advance_shape<point_type, StableTag, RegionTag> (mode)) return;
+      break;
     case Path:
       if (advance_shape<path_type, StableTag, RegionTag> (mode)) return;
       break;
@@ -767,6 +770,8 @@ ShapeIterator::quad_box_generic () const
     return (quad_box_by_shape<edge_type, StableTag> (region_tag));
   case EdgePair:
     return (quad_box_by_shape<edge_pair_type, StableTag> (region_tag));
+  case Point:
+    return (quad_box_by_shape<point_type, StableTag> (region_tag));
   case Path:
     return (quad_box_by_shape<path_type, StableTag> (region_tag));
   case PathRef:

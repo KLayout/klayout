@@ -1747,6 +1747,8 @@ local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, T
 
       for (std::vector<db::cell_index_type>::const_iterator bu = cells_bu.begin (); bu != cells_bu.end (); ++bu) {
 
+        tl::MutexLocker locker (& contexts.lock ());
+
         typename local_processor_contexts<TS, TI, TR>::iterator cpc = contexts.context_map ().find (&mp_subject_layout->cell (*bu));
         if (cpc != contexts.context_map ().end ()) {
 

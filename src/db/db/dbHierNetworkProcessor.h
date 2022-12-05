@@ -32,6 +32,7 @@
 #include "dbInstElement.h"
 #include "tlEquivalenceClusters.h"
 #include "tlAssert.h"
+#include "tlSList.h"
 
 #include <map>
 #include <list>
@@ -209,273 +210,6 @@ private:
   std::vector<std::string> m_global_net_names;
   std::map<unsigned int, global_nets_type> m_global_connections;
   edge_connectivity_type m_ec;
-};
-
-/**
- *  @brief The instance information for a cluster
- */
-class DB_PUBLIC ClusterInstElement
-{
-public:
-  ClusterInstElement (const db::InstElement &ie)
-  {
-    if (ie.array_inst.at_end ()) {
-
-      m_inst_cell_index = std::numeric_limits<db::cell_index_type>::max ();
-      m_inst_trans = db::ICplxTrans ();
-      m_inst_prop_id = 0;
-
-    } else {
-
-      m_inst_cell_index = ie.inst_ptr.cell_index ();
-      m_inst_trans = ie.complex_trans ();
-      m_inst_prop_id = ie.inst_ptr.prop_id ();
-
-    }
-  }
-
-  ClusterInstElement (db::cell_index_type inst_cell_index, const db::ICplxTrans &inst_trans, db::properties_id_type inst_prop_id)
-    : m_inst_cell_index (inst_cell_index), m_inst_trans (inst_trans), m_inst_prop_id (inst_prop_id)
-  {
-    //  .. nothing yet ..
-  }
-
-  ClusterInstElement ()
-    : m_inst_cell_index (std::numeric_limits<db::cell_index_type>::max ()), m_inst_trans (), m_inst_prop_id (0)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Returns true, if the cluster does not have an instance
-   */
-  bool has_instance () const
-  {
-    return m_inst_cell_index != std::numeric_limits<db::cell_index_type>::max ();
-  }
-
-  /**
-   *  @brief Gets the cell index of the cell which is instantiated
-   */
-  db::cell_index_type inst_cell_index () const
-  {
-    return m_inst_cell_index;
-  }
-
-  /**
-   *  @brief Gets the instance transformation
-   */
-  const db::ICplxTrans &inst_trans () const
-  {
-    return m_inst_trans;
-  }
-
-  /**
-   *  @brief Gets the instance properties id
-   */
-  db::properties_id_type inst_prop_id () const
-  {
-    return m_inst_prop_id;
-  }
-
-  /**
-   *  @brief Sets the instance properties id
-   */
-  void set_inst_prop_id (db::properties_id_type pid)
-  {
-    m_inst_prop_id = pid;
-  }
-
-  /**
-   *  @brief Transform with the given transformation
-   */
-  void transform (const db::ICplxTrans &tr)
-  {
-    m_inst_trans = tr * m_inst_trans;
-  }
-
-  /**
-   *  @brief Equality
-   */
-  bool operator== (const ClusterInstElement &other) const
-  {
-    return m_inst_cell_index == other.m_inst_cell_index && m_inst_trans.equal (other.m_inst_trans) && m_inst_prop_id == other.m_inst_prop_id;
-  }
-
-  /**
-   *  @brief Inequality
-   */
-  bool operator!= (const ClusterInstElement &other) const
-  {
-    return ! operator== (other);
-  }
-
-  /**
-   *  @brief Less operator
-   */
-  bool operator< (const ClusterInstElement &other) const
-  {
-    if (m_inst_cell_index != other.m_inst_cell_index) {
-      return m_inst_cell_index < other.m_inst_cell_index;
-    }
-    if (! m_inst_trans.equal (other.m_inst_trans)) {
-      return m_inst_trans.less (other.m_inst_trans);
-    }
-    return m_inst_prop_id < other.m_inst_prop_id;
-  }
-
-private:
-  db::cell_index_type m_inst_cell_index;
-  db::ICplxTrans m_inst_trans;
-  db::properties_id_type m_inst_prop_id;
-};
-
-/**
- *  @brief A connection to a cluster in a child instance
- */
-class DB_PUBLIC ClusterInstance
-  : public ClusterInstElement
-{
-public:
-  ClusterInstance (size_t id, db::cell_index_type inst_cell_index, const db::ICplxTrans &inst_trans, db::properties_id_type inst_prop_id)
-    : ClusterInstElement (inst_cell_index, inst_trans, inst_prop_id), m_id (id)
-  {
-    //  .. nothing yet ..
-  }
-
-  ClusterInstance (size_t id, const db::InstElement &inst_element)
-    : ClusterInstElement (inst_element), m_id (id)
-  {
-    //  .. nothing yet ..
-  }
-
-  ClusterInstance (size_t id)
-    : ClusterInstElement (), m_id (id)
-  {
-    //  .. nothing yet ..
-  }
-
-  ClusterInstance ()
-    : ClusterInstElement (), m_id (0)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Gets the cluster ID
-   */
-  size_t id () const
-  {
-    return m_id;
-  }
-
-  /**
-   *  @brief Equality
-   */
-  bool operator== (const ClusterInstance &other) const
-  {
-    return m_id == other.m_id && ClusterInstElement::operator== (other);
-  }
-
-  /**
-   *  @brief Inequality
-   */
-  bool operator!= (const ClusterInstance &other) const
-  {
-    return ! operator== (other);
-  }
-
-  /**
-   *  @brief Less operator
-   */
-  bool operator< (const ClusterInstance &other) const
-  {
-    if (m_id != other.m_id) {
-      return m_id < other.m_id;
-    }
-    return ClusterInstElement::operator< (other);
-  }
-
-private:
-  size_t m_id;
-};
-
-/**
- *  @brief A class representing a list of ClusterInstance objects
- *
- *  It is using a std::list internally, but adds fast size support for STLs which do not have that.
- */
-class DB_PUBLIC ClusterInstanceList
-{
-public:
-  typedef std::list<ClusterInstance> inner_list;
-  typedef inner_list::iterator iterator;
-  typedef inner_list::const_iterator const_iterator;
-
-  ClusterInstanceList ()
-    : m_list (), m_size (0)
-  {
-    //  .. nothing yet ..
-  }
-
-  ClusterInstanceList (const ClusterInstanceList &other)
-    : m_list (other.m_list), m_size (other.m_size)
-  {
-    //  .. nothing yet ..
-  }
-
-  ClusterInstanceList (ClusterInstanceList &&other)
-    : m_list (other.m_list), m_size (other.m_size)
-  {
-    //  .. nothing yet ..
-  }
-
-  ClusterInstanceList &operator= (const ClusterInstanceList &other)
-  {
-    if (this != &other) {
-      m_list = other.m_list;
-      m_size = other.m_size;
-    }
-    return *this;
-  }
-
-  iterator begin () { return m_list.begin (); }
-  iterator end () { return m_list.end (); }
-  const_iterator begin () const { return m_list.begin (); }
-  const_iterator end () const { return m_list.end (); }
-
-  bool empty () const
-  {
-    return m_list.empty ();
-  }
-
-  void push_back (const ClusterInstance &inst)
-  {
-    m_list.push_back (inst);
-    ++m_size;
-  }
-
-  void push_back (ClusterInstance &&inst)
-  {
-    m_list.push_back (inst);
-    ++m_size;
-  }
-
-  void splice (ClusterInstanceList &other)
-  {
-    m_size += other.m_size;
-    m_list.splice (m_list.end (), other.m_list, other.m_list.begin (), other.m_list.end ());
-    other.m_size = 0;
-  }
-
-  size_t size () const
-  {
-    return m_size;
-  }
-
-private:
-  inner_list m_list;
-  size_t m_size;
 };
 
 /**
@@ -863,6 +597,195 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
   x.mem_stat (stat, purpose, cat, no_self, parent);
 }
 
+/**
+ *  @brief The instance information for a cluster
+ */
+class DB_PUBLIC ClusterInstElement
+{
+public:
+  ClusterInstElement (const db::InstElement &ie)
+  {
+    if (ie.array_inst.at_end ()) {
+
+      m_inst_cell_index = std::numeric_limits<db::cell_index_type>::max ();
+      m_inst_trans = db::ICplxTrans ();
+      m_inst_prop_id = 0;
+
+    } else {
+
+      m_inst_cell_index = ie.inst_ptr.cell_index ();
+      m_inst_trans = ie.complex_trans ();
+      m_inst_prop_id = ie.inst_ptr.prop_id ();
+
+    }
+  }
+
+  ClusterInstElement (db::cell_index_type inst_cell_index, const db::ICplxTrans &inst_trans, db::properties_id_type inst_prop_id)
+    : m_inst_cell_index (inst_cell_index), m_inst_trans (inst_trans), m_inst_prop_id (inst_prop_id)
+  {
+    //  .. nothing yet ..
+  }
+
+  ClusterInstElement ()
+    : m_inst_cell_index (std::numeric_limits<db::cell_index_type>::max ()), m_inst_trans (), m_inst_prop_id (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Returns true, if the cluster does not have an instance
+   */
+  bool has_instance () const
+  {
+    return m_inst_cell_index != std::numeric_limits<db::cell_index_type>::max ();
+  }
+
+  /**
+   *  @brief Gets the cell index of the cell which is instantiated
+   */
+  db::cell_index_type inst_cell_index () const
+  {
+    return m_inst_cell_index;
+  }
+
+  /**
+   *  @brief Gets the instance transformation
+   */
+  const db::ICplxTrans &inst_trans () const
+  {
+    return m_inst_trans;
+  }
+
+  /**
+   *  @brief Gets the instance properties id
+   */
+  db::properties_id_type inst_prop_id () const
+  {
+    return m_inst_prop_id;
+  }
+
+  /**
+   *  @brief Sets the instance properties id
+   */
+  void set_inst_prop_id (db::properties_id_type pid)
+  {
+    m_inst_prop_id = pid;
+  }
+
+  /**
+   *  @brief Transform with the given transformation
+   */
+  void transform (const db::ICplxTrans &tr)
+  {
+    m_inst_trans = tr * m_inst_trans;
+  }
+
+  /**
+   *  @brief Equality
+   */
+  bool operator== (const ClusterInstElement &other) const
+  {
+    return m_inst_cell_index == other.m_inst_cell_index && m_inst_trans.equal (other.m_inst_trans) && m_inst_prop_id == other.m_inst_prop_id;
+  }
+
+  /**
+   *  @brief Inequality
+   */
+  bool operator!= (const ClusterInstElement &other) const
+  {
+    return ! operator== (other);
+  }
+
+  /**
+   *  @brief Less operator
+   */
+  bool operator< (const ClusterInstElement &other) const
+  {
+    if (m_inst_cell_index != other.m_inst_cell_index) {
+      return m_inst_cell_index < other.m_inst_cell_index;
+    }
+    if (! m_inst_trans.equal (other.m_inst_trans)) {
+      return m_inst_trans.less (other.m_inst_trans);
+    }
+    return m_inst_prop_id < other.m_inst_prop_id;
+  }
+
+private:
+  db::cell_index_type m_inst_cell_index;
+  db::ICplxTrans m_inst_trans;
+  db::properties_id_type m_inst_prop_id;
+};
+
+/**
+ *  @brief A connection to a cluster in a child instance
+ */
+class DB_PUBLIC ClusterInstance
+  : public ClusterInstElement
+{
+public:
+  ClusterInstance (size_t id, db::cell_index_type inst_cell_index, const db::ICplxTrans &inst_trans, db::properties_id_type inst_prop_id)
+    : ClusterInstElement (inst_cell_index, inst_trans, inst_prop_id), m_id (id)
+  {
+    //  .. nothing yet ..
+  }
+
+  ClusterInstance (size_t id, const db::InstElement &inst_element)
+    : ClusterInstElement (inst_element), m_id (id)
+  {
+    //  .. nothing yet ..
+  }
+
+  ClusterInstance (size_t id)
+    : ClusterInstElement (), m_id (id)
+  {
+    //  .. nothing yet ..
+  }
+
+  ClusterInstance ()
+    : ClusterInstElement (), m_id (0)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Gets the cluster ID
+   */
+  size_t id () const
+  {
+    return m_id;
+  }
+
+  /**
+   *  @brief Equality
+   */
+  bool operator== (const ClusterInstance &other) const
+  {
+    return m_id == other.m_id && ClusterInstElement::operator== (other);
+  }
+
+  /**
+   *  @brief Inequality
+   */
+  bool operator!= (const ClusterInstance &other) const
+  {
+    return ! operator== (other);
+  }
+
+  /**
+   *  @brief Less operator
+   */
+  bool operator< (const ClusterInstance &other) const
+  {
+    if (m_id != other.m_id) {
+      return m_id < other.m_id;
+    }
+    return ClusterInstElement::operator< (other);
+  }
+
+private:
+  size_t m_id;
+};
+
 typedef std::list<std::pair<ClusterInstance, ClusterInstance> > cluster_instance_pair_list_type;
 
 inline bool equal_array_delegates (const db::ArrayBase *a, const db::ArrayBase *b)
@@ -1118,7 +1041,7 @@ public:
 
 private:
   typename local_clusters<T>::const_iterator m_lc_iter;
-  typedef ClusterInstanceList connections_type;
+  typedef tl::slist<ClusterInstance> connections_type;
   typename std::map<typename local_cluster<T>::id_type, connections_type>::const_iterator m_x_iter, m_x_iter_end;
 };
 
@@ -1138,7 +1061,7 @@ class DB_PUBLIC_TEMPLATE connected_clusters
 {
 public:
   typedef typename local_clusters<T>::id_type id_type;
-  typedef ClusterInstanceList connections_type;
+  typedef tl::slist<ClusterInstance> connections_type;
   typedef typename local_clusters<T>::box_type box_type;
   typedef connected_clusters_iterator<T> all_iterator;
   typedef typename std::map<typename local_cluster<T>::id_type, connections_type>::const_iterator connections_iterator;

@@ -59,6 +59,8 @@ private:
   };
 
 public:
+  class const_iterator;
+
   class iterator
   {
   public:
@@ -84,6 +86,7 @@ public:
     bool operator!= (iterator other) const { return mp_p != other.mp_p; }
 
   private:
+    friend class slist<T>::const_iterator;
     node_type *mp_p;
   };
 
@@ -95,6 +98,7 @@ public:
     typedef const T &reference;
     typedef const T *pointer;
 
+    const_iterator (iterator i) : mp_p (i.mp_p) { }
     const_iterator (const node_type *p = 0) : mp_p (p) { }
     const_iterator operator++ () { mp_p = mp_p->next; return *this; }
 
@@ -116,7 +120,7 @@ public:
   };
 
   slist ()
-    : mp_first (0), mp_last (0)
+    : mp_first (0), mp_last (0), m_size (0)
   {
     //  .. nothing yet ..
   }

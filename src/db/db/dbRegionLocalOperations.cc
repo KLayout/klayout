@@ -317,7 +317,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
         ++nn;
       }
 
-// @@@ Use edges directly
+      //  TODO: Use edges directly
       polygons.clear ();
 
       db::polygon_ref_generator<TI> ps (layout, polygons);
@@ -402,7 +402,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
         ++nn;
       }
 
-// @@@ Use edges directly
+      //  TODO: Use edges directly
       spolygons.clear ();
 
       db::polygon_ref_generator<TS> ps (layout, spolygons);
@@ -836,7 +836,10 @@ void interacting_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*l
 
   }
 
-  tl_assert (nstart > 0);
+  if (nstart == 0) {
+    //  should not happen - but for safety we return here.
+    return;
+  }
 
   db::InteractionDetector id (m_mode, nstart - 1);
   id.set_include_touching (m_touching);

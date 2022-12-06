@@ -1,5 +1,132 @@
+0.28
+Changes (list may not be complete):
+* Bugfix: %GITHUB%/issues/989 "Layout#convert_pcell_to_static" does not handle"defunct" cells
+* Bugfix: %GITHUB%/issues/991 Basic library not available in Python module
+* Bugfix: %GITHUB%/issues/1059 Cleanup of PCell orphans after re-evaluation on load
+* Bugfix: %GITHUB%/issues/1081 Using a layer properties file from recent list without layout loaded crashes KLayout
+* Bugfix: %GITHUB%/issues/1138 Provide a way to suppress or redirect log output or disable warnings, specifically from file readers, in Python module
+* Bugfix: %GITHUB%/issues/1178 technology-data xml results in SEGV
+* Bugfix: %GITHUB%/issues/1190 General compatibility issue of Edges#extended/extended_* with deep mode
+* Enhacnement: %GITHUB%/issues/1056 X2 net names
+* Enhancement: %GITHUB%/issues/1052 Pdf documentation
+* Enhancement: %GITHUB%/issues/1053 Lefdef enhancements
+* Enhancement: Support for Qt6
+* Enhancement: KLayout paths
+  - $KLAYOUT_HOME can now be empty string (no home folder used)
+  - $KLAYOUT_PATH can now be empty string (no further and implicit search paths)
+* Enhancement: Python typehints
+  - Python include files are generated for Python module
+* Enhancement: Properties dialog now features object list on left side (select and change)
+* Enhancement: Compute area and perimeter from selection (Edit/Selection/Area and Perimeter)
+* Enhancement: Callbacks for PCells
+  - Allow dynamic change of some attributes (visibility, enabled etc.)
+  - By implementing "callback_impl" in PCellDeclarationHelper subclasses
+* Enhancement: Report browser
+  - Shape user properties are turned into RDB values
+  - Scanning of text objects
+* Enhancement: Support for high-DPI modes (scale factor 200%) 
+  - "Highres" option to fully exploit resolution, normally follows screen scaling
+* Enhancement: Multiple tech stacks for net tracer per technology
+* Enhancement: New rulers
+  - Angle
+  - Radius (%GITHUB%/issues/906)
+  - Multi-segment
+* Enhancement: LVS 
+  - Generates a log view which may have useful hints
+  - Schematic and extracted netlists are available as separate tabs for LVS view
+* Enhancement: DRC
+  - Antenna DRC measured values output on edge pair properties and into report file
+  - inside, not_inside, outside and not_outside also for edge/edge and edge/polygon layers
+  - split_inside, split_outside for edge/edge and edge/polygon layers
+  - andnot (edge/edge)
+  - inside_outside_part (edge/polygon)
+  - angle-class selectors (multiples or 90 or 45 degree)
+  - performance enhancements
+  - in_and_out (edge and polygon layers)
+* Enhancement: "data:" URL schemes to pass direct base-64 encoded data
+* Enhancement: "Close all except", "left of", "right of" etc. in layout tabs and macro editor tabs
+* Enhancmennt: Drop-down list to select tab in layout views
+* Enhancement: Setting for disabling "Save needed" dialog box
+* Enhancement: File details are shown (dump of file header) for unknown file formats
+* Enhancement: NoQt option for LayoutView
+  - PixelBuffer object instead of QImage
+  - LayoutView can be build without Qt
+  - Functions exist to emulate mouse events
+  - Included in standalone Python module
+  - Allows implementation of KLayout backend in web server
+* Enhancement: New command "-rr" (like -r but keeps application running, for UI macros)
+* Enhancement: PCell errors are shown on a special error layer which is visible together with guiding shapes
+* Enhancement: custom queries support micron-unit attributes (dbbox, path_dtrans etc.)
+* Enhancement: custom queries highlight results of queries when selected
+* Enhancement: scale and snap improvements (edge pair support, properties maintained, arrays not always flattened)
+* Enhancement: auto-run macros can not be given a priority in which they are executed
+* Enhancement: D25 module overhauled
+  - Uses a DRC subset to generate layers
+  - Allows booleans and specific color assignments
+  - Supports edges and edge pairs (will build walls)
+  - Not backward compatible!
+* Python/Ruby API:
+  - DText/Text: bbox, alignment enums
+  - Polygon#size with vector arguments
+  - DBox/Box#world
+  - Layout#unique_cell_name
+  - RecursiveShapeIterator#each, RecursiveInstanceIterator#each
+  - Layout#clip with DBox and Cell arguments
+  - Better automatic conversion of enum to int and vice versa
+  - CellInstArray constructor with Cell argument
+  - AbstractMenu#insert_menu, #clear_menu
+  - ActionBase#icon=, #on_menu_opening, #on_triggered
+  - CellMapping convinience methods
+  - Cell#read for easy importing of a layout into a cell + subtree
+  - LayerMap#map and #mmap: logical layer is optional now (needed to be incremental)
+  - Shapes#cell and #layout
+  - Edges#andnot, #split_interacting, #inside, #not_inside, #outside, #not_outside and related (for Region and Edges arguments)
+  - GenericDeviceExtractor#define_terminal convenience methods
+  - Box/DBox square and rectangle convenience constructor
+  - Box#enlarge convenience isotropic variant 
+  - Region#in_and_out, Edges#in_and_out
 
-0.28            (2022-xx-xx):
+0.27.13          (2022-11-30):
+* Bugfixes: 
+  - selection did not work in non-editable mode
+  - partial selection did not work for guiding shapes
+  - compile issue: NDEBUG is not usable after ruby.h
+
+0.27.12          (2022-11-01):
+* Bugfix: %GITHUB%/issues/1173 DXF SPLINE implementation not compatible with ezdxf
+* Bugfix: %GITHUB%/issues/1167 delete_cells slow in some cases
+* Bugfix: %GITHUB%/issues/1164 Deleting cells: 'basic_string: construction from null is not valid'
+* Bugfix: %GITHUB%/issues/1145 Crash when clearing a Shapes container by script while a shape is selected
+* Bugfix: %GITHUB%/issues/1144 Copy layer not choosing the right "new" target layer sometimes
+* Bugfix: %GITHUB%/issues/1143 DBU not taken from technology by default
+* Bugfix: %GITHUB%/issues/1097 Change oasis writer defaults to strict + cblocks, discourage the usage of oas.gz 
+* Bugfix: Incorrect behavior of some deep-mode DRC functions
+  - deep edges "and" with Region: incorrect behavior if region is empty or non-deep
+  - deep edges "inside_part" with Region: incorrect behavior if region is empty or non-deep
+  - deep edges "outside_part" with Region: incorrect behavior if region is empty or non-deep
+* Enhancement: Python include files are now provided for the Python package. This will add type information to the methods.
+
+0.27.11          (2022-08-10):
+* Bugfix: %GITHUB%/issues/1098 Normalize zero dimension when generating regular array instance
+* Enhancement: %GITHUB%/issues/1103 Add setting to disable Save Needed dialog box
+* Bugfix: %GITHUB%/issues/1106 "move by" does not move instances from partial selection
+* Bugfix: %GITHUB%/issues/1111 GenericDeviceExtractor#define_opt_layer not working
+* Bugfix: %GITHUB%/issues/1114 MSYS2 compatibility with latest revision (based on gcc 12.1)
+* Bugfix: %GITHUB%/issues/1126 Internal error on DRC operation
+* Bugfix: %GITHUB%/issues/1135 LVS mismatch on parallel devices and issue on ambiguity resolution
+* Enhancement: Support for Python 3.11
+* Enhancement: L2N and LVSDB readers made compatible with potential future extensions
+* Enhancement: DRC Antenna check now can be given a text layer which receives output describing the measured and computed values
+* Bugfix: *= method (e.g. Point, DPoint) properly listed in help and reflection API
+* Bugfixes: Fixed a number of potential segfaults due to memory corruption found during master branch refactoring
+
+0.27.10          (2022-06-04):
+* Bugfix: %GITHUB%/issues/1081 Using a layer properties file from recent list without layout loaded crashes KLayout
+* Enhancement: %GITHUB%/issues/1079 PCell update: Library#refresh should call coerce_parameters_impl  
+* Bugfix: %GITHUB%/issues/1075 Edit layer specification doesn't work well with PCells
+* Bugfix: %GITHUB%/issues/1071 Issues with GDS text format and "Save As"
+* Bugfix: %GITHUB%/issues/1068 Circle handle not shown sometimes
+* Bugfixes: two potential segfaults fixed due to early delete of LayoutView and access to non-initialized memory
 
 0.27.9          (2022-04-23):
 * Bugfix: %GITHUB%/issues/1008 Don't optimize away points on path edit

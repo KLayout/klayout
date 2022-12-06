@@ -108,7 +108,9 @@ public:
 private slots:
   void finished (QNetworkReply *);
   void resend ();
+#if !defined(QT_NO_SSL)
   void sslErrors (QNetworkReply *reply, const QList<QSslError> &errors);
+#endif
 
 private:
   std::string m_url;

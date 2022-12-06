@@ -263,7 +263,9 @@ InputHttpStreamPrivateData::InputHttpStreamPrivateData (InputHttpStream *stream,
     s_auth_handler = new AuthenticationHandler ();
     connect (s_network_manager, SIGNAL (authenticationRequired (QNetworkReply *, QAuthenticator *)), s_auth_handler, SLOT (authenticationRequired (QNetworkReply *, QAuthenticator *)));
     connect (s_network_manager, SIGNAL (proxyAuthenticationRequired (const QNetworkProxy &, QAuthenticator *)), s_auth_handler, SLOT (proxyAuthenticationRequired (const QNetworkProxy &, QAuthenticator *)));
+#if !defined(QT_NO_SSL)
     connect (s_network_manager, SIGNAL (sslErrors (QNetworkReply *, const QList<QSslError> &)), this, SLOT (sslErrors (QNetworkReply *, const QList<QSslError> &)));
+#endif
 
     tl::StaticObjects::reg (&s_network_manager);
     tl::StaticObjects::reg (&s_auth_handler);
@@ -515,6 +517,7 @@ InputHttpStreamPrivateData::read (char *b, size_t n)
   return data.size ();
 }
 
+#if !defined(QT_NO_SSL)
 void
 InputHttpStreamPrivateData::sslErrors (QNetworkReply *, const QList<QSslError> &errors)
 {
@@ -528,6 +531,7 @@ InputHttpStreamPrivateData::sslErrors (QNetworkReply *, const QList<QSslError> &
     m_ssl_errors += "\"";
   }
 }
+#endif
 
 void
 InputHttpStreamPrivateData::reset ()

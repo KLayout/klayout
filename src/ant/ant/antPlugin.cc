@@ -26,6 +26,7 @@
 #include "layDispatcher.h"
 #include "layAbstractMenu.h"
 #include "tlColor.h"
+#include "tlLog.h"
 #if defined(HAVE_QT)
 #  include "layConfigurationDialog.h"
 #endif
@@ -217,7 +218,8 @@ PluginDeclaration::initialized (lay::Dispatcher *root)
   bool any_missing = false;
   auto std_templates = make_standard_templates ();
   for (auto t = std_templates.begin (); ! any_missing && t != std_templates.end (); ++t) {
-    if (! t->category ().empty () && cat_names.find (t->category ()) == cat_names.end ()) {
+    if (! t->category ().empty () &&
+        (cat_names.find (t->category ()) == cat_names.end () || cat_names.find (t->category ())->second->version () != ant::Template::current_version ())) {
       any_missing = true;
     }
   }
@@ -225,6 +227,9 @@ PluginDeclaration::initialized (lay::Dispatcher *root)
   if (cat_names.empty ()) {
 
     //  full initial configuration
+    if (tl::verbosity () >= 20) {
+      tl::info << "Resetting annotation templates";
+    }
     root->config_set (cfg_ruler_templates, ant::TemplatesConverter ().to_string (make_standard_templates ()));
     root->config_end ();
 
@@ -235,9 +240,12 @@ PluginDeclaration::initialized (lay::Dispatcher *root)
     for (auto t = std_templates.begin (); t != std_templates.end (); ++t) {
       if (! t->category ().empty ()) {
         auto tt = cat_names.find (t->category ());
-        if (tt != cat_names.end ()) {
+        if (tt != cat_names.end () && tt->second->version () == ant::Template::current_version ()) {
           new_templates.push_back (*tt->second);
         } else {
+          if (tl::verbosity () >= 20) {
+            tl::info << "Resetting annotation template: " << t->title ();
+          }
           new_templates.push_back (*t);
         }
       }
@@ -246,6 +254,11 @@ PluginDeclaration::initialized (lay::Dispatcher *root)
       if (i->category ().empty ()) {
         new_templates.push_back (*i);
       }
+    }
+
+    //  upgrade
+    for (auto i = new_templates.begin (); i != new_templates.end (); ++i) {
+      i->version (ant::Template::current_version ());
     }
 
     root->config_set (cfg_ruler_templates, ant::TemplatesConverter ().to_string (new_templates));

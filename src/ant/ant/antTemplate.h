@@ -108,6 +108,27 @@ public:
   Template &operator= (const ant::Template &d);
 
   /**
+   *  @brief Gets the current version
+   */
+  static int current_version ();
+  /**
+   *  @brief Gets the version
+   *  The version is used to provide a migration path for KLayout versions.
+   */
+  int version () const
+  {
+    return m_version;
+  }
+
+  /**
+   *  @brief Sets the version
+   */
+  void version (int v)
+  {
+    m_version = v;
+  }
+
+  /**
    *  @brief Gets the category string
    *  The category string is used to label the rulers generated from this template.
    *  Templates that use a category string are regarded "system templates" and are not editable.
@@ -424,6 +445,7 @@ public:
   static std::string to_string (const std::vector<Template> &v);
 
 private:
+  int m_version;
   std::string m_title;
   std::string m_category;
   std::string m_fmt_x;

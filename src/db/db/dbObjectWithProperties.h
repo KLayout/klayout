@@ -194,6 +194,9 @@ typedef object_with_properties<DPath> DPathWithProperties;
 typedef object_with_properties<PathRef> PathRefWithProperties;
 typedef object_with_properties<DPathRef> DPathRefWithProperties;
 
+typedef object_with_properties<Point> PointWithProperties;
+typedef object_with_properties<DPoint> DPointWithProperties;
+
 typedef object_with_properties<Edge> EdgeWithProperties;
 typedef object_with_properties<DEdge> DEdgeWithProperties;
 

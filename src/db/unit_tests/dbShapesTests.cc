@@ -3406,33 +3406,6 @@ TEST(24c)
   EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
 }
 
-//  Bug #107
-TEST(100)
-{
-  db::Manager m (true);
-  db::Shapes shapes1 (&m, 0, true);
-
-  m.transaction ("y");
-  shapes1.insert (db::Box (200, -200, 100, -100));
-  m.commit ();
-
-  EXPECT_EQ (shapes_to_string_norm (_this, shapes1),
-    "box (100,-200;200,-100) #0\n"
-  );
-  m.undo ();
-  EXPECT_EQ (shapes_to_string_norm (_this, shapes1),
-    ""
-  );
-  m.redo ();
-  EXPECT_EQ (shapes_to_string_norm (_this, shapes1),
-    "box (100,-200;200,-100) #0\n"
-  );
-  m.undo ();
-  EXPECT_EQ (shapes_to_string_norm (_this, shapes1),
-    ""
-  );
-}
-
 //  Shape insert and clear and undo/redo - different layouts
 TEST(24d)
 {
@@ -3497,6 +3470,33 @@ TEST(24d)
 
   m.clear ();
   EXPECT_EQ (shapes_to_string_norm (_this, s1), "");
+}
+
+//  Bug #107
+TEST(100)
+{
+  db::Manager m (true);
+  db::Shapes shapes1 (&m, 0, true);
+
+  m.transaction ("y");
+  shapes1.insert (db::Box (200, -200, 100, -100));
+  m.commit ();
+
+  EXPECT_EQ (shapes_to_string_norm (_this, shapes1),
+    "box (100,-200;200,-100) #0\n"
+  );
+  m.undo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, shapes1),
+    ""
+  );
+  m.redo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, shapes1),
+    "box (100,-200;200,-100) #0\n"
+  );
+  m.undo ();
+  EXPECT_EQ (shapes_to_string_norm (_this, shapes1),
+    ""
+  );
 }
 
 //  Bug #835

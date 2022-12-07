@@ -56,7 +56,7 @@ class ArrayRepository;
  *  coordinates box).
  */
 
-template <class C, class R = C>
+template <class C, class R>
 struct DB_PUBLIC_TEMPLATE box
 {
   typedef C coord_type;

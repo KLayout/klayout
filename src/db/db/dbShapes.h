@@ -138,8 +138,9 @@ public:
     Text                   = 15,
     TextRef                = 16,
     TextPtrArray           = 17,
-    UserObject             = 18,
-    Null                   = 19 //  must be last!
+    Point                  = 18,
+    UserObject             = 19,
+    Null                   = 20 //  must be last!
   };
 
   enum flags_type 
@@ -154,6 +155,7 @@ public:
                       | (1 << SimplePolygonPtrArray),
     Edges             = (1 << Edge),
     EdgePairs         = (1 << EdgePair),
+    Points            = (1 << Point),
     Paths             = (1 << Path)
                       | (1 << PathRef) 
                       | (1 << PathPtrArray),
@@ -392,6 +394,7 @@ private:
     char sz17 [sizeof (per_shape_iter_size <text_ref_type>)];
     char sz18 [sizeof (per_shape_iter_size <text_ptr_array_type>)];
     char sz19 [sizeof (per_shape_iter_size <user_object_type>)];
+    char sz20 [sizeof (per_shape_iter_size <point_type>)];
   };
 
   //  this union is simply there to determine the maximum size required for all

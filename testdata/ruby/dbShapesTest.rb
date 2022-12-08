@@ -158,6 +158,9 @@ class DBShapes_TestClass < TestBase
     shapes.each( RBA::Shapes::SEdges ) { |s| arr.push( s ) } 
     assert_equal( arr.size, 0 )
     arr = []
+    shapes.each( RBA::Shapes::SPoints ) { |s| arr.push( s ) } 
+    assert_equal( arr.size, 0 )
+    arr = []
     shapes.each( RBA::Shapes::SBoxes ) { |s| arr.push( s ) } 
     assert_equal( arr.size, 1 )
     assert_equal( arr[0].prop_id, 0 )
@@ -166,6 +169,7 @@ class DBShapes_TestClass < TestBase
     assert_equal( arr[0].type, RBA::Shape::t_box )
     assert_equal( arr[0].polygon.to_s, "(10,-10;10,40;50,40;50,-10)" )
     assert_equal( arr[0].simple_polygon.to_s, "(10,-10;10,40;50,40;50,-10)" )
+    assert_equal( arr[0].point.inspect, "nil" )
     assert_equal( arr[0].edge.inspect, "nil" )
     assert_equal( arr[0].edge_pair.inspect, "nil" )
     assert_equal( arr[0].box.to_s, "(10,-10;50,40)" )
@@ -190,6 +194,7 @@ class DBShapes_TestClass < TestBase
     assert_equal( arr[0].is_edge?, true )
     assert_equal( arr[0].polygon.inspect, "nil" )
     assert_equal( arr[0].simple_polygon.inspect, "nil" )
+    assert_equal( arr[0].point.inspect, "nil" )
     assert_equal( arr[0].edge.to_s, "(-1,2;5,2)" )
     assert_equal( arr[0].edge_pair.inspect, "nil" )
     assert_equal( arr[0].box.inspect, "nil" )
@@ -217,12 +222,40 @@ class DBShapes_TestClass < TestBase
     assert_equal( arr[0].polygon.inspect, "nil" )
     assert_equal( arr[0].simple_polygon.inspect, "nil" )
     assert_equal( arr[0].edge_pair.to_s, "(-1,2;5,2)/(-1,5;5,5)" )
+    assert_equal( arr[0].point.inspect, "nil" )
     assert_equal( arr[0].edge.inspect, "nil" )
     assert_equal( arr[0].box.inspect, "nil" )
     assert_equal( arr[0].path.inspect, "nil" )
     assert_equal( arr[0].text.inspect, "nil" )
     assert_equal( arr[0].edge_pair == a, true )
     assert_equal( arr[0].bbox == a.bbox, true )
+    arr = []
+    shapes.each( RBA::Shapes::SBoxes ) { |s| arr.push( s ) } 
+    assert_equal( arr.size, 1 )
+    assert_equal( arr[0].is_box?, true )
+
+    # points
+
+    a = RBA::Point::new( -1, 2 )
+    c1.shapes( lindex ).insert( a )
+    arr = []
+    shapes.each( RBA::Shapes::SPoints ) { |s| arr.push( s ) } 
+    assert_equal( arr.size, 1 )
+    assert_equal( arr[0].prop_id, 0 )
+    assert_equal( arr[0].has_prop_id?, false )
+    assert_equal( arr[0].is_null?, false )
+    assert_equal( arr[0].type, RBA::Shape::t_point )
+    assert_equal( arr[0].is_point?, true )
+    assert_equal( arr[0].polygon.inspect, "nil" )
+    assert_equal( arr[0].simple_polygon.inspect, "nil" )
+    assert_equal( arr[0].point.to_s, "-1,2" )
+    assert_equal( arr[0].edge.inspect, "nil" )
+    assert_equal( arr[0].edge_pair.inspect, "nil" )
+    assert_equal( arr[0].box.inspect, "nil" )
+    assert_equal( arr[0].path.inspect, "nil" )
+    assert_equal( arr[0].text.inspect, "nil" )
+    assert_equal( arr[0].point == a, true )
+    assert_equal( arr[0].bbox == RBA::Box::new(a, a), true )
     arr = []
     shapes.each( RBA::Shapes::SBoxes ) { |s| arr.push( s ) } 
     assert_equal( arr.size, 1 )
@@ -486,6 +519,9 @@ class DBShapes_TestClass < TestBase
     shapes.each( RBA::Shapes::SEdges ) { |s| arr.push( s ) } 
     assert_equal( arr.size, 0 )
     arr = []
+    shapes.each( RBA::Shapes::SPoints ) { |s| arr.push( s ) } 
+    assert_equal( arr.size, 0 )
+    arr = []
     shapes.each( RBA::Shapes::SBoxes ) { |s| arr.push( s ) } 
     assert_equal( arr.size, 1 )
     assert_equal( arr[0].prop_id, 0 )
@@ -543,12 +579,39 @@ class DBShapes_TestClass < TestBase
     assert_equal( arr[0].is_edge_pair?, true )
     assert_equal( arr[0].dpolygon.inspect, "nil" )
     assert_equal( arr[0].dsimple_polygon.inspect, "nil" )
+    assert_equal( arr[0].dpoint.inspect, "nil" )
     assert_equal( arr[0].dedge_pair.to_s, "(-0.001,0.002;0.005,0.002)/(-0.001,0.005;0.005,0.005)" )
     assert_equal( arr[0].dedge.inspect, "nil" )
     assert_equal( arr[0].dbox.inspect, "nil" )
     assert_equal( arr[0].dpath.inspect, "nil" )
     assert_equal( arr[0].dtext.inspect, "nil" )
     assert_equal( arr[0].dbbox.to_s, "(-0.001,0.002;0.005,0.005)" )
+    arr = []
+    shapes.each( RBA::Shapes::SBoxes ) { |s| arr.push( s ) } 
+    assert_equal( arr.size, 1 )
+    assert_equal( arr[0].is_box?, true )
+
+    # points
+
+    a = RBA::DPoint::new( -1, 2 )
+    c1.shapes( lindex ).insert( a )
+    arr = []
+    shapes.each( RBA::Shapes::SPoints ) { |s| arr.push( s ) } 
+    assert_equal( arr.size, 1 )
+    assert_equal( arr[0].prop_id, 0 )
+    assert_equal( arr[0].has_prop_id?, false )
+    assert_equal( arr[0].is_null?, false )
+    assert_equal( arr[0].type, RBA::Shape::t_point )
+    assert_equal( arr[0].is_point?, true )
+    assert_equal( arr[0].dpolygon.inspect, "nil" )
+    assert_equal( arr[0].dsimple_polygon.inspect, "nil" )
+    assert_equal( arr[0].dpoint.to_s, "-1,2" )
+    assert_equal( arr[0].dedge.inspect, "nil" )
+    assert_equal( arr[0].dedge_pair.inspect, "nil" )
+    assert_equal( arr[0].dbox.inspect, "nil" )
+    assert_equal( arr[0].dpath.inspect, "nil" )
+    assert_equal( arr[0].dtext.inspect, "nil" )
+    assert_equal( arr[0].dbbox.to_s, "(-1,2;-1,2)" )
     arr = []
     shapes.each( RBA::Shapes::SBoxes ) { |s| arr.push( s ) } 
     assert_equal( arr.size, 1 )

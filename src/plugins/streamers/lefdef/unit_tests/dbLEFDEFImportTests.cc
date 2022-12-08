@@ -942,3 +942,15 @@ TEST(204_concave_pins)
   run_test (_this, "issue-1132", "read:test.lef", "au.oas.gz", lefdef_opt, false);
 }
 
+//  issue 1214
+TEST(205_lef_resistance)
+{
+  db::LEFDEFReaderOptions lefdef_opt = default_options ();
+  lefdef_opt.set_lef_pins_datatype (12);
+  lefdef_opt.set_lef_pins_suffix (".LEFPIN");
+  lefdef_opt.set_lef_labels_datatype (11);
+  lefdef_opt.set_lef_labels_suffix (".LEFLABEL");
+
+  run_test (_this, "issue-1214", "read:merged.nom.lef", "au.oas.gz", lefdef_opt, false);
+}
+

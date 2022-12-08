@@ -1443,7 +1443,8 @@ ApplicationBase::get_config_names () const
 GuiApplication::GuiApplication (int &argc, char **argv)
   : QApplication (argc, argv), ApplicationBase (false),
     mp_mw (0),
-    mp_recorder (0)
+    mp_recorder (0),
+    m_in_notify (0)
 {
   //  install a special style proxy to overcome the issue of black-on-black tree expanders
   setStyle (new lay::BackgroundAwareTreeStyle (0));
@@ -1479,14 +1480,28 @@ GuiApplication::initialize ()
 bool
 GuiApplication::notify (QObject *receiver, QEvent *e)
 {
-  //  Note: due to a bug in some Qt versions (i.e. 4.8.3) throwing exceptions across
-  //  signals may not be safe. Hence the local BEGIN_PROTECTED .. END_PROTECTED approach
-  //  is still preferred over the global solution through "notify"
+  bool in_notify = (m_in_notify > 0);
 
   bool ret = true;
-  BEGIN_PROTECTED
-    ret = QApplication::notify (receiver, e);
-  END_PROTECTED
+  ++m_in_notify;
+
+  //  Note: due to a bug in some Qt versions (i.e. 4.8.3) throwing exceptions across
+  //  signals may not be safe. Hence the local BEGIN_PROTECTED .. END_PROTECTED approach
+  //  is still preferred over the global solution through "notify".
+  //  Because END_PROTECTED may raise other events (message box) and this may cause other
+  //  exceptions, we use silent mode inside notify to avoid recursion.
+
+  if (in_notify) {
+    BEGIN_PROTECTED_SILENT
+      ret = QApplication::notify (receiver, e);
+    END_PROTECTED_SILENT
+  } else {
+    BEGIN_PROTECTED
+      ret = QApplication::notify (receiver, e);
+    END_PROTECTED
+  }
+
+  --m_in_notify;
   return ret;
 }
 

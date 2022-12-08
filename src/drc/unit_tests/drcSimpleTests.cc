@@ -1386,3 +1386,13 @@ TEST(58d_in_and_out)
 {
   run_test (_this, "58", true);
 }
+
+TEST(60_issue1216)
+{
+  run_test (_this, "60", false);
+}
+
+TEST(60d_issue1216)
+{
+  run_test (_this, "60", true);
+}

@@ -39,6 +39,7 @@ SOURCES = \
   tlThreadsTests.cc \
   tlUniqueIdTests.cc \
   tlListTests.cc \
+  tlSListTests.cc \
   tlEquivalenceClustersTests.cc \
   tlUniqueNameTests.cc \
   tlGlobPatternTests.cc \

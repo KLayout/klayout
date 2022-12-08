@@ -565,7 +565,7 @@ TEST(15c)
   r.insert (db::Box (db::Point (400, 250), db::Point (500, 300)));
 
   EXPECT_EQ (r.width_check (120, db::RegionCheckOptions (false, db::Projection)).to_string (), "(400,200;400,300)|(500,300;500,200)");
-  EXPECT_EQ (db::compare (r.space_check (120, db::RegionCheckOptions (false, db::Projection)), "(300,0;300,200)|(200,200;200,0);(300,300;300,500)|(200,500;200,300);(300,200;400,200)|(400,300;300,300)"), true);
+  EXPECT_EQ (db::compare (r.space_check (120, db::RegionCheckOptions (false, db::Projection)), "(300,0;300,200)|(200,200;200,0);(300,300;300,500)|(200,500;200,300);(300,200;400,200)|(400,300;300,300);(300,300;300,400)|(200,400;200,300);(300,400;300,500)|(200,500;200,400)"), true);
   EXPECT_EQ (r.notch_check (120, db::RegionCheckOptions (false, db::Projection)).to_string (), "(300,200;400,200)|(400,300;300,300)");
   EXPECT_EQ (db::compare (r.isolated_check (120, db::RegionCheckOptions (false, db::Projection)), "(300,0;300,200)|(200,200;200,0);(300,300;300,500)|(200,500;200,300)"), true);
 }

@@ -815,3 +815,136 @@ TEST(8)
 
 }
 
+//  Edges, EdgePairs, Points
+TEST(9)
+{
+  db::Manager m (true);
+  db::Shapes s (&m, 0, db::default_editable_mode ());
+
+  s.insert (db::Point (100, 200));
+  s.insert (db::Edge (db::Point (100, 200), db::Point (200, 400)));
+  s.insert (db::EdgePair (db::Edge (db::Point (100, 200), db::Point (200, 400)), db::Edge (db::Point (0, 300), db::Point (100, 500))));
+
+  db::ShapeIterator si;
+  si = s.begin (db::ShapeIterator::All);
+
+  EXPECT_EQ (si.at_end (), false);
+  EXPECT_EQ (si->is_edge (), true);
+  EXPECT_EQ (si->is_edge_pair (), false);
+  EXPECT_EQ (si->is_point (), false);
+
+  EXPECT_EQ (si->to_string (), "edge (100,200;200,400)");
+  EXPECT_EQ (si->edge ().to_string (), "(100,200;200,400)");
+
+  ++si;
+
+  EXPECT_EQ (si.at_end (), false);
+  EXPECT_EQ (si->is_edge (), false);
+  EXPECT_EQ (si->is_edge_pair (), true);
+  EXPECT_EQ (si->is_point (), false);
+
+  EXPECT_EQ (si->to_string (), "edge_pair (100,200;200,400)/(0,300;100,500)");
+  EXPECT_EQ (si->edge_pair ().to_string (), "(100,200;200,400)/(0,300;100,500)");
+
+  ++si;
+
+  EXPECT_EQ (si.at_end (), false);
+  EXPECT_EQ (si->is_edge (), false);
+  EXPECT_EQ (si->is_edge_pair (), false);
+  EXPECT_EQ (si->is_point (), true);
+
+  EXPECT_EQ (si->to_string (), "point 100,200");
+  EXPECT_EQ (si->point ().to_string (), "100,200");
+
+  ++si;
+
+  EXPECT_EQ (si.at_end (), true);
+
+
+  si = s.begin (db::ShapeIterator::Edges);
+
+  EXPECT_EQ (si.at_end (), false);
+  EXPECT_EQ (si->is_edge (), true);
+  EXPECT_EQ (si->is_edge_pair (), false);
+  EXPECT_EQ (si->is_point (), false);
+
+  EXPECT_EQ (si->to_string (), "edge (100,200;200,400)");
+  EXPECT_EQ (si->edge ().to_string (), "(100,200;200,400)");
+
+  ++si;
+
+  EXPECT_EQ (si.at_end (), true);
+
+
+  si = s.begin (db::ShapeIterator::EdgePairs);
+
+  EXPECT_EQ (si.at_end (), false);
+  EXPECT_EQ (si->is_edge (), false);
+  EXPECT_EQ (si->is_edge_pair (), true);
+  EXPECT_EQ (si->is_point (), false);
+
+  EXPECT_EQ (si->to_string (), "edge_pair (100,200;200,400)/(0,300;100,500)");
+  EXPECT_EQ (si->edge_pair ().to_string (), "(100,200;200,400)/(0,300;100,500)");
+
+  ++si;
+
+  EXPECT_EQ (si.at_end (), true);
+
+  si = s.begin (db::ShapeIterator::Points);
+
+  EXPECT_EQ (si.at_end (), false);
+  EXPECT_EQ (si->is_edge (), false);
+  EXPECT_EQ (si->is_edge_pair (), false);
+  EXPECT_EQ (si->is_point (), true);
+
+  EXPECT_EQ (si->to_string (), "point 100,200");
+  EXPECT_EQ (si->point ().to_string (), "100,200");
+
+  ++si;
+
+  EXPECT_EQ (si.at_end (), true);
+
+
+  s.clear ();
+  s.insert (db::PointWithProperties (db::Point (100, 200), 1));
+  s.insert (db::EdgeWithProperties (db::Edge (db::Point (100, 200), db::Point (200, 400)), 2));
+  s.insert (db::EdgePairWithProperties (db::EdgePair (db::Edge (db::Point (100, 200), db::Point (200, 400)), db::Edge (db::Point (0, 300), db::Point (100, 500))), 3));
+
+  si = s.begin (db::ShapeIterator::All);
+
+  EXPECT_EQ (si.at_end (), false);
+  EXPECT_EQ (si->is_edge (), true);
+  EXPECT_EQ (si->prop_id (), db::properties_id_type (2));
+  EXPECT_EQ (si->is_edge_pair (), false);
+  EXPECT_EQ (si->is_point (), false);
+
+  EXPECT_EQ (si->to_string (), "edge (100,200;200,400) prop_id=2");
+  EXPECT_EQ (si->edge ().to_string (), "(100,200;200,400)");
+
+  ++si;
+
+  EXPECT_EQ (si.at_end (), false);
+  EXPECT_EQ (si->is_edge (), false);
+  EXPECT_EQ (si->is_edge_pair (), true);
+  EXPECT_EQ (si->prop_id (), db::properties_id_type (3));
+  EXPECT_EQ (si->is_point (), false);
+
+  EXPECT_EQ (si->to_string (), "edge_pair (100,200;200,400)/(0,300;100,500) prop_id=3");
+  EXPECT_EQ (si->edge_pair ().to_string (), "(100,200;200,400)/(0,300;100,500)");
+
+  ++si;
+
+  EXPECT_EQ (si.at_end (), false);
+  EXPECT_EQ (si->is_edge (), false);
+  EXPECT_EQ (si->is_edge_pair (), false);
+  EXPECT_EQ (si->is_point (), true);
+  EXPECT_EQ (si->prop_id (), db::properties_id_type (1));
+
+  EXPECT_EQ (si->to_string (), "point 100,200 prop_id=1");
+  EXPECT_EQ (si->point ().to_string (), "100,200");
+
+  ++si;
+
+  EXPECT_EQ (si.at_end (), true);
+}
+

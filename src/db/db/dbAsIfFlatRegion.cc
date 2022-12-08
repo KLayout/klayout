@@ -581,7 +581,8 @@ AsIfFlatRegion::selected_interacting_generic (const Region &other, int mode, boo
   proc.set_report_progress (report_progress ());
 
   std::vector<generic_shape_iterator<db::Polygon> > others;
-  others.push_back ((mode < 0 || counting) ? other.begin_merged () : other.begin ());
+  //  NOTE: with counting the other region needs to be merged
+  others.push_back (counting ? other.begin_merged () : other.begin ());
 
   proc.run_flat (polygons, others, std::vector<bool> (), &op, oph.results ());
 
@@ -1069,7 +1070,6 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
 #if defined(USE_LOCAL_PROCESSOR)
 
   bool needs_merged_primary = different_polygons || options.needs_merged ();
-needs_merged_primary = true; // @@@
 
   db::RegionIterator polygons (needs_merged_primary ? begin_merged () : begin ());
   bool primary_is_merged = ! merged_semantics () || needs_merged_primary || is_merged ();

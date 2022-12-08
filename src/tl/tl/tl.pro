@@ -51,6 +51,7 @@ SOURCES = \
     tlLongInt.cc \
     tlUniqueId.cc \
     tlList.cc \
+    tlSList.cc \
     tlEquivalenceClusters.cc \
     tlUniqueName.cc \
     tlRecipe.cc \
@@ -115,6 +116,7 @@ HEADERS = \
     tlLongInt.h \
     tlUniqueId.h \
     tlList.h \
+    tlSList.h \
     tlEquivalenceClusters.h \
     tlUniqueName.h \
     tlRecipe.h \

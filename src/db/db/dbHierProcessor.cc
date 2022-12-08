@@ -1097,10 +1097,16 @@ private:
     const db::Cell &cell1 = mp_subject_layout->cell (inst1->object ().cell_index ());
     const db::Cell &cell2 = mp_intruder_layout->cell (inst2->object ().cell_index ());
     db::box_convert <db::CellInst, true> inst2_bc (*mp_intruder_layout, m_intruder_layer);
+    db::box_convert <db::CellInst, true> inst1_bc (*mp_subject_layout, m_subject_layer);
+
+    db::Box iibox2 = inst2->bbox (inst2_bc).enlarged (db::Vector (m_dist, m_dist));
+    if (iibox2.empty ()) {
+      return;
+    }
 
     std::unordered_map<db::ICplxTrans, std::list<std::pair<db::cell_index_type, db::ICplxTrans> > > interactions_cache;
 
-    for (db::CellInstArray::iterator n = inst1->begin (); ! n.at_end (); ++n) {
+    for (db::CellInstArray::iterator n = inst1->begin_touching (safe_box_enlarged (iibox2, -1, -1), inst1_bc); ! n.at_end (); ++n) {
 
       db::ICplxTrans tn1 = inst1->complex_trans (*n);
       db::ICplxTrans tni1 = tn1.inverted ();

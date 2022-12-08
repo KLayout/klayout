@@ -1264,7 +1264,7 @@ connected_clusters<T>::join_cluster_with (typename local_cluster<T>::id_type id,
     }
 
     connections_type &target = m_connections [id];
-    target.splice (target.end (), to_join, to_join.begin (), to_join.end ());
+    target.splice (to_join);
 
     m_connections.erase (tc);
 

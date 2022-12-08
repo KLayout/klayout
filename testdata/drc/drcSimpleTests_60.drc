@@ -1,0 +1,30 @@
+
+# Moved implementation
+
+source($drc_test_source)
+target($drc_test_target)
+
+if $drc_test_deep
+  deep
+end
+
+l8 = input(8, 0)
+l9 = input(9, 0)
+
+l8.output(8, 0)
+l9.output(9, 0)
+
+# NOTE: "sized" tests issue #1216
+l8.sized(0.1, 0).moved(-0.1, 0).sized(0, 0.1).moved(0, -0.1).output(108, 0)
+l9.sized(0.1, 0).moved(-0.1, 0).sized(0, 0.1).moved(0, -0.1).output(109, 0)
+
+l8.edges.moved(-0.1, -0.1).extended_out(0.05).output(118, 0)
+l9.edges.moved(-0.1, -0.1).extended_out(0.05).output(119, 0)
+
+# NOTE: "sized" tests issue #1216
+l8.rotated(90.0).sized(0, 0.1).output(208, 0)
+l9.rotated(90.0).sized(0, 0.1).output(209, 0)
+
+l8.edges.rotated(90.0).extended_out(0.05).output(218, 0)
+l9.edges.rotated(90.0).extended_out(0.05).output(219, 0)
+

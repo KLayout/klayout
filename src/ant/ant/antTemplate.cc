@@ -30,6 +30,12 @@
 namespace ant
 {
 
+int
+Template::current_version ()
+{
+  return 1;
+}
+
 ant::Template
 Template::from_object (const ant::Object &a, const std::string &title, int mode)
 {
@@ -57,7 +63,8 @@ Template::from_object (const ant::Object &a, const std::string &title, int mode)
 }
 
 Template::Template ()
-  : m_title (tl::to_string (tr ("Ruler"))),
+  : m_version (current_version ()),
+    m_title (tl::to_string (tr ("Ruler"))),
     m_fmt_x ("$X"), m_fmt_y ("$Y"), m_fmt ("$D"),
     m_style (ant::Object::STY_ruler), m_outline (ant::Object::OL_diag),
     m_snap (true), m_angle_constraint (lay::AC_Global),
@@ -74,7 +81,8 @@ Template::Template (const std::string &title,
                     const std::string &fmt_x, const std::string &fmt_y, const std::string &fmt, 
                     style_type style, outline_type outline, bool snap, lay::angle_constraint_type angle_constraint,
                     const std::string &cat)
-  : m_title (title),
+  : m_version (current_version ()),
+    m_title (title),
     m_category (cat),
     m_fmt_x (fmt_x), m_fmt_y (fmt_y), m_fmt (fmt),
     m_style (style), m_outline (outline),
@@ -89,7 +97,8 @@ Template::Template (const std::string &title,
 }
 
 Template::Template (const ant::Template &d)
-  : m_title (d.m_title),
+  : m_version (d.m_version),
+    m_title (d.m_title),
     m_category (d.m_category),
     m_fmt_x (d.m_fmt_x), m_fmt_y (d.m_fmt_y), m_fmt (d.m_fmt),
     m_style (d.m_style), m_outline (d.m_outline),
@@ -107,6 +116,7 @@ Template &
 Template::operator= (const ant::Template &d)
 {
   if (this != &d) {
+    m_version = d.m_version;
     m_title = d.m_title;
     m_category = d.m_category;
     m_fmt_x = d.m_fmt_x;
@@ -132,7 +142,7 @@ std::vector<Template>
 Template::from_string (const std::string &s)
 {
   std::vector<Template> r;
-  
+
   try {
     
     tl::Extractor ex (s.c_str ());
@@ -140,10 +150,18 @@ Template::from_string (const std::string &s)
     if (! ex.at_end ()) {
 
       r.push_back (Template ());
+      r.back ().version (0);
 
       while (! ex.at_end ()) {
 
-        if (ex.test ("mode=")) {
+        if (ex.test ("version=")) {
+
+          int v = 0;
+          ex.read (v);
+          r.back ().version (v);
+          ex.test (",");
+
+        } else if (ex.test ("mode=")) {
 
           std::string s;
           ex.read_word_or_quoted (s);
@@ -299,9 +317,15 @@ Template::from_string (const std::string &s)
 
           ex.expect (";");
           r.push_back (Template ());
+          r.back ().version (0);
 
         }
 
+      }
+
+      //  downgrade version
+      if (r.back ().version () > current_version ()) {
+        r.back ().version (current_version ());
       }
 
     }
@@ -337,6 +361,9 @@ Template::to_string (const std::vector<Template> &v)
     r += ",";
     r += "category=";
     r += tl::to_word_or_quoted_string (t->category ());
+    r += ",";
+    r += "version=";
+    r += tl::to_string (t->version ());
     r += ",";
     r += "fmt=";
     r += tl::to_word_or_quoted_string (t->fmt ());

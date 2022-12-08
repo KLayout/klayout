@@ -174,7 +174,7 @@ DeepRegion::DeepRegion (const DeepRegion &other)
     m_is_merged (other.m_is_merged)
 {
   if (m_merged_polygons_valid) {
-    m_merged_polygons = other.m_merged_polygons;
+    m_merged_polygons = other.m_merged_polygons.copy ();
   }
 }
 
@@ -189,7 +189,7 @@ DeepRegion::operator= (const DeepRegion &other)
     m_merged_polygons_valid = other.m_merged_polygons_valid;
     m_is_merged = other.m_is_merged;
     if (m_merged_polygons_valid) {
-      m_merged_polygons = other.m_merged_polygons;
+      m_merged_polygons = other.m_merged_polygons.copy ();
     }
 
   }
@@ -235,22 +235,56 @@ void DeepRegion::do_insert (const db::Polygon &polygon)
 template <class Trans>
 static void transform_deep_layer (db::DeepLayer &deep_layer, const Trans &t)
 {
-  //  TODO: this is a pretty cheap implementation. At least a plain move can be done with orientation variants.
+  if (t.equal (Trans (db::Disp (t.disp ())))) {
 
-  db::Layout &layout = deep_layer.layout ();
-  if (layout.begin_top_down () != layout.end_top_down ()) {
+    //  Plain move
 
-    db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
+    //  build cell variants for different orientations
+    db::OrientationReducer same_orientation;
 
-    db::Shapes flat_shapes (layout.is_editable ());
-    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer.layer ()); !iter.at_end (); ++iter) {
-      db::Polygon poly;
-      iter->polygon (poly);
-      flat_shapes.insert (poly.transformed (iter.trans ()).transformed (t));
+    db::VariantsCollectorBase vars (&same_orientation);
+    vars.collect (deep_layer.layout (), deep_layer.initial_cell ());
+    deep_layer.separate_variants (vars);
+
+    //  process the variants
+    db::Layout &layout = deep_layer.layout ();
+
+    for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+      const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
+      tl_assert (v.size () == size_t (1));
+
+      db::Trans tr (v.begin ()->first.inverted () * t.disp ());
+
+      db::Shapes &shapes = c->shapes (deep_layer.layer ());
+      db::Shapes new_shapes (layout.manager (), c.operator-> (), layout.is_editable ());
+      new_shapes.insert_transformed (shapes, tr);
+      shapes.swap (new_shapes);
+
     }
 
-    layout.clear_layer (deep_layer.layer ());
-    top_cell.shapes (deep_layer.layer ()).swap (flat_shapes);
+  } else {
+
+    //  General transformation -> note that this is a flat implementation!
+
+    db::Layout &layout = deep_layer.layout ();
+    if (layout.begin_top_down () != layout.end_top_down ()) {
+
+      db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
+
+      db::Shapes flat_shapes (layout.manager (), &top_cell, layout.is_editable ());
+      for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer.layer ()); !iter.at_end (); ++iter) {
+        db::Polygon poly;
+        iter->polygon (poly);
+        poly.transform (iter.trans ());
+        poly.transform (t);
+        flat_shapes.insert (db::PolygonRef (poly, layout.shape_repository ()));
+      }
+
+      layout.clear_layer (deep_layer.layer ());
+      top_cell.shapes (deep_layer.layer ()).swap (flat_shapes);
+
+    }
 
   }
 }
@@ -258,24 +292,36 @@ static void transform_deep_layer (db::DeepLayer &deep_layer, const Trans &t)
 void DeepRegion::do_transform (const db::Trans &t)
 {
   transform_deep_layer (deep_layer (), t);
+  if (m_merged_polygons_valid && m_merged_polygons.layer () != deep_layer ().layer ()) {
+    transform_deep_layer (m_merged_polygons, t);
+  }
   invalidate_bbox ();
 }
 
 void DeepRegion::do_transform (const db::ICplxTrans &t)
 {
   transform_deep_layer (deep_layer (), t);
+  if (m_merged_polygons_valid && m_merged_polygons.layer () != deep_layer ().layer ()) {
+    transform_deep_layer (m_merged_polygons, t);
+  }
   invalidate_bbox ();
 }
 
 void DeepRegion::do_transform (const db::IMatrix2d &t)
 {
   transform_deep_layer (deep_layer (), t);
+  if (m_merged_polygons_valid && m_merged_polygons.layer () != deep_layer ().layer ()) {
+    transform_deep_layer (m_merged_polygons, t);
+  }
   invalidate_bbox ();
 }
 
 void DeepRegion::do_transform (const db::IMatrix3d &t)
 {
   transform_deep_layer (deep_layer (), t);
+  if (m_merged_polygons_valid && m_merged_polygons.layer () != deep_layer ().layer ()) {
+    transform_deep_layer (m_merged_polygons, t);
+  }
   invalidate_bbox ();
 }
 
@@ -1952,6 +1998,7 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
     }
   }
 
+  min_count = std::max (size_t (1), min_count);
   bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   //  with these flag set to true, the resulting polygons are broken again.
@@ -1966,9 +2013,8 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
   }
 
   const db::DeepLayer &polygons = merged_deep_layer ();
-  //  NOTE: on "inside" or with counting, the other polygons must be merged
-  bool other_needs_merged = (mode < 0 || counting);
-  const db::DeepLayer &other_polygons = other_needs_merged ? other_deep->merged_deep_layer () : other_deep->deep_layer ();
+  //  NOTE: with counting, the other polygons must be merged
+  const db::DeepLayer &other_polygons = counting ? other_deep->merged_deep_layer () : other_deep->deep_layer ();
 
   db::InteractingLocalOperation op (mode, touching, output_mode, min_count, max_count, true);
 
@@ -2011,6 +2057,7 @@ DeepRegion::selected_interacting_generic (const Edges &other, InteractingOutputM
     }
   }
 
+  min_count = std::max (size_t (1), min_count);
   bool counting = !(min_count == 1 && max_count == std::numeric_limits<size_t>::max ());
 
   //  with these flag set to true, the resulting polygons are broken again.
@@ -2180,6 +2227,8 @@ DeepRegion::selected_interacting_generic (const Texts &other, InteractingOutputM
       return std::make_pair (new DeepRegion (deep_layer ().derived ()), (RegionDelegate *) 0);
     }
   }
+
+  min_count = std::max (size_t (1), min_count);
 
   //  with these flag set to true, the resulting polygons are broken again.
   bool split_after = false;

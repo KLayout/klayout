@@ -46,6 +46,53 @@ namespace edt
 {
 
 // -------------------------------------------------------------------------
+
+static std::string cell_name_from_sel (const edt::Service::obj_iterator &pos, edt::Service *service)
+{
+  if (! pos->is_cell_inst ()) {
+    return std::string ();
+  }
+
+  const lay::CellView &cv = service->view ()->cellview (pos->cv_index ());
+
+  db::Layout *def_layout = &cv->layout ();
+  db::cell_index_type def_cell_index = pos->back ().inst_ptr.cell_index ();
+  std::pair<db::Library *, db::cell_index_type> dl = def_layout->defining_library (def_cell_index);
+  if (dl.first) {
+    def_layout = &dl.first->layout ();
+    def_cell_index = dl.second;
+  }
+
+  std::pair<bool, db::pcell_id_type> pci = def_layout->is_pcell_instance (def_cell_index);
+  if (pci.first && def_layout->pcell_declaration (pci.second)) {
+    return def_layout->pcell_header (pci.second)->get_name ();
+  } else {
+    return def_layout->cell_name (def_cell_index);
+  }
+}
+
+namespace {
+
+struct SelectionPtrSort
+{
+  SelectionPtrSort (edt::Service *service)
+    : mp_service (service)
+  {
+    //  .. nothing yet ..
+  }
+
+  bool operator() (const edt::Service::obj_iterator &a, const edt::Service::obj_iterator &b)
+  {
+    return cell_name_from_sel (a, mp_service) < cell_name_from_sel (b, mp_service);
+  }
+
+private:
+  edt::Service *mp_service;
+};
+
+}
+
+// -------------------------------------------------------------------------
 //  InstPropertiesPage implementation
 
 static bool is_orthogonal (const db::DVector &rv, const db::DVector &cv)
@@ -61,6 +108,9 @@ InstPropertiesPage::InstPropertiesPage (edt::Service *service, db::Manager *mana
   for (edt::Service::obj_iterator s = service->selection ().begin (); s != service->selection ().end (); ++s) {
     m_selection_ptrs.push_back (s);
   }
+
+  std::sort (m_selection_ptrs.begin (), m_selection_ptrs.end (), SelectionPtrSort (service));
+
   m_prop_id = 0;
   mp_service->clear_highlights ();
 
@@ -249,30 +299,15 @@ InstPropertiesPage::select_entries (const std::vector<size_t> &entries)
 std::string
 InstPropertiesPage::description (size_t entry) const
 {
-  std::string d;
-
   edt::Service::obj_iterator pos = m_selection_ptrs [entry];
+  std::string d = cell_name_from_sel (pos, mp_service);
+
   if (! pos->is_cell_inst ()) {
     return d;
   }
 
   const lay::CellView &cv = mp_service->view ()->cellview (pos->cv_index ());
   double dbu = cv->layout ().dbu ();
-
-  db::Layout *def_layout = &cv->layout ();
-  db::cell_index_type def_cell_index = pos->back ().inst_ptr.cell_index ();
-  std::pair<db::Library *, db::cell_index_type> dl = def_layout->defining_library (def_cell_index);
-  if (dl.first) {
-    def_layout = &dl.first->layout ();
-    def_cell_index = dl.second;
-  }
-
-  std::pair<bool, db::pcell_id_type> pci = def_layout->is_pcell_instance (def_cell_index);
-  if (pci.first && def_layout->pcell_declaration (pci.second)) {
-    d += def_layout->pcell_header (pci.second)->get_name ();
-  } else {
-    d += def_layout->cell_name (def_cell_index);
-  }
 
   db::ICplxTrans t (pos->back ().inst_ptr.complex_trans ());
   db::DCplxTrans dt = db::CplxTrans (dbu) * t * db::CplxTrans (dbu).inverted ();

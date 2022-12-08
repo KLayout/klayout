@@ -153,6 +153,11 @@ public:
     }
   }
 
+  void emit_data_changed ()
+  {
+    emit dataChanged (index (0, 0, QModelIndex ()), index (rowCount (QModelIndex ()) - 1, columnCount (QModelIndex ()) - 1, QModelIndex ()));
+  }
+
 private:
   PropertiesDialog *mp_dialog;
   int m_icon_width, m_icon_height;
@@ -565,6 +570,9 @@ BEGIN_PROTECTED
   if (! t.is_empty ()) {
     m_transaction_id = t.id ();
   }
+
+  //  updates cell names in instances for example
+  mp_tree_model->emit_data_changed ();
 
 END_PROTECTED
 }

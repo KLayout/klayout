@@ -1561,7 +1561,7 @@ CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (CompoundRegi
   tl_assert (input == 0);  //  input is a dummy parameter
 
   m_has_other = other->has_external_inputs ();
-// @@@ needs a concept to deal with merged/non-merged inputs
+  // TODO: needs a concept to deal with merged/non-merged inputs
   m_is_other_merged = other->is_merged ();
 
   set_description ("check");
@@ -1588,8 +1588,8 @@ CompoundRegionCheckOperationNode::computed_dist () const
 void
 CompoundRegionCheckOperationNode::do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout *layout, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const
 {
-// @@@ needs a concept to deal with merged/non-merged primary
-bool is_merged = true;
+  // TODO: needs a concept to deal with merged/non-merged inputs
+  bool is_merged = true;
   db::check_local_operation<db::Polygon, db::Polygon> op (m_check, m_different_polygons, is_merged, m_has_other, m_is_other_merged, m_options);
 
   tl_assert (results.size () == 1);
@@ -1606,8 +1606,8 @@ bool is_merged = true;
 void
 CompoundRegionCheckOperationNode::do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t max_vertex_count, double area_ratio) const
 {
-// @@@ needs a concept to deal with merged/non-merged primary
-bool is_merged = true;
+  // TODO: needs a concept to deal with merged/non-merged inputs
+  bool is_merged = true;
   db::check_local_operation<db::PolygonRef, db::PolygonRef> op (m_check, m_different_polygons, is_merged, m_has_other, m_is_other_merged, m_options);
 
   tl_assert (results.size () == 1);

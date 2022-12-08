@@ -169,6 +169,18 @@ struct edge_pair_defs
     method ("bbox", &C::bbox,
       "@brief Gets the bounding box of the edge pair\n"
     ) +
+    method ("perimeter", &C::perimeter,
+      "@brief Gets the perimeter of the edge pair\n"
+      "\n"
+      "The perimeter is defined as the sum of the lengths of both edges ('active perimeter').\n"
+      "\n"
+      "This attribute has been introduced in version 0.28."
+    ) +
+    method ("area", &C::area,
+      "@brief Gets the area between the edges of the edge pair\n"
+      "\n"
+      "This attribute has been introduced in version 0.28."
+    ) +
     method ("<", &C::less, gsi::arg ("box"),
       "@brief Less operator\n"
       "Returns true, if this edge pair is 'less' with respect to first and second edge\n"

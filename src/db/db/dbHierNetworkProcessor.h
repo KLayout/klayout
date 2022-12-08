@@ -32,6 +32,7 @@
 #include "dbInstElement.h"
 #include "tlEquivalenceClusters.h"
 #include "tlAssert.h"
+#include "tlSList.h"
 
 #include <map>
 #include <list>
@@ -1040,7 +1041,7 @@ public:
 
 private:
   typename local_clusters<T>::const_iterator m_lc_iter;
-  typedef std::list<ClusterInstance> connections_type;
+  typedef tl::slist<ClusterInstance> connections_type;
   typename std::map<typename local_cluster<T>::id_type, connections_type>::const_iterator m_x_iter, m_x_iter_end;
 };
 
@@ -1060,7 +1061,7 @@ class DB_PUBLIC_TEMPLATE connected_clusters
 {
 public:
   typedef typename local_clusters<T>::id_type id_type;
-  typedef std::list<ClusterInstance> connections_type;
+  typedef tl::slist<ClusterInstance> connections_type;
   typedef typename local_clusters<T>::box_type box_type;
   typedef connected_clusters_iterator<T> all_iterator;
   typedef typename std::map<typename local_cluster<T>::id_type, connections_type>::const_iterator connections_iterator;

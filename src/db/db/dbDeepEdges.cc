@@ -171,7 +171,7 @@ DeepEdges::DeepEdges (const DeepEdges &other)
     m_is_merged (other.m_is_merged)
 {
   if (m_merged_edges_valid) {
-    m_merged_edges = other.m_merged_edges;
+    m_merged_edges = other.m_merged_edges.copy ();
   }
 }
 
@@ -186,7 +186,7 @@ DeepEdges::operator= (const DeepEdges &other)
     m_merged_edges_valid = other.m_merged_edges_valid;
     m_is_merged = other.m_is_merged;
     if (m_merged_edges_valid) {
-      m_merged_edges = other.m_merged_edges;
+      m_merged_edges = other.m_merged_edges.copy ();
     }
 
   }
@@ -227,20 +227,52 @@ void DeepEdges::do_insert (const db::Edge &edge)
 template <class Trans>
 static void transform_deep_layer (db::DeepLayer &deep_layer, const Trans &t)
 {
-  //  TODO: this is a pretty cheap implementation. At least a plain move can be done with orientation variants.
+  if (t.equal (Trans (db::Disp (t.disp ())))) {
 
-  db::Layout &layout = deep_layer.layout ();
-  if (layout.begin_top_down () != layout.end_top_down ()) {
+    //  Plain move
 
-    db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
+    //  build cell variants for different orientations
+    db::OrientationReducer same_orientation;
 
-    db::Shapes flat_shapes (layout.is_editable ());
-    for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer.layer ()); !iter.at_end (); ++iter) {
-      flat_shapes.insert (iter->edge ().transformed (iter.trans ()).transformed (t));
+    db::VariantsCollectorBase vars (&same_orientation);
+    vars.collect (deep_layer.layout (), deep_layer.initial_cell ());
+    deep_layer.separate_variants (vars);
+
+    //  process the variants
+    db::Layout &layout = deep_layer.layout ();
+
+    for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+      const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
+      tl_assert (v.size () == size_t (1));
+
+      db::Trans tr (v.begin ()->first.inverted () * t.disp ());
+
+      db::Shapes &shapes = c->shapes (deep_layer.layer ());
+      db::Shapes new_shapes (layout.manager (), c.operator-> (), layout.is_editable ());
+      new_shapes.insert_transformed (shapes, tr);
+      shapes.swap (new_shapes);
+
     }
 
-    layout.clear_layer (deep_layer.layer ());
-    top_cell.shapes (deep_layer.layer ()).swap (flat_shapes);
+  } else {
+
+    //  General transformation -> note that this is a flat implementation!
+
+    db::Layout &layout = deep_layer.layout ();
+    if (layout.begin_top_down () != layout.end_top_down ()) {
+
+      db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
+
+      db::Shapes flat_shapes (layout.is_editable ());
+      for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer.layer ()); !iter.at_end (); ++iter) {
+        flat_shapes.insert (iter->edge ().transformed (iter.trans ()).transformed (t));
+      }
+
+      layout.clear_layer (deep_layer.layer ());
+      top_cell.shapes (deep_layer.layer ()).swap (flat_shapes);
+
+    }
 
   }
 }
@@ -248,24 +280,36 @@ static void transform_deep_layer (db::DeepLayer &deep_layer, const Trans &t)
 void DeepEdges::do_transform (const db::Trans &t)
 {
   transform_deep_layer (deep_layer (), t);
+  if (m_merged_edges_valid && m_merged_edges.layer () != deep_layer ().layer ()) {
+    transform_deep_layer (m_merged_edges, t);
+  }
   invalidate_bbox ();
 }
 
 void DeepEdges::do_transform (const db::ICplxTrans &t)
 {
   transform_deep_layer (deep_layer (), t);
+  if (m_merged_edges_valid && m_merged_edges.layer () != deep_layer ().layer ()) {
+    transform_deep_layer (m_merged_edges, t);
+  }
   invalidate_bbox ();
 }
 
 void DeepEdges::do_transform (const db::IMatrix2d &t)
 {
   transform_deep_layer (deep_layer (), t);
+  if (m_merged_edges_valid && m_merged_edges.layer () != deep_layer ().layer ()) {
+    transform_deep_layer (m_merged_edges, t);
+  }
   invalidate_bbox ();
 }
 
 void DeepEdges::do_transform (const db::IMatrix3d &t)
 {
   transform_deep_layer (deep_layer (), t);
+  if (m_merged_edges_valid && m_merged_edges.layer () != deep_layer ().layer ()) {
+    transform_deep_layer (m_merged_edges, t);
+  }
   invalidate_bbox ();
 }
 

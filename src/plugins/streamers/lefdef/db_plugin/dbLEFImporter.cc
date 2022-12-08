@@ -545,19 +545,19 @@ via_size (double dbu, const Shape &shape)
 void
 LEFImporter::read_viadef_by_geometry (GeometryBasedLayoutGenerator *lg, ViaDesc &via_desc, const std::string &n, double dbu)
 {
-  //  ignore resistance spec
-  if (test ("RESISTANCE")) {
-    get_double ();
-    test (";");
-  }
-
   std::string layer_name;
   std::set<std::string> seen_layers;
   std::vector<std::string> routing_layers;
 
   while (true) {
 
-    if (test ("LAYER")) {
+    //  ignore resistance spec
+    if (test ("RESISTANCE")) {
+
+      get_double ();
+      test (";");
+
+    } else if (test ("LAYER")) {
 
       layer_name = get ();
 

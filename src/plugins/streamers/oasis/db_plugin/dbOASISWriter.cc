@@ -2964,7 +2964,7 @@ OASISWriter::write (const db::Path &path, db::properties_id_type prop_id, const 
 }
 
 void 
-OASISWriter::write (const db::Edge &edge, db::properties_id_type prop_id, const db::Repetition & /*rep*/)
+OASISWriter::write (const db::Edge &edge, db::properties_id_type prop_id, const db::Repetition &rep)
 {
   m_progress.set (mp_stream->pos ());
 
@@ -2979,6 +2979,9 @@ OASISWriter::write (const db::Edge &edge, db::properties_id_type prop_id, const 
   }
   if (mm_datatype != m_datatype) {
     info |= 0x02;
+  }
+  if (! rep.is_singular ()) {
+    info |= 0x04;
   }
   if (mm_geometry_x != edge.p1 ().x ()) {
     info |= 0x10;
@@ -3029,6 +3032,9 @@ OASISWriter::write (const db::Edge &edge, db::properties_id_type prop_id, const 
   if (info & 0x08) {
     mm_geometry_y = edge.p1 ().y ();
     write_coord (edge.p1 ().y ());
+  }
+  if (info & 0x04) {
+    write (rep);
   }
 
   if (prop_id != 0) {

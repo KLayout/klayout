@@ -210,7 +210,7 @@ PluginDeclaration::initialized (lay::Dispatcher *root)
   //  This provides a migration path from earlier versions (not having templates) to recent ones.
   std::map<std::string, const ant::Template *> cat_names;
   for (auto i = m_templates.begin (); i != m_templates.end (); ++i) {
-    if (! i->category ().empty ()) {
+    if (! i->category ().empty () || i->category ().find ("_") == 0) {
       cat_names.insert (std::make_pair (i->category (), i.operator-> ()));
     }
   }

@@ -230,8 +230,8 @@ on these layers touching or overlapping other shapes on these
 layers will form bigger, electrically connected areas.
 </p><p>
 Texts will be used to assign net names to the nets. The preferred
-method is to use <a href="#labels">labels</a> to create a text layer from a design 
-layer. When using <a href="#input">input</a>, text labels are carried implicitly
+method is to use <a href="/about/drc_ref_global.xml#labels">labels</a> to create a text layer from a design 
+layer. When using <a href="/about/drc_ref_global.xml#input">input</a>, text labels are carried implicitly
 with the polygons but at the cost of small dummy shapes (2x2 DBU
 marker polygons) and limited functionality.
 </p><p>

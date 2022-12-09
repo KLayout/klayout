@@ -36,7 +36,6 @@ The following global functions are relevant for the DRC expressions:
 <li><a href="/about/drc_ref_global.xml#bbox_max">bbox_max</a> </li>
 <li><a href="/about/drc_ref_global.xml#bbox_min">bbox_min</a> </li>
 <li><a href="/about/drc_ref_global.xml#bbox_width">bbox_width</a> </li>
-<li><a href="/about/drc_ref_global.xml#case">case</a> </li>
 <li><a href="/about/drc_ref_global.xml#corners">corners</a> </li>
 <li><a href="/about/drc_ref_global.xml#covering">covering</a> </li>
 <li><a href="/about/drc_ref_global.xml#enc">enc</a> </li>
@@ -71,6 +70,7 @@ The following global functions are relevant for the DRC expressions:
 <li><a href="/about/drc_ref_global.xml#smoothed">smoothed</a> </li>
 <li><a href="/about/drc_ref_global.xml#space">space</a> </li>
 <li><a href="/about/drc_ref_global.xml#squares">squares</a> </li>
+<li><a href="/about/drc_ref_global.xml#switch">switch</a> </li>
 <li><a href="/about/drc_ref_global.xml#width">width</a> </li>
 <li><a href="/about/drc_ref_global.xml#with_holes">with_holes</a> </li>
 </ul>

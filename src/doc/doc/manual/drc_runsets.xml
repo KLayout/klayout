@@ -396,7 +396,8 @@ output(w, "width violations")</pre>
       <a href="/about/drc_ref_layer.xml#separation">separation (sep)</a>,
       <a href="/about/drc_ref_layer.xml#notch">notch</a>,
       <a href="/about/drc_ref_layer.xml#isolated">isolated (iso)</a>,
-      <a href="/about/drc_ref_layer.xml#enclosure">enclosure (enc)</a>,
+      <a href="/about/drc_ref_layer.xml#enclosing">enclosing (enc)</a>,
+      <a href="/about/drc_ref_layer.xml#enclosed">enclosed</a>,
       <a href="/about/drc_ref_layer.xml#overlap">overlap</a>
     </li>
     <li>Universal DRC (see below):<br/>
@@ -427,7 +428,7 @@ output(w, "width violations")</pre>
       <a href="/about/drc_ref_layer.xml#overlapping">overlapping</a><br/>
       <a href="/about/drc_ref_layer.xml#pull_inside">pull_inside</a>,
       <a href="/about/drc_ref_layer.xml#pull_interacting">pull_interacting</a>,
-      <a href="/about/drc_ref_layer.xml#pull_outside">pull_outside</a>,
+      <a href="/about/drc_ref_layer.xml#pull_outside">pull_overlapping</a>,
       These methods are available as in-place operations as well:<br/>
       <a href="/about/drc_ref_layer.xml#select_covering">select_covering</a>,
       <a href="/about/drc_ref_layer.xml#select_interacting">select_interacting</a>,
@@ -608,10 +609,10 @@ output(w, "width violations")</pre>
   <ul>
     <li>Boolean AND with a polygon layer: will select those texts
         which are inside or at the border of a polygon.
-        <a href="/about/drc_ref_layer.xml#interact">interact</a> is a synonym for this operation.</li>
+        <a href="/about/drc_ref_layer.xml#interacting">interact</a> is a synonym for this operation.</li>
     <li>Boolean NOT with a polygon layer: will select those texts
         which are outside of any polygon.
-        <a href="/about/drc_ref_layer.xml#not_interact">not_interact</a> is a synonym for this operation.</li>
+        <a href="/about/drc_ref_layer.xml#not_interacting">not_interact</a> is a synonym for this operation.</li>
     <li>As second layer for region interact: this way, polygons
         can be selected which are tagged with certain texts.</li>
     <li>Text filtering by string: texts can be filtered either
@@ -737,7 +738,8 @@ overlaps = layer.size(0.2).raw.merged(2)</pre>
   <a href="/about/drc_ref_layer.xml#separation">separation (sep)</a>,
   <a href="/about/drc_ref_layer.xml#notch">notch</a>,
   <a href="/about/drc_ref_layer.xml#isolated">isolated (iso)</a>,
-  <a href="/about/drc_ref_layer.xml#enclosure">enclosure (enc)</a> or
+  <a href="/about/drc_ref_layer.xml#enclosing">enclosing (enc)</a> or
+  <a href="/about/drc_ref_layer.xml#enclosed">enclosed</a> or
   <a href="/about/drc_ref_layer.xml#overlap">overlap</a>.
   Shielding is turned off using the "transparent" option or turned on using "shielded". The latter
   is only for clarity, but is not required as shielding is enabled by default.
@@ -833,7 +835,7 @@ overlaps = layer.size(0.2).raw.merged(2)</pre>
   </ul>
 
   <p>
-  "measurement" is "width", "notch", "isolated" ("iso"), "separation" ("sep"), "overlap" or "enclosure" ("enc").
+  "measurement" is "width", "notch", "isolated" ("iso"), "separation" ("sep"), "overlap", "enclosed" or "enclosuring" ("enc").
   The last three checks are two-layer checks which require a second layer. The 
   second layer is specified together with the measurement like this:
   </p>

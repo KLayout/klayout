@@ -302,7 +302,7 @@ module DRC
     # A high \count to hier_count (flat to hierarchical) ratio is an indication
     # of a good hierarchical compression.
     # "hier_count" applies only to original layers without clip regions or
-    # cell filters and to layers in \deep mode. Otherwise, hier_count gives 
+    # cell filters and to layers in \global#deep mode. Otherwise, hier_count gives 
     # the same value than \count.
 
     def hier_count
@@ -1567,7 +1567,7 @@ CODE
     # objects. RBA::Region, RBA::Edges and RBA::EdgePair objects are accepted as well and the corresponding 
     # content of that collections is inserted into the output layer.
     #
-    # Other versions are available that allow translation of objects into other types (\collect_to_polygons, 
+    # Other versions are available that allow translation of objects into other types (\collect_to_region, 
     # \collect_to_edges and \collect_to_edge_pairs).
     #
     # Because this method executes inside the interpreter, it's inherently slow. Tiling does not
@@ -1645,7 +1645,7 @@ CODE
     # Returns the parts of the polygons which are not orientable (i.e. "8" configuration) or self-overlapping.
     # Merged semantics does not apply for this method. Always the raw polygons are taken (see \raw).
     #
-    # The odd_polygons check is not available in deep mode currently. See \deep_reject_odd_polygons for
+    # The odd_polygons check is not available in deep mode currently. See \global#deep_reject_odd_polygons for
     # an alternative.
     
     def odd_polygons

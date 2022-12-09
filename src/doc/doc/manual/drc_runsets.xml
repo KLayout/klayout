@@ -428,7 +428,7 @@ output(w, "width violations")</pre>
       <a href="/about/drc_ref_layer.xml#overlapping">overlapping</a><br/>
       <a href="/about/drc_ref_layer.xml#pull_inside">pull_inside</a>,
       <a href="/about/drc_ref_layer.xml#pull_interacting">pull_interacting</a>,
-      <a href="/about/drc_ref_layer.xml#pull_outside">pull_overlapping</a>,
+      <a href="/about/drc_ref_layer.xml#pull_overlapping">pull_overlapping</a>,
       These methods are available as in-place operations as well:<br/>
       <a href="/about/drc_ref_layer.xml#select_covering">select_covering</a>,
       <a href="/about/drc_ref_layer.xml#select_interacting">select_interacting</a>,

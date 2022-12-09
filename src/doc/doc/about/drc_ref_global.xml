@@ -16,7 +16,7 @@
 </ul>
 <p>
 "angle" represents the edge orientation filter on the primary shape edges in
-<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_global.xml#angle">angle</a> for more details). In this context,
+<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#angle">DRC#angle</a> for more details). In this context,
 the operation acts similar to <a href="/about/drc_ref_layer.xml#with_angle">Layer#with_angle</a>.
 </p>
 <a name="antenna_check"/><h2>"antenna_check" - Performs an antenna check</h2>
@@ -41,7 +41,7 @@ is equivalent to "layer.area" (see <a href="/about/drc_ref_layer.xml#area">Layer
 polygons in the layer. 
 </p><p>
 Without a layer argument, "area" represents an area filter for primary shapes in 
-<a href="/about/drc_ref_global.xml">global</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_global.xml#area">area</a> for more details).
+<a href="/about/drc_ref_global.xml">global</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#area">DRC#area</a> for more details).
 </p>
 <a name="area_ratio"/><h2>"area_ratio" - Selects primary shapes based on the ratio of bounding box and polygon area</h2>
 <keyword name="area_ratio"/>
@@ -50,7 +50,7 @@ Without a layer argument, "area" represents an area filter for primary shapes in
 <li><tt>area_ratio (in condition)</tt></li>
 </ul>
 <p>
-See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#area_ratio">area_ratio</a> and <a href="/about/drc_ref_global.xml#area_ratio">area_ratio</a> for more details.
+See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#area_ratio">area_ratio</a> and <a href="/about/drc_ref_drc.xml#area_ratio">DRC#area_ratio</a> for more details.
 </p>
 <a name="bbox_aspect_ratio"/><h2>"bbox_aspect_ratio" - Selects primary shapes based on the aspect ratio of their bounding boxes</h2>
 <keyword name="bbox_aspect_ratio"/>
@@ -59,7 +59,7 @@ See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#area_ratio">
 <li><tt>bbox_aspect_ratio (in condition)</tt></li>
 </ul>
 <p>
-See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#bbox_aspect_ratio">bbox_aspect_ratio</a> and <a href="/about/drc_ref_global.xml#bbox_aspect_ratio">bbox_aspect_ratio</a> for more details.
+See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#bbox_aspect_ratio">bbox_aspect_ratio</a> and <a href="/about/drc_ref_drc.xml#bbox_aspect_ratio">DRC#bbox_aspect_ratio</a> for more details.
 </p>
 <a name="bbox_height"/><h2>"bbox_height" - Selects primary shapes based on their bounding box height</h2>
 <keyword name="bbox_height"/>
@@ -73,7 +73,7 @@ bounding box height satisfies the condition. Conditions may be written as arithm
 against numeric values. For example, "bbox_height &lt; 2.0" will select all primary shapes whose
 bounding box height is less than 2 micrometers. See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> for more details about comparison 
 specs. Plain "bbox_min" is equivalent to "primary.bbox_min" - i.e. it is used on the primary
-shape. Also see <a href="/about/drc_ref_global.xml#bbox_min">bbox_min</a>.
+shape. Also see <a href="/about/drc_ref_drc.xml#bbox_min">DRC#bbox_min</a>.
 </p>
 <a name="bbox_max"/><h2>"bbox_max" - Selects primary shapes based on their bounding box height or width, whichever is larger</h2>
 <keyword name="bbox_max"/>
@@ -82,7 +82,7 @@ shape. Also see <a href="/about/drc_ref_global.xml#bbox_min">bbox_min</a>.
 <li><tt>bbox_max (in condition)</tt></li>
 </ul>
 <p>
-See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#bbox_max">bbox_max</a> and <a href="/about/drc_ref_global.xml#bbox_max">bbox_max</a> for more details.
+See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#bbox_max">bbox_max</a> and <a href="/about/drc_ref_drc.xml#bbox_max">DRC#bbox_max</a> for more details.
 </p>
 <a name="bbox_min"/><h2>"bbox_min" - Selects primary shapes based on their bounding box height or width, whichever is smaller</h2>
 <keyword name="bbox_min"/>
@@ -91,7 +91,7 @@ See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#bbox_max">bb
 <li><tt>bbox_max (in condition)</tt></li>
 </ul>
 <p>
-See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#bbox_min">bbox_min</a> and <a href="/about/drc_ref_global.xml#bbox_min">bbox_min</a> for more details.
+See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#bbox_min">bbox_min</a> and <a href="/about/drc_ref_drc.xml#bbox_min">DRC#bbox_min</a> for more details.
 </p>
 <a name="bbox_width"/><h2>"bbox_width" - Selects primary shapes based on their bounding box width</h2>
 <keyword name="bbox_width"/>
@@ -100,7 +100,7 @@ See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#bbox_min">bb
 <li><tt>bbox_max (in condition)</tt></li>
 </ul>
 <p>
-See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#bbox_height">bbox_height</a> and <a href="/about/drc_ref_global.xml#bbox_height">bbox_height</a> for more details.
+See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#bbox_height">bbox_height</a> and <a href="/about/drc_ref_drc.xml#bbox_height">DRC#bbox_height</a> for more details.
 </p>
 <a name="bjt3"/><h2>"bjt3" - Supplies the BJT3 transistor extractor class</h2>
 <keyword name="bjt3"/>
@@ -1049,7 +1049,7 @@ For further methods on the source object see <a href="/about/drc_ref_source.xml"
 This function can be used with a layer argument. In this case it
 is equivalent to "layer.length" (see <a href="/about/drc_ref_layer.xml#length">Layer#length</a>). Without a layer
 argument, "length" represents the edge length filter on the primary shape edges in 
-<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_global.xml#length">length</a> for more details). In this context,
+<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#length">DRC#length</a> for more details). In this context,
 the operation acts similar to <a href="/about/drc_ref_layer.xml#with_length">Layer#with_length</a>.
 </p>
 <a name="log"/><h2>"log" - Outputs as message to the logger window</h2>
@@ -1370,7 +1370,7 @@ is equivalent to "layer.perimeter" (see <a href="/about/drc_ref_layer.xml#perime
 total perimeter of all polygons in the layer.
 </p><p>
 Without a layer argument, "perimeter" represents a perimeter filter for primary shapes in 
-<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_global.xml#perimeter">perimeter</a> for more details).
+<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#perimeter">DRC#perimeter</a> for more details).
 </p>
 <a name="polygon"/><h2>"polygon" - Creates a polygon object</h2>
 <keyword name="polygon"/>
@@ -1486,7 +1486,7 @@ To remove this condition, call "region_touch" without any arguments.
 <li><tt>relative_height (in condition)</tt></li>
 </ul>
 <p>
-See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#relative_height">relative_height</a> and <a href="/about/drc_ref_global.xml#relative_height">relative_height</a> for more details.
+See <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>, <a href="#relative_height">relative_height</a> and <a href="/about/drc_ref_drc.xml#relative_height">DRC#relative_height</a> for more details.
 </p>
 <a name="report"/><h2>"report" - Specifies a report database for output</h2>
 <keyword name="report"/>

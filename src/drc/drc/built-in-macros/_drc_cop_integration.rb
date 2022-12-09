@@ -129,11 +129,11 @@ module DRC
     # methods are provided:
     #
     # @ul
-    # @li "\global#polygons": converts edge pairs to polygons @/li
-    # @li "\global#extended", "\global#extended_in", "\global#extended_out": converts edges to polygons @/li
-    # @li "\global#first_edges", \global#second_edges": extracts edges from edge pairs @/li
-    # @li "\global#edges": decomposes edge pairs and polygons into edges @/li
-    # @li "\global#corners": can extract corners from polygons @/li
+    # @li "\DRC#polygons": converts edge pairs to polygons @/li
+    # @li "\DRC#extended", "\DRC#extended_in", "\DRC#extended_out": converts edges to polygons @/li
+    # @li "\DRC#first_edges", \DRC#second_edges": extracts edges from edge pairs @/li
+    # @li "\DRC#edges": decomposes edge pairs and polygons into edges @/li
+    # @li "\DRC#corners": can extract corners from polygons @/li
     # @/ul
     #
     # The following example decomposes the primary polygons into edges:
@@ -174,8 +174,8 @@ module DRC
     #
     # @ul
     # @li Edge vs. edge and edge vs. polygon booleans @/li
-    # @li Edge vs. polygon interactions ("\global#interacting", "\global#overlapping") @/li
-    # @li Edge sampling ("\global#start_segments", "\global#centers", "\global#end_segments") @/li
+    # @li Edge vs. polygon interactions ("\DRC#interacting", "\DRC#overlapping") @/li
+    # @li Edge sampling ("\DRC#start_segments", "\DRC#centers", "\DRC#end_segments") @/li
     # @/ul
     #
     # @h3 Filters @/h3
@@ -183,14 +183,14 @@ module DRC
     # Filter operators select input polygons or edges based on their properties. These filters are provided:
     #
     # @ul
-    # @li "\global#area": selects polygons based on their area @/li
-    # @li "\global#perimeter": selects polygons based on their perimeter @/li
-    # @li "\global#area_ratio": selects polygons based on their bounding box to polygon area ratio @/li
-    # @li "\global#bbox_aspect_ratio": selects polygons based on their bounding box aspect ratio @/li
-    # @li "\global#relative_height": selects polygons based on their relative height @/li
-    # @li "\global#bbox_min", "\global#bbox_max", "\global#bbox_width", "\global#bbox_height": selects polygons based on their bounding box properties @/li
-    # @li "\global#length": selects edges based on their length @/li
-    # @li "\global#angle": selects edges based on their orientation @/li
+    # @li "\DRC#area": selects polygons based on their area @/li
+    # @li "\DRC#perimeter": selects polygons based on their perimeter @/li
+    # @li "\DRC#area_ratio": selects polygons based on their bounding box to polygon area ratio @/li
+    # @li "\DRC#bbox_aspect_ratio": selects polygons based on their bounding box aspect ratio @/li
+    # @li "\DRC#relative_height": selects polygons based on their relative height @/li
+    # @li "\DRC#bbox_min", "\DRC#bbox_max", "\DRC#bbox_width", "\DRC#bbox_height": selects polygons based on their bounding box properties @/li
+    # @li "\DRC#length": selects edges based on their length @/li
+    # @li "\DRC#angle": selects edges based on their orientation @/li
     # @/ul
     # 
     # For example, to select polygons with an area larger than one square micrometer, use:
@@ -214,7 +214,7 @@ module DRC
     # use the respective dimension for filtering the polygon.
     #
     # Note that it's basically possible to use the polygon filters on any input - computed and secondaries.
-    # In fact, plain "area" for example is a shortcut for "\global#primary.area" indicating that
+    # In fact, plain "area" for example is a shortcut for "\DRC#primary.area" indicating that
     # the area of primary shapes are supposed to be computed.
     # However, any input other than the primary is not necessarily complete or it may 
     # consist of multiple polygons. Hence the computed values may be too big or too small.
@@ -230,9 +230,9 @@ module DRC
     # The predicates available currently are:
     #
     # @ul
-    # @li "\global#rectangles": Filters rectangles @/li
-    # @li "\global#squares": Filters squares @/li
-    # @li "\global#rectilinear": Filters rectilinear ("Manhattan") polygons @/li
+    # @li "\DRC#rectangles": Filters rectangles @/li
+    # @li "\DRC#squares": Filters squares @/li
+    # @li "\DRC#rectilinear": Filters rectilinear ("Manhattan") polygons @/li
     # @/ul
     #
     # For the same reason as explained above, it's recommended to use these predicates
@@ -324,7 +324,7 @@ module DRC
     # out = l1.drc((primary & secondary(l2)).area > 1.0)
     # @/code
     #
-    # The "\global#secondary" operator indicates that "l2" is to be used as secondary input to the "drc" function. Only
+    # The "\DRC#secondary" operator indicates that "l2" is to be used as secondary input to the "drc" function. Only
     # in this form, the operators of the boolean AND can be reversed:
     # 
     # @code
@@ -340,7 +340,7 @@ module DRC
     # Obviously the primary is a simple one: it consists of a single shape, because
     # this is how the loop operates. Derived shape sets however can be more complex.
     # "Quantifiers" allow assessing properties of the complete, per-primary shape
-    # set. A simple one is "\global#count" which checks if the number of shapes within
+    # set. A simple one is "\DRC#count" which checks if the number of shapes within
     # a shape set is within a given range.
     #
     # Obviously, "primary.count == 1" is always true. So using "count" primaries isn't
@@ -596,49 +596,49 @@ CODE
     # against numeric values. For example, "bbox_height < 2.0" will select all primary shapes whose
     # bounding box height is less than 2 micrometers. See \Layer#drc for more details about comparison 
     # specs. Plain "bbox_min" is equivalent to "primary.bbox_min" - i.e. it is used on the primary
-    # shape. Also see \global#bbox_min.
+    # shape. Also see \DRC#bbox_min.
     
     # %DRC%
     # @name bbox_width
     # @brief Selects primary shapes based on their bounding box width
     # @synopsis bbox_max (in condition)
     #
-    # See \Layer#drc, \bbox_height and \global#bbox_height for more details.
+    # See \Layer#drc, \bbox_height and \DRC#bbox_height for more details.
     
     # %DRC%
     # @name bbox_max
     # @brief Selects primary shapes based on their bounding box height or width, whichever is larger
     # @synopsis bbox_max (in condition)
     #
-    # See \Layer#drc, \bbox_max and \global#bbox_max for more details.
+    # See \Layer#drc, \bbox_max and \DRC#bbox_max for more details.
     
     # %DRC%
     # @name bbox_min
     # @brief Selects primary shapes based on their bounding box height or width, whichever is smaller
     # @synopsis bbox_max (in condition)
     #
-    # See \Layer#drc, \bbox_min and \global#bbox_min for more details.
+    # See \Layer#drc, \bbox_min and \DRC#bbox_min for more details.
     
     # %DRC%
     # @name bbox_aspect_ratio
     # @brief Selects primary shapes based on the aspect ratio of their bounding boxes
     # @synopsis bbox_aspect_ratio (in condition)
     #
-    # See \Layer#drc, \bbox_aspect_ratio and \global#bbox_aspect_ratio for more details.
+    # See \Layer#drc, \bbox_aspect_ratio and \DRC#bbox_aspect_ratio for more details.
     
     # %DRC%
     # @name relative_height
     # @brief Selects primary shapes based on the ratio of height and width of their bounding boxes
     # @synopsis relative_height (in condition)
     #
-    # See \Layer#drc, \relative_height and \global#relative_height for more details.
+    # See \Layer#drc, \relative_height and \DRC#relative_height for more details.
     
     # %DRC%
     # @name area_ratio
     # @brief Selects primary shapes based on the ratio of bounding box and polygon area
     # @synopsis area_ratio (in condition)
     #
-    # See \Layer#drc, \area_ratio and \global#area_ratio for more details.
+    # See \Layer#drc, \area_ratio and \DRC#area_ratio for more details.
     
     %w(
       bbox_height
@@ -669,7 +669,7 @@ CODE
     # polygons in the layer. 
     #
     # Without a layer argument, "area" represents an area filter for primary shapes in 
-    # \global# expressions (see \Layer#drc and \global#area for more details).
+    # \global# expressions (see \Layer#drc and \DRC#area for more details).
     
     # %DRC%
     # @name hulls
@@ -704,7 +704,7 @@ CODE
     # total perimeter of all polygons in the layer.
     #
     # Without a layer argument, "perimeter" represents a perimeter filter for primary shapes in 
-    # \DRC# expressions (see \Layer#drc and \global#perimeter for more details).
+    # \DRC# expressions (see \Layer#drc and \DRC#perimeter for more details).
 
     # %DRC%
     # @name rectangles
@@ -748,7 +748,7 @@ CODE
     # This function can be used with a layer argument. In this case it
     # is equivalent to "layer.length" (see \Layer#length). Without a layer
     # argument, "length" represents the edge length filter on the primary shape edges in 
-    # \DRC# expressions (see \Layer#drc and \global#length for more details). In this context,
+    # \DRC# expressions (see \Layer#drc and \DRC#length for more details). In this context,
     # the operation acts similar to \Layer#with_length.
 
     # %DRC%
@@ -757,7 +757,7 @@ CODE
     # @synopsis angle (in condition)
     #
     # "angle" represents the edge orientation filter on the primary shape edges in
-    # \DRC# expressions (see \Layer#drc and \global#angle for more details). In this context,
+    # \DRC# expressions (see \Layer#drc and \DRC#angle for more details). In this context,
     # the operation acts similar to \Layer#with_angle.
 
     %w(

@@ -461,11 +461,11 @@ For the conversion of edges, edge pairs and polygons into other types, these
 methods are provided:
 </p><p>
 <ul>
-<li>"<a href="/about/drc_ref_global.xml#polygons">polygons</a>": converts edge pairs to polygons </li>
-<li>"<a href="/about/drc_ref_global.xml#extended">extended</a>", "<a href="/about/drc_ref_global.xml#extended_in">extended_in</a>", "<a href="/about/drc_ref_global.xml#extended_out">extended_out</a>": converts edges to polygons </li>
-<li>"<a href="/about/drc_ref_global.xml#first_edges">first_edges</a>", <a href="/about/drc_ref_global.xml#second_edges">second_edges</a>": extracts edges from edge pairs </li>
-<li>"<a href="/about/drc_ref_global.xml#edges">edges</a>": decomposes edge pairs and polygons into edges </li>
-<li>"<a href="/about/drc_ref_global.xml#corners">corners</a>": can extract corners from polygons </li>
+<li>"<a href="/about/drc_ref_drc.xml#polygons">DRC#polygons</a>": converts edge pairs to polygons </li>
+<li>"<a href="/about/drc_ref_drc.xml#extended">DRC#extended</a>", "<a href="/about/drc_ref_drc.xml#extended_in">DRC#extended_in</a>", "<a href="/about/drc_ref_drc.xml#extended_out">DRC#extended_out</a>": converts edges to polygons </li>
+<li>"<a href="/about/drc_ref_drc.xml#first_edges">DRC#first_edges</a>", <a href="/about/drc_ref_drc.xml#second_edges">DRC#second_edges</a>": extracts edges from edge pairs </li>
+<li>"<a href="/about/drc_ref_drc.xml#edges">DRC#edges</a>": decomposes edge pairs and polygons into edges </li>
+<li>"<a href="/about/drc_ref_drc.xml#corners">DRC#corners</a>": can extract corners from polygons </li>
 </ul>
 </p><p>
 The following example decomposes the primary polygons into edges:
@@ -506,8 +506,8 @@ The "drc" framework supports the following edge and edge/polygon operations:
 </p><p>
 <ul>
 <li>Edge vs. edge and edge vs. polygon booleans </li>
-<li>Edge vs. polygon interactions ("<a href="/about/drc_ref_global.xml#interacting">interacting</a>", "<a href="/about/drc_ref_global.xml#overlapping">overlapping</a>") </li>
-<li>Edge sampling ("<a href="/about/drc_ref_global.xml#start_segments">start_segments</a>", "<a href="/about/drc_ref_global.xml#centers">centers</a>", "<a href="/about/drc_ref_global.xml#end_segments">end_segments</a>") </li>
+<li>Edge vs. polygon interactions ("<a href="/about/drc_ref_drc.xml#interacting">DRC#interacting</a>", "<a href="/about/drc_ref_drc.xml#overlapping">DRC#overlapping</a>") </li>
+<li>Edge sampling ("<a href="/about/drc_ref_drc.xml#start_segments">DRC#start_segments</a>", "<a href="/about/drc_ref_drc.xml#centers">DRC#centers</a>", "<a href="/about/drc_ref_drc.xml#end_segments">DRC#end_segments</a>") </li>
 </ul>
 </p><p>
 <h3>Filters </h3>
@@ -515,14 +515,14 @@ The "drc" framework supports the following edge and edge/polygon operations:
 Filter operators select input polygons or edges based on their properties. These filters are provided:
 </p><p>
 <ul>
-<li>"<a href="/about/drc_ref_global.xml#area">area</a>": selects polygons based on their area </li>
-<li>"<a href="/about/drc_ref_global.xml#perimeter">perimeter</a>": selects polygons based on their perimeter </li>
-<li>"<a href="/about/drc_ref_global.xml#area_ratio">area_ratio</a>": selects polygons based on their bounding box to polygon area ratio </li>
-<li>"<a href="/about/drc_ref_global.xml#bbox_aspect_ratio">bbox_aspect_ratio</a>": selects polygons based on their bounding box aspect ratio </li>
-<li>"<a href="/about/drc_ref_global.xml#relative_height">relative_height</a>": selects polygons based on their relative height </li>
-<li>"<a href="/about/drc_ref_global.xml#bbox_min">bbox_min</a>", "<a href="/about/drc_ref_global.xml#bbox_max">bbox_max</a>", "<a href="/about/drc_ref_global.xml#bbox_width">bbox_width</a>", "<a href="/about/drc_ref_global.xml#bbox_height">bbox_height</a>": selects polygons based on their bounding box properties </li>
-<li>"<a href="/about/drc_ref_global.xml#length">length</a>": selects edges based on their length </li>
-<li>"<a href="/about/drc_ref_global.xml#angle">angle</a>": selects edges based on their orientation </li>
+<li>"<a href="/about/drc_ref_drc.xml#area">DRC#area</a>": selects polygons based on their area </li>
+<li>"<a href="/about/drc_ref_drc.xml#perimeter">DRC#perimeter</a>": selects polygons based on their perimeter </li>
+<li>"<a href="/about/drc_ref_drc.xml#area_ratio">DRC#area_ratio</a>": selects polygons based on their bounding box to polygon area ratio </li>
+<li>"<a href="/about/drc_ref_drc.xml#bbox_aspect_ratio">DRC#bbox_aspect_ratio</a>": selects polygons based on their bounding box aspect ratio </li>
+<li>"<a href="/about/drc_ref_drc.xml#relative_height">DRC#relative_height</a>": selects polygons based on their relative height </li>
+<li>"<a href="/about/drc_ref_drc.xml#bbox_min">DRC#bbox_min</a>", "<a href="/about/drc_ref_drc.xml#bbox_max">DRC#bbox_max</a>", "<a href="/about/drc_ref_drc.xml#bbox_width">DRC#bbox_width</a>", "<a href="/about/drc_ref_drc.xml#bbox_height">DRC#bbox_height</a>": selects polygons based on their bounding box properties </li>
+<li>"<a href="/about/drc_ref_drc.xml#length">DRC#length</a>": selects edges based on their length </li>
+<li>"<a href="/about/drc_ref_drc.xml#angle">DRC#angle</a>": selects edges based on their orientation </li>
 </ul>
 </p><p>
 For example, to select polygons with an area larger than one square micrometer, use:
@@ -546,7 +546,7 @@ In the same fashion, "perimeter" applies to the perimeter of the polygon.
 use the respective dimension for filtering the polygon.
 </p><p>
 Note that it's basically possible to use the polygon filters on any input - computed and secondaries.
-In fact, plain "area" for example is a shortcut for "<a href="/about/drc_ref_global.xml#primary">primary</a>.area" indicating that
+In fact, plain "area" for example is a shortcut for "<a href="/about/drc_ref_drc.xml#primary">DRC#primary</a>.area" indicating that
 the area of primary shapes are supposed to be computed.
 However, any input other than the primary is not necessarily complete or it may 
 consist of multiple polygons. Hence the computed values may be too big or too small.
@@ -562,9 +562,9 @@ passes the polygons if the condition is met.
 The predicates available currently are:
 </p><p>
 <ul>
-<li>"<a href="/about/drc_ref_global.xml#rectangles">rectangles</a>": Filters rectangles </li>
-<li>"<a href="/about/drc_ref_global.xml#squares">squares</a>": Filters squares </li>
-<li>"<a href="/about/drc_ref_global.xml#rectilinear">rectilinear</a>": Filters rectilinear ("Manhattan") polygons </li>
+<li>"<a href="/about/drc_ref_drc.xml#rectangles">DRC#rectangles</a>": Filters rectangles </li>
+<li>"<a href="/about/drc_ref_drc.xml#squares">DRC#squares</a>": Filters squares </li>
+<li>"<a href="/about/drc_ref_drc.xml#rectilinear">DRC#rectilinear</a>": Filters rectilinear ("Manhattan") polygons </li>
 </ul>
 </p><p>
 For the same reason as explained above, it's recommended to use these predicates
@@ -656,7 +656,7 @@ Note that the precise form of the example above is
 out = l1.drc((primary &amp; secondary(l2)).area &gt; 1.0)
 </pre>
 </p><p>
-The "<a href="/about/drc_ref_global.xml#secondary">secondary</a>" operator indicates that "l2" is to be used as secondary input to the "drc" function. Only
+The "<a href="/about/drc_ref_drc.xml#secondary">DRC#secondary</a>" operator indicates that "l2" is to be used as secondary input to the "drc" function. Only
 in this form, the operators of the boolean AND can be reversed:
 </p><p>
 <pre>
@@ -672,7 +672,7 @@ from the primary, it's neighborhood (secondaries) or from deriving shape sets.
 Obviously the primary is a simple one: it consists of a single shape, because
 this is how the loop operates. Derived shape sets however can be more complex.
 "Quantifiers" allow assessing properties of the complete, per-primary shape
-set. A simple one is "<a href="/about/drc_ref_global.xml#count">count</a>" which checks if the number of shapes within
+set. A simple one is "<a href="/about/drc_ref_drc.xml#count">DRC#count</a>" which checks if the number of shapes within
 a shape set is within a given range.
 </p><p>
 Obviously, "primary.count == 1" is always true. So using "count" primaries isn't

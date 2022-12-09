@@ -8,8 +8,8 @@
 <title>DRC Reference: Global Functions</title>
 <keyword name="global"/>
 <h2-index/>
-<a name="angle (in condition)"/><h2>"angle (in condition)" - In universal DRC context: selects edges based on their orientation</h2>
-<keyword name="angle (in condition)"/>
+<a name="angle"/><h2>"angle" - In universal DRC context: selects edges based on their orientation</h2>
+<keyword name="angle"/>
 <p>Usage:</p>
 <ul>
 <li><tt>angle (in condition)</tt></li>
@@ -1038,8 +1038,8 @@ l2 = layout("second_layout.gds")
 </p><p>
 For further methods on the source object see <a href="/about/drc_ref_source.xml">Source</a>.
 </p>
-<a name="length (in condition)"/><h2>"length (in condition)" - Computes the total edge length of an edge layer or in universal DRC context: selects edges based on a length condition</h2>
-<keyword name="length (in condition)"/>
+<a name="length"/><h2>"length" - Computes the total edge length of an edge layer or in universal DRC context: selects edges based on a length condition</h2>
+<keyword name="length"/>
 <p>Usage:</p>
 <ul>
 <li><tt>length (in condition)</tt></li>
@@ -1913,9 +1913,9 @@ The tile border specifies the distance to which shapes are collected into the
 tile. In order words, when processing a tile, shapes within the border distance
 participate in the operations.
 </p><p>
-For some operations such as booleans (<a href="#and">and</a>, <a href="#or">or</a>, ...), <a href="#size">size</a> and the DRC functions (<a href="#width">width</a>, <a href="#space">space</a>, ...)
-a tile border is automatically established. For other operations such as <a href="#with_area">with_area</a>
-or <a href="#edges">edges</a>, the exact distance is unknown, because such operations may have a long range.
+For some operations such as booleans (<a href="/about/drc_ref_layer.xml#and">Layer#and</a>, <a href="/about/drc_ref_layer.xml#or">Layer#or</a>, ...), <a href="/about/drc_ref_layer.xml#size">Layer#size</a> and the DRC functions (<a href="/about/drc_ref_layer.xml#width">Layer#width</a>, <a href="/about/drc_ref_layer.xml#space">Layer#space</a>, ...)
+a tile border is automatically established. For other operations such as <a href="/about/drc_ref_layer.xml#with_area">Layer#with_area</a>
+or <a href="/about/drc_ref_layer.xml#edges">Layer#edges</a>, the exact distance is unknown, because such operations may have a long range.
 In that cases, no border is used. The tile_borders function may be used to specify a minimum border
 which is used in that case. That allows taking into account at least shapes within the 
 given range, although not necessarily all.

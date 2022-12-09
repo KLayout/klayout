@@ -12,6 +12,10 @@ class EmptyClass:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> EmptyClass:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -113,6 +117,10 @@ class Value:
         This constructor has been introduced in version 0.22.
         """
     def __copy__(self) -> Value:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Value:
         r"""
         @brief Creates a copy of self
         """
@@ -402,6 +410,10 @@ class ArgType:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> ArgType:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, arg0: object) -> bool:
         r"""
         @brief Equality of two types
@@ -568,6 +580,10 @@ class MethodOverload:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> MethodOverload:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -672,6 +688,10 @@ class Method:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> Method:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Method:
         r"""
         @brief Creates a copy of self
         """
@@ -1012,6 +1032,10 @@ class Logger:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> Logger:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -1116,6 +1140,10 @@ class Timer:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> Timer:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Timer:
         r"""
         @brief Creates a copy of self
         """
@@ -1336,6 +1364,10 @@ class AbstractProgress(Progress):
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> AbstractProgress:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self, desc: str) -> None:
         r"""
         @brief Creates an abstract progress reporter with the given description
@@ -1443,6 +1475,10 @@ class RelativeProgress(Progress):
         The yield interval specifies, how often the event loop will be triggered. When the yield interval is 10 for example, the event loop will be executed every tenth call of \inc or \set.
         """
     def __copy__(self) -> RelativeProgress:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> RelativeProgress:
         r"""
         @brief Creates a copy of self
         """
@@ -1600,6 +1636,10 @@ class AbsoluteProgress(Progress):
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> AbsoluteProgress:
+        r"""
+        @brief Creates a copy of self
+        """
     @overload
     def __init__(self, desc: str) -> None:
         r"""
@@ -1688,6 +1728,10 @@ class ExpressionContext:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> ExpressionContext:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> ExpressionContext:
         r"""
         @brief Creates a copy of self
         """
@@ -1903,6 +1947,10 @@ class GlobPattern:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> GlobPattern:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self, pattern: str) -> None:
         r"""
         @brief Creates a new glob pattern match object
@@ -1992,6 +2040,10 @@ class ExecutableBase:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> ExecutableBase:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> ExecutableBase:
         r"""
         @brief Creates a copy of self
         """
@@ -2246,6 +2298,10 @@ class PythonGetterSetterPair:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> PythonGetterSetterPair:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -2337,6 +2393,10 @@ class PythonFunction:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> PythonFunction:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> PythonFunction:
         r"""
         @brief Creates a copy of self
         """

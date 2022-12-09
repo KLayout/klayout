@@ -94,11 +94,31 @@ class Box:
         """
     @overload
     @classmethod
+    def new(cls, arg0: int) -> Box:
+        r"""
+        @brief Creates a square with the given dimensions centered around the origin
+
+        Note that for integer-unit boxes, the dimension has to be an even number to avoid rounding.
+
+        This convenience constructor has been introduced in version 0.28.
+        """
+    @overload
+    @classmethod
     def new(cls, dbox: DBox) -> Box:
         r"""
         @brief Creates an integer coordinate box from a floating-point coordinate box
 
         This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dbox'.
+        """
+    @overload
+    @classmethod
+    def new(cls, arg0: int, arg1: int) -> Box:
+        r"""
+        @brief Creates a rectangle with given width and height, centered around the origin
+
+        Note that for integer-unit boxes, the dimensions have to be an even number to avoid rounding.
+
+        This convenience constructor has been introduced in version 0.28.
         """
     @overload
     @classmethod
@@ -182,6 +202,10 @@ class Box:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> Box:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, box: object) -> bool:
         r"""
         @brief Returns true if this box is equal to the other box
@@ -202,11 +226,29 @@ class Box:
         Empty boxes don't modify a box when joined with it. The intersection between an empty and any other box is also an empty box. The width, height, p1 and p2 attributes of an empty box are undefined. Use \empty? to get a value indicating whether the box is empty.
         """
     @overload
+    def __init__(self, arg0: int) -> None:
+        r"""
+        @brief Creates a square with the given dimensions centered around the origin
+
+        Note that for integer-unit boxes, the dimension has to be an even number to avoid rounding.
+
+        This convenience constructor has been introduced in version 0.28.
+        """
+    @overload
     def __init__(self, dbox: DBox) -> None:
         r"""
         @brief Creates an integer coordinate box from a floating-point coordinate box
 
         This constructor has been introduced in version 0.25 and replaces the previous static method 'from_dbox'.
+        """
+    @overload
+    def __init__(self, arg0: int, arg1: int) -> None:
+        r"""
+        @brief Creates a rectangle with given width and height, centered around the origin
+
+        Note that for integer-unit boxes, the dimensions have to be an even number to avoid rounding.
+
+        This convenience constructor has been introduced in version 0.28.
         """
     @overload
     def __init__(self, lower_left: Point, upper_right: Point) -> None:
@@ -413,6 +455,16 @@ class Box:
         An empty box may be created with the default constructor for example. Such a box is neutral when combining it with other boxes and renders empty boxes if used in box intersections and false in geometrical relationship tests. 
         """
     @overload
+    def enlarge(self, d: int) -> Box:
+        r"""
+        @brief Enlarges the box by a certain amount on all sides.
+
+        This is a convenience method which takes one values instead of two values. It will apply the given enlargement in both directions.
+        This method has been introduced in version 0.28.
+
+        @return A reference to this box.
+        """
+    @overload
     def enlarge(self, enlargement: Vector) -> Box:
         r"""
         @brief Enlarges the box by a certain amount.
@@ -437,10 +489,20 @@ class Box:
         @brief Enlarges the box by a certain amount.
 
 
-        This is a convenience method which takes two values instead of a Point object.
+        This is a convenience method which takes two values instead of a Vector object.
         This method has been introduced in version 0.23.
 
         @return A reference to this box.
+        """
+    @overload
+    def enlarged(self, d: int) -> Box:
+        r"""
+        @brief Enlarges the box by a certain amount on all sides.
+
+        This is a convenience method which takes one values instead of two values. It will apply the given enlargement in both directions.
+        This method has been introduced in version 0.28.
+
+        @return The enlarged box.
         """
     @overload
     def enlarged(self, enlargement: Vector) -> Box:
@@ -467,7 +529,7 @@ class Box:
         @brief Enlarges the box by a certain amount.
 
 
-        This is a convenience method which takes two values instead of a Point object.
+        This is a convenience method which takes two values instead of a Vector object.
         This method has been introduced in version 0.23.
 
         @return The enlarged box.
@@ -547,7 +609,7 @@ class Box:
         This is a convenience method which takes two values instead of a Point object.
         This method has been introduced in version 0.23.
 
-        @return The enlarged box.
+        @return The moved box.
         """
     def overlaps(self, box: Box) -> bool:
         r"""
@@ -715,11 +777,31 @@ class DBox:
         """
     @overload
     @classmethod
+    def new(cls, arg0: float) -> DBox:
+        r"""
+        @brief Creates a square with the given dimensions centered around the origin
+
+        Note that for integer-unit boxes, the dimension has to be an even number to avoid rounding.
+
+        This convenience constructor has been introduced in version 0.28.
+        """
+    @overload
+    @classmethod
     def new(cls, box: Box) -> DBox:
         r"""
         @brief Creates a floating-point coordinate box from an integer coordinate box
 
         This constructor has been introduced in version 0.25 and replaces the previous static method 'from_ibox'.
+        """
+    @overload
+    @classmethod
+    def new(cls, arg0: float, arg1: float) -> DBox:
+        r"""
+        @brief Creates a rectangle with given width and height, centered around the origin
+
+        Note that for integer-unit boxes, the dimensions have to be an even number to avoid rounding.
+
+        This convenience constructor has been introduced in version 0.28.
         """
     @overload
     @classmethod
@@ -803,6 +885,10 @@ class DBox:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> DBox:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, box: object) -> bool:
         r"""
         @brief Returns true if this box is equal to the other box
@@ -823,11 +909,29 @@ class DBox:
         Empty boxes don't modify a box when joined with it. The intersection between an empty and any other box is also an empty box. The width, height, p1 and p2 attributes of an empty box are undefined. Use \empty? to get a value indicating whether the box is empty.
         """
     @overload
+    def __init__(self, arg0: float) -> None:
+        r"""
+        @brief Creates a square with the given dimensions centered around the origin
+
+        Note that for integer-unit boxes, the dimension has to be an even number to avoid rounding.
+
+        This convenience constructor has been introduced in version 0.28.
+        """
+    @overload
     def __init__(self, box: Box) -> None:
         r"""
         @brief Creates a floating-point coordinate box from an integer coordinate box
 
         This constructor has been introduced in version 0.25 and replaces the previous static method 'from_ibox'.
+        """
+    @overload
+    def __init__(self, arg0: float, arg1: float) -> None:
+        r"""
+        @brief Creates a rectangle with given width and height, centered around the origin
+
+        Note that for integer-unit boxes, the dimensions have to be an even number to avoid rounding.
+
+        This convenience constructor has been introduced in version 0.28.
         """
     @overload
     def __init__(self, lower_left: DPoint, upper_right: DPoint) -> None:
@@ -1034,6 +1138,16 @@ class DBox:
         An empty box may be created with the default constructor for example. Such a box is neutral when combining it with other boxes and renders empty boxes if used in box intersections and false in geometrical relationship tests. 
         """
     @overload
+    def enlarge(self, d: float) -> DBox:
+        r"""
+        @brief Enlarges the box by a certain amount on all sides.
+
+        This is a convenience method which takes one values instead of two values. It will apply the given enlargement in both directions.
+        This method has been introduced in version 0.28.
+
+        @return A reference to this box.
+        """
+    @overload
     def enlarge(self, enlargement: DVector) -> DBox:
         r"""
         @brief Enlarges the box by a certain amount.
@@ -1058,10 +1172,20 @@ class DBox:
         @brief Enlarges the box by a certain amount.
 
 
-        This is a convenience method which takes two values instead of a Point object.
+        This is a convenience method which takes two values instead of a Vector object.
         This method has been introduced in version 0.23.
 
         @return A reference to this box.
+        """
+    @overload
+    def enlarged(self, d: float) -> DBox:
+        r"""
+        @brief Enlarges the box by a certain amount on all sides.
+
+        This is a convenience method which takes one values instead of two values. It will apply the given enlargement in both directions.
+        This method has been introduced in version 0.28.
+
+        @return The enlarged box.
         """
     @overload
     def enlarged(self, enlargement: DVector) -> DBox:
@@ -1088,7 +1212,7 @@ class DBox:
         @brief Enlarges the box by a certain amount.
 
 
-        This is a convenience method which takes two values instead of a Point object.
+        This is a convenience method which takes two values instead of a Vector object.
         This method has been introduced in version 0.23.
 
         @return The enlarged box.
@@ -1168,7 +1292,7 @@ class DBox:
         This is a convenience method which takes two values instead of a Point object.
         This method has been introduced in version 0.23.
 
-        @return The enlarged box.
+        @return The moved box.
         """
     def overlaps(self, box: DBox) -> bool:
         r"""
@@ -1315,6 +1439,14 @@ class Cell:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> Cell:
+        r"""
+        @brief Creates a copy of the cell
+
+        This method will create a copy of the cell. The new cell will be member of the same layout the original cell was member of. The copy will inherit all shapes and instances, but get a different cell_index and a modified name as duplicate cell names are not allowed in the same layout.
+
+        This method has been introduced in version 0.27.
+        """
+    def __deepcopy__(self) -> Cell:
         r"""
         @brief Creates a copy of the cell
 
@@ -2903,11 +3035,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'b' axis
+    @brief Sets the displacement vector for the 'b' axis in micrometer units
 
-    If the instance was not an array instance before it is made one.
+    Like \b= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
 
-    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
+    This method has been introduced in version 0.25.
     """
     cell: Cell
     r"""
@@ -2939,10 +3071,10 @@ class Instance:
     Getter:
     @brief Gets the basic \CellInstArray object associated with this instance reference.
     Setter:
-    @brief Changes the \CellInstArray object to the given one.
-    This method replaces the instance by the given CellInstArray object.
+    @brief Returns the basic cell instance array object by giving a micrometer unit object.
+    This method replaces the instance by the given CellInstArray object and it internally transformed into database units.
 
-    This method has been introduced in version 0.22
+    This method has been introduced in version 0.25
     """
     cplx_trans: ICplxTrans
     r"""
@@ -3081,9 +3213,10 @@ class Instance:
     @brief Gets the transformation of the instance or the first instance in the array
     The transformation returned is only valid if the array does not represent a complex transformation array
     Setter:
-    @brief Sets the transformation of the instance or the first instance in the array
+    @brief Sets the transformation of the instance or the first instance in the array (in micrometer units)
+    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
 
-    This method has been introduced in version 0.23.
+    This method has been introduced in version 0.25.
     """
     @classmethod
     def new(cls) -> Instance:
@@ -3091,6 +3224,10 @@ class Instance:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> Instance:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Instance:
         r"""
         @brief Creates a copy of self
         """
@@ -3536,6 +3673,10 @@ class ParentInstArray:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> ParentInstArray:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -3603,6 +3744,12 @@ class ParentInstArray:
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def dinst(self) -> DCellInstArray:
+        r"""
+        @brief Compute the inverse instance by which the parent is seen from the child in micrometer units
+
+        This convenience method has been introduced in version 0.28.
         """
     def dup(self) -> ParentInstArray:
         r"""
@@ -3871,6 +4018,10 @@ class CellInstArray:
         Starting with version 0.25 the displacements are of vector type.
         """
     def __copy__(self) -> CellInstArray:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> CellInstArray:
         r"""
         @brief Creates a copy of self
         """
@@ -4435,6 +4586,10 @@ class DCellInstArray:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> DCellInstArray:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Compares two arrays for equality
@@ -4845,6 +5000,10 @@ class CellMapping:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> CellMapping:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -5251,12 +5410,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -5435,12 +5594,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -5503,12 +5662,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -5533,12 +5692,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -5593,12 +5752,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -6143,6 +6302,10 @@ class TrapezoidDecompositionMode:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> TrapezoidDecompositionMode:
+        r"""
+        @brief Creates a copy of self
+        """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
@@ -6176,12 +6339,12 @@ class TrapezoidDecompositionMode:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -6311,6 +6474,10 @@ class PreferredOrientation:
         @brief Creates an enum from a string value
         """
     def __copy__(self) -> PreferredOrientation:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> PreferredOrientation:
         r"""
         @brief Creates a copy of self
         """
@@ -6566,6 +6733,10 @@ class Edge:
         Two points are given to create a new edge.
         """
     def __copy__(self) -> Edge:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Edge:
         r"""
         @brief Creates a copy of self
         """
@@ -7275,6 +7446,10 @@ class DEdge:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> DEdge:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, e: object) -> bool:
         r"""
         @brief Equality test
@@ -7926,6 +8101,10 @@ class EdgePair:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> EdgePair:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, box: object) -> bool:
         r"""
         @brief Equality
@@ -8020,6 +8199,12 @@ class EdgePair:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+    def area(self) -> int:
+        r"""
+        @brief Gets the area between the edges of the edge pair
+
+        This attribute has been introduced in version 0.28.
+        """
     def assign(self, other: EdgePair) -> None:
         r"""
         @brief Assigns another object to self
@@ -8081,6 +8266,14 @@ class EdgePair:
         @brief Normalizes the edge pair
         This method normalized the edge pair such that when connecting the edges at their 
         start and end points a closed loop is formed which is oriented clockwise. To achieve this, the points of the first and/or first and second edge are swapped. Normalization is a first step recommended before converting an edge pair to a polygon, because that way the polygons won't be self-overlapping and the enlargement parameter is applied properly.
+        """
+    def perimeter(self) -> int:
+        r"""
+        @brief Gets the perimeter of the edge pair
+
+        The perimeter is defined as the sum of the lengths of both edges ('active perimeter').
+
+        This attribute has been introduced in version 0.28.
         """
     def polygon(self, e: int) -> Polygon:
         r"""
@@ -8230,6 +8423,10 @@ class DEdgePair:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> DEdgePair:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, box: object) -> bool:
         r"""
         @brief Equality
@@ -8324,6 +8521,12 @@ class DEdgePair:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+    def area(self) -> float:
+        r"""
+        @brief Gets the area between the edges of the edge pair
+
+        This attribute has been introduced in version 0.28.
+        """
     def assign(self, other: DEdgePair) -> None:
         r"""
         @brief Assigns another object to self
@@ -8385,6 +8588,14 @@ class DEdgePair:
         @brief Normalizes the edge pair
         This method normalized the edge pair such that when connecting the edges at their 
         start and end points a closed loop is formed which is oriented clockwise. To achieve this, the points of the first and/or first and second edge are swapped. Normalization is a first step recommended before converting an edge pair to a polygon, because that way the polygons won't be self-overlapping and the enlargement parameter is applied properly.
+        """
+    def perimeter(self) -> float:
+        r"""
+        @brief Gets the perimeter of the edge pair
+
+        The perimeter is defined as the sum of the lengths of both edges ('active perimeter').
+
+        This attribute has been introduced in version 0.28.
         """
     def polygon(self, e: float) -> DPolygon:
         r"""
@@ -8599,6 +8810,10 @@ class EdgePairs(ShapeCollection):
         This method has been introduced in version 0.24.
         """
     def __copy__(self) -> EdgePairs:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> EdgePairs:
         r"""
         @brief Creates a copy of self
         """
@@ -9187,10 +9402,36 @@ class EdgePairs(ShapeCollection):
         This will filter edge pairs with at least one horizontal edge:
 
         @code
-        horizontal = edge_pairs.with_orientation(0, false)
+        horizontal = edge_pairs.with_angle(0, false)
+        @/code
+
+        Note that the inverse @b result @/b of \with_angle is delivered by \with_angle_both with the inverse flag set as edge pairs are unselected when both edges fail to meet the criterion.
+        I.e
+
+        @code
+        result = edge_pairs.with_angle(0, false)
+        others = edge_pairs.with_angle_both(0, true)
         @/code
 
         This method has been added in version 0.27.1.
+        """
+    @overload
+    def with_angle(self, type: Edges.EdgeType, inverse: bool) -> EdgePairs:
+        r"""
+        @brief Filter the edge pairs by orientation of their edges
+        Filters the edge pairs in the edge pair collection by orientation. If "inverse" is false, only edge pairs with at least one edge having an angle of the given type are returned. If "inverse" is true, edge pairs not fulfilling this criterion are returned.
+
+        This version allows specifying an edge type instead of an angle. Edge types include multiple distinct orientations and are specified using one of the \Edges#OrthoEdges, \Edges#DiagonalEdges or \Edges#OrthoDiagonalEdges types.
+
+        Note that the inverse @b result @/b of \with_angle is delivered by \with_angle_both with the inverse flag set as edge pairs are unselected when both edges fail to meet the criterion.
+        I.e
+
+        @code
+        result = edge_pairs.with_angle(RBA::Edges::Ortho, false)
+        others = edge_pairs.with_angle_both(RBA::Edges::Ortho, true)
+        @/code
+
+        This method has been added in version 0.28.
         """
     @overload
     def with_angle(self, min_angle: float, max_angle: float, inverse: bool, include_min_angle: Optional[bool] = ..., include_max_angle: Optional[bool] = ...) -> EdgePairs:
@@ -9199,6 +9440,14 @@ class EdgePairs(ShapeCollection):
         Filters the edge pairs in the edge pair collection by orientation. If "inverse" is false, only edge pairs with at least one edge having an angle between min_angle and max_angle are returned. If "inverse" is true, edge pairs not fulfilling this criterion are returned.
 
         With "include_min_angle" set to true (the default), the minimum angle is included in the criterion while with false, the minimum angle itself is not included. Same for "include_max_angle" where the default is false, meaning the maximum angle is not included in the range.
+
+        Note that the inverse @b result @/b of \with_angle is delivered by \with_angle_both with the inverse flag set as edge pairs are unselected when both edges fail to meet the criterion.
+        I.e
+
+        @code
+        result = edge_pairs.with_angle(0, 45, false)
+        others = edge_pairs.with_angle_both(0, 45, true)
+        @/code
 
         This method has been added in version 0.27.1.
         """
@@ -9211,10 +9460,36 @@ class EdgePairs(ShapeCollection):
         This will filter edge pairs with at least one horizontal edge:
 
         @code
-        horizontal = edge_pairs.with_orientation(0, false)
+        horizontal = edge_pairs.with_angle_both(0, false)
+        @/code
+
+        Note that the inverse @b result @/b of \with_angle_both is delivered by \with_angle with the inverse flag set as edge pairs are unselected when one edge fails to meet the criterion.
+        I.e
+
+        @code
+        result = edge_pairs.with_angle_both(0, false)
+        others = edge_pairs.with_angle(0, true)
         @/code
 
         This method has been added in version 0.27.1.
+        """
+    @overload
+    def with_angle_both(self, type: Edges.EdgeType, inverse: bool) -> EdgePairs:
+        r"""
+        @brief Filter the edge pairs by orientation of their edges
+        Filters the edge pairs in the edge pair collection by orientation. If "inverse" is false, only edge pairs with both edges having an angle of the given type are returned. If "inverse" is true, edge pairs not fulfilling this criterion for both edges are returned.
+
+        This version allows specifying an edge type instead of an angle. Edge types include multiple distinct orientations and are specified using one of the \Edges#OrthoEdges, \Edges#DiagonalEdges or \Edges#OrthoDiagonalEdges types.
+
+        Note that the inverse @b result @/b of \with_angle_both is delivered by \with_angle with the inverse flag set as edge pairs are unselected when one edge fails to meet the criterion.
+        I.e
+
+        @code
+        result = edge_pairs.with_angle_both(RBA::Edges::Ortho, false)
+        others = edge_pairs.with_angle(RBA::Edges::Ortho, true)
+        @/code
+
+        This method has been added in version 0.28.
         """
     @overload
     def with_angle_both(self, min_angle: float, max_angle: float, inverse: bool, include_min_angle: Optional[bool] = ..., include_max_angle: Optional[bool] = ...) -> EdgePairs:
@@ -9223,6 +9498,14 @@ class EdgePairs(ShapeCollection):
         Filters the edge pairs in the edge pair collection by orientation. If "inverse" is false, only edge pairs with both edges having an angle between min_angle and max_angle are returned. If "inverse" is true, edge pairs not fulfilling this criterion are returned.
 
         With "include_min_angle" set to true (the default), the minimum angle is included in the criterion while with false, the minimum angle itself is not included. Same for "include_max_angle" where the default is false, meaning the maximum angle is not included in the range.
+
+        Note that the inverse @b result @/b of \with_angle_both is delivered by \with_angle with the inverse flag set as edge pairs are unselected when one edge fails to meet the criterion.
+        I.e
+
+        @code
+        result = edge_pairs.with_angle_both(0, 45, false)
+        others = edge_pairs.with_angle(0, 45, true)
+        @/code
 
         This method has been added in version 0.27.1.
         """
@@ -9391,6 +9674,10 @@ class EdgeProcessor:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> EdgeProcessor:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> EdgeProcessor:
         r"""
         @brief Creates a copy of self
         """
@@ -10244,6 +10531,100 @@ class Edges(ShapeCollection):
 
     This class has been introduced in version 0.23.
     """
+    class EdgeType:
+        r"""
+        @brief This enum specifies the the edge type for edge angle filters.
+
+        This enum was introduced in version 0.28.
+        """
+        DiagonalEdges: ClassVar[Edges.EdgeType]
+        r"""
+        @brief Diagonal edges are selected (-45 and 45 degree)
+        """
+        OrthoDiagonalEdges: ClassVar[Edges.EdgeType]
+        r"""
+        @brief Diagonal or orthogonal edges are selected (0, 90, -45 and 45 degree)
+        """
+        OrthoEdges: ClassVar[Edges.EdgeType]
+        r"""
+        @brief Horizontal and vertical edges are selected
+        """
+        @overload
+        @classmethod
+        def new(cls, i: int) -> Edges.EdgeType:
+            r"""
+            @brief Creates an enum from an integer value
+            """
+        @overload
+        @classmethod
+        def new(cls, s: str) -> Edges.EdgeType:
+            r"""
+            @brief Creates an enum from a string value
+            """
+        @overload
+        def __eq__(self, other: object) -> bool:
+            r"""
+            @brief Compares an enum with an integer value
+            """
+        @overload
+        def __eq__(self, other: object) -> bool:
+            r"""
+            @brief Compares two enums
+            """
+        @overload
+        def __init__(self, i: int) -> None:
+            r"""
+            @brief Creates an enum from an integer value
+            """
+        @overload
+        def __init__(self, s: str) -> None:
+            r"""
+            @brief Creates an enum from a string value
+            """
+        @overload
+        def __lt__(self, other: int) -> bool:
+            r"""
+            @brief Returns true if the enum is less (in the enum symbol order) than the integer value
+            """
+        @overload
+        def __lt__(self, other: Edges.EdgeType) -> bool:
+            r"""
+            @brief Returns true if the first enum is less (in the enum symbol order) than the second
+            """
+        @overload
+        def __ne__(self, other: object) -> bool:
+            r"""
+            @brief Compares an enum with an integer for inequality
+            """
+        @overload
+        def __ne__(self, other: object) -> bool:
+            r"""
+            @brief Compares two enums for inequality
+            """
+        def __repr__(self) -> str:
+            r"""
+            @brief Converts an enum to a visual string
+            """
+        def __str__(self) -> str:
+            r"""
+            @brief Gets the symbolic string from an enum
+            """
+        def inspect(self) -> str:
+            r"""
+            @brief Converts an enum to a visual string
+            """
+        def to_i(self) -> int:
+            r"""
+            @brief Gets the integer value from the enum
+            """
+        def to_s(self) -> str:
+            r"""
+            @brief Gets the symbolic string from an enum
+            """
+    DiagonalEdges: ClassVar[Edges.EdgeType]
+    r"""
+    @brief Diagonal edges are selected (-45 and 45 degree)
+    """
     Euclidian: ClassVar[Region.Metrics]
     r"""
     @brief Specifies Euclidian metrics for the check functions
@@ -10254,6 +10635,14 @@ class Edges(ShapeCollection):
     @/code
 
     All points within a circle with radius d around one point are considered to have a smaller distance than d.
+    """
+    OrthoDiagonalEdges: ClassVar[Edges.EdgeType]
+    r"""
+    @brief Diagonal or orthogonal edges are selected (0, 90, -45 and 45 degree)
+    """
+    OrthoEdges: ClassVar[Edges.EdgeType]
+    r"""
+    @brief Horizontal and vertical edges are selected
     """
     Projection: ClassVar[Region.Metrics]
     r"""
@@ -10520,6 +10909,10 @@ class Edges(ShapeCollection):
         This method has been introduced in version 0.24.
         """
     def __copy__(self) -> Edges:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Edges:
         r"""
         @brief Creates a copy of self
         """
@@ -11143,6 +11536,13 @@ class Edges(ShapeCollection):
         r"""
         @brief Returns all edges which are members of the other edge collection
         This method returns all edges in self which can be found in the other edge collection as well with exactly the same geometry.
+        """
+    def in_and_out(self, other: Edges) -> List[Edges]:
+        r"""
+        @brief Returns all polygons which are members and not members of the other region
+        This method is equivalent to calling \members_of and \not_members_of, but delivers both results at the same time and is more efficient than two separate calls. The first element returned is the \members_of part, the second is the \not_members_of part.
+
+        This method has been introduced in version 0.28.
         """
     @overload
     def insert(self, box: Box) -> None:
@@ -12003,19 +12403,29 @@ class Edges(ShapeCollection):
     @overload
     def with_angle(self, angle: float, inverse: bool) -> Edges:
         r"""
-        @brief Filter the edges by orientation
+        @brief Filters the edges by orientation
         Filters the edges in the edge collection by orientation. If "inverse" is false, only edges which have the given angle to the x-axis are returned. If "inverse" is true, edges not having the given angle are returned.
 
         This will select horizontal edges:
 
         @code
-        horizontal = edges.with_orientation(0, false)
+        horizontal = edges.with_angle(0, false)
         @/code
+        """
+    @overload
+    def with_angle(self, type: Edges.EdgeType, inverse: bool) -> Edges:
+        r"""
+        @brief Filters the edges by orientation type
+        Filters the edges in the edge collection by orientation. If "inverse" is false, only edges which have an angle of the given type are returned. If "inverse" is true, edges which do not conform to this criterion are returned.
+
+        This version allows specifying an edge type instead of an angle. Edge types include multiple distinct orientations and are specified using one of the \OrthoEdges, \DiagonalEdges or \OrthoDiagonalEdges types.
+
+        This method has been added in version 0.28.
         """
     @overload
     def with_angle(self, min_angle: float, max_angle: float, inverse: bool, include_min_angle: Optional[bool] = ..., include_max_angle: Optional[bool] = ...) -> Edges:
         r"""
-        @brief Filter the edges by orientation
+        @brief Filters the edges by orientation
         Filters the edges in the edge collection by orientation. If "inverse" is false, only edges which have an angle to the x-axis larger or equal to "min_angle" (depending on "include_min_angle") and equal or less than "max_angle" (depending on "include_max_angle") are returned. If "inverse" is true, edges which do not conform to this criterion are returned.
 
         With "include_min_angle" set to true (the default), the minimum angle is included in the criterion while with false, the minimum angle itself is not included. Same for "include_max_angle" where the default is false, meaning the maximum angle is not included in the range.
@@ -12025,13 +12435,13 @@ class Edges(ShapeCollection):
     @overload
     def with_length(self, length: int, inverse: bool) -> Edges:
         r"""
-        @brief Filter the edges by length
+        @brief Filters the edges by length
         Filters the edges in the edge collection by length. If "inverse" is false, only edges which have the given length are returned. If "inverse" is true, edges not having the given length are returned.
         """
     @overload
     def with_length(self, min_length: Any, max_length: Any, inverse: bool) -> Edges:
         r"""
-        @brief Filter the edges by length
+        @brief Filters the edges by length
         Filters the edges in the edge collection by length. If "inverse" is false, only edges which have a length larger or equal to "min_length" and less than "max_length" are returned. If "inverse" is true, edges not having a length less than "min_length" or larger or equal than "max_length" are returned.
 
         If you don't want to specify a lower or upper limit, pass nil to that parameter.
@@ -12076,6 +12486,10 @@ class InstElement:
         Starting with version 0.15, this method takes an \Instance object (an instance reference) as the first argument.
         """
     def __copy__(self) -> InstElement:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> InstElement:
         r"""
         @brief Creates a copy of self
         """
@@ -12270,6 +12684,10 @@ class LayerMapping:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> LayerMapping:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> LayerMapping:
         r"""
         @brief Creates a copy of self
         """
@@ -12493,6 +12911,10 @@ class LayerInfo:
         This method was added in version 0.18.
         """
     def __copy__(self) -> LayerInfo:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> LayerInfo:
         r"""
         @brief Creates a copy of self
         """
@@ -12721,6 +13143,10 @@ class LayoutMetaInfo:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> LayoutMetaInfo:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self, name: str, value: str, description: Optional[str] = ...) -> None:
         r"""
         @brief Creates a layout meta info object
@@ -12903,6 +13329,10 @@ class Layout:
         This method was introduced in version 0.22.
         """
     def __copy__(self) -> Layout:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Layout:
         r"""
         @brief Creates a copy of self
         """
@@ -14800,6 +15230,10 @@ class SaveLayoutOptions:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> SaveLayoutOptions:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Default constructor
@@ -15309,6 +15743,10 @@ class Library:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> Library:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new, empty library
@@ -15472,6 +15910,10 @@ class PCellDeclaration_Native:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> PCellDeclaration_Native:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -15517,10 +15959,13 @@ class PCellDeclaration_Native:
         r"""
         @brief Assigns another object to self
         """
-    def can_create_from_shape(self, arg0: Layout, arg1: Shape, arg2: int) -> bool:
+    def callback(self, layout: Layout, name: str, states: PCellParameterStates) -> None:
         r"""
         """
-    def coerce_parameters(self, arg0: Layout, arg1: Sequence[Any]) -> List[Any]:
+    def can_create_from_shape(self, layout: Layout, shape: Shape, layer: int) -> bool:
+        r"""
+        """
+    def coerce_parameters(self, layout: Layout, parameters: Sequence[Any]) -> List[Any]:
         r"""
         """
     def create(self) -> None:
@@ -15540,14 +15985,14 @@ class PCellDeclaration_Native:
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
-    def display_text(self, arg0: Sequence[Any]) -> str:
+    def display_text(self, parameters: Sequence[Any]) -> str:
         r"""
         """
     def dup(self) -> PCellDeclaration_Native:
         r"""
         @brief Creates a copy of self
         """
-    def get_layers(self, arg0: Sequence[Any]) -> List[LayerInfo]:
+    def get_layers(self, parameters: Sequence[Any]) -> List[LayerInfo]:
         r"""
         """
     def get_parameters(self) -> List[PCellParameterDeclaration]:
@@ -15573,17 +16018,390 @@ class PCellDeclaration_Native:
         r"""
         @brief Gets the name of the PCell
         """
-    def parameters_from_shape(self, arg0: Layout, arg1: Shape, arg2: int) -> List[Any]:
+    def parameters_from_shape(self, layout: Layout, shape: Shape, layer: int) -> List[Any]:
         r"""
         """
-    def produce(self, arg0: Layout, arg1: Sequence[int], arg2: Sequence[Any], arg3: Cell) -> None:
+    def produce(self, layout: Layout, layers: Sequence[int], parameters: Sequence[Any], cell: Cell) -> None:
         r"""
         """
-    def transformation_from_shape(self, arg0: Layout, arg1: Shape, arg2: int) -> Trans:
+    def transformation_from_shape(self, layout: Layout, shape: Shape, layer: int) -> Trans:
         r"""
         """
     def wants_lazy_evaluation(self) -> bool:
         r"""
+        """
+
+class PCellParameterState:
+    r"""
+    @brief Provides access to the attributes of a single parameter within \PCellParameterStates.
+
+    See \PCellParameterStates for details about this feature.
+
+    This class has been introduced in version 0.28.
+    """
+    class ParameterStateIcon:
+        r"""
+        @brief This enum specifies the icon shown next to the parameter in PCell parameter list.
+
+        This enum was introduced in version 0.28.
+        """
+        ErrorIcon: ClassVar[PCellParameterState.ParameterStateIcon]
+        r"""
+        @brief An icon indicating an error is shown
+        """
+        InfoIcon: ClassVar[PCellParameterState.ParameterStateIcon]
+        r"""
+        @brief A general 'information' icon is shown
+        """
+        NoIcon: ClassVar[PCellParameterState.ParameterStateIcon]
+        r"""
+        @brief No icon is shown for the parameter
+        """
+        WarningIcon: ClassVar[PCellParameterState.ParameterStateIcon]
+        r"""
+        @brief An icon indicating a warning is shown
+        """
+        @overload
+        @classmethod
+        def new(cls, i: int) -> PCellParameterState.ParameterStateIcon:
+            r"""
+            @brief Creates an enum from an integer value
+            """
+        @overload
+        @classmethod
+        def new(cls, s: str) -> PCellParameterState.ParameterStateIcon:
+            r"""
+            @brief Creates an enum from a string value
+            """
+        @overload
+        def __eq__(self, other: object) -> bool:
+            r"""
+            @brief Compares an enum with an integer value
+            """
+        @overload
+        def __eq__(self, other: object) -> bool:
+            r"""
+            @brief Compares two enums
+            """
+        @overload
+        def __init__(self, i: int) -> None:
+            r"""
+            @brief Creates an enum from an integer value
+            """
+        @overload
+        def __init__(self, s: str) -> None:
+            r"""
+            @brief Creates an enum from a string value
+            """
+        @overload
+        def __lt__(self, other: int) -> bool:
+            r"""
+            @brief Returns true if the enum is less (in the enum symbol order) than the integer value
+            """
+        @overload
+        def __lt__(self, other: PCellParameterState.ParameterStateIcon) -> bool:
+            r"""
+            @brief Returns true if the first enum is less (in the enum symbol order) than the second
+            """
+        @overload
+        def __ne__(self, other: object) -> bool:
+            r"""
+            @brief Compares two enums for inequality
+            """
+        @overload
+        def __ne__(self, other: object) -> bool:
+            r"""
+            @brief Compares an enum with an integer for inequality
+            """
+        def __repr__(self) -> str:
+            r"""
+            @brief Converts an enum to a visual string
+            """
+        def __str__(self) -> str:
+            r"""
+            @brief Gets the symbolic string from an enum
+            """
+        def inspect(self) -> str:
+            r"""
+            @brief Converts an enum to a visual string
+            """
+        def to_i(self) -> int:
+            r"""
+            @brief Gets the integer value from the enum
+            """
+        def to_s(self) -> str:
+            r"""
+            @brief Gets the symbolic string from an enum
+            """
+    ErrorIcon: ClassVar[PCellParameterState.ParameterStateIcon]
+    r"""
+    @brief An icon indicating an error is shown
+    """
+    InfoIcon: ClassVar[PCellParameterState.ParameterStateIcon]
+    r"""
+    @brief A general 'information' icon is shown
+    """
+    NoIcon: ClassVar[PCellParameterState.ParameterStateIcon]
+    r"""
+    @brief No icon is shown for the parameter
+    """
+    WarningIcon: ClassVar[PCellParameterState.ParameterStateIcon]
+    r"""
+    @brief An icon indicating a warning is shown
+    """
+    enabled: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the parameter is enabled in the parameter form
+
+    Setter:
+    @brief Sets a value indicating whether the parameter is enabled in the parameter form
+    """
+    @property
+    def icon(self) -> None:
+        r"""
+        WARNING: This variable can only be set, not retrieved.
+        @brief Sets the icon for the parameter
+        """
+    readonly: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the parameter is read-only (not editable) in the parameter form
+
+    Setter:
+    @brief Sets a value indicating whether the parameter is made read-only (not editable) in the parameter form
+    """
+    tooltip: str
+    r"""
+    Getter:
+    @brief Gets the tool tip text
+
+    Setter:
+    @brief Sets the tool tip text
+
+    The tool tip is shown when hovering over the parameter label or edit field.
+    """
+    value: Any
+    r"""
+    Getter:
+    @brief Gets the value of the parameter
+
+    Setter:
+    @brief Sets the value of the parameter
+    """
+    visible: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the parameter is visible in the parameter form
+
+    Setter:
+    @brief Sets a value indicating whether the parameter is visible in the parameter form
+    """
+    @classmethod
+    def new(cls) -> PCellParameterState:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __copy__(self) -> PCellParameterState:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> PCellParameterState:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def assign(self, other: PCellParameterState) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def dup(self) -> PCellParameterState:
+        r"""
+        @brief Creates a copy of self
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def is_enabled(self) -> bool:
+        r"""
+        @brief Gets a value indicating whether the parameter is enabled in the parameter form
+        """
+    def is_readonly(self) -> bool:
+        r"""
+        @brief Gets a value indicating whether the parameter is read-only (not editable) in the parameter form
+        """
+    def is_visible(self) -> bool:
+        r"""
+        @brief Gets a value indicating whether the parameter is visible in the parameter form
+        """
+
+class PCellParameterStates:
+    r"""
+    @brief Provides access to the parameter states inside a 'callback' implementation of a PCell
+
+    Example: enables or disables a parameter 'n' based on the value:
+
+    @code
+    n_param = states.parameter("n")
+    n_param.enabled = n_param.value > 1.0
+    @/code
+
+    This class has been introduced in version 0.28.
+    """
+    @classmethod
+    def new(cls) -> PCellParameterStates:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __copy__(self) -> PCellParameterStates:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> PCellParameterStates:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def assign(self, other: PCellParameterStates) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def dup(self) -> PCellParameterStates:
+        r"""
+        @brief Creates a copy of self
+        """
+    def has_parameter(self, name: str) -> bool:
+        r"""
+        @brief Gets a value indicating whether a parameter with that name exists
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def parameter(self, name: str) -> PCellParameterState:
+        r"""
+        @brief Gets the parameter by name
+
+        This will return a \PCellParameterState object that can be used to manipulate the parameter state.
         """
 
 class PCellDeclaration(PCellDeclaration_Native):
@@ -15656,6 +16474,10 @@ class PCellDeclaration(PCellDeclaration_Native):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+    def callback(self, arg0: Layout, arg1: str, arg2: PCellParameterStates) -> None:
+        r"""
+        @hide
+        """
     def can_create_from_shape(self, arg0: Layout, arg1: Shape, arg2: int) -> bool:
         r"""
         @hide
@@ -15699,6 +16521,12 @@ class PCellParameterDeclaration:
     TypeBoolean: ClassVar[int]
     r"""
     @brief Type code: boolean data
+    """
+    TypeCallback: ClassVar[int]
+    r"""
+    @brief Type code: a button triggering a callback
+
+    This code has been introduced in version 0.28.
     """
     TypeDouble: ClassVar[int]
     r"""
@@ -15822,6 +16650,10 @@ class PCellParameterDeclaration:
         @param unit The unit string
         """
     def __copy__(self) -> PCellParameterDeclaration:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> PCellParameterDeclaration:
         r"""
         @brief Creates a copy of self
         """
@@ -15958,6 +16790,10 @@ class Manager:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> Manager:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Manager:
         r"""
         @brief Creates a copy of self
         """
@@ -16181,6 +17017,10 @@ class Matrix2d:
         @return The (element-wise) sum of self+m
         """
     def __copy__(self) -> Matrix2d:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Matrix2d:
         r"""
         @brief Creates a copy of self
         """
@@ -16541,6 +17381,10 @@ class IMatrix2d:
         @return The (element-wise) sum of self+m
         """
     def __copy__(self) -> IMatrix2d:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> IMatrix2d:
         r"""
         @brief Creates a copy of self
         """
@@ -16978,6 +17822,10 @@ class Matrix3d:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> Matrix3d:
+        r"""
+        @brief Creates a copy of self
+        """
     @overload
     def __init__(self) -> None:
         r"""
@@ -17392,6 +18240,10 @@ class IMatrix3d:
         @return The (element-wise) sum of self+m
         """
     def __copy__(self) -> IMatrix3d:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> IMatrix3d:
         r"""
         @brief Creates a copy of self
         """
@@ -17826,6 +18678,10 @@ class Path:
         @param round If this flag is true, the path will get rounded ends
         """
     def __copy__(self) -> Path:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Path:
         r"""
         @brief Creates a copy of self
         """
@@ -18310,6 +19166,10 @@ class DPath:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> DPath:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, p: object) -> bool:
         r"""
         @brief Equality test
@@ -18720,6 +19580,10 @@ class DPoint:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> DPoint:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, p: object) -> bool:
         r"""
         @brief Equality test operator
@@ -19044,6 +19908,10 @@ class Point:
         Starting with version 0.25, this method expects a vector argument.
         """
     def __copy__(self) -> Point:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Point:
         r"""
         @brief Creates a copy of self
         """
@@ -19385,6 +20253,10 @@ class SimplePolygon:
         The 'raw' argument has been added in version 0.24.
         """
     def __copy__(self) -> SimplePolygon:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> SimplePolygon:
         r"""
         @brief Creates a copy of self
         """
@@ -20037,6 +20909,10 @@ class DSimplePolygon:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> DSimplePolygon:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, p: object) -> bool:
         r"""
         @brief Returns a value indicating whether self is equal to p
@@ -20655,6 +21531,10 @@ class Polygon:
         The 'raw' argument was added in version 0.24.
         """
     def __copy__(self) -> Polygon:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Polygon:
         r"""
         @brief Creates a copy of self
         """
@@ -21592,6 +22472,10 @@ class DPolygon:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> DPolygon:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, p: object) -> bool:
         r"""
         @brief Returns a value indicating whether the polygons are equal
@@ -22299,6 +23183,10 @@ class LayerMap:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> LayerMap:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -22648,12 +23536,12 @@ class LoadLayoutOptions:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -23419,6 +24307,10 @@ class LoadLayoutOptions:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> LoadLayoutOptions:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -23784,6 +24676,10 @@ class RecursiveInstanceIterator:
         If "overlapping" is true, instances whose bounding box is overlapping the search region are reported. If "overlapping" is false, instances whose bounding box touches the search region are reported. The bounding box of instances is measured taking all layers of the target cell into account.
         """
     def __copy__(self) -> RecursiveInstanceIterator:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> RecursiveInstanceIterator:
         r"""
         @brief Creates a copy of self
         """
@@ -24396,6 +25292,10 @@ class RecursiveShapeIterator:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> RecursiveShapeIterator:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Comparison of iterators - equality
@@ -24995,12 +25895,12 @@ class Region(ShapeCollection):
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -25025,12 +25925,12 @@ class Region(ShapeCollection):
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -25085,12 +25985,12 @@ class Region(ShapeCollection):
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -25115,12 +26015,12 @@ class Region(ShapeCollection):
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -25462,6 +26362,10 @@ class Region(ShapeCollection):
         This method will compute the boolean AND (intersection) between two regions. The result is often but not necessarily always merged.
         """
     def __copy__(self) -> Region:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Region:
         r"""
         @brief Creates a copy of self
         """
@@ -25974,7 +26878,6 @@ class Region(ShapeCollection):
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
         "metrics" can be one of the constants \Euclidian, \Square or \Projection. See there for a description of these constants.
-        Use nil for this value to select the default (Euclidian metrics).
 
         "ignore_angle" specifies the angle limit of two edges. If two edges form an angle equal or above the given value, they will not contribute in the check. Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.
         Use nil for this value to select the default.
@@ -26010,7 +26913,6 @@ class Region(ShapeCollection):
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
         "metrics" can be one of the constants \Euclidian, \Square or \Projection. See there for a description of these constants.
-        Use nil for this value to select the default (Euclidian metrics).
 
         "ignore_angle" specifies the angle limit of two edges. If two edges form an angle equal or above the given value, they will not contribute in the check. Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.
         Use nil for this value to select the default.
@@ -26147,6 +27049,13 @@ class Region(ShapeCollection):
         @brief Returns all polygons which are members of the other region
         This method returns all polygons in self which can be found in the other region as well with exactly the same geometry.
         """
+    def in_and_out(self, other: Region) -> List[Region]:
+        r"""
+        @brief Returns all polygons which are members and not members of the other region
+        This method is equivalent to calling \members_of and \not_members_of, but delivers both results at the same time and is more efficient than two separate calls. The first element returned is the \members_of part, the second is the \not_members_of part.
+
+        This method has been introduced in version 0.28.
+        """
     @overload
     def insert(self, array: Sequence[Polygon]) -> None:
         r"""
@@ -26259,7 +27168,6 @@ class Region(ShapeCollection):
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
         "metrics" can be one of the constants \Euclidian, \Square or \Projection. See there for a description of these constants.
-        Use nil for this value to select the default (Euclidian metrics).
 
         "ignore_angle" specifies the angle limit of two edges. If two edges form an angle equal or above the given value, they will not contribute in the check. Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.
         Use nil for this value to select the default.
@@ -26365,7 +27273,6 @@ class Region(ShapeCollection):
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
         "metrics" can be one of the constants \Euclidian, \Square or \Projection. See there for a description of these constants.
-        Use nil for this value to select the default (Euclidian metrics).
 
         "ignore_angle" specifies the angle limit of two edges. If two edges form an angle equal or above the given value, they will not contribute in the check. Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.
         Use nil for this value to select the default.
@@ -26739,7 +27646,6 @@ class Region(ShapeCollection):
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the space check.
 
         "metrics" can be one of the constants \Euclidian, \Square or \Projection. See there for a description of these constants.
-        Use nil for this value to select the default (Euclidian metrics).
 
         "ignore_angle" specifies the angle limit of two edges. If two edges form an angle equal or above the given value, they will not contribute in the check. Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.
         Use nil for this value to select the default.
@@ -26778,7 +27684,6 @@ class Region(ShapeCollection):
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
         "metrics" can be one of the constants \Euclidian, \Square or \Projection. See there for a description of these constants.
-        Use nil for this value to select the default (Euclidian metrics).
 
         "ignore_angle" specifies the angle limit of two edges. If two edges form an angle equal or above the given value, they will not contribute in the check. Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.
         Use nil for this value to select the default.
@@ -27103,7 +28008,6 @@ class Region(ShapeCollection):
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
         "metrics" can be one of the constants \Euclidian, \Square or \Projection. See there for a description of these constants.
-        Use nil for this value to select the default (Euclidian metrics).
 
         "ignore_angle" specifies the angle limit of two edges. If two edges form an angle equal or above the given value, they will not contribute in the check. Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.
         Use nil for this value to select the default.
@@ -27270,7 +28174,6 @@ class Region(ShapeCollection):
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
         "metrics" can be one of the constants \Euclidian, \Square or \Projection. See there for a description of these constants.
-        Use nil for this value to select the default (Euclidian metrics).
 
         "ignore_angle" specifies the angle limit of two edges. If two edges form an angle equal or above the given value, they will not contribute in the check. Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.
         Use nil for this value to select the default.
@@ -27564,7 +28467,6 @@ class Region(ShapeCollection):
         If "whole_edges" is true, the resulting \EdgePairs collection will receive the whole edges which contribute in the width check.
 
         "metrics" can be one of the constants \Euclidian, \Square or \Projection. See there for a description of these constants.
-        Use nil for this value to select the default (Euclidian metrics).
 
         "ignore_angle" specifies the angle limit of two edges. If two edges form an angle equal or above the given value, they will not contribute in the check. Setting this value to 90 (the default) will exclude edges with an angle of 90 degree or more from the check.
         Use nil for this value to select the default.
@@ -27850,6 +28752,9 @@ class Shape:
     TPathRef: ClassVar[int]
     r"""
     """
+    TPoint: ClassVar[int]
+    r"""
+    """
     TPolygon: ClassVar[int]
     r"""
     """
@@ -27905,10 +28810,11 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a box.
     Setter:
-    @brief Replaces the shape by the given box (in micrometer units)
-    This method replaces the shape by the given box, like \box= with a \Box argument does. This version translates the box from micrometer units to database units internally.
+    @brief Replaces the shape by the given box
+    This method replaces the shape by the given box. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     box_center: Point
     r"""
@@ -28040,12 +28946,11 @@ class Shape:
     This method has been introduced in version 0.23.
 
     Setter:
-    @brief Sets the lower left corner of the box with the point being given in micrometer units
+    @brief Sets the lower left point of the box
 
     Applies to boxes only. Changes the lower left point of the box and throws an exception if the shape is not a box.
-    Translation from micrometer units to database units is done internally.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23.
     """
     box_p2: Point
     r"""
@@ -28057,12 +28962,11 @@ class Shape:
     This method has been introduced in version 0.23.
 
     Setter:
-    @brief Sets the upper right corner of the box with the point being given in micrometer units
+    @brief Sets the upper right point of the box
 
     Applies to boxes only. Changes the upper right point of the box and throws an exception if the shape is not a box.
-    Translation from micrometer units to database units is done internally.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23.
     """
     box_width: int
     r"""
@@ -28151,6 +29055,20 @@ class Shape:
 
     This method has been introduced in version 0.25.
     """
+    dpoint: Any
+    r"""
+    Getter:
+    @brief Returns the point object as a \DPoint object in micrometer units
+    See \point for a description of this method. This method returns the point after translation to micrometer units.
+
+    This method has been introduced in version 0.28.
+
+    Setter:
+    @brief Replaces the shape by the given point (in micrometer units)
+    This method replaces the shape by the given point, like \point= with a \Point argument does. This version translates the point from micrometer units to database units internally.
+
+    This method has been introduced in version 0.28.
+    """
     dpolygon: Any
     r"""
     Getter:
@@ -28202,10 +29120,11 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent an edge.
     Setter:
-    @brief Replaces the shape by the given edge (in micrometer units)
-    This method replaces the shape by the given edge, like \edge= with a \Edge argument does. This version translates the edge from micrometer units to database units internally.
+    @brief Replaces the shape by the given edge
+    This method replaces the shape by the given edge. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     edge_pair: Any
     r"""
@@ -28214,8 +29133,9 @@ class Shape:
 
     This method has been introduced in version 0.26.
     Setter:
-    @brief Replaces the shape by the given edge pair (in micrometer units)
-    This method replaces the shape by the given edge pair, like \edge_pair= with a \EdgePair argument does. This version translates the edge pair from micrometer units to database units internally.
+    @brief Replaces the shape by the given edge pair
+    This method replaces the shape by the given edge pair. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
     This method has been introduced in version 0.26.
     """
@@ -28341,6 +29261,20 @@ class Shape:
 
     This method has been introduced in version 0.23.
     """
+    point: Any
+    r"""
+    Getter:
+    @brief Returns the point object
+
+    This method has been introduced in version 0.28.
+
+    Setter:
+    @brief Replaces the shape by the given point
+    This method replaces the shape by the given point. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+
+    This method has been introduced in version 0.28.
+    """
     polygon: Any
     r"""
     Getter:
@@ -28351,11 +29285,10 @@ class Shape:
     Starting with version 0.23, this method returns nil, if the shape does not represent a geometrical primitive that can be converted to a polygon.
 
     Setter:
-    @brief Replaces the shape by the given polygon object
-    This method replaces the shape by the given polygon object. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given polygon (in micrometer units)
+    This method replaces the shape by the given polygon, like \polygon= with a \Polygon argument does. This version translates the polygon from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     prop_id: int
     r"""
@@ -28618,6 +29551,10 @@ class Shape:
         r"""
         """
     @classmethod
+    def t_point(cls) -> int:
+        r"""
+        """
+    @classmethod
     def t_polygon(cls) -> int:
         r"""
         """
@@ -28682,6 +29619,10 @@ class Shape:
         r"""
         """
     def __copy__(self) -> Shape:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Shape:
         r"""
         @brief Creates a copy of self
         """
@@ -28960,6 +29901,12 @@ class Shape:
         r"""
         @brief Returns true, if the shape is a path
         """
+    def is_point(self) -> bool:
+        r"""
+        @brief Returns true, if the object is an point
+
+        This method has been introduced in version 0.28.
+        """
     def is_polygon(self) -> bool:
         r"""
         @brief Returns true, if the shape is a polygon
@@ -29094,6 +30041,10 @@ class ShapeProcessor:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> ShapeProcessor:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> ShapeProcessor:
         r"""
         @brief Creates a copy of self
         """
@@ -29506,6 +30457,11 @@ class Shapes:
     r"""
     @brief Indicates that paths shall be retrieved
     """
+    SPoints: ClassVar[int]
+    r"""
+    @brief Indicates that points shall be retrieved
+    This constant has been added in version 0.28.
+    """
     SPolygons: ClassVar[int]
     r"""
     @brief Indicates that polygons shall be retrieved
@@ -29564,6 +30520,12 @@ class Shapes:
         @brief Indicates that paths shall be retrieved
         """
     @classmethod
+    def s_points(cls) -> int:
+        r"""
+        @brief Indicates that points shall be retrieved
+        This constant has been added in version 0.28.
+        """
+    @classmethod
     def s_polygons(cls) -> int:
         r"""
         @brief Indicates that polygons shall be retrieved
@@ -29591,6 +30553,10 @@ class Shapes:
         @brief Indicates that user objects shall be retrieved
         """
     def __copy__(self) -> Shapes:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Shapes:
         r"""
         @brief Creates a copy of self
         """
@@ -29881,6 +30847,22 @@ class Shapes:
         @return A reference to the new shape (a \Shape object)
 
         Starting with version 0.16, this method returns a reference to the newly created shape
+        """
+    @overload
+    def insert(self, point: DPoint) -> Shape:
+        r"""
+        @brief Inserts a micrometer-unit point into the shapes list
+        @return A reference to the new shape (a \Shape object)
+        This method behaves like the \insert version with a \Point argument, except that it will internally translate the point from micrometer to database units.
+
+        This variant has been introduced in version 0.28.
+        """
+    @overload
+    def insert(self, point: Point) -> Shape:
+        r"""
+        @brief Inserts an point into the shapes list
+
+        This variant has been introduced in version 0.28.
         """
     @overload
     def insert(self, polygon: DPolygon) -> Shape:
@@ -30396,6 +31378,12 @@ class Shapes:
         The property Id must be obtained from the \Layout object's property_id method which associates a property set with a property Id.
         Starting with version 0.16, this method returns a reference to the newly created shape
         """
+    def insert_point(self, point: Point) -> Shape:
+        r"""
+        @brief Inserts an point into the shapes list
+
+        This variant has been introduced in version 0.28.
+        """
     def insert_polygon(self, polygon: Polygon) -> Shape:
         r"""
         @brief Inserts a polygon into the shapes list
@@ -30537,6 +31525,24 @@ class Shapes:
 
         This method has been introduced with version 0.16. It replaces the given shape with the object specified. It does not change the property Id. To change the property Id, use the \replace_prop_id method. To replace a shape and discard the property Id, erase the shape and insert a new shape.
         This method is permitted in editable mode only.
+        """
+    @overload
+    def replace(self, shape: Shape, point: DPoint) -> Shape:
+        r"""
+        @brief Replaces the given shape with an point given in micrometer units
+        @return A reference to the new shape (a \Shape object)
+
+        This method behaves like the \replace version with an \Point argument, except that it will internally translate the point from micrometer to database units.
+
+        This variant has been introduced in version 0.28.
+        """
+    @overload
+    def replace(self, shape: Shape, point: Point) -> Shape:
+        r"""
+        @brief Replaces the given shape with an point object
+
+        This method replaces the given shape with the object specified. It does not change the property Id. To change the property Id, use the \replace_prop_id method. To replace a shape and discard the property Id, erase the shape and insert a new shape.
+        This variant has been introduced in version 0.28.
         """
     @overload
     def replace(self, shape: Shape, polygon: DPolygon) -> Shape:
@@ -30965,6 +31971,10 @@ class Technology:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> Technology:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -31271,6 +32281,10 @@ class Text:
         A string and a transformation is provided to this constructor. The transformation specifies the location and orientation of the text object. In addition, the text height and font can be specified.
         """
     def __copy__(self) -> Text:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Text:
         r"""
         @brief Creates a copy of self
         """
@@ -31640,8 +32654,7 @@ class DText:
     Setter:
     @brief Sets the vertical alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     x: float
     r"""
@@ -31721,6 +32734,10 @@ class DText:
         A string and a transformation is provided to this constructor. The transformation specifies the location and orientation of the text object. In addition, the text height and font can be specified.
         """
     def __copy__(self) -> DText:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> DText:
         r"""
         @brief Creates a copy of self
         """
@@ -32028,15 +33045,19 @@ class HAlign:
         r"""
         @brief Creates a copy of self
         """
-    @overload
-    def __eq__(self, other: object) -> bool:
+    def __deepcopy__(self) -> HAlign:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Creates a copy of self
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Compares two enums
+        """
+    @overload
+    def __eq__(self, other: object) -> bool:
+        r"""
+        @brief Compares an enum with an integer value
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -32194,6 +33215,10 @@ class VAlign:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> VAlign:
+        r"""
+        @brief Creates a copy of self
+        """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
@@ -32334,6 +33359,10 @@ class TileOutputReceiverBase:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> TileOutputReceiverBase:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> TileOutputReceiverBase:
         r"""
         @brief Creates a copy of self
         """
@@ -32581,6 +33610,10 @@ class TilingProcessor:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> TilingProcessor:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -32659,6 +33692,8 @@ class TilingProcessor:
         @brief Specifies input for the tiling processor
         This method will establish an input channel for the processor. This version receives input from an \EdgePairs object. Edge pair collections don't always come with a database unit, hence a database unit should be specified with the \dbu= method unless a layout object is specified as input too.
 
+        Caution: the EdgePairs object must stay valid during the lifetime of the tiling processor. Take care to store it in a variable to prevent early destruction of the EdgePairs object. Not doing so may crash the application.
+
         The name specifies the variable under which the input can be used in the scripts.
         This variant has been introduced in version 0.27.
         """
@@ -32667,6 +33702,8 @@ class TilingProcessor:
         r"""
         @brief Specifies input for the tiling processor
         This method will establish an input channel for the processor. This version receives input from an \Edges object. Edge collections don't always come with a database unit, hence a database unit should be specified with the \dbu= method unless a layout object is specified as input too.
+
+        Caution: the Edges object must stay valid during the lifetime of the tiling processor. Take care to store it in a variable to prevent early destruction of the Edges object. Not doing so may crash the application.
 
         The name specifies the variable under which the input can be used in the scripts.
         """
@@ -32684,6 +33721,8 @@ class TilingProcessor:
         @brief Specifies input for the tiling processor
         This method will establish an input channel for the processor. This version receives input from a \Region object. Regions don't always come with a database unit, hence a database unit should be specified with the \dbu= method unless a layout object is specified as input too.
 
+        Caution: the Region object must stay valid during the lifetime of the tiling processor. Take care to store it in a variable to prevent early destruction of the Region object. Not doing so may crash the application.
+
         The name specifies the variable under which the input can be used in the scripts.
         """
     @overload
@@ -32691,6 +33730,8 @@ class TilingProcessor:
         r"""
         @brief Specifies input for the tiling processor
         This method will establish an input channel for the processor. This version receives input from an \Texts object. Text collections don't always come with a database unit, hence a database unit should be specified with the \dbu= method unless a layout object is specified as input too.
+
+        Caution: the Texts object must stay valid during the lifetime of the tiling processor. Take care to store it in a variable to prevent early destruction of the Texts object. Not doing so may crash the application.
 
         The name specifies the variable under which the input can be used in the scripts.
         This variant has been introduced in version 0.27.
@@ -32701,6 +33742,8 @@ class TilingProcessor:
         @brief Specifies input for the tiling processor
         This method will establish an input channel for the processor. This version receives input from an \EdgePairs object. Edge pair collections don't always come with a database unit, hence a database unit should be specified with the \dbu= method unless a layout object is specified as input too.
 
+        Caution: the EdgePairs object must stay valid during the lifetime of the tiling processor. Take care to store it in a variable to prevent early destruction of the EdgePairs object. Not doing so may crash the application.
+
         The name specifies the variable under which the input can be used in the scripts.
         This variant has been introduced in version 0.27.
         """
@@ -32709,6 +33752,8 @@ class TilingProcessor:
         r"""
         @brief Specifies input for the tiling processor
         This method will establish an input channel for the processor. This version receives input from an \Edges object. Edge collections don't always come with a database unit, hence a database unit should be specified with the \dbu= method unless a layout object is specified as input too.
+
+        Caution: the Edges object must stay valid during the lifetime of the tiling processor. Take care to store it in a variable to prevent early destruction of the Edges object. Not doing so may crash the application.
 
         The name specifies the variable under which the input can be used in the scripts.
         This variant allows one to specify an additional transformation too. It has been introduced in version 0.23.2.
@@ -32729,6 +33774,8 @@ class TilingProcessor:
         @brief Specifies input for the tiling processor
         This method will establish an input channel for the processor. This version receives input from a \Region object. Regions don't always come with a database unit, hence a database unit should be specified with the \dbu= method unless a layout object is specified as input too.
 
+        Caution: the Region object must stay valid during the lifetime of the tiling processor. Take care to store it in a variable to prevent early destruction of the Region object. Not doing so may crash the application.
+
         The name specifies the variable under which the input can be used in the scripts.
         This variant allows one to specify an additional transformation too. It has been introduced in version 0.23.2.
         """
@@ -32737,6 +33784,8 @@ class TilingProcessor:
         r"""
         @brief Specifies input for the tiling processor
         This method will establish an input channel for the processor. This version receives input from an \Texts object. Text collections don't always come with a database unit, hence a database unit should be specified with the \dbu= method unless a layout object is specified as input too.
+
+        Caution: the Texts object must stay valid during the lifetime of the tiling processor. Take care to store it in a variable to prevent early destruction of the Texts object. Not doing so may crash the application.
 
         The name specifies the variable under which the input can be used in the scripts.
         This variant has been introduced in version 0.27.
@@ -33161,6 +34210,10 @@ class Trans:
         @param y The vertical displacement
         """
     def __copy__(self) -> Trans:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Trans:
         r"""
         @brief Creates a copy of self
         """
@@ -33906,6 +34959,10 @@ class DTrans:
         @param y The vertical displacement
         """
     def __copy__(self) -> DTrans:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> DTrans:
         r"""
         @brief Creates a copy of self
         """
@@ -34698,6 +35755,10 @@ class DCplxTrans:
         @param y The y displacement
         """
     def __copy__(self) -> DCplxTrans:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> DCplxTrans:
         r"""
         @brief Creates a copy of self
         """
@@ -35600,6 +36661,10 @@ class CplxTrans:
         @param y The y displacement
         """
     def __copy__(self) -> CplxTrans:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> CplxTrans:
         r"""
         @brief Creates a copy of self
         """
@@ -36523,6 +37588,10 @@ class ICplxTrans:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> ICplxTrans:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Tests for equality
@@ -37415,6 +38484,10 @@ class VCplxTrans:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> VCplxTrans:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Tests for equality
@@ -38122,6 +39195,10 @@ class Utils:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> Utils:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -38271,6 +39348,10 @@ class DVector:
         Adds vector v to self by adding the coordinates.
         """
     def __copy__(self) -> DVector:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> DVector:
         r"""
         @brief Creates a copy of self
         """
@@ -38615,6 +39696,10 @@ class Vector:
         Adds vector v to self by adding the coordinates.
         """
     def __copy__(self) -> Vector:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Vector:
         r"""
         @brief Creates a copy of self
         """
@@ -39022,6 +40107,17 @@ class LayoutDiff:
     @brief This signal indicates differences in the edges on the current layer
     The current layer is indicated by the \begin_layer_event signal or can be obtained from the diff object through \LayoutDiff#layer_info_a, \LayoutDiff#layer_index_a, \LayoutDiff#layer_info_b and \LayoutDiff#layer_index_b. In verbose mode (see \Verbose flag) more signals will be emitted for edges that are different between the two layouts.
     """
+    on_begin_edge_pair_differences: None
+    r"""
+    Getter:
+    @brief This signal indicates differences in the edge pairs on the current layer
+    The current layer is indicated by the \begin_layer_event signal or can be obtained from the diff object through \LayoutDiff#layer_info_a, \LayoutDiff#layer_index_a, \LayoutDiff#layer_info_b and \LayoutDiff#layer_index_b. In verbose mode (see \Verbose flag) more signals will be emitted for edge pairs that are different between the two layouts.
+    This event has been introduced in version 0.28.
+    Setter:
+    @brief This signal indicates differences in the edge pairs on the current layer
+    The current layer is indicated by the \begin_layer_event signal or can be obtained from the diff object through \LayoutDiff#layer_info_a, \LayoutDiff#layer_index_a, \LayoutDiff#layer_info_b and \LayoutDiff#layer_index_b. In verbose mode (see \Verbose flag) more signals will be emitted for edge pairs that are different between the two layouts.
+    This event has been introduced in version 0.28.
+    """
     on_begin_inst_differences: None
     r"""
     Getter:
@@ -39128,6 +40224,24 @@ class LayoutDiff:
     Setter:
     @brief This signal indicates an edge that is present in the second layout only
     """
+    on_edge_pair_in_a_only: None
+    r"""
+    Getter:
+    @brief This signal indicates an edge pair that is present in the first layout only
+    This event has been introduced in version 0.28.
+    Setter:
+    @brief This signal indicates an edge pair that is present in the first layout only
+    This event has been introduced in version 0.28.
+    """
+    on_edge_pair_in_b_only: None
+    r"""
+    Getter:
+    @brief This signal indicates an edge pair that is present in the second layout only
+    This event has been introduced in version 0.28.
+    Setter:
+    @brief This signal indicates an edge pair that is present in the second layout only
+    This event has been introduced in version 0.28.
+    """
     on_end_box_differences: None
     r"""
     Getter:
@@ -39151,6 +40265,17 @@ class LayoutDiff:
 
     Setter:
     @brief This signal indicates the end of sequence of edge differences
+    """
+    on_end_edge_pair_differences: None
+    r"""
+    Getter:
+    @brief This signal indicates the end of sequence of edge pair differences
+
+    This event has been introduced in version 0.28.
+    Setter:
+    @brief This signal indicates the end of sequence of edge pair differences
+
+    This event has been introduced in version 0.28.
     """
     on_end_inst_differences: None
     r"""
@@ -39292,6 +40417,10 @@ class LayoutDiff:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> LayoutDiff:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> LayoutDiff:
         r"""
         @brief Creates a copy of self
         """
@@ -39530,6 +40659,10 @@ class TextGenerator:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> TextGenerator:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -39708,6 +40841,10 @@ class NetlistObject:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> NetlistObject:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> NetlistObject:
         r"""
         @brief Creates a copy of self
         """
@@ -39899,6 +41036,10 @@ class DeviceReconnectedTerminal:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> DeviceReconnectedTerminal:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -40003,6 +41144,10 @@ class DeviceAbstractRef:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> DeviceAbstractRef:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> DeviceAbstractRef:
         r"""
         @brief Creates a copy of self
         """
@@ -40270,7 +41415,7 @@ class Device(NetlistObject):
     @overload
     def net_for_terminal(self, terminal_name: str) -> Net:
         r"""
-        @brief Gets the net connected to the specified terminal.
+        @brief Gets the net connected to the specified terminal (non-const version).
         If the terminal is not connected, nil is returned for the net.
 
         This convenience method has been introduced in version 0.27.3.
@@ -40278,7 +41423,7 @@ class Device(NetlistObject):
     @overload
     def net_for_terminal(self, terminal_name: str) -> Net:
         r"""
-        @brief Gets the net connected to the specified terminal (non-const version).
+        @brief Gets the net connected to the specified terminal.
         If the terminal is not connected, nil is returned for the net.
 
         This convenience method has been introduced in version 0.27.3.
@@ -40328,6 +41473,10 @@ class DeviceAbstract:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> DeviceAbstract:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> DeviceAbstract:
         r"""
         @brief Creates a copy of self
         """
@@ -40420,14 +41569,14 @@ class DeviceAbstract:
     @overload
     def netlist(self) -> Netlist:
         r"""
-        @brief Gets the netlist the device abstract lives in.
+        @brief Gets the netlist the device abstract lives in (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
     @overload
     def netlist(self) -> Netlist:
         r"""
-        @brief Gets the netlist the device abstract lives in (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the netlist the device abstract lives in.
         """
 
 class SubCircuit(NetlistObject):
@@ -40513,16 +41662,16 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in (non-const version).
+        @brief Gets the circuit the subcircuit lives in.
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
-
-        This constness variant has been introduced in version 0.26.8
         """
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in.
+        @brief Gets the circuit the subcircuit lives in (non-const version).
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
+
+        This constness variant has been introduced in version 0.26.8
         """
     @overload
     def circuit_ref(self) -> Circuit:
@@ -40602,6 +41751,10 @@ class NetTerminalRef:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> NetTerminalRef:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -40667,16 +41820,16 @@ class NetTerminalRef:
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference (non-const version).
+        @brief Gets the device reference.
         Gets the device object that this connection is made to.
-
-        This constness variant has been introduced in version 0.26.8
         """
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference.
+        @brief Gets the device reference (non-const version).
         Gets the device object that this connection is made to.
+
+        This constness variant has been introduced in version 0.26.8
         """
     def device_class(self) -> DeviceClass:
         r"""
@@ -40726,6 +41879,10 @@ class NetPinRef:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> NetPinRef:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> NetPinRef:
         r"""
         @brief Creates a copy of self
         """
@@ -40835,6 +41992,10 @@ class NetSubcircuitPinRef:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> NetSubcircuitPinRef:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> NetSubcircuitPinRef:
         r"""
         @brief Creates a copy of self
         """
@@ -41153,6 +42314,10 @@ class DeviceTerminalDefinition:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> DeviceTerminalDefinition:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self, name: str, description: Optional[str] = ...) -> None:
         r"""
         @brief Creates a new terminal definition.
@@ -41281,6 +42446,10 @@ class DeviceParameterDefinition:
         @param si_scaling The scaling factor to SI units
         """
     def __copy__(self) -> DeviceParameterDefinition:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> DeviceParameterDefinition:
         r"""
         @brief Creates a copy of self
         """
@@ -41415,6 +42584,10 @@ class EqualDeviceParameters:
         The '+' operator will join the parameter comparers and produce one that checks the combined parameters.
         """
     def __copy__(self) -> EqualDeviceParameters:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> EqualDeviceParameters:
         r"""
         @brief Creates a copy of self
         """
@@ -41577,6 +42750,10 @@ class GenericDeviceCombiner:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> GenericDeviceCombiner:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> GenericDeviceCombiner:
         r"""
         @brief Creates a copy of self
         """
@@ -41747,6 +42924,10 @@ class DeviceClass:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> DeviceClass:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> DeviceClass:
         r"""
         @brief Creates a copy of self
         """
@@ -42443,6 +43624,10 @@ class Netlist:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> Netlist:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -42584,20 +43769,25 @@ class Netlist:
     @overload
     def device_class_by_name(self, name: str) -> DeviceClass:
         r"""
+        @brief Gets the device class for a given name.
+        If the name is not a valid device class name, nil is returned.
+        """
+    @overload
+    def device_class_by_name(self, name: str) -> DeviceClass:
+        r"""
         @brief Gets the device class for a given name (const version).
         If the name is not a valid device class name, nil is returned.
 
         This constness variant has been introduced in version 0.26.8
         """
-    @overload
-    def device_class_by_name(self, name: str) -> DeviceClass:
-        r"""
-        @brief Gets the device class for a given name.
-        If the name is not a valid device class name, nil is returned.
-        """
     def dup(self) -> Netlist:
         r"""
         @brief Creates a copy of self
+        """
+    @overload
+    def each_circuit(self) -> Iterator[Circuit]:
+        r"""
+        @brief Iterates over the circuits of the netlist
         """
     @overload
     def each_circuit(self) -> Iterator[Circuit]:
@@ -42607,23 +43797,18 @@ class Netlist:
         This constness variant has been introduced in version 0.26.8
         """
     @overload
-    def each_circuit(self) -> Iterator[Circuit]:
-        r"""
-        @brief Iterates over the circuits of the netlist
-        """
-    @overload
-    def each_circuit_bottom_up(self) -> Iterator[Circuit]:
-        r"""
-        @brief Iterates over the circuits bottom-up
-        Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
-        """
-    @overload
     def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
         @brief Iterates over the circuits bottom-up (const version)
         Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
 
         This constness variant has been introduced in version 0.26.8
+        """
+    @overload
+    def each_circuit_bottom_up(self) -> Iterator[Circuit]:
+        r"""
+        @brief Iterates over the circuits bottom-up
+        Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
         """
     @overload
     def each_circuit_top_down(self) -> Iterator[Circuit]:
@@ -42765,6 +43950,10 @@ class NetlistSpiceWriterDelegate:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> NetlistSpiceWriterDelegate:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> NetlistSpiceWriterDelegate:
         r"""
         @brief Creates a copy of self
         """
@@ -43045,6 +44234,10 @@ class NetlistSpiceWriter(NetlistWriter):
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> NetlistSpiceWriter:
+        r"""
+        @brief Creates a copy of self
+        """
     @overload
     def __init__(self) -> None:
         r"""
@@ -43210,6 +44403,10 @@ class ParseElementComponentsData:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> ParseElementComponentsData:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -43331,6 +44528,10 @@ class ParseElementData:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> ParseElementData:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -43419,6 +44620,10 @@ class NetlistSpiceReaderDelegate:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> NetlistSpiceReaderDelegate:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> NetlistSpiceReaderDelegate:
         r"""
         @brief Creates a copy of self
         """
@@ -44452,6 +45657,10 @@ class DeviceClassFactory:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> DeviceClassFactory:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -44589,6 +45798,10 @@ class NetlistDeviceExtractorError:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> NetlistDeviceExtractorError:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -44677,6 +45890,10 @@ class NetlistDeviceExtractorLayerDefinition:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> NetlistDeviceExtractorLayerDefinition:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> NetlistDeviceExtractorLayerDefinition:
         r"""
         @brief Creates a copy of self
         """
@@ -44995,6 +46212,30 @@ class GenericDeviceExtractor(DeviceExtractorBase):
 
         This version produces a terminal with a shape given by the polygon. Note that the polygon is
         specified in database units.
+        """
+    @overload
+    def define_terminal(self, device: Device, terminal_name: str, layer_name: str, point: Point) -> None:
+        r"""
+        @brief Defines a device terminal using names for terminal and layer.
+
+        This convenience version of the ID-based \define_terminal methods allows using names for terminal and layer.
+        It has been introduced in version 0.28.
+        """
+    @overload
+    def define_terminal(self, device: Device, terminal_name: str, layer_name: str, shape: Box) -> None:
+        r"""
+        @brief Defines a device terminal using names for terminal and layer.
+
+        This convenience version of the ID-based \define_terminal methods allows using names for terminal and layer.
+        It has been introduced in version 0.28.
+        """
+    @overload
+    def define_terminal(self, device: Device, terminal_name: str, layer_name: str, shape: Polygon) -> None:
+        r"""
+        @brief Defines a device terminal using names for terminal and layer.
+
+        This convenience version of the ID-based \define_terminal methods allows using names for terminal and layer.
+        It has been introduced in version 0.28.
         """
     @overload
     def error(self, message: str) -> None:
@@ -45820,6 +47061,10 @@ class Connectivity:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> Connectivity:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -45993,12 +47238,12 @@ class LayoutToNetlist:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -47233,12 +48478,12 @@ class GenericNetlistCompareLogger(NetlistCompareLogger):
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -48300,6 +49545,10 @@ class Texts(ShapeCollection):
         @return A new text collection containing the texts inside or on the edge of polygons from the region
         """
     def __copy__(self) -> Texts:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Texts:
         r"""
         @brief Creates a copy of self
         """
@@ -49585,6 +50834,10 @@ class LEFDEFReaderConfiguration:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> LEFDEFReaderConfiguration:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -49883,9 +51136,9 @@ class LEFDEFReaderConfiguration:
         Mask specific rules have been introduced in version 0.27.
         """
 
-class NetTracerTechnology(TechnologyComponent):
+class NetTracerConnectivity:
     r"""
-    @brief A technology description for the net tracer
+    @brief A connectivity description for the net tracer
 
     This object represents the technology description for the net tracer (represented by the \NetTracer class).
     A technology description basically consists of connection declarations.
@@ -49897,11 +51150,41 @@ class NetTracerTechnology(TechnologyComponent):
 
     For details about the expressions see the description of the net tracer feature.
 
-    This class has been introduced in version 0.25.
+    This class has been introduced in version 0.28 and replaces the 'NetTracerTechnology' class which has been generalized.
     """
-    def __copy__(self) -> NetTracerTechnology:
+    description: str
+    r"""
+    Getter:
+    @brief Gets the description text of the connectivty definition
+    The description is an optional string giving a human-readable description for this definition.
+    Setter:
+    @brief Sets the description of the connectivty definition
+    """
+    name: str
+    r"""
+    Getter:
+    @brief Gets the name of the connectivty definition
+    The name is an optional string defining the formal name for this definition.
+
+    Setter:
+    @brief Sets the name of the connectivty definition
+    """
+    @classmethod
+    def new(cls) -> NetTracerConnectivity:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __copy__(self) -> NetTracerConnectivity:
         r"""
         @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> NetTracerConnectivity:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
         """
     def _create(self) -> None:
         r"""
@@ -49940,7 +51223,7 @@ class NetTracerTechnology(TechnologyComponent):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
-    def assign(self, other: TechnologyComponent) -> None:
+    def assign(self, other: NetTracerConnectivity) -> None:
         r"""
         @brief Assigns another object to self
         """
@@ -49956,9 +51239,32 @@ class NetTracerTechnology(TechnologyComponent):
         @brief Defines a connection between materials through a via
         See the class description for details about this method.
         """
-    def dup(self) -> NetTracerTechnology:
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def dup(self) -> NetTracerConnectivity:
         r"""
         @brief Creates a copy of self
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
         """
     def symbol(self, name: str, expr: str) -> None:
         r"""
@@ -49986,6 +51292,10 @@ class NetElement:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> NetElement:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> NetElement:
         r"""
         @brief Creates a copy of self
         """
@@ -50099,7 +51409,7 @@ class NetTracer:
 
     tracer = RBA::NetTracer::new
 
-    tech = RBA::NetTracerTechnology::new
+    tech = RBA::NetTracerConnectivity::new
     tech.connection("1/0", "2/0", "3/0")
 
     tracer.trace(tech, ly, ly.top_cell, RBA::Point::new(7000, 1500), ly.find_layer(1, 0))
@@ -50109,7 +51419,7 @@ class NetTracer:
     end
     @/code
 
-    This class has been introduced in version 0.25.
+    This class has been introduced in version 0.25. With version 0.28, the \NetTracerConnectivity class replaces the 'NetTracerTechnology' class.
     """
     trace_depth: int
     r"""
@@ -50133,6 +51443,10 @@ class NetTracer:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> NetTracer:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> NetTracer:
         r"""
         @brief Creates a copy of self
         """
@@ -50233,7 +51547,7 @@ class NetTracer:
         This attribute is useful only after the extraction has been performed.
         """
     @overload
-    def trace(self, tech: NetTracerTechnology, layout: Layout, cell: Cell, start_point: Point, start_layer: int) -> None:
+    def trace(self, tech: NetTracerConnectivity, layout: Layout, cell: Cell, start_point: Point, start_layer: int) -> None:
         r"""
         @brief Runs a net extraction
 
@@ -50242,7 +51556,7 @@ class NetTracer:
 
         This version runs a single extraction - i.e. it will extract all elements connected to the given seed point. A path extraction version is provided as well which will extract one (the presumably shortest) path between two points.
 
-        @param tech The technology definition
+        @param tech The connectivity definition
         @param layout The layout on which to run the extraction
         @param cell The cell on which to run the extraction (child cells will be included)
         @param start_point The start point from which to start extraction of the net
@@ -50253,9 +51567,18 @@ class NetTracer:
         r"""
         @brief Runs a net extraction taking a predefined technology
         This method behaves identical as the version with a technology object, except that it will look for a technology with the given name to obtain the extraction setup.
+        The technology is looked up by technology name. A version of this method exists where it is possible to specify the name of the particular connectivity to use in case there are multiple definitions available.
         """
     @overload
-    def trace(self, tech: NetTracerTechnology, layout: Layout, cell: Cell, start_point: Point, start_layer: int, stop_point: Point, stop_layer: int) -> None:
+    def trace(self, tech: str, connectivity_name: str, layout: Layout, cell: Cell, start_point: Point, start_layer: int) -> None:
+        r"""
+        @brief Runs a net extraction taking a predefined technology
+        This method behaves identical as the version with a technology object, except that it will look for a technology with the given name to obtain the extraction setup. This version allows specifying the name of the connecvitiy setup.
+
+        This method variant has been introduced in version 0.28.
+        """
+    @overload
+    def trace(self, tech: NetTracerConnectivity, layout: Layout, cell: Cell, start_point: Point, start_layer: int, stop_point: Point, stop_layer: int) -> None:
         r"""
         @brief Runs a path extraction
 
@@ -50264,7 +51587,7 @@ class NetTracer:
 
         This version runs a path extraction and will deliver elements forming one path leading from the start to the end point.
 
-        @param tech The technology definition
+        @param tech The connectivity definition
         @param layout The layout on which to run the extraction
         @param cell The cell on which to run the extraction (child cells will be included)
         @param start_point The start point from which to start extraction of the net
@@ -50277,5 +51600,13 @@ class NetTracer:
         r"""
         @brief Runs a path extraction taking a predefined technology
         This method behaves identical as the version with a technology object, except that it will look for a technology with the given name to obtain the extraction setup.
+        """
+    @overload
+    def trace(self, tech: str, connectivity_name: str, layout: Layout, cell: Cell, start_point: Point, start_layer: int, stop_point: Point, stop_layer: int) -> None:
+        r"""
+        @brief Runs a path extraction taking a predefined technology
+        This method behaves identical as the version with a technology object, except that it will look for a technology with the given name to obtain the extraction setup.This version allows specifying the name of the connecvitiy setup.
+
+        This method variant has been introduced in version 0.28.
         """
 

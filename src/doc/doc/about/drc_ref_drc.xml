@@ -31,7 +31,7 @@ The following global functions are relevant for the DRC expressions:
 <li><a href="/about/drc_ref_global.xml#angle">angle</a> </li>
 <li><a href="/about/drc_ref_global.xml#area">area</a> </li>
 <li><a href="/about/drc_ref_global.xml#area_ratio">area_ratio</a> </li>
-<li><a href="/about/drc_ref_global.xml#bbox_area_ratio">bbox_area_ratio</a> </li>
+<li><a href="/about/drc_ref_global.xml#bbox_aspect_ratio">bbox_aspect_ratio</a> </li>
 <li><a href="/about/drc_ref_global.xml#bbox_height">bbox_height</a> </li>
 <li><a href="/about/drc_ref_global.xml#bbox_max">bbox_max</a> </li>
 <li><a href="/about/drc_ref_global.xml#bbox_min">bbox_min</a> </li>
@@ -358,8 +358,8 @@ The plain function is equivalent to "primary.bbox_width".
 This method acts on edge expressions and delivers a specific part of each edge.
 See <a href="/about/drc_ref_layer.xml#centers">layer#centers</a> for details about this functionality.
 </p>
-<a name="corners (in condition)"/><h2>"corners (in condition)" - Applies smoothing</h2>
-<keyword name="corners (in condition)"/>
+<a name="corners"/><h2>"corners" - Applies smoothing</h2>
+<keyword name="corners"/>
 <p>Usage:</p>
 <ul>
 <li><tt>expression.corners</tt></li>

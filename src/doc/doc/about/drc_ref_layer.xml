@@ -546,7 +546,7 @@ In the same fashion, "perimeter" applies to the perimeter of the polygon.
 use the respective dimension for filtering the polygon.
 </p><p>
 Note that it's basically possible to use the polygon filters on any input - computed and secondaries.
-In fact, plain "area" for example is a shortcut for "<a href="/about/drc_ref_drc.xml#primary">DRC#primary</a>.area" indicating that
+In fact, plain "area" for example is a shortcut for "<a href="/about/drc_ref_global.xml#primary">primary</a>.area" indicating that
 the area of primary shapes are supposed to be computed.
 However, any input other than the primary is not necessarily complete or it may 
 consist of multiple polygons. Hence the computed values may be too big or too small.
@@ -656,7 +656,7 @@ Note that the precise form of the example above is
 out = l1.drc((primary &amp; secondary(l2)).area &gt; 1.0)
 </pre>
 </p><p>
-The "<a href="/about/drc_ref_drc.xml#secondary">DRC#secondary</a>" operator indicates that "l2" is to be used as secondary input to the "drc" function. Only
+The "<a href="/about/drc_ref_global.xml#secondary">secondary</a>" operator indicates that "l2" is to be used as secondary input to the "drc" function. Only
 in this form, the operators of the boolean AND can be reversed:
 </p><p>
 <pre>
@@ -3094,14 +3094,14 @@ This feature has been introduced in version 0.23.2.
 </ul>
 <p>
 This method can be applied to original layers - i.e. ones that have
-been created with <a href="#input">input</a>. By default, a small box (2x2 DBU) will be produced on each
+been created with <a href="/about/drc_ref_global.xml#input">input</a>. By default, a small box (2x2 DBU) will be produced on each
 selected text. By using the "as_dots" option, degenerated point-like edges will be
 produced.
 </p><p>
-The preferred method however is to use true text layers created with <a href="#labels">labels</a>.
+The preferred method however is to use true text layers created with <a href="/about/drc_ref_global.xml#labels">labels</a>.
 In this case, without specifying "as_dots" or "as_boxes" retains the text
 objects as such a text filtering is applied. In contrast to this, layers generated
-with <a href="#input">input</a> cannot maintain the text nature of the selected objects and 
+with <a href="/about/drc_ref_global.xml#input">input</a> cannot maintain the text nature of the selected objects and 
 produce dots or small polygon boxes in the <a href="#texts">texts</a> method.
 </p><p>
 Texts can be selected either by exact match string or a pattern match with a 
@@ -3151,7 +3151,7 @@ The effect of the operation is shown in these examples:
 <li><tt>layer.texts_not([ options ])</tt></li>
 </ul>
 <p>
-This method can be applied to true text layers obtained with <a href="#labels">labels</a>.
+This method can be applied to true text layers obtained with <a href="/about/drc_ref_global.xml#labels">labels</a>.
 In this case, without specifying "as_dots" or "as_boxes" retains the text
 objects as such. Only text filtering is applied.
 </p><p>
@@ -3338,7 +3338,7 @@ on <a href="#without_angle">without_angle</a>. This is because <a href="#without
 one edge does not match the criterion. The logical opposite of "one edge matches" however is 
 "both edges do not match".
 </p><p>
-The following images demonstrate some use cases of <a href="#with_angle">with_angle</a> and <a href="#without_angle:">without_angle:</a>
+The following images demonstrate some use cases of <a href="#with_angle">with_angle</a> and <a href="#without_angle">without_angle</a> :
 </p><p>
 <table>
 <tr>

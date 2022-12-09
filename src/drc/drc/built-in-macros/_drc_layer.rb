@@ -901,7 +901,7 @@ CODE
     # one edge does not match the criterion. The logical opposite of "one edge matches" however is 
     # "both edges do not match".
     #
-    # The following images demonstrate some use cases of \with_angle and \without_angle:
+    # The following images demonstrate some use cases of \with_angle and \without_angle :
     #
     # @table
     #   @tr 
@@ -1107,14 +1107,14 @@ CODE
     # @synopsis layer.texts(p)
     # @synopsis layer.texts([ options ])
     # This method can be applied to original layers - i.e. ones that have
-    # been created with \input. By default, a small box (2x2 DBU) will be produced on each
+    # been created with \global#input. By default, a small box (2x2 DBU) will be produced on each
     # selected text. By using the "as_dots" option, degenerated point-like edges will be
     # produced.
     #
-    # The preferred method however is to use true text layers created with \labels.
+    # The preferred method however is to use true text layers created with \global#labels.
     # In this case, without specifying "as_dots" or "as_boxes" retains the text
     # objects as such a text filtering is applied. In contrast to this, layers generated
-    # with \input cannot maintain the text nature of the selected objects and 
+    # with \global#input cannot maintain the text nature of the selected objects and 
     # produce dots or small polygon boxes in the \texts method.
     #
     # Texts can be selected either by exact match string or a pattern match with a 
@@ -1163,7 +1163,7 @@ CODE
     # @synopsis layer.texts_not(p)
     # @synopsis layer.texts_not([ options ])
     #
-    # This method can be applied to true text layers obtained with \labels.
+    # This method can be applied to true text layers obtained with \global#labels.
     # In this case, without specifying "as_dots" or "as_boxes" retains the text
     # objects as such. Only text filtering is applied.
     #

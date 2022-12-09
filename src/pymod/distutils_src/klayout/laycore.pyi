@@ -55,6 +55,10 @@ class PixelBuffer:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> PixelBuffer:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Returns a value indicating whether self is identical to the other image
@@ -239,6 +243,10 @@ class BitmapBuffer:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> BitmapBuffer:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Returns a value indicating whether self is identical to the other image
@@ -392,6 +400,10 @@ class MacroExecutionContext:
         If a debugger scope is set, back traces will be produced starting from that scope. Setting a scope is useful for implementing DSL interpreters and giving a proper hint about the original location of an error.
         """
     def __copy__(self) -> MacroExecutionContext:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> MacroExecutionContext:
         r"""
         @brief Creates a copy of self
         """
@@ -632,6 +644,10 @@ class MacroInterpreter:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> MacroInterpreter:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> MacroInterpreter:
         r"""
         @brief Creates a copy of self
         """
@@ -1635,6 +1651,10 @@ class LayerProperties:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> LayerProperties:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Equality 
@@ -2221,6 +2241,11 @@ class LayerPropertiesNodeRef(LayerPropertiesNode):
         @brief Creates a \LayerPropertiesNode object as a copy of the content of this node.
         This method is mainly provided for backward compatibility with 0.24 and before.
         """
+    def __deepcopy__(self) -> LayerPropertiesNode:
+        r"""
+        @brief Creates a \LayerPropertiesNode object as a copy of the content of this node.
+        This method is mainly provided for backward compatibility with 0.24 and before.
+        """
     def _assign(self, other: LayerProperties) -> None:
         r"""
         @brief Assigns another object to self
@@ -2271,14 +2296,14 @@ class LayerPropertiesNodeRef(LayerPropertiesNode):
         r"""
         @brief Assigns the contents of the 'other' object to self.
 
-        This version accepts a \LayerPropertiesNode object and allows modification of the layer node's hierarchy. Assignment will reconfigure the layer node in the view.
+        This version accepts a \LayerProperties object. Assignment will change the properties of the layer in the view.
         """
     @overload
     def assign(self, other: LayerProperties) -> None:
         r"""
         @brief Assigns the contents of the 'other' object to self.
 
-        This version accepts a \LayerProperties object. Assignment will change the properties of the layer in the view.
+        This version accepts a \LayerPropertiesNode object and allows modification of the layer node's hierarchy. Assignment will reconfigure the layer node in the view.
         """
     def delete(self) -> None:
         r"""
@@ -2314,6 +2339,10 @@ class LayerPropertiesIterator:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> LayerPropertiesIterator:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> LayerPropertiesIterator:
         r"""
         @brief Creates a copy of self
         """
@@ -2562,12 +2591,12 @@ class LayoutViewBase:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -2592,12 +2621,12 @@ class LayoutViewBase:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -2864,6 +2893,24 @@ class LayoutViewBase:
     Setter:
     @brief A event indicating that annotations have been added or removed
     This event has been added in version 0.25.
+    """
+    on_apply_technology: None
+    r"""
+    Getter:
+    @brief An event indicating that a cellview has requested a new technology
+
+    If the technology of a cellview is changed, this event is triggered.
+    The integer parameter of this event will indicate the cellview that has changed.
+
+    This event has been introduced in version 0.28.
+
+    Setter:
+    @brief An event indicating that a cellview has requested a new technology
+
+    If the technology of a cellview is changed, this event is triggered.
+    The integer parameter of this event will indicate the cellview that has changed.
+
+    This event has been introduced in version 0.28.
     """
     on_cell_visibility_changed: None
     r"""
@@ -3872,6 +3919,16 @@ class LayoutViewBase:
     def hide_cell(self, cell_index: int, cv_index: int) -> None:
         r"""
         @brief Hides the given cell for the given cellview
+        """
+    def icon_for_layer(self, iter: LayerPropertiesIterator, w: int, h: int, dpr: float, di_off: Optional[int] = ..., no_state: Optional[bool] = ...) -> PixelBuffer:
+        r"""
+        @brief Creates an icon pixmap for the given layer.
+
+        The icon will have size w times h pixels multiplied by the device pixel ratio (dpr). The dpr is The number of physical pixels per logical pixels on high-DPI displays.
+
+        'di_off' will shift the dither pattern by the given number of (physical) pixels. If 'no_state' is true, the icon will not reflect visibility or validity states but rather the display style.
+
+        This method has been introduced in version 0.28.
         """
     def image(self, id: int) -> Image:
         r"""
@@ -4895,6 +4952,10 @@ class CellView:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> CellView:
+        r"""
+        @brief Creates a copy of self
+        """
     def __eq__(self, other: object) -> bool:
         r"""
         @brief Equality: indicates whether the cellviews refer to the same one
@@ -5677,11 +5738,11 @@ class ActionBase:
     def icon(self) -> None:
         r"""
         WARNING: This variable can only be set, not retrieved.
-        @brief Sets the icon to the given image file
+        @brief Sets the icon to the given \QIcon object
 
-        @param file The image file to load for the icon
+        @param qicon The QIcon object
 
-        Passing an empty string will reset the icon.
+        This variant has been added in version 0.28.
         """
     icon_text: str
     r"""
@@ -6398,6 +6459,10 @@ class Cursor:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> Cursor:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -6513,6 +6578,10 @@ class ButtonState:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> ButtonState:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> ButtonState:
         r"""
         @brief Creates a copy of self
         """
@@ -6667,6 +6736,10 @@ class KeyCode:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> KeyCode:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> KeyCode:
         r"""
         @brief Creates a copy of self
         """
@@ -6900,6 +6973,10 @@ class DoubleValue:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> DoubleValue:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -7003,6 +7080,10 @@ class IntValue:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> IntValue:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -7103,6 +7184,10 @@ class StringValue:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> StringValue:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> StringValue:
         r"""
         @brief Creates a copy of self
         """
@@ -7210,6 +7295,10 @@ class StringListValue:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> StringListValue:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> StringListValue:
         r"""
         @brief Creates a copy of self
         """
@@ -7516,6 +7605,10 @@ class BrowserSource_Native:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> BrowserSource_Native:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -7628,6 +7721,10 @@ class BrowserSource:
         The default HTML string is sent when no specific implementation is provided.
         """
     def __copy__(self) -> BrowserSource:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> BrowserSource:
         r"""
         @brief Creates a copy of self
         """
@@ -8027,6 +8124,10 @@ class InputDialog:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> InputDialog:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -8224,6 +8325,10 @@ class FileDialog:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> FileDialog:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -8417,6 +8522,10 @@ class MessageBox(QMainWindow_Native):
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> MessageBox:
+        r"""
+        @brief Creates a copy of self
+        """
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -8519,6 +8628,10 @@ class NetlistObjectPath:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> NetlistObjectPath:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -8612,6 +8725,10 @@ class NetlistObjectsPath:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> NetlistObjectsPath:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> NetlistObjectsPath:
         r"""
         @brief Creates a copy of self
         """
@@ -9103,6 +9220,10 @@ class BasicAnnotation:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> BasicAnnotation:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
@@ -9305,6 +9426,13 @@ class Annotation(BasicAnnotation):
     @brief Gets the vertical angle code for use with the \angle_constraint method
     If this value is specified for the angle constraint, only vertical rulers are allowed.
     """
+    OutlineAngle: ClassVar[int]
+    r"""
+    @brief Gets the angle measurement ruler outline code for use with the \outline method
+    When this outline style is specified, the ruler is drawn to indicate the angle between the first and last segment.
+
+    This constant has been introduced in version 0.28.
+    """
     OutlineBox: ClassVar[int]
     r"""
     @brief Gets the box outline code for use with the \outline method
@@ -9332,6 +9460,13 @@ class Annotation(BasicAnnotation):
     When this outline style is specified, an ellipse is drawn with the extensions specified by the start and end point. The contour drawn as a line.
 
     This constant has been introduced in version 0.26.
+    """
+    OutlineRadius: ClassVar[int]
+    r"""
+    @brief Gets the radius measurement ruler outline code for use with the \outline method
+    When this outline style is specified, the ruler is drawn to indicate a radius defined by at least three points of the ruler.
+
+    This constant has been introduced in version 0.28.
     """
     OutlineXY: ClassVar[int]
     r"""
@@ -9375,6 +9510,7 @@ class Annotation(BasicAnnotation):
     r"""
     @brief Specifies auto-metric ruler mode for the \register_template method
     In auto-metric mode, a ruler can be placed with a single click and p1/p2 will be determined from the neighborhood.
+
     This constant has been introduced in version 0.25
     """
     RulerModeNormal: ClassVar[int]
@@ -9387,7 +9523,22 @@ class Annotation(BasicAnnotation):
     r"""
     @brief Specifies single-click ruler mode for the \register_template method
     In single click-mode, a ruler can be placed with a single click and p1 will be == p2.
+
     This constant has been introduced in version 0.25
+    """
+    RulerMultiSegment: ClassVar[int]
+    r"""
+    @brief Specifies multi-segment mode
+    In multi-segment mode, multiple segments can be created. The ruler is finished with a double click.
+
+    This constant has been introduced in version 0.28
+    """
+    RulerThreeClicks: ClassVar[int]
+    r"""
+    @brief Specifies three-click ruler mode for the \register_template method
+    In this ruler mode, two segments are created for angle and circle radius measurements. Three mouse clicks are required.
+
+    This constant has been introduced in version 0.28
     """
     StyleArrowBoth: ClassVar[int]
     r"""
@@ -9543,22 +9694,47 @@ class Annotation(BasicAnnotation):
     Getter:
     @brief Gets the first point of the ruler or marker
     The points of the ruler or marker are always given in micron units in floating-point coordinates.
+
+    This method is provided for backward compatibility. Starting with version 0.28, rulers can be multi-segmented. Use \points or \seg_p1 to retrieve the points of the ruler segments.
+
     @return The first point
 
     Setter:
     @brief Sets the first point of the ruler or marker
     The points of the ruler or marker are always given in micron units in floating-point coordinates.
+
+    This method is provided for backward compatibility. Starting with version 0.28, rulers can be multi-segmented. Use \points= to specify the ruler segments.
     """
     p2: db.DPoint
     r"""
     Getter:
     @brief Gets the second point of the ruler or marker
     The points of the ruler or marker are always given in micron units in floating-point coordinates.
+
+    This method is provided for backward compatibility. Starting with version 0.28, rulers can be multi-segmented. Use \points or \seg_p1 to retrieve the points of the ruler segments.
+
     @return The second point
 
     Setter:
     @brief Sets the second point of the ruler or marker
     The points of the ruler or marker are always given in micron units in floating-point coordinates.
+
+    This method is provided for backward compatibility. Starting with version 0.28, rulers can be multi-segmented. Use \points= to specify the ruler segments.
+    """
+    points: List[db.DPoint]
+    r"""
+    Getter:
+    @brief Gets the points of the ruler
+    A single-segmented ruler has two points. Rulers with more points have more segments correspondingly. Note that the point list may have one point only (single-point ruler) or may even be empty.
+
+    Use \points= to set the segment points. Use \segments to get the number of segments and \seg_p1 and \seg_p2 to get the first and second point of one segment.
+
+    Multi-segmented rulers have been introduced in version 0.28
+    Setter:
+    @brief Sets the points for a (potentially) multi-segmented ruler
+    See \points for a description of multi-segmented rulers. The list of points passed to this method is cleaned from duplicates before being stored inside the ruler.
+
+    This method has been introduced in version 0.28.
     """
     snap: bool
     r"""
@@ -9631,85 +9807,12 @@ class Annotation(BasicAnnotation):
     This method has been introduced in version 0.25
     """
     @classmethod
-    def angle_any(cls) -> int:
+    def from_s(cls, s: str) -> Annotation:
         r"""
-        @brief Gets the any angle code for use with the \angle_constraint method
-        If this value is specified for the angle constraint, all angles will be allowed.
-        """
-    @classmethod
-    def angle_diagonal(cls) -> int:
-        r"""
-        @brief Gets the diagonal angle code for use with the \angle_constraint method
-        If this value is specified for the angle constraint, only multiples of 45 degree are allowed.
-        """
-    @classmethod
-    def angle_global(cls) -> int:
-        r"""
-        @brief Gets the global angle code for use with the \angle_constraint method.
-        This code will tell the ruler or marker to use the angle constraint defined globally.
-        """
-    @classmethod
-    def angle_horizontal(cls) -> int:
-        r"""
-        @brief Gets the horizontal angle code for use with the \angle_constraint method
-        If this value is specified for the angle constraint, only horizontal rulers are allowed.
-        """
-    @classmethod
-    def angle_ortho(cls) -> int:
-        r"""
-        @brief Gets the ortho angle code for use with the \angle_constraint method
-        If this value is specified for the angle constraint, only multiples of 90 degree are allowed.
-        """
-    @classmethod
-    def angle_vertical(cls) -> int:
-        r"""
-        @brief Gets the vertical angle code for use with the \angle_constraint method
-        If this value is specified for the angle constraint, only vertical rulers are allowed.
-        """
-    @classmethod
-    def outline_box(cls) -> int:
-        r"""
-        @brief Gets the box outline code for use with the \outline method
-        When this outline style is specified, a box is drawn with the corners specified by the start and end point. All box edges are drawn in the style specified with the \style attribute.
-        """
-    @classmethod
-    def outline_diag(cls) -> int:
-        r"""
-        @brief Gets the diagonal output code for use with the \outline method
-        When this outline style is specified, a line connecting start and end points in the given style (ruler, arrow or plain line) is drawn.
-        """
-    @classmethod
-    def outline_diag_xy(cls) -> int:
-        r"""
-        @brief Gets the xy plus diagonal outline code for use with the \outline method
-        @brief outline_xy code used by the \outline method
-        When this outline style is specified, three lines are drawn: one horizontal from left to right and attached to the end of that a line from the bottom to the top. Another line is drawn connecting the start and end points directly. The lines are drawn in the specified style (see \style method).
-        """
-    @classmethod
-    def outline_diag_yx(cls) -> int:
-        r"""
-        @brief Gets the yx plus diagonal outline code for use with the \outline method
-        When this outline style is specified, three lines are drawn: one vertical from bottom to top and attached to the end of that a line from the left to the right. Another line is drawn connecting the start and end points directly. The lines are drawn in the specified style (see \style method).
-        """
-    @classmethod
-    def outline_ellipse(cls) -> int:
-        r"""
-        @brief Gets the ellipse outline code for use with the \outline method
-        When this outline style is specified, an ellipse is drawn with the extensions specified by the start and end point. The contour drawn as a line.
+        @brief Creates a ruler from a string representation
+        This function creates a ruler from the string returned by \to_s.
 
-        This constant has been introduced in version 0.26.
-        """
-    @classmethod
-    def outline_xy(cls) -> int:
-        r"""
-        @brief Gets the xy outline code for use with the \outline method
-        When this outline style is specified, two lines are drawn: one horizontal from left to right and attached to the end of that a line from the bottom to the top. The lines are drawn in the specified style (see \style method).
-        """
-    @classmethod
-    def outline_yx(cls) -> int:
-        r"""
-        @brief Gets the yx outline code for use with the \outline method
-        When this outline style is specified, two lines are drawn: one vertical from bottom to top and attached to the end of that a line from the left to the right. The lines are drawn in the specified style (see \style method).
+        This method was introduced in version 0.28.
         """
     @classmethod
     def register_template(cls, annotation: BasicAnnotation, title: str, mode: Optional[int] = ...) -> None:
@@ -9726,60 +9829,6 @@ class Annotation(BasicAnnotation):
         NOTE: this setting is persisted and the the application configuration is updated.
 
         This method has been added in version 0.25.
-        """
-    @classmethod
-    def style_arrow_both(cls) -> int:
-        r"""
-        @brief Gets the both arrow ends style code for use the \style method
-        When this style is specified, a two-headed arrow is drawn.
-        """
-    @classmethod
-    def style_arrow_end(cls) -> int:
-        r"""
-        @brief Gets the end arrow style code for use the \style method
-        When this style is specified, an arrow is drawn pointing from the start to the end point.
-        """
-    @classmethod
-    def style_arrow_start(cls) -> int:
-        r"""
-        @brief Gets the start arrow style code for use the \style method
-        When this style is specified, an arrow is drawn pointing from the end to the start point.
-        """
-    @classmethod
-    def style_cross_both(cls) -> int:
-        r"""
-        @brief Gets the line style code for use with the \style method
-        When this style is specified, a cross is drawn at both points.
-
-        This constant has been added in version 0.26.
-        """
-    @classmethod
-    def style_cross_end(cls) -> int:
-        r"""
-        @brief Gets the line style code for use with the \style method
-        When this style is specified, a cross is drawn at the end point.
-
-        This constant has been added in version 0.26.
-        """
-    @classmethod
-    def style_cross_start(cls) -> int:
-        r"""
-        @brief Gets the line style code for use with the \style method
-        When this style is specified, a cross is drawn at the start point.
-
-        This constant has been added in version 0.26.
-        """
-    @classmethod
-    def style_line(cls) -> int:
-        r"""
-        @brief Gets the line style code for use with the \style method
-        When this style is specified, a plain line is drawn.
-        """
-    @classmethod
-    def style_ruler(cls) -> int:
-        r"""
-        @brief Gets the ruler style code for use the \style method
-        When this style is specified, the annotation will show a ruler with some ticks at distances indicating a decade of units and a suitable subdivision into minor ticks at intervals of 1, 2 or 5 units.
         """
     @classmethod
     def unregister_templates(cls, category: str) -> None:
@@ -9883,17 +9932,42 @@ class Annotation(BasicAnnotation):
 
         This method was introduced in version 0.25.
         """
-    def text(self) -> str:
+    def seg_p1(self, segment_index: int) -> db.DPoint:
+        r"""
+        @brief Gets the first point of the given segment.
+        The segment is indicated by the segment index which is a number between 0 and \segments-1.
+
+        This method has been introduced in version 0.28.
+        """
+    def seg_p2(self, segment_index: int) -> db.DPoint:
+        r"""
+        @brief Gets the second point of the given segment.
+        The segment is indicated by the segment index which is a number between 0 and \segments-1.
+        The second point of a segment is also the first point of the following segment if there is one.
+
+        This method has been introduced in version 0.28.
+        """
+    def segments(self) -> int:
+        r"""
+        @brief Gets the number of segments.
+        This method returns the number of segments the ruler is made up. Even though the ruler can be one or even zero points, the number of segments is at least 1.
+
+        This method has been introduced in version 0.28.
+        """
+    def text(self, index: Optional[int] = ...) -> str:
         r"""
         @brief Returns the formatted text for the main label
+        The index parameter indicates which segment to use (0 is the first one). It has been added in version 0.28.
         """
-    def text_x(self) -> str:
+    def text_x(self, index: Optional[int] = ...) -> str:
         r"""
         @brief Returns the formatted text for the x-axis label
+        The index parameter indicates which segment to use (0 is the first one). It has been added in version 0.28.
         """
-    def text_y(self) -> str:
+    def text_y(self, index: Optional[int] = ...) -> str:
         r"""
         @brief Returns the formatted text for the y-axis label
+        The index parameter indicates which segment to use (0 is the first one). It has been added in version 0.28.
         """
     def to_s(self) -> str:
         r"""
@@ -10085,6 +10159,10 @@ class ObjectInstPath:
         Use this constructor to quickly turn a recursive shape iterator delivery into a shape selection.
         """
     def __copy__(self) -> ObjectInstPath:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> ObjectInstPath:
         r"""
         @brief Creates a copy of self
         """
@@ -10419,6 +10497,10 @@ class ImageDataMapping:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> ImageDataMapping:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self) -> None:
         r"""
         @brief Create a new data mapping object with default settings
@@ -10565,6 +10647,10 @@ class BasicImage:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> BasicImage:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> BasicImage:
         r"""
         @brief Creates a copy of self
         """

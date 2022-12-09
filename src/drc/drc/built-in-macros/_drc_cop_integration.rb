@@ -214,7 +214,7 @@ module DRC
     # use the respective dimension for filtering the polygon.
     #
     # Note that it's basically possible to use the polygon filters on any input - computed and secondaries.
-    # In fact, plain "area" for example is a shortcut for "\DRC#primary.area" indicating that
+    # In fact, plain "area" for example is a shortcut for "\global#primary.area" indicating that
     # the area of primary shapes are supposed to be computed.
     # However, any input other than the primary is not necessarily complete or it may 
     # consist of multiple polygons. Hence the computed values may be too big or too small.
@@ -324,7 +324,7 @@ module DRC
     # out = l1.drc((primary & secondary(l2)).area > 1.0)
     # @/code
     #
-    # The "\DRC#secondary" operator indicates that "l2" is to be used as secondary input to the "drc" function. Only
+    # The "\global#secondary" operator indicates that "l2" is to be used as secondary input to the "drc" function. Only
     # in this form, the operators of the boolean AND can be reversed:
     # 
     # @code
@@ -740,7 +740,7 @@ CODE
     # \DRC# expressions (see \Layer#drc and \global#rectilinear for more details).
 
     # %DRC%
-    # @name length (in condition)
+    # @name length
     # @brief Computes the total edge length of an edge layer or in universal DRC context: selects edges based on a length condition
     # @synopsis length (in condition)
     # @synopsis length(layer)
@@ -752,7 +752,7 @@ CODE
     # the operation acts similar to \Layer#with_length.
 
     # %DRC%
-    # @name angle (in condition)
+    # @name angle
     # @brief In universal DRC context: selects edges based on their orientation
     # @synopsis angle (in condition)
     #

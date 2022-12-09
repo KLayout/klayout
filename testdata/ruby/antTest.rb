@@ -626,7 +626,7 @@ class Ant_TestClass < TestBase
   def test_5
 
     lv = RBA::LayoutView::new
-    lv.set_config("ruler-templates", "mode=normal,title=Ruler,category=_ruler,fmt=$D,fmt_x=$X,fmt_y=$Y,position=auto,xalign=auto,yalign=auto,xlabel_xalign=auto,xlabel_yalign=auto,ylabel_xalign=auto,ylabel_yalign=auto,style=ruler,outline=diag,snap=true,angle_constraint=global")
+    lv.set_config("ruler-templates-v2", "mode=normal,title=Ruler,category=_ruler,fmt=$D,fmt_x=$X,fmt_y=$Y,position=auto,xalign=auto,yalign=auto,xlabel_xalign=auto,xlabel_yalign=auto,ylabel_xalign=auto,ylabel_yalign=auto,style=ruler,outline=diag,snap=true,angle_constraint=global")
     tpl = lv.annotation_templates
     assert_equal(tpl.size, 1)
 

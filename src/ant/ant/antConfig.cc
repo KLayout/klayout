@@ -298,7 +298,7 @@ const std::string cfg_ruler_snap_mode ("ruler-snap-mode");
 const std::string cfg_ruler_obj_snap ("ruler-obj-snap");
 const std::string cfg_ruler_grid_snap ("ruler-grid-snap");
 const std::string cfg_ruler_grid_micron ("grid-micron");
-const std::string cfg_ruler_templates ("ruler-templates");
+const std::string cfg_ruler_templates ("ruler-templates-v2");
 const std::string cfg_current_ruler_template ("current-ruler-template");
 
 } // namespace ant

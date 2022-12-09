@@ -1917,7 +1917,6 @@ CODE
       select_not_overlapping
       select_outside
       select_overlapping
-      select_touching
       size
       sized 
       smoothed

@@ -419,18 +419,20 @@ output(w, "width violations")</pre>
       <a href="/about/drc_ref_layer.xml#merged">merged</a>
     </li>
     <li>Shape selections:<br/>
+      <a href="/about/drc_ref_layer.xml#covering">covering</a>,
       <a href="/about/drc_ref_layer.xml#in">in</a>,
       <a href="/about/drc_ref_layer.xml#inside">inside</a>,
       <a href="/about/drc_ref_layer.xml#interacting">interacting</a>,
-      <a href="/about/drc_ref_layer.xml#pull_interacting">pull_interacting</a>,
       <a href="/about/drc_ref_layer.xml#outside">outside</a>,
-      <a href="/about/drc_ref_layer.xml#touching">touching</a>,
       <a href="/about/drc_ref_layer.xml#overlapping">overlapping</a><br/>
+      <a href="/about/drc_ref_layer.xml#pull_inside">pull_inside</a>,
+      <a href="/about/drc_ref_layer.xml#pull_interacting">pull_interacting</a>,
+      <a href="/about/drc_ref_layer.xml#pull_outside">pull_outside</a>,
       These methods are available as in-place operations as well:<br/>
+      <a href="/about/drc_ref_layer.xml#select_covering">select_covering</a>,
       <a href="/about/drc_ref_layer.xml#select_interacting">select_interacting</a>,
       <a href="/about/drc_ref_layer.xml#select_inside">select_inside</a>,
       <a href="/about/drc_ref_layer.xml#select_outside">select_outside</a>,
-      <a href="/about/drc_ref_layer.xml#select_touching">select_touching</a>,
       <a href="/about/drc_ref_layer.xml#select_overlapping">select_overlapping</a>
     </li>
     <li>Filters:<br/>

@@ -1,4 +1,4 @@
-0.28
+0.28             (2022-12-09):
 Changes (list may not be complete):
 * Bugfix: %GITHUB%/issues/989 "Layout#convert_pcell_to_static" does not handle"defunct" cells
 * Bugfix: %GITHUB%/issues/991 Basic library not available in Python module
@@ -7,10 +7,12 @@ Changes (list may not be complete):
 * Bugfix: %GITHUB%/issues/1138 Provide a way to suppress or redirect log output or disable warnings, specifically from file readers, in Python module
 * Bugfix: %GITHUB%/issues/1178 technology-data xml results in SEGV
 * Bugfix: %GITHUB%/issues/1190 General compatibility issue of Edges#extended/extended_* with deep mode
-* Enhacnement: %GITHUB%/issues/1056 X2 net names
-* Enhancement: %GITHUB%/issues/1052 Pdf documentation
-* Enhancement: %GITHUB%/issues/1053 Lefdef enhancements
-* Enhancement: Support for Qt6
+* Bugfix: %GITHUB%/issues/1216 DRC internal error on "moved"
+* Bugfix: %GITHUB%/issues/1214 LEF via parser error
+* Enhancement: %GITHUB%/issues/1056 X2 net names
+* Enhancement: %GITHUB%/issues/1052 PDF documentation
+* Enhancement: %GITHUB%/issues/1053 LEF/DEF enhancements
+* Enhancement: Qt6 enabled
 * Enhancement: KLayout paths
   - $KLAYOUT_HOME can now be empty string (no home folder used)
   - $KLAYOUT_PATH can now be empty string (no further and implicit search paths)

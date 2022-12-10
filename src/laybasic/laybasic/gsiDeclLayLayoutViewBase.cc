@@ -1977,7 +1977,7 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutVi
     "@brief Sends a mouse move event\n"
     "\n"
     "This method is intended to emulate the mouse move events sent by Qt normally in environments where Qt is not present. "
-    "The arguments follow the conventions used within \\Plugin#mouse_move_event for example.\n"
+    "The arguments follow the conventions used within \\Plugin#mouse_moved_event for example.\n"
     "\n"
     "This method was introduced in version 0.28."
   ) +
@@ -1985,7 +1985,7 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutVi
     "@brief Sends a mouse button press event\n"
     "\n"
     "This method is intended to emulate the mouse button press events sent by Qt normally in environments where Qt is not present. "
-    "The arguments follow the conventions used within \\Plugin#mouse_move_event for example.\n"
+    "The arguments follow the conventions used within \\Plugin#mouse_moved_event for example.\n"
     "\n"
     "This method was introduced in version 0.28."
   ) +
@@ -1993,7 +1993,7 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutVi
     "@brief Sends a mouse button double-click event\n"
     "\n"
     "This method is intended to emulate the mouse button double-click events sent by Qt normally in environments where Qt is not present. "
-    "The arguments follow the conventions used within \\Plugin#mouse_move_event for example.\n"
+    "The arguments follow the conventions used within \\Plugin#mouse_moved_event for example.\n"
     "\n"
     "This method was introduced in version 0.28."
   ) +
@@ -2001,7 +2001,7 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutVi
     "@brief Sends a mouse button release event\n"
     "\n"
     "This method is intended to emulate the mouse button release events sent by Qt normally in environments where Qt is not present. "
-    "The arguments follow the conventions used within \\Plugin#mouse_move_event for example.\n"
+    "The arguments follow the conventions used within \\Plugin#mouse_moved_event for example.\n"
     "\n"
     "This method was introduced in version 0.28."
   ) +

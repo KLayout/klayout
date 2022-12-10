@@ -30,12 +30,11 @@ module DRC
 # @li \global#angle @/li
 # @li \global#area @/li
 # @li \global#area_ratio @/li
-# @li \global#bbox_area_ratio @/li
+# @li \global#bbox_aspect_ratio @/li
 # @li \global#bbox_height @/li
 # @li \global#bbox_max @/li
 # @li \global#bbox_min @/li
 # @li \global#bbox_width @/li
-# @li \global#case @/li
 # @li \global#corners @/li
 # @li \global#covering @/li
 # @li \global#enc @/li
@@ -70,6 +69,7 @@ module DRC
 # @li \global#smoothed @/li
 # @li \global#space @/li
 # @li \global#squares @/li
+# @li \global#switch @/li
 # @li \global#width @/li
 # @li \global#with_holes @/li
 # @/ul
@@ -755,7 +755,7 @@ CODE
   end
   
   # %DRC%
-  # @name corners (in condition)
+  # @name corners
   # @brief Applies smoothing
   # @synopsis expression.corners
   # @synopsis expression.corners(as_dots)

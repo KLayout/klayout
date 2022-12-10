@@ -1226,7 +1226,7 @@ gsi::ClassExt<lay::LayoutViewBase> layout_view_decl (
     gsi::arg ("category"),
     "@brief Unregisters the template or templates with the given category string on this particular view\n"
     "\n"
-    "See \\Annotation#unregister_template for a method doing the same on application level."
+    "See \\Annotation#unregister_templates for a method doing the same on application level."
     "This method is hardly useful normally, but can be used when customizing layout views as "
     "individual widgets.\n"
     "\n"

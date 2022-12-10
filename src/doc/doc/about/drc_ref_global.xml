@@ -8,8 +8,8 @@
 <title>DRC Reference: Global Functions</title>
 <keyword name="global"/>
 <h2-index/>
-<a name="angle (in condition)"/><h2>"angle (in condition)" - In universal DRC context: selects edges based on their orientation</h2>
-<keyword name="angle (in condition)"/>
+<a name="angle"/><h2>"angle" - In universal DRC context: selects edges based on their orientation</h2>
+<keyword name="angle"/>
 <p>Usage:</p>
 <ul>
 <li><tt>angle (in condition)</tt></li>
@@ -41,7 +41,7 @@ is equivalent to "layer.area" (see <a href="/about/drc_ref_layer.xml#area">Layer
 polygons in the layer. 
 </p><p>
 Without a layer argument, "area" represents an area filter for primary shapes in 
-<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#area">DRC#area</a> for more details).
+<a href="/about/drc_ref_global.xml">global</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#area">DRC#area</a> for more details).
 </p>
 <a name="area_ratio"/><h2>"area_ratio" - Selects primary shapes based on the ratio of bounding box and polygon area</h2>
 <keyword name="area_ratio"/>
@@ -359,7 +359,7 @@ See <a href="/about/drc_ref_netter.xml#connect_implicit">Netter#connect_implicit
 This function can be used with a layer argument. In this case it
 is equivalent to "layer.corners" (see <a href="/about/drc_ref_layer.xml#corners">Layer#corners</a>). Without a layer
 argument, "corners" represents the corner generator/filter in primary shapes for
-<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#corners">DRC#corners</a> for more details).
+<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_global.xml#corners">corners</a> for more details).
 </p><p>
 Like the layer-based version, the "corners" operator accepts the 
 output type option: "as_dots" for dot-like edges, "as_boxes" for
@@ -380,7 +380,7 @@ This operator represents the selector of primary shapes
 which entirely cover shapes from the other layer. This version can be put into
 a condition indicating how many shapes of the other layer need to be covered.
 Use this operator within <a href="/about/drc_ref_drc.xml">DRC</a> expressions (also see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>). If can be used
-as method to an expression. See there for more details: <a href="/about/drc_ref_drc.xml#covering">DRC#covering</a>.
+as method to an expression. See there for more details: <a href="/about/drc_ref_global.xml#covering">covering</a>.
 </p>
 <a name="dbu"/><h2>"dbu" - Gets or sets the database unit to use</h2>
 <keyword name="dbu"/>
@@ -721,7 +721,7 @@ See <a href="/about/drc_ref_source.xml#extent">Source#extent</a> for a descripti
 This function can be used with a layer argument. In this case it
 is equivalent to "layer.extent_refs" (see <a href="/about/drc_ref_layer.xml#extent_refs">Layer#extent_refs</a>). Without a layer
 argument, "extent_refs" represents the partial extents extractor on primary shapes within
-<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#extent_refs">DRC#extent_refs</a> for more details).
+<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_global.xml#extent_refs">extent_refs</a> for more details).
 </p>
 <a name="extents"/><h2>"extents" - Returns the bounding box of each input object</h2>
 <keyword name="extents"/>
@@ -734,7 +734,7 @@ argument, "extent_refs" represents the partial extents extractor on primary shap
 This function can be used with a layer argument. In this case it
 is equivalent to "layer.extents" (see <a href="/about/drc_ref_layer.xml#extents">Layer#extents</a>). Without a layer
 argument, "extents" represents the extents generator on primary shapes within
-<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#extents">DRC#extents</a> for more details).
+<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_global.xml#extents">extents</a> for more details).
 </p>
 <a name="extract_devices"/><h2>"extract_devices" - Extracts devices for a given device extractor and device layer selection</h2>
 <keyword name="extract_devices"/>
@@ -813,7 +813,7 @@ argument, "holes" represents a hole extractor for primary shapes in
 This function can be used with a layer argument. In this case it
 is equivalent to "layer.hulls" (see <a href="/about/drc_ref_layer.xml#hulls">Layer#hulls</a>). Without a layer
 argument, "hulls" represents a hull contour extractor for primary shapes in 
-<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#hulls">DRC#hulls</a> for more details).
+<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_global.xml#hulls">hulls</a> for more details).
 </p>
 <a name="if_all"/><h2>"if_all" - Evaluates to the primary shape when all condition expression results are non-empty</h2>
 <keyword name="if_all"/>
@@ -888,7 +888,7 @@ this method.
 This operator represents the selector of primary shapes
 which are inside shapes from the other layer. 
 Use this operator within <a href="/about/drc_ref_drc.xml">DRC</a> expressions (also see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>). If can be used
-as method to an expression. See there for more details: <a href="/about/drc_ref_drc.xml#inside">DRC#inside</a>.
+as method to an expression. See there for more details: <a href="/about/drc_ref_global.xml#inside">inside</a>.
 </p>
 <a name="interacting"/><h2>"interacting" - Selects shapes interacting with other shapes</h2>
 <keyword name="interacting"/>
@@ -901,7 +901,7 @@ This operator represents the selector of primary shapes
 which interact with shapes from the other layer. This version can be put into
 a condition indicating how many shapes of the other layer need to be covered.
 Use this operator within <a href="/about/drc_ref_drc.xml">DRC</a> expressions (also see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>). If can be used
-as method to an expression. See there for more details: <a href="/about/drc_ref_drc.xml#interacting">DRC#interacting</a>.
+as method to an expression. See there for more details: <a href="/about/drc_ref_global.xml#interacting">interacting</a>.
 </p>
 <a name="is_deep?"/><h2>"is_deep?" - Returns true, if in deep mode</h2>
 <keyword name="is_deep?"/>
@@ -1038,8 +1038,8 @@ l2 = layout("second_layout.gds")
 </p><p>
 For further methods on the source object see <a href="/about/drc_ref_source.xml">Source</a>.
 </p>
-<a name="length (in condition)"/><h2>"length (in condition)" - Computes the total edge length of an edge layer or in universal DRC context: selects edges based on a length condition</h2>
-<keyword name="length (in condition)"/>
+<a name="length"/><h2>"length" - Computes the total edge length of an edge layer or in universal DRC context: selects edges based on a length condition</h2>
+<keyword name="length"/>
 <p>Usage:</p>
 <ul>
 <li><tt>length (in condition)</tt></li>
@@ -1136,7 +1136,7 @@ See also <a href="#max_area_ratio">max_area_ratio</a> for the other option affec
 This function can be used with a layer argument. In this case it
 is equivalent to "layer.middle" (see <a href="/about/drc_ref_layer.xml#middle">Layer#middle</a>). Without a layer
 argument, "middle" represents the bounding box center marker generator on primary shapes within
-<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#middle">DRC#middle</a> for more details).
+<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_global.xml#middle">middle</a> for more details).
 </p>
 <a name="mos3"/><h2>"mos3" - Supplies the MOS3 transistor extractor class</h2>
 <keyword name="mos3"/>
@@ -1267,7 +1267,7 @@ layout if is report database.
 This operator represents the selector of primary shapes
 which are outside shapes from the other layer. 
 Use this operator within <a href="/about/drc_ref_drc.xml">DRC</a> expressions (also see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>). If can be used
-as method to an expression. See there for more details: <a href="/about/drc_ref_drc.xml#outside">DRC#outside</a>.
+as method to an expression. See there for more details: <a href="/about/drc_ref_global.xml#outside">outside</a>.
 </p>
 <a name="overlap"/><h2>"overlap" - Performs an overlap check</h2>
 <keyword name="overlap"/>
@@ -1330,7 +1330,7 @@ This operator represents the selector of primary shapes
 which overlap shapes from the other layer. This version can be put into
 a condition indicating how many shapes of the other layer need to be covered.
 Use this operator within <a href="/about/drc_ref_drc.xml">DRC</a> expressions (also see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a>). If can be used
-as method to an expression. See there for more details: <a href="/about/drc_ref_drc.xml#overlapping">DRC#overlapping</a>.
+as method to an expression. See there for more details: <a href="/about/drc_ref_global.xml#overlapping">overlapping</a>.
 </p>
 <a name="p"/><h2>"p" - Creates a point object</h2>
 <keyword name="p"/>
@@ -1424,7 +1424,7 @@ is called on.
 This function can be used with a layer argument. In this case it
 is equivalent to "layer.rectangles" (see <a href="/about/drc_ref_layer.xml#rectangles">Layer#rectangles</a>). Without a layer
 argument, "rectangles" represents the rectangles filter for primary shapes in 
-<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#rectangles">DRC#rectangles</a> for more details).
+<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_global.xml#rectangles">rectangles</a> for more details).
 </p>
 <a name="rectilinear"/><h2>"rectilinear" - Selects all polygons which are rectilinear</h2>
 <keyword name="rectilinear"/>
@@ -1437,7 +1437,7 @@ argument, "rectangles" represents the rectangles filter for primary shapes in
 This function can be used with a layer argument. In this case it
 is equivalent to "layer.rectilinear" (see <a href="/about/drc_ref_layer.xml#rectilinear">Layer#rectilinear</a>). Without a layer
 argument, "rectilinear" represents the rectilinear polygons filter for primary shapes in 
-<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#rectilinear">DRC#rectilinear</a> for more details).
+<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_global.xml#rectilinear">rectilinear</a> for more details).
 </p>
 <a name="region_overlap"/><h2>"region_overlap" - Specifies region selected input in "overlap mode"</h2>
 <keyword name="region_overlap"/>
@@ -1570,7 +1570,7 @@ about this extractor.
 This function can be used with a layer argument. In this case it
 is equivalent to "layer.rounded_corners" (see <a href="/about/drc_ref_layer.xml#rounded_corners">Layer#rounded_corners</a>). Without a layer
 argument, "rounded_corners" represents the corner rounding algorithm on primary shapes within
-<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#rounded_corners">DRC#rounded_corners</a> for more details).
+<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_global.xml#rounded_corners">rounded_corners</a> for more details).
 </p>
 <a name="secondary"/><h2>"secondary" - Provides secondary input for the "drc" universal DRC function</h2>
 <keyword name="secondary"/>
@@ -1703,7 +1703,7 @@ This function is equivalent to "verbose(false)" (see <a href="#verbose">verbose<
 This function can be used with a layer argument. In this case it
 is equivalent to "layer.sized" (see <a href="/about/drc_ref_layer.xml#sized">Layer#sized</a>). Without a layer
 argument, "sized" represents the polygon sizer on primary shapes within
-<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#sized">DRC#sized</a> for more details).
+<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_global.xml#sized">sized</a> for more details).
 </p>
 <a name="smoothed"/><h2>"smoothed" - Applies smoothing</h2>
 <keyword name="smoothed"/>
@@ -1716,7 +1716,7 @@ argument, "sized" represents the polygon sizer on primary shapes within
 This function can be used with a layer argument. In this case it
 is equivalent to "layer.smoothed" (see <a href="/about/drc_ref_layer.xml#smoothed">Layer#smoothed</a>). Without a layer
 argument, "smoothed" represents the polygon smoother on primary shapes within
-<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#smoothed">DRC#smoothed</a> for more details).
+<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_global.xml#smoothed">smoothed</a> for more details).
 </p>
 <a name="source"/><h2>"source" - Specifies a source layout</h2>
 <keyword name="source"/>
@@ -1815,7 +1815,7 @@ See <a href="#enclosing">enclosing</a> for more details about the various ways t
 This function can be used with a layer argument. In this case it
 is equivalent to "layer.squares" (see <a href="/about/drc_ref_layer.xml#squares">Layer#squares</a>). Without a layer
 argument, "squares" represents the rectangles filter for primary shapes in 
-<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#squares">DRC#squares</a> for more details).
+<a href="/about/drc_ref_drc.xml">DRC</a> expressions (see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_global.xml#squares">squares</a> for more details).
 </p>
 <a name="switch"/><h2>"switch" - A conditional selector for the "drc" universal DRC function</h2>
 <keyword name="switch"/>
@@ -1913,9 +1913,9 @@ The tile border specifies the distance to which shapes are collected into the
 tile. In order words, when processing a tile, shapes within the border distance
 participate in the operations.
 </p><p>
-For some operations such as booleans (<a href="#and">and</a>, <a href="#or">or</a>, ...), <a href="#size">size</a> and the DRC functions (<a href="#width">width</a>, <a href="#space">space</a>, ...)
-a tile border is automatically established. For other operations such as <a href="#with_area">with_area</a>
-or <a href="#edges">edges</a>, the exact distance is unknown, because such operations may have a long range.
+For some operations such as booleans (<a href="/about/drc_ref_layer.xml#and">Layer#and</a>, <a href="/about/drc_ref_layer.xml#or">Layer#or</a>, ...), <a href="/about/drc_ref_layer.xml#size">Layer#size</a> and the DRC functions (<a href="/about/drc_ref_layer.xml#width">Layer#width</a>, <a href="/about/drc_ref_layer.xml#space">Layer#space</a>, ...)
+a tile border is automatically established. For other operations such as <a href="/about/drc_ref_layer.xml#with_area">Layer#with_area</a>
+or <a href="/about/drc_ref_layer.xml#edges">Layer#edges</a>, the exact distance is unknown, because such operations may have a long range.
 In that cases, no border is used. The tile_borders function may be used to specify a minimum border
 which is used in that case. That allows taking into account at least shapes within the 
 given range, although not necessarily all.
@@ -2056,7 +2056,7 @@ shape.
 <p>
 "with_holes" represents a polygon selector for
 <a href="/about/drc_ref_drc.xml">DRC</a> expressions selecting polygons of the primary by their number of holes
-(see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_drc.xml#with_holes">DRC#with_holes</a> for more details).
+(see <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> and <a href="/about/drc_ref_global.xml#with_holes">with_holes</a> for more details).
 </p>
 <a name="write_spice"/><h2>"write_spice" - Defines SPICE output format (with options)</h2>
 <keyword name="write_spice"/>

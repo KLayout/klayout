@@ -783,9 +783,9 @@ module DRC
     # tile. In order words, when processing a tile, shapes within the border distance
     # participate in the operations.
     #
-    # For some operations such as booleans (\and, \or, ...), \size and the DRC functions (\width, \space, ...)
-    # a tile border is automatically established. For other operations such as \with_area
-    # or \edges, the exact distance is unknown, because such operations may have a long range.
+    # For some operations such as booleans (\Layer#and, \Layer#or, ...), \Layer#size and the DRC functions (\Layer#width, \Layer#space, ...)
+    # a tile border is automatically established. For other operations such as \Layer#with_area
+    # or \Layer#edges, the exact distance is unknown, because such operations may have a long range.
     # In that cases, no border is used. The tile_borders function may be used to specify a minimum border
     # which is used in that case. That allows taking into account at least shapes within the 
     # given range, although not necessarily all.
@@ -1917,7 +1917,6 @@ CODE
       select_not_overlapping
       select_outside
       select_overlapping
-      select_touching
       size
       sized 
       smoothed
@@ -1937,7 +1936,7 @@ CODE
       with_area
       with_area_ratio
       with_bbox_area
-      with_bbox_area_ratio
+      with_bbox_aspect_ratio
       with_bbox_height
       with_bbox_max
       with_bbox_min
@@ -1948,7 +1947,7 @@ CODE
       without_area
       without_area_ratio
       without_bbox
-      without_bbox_area_ratio
+      without_bbox_aspect_ratio
       without_bbox_height
       without_bbox_max
       without_bbox_min

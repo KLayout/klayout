@@ -51,9 +51,9 @@ def escape(mod, s)
   s.gsub("&", "&amp;").
     gsub("<", "&lt;").
     gsub(">", "&gt;").
-    gsub(/\\\\([\w:#]+)/) { create_link(mod, $1) }.
-    gsub(/\\([\w:#]+)/) { create_ref(mod, $1) }.
-    gsub(/RBA::([\w#]+)/) { create_class_doc_ref($1) }
+    gsub(/\\\\([\w:#\?]+)/) { create_link(mod, $1) }.
+    gsub(/\\([\w:#\?]+)/) { create_ref(mod, $1) }.
+    gsub(/RBA::([\w#\?]+)/) { create_class_doc_ref($1) }
 end
 
 def unescape(s)

@@ -15,7 +15,7 @@
   connectivity (<a href="/about/drc_ref_global.xml#connect">connect</a>,
   <a href="/about/drc_ref_global.xml#connect_global">connect_global</a>, 
   <a href="/about/drc_ref_global.xml#connect_implicit">connect_implicit</a>) and
-  provided a reference netlist (<a href="/about/drc_ref_global.xml#schematic">schematic</a>),
+  provided a reference netlist (<a href="/about/lvs_ref_global.xml#schematic">schematic</a>),
   this function will perform the actual compare:
   </p>
 

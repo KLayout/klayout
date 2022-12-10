@@ -302,7 +302,7 @@ module DRC
     # A high \count to hier_count (flat to hierarchical) ratio is an indication
     # of a good hierarchical compression.
     # "hier_count" applies only to original layers without clip regions or
-    # cell filters and to layers in \deep mode. Otherwise, hier_count gives 
+    # cell filters and to layers in \global#deep mode. Otherwise, hier_count gives 
     # the same value than \count.
 
     def hier_count
@@ -901,7 +901,7 @@ CODE
     # one edge does not match the criterion. The logical opposite of "one edge matches" however is 
     # "both edges do not match".
     #
-    # The following images demonstrate some use cases of \with_angle and \without_angle:
+    # The following images demonstrate some use cases of \with_angle and \without_angle :
     #
     # @table
     #   @tr 
@@ -1107,14 +1107,14 @@ CODE
     # @synopsis layer.texts(p)
     # @synopsis layer.texts([ options ])
     # This method can be applied to original layers - i.e. ones that have
-    # been created with \input. By default, a small box (2x2 DBU) will be produced on each
+    # been created with \global#input. By default, a small box (2x2 DBU) will be produced on each
     # selected text. By using the "as_dots" option, degenerated point-like edges will be
     # produced.
     #
-    # The preferred method however is to use true text layers created with \labels.
+    # The preferred method however is to use true text layers created with \global#labels.
     # In this case, without specifying "as_dots" or "as_boxes" retains the text
     # objects as such a text filtering is applied. In contrast to this, layers generated
-    # with \input cannot maintain the text nature of the selected objects and 
+    # with \global#input cannot maintain the text nature of the selected objects and 
     # produce dots or small polygon boxes in the \texts method.
     #
     # Texts can be selected either by exact match string or a pattern match with a 
@@ -1163,7 +1163,7 @@ CODE
     # @synopsis layer.texts_not(p)
     # @synopsis layer.texts_not([ options ])
     #
-    # This method can be applied to true text layers obtained with \labels.
+    # This method can be applied to true text layers obtained with \global#labels.
     # In this case, without specifying "as_dots" or "as_boxes" retains the text
     # objects as such. Only text filtering is applied.
     #
@@ -1567,7 +1567,7 @@ CODE
     # objects. RBA::Region, RBA::Edges and RBA::EdgePair objects are accepted as well and the corresponding 
     # content of that collections is inserted into the output layer.
     #
-    # Other versions are available that allow translation of objects into other types (\collect_to_polygons, 
+    # Other versions are available that allow translation of objects into other types (\collect_to_region, 
     # \collect_to_edges and \collect_to_edge_pairs).
     #
     # Because this method executes inside the interpreter, it's inherently slow. Tiling does not
@@ -1645,7 +1645,7 @@ CODE
     # Returns the parts of the polygons which are not orientable (i.e. "8" configuration) or self-overlapping.
     # Merged semantics does not apply for this method. Always the raw polygons are taken (see \raw).
     #
-    # The odd_polygons check is not available in deep mode currently. See \deep_reject_odd_polygons for
+    # The odd_polygons check is not available in deep mode currently. See \global#deep_reject_odd_polygons for
     # an alternative.
     
     def odd_polygons

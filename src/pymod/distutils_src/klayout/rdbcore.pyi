@@ -35,6 +35,10 @@ class RdbReference:
         r"""
         @brief Creates a copy of self
         """
+    def __deepcopy__(self) -> RdbReference:
+        r"""
+        @brief Creates a copy of self
+        """
     def __init__(self, trans: db.DCplxTrans, parent_cell_id: int) -> None:
         r"""
         @brief Creates a reference with a given transformation and parent cell ID
@@ -378,23 +382,23 @@ class RdbCategory:
         @return The category ID
         """
     @overload
-    def scan_collection(self, cell: RdbCell, trans: db.CplxTrans, edge_pairs: db.EdgePairs, flat: Optional[bool] = ...) -> None:
+    def scan_collection(self, cell: RdbCell, trans: db.CplxTrans, edge_pairs: db.EdgePairs, flat: Optional[bool] = ..., with_properties: Optional[bool] = ...) -> None:
         r"""
         @brief Turns the given edge pair collection into a hierarchical or flat report database
         This a another flavour of \scan_collection accepting an edge pair collection.
 
-        This method has been introduced in version 0.26.
+        This method has been introduced in version 0.26. The 'with_properties' argument has been added in version 0.28.
         """
     @overload
-    def scan_collection(self, cell: RdbCell, trans: db.CplxTrans, edges: db.Edges, flat: Optional[bool] = ...) -> None:
+    def scan_collection(self, cell: RdbCell, trans: db.CplxTrans, edges: db.Edges, flat: Optional[bool] = ..., with_properties: Optional[bool] = ...) -> None:
         r"""
         @brief Turns the given edge collection into a hierarchical or flat report database
         This a another flavour of \scan_collection accepting an edge collection.
 
-        This method has been introduced in version 0.26.
+        This method has been introduced in version 0.26. The 'with_properties' argument has been added in version 0.28.
         """
     @overload
-    def scan_collection(self, cell: RdbCell, trans: db.CplxTrans, region: db.Region, flat: Optional[bool] = ...) -> None:
+    def scan_collection(self, cell: RdbCell, trans: db.CplxTrans, region: db.Region, flat: Optional[bool] = ..., with_properties: Optional[bool] = ...) -> None:
         r"""
         @brief Turns the given region into a hierarchical or flat report database
         The exact behavior depends on the nature of the region. If the region is a hierarchical (original or deep) region and the 'flat' argument is false, this method will produce a hierarchical report database in the given category. The 'cell_id' parameter is ignored in this case. Sample references will be produced to supply minimal instantiation information.
@@ -403,30 +407,19 @@ class RdbCategory:
 
         The transformation argument needs to supply the dbu-to-micron transformation.
 
-        This method has been introduced in version 0.26.
-        """
-    @overload
-    def scan_layer(self, layout: db.Layout, layer: int) -> None:
-        r"""
-        @brief Scans a layer from a layout into this category
-        Creates RDB items for each polygon or edge shape read from the each cell in the layout on the given layer and puts them into this category.
-        New cells will be generated for every cell encountered in the layout.
-        Other settings like database unit, description, top cell etc. are not made in the RDB.
+        If 'with_properties' is true, user properties will be turned into tagged values as well.
 
-        This method has been introduced in version 0.23.
+        This method has been introduced in version 0.26. The 'with_properties' argument has been added in version 0.28.
         """
     @overload
-    def scan_layer(self, layout: db.Layout, layer: int, cell: db.Cell) -> None:
+    def scan_collection(self, cell: RdbCell, trans: db.CplxTrans, texts: db.Texts, flat: Optional[bool] = ..., with_properties: Optional[bool] = ...) -> None:
         r"""
-        @brief Scans a layer from a layout into this category, starting with a given cell
-        Creates RDB items for each polygon or edge shape read from the cell and it's children in the layout on the given layer and puts them into this category.
-        New cells will be generated when required.
-        Other settings like database unit, description, top cell etc. are not made in the RDB.
+        @brief Turns the given edge pair collection into a hierarchical or flat report database
+        This a another flavour of \scan_collection accepting a text collection.
 
-        This method has been introduced in version 0.23.
+        This method has been introduced in version 0.28.
         """
-    @overload
-    def scan_layer(self, layout: db.Layout, layer: int, cell: db.Cell, levels: int) -> None:
+    def scan_layer(self, layout: db.Layout, layer: int, cell: Optional[db.Cell] = ..., levels: Optional[int] = ..., with_properties: Optional[bool] = ...) -> None:
         r"""
         @brief Scans a layer from a layout into this category, starting with a given cell and a depth specification
         Creates RDB items for each polygon or edge shape read from the cell and it's children in the layout on the given layer and puts them into this category.
@@ -434,16 +427,20 @@ class RdbCategory:
         "levels" is the number of hierarchy levels to take the child cells from. 0 means to use only "cell" and don't descend, -1 means "all levels".
         Other settings like database unit, description, top cell etc. are not made in the RDB.
 
-        This method has been introduced in version 0.23.
+        If 'with_properties' is true, user properties will be turned into tagged values as well.
+
+        This method has been introduced in version 0.23. The 'with_properties' argument has been added in version 0.28.
         """
-    def scan_shapes(self, iter: db.RecursiveShapeIterator, flat: Optional[bool] = ...) -> None:
+    def scan_shapes(self, iter: db.RecursiveShapeIterator, flat: Optional[bool] = ..., with_properties: Optional[bool] = ...) -> None:
         r"""
         @brief Scans the polygon or edge shapes from the shape iterator into the category
         Creates RDB items for each polygon or edge shape read from the iterator and puts them into this category.
         A similar, but lower-level method is \ReportDatabase#create_items with a \RecursiveShapeIterator argument.
         In contrast to \ReportDatabase#create_items, 'scan_shapes' can also produce hierarchical databases if the \flat argument is false. In this case, the hierarchy the recursive shape iterator traverses is copied into the report database using sample references.
 
-        This method has been introduced in version 0.23. The flat mode argument has been added in version 0.26.
+        If 'with_properties' is true, user properties will be turned into tagged values as well.
+
+        This method has been introduced in version 0.23. The flat mode argument has been added in version 0.26. The 'with_properties' argument has been added in version 0.28.
         """
 
 class RdbItemValue:
@@ -530,6 +527,10 @@ class RdbItemValue:
         This method has been introduced in version 0.22.
         """
     def __copy__(self) -> RdbItemValue:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> RdbItemValue:
         r"""
         @brief Creates a copy of self
         """
@@ -779,6 +780,10 @@ class RdbItem:
         @brief Creates a new object of this class
         """
     def __copy__(self) -> RdbItem:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> RdbItem:
         r"""
         @brief Creates a copy of self
         """
@@ -1146,31 +1151,33 @@ class ReportDatabase:
         A more convenient method that takes cell and category objects instead of ID's is the other version of \create_item.
         """
     @overload
-    def create_item(self, cell_id: int, category_id: int, trans: db.CplxTrans, shape: db.Shape) -> None:
+    def create_item(self, cell_id: int, category_id: int, trans: db.CplxTrans, shape: db.Shape, with_properties: Optional[bool] = ...) -> None:
         r"""
         @brief Creates a new item from a single shape
         This method produces an item from the given shape.
         It accepts various kind of shapes, such as texts, polygons, boxes and paths and converts them to a corresponding item. The transformation argument can be used to supply the transformation that applies the database unit for example.
 
-        This method has been introduced in version 0.25.3.
+        This method has been introduced in version 0.25.3. The 'with_properties' argument has been added in version 0.28.
 
         @param cell_id The ID of the cell to which the item is associated
         @param category_id The ID of the category to which the item is associated
         @param shape The shape to take the geometrical object from
         @param trans The transformation to apply
+        @param with_properties If true, user properties will be turned into tagged values as well
         """
     @overload
-    def create_items(self, cell_id: int, category_id: int, iter: db.RecursiveShapeIterator) -> None:
+    def create_items(self, cell_id: int, category_id: int, iter: db.RecursiveShapeIterator, with_properties: Optional[bool] = ...) -> None:
         r"""
         @brief Creates new items from a shape iterator
         This method takes the shapes from the given iterator and produces items from them.
         It accepts various kind of shapes, such as texts, polygons, boxes and paths and converts them to corresponding items. This method will produce a flat version of the shapes iterated by the shape iterator. A similar method, which is intended for production of polygon or edge error layers and also provides hierarchical database construction is \RdbCategory#scan_shapes.
 
-        This method has been introduced in version 0.25.3.
+        This method has been introduced in version 0.25.3. The 'with_properties' argument has been added in version 0.28.
 
         @param cell_id The ID of the cell to which the item is associated
         @param category_id The ID of the category to which the item is associated
         @param iter The iterator (a \RecursiveShapeIterator object) from which to take the items
+        @param with_properties If true, user properties will be turned into tagged values as well
         """
     @overload
     def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, array: Sequence[db.EdgePair]) -> None:
@@ -1223,7 +1230,7 @@ class ReportDatabase:
 
         This method will also produce a flat version of the edge pairs inside the edge pair collection. \RdbCategory#scan_collection is a similar method which also supports construction of hierarchical databases from deep edge pair collections.
 
-        This method has been introduced in version 0.23.
+        This method has been introduced in version 0.23. It has been deprecated in favor of \RdbCategory#scan_collection in version 0.28.
 
         @param cell_id The ID of the cell to which the item is associated
         @param category_id The ID of the category to which the item is associated
@@ -1239,7 +1246,7 @@ class ReportDatabase:
 
         This method will also produce a flat version of the edges inside the edge collection. \RdbCategory#scan_collection is a similar method which also supports construction of hierarchical databases from deep edge collections.
 
-        This method has been introduced in version 0.23.
+        This method has been introduced in version 0.23. It has been deprecated in favor of \RdbCategory#scan_collection in version 0.28.
 
         @param cell_id The ID of the cell to which the item is associated
         @param category_id The ID of the category to which the item is associated
@@ -1255,7 +1262,7 @@ class ReportDatabase:
 
         This method will also produce a flat version of the shapes inside the region. \RdbCategory#scan_collection is a similar method which also supports construction of hierarchical databases from deep regions.
 
-        This method has been introduced in version 0.23.
+        This method has been introduced in version 0.23. It has been deprecated in favor of \RdbCategory#scan_collection in version 0.28.
 
         @param cell_id The ID of the cell to which the item is associated
         @param category_id The ID of the category to which the item is associated
@@ -1263,18 +1270,19 @@ class ReportDatabase:
         @param region The region (a \Region object) containing the polygons for which to create items
         """
     @overload
-    def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, shapes: db.Shapes) -> None:
+    def create_items(self, cell_id: int, category_id: int, trans: db.CplxTrans, shapes: db.Shapes, with_properties: Optional[bool] = ...) -> None:
         r"""
         @brief Creates new items from a shape container
         This method takes the shapes from the given container and produces items from them.
         It accepts various kind of shapes, such as texts, polygons, boxes and paths and converts them to corresponding items. The transformation argument can be used to supply the transformation that applies the database unit for example.
 
-        This method has been introduced in version 0.25.3.
+        This method has been introduced in version 0.25.3. The 'with_properties' argument has been added in version 0.28.
 
         @param cell_id The ID of the cell to which the item is associated
         @param category_id The ID of the category to which the item is associated
         @param shapes The shape container from which to take the items
         @param trans The transformation to apply
+        @param with_properties If true, user properties will be turned into tagged values as well
         """
     def destroy(self) -> None:
         r"""

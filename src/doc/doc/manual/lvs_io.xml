@@ -148,7 +148,7 @@ X$2 VSS IN OUT SUBSTRATE NMOS PARAMS: L=0.25 W=0.9 AS=0.405 AD=0.405 PS=2.7
   <p>
   The main use case for reading netlists is for comparison in LVS.
   Reference netlists are read with the "schematic" function
-  (see <a href="/about/drc_ref_global.xml#schematic">schematic</a>):
+  (see <a href="/about/lvs_ref_global.xml#schematic">schematic</a>):
   </p>
 
   <pre>schematic("inverter.cir")</pre>

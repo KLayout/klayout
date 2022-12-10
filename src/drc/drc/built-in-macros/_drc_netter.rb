@@ -83,8 +83,8 @@ module DRC
     # layers will form bigger, electrically connected areas.
     #
     # Texts will be used to assign net names to the nets. The preferred
-    # method is to use \labels to create a text layer from a design 
-    # layer. When using \input, text labels are carried implicitly
+    # method is to use \global#labels to create a text layer from a design 
+    # layer. When using \global#input, text labels are carried implicitly
     # with the polygons but at the cost of small dummy shapes (2x2 DBU
     # marker polygons) and limited functionality.
     #

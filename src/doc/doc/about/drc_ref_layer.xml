@@ -198,7 +198,7 @@ and <class_doc href="EdgePair">EdgePair</class_doc> objects are accepted too and
 objects. <class_doc href="Region">Region</class_doc>, <class_doc href="Edges">Edges</class_doc> and <class_doc href="EdgePair">EdgePair</class_doc> objects are accepted as well and the corresponding 
 content of that collections is inserted into the output layer.
 </p><p>
-Other versions are available that allow translation of objects into other types (<a href="#collect_to_polygons">collect_to_polygons</a>, 
+Other versions are available that allow translation of objects into other types (<a href="#collect_to_region">collect_to_region</a>, 
 <a href="#collect_to_edges">collect_to_edges</a> and <a href="#collect_to_edge_pairs">collect_to_edge_pairs</a>).
 </p><p>
 Because this method executes inside the interpreter, it's inherently slow. Tiling does not
@@ -520,7 +520,7 @@ Filter operators select input polygons or edges based on their properties. These
 <li>"<a href="/about/drc_ref_drc.xml#area_ratio">DRC#area_ratio</a>": selects polygons based on their bounding box to polygon area ratio </li>
 <li>"<a href="/about/drc_ref_drc.xml#bbox_aspect_ratio">DRC#bbox_aspect_ratio</a>": selects polygons based on their bounding box aspect ratio </li>
 <li>"<a href="/about/drc_ref_drc.xml#relative_height">DRC#relative_height</a>": selects polygons based on their relative height </li>
-<li>"<a href="/about/drc_ref_drc.xml#bbox_min">DRC#bbox_min</a>", "<a href="/about/drc_ref_global.xml#bbox_max">bbox_max</a>", "<a href="/about/drc_ref_global.xml#bbox_width">bbox_width</a>", "<a href="/about/drc_ref_global.xml#bbox_height">bbox_height</a>": selects polygons based on their bounding box properties </li>
+<li>"<a href="/about/drc_ref_drc.xml#bbox_min">DRC#bbox_min</a>", "<a href="/about/drc_ref_drc.xml#bbox_max">DRC#bbox_max</a>", "<a href="/about/drc_ref_drc.xml#bbox_width">DRC#bbox_width</a>", "<a href="/about/drc_ref_drc.xml#bbox_height">DRC#bbox_height</a>": selects polygons based on their bounding box properties </li>
 <li>"<a href="/about/drc_ref_drc.xml#length">DRC#length</a>": selects edges based on their length </li>
 <li>"<a href="/about/drc_ref_drc.xml#angle">DRC#angle</a>": selects edges based on their orientation </li>
 </ul>
@@ -562,9 +562,9 @@ passes the polygons if the condition is met.
 The predicates available currently are:
 </p><p>
 <ul>
-<li>"<a href="/about/drc_ref_global.xml#rectangles">rectangles</a>": Filters rectangles </li>
-<li>"<a href="/about/drc_ref_global.xml#squares">squares</a>": Filters squares </li>
-<li>"<a href="/about/drc_ref_global.xml#rectilinear">rectilinear</a>": Filters rectilinear ("Manhattan") polygons </li>
+<li>"<a href="/about/drc_ref_drc.xml#rectangles">DRC#rectangles</a>": Filters rectangles </li>
+<li>"<a href="/about/drc_ref_drc.xml#squares">DRC#squares</a>": Filters squares </li>
+<li>"<a href="/about/drc_ref_drc.xml#rectilinear">DRC#rectilinear</a>": Filters rectilinear ("Manhattan") polygons </li>
 </ul>
 </p><p>
 For the same reason as explained above, it's recommended to use these predicates
@@ -1274,7 +1274,7 @@ regions or edges, with each cell counting once.
 A high <a href="#count">count</a> to hier_count (flat to hierarchical) ratio is an indication
 of a good hierarchical compression.
 "hier_count" applies only to original layers without clip regions or
-cell filters and to layers in <a href="#deep">deep</a> mode. Otherwise, hier_count gives 
+cell filters and to layers in <a href="/about/drc_ref_global.xml#deep">deep</a> mode. Otherwise, hier_count gives 
 the same value than <a href="#count">count</a>.
 </p>
 <a name="holes"/><h2>"holes" - Selects all polygon holes from the input</h2>
@@ -1351,34 +1351,6 @@ The following image shows the effect of the "in" method (input1: red, input2: bl
 <p>
 This method is equivalent to calling <a href="#in">in</a> and <a href="#not_in">not_in</a>, but more
 efficient as it delivers both results in a single call.
-</p><p>
-This method is available for polygon, text and edge layers. Edges can be selected
-with respect to other edges or polygons. Texts can be selected with respect to 
-polygons. Polygons can be selected with respect to edges, texts and other polygons.
-</p><p>
-The following image shows the effect of the "interacting" method (input1: red, input2: blue):
-</p><p>
-<table>
-<tr>
-<td><img src="/images/drc_interacting.png"/></td>
-</tr>
-</table>
-</p><p>
-If a single count is given, shapes from self are selected only if they do interact at least with the given
-number of (different) shapes from the other layer. If a min and max count is given, shapes from  
-self are selected only if they interact with min_count or more, but a maximum of max_count different shapes
-from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
-</p><p>
-<table>
-<tr>
-<td><img src="/images/drc_interacting2.png"/></td>
-<td><img src="/images/drc_interacting3.png"/></td>
-</tr>
-<tr>
-<td><img src="/images/drc_interacting4.png"/></td>
-<td><img src="/images/drc_interacting5.png"/></td>
-</tr>
-</table>
 </p>
 <a name="insert"/><h2>"insert" - Inserts one or many objects into the layer</h2>
 <keyword name="insert"/>
@@ -1486,6 +1458,50 @@ method computing both inside and outside part in a single call.
 </tr>
 </table>
 </p>
+<a name="interacting"/><h2>"interacting" - Selects shapes or regions of self which touch or overlap shapes from the other region</h2>
+<keyword name="interacting"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.interacting(other)</tt></li>
+<li><tt>layer.interacting(other, min_count)</tt></li>
+<li><tt>layer.interacting(other, min_count, max_count)</tt></li>
+<li><tt>layer.interacting(other, min_count .. max_count)</tt></li>
+</ul>
+<p>
+This method selects all shapes or regions from self which touch or overlap shapes from the other
+region. Unless self is in raw mode (see <a href="#raw">raw</a>), coherent regions are selected from self, 
+otherwise individual shapes are selected.
+It returns a new layer containing the selected shapes. A version which modifies self
+is <a href="#select_interacting">select_interacting</a>.
+</p><p>
+This method is available for polygon, text and edge layers. Edges can be selected
+with respect to other edges or polygons. Texts can be selected with respect to 
+polygons. Polygons can be selected with respect to edges, texts and other polygons.
+</p><p>
+The following image shows the effect of the "interacting" method (input1: red, input2: blue):
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_interacting.png"/></td>
+</tr>
+</table>
+</p><p>
+If a single count is given, shapes from self are selected only if they do interact at least with the given
+number of (different) shapes from the other layer. If a min and max count is given, shapes from  
+self are selected only if they interact with min_count or more, but a maximum of max_count different shapes
+from the other layer. Two polygons overlapping or touching at two locations are counted as single interactions.
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_interacting2.png"/></td>
+<td><img src="/images/drc_interacting3.png"/></td>
+</tr>
+<tr>
+<td><img src="/images/drc_interacting4.png"/></td>
+<td><img src="/images/drc_interacting5.png"/></td>
+</tr>
+</table>
+</p>
 <a name="intersections"/><h2>"intersections" - Returns the intersection points of intersecting edge segments for two edge collections</h2>
 <keyword name="intersections"/>
 <p>Usage:</p>
@@ -1541,7 +1557,7 @@ See <a href="#clean">clean</a> for a discussion of the clean state.
 This method will return true, if the polygons of this layer are
 merged, i.e. they don't overlap and form single continuous polygons.
 In clean mode, this is ensured implicitly. In raw mode (see <a href="#raw">raw</a>),
-merging can be achieved by using the <a href="#merge">merge</a> method. <a href="#is_merged">is_merged</a>?
+merging can be achieved by using the <a href="#merge">merge</a> method. <a href="#is_merged?">is_merged?</a>
 tells, whether calling <a href="#merge">merge</a> is necessary.
 </p>
 <a name="is_raw?"/><h2>"is_raw?" - Returns true, if the layer is raw state</h2>
@@ -2034,7 +2050,7 @@ The following image shows the effect of the notch check:
 Returns the parts of the polygons which are not orientable (i.e. "8" configuration) or self-overlapping.
 Merged semantics does not apply for this method. Always the raw polygons are taken (see <a href="#raw">raw</a>).
 </p><p>
-The odd_polygons check is not available in deep mode currently. See <a href="#deep_reject_odd_polygons">deep_reject_odd_polygons</a> for
+The odd_polygons check is not available in deep mode currently. See <a href="/about/drc_ref_global.xml#deep_reject_odd_polygons">deep_reject_odd_polygons</a> for
 an alternative.
 </p>
 <a name="ongrid"/><h2>"ongrid" - Checks for on-grid vertices</h2>
@@ -3078,14 +3094,14 @@ This feature has been introduced in version 0.23.2.
 </ul>
 <p>
 This method can be applied to original layers - i.e. ones that have
-been created with <a href="#input">input</a>. By default, a small box (2x2 DBU) will be produced on each
+been created with <a href="/about/drc_ref_global.xml#input">input</a>. By default, a small box (2x2 DBU) will be produced on each
 selected text. By using the "as_dots" option, degenerated point-like edges will be
 produced.
 </p><p>
-The preferred method however is to use true text layers created with <a href="#labels">labels</a>.
+The preferred method however is to use true text layers created with <a href="/about/drc_ref_global.xml#labels">labels</a>.
 In this case, without specifying "as_dots" or "as_boxes" retains the text
 objects as such a text filtering is applied. In contrast to this, layers generated
-with <a href="#input">input</a> cannot maintain the text nature of the selected objects and 
+with <a href="/about/drc_ref_global.xml#input">input</a> cannot maintain the text nature of the selected objects and 
 produce dots or small polygon boxes in the <a href="#texts">texts</a> method.
 </p><p>
 Texts can be selected either by exact match string or a pattern match with a 
@@ -3135,7 +3151,7 @@ The effect of the operation is shown in these examples:
 <li><tt>layer.texts_not([ options ])</tt></li>
 </ul>
 <p>
-This method can be applied to true text layers obtained with <a href="#labels">labels</a>.
+This method can be applied to true text layers obtained with <a href="/about/drc_ref_global.xml#labels">labels</a>.
 In this case, without specifying "as_dots" or "as_boxes" retains the text
 objects as such. Only text filtering is applied.
 </p><p>
@@ -3322,7 +3338,7 @@ on <a href="#without_angle">without_angle</a>. This is because <a href="#without
 one edge does not match the criterion. The logical opposite of "one edge matches" however is 
 "both edges do not match".
 </p><p>
-The following images demonstrate some use cases of <a href="#with_angle">with_angle</a> and <a href="#without_angle:">without_angle:</a>
+The following images demonstrate some use cases of <a href="#with_angle">with_angle</a> and <a href="#without_angle">without_angle</a> :
 </p><p>
 <table>
 <tr>

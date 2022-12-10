@@ -154,168 +154,126 @@ Template::from_string (const std::string &s)
 
       while (! ex.at_end ()) {
 
-        if (ex.test ("version=")) {
+        std::string key, s;
+        ex.read_word_or_quoted (key);
+        ex.expect ("=");
+        ex.read_word_or_quoted (s);
+
+        if (key == "version") {
 
           int v = 0;
-          ex.read (v);
+          tl::from_string (s, v);
           r.back ().version (v);
-          ex.test (",");
 
-        } else if (ex.test ("mode=")) {
+        } else if (key == "mode") {
 
-          std::string s;
-          ex.read_word_or_quoted (s);
           ant::RulerModeConverter mc;
           ant::Template::ruler_mode_type mode;
           mc.from_string (s, mode);
           r.back ().set_mode (mode);
-          ex.test (",");
 
-        } else if (ex.test ("title=")) {
+        } else if (key == "title") {
           
-          std::string s;
-          ex.read_word_or_quoted (s);
           r.back ().title (s);
-          ex.test (",");
           
-        } else if (ex.test ("category=")) {
+        } else if (key == "category") {
 
-          std::string s;
-          ex.read_word_or_quoted (s);
           r.back ().category (s);
-          ex.test (",");
 
-        } else if (ex.test ("fmt=")) {
+        } else if (key == "fmt") {
 
-          std::string s;
-          ex.read_word_or_quoted (s);
           r.back ().fmt (s);
-          ex.test (",");
 
-        } else if (ex.test ("fmt_x=")) {
+        } else if (key == "fmt_x") {
 
-          std::string s;
-          ex.read_word_or_quoted (s);
           r.back ().fmt_x (s);
-          ex.test (",");
 
-        } else if (ex.test ("fmt_y=")) {
+        } else if (key == "fmt_y") {
 
-          std::string s;
-          ex.read_word_or_quoted (s);
           r.back ().fmt_y (s);
-          ex.test (",");
 
-        } else if (ex.test ("position=")) {
+        } else if (key == "position") {
 
-          std::string s;
-          ex.read_word (s);
           ant::PositionConverter pc;
           ant::Object::position_type pos;
           pc.from_string (s, pos);
           r.back ().set_main_position (pos);
-          ex.test (",");
 
-        } else if (ex.test ("xalign=")) {
+        } else if (key == "xalign") {
 
-          std::string s;
-          ex.read_word (s);
           ant::AlignmentConverter ac;
           ant::Object::alignment_type a;
           ac.from_string (s, a);
           r.back ().set_main_xalign (a);
-          ex.test (",");
 
-        } else if (ex.test ("yalign=")) {
+        } else if (key == "yalign") {
 
-          std::string s;
-          ex.read_word (s);
           ant::AlignmentConverter ac;
           ant::Object::alignment_type a;
           ac.from_string (s, a);
           r.back ().set_main_yalign (a);
-          ex.test (",");
 
-        } else if (ex.test ("xlabel_xalign=")) {
+        } else if (key == "xlabel_xalign") {
 
-          std::string s;
-          ex.read_word (s);
           ant::AlignmentConverter ac;
           ant::Object::alignment_type a;
           ac.from_string (s, a);
           r.back ().set_xlabel_xalign (a);
-          ex.test (",");
 
-        } else if (ex.test ("xlabel_yalign=")) {
+        } else if (key == "xlabel_yalign") {
 
-          std::string s;
-          ex.read_word (s);
           ant::AlignmentConverter ac;
           ant::Object::alignment_type a;
           ac.from_string (s, a);
           r.back ().set_xlabel_yalign (a);
-          ex.test (",");
 
-        } else if (ex.test ("ylabel_xalign=")) {
+        } else if (key == "ylabel_xalign") {
 
-          std::string s;
-          ex.read_word (s);
           ant::AlignmentConverter ac;
           ant::Object::alignment_type a;
           ac.from_string (s, a);
           r.back ().set_ylabel_xalign (a);
-          ex.test (",");
 
-        } else if (ex.test ("ylabel_yalign=")) {
+        } else if (key == "ylabel_yalign") {
 
-          std::string s;
-          ex.read_word (s);
           ant::AlignmentConverter ac;
           ant::Object::alignment_type a;
           ac.from_string (s, a);
           r.back ().set_ylabel_yalign (a);
-          ex.test (",");
 
-        } else if (ex.test ("style=")) {
+        } else if (key == "style") {
 
-          std::string s;
-          ex.read_word (s);
           ant::StyleConverter sc;
           ant::Object::style_type st;
           sc.from_string (s, st);
           r.back ().style (st);
-          ex.test (",");
 
-        } else if (ex.test ("outline=")) {
+        } else if (key == "outline") {
 
-          std::string s;
-          ex.read_word (s);
           ant::OutlineConverter oc;
           ant::Object::outline_type ot;
           oc.from_string (s, ot);
           r.back ().outline (ot);
-          ex.test (",");
 
-        } else if (ex.test ("snap=")) {
+        } else if (key == "snap") {
 
           bool f = false;
-          ex.read (f);
+          tl::from_string (s, f);
           r.back ().snap (f);
-          ex.test (",");
 
-        } else if (ex.test ("angle_constraint=")) {
+        } else if (key == "angle_constraint") {
 
-          std::string s;
-          ex.read_word (s);
           ant::ACConverter sc;
           lay::angle_constraint_type sm;
           sc.from_string (s, sm);
           r.back ().angle_constraint (sm);
-          ex.test (",");
 
-        } else {
+        }
 
-          ex.expect (";");
+        ex.test (",");
+        
+        if (ex.test (";")) {
+
           r.push_back (Template ());
           r.back ().version (0);
 

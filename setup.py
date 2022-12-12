@@ -57,6 +57,7 @@ and won't find them. So we need to take away the path with
 from typing import List
 from setuptools import setup, Distribution, find_packages
 from setuptools.extension import Extension, Library
+from pathlib import Path
 import glob
 import os
 import re
@@ -904,6 +905,7 @@ lay = Extension(config.root + '.laycore',
 # Core setup function
 
 if __name__ == "__main__":
+    (Path(__file__).parent / "src/py.typed").touch()
     setup(
         name=config.root,
         version=config.version(),

@@ -32,6 +32,7 @@
 #include "dbText.h"
 #include "dbCell.h"
 #include "dbLayoutStateModel.h"
+#include "dbLayoutLayers.h"
 #include "dbLayerProperties.h"
 #include "dbMetaInfo.h"
 #include "dbCellInst.h"
@@ -391,50 +392,6 @@ private:
   cell_list (const cell_list &d);
 
   cell_type *mp_first, *mp_last;
-};
-
-/**
- *  @brief A layer iterator (for valid layers)
- *
- *  The layer iterator delivers layer indices and layer properties of layer layers.
- */
-class DB_PUBLIC LayerIterator
-{
-public:
-  /**
-   *  @brief Constructor
-   */
-  LayerIterator (unsigned int layer_index, const db::Layout &layout);
-
-  /**
-   *  @brief Increment operator
-   */
-  LayerIterator &operator++();
-
-  /**
-   *  @brief Equality
-   */
-  bool operator== (const LayerIterator &i)
-  {
-    return i.m_layer_index == m_layer_index;
-  }
-
-  /**
-   *  @brief Inequality
-   */
-  bool operator!= (const LayerIterator &i)
-  {
-    return i.m_layer_index != m_layer_index;
-  }
-
-  /**
-   *  @brief Access operator
-   */
-  std::pair<unsigned int, const db::LayerProperties *> operator*() const;
-
-private:
-  unsigned int m_layer_index;
-  const db::Layout &m_layout;
 };
 
 /**
@@ -1426,7 +1383,7 @@ public:
    */
   bool is_valid_layer (unsigned int n) const
   {
-    return (n < layers () && m_layer_states [n] == Normal);
+    return m_layers.layer_state (n) == db::LayoutLayers::Normal;
   }
 
   /**
@@ -1434,7 +1391,7 @@ public:
    */
   bool is_free_layer (unsigned int n) const
   {
-    return (n >= layers () || m_layer_states [n] == Free);
+    return m_layers.layer_state (n) == db::LayoutLayers::Free;
   }
 
   /**
@@ -1442,7 +1399,7 @@ public:
    */
   bool is_special_layer (unsigned int n) const
   {
-    return (n < layers () && m_layer_states [n] == Special);
+    return m_layers.layer_state (n) == db::LayoutLayers::Special;
   }
 
   /**
@@ -1454,7 +1411,7 @@ public:
    */
   unsigned int layers () const
   {
-    return (cell_index_type) m_layer_states.size ();
+    return m_layers.layers ();
   }
 
   /**
@@ -1462,7 +1419,7 @@ public:
    */
   layer_iterator begin_layers () const
   {
-    return layer_iterator (0, *this);
+    return m_layers.begin_layers ();
   }
 
   /**
@@ -1470,13 +1427,16 @@ public:
    */
   layer_iterator end_layers () const
   {
-    return layer_iterator (layers (), *this);
+    return m_layers.end_layers ();
   }
 
   /**
    *  @brief Reserve space for n layers
    */
-  void reserve_layers (unsigned int n);
+  void reserve_layers (unsigned int n)
+  {
+    m_layers.reserve_layers (n);
+  }
 
   /**
    *  @brief begin iterator of the unsorted cell list
@@ -1705,21 +1665,30 @@ public:
    *
    *  The guiding shape layer is used to store the guiding shapes of PCells
    */
-  unsigned int guiding_shape_layer () const;
+  unsigned int guiding_shape_layer () const
+  {
+    return m_layers.guiding_shape_layer ();
+  }
 
   /**
    *  @brief Gets the waste layer
    *
    *  The waste layer is used to store shapes that should not be visible and can be cleared at any time.
    */
-  unsigned int waste_layer () const;
+  unsigned int waste_layer () const
+  {
+    return m_layers.waste_layer ();
+  }
 
   /**
    *  @brief Gets the error layer
    *
    *  The error layer is used to display error messages.
    */
-  unsigned int error_layer () const;
+  unsigned int error_layer () const
+  {
+    return m_layers.error_layer ();
+  }
 
   /**
    *  @brief Set the properties for a specified layer
@@ -1731,7 +1700,7 @@ public:
    */
   const LayerProperties &get_properties (unsigned int i) const
   {
-    return m_layer_props [i];
+    return m_layers.get_properties (i);
   }
 
   /**
@@ -1877,8 +1846,6 @@ protected:
   virtual void do_update ();
 
 private:
-  enum LayerState { Normal, Free, Special };
-
   db::Library *mp_library;
   cell_list m_cells;
   size_t m_cells_size;
@@ -1887,11 +1854,9 @@ private:
   mutable unsigned int m_invalid;
   cell_index_vector m_top_down_list;
   size_t m_top_cells;
-  std::vector<unsigned int> m_free_indices;
-  std::vector<LayerState> m_layer_states;
+  LayoutLayers m_layers;
   std::vector<const char *> m_cell_names;
   cell_map_type m_cell_map;
-  std::vector<LayerProperties> m_layer_props;
   double m_dbu;
   db::properties_id_type m_prop_id;
   StringRepository m_string_repository;
@@ -1901,9 +1866,6 @@ private:
   std::vector<pcell_header_type *> m_pcells;
   pcell_name_map m_pcell_ids;
   lib_proxy_map m_lib_proxy_map;
-  int m_guiding_shape_layer;
-  int m_waste_layer;
-  int m_error_layer;
   bool m_do_cleanup;
   bool m_editable;
   meta_info m_meta_info;
@@ -1936,21 +1898,6 @@ private:
    *  @brief Allocate a cell index for a new cell
    */
   cell_index_type allocate_new_cell ();
-
-  /**  
-   *  @brief Insert a new layer
-   *
-   *  This creates a new index number, either from the free list
-   *  of by creating a new one.
-   */
-  unsigned int do_insert_layer (bool special = false);
-
-  /**  
-   *  @brief Insert a new layer at the given index
-   *
-   *  If the index is unused, create a new layer there.
-   */
-  void do_insert_layer (unsigned int index, bool special = false);
 
   /**
    *  @brief Implementation of prune_cell and prune_subcells

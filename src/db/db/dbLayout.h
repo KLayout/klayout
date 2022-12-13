@@ -192,13 +192,8 @@ public:
    *  @brief Default constructor
    */
   cell_list_const_iterator (cell_list_iterator<cell_type> iter)
-  { 
-    if (iter == cell_list_iterator<cell_type>()) {
-      mp_cell = nullptr;
-    } else {
-      mp_cell = &(*iter);
-    }
-  }
+    : mp_cell (iter.operator-> ())
+  { }
 
   /**
    *  @brief Equality

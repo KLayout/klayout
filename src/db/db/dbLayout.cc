@@ -256,6 +256,65 @@ private:
 };
 
 // -----------------------------------------------------------------
+//  Implementation of the ProxyContextInfo class
+
+ProxyContextInfo
+ProxyContextInfo::deserialize (std::vector<std::string>::const_iterator from, std::vector<std::string>::const_iterator to)
+{
+  ProxyContextInfo info;
+
+  for (std::vector<std::string>::const_iterator i = from; i != to; ++i) {
+
+    tl::Extractor ex (i->c_str ());
+
+    if (ex.test ("LIB=")) {
+
+      info.lib_name = ex.skip ();
+
+    } else if (ex.test ("P(")) {
+
+      std::pair<std::string, tl::Variant> vv;
+
+      ex.read_word_or_quoted (vv.first);
+      ex.test (")");
+      ex.test ("=");
+      ex.read (vv.second);
+
+      info.pcell_parameters.insert (vv);
+
+    } else if (ex.test ("PCELL=")) {
+
+      info.pcell_name = ex.skip ();
+
+    } else if (ex.test ("CELL=")) {
+
+      info.cell_name = ex.skip ();
+
+    }
+
+  }
+
+  return info;
+}
+
+void
+ProxyContextInfo::serialize (std::vector<std::string> &strings)
+{
+  if (! lib_name.empty ()) {
+    strings.push_back ("LIB=" + lib_name);
+  }
+  for (std::map<std::string, tl::Variant> ::const_iterator p = pcell_parameters.begin (); p != pcell_parameters.end (); ++p) {
+    strings.push_back ("P(" + tl::to_word_or_quoted_string (p->first) + ")=" + p->second.to_parsable_string ());
+  }
+  if (! pcell_name.empty ()) {
+    strings.push_back ("PCELL=" + pcell_name);
+  }
+  if (! cell_name.empty ()) {
+    strings.push_back ("CELL=" + cell_name);
+  }
+}
+
+// -----------------------------------------------------------------
 //  Implementation of the Layout class
 
 Layout::Layout (db::Manager *manager)
@@ -1821,12 +1880,6 @@ Layout::insert_layer (unsigned int index, const LayerProperties &props)
   }
 
   layer_properties_changed ();
-}
-
-unsigned int
-Layout::get_layer (const db::LayerProperties &lp)
-{
-  return m_layers.get_layer (lp);
 }
 
 unsigned int 

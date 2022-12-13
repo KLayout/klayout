@@ -185,7 +185,7 @@ public:
   unsigned int get_layer (const db::LayerProperties &props);
 
   /**
-   *  @brief Gets or creates a layer with the given properties or -1 if such a layer does not exist.
+   *  @brief Gets the layer with the given properties or -1 if such a layer does not exist.
    */
   int get_layer_maybe (const db::LayerProperties &props);
 

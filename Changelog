@@ -87,6 +87,7 @@ Changes (list may not be complete):
   - Box/DBox square and rectangle convenience constructor
   - Box#enlarge convenience isotropic variant 
   - Region#in_and_out, Edges#in_and_out
+  - New class NetTracerConnectivity introduced for multi-stack support in NetTracerTechnology, substitutes connectivity part NetTracerTechnology
 
 0.27.13          (2022-11-30):
 * Bugfixes: 

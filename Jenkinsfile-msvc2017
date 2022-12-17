@@ -22,10 +22,8 @@ node("master") {
 
   stage("Building target ${target}") {
         
-    withDockerContainer(image: "jenkins-${target}") {
-      //  from shared library
-      build(target, target_dir)
-    }
+    //  from shared library
+    build(target, target_dir)
 
   }
         
@@ -43,19 +41,15 @@ node("master") {
     "Unit testing": {
             
       ut_result = "no-result"
-      withDockerContainer(image: "jenkins-${target}") {
-        ut_result = run_ut(target)
-      }
+      ut_result = run_ut(target)
             
       junit(testResults: ut_result)
 
     }, 
     "Installtest": {
             
-      withDockerContainer(image: "jenkins-${target}-basic") {
-        //  from shared library
-        installtest(target, target_dir)
-      }
+      //  from shared library
+      installtest(target, target_dir)
 
     })
 

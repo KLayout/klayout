@@ -54,7 +54,7 @@ node("master") {
             
       withDockerContainer(image: "jenkins-${target}-basic") {
         //  from shared library
-        installtest(target, target_dir)
+        installtest_nopython(target, target_dir)
       }
 
     })

@@ -58,6 +58,9 @@ src/klayout.pro.user
 build/
 dist/
 
+# python type hints
+py.typed
+
 # IDEs
 .vscode
 

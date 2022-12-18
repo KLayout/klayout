@@ -200,7 +200,7 @@ def Parse_CommandLine_Arguments():
     if platform in [ "Monterey", "BigSur" ]:
         targetopt = "1,2,3,4"
     elif platform in ["Catalina"]:
-        targetopt = "0,1,2,3,4"
+        targetopt = "1,2,3,4"
     else:
         targetopt = ""
 

@@ -49,7 +49,7 @@ node("master") {
     "Installtest": {
             
       //  from shared library
-      installtest(target, target_dir)
+      installtest_nopython(target, target_dir)
 
     })
 

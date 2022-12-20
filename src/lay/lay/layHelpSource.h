@@ -70,7 +70,7 @@ std::string escape_xml (const std::string &s);
 /**
  *  @brief A specialization of BrowserSource for delivering the generated documentation
  */
-class HelpSource
+class LAY_PUBLIC HelpSource
   : public BrowserSource
 {
 public:

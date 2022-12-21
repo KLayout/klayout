@@ -41,9 +41,11 @@
 //  This hard-links the GSI test classes
 #include "../gsi_test/gsiTestForceLink.h"
 
-//  For testing the document structure
+#if defined(HAVE_QT)
+//  For testing thedocument structure
 #include "docForceLink.h"
 #include "iconsForceLink.h"
+#endif
 
 #include "version.h"
 

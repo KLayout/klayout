@@ -63,6 +63,7 @@ static const std::string cfg_micron_digits ("digits-micron");
 static const std::string cfg_dbu_digits ("digits-dbu");
 static const std::string cfg_assistant_bookmarks ("assistant-bookmarks");
 static const std::string cfg_always_exit_without_saving ("always-exit-without-saving");
+static const std::string cfg_always_show_parameter_names ("always-show-parameter-names");
 
 }
 

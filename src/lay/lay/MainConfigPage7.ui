@@ -154,6 +154,44 @@
      </layout>
     </widget>
    </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="title">
+      <string>Always show PCell Parameter Names in Properties</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <property name="leftMargin">
+       <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>9</number>
+      </property>
+      <item row="1" column="0" colspan="2">
+       <widget class="QCheckBox" name="always_show_parameter_names">
+        <property name="text">
+         <string>Show PCell Parameter Names by Defaul</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>If this option is enabled, the PCell properties window has 'Show parameter names' checked by default.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

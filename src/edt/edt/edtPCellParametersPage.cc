@@ -227,7 +227,8 @@ PCellParametersPage::init ()
 
   mp_show_parameter_names_cb = new QCheckBox (this);
   mp_show_parameter_names_cb->setText (tr ("Show parameter names"));
-  mp_show_parameter_names_cb->setChecked (m_show_parameter_names);
+  // start as checked if chosen to do so in setup
+  mp_show_parameter_names_cb->setChecked (m_show_parameter_names || m_always_show_parameter_names);
   frame_layout->addWidget (mp_show_parameter_names_cb, 3, 0, 1, 1);
 
   connect (mp_show_parameter_names_cb, SIGNAL (clicked (bool)), this, SLOT (show_parameter_names (bool)));

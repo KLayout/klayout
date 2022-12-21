@@ -1247,6 +1247,11 @@ MainWindow::configure (const std::string &name, const std::string &value)
     tl::from_string (value, m_always_exit_without_saving);
     return true;
 
+  } else if (name == cfg_always_show_parameter_names) {
+
+    tl::from_string (value, m_always_show_parameter_names);
+    return true;
+
   } else {
     return false;
   }

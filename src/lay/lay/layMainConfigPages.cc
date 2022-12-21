@@ -85,6 +85,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_reader_options_show_always, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_assistant_bookmarks, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_always_exit_without_saving, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_always_show_parameter_names, "false"));
   }
 
   virtual std::vector<std::pair <std::string, ConfigPage *> > config_pages (QWidget *parent) const 
@@ -203,6 +204,11 @@ MainConfigPage7::setup (lay::Dispatcher *root)
   bool ex = false;
   root->config_get (cfg_always_exit_without_saving, ex);
   mp_ui->always_exit_without_saving->setChecked (ex);
+  
+  bool sp = false;
+  root->config_get (cfg_always_show_parameter_names, sp);
+  mp_ui->always_show_parameter_names->setChecked (sp);
+  
 }
 
 void
@@ -212,6 +218,7 @@ MainConfigPage7::commit (lay::Dispatcher *root)
     root->config_set (cfg_layout_file_watcher_enabled, mp_ui->check_for_updates->isChecked ());
     root->config_set (cfg_keep_backups, mp_ui->keep_backups->value ());
     root->config_set (cfg_always_exit_without_saving, mp_ui->always_exit_without_saving->isChecked ());
+    root->config_set (cfg_always_show_parameter_names, mp_ui->always_show_parameter_names->isChecked ());
   } catch (...) { }
 }
 

@@ -55,10 +55,6 @@ sharedir="usr/share"
 bindir="usr/bin"
 libdir="usr/lib/klayout"
 
-# TODO: is there a better way to produce this path?
-distpackdir="usr/lib/python3/dist-packages"
-pylibdir="$distpackdir/klayout"
-
 # clean bin directory
 rm -rf $bininstdir
 
@@ -97,7 +93,6 @@ mkdir -p makedeb-tmp/${sharedir}/applications
 mkdir -p makedeb-tmp/${sharedir}/pixmaps
 mkdir -p makedeb-tmp/${libdir}/db_plugins
 mkdir -p makedeb-tmp/${libdir}/lay_plugins
-mkdir -p makedeb-tmp/${pylibdir}
 mkdir -p makedeb-tmp/${bindir}
 
 cp etc/klayout.desktop makedeb-tmp/${sharedir}/applications
@@ -111,13 +106,6 @@ cp -pd $bininstdir/klayout makedeb-tmp/${bindir}
 cp -pd $bininstdir/lib*so* makedeb-tmp/${libdir}
 cp -pd $bininstdir/db_plugins/lib*so* makedeb-tmp/${libdir}/db_plugins
 cp -pd $bininstdir/lay_plugins/lib*so* makedeb-tmp/${libdir}/lay_plugins
-cp -pd $bininstdir/pymod/klayout/*so makedeb-tmp/${pylibdir}
-cp -pd $bininstdir/pymod/klayout/*py makedeb-tmp/${pylibdir}
-for d in db tl rdb lib; do
-  mkdir -p makedeb-tmp/${pylibdir}/$d
-  cp -pd $bininstdir/pymod/klayout/$d/*py makedeb-tmp/${pylibdir}/$d
-done
-sed "s/%VERSION%/$version/g" <scripts/klayout.egg-info >makedeb-tmp/${distpackdir}/klayout.egg-info
 
 cd makedeb-tmp
 
@@ -141,7 +129,6 @@ grep -q $version ${sharedir}/doc/klayout/changelog.Debian || (
 echo "Modifying control file .."
 
 strip ${bindir}/*
-strip ${pylibdir}/*.so
 strip ${libdir}/db_plugins/*.so*
 strip ${libdir}/lay_plugins/*.so*
 

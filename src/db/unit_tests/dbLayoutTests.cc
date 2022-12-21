@@ -664,3 +664,70 @@ TEST(6)
     EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {CIRCLE}\nboundary 1 0 {-2071 -5000} {-5000 -2071} {-5000 2071} {-2071 5000} {2071 5000} {5000 2071} {5000 -2071} {2071 -5000} {-2071 -5000}\nend_cell\nend_lib\n");
   }
 }
+
+TEST(7_LayerProperties)
+{
+  db::Manager m;
+  db::Layout l (&m);
+
+  EXPECT_EQ (l.is_valid_layer (0), false);
+  EXPECT_EQ (l.guiding_shape_layer (), 0);
+  EXPECT_EQ (l.is_special_layer (0), true);
+  EXPECT_EQ (int (l.layers ()), 1);
+
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (1, 0)), -1);
+  unsigned int l1 = l.get_layer (db::LayerProperties (1, 0));
+  EXPECT_EQ (1, int (l1));
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (1, 0)), int (l1));
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (2, 0)), -1);
+  EXPECT_EQ (int (l.layers ()), 2);
+
+  unsigned int l2 = l.get_layer (db::LayerProperties (2, 0));
+  EXPECT_EQ (2, int (l2));
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (1, 0)), int (l1));
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (2, 0)), int (l2));
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (3, 0)), -1);
+  EXPECT_EQ (int (l.layers ()), 3);
+
+  l.insert_layer (l2, db::LayerProperties (3, 0));
+  EXPECT_EQ (int (l.layers ()), 3);
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (1, 0)), int (l1));
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (2, 0)), -1);
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (3, 0)), int (l2));
+  EXPECT_EQ (l.get_properties (l2).to_string (), "3/0");
+
+  l.transaction (std::string ());
+  l.delete_layer (l2);
+  l.commit ();
+
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (1, 0)), int (l1));
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (2, 0)), -1);
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (3, 0)), -1);
+
+  m.undo ();
+  EXPECT_EQ (int (l.layers ()), 3);
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (1, 0)), int (l1));
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (2, 0)), -1);
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (3, 0)), int (l2));
+
+  auto li = l.begin_layers ();
+  EXPECT_EQ (li != l.end_layers (), true);
+  EXPECT_EQ ((*li).second->to_string (), "1/0");
+  ++li;
+  EXPECT_EQ (li != l.end_layers (), true);
+  EXPECT_EQ ((*li).second->to_string (), "3/0");
+  ++li;
+  EXPECT_EQ (li == l.end_layers (), true);
+
+  l.set_properties (l2, db::LayerProperties (10, 0));
+  EXPECT_EQ (int (l.layers ()), 3);
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (1, 0)), int (l1));
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (2, 0)), -1);
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (3, 0)), -1);
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (10, 0)), int (l2));
+
+  l.clear ();
+  EXPECT_EQ (int (l.layers ()), 0);
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (1, 0)), -1);
+  EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (2, 0)), -1);
+}

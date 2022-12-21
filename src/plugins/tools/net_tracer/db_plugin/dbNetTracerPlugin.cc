@@ -80,7 +80,8 @@ get_default (const db::NetTracerTechnologyComponent &tc)
   if (tc.begin () != tc.end ()) {
     return tc.begin ().operator-> ();
   } else {
-    return 0;
+    static db::NetTracerConnectivity s_empty;
+    return &s_empty;
   }
 }
 
@@ -135,13 +136,8 @@ struct FallbackXMLReadAdaptor
   void start (const db::NetTracerTechnologyComponent &parent)
   {
     const db::NetTracerConnectivity *tn = get_default (parent);
-    if (! tn) {
-      m_iter = Iter ();
-      m_end = Iter ();
-    } else {
-      m_iter = (tn->*mp_begin) ();
-      m_end = (tn->*mp_end) ();
-    }
+    m_iter = (tn->*mp_begin) ();
+    m_end = (tn->*mp_end) ();
   }
 
   void next ()

@@ -1,3 +1,10 @@
+0.28.1           (2022-12-21):
+* Bugfix: %GITHUB%/issues/1225 XML error prevents generation of help index
+* Bugfix: Python module now has py.typed
+* Bugfix: Some segfaults fixed on MacOS, other Linux systems
+* Bugfix: dropped Python modules from RPM and DEB packages as this creates conflicts with pip-installed modules
+* Bugfix: OASIS reader error with CBLOCK byte counts larger than 4G
+
 0.28             (2022-12-09):
 Changes (list may not be complete):
 * Bugfix: %GITHUB%/issues/989 "Layout#convert_pcell_to_static" does not handle"defunct" cells
@@ -87,6 +94,7 @@ Changes (list may not be complete):
   - Box/DBox square and rectangle convenience constructor
   - Box#enlarge convenience isotropic variant 
   - Region#in_and_out, Edges#in_and_out
+  - New class NetTracerConnectivity introduced for multi-stack support in NetTracerTechnology, substitutes connectivity part NetTracerTechnology
 
 0.27.13          (2022-11-30):
 * Bugfixes: 

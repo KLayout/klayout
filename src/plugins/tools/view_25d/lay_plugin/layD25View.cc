@@ -125,6 +125,10 @@ bool D25View::configure(const std::string &name, const std::string &value)
     tl::Color bg;
     lc.from_string (value, bg);
 
+    if (! bg.is_valid ()) {
+      bg = view () ? view ()->background_color () : Qt::white;
+    }
+
     QPalette palette = mp_ui->material_list->palette ();
     palette.setColor (QPalette::Base, bg.to_qc ());
     palette.setColor (QPalette::Text, bg.to_mono () ? Qt::black : Qt::white);

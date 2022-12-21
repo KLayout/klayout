@@ -51,6 +51,7 @@
 #include "tlException.h"
 #include "tlEvents.h"
 #include "tlTimer.h"
+#include "tlDeferredExecution.h"
 #include "dbInstElement.h"
 
 namespace rdb {
@@ -2650,6 +2651,7 @@ public:
 
   //  called by children and owner
   void redraw ();
+  void redraw_later ();
   void redraw_layer (unsigned int index);
   void redraw_deco_layer ();
   void redraw_cell_boxes ();
@@ -2700,6 +2702,7 @@ private:
 
 private:
   lay::LayoutView *mp_ui;
+  tl::DeferredMethod<lay::LayoutViewBase> dm_redraw;
   bool m_editable;
   int m_disabled_edits;
   unsigned int m_options;

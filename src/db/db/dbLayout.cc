@@ -256,33 +256,6 @@ private:
 };
 
 // -----------------------------------------------------------------
-//  Implementation of the LayerIterator class
-
-LayerIterator::LayerIterator (unsigned int layer_index, const db::Layout &layout)
-  : m_layer_index (layer_index), m_layout (layout)
-{
-  while (m_layer_index < m_layout.layers () && ! m_layout.is_valid_layer (m_layer_index)) {
-    ++m_layer_index;
-  }
-}
-
-LayerIterator &
-LayerIterator::operator++() 
-{
-  do {
-    ++m_layer_index;
-  } while (m_layer_index < m_layout.layers () && ! m_layout.is_valid_layer (m_layer_index));
-
-  return *this;
-}
-
-std::pair<unsigned int, const db::LayerProperties *> 
-LayerIterator::operator*() const
-{
-  return std::pair<unsigned int, const db::LayerProperties *> (m_layer_index, &m_layout.get_properties (m_layer_index));
-}
-
-// -----------------------------------------------------------------
 //  Implementation of the ProxyContextInfo class
 
 ProxyContextInfo
@@ -353,9 +326,6 @@ Layout::Layout (db::Manager *manager)
     m_dbu (0.001),
     m_prop_id (0),
     m_properties_repository (this),
-    m_guiding_shape_layer (-1),
-    m_waste_layer (-1),
-    m_error_layer (-1),
     m_do_cleanup (false),
     m_editable (db::default_editable_mode ())
 {
@@ -371,9 +341,6 @@ Layout::Layout (bool editable, db::Manager *manager)
     m_dbu (0.001),
     m_prop_id (0),
     m_properties_repository (this),
-    m_guiding_shape_layer (-1),
-    m_waste_layer (-1),
-    m_error_layer (-1),
     m_do_cleanup (false),
     m_editable (editable)
 {
@@ -393,9 +360,6 @@ Layout::Layout (const db::Layout &layout)
     m_dbu (0.001),
     m_prop_id (0),
     m_properties_repository (this),
-    m_guiding_shape_layer (-1),
-    m_waste_layer (-1),
-    m_error_layer (-1),
     m_do_cleanup (false),
     m_editable (layout.m_editable)
 {
@@ -437,8 +401,7 @@ Layout::clear ()
 
   m_top_down_list.clear ();
 
-  m_free_indices.clear ();
-  m_layer_states.clear ();
+  m_layers.clear ();
 
   for (std::vector<const char *>::const_iterator p = m_cell_names.begin (); p != m_cell_names.end (); ++p) {
     if (*p) {
@@ -459,10 +422,6 @@ Layout::clear ()
   m_pcells.clear ();
   m_pcell_ids.clear ();
 
-  m_guiding_shape_layer = -1;
-  m_waste_layer = -1;
-  m_error_layer = -1;
-
   m_lib_proxy_map.clear ();
   m_meta_info.clear ();
 }
@@ -476,9 +435,8 @@ Layout::operator= (const Layout &d)
 
     clear ();
 
-    m_guiding_shape_layer = d.m_guiding_shape_layer;
-    m_waste_layer = d.m_waste_layer;
-    m_error_layer = d.m_error_layer;
+    m_layers = d.m_layers;
+
     m_editable = d.m_editable;
 
     m_pcell_ids = d.m_pcell_ids;
@@ -504,9 +462,6 @@ Layout::operator= (const Layout &d)
     }
 
     m_properties_repository = d.m_properties_repository; // because the cell assign operator does not map property ID's ..
-    m_free_indices = d.m_free_indices;
-    m_layer_states = d.m_layer_states;
-    m_layer_props = d.m_layer_props;
     m_top_down_list = d.m_top_down_list;
     m_top_cells = d.m_top_cells;
 
@@ -720,14 +675,13 @@ Layout::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat
     stat->add (typeid (*this), (void *) this, sizeof (*this), sizeof (*this), parent, purpose, cat);
   }
 
+  m_layers.mem_stat (stat, purpose, cat, true, (void *) this);
+
   db::mem_stat (stat, purpose, cat, m_cell_ptrs, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_free_cell_indices, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_top_down_list, true, (void *) this);
-  db::mem_stat (stat, purpose, cat, m_free_indices, true, (void *) this);
-  db::mem_stat (stat, purpose, cat, m_layer_states, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_cell_names, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_cell_map, true, (void *) this);
-  db::mem_stat (stat, purpose, cat, m_layer_props, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_pcells, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_pcell_ids, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_lib_proxy_map, true, (void *) this);
@@ -1839,8 +1793,8 @@ Layout::meta_info_value (const std::string &name) const
 void 
 Layout::swap_layers (unsigned int a, unsigned int b)
 {
-  tl_assert (a < layers () && m_layer_states [a] != Free);
-  tl_assert (b < layers () && m_layer_states [b] != Free);
+  tl_assert (m_layers.layer_state (a) != LayoutLayers::Free);
+  tl_assert (m_layers.layer_state (b) != LayoutLayers::Free);
 
   //  clear the shapes
   for (iterator c = begin (); c != end (); ++c) {
@@ -1851,8 +1805,8 @@ Layout::swap_layers (unsigned int a, unsigned int b)
 void 
 Layout::move_layer (unsigned int src, unsigned int dest)
 {
-  tl_assert (src < layers () && m_layer_states [src] != Free);
-  tl_assert (dest < layers () && m_layer_states [dest] != Free);
+  tl_assert (m_layers.layer_state (src) != LayoutLayers::Free);
+  tl_assert (m_layers.layer_state (dest) != LayoutLayers::Free);
 
   //  move the shapes
   for (iterator c = begin (); c != end (); ++c) {
@@ -1863,8 +1817,8 @@ Layout::move_layer (unsigned int src, unsigned int dest)
 void 
 Layout::copy_layer (unsigned int src, unsigned int dest)
 {
-  tl_assert (src < layers () && m_layer_states [src] != Free);
-  tl_assert (dest < layers () && m_layer_states [dest] != Free);
+  tl_assert (m_layers.layer_state (src) != LayoutLayers::Free);
+  tl_assert (m_layers.layer_state (dest) != LayoutLayers::Free);
 
   //  copy the shapes
   for (iterator c = begin (); c != end (); ++c) {
@@ -1875,7 +1829,7 @@ Layout::copy_layer (unsigned int src, unsigned int dest)
 void 
 Layout::clear_layer (unsigned int n)
 {
-  tl_assert (n < layers () && m_layer_states [n] != Free);
+  tl_assert (m_layers.layer_state (n) != LayoutLayers::Free);
 
   //  clear the shapes
   for (iterator c = begin (); c != end (); ++c) {
@@ -1886,14 +1840,13 @@ Layout::clear_layer (unsigned int n)
 void 
 Layout::delete_layer (unsigned int n)
 {
-  tl_assert (n < layers () && m_layer_states [n] != Free);
+  tl_assert (m_layers.layer_state (n) != LayoutLayers::Free);
 
   if (manager () && manager ()->transacting ()) {
-    manager ()->queue (this, new InsertRemoveLayerOp (n, m_layer_props [n], false /*delete*/));
+    manager ()->queue (this, new InsertRemoveLayerOp (n, m_layers.get_properties (n), false /*delete*/));
   }
 
-  m_free_indices.push_back (n);
-  m_layer_states [n] = Free;
+  m_layers.delete_layer (n);
 
   //  clear the shapes
   for (iterator c = begin (); c != end (); ++c) {
@@ -1906,11 +1859,7 @@ Layout::delete_layer (unsigned int n)
 unsigned int 
 Layout::insert_layer (const LayerProperties &props)
 {
-  unsigned int i = do_insert_layer ();
-  while (m_layer_props.size () <= i) {
-    m_layer_props.push_back (LayerProperties ());
-  }
-  m_layer_props [i] = props;
+  unsigned int i = m_layers.insert_layer (props);
 
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new InsertRemoveLayerOp (i, props, true/*insert*/));
@@ -1924,11 +1873,7 @@ Layout::insert_layer (const LayerProperties &props)
 void 
 Layout::insert_layer (unsigned int index, const LayerProperties &props)
 {
-  do_insert_layer (index);
-  while (m_layer_props.size () <= index) {
-    m_layer_props.push_back (LayerProperties ());
-  }
-  m_layer_props [index] = props;
+  m_layers.insert_layer (index, props);
 
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new InsertRemoveLayerOp (index, props, true/*insert*/));
@@ -1937,71 +1882,10 @@ Layout::insert_layer (unsigned int index, const LayerProperties &props)
   layer_properties_changed ();
 }
 
-unsigned int
-Layout::get_layer (const db::LayerProperties &lp)
-{
-  if (lp.is_null ()) {
-    //  for a null layer info always create a layer
-    return insert_layer ();
-  } else {
-    //  if we have a layer with the requested properties already, return this.
-    for (db::Layout::layer_iterator li = begin_layers (); li != end_layers (); ++li) {
-      if ((*li).second->log_equal (lp)) {
-        return (*li).first;
-      }
-    }
-    //  otherwise create a new layer
-    return insert_layer (lp);
-  }
-}
-
-unsigned int
-Layout::error_layer () const
-{
-  if (m_error_layer < 0) {
-    //  create the waste layer (since that layer is cached we can do
-    //  this in a "const" fashion.
-    db::Layout *self = const_cast<db::Layout *> (this);
-    self->m_error_layer = (int) self->insert_special_layer (db::LayerProperties ("WASTE"));
-  }
-
-  return (unsigned int) m_error_layer;
-}
-
-unsigned int
-Layout::waste_layer () const
-{
-  if (m_waste_layer < 0) {
-    //  create the waste layer (since that layer is cached we can do
-    //  this in a "const" fashion.
-    db::Layout *self = const_cast<db::Layout *> (this);
-    self->m_waste_layer = (int) self->insert_special_layer (db::LayerProperties ("WASTE"));
-  }
-
-  return (unsigned int) m_waste_layer;
-}
-
-unsigned int
-Layout::guiding_shape_layer () const
-{
-  if (m_guiding_shape_layer < 0) {
-    //  create the guiding shape layer (since that layer is cached we can do
-    //  this in a "const" fashion.
-    db::Layout *self = const_cast<db::Layout *> (this);
-    self->m_guiding_shape_layer = (int) self->insert_special_layer (db::LayerProperties ("GUIDING_SHAPES"));
-  }
-
-  return (unsigned int) m_guiding_shape_layer;
-}
-
 unsigned int 
 Layout::insert_special_layer (const LayerProperties &props)
 {
-  unsigned int i = do_insert_layer (true /*special*/);
-  while (m_layer_props.size () <= i) {
-    m_layer_props.push_back (LayerProperties ());
-  }
-  m_layer_props [i] = props;
+  unsigned int i = m_layers.insert_special_layer (props);
 
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new InsertRemoveLayerOp (i, props, true/*insert*/));
@@ -2013,13 +1897,13 @@ Layout::insert_special_layer (const LayerProperties &props)
 void 
 Layout::set_properties (unsigned int i, const LayerProperties &props)
 {
-  if (m_layer_props [i] != props) {
+  if (m_layers.get_properties (i) != props) {
 
     if (manager () && manager ()->transacting ()) {
-      manager ()->queue (this, new SetLayerPropertiesOp (i, props, m_layer_props [i]));
+      manager ()->queue (this, new SetLayerPropertiesOp (i, props, m_layers.get_properties (i)));
     }
 
-    m_layer_props [i] = props;
+    m_layers.set_properties (i, props);
 
     layer_properties_changed ();
 
@@ -2029,58 +1913,11 @@ Layout::set_properties (unsigned int i, const LayerProperties &props)
 void 
 Layout::insert_special_layer (unsigned int index, const LayerProperties &props)
 {
-  do_insert_layer (index, true /*special*/);
-  while (m_layer_props.size () <= index) {
-    m_layer_props.push_back (LayerProperties ());
-  }
-  m_layer_props [index] = props;
+  m_layers.insert_special_layer (index, props);
 
   if (manager () && manager ()->transacting ()) {
     manager ()->queue (this, new InsertRemoveLayerOp (index, props, true/*insert*/));
   }
-}
-
-unsigned int 
-Layout::do_insert_layer (bool special) 
-{
-  if (m_free_indices.size () > 0) {
-    unsigned int i = m_free_indices.back ();
-    m_free_indices.pop_back ();
-    m_layer_states [i] = special ? Special : Normal;
-    return i;
-  } else {
-    m_layer_states.push_back (special ? Special : Normal);
-    unsigned int i = layers () - 1;
-    return i;
-  }
-}
-
-void 
-Layout::do_insert_layer (unsigned int index, bool special) 
-{
-  if (index >= layers ()) {
-
-    //  add layer to the end of the list.
-    //  add as may freelist entries as required.
-    while (index > layers ()) {
-      m_free_indices.push_back (layers ());
-      m_layer_states.push_back (Free);
-    }
-    m_layer_states.push_back (special ? Special : Normal);
-
-  } else {
-
-    tl_assert (m_layer_states [index] == Free);
-    m_layer_states [index] = special ? Special : Normal;
-  
-  }
-
-}
-
-void 
-Layout::reserve_layers (unsigned int n)
-{
-  m_layer_states.reserve (n);
 }
 
 static const std::vector<tl::Variant> &gauge_parameters (const std::vector<tl::Variant> &p, const db::PCellDeclaration *pcell_decl, std::vector<tl::Variant> &buffer)
@@ -2354,8 +2191,8 @@ Layout::convert_cell_to_static (db::cell_index_type ci)
     new_cell.set_cell_index (ret_ci);
 
     //  remove guiding shapes.
-    if (m_guiding_shape_layer >= 0) {
-      new_cell.shapes (m_guiding_shape_layer).clear ();
+    if (m_layers.guiding_shape_layer_maybe () >= 0) {
+      new_cell.shapes (m_layers.guiding_shape_layer_maybe ()).clear ();
     }
 
   }

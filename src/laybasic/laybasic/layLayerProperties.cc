@@ -629,11 +629,7 @@ LayerProperties::do_realize (const LayoutViewBase *view) const
 
         //  lookup the layer with the given name/layer/datatype
         if (m_layer_index < 0 && ! m_source_real.is_wildcard_layer ()) {
-          for (unsigned int i = 0; i < cv->layout ().layers () && m_layer_index < 0; ++i) {
-            if (cv->layout ().is_valid_layer (i) && m_source_real.match (cv->layout ().get_properties (i))) {
-              m_layer_index = int (i);
-            }
-          }
+          m_layer_index = cv->layout ().get_layer_maybe (m_source_real.layer_props ());
         }
 
       }

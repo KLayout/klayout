@@ -4,6 +4,13 @@ DESTDIR = $$OUT_PWD/..
 include($$PWD/../klayout.pri)
 include($$PWD/../with_all_libs.pri)
 
+# NOTE: doc is needed for testing help sources
+
+INCLUDEPATH += $$DOC_INC $$ICONS_INC
+DEPENDPATH += $$DOC_INC $$ICONS_INC
+
+LIBS += -lklayout_doc -lklayout_icons
+
 TEMPLATE = app
 
 # Don't build the ut_runner app as ordinary command line tool on MacOS

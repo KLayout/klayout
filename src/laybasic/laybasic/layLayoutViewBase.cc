@@ -239,6 +239,7 @@ const double animation_interval = 0.5;
 LayoutViewBase::LayoutViewBase (db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
   : lay::Dispatcher (plugin_parent, false /*not standalone*/),
     mp_ui (0),
+    dm_redraw (this, &LayoutViewBase::redraw),
     m_editable (editable),
     m_options (options),
     m_annotation_shapes (manager)
@@ -252,6 +253,7 @@ LayoutViewBase::LayoutViewBase (db::Manager *manager, bool editable, lay::Plugin
 LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
   : lay::Dispatcher (plugin_parent, false /*not standalone*/),
     mp_ui (ui),
+    dm_redraw (this, &LayoutViewBase::redraw),
     m_editable (editable),
     m_options (options),
     m_annotation_shapes (manager)
@@ -265,6 +267,7 @@ LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, db::Manager *manager, bool 
 LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, lay::LayoutViewBase *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
   : lay::Dispatcher (plugin_parent, false /*not standalone*/),
     mp_ui (ui),
+    dm_redraw (this, &LayoutViewBase::redraw),
     m_editable (editable),
     m_options (options),
     m_annotation_shapes (manager)
@@ -769,7 +772,7 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
       //  keep a shadow state to correctly issue the redraw call
       m_default_font_size = df;
       lay::FixedFont::set_default_font_size (df);
-      redraw ();
+      redraw_later ();
     }
     //  do not take - let others have the event for the redraw call
     return false;
@@ -1814,7 +1817,7 @@ LayoutViewBase::set_properties (unsigned int index, const LayerPropertiesList &p
   if (index == current_layer_list ()) {
     end_layer_updates ();
     layer_list_changed_event (3);
-    redraw ();
+    redraw_later ();
     m_prop_changed = true;
   }
 }
@@ -1875,7 +1878,7 @@ LayoutViewBase::replace_layer_node (unsigned int index, const LayerPropertiesCon
       end_layer_updates ();
       layer_list_changed_event (2);
       //  TODO: check, if redraw is actually necessary (this is complex!)
-      redraw ();
+      redraw_later ();
       m_prop_changed = true;
     }
   }
@@ -1909,7 +1912,7 @@ LayoutViewBase::set_properties (unsigned int index, const LayerPropertiesConstIt
       layer_list_changed_event (1);
 
       if (need_redraw) {
-        redraw ();
+        redraw_later ();
       } 
 
       if (visible_changed) {
@@ -1945,7 +1948,7 @@ LayoutViewBase::insert_layer (unsigned int index, const LayerPropertiesConstIter
   if (index == current_layer_list ()) {
     end_layer_updates ();
     layer_list_changed_event (2);
-    redraw ();
+    redraw_later ();
     m_prop_changed = true;
   }
 
@@ -1978,7 +1981,7 @@ LayoutViewBase::delete_layer (unsigned int index, LayerPropertiesConstIterator &
   if (index == current_layer_list ()) {
     end_layer_updates ();
     layer_list_changed_event (2);
-    redraw ();
+    redraw_later ();
     m_prop_changed = true;
   }
 
@@ -2174,7 +2177,7 @@ void
 LayoutViewBase::signal_hier_changed ()
 {
   //  schedule a redraw request for all layers
-  redraw ();
+  redraw_later ();
   //  forward this event to our observers
   hier_changed_event ();
 }
@@ -2206,7 +2209,7 @@ void
 LayoutViewBase::signal_bboxes_changed ()
 {
   //  schedule a redraw request for all layers
-  redraw ();
+  redraw_later ();
 
   //  forward this event to our observers
   geom_changed_event ();
@@ -2216,7 +2219,7 @@ void
 LayoutViewBase::signal_cell_name_changed ()
 {
   cell_visibility_changed_event (); // HINT: that is not what actually is intended, but it serves the function ...
-  redraw ();  //  needs redraw
+  redraw_later ();  //  needs redraw
 }
 
 void
@@ -2229,7 +2232,7 @@ LayoutViewBase::signal_layer_properties_changed ()
   }
 
   //  schedule a redraw request - since the layer views might not have changed, this is necessary
-  redraw ();
+  redraw_later ();
 }
 
 void
@@ -2271,7 +2274,7 @@ LayoutViewBase::finish_cellviews_changed ()
 
   cellviews_changed_event ();
 
-  redraw ();
+  redraw_later ();
 }
 
 std::list<lay::CellView>::iterator
@@ -3897,6 +3900,12 @@ LayoutViewBase::redraw_deco_layer ()
 }
 
 void
+LayoutViewBase::redraw_later ()
+{
+  dm_redraw ();
+}
+
+void
 LayoutViewBase::redraw ()
 {
   std::vector <lay::RedrawLayerInfo> layers;
@@ -5463,6 +5472,7 @@ LayoutViewBase::current_pos (double /*x*/, double /*y*/)
 void
 LayoutViewBase::stop_redraw ()
 {
+  dm_redraw.cancel ();
   mp_canvas->stop_redraw ();
 }
 

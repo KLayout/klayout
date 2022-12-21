@@ -45,7 +45,6 @@ Requires: qt5-qttools >= 5.11.1
 Requires: qt5-qttools-devel >= 5.11.1
 
 %define buildopt -j2
-%define pylib %{python_sitearch}
 %define __python /usr/bin/python3
 %endif
 
@@ -55,7 +54,6 @@ Requires:	ruby >= 2.0.0
 Requires:	python3 >= 3.6.0
 Requires: qt-x11 >= 4.8.5
 %define buildopt -j2
-%define pylib %{python3_sitearch}
 %endif
 
 %if "%{target_system}" == "centos6"
@@ -65,7 +63,6 @@ Requires: ruby >= 1.8.7
 Requires: python >= 2.6.6
 Requires: qt-x11 >= 4.6.2
 %define buildopt -libcurl -j2
-%define pylib %{python_sitearch}
 %endif
 
 %if "%{target_system}" == "opensuse42_2"
@@ -74,7 +71,6 @@ Requires:	ruby2.3 >= 2.3.1
 Requires:	python3 >= 3.4.6
 Requires: libqt4-x11 >= 4.8.6
 %define buildopt -j2
-%define pylib %{python3_sitearch}
 %endif
 
 %if "%{target_system}" == "opensuse42_3"
@@ -83,7 +79,6 @@ Requires:	ruby2.3 >= 2.3.1
 Requires:	python3 >= 3.4.6
 Requires: libqt4-x11 >= 4.8.6
 %define buildopt -j2
-%define pylib %{python3_sitearch}
 %endif
 
 %if "%{target_system}" == "opensuse15"
@@ -92,7 +87,6 @@ Requires:	ruby >= 2.5
 Requires:	python3 >= 3.6
 Requires: libqt4-x11 >= 4.8.7
 %define buildopt -j2
-%define pylib %{python3_sitearch}
 %endif
 
 %if "%{target_system}" == "opensuse15"
@@ -148,17 +142,6 @@ strip %{_builddir}/bin.$TARGET/strm*
 
 TARGET="linux-release"
 
-# create and populate pylib
-mkdir -p %{buildroot}%{pylib}/klayout
-cp -pd %{_builddir}/bin.$TARGET/pymod/klayout/*.so %{buildroot}%{pylib}/klayout
-cp -pd %{_builddir}/bin.$TARGET/pymod/klayout/*.py %{buildroot}%{pylib}/klayout
-chmod 644 %{buildroot}%{pylib}/klayout/*
-for d in tl db rdb lib; do
-  mkdir -p %{buildroot}%{pylib}/klayout/$d
-  cp -pd %{_builddir}/bin.$TARGET/pymod/klayout/$d/*.py %{buildroot}%{pylib}/klayout/$d
-  chmod 644 %{buildroot}%{pylib}/klayout/$d/*
-done
-
 # create and populate libdir
 mkdir -p %{buildroot}%{_libdir}/klayout
 mkdir -p %{buildroot}%{_libdir}/klayout/db_plugins
@@ -191,7 +174,6 @@ install -Dm644 %{_sourcedir}/etc/logo.png %{buildroot}%{_datadir}/pixmaps/%{name
 %doc CONTRIB
 %{_bindir}/klayout
 %{_bindir}/strm*
-%{pylib}/klayout/*
 %{_libdir}/klayout/*
 %{_datadir}/applications/%{name}.desktop
 %{_datadir}/pixmaps/%{name}.png

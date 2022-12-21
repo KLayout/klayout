@@ -559,41 +559,42 @@ OASISReader::mark_start_table ()
 void 
 OASISReader::read_offset_table ()
 {
-  unsigned long of = 0;
+  unsigned int of = 0;
 
   of = get_uint ();
-  m_table_cellname = get_ulong ();
+  get (m_table_cellname);
   if (m_table_cellname != 0 && m_expect_strict_mode >= 0 && ((of == 0) != (m_expect_strict_mode == 0))) {
     warn (tl::to_string (tr ("CELLNAME offset table has unexpected strict mode")));
   }
 
   of = get_uint ();
-  m_table_textstring = get_ulong ();
+  get (m_table_textstring);
   if (m_table_textstring != 0 && m_expect_strict_mode >= 0 && ((of == 0) != (m_expect_strict_mode == 0))) {
     warn (tl::to_string (tr ("TEXTSTRING offset table has unexpected strict mode")));
   }
 
   of = get_uint ();
-  m_table_propname = get_ulong ();
+  get (m_table_propname);
   if (m_table_propname != 0 && m_expect_strict_mode >= 0 && ((of == 0) != (m_expect_strict_mode == 0))) {
     warn (tl::to_string (tr ("PROPNAME offset table has unexpected strict mode")));
   }
 
   of = get_uint ();
-  m_table_propstring = get_ulong ();
+  get (m_table_propstring);
   if (m_table_propstring != 0 && m_expect_strict_mode >= 0 && ((of == 0) != (m_expect_strict_mode == 0))) {
     warn (tl::to_string (tr ("PROPSTRING offset table has unexpected strict mode")));
   }
 
   of = get_uint ();
-  m_table_layername = get_ulong ();
+  get (m_table_layername);
   if (m_table_layername != 0 && m_expect_strict_mode >= 0 && ((of == 0) != (m_expect_strict_mode == 0))) {
     warn (tl::to_string (tr ("LAYERNAME offset table has unexpected strict mode")));
   }
 
   //  XNAME table ignored currently
   get_uint ();
-  get_ulong ();
+  size_t dummy = 0;
+  get (dummy);
 }
 
 static const char magic_bytes[] = { "%SEMI-OASIS\015\012" };
@@ -1084,8 +1085,9 @@ OASISReader::do_read (db::Layout &layout)
         error (tl::sprintf (tl::to_string (tr ("Invalid CBLOCK compression type %d")), type));
       }
 
-      get_uint ();  // uncomp-byte-count - not needed
-      get_uint ();  // comp-byte-count - not needed
+      size_t dummy = 0;
+      get (dummy);  // uncomp-byte-count - not needed
+      get (dummy);  // comp-byte-count - not needed
 
       //  put the stream into deflating mode
       m_stream.inflate ();
@@ -1282,8 +1284,9 @@ OASISReader::read_element_properties (db::PropertiesRepository &rep, bool ignore
         error (tl::sprintf (tl::to_string (tr ("Invalid CBLOCK compression type %d")), type));
       }
 
-      get_uint ();  // uncomp-byte-count - not needed
-      get_uint ();  // comp-byte-count - not needed
+      size_t dummy = 0;
+      get (dummy);  // uncomp-byte-count - not needed
+      get (dummy);  // comp-byte-count - not needed
 
       //  put the stream into deflating mode
       m_stream.inflate ();
@@ -1520,7 +1523,7 @@ OASISReader::read_pointlist (modal_variable <std::vector <db::Point> > &pointlis
 bool
 OASISReader::read_repetition ()
 {
-  unsigned char type = get_uint ();
+  unsigned int type = get_uint ();
   if (type == 0) {
     
     //  reuse modal variable
@@ -3308,8 +3311,9 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
         error (tl::sprintf (tl::to_string (tr ("Invalid CBLOCK compression type %d")), type));
       }
 
-      get_uint ();  // uncomp-byte-count - not needed
-      get_uint ();  // comp-byte-count - not needed
+      size_t dummy = 0;
+      get (dummy);  // uncomp-byte-count - not needed
+      get (dummy);  // comp-byte-count - not needed
 
       //  put the stream into deflating mode
       m_stream.inflate ();

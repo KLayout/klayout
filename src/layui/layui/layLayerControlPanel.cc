@@ -70,6 +70,7 @@ LCPTreeWidget::LCPTreeWidget (QWidget *parent, lay::LayerTreeModel *model, const
 {
   setObjectName (QString::fromUtf8 (name));
   setModel (model);
+  setUniformRowHeights (true);
 #if QT_VERSION >= 0x040200
   setAllColumnsShowFocus (true);
 #endif
@@ -1702,7 +1703,7 @@ LayerControlPanel::cancel_updates ()
 void
 LayerControlPanel::end_updates ()
 {
-  do_update_content ();
+  m_do_update_content_dm ();
 }
 
 void 

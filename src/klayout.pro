@@ -121,7 +121,7 @@ equals(HAVE_RUBY, "1") {
 }
 
 buddies.depends += plugins lym $$LANG_DEPENDS
-unit_tests.depends += plugins lym $$MAIN_DEPENDS $$LANG_DEPENDS
+unit_tests.depends += doc icons plugins lym $$MAIN_DEPENDS $$LANG_DEPENDS
 
 # Adds an extra target for generating the doc: "update_doc"
 update_doc.commands = $$PWD/../scripts/make_drc_lvs_doc.sh

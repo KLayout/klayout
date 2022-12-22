@@ -875,9 +875,29 @@ def Build_pymod(parameters):
         return 0
 
     #--------------------------------------------------------------------
-    # [2] Get the new directory names (dictionary) for "dist"
+    # [2] Get the new directory names (dictionary) for "dist" and
+    #     set the CPATH environment variable for including <png.h>
+    #     required to build the pymod of 0.28 or later
     #--------------------------------------------------------------------
     PymodDistDir = parameters['pymod_dist']
+    # Using MacPorts
+    if PymodDistDir[ModulePython] == 'dist-MP3':
+        addIncPath = "/opt/local/include"
+    # Using Homebrew
+    elif PymodDistDir[ModulePython] == 'dist-HB3':
+        addIncPath = "%s/include" % DefaultHomebrewRoot  # defined in "build4mac_env.py"
+    # Using Anaconda3
+    elif  PymodDistDir[ModulePython] == 'dist-ana3':
+        addIncPath = "/Applications/anaconda3/include"
+    else:
+        addIncPath = ""
+    if not addIncPath == "":
+        try:
+            cpath = os.environ['CPATH']
+        except KeyError:
+            os.environ['CPATH'] = addIncPath
+        else:
+            os.environ['CPATH'] = "%s:%s" % (addIncPath, cpath)
 
     #--------------------------------------------------------------------
     # [3] Set different command line parameters for building <pymod>
@@ -1491,6 +1511,36 @@ def Deploy_Binaries_For_Bundle(config, parameters):
         #       in "/usr/local/opt/python@3.8/lib/"
         #             Python.framework -> ../Frameworks/Python.framework/ <=== this symbolic was needed
         #             pkgconfig/
+        #
+        #     Use the "python3HB.py" tool to make different symbolic links [*] including the above one.
+        #        Catalina0{kazzz-s} lib (1)% pwd
+        #        /usr/local/opt/python@3.8/lib
+        #        Catalina0{kazzz-s} lib (2)% ll
+        #        total 0
+        #        drwxr-xr-x  4 kazzz-s admin 128 12 16 21:40 .
+        #        drwxr-xr-x 13 kazzz-s admin 416 12 12 23:08 ..
+        #    [*] lrwxr-xr-x  1 kazzz-s admin  31 12 16 21:40 Python.framework -> ../Frameworks/Python.framework/
+        #        drwxr-xr-x  4 kazzz-s admin 128 12 12 23:08 pkgconfig
+        #
+        #        Catalina0{kazzz-s} Python.framework (3)% pwd
+        #        /usr/local/opt/python@3.8/Frameworks/Python.framework/Versions
+        #        Catalina0{kazzz-s} Versions (4)% ll
+        #        total 0
+        #        drwxr-xr-x 4 kazzz-s admin 128 12 16 21:40 .
+        #        drwxr-xr-x 6 kazzz-s admin 192 12 16 21:40 ..
+        #        drwxr-xr-x 9 kazzz-s admin 288 12 12 23:08 3.8
+        #    [*] lrwxr-xr-x 1 kazzz-s admin   4 12 16 21:40 Current -> 3.8/
+        #
+        #        Catalina0{kazzz-s} Python.framework (5)% pwd
+        #        /usr/local/opt/python@3.8/Frameworks/Python.framework
+        #        Catalina0{kazzz-s} Python.framework (6)% ll
+        #        total 0
+        #        drwxr-xr-x 6 kazzz-s admin 192 12 16 21:40 .
+        #        drwxr-xr-x 3 kazzz-s admin  96 12 12 23:07 ..
+        #    [*] lrwxr-xr-x 1 kazzz-s admin  25 12 16 21:40 Headers -> Versions/Current/Headers/
+        #    [*] lrwxr-xr-x 1 kazzz-s admin  23 12 16 21:40 Python -> Versions/Current/Python
+        #    [*] lrwxr-xr-x 1 kazzz-s admin  27 12 16 21:40 Resources -> Versions/Current/Resources/
+        #        drwxr-xr-x 4 kazzz-s admin 128 12 16 21:40 Versions
         #-----------------------------------------------------------------------------------------------
         deploymentPython38HB   = (ModulePython == 'Python38Brew')
         deploymentPythonAutoHB = (ModulePython == 'PythonAutoBrew')
@@ -1550,43 +1600,49 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             os.chmod( targetDirM + "/start-console.py", 0o0755 )
             os.chmod( targetDirM + "/klayout_console",  0o0755 )
 
-            print("  [9.2] Relinking dylib dependencies inside Python.framework" )
-            print("   [9.2.1] Patching Python Framework" )
+            print( "  [9.2] Relinking dylib dependencies inside Python.framework" )
+            print( "   [9.2.1] Patching Python Framework" )
             depdict = WalkFrameworkPaths( pythonFrameworkPath )
             appPythonFrameworkPath = '@executable_path/../Frameworks/Python.framework/'
-            PerformChanges(depdict, [(HBPythonFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
+            PerformChanges( depdict, [(HBPythonFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs )
 
-            print("   [9.2.2] Patching /usr/local/opt/ libs")
-            usrLocalPath = '/usr/local/opt/'
+            print( "   [9.2.2] Patching 'Python' itself in Python Framework" )
+            filterreg = r'\t+%s/(opt|Cellar)' % DefaultHomebrewRoot
+            Patch_Python_In_PythonFramework( pythonFrameworkPath, filter_regex=filterreg  )
+
+            print( "   [9.2.3] Patching %s/opt/ libs" % DefaultHomebrewRoot ) # eg. DefaultHomebrewRoot == "/usr/local"
+            usrLocalPath    = '%s/opt/' % DefaultHomebrewRoot
             appUsrLocalPath = '@executable_path/../Frameworks/'
-            replacePairs = [(usrLocalPath, appUsrLocalPath, True)]
-            depdict = WalkFrameworkPaths(pythonFrameworkPath, search_path_filter=r'\t+/usr/local/(opt|Cellar)')
-            PerformChanges(depdict, replacePairs, bundleExecPathAbs)
+            replacePairs    = [ (usrLocalPath, appUsrLocalPath, True) ]
+            filterreg       = r'\t+%s/(opt|Cellar)' % DefaultHomebrewRoot
+            depdict         = WalkFrameworkPaths( pythonFrameworkPath, search_path_filter=filterreg )
+            PerformChanges( depdict, replacePairs, bundleExecPathAbs )
 
-            print("   [9.2.3] Patching openssl@1.1, gdbm, readline, sqlite, xz")
-            usrLocalPath = '/usr/local/opt'
+            print( "   [9.2.4] Patching openssl@1.1, gdbm, readline, sqlite, xz" )
+            usrLocalPath    = '%s/opt/' % DefaultHomebrewRoot
             appUsrLocalPath = '@executable_path/../Frameworks/'
-            replacePairs = [(usrLocalPath, appUsrLocalPath, True)]
-            replacePairs.extend([(openssl_version, '@executable_path/../Frameworks/openssl@1.1', True)
-                for openssl_version in glob.glob('/usr/local/Cellar/openssl@1.1/*')])
-            depdict = WalkFrameworkPaths([pythonFrameworkPath + '/../openssl@1.1',
-                                                                        pythonFrameworkPath + '/../gdbm',
-                                                                        pythonFrameworkPath + '/../readline',
-                                                                        pythonFrameworkPath + '/../sqlite',
-                                                                        pythonFrameworkPath + '/../xz'], search_path_filter=r'\t+/usr/local/(opt|Cellar)')
+            replacePairs    = [ (usrLocalPath, appUsrLocalPath, True) ]
+            replacePairs.extend( [ (openssl_version, '@executable_path/../Frameworks/openssl@1.1', True)
+                for openssl_version in glob.glob( '%s/Cellar/openssl@1.1/*' % DefaultHomebrewRoot ) ] )
+            filterreg = r'\t+%s/(opt|Cellar)' % DefaultHomebrewRoot
+            depdict   = WalkFrameworkPaths( [pythonFrameworkPath + '/../openssl@1.1',
+                                             pythonFrameworkPath + '/../gdbm',
+                                             pythonFrameworkPath + '/../readline',
+                                             pythonFrameworkPath + '/../sqlite',
+                                             pythonFrameworkPath + '/../xz'], search_path_filter=filterreg )
 
-            PerformChanges(depdict, replacePairs, bundleExecPathAbs)
+            PerformChanges( depdict, replacePairs, bundleExecPathAbs )
 
-            print("  [9.3] Relinking dylib dependencies for klayout")
+            print( "  [9.3] Relinking dylib dependencies for klayout" )
             klayoutPath = bundleExecPathAbs
-            depdict = WalkFrameworkPaths(klayoutPath, filter_regex=r'klayout$')
-            PerformChanges(depdict, [(HBPythonFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
+            depdict     = WalkFrameworkPaths( klayoutPath, filter_regex=r'klayout$' )
+            PerformChanges( depdict, [(HBPythonFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs )
 
             libKlayoutPath = bundleExecPathAbs + '../Frameworks'
-            depdict = WalkFrameworkPaths(libKlayoutPath, filter_regex=r'libklayout')
-            PerformChanges(depdict, [(HBPythonFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs)
+            depdict        = WalkFrameworkPaths( libKlayoutPath, filter_regex=r'libklayout' )
+            PerformChanges( depdict, [(HBPythonFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs )
 
-            print("  [9.4] Patching site.py, pip/, and distutils/")
+            print( "  [9.4] Patching site.py, pip/, and distutils/" )
             site_module = "%s/Versions/%s/lib/python%s/site.py" % (pythonFrameworkPath, pythonHBVer, pythonHBVer)
             with open(site_module, 'r') as site:
                 buf = site.readlines()

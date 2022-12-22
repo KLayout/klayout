@@ -67,9 +67,9 @@ for %%a in (%*) do (
           set "HAVE_QTBINDINGS=0"
         ) else if "!arg!" equ "-without-qt" (
           set "HAVE_QT=0"
-	  set "HAVE_CURL=1"
-	  set "HAVE_EXPAT=1"
-	  set "HAVE_PTHREADS=1"
+	        set "HAVE_CURL=1"
+	        set "HAVE_EXPAT=1"
+	        set "HAVE_PTHREADS=1"
           set "HAVE_QTBINDINGS=0"
         ) else if "!arg!" equ "-with-64bit-coord" (
           set "HAVE_64BIT_COORD=1"
@@ -253,6 +253,8 @@ if not exist "%option-build%" (
   echo ERROR: build directory does not exists and cannot be created
   goto :eof
 )
+
+touch %inst_path%\src\version\version.h
 
 echo on
 "%option-qmake%" ^

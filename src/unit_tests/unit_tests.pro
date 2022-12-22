@@ -4,12 +4,16 @@ DESTDIR = $$OUT_PWD/..
 include($$PWD/../klayout.pri)
 include($$PWD/../with_all_libs.pri)
 
-# NOTE: doc is needed for testing help sources
+!equals(HAVE_QT, "0") {
 
-INCLUDEPATH += $$DOC_INC $$ICONS_INC
-DEPENDPATH += $$DOC_INC $$ICONS_INC
+  # NOTE: doc is needed for testing help sources
 
-LIBS += -lklayout_doc -lklayout_icons
+  INCLUDEPATH += $$DOC_INC $$ICONS_INC
+  DEPENDPATH += $$DOC_INC $$ICONS_INC
+
+  LIBS += -lklayout_doc -lklayout_icons
+
+}
 
 TEMPLATE = app
 

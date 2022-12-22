@@ -60,6 +60,7 @@ LayoutVsSchematic::~LayoutVsSchematic ()
 
 void LayoutVsSchematic::set_reference_netlist (db::Netlist *ref_netlist)
 {
+  ref_netlist->keep ();
   mp_reference_netlist.reset (ref_netlist);
   mp_cross_ref.reset (0);
 }

@@ -1,3 +1,6 @@
+0.28.2           (2022-12-22):
+* Bugfix: %GITHUB%/issues/1230 LVS browser crashes
+ 
 0.28.1           (2022-12-21):
 * Bugfix: %GITHUB%/issues/1225 XML error prevents generation of help index
 * Bugfix: Python module now has py.typed

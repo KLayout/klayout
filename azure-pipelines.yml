@@ -29,6 +29,9 @@ jobs:
       cp310-cp310-win_amd64.whl:
         python.version: '3.10'
         python.architecture: 'x64'
+      cp311-cp311-win_amd64.whl:
+        python.version: '3.11'
+        python.architecture: 'x64'
       cp36-cp36m-win32.whl:
         python.version: '3.6'
         python.architecture: 'x86'
@@ -43,6 +46,9 @@ jobs:
         python.architecture: 'x86'
       cp310-cp310-win32.whl:
         python.version: '3.10'
+        python.architecture: 'x86'
+      cp311-cp311-win32.whl:
+        python.version: '3.11'
         python.architecture: 'x86'
     maxParallel: 6
 

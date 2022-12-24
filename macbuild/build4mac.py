@@ -38,16 +38,16 @@ def GenerateUsage(platform):
         myRuby    = "hb31"
         myPython  = "hb38"
         moduleset = ('qt5Brew', 'HB31', 'HB38')
-    else: # with Xcode [ .. 12.4]
+    else: # with Xcode [ .. 12.4]; 'sys' for Python has been abolished in 0.28
         myQt56    = "qt5macports"
-        myRuby    = "sys"
-        myPython  = "sys"
-        moduleset = ('qt5MP', 'Sys', 'Sys')
+        myRuby    = "mp31"
+        myPython  = "mp38"
+        moduleset = ('qt5MP', 'MP31', 'MP38')
 
     usage  = "\n"
     usage += "---------------------------------------------------------------------------------------------------------\n"
     usage += "<< Usage of 'build4mac.py' >>\n"
-    usage += "       for building KLayout 0.27.11 or later on different Apple macOS / Mac OSX platforms.\n"
+    usage += "       for building KLayout 0.28 or later on different Apple macOS / Mac OSX platforms.\n"
     usage += "\n"
     usage += "$ [python] ./build4mac.py\n"
     usage += "   option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)| default value\n"
@@ -66,10 +66,9 @@ def GenerateUsage(platform):
     usage += "                        :   MP31: use Ruby 3.1 from MacPorts                             | \n"
     usage += "                        :   HB31: use Ruby 3.1 from Homebrew                             | \n"
     usage += "                        :   Ana3: use Ruby 3.1 from Anaconda3                            | \n"
-    usage += "   [-p|--python <type>] : case-insensitive type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3',   | %s \n" % myPython
+    usage += "   [-p|--python <type>] : case-insensitive type=['nil',  'MP38', 'HB38', 'Ana3',         | %s \n" % myPython
     usage += "                        :                        HB39', 'HBAuto']                        | \n"
     usage += "                        :    nil: don't bind Python                                      | \n"
-    usage += "                        :    Sys: use OS-bundled Python 2.7 [ElCapitan -- Catalina]      | \n"
     usage += "                        :   MP38: use Python 3.8 from MacPorts                           | \n"
     usage += "                        :   HB38: use Python 3.8 from Homebrew                           | \n"
     usage += "                        :   Ana3: use Python 3.8 from Anaconda3                          | \n"
@@ -81,10 +80,10 @@ def GenerateUsage(platform):
     usage += "   [-m|--make <option>] : option passed to 'make'                                        | '--jobs=4'\n"
     usage += "   [-d|--debug]         : enable debug mode build                                        | disabled\n"
     usage += "   [-c|--checkcom]      : check command-line and exit without building                   | disabled\n"
-    usage += "   [-y|--deploy]        : deploy executables and dylibs including Qt's Frameworks        | disabled\n"
+    usage += "   [-y|--deploy]        : deploy executables and dylibs, including Qt's Frameworks       | disabled\n"
     usage += "   [-Y|--DEPLOY]        : deploy executables and dylibs for those who built KLayout      | disabled\n"
     usage += "                        : from the source code and use the tools in the same machine     | \n"
-    usage += "                        : ! After confirmation of the uccessful build of 'klayout.app',  | \n"
+    usage += "                        : ! After confirmation of the successful build of 'klayout.app', | \n"
     usage += "                        :   rerun this script with BOTH:                                 | \n"
     usage += "                        :     1) the same options used for building AND                  | \n"
     usage += "                        :     2) <-y|--deploy> OR <-Y|--DEPLOY>                          | \n"
@@ -387,7 +386,7 @@ def Parse_CLI_Args(config):
 
     p.add_option( '-p', '--python',
                     dest='type_python',
-                    help="Python type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3', 'HB39', 'HBAuto']" )
+                    help="Python type=['nil', 'MP38', 'HB38', 'Ana3', 'HB39', 'HBAuto']" )
 
     p.add_option( '-P', '--buildPymod',
                     action='store_true',
@@ -461,8 +460,8 @@ def Parse_CLI_Args(config):
                         checkusage     = False )
     else: # with Xcode [ .. 12.4]
         p.set_defaults( type_qt        = "qt5macports",
-                        type_ruby      = "sys",
-                        type_python    = "sys",
+                        type_ruby      = "mp31",
+                        type_python    = "mp38",
                         build_pymod    = False,
                         no_qt_binding  = False,
                         no_qt_uitools  = False,
@@ -562,7 +561,7 @@ def Parse_CLI_Args(config):
     # (C) Determine the Python type
     candidates           = dict()
     candidates['NIL']    = 'nil'
-    candidates['SYS']    = 'Sys'
+    # candidates['SYS']  = 'Sys'   # has been abolished in 0.28
     candidates['MP38']   = 'MP38'
     candidates['HB38']   = 'HB38'
     candidates['ANA3']   = 'Ana3'

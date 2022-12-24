@@ -3,7 +3,7 @@ Author: Kazzz-S<br>
 Last modified: 2022-12-24<br>
 
 # 1. Introduction
-This directory **`macbuild`** contains different files required for building KLayout (http://www.klayout.de/) version 0.28.2 or later for different 64-bit macOS, including:
+This directory **`macbuild`** contains various files required for building KLayout (http://www.klayout.de/) version 0.28.2 or later for different 64-bit macOS, including:
 * Catalina    (10.15.7) : the primary development environment
 * Big Sur     (11.x)    : experimental; Apple M1 chip is not tested since the author does not own an M1 Mac
 * Monterey    (12.x)    : -- ditto --
@@ -57,7 +57,7 @@ $ /usr/bin/python --version
 This configuration WAS possible only for macOS Catalina (10.15.7).<br> 
 However, it is no longer supported since KLayout version 0.28.x~ uses some Python3-specific features. 
 Therefore, MacPorts' Ruby 3.1 and Python 3.8 are adopted as the default environment for Catalina.
-Big Sur and Monterey use Homebrew's Ruby 3.1 and Python 3.8 by default.
+In contrast, Homebrew's Ruby 3.1 and Python 3.8 are the default environment for Big Sur and Monterey.
 
 The build script **`build4mac.py`** provides several possible combinations of Qt5, Ruy, and Python modules to accommodate such a slightly complex environment.<br>
 Some typical use cases are described in Section 6.
@@ -69,7 +69,7 @@ You need to have the followings:
 * Optionally, Ruby and Python packages from MacPorts, Homebrew, or Anaconda3
 #### For matching versions of Ruby and Python, please also refer to `build4mac_env.py`.
 
-# 5. Command-line options of **`build4mac.py`** are shown below.
+# 5. Command-line options of **`build4mac.py`**
 **((Notes))** For **Catalina**
 ```
 ---------------------------------------------------------------------------------------------------------

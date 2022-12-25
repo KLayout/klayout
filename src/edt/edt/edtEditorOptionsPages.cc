@@ -853,6 +853,8 @@ EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Var
     pc = layout->pcell_by_name (tl::to_string (m_cell_name).c_str ());
   }
 
+  //  TODO: don't re-generate the PCellParametersPage unless the PCell has changed
+
   PCellParametersPage::State pcp_state;
 
   //  Hint: we shall not delete the page immediately. This gives a segmentation fault in some cases.
@@ -872,7 +874,7 @@ EditorOptionsInstPCellParam::update_pcell_parameters (const std::vector <tl::Var
 
   if (pc.first && layout->pcell_declaration (pc.second) && view ()->cellview (m_cv_index).is_valid ()) {
 
-    mp_pcell_parameters = new PCellParametersPage (this, true /*dense*/);
+    mp_pcell_parameters = new PCellParametersPage (this, dispatcher (), true /*dense*/);
     mp_pcell_parameters->setup (view (), m_cv_index, layout->pcell_declaration (pc.second), parameters);
     this->layout ()->addWidget (mp_pcell_parameters);
 

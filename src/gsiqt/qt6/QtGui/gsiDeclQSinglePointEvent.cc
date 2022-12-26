@@ -70,21 +70,6 @@ static void _call_f_buttons_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// QSinglePointEvent *QSinglePointEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QSinglePointEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QSinglePointEvent * > ((QSinglePointEvent *)((QSinglePointEvent *)cls)->clone ());
-}
-
-
 // QObject *QSinglePointEvent::exclusivePointGrabber()
 
 
@@ -217,7 +202,6 @@ static gsi::Methods methods_QSinglePointEvent () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericMethod ("button", "@brief Method Qt::MouseButton QSinglePointEvent::button()\n", true, &_init_f_button_c0, &_call_f_button_c0);
   methods += new qt_gsi::GenericMethod ("buttons", "@brief Method QFlags<Qt::MouseButton> QSinglePointEvent::buttons()\n", true, &_init_f_buttons_c0, &_call_f_buttons_c0);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QSinglePointEvent *QSinglePointEvent::clone()\nThis is a reimplementation of QPointerEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("exclusivePointGrabber", "@brief Method QObject *QSinglePointEvent::exclusivePointGrabber()\n", true, &_init_f_exclusivePointGrabber_c0, &_call_f_exclusivePointGrabber_c0);
   methods += new qt_gsi::GenericMethod ("globalPosition", "@brief Method QPointF QSinglePointEvent::globalPosition()\n", true, &_init_f_globalPosition_c0, &_call_f_globalPosition_c0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent?", "@brief Method bool QSinglePointEvent::isBeginEvent()\nThis is a reimplementation of QPointerEvent::isBeginEvent", true, &_init_f_isBeginEvent_c0, &_call_f_isBeginEvent_c0);
@@ -245,21 +229,6 @@ class QSinglePointEvent_Adaptor : public QSinglePointEvent, public qt_gsi::QtObj
 public:
 
   virtual ~QSinglePointEvent_Adaptor();
-
-  //  [adaptor impl] QSinglePointEvent *QSinglePointEvent::clone()
-  QSinglePointEvent * cbs_clone_c0_0() const
-  {
-    return QSinglePointEvent::clone();
-  }
-
-  virtual QSinglePointEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QSinglePointEvent_Adaptor, QSinglePointEvent *>(&QSinglePointEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QSinglePointEvent::clone();
-    }
-  }
 
   //  [adaptor impl] bool QSinglePointEvent::isBeginEvent()
   bool cbs_isBeginEvent_c0_0() const
@@ -336,7 +305,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_isBeginEvent_c0_0;
   gsi::Callback cb_isEndEvent_c0_0;
   gsi::Callback cb_isUpdateEvent_c0_0;
@@ -345,25 +313,6 @@ public:
 };
 
 QSinglePointEvent_Adaptor::~QSinglePointEvent_Adaptor() { }
-
-// QSinglePointEvent *QSinglePointEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QSinglePointEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QSinglePointEvent * > ((QSinglePointEvent *)((QSinglePointEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QSinglePointEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
-}
-
 
 // bool QSinglePointEvent::isBeginEvent()
 
@@ -477,8 +426,6 @@ gsi::Class<QSinglePointEvent> &qtdecl_QSinglePointEvent ();
 
 static gsi::Methods methods_QSinglePointEvent_Adaptor () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QSinglePointEvent *QSinglePointEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@brief Virtual method bool QSinglePointEvent::isBeginEvent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@hide", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0, &_set_callback_cbs_isBeginEvent_c0_0);
   methods += new qt_gsi::GenericMethod ("isEndEvent", "@brief Virtual method bool QSinglePointEvent::isEndEvent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isEndEvent_c0_0, &_call_cbs_isEndEvent_c0_0);

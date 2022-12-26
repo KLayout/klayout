@@ -37,21 +37,6 @@
 // -----------------------------------------------------------------------
 // class QContextMenuEvent
 
-// QContextMenuEvent *QContextMenuEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QContextMenuEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QContextMenuEvent * > ((QContextMenuEvent *)((QContextMenuEvent *)cls)->clone ());
-}
-
-
 // const QPoint &QContextMenuEvent::globalPos()
 
 
@@ -162,7 +147,6 @@ namespace gsi
 
 static gsi::Methods methods_QContextMenuEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QContextMenuEvent *QContextMenuEvent::clone()\nThis is a reimplementation of QInputEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("globalPos", "@brief Method const QPoint &QContextMenuEvent::globalPos()\n", true, &_init_f_globalPos_c0, &_call_f_globalPos_c0);
   methods += new qt_gsi::GenericMethod ("globalX", "@brief Method int QContextMenuEvent::globalX()\n", true, &_init_f_globalX_c0, &_call_f_globalX_c0);
   methods += new qt_gsi::GenericMethod ("globalY", "@brief Method int QContextMenuEvent::globalY()\n", true, &_init_f_globalY_c0, &_call_f_globalY_c0);
@@ -208,21 +192,6 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [adaptor impl] QContextMenuEvent *QContextMenuEvent::clone()
-  QContextMenuEvent * cbs_clone_c0_0() const
-  {
-    return QContextMenuEvent::clone();
-  }
-
-  virtual QContextMenuEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QContextMenuEvent_Adaptor, QContextMenuEvent *>(&QContextMenuEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QContextMenuEvent::clone();
-    }
-  }
-
   //  [adaptor impl] void QContextMenuEvent::setAccepted(bool accepted)
   void cbs_setAccepted_864_0(bool accepted)
   {
@@ -253,7 +222,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_setAccepted_864_0;
   gsi::Callback cb_setTimestamp_1103_0;
 };
@@ -305,25 +273,6 @@ static void _call_ctor_QContextMenuEvent_Adaptor_4717 (const qt_gsi::GenericStat
   const qt_gsi::Converter<QContextMenuEvent::Reason>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QContextMenuEvent::Reason>::target_type & >() (args, heap);
   const QPoint &arg2 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QContextMenuEvent_Adaptor *> (new QContextMenuEvent_Adaptor (qt_gsi::QtToCppAdaptor<QContextMenuEvent::Reason>(arg1).cref(), arg2));
-}
-
-
-// QContextMenuEvent *QContextMenuEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QContextMenuEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QContextMenuEvent * > ((QContextMenuEvent *)((QContextMenuEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QContextMenuEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
 }
 
 
@@ -384,8 +333,6 @@ static gsi::Methods methods_QContextMenuEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QContextMenuEvent::QContextMenuEvent(QContextMenuEvent::Reason reason, const QPoint &pos, const QPoint &globalPos, QFlags<Qt::KeyboardModifier> modifiers)\nThis method creates an object of class QContextMenuEvent.", &_init_ctor_QContextMenuEvent_Adaptor_9494, &_call_ctor_QContextMenuEvent_Adaptor_9494);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QContextMenuEvent::QContextMenuEvent(QContextMenuEvent::Reason reason, const QPoint &pos)\nThis method creates an object of class QContextMenuEvent.", &_init_ctor_QContextMenuEvent_Adaptor_4717, &_call_ctor_QContextMenuEvent_Adaptor_4717);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QContextMenuEvent *QContextMenuEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Virtual method void QContextMenuEvent::setAccepted(bool accepted)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@hide", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0, &_set_callback_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setTimestamp", "@brief Virtual method void QContextMenuEvent::setTimestamp(quint64 timestamp)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setTimestamp_1103_0, &_call_cbs_setTimestamp_1103_0);

@@ -86,51 +86,6 @@ static void _call_f_begin_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// QJsonObject::const_iterator QJsonObject::begin()
-
-
-static void _init_f_begin_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QJsonObject::const_iterator > ();
-}
-
-static void _call_f_begin_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QJsonObject::const_iterator > ((QJsonObject::const_iterator)((QJsonObject *)cls)->begin ());
-}
-
-
-// QJsonObject::const_iterator QJsonObject::constBegin()
-
-
-static void _init_f_constBegin_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QJsonObject::const_iterator > ();
-}
-
-static void _call_f_constBegin_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QJsonObject::const_iterator > ((QJsonObject::const_iterator)((QJsonObject *)cls)->constBegin ());
-}
-
-
-// QJsonObject::const_iterator QJsonObject::constEnd()
-
-
-static void _init_f_constEnd_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QJsonObject::const_iterator > ();
-}
-
-static void _call_f_constEnd_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QJsonObject::const_iterator > ((QJsonObject::const_iterator)((QJsonObject *)cls)->constEnd ());
-}
-
-
 // QJsonObject::const_iterator QJsonObject::constFind(const QString &key)
 
 
@@ -287,21 +242,6 @@ static void _call_f_end_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gs
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QJsonObject::iterator > ((QJsonObject::iterator)((QJsonObject *)cls)->end ());
-}
-
-
-// QJsonObject::const_iterator QJsonObject::end()
-
-
-static void _init_f_end_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QJsonObject::const_iterator > ();
-}
-
-static void _call_f_end_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QJsonObject::const_iterator > ((QJsonObject::const_iterator)((QJsonObject *)cls)->end ());
 }
 
 
@@ -1006,9 +946,6 @@ static gsi::Methods methods_QJsonObject () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QJsonObject::QJsonObject()\nThis method creates an object of class QJsonObject.", &_init_ctor_QJsonObject_0, &_call_ctor_QJsonObject_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QJsonObject::QJsonObject(const QJsonObject &other)\nThis method creates an object of class QJsonObject.", &_init_ctor_QJsonObject_2403, &_call_ctor_QJsonObject_2403);
   methods += new qt_gsi::GenericMethod ("begin", "@brief Method QJsonObject::iterator QJsonObject::begin()\n", false, &_init_f_begin_0, &_call_f_begin_0);
-  methods += new qt_gsi::GenericMethod ("begin", "@brief Method QJsonObject::const_iterator QJsonObject::begin()\n", true, &_init_f_begin_c0, &_call_f_begin_c0);
-  methods += new qt_gsi::GenericMethod ("constBegin", "@brief Method QJsonObject::const_iterator QJsonObject::constBegin()\n", true, &_init_f_constBegin_c0, &_call_f_constBegin_c0);
-  methods += new qt_gsi::GenericMethod ("constEnd", "@brief Method QJsonObject::const_iterator QJsonObject::constEnd()\n", true, &_init_f_constEnd_c0, &_call_f_constEnd_c0);
   methods += new qt_gsi::GenericMethod ("constFind", "@brief Method QJsonObject::const_iterator QJsonObject::constFind(const QString &key)\n", true, &_init_f_constFind_c2025, &_call_f_constFind_c2025);
   methods += new qt_gsi::GenericMethod ("constFind", "@brief Method QJsonObject::const_iterator QJsonObject::constFind(QStringView key)\n", true, &_init_f_constFind_c1559, &_call_f_constFind_c1559);
   methods += new qt_gsi::GenericMethod ("constFind", "@brief Method QJsonObject::const_iterator QJsonObject::constFind(QLatin1String key)\n", true, &_init_f_constFind_c1701, &_call_f_constFind_c1701);
@@ -1018,7 +955,6 @@ static gsi::Methods methods_QJsonObject () {
   methods += new qt_gsi::GenericMethod ("count", "@brief Method qsizetype QJsonObject::count()\n", true, &_init_f_count_c0, &_call_f_count_c0);
   methods += new qt_gsi::GenericMethod ("empty", "@brief Method bool QJsonObject::empty()\n", true, &_init_f_empty_c0, &_call_f_empty_c0);
   methods += new qt_gsi::GenericMethod ("end", "@brief Method QJsonObject::iterator QJsonObject::end()\n", false, &_init_f_end_0, &_call_f_end_0);
-  methods += new qt_gsi::GenericMethod ("end", "@brief Method QJsonObject::const_iterator QJsonObject::end()\n", true, &_init_f_end_c0, &_call_f_end_c0);
   methods += new qt_gsi::GenericMethod ("erase", "@brief Method QJsonObject::iterator QJsonObject::erase(QJsonObject::iterator it)\n", false, &_init_f_erase_2516, &_call_f_erase_2516);
   methods += new qt_gsi::GenericMethod ("find", "@brief Method QJsonObject::iterator QJsonObject::find(const QString &key)\n", false, &_init_f_find_2025, &_call_f_find_2025);
   methods += new qt_gsi::GenericMethod ("find", "@brief Method QJsonObject::const_iterator QJsonObject::find(const QString &key)\n", true, &_init_f_find_c2025, &_call_f_find_c2025);

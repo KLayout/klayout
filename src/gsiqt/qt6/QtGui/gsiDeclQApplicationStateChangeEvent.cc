@@ -50,28 +50,12 @@ static void _call_f_applicationState_c0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// QApplicationStateChangeEvent *QApplicationStateChangeEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QApplicationStateChangeEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QApplicationStateChangeEvent * > ((QApplicationStateChangeEvent *)((QApplicationStateChangeEvent *)cls)->clone ());
-}
-
-
 namespace gsi
 {
 
 static gsi::Methods methods_QApplicationStateChangeEvent () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericMethod ("applicationState", "@brief Method Qt::ApplicationState QApplicationStateChangeEvent::applicationState()\n", true, &_init_f_applicationState_c0, &_call_f_applicationState_c0);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QApplicationStateChangeEvent *QApplicationStateChangeEvent::clone()\nThis is a reimplementation of QEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   return methods;
 }
 
@@ -98,21 +82,6 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [adaptor impl] QApplicationStateChangeEvent *QApplicationStateChangeEvent::clone()
-  QApplicationStateChangeEvent * cbs_clone_c0_0() const
-  {
-    return QApplicationStateChangeEvent::clone();
-  }
-
-  virtual QApplicationStateChangeEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QApplicationStateChangeEvent_Adaptor, QApplicationStateChangeEvent *>(&QApplicationStateChangeEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QApplicationStateChangeEvent::clone();
-    }
-  }
-
   //  [adaptor impl] void QApplicationStateChangeEvent::setAccepted(bool accepted)
   void cbs_setAccepted_864_0(bool accepted)
   {
@@ -128,7 +97,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_setAccepted_864_0;
 };
 
@@ -149,25 +117,6 @@ static void _call_ctor_QApplicationStateChangeEvent_Adaptor_2402 (const qt_gsi::
   tl::Heap heap;
   const qt_gsi::Converter<Qt::ApplicationState>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::ApplicationState>::target_type & >() (args, heap);
   ret.write<QApplicationStateChangeEvent_Adaptor *> (new QApplicationStateChangeEvent_Adaptor (qt_gsi::QtToCppAdaptor<Qt::ApplicationState>(arg1).cref()));
-}
-
-
-// QApplicationStateChangeEvent *QApplicationStateChangeEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QApplicationStateChangeEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QApplicationStateChangeEvent * > ((QApplicationStateChangeEvent *)((QApplicationStateChangeEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QApplicationStateChangeEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
 }
 
 
@@ -203,8 +152,6 @@ gsi::Class<QApplicationStateChangeEvent> &qtdecl_QApplicationStateChangeEvent ()
 static gsi::Methods methods_QApplicationStateChangeEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QApplicationStateChangeEvent::QApplicationStateChangeEvent(Qt::ApplicationState state)\nThis method creates an object of class QApplicationStateChangeEvent.", &_init_ctor_QApplicationStateChangeEvent_Adaptor_2402, &_call_ctor_QApplicationStateChangeEvent_Adaptor_2402);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QApplicationStateChangeEvent *QApplicationStateChangeEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Virtual method void QApplicationStateChangeEvent::setAccepted(bool accepted)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@hide", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0, &_set_callback_cbs_setAccepted_864_0);
   return methods;

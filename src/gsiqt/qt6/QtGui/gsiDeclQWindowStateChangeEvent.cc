@@ -35,21 +35,6 @@
 // -----------------------------------------------------------------------
 // class QWindowStateChangeEvent
 
-// QWindowStateChangeEvent *QWindowStateChangeEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QWindowStateChangeEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QWindowStateChangeEvent * > ((QWindowStateChangeEvent *)((QWindowStateChangeEvent *)cls)->clone ());
-}
-
-
 // bool QWindowStateChangeEvent::isOverride()
 
 
@@ -85,7 +70,6 @@ namespace gsi
 
 static gsi::Methods methods_QWindowStateChangeEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QWindowStateChangeEvent *QWindowStateChangeEvent::clone()\nThis is a reimplementation of QEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("isOverride?", "@brief Method bool QWindowStateChangeEvent::isOverride()\n", true, &_init_f_isOverride_c0, &_call_f_isOverride_c0);
   methods += new qt_gsi::GenericMethod ("oldState", "@brief Method QFlags<Qt::WindowState> QWindowStateChangeEvent::oldState()\n", true, &_init_f_oldState_c0, &_call_f_oldState_c0);
   return methods;
@@ -120,21 +104,6 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [adaptor impl] QWindowStateChangeEvent *QWindowStateChangeEvent::clone()
-  QWindowStateChangeEvent * cbs_clone_c0_0() const
-  {
-    return QWindowStateChangeEvent::clone();
-  }
-
-  virtual QWindowStateChangeEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QWindowStateChangeEvent_Adaptor, QWindowStateChangeEvent *>(&QWindowStateChangeEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QWindowStateChangeEvent::clone();
-    }
-  }
-
   //  [adaptor impl] void QWindowStateChangeEvent::setAccepted(bool accepted)
   void cbs_setAccepted_864_0(bool accepted)
   {
@@ -150,7 +119,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_setAccepted_864_0;
 };
 
@@ -174,25 +142,6 @@ static void _call_ctor_QWindowStateChangeEvent_Adaptor_3346 (const qt_gsi::Gener
   QFlags<Qt::WindowState> arg1 = gsi::arg_reader<QFlags<Qt::WindowState> >() (args, heap);
   bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (false, heap);
   ret.write<QWindowStateChangeEvent_Adaptor *> (new QWindowStateChangeEvent_Adaptor (arg1, arg2));
-}
-
-
-// QWindowStateChangeEvent *QWindowStateChangeEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QWindowStateChangeEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QWindowStateChangeEvent * > ((QWindowStateChangeEvent *)((QWindowStateChangeEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QWindowStateChangeEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
 }
 
 
@@ -228,8 +177,6 @@ gsi::Class<QWindowStateChangeEvent> &qtdecl_QWindowStateChangeEvent ();
 static gsi::Methods methods_QWindowStateChangeEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QWindowStateChangeEvent::QWindowStateChangeEvent(QFlags<Qt::WindowState> oldState, bool isOverride)\nThis method creates an object of class QWindowStateChangeEvent.", &_init_ctor_QWindowStateChangeEvent_Adaptor_3346, &_call_ctor_QWindowStateChangeEvent_Adaptor_3346);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QWindowStateChangeEvent *QWindowStateChangeEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Virtual method void QWindowStateChangeEvent::setAccepted(bool accepted)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@hide", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0, &_set_callback_cbs_setAccepted_864_0);
   return methods;

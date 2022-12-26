@@ -28,7 +28,6 @@
 */
 
 #include <QDragEnterEvent>
-#include <QDragMoveEvent>
 #include <QMimeData>
 #include <QObject>
 #include <QPoint>
@@ -72,21 +71,6 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [adaptor impl] QDragMoveEvent *QDragEnterEvent::clone()
-  QDragMoveEvent * cbs_clone_c0_0() const
-  {
-    return QDragEnterEvent::clone();
-  }
-
-  virtual QDragMoveEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QDragEnterEvent_Adaptor, QDragMoveEvent *>(&QDragEnterEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QDragEnterEvent::clone();
-    }
-  }
-
   //  [adaptor impl] void QDragEnterEvent::setAccepted(bool accepted)
   void cbs_setAccepted_864_0(bool accepted)
   {
@@ -102,7 +86,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_setAccepted_864_0;
 };
 
@@ -138,25 +121,6 @@ static void _call_ctor_QDragEnterEvent_Adaptor_11787 (const qt_gsi::GenericStati
 }
 
 
-// QDragMoveEvent *QDragEnterEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QDragMoveEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QDragMoveEvent * > ((QDragMoveEvent *)((QDragEnterEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QDragEnterEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
-}
-
-
 // void QDragEnterEvent::setAccepted(bool accepted)
 
 static void _init_cbs_setAccepted_864_0 (qt_gsi::GenericMethod *decl)
@@ -189,8 +153,6 @@ gsi::Class<QDragEnterEvent> &qtdecl_QDragEnterEvent ();
 static gsi::Methods methods_QDragEnterEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDragEnterEvent::QDragEnterEvent(const QPoint &pos, QFlags<Qt::DropAction> actions, const QMimeData *data, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers)\nThis method creates an object of class QDragEnterEvent.", &_init_ctor_QDragEnterEvent_Adaptor_11787, &_call_ctor_QDragEnterEvent_Adaptor_11787);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QDragMoveEvent *QDragEnterEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Virtual method void QDragEnterEvent::setAccepted(bool accepted)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@hide", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0, &_set_callback_cbs_setAccepted_864_0);
   return methods;

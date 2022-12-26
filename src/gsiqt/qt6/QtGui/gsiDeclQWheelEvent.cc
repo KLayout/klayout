@@ -56,21 +56,6 @@ static void _call_f_angleDelta_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// QWheelEvent *QWheelEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QWheelEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QWheelEvent * > ((QWheelEvent *)((QWheelEvent *)cls)->clone ());
-}
-
-
 // bool QWheelEvent::hasPixelDelta()
 
 
@@ -212,7 +197,6 @@ namespace gsi
 static gsi::Methods methods_QWheelEvent () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericMethod ("angleDelta", "@brief Method QPoint QWheelEvent::angleDelta()\n", true, &_init_f_angleDelta_c0, &_call_f_angleDelta_c0);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QWheelEvent *QWheelEvent::clone()\nThis is a reimplementation of QSinglePointEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("hasPixelDelta", "@brief Method bool QWheelEvent::hasPixelDelta()\n", true, &_init_f_hasPixelDelta_c0, &_call_f_hasPixelDelta_c0);
   methods += new qt_gsi::GenericMethod ("inverted", "@brief Method bool QWheelEvent::inverted()\n", true, &_init_f_inverted_c0, &_call_f_inverted_c0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent?", "@brief Method bool QWheelEvent::isBeginEvent()\nThis is a reimplementation of QSinglePointEvent::isBeginEvent", true, &_init_f_isBeginEvent_c0, &_call_f_isBeginEvent_c0);
@@ -258,21 +242,6 @@ public:
   QWheelEvent_Adaptor(const QPointF &pos, const QPointF &globalPos, QPoint pixelDelta, QPoint angleDelta, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::ScrollPhase phase, bool inverted, Qt::MouseEventSource source, const QPointingDevice *device) : QWheelEvent(pos, globalPos, pixelDelta, angleDelta, buttons, modifiers, phase, inverted, source, device)
   {
     qt_gsi::QtObjectBase::init (this);
-  }
-
-  //  [adaptor impl] QWheelEvent *QWheelEvent::clone()
-  QWheelEvent * cbs_clone_c0_0() const
-  {
-    return QWheelEvent::clone();
-  }
-
-  virtual QWheelEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QWheelEvent_Adaptor, QWheelEvent *>(&QWheelEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QWheelEvent::clone();
-    }
   }
 
   //  [adaptor impl] bool QWheelEvent::isBeginEvent()
@@ -350,7 +319,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_isBeginEvent_c0_0;
   gsi::Callback cb_isEndEvent_c0_0;
   gsi::Callback cb_isUpdateEvent_c0_0;
@@ -402,25 +370,6 @@ static void _call_ctor_QWheelEvent_Adaptor_18729 (const qt_gsi::GenericStaticMet
   const qt_gsi::Converter<Qt::MouseEventSource>::target_type & arg9 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::MouseEventSource>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::MouseEventSource>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::MouseEventSource>(heap, Qt::MouseEventNotSynthesized), heap);
   const QPointingDevice *arg10 = args ? gsi::arg_reader<const QPointingDevice * >() (args, heap) : gsi::arg_maker<const QPointingDevice * >() (QPointingDevice::primaryPointingDevice(), heap);
   ret.write<QWheelEvent_Adaptor *> (new QWheelEvent_Adaptor (arg1, arg2, arg3, arg4, arg5, arg6, qt_gsi::QtToCppAdaptor<Qt::ScrollPhase>(arg7).cref(), arg8, qt_gsi::QtToCppAdaptor<Qt::MouseEventSource>(arg9).cref(), arg10));
-}
-
-
-// QWheelEvent *QWheelEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QWheelEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QWheelEvent * > ((QWheelEvent *)((QWheelEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QWheelEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
 }
 
 
@@ -537,8 +486,6 @@ gsi::Class<QWheelEvent> &qtdecl_QWheelEvent ();
 static gsi::Methods methods_QWheelEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QWheelEvent::QWheelEvent(const QPointF &pos, const QPointF &globalPos, QPoint pixelDelta, QPoint angleDelta, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::ScrollPhase phase, bool inverted, Qt::MouseEventSource source, const QPointingDevice *device)\nThis method creates an object of class QWheelEvent.", &_init_ctor_QWheelEvent_Adaptor_18729, &_call_ctor_QWheelEvent_Adaptor_18729);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QWheelEvent *QWheelEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@brief Virtual method bool QWheelEvent::isBeginEvent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@hide", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0, &_set_callback_cbs_isBeginEvent_c0_0);
   methods += new qt_gsi::GenericMethod ("isEndEvent", "@brief Virtual method bool QWheelEvent::isEndEvent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isEndEvent_c0_0, &_call_cbs_isEndEvent_c0_0);

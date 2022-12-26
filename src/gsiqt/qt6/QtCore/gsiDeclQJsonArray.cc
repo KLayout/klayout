@@ -431,25 +431,6 @@ static void _call_f_operator_index__1442 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// QJsonValue QJsonArray::operator[](qsizetype i)
-
-
-static void _init_f_operator_index__c1442 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("i");
-  decl->add_arg<qsizetype > (argspec_0);
-  decl->set_return<QJsonValue > ();
-}
-
-static void _call_f_operator_index__c1442 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  qsizetype arg1 = gsi::arg_reader<qsizetype >() (args, heap);
-  ret.write<QJsonValue > ((QJsonValue)((QJsonArray *)cls)->operator[] (arg1));
-}
-
-
 // void QJsonArray::pop_back()
 
 
@@ -752,7 +733,6 @@ static gsi::Methods methods_QJsonArray () {
   methods += new qt_gsi::GenericMethod ("<<", "@brief Method QJsonArray &QJsonArray::operator<<(const QJsonValue &v)\n", false, &_init_f_operator_lt__lt__2313, &_call_f_operator_lt__lt__2313);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QJsonArray::operator==(const QJsonArray &other)\n", true, &_init_f_operator_eq__eq__c2315, &_call_f_operator_eq__eq__c2315);
   methods += new qt_gsi::GenericMethod ("[]", "@brief Method QJsonValueRef QJsonArray::operator[](qsizetype i)\n", false, &_init_f_operator_index__1442, &_call_f_operator_index__1442);
-  methods += new qt_gsi::GenericMethod ("[]", "@brief Method QJsonValue QJsonArray::operator[](qsizetype i)\n", true, &_init_f_operator_index__c1442, &_call_f_operator_index__c1442);
   methods += new qt_gsi::GenericMethod ("pop_back", "@brief Method void QJsonArray::pop_back()\n", false, &_init_f_pop_back_0, &_call_f_pop_back_0);
   methods += new qt_gsi::GenericMethod ("pop_front", "@brief Method void QJsonArray::pop_front()\n", false, &_init_f_pop_front_0, &_call_f_pop_front_0);
   methods += new qt_gsi::GenericMethod ("prepend", "@brief Method void QJsonArray::prepend(const QJsonValue &value)\n", false, &_init_f_prepend_2313, &_call_f_prepend_2313);

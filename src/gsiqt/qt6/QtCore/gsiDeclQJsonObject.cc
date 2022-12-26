@@ -86,63 +86,6 @@ static void _call_f_begin_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// QJsonObject::const_iterator QJsonObject::constFind(const QString &key)
-
-
-static void _init_f_constFind_c2025 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<const QString & > (argspec_0);
-  decl->set_return<QJsonObject::const_iterator > ();
-}
-
-static void _call_f_constFind_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  ret.write<QJsonObject::const_iterator > ((QJsonObject::const_iterator)((QJsonObject *)cls)->constFind (arg1));
-}
-
-
-// QJsonObject::const_iterator QJsonObject::constFind(QStringView key)
-
-
-static void _init_f_constFind_c1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<QJsonObject::const_iterator > ();
-}
-
-static void _call_f_constFind_c1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QJsonObject::const_iterator > ((QJsonObject::const_iterator)((QJsonObject *)cls)->constFind (arg1));
-}
-
-
-// QJsonObject::const_iterator QJsonObject::constFind(QLatin1String key)
-
-
-static void _init_f_constFind_c1701 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QLatin1String > (argspec_0);
-  decl->set_return<QJsonObject::const_iterator > ();
-}
-
-static void _call_f_constFind_c1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
-  ret.write<QJsonObject::const_iterator > ((QJsonObject::const_iterator)((QJsonObject *)cls)->constFind (arg1));
-}
-
-
 // bool QJsonObject::contains(const QString &key)
 
 
@@ -158,44 +101,6 @@ static void _call_f_contains_c2025 (const qt_gsi::GenericMethod * /*decl*/, void
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  ret.write<bool > ((bool)((QJsonObject *)cls)->contains (arg1));
-}
-
-
-// bool QJsonObject::contains(QStringView key)
-
-
-static void _init_f_contains_c1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_contains_c1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<bool > ((bool)((QJsonObject *)cls)->contains (arg1));
-}
-
-
-// bool QJsonObject::contains(QLatin1String key)
-
-
-static void _init_f_contains_c1701 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QLatin1String > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_contains_c1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
   ret.write<bool > ((bool)((QJsonObject *)cls)->contains (arg1));
 }
 
@@ -283,101 +188,6 @@ static void _call_f_find_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// QJsonObject::const_iterator QJsonObject::find(const QString &key)
-
-
-static void _init_f_find_c2025 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<const QString & > (argspec_0);
-  decl->set_return<QJsonObject::const_iterator > ();
-}
-
-static void _call_f_find_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  ret.write<QJsonObject::const_iterator > ((QJsonObject::const_iterator)((QJsonObject *)cls)->find (arg1));
-}
-
-
-// QJsonObject::iterator QJsonObject::find(QStringView key)
-
-
-static void _init_f_find_1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<QJsonObject::iterator > ();
-}
-
-static void _call_f_find_1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QJsonObject::iterator > ((QJsonObject::iterator)((QJsonObject *)cls)->find (arg1));
-}
-
-
-// QJsonObject::iterator QJsonObject::find(QLatin1String key)
-
-
-static void _init_f_find_1701 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QLatin1String > (argspec_0);
-  decl->set_return<QJsonObject::iterator > ();
-}
-
-static void _call_f_find_1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
-  ret.write<QJsonObject::iterator > ((QJsonObject::iterator)((QJsonObject *)cls)->find (arg1));
-}
-
-
-// QJsonObject::const_iterator QJsonObject::find(QStringView key)
-
-
-static void _init_f_find_c1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<QJsonObject::const_iterator > ();
-}
-
-static void _call_f_find_c1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QJsonObject::const_iterator > ((QJsonObject::const_iterator)((QJsonObject *)cls)->find (arg1));
-}
-
-
-// QJsonObject::const_iterator QJsonObject::find(QLatin1String key)
-
-
-static void _init_f_find_c1701 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QLatin1String > (argspec_0);
-  decl->set_return<QJsonObject::const_iterator > ();
-}
-
-static void _call_f_find_c1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
-  ret.write<QJsonObject::const_iterator > ((QJsonObject::const_iterator)((QJsonObject *)cls)->find (arg1));
-}
-
-
 // QJsonObject::iterator QJsonObject::insert(const QString &key, const QJsonValue &value)
 
 
@@ -395,50 +205,6 @@ static void _call_f_insert_4230 (const qt_gsi::GenericMethod * /*decl*/, void *c
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const QJsonValue &arg2 = gsi::arg_reader<const QJsonValue & >() (args, heap);
-  ret.write<QJsonObject::iterator > ((QJsonObject::iterator)((QJsonObject *)cls)->insert (arg1, arg2));
-}
-
-
-// QJsonObject::iterator QJsonObject::insert(QStringView key, const QJsonValue &value)
-
-
-static void _init_f_insert_3764 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("value");
-  decl->add_arg<const QJsonValue & > (argspec_1);
-  decl->set_return<QJsonObject::iterator > ();
-}
-
-static void _call_f_insert_3764 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  const QJsonValue &arg2 = gsi::arg_reader<const QJsonValue & >() (args, heap);
-  ret.write<QJsonObject::iterator > ((QJsonObject::iterator)((QJsonObject *)cls)->insert (arg1, arg2));
-}
-
-
-// QJsonObject::iterator QJsonObject::insert(QLatin1String key, const QJsonValue &value)
-
-
-static void _init_f_insert_3906 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QLatin1String > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("value");
-  decl->add_arg<const QJsonValue & > (argspec_1);
-  decl->set_return<QJsonObject::iterator > ();
-}
-
-static void _call_f_insert_3906 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
   const QJsonValue &arg2 = gsi::arg_reader<const QJsonValue & >() (args, heap);
   ret.write<QJsonObject::iterator > ((QJsonObject::iterator)((QJsonObject *)cls)->insert (arg1, arg2));
 }
@@ -546,25 +312,6 @@ static void _call_f_operator_eq__eq__c2403 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// QJsonValue QJsonObject::operator[](const QString &key)
-
-
-static void _init_f_operator_index__c2025 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<const QString & > (argspec_0);
-  decl->set_return<QJsonValue > ();
-}
-
-static void _call_f_operator_index__c2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  ret.write<QJsonValue > ((QJsonValue)((QJsonObject *)cls)->operator[] (arg1));
-}
-
-
 // QJsonValueRef QJsonObject::operator[](const QString &key)
 
 
@@ -584,82 +331,6 @@ static void _call_f_operator_index__2025 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// QJsonValue QJsonObject::operator[](QStringView key)
-
-
-static void _init_f_operator_index__c1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<QJsonValue > ();
-}
-
-static void _call_f_operator_index__c1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QJsonValue > ((QJsonValue)((QJsonObject *)cls)->operator[] (arg1));
-}
-
-
-// QJsonValue QJsonObject::operator[](QLatin1String key)
-
-
-static void _init_f_operator_index__c1701 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QLatin1String > (argspec_0);
-  decl->set_return<QJsonValue > ();
-}
-
-static void _call_f_operator_index__c1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
-  ret.write<QJsonValue > ((QJsonValue)((QJsonObject *)cls)->operator[] (arg1));
-}
-
-
-// QJsonValueRef QJsonObject::operator[](QStringView key)
-
-
-static void _init_f_operator_index__1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<QJsonValueRef > ();
-}
-
-static void _call_f_operator_index__1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QJsonValueRef > ((QJsonValueRef)((QJsonObject *)cls)->operator[] (arg1));
-}
-
-
-// QJsonValueRef QJsonObject::operator[](QLatin1String key)
-
-
-static void _init_f_operator_index__1701 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QLatin1String > (argspec_0);
-  decl->set_return<QJsonValueRef > ();
-}
-
-static void _call_f_operator_index__1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
-  ret.write<QJsonValueRef > ((QJsonValueRef)((QJsonObject *)cls)->operator[] (arg1));
-}
-
-
 // void QJsonObject::remove(const QString &key)
 
 
@@ -675,46 +346,6 @@ static void _call_f_remove_2025 (const qt_gsi::GenericMethod * /*decl*/, void *c
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QJsonObject *)cls)->remove (arg1);
-}
-
-
-// void QJsonObject::remove(QStringView key)
-
-
-static void _init_f_remove_1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_remove_1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QJsonObject *)cls)->remove (arg1);
-}
-
-
-// void QJsonObject::remove(QLatin1String key)
-
-
-static void _init_f_remove_1701 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QLatin1String > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_remove_1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QJsonObject *)cls)->remove (arg1);
 }
@@ -774,44 +405,6 @@ static void _call_f_take_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// QJsonValue QJsonObject::take(QStringView key)
-
-
-static void _init_f_take_1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<QJsonValue > ();
-}
-
-static void _call_f_take_1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QJsonValue > ((QJsonValue)((QJsonObject *)cls)->take (arg1));
-}
-
-
-// QJsonValue QJsonObject::take(QLatin1String key)
-
-
-static void _init_f_take_1701 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QLatin1String > (argspec_0);
-  decl->set_return<QJsonValue > ();
-}
-
-static void _call_f_take_1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
-  ret.write<QJsonValue > ((QJsonValue)((QJsonObject *)cls)->take (arg1));
-}
-
-
 // QVariantHash QJsonObject::toVariantHash()
 
 
@@ -857,44 +450,6 @@ static void _call_f_value_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *c
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  ret.write<QJsonValue > ((QJsonValue)((QJsonObject *)cls)->value (arg1));
-}
-
-
-// QJsonValue QJsonObject::value(QStringView key)
-
-
-static void _init_f_value_c1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<QJsonValue > ();
-}
-
-static void _call_f_value_c1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QJsonValue > ((QJsonValue)((QJsonObject *)cls)->value (arg1));
-}
-
-
-// QJsonValue QJsonObject::value(QLatin1String key)
-
-
-static void _init_f_value_c1701 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QLatin1String > (argspec_0);
-  decl->set_return<QJsonValue > ();
-}
-
-static void _call_f_value_c1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
   ret.write<QJsonValue > ((QJsonValue)((QJsonObject *)cls)->value (arg1));
 }
 
@@ -946,50 +501,27 @@ static gsi::Methods methods_QJsonObject () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QJsonObject::QJsonObject()\nThis method creates an object of class QJsonObject.", &_init_ctor_QJsonObject_0, &_call_ctor_QJsonObject_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QJsonObject::QJsonObject(const QJsonObject &other)\nThis method creates an object of class QJsonObject.", &_init_ctor_QJsonObject_2403, &_call_ctor_QJsonObject_2403);
   methods += new qt_gsi::GenericMethod ("begin", "@brief Method QJsonObject::iterator QJsonObject::begin()\n", false, &_init_f_begin_0, &_call_f_begin_0);
-  methods += new qt_gsi::GenericMethod ("constFind", "@brief Method QJsonObject::const_iterator QJsonObject::constFind(const QString &key)\n", true, &_init_f_constFind_c2025, &_call_f_constFind_c2025);
-  methods += new qt_gsi::GenericMethod ("constFind", "@brief Method QJsonObject::const_iterator QJsonObject::constFind(QStringView key)\n", true, &_init_f_constFind_c1559, &_call_f_constFind_c1559);
-  methods += new qt_gsi::GenericMethod ("constFind", "@brief Method QJsonObject::const_iterator QJsonObject::constFind(QLatin1String key)\n", true, &_init_f_constFind_c1701, &_call_f_constFind_c1701);
   methods += new qt_gsi::GenericMethod ("contains", "@brief Method bool QJsonObject::contains(const QString &key)\n", true, &_init_f_contains_c2025, &_call_f_contains_c2025);
-  methods += new qt_gsi::GenericMethod ("contains", "@brief Method bool QJsonObject::contains(QStringView key)\n", true, &_init_f_contains_c1559, &_call_f_contains_c1559);
-  methods += new qt_gsi::GenericMethod ("contains", "@brief Method bool QJsonObject::contains(QLatin1String key)\n", true, &_init_f_contains_c1701, &_call_f_contains_c1701);
   methods += new qt_gsi::GenericMethod ("count", "@brief Method qsizetype QJsonObject::count()\n", true, &_init_f_count_c0, &_call_f_count_c0);
   methods += new qt_gsi::GenericMethod ("empty", "@brief Method bool QJsonObject::empty()\n", true, &_init_f_empty_c0, &_call_f_empty_c0);
   methods += new qt_gsi::GenericMethod ("end", "@brief Method QJsonObject::iterator QJsonObject::end()\n", false, &_init_f_end_0, &_call_f_end_0);
   methods += new qt_gsi::GenericMethod ("erase", "@brief Method QJsonObject::iterator QJsonObject::erase(QJsonObject::iterator it)\n", false, &_init_f_erase_2516, &_call_f_erase_2516);
   methods += new qt_gsi::GenericMethod ("find", "@brief Method QJsonObject::iterator QJsonObject::find(const QString &key)\n", false, &_init_f_find_2025, &_call_f_find_2025);
-  methods += new qt_gsi::GenericMethod ("find", "@brief Method QJsonObject::const_iterator QJsonObject::find(const QString &key)\n", true, &_init_f_find_c2025, &_call_f_find_c2025);
-  methods += new qt_gsi::GenericMethod ("find", "@brief Method QJsonObject::iterator QJsonObject::find(QStringView key)\n", false, &_init_f_find_1559, &_call_f_find_1559);
-  methods += new qt_gsi::GenericMethod ("find", "@brief Method QJsonObject::iterator QJsonObject::find(QLatin1String key)\n", false, &_init_f_find_1701, &_call_f_find_1701);
-  methods += new qt_gsi::GenericMethod ("find", "@brief Method QJsonObject::const_iterator QJsonObject::find(QStringView key)\n", true, &_init_f_find_c1559, &_call_f_find_c1559);
-  methods += new qt_gsi::GenericMethod ("find", "@brief Method QJsonObject::const_iterator QJsonObject::find(QLatin1String key)\n", true, &_init_f_find_c1701, &_call_f_find_c1701);
   methods += new qt_gsi::GenericMethod ("insert", "@brief Method QJsonObject::iterator QJsonObject::insert(const QString &key, const QJsonValue &value)\n", false, &_init_f_insert_4230, &_call_f_insert_4230);
-  methods += new qt_gsi::GenericMethod ("insert", "@brief Method QJsonObject::iterator QJsonObject::insert(QStringView key, const QJsonValue &value)\n", false, &_init_f_insert_3764, &_call_f_insert_3764);
-  methods += new qt_gsi::GenericMethod ("insert", "@brief Method QJsonObject::iterator QJsonObject::insert(QLatin1String key, const QJsonValue &value)\n", false, &_init_f_insert_3906, &_call_f_insert_3906);
   methods += new qt_gsi::GenericMethod ("isEmpty?", "@brief Method bool QJsonObject::isEmpty()\n", true, &_init_f_isEmpty_c0, &_call_f_isEmpty_c0);
   methods += new qt_gsi::GenericMethod ("keys", "@brief Method QStringList QJsonObject::keys()\n", true, &_init_f_keys_c0, &_call_f_keys_c0);
   methods += new qt_gsi::GenericMethod ("length", "@brief Method qsizetype QJsonObject::length()\n", true, &_init_f_length_c0, &_call_f_length_c0);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QJsonObject &QJsonObject::operator =(const QJsonObject &other)\n", false, &_init_f_operator_eq__2403, &_call_f_operator_eq__2403);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QJsonObject::operator!=(const QJsonObject &other)\n", true, &_init_f_operator_excl__eq__c2403, &_call_f_operator_excl__eq__c2403);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QJsonObject::operator==(const QJsonObject &other)\n", true, &_init_f_operator_eq__eq__c2403, &_call_f_operator_eq__eq__c2403);
-  methods += new qt_gsi::GenericMethod ("[]", "@brief Method QJsonValue QJsonObject::operator[](const QString &key)\n", true, &_init_f_operator_index__c2025, &_call_f_operator_index__c2025);
   methods += new qt_gsi::GenericMethod ("[]", "@brief Method QJsonValueRef QJsonObject::operator[](const QString &key)\n", false, &_init_f_operator_index__2025, &_call_f_operator_index__2025);
-  methods += new qt_gsi::GenericMethod ("[]", "@brief Method QJsonValue QJsonObject::operator[](QStringView key)\n", true, &_init_f_operator_index__c1559, &_call_f_operator_index__c1559);
-  methods += new qt_gsi::GenericMethod ("[]", "@brief Method QJsonValue QJsonObject::operator[](QLatin1String key)\n", true, &_init_f_operator_index__c1701, &_call_f_operator_index__c1701);
-  methods += new qt_gsi::GenericMethod ("[]", "@brief Method QJsonValueRef QJsonObject::operator[](QStringView key)\n", false, &_init_f_operator_index__1559, &_call_f_operator_index__1559);
-  methods += new qt_gsi::GenericMethod ("[]", "@brief Method QJsonValueRef QJsonObject::operator[](QLatin1String key)\n", false, &_init_f_operator_index__1701, &_call_f_operator_index__1701);
   methods += new qt_gsi::GenericMethod ("remove", "@brief Method void QJsonObject::remove(const QString &key)\n", false, &_init_f_remove_2025, &_call_f_remove_2025);
-  methods += new qt_gsi::GenericMethod ("remove", "@brief Method void QJsonObject::remove(QStringView key)\n", false, &_init_f_remove_1559, &_call_f_remove_1559);
-  methods += new qt_gsi::GenericMethod ("remove", "@brief Method void QJsonObject::remove(QLatin1String key)\n", false, &_init_f_remove_1701, &_call_f_remove_1701);
   methods += new qt_gsi::GenericMethod ("size", "@brief Method qsizetype QJsonObject::size()\n", true, &_init_f_size_c0, &_call_f_size_c0);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QJsonObject::swap(QJsonObject &other)\n", false, &_init_f_swap_1708, &_call_f_swap_1708);
   methods += new qt_gsi::GenericMethod ("take", "@brief Method QJsonValue QJsonObject::take(const QString &key)\n", false, &_init_f_take_2025, &_call_f_take_2025);
-  methods += new qt_gsi::GenericMethod ("take", "@brief Method QJsonValue QJsonObject::take(QStringView key)\n", false, &_init_f_take_1559, &_call_f_take_1559);
-  methods += new qt_gsi::GenericMethod ("take", "@brief Method QJsonValue QJsonObject::take(QLatin1String key)\n", false, &_init_f_take_1701, &_call_f_take_1701);
   methods += new qt_gsi::GenericMethod ("toVariantHash", "@brief Method QVariantHash QJsonObject::toVariantHash()\n", true, &_init_f_toVariantHash_c0, &_call_f_toVariantHash_c0);
   methods += new qt_gsi::GenericMethod ("toVariantMap", "@brief Method QVariantMap QJsonObject::toVariantMap()\n", true, &_init_f_toVariantMap_c0, &_call_f_toVariantMap_c0);
   methods += new qt_gsi::GenericMethod ("value", "@brief Method QJsonValue QJsonObject::value(const QString &key)\n", true, &_init_f_value_c2025, &_call_f_value_c2025);
-  methods += new qt_gsi::GenericMethod ("value", "@brief Method QJsonValue QJsonObject::value(QStringView key)\n", true, &_init_f_value_c1559, &_call_f_value_c1559);
-  methods += new qt_gsi::GenericMethod ("value", "@brief Method QJsonValue QJsonObject::value(QLatin1String key)\n", true, &_init_f_value_c1701, &_call_f_value_c1701);
   methods += new qt_gsi::GenericStaticMethod ("fromVariantHash", "@brief Static method QJsonObject QJsonObject::fromVariantHash(const QVariantHash &map)\nThis method is static and can be called without an instance.", &_init_f_fromVariantHash_2507, &_call_f_fromVariantHash_2507);
   methods += new qt_gsi::GenericStaticMethod ("fromVariantMap", "@brief Static method QJsonObject QJsonObject::fromVariantMap(const QVariantMap &map)\nThis method is static and can be called without an instance.", &_init_f_fromVariantMap_2405, &_call_f_fromVariantMap_2405);
   return methods;

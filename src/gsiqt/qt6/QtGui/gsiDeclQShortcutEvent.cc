@@ -36,21 +36,6 @@
 // -----------------------------------------------------------------------
 // class QShortcutEvent
 
-// QShortcutEvent *QShortcutEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QShortcutEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QShortcutEvent * > ((QShortcutEvent *)((QShortcutEvent *)cls)->clone ());
-}
-
-
 // bool QShortcutEvent::isAmbiguous()
 
 
@@ -101,7 +86,6 @@ namespace gsi
 
 static gsi::Methods methods_QShortcutEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QShortcutEvent *QShortcutEvent::clone()\nThis is a reimplementation of QEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("isAmbiguous?", "@brief Method bool QShortcutEvent::isAmbiguous()\n", true, &_init_f_isAmbiguous_c0, &_call_f_isAmbiguous_c0);
   methods += new qt_gsi::GenericMethod ("key", "@brief Method const QKeySequence &QShortcutEvent::key()\n", true, &_init_f_key_c0, &_call_f_key_c0);
   methods += new qt_gsi::GenericMethod ("shortcutId", "@brief Method int QShortcutEvent::shortcutId()\n", true, &_init_f_shortcutId_c0, &_call_f_shortcutId_c0);
@@ -137,21 +121,6 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [adaptor impl] QShortcutEvent *QShortcutEvent::clone()
-  QShortcutEvent * cbs_clone_c0_0() const
-  {
-    return QShortcutEvent::clone();
-  }
-
-  virtual QShortcutEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QShortcutEvent_Adaptor, QShortcutEvent *>(&QShortcutEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QShortcutEvent::clone();
-    }
-  }
-
   //  [adaptor impl] void QShortcutEvent::setAccepted(bool accepted)
   void cbs_setAccepted_864_0(bool accepted)
   {
@@ -167,7 +136,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_setAccepted_864_0;
 };
 
@@ -194,25 +162,6 @@ static void _call_ctor_QShortcutEvent_Adaptor_3931 (const qt_gsi::GenericStaticM
   int arg2 = gsi::arg_reader<int >() (args, heap);
   bool arg3 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (false, heap);
   ret.write<QShortcutEvent_Adaptor *> (new QShortcutEvent_Adaptor (arg1, arg2, arg3));
-}
-
-
-// QShortcutEvent *QShortcutEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QShortcutEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QShortcutEvent * > ((QShortcutEvent *)((QShortcutEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QShortcutEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
 }
 
 
@@ -248,8 +197,6 @@ gsi::Class<QShortcutEvent> &qtdecl_QShortcutEvent ();
 static gsi::Methods methods_QShortcutEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QShortcutEvent::QShortcutEvent(const QKeySequence &key, int id, bool ambiguous)\nThis method creates an object of class QShortcutEvent.", &_init_ctor_QShortcutEvent_Adaptor_3931, &_call_ctor_QShortcutEvent_Adaptor_3931);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QShortcutEvent *QShortcutEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Virtual method void QShortcutEvent::setAccepted(bool accepted)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@hide", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0, &_set_callback_cbs_setAccepted_864_0);
   return methods;

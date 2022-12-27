@@ -41,21 +41,6 @@
 // -----------------------------------------------------------------------
 // class QMouseEvent
 
-// QMouseEvent *QMouseEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QMouseEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QMouseEvent * > ((QMouseEvent *)((QMouseEvent *)cls)->clone ());
-}
-
-
 // QFlags<Qt::MouseEventFlag> QMouseEvent::flags()
 
 
@@ -226,7 +211,6 @@ namespace gsi
 
 static gsi::Methods methods_QMouseEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QMouseEvent *QMouseEvent::clone()\nThis is a reimplementation of QSinglePointEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("flags", "@brief Method QFlags<Qt::MouseEventFlag> QMouseEvent::flags()\n", true, &_init_f_flags_c0, &_call_f_flags_c0);
   methods += new qt_gsi::GenericMethod ("globalPos", "@brief Method QPoint QMouseEvent::globalPos()\n", true, &_init_f_globalPos_c0, &_call_f_globalPos_c0);
   methods += new qt_gsi::GenericMethod ("globalX", "@brief Method int QMouseEvent::globalX()\n", true, &_init_f_globalX_c0, &_call_f_globalX_c0);
@@ -306,21 +290,6 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [adaptor impl] QMouseEvent *QMouseEvent::clone()
-  QMouseEvent * cbs_clone_c0_0() const
-  {
-    return QMouseEvent::clone();
-  }
-
-  virtual QMouseEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QMouseEvent_Adaptor, QMouseEvent *>(&QMouseEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QMouseEvent::clone();
-    }
-  }
-
   //  [adaptor impl] bool QMouseEvent::isBeginEvent()
   bool cbs_isBeginEvent_c0_0() const
   {
@@ -396,7 +365,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_isBeginEvent_c0_0;
   gsi::Callback cb_isEndEvent_c0_0;
   gsi::Callback cb_isUpdateEvent_c0_0;
@@ -556,25 +524,6 @@ static void _call_ctor_QMouseEvent_Adaptor_19483 (const qt_gsi::GenericStaticMet
 }
 
 
-// QMouseEvent *QMouseEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QMouseEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QMouseEvent * > ((QMouseEvent *)((QMouseEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QMouseEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
-}
-
-
 // bool QMouseEvent::isBeginEvent()
 
 static void _init_cbs_isBeginEvent_c0_0 (qt_gsi::GenericMethod *decl)
@@ -691,8 +640,6 @@ static gsi::Methods methods_QMouseEvent_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMouseEvent::QMouseEvent(QEvent::Type type, const QPointF &localPos, const QPointF &globalPos, Qt::MouseButton button, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, const QPointingDevice *device)\nThis method creates an object of class QMouseEvent.", &_init_ctor_QMouseEvent_Adaptor_15304, &_call_ctor_QMouseEvent_Adaptor_15304);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMouseEvent::QMouseEvent(QEvent::Type type, const QPointF &localPos, const QPointF &scenePos, const QPointF &globalPos, Qt::MouseButton button, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, const QPointingDevice *device)\nThis method creates an object of class QMouseEvent.", &_init_ctor_QMouseEvent_Adaptor_17182, &_call_ctor_QMouseEvent_Adaptor_17182);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMouseEvent::QMouseEvent(QEvent::Type type, const QPointF &localPos, const QPointF &scenePos, const QPointF &globalPos, Qt::MouseButton button, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::MouseEventSource source, const QPointingDevice *device)\nThis method creates an object of class QMouseEvent.", &_init_ctor_QMouseEvent_Adaptor_19483, &_call_ctor_QMouseEvent_Adaptor_19483);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QMouseEvent *QMouseEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@brief Virtual method bool QMouseEvent::isBeginEvent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@hide", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0, &_set_callback_cbs_isBeginEvent_c0_0);
   methods += new qt_gsi::GenericMethod ("isEndEvent", "@brief Virtual method bool QMouseEvent::isEndEvent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isEndEvent_c0_0, &_call_cbs_isEndEvent_c0_0);

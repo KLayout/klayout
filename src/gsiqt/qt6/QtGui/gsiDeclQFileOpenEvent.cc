@@ -37,21 +37,6 @@
 // -----------------------------------------------------------------------
 // class QFileOpenEvent
 
-// QFileOpenEvent *QFileOpenEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QFileOpenEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QFileOpenEvent * > ((QFileOpenEvent *)((QFileOpenEvent *)cls)->clone ());
-}
-
-
 // QString QFileOpenEvent::file()
 
 
@@ -109,7 +94,6 @@ namespace gsi
 
 static gsi::Methods methods_QFileOpenEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QFileOpenEvent *QFileOpenEvent::clone()\nThis is a reimplementation of QEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("file", "@brief Method QString QFileOpenEvent::file()\n", true, &_init_f_file_c0, &_call_f_file_c0);
   methods += new qt_gsi::GenericMethod ("openFile", "@brief Method bool QFileOpenEvent::openFile(QFile &file, QFlags<QIODeviceBase::OpenModeFlag> flags)\n", true, &_init_f_openFile_c4596, &_call_f_openFile_c4596);
   methods += new qt_gsi::GenericMethod ("url", "@brief Method QUrl QFileOpenEvent::url()\n", true, &_init_f_url_c0, &_call_f_url_c0);
@@ -145,21 +129,6 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [adaptor impl] QFileOpenEvent *QFileOpenEvent::clone()
-  QFileOpenEvent * cbs_clone_c0_0() const
-  {
-    return QFileOpenEvent::clone();
-  }
-
-  virtual QFileOpenEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QFileOpenEvent_Adaptor, QFileOpenEvent *>(&QFileOpenEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QFileOpenEvent::clone();
-    }
-  }
-
   //  [adaptor impl] void QFileOpenEvent::setAccepted(bool accepted)
   void cbs_setAccepted_864_0(bool accepted)
   {
@@ -175,7 +144,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_setAccepted_864_0;
 };
 
@@ -217,25 +185,6 @@ static void _call_ctor_QFileOpenEvent_Adaptor_1701 (const qt_gsi::GenericStaticM
 }
 
 
-// QFileOpenEvent *QFileOpenEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QFileOpenEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QFileOpenEvent * > ((QFileOpenEvent *)((QFileOpenEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QFileOpenEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
-}
-
-
 // void QFileOpenEvent::setAccepted(bool accepted)
 
 static void _init_cbs_setAccepted_864_0 (qt_gsi::GenericMethod *decl)
@@ -269,8 +218,6 @@ static gsi::Methods methods_QFileOpenEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QFileOpenEvent::QFileOpenEvent(const QString &file)\nThis method creates an object of class QFileOpenEvent.", &_init_ctor_QFileOpenEvent_Adaptor_2025, &_call_ctor_QFileOpenEvent_Adaptor_2025);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QFileOpenEvent::QFileOpenEvent(const QUrl &url)\nThis method creates an object of class QFileOpenEvent.", &_init_ctor_QFileOpenEvent_Adaptor_1701, &_call_ctor_QFileOpenEvent_Adaptor_1701);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QFileOpenEvent *QFileOpenEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Virtual method void QFileOpenEvent::setAccepted(bool accepted)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@hide", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0, &_set_callback_cbs_setAccepted_864_0);
   return methods;

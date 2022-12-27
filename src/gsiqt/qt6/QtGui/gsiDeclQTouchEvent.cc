@@ -39,21 +39,6 @@
 // -----------------------------------------------------------------------
 // class QTouchEvent
 
-// QTouchEvent *QTouchEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QTouchEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QTouchEvent * > ((QTouchEvent *)((QTouchEvent *)cls)->clone ());
-}
-
-
 // bool QTouchEvent::isBeginEvent()
 
 
@@ -149,7 +134,6 @@ namespace gsi
 
 static gsi::Methods methods_QTouchEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QTouchEvent *QTouchEvent::clone()\nThis is a reimplementation of QPointerEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent?", "@brief Method bool QTouchEvent::isBeginEvent()\nThis is a reimplementation of QPointerEvent::isBeginEvent", true, &_init_f_isBeginEvent_c0, &_call_f_isBeginEvent_c0);
   methods += new qt_gsi::GenericMethod ("isEndEvent?", "@brief Method bool QTouchEvent::isEndEvent()\nThis is a reimplementation of QPointerEvent::isEndEvent", true, &_init_f_isEndEvent_c0, &_call_f_isEndEvent_c0);
   methods += new qt_gsi::GenericMethod ("isUpdateEvent?", "@brief Method bool QTouchEvent::isUpdateEvent()\nThis is a reimplementation of QPointerEvent::isUpdateEvent", true, &_init_f_isUpdateEvent_c0, &_call_f_isUpdateEvent_c0);
@@ -210,21 +194,6 @@ public:
   QTouchEvent_Adaptor(QEvent::Type eventType, const QPointingDevice *device, QFlags<Qt::KeyboardModifier> modifiers, QFlags<QEventPoint::State> touchPointStates, const QList<QEventPoint> &touchPoints) : QTouchEvent(eventType, device, modifiers, touchPointStates, touchPoints)
   {
     qt_gsi::QtObjectBase::init (this);
-  }
-
-  //  [adaptor impl] QTouchEvent *QTouchEvent::clone()
-  QTouchEvent * cbs_clone_c0_0() const
-  {
-    return QTouchEvent::clone();
-  }
-
-  virtual QTouchEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QTouchEvent_Adaptor, QTouchEvent *>(&QTouchEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QTouchEvent::clone();
-    }
   }
 
   //  [adaptor impl] bool QTouchEvent::isBeginEvent()
@@ -302,7 +271,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_isBeginEvent_c0_0;
   gsi::Callback cb_isEndEvent_c0_0;
   gsi::Callback cb_isUpdateEvent_c0_0;
@@ -366,25 +334,6 @@ static void _call_ctor_QTouchEvent_Adaptor_12963 (const qt_gsi::GenericStaticMet
   QFlags<QEventPoint::State> arg4 = gsi::arg_reader<QFlags<QEventPoint::State> >() (args, heap);
   const QList<QEventPoint> &arg5 = args ? gsi::arg_reader<const QList<QEventPoint> & >() (args, heap) : gsi::arg_maker<const QList<QEventPoint> & >() ({}, heap);
   ret.write<QTouchEvent_Adaptor *> (new QTouchEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), arg2, arg3, arg4, arg5));
-}
-
-
-// QTouchEvent *QTouchEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QTouchEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QTouchEvent * > ((QTouchEvent *)((QTouchEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QTouchEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
 }
 
 
@@ -502,8 +451,6 @@ static gsi::Methods methods_QTouchEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTouchEvent::QTouchEvent(QEvent::Type eventType, const QPointingDevice *device, QFlags<Qt::KeyboardModifier> modifiers, const QList<QEventPoint> &touchPoints)\nThis method creates an object of class QTouchEvent.", &_init_ctor_QTouchEvent_Adaptor_10193, &_call_ctor_QTouchEvent_Adaptor_10193);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTouchEvent::QTouchEvent(QEvent::Type eventType, const QPointingDevice *device, QFlags<Qt::KeyboardModifier> modifiers, QFlags<QEventPoint::State> touchPointStates, const QList<QEventPoint> &touchPoints)\nThis method creates an object of class QTouchEvent.", &_init_ctor_QTouchEvent_Adaptor_12963, &_call_ctor_QTouchEvent_Adaptor_12963);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QTouchEvent *QTouchEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@brief Virtual method bool QTouchEvent::isBeginEvent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@hide", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0, &_set_callback_cbs_isBeginEvent_c0_0);
   methods += new qt_gsi::GenericMethod ("isEndEvent", "@brief Virtual method bool QTouchEvent::isEndEvent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isEndEvent_c0_0, &_call_cbs_isEndEvent_c0_0);

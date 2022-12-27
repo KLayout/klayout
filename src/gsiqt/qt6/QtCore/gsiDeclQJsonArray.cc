@@ -125,81 +125,6 @@ static void _call_f_begin_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
-// QJsonArray::const_iterator QJsonArray::begin()
-
-
-static void _init_f_begin_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QJsonArray::const_iterator > ();
-}
-
-static void _call_f_begin_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QJsonArray::const_iterator > ((QJsonArray::const_iterator)((QJsonArray *)cls)->begin ());
-}
-
-
-// QJsonArray::const_iterator QJsonArray::cbegin()
-
-
-static void _init_f_cbegin_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QJsonArray::const_iterator > ();
-}
-
-static void _call_f_cbegin_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QJsonArray::const_iterator > ((QJsonArray::const_iterator)((QJsonArray *)cls)->cbegin ());
-}
-
-
-// QJsonArray::const_iterator QJsonArray::cend()
-
-
-static void _init_f_cend_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QJsonArray::const_iterator > ();
-}
-
-static void _call_f_cend_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QJsonArray::const_iterator > ((QJsonArray::const_iterator)((QJsonArray *)cls)->cend ());
-}
-
-
-// QJsonArray::const_iterator QJsonArray::constBegin()
-
-
-static void _init_f_constBegin_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QJsonArray::const_iterator > ();
-}
-
-static void _call_f_constBegin_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QJsonArray::const_iterator > ((QJsonArray::const_iterator)((QJsonArray *)cls)->constBegin ());
-}
-
-
-// QJsonArray::const_iterator QJsonArray::constEnd()
-
-
-static void _init_f_constEnd_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QJsonArray::const_iterator > ();
-}
-
-static void _call_f_constEnd_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QJsonArray::const_iterator > ((QJsonArray::const_iterator)((QJsonArray *)cls)->constEnd ());
-}
-
-
 // bool QJsonArray::contains(const QJsonValue &element)
 
 
@@ -261,21 +186,6 @@ static void _call_f_end_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gs
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QJsonArray::iterator > ((QJsonArray::iterator)((QJsonArray *)cls)->end ());
-}
-
-
-// QJsonArray::const_iterator QJsonArray::end()
-
-
-static void _init_f_end_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QJsonArray::const_iterator > ();
-}
-
-static void _call_f_end_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QJsonArray::const_iterator > ((QJsonArray::const_iterator)((QJsonArray *)cls)->end ());
 }
 
 
@@ -518,25 +428,6 @@ static void _call_f_operator_index__1442 (const qt_gsi::GenericMethod * /*decl*/
   tl::Heap heap;
   qsizetype arg1 = gsi::arg_reader<qsizetype >() (args, heap);
   ret.write<QJsonValueRef > ((QJsonValueRef)((QJsonArray *)cls)->operator[] (arg1));
-}
-
-
-// QJsonValue QJsonArray::operator[](qsizetype i)
-
-
-static void _init_f_operator_index__c1442 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("i");
-  decl->add_arg<qsizetype > (argspec_0);
-  decl->set_return<QJsonValue > ();
-}
-
-static void _call_f_operator_index__c1442 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  qsizetype arg1 = gsi::arg_reader<qsizetype >() (args, heap);
-  ret.write<QJsonValue > ((QJsonValue)((QJsonArray *)cls)->operator[] (arg1));
 }
 
 
@@ -825,16 +716,10 @@ static gsi::Methods methods_QJsonArray () {
   methods += new qt_gsi::GenericMethod ("append", "@brief Method void QJsonArray::append(const QJsonValue &value)\n", false, &_init_f_append_2313, &_call_f_append_2313);
   methods += new qt_gsi::GenericMethod ("at", "@brief Method QJsonValue QJsonArray::at(qsizetype i)\n", true, &_init_f_at_c1442, &_call_f_at_c1442);
   methods += new qt_gsi::GenericMethod ("begin", "@brief Method QJsonArray::iterator QJsonArray::begin()\n", false, &_init_f_begin_0, &_call_f_begin_0);
-  methods += new qt_gsi::GenericMethod ("begin", "@brief Method QJsonArray::const_iterator QJsonArray::begin()\n", true, &_init_f_begin_c0, &_call_f_begin_c0);
-  methods += new qt_gsi::GenericMethod ("cbegin", "@brief Method QJsonArray::const_iterator QJsonArray::cbegin()\n", true, &_init_f_cbegin_c0, &_call_f_cbegin_c0);
-  methods += new qt_gsi::GenericMethod ("cend", "@brief Method QJsonArray::const_iterator QJsonArray::cend()\n", true, &_init_f_cend_c0, &_call_f_cend_c0);
-  methods += new qt_gsi::GenericMethod ("constBegin", "@brief Method QJsonArray::const_iterator QJsonArray::constBegin()\n", true, &_init_f_constBegin_c0, &_call_f_constBegin_c0);
-  methods += new qt_gsi::GenericMethod ("constEnd", "@brief Method QJsonArray::const_iterator QJsonArray::constEnd()\n", true, &_init_f_constEnd_c0, &_call_f_constEnd_c0);
   methods += new qt_gsi::GenericMethod ("contains", "@brief Method bool QJsonArray::contains(const QJsonValue &element)\n", true, &_init_f_contains_c2313, &_call_f_contains_c2313);
   methods += new qt_gsi::GenericMethod ("count", "@brief Method qsizetype QJsonArray::count()\n", true, &_init_f_count_c0, &_call_f_count_c0);
   methods += new qt_gsi::GenericMethod ("empty", "@brief Method bool QJsonArray::empty()\n", true, &_init_f_empty_c0, &_call_f_empty_c0);
   methods += new qt_gsi::GenericMethod ("end", "@brief Method QJsonArray::iterator QJsonArray::end()\n", false, &_init_f_end_0, &_call_f_end_0);
-  methods += new qt_gsi::GenericMethod ("end", "@brief Method QJsonArray::const_iterator QJsonArray::end()\n", true, &_init_f_end_c0, &_call_f_end_c0);
   methods += new qt_gsi::GenericMethod ("erase", "@brief Method QJsonArray::iterator QJsonArray::erase(QJsonArray::iterator it)\n", false, &_init_f_erase_2428, &_call_f_erase_2428);
   methods += new qt_gsi::GenericMethod ("first", "@brief Method QJsonValue QJsonArray::first()\n", true, &_init_f_first_c0, &_call_f_first_c0);
   methods += new qt_gsi::GenericMethod ("insert", "@brief Method void QJsonArray::insert(qsizetype i, const QJsonValue &value)\n", false, &_init_f_insert_3647, &_call_f_insert_3647);
@@ -848,7 +733,6 @@ static gsi::Methods methods_QJsonArray () {
   methods += new qt_gsi::GenericMethod ("<<", "@brief Method QJsonArray &QJsonArray::operator<<(const QJsonValue &v)\n", false, &_init_f_operator_lt__lt__2313, &_call_f_operator_lt__lt__2313);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QJsonArray::operator==(const QJsonArray &other)\n", true, &_init_f_operator_eq__eq__c2315, &_call_f_operator_eq__eq__c2315);
   methods += new qt_gsi::GenericMethod ("[]", "@brief Method QJsonValueRef QJsonArray::operator[](qsizetype i)\n", false, &_init_f_operator_index__1442, &_call_f_operator_index__1442);
-  methods += new qt_gsi::GenericMethod ("[]", "@brief Method QJsonValue QJsonArray::operator[](qsizetype i)\n", true, &_init_f_operator_index__c1442, &_call_f_operator_index__c1442);
   methods += new qt_gsi::GenericMethod ("pop_back", "@brief Method void QJsonArray::pop_back()\n", false, &_init_f_pop_back_0, &_call_f_pop_back_0);
   methods += new qt_gsi::GenericMethod ("pop_front", "@brief Method void QJsonArray::pop_front()\n", false, &_init_f_pop_front_0, &_call_f_pop_front_0);
   methods += new qt_gsi::GenericMethod ("prepend", "@brief Method void QJsonArray::prepend(const QJsonValue &value)\n", false, &_init_f_prepend_2313, &_call_f_prepend_2313);

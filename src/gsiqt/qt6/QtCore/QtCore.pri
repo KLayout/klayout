@@ -64,11 +64,9 @@ SOURCES += \
   $$PWD/gsiDeclQItemSelectionRange.cc \
   $$PWD/gsiDeclQJsonArray.cc \
   $$PWD/gsiDeclQJsonArray_Iterator.cc \
-  $$PWD/gsiDeclQJsonArray_Const_iterator.cc \
   $$PWD/gsiDeclQJsonDocument.cc \
   $$PWD/gsiDeclQJsonObject.cc \
   $$PWD/gsiDeclQJsonObject_Iterator.cc \
-  $$PWD/gsiDeclQJsonObject_Const_iterator.cc \
   $$PWD/gsiDeclQJsonParseError.cc \
   $$PWD/gsiDeclQJsonValue.cc \
   $$PWD/gsiDeclQJsonValueRef.cc \

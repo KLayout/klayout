@@ -542,25 +542,6 @@ static void _call_f_swap_1693 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// quint64 QVideoFrame::textureHandle(int plane)
-
-
-static void _init_f_textureHandle_c767 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("plane");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return<quint64 > ();
-}
-
-static void _call_f_textureHandle_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  ret.write<quint64 > ((quint64)((QVideoFrame *)cls)->textureHandle (arg1));
-}
-
-
 // QImage QVideoFrame::toImage()
 
 
@@ -642,7 +623,6 @@ static gsi::Methods methods_QVideoFrame () {
   methods += new qt_gsi::GenericMethod ("subtitleText", "@brief Method QString QVideoFrame::subtitleText()\n", true, &_init_f_subtitleText_c0, &_call_f_subtitleText_c0);
   methods += new qt_gsi::GenericMethod ("surfaceFormat", "@brief Method QVideoFrameFormat QVideoFrame::surfaceFormat()\n", true, &_init_f_surfaceFormat_c0, &_call_f_surfaceFormat_c0);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QVideoFrame::swap(QVideoFrame &other)\n", false, &_init_f_swap_1693, &_call_f_swap_1693);
-  methods += new qt_gsi::GenericMethod ("textureHandle", "@brief Method quint64 QVideoFrame::textureHandle(int plane)\n", true, &_init_f_textureHandle_c767, &_call_f_textureHandle_c767);
   methods += new qt_gsi::GenericMethod ("toImage", "@brief Method QImage QVideoFrame::toImage()\n", true, &_init_f_toImage_c0, &_call_f_toImage_c0);
   methods += new qt_gsi::GenericMethod ("unmap", "@brief Method void QVideoFrame::unmap()\n", false, &_init_f_unmap_0, &_call_f_unmap_0);
   methods += new qt_gsi::GenericMethod ("width", "@brief Method int QVideoFrame::width()\n", true, &_init_f_width_c0, &_call_f_width_c0);

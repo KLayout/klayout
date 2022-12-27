@@ -37,21 +37,6 @@
 // -----------------------------------------------------------------------
 // class QPaintEvent
 
-// QPaintEvent *QPaintEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QPaintEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QPaintEvent * > ((QPaintEvent *)((QPaintEvent *)cls)->clone ());
-}
-
-
 // const QRect &QPaintEvent::rect()
 
 
@@ -87,7 +72,6 @@ namespace gsi
 
 static gsi::Methods methods_QPaintEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QPaintEvent *QPaintEvent::clone()\nThis is a reimplementation of QEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("rect", "@brief Method const QRect &QPaintEvent::rect()\n", true, &_init_f_rect_c0, &_call_f_rect_c0);
   methods += new qt_gsi::GenericMethod ("region", "@brief Method const QRegion &QPaintEvent::region()\n", true, &_init_f_region_c0, &_call_f_region_c0);
   return methods;
@@ -122,21 +106,6 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [adaptor impl] QPaintEvent *QPaintEvent::clone()
-  QPaintEvent * cbs_clone_c0_0() const
-  {
-    return QPaintEvent::clone();
-  }
-
-  virtual QPaintEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QPaintEvent_Adaptor, QPaintEvent *>(&QPaintEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QPaintEvent::clone();
-    }
-  }
-
   //  [adaptor impl] void QPaintEvent::setAccepted(bool accepted)
   void cbs_setAccepted_864_0(bool accepted)
   {
@@ -152,7 +121,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_setAccepted_864_0;
 };
 
@@ -194,25 +162,6 @@ static void _call_ctor_QPaintEvent_Adaptor_1792 (const qt_gsi::GenericStaticMeth
 }
 
 
-// QPaintEvent *QPaintEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QPaintEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QPaintEvent * > ((QPaintEvent *)((QPaintEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QPaintEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
-}
-
-
 // void QPaintEvent::setAccepted(bool accepted)
 
 static void _init_cbs_setAccepted_864_0 (qt_gsi::GenericMethod *decl)
@@ -246,8 +195,6 @@ static gsi::Methods methods_QPaintEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPaintEvent::QPaintEvent(const QRegion &paintRegion)\nThis method creates an object of class QPaintEvent.", &_init_ctor_QPaintEvent_Adaptor_2006, &_call_ctor_QPaintEvent_Adaptor_2006);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPaintEvent::QPaintEvent(const QRect &paintRect)\nThis method creates an object of class QPaintEvent.", &_init_ctor_QPaintEvent_Adaptor_1792, &_call_ctor_QPaintEvent_Adaptor_1792);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QPaintEvent *QPaintEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Virtual method void QPaintEvent::setAccepted(bool accepted)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@hide", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0, &_set_callback_cbs_setAccepted_864_0);
   return methods;

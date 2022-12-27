@@ -111,21 +111,6 @@ static void _call_f_clearPassiveGrabbers_2430 (const qt_gsi::GenericMethod * /*d
 }
 
 
-// QPointerEvent *QPointerEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QPointerEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QPointerEvent * > ((QPointerEvent *)((QPointerEvent *)cls)->clone ());
-}
-
-
 // QObject *QPointerEvent::exclusiveGrabber(const QEventPoint &point)
 
 
@@ -401,7 +386,6 @@ static gsi::Methods methods_QPointerEvent () {
   methods += new qt_gsi::GenericMethod ("allPointsAccepted", "@brief Method bool QPointerEvent::allPointsAccepted()\n", true, &_init_f_allPointsAccepted_c0, &_call_f_allPointsAccepted_c0);
   methods += new qt_gsi::GenericMethod ("allPointsGrabbed", "@brief Method bool QPointerEvent::allPointsGrabbed()\n", true, &_init_f_allPointsGrabbed_c0, &_call_f_allPointsGrabbed_c0);
   methods += new qt_gsi::GenericMethod ("clearPassiveGrabbers", "@brief Method void QPointerEvent::clearPassiveGrabbers(const QEventPoint &point)\n", false, &_init_f_clearPassiveGrabbers_2430, &_call_f_clearPassiveGrabbers_2430);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QPointerEvent *QPointerEvent::clone()\nThis is a reimplementation of QInputEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("exclusiveGrabber", "@brief Method QObject *QPointerEvent::exclusiveGrabber(const QEventPoint &point)\n", true, &_init_f_exclusiveGrabber_c2430, &_call_f_exclusiveGrabber_c2430);
   methods += new qt_gsi::GenericMethod ("isBeginEvent?", "@brief Method bool QPointerEvent::isBeginEvent()\n", true, &_init_f_isBeginEvent_c0, &_call_f_isBeginEvent_c0);
   methods += new qt_gsi::GenericMethod ("isEndEvent?", "@brief Method bool QPointerEvent::isEndEvent()\n", true, &_init_f_isEndEvent_c0, &_call_f_isEndEvent_c0);
@@ -453,21 +437,6 @@ public:
   QPointerEvent_Adaptor(QEvent::Type type, const QPointingDevice *dev, QFlags<Qt::KeyboardModifier> modifiers, const QList<QEventPoint> &points) : QPointerEvent(type, dev, modifiers, points)
   {
     qt_gsi::QtObjectBase::init (this);
-  }
-
-  //  [adaptor impl] QPointerEvent *QPointerEvent::clone()
-  QPointerEvent * cbs_clone_c0_0() const
-  {
-    return QPointerEvent::clone();
-  }
-
-  virtual QPointerEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QPointerEvent_Adaptor, QPointerEvent *>(&QPointerEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QPointerEvent::clone();
-    }
   }
 
   //  [adaptor impl] bool QPointerEvent::isBeginEvent()
@@ -545,7 +514,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_isBeginEvent_c0_0;
   gsi::Callback cb_isEndEvent_c0_0;
   gsi::Callback cb_isUpdateEvent_c0_0;
@@ -579,25 +547,6 @@ static void _call_ctor_QPointerEvent_Adaptor_10193 (const qt_gsi::GenericStaticM
   QFlags<Qt::KeyboardModifier> arg3 = args ? gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap) : gsi::arg_maker<QFlags<Qt::KeyboardModifier> >() (Qt::NoModifier, heap);
   const QList<QEventPoint> &arg4 = args ? gsi::arg_reader<const QList<QEventPoint> & >() (args, heap) : gsi::arg_maker<const QList<QEventPoint> & >() ({}, heap);
   ret.write<QPointerEvent_Adaptor *> (new QPointerEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), arg2, arg3, arg4));
-}
-
-
-// QPointerEvent *QPointerEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QPointerEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QPointerEvent * > ((QPointerEvent *)((QPointerEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QPointerEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
 }
 
 
@@ -714,8 +663,6 @@ gsi::Class<QPointerEvent> &qtdecl_QPointerEvent ();
 static gsi::Methods methods_QPointerEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPointerEvent::QPointerEvent(QEvent::Type type, const QPointingDevice *dev, QFlags<Qt::KeyboardModifier> modifiers, const QList<QEventPoint> &points)\nThis method creates an object of class QPointerEvent.", &_init_ctor_QPointerEvent_Adaptor_10193, &_call_ctor_QPointerEvent_Adaptor_10193);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QPointerEvent *QPointerEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@brief Virtual method bool QPointerEvent::isBeginEvent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@hide", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0, &_set_callback_cbs_isBeginEvent_c0_0);
   methods += new qt_gsi::GenericMethod ("isEndEvent", "@brief Virtual method bool QPointerEvent::isEndEvent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isEndEvent_c0_0, &_call_cbs_isEndEvent_c0_0);

@@ -37,6 +37,7 @@
 namespace lay
 {
   class LayoutViewBase;
+  class Dispatcher;
 }
 
 namespace edt
@@ -53,10 +54,9 @@ Q_OBJECT
 public:
   struct State
   {
-    State () : valid (false), show_parameter_names (false), hScrollPosition (0), vScrollPosition (0) { }
+    State () : valid (false), hScrollPosition (0), vScrollPosition (0) { }
 
     bool valid;
-    bool show_parameter_names;
     int hScrollPosition;
     int vScrollPosition;
     QString focusWidget;
@@ -69,7 +69,7 @@ public:
    *
    *  @param dense Use a dense layout if true
    */
-  PCellParametersPage (QWidget *parent, bool dense = false);
+  PCellParametersPage (QWidget *parent, lay::Dispatcher *dispatcher, bool dense = false);
 
   /**
    *  @brief initialization
@@ -148,6 +148,7 @@ private slots:
   void update_button_pressed ();
 
 private:
+  lay::Dispatcher *mp_dispatcher;
   QScrollArea *mp_parameters_area;
   QLabel *mp_error_label;
   QLabel *mp_error_icon;

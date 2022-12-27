@@ -24,9 +24,11 @@
 
 #include "edtPCellParametersPage.h"
 #include "edtPropertiesPageUtils.h"
+#include "edtConfig.h"
 #include "layWidgets.h"
 #include "layQtTools.h"
 #include "layLayoutViewBase.h"
+#include "layDispatcher.h"
 #include "tlScriptError.h"
 
 #include <QFrame>
@@ -148,9 +150,13 @@ static void set_value (const db::PCellParameterDeclaration &p, QWidget *widget, 
   }
 }
 
-PCellParametersPage::PCellParametersPage (QWidget *parent, bool dense)
-  : QFrame (parent), m_dense (dense), m_show_parameter_names (false), dm_parameter_changed (this, &PCellParametersPage::do_parameter_changed)
+PCellParametersPage::PCellParametersPage (QWidget *parent, lay::Dispatcher *dispatcher, bool dense)
+  : QFrame (parent), mp_dispatcher (dispatcher), m_dense (dense), m_show_parameter_names (false), dm_parameter_changed (this, &PCellParametersPage::do_parameter_changed)
 {
+  if (mp_dispatcher) {
+    mp_dispatcher->config_get (cfg_edit_pcell_show_parameter_names, m_show_parameter_names);
+  }
+
   init ();
 }
 
@@ -168,6 +174,8 @@ PCellParametersPage::init ()
   QGridLayout *frame_layout = new QGridLayout (this);
   //  spacing and margin for tool windows
   frame_layout->setContentsMargins (0, 0, 0, 0);
+  frame_layout->setHorizontalSpacing (0);
+  frame_layout->setVerticalSpacing (0);
   setLayout (frame_layout);
 
   mp_update_frame = new QFrame (this);
@@ -209,11 +217,11 @@ PCellParametersPage::init ()
     error_frame_layout->setVerticalSpacing (2);
   }
 
-  mp_error_icon = new QLabel (mp_update_frame);
+  mp_error_icon = new QLabel (mp_error_frame);
   mp_error_icon->setPixmap (QPixmap (":/warn_16px@2x.png"));
   error_frame_layout->addWidget (mp_error_icon, 1, 0, 1, 1);
 
-  mp_error_label = new QLabel (mp_update_frame);
+  mp_error_label = new QLabel (mp_error_frame);
   mp_error_label->setWordWrap (true);
   palette = mp_error_label->palette ();
   palette.setColor (QPalette::WindowText, Qt::red);
@@ -225,10 +233,20 @@ PCellParametersPage::init ()
 
   error_frame_layout->setColumnStretch (2, 1);
 
-  mp_show_parameter_names_cb = new QCheckBox (this);
+  QFrame *show_parameter_names_frame = new QFrame (this);
+  show_parameter_names_frame->setFrameShape (QFrame::NoFrame);
+  frame_layout->addWidget (show_parameter_names_frame, 3, 0, 1, 1);
+
+  QHBoxLayout *show_parameter_names_frame_layout = new QHBoxLayout (show_parameter_names_frame);
+  show_parameter_names_frame->setLayout (show_parameter_names_frame_layout);
+  if (m_dense) {
+    show_parameter_names_frame_layout->setContentsMargins (4, 4, 4, 4);
+  }
+
+  mp_show_parameter_names_cb = new QCheckBox (show_parameter_names_frame);
   mp_show_parameter_names_cb->setText (tr ("Show parameter names"));
   mp_show_parameter_names_cb->setChecked (m_show_parameter_names);
-  frame_layout->addWidget (mp_show_parameter_names_cb, 3, 0, 1, 1);
+  show_parameter_names_frame_layout->addWidget (mp_show_parameter_names_cb);
 
   connect (mp_show_parameter_names_cb, SIGNAL (clicked (bool)), this, SLOT (show_parameter_names (bool)));
 }
@@ -248,6 +266,11 @@ PCellParametersPage::show_parameter_names (bool f)
 
   m_show_parameter_names = f;
   mp_show_parameter_names_cb->setChecked (f);
+
+  if (mp_dispatcher) {
+    mp_dispatcher->config_set (cfg_edit_pcell_show_parameter_names, m_show_parameter_names);
+  }
+
   setup (mp_view, m_cv_index, mp_pcell_decl.get (), get_parameters ());
 }
 
@@ -528,6 +551,8 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
   }
 
   m_initial_states = m_states;
+  mp_error_frame->hide ();
+
   update_widgets_from_states (m_states);
 
   mp_parameters_area->setWidget (main_frame);
@@ -545,8 +570,6 @@ PCellParametersPage::get_state ()
   s.vScrollPosition = mp_parameters_area->verticalScrollBar ()->value ();
   s.hScrollPosition = mp_parameters_area->horizontalScrollBar ()->value ();
 
-  s.show_parameter_names = m_show_parameter_names;
-
   if (focusWidget ()) {
     s.focusWidget = focusWidget ()->objectName ();
   }
@@ -561,10 +584,6 @@ PCellParametersPage::set_state (const State &s)
 
     mp_parameters_area->verticalScrollBar ()->setValue (s.vScrollPosition);
     mp_parameters_area->horizontalScrollBar ()->setValue (s.hScrollPosition);
-
-    if (s.show_parameter_names != m_show_parameter_names) {
-      show_parameter_names (s.show_parameter_names);
-    }
 
     if (! s.focusWidget.isEmpty ()) {
       QWidget *c = findChild<QWidget *> (s.focusWidget);
@@ -784,6 +803,7 @@ PCellParametersPage::get_parameters (db::ParameterStates &states, bool *ok)
     }
 
     bool edit_error = false;
+    mp_error_frame->hide ();
 
     get_parameters_internal (states, edit_error);
 
@@ -865,6 +885,8 @@ PCellParametersPage::set_parameters (const std::vector<tl::Variant> &parameters)
   }
 
   m_initial_states = m_states;
+  mp_error_frame->hide ();
+
   set_parameters_internal (m_states, false);
 }
 
@@ -950,8 +972,6 @@ PCellParametersPage::set_parameters_internal (const db::ParameterStates &states,
       set_value (*p, m_widgets [r], states.parameter (p->get_name ()).value ());
     }
   }
-
-  mp_error_frame->hide ();
 
   bool update_needed = false;
 

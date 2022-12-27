@@ -1009,7 +1009,7 @@ InstPropertiesPage::update_pcell_parameters ()
         mp_pcell_parameters->deleteLater ();
       }
 
-      mp_pcell_parameters = new PCellParametersPage (pcell_tab);
+      mp_pcell_parameters = new PCellParametersPage (pcell_tab, mp_service->view ()->dispatcher ());
       connect (mp_pcell_parameters, SIGNAL (edited ()), this, SIGNAL (edited ()));
       mp_pcell_parameters->setup (mp_service->view (), pos->cv_index (), layout->pcell_declaration (pc.second), parameters);
       pcell_tab->layout ()->addWidget (mp_pcell_parameters);

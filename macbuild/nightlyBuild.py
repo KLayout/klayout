@@ -52,7 +52,7 @@ def Test_My_Platform( platforms=['Catalina', 'BigSur', 'Monterey' ] ):
 #------------------------------------------------------------------------------
 def Get_Build_Target_Dict():
     buildTargetDic    = dict()
-    buildTargetDic[0] = 'std'
+    # buildTargetDic[0] = 'std'   # has been abolished in 0.28
     buildTargetDic[1] = 'ports'
     buildTargetDic[2] = 'brew'
     buildTargetDic[3] = 'brewHW'
@@ -200,7 +200,7 @@ def Parse_CommandLine_Arguments():
     if platform in [ "Monterey", "BigSur" ]:
         targetopt = "1,2,3,4"
     elif platform in ["Catalina"]:
-        targetopt = "0,1,2,3,4"
+        targetopt = "1,2,3,4"
     else:
         targetopt = ""
 
@@ -213,7 +213,7 @@ def Parse_CommandLine_Arguments():
     Usage += "   option & argument : comment on option if any                            | default value\n"
     Usage += "   ------------------------------------------------------------------------+--------------\n"
     Usage += "   [--qt <type>] : 5='qt5', 6='qt6' (migration to Qt6 is ongoing)          | 5\n"
-    Usage += "   [--target <list>] : 0='std', 1='ports', 2='brew', 3='brewHW', 4='ana3', | '%s'\n" % targetopt
+    Usage += "   [--target <list>] : 1='ports', 2='brew', 3='brewHW', 4='ana3',          | '%s'\n" % targetopt
     Usage += "                       5='brewA', 6='brewAHW'                              | \n"
     Usage += "                       * with --qt=6, use --target='2,3' (4 is ignored)    | \n"
     Usage += "   [--build] : build and deploy                                            | disabled\n"
@@ -233,7 +233,7 @@ def Parse_CommandLine_Arguments():
     Usage += "          (3) $ ./nightlyBuild.py  --test                                  | \n"
     Usage += "          (4) $ ./nightlyBuild.py  --check (confirm the QA Test results)   | \n"
     Usage += "          (5) $ ./nightlyBuild.py  --makedmg  1                            | \n"
-    Usage += "          (6) $ ./nightlyBuild.py  --upload  '0.27.11'                     | \n"
+    Usage += "          (6) $ ./nightlyBuild.py  --upload  '0.28.2'                      | \n"
     Usage += "          (7) $ ./nightlyBuild.py  --cleandmg 1                            | \n"
     Usage += "---------------------------------------------------------------------------+----------------------\n"
 
@@ -319,7 +319,7 @@ def Parse_CommandLine_Arguments():
     targetDic = Get_Build_Target_Dict()
     Target    = list()
     for idx in sorted( list( set( [ int(item) for item in opt.targets.split(",") ] ) ) ):
-        if idx in range(0, 7):
+        if idx in range(1, 7):  # '0' has been abolished in 0.28
             Target.append( targetDic[idx] )
 
     Build     = opt.build

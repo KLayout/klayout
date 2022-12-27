@@ -51,6 +51,7 @@ class MarkerBrowserConfigPage
 
 public:
   MarkerBrowserConfigPage (QWidget *parent);
+  ~MarkerBrowserConfigPage ();
 
   virtual void setup (lay::Dispatcher *root);
   virtual void commit (lay::Dispatcher *root);
@@ -69,6 +70,7 @@ class MarkerBrowserConfigPage2
 
 public:
   MarkerBrowserConfigPage2 (QWidget *parent);
+  ~MarkerBrowserConfigPage2 ();
 
   virtual void setup (lay::Dispatcher *root);
   virtual void commit (lay::Dispatcher *root);

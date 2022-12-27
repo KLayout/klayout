@@ -226,8 +226,8 @@ MacroEditorHighlighters::scheme_for (lym::Macro::Interpreter lang, const std::st
 // ----------------------------------------------------------------------------------------------
 //  MacroEditorExecutionModel implementation
 
-MacroEditorExecutionModel::MacroEditorExecutionModel (QObject * /*parent*/)
-  : m_current_line (-1), m_run_mode (false), m_interpreter (lym::Macro::None)
+MacroEditorExecutionModel::MacroEditorExecutionModel (QObject *parent)
+  : QObject (parent), m_current_line (-1), m_run_mode (false), m_interpreter (lym::Macro::None)
 {
   // .. nothing yet ..
 }

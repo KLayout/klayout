@@ -110,6 +110,12 @@ NetlistBrowserConfigPage::NetlistBrowserConfigPage (QWidget *parent)
   connect (mp_ui->cbx_window, SIGNAL (currentIndexChanged (int)), this, SLOT (window_changed (int)));
 }
 
+NetlistBrowserConfigPage::~NetlistBrowserConfigPage ()
+{
+  delete mp_ui;
+  mp_ui = 0;
+}
+
 void
 NetlistBrowserConfigPage::setup (lay::Dispatcher *root)
 {

@@ -28,6 +28,7 @@
 #include "layProgress.h"
 #include "layMainWindow.h"
 #include "layProgressWidget.h"
+#include "layApplication.h"
 #include "tlProgress.h"
 #include "tlDeferredExecution.h"
 
@@ -211,11 +212,8 @@ ProgressReporter::update_and_yield ()
 void
 ProgressReporter::process_events ()
 {
-  //  Don't execute deferred methods during progress handling (undesired side effects)
-  tl::NoDeferredMethods silent;
-
-  if (m_pw_visible && lay::MainWindow::instance () && QApplication::instance ()) {
-    QApplication::instance ()->processEvents (QEventLoop::AllEvents);
+  if (m_pw_visible && lay::MainWindow::instance () && lay::ApplicationBase::instance ()) {
+    lay::ApplicationBase::instance ()->process_events (QEventLoop::AllEvents, true /* no deferred methods */);
   }
 }
 

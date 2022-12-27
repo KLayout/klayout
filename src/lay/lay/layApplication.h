@@ -480,6 +480,8 @@ private:
   MainWindow *mp_mw;
   gtf::Recorder *mp_recorder;
   int m_in_notify;
+
+  bool do_notify (QObject *receiver, QEvent *e);
 };
 
 /**

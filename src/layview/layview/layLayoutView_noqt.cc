@@ -34,9 +34,10 @@ LayoutView::LayoutView (db::Manager *mgr, bool editable, lay::Plugin *plugin_par
   finish ();
 }
 
-LayoutView::LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options)
-  : LayoutViewBase (this, source, mgr, editable, plugin_parent, options)
+LayoutView::LayoutView (db::Manager *mgr, lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options)
+  : LayoutViewBase (this, mgr, editable, plugin_parent, options)
 {
+  copy_from (source);
   config_setup ();
   finish ();
 }

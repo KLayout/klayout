@@ -264,20 +264,10 @@ LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, db::Manager *manager, bool 
   init (manager);
 }
 
-LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, lay::LayoutViewBase *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
-  : lay::Dispatcher (plugin_parent, false /*not standalone*/),
-    mp_ui (ui),
-    dm_redraw (this, &LayoutViewBase::redraw),
-    m_editable (editable),
-    m_options (options),
-    m_annotation_shapes (manager)
+void
+LayoutViewBase::copy_from (lay::LayoutViewBase *source)
 {
-  //  either it's us or the parent has a dispatcher
-  tl_assert (dispatcher () != 0);
-
   m_annotation_shapes = source->m_annotation_shapes;
-
-  init (manager);
 
   //  set the handle reference and clear all cell related stuff 
   m_cellviews = source->cellview_list ();
@@ -289,6 +279,8 @@ LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, lay::LayoutViewBase *source
   m_synchronous = source->synchronous ();
   m_drawing_workers = source->drawing_workers ();
 
+  begin_layer_updates ();
+
   //  duplicate the layer properties
   for (size_t i = 0; i < source->m_layer_properties_lists.size (); ++i) {
     if (i >= m_layer_properties_lists.size ()) {
@@ -298,6 +290,8 @@ LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, lay::LayoutViewBase *source
     }
     m_layer_properties_lists [i]->attach_view (this, (unsigned int) i);
   }
+
+  end_layer_updates ();
 
   if (! m_layer_properties_lists.empty ()) {
     mp_canvas->set_dither_pattern (m_layer_properties_lists [0]->dither_pattern ()); 

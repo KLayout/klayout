@@ -38,21 +38,6 @@
 // -----------------------------------------------------------------------
 // class QScrollPrepareEvent
 
-// QScrollPrepareEvent *QScrollPrepareEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QScrollPrepareEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QScrollPrepareEvent * > ((QScrollPrepareEvent *)((QScrollPrepareEvent *)cls)->clone ());
-}
-
-
 // QPointF QScrollPrepareEvent::contentPos()
 
 
@@ -178,7 +163,6 @@ namespace gsi
 
 static gsi::Methods methods_QScrollPrepareEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QScrollPrepareEvent *QScrollPrepareEvent::clone()\nThis is a reimplementation of QEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod (":contentPos", "@brief Method QPointF QScrollPrepareEvent::contentPos()\n", true, &_init_f_contentPos_c0, &_call_f_contentPos_c0);
   methods += new qt_gsi::GenericMethod (":contentPosRange", "@brief Method QRectF QScrollPrepareEvent::contentPosRange()\n", true, &_init_f_contentPosRange_c0, &_call_f_contentPosRange_c0);
   methods += new qt_gsi::GenericMethod ("setContentPos|contentPos=", "@brief Method void QScrollPrepareEvent::setContentPos(const QPointF &pos)\n", false, &_init_f_setContentPos_1986, &_call_f_setContentPos_1986);
@@ -212,21 +196,6 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [adaptor impl] QScrollPrepareEvent *QScrollPrepareEvent::clone()
-  QScrollPrepareEvent * cbs_clone_c0_0() const
-  {
-    return QScrollPrepareEvent::clone();
-  }
-
-  virtual QScrollPrepareEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QScrollPrepareEvent_Adaptor, QScrollPrepareEvent *>(&QScrollPrepareEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QScrollPrepareEvent::clone();
-    }
-  }
-
   //  [adaptor impl] void QScrollPrepareEvent::setAccepted(bool accepted)
   void cbs_setAccepted_864_0(bool accepted)
   {
@@ -242,7 +211,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_setAccepted_864_0;
 };
 
@@ -263,25 +231,6 @@ static void _call_ctor_QScrollPrepareEvent_Adaptor_1986 (const qt_gsi::GenericSt
   tl::Heap heap;
   const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
   ret.write<QScrollPrepareEvent_Adaptor *> (new QScrollPrepareEvent_Adaptor (arg1));
-}
-
-
-// QScrollPrepareEvent *QScrollPrepareEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QScrollPrepareEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QScrollPrepareEvent * > ((QScrollPrepareEvent *)((QScrollPrepareEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QScrollPrepareEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
 }
 
 
@@ -317,8 +266,6 @@ gsi::Class<QScrollPrepareEvent> &qtdecl_QScrollPrepareEvent ();
 static gsi::Methods methods_QScrollPrepareEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QScrollPrepareEvent::QScrollPrepareEvent(const QPointF &startPos)\nThis method creates an object of class QScrollPrepareEvent.", &_init_ctor_QScrollPrepareEvent_Adaptor_1986, &_call_ctor_QScrollPrepareEvent_Adaptor_1986);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QScrollPrepareEvent *QScrollPrepareEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Virtual method void QScrollPrepareEvent::setAccepted(bool accepted)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@hide", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0, &_set_callback_cbs_setAccepted_864_0);
   return methods;

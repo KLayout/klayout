@@ -37,21 +37,6 @@
 // -----------------------------------------------------------------------
 // class QKeyEvent
 
-// QKeyEvent *QKeyEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QKeyEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QKeyEvent * > ((QKeyEvent *)((QKeyEvent *)cls)->clone ());
-}
-
-
 // int QKeyEvent::count()
 
 
@@ -211,7 +196,6 @@ namespace gsi
 
 static gsi::Methods methods_QKeyEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QKeyEvent *QKeyEvent::clone()\nThis is a reimplementation of QInputEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("count", "@brief Method int QKeyEvent::count()\n", true, &_init_f_count_c0, &_call_f_count_c0);
   methods += new qt_gsi::GenericMethod ("isAutoRepeat?", "@brief Method bool QKeyEvent::isAutoRepeat()\n", true, &_init_f_isAutoRepeat_c0, &_call_f_isAutoRepeat_c0);
   methods += new qt_gsi::GenericMethod ("key", "@brief Method int QKeyEvent::key()\n", true, &_init_f_key_c0, &_call_f_key_c0);
@@ -296,21 +280,6 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [adaptor impl] QKeyEvent *QKeyEvent::clone()
-  QKeyEvent * cbs_clone_c0_0() const
-  {
-    return QKeyEvent::clone();
-  }
-
-  virtual QKeyEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QKeyEvent_Adaptor, QKeyEvent *>(&QKeyEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QKeyEvent::clone();
-    }
-  }
-
   //  [adaptor impl] void QKeyEvent::setAccepted(bool accepted)
   void cbs_setAccepted_864_0(bool accepted)
   {
@@ -341,7 +310,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_setAccepted_864_0;
   gsi::Callback cb_setTimestamp_1103_0;
 };
@@ -426,25 +394,6 @@ static void _call_ctor_QKeyEvent_Adaptor_14238 (const qt_gsi::GenericStaticMetho
 }
 
 
-// QKeyEvent *QKeyEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QKeyEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QKeyEvent * > ((QKeyEvent *)((QKeyEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QKeyEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
-}
-
-
 // void QKeyEvent::setAccepted(bool accepted)
 
 static void _init_cbs_setAccepted_864_0 (qt_gsi::GenericMethod *decl)
@@ -502,8 +451,6 @@ static gsi::Methods methods_QKeyEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QKeyEvent::QKeyEvent(QEvent::Type type, int key, QFlags<Qt::KeyboardModifier> modifiers, const QString &text, bool autorep, quint16 count)\nThis method creates an object of class QKeyEvent.", &_init_ctor_QKeyEvent_Adaptor_8858, &_call_ctor_QKeyEvent_Adaptor_8858);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QKeyEvent::QKeyEvent(QEvent::Type type, int key, QFlags<Qt::KeyboardModifier> modifiers, quint32 nativeScanCode, quint32 nativeVirtualKey, quint32 nativeModifiers, const QString &text, bool autorep, quint16 count, const QInputDevice *device)\nThis method creates an object of class QKeyEvent.", &_init_ctor_QKeyEvent_Adaptor_14238, &_call_ctor_QKeyEvent_Adaptor_14238);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QKeyEvent *QKeyEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Virtual method void QKeyEvent::setAccepted(bool accepted)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@hide", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0, &_set_callback_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setTimestamp", "@brief Virtual method void QKeyEvent::setTimestamp(quint64 timestamp)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setTimestamp_1103_0, &_call_cbs_setTimestamp_1103_0);

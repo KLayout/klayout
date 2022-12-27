@@ -41,21 +41,6 @@
 // -----------------------------------------------------------------------
 // class QNativeGestureEvent
 
-// QNativeGestureEvent *QNativeGestureEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QNativeGestureEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QNativeGestureEvent * > ((QNativeGestureEvent *)((QNativeGestureEvent *)cls)->clone ());
-}
-
-
 // QPointF QNativeGestureEvent::delta()
 
 
@@ -196,7 +181,6 @@ namespace gsi
 
 static gsi::Methods methods_QNativeGestureEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QNativeGestureEvent *QNativeGestureEvent::clone()\nThis is a reimplementation of QSinglePointEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("delta", "@brief Method QPointF QNativeGestureEvent::delta()\n", true, &_init_f_delta_c0, &_call_f_delta_c0);
   methods += new qt_gsi::GenericMethod ("fingerCount", "@brief Method int QNativeGestureEvent::fingerCount()\n", true, &_init_f_fingerCount_c0, &_call_f_fingerCount_c0);
   methods += new qt_gsi::GenericMethod ("gestureType", "@brief Method Qt::NativeGestureType QNativeGestureEvent::gestureType()\n", true, &_init_f_gestureType_c0, &_call_f_gestureType_c0);
@@ -242,21 +226,6 @@ public:
   QNativeGestureEvent_Adaptor(Qt::NativeGestureType type, const QPointingDevice *dev, int fingerCount, const QPointF &localPos, const QPointF &scenePos, const QPointF &globalPos, double value, const QPointF &delta, quint64 sequenceId) : QNativeGestureEvent(type, dev, fingerCount, localPos, scenePos, globalPos, value, delta, sequenceId)
   {
     qt_gsi::QtObjectBase::init (this);
-  }
-
-  //  [adaptor impl] QNativeGestureEvent *QNativeGestureEvent::clone()
-  QNativeGestureEvent * cbs_clone_c0_0() const
-  {
-    return QNativeGestureEvent::clone();
-  }
-
-  virtual QNativeGestureEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QNativeGestureEvent_Adaptor, QNativeGestureEvent *>(&QNativeGestureEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QNativeGestureEvent::clone();
-    }
   }
 
   //  [adaptor impl] bool QNativeGestureEvent::isBeginEvent()
@@ -334,7 +303,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_isBeginEvent_c0_0;
   gsi::Callback cb_isEndEvent_c0_0;
   gsi::Callback cb_isUpdateEvent_c0_0;
@@ -422,25 +390,6 @@ static void _call_ctor_QNativeGestureEvent_Adaptor_15368 (const qt_gsi::GenericS
   const QPointF &arg8 = gsi::arg_reader<const QPointF & >() (args, heap);
   quint64 arg9 = args ? gsi::arg_reader<quint64 >() (args, heap) : gsi::arg_maker<quint64 >() ((18446744073709551615UL), heap);
   ret.write<QNativeGestureEvent_Adaptor *> (new QNativeGestureEvent_Adaptor (qt_gsi::QtToCppAdaptor<Qt::NativeGestureType>(arg1).cref(), arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9));
-}
-
-
-// QNativeGestureEvent *QNativeGestureEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QNativeGestureEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QNativeGestureEvent * > ((QNativeGestureEvent *)((QNativeGestureEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QNativeGestureEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
 }
 
 
@@ -558,8 +507,6 @@ static gsi::Methods methods_QNativeGestureEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QNativeGestureEvent::QNativeGestureEvent(Qt::NativeGestureType type, const QPointingDevice *dev, const QPointF &localPos, const QPointF &scenePos, const QPointF &globalPos, double value, quint64 sequenceId, quint64 intArgument)\nThis method creates an object of class QNativeGestureEvent.", &_init_ctor_QNativeGestureEvent_Adaptor_13826, &_call_ctor_QNativeGestureEvent_Adaptor_13826);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QNativeGestureEvent::QNativeGestureEvent(Qt::NativeGestureType type, const QPointingDevice *dev, int fingerCount, const QPointF &localPos, const QPointF &scenePos, const QPointF &globalPos, double value, const QPointF &delta, quint64 sequenceId)\nThis method creates an object of class QNativeGestureEvent.", &_init_ctor_QNativeGestureEvent_Adaptor_15368, &_call_ctor_QNativeGestureEvent_Adaptor_15368);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QNativeGestureEvent *QNativeGestureEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@brief Virtual method bool QNativeGestureEvent::isBeginEvent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@hide", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0, &_set_callback_cbs_isBeginEvent_c0_0);
   methods += new qt_gsi::GenericMethod ("isEndEvent", "@brief Virtual method bool QNativeGestureEvent::isEndEvent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isEndEvent_c0_0, &_call_cbs_isEndEvent_c0_0);

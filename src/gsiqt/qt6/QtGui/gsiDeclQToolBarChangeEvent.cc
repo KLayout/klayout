@@ -35,21 +35,6 @@
 // -----------------------------------------------------------------------
 // class QToolBarChangeEvent
 
-// QToolBarChangeEvent *QToolBarChangeEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QToolBarChangeEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QToolBarChangeEvent * > ((QToolBarChangeEvent *)((QToolBarChangeEvent *)cls)->clone ());
-}
-
-
 // bool QToolBarChangeEvent::toggle()
 
 
@@ -70,7 +55,6 @@ namespace gsi
 
 static gsi::Methods methods_QToolBarChangeEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QToolBarChangeEvent *QToolBarChangeEvent::clone()\nThis is a reimplementation of QEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("toggle", "@brief Method bool QToolBarChangeEvent::toggle()\n", true, &_init_f_toggle_c0, &_call_f_toggle_c0);
   return methods;
 }
@@ -98,21 +82,6 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [adaptor impl] QToolBarChangeEvent *QToolBarChangeEvent::clone()
-  QToolBarChangeEvent * cbs_clone_c0_0() const
-  {
-    return QToolBarChangeEvent::clone();
-  }
-
-  virtual QToolBarChangeEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QToolBarChangeEvent_Adaptor, QToolBarChangeEvent *>(&QToolBarChangeEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QToolBarChangeEvent::clone();
-    }
-  }
-
   //  [adaptor impl] void QToolBarChangeEvent::setAccepted(bool accepted)
   void cbs_setAccepted_864_0(bool accepted)
   {
@@ -128,7 +97,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_setAccepted_864_0;
 };
 
@@ -149,25 +117,6 @@ static void _call_ctor_QToolBarChangeEvent_Adaptor_864 (const qt_gsi::GenericSta
   tl::Heap heap;
   bool arg1 = gsi::arg_reader<bool >() (args, heap);
   ret.write<QToolBarChangeEvent_Adaptor *> (new QToolBarChangeEvent_Adaptor (arg1));
-}
-
-
-// QToolBarChangeEvent *QToolBarChangeEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QToolBarChangeEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QToolBarChangeEvent * > ((QToolBarChangeEvent *)((QToolBarChangeEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QToolBarChangeEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
 }
 
 
@@ -203,8 +152,6 @@ gsi::Class<QToolBarChangeEvent> &qtdecl_QToolBarChangeEvent ();
 static gsi::Methods methods_QToolBarChangeEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QToolBarChangeEvent::QToolBarChangeEvent(bool t)\nThis method creates an object of class QToolBarChangeEvent.", &_init_ctor_QToolBarChangeEvent_Adaptor_864, &_call_ctor_QToolBarChangeEvent_Adaptor_864);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QToolBarChangeEvent *QToolBarChangeEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Virtual method void QToolBarChangeEvent::setAccepted(bool accepted)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@hide", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0, &_set_callback_cbs_setAccepted_864_0);
   return methods;

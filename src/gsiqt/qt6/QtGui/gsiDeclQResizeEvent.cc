@@ -36,21 +36,6 @@
 // -----------------------------------------------------------------------
 // class QResizeEvent
 
-// QResizeEvent *QResizeEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QResizeEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QResizeEvent * > ((QResizeEvent *)((QResizeEvent *)cls)->clone ());
-}
-
-
 // const QSize &QResizeEvent::oldSize()
 
 
@@ -86,7 +71,6 @@ namespace gsi
 
 static gsi::Methods methods_QResizeEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QResizeEvent *QResizeEvent::clone()\nThis is a reimplementation of QEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("oldSize", "@brief Method const QSize &QResizeEvent::oldSize()\n", true, &_init_f_oldSize_c0, &_call_f_oldSize_c0);
   methods += new qt_gsi::GenericMethod ("size", "@brief Method const QSize &QResizeEvent::size()\n", true, &_init_f_size_c0, &_call_f_size_c0);
   return methods;
@@ -115,21 +99,6 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [adaptor impl] QResizeEvent *QResizeEvent::clone()
-  QResizeEvent * cbs_clone_c0_0() const
-  {
-    return QResizeEvent::clone();
-  }
-
-  virtual QResizeEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QResizeEvent_Adaptor, QResizeEvent *>(&QResizeEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QResizeEvent::clone();
-    }
-  }
-
   //  [adaptor impl] void QResizeEvent::setAccepted(bool accepted)
   void cbs_setAccepted_864_0(bool accepted)
   {
@@ -145,7 +114,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_setAccepted_864_0;
 };
 
@@ -169,25 +137,6 @@ static void _call_ctor_QResizeEvent_Adaptor_3502 (const qt_gsi::GenericStaticMet
   const QSize &arg1 = gsi::arg_reader<const QSize & >() (args, heap);
   const QSize &arg2 = gsi::arg_reader<const QSize & >() (args, heap);
   ret.write<QResizeEvent_Adaptor *> (new QResizeEvent_Adaptor (arg1, arg2));
-}
-
-
-// QResizeEvent *QResizeEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QResizeEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QResizeEvent * > ((QResizeEvent *)((QResizeEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QResizeEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
 }
 
 
@@ -223,8 +172,6 @@ gsi::Class<QResizeEvent> &qtdecl_QResizeEvent ();
 static gsi::Methods methods_QResizeEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QResizeEvent::QResizeEvent(const QSize &size, const QSize &oldSize)\nThis method creates an object of class QResizeEvent.", &_init_ctor_QResizeEvent_Adaptor_3502, &_call_ctor_QResizeEvent_Adaptor_3502);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QResizeEvent *QResizeEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Virtual method void QResizeEvent::setAccepted(bool accepted)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@hide", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0, &_set_callback_cbs_setAccepted_864_0);
   return methods;

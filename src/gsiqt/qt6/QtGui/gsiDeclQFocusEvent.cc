@@ -35,21 +35,6 @@
 // -----------------------------------------------------------------------
 // class QFocusEvent
 
-// QFocusEvent *QFocusEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QFocusEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QFocusEvent * > ((QFocusEvent *)((QFocusEvent *)cls)->clone ());
-}
-
-
 // bool QFocusEvent::gotFocus()
 
 
@@ -100,7 +85,6 @@ namespace gsi
 
 static gsi::Methods methods_QFocusEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QFocusEvent *QFocusEvent::clone()\nThis is a reimplementation of QEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("gotFocus", "@brief Method bool QFocusEvent::gotFocus()\n", true, &_init_f_gotFocus_c0, &_call_f_gotFocus_c0);
   methods += new qt_gsi::GenericMethod ("lostFocus", "@brief Method bool QFocusEvent::lostFocus()\n", true, &_init_f_lostFocus_c0, &_call_f_lostFocus_c0);
   methods += new qt_gsi::GenericMethod ("reason", "@brief Method Qt::FocusReason QFocusEvent::reason()\n", true, &_init_f_reason_c0, &_call_f_reason_c0);
@@ -136,21 +120,6 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [adaptor impl] QFocusEvent *QFocusEvent::clone()
-  QFocusEvent * cbs_clone_c0_0() const
-  {
-    return QFocusEvent::clone();
-  }
-
-  virtual QFocusEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QFocusEvent_Adaptor, QFocusEvent *>(&QFocusEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QFocusEvent::clone();
-    }
-  }
-
   //  [adaptor impl] void QFocusEvent::setAccepted(bool accepted)
   void cbs_setAccepted_864_0(bool accepted)
   {
@@ -166,7 +135,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_setAccepted_864_0;
 };
 
@@ -190,25 +158,6 @@ static void _call_ctor_QFocusEvent_Adaptor_3334 (const qt_gsi::GenericStaticMeth
   const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap);
   const qt_gsi::Converter<Qt::FocusReason>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::FocusReason>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::FocusReason>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::FocusReason>(heap, Qt::OtherFocusReason), heap);
   ret.write<QFocusEvent_Adaptor *> (new QFocusEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), qt_gsi::QtToCppAdaptor<Qt::FocusReason>(arg2).cref()));
-}
-
-
-// QFocusEvent *QFocusEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QFocusEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QFocusEvent * > ((QFocusEvent *)((QFocusEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QFocusEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
 }
 
 
@@ -244,8 +193,6 @@ gsi::Class<QFocusEvent> &qtdecl_QFocusEvent ();
 static gsi::Methods methods_QFocusEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QFocusEvent::QFocusEvent(QEvent::Type type, Qt::FocusReason reason)\nThis method creates an object of class QFocusEvent.", &_init_ctor_QFocusEvent_Adaptor_3334, &_call_ctor_QFocusEvent_Adaptor_3334);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QFocusEvent *QFocusEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Virtual method void QFocusEvent::setAccepted(bool accepted)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@hide", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0, &_set_callback_cbs_setAccepted_864_0);
   return methods;

@@ -28,7 +28,6 @@
 */
 
 #include <QIconDragEvent>
-#include <QEvent>
 #include "gsiQt.h"
 #include "gsiQtGuiCommon.h"
 #include <memory>
@@ -67,21 +66,6 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [adaptor impl] QEvent *QIconDragEvent::clone()
-  QEvent * cbs_clone_c0_0() const
-  {
-    return QIconDragEvent::clone();
-  }
-
-  virtual QEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QIconDragEvent_Adaptor, QEvent *>(&QIconDragEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QIconDragEvent::clone();
-    }
-  }
-
   //  [adaptor impl] void QIconDragEvent::setAccepted(bool accepted)
   void cbs_setAccepted_864_0(bool accepted)
   {
@@ -97,7 +81,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_setAccepted_864_0;
 };
 
@@ -114,25 +97,6 @@ static void _call_ctor_QIconDragEvent_Adaptor_0 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QIconDragEvent_Adaptor *> (new QIconDragEvent_Adaptor ());
-}
-
-
-// QEvent *QIconDragEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QEvent * > ((QEvent *)((QIconDragEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QIconDragEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
 }
 
 
@@ -168,8 +132,6 @@ gsi::Class<QIconDragEvent> &qtdecl_QIconDragEvent ();
 static gsi::Methods methods_QIconDragEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QIconDragEvent::QIconDragEvent()\nThis method creates an object of class QIconDragEvent.", &_init_ctor_QIconDragEvent_Adaptor_0, &_call_ctor_QIconDragEvent_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QEvent *QIconDragEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Virtual method void QIconDragEvent::setAccepted(bool accepted)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@hide", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0, &_set_callback_cbs_setAccepted_864_0);
   return methods;

@@ -41,21 +41,6 @@
 // -----------------------------------------------------------------------
 // class QEnterEvent
 
-// QEnterEvent *QEnterEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QEnterEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QEnterEvent * > ((QEnterEvent *)((QEnterEvent *)cls)->clone ());
-}
-
-
 // QPoint QEnterEvent::globalPos()
 
 
@@ -196,7 +181,6 @@ namespace gsi
 
 static gsi::Methods methods_QEnterEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QEnterEvent *QEnterEvent::clone()\nThis is a reimplementation of QSinglePointEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("globalPos", "@brief Method QPoint QEnterEvent::globalPos()\n", true, &_init_f_globalPos_c0, &_call_f_globalPos_c0);
   methods += new qt_gsi::GenericMethod ("globalX", "@brief Method int QEnterEvent::globalX()\n", true, &_init_f_globalX_c0, &_call_f_globalX_c0);
   methods += new qt_gsi::GenericMethod ("globalY", "@brief Method int QEnterEvent::globalY()\n", true, &_init_f_globalY_c0, &_call_f_globalY_c0);
@@ -236,21 +220,6 @@ public:
   QEnterEvent_Adaptor(const QPointF &localPos, const QPointF &scenePos, const QPointF &globalPos, const QPointingDevice *device) : QEnterEvent(localPos, scenePos, globalPos, device)
   {
     qt_gsi::QtObjectBase::init (this);
-  }
-
-  //  [adaptor impl] QEnterEvent *QEnterEvent::clone()
-  QEnterEvent * cbs_clone_c0_0() const
-  {
-    return QEnterEvent::clone();
-  }
-
-  virtual QEnterEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QEnterEvent_Adaptor, QEnterEvent *>(&QEnterEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QEnterEvent::clone();
-    }
   }
 
   //  [adaptor impl] bool QEnterEvent::isBeginEvent()
@@ -328,7 +297,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_isBeginEvent_c0_0;
   gsi::Callback cb_isEndEvent_c0_0;
   gsi::Callback cb_isUpdateEvent_c0_0;
@@ -362,25 +330,6 @@ static void _call_ctor_QEnterEvent_Adaptor_8464 (const qt_gsi::GenericStaticMeth
   const QPointF &arg3 = gsi::arg_reader<const QPointF & >() (args, heap);
   const QPointingDevice *arg4 = args ? gsi::arg_reader<const QPointingDevice * >() (args, heap) : gsi::arg_maker<const QPointingDevice * >() (QPointingDevice::primaryPointingDevice(), heap);
   ret.write<QEnterEvent_Adaptor *> (new QEnterEvent_Adaptor (arg1, arg2, arg3, arg4));
-}
-
-
-// QEnterEvent *QEnterEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QEnterEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QEnterEvent * > ((QEnterEvent *)((QEnterEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QEnterEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
 }
 
 
@@ -497,8 +446,6 @@ gsi::Class<QEnterEvent> &qtdecl_QEnterEvent ();
 static gsi::Methods methods_QEnterEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QEnterEvent::QEnterEvent(const QPointF &localPos, const QPointF &scenePos, const QPointF &globalPos, const QPointingDevice *device)\nThis method creates an object of class QEnterEvent.", &_init_ctor_QEnterEvent_Adaptor_8464, &_call_ctor_QEnterEvent_Adaptor_8464);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QEnterEvent *QEnterEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@brief Virtual method bool QEnterEvent::isBeginEvent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@hide", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0, &_set_callback_cbs_isBeginEvent_c0_0);
   methods += new qt_gsi::GenericMethod ("isEndEvent", "@brief Virtual method bool QEnterEvent::isEndEvent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isEndEvent_c0_0, &_call_cbs_isEndEvent_c0_0);

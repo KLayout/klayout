@@ -41,21 +41,6 @@
 // -----------------------------------------------------------------------
 // class QTabletEvent
 
-// QTabletEvent *QTabletEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QTabletEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QTabletEvent * > ((QTabletEvent *)((QTabletEvent *)cls)->clone ());
-}
-
-
 // QPoint QTabletEvent::globalPos()
 
 
@@ -316,7 +301,6 @@ namespace gsi
 
 static gsi::Methods methods_QTabletEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QTabletEvent *QTabletEvent::clone()\nThis is a reimplementation of QSinglePointEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("globalPos", "@brief Method QPoint QTabletEvent::globalPos()\n", true, &_init_f_globalPos_c0, &_call_f_globalPos_c0);
   methods += new qt_gsi::GenericMethod ("globalPosF", "@brief Method const QPointF QTabletEvent::globalPosF()\n", true, &_init_f_globalPosF_c0, &_call_f_globalPosF_c0);
   methods += new qt_gsi::GenericMethod ("globalX", "@brief Method int QTabletEvent::globalX()\n", true, &_init_f_globalX_c0, &_call_f_globalX_c0);
@@ -353,21 +337,6 @@ class QTabletEvent_Adaptor : public QTabletEvent, public qt_gsi::QtObjectBase
 public:
 
   virtual ~QTabletEvent_Adaptor();
-
-  //  [adaptor impl] QTabletEvent *QTabletEvent::clone()
-  QTabletEvent * cbs_clone_c0_0() const
-  {
-    return QTabletEvent::clone();
-  }
-
-  virtual QTabletEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QTabletEvent_Adaptor, QTabletEvent *>(&QTabletEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QTabletEvent::clone();
-    }
-  }
 
   //  [adaptor impl] bool QTabletEvent::isBeginEvent()
   bool cbs_isBeginEvent_c0_0() const
@@ -444,7 +413,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_isBeginEvent_c0_0;
   gsi::Callback cb_isEndEvent_c0_0;
   gsi::Callback cb_isUpdateEvent_c0_0;
@@ -453,25 +421,6 @@ public:
 };
 
 QTabletEvent_Adaptor::~QTabletEvent_Adaptor() { }
-
-// QTabletEvent *QTabletEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QTabletEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QTabletEvent * > ((QTabletEvent *)((QTabletEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QTabletEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
-}
-
 
 // bool QTabletEvent::isBeginEvent()
 
@@ -585,8 +534,6 @@ gsi::Class<QTabletEvent> &qtdecl_QTabletEvent ();
 
 static gsi::Methods methods_QTabletEvent_Adaptor () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QTabletEvent *QTabletEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@brief Virtual method bool QTabletEvent::isBeginEvent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@hide", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0, &_set_callback_cbs_isBeginEvent_c0_0);
   methods += new qt_gsi::GenericMethod ("isEndEvent", "@brief Virtual method bool QTabletEvent::isEndEvent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isEndEvent_c0_0, &_call_cbs_isEndEvent_c0_0);

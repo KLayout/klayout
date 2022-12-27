@@ -35,21 +35,6 @@
 // -----------------------------------------------------------------------
 // class QWhatsThisClickedEvent
 
-// QWhatsThisClickedEvent *QWhatsThisClickedEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QWhatsThisClickedEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QWhatsThisClickedEvent * > ((QWhatsThisClickedEvent *)((QWhatsThisClickedEvent *)cls)->clone ());
-}
-
-
 // QString QWhatsThisClickedEvent::href()
 
 
@@ -70,7 +55,6 @@ namespace gsi
 
 static gsi::Methods methods_QWhatsThisClickedEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QWhatsThisClickedEvent *QWhatsThisClickedEvent::clone()\nThis is a reimplementation of QEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("href", "@brief Method QString QWhatsThisClickedEvent::href()\n", true, &_init_f_href_c0, &_call_f_href_c0);
   return methods;
 }
@@ -98,21 +82,6 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [adaptor impl] QWhatsThisClickedEvent *QWhatsThisClickedEvent::clone()
-  QWhatsThisClickedEvent * cbs_clone_c0_0() const
-  {
-    return QWhatsThisClickedEvent::clone();
-  }
-
-  virtual QWhatsThisClickedEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QWhatsThisClickedEvent_Adaptor, QWhatsThisClickedEvent *>(&QWhatsThisClickedEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QWhatsThisClickedEvent::clone();
-    }
-  }
-
   //  [adaptor impl] void QWhatsThisClickedEvent::setAccepted(bool accepted)
   void cbs_setAccepted_864_0(bool accepted)
   {
@@ -128,7 +97,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_setAccepted_864_0;
 };
 
@@ -149,25 +117,6 @@ static void _call_ctor_QWhatsThisClickedEvent_Adaptor_2025 (const qt_gsi::Generi
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QWhatsThisClickedEvent_Adaptor *> (new QWhatsThisClickedEvent_Adaptor (arg1));
-}
-
-
-// QWhatsThisClickedEvent *QWhatsThisClickedEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QWhatsThisClickedEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QWhatsThisClickedEvent * > ((QWhatsThisClickedEvent *)((QWhatsThisClickedEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QWhatsThisClickedEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
 }
 
 
@@ -203,8 +152,6 @@ gsi::Class<QWhatsThisClickedEvent> &qtdecl_QWhatsThisClickedEvent ();
 static gsi::Methods methods_QWhatsThisClickedEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QWhatsThisClickedEvent::QWhatsThisClickedEvent(const QString &href)\nThis method creates an object of class QWhatsThisClickedEvent.", &_init_ctor_QWhatsThisClickedEvent_Adaptor_2025, &_call_ctor_QWhatsThisClickedEvent_Adaptor_2025);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QWhatsThisClickedEvent *QWhatsThisClickedEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Virtual method void QWhatsThisClickedEvent::setAccepted(bool accepted)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@hide", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0, &_set_callback_cbs_setAccepted_864_0);
   return methods;

@@ -36,21 +36,6 @@
 // -----------------------------------------------------------------------
 // class QHelpEvent
 
-// QHelpEvent *QHelpEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QHelpEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QHelpEvent * > ((QHelpEvent *)((QHelpEvent *)cls)->clone ());
-}
-
-
 // const QPoint &QHelpEvent::globalPos()
 
 
@@ -146,7 +131,6 @@ namespace gsi
 
 static gsi::Methods methods_QHelpEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QHelpEvent *QHelpEvent::clone()\nThis is a reimplementation of QEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("globalPos", "@brief Method const QPoint &QHelpEvent::globalPos()\n", true, &_init_f_globalPos_c0, &_call_f_globalPos_c0);
   methods += new qt_gsi::GenericMethod ("globalX", "@brief Method int QHelpEvent::globalX()\n", true, &_init_f_globalX_c0, &_call_f_globalX_c0);
   methods += new qt_gsi::GenericMethod ("globalY", "@brief Method int QHelpEvent::globalY()\n", true, &_init_f_globalY_c0, &_call_f_globalY_c0);
@@ -179,21 +163,6 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [adaptor impl] QHelpEvent *QHelpEvent::clone()
-  QHelpEvent * cbs_clone_c0_0() const
-  {
-    return QHelpEvent::clone();
-  }
-
-  virtual QHelpEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QHelpEvent_Adaptor, QHelpEvent *>(&QHelpEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QHelpEvent::clone();
-    }
-  }
-
   //  [adaptor impl] void QHelpEvent::setAccepted(bool accepted)
   void cbs_setAccepted_864_0(bool accepted)
   {
@@ -209,7 +178,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_setAccepted_864_0;
 };
 
@@ -236,25 +204,6 @@ static void _call_ctor_QHelpEvent_Adaptor_5181 (const qt_gsi::GenericStaticMetho
   const QPoint &arg2 = gsi::arg_reader<const QPoint & >() (args, heap);
   const QPoint &arg3 = gsi::arg_reader<const QPoint & >() (args, heap);
   ret.write<QHelpEvent_Adaptor *> (new QHelpEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), arg2, arg3));
-}
-
-
-// QHelpEvent *QHelpEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QHelpEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QHelpEvent * > ((QHelpEvent *)((QHelpEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QHelpEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
 }
 
 
@@ -290,8 +239,6 @@ gsi::Class<QHelpEvent> &qtdecl_QHelpEvent ();
 static gsi::Methods methods_QHelpEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QHelpEvent::QHelpEvent(QEvent::Type type, const QPoint &pos, const QPoint &globalPos)\nThis method creates an object of class QHelpEvent.", &_init_ctor_QHelpEvent_Adaptor_5181, &_call_ctor_QHelpEvent_Adaptor_5181);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QHelpEvent *QHelpEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Virtual method void QHelpEvent::setAccepted(bool accepted)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@hide", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0, &_set_callback_cbs_setAccepted_864_0);
   return methods;

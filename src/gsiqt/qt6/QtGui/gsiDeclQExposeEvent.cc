@@ -36,21 +36,6 @@
 // -----------------------------------------------------------------------
 // class QExposeEvent
 
-// QExposeEvent *QExposeEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QExposeEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QExposeEvent * > ((QExposeEvent *)((QExposeEvent *)cls)->clone ());
-}
-
-
 // const QRegion &QExposeEvent::region()
 
 
@@ -71,7 +56,6 @@ namespace gsi
 
 static gsi::Methods methods_QExposeEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QExposeEvent *QExposeEvent::clone()\nThis is a reimplementation of QEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("region", "@brief Method const QRegion &QExposeEvent::region()\n", true, &_init_f_region_c0, &_call_f_region_c0);
   return methods;
 }
@@ -99,21 +83,6 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [adaptor impl] QExposeEvent *QExposeEvent::clone()
-  QExposeEvent * cbs_clone_c0_0() const
-  {
-    return QExposeEvent::clone();
-  }
-
-  virtual QExposeEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QExposeEvent_Adaptor, QExposeEvent *>(&QExposeEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QExposeEvent::clone();
-    }
-  }
-
   //  [adaptor impl] void QExposeEvent::setAccepted(bool accepted)
   void cbs_setAccepted_864_0(bool accepted)
   {
@@ -129,7 +98,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_setAccepted_864_0;
 };
 
@@ -150,25 +118,6 @@ static void _call_ctor_QExposeEvent_Adaptor_2006 (const qt_gsi::GenericStaticMet
   tl::Heap heap;
   const QRegion &arg1 = gsi::arg_reader<const QRegion & >() (args, heap);
   ret.write<QExposeEvent_Adaptor *> (new QExposeEvent_Adaptor (arg1));
-}
-
-
-// QExposeEvent *QExposeEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QExposeEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QExposeEvent * > ((QExposeEvent *)((QExposeEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QExposeEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
 }
 
 
@@ -204,8 +153,6 @@ gsi::Class<QExposeEvent> &qtdecl_QExposeEvent ();
 static gsi::Methods methods_QExposeEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QExposeEvent::QExposeEvent(const QRegion &m_region)\nThis method creates an object of class QExposeEvent.", &_init_ctor_QExposeEvent_Adaptor_2006, &_call_ctor_QExposeEvent_Adaptor_2006);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QExposeEvent *QExposeEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Virtual method void QExposeEvent::setAccepted(bool accepted)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@hide", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0, &_set_callback_cbs_setAccepted_864_0);
   return methods;

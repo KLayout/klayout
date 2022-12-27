@@ -41,21 +41,6 @@
 // -----------------------------------------------------------------------
 // class QHoverEvent
 
-// QHoverEvent *QHoverEvent::clone()
-
-
-static void _init_f_clone_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QHoverEvent * > ();
-}
-
-static void _call_f_clone_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QHoverEvent * > ((QHoverEvent *)((QHoverEvent *)cls)->clone ());
-}
-
-
 // bool QHoverEvent::isUpdateEvent()
 
 
@@ -136,7 +121,6 @@ namespace gsi
 
 static gsi::Methods methods_QHoverEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Method QHoverEvent *QHoverEvent::clone()\nThis is a reimplementation of QSinglePointEvent::clone", true, &_init_f_clone_c0, &_call_f_clone_c0);
   methods += new qt_gsi::GenericMethod ("isUpdateEvent?", "@brief Method bool QHoverEvent::isUpdateEvent()\nThis is a reimplementation of QSinglePointEvent::isUpdateEvent", true, &_init_f_isUpdateEvent_c0, &_call_f_isUpdateEvent_c0);
   methods += new qt_gsi::GenericMethod ("oldPos", "@brief Method QPoint QHoverEvent::oldPos()\n", true, &_init_f_oldPos_c0, &_call_f_oldPos_c0);
   methods += new qt_gsi::GenericMethod ("oldPosF", "@brief Method QPointF QHoverEvent::oldPosF()\n", true, &_init_f_oldPosF_c0, &_call_f_oldPosF_c0);
@@ -178,21 +162,6 @@ public:
   QHoverEvent_Adaptor(QEvent::Type type, const QPointF &pos, const QPointF &oldPos, QFlags<Qt::KeyboardModifier> modifiers, const QPointingDevice *device) : QHoverEvent(type, pos, oldPos, modifiers, device)
   {
     qt_gsi::QtObjectBase::init (this);
-  }
-
-  //  [adaptor impl] QHoverEvent *QHoverEvent::clone()
-  QHoverEvent * cbs_clone_c0_0() const
-  {
-    return QHoverEvent::clone();
-  }
-
-  virtual QHoverEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QHoverEvent_Adaptor, QHoverEvent *>(&QHoverEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QHoverEvent::clone();
-    }
   }
 
   //  [adaptor impl] bool QHoverEvent::isBeginEvent()
@@ -270,7 +239,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_isBeginEvent_c0_0;
   gsi::Callback cb_isEndEvent_c0_0;
   gsi::Callback cb_isUpdateEvent_c0_0;
@@ -307,25 +275,6 @@ static void _call_ctor_QHoverEvent_Adaptor_11012 (const qt_gsi::GenericStaticMet
   QFlags<Qt::KeyboardModifier> arg4 = args ? gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap) : gsi::arg_maker<QFlags<Qt::KeyboardModifier> >() (Qt::NoModifier, heap);
   const QPointingDevice *arg5 = args ? gsi::arg_reader<const QPointingDevice * >() (args, heap) : gsi::arg_maker<const QPointingDevice * >() (QPointingDevice::primaryPointingDevice(), heap);
   ret.write<QHoverEvent_Adaptor *> (new QHoverEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), arg2, arg3, arg4, arg5));
-}
-
-
-// QHoverEvent *QHoverEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QHoverEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QHoverEvent * > ((QHoverEvent *)((QHoverEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QHoverEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
 }
 
 
@@ -442,8 +391,6 @@ gsi::Class<QHoverEvent> &qtdecl_QHoverEvent ();
 static gsi::Methods methods_QHoverEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QHoverEvent::QHoverEvent(QEvent::Type type, const QPointF &pos, const QPointF &oldPos, QFlags<Qt::KeyboardModifier> modifiers, const QPointingDevice *device)\nThis method creates an object of class QHoverEvent.", &_init_ctor_QHoverEvent_Adaptor_11012, &_call_ctor_QHoverEvent_Adaptor_11012);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QHoverEvent *QHoverEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@brief Virtual method bool QHoverEvent::isBeginEvent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent", "@hide", true, &_init_cbs_isBeginEvent_c0_0, &_call_cbs_isBeginEvent_c0_0, &_set_callback_cbs_isBeginEvent_c0_0);
   methods += new qt_gsi::GenericMethod ("isEndEvent", "@brief Virtual method bool QHoverEvent::isEndEvent()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isEndEvent_c0_0, &_call_cbs_isEndEvent_c0_0);

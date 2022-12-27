@@ -28,7 +28,6 @@
 */
 
 #include <QShowEvent>
-#include <QEvent>
 #include "gsiQt.h"
 #include "gsiQtGuiCommon.h"
 #include <memory>
@@ -67,21 +66,6 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [adaptor impl] QEvent *QShowEvent::clone()
-  QEvent * cbs_clone_c0_0() const
-  {
-    return QShowEvent::clone();
-  }
-
-  virtual QEvent * clone() const
-  {
-    if (cb_clone_c0_0.can_issue()) {
-      return cb_clone_c0_0.issue<QShowEvent_Adaptor, QEvent *>(&QShowEvent_Adaptor::cbs_clone_c0_0);
-    } else {
-      return QShowEvent::clone();
-    }
-  }
-
   //  [adaptor impl] void QShowEvent::setAccepted(bool accepted)
   void cbs_setAccepted_864_0(bool accepted)
   {
@@ -97,7 +81,6 @@ public:
     }
   }
 
-  gsi::Callback cb_clone_c0_0;
   gsi::Callback cb_setAccepted_864_0;
 };
 
@@ -114,25 +97,6 @@ static void _call_ctor_QShowEvent_Adaptor_0 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QShowEvent_Adaptor *> (new QShowEvent_Adaptor ());
-}
-
-
-// QEvent *QShowEvent::clone()
-
-static void _init_cbs_clone_c0_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QEvent * > ();
-}
-
-static void _call_cbs_clone_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QEvent * > ((QEvent *)((QShowEvent_Adaptor *)cls)->cbs_clone_c0_0 ());
-}
-
-static void _set_callback_cbs_clone_c0_0 (void *cls, const gsi::Callback &cb)
-{
-  ((QShowEvent_Adaptor *)cls)->cb_clone_c0_0 = cb;
 }
 
 
@@ -168,8 +132,6 @@ gsi::Class<QShowEvent> &qtdecl_QShowEvent ();
 static gsi::Methods methods_QShowEvent_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QShowEvent::QShowEvent()\nThis method creates an object of class QShowEvent.", &_init_ctor_QShowEvent_Adaptor_0, &_call_ctor_QShowEvent_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@brief Virtual method QEvent *QShowEvent::clone()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0);
-  methods += new qt_gsi::GenericMethod ("clone", "@hide", true, &_init_cbs_clone_c0_0, &_call_cbs_clone_c0_0, &_set_callback_cbs_clone_c0_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Virtual method void QShowEvent::setAccepted(bool accepted)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0);
   methods += new qt_gsi::GenericMethod ("setAccepted", "@hide", false, &_init_cbs_setAccepted_864_0, &_call_cbs_setAccepted_864_0, &_set_callback_cbs_setAccepted_864_0);
   return methods;

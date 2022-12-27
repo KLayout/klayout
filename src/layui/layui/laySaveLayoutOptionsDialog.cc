@@ -398,7 +398,8 @@ SaveLayoutAsOptionsDialog::SaveLayoutAsOptionsDialog (QWidget *parent, const std
 
 SaveLayoutAsOptionsDialog::~SaveLayoutAsOptionsDialog ()
 {
-  //  .. nothing yet ..
+  delete mp_ui;
+  mp_ui = 0;
 }
 
 void

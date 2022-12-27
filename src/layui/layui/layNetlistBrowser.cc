@@ -182,6 +182,12 @@ NetlistBrowserConfigPage2::NetlistBrowserConfigPage2 (QWidget *parent)
   }
 }
 
+NetlistBrowserConfigPage2::~NetlistBrowserConfigPage2 ()
+{
+  delete mp_ui;
+  mp_ui = 0;
+}
+
 void
 NetlistBrowserConfigPage2::color_button_clicked ()
 {

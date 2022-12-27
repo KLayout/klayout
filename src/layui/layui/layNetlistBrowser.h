@@ -73,6 +73,7 @@ class NetlistBrowserConfigPage2
 
 public:
   NetlistBrowserConfigPage2 (QWidget *parent);
+  ~NetlistBrowserConfigPage2 ();
 
   virtual void setup (lay::Dispatcher *root);
   virtual void commit (lay::Dispatcher *root);

@@ -130,6 +130,9 @@ NetlistBrowserDialog::NetlistBrowserDialog (lay::Dispatcher *root, LayoutViewBas
 NetlistBrowserDialog::~NetlistBrowserDialog ()
 {
   tl::Object::detach_from_all_events ();
+
+  delete mp_ui;
+  mp_ui = 0;
 }
 
 db::LayoutToNetlist *

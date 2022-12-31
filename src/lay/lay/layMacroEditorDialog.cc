@@ -3079,7 +3079,7 @@ size_t
 MacroEditorDialog::id_for_path (gsi::Interpreter *, const std::string &path)
 {
   for (std::map <lym::Macro *, MacroEditorPage *>::const_iterator m = m_tab_widgets.begin (); m != m_tab_widgets.end (); ++m) {
-    if (m->first->path () == path) {
+    if (tl::is_same_file(m->first->path (), path)) {
       m_file_to_widget.push_back (*m);
       return m_file_to_widget.size ();
     }

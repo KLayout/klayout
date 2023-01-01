@@ -275,7 +275,7 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
 }
 
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
-  : LayoutViewBase (this, source, manager, editable, plugin_parent, options),
+  : LayoutViewBase (this, manager, editable, plugin_parent, options),
     mp_widget (0),
     dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
 {
@@ -283,6 +283,8 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
   tl::DeferredMethodScheduler::instance ();
 
   init_ui ();
+
+  copy_from (source);
 
   bookmarks (source->bookmarks ());
   LayoutView::set_active_cellview_index (source->active_cellview_index ());
@@ -300,7 +302,7 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
 }
 
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, LayoutViewWidget *widget, unsigned int options)
-  : LayoutViewBase (this, source, manager, editable, plugin_parent, options),
+  : LayoutViewBase (this, manager, editable, plugin_parent, options),
     mp_widget (widget),
     dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
 {
@@ -308,6 +310,8 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
   tl::DeferredMethodScheduler::instance ();
 
   init_ui ();
+
+  copy_from (source);
 
   bookmarks (source->bookmarks ());
   LayoutView::set_active_cellview_index (source->active_cellview_index ());

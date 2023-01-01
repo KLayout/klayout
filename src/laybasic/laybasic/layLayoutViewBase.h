@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -192,15 +192,15 @@ public:
    */
   LayoutViewBase (lay::LayoutView *ui, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
 
-  /**
-   *  @brief Constructor (clone from another view)
-   */
-  LayoutViewBase (lay::LayoutView *ui, lay::LayoutViewBase *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
-
   /** 
    *  @brief Destructor
    */
   ~LayoutViewBase ();
+
+  /**
+   *  @brief Copies settings from the source view
+   */
+  void copy_from (lay::LayoutViewBase *source);
 
   /**
    *  @brief Gets the current mode

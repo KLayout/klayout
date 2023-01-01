@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -478,6 +478,12 @@ TEST(4)
   ps.insert (std::make_pair (g.properties_repository ().prop_name_id (tl::Variant (1)), tl::Variant ("XXX")));
   prop_id = g.properties_repository ().properties_id (ps);
   EXPECT_EQ (el.property_ids_dirty, true);
+
+  el.layer_properties_dirty = false;
+  EXPECT_EQ (g.get_layer_maybe (db::LayerProperties (42, 17)), -1);
+  EXPECT_EQ (el.layer_properties_dirty, false);
+  EXPECT_EQ (g.get_layer (db::LayerProperties (42, 17)) >= 0, true);
+  EXPECT_EQ (el.layer_properties_dirty, true);  //  new layer got inserted
 }
 
 static std::string l2s (const db::Layout &layout)

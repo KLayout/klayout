@@ -1856,6 +1856,22 @@ Layout::delete_layer (unsigned int n)
   layer_properties_changed ();
 }
 
+unsigned int
+Layout::get_layer (const db::LayerProperties &props)
+{
+  int li = get_layer_maybe (props);
+  if (li >= 0) {
+    return (unsigned int) li;
+  }
+
+  if (props.is_null ()) {
+    //  for a null layer info always create a layer
+    return insert_layer ();
+  } else {
+    return insert_layer (props);
+  }
+}
+
 unsigned int 
 Layout::insert_layer (const LayerProperties &props)
 {

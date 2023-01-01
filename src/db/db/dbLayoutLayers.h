@@ -187,7 +187,7 @@ public:
   /**
    *  @brief Gets the layer with the given properties or -1 if such a layer does not exist.
    */
-  int get_layer_maybe (const db::LayerProperties &props);
+  int get_layer_maybe (const db::LayerProperties &props) const;
 
   /**
    *  @brief Insert a new special layer with the given properties

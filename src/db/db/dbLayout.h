@@ -1644,15 +1644,12 @@ public:
    *  If there already is a layer matching the given properties, it's index will be
    *  returned. Otherwise a new layer with these properties is created.
    */
-  unsigned int get_layer (const db::LayerProperties &props)
-  {
-    return m_layers.get_layer (props);
-  }
+  unsigned int get_layer (const db::LayerProperties &props);
 
   /**
    *  @brief Gets the layer with the given properties or -1 if such a layer does not exist
    */
-  int get_layer_maybe (const db::LayerProperties &props)
+  int get_layer_maybe (const db::LayerProperties &props) const
   {
     return m_layers.get_layer_maybe (props);
   }

@@ -733,7 +733,7 @@ void MacroCollection::rename_macro (Macro *macro, const std::string &new_name)
 lym::Macro *MacroCollection::find_macro (const std::string &path)
 {
   for (iterator m = begin (); m != end (); ++m) {
-    if (m->second->path () == path) {
+    if (tl::is_same_file (m->second->path (), path)) {
       return m->second;
     }
   }

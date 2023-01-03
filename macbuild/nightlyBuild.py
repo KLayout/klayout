@@ -16,14 +16,16 @@ import subprocess
 #
 # @return matching platform name on success; "" on failure
 #------------------------------------------------------------------------------
-def Test_My_Platform( platforms=['Catalina', 'BigSur', 'Monterey' ] ):
+def Test_My_Platform( platforms=[ 'Catalina', 'BigSur', 'Monterey', 'Ventura' ] ):
     (System, Node, Release, MacVersion, Machine, Processor) = platform.uname()
 
     if not System == "Darwin":
         return ""
 
     release = int( Release.split(".")[0] ) # take the first of ['19', '0', '0']
-    if   release == 21:
+    if   release == 22:
+        Platform = "Ventura"
+    elif release == 21:
         Platform = "Monterey"
     elif release == 20:
         Platform = "BigSur"
@@ -81,11 +83,11 @@ def Get_Build_Options( targetDic ):
         if target == "std": # use 'Qt5MacPorts' that provides Qt 5.15.2~ to run on "Big Sur", too
             buildOp["std"]     = [ '-q', '%sMacPorts' % qtType, '-r', 'sys',  '-p', 'sys'    ]
         elif target == "ports":
-            buildOp["ports"]   = [ '-q', '%sMacPorts' % qtType, '-r', 'MP31', '-p', 'MP38'   ]
+            buildOp["ports"]   = [ '-q', '%sMacPorts' % qtType, '-r', 'MP31', '-p', 'MP39'   ]
         elif target == "brew":
-            buildOp["brew"]    = [ '-q', '%sBrew' % qtType,     '-r', 'HB31', '-p', 'HB38'   ]
+            buildOp["brew"]    = [ '-q', '%sBrew' % qtType,     '-r', 'HB31', '-p', 'HB39'   ]
         elif target == "brewHW":
-            buildOp["brewHW"]  = [ '-q', '%sBrew' % qtType,     '-r', 'sys',  '-p', 'HB38'   ]
+            buildOp["brewHW"]  = [ '-q', '%sBrew' % qtType,     '-r', 'sys',  '-p', 'HB39'   ]
         elif target == "ana3":
             buildOp["ana3"]    = [ '-q', '%sAna3' % qtType,     '-r', 'Ana3', '-p', 'Ana3'   ]
         elif target == "brewA":
@@ -119,11 +121,11 @@ def Get_QAT_Directory( targetDic, platform ):
         if target == "std":
             dirQAT["std"]       = '%sMP.build.macos-%s-release-RsysPsys.macQAT' % (qtType, platform)
         elif target == "ports":
-            dirQAT["ports"]     = '%sMP.build.macos-%s-release-Rmp31Pmp38.macQAT' % (qtType, platform)
+            dirQAT["ports"]     = '%sMP.build.macos-%s-release-Rmp31Pmp39.macQAT' % (qtType, platform)
         elif target == "brew":
-            dirQAT["brew"]      = '%sBrew.build.macos-%s-release-Rhb31Phb38.macQAT' % (qtType, platform)
+            dirQAT["brew"]      = '%sBrew.build.macos-%s-release-Rhb31Phb39.macQAT' % (qtType, platform)
         elif target == "brewHW":
-            dirQAT["brewHW"]    = '%sBrew.build.macos-%s-release-RsysPhb38.macQAT' % (qtType, platform)
+            dirQAT["brewHW"]    = '%sBrew.build.macos-%s-release-RsysPhb39.macQAT' % (qtType, platform)
         elif target == "ana3":
             dirQAT["ana3"]      = '%sAna3.build.macos-%s-release-Rana3Pana3.macQAT' % (qtType, platform)
         elif target == "brewA":
@@ -160,13 +162,13 @@ def Get_Package_Options( targetDic, platform, srlDMG, makeflag ):
             packOp["std"]       = [ '-p', 'ST-%sMP.pkg.macos-%s-release-RsysPsys' % (qtType, platform),
                                     '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "ports":
-            packOp["ports"]     = [ '-p', 'LW-%sMP.pkg.macos-%s-release-Rmp31Pmp38' % (qtType, platform),
+            packOp["ports"]     = [ '-p', 'LW-%sMP.pkg.macos-%s-release-Rmp31Pmp39' % (qtType, platform),
                                     '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "brew":
-            packOp["brew"]      = [ '-p', 'LW-%sBrew.pkg.macos-%s-release-Rhb31Phb38' % (qtType, platform),
+            packOp["brew"]      = [ '-p', 'LW-%sBrew.pkg.macos-%s-release-Rhb31Phb39' % (qtType, platform),
                                     '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "brewHW":
-            packOp["brewHW"]    = [ '-p', 'HW-%sBrew.pkg.macos-%s-release-RsysPhb38' % (qtType, platform),
+            packOp["brewHW"]    = [ '-p', 'HW-%sBrew.pkg.macos-%s-release-RsysPhb39' % (qtType, platform),
                                     '-s', '%d' % srlDMG, '%s' % flag ]
         elif target == "ana3":
             packOp["ana3"]      = [ '-p', 'LW-%sAna3.pkg.macos-%s-release-Rana3Pana3' % (qtType, platform),
@@ -195,19 +197,18 @@ def Parse_CommandLine_Arguments():
     global Upload    # operation flag
     global SrlDMG    # DMG serial number
     global Dropbox   # Dropbox directory
+    global DryRun    # True for dry-run
 
     platform = Test_My_Platform()
-    if platform in [ "Monterey", "BigSur" ]:
-        targetopt = "1,2,3,4"
-    elif platform in ["Catalina"]:
+    if platform in [ "Ventura", "Monterey", "BigSur", "Catalina" ]:
         targetopt = "1,2,3,4"
     else:
         targetopt = ""
 
     Usage  = "\n"
-    Usage += "--------------------------------------------------------------------------------------------------\n"
+    Usage += "----------------------------------------------------------------------------------------------------------\n"
     Usage += " nightlyBuild.py [EXPERIMENTAL] \n"
-    Usage += "   << To execute the jobs for making KLayout's DMGs for macOS Catalina, Big Sur, or Monterey >>\n"
+    Usage += "   << To execute the jobs for making KLayout's DMGs for macOS Catalina, Big Sur, Monterey, or Ventura >>\n"
     Usage += "\n"
     Usage += "$ [python] nightlyBuild.py\n"
     Usage += "   option & argument : comment on option if any                            | default value\n"
@@ -222,6 +223,7 @@ def Parse_CommandLine_Arguments():
     Usage += "   [--check] : check the QA Test results                                   | disabled\n"
     Usage += "   [--makedmg|--cleandmg <srlno>] : make or clean DMGs                     | disabled\n"
     Usage += "   [--upload <dropbox>] : upload DMGs to $HOME/Dropbox/klayout/<dropbox>   | disabled\n"
+    Usage += "   [--dryrun]           : dry-run for --build option                       | disabled\n"
     Usage += "   [-?|--?]             : print this usage and exit                        | disabled\n"
     Usage += "                                                                           | \n"
     Usage += "      To use this script, make a symbolic link in the project root by:     | \n"
@@ -235,7 +237,7 @@ def Parse_CommandLine_Arguments():
     Usage += "          (5) $ ./nightlyBuild.py  --makedmg  1                            | \n"
     Usage += "          (6) $ ./nightlyBuild.py  --upload  '0.28.2'                      | \n"
     Usage += "          (7) $ ./nightlyBuild.py  --cleandmg 1                            | \n"
-    Usage += "---------------------------------------------------------------------------+----------------------\n"
+    Usage += "---------------------------------------------------------------------------+------------------------------\n"
 
     p = optparse.OptionParser( usage=Usage )
     p.add_option( '--qt',
@@ -282,6 +284,12 @@ def Parse_CommandLine_Arguments():
                     dest='upload',
                     help='upload to Dropbox' )
 
+    p.add_option( '--dryrun',
+                    action='store_true',
+                    dest='dry_run',
+                    default=False,
+                    help='dry-run' )
+
     p.add_option( '-?', '--??',
                     action='store_true',
                     dest='checkusage',
@@ -297,6 +305,7 @@ def Parse_CommandLine_Arguments():
                     makedmg    = "",
                     cleandmg   = "",
                     upload     = "",
+                    dry_run    = False,
                     checkusage = False )
 
     opt, args = p.parse_args()
@@ -304,9 +313,9 @@ def Parse_CommandLine_Arguments():
         print(Usage)
         quit()
 
-    myPlatform = Test_My_Platform( ['Catalina', 'BigSur', 'Monterey' ] )
+    myPlatform = Test_My_Platform( [ 'Catalina', 'BigSur', 'Monterey', 'Ventura' ] )
     if myPlatform == "":
-        print( "! Current platform is not ['Catalina', 'BigSur', 'Monterey' ]" )
+        print( "! Current platform is not [ 'Catalina', 'BigSur', 'Monterey', 'Ventura' ]" )
         print(Usage)
         quit()
 
@@ -316,9 +325,14 @@ def Parse_CommandLine_Arguments():
         print(Usage)
         quit()
 
+    targetIdx = list()
+    for target in [ int(item) for item in opt.targets.split(",") ]:
+        if not target in targetIdx:
+            targetIdx.append(target)  # first appeared and non-duplicated index
+
     targetDic = Get_Build_Target_Dict()
     Target    = list()
-    for idx in sorted( list( set( [ int(item) for item in opt.targets.split(",") ] ) ) ):
+    for idx in targetIdx:
         if idx in range(1, 7):  # '0' has been abolished in 0.28
             Target.append( targetDic[idx] )
 
@@ -329,6 +343,7 @@ def Parse_CommandLine_Arguments():
     MakeDMG   = False
     CleanDMG  = False
     Upload    = False
+    DryRun    = opt.dry_run
 
     if not opt.makedmg == "":
         MakeDMG = True
@@ -360,7 +375,7 @@ def Build_Deploy():
     buildOp   = Get_Build_Options( Get_Build_Target_Dict() )
 
     for key in Target:
-        if key == 4 and QtType == 6: # anaconda3 does not provide Qt6 so far
+        if key == "ana3" and QtType == 6: # anaconda3 does not provide Qt6 so far
             continue
 
         command1 = [ pyBuilder ] + buildOp[key]
@@ -368,9 +383,13 @@ def Build_Deploy():
             command2 = [ pyBuilder ] + buildOp[key] + ['-y']
         else:
             command2 = [ pyBuilder ] + buildOp[key] + ['-Y']
-        print(command1)
-        print(command2)
-        #continue
+
+        if DryRun:
+            print( "### Target = <%s> ###" % key )
+            print(command1)
+            print(command2)
+            print( "" )
+            continue
 
         if subprocess.call( command1, shell=False ) != 0:
             print( "", file=sys.stderr )

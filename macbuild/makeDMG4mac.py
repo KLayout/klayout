@@ -105,7 +105,11 @@ def SetGlobals():
 
     release = int( Release.split(".")[0] ) # take the first of ['19', '0', '0']
     LatestOS = ""
-    if release == 21:
+    if release == 22:
+        GenOSName = "macOS"
+        Platform  = "Ventura"
+        LatestOS  = Platform
+    elif release == 21:
         GenOSName = "macOS"
         Platform  = "Monterey"
         LatestOS  = Platform
@@ -137,7 +141,7 @@ def SetGlobals():
         sys.exit(1)
 
     if not Machine == "x86_64":
-        if Machine == "arm64" and Platform in ["Monterey", "BigSur"]: # with an Apple Silicon Chip
+        if Machine == "arm64" and Platform in ["Ventura", "Monterey", "BigSur"]: # with an Apple Silicon Chip
             print("")
             print( "### Your Mac equips an Apple Silicon Chip ###" )
             print("")
@@ -292,7 +296,7 @@ def CheckPkgDirectory():
         LatestOSMacPorts   = Platform == LatestOS
         LatestOSMacPorts  &= PackagePrefix == "LW"
         LatestOSMacPorts  &= QtIdentification in ["qt5MP", "qt6MP"]
-        LatestOSMacPorts  &= RubyPythonID in ["Rmp31Pmp38"]
+        LatestOSMacPorts  &= RubyPythonID in ["Rmp31Pmp38", "Rmp31Pmp39"]
 
         LatestOSHomebrew   = Platform == LatestOS
         LatestOSHomebrew  &= PackagePrefix == "LW"

@@ -2,7 +2,7 @@
 /*
 
   KLayoutLayers LayoutLayers Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -157,25 +157,8 @@ LayoutLayers::insert_layer (unsigned int index, const LayerProperties &props)
   set_properties (index, props);
 }
 
-unsigned int
-LayoutLayers::get_layer (const db::LayerProperties &lp)
-{
-  if (lp.is_null ()) {
-    //  for a null layer info always create a layer
-    return insert_layer ();
-  } else {
-    auto i = m_layers_by_props.find (lp);
-    if (i != m_layers_by_props.end () && i->first.log_equal (lp)) {
-      return i->second;
-    } else {
-      //  otherwise create a new layer
-      return insert_layer (lp);
-    }
-  }
-}
-
 int
-LayoutLayers::get_layer_maybe (const db::LayerProperties &lp)
+LayoutLayers::get_layer_maybe (const db::LayerProperties &lp) const
 {
   if (lp.is_null ()) {
     return -1;

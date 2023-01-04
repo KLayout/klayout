@@ -578,10 +578,11 @@ void LayoutViewBase::drop_url (const std::string &path_or_url)
 
 void LayoutViewBase::clear_plugins ()
 {
-  for (std::vector<lay::Plugin *>::iterator p = mp_plugins.begin (); p != mp_plugins.end (); ++p) {
+  std::vector<lay::Plugin *> plugins;
+  mp_plugins.swap (plugins);
+  for (std::vector<lay::Plugin *>::iterator p = plugins.begin (); p != plugins.end (); ++p) {
     delete *p;
   }
-  mp_plugins.clear ();
   mp_active_plugin = 0;
 }
 

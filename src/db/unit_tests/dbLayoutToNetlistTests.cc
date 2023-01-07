@@ -395,7 +395,7 @@ TEST(1_BasicExtraction)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
 
-    l2n.build_all_nets (cm, ly2, lmap, 0, tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, 0);
+    l2n.build_all_nets (cm, ly2, lmap, 0, db::LayoutToNetlist::NoProperties, tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, 0);
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
@@ -421,7 +421,7 @@ TEST(1_BasicExtraction)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
 
-    l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, 0);
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", db::LayoutToNetlist::NoProperties, tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, 0);
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
@@ -447,7 +447,7 @@ TEST(1_BasicExtraction)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
 
-    l2n.build_all_nets (cm, ly2, lmap, 0, tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", 0);
+    l2n.build_all_nets (cm, ly2, lmap, 0, db::LayoutToNetlist::NoProperties, tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", 0);
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
@@ -473,7 +473,7 @@ TEST(1_BasicExtraction)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
 
-    l2n.build_all_nets (cm, ly2, lmap, 0, tl::Variant (42), db::LayoutToNetlist::BNH_Flatten, 0, 0);
+    l2n.build_all_nets (cm, ly2, lmap, 0, db::LayoutToNetlist::AllProperties, tl::Variant (42), db::LayoutToNetlist::BNH_Flatten, 0, 0);
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
@@ -499,7 +499,7 @@ TEST(1_BasicExtraction)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
 
-    l2n.build_all_nets (cm, ly2, lmap, 0, tl::Variant (42), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", 0);
+    l2n.build_all_nets (cm, ly2, lmap, 0, db::LayoutToNetlist::AllProperties, tl::Variant (42), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", 0);
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
@@ -525,7 +525,7 @@ TEST(1_BasicExtraction)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
 
-    l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", db::LayoutToNetlist::NoProperties, tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
@@ -636,7 +636,7 @@ TEST(1_BasicExtraction)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
 
-    l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", db::LayoutToNetlist::NoProperties, tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");

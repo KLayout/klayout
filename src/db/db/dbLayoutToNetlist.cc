@@ -984,9 +984,17 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
 }
 
 db::properties_id_type
-LayoutToNetlist::make_netname_propid (db::Layout &ly, const tl::Variant &netname_prop, const db::Net &net) const
+LayoutToNetlist::make_netname_propid (db::Layout &ly, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, const db::Net &net) const
 {
-  if (! netname_prop.is_nil () || net.begin_properties () != net.end_properties ()) {
+  if (net_prop_mode == FakePropId) {
+
+    return reinterpret_cast<db::properties_id_type> (&net);
+
+  } else if (net_prop_mode == NoProperties) {
+
+    return 0;
+
+  } else if (! netname_prop.is_nil () || (net_prop_mode == AllProperties && net.begin_properties () != net.end_properties ())) {
 
     db::PropertiesRepository::properties_set propset;
 
@@ -998,18 +1006,24 @@ LayoutToNetlist::make_netname_propid (db::Layout &ly, const tl::Variant &netname
 
     if (! netname_prop.is_nil ()) {
       db::property_names_id_type name_propnameid = ly.properties_repository ().prop_name_id (netname_prop);
-      propset.insert (std::make_pair (name_propnameid, tl::Variant (net.expanded_name ())));
+      if (net_prop_mode == NetIDOnly) {
+        propset.insert (std::make_pair (name_propnameid, tl::Variant (reinterpret_cast <size_t> (&net))));
+      } else {
+        propset.insert (std::make_pair (name_propnameid, tl::Variant (net.expanded_name ())));
+      }
     }
 
     return ly.properties_repository ().properties_id (propset);
 
   } else {
+
     return 0;
+
   }
 }
 
 void
-LayoutToNetlist::build_net (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix) const
+LayoutToNetlist::build_net (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix) const
 {
   if (! m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has not been extracted yet")));
@@ -1019,14 +1033,14 @@ LayoutToNetlist::build_net (const db::Net &net, db::Layout &target, db::Cell &ta
 
   double mag = internal_layout ()->dbu () / target.dbu ();
 
-  db::properties_id_type netname_propid = make_netname_propid (target, netname_prop, net);
+  db::properties_id_type netname_propid = make_netname_propid (target, net_prop_mode, netname_prop, net);
   build_net_rec (net, target, target_cell, lmap, 0, netname_propid, hier_mode, cell_name_prefix, device_cell_name_prefix, cell_reuse_table, db::ICplxTrans (mag));
 }
 
 void
-LayoutToNetlist::build_all_nets (const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix) const
+LayoutToNetlist::build_all_nets (const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix) const
 {
-  build_nets (0, cmap, target, lmap, net_cell_name_prefix, netname_prop, hier_mode, circuit_cell_name_prefix, device_cell_name_prefix);
+  build_nets (0, cmap, target, lmap, net_cell_name_prefix, net_prop_mode, netname_prop, hier_mode, circuit_cell_name_prefix, device_cell_name_prefix);
 }
 
 void
@@ -1059,7 +1073,7 @@ LayoutToNetlist::build_net_rec (const db::Net &net, db::Layout &target, db::cell
 }
 
 void
-LayoutToNetlist::build_nets (const std::vector<const db::Net *> *nets, const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix) const
+LayoutToNetlist::build_nets (const std::vector<const db::Net *> *nets, const db::CellMapping &cmap, db::Layout &target, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, BuildNetHierarchyMode hier_mode, const char *circuit_cell_name_prefix, const char *device_cell_name_prefix) const
 {
   if (! m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has not been extracted yet")));
@@ -1085,7 +1099,7 @@ LayoutToNetlist::build_nets (const std::vector<const db::Net *> *nets, const db:
       }
 
       if (! nets || net_set.find (n.operator-> ()) != net_set.end ()) {
-        db::properties_id_type netname_propid = make_netname_propid (target, netname_prop, *n);
+        db::properties_id_type netname_propid = make_netname_propid (target, net_prop_mode, netname_prop, *n);
         build_net_rec (*n, target, c->cell_index (), cmap, lmap, net_cell_name_prefix, netname_propid, hier_mode, circuit_cell_name_prefix, device_cell_name_prefix, cell_reuse_table, db::ICplxTrans ());
       }
 
@@ -1114,7 +1128,7 @@ LayoutToNetlist::build_nets (const std::vector<const db::Net *> *nets, const db:
               double dbu = target.dbu ();
               db::ICplxTrans tr = db::CplxTrans (dbu).inverted () * subcircuit.trans () * db::CplxTrans (dbu);
 
-              db::properties_id_type netname_propid = make_netname_propid (target, netname_prop, *n);
+              db::properties_id_type netname_propid = make_netname_propid (target, net_prop_mode, netname_prop, *n);
 
               if (net_cell_name_prefix) {
                 std::string ncn = std::string (net_cell_name_prefix) + subcircuit.expanded_name () + ":";

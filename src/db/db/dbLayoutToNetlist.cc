@@ -742,28 +742,28 @@ static bool deliver_shape (const db::NetShape &s, db::Shapes &shapes, const Tr &
 
     db::PolygonRef pr = s.polygon_ref ();
 
-    if (pr.obj ().is_box ()) {
+    db::Layout *layout = shapes.layout ();
+    if (layout) {
+      //  NOTE: by maintaining the PolygonRefs we can directly use the output of "build_nets" as input
+      //  for a hierarchical processor.
+      db::PolygonRef polygon_ref (pr.obj ().transformed (pr.trans ()).transformed (tr), layout->shape_repository ());
+      if (propid) {
+        shapes.insert (db::PolygonRefWithProperties (polygon_ref, propid));
+      } else {
+        shapes.insert (polygon_ref);
+      }
+    } else if (pr.obj ().is_box ()) {
       if (propid) {
         shapes.insert (db::BoxWithProperties (pr.obj ().box ().transformed (pr.trans ()).transformed (tr), propid));
       } else {
         shapes.insert (pr.obj ().box ().transformed (pr.trans ()).transformed (tr));
       }
     } else {
-      db::Layout *layout = shapes.layout ();
-      if (layout) {
-        db::PolygonRef polygon_ref (pr.obj ().transformed (pr.trans ()).transformed (tr), layout->shape_repository ());
-        if (propid) {
-          shapes.insert (db::PolygonRefWithProperties (polygon_ref, propid));
-        } else {
-          shapes.insert (polygon_ref);
-        }
+      db::Polygon polygon (pr.obj ().transformed (pr.trans ()).transformed (tr));
+      if (propid) {
+        shapes.insert (db::PolygonWithProperties (polygon, propid));
       } else {
-        db::Polygon polygon (pr.obj ().transformed (pr.trans ()).transformed (tr));
-        if (propid) {
-          shapes.insert (db::PolygonWithProperties (polygon, propid));
-        } else {
-          shapes.insert (polygon);
-        }
+        shapes.insert (polygon);
       }
     }
 

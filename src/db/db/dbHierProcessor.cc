@@ -182,6 +182,33 @@ public:
   shape_reference_translator (db::Layout * /*target_layout*/) { }
 };
 
+template<class Basic>
+class shape_reference_translator<db::object_with_properties<Basic> >
+  : public shape_reference_translator<Basic>
+{
+public:
+  typedef db::object_with_properties<Basic> shape_type;
+
+  shape_reference_translator (db::Layout *target_layout)
+    : shape_reference_translator<Basic> (target_layout)
+  {
+    //  .. nothing yet ..
+  }
+
+  shape_type operator() (const shape_type &s) const
+  {
+    //  CAUTION: no property ID translation happens here (reasoning: the main use case is fake ID for net tagging)
+    return shape_type (shape_reference_translator<Basic>::operator () (s), s.properties_id ());
+  }
+
+  template <class Trans>
+  shape_type operator() (const shape_type &s, const Trans &tr) const
+  {
+    //  CAUTION: no property ID translation happens here (reasoning: the main use case is fake ID for net tagging)
+    return shape_type (shape_reference_translator<Basic>::operator () (s, tr), s.properties_id ());
+  }
+};
+
 template <class Ref, class Trans>
 class shape_reference_translator_with_trans_from_shape_ref
 {
@@ -271,6 +298,26 @@ public:
 
 private:
   Trans m_trans;
+};
+
+template <class Basic, class Trans>
+class shape_reference_translator_with_trans<db::object_with_properties<Basic>, Trans>
+  : public shape_reference_translator_with_trans<Basic, Trans>
+{
+public:
+  typedef db::object_with_properties<Basic> shape_type;
+
+  shape_reference_translator_with_trans (db::Layout *target_layout)
+    : shape_reference_translator_with_trans<Basic, Trans> (target_layout)
+  {
+    //  .. nothing yet ..
+  }
+
+  shape_type operator() (const shape_type &s) const
+  {
+    //  CAUTION: no property ID translation happens here (reasoning: the main use case is fake ID for net tagging)
+    return shape_type (shape_reference_translator_with_trans<Basic, Trans>::operator () (s), s.properties_id ());
+  }
 };
 
 // ---------------------------------------------------------------------------------------------
@@ -398,6 +445,7 @@ template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Text, db:
 template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Edge, db::Polygon>;
 template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Text, db::Text>;
 template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor_cell_context<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::PolygonRef, db::EdgePair>;
@@ -711,6 +759,7 @@ template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Edge, db
 template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Edge, db::Edge>;
 template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Text, db::Polygon>;
 template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Text, db::Text>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::PolygonRef, db::EdgePair>;
@@ -815,6 +864,7 @@ template class DB_PUBLIC shape_interactions<db::Polygon, db::Polygon>;
 template class DB_PUBLIC shape_interactions<db::Polygon, db::Text>;
 template class DB_PUBLIC shape_interactions<db::Polygon, db::TextRef>;
 template class DB_PUBLIC shape_interactions<db::Polygon, db::Edge>;
+template class DB_PUBLIC shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
 template class DB_PUBLIC shape_interactions<db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC shape_interactions<db::PolygonRef, db::TextRef>;
 template class DB_PUBLIC shape_interactions<db::PolygonRef, db::Text>;
@@ -1285,6 +1335,7 @@ template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, d
 template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Text, db::Text>;
 template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Edge, db::Polygon>;
 template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRef>;
 template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::TextRef, db::TextRef>;
 template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::TextRef, db::PolygonRef>;
@@ -1347,6 +1398,7 @@ template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db
 template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Text, db::Text>;
 template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Edge, db::Polygon>;
 template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRef>;
 template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::PolygonRef, db::EdgePair>;
@@ -2362,6 +2414,7 @@ template class DB_PUBLIC local_processor<db::Polygon, db::Text, db::Polygon>;
 template class DB_PUBLIC local_processor<db::Polygon, db::Text, db::Text>;
 template class DB_PUBLIC local_processor<db::Polygon, db::Edge, db::Polygon>;
 template class DB_PUBLIC local_processor<db::Polygon, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRef>;
 template class DB_PUBLIC local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC local_processor<db::PolygonRef, db::Edge, db::Edge>;

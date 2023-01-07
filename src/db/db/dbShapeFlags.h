@@ -33,30 +33,53 @@ namespace db
 template <class T> unsigned int shape_flags ();
 template <class T> unsigned int shape_flags_pure ();
 
-template <> inline unsigned int shape_flags<db::PolygonRef> ()      { return 1 << db::ShapeIterator::PolygonRef; }
-template <> inline unsigned int shape_flags_pure<db::PolygonRef> () { return 1 << db::ShapeIterator::PolygonRef; }
+template <> inline unsigned int shape_flags<db::PolygonRef> ()                      { return 1 << db::ShapeIterator::PolygonRef; }
+template <> inline unsigned int shape_flags_pure<db::PolygonRef> ()                 { return 1 << db::ShapeIterator::PolygonRef; }
 
-template <> inline unsigned int shape_flags<db::TextRef> ()         { return 1 << db::ShapeIterator::TextRef; }
-template <> inline unsigned int shape_flags_pure<db::TextRef> ()    { return 1 << db::ShapeIterator::TextRef; }
+template <> inline unsigned int shape_flags<db::TextRef> ()                         { return 1 << db::ShapeIterator::TextRef; }
+template <> inline unsigned int shape_flags_pure<db::TextRef> ()                    { return 1 << db::ShapeIterator::TextRef; }
 
-template <> inline unsigned int shape_flags<db::Box> ()             { return db::ShapeIterator::Boxes; }
-template <> inline unsigned int shape_flags_pure<db::Box> ()        { return 1 << db::ShapeIterator::Box; }
+template <> inline unsigned int shape_flags<db::Box> ()                             { return db::ShapeIterator::Boxes; }
+template <> inline unsigned int shape_flags_pure<db::Box> ()                        { return 1 << db::ShapeIterator::Box; }
 
-template <> inline unsigned int shape_flags<db::Path> ()            { return db::ShapeIterator::Paths; }
-template <> inline unsigned int shape_flags_pure<db::Path> ()       { return 1 << db::ShapeIterator::Path; }
+template <> inline unsigned int shape_flags<db::Path> ()                            { return db::ShapeIterator::Paths; }
+template <> inline unsigned int shape_flags_pure<db::Path> ()                       { return 1 << db::ShapeIterator::Path; }
 
-template <> inline unsigned int shape_flags<db::Polygon> ()         { return db::ShapeIterator::Polygons; }
-template <> inline unsigned int shape_flags_pure<db::Polygon> ()    { return 1 << db::ShapeIterator::Polygon; }
+template <> inline unsigned int shape_flags<db::Polygon> ()                         { return db::ShapeIterator::Polygons; }
+template <> inline unsigned int shape_flags_pure<db::Polygon> ()                    { return 1 << db::ShapeIterator::Polygon; }
 
-template <> inline unsigned int shape_flags<db::Edge> ()            { return db::ShapeIterator::Edges; }
-template <> inline unsigned int shape_flags_pure<db::Edge> ()       { return 1 << db::ShapeIterator::Edge; }
+template <> inline unsigned int shape_flags<db::Edge> ()                            { return db::ShapeIterator::Edges; }
+template <> inline unsigned int shape_flags_pure<db::Edge> ()                       { return 1 << db::ShapeIterator::Edge; }
 
-template <> inline unsigned int shape_flags<db::EdgePair> ()        { return db::ShapeIterator::EdgePairs; }
-template <> inline unsigned int shape_flags_pure<db::EdgePair> ()   { return 1 << db::ShapeIterator::EdgePair; }
+template <> inline unsigned int shape_flags<db::EdgePair> ()                        { return db::ShapeIterator::EdgePairs; }
+template <> inline unsigned int shape_flags_pure<db::EdgePair> ()                   { return 1 << db::ShapeIterator::EdgePair; }
 
-template <> inline unsigned int shape_flags<db::Text> ()            { return db::ShapeIterator::Texts; }
-template <> inline unsigned int shape_flags_pure<db::Text> ()       { return 1 << db::ShapeIterator::Text; }
+template <> inline unsigned int shape_flags<db::Text> ()                            { return db::ShapeIterator::Texts; }
+template <> inline unsigned int shape_flags_pure<db::Text> ()                       { return 1 << db::ShapeIterator::Text; }
 
+template <> inline unsigned int shape_flags<db::PolygonRefWithProperties> ()        { return db::ShapeIterator::Properties | shape_flags_pure<db::PolygonRef> (); }
+template <> inline unsigned int shape_flags_pure<db::PolygonRefWithProperties> ()   { return db::ShapeIterator::Properties | shape_flags_pure<db::PolygonRef> (); }
+
+template <> inline unsigned int shape_flags<db::TextRefWithProperties> ()           { return db::ShapeIterator::Properties | shape_flags_pure<db::TextRef> (); }
+template <> inline unsigned int shape_flags_pure<db::TextRefWithProperties> ()      { return db::ShapeIterator::Properties | shape_flags_pure<db::TextRef> (); }
+
+template <> inline unsigned int shape_flags<db::BoxWithProperties> ()               { return db::ShapeIterator::Properties | shape_flags_pure<db::Box> (); }
+template <> inline unsigned int shape_flags_pure<db::BoxWithProperties> ()          { return db::ShapeIterator::Properties | shape_flags_pure<db::Box> (); }
+
+template <> inline unsigned int shape_flags<db::PathWithProperties> ()              { return db::ShapeIterator::Properties | shape_flags_pure<db::Path> (); }
+template <> inline unsigned int shape_flags_pure<db::PathWithProperties> ()         { return db::ShapeIterator::Properties | shape_flags_pure<db::Path> (); }
+
+template <> inline unsigned int shape_flags<db::PolygonWithProperties> ()           { return db::ShapeIterator::Properties | shape_flags_pure<db::Polygon> (); }
+template <> inline unsigned int shape_flags_pure<db::PolygonWithProperties> ()      { return db::ShapeIterator::Properties | shape_flags_pure<db::Polygon> (); }
+
+template <> inline unsigned int shape_flags<db::EdgeWithProperties> ()              { return db::ShapeIterator::Properties | shape_flags_pure<db::Edge> (); }
+template <> inline unsigned int shape_flags_pure<db::EdgeWithProperties> ()         { return db::ShapeIterator::Properties | shape_flags_pure<db::Edge> (); }
+
+template <> inline unsigned int shape_flags<db::EdgePairWithProperties> ()          { return db::ShapeIterator::Properties | shape_flags_pure<db::EdgePair> (); }
+template <> inline unsigned int shape_flags_pure<db::EdgePairWithProperties> ()     { return db::ShapeIterator::Properties | shape_flags_pure<db::EdgePair> (); }
+
+template <> inline unsigned int shape_flags<db::TextWithProperties> ()              { return db::ShapeIterator::Properties | shape_flags_pure<db::Text> (); }
+template <> inline unsigned int shape_flags_pure<db::TextWithProperties> ()         { return db::ShapeIterator::Properties | shape_flags_pure<db::Text> (); }
 
 template <class T>
 struct DB_PUBLIC shape_to_object

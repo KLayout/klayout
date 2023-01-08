@@ -2199,6 +2199,61 @@ TEST(51_PropertiesFlatFromLayout)
   EXPECT_EQ (s.at_end (), true);
 }
 
+TEST(52_PropertiesDeep)
+{
+  db::DeepShapeStore dss ("TOP", 0.001);
+  db::Region r (dss);
+
+  //  Fill flat region with parts with properties
+
+  r.insert (db::Box (0, 0, 100, 200));
+  r.insert (db::BoxWithProperties (db::Box (1, 2, 101, 202), 1));
+  r.insert (db::Box (10, 20, 110, 220));
+  r.insert (db::BoxWithProperties (db::Box (11, 12, 111, 212), 42));
+
+  EXPECT_EQ (r.count (), size_t (4));
+
+  db::Region::const_iterator s = r.begin ();
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (0));
+  EXPECT_EQ (s->to_string (), "(0,0;0,200;100,200;100,0)");
+  ++s;
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (0));
+  EXPECT_EQ (s->to_string (), "(10,20;10,220;110,220;110,20)");
+  ++s;
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (1));
+  EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
+  ++s;
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (42));
+  EXPECT_EQ (s->to_string (), "(11,12;11,212;111,212;111,12)");
+  ++s;
+  EXPECT_EQ (s.at_end (), true);
+
+  s = r.begin_merged ();
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (0));
+  //  property #0 elements are merged
+  EXPECT_EQ (s->to_string (), "(0,0;0,200;10,200;10,220;110,220;110,20;100,20;100,0)");
+  ++s;
+
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (1));
+  //  a single property #1 element
+  EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
+  ++s;
+
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (42));
+  //  a single property #42 element
+  EXPECT_EQ (s->to_string (), "(11,12;11,212;111,212;111,12)");
+  ++s;
+
+  EXPECT_EQ (s.at_end (), true);
+}
+
 TEST(100_Processors)
 {
   db::Region r;

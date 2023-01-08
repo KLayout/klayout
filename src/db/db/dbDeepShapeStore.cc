@@ -481,13 +481,14 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Region &region, bool for_n
 
   //  try to maintain the texts on top level - go through shape iterator
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> ii = region.begin_iter ();
+  bool regard_props = ((ii.first.shape_flags () & db::ShapeIterator::RegardProperties) != 0);
   db::ICplxTrans ttop = trans * ii.second;
   while (! ii.first.at_end ()) {
 
     if (for_netlist && ii.first->is_text () && ii.first.layout () && ii.first.cell () != ii.first.top_cell ()) {
       //  Skip texts on levels below top cell. For the reasoning see the description of this method.
     } else {
-      red.push (*ii.first, ttop * ii.first.trans (), world, 0, shapes);
+      red.push (*ii.first, regard_props ? ii.first->prop_id () : 0, ttop * ii.first.trans (), world, 0, shapes);
     }
 
     ++ii.first;
@@ -518,9 +519,10 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Edges &edges, const db::IC
   db::EdgeBuildingHierarchyBuilderShapeReceiver eb (false);
 
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> ii = edges.begin_iter ();
+  bool regard_props = ((ii.first.shape_flags () & db::ShapeIterator::RegardProperties) != 0);
   db::ICplxTrans ttop = trans * ii.second;
   while (! ii.first.at_end ()) {
-    eb.push (*ii.first, ttop * ii.first.trans (), world, 0, shapes);
+    eb.push (*ii.first, regard_props ? ii.first->prop_id () : 0, ttop * ii.first.trans (), world, 0, shapes);
     ++ii.first;
   }
 
@@ -548,9 +550,10 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Texts &texts, const db::IC
   db::TextBuildingHierarchyBuilderShapeReceiver tb (&layout ());
 
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> ii = texts.begin_iter ();
+  bool regard_props = ((ii.first.shape_flags () & db::ShapeIterator::RegardProperties) != 0);
   db::ICplxTrans ttop = trans * ii.second;
   while (! ii.first.at_end ()) {
-    tb.push (*ii.first, ttop * ii.first.trans (), world, 0, shapes);
+    tb.push (*ii.first, regard_props ? ii.first->prop_id () : 0, ttop * ii.first.trans (), world, 0, shapes);
     ++ii.first;
   }
 
@@ -905,7 +908,7 @@ DeepLayer DeepShapeStore::create_copy (const DeepLayer &source, HierarchyBuilder
     db::Shapes &into = c->shapes (layer_index);
     const db::Shapes &from = c->shapes (from_layer_index);
     for (db::Shapes::shape_iterator s = from.begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
-      pipe->push (*s, trans, region, 0, &into);
+      pipe->push (*s, s->prop_id (), trans, region, 0, &into);
     }
   }
 

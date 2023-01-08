@@ -171,6 +171,7 @@ public:
     Properties        = (1 << Null),
     All               = (1 << Null) - 1,
     AllWithProperties = (1 << (Null + 1)) - 1,
+    RegardProperties  = (1 << (Null + 1)),          //  special flag, not evaluated on query but in receiver (indicates to regard shapes with different properties as different entities)
     Nothing           = 0
   };
     
@@ -1266,7 +1267,8 @@ public:
   {
     size_t n = 0;
     for (tl::vector<LayerBase *>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-      if ((flags & (*l)->type_mask ()) != 0) {
+      unsigned int tm = (*l)->type_mask ();
+      if (((flags & db::ShapeIterator::Properties) == 0 || (tm & db::ShapeIterator::Properties) != 0) && (flags & tm) != 0) {
         n += (*l)->size ();
       }
     }
@@ -1466,13 +1468,32 @@ public:
   }
 
   /**
+   *  @brief Gets a flag indicating whether an update is needed
+   *
+   *  This flag means that the shape collection has been modified and the bounding box
+   *  and the quad trees will be recomputed (internally).
+   */
+  bool is_dirty () const
+  {
+    return (size_t (mp_cell) & 1) != 0;
+  }
+
+  /**
+   *  @brief Gets a value indicating that the shape collection is constructed with editable scope
+   */
+  bool is_editable () const
+  {
+    return (size_t (mp_cell) & 2) != 0;
+  }
+
+  /**
    *  @brief Gets the pointer to layout that the shapes container belongs to
    *
    *  This pointer can be 0 if the shapes container is a standalone container
    */
   db::Layout *layout () const;
 
-  /** 
+  /**
    *  @brief Implementation of the redo method
    */
   void redo (db::Op *op);
@@ -1502,18 +1523,6 @@ private:
   tl::vector<LayerBase *> &get_layers ()
   {
     return m_layers;
-  }
-
-  //  extract dirty flag from mp_cell
-  bool is_dirty () const 
-  {
-    return (size_t (mp_cell) & 1) != 0;
-  }
-
-  //  extract editable flag from mp_cell
-  bool is_editable () const 
-  {
-    return (size_t (mp_cell) & 2) != 0;
   }
 
   //  get the shape repository associated with this container

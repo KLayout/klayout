@@ -279,7 +279,7 @@ void AsIfFlatRegion::merge_polygons_to (db::Shapes &output, bool min_coherence, 
 
   if (need_split_props) {
 
-    db::Shapes result;
+    db::Shapes result (output.is_editable ());
 
     std::vector<std::pair<db::properties_id_type, const db::Polygon *> > polygons_by_prop_id;
     polygons_by_prop_id.reserve (n);

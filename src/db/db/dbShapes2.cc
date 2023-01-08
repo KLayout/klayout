@@ -755,7 +755,7 @@ inline unsigned int iterator_type_mask (ShapeIterator::user_object_type::tag)
 template <class Sh>
 inline unsigned int iterator_type_mask (db::object_tag< db::object_with_properties<Sh> >)
 {
-  return iterator_type_mask (typename Sh::tag ());
+  return iterator_type_mask (typename Sh::tag ()) | ShapeIterator::Properties;
 }
 
 template <class Sh, class StableTag>

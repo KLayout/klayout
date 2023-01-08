@@ -116,7 +116,7 @@ namespace
       if (! m_rec_iter.at_end ()) {
         m_rec_iter->edge (m_shape);
         m_shape.transform (m_iter_trans * m_rec_iter.trans ());
-        m_prop_id = (m_rec_iter.shape_flags () & db::ShapeIterator::Properties) != 0 ? m_rec_iter->prop_id () : 0;
+        m_prop_id = (m_rec_iter.shape_flags () & db::ShapeIterator::RegardProperties) != 0 ? m_rec_iter->prop_id () : 0;
       }
     }
 

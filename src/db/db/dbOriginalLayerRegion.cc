@@ -119,7 +119,7 @@ namespace
       if (! m_rec_iter.at_end ()) {
         m_rec_iter->polygon (m_polygon);
         m_polygon.transform (m_iter_trans * m_rec_iter.trans (), false);
-        m_prop_id = (m_rec_iter.shape_flags () & db::ShapeIterator::Properties) != 0 ? m_rec_iter->prop_id () : 0;
+        m_prop_id = (m_rec_iter.shape_flags () & db::ShapeIterator::RegardProperties) != 0 ? m_rec_iter->prop_id () : 0;
       }
     }
 
@@ -240,10 +240,10 @@ OriginalLayerRegion::count () const
       size_t nn = 0;
       if (iter.multiple_layers ()) {
         for (std::vector<unsigned int>::const_iterator l = iter.layers ().begin (); l != iter.layers ().end (); ++l) {
-          nn += layout.cell (*c).shapes (*l).size (iter.shape_flags () & db::ShapeIterator::Regions);
+          nn += layout.cell (*c).shapes (*l).size (iter.shape_flags () & (db::ShapeIterator::Regions | db::ShapeIterator::Properties));
         }
       } else if (iter.layer () < layout.layers ()) {
-        nn += layout.cell (*c).shapes (iter.layer ()).size (iter.shape_flags () & db::ShapeIterator::Regions);
+        nn += layout.cell (*c).shapes (iter.layer ()).size (iter.shape_flags () & (db::ShapeIterator::Regions | db::ShapeIterator::Properties));
       }
       n += cc.weight (*c) * nn;
     }

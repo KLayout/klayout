@@ -448,6 +448,7 @@ static db::Layout *layout (db::Shapes *sh)
 
 static unsigned int s_all ()                 { return db::ShapeIterator::All; }
 static unsigned int s_all_with_properties () { return db::ShapeIterator::AllWithProperties; }
+static unsigned int s_regard_properties ()   { return db::ShapeIterator::RegardProperties; }
 static unsigned int s_properties ()          { return db::ShapeIterator::Properties; }
 static unsigned int s_polygons ()            { return db::ShapeIterator::Polygons; }
 static unsigned int s_regions ()             { return db::ShapeIterator::Regions; }
@@ -1334,6 +1335,10 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
   ) +
   gsi::method ("SProperties|#s_properties", &s_properties,
     "@brief Indicates that only shapes with properties shall be retrieved"
+  ) +
+  gsi::method ("SRegardProperties|#s_regard_properties", &s_regard_properties,
+    "@brief Special option to regard shapes with different properties as different entities (used by \\Region for example).\n"
+    "This option has been introduced in version 0.28.4.\n"
   ) +
   gsi::method_ext ("dump_mem_statistics", &dump_mem_statistics, gsi::arg<bool> ("detailed", false),
     "@hide"

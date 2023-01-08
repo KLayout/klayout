@@ -53,7 +53,7 @@ public:
 
   RegionDelegate *clone () const;
 
-  virtual void do_insert (const db::Polygon &polygon);
+  virtual void do_insert (const db::Polygon &polygon, db::properties_id_type prop_id);
 
   virtual void do_transform (const db::Trans &t);
   virtual void do_transform (const db::ICplxTrans &t);
@@ -74,6 +74,7 @@ public:
   virtual bool is_merged () const;
 
   virtual const db::Polygon *nth (size_t n) const;
+  virtual db::properties_id_type nth_prop_id (size_t n) const;
   virtual bool has_valid_polygons () const;
   virtual bool has_valid_merged_polygons () const;
 

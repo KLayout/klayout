@@ -311,6 +311,7 @@ public:
   virtual std::pair<RegionDelegate *, RegionDelegate *> in_and_out (const Region &other) const = 0;
 
   virtual const db::Polygon *nth (size_t n) const = 0;
+  virtual db::properties_id_type nth_prop_id (size_t n) const = 0;
   virtual bool has_valid_polygons () const = 0;
   virtual bool has_valid_merged_polygons () const = 0;
 

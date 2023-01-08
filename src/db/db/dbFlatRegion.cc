@@ -25,6 +25,7 @@
 #include "dbEmptyRegion.h"
 #include "dbRegion.h"
 #include "dbShapeProcessor.h"
+#include "tlSList.h"
 
 namespace db
 {
@@ -108,33 +109,8 @@ void
 FlatRegion::ensure_merged_polygons_valid () const
 {
   if (! m_merged_polygons_valid) {
-
-    mp_merged_polygons->clear ();
-
-    db::EdgeProcessor ep (report_progress (), progress_desc ());
-    ep.set_base_verbosity (base_verbosity ());
-
-    //  count edges and reserve memory
-    size_t n = 0;
-    for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
-      n += p->vertices ();
-    }
-    ep.reserve (n);
-
-    //  insert the polygons into the processor
-    n = 0;
-    for (RegionIterator p (begin ()); ! p.at_end (); ++p, ++n) {
-      ep.insert (*p, n);
-    }
-
-    //  and run the merge step
-    db::MergeOp op (0);
-    db::ShapeGenerator pc (*mp_merged_polygons);
-    db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence ());
-    ep.process (pg, op);
-
+    merge_polygons_to (*mp_merged_polygons, min_coherence (), 0);
     m_merged_polygons_valid = true;
-
   }
 }
 
@@ -279,28 +255,7 @@ RegionDelegate *FlatRegion::merged_in_place (bool min_coherence, unsigned int mi
   } else {
 
     invalidate_cache ();
-
-    db::EdgeProcessor ep (report_progress (), progress_desc ());
-    ep.set_base_verbosity (base_verbosity ());
-
-    //  count edges and reserve memory
-    size_t n = 0;
-    for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
-      n += p->vertices ();
-    }
-    ep.reserve (n);
-
-    //  insert the polygons into the processor
-    n = 0;
-    for (RegionIterator p (begin ()); ! p.at_end (); ++p, ++n) {
-      ep.insert (*p, n);
-    }
-
-    //  and run the merge step
-    db::MergeOp op (min_wc);
-    db::ShapeGenerator pc (*mp_polygons, true /*clear*/);
-    db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence);
-    ep.process (pg, op);
+    merge_polygons_to (*mp_polygons, min_coherence, min_wc);
 
     m_is_merged = true;
 
@@ -385,7 +340,46 @@ RegionDelegate *FlatRegion::add_in_place (const Region &other)
 
 const db::Polygon *FlatRegion::nth (size_t n) const
 {
-  return n < mp_polygons->size () ? &mp_polygons->get_layer<db::Polygon, db::unstable_layer_tag> ().begin () [n] : 0;
+  //  NOTE: this assumes that we iterate over non-property polygons first and then over polygons with properties
+
+  if (n >= mp_polygons->size ()) {
+    return 0;
+  }
+
+  const db::layer<db::Polygon, db::unstable_layer_tag> &l = mp_polygons->get_layer<db::Polygon, db::unstable_layer_tag> ();
+  if (n < l.size ()) {
+    return &l.begin () [n];
+  }
+  n -= l.size ();
+
+  const db::layer<db::PolygonWithProperties, db::unstable_layer_tag> &lp = mp_polygons->get_layer<db::PolygonWithProperties, db::unstable_layer_tag> ();
+  if (n < lp.size ()) {
+    return &lp.begin () [n];
+  }
+
+  return 0;
+}
+
+db::properties_id_type FlatRegion::nth_prop_id (size_t n) const
+{
+  //  NOTE: this assumes that we iterate over non-property polygons first and then over polygons with properties
+
+  if (n >= mp_polygons->size ()) {
+    return 0;
+  }
+
+  const db::layer<db::Polygon, db::unstable_layer_tag> &l = mp_polygons->get_layer<db::Polygon, db::unstable_layer_tag> ();
+  if (n < l.size ()) {
+    return 0;
+  }
+  n -= l.size ();
+
+  const db::layer<db::PolygonWithProperties, db::unstable_layer_tag> &lp = mp_polygons->get_layer<db::PolygonWithProperties, db::unstable_layer_tag> ();
+  if (n < lp.size ()) {
+    return lp.begin () [n].properties_id ();
+  }
+
+  return 0;
 }
 
 bool FlatRegion::has_valid_polygons () const
@@ -409,13 +403,17 @@ void FlatRegion::insert_into (Layout *layout, db::cell_index_type into_cell, uns
 }
 
 void
-FlatRegion::do_insert (const db::Polygon &polygon)
+FlatRegion::do_insert (const db::Polygon &polygon, properties_id_type prop_id)
 {
   if (polygon.holes () > 0 || polygon.vertices () > 0) {
 
     bool is_box = (empty () && polygon.is_box ());
 
-    mp_polygons->insert (polygon);
+    if (prop_id != 0) {
+      mp_polygons->insert (db::PolygonWithProperties (polygon, prop_id));
+    } else {
+      mp_polygons->insert (polygon);
+    }
     set_is_merged (is_box);
 
     invalidate_cache ();

@@ -44,7 +44,7 @@ public:
   typedef db::EdgePair value_type;
 
   DeepEdgePairsIterator (const db::RecursiveShapeIterator &iter)
-    : m_iter (iter)
+    : m_iter (iter), m_prop_id (0)
   {
     set ();
   }
@@ -70,6 +70,11 @@ public:
   virtual const value_type *get () const
   {
     return &m_edge_pair;
+  }
+
+  virtual db::properties_id_type prop_id () const
+  {
+    return m_prop_id;
   }
 
   virtual bool equals (const generic_shape_iterator_delegate_base<value_type> *other) const
@@ -100,12 +105,14 @@ private:
 
   db::RecursiveShapeIterator m_iter;
   mutable value_type m_edge_pair;
+  mutable db::properties_id_type m_prop_id;
 
   void set () const
   {
     if (! m_iter.at_end ()) {
-      m_iter.shape ().edge_pair (m_edge_pair);
+      m_iter->edge_pair (m_edge_pair);
       m_edge_pair.transform (m_iter.trans ());
+      m_prop_id = m_iter->prop_id ();
     }
   }
 };

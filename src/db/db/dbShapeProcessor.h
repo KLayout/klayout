@@ -56,10 +56,12 @@ public:
    *  the start method is called and when the shape container is cleared if "clear_shapes"
    *  is set.
    *
+   *  @param shapes Where to store the shapes
    *  @param clear_shapes If true, the shapes container is cleared on the start event.
+   *  @param prop_id The properties ID to assign to all the output shapes (or 0 if no property shall be assigned)
    */
-  ShapeGenerator (db::Shapes &shapes, bool clear_shapes = false)
-    : PolygonSink (), mp_shapes (&shapes), m_clear_shapes (clear_shapes)
+  ShapeGenerator (db::Shapes &shapes, bool clear_shapes = false, db::properties_id_type prop_id = 0)
+    : PolygonSink (), mp_shapes (&shapes), m_clear_shapes (clear_shapes), m_prop_id (prop_id)
   { }
 
   /**
@@ -67,7 +69,11 @@ public:
    */
   virtual void put (const db::Polygon &polygon) 
   {
-    mp_shapes->insert (polygon);
+    if (m_prop_id) {
+      mp_shapes->insert (db::PolygonWithProperties (polygon, m_prop_id));
+    } else {
+      mp_shapes->insert (polygon);
+    }
   }
 
   /**
@@ -85,6 +91,7 @@ public:
 private:
   db::Shapes *mp_shapes;
   bool m_clear_shapes;
+  db::properties_id_type m_prop_id;
 };
 
 /**

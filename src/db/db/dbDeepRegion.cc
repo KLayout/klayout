@@ -57,7 +57,7 @@ public:
   typedef db::Polygon value_type;
 
   DeepRegionIterator (const db::RecursiveShapeIterator &iter)
-    : m_iter (iter)
+    : m_iter (iter), m_prop_id (0)
   {
     set ();
   }
@@ -83,6 +83,11 @@ public:
   virtual const value_type *get () const
   {
     return &m_polygon;
+  }
+
+  virtual db::properties_id_type prop_id () const
+  {
+    return m_prop_id;
   }
 
   virtual bool equals (const generic_shape_iterator_delegate_base<value_type> *other) const
@@ -113,12 +118,14 @@ private:
 
   db::RecursiveShapeIterator m_iter;
   mutable value_type m_polygon;
+  mutable db::properties_id_type m_prop_id;
 
   void set () const
   {
     if (! m_iter.at_end ()) {
-      m_iter.shape ().polygon (m_polygon);
+      m_iter->polygon (m_polygon);
       m_polygon.transform (m_iter.trans (), false);
+      m_prop_id = m_iter->prop_id ();
     }
   }
 };
@@ -220,12 +227,17 @@ void DeepRegion::min_coherence_changed ()
   set_is_merged (false);
 }
 
-void DeepRegion::do_insert (const db::Polygon &polygon)
+void DeepRegion::do_insert (const db::Polygon &polygon, db::properties_id_type prop_id)
 {
   db::Layout &layout = deep_layer ().layout ();
   if (layout.begin_top_down () != layout.end_top_down ()) {
     db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
-    top_cell.shapes (deep_layer ().layer ()).insert (db::PolygonRef (polygon, layout.shape_repository ()));
+    db::Shapes &shapes = top_cell.shapes (deep_layer ().layer ());
+    if (prop_id == 0) {
+      shapes.insert (db::PolygonRef (polygon, layout.shape_repository ()));
+    } else {
+      shapes.insert (db::PolygonRefWithProperties (db::PolygonRef (polygon, layout.shape_repository ()), prop_id));
+    }
   }
 
   invalidate_bbox ();
@@ -435,6 +447,12 @@ DeepRegion::is_merged () const
 
 const db::Polygon *
 DeepRegion::nth (size_t) const
+{
+  throw tl::Exception (tl::to_string (tr ("Random access to polygons is available only for flat regions")));
+}
+
+db::properties_id_type
+DeepRegion::nth_prop_id (size_t) const
 {
   throw tl::Exception (tl::to_string (tr ("Random access to polygons is available only for flat regions")));
 }

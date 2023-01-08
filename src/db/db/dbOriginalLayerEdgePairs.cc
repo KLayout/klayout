@@ -41,7 +41,7 @@ namespace
     typedef db::EdgePair value_type;
 
     OriginalLayerEdgePairsIterator (const db::RecursiveShapeIterator &iter, const db::ICplxTrans &trans)
-      : m_rec_iter (iter), m_iter_trans (trans)
+      : m_rec_iter (iter), m_iter_trans (trans), m_prop_id (0)
     {
       set ();
     }
@@ -65,6 +65,11 @@ namespace
     virtual const value_type *get () const
     {
       return &m_shape;
+    }
+
+    virtual db::properties_id_type prop_id () const
+    {
+      return m_prop_id;
     }
 
     virtual EdgePairsIteratorDelegate *clone () const
@@ -100,15 +105,17 @@ namespace
     db::RecursiveShapeIterator m_rec_iter;
     db::ICplxTrans m_iter_trans;
     value_type m_shape;
+    db::properties_id_type m_prop_id;
 
     void set ()
     {
-      while (! m_rec_iter.at_end () && !m_rec_iter.shape ().is_edge_pair ()) {
+      while (! m_rec_iter.at_end () && !m_rec_iter->is_edge_pair ()) {
         ++m_rec_iter;
       }
       if (! m_rec_iter.at_end ()) {
-        m_rec_iter.shape ().edge_pair (m_shape);
+        m_rec_iter->edge_pair (m_shape);
         m_shape.transform (m_iter_trans * m_rec_iter.trans ());
+        m_prop_id = (m_rec_iter.shape_flags () & db::ShapeIterator::Properties) != 0 ? m_rec_iter->prop_id () : 0;
       }
     }
 

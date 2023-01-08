@@ -62,6 +62,7 @@ public:
   virtual size_t hier_count () const;
 
   virtual const db::Polygon *nth (size_t n) const;
+  virtual db::properties_id_type nth_prop_id (size_t) const;
   virtual bool has_valid_polygons () const;
   virtual bool has_valid_merged_polygons () const;
 

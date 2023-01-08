@@ -260,6 +260,95 @@ void AsIfFlatRegion::invalidate_bbox ()
   m_bbox_valid = false;
 }
 
+void AsIfFlatRegion::merge_polygons_to (db::Shapes &output, bool min_coherence, unsigned int min_wc) const
+{
+  db::EdgeProcessor ep (report_progress (), progress_desc ());
+  ep.set_base_verbosity (base_verbosity ());
+
+  //  count edges and reserve memory
+  size_t n = 0;
+  db::properties_id_type prop_id = 0;
+  bool need_split_props = false;
+  for (RegionIterator s (begin ()); ! s.at_end (); ++s, ++n) {
+    if (n == 0) {
+      prop_id = s.prop_id ();
+    } else if (! need_split_props && prop_id != s.prop_id ()) {
+      need_split_props = true;
+    }
+  }
+
+  if (need_split_props) {
+
+    db::Shapes result;
+
+    std::vector<std::pair<db::properties_id_type, const db::Polygon *> > polygons_by_prop_id;
+    polygons_by_prop_id.reserve (n);
+
+    db::AddressablePolygonDelivery addressable_polygons (begin ());
+    while (! addressable_polygons.at_end ()) {
+      polygons_by_prop_id.push_back (std::make_pair (addressable_polygons.prop_id (), addressable_polygons.operator-> ()));
+      addressable_polygons.inc ();
+    }
+
+    std::sort (polygons_by_prop_id.begin (), polygons_by_prop_id.end ());
+
+    for (auto p = polygons_by_prop_id.begin (); p != polygons_by_prop_id.end (); ) {
+
+      auto pp = p;
+      while (pp != polygons_by_prop_id.end () && pp->first == p->first) {
+        ++pp;
+      }
+
+      ep.clear ();
+
+      n = 0;
+      for (auto i = p; i != pp; ++i) {
+        n += i->second->vertices ();
+      }
+      ep.reserve (n);
+
+      n = 0;
+      for (auto i = p; i != pp; ++i, ++n) {
+        ep.insert (*i->second, n);
+      }
+
+      //  and run the merge step
+      db::MergeOp op (min_wc);
+      db::ShapeGenerator pc (result, false /*don't clear*/, p->first);
+      db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence);
+      ep.process (pg, op);
+
+      p = pp;
+
+    }
+
+    output.swap (result);
+
+  } else {
+
+    n = 0;
+    for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
+      n += p->vertices ();
+    }
+    ep.reserve (n);
+
+    //  insert the polygons into the processor
+    n = 0;
+    for (RegionIterator p (begin ()); ! p.at_end (); ++p, ++n) {
+      ep.insert (*p, n);
+    }
+
+    output.clear ();
+
+    //  and run the merge step
+    db::MergeOp op (min_wc);
+    db::ShapeGenerator pc (output, false /*don't clear*/, prop_id);
+    db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence);
+    ep.process (pg, op);
+
+  }
+}
+
 RegionDelegate *
 AsIfFlatRegion::filtered (const PolygonFilterBase &filter) const
 {

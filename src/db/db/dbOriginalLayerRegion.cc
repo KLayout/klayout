@@ -25,7 +25,6 @@
 #include "dbFlatRegion.h"
 #include "dbFlatEdges.h"
 #include "dbRegion.h"
-#include "dbShapeProcessor.h"
 #include "dbDeepEdges.h"
 #include "dbDeepRegion.h"
 #include "dbDeepShapeStore.h"
@@ -46,7 +45,7 @@ namespace
   {
   public:
     OriginalLayerRegionIterator (const db::RecursiveShapeIterator &iter, const db::ICplxTrans &trans)
-      : m_rec_iter (iter), m_iter_trans (trans)
+      : m_rec_iter (iter), m_iter_trans (trans), m_prop_id (0)
     {
       set ();
     }
@@ -70,6 +69,11 @@ namespace
     virtual const value_type *get () const
     {
       return &m_polygon;
+    }
+
+    virtual db::properties_id_type prop_id () const
+    {
+      return m_prop_id;
     }
 
     virtual RegionIteratorDelegate *clone () const
@@ -105,15 +109,17 @@ namespace
     db::RecursiveShapeIterator m_rec_iter;
     db::ICplxTrans m_iter_trans;
     db::Polygon m_polygon;
+    db::properties_id_type m_prop_id;
 
     void set ()
     {
-      while (! m_rec_iter.at_end () && ! (m_rec_iter.shape ().is_polygon () || m_rec_iter.shape ().is_path () || m_rec_iter.shape ().is_box ())) {
+      while (! m_rec_iter.at_end () && ! (m_rec_iter->is_polygon () || m_rec_iter->is_path () || m_rec_iter->is_box ())) {
         ++m_rec_iter;
       }
       if (! m_rec_iter.at_end ()) {
-        m_rec_iter.shape ().polygon (m_polygon);
+        m_rec_iter->polygon (m_polygon);
         m_polygon.transform (m_iter_trans * m_rec_iter.trans (), false);
+        m_prop_id = (m_rec_iter.shape_flags () & db::ShapeIterator::Properties) != 0 ? m_rec_iter->prop_id () : 0;
       }
     }
 
@@ -339,6 +345,12 @@ OriginalLayerRegion::nth (size_t) const
   throw tl::Exception (tl::to_string (tr ("Random access to polygons is available only for flat regions")));
 }
 
+db::properties_id_type
+OriginalLayerRegion::nth_prop_id (size_t) const
+{
+  throw tl::Exception (tl::to_string (tr ("Random access to polygons is available only for flat regions")));
+}
+
 bool
 OriginalLayerRegion::has_valid_polygons () const
 {
@@ -412,28 +424,7 @@ OriginalLayerRegion::ensure_merged_polygons_valid () const
   if (! m_merged_polygons_valid) {
 
     m_merged_polygons.clear ();
-
-    db::EdgeProcessor ep (report_progress (), progress_desc ());
-    ep.set_base_verbosity (base_verbosity ());
-
-    //  count edges and reserve memory
-    size_t n = 0;
-    for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
-      n += p->vertices ();
-    }
-    ep.reserve (n);
-
-    //  insert the polygons into the processor
-    n = 0;
-    for (RegionIterator p (begin ()); ! p.at_end (); ++p, ++n) {
-      ep.insert (*p, n);
-    }
-
-    //  and run the merge step
-    db::MergeOp op (0);
-    db::ShapeGenerator pc (m_merged_polygons);
-    db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence ());
-    ep.process (pg, op);
+    merge_polygons_to (m_merged_polygons, min_coherence (), 0);
 
     m_merged_polygons_valid = true;
 

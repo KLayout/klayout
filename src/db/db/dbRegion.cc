@@ -155,9 +155,13 @@ void Region::insert (const Sh &shape)
 }
 
 template DB_PUBLIC void Region::insert (const db::Box &);
+template DB_PUBLIC void Region::insert (const db::BoxWithProperties &);
 template DB_PUBLIC void Region::insert (const db::SimplePolygon &);
+template DB_PUBLIC void Region::insert (const db::SimplePolygonWithProperties &);
 template DB_PUBLIC void Region::insert (const db::Polygon &);
+template DB_PUBLIC void Region::insert (const db::PolygonWithProperties &);
 template DB_PUBLIC void Region::insert (const db::Path &);
+template DB_PUBLIC void Region::insert (const db::PathWithProperties &);
 
 void Region::insert (const db::Shape &shape)
 {

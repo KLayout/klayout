@@ -92,12 +92,13 @@ public:
   virtual RegionDelegate *add (const Region &other) const;
 
   virtual const db::Polygon *nth (size_t n) const;
+  virtual db::properties_id_type nth_prop_id (size_t) const;
   virtual bool has_valid_polygons () const;
   virtual bool has_valid_merged_polygons () const;
 
   virtual const db::RecursiveShapeIterator *iter () const;
 
-  void do_insert (const db::Polygon &polygon);
+  void do_insert (const db::Polygon &polygon, db::properties_id_type prop_id);
 
   void do_transform (const db::Trans &t)
   {

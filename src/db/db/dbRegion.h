@@ -169,9 +169,27 @@ public:
   }
 
   /**
+   *  @brief Constructor from a box with properties
+   */
+  explicit Region (const db::BoxWithProperties &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
    *  @brief Constructor from a polygon
    */
   explicit Region (const db::Polygon &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
+   *  @brief Constructor from a polygon with properties
+   */
+  explicit Region (const db::PolygonWithProperties &s)
     : mp_delegate (0)
   {
     insert (s);
@@ -187,9 +205,27 @@ public:
   }
 
   /**
+   *  @brief Constructor from a simple polygon with properties
+   */
+  explicit Region (const db::SimplePolygonWithProperties &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
    *  @brief Constructor from a path
    */
   explicit Region (const db::Path &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
+   *  @brief Constructor from a path with properties
+   */
+  explicit Region (const db::PathWithProperties &s)
     : mp_delegate (0)
   {
     insert (s);
@@ -1650,6 +1686,17 @@ public:
   const db::Polygon *nth (size_t n) const
   {
     return mp_delegate->nth (n);
+  }
+
+  /**
+   *  @brief Returns the nth polygon's property ID
+   *
+   *  This operation is available only for flat regions - i.e. such for which
+   *  "has_valid_polygons" is true.
+   */
+  db::properties_id_type nth_prop_id (size_t n) const
+  {
+    return mp_delegate->nth_prop_id (n);
   }
 
   /**

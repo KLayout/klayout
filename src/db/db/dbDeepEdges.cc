@@ -54,7 +54,7 @@ public:
   typedef db::Edge value_type;
 
   DeepEdgesIterator (const db::RecursiveShapeIterator &iter)
-    : m_iter (iter)
+    : m_iter (iter), m_prop_id (0)
   {
     set ();
   }
@@ -80,6 +80,11 @@ public:
   virtual const value_type *get () const
   {
     return &m_edge;
+  }
+
+  virtual db::properties_id_type prop_id () const
+  {
+    return m_prop_id;
   }
 
   virtual bool equals (const generic_shape_iterator_delegate_base<value_type> *other) const
@@ -110,12 +115,14 @@ private:
 
   db::RecursiveShapeIterator m_iter;
   mutable value_type m_edge;
+  mutable db::properties_id_type m_prop_id;
 
   void set () const
   {
     if (! m_iter.at_end ()) {
-      m_iter.shape ().edge (m_edge);
+      m_iter->edge (m_edge);
       m_edge.transform (m_iter.trans ());
+      m_prop_id = m_iter->prop_id ();
     }
   }
 };

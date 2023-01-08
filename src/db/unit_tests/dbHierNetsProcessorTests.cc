@@ -210,7 +210,7 @@ TEST(0_Develop)
   lmap_write [wvia1 = ly2.insert_layer (db::LayerProperties (16, 0))] = l2n.layer_by_name ("via1");
   lmap_write [wmetal2 = ly2.insert_layer (db::LayerProperties (17, 0))] = l2n.layer_by_name ("metal2");
 
-  l2n.build_all_nets (cm, ly2, lmap_write, "NET_", db::LayoutToNetlist::FakePropId, tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "SC_", 0 /*don't produce devices*/);
+  l2n.build_all_nets (cm, ly2, lmap_write, "NET_", db::LayoutToNetlist::NetIDOnly, tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "SC_", 0 /*don't produce devices*/);
 
   unsigned int out = ly2.insert_layer (db::LayerProperties (1000, 0));
 

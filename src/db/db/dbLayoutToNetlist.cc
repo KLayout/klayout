@@ -986,11 +986,7 @@ LayoutToNetlist::build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &
 db::properties_id_type
 LayoutToNetlist::make_netname_propid (db::Layout &ly, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, const db::Net &net) const
 {
-  if (net_prop_mode == FakePropId) {
-
-    return reinterpret_cast<db::properties_id_type> (&net);
-
-  } else if (net_prop_mode == NoProperties) {
+  if (net_prop_mode == NoProperties) {
 
     return 0;
 

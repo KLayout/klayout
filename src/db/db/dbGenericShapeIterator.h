@@ -46,6 +46,7 @@ public:
   virtual bool at_end () const = 0;
   virtual void increment () = 0;
   virtual const T *get () const = 0;
+  virtual db::properties_id_type prop_id () const = 0;
   virtual generic_shape_iterator_delegate_base<T> *clone () const = 0;
   virtual bool equals (const generic_shape_iterator_delegate_base<T> *other) const = 0;
 };
@@ -84,6 +85,11 @@ public:
   virtual const value_type *get () const
   {
     return m_iter.operator-> ();
+  }
+
+  virtual db::properties_id_type prop_id () const
+  {
+    return 0;
   }
 
   generic_shape_iterator_delegate_base<value_type> *clone () const
@@ -139,6 +145,11 @@ public:
   virtual const value_type *get () const
   {
     return m_iter.operator-> ();
+  }
+
+  virtual db::properties_id_type prop_id () const
+  {
+    return 0;
   }
 
   generic_shape_iterator_delegate_base<value_type> *clone () const
@@ -215,6 +226,11 @@ public:
     } else {
       return m_s2o.get (*m_iter);
     }
+  }
+
+  virtual db::properties_id_type prop_id () const
+  {
+    return m_iter->prop_id ();
   }
 
   generic_shape_iterator_delegate_base<T> *clone () const
@@ -319,6 +335,11 @@ public:
     return ! mp_delegate || mp_delegate->is_addressable ();
   }
 
+  db::properties_id_type prop_id () const
+  {
+    return mp_delegate ? mp_delegate->prop_id () : 0;
+  }
+
   reference operator* () const
   {
     return *mp_delegate->get ();
@@ -420,6 +441,11 @@ public:
     } else {
       return &m_heap.back ();
     }
+  }
+
+  db::properties_id_type prop_id () const
+  {
+    return m_iter.prop_id ();
   }
 
 private:

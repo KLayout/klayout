@@ -727,12 +727,6 @@ public:
      *  @brief Like NetNameOnly, but use a unique net ID (db::Net address actually) instead of name
      */
     NetIDOnly,
-
-    /**
-     *  @brief Use the net ID (db::Net address) directly as property ID
-     *  Caution: you need to know what you're doing if you use that mode.
-     */
-    FakePropId
   };
 
   /**

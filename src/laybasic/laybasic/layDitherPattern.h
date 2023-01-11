@@ -243,6 +243,7 @@ private:
 
   void set_pattern_impl (const uint32_t *pattern, unsigned int w, unsigned int h);
   void set_pattern_impl (const uint64_t *pattern, unsigned int w, unsigned int h);
+  void assign_no_lock (const DitherPatternInfo &other);
 };
 
 /**

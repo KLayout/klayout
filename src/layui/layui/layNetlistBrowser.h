@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -54,6 +54,7 @@ class NetlistBrowserConfigPage
 
 public:
   NetlistBrowserConfigPage (QWidget *parent);
+  ~NetlistBrowserConfigPage ();
 
   virtual void setup (lay::Dispatcher *root);
   virtual void commit (lay::Dispatcher *root);
@@ -72,6 +73,7 @@ class NetlistBrowserConfigPage2
 
 public:
   NetlistBrowserConfigPage2 (QWidget *parent);
+  ~NetlistBrowserConfigPage2 ();
 
   virtual void setup (lay::Dispatcher *root);
   virtual void commit (lay::Dispatcher *root);

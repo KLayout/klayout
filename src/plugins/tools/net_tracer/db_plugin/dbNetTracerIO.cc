@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -498,6 +498,7 @@ NetTracerTechnologyComponent::NetTracerTechnologyComponent ()
 //  NetTracerConnectivity implementation
 
 NetTracerConnectivity::NetTracerConnectivity ()
+  : m_is_fallback_default (false)
 {
   // .. nothing yet ..
 }
@@ -510,6 +511,7 @@ NetTracerConnectivity::NetTracerConnectivity (const NetTracerConnectivity &d)
 NetTracerConnectivity &NetTracerConnectivity::operator= (const NetTracerConnectivity &d)
 {
   if (this != &d) {
+    m_is_fallback_default = d.m_is_fallback_default;
     m_connections = d.m_connections;
     m_symbols = d.m_symbols;
     m_name = d.m_name;

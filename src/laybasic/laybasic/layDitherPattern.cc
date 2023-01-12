@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -462,6 +462,8 @@ static const char *dither_strings [] = {
 // ---------------------------------------------------------------------
 //  DitherPatternInfo implementation
 
+static tl::Mutex s_mutex;
+
 DitherPatternInfo::DitherPatternInfo ()
   : m_width (1), m_height (1), m_order_index (0)
 {
@@ -482,23 +484,31 @@ DitherPatternInfo &
 DitherPatternInfo::operator= (const DitherPatternInfo &d)
 {
   if (&d != this) {
-
-    m_order_index = d.m_order_index;
-    m_name = d.m_name;
-    m_width = d.m_width;
-    m_pattern_stride = d.m_pattern_stride;
-    m_height = d.m_height;
-
-    for (size_t i = 0; i < sizeof (m_pattern) / sizeof (m_pattern [0]); ++i) {
-      m_pattern [i] = &m_buffer [0] + (d.m_pattern [i] - d.m_buffer);
-    }
-    memcpy (m_buffer, d.m_buffer, sizeof (m_buffer));
+    tl::MutexLocker locker (& s_mutex);
+    assign_no_lock (d);
   }
 
   return *this;
 }
 
-bool 
+void
+DitherPatternInfo::assign_no_lock (const DitherPatternInfo &d)
+{
+  m_scaled_pattern.reset ();
+
+  m_order_index = d.m_order_index;
+  m_name = d.m_name;
+  m_width = d.m_width;
+  m_pattern_stride = d.m_pattern_stride;
+  m_height = d.m_height;
+
+  for (size_t i = 0; i < sizeof (m_pattern) / sizeof (m_pattern [0]); ++i) {
+    m_pattern [i] = &m_buffer [0] + (d.m_pattern [i] - d.m_buffer);
+  }
+  memcpy (m_buffer, d.m_buffer, sizeof (m_buffer));
+}
+
+bool
 DitherPatternInfo::same_bitmap (const DitherPatternInfo &d) const
 {
   if (m_width != d.m_width || m_height != d.m_height) {
@@ -597,15 +607,11 @@ DitherPatternInfo::get_bitmap (int width, int height, int frame_width) const
 
 #endif
 
-static tl::Mutex s_mutex;
-
 void 
 DitherPatternInfo::set_pattern (const uint32_t *pt, unsigned int w, unsigned int h) 
 {
-  {
-    tl::MutexLocker locker (& s_mutex);
-    m_scaled_pattern.reset (0);
-  }
+  tl::MutexLocker locker (& s_mutex);
+  m_scaled_pattern.reset (0);
 
   set_pattern_impl (pt, w, h);
 }
@@ -669,10 +675,8 @@ DitherPatternInfo::set_pattern_impl (const uint32_t *pt, unsigned int w, unsigne
 void
 DitherPatternInfo::set_pattern (const uint64_t *pt, unsigned int w, unsigned int h)
 {
-  {
-    tl::MutexLocker locker (& s_mutex);
-    m_scaled_pattern.reset (0);
-  }
+  tl::MutexLocker locker (& s_mutex);
+  m_scaled_pattern.reset (0);
 
   set_pattern_impl (pt, w, h);
 }
@@ -752,7 +756,7 @@ DitherPatternInfo::scaled (unsigned int n) const
   }
 
   DitherPatternInfo &sp = (*m_scaled_pattern) [n];
-  sp = *this;
+  sp.assign_no_lock (*this);
   sp.scale_pattern (n);
   return sp;
 }

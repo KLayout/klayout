@@ -1,7 +1,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -663,7 +663,12 @@ method_adaptor (int mid, PyObject *self, PyObject *args)
 
     //  method is not implemented
     if (! meth) {
+#if PY_MAJOR_VERSION < 3
+      PyErr_SetNone(PyExc_NotImplementedError);
+      return NULL;
+#else
       Py_RETURN_NOTIMPLEMENTED;
+#endif
     }
 
     //  handle special methods

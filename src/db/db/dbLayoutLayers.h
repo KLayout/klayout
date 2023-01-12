@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -187,7 +187,7 @@ public:
   /**
    *  @brief Gets the layer with the given properties or -1 if such a layer does not exist.
    */
-  int get_layer_maybe (const db::LayerProperties &props);
+  int get_layer_maybe (const db::LayerProperties &props) const;
 
   /**
    *  @brief Insert a new special layer with the given properties

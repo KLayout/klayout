@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -39,8 +39,8 @@ class BookmarkListModel
   : public QAbstractItemModel
 {
 public:
-  BookmarkListModel (const lay::BookmarkList *bookmarks)
-    : mp_bookmarks (bookmarks)
+  BookmarkListModel (QObject *parent, const lay::BookmarkList *bookmarks)
+    : QAbstractItemModel (parent), mp_bookmarks (bookmarks)
   {
     //  .. nothing yet ..
   }
@@ -103,7 +103,7 @@ BookmarksView::BookmarksView (LayoutViewBase *view, QWidget *parent, const char 
   mp_bookmarks = new QListView (this);
   layout->addWidget (mp_bookmarks);
 
-  mp_bookmarks->setModel (new BookmarkListModel (&view->bookmarks ()));
+  mp_bookmarks->setModel (new BookmarkListModel (this, &view->bookmarks ()));
   mp_bookmarks->setSelectionMode (QAbstractItemView::ExtendedSelection);
   mp_bookmarks->setContextMenuPolicy (Qt::CustomContextMenu);
 

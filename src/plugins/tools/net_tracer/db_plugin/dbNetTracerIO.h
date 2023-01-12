@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -369,6 +369,16 @@ public:
   NetTracerConnectivity (const NetTracerConnectivity &d);
   NetTracerConnectivity &operator= (const NetTracerConnectivity &d);
 
+  bool is_fallback_default () const
+  {
+    return m_is_fallback_default;
+  }
+
+  void set_fallback_default (bool f)
+  {
+    m_is_fallback_default = f;
+  }
+
   const std::string &name () const
   {
     return m_name;
@@ -491,6 +501,7 @@ private:
   std::vector<NetTracerConnectionInfo> m_connections;
   std::vector<NetTracerSymbolInfo> m_symbols;
   std::string m_name, m_description;
+  bool m_is_fallback_default;
 };
 
 class DB_PLUGIN_PUBLIC NetTracerTechnologyComponent

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -98,15 +98,23 @@ namespace lay
 //  LayoutViewWidget implementation
 
 LayoutViewWidget::LayoutViewWidget (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent, unsigned int options)
-  : QFrame (parent)
+  : QFrame (parent), mp_view (0)
 {
-  mp_view = new LayoutView (mgr, editable, plugin_parent, this, options);
+  //  NOTE: construction the LayoutView may trigger events (script code executed etc.) which must
+  //  not meet an invalid mp_view pointer (e.g. in eventFilter). Hence, mp_view is 0 first, and set only
+  //  after the LayoutView is successfully constructed.
+  std::unique_ptr<LayoutView> view (new LayoutView (mgr, editable, plugin_parent, this, options));
+  mp_view = view.release ();
 }
 
 LayoutViewWidget::LayoutViewWidget (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent, unsigned int options)
-  : QFrame (parent)
+  : QFrame (parent), mp_view (0)
 {
-  mp_view = new LayoutView (source, mgr, editable, plugin_parent, this, options);
+  //  NOTE: construction the LayoutView may trigger events (script code executed etc.) which must
+  //  not meet an invalid mp_view pointer (e.g. in eventFilter). Hence, mp_view is 0 first, and set only
+  //  after the LayoutView is successfully constructed.
+  std::unique_ptr<LayoutView> view (new LayoutView (source, mgr, editable, plugin_parent, this, options));
+  mp_view = view.release ();
 }
 
 LayoutViewWidget::~LayoutViewWidget ()
@@ -275,7 +283,7 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
 }
 
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
-  : LayoutViewBase (this, source, manager, editable, plugin_parent, options),
+  : LayoutViewBase (this, manager, editable, plugin_parent, options),
     mp_widget (0),
     dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
 {
@@ -283,6 +291,8 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
   tl::DeferredMethodScheduler::instance ();
 
   init_ui ();
+
+  copy_from (source);
 
   bookmarks (source->bookmarks ());
   LayoutView::set_active_cellview_index (source->active_cellview_index ());
@@ -300,7 +310,7 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
 }
 
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, LayoutViewWidget *widget, unsigned int options)
-  : LayoutViewBase (this, source, manager, editable, plugin_parent, options),
+  : LayoutViewBase (this, manager, editable, plugin_parent, options),
     mp_widget (widget),
     dm_setup_editor_option_pages (this, &LayoutView::do_setup_editor_options_pages)
 {
@@ -308,6 +318,8 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
   tl::DeferredMethodScheduler::instance ();
 
   init_ui ();
+
+  copy_from (source);
 
   bookmarks (source->bookmarks ());
   LayoutView::set_active_cellview_index (source->active_cellview_index ());

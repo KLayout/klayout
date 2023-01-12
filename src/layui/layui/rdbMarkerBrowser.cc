@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -138,6 +138,12 @@ MarkerBrowserConfigPage::MarkerBrowserConfigPage (QWidget *parent)
   connect (mp_ui->cbx_window, SIGNAL (currentIndexChanged (int)), this, SLOT (window_changed (int)));
 }
 
+MarkerBrowserConfigPage::~MarkerBrowserConfigPage ()
+{
+  delete mp_ui;
+  mp_ui = 0;
+}
+
 void 
 MarkerBrowserConfigPage::setup (lay::Dispatcher *root)
 {
@@ -196,7 +202,13 @@ MarkerBrowserConfigPage2::MarkerBrowserConfigPage2 (QWidget *parent)
   mp_ui->setupUi (this);
 }
 
-void 
+MarkerBrowserConfigPage2::~MarkerBrowserConfigPage2 ()
+{
+  delete mp_ui;
+  mp_ui = 0;
+}
+
+void
 MarkerBrowserConfigPage2::setup (lay::Dispatcher *root)
 {
   //  marker color

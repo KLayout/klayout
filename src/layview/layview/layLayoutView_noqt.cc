@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -35,8 +35,9 @@ LayoutView::LayoutView (db::Manager *mgr, bool editable, lay::Plugin *plugin_par
 }
 
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options)
-  : LayoutViewBase (this, source, mgr, editable, plugin_parent, options)
+  : LayoutViewBase (this, mgr, editable, plugin_parent, options)
 {
+  copy_from (source);
   config_setup ();
   finish ();
 }

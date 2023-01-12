@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -75,6 +75,8 @@ static const char *style_strings [] = {
 // ---------------------------------------------------------------------
 //  LineStyleInfo implementation
 
+static tl::Mutex s_mutex;
+
 LineStyleInfo::LineStyleInfo ()
   : m_width (0), m_order_index (0)
 {
@@ -92,19 +94,26 @@ LineStyleInfo &
 LineStyleInfo::operator= (const LineStyleInfo &d)
 {
   if (&d != this) {
-
-    m_order_index = d.m_order_index;
-    m_name = d.m_name;
-    m_width = d.m_width;
-    m_pattern_stride = d.m_pattern_stride;
-    
-    memcpy (m_pattern, d.m_pattern, sizeof (m_pattern));
-
+    tl::MutexLocker locker (& s_mutex);
+    assign_no_lock (d);
   }
   return *this;
 }
 
-bool 
+void
+LineStyleInfo::assign_no_lock (const LineStyleInfo &d)
+{
+  m_scaled_pattern.reset (0);
+
+  m_order_index = d.m_order_index;
+  m_name = d.m_name;
+  m_width = d.m_width;
+  m_pattern_stride = d.m_pattern_stride;
+
+  memcpy (m_pattern, d.m_pattern, sizeof (m_pattern));
+}
+
+bool
 LineStyleInfo::same_bits (const LineStyleInfo &d) const
 {
   if (m_width != d.m_width) {
@@ -201,15 +210,11 @@ LineStyleInfo::get_bitmap (int width, int height) const
 }
 #endif
 
-static tl::Mutex s_mutex;
-
 void
 LineStyleInfo::set_pattern (uint32_t pt, unsigned int w) 
 {
-  {
-    tl::MutexLocker locker (& s_mutex);
-    m_scaled_pattern.reset (0);
-  }
+  tl::MutexLocker locker (& s_mutex);
+  m_scaled_pattern.reset (0);
 
   memset (m_pattern, 0, sizeof (m_pattern));
 
@@ -271,7 +276,7 @@ LineStyleInfo::scaled (unsigned int n) const
   }
 
   LineStyleInfo &sp = (*m_scaled_pattern) [n];
-  sp = *this;
+  sp.assign_no_lock (*this);
   sp.scale_pattern (n);
   return sp;
 }

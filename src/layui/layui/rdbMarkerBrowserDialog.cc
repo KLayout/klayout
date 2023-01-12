@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -121,6 +121,9 @@ MarkerBrowserDialog::MarkerBrowserDialog (lay::Dispatcher *root, lay::LayoutView
 MarkerBrowserDialog::~MarkerBrowserDialog ()
 {
   tl::Object::detach_from_all_events ();
+
+  delete mp_ui;
+  mp_ui = 0;
 }
 
 void

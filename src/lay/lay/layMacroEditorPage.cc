@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -226,8 +226,8 @@ MacroEditorHighlighters::scheme_for (lym::Macro::Interpreter lang, const std::st
 // ----------------------------------------------------------------------------------------------
 //  MacroEditorExecutionModel implementation
 
-MacroEditorExecutionModel::MacroEditorExecutionModel (QObject * /*parent*/)
-  : m_current_line (-1), m_run_mode (false), m_interpreter (lym::Macro::None)
+MacroEditorExecutionModel::MacroEditorExecutionModel (QObject *parent)
+  : QObject (parent), m_current_line (-1), m_run_mode (false), m_interpreter (lym::Macro::None)
 {
   // .. nothing yet ..
 }

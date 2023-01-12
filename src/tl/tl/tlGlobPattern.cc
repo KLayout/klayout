@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -717,6 +717,12 @@ GlobPattern::GlobPattern (const GlobPattern &other)
   m_needs_compile = true;
 
   operator= (other);
+}
+
+GlobPattern::~GlobPattern ()
+{
+  delete mp_op;
+  mp_op = 0;
 }
 
 GlobPattern &

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "layuiCommon.h"
 
 #include "tlObject.h"
+#include "tlDeferredExecution.h"
 
 #include <QPushButton>
 #include <QComboBox>
@@ -251,9 +252,11 @@ protected slots:
 
 private:
   LayerSelectionComboBoxPrivateData *mp_private;
+  tl::DeferredMethod<LayerSelectionComboBox> dm_update_layer_list;
 
   void on_layer_list_changed (int);
   void update_layer_list ();
+  void do_update_layer_list ();
 };
 
 /**

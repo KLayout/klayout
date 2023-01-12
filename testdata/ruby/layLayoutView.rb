@@ -1,7 +1,7 @@
 # encoding: UTF-8
 
 # KLayout Layout Viewer
-# Copyright (C) 2006-2022 Matthias Koefferlein
+# Copyright (C) 2006-2023 Matthias Koefferlein
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -495,6 +495,43 @@ class LAYLayoutView_TestClass < TestBase
       assert_equal(lv.mode_name, "select")
 
     end
+
+  end
+
+  class DummyPlugin < RBA::Plugin
+    def initialize(manager, view)
+      self.manager = manager
+      self.view = view
+    end
+  end
+
+  class DummyPluginFactory < RBA::PluginFactory
+    def initialize()
+      register(1000, "dummy_plugin", "Dummy Plugin")
+    end
+    def create_plugin(manager, unused, view)
+      DummyPlugin::new(manager, view)
+    end
+  end
+
+  # issue-1242
+  def test_6
+
+    if !RBA.constants.member?(:MainWindow)
+      return
+    end
+
+    # Create a new layout
+    main_window = RBA::MainWindow.instance()
+    main_window.close_all
+    main_window.create_layout(2)
+
+    # Register plugin -> crashes in issue-1242
+    dpi = DummyPluginFactory::new
+
+    main_window.close_all
+
+    dpi._destroy
 
   end
 

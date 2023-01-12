@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -243,6 +243,7 @@ private:
 
   void set_pattern_impl (const uint32_t *pattern, unsigned int w, unsigned int h);
   void set_pattern_impl (const uint64_t *pattern, unsigned int w, unsigned int h);
+  void assign_no_lock (const DitherPatternInfo &other);
 };
 
 /**

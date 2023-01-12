@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -52,6 +52,41 @@ static void def_symbol (db::NetTracerConnectivity *tech, const std::string &name
   tech->add_symbol (db::NetTracerSymbolInfo (db::LayerProperties (name), expr));
 }
 
+static std::string get_layer_a (const db::NetTracerConnectionInfo *info)
+{
+  return info->layer_a ().to_string ();
+}
+
+static std::string get_via_layer (const db::NetTracerConnectionInfo *info)
+{
+  return info->via_layer ().to_string ();
+}
+
+static std::string get_layer_b (const db::NetTracerConnectionInfo *info)
+{
+  return info->layer_b ().to_string ();
+}
+
+gsi::Class<db::NetTracerConnectionInfo> decl_NetTracerConnectionInfo ("db", "NetTracerConnectionInfo",
+  gsi::method_ext ("layer_a", &get_layer_a, "@brief Gets the expression for the A layer") +
+  gsi::method_ext ("via_layer", &get_via_layer, "@brief Gets the expression for the Via layer") +
+  gsi::method_ext ("layer_b", &get_layer_b, "@brief Gets the expression for the B layer"),
+  "@brief Represents a single connection info line for the net tracer technology definition\n"
+  "This class has been introduced in version 0.28.3."
+);
+
+static std::string get_symbol (const db::NetTracerSymbolInfo *info)
+{
+  return info->symbol ().to_string ();
+}
+
+gsi::Class<db::NetTracerSymbolInfo> decl_NetTracerSymbolInfo ("db", "NetTracerSymbolInfo",
+  gsi::method_ext ("symbol", &get_symbol, "@brief Gets the symbol") +
+  gsi::method ("expression", &db::NetTracerSymbolInfo::expression, "@brief Gets the expression"),
+  "@brief Represents a single symbol info line for the net tracer technology definition\n"
+  "This class has been introduced in version 0.28.3."
+);
+
 gsi::Class<db::NetTracerConnectivity> decl_NetTracerConnectivity ("db", "NetTracerConnectivity",
   gsi::method ("name", &db::NetTracerConnectivity::name,
     "@brief Gets the name of the connectivty definition\n"
@@ -79,6 +114,14 @@ gsi::Class<db::NetTracerConnectivity> decl_NetTracerConnectivity ("db", "NetTrac
     "@brief Defines a symbol for use in the material expressions.\n"
     "Defines a sub-expression to be used in further symbols or material expressions. "
     "For the detailed notation of the expression see the description of the net tracer feature."
+  ) +
+  gsi::iterator ("each_connection", static_cast<db::NetTracerConnectivity::const_iterator (db::NetTracerConnectivity::*) () const> (&db::NetTracerConnectivity::begin), static_cast<db::NetTracerConnectivity::const_iterator (db::NetTracerConnectivity::*) () const> (&db::NetTracerConnectivity::end),
+    "@brief Gets the connection information.\n"
+    "This iterator method has been introduced in version 0.28.3.\n"
+  ) +
+  gsi::iterator ("each_symbol", static_cast<db::NetTracerConnectivity::const_symbol_iterator (db::NetTracerConnectivity::*) () const> (&db::NetTracerConnectivity::begin_symbols), static_cast<db::NetTracerConnectivity::const_symbol_iterator (db::NetTracerConnectivity::*) () const> (&db::NetTracerConnectivity::end_symbols),
+    "@brief Gets the symbol information.\n"
+    "This iterator method has been introduced in version 0.28.3.\n"
   ),
   "@brief A connectivity description for the net tracer\n"
   "\n"
@@ -97,6 +140,18 @@ gsi::Class<db::NetTracerConnectivity> decl_NetTracerConnectivity ("db", "NetTrac
   "\n"
   "This class has been introduced in version 0.28 and replaces the 'NetTracerTechnology' class which "
   "has been generalized.\n"
+);
+
+DB_PUBLIC gsi::Class<db::TechnologyComponent> &decl_dbTechnologyComponent ();
+
+gsi::Class<db::NetTracerTechnologyComponent> decl_NetTracerTechnologyComponent (decl_dbTechnologyComponent (), "db", "NetTracerTechnologyComponent",
+  gsi::iterator ("each", static_cast<db::NetTracerTechnologyComponent::const_iterator (db::NetTracerTechnologyComponent::*) () const> (&db::NetTracerTechnologyComponent::begin), static_cast<db::NetTracerTechnologyComponent::const_iterator (db::NetTracerTechnologyComponent::*) () const> (&db::NetTracerTechnologyComponent::end),
+    "@brief Gets the connectivity definitions from the net tracer technology component.\n"
+  ),
+  "@brief Represents the technology information for the net tracer.\n"
+  "This class has been redefined in version 0.28 and re-introduced in version 0.28.3. Since version 0.28, "
+  "multiple stacks are supported and the individual stack definition is provided through a list of stacks. Use \\each "
+  "to iterate the stacks."
 );
 
 static void trace1 (db::NetTracer *net_tracer, const db::NetTracerConnectivity &tech, const db::Layout &layout, const db::Cell &cell, const db::Point &start_point, unsigned int start_layer)

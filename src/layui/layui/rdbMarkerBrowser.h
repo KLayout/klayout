@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -51,6 +51,7 @@ class MarkerBrowserConfigPage
 
 public:
   MarkerBrowserConfigPage (QWidget *parent);
+  ~MarkerBrowserConfigPage ();
 
   virtual void setup (lay::Dispatcher *root);
   virtual void commit (lay::Dispatcher *root);
@@ -69,6 +70,7 @@ class MarkerBrowserConfigPage2
 
 public:
   MarkerBrowserConfigPage2 (QWidget *parent);
+  ~MarkerBrowserConfigPage2 ();
 
   virtual void setup (lay::Dispatcher *root);
   virtual void commit (lay::Dispatcher *root);

@@ -2,7 +2,7 @@
 /*
 
   KLayout Layout Viewer
-  Copyright (C) 2006-2022 Matthias Koefferlein
+  Copyright (C) 2006-2023 Matthias Koefferlein
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -326,7 +326,7 @@ struct LayerSelectionComboBoxPrivateData
 };
 
 LayerSelectionComboBox::LayerSelectionComboBox (QWidget *parent)
-  : QComboBox (parent)
+  : QComboBox (parent), dm_update_layer_list (this, &LayerSelectionComboBox::do_update_layer_list)
 {
   mp_private = new LayerSelectionComboBoxPrivateData ();
   mp_private->no_layer_available = false;
@@ -471,6 +471,12 @@ LayerSelectionComboBox::set_layout (const db::Layout *layout)
 
 void
 LayerSelectionComboBox::update_layer_list ()
+{
+  dm_update_layer_list ();
+}
+
+void
+LayerSelectionComboBox::do_update_layer_list ()
 {
   int i = currentIndex ();
   db::LayerProperties props = mp_private->last_props;

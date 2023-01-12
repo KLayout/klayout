@@ -291,6 +291,8 @@ public:
   gsi::Callback f_tracking_position;
 };
 
+static std::map <std::string, PluginFactoryBase *> s_factories;
+
 class PluginFactoryBase
   : public lay::PluginDeclaration
 {
@@ -304,6 +306,13 @@ public:
 
   ~PluginFactoryBase ()
   {
+    for (auto f = s_factories.begin (); f != s_factories.end (); ++f) {
+      if (f->second == this) {
+        s_factories.erase (f);
+        break;
+      }
+    }
+
     delete mp_registration;
     mp_registration = 0;
   }
@@ -319,7 +328,6 @@ public:
     keep ();
 
     //  remove an existing factory with the same name
-    static std::map <std::string, PluginFactoryBase *> s_factories;
     std::map <std::string, PluginFactoryBase *>::iterator f = s_factories.find (name);
     if (f != s_factories.end ()) {
       delete f->second;

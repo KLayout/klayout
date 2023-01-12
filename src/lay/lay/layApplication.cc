@@ -1480,6 +1480,19 @@ GuiApplication::initialize ()
 bool
 GuiApplication::notify (QObject *receiver, QEvent *e)
 {
+  if (dynamic_cast<QPaintEvent *> (e)) {
+    //  NOTE: we don't want recursive paint events - the painters are not reentrant.
+    //  Hence we disable process_events_impl (specifically for progress reporters).
+    lay::BusySection busy;
+    return do_notify (receiver, e);
+  } else {
+    return do_notify (receiver, e);
+  }
+}
+
+bool
+GuiApplication::do_notify (QObject *receiver, QEvent *e)
+{
   bool in_notify = (m_in_notify > 0);
 
   bool ret = true;

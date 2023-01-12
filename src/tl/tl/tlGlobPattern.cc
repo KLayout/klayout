@@ -719,6 +719,12 @@ GlobPattern::GlobPattern (const GlobPattern &other)
   operator= (other);
 }
 
+GlobPattern::~GlobPattern ()
+{
+  delete mp_op;
+  mp_op = 0;
+}
+
 GlobPattern &
 GlobPattern::operator= (const GlobPattern &other)
 {

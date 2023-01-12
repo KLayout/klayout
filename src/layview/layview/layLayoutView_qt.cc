@@ -98,15 +98,23 @@ namespace lay
 //  LayoutViewWidget implementation
 
 LayoutViewWidget::LayoutViewWidget (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent, unsigned int options)
-  : QFrame (parent)
+  : QFrame (parent), mp_view (0)
 {
-  mp_view = new LayoutView (mgr, editable, plugin_parent, this, options);
+  //  NOTE: construction the LayoutView may trigger events (script code executed etc.) which must
+  //  not meet an invalid mp_view pointer (e.g. in eventFilter). Hence, mp_view is 0 first, and set only
+  //  after the LayoutView is successfully constructed.
+  std::unique_ptr<LayoutView> view (new LayoutView (mgr, editable, plugin_parent, this, options));
+  mp_view = view.release ();
 }
 
 LayoutViewWidget::LayoutViewWidget (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent, unsigned int options)
-  : QFrame (parent)
+  : QFrame (parent), mp_view (0)
 {
-  mp_view = new LayoutView (source, mgr, editable, plugin_parent, this, options);
+  //  NOTE: construction the LayoutView may trigger events (script code executed etc.) which must
+  //  not meet an invalid mp_view pointer (e.g. in eventFilter). Hence, mp_view is 0 first, and set only
+  //  after the LayoutView is successfully constructed.
+  std::unique_ptr<LayoutView> view (new LayoutView (source, mgr, editable, plugin_parent, this, options));
+  mp_view = view.release ();
 }
 
 LayoutViewWidget::~LayoutViewWidget ()

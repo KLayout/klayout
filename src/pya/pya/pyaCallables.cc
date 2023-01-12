@@ -663,7 +663,12 @@ method_adaptor (int mid, PyObject *self, PyObject *args)
 
     //  method is not implemented
     if (! meth) {
+#if PY_MAJOR_VERSION < 3
+      PyErr_SetNone(PyExc_NotImplementedError);
+      return NULL;
+#else
       Py_RETURN_NOTIMPLEMENTED;
+#endif
     }
 
     //  handle special methods

@@ -3077,6 +3077,11 @@ class BasicTest(unittest.TestCase):
   # fallback to __rmul__ for not implemented __mul__
 
   def test_90(self):
+
+    # skip this test for Python 2
+    if sys.version_info < (3, 0):
+      return
+
     class RMulObject:
       def __init__(self, factor):
         self.factor = factor

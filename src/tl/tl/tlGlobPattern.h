@@ -59,6 +59,11 @@ public:
   GlobPattern (const GlobPattern &other);
 
   /**
+   *  @brief Destructor
+   */
+  ~GlobPattern ();
+
+  /**
    *  @brief Assignment
    */
   GlobPattern &operator= (const GlobPattern &other);

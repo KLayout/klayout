@@ -121,6 +121,9 @@ MarkerBrowserDialog::MarkerBrowserDialog (lay::Dispatcher *root, lay::LayoutView
 MarkerBrowserDialog::~MarkerBrowserDialog ()
 {
   tl::Object::detach_from_all_events ();
+
+  delete mp_ui;
+  mp_ui = 0;
 }
 
 void

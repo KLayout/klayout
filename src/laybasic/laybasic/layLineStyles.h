@@ -216,6 +216,8 @@ private:
   unsigned int m_order_index;
   std::string m_name;
   mutable std::unique_ptr<std::map<unsigned int, LineStyleInfo> > m_scaled_pattern;
+
+  void assign_no_lock (const LineStyleInfo &other);
 };
 
 /**

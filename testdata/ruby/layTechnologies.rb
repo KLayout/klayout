@@ -23,6 +23,14 @@ end
 
 load("test_prologue.rb")
 
+def nt_tech_to_s(t)
+  t.each.collect do |s|
+    ([ "Stack [" + s.name + "]:" ] + 
+      s.each_connection.collect { |c| " conn: " + c.layer_a + "," + c.via_layer + "," + c.layer_b } + 
+      s.each_symbol.collect { |c| " symbol: " + c.symbol + "=" + c.expression }).join("\n")
+  end.join("\n") + "\n"
+end
+
 class LAYTechnologies_TestClass < TestBase
 
   def test_1
@@ -117,7 +125,88 @@ END
 
     assert_equal(tech.component_names.size > 0, true)
     assert_equal(tech.component_names.find("connectivity") != nil, true)
-    assert_equal(tech.component("connectivity").class.to_s, "RBA::TechnologyComponent")
+    assert_equal(tech.component("connectivity").class.to_s, "RBA::NetTracerTechnologyComponent")
+
+  end
+
+  # issue 1245
+  def test_3
+
+    # empty connectivity
+    tech = RBA::Technology::technology_from_xml(<<END)
+<technology>
+  <name>X</name>
+  <connectivity/>
+</technology>
+END
+
+    nt_tech = tech.component("connectivity")
+
+    assert_equal(nt_tech_to_s(nt_tech), "\n")
+
+    # 0.27 to 0.28 migration
+    tech = RBA::Technology::technology_from_xml(<<END)
+<technology>
+  <name>X</name>
+  <connectivity>
+    <connection>11,2,3</connection>
+    <connection>14,5,6</connection>
+    <symbols>AA=17</symbols>
+    <symbols>BB=42</symbols>
+  </connectivity>
+</technology>
+END
+
+    nt_tech = tech.component("connectivity")
+
+    assert_equal(nt_tech_to_s(nt_tech), <<END)
+Stack []:
+ conn: 11,2,3
+ conn: 14,5,6
+ symbol: AA=17
+ symbol: BB=42
+END
+
+    # 0.28 way
+    tech = RBA::Technology::technology_from_xml(<<END)
+<technology>
+  <name>X</name>
+  <connectivity>
+    <stack>
+      <name>ST1</name>
+      <connection>1,2,3</connection>
+      <connection>4,5,6</connection>
+      <symbols>A=17</symbols>
+      <symbols>B=42</symbols>
+    </stack>
+    <stack>
+      <name>ST2</name>
+      <connection>1,2,3</connection>
+      <connection>4,5,7</connection>
+      <symbols>A=1</symbols>
+    </stack>
+    <!-- ignored: -->
+    <connection>1,2,3</connection>
+    <connection>4,5,6</connection>
+    <symbols>AA=17</symbols>
+    <symbols>BB=42</symbols>
+  </connectivity>
+</technology>
+END
+
+    nt_tech = tech.component("connectivity")
+
+    assert_equal(nt_tech_to_s(nt_tech), <<END)
+Stack [ST1]:
+ conn: 1,2,3
+ conn: 4,5,6
+ symbol: A=17
+ symbol: B=42
+Stack [ST2]:
+ conn: 1,2,3
+ conn: 4,5,7
+ symbol: A=1
+END
 
   end
 

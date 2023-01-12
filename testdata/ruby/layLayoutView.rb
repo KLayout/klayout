@@ -517,6 +517,10 @@ class LAYLayoutView_TestClass < TestBase
   # issue-1242
   def test_6
 
+    if !RBA.constants.member?(:MainWindow)
+      return
+    end
+
     # Create a new layout
     main_window = RBA::MainWindow.instance()
     main_window.close_all

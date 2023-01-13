@@ -1,3 +1,15 @@
+0.28.3           (2023-01-12):
+* Bugfix: %GITHUB%/issues/1247 Layer stipples not updated after editing custom stipples with high-DPI displays
+* Bugfix: %GITHUB%/issues/1245 Connectivity not preserved when loading/saving technology
+* Bugfix: %GITHUB%/issues/1242 KLayout 0.28.2 crashes when registering a plugin if a layout exists
+* Bugfix: %GITHUB%/issues/1240 Layer is not activated from layer properties file on first creation
+* Bugfix: %GITHUB%/issues/1238 Macro IDE: breakpoints not effective on Windows
+* Bugfix: %GITHUB%/issues/1234 "Clone view": layer list is empty
+* Enhancement: %GITHUB%/issues/1228 Add option to have Show parameter names on by default
+* Enhancement: Improved performance of layer list with many layers
+* Bugfix: Restored ability to build with Python 2.7
+* Enhancement: Compatibility with Qt 6.4.1
+ 
 0.28.2           (2022-12-22):
 * Bugfix: %GITHUB%/issues/1230 LVS browser crashes
  

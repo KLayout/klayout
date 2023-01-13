@@ -38,16 +38,16 @@ def GenerateUsage(platform):
         myRuby    = "hb31"
         myPython  = "hb39"
         moduleset = ('qt5Brew', 'HB31', 'HB39')
-    else: # with Xcode [ .. 12.4]; 'sys' for Python has been abolished in 0.28
+    else: # with Xcode [ .. 12.4]; 'sys' for Python has been restored in 0.28.3
         myQt56    = "qt5macports"
-        myRuby    = "mp31"
-        myPython  = "mp39"
-        moduleset = ('qt5MP', 'MP31', 'MP39')
+        myRuby    = "sys"
+        myPython  = "sys"
+        moduleset = ('qt5MP', 'Sys', 'Sys')
 
     usage  = "\n"
     usage += "---------------------------------------------------------------------------------------------------------\n"
     usage += "<< Usage of 'build4mac.py' >>\n"
-    usage += "       for building KLayout 0.28 or later on different Apple macOS / Mac OSX platforms.\n"
+    usage += "       for building KLayout 0.28.3 or later on different Apple macOS / Mac OSX platforms.\n"
     usage += "\n"
     usage += "$ [python] ./build4mac.py\n"
     usage += "   option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)| default value\n"
@@ -66,9 +66,10 @@ def GenerateUsage(platform):
     usage += "                        :   MP31: use Ruby 3.1 from MacPorts                             | \n"
     usage += "                        :   HB31: use Ruby 3.1 from Homebrew                             | \n"
     usage += "                        :   Ana3: use Ruby 3.1 from Anaconda3                            | \n"
-    usage += "   [-p|--python <type>] : case-insensitive type=['nil',  'MP38', 'HB38', 'Ana3',         | %s \n" % myPython
+    usage += "   [-p|--python <type>] : case-insensitive type=['nil',  'Sys', 'MP38', 'HB38', 'Ana3',  | %s \n" % myPython
     usage += "                        :                        'MP39', HB39', 'HBAuto']                | \n"
     usage += "                        :    nil: don't bind Python                                      | \n"
+    usage += "                        :    Sys: use OS-bundled Python 2.7 up to Catalina               | \n"
     usage += "                        :   MP38: use Python 3.8 from MacPorts                           | \n"
     usage += "                        :   HB38: use Python 3.8 from Homebrew                           | \n"
     usage += "                        :   Ana3: use Python 3.9 from Anaconda3                          | \n"
@@ -393,7 +394,7 @@ def Parse_CLI_Args(config):
 
     p.add_option( '-p', '--python',
                     dest='type_python',
-                    help="Python type=['nil', 'MP38', 'HB38', 'Ana3', 'MP39', 'HB39', 'HBAuto']" )
+                    help="Python type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3', 'MP39', 'HB39', 'HBAuto']" )
 
     p.add_option( '-P', '--buildPymod',
                     action='store_true',
@@ -467,8 +468,8 @@ def Parse_CLI_Args(config):
                         checkusage     = False )
     else: # with Xcode [ .. 12.4]
         p.set_defaults( type_qt        = "qt5macports",
-                        type_ruby      = "mp31",
-                        type_python    = "mp39",
+                        type_ruby      = "sys",
+                        type_python    = "sys",
                         build_pymod    = False,
                         no_qt_binding  = False,
                         no_qt_uitools  = False,
@@ -570,7 +571,7 @@ def Parse_CLI_Args(config):
     # (C) Determine the Python type
     candidates           = dict()
     candidates['NIL']    = 'nil'
-    # candidates['SYS']  = 'Sys'   # has been abolished in 0.28
+    candidates['SYS']    = 'Sys'   # has been restored in 0.28.3
     candidates['MP38']   = 'MP38'
     candidates['HB38']   = 'HB38'
     candidates['ANA3']   = 'Ana3'
@@ -587,10 +588,8 @@ def Parse_CLI_Args(config):
         if choicePython ==  "nil":
             ModulePython = 'nil'
         elif choicePython == "Sys":
-            if Platform in [ "Ventura", "Monterey" ]:
+            if Platform in [ "Ventura", "Monterey", "BigSur" ]:
                 raise Exception( "! Cannot choose the 'sys' Python on <%s>" % Platform )
-            elif Platform == "BigSur":
-                ModulePython = 'PythonBigSur'
             elif Platform == "Catalina":
                 ModulePython = 'PythonCatalina'
             elif Platform == "Mojave":

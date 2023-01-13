@@ -77,7 +77,7 @@ def SetGlobals():
     Usage  = "\n"
     Usage += "---------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'makeDMG4mac.py' >>\n"
-    Usage += "       for making a DMG file of KLayout 0.28 or later on different Apple macOS / Mac OSX platforms.\n"
+    Usage += "       for making a DMG file of KLayout 0.28.3 or later on different Apple macOS / Mac OSX platforms.\n"
     Usage += "\n"
     Usage += "$ [python] ./makeDMG4mac.py\n"
     Usage += "   option & argument    : descriptions                                               | default value\n"
@@ -255,8 +255,9 @@ def CheckPkgDirectory():
         print( "" )
         return -1
 
-    #-----------------------------------------------------------------------------
+    #-----------------------------------------------------------------------------------------------
     # [2] Identify (Qt, Ruby, Python) from PkgDir
+    #     * ST-qt5MP.pkg.macos-Catalina-release-RsysPsys     # 'ST' has been restored in 0.28.3
     #     * LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
     #     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb31Phb38
     #     * LW-qt5MP.pkg.macos-Catalina-release-Rmp31Pmp38
@@ -267,8 +268,8 @@ def CheckPkgDirectory():
     #     * LW-qt6Brew.pkg.macos-Catalina-release-Rhb31Phb38
     #     * LW-qt6MP.pkg.macos-Catalina-release-Rmp31Pmp38
     #     * HW-qt6Brew.pkg.macos-Catalina-release-RsysPhb38
-    #-----------------------------------------------------------------------------
-    patQRP = u'(LW|HW|EX)([-])([qt5|qt6][0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-]release[-])([0-9A-Za-z]+)'
+    #-----------------------------------------------------------------------------------------------
+    patQRP = u'(ST|LW|HW|EX)([-])([qt5|qt6][0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-]release[-])([0-9A-Za-z]+)'
     regQRP = re.compile(patQRP)
     if not regQRP.match(PkgDir):
         print( "! Cannot identify (Qt, Ruby, Python) from the package directory name" )

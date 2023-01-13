@@ -84,7 +84,7 @@ Qt6Brew = { 'qmake' : '%s/opt/qt@6/bin/qmake' % DefaultHomebrewRoot,
 #-----------------------------------------------------
 RubyNil  = [ 'nil' ]
 RubySys  = [ 'RubyElCapitan', 'RubySierra', 'RubyHighSierra', 'RubyMojave' ]
-RubySys += [ 'RubyCatalina', 'RubyBigSur', 'RubyMonterey' ]
+RubySys += [ 'RubyCatalina', 'RubyBigSur', 'RubyMonterey', 'RubyVentura' ]
 RubyExt  = [ 'Ruby31MacPorts', 'Ruby31Brew', 'RubyAnaconda3' ]
 Rubies   = RubyNil + RubySys + RubyExt
 
@@ -174,6 +174,16 @@ RubyMonterey    = { 'exe':  '/System/Library/Frameworks/Ruby.framework/Versions/
                     'lib':  '%s/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/libruby.tbd' % MontereySDK
                   }
 
+# Bundled with Ventura (14.x)
+# Refer to the "Catalina" section above
+# [Key Type Name] = 'Sys'
+VenturaSDK      = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
+RubyVentura     = { 'exe':  '/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby',
+                    'inc':  '%s/System/Library/Frameworks/Ruby.framework/Headers' % VenturaSDK,
+                    'inc2': '%s/System/Library/Frameworks/Ruby.framework/Headers/ruby' % VenturaSDK,
+                    'lib':  '%s/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/libruby.tbd' % VenturaSDK
+                  }
+
 # Ruby 3.1 from MacPorts (https://www.macports.org/) *+*+*+ EXPERIMENTAL *+*+*+
 #  install with 'sudo port install ruby31'
 # [Key Type Name] = 'MP31'
@@ -210,6 +220,7 @@ RubyDictionary  = { 'nil'           : None,
                     'RubyCatalina'  : RubyCatalina,
                     'RubyBigSur'    : RubyBigSur,
                     'RubyMonterey'  : RubyMonterey,
+                    'RubyVentura'   : RubyVentura,
                     'Ruby31MacPorts': Ruby31MacPorts,
                     'Ruby31Brew'    : Ruby31Brew,
                     'RubyAnaconda3' : RubyAnaconda3
@@ -221,7 +232,8 @@ RubyDictionary  = { 'nil'           : None,
 PythonNil  = [ 'nil' ]
 PythonSys  = [ 'PythonElCapitan', 'PythonSierra', 'PythonHighSierra', 'PythonMojave' ]
 PythonSys += [ 'PythonCatalina', 'PythonBigSur', 'PythonMonterey' ]
-PythonExt  = [ 'Python38MacPorts', 'Python38Brew', 'Python39Brew', 'PythonAnaconda3', 'PythonAutoBrew' ]
+PythonExt  = [ 'Python38MacPorts', 'Python39MacPorts', 'Python38Brew', 'Python39Brew' ]
+PythonExt += [ 'PythonAnaconda3', 'PythonAutoBrew' ]
 Pythons    = PythonNil + PythonSys + PythonExt
 
 #-----------------------------------------------------
@@ -299,6 +311,14 @@ Python38MacPorts= { 'exe': '/opt/local/Library/Frameworks/Python.framework/Versi
                     'lib': '/opt/local/Library/Frameworks/Python.framework/Versions/3.8/lib/libpython3.8.dylib'
                   }
 
+# Python 3.9 from MacPorts (https://www.macports.org/) *+*+*+ EXPERIMENTAL *+*+*+
+#   install with 'sudo port install python39'
+# [Key Type Name] = 'MP38'
+Python39MacPorts= { 'exe': '/opt/local/Library/Frameworks/Python.framework/Versions/3.9/bin/python3.9',
+                    'inc': '/opt/local/Library/Frameworks/Python.framework/Versions/3.9/include/python3.9',
+                    'lib': '/opt/local/Library/Frameworks/Python.framework/Versions/3.9/lib/libpython3.9.dylib'
+                  }
+
 # Python 3.8 from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
 #   install with 'brew install python@3.8'
 # [Key Type Name] = 'HB38'
@@ -321,9 +341,9 @@ Python39Brew    = { 'exe': '%s/Versions/3.9/bin/python3.9' % HBPython39Framework
 # The standard installation deploys the tool under $HOME/opt/anaconda3/.
 # If so, you need to make a symbolic link: /Applications/anaconda3 ---> $HOME/opt/anaconda3/
 # [Key Type Name] = 'Ana3'
-PythonAnaconda3 = { 'exe': '/Applications/anaconda3/bin/python3.8',
-                    'inc': '/Applications/anaconda3/include/python3.8',
-                    'lib': '/Applications/anaconda3/lib/libpython3.8.dylib'
+PythonAnaconda3 = { 'exe': '/Applications/anaconda3/bin/python3.9',
+                    'inc': '/Applications/anaconda3/include/python3.9',
+                    'lib': '/Applications/anaconda3/lib/libpython3.9.dylib'
                   }
 
 # Latest Python from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
@@ -358,6 +378,7 @@ PythonDictionary = { 'nil'             : None,
                      'PythonBigSur'    : PythonBigSur,
                      'PythonMonterey'  : PythonMonterey,
                      'Python38MacPorts': Python38MacPorts,
+                     'Python39MacPorts': Python39MacPorts,
                      'Python38Brew'    : Python38Brew,
                      'Python39Brew'    : Python39Brew,
                      'PythonAnaconda3' : PythonAnaconda3

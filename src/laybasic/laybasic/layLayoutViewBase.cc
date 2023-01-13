@@ -294,7 +294,8 @@ LayoutViewBase::copy_from (lay::LayoutViewBase *source)
   end_layer_updates ();
 
   if (! m_layer_properties_lists.empty ()) {
-    mp_canvas->set_dither_pattern (m_layer_properties_lists [0]->dither_pattern ()); 
+    mp_canvas->set_dither_pattern (m_layer_properties_lists [0]->dither_pattern ());
+    mp_canvas->set_line_styles (m_layer_properties_lists [0]->line_styles ());
   }
 
   //  copy the title

@@ -305,13 +305,13 @@ TEST(1c_ReaderBasicShortWithProps)
 
     db::CellMapping cm = l2n.cell_mapping_into (ly2, top2);
 
-    l2n.build_all_nets (cm, ly2, lmap, "NET_", db::LayoutToNetlist::NoProperties, tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, "DEVICE_");
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", db::LayoutToNetlist::AllProperties, tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, "DEVICE_");
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
     au = tl::combine_path (au, "l2n_reader_au_p.oas");
 
-    db::compare_layouts (_this, ly2, au, db::WriteOAS);
+    db::compare_layouts (_this, ly2, au, db::NormalizationMode (db::WriteOAS | db::AsPolygons));
   }
 }
 

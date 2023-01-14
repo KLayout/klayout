@@ -85,7 +85,7 @@ void run_test (tl::TestBase *_this, const std::string &file, const db::NetTracer
   fn += file_au;
 
   CHECKPOINT ();
-  db::compare_layouts (_this, layout_nets, fn, db::WriteOAS);
+  db::compare_layouts (_this, layout_nets, fn, db::NormalizationMode (db::WriteOAS | db::AsPolygons));
 }
 
 TEST(1) 

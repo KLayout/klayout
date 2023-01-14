@@ -57,8 +57,8 @@ void EdgeToEdgeSetGenerator::put (const db::Edge &edge, int tag)
 // -----------------------------------------------------------------------------------------------
 //  class PolygonRefGenerator
 
-PolygonRefToShapesGenerator::PolygonRefToShapesGenerator (db::Layout *layout, db::Shapes *shapes)
-  : PolygonSink (), mp_layout (layout), mp_shapes (shapes)
+PolygonRefToShapesGenerator::PolygonRefToShapesGenerator (db::Layout *layout, db::Shapes *shapes, db::properties_id_type prop_id)
+  : PolygonSink (), mp_layout (layout), mp_shapes (shapes), m_prop_id (prop_id)
 {
   //  .. nothing yet ..
 }
@@ -66,7 +66,11 @@ PolygonRefToShapesGenerator::PolygonRefToShapesGenerator (db::Layout *layout, db
 void PolygonRefToShapesGenerator::put (const db::Polygon &polygon)
 {
   tl::MutexLocker locker (&mp_layout->lock ());
-  mp_shapes->insert (db::PolygonRef (polygon, mp_layout->shape_repository ()));
+  if (m_prop_id != 0) {
+    mp_shapes->insert (db::PolygonRefWithProperties (db::PolygonRef (polygon, mp_layout->shape_repository ()), m_prop_id));
+  } else {
+    mp_shapes->insert (db::PolygonRef (polygon, mp_layout->shape_repository ()));
+  }
 }
 
 // -----------------------------------------------------------------------------------------------

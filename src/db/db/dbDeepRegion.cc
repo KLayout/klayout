@@ -598,7 +598,7 @@ private:
 
     //  and run the merge step
     db::MergeOp op (min_wc);
-    db::PolygonRefToShapesGenerator pr (mp_layout, &s->second);
+    db::PolygonRefToShapesGenerator pr (mp_layout, &s->second, c.begin_attr () == c.end_attr () ? db::properties_id_type (0) : *c.begin_attr ());
     db::PolygonGenerator pg (pr, false /*don't resolve holes*/, m_min_coherence);
     m_ep.process (pg, op);
 
@@ -647,7 +647,7 @@ DeepRegion::ensure_merged_polygons_valid () const
       db::Connectivity conn;
       conn.connect (deep_layer ());
       hc.set_base_verbosity (base_verbosity () + 10);
-      hc.build (layout, deep_layer ().initial_cell (), conn);
+      hc.build (layout, deep_layer ().initial_cell (), conn, 0, 0, true /*separate_attributes*/);
 
       //  collect the clusters and merge them into big polygons
       //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is

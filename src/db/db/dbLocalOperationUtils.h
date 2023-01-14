@@ -155,7 +155,7 @@ public:
   /**
    *  @brief Constructor specifying an external vector for storing the polygons
    */
-  PolygonRefToShapesGenerator (db::Layout *layout, db::Shapes *shapes);
+  PolygonRefToShapesGenerator (db::Layout *layout, db::Shapes *shapes, db::properties_id_type prop_id = 0);
 
   /**
    *  @brief Implementation of the PolygonSink interface
@@ -165,6 +165,7 @@ public:
 private:
   db::Layout *mp_layout;
   db::Shapes *mp_shapes;
+  db::properties_id_type m_prop_id;
 };
 
 class DB_PUBLIC PolygonSplitter

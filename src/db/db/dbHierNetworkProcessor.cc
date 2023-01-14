@@ -872,8 +872,8 @@ struct cluster_building_receiver
   typedef std::set<size_t> global_nets;
   typedef std::pair<shape_vector, global_nets> cluster_value;
 
-  cluster_building_receiver (const db::Connectivity &conn, const tl::equivalence_clusters<size_t> *attr_equivalence)
-    : mp_conn (&conn), mp_attr_equivalence (attr_equivalence)
+  cluster_building_receiver (const db::Connectivity &conn, const tl::equivalence_clusters<size_t> *attr_equivalence, bool separate_attributes)
+    : mp_conn (&conn), mp_attr_equivalence (attr_equivalence), m_separate_attributes (separate_attributes)
   {
     if (mp_attr_equivalence) {
       //  cache the global nets per attribute equivalence cluster
@@ -930,6 +930,9 @@ struct cluster_building_receiver
 
   void add (const T *s1, std::pair<unsigned int, size_t> p1, const T *s2, std::pair<unsigned int, size_t> p2)
   {
+    if (m_separate_attributes && p1.second != p2.second) {
+      return;
+    }
     if (! mp_conn->interacts (*s1, p1.first, *s2, p2.first)) {
       return;
     }
@@ -1021,6 +1024,7 @@ private:
   std::list<cluster_value> m_clusters;
   std::map<size_t, std::set<size_t> > m_global_nets_by_attribute_cluster;
   const tl::equivalence_clusters<size_t> *mp_attr_equivalence;
+  bool m_separate_attributes;
 
   void join (typename std::list<cluster_value>::iterator ic1, typename std::list<cluster_value>::iterator ic2)
   {
@@ -1126,7 +1130,7 @@ struct get_shape_flags<db::NetShape>
 
 template <class T>
 void
-local_clusters<T>::build_clusters (const db::Cell &cell, const db::Connectivity &conn, const tl::equivalence_clusters<size_t> *attr_equivalence, bool report_progress)
+local_clusters<T>::build_clusters (const db::Cell &cell, const db::Connectivity &conn, const tl::equivalence_clusters<size_t> *attr_equivalence, bool report_progress, bool separate_attributes)
 {
   static std::string desc = tl::to_string (tr ("Building local clusters"));
 
@@ -1143,7 +1147,7 @@ local_clusters<T>::build_clusters (const db::Cell &cell, const db::Connectivity 
     }
   }
 
-  cluster_building_receiver<T, box_type> rec (conn, attr_equivalence);
+  cluster_building_receiver<T, box_type> rec (conn, attr_equivalence, separate_attributes);
   bs.process (rec, 1 /*==touching*/, bc);
   rec.generate_clusters (*this);
 
@@ -1391,11 +1395,11 @@ hier_clusters<T>::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpos
 
 template <class T>
 void
-hier_clusters<T>::build (const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const std::map<db::cell_index_type, tl::equivalence_clusters<size_t> > *attr_equivalence, const std::set<db::cell_index_type> *breakout_cells)
+hier_clusters<T>::build (const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const std::map<db::cell_index_type, tl::equivalence_clusters<size_t> > *attr_equivalence, const std::set<db::cell_index_type> *breakout_cells, bool separate_attributes)
 {
   clear ();
   cell_clusters_box_converter<T> cbc (layout, *this);
-  do_build (cbc, layout, cell, conn, attr_equivalence, breakout_cells);
+  do_build (cbc, layout, cell, conn, attr_equivalence, breakout_cells, separate_attributes);
 }
 
 namespace
@@ -1437,9 +1441,18 @@ public:
   /**
    *  @brief Constructor
    */
-  hc_receiver (const db::Layout &layout, const db::Cell &cell, db::connected_clusters<T> &cell_clusters, hier_clusters<T> &tree, const cell_clusters_box_converter<T> &cbc, const db::Connectivity &conn, const std::set<db::cell_index_type> *breakout_cells, typename hier_clusters<T>::instance_interaction_cache_type *instance_interaction_cache)
-    : mp_layout (&layout), mp_cell (&cell), mp_tree (&tree), mp_cbc (&cbc), mp_conn (&conn), mp_breakout_cells (breakout_cells), m_cluster_cache_misses (0), m_cluster_cache_hits (0), mp_instance_interaction_cache (instance_interaction_cache)
+  hc_receiver (const db::Layout &layout, const db::Cell &cell, db::connected_clusters<T> &cell_clusters, hier_clusters<T> &tree, const cell_clusters_box_converter<T> &cbc, const db::Connectivity &conn, const std::set<db::cell_index_type> *breakout_cells, typename hier_clusters<T>::instance_interaction_cache_type *instance_interaction_cache, bool separate_attributes)
   {
+    mp_layout = &layout;
+    mp_cell = &cell;
+    mp_tree = &tree;
+    mp_cbc = &cbc;
+    mp_conn = &conn;
+    mp_breakout_cells = breakout_cells;
+    m_cluster_cache_misses = 0;
+    m_cluster_cache_hits = 0;
+    mp_instance_interaction_cache = instance_interaction_cache;
+    m_separate_attributes = separate_attributes;
     mp_cell_clusters = &cell_clusters;
   }
 
@@ -1568,6 +1581,7 @@ private:
   instance_interaction_cache<interaction_key_for_clusters<box_type>, std::list<std::pair<size_t, size_t> > > m_interaction_cache_for_clusters;
   size_t m_cluster_cache_misses, m_cluster_cache_hits;
   typename hier_clusters<T>::instance_interaction_cache_type *mp_instance_interaction_cache;
+  bool m_separate_attributes;
 
   /**
    *  @brief Investigate a pair of instances
@@ -1838,7 +1852,7 @@ private:
         box_type bc2 = (common2 & i->bbox ().transformed (t12));
         for (typename db::local_clusters<T>::touching_iterator j = cl2.begin_touching (bc2); ! j.at_end (); ++j) {
 
-          if (i->interacts (*j, t21, *mp_conn)) {
+          if ((! m_separate_attributes || i->same_attrs (*j)) && i->interacts (*j, t21, *mp_conn)) {
             new_interactions.push_back (std::make_pair (i->id (), j->id ()));
           }
 
@@ -2010,7 +2024,7 @@ private:
 
     for (typename db::local_clusters<T>::touching_iterator j = cl2.begin_touching (c1.bbox ().transformed (t2.inverted ())); ! j.at_end (); ++j) {
 
-      if (c1.interacts (*j, t2, *mp_conn)) {
+      if ((! m_separate_attributes || c1.same_attrs (*j)) && c1.interacts (*j, t2, *mp_conn)) {
         interactions.push_back (std::make_pair (c1.id (), j->id ()));
       }
 
@@ -2249,7 +2263,7 @@ hier_clusters<T>::propagate_cluster_inst (const db::Layout &layout, const db::Ce
 
 template <class T>
 void
-hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const std::map<db::cell_index_type, tl::equivalence_clusters<size_t> > *attr_equivalence, const std::set<db::cell_index_type> *breakout_cells)
+hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const std::map<db::cell_index_type, tl::equivalence_clusters<size_t> > *attr_equivalence, const std::set<db::cell_index_type> *breakout_cells, bool separate_attributes)
 {
   tl::SelfTimer timer (tl::verbosity () > m_base_verbosity, tl::to_string (tr ("Computing shape clusters")));
 
@@ -2284,7 +2298,7 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
         }
       }
 
-      build_local_cluster (layout, layout.cell (*c), conn, ec);
+      build_local_cluster (layout, layout.cell (*c), conn, ec, separate_attributes);
 
       ++progress;
 
@@ -2315,7 +2329,7 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
           todo.push_back (*c);
         } else {
           tl_assert (! todo.empty ());
-          build_hier_connections_for_cells (cbc, layout, todo, conn, breakout_cells, progress, instance_interaction_cache);
+          build_hier_connections_for_cells (cbc, layout, todo, conn, breakout_cells, progress, instance_interaction_cache, separate_attributes);
           done.insert (todo.begin (), todo.end ());
           todo.clear ();
           todo.push_back (*c);
@@ -2325,7 +2339,7 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
 
     }
 
-    build_hier_connections_for_cells (cbc, layout, todo, conn, breakout_cells, progress, instance_interaction_cache);
+    build_hier_connections_for_cells (cbc, layout, todo, conn, breakout_cells, progress, instance_interaction_cache, separate_attributes);
   }
 
   if (tl::verbosity () >= m_base_verbosity + 20) {
@@ -2335,7 +2349,7 @@ hier_clusters<T>::do_build (cell_clusters_box_converter<T> &cbc, const db::Layou
 
 template <class T>
 void
-hier_clusters<T>::build_local_cluster (const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const tl::equivalence_clusters<size_t> *attr_equivalence)
+hier_clusters<T>::build_local_cluster (const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const tl::equivalence_clusters<size_t> *attr_equivalence, bool separate_attributes)
 {
   std::string msg = tl::to_string (tr ("Computing local clusters for cell: ")) + std::string (layout.cell_name (cell.cell_index ()));
   if (tl::verbosity () >= m_base_verbosity + 20) {
@@ -2344,15 +2358,15 @@ hier_clusters<T>::build_local_cluster (const db::Layout &layout, const db::Cell 
   tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 20, msg);
 
   connected_clusters<T> &local = m_per_cell_clusters [cell.cell_index ()];
-  local.build_clusters (cell, conn, attr_equivalence, true);
+  local.build_clusters (cell, conn, attr_equivalence, true, separate_attributes);
 }
 
 template <class T>
 void
-hier_clusters<T>::build_hier_connections_for_cells (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const std::vector<db::cell_index_type> &cells, const db::Connectivity &conn, const std::set<db::cell_index_type> *breakout_cells, tl::RelativeProgress &progress, instance_interaction_cache_type &instance_interaction_cache)
+hier_clusters<T>::build_hier_connections_for_cells (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const std::vector<db::cell_index_type> &cells, const db::Connectivity &conn, const std::set<db::cell_index_type> *breakout_cells, tl::RelativeProgress &progress, instance_interaction_cache_type &instance_interaction_cache, bool separate_attributes)
 {
   for (std::vector<db::cell_index_type>::const_iterator c = cells.begin (); c != cells.end (); ++c) {
-    build_hier_connections (cbc, layout, layout.cell (*c), conn, breakout_cells, instance_interaction_cache);
+    build_hier_connections (cbc, layout, layout.cell (*c), conn, breakout_cells, instance_interaction_cache, separate_attributes);
     ++progress;
   }
 }
@@ -2436,7 +2450,7 @@ private:
 
 template <class T>
 void
-hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const std::set<db::cell_index_type> *breakout_cells, instance_interaction_cache_type &instance_interaction_cache)
+hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const std::set<db::cell_index_type> *breakout_cells, instance_interaction_cache_type &instance_interaction_cache, bool separate_attributes)
 {
   std::string msg = tl::to_string (tr ("Computing hierarchical clusters for cell: ")) + std::string (layout.cell_name (cell.cell_index ()));
   if (tl::verbosity () >= m_base_verbosity + 20) {
@@ -2448,7 +2462,7 @@ hier_clusters<T>::build_hier_connections (cell_clusters_box_converter<T> &cbc, c
 
   //  NOTE: this is a receiver for both the child-to-child and
   //  local to child interactions.
-  std::unique_ptr<hc_receiver<T> > rec (new hc_receiver<T> (layout, cell, local, *this, cbc, conn, breakout_cells, &instance_interaction_cache));
+  std::unique_ptr<hc_receiver<T> > rec (new hc_receiver<T> (layout, cell, local, *this, cbc, conn, breakout_cells, &instance_interaction_cache, separate_attributes));
   cell_inst_clusters_box_converter<T> cibc (cbc);
 
   //  The box scanner needs pointers so we have to first store the instances

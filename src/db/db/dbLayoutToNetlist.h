@@ -727,6 +727,11 @@ public:
      *  @brief Like NetNameOnly, but use a unique net ID (db::Net address actually) instead of name
      */
     NetIDOnly,
+
+    /**
+     *  @brief Like NetNameOnly, but use a tuple of name and ID
+     */
+    NetNameAndIDOnly,
   };
 
   /**

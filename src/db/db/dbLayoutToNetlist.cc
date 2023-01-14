@@ -1002,7 +1002,13 @@ LayoutToNetlist::make_netname_propid (db::Layout &ly, NetPropertyMode net_prop_m
 
     if (! netname_prop.is_nil ()) {
       db::property_names_id_type name_propnameid = ly.properties_repository ().prop_name_id (netname_prop);
-      if (net_prop_mode == NetIDOnly) {
+      if (net_prop_mode == NetNameAndIDOnly) {
+        std::vector<tl::Variant> l;
+        l.reserve (2);
+        l.push_back (tl::Variant (net.expanded_name ()));
+        l.push_back (tl::Variant (reinterpret_cast <size_t> (&net)));
+        propset.insert (std::make_pair (name_propnameid, tl::Variant (l)));
+      } else if (net_prop_mode == NetIDOnly) {
         propset.insert (std::make_pair (name_propnameid, tl::Variant (reinterpret_cast <size_t> (&net))));
       } else {
         propset.insert (std::make_pair (name_propnameid, tl::Variant (net.expanded_name ())));

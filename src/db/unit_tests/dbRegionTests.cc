@@ -2254,6 +2254,127 @@ TEST(52_PropertiesDeep)
   EXPECT_EQ (s.at_end (), true);
 }
 
+TEST(53_PropertiesDeepFromLayout)
+{
+  db::DeepShapeStore dss ("TOP", 0.001);
+
+  db::Layout ly;
+  unsigned int li = ly.insert_layer ();
+  db::Cell &top = ly.cell (ly.add_cell ("TOP"));
+
+  db::Shapes &si = top.shapes (li);
+  si.insert (db::Box (0, 0, 100, 200));
+  si.insert (db::BoxWithProperties (db::Box (1, 2, 101, 202), 1));
+  si.insert (db::Box (10, 20, 110, 220));
+  si.insert (db::BoxWithProperties (db::Box (11, 12, 111, 212), 42));
+
+  //  NOTE: without specific "property only" selector -> properties are ignored.
+
+  db::Region r (db::RecursiveShapeIterator (ly, top, li), dss);
+
+  EXPECT_EQ (r.count (), size_t (4));
+
+  db::Region::const_iterator s = r.begin ();
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (0));
+  EXPECT_EQ (s->to_string (), "(0,0;0,200;100,200;100,0)");
+  ++s;
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (0));
+  EXPECT_EQ (s->to_string (), "(10,20;10,220;110,220;110,20)");
+  ++s;
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (0));
+  EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
+  ++s;
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (0));
+  EXPECT_EQ (s->to_string (), "(11,12;11,212;111,212;111,12)");
+  ++s;
+  EXPECT_EQ (s.at_end (), true);
+
+  s = r.begin_merged ();
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (0));
+  //  property #0 elements are merged
+  EXPECT_EQ (s->to_string (), "(0,0;0,200;1,200;1,202;10,202;10,220;110,220;110,212;111,212;111,12;101,12;101,2;100,2;100,0)");
+  ++s;
+
+  EXPECT_EQ (s.at_end (), true);
+
+  //  NOTE: now with explicit propertly-only source
+  db::RecursiveShapeIterator rsi (ly, top, li);
+  rsi.shape_flags (db::ShapeIterator::AllWithProperties);
+  r = db::Region (rsi, dss);
+
+  EXPECT_EQ (r.count (), size_t (2));
+
+  s = r.begin ();
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (0));
+  EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
+  ++s;
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (0));
+  EXPECT_EQ (s->to_string (), "(11,12;11,212;111,212;111,12)");
+  ++s;
+  EXPECT_EQ (s.at_end (), true);
+
+  s = r.begin_merged ();
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (0));
+  //  property #0 elements are merged
+  EXPECT_EQ (s->to_string (), "(1,2;1,202;11,202;11,212;111,212;111,12;101,12;101,2)");
+  ++s;
+
+  //  NOTE: now with regarding properties
+  rsi = db::RecursiveShapeIterator (ly, top, li);
+  rsi.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  r = db::Region (rsi, dss);
+
+  EXPECT_EQ (r.count (), size_t (4));
+
+  s = r.begin ();
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (0));
+  EXPECT_EQ (s->to_string (), "(0,0;0,200;100,200;100,0)");
+  ++s;
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (0));
+  EXPECT_EQ (s->to_string (), "(10,20;10,220;110,220;110,20)");
+  ++s;
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (1));
+  EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
+  ++s;
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (42));
+  EXPECT_EQ (s->to_string (), "(11,12;11,212;111,212;111,12)");
+  ++s;
+  EXPECT_EQ (s.at_end (), true);
+
+  s = r.begin_merged ();
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (0));
+  //  property #0 elements are merged
+  EXPECT_EQ (s->to_string (), "(0,0;0,200;10,200;10,220;110,220;110,20;100,20;100,0)");
+  ++s;
+
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (1));
+  //  a single property #1 element
+  EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
+  ++s;
+
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (s.prop_id (), db::properties_id_type (42));
+  //  a single property #42 element
+  EXPECT_EQ (s->to_string (), "(11,12;11,212;111,212;111,12)");
+  ++s;
+
+  EXPECT_EQ (s.at_end (), true);
+}
+
 TEST(100_Processors)
 {
   db::Region r;

@@ -1036,7 +1036,15 @@ public:
    */
   Region operator& (const Region &other) const
   {
-    return Region (mp_delegate->and_with (other));
+    return Region (mp_delegate->and_with (other, db::NoPropertyConstraint));
+  }
+
+  /**
+   *  @brief Boolean AND operator with options
+   */
+  Region bool_and (const Region &other, PropertyConstraint prop_constraint = db::NoPropertyConstraint) const
+  {
+    return Region (mp_delegate->and_with (other, prop_constraint));
   }
 
   /**
@@ -1047,7 +1055,19 @@ public:
    */
   Region &operator&= (const Region &other)
   {
-    set_delegate (mp_delegate->and_with (other));
+    set_delegate (mp_delegate->and_with (other, db::NoPropertyConstraint));
+    return *this;
+  }
+
+  /**
+   *  @brief In-place boolean AND operator with options
+   *
+   *  This method does not necessarily merge the region. To ensure the region
+   *  is merged, call merge afterwards.
+   */
+  Region &bool_and_with (const Region &other, PropertyConstraint prop_constraint = db::NoPropertyConstraint)
+  {
+    set_delegate (mp_delegate->and_with (other, prop_constraint));
     return *this;
   }
 
@@ -1056,7 +1076,15 @@ public:
    */
   Region operator- (const Region &other) const
   {
-    return Region (mp_delegate->not_with (other));
+    return Region (mp_delegate->not_with (other, db::NoPropertyConstraint));
+  }
+
+  /**
+   *  @brief Boolean NOT operator with options
+   */
+  Region bool_not (const Region &other, PropertyConstraint prop_constraint = db::NoPropertyConstraint) const
+  {
+    return Region (mp_delegate->not_with (other, prop_constraint));
   }
 
   /**
@@ -1067,7 +1095,19 @@ public:
    */
   Region &operator-= (const Region &other)
   {
-    set_delegate (mp_delegate->not_with (other));
+    set_delegate (mp_delegate->not_with (other, db::NoPropertyConstraint));
+    return *this;
+  }
+
+  /**
+   *  @brief In-place boolean NOT operator with options
+   *
+   *  This method does not necessarily merge the region. To ensure the region
+   *  is merged, call merge afterwards.
+   */
+  Region bool_not_with (const Region &other, PropertyConstraint prop_constraint = db::NoPropertyConstraint)
+  {
+    set_delegate (mp_delegate->not_with (other, prop_constraint));
     return *this;
   }
 
@@ -1134,9 +1174,9 @@ public:
    *
    *  The first region delivered will be the AND result, the second one the NOT result.
    */
-  std::pair<Region, Region> andnot (const Region &other) const
+  std::pair<Region, Region> andnot (const Region &other, PropertyConstraint prop_constraint = db::NoPropertyConstraint) const
   {
-    std::pair<RegionDelegate *, RegionDelegate *> res = mp_delegate->andnot_with (other);
+    std::pair<RegionDelegate *, RegionDelegate *> res = mp_delegate->andnot_with (other, prop_constraint);
     return std::make_pair (Region (res.first), Region (res.second));
   }
 

@@ -29,6 +29,7 @@
 #include "dbLocalOperation.h"
 #include "dbEdgeProcessor.h"
 #include "dbRegionCheckUtils.h"
+#include "dbPropertyConstraint.h"
 
 #include <vector>
 #include <unordered_set>

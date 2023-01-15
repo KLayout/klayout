@@ -98,9 +98,9 @@ public:
   virtual RegionDelegate *sized (coord_type, unsigned int) const { return new EmptyRegion (); }
   virtual RegionDelegate *sized (coord_type, coord_type, unsigned int) const { return new EmptyRegion (); }
 
-  virtual RegionDelegate *and_with (const Region &) const { return new EmptyRegion (); }
-  virtual RegionDelegate *not_with (const Region &) const { return new EmptyRegion (); }
-  virtual std::pair<RegionDelegate *, RegionDelegate *> andnot_with (const Region &) const { return std::make_pair (new EmptyRegion (), new EmptyRegion ()); }
+  virtual RegionDelegate *and_with (const Region &, db::PropertyConstraint) const { return new EmptyRegion (); }
+  virtual RegionDelegate *not_with (const Region &, db::PropertyConstraint) const { return new EmptyRegion (); }
+  virtual std::pair<RegionDelegate *, RegionDelegate *> andnot_with (const Region &, db::PropertyConstraint) const { return std::make_pair (new EmptyRegion (), new EmptyRegion ()); }
   virtual RegionDelegate *xor_with (const Region &other) const;
   virtual RegionDelegate *or_with (const Region &other) const;
   virtual RegionDelegate *add_in_place (const Region &other);

@@ -699,7 +699,7 @@ DeepRegion::insert_into (db::Layout *layout, db::cell_index_type into_cell, unsi
 }
 
 RegionDelegate *
-DeepRegion::and_with (const Region &other) const
+DeepRegion::and_with (const Region &other, PropertyConstraint property_constraint) const
 {
   const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
 
@@ -713,17 +713,17 @@ DeepRegion::and_with (const Region &other) const
 
   } else if (! other_deep) {
 
-    return AsIfFlatRegion::and_with (other);
+    return AsIfFlatRegion::and_with (other, property_constraint);
 
   } else {
 
-    return new DeepRegion (and_or_not_with (other_deep, true));
+    return new DeepRegion (and_or_not_with (other_deep, true, property_constraint));
 
   }
 }
 
 RegionDelegate *
-DeepRegion::not_with (const Region &other) const
+DeepRegion::not_with (const Region &other, PropertyConstraint property_constraint) const
 {
   const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
 
@@ -733,11 +733,11 @@ DeepRegion::not_with (const Region &other) const
 
   } else if (! other_deep) {
 
-    return AsIfFlatRegion::not_with (other);
+    return AsIfFlatRegion::not_with (other, property_constraint);
 
   } else {
 
-    return new DeepRegion (and_or_not_with (other_deep, false));
+    return new DeepRegion (and_or_not_with (other_deep, false, property_constraint));
 
   }
 }
@@ -750,7 +750,7 @@ DeepRegion::or_with (const Region &other) const
 }
 
 std::pair<RegionDelegate *, RegionDelegate *>
-DeepRegion::andnot_with (const Region &other) const
+DeepRegion::andnot_with (const Region &other, PropertyConstraint property_constraint) const
 {
   const DeepRegion *other_deep = dynamic_cast <const DeepRegion *> (other.delegate ());
 
@@ -764,39 +764,59 @@ DeepRegion::andnot_with (const Region &other) const
 
   } else if (! other_deep) {
 
-    return AsIfFlatRegion::andnot_with (other);
+    return AsIfFlatRegion::andnot_with (other, property_constraint);
 
   } else {
 
-    std::pair<DeepLayer, DeepLayer> res = and_and_not_with (other_deep);
+    std::pair<DeepLayer, DeepLayer> res = and_and_not_with (other_deep, property_constraint);
     return std::make_pair (new DeepRegion (res.first), new DeepRegion (res.second));
 
   }
 }
 
 DeepLayer
-DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op) const
+DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op, db::PropertyConstraint property_constraint) const
 {
   DeepLayer dl_out (deep_layer ().derived ());
 
-  db::BoolAndOrNotLocalOperation op (and_op);
+  if (property_constraint == db::NoPropertyConstraint) {
 
-  db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
-  proc.set_base_verbosity (base_verbosity ());
-  proc.set_description (progress_desc ());
-  proc.set_report_progress (report_progress ());
-  proc.set_threads (deep_layer ().store ()->threads ());
-  proc.set_area_ratio (deep_layer ().store ()->max_area_ratio ());
-  proc.set_max_vertex_count (deep_layer ().store ()->max_vertex_count ());
+    db::BoolAndOrNotLocalOperation op (and_op);
 
-  proc.run (&op, deep_layer ().layer (), other->deep_layer ().layer (), dl_out.layer ());
+    db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
+    proc.set_base_verbosity (base_verbosity ());
+    proc.set_description (progress_desc ());
+    proc.set_report_progress (report_progress ());
+    proc.set_threads (deep_layer ().store ()->threads ());
+    proc.set_area_ratio (deep_layer ().store ()->max_area_ratio ());
+    proc.set_max_vertex_count (deep_layer ().store ()->max_vertex_count ());
+
+    proc.run (&op, deep_layer ().layer (), other->deep_layer ().layer (), dl_out.layer ());
+
+  } else {
+
+    db::BoolAndOrNotLocalOperationWithProperties op (and_op, &deep_layer ().layout (), &other->deep_layer ().layout (), property_constraint);
+
+    db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
+    proc.set_base_verbosity (base_verbosity ());
+    proc.set_description (progress_desc ());
+    proc.set_report_progress (report_progress ());
+    proc.set_threads (deep_layer ().store ()->threads ());
+    proc.set_area_ratio (deep_layer ().store ()->max_area_ratio ());
+    proc.set_max_vertex_count (deep_layer ().store ()->max_vertex_count ());
+
+    proc.run (&op, deep_layer ().layer (), other->deep_layer ().layer (), dl_out.layer ());
+
+  }
 
   return dl_out;
 }
 
 std::pair<DeepLayer, DeepLayer>
-DeepRegion::and_and_not_with (const DeepRegion *other) const
+DeepRegion::and_and_not_with (const DeepRegion *other, PropertyConstraint property_constraint) const
 {
+  // @@@ TODO: implement property_constraint
+
   DeepLayer dl_out1 (deep_layer ().derived ());
   DeepLayer dl_out2 (deep_layer ().derived ());
 
@@ -845,8 +865,8 @@ DeepRegion::xor_with (const Region &other) const
 
     //  Implement XOR as (A-B)+(B-A) - only this implementation
     //  is compatible with the local processor scheme
-    DeepLayer n1 (and_or_not_with (other_deep, false));
-    DeepLayer n2 (other_deep->and_or_not_with (this, false));
+    DeepLayer n1 (and_or_not_with (other_deep, false, db::NoPropertyConstraint));
+    DeepLayer n2 (other_deep->and_or_not_with (this, false, db::NoPropertyConstraint));
 
     n1.add_from (n2);
     return new DeepRegion (n1);

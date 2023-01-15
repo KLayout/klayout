@@ -619,9 +619,9 @@ static db::EdgePairs separation2 (const db::Region *r, const db::Region &other, 
                              );
 }
 
-static std::vector<db::Region> andnot (const db::Region *r, const db::Region &other)
+static std::vector<db::Region> andnot (const db::Region *r, const db::Region &other, db::PropertyConstraint prop_constraint)
 {
-  return as_2region_vector (r->andnot (other));
+  return as_2region_vector (r->andnot (other, prop_constraint));
 }
 
 static std::vector<db::Region> split_inside (const db::Region *r, const db::Region &other)
@@ -1595,7 +1595,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "Merged semantics applies for this method (see \\merged_semantics= for a description of this concept)\n"
   ) +
-  method_ext ("andnot", &andnot, gsi::arg ("other"),
+  method_ext ("andnot", &andnot, gsi::arg ("other"), gsi::arg ("property_constraint", db::NoPropertyConstraint),
     "@brief Returns the boolean AND and NOT between self and the other region\n"
     "\n"
     "@return A two-element array of regions with the first one being the AND result and the second one being the NOT result\n"
@@ -1613,6 +1613,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This method will compute the boolean AND (intersection) between two regions. "
     "The result is often but not necessarily always merged.\n"
   ) +
+  method ("and", &db::Region::bool_and, gsi::arg ("other"), gsi::arg ("property_constraint", db::NoPropertyConstraint),
+    "@brief Returns the boolean AND between self and the other region\n"
+    "\n"
+    "@return The result of the boolean AND operation\n"
+    "\n"
+    "This method will compute the boolean AND (intersection) between two regions. "
+    "The result is often but not necessarily always merged.\n"
+    "It allows specification of a property constaint - e.g. only performing the boolean operation between "
+    "shapes with the same user properties.\n"
+    "\n"
+    "This variant has been introduced in version 0.28.4."
+  ) +
   method ("&=", &db::Region::operator&=, gsi::arg ("other"),
     "@brief Performs the boolean AND between self and the other region\n"
     "\n"
@@ -1620,6 +1632,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method will compute the boolean AND (intersection) between two regions. "
     "The result is often but not necessarily always merged.\n"
+  ) +
+  method ("and_with", &db::Region::bool_and_with, gsi::arg ("other"), gsi::arg ("property_constraint", db::NoPropertyConstraint),
+    "@brief Performs the boolean AND between self and the other region\n"
+    "\n"
+    "@return The region after modification (self)\n"
+    "\n"
+    "This method will compute the boolean AND (intersection) between two regions. "
+    "The result is often but not necessarily always merged.\n"
+    "It allows specification of a property constaint - e.g. only performing the boolean operation between "
+    "shapes with the same user properties.\n"
+    "\n"
+    "This variant has been introduced in version 0.28.4."
   ) +
   method ("-", &db::Region::operator-, gsi::arg ("other"),
     "@brief Returns the boolean NOT between self and the other region\n"
@@ -1629,7 +1653,23 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This method will compute the boolean NOT (intersection) between two regions. "
     "The result is often but not necessarily always merged.\n"
   ) +
+  method ("not", &db::Region::bool_not, gsi::arg ("other"), gsi::arg ("property_constraint", db::NoPropertyConstraint),
+    "@brief Returns the boolean NOT between self and the other region\n"
+    "\n"
+    "@return The result of the boolean NOT operation\n"
+    "\n"
+    "This method will compute the boolean NOT (intersection) between two regions. "
+    "The result is often but not necessarily always merged.\n"
+  ) +
   method ("-=", &db::Region::operator-=, gsi::arg ("other"),
+    "@brief Performs the boolean NOT between self and the other region\n"
+    "\n"
+    "@return The region after modification (self)\n"
+    "\n"
+    "This method will compute the boolean NOT (intersection) between two regions. "
+    "The result is often but not necessarily always merged.\n"
+  ) +
+  method ("not_with", &db::Region::bool_not_with, gsi::arg ("other"), gsi::arg ("property_constraint", db::NoPropertyConstraint),
     "@brief Performs the boolean NOT between self and the other region\n"
     "\n"
     "@return The region after modification (self)\n"
@@ -3054,6 +3094,32 @@ gsi::EnumIn<db::Region, db::metrics_type> decl_Region_Metrics ("db", "Metrics",
 //  (Edges injection has to be done here because only here defs() is available)
 gsi::ClassExt<db::Region> inject_Metrics_in_parent (decl_Region_Metrics.defs ());
 gsi::ClassExt<db::Edges> inject_Metrics_in_Edges (decl_Region_Metrics.defs ());
+
+gsi::EnumIn<db::Region, db::PropertyConstraint> decl_Region_PropertyConstraint ("db", "PropertyConstraint",
+  gsi::enum_const ("NoPropertyConstraint", db::NoPropertyConstraint,
+    "@brief Specifies not to apply any property constraint\n"
+    "When using this constraint - for example on a boolean operation - shapes are considered "
+    "regardless of their user properties."
+  ) +
+  gsi::enum_const ("SamePropertiesConstraint", db::SamePropertiesConstraint,
+    "@brief Specifies to consider shapes only if their user properties are the same\n"
+    "When using this constraint - for example on a boolean operation - shapes are considered "
+    "only if their user properties are the same."
+  ) +
+  gsi::enum_const ("DifferentPropertiesConstraint", db::DifferentPropertiesConstraint,
+    "@brief Specifies to consider shapes only if their user properties are different\n"
+    "When using this constraint - for example on a boolean operation - shapes are considered "
+    "only if their user properties are different."
+  ),
+  "@brief This class represents the property constraint for boolean and check functions.\n"
+  "\n"
+  "This enum has been introduced in version 0.28.4."
+);
+
+//  Inject the Region::PropertyConstraint declarations into Region and Edges:
+//  (Edges injection has to be done here because only here defs() is available)
+gsi::ClassExt<db::Region> inject_PropertyConstraint_in_parent (decl_Region_PropertyConstraint.defs ());
+gsi::ClassExt<db::Edges> inject_PropertyConstraint_in_Edges (decl_Region_PropertyConstraint.defs ());
 
 gsi::EnumIn<db::Region, db::RectFilter> decl_Region_RectFilter ("db", "RectFilter",
   gsi::enum_const ("NoRectFilter", db::RectFilter::NoRectFilter,

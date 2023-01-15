@@ -1428,7 +1428,7 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 }
 
 RegionDelegate *
-AsIfFlatRegion::and_with (const Region &other) const
+AsIfFlatRegion::and_with (const Region &other, PropertyConstraint property_constraint) const
 {
   if (empty () || other.empty ()) {
 
@@ -1479,6 +1479,8 @@ AsIfFlatRegion::and_with (const Region &other) const
 
   } else {
 
+    // @@@ TODO: implement property constraint
+
     //  Generic case
     db::EdgeProcessor ep (report_progress (), progress_desc ());
     ep.set_base_verbosity (base_verbosity ());
@@ -1515,7 +1517,7 @@ AsIfFlatRegion::and_with (const Region &other) const
 }
 
 RegionDelegate *
-AsIfFlatRegion::not_with (const Region &other) const
+AsIfFlatRegion::not_with (const Region &other, PropertyConstraint property_constraint) const
 {
   if (empty ()) {
 
@@ -1533,6 +1535,8 @@ AsIfFlatRegion::not_with (const Region &other) const
     return clone ();
 
   } else {
+
+    // @@@ TODO: implement property constraint
 
     //  Generic case
     db::EdgeProcessor ep (report_progress (), progress_desc ());
@@ -1571,7 +1575,7 @@ AsIfFlatRegion::not_with (const Region &other) const
 
 
 std::pair<RegionDelegate *, RegionDelegate *>
-AsIfFlatRegion::andnot_with (const Region &other) const
+AsIfFlatRegion::andnot_with (const Region &other, PropertyConstraint property_constraint) const
 {
   if (empty ()) {
 
@@ -1589,6 +1593,8 @@ AsIfFlatRegion::andnot_with (const Region &other) const
     return std::make_pair (new EmptyRegion (), clone ());
 
   } else {
+
+    // @@@ TODO: implement property constraint
 
     //  Generic case
     db::EdgeProcessor ep (report_progress (), progress_desc ());

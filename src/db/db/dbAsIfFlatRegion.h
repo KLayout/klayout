@@ -122,11 +122,11 @@ public:
   virtual RegionDelegate *sized (coord_type d, unsigned int mode) const;
   virtual RegionDelegate *sized (coord_type dx, coord_type dy, unsigned int mode) const;
 
-  virtual RegionDelegate *and_with (const Region &other) const;
-  virtual RegionDelegate *not_with (const Region &other) const;
+  virtual RegionDelegate *and_with (const Region &other, PropertyConstraint property_constraint) const;
+  virtual RegionDelegate *not_with (const Region &other, PropertyConstraint property_constraint) const;
   virtual RegionDelegate *xor_with (const Region &other) const;
   virtual RegionDelegate *or_with (const Region &other) const;
-  virtual std::pair<RegionDelegate *, RegionDelegate *> andnot_with (const Region &) const;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> andnot_with (const Region &other, PropertyConstraint property_constraint) const;
 
   virtual RegionDelegate *add_in_place (const Region &other)
   {

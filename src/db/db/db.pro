@@ -288,6 +288,7 @@ HEADERS = \
   dbPolygonTools.h \
   dbPolygonGenerators.h \
   dbPropertiesRepository.h \
+  dbPropertyConstraint.h \
   dbReader.h \
   dbRecursiveInstanceIterator.h \
   dbRecursiveShapeIterator.h \

@@ -197,14 +197,12 @@ public:
 
   shape_type operator() (const shape_type &s) const
   {
-    //  CAUTION: no property ID translation happens here (reasoning: the main use case is fake ID for net tagging)
     return shape_type (shape_reference_translator<Basic>::operator () (s), s.properties_id ());
   }
 
   template <class Trans>
   shape_type operator() (const shape_type &s, const Trans &tr) const
   {
-    //  CAUTION: no property ID translation happens here (reasoning: the main use case is fake ID for net tagging)
     return shape_type (shape_reference_translator<Basic>::operator () (s, tr), s.properties_id ());
   }
 };
@@ -445,7 +443,7 @@ template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Text, db:
 template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Edge, db::Polygon>;
 template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Text, db::Text>;
 template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Edge, db::Edge>;
-template class DB_PUBLIC local_processor_cell_context<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRef>;
+template class DB_PUBLIC local_processor_cell_context<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
 template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::PolygonRef, db::EdgePair>;
@@ -759,7 +757,7 @@ template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Edge, db
 template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Edge, db::Edge>;
 template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Text, db::Polygon>;
 template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Text, db::Text>;
-template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRef>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::PolygonRef, db::EdgePair>;
@@ -1064,6 +1062,7 @@ private:
   void add_shapes_from_intruder_inst (unsigned int id1, const db::Cell &intruder_cell, const db::ICplxTrans &tn, unsigned int /*inst_id*/, const db::Box &region)
   {
     db::shape_reference_translator<TI> rt (mp_subject_layout);
+    db::shape_to_object<TI> s2o;
 
     //  Look up all shapes from the intruder instance which interact with the subject shape
     //  (given through region)
@@ -1074,7 +1073,7 @@ private:
 
       //  NOTE: we intentionally rewrite to the *subject* layout - this way polygon refs in the context come from the
       //  subject, not from the intruder.
-      TI ref2 = rt (*si.shape ().basic_ptr (typename TI::tag ()), tn * si.trans ());
+      TI ref2 = rt (s2o (si.shape ()), tn * si.trans ());
 
       //  reuse the same id for shapes from the same instance -> this avoid duplicates with different IDs on
       //  the intruder side.
@@ -1335,7 +1334,7 @@ template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, d
 template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Text, db::Text>;
 template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Edge, db::Polygon>;
 template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Edge, db::Edge>;
-template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRef>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
 template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::TextRef, db::TextRef>;
 template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::TextRef, db::PolygonRef>;
@@ -1398,7 +1397,7 @@ template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db
 template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Text, db::Text>;
 template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Edge, db::Polygon>;
 template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Edge, db::Edge>;
-template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRef>;
+template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
 template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::PolygonRef, db::EdgePair>;
@@ -1712,6 +1711,7 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
     //  TODO: can we shortcut this if interactions is empty?
     {
       db::box_scanner2<db::CellInstArray, int, TI, int> scanner;
+      db::addressable_object_from_shape<TI> heap;
       interaction_registration_inst2shape<TS, TI, TR> rec (mp_subject_layout, contexts.subject_layer (), dist, &interactions);
 
       for (db::Cell::const_iterator i = subject_cell->begin (); !i.at_end (); ++i) {
@@ -1728,7 +1728,7 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
 
       for (std::map<unsigned int, const db::Shapes *>::const_iterator im = intruder_shapes.begin (); im != intruder_shapes.end (); ++im) {
         for (db::Shapes::shape_iterator i = im->second->begin (shape_flags<TI> ()); !i.at_end (); ++i) {
-          scanner.insert2 (i->basic_ptr (typename TI::tag ()), im->first);
+          scanner.insert2 (heap (*i), im->first);
         }
       }
 
@@ -1880,11 +1880,12 @@ struct scan_shape2shape_same_layer
   operator () (const db::Shapes *subject_shapes, unsigned int subject_id0, const std::set<TI> &intruders, unsigned int intruder_layer_index, shape_interactions<TS, TI> &interactions, db::Coord dist) const
   {
     db::box_scanner2<TS, int, TI, int> scanner;
+    db::addressable_object_from_shape<TS> heap;
     interaction_registration_shape1<TS, TI> rec (&interactions, intruder_layer_index);
 
     unsigned int id = subject_id0;
     for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<TS> ()); !i.at_end (); ++i) {
-      const TS *ref = i->basic_ptr (typename TS::tag ());
+      const TS *ref = heap (*i);
       scanner.insert1 (ref, id++);
     }
 
@@ -1904,12 +1905,12 @@ struct scan_shape2shape_same_layer<T, T>
   operator () (const db::Shapes *subject_shapes, unsigned int subject_id0, const std::set<T> &intruders, unsigned int intruder_layer, shape_interactions<T, T> &interactions, db::Coord dist) const
   {
     db::box_scanner<T, int> scanner;
+    db::addressable_object_from_shape<T> heap;
     interaction_registration_shape1<T, T> rec (&interactions, intruder_layer);
 
     unsigned int id = subject_id0;
     for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<T> ()); !i.at_end (); ++i) {
-      const T *ref = i->basic_ptr (typename T::tag ());
-      scanner.insert (ref, id++);
+      scanner.insert (heap (*i), id++);
     }
 
     //  TODO: can we confine this search to the subject's (sized) bounding box?
@@ -1928,12 +1929,13 @@ struct scan_shape2shape_different_layers
   operator () (db::Layout *layout, const db::Shapes *subject_shapes, const db::Shapes *intruder_shapes, unsigned int subject_id0, const std::set<TI> *intruders, unsigned int intruder_layer_index, shape_interactions<TS, TI> &interactions, db::Coord dist) const
   {
     db::box_scanner2<TS, int, TI, int> scanner;
+    db::addressable_object_from_shape<TS> sheap;
+    db::addressable_object_from_shape<TI> iheap;
     interaction_registration_shape2shape<TS, TI> rec (layout, &interactions, intruder_layer_index);
 
     unsigned int id = subject_id0;
     for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<TS> ()); !i.at_end (); ++i, ++id) {
-      const TS *ref = i->basic_ptr (typename TS::tag ());
-      scanner.insert1 (ref, id);
+      scanner.insert1 (sheap (*i), id);
     }
 
     //  TODO: can we confine this search to the subject's (sized) bounding box?
@@ -1952,7 +1954,7 @@ struct scan_shape2shape_different_layers
       unsigned int id = subject_id0;
       for (db::Shapes::shape_iterator i = intruder_shapes->begin (shape_flags<TI> ()); !i.at_end (); ++i, ++id) {
         unsigned int iid = interactions.next_id ();
-        scanner.insert2 (i->basic_ptr (typename TI::tag ()), iid);
+        scanner.insert2 (iheap (*i), iid);
         rec.same (id, iid);
       }
 
@@ -1960,7 +1962,7 @@ struct scan_shape2shape_different_layers
 
       //  TODO: can we confine this search to the subject's (sized) bounding box?
       for (db::Shapes::shape_iterator i = intruder_shapes->begin (shape_flags<TI> ()); !i.at_end (); ++i) {
-        scanner.insert2 (i->basic_ptr (typename TI::tag ()), interactions.next_id ());
+        scanner.insert2 (iheap (*i), interactions.next_id ());
       }
 
     }
@@ -1976,6 +1978,7 @@ void
 local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_contexts<TS, TI, TR> &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const local_operation<TS, TI, TR> *op, const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, std::vector<std::unordered_set<TR> > &result) const
 {
   const db::Shapes *subject_shapes = &subject_cell->shapes (contexts.subject_layer ());
+  db::shape_to_object<TS> s2o;
 
   shape_interactions<TS, TI> interactions;
 
@@ -1990,8 +1993,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
     }
 
     if (op->on_empty_intruder_hint () != OnEmptyIntruderHint::Drop) {
-      const TS *ref = i->basic_ptr (typename TS::tag ());
-      interactions.add_subject (id, *ref);
+      interactions.add_subject (id, s2o (*i));
     }
 
   }
@@ -2035,11 +2037,12 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
     if (! subject_shapes->empty () && ! ((! intruder_cell || intruder_cell->begin ().at_end ()) && intruders.first.empty ())) {
 
       db::box_scanner2<TS, int, db::CellInstArray, int> scanner;
+      db::addressable_object_from_shape<TS> heap;
       interaction_registration_shape2inst<TS, TI> rec (mp_subject_layout, mp_intruder_layout, ail, il_index, op->dist (), &interactions);
 
       unsigned int id = subject_id0;
       for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<TS> ()); !i.at_end (); ++i) {
-        scanner.insert1 (i->basic_ptr (typename TS::tag ()), id++);
+        scanner.insert1 (heap (*i), id++);
       }
 
       unsigned int inst_id = 0;
@@ -2414,7 +2417,7 @@ template class DB_PUBLIC local_processor<db::Polygon, db::Text, db::Polygon>;
 template class DB_PUBLIC local_processor<db::Polygon, db::Text, db::Text>;
 template class DB_PUBLIC local_processor<db::Polygon, db::Edge, db::Polygon>;
 template class DB_PUBLIC local_processor<db::Polygon, db::Edge, db::Edge>;
-template class DB_PUBLIC local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRef>;
+template class DB_PUBLIC local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
 template class DB_PUBLIC local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC local_processor<db::PolygonRef, db::Edge, db::Edge>;

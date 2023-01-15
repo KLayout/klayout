@@ -30,6 +30,7 @@
 #include "dbLayout.h"
 #include "dbEdgeBoolean.h"
 #include "dbEdgeProcessor.h"
+#include "dbPropertyConstraint.h"
 
 #include <unordered_map>
 #include <unordered_set>
@@ -144,6 +145,25 @@ public:
 
 private:
   bool m_is_and;
+};
+
+/**
+ *  @brief Implements a boolean AND or NOT operation
+ */
+class DB_PUBLIC BoolAndOrNotLocalOperationWithProperties
+  : public local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>
+{
+public:
+  BoolAndOrNotLocalOperationWithProperties (bool is_and, const db::Layout *subject_layout, const db::Layout *intruder_layout, db::PropertyConstraint property_constraint);
+
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::PolygonRefWithProperties> > &result, size_t max_vertex_count, double area_ratio) const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
+  virtual std::string description () const;
+
+private:
+  bool m_is_and;
+  db::PropertyConstraint m_property_constraint;
+  const db::Layout *mp_subject_layout, *mp_intruder_layout;
 };
 
 /**

@@ -40,92 +40,6 @@ static unsigned int define_layer (db::Layout &ly, db::LayerMap &lmap, int gds_la
   return lid;
 }
 
-class BoolBetweenNets
-  : public db::local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRef>
-{
-public:
-  BoolBetweenNets (bool is_and, bool connected)
-    : m_is_and (is_and), m_connected (connected)
-  {
-    //  .. nothing yet ..
-  }
-
-  db::OnEmptyIntruderHint
-  on_empty_intruder_hint () const
-  {
-    return m_is_and ? db::Drop : db::Copy;
-  }
-
-  std::string
-  description () const
-  {
-    return m_is_and ? tl::to_string (tr ("AND operation")) : tl::to_string (tr ("NOT operation"));
-  }
-
-  void
-  do_compute_local (db::Layout *layout, const db::shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
-  {
-    tl_assert (results.size () == 1);
-    std::unordered_set<db::PolygonRef> &result = results.front ();
-
-    db::EdgeProcessor ep;
-
-    //  NOTE: is guess we do not need to handle subject/subject interactions ...
-    for (auto i = interactions.begin (); i != interactions.end (); ++i) {
-
-      const db::PolygonRefWithProperties &subject = interactions.subject_shape (i->first);
-
-      bool any_intruder = false;
-      for (auto j = i->second.begin (); j != i->second.end () && ! any_intruder; ++j) {
-        const db::PolygonRefWithProperties &other = interactions.intruder_shape (*j).second;
-        any_intruder = ((other.properties_id () == subject.properties_id ()) == m_connected);
-      }
-
-      if (! any_intruder) {
-
-        //  shortcut (not: keep, and: drop)
-        if (! m_is_and) {
-          result.insert (subject);
-        }
-
-      } else {
-
-        ep.clear ();
-
-        for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
-          ep.insert (*e, 0);
-        }
-
-        for (auto j = i->second.begin (); j != i->second.end (); ++j) {
-
-          const db::PolygonRefWithProperties &other = interactions.intruder_shape (*j).second;
-          if ((other.properties_id () == subject.properties_id ()) == m_connected) {
-            for (db::PolygonRef::polygon_edge_iterator e = other.begin_edge (); ! e.at_end(); ++e) {
-              ep.insert (*e, 1);
-            }
-          }
-
-        }
-
-        db::BooleanOp op (m_is_and ? db::BooleanOp::And : db::BooleanOp::ANotB);
-        db::PolygonRefGenerator pr (layout, result);
-        db::PolygonSplitter splitter (pr, area_ratio, max_vertex_count);
-        db::PolygonGenerator pg (splitter, true, true);
-        ep.set_base_verbosity (50);
-        ep.process (pg, op);
-
-      }
-
-    }
-
-  }
-
-private:
-  bool m_is_and;
-  bool m_connected;
-};
-
-
 TEST(0_Develop)
 {
   db::Layout ly;
@@ -210,15 +124,26 @@ TEST(0_Develop)
   lmap_write [wvia1 = ly2.insert_layer (db::LayerProperties (16, 0))] = l2n.layer_by_name ("via1");
   lmap_write [wmetal2 = ly2.insert_layer (db::LayerProperties (17, 0))] = l2n.layer_by_name ("metal2");
 
-  l2n.build_all_nets (cm, ly2, lmap_write, "NET_", db::LayoutToNetlist::NetIDOnly, tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "SC_", 0 /*don't produce devices*/);
+  l2n.build_all_nets (cm, ly2, lmap_write, "NET_", db::LayoutToNetlist::NetNameAndIDOnly, tl::Variant (1), db::LayoutToNetlist::BNH_SubcircuitCells, "SC_", 0 /*don't produce devices*/);
 
-  unsigned int out = ly2.insert_layer (db::LayerProperties (1000, 0));
+  unsigned int out1 = ly2.insert_layer (db::LayerProperties (1000, 0));
+  unsigned int out2 = ly2.insert_layer (db::LayerProperties (1001, 0));
+  unsigned int out3 = ly2.insert_layer (db::LayerProperties (1002, 0));
 
-  db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRef> proc (&ly2, &top2);
-  BoolBetweenNets n2n (true, true);
-  proc.run (&n2n, wmetal1, wmetal2, out);
+  db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties> proc (&ly2, &top2);
+  {
+    db::BoolAndOrNotLocalOperationWithProperties n2n (true, &ly2, &ly2, db::SamePropertiesConstraint);
+    proc.run (&n2n, wmetal1, wmetal2, out1);
+  }
+  {
+    db::BoolAndOrNotLocalOperationWithProperties n2n (true, &ly2, &ly2, db::DifferentPropertiesConstraint);
+    proc.run (&n2n, wmetal1, wmetal2, out2);
+  }
+  {
+    db::BoolAndOrNotLocalOperationWithProperties n2n (true, &ly2, &ly2, db::NoPropertyConstraint);
+    proc.run (&n2n, wmetal1, wmetal2, out3);
+  }
 
-  //  @@@ may no work correctly as we have used fake prop ids
   {
     db::SaveLayoutOptions options;
 

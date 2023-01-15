@@ -1043,36 +1043,6 @@ private:
 };
 
 template <class T>
-struct addressable_object_from_shape
-{
-  const T *operator () (const db::Shape &shape)
-  {
-    typename T::tag object_tag;
-    return shape.basic_ptr (object_tag);
-  }
-};
-
-template <>
-struct addressable_object_from_shape<db::NetShape>
-{
-  const NetShape *operator () (const db::Shape &shape)
-  {
-    if (shape.type () == db::Shape::TextRef) {
-      m_heap.push_back (db::NetShape (shape.text_ref ()));
-      return &m_heap.back ();
-    } else if (shape.type () == db::Shape::PolygonRef) {
-      m_heap.push_back (db::NetShape (shape.polygon_ref ()));
-      return &m_heap.back ();
-    } else {
-      tl_assert (false);
-    }
-  }
-
-private:
-  std::list<NetShape> m_heap;
-};
-
-template <class T>
 struct attr_accessor
 {
   size_t operator() (const db::Shape &shape) const

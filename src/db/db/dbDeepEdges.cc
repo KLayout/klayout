@@ -448,6 +448,12 @@ DeepEdges::iter () const
   return 0;
 }
 
+const db::Layout *
+DeepEdges::layout () const
+{
+  return &deep_layer ().layout ();
+}
+
 bool DeepEdges::equals (const Edges &other) const
 {
   const DeepEdges *other_delegate = dynamic_cast<const DeepEdges *> (other.delegate ());

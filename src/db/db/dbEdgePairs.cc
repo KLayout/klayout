@@ -149,8 +149,14 @@ const db::RecursiveShapeIterator &
 EdgePairs::iter () const
 {
   static db::RecursiveShapeIterator def_iter;
-  const db::RecursiveShapeIterator *i = mp_delegate->iter ();
+  const db::RecursiveShapeIterator *i = mp_delegate ? mp_delegate->iter () : 0;
   return *(i ? i : &def_iter);
+}
+
+const db::Layout *
+EdgePairs::layout () const
+{
+  return mp_delegate ? mp_delegate->layout () : 0;
 }
 
 void EdgePairs::processed (Region &output, const EdgePairToPolygonProcessorBase &filter) const

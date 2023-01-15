@@ -314,6 +314,11 @@ const db::RecursiveShapeIterator *DeepEdgePairs::iter () const
   return 0;
 }
 
+const db::Layout *DeepEdgePairs::layout () const
+{
+  return &deep_layer ().layout ();
+}
+
 EdgePairsDelegate *
 DeepEdgePairs::add_in_place (const EdgePairs &other)
 {

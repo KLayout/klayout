@@ -72,6 +72,7 @@ public:
   virtual const db::EdgePair *nth (size_t n) const;
   virtual bool has_valid_edge_pairs () const;
   virtual const db::RecursiveShapeIterator *iter () const;
+  virtual const db::Layout *layout () const;
 
   virtual EdgePairsDelegate *filter_in_place (const EdgePairFilterBase &filter);
   virtual EdgePairsDelegate *filtered (const EdgePairFilterBase &) const;

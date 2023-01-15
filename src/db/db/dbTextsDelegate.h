@@ -102,6 +102,7 @@ public:
   virtual bool has_valid_texts () const = 0;
 
   virtual const db::RecursiveShapeIterator *iter () const = 0;
+  virtual const db::Layout *layout () const = 0;
 
   virtual bool equals (const Texts &other) const = 0;
   virtual bool less (const Texts &other) const = 0;

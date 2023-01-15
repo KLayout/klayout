@@ -188,6 +188,11 @@ const db::RecursiveShapeIterator *FlatEdgePairs::iter () const
   return 0;
 }
 
+const db::Layout *FlatEdgePairs::layout () const
+{
+  return 0;
+}
+
 void
 FlatEdgePairs::insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const
 {

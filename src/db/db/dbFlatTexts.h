@@ -79,6 +79,7 @@ public:
   virtual bool has_valid_texts () const;
 
   virtual const db::RecursiveShapeIterator *iter () const;
+  virtual const db::Layout *layout () const;
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
   virtual void insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const;

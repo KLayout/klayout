@@ -146,8 +146,14 @@ const db::RecursiveShapeIterator &
 Texts::iter () const
 {
   static db::RecursiveShapeIterator def_iter;
-  const db::RecursiveShapeIterator *i = mp_delegate->iter ();
+  const db::RecursiveShapeIterator *i = mp_delegate ? mp_delegate->iter () : 0;
   return *(i ? i : &def_iter);
+}
+
+const db::Layout *
+Texts::layout () const
+{
+  return mp_delegate ? mp_delegate->layout () : 0;
 }
 
 void Texts::polygons (Region &output, db::Coord e) const

@@ -397,6 +397,11 @@ const db::RecursiveShapeIterator *FlatRegion::iter () const
   return 0;
 }
 
+const db::Layout *FlatRegion::layout () const
+{
+  return 0;
+}
+
 void FlatRegion::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
   layout->cell (into_cell).shapes (into_layer).insert (*mp_polygons);

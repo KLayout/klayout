@@ -141,6 +141,7 @@ public:
   virtual db::properties_id_type nth_prop_id (size_t) const { tl_assert (false); }
 
   virtual const db::RecursiveShapeIterator *iter () const { return 0; }
+  virtual const db::Layout *layout () const { return 0; }
 
   virtual bool equals (const Region &other) const;
   virtual bool less (const Region &other) const;

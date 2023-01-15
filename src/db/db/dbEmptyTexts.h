@@ -71,6 +71,7 @@ public:
   virtual bool has_valid_texts () const { return true; }
 
   virtual const db::RecursiveShapeIterator *iter () const { return 0; }
+  virtual const db::Layout *layout () const { return 0; }
 
   virtual bool equals (const Texts &other) const;
   virtual bool less (const Texts &other) const;

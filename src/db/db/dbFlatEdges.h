@@ -91,6 +91,7 @@ public:
   virtual bool has_valid_merged_edges () const;
 
   virtual const db::RecursiveShapeIterator *iter () const;
+  virtual const db::Layout *layout () const;
 
   void do_insert (const db::Edge &edge);
 

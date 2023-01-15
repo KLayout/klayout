@@ -1471,6 +1471,14 @@ public:
   const db::RecursiveShapeIterator &iter () const;
 
   /**
+   *  @brief Gets the source layout for the polygons
+   *
+   *  Use this layout to decode property IDs. This layout may be null, in which case the
+   *  source layout is outside the scope of this region.
+   */
+  const db::Layout *layout () const;
+
+  /**
    *  @brief Equality
    */
   bool operator== (const db::Edges &other) const

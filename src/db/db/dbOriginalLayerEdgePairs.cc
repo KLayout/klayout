@@ -202,6 +202,12 @@ OriginalLayerEdgePairs::iter () const
   return &m_iter;
 }
 
+const db::Layout *
+OriginalLayerEdgePairs::layout () const
+{
+  return m_iter.layout ();
+}
+
 bool
 OriginalLayerEdgePairs::equals (const EdgePairs &other) const
 {

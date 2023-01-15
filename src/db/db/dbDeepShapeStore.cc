@@ -475,14 +475,15 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Region &region, bool for_n
   db::Shapes *shapes = &initial_cell ().shapes (layer);
   db::Box world = db::Box::world ();
 
-  //  The chain of operators for producing clipped and reduced polygon references
-  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (&layout (), text_enlargement (), text_property_name ());
-  db::ReducingHierarchyBuilderShapeReceiver red (&refs, max_area_ratio, max_vertex_count, m_state.reject_odd_polygons ());
-
   //  try to maintain the texts on top level - go through shape iterator
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> ii = region.begin_iter ();
   bool regard_props = ((ii.first.shape_flags () & db::ShapeIterator::RegardProperties) != 0);
   db::ICplxTrans ttop = trans * ii.second;
+
+  //  The chain of operators for producing clipped and reduced polygon references
+  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (&layout (), ii.first.layout (), text_enlargement (), text_property_name ());
+  db::ReducingHierarchyBuilderShapeReceiver red (&refs, max_area_ratio, max_vertex_count, m_state.reject_odd_polygons ());
+
   while (! ii.first.at_end ()) {
 
     if (for_netlist && ii.first->is_text () && ii.first.layout () && ii.first.cell () != ii.first.top_cell ()) {
@@ -516,11 +517,11 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Edges &edges, const db::IC
   db::Shapes *shapes = &initial_cell ().shapes (layer);
   db::Box world = db::Box::world ();
 
-  db::EdgeBuildingHierarchyBuilderShapeReceiver eb (false);
-
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> ii = edges.begin_iter ();
   bool regard_props = ((ii.first.shape_flags () & db::ShapeIterator::RegardProperties) != 0);
   db::ICplxTrans ttop = trans * ii.second;
+
+  db::EdgeBuildingHierarchyBuilderShapeReceiver eb (&layout (), ii.first.layout (), false);
   while (! ii.first.at_end ()) {
     eb.push (*ii.first, regard_props ? ii.first->prop_id () : 0, ttop * ii.first.trans (), world, 0, shapes);
     ++ii.first;
@@ -547,11 +548,12 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Texts &texts, const db::IC
   db::Shapes *shapes = &initial_cell ().shapes (layer);
   db::Box world = db::Box::world ();
 
-  db::TextBuildingHierarchyBuilderShapeReceiver tb (&layout ());
-
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> ii = texts.begin_iter ();
   bool regard_props = ((ii.first.shape_flags () & db::ShapeIterator::RegardProperties) != 0);
   db::ICplxTrans ttop = trans * ii.second;
+
+  db::TextBuildingHierarchyBuilderShapeReceiver tb (&layout (), ii.first.layout ());
+
   while (! ii.first.at_end ()) {
     tb.push (*ii.first, regard_props ? ii.first->prop_id () : 0, ttop * ii.first.trans (), world, 0, shapes);
     ++ii.first;
@@ -839,7 +841,7 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
   builder.set_target_layer (layer_index);
 
   //  The chain of operators for producing clipped and reduced polygon references
-  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (& layout, text_enlargement (), text_property_name ());
+  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (&layout, si.layout (), text_enlargement (), text_property_name ());
   db::ReducingHierarchyBuilderShapeReceiver red (&refs, max_area_ratio, max_vertex_count, m_state.reject_odd_polygons ());
   db::ClippingHierarchyBuilderShapeReceiver clip (&red);
 
@@ -917,13 +919,19 @@ DeepLayer DeepShapeStore::create_copy (const DeepLayer &source, HierarchyBuilder
 
 DeepLayer DeepShapeStore::create_edge_layer (const db::RecursiveShapeIterator &si, bool as_edges, const db::ICplxTrans &trans)
 {
-  db::EdgeBuildingHierarchyBuilderShapeReceiver refs (as_edges);
+  unsigned int layout_index = layout_for_iter (si, trans);
+  db::Layout &layout = m_layouts[layout_index]->layout;
+
+  db::EdgeBuildingHierarchyBuilderShapeReceiver refs (&layout, si.layout (), as_edges);
   return create_custom_layer (si, &refs, trans);
 }
 
 DeepLayer DeepShapeStore::create_edge_pair_layer (const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans)
 {
-  db::EdgePairBuildingHierarchyBuilderShapeReceiver refs;
+  unsigned int layout_index = layout_for_iter (si, trans);
+  db::Layout &layout = m_layouts[layout_index]->layout;
+
+  db::EdgePairBuildingHierarchyBuilderShapeReceiver refs (&layout, si.layout ());
   return create_custom_layer (si, &refs, trans);
 }
 
@@ -932,7 +940,7 @@ DeepLayer DeepShapeStore::create_text_layer (const db::RecursiveShapeIterator &s
   unsigned int layout_index = layout_for_iter (si, trans);
   db::Layout &layout = m_layouts[layout_index]->layout;
 
-  db::TextBuildingHierarchyBuilderShapeReceiver refs (&layout);
+  db::TextBuildingHierarchyBuilderShapeReceiver refs (&layout, si.layout ());
   return create_custom_layer (si, &refs, trans);
 }
 

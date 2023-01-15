@@ -202,6 +202,12 @@ OriginalLayerTexts::iter () const
   return &m_iter;
 }
 
+const db::Layout *
+OriginalLayerTexts::layout () const
+{
+  return m_iter.layout ();
+}
+
 bool
 OriginalLayerTexts::equals (const Texts &other) const
 {

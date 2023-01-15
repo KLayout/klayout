@@ -318,6 +318,11 @@ const db::RecursiveShapeIterator *FlatEdges::iter () const
   return 0;
 }
 
+const db::Layout *FlatEdges::layout () const
+{
+  return 0;
+}
+
 void
 FlatEdges::do_insert (const db::Edge &edge)
 {

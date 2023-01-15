@@ -62,6 +62,7 @@ public:
   virtual bool has_valid_merged_edges () const;
 
   virtual const db::RecursiveShapeIterator *iter () const;
+  virtual const db::Layout *layout () const;
 
   virtual bool equals (const Edges &other) const;
   virtual bool less (const Edges &other) const;

@@ -475,6 +475,12 @@ DeepRegion::iter () const
   return 0;
 }
 
+const db::Layout *
+DeepRegion::layout () const
+{
+  return &deep_layer ().layout ();
+}
+
 bool
 DeepRegion::equals (const Region &other) const
 {

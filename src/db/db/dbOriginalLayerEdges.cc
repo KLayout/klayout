@@ -251,6 +251,12 @@ OriginalLayerEdges::iter () const
   return &m_iter;
 }
 
+const db::Layout *
+OriginalLayerEdges::layout () const
+{
+  return m_iter.layout ();
+}
+
 bool
 OriginalLayerEdges::equals (const Edges &other) const
 {

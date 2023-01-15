@@ -73,6 +73,7 @@ public:
   virtual const db::Text *nth (size_t n) const;
   virtual bool has_valid_texts () const;
   virtual const db::RecursiveShapeIterator *iter () const;
+  virtual const db::Layout *layout () const;
 
   virtual TextsDelegate *filter_in_place (const TextFilterBase &filter);
   virtual TextsDelegate *filtered (const TextFilterBase &) const;

@@ -369,6 +369,12 @@ OriginalLayerRegion::iter () const
   return &m_iter;
 }
 
+const db::Layout *
+OriginalLayerRegion::layout () const
+{
+  return m_iter.layout ();
+}
+
 bool
 OriginalLayerRegion::equals (const Region &other) const
 {

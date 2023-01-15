@@ -634,12 +634,27 @@ ReducingHierarchyBuilderShapeReceiver::reduce (const db::Polygon &poly, db::prop
 
 // ---------------------------------------------------------------------------------------------
 
-PolygonReferenceHierarchyBuilderShapeReceiver::PolygonReferenceHierarchyBuilderShapeReceiver (db::Layout *layout, int text_enlargement, const tl::Variant &text_prop_name)
+PolygonReferenceHierarchyBuilderShapeReceiver::PolygonReferenceHierarchyBuilderShapeReceiver (db::Layout *layout, const db::Layout *source_layout, int text_enlargement, const tl::Variant &text_prop_name)
   : mp_layout (layout), m_text_enlargement (text_enlargement), m_make_text_prop (false), m_text_prop_id (0)
 {
   if (! text_prop_name.is_nil ()) {
     m_text_prop_id = layout->properties_repository ().prop_name_id (text_prop_name);
     m_make_text_prop = true;
+  }
+
+  if (source_layout && source_layout != layout) {
+    m_pm.set_source (*source_layout);
+    m_pm.set_target (*layout);
+  }
+}
+
+void PolygonReferenceHierarchyBuilderShapeReceiver::make_pref (db::Shapes *target, const db::Polygon &poly, db::properties_id_type prop_id)
+{
+  prop_id = m_pm (prop_id);
+  if (prop_id != 0) {
+    target->insert (db::PolygonRefWithProperties (db::PolygonRef (poly, mp_layout->shape_repository ()), prop_id));
+  } else {
+    target->insert (db::PolygonRef (poly, mp_layout->shape_repository ()));
   }
 }
 
@@ -656,14 +671,12 @@ void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Shape &shape
     //  NOTE: as this is a specialized receiver for the purpose of building region
     //  representations we don't need empty polygons here
     if (poly.area2 () > 0) {
-      if (prop_id != 0) {
-        target->insert (db::PolygonRefWithProperties (db::PolygonRef (poly, mp_layout->shape_repository ()), prop_id));
-      } else {
-        target->insert (db::PolygonRef (poly, mp_layout->shape_repository ()));
-      }
+      make_pref (target, poly, prop_id);
     }
 
   } else if (shape.is_text () && m_text_enlargement >= 0) {
+
+    //  Texts generate small marker shapes with text_enlargement defining the box
 
     db::Polygon poly (shape.text_trans () * db::Box (-m_text_enlargement, -m_text_enlargement, m_text_enlargement, m_text_enlargement));
     if (! trans.is_unity ()) {
@@ -671,21 +684,24 @@ void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Shape &shape
     }
     db::PolygonRef pref (poly, mp_layout->shape_repository ());
 
+    db::properties_id_type pid;
+
     if (m_make_text_prop) {
 
+      //  NOTE: text properties override the prop_id passed down from the hierarchy builder when generating the
+      //  text marker shape
       db::PropertiesRepository::properties_set ps;
       ps.insert (std::make_pair (m_text_prop_id, tl::Variant (shape.text_string ())));
-      db::properties_id_type pid = mp_layout->properties_repository ().properties_id (ps);
-
-      target->insert (db::PolygonRefWithProperties (pref, pid));
+      pid = mp_layout->properties_repository ().properties_id (ps);
 
     } else {
+      pid = m_pm (prop_id);
+    }
 
-      if (prop_id != 0) {
-        target->insert (db::PolygonRefWithProperties (pref, prop_id));
-      } else {
-        target->insert (pref);
-      }
+    if (pid != 0) {
+      target->insert (db::PolygonRefWithProperties (pref, pid));
+    } else {
+      target->insert (pref);
     }
 
   }
@@ -694,31 +710,26 @@ void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Shape &shape
 void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Box &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
 {
   if (shape.area () > 0) {
-    if (prop_id != 0) {
-      target->insert (db::PolygonRefWithProperties (db::PolygonRef (db::Polygon (shape.transformed (trans)), mp_layout->shape_repository ()), prop_id));
-    } else {
-      target->insert (db::PolygonRef (db::Polygon (shape.transformed (trans)), mp_layout->shape_repository ()));
-    }
+    make_pref (target, db::Polygon (shape).transformed (trans), prop_id);
   }
 }
 
 void PolygonReferenceHierarchyBuilderShapeReceiver::push (const db::Polygon &shape, properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
 {
   if (shape.area2 () > 0) {
-    if (prop_id != 0) {
-      target->insert (db::PolygonRefWithProperties (db::PolygonRef (shape.transformed (trans), mp_layout->shape_repository ()), prop_id));
-    } else {
-      target->insert (db::PolygonRef (shape.transformed (trans), mp_layout->shape_repository ()));
-    }
+    make_pref (target, shape.transformed (trans), prop_id);
   }
 }
 
 // ---------------------------------------------------------------------------------------------
 
-EdgeBuildingHierarchyBuilderShapeReceiver::EdgeBuildingHierarchyBuilderShapeReceiver (bool as_edges)
+EdgeBuildingHierarchyBuilderShapeReceiver::EdgeBuildingHierarchyBuilderShapeReceiver (db::Layout *layout, const db::Layout *source_layout, bool as_edges)
   : m_as_edges (as_edges)
 {
-  //  .. nothing yet ..
+  if (source_layout && source_layout != layout) {
+    m_pm.set_source (*source_layout);
+    m_pm.set_target (*layout);
+  }
 }
 
 void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
@@ -730,6 +741,7 @@ void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, db
   } else if (m_as_edges && shape.is_box ()) {
     push (shape.box (), prop_id, trans, region, complex_region, target);
   } else if (shape.is_edge ()) {
+    prop_id = m_pm (prop_id);
     if (prop_id != 0) {
       target->insert (db::EdgeWithProperties (shape.edge (), shape.prop_id ()));
     } else {
@@ -741,6 +753,7 @@ void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, db
 void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Box &box, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
 {
   if (m_as_edges && ! box.empty ()) {
+    prop_id = m_pm (prop_id);
     if (prop_id != 0) {
       target->insert (db::EdgeWithProperties (db::Edge (box.p1 (), box.upper_left ()).transformed (trans), prop_id));
       target->insert (db::EdgeWithProperties (db::Edge (box.upper_left (), box.p2 ()).transformed (trans), prop_id));
@@ -758,6 +771,7 @@ void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Box &box, db::pr
 void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Polygon &poly, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *target)
 {
   if (m_as_edges) {
+    prop_id = m_pm (prop_id);
     for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
       if (prop_id != 0) {
         target->insert (db::EdgeWithProperties ((*e).transformed (trans), prop_id));
@@ -770,14 +784,18 @@ void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Polygon &poly, d
 
 // ---------------------------------------------------------------------------------------------
 
-EdgePairBuildingHierarchyBuilderShapeReceiver::EdgePairBuildingHierarchyBuilderShapeReceiver ()
+EdgePairBuildingHierarchyBuilderShapeReceiver::EdgePairBuildingHierarchyBuilderShapeReceiver (db::Layout *layout, const db::Layout *source_layout)
 {
-  //  .. nothing yet ..
+  if (source_layout && source_layout != layout) {
+    m_pm.set_source (*source_layout);
+    m_pm.set_target (*layout);
+  }
 }
 
 void EdgePairBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box & /*region*/, const db::RecursiveShapeReceiver::box_tree_type * /*complex_region*/, db::Shapes *target)
 {
   if (shape.is_edge_pair ()) {
+    prop_id = m_pm (prop_id);
     if (prop_id != 0) {
       target->insert (db::EdgePairWithProperties (shape.edge_pair ().transformed (trans), prop_id));
     } else {
@@ -788,10 +806,13 @@ void EdgePairBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape
 
 // ---------------------------------------------------------------------------------------------
 
-TextBuildingHierarchyBuilderShapeReceiver::TextBuildingHierarchyBuilderShapeReceiver (db::Layout *layout)
+TextBuildingHierarchyBuilderShapeReceiver::TextBuildingHierarchyBuilderShapeReceiver (db::Layout *layout, const db::Layout *source_layout)
   : mp_layout (layout)
 {
-  //  .. nothing yet ..
+  if (source_layout && source_layout != layout) {
+    m_pm.set_source (*source_layout);
+    m_pm.set_target (*layout);
+  }
 }
 
 void TextBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, db::properties_id_type prop_id, const db::ICplxTrans &trans, const db::Box & /*region*/, const db::RecursiveShapeReceiver::box_tree_type * /*complex_region*/, db::Shapes *target)
@@ -800,6 +821,7 @@ void TextBuildingHierarchyBuilderShapeReceiver::push (const db::Shape &shape, db
     //  NOTE: we intentionally skip all the text attributes (font etc.) here because in the context
     //  of a text collections we're only interested in the locations.
     db::Text t (shape.text_string (), shape.text_trans ());
+    prop_id = m_pm (prop_id);
     if (prop_id != 0) {
       target->insert (db::TextRefWithProperties (db::TextRef (t.transformed (trans), mp_layout->shape_repository ()), prop_id));
     } else {

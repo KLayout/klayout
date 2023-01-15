@@ -108,8 +108,14 @@ const db::RecursiveShapeIterator &
 Edges::iter () const
 {
   static db::RecursiveShapeIterator def_iter;
-  const db::RecursiveShapeIterator *i = mp_delegate->iter ();
+  const db::RecursiveShapeIterator *i = mp_delegate ? mp_delegate->iter () : 0;
   return *(i ? i : &def_iter);
+}
+
+const db::Layout *
+Edges::layout () const
+{
+  return mp_delegate ? mp_delegate->layout () : 0;
 }
 
 void

@@ -97,6 +97,7 @@ public:
   virtual bool has_valid_merged_polygons () const;
 
   virtual const db::RecursiveShapeIterator *iter () const;
+  virtual const db::Layout *layout () const;
 
   void do_insert (const db::Polygon &polygon, db::properties_id_type prop_id);
 

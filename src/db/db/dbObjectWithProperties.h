@@ -176,6 +176,15 @@ public:
     m_id = id;
   }
 
+  /**
+   *  @brief Returns the transformed object
+   */
+  template <class Trans>
+  object_with_properties<Obj> transformed (const Trans &tr) const
+  {
+    return object_with_properties<Obj> (Obj::transformed (tr), m_id);
+  }
+
 private:
   properties_id_type m_id;
 };

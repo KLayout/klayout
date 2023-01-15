@@ -192,23 +192,36 @@ FlatEdges::processed_in_place (const EdgeProcessorBase &filter)
   db::Shapes &e = *mp_edges;
 
   edge_iterator_type pw = e.get_layer<db::Edge, db::unstable_layer_tag> ().begin ();
+  edge_iterator_wp_type pw_wp = e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().begin ();
+
   for (EdgesIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
 
     edge_res.clear ();
     filter.process (*p, edge_res);
 
     for (std::vector<db::Edge>::const_iterator pr = edge_res.begin (); pr != edge_res.end (); ++pr) {
-      if (pw == e.get_layer<db::Edge, db::unstable_layer_tag> ().end ()) {
-        e.get_layer<db::Edge, db::unstable_layer_tag> ().insert (*pr);
-        pw = e.get_layer<db::Edge, db::unstable_layer_tag> ().end ();
+      if (p.prop_id () != 0) {
+        if (pw_wp == e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().end ()) {
+          e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().insert (db::EdgeWithProperties (*pr, p.prop_id ()));
+          pw_wp = e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().end ();
+        } else {
+          e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().replace (pw_wp++, db::EdgeWithProperties (*pr, p.prop_id ()));
+        }
       } else {
-        e.get_layer<db::Edge, db::unstable_layer_tag> ().replace (pw++, *pr);
+        if (pw == e.get_layer<db::Edge, db::unstable_layer_tag> ().end ()) {
+          e.get_layer<db::Edge, db::unstable_layer_tag> ().insert (*pr);
+          pw = e.get_layer<db::Edge, db::unstable_layer_tag> ().end ();
+        } else {
+          e.get_layer<db::Edge, db::unstable_layer_tag> ().replace (pw++, *pr);
+        }
       }
     }
 
   }
 
   e.get_layer<db::Edge, db::unstable_layer_tag> ().erase (pw, e.get_layer<db::Edge, db::unstable_layer_tag> ().end ());
+  e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().erase (pw_wp, e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().end ());
+
   mp_merged_edges->clear ();
   m_is_merged = filter.result_is_merged () && merged_semantics ();
 
@@ -221,18 +234,31 @@ FlatEdges::filter_in_place (const EdgeFilterBase &filter)
   db::Shapes &e = *mp_edges;
 
   edge_iterator_type pw = e.get_layer<db::Edge, db::unstable_layer_tag> ().begin ();
+  edge_iterator_wp_type pw_wp = e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().begin ();
+
   for (EdgesIterator p (begin_merged ()); ! p.at_end (); ++p) {
     if (filter.selected (*p)) {
-      if (pw == e.get_layer<db::Edge, db::unstable_layer_tag> ().end ()) {
-        e.get_layer<db::Edge, db::unstable_layer_tag> ().insert (*p);
-        pw = e.get_layer<db::Edge, db::unstable_layer_tag> ().end ();
+      if (p.prop_id () != 0) {
+        if (pw_wp == e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().end ()) {
+          e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().insert (db::EdgeWithProperties (*p, p.prop_id ()));
+          pw_wp = e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().end ();
+        } else {
+          e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().replace (pw_wp++, db::EdgeWithProperties (*p, p.prop_id ()));
+        }
       } else {
-        e.get_layer<db::Edge, db::unstable_layer_tag> ().replace (pw++, *p);
+        if (pw == e.get_layer<db::Edge, db::unstable_layer_tag> ().end ()) {
+          e.get_layer<db::Edge, db::unstable_layer_tag> ().insert (*p);
+          pw = e.get_layer<db::Edge, db::unstable_layer_tag> ().end ();
+        } else {
+          e.get_layer<db::Edge, db::unstable_layer_tag> ().replace (pw++, *p);
+        }
       }
     }
   }
 
   e.get_layer<db::Edge, db::unstable_layer_tag> ().erase (pw, e.get_layer<db::Edge, db::unstable_layer_tag> ().end ());
+  e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().erase (pw_wp, e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().end ());
+
   mp_merged_edges->clear ();
   m_is_merged = merged_semantics ();
 

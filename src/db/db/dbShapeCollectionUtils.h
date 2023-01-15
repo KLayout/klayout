@@ -39,9 +39,9 @@
 namespace db {
 
 /**
- *  @brief A template base class for edge processors
+ *  @brief A template base class for a shape processors
  *
- *  A polygon processor can turn a edge into something else.
+ *  A shape processor can turn a shape into something else.
  */
 template <class Shape, class Result>
 class DB_PUBLIC_TEMPLATE shape_collection_processor

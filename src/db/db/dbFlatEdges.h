@@ -50,6 +50,8 @@ public:
 
   typedef db::layer<db::Edge, db::unstable_layer_tag> edge_layer_type;
   typedef edge_layer_type::iterator edge_iterator_type;
+  typedef db::layer<db::EdgeWithProperties, db::unstable_layer_tag> edge_layer_wp_type;
+  typedef edge_layer_wp_type::iterator edge_iterator_wp_type;
 
   FlatEdges ();
   FlatEdges (const db::Shapes &edges, bool is_merged);
@@ -146,6 +148,9 @@ private:
       db::Shapes &e = *mp_edges;
       for (edge_iterator_type p = e.template get_layer<db::Edge, db::unstable_layer_tag> ().begin (); p != e.get_layer<db::Edge, db::unstable_layer_tag> ().end (); ++p) {
         e.get_layer<db::Edge, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
+      }
+      for (edge_iterator_wp_type p = e.template get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().begin (); p != e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().end (); ++p) {
+        e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
       }
       invalidate_cache ();
     }

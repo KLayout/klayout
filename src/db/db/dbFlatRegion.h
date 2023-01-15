@@ -48,6 +48,8 @@ public:
   typedef db::Polygon value_type;
   typedef db::layer<db::Polygon, db::unstable_layer_tag> polygon_layer_type;
   typedef polygon_layer_type::iterator polygon_iterator_type;
+  typedef db::layer<db::PolygonWithProperties, db::unstable_layer_tag> polygon_layer_wp_type;
+  typedef polygon_layer_wp_type::iterator polygon_iterator_wp_type;
 
   FlatRegion ();
   FlatRegion (const db::Shapes &polygons, bool is_merged);
@@ -156,6 +158,9 @@ private:
       db::Shapes &polygons = *mp_polygons;
       for (polygon_iterator_type p = polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin (); p != polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end (); ++p) {
         polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
+      }
+      for (polygon_iterator_wp_type p = polygons.get_layer<db::PolygonWithProperties, db::unstable_layer_tag> ().begin (); p != polygons.get_layer<db::PolygonWithProperties, db::unstable_layer_tag> ().end (); ++p) {
+        polygons.get_layer<db::PolygonWithProperties, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
       }
       invalidate_cache ();
     }

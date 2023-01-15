@@ -162,7 +162,11 @@ AsIfFlatEdgePairs::processed_to_polygons (const EdgePairToPolygonProcessorBase &
     res_polygons.clear ();
     filter.process (*e, res_polygons);
     for (std::vector<db::Polygon>::const_iterator pr = res_polygons.begin (); pr != res_polygons.end (); ++pr) {
-      region->insert (*pr);
+      if (e.prop_id () != 0) {
+        region->insert (db::PolygonWithProperties (*pr, e.prop_id ()));
+      } else {
+        region->insert (*pr);
+      }
     }
   }
 
@@ -184,7 +188,11 @@ AsIfFlatEdgePairs::processed_to_edges (const EdgePairToEdgeProcessorBase &filter
     res_edges.clear ();
     filter.process (*e, res_edges);
     for (std::vector<db::Edge>::const_iterator pr = res_edges.begin (); pr != res_edges.end (); ++pr) {
-      edges->insert (*pr);
+      if (e.prop_id () != 0) {
+        edges->insert (db::EdgeWithProperties (*pr, e.prop_id ()));
+      } else {
+        edges->insert (*pr);
+      }
     }
   }
 

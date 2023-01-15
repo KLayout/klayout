@@ -378,7 +378,11 @@ AsIfFlatRegion::processed (const PolygonProcessorBase &filter) const
     poly_res.clear ();
     filter.process (*p, poly_res);
     for (std::vector<db::Polygon>::const_iterator pr = poly_res.begin (); pr != poly_res.end (); ++pr) {
-      new_region->insert (*pr);
+      if (p.prop_id () != 0) {
+        new_region->insert (db::PolygonWithProperties (*pr, p.prop_id ()));
+      } else {
+        new_region->insert (*pr);
+      }
     }
 
   }
@@ -401,7 +405,11 @@ AsIfFlatRegion::processed_to_edges (const PolygonToEdgeProcessorBase &filter) co
     edge_res.clear ();
     filter.process (*p, edge_res);
     for (std::vector<db::Edge>::const_iterator er = edge_res.begin (); er != edge_res.end (); ++er) {
-      new_edges->insert (*er);
+      if (p.prop_id () != 0) {
+        new_edges->insert (db::EdgeWithProperties (*er, p.prop_id ()));
+      } else {
+        new_edges->insert (*er);
+      }
     }
 
   }
@@ -424,7 +432,11 @@ AsIfFlatRegion::processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &f
     edge_pair_res.clear ();
     filter.process (*p, edge_pair_res);
     for (std::vector<db::EdgePair>::const_iterator epr = edge_pair_res.begin (); epr != edge_pair_res.end (); ++epr) {
-      new_edge_pairs->insert (*epr);
+      if (p.prop_id () != 0) {
+        new_edge_pairs->insert (db::EdgePairWithProperties (*epr, p.prop_id ()));
+      } else {
+        new_edge_pairs->insert (*epr);
+      }
     }
 
   }

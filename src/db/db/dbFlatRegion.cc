@@ -172,20 +172,33 @@ Box FlatRegion::compute_bbox () const
 RegionDelegate *FlatRegion::filter_in_place (const PolygonFilterBase &filter)
 {
   db::layer<db::Polygon, db::unstable_layer_tag> &poly_layer = mp_polygons->get_layer<db::Polygon, db::unstable_layer_tag> ();
+  db::layer<db::PolygonWithProperties, db::unstable_layer_tag> &poly_layer_wp = mp_polygons->get_layer<db::PolygonWithProperties, db::unstable_layer_tag> ();
 
   polygon_iterator_type pw = poly_layer.begin ();
+  polygon_iterator_wp_type pw_wp = poly_layer_wp.begin ();
+
   for (RegionIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
     if (filter.selected (*p)) {
-      if (pw == poly_layer.end ()) {
-        poly_layer.insert (*p);
-        poly_layer.end ();
+      if (p.prop_id () != 0) {
+        if (pw_wp == poly_layer_wp.end ()) {
+          poly_layer_wp.insert (db::PolygonWithProperties (*p, p.prop_id ()));
+          pw_wp = poly_layer_wp.end ();
+        } else {
+          poly_layer_wp.replace (pw_wp++, db::PolygonWithProperties (*p, p.prop_id ()));
+        }
       } else {
-        poly_layer.replace (pw++, *p);
+        if (pw == poly_layer.end ()) {
+          poly_layer.insert (*p);
+          pw = poly_layer.end ();
+        } else {
+          poly_layer.replace (pw++, *p);
+        }
       }
     }
   }
 
   poly_layer.erase (pw, poly_layer.end ());
+  poly_layer_wp.erase (pw_wp, poly_layer_wp.end ());
 
   mp_merged_polygons->clear ();
   m_is_merged = filter.requires_raw_input () ? false : merged_semantics ();
@@ -197,15 +210,24 @@ RegionDelegate *FlatRegion::process_in_place (const PolygonProcessorBase &filter
 {
   db::layer<db::Polygon, db::unstable_layer_tag> &poly_layer = mp_polygons->get_layer<db::Polygon, db::unstable_layer_tag> ();
   db::layer<db::Polygon, db::unstable_layer_tag> out;
+  db::layer<db::PolygonWithProperties, db::unstable_layer_tag> &poly_layer_wp = mp_polygons->get_layer<db::PolygonWithProperties, db::unstable_layer_tag> ();
+  db::layer<db::PolygonWithProperties, db::unstable_layer_tag> out_wp;
 
   std::vector<db::Polygon> poly_res;
   for (RegionIterator p (filter.requires_raw_input () ? begin () : begin_merged ()); ! p.at_end (); ++p) {
     poly_res.clear ();
     filter.process (*p, poly_res);
-    out.insert (poly_res.begin (), poly_res.end ());
+    if (p.prop_id () != 0) {
+      for (auto r = poly_res.begin (); r != poly_res.end (); ++r) {
+        out_wp.insert (db::PolygonWithProperties (*r, p.prop_id ()));
+      }
+    } else {
+      out.insert (poly_res.begin (), poly_res.end ());
+    }
   }
 
   poly_layer.swap (out);
+  poly_layer_wp.swap (out_wp);
 
   mp_merged_polygons->clear ();
   m_is_merged = filter.result_is_merged () && merged_semantics ();

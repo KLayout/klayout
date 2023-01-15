@@ -140,7 +140,11 @@ AsIfFlatRegion::edges (const EdgeFilterBase *filter) const
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
     for (db::Polygon::polygon_edge_iterator e = p->begin_edge (); ! e.at_end (); ++e) {
       if (! filter || filter->selected (*e)) {
-        result->insert (*e);
+        if (p.prop_id () != 0) {
+          result->insert (db::EdgeWithProperties (*e, p.prop_id ()));
+        } else {
+          result->insert (*e);
+        }
       }
     }
   }

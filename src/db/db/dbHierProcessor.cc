@@ -354,6 +354,8 @@ db::Box safe_box_enlarged (const db::Box &box, db::Coord dx, db::Coord dy)
 {
   if (box.empty ()) {
     return box;
+  } else if (box == db::Box::world ()) {
+    return box;
   } else {
     db::Coord w2 = db::Coord (box.width () / 2);
     db::Coord h2 = db::Coord (box.height () / 2);
@@ -2222,18 +2224,13 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
   db::Coord dist = op->dist ();
 
-  db::Box subjects_box = subjects.bbox ();
-  if (subjects_box != db::Box::world ()) {
-    subjects_box.enlarge (db::Vector (dist, dist));
-  }
+  db::Box subjects_box = safe_box_enlarged (subjects.bbox (), dist - 1, dist - 1);
 
   db::Box intruders_box;
   for (typename std::vector<generic_shape_iterator<TI> >::const_iterator il = intruders.begin (); il != intruders.end (); ++il) {
     intruders_box += il->bbox ();
   }
-  if (intruders_box != db::Box::world ()) {
-    intruders_box.enlarge (db::Vector (dist, dist));
-  }
+  intruders_box = safe_box_enlarged (intruders_box, dist - 1, dist - 1);
 
   db::Box common_box = intruders_box & subjects_box;
   if (common_box.empty ()) {
@@ -2295,7 +2292,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
           } else {
 
-            addressable_shape_delivery<TI> ii ((*il).confined (common_box, true));
+            addressable_shape_delivery<TI> ii ((*il).confined (common_box, false));
             for (; !ii.at_end (); ++ii) {
               scanner.insert2 (ii.operator-> (), interactions.next_id ());
             }
@@ -2331,7 +2328,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
           interaction_registration_shape1_scanner_combo<TS, TI> scanner (&interactions, il_index, m_report_progress, scan_description);
 
-          addressable_shape_delivery<TS> is (subjects.confined (common_box, true));
+          addressable_shape_delivery<TS> is (subjects.confined (common_box, false));
           unsigned int id = id_first;
 
           for ( ; ! is.at_end (); ++is, ++id) {
@@ -2350,7 +2347,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
             //  this is the case of intra-layer interactions ("foreign"): we pretend we have two layers and
             //  reject shape self-interactions by registering them as "same"
 
-            addressable_shape_delivery<TS> is (subjects.confined (common_box, true));
+            addressable_shape_delivery<TS> is (subjects.confined (common_box, false));
 
             unsigned int id = id_first;
             for ( ; ! is.at_end (); ++is, ++id) {
@@ -2364,8 +2361,8 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
           } else {
 
-            addressable_shape_delivery<TS> is (subjects.confined (common_box, true));
-            addressable_shape_delivery<TI> ii ((*il).confined (common_box, true));
+            addressable_shape_delivery<TS> is (subjects.confined (common_box, false));
+            addressable_shape_delivery<TI> ii ((*il).confined (common_box, false));
 
             unsigned int id = id_first;
             for ( ; ! is.at_end (); ++is, ++id) {

@@ -876,7 +876,7 @@ AsIfFlatEdges::edge_region_op (const Region &other, db::EdgePolygonOp::mode_t mo
 EdgesDelegate *
 AsIfFlatEdges::add (const Edges &other) const
 {
-  FlatEdges *other_flat = dynamic_cast<FlatEdges *> (other.delegate ());
+  const FlatEdges *other_flat = dynamic_cast<const FlatEdges *> (other.delegate ());
   if (other_flat) {
 
     std::unique_ptr<FlatEdges> new_edges (new FlatEdges (*other_flat));

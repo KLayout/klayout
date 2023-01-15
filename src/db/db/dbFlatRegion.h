@@ -97,7 +97,8 @@ public:
   virtual bool has_valid_merged_polygons () const;
 
   virtual const db::RecursiveShapeIterator *iter () const;
-  virtual const db::Layout *layout () const;
+  virtual db::PropertiesRepository *properties_repository ();
+  virtual const db::PropertiesRepository *properties_repository () const;
 
   void do_insert (const db::Polygon &polygon, db::properties_id_type prop_id);
 
@@ -143,6 +144,7 @@ private:
   mutable tl::copy_on_write_ptr<db::Shapes> mp_polygons;
   mutable tl::copy_on_write_ptr<db::Shapes> mp_merged_polygons;
   mutable bool m_merged_polygons_valid;
+  mutable tl::copy_on_write_ptr<db::PropertiesRepository> mp_properties_repository;
 
   void init ();
   void ensure_merged_polygons_valid () const;

@@ -50,7 +50,7 @@ DeepLayer::DeepLayer ()
 DeepLayer::DeepLayer (const Region &region)
   : mp_store (), m_layout (0), m_layer (0)
 {
-  const db::DeepRegion *dr = dynamic_cast<db::DeepRegion *> (region.delegate ());
+  const db::DeepRegion *dr = dynamic_cast<const db::DeepRegion *> (region.delegate ());
   tl_assert (dr != 0);
   *this = dr->deep_layer ();
 }
@@ -58,7 +58,7 @@ DeepLayer::DeepLayer (const Region &region)
 DeepLayer::DeepLayer (const Texts &texts)
   : mp_store (), m_layout (0), m_layer (0)
 {
-  const db::DeepTexts *dr = dynamic_cast<db::DeepTexts *> (texts.delegate ());
+  const db::DeepTexts *dr = dynamic_cast<const db::DeepTexts *> (texts.delegate ());
   tl_assert (dr != 0);
   *this = dr->deep_layer ();
 }
@@ -66,7 +66,7 @@ DeepLayer::DeepLayer (const Texts &texts)
 DeepLayer::DeepLayer (const Edges &edges)
   : mp_store (), m_layout (0), m_layer (0)
 {
-  const db::DeepEdges *dr = dynamic_cast<db::DeepEdges *> (edges.delegate ());
+  const db::DeepEdges *dr = dynamic_cast<const db::DeepEdges *> (edges.delegate ());
   tl_assert (dr != 0);
   *this = dr->deep_layer ();
 }
@@ -74,7 +74,7 @@ DeepLayer::DeepLayer (const Edges &edges)
 DeepLayer::DeepLayer (const EdgePairs &edge_pairs)
   : mp_store (), m_layout (0), m_layer (0)
 {
-  const db::DeepEdgePairs *dr = dynamic_cast<db::DeepEdgePairs *> (edge_pairs.delegate ());
+  const db::DeepEdgePairs *dr = dynamic_cast<const db::DeepEdgePairs *> (edge_pairs.delegate ());
   tl_assert (dr != 0);
   *this = dr->deep_layer ();
 }

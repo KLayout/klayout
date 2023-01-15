@@ -64,6 +64,11 @@ public:
   PropertiesRepository (db::LayoutStateModel *state_model = 0);
 
   /**
+   *  @brief Copy constructor
+   */
+  PropertiesRepository (const PropertiesRepository &d);
+
+  /**
    *  @brief Assignment
    */
   PropertiesRepository &operator= (const PropertiesRepository &d);
@@ -232,8 +237,6 @@ private:
   std::map <name_value_pair, properties_id_vector> m_properties_component_table;
 
   db::LayoutStateModel *mp_state_model;
-
-  PropertiesRepository (const PropertiesRepository &d);
 };
 
 /**

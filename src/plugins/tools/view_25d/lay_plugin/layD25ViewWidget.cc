@@ -661,7 +661,7 @@ D25ViewWidget::entry (const db::Region &data, double dbu, double zstart, double 
 {
   //  try to establish a default color from the region's origin if required
   const db::RecursiveShapeIterator *iter = 0;
-  const db::OriginalLayerRegion *original = dynamic_cast<db::OriginalLayerRegion *> (data.delegate ());
+  const db::OriginalLayerRegion *original = dynamic_cast<const db::OriginalLayerRegion *> (data.delegate ());
   if (original) {
     iter = original->iter ();
   }
@@ -677,7 +677,7 @@ D25ViewWidget::entry (const db::Edges &data, double dbu, double zstart, double z
 {
   //  try to establish a default color from the region's origin if required
   const db::RecursiveShapeIterator *iter = 0;
-  const db::OriginalLayerEdges *original = dynamic_cast<db::OriginalLayerEdges *> (data.delegate ());
+  const db::OriginalLayerEdges *original = dynamic_cast<const  db::OriginalLayerEdges *> (data.delegate ());
   if (original) {
     iter = original->iter ();
   }
@@ -693,7 +693,7 @@ D25ViewWidget::entry (const db::EdgePairs &data, double dbu, double zstart, doub
 {
   //  try to establish a default color from the region's origin if required
   const db::RecursiveShapeIterator *iter = 0;
-  const db::OriginalLayerEdgePairs *original = dynamic_cast<db::OriginalLayerEdgePairs *> (data.delegate ());
+  const db::OriginalLayerEdgePairs *original = dynamic_cast<const  db::OriginalLayerEdgePairs *> (data.delegate ());
   if (original) {
     iter = original->iter ();
   }

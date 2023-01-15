@@ -448,10 +448,14 @@ DeepEdges::iter () const
   return 0;
 }
 
-const db::Layout *
-DeepEdges::layout () const
+db::PropertiesRepository *DeepEdges::properties_repository ()
 {
-  return &deep_layer ().layout ();
+  return &deep_layer ().layout ().properties_repository ();
+}
+
+const db::PropertiesRepository *DeepEdges::properties_repository () const
+{
+  return &deep_layer ().layout ().properties_repository ();
 }
 
 bool DeepEdges::equals (const Edges &other) const

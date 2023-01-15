@@ -1728,7 +1728,7 @@ AsIfFlatRegion::or_with (const Region &other) const
 RegionDelegate *
 AsIfFlatRegion::add (const Region &other) const
 {
-  FlatRegion *other_flat = dynamic_cast<FlatRegion *> (other.delegate ());
+  const FlatRegion *other_flat = dynamic_cast<const FlatRegion *> (other.delegate ());
   if (other_flat) {
 
     std::unique_ptr<FlatRegion> new_region (new FlatRegion (*other_flat));

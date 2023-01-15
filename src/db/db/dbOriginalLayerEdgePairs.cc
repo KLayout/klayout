@@ -202,10 +202,16 @@ OriginalLayerEdgePairs::iter () const
   return &m_iter;
 }
 
-const db::Layout *
-OriginalLayerEdgePairs::layout () const
+db::PropertiesRepository *
+OriginalLayerEdgePairs::properties_repository ()
 {
-  return m_iter.layout ();
+  return m_iter.layout () ? &const_cast<db::Layout * >(m_iter.layout ())->properties_repository () : 0;
+}
+
+const db::PropertiesRepository *
+OriginalLayerEdgePairs::properties_repository () const
+{
+  return m_iter.layout () ? &m_iter.layout ()->properties_repository () : 0;
 }
 
 bool

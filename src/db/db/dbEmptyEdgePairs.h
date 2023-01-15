@@ -73,7 +73,8 @@ public:
   virtual bool has_valid_edge_pairs () const { return true; }
 
   virtual const db::RecursiveShapeIterator *iter () const { return 0; }
-  virtual const db::Layout *layout () const { return 0; }
+  virtual db::PropertiesRepository *properties_repository () { return 0; }
+  virtual const db::PropertiesRepository *properties_repository () const { return 0; }
 
   virtual bool equals (const EdgePairs &other) const;
   virtual bool less (const EdgePairs &other) const;

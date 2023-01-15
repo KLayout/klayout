@@ -338,9 +338,14 @@ const db::RecursiveShapeIterator *DeepTexts::iter () const
   return 0;
 }
 
-const db::Layout *DeepTexts::layout () const
+db::PropertiesRepository *DeepTexts::properties_repository ()
 {
-  return &deep_layer ().layout ();
+  return &deep_layer ().layout ().properties_repository ();
+}
+
+const db::PropertiesRepository *DeepTexts::properties_repository () const
+{
+  return &deep_layer ().layout ().properties_repository ();
 }
 
 TextsDelegate *

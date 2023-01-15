@@ -42,6 +42,12 @@ PropertiesRepository::PropertiesRepository (db::LayoutStateModel *state_model)
   tl_assert (id == 0);
 }
 
+PropertiesRepository::PropertiesRepository (const PropertiesRepository &d)
+  : mp_state_model (0)
+{
+  operator= (d);
+}
+
 PropertiesRepository &
 PropertiesRepository::operator= (const PropertiesRepository &d)
 {

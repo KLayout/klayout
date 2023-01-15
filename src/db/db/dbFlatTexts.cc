@@ -32,7 +32,7 @@ namespace db
 //  FlatTexts implementation
 
 FlatTexts::FlatTexts ()
-  : MutableTexts (), mp_texts (new db::Shapes (false))
+  : MutableTexts (), mp_texts (new db::Shapes (false)), mp_properties_repository (new db::PropertiesRepository ())
 {
   //  .. nothing yet ..
 }
@@ -43,13 +43,13 @@ FlatTexts::~FlatTexts ()
 }
 
 FlatTexts::FlatTexts (const FlatTexts &other)
-  : MutableTexts (other), mp_texts (other.mp_texts)
+  : MutableTexts (other), mp_texts (other.mp_texts), mp_properties_repository (other.mp_properties_repository)
 {
   //  .. nothing yet ..
 }
 
 FlatTexts::FlatTexts (const db::Shapes &texts)
-  : MutableTexts (), mp_texts (new db::Shapes (texts))
+  : MutableTexts (), mp_texts (new db::Shapes (texts)), mp_properties_repository (new db::PropertiesRepository ())
 {
   //  .. nothing yet ..
 }
@@ -121,7 +121,7 @@ TextsDelegate *FlatTexts::add (const Texts &other) const
   std::unique_ptr<FlatTexts> new_texts (new FlatTexts (*this));
   new_texts->invalidate_cache ();
 
-  FlatTexts *other_flat = dynamic_cast<FlatTexts *> (other.delegate ());
+  const FlatTexts *other_flat = dynamic_cast<const FlatTexts *> (other.delegate ());
   if (other_flat) {
 
     new_texts->raw_texts ().insert (other_flat->raw_texts ().get_layer<db::Text, db::unstable_layer_tag> ().begin (), other_flat->raw_texts ().get_layer<db::Text, db::unstable_layer_tag> ().end ());
@@ -150,7 +150,7 @@ TextsDelegate *FlatTexts::add_in_place (const Texts &other)
 
   db::Shapes &texts = *mp_texts;
 
-  FlatTexts *other_flat = dynamic_cast<FlatTexts *> (other.delegate ());
+  const FlatTexts *other_flat = dynamic_cast<const FlatTexts *> (other.delegate ());
   if (other_flat) {
 
     texts.insert (other_flat->raw_texts ().get_layer<db::Text, db::unstable_layer_tag> ().begin (), other_flat->raw_texts ().get_layer<db::Text, db::unstable_layer_tag> ().end ());
@@ -188,9 +188,14 @@ const db::RecursiveShapeIterator *FlatTexts::iter () const
   return 0;
 }
 
-const db::Layout *FlatTexts::layout () const
+db::PropertiesRepository *FlatTexts::properties_repository ()
 {
-  return 0;
+  return mp_properties_repository.get_non_const ();
+}
+
+const db::PropertiesRepository *FlatTexts::properties_repository () const
+{
+  return mp_properties_repository.get_const ();
 }
 
 void

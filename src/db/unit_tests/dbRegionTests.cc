@@ -2254,28 +2254,6 @@ TEST(52_PropertiesDeep)
   EXPECT_EQ (s.at_end (), true);
 }
 
-//  TODO: should go somewhere central
-static std::string prop2string (const db::Layout *layout, db::properties_id_type prop_id)
-{
-  if (! layout) {
-    return std::string ("(no layout)");
-  }
-
-  const db::PropertiesRepository::properties_set &ps = layout->properties_repository ().properties (prop_id);
-
-  std::string res;
-  for (auto i = ps.begin (); i != ps.end (); ++i) {
-    if (i != ps.begin ()) {
-      res += "\n";
-    }
-    res += layout->properties_repository ().prop_name (i->first).to_string ();
-    res += "=";
-    res += i->second.to_string ();
-  }
-
-  return res;
-}
-
 TEST(53_PropertiesDeepFromLayout)
 {
   db::DeepShapeStore dss;
@@ -2377,11 +2355,11 @@ TEST(53_PropertiesDeepFromLayout)
   EXPECT_EQ (s->to_string (), "(10,20;10,220;110,220;110,20)");
   ++s;
   EXPECT_EQ (s.at_end (), false);
-  EXPECT_EQ (prop2string (r.layout (), s.prop_id ()), "VALUE=1");
+  EXPECT_EQ (prop2string (r.properties_repository (), s.prop_id ()), "VALUE=1");
   EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
   ++s;
   EXPECT_EQ (s.at_end (), false);
-  EXPECT_EQ (prop2string (r.layout (), s.prop_id ()), "VALUE=42");
+  EXPECT_EQ (prop2string (r.properties_repository (), s.prop_id ()), "VALUE=42");
   EXPECT_EQ (s->to_string (), "(11,12;11,212;111,212;111,12)");
   ++s;
   EXPECT_EQ (s.at_end (), true);
@@ -2394,13 +2372,13 @@ TEST(53_PropertiesDeepFromLayout)
   ++s;
 
   EXPECT_EQ (s.at_end (), false);
-  EXPECT_EQ (prop2string (r.layout (), s.prop_id ()), "VALUE=1");
+  EXPECT_EQ (prop2string (r.properties_repository (), s.prop_id ()), "VALUE=1");
   //  a single property #1 element
   EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
   ++s;
 
   EXPECT_EQ (s.at_end (), false);
-  EXPECT_EQ (prop2string (r.layout (), s.prop_id ()), "VALUE=42");
+  EXPECT_EQ (prop2string (r.properties_repository (), s.prop_id ()), "VALUE=42");
   //  a single property #42 element
   EXPECT_EQ (s->to_string (), "(11,12;11,212;111,212;111,12)");
   ++s;

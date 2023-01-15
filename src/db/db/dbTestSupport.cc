@@ -419,4 +419,24 @@ bool compare (const db::Box &box, const std::string &string)
   return box.to_string () == string;
 }
 
+/**
+ *  @brief Converts a property ID into a property key/value string representation
+ */
+std::string prop2string (const db::PropertiesRepository &pr, db::properties_id_type prop_id)
+{
+  const db::PropertiesRepository::properties_set &ps = pr.properties (prop_id);
+
+  std::string res;
+  for (auto i = ps.begin (); i != ps.end (); ++i) {
+    if (i != ps.begin ()) {
+      res += "\n";
+    }
+    res += pr.prop_name (i->first).to_string ();
+    res += "=";
+    res += i->second.to_string ();
+  }
+
+  return res;
+}
+
 }

@@ -33,7 +33,7 @@ namespace db
 //  FlatEdges implementation
 
 FlatEdges::FlatEdges ()
-  : MutableEdges (), mp_edges (new db::Shapes (false)), mp_merged_edges (new db::Shapes (false))
+  : MutableEdges (), mp_edges (new db::Shapes (false)), mp_merged_edges (new db::Shapes (false)), mp_properties_repository (new db::PropertiesRepository ())
 {
   init ();
 }
@@ -44,7 +44,7 @@ FlatEdges::~FlatEdges ()
 }
 
 FlatEdges::FlatEdges (const FlatEdges &other)
-  : MutableEdges (other), mp_edges (other.mp_edges), mp_merged_edges (other.mp_merged_edges)
+  : MutableEdges (other), mp_edges (other.mp_edges), mp_merged_edges (other.mp_merged_edges), mp_properties_repository (other.mp_properties_repository)
 {
   init ();
 
@@ -53,7 +53,7 @@ FlatEdges::FlatEdges (const FlatEdges &other)
 }
 
 FlatEdges::FlatEdges (const db::Shapes &edges, bool is_merged)
-  : MutableEdges (), mp_edges (new db::Shapes (edges)), mp_merged_edges (new db::Shapes (false))
+  : MutableEdges (), mp_edges (new db::Shapes (edges)), mp_merged_edges (new db::Shapes (false)), mp_properties_repository (new db::PropertiesRepository ())
 {
   init ();
 
@@ -61,7 +61,7 @@ FlatEdges::FlatEdges (const db::Shapes &edges, bool is_merged)
 }
 
 FlatEdges::FlatEdges (bool is_merged)
-  : MutableEdges (), mp_edges (new db::Shapes (false)), mp_merged_edges (new db::Shapes (false))
+  : MutableEdges (), mp_edges (new db::Shapes (false)), mp_merged_edges (new db::Shapes (false)), mp_properties_repository (new db::PropertiesRepository ())
 {
   init ();
 
@@ -245,7 +245,7 @@ EdgesDelegate *FlatEdges::add (const Edges &other) const
   new_region->invalidate_cache ();
   new_region->set_is_merged (false);
 
-  FlatEdges *other_flat = dynamic_cast<FlatEdges *> (other.delegate ());
+  const FlatEdges *other_flat = dynamic_cast<const FlatEdges *> (other.delegate ());
   if (other_flat) {
 
     new_region->raw_edges ().insert (other_flat->raw_edges ().get_layer<db::Edge, db::unstable_layer_tag> ().begin (), other_flat->raw_edges ().get_layer<db::Edge, db::unstable_layer_tag> ().end ());
@@ -275,7 +275,7 @@ EdgesDelegate *FlatEdges::add_in_place (const Edges &other)
 
   db::Shapes &e = *mp_edges;
 
-  FlatEdges *other_flat = dynamic_cast<FlatEdges *> (other.delegate ());
+  const FlatEdges *other_flat = dynamic_cast<const FlatEdges *> (other.delegate ());
   if (other_flat) {
 
     e.insert (other_flat->raw_edges ().get_layer<db::Edge, db::unstable_layer_tag> ().begin (), other_flat->raw_edges ().get_layer<db::Edge, db::unstable_layer_tag> ().end ());
@@ -318,9 +318,14 @@ const db::RecursiveShapeIterator *FlatEdges::iter () const
   return 0;
 }
 
-const db::Layout *FlatEdges::layout () const
+db::PropertiesRepository *FlatEdges::properties_repository ()
 {
-  return 0;
+  return mp_properties_repository.get_non_const ();
+}
+
+const db::PropertiesRepository *FlatEdges::properties_repository () const
+{
+  return mp_properties_repository.get_const ();
 }
 
 void

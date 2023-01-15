@@ -205,7 +205,8 @@ public:
   virtual bool has_valid_edge_pairs () const = 0;
 
   virtual const db::RecursiveShapeIterator *iter () const = 0;
-  virtual const db::Layout *layout () const = 0;
+  virtual db::PropertiesRepository *properties_repository () = 0;
+  virtual const db::PropertiesRepository *properties_repository () const = 0;
 
   virtual bool equals (const EdgePairs &other) const = 0;
   virtual bool less (const EdgePairs &other) const = 0;

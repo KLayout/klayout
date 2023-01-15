@@ -32,7 +32,7 @@ namespace db
 //  FlatEdgePairs implementation
 
 FlatEdgePairs::FlatEdgePairs ()
-  : MutableEdgePairs (), mp_edge_pairs (new db::Shapes (false))
+  : MutableEdgePairs (), mp_edge_pairs (new db::Shapes (false)), mp_properties_repository (new db::PropertiesRepository ())
 {
   //  .. nothing yet ..
 }
@@ -43,13 +43,13 @@ FlatEdgePairs::~FlatEdgePairs ()
 }
 
 FlatEdgePairs::FlatEdgePairs (const FlatEdgePairs &other)
-  : MutableEdgePairs (other), mp_edge_pairs (other.mp_edge_pairs)
+  : MutableEdgePairs (other), mp_edge_pairs (other.mp_edge_pairs), mp_properties_repository (other.mp_properties_repository)
 {
   //  .. nothing yet ..
 }
 
 FlatEdgePairs::FlatEdgePairs (const db::Shapes &edge_pairs)
-  : MutableEdgePairs (), mp_edge_pairs (new db::Shapes (edge_pairs))
+  : MutableEdgePairs (), mp_edge_pairs (new db::Shapes (edge_pairs)), mp_properties_repository (new db::PropertiesRepository ())
 {
   //  .. nothing yet ..
 }
@@ -121,7 +121,7 @@ EdgePairsDelegate *FlatEdgePairs::add (const EdgePairs &other) const
   std::unique_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs (*this));
   new_edge_pairs->invalidate_cache ();
 
-  FlatEdgePairs *other_flat = dynamic_cast<FlatEdgePairs *> (other.delegate ());
+  const FlatEdgePairs *other_flat = dynamic_cast<const FlatEdgePairs *> (other.delegate ());
   if (other_flat) {
 
     new_edge_pairs->raw_edge_pairs ().insert (other_flat->raw_edge_pairs ().get_layer<db::EdgePair, db::unstable_layer_tag> ().begin (), other_flat->raw_edge_pairs ().get_layer<db::EdgePair, db::unstable_layer_tag> ().end ());
@@ -150,7 +150,7 @@ EdgePairsDelegate *FlatEdgePairs::add_in_place (const EdgePairs &other)
 
   db::Shapes &ep = *mp_edge_pairs;
 
-  FlatEdgePairs *other_flat = dynamic_cast<FlatEdgePairs *> (other.delegate ());
+  const FlatEdgePairs *other_flat = dynamic_cast<const FlatEdgePairs *> (other.delegate ());
   if (other_flat) {
 
     ep.insert (other_flat->raw_edge_pairs ().get_layer<db::EdgePair, db::unstable_layer_tag> ().begin (), other_flat->raw_edge_pairs ().get_layer<db::EdgePair, db::unstable_layer_tag> ().end ());
@@ -188,9 +188,14 @@ const db::RecursiveShapeIterator *FlatEdgePairs::iter () const
   return 0;
 }
 
-const db::Layout *FlatEdgePairs::layout () const
+db::PropertiesRepository *FlatEdgePairs::properties_repository ()
 {
-  return 0;
+  return mp_properties_repository.get_non_const ();
+}
+
+const db::PropertiesRepository *FlatEdgePairs::properties_repository () const
+{
+  return mp_properties_repository.get_const ();
 }
 
 void

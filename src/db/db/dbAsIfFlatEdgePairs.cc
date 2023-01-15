@@ -260,7 +260,7 @@ AsIfFlatEdgePairs::second_edges () const
 EdgePairsDelegate *
 AsIfFlatEdgePairs::add (const EdgePairs &other) const
 {
-  FlatEdgePairs *other_flat = dynamic_cast<FlatEdgePairs *> (other.delegate ());
+  const FlatEdgePairs *other_flat = dynamic_cast<const FlatEdgePairs *> (other.delegate ());
   if (other_flat) {
 
     std::unique_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs (*other_flat));

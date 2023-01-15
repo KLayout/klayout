@@ -34,7 +34,7 @@ namespace db
 //  FlatRegion implementation
 
 FlatRegion::FlatRegion ()
-  : MutableRegion (), mp_polygons (new db::Shapes (false)), mp_merged_polygons (new db::Shapes (false))
+  : MutableRegion (), mp_polygons (new db::Shapes (false)), mp_merged_polygons (new db::Shapes (false)), mp_properties_repository (new db::PropertiesRepository ())
 {
   init ();
 }
@@ -45,7 +45,7 @@ FlatRegion::~FlatRegion ()
 }
 
 FlatRegion::FlatRegion (const FlatRegion &other)
-  : MutableRegion (other), mp_polygons (other.mp_polygons), mp_merged_polygons (other.mp_merged_polygons)
+  : MutableRegion (other), mp_polygons (other.mp_polygons), mp_merged_polygons (other.mp_merged_polygons), mp_properties_repository (other.mp_properties_repository)
 {
   init ();
 
@@ -54,7 +54,7 @@ FlatRegion::FlatRegion (const FlatRegion &other)
 }
 
 FlatRegion::FlatRegion (const db::Shapes &polygons, bool is_merged)
-  : MutableRegion (), mp_polygons (new db::Shapes (polygons)), mp_merged_polygons (new db::Shapes (false))
+  : MutableRegion (), mp_polygons (new db::Shapes (polygons)), mp_merged_polygons (new db::Shapes (false)), mp_properties_repository (new db::PropertiesRepository ())
 {
   init ();
 
@@ -62,7 +62,7 @@ FlatRegion::FlatRegion (const db::Shapes &polygons, bool is_merged)
 }
 
 FlatRegion::FlatRegion (bool is_merged)
-  : MutableRegion (), mp_polygons (new db::Shapes (false)), mp_merged_polygons (new db::Shapes (false))
+  : MutableRegion (), mp_polygons (new db::Shapes (false)), mp_merged_polygons (new db::Shapes (false)), mp_properties_repository (new db::PropertiesRepository ())
 {
   init ();
 
@@ -285,7 +285,7 @@ RegionDelegate *FlatRegion::add (const Region &other) const
   new_region->invalidate_cache ();
   new_region->set_is_merged (false);
 
-  FlatRegion *other_flat = dynamic_cast<FlatRegion *> (other.delegate ());
+  const FlatRegion *other_flat = dynamic_cast<const FlatRegion *> (other.delegate ());
   if (other_flat) {
 
     new_region->raw_polygons ().insert (other_flat->raw_polygons ().get_layer<db::Polygon, db::unstable_layer_tag> ().begin (), other_flat->raw_polygons ().get_layer<db::Polygon, db::unstable_layer_tag> ().end ());
@@ -315,7 +315,7 @@ RegionDelegate *FlatRegion::add_in_place (const Region &other)
 
   db::Shapes &polygons = *mp_polygons;
 
-  FlatRegion *other_flat = dynamic_cast<FlatRegion *> (other.delegate ());
+  const FlatRegion *other_flat = dynamic_cast<const FlatRegion *> (other.delegate ());
   if (other_flat) {
 
     polygons.insert (other_flat->raw_polygons ().get_layer<db::Polygon, db::unstable_layer_tag> ().begin (), other_flat->raw_polygons ().get_layer<db::Polygon, db::unstable_layer_tag> ().end ());
@@ -397,9 +397,14 @@ const db::RecursiveShapeIterator *FlatRegion::iter () const
   return 0;
 }
 
-const db::Layout *FlatRegion::layout () const
+db::PropertiesRepository *FlatRegion::properties_repository ()
 {
-  return 0;
+  return mp_properties_repository.get_non_const ();
+}
+
+const db::PropertiesRepository *FlatRegion::properties_repository () const
+{
+  return mp_properties_repository.get_const ();
 }
 
 void FlatRegion::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const

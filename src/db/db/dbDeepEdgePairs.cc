@@ -314,9 +314,14 @@ const db::RecursiveShapeIterator *DeepEdgePairs::iter () const
   return 0;
 }
 
-const db::Layout *DeepEdgePairs::layout () const
+db::PropertiesRepository *DeepEdgePairs::properties_repository ()
 {
-  return &deep_layer ().layout ();
+  return &deep_layer ().layout ().properties_repository ();
+}
+
+const db::PropertiesRepository *DeepEdgePairs::properties_repository () const
+{
+  return &deep_layer ().layout ().properties_repository ();
 }
 
 EdgePairsDelegate *

@@ -78,7 +78,8 @@ public:
   virtual bool has_valid_edge_pairs () const;
 
   virtual const db::RecursiveShapeIterator *iter () const;
-  virtual const db::Layout *layout () const;
+  virtual db::PropertiesRepository *properties_repository ();
+  virtual const db::PropertiesRepository *properties_repository () const;
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
   virtual void insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const;
@@ -120,6 +121,7 @@ private:
   FlatEdgePairs &operator= (const FlatEdgePairs &other);
 
   mutable tl::copy_on_write_ptr<db::Shapes> mp_edge_pairs;
+  mutable tl::copy_on_write_ptr<db::PropertiesRepository> mp_properties_repository;
 
   template <class Trans>
   void transform_generic (const Trans &trans)

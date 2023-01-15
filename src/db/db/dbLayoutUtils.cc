@@ -61,6 +61,12 @@ DirectLayerMapping::map_layer (const LayerProperties &lprops)
 //  PropertyMapper implementation
 
 PropertyMapper::PropertyMapper (db::Layout &target, const db::Layout &source)
+  : mp_target (&target.properties_repository ()), mp_source (&source.properties_repository ())
+{
+  //  .. nothing yet ..
+}
+
+PropertyMapper::PropertyMapper (db::PropertiesRepository &target, const db::PropertiesRepository &source)
   : mp_target (&target), mp_source (&source)
 {
   //  .. nothing yet ..
@@ -84,6 +90,18 @@ PropertyMapper::PropertyMapper ()
 void 
 PropertyMapper::set_source (const db::Layout &source)
 {
+  if (&source.properties_repository () != mp_source) {
+    m_prop_id_map.clear ();
+    mp_source = &source.properties_repository ();
+  }
+}
+
+/**
+ *  @brief Specify the source property repository
+ */
+void
+PropertyMapper::set_source (const db::PropertiesRepository &source)
+{
   if (&source != mp_source) {
     m_prop_id_map.clear ();
     mp_source = &source;
@@ -95,6 +113,18 @@ PropertyMapper::set_source (const db::Layout &source)
  */
 void 
 PropertyMapper::set_target (db::Layout &target)
+{
+  if (&target.properties_repository () != mp_target) {
+    m_prop_id_map.clear ();
+    mp_target = &target.properties_repository ();
+  }
+}
+
+/**
+ *  @brief Specify the target property repository
+ */
+void
+PropertyMapper::set_target (db::PropertiesRepository &target)
 {
   if (&target != mp_target) {
     m_prop_id_map.clear ();
@@ -118,7 +148,7 @@ PropertyMapper::operator() (db::Layout::properties_id_type source_id)
   std::map <db::Layout::properties_id_type, db::Layout::properties_id_type>::const_iterator p = m_prop_id_map.find (source_id);
 
   if (p == m_prop_id_map.end ()) {
-    db::Layout::properties_id_type new_id = mp_target->properties_repository ().translate (mp_source->properties_repository (), source_id);
+    db::Layout::properties_id_type new_id = mp_target->translate (*mp_source, source_id);
     m_prop_id_map.insert (std::make_pair (source_id, new_id));
     return new_id;
   } else {

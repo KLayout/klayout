@@ -216,7 +216,7 @@ AsIfFlatTexts::edges () const
 TextsDelegate *
 AsIfFlatTexts::add (const Texts &other) const
 {
-  FlatTexts *other_flat = dynamic_cast<FlatTexts *> (other.delegate ());
+  const FlatTexts *other_flat = dynamic_cast<const FlatTexts *> (other.delegate ());
   if (other_flat) {
 
     std::unique_ptr<FlatTexts> new_texts (new FlatTexts (*other_flat));

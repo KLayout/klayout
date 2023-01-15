@@ -298,7 +298,15 @@ public:
   /**
    *  @brief Gets the underlying delegate object
    */
-  RegionDelegate *delegate () const
+  const RegionDelegate *delegate () const
+  {
+    return mp_delegate;
+  }
+
+  /**
+   *  @brief Gets the underlying delegate object
+   */
+  RegionDelegate *delegate ()
   {
     return mp_delegate;
   }
@@ -1757,12 +1765,18 @@ public:
   const db::RecursiveShapeIterator &iter () const;
 
   /**
-   *  @brief Gets the source layout for the polygons
+   *  @brief Gets the property repository
    *
-   *  Use this layout to decode property IDs. This layout may be null, in which case the
-   *  source layout is outside the scope of this region.
+   *  Use this object to decode property IDs.
    */
-  const db::Layout *layout () const;
+  const db::PropertiesRepository &properties_repository () const;
+
+  /**
+   *  @brief Gets the property repository
+   *
+   *  Use this object to decode and encode property IDs.
+   */
+  db::PropertiesRepository &properties_repository ();
 
   /**
    *  @brief Equality

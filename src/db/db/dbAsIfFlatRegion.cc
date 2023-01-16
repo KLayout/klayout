@@ -364,6 +364,7 @@ AsIfFlatRegion::filtered (const PolygonFilterBase &filter) const
     }
   }
 
+  new_region->set_is_merged (true);
   return new_region.release ();
 }
 
@@ -1017,7 +1018,7 @@ AsIfFlatRegion::snapped (db::Coord gx, db::Coord gy)
     throw tl::Exception (tl::to_string (tr ("Grid snap requires a positive grid value")));
   }
 
-  std::unique_ptr<FlatRegion> new_region (new FlatRegion (merged_semantics ()));
+  std::unique_ptr<FlatRegion> new_region (new FlatRegion ());
 
   gx = std::max (db::Coord (1), gx);
   gy = std::max (db::Coord (1), gy);
@@ -1386,13 +1387,19 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
   } else if (! merged_semantics () || is_merged ()) {
 
     //  Generic case
-    std::unique_ptr<FlatRegion> new_region (new FlatRegion (false /*output isn't merged*/));
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion ());
 
     db::ShapeGenerator pc (new_region->raw_polygons (), false);
     db::PolygonGenerator pg (pc, false, true);
     db::SizingPolygonFilter sf (pg, dx, dy, mode);
     for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
       sf.put (*p);
+    }
+
+    //  in case of negative sizing the output polygons will still be merged (on positive sizing they might
+    //  overlap after size and are not necessarily merged)
+    if (dx < 0 && dy < 0 && is_merged ()) {
+      new_region->set_is_merged (true);
     }
 
     return new_region.release ();
@@ -1416,13 +1423,19 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
       ep.insert (*p, n);
     }
 
-    std::unique_ptr<FlatRegion> new_region (new FlatRegion (false /*output isn't merged*/));
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion ());
     db::ShapeGenerator pc (new_region->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg2 (pc, false /*don't resolve holes*/, true /*min. coherence*/);
     db::SizingPolygonFilter siz (pg2, dx, dy, mode);
     db::PolygonGenerator pg (siz, false /*don't resolve holes*/, min_coherence () /*min. coherence*/);
     db::BooleanOp op (db::BooleanOp::Or);
     ep.process (pg, op);
+
+    //  in case of negative sizing the output polygons will still be merged (on positive sizing they might
+    //  overlap after size and are not necessarily merged)
+    if (dx < 0 && dy < 0 && merged_semantics ()) {
+      new_region->set_is_merged (true);
+    }
 
     return new_region.release ();
 

@@ -350,7 +350,7 @@ TEST(5_BoolXOR)
   db::Region r42xor3  = r42 ^ r3;
   db::Region r42xor42 = r42 ^ r42;
 
-  EXPECT_EQ (r2xor3.is_merged (), false);
+  EXPECT_EQ (r2xor3.is_merged (), true);
 
   db::Layout target;
   unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));

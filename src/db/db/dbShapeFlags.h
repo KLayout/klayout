@@ -36,10 +36,12 @@ struct shape_flags_traits
 {
   static unsigned int generic () { return 0; }
   static unsigned int pure ()    { return 0; }
+  static bool with_props ()      { return false; }
 };
 
 template <>
 struct shape_flags_traits<db::PolygonRef>
+  : public shape_flags_traits<void>
 {
   static unsigned int generic () { return 1 << db::ShapeIterator::PolygonRef; }
   static unsigned int pure ()    { return 1 << db::ShapeIterator::PolygonRef; }
@@ -47,6 +49,7 @@ struct shape_flags_traits<db::PolygonRef>
 
 template <>
 struct shape_flags_traits<db::TextRef>
+  : public shape_flags_traits<void>
 {
   static unsigned int generic () { return 1 << db::ShapeIterator::TextRef; }
   static unsigned int pure ()    { return 1 << db::ShapeIterator::TextRef; }
@@ -54,6 +57,7 @@ struct shape_flags_traits<db::TextRef>
 
 template <>
 struct shape_flags_traits<db::Box>
+  : public shape_flags_traits<void>
 {
   static unsigned int generic () { return db::ShapeIterator::Boxes; }
   static unsigned int pure ()    { return 1 << db::ShapeIterator::Box; }
@@ -61,6 +65,7 @@ struct shape_flags_traits<db::Box>
 
 template <>
 struct shape_flags_traits<db::Path>
+  : public shape_flags_traits<void>
 {
   static unsigned int generic () { return db::ShapeIterator::Paths; }
   static unsigned int pure ()    { return 1 << db::ShapeIterator::Path; }
@@ -68,6 +73,7 @@ struct shape_flags_traits<db::Path>
 
 template <>
 struct shape_flags_traits<db::Polygon>
+  : public shape_flags_traits<void>
 {
   static unsigned int generic () { return db::ShapeIterator::Polygons; }
   static unsigned int pure ()    { return 1 << db::ShapeIterator::Polygon; }
@@ -75,6 +81,7 @@ struct shape_flags_traits<db::Polygon>
 
 template <>
 struct shape_flags_traits<db::SimplePolygon>
+  : public shape_flags_traits<void>
 {
   static unsigned int generic () { return db::ShapeIterator::Polygons; }
   static unsigned int pure ()    { return 1 << db::ShapeIterator::SimplePolygon; }
@@ -82,6 +89,7 @@ struct shape_flags_traits<db::SimplePolygon>
 
 template <>
 struct shape_flags_traits<db::Edge>
+  : public shape_flags_traits<void>
 {
   static unsigned int generic () { return db::ShapeIterator::Edges; }
   static unsigned int pure ()    { return 1 << db::ShapeIterator::Edge; }
@@ -89,6 +97,7 @@ struct shape_flags_traits<db::Edge>
 
 template <>
 struct shape_flags_traits<db::EdgePair>
+  : public shape_flags_traits<void>
 {
   static unsigned int generic () { return db::ShapeIterator::EdgePairs; }
   static unsigned int pure ()    { return 1 << db::ShapeIterator::EdgePair; }
@@ -96,6 +105,7 @@ struct shape_flags_traits<db::EdgePair>
 
 template <>
 struct shape_flags_traits<db::Text>
+  : public shape_flags_traits<void>
 {
   static unsigned int generic () { return db::ShapeIterator::Texts; }
   static unsigned int pure ()    { return 1 << db::ShapeIterator::Text; }
@@ -103,13 +113,14 @@ struct shape_flags_traits<db::Text>
 
 template <class T>
 struct shape_flags_traits<db::object_with_properties<T> >
+  : public shape_flags_traits<T>
 {
-  static unsigned int generic () { return shape_flags_traits<T>::generic (); }
-  static unsigned int pure ()    { return shape_flags_traits<T>::pure (); }
+  static bool with_props ()      { return true; }
 };
 
 template <class T> unsigned int shape_flags ()      { return shape_flags_traits<T>::generic (); }
 template <class T> unsigned int shape_flags_pure () { return shape_flags_traits<T>::pure (); }
+template <class T> bool shape_flags_with_props ()   { return shape_flags_traits<T>::with_props (); }
 
 /**
  *  @brief Converter helpers for changing a shape to an object of a specific type

@@ -104,7 +104,7 @@ AsIfFlatEdges::selected_interacting_generic (const Region &other, EdgeInteractio
 
   db::box_scanner2<db::Edge, size_t, db::Polygon, size_t> scanner (report_progress (), progress_desc ());
 
-  AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
+  AddressableEdgeDelivery e (begin_merged ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert1 (e.operator-> (), 0);
@@ -150,7 +150,7 @@ AsIfFlatEdges::selected_interacting_generic (const Edges &edges, EdgeInteraction
 
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
 
-  AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
+  AddressableEdgeDelivery e (begin_merged ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert (e.operator-> (), 0);
@@ -201,7 +201,7 @@ AsIfFlatEdges::selected_interacting_pair_generic (const Region &region, EdgeInte
 
   db::box_scanner2<db::Edge, size_t, db::Polygon, size_t> scanner (report_progress (), progress_desc ());
 
-  AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
+  AddressableEdgeDelivery e (begin_merged ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert1 (e.operator-> (), 0);
@@ -245,7 +245,7 @@ AsIfFlatEdges::selected_interacting_pair_generic (const Edges &other, EdgeIntera
 
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
 
-  AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
+  AddressableEdgeDelivery e (begin_merged ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert (e.operator-> (), 0);
@@ -281,7 +281,7 @@ AsIfFlatEdges::pull_generic (const Edges &edges) const
 {
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
 
-  AddressableEdgeDelivery e (begin (), has_valid_edges ());
+  AddressableEdgeDelivery e (begin ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert (e.operator-> (), 1);
@@ -310,7 +310,7 @@ AsIfFlatEdges::pull_generic (const Region &other) const
 
   db::box_scanner2<db::Edge, size_t, db::Polygon, size_t> scanner (report_progress (), progress_desc ());
 
-  AddressableEdgeDelivery e (begin (), true);
+  AddressableEdgeDelivery e (begin ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert1 (e.operator-> (), 0);
@@ -487,7 +487,7 @@ AsIfFlatEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, c
     db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
     scanner.reserve (count ());
 
-    AddressableEdgeDelivery e (begin (), has_valid_edges ());
+    AddressableEdgeDelivery e (begin ());
 
     size_t n = 0;
     for ( ; ! e.at_end (); ++e) {
@@ -733,7 +733,7 @@ AsIfFlatEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Co
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve (count () + (other ? other->count () : 0));
 
-  AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
+  AddressableEdgeDelivery e (begin_merged ());
 
   size_t n = 0;
   for ( ; ! e.at_end (); ++e) {
@@ -774,7 +774,7 @@ AsIfFlatEdges::boolean (const Edges *other, EdgeBoolOp op) const
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve (count () + (other ? other->count () : 0));
 
-  AddressableEdgeDelivery e (begin (), has_valid_edges ());
+  AddressableEdgeDelivery e (begin ());
 
   for ( ; ! e.at_end (); ++e) {
     if (! e->is_degenerate ()) {
@@ -808,7 +808,7 @@ AsIfFlatEdges::boolean_andnot (const Edges *other) const
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve (count () + (other ? other->count () : 0));
 
-  AddressableEdgeDelivery e (begin (), has_valid_edges ());
+  AddressableEdgeDelivery e (begin ());
 
   for ( ; ! e.at_end (); ++e) {
     if (! e->is_degenerate ()) {

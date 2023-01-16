@@ -95,6 +95,7 @@ template class DB_PUBLIC local_operation<db::Polygon, db::Text, db::Text>;
 template class DB_PUBLIC local_operation<db::Polygon, db::Edge, db::Polygon>;
 template class DB_PUBLIC local_operation<db::Polygon, db::Edge, db::Edge>;
 template class DB_PUBLIC local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
+template class DB_PUBLIC local_operation<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties>;
 template class DB_PUBLIC local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_operation<db::PolygonRef, db::Text, db::PolygonRef>;
 template class DB_PUBLIC local_operation<db::PolygonRef, db::TextRef, db::PolygonRef>;
@@ -193,56 +194,60 @@ BoolAndOrNotLocalOperation::do_compute_local (db::Layout *layout, const shape_in
 // ---------------------------------------------------------------------------------------------
 //  BoolAndOrNotLocalOperationWithProperties implementation
 
-BoolAndOrNotLocalOperationWithProperties::BoolAndOrNotLocalOperationWithProperties (bool is_and, const db::Layout *subject_layout, const db::Layout *intruder_layout, db::PropertyConstraint property_constraint)
-  : m_is_and (is_and), m_property_constraint (property_constraint), mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout)
+template <class TS, class TI, class TR>
+bool_and_or_not_local_operation_with_properties<TS, TI, TR>::bool_and_or_not_local_operation_with_properties (bool is_and, db::PropertiesRepository *target_pr, const db::PropertiesRepository *subject_pr, const db::PropertiesRepository *intruder_pr, db::PropertyConstraint property_constraint)
+  : m_is_and (is_and), m_property_constraint (property_constraint), mp_target_pr (target_pr), mp_subject_pr (subject_pr), mp_intruder_pr (intruder_pr)
 {
   //  .. nothing yet ..
 }
 
+template <class TS, class TI, class TR>
 OnEmptyIntruderHint
-BoolAndOrNotLocalOperationWithProperties::on_empty_intruder_hint () const
+bool_and_or_not_local_operation_with_properties<TS, TI, TR>::on_empty_intruder_hint () const
 {
   return m_is_and ? Drop : Copy;
 }
 
+template <class TS, class TI, class TR>
 std::string
-BoolAndOrNotLocalOperationWithProperties::description () const
+bool_and_or_not_local_operation_with_properties<TS, TI, TR>::description () const
 {
   return m_is_and ? tl::to_string (tr ("AND operation")) : tl::to_string (tr ("NOT operation"));
 }
 
+template <class TS, class TI, class TR>
 void
-BoolAndOrNotLocalOperationWithProperties::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::PolygonRefWithProperties> > &results, size_t max_vertex_count, double area_ratio) const
+bool_and_or_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &results, size_t max_vertex_count, double area_ratio) const
 {
-  db::PropertyMapper pms (*layout, *mp_subject_layout);
-  db::PropertyMapper pmi (*layout, *mp_intruder_layout);
+  db::PropertyMapper pms (*mp_target_pr, *mp_subject_pr);
+  db::PropertyMapper pmi (*mp_target_pr, *mp_intruder_pr);
 
   tl_assert (results.size () == 1);
-  std::unordered_set<db::PolygonRefWithProperties> &result = results.front ();
+  std::unordered_set<db::object_with_properties<TR> > &result = results.front ();
 
   db::EdgeProcessor ep;
 
-  std::map<db::properties_id_type, std::pair<tl::slist<db::PolygonRef>, std::set<db::PolygonRef> > > by_prop_id;
+  std::map<db::properties_id_type, std::pair<tl::slist<TS>, std::set<TI> > > by_prop_id;
 
-  for (shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+  for (auto i = interactions.begin (); i != interactions.end (); ++i) {
 
-    const db::PolygonRefWithProperties &subject = interactions.subject_shape (i->first);
+    const db::object_with_properties<TS> &subject = interactions.subject_shape (i->first);
 
     if (i->second.empty ()) {
 
       if (! m_is_and) {
-        result.insert (db::PolygonRefWithProperties (subject, pms (subject.properties_id ())));
+        result.insert (db::object_with_properties<TR> (subject, pms (subject.properties_id ())));
       }
 
     } else {
 
       db::properties_id_type prop_id_s = pms (subject.properties_id ());
 
-      std::pair<tl::slist<db::PolygonRef>, std::set<db::PolygonRef> > &shapes_by_prop = by_prop_id [prop_id_s];
+      auto &shapes_by_prop = by_prop_id [prop_id_s];
       shapes_by_prop.first.push_front (subject);
 
-      for (shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        const db::PolygonRefWithProperties &intruder = interactions.intruder_shape (*j).second;
+      for (auto j = i->second.begin (); j != i->second.end (); ++j) {
+        const db::object_with_properties<TI> &intruder = interactions.intruder_shape (*j).second;
         db::properties_id_type prop_id_i = (m_property_constraint != db::NoPropertyConstraint ? pmi (intruder.properties_id ()) : prop_id_s);
         if ((prop_id_i != prop_id_s) == (m_property_constraint == db::DifferentPropertiesConstraint)) {
           shapes_by_prop.second.insert (intruder);
@@ -258,23 +263,23 @@ BoolAndOrNotLocalOperationWithProperties::do_compute_local (db::Layout *layout, 
     ep.clear ();
     size_t p1 = 0, p2 = 1;
 
-    const std::set<db::PolygonRef> &others = p2s->second.second;
+    const std::set<TI> &others = p2s->second.second;
     db::properties_id_type prop_id = p2s->first;
 
     for (auto s = p2s->second.first.begin (); s != p2s->second.first.end (); ++s) {
 
-      const db::PolygonRef &subject = *s;
+      const TS &subject = *s;
       if (others.find (subject) != others.end ()) {
         if (m_is_and) {
-          result.insert (db::PolygonRefWithProperties (subject, prop_id));
+          result.insert (db::object_with_properties<TR> (subject, prop_id));
         }
       } else if (others.empty ()) {
         //  shortcut (not: keep, and: drop)
         if (! m_is_and) {
-          result.insert (db::PolygonRefWithProperties (subject, prop_id));
+          result.insert (db::object_with_properties<TR> (subject, prop_id));
         }
       } else {
-        for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+        for (auto e = subject.begin_edge (); ! e.at_end(); ++e) {
           ep.insert (*e, p1);
         }
         p1 += 2;
@@ -284,30 +289,33 @@ BoolAndOrNotLocalOperationWithProperties::do_compute_local (db::Layout *layout, 
 
     if (! others.empty () && p1 > 0) {
 
-      for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
-        for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
+      for (auto o = others.begin (); o != others.end (); ++o) {
+        for (auto e = o->begin_edge (); ! e.at_end(); ++e) {
           ep.insert (*e, p2);
         }
         p2 += 2;
       }
 
-      std::unordered_set<db::PolygonRef> result_wo_props;
+      std::unordered_set<TR> result_wo_props;
 
       db::BooleanOp op (m_is_and ? db::BooleanOp::And : db::BooleanOp::ANotB);
-      db::PolygonRefGenerator pr (layout, result_wo_props);
+      db::polygon_ref_generator<TR> pr (layout, result_wo_props);
       db::PolygonSplitter splitter (pr, area_ratio, max_vertex_count);
       db::PolygonGenerator pg (splitter, true, true);
       ep.set_base_verbosity (50);
       ep.process (pg, op);
 
       for (auto r = result_wo_props.begin (); r != result_wo_props.end (); ++r) {
-        result.insert (db::PolygonRefWithProperties (*r, prop_id));
+        result.insert (db::object_with_properties<TR> (*r, prop_id));
       }
 
     }
 
   }
 }
+
+template class bool_and_or_not_local_operation_with_properties<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class bool_and_or_not_local_operation_with_properties<db::Polygon, db::Polygon, db::Polygon>;
 
 // ---------------------------------------------------------------------------------------------
 //  TwoBoolAndNotLocalOperation implementation

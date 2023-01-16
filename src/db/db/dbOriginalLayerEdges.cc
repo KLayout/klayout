@@ -305,7 +305,7 @@ OriginalLayerEdges::ensure_merged_edges_valid () const
     db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
     scanner.reserve (count ());
 
-    AddressableEdgeDelivery e (begin (), has_valid_edges ());
+    AddressableEdgeDelivery e (begin ());
 
     for ( ; ! e.at_end (); ++e) {
       if (! e->is_degenerate ()) {

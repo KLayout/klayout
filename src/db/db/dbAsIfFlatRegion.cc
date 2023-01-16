@@ -1493,41 +1493,7 @@ AsIfFlatRegion::and_with (const Region &other, PropertyConstraint property_const
     return new EmptyRegion ();
 
   } else {
-
-    // @@@ TODO: implement property constraint
-
-    //  Generic case
-    db::EdgeProcessor ep (report_progress (), progress_desc ());
-    ep.set_base_verbosity (base_verbosity ());
-
-    //  count edges and reserve memory
-    size_t n = 0;
-    for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
-      n += p->vertices ();
-    }
-    for (RegionIterator p (other.begin ()); ! p.at_end (); ++p) {
-      n += p->vertices ();
-    }
-    ep.reserve (n);
-
-    //  insert the polygons into the processor
-    n = 0;
-    for (RegionIterator p (begin ()); ! p.at_end (); ++p, n += 2) {
-      ep.insert (*p, n);
-    }
-    n = 1;
-    for (RegionIterator p (other.begin ()); ! p.at_end (); ++p, n += 2) {
-      ep.insert (*p, n);
-    }
-
-    std::unique_ptr<FlatRegion> new_region (new FlatRegion (true));
-    db::BooleanOp op (db::BooleanOp::And);
-    db::ShapeGenerator pc (new_region->raw_polygons (), true /*clear*/);
-    db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence ());
-    ep.process (pg, op);
-
-    return new_region.release ();
-
+    return and_or_not_with (true, other, property_constraint);
   }
 }
 
@@ -1550,8 +1516,14 @@ AsIfFlatRegion::not_with (const Region &other, PropertyConstraint property_const
     return clone ();
 
   } else {
+    return and_or_not_with (false, other, property_constraint);
+  }
+}
 
-    // @@@ TODO: implement property constraint
+RegionDelegate *
+AsIfFlatRegion::and_or_not_with (bool is_and, const Region &other, PropertyConstraint property_constraint) const
+{
+  if (property_constraint == db::IgnoreProperties) {
 
     //  Generic case
     db::EdgeProcessor ep (report_progress (), progress_desc ());
@@ -1578,16 +1550,37 @@ AsIfFlatRegion::not_with (const Region &other, PropertyConstraint property_const
     }
 
     std::unique_ptr<FlatRegion> new_region (new FlatRegion (true));
-    db::BooleanOp op (db::BooleanOp::ANotB);
+    db::BooleanOp op (is_and ? db::BooleanOp::And : db::BooleanOp::ANotB);
     db::ShapeGenerator pc (new_region->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence ());
     ep.process (pg, op);
 
     return new_region.release ();
 
+  } else {
+
+    db::generic_shape_iterator<db::PolygonWithProperties> polygons (db::make_wp_iter (begin ()));
+
+    std::unique_ptr<FlatRegion> output (new FlatRegion ());
+    std::vector<db::Shapes *> results;
+    results.push_back (&output->raw_polygons ());
+
+    db::bool_and_or_not_local_operation_with_properties<db::Polygon, db::Polygon, db::Polygon> op (is_and, output->properties_repository (), properties_repository (), &other.properties_repository (), property_constraint);
+
+    db::local_processor<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties> proc;
+    proc.set_base_verbosity (base_verbosity ());
+    proc.set_description (progress_desc ());
+    proc.set_report_progress (report_progress ());
+
+    std::vector<db::generic_shape_iterator<db::PolygonWithProperties> > others;
+    others.push_back (db::make_wp_iter (other.begin ()));
+
+    proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
+
+    return output.release ();
+
   }
 }
-
 
 std::pair<RegionDelegate *, RegionDelegate *>
 AsIfFlatRegion::andnot_with (const Region &other, PropertyConstraint property_constraint) const

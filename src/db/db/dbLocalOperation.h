@@ -150,21 +150,25 @@ private:
 /**
  *  @brief Implements a boolean AND or NOT operation with property handling
  */
-class DB_PUBLIC BoolAndOrNotLocalOperationWithProperties
-  : public local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>
+template <class TS, class TI, class TR>
+class DB_PUBLIC bool_and_or_not_local_operation_with_properties
+  : public local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::object_with_properties<TR> >
 {
 public:
-  BoolAndOrNotLocalOperationWithProperties (bool is_and, const db::Layout *subject_layout, const db::Layout *intruder_layout, db::PropertyConstraint property_constraint);
+  bool_and_or_not_local_operation_with_properties (bool is_and, db::PropertiesRepository *target_pr, const db::PropertiesRepository *subject_pr, const db::PropertiesRepository *intruder_pr, db::PropertyConstraint property_constraint);
 
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::PolygonRefWithProperties> > &result, size_t max_vertex_count, double area_ratio) const;
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &result, size_t max_vertex_count, double area_ratio) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
 private:
   bool m_is_and;
   db::PropertyConstraint m_property_constraint;
-  const db::Layout *mp_subject_layout, *mp_intruder_layout;
+  db::PropertiesRepository *mp_target_pr;
+  const db::PropertiesRepository *mp_subject_pr, *mp_intruder_pr;
 };
+
+typedef bool_and_or_not_local_operation_with_properties<db::PolygonRef, db::PolygonRef, db::PolygonRef> BoolAndOrNotLocalOperationWithProperties;
 
 /**
  *  @brief Implements a boolean AND plus NOT operation

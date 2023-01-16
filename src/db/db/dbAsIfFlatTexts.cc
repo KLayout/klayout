@@ -334,7 +334,7 @@ AsIfFlatTexts::selected_interacting_generic (const Region &other, bool inverse) 
 
   db::box_scanner2<db::Text, size_t, db::Polygon, size_t> scanner (report_progress (), progress_desc ());
 
-  AddressableTextDelivery e (begin (), has_valid_texts ());
+  AddressableTextDelivery e (begin ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert1 (e.operator-> (), 0);
@@ -380,7 +380,7 @@ AsIfFlatTexts::pull_generic (const Region &other) const
 
   db::box_scanner2<db::Text, size_t, db::Polygon, size_t> scanner (report_progress (), progress_desc ());
 
-  AddressableTextDelivery e (begin (), has_valid_texts ());
+  AddressableTextDelivery e (begin ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert1 (e.operator-> (), 0);

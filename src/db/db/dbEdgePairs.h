@@ -100,7 +100,7 @@ public:
   }
 };
 
-typedef addressable_shape_delivery_gen<EdgePairsIterator> AddressableEdgePairDelivery;
+typedef addressable_shape_delivery<EdgePair> AddressableEdgePairDelivery;
 
 class EdgePairs;
 
@@ -496,7 +496,7 @@ public:
    */
   AddressableEdgePairDelivery addressable_edge_pairs () const
   {
-    return AddressableEdgePairDelivery (begin (), has_valid_edge_pairs ());
+    return AddressableEdgePairDelivery (begin ());
   }
 
   /**

@@ -95,7 +95,7 @@ public:
   }
 };
 
-typedef addressable_shape_delivery_gen<EdgesIterator> AddressableEdgeDelivery;
+typedef addressable_shape_delivery<Edge> AddressableEdgeDelivery;
 
 class Edges;
 
@@ -1449,7 +1449,7 @@ public:
    */
   AddressableEdgeDelivery addressable_edges () const
   {
-    return AddressableEdgeDelivery (begin (), has_valid_edges ());
+    return AddressableEdgeDelivery (begin ());
   }
 
   /**
@@ -1468,7 +1468,7 @@ public:
    */
   AddressableEdgeDelivery addressable_merged_edges () const
   {
-    return AddressableEdgeDelivery (begin_merged (), has_valid_merged_edges ());
+    return AddressableEdgeDelivery (begin_merged ());
   }
 
   /**

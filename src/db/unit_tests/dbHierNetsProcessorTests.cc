@@ -132,15 +132,15 @@ TEST(0_Develop)
 
   db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties> proc (&ly2, &top2);
   {
-    db::BoolAndOrNotLocalOperationWithProperties n2n (true, &ly2, &ly2, db::SamePropertiesConstraint);
+    db::BoolAndOrNotLocalOperationWithProperties n2n (true, &ly2.properties_repository (), &ly2.properties_repository (), &ly2.properties_repository (), db::SamePropertiesConstraint);
     proc.run (&n2n, wmetal1, wmetal2, out1);
   }
   {
-    db::BoolAndOrNotLocalOperationWithProperties n2n (true, &ly2, &ly2, db::DifferentPropertiesConstraint);
+    db::BoolAndOrNotLocalOperationWithProperties n2n (true, &ly2.properties_repository (), &ly2.properties_repository (), &ly2.properties_repository (), db::DifferentPropertiesConstraint);
     proc.run (&n2n, wmetal1, wmetal2, out2);
   }
   {
-    db::BoolAndOrNotLocalOperationWithProperties n2n (true, &ly2, &ly2, db::NoPropertyConstraint);
+    db::BoolAndOrNotLocalOperationWithProperties n2n (true, &ly2.properties_repository (), &ly2.properties_repository (), &ly2.properties_repository (), db::NoPropertyConstraint);
     proc.run (&n2n, wmetal1, wmetal2, out3);
   }
 

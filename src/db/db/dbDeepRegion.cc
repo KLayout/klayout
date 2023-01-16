@@ -796,7 +796,7 @@ DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op, db::PropertyC
 
   } else {
 
-    db::BoolAndOrNotLocalOperationWithProperties op (and_op, &deep_layer ().layout (), &other->deep_layer ().layout (), property_constraint);
+    db::BoolAndOrNotLocalOperationWithProperties op (and_op, &dl_out.layout ().properties_repository (), &deep_layer ().layout ().properties_repository (), &other->deep_layer ().layout ().properties_repository (), property_constraint);
 
     db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
     proc.set_base_verbosity (base_verbosity ());

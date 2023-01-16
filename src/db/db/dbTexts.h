@@ -100,7 +100,7 @@ public:
   }
 };
 
-typedef addressable_shape_delivery_gen<TextsIterator> AddressableTextDelivery;
+typedef addressable_shape_delivery<Text> AddressableTextDelivery;
 
 class Texts;
 
@@ -522,7 +522,7 @@ public:
    */
   AddressableTextDelivery addressable_texts () const
   {
-    return AddressableTextDelivery (begin (), has_valid_texts ());
+    return AddressableTextDelivery (begin ());
   }
 
   /**

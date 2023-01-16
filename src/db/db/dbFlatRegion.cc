@@ -39,11 +39,6 @@ FlatRegion::FlatRegion ()
   init ();
 }
 
-FlatRegion::~FlatRegion ()
-{
-  //  .. nothing yet ..
-}
-
 FlatRegion::FlatRegion (const FlatRegion &other)
   : MutableRegion (other), mp_polygons (other.mp_polygons), mp_merged_polygons (other.mp_merged_polygons), mp_properties_repository (other.mp_properties_repository)
 {
@@ -67,6 +62,11 @@ FlatRegion::FlatRegion (bool is_merged)
   init ();
 
   m_is_merged = is_merged;
+}
+
+FlatRegion::~FlatRegion ()
+{
+  //  .. nothing yet ..
 }
 
 void FlatRegion::set_is_merged (bool m)

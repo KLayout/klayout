@@ -1122,7 +1122,7 @@ public:
   /**
    *  @brief Boolean XOR operator with options
    *
-   *  TODO: property constraints are not implemented propertly yet.
+   *  TODO: property constraints are not implemented properly yet.
    */
   Region bool_xor (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties) const
   {
@@ -1147,7 +1147,7 @@ public:
    *  This method does not necessarily merge the region. To ensure the region
    *  is merged, call merge afterwards.
    *
-   *  TODO: property constraints are not implemented propertly yet.
+   *  TODO: property constraints are not implemented properly yet.
    */
   Region &bool_xor_with (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties)
   {
@@ -1170,7 +1170,7 @@ public:
    *
    *  This method merges the polygons of both regions.
    *
-   *  TODO: property constraints are not implemented propertly yet.
+   *  TODO: property constraints are not implemented properly yet.
    */
   Region bool_or (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties) const
   {
@@ -1189,7 +1189,7 @@ public:
   /**
    *  @brief In-place boolean OR operator with options
    *
-   *  TODO: property constraints are not implemented propertly yet.
+   *  TODO: property constraints are not implemented properly yet.
    */
   Region &bool_or_with (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties)
   {

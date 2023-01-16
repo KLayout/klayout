@@ -36,19 +36,32 @@ namespace db
 enum PropertyConstraint
 {
   /**
-   *  @brief No constraint, shapes are processed regardless of their properties
+   *  @brief Ignore properties
+   *
+   *  In this mode, properties are not considered and erased.
    */
-  NoPropertyConstraint = 0,
+  IgnoreProperties = 0,
+
+  /**
+   *  @brief No constraint, shapes are processed regardless of their properties
+   *
+   *  Properties are attached to the outputs where applicable.
+   */
+  NoPropertyConstraint = 1,
 
   /**
    *  @brief Shapes are processed if their properties are the same
+   *
+   *  Properties are attached to the outputs where applicable.
    */
-  SamePropertiesConstraint = 1,
+  SamePropertiesConstraint = 2,
 
   /**
    *  @brief Shapes are processed if their properties are different
+   *
+   *  Properties are attached to the outputs where applicable.
    */
-  DifferentPropertiesConstraint = 2
+  DifferentPropertiesConstraint = 3
 };
 
 }

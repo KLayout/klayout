@@ -1036,13 +1036,13 @@ public:
    */
   Region operator& (const Region &other) const
   {
-    return Region (mp_delegate->and_with (other, db::NoPropertyConstraint));
+    return Region (mp_delegate->and_with (other, db::IgnoreProperties));
   }
 
   /**
    *  @brief Boolean AND operator with options
    */
-  Region bool_and (const Region &other, PropertyConstraint prop_constraint = db::NoPropertyConstraint) const
+  Region bool_and (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties) const
   {
     return Region (mp_delegate->and_with (other, prop_constraint));
   }
@@ -1055,7 +1055,7 @@ public:
    */
   Region &operator&= (const Region &other)
   {
-    set_delegate (mp_delegate->and_with (other, db::NoPropertyConstraint));
+    set_delegate (mp_delegate->and_with (other, db::IgnoreProperties));
     return *this;
   }
 
@@ -1065,7 +1065,7 @@ public:
    *  This method does not necessarily merge the region. To ensure the region
    *  is merged, call merge afterwards.
    */
-  Region &bool_and_with (const Region &other, PropertyConstraint prop_constraint = db::NoPropertyConstraint)
+  Region &bool_and_with (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties)
   {
     set_delegate (mp_delegate->and_with (other, prop_constraint));
     return *this;
@@ -1076,13 +1076,13 @@ public:
    */
   Region operator- (const Region &other) const
   {
-    return Region (mp_delegate->not_with (other, db::NoPropertyConstraint));
+    return Region (mp_delegate->not_with (other, db::IgnoreProperties));
   }
 
   /**
    *  @brief Boolean NOT operator with options
    */
-  Region bool_not (const Region &other, PropertyConstraint prop_constraint = db::NoPropertyConstraint) const
+  Region bool_not (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties) const
   {
     return Region (mp_delegate->not_with (other, prop_constraint));
   }
@@ -1095,7 +1095,7 @@ public:
    */
   Region &operator-= (const Region &other)
   {
-    set_delegate (mp_delegate->not_with (other, db::NoPropertyConstraint));
+    set_delegate (mp_delegate->not_with (other, db::IgnoreProperties));
     return *this;
   }
 
@@ -1105,7 +1105,7 @@ public:
    *  This method does not necessarily merge the region. To ensure the region
    *  is merged, call merge afterwards.
    */
-  Region bool_not_with (const Region &other, PropertyConstraint prop_constraint = db::NoPropertyConstraint)
+  Region bool_not_with (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties)
   {
     set_delegate (mp_delegate->not_with (other, prop_constraint));
     return *this;
@@ -1116,13 +1116,15 @@ public:
    */
   Region operator^ (const Region &other) const
   {
-    return Region (mp_delegate->xor_with (other, db::NoPropertyConstraint));
+    return Region (mp_delegate->xor_with (other, db::IgnoreProperties));
   }
 
   /**
    *  @brief Boolean XOR operator with options
+   *
+   *  TODO: property constraints are not implemented propertly yet.
    */
-  Region bool_xor (const Region &other, PropertyConstraint prop_constraint = db::NoPropertyConstraint) const
+  Region bool_xor (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties) const
   {
     return Region (mp_delegate->xor_with (other, prop_constraint));
   }
@@ -1135,7 +1137,7 @@ public:
    */
   Region &operator^= (const Region &other)
   {
-    set_delegate (mp_delegate->xor_with (other, db::NoPropertyConstraint));
+    set_delegate (mp_delegate->xor_with (other, db::IgnoreProperties));
     return *this;
   }
 
@@ -1144,8 +1146,10 @@ public:
    *
    *  This method does not necessarily merge the region. To ensure the region
    *  is merged, call merge afterwards.
+   *
+   *  TODO: property constraints are not implemented propertly yet.
    */
-  Region &bool_xor_with (const Region &other, PropertyConstraint prop_constraint = db::NoPropertyConstraint)
+  Region &bool_xor_with (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties)
   {
     set_delegate (mp_delegate->xor_with (other, prop_constraint));
     return *this;
@@ -1158,15 +1162,17 @@ public:
    */
   Region operator| (const Region &other) const
   {
-    return Region (mp_delegate->or_with (other, db::NoPropertyConstraint));
+    return Region (mp_delegate->or_with (other, db::IgnoreProperties));
   }
 
   /**
    *  @brief Boolean OR operator with options
    *
    *  This method merges the polygons of both regions.
+   *
+   *  TODO: property constraints are not implemented propertly yet.
    */
-  Region bool_or (const Region &other, PropertyConstraint prop_constraint = db::NoPropertyConstraint) const
+  Region bool_or (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties) const
   {
     return Region (mp_delegate->or_with (other, prop_constraint));
   }
@@ -1176,14 +1182,16 @@ public:
    */
   Region &operator|= (const Region &other)
   {
-    set_delegate (mp_delegate->or_with (other, db::NoPropertyConstraint));
+    set_delegate (mp_delegate->or_with (other, db::IgnoreProperties));
     return *this;
   }
 
   /**
-   *  @brief In-place boolean OR operator
+   *  @brief In-place boolean OR operator with options
+   *
+   *  TODO: property constraints are not implemented propertly yet.
    */
-  Region &bool_or_with (const Region &other, PropertyConstraint prop_constraint = db::NoPropertyConstraint)
+  Region &bool_or_with (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties)
   {
     set_delegate (mp_delegate->or_with (other, prop_constraint));
     return *this;

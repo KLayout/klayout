@@ -780,7 +780,7 @@ DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op, db::PropertyC
 {
   DeepLayer dl_out (deep_layer ().derived ());
 
-  if (property_constraint == db::NoPropertyConstraint) {
+  if (property_constraint == db::IgnoreProperties) {
 
     db::BoolAndOrNotLocalOperation op (and_op);
 
@@ -819,7 +819,7 @@ DeepRegion::and_and_not_with (const DeepRegion *other, PropertyConstraint proper
   DeepLayer dl_out1 (deep_layer ().derived ());
   DeepLayer dl_out2 (deep_layer ().derived ());
 
-  if (property_constraint == db::NoPropertyConstraint) {
+  if (property_constraint == db::IgnoreProperties) {
 
     db::TwoBoolAndNotLocalOperation op;
 

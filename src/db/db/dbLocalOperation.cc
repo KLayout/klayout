@@ -236,14 +236,14 @@ BoolAndOrNotLocalOperationWithProperties::do_compute_local (db::Layout *layout, 
 
     } else {
 
-      db::properties_id_type prop_id_s = (m_property_constraint != db::NoPropertyConstraint ? pms (subject.properties_id ()) : 0);
+      db::properties_id_type prop_id_s = pms (subject.properties_id ());
 
       std::pair<tl::slist<db::PolygonRef>, std::set<db::PolygonRef> > &shapes_by_prop = by_prop_id [prop_id_s];
       shapes_by_prop.first.push_front (subject);
 
       for (shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
         const db::PolygonRefWithProperties &intruder = interactions.intruder_shape (*j).second;
-        db::properties_id_type prop_id_i = (m_property_constraint != db::NoPropertyConstraint ? pmi (intruder.properties_id ()) : 0);
+        db::properties_id_type prop_id_i = (m_property_constraint != db::NoPropertyConstraint ? pmi (intruder.properties_id ()) : prop_id_s);
         if ((prop_id_i != prop_id_s) == (m_property_constraint == db::DifferentPropertiesConstraint)) {
           shapes_by_prop.second.insert (intruder);
         }
@@ -423,14 +423,14 @@ TwoBoolAndNotLocalOperationWithProperties::do_compute_local (db::Layout *layout,
 
     } else {
 
-      db::properties_id_type prop_id_s = (m_property_constraint != db::NoPropertyConstraint ? pms (subject.properties_id ()) : 0);
+      db::properties_id_type prop_id_s = pms (subject.properties_id ());
 
       std::pair<tl::slist<db::PolygonRef>, std::set<db::PolygonRef> > &shapes_by_prop = by_prop_id [prop_id_s];
       shapes_by_prop.first.push_front (subject);
 
       for (shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
         const db::PolygonRefWithProperties &intruder = interactions.intruder_shape (*j).second;
-        db::properties_id_type prop_id_i = (m_property_constraint != db::NoPropertyConstraint ? pmi (intruder.properties_id ()) : 0);
+        db::properties_id_type prop_id_i = (m_property_constraint != db::NoPropertyConstraint ? pmi (intruder.properties_id ()) : prop_id_s);
         if ((prop_id_i != prop_id_s) == (m_property_constraint == db::DifferentPropertiesConstraint)) {
           shapes_by_prop.second.insert (intruder);
         }

@@ -137,9 +137,13 @@ TEST(2)
 
     db::RecursiveShapeIterator iter1 (ly, ly.cell (top_cell_index), li1, db::Box (2000, -1000, 6000, 4000));
     regions.push_back (std::make_pair (db::Region (iter1), tl));
+    //  TODO: currently, original layer regions don't clip - emulate this
+    regions.back ().first &= db::Region (iter1.region ());
 
     db::RecursiveShapeIterator iter2 (ly, ly.cell (top_cell_index), li1, db::Box (14000, 0, 20000, 3000));
     regions.push_back (std::make_pair (db::Region (iter2), tl));
+    //  TODO: currently, original layer regions don't clip - emulate this
+    regions.back ().first &= db::Region (iter2.region ());
 
   }
 
@@ -272,7 +276,11 @@ TEST(4_Add)
   db::Region r42 (db::RecursiveShapeIterator (ly, top_cell, l42));
   db::Region box (db::Box (2000, -1000, 6000, 4000));
   db::Region r2box (db::RecursiveShapeIterator (ly, top_cell, l2, box));
+  //  TODO: currently, original layer regions don't clip - emulate this
+  r2box &= db::Region (box);
   db::Region r3box (db::RecursiveShapeIterator (ly, top_cell, l3, box));
+  //  TODO: currently, original layer regions don't clip - emulate this
+  r3box &= db::Region (box);
 
   //  intra-layout
 

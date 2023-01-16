@@ -148,7 +148,7 @@ private:
 };
 
 /**
- *  @brief Implements a boolean AND or NOT operation
+ *  @brief Implements a boolean AND or NOT operation with property handling
  */
 class DB_PUBLIC BoolAndOrNotLocalOperationWithProperties
   : public local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>
@@ -180,6 +180,26 @@ public:
 
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &result, size_t max_vertex_count, double area_ratio) const;
   virtual std::string description () const;
+};
+
+/**
+ *  @brief Implements a boolean AND plus NOT operation
+ *
+ *  This processor delivers two outputs: the first one having the AND result, the second
+ *  one having the NOT result.
+ */
+class DB_PUBLIC TwoBoolAndNotLocalOperationWithProperties
+  : public local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>
+{
+public:
+  TwoBoolAndNotLocalOperationWithProperties (const db::Layout *subject_layout, const db::Layout *intruder_layout, db::PropertyConstraint property_constraint);
+
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::PolygonRefWithProperties> > &result, size_t max_vertex_count, double area_ratio) const;
+  virtual std::string description () const;
+
+private:
+  db::PropertyConstraint m_property_constraint;
+  const db::Layout *mp_subject_layout, *mp_intruder_layout;
 };
 
 /**

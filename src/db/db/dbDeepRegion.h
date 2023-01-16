@@ -101,8 +101,8 @@ public:
 
   virtual RegionDelegate *and_with (const Region &other, db::PropertyConstraint property_constraint) const;
   virtual RegionDelegate *not_with (const Region &other, db::PropertyConstraint property_constraint) const;
-  virtual RegionDelegate *xor_with (const Region &other) const;
-  virtual RegionDelegate *or_with (const Region &other) const;
+  virtual RegionDelegate *xor_with (const Region &other, db::PropertyConstraint property_constraint) const;
+  virtual RegionDelegate *or_with (const Region &other, db::PropertyConstraint property_constraint) const;
   virtual std::pair<RegionDelegate *, RegionDelegate *> andnot_with (const Region &, db::PropertyConstraint property_constraint) const;
 
   virtual RegionDelegate *add_in_place (const Region &other);

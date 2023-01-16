@@ -83,7 +83,8 @@ SOURCES = \
   dbArrayTests.cc \
   dbDeepTextsTests.cc \
   dbNetShapeTests.cc \
-  dbHierNetsProcessorTests.cc
+  dbHierNetsProcessorTests.cc \
+  dbAsIfFlatRegionTests.cc
 
 INCLUDEPATH += $$TL_INC $$DB_INC $$GSI_INC
 DEPENDPATH += $$TL_INC $$DB_INC $$GSI_INC

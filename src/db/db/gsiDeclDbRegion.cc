@@ -1660,6 +1660,10 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method will compute the boolean NOT (intersection) between two regions. "
     "The result is often but not necessarily always merged.\n"
+    "It allows specification of a property constaint - e.g. only performing the boolean operation between "
+    "shapes with the same user properties.\n"
+    "\n"
+    "This variant has been introduced in version 0.28.4."
   ) +
   method ("-=", &db::Region::operator-=, gsi::arg ("other"),
     "@brief Performs the boolean NOT between self and the other region\n"
@@ -1676,6 +1680,10 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method will compute the boolean NOT (intersection) between two regions. "
     "The result is often but not necessarily always merged.\n"
+    "It allows specification of a property constaint - e.g. only performing the boolean operation between "
+    "shapes with the same user properties.\n"
+    "\n"
+    "This variant has been introduced in version 0.28.4."
   ) +
   method ("^", &db::Region::operator^, gsi::arg ("other"),
     "@brief Returns the boolean XOR between self and the other region\n"
@@ -1685,6 +1693,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This method will compute the boolean XOR (intersection) between two regions. "
     "The result is often but not necessarily always merged.\n"
   ) +
+  method ("xor", &db::Region::bool_xor, gsi::arg ("other"), gsi::arg ("property_constraint", db::NoPropertyConstraint),
+    "@brief Returns the boolean XOR between self and the other region\n"
+    "\n"
+    "@return The result of the boolean XOR operation\n"
+    "\n"
+    "This method will compute the boolean XOR (intersection) between two regions. "
+    "The result is often but not necessarily always merged.\n"
+    "It allows specification of a property constaint - e.g. only performing the boolean operation between "
+    "shapes with the same user properties.\n"
+    "\n"
+    "This variant has been introduced in version 0.28.4."
+  ) +
   method ("^=", &db::Region::operator^=, gsi::arg ("other"),
     "@brief Performs the boolean XOR between self and the other region\n"
     "\n"
@@ -1692,6 +1712,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method will compute the boolean XOR (intersection) between two regions. "
     "The result is often but not necessarily always merged.\n"
+  ) +
+  method ("xor_with", &db::Region::bool_xor_with, gsi::arg ("other"), gsi::arg ("property_constraint", db::NoPropertyConstraint),
+    "@brief Performs the boolean XOR between self and the other region\n"
+    "\n"
+    "@return The region after modification (self)\n"
+    "\n"
+    "This method will compute the boolean XOR (intersection) between two regions. "
+    "The result is often but not necessarily always merged.\n"
+    "It allows specification of a property constaint - e.g. only performing the boolean operation between "
+    "shapes with the same user properties.\n"
+    "\n"
+    "This variant has been introduced in version 0.28.4."
   ) +
   method ("\\|", &db::Region::operator|, gsi::arg ("other"),
     "@brief Returns the boolean OR between self and the other region\n"
@@ -1701,6 +1733,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The boolean OR is implemented by merging the polygons of both regions. To simply join the regions "
     "without merging, the + operator is more efficient."
   ) +
+  method ("or", &db::Region::bool_or, gsi::arg ("other"), gsi::arg ("property_constraint", db::NoPropertyConstraint),
+    "@brief Returns the boolean OR between self and the other region\n"
+    "\n"
+    "@return The resulting region\n"
+    "\n"
+    "The boolean OR is implemented by merging the polygons of both regions. To simply join the regions "
+    "without merging, the + operator is more efficient."
+    "It allows specification of a property constaint - e.g. only performing the boolean operation between "
+    "shapes with the same user properties.\n"
+    "\n"
+    "This variant has been introduced in version 0.28.4."
+  ) +
   method ("\\|=", &db::Region::operator|=, gsi::arg ("other"),
     "@brief Performs the boolean OR between self and the other region\n"
     "\n"
@@ -1708,6 +1752,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "The boolean OR is implemented by merging the polygons of both regions. To simply join the regions "
     "without merging, the + operator is more efficient."
+  ) +
+  method ("or_with", &db::Region::bool_or_with, gsi::arg ("other"), gsi::arg ("property_constraint", db::NoPropertyConstraint),
+    "@brief Performs the boolean OR between self and the other region\n"
+    "\n"
+    "@return The region after modification (self)\n"
+    "\n"
+    "The boolean OR is implemented by merging the polygons of both regions. To simply join the regions "
+    "without merging, the + operator is more efficient."
+    "It allows specification of a property constaint - e.g. only performing the boolean operation between "
+    "shapes with the same user properties.\n"
+    "\n"
+    "This variant has been introduced in version 0.28.4."
   ) +
   method ("+", &db::Region::operator+, gsi::arg ("other"),
     "@brief Returns the combined region of self and the other region\n"

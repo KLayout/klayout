@@ -1641,7 +1641,7 @@ AsIfFlatRegion::andnot_with (const Region &other, PropertyConstraint property_co
 }
 
 RegionDelegate *
-AsIfFlatRegion::xor_with (const Region &other) const
+AsIfFlatRegion::xor_with (const Region &other, PropertyConstraint prop_constraint) const
 {
   if (empty () && ! other.strict_handling ()) {
 
@@ -1654,9 +1654,11 @@ AsIfFlatRegion::xor_with (const Region &other) const
   } else if (! bbox ().overlaps (other.bbox ()) && ! strict_handling () && ! other.strict_handling ()) {
 
     //  Simplified handling for disjunct case
-    return or_with (other);
+    return or_with (other, prop_constraint);
 
   } else {
+
+    // @@@ TODO: implement property constraint
 
     //  Generic case
     db::EdgeProcessor ep (report_progress (), progress_desc ());
@@ -1694,7 +1696,7 @@ AsIfFlatRegion::xor_with (const Region &other) const
 }
 
 RegionDelegate *
-AsIfFlatRegion::or_with (const Region &other) const
+AsIfFlatRegion::or_with (const Region &other, PropertyConstraint prop_constraint) const
 {
   if (empty () && ! other.strict_handling ()) {
 
@@ -1711,6 +1713,8 @@ AsIfFlatRegion::or_with (const Region &other) const
     return add (other);
 
   } else {
+
+    // @@@ TODO: implement property constraint
 
     //  Generic case
     db::EdgeProcessor ep (report_progress (), progress_desc ());

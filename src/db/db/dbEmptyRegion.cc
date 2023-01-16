@@ -67,19 +67,20 @@ EmptyRegion::add (const Region &other) const
 }
 
 RegionDelegate *
-EmptyRegion::xor_with (const Region &other) const
+EmptyRegion::xor_with (const Region &other, db::PropertyConstraint prop_constraint) const
 {
-  return or_with (other);
+  return or_with (other, prop_constraint);
 }
 
 RegionDelegate *
-EmptyRegion::or_with (const Region &other) const
+EmptyRegion::or_with (const Region &other, db::PropertyConstraint /*prop_constraint*/) const
 {
   if (other.empty ()) {
     return new EmptyRegion ();
   } else if (! other.strict_handling ()) {
     return other.delegate ()->clone ();
   } else {
+    // @@@ TODO: implement prop_constraint
     return other.delegate ()->merged ();
   }
 }

@@ -171,7 +171,7 @@ BoolAndOrNotLocalOperation::do_compute_local (db::Layout *layout, const shape_in
 
   }
 
-  if (! others.empty () || p1 > 0) {
+  if (! others.empty () && p1 > 0) {
 
     for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
       for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
@@ -216,8 +216,6 @@ BoolAndOrNotLocalOperationWithProperties::do_compute_local (db::Layout *layout, 
 {
   db::PropertyMapper pms (*layout, *mp_subject_layout);
   db::PropertyMapper pmi (*layout, *mp_intruder_layout);
-
-  //  @@@ TODO: implement different property constraint etc.
 
   tl_assert (results.size () == 1);
   std::unordered_set<db::PolygonRefWithProperties> &result = results.front ();
@@ -356,7 +354,7 @@ TwoBoolAndNotLocalOperation::do_compute_local (db::Layout *layout, const shape_i
 
   }
 
-  if (! others.empty () || p1 > 0) {
+  if (! others.empty () && p1 > 0) {
 
     for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
       for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
@@ -387,6 +385,128 @@ TwoBoolAndNotLocalOperation::do_compute_local (db::Layout *layout, const shape_i
 }
 
 std::string TwoBoolAndNotLocalOperation::description () const
+{
+  return tl::to_string (tr ("ANDNOT operation"));
+}
+
+// ---------------------------------------------------------------------------------------------
+//  TwoBoolAndNotLocalOperationWithProperties implementation
+
+TwoBoolAndNotLocalOperationWithProperties::TwoBoolAndNotLocalOperationWithProperties (const db::Layout *subject_layout, const db::Layout *intruder_layout, db::PropertyConstraint property_constraint)
+  : db::local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties> (),
+    m_property_constraint (property_constraint), mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout)
+{
+  //  .. nothing yet ..
+}
+
+void
+TwoBoolAndNotLocalOperationWithProperties::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::PolygonRefWithProperties> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  db::PropertyMapper pms (*layout, *mp_subject_layout);
+  db::PropertyMapper pmi (*layout, *mp_intruder_layout);
+
+  tl_assert (results.size () == 2);
+  std::unordered_set<db::PolygonRefWithProperties> &result0 = results [0];
+  std::unordered_set<db::PolygonRefWithProperties> &result1 = results [1];
+
+  db::EdgeProcessor ep;
+
+  std::map<db::properties_id_type, std::pair<tl::slist<db::PolygonRef>, std::set<db::PolygonRef> > > by_prop_id;
+
+  for (shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+
+    const db::PolygonRefWithProperties &subject = interactions.subject_shape (i->first);
+
+    if (i->second.empty ()) {
+
+      result1.insert (db::PolygonRefWithProperties (subject, pms (subject.properties_id ())));
+
+    } else {
+
+      db::properties_id_type prop_id_s = (m_property_constraint != db::NoPropertyConstraint ? pms (subject.properties_id ()) : 0);
+
+      std::pair<tl::slist<db::PolygonRef>, std::set<db::PolygonRef> > &shapes_by_prop = by_prop_id [prop_id_s];
+      shapes_by_prop.first.push_front (subject);
+
+      for (shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+        const db::PolygonRefWithProperties &intruder = interactions.intruder_shape (*j).second;
+        db::properties_id_type prop_id_i = (m_property_constraint != db::NoPropertyConstraint ? pmi (intruder.properties_id ()) : 0);
+        if ((prop_id_i != prop_id_s) == (m_property_constraint == db::DifferentPropertiesConstraint)) {
+          shapes_by_prop.second.insert (intruder);
+        }
+      }
+
+    }
+
+  }
+
+  for (auto p2s = by_prop_id.begin (); p2s != by_prop_id.end (); ++p2s) {
+
+    ep.clear ();
+    size_t p1 = 0, p2 = 1;
+
+    const std::set<db::PolygonRef> &others = p2s->second.second;
+    db::properties_id_type prop_id = p2s->first;
+
+    for (auto s = p2s->second.first.begin (); s != p2s->second.first.end (); ++s) {
+
+      const db::PolygonRef &subject = *s;
+      if (others.find (subject) != others.end ()) {
+        result0.insert (db::PolygonRefWithProperties (subject, prop_id));
+      } else if (others.empty ()) {
+        //  shortcut (not: keep, and: drop)
+        result1.insert (db::PolygonRefWithProperties (subject, prop_id));
+      } else {
+        for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+          ep.insert (*e, p1);
+        }
+        p1 += 2;
+      }
+
+    }
+
+    if (! others.empty () && p1 > 0) {
+
+      for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
+        for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
+          ep.insert (*e, p2);
+        }
+        p2 += 2;
+      }
+
+      std::unordered_set<db::PolygonRef> result0_wo_props;
+      std::unordered_set<db::PolygonRef> result1_wo_props;
+
+      db::BooleanOp op0 (db::BooleanOp::And);
+      db::PolygonRefGenerator pr0 (layout, result0_wo_props);
+      db::PolygonSplitter splitter0 (pr0, area_ratio, max_vertex_count);
+      db::PolygonGenerator pg0 (splitter0, true, true);
+
+      db::BooleanOp op1 (db::BooleanOp::ANotB);
+      db::PolygonRefGenerator pr1 (layout, result1_wo_props);
+      db::PolygonSplitter splitter1 (pr1, area_ratio, max_vertex_count);
+      db::PolygonGenerator pg1 (splitter1, true, true);
+
+      ep.set_base_verbosity (50);
+
+      std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > procs;
+      procs.push_back (std::make_pair (&pg0, &op0));
+      procs.push_back (std::make_pair (&pg1, &op1));
+      ep.process (procs);
+
+      for (auto r = result0_wo_props.begin (); r != result0_wo_props.end (); ++r) {
+        result0.insert (db::PolygonRefWithProperties (*r, prop_id));
+      }
+      for (auto r = result1_wo_props.begin (); r != result1_wo_props.end (); ++r) {
+        result1.insert (db::PolygonRefWithProperties (*r, prop_id));
+      }
+
+    }
+
+  }
+}
+
+std::string TwoBoolAndNotLocalOperationWithProperties::description () const
 {
   return tl::to_string (tr ("ANDNOT operation"));
 }

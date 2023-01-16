@@ -77,7 +77,7 @@ def SetGlobals():
     Usage  = "\n"
     Usage += "---------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'makeDMG4mac.py' >>\n"
-    Usage += "       for making a DMG file of KLayout 0.28 or later on different Apple macOS / Mac OSX platforms.\n"
+    Usage += "       for making a DMG file of KLayout 0.28.3 or later on different Apple macOS / Mac OSX platforms.\n"
     Usage += "\n"
     Usage += "$ [python] ./makeDMG4mac.py\n"
     Usage += "   option & argument    : descriptions                                               | default value\n"
@@ -105,7 +105,11 @@ def SetGlobals():
 
     release = int( Release.split(".")[0] ) # take the first of ['19', '0', '0']
     LatestOS = ""
-    if release == 21:
+    if release == 22:
+        GenOSName = "macOS"
+        Platform  = "Ventura"
+        LatestOS  = Platform
+    elif release == 21:
         GenOSName = "macOS"
         Platform  = "Monterey"
         LatestOS  = Platform
@@ -137,7 +141,7 @@ def SetGlobals():
         sys.exit(1)
 
     if not Machine == "x86_64":
-        if Machine == "arm64" and Platform in ["Monterey", "BigSur"]: # with an Apple Silicon Chip
+        if Machine == "arm64" and Platform in ["Ventura", "Monterey", "BigSur"]: # with an Apple Silicon Chip
             print("")
             print( "### Your Mac equips an Apple Silicon Chip ###" )
             print("")
@@ -251,8 +255,9 @@ def CheckPkgDirectory():
         print( "" )
         return -1
 
-    #-----------------------------------------------------------------------------
+    #-----------------------------------------------------------------------------------------------
     # [2] Identify (Qt, Ruby, Python) from PkgDir
+    #     * ST-qt5MP.pkg.macos-Catalina-release-RsysPsys     # 'ST' has been restored in 0.28.3
     #     * LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
     #     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb31Phb38
     #     * LW-qt5MP.pkg.macos-Catalina-release-Rmp31Pmp38
@@ -263,8 +268,8 @@ def CheckPkgDirectory():
     #     * LW-qt6Brew.pkg.macos-Catalina-release-Rhb31Phb38
     #     * LW-qt6MP.pkg.macos-Catalina-release-Rmp31Pmp38
     #     * HW-qt6Brew.pkg.macos-Catalina-release-RsysPhb38
-    #-----------------------------------------------------------------------------
-    patQRP = u'(LW|HW|EX)([-])([qt5|qt6][0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-]release[-])([0-9A-Za-z]+)'
+    #-----------------------------------------------------------------------------------------------
+    patQRP = u'(ST|LW|HW|EX)([-])([qt5|qt6][0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-]release[-])([0-9A-Za-z]+)'
     regQRP = re.compile(patQRP)
     if not regQRP.match(PkgDir):
         print( "! Cannot identify (Qt, Ruby, Python) from the package directory name" )
@@ -292,7 +297,7 @@ def CheckPkgDirectory():
         LatestOSMacPorts   = Platform == LatestOS
         LatestOSMacPorts  &= PackagePrefix == "LW"
         LatestOSMacPorts  &= QtIdentification in ["qt5MP", "qt6MP"]
-        LatestOSMacPorts  &= RubyPythonID in ["Rmp31Pmp38"]
+        LatestOSMacPorts  &= RubyPythonID in ["Rmp31Pmp38", "Rmp31Pmp39"]
 
         LatestOSHomebrew   = Platform == LatestOS
         LatestOSHomebrew  &= PackagePrefix == "LW"

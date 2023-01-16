@@ -36,6 +36,7 @@
 #include <QDateTime>
 #include <QUrl>
 #include <QMimeData>
+#include <QClipboard>
 
 #if defined(__APPLE__) && (QT_VERSION < 0x050401)
 // A workaround for the issue of Qt 4.8.x when handling "File Reference URL" in OSX
@@ -2163,6 +2164,18 @@ MainWindow::cm_screenshot ()
 }
 
 void
+MainWindow::cm_screenshot_to_clipboard ()
+{
+  if (current_view ()) {
+    QImage screenshot = current_view ()->get_screenshot ();
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    clipboard->setImage(screenshot);
+  } else {
+    throw tl::Exception (tl::to_string (QObject::tr ("No view open to create a screenshot from")));
+  }
+}
+
+void
 MainWindow::cm_save_current_cell_as ()
 {
   if (current_view ()) {
@@ -3939,6 +3952,8 @@ MainWindow::menu_activated (const std::string &symbol)
     cm_load_bookmarks ();
   } else if (symbol == "cm_screenshot") {
     cm_screenshot ();
+  } else if (symbol == "cm_screenshot_to_clipboard") {
+      cm_screenshot_to_clipboard ();
   } else if (symbol == "cm_save_current_cell_as") {
     cm_save_current_cell_as ();
   } else if (symbol == "cm_save") {
@@ -4297,6 +4312,7 @@ public:
     menu_entries.push_back (lay::menu_item ("cm_setup", "setup:edit", at, tl::to_string (QObject::tr ("Setup"))));
     menu_entries.push_back (lay::separator ("misc_group", at));
     menu_entries.push_back (lay::menu_item ("cm_screenshot", "screenshot:edit", at, tl::to_string (QObject::tr ("Screenshot(Print)"))));
+    menu_entries.push_back (lay::menu_item ("cm_screenshot_to_clipboard", "screenshot_to_clipboard:edit", at, tl::to_string (QObject::tr ("Screenshot to clipboard"))));
     menu_entries.push_back (lay::menu_item ("cm_layout_props", "layout_props:edit", at, tl::to_string (QObject::tr ("Layout Properties"))));
     menu_entries.push_back (lay::menu_item ("cm_layout_stats", "layout_stats:edit", at, tl::to_string (QObject::tr ("Layout Statistics"))));
     menu_entries.push_back (lay::separator ("layer_group", at));

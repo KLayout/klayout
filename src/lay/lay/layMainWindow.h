@@ -780,6 +780,7 @@ private:
   void cm_save_bookmarks ();
   void cm_load_bookmarks ();
   void cm_screenshot ();
+  void cm_screenshot_to_clipboard ();
   void cm_save_current_cell_as ();
   void cm_save ();
   void cm_save_as ();

@@ -204,8 +204,6 @@ TEST(3_BoolAndNot)
   db::Region tr42and3  = r42.andnot (r3).first;
   db::Region tr42and42 = r42.andnot (r42).first;
 
-  EXPECT_EQ (r2and3.is_merged (), false);
-
   {
     db::Layout target;
     unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));

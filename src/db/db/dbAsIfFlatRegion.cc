@@ -890,6 +890,8 @@ template <class Trans>
 void
 AsIfFlatRegion::produce_markers_for_grid_check (const db::Polygon &poly, const Trans &tr, db::Coord gx, db::Coord gy, db::Shapes &shapes)
 {
+  Trans tr_inv = tr.inverted ();
+
   gx = std::max (db::Coord (1), gx);
   gy = std::max (db::Coord (1), gy);
 
@@ -908,7 +910,7 @@ AsIfFlatRegion::produce_markers_for_grid_check (const db::Polygon &poly, const T
     for (db::Polygon::polygon_contour_iterator pt = b; pt != e; ++pt) {
       db::Point p = tr * *pt;
       if ((p.x () % gx) != 0 || (p.y () % gy) != 0) {
-        shapes.insert (EdgePair (db::Edge (p, p), db::Edge (p, p)));
+        shapes.insert (EdgePair (db::Edge (p, p), db::Edge (p, p)).transformed (tr_inv));
       }
     }
 

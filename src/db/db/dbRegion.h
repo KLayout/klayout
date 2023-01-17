@@ -1166,7 +1166,7 @@ public:
    *
    *  The first region delivered will be the AND result, the second one the NOT result.
    */
-  std::pair<Region, Region> andnot (const Region &other, PropertyConstraint prop_constraint = db::NoPropertyConstraint) const
+  std::pair<Region, Region> andnot (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties) const
   {
     std::pair<RegionDelegate *, RegionDelegate *> res = mp_delegate->andnot_with (other, prop_constraint);
     return std::make_pair (Region (res.first), Region (res.second));

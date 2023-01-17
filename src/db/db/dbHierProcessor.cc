@@ -2229,16 +2229,16 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
   db::Coord dist = op->dist ();
 
-  db::Box subjects_box = safe_box_enlarged (subjects.bbox (), dist - 1, dist - 1);
+  db::Box subjects_box = safe_box_enlarged (subjects.bbox (), dist, dist);
 
   db::Box intruders_box;
   for (typename std::vector<generic_shape_iterator<TI> >::const_iterator il = intruders.begin (); il != intruders.end (); ++il) {
     intruders_box += il->bbox ();
   }
-  intruders_box = safe_box_enlarged (intruders_box, dist - 1, dist - 1);
+  intruders_box = safe_box_enlarged (intruders_box, dist, dist);
 
   db::Box common_box = intruders_box & subjects_box;
-  if (common_box.empty ()) {
+  if (common_box.empty () || common_box.width () == 0 || common_box.height () == 0) {
 
     if (needs_isolated_subjects) {
       for (generic_shape_iterator<TS> is = subjects; ! is.at_end (); ++is) {
@@ -2248,6 +2248,8 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
     }
 
   } else {
+
+    common_box = safe_box_enlarged (common_box, -1, -1);
 
     if (needs_isolated_subjects) {
 

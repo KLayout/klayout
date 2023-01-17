@@ -96,7 +96,7 @@ public:
   virtual db::PropertiesRepository *properties_repository ();
   virtual const db::PropertiesRepository *properties_repository () const;
 
-  void do_insert (const db::Edge &edge);
+  void do_insert (const db::Edge &edge, properties_id_type prop_id);
 
   void do_transform (const db::Trans &t)
   {

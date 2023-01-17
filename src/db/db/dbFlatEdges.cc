@@ -88,7 +88,8 @@ void FlatEdges::init ()
 
 void FlatEdges::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
-  layout->cell (into_cell).shapes (into_layer).insert (*mp_edges);
+  db::PropertyMapper pm (&layout->properties_repository (), mp_properties_repository.get_const ());
+  layout->cell (into_cell).shapes (into_layer).insert (*mp_edges, pm);
 }
 
 void FlatEdges::merged_semantics_changed ()
@@ -355,11 +356,16 @@ const db::PropertiesRepository *FlatEdges::properties_repository () const
 }
 
 void
-FlatEdges::do_insert (const db::Edge &edge)
+FlatEdges::do_insert (const db::Edge &edge, db::properties_id_type prop_id)
 {
   m_is_merged = empty ();
 
-  mp_edges->insert (edge);
+  if (prop_id == 0) {
+    mp_edges->insert (edge);
+  } else {
+    mp_edges->insert (db::EdgeWithProperties (edge, prop_id));
+  }
+
   invalidate_cache ();
 }
 

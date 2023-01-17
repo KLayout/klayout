@@ -219,12 +219,17 @@ void DeepEdges::merged_semantics_changed ()
   //  .. nothing yet ..
 }
 
-void DeepEdges::do_insert (const db::Edge &edge)
+void DeepEdges::do_insert (const db::Edge &edge, db::properties_id_type prop_id)
 {
   db::Layout &layout = deep_layer ().layout ();
   if (layout.begin_top_down () != layout.end_top_down ()) {
     db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
-    top_cell.shapes (deep_layer ().layer ()).insert (edge);
+    db::Shapes &shapes = top_cell.shapes (deep_layer ().layer ());
+    if (prop_id == 0) {
+      shapes.insert (edge);
+    } else {
+      shapes.insert (db::EdgeWithProperties (edge, prop_id));
+    }
   }
 
   invalidate_bbox ();

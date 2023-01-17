@@ -960,10 +960,15 @@ AsIfFlatEdges::insert_into (Layout *layout, db::cell_index_type into_cell, unsig
 {
   //  improves performance when inserting an original layout into the same layout
   db::LayoutLocker locker (layout);
+  db::PropertyMapper pm (&layout->properties_repository (), properties_repository ());
 
   db::Shapes &shapes = layout->cell (into_cell).shapes (into_layer);
   for (EdgesIterator e (begin ()); ! e.at_end (); ++e) {
-    shapes.insert (*e);
+    if (e.prop_id () != 0) {
+      shapes.insert (db::EdgeWithProperties (*e, pm (e.prop_id ())));
+    } else {
+      shapes.insert (*e);
+    }
   }
 }
 

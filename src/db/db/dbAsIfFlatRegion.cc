@@ -130,6 +130,7 @@ EdgesDelegate *
 AsIfFlatRegion::edges (const EdgeFilterBase *filter) const
 {
   std::unique_ptr<FlatEdges> result (new FlatEdges ());
+  db::PropertyMapper pm (result->properties_repository (), properties_repository ());
 
   size_t n = 0;
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
@@ -138,10 +139,11 @@ AsIfFlatRegion::edges (const EdgeFilterBase *filter) const
   result->reserve (n);
 
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
+    db::properties_id_type prop_id = p.prop_id ();
     for (db::Polygon::polygon_edge_iterator e = p->begin_edge (); ! e.at_end (); ++e) {
       if (! filter || filter->selected (*e)) {
-        if (p.prop_id () != 0) {
-          result->insert (db::EdgeWithProperties (*e, p.prop_id ()));
+        if (prop_id != 0) {
+          result->insert (db::EdgeWithProperties (*e, pm (prop_id)));
         } else {
           result->insert (*e);
         }
@@ -1707,7 +1709,7 @@ AsIfFlatRegion::xor_with (const Region &other, PropertyConstraint prop_constrain
 }
 
 RegionDelegate *
-AsIfFlatRegion::or_with (const Region &other, PropertyConstraint prop_constraint) const
+AsIfFlatRegion::or_with (const Region &other, PropertyConstraint /*prop_constraint*/) const
 {
   if (empty () && ! other.strict_handling ()) {
 
@@ -1807,10 +1809,15 @@ AsIfFlatRegion::insert_into (Layout *layout, db::cell_index_type into_cell, unsi
 {
   //  improves performance when inserting an original layout into the same layout
   db::LayoutLocker locker (layout);
+  db::PropertyMapper pm (&layout->properties_repository (), properties_repository ());
 
   db::Shapes &shapes = layout->cell (into_cell).shapes (into_layer);
   for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
-    shapes.insert (*p);
+    if (p.prop_id () != 0) {
+      shapes.insert (db::PolygonWithProperties (*p, pm (p.prop_id ())));
+    } else {
+      shapes.insert (*p);
+    }
   }
 }
 

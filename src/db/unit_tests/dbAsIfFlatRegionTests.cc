@@ -1716,3 +1716,57 @@ TEST(40_BoolWithProperties)
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au40.gds");
 }
 
+TEST(41_EdgesWithProperties)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_40.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));  //  empty
+
+  db::RecursiveShapeIterator si1 (ly, top_cell, l1);
+  si1.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  db::Region r1wp (si1);
+  db::Region r1wp_nomerge = r1wp;
+  r1wp_nomerge.set_merged_semantics (false);
+
+  si1.shape_flags (db::ShapeIterator::All);
+  db::Region r1 (si1);
+
+  db::RecursiveShapeIterator si2 (ly, top_cell, l2);
+  si2.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  db::Region r2wp (si2);
+  db::Region r2wp_nomerge = r2wp;
+  r2wp_nomerge.set_merged_semantics (false);
+
+  si2.shape_flags (db::ShapeIterator::All);
+  db::Region r2 (si2);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r1wp);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2wp);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1.edges ());
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1wp.edges ());
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r1wp_nomerge.edges ());
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r2.edges ());
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r2wp.edges ());
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), r2wp_nomerge.edges ());
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au41.gds");
+}
+

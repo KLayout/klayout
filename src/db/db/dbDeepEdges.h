@@ -62,7 +62,7 @@ public:
 
   virtual void reserve (size_t n);
 
-  virtual void do_insert (const db::Edge &edge);
+  virtual void do_insert (const db::Edge &edge, properties_id_type prop_id);
 
   EdgesDelegate *clone () const;
 

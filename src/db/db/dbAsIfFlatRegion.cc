@@ -264,8 +264,13 @@ void AsIfFlatRegion::invalidate_bbox ()
   m_bbox_valid = false;
 }
 
-void AsIfFlatRegion::merge_polygons_to (db::Shapes &output, bool min_coherence, unsigned int min_wc) const
+void AsIfFlatRegion::merge_polygons_to (db::Shapes &output, bool min_coherence, unsigned int min_wc, db::PropertiesRepository *target_rp) const
 {
+  db::PropertyMapper pm;
+  if (target_rp && properties_repository ()) {
+    pm = db::PropertyMapper (*target_rp, *properties_repository ());
+  }
+
   db::EdgeProcessor ep (report_progress (), progress_desc ());
   ep.set_base_verbosity (base_verbosity ());
 
@@ -318,7 +323,7 @@ void AsIfFlatRegion::merge_polygons_to (db::Shapes &output, bool min_coherence, 
 
       //  and run the merge step
       db::MergeOp op (min_wc);
-      db::ShapeGenerator pc (result, false /*don't clear*/, p->first);
+      db::ShapeGenerator pc (result, false /*don't clear*/, pm (p->first));
       db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence);
       ep.process (pg, op);
 
@@ -346,7 +351,7 @@ void AsIfFlatRegion::merge_polygons_to (db::Shapes &output, bool min_coherence, 
 
     //  and run the merge step
     db::MergeOp op (min_wc);
-    db::ShapeGenerator pc (output, false /*don't clear*/, prop_id);
+    db::ShapeGenerator pc (output, false /*don't clear*/, pm (prop_id));
     db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence);
     ep.process (pg, op);
 
@@ -1323,29 +1328,8 @@ AsIfFlatRegion::merged (bool min_coherence, unsigned int min_wc) const
 
   } else {
 
-    db::EdgeProcessor ep (report_progress (), progress_desc ());
-    ep.set_base_verbosity (base_verbosity ());
-
-    //  count edges and reserve memory
-    size_t n = 0;
-    for (RegionIterator p (begin ()); ! p.at_end (); ++p, ++n) {
-      n += p->vertices ();
-    }
-    ep.reserve (n);
-
-    //  insert the polygons into the processor
-    n = 0;
-    for (RegionIterator p (begin ()); ! p.at_end (); ++p, ++n) {
-      ep.insert (*p, n);
-    }
-
     std::unique_ptr<FlatRegion> new_region (new FlatRegion (true));
-
-    //  and run the merge step
-    db::MergeOp op (min_wc);
-    db::ShapeGenerator pc (new_region->raw_polygons (), true /*clear*/);
-    db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence);
-    ep.process (pg, op);
+    merge_polygons_to (new_region->raw_polygons (), min_coherence, min_wc, new_region->properties_repository ());
 
     return new_region.release ();
 

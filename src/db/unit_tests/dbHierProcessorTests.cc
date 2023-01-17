@@ -55,7 +55,7 @@ class BoolAndOrNotWithSizedLocalOperation
 {
 public:
   BoolAndOrNotWithSizedLocalOperation (bool is_and, db::Coord dist)
-    : BoolAndOrNotLocalOperation (is_and), m_dist (dist)
+    : db::BoolAndOrNotLocalOperation (is_and), m_dist (dist)
   {
     //  .. nothing yet ..
   }
@@ -72,7 +72,7 @@ public:
       }
     }
 
-    BoolAndOrNotLocalOperation::do_compute_local (layout, sized_interactions, results, max_vertex_count, area_ratio);
+    db::BoolAndOrNotLocalOperation::do_compute_local (layout, sized_interactions, results, max_vertex_count, area_ratio);
   }
 
   db::Coord dist () const

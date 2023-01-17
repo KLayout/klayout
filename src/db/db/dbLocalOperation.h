@@ -133,19 +133,23 @@ protected:
 /**
  *  @brief Implements a boolean AND or NOT operation
  */
-class DB_PUBLIC BoolAndOrNotLocalOperation
-  : public local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>
+
+template <class TS, class TI, class TR>
+class DB_PUBLIC bool_and_or_not_local_operation
+  : public local_operation<TS, TI, TR>
 {
 public:
-  BoolAndOrNotLocalOperation (bool is_and);
+  bool_and_or_not_local_operation (bool is_and);
 
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &result, size_t max_vertex_count, double area_ratio) const;
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &result, size_t max_vertex_count, double area_ratio) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
 private:
   bool m_is_and;
 };
+
+typedef bool_and_or_not_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> BoolAndOrNotLocalOperation;
 
 /**
  *  @brief Implements a boolean AND or NOT operation with property handling
@@ -176,15 +180,19 @@ typedef bool_and_or_not_local_operation_with_properties<db::PolygonRef, db::Poly
  *  This processor delivers two outputs: the first one having the AND result, the second
  *  one having the NOT result.
  */
-class DB_PUBLIC TwoBoolAndNotLocalOperation
-  : public local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>
+
+template <class TS, class TI, class TR>
+class DB_PUBLIC two_bool_and_not_local_operation
+  : public local_operation<TS, TI, TR>
 {
 public:
-  TwoBoolAndNotLocalOperation ();
+  two_bool_and_not_local_operation ();
 
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &result, size_t max_vertex_count, double area_ratio) const;
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &result, size_t max_vertex_count, double area_ratio) const;
   virtual std::string description () const;
 };
+
+typedef two_bool_and_not_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> TwoBoolAndNotLocalOperation;
 
 /**
  *  @brief Implements a boolean AND plus NOT operation
@@ -192,19 +200,23 @@ public:
  *  This processor delivers two outputs: the first one having the AND result, the second
  *  one having the NOT result.
  */
-class DB_PUBLIC TwoBoolAndNotLocalOperationWithProperties
-  : public local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>
+template <class TS, class TI, class TR>
+class DB_PUBLIC two_bool_and_not_local_operation_with_properties
+  : public local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::object_with_properties<TR> >
 {
 public:
-  TwoBoolAndNotLocalOperationWithProperties (const db::Layout *subject_layout, const db::Layout *intruder_layout, db::PropertyConstraint property_constraint);
+  two_bool_and_not_local_operation_with_properties (db::PropertiesRepository *target1_pr, db::PropertiesRepository *target2_pr, const db::PropertiesRepository *subject_pr, const db::PropertiesRepository *intruder_pr, db::PropertyConstraint property_constraint);
 
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::PolygonRefWithProperties> > &result, size_t max_vertex_count, double area_ratio) const;
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &result, size_t max_vertex_count, double area_ratio) const;
   virtual std::string description () const;
 
 private:
   db::PropertyConstraint m_property_constraint;
-  const db::Layout *mp_subject_layout, *mp_intruder_layout;
+  db::PropertiesRepository *mp_target1_pr, *mp_target2_pr;
+  const db::PropertiesRepository *mp_subject_pr, *mp_intruder_pr;
 };
+
+typedef two_bool_and_not_local_operation_with_properties<db::PolygonRef, db::PolygonRef, db::PolygonRef> TwoBoolAndNotLocalOperationWithProperties;
 
 /**
  *  @brief Implements a merge operation with an overlap count

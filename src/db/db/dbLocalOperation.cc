@@ -116,44 +116,48 @@ template class DB_PUBLIC local_operation<db::TextRef, db::PolygonRef, db::TextRe
 // ---------------------------------------------------------------------------------------------
 //  BoolAndOrNotLocalOperation implementation
 
-BoolAndOrNotLocalOperation::BoolAndOrNotLocalOperation (bool is_and)
+template <class TS, class TI, class TR>
+bool_and_or_not_local_operation<TS, TI, TR>::bool_and_or_not_local_operation (bool is_and)
   : m_is_and (is_and)
 {
   //  .. nothing yet ..
 }
 
+template <class TS, class TI, class TR>
 OnEmptyIntruderHint
-BoolAndOrNotLocalOperation::on_empty_intruder_hint () const
+bool_and_or_not_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
 {
   return m_is_and ? Drop : Copy;
 }
 
+template <class TS, class TI, class TR>
 std::string
-BoolAndOrNotLocalOperation::description () const
+bool_and_or_not_local_operation<TS, TI, TR>::description () const
 {
   return m_is_and ? tl::to_string (tr ("AND operation")) : tl::to_string (tr ("NOT operation"));
 }
 
+template <class TS, class TI, class TR>
 void
-BoolAndOrNotLocalOperation::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
+bool_and_or_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio) const
 {
   tl_assert (results.size () == 1);
-  std::unordered_set<db::PolygonRef> &result = results.front ();
+  std::unordered_set<TR> &result = results.front ();
 
   db::EdgeProcessor ep;
 
   size_t p1 = 0, p2 = 1;
 
-  std::set<db::PolygonRef> others;
-  for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-    for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+  std::set<TI> others;
+  for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+    for (auto j = i->second.begin (); j != i->second.end (); ++j) {
       others.insert (interactions.intruder_shape (*j).second);
     }
   }
 
-  for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+  for (auto i = interactions.begin (); i != interactions.end (); ++i) {
 
-    const db::PolygonRef &subject = interactions.subject_shape (i->first);
+    const TR &subject = interactions.subject_shape (i->first);
     if (others.find (subject) != others.end ()) {
       if (m_is_and) {
         result.insert (subject);
@@ -164,7 +168,7 @@ BoolAndOrNotLocalOperation::do_compute_local (db::Layout *layout, const shape_in
         result.insert (subject);
       }
     } else {
-      for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+      for (auto e = subject.begin_edge (); ! e.at_end(); ++e) {
         ep.insert (*e, p1);
       }
       p1 += 2;
@@ -174,15 +178,15 @@ BoolAndOrNotLocalOperation::do_compute_local (db::Layout *layout, const shape_in
 
   if (! others.empty () && p1 > 0) {
 
-    for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
-      for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
+    for (auto o = others.begin (); o != others.end (); ++o) {
+      for (auto e = o->begin_edge (); ! e.at_end(); ++e) {
         ep.insert (*e, p2);
       }
       p2 += 2;
     }
 
     db::BooleanOp op (m_is_and ? db::BooleanOp::And : db::BooleanOp::ANotB);
-    db::PolygonRefGenerator pr (layout, result);
+    db::polygon_ref_generator<TR> pr (layout, result);
     db::PolygonSplitter splitter (pr, area_ratio, max_vertex_count);
     db::PolygonGenerator pg (splitter, true, true);
     ep.set_base_verbosity (50);
@@ -190,6 +194,9 @@ BoolAndOrNotLocalOperation::do_compute_local (db::Layout *layout, const shape_in
 
   }
 }
+
+template class DB_PUBLIC bool_and_or_not_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC bool_and_or_not_local_operation<db::Polygon, db::Polygon, db::Polygon>;
 
 // ---------------------------------------------------------------------------------------------
 //  BoolAndOrNotLocalOperationWithProperties implementation
@@ -314,47 +321,49 @@ bool_and_or_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (d
   }
 }
 
-template class bool_and_or_not_local_operation_with_properties<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
-template class bool_and_or_not_local_operation_with_properties<db::Polygon, db::Polygon, db::Polygon>;
+template class DB_PUBLIC bool_and_or_not_local_operation_with_properties<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC bool_and_or_not_local_operation_with_properties<db::Polygon, db::Polygon, db::Polygon>;
 
 // ---------------------------------------------------------------------------------------------
 //  TwoBoolAndNotLocalOperation implementation
 
-TwoBoolAndNotLocalOperation::TwoBoolAndNotLocalOperation ()
-  : db::local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> ()
+template <class TS, class TI, class TR>
+two_bool_and_not_local_operation<TS, TI, TR>::two_bool_and_not_local_operation ()
+  : db::local_operation<TS, TI, TR> ()
 {
   //  .. nothing yet ..
 }
 
+template <class TS, class TI, class TR>
 void
-TwoBoolAndNotLocalOperation::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
+two_bool_and_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio) const
 {
   tl_assert (results.size () == 2);
 
   db::EdgeProcessor ep;
 
-  std::unordered_set<db::PolygonRef> &result0 = results [0];
-  std::unordered_set<db::PolygonRef> &result1 = results [1];
+  std::unordered_set<TR> &result0 = results [0];
+  std::unordered_set<TR> &result1 = results [1];
 
   size_t p1 = 0, p2 = 1;
 
-  std::set<db::PolygonRef> others;
-  for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
-    for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
+  std::set<TI> others;
+  for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+    for (auto j = i->second.begin (); j != i->second.end (); ++j) {
       others.insert (interactions.intruder_shape (*j).second);
     }
   }
 
-  for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+  for (auto i = interactions.begin (); i != interactions.end (); ++i) {
 
-    const db::PolygonRef &subject = interactions.subject_shape (i->first);
+    const TS &subject = interactions.subject_shape (i->first);
     if (others.find (subject) != others.end ()) {
       result0.insert (subject);
     } else if (i->second.empty ()) {
       //  shortcut (not: keep, and: drop)
       result1.insert (subject);
     } else {
-      for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+      for (auto e = subject.begin_edge (); ! e.at_end(); ++e) {
         ep.insert (*e, p1);
       }
       p1 += 2;
@@ -364,20 +373,20 @@ TwoBoolAndNotLocalOperation::do_compute_local (db::Layout *layout, const shape_i
 
   if (! others.empty () && p1 > 0) {
 
-    for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
-      for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
+    for (auto o = others.begin (); o != others.end (); ++o) {
+      for (auto e = o->begin_edge (); ! e.at_end(); ++e) {
         ep.insert (*e, p2);
       }
       p2 += 2;
     }
 
     db::BooleanOp op0 (db::BooleanOp::And);
-    db::PolygonRefGenerator pr0 (layout, result0);
+    db::polygon_ref_generator<TR> pr0 (layout, result0);
     db::PolygonSplitter splitter0 (pr0, area_ratio, max_vertex_count);
     db::PolygonGenerator pg0 (splitter0, true, true);
 
     db::BooleanOp op1 (db::BooleanOp::ANotB);
-    db::PolygonRefGenerator pr1 (layout, result1);
+    db::polygon_ref_generator<TR> pr1 (layout, result1);
     db::PolygonSplitter splitter1 (pr1, area_ratio, max_vertex_count);
     db::PolygonGenerator pg1 (splitter1, true, true);
 
@@ -392,52 +401,59 @@ TwoBoolAndNotLocalOperation::do_compute_local (db::Layout *layout, const shape_i
 
 }
 
-std::string TwoBoolAndNotLocalOperation::description () const
+template <class TS, class TI, class TR>
+std::string two_bool_and_not_local_operation<TS, TI, TR>::description () const
 {
   return tl::to_string (tr ("ANDNOT operation"));
 }
 
+template class DB_PUBLIC two_bool_and_not_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC two_bool_and_not_local_operation<db::Polygon, db::Polygon, db::Polygon>;
+
 // ---------------------------------------------------------------------------------------------
 //  TwoBoolAndNotLocalOperationWithProperties implementation
 
-TwoBoolAndNotLocalOperationWithProperties::TwoBoolAndNotLocalOperationWithProperties (const db::Layout *subject_layout, const db::Layout *intruder_layout, db::PropertyConstraint property_constraint)
-  : db::local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties> (),
-    m_property_constraint (property_constraint), mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout)
+template <class TS, class TI, class TR>
+two_bool_and_not_local_operation_with_properties<TS, TI, TR>::two_bool_and_not_local_operation_with_properties (db::PropertiesRepository *target1_pr, db::PropertiesRepository *target2_pr, const db::PropertiesRepository *subject_pr, const db::PropertiesRepository *intruder_pr, db::PropertyConstraint property_constraint)
+  : db::local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::object_with_properties<TR> > (),
+    m_property_constraint (property_constraint), mp_target1_pr (target1_pr), mp_target2_pr (target2_pr), mp_subject_pr (subject_pr), mp_intruder_pr (intruder_pr)
 {
   //  .. nothing yet ..
 }
 
+template <class TS, class TI, class TR>
 void
-TwoBoolAndNotLocalOperationWithProperties::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::PolygonRefWithProperties> > &results, size_t max_vertex_count, double area_ratio) const
+two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &results, size_t max_vertex_count, double area_ratio) const
 {
-  db::PropertyMapper pms (*layout, *mp_subject_layout);
-  db::PropertyMapper pmi (*layout, *mp_intruder_layout);
+  db::PropertyMapper pms (*mp_target1_pr, *mp_subject_pr);
+  db::PropertyMapper pmi (*mp_target1_pr, *mp_intruder_pr);
+  db::PropertyMapper pm12 (*mp_target2_pr, *mp_target1_pr);
 
   tl_assert (results.size () == 2);
-  std::unordered_set<db::PolygonRefWithProperties> &result0 = results [0];
-  std::unordered_set<db::PolygonRefWithProperties> &result1 = results [1];
+  std::unordered_set<db::object_with_properties<TR> > &result0 = results [0];
+  std::unordered_set<db::object_with_properties<TR> > &result1 = results [1];
 
   db::EdgeProcessor ep;
 
-  std::map<db::properties_id_type, std::pair<tl::slist<db::PolygonRef>, std::set<db::PolygonRef> > > by_prop_id;
+  std::map<db::properties_id_type, std::pair<tl::slist<TS>, std::set<TI> > > by_prop_id;
 
-  for (shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+  for (auto i = interactions.begin (); i != interactions.end (); ++i) {
 
-    const db::PolygonRefWithProperties &subject = interactions.subject_shape (i->first);
+    const db::object_with_properties<TS> &subject = interactions.subject_shape (i->first);
 
     if (i->second.empty ()) {
 
-      result1.insert (db::PolygonRefWithProperties (subject, pms (subject.properties_id ())));
+      result1.insert (db::object_with_properties<TR> (subject, pms (subject.properties_id ())));
 
     } else {
 
       db::properties_id_type prop_id_s = pms (subject.properties_id ());
 
-      std::pair<tl::slist<db::PolygonRef>, std::set<db::PolygonRef> > &shapes_by_prop = by_prop_id [prop_id_s];
+      auto &shapes_by_prop = by_prop_id [prop_id_s];
       shapes_by_prop.first.push_front (subject);
 
-      for (shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties>::iterator2 j = i->second.begin (); j != i->second.end (); ++j) {
-        const db::PolygonRefWithProperties &intruder = interactions.intruder_shape (*j).second;
+      for (auto j = i->second.begin (); j != i->second.end (); ++j) {
+        const db::object_with_properties<TI> &intruder = interactions.intruder_shape (*j).second;
         db::properties_id_type prop_id_i = (m_property_constraint != db::NoPropertyConstraint ? pmi (intruder.properties_id ()) : prop_id_s);
         if ((prop_id_i != prop_id_s) == (m_property_constraint == db::DifferentPropertiesConstraint)) {
           shapes_by_prop.second.insert (intruder);
@@ -453,19 +469,19 @@ TwoBoolAndNotLocalOperationWithProperties::do_compute_local (db::Layout *layout,
     ep.clear ();
     size_t p1 = 0, p2 = 1;
 
-    const std::set<db::PolygonRef> &others = p2s->second.second;
+    const std::set<TR> &others = p2s->second.second;
     db::properties_id_type prop_id = p2s->first;
 
     for (auto s = p2s->second.first.begin (); s != p2s->second.first.end (); ++s) {
 
-      const db::PolygonRef &subject = *s;
+      const TR &subject = *s;
       if (others.find (subject) != others.end ()) {
-        result0.insert (db::PolygonRefWithProperties (subject, prop_id));
+        result0.insert (db::object_with_properties<TR> (subject, prop_id));
       } else if (others.empty ()) {
         //  shortcut (not: keep, and: drop)
-        result1.insert (db::PolygonRefWithProperties (subject, prop_id));
+        result1.insert (db::object_with_properties<TR> (subject, pm12 (prop_id)));
       } else {
-        for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+        for (auto e = subject.begin_edge (); ! e.at_end(); ++e) {
           ep.insert (*e, p1);
         }
         p1 += 2;
@@ -475,23 +491,23 @@ TwoBoolAndNotLocalOperationWithProperties::do_compute_local (db::Layout *layout,
 
     if (! others.empty () && p1 > 0) {
 
-      for (std::set<db::PolygonRef>::const_iterator o = others.begin (); o != others.end (); ++o) {
-        for (db::PolygonRef::polygon_edge_iterator e = o->begin_edge (); ! e.at_end(); ++e) {
+      for (auto o = others.begin (); o != others.end (); ++o) {
+        for (auto e = o->begin_edge (); ! e.at_end(); ++e) {
           ep.insert (*e, p2);
         }
         p2 += 2;
       }
 
-      std::unordered_set<db::PolygonRef> result0_wo_props;
-      std::unordered_set<db::PolygonRef> result1_wo_props;
+      std::unordered_set<TR> result0_wo_props;
+      std::unordered_set<TR> result1_wo_props;
 
       db::BooleanOp op0 (db::BooleanOp::And);
-      db::PolygonRefGenerator pr0 (layout, result0_wo_props);
+      db::polygon_ref_generator<TR> pr0 (layout, result0_wo_props);
       db::PolygonSplitter splitter0 (pr0, area_ratio, max_vertex_count);
       db::PolygonGenerator pg0 (splitter0, true, true);
 
       db::BooleanOp op1 (db::BooleanOp::ANotB);
-      db::PolygonRefGenerator pr1 (layout, result1_wo_props);
+      db::polygon_ref_generator<TR> pr1 (layout, result1_wo_props);
       db::PolygonSplitter splitter1 (pr1, area_ratio, max_vertex_count);
       db::PolygonGenerator pg1 (splitter1, true, true);
 
@@ -503,10 +519,10 @@ TwoBoolAndNotLocalOperationWithProperties::do_compute_local (db::Layout *layout,
       ep.process (procs);
 
       for (auto r = result0_wo_props.begin (); r != result0_wo_props.end (); ++r) {
-        result0.insert (db::PolygonRefWithProperties (*r, prop_id));
+        result0.insert (db::object_with_properties<TR> (*r, prop_id));
       }
       for (auto r = result1_wo_props.begin (); r != result1_wo_props.end (); ++r) {
-        result1.insert (db::PolygonRefWithProperties (*r, prop_id));
+        result1.insert (db::object_with_properties<TR> (*r, pm12 (prop_id)));
       }
 
     }
@@ -514,10 +530,14 @@ TwoBoolAndNotLocalOperationWithProperties::do_compute_local (db::Layout *layout,
   }
 }
 
-std::string TwoBoolAndNotLocalOperationWithProperties::description () const
+template <class TS, class TI, class TR>
+std::string two_bool_and_not_local_operation_with_properties<TS, TI, TR>::description () const
 {
   return tl::to_string (tr ("ANDNOT operation"));
 }
+
+template class DB_PUBLIC two_bool_and_not_local_operation_with_properties<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC two_bool_and_not_local_operation_with_properties<db::Polygon, db::Polygon, db::Polygon>;
 
 // ---------------------------------------------------------------------------------------------
 

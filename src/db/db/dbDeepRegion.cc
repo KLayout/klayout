@@ -881,7 +881,10 @@ DeepRegion::and_and_not_with (const DeepRegion *other, PropertyConstraint proper
 
   } else {
 
-    db::TwoBoolAndNotLocalOperationWithProperties op (&deep_layer ().layout (), &other->deep_layer ().layout (), property_constraint);
+    db::PropertiesRepository *pr_out1 = &dl_out1.layout ().properties_repository ();
+    db::PropertiesRepository *pr_out2 = &dl_out2.layout ().properties_repository ();
+    const db::PropertiesRepository *pr = &deep_layer ().layout ().properties_repository ();
+    db::TwoBoolAndNotLocalOperationWithProperties op (pr_out1, pr_out2, pr, pr, property_constraint);
 
     db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
     proc.set_base_verbosity (base_verbosity ());

@@ -1584,9 +1584,7 @@ AsIfFlatRegion::andnot_with (const Region &other, PropertyConstraint property_co
     //  Nothing to do
     return std::make_pair (new EmptyRegion (), clone ());
 
-  } else {
-
-    // @@@ TODO: implement property constraint
+  } else if (property_constraint == db::IgnoreProperties) {
 
     //  Generic case
     db::EdgeProcessor ep (report_progress (), progress_desc ());
@@ -1628,6 +1626,30 @@ AsIfFlatRegion::andnot_with (const Region &other, PropertyConstraint property_co
     ep.process (procs);
 
     return std::make_pair (new_region1.release (), new_region2.release ());
+
+  } else {
+
+    db::generic_shape_iterator<db::PolygonWithProperties> polygons (db::make_wp_iter (begin ()));
+
+    std::unique_ptr<FlatRegion> output1 (new FlatRegion ());
+    std::unique_ptr<FlatRegion> output2 (new FlatRegion ());
+    std::vector<db::Shapes *> results;
+    results.push_back (&output1->raw_polygons ());
+    results.push_back (&output2->raw_polygons ());
+
+    db::two_bool_and_not_local_operation_with_properties<db::Polygon, db::Polygon, db::Polygon> op (output1->properties_repository (), output2->properties_repository (), properties_repository (), &other.properties_repository (), property_constraint);
+
+    db::local_processor<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties> proc;
+    proc.set_base_verbosity (base_verbosity ());
+    proc.set_description (progress_desc ());
+    proc.set_report_progress (report_progress ());
+
+    std::vector<db::generic_shape_iterator<db::PolygonWithProperties> > others;
+    others.push_back (db::make_wp_iter (other.begin ()));
+
+    proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
+
+    return std::make_pair (output1.release (), output2.release ());
 
   }
 }

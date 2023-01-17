@@ -784,7 +784,7 @@ DeepRegion::not_with (const Region &other, PropertyConstraint property_constrain
 RegionDelegate *
 DeepRegion::or_with (const Region &other, db::PropertyConstraint /*property_constraint*/) const
 {
-  //  @@@ TODO: implement property_constraint
+  //  TODO: implement property_constraint
   RegionDelegate *res = add (other);
   return res->merged_in_place ();
 }

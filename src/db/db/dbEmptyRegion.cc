@@ -80,7 +80,7 @@ EmptyRegion::or_with (const Region &other, db::PropertyConstraint /*prop_constra
   } else if (! other.strict_handling ()) {
     return other.delegate ()->clone ();
   } else {
-    // @@@ TODO: implement prop_constraint
+    //  TODO: implement prop_constraint
     return other.delegate ()->merged ();
   }
 }

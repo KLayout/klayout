@@ -1672,7 +1672,7 @@ AsIfFlatRegion::xor_with (const Region &other, PropertyConstraint prop_constrain
 
   } else {
 
-    // @@@ TODO: implement property constraint
+    //  TODO: implement property constraint
 
     //  Generic case
     db::EdgeProcessor ep (report_progress (), progress_desc ());
@@ -1728,7 +1728,7 @@ AsIfFlatRegion::or_with (const Region &other, PropertyConstraint prop_constraint
 
   } else {
 
-    // @@@ TODO: implement property constraint
+    //  TODO: implement property constraint
 
     //  Generic case
     db::EdgeProcessor ep (report_progress (), progress_desc ());

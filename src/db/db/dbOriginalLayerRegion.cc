@@ -423,7 +423,7 @@ OriginalLayerRegion::insert_into (Layout *layout, db::cell_index_type into_cell,
 
   db::PropertyMapper pm;
   if (m_iter.layout ()) {
-    pm = db::PropertyMapper (*layout, *m_iter.layout ());
+    pm = db::PropertyMapper (layout, m_iter.layout ());
   }
 
   //  NOTE: if the source (r) is from the same layout than the shapes live in, we better

@@ -266,10 +266,7 @@ void AsIfFlatRegion::invalidate_bbox ()
 
 void AsIfFlatRegion::merge_polygons_to (db::Shapes &output, bool min_coherence, unsigned int min_wc, db::PropertiesRepository *target_rp) const
 {
-  db::PropertyMapper pm;
-  if (target_rp && properties_repository ()) {
-    pm = db::PropertyMapper (*target_rp, *properties_repository ());
-  }
+  db::PropertyMapper pm (target_rp, properties_repository ());
 
   db::EdgeProcessor ep (report_progress (), progress_desc ());
   ep.set_base_verbosity (base_verbosity ());

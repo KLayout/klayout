@@ -643,8 +643,8 @@ PolygonReferenceHierarchyBuilderShapeReceiver::PolygonReferenceHierarchyBuilderS
   }
 
   if (source_layout && source_layout != layout) {
-    m_pm.set_source (*source_layout);
-    m_pm.set_target (*layout);
+    m_pm.set_source (source_layout);
+    m_pm.set_target (layout);
   }
 }
 
@@ -727,8 +727,8 @@ EdgeBuildingHierarchyBuilderShapeReceiver::EdgeBuildingHierarchyBuilderShapeRece
   : m_as_edges (as_edges)
 {
   if (source_layout && source_layout != layout) {
-    m_pm.set_source (*source_layout);
-    m_pm.set_target (*layout);
+    m_pm.set_source (source_layout);
+    m_pm.set_target (layout);
   }
 }
 
@@ -787,8 +787,8 @@ void EdgeBuildingHierarchyBuilderShapeReceiver::push (const db::Polygon &poly, d
 EdgePairBuildingHierarchyBuilderShapeReceiver::EdgePairBuildingHierarchyBuilderShapeReceiver (db::Layout *layout, const db::Layout *source_layout)
 {
   if (source_layout && source_layout != layout) {
-    m_pm.set_source (*source_layout);
-    m_pm.set_target (*layout);
+    m_pm.set_source (source_layout);
+    m_pm.set_target (layout);
   }
 }
 
@@ -810,8 +810,8 @@ TextBuildingHierarchyBuilderShapeReceiver::TextBuildingHierarchyBuilderShapeRece
   : mp_layout (layout)
 {
   if (source_layout && source_layout != layout) {
-    m_pm.set_source (*source_layout);
-    m_pm.set_target (*layout);
+    m_pm.set_source (source_layout);
+    m_pm.set_target (layout);
   }
 }
 

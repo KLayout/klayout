@@ -95,7 +95,9 @@ template class DB_PUBLIC local_operation<db::Polygon, db::Text, db::Text>;
 template class DB_PUBLIC local_operation<db::Polygon, db::Edge, db::Polygon>;
 template class DB_PUBLIC local_operation<db::Polygon, db::Edge, db::Edge>;
 template class DB_PUBLIC local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
+template class DB_PUBLIC local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties>;
 template class DB_PUBLIC local_operation<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties>;
+template class DB_PUBLIC local_operation<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgeWithProperties>;
 template class DB_PUBLIC local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_operation<db::PolygonRef, db::Text, db::PolygonRef>;
 template class DB_PUBLIC local_operation<db::PolygonRef, db::TextRef, db::PolygonRef>;
@@ -203,7 +205,7 @@ template class DB_PUBLIC bool_and_or_not_local_operation<db::Polygon, db::Polygo
 
 template <class TS, class TI, class TR>
 bool_and_or_not_local_operation_with_properties<TS, TI, TR>::bool_and_or_not_local_operation_with_properties (bool is_and, db::PropertiesRepository *target_pr, const db::PropertiesRepository *subject_pr, const db::PropertiesRepository *intruder_pr, db::PropertyConstraint property_constraint)
-  : m_is_and (is_and), m_property_constraint (property_constraint), mp_target_pr (target_pr), mp_subject_pr (subject_pr), mp_intruder_pr (intruder_pr)
+  : m_is_and (is_and), m_property_constraint (property_constraint), m_pms (target_pr, subject_pr), m_pmi (target_pr, intruder_pr)
 {
   //  .. nothing yet ..
 }
@@ -226,9 +228,6 @@ template <class TS, class TI, class TR>
 void
 bool_and_or_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &results, size_t max_vertex_count, double area_ratio) const
 {
-  db::PropertyMapper pms (*mp_target_pr, *mp_subject_pr);
-  db::PropertyMapper pmi (*mp_target_pr, *mp_intruder_pr);
-
   tl_assert (results.size () == 1);
   std::unordered_set<db::object_with_properties<TR> > &result = results.front ();
 
@@ -243,19 +242,19 @@ bool_and_or_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (d
     if (i->second.empty ()) {
 
       if (! m_is_and) {
-        result.insert (db::object_with_properties<TR> (subject, pms (subject.properties_id ())));
+        result.insert (db::object_with_properties<TR> (subject, m_pms (subject.properties_id ())));
       }
 
     } else {
 
-      db::properties_id_type prop_id_s = pms (subject.properties_id ());
+      db::properties_id_type prop_id_s = m_pms (subject.properties_id ());
 
       auto &shapes_by_prop = by_prop_id [prop_id_s];
       shapes_by_prop.first.push_front (subject);
 
       for (auto j = i->second.begin (); j != i->second.end (); ++j) {
         const db::object_with_properties<TI> &intruder = interactions.intruder_shape (*j).second;
-        db::properties_id_type prop_id_i = (m_property_constraint != db::NoPropertyConstraint ? pmi (intruder.properties_id ()) : prop_id_s);
+        db::properties_id_type prop_id_i = (m_property_constraint != db::NoPropertyConstraint ? m_pmi (intruder.properties_id ()) : prop_id_s);
         if ((prop_id_i != prop_id_s) == (m_property_constraint == db::DifferentPropertiesConstraint)) {
           shapes_by_prop.second.insert (intruder);
         }
@@ -303,18 +302,12 @@ bool_and_or_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (d
         p2 += 2;
       }
 
-      std::unordered_set<TR> result_wo_props;
-
       db::BooleanOp op (m_is_and ? db::BooleanOp::And : db::BooleanOp::ANotB);
-      db::polygon_ref_generator<TR> pr (layout, result_wo_props);
+      db::polygon_ref_generator_with_properties<db::object_with_properties<TR> > pr (layout, result, prop_id);
       db::PolygonSplitter splitter (pr, area_ratio, max_vertex_count);
       db::PolygonGenerator pg (splitter, true, true);
       ep.set_base_verbosity (50);
       ep.process (pg, op);
-
-      for (auto r = result_wo_props.begin (); r != result_wo_props.end (); ++r) {
-        result.insert (db::object_with_properties<TR> (*r, prop_id));
-      }
 
     }
 
@@ -416,7 +409,7 @@ template class DB_PUBLIC two_bool_and_not_local_operation<db::Polygon, db::Polyg
 template <class TS, class TI, class TR>
 two_bool_and_not_local_operation_with_properties<TS, TI, TR>::two_bool_and_not_local_operation_with_properties (db::PropertiesRepository *target1_pr, db::PropertiesRepository *target2_pr, const db::PropertiesRepository *subject_pr, const db::PropertiesRepository *intruder_pr, db::PropertyConstraint property_constraint)
   : db::local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::object_with_properties<TR> > (),
-    m_property_constraint (property_constraint), mp_target1_pr (target1_pr), mp_target2_pr (target2_pr), mp_subject_pr (subject_pr), mp_intruder_pr (intruder_pr)
+    m_property_constraint (property_constraint), m_pms (target1_pr, subject_pr), m_pmi (target1_pr, intruder_pr), m_pm12 (target2_pr, target1_pr)
 {
   //  .. nothing yet ..
 }
@@ -425,10 +418,6 @@ template <class TS, class TI, class TR>
 void
 two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &results, size_t max_vertex_count, double area_ratio) const
 {
-  db::PropertyMapper pms (*mp_target1_pr, *mp_subject_pr);
-  db::PropertyMapper pmi (*mp_target1_pr, *mp_intruder_pr);
-  db::PropertyMapper pm12 (*mp_target2_pr, *mp_target1_pr);
-
   tl_assert (results.size () == 2);
   std::unordered_set<db::object_with_properties<TR> > &result0 = results [0];
   std::unordered_set<db::object_with_properties<TR> > &result1 = results [1];
@@ -443,18 +432,18 @@ two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (
 
     if (i->second.empty ()) {
 
-      result1.insert (db::object_with_properties<TR> (subject, pms (subject.properties_id ())));
+      result1.insert (db::object_with_properties<TR> (subject, m_pms (subject.properties_id ())));
 
     } else {
 
-      db::properties_id_type prop_id_s = pms (subject.properties_id ());
+      db::properties_id_type prop_id_s = m_pms (subject.properties_id ());
 
       auto &shapes_by_prop = by_prop_id [prop_id_s];
       shapes_by_prop.first.push_front (subject);
 
       for (auto j = i->second.begin (); j != i->second.end (); ++j) {
         const db::object_with_properties<TI> &intruder = interactions.intruder_shape (*j).second;
-        db::properties_id_type prop_id_i = (m_property_constraint != db::NoPropertyConstraint ? pmi (intruder.properties_id ()) : prop_id_s);
+        db::properties_id_type prop_id_i = (m_property_constraint != db::NoPropertyConstraint ? m_pmi (intruder.properties_id ()) : prop_id_s);
         if ((prop_id_i != prop_id_s) == (m_property_constraint == db::DifferentPropertiesConstraint)) {
           shapes_by_prop.second.insert (intruder);
         }
@@ -479,7 +468,7 @@ two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (
         result0.insert (db::object_with_properties<TR> (subject, prop_id));
       } else if (others.empty ()) {
         //  shortcut (not: keep, and: drop)
-        result1.insert (db::object_with_properties<TR> (subject, pm12 (prop_id)));
+        result1.insert (db::object_with_properties<TR> (subject, m_pm12 (prop_id)));
       } else {
         for (auto e = subject.begin_edge (); ! e.at_end(); ++e) {
           ep.insert (*e, p1);
@@ -522,7 +511,7 @@ two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (
         result0.insert (db::object_with_properties<TR> (*r, prop_id));
       }
       for (auto r = result1_wo_props.begin (); r != result1_wo_props.end (); ++r) {
-        result1.insert (db::object_with_properties<TR> (*r, pm12 (prop_id)));
+        result1.insert (db::object_with_properties<TR> (*r, m_pm12 (prop_id)));
       }
 
     }

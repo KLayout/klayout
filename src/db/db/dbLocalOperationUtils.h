@@ -123,30 +123,116 @@ private:
 
 typedef polygon_ref_generator<db::PolygonRef> PolygonRefGenerator;
 
-class DB_PUBLIC EdgeToEdgeSetGenerator
+template <class T>
+class DB_PUBLIC polygon_ref_generator_with_properties;
+
+template <>
+class DB_PUBLIC polygon_ref_generator_with_properties<db::PolygonRefWithProperties>
+  : public PolygonSink
+{
+public:
+  /**
+   *  @brief Constructor
+   */
+  polygon_ref_generator_with_properties (db::Layout *layout, std::unordered_set<db::PolygonRefWithProperties> &polyrefs, db::properties_id_type prop_id)
+    : PolygonSink (), mp_layout (layout), mp_polyrefs (&polyrefs), m_prop_id (prop_id)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Implementation of the PolygonSink interface
+   */
+  void put (const db::Polygon &polygon)
+  {
+    tl::MutexLocker locker (&mp_layout->lock ());
+    mp_polyrefs->insert (db::PolygonRefWithProperties (db::PolygonRef (polygon, mp_layout->shape_repository ()), m_prop_id));
+  }
+
+private:
+  db::Layout *mp_layout;
+  std::unordered_set<db::PolygonRefWithProperties> *mp_polyrefs;
+  db::properties_id_type m_prop_id;
+};
+
+template <>
+class DB_PUBLIC polygon_ref_generator_with_properties<db::PolygonWithProperties>
+  : public PolygonSink
+{
+public:
+  /**
+   *  @brief Constructor
+   */
+  polygon_ref_generator_with_properties (db::Layout *, std::unordered_set<db::PolygonWithProperties> &polygons, db::properties_id_type prop_id)
+    : mp_polygons (&polygons), m_prop_id (prop_id)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Implementation of the PolygonSink interface
+   */
+  virtual void put (const db::Polygon &polygon)
+  {
+    mp_polygons->insert (db::PolygonWithProperties (polygon, m_prop_id));
+  }
+
+private:
+  std::unordered_set<db::PolygonWithProperties> *mp_polygons;
+  db::properties_id_type m_prop_id;
+};
+
+typedef polygon_ref_generator<db::PolygonRef> PolygonRefGenerator;
+
+template <class Container>
+class DB_PUBLIC edge_to_edge_set_generator
   : public EdgeSink
 {
 public:
   /**
    *  @brief Constructor
    */
-  EdgeToEdgeSetGenerator (std::unordered_set<db::Edge> &edges, int tag = 0, EdgeToEdgeSetGenerator *chained = 0);
+  edge_to_edge_set_generator (Container &edges, int tag = 0, EdgeSink *chained = 0)
+    : mp_edges (&edges), m_tag (tag), mp_chained (chained)
+  {
+    //  .. nothing yet ..
+  }
 
   /**
    *  @brief Implementation of the PolygonSink interface
    */
-  virtual void put (const db::Edge &edge);
+  virtual void put (const db::Edge &edge)
+  {
+    if (mp_edges) {
+      mp_edges->insert (edge);
+    }
+    if (mp_chained) {
+      mp_chained->put (edge);
+    }
+  }
 
   /**
    *  @brief Implementation of the PolygonSink interface
    */
-  virtual void put (const db::Edge &edge, int tag);
+  virtual void put (const db::Edge &edge, int tag)
+  {
+    if (m_tag == 0 || m_tag == tag) {
+      if (mp_edges) {
+        mp_edges->insert (edge);
+      }
+    }
+    if (mp_chained) {
+      mp_chained->put (edge, tag);
+    }
+  }
 
 private:
-  std::unordered_set<db::Edge> *mp_edges;
+  Container *mp_edges;
   int m_tag;
-  EdgeToEdgeSetGenerator *mp_chained;
+  EdgeSink *mp_chained;
 };
+
+typedef edge_to_edge_set_generator<std::unordered_set<db::Edge> > EdgeToEdgeSetGenerator;
 
 class DB_PUBLIC PolygonRefToShapesGenerator
   : public PolygonSink
@@ -183,6 +269,38 @@ private:
   PolygonSink *mp_sink;
   double m_max_area_ratio;
   size_t m_max_vertex_count;
+};
+
+template <class T, class Container>
+class DB_PUBLIC property_injector
+{
+public:
+  typedef typename Container::const_iterator const_iterator;
+
+  property_injector (Container *container, db::properties_id_type prop_id)
+    : mp_container (container), m_prop_id (prop_id)
+  {
+    //  .. nothing yet ..
+  }
+
+  const_iterator begin () const
+  {
+    return mp_container->begin ();
+  }
+
+  const_iterator end () const
+  {
+    return mp_container->end ();
+  }
+
+  void insert (const T &t)
+  {
+    mp_container->insert (db::object_with_properties<T> (t, m_prop_id));
+  }
+
+private:
+  Container *mp_container;
+  db::properties_id_type m_prop_id;
 };
 
 }

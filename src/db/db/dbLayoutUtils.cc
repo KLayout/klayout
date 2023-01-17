@@ -26,6 +26,7 @@
 #include "dbPolygonTools.h"
 #include "tlProgress.h"
 #include "tlTimer.h"
+#include "tlThreads.h"
 
 namespace db
 {
@@ -60,14 +61,14 @@ DirectLayerMapping::map_layer (const LayerProperties &lprops)
 // ------------------------------------------------------------------------------------
 //  PropertyMapper implementation
 
-PropertyMapper::PropertyMapper (db::Layout &target, const db::Layout &source)
-  : mp_target (&target.properties_repository ()), mp_source (&source.properties_repository ())
+PropertyMapper::PropertyMapper (db::Layout *target, const db::Layout *source)
+  : mp_target (target ? &target->properties_repository () : 0), mp_source (source ? &source->properties_repository () : 0)
 {
   //  .. nothing yet ..
 }
 
-PropertyMapper::PropertyMapper (db::PropertiesRepository &target, const db::PropertiesRepository &source)
-  : mp_target (&target), mp_source (&source)
+PropertyMapper::PropertyMapper (db::PropertiesRepository *target, const db::PropertiesRepository *source)
+  : mp_target (target), mp_source (source)
 {
   //  .. nothing yet ..
 }
@@ -88,11 +89,12 @@ PropertyMapper::PropertyMapper ()
  *  @brief Specify the source layout
  */
 void 
-PropertyMapper::set_source (const db::Layout &source)
+PropertyMapper::set_source (const db::Layout *source)
 {
-  if (&source.properties_repository () != mp_source) {
+  const db::PropertiesRepository *pr = source ? &source->properties_repository () : 0;
+  if (pr != mp_source) {
     m_prop_id_map.clear ();
-    mp_source = &source.properties_repository ();
+    mp_source = pr;
   }
 }
 
@@ -100,11 +102,11 @@ PropertyMapper::set_source (const db::Layout &source)
  *  @brief Specify the source property repository
  */
 void
-PropertyMapper::set_source (const db::PropertiesRepository &source)
+PropertyMapper::set_source (const db::PropertiesRepository *source)
 {
-  if (&source != mp_source) {
+  if (source != mp_source) {
     m_prop_id_map.clear ();
-    mp_source = &source;
+    mp_source = source;
   }
 }
 
@@ -112,11 +114,12 @@ PropertyMapper::set_source (const db::PropertiesRepository &source)
  *  @brief Specify the target layout
  */
 void 
-PropertyMapper::set_target (db::Layout &target)
+PropertyMapper::set_target (db::Layout *target)
 {
-  if (&target.properties_repository () != mp_target) {
+  db::PropertiesRepository *pr = target ? &target->properties_repository () : 0;
+  if (pr != mp_target) {
     m_prop_id_map.clear ();
-    mp_target = &target.properties_repository ();
+    mp_target = pr;
   }
 }
 
@@ -124,11 +127,11 @@ PropertyMapper::set_target (db::Layout &target)
  *  @brief Specify the target property repository
  */
 void
-PropertyMapper::set_target (db::PropertiesRepository &target)
+PropertyMapper::set_target (db::PropertiesRepository *target)
 {
-  if (&target != mp_target) {
+  if (target != mp_target) {
     m_prop_id_map.clear ();
-    mp_target = &target;
+    mp_target = target;
   }
 }
 
@@ -138,12 +141,15 @@ PropertyMapper::set_target (db::PropertiesRepository &target)
 db::Layout::properties_id_type 
 PropertyMapper::operator() (db::Layout::properties_id_type source_id)
 {
-  if (source_id == 0 || mp_source == mp_target) {
+  if (source_id == 0 || mp_source == mp_target || ! mp_source || ! mp_target) {
     return source_id;
   }
 
   tl_assert (mp_source != 0);
   tl_assert (mp_target != 0);
+
+  static tl::Mutex s_mutex;
+  tl::MutexLocker locker (&s_mutex);
 
   std::map <db::Layout::properties_id_type, db::Layout::properties_id_type>::const_iterator p = m_prop_id_map.find (source_id);
 
@@ -226,7 +232,7 @@ merge_layouts (db::Layout &target,
   }
 
   //  provide the property mapper
-  db::PropertyMapper pm (target, source);
+  db::PropertyMapper pm (&target, &source);
 
   tl::RelativeProgress progress (tl::to_string (tr ("Merge cells")), all_cells_to_copy.size (), 1);
 
@@ -338,7 +344,7 @@ copy_or_move_shapes (db::Layout &target,
   collect_cells_to_copy (source, source_cells, cell_mapping, all_top_level_cells, all_cells_to_copy);
 
   //  provide the property mapper
-  db::PropertyMapper pm (target, source);
+  db::PropertyMapper pm (&target, &source);
 
   tl::RelativeProgress progress (tl::to_string (tr ("Merge cells")), all_cells_to_copy.size () * layer_mapping.size (), 1);
 

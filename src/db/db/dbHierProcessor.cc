@@ -544,6 +544,62 @@ subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::
 
 template <class TS, class TI>
 static void
+subtract (std::unordered_set<db::PolygonRefWithProperties> &res, const std::unordered_set<db::PolygonRefWithProperties> &other, db::Layout *layout, const db::local_processor<TS, TI, db::PolygonRefWithProperties> *proc)
+{
+  if (other.empty ()) {
+    return;
+  }
+
+  if (! proc->boolean_core ()) {
+    subtract_set (res, other);
+    return;
+  }
+
+  size_t max_vertex_count = proc->max_vertex_count ();
+  double area_ratio = proc->area_ratio ();
+
+  std::unordered_set<db::PolygonRefWithProperties> first;
+  first.swap (res);
+
+  std::map<db::properties_id_type, std::pair<std::vector<const db::PolygonRefWithProperties *>, std::vector<const db::PolygonRefWithProperties *> > > by_prop_id;
+  for (auto i = first.begin (); i != first.end (); ++i)   {
+    by_prop_id [i->properties_id ()].first.push_back (i.operator-> ());
+  }
+  for (auto i = other.begin (); i != other.end (); ++i)   {
+    by_prop_id [i->properties_id ()].second.push_back (i.operator-> ());
+  }
+
+  db::EdgeProcessor ep;
+  ep.set_base_verbosity (proc->base_verbosity () + 30);
+
+  for (auto s2p = by_prop_id.begin (); s2p != by_prop_id.end (); ++s2p) {
+
+    db::properties_id_type prop_id = s2p->first;
+    size_t p1 = 0, p2 = 1;
+
+    ep.clear ();
+
+    for (auto i = s2p->second.first.begin (); i != s2p->second.first.end (); ++i) {
+      ep.insert (**i, p1);
+      p1 += 2;
+    }
+
+    for (auto i = s2p->second.second.begin (); i != s2p->second.second.end (); ++i) {
+      ep.insert (**i, p2);
+      p2 += 2;
+    }
+
+    db::BooleanOp op (db::BooleanOp::ANotB);
+    db::polygon_ref_generator_with_properties<db::PolygonRefWithProperties> pr (layout, res, prop_id);
+    db::PolygonSplitter splitter (pr, area_ratio, max_vertex_count);
+    db::PolygonGenerator pg (splitter, true, true);
+    ep.process (pg, op);
+
+  }
+}
+
+template <class TS, class TI>
+static void
 subtract (std::unordered_set<db::Edge> &res, const std::unordered_set<db::Edge> &other, db::Layout * /*layout*/, const db::local_processor<TS, TI, db::Edge> *proc)
 {
   if (other.empty ()) {
@@ -570,6 +626,59 @@ subtract (std::unordered_set<db::Edge> &res, const std::unordered_set<db::Edge> 
   scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
 
   res.swap (result);
+}
+
+template <class TS, class TI>
+static void
+subtract (std::unordered_set<db::EdgeWithProperties> &res, const std::unordered_set<db::EdgeWithProperties> &other, db::Layout * /*layout*/, const db::local_processor<TS, TI, db::EdgeWithProperties> *proc)
+{
+  if (other.empty ()) {
+    return;
+  }
+
+  if (! proc->boolean_core ()) {
+    subtract_set (res, other);
+    return;
+  }
+
+  std::unordered_set<db::EdgeWithProperties> first;
+  first.swap (res);
+
+  std::map<db::properties_id_type, std::pair<std::vector<const db::EdgeWithProperties *>, std::vector<const db::EdgeWithProperties *> > > by_prop_id;
+  for (auto i = first.begin (); i != first.end (); ++i)   {
+    by_prop_id [i->properties_id ()].first.push_back (i.operator-> ());
+  }
+  for (auto i = other.begin (); i != other.end (); ++i)   {
+    by_prop_id [i->properties_id ()].second.push_back (i.operator-> ());
+  }
+
+  for (auto s2p = by_prop_id.begin (); s2p != by_prop_id.end (); ++s2p) {
+
+    if (s2p->second.second.empty ()) {
+
+      for (auto i = s2p->second.first.begin (); i != s2p->second.first.end (); ++i) {
+        res.insert (**i);
+      }
+
+    } else {
+
+      db::box_scanner<db::Edge, size_t> scanner;
+      scanner.reserve (s2p->second.first.size () + s2p->second.second.size ());
+
+      for (auto i = s2p->second.first.begin (); i != s2p->second.first.end (); ++i) {
+        scanner.insert (*i, 0);
+      }
+      for (auto i = s2p->second.second.begin (); i != s2p->second.second.end (); ++i) {
+        scanner.insert (*i, 1);
+      }
+
+      db::property_injector<db::Edge, std::unordered_set<db::EdgeWithProperties> > prop_inject (&res, s2p->first);
+      EdgeBooleanClusterCollector<db::property_injector<db::Edge, std::unordered_set<db::EdgeWithProperties> > > cluster_collector (&prop_inject, EdgeNot);
+      scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
+
+    }
+
+  }
 }
 
 template <class TS, class TI, class TR>
@@ -761,7 +870,9 @@ template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Edge, db
 template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Text, db::Polygon>;
 template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Text, db::Text>;
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties>;
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgeWithProperties>;
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::PolygonRef, db::EdgePair>;
@@ -1340,7 +1451,9 @@ template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, d
 template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Edge, db::Polygon>;
 template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Edge, db::Edge>;
 template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties>;
 template class DB_PUBLIC local_processor_context_computation_task<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgeWithProperties>;
 template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::TextRef, db::TextRef>;
 template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::TextRef, db::PolygonRef>;
@@ -1403,8 +1516,10 @@ template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db
 template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Text, db::Text>;
 template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Edge, db::Polygon>;
 template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties>;
 template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
 template class DB_PUBLIC local_processor_result_computation_task<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties>;
+template class DB_PUBLIC local_processor_result_computation_task<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgeWithProperties>;
 template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::PolygonRef, db::EdgePair>;
@@ -2421,7 +2536,9 @@ template class DB_PUBLIC local_processor<db::Polygon, db::Text, db::Text>;
 template class DB_PUBLIC local_processor<db::Polygon, db::Edge, db::Polygon>;
 template class DB_PUBLIC local_processor<db::Polygon, db::Edge, db::Edge>;
 template class DB_PUBLIC local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
+template class DB_PUBLIC local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties>;
 template class DB_PUBLIC local_processor<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties>;
+template class DB_PUBLIC local_processor<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgeWithProperties>;
 template class DB_PUBLIC local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC local_processor<db::PolygonRef, db::Edge, db::Edge>;

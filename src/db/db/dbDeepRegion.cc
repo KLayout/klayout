@@ -1285,12 +1285,41 @@ DeepRegion::snapped (db::Coord gx, db::Coord gy)
 namespace
 {
 
+template <class TS, class TI>
+static
+std::map<db::properties_id_type, std::pair<std::vector<const TS *>, std::vector<const TI *> > >
+separate_by_same_properties (const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, db::PropertyMapper &pms, db::PropertyMapper &pmi)
+{
+  std::map<db::properties_id_type, std::pair<std::vector<const TS *>, std::vector<const TI *> > > by_prop_id;
+
+  for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+
+    const db::object_with_properties<TS> &subject = interactions.subject_shape (i->first);
+
+    std::pair<std::vector<const TS *>, std::vector<const TI *> > &s2p = by_prop_id [pms (subject.properties_id ())];
+    s2p.first.push_back (&subject);
+
+    for (auto ii = i->second.begin (); ii != i->second.end (); ++ii) {
+
+      const std::pair<unsigned int, db::object_with_properties<TI> > &intruder = interactions.intruder_shape (*ii);
+
+      if (subject.properties_id () == pmi (intruder.second.properties_id ())) {
+        s2p.second.push_back (&intruder.second);
+      }
+
+    }
+
+  }
+
+  return by_prop_id;
+}
+
 class PolygonToEdgeLocalOperation
-  : public local_operation<db::PolygonRef, db::PolygonRef, db::Edge>
+  : public local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties>
 {
 public:
-  PolygonToEdgeLocalOperation ()
-    : local_operation<db::PolygonRef, db::PolygonRef, db::Edge> ()
+  PolygonToEdgeLocalOperation (db::PropertiesRepository *target_pr, const db::PropertiesRepository *source_pr)
+    : local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties> (), m_pm (target_pr, source_pr)
   {
     //  .. nothing yet ..
   }
@@ -1299,63 +1328,75 @@ public:
   virtual bool requests_single_subjects () const { return true; }
   virtual std::string description () const { return std::string ("polygon to edges"); }
 
-  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::EdgeWithProperties> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
   {
     db::EdgeProcessor ep;
     ep.set_base_verbosity (50);
 
-    for (shape_interactions<db::PolygonRef, db::PolygonRef>::subject_iterator s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
-      ep.insert (s->second);
-    }
+    auto by_prop_id = separate_by_same_properties (interactions, m_pm, m_pm);
+    for (auto shapes_by_prop_id = by_prop_id.begin (); shapes_by_prop_id != by_prop_id.end (); ++shapes_by_prop_id) {
 
-    if (interactions.num_intruders () == 0) {
+      db::properties_id_type prop_id = shapes_by_prop_id->first;
 
-      db::EdgeToEdgeSetGenerator eg (results.front ());
-      db::MergeOp op (0);
-      ep.process (eg, op);
-
-    } else {
-
-      //  With intruders: to compute our local contribution we take the edges without and with intruders
-      //  and deliver what is in both sets
-
-      db::MergeOp op (0);
-
-      std::vector<Edge> edges1;
-      db::EdgeContainer ec1 (edges1);
-      ep.process (ec1, op);
-
-      ep.clear ();
-
-      for (shape_interactions<db::PolygonRef, db::PolygonRef>::subject_iterator s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
-        ep.insert (s->second);
-      }
-      for (shape_interactions<db::PolygonRef, db::PolygonRef>::intruder_iterator i = interactions.begin_intruders (); i != interactions.end_intruders (); ++i) {
-        ep.insert (i->second.second);
+      for (auto s = shapes_by_prop_id->second.first.begin (); s != shapes_by_prop_id->second.first.end (); ++s) {
+        ep.insert (**s);
       }
 
-      std::vector<Edge> edges2;
-      db::EdgeContainer ec2 (edges2);
-      ep.process (ec2, op);
+      db::property_injector<db::Edge, std::unordered_set<db::EdgeWithProperties> > results_with_properties (&results.front (), prop_id);
 
-      //  Runs the boolean AND between the result with and without intruders
+      if (shapes_by_prop_id->second.second.empty ()) {
 
-      db::box_scanner<db::Edge, size_t> scanner;
-      scanner.reserve (edges1.size () + edges2.size ());
+        db::edge_to_edge_set_generator<db::property_injector<db::Edge, std::unordered_set<db::EdgeWithProperties> > > eg (results_with_properties, prop_id);
+        db::MergeOp op (0);
+        ep.process (eg, op);
 
-      for (std::vector<Edge>::const_iterator i = edges1.begin (); i != edges1.end (); ++i) {
-        scanner.insert (i.operator-> (), 0);
+      } else {
+
+        //  With intruders: to compute our local contribution we take the edges without and with intruders
+        //  and deliver what is in both sets
+
+        db::MergeOp op (0);
+
+        std::vector<Edge> edges1;
+        db::EdgeContainer ec1 (edges1);
+        ep.process (ec1, op);
+
+        ep.clear ();
+
+        for (auto s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
+          ep.insert (s->second);
+        }
+        for (auto i = interactions.begin_intruders (); i != interactions.end_intruders (); ++i) {
+          ep.insert (i->second.second);
+        }
+
+        std::vector<Edge> edges2;
+        db::EdgeContainer ec2 (edges2);
+        ep.process (ec2, op);
+
+        //  Runs the boolean AND between the result with and without intruders
+
+        db::box_scanner<db::Edge, size_t> scanner;
+        scanner.reserve (edges1.size () + edges2.size ());
+
+        for (std::vector<Edge>::const_iterator i = edges1.begin (); i != edges1.end (); ++i) {
+          scanner.insert (i.operator-> (), 0);
+        }
+        for (std::vector<Edge>::const_iterator i = edges2.begin (); i != edges2.end (); ++i) {
+          scanner.insert (i.operator-> (), 1);
+        }
+
+        EdgeBooleanClusterCollector<db::property_injector<Edge, std::unordered_set<db::EdgeWithProperties> > > cluster_collector (&results_with_properties, EdgeAnd);
+        scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
+
       }
-      for (std::vector<Edge>::const_iterator i = edges2.begin (); i != edges2.end (); ++i) {
-        scanner.insert (i.operator-> (), 1);
-      }
-
-      EdgeBooleanClusterCollector<std::unordered_set<db::Edge> > cluster_collector (&results.front (), EdgeAnd);
-      scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
 
     }
 
   }
+
+private:
+  mutable db::PropertyMapper m_pm;
 };
 
 }
@@ -1363,8 +1404,10 @@ public:
 EdgesDelegate *
 DeepRegion::edges (const EdgeFilterBase *filter) const
 {
+  std::unique_ptr<db::DeepEdges> res (new db::DeepEdges (deep_layer ().derived ()));
+
   if (empty ()) {
-    return new db::DeepEdges (deep_layer ().derived ());
+    return res.release ();
   }
 
   if (! filter && merged_semantics () && ! merged_polygons_available ()) {
@@ -1373,11 +1416,9 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
 
     const db::DeepLayer &polygons = deep_layer ();
 
-    db::PolygonToEdgeLocalOperation op;
+    db::PolygonToEdgeLocalOperation op (res->properties_repository (), &polygons.layout ().properties_repository ());
 
-    db::local_processor<db::PolygonRef, db::PolygonRef, db::Edge> proc (const_cast<db::Layout *> (&polygons.layout ()),
-                                                                        const_cast<db::Cell *> (&polygons.initial_cell ()),
-                                                                        polygons.breakout_cells ());
+    db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties> proc (&res->deep_layer ().layout (), &res->deep_layer ().initial_cell (), polygons.breakout_cells ());
 
     proc.set_description (progress_desc ());
     proc.set_report_progress (report_progress ());
@@ -1387,15 +1428,12 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
     //  a boolean core makes somewhat better hierarchy
     proc.set_boolean_core (true);
 
-    std::unique_ptr<db::DeepEdges> res (new db::DeepEdges (polygons.derived ()));
-
     proc.run (&op, polygons.layer (), foreign_idlayer (), res->deep_layer ().layer ());
-
-    return res.release ();
 
   } else {
 
     const db::DeepLayer &polygons = merged_deep_layer ();
+    db::PropertyMapper pm (res->properties_repository (), &polygons.layout ().properties_repository ());
 
     std::unique_ptr<VariantsCollectorBase> vars;
 
@@ -1412,7 +1450,6 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
 
     db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
-    std::unique_ptr<db::DeepEdges> res (new db::DeepEdges (polygons.derived ()));
     for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
       db::ICplxTrans tr;
@@ -1432,7 +1469,7 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
 
         for (db::Polygon::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); ++e) {
           if (! filter || filter->selected ((*e).transformed (tr))) {
-            st.insert (*e);
+            st.insert (db::EdgeWithProperties (*e, pm (si->prop_id ())));
           }
         }
 
@@ -1441,9 +1478,10 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
     }
 
     res->set_is_merged (merged_semantics () || is_merged ());
-    return res.release ();
 
   }
+
+  return res.release ();
 }
 
 RegionDelegate *

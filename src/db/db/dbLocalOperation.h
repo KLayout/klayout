@@ -31,6 +31,7 @@
 #include "dbEdgeBoolean.h"
 #include "dbEdgeProcessor.h"
 #include "dbPropertyConstraint.h"
+#include "dbLayoutUtils.h"
 
 #include <unordered_map>
 #include <unordered_set>
@@ -168,8 +169,8 @@ public:
 private:
   bool m_is_and;
   db::PropertyConstraint m_property_constraint;
-  db::PropertiesRepository *mp_target_pr;
-  const db::PropertiesRepository *mp_subject_pr, *mp_intruder_pr;
+  mutable db::PropertyMapper m_pms;
+  mutable db::PropertyMapper m_pmi;
 };
 
 typedef bool_and_or_not_local_operation_with_properties<db::PolygonRef, db::PolygonRef, db::PolygonRef> BoolAndOrNotLocalOperationWithProperties;
@@ -212,8 +213,7 @@ public:
 
 private:
   db::PropertyConstraint m_property_constraint;
-  db::PropertiesRepository *mp_target1_pr, *mp_target2_pr;
-  const db::PropertiesRepository *mp_subject_pr, *mp_intruder_pr;
+  mutable db::PropertyMapper m_pms, m_pmi, m_pm12;
 };
 
 typedef two_bool_and_not_local_operation_with_properties<db::PolygonRef, db::PolygonRef, db::PolygonRef> TwoBoolAndNotLocalOperationWithProperties;

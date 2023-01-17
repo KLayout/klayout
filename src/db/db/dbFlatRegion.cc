@@ -431,7 +431,8 @@ const db::PropertiesRepository *FlatRegion::properties_repository () const
 
 void FlatRegion::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
-  layout->cell (into_cell).shapes (into_layer).insert (*mp_polygons);
+  db::PropertyMapper pm (layout->properties_repository (), *mp_properties_repository.get_const ());
+  layout->cell (into_cell).shapes (into_layer).insert (*mp_polygons, pm);
 }
 
 void

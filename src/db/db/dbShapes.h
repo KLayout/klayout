@@ -788,7 +788,7 @@ public:
       } else {
         //  translate and transform into this
         for (tl::vector<LayerBase *>::const_iterator l = d.m_layers.begin (); l != d.m_layers.end (); ++l) {
-          (*l)->transform_into (this, shape_repository (), array_repository (), pm_delegate);
+          (*l)->translate_into (this, shape_repository (), array_repository (), pm_delegate);
         }
       }
 

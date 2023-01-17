@@ -39,62 +39,7 @@ class MutableEdges;
 class EmptyEdges;
 class DeepShapeStore;
 
-/**
- *  @brief An edge set iterator
- *
- *  The iterator delivers the edges of the edge set
- */
-class DB_PUBLIC EdgesIterator
-  : public generic_shape_iterator<db::Edge>
-{
-public:
-  /**
-   *  @brief Default constructor
-   */
-  EdgesIterator ()
-    : generic_shape_iterator<db::Edge> ()
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Constructor from a delegate
-   *  The iterator will take ownership over the delegate
-   */
-  EdgesIterator (EdgesIteratorDelegate *delegate)
-    : generic_shape_iterator<db::Edge> (delegate)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Copy constructor and assignment
-   */
-  EdgesIterator (const EdgesIterator &other)
-    : generic_shape_iterator<db::Edge> (static_cast<const generic_shape_iterator<db::Edge> &> (other))
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Assignment
-   */
-  EdgesIterator &operator= (const EdgesIterator &other)
-  {
-    generic_shape_iterator<db::Edge>::operator= (other);
-    return *this;
-  }
-
-  /**
-   *  @brief Increment
-   */
-  EdgesIterator &operator++ ()
-  {
-    generic_shape_iterator<db::Edge>::operator++ ();
-    return *this;
-  }
-};
-
+typedef generic_shape_iterator<db::Edge> EdgesIterator;
 typedef addressable_shape_delivery<Edge> AddressableEdgeDelivery;
 
 class Edges;

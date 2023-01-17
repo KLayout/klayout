@@ -43,62 +43,7 @@ class DeepShapeStore;
 class TransformationReducer;
 class CompoundRegionOperationNode;
 
-/**
- *  @brief A region iterator
- *
- *  The iterator delivers the polygons of the region
- */
-class DB_PUBLIC RegionIterator
-  : public generic_shape_iterator<db::Polygon>
-{
-public:
-  /**
-   *  @brief Default constructor
-   */
-  RegionIterator ()
-    : generic_shape_iterator<db::Polygon> ()
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Constructor from a delegate
-   *  The iterator will take ownership over the delegate
-   */
-  RegionIterator (RegionIteratorDelegate *delegate)
-    : generic_shape_iterator<db::Polygon> (delegate)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Copy constructor and assignment
-   */
-  RegionIterator (const RegionIterator &other)
-    : generic_shape_iterator<db::Polygon> (static_cast<const generic_shape_iterator<db::Polygon> &> (other))
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Assignment
-   */
-  RegionIterator &operator= (const RegionIterator &other)
-  {
-    generic_shape_iterator<db::Polygon>::operator= (other);
-    return *this;
-  }
-
-  /**
-   *  @brief Increment
-   */
-  RegionIterator &operator++ ()
-  {
-    generic_shape_iterator<db::Polygon>::operator++ ();
-    return *this;
-  }
-};
-
+typedef generic_shape_iterator<db::Polygon> RegionIterator;
 typedef addressable_shape_delivery<db::Polygon> AddressablePolygonDelivery;
 
 /**

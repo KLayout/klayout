@@ -43,63 +43,7 @@ class Region;
 class DeepShapeStore;
 class TransformationReducer;
 
-/**
- *  @brief An text set iterator
- *
- *  The iterator delivers the texts of the text set
- */
-
-class DB_PUBLIC TextsIterator
-  : public generic_shape_iterator<db::Text>
-{
-public:
-  /**
-   *  @brief Default constructor
-   */
-  TextsIterator ()
-    : generic_shape_iterator<db::Text> ()
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Constructor from a delegate
-   *  The iterator will take ownership over the delegate
-   */
-  TextsIterator (TextsIteratorDelegate *delegate)
-    : generic_shape_iterator<db::Text> (delegate)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Copy constructor and assignment
-   */
-  TextsIterator (const TextsIterator &other)
-    : generic_shape_iterator<db::Text> (static_cast<const generic_shape_iterator<db::Text> &> (other))
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Assignment
-   */
-  TextsIterator &operator= (const TextsIterator &other)
-  {
-    generic_shape_iterator<db::Text>::operator= (other);
-    return *this;
-  }
-
-  /**
-   *  @brief Increment
-   */
-  TextsIterator &operator++ ()
-  {
-    generic_shape_iterator<db::Text>::operator++ ();
-    return *this;
-  }
-};
-
+typedef generic_shape_iterator<Text> TextsIterator;
 typedef addressable_shape_delivery<Text> AddressableTextDelivery;
 
 class Texts;

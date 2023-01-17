@@ -44,62 +44,7 @@ class DeepShapeStore;
 class TransformationReducer;
 class EdgeFilterBase;
 
-/**
- *  @brief An edge pair set iterator
- *
- *  The iterator delivers the edge pairs of the edge pair set
- */
-class DB_PUBLIC EdgePairsIterator
-  : public generic_shape_iterator<db::EdgePair>
-{
-public:
-  /**
-   *  @brief Default constructor
-   */
-  EdgePairsIterator ()
-    : generic_shape_iterator<db::EdgePair> ()
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Constructor from a delegate
-   *  The iterator will take ownership over the delegate
-   */
-  EdgePairsIterator (EdgePairsIteratorDelegate *delegate)
-    : generic_shape_iterator<db::EdgePair> (delegate)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Copy constructor and assignment
-   */
-  EdgePairsIterator (const EdgePairsIterator &other)
-    : generic_shape_iterator<db::EdgePair> (static_cast<const generic_shape_iterator<db::EdgePair> &> (other))
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Assignment
-   */
-  EdgePairsIterator &operator= (const EdgePairsIterator &other)
-  {
-    generic_shape_iterator<db::EdgePair>::operator= (other);
-    return *this;
-  }
-
-  /**
-   *  @brief Increment
-   */
-  EdgePairsIterator &operator++ ()
-  {
-    generic_shape_iterator<db::EdgePair>::operator++ ();
-    return *this;
-  }
-};
-
+typedef generic_shape_iterator<EdgePair> EdgePairsIterator;
 typedef addressable_shape_delivery<EdgePair> AddressableEdgePairDelivery;
 
 class EdgePairs;

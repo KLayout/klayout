@@ -153,6 +153,7 @@ OriginalLayerRegion::OriginalLayerRegion (const OriginalLayerRegion &other)
 OriginalLayerRegion::OriginalLayerRegion (const RecursiveShapeIterator &si, bool is_merged)
   : AsIfFlatRegion (), m_merged_polygons (false), m_iter (si)
 {
+  tl_assert (si.layout ());
   init ();
 
   m_is_merged = is_merged;
@@ -161,6 +162,7 @@ OriginalLayerRegion::OriginalLayerRegion (const RecursiveShapeIterator &si, bool
 OriginalLayerRegion::OriginalLayerRegion (const RecursiveShapeIterator &si, const db::ICplxTrans &trans, bool merged_semantics, bool is_merged)
   : AsIfFlatRegion (), m_merged_polygons (false), m_iter (si), m_iter_trans (trans)
 {
+  tl_assert (si.layout ());
   init ();
 
   m_is_merged = is_merged;
@@ -421,11 +423,12 @@ OriginalLayerRegion::insert_into (Layout *layout, db::cell_index_type into_cell,
 
   db::Shapes &sh = layout->cell (into_cell).shapes (into_layer);
 
+  db::PropertyMapper pm (*layout, *m_iter.layout ());
+
   //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
   //  lock the layout against updates while inserting
   db::LayoutLocker locker (layout);
   for (db::RecursiveShapeIterator i = m_iter; !i.at_end (); ++i) {
-    tl::ident_map<db::properties_id_type> pm;
     sh.insert (*i, i.trans (), pm);
   }
 }

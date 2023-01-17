@@ -532,15 +532,52 @@ public:
   void erase (size_t cid, db::cell_index_type ci)
   {
     m_merged_cluster.erase (std::make_pair (cid, ci));
+    m_property_id_per_cluster.erase (std::make_pair (cid, ci));
   }
 
 private:
   std::map<std::pair<size_t, db::cell_index_type>, db::Shapes> m_merged_cluster;
+  std::map<std::pair<size_t, db::cell_index_type>, db::properties_id_type> m_property_id_per_cluster;
   unsigned int m_layer;
   db::Layout *mp_layout;
   const db::hier_clusters<db::PolygonRef> *mp_hc;
   bool m_min_coherence;
   db::EdgeProcessor m_ep;
+
+  db::properties_id_type property_id (size_t cid, db::cell_index_type ci, bool initial)
+  {
+    std::map<std::pair<size_t, db::cell_index_type>, db::properties_id_type>::iterator s = m_property_id_per_cluster.find (std::make_pair (cid, ci));
+
+    //  some sanity checks: initial clusters are single-use, are never generated twice and cannot be retrieved again
+    if (initial) {
+      tl_assert (s == m_property_id_per_cluster.end ());
+    }
+
+    if (s != m_property_id_per_cluster.end ()) {
+      return s->second;
+    }
+
+    s = m_property_id_per_cluster.insert (std::make_pair (std::make_pair (cid, ci), db::properties_id_type (0))).first;
+
+    const db::connected_clusters<db::PolygonRef> &cc = mp_hc->clusters_per_cell (ci);
+    const db::local_cluster<db::PolygonRef> &c = cc.cluster_by_id (cid);
+
+    if (c.begin_attr () != c.end_attr ()) {
+
+      s->second = *c.begin_attr ();
+
+    } else {
+
+      const db::connected_clusters<db::PolygonRef>::connections_type &conn = cc.connections_for_cluster (cid);
+      for (db::connected_clusters<db::PolygonRef>::connections_type::const_iterator i = conn.begin (); i != conn.end () && s->second == db::properties_id_type (0); ++i) {
+        s->second = property_id (i->id (), i->inst_cell_index (), false);
+      }
+
+    }
+
+    return s->second;
+
+  }
 
   db::Shapes &compute_merged (size_t cid, db::cell_index_type ci, bool initial, unsigned int min_wc)
   {
@@ -556,6 +593,8 @@ private:
     }
 
     s = m_merged_cluster.insert (std::make_pair (std::make_pair (cid, ci), db::Shapes (false))).first;
+
+    db::properties_id_type prop_id = property_id (cid, ci, initial);
 
     const db::connected_clusters<db::PolygonRef> &cc = mp_hc->clusters_per_cell (ci);
     const db::local_cluster<db::PolygonRef> &c = cc.cluster_by_id (cid);
@@ -608,7 +647,7 @@ private:
 
     //  and run the merge step
     db::MergeOp op (min_wc);
-    db::PolygonRefToShapesGenerator pr (mp_layout, &s->second, c.begin_attr () == c.end_attr () ? db::properties_id_type (0) : *c.begin_attr ());
+    db::PolygonRefToShapesGenerator pr (mp_layout, &s->second, prop_id);
     db::PolygonGenerator pg (pr, false /*don't resolve holes*/, m_min_coherence);
     m_ep.process (pg, op);
 

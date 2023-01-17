@@ -33,21 +33,21 @@ from build4mac_util import *
 # @return (usage, moduleset)-tuple
 #-------------------------------------------------------------------------------
 def GenerateUsage(platform):
-    if platform.upper() in [ "MONTEREY", "BIGSUR" ]: # with Xcode [13.1 .. ]
+    if platform.upper() in [ "VENTURA", "MONTEREY", "BIGSUR" ]: # with Xcode [13.1 .. ]
         myQt56    = "qt5brew"
         myRuby    = "hb31"
-        myPython  = "hb38"
-        moduleset = ('qt5Brew', 'HB31', 'HB38')
-    else: # with Xcode [ .. 12.4]; 'sys' for Python has been abolished in 0.28
+        myPython  = "hb39"
+        moduleset = ('qt5Brew', 'HB31', 'HB39')
+    else: # with Xcode [ .. 12.4]; 'sys' for Python has been restored in 0.28.3
         myQt56    = "qt5macports"
-        myRuby    = "mp31"
-        myPython  = "mp38"
-        moduleset = ('qt5MP', 'MP31', 'MP38')
+        myRuby    = "sys"
+        myPython  = "sys"
+        moduleset = ('qt5MP', 'Sys', 'Sys')
 
     usage  = "\n"
     usage += "---------------------------------------------------------------------------------------------------------\n"
     usage += "<< Usage of 'build4mac.py' >>\n"
-    usage += "       for building KLayout 0.28 or later on different Apple macOS / Mac OSX platforms.\n"
+    usage += "       for building KLayout 0.28.3 or later on different Apple macOS / Mac OSX platforms.\n"
     usage += "\n"
     usage += "$ [python] ./build4mac.py\n"
     usage += "   option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)| default value\n"
@@ -66,12 +66,14 @@ def GenerateUsage(platform):
     usage += "                        :   MP31: use Ruby 3.1 from MacPorts                             | \n"
     usage += "                        :   HB31: use Ruby 3.1 from Homebrew                             | \n"
     usage += "                        :   Ana3: use Ruby 3.1 from Anaconda3                            | \n"
-    usage += "   [-p|--python <type>] : case-insensitive type=['nil',  'MP38', 'HB38', 'Ana3',         | %s \n" % myPython
-    usage += "                        :                        HB39', 'HBAuto']                        | \n"
+    usage += "   [-p|--python <type>] : case-insensitive type=['nil',  'Sys', 'MP38', 'HB38', 'Ana3',  | %s \n" % myPython
+    usage += "                        :                        'MP39', HB39', 'HBAuto']                | \n"
     usage += "                        :    nil: don't bind Python                                      | \n"
+    usage += "                        :    Sys: use OS-bundled Python 2.7 up to Catalina               | \n"
     usage += "                        :   MP38: use Python 3.8 from MacPorts                           | \n"
     usage += "                        :   HB38: use Python 3.8 from Homebrew                           | \n"
-    usage += "                        :   Ana3: use Python 3.8 from Anaconda3                          | \n"
+    usage += "                        :   Ana3: use Python 3.9 from Anaconda3                          | \n"
+    usage += "                        :   MP39: use Python 3.9 from MacPorts                           | \n"
     usage += "                        :   HB39: use Python 3.9 from Homebrew                           | \n"
     usage += "                        : HBAuto: use the latest Python 3.x auto-detected from Homebrew  | \n"
     usage += "   [-P|--buildPymod]    : build and deploy Pymod (*.whl and *.egg) for LW-*.dmg          | disabled\n"
@@ -112,7 +114,9 @@ def Get_Default_Config():
         sys.exit(1)
 
     release = int( Release.split(".")[0] ) # take the first of ['19', '0', '0']
-    if   release == 21:
+    if   release == 22:
+        Platform = "Ventura"
+    elif release == 21:
         Platform = "Monterey"
     elif release == 20:
         Platform = "BigSur"
@@ -134,7 +138,7 @@ def Get_Default_Config():
         sys.exit(1)
 
     if not Machine == "x86_64":
-        if Machine == "arm64" and Platform in ["Monterey", "BigSur"]: # with an Apple Silicon Chip
+        if Machine == "arm64" and Platform in ["Ventura", "Monterey", "BigSur"]: # with an Apple Silicon Chip
             print("")
             print( "### Your Mac equips an Apple Silicon Chip ###" )
             print("")
@@ -148,10 +152,14 @@ def Get_Default_Config():
     Usage, ModuleSet = GenerateUsage(Platform)
 
     # Set the default modules
-    if   Platform == "Monterey":
+    if   Platform == "Ventura":
         ModuleQt     = "Qt5Brew"
-        ModuleRuby   = "RubyMonterey"
-        ModulePython = "PythonMonterey"
+        ModuleRuby   = "Ruby31Brew"
+        ModulePython = "Python38Brew"
+    elif Platform == "Monterey":
+        ModuleQt     = "Qt5Brew"
+        ModuleRuby   = "Ruby31Brew"
+        ModulePython = "Python38Brew"
     elif Platform == "BigSur":
         ModuleQt     = "Qt5Brew"
         ModuleRuby   = "RubyBigSur"
@@ -302,7 +310,7 @@ def ApplyPatch2KLayoutQtPri4Ruby3(config):
     # (A) Check Platform
     #----------------------------------------------------------------
     Platform = config['Platform']
-    if Platform in [ "Monterey" ]:
+    if Platform in [ "Ventura", "Monterey" ]:
         return
     elif Platform in [ "BigSur", "Catalina" ]: # take care
         pass
@@ -386,7 +394,7 @@ def Parse_CLI_Args(config):
 
     p.add_option( '-p', '--python',
                     dest='type_python',
-                    help="Python type=['nil', 'MP38', 'HB38', 'Ana3', 'HB39', 'HBAuto']" )
+                    help="Python type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3', 'MP39', 'HB39', 'HBAuto']" )
 
     p.add_option( '-P', '--buildPymod',
                     action='store_true',
@@ -444,10 +452,10 @@ def Parse_CLI_Args(config):
                     default=False,
                     help='check usage' )
 
-    if Platform.upper() in [ "MONTEREY", "BIGSUR" ]: # with Xcode [13.1 .. ]
+    if Platform.upper() in [ "VENTURA", "MONTEREY", "BIGSUR" ]: # with Xcode [13.1 .. ]
         p.set_defaults( type_qt        = "qt5brew",
                         type_ruby      = "hb31",
-                        type_python    = "hb38",
+                        type_python    = "hb39",
                         build_pymod    = False,
                         no_qt_binding  = False,
                         no_qt_uitools  = False,
@@ -460,8 +468,8 @@ def Parse_CLI_Args(config):
                         checkusage     = False )
     else: # with Xcode [ .. 12.4]
         p.set_defaults( type_qt        = "qt5macports",
-                        type_ruby      = "mp31",
-                        type_python    = "mp38",
+                        type_ruby      = "sys",
+                        type_python    = "sys",
                         build_pymod    = False,
                         no_qt_binding  = False,
                         no_qt_uitools  = False,
@@ -528,7 +536,9 @@ def Parse_CLI_Args(config):
             ModuleRuby = 'nil'
         elif choiceRuby == "Sys":
             choiceRuby = "Sys"
-            if Platform == "Monterey":
+            if Platform == "Ventura":
+                ModuleRuby = 'RubyVentura'
+            elif Platform == "Monterey":
                 ModuleRuby = 'RubyMonterey'
             elif Platform == "BigSur":
                 ModuleRuby = 'RubyBigSur'
@@ -561,10 +571,11 @@ def Parse_CLI_Args(config):
     # (C) Determine the Python type
     candidates           = dict()
     candidates['NIL']    = 'nil'
-    # candidates['SYS']  = 'Sys'   # has been abolished in 0.28
+    candidates['SYS']    = 'Sys'   # has been restored in 0.28.3
     candidates['MP38']   = 'MP38'
     candidates['HB38']   = 'HB38'
     candidates['ANA3']   = 'Ana3'
+    candidates['MP39']   = 'MP39'
     candidates['HB39']   = 'HB39'
     candidates['HBAUTO'] = 'HBAuto'
     try:
@@ -577,10 +588,8 @@ def Parse_CLI_Args(config):
         if choicePython ==  "nil":
             ModulePython = 'nil'
         elif choicePython == "Sys":
-            if Platform == "Monterey":
-                ModulePython = 'PythonMonterey'
-            elif Platform == "BigSur":
-                ModulePython = 'PythonBigSur'
+            if Platform in [ "Ventura", "Monterey", "BigSur" ]:
+                raise Exception( "! Cannot choose the 'sys' Python on <%s>" % Platform )
             elif Platform == "Catalina":
                 ModulePython = 'PythonCatalina'
             elif Platform == "Mojave":
@@ -600,6 +609,8 @@ def Parse_CLI_Args(config):
         elif choicePython == "Ana3":
             ModulePython = 'PythonAnaconda3'
             NonOSStdLang = True
+        elif choicePython == "MP39":
+            ModulePython = 'Python39MacPorts'
         elif choicePython == "HB39":
             ModulePython = 'Python39Brew'
             NonOSStdLang = True
@@ -832,9 +843,9 @@ def Get_Build_Parameters(config):
     parameters['ModulePython'] = ModulePython
 
     PymodDistDir = dict()
-    if Platform in [ 'Monterey', 'BigSur', 'Catalina' ]:
+    if Platform in [ 'Ventura', 'Monterey', 'BigSur', 'Catalina' ]:
         if ModuleRuby in [ 'Ruby31MacPorts', 'Ruby31Brew', 'RubyAnaconda3' ]:
-            if ModulePython in ['Python38MacPorts']:
+            if ModulePython in [ 'Python38MacPorts', 'Python39MacPorts' ]:
                 PymodDistDir[ModulePython] = 'dist-MP3'
             elif ModulePython in [ 'Python38Brew', 'Python39Brew', 'PythonAutoBrew' ]:
                 PymodDistDir[ModulePython] = 'dist-HB3'
@@ -855,10 +866,10 @@ def Build_pymod(parameters):
     #---------------------------------------------------------------------------
     # [1] <pymod> will be built if:
     #       BuildPymod   = True
-    #       Platform     = [ 'Monterey', 'BigSur', 'Catalina' ]
+    #       Platform     = [ 'Ventura', 'Monterey', 'BigSur', 'Catalina' ]
     #       ModuleRuby   = [ 'Ruby31MacPorts', 'Ruby31Brew', 'RubyAnaconda3' ]
-    #       ModulePython = [ 'Python38MacPorts', 'Python38Brew',
-    #                        'PythonAnaconda3',  'Python39Brew', 'PythonAutoBrew' ]
+    #       ModulePython = [ 'Python38MacPorts', 'Python38Brew', 'PythonAnaconda3',
+    #                        'Python39MacPorts', 'Python39Brew', 'PythonAutoBrew' ]
     #---------------------------------------------------------------------------
     BuildPymod   = parameters['BuildPymod']
     Platform     = parameters['Platform']
@@ -866,11 +877,12 @@ def Build_pymod(parameters):
     ModulePython = parameters['ModulePython']
     if not BuildPymod:
         return 0
-    if not Platform in [ 'Monterey', 'BigSur', 'Catalina' ]:
+    if not Platform in [ 'Ventura', 'Monterey', 'BigSur', 'Catalina' ]:
         return 0
     elif not ModuleRuby in [ 'Ruby31MacPorts', 'Ruby31Brew', 'RubyAnaconda3' ]:
         return 0
-    elif not ModulePython in [ 'Python38MacPorts', 'Python38Brew', 'PythonAnaconda3', 'Python39Brew', 'PythonAutoBrew' ]:
+    elif not ModulePython in [ 'Python38MacPorts', 'Python38Brew', 'PythonAnaconda3', \
+                               'Python39MacPorts', 'Python39Brew', 'PythonAutoBrew' ]:
         return 0
 
     #--------------------------------------------------------------------
@@ -882,14 +894,18 @@ def Build_pymod(parameters):
     # Using MacPorts
     if PymodDistDir[ModulePython] == 'dist-MP3':
         addIncPath = "/opt/local/include"
+        addLibPath = "/opt/local/lib"
     # Using Homebrew
     elif PymodDistDir[ModulePython] == 'dist-HB3':
         addIncPath = "%s/include" % DefaultHomebrewRoot  # defined in "build4mac_env.py"
-    # Using Anaconda3
+        addLibPath = "%s/lib"     % DefaultHomebrewRoot  # defined in "build4mac_env.py"
     elif  PymodDistDir[ModulePython] == 'dist-ana3':
         addIncPath = "/Applications/anaconda3/include"
+        addLibPath = "/Applications/anaconda3/lib"
     else:
         addIncPath = ""
+        addLibPath = ""
+
     if not addIncPath == "":
         try:
             cpath = os.environ['CPATH']
@@ -897,6 +913,14 @@ def Build_pymod(parameters):
             os.environ['CPATH'] = addIncPath
         else:
             os.environ['CPATH'] = "%s:%s" % (addIncPath, cpath)
+
+    if not addLibPath == "":
+        try:
+            ldpath = os.environ['LDFLAGS']
+        except KeyError:
+            os.environ['LDFLAGS'] = '-L%s' % addLibPath
+        else:
+            os.environ['LDFLAGS'] = '-L%s %s' % (addLibPath, ldpath)
 
     #--------------------------------------------------------------------
     # [3] Set different command line parameters for building <pymod>
@@ -1542,13 +1566,17 @@ def Deploy_Binaries_For_Bundle(config, parameters):
         #        drwxr-xr-x 4 kazzz-s admin 128 12 16 21:40 Versions
         #-----------------------------------------------------------------------------------------------
         deploymentPython38HB   = (ModulePython == 'Python38Brew')
+        deploymentPython39HB   = (ModulePython == 'Python39Brew')
         deploymentPythonAutoHB = (ModulePython == 'PythonAutoBrew')
-        if (deploymentPython38HB or deploymentPythonAutoHB) and NonOSStdLang:
+        if (deploymentPython38HB or deploymentPython39HB or deploymentPythonAutoHB) and NonOSStdLang:
             from build4mac_util import WalkFrameworkPaths, PerformChanges
 
             if deploymentPython38HB:
                 HBPythonFrameworkPath = HBPython38FrameworkPath
                 pythonHBVer           = "3.8" # 'pinned' to this version as of KLayout version 0.26.7 (2020-09-13)
+            elif deploymentPython39HB:
+                HBPythonFrameworkPath = HBPython39FrameworkPath
+                pythonHBVer           = "3.9" # 'pinned' to this version as of KLayout version 0.28.2 (2023-01-02)
             elif deploymentPythonAutoHB:
                 HBPythonFrameworkPath = HBPythonAutoFrameworkPath
                 pythonHBVer           = HBPythonAutoVersion

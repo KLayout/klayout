@@ -85,6 +85,7 @@ static const char *cm_symbols[] = {
   "cm_cancel",
   "cm_redraw",
   "cm_screenshot",
+  "cm_screenshot_to_clipboard",
   "cm_save_layer_props",
   "cm_load_layer_props",
   "cm_save_bookmarks",

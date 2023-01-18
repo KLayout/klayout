@@ -56,7 +56,7 @@ DeepShapeCollectionDelegateBase::apply_property_translator (const db::Properties
 
     db::Shapes &shapes = c->shapes (m_deep_layer.layer ());
 
-    db::Shapes new_shapes;
+    db::Shapes new_shapes (shapes.is_editable ());
     new_shapes.assign (shapes, pt);
     shapes.swap (new_shapes);
 
@@ -80,6 +80,12 @@ ShapeCollection::properties_repository ()
   db::PropertiesRepository *r = get_delegate () ? get_delegate ()->properties_repository () : 0;
   tl_assert (r != 0);
   return *r;
+}
+
+bool
+ShapeCollection::has_properties_repository () const
+{
+  return get_delegate () && get_delegate ()->properties_repository ();
 }
 
 void

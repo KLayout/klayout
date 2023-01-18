@@ -421,7 +421,7 @@ const db::RecursiveShapeIterator *FlatRegion::iter () const
 
 void FlatRegion::apply_property_translator (const db::PropertiesTranslator &pt)
 {
-  db::Shapes new_polygons;
+  db::Shapes new_polygons (mp_polygons->is_editable ());
   new_polygons.assign (*mp_polygons, pt);
   mp_polygons->swap (new_polygons);
 }

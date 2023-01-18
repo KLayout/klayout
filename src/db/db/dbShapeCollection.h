@@ -120,6 +120,11 @@ public:
    *  Use this object to decode property IDs.
    */
   const db::PropertiesRepository &properties_repository () const;
+
+  /**
+   *  @brief Gets a value indicating whether a properties repository is available
+   */
+  bool has_properties_repository () const;
 };
 
 }

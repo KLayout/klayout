@@ -2386,6 +2386,140 @@ TEST(53_PropertiesDeepFromLayout)
   EXPECT_EQ (s.at_end (), true);
 }
 
+TEST(54_PropertiesFilterDeep)
+{
+  db::DeepShapeStore dss ("TOP", 0.001);
+  db::Region r (dss);
+
+  db::PropertiesRepository &rp = r.properties_repository ();
+  db::property_names_id_type key1 = rp.prop_name_id (1);
+  db::property_names_id_type key2 = rp.prop_name_id (2);
+  db::property_names_id_type key3 = rp.prop_name_id (3);
+
+  db::PropertiesRepository::properties_set ps;
+  ps.insert (std::make_pair (key1, 100));
+  ps.insert (std::make_pair (key2, 101));
+  db::properties_id_type prop1a = rp.properties_id (ps);
+
+  ps.clear ();
+  ps.insert (std::make_pair (key1, 0));
+  ps.insert (std::make_pair (key2, 101));
+  db::properties_id_type prop1b = rp.properties_id (ps);
+
+  ps.clear ();
+  ps.insert (std::make_pair (key1, 100));
+  ps.insert (std::make_pair (key3, 102));
+  db::properties_id_type prop2 = rp.properties_id (ps);
+
+  ps.clear ();
+  ps.insert (std::make_pair (key1, 100));
+  db::properties_id_type prop3 = rp.properties_id (ps);
+
+  r.insert (db::BoxWithProperties (db::Box (1, 2, 101, 202), prop1a));
+  r.insert (db::BoxWithProperties (db::Box (10, 12, 111, 212), prop1b));
+  r.insert (db::BoxWithProperties (db::Box (20, 22, 121, 222), prop2));
+  r.insert (db::BoxWithProperties (db::Box (30, 32, 131, 232), prop3));
+
+  db::Region rr = r;
+
+  std::set<tl::Variant> kf;
+  kf.insert (1);
+
+  rr.apply_property_translator (db::PropertiesTranslator::make_filter (rr.properties_repository (), kf));
+
+  db::Region::const_iterator s = rr.begin ();
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (db::prop2string (rr.properties_repository (), s.prop_id ()), "1=100");
+  EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
+  ++s;
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (db::prop2string (rr.properties_repository (), s.prop_id ()), "1=0");
+  EXPECT_EQ (s->to_string (), "(10,12;10,212;111,212;111,12)");
+  ++s;
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (db::prop2string (rr.properties_repository (), s.prop_id ()), "1=100");
+  EXPECT_EQ (s->to_string (), "(20,22;20,222;121,222;121,22)");
+  ++s;
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (db::prop2string (rr.properties_repository (), s.prop_id ()), "1=100");
+  EXPECT_EQ (s->to_string (), "(30,32;30,232;131,232;131,32)");
+  ++s;
+  EXPECT_EQ (s.at_end (), true);
+
+  s = r.begin ();
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (db::prop2string (r.properties_repository (), s.prop_id ()), "1=100\n2=101");
+  EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
+}
+
+TEST(55_PropertiesFilterFlat)
+{
+  db::Region r;
+  //  force flat:
+  r.insert (db::Box (0, 0, 1, 1));
+  r.clear ();
+
+  db::PropertiesRepository &rp = r.properties_repository ();
+  db::property_names_id_type key1 = rp.prop_name_id (1);
+  db::property_names_id_type key2 = rp.prop_name_id (2);
+  db::property_names_id_type key3 = rp.prop_name_id (3);
+
+  db::PropertiesRepository::properties_set ps;
+  ps.insert (std::make_pair (key1, 100));
+  ps.insert (std::make_pair (key2, 101));
+  db::properties_id_type prop1a = rp.properties_id (ps);
+
+  ps.clear ();
+  ps.insert (std::make_pair (key1, 0));
+  ps.insert (std::make_pair (key2, 101));
+  db::properties_id_type prop1b = rp.properties_id (ps);
+
+  ps.clear ();
+  ps.insert (std::make_pair (key1, 100));
+  ps.insert (std::make_pair (key3, 102));
+  db::properties_id_type prop2 = rp.properties_id (ps);
+
+  ps.clear ();
+  ps.insert (std::make_pair (key1, 100));
+  db::properties_id_type prop3 = rp.properties_id (ps);
+
+  r.insert (db::BoxWithProperties (db::Box (1, 2, 101, 202), prop1a));
+  r.insert (db::BoxWithProperties (db::Box (10, 12, 111, 212), prop1b));
+  r.insert (db::BoxWithProperties (db::Box (20, 22, 121, 222), prop2));
+  r.insert (db::BoxWithProperties (db::Box (30, 32, 131, 232), prop3));
+
+  db::Region rr = r;
+
+  std::set<tl::Variant> kf;
+  kf.insert (1);
+
+  rr.apply_property_translator (db::PropertiesTranslator::make_filter (rr.properties_repository (), kf));
+
+  db::Region::const_iterator s = rr.begin ();
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (db::prop2string (rr.properties_repository (), s.prop_id ()), "1=100");
+  EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
+  ++s;
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (db::prop2string (rr.properties_repository (), s.prop_id ()), "1=0");
+  EXPECT_EQ (s->to_string (), "(10,12;10,212;111,212;111,12)");
+  ++s;
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (db::prop2string (rr.properties_repository (), s.prop_id ()), "1=100");
+  EXPECT_EQ (s->to_string (), "(20,22;20,222;121,222;121,22)");
+  ++s;
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (db::prop2string (rr.properties_repository (), s.prop_id ()), "1=100");
+  EXPECT_EQ (s->to_string (), "(30,32;30,232;131,232;131,32)");
+  ++s;
+  EXPECT_EQ (s.at_end (), true);
+
+  s = r.begin ();
+  EXPECT_EQ (s.at_end (), false);
+  EXPECT_EQ (db::prop2string (r.properties_repository (), s.prop_id ()), "1=100\n2=101");
+  EXPECT_EQ (s->to_string (), "(1,2;1,202;101,202;101,2)");
+}
+
 TEST(100_Processors)
 {
   db::Region r;

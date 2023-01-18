@@ -347,7 +347,7 @@ const db::RecursiveShapeIterator *FlatEdges::iter () const
 
 void FlatEdges::apply_property_translator (const db::PropertiesTranslator &pt)
 {
-  db::Shapes new_edges;
+  db::Shapes new_edges (mp_edges->is_editable ());
   new_edges.assign (*mp_edges, pt);
   mp_edges->swap (new_edges);
 }

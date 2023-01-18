@@ -35,6 +35,7 @@
 #include "dbLocalOperation.h"
 #include "dbLocalOperationUtils.h"
 #include "dbRegionLocalOperations.h"  //  for db::ContainedEdgesLocalOperation
+#include "dbEdgesLocalOperations.h"
 #include "dbHierProcessor.h"
 #include "dbEmptyEdges.h"
 

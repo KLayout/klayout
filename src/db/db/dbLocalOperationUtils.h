@@ -29,6 +29,7 @@
 
 #include "dbLayout.h"
 #include "dbPolygonGenerators.h"
+#include "dbLocalOperation.h"
 #include "dbHash.h"
 #include "tlThreads.h"
 
@@ -302,6 +303,45 @@ private:
   Container *mp_container;
   db::properties_id_type m_prop_id;
 };
+
+/**
+ *  @brief Separates the interacting shapes by property relation
+ *
+ *  Returns a map of property ID, subject shapes and intruder shapes belonging to the subject shapes.
+ *  Depending on the property constraint the intruders will either be ones with and properties (NoPropertyConstraint),
+ *  the same properties than the subject (SamePropertiesConstraint) or different properties (DifferentPropertiesConstraint).
+ */
+template <class TS, class TI>
+DB_PUBLIC
+std::map<db::properties_id_type, std::pair<std::vector<const TS *>, std::set<const TI *> > >
+separate_interactions_by_properties (const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, db::PropertyConstraint property_constraint, db::PropertyMapper &pms, db::PropertyMapper &pmi)
+{
+  std::map<db::properties_id_type, std::pair<std::vector<const TS *>, std::set<const TI *> > > by_prop_id;
+
+  for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+
+    const db::object_with_properties<TS> &subject = interactions.subject_shape (i->first);
+
+    db::properties_id_type prop_id = pms (subject.properties_id ());
+
+    std::pair<std::vector<const TS *>, std::set<const TI *> > &s2p = by_prop_id [prop_id];
+    s2p.first.push_back (&subject);
+
+    for (auto ii = i->second.begin (); ii != i->second.end (); ++ii) {
+
+      const std::pair<unsigned int, db::object_with_properties<TI> > &intruder = interactions.intruder_shape (*ii);
+      db::properties_id_type intruder_prop_id = (property_constraint == db::NoPropertyConstraint ? prop_id : pmi (intruder.second.properties_id ()));
+
+      if ((property_constraint == db::DifferentPropertiesConstraint) == (prop_id != intruder_prop_id)) {
+        s2p.second.insert (&intruder.second);
+      }
+
+    }
+
+  }
+
+  return by_prop_id;
+}
 
 }
 

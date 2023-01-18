@@ -30,6 +30,7 @@
 #include "dbEdgeProcessor.h"
 #include "dbPolygonGenerators.h"
 #include "dbLocalOperationUtils.h"
+#include "dbRegionLocalOperations.h"
 #include "dbPolygon.h"
 
 static std::string testdata (const std::string &fn)

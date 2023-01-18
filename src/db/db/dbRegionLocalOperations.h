@@ -27,6 +27,7 @@
 #include "dbCommon.h"
 #include "dbEdgePairRelations.h"
 #include "dbLocalOperation.h"
+#include "dbLocalOperationUtils.h"
 #include "dbEdgeProcessor.h"
 #include "dbRegionCheckUtils.h"
 #include "dbPropertyConstraint.h"
@@ -125,7 +126,8 @@ struct DB_PUBLIC RegionCheckOptions
                       bool _shielded = true,
                       OppositeFilter _opposite_filter = NoOppositeFilter,
                       RectFilter _rect_filter = NoRectFilter,
-                      bool _negative = false)
+                      bool _negative = false,
+                      PropertyConstraint _prop_constraint = IgnoreProperties)
     : whole_edges (_whole_edges),
       metrics (_metrics),
       ignore_angle (_ignore_angle),
@@ -134,7 +136,8 @@ struct DB_PUBLIC RegionCheckOptions
       shielded (_shielded),
       opposite_filter (_opposite_filter),
       rect_filter (_rect_filter),
-      negative (_negative)
+      negative (_negative),
+      prop_constraint (_prop_constraint)
   { }
 
   /**
@@ -200,6 +203,11 @@ struct DB_PUBLIC RegionCheckOptions
   bool negative;
 
   /**
+   *  @brief Specifies a property constraint - e.g. checking only shapes with the same properties
+   */
+  PropertyConstraint prop_constraint;
+
+  /**
    *  @brief Gets a value indicating whether merged primary input is required
    */
   bool needs_merged () const
@@ -214,8 +222,27 @@ struct DB_PUBLIC RegionCheckOptions
 };
 
 template <class TS, class TI>
+class check_local_operation_base
+{
+public:
+  check_local_operation_base (const EdgeRelationFilter &check, bool different_polygons, bool is_merged, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options);
+
+protected:
+  EdgeRelationFilter m_check;
+  bool m_different_polygons;
+  bool m_is_merged;
+  bool m_has_other;
+  bool m_other_is_merged;
+  db::RegionCheckOptions m_options;
+
+  void compute_results (db::Layout *layout, const std::vector<const TS *> &subjects, const std::set<const TI *> &intruders, std::unordered_set<db::EdgePair> &result, std::unordered_set<db::EdgePair> &intra_polygon_result) const;
+  void apply_opposite_filter (const std::vector<const TS *> &subjects, std::unordered_set<db::EdgePair> &result, std::unordered_set<db::EdgePair> &intra_polygon_result) const;
+  void apply_rectangle_filter (const std::vector<const TS *> &subjects, std::unordered_set<db::EdgePair> &result) const;
+};
+
+template <class TS, class TI>
 class check_local_operation
-  : public local_operation<TS, TI, db::EdgePair>
+  : public local_operation<TS, TI, db::EdgePair>, public check_local_operation_base<TS, TI>
 {
 public:
   check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool is_merged, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options);
@@ -226,14 +253,24 @@ public:
   virtual std::string description () const;
 
   virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
+};
+
+template <class TS, class TI>
+class check_local_operation_with_properties
+  : public local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::EdgePair>, public check_local_operation_base<TS, TI>
+{
+public:
+  check_local_operation_with_properties (const EdgeRelationFilter &check, bool different_polygons, bool is_merged, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options, db::PropertiesRepository *target_pr, const db::PropertiesRepository *subject_pr, const db::PropertiesRepository *intruder_pr);
+
+  virtual db::Coord dist () const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
+  virtual bool requests_single_subjects () const { return true; }
+  virtual std::string description () const;
+
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
 
 private:
-  EdgeRelationFilter m_check;
-  bool m_different_polygons;
-  bool m_is_merged;
-  bool m_has_other;
-  bool m_other_is_merged;
-  db::RegionCheckOptions m_options;
+  mutable db::PropertyMapper m_pms, m_pmi;
 };
 
 typedef check_local_operation<db::PolygonRef, db::PolygonRef> CheckLocalOperation;
@@ -371,6 +408,131 @@ private:
 typedef contained_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> ContainedLocalOperation;
 //  the implementation is type-agnostic and can be used for edges too
 typedef contained_local_operation<db::Edge, db::Edge, db::Edge> ContainedEdgesLocalOperation;
+
+/**
+ *  @brief Implements a boolean AND or NOT operation
+ */
+
+template <class TS, class TI, class TR>
+class DB_PUBLIC bool_and_or_not_local_operation
+  : public local_operation<TS, TI, TR>
+{
+public:
+  bool_and_or_not_local_operation (bool is_and);
+
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &result, size_t max_vertex_count, double area_ratio) const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
+  virtual std::string description () const;
+
+private:
+  bool m_is_and;
+};
+
+typedef bool_and_or_not_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> BoolAndOrNotLocalOperation;
+
+/**
+ *  @brief Implements a boolean AND or NOT operation with property handling
+ */
+template <class TS, class TI, class TR>
+class DB_PUBLIC bool_and_or_not_local_operation_with_properties
+  : public local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::object_with_properties<TR> >
+{
+public:
+  bool_and_or_not_local_operation_with_properties (bool is_and, db::PropertiesRepository *target_pr, const db::PropertiesRepository *subject_pr, const db::PropertiesRepository *intruder_pr, db::PropertyConstraint property_constraint);
+
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &result, size_t max_vertex_count, double area_ratio) const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
+  virtual std::string description () const;
+
+private:
+  bool m_is_and;
+  db::PropertyConstraint m_property_constraint;
+  mutable db::PropertyMapper m_pms;
+  mutable db::PropertyMapper m_pmi;
+};
+
+typedef bool_and_or_not_local_operation_with_properties<db::PolygonRef, db::PolygonRef, db::PolygonRef> BoolAndOrNotLocalOperationWithProperties;
+
+/**
+ *  @brief Implements a boolean AND plus NOT operation
+ *
+ *  This processor delivers two outputs: the first one having the AND result, the second
+ *  one having the NOT result.
+ */
+
+template <class TS, class TI, class TR>
+class DB_PUBLIC two_bool_and_not_local_operation
+  : public local_operation<TS, TI, TR>
+{
+public:
+  two_bool_and_not_local_operation ();
+
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &result, size_t max_vertex_count, double area_ratio) const;
+  virtual std::string description () const;
+};
+
+typedef two_bool_and_not_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef> TwoBoolAndNotLocalOperation;
+
+/**
+ *  @brief Implements a boolean AND plus NOT operation
+ *
+ *  This processor delivers two outputs: the first one having the AND result, the second
+ *  one having the NOT result.
+ */
+template <class TS, class TI, class TR>
+class DB_PUBLIC two_bool_and_not_local_operation_with_properties
+  : public local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::object_with_properties<TR> >
+{
+public:
+  two_bool_and_not_local_operation_with_properties (db::PropertiesRepository *target1_pr, db::PropertiesRepository *target2_pr, const db::PropertiesRepository *subject_pr, const db::PropertiesRepository *intruder_pr, db::PropertyConstraint property_constraint);
+
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &result, size_t max_vertex_count, double area_ratio) const;
+  virtual std::string description () const;
+
+private:
+  db::PropertyConstraint m_property_constraint;
+  mutable db::PropertyMapper m_pms, m_pmi, m_pm12;
+};
+
+typedef two_bool_and_not_local_operation_with_properties<db::PolygonRef, db::PolygonRef, db::PolygonRef> TwoBoolAndNotLocalOperationWithProperties;
+
+/**
+ *  @brief Implements a merge operation with an overlap count
+ *  With a given wrap_count, the result will only contains shapes where
+ *  the original shapes overlap at least "wrap_count" times.
+ */
+class DB_PUBLIC SelfOverlapMergeLocalOperation
+  : public local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>
+{
+public:
+  SelfOverlapMergeLocalOperation (unsigned int wrap_count);
+
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &result, size_t max_vertex_count, double area_ratio) const;
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
+  virtual std::string description () const;
+
+private:
+  unsigned int m_wrap_count;
+};
+
+/**
+ *  @brief Converts polygons to edges
+ */
+class DB_PUBLIC PolygonToEdgeLocalOperation
+  : public local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties>
+{
+public:
+  PolygonToEdgeLocalOperation (db::PropertiesRepository *target_pr, const db::PropertiesRepository *source_pr);
+
+  virtual db::Coord dist () const { return 1; }
+  virtual bool requests_single_subjects () const { return true; }
+  virtual std::string description () const;
+
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::EdgeWithProperties> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
+
+private:
+  mutable db::PropertyMapper m_pm;
+};
 
 } // namespace db
 

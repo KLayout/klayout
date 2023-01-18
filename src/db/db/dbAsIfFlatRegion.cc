@@ -1268,7 +1268,7 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
     //  ignore empty
     return new EmptyRegion ();
 
-  } else if (is_box () && mode >= 2) {
+  } else if (is_box () && begin ()->prop_id () == 0 && mode >= 2) {
 
     //  simplified handling for a box
     db::Box b = bbox ().enlarged (db::Vector (dx, dy));

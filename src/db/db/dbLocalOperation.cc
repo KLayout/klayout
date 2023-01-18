@@ -22,18 +22,6 @@
 
 #include "dbLocalOperation.h"
 #include "dbHierProcessor.h"
-#include "dbBoxScanner.h"
-#include "dbRecursiveShapeIterator.h"
-#include "dbBoxConvert.h"
-#include "dbPolygonGenerators.h"
-#include "dbPolygonTools.h"
-#include "dbEdgeBoolean.h"
-#include "dbLayoutUtils.h"
-#include "tlLog.h"
-#include "tlTimer.h"
-#include "tlInternational.h"
-#include "tlProgress.h"
-#include "tlSList.h"
 
 namespace db
 {
@@ -95,8 +83,10 @@ template class DB_PUBLIC local_operation<db::Polygon, db::Edge, db::Polygon>;
 template class DB_PUBLIC local_operation<db::Polygon, db::Edge, db::Edge>;
 template class DB_PUBLIC local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
 template class DB_PUBLIC local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties>;
+template class DB_PUBLIC local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgePair>;
 template class DB_PUBLIC local_operation<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties>;
 template class DB_PUBLIC local_operation<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgeWithProperties>;
+template class DB_PUBLIC local_operation<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePair>;
 template class DB_PUBLIC local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_operation<db::PolygonRef, db::Text, db::PolygonRef>;
 template class DB_PUBLIC local_operation<db::PolygonRef, db::TextRef, db::PolygonRef>;

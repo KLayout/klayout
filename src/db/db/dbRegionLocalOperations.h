@@ -31,6 +31,7 @@
 #include "dbEdgeProcessor.h"
 #include "dbRegionCheckUtils.h"
 #include "dbPropertyConstraint.h"
+#include "dbLayoutUtils.h"
 
 #include <vector>
 #include <unordered_set>

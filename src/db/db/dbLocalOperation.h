@@ -26,12 +26,7 @@
 #define HDR_dbLocalOperation
 
 #include "dbCommon.h"
-
 #include "dbLayout.h"
-#include "dbEdgeBoolean.h"
-#include "dbEdgeProcessor.h"
-#include "dbPropertyConstraint.h"
-#include "dbLayoutUtils.h"
 
 #include <unordered_map>
 #include <unordered_set>

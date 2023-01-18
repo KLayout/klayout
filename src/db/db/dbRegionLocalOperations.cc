@@ -25,6 +25,7 @@
 #include "dbRegionUtils.h"
 #include "dbLocalOperationUtils.h"
 #include "dbHierProcessor.h"
+#include "dbEdgeBoolean.h"
 
 namespace db
 {

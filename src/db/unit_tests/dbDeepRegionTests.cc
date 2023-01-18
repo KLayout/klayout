@@ -2222,7 +2222,6 @@ TEST(41_EdgesWithProperties)
 
   unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
   unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
-  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));  //  empty
 
   db::RecursiveShapeIterator si1 (ly, top_cell, l1);
   si1.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
@@ -2258,6 +2257,77 @@ TEST(41_EdgesWithProperties)
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au41.gds");
+}
+
+TEST(42_DRCWithProperties)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_42.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+
+  db::RecursiveShapeIterator si1 (ly, top_cell, l1);
+  si1.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  db::Region r1 (si1, dss);
+  db::Region r1_nomerge (r1);
+  r1_nomerge.set_merged_semantics (false);
+
+  db::RecursiveShapeIterator si2 (ly, top_cell, l2);
+  si2.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  db::Region r2 (si2, dss);
+  db::Region r2_nomerge (r2);
+  r2_nomerge.set_merged_semantics (false);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  db::RegionCheckOptions opt;
+  opt.metrics = db::Projection;
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r1);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1.space_check (1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1.separation_check (r2, 1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r2.space_check (1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), r1_nomerge.space_check (1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), r1_nomerge.separation_check (r2, 1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (15, 0)), r1.separation_check (r2_nomerge, 1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (16, 0)), r1_nomerge.separation_check (r2_nomerge, 1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (17, 0)), r2_nomerge.space_check (1000, opt));
+
+  opt.prop_constraint = db::NoPropertyConstraint;
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r1.space_check (1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r1.separation_check (r2, 1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), r2.space_check (1000, opt));
+
+  opt.prop_constraint = db::SamePropertiesConstraint;
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), r1.space_check (1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), r1.separation_check (r2, 1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 0)), r2.space_check (1000, opt));
+
+  opt.prop_constraint = db::DifferentPropertiesConstraint;
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), r1.space_check (1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), r1.separation_check (r2, 1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 0)), r2.space_check (1000, opt));
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au42.gds");
 }
 
 TEST(100_Integration)

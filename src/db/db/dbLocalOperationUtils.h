@@ -28,6 +28,7 @@
 #include "dbCommon.h"
 
 #include "dbLayout.h"
+#include "dbPropertyConstraint.h"
 #include "dbPolygonGenerators.h"
 #include "dbLocalOperation.h"
 #include "dbHash.h"
@@ -37,6 +38,8 @@
 
 namespace db
 {
+
+class PropertyMapper;
 
 template <class Trans>
 class polygon_transformation_filter

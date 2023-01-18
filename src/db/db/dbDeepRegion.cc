@@ -1616,6 +1616,7 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
     db::SizingPolygonFilter siz (pg2, d_with_mag, d_with_mag, mode);
 
     for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
+      pr.set_prop_id (si->prop_id ());
       db::Polygon poly;
       si->polygon (poly);
       siz.put (poly);
@@ -1678,6 +1679,7 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
     db::SizingPolygonFilter siz (pg2, dx_with_mag, dy_with_mag, mode);
 
     for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
+      pr.set_prop_id (si->prop_id ());
       db::Polygon poly;
       si->polygon (poly);
       siz.put (poly);

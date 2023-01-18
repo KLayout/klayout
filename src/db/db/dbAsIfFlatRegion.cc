@@ -1278,11 +1278,13 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 
     //  Generic case
     std::unique_ptr<FlatRegion> new_region (new FlatRegion ());
+    db::PropertyMapper pm (new_region->properties_repository (), properties_repository ());
 
     db::ShapeGenerator pc (new_region->raw_polygons (), false);
     db::PolygonGenerator pg (pc, false, true);
     db::SizingPolygonFilter sf (pg, dx, dy, mode);
     for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
+      pc.set_prop_id (pm (p.prop_id ()));
       sf.put (*p);
     }
 
@@ -1296,6 +1298,10 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 
   } else {
 
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion ());
+
+//  old implementation without property support
+#if 0
     //  Generic case - the size operation will merge first
     db::EdgeProcessor ep (report_progress (), progress_desc ());
     ep.set_base_verbosity (base_verbosity ());
@@ -1313,13 +1319,26 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
       ep.insert (*p, n);
     }
 
-    std::unique_ptr<FlatRegion> new_region (new FlatRegion ());
     db::ShapeGenerator pc (new_region->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg2 (pc, false /*don't resolve holes*/, true /*min. coherence*/);
     db::SizingPolygonFilter siz (pg2, dx, dy, mode);
     db::PolygonGenerator pg (siz, false /*don't resolve holes*/, min_coherence () /*min. coherence*/);
     db::BooleanOp op (db::BooleanOp::Or);
     ep.process (pg, op);
+#else
+
+    //  Generic case
+    db::PropertyMapper pm (new_region->properties_repository (), properties_repository ());
+
+    db::ShapeGenerator pc (new_region->raw_polygons (), false);
+    db::PolygonGenerator pg (pc, false, true);
+    db::SizingPolygonFilter sf (pg, dx, dy, mode);
+    for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
+      pc.set_prop_id (pm (p.prop_id ()));
+      sf.put (*p);
+    }
+
+#endif
 
     //  in case of negative sizing the output polygons will still be merged (on positive sizing they might
     //  overlap after size and are not necessarily merged)

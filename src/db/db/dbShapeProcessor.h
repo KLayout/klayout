@@ -65,6 +65,14 @@ public:
   { }
 
   /**
+   *  @brief Sets the properties ID to be used for the next polygon
+   */
+  void set_prop_id (db::properties_id_type prop_id)
+  {
+    m_prop_id = prop_id;
+  }
+
+  /**
    *  @brief Implementation of the PolygonSink interface
    */
   virtual void put (const db::Polygon &polygon) 

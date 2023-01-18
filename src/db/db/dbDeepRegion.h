@@ -179,6 +179,14 @@ private:
   DeepRegion *apply_filter (const PolygonFilterBase &filter) const;
 
   template <class Result, class OutputContainer> OutputContainer *processed_impl (const polygon_processor<Result> &filter) const;
+
+  template <class Proc>
+  void configure_proc (Proc &proc) const
+  {
+    proc.set_description (progress_desc ());
+    proc.set_report_progress (report_progress ());
+    proc.set_base_verbosity (base_verbosity ());
+  }
 };
 
 }

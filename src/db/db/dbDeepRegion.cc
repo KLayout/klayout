@@ -824,9 +824,7 @@ DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op, db::PropertyC
     db::BoolAndOrNotLocalOperation op (and_op);
 
     db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
-    proc.set_base_verbosity (base_verbosity ());
-    proc.set_description (progress_desc ());
-    proc.set_report_progress (report_progress ());
+    configure_proc (proc);
     proc.set_threads (deep_layer ().store ()->threads ());
     proc.set_area_ratio (deep_layer ().store ()->max_area_ratio ());
     proc.set_max_vertex_count (deep_layer ().store ()->max_vertex_count ());
@@ -838,9 +836,7 @@ DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op, db::PropertyC
     db::BoolAndOrNotLocalOperationWithProperties op (and_op, &dl_out.layout ().properties_repository (), &deep_layer ().layout ().properties_repository (), &other->deep_layer ().layout ().properties_repository (), property_constraint);
 
     db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
-    proc.set_base_verbosity (base_verbosity ());
-    proc.set_description (progress_desc ());
-    proc.set_report_progress (report_progress ());
+    configure_proc (proc);
     proc.set_threads (deep_layer ().store ()->threads ());
     proc.set_area_ratio (deep_layer ().store ()->max_area_ratio ());
     proc.set_max_vertex_count (deep_layer ().store ()->max_vertex_count ());
@@ -863,9 +859,7 @@ DeepRegion::and_and_not_with (const DeepRegion *other, PropertyConstraint proper
     db::TwoBoolAndNotLocalOperation op;
 
     db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
-    proc.set_base_verbosity (base_verbosity ());
-    proc.set_description (progress_desc ());
-    proc.set_report_progress (report_progress ());
+    configure_proc (proc);
     proc.set_threads (deep_layer ().store ()->threads ());
     proc.set_area_ratio (deep_layer ().store ()->max_area_ratio ());
     proc.set_max_vertex_count (deep_layer ().store ()->max_vertex_count ());
@@ -887,9 +881,7 @@ DeepRegion::and_and_not_with (const DeepRegion *other, PropertyConstraint proper
     db::TwoBoolAndNotLocalOperationWithProperties op (pr_out1, pr_out2, pr, pr, property_constraint);
 
     db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
-    proc.set_base_verbosity (base_verbosity ());
-    proc.set_description (progress_desc ());
-    proc.set_report_progress (report_progress ());
+    configure_proc (proc);
     proc.set_threads (deep_layer ().store ()->threads ());
     proc.set_area_ratio (deep_layer ().store ()->max_area_ratio ());
     proc.set_max_vertex_count (deep_layer ().store ()->max_vertex_count ());
@@ -1301,9 +1293,7 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
 
     db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties> proc (&res->deep_layer ().layout (), &res->deep_layer ().initial_cell (), polygons.breakout_cells ());
 
-    proc.set_description (progress_desc ());
-    proc.set_report_progress (report_progress ());
-    proc.set_base_verbosity (base_verbosity ());
+    configure_proc (proc);
     proc.set_threads (polygons.store ()->threads ());
 
     //  a boolean core makes somewhat better hierarchy
@@ -1837,21 +1827,40 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 
   std::unique_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
 
-  db::CheckLocalOperation op (check, different_polygons, primary_is_merged, other_deep != 0, other_is_merged, options);
+  db::Layout *subject_layout = &res->deep_layer ().layout ();
+  db::Cell *subject_top = &res->deep_layer ().initial_cell ();
+  const db::Layout *intruder_layout = other_deep ? &other_deep->deep_layer ().layout () : &polygons.layout ();
+  const db::Cell *intruder_top = other_deep ? &other_deep->deep_layer ().initial_cell () : &polygons.initial_cell ();
+  const std::set<db::cell_index_type> *subject_breakout_cells = deep_layer ().breakout_cells ();
+  const std::set<db::cell_index_type> *intruder_breakout_cells = other_deep ? other_deep->deep_layer ().breakout_cells () : 0;
 
-  db::local_processor<db::PolygonRef, db::PolygonRef, db::EdgePair> proc (const_cast<db::Layout *> (&polygons.layout ()),
-                                                                          const_cast<db::Cell *> (&polygons.initial_cell ()),
-                                                                          other_deep ? &other_deep->deep_layer ().layout () : const_cast<db::Layout *> (&polygons.layout ()),
-                                                                          other_deep ? &other_deep->deep_layer ().initial_cell () : const_cast<db::Cell *> (&polygons.initial_cell ()),
-                                                                          deep_layer ().breakout_cells (),
-                                                                          other_deep ? other_deep->deep_layer ().breakout_cells () : 0);
+  if (options.prop_constraint == db::IgnoreProperties) {
 
-  proc.set_description (progress_desc ());
-  proc.set_report_progress (report_progress ());
-  proc.set_base_verbosity (base_verbosity ());
-  proc.set_threads (polygons.store ()->threads ());
+    db::CheckLocalOperation op (check, different_polygons, primary_is_merged, other_deep != 0, other_is_merged, options);
 
-  proc.run (&op, polygons.layer (), other_layer, res->deep_layer ().layer ());
+    db::local_processor<db::PolygonRef, db::PolygonRef, db::EdgePair> proc (subject_layout, subject_top,
+                                                                            intruder_layout, intruder_top,
+                                                                            subject_breakout_cells, intruder_breakout_cells);
+
+    configure_proc (proc);
+    proc.set_threads (polygons.store ()->threads ());
+
+    proc.run (&op, polygons.layer (), other_layer, res->deep_layer ().layer ());
+
+  } else {
+
+    db::check_local_operation_with_properties<db::PolygonRef, db::PolygonRef> op (check, different_polygons, primary_is_merged, other_deep != 0, other_is_merged, options, res->properties_repository (), properties_repository (), other_deep ? other_deep->properties_repository () : &polygons.layout ().properties_repository ());
+
+    db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgePair> proc (subject_layout, subject_top,
+                                                                                                        intruder_layout, intruder_top,
+                                                                                                        subject_breakout_cells, intruder_breakout_cells);
+
+    configure_proc (proc);
+    proc.set_threads (polygons.store ()->threads ());
+
+    proc.run (&op, polygons.layer (), other_layer, res->deep_layer ().layer ());
+
+  }
 
   return res.release ();
 }
@@ -1988,9 +1997,7 @@ DeepRegion::in_and_out_generic (const Region &other, InteractingOutputMode outpu
   db::ContainedLocalOperation op (output_mode);
 
   db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell (), polygons.breakout_cells (), other_polygons.breakout_cells ());
-  proc.set_description (progress_desc ());
-  proc.set_report_progress (report_progress ());
-  proc.set_base_verbosity (base_verbosity ());
+  configure_proc (proc);
   proc.set_threads (polygons.store ()->threads ());
 
   InteractingResultHolder orh (output_mode, merged_semantics (), polygons);
@@ -2052,9 +2059,7 @@ DeepRegion::selected_interacting_generic (const Region &other, int mode, bool to
   db::InteractingLocalOperation op (mode, touching, output_mode, min_count, max_count, true);
 
   db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell (), polygons.breakout_cells (), other_polygons.breakout_cells ());
-  proc.set_description (progress_desc ());
-  proc.set_report_progress (report_progress ());
-  proc.set_base_verbosity (base_verbosity ());
+  configure_proc (proc);
   proc.set_threads (polygons.store ()->threads ());
   if (split_after) {
     proc.set_area_ratio (polygons.store ()->max_area_ratio ());
@@ -2109,9 +2114,7 @@ DeepRegion::selected_interacting_generic (const Edges &other, InteractingOutputM
   db::InteractingWithEdgeLocalOperation op (output_mode, min_count, max_count, true);
 
   db::local_processor<db::PolygonRef, db::Edge, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), polygons.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
-  proc.set_description (progress_desc ());
-  proc.set_report_progress (report_progress ());
-  proc.set_base_verbosity (base_verbosity ());
+  configure_proc (proc);
   proc.set_threads (polygons.store ()->threads ());
   if (split_after) {
     proc.set_area_ratio (polygons.store ()->max_area_ratio ());
@@ -2155,9 +2158,7 @@ DeepRegion::pull_generic (const Region &other, int mode, bool touching) const
   db::PullLocalOperation op (mode, touching);
 
   db::local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell (), polygons.breakout_cells (), other_polygons.breakout_cells ());
-  proc.set_description (progress_desc ());
-  proc.set_report_progress (report_progress ());
-  proc.set_base_verbosity (base_verbosity ());
+  configure_proc (proc);
   proc.set_threads (polygons.store ()->threads ());
   if (split_after) {
     proc.set_area_ratio (polygons.store ()->max_area_ratio ());
@@ -2195,9 +2196,7 @@ DeepRegion::pull_generic (const Edges &other) const
   db::PullWithEdgeLocalOperation op;
 
   db::local_processor<db::PolygonRef, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_edges.layout (), &other_edges.initial_cell (), polygons.breakout_cells (), other_edges.breakout_cells ());
-  proc.set_description (progress_desc ());
-  proc.set_report_progress (report_progress ());
-  proc.set_base_verbosity (base_verbosity ());
+  configure_proc (proc);
   proc.set_threads (polygons.store ()->threads ());
   proc.run (&op, polygons.layer (), other_edges.layer (), dl_out.layer ());
 
@@ -2230,9 +2229,7 @@ DeepRegion::pull_generic (const Texts &other) const
   db::PullWithTextLocalOperation op;
 
   db::local_processor<db::PolygonRef, db::TextRef, db::TextRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_texts.layout (), &other_texts.initial_cell (), polygons.breakout_cells (), other_texts.breakout_cells ());
-  proc.set_description (progress_desc ());
-  proc.set_report_progress (report_progress ());
-  proc.set_base_verbosity (base_verbosity ());
+  configure_proc (proc);
   proc.set_threads (polygons.store ()->threads ());
   proc.run (&op, polygons.layer (), other_texts.layer (), dl_out.layer ());
 
@@ -2279,9 +2276,7 @@ DeepRegion::selected_interacting_generic (const Texts &other, InteractingOutputM
   db::InteractingWithTextLocalOperation op (output_mode, min_count, max_count);
 
   db::local_processor<db::PolygonRef, db::TextRef, db::PolygonRef> proc (const_cast<db::Layout *> (&polygons.layout ()), const_cast<db::Cell *> (&polygons.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), polygons.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
-  proc.set_description (progress_desc ());
-  proc.set_report_progress (report_progress ());
-  proc.set_base_verbosity (base_verbosity ());
+  configure_proc (proc);
   proc.set_threads (polygons.store ()->threads ());
   if (split_after) {
     proc.set_area_ratio (polygons.store ()->max_area_ratio ());

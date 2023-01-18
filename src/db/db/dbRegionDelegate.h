@@ -237,9 +237,9 @@ public:
   virtual perimeter_type perimeter (const db::Box &box) const = 0;
   virtual Box bbox () const = 0;
 
-  virtual EdgePairsDelegate *cop_to_edge_pairs (db::CompoundRegionOperationNode &node) = 0;
-  virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node) = 0;
-  virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node) = 0;
+  virtual EdgePairsDelegate *cop_to_edge_pairs (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint) = 0;
+  virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint) = 0;
+  virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint) = 0;
 
   virtual EdgePairsDelegate *width_check (db::Coord d, const RegionCheckOptions &options) const = 0;
   virtual EdgePairsDelegate *space_check (db::Coord d, const RegionCheckOptions &options) const = 0;

@@ -700,14 +700,14 @@ static size_t id (const db::Region *r)
 }
 
 
-tl::Variant complex_op (db::Region *region, db::CompoundRegionOperationNode *node)
+tl::Variant complex_op (db::Region *region, db::CompoundRegionOperationNode *node, db::PropertyConstraint prop_constraint)
 {
   if (node->result_type () == db::CompoundRegionOperationNode::Region) {
-    return tl::Variant (region->cop_to_region (*node));
+    return tl::Variant (region->cop_to_region (*node, prop_constraint));
   } else if (node->result_type () == db::CompoundRegionOperationNode::Edges) {
-    return tl::Variant (region->cop_to_edges (*node));
+    return tl::Variant (region->cop_to_edges (*node, prop_constraint));
   } else if (node->result_type () == db::CompoundRegionOperationNode::EdgePairs) {
-    return tl::Variant (region->cop_to_edge_pairs (*node));
+    return tl::Variant (region->cop_to_edge_pairs (*node, prop_constraint));
   } else {
     return tl::Variant ();
   }
@@ -967,10 +967,14 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "@brief Gets a flag indicating whether minimum coherence is selected\n"
     "See \\min_coherence= for a description of this attribute.\n"
   ) +
-  method_ext ("complex_op", &complex_op, gsi::arg ("node"),
+  method_ext ("complex_op", &complex_op, gsi::arg ("node"), gsi::arg ("property_constraint", db::IgnoreProperties),
     "@brief Executes a complex operation (see \\CompoundRegionOperationNode for details)\n"
     "\n"
     "This method has been introduced in version 0.27."
+    "\n"
+    "The 'property_constraint' parameter controls whether properties are considered: with 'SamePropertiesConstraint' "
+    "the operation is only applied between shapes with identical properties. With 'DifferentPropertiesConstraint' only "
+    "between shapes with different properties. This option has been introduced in version 0.28.4."
   ) +
   method_ext ("with_perimeter", with_perimeter1, gsi::arg ("perimeter"), gsi::arg ("inverse"),
     "@brief Filter the polygons by perimeter\n"

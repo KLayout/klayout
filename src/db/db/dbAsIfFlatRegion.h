@@ -54,9 +54,9 @@ public:
 
   virtual std::string to_string (size_t nmax) const;
 
-  virtual EdgePairsDelegate *cop_to_edge_pairs (db::CompoundRegionOperationNode &node);
-  virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node);
-  virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node);
+  virtual EdgePairsDelegate *cop_to_edge_pairs (db::CompoundRegionOperationNode &node, PropertyConstraint prop_constraint);
+  virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint);
+  virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint);
 
   EdgePairsDelegate *width_check (db::Coord d, const RegionCheckOptions &options) const;
   EdgePairsDelegate *space_check (db::Coord d, const RegionCheckOptions &options) const;

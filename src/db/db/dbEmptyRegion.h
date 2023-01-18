@@ -62,9 +62,9 @@ public:
 
   virtual Box bbox () const { return Box (); }
 
-  virtual EdgePairsDelegate *cop_to_edge_pairs (db::CompoundRegionOperationNode &node);
-  virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node);
-  virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node);
+  virtual EdgePairsDelegate *cop_to_edge_pairs (db::CompoundRegionOperationNode &node, PropertyConstraint);
+  virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node, PropertyConstraint);
+  virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node, PropertyConstraint);
 
   virtual EdgePairsDelegate *width_check (db::Coord, const RegionCheckOptions &) const;
   virtual EdgePairsDelegate *space_check (db::Coord, const RegionCheckOptions &) const;

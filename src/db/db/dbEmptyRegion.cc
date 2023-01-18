@@ -98,19 +98,19 @@ EmptyRegion::processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &) co
 }
 
 EdgePairsDelegate *
-EmptyRegion::cop_to_edge_pairs (db::CompoundRegionOperationNode &)
+EmptyRegion::cop_to_edge_pairs (db::CompoundRegionOperationNode &, db::PropertyConstraint)
 {
   return new EmptyEdgePairs ();
 }
 
 RegionDelegate *
-EmptyRegion::cop_to_region (db::CompoundRegionOperationNode &)
+EmptyRegion::cop_to_region (db::CompoundRegionOperationNode &, db::PropertyConstraint)
 {
   return new EmptyRegion ();
 }
 
 EdgesDelegate *
-EmptyRegion::cop_to_edges (db::CompoundRegionOperationNode &)
+EmptyRegion::cop_to_edges (db::CompoundRegionOperationNode &, db::PropertyConstraint)
 {
   return new EmptyEdges ();
 }

@@ -346,6 +346,60 @@ separate_interactions_by_properties (const shape_interactions<db::object_with_pr
   return by_prop_id;
 }
 
+/**
+ *  @brief Separates the interacting shapes by property relation
+ *
+ *  Returns a map of property ID, subject shapes and intruder shapes belonging to the subject shapes.
+ *  Depending on the property constraint the intruders will either be ones with and properties (NoPropertyConstraint),
+ *  the same properties than the subject (SamePropertiesConstraint) or different properties (DifferentPropertiesConstraint).
+ */
+template <class TS, class TI>
+DB_PUBLIC
+std::map<db::properties_id_type, db::shape_interactions<TS, TI> >
+separate_interactions_to_interactions_by_properties (const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, db::PropertyConstraint property_constraint, db::PropertyMapper &pms, std::vector<db::PropertyMapper> &pmis)
+{
+  std::map<db::properties_id_type, db::shape_interactions<TS, TI> > by_prop_id;
+  std::map<db::properties_id_type, std::set<unsigned int> > intruder_ids_by_prop_id;
+
+  for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+
+    const db::object_with_properties<TS> &subject = interactions.subject_shape (i->first);
+    db::properties_id_type prop_id = pms (subject.properties_id ());
+
+    db::shape_interactions<TS, TI> &s2p = by_prop_id [prop_id];
+    std::set<unsigned int> &intruder_ids = intruder_ids_by_prop_id [prop_id];
+    s2p.add_subject (i->first, subject);
+
+    for (auto ii = i->second.begin (); ii != i->second.end (); ++ii) {
+
+      const std::pair<unsigned int, db::object_with_properties<TI> > &intruder = interactions.intruder_shape (*ii);
+      tl_assert (intruder.first < (unsigned int) pmis.size ());
+      db::properties_id_type intruder_prop_id = (property_constraint == db::NoPropertyConstraint ? prop_id : pmis[intruder.first] (intruder.second.properties_id ()));
+
+      if ((property_constraint == db::DifferentPropertiesConstraint) == (prop_id != intruder_prop_id)) {
+        s2p.add_interaction (i->first, *ii);
+        intruder_ids.insert (*ii);
+      }
+
+    }
+
+  }
+
+  for (auto i = intruder_ids_by_prop_id.begin (); i != intruder_ids_by_prop_id.end (); ++i) {
+
+    db::shape_interactions<TS, TI> &s2p = by_prop_id [i->first];
+    const std::set<unsigned int> &intruder_ids = intruder_ids_by_prop_id [i->first];
+
+    for (auto ii = intruder_ids.begin (); ii != intruder_ids.end (); ++ii) {
+      auto is = interactions.intruder_shape (*ii);
+      s2p.add_intruder_shape (*ii, is.first, is.second);
+    }
+
+  }
+
+  return by_prop_id;
+}
+
 }
 
 #endif

@@ -217,35 +217,35 @@ Region::mutable_region ()
 }
 
 EdgePairs
-Region::cop_to_edge_pairs (db::CompoundRegionOperationNode &node)
+Region::cop_to_edge_pairs (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   tl_assert (node.result_type () == db::CompoundRegionOperationNode::EdgePairs);
-  return EdgePairs (mp_delegate->cop_to_edge_pairs (node));
+  return EdgePairs (mp_delegate->cop_to_edge_pairs (node, prop_constraint));
 }
 
 Region
-Region::cop_to_region (db::CompoundRegionOperationNode &node)
+Region::cop_to_region (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   tl_assert (node.result_type () == db::CompoundRegionOperationNode::Region);
-  return Region (mp_delegate->cop_to_region (node));
+  return Region (mp_delegate->cop_to_region (node, prop_constraint));
 }
 
 Edges
-Region::cop_to_edges (db::CompoundRegionOperationNode &node)
+Region::cop_to_edges (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   tl_assert (node.result_type () == db::CompoundRegionOperationNode::Edges);
-  return Edges (mp_delegate->cop_to_edges (node));
+  return Edges (mp_delegate->cop_to_edges (node, prop_constraint));
 }
 
 tl::Variant
-Region::cop (db::CompoundRegionOperationNode &node)
+Region::cop (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   if (node.result_type () == db::CompoundRegionOperationNode::EdgePairs) {
-    return tl::Variant::make_variant (new EdgePairs (mp_delegate->cop_to_edge_pairs (node)));
+    return tl::Variant::make_variant (new EdgePairs (mp_delegate->cop_to_edge_pairs (node, prop_constraint)));
   } else if (node.result_type () == db::CompoundRegionOperationNode::Edges) {
-    return tl::Variant::make_variant (new Edges (mp_delegate->cop_to_edges (node)));
+    return tl::Variant::make_variant (new Edges (mp_delegate->cop_to_edges (node, prop_constraint)));
   } else if (node.result_type () == db::CompoundRegionOperationNode::Region) {
-    return tl::Variant::make_variant (new Region (mp_delegate->cop_to_region (node)));
+    return tl::Variant::make_variant (new Region (mp_delegate->cop_to_region (node, prop_constraint)));
   } else {
     return tl::Variant ();
   }

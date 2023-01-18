@@ -613,7 +613,7 @@ public:
    *  The compound operation needs to feature edge pair output, e.g.
    *  node.result_type() needs to be EdgePairs.
    */
-  EdgePairs cop_to_edge_pairs (db::CompoundRegionOperationNode &node);
+  EdgePairs cop_to_edge_pairs (db::CompoundRegionOperationNode &node, PropertyConstraint prop_constraint = db::IgnoreProperties);
 
   /**
    *  @brief Performs a compound operation rendering a region
@@ -621,7 +621,7 @@ public:
    *  The compound operation needs to feature region output, e.g.
    *  node.result_type() needs to be Region.
    */
-  Region cop_to_region (db::CompoundRegionOperationNode &node);
+  Region cop_to_region (db::CompoundRegionOperationNode &node, PropertyConstraint prop_constraint = db::IgnoreProperties);
 
   /**
    *  @brief Performs a compound operation rendering edges
@@ -629,7 +629,7 @@ public:
    *  The compound operation needs to feature region output, e.g.
    *  node.result_type() needs to be Edges.
    */
-  Edges cop_to_edges (db::CompoundRegionOperationNode &node);
+  Edges cop_to_edges (db::CompoundRegionOperationNode &node, PropertyConstraint prop_constraint = db::IgnoreProperties);
 
   /**
    *  @brief A universal form of the compound operation
@@ -637,7 +637,7 @@ public:
    *  The returned variant will be of the type requested by the
    *  compound operation node.
    */
-  tl::Variant cop (db::CompoundRegionOperationNode &node);
+  tl::Variant cop (db::CompoundRegionOperationNode &node, PropertyConstraint prop_constraint = db::IgnoreProperties);
 
   /**
    *  @brief Applies a width check and returns EdgePairs which correspond to violation markers

@@ -1740,7 +1740,7 @@ TEST(41_EdgesWithProperties)
   db::Region r1wp_nomerge = r1wp;
   r1wp_nomerge.set_merged_semantics (false);
 
-  si1.shape_flags (db::ShapeIterator::All);
+  si1 = db::RecursiveShapeIterator (ly, top_cell, l1);
   db::Region r1 (si1);
 
   db::RecursiveShapeIterator si2 (ly, top_cell, l2);
@@ -1749,7 +1749,7 @@ TEST(41_EdgesWithProperties)
   db::Region r2wp_nomerge = r2wp;
   r2wp_nomerge.set_merged_semantics (false);
 
-  si2.shape_flags (db::ShapeIterator::All);
+  si2.apply_property_translator (db::PropertiesTranslator::make_remove_all ());
   db::Region r2 (si2);
 
   db::Layout target;

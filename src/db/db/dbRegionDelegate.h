@@ -316,6 +316,8 @@ public:
   virtual bool has_valid_merged_polygons () const = 0;
 
   virtual const db::RecursiveShapeIterator *iter () const = 0;
+
+  virtual void apply_property_translator (const db::PropertiesTranslator &pt) = 0;
   virtual db::PropertiesRepository *properties_repository () = 0;
   virtual const db::PropertiesRepository *properties_repository () const = 0;
 

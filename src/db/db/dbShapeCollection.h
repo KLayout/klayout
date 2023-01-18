@@ -26,10 +26,14 @@
 #include "dbCommon.h"
 #include "dbDeepShapeStore.h"
 #include "tlUniqueId.h"
+#include "tlVariant.h"
 #include "gsiObject.h"
 
 namespace db
 {
+
+class PropertiesTranslator;
+class PropertiesRepository;
 
 /**
  *  @brief A base class for the deep collection delegates
@@ -37,20 +41,10 @@ namespace db
 class DB_PUBLIC DeepShapeCollectionDelegateBase
 {
 public:
-  DeepShapeCollectionDelegateBase () { }
+  DeepShapeCollectionDelegateBase ();
+  DeepShapeCollectionDelegateBase (const DeepShapeCollectionDelegateBase &other);
 
-  DeepShapeCollectionDelegateBase (const DeepShapeCollectionDelegateBase &other)
-  {
-    m_deep_layer = other.m_deep_layer.copy ();
-  }
-
-  DeepShapeCollectionDelegateBase &operator= (const DeepShapeCollectionDelegateBase &other)
-  {
-    if (this != &other) {
-      m_deep_layer = other.m_deep_layer.copy ();
-    }
-    return *this;
-  }
+  DeepShapeCollectionDelegateBase &operator= (const DeepShapeCollectionDelegateBase &other);
 
   const db::DeepLayer &deep_layer () const
   {
@@ -61,6 +55,8 @@ public:
   {
     return m_deep_layer;
   }
+
+  void apply_property_translator (const db::PropertiesTranslator &pt);
 
 protected:
   virtual void set_deep_layer (const db::DeepLayer &dl)
@@ -83,6 +79,10 @@ public:
   virtual ~ShapeCollectionDelegateBase () { }
 
   virtual DeepShapeCollectionDelegateBase *deep () { return 0; }
+
+  virtual void apply_property_translator (const db::PropertiesTranslator & /*pt*/) = 0;
+  virtual db::PropertiesRepository *properties_repository () = 0;
+  virtual const db::PropertiesRepository *properties_repository () const = 0;
 };
 
 /**
@@ -96,6 +96,30 @@ public:
   virtual ~ShapeCollection () { }
 
   virtual ShapeCollectionDelegateBase *get_delegate () const = 0;
+
+  /**
+   *  @brief Applies a PropertyTranslator
+   *
+   *  This method will translate the property IDs according to the given property translator.
+   *
+   *  Note that the property translator needs to be built from the PropertiesRepository
+   *  delivered by "properties_repository".
+   */
+  void apply_property_translator (const db::PropertiesTranslator &pt);
+
+  /**
+   *  @brief Gets the property repository
+   *
+   *  Use this object to decode and encode property IDs.
+   */
+  db::PropertiesRepository &properties_repository ();
+
+  /**
+   *  @brief Gets the property repository (const version)
+   *
+   *  Use this object to decode property IDs.
+   */
+  const db::PropertiesRepository &properties_repository () const;
 };
 
 }

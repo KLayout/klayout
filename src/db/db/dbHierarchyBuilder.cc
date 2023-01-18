@@ -152,13 +152,13 @@ static std::pair<bool, std::set<db::Box> > compute_clip_variant (const db::Box &
 }
 
 HierarchyBuilder::HierarchyBuilder (db::Layout *target, unsigned int target_layer, const db::ICplxTrans &trans, HierarchyBuilderShapeReceiver *pipe)
-  : mp_target (target), m_initial_pass (true), m_ignore_properties (true), m_cm_new_entry (false), m_target_layer (target_layer), m_trans (trans)
+  : mp_target (target), m_initial_pass (true), m_cm_new_entry (false), m_target_layer (target_layer), m_trans (trans)
 {
   set_shape_receiver (pipe);
 }
 
 HierarchyBuilder::HierarchyBuilder (db::Layout *target, const db::ICplxTrans &trans, HierarchyBuilderShapeReceiver *pipe)
-  : mp_target (target), m_initial_pass (true), m_ignore_properties (true), m_cm_new_entry (false), m_target_layer (0), m_trans (trans)
+  : mp_target (target), m_initial_pass (true), m_cm_new_entry (false), m_target_layer (0), m_trans (trans)
 {
   set_shape_receiver (pipe);
 }
@@ -179,7 +179,6 @@ HierarchyBuilder::reset ()
 {
   m_initial_pass = true;
   mp_initial_cell = 0;
-  m_ignore_properties = true;
 
   m_cells_to_be_filled.clear ();
   m_cell_map.clear ();
@@ -245,8 +244,6 @@ HierarchyBuilder::begin (const RecursiveShapeIterator *iter)
     tl_assert (compare_iterators_with_respect_to_target_hierarchy (m_source, *iter) == 0);
   }
 
-  m_ignore_properties = ((iter->shape_flags () & db::ShapeIterator::RegardProperties) == 0);
-
   m_cell_stack.clear ();
   m_cells_seen.clear ();
 
@@ -278,7 +275,6 @@ HierarchyBuilder::end (const RecursiveShapeIterator *iter)
 {
   tl_assert (! iter->layout () || ! iter->top_cell () || m_cell_stack.size () == 1);
 
-  m_ignore_properties = true;
   m_initial_pass = false;
   m_cells_seen.clear ();
   mp_initial_cell = m_cell_stack.empty () ? 0 : m_cell_stack.front ().second.front ();
@@ -411,11 +407,11 @@ HierarchyBuilder::new_inst_member (const RecursiveShapeIterator *iter, const db:
 }
 
 void
-HierarchyBuilder::shape (const RecursiveShapeIterator * /*iter*/, const db::Shape &shape, const db::ICplxTrans &apply_always, const db::ICplxTrans & /*trans*/, const db::Box &region, const box_tree_type *complex_region)
+HierarchyBuilder::shape (const RecursiveShapeIterator *iter, const db::Shape &shape, const db::ICplxTrans &apply_always, const db::ICplxTrans & /*trans*/, const db::Box &region, const box_tree_type *complex_region)
 {
   for (std::vector<db::Cell *>::const_iterator c = m_cell_stack.back ().second.begin (); c != m_cell_stack.back ().second.end (); ++c) {
     db::Shapes &shapes = (*c)->shapes (m_target_layer);
-    mp_pipe->push (shape, m_ignore_properties ? 0 : shape.prop_id (), m_trans * apply_always, region, complex_region, &shapes);
+    mp_pipe->push (shape, iter->prop_id (), m_trans * apply_always, region, complex_region, &shapes);
   }
 }
 

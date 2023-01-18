@@ -475,6 +475,11 @@ DeepRegion::iter () const
   return 0;
 }
 
+void DeepRegion::apply_property_translator (const db::PropertiesTranslator &pt)
+{
+  DeepShapeCollectionDelegateBase::apply_property_translator (pt);
+}
+
 db::PropertiesRepository *DeepRegion::properties_repository ()
 {
   return &deep_layer ().layout ().properties_repository ();

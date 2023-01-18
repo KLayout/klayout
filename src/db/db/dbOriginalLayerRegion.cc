@@ -119,7 +119,7 @@ namespace
       if (! m_rec_iter.at_end ()) {
         m_rec_iter->polygon (m_polygon);
         m_polygon.transform (m_iter_trans * m_rec_iter.trans (), false);
-        m_prop_id = (m_rec_iter.shape_flags () & db::ShapeIterator::RegardProperties) != 0 ? m_rec_iter->prop_id () : 0;
+        m_prop_id = m_rec_iter.prop_id ();
       }
     }
 
@@ -367,6 +367,12 @@ const db::RecursiveShapeIterator *
 OriginalLayerRegion::iter () const
 {
   return &m_iter;
+}
+
+void
+OriginalLayerRegion::apply_property_translator (const db::PropertiesTranslator &pt)
+{
+  m_iter.apply_property_translator (pt);
 }
 
 db::PropertiesRepository *

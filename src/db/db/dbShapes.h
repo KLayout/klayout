@@ -171,7 +171,6 @@ public:
     Properties        = (1 << Null),
     All               = (1 << Null) - 1,
     AllWithProperties = (1 << (Null + 1)) - 1,
-    RegardProperties  = (1 << (Null + 1)),          //  special flag, not evaluated on query but in receiver (indicates to regard shapes with different properties as different entities)
     Nothing           = 0
   };
     

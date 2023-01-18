@@ -314,6 +314,11 @@ const db::RecursiveShapeIterator *DeepEdgePairs::iter () const
   return 0;
 }
 
+void DeepEdgePairs::apply_property_translator (const db::PropertiesTranslator &pt)
+{
+  DeepShapeCollectionDelegateBase::apply_property_translator (pt);
+}
+
 db::PropertiesRepository *DeepEdgePairs::properties_repository ()
 {
   return &deep_layer ().layout ().properties_repository ();

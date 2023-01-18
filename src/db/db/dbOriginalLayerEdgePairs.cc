@@ -115,7 +115,7 @@ namespace
       if (! m_rec_iter.at_end ()) {
         m_rec_iter->edge_pair (m_shape);
         m_shape.transform (m_iter_trans * m_rec_iter.trans ());
-        m_prop_id = (m_rec_iter.shape_flags () & db::ShapeIterator::RegardProperties) != 0 ? m_rec_iter->prop_id () : 0;
+        m_prop_id = m_rec_iter.prop_id ();
       }
     }
 
@@ -200,6 +200,12 @@ const db::RecursiveShapeIterator *
 OriginalLayerEdgePairs::iter () const
 {
   return &m_iter;
+}
+
+void
+OriginalLayerEdgePairs::apply_property_translator (const db::PropertiesTranslator &pt)
+{
+  m_iter.apply_property_translator (pt);
 }
 
 db::PropertiesRepository *

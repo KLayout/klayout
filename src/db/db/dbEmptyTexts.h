@@ -71,6 +71,7 @@ public:
   virtual bool has_valid_texts () const { return true; }
 
   virtual const db::RecursiveShapeIterator *iter () const { return 0; }
+  virtual void apply_property_translator (const db::PropertiesTranslator &) { }
   virtual db::PropertiesRepository *properties_repository () { return 0; }
   virtual const db::PropertiesRepository *properties_repository () const { return 0; }
 

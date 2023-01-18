@@ -109,22 +109,6 @@ Region::iter () const
   return *(i ? i : &def_iter);
 }
 
-const db::PropertiesRepository &
-Region::properties_repository () const
-{
-  static db::PropertiesRepository empty_prop_repo;
-  const db::PropertiesRepository *r = delegate () ? delegate ()->properties_repository () : 0;
-  return *(r ? r : &empty_prop_repo);
-}
-
-db::PropertiesRepository &
-Region::properties_repository ()
-{
-  db::PropertiesRepository *r = delegate () ? delegate ()->properties_repository () : 0;
-  tl_assert (r != 0);
-  return *r;
-}
-
 void
 Region::set_delegate (RegionDelegate *delegate, bool keep_attributes)
 {
@@ -396,6 +380,8 @@ static void fill_texts (const Iter &iter, const std::string &pat, bool pattern, 
   const db::Layout *layout = 0;
 
   if (org_deep) {
+    //  NOTE: deep regions can store texts in a special way - as small boxes with a special property attached.
+    //  The property will give the text string. This function can restore these pseudo-texts as Text objects.
     layout = &org_deep->deep_layer ().layout ();
     const db::DeepShapeStore *store = org_deep->deep_layer ().store ();
     if (! store->text_property_name ().is_nil ()) {

@@ -345,6 +345,13 @@ const db::RecursiveShapeIterator *FlatEdges::iter () const
   return 0;
 }
 
+void FlatEdges::apply_property_translator (const db::PropertiesTranslator &pt)
+{
+  db::Shapes new_edges;
+  new_edges.assign (*mp_edges, pt);
+  mp_edges->swap (new_edges);
+}
+
 db::PropertiesRepository *FlatEdges::properties_repository ()
 {
   return mp_properties_repository.get_non_const ();

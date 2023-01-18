@@ -188,6 +188,13 @@ const db::RecursiveShapeIterator *FlatTexts::iter () const
   return 0;
 }
 
+void FlatTexts::apply_property_translator (const db::PropertiesTranslator &pt)
+{
+  db::Shapes new_texts;
+  new_texts.assign (*mp_texts, pt);
+  mp_texts->swap (new_texts);
+}
+
 db::PropertiesRepository *FlatTexts::properties_repository ()
 {
   return mp_properties_repository.get_non_const ();

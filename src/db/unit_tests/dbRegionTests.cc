@@ -2153,7 +2153,7 @@ TEST(51_PropertiesFlatFromLayout)
 
   //  NOTE: now with regarding properties
   rsi = db::RecursiveShapeIterator (ly, top, li);
-  rsi.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  rsi.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   r = db::Region (rsi);
 
   EXPECT_EQ (r.count (), size_t (4));
@@ -2340,7 +2340,7 @@ TEST(53_PropertiesDeepFromLayout)
 
   //  NOTE: now with regarding properties
   rsi = db::RecursiveShapeIterator (ly, top, li);
-  rsi.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  rsi.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   r = db::Region (rsi, dss);
 
   EXPECT_EQ (r.count (), size_t (4));

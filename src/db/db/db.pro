@@ -375,6 +375,7 @@ HEADERS = \
   dbRegionUtils.h \
   dbEdgesUtils.h \
   dbRegionProcessors.h \
+  gsiDeclDbContainerHelpers.h \
   gsiDeclDbHelpers.h \
   dbNetlistCompare.h \
   dbNetlistReader.h \

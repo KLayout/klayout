@@ -406,7 +406,6 @@ private:
   tl::weak_ptr<db::Layout> mp_target;
   HierarchyBuilderShapeReceiver *mp_pipe;
   bool m_initial_pass;
-  bool m_ignore_properties;
   db::RecursiveShapeIterator m_source;
   cell_map_type m_cell_map;
   original_target_to_variants_map_type m_original_targets_to_variants_map;

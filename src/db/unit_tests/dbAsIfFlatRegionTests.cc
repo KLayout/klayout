@@ -1660,15 +1660,15 @@ TEST(40_BoolWithProperties)
   unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));  //  empty
 
   db::RecursiveShapeIterator si1 (ly, top_cell, l1);
-  si1.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  si1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r1 (si1);
 
   db::RecursiveShapeIterator si2 (ly, top_cell, l2);
-  si2.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  si2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r2 (si2);
 
   db::RecursiveShapeIterator si3 (ly, top_cell, l3);
-  si3.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  si3.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r3 (si3);
 
   db::Layout target;
@@ -1735,7 +1735,7 @@ TEST(41_EdgesWithProperties)
   unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
 
   db::RecursiveShapeIterator si1 (ly, top_cell, l1);
-  si1.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  si1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r1wp (si1);
   db::Region r1wp_nomerge = r1wp;
   r1wp_nomerge.set_merged_semantics (false);
@@ -1744,7 +1744,7 @@ TEST(41_EdgesWithProperties)
   db::Region r1 (si1);
 
   db::RecursiveShapeIterator si2 (ly, top_cell, l2);
-  si2.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  si2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r2wp (si2);
   db::Region r2wp_nomerge = r2wp;
   r2wp_nomerge.set_merged_semantics (false);
@@ -1788,13 +1788,13 @@ TEST(42_DRCWithProperties)
   unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
 
   db::RecursiveShapeIterator si1 (ly, top_cell, l1);
-  si1.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  si1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r1 (si1);
   db::Region r1_nomerge (r1);
   r1_nomerge.set_merged_semantics (false);
 
   db::RecursiveShapeIterator si2 (ly, top_cell, l2);
-  si2.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  si2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r2 (si2);
   db::Region r2_nomerge (r2);
   r2_nomerge.set_merged_semantics (false);
@@ -1857,11 +1857,11 @@ TEST(43_ComplexOpsWithProperties)
   unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
 
   db::RecursiveShapeIterator si1 (ly, top_cell, l1);
-  si1.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  si1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r1 (si1);
 
   db::RecursiveShapeIterator si2 (ly, top_cell, l2);
-  si2.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  si2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r2 (si2);
 
   db::Layout target;
@@ -1922,11 +1922,11 @@ TEST(44_SizeWithProperties)
   unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
 
   db::RecursiveShapeIterator si1 (ly, top_cell, l1);
-  si1.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  si1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r1 (si1);
 
   db::RecursiveShapeIterator si2 (ly, top_cell, l2);
-  si2.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  si2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
   db::Region r2 (si2);
 
   db::Layout target;

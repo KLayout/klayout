@@ -338,6 +338,11 @@ const db::RecursiveShapeIterator *DeepTexts::iter () const
   return 0;
 }
 
+void DeepTexts::apply_property_translator (const db::PropertiesTranslator &pt)
+{
+  DeepShapeCollectionDelegateBase::apply_property_translator (pt);
+}
+
 db::PropertiesRepository *DeepTexts::properties_repository ()
 {
   return &deep_layer ().layout ().properties_repository ();

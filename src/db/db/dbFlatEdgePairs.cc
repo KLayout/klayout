@@ -188,6 +188,13 @@ const db::RecursiveShapeIterator *FlatEdgePairs::iter () const
   return 0;
 }
 
+void FlatEdgePairs::apply_property_translator (const db::PropertiesTranslator &pt)
+{
+  db::Shapes new_edge_pairs;
+  new_edge_pairs.assign (*mp_edge_pairs, pt);
+  mp_edge_pairs->swap (new_edge_pairs);
+}
+
 db::PropertiesRepository *FlatEdgePairs::properties_repository ()
 {
   return mp_properties_repository.get_non_const ();

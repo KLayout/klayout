@@ -141,6 +141,7 @@ public:
   virtual db::properties_id_type nth_prop_id (size_t) const { tl_assert (false); }
 
   virtual const db::RecursiveShapeIterator *iter () const { return 0; }
+  virtual void apply_property_translator (const db::PropertiesTranslator &) { }
   virtual db::PropertiesRepository *properties_repository () { return 0; }
   virtual const db::PropertiesRepository *properties_repository () const { return 0; }
 

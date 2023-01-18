@@ -419,6 +419,13 @@ const db::RecursiveShapeIterator *FlatRegion::iter () const
   return 0;
 }
 
+void FlatRegion::apply_property_translator (const db::PropertiesTranslator &pt)
+{
+  db::Shapes new_polygons;
+  new_polygons.assign (*mp_polygons, pt);
+  mp_polygons->swap (new_polygons);
+}
+
 db::PropertiesRepository *FlatRegion::properties_repository ()
 {
   return mp_properties_repository.get_non_const ();

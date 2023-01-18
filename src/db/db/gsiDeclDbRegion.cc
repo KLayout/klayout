@@ -37,6 +37,8 @@
 #include "dbCompoundOperation.h"
 #include "tlGlobPattern.h"
 
+#include "gsiDeclDbContainerHelpers.h"
+
 #include <memory>
 #include <vector>
 #include <set>
@@ -3030,7 +3032,9 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This method is equivalent to \\Cell#fill_region, but is based on Region (with the cell being the first parameter).\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
-  ),
+  ) +
+  gsi::make_property_methods<db::Region> ()
+  ,
   "@brief A region (a potentially complex area consisting of multiple polygons)\n"
   "\n\n"
   "This class was introduced to simplify operations on polygon sets like boolean or sizing operations. "

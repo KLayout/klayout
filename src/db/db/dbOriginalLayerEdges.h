@@ -62,6 +62,7 @@ public:
   virtual bool has_valid_merged_edges () const;
 
   virtual const db::RecursiveShapeIterator *iter () const;
+  virtual void apply_property_translator (const db::PropertiesTranslator &pt);
   virtual db::PropertiesRepository *properties_repository ();
   virtual const db::PropertiesRepository *properties_repository () const;
 

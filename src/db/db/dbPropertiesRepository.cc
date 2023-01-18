@@ -213,5 +213,135 @@ PropertiesRepository::translate (const PropertiesRepository &rep, properties_id_
   return properties_id (new_pset);
 }
 
+
+// ----------------------------------------------------------------------------------
+//  PropertiesRepository implementation
+
+PropertiesTranslator::PropertiesTranslator ()
+  : m_pass (true), m_null (true)
+{
+  //  .. nothing yet ..
+}
+
+PropertiesTranslator::PropertiesTranslator (bool pass)
+  : m_pass (pass), m_null (false)
+{
+  //  .. nothing yet ..
+}
+
+PropertiesTranslator::PropertiesTranslator (const std::map<db::properties_id_type, db::properties_id_type> &map)
+  : m_map (map), m_pass (false), m_null (false)
+{
+  //  .. nothing yet ..
+}
+
+PropertiesTranslator
+PropertiesTranslator::operator* (const PropertiesTranslator &other) const
+{
+  if (other.m_pass) {
+
+    //  NOTE: by handling this first, "pass_all * null" will give "pass_all" which is desired
+    //  for RecursiveShapeIterator::apply_property_translator.
+    return *this;
+
+  } else if (m_pass) {
+
+    return other;
+
+  } else {
+
+    std::map<db::properties_id_type, db::properties_id_type> new_map;
+
+    for (auto i = other.m_map.begin (); i != other.m_map.end (); ++i) {
+      auto ii = m_map.find (i->second);
+      if (ii != m_map.end ()) {
+        new_map.insert (std::make_pair (i->first, ii->second));
+      }
+    }
+
+    return PropertiesTranslator (new_map);
+
+  }
+}
+
+db::properties_id_type
+PropertiesTranslator::operator() (db::properties_id_type id) const
+{
+  if (m_pass || id == 0) {
+    return id;
+  } else {
+    auto i = m_map.find (id);
+    return i != m_map.end () ? i->second : 0;
+  }
+}
+
+PropertiesTranslator
+PropertiesTranslator::make_remove_all ()
+{
+  return PropertiesTranslator (false);
+}
+
+PropertiesTranslator
+PropertiesTranslator::make_pass_all ()
+{
+  return PropertiesTranslator (true);
+}
+
+PropertiesTranslator
+PropertiesTranslator::make_filter (db::PropertiesRepository &repo, const std::set<tl::Variant> &keys)
+{
+  std::map<db::properties_id_type, db::properties_id_type> map;
+  std::set<db::property_names_id_type> names_selected;
+
+  for (auto k = keys.begin (); k != keys.end (); ++k) {
+    names_selected.insert (repo.prop_name_id (*k));
+  }
+
+  db::PropertiesRepository org_repo = repo;
+
+  for (auto p = org_repo.begin (); p != org_repo.end (); ++p) {
+    db::PropertiesRepository::properties_set new_set;
+    for (auto i = p->second.begin (); i != p->second.end (); ++i) {
+      if (names_selected.find (i->first) != names_selected.end ()) {
+        new_set.insert (*i);
+      }
+    }
+    if (! new_set.empty ()) {
+      map.insert (std::make_pair (p->first, repo.properties_id (new_set)));
+    }
+  }
+
+  return PropertiesTranslator (map);
+}
+
+PropertiesTranslator
+PropertiesTranslator::make_key_mapper (db::PropertiesRepository &repo, const std::map<tl::Variant, tl::Variant> &keys)
+{
+  std::map<db::properties_id_type, db::properties_id_type> map;
+  std::map<db::property_names_id_type, db::property_names_id_type> name_map;
+
+  for (auto k = keys.begin (); k != keys.end (); ++k) {
+    name_map.insert (std::make_pair (repo.prop_name_id (k->first), repo.prop_name_id (k->second)));
+  }
+
+  db::PropertiesRepository org_repo = repo;
+
+  for (auto p = org_repo.begin (); p != org_repo.end (); ++p) {
+    db::PropertiesRepository::properties_set new_set;
+    for (auto i = p->second.begin (); i != p->second.end (); ++i) {
+      auto nm = name_map.find (i->first);
+      if (nm != name_map.end ()) {
+        new_set.insert (std::make_pair (nm->second, i->second));
+      }
+    }
+    if (! new_set.empty ()) {
+      map.insert (std::make_pair (p->first, repo.properties_id (new_set)));
+    }
+  }
+
+  return PropertiesTranslator (map);
+}
+
+
 } // namespace db
 

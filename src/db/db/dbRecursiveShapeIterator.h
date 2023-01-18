@@ -321,6 +321,41 @@ public:
   }
 
   /**
+   *  @brief Gets the installed property translator
+   *
+   *  The property translator is not automatically applied, but available to consumers
+   *  of shapes to perform property translation.
+   */
+  const db::PropertiesTranslator &property_translator () const
+  {
+    return m_property_translator;
+  }
+
+  /**
+   *  @brief Applies a PropertyTranslator
+   *
+   *  The property translator is available for receivers of the recursive shape
+   *  iterator items. This method will apply an additional property translator
+   *  atop of existing ones.
+   */
+  void apply_property_translator (const db::PropertiesTranslator &pt)
+  {
+    m_property_translator = pt * m_property_translator;
+  }
+
+  /**
+   *  @brief Sets a PropertyTranslator
+   *
+   *  The property translator is available for receivers of the recursive shape
+   *  iterator items. This method will apply an additional property translator
+   *  atop of existing ones.
+   */
+  void set_property_translator (const db::PropertiesTranslator &pt)
+  {
+    m_property_translator = pt;
+  }
+
+  /**
    *  @brief Gets the basic region the iterator is using (will be world if none is set)
    *  In addition to the basic region, a complex region may be defined that is further confining the
    *  search to a subregion of the basic region.
@@ -649,6 +684,21 @@ public:
   bool at_end () const;
 
   /**
+   *  @brief Gets the translated property ID
+   *
+   *  This version employs the property translator to deliver the real property ID.
+   */
+  db::properties_id_type prop_id () const
+  {
+    if (m_property_translator.is_null ()) {
+      return 0;
+    } else {
+      validate (0);
+      return m_property_translator (m_shape->prop_id ());
+    }
+  }
+
+  /**
    *  @brief Gets the current cell's index
    */
   db::cell_index_type cell_index () const
@@ -765,6 +815,7 @@ private:
   bool m_overlapping;
   std::set<db::cell_index_type> m_start, m_stop;
   cplx_trans_type m_global_trans;
+  db::PropertiesTranslator m_property_translator;
 
   tl::weak_ptr<layout_type> mp_layout;
   const cell_type *mp_top_cell;

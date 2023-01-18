@@ -240,6 +240,117 @@ private:
 };
 
 /**
+ *  @brief A map for selecting/translating properties
+ *
+ *  The following rules apply:
+ *  - All non-mapped properties are mapped to 0 (removed)
+ *  - 0 is always mapped to 0
+ *  - Do not include key or value 0 in the map passed to the constructor
+ *
+ *  A "pass translator" will pass all IDs unchanged.
+ *
+ *  Note that a property translator - specifically the filters and
+ *  mappers created by "make_filter" and "make_key_mapper" - are snapshots.
+ *  As creating new filters will generate new property IDs for the mapping
+ *  targets, property translators generated previously may become invalid.
+ *  In general it is safe to concatenate new translators after old ones.
+ *  The old ones will not map the property IDs understood by the new ones,
+ *  but as such IDs cannot become input to the old translator, this should
+ *  not matter.
+ */
+
+class DB_PUBLIC PropertiesTranslator
+{
+public:
+  /**
+   *  @brief Default constructor - this creates a null translator
+   */
+  PropertiesTranslator ();
+
+  /**
+   *  @brief Creates a "pass all" (pass = true) or "remove all" (pass = false) translator
+   */
+  PropertiesTranslator (bool pass);
+
+  /**
+   *  @brief Creates a property ID mapper from a table
+   */
+  PropertiesTranslator (const std::map<db::properties_id_type, db::properties_id_type> &map);
+
+  /**
+   *  @brief Gets a value indicating whether the translator is "pass"
+   */
+  bool is_pass () const
+  {
+    return m_pass;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the translator is "empty" (remove all)
+   */
+  bool is_empty () const
+  {
+    return ! m_pass && m_map.empty ();
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the translator is "null" (default-constructed)
+   */
+  bool is_null () const
+  {
+    return m_null;
+  }
+
+  /**
+   *  @brief Concatenates two translators (the right one first)
+   */
+  PropertiesTranslator operator* (const PropertiesTranslator &other) const;
+
+  /**
+   *  @brief Concatenates two translators (the right one first) - in place version
+   */
+  PropertiesTranslator &operator*= (const PropertiesTranslator &other)
+  {
+    *this = this->operator* (other);
+    return *this;
+  }
+
+  /**
+   *  @brief Translation of the property ID
+   */
+  db::properties_id_type operator() (db::properties_id_type id) const;
+
+  /**
+   *  @brief Factory: create a "remove all" translator
+   */
+  static PropertiesTranslator make_remove_all ();
+
+  /**
+   *  @brief Factory: create a "pass all" translator
+   */
+  static PropertiesTranslator make_pass_all ();
+
+  /**
+   *  @brief Factory: create a filter translator
+   *
+   *  The translator delivered by this function will leave only the given keys in the properties.
+   */
+  static PropertiesTranslator make_filter (db::PropertiesRepository &repo, const std::set<tl::Variant> &keys);
+
+  /**
+   *  @brief Factory: create a key mapper translator
+   *
+   *  The translator delivered by this function will translate the given keys to new ones
+   *  and remove non-listed keys.
+   */
+  static PropertiesTranslator make_key_mapper (db::PropertiesRepository &repo, const std::map<tl::Variant, tl::Variant> &keys);
+
+private:
+  std::map<db::properties_id_type, db::properties_id_type> m_map;
+  bool m_pass, m_null;
+};
+
+/**
  *  @brief Collect memory statistics
  */
 inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const PropertiesRepository &x, bool no_self = false, void *parent = 0)

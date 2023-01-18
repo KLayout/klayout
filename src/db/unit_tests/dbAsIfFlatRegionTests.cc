@@ -33,6 +33,7 @@
 #include "dbOriginalLayerRegion.h"
 #include "dbCellGraphUtils.h"
 #include "dbTestSupport.h"
+#include "dbCompoundOperation.h"
 #include "tlUnitTest.h"
 #include "tlStream.h"
 
@@ -1838,3 +1839,69 @@ TEST(42_DRCWithProperties)
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au42.gds");
 }
+
+TEST(43_ComplexOpsWithProperties)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_42.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+
+  db::RecursiveShapeIterator si1 (ly, top_cell, l1);
+  si1.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  db::Region r1 (si1);
+
+  db::RecursiveShapeIterator si2 (ly, top_cell, l2);
+  si2.shape_flags (db::ShapeIterator::All | db::ShapeIterator::RegardProperties);
+  db::Region r2 (si2);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  db::RegionCheckOptions opt;
+  opt.metrics = db::Projection;
+
+  db::CompoundRegionOperationSecondaryNode *secondary = new db::CompoundRegionOperationSecondaryNode (&r2);
+  db::CompoundRegionCheckOperationNode sep_check (secondary, db::SpaceRelation, true /*==different polygons*/, 1000, opt);
+
+  db::CompoundRegionOperationSecondaryNode *secondary2 = new db::CompoundRegionOperationSecondaryNode (&r2);
+  db::CompoundRegionCheckOperationNode *sep_check2 = new db::CompoundRegionCheckOperationNode (secondary2, db::SpaceRelation, true /*==different polygons*/, 1000, opt);
+  db::CompoundRegionEdgePairToPolygonProcessingOperationNode sep_check2p (new db::EdgePairToPolygonProcessor (0), sep_check2, true);
+
+  db::CompoundRegionOperationSecondaryNode *secondary3 = new db::CompoundRegionOperationSecondaryNode (&r2);
+  db::CompoundRegionCheckOperationNode *sep_check3 = new db::CompoundRegionCheckOperationNode (secondary3, db::SpaceRelation, true /*==different polygons*/, 1000, opt);
+  db::CompoundRegionEdgePairToEdgeProcessingOperationNode sep_check2e (new db::EdgePairToEdgesProcessor (), sep_check3, true);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r1);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1.cop_to_edge_pairs (sep_check));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1.cop_to_region (sep_check2p));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r1.cop_to_edges (sep_check2e));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r1.cop_to_edge_pairs (sep_check, db::NoPropertyConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r1.cop_to_region (sep_check2p, db::NoPropertyConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), r1.cop_to_edges (sep_check2e, db::NoPropertyConstraint));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), r1.cop_to_edge_pairs (sep_check, db::SamePropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), r1.cop_to_region (sep_check2p, db::SamePropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 0)), r1.cop_to_edges (sep_check2e, db::SamePropertiesConstraint));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), r1.cop_to_edge_pairs (sep_check, db::DifferentPropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), r1.cop_to_region (sep_check2p, db::DifferentPropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 0)), r1.cop_to_edges (sep_check2e, db::DifferentPropertiesConstraint));
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au43.gds");
+}
+

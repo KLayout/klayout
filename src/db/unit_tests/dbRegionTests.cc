@@ -24,6 +24,7 @@
 #include "tlUnitTest.h"
 
 #include "dbRegion.h"
+#include "dbFlatRegion.h"
 #include "dbRegionUtils.h"
 #include "dbRegionProcessors.h"
 #include "dbEdgesUtils.h"
@@ -2454,10 +2455,8 @@ TEST(54_PropertiesFilterDeep)
 
 TEST(55_PropertiesFilterFlat)
 {
-  db::Region r;
-  //  force flat:
-  r.insert (db::Box (0, 0, 1, 1));
-  r.clear ();
+  //  NOTE: we have to force flat as otherwise no properties repo is available
+  db::Region r (new db::FlatRegion ());
 
   db::PropertiesRepository &rp = r.properties_repository ();
   db::property_names_id_type key1 = rp.prop_name_id (1);

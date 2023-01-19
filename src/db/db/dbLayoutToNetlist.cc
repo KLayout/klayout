@@ -267,7 +267,7 @@ void LayoutToNetlist::connect (const db::Region &l)
   reset_extracted ();
 
   if (! is_persisted (l)) {
-    register_layer (l, make_new_name ());
+    register_layer (l);
   }
 
   //  we need to keep a reference, so we can safely delete the region
@@ -282,10 +282,10 @@ void LayoutToNetlist::connect_impl (const db::ShapeCollection &a, const db::Shap
   reset_extracted ();
 
   if (! is_persisted (a)) {
-    register_layer (a, make_new_name ());
+    register_layer (a);
   }
   if (! is_persisted (b)) {
-    register_layer (b, make_new_name ());
+    register_layer (b);
   }
 
   //  we need to keep a reference, so we can safely delete the region
@@ -302,7 +302,7 @@ size_t LayoutToNetlist::connect_global_impl (const db::ShapeCollection &l, const
   reset_extracted ();
 
   if (! is_persisted (l)) {
-    register_layer (l, make_new_name ());
+    register_layer (l);
   }
 
   //  we need to keep a reference, so we can safely delete the region
@@ -548,9 +548,17 @@ db::Region *LayoutToNetlist::layer_by_index (unsigned int index)
 
 db::Region *LayoutToNetlist::layer_by_original (const ShapeCollectionDelegateBase *original_delegate)
 {
-  auto n = m_region_by_original.find (original_delegate);
+  auto n = m_region_by_original.find (tl::id_of (original_delegate));
   if (n == m_region_by_original.end ()) {
-    return 0;
+
+    DeepShapeCollectionDelegateBase *dl = const_cast<ShapeCollectionDelegateBase *> (original_delegate)->deep ();
+    if (dl && dl->deep_layer ().store () == mp_dss.get ()) {
+      //  implicitly original because the collection is inside our DSS
+      return new db::Region (new db::DeepRegion (dl->deep_layer ()));
+    } else {
+      return 0;
+    }
+
   } else {
     return new db::Region (new db::DeepRegion (n->second));
   }
@@ -581,7 +589,11 @@ std::string LayoutToNetlist::name (const ShapeCollection &coll) const
 
 void LayoutToNetlist::register_layer (const ShapeCollection &collection, const std::string &n)
 {
-  if (m_named_regions.find (n) != m_named_regions.end ()) {
+  if (m_region_by_original.find (tl::id_of (collection.get_delegate ())) != m_region_by_original.end ()) {
+    throw tl::Exception (tl::to_string (tr ("The layer is already registered")));
+  }
+
+  if (! n.empty () && m_named_regions.find (n) != m_named_regions.end ()) {
     throw tl::Exception (tl::to_string (tr ("Layer name is already used: ")) + n);
   }
 
@@ -611,9 +623,12 @@ void LayoutToNetlist::register_layer (const ShapeCollection &collection, const s
 
   }
 
-  m_named_regions [n] = dl;
-  m_region_by_original [collection.get_delegate ()] = dl;
-  m_name_of_layer [dl.layer ()] = n;
+  m_region_by_original [tl::id_of (collection.get_delegate ())] = dl;
+
+  if (! n.empty ()) {
+    m_named_regions [n] = dl;
+    m_name_of_layer [dl.layer ()] = n;
+  }
 }
 
 db::DeepLayer LayoutToNetlist::deep_layer_of (const db::ShapeCollection &coll) const
@@ -630,6 +645,17 @@ db::DeepLayer LayoutToNetlist::deep_layer_of (const db::ShapeCollection &coll) c
 
   } else {
     return dr->deep_layer ();
+  }
+}
+
+bool LayoutToNetlist::is_persisted_impl (const db::ShapeCollection &coll) const
+{
+  if (coll.get_delegate ()->deep () && coll.get_delegate ()->deep ()->deep_layer ().store () == mp_dss.get ()) {
+    //  implicitly persisted because the collection is inside our DSS
+    return true;
+  } else {
+    //  explicitly persisted through "register"
+    return m_region_by_original.find (tl::id_of (coll.get_delegate ())) != m_region_by_original.end ();
   }
 }
 
@@ -865,7 +891,7 @@ static bool deliver_shapes_of_net (bool recursive, const db::Netlist *nl, const 
   return true;
 }
 
-void LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive, db::Shapes &to, db::properties_id_type propid) const
+void LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive, db::Shapes &to, db::properties_id_type propid, const ICplxTrans &trans) const
 {
   unsigned int lid = layer_of (of_layer);
   const db::Circuit *circuit = net.circuit ();
@@ -874,10 +900,10 @@ void LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region &of_la
   std::map<unsigned int, db::Shapes *> lmap;
   lmap [lid] = &to;
 
-  deliver_shapes_of_net (recursive, mp_netlist.get (), m_net_clusters, circuit->cell_index (), net.cluster_id (), lmap, db::ICplxTrans (), propid);
+  deliver_shapes_of_net (recursive, mp_netlist.get (), m_net_clusters, circuit->cell_index (), net.cluster_id (), lmap, trans, propid);
 }
 
-db::Region *LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive) const
+db::Region *LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive, const db::ICplxTrans &trans) const
 {
   unsigned int lid = layer_of (of_layer);
   const db::Circuit *circuit = net.circuit ();
@@ -887,7 +913,7 @@ db::Region *LayoutToNetlist::shapes_of_net (const db::Net &net, const db::Region
   std::map<unsigned int, db::Region *> lmap;
   lmap [lid] = res.get ();
 
-  deliver_shapes_of_net (recursive, mp_netlist.get (), m_net_clusters, circuit->cell_index (), net.cluster_id (), lmap, db::ICplxTrans (), 0);
+  deliver_shapes_of_net (recursive, mp_netlist.get (), m_net_clusters, circuit->cell_index (), net.cluster_id (), lmap, trans, 0);
 
   return res.release ();
 }

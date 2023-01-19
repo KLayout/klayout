@@ -237,14 +237,22 @@ public:
   double device_scaling () const;
 
   /**
-   *  @brief Register a layer under the given name
-   *  This is a formal name for the layer. Using a name or layer properties
-   *  (see below) enhances readability of backannotated information
+   *  @brief Register a layer, optionally under the given name
+   *  Using a name or layer properties (see below) enhances readability of backannotated information
    *  if layers are involved. Use this method to attach a name to a region
    *  derived by boolean operations for example.
-   *  Named regions are persisted inside the LayoutToNetlist object.
+   *
+   *  Registered regions are persisted inside the LayoutToNetlist object
+   *  if they are flat or original layer regions.
+   *  This allows passing flat or original layer collections.
+   *
+   *  If no name is given, the region will not be registered under a name.
+   *  Still the collection will be persisted if required.
+   *
+   *  In addition to regions, text collections can be registered too.
+   *  Including texts in "connect" makes net names begin assigned from the text strings.
    */
-  void register_layer (const ShapeCollection &collection, const std::string &name);
+  void register_layer (const ShapeCollection &collection, const std::string &name = std::string ());
 
   /**
    *  @brief Gets the name of the given collection
@@ -279,7 +287,7 @@ public:
   template <class Collection>
   bool is_persisted (const Collection &coll) const
   {
-    return m_name_of_layer.find (layer_of (coll)) != m_name_of_layer.end ();
+    return is_persisted_impl (coll);
   }
 
   /**
@@ -705,7 +713,7 @@ public:
    *  This methods returns a new'd Region. It's the responsibility of the caller
    *  to delete this object.
    */
-  db::Region *shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive) const;
+  db::Region *shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive, const db::ICplxTrans &trans = db::ICplxTrans ()) const;
 
   /**
    *  @brief Delivers all shapes of a specific net and layer to the given Shapes container.
@@ -718,7 +726,7 @@ public:
    *
    *  propid is an optional properties ID which is attached to the shapes if not 0.
    */
-  void shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive, db::Shapes &to, properties_id_type propid = 0) const;
+  void shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive, db::Shapes &to, properties_id_type propid = 0, const db::ICplxTrans &trans = db::ICplxTrans ()) const;
 
   /**
    *  @brief Builds a net representation in the given layout and cell
@@ -932,7 +940,7 @@ private:
   std::set<db::DeepLayer> m_dlrefs;
   std::map<std::string, db::DeepLayer> m_named_regions;
   std::map<unsigned int, std::string> m_name_of_layer;
-  std::map<const db::ShapeCollectionDelegateBase *, db::DeepLayer> m_region_by_original;
+  std::map<tl::id_type, db::DeepLayer> m_region_by_original;
   bool m_netlist_extracted;
   bool m_is_flat;
   double m_device_scaling;
@@ -953,6 +961,7 @@ private:
   db::CellMapping make_cell_mapping_into (db::Layout &layout, db::Cell &cell, const std::vector<const db::Net *> *nets, bool with_device_cells);
   void connect_impl (const db::ShapeCollection &a, const db::ShapeCollection &b);
   size_t connect_global_impl (const db::ShapeCollection &l, const std::string &gn);
+  bool is_persisted_impl (const db::ShapeCollection &coll) const;
 
   //  implementation of NetlistManipulationCallbacks
   virtual size_t link_net_to_parent_circuit (const Net *subcircuit_net, Circuit *parent_circuit, const DCplxTrans &trans);

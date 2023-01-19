@@ -436,12 +436,6 @@ const db::PropertiesRepository *FlatRegion::properties_repository () const
   return mp_properties_repository.get_const ();
 }
 
-RegionDelegate *FlatRegion::nets (LayoutToNetlist *l2n, NetPropertyMode prop_mode, const tl::Variant &net_prop_name, const std::vector<const db::Net *> *net_filter) const
-{
-  //  @@@ TODO: implement (how?)
-  return 0;
-}
-
 void FlatRegion::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
   db::PropertyMapper pm (&layout->properties_repository (), mp_properties_repository.get_const ());

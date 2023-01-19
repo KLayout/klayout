@@ -103,8 +103,6 @@ public:
   virtual db::PropertiesRepository *properties_repository ();
   virtual const db::PropertiesRepository *properties_repository () const;
 
-  virtual RegionDelegate *nets (LayoutToNetlist *l2n, NetPropertyMode prop_mode, const tl::Variant &net_prop_name, const std::vector<const db::Net *> *net_filter) const;
-
   void do_insert (const db::Polygon &polygon, db::properties_id_type prop_id);
 
   void do_transform (const db::Trans &t)

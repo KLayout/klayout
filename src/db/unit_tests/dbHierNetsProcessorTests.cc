@@ -23,15 +23,12 @@
 
 #include "tlUnitTest.h"
 #include "tlStream.h"
+#include "tlFileUtils.h"
 #include "dbLayoutToNetlist.h"
 #include "dbTestSupport.h"
 #include "dbReader.h"
 #include "dbWriter.h"
 #include "dbCommonReader.h"
-#include "dbHierProcessor.h"
-
-// @@@
-#include "dbLocalOperationUtils.h"
 
 static unsigned int define_layer (db::Layout &ly, db::LayerMap &lmap, int gds_layer, int gds_datatype = 0)
 {
@@ -40,33 +37,37 @@ static unsigned int define_layer (db::Layout &ly, db::LayerMap &lmap, int gds_la
   return lid;
 }
 
-TEST(0_Develop)
+db::Region make_region (const db::RecursiveShapeIterator &si, db::DeepShapeStore &dss, bool flat)
+{
+  return flat ? db::Region (si) : db::Region (si, dss);
+}
+
+void run_test (tl::TestBase *_this, bool flat, bool flat_nets, const std::string &au_fn)
 {
   db::Layout ly;
   db::DeepShapeStore dss;
-  // @@@ dss.set_subcircuit_hierarchy_for_nets (true);
+  if (! flat_nets) {
+    dss.set_subcircuit_hierarchy_for_nets (true);
+  }
+
   db::LayerMap lmap;
 
-  unsigned int poly       = define_layer (ly, lmap, 7);
-  unsigned int cont       = define_layer (ly, lmap, 14);
-  unsigned int metal1     = define_layer (ly, lmap, 15);
-  unsigned int via1       = define_layer (ly, lmap, 16);
-  unsigned int metal2     = define_layer (ly, lmap, 17);
-  unsigned int via2       = define_layer (ly, lmap, 18);
-  unsigned int metal3     = define_layer (ly, lmap, 19);
-  unsigned int via3       = define_layer (ly, lmap, 20);
-  unsigned int metal4     = define_layer (ly, lmap, 21);
+  unsigned int poly       = define_layer (ly, lmap, 1);
+  unsigned int cont       = define_layer (ly, lmap, 2);
+  unsigned int metal1     = define_layer (ly, lmap, 3);
+  unsigned int via1       = define_layer (ly, lmap, 4);
+  unsigned int metal2     = define_layer (ly, lmap, 5);
+  unsigned int via2       = define_layer (ly, lmap, 6);
+  unsigned int metal3     = define_layer (ly, lmap, 7);
+  unsigned int via3       = define_layer (ly, lmap, 8);
+  unsigned int metal4     = define_layer (ly, lmap, 9);
 
   {
     db::LoadLayoutOptions options;
     options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
-    // @@@ std::string fn (tl::testdata ());
-    // @@@ fn = tl::combine_path (fn, "algo");
-    // @@@ fn = tl::combine_path (fn, "device_extract_l1.gds");
-
-    std::string fn ("/home/matthias/klayout/testdata/laurent_ANA_DRIVE7/ANA_DRIVE7.gds"); // @@@
+    std::string fn = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nets_proc_1.gds");
 
     tl::InputStream stream (fn);
     db::Reader reader (stream);
@@ -75,20 +76,38 @@ TEST(0_Develop)
 
   db::Cell &tc = ly.cell (*ly.begin_top_down ());
 
-  db::Region rpoly (db::RecursiveShapeIterator (ly, tc, poly), dss);
-  db::Region rcont (db::RecursiveShapeIterator (ly, tc, cont), dss);
-  db::Region rmetal1 (db::RecursiveShapeIterator (ly, tc, metal1), dss);
-  db::Region rvia1 (db::RecursiveShapeIterator (ly, tc, via1), dss);
-  db::Region rmetal2 (db::RecursiveShapeIterator (ly, tc, metal2), dss);
-  db::Region rvia2 (db::RecursiveShapeIterator (ly, tc, via2), dss);
-  db::Region rmetal3 (db::RecursiveShapeIterator (ly, tc, metal3), dss);
-  db::Region rvia3 (db::RecursiveShapeIterator (ly, tc, via3), dss);
-  db::Region rmetal4 (db::RecursiveShapeIterator (ly, tc, metal4), dss);
+  db::Region rpoly    = make_region (db::RecursiveShapeIterator (ly, tc, poly),   dss, flat);
+  db::Region rcont    = make_region (db::RecursiveShapeIterator (ly, tc, cont),   dss, flat);
+  db::Region rmetal1  = make_region (db::RecursiveShapeIterator (ly, tc, metal1), dss, flat);
+  db::Region rvia1    = make_region (db::RecursiveShapeIterator (ly, tc, via1),   dss, flat);
+  db::Region rmetal2  = make_region (db::RecursiveShapeIterator (ly, tc, metal2), dss, flat);
+  db::Region rvia2    = make_region (db::RecursiveShapeIterator (ly, tc, via2),   dss, flat);
+  db::Region rmetal3  = make_region (db::RecursiveShapeIterator (ly, tc, metal3), dss, flat);
+  db::Region rvia3    = make_region (db::RecursiveShapeIterator (ly, tc, via3),   dss, flat);
+  db::Region rmetal4  = make_region (db::RecursiveShapeIterator (ly, tc, metal4), dss, flat);
 
-  std::unique_ptr<db::LayoutToNetlist> l2n (new db::LayoutToNetlist (&dss));
-  EXPECT_EQ (dss.has_net_builder_for (0, l2n.get ()), false);
+  std::unique_ptr<db::LayoutToNetlist> l2n;
+  if (! flat) {
+    l2n.reset (new db::LayoutToNetlist (&dss));
+    EXPECT_EQ (dss.has_net_builder_for (0, l2n.get ()), false);
+  } else {
+    l2n.reset (new db::LayoutToNetlist (ly.cell_name (tc.cell_index ()), ly.dbu ()));
+  }
 
   //  net extraction
+
+  if (flat) {
+    //  flat or original layers need to be registered
+    l2n->register_layer (rpoly);
+    l2n->register_layer (rcont);
+    l2n->register_layer (rmetal1);
+    l2n->register_layer (rvia1);
+    l2n->register_layer (rmetal2);
+    l2n->register_layer (rvia2);
+    l2n->register_layer (rmetal3);
+    l2n->register_layer (rvia3);
+    l2n->register_layer (rmetal4);
+  }
 
   //  Intra-layer
   l2n->connect (rpoly);
@@ -110,41 +129,17 @@ TEST(0_Develop)
   l2n->connect (rmetal3,    rvia3);
   l2n->connect (rvia3,      rmetal4);
 
-printf("@@@ extraction\n"); fflush(stdout);
   l2n->extract_netlist ();
 
-printf("@@@ cells1=%d\n", int(dss.layout ().cells())); fflush(stdout);
   db::Region rmetal1_nets = rmetal1.nets (*l2n, db::NPM_NetNameAndIDOnly, tl::Variant (1));
-  EXPECT_EQ (dss.has_net_builder_for (0, l2n.get ()), true);
-printf("@@@ cells2=%d\n", int(dss.layout ().cells())); fflush(stdout);
+  if (! flat) {
+    EXPECT_EQ (dss.has_net_builder_for (0, l2n.get ()), true);
+  }
   db::Region rmetal2_nets = rmetal2.nets (*l2n, db::NPM_NetNameAndIDOnly, tl::Variant (1));
-printf("@@@ cells3=%d\n", int(dss.layout ().cells())); fflush(stdout);
-  db::Region rmetal1_nets_more = rmetal1.nets (*l2n, db::NPM_NetNameAndIDOnly, tl::Variant (1));
-printf("@@@ cells4=%d\n", int(dss.layout ().cells())); fflush(stdout);
-
-// @@@
-dss.layout().set_properties(rpoly.delegate ()->deep ()->deep_layer ().layer (), db::LayerProperties(7, 0));
-dss.layout().set_properties(rcont.delegate ()->deep ()->deep_layer ().layer (), db::LayerProperties(14, 0));
-dss.layout().set_properties(rmetal1.delegate ()->deep ()->deep_layer ().layer (), db::LayerProperties(15, 0));
-dss.layout().set_properties(rvia1.delegate ()->deep ()->deep_layer ().layer (), db::LayerProperties(16, 0));
-dss.layout().set_properties(rmetal2.delegate ()->deep ()->deep_layer ().layer (), db::LayerProperties(17, 0));
-dss.layout().set_properties(rmetal1_nets.delegate ()->deep ()->deep_layer ().layer (), db::LayerProperties(115, 0));
-dss.layout().set_properties(rmetal2_nets.delegate ()->deep ()->deep_layer ().layer (), db::LayerProperties(117, 0));
-{
-  db::SaveLayoutOptions options;
-  std::string fn ("net_outx.gds"); // @@@
-  tl::OutputStream stream (fn);
-  db::Writer writer (options);
-  writer.write (dss.layout(), stream);
-}
-// @@@
 
   db::Region res1 = rmetal1_nets.bool_and (rmetal2_nets, db::SamePropertiesConstraint);
-printf("@@@2\n"); fflush(stdout);
   db::Region res2 = rmetal1_nets.bool_and (rmetal2_nets, db::DifferentPropertiesConstraint);
-printf("@@@3\n"); fflush(stdout);
   db::Region res3 = rmetal1_nets.bool_and (rmetal2_nets, db::NoPropertyConstraint);
-printf("@@@4\n"); fflush(stdout);
 
   rmetal1_nets.insert_into (&ly, tc.cell_index (), ly.insert_layer (db::LayerProperties (100, 0)));
   rmetal2_nets.insert_into (&ly, tc.cell_index (), ly.insert_layer (db::LayerProperties (101, 0)));
@@ -152,19 +147,28 @@ printf("@@@4\n"); fflush(stdout);
   res1.insert_into (&ly, tc.cell_index (), ly.insert_layer (db::LayerProperties (1000, 0)));
   res2.insert_into (&ly, tc.cell_index (), ly.insert_layer (db::LayerProperties (1001, 0)));
   res3.insert_into (&ly, tc.cell_index (), ly.insert_layer (db::LayerProperties (1002, 0)));
-printf("@@@5\n"); fflush(stdout);
 
   //  Test auto-unregistration
   l2n.reset (0);
-  EXPECT_EQ (dss.has_net_builder_for (0, l2n.get ()), false);
-
-  {
-    db::SaveLayoutOptions options;
-
-    std::string fn (dss.subcircuit_hierarchy_for_nets () ? "net_outh.gds" : "net_out.gds"); // @@@
-
-    tl::OutputStream stream (fn);
-    db::Writer writer (options);
-    writer.write (ly, stream);
+  if (! flat) {
+    EXPECT_EQ (dss.has_net_builder_for (0, l2n.get ()), false);
   }
+
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), au_fn);
+  db::compare_layouts (_this, ly, au_path);
+}
+
+TEST(1_NetSpecificBoolFlat)
+{
+  run_test (_this, false, true, "net_proc_au1.gds");
+}
+
+TEST(2_NetSpecificBoolFlatNets)
+{
+  run_test (_this, false, true, "net_proc_au2.gds");
+}
+
+TEST(3_NetSpecificBoolFullyHier)
+{
+  run_test (_this, false, false, "net_proc_au3.gds");
 }

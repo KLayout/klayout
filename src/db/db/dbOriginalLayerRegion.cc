@@ -440,12 +440,6 @@ OriginalLayerRegion::insert_into (Layout *layout, db::cell_index_type into_cell,
   }
 }
 
-RegionDelegate *OriginalLayerRegion::nets (LayoutToNetlist *l2n, NetPropertyMode prop_mode, const tl::Variant &net_prop_name, const std::vector<const db::Net *> *net_filter) const
-{
-  //  @@@ TODO: implement (how?)
-  return 0;
-}
-
 void
 OriginalLayerRegion::ensure_merged_polygons_valid () const
 {

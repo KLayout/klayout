@@ -75,7 +75,7 @@ template <>
 struct shape_flags_traits<db::Polygon>
   : public shape_flags_traits<void>
 {
-  static unsigned int generic () { return db::ShapeIterator::Polygons; }
+  static unsigned int generic () { return db::ShapeIterator::Regions; }
   static unsigned int pure ()    { return 1 << db::ShapeIterator::Polygon; }
 };
 
@@ -83,7 +83,7 @@ template <>
 struct shape_flags_traits<db::SimplePolygon>
   : public shape_flags_traits<void>
 {
-  static unsigned int generic () { return db::ShapeIterator::Polygons; }
+  static unsigned int generic () { return db::ShapeIterator::Regions; }
   static unsigned int pure ()    { return 1 << db::ShapeIterator::SimplePolygon; }
 };
 

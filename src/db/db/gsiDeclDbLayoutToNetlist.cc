@@ -315,10 +315,12 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("layer_name", (std::string (db::LayoutToNetlist::*) (unsigned int) const) &db::LayoutToNetlist::name, gsi::arg ("l"),
     "@brief Gets the name of the given layer (by index)\n"
   ) +
-  gsi::method ("register", (void (db::LayoutToNetlist::*) (const db::ShapeCollection &collection, const std::string &)) &db::LayoutToNetlist::register_layer, gsi::arg ("l"), gsi::arg ("n"),
+  gsi::method ("register", (void (db::LayoutToNetlist::*) (const db::ShapeCollection &collection, const std::string &)) &db::LayoutToNetlist::register_layer, gsi::arg ("l"), gsi::arg ("n", std::string ()),
     "@brief Names the given layer\n"
-    "'l' must be a hierarchical \\Region or \\Texts object derived with \\make_layer, \\make_text_layer or \\make_polygon_layer or "
-    "a region derived from those by boolean operations or other hierarchical operations.\n"
+    "'l' must be a \\Region or \\Texts object.\n"
+    "Flat regions or text collections must be registered with this function, before they can be used in \\connect. "
+    "Registering will copy the shapes into the LayoutToNetlist object in this step to enable "
+    "netlist extraction.\n"
     "\n"
     "Naming a layer allows the system to indicate the layer in various contexts, i.e. "
     "when writing the data to a file. Named layers are also persisted inside the LayoutToNetlist object. "
@@ -574,16 +576,20 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("netlist", &db::LayoutToNetlist::netlist,
     "@brief gets the netlist extracted (0 if no extraction happened yet)\n"
   ) +
-  gsi::factory ("shapes_of_net", (db::Region *(db::LayoutToNetlist::*) (const db::Net &, const db::Region &, bool) const) &db::LayoutToNetlist::shapes_of_net, gsi::arg ("net"), gsi::arg ("of_layer"), gsi::arg ("recursive"),
+  gsi::factory ("shapes_of_net", (db::Region *(db::LayoutToNetlist::*) (const db::Net &, const db::Region &, bool, const db::ICplxTrans &) const) &db::LayoutToNetlist::shapes_of_net, gsi::arg ("net"), gsi::arg ("of_layer"), gsi::arg ("recursive", true), gsi::arg ("trans", db::ICplxTrans (), "unity"),
     "@brief Returns all shapes of a specific net and layer.\n"
     "If 'recursive'' is true, the returned region will contain the shapes of\n"
     "all subcircuits too.\n"
+    "\n"
+    "The optional 'trans' parameter allows applying a transformation to all shapes. It has been introduced in version 0.28.4."
   ) +
-  gsi::method ("shapes_of_net", (void (db::LayoutToNetlist::*) (const db::Net &, const db::Region &, bool, db::Shapes &, db::properties_id_type) const) &db::LayoutToNetlist::shapes_of_net, gsi::arg ("net"), gsi::arg ("of_layer"), gsi::arg ("recursive"), gsi::arg ("to"), gsi::arg ("propid", db::properties_id_type (0), "0"),
+  gsi::method ("shapes_of_net", (void (db::LayoutToNetlist::*) (const db::Net &, const db::Region &, bool, db::Shapes &, db::properties_id_type, const db::ICplxTrans &) const) &db::LayoutToNetlist::shapes_of_net, gsi::arg ("net"), gsi::arg ("of_layer"), gsi::arg ("recursive"), gsi::arg ("to"), gsi::arg ("propid", db::properties_id_type (0), "0"), gsi::arg ("trans", db::ICplxTrans (), "unity"),
     "@brief Sends all shapes of a specific net and layer to the given Shapes container.\n"
     "If 'recursive'' is true, the returned region will contain the shapes of\n"
     "all subcircuits too.\n"
     "\"prop_id\" is an optional properties ID. If given, this property set will be attached to the shapes."
+    "\n"
+    "The optional 'trans' parameter allows applying a transformation to all shapes. It has been introduced in version 0.28.4."
   ) +
   gsi::method_ext ("build_net", &build_net, gsi::arg ("net"), gsi::arg ("target"), gsi::arg ("target_cell"), gsi::arg ("lmap"), gsi::arg ("netname_prop", tl::Variant (), "nil"), gsi::arg ("hier_mode", db::BNH_Flatten, "BNH_Flatten"), gsi::arg ("circuit_cell_name_prefix", tl::Variant (), "nil"), gsi::arg ("device_cell_name_prefix", tl::Variant (), "nil"),
     "@brief Builds a net representation in the given layout and cell\n"

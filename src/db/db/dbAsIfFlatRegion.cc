@@ -40,6 +40,7 @@
 #include "dbRegionLocalOperations.h"
 #include "dbHierProcessor.h"
 #include "dbCompoundOperation.h"
+#include "dbLayoutToNetlist.h"
 
 #include <sstream>
 
@@ -1728,6 +1729,60 @@ AsIfFlatRegion::add (const Region &other) const
     return new_region.release ();
 
   }
+}
+
+static void
+deliver_shapes_of_nets_recursive (db::Shapes &out, db::PropertiesRepository *pr, const db::Circuit *circuit, const LayoutToNetlist *l2n, const db::Region *of_layer, NetPropertyMode prop_mode, const tl::Variant &net_prop_name, const db::ICplxTrans &tr, const std::set<const db::Net *> *net_filter)
+{
+  db::CplxTrans dbu_trans (l2n->internal_layout ()->dbu ());
+  auto dbu_trans_inv = dbu_trans.inverted ();
+
+  for (auto n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
+
+    if (! net_filter || net_filter->find (n.operator-> ()) != net_filter->end ()) {
+      db::properties_id_type prop_id = db::NetBuilder::make_netname_propid (*pr, prop_mode, net_prop_name, *n);
+      l2n->shapes_of_net (*n, *of_layer, true, out, prop_id, tr);
+    }
+
+    //  dive into subcircuits
+    for (auto sc = circuit->begin_subcircuits (); sc != circuit->end_subcircuits (); ++sc) {
+      const db::Circuit *circuit_ref = sc->circuit_ref ();
+      db::ICplxTrans tr_ref = tr * (dbu_trans_inv * sc->trans () * dbu_trans);
+      deliver_shapes_of_nets_recursive (out, pr, circuit_ref, l2n, of_layer, prop_mode, net_prop_name, tr_ref, net_filter);
+    }
+
+  }
+}
+
+RegionDelegate *
+AsIfFlatRegion::nets (LayoutToNetlist *l2n, NetPropertyMode prop_mode, const tl::Variant &net_prop_name, const std::vector<const db::Net *> *net_filter) const
+{
+  if (! l2n->is_netlist_extracted ()) {
+    throw tl::Exception (tl::to_string (tr ("The netlist has not been extracted yet")));
+  }
+
+  std::unique_ptr<db::FlatRegion> result (new db::FlatRegion ());
+  std::unique_ptr<db::Region> region_for_layer (l2n->layer_by_original (this));
+
+  if (! region_for_layer) {
+    throw tl::Exception (tl::to_string (tr ("The given layer is not an original layer used in netlist extraction")));
+  }
+
+  if (l2n->netlist ()->top_circuit_count () == 0) {
+    throw tl::Exception (tl::to_string (tr ("No top circuit found in netlist")));
+  } else if (l2n->netlist ()->top_circuit_count () > 1) {
+    throw tl::Exception (tl::to_string (tr ("More than one top circuit found in netlist")));
+  }
+  const db::Circuit *top_circuit = l2n->netlist ()->begin_top_down ().operator-> ();
+
+  std::set<const db::Net *> net_filter_set;
+  if (net_filter) {
+    net_filter_set.insert (net_filter->begin (), net_filter->end ());
+  }
+
+  deliver_shapes_of_nets_recursive (result->raw_polygons (), result->properties_repository (), top_circuit, l2n, region_for_layer.get (), prop_mode, net_prop_name, db::ICplxTrans (), net_filter ? &net_filter_set : 0);
+
+  return result.release ();
 }
 
 void

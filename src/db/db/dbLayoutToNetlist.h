@@ -1108,6 +1108,11 @@ public:
    */
   void build_nets (const std::vector<const Net *> *nets, const std::map<unsigned int, const db::Region *> &lmap, NetPropertyMode prop_mode, const tl::Variant &netname_prop) const;
 
+  /**
+   *  @brief A helper function to create a property ID for a given net, net property name and net property mode
+   */
+  static db::properties_id_type make_netname_propid (db::PropertiesRepository &pr, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, const db::Net &net);
+
 private:
   struct CellReuseTableKey
   {
@@ -1153,7 +1158,6 @@ private:
   void build_net_rec (const db::Net &net, cell_index_type circuit_cell, const std::map<unsigned int, const db::Region *> &lmap, const std::string &add_net_cell_name_prefix, db::properties_id_type netname_propid, const ICplxTrans &tr) const;
   void build_net_rec (const db::Net &net, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const std::string &add_net_cell_name_prefix, db::properties_id_type netname_propid, const ICplxTrans &tr) const;
   void build_net_rec (db::cell_index_type ci, size_t cid, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const Net *net, const std::string &add_net_cell_name_prefix, db::properties_id_type netname_propid, const ICplxTrans &tr) const;
-  db::properties_id_type make_netname_propid (db::Layout &ly, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, const db::Net &net) const;
 
   db::Layout &target () const
   {

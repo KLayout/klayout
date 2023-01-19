@@ -1558,7 +1558,7 @@ NetBuilder::build_net (db::Cell &target_cell, const db::Net &net, const std::map
 
   double mag = mp_source->internal_layout ()->dbu () / mp_target->dbu ();
 
-  db::properties_id_type netname_propid = make_netname_propid (target (), net_prop_mode, netname_prop, net);
+  db::properties_id_type netname_propid = make_netname_propid (target ().properties_repository (), net_prop_mode, netname_prop, net);
   build_net_rec (net, target_cell, lmap, std::string (), netname_propid, db::ICplxTrans (mag));
 }
 
@@ -1599,7 +1599,7 @@ NetBuilder::build_nets (const std::vector<const Net *> *nets, const std::map<uns
       }
 
       if (! nets || net_set.find (n.operator-> ()) != net_set.end ()) {
-        db::properties_id_type netname_propid = make_netname_propid (target (), prop_mode, netname_prop, *n);
+        db::properties_id_type netname_propid = make_netname_propid (target ().properties_repository (), prop_mode, netname_prop, *n);
         build_net_rec (*n, c->cell_index (), lmap, std::string (), netname_propid, db::ICplxTrans ());
       }
 
@@ -1628,7 +1628,7 @@ NetBuilder::build_nets (const std::vector<const Net *> *nets, const std::map<uns
               double dbu = mp_target->dbu ();
               db::ICplxTrans tr = db::CplxTrans (dbu).inverted () * subcircuit.trans () * db::CplxTrans (dbu);
 
-              db::properties_id_type netname_propid = make_netname_propid (target (), prop_mode, netname_prop, *n);
+              db::properties_id_type netname_propid = make_netname_propid (target ().properties_repository (), prop_mode, netname_prop, *n);
 
               build_net_rec (*n, c->cell_index (), lmap, subcircuit.expanded_name () + ":", netname_propid, tr);
 
@@ -1784,7 +1784,7 @@ NetBuilder::build_net_rec (const db::Net &net, db::cell_index_type circuit_cell,
 }
 
 db::properties_id_type
-NetBuilder::make_netname_propid (db::Layout &ly, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, const db::Net &net) const
+NetBuilder::make_netname_propid (db::PropertiesRepository &pr, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, const db::Net &net)
 {
   if (net_prop_mode == NPM_NoProperties) {
 
@@ -1796,12 +1796,12 @@ NetBuilder::make_netname_propid (db::Layout &ly, NetPropertyMode net_prop_mode, 
 
     //  add the user properties too (TODO: make this configurable?)
     for (db::Net::property_iterator p = net.begin_properties (); p != net.end_properties (); ++p) {
-      db::property_names_id_type key_propnameid = ly.properties_repository ().prop_name_id (p->first);
+      db::property_names_id_type key_propnameid = pr.prop_name_id (p->first);
       propset.insert (std::make_pair (key_propnameid, p->second));
     }
 
     if (! netname_prop.is_nil ()) {
-      db::property_names_id_type name_propnameid = ly.properties_repository ().prop_name_id (netname_prop);
+      db::property_names_id_type name_propnameid = pr.prop_name_id (netname_prop);
       if (net_prop_mode == NPM_NetNameAndIDOnly) {
         std::vector<tl::Variant> l;
         l.reserve (2);
@@ -1815,7 +1815,7 @@ NetBuilder::make_netname_propid (db::Layout &ly, NetPropertyMode net_prop_mode, 
       }
     }
 
-    return ly.properties_repository ().properties_id (propset);
+    return pr.properties_id (propset);
 
   } else {
 

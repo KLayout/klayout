@@ -373,6 +373,9 @@ void
 OriginalLayerRegion::apply_property_translator (const db::PropertiesTranslator &pt)
 {
   m_iter.apply_property_translator (pt);
+
+  m_merged_polygons_valid = false;
+  m_merged_polygons.clear ();
 }
 
 db::PropertiesRepository *

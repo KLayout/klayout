@@ -255,6 +255,9 @@ void
 OriginalLayerEdges::apply_property_translator (const db::PropertiesTranslator &pt)
 {
   m_iter.apply_property_translator (pt);
+
+  m_merged_edges_valid = false;
+  m_merged_edges.clear ();
 }
 
 db::PropertiesRepository *

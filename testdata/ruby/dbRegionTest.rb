@@ -1137,6 +1137,37 @@ class DBRegion_TestClass < TestBase
 
   end
 
+  # Check with properties
+  def test_check_with_properties
+
+    ly = RBA::Layout::new
+    tc = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+    l2 = ly.layer(2, 0)
+
+    p1 = ly.properties_id([ [ 1, 17 ] ])
+    p2 = ly.properties_id([ [ 1, 42 ] ])
+
+    tc.shapes(l1).insert(RBA::Box::new(RBA::Point::new(0, 0), RBA::Point::new(100, 200)), p1)
+    tc.shapes(l1).insert(RBA::Box::new(RBA::Point::new(200, 0), RBA::Point::new(300, 200)), p2)
+    tc.shapes(l1).insert(RBA::Box::new(RBA::Point::new(400, 0), RBA::Point::new(500, 200)))
+
+    tc.shapes(l2).insert(RBA::Box::new(RBA::Point::new(0, 250), RBA::Point::new(500, 300)), p1)
+
+    r = RBA::Region::new(tc.begin_shapes_rec(l1)).enable_properties
+    rr = RBA::Region::new(tc.begin_shapes_rec(l2)).enable_properties
+
+    assert_equal(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false).to_s, "(400,200;500,200)/(500,250;400,250);(0,200;100,200)/(100,250;0,250);(200,200;300,200)/(300,250;200,250)")
+    assert_equal(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::NoPropertyConstraint).to_s, "(400,200;500,200)/(500,250;400,250);(0,200;100,200)/(100,250;0,250);(200,200;300,200)/(300,250;200,250)")
+    assert_equal(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::SamePropertiesConstraint).to_s, "(0,200;100,200)/(100,250;0,250)")
+    assert_equal(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::DifferentPropertiesConstraint).to_s, "(400,200;500,200)/(500,250;400,250);(200,200;300,200)/(300,250;200,250)")
+
+    r.remove_properties
+    rr.remove_properties
+    assert_equal(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::SamePropertiesConstraint).to_s, "(0,200;100,200)/(100,250;0,250);(200,200;300,200)/(300,250;200,250);(400,200;500,200)/(500,250;400,250)")
+
+  end
+
 end
 
 load("test_epilogue.rb")

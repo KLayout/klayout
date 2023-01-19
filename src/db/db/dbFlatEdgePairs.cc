@@ -193,6 +193,8 @@ void FlatEdgePairs::apply_property_translator (const db::PropertiesTranslator &p
   db::Shapes new_edge_pairs (mp_edge_pairs->is_editable ());
   new_edge_pairs.assign (*mp_edge_pairs, pt);
   mp_edge_pairs->swap (new_edge_pairs);
+
+  invalidate_cache ();
 }
 
 db::PropertiesRepository *FlatEdgePairs::properties_repository ()

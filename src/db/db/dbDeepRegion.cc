@@ -484,6 +484,9 @@ DeepRegion::iter () const
 void DeepRegion::apply_property_translator (const db::PropertiesTranslator &pt)
 {
   DeepShapeCollectionDelegateBase::apply_property_translator (pt);
+
+  m_merged_polygons_valid = false;
+  m_merged_polygons = db::DeepLayer ();
 }
 
 db::PropertiesRepository *DeepRegion::properties_repository ()
@@ -740,6 +743,7 @@ DeepRegion::set_is_merged (bool f)
 {
   m_is_merged = f;
   m_merged_polygons_valid = false;
+  m_merged_polygons = db::DeepLayer ();
 }
 
 void

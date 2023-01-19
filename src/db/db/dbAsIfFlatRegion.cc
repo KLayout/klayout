@@ -1088,25 +1088,25 @@ AsIfFlatRegion::notch_check (db::Coord d, const RegionCheckOptions &options) con
 EdgePairsDelegate *
 AsIfFlatRegion::enclosing_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const
 {
-  return run_check (db::OverlapRelation, true, &other, d, options);
+  return run_check (db::OverlapRelation, true /*@@@false?*/, &other, d, options);
 }
 
 EdgePairsDelegate *
 AsIfFlatRegion::overlap_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const
 {
-  return run_check (db::WidthRelation, true, &other, d, options);
+  return run_check (db::WidthRelation, true /*@@@false?*/, &other, d, options);
 }
 
 EdgePairsDelegate *
 AsIfFlatRegion::separation_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const
 {
-  return run_check (db::SpaceRelation, true, &other, d, options);
+  return run_check (db::SpaceRelation, true /*@@@false?*/, &other, d, options);
 }
 
 EdgePairsDelegate *
 AsIfFlatRegion::inside_check (const Region &other, db::Coord d, const RegionCheckOptions &options) const
 {
-  return run_check (db::InsideRelation, true, &other, d, options);
+  return run_check (db::InsideRelation, true /*@@@false?*/, &other, d, options);
 }
 
 EdgePairsDelegate *

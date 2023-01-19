@@ -193,6 +193,8 @@ void FlatTexts::apply_property_translator (const db::PropertiesTranslator &pt)
   db::Shapes new_texts (mp_texts->is_editable ());
   new_texts.assign (*mp_texts, pt);
   mp_texts->swap (new_texts);
+
+  invalidate_cache ();
 }
 
 db::PropertiesRepository *FlatTexts::properties_repository ()

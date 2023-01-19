@@ -457,6 +457,9 @@ DeepEdges::iter () const
 void DeepEdges::apply_property_translator (const db::PropertiesTranslator &pt)
 {
   DeepShapeCollectionDelegateBase::apply_property_translator (pt);
+
+  m_merged_edges_valid = false;
+  m_merged_edges = db::DeepLayer ();
 }
 
 db::PropertiesRepository *DeepEdges::properties_repository ()
@@ -641,6 +644,7 @@ DeepEdges::set_is_merged (bool f)
 {
   m_is_merged = f;
   m_merged_edges_valid = false;
+  m_merged_edges = db::DeepLayer ();
 }
 
 void

@@ -1101,6 +1101,42 @@ class DBRegion_TestClass < TestBase
 
   end
 
+  # Bool with properties
+  def test_bool_with_properties
+
+    ly = RBA::Layout::new
+    tc = ly.create_cell("TOP")
+    l1 = ly.layer(1, 0)
+    l2 = ly.layer(2, 0)
+
+    p1 = ly.properties_id([ [ 1, 17 ] ])
+    p2 = ly.properties_id([ [ 1, 42 ] ])
+
+    tc.shapes(l1).insert(RBA::Box::new(RBA::Point::new(0, 0), RBA::Point::new(100, 200)), p1)
+    tc.shapes(l1).insert(RBA::Box::new(RBA::Point::new(200, 0), RBA::Point::new(300, 200)), p2)
+    tc.shapes(l1).insert(RBA::Box::new(RBA::Point::new(400, 0), RBA::Point::new(500, 200)))
+
+    tc.shapes(l2).insert(RBA::Box::new(RBA::Point::new(0, 0), RBA::Point::new(500, 50)), p1)
+    tc.shapes(l2).insert(RBA::Box::new(RBA::Point::new(0, 50), RBA::Point::new(500, 100)))
+
+    r = RBA::Region::new(tc.begin_shapes_rec(l1)).enable_properties
+    rr = RBA::Region::new(tc.begin_shapes_rec(l2)).enable_properties
+
+    assert_equal((r & rr).to_s, "(0,0;0,100;100,100;100,0);(200,0;200,100;300,100;300,0);(400,0;400,100;500,100;500,0)")
+    assert_equal(r.and(rr).to_s, "(0,0;0,100;100,100;100,0);(200,0;200,100;300,100;300,0);(400,0;400,100;500,100;500,0)")
+    assert_equal(r.and(rr, RBA::Region::NoPropertyConstraint).to_s, "(0,0;0,100;100,100;100,0);(200,0;200,100;300,100;300,0);(400,0;400,100;500,100;500,0)")
+    assert_equal(r.and(rr, RBA::Region::SamePropertiesConstraint).to_s, "(0,0;0,50;100,50;100,0);(400,50;400,100;500,100;500,50)")
+    assert_equal(r.and(rr, RBA::Region::DifferentPropertiesConstraint).to_s, "(0,50;0,100;100,100;100,50);(200,0;200,100;300,100;300,0);(400,0;400,50;500,50;500,0)")
+
+    assert_equal(r.not(rr).to_s, "(0,100;0,200;100,200;100,100);(200,100;200,200;300,200;300,100);(400,100;400,200;500,200;500,100)")
+    assert_equal(r.not(rr, RBA::Region::SamePropertiesConstraint).to_s, "(0,50;0,200;100,200;100,50);(400,100;400,200;500,200;500,100);(200,0;200,200;300,200;300,0);(400,0;400,50;500,50;500,0)")
+
+    r.remove_properties
+    rr.remove_properties
+    assert_equal(r.and(rr, RBA::Region::DifferentPropertiesConstraint).to_s, "")
+
+  end
+
 end
 
 load("test_epilogue.rb")

@@ -433,6 +433,7 @@ void LayoutToNetlist::mem_stat (MemStatistics *stat, MemStatistics::purpose_t pu
   db::mem_stat (stat, purpose, cat, m_dlrefs, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_named_regions, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_name_of_layer, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_region_by_original, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_joined_net_names, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_joined_net_names_per_cell, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_joined_nets, true, (void *) this);
@@ -537,11 +538,21 @@ db::Region *LayoutToNetlist::layer_by_name (const std::string &name)
 
 db::Region *LayoutToNetlist::layer_by_index (unsigned int index)
 {
-  std::map<unsigned int, std::string>::const_iterator n = m_name_of_layer.find (index);
+  auto n = m_name_of_layer.find (index);
   if (n == m_name_of_layer.end ()) {
     return 0;
   } else {
     return layer_by_name (n->second);
+  }
+}
+
+db::Region *LayoutToNetlist::layer_by_original (const ShapeCollectionDelegateBase *original_delegate)
+{
+  auto n = m_region_by_original.find (original_delegate);
+  if (n == m_region_by_original.end ()) {
+    return 0;
+  } else {
+    return new db::Region (new db::DeepRegion (n->second));
   }
 }
 
@@ -601,6 +612,7 @@ void LayoutToNetlist::register_layer (const ShapeCollection &collection, const s
   }
 
   m_named_regions [n] = dl;
+  m_region_by_original [collection.get_delegate ()] = dl;
   m_name_of_layer [dl.layer ()] = n;
 }
 

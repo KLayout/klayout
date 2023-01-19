@@ -47,6 +47,8 @@ class Edges;
 class EdgePairs;
 class Texts;
 class ShapeCollection;
+class NetBuilder;
+class LayoutToNetlist;
 
 /**
  *  @brief Represents a shape collection from the deep shape store
@@ -218,6 +220,16 @@ public:
   {
     check_dss ();
     return mp_store.get ();
+  }
+
+  /**
+   *  @brief Gets the non-const shape store object
+   *  This feature is intended for internal purposes.
+   */
+  DeepShapeStore *store_non_const () const
+  {
+    check_dss ();
+    return const_cast<DeepShapeStore *> (mp_store.get ());
   }
 
 private:
@@ -667,6 +679,37 @@ public:
    *  @brief Gets a value indicating whether the given index is a valid layout index
    */
   bool is_valid_layout_index (unsigned int n) const;
+
+  /**
+   *  @brief Gets the net builder object for a given layout index and LayoutToNetlist database
+   *
+   *  If no net builder is available, one will be created. Use \\has_net_builder to check whether one is
+   *  already created.
+   */
+  db::NetBuilder &net_builder_for (unsigned int layout_index, db::LayoutToNetlist *l2n);
+
+  /**
+   *  @brief Gets the net builder object for a given LayoutToNetlist database (requires the DSS to be singular)
+   */
+  db::NetBuilder &net_builder_for (db::LayoutToNetlist *l2n)
+  {
+    require_singular ();
+    return net_builder_for (0, l2n);
+  }
+
+  /**
+   *  @brief Gets a value indicating whether a net building is available
+   */
+  bool has_net_builder_for(unsigned int layout_index, db::LayoutToNetlist *l2n);
+
+  /**
+   *  @brief Gets the net builder object for a given LayoutToNetlist database (requires the DSS to be singular)
+   */
+  bool has_net_builder_for (db::LayoutToNetlist *l2n)
+  {
+    require_singular ();
+    return has_net_builder_for (0, l2n);
+  }
 
   /**
    *  @brief The deep shape store also keeps the number of threads to allocate for the hierarchical processor

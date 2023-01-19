@@ -27,66 +27,13 @@
 #include "dbCellMapping.h"
 #include "dbNetlistExtractor.h"
 #include "dbNetlistDeviceExtractor.h"
+#include "dbLayoutToNetlistEnums.h"
 #include "tlGlobPattern.h"
 
 namespace db
 {
 
 class NetlistBuilder;
-
-/**
- *  @brief An enum describing the way how net information is attached to shapes as properties in "build_nets"
- */
-enum NetPropertyMode
-{
-  /**
-   *  @brief Do no generate properties
-   */
-  NPM_NoProperties,
-
-  /**
-   *  @brief Attach all net properties plus the net name (if a "netname_prop" is specified to "build_nets")
-   */
-  NPM_AllProperties,
-
-  /**
-   *  @brief Attach net name only (if a "netname_prop" is specified to "build_nets")
-   */
-  NPM_NetNameOnly,
-
-  /**
-   *  @brief Like NetNameOnly, but use a unique net ID (db::Net address actually) instead of name
-   */
-  NPM_NetIDOnly,
-
-  /**
-   *  @brief Like NetNameOnly, but use a tuple of name and ID
-   */
-  NPM_NetNameAndIDOnly,
-};
-
-/**
- *  @brief An enum describing the way the net hierarchy is mapped
- */
-enum BuildNetHierarchyMode
-{
-  /**
-   *  @brief Flatten the net
-   *  Collects all shapes of a net and puts that into the net cell or circuit cell
-   */
-  BNH_Flatten = 0,
-  /**
-   *  @brief Build a net hierarchy adding cells for each subcircuit on the net
-   *  Uses the circuit_cell_prefix to build the subcircuit cell names
-   */
-  BNH_SubcircuitCells = 1,
-  /**
-   *  @brief No hierarchy
-   *  Just output the shapes of the net belonging to the circuit cell.
-   *  Connections are not indicated!
-   */
-  BNH_Disconnected = 2
-};
 
 /**
  *  @brief A generic framework for extracting netlists from layouts
@@ -352,6 +299,20 @@ public:
    *  be retrieved with this method.
    */
   db::Region *layer_by_index (unsigned int index);
+
+  /**
+   *  @brief Gets the internal layer from the original layer
+   */
+  db::Region *layer_by_original (const ShapeCollection &original_layer)
+  {
+    return layer_by_original (original_layer.get_delegate ());
+  }
+
+  /**
+   *  @brief Gets the layer from the original layer's delegate
+   *  Returns 0 if the original layer was not registered as an input_layer.
+   */
+  db::Region *layer_by_original (const ShapeCollectionDelegateBase *original_delegate);
 
   /**
    *  @brief Iterates over the layer indexes and names managed by this object (begin)
@@ -971,6 +932,7 @@ private:
   std::set<db::DeepLayer> m_dlrefs;
   std::map<std::string, db::DeepLayer> m_named_regions;
   std::map<unsigned int, std::string> m_name_of_layer;
+  std::map<const db::ShapeCollectionDelegateBase *, db::DeepLayer> m_region_by_original;
   bool m_netlist_extracted;
   bool m_is_flat;
   double m_device_scaling;

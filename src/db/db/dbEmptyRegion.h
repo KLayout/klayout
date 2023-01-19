@@ -150,6 +150,8 @@ public:
 
   virtual void insert_into (Layout *, db::cell_index_type, unsigned int) const { }
 
+  virtual RegionDelegate *nets (LayoutToNetlist *, NetPropertyMode, const tl::Variant &, const std::vector<const db::Net *> *) const { return new EmptyRegion (); }
+
 private:
   EmptyRegion &operator= (const EmptyRegion &other);
 };

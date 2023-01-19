@@ -35,8 +35,10 @@
 #include "dbGenericShapeIterator.h"
 #include "dbRegionLocalOperations.h"
 #include "dbHash.h"
+#include "dbLayoutToNetlistEnums.h"
 
 #include <list>
+#include <set>
 #include <unordered_set>
 
 namespace db {
@@ -46,6 +48,8 @@ class EdgeFilterBase;
 class EdgesDelegate;
 class EdgePairsDelegate;
 class CompoundRegionOperationNode;
+class LayoutToNetlist;
+class Net;
 
 /**
  *  @brief A base class for polygon filters
@@ -325,6 +329,8 @@ public:
   virtual bool less (const Region &other) const = 0;
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const = 0;
+
+  virtual RegionDelegate *nets (LayoutToNetlist *l2n, NetPropertyMode prop_mode, const tl::Variant &net_prop_name, const std::vector<const db::Net *> *net_filter) const = 0;
 
   const std::string &progress_desc () const
   {

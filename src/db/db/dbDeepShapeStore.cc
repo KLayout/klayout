@@ -33,6 +33,7 @@
 #include "dbDeepEdgePairs.h"
 #include "dbDeepTexts.h"
 #include "dbShapeCollection.h"
+#include "dbLayoutToNetlist.h"
 
 #include "tlTimer.h"
 
@@ -261,10 +262,31 @@ DeepLayer::check_dss () const
   }
 }
 
-// ----------------------------------------------------------------------------------
-
 struct DeepShapeStore::LayoutHolder
 {
+  class L2NStatusChangedListener
+    : public tl::Object
+  {
+  public:
+    L2NStatusChangedListener (DeepShapeStore::LayoutHolder *lh, db::LayoutToNetlist *l2n)
+      : mp_lh (lh), mp_l2n (l2n)
+    {
+      mp_l2n->status_changed_event ().add (this, &L2NStatusChangedListener::l2n_destroyed);
+    }
+
+  private:
+    void l2n_destroyed (gsi::ObjectBase::StatusEventType ev)
+    {
+      if (ev == gsi::ObjectBase::ObjectDestroyed) {
+        //  CAUTION: this will eventually delete *this!
+        mp_lh->remove_l2n (mp_l2n);
+      }
+    }
+
+    DeepShapeStore::LayoutHolder *mp_lh;
+    db::LayoutToNetlist *mp_l2n;
+  };
+
   LayoutHolder (const db::ICplxTrans &trans)
     : refs (0), layout (false), builder (&layout, trans)
   {
@@ -287,9 +309,34 @@ struct DeepShapeStore::LayoutHolder
     }
   }
 
+  bool has_net_builder_for (db::LayoutToNetlist *l2n) const
+  {
+    auto l = net_builders.find (l2n);
+    return (l != net_builders.end ());
+  }
+
+  db::NetBuilder &net_builder_for (db::Cell &top, db::LayoutToNetlist *l2n)
+  {
+    auto l = net_builders.find (l2n);
+    if (l == net_builders.end ()) {
+      //  @@@ what happens if layout is the same than used inside l2n (l2n has weak reference to same DSS)??
+      l = net_builders.insert (std::make_pair (l2n, std::make_pair (L2NStatusChangedListener (this, l2n), db::NetBuilder (&layout, l2n->cell_mapping_into (layout, top, false), l2n)))).first;
+    }
+    return l->second.second;
+  }
+
+  void remove_l2n (db::LayoutToNetlist *l2n)
+  {
+    auto l = net_builders.find (l2n);
+    if (l != net_builders.end ()) {
+      net_builders.erase (l);
+    }
+  }
+
   int refs;
   db::Layout layout;
   db::HierarchyBuilder builder;
+  std::map<db::LayoutToNetlist *, std::pair<L2NStatusChangedListener, db::NetBuilder> > net_builders;
   std::map<unsigned int, int> layer_refs;
 };
 
@@ -651,6 +698,18 @@ void
 DeepShapeStore::add_breakout_cells (unsigned int layout_index, const std::set<db::cell_index_type> &cc)
 {
   m_state.add_breakout_cells (layout_index, cc);
+}
+
+bool
+DeepShapeStore::has_net_builder_for (unsigned int layout_index, db::LayoutToNetlist *l2n)
+{
+  return m_layouts [layout_index]->has_net_builder_for (l2n);
+}
+
+db::NetBuilder &
+DeepShapeStore::net_builder_for (unsigned int layout_index, db::LayoutToNetlist *l2n)
+{
+  return m_layouts [layout_index]->net_builder_for (initial_cell (layout_index), l2n);
 }
 
 void DeepShapeStore::set_threads (int n)

@@ -76,6 +76,8 @@ public:
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
 
+  virtual RegionDelegate *nets (LayoutToNetlist *l2n, NetPropertyMode prop_mode, const tl::Variant &net_prop_name, const std::vector<const db::Net *> *net_filter) const;
+
 protected:
   virtual void merged_semantics_changed ();
   virtual void min_coherence_changed ();

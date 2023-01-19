@@ -262,6 +262,7 @@ HEADERS = \
   dbLayoutLayers.h \
   dbLayoutQuery.h \
   dbLayoutStateModel.h \
+  dbLayoutToNetlistEnums.h \
   dbLayoutUtils.h \
   dbLibrary.h \
   dbLibraryManager.h \

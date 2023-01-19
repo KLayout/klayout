@@ -1831,6 +1831,20 @@ public:
   }
 
   /**
+   *  @brief Pulls the net shapes from a LayoutToNetlist database
+   *
+   *  This will pull the net shapes from the LayoutToNetlist database, provided that this
+   *  layer was an input to the netlist extraction.
+   *
+   *  Netlist names will be attached as properties according to prop_mode and net_prop_name.
+   *  A net filter can be provided so that only certain nets are produced.
+   */
+  Region nets (LayoutToNetlist *l2n, NetPropertyMode prop_mode, const tl::Variant &net_prop_name, const std::vector<const db::Net *> *nets = 0) const
+  {
+    return Region (mp_delegate->nets (l2n, prop_mode, net_prop_name, nets));
+  }
+
+  /**
    *  @brief Delivers texts as dots (degenerated edges)
    *
    *  "pat" is a text selector. If "as_pattern" is true, this pattern will be

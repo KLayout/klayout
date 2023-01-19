@@ -41,6 +41,7 @@
 #include "dbRegionLocalOperations.h"
 #include "dbLocalOperationUtils.h"
 #include "dbCompoundOperation.h"
+#include "dbLayoutToNetlist.h"
 #include "tlTimer.h"
 
 namespace db
@@ -740,6 +741,30 @@ void
 DeepRegion::insert_into (db::Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
   deep_layer ().insert_into (layout, into_cell, into_layer);
+}
+
+RegionDelegate *
+DeepRegion::nets (LayoutToNetlist *l2n, NetPropertyMode prop_mode, const tl::Variant &net_prop_name, const std::vector<const db::Net *> *nets) const
+{
+  db::NetBuilder &net_builder = deep_layer ().store_non_const ()->net_builder_for (l2n);
+
+  if (&l2n->dss () != deep_layer ().store ()) {
+    throw tl::Exception (tl::to_string (tr ("Extracted netlist is from different scope as this layer - cannot pull net shapes")));
+  }
+
+  DeepLayer result = deep_layer ().derived ();
+
+  std::unique_ptr<db::Region> region_for_layer (l2n->layer_by_original (this));
+  if (! region_for_layer) {
+    throw tl::Exception (tl::to_string (tr ("The given layer is not an original layer used in netlist extraction")));
+  }
+
+  std::map<unsigned int, const db::Region *> lmap;
+  lmap.insert (std::make_pair (result.layer (), region_for_layer.get ()));
+
+  net_builder.build_nets (nets, lmap, prop_mode, net_prop_name);
+
+  return new db::DeepRegion (result);
 }
 
 RegionDelegate *

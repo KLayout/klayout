@@ -43,6 +43,7 @@ static unsigned int define_layer (db::Layout &ly, db::LayerMap &lmap, int gds_la
 TEST(0_Develop)
 {
   db::Layout ly;
+  db::DeepShapeStore dss;
   db::LayerMap lmap;
 
   unsigned int poly       = define_layer (ly, lmap, 7);
@@ -72,77 +73,57 @@ TEST(0_Develop)
   }
 
   db::Cell &tc = ly.cell (*ly.begin_top_down ());
-  db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
 
-  std::unique_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
-  std::unique_ptr<db::Region> rcont (l2n.make_polygon_layer (cont, "cont"));
-  std::unique_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
-  std::unique_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
-  std::unique_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
-  std::unique_ptr<db::Region> rvia2 (l2n.make_polygon_layer (via1, "via2"));
-  std::unique_ptr<db::Region> rmetal3 (l2n.make_polygon_layer (metal2, "metal3"));
-  std::unique_ptr<db::Region> rvia3 (l2n.make_polygon_layer (via1, "via3"));
-  std::unique_ptr<db::Region> rmetal4 (l2n.make_polygon_layer (metal2, "metal4"));
+  db::Region rpoly (db::RecursiveShapeIterator (ly, tc, poly), dss);
+  db::Region rcont (db::RecursiveShapeIterator (ly, tc, cont), dss);
+  db::Region rmetal1 (db::RecursiveShapeIterator (ly, tc, metal1), dss);
+  db::Region rvia1 (db::RecursiveShapeIterator (ly, tc, via1), dss);
+  db::Region rmetal2 (db::RecursiveShapeIterator (ly, tc, metal2), dss);
+  db::Region rvia2 (db::RecursiveShapeIterator (ly, tc, via2), dss);
+  db::Region rmetal3 (db::RecursiveShapeIterator (ly, tc, metal3), dss);
+  db::Region rvia3 (db::RecursiveShapeIterator (ly, tc, via3), dss);
+  db::Region rmetal4 (db::RecursiveShapeIterator (ly, tc, metal4), dss);
+
+  db::LayoutToNetlist l2n (&dss);
 
   //  net extraction
 
   //  Intra-layer
-  l2n.connect (*rpoly);
-  l2n.connect (*rcont);
-  l2n.connect (*rmetal1);
-  l2n.connect (*rvia1);
-  l2n.connect (*rmetal2);
-  l2n.connect (*rvia2);
-  l2n.connect (*rmetal3);
-  l2n.connect (*rvia3);
-  l2n.connect (*rmetal4);
+  l2n.connect (rpoly);
+  l2n.connect (rcont);
+  l2n.connect (rmetal1);
+  l2n.connect (rvia1);
+  l2n.connect (rmetal2);
+  l2n.connect (rvia2);
+  l2n.connect (rmetal3);
+  l2n.connect (rvia3);
+  l2n.connect (rmetal4);
   //  Inter-layer
-  l2n.connect (*rpoly,      *rcont);
-  l2n.connect (*rcont,       *rmetal1);
-  l2n.connect (*rmetal1,    *rvia1);
-  l2n.connect (*rvia1,      *rmetal2);
-  l2n.connect (*rmetal2,    *rvia2);
-  l2n.connect (*rvia2,      *rmetal3);
-  l2n.connect (*rmetal3,    *rvia3);
-  l2n.connect (*rvia3,      *rmetal4);
+  l2n.connect (rpoly,      rcont);
+  l2n.connect (rcont,      rmetal1);
+  l2n.connect (rmetal1,    rvia1);
+  l2n.connect (rvia1,      rmetal2);
+  l2n.connect (rmetal2,    rvia2);
+  l2n.connect (rvia2,      rmetal3);
+  l2n.connect (rmetal3,    rvia3);
+  l2n.connect (rvia3,      rmetal4);
 
   l2n.extract_netlist ();
 
-  //  ....
+  // @@@ TODO: beautify
+  db::Region rmetal1_nets = rmetal1.nets (&l2n, db::NPM_NetNameAndIDOnly, tl::Variant (1));
+  db::Region rmetal2_nets = rmetal2.nets (&l2n, db::NPM_NetNameAndIDOnly, tl::Variant (1));
 
-  db::Layout ly2;
-  ly2.dbu (l2n.internal_layout ()->dbu ());
-  db::Cell &top2 = ly2.cell (ly2.add_cell (ly.cell_name (tc.cell_index ())));
+  db::Region res1 = rmetal1_nets.bool_and (rmetal2_nets, db::SamePropertiesConstraint);
+  db::Region res2 = rmetal1_nets.bool_and (rmetal2_nets, db::DifferentPropertiesConstraint);
+  db::Region res3 = rmetal1_nets.bool_and (rmetal2_nets, db::NoPropertyConstraint);
 
-  db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, false /*without device cells*/);
+  rmetal1_nets.insert_into (&ly, tc.cell_index (), ly.insert_layer (db::LayerProperties (100, 0)));
+  rmetal2_nets.insert_into (&ly, tc.cell_index (), ly.insert_layer (db::LayerProperties (101, 0)));
 
-  std::map<unsigned int, const db::Region *> lmap_write;
-  unsigned int wpoly, wcont, wmetal1, wvia1, wmetal2;
-  lmap_write [wpoly = ly2.insert_layer (db::LayerProperties (7, 0))] = l2n.layer_by_name ("poly");
-  lmap_write [wcont = ly2.insert_layer (db::LayerProperties (14, 0))] = l2n.layer_by_name ("cont");
-  lmap_write [wmetal1 = ly2.insert_layer (db::LayerProperties (15, 0))] = l2n.layer_by_name ("metal1");
-  lmap_write [wvia1 = ly2.insert_layer (db::LayerProperties (16, 0))] = l2n.layer_by_name ("via1");
-  lmap_write [wmetal2 = ly2.insert_layer (db::LayerProperties (17, 0))] = l2n.layer_by_name ("metal2");
-
-  l2n.build_all_nets (cm, ly2, lmap_write, "NET_", db::NPM_NetNameAndIDOnly, tl::Variant (1), db::BNH_SubcircuitCells, "SC_", 0 /*don't produce devices*/);
-
-  unsigned int out1 = ly2.insert_layer (db::LayerProperties (1000, 0));
-  unsigned int out2 = ly2.insert_layer (db::LayerProperties (1001, 0));
-  unsigned int out3 = ly2.insert_layer (db::LayerProperties (1002, 0));
-
-  db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties> proc (&ly2, &top2);
-  {
-    db::BoolAndOrNotLocalOperationWithProperties n2n (true, &ly2.properties_repository (), &ly2.properties_repository (), &ly2.properties_repository (), db::SamePropertiesConstraint);
-    proc.run (&n2n, wmetal1, wmetal2, out1);
-  }
-  {
-    db::BoolAndOrNotLocalOperationWithProperties n2n (true, &ly2.properties_repository (), &ly2.properties_repository (), &ly2.properties_repository (), db::DifferentPropertiesConstraint);
-    proc.run (&n2n, wmetal1, wmetal2, out2);
-  }
-  {
-    db::BoolAndOrNotLocalOperationWithProperties n2n (true, &ly2.properties_repository (), &ly2.properties_repository (), &ly2.properties_repository (), db::NoPropertyConstraint);
-    proc.run (&n2n, wmetal1, wmetal2, out3);
-  }
+  res1.insert_into (&ly, tc.cell_index (), ly.insert_layer (db::LayerProperties (1000, 0)));
+  res2.insert_into (&ly, tc.cell_index (), ly.insert_layer (db::LayerProperties (1001, 0)));
+  res3.insert_into (&ly, tc.cell_index (), ly.insert_layer (db::LayerProperties (1002, 0)));
 
   {
     db::SaveLayoutOptions options;
@@ -151,6 +132,6 @@ TEST(0_Develop)
 
     tl::OutputStream stream (fn);
     db::Writer writer (options);
-    writer.write (ly2, stream);
+    writer.write (ly, stream);
   }
 }

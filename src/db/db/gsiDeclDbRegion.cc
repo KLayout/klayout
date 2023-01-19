@@ -526,6 +526,7 @@ static db::EdgePairs width2 (const db::Region *r, db::Region::distance_type d, b
 
 static db::EdgePairs space2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter, bool negative, db::PropertyConstraint prop_constraint)
 {
+  //  @@@ TODO: space intra-polygon with different properties constraint?? -> revert to "isolated"?
   return r->space_check (d, db::RegionCheckOptions (whole_edges,
                                             metrics,
                                             ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
@@ -539,7 +540,7 @@ static db::EdgePairs space2 (const db::Region *r, db::Region::distance_type d, b
                         );
 }
 
-static db::EdgePairs notch2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool negative, db::PropertyConstraint prop_constraint)
+static db::EdgePairs notch2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool negative)
 {
   return r->notch_check (d, db::RegionCheckOptions (whole_edges,
                                             metrics,
@@ -549,8 +550,7 @@ static db::EdgePairs notch2 (const db::Region *r, db::Region::distance_type d, b
                                             shielded,
                                             db::NoOppositeFilter,
                                             db::NoRectFilter,
-                                            negative,
-                                            prop_constraint)
+                                            negative)
                         );
 }
 
@@ -2597,7 +2597,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27.\n"
     "'property_constraint' has been added in version 0.28.4."
   ) +
-  method_ext ("notch_check", &notch2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("negative", false), gsi::arg ("property_constraint", db::IgnoreProperties),
+  method_ext ("notch_check", &notch2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("negative", false),
     "@brief Performs a space check between edges of the same polygon with options\n"
     "@param d The minimum space for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"

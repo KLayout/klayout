@@ -352,11 +352,16 @@ flatten_layer (db::DeepLayer &deep_layer)
     db::Cell &top_cell = layout.cell (*layout.begin_top_down ());
 
     db::Shapes flat_shapes (layout.is_editable ());
+
     for (db::RecursiveShapeIterator iter (layout, top_cell, deep_layer.layer ()); !iter.at_end (); ++iter) {
       if (iter->is_polygon ()) {
         db::Polygon poly;
         iter->polygon (poly);
-        flat_shapes.insert (db::PolygonRef (poly.transformed (iter.trans ()), layout.shape_repository ()));
+        if (! iter->prop_id ()) {
+          flat_shapes.insert (db::PolygonRef (poly.transformed (iter.trans ()), layout.shape_repository ()));
+        } else {
+          flat_shapes.insert (db::PolygonRefWithProperties (db::PolygonRef (poly.transformed (iter.trans ()), layout.shape_repository ()), iter->prop_id ()));
+        }
       }
     }
 

@@ -2444,6 +2444,46 @@ TEST(44_SizeWithProperties)
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au44.gds");
 }
 
+TEST(45_FlattenWithProperties)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_42.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+
+  db::RecursiveShapeIterator si1 (ly, top_cell, l1);
+  si1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  db::Region r1 (si1, dss);
+
+  db::RecursiveShapeIterator si2 (ly, top_cell, l2);
+  si2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  db::Region r2 (si2, dss);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r1);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1.flatten ());
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r2.flatten ());
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au45.gds");
+}
+
 TEST(100_Integration)
 {
   db::Layout ly;

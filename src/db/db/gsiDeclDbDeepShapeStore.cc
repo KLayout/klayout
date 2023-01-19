@@ -166,6 +166,21 @@ Class<db::DeepShapeStore> decl_dbDeepShapeStore ("db", "DeepShapeStore",
   gsi::method ("text_enlargement", &db::DeepShapeStore::text_enlargement,
     "@brief Gets the text enlargement value.\n"
   ) +
+  gsi::method ("subcircuit_hierarchy_for_nets=", &db::DeepShapeStore::set_subcircuit_hierarchy_for_nets, gsi::arg ("value"),
+    "@brief Sets a value indicating whether to build a subcircuit hierarchy per net\n"
+    "\n"
+    "\nThis flag is used to determine the way, net subcircuit hierarchies are built:\n"
+    "when true, subcells are created for subcircuits on a net. Otherwise the net\n"
+    "shapes are produced flat inside the cell they appear on.\n"
+    "\n"
+    "This attribute has been introduced in version 0.28.4"
+  ) +
+  gsi::method ("subcircuit_hierarchy_for_nets=", &db::DeepShapeStore::set_subcircuit_hierarchy_for_nets, gsi::arg ("value"),
+    "@brief Gets a value indicating whether to build a subcircuit hierarchy per net\n"
+    "See \\subcircuit_hierarchy_for_nets= for details.\n"
+    "\n"
+    "This attribute has been introduced in version 0.28.4"
+  ) +
   gsi::method ("clear_breakout_cells", &db::DeepShapeStore::clear_breakout_cells, gsi::arg ("layout_index"),
     "@brief Clears the breakout cells\n"
     "Breakout cells are a feature by which hierarchy handling can be disabled for specific cells. "

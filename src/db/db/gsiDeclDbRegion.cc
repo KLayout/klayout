@@ -35,6 +35,7 @@
 #include "dbFillTool.h"
 #include "dbRegionProcessors.h"
 #include "dbCompoundOperation.h"
+#include "dbLayoutToNetlist.h"
 #include "tlGlobPattern.h"
 
 #include "gsiDeclDbContainerHelpers.h"
@@ -734,6 +735,12 @@ fill_region_multi (const db::Region *fr, db::Cell *cell, db::cell_index_type fil
                    const db::Vector &fill_margin, db::Region *remaining_polygons, const db::Box &glue_box)
 {
   db::fill_region_repeat (cell, *fr, fill_cell_index, fc_box, row_step, column_step, fill_margin, remaining_polygons, glue_box);
+}
+
+static db::Region
+nets (const db::Region *region, db::LayoutToNetlist &l2n, const tl::Variant &net_prop_name, const std::vector<const db::Net *> *net_filter)
+{
+  return region->nets (l2n, net_prop_name.is_nil () ? db::NPM_NoProperties : db::NPM_NetNameAndIDOnly, net_prop_name, net_filter);
 }
 
 static db::Region
@@ -3032,6 +3039,20 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This method is equivalent to \\Cell#fill_region, but is based on Region (with the cell being the first parameter).\n"
     "\n"
     "This method has been introduced in version 0.27.\n"
+  ) +
+  gsi::method_ext ("nets", &nets, gsi::arg ("extracted"), gsi::arg ("net_prop_name", tl::Variant (), "nil"), gsi::arg ("net_filter"),
+    "@brief Pulls the net shapes from a LayoutToNetlist database\n"
+    "This method will pull the net shapes from the LayoutToNetlist database, provided that this "
+    "region was an input to the netlist extraction.\n"
+    "\n"
+    "A (net name, net id) tuple will be attached as properties to the shapes if 'net_prop_name' is given and not nil. "
+    "This allows generating unique properties per shape flagging the net the shape is on. This feature is good for "
+    "performing net-dependent booleans and DRC checks.\n"
+    "\n"
+    "A net filter can be provided with the 'net_filter' argument. If given, only nets from this "
+    "set are produced.\n"
+    "\n"
+    "This method was introduced in version 0.28.4"
   ) +
   gsi::make_property_methods<db::Region> ()
   ,

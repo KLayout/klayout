@@ -1027,33 +1027,21 @@ public:
    *
    *  Pass 0 to this string value to reset it.
    */
-  void set_net_cell_name_prefix (const char *s)
-  {
-    m_has_net_cell_name_prefix = (s != 0);
-    m_net_cell_name_prefix = std::string (s ? s : "");
-  }
+  void set_net_cell_name_prefix (const char *s);
 
   /**
    *  @brief Sets or resets the circuit cell name prefix
    *
    *  Pass 0 to this string value to reset it.
    */
-  void set_cell_name_prefix (const char *s)
-  {
-    m_has_cell_name_prefix = (s != 0);
-    m_cell_name_prefix = std::string (s ? s : "");
-  }
+  void set_cell_name_prefix (const char *s);
 
   /**
    *  @brief Sets or resets the device cell name prefix
    *
    *  Pass 0 to this string value to reset it.
    */
-  void set_device_cell_name_prefix (const char *s)
-  {
-    m_has_device_cell_name_prefix = (s != 0);
-    m_device_cell_name_prefix = std::string (s ? s : "");
-  }
+  void set_device_cell_name_prefix (const char *s);
 
   /**
    *  @brief See \LayoutToNetlist for details of this function
@@ -1103,7 +1091,7 @@ private:
     size_t cluster_id;
   };
 
-  typedef std::map<CellReuseTableKey, db::cell_index_type> cell_reuse_table_type;
+  typedef std::map<CellReuseTableKey, std::pair<db::cell_index_type, bool> > cell_reuse_table_type;
 
   tl::weak_ptr<db::Layout> mp_target;
   db::CellMapping m_cmap;
@@ -1120,6 +1108,7 @@ private:
   void build_net_rec (const db::Net &net, cell_index_type circuit_cell, const std::map<unsigned int, const db::Region *> &lmap, const std::string &add_net_cell_name_prefix, db::properties_id_type netname_propid, const ICplxTrans &tr) const;
   void build_net_rec (const db::Net &net, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const std::string &add_net_cell_name_prefix, db::properties_id_type netname_propid, const ICplxTrans &tr) const;
   void build_net_rec (db::cell_index_type ci, size_t cid, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const Net *net, const std::string &add_net_cell_name_prefix, db::properties_id_type netname_propid, const ICplxTrans &tr) const;
+  void prepare_build_nets () const;
 
   db::Layout &target () const
   {

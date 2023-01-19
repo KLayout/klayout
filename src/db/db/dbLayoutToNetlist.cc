@@ -1559,7 +1559,40 @@ NetBuilder::operator= (db::NetBuilder &&other)
 }
 
 void
-NetBuilder::build_net (db::Cell &target_cell, const db::Net &net, const std::map<unsigned int, const db::Region *> &lmap, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop) const
+NetBuilder::set_net_cell_name_prefix (const char *s)
+{
+  m_has_net_cell_name_prefix = (s != 0);
+  m_net_cell_name_prefix = std::string (s ? s : "");
+}
+
+void
+NetBuilder::set_cell_name_prefix (const char *s)
+{
+  bool has_cell_name_prefix = (s != 0);
+  std::string cell_name_prefix (s ? s : "");
+
+  if (has_cell_name_prefix != m_has_cell_name_prefix || cell_name_prefix != m_cell_name_prefix) {
+    m_reuse_table.clear ();
+    m_has_cell_name_prefix = has_cell_name_prefix;
+    m_cell_name_prefix = cell_name_prefix;
+  }
+}
+
+void
+NetBuilder::set_device_cell_name_prefix (const char *s)
+{
+  bool has_device_cell_name_prefix = (s != 0);
+  std::string device_cell_name_prefix (s ? s : "");
+
+  if (has_device_cell_name_prefix != m_has_device_cell_name_prefix || device_cell_name_prefix != m_device_cell_name_prefix) {
+    m_reuse_table.clear ();
+    m_has_device_cell_name_prefix = has_device_cell_name_prefix;
+    m_device_cell_name_prefix = device_cell_name_prefix;
+  }
+}
+
+void
+NetBuilder::prepare_build_nets () const
 {
   tl_assert (mp_target.get ());
   tl_assert (mp_source.get ());
@@ -1567,6 +1600,17 @@ NetBuilder::build_net (db::Cell &target_cell, const db::Net &net, const std::map
   if (! mp_source->is_netlist_extracted ()) {
     throw tl::Exception (tl::to_string (tr ("The netlist has not been extracted yet")));
   }
+
+  //  Resets the "initialized" flag so existing cells are reused but freshly filled
+  for (auto i = m_reuse_table.begin (); i != m_reuse_table.end (); ++i) {
+    i->second.second = false;
+  }
+}
+
+void
+NetBuilder::build_net (db::Cell &target_cell, const db::Net &net, const std::map<unsigned int, const db::Region *> &lmap, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop) const
+{
+  prepare_build_nets ();
 
   double mag = mp_source->internal_layout ()->dbu () / mp_target->dbu ();
 
@@ -1577,21 +1621,13 @@ NetBuilder::build_net (db::Cell &target_cell, const db::Net &net, const std::map
 void
 NetBuilder::build_all_nets (const std::map<unsigned int, const db::Region *> &lmap, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop) const
 {
-  tl_assert (mp_target.get ());
-  tl_assert (mp_source.get ());
-
   build_nets (0, lmap, net_prop_mode, netname_prop);
 }
 
 void
 NetBuilder::build_nets (const std::vector<const Net *> *nets, const std::map<unsigned int, const db::Region *> &lmap, NetPropertyMode prop_mode, const tl::Variant &netname_prop) const
 {
-  tl_assert (mp_target.get ());
-  tl_assert (mp_source.get ());
-
-  if (! mp_source->is_netlist_extracted ()) {
-    throw tl::Exception (tl::to_string (tr ("The netlist has not been extracted yet")));
-  }
+  prepare_build_nets ();
 
   std::set<const db::Net *> net_set;
   if (nets) {
@@ -1729,7 +1765,7 @@ NetBuilder::build_net_rec (db::cell_index_type ci, size_t cid, db::Cell &tc, con
 
     CellReuseTableKey cmap_key (subci, netname_propid, subcid);
 
-    cell_reuse_table_type::const_iterator cm = m_reuse_table.find (cmap_key);
+    cell_reuse_table_type::iterator cm = m_reuse_table.find (cmap_key);
     if (cm == m_reuse_table.end ()) {
 
       bool has_name_prefix = false;
@@ -1747,18 +1783,24 @@ NetBuilder::build_net_rec (db::cell_index_type ci, size_t cid, db::Cell &tc, con
         std::string cell_name = mp_source->internal_layout ()->cell_name (subci);
 
         db::cell_index_type target_ci = target ().add_cell ((name_prefix + cell_name).c_str ());
-        cm = m_reuse_table.insert (std::make_pair (cmap_key, target_ci)).first;
+        cm = m_reuse_table.insert (std::make_pair (cmap_key, std::make_pair (target_ci, true))).first;
 
         build_net_rec (subci, subcid, target ().cell (target_ci), lmap, 0, std::string (), netname_propid, tr_mag);
 
       } else {
-        cm = m_reuse_table.insert (std::make_pair (cmap_key, std::numeric_limits<db::cell_index_type>::max ())).first;
+        cm = m_reuse_table.insert (std::make_pair (cmap_key, std::make_pair (std::numeric_limits<db::cell_index_type>::max (), false))).first;
       }
+
+    } else if (!cm->second.second) {
+
+      //  initialize cell (after reuse of the net builder)
+      build_net_rec (subci, subcid, target ().cell (cm->second.first), lmap, 0, std::string (), netname_propid, tr_mag);
+      cm->second.second = true;
 
     }
 
-    if (cm->second != std::numeric_limits<db::cell_index_type>::max ()) {
-      db::CellInstArray ci (db::CellInst (cm->second), tr_wo_mag * c->inst_trans ());
+    if (cm->second.first != std::numeric_limits<db::cell_index_type>::max ()) {
+      db::CellInstArray ci (db::CellInst (cm->second.first), tr_wo_mag * c->inst_trans ());
       ci.transform_into (tr_mag);
       target_cell->insert (ci);
     }

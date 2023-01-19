@@ -319,10 +319,11 @@ struct DeepShapeStore::LayoutHolder
   {
     auto l = net_builders.find (l2n);
     if (l == net_builders.end ()) {
-      //  @@@ what happens if layout is the same than used inside l2n (l2n has weak reference to same DSS)??
       l = net_builders.insert (std::make_pair (l2n, std::make_pair (L2NStatusChangedListener (this, l2n), db::NetBuilder (&layout, l2n->cell_mapping_into (layout, top, false), l2n)))).first;
+      return l->second.second;
+    } else {
+      return l->second.second;
     }
-    return l->second.second;
   }
 
   void remove_l2n (db::LayoutToNetlist *l2n)
@@ -343,7 +344,7 @@ struct DeepShapeStore::LayoutHolder
 // ----------------------------------------------------------------------------------
 
 DeepShapeStoreState::DeepShapeStoreState ()
-  : m_threads (1), m_max_area_ratio (3.0), m_max_vertex_count (16), m_reject_odd_polygons (false), m_text_property_name (), m_text_enlargement (-1)
+  : m_threads (1), m_max_area_ratio (3.0), m_max_vertex_count (16), m_reject_odd_polygons (false), m_text_property_name (), m_text_enlargement (-1), m_subcircuit_hierarchy_for_nets (false)
 {
   //  .. nothing yet ..
 }
@@ -449,6 +450,19 @@ DeepShapeStoreState::max_vertex_count () const
 {
   return m_max_vertex_count;
 }
+
+void
+DeepShapeStoreState::set_subcircuit_hierarchy_for_nets (bool f)
+{
+  m_subcircuit_hierarchy_for_nets = f;
+}
+
+bool
+DeepShapeStoreState::subcircuit_hierarchy_for_nets () const
+{
+  return m_subcircuit_hierarchy_for_nets;
+}
+
 
 // ----------------------------------------------------------------------------------
 
@@ -670,6 +684,16 @@ const tl::Variant &DeepShapeStore::text_property_name () const
   return m_state.text_property_name ();
 }
 
+void DeepShapeStore::set_subcircuit_hierarchy_for_nets (bool f)
+{
+  m_state.set_subcircuit_hierarchy_for_nets (f);
+}
+
+bool DeepShapeStore::subcircuit_hierarchy_for_nets () const
+{
+  return m_state.subcircuit_hierarchy_for_nets ();
+}
+
 const std::set<db::cell_index_type> *
 DeepShapeStore::breakout_cells (unsigned int layout_index) const
 {
@@ -709,7 +733,16 @@ DeepShapeStore::has_net_builder_for (unsigned int layout_index, db::LayoutToNetl
 db::NetBuilder &
 DeepShapeStore::net_builder_for (unsigned int layout_index, db::LayoutToNetlist *l2n)
 {
-  return m_layouts [layout_index]->net_builder_for (initial_cell (layout_index), l2n);
+  db::NetBuilder &nb = m_layouts [layout_index]->net_builder_for (initial_cell (layout_index), l2n);
+
+  if (subcircuit_hierarchy_for_nets ()) {
+    nb.set_hier_mode (db::BNH_SubcircuitCells);
+    nb.set_cell_name_prefix ("X$$"); //  TODO: needs to be a configuration option?
+  } else {
+    nb.set_hier_mode (db::BNH_Flatten);
+  }
+
+  return nb;
 }
 
 void DeepShapeStore::set_threads (int n)

@@ -1839,9 +1839,9 @@ public:
    *  Netlist names will be attached as properties according to prop_mode and net_prop_name.
    *  A net filter can be provided so that only certain nets are produced.
    */
-  Region nets (LayoutToNetlist *l2n, NetPropertyMode prop_mode, const tl::Variant &net_prop_name, const std::vector<const db::Net *> *nets = 0) const
+  Region nets (LayoutToNetlist &l2n, NetPropertyMode prop_mode = db::NPM_NoProperties, const tl::Variant &net_prop_name = tl::Variant (0), const std::vector<const db::Net *> *nets = 0) const
   {
-    return Region (mp_delegate->nets (l2n, prop_mode, net_prop_name, nets));
+    return Region (mp_delegate->nets (&l2n, prop_mode, net_prop_name, nets));
   }
 
   /**

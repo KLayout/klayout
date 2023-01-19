@@ -274,6 +274,9 @@ public:
   void add_breakout_cell (unsigned int layout_index, db::cell_index_type ci);
   void add_breakout_cells (unsigned int layout_index, const std::set<db::cell_index_type> &cc);
 
+  void set_subcircuit_hierarchy_for_nets (bool f);
+  bool subcircuit_hierarchy_for_nets () const;
+
 private:
   int m_threads;
   double m_max_area_ratio;
@@ -282,6 +285,7 @@ private:
   tl::Variant m_text_property_name;
   std::vector<std::set<db::cell_index_type> > m_breakout_cells;
   int m_text_enlargement;
+  bool m_subcircuit_hierarchy_for_nets;
 
   std::set<db::cell_index_type> &ensure_breakout_cells (unsigned int layout_index)
   {
@@ -794,6 +798,20 @@ public:
    *  @brief Gets the text enlargement value
    */
   int text_enlargement () const;
+
+  /**
+   *  @brief Sets a value indicating whether to build a subcircuit hierarchy per net
+   *
+   *  This flag is used to determine the way, net subcircuit hierarchies are built:
+   *  when true, subcells are created for subcircuits on a net. Otherwise the net
+   *  shapes are produced flat inside the cell they appear on.
+   */
+  void set_subcircuit_hierarchy_for_nets (bool f);
+
+  /**
+   *  @brief Gets a value indicating whether to build a subcircuit hierarchy per net
+   */
+  bool subcircuit_hierarchy_for_nets () const;
 
   /**
    *  @brief Gets the breakout cells for a given layout

@@ -52,9 +52,9 @@ enum NetPropertyMode
   NPM_NetIDOnly,
 
   /**
-   *  @brief Like NetNameOnly, but use a tuple of name and ID
+   *  @brief Like NetNameOnly, but use a tuple of net and circuit name
    */
-  NPM_NetNameAndIDOnly,
+  NPM_NetQualifiedNameOnly,
 };
 
 /**

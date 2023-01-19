@@ -131,11 +131,11 @@ void run_test (tl::TestBase *_this, bool flat, bool flat_nets, const std::string
 
   l2n->extract_netlist ();
 
-  db::Region rmetal1_nets = rmetal1.nets (*l2n, db::NPM_NetNameAndIDOnly, tl::Variant (1));
+  db::Region rmetal1_nets = rmetal1.nets (*l2n, db::NPM_NetQualifiedNameOnly, tl::Variant (1));
   if (! flat) {
     EXPECT_EQ (dss.has_net_builder_for (0, l2n.get ()), true);
   }
-  db::Region rmetal2_nets = rmetal2.nets (*l2n, db::NPM_NetNameAndIDOnly, tl::Variant (1));
+  db::Region rmetal2_nets = rmetal2.nets (*l2n, db::NPM_NetQualifiedNameOnly, tl::Variant (1));
 
   db::Region res1 = rmetal1_nets.bool_and (rmetal2_nets, db::SamePropertiesConstraint);
   db::Region res2 = rmetal1_nets.bool_and (rmetal2_nets, db::DifferentPropertiesConstraint);

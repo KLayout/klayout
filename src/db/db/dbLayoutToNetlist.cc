@@ -158,9 +158,7 @@ db::Region *LayoutToNetlist::make_layer (const std::string &n)
   si.shape_flags (db::ShapeIterator::Nothing);
 
   std::unique_ptr <db::Region> region (new db::Region (si, dss ()));
-  if (! n.empty ()) {
-    register_layer (*region, n);
-  }
+  register_layer (*region, n);
   return region.release ();
 }
 
@@ -171,9 +169,7 @@ db::Region *LayoutToNetlist::make_layer (unsigned int layer_index, const std::st
   si.shape_flags (db::ShapeIterator::All);
 
   std::unique_ptr <db::Region> region (new db::Region (si, dss ()));
-  if (! n.empty ()) {
-    register_layer (*region, n);
-  }
+  register_layer (*region, n);
   return region.release ();
 }
 
@@ -184,9 +180,7 @@ db::Texts *LayoutToNetlist::make_text_layer (unsigned int layer_index, const std
   si.shape_flags (db::ShapeIterator::Texts);
 
   std::unique_ptr <db::Texts> texts (new db::Texts (si, dss ()));
-  if (! n.empty ()) {
-    register_layer (*texts, n);
-  }
+  register_layer (*texts, n);
   return texts.release ();
 }
 
@@ -197,9 +191,7 @@ db::Region *LayoutToNetlist::make_polygon_layer (unsigned int layer_index, const
   si.shape_flags (db::ShapeIterator::Paths | db::ShapeIterator::Polygons | db::ShapeIterator::Boxes);
 
   std::unique_ptr <db::Region> region (new db::Region (si, dss ()));
-  if (! n.empty ()) {
-    register_layer (*region, n);
-  }
+  register_layer (*region, n);
   return region.release ();
 }
 
@@ -434,6 +426,7 @@ void LayoutToNetlist::mem_stat (MemStatistics *stat, MemStatistics::purpose_t pu
   db::mem_stat (stat, purpose, cat, m_named_regions, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_name_of_layer, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_region_by_original, true, (void *) this);
+  db::mem_stat (stat, purpose, cat, m_region_of_layer, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_joined_net_names, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_joined_net_names_per_cell, true, (void *) this);
   db::mem_stat (stat, purpose, cat, m_joined_nets, true, (void *) this);
@@ -538,11 +531,11 @@ db::Region *LayoutToNetlist::layer_by_name (const std::string &name)
 
 db::Region *LayoutToNetlist::layer_by_index (unsigned int index)
 {
-  auto n = m_name_of_layer.find (index);
-  if (n == m_name_of_layer.end ()) {
+  auto n = m_region_of_layer.find (index);
+  if (n == m_region_of_layer.end ()) {
     return 0;
   } else {
-    return layer_by_name (n->second);
+    return new db::Region (new db::DeepRegion (n->second));
   }
 }
 
@@ -587,15 +580,18 @@ std::string LayoutToNetlist::name (const ShapeCollection &coll) const
   }
 }
 
-void LayoutToNetlist::register_layer (const ShapeCollection &collection, const std::string &n)
+void LayoutToNetlist::register_layer (const ShapeCollection &collection, const std::string &n_in)
 {
   if (m_region_by_original.find (tl::id_of (collection.get_delegate ())) != m_region_by_original.end ()) {
     throw tl::Exception (tl::to_string (tr ("The layer is already registered")));
   }
 
-  if (! n.empty () && m_named_regions.find (n) != m_named_regions.end ()) {
-    throw tl::Exception (tl::to_string (tr ("Layer name is already used: ")) + n);
+  if (! n_in.empty () && m_named_regions.find (n_in) != m_named_regions.end ()) {
+    throw tl::Exception (tl::to_string (tr ("Layer name is already used: ")) + n_in);
   }
+
+  //  Caution: this make create names which clash with future explicit names. Hopefully, the generated names are unique enough.
+  std::string n = n_in.empty () ? make_new_name () : n_in;
 
   db::DeepLayer dl;
 
@@ -612,11 +608,6 @@ void LayoutToNetlist::register_layer (const ShapeCollection &collection, const s
 
     } else {
 
-      if (is_persisted (collection)) {
-        std::string prev_name = name (collection);
-        m_named_regions.erase (prev_name);
-      }
-
       dl = delegate->deep_layer ();
 
     }
@@ -624,11 +615,9 @@ void LayoutToNetlist::register_layer (const ShapeCollection &collection, const s
   }
 
   m_region_by_original [tl::id_of (collection.get_delegate ())] = dl;
-
-  if (! n.empty ()) {
-    m_named_regions [n] = dl;
-    m_name_of_layer [dl.layer ()] = n;
-  }
+  m_region_of_layer [dl.layer ()] = dl;
+  m_named_regions [n] = dl;
+  m_name_of_layer [dl.layer ()] = n;
 }
 
 db::DeepLayer LayoutToNetlist::deep_layer_of (const db::ShapeCollection &coll) const
@@ -1882,11 +1871,11 @@ NetBuilder::make_netname_propid (db::PropertiesRepository &pr, NetPropertyMode n
 
     if (! netname_prop.is_nil ()) {
       db::property_names_id_type name_propnameid = pr.prop_name_id (netname_prop);
-      if (net_prop_mode == NPM_NetNameAndIDOnly) {
+      if (net_prop_mode == NPM_NetQualifiedNameOnly) {
         std::vector<tl::Variant> l;
         l.reserve (2);
         l.push_back (tl::Variant (net.expanded_name ()));
-        l.push_back (tl::Variant (reinterpret_cast <size_t> (&net)));
+        l.push_back (tl::Variant (net.circuit ()->name ()));
         propset.insert (std::make_pair (name_propnameid, tl::Variant (l)));
       } else if (net_prop_mode == NPM_NetIDOnly) {
         propset.insert (std::make_pair (name_propnameid, tl::Variant (reinterpret_cast <size_t> (&net))));

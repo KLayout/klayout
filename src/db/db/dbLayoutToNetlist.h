@@ -941,6 +941,7 @@ private:
   std::map<std::string, db::DeepLayer> m_named_regions;
   std::map<unsigned int, std::string> m_name_of_layer;
   std::map<tl::id_type, db::DeepLayer> m_region_by_original;
+  std::map<unsigned int, db::DeepLayer> m_region_of_layer;
   bool m_netlist_extracted;
   bool m_is_flat;
   double m_device_scaling;

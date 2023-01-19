@@ -747,7 +747,7 @@ fill_region_multi (const db::Region *fr, db::Cell *cell, db::cell_index_type fil
 static db::Region
 nets (const db::Region *region, db::LayoutToNetlist &l2n, const tl::Variant &net_prop_name, const std::vector<const db::Net *> *net_filter)
 {
-  return region->nets (l2n, net_prop_name.is_nil () ? db::NPM_NoProperties : db::NPM_NetNameAndIDOnly, net_prop_name, net_filter);
+  return region->nets (l2n, net_prop_name.is_nil () ? db::NPM_NoProperties : db::NPM_NetQualifiedNameOnly, net_prop_name, net_filter);
 }
 
 static db::Region

@@ -74,7 +74,7 @@ TEST(1_ReaderBasic)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_by_name ("via1");
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_by_name ("metal2");
 
-    l2n.build_all_nets (cm, ly2, lmap, "NET_", db::LayoutToNetlist::NoProperties, tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, "DEVICE_");
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_Disconnected, 0, "DEVICE_");
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
@@ -104,7 +104,7 @@ TEST(1_ReaderBasic)
 
     db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, nets);
 
-    l2n.build_nets (&nets, cm, ly2, lmap, "NET_", db::LayoutToNetlist::NoProperties, tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, "DEVICE_");
+    l2n.build_nets (&nets, cm, ly2, lmap, "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_Disconnected, 0, "DEVICE_");
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
@@ -134,7 +134,7 @@ TEST(1_ReaderBasic)
 
     db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, nets);
 
-    l2n.build_nets (&nets, cm, ly2, lmap, "NET_", db::LayoutToNetlist::NoProperties, tl::Variant (), db::LayoutToNetlist::BNH_Flatten, 0, "DEVICE_");
+    l2n.build_nets (&nets, cm, ly2, lmap, "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_Flatten, 0, "DEVICE_");
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
@@ -164,7 +164,7 @@ TEST(1_ReaderBasic)
 
     db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, nets);
 
-    l2n.build_nets (&nets, cm, ly2, lmap, "NET_", db::LayoutToNetlist::NoProperties, tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
+    l2n.build_nets (&nets, cm, ly2, lmap, "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
@@ -195,7 +195,7 @@ TEST(1_ReaderBasic)
 
     db::CellMapping cm = l2n.cell_mapping_into (ly2, top2, nets);
 
-    l2n.build_nets (&nets, cm, ly2, lmap, "NET_", db::LayoutToNetlist::NoProperties, tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", 0);
+    l2n.build_nets (&nets, cm, ly2, lmap, "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_SubcircuitCells, "CIRCUIT_", 0);
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
@@ -226,7 +226,7 @@ TEST(1_ReaderBasic)
 
     db::CellMapping cm = l2n.const_cell_mapping_into (ly2, top2);
 
-    l2n.build_nets (&nets, cm, ly2, lmap, "NET_", db::LayoutToNetlist::NoProperties, tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
+    l2n.build_nets (&nets, cm, ly2, lmap, "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
@@ -305,7 +305,7 @@ TEST(1c_ReaderBasicShortWithProps)
 
     db::CellMapping cm = l2n.cell_mapping_into (ly2, top2);
 
-    l2n.build_all_nets (cm, ly2, lmap, "NET_", db::LayoutToNetlist::AllProperties, tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, "DEVICE_");
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", db::NPM_AllProperties, tl::Variant (), db::BNH_Disconnected, 0, "DEVICE_");
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
@@ -361,7 +361,7 @@ TEST(2_ReaderWithGlobalNets)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_by_name ("via1");
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_by_name ("metal2");
 
-    l2n.build_all_nets (cm, ly2, lmap, "NET_", db::LayoutToNetlist::NoProperties, tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
@@ -417,7 +417,7 @@ TEST(3_ReaderAbsoluteCoordinates)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = l2n.layer_by_name ("via1");
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = l2n.layer_by_name ("metal2");
 
-    l2n.build_all_nets (cm, ly2, lmap, "NET_", db::LayoutToNetlist::NoProperties, tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
@@ -463,7 +463,7 @@ TEST(4_ReaderCombinedDevices)
 
     std::map<unsigned int, const db::Region *> lmap = l2n.create_layermap (ly2, 1000);
 
-    l2n.build_all_nets (cm, ly2, lmap, "NET_", db::LayoutToNetlist::NoProperties, tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");

@@ -32,6 +32,62 @@
 namespace db
 {
 
+class NetlistBuilder;
+
+/**
+ *  @brief An enum describing the way how net information is attached to shapes as properties in "build_nets"
+ */
+enum NetPropertyMode
+{
+  /**
+   *  @brief Do no generate properties
+   */
+  NPM_NoProperties,
+
+  /**
+   *  @brief Attach all net properties plus the net name (if a "netname_prop" is specified to "build_nets")
+   */
+  NPM_AllProperties,
+
+  /**
+   *  @brief Attach net name only (if a "netname_prop" is specified to "build_nets")
+   */
+  NPM_NetNameOnly,
+
+  /**
+   *  @brief Like NetNameOnly, but use a unique net ID (db::Net address actually) instead of name
+   */
+  NPM_NetIDOnly,
+
+  /**
+   *  @brief Like NetNameOnly, but use a tuple of name and ID
+   */
+  NPM_NetNameAndIDOnly,
+};
+
+/**
+ *  @brief An enum describing the way the net hierarchy is mapped
+ */
+enum BuildNetHierarchyMode
+{
+  /**
+   *  @brief Flatten the net
+   *  Collects all shapes of a net and puts that into the net cell or circuit cell
+   */
+  BNH_Flatten = 0,
+  /**
+   *  @brief Build a net hierarchy adding cells for each subcircuit on the net
+   *  Uses the circuit_cell_prefix to build the subcircuit cell names
+   */
+  BNH_SubcircuitCells = 1,
+  /**
+   *  @brief No hierarchy
+   *  Just output the shapes of the net belonging to the circuit cell.
+   *  Connections are not indicated!
+   */
+  BNH_Disconnected = 2
+};
+
 /**
  *  @brief A generic framework for extracting netlists from layouts
  *
@@ -704,60 +760,6 @@ public:
   void shapes_of_net (const db::Net &net, const db::Region &of_layer, bool recursive, db::Shapes &to, properties_id_type propid = 0) const;
 
   /**
-   *  @brief An enum describing the way how net information is attached to shapes as properties in "build_nets"
-   */
-  enum NetPropertyMode
-  {
-    /**
-     *  @brief Do no generate properties
-     */
-    NoProperties,
-
-    /**
-     *  @brief Attach all net properties plus the net name (if a "netname_prop" is specified to "build_nets")
-     */
-    AllProperties,
-
-    /**
-     *  @brief Attach net name only (if a "netname_prop" is specified to "build_nets")
-     */
-    NetNameOnly,
-
-    /**
-     *  @brief Like NetNameOnly, but use a unique net ID (db::Net address actually) instead of name
-     */
-    NetIDOnly,
-
-    /**
-     *  @brief Like NetNameOnly, but use a tuple of name and ID
-     */
-    NetNameAndIDOnly,
-  };
-
-  /**
-   *  @brief An enum describing the way the net hierarchy is mapped
-   */
-  enum BuildNetHierarchyMode
-  {
-    /**
-     *  @brief Flatten the net
-     *  Collects all shapes of a net and puts that into the net cell or circuit cell
-     */
-    BNH_Flatten = 0,
-    /**
-     *  @brief Build a net hierarchy adding cells for each subcircuit on the net
-     *  Uses the circuit_cell_prefix to build the subcircuit cell names
-     */
-    BNH_SubcircuitCells = 1,
-    /**
-     *  @brief No hierarchy
-     *  Just output the shapes of the net belonging to the circuit cell.
-     *  Connections are not indicated!
-     */
-    BNH_Disconnected = 2
-  };
-
-  /**
    *  @brief Builds a net representation in the given layout and cell
    *
    *  This method puts the shapes of a net into the given target cell using a variety of options
@@ -980,6 +982,133 @@ private:
   std::list<std::set<std::string> > m_joined_nets;
   std::list<std::pair<tl::GlobPattern, std::set<std::string> > > m_joined_nets_per_cell;
 
+  void init ();
+  void ensure_netlist ();
+  size_t search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<NetShape> &test_cluster, std::vector<db::InstElement> &rev_inst_path);
+  db::DeepLayer deep_layer_of (const ShapeCollection &coll) const;
+  void ensure_layout () const;
+  std::string make_new_name (const std::string &stem = std::string ());
+  db::CellMapping make_cell_mapping_into (db::Layout &layout, db::Cell &cell, const std::vector<const db::Net *> *nets, bool with_device_cells);
+  void connect_impl (const db::ShapeCollection &a, const db::ShapeCollection &b);
+  size_t connect_global_impl (const db::ShapeCollection &l, const std::string &gn);
+
+  //  implementation of NetlistManipulationCallbacks
+  virtual size_t link_net_to_parent_circuit (const Net *subcircuit_net, Circuit *parent_circuit, const DCplxTrans &trans);
+  virtual void link_nets (const db::Net *net, const db::Net *with);
+};
+
+/**
+ *  @brief An object building nets (net-to-layout)
+ *
+ *  This object can be used to persist netlist builder information - e.g. reusing net cells when building individual
+ *  layers from nets. In this case, build nets with a layer selection and call the build_net function many times.
+ */
+
+class DB_PUBLIC NetBuilder
+{
+public:
+  /**
+   *  @brief Default constructor
+   */
+  NetBuilder ();
+
+  /**
+   *  @brief Constructs a net builder with a target layout, a cell mapping table and a LayoutToNetlist source
+   *
+   *  @param target The target layout
+   *  @param cmap The cell mapping from the internal layout (inside LayoutToNetlist) to the target - use LayoutInfo::cell_mapping_into to generate this map
+   *  @param source The LayoutToNetlist source.
+   *
+   *  A cell map needs to be supplied only if intending to build many nets in hierarchical mode from multiple circuits.
+   */
+  NetBuilder (db::Layout *target, const db::CellMapping &cmap, const db::LayoutToNetlist *source);
+
+  /**
+   *  @brief Constructs a net builder with a source only
+   *
+   *  @param source The LayoutToNetlist source.
+   *
+   *  This net builder can be used to build single nets into dedicated target cells.
+   */
+  NetBuilder (db::Layout *target, const db::LayoutToNetlist *source);
+
+  /**
+   *  @brief Copy constructor
+   */
+  NetBuilder (const db::NetBuilder &other);
+
+  /**
+   *  @brief Move constructor
+   */
+  NetBuilder (db::NetBuilder &&other);
+
+  /**
+   *  @brief Assignment
+   */
+  NetBuilder &operator= (const db::NetBuilder &other);
+
+  /**
+   *  @brief Move
+   */
+  NetBuilder &operator= (db::NetBuilder &&other);
+
+  /**
+   *  @brief Sets the net-to-hierarchy generation mode
+   */
+  void set_hier_mode (BuildNetHierarchyMode hm)
+  {
+    m_hier_mode = hm;
+  }
+
+  /**
+   *  @brief Sets or resets the net cell name prefix
+   *
+   *  Pass 0 to this string value to reset it.
+   */
+  void set_net_cell_name_prefix (const char *s)
+  {
+    m_has_net_cell_name_prefix = (s != 0);
+    m_net_cell_name_prefix = std::string (s ? s : "");
+  }
+
+  /**
+   *  @brief Sets or resets the circuit cell name prefix
+   *
+   *  Pass 0 to this string value to reset it.
+   */
+  void set_cell_name_prefix (const char *s)
+  {
+    m_has_cell_name_prefix = (s != 0);
+    m_cell_name_prefix = std::string (s ? s : "");
+  }
+
+  /**
+   *  @brief Sets or resets the device cell name prefix
+   *
+   *  Pass 0 to this string value to reset it.
+   */
+  void set_device_cell_name_prefix (const char *s)
+  {
+    m_has_device_cell_name_prefix = (s != 0);
+    m_device_cell_name_prefix = std::string (s ? s : "");
+  }
+
+  /**
+   *  @brief See \LayoutToNetlist for details of this function
+   */
+  void build_net (db::Cell &target_cell, const db::Net &net, const std::map<unsigned int, const db::Region *> &lmap, NetPropertyMode prop_mode, const tl::Variant &netname_prop) const;
+
+  /**
+   *  @brief See \LayoutToNetlist for details of this function
+   */
+  void build_all_nets (const std::map<unsigned int, const db::Region *> &lmap, NetPropertyMode prop_mode, const tl::Variant &netname_prop) const;
+
+  /**
+   *  @brief See \LayoutToNetlist for details of this function
+   */
+  void build_nets (const std::vector<const Net *> *nets, const std::map<unsigned int, const db::Region *> &lmap, NetPropertyMode prop_mode, const tl::Variant &netname_prop) const;
+
+private:
   struct CellReuseTableKey
   {
     CellReuseTableKey (db::cell_index_type _cell_index, db::properties_id_type _netname_propid, size_t _cluster_id)
@@ -1009,23 +1138,27 @@ private:
 
   typedef std::map<CellReuseTableKey, db::cell_index_type> cell_reuse_table_type;
 
-  void init ();
-  void ensure_netlist ();
-  size_t search_net (const db::ICplxTrans &trans, const db::Cell *cell, const db::local_cluster<NetShape> &test_cluster, std::vector<db::InstElement> &rev_inst_path);
-  void build_net_rec (const db::Net &net, db::Layout &target, cell_index_type circuit_cell, const db::CellMapping &cmap, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, cell_reuse_table_type &reuse_table, const ICplxTrans &tr) const;
-  void build_net_rec (const db::Net &net, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, cell_reuse_table_type &reuse_table, const ICplxTrans &tr) const;
-  void build_net_rec (db::cell_index_type ci, size_t cid, db::Layout &target, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const Net *net, const char *net_cell_name_prefix, db::properties_id_type netname_propid, BuildNetHierarchyMode hier_mode, const char *cell_name_prefix, const char *device_cell_name_prefix, cell_reuse_table_type &reuse_table, const ICplxTrans &tr) const;
-  db::DeepLayer deep_layer_of (const ShapeCollection &coll) const;
-  void ensure_layout () const;
-  std::string make_new_name (const std::string &stem = std::string ());
-  db::properties_id_type make_netname_propid (db::Layout &ly, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, const db::Net &net) const;
-  db::CellMapping make_cell_mapping_into (db::Layout &layout, db::Cell &cell, const std::vector<const db::Net *> *nets, bool with_device_cells);
-  void connect_impl (const db::ShapeCollection &a, const db::ShapeCollection &b);
-  size_t connect_global_impl (const db::ShapeCollection &l, const std::string &gn);
+  tl::weak_ptr<db::Layout> mp_target;
+  db::CellMapping m_cmap;
+  tl::weak_ptr<db::LayoutToNetlist> mp_source;
+  mutable cell_reuse_table_type m_reuse_table;
+  BuildNetHierarchyMode m_hier_mode;
+  bool m_has_net_cell_name_prefix;
+  std::string m_net_cell_name_prefix;
+  bool m_has_cell_name_prefix;
+  std::string m_cell_name_prefix;
+  bool m_has_device_cell_name_prefix;
+  std::string m_device_cell_name_prefix;
 
-  //  implementation of NetlistManipulationCallbacks
-  virtual size_t link_net_to_parent_circuit (const Net *subcircuit_net, Circuit *parent_circuit, const DCplxTrans &trans);
-  virtual void link_nets (const db::Net *net, const db::Net *with);
+  void build_net_rec (const db::Net &net, cell_index_type circuit_cell, const std::map<unsigned int, const db::Region *> &lmap, const std::string &add_net_cell_name_prefix, db::properties_id_type netname_propid, const ICplxTrans &tr) const;
+  void build_net_rec (const db::Net &net, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const std::string &add_net_cell_name_prefix, db::properties_id_type netname_propid, const ICplxTrans &tr) const;
+  void build_net_rec (db::cell_index_type ci, size_t cid, db::Cell &target_cell, const std::map<unsigned int, const db::Region *> &lmap, const Net *net, const std::string &add_net_cell_name_prefix, db::properties_id_type netname_propid, const ICplxTrans &tr) const;
+  db::properties_id_type make_netname_propid (db::Layout &ly, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, const db::Net &net) const;
+
+  db::Layout &target () const
+  {
+    return const_cast<db::Layout &> (*mp_target);
+  }
 };
 
 /**

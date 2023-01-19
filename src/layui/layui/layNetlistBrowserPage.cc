@@ -1781,9 +1781,9 @@ NetlistBrowserPage::export_nets (const std::vector<const db::Net *> *nets)
 
     database->build_nets (nets, cm, target_layout, lm,
                           dialog->net_prefix ().empty () ? 0 : dialog->net_prefix ().c_str (),
-                          db::LayoutToNetlist::AllProperties,
+                          db::NPM_AllProperties,
                           dialog->net_propname (),
-                          dialog->produce_circuit_cells () ? db::LayoutToNetlist::BNH_SubcircuitCells : db::LayoutToNetlist::BNH_Flatten,
+                          dialog->produce_circuit_cells () ? db::BNH_SubcircuitCells : db::BNH_Flatten,
                           dialog->produce_circuit_cells () ? dialog->circuit_cell_prefix ().c_str () : 0,
                           dialog->produce_device_cells () ? dialog->device_cell_prefix ().c_str () : 0);
 

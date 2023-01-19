@@ -3040,7 +3040,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
-  gsi::method_ext ("nets", &nets, gsi::arg ("extracted"), gsi::arg ("net_prop_name", tl::Variant (), "nil"), gsi::arg ("net_filter"),
+  gsi::method_ext ("nets", &nets, gsi::arg ("extracted"), gsi::arg ("net_prop_name", tl::Variant (), "nil"), gsi::arg ("net_filter", (const std::vector<const db::Net *> *) (0), "nil"),
     "@brief Pulls the net shapes from a LayoutToNetlist database\n"
     "This method will pull the net shapes from the LayoutToNetlist database, provided that this "
     "region was an input to the netlist extraction.\n"

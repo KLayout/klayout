@@ -1817,7 +1817,7 @@ NetBuilder::build_net_rec (db::cell_index_type ci, size_t cid, db::Cell &tc, con
         cm = m_reuse_table.insert (std::make_pair (cmap_key, std::make_pair (std::numeric_limits<db::cell_index_type>::max (), false))).first;
       }
 
-    } else if (!cm->second.second) {
+    } else if (!cm->second.second && cm->second.first != std::numeric_limits<db::cell_index_type>::max ()) {
 
       //  initialize cell (after reuse of the net builder)
       build_net_rec (subci, subcid, target ().cell (cm->second.first), lmap, 0, std::string (), netname_propid, tr_mag);

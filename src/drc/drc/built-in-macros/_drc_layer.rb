@@ -3689,7 +3689,7 @@ CODE
     #         Double-bounded ranges are also available, like: "0.5 <= projecting < 2.0". @/li
     #   @li @b transparent @/b: performs the check without shielding (polygon layers only) @/li
     #   @li @b shielded @/b: performs the check with shielding (polygon layers only) @/li
-    #   @li @b props_eq @/b, @b props_ne @/b, @b props_copy @/b: (does not apply to width check) -
+    #   @li @b props_eq @/b, @b props_ne @/b, @b props_copy @/b: (only props_copy applies to width check) -
     #         see "Properties constraints" below.
     # @/ul
     #
@@ -3757,8 +3757,8 @@ CODE
     # @h3 Properties constraints (available on intra-polygon checks such as \space, \sep etc.) @/h3
     #
     # This feature is listed here, because this documentation is generic and used for other checks
-    # as well. It is not available on 'width' as it applies to intra-polygon checks - when
-    # pairs of different polygons are involved - something that width does not apply to.
+    # as well. \props_eq and \props_ne are not available on 'width' or 'notch' as these apply to intra-polygon checks - when
+    # pairs of different polygons are involved - something that 'width' or 'notch' does need.
     #
     # With properties constraints, the check is performed between shapes with the same
     # or different properties. "properties" refers to the full set of key/value pairs 
@@ -3783,6 +3783,8 @@ CODE
     # \props_copy is a special properties constraint that does not alter the behaviour of
     # the checks, but copies the primary shape's properties to the output markers
     # (a behaviour that is implied by \props_eq and \props_ne, but not there by default).
+    # This constraint is applicable to \width and \notch checks too. The effect is that
+    # the original polygon's properties are copied to the error markers.
     
     # %DRC%
     # @name space
@@ -4108,6 +4110,7 @@ CODE
           whole_edges = false
           other = nil
           shielded = nil
+          negative = false
           opposite_filter = RBA::Region::NoOppositeFilter
           rect_filter = RBA::Region::NoRectFilter
           prop_constraint = RBA::Region::IgnoreProperties
@@ -4118,6 +4121,8 @@ CODE
               metrics = a.value
             elsif a.is_a?(DRCWholeEdges)
               whole_edges = a.value
+            elsif a.is_a?(DRCNegative)
+              negative = true
             elsif a.is_a?(DRCPropertiesConstraint)
               prop_constraint = a.value
             elsif a.is_a?(DRCOppositeErrorFilter)
@@ -4152,15 +4157,19 @@ CODE
             if :#{f} != :width && :#{f} != :notch
               args << opposite_filter
               args << rect_filter
-              args << false  # negative
-              args << prop_constraint
-            elsif opposite_filter != RBA::Region::NoOppositeFilter
-              raise("An opposite error filter cannot be used with this check")
-            elsif rect_filter != RBA::Region::NoRectFilter
-              raise("A rectangle error filter cannot be used with this check")
-            elsif prop_constraint != RBA::Region::IgnoreProperties
-              raise("A properties constraint cannot be used with this check")
+            else
+              if opposite_filter != RBA::Region::NoOppositeFilter
+                raise("An opposite error filter cannot be used with this check")
+              elsif rect_filter != RBA::Region::NoRectFilter
+                raise("A rectangle error filter cannot be used with this check")
+              elsif prop_constraint != RBA::Region::IgnoreProperties && prop_constraint != RBA::Region::NoPropertyConstraint
+                raise("A specific properties constraint cannot be used with this check (only 'props_copy' can be used)")
+              end
             end
+            args << negative
+            args << prop_constraint
+          elsif negative
+            raise("Negative output can only be used for polygon layers")
           elsif shielded != nil
             raise("Shielding can only be used for polygon layers")
           elsif opposite_filter != RBA::Region::NoOppositeFilter

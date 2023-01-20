@@ -153,6 +153,12 @@ module DRC
     end
   end
   
+  # Negative output on checks
+  class DRCNegative
+    def initialize
+    end
+  end
+  
   # A wrapper for a pair of limit values
   # This class is used to identify projection limits for DRC
   # functions

@@ -73,11 +73,15 @@ l1_nets.space(1.0.um, projection).polygons.output(200, 0)
 l1_nets.space(1.0.um, projection, props_eq).polygons.output(201, 0)
 l1_nets.space(1.0.um, projection, props_ne).polygons.output(202, 0)
 l1_nets.space(1.0.um, projection, props_copy).polygons.output(203, 0)
+l1_nets.width(1.0.um, projection).polygons.output(204, 0)
+l1_nets.width(1.0.um, projection, props_copy).polygons.output(205, 0)
 
 l1_nets.drc(space(projection) < 1.0.um).polygons.output(210, 0)
 l1_nets.drc(space(projection) < 1.0.um, props_eq).polygons.output(211, 0)
 l1_nets.drc(space(projection) < 1.0.um, props_ne).polygons.output(212, 0)
 l1_nets.drc(space(projection) < 1.0.um, props_copy).polygons.output(213, 0)
+l1_nets.drc(width(projection) < 1.0.um).polygons.output(214, 0)
+l1_nets.drc(width(projection) < 1.0.um, props_copy).polygons.output(215, 0)
 
 # edge pair to edge/polygon conversion with properties
 
@@ -86,4 +90,14 @@ l1_nets.space(1.0.um, projection, props_copy).first_edges.output(221, 0)
 l1_nets.space(1.0.um, projection, props_copy).second_edges.output(222, 0)
 l1_nets.space(1.0.um, projection, props_copy).edges.output(223, 0)
 l1_nets.space(1.0.um, projection, props_copy).edges.extended_in(10.nm).output(224, 0)
+
+# sizing with properties
+
+l1_nets_sized = l1_nets.sized(0.2.um)
+l1_nets_sized.and(l1_nets_sized, props_ne).output(300, 0)   # overlap of different nets, same layer
+
+l1_nets.drc(primary.sized(0.2.um) & foreign.sized(0.2.um)).output(310, 0)
+l1_nets.drc(primary.sized(0.2.um) & foreign.sized(0.2.um), props_ne).output(311, 0)
+l1_nets.drc(primary.sized(0.2.um) & foreign.sized(0.2.um), props_eq).output(312, 0)
+l1_nets.drc(primary.sized(0.2.um) & foreign.sized(0.2.um), props_copy).output(313, 0)
 

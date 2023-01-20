@@ -319,6 +319,10 @@ module DRC
         DRCPropertiesConstraint::new(RBA::Region::NoPropertyConstraint)
       end
     end
+
+    def negative
+      DRCNegative::new
+    end
     
     def pattern(p)
       self._context("pattern") do

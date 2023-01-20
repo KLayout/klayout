@@ -1198,6 +1198,7 @@ EdgePairsDelegate *
 AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options) const
 {
   std::unique_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
+  db::PropertyMapper pm (result->properties_repository (), properties_repository ());
 
   EdgeRelationFilter check (rel, d, options.metrics);
   check.set_include_zero (false);
@@ -1206,18 +1207,16 @@ AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord 
   check.set_min_projection (options.min_projection);
   check.set_max_projection (options.max_projection);
 
-  edge2edge_check_negative_or_positive<db::FlatEdgePairs> edge_check (check, *result, options.negative, false /*=same polygons*/, false /*=same layers*/, options.shielded, true /*symmetric edge pairs*/);
-  poly2poly_check<db::Polygon> poly_check (edge_check);
+  for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
 
-  do {
+    edge2edge_check_negative_or_positive<db::Shapes> edge_check (check, result->raw_edge_pairs (), options.negative, false /*=same polygons*/, false /*=same layers*/, options.shielded, true /*symmetric edge pairs*/, options.prop_constraint == db::IgnoreProperties ? 0 : pm (p.prop_id ()));
+    poly2poly_check<db::Polygon> poly_check (edge_check);
 
-    size_t n = 0;
-    for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
-      poly_check.single (*p, n);
-      n += 2;
-    }
+    do {
+      poly_check.single (*p, 0);
+    } while (edge_check.prepare_next_pass ());
 
-  } while (edge_check.prepare_next_pass ());
+  }
 
   return result.release ();
 }

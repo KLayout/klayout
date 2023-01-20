@@ -409,13 +409,13 @@ public:
   typedef Iterator const_iterator;
 
   ShapesToOutputContainerAdaptor ()
-    : mp_shapes (0)
+    : mp_shapes (0), m_prop_id (0)
   {
     //  .. nothing yet ..
   }
 
-  ShapesToOutputContainerAdaptor (db::Shapes &shapes)
-    : mp_shapes (&shapes)
+  ShapesToOutputContainerAdaptor (db::Shapes &shapes, db::properties_id_type prop_id = 0)
+    : mp_shapes (&shapes), m_prop_id (prop_id)
   {
     //  .. nothing yet ..
   }
@@ -432,11 +432,16 @@ public:
 
   void insert (const db::Edge &edge)
   {
-    mp_shapes->insert (edge);
+    if (m_prop_id != 0) {
+      mp_shapes->insert (db::EdgeWithProperties (edge, m_prop_id));
+    } else {
+      mp_shapes->insert (edge);
+    }
   }
 
 private:
   db::Shapes *mp_shapes;
+  db::properties_id_type m_prop_id;
 };
 
 /**
@@ -445,13 +450,13 @@ private:
 struct DB_PUBLIC EdgeBooleanClusterCollectorToShapes
   : EdgeBooleanClusterCollector<ShapesToOutputContainerAdaptor>
 {
-  EdgeBooleanClusterCollectorToShapes (db::Shapes *output, EdgeBoolOp op)
-    : EdgeBooleanClusterCollector<ShapesToOutputContainerAdaptor> (&m_adaptor, op), m_adaptor (*output)
+  EdgeBooleanClusterCollectorToShapes (db::Shapes *output, EdgeBoolOp op, db::properties_id_type prop_id = 0)
+    : EdgeBooleanClusterCollector<ShapesToOutputContainerAdaptor> (&m_adaptor, op), m_adaptor (*output, prop_id)
   {
   }
 
-  EdgeBooleanClusterCollectorToShapes (db::Shapes *output, EdgeBoolOp op, db::Shapes *output2)
-    : EdgeBooleanClusterCollector<ShapesToOutputContainerAdaptor> (&m_adaptor, op, &m_adaptor2), m_adaptor (*output), m_adaptor2 (*output2)
+  EdgeBooleanClusterCollectorToShapes (db::Shapes *output, EdgeBoolOp op, db::Shapes *output2, db::properties_id_type prop_id = 0)
+    : EdgeBooleanClusterCollector<ShapesToOutputContainerAdaptor> (&m_adaptor, op, &m_adaptor2), m_adaptor (*output, prop_id), m_adaptor2 (*output2, prop_id)
   {
   }
 

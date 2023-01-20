@@ -97,6 +97,8 @@ Box FlatEdgePairs::compute_bbox () const
 EdgePairsDelegate *
 FlatEdgePairs::filter_in_place (const EdgePairFilterBase &filter)
 {
+  //  TODO: implement property support
+
   db::Shapes &ep = *mp_edge_pairs;
 
   edge_pair_iterator_type pw = ep.get_layer<db::EdgePair, db::unstable_layer_tag> ().begin ();
@@ -121,22 +123,22 @@ EdgePairsDelegate *FlatEdgePairs::add (const EdgePairs &other) const
   std::unique_ptr<FlatEdgePairs> new_edge_pairs (new FlatEdgePairs (*this));
   new_edge_pairs->invalidate_cache ();
 
+  db::PropertyMapper pm (new_edge_pairs->properties_repository (), &other.properties_repository ());
+
   const FlatEdgePairs *other_flat = dynamic_cast<const FlatEdgePairs *> (other.delegate ());
   if (other_flat) {
 
-    new_edge_pairs->raw_edge_pairs ().insert (other_flat->raw_edge_pairs ().get_layer<db::EdgePair, db::unstable_layer_tag> ().begin (), other_flat->raw_edge_pairs ().get_layer<db::EdgePair, db::unstable_layer_tag> ().end ());
+    new_edge_pairs->raw_edge_pairs ().insert (other_flat->raw_edge_pairs (), pm);
 
   } else {
 
-    size_t n = new_edge_pairs->raw_edge_pairs ().size ();
     for (EdgePairsIterator p (other.begin ()); ! p.at_end (); ++p) {
-      ++n;
-    }
-
-    new_edge_pairs->raw_edge_pairs ().reserve (db::EdgePair::tag (), n);
-
-    for (EdgePairsIterator p (other.begin ()); ! p.at_end (); ++p) {
-      new_edge_pairs->raw_edge_pairs ().insert (*p);
+      db::properties_id_type prop_id = pm (p.prop_id ());
+      if (prop_id != 0) {
+        new_edge_pairs->raw_edge_pairs ().insert (db::EdgePairWithProperties (*p, prop_id));
+      } else {
+        new_edge_pairs->raw_edge_pairs ().insert (*p);
+      }
     }
 
   }
@@ -150,22 +152,22 @@ EdgePairsDelegate *FlatEdgePairs::add_in_place (const EdgePairs &other)
 
   db::Shapes &ep = *mp_edge_pairs;
 
+  db::PropertyMapper pm (properties_repository (), &other.properties_repository ());
+
   const FlatEdgePairs *other_flat = dynamic_cast<const FlatEdgePairs *> (other.delegate ());
   if (other_flat) {
 
-    ep.insert (other_flat->raw_edge_pairs ().get_layer<db::EdgePair, db::unstable_layer_tag> ().begin (), other_flat->raw_edge_pairs ().get_layer<db::EdgePair, db::unstable_layer_tag> ().end ());
+    ep.insert (other_flat->raw_edge_pairs (), pm);
 
   } else {
 
-    size_t n = ep.size ();
     for (EdgePairsIterator p (other.begin ()); ! p.at_end (); ++p) {
-      ++n;
-    }
-
-    ep.reserve (db::EdgePair::tag (), n);
-
-    for (EdgePairsIterator p (other.begin ()); ! p.at_end (); ++p) {
-      ep.insert (*p);
+      db::properties_id_type prop_id = pm (p.prop_id ());
+      if (prop_id != 0) {
+        ep.insert (db::EdgePairWithProperties (*p, prop_id));
+      } else {
+        ep.insert (*p);
+      }
     }
 
   }
@@ -211,8 +213,15 @@ void
 FlatEdgePairs::insert_into_as_polygons (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer, db::Coord enl) const
 {
   db::Shapes &out = layout->cell (into_cell).shapes (into_layer);
+  db::PropertyMapper pm (&layout->properties_repository (), properties_repository ());
+
   for (EdgePairsIterator p (begin ()); ! p.at_end (); ++p) {
-    out.insert (p->normalized ().to_simple_polygon (enl));
+    db::properties_id_type prop_id = pm (p.prop_id ());
+    if (prop_id != 0) {
+      out.insert (db::SimplePolygonWithProperties (p->normalized ().to_simple_polygon (enl), prop_id));
+    } else {
+      out.insert (p->normalized ().to_simple_polygon (enl));
+    }
   }
 }
 

@@ -480,6 +480,8 @@ AsIfFlatEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, c
 {
   if (join) {
 
+    //  TODO: property support?
+
     std::unique_ptr<FlatRegion> output (new FlatRegion ());
     db::ShapeGenerator sg (output->raw_polygons (), false);
     JoinEdgesClusterCollector cluster_collector (&sg, ext_b, ext_e, ext_o, ext_i);
@@ -502,8 +504,15 @@ AsIfFlatEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, c
   } else {
 
     std::unique_ptr<FlatRegion> output (new FlatRegion ());
+    db::PropertyMapper pm (output->properties_repository (), properties_repository ());
+
     for (EdgesIterator e (begin_merged ()); ! e.at_end (); ++e) {
-      output->insert (extended_edge (*e, ext_b, ext_e, ext_o, ext_i));
+      db::properties_id_type prop_id = pm (e.prop_id ());
+      if (prop_id != 0) {
+        output->insert (db::PolygonWithProperties (extended_edge (*e, ext_b, ext_e, ext_o, ext_i), prop_id));
+      } else {
+        output->insert (extended_edge (*e, ext_b, ext_e, ext_o, ext_i));
+      }
     }
 
     return output.release ();

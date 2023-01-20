@@ -11,7 +11,7 @@ module DRC
     # %DRC%
     # @name drc
     # @brief Provides a generic DRC function for use with \DRC# expressions
-    # @synopsis layer.drc(expression)
+    # @synopsis layer.drc(expression [, prop_constraint ])
     #
     # This method implements the universal DRC which offers enhanced abilities,
     # improved performance in some applications and better readability.
@@ -378,6 +378,24 @@ module DRC
     # or the boolean operation. But when the "drc" function executes the loop over the primaries it will 
     # only compute the area once per primary as it is represented by the same Ruby object.
     #
+    # @h3 Properties constraints @/h3
+    #
+    # The method can be given a properties constraint so that it is only performed
+    # between shapes with the same or different user properties. Note that properties
+    # have to be enabled or generated (e.g. through the \nets method) before they can
+    # be used.
+    #
+    # Example:
+    #
+    # @code
+    # connect(metal1, via1)
+    # ... 
+    # 
+    # space_not_connected = metal1.nets.drc(space < 0.4.um, props_ne)
+    # @code
+    #
+    # See \global#prop_eq, \global#prop_ne and \global#prop_copy for details.
+    #
     # @h3 Outlook @/h3
     #
     # DRC expressions are quite rich and powerful. They provide a more intuitive way of
@@ -386,10 +404,11 @@ module DRC
     #
     # More formal details about the bits and pieces can be found in the "\DRC" class documentation.
 
-    def drc(op)
+    def drc(op, prop_constraint = DRCPropertiesConstraint::new(RBA::Region::IgnoreProperties))
       @engine._context("drc") do
         requires_region
         op.is_a?(DRCOpNode) || raise("A DRC expression is required for the argument (got #{op.inspect})")
+        prop_constraint.is_a?(DRCPropertiesConstraint) || raise("A properties constraint is required for the second argument (got #{prop_constraint.inspect})")
         node = op.create_node({})
         result_cls = nil
         if node.result_type == RBA::CompoundRegionOperationNode::ResultType::Region
@@ -400,7 +419,7 @@ module DRC
           result_cls = RBA::EdgePairs
         end
         if result_cls
-          DRCLayer::new(@engine, @engine._tcmd(self.data, node.distance, result_cls, :complex_op, node))
+          DRCLayer::new(@engine, @engine._tcmd(self.data, node.distance, result_cls, :complex_op, node, prop_constraint.value))
         end
       end
     end

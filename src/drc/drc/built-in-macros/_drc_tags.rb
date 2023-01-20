@@ -134,6 +134,24 @@ module DRC
       self.pattern = p
     end
   end
+
+  # A wrapper for a property name
+  # Use "prop(key)" to generate this tag.
+  class DRCPropertyName
+    attr_accessor :value
+    def initialize(k)
+      self.value = k
+    end
+  end
+  
+  # A wrapper for a property constraint
+  # Use "props_eq", "props_ne" or "props_copy" to generate this tag.
+  class DRCPropertiesConstraint
+    attr_accessor :value
+    def initialize(v)
+      self.value = v
+    end
+  end
   
   # A wrapper for a pair of limit values
   # This class is used to identify projection limits for DRC

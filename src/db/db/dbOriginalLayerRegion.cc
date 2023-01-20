@@ -419,6 +419,17 @@ OriginalLayerRegion::init ()
   m_merged_polygons_valid = false;
 }
 
+namespace {
+
+struct AssignProp
+{
+  AssignProp () : prop_id (0) { }
+  db::properties_id_type operator() (db::properties_id_type) { return prop_id; }
+  db::properties_id_type prop_id;
+};
+
+}
+
 void
 OriginalLayerRegion::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
@@ -438,8 +449,11 @@ OriginalLayerRegion::insert_into (Layout *layout, db::cell_index_type into_cell,
   //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
   //  lock the layout against updates while inserting
   db::LayoutLocker locker (layout);
+  AssignProp ap;
   for (db::RecursiveShapeIterator i = m_iter; !i.at_end (); ++i) {
-    sh.insert (*i, i.trans (), pm);
+    db::properties_id_type prop_id = i.prop_id ();
+    ap.prop_id = (prop_id != 0 ? pm (prop_id) : 0);
+    sh.insert (*i, i.trans (), ap);
   }
 }
 

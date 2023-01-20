@@ -1300,19 +1300,32 @@ DeepShapeStore::insert_as_polygons (const DeepLayer &deep_layer, db::Layout *int
 
       if (s->is_edge_pair ()) {
 
-        out.insert (s->edge_pair ().normalized ().to_simple_polygon (enl));
+        if (s->prop_id () != 0) {
+          out.insert (db::SimplePolygonWithProperties (s->edge_pair ().normalized ().to_simple_polygon (enl), s->prop_id ()));
+        } else {
+          out.insert (s->edge_pair ().normalized ().to_simple_polygon (enl));
+        }
 
       } else if (s->is_path () || s->is_polygon () || s->is_box ()) {
 
         db::Polygon poly;
         s->polygon (poly);
-        out.insert (poly);
+        if (s->prop_id () != 0) {
+          out.insert (db::PolygonWithProperties (poly, s->prop_id ()));
+        } else {
+          out.insert (poly);
+        }
 
       } else if (s->is_text ()) {
 
         db::Text t;
         s->text (t);
-        out.insert (db::SimplePolygon (t.box ().enlarged (db::Vector (enl, enl))));
+        db::SimplePolygon sp (t.box ().enlarged (db::Vector (enl, enl)));
+        if (s->prop_id () != 0) {
+          out.insert (db::SimplePolygonWithProperties (sp, s->prop_id ()));
+        } else {
+          out.insert (sp);
+        }
 
       }
 

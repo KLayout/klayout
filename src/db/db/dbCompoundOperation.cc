@@ -1548,6 +1548,11 @@ CompoundRegionCheckOperationNode::CompoundRegionCheckOperationNode (CompoundRegi
 {
   set_description ("check");
 
+  //  force different polygons in the different properties case to skip intra-polygon checks
+  if (m_options.prop_constraint == DifferentPropertiesConstraint) {
+    m_different_polygons = true;
+  }
+
   m_check.set_include_zero (false);
   m_check.set_whole_edges (options.whole_edges);
   m_check.set_ignore_angle (options.ignore_angle);

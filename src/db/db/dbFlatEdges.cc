@@ -110,19 +110,62 @@ FlatEdges::ensure_merged_edges_valid () const
 
     mp_merged_edges->clear ();
 
-    db::Shapes tmp (false);
-    EdgeBooleanClusterCollectorToShapes cluster_collector (&tmp, EdgeOr);
-
     db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
-    scanner.reserve (mp_edges->size ());
 
-    for (EdgesIterator e (begin ()); ! e.at_end (); ++e) {
-      if (! e->is_degenerate ()) {
-        scanner.insert (&*e, 0); 
+    //  count edges and reserve memory
+    size_t n = 0;
+    db::properties_id_type prop_id = 0;
+    bool need_split_props = false;
+    for (EdgesIterator s (begin ()); ! s.at_end (); ++s, ++n) {
+      if (n == 0) {
+        prop_id = s.prop_id ();
+      } else if (! need_split_props && prop_id != s.prop_id ()) {
+        need_split_props = true;
       }
     }
 
-    scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
+    db::Shapes tmp (false);
+
+    if (! need_split_props) {
+
+      EdgeBooleanClusterCollectorToShapes cluster_collector (&tmp, EdgeOr);
+
+      scanner.reserve (mp_edges->size ());
+
+      for (EdgesIterator e (begin ()); ! e.at_end (); ++e) {
+        if (! e->is_degenerate ()) {
+          scanner.insert (&*e, 0);
+        }
+      }
+
+      scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
+
+    } else {
+
+      std::map<db::properties_id_type, std::vector<const db::Edge *> > edges_by_props;
+
+      for (EdgesIterator e (begin ()); ! e.at_end (); ++e) {
+        if (! e->is_degenerate ()) {
+          edges_by_props [e.prop_id ()].push_back (e.operator-> ());
+        }
+      }
+
+      for (auto s2p = edges_by_props.begin (); s2p != edges_by_props.end (); ++s2p) {
+
+        EdgeBooleanClusterCollectorToShapes cluster_collector (&tmp, EdgeOr, s2p->first);
+
+        scanner.clear ();
+        scanner.reserve (s2p->second.size ());
+
+        for (auto s = s2p->second.begin (); s != s2p->second.end (); ++s) {
+          scanner.insert (*s, 0);
+        }
+
+        scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
+
+      }
+
+    }
 
     mp_merged_edges->swap (tmp);
     m_merged_edges_valid = true;

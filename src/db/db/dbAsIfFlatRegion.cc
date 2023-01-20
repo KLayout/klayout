@@ -1112,6 +1112,11 @@ AsIfFlatRegion::inside_check (const Region &other, db::Coord d, const RegionChec
 EdgePairsDelegate *
 AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const
 {
+  //  force different polygons in the different properties case to skip intra-polygon checks
+  if (options.prop_constraint == DifferentPropertiesConstraint) {
+    different_polygons = true;
+  }
+
   bool needs_merged_primary = different_polygons || options.needs_merged ();
 
   db::RegionIterator polygons (needs_merged_primary ? begin_merged () : begin ());
@@ -1172,7 +1177,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
 
     db::check_local_operation_with_properties<db::Polygon, db::Polygon> op (check, different_polygons, primary_is_merged, has_other, other_is_merged, options, output->properties_repository (), subject_pr, intruder_pr);
 
-    db::local_processor<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePair> proc;
+    db::local_processor<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePairWithProperties> proc;
     proc.set_base_verbosity (base_verbosity ());
     proc.set_description (progress_desc ());
     proc.set_report_progress (report_progress ());
@@ -1362,12 +1367,16 @@ AsIfFlatRegion::and_with (const Region &other, PropertyConstraint property_const
 
   } else if (property_constraint == db::IgnoreProperties && is_box () && other.is_box ()) {
 
+    //  @@@ TODO: implement this with property constraints as that is important for the clip implementation!
+
     //  Simplified handling for boxes
     db::Box b = bbox ();
     b &= other.bbox ();
     return region_from_box (b);
 
   } else if (property_constraint == db::IgnoreProperties && is_box () && ! other.strict_handling ()) {
+
+    //  @@@ TODO: implement this with property constraints as that is important for the clip implementation!
 
     //  map AND with box to clip ..
     db::Box b = bbox ();
@@ -1383,6 +1392,8 @@ AsIfFlatRegion::and_with (const Region &other, PropertyConstraint property_const
     return new_region.release ();
 
   } else if (property_constraint == db::IgnoreProperties && other.is_box () && ! strict_handling ()) {
+
+    //  @@@ TODO: implement this with property constraints as that is important for the clip implementation!
 
     //  map AND with box to clip ..
     db::Box b = other.bbox ();
@@ -1794,8 +1805,9 @@ AsIfFlatRegion::insert_into (Layout *layout, db::cell_index_type into_cell, unsi
 
   db::Shapes &shapes = layout->cell (into_cell).shapes (into_layer);
   for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
-    if (p.prop_id () != 0) {
-      shapes.insert (db::PolygonWithProperties (*p, pm (p.prop_id ())));
+    db::properties_id_type prop_id = p.prop_id ();
+    if (prop_id != 0) {
+      shapes.insert (db::PolygonWithProperties (*p, pm (prop_id)));
     } else {
       shapes.insert (*p);
     }

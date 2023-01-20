@@ -149,22 +149,23 @@ TEST(0_Basic)
   reg_copy.reset (0);
 
   std::unique_ptr<db::Region> reg2 (l2n.make_layer ());
-  EXPECT_EQ (l2n.name (1u), "");
-  EXPECT_EQ (l2n.name (*reg2), "");
+  EXPECT_EQ (l2n.name (1u), "$1");
+  EXPECT_EQ (l2n.name (*reg2), "$1");
   EXPECT_EQ (l2n.layer_of (*reg2), 1u);
   EXPECT_EQ (l2n.internal_layout ()->is_valid_layer (1), true);
   reg2.reset (0);
-  EXPECT_EQ (l2n.internal_layout ()->is_valid_layer (1), false);
+  //  NOTE: deleting the region does not free the layer as we hold it internally inside LayoutToNetlist
+  EXPECT_EQ (l2n.internal_layout ()->is_valid_layer (1), true);
 
   std::unique_ptr<db::Region> reg3 (l2n.make_layer ("l3"));
   EXPECT_EQ (l2n.name (*reg3), "l3");
-  EXPECT_EQ (l2n.layer_of (*reg3), 1u);
+  EXPECT_EQ (l2n.layer_of (*reg3), 2u);
 
   std::string s;
   for (db::LayoutToNetlist::layer_iterator l = l2n.begin_layers (); l != l2n.end_layers (); ++l) {
     s += tl::to_string (l->first) + ":" + l->second + ";";
   }
-  EXPECT_EQ (s, "0:l1;1:l3;");
+  EXPECT_EQ (s, "0:l1;1:$1;2:l3;");
 }
 
 TEST(1_BasicExtraction)

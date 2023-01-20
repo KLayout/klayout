@@ -1893,6 +1893,11 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
     return new db::DeepEdgePairs (deep_layer ().derived ());
   }
 
+  //  force different polygons in the different properties case to skip intra-polygon checks
+  if (options.prop_constraint == DifferentPropertiesConstraint) {
+    different_polygons = true;
+  }
+
   const db::DeepRegion *other_deep = 0;
   unsigned int other_layer = 0;
   bool other_is_merged = true;
@@ -1959,9 +1964,9 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 
     db::check_local_operation_with_properties<db::PolygonRef, db::PolygonRef> op (check, different_polygons, primary_is_merged, other_deep != 0, other_is_merged, options, res->properties_repository (), properties_repository (), other_deep ? other_deep->properties_repository () : &polygons.layout ().properties_repository ());
 
-    db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgePair> proc (subject_layout, subject_top,
-                                                                                                        intruder_layout, intruder_top,
-                                                                                                        subject_breakout_cells, intruder_breakout_cells);
+    db::local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgePairWithProperties> proc (subject_layout, subject_top,
+                                                                                                                intruder_layout, intruder_top,
+                                                                                                                subject_breakout_cells, intruder_breakout_cells);
 
     configure_proc (proc);
     proc.set_threads (polygons.store ()->threads ());

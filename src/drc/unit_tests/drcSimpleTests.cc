@@ -1396,3 +1396,8 @@ TEST(60d_issue1216)
 {
   run_test (_this, "60", true);
 }
+
+TEST(70_props)
+{
+  run_test (_this, "70", false);
+}

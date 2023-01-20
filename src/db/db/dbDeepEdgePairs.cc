@@ -473,7 +473,11 @@ RegionDelegate *DeepEdgePairs::polygons (db::Coord e) const
     for (db::Shapes::shape_iterator s = c->shapes (deep_layer ().layer ()).begin (db::ShapeIterator::EdgePairs); ! s.at_end (); ++s) {
       db::Polygon poly = s->edge_pair ().normalized ().to_polygon (e);
       if (poly.vertices () >= 3) {
-        output.insert (db::PolygonRef (poly, layout.shape_repository ()));
+        if (s->prop_id () != 0) {
+          output.insert (db::PolygonRefWithProperties (db::PolygonRef (poly, layout.shape_repository ()), s->prop_id ()));
+        } else {
+          output.insert (db::PolygonRef (poly, layout.shape_repository ()));
+        }
       }
     }
   }
@@ -491,10 +495,18 @@ EdgesDelegate *DeepEdgePairs::generic_edges (bool first, bool second) const
     for (db::Shapes::shape_iterator s = c->shapes (deep_layer ().layer ()).begin (db::ShapeIterator::EdgePairs); ! s.at_end (); ++s) {
       db::EdgePair ep = s->edge_pair ();
       if (first) {
-        output.insert (ep.first ());
+        if (s->prop_id () != 0) {
+          output.insert (db::EdgeWithProperties (ep.first (), s->prop_id ()));
+        } else {
+          output.insert (ep.first ());
+        }
       }
       if (second) {
-        output.insert (ep.second ());
+        if (s->prop_id () != 0) {
+          output.insert (db::EdgeWithProperties (ep.second (), s->prop_id ()));
+        } else {
+          output.insert (ep.second ());
+        }
       }
     }
   }

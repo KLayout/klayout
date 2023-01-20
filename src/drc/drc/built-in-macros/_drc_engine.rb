@@ -241,6 +241,85 @@ module DRC
       DRCRectangleErrorFilter::new(RBA::Region::FourSidesAllowed)
     end
     
+    def prop(k)
+      self._context("prop") do
+        DRCPropertyName::new(k)
+      end
+    end
+    
+    # %DRC%
+    # @brief Specifies "same properties" for operations supporting user properties constraints
+    # @name props_eq
+    # 
+    # Some operations such as boolean AND support properties constraints. By giving 
+    # a "props_eq" constraint, the operation is performed only on shapes with the same
+    # properties, where "properties" stands for the full set of key/value pairs.
+    # 
+    # Note that you have to enable properties explicitly or generate properties (e.g. 
+    # with the \DRCLayer#nets method).
+    #
+    # Example:
+    # 
+    # @code
+    # connect(metal1, via1)
+    # connect(via1, metal2)
+    # ... further connect statements
+    # 
+    # m1m2_overlap_connected = metal1.nets.and(metal2, props_eq) 
+    # @/code
+    #
+    # See also \props_ne.
+
+    # %DRC%
+    # @brief Specifies "different properties" for operations supporting user properties constraints
+    # @name props_ne
+    # 
+    # Some operations such as boolean AND support properties constraints. By giving 
+    # a "props_ne" constraint, the operation is performed only on shapes with different
+    # properties, where "properties" stands for the full set of key/value pairs.
+    # 
+    # Note that you have to enable properties explicitly or generate properties (e.g. 
+    # with the \DRCLayer#nets method).
+    #
+    # Example:
+    # 
+    # @code
+    # connect(metal1, via1)
+    # connect(via1, metal2)
+    # ... further connect statements
+    # 
+    # m1m2_overlap_not_connected = metal1.nets.and(metal2, props_ne)
+    # @/code
+    #
+    # See also \props_eq.
+
+    # %DRC%
+    # @brief Specifies "copy properties" on operations supporting user properties constraints
+    # @name props_copy
+    #
+    # This properties constraint does not constrain the operation, but instructs it to 
+    # attach the properties from the primary input to the output objects.
+    # 
+    # See also \props_ne and \props_eq.
+     
+    def props_eq
+      self._context("props_eq") do
+        DRCPropertiesConstraint::new(RBA::Region::SamePropertiesConstraint)
+      end
+    end
+    
+    def props_ne
+      self._context("props_ne") do
+        DRCPropertiesConstraint::new(RBA::Region::DifferentPropertiesConstraint)
+      end
+    end
+    
+    def props_copy
+      self._context("props_copy") do
+        DRCPropertiesConstraint::new(RBA::Region::NoPropertyConstraint)
+      end
+    end
+    
     def pattern(p)
       self._context("pattern") do
         DRCPattern::new(true, p)
@@ -2596,6 +2675,10 @@ CODE
       @dss
     end
 
+    def _default_netter
+      @netter 
+    end
+
     def _netter
       @netter ||= DRC::DRCNetter::new(self)
     end
@@ -2775,7 +2858,8 @@ CODE
         if cls == RBA::Region && clip && box
           # HACK: deep regions will always clip in the constructor, so skip this
           if ! @deep 
-            r &= RBA::Region::new(box)
+            # NOTE: NoPropertyConstraint will copy the original properties
+            r.and(RBA::Region::new(box), RBA::Region::NoPropertyConstraint)
           end
         end
       

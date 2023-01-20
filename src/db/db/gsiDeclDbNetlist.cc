@@ -1405,47 +1405,15 @@ static db::Pin *create_pin (db::Circuit *circuit, const std::string &name)
 }
 
 static std::vector<db::Net *>
-nets_by_name (db::Circuit *circuit, const std::string &name_pattern)
+nets_non_const (const std::vector<const db::Net *> &nc)
 {
-  std::vector<db::Net *> res;
-  if (! circuit) {
-    return res;
+  std::vector<db::Net *> n;
+  n.reserve (nc.size ());
+  for (auto i = nc.begin (); i != nc.end (); ++i) {
+    n.push_back (const_cast<db::Net *> (*i));
   }
 
-  tl::GlobPattern glob (name_pattern);
-  if (circuit->netlist ()) {
-    glob.set_case_sensitive (circuit->netlist ()->is_case_sensitive ());
-  }
-  for (db::Circuit::net_iterator n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
-    db::Net *net = n.operator-> ();
-    if (glob.match (net->name ())) {
-      res.push_back (net);
-    }
-  }
-
-  return res;
-}
-
-static std::vector<db::Net *>
-nets_by_name_from_netlist (db::Netlist *netlist, const std::string &name_pattern)
-{
-  std::vector<db::Net *> res;
-  if (! netlist) {
-    return res;
-  }
-
-  tl::GlobPattern glob (name_pattern);
-  glob.set_case_sensitive (netlist->is_case_sensitive ());
-  for (auto c = netlist->begin_circuits (); c != netlist->end_circuits (); ++c) {
-    for (auto n = c->begin_nets (); n != c->end_nets (); ++n) {
-      db::Net *net = n.operator-> ();
-      if (glob.match (net->name ())) {
-        res.push_back (net);
-      }
-    }
-  }
-
-  return res;
+  return n;
 }
 
 static std::vector<const db::Net *>
@@ -1470,6 +1438,12 @@ nets_by_name_const (const db::Circuit *circuit, const std::string &name_pattern)
   return res;
 }
 
+static std::vector<db::Net *>
+nets_by_name (db::Circuit *circuit, const std::string &name_pattern)
+{
+  return nets_non_const (nets_by_name_const (circuit, name_pattern));
+}
+
 static std::vector<const db::Net *>
 nets_by_name_const_from_netlist (const db::Netlist *netlist, const std::string &name_pattern)
 {
@@ -1483,13 +1457,20 @@ nets_by_name_const_from_netlist (const db::Netlist *netlist, const std::string &
   for (auto c = netlist->begin_circuits (); c != netlist->end_circuits (); ++c) {
     for (auto n = c->begin_nets (); n != c->end_nets (); ++n) {
       const db::Net *net = n.operator-> ();
-      if (glob.match (net->name ())) {
+      //  NOTE: we only pick root nets (pin_count == 0)
+      if (net->pin_count () == 0 && glob.match (net->name ())) {
         res.push_back (net);
       }
     }
   }
 
   return res;
+}
+
+static std::vector<db::Net *>
+nets_by_name_from_netlist (db::Netlist *netlist, const std::string &name_pattern)
+{
+  return nets_non_const (nets_by_name_const_from_netlist (netlist, name_pattern));
 }
 
 Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",

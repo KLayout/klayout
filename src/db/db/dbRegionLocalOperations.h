@@ -258,7 +258,7 @@ public:
 
 template <class TS, class TI>
 class check_local_operation_with_properties
-  : public local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::EdgePair>, public check_local_operation_base<TS, TI>
+  : public local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::EdgePairWithProperties>, public check_local_operation_base<TS, TI>
 {
 public:
   check_local_operation_with_properties (const EdgeRelationFilter &check, bool different_polygons, bool is_merged, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options, db::PropertiesRepository *target_pr, const db::PropertiesRepository *subject_pr, const db::PropertiesRepository *intruder_pr);
@@ -268,7 +268,7 @@ public:
   virtual bool requests_single_subjects () const { return true; }
   virtual std::string description () const;
 
-  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
+  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const;
 
 private:
   mutable db::PropertyMapper m_pms, m_pmi;

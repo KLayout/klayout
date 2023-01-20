@@ -524,22 +524,6 @@ static db::EdgePairs width2 (const db::Region *r, db::Region::distance_type d, b
                         );
 }
 
-static db::EdgePairs space2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter, bool negative, db::PropertyConstraint prop_constraint)
-{
-  //  @@@ TODO: space intra-polygon with different properties constraint?? -> revert to "isolated"?
-  return r->space_check (d, db::RegionCheckOptions (whole_edges,
-                                            metrics,
-                                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
-                                            min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
-                                            max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
-                                            shielded,
-                                            opposite,
-                                            rect_filter,
-                                            negative,
-                                            prop_constraint)
-                        );
-}
-
 static db::EdgePairs notch2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, bool negative)
 {
   return r->notch_check (d, db::RegionCheckOptions (whole_edges,
@@ -567,6 +551,21 @@ static db::EdgePairs isolated2 (const db::Region *r, db::Region::distance_type d
                                             negative,
                                             prop_constraint)
                            );
+}
+
+static db::EdgePairs space2 (const db::Region *r, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter, bool negative, db::PropertyConstraint prop_constraint)
+{
+  return r->space_check (d, db::RegionCheckOptions (whole_edges,
+                                            metrics,
+                                            ignore_angle.is_nil () ? 90 : ignore_angle.to_double (),
+                                            min_projection.is_nil () ? db::Region::distance_type (0) : min_projection.to<db::Region::distance_type> (),
+                                            max_projection.is_nil () ? std::numeric_limits<db::Region::distance_type>::max () : max_projection.to<db::Region::distance_type> (),
+                                            shielded,
+                                            opposite,
+                                            rect_filter,
+                                            negative,
+                                            prop_constraint)
+                        );
 }
 
 static db::EdgePairs inside2 (const db::Region *r, const db::Region &other, db::Region::distance_type d, bool whole_edges, db::metrics_type metrics, const tl::Variant &ignore_angle, const tl::Variant &min_projection, const tl::Variant &max_projection, bool shielded, db::OppositeFilter opposite, db::RectFilter rect_filter, bool negative, db::PropertyConstraint prop_constraint)

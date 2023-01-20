@@ -752,7 +752,7 @@ check_local_operation_with_properties<TS, TI>::check_local_operation_with_proper
 
 template <class TS, class TI>
 void
-check_local_operation_with_properties<TS, TI>::do_compute_local (db::Layout *layout, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+check_local_operation_with_properties<TS, TI>::do_compute_local (db::Layout *layout, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
 {
   tl_assert (results.size () == 1);
 
@@ -781,7 +781,9 @@ check_local_operation_with_properties<TS, TI>::do_compute_local (db::Layout *lay
       check_local_operation_base<TS, TI>::apply_rectangle_filter (subjects, result);
     }
 
-    results.front ().insert (result.begin (), result.end ());
+    for (auto r = result.begin (); r != result.end (); ++r) {
+      results.front ().insert (db::EdgePairWithProperties (*r, s2p->first));
+    }
 
   }
 }

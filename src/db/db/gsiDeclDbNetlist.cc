@@ -1455,10 +1455,11 @@ nets_by_name_const_from_netlist (const db::Netlist *netlist, const std::string &
   tl::GlobPattern glob (name_pattern);
   glob.set_case_sensitive (netlist->is_case_sensitive ());
   for (auto c = netlist->begin_circuits (); c != netlist->end_circuits (); ++c) {
+    bool is_top = (c->begin_parents () == c->end_parents ());
     for (auto n = c->begin_nets (); n != c->end_nets (); ++n) {
       const db::Net *net = n.operator-> ();
-      //  NOTE: we only pick root nets (pin_count == 0)
-      if (net->pin_count () == 0 && glob.match (net->name ())) {
+      //  NOTE: we only pick root nets (pin_count == 0 or in top cell)
+      if ((is_top || net->pin_count () == 0) && glob.match (net->name ())) {
         res.push_back (net);
       }
     }

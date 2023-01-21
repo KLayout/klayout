@@ -351,7 +351,7 @@ CODE
           @layout_var.cells(cell_filter).each do |cell|
             cell.shapes(tmp).insert(cell.bbox)
           end
-          layer = DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, [tmp], @sel, @box, @clip, @overlapping, RBA::Shapes::SAll, @global_trans, RBA::Region))
+          layer = DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, [tmp], @sel, @box, @clip, @overlapping, RBA::Shapes::SAll, @global_trans, [], RBA::Region))
         else
           layer = input
           layer.insert((RBA::DBox::from_ibox(@cell.bbox) * @layout.dbu).transformed(@global_trans))
@@ -555,7 +555,8 @@ CODE
 
     def make_layer
       layers = []
-      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SAll, @global_trans, RBA::Region))
+      prop_selectors = []
+      DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SAll, @global_trans, prop_selectors, RBA::Region))
     end
 
     # %DRC%

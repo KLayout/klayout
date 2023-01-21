@@ -1071,7 +1071,7 @@ public:
   /**
    *  @brief A helper function to create a property ID for a given net, net property name and net property mode
    */
-  static db::properties_id_type make_netname_propid (db::PropertiesRepository &pr, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, const db::Net &net);
+  static db::properties_id_type make_netname_propid (db::PropertiesRepository &pr, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, const db::Net &net, const std::string &net_name_prefix = std::string ());
 
 private:
   struct CellReuseTableKey

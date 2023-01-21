@@ -1691,9 +1691,10 @@ NetBuilder::build_nets (const std::vector<const Net *> *nets, const std::map<uns
               double dbu = mp_target->dbu ();
               db::ICplxTrans tr = db::CplxTrans (dbu).inverted () * subcircuit.trans () * db::CplxTrans (dbu);
 
-              db::properties_id_type netname_propid = make_netname_propid (target ().properties_repository (), prop_mode, netname_prop, *n);
+              std::string net_name_prefix = subcircuit.expanded_name () + ":";
+              db::properties_id_type netname_propid = make_netname_propid (target ().properties_repository (), prop_mode, netname_prop, *n, net_name_prefix);
 
-              build_net_rec (*n, c->cell_index (), lmap, subcircuit.expanded_name () + ":", netname_propid, tr);
+              build_net_rec (*n, c->cell_index (), lmap, net_name_prefix, netname_propid, tr);
 
             }
 
@@ -1853,7 +1854,7 @@ NetBuilder::build_net_rec (const db::Net &net, db::cell_index_type circuit_cell,
 }
 
 db::properties_id_type
-NetBuilder::make_netname_propid (db::PropertiesRepository &pr, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, const db::Net &net)
+NetBuilder::make_netname_propid (db::PropertiesRepository &pr, NetPropertyMode net_prop_mode, const tl::Variant &netname_prop, const db::Net &net, const std::string &net_name_prefix)
 {
   if (net_prop_mode == NPM_NoProperties) {
 
@@ -1874,13 +1875,13 @@ NetBuilder::make_netname_propid (db::PropertiesRepository &pr, NetPropertyMode n
       if (net_prop_mode == NPM_NetQualifiedNameOnly) {
         std::vector<tl::Variant> l;
         l.reserve (2);
-        l.push_back (tl::Variant (net.expanded_name ()));
+        l.push_back (tl::Variant (net_name_prefix + net.expanded_name ()));
         l.push_back (tl::Variant (net.circuit ()->name ()));
         propset.insert (std::make_pair (name_propnameid, tl::Variant (l)));
       } else if (net_prop_mode == NPM_NetIDOnly) {
         propset.insert (std::make_pair (name_propnameid, tl::Variant (reinterpret_cast <size_t> (&net))));
       } else {
-        propset.insert (std::make_pair (name_propnameid, tl::Variant (net.expanded_name ())));
+        propset.insert (std::make_pair (name_propnameid, tl::Variant (net_name_prefix + net.expanded_name ())));
       }
     }
 

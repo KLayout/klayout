@@ -312,7 +312,6 @@ private:
   mutable db::Box m_bbox;
 
   virtual db::Box compute_bbox () const;
-  static RegionDelegate *region_from_box (const db::Box &b);
   EdgePairsDelegate *space_or_isolated_check (db::Coord d, const RegionCheckOptions &options, bool isolated) const;
 };
 

@@ -34,6 +34,7 @@
 #include "dbCellGraphUtils.h"
 #include "dbTestSupport.h"
 #include "dbCompoundOperation.h"
+#include "dbFlatRegion.h"
 #include "tlUnitTest.h"
 #include "tlStream.h"
 
@@ -1736,6 +1737,38 @@ TEST(40_BoolWithProperties)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (51, 1)), r1.andnot (r3, db::SamePropertiesConstraintDrop).second);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (52, 1)), r1.andnot (r3, db::DifferentPropertiesConstraintDrop).first);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (53, 1)), r1.andnot (r3, db::DifferentPropertiesConstraintDrop).second);
+
+  db::Box clip (0, 8000, 10000, 15000);
+  db::Region clip_region;
+  clip_region.insert (clip);
+
+  db::Region clip_region_wp (new db::FlatRegion ());
+  db::property_names_id_type pn = clip_region_wp.properties_repository ().prop_name_id (1);
+  db::PropertiesRepository::properties_set ps;
+  ps.insert (std::make_pair (pn, 42));
+  db::properties_id_type pid42 = clip_region_wp.properties_repository ().properties_id (ps);
+  clip_region_wp.insert (db::BoxWithProperties (clip, pid42));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (60, 0)), r1.bool_and (clip_region));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (61, 0)), r1.bool_and (clip_region_wp));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (62, 0)), clip_region.bool_and (r1));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (63, 0)), clip_region_wp.bool_and (r1));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (64, 0)), clip_region_wp.bool_and (clip_region));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (65, 0)), clip_region_wp.bool_and (clip_region_wp));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (70, 0)), r1.bool_and (clip_region, db::SamePropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (71, 0)), r1.bool_and (clip_region_wp, db::SamePropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (72, 0)), clip_region.bool_and (r1, db::SamePropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (73, 0)), clip_region_wp.bool_and (r1, db::SamePropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (74, 0)), clip_region_wp.bool_and (clip_region, db::SamePropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (75, 0)), clip_region_wp.bool_and (clip_region_wp, db::SamePropertiesConstraint));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (80, 0)), r1.bool_and (clip_region, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (81, 0)), r1.bool_and (clip_region_wp, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (82, 0)), clip_region.bool_and (r1, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (83, 0)), clip_region_wp.bool_and (r1, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (84, 0)), clip_region_wp.bool_and (clip_region, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (85, 0)), clip_region_wp.bool_and (clip_region_wp, db::SamePropertiesConstraintDrop));
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au40.gds");

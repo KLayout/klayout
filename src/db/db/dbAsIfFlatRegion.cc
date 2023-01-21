@@ -75,6 +75,23 @@ private:
 
 }
 
+static
+RegionDelegate *region_from_box (const db::Box &b, const db::PropertiesRepository *pr, db::properties_id_type prop_id)
+{
+  if (! b.empty () && b.width () > 0 && b.height () > 0) {
+    FlatRegion *new_region = new FlatRegion ();
+    if (prop_id != 0) {
+      db::PropertyMapper pm (const_cast<db::PropertiesRepository *> (new_region->properties_repository ()), pr);
+      new_region->insert (db::BoxWithProperties (b, pm (prop_id)));
+    } else {
+      new_region->insert (b);
+    }
+    return new_region;
+  } else {
+    return new EmptyRegion ();
+  }
+}
+
 // -------------------------------------------------------------------------------------------------------------
 //  AsIfFlagRegion implementation
 
@@ -1248,18 +1265,6 @@ AsIfFlatRegion::merged (bool min_coherence, unsigned int min_wc) const
 }
 
 RegionDelegate *
-AsIfFlatRegion::region_from_box (const db::Box &b)
-{
-  if (! b.empty () && b.width () > 0 && b.height () > 0) {
-    FlatRegion *new_region = new FlatRegion ();
-    new_region->insert (b);
-    return new_region;
-  } else {
-    return new EmptyRegion ();
-  }
-}
-
-RegionDelegate *
 AsIfFlatRegion::sized (coord_type d, unsigned int mode) const
 {
   return sized (d, d, mode);
@@ -1273,11 +1278,11 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
     //  ignore empty
     return new EmptyRegion ();
 
-  } else if (is_box () && begin ()->prop_id () == 0 && mode >= 2) {
+  } else if (is_box () && mode >= 2) {
 
     //  simplified handling for a box
     db::Box b = bbox ().enlarged (db::Vector (dx, dy));
-    return region_from_box (b);
+    return region_from_box (b, properties_repository (), begin ()->prop_id ());
 
   } else if (! merged_semantics () || is_merged ()) {
 
@@ -1364,45 +1369,85 @@ AsIfFlatRegion::and_with (const Region &other, PropertyConstraint property_const
     //  Nothing to do
     return new EmptyRegion ();
 
-  } else if (pc_skip (property_constraint) && is_box () && other.is_box ()) {
+  } else if (is_box () && other.is_box ()) {
 
-    //  @@@ TODO: implement this with property constraints as that is important for the clip implementation!
+    if (pc_skip (property_constraint) || pc_match (property_constraint, begin ()->prop_id (), other.begin ().prop_id ())) {
 
-    //  Simplified handling for boxes
-    db::Box b = bbox ();
-    b &= other.bbox ();
-    return region_from_box (b);
+      //  Simplified handling for boxes
+      db::Box b = bbox ();
+      b &= other.bbox ();
 
-  } else if (pc_skip (property_constraint) && is_box () && ! other.strict_handling ()) {
+      db::properties_id_type prop_id_out = pc_norm (property_constraint, begin ()->prop_id ());
 
-    //  @@@ TODO: implement this with property constraints as that is important for the clip implementation!
+      return region_from_box (b, properties_repository (), prop_id_out);
+
+    } else {
+      return new EmptyRegion ();
+    }
+
+  } else if (is_box () && ! other.strict_handling ()) {
+
+    db::properties_id_type self_prop_id = pc_skip (property_constraint) ? 0 : begin ()->prop_id ();
 
     //  map AND with box to clip ..
     db::Box b = bbox ();
     std::unique_ptr<FlatRegion> new_region (new FlatRegion (false));
+    db::PropertyMapper pm (new_region->properties_repository (), properties_repository ());
+
+    db::properties_id_type prop_id_out = pm (pc_norm (property_constraint, self_prop_id));
 
     std::vector<db::Polygon> clipped;
     for (RegionIterator p (other.begin ()); ! p.at_end (); ++p) {
-      clipped.clear ();
-      clip_poly (*p, b, clipped);
-      new_region->raw_polygons ().insert (clipped.begin (), clipped.end ());
+
+      db::properties_id_type prop_id = p.prop_id ();
+      if (pc_match (property_constraint, self_prop_id, prop_id)) {
+
+        clipped.clear ();
+        clip_poly (*p, b, clipped);
+
+        if (prop_id_out == 0) {
+          new_region->raw_polygons ().insert (clipped.begin (), clipped.end ());
+        } else {
+          for (auto i = clipped.begin (); i != clipped.end (); ++i) {
+            new_region->raw_polygons ().insert (db::PolygonWithProperties (*i, prop_id_out));
+          }
+        }
+
+      }
+
     }
 
     return new_region.release ();
 
-  } else if (pc_skip (property_constraint) && other.is_box () && ! strict_handling ()) {
+  } else if (other.is_box () && ! strict_handling ()) {
 
-    //  @@@ TODO: implement this with property constraints as that is important for the clip implementation!
+    db::properties_id_type other_prop_id = pc_skip (property_constraint) ? 0 : other.begin ().prop_id ();
 
     //  map AND with box to clip ..
     db::Box b = other.bbox ();
     std::unique_ptr<FlatRegion> new_region (new FlatRegion (false));
+    db::PropertyMapper pm (new_region->properties_repository (), properties_repository ());
 
     std::vector<db::Polygon> clipped;
     for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
-      clipped.clear ();
-      clip_poly (*p, b, clipped);
-      new_region->raw_polygons ().insert (clipped.begin (), clipped.end ());
+
+      db::properties_id_type prop_id = p.prop_id ();
+      if (pc_match (property_constraint, prop_id, other_prop_id)) {
+
+        clipped.clear ();
+        clip_poly (*p, b, clipped);
+
+        db::properties_id_type prop_id_out = pm (pc_norm (property_constraint, prop_id));
+        if (prop_id_out == 0) {
+          new_region->raw_polygons ().insert (clipped.begin (), clipped.end ());
+        } else {
+          for (auto i = clipped.begin (); i != clipped.end (); ++i) {
+            new_region->raw_polygons ().insert (db::PolygonWithProperties (*i, prop_id_out));
+          }
+        }
+
+      }
+
     }
 
     return new_region.release ();

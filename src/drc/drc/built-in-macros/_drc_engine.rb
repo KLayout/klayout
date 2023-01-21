@@ -2902,7 +2902,7 @@ CODE
           # HACK: deep regions will always clip in the constructor, so skip this
           if ! @deep 
             # NOTE: NoPropertyConstraint will copy the original properties
-            r.and(RBA::Region::new(box), RBA::Region::NoPropertyConstraint)
+            r.and_with(RBA::Region::new(box), RBA::Region::NoPropertyConstraint)
           end
         end
       

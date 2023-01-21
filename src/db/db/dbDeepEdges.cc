@@ -513,6 +513,60 @@ public:
 
   db::Shapes &merged (size_t cid, db::cell_index_type ci, bool initial = true)
   {
+    return compute_merged (cid, ci, initial);
+  }
+
+  void erase (size_t cid, db::cell_index_type ci)
+  {
+    m_merged_cluster.erase (std::make_pair (cid, ci));
+    m_property_id_per_cluster.erase (std::make_pair (cid, ci));
+  }
+
+private:
+  std::map<std::pair<size_t, db::cell_index_type>, db::Shapes> m_merged_cluster;
+  std::map<std::pair<size_t, db::cell_index_type>, db::properties_id_type> m_property_id_per_cluster;
+  std::set<std::pair<size_t, db::cell_index_type> > m_done;
+  unsigned int m_layer;
+  const db::hier_clusters<db::Edge> *mp_hc;
+  db::box_scanner<db::Edge, size_t> m_scanner;
+
+  db::properties_id_type property_id (size_t cid, db::cell_index_type ci, bool initial)
+  {
+    std::map<std::pair<size_t, db::cell_index_type>, db::properties_id_type>::iterator s = m_property_id_per_cluster.find (std::make_pair (cid, ci));
+
+    //  some sanity checks: initial clusters are single-use, are never generated twice and cannot be retrieved again
+    if (initial) {
+      tl_assert (s == m_property_id_per_cluster.end ());
+    }
+
+    if (s != m_property_id_per_cluster.end ()) {
+      return s->second;
+    }
+
+    s = m_property_id_per_cluster.insert (std::make_pair (std::make_pair (cid, ci), db::properties_id_type (0))).first;
+
+    const db::connected_clusters<db::Edge> &cc = mp_hc->clusters_per_cell (ci);
+    const db::local_cluster<db::Edge> &c = cc.cluster_by_id (cid);
+
+    if (c.begin_attr () != c.end_attr ()) {
+
+      s->second = *c.begin_attr ();
+
+    } else {
+
+      const db::connected_clusters<db::Edge>::connections_type &conn = cc.connections_for_cluster (cid);
+      for (db::connected_clusters<db::Edge>::connections_type::const_iterator i = conn.begin (); i != conn.end () && s->second == db::properties_id_type (0); ++i) {
+        s->second = property_id (i->id (), i->inst_cell_index (), false);
+      }
+
+    }
+
+    return s->second;
+
+  }
+
+  db::Shapes &compute_merged (size_t cid, db::cell_index_type ci, bool initial)
+  {
     std::map<std::pair<size_t, db::cell_index_type>, db::Shapes>::iterator s = m_merged_cluster.find (std::make_pair (cid, ci));
 
     //  some sanity checks: initial clusters are single-use, are never generated twice and cannot be retrieved again
@@ -529,6 +583,8 @@ public:
 
     s = m_merged_cluster.insert (std::make_pair (std::make_pair (cid, ci), db::Shapes (false))).first;
 
+    db::properties_id_type prop_id = property_id (cid, ci, initial);
+
     const db::connected_clusters<db::Edge> &cc = mp_hc->clusters_per_cell (ci);
     const db::local_cluster<db::Edge> &c = cc.cluster_by_id (cid);
 
@@ -536,7 +592,7 @@ public:
 
     const db::connected_clusters<db::Edge>::connections_type &conn = cc.connections_for_cluster (cid);
     for (db::connected_clusters<db::Edge>::connections_type::const_iterator i = conn.begin (); i != conn.end (); ++i) {
-      const db::Shapes &cc_shapes = merged (i->id (), i->inst_cell_index (), false);
+      const db::Shapes &cc_shapes = compute_merged (i->id (), i->inst_cell_index (), false);
       merged_child_clusters.push_back (std::make_pair (&cc_shapes, i->inst_trans ()));
     }
 
@@ -562,18 +618,11 @@ public:
     //  .. and run the merge operation
 
     s->second.clear ();
-    EdgeBooleanClusterCollectorToShapes cluster_collector (&s->second, EdgeOr);
+    EdgeBooleanClusterCollectorToShapes cluster_collector (&s->second, EdgeOr, prop_id);
     m_scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
 
     return s->second;
   }
-
-private:
-  std::map<std::pair<size_t, db::cell_index_type>, db::Shapes> m_merged_cluster;
-  std::set<std::pair<size_t, db::cell_index_type> > m_done;
-  unsigned int m_layer;
-  const db::hier_clusters<db::Edge> *mp_hc;
-  db::box_scanner<db::Edge, size_t> m_scanner;
 };
 
 }
@@ -613,7 +662,7 @@ DeepEdges::ensure_merged_edges_valid () const
       hc.set_base_verbosity (base_verbosity() + 10);
       hc.build (layout, deep_layer ().initial_cell (), conn);
 
-      //  collect the clusters and merge them into big polygons
+      //  collect the clusters and merge them into larger edges
       //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is
       //  hopefully more efficient that collecting everything and will lead to reuse of parts.
 
@@ -627,7 +676,7 @@ DeepEdges::ensure_merged_edges_valid () const
           if (cc.is_root (*cl)) {
             db::Shapes &s = cm.merged (*cl, c->cell_index ());
             c->shapes (m_merged_edges.layer ()).insert (s);
-            s.clear (); //  not needed anymore
+            cm.erase (*cl, c->cell_index ()); //  not needed anymore
           }
         }
       }
@@ -1219,6 +1268,8 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
 
   if (join) {
 
+    //  TODO: property support
+
     db::hier_clusters<db::Edge> hc;
     db::Connectivity conn (db::Connectivity::EdgesConnectByPoints);
     conn.connect (edges);
@@ -1279,6 +1330,7 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
 
         PolygonRefToShapesGenerator prgen (&layout, out);
         for (db::Shapes::shape_iterator si = c->shapes (edges.layer ()).begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
+          prgen.set_prop_id (si->prop_id ());
           prgen.put (extended_edge (si->edge ().transformed (v->first), ext_b, ext_e, ext_o, ext_i).transformed (v->first.inverted ()));
         }
 

@@ -1413,6 +1413,72 @@ See <a href="/about/drc_ref_source.xml#polygons">Source#polygons</a> for a descr
 The primary input of the universal DRC function is the layer the <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> function
 is called on.
 </p>
+<a name="props_copy"/><h2>"props_copy" - Specifies "copy properties" on operations supporting user properties constraints</h2>
+<keyword name="props_copy"/>
+<p>
+This properties constraint does not constrain the operation, but instructs it to 
+attach the properties from the primary input to the output objects.
+</p><p>
+See also <a href="#props_ne">props_ne</a> and <a href="#props_eq">props_eq</a>.
+</p>
+<a name="props_eq"/><h2>"props_eq" - Specifies "same properties" for operations supporting user properties constraints</h2>
+<keyword name="props_eq"/>
+<p>
+Some operations such as boolean AND support properties constraints. By giving 
+a "props_eq" constraint, the operation is performed only on shapes with the same
+properties, where "properties" stands for the full set of key/value pairs.
+</p><p>
+Note that you have to enable properties explicitly or generate properties (e.g. 
+with the <a href="/about/drc_ref_drclayer.xml#nets">DRCLayer#nets</a> method).
+</p><p>
+Example:
+</p><p>
+<pre>
+connect(metal1, via1)
+connect(via1, metal2)
+... further connect statements
+
+m1m2_overlap_connected = metal1.nets.and(metal2, props_eq) 
+</pre>
+</p><p>
+"props_eq" can be combined with <a href="#props_copy">props_copy</a>. In this case, properties
+are transferred to the output shapes and can be used in further processing:
+</p><p>
+<pre>
+m1m2_overlap_connected = metal1.nets.and(metal2, props_eq + props_copy) 
+</pre>
+</p><p>
+See also <a href="#props_ne">props_ne</a>.
+</p>
+<a name="props_ne"/><h2>"props_ne" - Specifies "different properties" for operations supporting user properties constraints</h2>
+<keyword name="props_ne"/>
+<p>
+Some operations such as boolean AND support properties constraints. By giving 
+a "props_ne" constraint, the operation is performed only on shapes with different
+properties, where "properties" stands for the full set of key/value pairs.
+</p><p>
+Note that you have to enable properties explicitly or generate properties (e.g. 
+with the <a href="/about/drc_ref_drclayer.xml#nets">DRCLayer#nets</a> method).
+</p><p>
+Example:
+</p><p>
+<pre>
+connect(metal1, via1)
+connect(via1, metal2)
+... further connect statements
+
+m1m2_overlap_not_connected = metal1.nets.and(metal2, props_ne)
+</pre>
+</p><p>
+"props_ne" can be combined with <a href="#props_copy">props_copy</a>. In this case, properties
+are transferred to the output shapes and can be used in further processing:
+</p><p>
+<pre>
+m1m2_overlap_connected = metal1.nets.and(metal2, props_ne + props_copy) 
+</pre>
+</p><p>
+See also <a href="#props_eq">props_eq</a>.
+</p>
 <a name="rectangles"/><h2>"rectangles" - Selects all polygons which are rectangles</h2>
 <keyword name="rectangles"/>
 <p>Usage:</p>

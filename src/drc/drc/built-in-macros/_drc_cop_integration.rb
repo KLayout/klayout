@@ -382,7 +382,7 @@ module DRC
     #
     # The method can be given a properties constraint so that it is only performed
     # between shapes with the same or different user properties. Note that properties
-    # have to be enabled or generated (e.g. through the \nets method) before they can
+    # have to be enabled or generated (e.g. through the \DRCLayer#nets method) before they can
     # be used.
     #
     # Example:
@@ -392,9 +392,9 @@ module DRC
     # ... 
     # 
     # space_not_connected = metal1.nets.drc(space < 0.4.um, props_ne)
-    # @code
+    # @/code
     #
-    # See \global#prop_eq, \global#prop_ne and \global#prop_copy for details.
+    # See \global#props_eq, \global#props_ne and \global#props_copy for details.
     #
     # @h3 Outlook @/h3
     #

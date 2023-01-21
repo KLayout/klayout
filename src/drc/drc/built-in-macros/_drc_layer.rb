@@ -3690,7 +3690,7 @@ CODE
     #   @li @b transparent @/b: performs the check without shielding (polygon layers only) @/li
     #   @li @b shielded @/b: performs the check with shielding (polygon layers only) @/li
     #   @li @b props_eq @/b, @b props_ne @/b, @b props_copy @/b: (only props_copy applies to width check) -
-    #         see "Properties constraints" below.
+    #         see "Properties constraints" below. @/li
     # @/ul
     #
     # Note that without the angle_limit, acute corners will always be reported, since two 
@@ -3778,7 +3778,7 @@ CODE
     #
     # space_not_connected = metal1_nets.space(0.4.um, props_ne)
     # space_connected     = metal1_nets.space(0.4.um, props_eq)
-    # @code
+    # @/code
     #
     # \props_copy is a special properties constraint that does not alter the behaviour of
     # the checks, but copies the primary shape's properties to the output markers.
@@ -3790,7 +3790,7 @@ CODE
     # @code
     # space_not_connected = metal1_nets.space(0.4.um, props_ne + props_copy)
     # space_connected     = metal1_nets.space(0.4.um, props_eq + props_copy)
-    # @code
+    # @/code
     #
     
     # %DRC%
@@ -4882,7 +4882,7 @@ CODE
     end
 
     # %DRC%
-    # @name net
+    # @name nets
     # @brief Pulls net shapes from selected or all nets, optionally annotating nets with properties
     # @synopsis layer.nets
     # @synopsis layer.nets(net_filter)

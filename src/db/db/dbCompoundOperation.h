@@ -1658,7 +1658,7 @@ protected:
 
       for (size_t n = 0; n < results.size (); ++n) {
         for (auto i = results_wo_props [n].begin (); i != results_wo_props [n].end (); ++i) {
-          results [n].insert (db::object_with_properties<TR> (*i, s2p->first));
+          results [n].insert (db::object_with_properties<TR> (*i, pc_norm (m_prop_constraint, s2p->first)));
         }
       }
 

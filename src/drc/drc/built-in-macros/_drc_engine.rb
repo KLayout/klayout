@@ -267,6 +267,13 @@ module DRC
     # 
     # m1m2_overlap_connected = metal1.nets.and(metal2, props_eq) 
     # @/code
+    # 
+    # "props_eq" can be combined with \props_copy. In this case, properties
+    # are transferred to the output shapes and can be used in further processing:
+    #
+    # @code
+    # m1m2_overlap_connected = metal1.nets.and(metal2, props_eq + props_copy) 
+    # @/code
     #
     # See also \props_ne.
 
@@ -289,6 +296,13 @@ module DRC
     # ... further connect statements
     # 
     # m1m2_overlap_not_connected = metal1.nets.and(metal2, props_ne)
+    # @/code
+    #
+    # "props_ne" can be combined with \props_copy. In this case, properties
+    # are transferred to the output shapes and can be used in further processing:
+    #
+    # @code
+    # m1m2_overlap_connected = metal1.nets.and(metal2, props_ne + props_copy) 
     # @/code
     #
     # See also \props_eq.

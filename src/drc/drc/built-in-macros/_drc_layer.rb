@@ -3781,10 +3781,17 @@ CODE
     # @code
     #
     # \props_copy is a special properties constraint that does not alter the behaviour of
-    # the checks, but copies the primary shape's properties to the output markers
-    # (a behaviour that is implied by \props_eq and \props_ne, but not there by default).
+    # the checks, but copies the primary shape's properties to the output markers.
     # This constraint is applicable to \width and \notch checks too. The effect is that
     # the original polygon's properties are copied to the error markers.
+    # \props_copy can be combined with \props_eq and \props_ne to copy the original
+    # shape's properties to the output too:
+    #
+    # @code
+    # space_not_connected = metal1_nets.space(0.4.um, props_ne + props_copy)
+    # space_connected     = metal1_nets.space(0.4.um, props_eq + props_copy)
+    # @code
+    #
     
     # %DRC%
     # @name space

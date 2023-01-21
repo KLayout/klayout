@@ -3172,10 +3172,20 @@ gsi::EnumIn<db::Region, db::PropertyConstraint> decl_Region_PropertyConstraint (
     "When using this constraint - for example on a boolean operation - shapes are considered "
     "only if their user properties are the same. Properties are generated on the output shapes where applicable."
   ) +
+  gsi::enum_const ("SamePropertiesConstraintDrop", db::SamePropertiesConstraintDrop,
+    "@brief Specifies to consider shapes only if their user properties are the same\n"
+    "When using this constraint - for example on a boolean operation - shapes are considered "
+    "only if their user properties are the same. No properties are generated on the output shapes."
+  ) +
   gsi::enum_const ("DifferentPropertiesConstraint", db::DifferentPropertiesConstraint,
     "@brief Specifies to consider shapes only if their user properties are different\n"
     "When using this constraint - for example on a boolean operation - shapes are considered "
     "only if their user properties are different. Properties are generated on the output shapes where applicable."
+  ) +
+  gsi::enum_const ("DifferentPropertiesConstraintDrop", db::DifferentPropertiesConstraintDrop,
+    "@brief Specifies to consider shapes only if their user properties are different\n"
+    "When using this constraint - for example on a boolean operation - shapes are considered "
+    "only if their user properties are the same. No properties are generated on the output shapes."
   ),
   "@brief This class represents the property constraint for boolean and check functions.\n"
   "\n"

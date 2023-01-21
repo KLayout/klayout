@@ -341,9 +341,8 @@ separate_interactions_by_properties (const shape_interactions<db::object_with_pr
     for (auto ii = i->second.begin (); ii != i->second.end (); ++ii) {
 
       const std::pair<unsigned int, db::object_with_properties<TI> > &intruder = interactions.intruder_shape (*ii);
-      db::properties_id_type intruder_prop_id = (property_constraint == db::NoPropertyConstraint ? prop_id : pmi (intruder.second.properties_id ()));
 
-      if ((property_constraint == db::DifferentPropertiesConstraint) == (prop_id != intruder_prop_id)) {
+      if (pc_match (property_constraint, prop_id, pmi (intruder.second.properties_id ()))) {
         s2p.second.insert (&intruder.second);
       }
 
@@ -382,9 +381,8 @@ separate_interactions_to_interactions_by_properties (const shape_interactions<db
 
       const std::pair<unsigned int, db::object_with_properties<TI> > &intruder = interactions.intruder_shape (*ii);
       tl_assert (intruder.first < (unsigned int) pmis.size ());
-      db::properties_id_type intruder_prop_id = (property_constraint == db::NoPropertyConstraint ? prop_id : pmis[intruder.first] (intruder.second.properties_id ()));
 
-      if ((property_constraint == db::DifferentPropertiesConstraint) == (prop_id != intruder_prop_id)) {
+      if (pc_match (property_constraint, prop_id, pmis[intruder.first] (intruder.second.properties_id ()))) {
         s2p.add_interaction (i->first, *ii);
         intruder_ids.insert (*ii);
       }

@@ -26,6 +26,7 @@
 #define HDR_dbPropertyConstraint
 
 #include "dbCommon.h"
+#include "dbTypes.h"
 
 namespace db
 {
@@ -57,12 +58,72 @@ enum PropertyConstraint
   SamePropertiesConstraint = 2,
 
   /**
+   *  @brief Shapes are processed if their properties are the same
+   *
+   *  No properties are attached to the output.
+   */
+  SamePropertiesConstraintDrop = 3,
+
+  /**
    *  @brief Shapes are processed if their properties are different
    *
    *  Properties are attached to the outputs where applicable.
    */
-  DifferentPropertiesConstraint = 3
+  DifferentPropertiesConstraint = 4,
+
+  /**
+   *  @brief Shapes are processed if their properties are different
+   *
+   *  No properties are attached to the output.
+   */
+  DifferentPropertiesConstraintDrop = 5
 };
+
+/**
+ *  @brief Returns a predicate indicating whether properties need to be considered
+ */
+bool inline pc_skip (PropertyConstraint pc)
+{
+  return pc == IgnoreProperties;
+}
+
+/**
+ *  @brief Returns a predicate indicating whether properties are always different
+ */
+bool inline pc_always_different (PropertyConstraint pc)
+{
+  return pc == DifferentPropertiesConstraint || pc == DifferentPropertiesConstraintDrop;
+}
+
+/**
+ *  @brief Returns a value indicating whether two properties satisfy the condition
+ */
+bool inline pc_match (PropertyConstraint pc, db::properties_id_type a, db::properties_id_type b)
+{
+  if (pc == SamePropertiesConstraint || pc == SamePropertiesConstraintDrop) {
+    return a == b;
+  } else if (pc == DifferentPropertiesConstraint || pc == DifferentPropertiesConstraintDrop) {
+    return a != b;
+  } else {
+    return true;
+  }
+}
+
+/**
+ *  @brief Returns a value indicating whether the property can be removed on output
+ */
+bool inline pc_remove (PropertyConstraint pc)
+{
+  return pc == IgnoreProperties || pc == SamePropertiesConstraintDrop || pc == DifferentPropertiesConstraintDrop;
+}
+
+/**
+ *  @brief Returns a normalized property for output
+ */
+db::properties_id_type inline pc_norm (PropertyConstraint pc, db::properties_id_type prop_id)
+{
+  return pc_remove (pc) ? 0 : prop_id;
+}
 
 }
 

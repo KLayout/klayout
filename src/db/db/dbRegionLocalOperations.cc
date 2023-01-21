@@ -782,7 +782,7 @@ check_local_operation_with_properties<TS, TI>::do_compute_local (db::Layout *lay
     }
 
     for (auto r = result.begin (); r != result.end (); ++r) {
-      results.front ().insert (db::EdgePairWithProperties (*r, s2p->first));
+      results.front ().insert (db::EdgePairWithProperties (*r, pc_norm (check_local_operation_base<TS, TI>::m_options.prop_constraint, s2p->first)));
     }
 
   }
@@ -1668,8 +1668,7 @@ bool_and_or_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (d
 
       for (auto j = i->second.begin (); j != i->second.end (); ++j) {
         const db::object_with_properties<TI> &intruder = interactions.intruder_shape (*j).second;
-        db::properties_id_type prop_id_i = (m_property_constraint != db::NoPropertyConstraint ? m_pmi (intruder.properties_id ()) : prop_id_s);
-        if ((prop_id_i != prop_id_s) == (m_property_constraint == db::DifferentPropertiesConstraint)) {
+        if (pc_match (m_property_constraint, prop_id_s, m_pmi (intruder.properties_id ()))) {
           shapes_by_prop.second.insert (intruder);
         }
       }
@@ -1684,7 +1683,7 @@ bool_and_or_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (d
     size_t p1 = 0, p2 = 1;
 
     const std::set<TI> &others = p2s->second.second;
-    db::properties_id_type prop_id = p2s->first;
+    db::properties_id_type prop_id = pc_norm (m_property_constraint, p2s->first);
 
     for (auto s = p2s->second.first.begin (); s != p2s->second.first.end (); ++s) {
 
@@ -1857,8 +1856,7 @@ two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (
 
       for (auto j = i->second.begin (); j != i->second.end (); ++j) {
         const db::object_with_properties<TI> &intruder = interactions.intruder_shape (*j).second;
-        db::properties_id_type prop_id_i = (m_property_constraint != db::NoPropertyConstraint ? m_pmi (intruder.properties_id ()) : prop_id_s);
-        if ((prop_id_i != prop_id_s) == (m_property_constraint == db::DifferentPropertiesConstraint)) {
+        if (pc_match (m_property_constraint, prop_id_s, m_pmi (intruder.properties_id ()))) {
           shapes_by_prop.second.insert (intruder);
         }
       }
@@ -1873,7 +1871,7 @@ two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (
     size_t p1 = 0, p2 = 1;
 
     const std::set<TR> &others = p2s->second.second;
-    db::properties_id_type prop_id = p2s->first;
+    db::properties_id_type prop_id = pc_norm (m_property_constraint, p2s->first);
 
     for (auto s = p2s->second.first.begin (); s != p2s->second.first.end (); ++s) {
 

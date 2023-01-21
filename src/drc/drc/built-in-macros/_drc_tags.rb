@@ -151,6 +151,30 @@ module DRC
     def initialize(v)
       self.value = v
     end
+    def is_eq?
+      self.value == RBA::Region::SamePropertiesConstraint || self.value == RBA::Region::SamePropertiesConstraintDrop
+    end
+    def is_ne?
+      self.value == RBA::Region::DifferentPropertiesConstraint || self.value == RBA::Region::DifferentPropertiesConstraintDrop
+    end
+    def is_copy?
+      self.value == RBA::Region::NoPropertyConstraint || self.value == RBA::Region::SamePropertiesConstraint || self.value == RBA::Region::DifferentPropertiesConstraint
+    end
+    def +(other)
+      other.is_a?(DRCPropertiesConstraint) || raise("'+' needs to be applied to two properties constraints (got #{other.inspect} for the second one)")
+      is_eq = self.is_eq? || other.is_eq? 
+      is_ne = self.is_ne? || other.is_ne? 
+      is_copy = self.is_copy? || other.is_copy? 
+      if is_eq == is_ne
+        DRCPropertiesConstraint::new(is_copy ? RBA::Region::NoPropertyConstraint : RBA::Region::IgnoreProperties)
+      elsif is_eq
+        DRCPropertiesConstraint::new(is_copy ? RBA::Region::SamePropertiesConstraint : RBA::Region::SamePropertiesConstraintDrop)
+      elsif is_ne
+        DRCPropertiesConstraint::new(is_copy ? RBA::Region::DifferentPropertiesConstraint : RBA::Region::DifferentPropertiesConstraintDrop)
+      else
+        nil
+      end
+    end
   end
   
   # Negative output on checks

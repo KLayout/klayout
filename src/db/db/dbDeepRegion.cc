@@ -858,7 +858,7 @@ DeepRegion::and_or_not_with (const DeepRegion *other, bool and_op, db::PropertyC
 {
   DeepLayer dl_out (deep_layer ().derived ());
 
-  if (property_constraint == db::IgnoreProperties) {
+  if (pc_skip (property_constraint)) {
 
     db::BoolAndOrNotLocalOperation op (and_op);
 
@@ -893,7 +893,7 @@ DeepRegion::and_and_not_with (const DeepRegion *other, PropertyConstraint proper
   DeepLayer dl_out1 (deep_layer ().derived ());
   DeepLayer dl_out2 (deep_layer ().derived ());
 
-  if (property_constraint == db::IgnoreProperties) {
+  if (pc_skip (property_constraint)) {
 
     db::TwoBoolAndNotLocalOperation op;
 
@@ -1840,7 +1840,7 @@ EdgePairsDelegate *
 DeepRegion::cop_to_edge_pairs (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   DeepEdgePairs *output = 0;
-  if (prop_constraint == db::IgnoreProperties) {
+  if (pc_skip (prop_constraint)) {
     output = region_cop_impl<db::EdgePair, DeepEdgePairs> (this, node);
   } else {
     output = region_cop_with_properties_impl<db::EdgePair, DeepEdgePairs> (this, node, prop_constraint);
@@ -1856,7 +1856,7 @@ RegionDelegate *
 DeepRegion::cop_to_region (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   DeepRegion *output = 0;
-  if (prop_constraint == db::IgnoreProperties) {
+  if (pc_skip (prop_constraint)) {
     output = region_cop_impl<db::PolygonRef, db::DeepRegion> (this, node);
   } else {
     output = region_cop_with_properties_impl<db::PolygonRef, DeepRegion> (this, node, prop_constraint);
@@ -1872,7 +1872,7 @@ EdgesDelegate *
 DeepRegion::cop_to_edges (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   DeepEdges *output = 0;
-  if (prop_constraint == db::IgnoreProperties) {
+  if (pc_skip (prop_constraint)) {
     output = region_cop_impl<db::Edge, DeepEdges> (this, node);
   } else {
     output = region_cop_with_properties_impl<db::Edge, DeepEdges> (this, node, prop_constraint);
@@ -1894,7 +1894,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
   }
 
   //  force different polygons in the different properties case to skip intra-polygon checks
-  if (options.prop_constraint == DifferentPropertiesConstraint) {
+  if (pc_always_different (options.prop_constraint)) {
     different_polygons = true;
   }
 
@@ -2004,7 +2004,7 @@ DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, c
 
     for (db::Shapes::shape_iterator s = shapes.begin (db::ShapeIterator::Polygons); ! s.at_end (); ++s) {
 
-      edge2edge_check_negative_or_positive<db::Shapes> edge_check (check, result, options.negative, false /*does not require different polygons*/, false /*does not require different layers*/, options.shielded, true /*symmetric edge pairs*/, options.prop_constraint == db::IgnoreProperties ? 0 : s->prop_id ());
+      edge2edge_check_negative_or_positive<db::Shapes> edge_check (check, result, options.negative, false /*does not require different polygons*/, false /*does not require different layers*/, options.shielded, true /*symmetric edge pairs*/, pc_remove (options.prop_constraint) ? 0 : s->prop_id ());
       poly2poly_check<db::Polygon> poly_check (edge_check);
 
       db::Polygon poly;

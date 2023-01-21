@@ -1017,7 +1017,7 @@ EdgePairsDelegate *
 AsIfFlatRegion::cop_to_edge_pairs (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   std::unique_ptr<FlatEdgePairs> output (new FlatEdgePairs ());
-  if (prop_constraint == db::IgnoreProperties) {
+  if (pc_skip (prop_constraint)) {
     region_cop_impl<db::EdgePair> (this, &output->raw_edge_pairs (), node);
   } else {
     region_cop_with_properties_impl<db::EdgePair> (this, &output->raw_edge_pairs (), output->properties_repository (), node, prop_constraint);
@@ -1029,7 +1029,7 @@ RegionDelegate *
 AsIfFlatRegion::cop_to_region (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   std::unique_ptr<FlatRegion> output (new FlatRegion ());
-  if (prop_constraint == db::IgnoreProperties) {
+  if (pc_skip (prop_constraint)) {
     region_cop_impl<db::Polygon> (this, &output->raw_polygons (), node);
   } else {
     region_cop_with_properties_impl<db::Polygon> (this, &output->raw_polygons (), output->properties_repository (), node, prop_constraint);
@@ -1041,7 +1041,7 @@ EdgesDelegate *
 AsIfFlatRegion::cop_to_edges (db::CompoundRegionOperationNode &node, PropertyConstraint prop_constraint)
 {
   std::unique_ptr<FlatEdges> output (new FlatEdges ());
-  if (prop_constraint == db::IgnoreProperties) {
+  if (pc_skip (prop_constraint)) {
     region_cop_impl<db::Edge> (this, &output->raw_edges (), node);
   } else {
     region_cop_with_properties_impl<db::Edge> (this, &output->raw_edges (), output->properties_repository (), node, prop_constraint);
@@ -1113,7 +1113,7 @@ EdgePairsDelegate *
 AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const
 {
   //  force different polygons in the different properties case to skip intra-polygon checks
-  if (options.prop_constraint == DifferentPropertiesConstraint) {
+  if (pc_always_different (options.prop_constraint)) {
     different_polygons = true;
   }
 
@@ -1159,7 +1159,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_edge_pairs ());
 
-  if (options.prop_constraint == db::IgnoreProperties) {
+  if (pc_skip (options.prop_constraint)) {
 
     db::check_local_operation<db::Polygon, db::Polygon> op (check, different_polygons, primary_is_merged, has_other, other_is_merged, options);
 
@@ -1209,7 +1209,7 @@ AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord 
 
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
 
-    edge2edge_check_negative_or_positive<db::Shapes> edge_check (check, result->raw_edge_pairs (), options.negative, false /*=same polygons*/, false /*=same layers*/, options.shielded, true /*symmetric edge pairs*/, options.prop_constraint == db::IgnoreProperties ? 0 : pm (p.prop_id ()));
+    edge2edge_check_negative_or_positive<db::Shapes> edge_check (check, result->raw_edge_pairs (), options.negative, false /*=same polygons*/, false /*=same layers*/, options.shielded, true /*symmetric edge pairs*/, pc_remove (options.prop_constraint) ? 0 : pm (p.prop_id ()));
     poly2poly_check<db::Polygon> poly_check (edge_check);
 
     do {
@@ -1364,7 +1364,7 @@ AsIfFlatRegion::and_with (const Region &other, PropertyConstraint property_const
     //  Nothing to do
     return new EmptyRegion ();
 
-  } else if (property_constraint == db::IgnoreProperties && is_box () && other.is_box ()) {
+  } else if (pc_skip (property_constraint) && is_box () && other.is_box ()) {
 
     //  @@@ TODO: implement this with property constraints as that is important for the clip implementation!
 
@@ -1373,7 +1373,7 @@ AsIfFlatRegion::and_with (const Region &other, PropertyConstraint property_const
     b &= other.bbox ();
     return region_from_box (b);
 
-  } else if (property_constraint == db::IgnoreProperties && is_box () && ! other.strict_handling ()) {
+  } else if (pc_skip (property_constraint) && is_box () && ! other.strict_handling ()) {
 
     //  @@@ TODO: implement this with property constraints as that is important for the clip implementation!
 
@@ -1390,7 +1390,7 @@ AsIfFlatRegion::and_with (const Region &other, PropertyConstraint property_const
 
     return new_region.release ();
 
-  } else if (property_constraint == db::IgnoreProperties && other.is_box () && ! strict_handling ()) {
+  } else if (pc_skip (property_constraint) && other.is_box () && ! strict_handling ()) {
 
     //  @@@ TODO: implement this with property constraints as that is important for the clip implementation!
 
@@ -1443,7 +1443,7 @@ AsIfFlatRegion::not_with (const Region &other, PropertyConstraint property_const
 RegionDelegate *
 AsIfFlatRegion::and_or_not_with (bool is_and, const Region &other, PropertyConstraint property_constraint) const
 {
-  if (property_constraint == db::IgnoreProperties) {
+  if (pc_skip (property_constraint)) {
 
     //  Generic case
     db::EdgeProcessor ep (report_progress (), progress_desc ());
@@ -1520,7 +1520,7 @@ AsIfFlatRegion::andnot_with (const Region &other, PropertyConstraint property_co
     //  Nothing to do
     return std::make_pair (new EmptyRegion (), clone ());
 
-  } else if (property_constraint == db::IgnoreProperties) {
+  } else if (pc_skip (property_constraint)) {
 
     //  Generic case
     db::EdgeProcessor ep (report_progress (), progress_desc ());

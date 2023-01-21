@@ -323,6 +323,30 @@ module DRC
     def negative
       DRCNegative::new
     end
+
+    def enable_props
+      DRCPropertySelector::new(:enable_properties)
+    end
+    
+    def remove_props
+      DRCPropertySelector::new(:remove_properties)
+    end
+    
+    def select_props(*keys)
+      self._context("select_props") do
+        keys.each do |k|
+          k.is_a?(String) || k.is_a?(1.class) || raise("Key values need to be integers or strings (got '#{k.inspect}')")
+        end
+        DRCPropertySelector::new(:filter_properties, keys)
+      end
+    end
+    
+    def map_props(hash)
+      self._context("map_props") do
+        hash.is_a?(Hash) || raise("Argument needs to be a hash (got '#{hash.inspect}')")
+        DRCPropertySelector::new(:map_properties, hash)
+      end
+    end
     
     def pattern(p)
       self._context("pattern") do
@@ -2806,7 +2830,7 @@ CODE
       end
     end
     
-    def _input(layout, cell_index, layers, sel, box, clip, overlapping, shape_flags, global_trans, cls)
+    def _input(layout, cell_index, layers, sel, box, clip, overlapping, shape_flags, global_trans, prop_sel, cls)
     
       if layers.empty? && ! @deep
 
@@ -2819,6 +2843,7 @@ CODE
         else
           iter = RBA::RecursiveShapeIterator::new(layout, layout.cell(cell_index), layers)
         end
+        prop_sel.each { |p| p.apply_to(iter) }
         iter.shape_flags = shape_flags
         iter.global_dtrans = global_trans
         

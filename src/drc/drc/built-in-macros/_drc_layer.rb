@@ -4783,36 +4783,34 @@ CODE
     
     # %DRC%
     # @name select_props
-    # @brief Enables or selects properties from original or property-annotated layers
-    # @synopsis layer.select_props
+    # @brief Enables or selects properties from a property-annotated layer
     # @synopsis layer.select_props(keys)
     #
-    # This method will enable user properties or select specific property keys
-    # from layers. It returns a new layer with properties enabled. The
+    # This method will select specific property keys
+    # from layers. It returns a new layer with the new properties. The
     # original layer is not modified.
     #
-    # When used on original layers, this method will enable properties on input.
-    # By default, properties are not read:
-    #
-    # @code
-    # layer1 = input(1, 0)
-    # layer1_with_props = input(1, 0).select_props
-    # @/code
-    #
     # You can specify the user property keys (names) to use. As user properties
-    # in general are a set of key/value pairs and may carry multiple information
+    # in general are a set of key/value pairs and may carry multiple values
     # under different keys, this feature can be handy to filter out a specific 
     # aspect. To get only the values from key 1 (integer), use:
     #
     # @code
-    # layer1_with_props = input(1, 0).select_props(1)
+    # layer1 = input(1, 0, enable_properties)
+    # layer1_filtered = layer1.select_props(1)
     # @/code
     #
     # To get the combined key 1 and 2 properties, use:
     #
     # @code
-    # layer1_with_props = input(1, 0).select_props(1, 2)
+    # layer1 = input(1, 0, enable_properties)
+    # layer1_filtered = layer1.select_props(1, 2)
     # @/code
+    #
+    # Without any arguments, this method will remove all properties.
+    # Note that you can directly filter or map properties on input
+    # which is more efficient than first loading all and then selecting some
+    # properties. See \DRCSource#input for details.
     #
     # \map_props is a way to change property keys and \remove_props
     # will entirely remove all user properties.
@@ -4822,7 +4820,7 @@ CODE
     # @brief Selects properties with certain keys and allows key mapping
     # @synopsis layer.map_props({ key => key_new, .. })
     #
-    # Similar to \select_props, this method will enable user properties
+    # Similar to \select_props, this method will map or filter properties and
     # and take the values from certain keys. In addition, this method allows
     # mapping keys to new keys. Specify a hash argument with old to new keys.
     #
@@ -4835,7 +4833,8 @@ CODE
     # use:
     #
     # @code
-    # layer1_with_props = input(1, 0).map_props({ 2 => 1 })
+    # layer1 = input(1, 0, enable_properties)
+    # layer1_mapped = layer1.map_props({ 2 => 1 })
     # @/code
     # 
     # See also \select_props and \remove_props.

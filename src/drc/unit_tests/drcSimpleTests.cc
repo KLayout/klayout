@@ -1401,3 +1401,8 @@ TEST(70_props)
 {
   run_test (_this, "70", false);
 }
+
+TEST(70d_props)
+{
+  run_test (_this, "70", true);
+}

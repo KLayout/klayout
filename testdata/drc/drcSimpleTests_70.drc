@@ -8,28 +8,37 @@ if $drc_test_deep
   deep
 end
 
-l1 = input(1, 0)
-l2 = input(2, 0)
-l3 = input(3, 0)
-l4 = input(4, 0)
+# properties on input
+l1              = input(1, 0)
+l2              = input(2, 0)
+l3_wp           = input(3, 0, enable_props)
+l3_wp1_input    = input(3, 0, select_props(1))
+l3_wp2as1_input = input(3, 0, map_props({ 2 => 1 }))
+l3              = input(3, 0)
+l4_wp           = input(4, 0, enable_props)
+l4              = input(4, 0)
+
+# derived properties
+l3_wp1          = l3_wp.select_props(1)
+l3_wp2as1       = l3_wp.map_props({ 2 => 1 })
+l3_nowp         = l3_wp.remove_props
+
+# dump to output
 
 l1.output(1, 0)
 l2.output(2, 0)
 l3.output(3, 0)
 l4.output(4, 0)
 
-l3_wp = l3.select_props
-l3_wp1 = l3.select_props(1)
-l3_wp2as1 = l3.map_props({ 2 => 1 })
-l3_nowp = l3_wp.remove_props
-
-l4_wp = l4.select_props
-
 l3_wp.output(10, 0)
 l3_wp1.output(11, 0)
 l3_wp2as1.output(12, 0)
 l3_nowp.output(13, 0)
-l4_wp.output(14, 0)
+l3_wp1_input.output(14, 0)
+l3_wp2as1_input.output(15, 0)
+l4_wp.output(16, 0)
+
+# booleans with properties constraints
 
 l3_wp.and(l4_wp, props_eq).output(20, 0)
 l3_wp1.and(l4_wp, props_eq).output(21, 0)

@@ -57,8 +57,9 @@ DeepShapeCollectionDelegateBase::apply_property_translator (const db::Properties
     db::Shapes &shapes = c->shapes (m_deep_layer.layer ());
 
     db::Shapes new_shapes (shapes.is_editable ());
-    new_shapes.assign (shapes, pt);
     shapes.swap (new_shapes);
+
+    shapes.assign (new_shapes, pt);
 
   }
 }

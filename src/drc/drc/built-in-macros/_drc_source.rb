@@ -374,6 +374,7 @@ CODE
     # @synopsis source.input(layer, datatype)
     # @synopsis source.input(layer_into)
     # @synopsis source.input(filter, ...)
+    # @synopsis source.input(props_spec, ...)
     # Creates a layer with the shapes from the given layer of the source.
     # The layer can be specified by layer and optionally datatype, by a RBA::LayerInfo
     # object or by a sequence of filters. 
@@ -410,12 +411,27 @@ CODE
     #
     # "input" without any arguments will create a new, empty original layer.
     #
+    # If you want to use user properties - for example with properties constraints in DRC checks -
+    # you need to enable properties on input:
+    #
+    # @code
+    # input1_with_props = input(1, 0, enable_props)
+    # @/code
+    #
+    # You can also filter or map property keys, similar to the functions available on
+    # layers (\DRCLayer#map_props, \DRCLayer#select_props). For example to select
+    # property values with key 17 (numerical) only, use:
+    #
+    # @code
+    # input1_with_props = input(1, 0, select_props(17))
+    # @/code
+    #
     # Use the global version of "input" without a source object to address the default source.
     
     def input(*args)
       @engine._context("input") do
-        layers = parse_input_layers(*args)
-        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SAll, @global_trans, RBA::Region))
+        layers, prop_selectors = parse_input_layers(*args)
+        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SAll, @global_trans, prop_selectors, RBA::Region))
       end
     end
 
@@ -441,8 +457,8 @@ CODE
     
     def labels(*args)
       @engine._context("labels") do
-        layers = parse_input_layers(*args)
-        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::STexts, @global_trans, RBA::Texts))
+        layers, prop_selectors = parse_input_layers(*args)
+        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::STexts, @global_trans, prop_selectors, RBA::Texts))
       end
     end
 
@@ -467,8 +483,8 @@ CODE
     
     def polygons(*args)
       @engine._context("polygons") do
-        layers = parse_input_layers(*args)
-        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SBoxes | RBA::Shapes::SPaths | RBA::Shapes::SPolygons | RBA::Shapes::SEdgePairs, @global_trans, RBA::Region))
+        layers, prop_selectors = parse_input_layers(*args)
+        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SBoxes | RBA::Shapes::SPaths | RBA::Shapes::SPolygons | RBA::Shapes::SEdgePairs, @global_trans, prop_selectors, RBA::Region))
       end
     end
 
@@ -496,8 +512,8 @@ CODE
     
     def edges(*args)
       @engine._context("edges") do
-        layers = parse_input_layers(*args)
-        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SBoxes | RBA::Shapes::SPaths | RBA::Shapes::SPolygons | RBA::Shapes::SEdgePairs | RBA::Shapes::SEdges, @global_trans, RBA::Edges))
+        layers, prop_selectors = parse_input_layers(*args)
+        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SBoxes | RBA::Shapes::SPaths | RBA::Shapes::SPolygons | RBA::Shapes::SEdgePairs | RBA::Shapes::SEdges, @global_trans, prop_selectors, RBA::Edges))
       end
     end
 
@@ -525,8 +541,8 @@ CODE
     
     def edge_pairs(*args)
       @engine._context("edge_pairs") do
-        layers = parse_input_layers(*args)
-        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SEdgePairs, @global_trans, RBA::EdgePairs))
+        layers, prop_selectors = parse_input_layers(*args)
+        DRCLayer::new(@engine, @engine._cmd(@engine, :_input, @layout_var, @cell.cell_index, layers, @sel, @box, @clip, @overlapping, RBA::Shapes::SEdgePairs, @global_trans, prop_selectors, RBA::EdgePairs))
       end
     end
 
@@ -581,7 +597,10 @@ CODE
     def parse_input_layers(*args)
 
       layers = []
-     
+      prop_selectors = args.select { |a| a.is_a?(DRCPropertySelector) }
+
+      args = args.select { |a| !a.is_a?(DRCPropertySelector) }
+
       if args.size == 0
       
         li = @layout.insert_layer(RBA::LayerInfo::new)
@@ -615,7 +634,7 @@ CODE
         
       end
 
-      layers
+      [ layers, prop_selectors ]
 
     end
 

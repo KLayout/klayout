@@ -158,6 +158,19 @@ module DRC
     def initialize
     end
   end
+
+  # Property selector for "input"
+  class DRCPropertySelector
+    attr_accessor :method
+    attr_accessor :args
+    def apply_to(iter)
+      iter.send(self.method, *self.args)
+    end
+    def initialize(method, *args)
+      self.method = method
+      self.args = args
+    end
+  end
   
   # A wrapper for a pair of limit values
   # This class is used to identify projection limits for DRC

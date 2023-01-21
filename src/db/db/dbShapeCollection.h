@@ -83,6 +83,13 @@ public:
   virtual void apply_property_translator (const db::PropertiesTranslator & /*pt*/) = 0;
   virtual db::PropertiesRepository *properties_repository () = 0;
   virtual const db::PropertiesRepository *properties_repository () const = 0;
+
+  void remove_properties (bool remove = true)
+  {
+    if (remove) {
+      apply_property_translator (db::PropertiesTranslator::make_remove_all ());
+    }
+  }
 };
 
 /**

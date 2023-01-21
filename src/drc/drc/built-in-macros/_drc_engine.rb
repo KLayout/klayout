@@ -318,13 +318,13 @@ module DRC
      
     def props_eq
       self._context("props_eq") do
-        DRCPropertiesConstraint::new(RBA::Region::SamePropertiesConstraint)
+        DRCPropertiesConstraint::new(RBA::Region::SamePropertiesConstraintDrop)
       end
     end
     
     def props_ne
       self._context("props_ne") do
-        DRCPropertiesConstraint::new(RBA::Region::DifferentPropertiesConstraint)
+        DRCPropertiesConstraint::new(RBA::Region::DifferentPropertiesConstraintDrop)
       end
     end
     

@@ -239,6 +239,12 @@ public:
 
   virtual EdgesDelegate *clone () const = 0;
 
+  EdgesDelegate *remove_properties (bool remove = true)
+  {
+    ShapeCollectionDelegateBase::remove_properties (remove);
+    return this;
+  }
+
   void set_base_verbosity (int vb);
   int base_verbosity () const
   {

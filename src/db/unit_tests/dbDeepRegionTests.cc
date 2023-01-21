@@ -2176,6 +2176,12 @@ TEST(40_BoolWithProperties)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (25, 0)), r3.bool_and (r2, db::DifferentPropertiesConstraint));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (26, 0)), r1.bool_and (r3, db::SamePropertiesConstraint));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (27, 0)), r1.bool_and (r3, db::DifferentPropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 1)), r1.bool_and (r2, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 1)), r1.bool_and (r2, db::DifferentPropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (24, 1)), r3.bool_and (r2, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (25, 1)), r3.bool_and (r2, db::DifferentPropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (26, 1)), r1.bool_and (r3, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (27, 1)), r1.bool_and (r3, db::DifferentPropertiesConstraintDrop));
 
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), r1 - r2);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), r1.bool_not (r2, db::NoPropertyConstraint));
@@ -2185,6 +2191,12 @@ TEST(40_BoolWithProperties)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (35, 0)), r3.bool_not (r2, db::DifferentPropertiesConstraint));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (36, 0)), r1.bool_not (r3, db::SamePropertiesConstraint));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (37, 0)), r1.bool_not (r3, db::DifferentPropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 1)), r1.bool_not (r2, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (33, 1)), r1.bool_not (r2, db::DifferentPropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (34, 1)), r3.bool_not (r2, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (35, 1)), r3.bool_not (r2, db::DifferentPropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (36, 1)), r1.bool_not (r3, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (37, 1)), r1.bool_not (r3, db::DifferentPropertiesConstraintDrop));
 
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), r1.andnot (r2).first);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), r1.andnot (r2).second);
@@ -2200,6 +2212,18 @@ TEST(40_BoolWithProperties)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (51, 0)), r1.andnot (r3, db::SamePropertiesConstraint).second);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (52, 0)), r1.andnot (r3, db::DifferentPropertiesConstraint).first);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (53, 0)), r1.andnot (r3, db::DifferentPropertiesConstraint).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 1)), r1.andnot (r2, db::SamePropertiesConstraintDrop).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (43, 1)), r1.andnot (r2, db::SamePropertiesConstraintDrop).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (44, 1)), r1.andnot (r2, db::DifferentPropertiesConstraintDrop).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (45, 1)), r1.andnot (r2, db::DifferentPropertiesConstraintDrop).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (46, 1)), r3.andnot (r2, db::SamePropertiesConstraintDrop).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (47, 1)), r3.andnot (r2, db::SamePropertiesConstraintDrop).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (48, 1)), r3.andnot (r2, db::DifferentPropertiesConstraintDrop).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (49, 1)), r3.andnot (r2, db::DifferentPropertiesConstraintDrop).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (50, 1)), r1.andnot (r3, db::SamePropertiesConstraintDrop).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (51, 1)), r1.andnot (r3, db::SamePropertiesConstraintDrop).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (52, 1)), r1.andnot (r3, db::DifferentPropertiesConstraintDrop).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (53, 1)), r1.andnot (r3, db::DifferentPropertiesConstraintDrop).second);
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au40.gds");
@@ -2321,11 +2345,23 @@ TEST(42_DRCWithProperties)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), r1.separation_check (r2, 1000, opt));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 0)), r2.space_check (1000, opt));
 
+  opt.prop_constraint = db::SamePropertiesConstraintDrop;
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 1)), r1.space_check (1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 1)), r1.separation_check (r2, 1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 1)), r2.space_check (1000, opt));
+
   opt.prop_constraint = db::DifferentPropertiesConstraint;
 
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), r1.space_check (1000, opt));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), r1.separation_check (r2, 1000, opt));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 0)), r2.space_check (1000, opt));
+
+  opt.prop_constraint = db::DifferentPropertiesConstraintDrop;
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 1)), r1.space_check (1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 1)), r1.separation_check (r2, 1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 1)), r2.space_check (1000, opt));
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au42.gds");
@@ -2390,9 +2426,17 @@ TEST(43_ComplexOpsWithProperties)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), r1.cop_to_region (sep_check2p, db::SamePropertiesConstraint));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 0)), r1.cop_to_edges (sep_check2e, db::SamePropertiesConstraint));
 
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 1)), r1.cop_to_edge_pairs (sep_check, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 1)), r1.cop_to_region (sep_check2p, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 1)), r1.cop_to_edges (sep_check2e, db::SamePropertiesConstraintDrop));
+
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), r1.cop_to_edge_pairs (sep_check, db::DifferentPropertiesConstraint));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), r1.cop_to_region (sep_check2p, db::DifferentPropertiesConstraint));
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 0)), r1.cop_to_edges (sep_check2e, db::DifferentPropertiesConstraint));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 1)), r1.cop_to_edge_pairs (sep_check, db::DifferentPropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 1)), r1.cop_to_region (sep_check2p, db::DifferentPropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 1)), r1.cop_to_edges (sep_check2e, db::DifferentPropertiesConstraintDrop));
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au43.gds");
@@ -2427,9 +2471,6 @@ TEST(44_SizeWithProperties)
 
   db::Layout target;
   unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
-
-  db::RegionCheckOptions opt;
-  opt.metrics = db::Projection;
 
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r1);
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);

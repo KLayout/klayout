@@ -66,6 +66,12 @@ public:
 
   virtual TextsDelegate *clone () const = 0;
 
+  TextsDelegate *remove_properties (bool remove = true)
+  {
+    ShapeCollectionDelegateBase::remove_properties (remove);
+    return this;
+  }
+
   void enable_progress (const std::string &progress_desc);
   void disable_progress ();
 

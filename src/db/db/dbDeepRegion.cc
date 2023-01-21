@@ -783,11 +783,11 @@ DeepRegion::and_with (const Region &other, PropertyConstraint property_constrain
 
   if (empty ()) {
 
-    return clone ();
+    return clone ()->remove_properties (pc_remove (property_constraint));
 
   } else if (other.empty ()) {
 
-    return other.delegate ()->clone ();
+    return other.delegate ()->clone ()->remove_properties (pc_remove (property_constraint));
 
   } else if (! other_deep) {
 
@@ -807,7 +807,7 @@ DeepRegion::not_with (const Region &other, PropertyConstraint property_constrain
 
   if (empty () || other.empty ()) {
 
-    return clone ();
+    return clone ()->remove_properties (pc_remove (property_constraint));
 
   } else if (! other_deep) {
 
@@ -835,11 +835,11 @@ DeepRegion::andnot_with (const Region &other, PropertyConstraint property_constr
 
   if (empty ()) {
 
-    return std::make_pair (clone (), clone ());
+    return std::make_pair (clone ()->remove_properties (pc_remove (property_constraint)), clone ()->remove_properties (pc_remove (property_constraint)));
 
   } else if (other.empty ()) {
 
-    return std::make_pair (other.delegate ()->clone (), clone ());
+    return std::make_pair (other.delegate ()->clone ()->remove_properties (pc_remove (property_constraint)), clone ()->remove_properties (pc_remove (property_constraint)));
 
   } else if (! other_deep) {
 

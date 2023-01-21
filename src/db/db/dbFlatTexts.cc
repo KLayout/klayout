@@ -190,11 +190,15 @@ const db::RecursiveShapeIterator *FlatTexts::iter () const
 
 void FlatTexts::apply_property_translator (const db::PropertiesTranslator &pt)
 {
-  db::Shapes new_texts (mp_texts->is_editable ());
-  new_texts.assign (*mp_texts, pt);
-  mp_texts->swap (new_texts);
+  if ((mp_texts->type_mask () & db::ShapeIterator::Properties) != 0) {
 
-  invalidate_cache ();
+    db::Shapes new_texts (mp_texts->is_editable ());
+    new_texts.assign (*mp_texts, pt);
+    mp_texts->swap (new_texts);
+
+    invalidate_cache ();
+
+  }
 }
 
 db::PropertiesRepository *FlatTexts::properties_repository ()

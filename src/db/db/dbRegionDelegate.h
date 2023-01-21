@@ -196,6 +196,12 @@ public:
 
   virtual RegionDelegate *clone () const = 0;
 
+  RegionDelegate *remove_properties (bool remove = true)
+  {
+    ShapeCollectionDelegateBase::remove_properties (remove);
+    return this;
+  }
+
   void set_base_verbosity (int vb);
   int base_verbosity () const
   {

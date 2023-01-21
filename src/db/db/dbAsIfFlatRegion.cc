@@ -1428,12 +1428,12 @@ AsIfFlatRegion::not_with (const Region &other, PropertyConstraint property_const
   } else if (other.empty () && ! strict_handling ()) {
 
     //  Nothing to do
-    return clone ();
+    return clone ()->remove_properties (pc_remove (property_constraint));
 
   } else if (! bbox ().overlaps (other.bbox ()) && ! strict_handling ()) {
 
     //  Nothing to do
-    return clone ();
+    return clone ()->remove_properties (pc_remove (property_constraint));
 
   } else {
     return and_or_not_with (false, other, property_constraint);
@@ -1513,12 +1513,12 @@ AsIfFlatRegion::andnot_with (const Region &other, PropertyConstraint property_co
   } else if (other.empty () && ! strict_handling ()) {
 
     //  Nothing to do
-    return std::make_pair (new EmptyRegion (), clone ());
+    return std::make_pair (new EmptyRegion (), clone ()->remove_properties (pc_remove (property_constraint)));
 
   } else if (! bbox ().overlaps (other.bbox ()) && ! strict_handling ()) {
 
     //  Nothing to do
-    return std::make_pair (new EmptyRegion (), clone ());
+    return std::make_pair (new EmptyRegion (), clone ()->remove_properties (pc_remove (property_constraint)));
 
   } else if (pc_skip (property_constraint)) {
 

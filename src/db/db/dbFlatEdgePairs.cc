@@ -192,11 +192,15 @@ const db::RecursiveShapeIterator *FlatEdgePairs::iter () const
 
 void FlatEdgePairs::apply_property_translator (const db::PropertiesTranslator &pt)
 {
-  db::Shapes new_edge_pairs (mp_edge_pairs->is_editable ());
-  new_edge_pairs.assign (*mp_edge_pairs, pt);
-  mp_edge_pairs->swap (new_edge_pairs);
+  if ((mp_edge_pairs->type_mask () & db::ShapeIterator::Properties) != 0) {
 
-  invalidate_cache ();
+    db::Shapes new_edge_pairs (mp_edge_pairs->is_editable ());
+    new_edge_pairs.assign (*mp_edge_pairs, pt);
+    mp_edge_pairs->swap (new_edge_pairs);
+
+    invalidate_cache ();
+
+  }
 }
 
 db::PropertiesRepository *FlatEdgePairs::properties_repository ()

@@ -55,11 +55,16 @@ DeepShapeCollectionDelegateBase::apply_property_translator (const db::Properties
   for (auto c = layout.begin (); c != layout.end (); ++c) {
 
     db::Shapes &shapes = c->shapes (m_deep_layer.layer ());
+    if ((shapes.type_mask () & ShapeIterator::Properties) != 0) {
 
-    db::Shapes new_shapes (shapes.is_editable ());
-    shapes.swap (new_shapes);
+      //  properties are present - need to translate them
 
-    shapes.assign (new_shapes, pt);
+      db::Shapes new_shapes (shapes.is_editable ());
+      shapes.swap (new_shapes);
+
+      shapes.assign (new_shapes, pt);
+
+    }
 
   }
 }

@@ -37,6 +37,9 @@
 #include <QUrl>
 #include <QMimeData>
 #include <QClipboard>
+#if QT_VERSION >= 0x050000
+#  include <QGuiApplication>
+#endif
 
 #if defined(__APPLE__) && (QT_VERSION < 0x050401)
 // A workaround for the issue of Qt 4.8.x when handling "File Reference URL" in OSX
@@ -2168,7 +2171,11 @@ MainWindow::cm_screenshot_to_clipboard ()
 {
   if (current_view ()) {
     QImage screenshot = current_view ()->get_screenshot ();
+#if QT_VERSION >= 0x050000
     QClipboard *clipboard = QGuiApplication::clipboard();
+#else
+    QClipboard *clipboard = QApplication::clipboard();
+#endif
     clipboard->setImage(screenshot);
   } else {
     throw tl::Exception (tl::to_string (QObject::tr ("No view open to create a screenshot from")));

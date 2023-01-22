@@ -1122,14 +1122,14 @@ class DBRegion_TestClass < TestBase
     r = RBA::Region::new(tc.begin_shapes_rec(l1)).enable_properties
     rr = RBA::Region::new(tc.begin_shapes_rec(l2)).enable_properties
 
-    assert_equal((r & rr).to_s, "(0,0;0,100;100,100;100,0);(200,0;200,100;300,100;300,0);(400,0;400,100;500,100;500,0)")
-    assert_equal(r.and(rr).to_s, "(0,0;0,100;100,100;100,0);(200,0;200,100;300,100;300,0);(400,0;400,100;500,100;500,0)")
-    assert_equal(r.and(rr, RBA::Region::NoPropertyConstraint).to_s, "(0,0;0,100;100,100;100,0);(200,0;200,100;300,100;300,0);(400,0;400,100;500,100;500,0)")
-    assert_equal(r.and(rr, RBA::Region::SamePropertiesConstraint).to_s, "(0,0;0,50;100,50;100,0);(400,50;400,100;500,100;500,50)")
-    assert_equal(r.and(rr, RBA::Region::DifferentPropertiesConstraint).to_s, "(0,50;0,100;100,100;100,50);(200,0;200,100;300,100;300,0);(400,0;400,50;500,50;500,0)")
+    assert_equal(csort((r & rr).to_s), csort("(0,0;0,100;100,100;100,0);(200,0;200,100;300,100;300,0);(400,0;400,100;500,100;500,0)"))
+    assert_equal(csort(r.and(rr).to_s), csort("(0,0;0,100;100,100;100,0);(200,0;200,100;300,100;300,0);(400,0;400,100;500,100;500,0)"))
+    assert_equal(csort(r.and(rr, RBA::Region::NoPropertyConstraint).to_s), csort("(0,0;0,100;100,100;100,0);(200,0;200,100;300,100;300,0);(400,0;400,100;500,100;500,0)"))
+    assert_equal(csort(r.and(rr, RBA::Region::SamePropertiesConstraint).to_s), csort("(0,0;0,50;100,50;100,0);(400,50;400,100;500,100;500,50)"))
+    assert_equal(csort(r.and(rr, RBA::Region::DifferentPropertiesConstraint).to_s), csort("(0,50;0,100;100,100;100,50);(200,0;200,100;300,100;300,0);(400,0;400,50;500,50;500,0)"))
 
-    assert_equal(r.not(rr).to_s, "(0,100;0,200;100,200;100,100);(200,100;200,200;300,200;300,100);(400,100;400,200;500,200;500,100)")
-    assert_equal(r.not(rr, RBA::Region::SamePropertiesConstraint).to_s, "(0,50;0,200;100,200;100,50);(400,100;400,200;500,200;500,100);(200,0;200,200;300,200;300,0);(400,0;400,50;500,50;500,0)")
+    assert_equal(csort(r.not(rr).to_s), csort("(0,100;0,200;100,200;100,100);(200,100;200,200;300,200;300,100);(400,100;400,200;500,200;500,100)"))
+    assert_equal(csort(r.not(rr, RBA::Region::SamePropertiesConstraint).to_s), csort("(0,50;0,200;100,200;100,50);(400,100;400,200;500,200;500,100);(200,0;200,200;300,200;300,0);(400,0;400,50;500,50;500,0)"))
 
     r.remove_properties
     rr.remove_properties
@@ -1157,14 +1157,14 @@ class DBRegion_TestClass < TestBase
     r = RBA::Region::new(tc.begin_shapes_rec(l1)).enable_properties
     rr = RBA::Region::new(tc.begin_shapes_rec(l2)).enable_properties
 
-    assert_equal(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false).to_s, "(400,200;500,200)/(500,250;400,250);(0,200;100,200)/(100,250;0,250);(200,200;300,200)/(300,250;200,250)")
-    assert_equal(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::NoPropertyConstraint).to_s, "(400,200;500,200)/(500,250;400,250);(0,200;100,200)/(100,250;0,250);(200,200;300,200)/(300,250;200,250)")
-    assert_equal(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::SamePropertiesConstraint).to_s, "(0,200;100,200)/(100,250;0,250)")
-    assert_equal(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::DifferentPropertiesConstraint).to_s, "(400,200;500,200)/(500,250;400,250);(200,200;300,200)/(300,250;200,250)")
+    assert_equal(csort(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false).to_s), csort("(400,200;500,200)/(500,250;400,250);(0,200;100,200)/(100,250;0,250);(200,200;300,200)/(300,250;200,250)"))
+    assert_equal(csort(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::NoPropertyConstraint).to_s), csort("(400,200;500,200)/(500,250;400,250);(0,200;100,200)/(100,250;0,250);(200,200;300,200)/(300,250;200,250)"))
+    assert_equal(csort(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::SamePropertiesConstraint).to_s), csort("(0,200;100,200)/(100,250;0,250)"))
+    assert_equal(csort(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::DifferentPropertiesConstraint).to_s), csort("(400,200;500,200)/(500,250;400,250);(200,200;300,200)/(300,250;200,250)"))
 
     r.remove_properties
     rr.remove_properties
-    assert_equal(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::SamePropertiesConstraint).to_s, "(0,200;100,200)/(100,250;0,250);(200,200;300,200)/(300,250;200,250);(400,200;500,200)/(500,250;400,250)")
+    assert_equal(csort(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::SamePropertiesConstraint).to_s), csort("(0,200;100,200)/(100,250;0,250);(200,200;300,200)/(300,250;200,250);(400,200;500,200)/(500,250;400,250)"))
 
   end
 

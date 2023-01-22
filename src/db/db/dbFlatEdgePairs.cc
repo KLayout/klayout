@@ -232,7 +232,8 @@ FlatEdgePairs::insert_into_as_polygons (Layout *layout, db::cell_index_type into
 void
 FlatEdgePairs::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
-  layout->cell (into_cell).shapes (into_layer).insert (*mp_edge_pairs);
+  db::PropertyMapper pm (&layout->properties_repository (), properties_repository ());
+  layout->cell (into_cell).shapes (into_layer).insert (*mp_edge_pairs, pm);
 }
 
 void

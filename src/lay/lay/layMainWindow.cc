@@ -37,6 +37,7 @@
 #include <QUrl>
 #include <QMimeData>
 #include <QClipboard>
+#include <QGuiApplication>
 
 #if defined(__APPLE__) && (QT_VERSION < 0x050401)
 // A workaround for the issue of Qt 4.8.x when handling "File Reference URL" in OSX

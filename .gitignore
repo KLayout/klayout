@@ -37,6 +37,7 @@ build-*
 bin-*
 mkqtdecl.tmp
 mkqtdecl5.tmp
+mkqtdecl6.tmp
 testtmp
 *build.macos*
 *bin.macos*

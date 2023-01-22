@@ -323,7 +323,7 @@ private:
  *  the same properties than the subject (SamePropertiesConstraint) or different properties (DifferentPropertiesConstraint).
  */
 template <class TS, class TI>
-DB_PUBLIC
+DB_PUBLIC_TEMPLATE
 std::map<db::properties_id_type, std::pair<std::vector<const TS *>, std::set<const TI *> > >
 separate_interactions_by_properties (const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, db::PropertyConstraint property_constraint, db::PropertyMapper &pms, db::PropertyMapper &pmi)
 {
@@ -361,7 +361,7 @@ separate_interactions_by_properties (const shape_interactions<db::object_with_pr
  *  the same properties than the subject (SamePropertiesConstraint) or different properties (DifferentPropertiesConstraint).
  */
 template <class TS, class TI>
-DB_PUBLIC
+DB_PUBLIC_TEMPLATE
 std::map<db::properties_id_type, db::shape_interactions<TS, TI> >
 separate_interactions_to_interactions_by_properties (const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, db::PropertyConstraint property_constraint, db::PropertyMapper &pms, std::vector<db::PropertyMapper> &pmis)
 {

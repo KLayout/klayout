@@ -1258,9 +1258,8 @@ LayoutView::set_active_cellview_index (int index)
   if (index >= 0 && index < int (cellviews ())) {
     if (mp_hierarchy_panel) {
       mp_hierarchy_panel->select_active (index);
-    } else {
-      LayoutViewBase::set_active_cellview_index (index);
     }
+    LayoutViewBase::set_active_cellview_index (index);
   }
 }
 

@@ -3402,11 +3402,11 @@ LayoutViewBase::load_layout (const std::string &filename, const db::LoadLayoutOp
       std::vector <db::cell_index_type> p;
       p.push_back (*top);
       select_cell (p, cv_index);
-    } else {
-      //  even if there is no cell, select the cellview item
-      //  to support applications with an active cellview (that is however invalid)
-      set_active_cellview_index (cv_index);
     }
+
+    //  even if there is no cell, select the cellview item
+    //  to support applications with an active cellview (that is however invalid)
+    set_active_cellview_index (cv_index);
 
     bool add_other_layers = m_add_other_layers;
 

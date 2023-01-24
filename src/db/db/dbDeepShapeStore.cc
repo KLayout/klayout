@@ -33,6 +33,7 @@
 #include "dbDeepEdgePairs.h"
 #include "dbDeepTexts.h"
 #include "dbShapeCollection.h"
+#include "dbLayoutToNetlist.h"
 
 #include "tlTimer.h"
 
@@ -50,7 +51,7 @@ DeepLayer::DeepLayer ()
 DeepLayer::DeepLayer (const Region &region)
   : mp_store (), m_layout (0), m_layer (0)
 {
-  const db::DeepRegion *dr = dynamic_cast<db::DeepRegion *> (region.delegate ());
+  const db::DeepRegion *dr = dynamic_cast<const db::DeepRegion *> (region.delegate ());
   tl_assert (dr != 0);
   *this = dr->deep_layer ();
 }
@@ -58,7 +59,7 @@ DeepLayer::DeepLayer (const Region &region)
 DeepLayer::DeepLayer (const Texts &texts)
   : mp_store (), m_layout (0), m_layer (0)
 {
-  const db::DeepTexts *dr = dynamic_cast<db::DeepTexts *> (texts.delegate ());
+  const db::DeepTexts *dr = dynamic_cast<const db::DeepTexts *> (texts.delegate ());
   tl_assert (dr != 0);
   *this = dr->deep_layer ();
 }
@@ -66,7 +67,7 @@ DeepLayer::DeepLayer (const Texts &texts)
 DeepLayer::DeepLayer (const Edges &edges)
   : mp_store (), m_layout (0), m_layer (0)
 {
-  const db::DeepEdges *dr = dynamic_cast<db::DeepEdges *> (edges.delegate ());
+  const db::DeepEdges *dr = dynamic_cast<const db::DeepEdges *> (edges.delegate ());
   tl_assert (dr != 0);
   *this = dr->deep_layer ();
 }
@@ -74,7 +75,7 @@ DeepLayer::DeepLayer (const Edges &edges)
 DeepLayer::DeepLayer (const EdgePairs &edge_pairs)
   : mp_store (), m_layout (0), m_layer (0)
 {
-  const db::DeepEdgePairs *dr = dynamic_cast<db::DeepEdgePairs *> (edge_pairs.delegate ());
+  const db::DeepEdgePairs *dr = dynamic_cast<const db::DeepEdgePairs *> (edge_pairs.delegate ());
   tl_assert (dr != 0);
   *this = dr->deep_layer ();
 }
@@ -261,10 +262,31 @@ DeepLayer::check_dss () const
   }
 }
 
-// ----------------------------------------------------------------------------------
-
 struct DeepShapeStore::LayoutHolder
 {
+  class L2NStatusChangedListener
+    : public tl::Object
+  {
+  public:
+    L2NStatusChangedListener (DeepShapeStore::LayoutHolder *lh, db::LayoutToNetlist *l2n)
+      : mp_lh (lh), mp_l2n (l2n)
+    {
+      mp_l2n->status_changed_event ().add (this, &L2NStatusChangedListener::l2n_destroyed);
+    }
+
+  private:
+    void l2n_destroyed (gsi::ObjectBase::StatusEventType ev)
+    {
+      if (ev == gsi::ObjectBase::ObjectDestroyed) {
+        //  CAUTION: this will eventually delete *this!
+        mp_lh->remove_l2n (mp_l2n);
+      }
+    }
+
+    DeepShapeStore::LayoutHolder *mp_lh;
+    db::LayoutToNetlist *mp_l2n;
+  };
+
   LayoutHolder (const db::ICplxTrans &trans)
     : refs (0), layout (false), builder (&layout, trans)
   {
@@ -287,16 +309,42 @@ struct DeepShapeStore::LayoutHolder
     }
   }
 
+  bool has_net_builder_for (db::LayoutToNetlist *l2n) const
+  {
+    auto l = net_builders.find (l2n);
+    return (l != net_builders.end ());
+  }
+
+  db::NetBuilder &net_builder_for (db::Cell &top, db::LayoutToNetlist *l2n)
+  {
+    auto l = net_builders.find (l2n);
+    if (l == net_builders.end ()) {
+      l = net_builders.insert (std::make_pair (l2n, std::make_pair (L2NStatusChangedListener (this, l2n), db::NetBuilder (&layout, l2n->cell_mapping_into (layout, top, false), l2n)))).first;
+      return l->second.second;
+    } else {
+      return l->second.second;
+    }
+  }
+
+  void remove_l2n (db::LayoutToNetlist *l2n)
+  {
+    auto l = net_builders.find (l2n);
+    if (l != net_builders.end ()) {
+      net_builders.erase (l);
+    }
+  }
+
   int refs;
   db::Layout layout;
   db::HierarchyBuilder builder;
+  std::map<db::LayoutToNetlist *, std::pair<L2NStatusChangedListener, db::NetBuilder> > net_builders;
   std::map<unsigned int, int> layer_refs;
 };
 
 // ----------------------------------------------------------------------------------
 
 DeepShapeStoreState::DeepShapeStoreState ()
-  : m_threads (1), m_max_area_ratio (3.0), m_max_vertex_count (16), m_reject_odd_polygons (false), m_text_property_name (), m_text_enlargement (-1)
+  : m_threads (1), m_max_area_ratio (3.0), m_max_vertex_count (16), m_reject_odd_polygons (false), m_text_property_name (), m_text_enlargement (-1), m_subcircuit_hierarchy_for_nets (false)
 {
   //  .. nothing yet ..
 }
@@ -403,6 +451,19 @@ DeepShapeStoreState::max_vertex_count () const
   return m_max_vertex_count;
 }
 
+void
+DeepShapeStoreState::set_subcircuit_hierarchy_for_nets (bool f)
+{
+  m_subcircuit_hierarchy_for_nets = f;
+}
+
+bool
+DeepShapeStoreState::subcircuit_hierarchy_for_nets () const
+{
+  return m_subcircuit_hierarchy_for_nets;
+}
+
+
 // ----------------------------------------------------------------------------------
 
 static size_t s_instance_count = 0;
@@ -475,19 +536,20 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Region &region, bool for_n
   db::Shapes *shapes = &initial_cell ().shapes (layer);
   db::Box world = db::Box::world ();
 
-  //  The chain of operators for producing clipped and reduced polygon references
-  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (&layout (), text_enlargement (), text_property_name ());
-  db::ReducingHierarchyBuilderShapeReceiver red (&refs, max_area_ratio, max_vertex_count, m_state.reject_odd_polygons ());
-
   //  try to maintain the texts on top level - go through shape iterator
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> ii = region.begin_iter ();
   db::ICplxTrans ttop = trans * ii.second;
+
+  //  The chain of operators for producing clipped and reduced polygon references
+  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (&layout (), ii.first.layout (), text_enlargement (), text_property_name ());
+  db::ReducingHierarchyBuilderShapeReceiver red (&refs, max_area_ratio, max_vertex_count, m_state.reject_odd_polygons ());
+
   while (! ii.first.at_end ()) {
 
     if (for_netlist && ii.first->is_text () && ii.first.layout () && ii.first.cell () != ii.first.top_cell ()) {
       //  Skip texts on levels below top cell. For the reasoning see the description of this method.
     } else {
-      red.push (*ii.first, ttop * ii.first.trans (), world, 0, shapes);
+      red.push (*ii.first, ii.first.prop_id (), ttop * ii.first.trans (), world, 0, shapes);
     }
 
     ++ii.first;
@@ -515,12 +577,12 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Edges &edges, const db::IC
   db::Shapes *shapes = &initial_cell ().shapes (layer);
   db::Box world = db::Box::world ();
 
-  db::EdgeBuildingHierarchyBuilderShapeReceiver eb (false);
-
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> ii = edges.begin_iter ();
   db::ICplxTrans ttop = trans * ii.second;
+
+  db::EdgeBuildingHierarchyBuilderShapeReceiver eb (&layout (), ii.first.layout (), false);
   while (! ii.first.at_end ()) {
-    eb.push (*ii.first, ttop * ii.first.trans (), world, 0, shapes);
+    eb.push (*ii.first, ii.first.prop_id (), ttop * ii.first.trans (), world, 0, shapes);
     ++ii.first;
   }
 
@@ -545,12 +607,13 @@ DeepLayer DeepShapeStore::create_from_flat (const db::Texts &texts, const db::IC
   db::Shapes *shapes = &initial_cell ().shapes (layer);
   db::Box world = db::Box::world ();
 
-  db::TextBuildingHierarchyBuilderShapeReceiver tb (&layout ());
-
   std::pair<db::RecursiveShapeIterator, db::ICplxTrans> ii = texts.begin_iter ();
   db::ICplxTrans ttop = trans * ii.second;
+
+  db::TextBuildingHierarchyBuilderShapeReceiver tb (&layout (), ii.first.layout ());
+
   while (! ii.first.at_end ()) {
-    tb.push (*ii.first, ttop * ii.first.trans (), world, 0, shapes);
+    tb.push (*ii.first, ii.first.prop_id (), ttop * ii.first.trans (), world, 0, shapes);
     ++ii.first;
   }
 
@@ -621,6 +684,16 @@ const tl::Variant &DeepShapeStore::text_property_name () const
   return m_state.text_property_name ();
 }
 
+void DeepShapeStore::set_subcircuit_hierarchy_for_nets (bool f)
+{
+  m_state.set_subcircuit_hierarchy_for_nets (f);
+}
+
+bool DeepShapeStore::subcircuit_hierarchy_for_nets () const
+{
+  return m_state.subcircuit_hierarchy_for_nets ();
+}
+
 const std::set<db::cell_index_type> *
 DeepShapeStore::breakout_cells (unsigned int layout_index) const
 {
@@ -649,6 +722,27 @@ void
 DeepShapeStore::add_breakout_cells (unsigned int layout_index, const std::set<db::cell_index_type> &cc)
 {
   m_state.add_breakout_cells (layout_index, cc);
+}
+
+bool
+DeepShapeStore::has_net_builder_for (unsigned int layout_index, db::LayoutToNetlist *l2n)
+{
+  return m_layouts [layout_index]->has_net_builder_for (l2n);
+}
+
+db::NetBuilder &
+DeepShapeStore::net_builder_for (unsigned int layout_index, db::LayoutToNetlist *l2n)
+{
+  db::NetBuilder &nb = m_layouts [layout_index]->net_builder_for (initial_cell (layout_index), l2n);
+
+  if (subcircuit_hierarchy_for_nets ()) {
+    nb.set_hier_mode (db::BNH_SubcircuitCells);
+    nb.set_cell_name_prefix ("X$$"); //  TODO: needs to be a configuration option?
+  } else {
+    nb.set_hier_mode (db::BNH_Flatten);
+  }
+
+  return nb;
 }
 
 void DeepShapeStore::set_threads (int n)
@@ -836,7 +930,7 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
   builder.set_target_layer (layer_index);
 
   //  The chain of operators for producing clipped and reduced polygon references
-  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (& layout, text_enlargement (), text_property_name ());
+  db::PolygonReferenceHierarchyBuilderShapeReceiver refs (&layout, si.layout (), text_enlargement (), text_property_name ());
   db::ReducingHierarchyBuilderShapeReceiver red (&refs, max_area_ratio, max_vertex_count, m_state.reject_odd_polygons ());
   db::ClippingHierarchyBuilderShapeReceiver clip (&red);
 
@@ -905,7 +999,7 @@ DeepLayer DeepShapeStore::create_copy (const DeepLayer &source, HierarchyBuilder
     db::Shapes &into = c->shapes (layer_index);
     const db::Shapes &from = c->shapes (from_layer_index);
     for (db::Shapes::shape_iterator s = from.begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
-      pipe->push (*s, trans, region, 0, &into);
+      pipe->push (*s, s->prop_id (), trans, region, 0, &into);
     }
   }
 
@@ -914,13 +1008,19 @@ DeepLayer DeepShapeStore::create_copy (const DeepLayer &source, HierarchyBuilder
 
 DeepLayer DeepShapeStore::create_edge_layer (const db::RecursiveShapeIterator &si, bool as_edges, const db::ICplxTrans &trans)
 {
-  db::EdgeBuildingHierarchyBuilderShapeReceiver refs (as_edges);
+  unsigned int layout_index = layout_for_iter (si, trans);
+  db::Layout &layout = m_layouts[layout_index]->layout;
+
+  db::EdgeBuildingHierarchyBuilderShapeReceiver refs (&layout, si.layout (), as_edges);
   return create_custom_layer (si, &refs, trans);
 }
 
 DeepLayer DeepShapeStore::create_edge_pair_layer (const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans)
 {
-  db::EdgePairBuildingHierarchyBuilderShapeReceiver refs;
+  unsigned int layout_index = layout_for_iter (si, trans);
+  db::Layout &layout = m_layouts[layout_index]->layout;
+
+  db::EdgePairBuildingHierarchyBuilderShapeReceiver refs (&layout, si.layout ());
   return create_custom_layer (si, &refs, trans);
 }
 
@@ -929,7 +1029,7 @@ DeepLayer DeepShapeStore::create_text_layer (const db::RecursiveShapeIterator &s
   unsigned int layout_index = layout_for_iter (si, trans);
   db::Layout &layout = m_layouts[layout_index]->layout;
 
-  db::TextBuildingHierarchyBuilderShapeReceiver refs (&layout);
+  db::TextBuildingHierarchyBuilderShapeReceiver refs (&layout, si.layout ());
   return create_custom_layer (si, &refs, trans);
 }
 
@@ -1200,19 +1300,32 @@ DeepShapeStore::insert_as_polygons (const DeepLayer &deep_layer, db::Layout *int
 
       if (s->is_edge_pair ()) {
 
-        out.insert (s->edge_pair ().normalized ().to_simple_polygon (enl));
+        if (s->prop_id () != 0) {
+          out.insert (db::SimplePolygonWithProperties (s->edge_pair ().normalized ().to_simple_polygon (enl), s->prop_id ()));
+        } else {
+          out.insert (s->edge_pair ().normalized ().to_simple_polygon (enl));
+        }
 
       } else if (s->is_path () || s->is_polygon () || s->is_box ()) {
 
         db::Polygon poly;
         s->polygon (poly);
-        out.insert (poly);
+        if (s->prop_id () != 0) {
+          out.insert (db::PolygonWithProperties (poly, s->prop_id ()));
+        } else {
+          out.insert (poly);
+        }
 
       } else if (s->is_text ()) {
 
         db::Text t;
         s->text (t);
-        out.insert (db::SimplePolygon (t.box ().enlarged (db::Vector (enl, enl))));
+        db::SimplePolygon sp (t.box ().enlarged (db::Vector (enl, enl)));
+        if (s->prop_id () != 0) {
+          out.insert (db::SimplePolygonWithProperties (sp, s->prop_id ()));
+        } else {
+          out.insert (sp);
+        }
 
       }
 

@@ -1405,25 +1405,15 @@ static db::Pin *create_pin (db::Circuit *circuit, const std::string &name)
 }
 
 static std::vector<db::Net *>
-nets_by_name (db::Circuit *circuit, const std::string &name_pattern)
+nets_non_const (const std::vector<const db::Net *> &nc)
 {
-  std::vector<db::Net *> res;
-  if (! circuit) {
-    return res;
+  std::vector<db::Net *> n;
+  n.reserve (nc.size ());
+  for (auto i = nc.begin (); i != nc.end (); ++i) {
+    n.push_back (const_cast<db::Net *> (*i));
   }
 
-  tl::GlobPattern glob (name_pattern);
-  if (circuit->netlist ()) {
-    glob.set_case_sensitive (circuit->netlist ()->is_case_sensitive ());
-  }
-  for (db::Circuit::net_iterator n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
-    db::Net *net = n.operator-> ();
-    if (glob.match (net->name ())) {
-      res.push_back (net);
-    }
-  }
-
-  return res;
+  return n;
 }
 
 static std::vector<const db::Net *>
@@ -1446,6 +1436,42 @@ nets_by_name_const (const db::Circuit *circuit, const std::string &name_pattern)
   }
 
   return res;
+}
+
+static std::vector<db::Net *>
+nets_by_name (db::Circuit *circuit, const std::string &name_pattern)
+{
+  return nets_non_const (nets_by_name_const (circuit, name_pattern));
+}
+
+static std::vector<const db::Net *>
+nets_by_name_const_from_netlist (const db::Netlist *netlist, const std::string &name_pattern)
+{
+  std::vector<const db::Net *> res;
+  if (! netlist) {
+    return res;
+  }
+
+  tl::GlobPattern glob (name_pattern);
+  glob.set_case_sensitive (netlist->is_case_sensitive ());
+  for (auto c = netlist->begin_circuits (); c != netlist->end_circuits (); ++c) {
+    bool is_top = (c->begin_parents () == c->end_parents ());
+    for (auto n = c->begin_nets (); n != c->end_nets (); ++n) {
+      const db::Net *net = n.operator-> ();
+      //  NOTE: we only pick root nets (pin_count == 0 or in top cell)
+      if ((is_top || net->pin_count () == 0) && glob.match (net->name ())) {
+        res.push_back (net);
+      }
+    }
+  }
+
+  return res;
+}
+
+static std::vector<db::Net *>
+nets_by_name_from_netlist (db::Netlist *netlist, const std::string &name_pattern)
+{
+  return nets_non_const (nets_by_name_const_from_netlist (netlist, name_pattern));
 }
 
 Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
@@ -1966,7 +1992,7 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "@brief Gets the circuit object for a given cell index (const version).\n"
     "If the cell index is not valid or no circuit is registered with this index, nil is returned."
     "\n\n"
-    "This constness variant has been introduced in version 0.26.8"
+    "This constness variant has been introduced in version 0.26.8."
   ) +
   gsi::method ("circuit_by_name", (db::Circuit *(db::Netlist::*) (const std::string &)) &db::Netlist::circuit_by_name, gsi::arg ("name"),
     "@brief Gets the circuit object for a given name.\n"
@@ -1976,7 +2002,7 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "@brief Gets the circuit object for a given name (const version).\n"
     "If the name is not a valid circuit name, nil is returned."
     "\n\n"
-    "This constness variant has been introduced in version 0.26.8"
+    "This constness variant has been introduced in version 0.26.8."
   ) +
   gsi::method_ext ("circuits_by_name", &circuits_by_name, gsi::arg ("name_pattern"),
     "@brief Gets the circuit objects for a given name filter.\n"
@@ -1988,7 +2014,19 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "@brief Gets the circuit objects for a given name filter (const version).\n"
     "The name filter is a glob pattern. This method will return all \\Circuit objects matching the glob pattern.\n"
     "\n\n"
-    "This constness variant has been introduced in version 0.26.8"
+    "This constness variant has been introduced in version 0.26.8."
+  ) +
+  gsi::method_ext ("nets_by_name", &nets_by_name_from_netlist, gsi::arg ("name_pattern"),
+    "@brief Gets the net objects for a given name filter.\n"
+    "The name filter is a glob pattern. This method will return all \\Net objects matching the glob pattern.\n"
+    "\n"
+    "This method has been introduced in version 0.28.4.\n"
+  ) +
+  gsi::method_ext ("nets_by_name", &nets_by_name_const_from_netlist, gsi::arg ("name_pattern"),
+    "@brief Gets the net objects for a given name filter (const version).\n"
+    "The name filter is a glob pattern. This method will return all \\Net objects matching the glob pattern.\n"
+    "\n\n"
+    "This constness variant has been introduced in version 0.28.4."
   ) +
   gsi::iterator ("each_circuit_top_down", (db::Netlist::top_down_circuit_iterator (db::Netlist::*) ()) &db::Netlist::begin_top_down, (db::Netlist::top_down_circuit_iterator (db::Netlist::*) ()) &db::Netlist::end_top_down,
     "@brief Iterates over the circuits top-down\n"
@@ -2000,7 +2038,7 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "Iterating top-down means the parent circuits come before the child circuits. "
     "The first \\top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits."
     "\n\n"
-    "This constness variant has been introduced in version 0.26.8"
+    "This constness variant has been introduced in version 0.26.8."
   ) +
   gsi::iterator ("each_circuit_bottom_up", (db::Netlist::bottom_up_circuit_iterator (db::Netlist::*) ()) &db::Netlist::begin_bottom_up, (db::Netlist::bottom_up_circuit_iterator (db::Netlist::*) ()) &db::Netlist::end_bottom_up,
     "@brief Iterates over the circuits bottom-up\n"
@@ -2012,7 +2050,7 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "Iterating bottom-up means the parent circuits come after the child circuits. "
     "This is the basically the reverse order as delivered by \\each_circuit_top_down."
     "\n\n"
-    "This constness variant has been introduced in version 0.26.8"
+    "This constness variant has been introduced in version 0.26.8."
   ) +
   gsi::method ("top_circuit_count", &db::Netlist::top_circuit_count,
     "@brief Gets the number of top circuits.\n"
@@ -2025,7 +2063,7 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::iterator ("each_circuit", (db::Netlist::const_circuit_iterator (db::Netlist::*) () const) &db::Netlist::begin_circuits, (db::Netlist::const_circuit_iterator (db::Netlist::*) () const) &db::Netlist::end_circuits,
     "@brief Iterates over the circuits of the netlist (const version)"
     "\n\n"
-    "This constness variant has been introduced in version 0.26.8"
+    "This constness variant has been introduced in version 0.26.8."
   ) +
   gsi::method_ext ("add", &gsi::add_device_class, gsi::arg ("device_class"),
     "@brief Adds the device class to the netlist\n"
@@ -2046,7 +2084,7 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "@brief Gets the device class for a given name (const version).\n"
     "If the name is not a valid device class name, nil is returned."
     "\n\n"
-    "This constness variant has been introduced in version 0.26.8"
+    "This constness variant has been introduced in version 0.26.8."
   ) +
   gsi::iterator ("each_device_class", (db::Netlist::device_class_iterator (db::Netlist::*) ()) &db::Netlist::begin_device_classes, (db::Netlist::device_class_iterator (db::Netlist::*) ()) &db::Netlist::end_device_classes,
     "@brief Iterates over the device classes of the netlist"
@@ -2054,7 +2092,7 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   gsi::iterator ("each_device_class", (db::Netlist::const_device_class_iterator (db::Netlist::*) () const) &db::Netlist::begin_device_classes, (db::Netlist::const_device_class_iterator (db::Netlist::*) () const) &db::Netlist::end_device_classes,
     "@brief Iterates over the device classes of the netlist (const version)"
     "\n\n"
-    "This constness variant has been introduced in version 0.26.8"
+    "This constness variant has been introduced in version 0.26.8."
   ) +
   gsi::method ("to_s", &db::Netlist::to_string,
     "@brief Converts the netlist to a string representation.\n"

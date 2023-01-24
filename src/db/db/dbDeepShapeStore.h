@@ -47,6 +47,8 @@ class Edges;
 class EdgePairs;
 class Texts;
 class ShapeCollection;
+class NetBuilder;
+class LayoutToNetlist;
 
 /**
  *  @brief Represents a shape collection from the deep shape store
@@ -220,6 +222,16 @@ public:
     return mp_store.get ();
   }
 
+  /**
+   *  @brief Gets the non-const shape store object
+   *  This feature is intended for internal purposes.
+   */
+  DeepShapeStore *store_non_const () const
+  {
+    check_dss ();
+    return const_cast<DeepShapeStore *> (mp_store.get ());
+  }
+
 private:
   friend class DeepShapeStore;
 
@@ -262,6 +274,9 @@ public:
   void add_breakout_cell (unsigned int layout_index, db::cell_index_type ci);
   void add_breakout_cells (unsigned int layout_index, const std::set<db::cell_index_type> &cc);
 
+  void set_subcircuit_hierarchy_for_nets (bool f);
+  bool subcircuit_hierarchy_for_nets () const;
+
 private:
   int m_threads;
   double m_max_area_ratio;
@@ -270,6 +285,7 @@ private:
   tl::Variant m_text_property_name;
   std::vector<std::set<db::cell_index_type> > m_breakout_cells;
   int m_text_enlargement;
+  bool m_subcircuit_hierarchy_for_nets;
 
   std::set<db::cell_index_type> &ensure_breakout_cells (unsigned int layout_index)
   {
@@ -669,6 +685,37 @@ public:
   bool is_valid_layout_index (unsigned int n) const;
 
   /**
+   *  @brief Gets the net builder object for a given layout index and LayoutToNetlist database
+   *
+   *  If no net builder is available, one will be created. Use \\has_net_builder to check whether one is
+   *  already created.
+   */
+  db::NetBuilder &net_builder_for (unsigned int layout_index, db::LayoutToNetlist *l2n);
+
+  /**
+   *  @brief Gets the net builder object for a given LayoutToNetlist database (requires the DSS to be singular)
+   */
+  db::NetBuilder &net_builder_for (db::LayoutToNetlist *l2n)
+  {
+    require_singular ();
+    return net_builder_for (0, l2n);
+  }
+
+  /**
+   *  @brief Gets a value indicating whether a net building is available
+   */
+  bool has_net_builder_for(unsigned int layout_index, db::LayoutToNetlist *l2n);
+
+  /**
+   *  @brief Gets the net builder object for a given LayoutToNetlist database (requires the DSS to be singular)
+   */
+  bool has_net_builder_for (db::LayoutToNetlist *l2n)
+  {
+    require_singular ();
+    return has_net_builder_for (0, l2n);
+  }
+
+  /**
    *  @brief The deep shape store also keeps the number of threads to allocate for the hierarchical processor
    *
    *  This is a kind of hack, but it's convenient.
@@ -751,6 +798,20 @@ public:
    *  @brief Gets the text enlargement value
    */
   int text_enlargement () const;
+
+  /**
+   *  @brief Sets a value indicating whether to build a subcircuit hierarchy per net
+   *
+   *  This flag is used to determine the way, net subcircuit hierarchies are built:
+   *  when true, subcells are created for subcircuits on a net. Otherwise the net
+   *  shapes are produced flat inside the cell they appear on.
+   */
+  void set_subcircuit_hierarchy_for_nets (bool f);
+
+  /**
+   *  @brief Gets a value indicating whether to build a subcircuit hierarchy per net
+   */
+  bool subcircuit_hierarchy_for_nets () const;
 
   /**
    *  @brief Gets the breakout cells for a given layout

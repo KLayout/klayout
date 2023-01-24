@@ -1192,7 +1192,7 @@ static void move_or_copy_from_other_cell (db::Cell *cell, db::Cell *src_cell, un
 
   } else if (cell->layout () != src_cell->layout ()) {
 
-    db::PropertyMapper pm (*cell->layout (), *src_cell->layout ());
+    db::PropertyMapper pm (cell->layout (), src_cell->layout ());
     db::ICplxTrans tr (src_cell->layout ()->dbu () / cell->layout ()->dbu ());
 
     cell->shapes (dest_layer).insert_transformed (src_cell->shapes (src_layer), tr, pm);

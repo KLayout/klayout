@@ -105,7 +105,7 @@ const db::RecursiveShapeIterator &
 Region::iter () const
 {
   static db::RecursiveShapeIterator def_iter;
-  const db::RecursiveShapeIterator *i = mp_delegate->iter ();
+  const db::RecursiveShapeIterator *i = mp_delegate ? mp_delegate->iter () : 0;
   return *(i ? i : &def_iter);
 }
 
@@ -155,9 +155,13 @@ void Region::insert (const Sh &shape)
 }
 
 template DB_PUBLIC void Region::insert (const db::Box &);
+template DB_PUBLIC void Region::insert (const db::BoxWithProperties &);
 template DB_PUBLIC void Region::insert (const db::SimplePolygon &);
+template DB_PUBLIC void Region::insert (const db::SimplePolygonWithProperties &);
 template DB_PUBLIC void Region::insert (const db::Polygon &);
+template DB_PUBLIC void Region::insert (const db::PolygonWithProperties &);
 template DB_PUBLIC void Region::insert (const db::Path &);
+template DB_PUBLIC void Region::insert (const db::PathWithProperties &);
 
 void Region::insert (const db::Shape &shape)
 {
@@ -197,35 +201,35 @@ Region::mutable_region ()
 }
 
 EdgePairs
-Region::cop_to_edge_pairs (db::CompoundRegionOperationNode &node)
+Region::cop_to_edge_pairs (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   tl_assert (node.result_type () == db::CompoundRegionOperationNode::EdgePairs);
-  return EdgePairs (mp_delegate->cop_to_edge_pairs (node));
+  return EdgePairs (mp_delegate->cop_to_edge_pairs (node, prop_constraint));
 }
 
 Region
-Region::cop_to_region (db::CompoundRegionOperationNode &node)
+Region::cop_to_region (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   tl_assert (node.result_type () == db::CompoundRegionOperationNode::Region);
-  return Region (mp_delegate->cop_to_region (node));
+  return Region (mp_delegate->cop_to_region (node, prop_constraint));
 }
 
 Edges
-Region::cop_to_edges (db::CompoundRegionOperationNode &node)
+Region::cop_to_edges (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   tl_assert (node.result_type () == db::CompoundRegionOperationNode::Edges);
-  return Edges (mp_delegate->cop_to_edges (node));
+  return Edges (mp_delegate->cop_to_edges (node, prop_constraint));
 }
 
 tl::Variant
-Region::cop (db::CompoundRegionOperationNode &node)
+Region::cop (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   if (node.result_type () == db::CompoundRegionOperationNode::EdgePairs) {
-    return tl::Variant::make_variant (new EdgePairs (mp_delegate->cop_to_edge_pairs (node)));
+    return tl::Variant::make_variant (new EdgePairs (mp_delegate->cop_to_edge_pairs (node, prop_constraint)));
   } else if (node.result_type () == db::CompoundRegionOperationNode::Edges) {
-    return tl::Variant::make_variant (new Edges (mp_delegate->cop_to_edges (node)));
+    return tl::Variant::make_variant (new Edges (mp_delegate->cop_to_edges (node, prop_constraint)));
   } else if (node.result_type () == db::CompoundRegionOperationNode::Region) {
-    return tl::Variant::make_variant (new Region (mp_delegate->cop_to_region (node)));
+    return tl::Variant::make_variant (new Region (mp_delegate->cop_to_region (node, prop_constraint)));
   } else {
     return tl::Variant ();
   }
@@ -376,6 +380,8 @@ static void fill_texts (const Iter &iter, const std::string &pat, bool pattern, 
   const db::Layout *layout = 0;
 
   if (org_deep) {
+    //  NOTE: deep regions can store texts in a special way - as small boxes with a special property attached.
+    //  The property will give the text string. This function can restore these pseudo-texts as Text objects.
     layout = &org_deep->deep_layer ().layout ();
     const db::DeepShapeStore *store = org_deep->deep_layer ().store ();
     if (! store->text_property_name ().is_nil ()) {
@@ -451,7 +457,7 @@ public:
     }
   }
 
-  virtual void push (const db::Shape &shape, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
+  virtual void push (const db::Shape &shape, db::properties_id_type, const db::ICplxTrans &trans, const db::Box &region, const db::RecursiveShapeReceiver::box_tree_type *complex_region, db::Shapes *target)
   {
     bool is_text = false;
     std::string text_string;
@@ -494,8 +500,8 @@ public:
     }
   }
 
-  virtual void push (const db::Box &, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) { }
-  virtual void push (const db::Polygon &, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) { }
+  virtual void push (const db::Box &, db::properties_id_type, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) { }
+  virtual void push (const db::Polygon &, db::properties_id_type, const db::ICplxTrans &, const db::Box &, const db::RecursiveShapeReceiver::box_tree_type *, db::Shapes *) { }
 
 private:
   Delivery m_delivery;

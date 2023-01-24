@@ -43,62 +43,7 @@ class DeepShapeStore;
 class TransformationReducer;
 class CompoundRegionOperationNode;
 
-/**
- *  @brief A region iterator
- *
- *  The iterator delivers the polygons of the region
- */
-class DB_PUBLIC RegionIterator
-  : public generic_shape_iterator<db::Polygon>
-{
-public:
-  /**
-   *  @brief Default constructor
-   */
-  RegionIterator ()
-    : generic_shape_iterator<db::Polygon> ()
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Constructor from a delegate
-   *  The iterator will take ownership over the delegate
-   */
-  RegionIterator (RegionIteratorDelegate *delegate)
-    : generic_shape_iterator<db::Polygon> (delegate)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Copy constructor and assignment
-   */
-  RegionIterator (const RegionIterator &other)
-    : generic_shape_iterator<db::Polygon> (static_cast<const generic_shape_iterator<db::Polygon> &> (other))
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Assignment
-   */
-  RegionIterator &operator= (const RegionIterator &other)
-  {
-    generic_shape_iterator<db::Polygon>::operator= (other);
-    return *this;
-  }
-
-  /**
-   *  @brief Increment
-   */
-  RegionIterator &operator++ ()
-  {
-    generic_shape_iterator<db::Polygon>::operator++ ();
-    return *this;
-  }
-};
-
+typedef generic_shape_iterator<db::Polygon> RegionIterator;
 typedef addressable_shape_delivery<db::Polygon> AddressablePolygonDelivery;
 
 /**
@@ -169,9 +114,27 @@ public:
   }
 
   /**
+   *  @brief Constructor from a box with properties
+   */
+  explicit Region (const db::BoxWithProperties &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
    *  @brief Constructor from a polygon
    */
   explicit Region (const db::Polygon &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
+   *  @brief Constructor from a polygon with properties
+   */
+  explicit Region (const db::PolygonWithProperties &s)
     : mp_delegate (0)
   {
     insert (s);
@@ -187,9 +150,27 @@ public:
   }
 
   /**
+   *  @brief Constructor from a simple polygon with properties
+   */
+  explicit Region (const db::SimplePolygonWithProperties &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
    *  @brief Constructor from a path
    */
   explicit Region (const db::Path &s)
+    : mp_delegate (0)
+  {
+    insert (s);
+  }
+
+  /**
+   *  @brief Constructor from a path with properties
+   */
+  explicit Region (const db::PathWithProperties &s)
     : mp_delegate (0)
   {
     insert (s);
@@ -262,7 +243,15 @@ public:
   /**
    *  @brief Gets the underlying delegate object
    */
-  RegionDelegate *delegate () const
+  const RegionDelegate *delegate () const
+  {
+    return mp_delegate;
+  }
+
+  /**
+   *  @brief Gets the underlying delegate object
+   */
+  RegionDelegate *delegate ()
   {
     return mp_delegate;
   }
@@ -624,7 +613,7 @@ public:
    *  The compound operation needs to feature edge pair output, e.g.
    *  node.result_type() needs to be EdgePairs.
    */
-  EdgePairs cop_to_edge_pairs (db::CompoundRegionOperationNode &node);
+  EdgePairs cop_to_edge_pairs (db::CompoundRegionOperationNode &node, PropertyConstraint prop_constraint = db::IgnoreProperties);
 
   /**
    *  @brief Performs a compound operation rendering a region
@@ -632,7 +621,7 @@ public:
    *  The compound operation needs to feature region output, e.g.
    *  node.result_type() needs to be Region.
    */
-  Region cop_to_region (db::CompoundRegionOperationNode &node);
+  Region cop_to_region (db::CompoundRegionOperationNode &node, PropertyConstraint prop_constraint = db::IgnoreProperties);
 
   /**
    *  @brief Performs a compound operation rendering edges
@@ -640,7 +629,7 @@ public:
    *  The compound operation needs to feature region output, e.g.
    *  node.result_type() needs to be Edges.
    */
-  Edges cop_to_edges (db::CompoundRegionOperationNode &node);
+  Edges cop_to_edges (db::CompoundRegionOperationNode &node, PropertyConstraint prop_constraint = db::IgnoreProperties);
 
   /**
    *  @brief A universal form of the compound operation
@@ -648,7 +637,7 @@ public:
    *  The returned variant will be of the type requested by the
    *  compound operation node.
    */
-  tl::Variant cop (db::CompoundRegionOperationNode &node);
+  tl::Variant cop (db::CompoundRegionOperationNode &node, PropertyConstraint prop_constraint = db::IgnoreProperties);
 
   /**
    *  @brief Applies a width check and returns EdgePairs which correspond to violation markers
@@ -992,7 +981,15 @@ public:
    */
   Region operator& (const Region &other) const
   {
-    return Region (mp_delegate->and_with (other));
+    return Region (mp_delegate->and_with (other, db::IgnoreProperties));
+  }
+
+  /**
+   *  @brief Boolean AND operator with options
+   */
+  Region bool_and (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties) const
+  {
+    return Region (mp_delegate->and_with (other, prop_constraint));
   }
 
   /**
@@ -1003,7 +1000,19 @@ public:
    */
   Region &operator&= (const Region &other)
   {
-    set_delegate (mp_delegate->and_with (other));
+    set_delegate (mp_delegate->and_with (other, db::IgnoreProperties));
+    return *this;
+  }
+
+  /**
+   *  @brief In-place boolean AND operator with options
+   *
+   *  This method does not necessarily merge the region. To ensure the region
+   *  is merged, call merge afterwards.
+   */
+  Region &bool_and_with (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties)
+  {
+    set_delegate (mp_delegate->and_with (other, prop_constraint));
     return *this;
   }
 
@@ -1012,7 +1021,15 @@ public:
    */
   Region operator- (const Region &other) const
   {
-    return Region (mp_delegate->not_with (other));
+    return Region (mp_delegate->not_with (other, db::IgnoreProperties));
+  }
+
+  /**
+   *  @brief Boolean NOT operator with options
+   */
+  Region bool_not (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties) const
+  {
+    return Region (mp_delegate->not_with (other, prop_constraint));
   }
 
   /**
@@ -1023,7 +1040,19 @@ public:
    */
   Region &operator-= (const Region &other)
   {
-    set_delegate (mp_delegate->not_with (other));
+    set_delegate (mp_delegate->not_with (other, db::IgnoreProperties));
+    return *this;
+  }
+
+  /**
+   *  @brief In-place boolean NOT operator with options
+   *
+   *  This method does not necessarily merge the region. To ensure the region
+   *  is merged, call merge afterwards.
+   */
+  Region bool_not_with (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties)
+  {
+    set_delegate (mp_delegate->not_with (other, prop_constraint));
     return *this;
   }
 
@@ -1032,7 +1061,17 @@ public:
    */
   Region operator^ (const Region &other) const
   {
-    return Region (mp_delegate->xor_with (other));
+    return Region (mp_delegate->xor_with (other, db::IgnoreProperties));
+  }
+
+  /**
+   *  @brief Boolean XOR operator with options
+   *
+   *  TODO: property constraints are not implemented properly yet.
+   */
+  Region bool_xor (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties) const
+  {
+    return Region (mp_delegate->xor_with (other, prop_constraint));
   }
 
   /**
@@ -1043,7 +1082,21 @@ public:
    */
   Region &operator^= (const Region &other)
   {
-    set_delegate (mp_delegate->xor_with (other));
+    set_delegate (mp_delegate->xor_with (other, db::IgnoreProperties));
+    return *this;
+  }
+
+  /**
+   *  @brief In-place boolean XOR operator with options
+   *
+   *  This method does not necessarily merge the region. To ensure the region
+   *  is merged, call merge afterwards.
+   *
+   *  TODO: property constraints are not implemented properly yet.
+   */
+  Region &bool_xor_with (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties)
+  {
+    set_delegate (mp_delegate->xor_with (other, prop_constraint));
     return *this;
   }
 
@@ -1054,7 +1107,19 @@ public:
    */
   Region operator| (const Region &other) const
   {
-    return Region (mp_delegate->or_with (other));
+    return Region (mp_delegate->or_with (other, db::IgnoreProperties));
+  }
+
+  /**
+   *  @brief Boolean OR operator with options
+   *
+   *  This method merges the polygons of both regions.
+   *
+   *  TODO: property constraints are not implemented properly yet.
+   */
+  Region bool_or (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties) const
+  {
+    return Region (mp_delegate->or_with (other, prop_constraint));
   }
 
   /**
@@ -1062,7 +1127,18 @@ public:
    */
   Region &operator|= (const Region &other)
   {
-    set_delegate (mp_delegate->or_with (other));
+    set_delegate (mp_delegate->or_with (other, db::IgnoreProperties));
+    return *this;
+  }
+
+  /**
+   *  @brief In-place boolean OR operator with options
+   *
+   *  TODO: property constraints are not implemented properly yet.
+   */
+  Region &bool_or_with (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties)
+  {
+    set_delegate (mp_delegate->or_with (other, prop_constraint));
     return *this;
   }
 
@@ -1090,9 +1166,9 @@ public:
    *
    *  The first region delivered will be the AND result, the second one the NOT result.
    */
-  std::pair<Region, Region> andnot (const Region &other) const
+  std::pair<Region, Region> andnot (const Region &other, PropertyConstraint prop_constraint = db::IgnoreProperties) const
   {
-    std::pair<RegionDelegate *, RegionDelegate *> res = mp_delegate->andnot_with (other);
+    std::pair<RegionDelegate *, RegionDelegate *> res = mp_delegate->andnot_with (other, prop_constraint);
     return std::make_pair (Region (res.first), Region (res.second));
   }
 
@@ -1653,6 +1729,17 @@ public:
   }
 
   /**
+   *  @brief Returns the nth polygon's property ID
+   *
+   *  This operation is available only for flat regions - i.e. such for which
+   *  "has_valid_polygons" is true.
+   */
+  db::properties_id_type nth_prop_id (size_t n) const
+  {
+    return mp_delegate->nth_prop_id (n);
+  }
+
+  /**
    *  @brief Forces flattening of the region
    *
    *  This method will turn any region into a flat shape collection.
@@ -1741,6 +1828,20 @@ public:
   void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
   {
     return mp_delegate->insert_into (layout, into_cell, into_layer);
+  }
+
+  /**
+   *  @brief Pulls the net shapes from a LayoutToNetlist database
+   *
+   *  This will pull the net shapes from the LayoutToNetlist database, provided that this
+   *  layer was an input to the netlist extraction.
+   *
+   *  Netlist names will be attached as properties according to prop_mode and net_prop_name.
+   *  A net filter can be provided so that only certain nets are produced.
+   */
+  Region nets (LayoutToNetlist &l2n, NetPropertyMode prop_mode = db::NPM_NoProperties, const tl::Variant &net_prop_name = tl::Variant (0), const std::vector<const db::Net *> *nets = 0) const
+  {
+    return Region (mp_delegate->nets (&l2n, prop_mode, net_prop_name, nets));
   }
 
   /**

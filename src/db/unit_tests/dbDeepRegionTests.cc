@@ -33,6 +33,7 @@
 #include "dbOriginalLayerRegion.h"
 #include "dbCellGraphUtils.h"
 #include "dbTestSupport.h"
+#include "dbCompoundOperation.h"
 #include "tlUnitTest.h"
 #include "tlStream.h"
 
@@ -2124,6 +2125,404 @@ TEST(31_in_and_out)
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au31.gds");
+}
+
+TEST(40_BoolWithProperties)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_40.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l3 = ly.get_layer (db::LayerProperties (3, 0));  //  empty
+
+  db::RecursiveShapeIterator si1 (ly, top_cell, l1);
+  si1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  db::Region r1 (si1, dss);
+
+  db::RecursiveShapeIterator si2 (ly, top_cell, l2);
+  si2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  db::Region r2 (si2, dss);
+
+  db::RecursiveShapeIterator si3 (ly, top_cell, l3);
+  si3.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  db::Region r3 (si3, dss);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r1);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1.merged ());
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r2.merged ());
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r1 & r2);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r1.bool_and (r2, db::NoPropertyConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), r1.bool_and (r2, db::SamePropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 0)), r1.bool_and (r2, db::DifferentPropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (24, 0)), r3.bool_and (r2, db::SamePropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (25, 0)), r3.bool_and (r2, db::DifferentPropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (26, 0)), r1.bool_and (r3, db::SamePropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (27, 0)), r1.bool_and (r3, db::DifferentPropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 1)), r1.bool_and (r2, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (23, 1)), r1.bool_and (r2, db::DifferentPropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (24, 1)), r3.bool_and (r2, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (25, 1)), r3.bool_and (r2, db::DifferentPropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (26, 1)), r1.bool_and (r3, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (27, 1)), r1.bool_and (r3, db::DifferentPropertiesConstraintDrop));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), r1 - r2);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), r1.bool_not (r2, db::NoPropertyConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 0)), r1.bool_not (r2, db::SamePropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (33, 0)), r1.bool_not (r2, db::DifferentPropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (34, 0)), r3.bool_not (r2, db::SamePropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (35, 0)), r3.bool_not (r2, db::DifferentPropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (36, 0)), r1.bool_not (r3, db::SamePropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (37, 0)), r1.bool_not (r3, db::DifferentPropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 1)), r1.bool_not (r2, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (33, 1)), r1.bool_not (r2, db::DifferentPropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (34, 1)), r3.bool_not (r2, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (35, 1)), r3.bool_not (r2, db::DifferentPropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (36, 1)), r1.bool_not (r3, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (37, 1)), r1.bool_not (r3, db::DifferentPropertiesConstraintDrop));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), r1.andnot (r2).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), r1.andnot (r2).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 0)), r1.andnot (r2, db::SamePropertiesConstraint).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (43, 0)), r1.andnot (r2, db::SamePropertiesConstraint).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (44, 0)), r1.andnot (r2, db::DifferentPropertiesConstraint).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (45, 0)), r1.andnot (r2, db::DifferentPropertiesConstraint).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (46, 0)), r3.andnot (r2, db::SamePropertiesConstraint).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (47, 0)), r3.andnot (r2, db::SamePropertiesConstraint).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (48, 0)), r3.andnot (r2, db::DifferentPropertiesConstraint).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (49, 0)), r3.andnot (r2, db::DifferentPropertiesConstraint).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (50, 0)), r1.andnot (r3, db::SamePropertiesConstraint).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (51, 0)), r1.andnot (r3, db::SamePropertiesConstraint).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (52, 0)), r1.andnot (r3, db::DifferentPropertiesConstraint).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (53, 0)), r1.andnot (r3, db::DifferentPropertiesConstraint).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 1)), r1.andnot (r2, db::SamePropertiesConstraintDrop).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (43, 1)), r1.andnot (r2, db::SamePropertiesConstraintDrop).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (44, 1)), r1.andnot (r2, db::DifferentPropertiesConstraintDrop).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (45, 1)), r1.andnot (r2, db::DifferentPropertiesConstraintDrop).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (46, 1)), r3.andnot (r2, db::SamePropertiesConstraintDrop).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (47, 1)), r3.andnot (r2, db::SamePropertiesConstraintDrop).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (48, 1)), r3.andnot (r2, db::DifferentPropertiesConstraintDrop).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (49, 1)), r3.andnot (r2, db::DifferentPropertiesConstraintDrop).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (50, 1)), r1.andnot (r3, db::SamePropertiesConstraintDrop).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (51, 1)), r1.andnot (r3, db::SamePropertiesConstraintDrop).second);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (52, 1)), r1.andnot (r3, db::DifferentPropertiesConstraintDrop).first);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (53, 1)), r1.andnot (r3, db::DifferentPropertiesConstraintDrop).second);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au40.gds");
+}
+
+TEST(41_EdgesWithProperties)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_40.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+
+  db::RecursiveShapeIterator si1 (ly, top_cell, l1);
+  si1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  db::Region r1wp (si1, dss);
+  db::Region r1wp_nomerge = r1wp;
+  r1wp_nomerge.set_merged_semantics (false);
+
+  si1 = db::RecursiveShapeIterator (ly, top_cell, l1);
+  db::Region r1 (si1, dss);
+
+  db::RecursiveShapeIterator si2 (ly, top_cell, l2);
+  si2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  db::Region r2wp (si2, dss);
+  db::Region r2wp_nomerge = r2wp;
+  r2wp_nomerge.set_merged_semantics (false);
+
+  si2.apply_property_translator (db::PropertiesTranslator::make_remove_all ());
+  db::Region r2 (si2, dss);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r1wp);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2wp);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1.edges ());
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1wp.edges ());
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r1wp_nomerge.edges ());
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r2.edges ());
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r2wp.edges ());
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), r2wp_nomerge.edges ());
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au41.gds");
+}
+
+TEST(42_DRCWithProperties)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_42.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+
+  db::RecursiveShapeIterator si1 (ly, top_cell, l1);
+  si1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  db::Region r1 (si1, dss);
+  db::Region r1_nomerge (r1);
+  r1_nomerge.set_merged_semantics (false);
+
+  db::RecursiveShapeIterator si2 (ly, top_cell, l2);
+  si2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  db::Region r2 (si2, dss);
+  db::Region r2_nomerge (r2);
+  r2_nomerge.set_merged_semantics (false);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  db::RegionCheckOptions opt;
+  opt.metrics = db::Projection;
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r1);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1.space_check (1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1.separation_check (r2, 1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r2.space_check (1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (13, 0)), r1_nomerge.space_check (1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (14, 0)), r1_nomerge.separation_check (r2, 1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (15, 0)), r1.separation_check (r2_nomerge, 1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (16, 0)), r1_nomerge.separation_check (r2_nomerge, 1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (17, 0)), r2_nomerge.space_check (1000, opt));
+
+  opt.prop_constraint = db::NoPropertyConstraint;
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r1.space_check (1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r1.separation_check (r2, 1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), r2.space_check (1000, opt));
+
+  opt.prop_constraint = db::SamePropertiesConstraint;
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), r1.space_check (1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), r1.separation_check (r2, 1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 0)), r2.space_check (1000, opt));
+
+  opt.prop_constraint = db::SamePropertiesConstraintDrop;
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 1)), r1.space_check (1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 1)), r1.separation_check (r2, 1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 1)), r2.space_check (1000, opt));
+
+  opt.prop_constraint = db::DifferentPropertiesConstraint;
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), r1.space_check (1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), r1.separation_check (r2, 1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 0)), r2.space_check (1000, opt));
+
+  opt.prop_constraint = db::DifferentPropertiesConstraintDrop;
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 1)), r1.space_check (1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 1)), r1.separation_check (r2, 1000, opt));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 1)), r2.space_check (1000, opt));
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au42.gds");
+}
+
+TEST(43_ComplexOpsWithProperties)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_42.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+
+  db::RecursiveShapeIterator si1 (ly, top_cell, l1);
+  si1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  db::Region r1 (si1, dss);
+
+  db::RecursiveShapeIterator si2 (ly, top_cell, l2);
+  si2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  db::Region r2 (si2, dss);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  db::RegionCheckOptions opt;
+  opt.metrics = db::Projection;
+
+  db::CompoundRegionOperationSecondaryNode *secondary = new db::CompoundRegionOperationSecondaryNode (&r2);
+  db::CompoundRegionCheckOperationNode sep_check (secondary, db::SpaceRelation, true /*==different polygons*/, 1000, opt);
+
+  db::CompoundRegionOperationSecondaryNode *secondary2 = new db::CompoundRegionOperationSecondaryNode (&r2);
+  db::CompoundRegionCheckOperationNode *sep_check2 = new db::CompoundRegionCheckOperationNode (secondary2, db::SpaceRelation, true /*==different polygons*/, 1000, opt);
+  db::CompoundRegionEdgePairToPolygonProcessingOperationNode sep_check2p (new db::EdgePairToPolygonProcessor (0), sep_check2, true);
+
+  db::CompoundRegionOperationSecondaryNode *secondary3 = new db::CompoundRegionOperationSecondaryNode (&r2);
+  db::CompoundRegionCheckOperationNode *sep_check3 = new db::CompoundRegionCheckOperationNode (secondary3, db::SpaceRelation, true /*==different polygons*/, 1000, opt);
+  db::CompoundRegionEdgePairToEdgeProcessingOperationNode sep_check2e (new db::EdgePairToEdgesProcessor (), sep_check3, true);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r1);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1.cop_to_edge_pairs (sep_check));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1.cop_to_region (sep_check2p));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (12, 0)), r1.cop_to_edges (sep_check2e));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r1.cop_to_edge_pairs (sep_check, db::NoPropertyConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r1.cop_to_region (sep_check2p, db::NoPropertyConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (22, 0)), r1.cop_to_edges (sep_check2e, db::NoPropertyConstraint));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 0)), r1.cop_to_edge_pairs (sep_check, db::SamePropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 0)), r1.cop_to_region (sep_check2p, db::SamePropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 0)), r1.cop_to_edges (sep_check2e, db::SamePropertiesConstraint));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (30, 1)), r1.cop_to_edge_pairs (sep_check, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (31, 1)), r1.cop_to_region (sep_check2p, db::SamePropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (32, 1)), r1.cop_to_edges (sep_check2e, db::SamePropertiesConstraintDrop));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 0)), r1.cop_to_edge_pairs (sep_check, db::DifferentPropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 0)), r1.cop_to_region (sep_check2p, db::DifferentPropertiesConstraint));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 0)), r1.cop_to_edges (sep_check2e, db::DifferentPropertiesConstraint));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (40, 1)), r1.cop_to_edge_pairs (sep_check, db::DifferentPropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (41, 1)), r1.cop_to_region (sep_check2p, db::DifferentPropertiesConstraintDrop));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (42, 1)), r1.cop_to_edges (sep_check2e, db::DifferentPropertiesConstraintDrop));
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au43.gds");
+}
+
+TEST(44_SizeWithProperties)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_42.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+
+  db::RecursiveShapeIterator si1 (ly, top_cell, l1);
+  si1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  db::Region r1 (si1, dss);
+
+  db::RecursiveShapeIterator si2 (ly, top_cell, l2);
+  si2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  db::Region r2 (si2, dss);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r1);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1.sized (200));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1.sized (250, 50));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r2.sized (200));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r2.sized (250, 50));
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au44.gds");
+}
+
+TEST(45_FlattenWithProperties)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_42.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+
+  db::RecursiveShapeIterator si1 (ly, top_cell, l1);
+  si1.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  db::Region r1 (si1, dss);
+
+  db::RecursiveShapeIterator si2 (ly, top_cell, l2);
+  si2.apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+  db::Region r2 (si2, dss);
+
+  db::Layout target;
+  unsigned int target_top_cell_index = target.add_cell (ly.cell_name (top_cell_index));
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (1, 0)), r1);
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
+
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1.flatten ());
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r2.flatten ());
+
+  CHECKPOINT();
+  db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au45.gds");
 }
 
 TEST(100_Integration)

@@ -54,7 +54,7 @@ public:
 
   virtual void reserve (size_t n) = 0;
 
-  virtual void do_insert (const db::Edge &edge) = 0;
+  virtual void do_insert (const db::Edge &edge, db::properties_id_type prop_id) = 0;
 
   void transform (const db::UnitTrans &) { }
   void transform (const db::Disp &t) { do_transform (db::Trans (t)); }
@@ -63,29 +63,37 @@ public:
   void transform (const db::IMatrix2d &t) { do_transform (t); }
   void transform (const db::IMatrix3d &t) { do_transform (t); }
 
-  void insert (const db::Edge &edge) { do_insert (edge); }
+  void insert (const db::Edge &edge) { do_insert (edge, 0); }
+  void insert (const db::EdgeWithProperties &edge) { do_insert (edge, edge.properties_id ()); }
   void insert (const db::Box &box);
+  void insert (const db::BoxWithProperties &box);
   void insert (const db::Path &path);
+  void insert (const db::PathWithProperties &path);
   void insert (const db::SimplePolygon &polygon);
+  void insert (const db::SimplePolygonWithProperties &polygon);
   void insert (const db::Polygon &polygon);
+  void insert (const db::PolygonWithProperties &polygon);
   void insert (const db::Shape &shape);
 
   template <class T>
   void insert (const db::Shape &shape, const T &trans)
   {
+    db::properties_id_type prop_id = shape.prop_id ();
+
     if (shape.is_polygon () || shape.is_path () || shape.is_box ()) {
 
       db::Polygon poly;
       shape.polygon (poly);
-      poly.transform (trans);
-      insert (poly);
+      for (auto e = poly.begin_edge (); ! e.at_end (); ++e) {
+        do_insert ((*e).transformed (trans), prop_id);
+      }
 
     } else if (shape.is_edge ()) {
 
       db::Edge edge;
       shape.edge (edge);
       edge.transform (trans);
-      insert (edge);
+      do_insert (edge, prop_id);
 
     }
   }

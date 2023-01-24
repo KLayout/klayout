@@ -26,6 +26,7 @@
 #include "dbRecursiveShapeIterator.h"
 #include "dbBoxConvert.h"
 #include "dbEdgeProcessor.h"
+#include "dbEdgeBoolean.h"
 #include "dbPolygonGenerators.h"
 #include "dbLocalOperationUtils.h"
 #include "dbShapeFlags.h"
@@ -182,6 +183,31 @@ public:
   shape_reference_translator (db::Layout * /*target_layout*/) { }
 };
 
+template<class Basic>
+class shape_reference_translator<db::object_with_properties<Basic> >
+  : public shape_reference_translator<Basic>
+{
+public:
+  typedef db::object_with_properties<Basic> shape_type;
+
+  shape_reference_translator (db::Layout *target_layout)
+    : shape_reference_translator<Basic> (target_layout)
+  {
+    //  .. nothing yet ..
+  }
+
+  shape_type operator() (const shape_type &s) const
+  {
+    return shape_type (shape_reference_translator<Basic>::operator () (s), s.properties_id ());
+  }
+
+  template <class Trans>
+  shape_type operator() (const shape_type &s, const Trans &tr) const
+  {
+    return shape_type (shape_reference_translator<Basic>::operator () (s, tr), s.properties_id ());
+  }
+};
+
 template <class Ref, class Trans>
 class shape_reference_translator_with_trans_from_shape_ref
 {
@@ -273,6 +299,26 @@ private:
   Trans m_trans;
 };
 
+template <class Basic, class Trans>
+class shape_reference_translator_with_trans<db::object_with_properties<Basic>, Trans>
+  : public shape_reference_translator_with_trans<Basic, Trans>
+{
+public:
+  typedef db::object_with_properties<Basic> shape_type;
+
+  shape_reference_translator_with_trans (db::Layout *target_layout)
+    : shape_reference_translator_with_trans<Basic, Trans> (target_layout)
+  {
+    //  .. nothing yet ..
+  }
+
+  shape_type operator() (const shape_type &s) const
+  {
+    //  CAUTION: no property ID translation happens here (reasoning: the main use case is fake ID for net tagging)
+    return shape_type (shape_reference_translator_with_trans<Basic, Trans>::operator () (s), s.properties_id ());
+  }
+};
+
 // ---------------------------------------------------------------------------------------------
 
 /**
@@ -308,6 +354,8 @@ void safe_insert2_into_box_scanner (db::box_scanner2 <T1, P1, T2, P2> &, const T
 db::Box safe_box_enlarged (const db::Box &box, db::Coord dx, db::Coord dy)
 {
   if (box.empty ()) {
+    return box;
+  } else if (box == db::Box::world ()) {
     return box;
   } else {
     db::Coord w2 = db::Coord (box.width () / 2);
@@ -391,20 +439,6 @@ local_processor_cell_context<TS, TI, TR>::propagate (unsigned int output_layer, 
 
   }
 }
-
-//  explicit instantiations
-template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Polygon, db::Polygon>;
-template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Text, db::Polygon>;
-template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Edge, db::Polygon>;
-template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Text, db::Text>;
-template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Edge, db::Edge>;
-template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
-template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::Edge, db::PolygonRef>;
-template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::PolygonRef, db::EdgePair>;
-template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Polygon, db::EdgePair>;
-template class DB_PUBLIC local_processor_cell_context<db::Edge, db::Edge, db::Edge>;
-template class DB_PUBLIC local_processor_cell_context<db::Edge, db::Polygon, db::Edge>;
-template class DB_PUBLIC local_processor_cell_context<db::Edge, db::Edge, db::EdgePair>;
 
 // ---------------------------------------------------------------------------------------------
 //  LocalProcessorCellContexts implementation
@@ -495,6 +529,62 @@ subtract (std::unordered_set<db::PolygonRef> &res, const std::unordered_set<db::
 
 template <class TS, class TI>
 static void
+subtract (std::unordered_set<db::PolygonRefWithProperties> &res, const std::unordered_set<db::PolygonRefWithProperties> &other, db::Layout *layout, const db::local_processor<TS, TI, db::PolygonRefWithProperties> *proc)
+{
+  if (other.empty ()) {
+    return;
+  }
+
+  if (! proc->boolean_core ()) {
+    subtract_set (res, other);
+    return;
+  }
+
+  size_t max_vertex_count = proc->max_vertex_count ();
+  double area_ratio = proc->area_ratio ();
+
+  std::unordered_set<db::PolygonRefWithProperties> first;
+  first.swap (res);
+
+  std::map<db::properties_id_type, std::pair<std::vector<const db::PolygonRefWithProperties *>, std::vector<const db::PolygonRefWithProperties *> > > by_prop_id;
+  for (auto i = first.begin (); i != first.end (); ++i)   {
+    by_prop_id [i->properties_id ()].first.push_back (i.operator-> ());
+  }
+  for (auto i = other.begin (); i != other.end (); ++i)   {
+    by_prop_id [i->properties_id ()].second.push_back (i.operator-> ());
+  }
+
+  db::EdgeProcessor ep;
+  ep.set_base_verbosity (proc->base_verbosity () + 30);
+
+  for (auto s2p = by_prop_id.begin (); s2p != by_prop_id.end (); ++s2p) {
+
+    db::properties_id_type prop_id = s2p->first;
+    size_t p1 = 0, p2 = 1;
+
+    ep.clear ();
+
+    for (auto i = s2p->second.first.begin (); i != s2p->second.first.end (); ++i) {
+      ep.insert (**i, p1);
+      p1 += 2;
+    }
+
+    for (auto i = s2p->second.second.begin (); i != s2p->second.second.end (); ++i) {
+      ep.insert (**i, p2);
+      p2 += 2;
+    }
+
+    db::BooleanOp op (db::BooleanOp::ANotB);
+    db::polygon_ref_generator_with_properties<db::PolygonRefWithProperties> pr (layout, res, prop_id);
+    db::PolygonSplitter splitter (pr, area_ratio, max_vertex_count);
+    db::PolygonGenerator pg (splitter, true, true);
+    ep.process (pg, op);
+
+  }
+}
+
+template <class TS, class TI>
+static void
 subtract (std::unordered_set<db::Edge> &res, const std::unordered_set<db::Edge> &other, db::Layout * /*layout*/, const db::local_processor<TS, TI, db::Edge> *proc)
 {
   if (other.empty ()) {
@@ -521,6 +611,59 @@ subtract (std::unordered_set<db::Edge> &res, const std::unordered_set<db::Edge> 
   scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
 
   res.swap (result);
+}
+
+template <class TS, class TI>
+static void
+subtract (std::unordered_set<db::EdgeWithProperties> &res, const std::unordered_set<db::EdgeWithProperties> &other, db::Layout * /*layout*/, const db::local_processor<TS, TI, db::EdgeWithProperties> *proc)
+{
+  if (other.empty ()) {
+    return;
+  }
+
+  if (! proc->boolean_core ()) {
+    subtract_set (res, other);
+    return;
+  }
+
+  std::unordered_set<db::EdgeWithProperties> first;
+  first.swap (res);
+
+  std::map<db::properties_id_type, std::pair<std::vector<const db::EdgeWithProperties *>, std::vector<const db::EdgeWithProperties *> > > by_prop_id;
+  for (auto i = first.begin (); i != first.end (); ++i)   {
+    by_prop_id [i->properties_id ()].first.push_back (i.operator-> ());
+  }
+  for (auto i = other.begin (); i != other.end (); ++i)   {
+    by_prop_id [i->properties_id ()].second.push_back (i.operator-> ());
+  }
+
+  for (auto s2p = by_prop_id.begin (); s2p != by_prop_id.end (); ++s2p) {
+
+    if (s2p->second.second.empty ()) {
+
+      for (auto i = s2p->second.first.begin (); i != s2p->second.first.end (); ++i) {
+        res.insert (**i);
+      }
+
+    } else {
+
+      db::box_scanner<db::Edge, size_t> scanner;
+      scanner.reserve (s2p->second.first.size () + s2p->second.second.size ());
+
+      for (auto i = s2p->second.first.begin (); i != s2p->second.first.end (); ++i) {
+        scanner.insert (*i, 0);
+      }
+      for (auto i = s2p->second.second.begin (); i != s2p->second.second.end (); ++i) {
+        scanner.insert (*i, 1);
+      }
+
+      db::property_injector<db::Edge, std::unordered_set<db::EdgeWithProperties> > prop_inject (&res, s2p->first);
+      EdgeBooleanClusterCollector<db::property_injector<db::Edge, std::unordered_set<db::EdgeWithProperties> > > cluster_collector (&prop_inject, EdgeNot);
+      scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
+
+    }
+
+  }
 }
 
 template <class TS, class TI, class TR>
@@ -705,20 +848,6 @@ local_processor_cell_contexts<TS, TI, TR>::compute_results (const local_processo
   }
 }
 
-//  explicit instantiations
-template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Polygon, db::Polygon>;
-template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Edge, db::Polygon>;
-template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Edge, db::Edge>;
-template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Text, db::Polygon>;
-template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Text, db::Text>;
-template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
-template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::Edge, db::PolygonRef>;
-template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::PolygonRef, db::EdgePair>;
-template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Polygon, db::EdgePair>;
-template class DB_PUBLIC local_processor_cell_contexts<db::Edge, db::PolygonRef, db::Edge>;
-template class DB_PUBLIC local_processor_cell_contexts<db::Edge, db::Edge, db::Edge>;
-template class DB_PUBLIC local_processor_cell_contexts<db::Edge, db::Edge, db::EdgePair>;
-
 // ---------------------------------------------------------------------------------------------
 
 template <class TS, class TI>
@@ -809,20 +938,6 @@ shape_interactions<TS, TI>::intruder_shape (unsigned int id) const
     return i->second;
   }
 }
-
-//  explicit instantiations
-template class DB_PUBLIC shape_interactions<db::Polygon, db::Polygon>;
-template class DB_PUBLIC shape_interactions<db::Polygon, db::Text>;
-template class DB_PUBLIC shape_interactions<db::Polygon, db::TextRef>;
-template class DB_PUBLIC shape_interactions<db::Polygon, db::Edge>;
-template class DB_PUBLIC shape_interactions<db::PolygonRef, db::PolygonRef>;
-template class DB_PUBLIC shape_interactions<db::PolygonRef, db::TextRef>;
-template class DB_PUBLIC shape_interactions<db::PolygonRef, db::Text>;
-template class DB_PUBLIC shape_interactions<db::PolygonRef, db::Edge>;
-template class DB_PUBLIC shape_interactions<db::Edge, db::Edge>;
-template class DB_PUBLIC shape_interactions<db::Edge, db::PolygonRef>;
-template class DB_PUBLIC shape_interactions<db::TextRef, db::TextRef>;
-template class DB_PUBLIC shape_interactions<db::TextRef, db::PolygonRef>;
 
 // ---------------------------------------------------------------------------------------------
 //  Helper classes for the LocalProcessor
@@ -1014,6 +1129,7 @@ private:
   void add_shapes_from_intruder_inst (unsigned int id1, const db::Cell &intruder_cell, const db::ICplxTrans &tn, unsigned int /*inst_id*/, const db::Box &region)
   {
     db::shape_reference_translator<TI> rt (mp_subject_layout);
+    db::shape_to_object<TI> s2o;
 
     //  Look up all shapes from the intruder instance which interact with the subject shape
     //  (given through region)
@@ -1024,7 +1140,7 @@ private:
 
       //  NOTE: we intentionally rewrite to the *subject* layout - this way polygon refs in the context come from the
       //  subject, not from the intruder.
-      TI ref2 = rt (*si.shape ().basic_ptr (typename TI::tag ()), tn * si.trans ());
+      TI ref2 = rt (s2o (si.shape ()), tn * si.trans ());
 
       //  reuse the same id for shapes from the same instance -> this avoid duplicates with different IDs on
       //  the intruder side.
@@ -1279,28 +1395,6 @@ local_processor_context_computation_task<TS, TI, TR>::perform ()
   mp_proc->compute_contexts (*mp_contexts, mp_parent_context, mp_subject_parent, mp_subject_cell, m_subject_cell_inst, mp_intruder_cell, m_intruders, m_dist);
 }
 
-//  explicit instantiations
-template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Polygon, db::Polygon>;
-template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Text, db::Polygon>;
-template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Text, db::Text>;
-template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Edge, db::Polygon>;
-template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Edge, db::Edge>;
-template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
-template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::TextRef, db::TextRef>;
-template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::TextRef, db::PolygonRef>;
-template class DB_PUBLIC local_processor_context_computation_task<db::TextRef, db::PolygonRef, db::PolygonRef>;
-template class DB_PUBLIC local_processor_context_computation_task<db::TextRef, db::PolygonRef, db::TextRef>;
-template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::Edge, db::PolygonRef>;
-template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::Edge, db::Edge>;
-template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::PolygonRef, db::Edge>;
-template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::PolygonRef, db::EdgePair>;
-template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Polygon, db::EdgePair>;
-template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Polygon, db::Edge>;
-template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::Edge, db::Edge>;
-template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::PolygonRef, db::Edge>;
-template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::Edge, db::EdgePair>;
-template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::PolygonRef, db::PolygonRef>;
-
 // ---------------------------------------------------------------------------------------------
 //  LocalProcessorResultComputationTask implementation
 
@@ -1340,20 +1434,6 @@ local_processor_result_computation_task<TS, TI, TR>::perform ()
     mp_contexts->context_map ().erase (mp_cell);
   }
 }
-
-//  explicit instantiations
-template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Polygon, db::Polygon>;
-template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Text, db::Polygon>;
-template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Text, db::Text>;
-template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Edge, db::Polygon>;
-template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Edge, db::Edge>;
-template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
-template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::Edge, db::PolygonRef>;
-template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::PolygonRef, db::EdgePair>;
-template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Polygon, db::EdgePair>;
-template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::Edge, db::Edge>;
-template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::PolygonRef, db::Edge>;
-template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::Edge, db::EdgePair>;
 
 // ---------------------------------------------------------------------------------------------
 //  LocalProcessor implementation
@@ -1660,6 +1740,7 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
     //  TODO: can we shortcut this if interactions is empty?
     {
       db::box_scanner2<db::CellInstArray, int, TI, int> scanner;
+      db::addressable_object_from_shape<TI> heap;
       interaction_registration_inst2shape<TS, TI, TR> rec (mp_subject_layout, contexts.subject_layer (), dist, &interactions);
 
       for (db::Cell::const_iterator i = subject_cell->begin (); !i.at_end (); ++i) {
@@ -1676,7 +1757,7 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
 
       for (std::map<unsigned int, const db::Shapes *>::const_iterator im = intruder_shapes.begin (); im != intruder_shapes.end (); ++im) {
         for (db::Shapes::shape_iterator i = im->second->begin (shape_flags<TI> ()); !i.at_end (); ++i) {
-          scanner.insert2 (i->basic_ptr (typename TI::tag ()), im->first);
+          scanner.insert2 (heap (*i), im->first);
         }
       }
 
@@ -1828,11 +1909,12 @@ struct scan_shape2shape_same_layer
   operator () (const db::Shapes *subject_shapes, unsigned int subject_id0, const std::set<TI> &intruders, unsigned int intruder_layer_index, shape_interactions<TS, TI> &interactions, db::Coord dist) const
   {
     db::box_scanner2<TS, int, TI, int> scanner;
+    db::addressable_object_from_shape<TS> heap;
     interaction_registration_shape1<TS, TI> rec (&interactions, intruder_layer_index);
 
     unsigned int id = subject_id0;
     for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<TS> ()); !i.at_end (); ++i) {
-      const TS *ref = i->basic_ptr (typename TS::tag ());
+      const TS *ref = heap (*i);
       scanner.insert1 (ref, id++);
     }
 
@@ -1852,12 +1934,12 @@ struct scan_shape2shape_same_layer<T, T>
   operator () (const db::Shapes *subject_shapes, unsigned int subject_id0, const std::set<T> &intruders, unsigned int intruder_layer, shape_interactions<T, T> &interactions, db::Coord dist) const
   {
     db::box_scanner<T, int> scanner;
+    db::addressable_object_from_shape<T> heap;
     interaction_registration_shape1<T, T> rec (&interactions, intruder_layer);
 
     unsigned int id = subject_id0;
     for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<T> ()); !i.at_end (); ++i) {
-      const T *ref = i->basic_ptr (typename T::tag ());
-      scanner.insert (ref, id++);
+      scanner.insert (heap (*i), id++);
     }
 
     //  TODO: can we confine this search to the subject's (sized) bounding box?
@@ -1876,12 +1958,13 @@ struct scan_shape2shape_different_layers
   operator () (db::Layout *layout, const db::Shapes *subject_shapes, const db::Shapes *intruder_shapes, unsigned int subject_id0, const std::set<TI> *intruders, unsigned int intruder_layer_index, shape_interactions<TS, TI> &interactions, db::Coord dist) const
   {
     db::box_scanner2<TS, int, TI, int> scanner;
+    db::addressable_object_from_shape<TS> sheap;
+    db::addressable_object_from_shape<TI> iheap;
     interaction_registration_shape2shape<TS, TI> rec (layout, &interactions, intruder_layer_index);
 
     unsigned int id = subject_id0;
     for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<TS> ()); !i.at_end (); ++i, ++id) {
-      const TS *ref = i->basic_ptr (typename TS::tag ());
-      scanner.insert1 (ref, id);
+      scanner.insert1 (sheap (*i), id);
     }
 
     //  TODO: can we confine this search to the subject's (sized) bounding box?
@@ -1900,7 +1983,7 @@ struct scan_shape2shape_different_layers
       unsigned int id = subject_id0;
       for (db::Shapes::shape_iterator i = intruder_shapes->begin (shape_flags<TI> ()); !i.at_end (); ++i, ++id) {
         unsigned int iid = interactions.next_id ();
-        scanner.insert2 (i->basic_ptr (typename TI::tag ()), iid);
+        scanner.insert2 (iheap (*i), iid);
         rec.same (id, iid);
       }
 
@@ -1908,7 +1991,7 @@ struct scan_shape2shape_different_layers
 
       //  TODO: can we confine this search to the subject's (sized) bounding box?
       for (db::Shapes::shape_iterator i = intruder_shapes->begin (shape_flags<TI> ()); !i.at_end (); ++i) {
-        scanner.insert2 (i->basic_ptr (typename TI::tag ()), interactions.next_id ());
+        scanner.insert2 (iheap (*i), interactions.next_id ());
       }
 
     }
@@ -1924,6 +2007,7 @@ void
 local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_contexts<TS, TI, TR> &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const local_operation<TS, TI, TR> *op, const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, std::vector<std::unordered_set<TR> > &result) const
 {
   const db::Shapes *subject_shapes = &subject_cell->shapes (contexts.subject_layer ());
+  db::shape_to_object<TS> s2o;
 
   shape_interactions<TS, TI> interactions;
 
@@ -1938,8 +2022,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
     }
 
     if (op->on_empty_intruder_hint () != OnEmptyIntruderHint::Drop) {
-      const TS *ref = i->basic_ptr (typename TS::tag ());
-      interactions.add_subject (id, *ref);
+      interactions.add_subject (id, s2o (*i));
     }
 
   }
@@ -1983,11 +2066,12 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
     if (! subject_shapes->empty () && ! ((! intruder_cell || intruder_cell->begin ().at_end ()) && intruders.first.empty ())) {
 
       db::box_scanner2<TS, int, db::CellInstArray, int> scanner;
+      db::addressable_object_from_shape<TS> heap;
       interaction_registration_shape2inst<TS, TI> rec (mp_subject_layout, mp_intruder_layout, ail, il_index, op->dist (), &interactions);
 
       unsigned int id = subject_id0;
       for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<TS> ()); !i.at_end (); ++i) {
-        scanner.insert1 (i->basic_ptr (typename TS::tag ()), id++);
+        scanner.insert1 (heap (*i), id++);
       }
 
       unsigned int inst_id = 0;
@@ -2167,21 +2251,16 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
   db::Coord dist = op->dist ();
 
-  db::Box subjects_box = subjects.bbox ();
-  if (subjects_box != db::Box::world ()) {
-    subjects_box.enlarge (db::Vector (dist, dist));
-  }
+  db::Box subjects_box = safe_box_enlarged (subjects.bbox (), dist, dist);
 
   db::Box intruders_box;
   for (typename std::vector<generic_shape_iterator<TI> >::const_iterator il = intruders.begin (); il != intruders.end (); ++il) {
     intruders_box += il->bbox ();
   }
-  if (intruders_box != db::Box::world ()) {
-    intruders_box.enlarge (db::Vector (dist, dist));
-  }
+  intruders_box = safe_box_enlarged (intruders_box, dist, dist);
 
   db::Box common_box = intruders_box & subjects_box;
-  if (common_box.empty ()) {
+  if (common_box.empty () || common_box.width () == 0 || common_box.height () == 0) {
 
     if (needs_isolated_subjects) {
       for (generic_shape_iterator<TS> is = subjects; ! is.at_end (); ++is) {
@@ -2192,13 +2271,14 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
   } else {
 
+    common_box = safe_box_enlarged (common_box, -1, -1);
+
     if (needs_isolated_subjects) {
 
-      addressable_shape_delivery<TS> is (subjects);
+      unaddressable_shape_delivery<TS> is (subjects);
       for ( ; !is.at_end (); ++is) {
-        const TS *shape = is.operator-> ();
         unsigned int id = interactions.next_id ();
-        interactions.add_subject (id, *shape);
+        interactions.add_subject (id, *is);
       }
 
       unsigned int il_index = 0;
@@ -2240,7 +2320,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
           } else {
 
-            addressable_shape_delivery<TI> ii ((*il).confined (common_box, true));
+            addressable_shape_delivery<TI> ii ((*il).confined (common_box, false));
             for (; !ii.at_end (); ++ii) {
               scanner.insert2 (ii.operator-> (), interactions.next_id ());
             }
@@ -2276,7 +2356,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
           interaction_registration_shape1_scanner_combo<TS, TI> scanner (&interactions, il_index, m_report_progress, scan_description);
 
-          addressable_shape_delivery<TS> is (subjects.confined (common_box, true));
+          addressable_shape_delivery<TS> is (subjects.confined (common_box, false));
           unsigned int id = id_first;
 
           for ( ; ! is.at_end (); ++is, ++id) {
@@ -2295,7 +2375,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
             //  this is the case of intra-layer interactions ("foreign"): we pretend we have two layers and
             //  reject shape self-interactions by registering them as "same"
 
-            addressable_shape_delivery<TS> is (subjects.confined (common_box, true));
+            addressable_shape_delivery<TS> is (subjects.confined (common_box, false));
 
             unsigned int id = id_first;
             for ( ; ! is.at_end (); ++is, ++id) {
@@ -2309,8 +2389,8 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
           } else {
 
-            addressable_shape_delivery<TS> is (subjects.confined (common_box, true));
-            addressable_shape_delivery<TI> ii ((*il).confined (common_box, true));
+            addressable_shape_delivery<TS> is (subjects.confined (common_box, false));
+            addressable_shape_delivery<TI> ii ((*il).confined (common_box, false));
 
             unsigned int id = id_first;
             for ( ; ! is.at_end (); ++is, ++id) {
@@ -2356,12 +2436,136 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
   }
 }
 
+// ---------------------------------------------------------------------------------------------
+
+//  NOTE: don't forget to update the explicit instantiations in dbLocalOperation.cc
+
+//  explicit instantiations
+template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Polygon, db::Polygon>;
+template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Text, db::Polygon>;
+template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Edge, db::Polygon>;
+template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Text, db::Text>;
+template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor_cell_context<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
+template class DB_PUBLIC local_processor_cell_context<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties>;
+template class DB_PUBLIC local_processor_cell_context<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgePairWithProperties>;
+template class DB_PUBLIC local_processor_cell_context<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_context<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties>;
+template class DB_PUBLIC local_processor_cell_context<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgeWithProperties>;
+template class DB_PUBLIC local_processor_cell_context<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePairWithProperties>;
+template class DB_PUBLIC local_processor_cell_context<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::Edge, db::PolygonRef>;
+template class DB_PUBLIC local_processor_cell_context<db::PolygonRef, db::PolygonRef, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_context<db::Polygon, db::Polygon, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_context<db::Edge, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor_cell_context<db::Edge, db::Polygon, db::Edge>;
+template class DB_PUBLIC local_processor_cell_context<db::Edge, db::Edge, db::EdgePair>;
+
+//  explicit instantiations
+template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Polygon, db::Polygon>;
+template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Edge, db::Polygon>;
+template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Text, db::Polygon>;
+template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Text, db::Text>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgePairWithProperties>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgeWithProperties>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePairWithProperties>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::Edge, db::PolygonRef>;
+template class DB_PUBLIC local_processor_cell_contexts<db::PolygonRef, db::PolygonRef, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_contexts<db::Polygon, db::Polygon, db::EdgePair>;
+template class DB_PUBLIC local_processor_cell_contexts<db::Edge, db::PolygonRef, db::Edge>;
+template class DB_PUBLIC local_processor_cell_contexts<db::Edge, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor_cell_contexts<db::Edge, db::Edge, db::EdgePair>;
+
+//  explicit instantiations
+template class DB_PUBLIC shape_interactions<db::Polygon, db::Polygon>;
+template class DB_PUBLIC shape_interactions<db::Polygon, db::Text>;
+template class DB_PUBLIC shape_interactions<db::Polygon, db::TextRef>;
+template class DB_PUBLIC shape_interactions<db::Polygon, db::Edge>;
+template class DB_PUBLIC shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
+template class DB_PUBLIC shape_interactions<db::PolygonWithProperties, db::PolygonWithProperties>;
+template class DB_PUBLIC shape_interactions<db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC shape_interactions<db::PolygonRef, db::TextRef>;
+template class DB_PUBLIC shape_interactions<db::PolygonRef, db::Text>;
+template class DB_PUBLIC shape_interactions<db::PolygonRef, db::Edge>;
+template class DB_PUBLIC shape_interactions<db::Edge, db::Edge>;
+template class DB_PUBLIC shape_interactions<db::Edge, db::PolygonRef>;
+template class DB_PUBLIC shape_interactions<db::TextRef, db::TextRef>;
+template class DB_PUBLIC shape_interactions<db::TextRef, db::PolygonRef>;
+
+//  explicit instantiations
+template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Polygon, db::Polygon>;
+template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Text, db::Polygon>;
+template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Text, db::Text>;
+template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Edge, db::Polygon>;
+template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgePairWithProperties>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgePair>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgeWithProperties>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePairWithProperties>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePair>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::TextRef, db::TextRef>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::TextRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor_context_computation_task<db::TextRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor_context_computation_task<db::TextRef, db::PolygonRef, db::TextRef>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::Edge, db::PolygonRef>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::PolygonRef, db::Edge>;
+template class DB_PUBLIC local_processor_context_computation_task<db::PolygonRef, db::PolygonRef, db::EdgePair>;
+template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Polygon, db::EdgePair>;
+template class DB_PUBLIC local_processor_context_computation_task<db::Polygon, db::Polygon, db::Edge>;
+template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::PolygonRef, db::Edge>;
+template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::Edge, db::EdgePair>;
+template class DB_PUBLIC local_processor_context_computation_task<db::Edge, db::PolygonRef, db::PolygonRef>;
+
+//  explicit instantiations
+template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Polygon, db::Polygon>;
+template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Text, db::Polygon>;
+template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Text, db::Text>;
+template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Edge, db::Polygon>;
+template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties>;
+template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
+template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgePairWithProperties>;
+template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgePair>;
+template class DB_PUBLIC local_processor_result_computation_task<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties>;
+template class DB_PUBLIC local_processor_result_computation_task<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgeWithProperties>;
+template class DB_PUBLIC local_processor_result_computation_task<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePairWithProperties>;
+template class DB_PUBLIC local_processor_result_computation_task<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePair>;
+template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::Edge, db::PolygonRef>;
+template class DB_PUBLIC local_processor_result_computation_task<db::PolygonRef, db::PolygonRef, db::EdgePair>;
+template class DB_PUBLIC local_processor_result_computation_task<db::Polygon, db::Polygon, db::EdgePair>;
+template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::PolygonRef, db::Edge>;
+template class DB_PUBLIC local_processor_result_computation_task<db::Edge, db::Edge, db::EdgePair>;
+
 //  explicit instantiations
 template class DB_PUBLIC local_processor<db::Polygon, db::Polygon, db::Polygon>;
 template class DB_PUBLIC local_processor<db::Polygon, db::Text, db::Polygon>;
 template class DB_PUBLIC local_processor<db::Polygon, db::Text, db::Text>;
 template class DB_PUBLIC local_processor<db::Polygon, db::Edge, db::Polygon>;
 template class DB_PUBLIC local_processor<db::Polygon, db::Edge, db::Edge>;
+template class DB_PUBLIC local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::PolygonRefWithProperties>;
+template class DB_PUBLIC local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties>;
+template class DB_PUBLIC local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgePair>;
+template class DB_PUBLIC local_processor<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgePairWithProperties>;
+template class DB_PUBLIC local_processor<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties>;
+template class DB_PUBLIC local_processor<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgeWithProperties>;
+template class DB_PUBLIC local_processor<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePair>;
+template class DB_PUBLIC local_processor<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePairWithProperties>;
 template class DB_PUBLIC local_processor<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC local_processor<db::PolygonRef, db::Edge, db::PolygonRef>;
 template class DB_PUBLIC local_processor<db::PolygonRef, db::Edge, db::Edge>;

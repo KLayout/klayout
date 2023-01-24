@@ -104,7 +104,7 @@ AsIfFlatEdges::selected_interacting_generic (const Region &other, EdgeInteractio
 
   db::box_scanner2<db::Edge, size_t, db::Polygon, size_t> scanner (report_progress (), progress_desc ());
 
-  AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
+  AddressableEdgeDelivery e (begin_merged ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert1 (e.operator-> (), 0);
@@ -150,7 +150,7 @@ AsIfFlatEdges::selected_interacting_generic (const Edges &edges, EdgeInteraction
 
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
 
-  AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
+  AddressableEdgeDelivery e (begin_merged ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert (e.operator-> (), 0);
@@ -201,7 +201,7 @@ AsIfFlatEdges::selected_interacting_pair_generic (const Region &region, EdgeInte
 
   db::box_scanner2<db::Edge, size_t, db::Polygon, size_t> scanner (report_progress (), progress_desc ());
 
-  AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
+  AddressableEdgeDelivery e (begin_merged ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert1 (e.operator-> (), 0);
@@ -245,7 +245,7 @@ AsIfFlatEdges::selected_interacting_pair_generic (const Edges &other, EdgeIntera
 
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
 
-  AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
+  AddressableEdgeDelivery e (begin_merged ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert (e.operator-> (), 0);
@@ -281,7 +281,7 @@ AsIfFlatEdges::pull_generic (const Edges &edges) const
 {
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
 
-  AddressableEdgeDelivery e (begin (), has_valid_edges ());
+  AddressableEdgeDelivery e (begin ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert (e.operator-> (), 1);
@@ -310,7 +310,7 @@ AsIfFlatEdges::pull_generic (const Region &other) const
 
   db::box_scanner2<db::Edge, size_t, db::Polygon, size_t> scanner (report_progress (), progress_desc ());
 
-  AddressableEdgeDelivery e (begin (), true);
+  AddressableEdgeDelivery e (begin ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert1 (e.operator-> (), 0);
@@ -480,6 +480,8 @@ AsIfFlatEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, c
 {
   if (join) {
 
+    //  TODO: property support?
+
     std::unique_ptr<FlatRegion> output (new FlatRegion ());
     db::ShapeGenerator sg (output->raw_polygons (), false);
     JoinEdgesClusterCollector cluster_collector (&sg, ext_b, ext_e, ext_o, ext_i);
@@ -487,7 +489,7 @@ AsIfFlatEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, c
     db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
     scanner.reserve (count ());
 
-    AddressableEdgeDelivery e (begin (), has_valid_edges ());
+    AddressableEdgeDelivery e (begin ());
 
     size_t n = 0;
     for ( ; ! e.at_end (); ++e) {
@@ -502,8 +504,15 @@ AsIfFlatEdges::extended (coord_type ext_b, coord_type ext_e, coord_type ext_o, c
   } else {
 
     std::unique_ptr<FlatRegion> output (new FlatRegion ());
+    db::PropertyMapper pm (output->properties_repository (), properties_repository ());
+
     for (EdgesIterator e (begin_merged ()); ! e.at_end (); ++e) {
-      output->insert (extended_edge (*e, ext_b, ext_e, ext_o, ext_i));
+      db::properties_id_type prop_id = pm (e.prop_id ());
+      if (prop_id != 0) {
+        output->insert (db::PolygonWithProperties (extended_edge (*e, ext_b, ext_e, ext_o, ext_i), prop_id));
+      } else {
+        output->insert (extended_edge (*e, ext_b, ext_e, ext_o, ext_i));
+      }
     }
 
     return output.release ();
@@ -733,7 +742,7 @@ AsIfFlatEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Co
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve (count () + (other ? other->count () : 0));
 
-  AddressableEdgeDelivery e (begin_merged (), has_valid_merged_edges ());
+  AddressableEdgeDelivery e (begin_merged ());
 
   size_t n = 0;
   for ( ; ! e.at_end (); ++e) {
@@ -774,7 +783,7 @@ AsIfFlatEdges::boolean (const Edges *other, EdgeBoolOp op) const
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve (count () + (other ? other->count () : 0));
 
-  AddressableEdgeDelivery e (begin (), has_valid_edges ());
+  AddressableEdgeDelivery e (begin ());
 
   for ( ; ! e.at_end (); ++e) {
     if (! e->is_degenerate ()) {
@@ -808,7 +817,7 @@ AsIfFlatEdges::boolean_andnot (const Edges *other) const
   db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
   scanner.reserve (count () + (other ? other->count () : 0));
 
-  AddressableEdgeDelivery e (begin (), has_valid_edges ());
+  AddressableEdgeDelivery e (begin ());
 
   for ( ; ! e.at_end (); ++e) {
     if (! e->is_degenerate ()) {
@@ -876,7 +885,7 @@ AsIfFlatEdges::edge_region_op (const Region &other, db::EdgePolygonOp::mode_t mo
 EdgesDelegate *
 AsIfFlatEdges::add (const Edges &other) const
 {
-  FlatEdges *other_flat = dynamic_cast<FlatEdges *> (other.delegate ());
+  const FlatEdges *other_flat = dynamic_cast<const FlatEdges *> (other.delegate ());
   if (other_flat) {
 
     std::unique_ptr<FlatEdges> new_edges (new FlatEdges (*other_flat));
@@ -960,10 +969,15 @@ AsIfFlatEdges::insert_into (Layout *layout, db::cell_index_type into_cell, unsig
 {
   //  improves performance when inserting an original layout into the same layout
   db::LayoutLocker locker (layout);
+  db::PropertyMapper pm (&layout->properties_repository (), properties_repository ());
 
   db::Shapes &shapes = layout->cell (into_cell).shapes (into_layer);
   for (EdgesIterator e (begin ()); ! e.at_end (); ++e) {
-    shapes.insert (*e);
+    if (e.prop_id () != 0) {
+      shapes.insert (db::EdgeWithProperties (*e, pm (e.prop_id ())));
+    } else {
+      shapes.insert (*e);
+    }
   }
 }
 

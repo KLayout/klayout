@@ -26,10 +26,7 @@
 #define HDR_dbLocalOperation
 
 #include "dbCommon.h"
-
 #include "dbLayout.h"
-#include "dbEdgeBoolean.h"
-#include "dbEdgeProcessor.h"
 
 #include <unordered_map>
 #include <unordered_set>
@@ -127,102 +124,6 @@ protected:
    *  @param result The container to which the results are written
    */
   virtual void do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &result, size_t max_vertex_count, double area_ratio) const = 0;
-};
-
-/**
- *  @brief Implements a boolean AND or NOT operation
- */
-class DB_PUBLIC BoolAndOrNotLocalOperation
-  : public local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>
-{
-public:
-  BoolAndOrNotLocalOperation (bool is_and);
-
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &result, size_t max_vertex_count, double area_ratio) const;
-  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
-  virtual std::string description () const;
-
-private:
-  bool m_is_and;
-};
-
-/**
- *  @brief Implements a boolean AND plus NOT operation
- *
- *  This processor delivers two outputs: the first one having the AND result, the second
- *  one having the NOT result.
- */
-class DB_PUBLIC TwoBoolAndNotLocalOperation
-  : public local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>
-{
-public:
-  TwoBoolAndNotLocalOperation ();
-
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &result, size_t max_vertex_count, double area_ratio) const;
-  virtual std::string description () const;
-};
-
-/**
- *  @brief Implements a merge operation with an overlap count
- *  With a given wrap_count, the result will only contains shapes where
- *  the original shapes overlap at least "wrap_count" times.
- */
-class DB_PUBLIC SelfOverlapMergeLocalOperation
-  : public local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>
-{
-public:
-  SelfOverlapMergeLocalOperation (unsigned int wrap_count);
-
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &result, size_t max_vertex_count, double area_ratio) const;
-  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
-  virtual std::string description () const;
-
-private:
-  unsigned int m_wrap_count;
-};
-
-/**
- *  @brief Implements a boolean AND or NOT operation between edges
- */
-class DB_PUBLIC EdgeBoolAndOrNotLocalOperation
-  : public local_operation<db::Edge, db::Edge, db::Edge>
-{
-public:
-  EdgeBoolAndOrNotLocalOperation (db::EdgeBoolOp op);
-
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &result, size_t max_vertex_count, double area_ratio) const;
-  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
-  virtual std::string description () const;
-
-  //  edge interaction distance is 1 to force overlap between edges and edge/boxes
-  virtual db::Coord dist () const { return 1; }
-
-private:
-  db::EdgeBoolOp m_op;
-};
-
-/**
- *  @brief Implements a boolean AND or NOT operation between edges and polygons (polygons as intruders)
- *
- *  "AND" is implemented by "outside == false", "NOT" by "outside == true" with "include_borders == true".
- *  With "include_borders == false" the operations are "INSIDE" and "OUTSIDE".
- */
-class DB_PUBLIC EdgeToPolygonLocalOperation
-  : public local_operation<db::Edge, db::PolygonRef, db::Edge>
-{
-public:
-  EdgeToPolygonLocalOperation (EdgePolygonOp::mode_t op, bool include_borders);
-
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &result, size_t max_vertex_count, double area_ratio) const;
-  virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
-  virtual std::string description () const;
-
-  //  edge interaction distance is 1 to force overlap between edges and edge/boxes
-  virtual db::Coord dist () const { return m_include_borders ? 1 : 0; }
-
-private:
-  db::EdgePolygonOp::mode_t m_op;
-  bool m_include_borders;
 };
 
 }

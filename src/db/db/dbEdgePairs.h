@@ -44,63 +44,8 @@ class DeepShapeStore;
 class TransformationReducer;
 class EdgeFilterBase;
 
-/**
- *  @brief An edge pair set iterator
- *
- *  The iterator delivers the edge pairs of the edge pair set
- */
-class DB_PUBLIC EdgePairsIterator
-  : public generic_shape_iterator<db::EdgePair>
-{
-public:
-  /**
-   *  @brief Default constructor
-   */
-  EdgePairsIterator ()
-    : generic_shape_iterator<db::EdgePair> ()
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Constructor from a delegate
-   *  The iterator will take ownership over the delegate
-   */
-  EdgePairsIterator (EdgePairsIteratorDelegate *delegate)
-    : generic_shape_iterator<db::EdgePair> (delegate)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Copy constructor and assignment
-   */
-  EdgePairsIterator (const EdgePairsIterator &other)
-    : generic_shape_iterator<db::EdgePair> (static_cast<const generic_shape_iterator<db::EdgePair> &> (other))
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Assignment
-   */
-  EdgePairsIterator &operator= (const EdgePairsIterator &other)
-  {
-    generic_shape_iterator<db::EdgePair>::operator= (other);
-    return *this;
-  }
-
-  /**
-   *  @brief Increment
-   */
-  EdgePairsIterator &operator++ ()
-  {
-    generic_shape_iterator<db::EdgePair>::operator++ ();
-    return *this;
-  }
-};
-
-typedef addressable_shape_delivery_gen<EdgePairsIterator> AddressableEdgePairDelivery;
+typedef generic_shape_iterator<EdgePair> EdgePairsIterator;
+typedef addressable_shape_delivery<EdgePair> AddressableEdgePairDelivery;
 
 class EdgePairs;
 
@@ -251,7 +196,15 @@ public:
   /**
    *  @brief Gets the underlying delegate object
    */
-  EdgePairsDelegate *delegate () const
+  const EdgePairsDelegate *delegate () const
+  {
+    return mp_delegate;
+  }
+
+  /**
+   *  @brief Gets the underlying delegate object
+   */
+  EdgePairsDelegate *delegate ()
   {
     return mp_delegate;
   }
@@ -488,7 +441,7 @@ public:
    */
   AddressableEdgePairDelivery addressable_edge_pairs () const
   {
-    return AddressableEdgePairDelivery (begin (), has_valid_edge_pairs ());
+    return AddressableEdgePairDelivery (begin ());
   }
 
   /**
@@ -497,6 +450,20 @@ public:
    *  This method is intended for users who know what they are doing
    */
   const db::RecursiveShapeIterator &iter () const;
+
+  /**
+   *  @brief Gets the property repository
+   *
+   *  Use this object to decode property IDs.
+   */
+  const db::PropertiesRepository &properties_repository () const;
+
+  /**
+   *  @brief Gets the property repository
+   *
+   *  Use this object to decode and encode property IDs.
+   */
+  db::PropertiesRepository &properties_repository ();
 
   /**
    *  @brief Equality

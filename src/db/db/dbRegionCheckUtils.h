@@ -156,14 +156,14 @@ class DB_PUBLIC_TEMPLATE edge2edge_check
   : public Edge2EdgeCheckBase
 {
 public:
-  edge2edge_check (const EdgeRelationFilter &check, Output &output, bool different_polygons, bool requires_different_layers, bool with_shielding, bool symmetric_edges)
-    : Edge2EdgeCheckBase (check, different_polygons, requires_different_layers, with_shielding, symmetric_edges), mp_output_inter (&output), mp_output_intra (0)
+  edge2edge_check (const EdgeRelationFilter &check, Output &output, bool different_polygons, bool requires_different_layers, bool with_shielding, bool symmetric_edges, db::properties_id_type prop_id = 0)
+    : Edge2EdgeCheckBase (check, different_polygons, requires_different_layers, with_shielding, symmetric_edges), mp_output_inter (&output), mp_output_intra (0), m_prop_id (prop_id)
   {
     //  .. nothing yet ..
   }
 
-  edge2edge_check (const EdgeRelationFilter &check, Output &output_inter, Output &output_intra, bool different_polygons, bool requires_different_layers, bool with_shielding, bool symmetric_edges)
-    : Edge2EdgeCheckBase (check, different_polygons, requires_different_layers, with_shielding, symmetric_edges), mp_output_inter (&output_inter), mp_output_intra (&output_intra)
+  edge2edge_check (const EdgeRelationFilter &check, Output &output_inter, Output &output_intra, bool different_polygons, bool requires_different_layers, bool with_shielding, bool symmetric_edges, db::properties_id_type prop_id = 0)
+    : Edge2EdgeCheckBase (check, different_polygons, requires_different_layers, with_shielding, symmetric_edges), mp_output_inter (&output_inter), mp_output_intra (&output_intra), m_prop_id (prop_id)
   {
     //  .. nothing yet ..
   }
@@ -172,15 +172,24 @@ protected:
   void put (const db::EdgePair &edge, bool inter_polygon) const
   {
     if (! inter_polygon || ! mp_output_intra) {
-      mp_output_inter->insert (edge);
+      if (m_prop_id != 0) {
+        mp_output_inter->insert (db::EdgePairWithProperties(edge, m_prop_id));
+      } else {
+        mp_output_inter->insert (edge);
+      }
     } else {
-      mp_output_intra->insert (edge);
+      if (m_prop_id != 0) {
+        mp_output_intra->insert (db::EdgePairWithProperties(edge, m_prop_id));
+      } else {
+        mp_output_intra->insert (edge);
+      }
     }
   }
 
 private:
   Output *mp_output_inter;
   Output *mp_output_intra;
+  db::properties_id_type m_prop_id;
 };
 
 /**
@@ -194,16 +203,16 @@ class DB_PUBLIC_TEMPLATE edge2edge_check_with_negative_output
   : public edge2edge_check<Output>
 {
 public:
-  edge2edge_check_with_negative_output (const EdgeRelationFilter &check, Output &output, NegativeEdgeOutput &l1_negative_output, NegativeEdgeOutput &l2_negative_output, bool different_polygons, bool requires_different_layers, bool with_shielding, bool symmetric_edges)
-    : edge2edge_check<Output> (check, output, different_polygons, requires_different_layers, with_shielding, symmetric_edges),
+  edge2edge_check_with_negative_output (const EdgeRelationFilter &check, Output &output, NegativeEdgeOutput &l1_negative_output, NegativeEdgeOutput &l2_negative_output, bool different_polygons, bool requires_different_layers, bool with_shielding, bool symmetric_edges, db::properties_id_type prop_id = 0)
+    : edge2edge_check<Output> (check, output, different_polygons, requires_different_layers, with_shielding, symmetric_edges, prop_id),
       mp_l1_negative_output (&l1_negative_output),
       mp_l2_negative_output (&l2_negative_output)
   {
     edge2edge_check<Output>::set_has_negative_edge_output (true);
   }
 
-  edge2edge_check_with_negative_output (const EdgeRelationFilter &check, Output &output_inter, Output &output_intra, NegativeEdgeOutput &l1_negative_output, NegativeEdgeOutput &l2_negative_output, bool different_polygons, bool requires_different_layers, bool with_shielding, bool symmetric_edges)
-    : edge2edge_check<Output> (check, output_inter, output_intra, different_polygons, requires_different_layers, with_shielding, symmetric_edges),
+  edge2edge_check_with_negative_output (const EdgeRelationFilter &check, Output &output_inter, Output &output_intra, NegativeEdgeOutput &l1_negative_output, NegativeEdgeOutput &l2_negative_output, bool different_polygons, bool requires_different_layers, bool with_shielding, bool symmetric_edges, db::properties_id_type prop_id = 0)
+    : edge2edge_check<Output> (check, output_inter, output_intra, different_polygons, requires_different_layers, with_shielding, symmetric_edges, prop_id),
       mp_l1_negative_output (&l1_negative_output),
       mp_l2_negative_output (&l2_negative_output)
   {
@@ -272,15 +281,15 @@ class DB_PUBLIC_TEMPLATE edge2edge_check_negative_or_positive
   : public edge2edge_check<Output>
 {
 public:
-  edge2edge_check_negative_or_positive (const EdgeRelationFilter &check, Output &output, bool negative_output, bool different_polygons, bool requires_different_layers, bool with_shielding, bool symmetric)
-    : edge2edge_check<Output> (check, output, different_polygons, requires_different_layers, with_shielding, symmetric)
+  edge2edge_check_negative_or_positive (const EdgeRelationFilter &check, Output &output, bool negative_output, bool different_polygons, bool requires_different_layers, bool with_shielding, bool symmetric, db::properties_id_type prop_id = 0)
+    : edge2edge_check<Output> (check, output, different_polygons, requires_different_layers, with_shielding, symmetric, prop_id)
   {
     edge2edge_check<Output>::set_has_negative_edge_output (negative_output);
     edge2edge_check<Output>::set_has_edge_pair_output (! negative_output);
   }
 
-  edge2edge_check_negative_or_positive (const EdgeRelationFilter &check, Output &output_inter, Output &output_intra, bool negative_output, bool different_polygons, bool requires_different_layers, bool with_shielding, bool symmetric)
-    : edge2edge_check<Output> (check, output_inter, output_intra, different_polygons, requires_different_layers, with_shielding, symmetric)
+  edge2edge_check_negative_or_positive (const EdgeRelationFilter &check, Output &output_inter, Output &output_intra, bool negative_output, bool different_polygons, bool requires_different_layers, bool with_shielding, bool symmetric, db::properties_id_type prop_id = 0)
+    : edge2edge_check<Output> (check, output_inter, output_intra, different_polygons, requires_different_layers, with_shielding, symmetric, prop_id)
   {
     edge2edge_check<Output>::set_has_negative_edge_output (negative_output);
     edge2edge_check<Output>::set_has_edge_pair_output (! negative_output);

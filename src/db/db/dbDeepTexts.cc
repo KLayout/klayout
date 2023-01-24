@@ -49,7 +49,7 @@ public:
   typedef db::Text value_type;
 
   DeepTextsIterator (const db::RecursiveShapeIterator &iter)
-    : m_iter (iter)
+    : m_iter (iter), m_prop_id (0)
   {
     set ();
   }
@@ -75,6 +75,11 @@ public:
   virtual const value_type *get () const
   {
     return &m_text;
+  }
+
+  virtual db::properties_id_type prop_id () const
+  {
+    return m_prop_id;
   }
 
   virtual bool equals (const generic_shape_iterator_delegate_base<value_type> *other) const
@@ -105,12 +110,14 @@ private:
 
   db::RecursiveShapeIterator m_iter;
   mutable value_type m_text;
+  mutable db::properties_id_type m_prop_id;
 
   void set () const
   {
     if (! m_iter.at_end ()) {
-      m_iter.shape ().text (m_text);
+      m_iter->text (m_text);
       m_text.transform (m_iter.trans ());
+      m_prop_id = m_iter->prop_id ();
     }
   }
 };
@@ -329,6 +336,21 @@ bool DeepTexts::has_valid_texts () const
 const db::RecursiveShapeIterator *DeepTexts::iter () const
 {
   return 0;
+}
+
+void DeepTexts::apply_property_translator (const db::PropertiesTranslator &pt)
+{
+  DeepShapeCollectionDelegateBase::apply_property_translator (pt);
+}
+
+db::PropertiesRepository *DeepTexts::properties_repository ()
+{
+  return &deep_layer ().layout ().properties_repository ();
+}
+
+const db::PropertiesRepository *DeepTexts::properties_repository () const
+{
+  return &deep_layer ().layout ().properties_repository ();
 }
 
 TextsDelegate *

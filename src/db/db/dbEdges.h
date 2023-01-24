@@ -39,63 +39,8 @@ class MutableEdges;
 class EmptyEdges;
 class DeepShapeStore;
 
-/**
- *  @brief An edge set iterator
- *
- *  The iterator delivers the edges of the edge set
- */
-class DB_PUBLIC EdgesIterator
-  : public generic_shape_iterator<db::Edge>
-{
-public:
-  /**
-   *  @brief Default constructor
-   */
-  EdgesIterator ()
-    : generic_shape_iterator<db::Edge> ()
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Constructor from a delegate
-   *  The iterator will take ownership over the delegate
-   */
-  EdgesIterator (EdgesIteratorDelegate *delegate)
-    : generic_shape_iterator<db::Edge> (delegate)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Copy constructor and assignment
-   */
-  EdgesIterator (const EdgesIterator &other)
-    : generic_shape_iterator<db::Edge> (static_cast<const generic_shape_iterator<db::Edge> &> (other))
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Assignment
-   */
-  EdgesIterator &operator= (const EdgesIterator &other)
-  {
-    generic_shape_iterator<db::Edge>::operator= (other);
-    return *this;
-  }
-
-  /**
-   *  @brief Increment
-   */
-  EdgesIterator &operator++ ()
-  {
-    generic_shape_iterator<db::Edge>::operator++ ();
-    return *this;
-  }
-};
-
-typedef addressable_shape_delivery_gen<EdgesIterator> AddressableEdgeDelivery;
+typedef generic_shape_iterator<db::Edge> EdgesIterator;
+typedef addressable_shape_delivery<Edge> AddressableEdgeDelivery;
 
 class Edges;
 
@@ -269,7 +214,15 @@ public:
   /**
    *  @brief Gets the underlying delegate object
    */
-  EdgesDelegate *delegate () const
+  const EdgesDelegate *delegate () const
+  {
+    return mp_delegate;
+  }
+
+  /**
+   *  @brief Gets the underlying delegate object
+   */
+  EdgesDelegate *delegate ()
   {
     return mp_delegate;
   }
@@ -1441,7 +1394,7 @@ public:
    */
   AddressableEdgeDelivery addressable_edges () const
   {
-    return AddressableEdgeDelivery (begin (), has_valid_edges ());
+    return AddressableEdgeDelivery (begin ());
   }
 
   /**
@@ -1460,7 +1413,7 @@ public:
    */
   AddressableEdgeDelivery addressable_merged_edges () const
   {
-    return AddressableEdgeDelivery (begin_merged (), has_valid_merged_edges ());
+    return AddressableEdgeDelivery (begin_merged ());
   }
 
   /**
@@ -1469,6 +1422,20 @@ public:
    *  This method is intended for users who know what they are doing
    */
   const db::RecursiveShapeIterator &iter () const;
+
+  /**
+   *  @brief Gets the property repository
+   *
+   *  Use this object to decode property IDs.
+   */
+  const db::PropertiesRepository &properties_repository () const;
+
+  /**
+   *  @brief Gets the property repository
+   *
+   *  Use this object to decode and encode property IDs.
+   */
+  db::PropertiesRepository &properties_repository ();
 
   /**
    *  @brief Equality

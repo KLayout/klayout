@@ -40,10 +40,9 @@
 #include "dbRegionLocalOperations.h"
 #include "dbHierProcessor.h"
 #include "dbCompoundOperation.h"
+#include "dbLayoutToNetlist.h"
 
 #include <sstream>
-
-#define USE_LOCAL_PROCESSOR   // comment out for original implementation based on a single scan
 
 namespace db
 {
@@ -74,6 +73,23 @@ private:
   std::unordered_map<const db::Polygon *, size_t, std::ptr_hash_from_value<db::Polygon> > *mp_result;
 };
 
+}
+
+static
+RegionDelegate *region_from_box (const db::Box &b, const db::PropertiesRepository *pr, db::properties_id_type prop_id)
+{
+  if (! b.empty () && b.width () > 0 && b.height () > 0) {
+    FlatRegion *new_region = new FlatRegion ();
+    if (prop_id != 0) {
+      db::PropertyMapper pm (const_cast<db::PropertiesRepository *> (new_region->properties_repository ()), pr);
+      new_region->insert (db::BoxWithProperties (b, pm (prop_id)));
+    } else {
+      new_region->insert (b);
+    }
+    return new_region;
+  } else {
+    return new EmptyRegion ();
+  }
 }
 
 // -------------------------------------------------------------------------------------------------------------
@@ -130,6 +146,7 @@ EdgesDelegate *
 AsIfFlatRegion::edges (const EdgeFilterBase *filter) const
 {
   std::unique_ptr<FlatEdges> result (new FlatEdges ());
+  db::PropertyMapper pm (result->properties_repository (), properties_repository ());
 
   size_t n = 0;
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
@@ -138,9 +155,14 @@ AsIfFlatRegion::edges (const EdgeFilterBase *filter) const
   result->reserve (n);
 
   for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
+    db::properties_id_type prop_id = p.prop_id ();
     for (db::Polygon::polygon_edge_iterator e = p->begin_edge (); ! e.at_end (); ++e) {
       if (! filter || filter->selected (*e)) {
-        result->insert (*e);
+        if (prop_id != 0) {
+          result->insert (db::EdgeWithProperties (*e, pm (prop_id)));
+        } else {
+          result->insert (*e);
+        }
       }
     }
   }
@@ -260,6 +282,97 @@ void AsIfFlatRegion::invalidate_bbox ()
   m_bbox_valid = false;
 }
 
+void AsIfFlatRegion::merge_polygons_to (db::Shapes &output, bool min_coherence, unsigned int min_wc, db::PropertiesRepository *target_rp) const
+{
+  db::PropertyMapper pm (target_rp, properties_repository ());
+
+  db::EdgeProcessor ep (report_progress (), progress_desc ());
+  ep.set_base_verbosity (base_verbosity ());
+
+  //  count edges and reserve memory
+  size_t n = 0;
+  db::properties_id_type prop_id = 0;
+  bool need_split_props = false;
+  for (RegionIterator s (begin ()); ! s.at_end (); ++s, ++n) {
+    if (n == 0) {
+      prop_id = s.prop_id ();
+    } else if (! need_split_props && prop_id != s.prop_id ()) {
+      need_split_props = true;
+    }
+  }
+
+  if (need_split_props) {
+
+    db::Shapes result (output.is_editable ());
+
+    std::vector<std::pair<db::properties_id_type, const db::Polygon *> > polygons_by_prop_id;
+    polygons_by_prop_id.reserve (n);
+
+    db::AddressablePolygonDelivery addressable_polygons (begin ());
+    while (! addressable_polygons.at_end ()) {
+      polygons_by_prop_id.push_back (std::make_pair (addressable_polygons.prop_id (), addressable_polygons.operator-> ()));
+      addressable_polygons.inc ();
+    }
+
+    std::sort (polygons_by_prop_id.begin (), polygons_by_prop_id.end ());
+
+    for (auto p = polygons_by_prop_id.begin (); p != polygons_by_prop_id.end (); ) {
+
+      auto pp = p;
+      while (pp != polygons_by_prop_id.end () && pp->first == p->first) {
+        ++pp;
+      }
+
+      ep.clear ();
+
+      n = 0;
+      for (auto i = p; i != pp; ++i) {
+        n += i->second->vertices ();
+      }
+      ep.reserve (n);
+
+      n = 0;
+      for (auto i = p; i != pp; ++i, ++n) {
+        ep.insert (*i->second, n);
+      }
+
+      //  and run the merge step
+      db::MergeOp op (min_wc);
+      db::ShapeGenerator pc (result, false /*don't clear*/, pm (p->first));
+      db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence);
+      ep.process (pg, op);
+
+      p = pp;
+
+    }
+
+    output.swap (result);
+
+  } else {
+
+    n = 0;
+    for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
+      n += p->vertices ();
+    }
+    ep.reserve (n);
+
+    //  insert the polygons into the processor
+    n = 0;
+    for (RegionIterator p (begin ()); ! p.at_end (); ++p, ++n) {
+      ep.insert (*p, n);
+    }
+
+    output.clear ();
+
+    //  and run the merge step
+    db::MergeOp op (min_wc);
+    db::ShapeGenerator pc (output, false /*don't clear*/, pm (prop_id));
+    db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence);
+    ep.process (pg, op);
+
+  }
+}
+
 RegionDelegate *
 AsIfFlatRegion::filtered (const PolygonFilterBase &filter) const
 {
@@ -271,6 +384,7 @@ AsIfFlatRegion::filtered (const PolygonFilterBase &filter) const
     }
   }
 
+  new_region->set_is_merged (true);
   return new_region.release ();
 }
 
@@ -289,7 +403,11 @@ AsIfFlatRegion::processed (const PolygonProcessorBase &filter) const
     poly_res.clear ();
     filter.process (*p, poly_res);
     for (std::vector<db::Polygon>::const_iterator pr = poly_res.begin (); pr != poly_res.end (); ++pr) {
-      new_region->insert (*pr);
+      if (p.prop_id () != 0) {
+        new_region->insert (db::PolygonWithProperties (*pr, p.prop_id ()));
+      } else {
+        new_region->insert (*pr);
+      }
     }
 
   }
@@ -312,7 +430,11 @@ AsIfFlatRegion::processed_to_edges (const PolygonToEdgeProcessorBase &filter) co
     edge_res.clear ();
     filter.process (*p, edge_res);
     for (std::vector<db::Edge>::const_iterator er = edge_res.begin (); er != edge_res.end (); ++er) {
-      new_edges->insert (*er);
+      if (p.prop_id () != 0) {
+        new_edges->insert (db::EdgeWithProperties (*er, p.prop_id ()));
+      } else {
+        new_edges->insert (*er);
+      }
     }
 
   }
@@ -335,7 +457,11 @@ AsIfFlatRegion::processed_to_edge_pairs (const PolygonToEdgePairProcessorBase &f
     edge_pair_res.clear ();
     filter.process (*p, edge_pair_res);
     for (std::vector<db::EdgePair>::const_iterator epr = edge_pair_res.begin (); epr != edge_pair_res.end (); ++epr) {
-      new_edge_pairs->insert (*epr);
+      if (p.prop_id () != 0) {
+        new_edge_pairs->insert (db::EdgePairWithProperties (*epr, p.prop_id ()));
+      } else {
+        new_edge_pairs->insert (*epr);
+      }
     }
 
   }
@@ -598,8 +724,6 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
     return new EmptyEdges ();
   }
 
-#if defined(USE_LOCAL_PROCESSOR)
-
   db::RegionIterator polygons (begin ());
 
   db::pull_with_edge_local_operation <db::Polygon, db::Edge, db::Edge> op;
@@ -619,39 +743,11 @@ AsIfFlatRegion::pull_generic (const Edges &other) const
   proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
 
   return output.release ();
-
-#else
-
-  db::box_scanner2<db::Polygon, size_t, db::Edge, size_t> scanner (report_progress (), progress_desc ());
-  scanner.reserve1 (count ());
-  scanner.reserve2 (other.count ());
-
-  std::unique_ptr<FlatEdges> output (new FlatEdges (false));
-  region_to_edge_interaction_filter<db::Polygon, db::Edge, db::Shapes, db::Edge> filter (output->raw_edges (), false);
-
-  AddressablePolygonDelivery p (begin ());
-
-  for ( ; ! p.at_end (); ++p) {
-    scanner.insert1 (p.operator-> (), 0);
-  }
-
-  AddressableEdgeDelivery e (other.addressable_merged_edges ());
-
-  for ( ; ! e.at_end (); ++e) {
-    scanner.insert2 (e.operator-> (), 0);
-  }
-
-  scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Edge> ());
-
-  return output.release ();
-#endif
 }
 
 TextsDelegate *
 AsIfFlatRegion::pull_generic (const Texts &other) const
 {
-#if defined(USE_LOCAL_PROCESSOR)
-
   db::RegionIterator polygons (begin ());
 
   db::pull_with_text_local_operation <db::Polygon, db::Text, db::Text> op;
@@ -671,44 +767,11 @@ AsIfFlatRegion::pull_generic (const Texts &other) const
   proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
 
   return output.release ();
-
-#else
-  if (other.empty ()) {
-    return other.delegate ()->clone ();
-  } else if (empty ()) {
-    return new EmptyTexts ();
-  }
-
-  db::box_scanner2<db::Polygon, size_t, db::Text, size_t> scanner (report_progress (), progress_desc ());
-  scanner.reserve1 (count ());
-  scanner.reserve2 (other.count ());
-
-  std::unique_ptr<FlatTexts> output (new FlatTexts (false));
-  region_to_text_interaction_filter<db::Polygon, db::Text, db::Shapes, db::Text> filter (output->raw_texts (), false);
-
-  AddressablePolygonDelivery p (begin ());
-
-  for ( ; ! p.at_end (); ++p) {
-    scanner.insert1 (p.operator-> (), 0);
-  }
-
-  AddressableTextDelivery e (other.addressable_texts ());
-
-  for ( ; ! e.at_end (); ++e) {
-    scanner.insert2 (e.operator-> (), 0);
-  }
-
-  scanner.process (filter, 1, db::box_convert<db::Polygon> (), db::box_convert<db::Text> ());
-
-  return output.release ();
-#endif
 }
 
 RegionDelegate *
 AsIfFlatRegion::pull_generic (const Region &other, int mode, bool touching) const
 {
-#if defined(USE_LOCAL_PROCESSOR)
-
   db::RegionIterator polygons (begin ());
 
   db::pull_local_operation <db::Polygon, db::Polygon, db::Polygon> op (mode, touching);
@@ -728,63 +791,14 @@ AsIfFlatRegion::pull_generic (const Region &other, int mode, bool touching) cons
   proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
 
   return output.release ();
-
-#else
-  db::EdgeProcessor ep (report_progress (), progress_desc ());
-  ep.set_base_verbosity (base_verbosity ());
-
-  //  shortcut
-  if (empty ()) {
-    return clone ();
-  } else if (other.empty ()) {
-    return new EmptyRegion ();
-  }
-
-  size_t n = 1;
-  for (RegionIterator p = other.begin_merged (); ! p.at_end (); ++p, ++n) {
-    if (p->box ().touches (bbox ())) {
-      ep.insert (*p, n);
-    }
-  }
-
-  for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
-    if (mode > 0 || p->box ().touches (other.bbox ())) {
-      ep.insert (*p, 0);
-    }
-  }
-
-  db::InteractionDetector id (mode, 0);
-  id.set_include_touching (touching);
-  db::EdgeSink es;
-  ep.process (es, id);
-  id.finish ();
-
-  std::unique_ptr<FlatRegion> output (new FlatRegion (false));
-
-  n = 0;
-  std::set <size_t> selected;
-  for (db::InteractionDetector::iterator i = id.begin (); i != id.end () && i->first == 0; ++i) {
-    ++n;
-    selected.insert (i->second);
-  }
-
-  output->reserve (n);
-
-  n = 1;
-  for (RegionIterator p = other.begin_merged (); ! p.at_end (); ++p, ++n) {
-    if (selected.find (n) != selected.end ()) {
-      output->raw_polygons ().insert (*p);
-    }
-  }
-
-  return output.release ();
-#endif
 }
 
 template <class Trans>
 void
 AsIfFlatRegion::produce_markers_for_grid_check (const db::Polygon &poly, const Trans &tr, db::Coord gx, db::Coord gy, db::Shapes &shapes)
 {
+  Trans tr_inv = tr.inverted ();
+
   gx = std::max (db::Coord (1), gx);
   gy = std::max (db::Coord (1), gy);
 
@@ -803,7 +817,7 @@ AsIfFlatRegion::produce_markers_for_grid_check (const db::Polygon &poly, const T
     for (db::Polygon::polygon_contour_iterator pt = b; pt != e; ++pt) {
       db::Point p = tr * *pt;
       if ((p.x () % gx) != 0 || (p.y () % gy) != 0) {
-        shapes.insert (EdgePair (db::Edge (p, p), db::Edge (p, p)));
+        shapes.insert (EdgePair (db::Edge (p, p), db::Edge (p, p)).transformed (tr_inv));
       }
     }
 
@@ -910,7 +924,7 @@ AsIfFlatRegion::snapped (db::Coord gx, db::Coord gy)
     throw tl::Exception (tl::to_string (tr ("Grid snap requires a positive grid value")));
   }
 
-  std::unique_ptr<FlatRegion> new_region (new FlatRegion (merged_semantics ()));
+  std::unique_ptr<FlatRegion> new_region (new FlatRegion ());
 
   gx = std::max (db::Coord (1), gx);
   gy = std::max (db::Coord (1), gy);
@@ -980,27 +994,75 @@ void region_cop_impl (AsIfFlatRegion *region, db::Shapes *output_to, db::Compoun
   proc.run_flat (polygons, others, foreign, &op, results);
 }
 
+template <class TR>
+static
+void region_cop_with_properties_impl (AsIfFlatRegion *region, db::Shapes *output_to, db::PropertiesRepository *target_pr, db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
+{
+  db::local_processor<db::PolygonWithProperties, db::PolygonWithProperties, db::object_with_properties<TR> > proc;
+  proc.set_base_verbosity (region->base_verbosity ());
+  proc.set_description (region->progress_desc ());
+  proc.set_report_progress (region->report_progress ());
+
+  db::generic_shape_iterator<db::PolygonWithProperties> polygons (db::make_wp_iter (region->begin_merged ()));
+
+  std::vector<const db::PropertiesRepository *> intruder_prs;
+  const db::PropertiesRepository *subject_pr = region->properties_repository ();
+
+  std::vector<generic_shape_iterator<db::PolygonWithProperties> > others;
+  std::vector<bool> foreign;
+  std::vector<db::Region *> inputs = node.inputs ();
+  for (std::vector<db::Region *>::const_iterator i = inputs.begin (); i != inputs.end (); ++i) {
+    if (*i == subject_regionptr () || *i == foreign_regionptr ()) {
+      others.push_back (db::make_wp_iter (region->begin_merged ()));
+      foreign.push_back (*i == foreign_regionptr ());
+      intruder_prs.push_back (subject_pr);
+    } else {
+      others.push_back (db::make_wp_iter ((*i)->begin ()));
+      foreign.push_back (false);
+      intruder_prs.push_back (&(*i)->properties_repository ());
+    }
+  }
+
+  std::vector<db::Shapes *> results;
+  results.push_back (output_to);
+
+  compound_local_operation_with_properties<db::Polygon, db::Polygon, TR> op (&node, prop_constraint, target_pr, subject_pr, intruder_prs);
+  proc.run_flat (polygons, others, foreign, &op, results);
+}
+
 EdgePairsDelegate *
-AsIfFlatRegion::cop_to_edge_pairs (db::CompoundRegionOperationNode &node)
+AsIfFlatRegion::cop_to_edge_pairs (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   std::unique_ptr<FlatEdgePairs> output (new FlatEdgePairs ());
-  region_cop_impl<db::EdgePair> (this, &output->raw_edge_pairs (), node);
+  if (pc_skip (prop_constraint)) {
+    region_cop_impl<db::EdgePair> (this, &output->raw_edge_pairs (), node);
+  } else {
+    region_cop_with_properties_impl<db::EdgePair> (this, &output->raw_edge_pairs (), output->properties_repository (), node, prop_constraint);
+  }
   return output.release ();
 }
 
 RegionDelegate *
-AsIfFlatRegion::cop_to_region (db::CompoundRegionOperationNode &node)
+AsIfFlatRegion::cop_to_region (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint)
 {
   std::unique_ptr<FlatRegion> output (new FlatRegion ());
-  region_cop_impl<db::Polygon> (this, &output->raw_polygons (), node);
+  if (pc_skip (prop_constraint)) {
+    region_cop_impl<db::Polygon> (this, &output->raw_polygons (), node);
+  } else {
+    region_cop_with_properties_impl<db::Polygon> (this, &output->raw_polygons (), output->properties_repository (), node, prop_constraint);
+  }
   return output.release ();
 }
 
 EdgesDelegate *
-AsIfFlatRegion::cop_to_edges (db::CompoundRegionOperationNode &node)
+AsIfFlatRegion::cop_to_edges (db::CompoundRegionOperationNode &node, PropertyConstraint prop_constraint)
 {
   std::unique_ptr<FlatEdges> output (new FlatEdges ());
-  region_cop_impl<db::Edge> (this, &output->raw_edges (), node);
+  if (pc_skip (prop_constraint)) {
+    region_cop_impl<db::Edge> (this, &output->raw_edges (), node);
+  } else {
+    region_cop_with_properties_impl<db::Edge> (this, &output->raw_edges (), output->properties_repository (), node, prop_constraint);
+  }
   return output.release ();
 }
 
@@ -1067,7 +1129,10 @@ AsIfFlatRegion::inside_check (const Region &other, db::Coord d, const RegionChec
 EdgePairsDelegate *
 AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, const Region *other, db::Coord d, const RegionCheckOptions &options) const
 {
-#if defined(USE_LOCAL_PROCESSOR)
+  //  force different polygons in the different properties case to skip intra-polygon checks
+  if (pc_always_different (options.prop_constraint)) {
+    different_polygons = true;
+  }
 
   bool needs_merged_primary = different_polygons || options.needs_merged ();
 
@@ -1081,11 +1146,6 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   check.set_min_projection (options.min_projection);
   check.set_max_projection (options.max_projection);
 
-  db::local_processor<db::Polygon, db::Polygon, db::EdgePair> proc;
-  proc.set_base_verbosity (base_verbosity ());
-  proc.set_description (progress_desc ());
-  proc.set_report_progress (report_progress ());
-
   std::vector<generic_shape_iterator<db::Polygon> > others;
   std::vector<bool> foreign;
   bool has_other = false;
@@ -1098,6 +1158,7 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   } else {
     foreign.push_back (false);
     if (! other->merged_semantics ()) {
+      others.push_back (other->begin ());
       other_is_merged = true;
     } else if (options.whole_edges) {
       //  NOTE: whole edges needs both inputs merged
@@ -1110,69 +1171,51 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
     has_other = true;
   }
 
-  db::check_local_operation<db::Polygon, db::Polygon> op (check, different_polygons, primary_is_merged, has_other, other_is_merged, options);
-
   std::unique_ptr<FlatEdgePairs> output (new FlatEdgePairs ());
+
   std::vector<db::Shapes *> results;
   results.push_back (&output->raw_edge_pairs ());
 
-  proc.run_flat (polygons, others, foreign, &op, results);
+  if (pc_skip (options.prop_constraint)) {
 
-  return output.release ();
+    db::check_local_operation<db::Polygon, db::Polygon> op (check, different_polygons, primary_is_merged, has_other, other_is_merged, options);
 
-#else
-  //  not supported in this implementation
-  tl_assert (! m_options.no_opposite);
+    db::local_processor<db::Polygon, db::Polygon, db::EdgePair> proc;
+    proc.set_base_verbosity (base_verbosity ());
+    proc.set_description (progress_desc ());
+    proc.set_report_progress (report_progress ());
 
-  std::unique_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
+    proc.run_flat (polygons, others, foreign, &op, results);
 
-  db::box_scanner<db::Polygon, size_t> scanner (report_progress (), progress_desc ());
-  scanner.reserve (count () + (other ? other->count () : 0));
+  } else {
 
-  AddressablePolygonDelivery p (begin_merged ());
+    const db::PropertiesRepository *subject_pr = properties_repository ();
+    const db::PropertiesRepository *intruder_pr = (other == subject_regionptr () || other == foreign_regionptr ()) ? subject_pr : &other->properties_repository ();
 
-  size_t n = 0;
-  for ( ; ! p.at_end (); ++p) {
-    scanner.insert (p.operator-> (), n);
-    n += 2;
-  }
+    db::check_local_operation_with_properties<db::Polygon, db::Polygon> op (check, different_polygons, primary_is_merged, has_other, other_is_merged, options, output->properties_repository (), subject_pr, intruder_pr);
 
-  AddressablePolygonDelivery po;
+    db::local_processor<db::PolygonWithProperties, db::PolygonWithProperties, db::EdgePairWithProperties> proc;
+    proc.set_base_verbosity (base_verbosity ());
+    proc.set_description (progress_desc ());
+    proc.set_report_progress (report_progress ());
 
-  if (other) {
-
-    po = other->addressable_merged_polygons ();
-
-    n = 1;
-    for ( ; ! po.at_end (); ++po) {
-      scanner.insert (po.operator-> (), n);
-      n += 2;
+    std::vector<db::generic_shape_iterator<db::PolygonWithProperties> > others_wp;
+    for (auto o = others.begin (); o != others.end (); ++o) {
+      others_wp.push_back (db::make_wp_iter (std::move (*o)));
     }
 
+    proc.run_flat (db::make_wp_iter (std::move (polygons)), others_wp, foreign, &op, results);
+
   }
 
-  EdgeRelationFilter check (rel, d, options.metrics);
-  check.set_include_zero (false);
-  check.set_whole_edges (options.whole_edges);
-  check.set_ignore_angle (options.ignore_angle);
-  check.set_min_projection (options.min_projection);
-  check.set_max_projection (options.max_projection);
-
-  edge2edge_check_negative_or_positive<db::FlatEdgePairs> edge_check (check, *result, options.negative, different_polygons, other != 0 /*requires different layers*/, options.shielded);
-  poly2poly_check<db::Polygon, db::FlatEdgePairs> poly_check (edge_check);
-
-  do {
-    scanner.process (poly_check, d, db::box_convert<db::Polygon> ());
-  } while (edge_check.prepare_next_pass ());
-
-  return result.release ();
-#endif
+  return output.release ();
 }
 
 EdgePairsDelegate *
 AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options) const
 {
   std::unique_ptr<FlatEdgePairs> result (new FlatEdgePairs ());
+  db::PropertyMapper pm (result->properties_repository (), properties_repository ());
 
   EdgeRelationFilter check (rel, d, options.metrics);
   check.set_include_zero (false);
@@ -1181,18 +1224,16 @@ AsIfFlatRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord 
   check.set_min_projection (options.min_projection);
   check.set_max_projection (options.max_projection);
 
-  edge2edge_check_negative_or_positive<db::FlatEdgePairs> edge_check (check, *result, options.negative, false /*=same polygons*/, false /*=same layers*/, options.shielded, true /*symmetric edge pairs*/);
-  poly2poly_check<db::Polygon> poly_check (edge_check);
+  for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
 
-  do {
+    edge2edge_check_negative_or_positive<db::Shapes> edge_check (check, result->raw_edge_pairs (), options.negative, false /*=same polygons*/, false /*=same layers*/, options.shielded, true /*symmetric edge pairs*/, pc_remove (options.prop_constraint) ? 0 : pm (p.prop_id ()));
+    poly2poly_check<db::Polygon> poly_check (edge_check);
 
-    size_t n = 0;
-    for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
-      poly_check.single (*p, n);
-      n += 2;
-    }
+    do {
+      poly_check.single (*p, 0);
+    } while (edge_check.prepare_next_pass ());
 
-  } while (edge_check.prepare_next_pass ());
+  }
 
   return result.release ();
 }
@@ -1215,44 +1256,11 @@ AsIfFlatRegion::merged (bool min_coherence, unsigned int min_wc) const
 
   } else {
 
-    db::EdgeProcessor ep (report_progress (), progress_desc ());
-    ep.set_base_verbosity (base_verbosity ());
-
-    //  count edges and reserve memory
-    size_t n = 0;
-    for (RegionIterator p (begin ()); ! p.at_end (); ++p, ++n) {
-      n += p->vertices ();
-    }
-    ep.reserve (n);
-
-    //  insert the polygons into the processor
-    n = 0;
-    for (RegionIterator p (begin ()); ! p.at_end (); ++p, ++n) {
-      ep.insert (*p, n);
-    }
-
     std::unique_ptr<FlatRegion> new_region (new FlatRegion (true));
-
-    //  and run the merge step
-    db::MergeOp op (min_wc);
-    db::ShapeGenerator pc (new_region->raw_polygons (), true /*clear*/);
-    db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence);
-    ep.process (pg, op);
+    merge_polygons_to (new_region->raw_polygons (), min_coherence, min_wc, new_region->properties_repository ());
 
     return new_region.release ();
 
-  }
-}
-
-RegionDelegate *
-AsIfFlatRegion::region_from_box (const db::Box &b)
-{
-  if (! b.empty () && b.width () > 0 && b.height () > 0) {
-    FlatRegion *new_region = new FlatRegion ();
-    new_region->insert (b);
-    return new_region;
-  } else {
-    return new EmptyRegion ();
   }
 }
 
@@ -1274,24 +1282,36 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 
     //  simplified handling for a box
     db::Box b = bbox ().enlarged (db::Vector (dx, dy));
-    return region_from_box (b);
+    return region_from_box (b, properties_repository (), begin ()->prop_id ());
 
   } else if (! merged_semantics () || is_merged ()) {
 
     //  Generic case
-    std::unique_ptr<FlatRegion> new_region (new FlatRegion (false /*output isn't merged*/));
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion ());
+    db::PropertyMapper pm (new_region->properties_repository (), properties_repository ());
 
     db::ShapeGenerator pc (new_region->raw_polygons (), false);
     db::PolygonGenerator pg (pc, false, true);
     db::SizingPolygonFilter sf (pg, dx, dy, mode);
     for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
+      pc.set_prop_id (pm (p.prop_id ()));
       sf.put (*p);
+    }
+
+    //  in case of negative sizing the output polygons will still be merged (on positive sizing they might
+    //  overlap after size and are not necessarily merged)
+    if (dx < 0 && dy < 0 && is_merged ()) {
+      new_region->set_is_merged (true);
     }
 
     return new_region.release ();
 
   } else {
 
+    std::unique_ptr<FlatRegion> new_region (new FlatRegion ());
+
+//  old implementation without property support
+#if 0
     //  Generic case - the size operation will merge first
     db::EdgeProcessor ep (report_progress (), progress_desc ());
     ep.set_base_verbosity (base_verbosity ());
@@ -1309,13 +1329,32 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
       ep.insert (*p, n);
     }
 
-    std::unique_ptr<FlatRegion> new_region (new FlatRegion (false /*output isn't merged*/));
     db::ShapeGenerator pc (new_region->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg2 (pc, false /*don't resolve holes*/, true /*min. coherence*/);
     db::SizingPolygonFilter siz (pg2, dx, dy, mode);
     db::PolygonGenerator pg (siz, false /*don't resolve holes*/, min_coherence () /*min. coherence*/);
     db::BooleanOp op (db::BooleanOp::Or);
     ep.process (pg, op);
+#else
+
+    //  Generic case
+    db::PropertyMapper pm (new_region->properties_repository (), properties_repository ());
+
+    db::ShapeGenerator pc (new_region->raw_polygons (), false);
+    db::PolygonGenerator pg (pc, false, true);
+    db::SizingPolygonFilter sf (pg, dx, dy, mode);
+    for (RegionIterator p (begin_merged ()); ! p.at_end (); ++p) {
+      pc.set_prop_id (pm (p.prop_id ()));
+      sf.put (*p);
+    }
+
+#endif
+
+    //  in case of negative sizing the output polygons will still be merged (on positive sizing they might
+    //  overlap after size and are not necessarily merged)
+    if (dx < 0 && dy < 0 && merged_semantics ()) {
+      new_region->set_is_merged (true);
+    }
 
     return new_region.release ();
 
@@ -1323,7 +1362,7 @@ AsIfFlatRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
 }
 
 RegionDelegate *
-AsIfFlatRegion::and_with (const Region &other) const
+AsIfFlatRegion::and_with (const Region &other, PropertyConstraint property_constraint) const
 {
   if (empty () || other.empty ()) {
 
@@ -1332,37 +1371,83 @@ AsIfFlatRegion::and_with (const Region &other) const
 
   } else if (is_box () && other.is_box ()) {
 
-    //  Simplified handling for boxes
-    db::Box b = bbox ();
-    b &= other.bbox ();
-    return region_from_box (b);
+    if (pc_skip (property_constraint) || pc_match (property_constraint, begin ()->prop_id (), other.begin ().prop_id ())) {
+
+      //  Simplified handling for boxes
+      db::Box b = bbox ();
+      b &= other.bbox ();
+
+      db::properties_id_type prop_id_out = pc_norm (property_constraint, begin ()->prop_id ());
+
+      return region_from_box (b, properties_repository (), prop_id_out);
+
+    } else {
+      return new EmptyRegion ();
+    }
 
   } else if (is_box () && ! other.strict_handling ()) {
+
+    db::properties_id_type self_prop_id = pc_skip (property_constraint) ? 0 : begin ()->prop_id ();
 
     //  map AND with box to clip ..
     db::Box b = bbox ();
     std::unique_ptr<FlatRegion> new_region (new FlatRegion (false));
+    db::PropertyMapper pm (new_region->properties_repository (), properties_repository ());
+
+    db::properties_id_type prop_id_out = pm (pc_norm (property_constraint, self_prop_id));
 
     std::vector<db::Polygon> clipped;
     for (RegionIterator p (other.begin ()); ! p.at_end (); ++p) {
-      clipped.clear ();
-      clip_poly (*p, b, clipped);
-      new_region->raw_polygons ().insert (clipped.begin (), clipped.end ());
+
+      db::properties_id_type prop_id = p.prop_id ();
+      if (pc_match (property_constraint, self_prop_id, prop_id)) {
+
+        clipped.clear ();
+        clip_poly (*p, b, clipped);
+
+        if (prop_id_out == 0) {
+          new_region->raw_polygons ().insert (clipped.begin (), clipped.end ());
+        } else {
+          for (auto i = clipped.begin (); i != clipped.end (); ++i) {
+            new_region->raw_polygons ().insert (db::PolygonWithProperties (*i, prop_id_out));
+          }
+        }
+
+      }
+
     }
 
     return new_region.release ();
 
   } else if (other.is_box () && ! strict_handling ()) {
 
+    db::properties_id_type other_prop_id = pc_skip (property_constraint) ? 0 : other.begin ().prop_id ();
+
     //  map AND with box to clip ..
     db::Box b = other.bbox ();
     std::unique_ptr<FlatRegion> new_region (new FlatRegion (false));
+    db::PropertyMapper pm (new_region->properties_repository (), properties_repository ());
 
     std::vector<db::Polygon> clipped;
     for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
-      clipped.clear ();
-      clip_poly (*p, b, clipped);
-      new_region->raw_polygons ().insert (clipped.begin (), clipped.end ());
+
+      db::properties_id_type prop_id = p.prop_id ();
+      if (pc_match (property_constraint, prop_id, other_prop_id)) {
+
+        clipped.clear ();
+        clip_poly (*p, b, clipped);
+
+        db::properties_id_type prop_id_out = pm (pc_norm (property_constraint, prop_id));
+        if (prop_id_out == 0) {
+          new_region->raw_polygons ().insert (clipped.begin (), clipped.end ());
+        } else {
+          for (auto i = clipped.begin (); i != clipped.end (); ++i) {
+            new_region->raw_polygons ().insert (db::PolygonWithProperties (*i, prop_id_out));
+          }
+        }
+
+      }
+
     }
 
     return new_region.release ();
@@ -1373,44 +1458,12 @@ AsIfFlatRegion::and_with (const Region &other) const
     return new EmptyRegion ();
 
   } else {
-
-    //  Generic case
-    db::EdgeProcessor ep (report_progress (), progress_desc ());
-    ep.set_base_verbosity (base_verbosity ());
-
-    //  count edges and reserve memory
-    size_t n = 0;
-    for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
-      n += p->vertices ();
-    }
-    for (RegionIterator p (other.begin ()); ! p.at_end (); ++p) {
-      n += p->vertices ();
-    }
-    ep.reserve (n);
-
-    //  insert the polygons into the processor
-    n = 0;
-    for (RegionIterator p (begin ()); ! p.at_end (); ++p, n += 2) {
-      ep.insert (*p, n);
-    }
-    n = 1;
-    for (RegionIterator p (other.begin ()); ! p.at_end (); ++p, n += 2) {
-      ep.insert (*p, n);
-    }
-
-    std::unique_ptr<FlatRegion> new_region (new FlatRegion (true));
-    db::BooleanOp op (db::BooleanOp::And);
-    db::ShapeGenerator pc (new_region->raw_polygons (), true /*clear*/);
-    db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence ());
-    ep.process (pg, op);
-
-    return new_region.release ();
-
+    return and_or_not_with (true, other, property_constraint);
   }
 }
 
 RegionDelegate *
-AsIfFlatRegion::not_with (const Region &other) const
+AsIfFlatRegion::not_with (const Region &other, PropertyConstraint property_constraint) const
 {
   if (empty ()) {
 
@@ -1420,14 +1473,22 @@ AsIfFlatRegion::not_with (const Region &other) const
   } else if (other.empty () && ! strict_handling ()) {
 
     //  Nothing to do
-    return clone ();
+    return clone ()->remove_properties (pc_remove (property_constraint));
 
   } else if (! bbox ().overlaps (other.bbox ()) && ! strict_handling ()) {
 
     //  Nothing to do
-    return clone ();
+    return clone ()->remove_properties (pc_remove (property_constraint));
 
   } else {
+    return and_or_not_with (false, other, property_constraint);
+  }
+}
+
+RegionDelegate *
+AsIfFlatRegion::and_or_not_with (bool is_and, const Region &other, PropertyConstraint property_constraint) const
+{
+  if (pc_skip (property_constraint)) {
 
     //  Generic case
     db::EdgeProcessor ep (report_progress (), progress_desc ());
@@ -1454,19 +1515,40 @@ AsIfFlatRegion::not_with (const Region &other) const
     }
 
     std::unique_ptr<FlatRegion> new_region (new FlatRegion (true));
-    db::BooleanOp op (db::BooleanOp::ANotB);
+    db::BooleanOp op (is_and ? db::BooleanOp::And : db::BooleanOp::ANotB);
     db::ShapeGenerator pc (new_region->raw_polygons (), true /*clear*/);
     db::PolygonGenerator pg (pc, false /*don't resolve holes*/, min_coherence ());
     ep.process (pg, op);
 
     return new_region.release ();
 
+  } else {
+
+    db::generic_shape_iterator<db::PolygonWithProperties> polygons (db::make_wp_iter (begin ()));
+
+    std::unique_ptr<FlatRegion> output (new FlatRegion ());
+    std::vector<db::Shapes *> results;
+    results.push_back (&output->raw_polygons ());
+
+    db::bool_and_or_not_local_operation_with_properties<db::Polygon, db::Polygon, db::Polygon> op (is_and, output->properties_repository (), properties_repository (), &other.properties_repository (), property_constraint);
+
+    db::local_processor<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties> proc;
+    proc.set_base_verbosity (base_verbosity ());
+    proc.set_description (progress_desc ());
+    proc.set_report_progress (report_progress ());
+
+    std::vector<db::generic_shape_iterator<db::PolygonWithProperties> > others;
+    others.push_back (db::make_wp_iter (other.begin ()));
+
+    proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
+
+    return output.release ();
+
   }
 }
 
-
 std::pair<RegionDelegate *, RegionDelegate *>
-AsIfFlatRegion::andnot_with (const Region &other) const
+AsIfFlatRegion::andnot_with (const Region &other, PropertyConstraint property_constraint) const
 {
   if (empty ()) {
 
@@ -1476,14 +1558,14 @@ AsIfFlatRegion::andnot_with (const Region &other) const
   } else if (other.empty () && ! strict_handling ()) {
 
     //  Nothing to do
-    return std::make_pair (new EmptyRegion (), clone ());
+    return std::make_pair (new EmptyRegion (), clone ()->remove_properties (pc_remove (property_constraint)));
 
   } else if (! bbox ().overlaps (other.bbox ()) && ! strict_handling ()) {
 
     //  Nothing to do
-    return std::make_pair (new EmptyRegion (), clone ());
+    return std::make_pair (new EmptyRegion (), clone ()->remove_properties (pc_remove (property_constraint)));
 
-  } else {
+  } else if (pc_skip (property_constraint)) {
 
     //  Generic case
     db::EdgeProcessor ep (report_progress (), progress_desc ());
@@ -1526,11 +1608,35 @@ AsIfFlatRegion::andnot_with (const Region &other) const
 
     return std::make_pair (new_region1.release (), new_region2.release ());
 
+  } else {
+
+    db::generic_shape_iterator<db::PolygonWithProperties> polygons (db::make_wp_iter (begin ()));
+
+    std::unique_ptr<FlatRegion> output1 (new FlatRegion ());
+    std::unique_ptr<FlatRegion> output2 (new FlatRegion ());
+    std::vector<db::Shapes *> results;
+    results.push_back (&output1->raw_polygons ());
+    results.push_back (&output2->raw_polygons ());
+
+    db::two_bool_and_not_local_operation_with_properties<db::Polygon, db::Polygon, db::Polygon> op (output1->properties_repository (), output2->properties_repository (), properties_repository (), &other.properties_repository (), property_constraint);
+
+    db::local_processor<db::PolygonWithProperties, db::PolygonWithProperties, db::PolygonWithProperties> proc;
+    proc.set_base_verbosity (base_verbosity ());
+    proc.set_description (progress_desc ());
+    proc.set_report_progress (report_progress ());
+
+    std::vector<db::generic_shape_iterator<db::PolygonWithProperties> > others;
+    others.push_back (db::make_wp_iter (other.begin ()));
+
+    proc.run_flat (polygons, others, std::vector<bool> (), &op, results);
+
+    return std::make_pair (output1.release (), output2.release ());
+
   }
 }
 
 RegionDelegate *
-AsIfFlatRegion::xor_with (const Region &other) const
+AsIfFlatRegion::xor_with (const Region &other, PropertyConstraint prop_constraint) const
 {
   if (empty () && ! other.strict_handling ()) {
 
@@ -1543,9 +1649,11 @@ AsIfFlatRegion::xor_with (const Region &other) const
   } else if (! bbox ().overlaps (other.bbox ()) && ! strict_handling () && ! other.strict_handling ()) {
 
     //  Simplified handling for disjunct case
-    return or_with (other);
+    return or_with (other, prop_constraint);
 
   } else {
+
+    //  TODO: implement property constraint
 
     //  Generic case
     db::EdgeProcessor ep (report_progress (), progress_desc ());
@@ -1583,7 +1691,7 @@ AsIfFlatRegion::xor_with (const Region &other) const
 }
 
 RegionDelegate *
-AsIfFlatRegion::or_with (const Region &other) const
+AsIfFlatRegion::or_with (const Region &other, PropertyConstraint /*prop_constraint*/) const
 {
   if (empty () && ! other.strict_handling ()) {
 
@@ -1600,6 +1708,8 @@ AsIfFlatRegion::or_with (const Region &other) const
     return add (other);
 
   } else {
+
+    //  TODO: implement property constraint
 
     //  Generic case
     db::EdgeProcessor ep (report_progress (), progress_desc ());
@@ -1639,7 +1749,7 @@ AsIfFlatRegion::or_with (const Region &other) const
 RegionDelegate *
 AsIfFlatRegion::add (const Region &other) const
 {
-  FlatRegion *other_flat = dynamic_cast<FlatRegion *> (other.delegate ());
+  const FlatRegion *other_flat = dynamic_cast<const FlatRegion *> (other.delegate ());
   if (other_flat) {
 
     std::unique_ptr<FlatRegion> new_region (new FlatRegion (*other_flat));
@@ -1676,15 +1786,75 @@ AsIfFlatRegion::add (const Region &other) const
   }
 }
 
+static void
+deliver_shapes_of_nets_recursive (db::Shapes &out, db::PropertiesRepository *pr, const db::Circuit *circuit, const LayoutToNetlist *l2n, const db::Region *of_layer, NetPropertyMode prop_mode, const tl::Variant &net_prop_name, const db::ICplxTrans &tr, const std::set<const db::Net *> *net_filter)
+{
+  db::CplxTrans dbu_trans (l2n->internal_layout ()->dbu ());
+  auto dbu_trans_inv = dbu_trans.inverted ();
+
+  for (auto n = circuit->begin_nets (); n != circuit->end_nets (); ++n) {
+
+    if (! net_filter || net_filter->find (n.operator-> ()) != net_filter->end ()) {
+      db::properties_id_type prop_id = db::NetBuilder::make_netname_propid (*pr, prop_mode, net_prop_name, *n);
+      l2n->shapes_of_net (*n, *of_layer, true, out, prop_id, tr);
+    }
+
+    //  dive into subcircuits
+    for (auto sc = circuit->begin_subcircuits (); sc != circuit->end_subcircuits (); ++sc) {
+      const db::Circuit *circuit_ref = sc->circuit_ref ();
+      db::ICplxTrans tr_ref = tr * (dbu_trans_inv * sc->trans () * dbu_trans);
+      deliver_shapes_of_nets_recursive (out, pr, circuit_ref, l2n, of_layer, prop_mode, net_prop_name, tr_ref, net_filter);
+    }
+
+  }
+}
+
+RegionDelegate *
+AsIfFlatRegion::nets (LayoutToNetlist *l2n, NetPropertyMode prop_mode, const tl::Variant &net_prop_name, const std::vector<const db::Net *> *net_filter) const
+{
+  if (! l2n->is_netlist_extracted ()) {
+    throw tl::Exception (tl::to_string (tr ("The netlist has not been extracted yet")));
+  }
+
+  std::unique_ptr<db::FlatRegion> result (new db::FlatRegion ());
+  std::unique_ptr<db::Region> region_for_layer (l2n->layer_by_original (this));
+
+  if (! region_for_layer) {
+    throw tl::Exception (tl::to_string (tr ("The given layer is not an original layer used in netlist extraction")));
+  }
+
+  if (l2n->netlist ()->top_circuit_count () == 0) {
+    throw tl::Exception (tl::to_string (tr ("No top circuit found in netlist")));
+  } else if (l2n->netlist ()->top_circuit_count () > 1) {
+    throw tl::Exception (tl::to_string (tr ("More than one top circuit found in netlist")));
+  }
+  const db::Circuit *top_circuit = l2n->netlist ()->begin_top_down ().operator-> ();
+
+  std::set<const db::Net *> net_filter_set;
+  if (net_filter) {
+    net_filter_set.insert (net_filter->begin (), net_filter->end ());
+  }
+
+  deliver_shapes_of_nets_recursive (result->raw_polygons (), result->properties_repository (), top_circuit, l2n, region_for_layer.get (), prop_mode, net_prop_name, db::ICplxTrans (), net_filter ? &net_filter_set : 0);
+
+  return result.release ();
+}
+
 void
 AsIfFlatRegion::insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
   //  improves performance when inserting an original layout into the same layout
   db::LayoutLocker locker (layout);
+  db::PropertyMapper pm (&layout->properties_repository (), properties_repository ());
 
   db::Shapes &shapes = layout->cell (into_cell).shapes (into_layer);
   for (RegionIterator p (begin ()); ! p.at_end (); ++p) {
-    shapes.insert (*p);
+    db::properties_id_type prop_id = p.prop_id ();
+    if (prop_id != 0) {
+      shapes.insert (db::PolygonWithProperties (*p, pm (prop_id)));
+    } else {
+      shapes.insert (*p);
+    }
   }
 }
 

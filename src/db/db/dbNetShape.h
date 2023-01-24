@@ -27,6 +27,9 @@
 #include "dbText.h"
 #include "dbShapeRepository.h"
 #include "dbBoxConvert.h"
+#include "dbShape.h"
+#include "dbShapeFlags.h" //  for addressable_object_from_shape
+#include "tlSList.h"
 
 namespace db {
 
@@ -170,6 +173,28 @@ struct box_convert<db::NetShape>
   {
     return net_shape.bbox ();
   }
+};
+
+template <>
+struct addressable_object_from_shape<db::NetShape>
+{
+  typedef db::NetShape value_type;
+
+  const value_type *operator () (const db::Shape &shape)
+  {
+    if (shape.type () == db::Shape::TextRef) {
+      m_heap.push_back (db::NetShape (shape.text_ref ()));
+      return &m_heap.back ();
+    } else if (shape.type () == db::Shape::PolygonRef) {
+      m_heap.push_back (db::NetShape (shape.polygon_ref ()));
+      return &m_heap.back ();
+    } else {
+      tl_assert (false);
+    }
+  }
+
+private:
+  tl::slist<NetShape> m_heap;
 };
 
 }

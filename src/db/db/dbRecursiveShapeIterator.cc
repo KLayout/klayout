@@ -73,6 +73,7 @@ RecursiveShapeIterator &RecursiveShapeIterator::operator= (const RecursiveShapeI
     m_shape = d.m_shape;
     m_trans = d.m_trans;
     m_global_trans = d.m_global_trans;
+    m_property_translator = d.m_property_translator;
     m_trans_stack = d.m_trans_stack;
     m_inst_iterators = d.m_inst_iterators;
     m_inst_array_iterators = d.m_inst_array_iterators;
@@ -284,6 +285,7 @@ RecursiveShapeIterator::init ()
   mp_cell = 0;
   m_current_layer = 0;
   m_global_trans = cplx_trans_type ();
+  m_property_translator = db::PropertiesTranslator ();
 }
 
 void

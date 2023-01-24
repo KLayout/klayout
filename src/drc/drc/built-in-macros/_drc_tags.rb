@@ -134,6 +134,67 @@ module DRC
       self.pattern = p
     end
   end
+
+  # A wrapper for a property name
+  # Use "prop(key)" to generate this tag.
+  class DRCPropertyName
+    attr_accessor :value
+    def initialize(k)
+      self.value = k
+    end
+  end
+  
+  # A wrapper for a property constraint
+  # Use "props_eq", "props_ne" or "props_copy" to generate this tag.
+  class DRCPropertiesConstraint
+    attr_accessor :value
+    def initialize(v)
+      self.value = v
+    end
+    def is_eq?
+      self.value == RBA::Region::SamePropertiesConstraint || self.value == RBA::Region::SamePropertiesConstraintDrop
+    end
+    def is_ne?
+      self.value == RBA::Region::DifferentPropertiesConstraint || self.value == RBA::Region::DifferentPropertiesConstraintDrop
+    end
+    def is_copy?
+      self.value == RBA::Region::NoPropertyConstraint || self.value == RBA::Region::SamePropertiesConstraint || self.value == RBA::Region::DifferentPropertiesConstraint
+    end
+    def +(other)
+      other.is_a?(DRCPropertiesConstraint) || raise("'+' needs to be applied to two properties constraints (got #{other.inspect} for the second one)")
+      is_eq = self.is_eq? || other.is_eq? 
+      is_ne = self.is_ne? || other.is_ne? 
+      is_copy = self.is_copy? || other.is_copy? 
+      if is_eq == is_ne
+        DRCPropertiesConstraint::new(is_copy ? RBA::Region::NoPropertyConstraint : RBA::Region::IgnoreProperties)
+      elsif is_eq
+        DRCPropertiesConstraint::new(is_copy ? RBA::Region::SamePropertiesConstraint : RBA::Region::SamePropertiesConstraintDrop)
+      elsif is_ne
+        DRCPropertiesConstraint::new(is_copy ? RBA::Region::DifferentPropertiesConstraint : RBA::Region::DifferentPropertiesConstraintDrop)
+      else
+        nil
+      end
+    end
+  end
+  
+  # Negative output on checks
+  class DRCNegative
+    def initialize
+    end
+  end
+
+  # Property selector for "input"
+  class DRCPropertySelector
+    attr_accessor :method
+    attr_accessor :args
+    def apply_to(iter)
+      iter.send(self.method, *self.args)
+    end
+    def initialize(method, *args)
+      self.method = method
+      self.args = args
+    end
+  end
   
   # A wrapper for a pair of limit values
   # This class is used to identify projection limits for DRC

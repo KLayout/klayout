@@ -1618,6 +1618,69 @@ private:
   tl::weak_ptr<CompoundRegionOperationNode> mp_node;
 };
 
+/**
+ *  @brief The generic local operation with property support
+ *
+ *  This local operation executes the operation tree within a local processor.
+ *  When put into a local processor, the operation tree will be executed on each interaction.
+ */
+template <class TS, class TI, class TR>
+class DB_PUBLIC compound_local_operation_with_properties
+  : public local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::object_with_properties<TR> >
+{
+public:
+  /**
+   *  @brief Constructor
+   *
+   *  Creates a local operation which utilizes the operation tree. "node" is the root of the operation tree.
+   *  Ownership of the node is *not* transferred to the local operation.
+   */
+  compound_local_operation_with_properties<TS, TI, TR> (CompoundRegionOperationNode *node, db::PropertyConstraint prop_constraint, db::PropertiesRepository *target_pr, const db::PropertiesRepository *subject_pr, const std::vector<const db::PropertiesRepository *> &intruder_prs)
+    : mp_node (node), m_prop_constraint (prop_constraint), m_pms (target_pr, subject_pr)
+  {
+    m_pmis.reserve (intruder_prs.size ());
+    for (auto i = intruder_prs.begin (); i != intruder_prs.end (); ++i) {
+      m_pmis.push_back (db::PropertyMapper (target_pr, *i));
+    }
+  }
+
+protected:
+  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &results, size_t max_vertex_count, double area_ratio) const
+  {
+    auto interactions_by_prop_id = separate_interactions_to_interactions_by_properties (interactions, m_prop_constraint, m_pms, m_pmis);
+    for (auto s2p = interactions_by_prop_id.begin (); s2p != interactions_by_prop_id.end (); ++s2p) {
+
+      std::vector<std::unordered_set<TR> > results_wo_props;
+      results_wo_props.resize (results.size ());
+
+      CompoundRegionOperationCache cache;
+      mp_node->compute_local (&cache, layout, s2p->second, results_wo_props, max_vertex_count, area_ratio);
+
+      for (size_t n = 0; n < results.size (); ++n) {
+        for (auto i = results_wo_props [n].begin (); i != results_wo_props [n].end (); ++i) {
+          results [n].insert (db::object_with_properties<TR> (*i, pc_norm (m_prop_constraint, s2p->first)));
+        }
+      }
+
+    }
+  }
+
+  virtual db::Coord dist () const { return mp_node->dist (); }
+  virtual OnEmptyIntruderHint on_empty_intruder_hint () const { return mp_node->on_empty_intruder_hint (); }
+  virtual bool requests_single_subjects () const { return true; }
+  virtual std::string description () const { return mp_node->description (); }
+
+  const TransformationReducer *vars () const { return mp_node->vars (); }
+  bool wants_variants () const { return mp_node->wants_variants (); }
+  std::vector<db::Region *> inputs () const { return mp_node->inputs (); }
+
+private:
+  tl::weak_ptr<CompoundRegionOperationNode> mp_node;
+  db::PropertyConstraint m_prop_constraint;
+  mutable db::PropertyMapper m_pms;
+  mutable std::vector<db::PropertyMapper> m_pmis;
+};
+
 }
 
 #endif

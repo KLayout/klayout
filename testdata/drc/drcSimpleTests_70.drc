@@ -1,0 +1,119 @@
+
+# Moved implementation
+
+source($drc_test_source)
+target($drc_test_target)
+
+if $drc_test_deep
+  deep
+end
+
+# properties on input
+l1              = input(1, 0)
+l2              = input(2, 0)
+l3_wp           = input(3, 0, enable_props)
+l3_wp1_input    = input(3, 0, select_props(1))
+l3_wp2as1_input = input(3, 0, map_props({ 2 => 1 }))
+l3              = input(3, 0)
+l4_wp           = input(4, 0, enable_props)
+l4              = input(4, 0)
+
+# derived properties
+l3_wp1          = l3_wp.select_props(1)
+l3_wp2as1       = l3_wp.map_props({ 2 => 1 })
+l3_nowp         = l3_wp.remove_props
+
+# dump to output
+
+l1.output(1, 0)
+l2.output(2, 0)
+l3.output(3, 0)
+l4.output(4, 0)
+
+l3_wp.output(10, 0)
+l3_wp1.output(11, 0)
+l3_wp2as1.output(12, 0)
+l3_nowp.output(13, 0)
+l3_wp1_input.output(14, 0)
+l3_wp2as1_input.output(15, 0)
+l4_wp.output(16, 0)
+
+# booleans with properties constraints
+
+l3_wp.and(l4_wp, props_eq + props_copy).output(20, 0)
+l3_wp1.and(l4_wp, props_eq + props_copy).output(21, 0)
+l3_wp2as1.and(l4_wp, props_eq + props_copy).output(22, 0)
+l3_nowp.and(l4_wp, props_eq + props_copy).output(23, 0)
+
+l3_wp.and(l4_wp, props_ne + props_copy).output(30, 0)
+l3_wp1.and(l4_wp, props_ne + props_copy).output(31, 0)
+l3_wp2as1.and(l4_wp, props_ne + props_copy).output(32, 0)
+l3_nowp.and(l4_wp, props_ne + props_copy).output(33, 0)
+
+l3_wp.and(l4_wp, props_copy).output(40, 0)
+l3_wp1.and(l4_wp, props_copy).output(41, 0)
+l3_wp2as1.and(l4_wp, props_copy).output(42, 0)
+l3_nowp.and(l4_wp, props_copy).output(43, 0)
+
+l3_wp.and(l4_wp).output(50, 0)
+l3_wp1.and(l4_wp).output(51, 0)
+l3_wp2as1.and(l4_wp).output(52, 0)
+l3_nowp.and(l4_wp).output(53, 0)
+
+
+connect(l1, l2)
+
+l1.nets.output(100, 0)
+l1.nets(self._netter).output(101, 0)
+l1.nets(prop(1)).output(102, 0)
+l1.nets(prop(nil)).output(103, 0)
+
+l1.nets("X").output(110, 0)
+l1.nets("TOP", "X").output(111, 0)
+l1.nets("TOP", "NOTEXIST").output(112, 0)
+l1.nets("NOTEXIST", "NOTEXIST").output(113, 0)
+
+
+# checks with property constraints
+
+l1_nets = l1.nets
+
+l1_nets.space(1.0.um, projection).polygons.output(200, 0)
+l1_nets.space(1.0.um, projection, props_eq + props_copy).polygons.output(201, 0)
+l1_nets.space(1.0.um, projection, props_ne + props_copy).polygons.output(202, 0)
+l1_nets.space(1.0.um, projection, props_copy).polygons.output(203, 0)
+l1_nets.width(1.0.um, projection).polygons.output(204, 0)
+l1_nets.width(1.0.um, projection, props_copy).polygons.output(205, 0)
+l1_nets.space(1.0.um, projection, props_eq).polygons.output(206, 0)
+l1_nets.space(1.0.um, projection, props_ne).polygons.output(207, 0)
+
+l1_nets.drc(space(projection) < 1.0.um).polygons.output(210, 0)
+l1_nets.drc(space(projection) < 1.0.um, props_eq + props_copy).polygons.output(211, 0)
+l1_nets.drc(space(projection) < 1.0.um, props_ne + props_copy).polygons.output(212, 0)
+l1_nets.drc(space(projection) < 1.0.um, props_copy).polygons.output(213, 0)
+l1_nets.drc(width(projection) < 1.0.um).polygons.output(214, 0)
+l1_nets.drc(width(projection) < 1.0.um, props_copy).polygons.output(215, 0)
+l1_nets.drc(space(projection) < 1.0.um, props_eq).polygons.output(216, 0)
+l1_nets.drc(space(projection) < 1.0.um, props_ne).polygons.output(217, 0)
+
+# edge pair to edge/polygon conversion with properties
+
+l1_nets.space(1.0.um, projection, props_copy).output(220, 0)
+l1_nets.space(1.0.um, projection, props_copy).first_edges.output(221, 0)
+l1_nets.space(1.0.um, projection, props_copy).second_edges.output(222, 0)
+l1_nets.space(1.0.um, projection, props_copy).edges.output(223, 0)
+l1_nets.space(1.0.um, projection, props_copy).edges.extended_in(10.nm).output(224, 0)
+
+# sizing with properties
+
+l1_nets_sized = l1_nets.sized(0.2.um)
+l1_nets_sized.and(l1_nets_sized, props_ne + props_copy).output(300, 0)   # overlap of different nets, same layer
+l1_nets_sized.and(l1_nets_sized, props_ne).output(301, 0)
+
+l1_nets.drc(primary.sized(0.2.um) & foreign.sized(0.2.um)).output(310, 0)
+l1_nets.drc(primary.sized(0.2.um) & foreign.sized(0.2.um), props_ne + props_copy).output(311, 0)
+l1_nets.drc(primary.sized(0.2.um) & foreign.sized(0.2.um), props_eq + props_copy).output(312, 0)
+l1_nets.drc(primary.sized(0.2.um) & foreign.sized(0.2.um), props_copy).output(313, 0)
+l1_nets.drc(primary.sized(0.2.um) & foreign.sized(0.2.um), props_ne).output(314, 0)
+l1_nets.drc(primary.sized(0.2.um) & foreign.sized(0.2.um), props_eq).output(315, 0)
+

@@ -43,64 +43,8 @@ class Region;
 class DeepShapeStore;
 class TransformationReducer;
 
-/**
- *  @brief An text set iterator
- *
- *  The iterator delivers the texts of the text set
- */
-
-class DB_PUBLIC TextsIterator
-  : public generic_shape_iterator<db::Text>
-{
-public:
-  /**
-   *  @brief Default constructor
-   */
-  TextsIterator ()
-    : generic_shape_iterator<db::Text> ()
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Constructor from a delegate
-   *  The iterator will take ownership over the delegate
-   */
-  TextsIterator (TextsIteratorDelegate *delegate)
-    : generic_shape_iterator<db::Text> (delegate)
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Copy constructor and assignment
-   */
-  TextsIterator (const TextsIterator &other)
-    : generic_shape_iterator<db::Text> (static_cast<const generic_shape_iterator<db::Text> &> (other))
-  {
-    //  .. nothing yet ..
-  }
-
-  /**
-   *  @brief Assignment
-   */
-  TextsIterator &operator= (const TextsIterator &other)
-  {
-    generic_shape_iterator<db::Text>::operator= (other);
-    return *this;
-  }
-
-  /**
-   *  @brief Increment
-   */
-  TextsIterator &operator++ ()
-  {
-    generic_shape_iterator<db::Text>::operator++ ();
-    return *this;
-  }
-};
-
-typedef addressable_shape_delivery_gen<TextsIterator> AddressableTextDelivery;
+typedef generic_shape_iterator<Text> TextsIterator;
+typedef addressable_shape_delivery<Text> AddressableTextDelivery;
 
 class Texts;
 
@@ -248,7 +192,15 @@ public:
   /**
    *  @brief Gets the underlying delegate object
    */
-  TextsDelegate *delegate () const
+  const TextsDelegate *delegate () const
+  {
+    return mp_delegate;
+  }
+
+  /**
+   *  @brief Gets the underlying delegate object
+   */
+  TextsDelegate *delegate ()
   {
     return mp_delegate;
   }
@@ -514,7 +466,7 @@ public:
    */
   AddressableTextDelivery addressable_texts () const
   {
-    return AddressableTextDelivery (begin (), has_valid_texts ());
+    return AddressableTextDelivery (begin ());
   }
 
   /**
@@ -523,6 +475,20 @@ public:
    *  This method is intended for users who know what they are doing
    */
   const db::RecursiveShapeIterator &iter () const;
+
+  /**
+   *  @brief Gets the property repository
+   *
+   *  Use this object to decode property IDs.
+   */
+  const db::PropertiesRepository &properties_repository () const;
+
+  /**
+   *  @brief Gets the property repository
+   *
+   *  Use this object to decode and encode property IDs.
+   */
+  db::PropertiesRepository &properties_repository ();
 
   /**
    *  @brief Equality

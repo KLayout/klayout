@@ -35,8 +35,10 @@
 #include "dbGenericShapeIterator.h"
 #include "dbRegionLocalOperations.h"
 #include "dbHash.h"
+#include "dbLayoutToNetlistEnums.h"
 
 #include <list>
+#include <set>
 #include <unordered_set>
 
 namespace db {
@@ -46,6 +48,8 @@ class EdgeFilterBase;
 class EdgesDelegate;
 class EdgePairsDelegate;
 class CompoundRegionOperationNode;
+class LayoutToNetlist;
+class Net;
 
 /**
  *  @brief A base class for polygon filters
@@ -192,6 +196,12 @@ public:
 
   virtual RegionDelegate *clone () const = 0;
 
+  RegionDelegate *remove_properties (bool remove = true)
+  {
+    ShapeCollectionDelegateBase::remove_properties (remove);
+    return this;
+  }
+
   void set_base_verbosity (int vb);
   int base_verbosity () const
   {
@@ -237,9 +247,9 @@ public:
   virtual perimeter_type perimeter (const db::Box &box) const = 0;
   virtual Box bbox () const = 0;
 
-  virtual EdgePairsDelegate *cop_to_edge_pairs (db::CompoundRegionOperationNode &node) = 0;
-  virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node) = 0;
-  virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node) = 0;
+  virtual EdgePairsDelegate *cop_to_edge_pairs (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint) = 0;
+  virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint) = 0;
+  virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint) = 0;
 
   virtual EdgePairsDelegate *width_check (db::Coord d, const RegionCheckOptions &options) const = 0;
   virtual EdgePairsDelegate *space_check (db::Coord d, const RegionCheckOptions &options) const = 0;
@@ -273,13 +283,13 @@ public:
   virtual RegionDelegate *sized (coord_type d, unsigned int mode) const = 0;
   virtual RegionDelegate *sized (coord_type dx, coord_type dy, unsigned int mode) const = 0;
 
-  virtual RegionDelegate *and_with (const Region &other) const = 0;
-  virtual RegionDelegate *not_with (const Region &other) const = 0;
-  virtual RegionDelegate *xor_with (const Region &other) const = 0;
-  virtual RegionDelegate *or_with (const Region &other) const = 0;
+  virtual RegionDelegate *and_with (const Region &other, PropertyConstraint prop_constraint) const = 0;
+  virtual RegionDelegate *not_with (const Region &other, PropertyConstraint prop_constraint) const = 0;
+  virtual RegionDelegate *xor_with (const Region &other, PropertyConstraint prop_constraint) const = 0;
+  virtual RegionDelegate *or_with (const Region &other, PropertyConstraint prop_constraint) const = 0;
   virtual RegionDelegate *add_in_place (const Region &other) = 0;
   virtual RegionDelegate *add (const Region &other) const = 0;
-  virtual std::pair<RegionDelegate *, RegionDelegate *> andnot_with (const Region &other) const = 0;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> andnot_with (const Region &other, PropertyConstraint prop_constraint) const = 0;
 
   virtual RegionDelegate *selected_outside (const Region &other) const = 0;
   virtual RegionDelegate *selected_not_outside (const Region &other) const = 0;
@@ -311,15 +321,22 @@ public:
   virtual std::pair<RegionDelegate *, RegionDelegate *> in_and_out (const Region &other) const = 0;
 
   virtual const db::Polygon *nth (size_t n) const = 0;
+  virtual db::properties_id_type nth_prop_id (size_t n) const = 0;
   virtual bool has_valid_polygons () const = 0;
   virtual bool has_valid_merged_polygons () const = 0;
 
   virtual const db::RecursiveShapeIterator *iter () const = 0;
 
+  virtual void apply_property_translator (const db::PropertiesTranslator &pt) = 0;
+  virtual db::PropertiesRepository *properties_repository () = 0;
+  virtual const db::PropertiesRepository *properties_repository () const = 0;
+
   virtual bool equals (const Region &other) const = 0;
   virtual bool less (const Region &other) const = 0;
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const = 0;
+
+  virtual RegionDelegate *nets (LayoutToNetlist *l2n, NetPropertyMode prop_mode, const tl::Variant &net_prop_name, const std::vector<const db::Net *> *net_filter) const = 0;
 
   const std::string &progress_desc () const
   {

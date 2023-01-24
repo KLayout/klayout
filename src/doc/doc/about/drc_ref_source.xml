@@ -171,6 +171,7 @@ source.global_transform(shift(0, 100.um), rotate(90.0))
 <li><tt>source.input(layer, datatype)</tt></li>
 <li><tt>source.input(layer_into)</tt></li>
 <li><tt>source.input(filter, ...)</tt></li>
+<li><tt>source.input(props_spec, ...)</tt></li>
 </ul>
 <p>
 Creates a layer with the shapes from the given layer of the source.
@@ -208,6 +209,21 @@ True text layers should be preferred over mixed polygon/text layers if text obje
 is required.
 </p><p>
 "input" without any arguments will create a new, empty original layer.
+</p><p>
+If you want to use user properties - for example with properties constraints in DRC checks -
+you need to enable properties on input:
+</p><p>
+<pre>
+input1_with_props = input(1, 0, enable_props)
+</pre>
+</p><p>
+You can also filter or map property keys, similar to the functions available on
+layers (<a href="/about/drc_ref_drclayer.xml#map_props">DRCLayer#map_props</a>, <a href="/about/drc_ref_drclayer.xml#select_props">DRCLayer#select_props</a>). For example to select
+property values with key 17 (numerical) only, use:
+</p><p>
+<pre>
+input1_with_props = input(1, 0, select_props(17))
+</pre>
 </p><p>
 Use the global version of "input" without a source object to address the default source.
 </p>

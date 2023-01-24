@@ -37,6 +37,7 @@ namespace tl
 namespace db
 {
 
+class PropertiesRepository;
 class Layout;
 class Cell;
 class LayerMap;
@@ -116,6 +117,11 @@ bool DB_PUBLIC compare (const db::Texts &texts, const std::string &string);
  *  @brief Convenient compare of box vs. string
  */
 bool DB_PUBLIC compare (const db::Box &box, const std::string &string);
+
+/**
+ *  @brief Converts a property ID into a property key/value string representation
+ */
+std::string DB_PUBLIC prop2string (const db::PropertiesRepository &pr, db::properties_id_type prop_id);
 
 }
 

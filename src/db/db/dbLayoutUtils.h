@@ -80,8 +80,16 @@ public:
    *  @param source The source layout
    *  @param target The target layout
    */
-  PropertyMapper (db::Layout &target, const db::Layout &source);
+  PropertyMapper (db::Layout *target, const db::Layout *source);
   
+  /**
+   *  @brief Instantiate a property mapper for mapping of property ids from the source to the target property repository
+   *
+   *  @param source The source property repository
+   *  @param target The target property repository
+   */
+  PropertyMapper (db::PropertiesRepository *target, const db::PropertiesRepository *source);
+
   /**
    *  @brief Instantiate a property mapper for mapping of property ids from the source to the target layout
    *
@@ -93,21 +101,31 @@ public:
   /**
    *  @brief Specify the source layout
    */
-  void set_source (const db::Layout &source);
+  void set_source (const db::Layout *source);
   
+  /**
+   *  @brief Specify the source property repository
+   */
+  void set_source (const db::PropertiesRepository *source);
+
   /**
    *  @brief Specify the target layout
    */
-  void set_target (db::Layout &target);
+  void set_target (db::Layout *target);
   
+  /**
+   *  @brief Specify the target property repository
+   */
+  void set_target (db::PropertiesRepository *target);
+
   /**
    *  @brief The actual mapping function
    */
   db::Layout::properties_id_type operator() (db::Layout::properties_id_type source_id);
 
 private:
-  db::Layout *mp_target;
-  const db::Layout *mp_source;
+  db::PropertiesRepository *mp_target;
+  const db::PropertiesRepository *mp_source;
   std::map <db::Layout::properties_id_type, db::Layout::properties_id_type> m_prop_id_map;
 };
 

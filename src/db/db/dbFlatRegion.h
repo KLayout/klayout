@@ -48,6 +48,8 @@ public:
   typedef db::Polygon value_type;
   typedef db::layer<db::Polygon, db::unstable_layer_tag> polygon_layer_type;
   typedef polygon_layer_type::iterator polygon_iterator_type;
+  typedef db::layer<db::PolygonWithProperties, db::unstable_layer_tag> polygon_layer_wp_type;
+  typedef polygon_layer_wp_type::iterator polygon_iterator_wp_type;
 
   FlatRegion ();
   FlatRegion (const db::Shapes &polygons, bool is_merged);
@@ -92,12 +94,16 @@ public:
   virtual RegionDelegate *add (const Region &other) const;
 
   virtual const db::Polygon *nth (size_t n) const;
+  virtual db::properties_id_type nth_prop_id (size_t) const;
   virtual bool has_valid_polygons () const;
   virtual bool has_valid_merged_polygons () const;
 
   virtual const db::RecursiveShapeIterator *iter () const;
+  virtual void apply_property_translator (const db::PropertiesTranslator &pt);
+  virtual db::PropertiesRepository *properties_repository ();
+  virtual const db::PropertiesRepository *properties_repository () const;
 
-  void do_insert (const db::Polygon &polygon);
+  void do_insert (const db::Polygon &polygon, db::properties_id_type prop_id);
 
   void do_transform (const db::Trans &t)
   {
@@ -141,6 +147,7 @@ private:
   mutable tl::copy_on_write_ptr<db::Shapes> mp_polygons;
   mutable tl::copy_on_write_ptr<db::Shapes> mp_merged_polygons;
   mutable bool m_merged_polygons_valid;
+  mutable tl::copy_on_write_ptr<db::PropertiesRepository> mp_properties_repository;
 
   void init ();
   void ensure_merged_polygons_valid () const;
@@ -152,6 +159,9 @@ private:
       db::Shapes &polygons = *mp_polygons;
       for (polygon_iterator_type p = polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().begin (); p != polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().end (); ++p) {
         polygons.get_layer<db::Polygon, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
+      }
+      for (polygon_iterator_wp_type p = polygons.get_layer<db::PolygonWithProperties, db::unstable_layer_tag> ().begin (); p != polygons.get_layer<db::PolygonWithProperties, db::unstable_layer_tag> ().end (); ++p) {
+        polygons.get_layer<db::PolygonWithProperties, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
       }
       invalidate_cache ();
     }

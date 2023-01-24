@@ -66,6 +66,12 @@ public:
 
   virtual TextsDelegate *clone () const = 0;
 
+  TextsDelegate *remove_properties (bool remove = true)
+  {
+    ShapeCollectionDelegateBase::remove_properties (remove);
+    return this;
+  }
+
   void enable_progress (const std::string &progress_desc);
   void disable_progress ();
 
@@ -102,6 +108,9 @@ public:
   virtual bool has_valid_texts () const = 0;
 
   virtual const db::RecursiveShapeIterator *iter () const = 0;
+  virtual void apply_property_translator (const db::PropertiesTranslator &pt) = 0;
+  virtual db::PropertiesRepository *properties_repository () = 0;
+  virtual const db::PropertiesRepository *properties_repository () const = 0;
 
   virtual bool equals (const Texts &other) const = 0;
   virtual bool less (const Texts &other) const = 0;

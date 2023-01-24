@@ -829,9 +829,7 @@ NetTracerLayerExpression::make_l2n_region (db::LayoutToNetlist &l2n, std::map <u
     *res -= *rhb->get ();
   }
 
-  if (! name.empty ()) {
-    l2n.register_layer (*res, name);
-  }
+  l2n.register_layer (*res, name);
 
   return tl::shared_ptr<NetTracerLayerExpression::RegionHolder> (new NetTracerLayerExpression::RegionHolder (res.release ()));
 }

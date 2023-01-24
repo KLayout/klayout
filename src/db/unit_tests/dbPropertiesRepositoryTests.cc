@@ -22,6 +22,7 @@
 
 
 #include "dbPropertiesRepository.h"
+#include "dbTestSupport.h"
 #include "tlString.h"
 #include "tlUnitTest.h"
 
@@ -259,3 +260,135 @@ TEST(6)
   EXPECT_EQ (pid2, size_t (2));
 }
 
+
+TEST(10_PropertiesTranslator)
+{
+  EXPECT_EQ (db::PropertiesTranslator ().is_null (), true);
+  EXPECT_EQ (db::PropertiesTranslator ().is_pass (), true);
+  EXPECT_EQ (db::PropertiesTranslator ().is_empty (), false);
+  EXPECT_EQ (db::PropertiesTranslator::make_pass_all ().is_null (), false);
+  EXPECT_EQ (db::PropertiesTranslator::make_pass_all ().is_pass (), true);
+  EXPECT_EQ (db::PropertiesTranslator::make_pass_all ().is_empty (), false);
+  EXPECT_EQ (db::PropertiesTranslator::make_remove_all ().is_null (), false);
+  EXPECT_EQ (db::PropertiesTranslator::make_remove_all ().is_pass (), false);
+  EXPECT_EQ (db::PropertiesTranslator::make_remove_all ().is_empty (), true);
+
+  db::PropertiesRepository rp;
+  db::property_names_id_type key1 = rp.prop_name_id (1);
+  db::property_names_id_type key2 = rp.prop_name_id (2);
+  db::property_names_id_type key3 = rp.prop_name_id (3);
+
+  db::PropertiesRepository::properties_set ps;
+  ps.insert (std::make_pair (key1, 100));
+  ps.insert (std::make_pair (key2, 101));
+  db::properties_id_type prop1a = rp.properties_id (ps);
+  EXPECT_EQ (prop2string (rp, prop1a), "1=100\n2=101");
+
+  ps.clear ();
+  ps.insert (std::make_pair (key1, 0));
+  ps.insert (std::make_pair (key2, 101));
+  db::properties_id_type prop1b = rp.properties_id (ps);
+  EXPECT_EQ (prop2string (rp, prop1b), "1=0\n2=101");
+
+  ps.clear ();
+  ps.insert (std::make_pair (key1, 100));
+  ps.insert (std::make_pair (key3, 102));
+  db::properties_id_type prop2 = rp.properties_id (ps);
+  EXPECT_EQ (prop2string (rp, prop2), "1=100\n3=102");
+
+  ps.clear ();
+  ps.insert (std::make_pair (key1, 100));
+  db::properties_id_type prop3 = rp.properties_id (ps);
+  EXPECT_EQ (prop2string (rp, prop3), "1=100");
+
+  db::PropertiesRepository rp_org = rp;
+
+  db::PropertiesTranslator t;
+  EXPECT_EQ (prop2string (rp, t (prop1a)), "1=100\n2=101");
+  EXPECT_EQ (prop2string (rp, t (prop1b)), "1=0\n2=101");
+  EXPECT_EQ (prop2string (rp, t (prop2)), "1=100\n3=102");
+  EXPECT_EQ (prop2string (rp, t (prop3)), "1=100");
+
+  t = db::PropertiesTranslator::make_pass_all ();
+  EXPECT_EQ (prop2string (rp, t (prop1a)), "1=100\n2=101");
+  EXPECT_EQ (prop2string (rp, t (prop1b)), "1=0\n2=101");
+  EXPECT_EQ (prop2string (rp, t (prop2)), "1=100\n3=102");
+  EXPECT_EQ (prop2string (rp, t (prop3)), "1=100");
+
+  t = db::PropertiesTranslator::make_remove_all ();
+  EXPECT_EQ (prop2string (rp, t (prop1a)), "");
+  EXPECT_EQ (prop2string (rp, t (prop1b)), "");
+  EXPECT_EQ (prop2string (rp, t (prop2)), "");
+  EXPECT_EQ (prop2string (rp, t (prop3)), "");
+
+  std::set<tl::Variant> kf;
+  kf.insert (1);
+  t = db::PropertiesTranslator::make_filter (rp, kf);
+  EXPECT_EQ (prop2string (rp, t (prop1a)), "1=100");
+  EXPECT_EQ (prop2string (rp, t (prop1b)), "1=0");
+  EXPECT_EQ (prop2string (rp, t (prop2)), "1=100");
+  EXPECT_EQ (prop2string (rp, t (prop3)), "1=100");
+
+  kf.insert (3);
+  t = db::PropertiesTranslator::make_filter (rp, kf);
+  EXPECT_EQ (prop2string (rp, t (prop1a)), "1=100");
+  EXPECT_EQ (prop2string (rp, t (prop1b)), "1=0");
+  EXPECT_EQ (prop2string (rp, t (prop2)), "1=100\n3=102");
+  EXPECT_EQ (prop2string (rp, t (prop3)), "1=100");
+
+  std::map<tl::Variant, tl::Variant> km;
+  km[1] = 4;
+  km[3] = 1;
+
+  t = db::PropertiesTranslator::make_key_mapper (rp, km);
+  EXPECT_EQ (prop2string (rp, t (prop1a)), "4=100");
+  EXPECT_EQ (prop2string (rp, t (prop1b)), "4=0");
+  EXPECT_EQ (prop2string (rp, t (prop2)), "1=102\n4=100");
+  EXPECT_EQ (prop2string (rp, t (prop3)), "4=100");
+
+  kf.clear ();
+  kf.insert (4);
+  t = db::PropertiesTranslator::make_filter (rp, kf) * db::PropertiesTranslator::make_key_mapper (rp, km);
+  EXPECT_EQ (t.is_empty (), false);
+  EXPECT_EQ (prop2string (rp, t (prop1a)), "4=100");
+  EXPECT_EQ (prop2string (rp, t (prop1b)), "4=0");
+  EXPECT_EQ (prop2string (rp, t (prop2)), "4=100");
+  EXPECT_EQ (prop2string (rp, t (prop3)), "4=100");
+
+  kf.clear ();
+  kf.insert (3);
+
+  t = db::PropertiesTranslator::make_filter (rp, kf) * db::PropertiesTranslator::make_key_mapper (rp, km);
+  EXPECT_EQ (t.is_empty (), true);
+  EXPECT_EQ (prop2string (rp, t (prop1a)), "");
+  EXPECT_EQ (prop2string (rp, t (prop1b)), "");
+  EXPECT_EQ (prop2string (rp, t (prop2)), "");
+  EXPECT_EQ (prop2string (rp, t (prop3)), "");
+
+  t = db::PropertiesTranslator::make_key_mapper (rp, km) * db::PropertiesTranslator::make_filter (rp, kf);
+  EXPECT_EQ (t.is_empty (), false);
+  EXPECT_EQ (prop2string (rp, t (prop1a)), "");
+  EXPECT_EQ (prop2string (rp, t (prop1b)), "");
+  EXPECT_EQ (prop2string (rp, t (prop2)), "1=102");
+  EXPECT_EQ (prop2string (rp, t (prop3)), "");
+
+  rp = rp_org;
+
+  t = db::PropertiesTranslator::make_key_mapper (rp, km);
+  t = db::PropertiesTranslator::make_filter (rp, kf) * t;
+  EXPECT_EQ (t.is_empty (), true);
+  EXPECT_EQ (prop2string (rp, t (prop1a)), "");
+  EXPECT_EQ (prop2string (rp, t (prop1b)), "");
+  EXPECT_EQ (prop2string (rp, t (prop2)), "");
+  EXPECT_EQ (prop2string (rp, t (prop3)), "");
+
+  rp = rp_org;
+
+  t = db::PropertiesTranslator::make_filter (rp, kf);
+  t = db::PropertiesTranslator::make_key_mapper (rp, km) * t;
+  EXPECT_EQ (t.is_empty (), false);
+  EXPECT_EQ (prop2string (rp, t (prop1a)), "");
+  EXPECT_EQ (prop2string (rp, t (prop1b)), "");
+  EXPECT_EQ (prop2string (rp, t (prop2)), "1=102");
+  EXPECT_EQ (prop2string (rp, t (prop3)), "");
+}

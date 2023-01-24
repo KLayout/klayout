@@ -46,6 +46,7 @@ public:
   virtual bool at_end () const = 0;
   virtual void increment () = 0;
   virtual const T *get () const = 0;
+  virtual db::properties_id_type prop_id () const = 0;
   virtual generic_shape_iterator_delegate_base<T> *clone () const = 0;
   virtual bool equals (const generic_shape_iterator_delegate_base<T> *other) const = 0;
 };
@@ -84,6 +85,11 @@ public:
   virtual const value_type *get () const
   {
     return m_iter.operator-> ();
+  }
+
+  virtual db::properties_id_type prop_id () const
+  {
+    return 0;
   }
 
   generic_shape_iterator_delegate_base<value_type> *clone () const
@@ -141,6 +147,11 @@ public:
     return m_iter.operator-> ();
   }
 
+  virtual db::properties_id_type prop_id () const
+  {
+    return 0;
+  }
+
   generic_shape_iterator_delegate_base<value_type> *clone () const
   {
     return new generic_shape_iterator_delegate1<Iter> (*this);
@@ -170,7 +181,7 @@ public:
       const_cast<db::Shapes *> (mp_shapes)->update ();
     }
     m_iter = mp_shapes->begin (shape_flags<T> ());
-    m_is_addressable = shape_flags<T> () == shape_flags_pure<T> () || mp_shapes->begin (shape_flags<T> () - shape_flags_pure<T> ()).at_end ();
+    m_is_addressable = ! shape_flags_with_props<T> () && (shape_flags<T> () == shape_flags_pure<T> () || mp_shapes->begin (shape_flags<T> () - shape_flags_pure<T> ()).at_end ());
     set ();
   }
 
@@ -215,6 +226,11 @@ public:
     } else {
       return m_s2o.get (*m_iter);
     }
+  }
+
+  virtual db::properties_id_type prop_id () const
+  {
+    return m_iter->prop_id ();
   }
 
   generic_shape_iterator_delegate_base<T> *clone () const
@@ -289,9 +305,23 @@ public:
     : mp_delegate (other.mp_delegate ? other.mp_delegate->clone () : 0)
   { }
 
+  generic_shape_iterator (generic_shape_iterator &&other)
+    : mp_delegate (0)
+  {
+    std::swap (mp_delegate, other.mp_delegate);
+  }
+
   ~generic_shape_iterator ()
   {
     delete mp_delegate;
+    mp_delegate = 0;
+  }
+
+  generic_shape_iterator &set_delegate (generic_shape_iterator_delegate_base<T> *delegate)
+  {
+    delete mp_delegate;
+    mp_delegate = delegate;
+    return *this;
   }
 
   generic_shape_iterator &operator= (const generic_shape_iterator &other)
@@ -317,6 +347,11 @@ public:
   bool is_addressable () const
   {
     return ! mp_delegate || mp_delegate->is_addressable ();
+  }
+
+  db::properties_id_type prop_id () const
+  {
+    return mp_delegate ? mp_delegate->prop_id () : 0;
   }
 
   reference operator* () const
@@ -372,12 +407,108 @@ public:
 };
 
 /**
- *  @brief A helper class allowing delivery of addressable edges
+ *  @brief Wraps a generic shape iterator to provide a property-enabled one
+ */
+
+template <class T>
+class DB_PUBLIC generic_shape_iterator_with_properties_delegate
+  : public generic_shape_iterator_delegate_base<db::object_with_properties<T> >
+{
+public:
+  generic_shape_iterator_with_properties_delegate (generic_shape_iterator<T> &&basic)
+    : m_basic (basic)
+  {
+    set ();
+  }
+
+  generic_shape_iterator_with_properties_delegate (generic_shape_iterator_delegate_base<T> *delegate)
+    : m_basic (delegate)
+  {
+    set ();
+  }
+
+  generic_shape_iterator_with_properties_delegate (const generic_shape_iterator<T> &basic)
+    : m_basic (basic)
+  {
+    set ();
+  }
+
+  generic_shape_iterator_with_properties_delegate *clone () const
+  {
+    return new generic_shape_iterator_with_properties_delegate (m_basic);
+  }
+
+  virtual void do_reset (const db::Box &region, bool overlapping)
+  {
+    m_basic.reset (region, overlapping);
+  }
+
+  virtual db::Box bbox () const
+  {
+    return m_basic.bbox ();
+  }
+
+  virtual bool is_addressable () const
+  {
+    return false;
+  }
+
+  virtual bool at_end () const
+  {
+    return m_basic.at_end ();
+  }
+
+  virtual void increment ()
+  {
+    ++m_basic;
+    set ();
+  }
+
+  virtual const db::object_with_properties<T> *get () const
+  {
+    return &m_object;
+  }
+
+  virtual db::properties_id_type prop_id () const
+  {
+    return m_object.properties_id ();
+  }
+
+  virtual bool equals (const generic_shape_iterator_delegate_base<db::object_with_properties<T> > *other) const
+  {
+    const generic_shape_iterator_with_properties_delegate<T> *other_cast = dynamic_cast<const generic_shape_iterator_with_properties_delegate<T> *> (other);
+    return other_cast && m_basic == other_cast->m_basic;
+  }
+
+private:
+  db::generic_shape_iterator<T> m_basic;
+  db::object_with_properties<T> m_object;
+
+  void set ()
+  {
+    m_object = db::object_with_properties<T> (*m_basic, m_basic.prop_id ());
+  }
+};
+
+template <class T>
+generic_shape_iterator<db::object_with_properties<T> > make_wp_iter (generic_shape_iterator<T> &&basic)
+{
+  return generic_shape_iterator<db::object_with_properties<T> > ().set_delegate (new generic_shape_iterator_with_properties_delegate<T> (basic));
+}
+
+template <class T>
+generic_shape_iterator<db::object_with_properties<T> > make_wp_iter (db::generic_shape_iterator_delegate_base<T> *delegate)
+{
+  return generic_shape_iterator<db::object_with_properties<T> > ().set_delegate (new generic_shape_iterator_with_properties_delegate<T> (delegate));
+}
+
+/**
+ *  @brief A helper class allowing delivery of addressable objects
  *
  *  In some applications (i.e. box scanner), shapes need to be taken
  *  by address. An iterator cannot always deliver addressable objects.
- *  This class help providing this ability by keeping a temporary copy
- *  if required.
+ *  The addressable_shape_delivery class help providing this ability by keeping temporary copies
+ *  if required on a heap.
  */
 
 template <class Iter>
@@ -422,30 +553,20 @@ public:
     }
   }
 
+  const value_type &operator* () const
+  {
+    return *operator-> ();
+  }
+
+  db::properties_id_type prop_id () const
+  {
+    return m_iter.prop_id ();
+  }
+
 private:
   Iter m_iter;
   bool m_iterator_is_addressable;
   std::list<value_type> m_heap;
-};
-
-template <class Iter>
-class DB_PUBLIC addressable_shape_delivery_gen
-  : public addressable_shape_delivery_impl<Iter>
-{
-public:
-  addressable_shape_delivery_gen ()
-    : addressable_shape_delivery_impl<Iter> ()
-  { }
-
-  explicit addressable_shape_delivery_gen (const Iter &iter, bool iterator_is_addressable)
-    : addressable_shape_delivery_impl<Iter> (iter, iterator_is_addressable)
-  { }
-
-  addressable_shape_delivery_gen &operator++ ()
-  {
-    addressable_shape_delivery_impl<Iter>::inc ();
-    return *this;
-  }
 };
 
 template <class T>
@@ -469,6 +590,29 @@ public:
     return *this;
   }
 };
+
+template <class T>
+class DB_PUBLIC unaddressable_shape_delivery
+  : public addressable_shape_delivery_impl<db::generic_shape_iterator<T> >
+{
+public:
+  typedef db::generic_shape_iterator<T> iter_type;
+
+  unaddressable_shape_delivery ()
+    : addressable_shape_delivery_impl<iter_type> ()
+  { }
+
+  explicit unaddressable_shape_delivery (const iter_type &iter)
+    : addressable_shape_delivery_impl<iter_type> (iter, true)
+  { }
+
+  unaddressable_shape_delivery &operator++ ()
+  {
+    addressable_shape_delivery_impl<iter_type>::inc ();
+    return *this;
+  }
+};
+
 
 }
 

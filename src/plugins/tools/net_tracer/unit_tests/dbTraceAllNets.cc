@@ -78,14 +78,14 @@ void run_test (tl::TestBase *_this, const std::string &file, const db::NetTracer
   db::Cell &top_cell = layout_nets.cell (layout_nets.add_cell ("NETS"));
   db::CellMapping cm = l2ndb.cell_mapping_into (layout_nets, top_cell);
 
-  l2ndb.build_all_nets (cm, layout_nets, l2ndb.create_layermap (layout_nets, 1000), "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", 0);
+  l2ndb.build_all_nets (cm, layout_nets, l2ndb.create_layermap (layout_nets, 1000), "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_SubcircuitCells, "CIRCUIT_", 0);
 
   std::string fn (tl::testdata ());
   fn += "/net_tracer/";
   fn += file_au;
 
   CHECKPOINT ();
-  db::compare_layouts (_this, layout_nets, fn, db::WriteOAS);
+  db::compare_layouts (_this, layout_nets, fn, db::NormalizationMode (db::WriteOAS | db::AsPolygons));
 }
 
 TEST(1) 

@@ -62,9 +62,9 @@ public:
 
   virtual Box bbox () const { return Box (); }
 
-  virtual EdgePairsDelegate *cop_to_edge_pairs (db::CompoundRegionOperationNode &node);
-  virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node);
-  virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node);
+  virtual EdgePairsDelegate *cop_to_edge_pairs (db::CompoundRegionOperationNode &node, PropertyConstraint);
+  virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node, PropertyConstraint);
+  virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node, PropertyConstraint);
 
   virtual EdgePairsDelegate *width_check (db::Coord, const RegionCheckOptions &) const;
   virtual EdgePairsDelegate *space_check (db::Coord, const RegionCheckOptions &) const;
@@ -98,11 +98,11 @@ public:
   virtual RegionDelegate *sized (coord_type, unsigned int) const { return new EmptyRegion (); }
   virtual RegionDelegate *sized (coord_type, coord_type, unsigned int) const { return new EmptyRegion (); }
 
-  virtual RegionDelegate *and_with (const Region &) const { return new EmptyRegion (); }
-  virtual RegionDelegate *not_with (const Region &) const { return new EmptyRegion (); }
-  virtual std::pair<RegionDelegate *, RegionDelegate *> andnot_with (const Region &) const { return std::make_pair (new EmptyRegion (), new EmptyRegion ()); }
-  virtual RegionDelegate *xor_with (const Region &other) const;
-  virtual RegionDelegate *or_with (const Region &other) const;
+  virtual RegionDelegate *and_with (const Region &, db::PropertyConstraint) const { return new EmptyRegion (); }
+  virtual RegionDelegate *not_with (const Region &, db::PropertyConstraint) const { return new EmptyRegion (); }
+  virtual std::pair<RegionDelegate *, RegionDelegate *> andnot_with (const Region &, db::PropertyConstraint) const { return std::make_pair (new EmptyRegion (), new EmptyRegion ()); }
+  virtual RegionDelegate *xor_with (const Region &other, db::PropertyConstraint prop_constraint) const;
+  virtual RegionDelegate *or_with (const Region &other, db::PropertyConstraint prop_constraint) const;
   virtual RegionDelegate *add_in_place (const Region &other);
   virtual RegionDelegate *add (const Region &other) const;
 
@@ -138,13 +138,19 @@ public:
   virtual bool has_valid_polygons () const { return true; }
   virtual bool has_valid_merged_polygons () const { return true; }
   virtual const db::Polygon *nth (size_t) const { tl_assert (false); }
+  virtual db::properties_id_type nth_prop_id (size_t) const { tl_assert (false); }
 
   virtual const db::RecursiveShapeIterator *iter () const { return 0; }
+  virtual void apply_property_translator (const db::PropertiesTranslator &) { }
+  virtual db::PropertiesRepository *properties_repository () { return 0; }
+  virtual const db::PropertiesRepository *properties_repository () const { return 0; }
 
   virtual bool equals (const Region &other) const;
   virtual bool less (const Region &other) const;
 
   virtual void insert_into (Layout *, db::cell_index_type, unsigned int) const { }
+
+  virtual RegionDelegate *nets (LayoutToNetlist *, NetPropertyMode, const tl::Variant &, const std::vector<const db::Net *> *) const { return new EmptyRegion (); }
 
 private:
   EmptyRegion &operator= (const EmptyRegion &other);

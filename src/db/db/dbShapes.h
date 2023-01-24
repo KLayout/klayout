@@ -787,7 +787,7 @@ public:
       } else {
         //  translate and transform into this
         for (tl::vector<LayerBase *>::const_iterator l = d.m_layers.begin (); l != d.m_layers.end (); ++l) {
-          (*l)->transform_into (this, shape_repository (), array_repository (), pm_delegate);
+          (*l)->translate_into (this, shape_repository (), array_repository (), pm_delegate);
         }
       }
 
@@ -1266,7 +1266,8 @@ public:
   {
     size_t n = 0;
     for (tl::vector<LayerBase *>::const_iterator l = m_layers.begin (); l != m_layers.end (); ++l) {
-      if ((flags & (*l)->type_mask ()) != 0) {
+      unsigned int tm = (*l)->type_mask ();
+      if (((flags & db::ShapeIterator::Properties) == 0 || (tm & db::ShapeIterator::Properties) != 0) && (flags & tm) != 0) {
         n += (*l)->size ();
       }
     }
@@ -1466,13 +1467,32 @@ public:
   }
 
   /**
+   *  @brief Gets a flag indicating whether an update is needed
+   *
+   *  This flag means that the shape collection has been modified and the bounding box
+   *  and the quad trees will be recomputed (internally).
+   */
+  bool is_dirty () const
+  {
+    return (size_t (mp_cell) & 1) != 0;
+  }
+
+  /**
+   *  @brief Gets a value indicating that the shape collection is constructed with editable scope
+   */
+  bool is_editable () const
+  {
+    return (size_t (mp_cell) & 2) != 0;
+  }
+
+  /**
    *  @brief Gets the pointer to layout that the shapes container belongs to
    *
    *  This pointer can be 0 if the shapes container is a standalone container
    */
   db::Layout *layout () const;
 
-  /** 
+  /**
    *  @brief Implementation of the redo method
    */
   void redo (db::Op *op);
@@ -1502,18 +1522,6 @@ private:
   tl::vector<LayerBase *> &get_layers ()
   {
     return m_layers;
-  }
-
-  //  extract dirty flag from mp_cell
-  bool is_dirty () const 
-  {
-    return (size_t (mp_cell) & 1) != 0;
-  }
-
-  //  extract editable flag from mp_cell
-  bool is_editable () const 
-  {
-    return (size_t (mp_cell) & 2) != 0;
   }
 
   //  get the shape repository associated with this container

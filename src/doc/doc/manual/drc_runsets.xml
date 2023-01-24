@@ -6,6 +6,10 @@
   <title>DRC Runsets</title>
   <keyword name="DRC"/>
   <keyword name="DRC runset"/>
+  <keyword name="DRC user properties"/>
+  <keyword name="DRC connected"/>
+  <keyword name="DRC unconnected"/>
+  <keyword name="DRC nets"/>
 
   <h2-index/>
 
@@ -1136,6 +1140,206 @@ puts poly.is_deep?   # -&gt; false
   option is to propagate results from such cases into the parent cells. In the worst
   case this will lead to flattening of the layout and loss of hierarchy.
   </p>
+
+  <h2>DRC and user properties</h2>
+
+  <p>
+  The DRC feature has some support for user properties. User properties are sets of
+  key/value pairs attached to shapes. This is a standard feature of KLayout and GDS/OASIS.
+  The GDS format supports numerical (positive integer) keys and string values while OASIS
+  supports more types of keys and values - specifically string keys.
+  </p>
+
+  <p>
+  For DRC, the property set attached to a shape is regarded as a whole.
+  The DRC can act on these properties in specific ways:
+  </p>
+
+  <ul>
+    <li><b>Ignore properties</b>: this is the default mode</li>
+    <li><b>Use properties</b>: configure operations such as checks and some boolean operations to 
+      only consider shapes with the same or different properties</li>
+    <li><b>Map/filter</b>: change property keys/sets or remove them</li>
+    <li><b>Transfer properties</b>: through operations, e.g. "size" or "with_..." selectors</li>
+  </ul>
+
+  <p>
+  Specifically, DRC functions can also <b>generate</b> properties. Currently there is
+  only the "nets" method which attaches net identity information to shapes 
+  involved in a "connect" statement.
+  This feature opens a path to implementing "connected" or "unconnected" mode
+  boolean operations and DRC checks.
+  </p>
+
+  <p>
+  As of this writing, user property support is somewhat experimental.
+  User properties support has a huge potential, so there is more to come.
+  </p>
+
+  <p>
+  Currently, the following operations can be conditioned to act on shapes with same
+  or different properties:
+  </p>
+
+  <ul>
+    <li>Polygon boolean operations: "and", "not" and "andnot"</li>
+    <li>Polygon-mode DRC checks such as "separation", "space", "isolated" etc.</li>
+  </ul>
+
+  <p>
+  A variety of operations can transfer properties, i.e. edge-pair-to-polygon, edge-pair-to-edges,
+  polygon-to-edges, edge-to-polygon, some filters, the "size" function. It is planned
+  to enable most features to transfer properties where applicable.
+  </p>
+
+  <p>
+  Property generation is supported currently by:
+  </p>
+
+  <ul>
+    <li>Reading properties from input layouts</li>
+    <li>Using the "nets" feature to generate net identity properties.</li>
+  </ul>
+
+  <p>
+  Property manipulation is supported in a very basic way: properties can be removed
+  entirely from a layer or certain property keys can be selected and optionally
+  mapped to a different key.
+  Property values cannot be manipulated currently.
+  </p>
+
+  <p>
+  In general, once a layer has properties, shapes with different properties are
+  regarded as non-interacting. When shapes are merged, only groups of shapes
+  with the same properties are merged into bigger chunks. This applies to polygons
+  and edges. This can have the strange consequence that after merge, still 
+  polygons may overlap. Note that this only applies to the case with properties.
+  The normal behavior is not changed.
+  </p>
+
+  <h3>Reading user properties</h3>
+
+  <p>
+  By default, user properties are not read into the shape containers. 
+  You need to enable them explicitly:
+  </p>
+
+  <pre>l1 = input(1, 0, enable_props)</pre>
+
+  <p>
+  At this point you can select certain keys from the set of properties. For example
+  to select only values with key 17 and 18 (numerical), use:
+  </p>
+
+  <pre>l1 = input(1, 0, select_props(17, 18))</pre>
+
+  <p>
+  You can also select and map keys to other keys, like this:
+  </p>
+
+  <pre>l1 = input(1, 0, map_props({ 17 => 1, 18 => 18 }))</pre>
+
+  <p>
+  This will map values with key 17 to 1 and read those from 18 while
+  maintaining the key. Values with other keys are ignored.
+  See <a href="/about/drc_ref_global.xml#input">input function documentation</a>
+  for more details.
+  </p>
+
+  <h3>Manipulating properties</h3>
+
+  <p>
+  Once you have a layer with properties, you can remove them:
+  </p>
+
+  <pre>layer_without_properties = layer.remove_props</pre>
+
+  <p>
+  You can also apply <a href="/about/drc_ref_layer.xml#select_props">select_props</a> or <a href="/about/drc_ref_layer.xml#map_props">map_props</a> to filter values
+  with certain keys or map keys:
+  </p>
+
+  <pre>reduced_layer = layer.select_props(17, 18)
+reduced_layer = layer.map_props({ 17 => 1, 18 => 18 })</pre>
+
+  <h3>Generating properties as net identities</h3>
+
+  <p>
+  The most important application is to use the <a href="/about/drc_ref_layer.xml#nets">nets</a> method to 
+  generate net identity properties:
+  </p>
+
+  <pre>connect(metal1, via1)
+connect(via1, metal2)
+
+metal1_nets = metal1.nets</pre>
+
+  <p>
+  By default, a unique net identifier (a tuple of circuit and net name) is generated
+  on property key 0. You can specify the key as well:
+  </p>
+
+  <pre>metal1_nets = metal1.nets(prop(17))</pre>
+
+  <p>
+  The "nets" function has a number of options, specifically you can filter certain
+  nets (by name or circuit + name). This makes the "nets" function useful for other
+  purposes too. If you do not need properties then, specify "nil" as the property key:
+  </p>
+
+  <pre>metal1_vdd_net = metal1.nets(prop(nil), "VDD")</pre>
+
+  <h3>Using properties in checks and boolean operations</h3>
+
+  <p>
+  The main purpose of properties is to use them in operations.
+  To confine a boolean operation to shapes with different properties,
+  use the <a href="/about/drc_ref_global.xml#props_ne">props_ne</a> keyword. To confine a boolean operation to shapes
+  with the same properties, use <a href="/about/drc_ref_global.xml#props_eq">props_eq</a>:
+  </p>
+
+  <pre>connect(metal1, via1)
+connect(via1, metal2)
+
+metal1_nets = metal1.nets
+metal2_nets = metal2.nets
+
+metal1_over_metal2_connected = metal1_nets.and(metal2_nets, props_eq)
+metal1_over_metal2_unconnected = metal1_nets.and(metal2_nets, props_ne)</pre>
+
+  <p>
+  You can also instruct this operation to emit the original properties
+  on the output with <a href="/about/drc_ref_global.xml#props_eq">props_copy</a>:
+  </p>
+ 
+  <pre>result_with_props = metal1_nets.and(metal2_nets, props_eq + props_copy)</pre>
+
+  <p>
+  Similarly, properties can participate in checks:
+  </p>
+
+  <pre>connect(metal1, via1)
+connect(via1, metal2)
+
+metal1_nets = metal1.nets
+metal2_nets = metal2.nets
+
+metal1_space_connected = metal1_nets.space(0.4.um, props_eq)
+metal1_space_unconnected = metal1_nets.space(1.um, props_ne)</pre>
+
+  <p>
+  "props_eq", "props_ne" and "props_copy" are also available on the
+  generic DRC function (<a href="/about/drc_ref_layer.xml#drc">drc</a>), which opens new options, e.g. 
+  detecting potential short locations ("critical area") between unconnected nets:
+  </p>
+
+  <pre>connect(metal1, via1)
+connect(via1, metal2)
+
+metal1_nets = metal1.nets
+metal2_nets = metal2.nets
+
+critical_area = l1_nets.drc(primary.sized(0.2.um) &amp; foreign.sized(0.2.um), props_ne)</pre>
 
 </doc>
 

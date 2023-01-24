@@ -42,7 +42,7 @@ namespace
     typedef db::Edge value_type;
 
     OriginalLayerEdgesIterator (const db::RecursiveShapeIterator &iter, const db::ICplxTrans &trans)
-      : m_rec_iter (iter), m_iter_trans (trans)
+      : m_rec_iter (iter), m_iter_trans (trans), m_prop_id (0)
     {
       set ();
     }
@@ -66,6 +66,11 @@ namespace
     virtual const value_type *get () const
     {
       return &m_shape;
+    }
+
+    virtual db::properties_id_type prop_id () const
+    {
+      return m_prop_id;
     }
 
     virtual EdgesIteratorDelegate *clone () const
@@ -101,15 +106,17 @@ namespace
     db::RecursiveShapeIterator m_rec_iter;
     db::ICplxTrans m_iter_trans;
     value_type m_shape;
+    db::properties_id_type m_prop_id;
 
     void set ()
     {
-      while (! m_rec_iter.at_end () && !m_rec_iter.shape ().is_edge ()) {
+      while (! m_rec_iter.at_end () && !m_rec_iter->is_edge ()) {
         ++m_rec_iter;
       }
       if (! m_rec_iter.at_end ()) {
-        m_rec_iter.shape ().edge (m_shape);
+        m_rec_iter->edge (m_shape);
         m_shape.transform (m_iter_trans * m_rec_iter.trans ());
+        m_prop_id = m_rec_iter.prop_id ();
       }
     }
 
@@ -120,7 +127,6 @@ namespace
       }
     }
   };
-
 }
 
 OriginalLayerEdges::OriginalLayerEdges ()
@@ -245,6 +251,27 @@ OriginalLayerEdges::iter () const
   return &m_iter;
 }
 
+void
+OriginalLayerEdges::apply_property_translator (const db::PropertiesTranslator &pt)
+{
+  m_iter.apply_property_translator (pt);
+
+  m_merged_edges_valid = false;
+  m_merged_edges.clear ();
+}
+
+db::PropertiesRepository *
+OriginalLayerEdges::properties_repository ()
+{
+  return m_iter.layout () ? &const_cast<db::Layout * >(m_iter.layout ())->properties_repository () : 0;
+}
+
+const db::PropertiesRepository *
+OriginalLayerEdges::properties_repository () const
+{
+  return m_iter.layout () ? &m_iter.layout ()->properties_repository () : 0;
+}
+
 bool
 OriginalLayerEdges::equals (const Edges &other) const
 {
@@ -287,7 +314,7 @@ OriginalLayerEdges::ensure_merged_edges_valid () const
     db::box_scanner<db::Edge, size_t> scanner (report_progress (), progress_desc ());
     scanner.reserve (count ());
 
-    AddressableEdgeDelivery e (begin (), has_valid_edges ());
+    AddressableEdgeDelivery e (begin ());
 
     for ( ; ! e.at_end (); ++e) {
       if (! e->is_degenerate ()) {

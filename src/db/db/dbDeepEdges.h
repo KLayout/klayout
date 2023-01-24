@@ -62,7 +62,7 @@ public:
 
   virtual void reserve (size_t n);
 
-  virtual void do_insert (const db::Edge &edge);
+  virtual void do_insert (const db::Edge &edge, properties_id_type prop_id);
 
   EdgesDelegate *clone () const;
 
@@ -80,6 +80,9 @@ public:
   virtual bool has_valid_merged_edges () const;
 
   virtual const db::RecursiveShapeIterator *iter () const;
+  virtual void apply_property_translator (const db::PropertiesTranslator &pt);
+  virtual db::PropertiesRepository *properties_repository ();
+  virtual const db::PropertiesRepository *properties_repository () const;
 
   virtual bool equals (const Edges &other) const;
   virtual bool less (const Edges &other) const;

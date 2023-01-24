@@ -241,6 +241,127 @@ module DRC
       DRCRectangleErrorFilter::new(RBA::Region::FourSidesAllowed)
     end
     
+    def prop(k)
+      self._context("prop") do
+        DRCPropertyName::new(k)
+      end
+    end
+    
+    # %DRC%
+    # @brief Specifies "same properties" for operations supporting user properties constraints
+    # @name props_eq
+    # 
+    # Some operations such as boolean AND support properties constraints. By giving 
+    # a "props_eq" constraint, the operation is performed only on shapes with the same
+    # properties, where "properties" stands for the full set of key/value pairs.
+    # 
+    # Note that you have to enable properties explicitly or generate properties (e.g. 
+    # with the \DRCLayer#nets method).
+    #
+    # Example:
+    # 
+    # @code
+    # connect(metal1, via1)
+    # connect(via1, metal2)
+    # ... further connect statements
+    # 
+    # m1m2_overlap_connected = metal1.nets.and(metal2, props_eq) 
+    # @/code
+    # 
+    # "props_eq" can be combined with \props_copy. In this case, properties
+    # are transferred to the output shapes and can be used in further processing:
+    #
+    # @code
+    # m1m2_overlap_connected = metal1.nets.and(metal2, props_eq + props_copy) 
+    # @/code
+    #
+    # See also \props_ne.
+
+    # %DRC%
+    # @brief Specifies "different properties" for operations supporting user properties constraints
+    # @name props_ne
+    # 
+    # Some operations such as boolean AND support properties constraints. By giving 
+    # a "props_ne" constraint, the operation is performed only on shapes with different
+    # properties, where "properties" stands for the full set of key/value pairs.
+    # 
+    # Note that you have to enable properties explicitly or generate properties (e.g. 
+    # with the \DRCLayer#nets method).
+    #
+    # Example:
+    # 
+    # @code
+    # connect(metal1, via1)
+    # connect(via1, metal2)
+    # ... further connect statements
+    # 
+    # m1m2_overlap_not_connected = metal1.nets.and(metal2, props_ne)
+    # @/code
+    #
+    # "props_ne" can be combined with \props_copy. In this case, properties
+    # are transferred to the output shapes and can be used in further processing:
+    #
+    # @code
+    # m1m2_overlap_connected = metal1.nets.and(metal2, props_ne + props_copy) 
+    # @/code
+    #
+    # See also \props_eq.
+
+    # %DRC%
+    # @brief Specifies "copy properties" on operations supporting user properties constraints
+    # @name props_copy
+    #
+    # This properties constraint does not constrain the operation, but instructs it to 
+    # attach the properties from the primary input to the output objects.
+    # 
+    # See also \props_ne and \props_eq.
+     
+    def props_eq
+      self._context("props_eq") do
+        DRCPropertiesConstraint::new(RBA::Region::SamePropertiesConstraintDrop)
+      end
+    end
+    
+    def props_ne
+      self._context("props_ne") do
+        DRCPropertiesConstraint::new(RBA::Region::DifferentPropertiesConstraintDrop)
+      end
+    end
+    
+    def props_copy
+      self._context("props_copy") do
+        DRCPropertiesConstraint::new(RBA::Region::NoPropertyConstraint)
+      end
+    end
+
+    def negative
+      DRCNegative::new
+    end
+
+    def enable_props
+      DRCPropertySelector::new(:enable_properties)
+    end
+    
+    def remove_props
+      DRCPropertySelector::new(:remove_properties)
+    end
+    
+    def select_props(*keys)
+      self._context("select_props") do
+        keys.each do |k|
+          k.is_a?(String) || k.is_a?(1.class) || raise("Key values need to be integers or strings (got '#{k.inspect}')")
+        end
+        DRCPropertySelector::new(:filter_properties, keys)
+      end
+    end
+    
+    def map_props(hash)
+      self._context("map_props") do
+        hash.is_a?(Hash) || raise("Argument needs to be a hash (got '#{hash.inspect}')")
+        DRCPropertySelector::new(:map_properties, hash)
+      end
+    end
+    
     def pattern(p)
       self._context("pattern") do
         DRCPattern::new(true, p)
@@ -2596,6 +2717,10 @@ CODE
       @dss
     end
 
+    def _default_netter
+      @netter 
+    end
+
     def _netter
       @netter ||= DRC::DRCNetter::new(self)
     end
@@ -2719,7 +2844,7 @@ CODE
       end
     end
     
-    def _input(layout, cell_index, layers, sel, box, clip, overlapping, shape_flags, global_trans, cls)
+    def _input(layout, cell_index, layers, sel, box, clip, overlapping, shape_flags, global_trans, prop_sel, cls)
     
       if layers.empty? && ! @deep
 
@@ -2732,6 +2857,7 @@ CODE
         else
           iter = RBA::RecursiveShapeIterator::new(layout, layout.cell(cell_index), layers)
         end
+        prop_sel.each { |p| p.apply_to(iter) }
         iter.shape_flags = shape_flags
         iter.global_dtrans = global_trans
         
@@ -2775,7 +2901,8 @@ CODE
         if cls == RBA::Region && clip && box
           # HACK: deep regions will always clip in the constructor, so skip this
           if ! @deep 
-            r &= RBA::Region::new(box)
+            # NOTE: NoPropertyConstraint will copy the original properties
+            r.and_with(RBA::Region::new(box), RBA::Region::NoPropertyConstraint)
           end
         end
       

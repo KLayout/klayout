@@ -487,7 +487,7 @@ struct translate_into_shapes
     mp_shapes->insert (new_shape);
   }
 
-  template <class Sh, class T>
+  template <class Sh>
   void operator() (const db::object_with_properties<Sh> &sh)
   {
     Sh new_shape;
@@ -495,7 +495,7 @@ struct translate_into_shapes
     mp_shapes->insert (db::object_with_properties<Sh> (new_shape, sh.properties_id ()));
   }
 
-  template <class Sh, class T, class PropIdMap>
+  template <class Sh, class PropIdMap>
   void operator() (const db::object_with_properties<Sh> &sh, PropIdMap &pm)
   {
     Sh new_shape;
@@ -755,7 +755,7 @@ inline unsigned int iterator_type_mask (ShapeIterator::user_object_type::tag)
 template <class Sh>
 inline unsigned int iterator_type_mask (db::object_tag< db::object_with_properties<Sh> >)
 {
-  return iterator_type_mask (typename Sh::tag ());
+  return iterator_type_mask (typename Sh::tag ()) | ShapeIterator::Properties;
 }
 
 template <class Sh, class StableTag>

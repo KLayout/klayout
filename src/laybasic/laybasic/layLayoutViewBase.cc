@@ -3314,7 +3314,7 @@ LayoutViewBase::create_layout (const std::string &technology, bool add_cellview,
 {
   const db::Technology *tech = db::Technologies::instance ()->technology_by_name (technology);
 
-  db::Layout *layout = new db::Layout (manager ());
+  db::Layout *layout = new db::Layout (m_editable, manager ());
   if (tech) {
     layout->dbu (tech->dbu ());
   }

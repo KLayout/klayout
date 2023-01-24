@@ -74,25 +74,35 @@ void check_error ()
     if (PyErr_GivenExceptionMatches (exc_type.get (), PyExc_SyntaxError) && PyTuple_Check (exc_value.get ()) && PyTuple_Size (exc_value.get ()) >= 2) {
 
       const char *sourcefile = 0;
+      std::string sourcefile_arg;
       int line = 0;
-      std::string msg;
+      std::string msg = "syntax error (could not parse exception)";
 
-      const char *msg_arg = 0, *sourcefile_arg = 0, *text_arg = 0; 
-      int line_arg = 0, column_arg = 0;
-      if (exc_value && PyArg_ParseTuple (exc_value.get (), "s(siis)", &msg_arg, &sourcefile_arg, &line_arg, &column_arg, &text_arg)) {
+      try {
 
-        //  build a Ruby-like message
-        msg = sourcefile_arg;
-        msg += ":";
-        msg += tl::to_string (line_arg);
-        msg += ": ";
-        msg += msg_arg;
+        if (exc_value && PyTuple_Check (exc_value.get ()) && PyTuple_Size (exc_value.get ()) >= 2) {
 
-        sourcefile = sourcefile_arg;
-        line = line_arg;
+          std::string msg_arg = python2c<std::string> (PyTuple_GetItem (exc_value.get (), 0));
 
-      } else {
-        msg = "syntax error";
+          PyObject *args = PyTuple_GetItem (exc_value.get (), 1);
+          if (PyTuple_Check (args) && PyTuple_Size (args) >= 3) {
+            sourcefile_arg = python2c<std::string> (PyTuple_GetItem (args, 0));
+            sourcefile = sourcefile_arg.c_str ();
+            line = python2c<int> (PyTuple_GetItem (args, 1));
+            //  Not used: column_arg = python2c<int> (PyTuple_GetItem (args, 2);
+          }
+
+          //  build a Ruby-like message
+          msg = sourcefile_arg;
+          msg += ":";
+          msg += tl::to_string (line);
+          msg += ": ";
+          msg += msg_arg;
+
+        }
+
+      } catch (...) {
+        //  ignore exceptions here
       }
 
       if (! backtrace.empty () && ! sourcefile) {

@@ -469,6 +469,8 @@ template <class Trans>
 Shapes::shape_type 
 Shapes::do_insert (const Shapes::shape_type &shape, const Trans &t, tl::func_delegate_base <db::properties_id_type> &pm)
 {
+  db::properties_id_type new_pid = shape.has_prop_id () ? pm (shape.prop_id ()) : 0;
+
   switch (shape.m_type) {
   case shape_type::Null:
   default:
@@ -478,10 +480,10 @@ Shapes::do_insert (const Shapes::shape_type &shape, const Trans &t, tl::func_del
       shape_type::polygon_type p (shape.polygon ());
       //  Hint: we don't compress so we don't loose information
       p.transform (t, false);
-      if (! shape.has_prop_id ()) {
+      if (new_pid == 0) {
         return insert (p);
       } else {
-        return insert (db::object_with_properties<shape_type::polygon_type> (p, pm (shape.prop_id ())));
+        return insert (db::object_with_properties<shape_type::polygon_type> (p, new_pid));
       }
     }
   case shape_type::PolygonRef:
@@ -492,10 +494,10 @@ Shapes::do_insert (const Shapes::shape_type &shape, const Trans &t, tl::func_del
       //  Hint: we don't compress so we don't loose information
       p.transform (t, false);
       //  TODO: could create a reference again, but this is what a transform would to as well.
-      if (! shape.has_prop_id ()) {
+      if (new_pid == 0) {
         return insert (p);
       } else {
-        return insert (db::object_with_properties<shape_type::polygon_type> (p, pm (shape.prop_id ())));
+        return insert (db::object_with_properties<shape_type::polygon_type> (p, new_pid));
       }
     }
   case shape_type::SimplePolygon:
@@ -503,10 +505,10 @@ Shapes::do_insert (const Shapes::shape_type &shape, const Trans &t, tl::func_del
       shape_type::simple_polygon_type p (shape.simple_polygon ());
       //  Hint: we don't compress so we don't loose information
       p.transform (t, false);
-      if (! shape.has_prop_id ()) {
+      if (new_pid == 0) {
         return insert (p);
       } else {
-        return insert (db::object_with_properties<shape_type::simple_polygon_type> (p, pm (shape.prop_id ())));
+        return insert (db::object_with_properties<shape_type::simple_polygon_type> (p, new_pid));
       }
     }
   case shape_type::SimplePolygonRef:
@@ -517,50 +519,50 @@ Shapes::do_insert (const Shapes::shape_type &shape, const Trans &t, tl::func_del
       //  Hint: we don't compress so we don't loose information
       p.transform (t, false);
       //  TODO: could create a reference again, but this is what a transform would to as well.
-      if (! shape.has_prop_id ()) {
+      if (new_pid == 0) {
         return insert (p);
       } else {
-        return insert (db::object_with_properties<shape_type::simple_polygon_type> (p, pm (shape.prop_id ())));
+        return insert (db::object_with_properties<shape_type::simple_polygon_type> (p, new_pid));
       }
     }
   case shape_type::Edge:
     {
       shape_type::edge_type p (shape.edge ());
       p.transform (t);
-      if (! shape.has_prop_id ()) {
+      if (new_pid == 0) {
         return insert (p);
       } else {
-        return insert (db::object_with_properties<shape_type::edge_type> (p, pm (shape.prop_id ())));
+        return insert (db::object_with_properties<shape_type::edge_type> (p, new_pid));
       }
     }
   case shape_type::Point:
     {
       shape_type::point_type p (shape.point ());
       p = t.trans (p);
-      if (! shape.has_prop_id ()) {
+      if (new_pid == 0) {
         return insert (p);
       } else {
-        return insert (db::object_with_properties<shape_type::point_type> (p, pm (shape.prop_id ())));
+        return insert (db::object_with_properties<shape_type::point_type> (p, new_pid));
       }
     }
   case shape_type::EdgePair:
     {
       shape_type::edge_pair_type p (shape.edge_pair ());
       p.transform (t);
-      if (! shape.has_prop_id ()) {
+      if (new_pid == 0) {
         return insert (p);
       } else {
-        return insert (db::object_with_properties<shape_type::edge_pair_type> (p, pm (shape.prop_id ())));
+        return insert (db::object_with_properties<shape_type::edge_pair_type> (p, new_pid));
       }
     }
   case shape_type::Path:
     {
       shape_type::path_type p (shape.path ());
       p.transform (t);
-      if (! shape.has_prop_id ()) {
+      if (new_pid == 0) {
         return insert (p);
       } else {
-        return insert (db::object_with_properties<shape_type::path_type> (p, pm (shape.prop_id ())));
+        return insert (db::object_with_properties<shape_type::path_type> (p, new_pid));
       }
     }
   case shape_type::PathRef:
@@ -570,10 +572,10 @@ Shapes::do_insert (const Shapes::shape_type &shape, const Trans &t, tl::func_del
       shape.path (p);
       p.transform (t);
       //  TODO: could create a reference again, but this is what a transform would to as well.
-      if (! shape.has_prop_id ()) {
+      if (new_pid == 0) {
         return insert (p);
       } else {
-        return insert (db::object_with_properties<shape_type::path_type> (p, pm (shape.prop_id ())));
+        return insert (db::object_with_properties<shape_type::path_type> (p, new_pid));
       }
     }
   case shape_type::Box:
@@ -584,19 +586,19 @@ Shapes::do_insert (const Shapes::shape_type &shape, const Trans &t, tl::func_del
       if (t.is_ortho ()) {
         shape_type::box_type p (shape.box ());
         p.transform (t);
-        if (! shape.has_prop_id ()) {
+        if (new_pid == 0) {
           return insert (p);
         } else {
-          return insert (db::object_with_properties<shape_type::box_type> (p, pm (shape.prop_id ())));
+          return insert (db::object_with_properties<shape_type::box_type> (p, new_pid));
         }
       } else {
         //  A box cannot stay a box in this case ...
         shape_type::simple_polygon_type p (shape.box ());
         p.transform (t);
-        if (! shape.has_prop_id ()) {
+        if (new_pid == 0) {
           return insert (p);
         } else {
-          return insert (db::object_with_properties<shape_type::simple_polygon_type> (p, pm (shape.prop_id ())));
+          return insert (db::object_with_properties<shape_type::simple_polygon_type> (p, new_pid));
         }
       }
     }
@@ -604,10 +606,10 @@ Shapes::do_insert (const Shapes::shape_type &shape, const Trans &t, tl::func_del
     {
       shape_type::text_type p (shape.text ());
       p.transform (t);
-      if (! shape.has_prop_id ()) {
+      if (new_pid == 0) {
         return insert (p);
       } else {
-        return insert (db::object_with_properties<shape_type::text_type> (p, pm (shape.prop_id ())));
+        return insert (db::object_with_properties<shape_type::text_type> (p, new_pid));
       }
     }
   case shape_type::TextRef:
@@ -617,20 +619,20 @@ Shapes::do_insert (const Shapes::shape_type &shape, const Trans &t, tl::func_del
       shape.text (p);
       p.transform (t);
       //  TODO: could create a reference again, but this is what a transform would to as well.
-      if (! shape.has_prop_id ()) {
+      if (new_pid == 0) {
         return insert (p);
       } else {
-        return insert (db::object_with_properties<shape_type::text_type> (p, pm (shape.prop_id ())));
+        return insert (db::object_with_properties<shape_type::text_type> (p, new_pid));
       }
     }
   case shape_type::UserObject:
     {
       shape_type::user_object_type p (shape.user_object ());
       p.transform (t);
-      if (! shape.has_prop_id ()) {
+      if (new_pid == 0) {
         return insert (p);
       } else {
-        return insert (db::object_with_properties<shape_type::user_object_type> (p, pm (shape.prop_id ())));
+        return insert (db::object_with_properties<shape_type::user_object_type> (p, new_pid));
       }
     }
   case shape_type::PolygonPtrArray:
@@ -709,7 +711,7 @@ Shapes::replace_prop_id (const Shapes::shape_type &ref, db::properties_id_type p
     throw tl::Exception (tl::to_string (tr ("Function 'replace_prop_id' is permitted only in editable mode")));
   }
 
-  if (ref.with_props ()) {
+  if (ref.has_prop_id ()) {
 
     //  this assumes we can simply patch the properties ID ..
     switch (ref.m_type) {
@@ -1241,7 +1243,7 @@ Shapes::reinsert_member_with_props (typename db::object_tag<Sh1>, const shape_ty
   }
 
   //  the shape types are not equal - resolve into erase and insert (of new)
-  if (! ref.with_props ()) {
+  if (! ref.has_prop_id ()) {
     erase_shape (ref);
     return insert (sh);
   } else {
@@ -1260,7 +1262,7 @@ Shapes::replace_member_with_props (typename db::object_tag<Sh1>, const shape_typ
   }
 
   //  the shape types are not equal - resolve into erase and insert (of new)
-  if (! ref.with_props ()) {
+  if (! ref.has_prop_id ()) {
     erase_shape (ref);
     return insert (sh);
   } else {
@@ -1310,7 +1312,7 @@ Shapes::replace_member_with_props (typename db::object_tag<Sh> tag, const shape_
       throw tl::Exception (tl::to_string (tr ("Function 'replace' is permitted only in editable mode")));
     }
 
-    if (! ref.with_props ()) {
+    if (! ref.has_prop_id ()) {
 
       if (manager () && manager ()->transacting ()) {
         check_is_editable_for_undo_redo ();

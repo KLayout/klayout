@@ -179,7 +179,11 @@ AsIfFlatTexts::processed_to_polygons (const TextToPolygonProcessorBase &filter) 
     res_polygons.clear ();
     filter.process (*e, res_polygons);
     for (std::vector<db::Polygon>::const_iterator pr = res_polygons.begin (); pr != res_polygons.end (); ++pr) {
-      region->insert (*pr);
+      if (e.prop_id () != 0) {
+        region->insert (db::PolygonWithProperties (*pr, e.prop_id ()));
+      } else {
+        region->insert (*pr);
+      }
     }
   }
 
@@ -216,7 +220,7 @@ AsIfFlatTexts::edges () const
 TextsDelegate *
 AsIfFlatTexts::add (const Texts &other) const
 {
-  FlatTexts *other_flat = dynamic_cast<FlatTexts *> (other.delegate ());
+  const FlatTexts *other_flat = dynamic_cast<const FlatTexts *> (other.delegate ());
   if (other_flat) {
 
     std::unique_ptr<FlatTexts> new_texts (new FlatTexts (*other_flat));
@@ -330,7 +334,7 @@ AsIfFlatTexts::selected_interacting_generic (const Region &other, bool inverse) 
 
   db::box_scanner2<db::Text, size_t, db::Polygon, size_t> scanner (report_progress (), progress_desc ());
 
-  AddressableTextDelivery e (begin (), has_valid_texts ());
+  AddressableTextDelivery e (begin ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert1 (e.operator-> (), 0);
@@ -376,7 +380,7 @@ AsIfFlatTexts::pull_generic (const Region &other) const
 
   db::box_scanner2<db::Text, size_t, db::Polygon, size_t> scanner (report_progress (), progress_desc ());
 
-  AddressableTextDelivery e (begin (), has_valid_texts ());
+  AddressableTextDelivery e (begin ());
 
   for ( ; ! e.at_end (); ++e) {
     scanner.insert1 (e.operator-> (), 0);

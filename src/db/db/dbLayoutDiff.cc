@@ -670,11 +670,11 @@ do_compare_layouts (const db::Layout &a, const db::Cell *top_a, const db::Layout
   na.properties_repository () = a.properties_repository ();
   nb.properties_repository () = b.properties_repository ();
 
-  db::PropertyMapper prop_normalize_a (n, a);
-  db::PropertyMapper prop_normalize_b (n, b);
+  db::PropertyMapper prop_normalize_a (&n, &a);
+  db::PropertyMapper prop_normalize_b (&n, &b);
 
-  db::PropertyMapper prop_remap_to_a (na, n);
-  db::PropertyMapper prop_remap_to_b (nb, n);
+  db::PropertyMapper prop_remap_to_a (&na, &n);
+  db::PropertyMapper prop_remap_to_b (&nb, &n);
 
   //  compare layers
 

@@ -224,7 +224,7 @@ LibraryProxy::update (db::ImportLayerMapping *layer_mapping)
   clear_shapes ();
   clear_insts ();
 
-  PropertyMapper prop_id_map (*layout (), lib->layout ());
+  PropertyMapper prop_id_map (layout (), &lib->layout ());
 
   for (unsigned int l = 0; l < lib->layout ().layers (); ++l) {
     if (layer_indices [l] >= 0) {

@@ -220,7 +220,7 @@ TEST(2_WithClipAndRefGeneration)
   }
 
   db::Layout target;
-  db::PolygonReferenceHierarchyBuilderShapeReceiver ref(&target);
+  db::PolygonReferenceHierarchyBuilderShapeReceiver ref(&target, 0);
   db::ClippingHierarchyBuilderShapeReceiver clip(&ref);
   db::HierarchyBuilder builder (&target, db::ICplxTrans (), &clip);
 
@@ -259,7 +259,7 @@ TEST(2_WithEmptyResult)
   }
 
   db::Layout target;
-  db::PolygonReferenceHierarchyBuilderShapeReceiver ref(&target);
+  db::PolygonReferenceHierarchyBuilderShapeReceiver ref(&target, 0);
   db::ClippingHierarchyBuilderShapeReceiver clip(&ref);
   db::HierarchyBuilder builder (&target, db::ICplxTrans (), &clip);
 

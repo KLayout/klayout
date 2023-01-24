@@ -172,6 +172,32 @@ static db::Region complex_region (const db::RecursiveShapeIterator *iter)
   }
 }
 
+static void enable_properties (db::RecursiveShapeIterator *c)
+{
+  c->apply_property_translator (db::PropertiesTranslator::make_pass_all ());
+}
+
+static void remove_properties (db::RecursiveShapeIterator *c)
+{
+  c->apply_property_translator (db::PropertiesTranslator::make_remove_all ());
+}
+
+static void filter_properties (db::RecursiveShapeIterator *c, const std::vector<tl::Variant> &keys)
+{
+  if (c->layout ()) {
+    std::set<tl::Variant> kf;
+    kf.insert (keys.begin (), keys.end ());
+    c->apply_property_translator (db::PropertiesTranslator::make_filter (const_cast<db::Layout *> (c->layout ())->properties_repository (), kf));
+  }
+}
+
+static void map_properties (db::RecursiveShapeIterator *c, const std::map<tl::Variant, tl::Variant> &map)
+{
+  if (c->layout ()) {
+    c->apply_property_translator (db::PropertiesTranslator::make_key_mapper (const_cast<db::Layout *> (c->layout ())->properties_repository (), map));
+  }
+}
+
 Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveShapeIterator",
   gsi::constructor ("new", &new_si1, gsi::arg ("layout"), gsi::arg ("cell"), gsi::arg ("layer"),
     "@brief Creates a recursive, single-layer shape iterator.\n"
@@ -547,6 +573,20 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
     "\n"
     "This method has been introduced in version 0.25.3."
   ) +
+  gsi::method ("prop_id", &db::RecursiveShapeIterator::prop_id,
+    "@brief Gets the effective properties ID\n"
+    "The shape iterator supports property filtering and translation. This method will deliver "
+    "the effective property ID after translation. The original property ID can be obtained from "
+    "'shape.prop_id' and is not changed by installing filters or mappers.\n"
+    "\n"
+    "\\prop_id is evaluated by \\Region objects for example, when they are created "
+    "from a shape iterator.\n"
+    "\n"
+    "See \\enable_properties, \\filter_properties, \\remove_properties and \\map_properties for "
+    "details on this feature.\n"
+    "\n"
+    "This attribute has been introduced in version 0.28.4."
+  ) +
   gsi::method ("shape", &db::RecursiveShapeIterator::shape,
     "@brief Gets the current shape\n"
     "\n"
@@ -592,6 +632,51 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
     "@brief Comparison of iterators - inequality\n"
     "\n"
     "Two iterators are not equal if they do not point to the same shape.\n"
+  ) +
+  gsi::method_ext ("enable_properties", &enable_properties,
+    "@brief Enables properties for the given iterator.\n"
+    "Afer enabling properties, \\prop_id will deliver the effective properties ID for the current shape. "
+    "By default, properties are not enabled and \\prop_id will always return 0 (no properties attached). "
+    "Alternatively you can apply \\filter_properties "
+    "or \\map_properties to enable properties with a specific name key.\n"
+    "\n"
+    "Note that property filters/mappers are additive and act in addition (after) the currently installed filter.\n"
+    "\n"
+    "This feature has been introduced in version 0.28.4."
+  ) +
+  gsi::method_ext ("remove_properties", &remove_properties,
+    "@brief Removes properties for the given container.\n"
+    "This will remove all properties and \\prop_id will deliver 0 always (no properties attached).\n"
+    "Alternatively you can apply \\filter_properties "
+    "or \\map_properties to enable properties with a specific name key.\n"
+    "\n"
+    "Note that property filters/mappers are additive and act in addition (after) the currently installed filter.\n"
+    "So effectively after 'remove_properties' you cannot get them back.\n"
+    "\n"
+    "This feature has been introduced in version 0.28.4."
+  ) +
+  gsi::method_ext ("filter_properties", &filter_properties, gsi::arg ("keys"),
+    "@brief Filters properties by certain keys.\n"
+    "Calling this method will reduce the properties to values with name keys from the 'keys' list.\n"
+    "As a side effect, this method enables properties.\n"
+    "As with \\enable_properties or \\remove_properties, this filter has an effect on the value returned "
+    "by \\prop_id, not on the properties ID attached to the shape directly.\n"
+    "\n"
+    "Note that property filters/mappers are additive and act in addition (after) the currently installed filter.\n"
+    "\n"
+    "This feature has been introduced in version 0.28.4."
+  ) +
+  gsi::method_ext ("map_properties", &map_properties, gsi::arg ("key_map"),
+    "@brief Maps properties by name key.\n"
+    "Calling this method will reduce the properties to values with name keys from the 'keys' hash and "
+    "renames the properties. Property values with keys not listed in the key map will be removed.\n"
+    "As a side effect, this method enables properties.\n"
+    "As with \\enable_properties or \\remove_properties, this filter has an effect on the value returned "
+    "by \\prop_id, not on the properties ID attached to the shape directly.\n"
+    "\n"
+    "Note that property filters/mappers are additive and act in addition (after) the currently installed filter.\n"
+    "\n"
+    "This feature has been introduced in version 0.28.4."
   ),
   "@brief An iterator delivering shapes recursively\n"
   "\n"

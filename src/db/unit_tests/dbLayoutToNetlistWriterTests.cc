@@ -207,7 +207,7 @@ TEST(1_WriterBasic)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
 
-    l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_Disconnected, 0, "DEVICE_");
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_Disconnected, 0, "DEVICE_");
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");
@@ -440,7 +440,7 @@ TEST(2_WriterWithGlobalNets)
     lmap [ly2.insert_layer (db::LayerProperties (7, 0)) ] = rvia1.get ();
     lmap [ly2.insert_layer (db::LayerProperties (8, 0)) ] = rmetal2.get ();
 
-    l2n.build_all_nets (cm, ly2, lmap, "NET_", tl::Variant (), db::LayoutToNetlist::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
+    l2n.build_all_nets (cm, ly2, lmap, "NET_", db::NPM_NoProperties, tl::Variant (), db::BNH_SubcircuitCells, "CIRCUIT_", "DEVICE_");
 
     std::string au = tl::testdata ();
     au = tl::combine_path (au, "algo");

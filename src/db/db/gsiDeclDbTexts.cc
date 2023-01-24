@@ -28,6 +28,8 @@
 #include "dbDeepTexts.h"
 #include "dbTextsUtils.h"
 
+#include "gsiDeclDbContainerHelpers.h"
+
 namespace gsi
 {
 
@@ -506,7 +508,9 @@ Class<db::Texts> decl_Texts (decl_dbShapeCollection, "db", "Texts",
   method_ext ("to_s", &to_string1, gsi::arg ("max_count"),
     "@brief Converts the text collection to a string\n"
     "This version allows specification of the maximum number of texts contained in the string."
-  ),
+  ) +
+  gsi::make_property_methods<db::Texts> ()
+  ,
   "@brief Texts (a collection of texts)\n"
   "\n"
   "Text objects are useful as labels for net names, to identify certain regions and to specify specific locations in general. "

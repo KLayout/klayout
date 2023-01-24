@@ -338,6 +338,14 @@ public:
   void add_attr (attr_id a);
 
   /**
+   *  @brief Gets a value indicating whether the attributes of the clusters are identical
+   */
+  bool same_attrs (const local_cluster<T> &other) const
+  {
+    return m_attrs == other.m_attrs;
+  }
+
+  /**
    *  @brief Gets the attribute iterator (begin)
    */
   attr_iterator begin_attr () const
@@ -537,7 +545,7 @@ public:
    *  cluster joining may happen in this case, because multi-attribute
    *  assignment might create connections too.
    */
-  void build_clusters (const db::Cell &cell, const db::Connectivity &conn, const tl::equivalence_clusters<size_t> *attr_equivalence = 0, bool report_progress = false);
+  void build_clusters (const db::Cell &cell, const db::Connectivity &conn, const tl::equivalence_clusters<size_t> *attr_equivalence = 0, bool report_progress = false, bool separate_attributes = false);
 
   /**
    *  @brief Creates and inserts a new clusters
@@ -1212,7 +1220,7 @@ public:
   /**
    *  @brief Builds a hierarchy of clusters from a cell hierarchy and given connectivity
    */
-  void build (const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const std::map<db::cell_index_type, tl::equivalence_clusters<size_t> > *attr_equivalence = 0, const std::set<cell_index_type> *breakout_cells = 0);
+  void build (const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const std::map<db::cell_index_type, tl::equivalence_clusters<size_t> > *attr_equivalence = 0, const std::set<cell_index_type> *breakout_cells = 0, bool separate_attributes = false);
 
   /**
    *  @brief Gets the connected clusters for a given cell
@@ -1255,10 +1263,10 @@ public:
   void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const;
 
 private:
-  void build_local_cluster (const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const tl::equivalence_clusters<size_t> *attr_equivalence);
-  void build_hier_connections (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const std::set<cell_index_type> *breakout_cells, instance_interaction_cache_type &instance_interaction_cache);
-  void build_hier_connections_for_cells (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const std::vector<db::cell_index_type> &cells, const db::Connectivity &conn, const std::set<cell_index_type> *breakout_cells, tl::RelativeProgress &progress, instance_interaction_cache_type &instance_interaction_cache);
-  void do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const std::map<cell_index_type, tl::equivalence_clusters<size_t> > *attr_equivalence, const std::set<cell_index_type> *breakout_cells);
+  void build_local_cluster (const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const tl::equivalence_clusters<size_t> *attr_equivalence, bool separate_attributes);
+  void build_hier_connections (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const std::set<cell_index_type> *breakout_cells, instance_interaction_cache_type &instance_interaction_cache, bool separate_attributes);
+  void build_hier_connections_for_cells (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const std::vector<db::cell_index_type> &cells, const db::Connectivity &conn, const std::set<cell_index_type> *breakout_cells, tl::RelativeProgress &progress, instance_interaction_cache_type &instance_interaction_cache, bool separate_attributes);
+  void do_build (cell_clusters_box_converter<T> &cbc, const db::Layout &layout, const db::Cell &cell, const db::Connectivity &conn, const std::map<cell_index_type, tl::equivalence_clusters<size_t> > *attr_equivalence, const std::set<cell_index_type> *breakout_cells, bool separate_attributes);
 
   std::map<db::cell_index_type, connected_clusters<T> > m_per_cell_clusters;
   int m_base_verbosity;

@@ -62,10 +62,14 @@ public:
   virtual size_t hier_count () const;
 
   virtual const db::Polygon *nth (size_t n) const;
+  virtual db::properties_id_type nth_prop_id (size_t) const;
   virtual bool has_valid_polygons () const;
   virtual bool has_valid_merged_polygons () const;
 
   virtual const db::RecursiveShapeIterator *iter () const;
+  virtual void apply_property_translator (const db::PropertiesTranslator &pt);
+  virtual db::PropertiesRepository *properties_repository ();
+  virtual const db::PropertiesRepository *properties_repository () const;
 
   virtual bool equals (const Region &other) const;
   virtual bool less (const Region &other) const;

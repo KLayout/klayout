@@ -280,7 +280,10 @@ static db::CompoundRegionOperationNode *new_polygon_breaker (db::CompoundRegionO
 static db::CompoundRegionOperationNode *new_sized (db::CompoundRegionOperationNode *input, db::Coord dx, db::Coord dy, unsigned int mode)
 {
   check_non_null (input, "input");
-  return new db::CompoundRegionProcessingOperationNode (new db::PolygonSizer (dx, dy, mode), input, true /*processor is owned*/, std::max (db::Coord (0), std::max (dx, dy)) /*dist adder*/);
+  //  NOTE: the distance needs to be twice as we may want to see interactions between the post-size features and those interact when
+  //  within twice the size range.
+  db::Coord dist = 2 * std::max (db::Coord (0), std::max (dx, dy));
+  return new db::CompoundRegionProcessingOperationNode (new db::PolygonSizer (dx, dy, mode), input, true /*processor is owned*/, dist);
 }
 
 static db::CompoundRegionOperationNode *new_merged (db::CompoundRegionOperationNode *input, bool min_coherence, unsigned int min_wc)

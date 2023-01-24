@@ -32,6 +32,8 @@
 #include "dbOriginalLayerRegion.h"
 #include "dbLayoutUtils.h"
 
+#include "gsiDeclDbContainerHelpers.h"
+
 namespace gsi
 {
 
@@ -1750,7 +1752,9 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
   method ("disable_progress", &db::Edges::disable_progress,
     "@brief Disable progress reporting\n"
     "Calling this method will disable progress reporting. See \\enable_progress.\n"
-  ),
+  ) +
+  gsi::make_property_methods<db::Edges> ()
+  ,
   "@brief A collection of edges (Not necessarily describing closed contours)\n"
   "\n\n"
   "This class was introduced to simplify operations on edges sets. "

@@ -50,6 +50,8 @@ public:
 
   typedef db::layer<db::Edge, db::unstable_layer_tag> edge_layer_type;
   typedef edge_layer_type::iterator edge_iterator_type;
+  typedef db::layer<db::EdgeWithProperties, db::unstable_layer_tag> edge_layer_wp_type;
+  typedef edge_layer_wp_type::iterator edge_iterator_wp_type;
 
   FlatEdges ();
   FlatEdges (const db::Shapes &edges, bool is_merged);
@@ -91,8 +93,11 @@ public:
   virtual bool has_valid_merged_edges () const;
 
   virtual const db::RecursiveShapeIterator *iter () const;
+  virtual void apply_property_translator (const db::PropertiesTranslator &pt);
+  virtual db::PropertiesRepository *properties_repository ();
+  virtual const db::PropertiesRepository *properties_repository () const;
 
-  void do_insert (const db::Edge &edge);
+  void do_insert (const db::Edge &edge, properties_id_type prop_id);
 
   void do_transform (const db::Trans &t)
   {
@@ -132,6 +137,7 @@ private:
   mutable tl::copy_on_write_ptr<db::Shapes> mp_edges;
   mutable tl::copy_on_write_ptr<db::Shapes> mp_merged_edges;
   mutable bool m_merged_edges_valid;
+  mutable tl::copy_on_write_ptr<db::PropertiesRepository> mp_properties_repository;
 
   void init ();
   void ensure_merged_edges_valid () const;
@@ -143,6 +149,9 @@ private:
       db::Shapes &e = *mp_edges;
       for (edge_iterator_type p = e.template get_layer<db::Edge, db::unstable_layer_tag> ().begin (); p != e.get_layer<db::Edge, db::unstable_layer_tag> ().end (); ++p) {
         e.get_layer<db::Edge, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
+      }
+      for (edge_iterator_wp_type p = e.template get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().begin (); p != e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().end (); ++p) {
+        e.get_layer<db::EdgeWithProperties, db::unstable_layer_tag> ().replace (p, p->transformed (trans));
       }
       invalidate_cache ();
     }

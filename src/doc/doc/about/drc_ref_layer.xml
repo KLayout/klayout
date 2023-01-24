@@ -61,11 +61,12 @@ is "<a href="#xor">xor</a>". See there for a description of the function.
 <keyword name="and"/>
 <p>Usage:</p>
 <ul>
-<li><tt>layer.and(other)</tt></li>
+<li><tt>layer.and(other [, prop_constraint ])</tt></li>
 </ul>
 <p>
 The method computes a boolean AND between self and other.
-It is an alias for the "&amp;" operator.
+It is an alias for the "&amp;" operator which lacks the ability
+to specify a properties constraint.
 </p><p>
 This method is available for polygon and edge layers.
 If the first operand is an edge layer and the second is a polygon layer, the
@@ -92,6 +93,14 @@ polygons will be written to the output (labels: red, input2: blue):
 <td><img src="/images/drc_textpoly1.png"/></td>
 </tr>
 </table>
+</p><p>
+When a properties constraint is given, the operation is performed
+only between shapes with the given relation. Together with the 
+ability to provide net-annotated shapes through the <a href="#nets">nets</a> method, this
+allows constraining the boolean operation to shapes from the same or
+from different nets.
+</p><p>
+See <a href="/about/drc_ref_global.xml#prop_eq">prop_eq</a>, <a href="/about/drc_ref_global.xml#prop_ne">prop_ne</a> and <a href="/about/drc_ref_global.xml#prop_copy">prop_copy</a> for details.
 </p>
 <a name="andnot"/><h2>"andnot" - Computes Boolean AND and NOT results at the same time</h2>
 <keyword name="andnot"/>
@@ -343,7 +352,7 @@ of the layer's data.
 <keyword name="drc"/>
 <p>Usage:</p>
 <ul>
-<li><tt>layer.drc(expression)</tt></li>
+<li><tt>layer.drc(expression [, prop_constraint ])</tt></li>
 </ul>
 <p>
 This method implements the universal DRC which offers enhanced abilities,
@@ -709,6 +718,24 @@ out = l1.drc((overlap_area == 1.0) + (overlap_area == 2.0))
 Note that the first line prepares the operation, but does not execute the area computation
 or the boolean operation. But when the "drc" function executes the loop over the primaries it will 
 only compute the area once per primary as it is represented by the same Ruby object.
+</p><p>
+<h3>Properties constraints </h3>
+</p><p>
+The method can be given a properties constraint so that it is only performed
+between shapes with the same or different user properties. Note that properties
+have to be enabled or generated (e.g. through the <a href="/about/drc_ref_drclayer.xml#nets">DRCLayer#nets</a> method) before they can
+be used.
+</p><p>
+Example:
+</p><p>
+<pre>
+connect(metal1, via1)
+... 
+
+space_not_connected = metal1.nets.drc(space &lt; 0.4.um, props_ne)
+</pre>
+</p><p>
+See <a href="/about/drc_ref_global.xml#props_eq">props_eq</a>, <a href="/about/drc_ref_global.xml#props_ne">props_ne</a> and <a href="/about/drc_ref_global.xml#props_copy">props_copy</a> for details.
 </p><p>
 <h3>Outlook </h3>
 </p><p>
@@ -1639,6 +1666,32 @@ i.e. before computing the length, the edges are merged unless
 raw mode is chosen (see <a href="#raw">raw</a>). Hence in clean mode (see <a href="#clean">clean</a>), overlapping
 edges are not counted twice.
 </p>
+<a name="map_props"/><h2>"map_props" - Selects properties with certain keys and allows key mapping</h2>
+<keyword name="map_props"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.map_props({ key =&gt; key_new, .. })</tt></li>
+</ul>
+<p>
+Similar to <a href="#select_props">select_props</a>, this method will map or filter properties and
+and take the values from certain keys. In addition, this method allows
+mapping keys to new keys. Specify a hash argument with old to new keys.
+</p><p>
+Property values with keys not listed in the hash are removed.
+</p><p>
+Note that this method returns a new layer with the new properties. The
+original layer will not be touched. 
+</p><p>
+For example to map key 2 to 1 (integer name keys) and ignore other keys,
+use:
+</p><p>
+<pre>
+layer1 = input(1, 0, enable_properties)
+layer1_mapped = layer1.map_props({ 2 =&gt; 1 })
+</pre>
+</p><p>
+See also <a href="#select_props">select_props</a> and <a href="#remove_props">remove_props</a>.
+</p>
 <a name="merge"/><h2>"merge" - Merges the layer (modifies the layer)</h2>
 <keyword name="merge"/>
 <p>Usage:</p>
@@ -1740,6 +1793,53 @@ The following images shows the effect of the "moved" method:
 </tr>
 </table>
 </p>
+<a name="nets"/><h2>"nets" - Pulls net shapes from selected or all nets, optionally annotating nets with properties</h2>
+<keyword name="nets"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.nets</tt></li>
+<li><tt>layer.nets(net_filter)</tt></li>
+<li><tt>layer.nets(circuit_filter, net_filter)</tt></li>
+<li><tt>layer.nets(netter, ...)</tt></li>
+<li><tt>layer.nets(prop(key), ...)</tt></li>
+<li><tt>layer.nets(prop(key), ...)</tt></li>
+</ul>
+<p>
+This method needs a layer that has been used in a connect statement.
+It will take the shapes corresponding to this layer for all or selected nets
+and attach the net identity in form of a user property.
+</p><p>
+This way, the resulting shapes can be used in property-constrained boolean operations
+or DRC checks to implement operations in connected or non-connected mode.
+</p><p>
+A glob-style name pattern can be supplied to filter nets. Nets are always
+complete - subnets from subcircuits are not selected. The net name is taken from
+the net's home circuit (to topmost location where all net connections are formed).
+You can specify a circuit filter to select nets from certain circuits only or
+give a <class_doc href="Circuit">Circuit</class_doc> object explicitly. 
+</p><p>
+<pre>
+connect(metal1, via1)
+connect(via1, metal2)
+
+metal1_all_nets = metal1.nets
+metal1_vdd      = metal1.nets("VDD")
+metal1_vdd      = metal1.nets("TOPLEVEL", "VDD")
+</pre>
+</p><p>
+By default, the property key used for the net identity is numerical 0 (integer). You
+can change the key by giving a property key with the "prop" qualifier. Using "nil" for the key
+will disable properties:
+</p><p>
+<pre>
+metal1_vdd = metal1.nets("VDD", prop(1))
+# disables properties:
+metal1_vdd = metal1.nets("VDD", prop(nil))
+</pre>
+</p><p>
+If a custom netter object has been used for the construction of the 
+connectivity, pass it to the "nets" method among the other arguments.
+</p>
 <a name="non_rectangles"/><h2>"non_rectangles" - Selects all polygons from the input which are not rectangles</h2>
 <keyword name="non_rectangles"/>
 <p>Usage:</p>
@@ -1785,7 +1885,7 @@ This feature has been introduced in version 0.23.2.
 <keyword name="not"/>
 <p>Usage:</p>
 <ul>
-<li><tt>layer.not(other)</tt></li>
+<li><tt>layer.not(other [, prop_constraint ])</tt></li>
 </ul>
 <p>
 The method computes a boolean NOT between self and other.
@@ -1816,6 +1916,14 @@ written to the output (labels: red, input2: blue):
 <td><img src="/images/drc_textpoly2.png"/></td>
 </tr>
 </table>
+</p><p>
+When a properties constraint is given, the operation is performed
+only between shapes with the given relation. Together with the 
+ability to provide net-annotated shapes through the <a href="#nets">nets</a> method, this
+allows constraining the boolean operation to shapes from the same or
+from different nets.
+</p><p>
+See <a href="/about/drc_ref_global.xml#prop_eq">prop_eq</a>, <a href="/about/drc_ref_global.xml#prop_ne">prop_ne</a> and <a href="/about/drc_ref_global.xml#prop_copy">prop_copy</a> for details.
 </p>
 <a name="not_covering"/><h2>"not_covering" - Selects shapes or regions of self which do not cover (enclose) one or more shapes from the other region</h2>
 <keyword name="not_covering"/>
@@ -2390,6 +2498,19 @@ This method is available for polygon layers. By default "merged" semantics appli
 i.e. all polygons are merged before rectilinear polygons are selected (see <a href="#clean">clean</a> and <a href="#raw">raw</a>).
 <a href="#non_rectilinear">non_rectilinear</a> will select all non-rectangles.
 </p>
+<a name="remove_props"/><h2>"remove_props" - Returns a new layer with all properties removed</h2>
+<keyword name="remove_props"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.remove_props</tt></li>
+</ul>
+<p>
+This method will drop all user properties from the layer.
+Note that a new layer without properties is returned. The
+original layer stays untouched.
+</p><p>
+See also <a href="#select_props">select_props</a> and <a href="#map_props">map_props</a>.
+</p>
 <a name="rotate"/><h2>"rotate" - Rotates a layer (modifies the layer)</h2>
 <keyword name="rotate"/>
 <p>Usage:</p>
@@ -2671,6 +2792,42 @@ It modifies self to contain the selected shapes. A version which does not modify
 is <a href="#overlapping">overlapping</a>.
 </p><p>
 This method is available for polygons only.
+</p>
+<a name="select_props"/><h2>"select_props" - Enables or selects properties from a property-annotated layer</h2>
+<keyword name="select_props"/>
+<p>Usage:</p>
+<ul>
+<li><tt>layer.select_props(keys)</tt></li>
+</ul>
+<p>
+This method will select specific property keys
+from layers. It returns a new layer with the new properties. The
+original layer is not modified.
+</p><p>
+You can specify the user property keys (names) to use. As user properties
+in general are a set of key/value pairs and may carry multiple values
+under different keys, this feature can be handy to filter out a specific 
+aspect. To get only the values from key 1 (integer), use:
+</p><p>
+<pre>
+layer1 = input(1, 0, enable_properties)
+layer1_filtered = layer1.select_props(1)
+</pre>
+</p><p>
+To get the combined key 1 and 2 properties, use:
+</p><p>
+<pre>
+layer1 = input(1, 0, enable_properties)
+layer1_filtered = layer1.select_props(1, 2)
+</pre>
+</p><p>
+Without any arguments, this method will remove all properties.
+Note that you can directly filter or map properties on input
+which is more efficient than first loading all and then selecting some
+properties. See <a href="/about/drc_ref_drcsource.xml#input">DRCSource#input</a> for details.
+</p><p>
+<a href="#map_props">map_props</a> is a way to change property keys and <a href="#remove_props">remove_props</a>
+will entirely remove all user properties.
 </p>
 <a name="sep"/><h2>"sep" - An alias for "separation"</h2>
 <keyword name="sep"/>
@@ -3230,6 +3387,8 @@ but is more intuitive, as "projecting" is written with a condition, like
 Double-bounded ranges are also available, like: "0.5 &lt;= projecting &lt; 2.0". </li>
 <li><b>transparent </b>: performs the check without shielding (polygon layers only) </li>
 <li><b>shielded </b>: performs the check with shielding (polygon layers only) </li>
+<li><b>props_eq </b>, <b>props_ne </b>, <b>props_copy </b>: (only props_copy applies to width check) -
+see "Properties constraints" below. </li>
 </ul>
 </p><p>
 Note that without the angle_limit, acute corners will always be reported, since two 
@@ -3292,6 +3451,44 @@ you try to check the distance between features of B vs. A, you cannot use shield
 because B features which are identical to A features will shield those entirely. 
 </p><p>
 Shielding is enabled by default, but can be switched off with the "transparent" option.
+</p><p>
+<h3>Properties constraints (available on intra-polygon checks such as <a href="#space">space</a>, <a href="#sep">sep</a> etc.) </h3>
+</p><p>
+This feature is listed here, because this documentation is generic and used for other checks
+as well. <a href="#props_eq">props_eq</a> and <a href="#props_ne">props_ne</a> are not available on 'width' or 'notch' as these apply to intra-polygon checks - when
+pairs of different polygons are involved - something that 'width' or 'notch' does need.
+</p><p>
+With properties constraints, the check is performed between shapes with the same
+or different properties. "properties" refers to the full set of key/value pairs 
+attached to a shape.
+</p><p>
+Property constraints are specified by adding <a href="#props_eq">props_eq</a> or <a href="#props_ne">props_ne</a> to the arguments.
+If these literals are present, only shapes with same of different properties are
+involved in the check. In connection with the net annotation feature this allows
+checking space between connected or disconnected shapes for example:
+</p><p>
+<pre>
+connect(metal1, via1)
+... 
+
+# attaches net identity as properties
+metal1_nets = metal1.nets
+
+space_not_connected = metal1_nets.space(0.4.um, props_ne)
+space_connected     = metal1_nets.space(0.4.um, props_eq)
+</pre>
+</p><p>
+<a href="#props_copy">props_copy</a> is a special properties constraint that does not alter the behaviour of
+the checks, but copies the primary shape's properties to the output markers.
+This constraint is applicable to <a href="#width">width</a> and <a href="#notch">notch</a> checks too. The effect is that
+the original polygon's properties are copied to the error markers.
+<a href="#props_copy">props_copy</a> can be combined with <a href="#props_eq">props_eq</a> and <a href="#props_ne">props_ne</a> to copy the original
+shape's properties to the output too:
+</p><p>
+<pre>
+space_not_connected = metal1_nets.space(0.4.um, props_ne + props_copy)
+space_connected     = metal1_nets.space(0.4.um, props_eq + props_copy)
+</pre>
 </p>
 <a name="with_angle"/><h2>"with_angle" - Selects edges by their angle</h2>
 <keyword name="with_angle"/>

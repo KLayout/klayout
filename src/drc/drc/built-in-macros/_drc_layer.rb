@@ -1744,9 +1744,10 @@ CODE
     # %DRC%
     # @name and
     # @brief Boolean AND operation
-    # @synopsis layer.and(other)
+    # @synopsis layer.and(other [, prop_constraint ])
     # The method computes a boolean AND between self and other.
-    # It is an alias for the "&" operator.
+    # It is an alias for the "&" operator which lacks the ability
+    # to specify a properties constraint.
     #
     # This method is available for polygon and edge layers.
     # If the first operand is an edge layer and the second is a polygon layer, the
@@ -1773,17 +1774,19 @@ CODE
     #     @td @img(/images/drc_textpoly1.png) @/td
     #   @/tr
     # @/table
-    
-    def and(other)
-      @engine._context("and") do
-        self & other    
-      end
-    end
+    #
+    # When a properties constraint is given, the operation is performed
+    # only between shapes with the given relation. Together with the 
+    # ability to provide net-annotated shapes through the \nets method, this
+    # allows constraining the boolean operation to shapes from the same or
+    # from different nets.
+    # 
+    # See \global#prop_eq, \global#prop_ne and \global#prop_copy for details.
     
     # %DRC%
     # @name not
     # @brief Boolean NOT operation
-    # @synopsis layer.not(other)
+    # @synopsis layer.not(other [, prop_constraint ])
     # The method computes a boolean NOT between self and other.
     # It is an alias for the "-" operator.
     #
@@ -1812,10 +1815,42 @@ CODE
     #     @td @img(/images/drc_textpoly2.png) @/td
     #   @/tr
     # @/table
+    #
+    # When a properties constraint is given, the operation is performed
+    # only between shapes with the given relation. Together with the 
+    # ability to provide net-annotated shapes through the \nets method, this
+    # allows constraining the boolean operation to shapes from the same or
+    # from different nets.
+    #
+    # See \global#prop_eq, \global#prop_ne and \global#prop_copy for details.
     
-    def not(other)
-      @engine._context("not") do
-        self - other    
+    def and(other, prop_constraint = nil)
+      if prop_constraint
+        @engine._context("and") do
+          prop_constraint.is_a?(DRCPropertiesConstraint) || raise("The properties constraint needs to be prop_eq, prop_ne or prop_copy")
+          # currently only available for regions
+          requires_region
+          check_is_layer(other)
+          other.requires_region
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :and, other.data, prop_constraint.value))
+        end
+      else
+        self & other
+      end
+    end
+    
+    def not(other, prop_constraint = nil)
+      if prop_constraint
+        @engine._context("not") do
+          prop_constraint.is_a?(DRCPropertiesConstraint) || raise("The properties constraint needs to be prop_eq, prop_ne or prop_copy")
+          # currently only available for regions
+          requires_region
+          check_is_layer(other)
+          other.requires_region
+          DRCLayer::new(@engine, @engine._tcmd(self.data, 0, self.data.class, :not, other.data, prop_constraint.value))
+        end
+      else
+        self - other
       end
     end
     
@@ -3654,6 +3689,8 @@ CODE
     #         Double-bounded ranges are also available, like: "0.5 <= projecting < 2.0". @/li
     #   @li @b transparent @/b: performs the check without shielding (polygon layers only) @/li
     #   @li @b shielded @/b: performs the check with shielding (polygon layers only) @/li
+    #   @li @b props_eq @/b, @b props_ne @/b, @b props_copy @/b: (only props_copy applies to width check) -
+    #         see "Properties constraints" below. @/li
     # @/ul
     #
     # Note that without the angle_limit, acute corners will always be reported, since two 
@@ -3716,6 +3753,45 @@ CODE
     # because B features which are identical to A features will shield those entirely. 
     #
     # Shielding is enabled by default, but can be switched off with the "transparent" option.
+    #
+    # @h3 Properties constraints (available on intra-polygon checks such as \space, \sep etc.) @/h3
+    #
+    # This feature is listed here, because this documentation is generic and used for other checks
+    # as well. \props_eq and \props_ne are not available on 'width' or 'notch' as these apply to intra-polygon checks - when
+    # pairs of different polygons are involved - something that 'width' or 'notch' does need.
+    #
+    # With properties constraints, the check is performed between shapes with the same
+    # or different properties. "properties" refers to the full set of key/value pairs 
+    # attached to a shape.
+    #
+    # Property constraints are specified by adding \props_eq or \props_ne to the arguments.
+    # If these literals are present, only shapes with same of different properties are
+    # involved in the check. In connection with the net annotation feature this allows
+    # checking space between connected or disconnected shapes for example:
+    #
+    # @code
+    # connect(metal1, via1)
+    # ... 
+    # 
+    # # attaches net identity as properties
+    # metal1_nets = metal1.nets
+    #
+    # space_not_connected = metal1_nets.space(0.4.um, props_ne)
+    # space_connected     = metal1_nets.space(0.4.um, props_eq)
+    # @/code
+    #
+    # \props_copy is a special properties constraint that does not alter the behaviour of
+    # the checks, but copies the primary shape's properties to the output markers.
+    # This constraint is applicable to \width and \notch checks too. The effect is that
+    # the original polygon's properties are copied to the error markers.
+    # \props_copy can be combined with \props_eq and \props_ne to copy the original
+    # shape's properties to the output too:
+    #
+    # @code
+    # space_not_connected = metal1_nets.space(0.4.um, props_ne + props_copy)
+    # space_connected     = metal1_nets.space(0.4.um, props_eq + props_copy)
+    # @/code
+    #
     
     # %DRC%
     # @name space
@@ -3754,7 +3830,6 @@ CODE
     #     @td @img(/images/drc_space1.png) @/td
     #   @/tr
     # @/table
-    #
     
     # %DRC%
     # @name isolated
@@ -4042,8 +4117,10 @@ CODE
           whole_edges = false
           other = nil
           shielded = nil
+          negative = false
           opposite_filter = RBA::Region::NoOppositeFilter
           rect_filter = RBA::Region::NoRectFilter
+          prop_constraint = RBA::Region::IgnoreProperties
 
           n = 1
           args.each do |a|
@@ -4051,6 +4128,10 @@ CODE
               metrics = a.value
             elsif a.is_a?(DRCWholeEdges)
               whole_edges = a.value
+            elsif a.is_a?(DRCNegative)
+              negative = true
+            elsif a.is_a?(DRCPropertiesConstraint)
+              prop_constraint = a.value
             elsif a.is_a?(DRCOppositeErrorFilter)
               opposite_filter = a.value
             elsif a.is_a?(DRCRectangleErrorFilter)
@@ -4083,11 +4164,19 @@ CODE
             if :#{f} != :width && :#{f} != :notch
               args << opposite_filter
               args << rect_filter
-            elsif opposite_filter != RBA::Region::NoOppositeFilter
-              raise("An opposite error filter cannot be used with this check")
-            elsif rect_filter != RBA::Region::NoRectFilter
-              raise("A rectangle error filter cannot be used with this check")
+            else
+              if opposite_filter != RBA::Region::NoOppositeFilter
+                raise("An opposite error filter cannot be used with this check")
+              elsif rect_filter != RBA::Region::NoRectFilter
+                raise("A rectangle error filter cannot be used with this check")
+              elsif prop_constraint != RBA::Region::IgnoreProperties && prop_constraint != RBA::Region::NoPropertyConstraint
+                raise("A specific properties constraint cannot be used with this check (only 'props_copy' can be used)")
+              end
             end
+            args << negative
+            args << prop_constraint
+          elsif negative
+            raise("Negative output can only be used for polygon layers")
           elsif shielded != nil
             raise("Shielding can only be used for polygon layers")
           elsif opposite_filter != RBA::Region::NoOppositeFilter
@@ -4699,6 +4788,208 @@ CODE
       end
     end
     
+    # %DRC%
+    # @name select_props
+    # @brief Enables or selects properties from a property-annotated layer
+    # @synopsis layer.select_props(keys)
+    #
+    # This method will select specific property keys
+    # from layers. It returns a new layer with the new properties. The
+    # original layer is not modified.
+    #
+    # You can specify the user property keys (names) to use. As user properties
+    # in general are a set of key/value pairs and may carry multiple values
+    # under different keys, this feature can be handy to filter out a specific 
+    # aspect. To get only the values from key 1 (integer), use:
+    #
+    # @code
+    # layer1 = input(1, 0, enable_properties)
+    # layer1_filtered = layer1.select_props(1)
+    # @/code
+    #
+    # To get the combined key 1 and 2 properties, use:
+    #
+    # @code
+    # layer1 = input(1, 0, enable_properties)
+    # layer1_filtered = layer1.select_props(1, 2)
+    # @/code
+    #
+    # Without any arguments, this method will remove all properties.
+    # Note that you can directly filter or map properties on input
+    # which is more efficient than first loading all and then selecting some
+    # properties. See \DRCSource#input for details.
+    #
+    # \map_props is a way to change property keys and \remove_props
+    # will entirely remove all user properties.
+
+    # %DRC%
+    # @name map_props
+    # @brief Selects properties with certain keys and allows key mapping
+    # @synopsis layer.map_props({ key => key_new, .. })
+    #
+    # Similar to \select_props, this method will map or filter properties and
+    # and take the values from certain keys. In addition, this method allows
+    # mapping keys to new keys. Specify a hash argument with old to new keys.
+    #
+    # Property values with keys not listed in the hash are removed.
+    # 
+    # Note that this method returns a new layer with the new properties. The
+    # original layer will not be touched. 
+    #
+    # For example to map key 2 to 1 (integer name keys) and ignore other keys,
+    # use:
+    #
+    # @code
+    # layer1 = input(1, 0, enable_properties)
+    # layer1_mapped = layer1.map_props({ 2 => 1 })
+    # @/code
+    # 
+    # See also \select_props and \remove_props.
+
+    # %DRC%
+    # @name remove_props
+    # @brief Returns a new layer with all properties removed
+    # @synopsis layer.remove_props
+    #
+    # This method will drop all user properties from the layer.
+    # Note that a new layer without properties is returned. The
+    # original layer stays untouched.
+    # 
+    # See also \select_props and \map_props.
+
+    def select_props(*args)
+      @engine._context("select_props") do
+        keys = args.flatten 
+        if keys.empty?
+          DRC::DRCLayer::new(@engine, self.data.dup.enable_properties)
+        else
+          DRC::DRCLayer::new(@engine, self.data.dup.filter_properties(keys))
+        end
+      end
+    end
+
+    def remove_props
+      @engine._context("remove_props") do
+        DRC::DRCLayer::new(@engine, self.data.dup.remove_properties)
+      end
+    end
+
+    def map_props(arg)
+      @engine._context("map_props") do
+        arg.is_a?(Hash) || raise("Argument of 'map_props' needs to be a mapping hash")
+        DRC::DRCLayer::new(@engine, self.data.dup.map_properties(arg))
+      end
+    end
+
+    # %DRC%
+    # @name nets
+    # @brief Pulls net shapes from selected or all nets, optionally annotating nets with properties
+    # @synopsis layer.nets
+    # @synopsis layer.nets(net_filter)
+    # @synopsis layer.nets(circuit_filter, net_filter)
+    # @synopsis layer.nets(netter, ...)
+    # @synopsis layer.nets(prop(key), ...)
+    # @synopsis layer.nets(prop(key), ...)
+    #
+    # This method needs a layer that has been used in a connect statement.
+    # It will take the shapes corresponding to this layer for all or selected nets
+    # and attach the net identity in form of a user property.
+    #
+    # This way, the resulting shapes can be used in property-constrained boolean operations
+    # or DRC checks to implement operations in connected or non-connected mode.
+    # 
+    # A glob-style name pattern can be supplied to filter nets. Nets are always
+    # complete - subnets from subcircuits are not selected. The net name is taken from
+    # the net's home circuit (to topmost location where all net connections are formed).
+    # You can specify a circuit filter to select nets from certain circuits only or
+    # give a RBA::Circuit object explicitly. 
+    # 
+    # @code
+    # connect(metal1, via1)
+    # connect(via1, metal2)
+    #
+    # metal1_all_nets = metal1.nets
+    # metal1_vdd      = metal1.nets("VDD")
+    # metal1_vdd      = metal1.nets("TOPLEVEL", "VDD")
+    # @/code
+    #
+    # By default, the property key used for the net identity is numerical 0 (integer). You
+    # can change the key by giving a property key with the "prop" qualifier. Using "nil" for the key
+    # will disable properties:
+    #
+    # @code
+    # metal1_vdd = metal1.nets("VDD", prop(1))
+    # # disables properties:
+    # metal1_vdd = metal1.nets("VDD", prop(nil))
+    # @/code
+    #
+    # If a custom netter object has been used for the construction of the 
+    # connectivity, pass it to the "nets" method among the other arguments.
+
+    def nets(*args)
+
+      @engine._context("nets") do
+
+        # parse arguments
+        filters = nil
+        circuits = nil
+        prop_id = 0
+        netter = nil
+        args.each do |a|
+          if a.is_a?(String)
+            filters ||= []
+            filters << a
+          elsif a.is_a?(1.class)
+            prop_id = a
+          elsif a.is_a?(RBA::Circuit)
+            circuits ||= []
+            circuits << a
+          elsif a.is_a?(DRCPropertyName)
+            prop_id = a.value
+          elsif a.is_a?(DRCNetter)
+            netter = a
+          else
+            raise("Invalid argument type for #{a.inspect}")
+          end
+        end
+
+        # get netter and netlist
+        netter ||= @engine._default_netter
+        if ! netter
+          raise("No netlist extractor available - did you forget 'connect' statements?")
+        end
+        netlist = netter.netlist
+        if ! netlist
+          raise("No netlist available - extraction failed?")
+        end
+
+        # create list of nets
+        circuit_filter = nil
+        if filters && filters.size > 1
+          circuit_filter = filters.shift
+        end
+        if circuit_filter
+          circuits ||= []
+          circuits += netlist.circuits_by_name(circuit_filter)
+        end
+        nets = nil
+        if !circuits
+          if filters
+            nets = filters.collect { |f| netlist.nets_by_name(f) }.flatten
+          end
+        else
+          nets = circuits.collect do |circuit|
+            (filters || ["*"]).collect { |f| circuit.nets_by_name(f) }.flatten
+          end.flatten
+        end
+
+        # pulls the net shapes
+        DRCLayer::new(@engine, @engine._cmd(self.data, :nets, netter._l2n_data, prop_id, nets))
+
+      end
+
+    end
+
     # %DRC%
     # @name output
     # @brief Outputs the content of the layer

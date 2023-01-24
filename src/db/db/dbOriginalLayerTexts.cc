@@ -41,7 +41,7 @@ namespace
     typedef db::Text value_type;
 
     OriginalLayerTextsIterator (const db::RecursiveShapeIterator &iter, const db::ICplxTrans &trans)
-      : m_rec_iter (iter), m_iter_trans (trans)
+      : m_rec_iter (iter), m_iter_trans (trans), m_prop_id (0)
     {
       set ();
     }
@@ -65,6 +65,11 @@ namespace
     virtual const value_type *get () const
     {
       return &m_shape;
+    }
+
+    virtual db::properties_id_type prop_id () const
+    {
+      return m_prop_id;
     }
 
     virtual OriginalLayerTextsIterator *clone () const
@@ -100,6 +105,7 @@ namespace
     db::RecursiveShapeIterator m_rec_iter;
     db::ICplxTrans m_iter_trans;
     value_type m_shape;
+    db::properties_id_type m_prop_id;
 
     void set ()
     {
@@ -107,8 +113,9 @@ namespace
         ++m_rec_iter;
       }
       if (! m_rec_iter.at_end ()) {
-        m_rec_iter.shape ().text (m_shape);
+        m_rec_iter->text (m_shape);
         m_shape.transform (m_iter_trans * m_rec_iter.trans ());
+        m_prop_id = m_rec_iter.prop_id ();
       }
     }
 
@@ -193,6 +200,24 @@ const db::RecursiveShapeIterator *
 OriginalLayerTexts::iter () const
 {
   return &m_iter;
+}
+
+void
+OriginalLayerTexts::apply_property_translator (const db::PropertiesTranslator &pt)
+{
+  m_iter.apply_property_translator (pt);
+}
+
+db::PropertiesRepository *
+OriginalLayerTexts::properties_repository ()
+{
+  return m_iter.layout () ? &const_cast<db::Layout * >(m_iter.layout ())->properties_repository () : 0;
+}
+
+const db::PropertiesRepository *
+OriginalLayerTexts::properties_repository () const
+{
+  return m_iter.layout () ? &m_iter.layout ()->properties_repository () : 0;
 }
 
 bool

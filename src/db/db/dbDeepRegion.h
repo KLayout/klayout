@@ -53,7 +53,7 @@ public:
 
   RegionDelegate *clone () const;
 
-  virtual void do_insert (const db::Polygon &polygon);
+  virtual void do_insert (const db::Polygon &polygon, db::properties_id_type prop_id);
 
   virtual void do_transform (const db::Trans &t);
   virtual void do_transform (const db::ICplxTrans &t);
@@ -74,10 +74,14 @@ public:
   virtual bool is_merged () const;
 
   virtual const db::Polygon *nth (size_t n) const;
+  virtual db::properties_id_type nth_prop_id (size_t n) const;
   virtual bool has_valid_polygons () const;
   virtual bool has_valid_merged_polygons () const;
 
   virtual const db::RecursiveShapeIterator *iter () const;
+  virtual void apply_property_translator (const db::PropertiesTranslator &pt);
+  virtual db::PropertiesRepository *properties_repository ();
+  virtual const db::PropertiesRepository *properties_repository () const;
 
   virtual bool equals (const Region &other) const;
   virtual bool less (const Region &other) const;
@@ -92,15 +96,15 @@ public:
 
   virtual std::string to_string (size_t nmax) const;
 
-  virtual EdgePairsDelegate *cop_to_edge_pairs (db::CompoundRegionOperationNode &node);
-  virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node);
-  virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node);
+  virtual EdgePairsDelegate *cop_to_edge_pairs (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint);
+  virtual RegionDelegate *cop_to_region (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint);
+  virtual EdgesDelegate *cop_to_edges (db::CompoundRegionOperationNode &node, db::PropertyConstraint prop_constraint);
 
-  virtual RegionDelegate *and_with (const Region &other) const;
-  virtual RegionDelegate *not_with (const Region &other) const;
-  virtual RegionDelegate *xor_with (const Region &other) const;
-  virtual RegionDelegate *or_with (const Region &other) const;
-  virtual std::pair<RegionDelegate *, RegionDelegate *> andnot_with (const Region &) const;
+  virtual RegionDelegate *and_with (const Region &other, db::PropertyConstraint property_constraint) const;
+  virtual RegionDelegate *not_with (const Region &other, db::PropertyConstraint property_constraint) const;
+  virtual RegionDelegate *xor_with (const Region &other, db::PropertyConstraint property_constraint) const;
+  virtual RegionDelegate *or_with (const Region &other, db::PropertyConstraint property_constraint) const;
+  virtual std::pair<RegionDelegate *, RegionDelegate *> andnot_with (const Region &, db::PropertyConstraint property_constraint) const;
 
   virtual RegionDelegate *add_in_place (const Region &other);
   virtual RegionDelegate *add (const Region &other) const;
@@ -134,6 +138,8 @@ public:
   virtual RegionDelegate *sized (coord_type dx, coord_type dy, unsigned int mode) const;
 
   virtual void insert_into (Layout *layout, db::cell_index_type into_cell, unsigned int into_layer) const;
+
+  virtual RegionDelegate *nets (LayoutToNetlist *l2n, NetPropertyMode prop_mode, const tl::Variant &net_prop_name, const std::vector<const Net *> *nets) const;
 
   virtual DeepShapeCollectionDelegateBase *deep ()
   {
@@ -171,11 +177,19 @@ private:
 
   void init ();
   void ensure_merged_polygons_valid () const;
-  DeepLayer and_or_not_with(const DeepRegion *other, bool and_op) const;
-  std::pair<DeepLayer, DeepLayer> and_and_not_with (const DeepRegion *other) const;
+  DeepLayer and_or_not_with(const DeepRegion *other, bool and_op, PropertyConstraint property_constraint) const;
+  std::pair<DeepLayer, DeepLayer> and_and_not_with (const DeepRegion *other, PropertyConstraint property_constraint) const;
   DeepRegion *apply_filter (const PolygonFilterBase &filter) const;
 
   template <class Result, class OutputContainer> OutputContainer *processed_impl (const polygon_processor<Result> &filter) const;
+
+  template <class Proc>
+  void configure_proc (Proc &proc) const
+  {
+    proc.set_description (progress_desc ());
+    proc.set_report_progress (report_progress ());
+    proc.set_base_verbosity (base_verbosity ());
+  }
 };
 
 }

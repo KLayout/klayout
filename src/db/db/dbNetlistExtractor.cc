@@ -285,7 +285,8 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
     for (connected_clusters_type::all_iterator c = clusters.begin_all (); ! c.at_end (); ++c) {
 
       const db::local_cluster<db::NetShape> &lc = clusters.cluster_by_id (*c);
-      if (clusters.connections_for_cluster (*c).empty () && lc.empty ()) {
+      const connected_clusters_type::connections_type &cc = clusters.connections_for_cluster (*c);
+      if (cc.empty () && lc.empty ()) {
         //  this is an entirely empty cluster so we skip it.
         //  Such clusters are left over when joining clusters.
         continue;
@@ -312,6 +313,23 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
           net_names.insert (conn.global_net_name (*g));
         }
       }
+
+#if 0
+      //  This code will pull net names from subcircuits into their parents if those nets are dummy connections
+      //  made to satisfy the subcircuit's pin, but not to make a physical connection.
+      //  Don't know whether this is a good idea, so this code is disabled for now.
+
+      if (net_names.empty () && clusters.is_dummy (*c) && net->subcircuit_pin_count () == 1) {
+        //  in the case of a dummy connection (partially connected subcircuits) create a
+        //  new name indicating the subcircuit and the subcircuit net name - this makes subcircuit
+        //  net names available (the net is pseudo-root inside in the subcircuit)
+        const db::NetSubcircuitPinRef &sc_pin = *net->begin_subcircuit_pins ();
+        const db::Net *sc_net = sc_pin.subcircuit ()->circuit_ref ()->net_for_pin (sc_pin.pin_id ());
+        if (sc_net && ! sc_net->name ().empty ()) {
+          net_names.insert (sc_pin.subcircuit ()->expanded_name () + ":" + sc_net->name ());
+        }
+      }
+#endif
 
       assign_net_names (net, net_names);
 

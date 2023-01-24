@@ -29,6 +29,7 @@ SOURCES = \
   dbEdgePairs.cc \
   dbEdgeProcessor.cc \
   dbEdges.cc \
+  dbEdgesLocalOperations.cc \
   dbFillTool.cc \
   dbFuzzyCellMapping.cc \
   dbGenericShapeIterator.cc \
@@ -243,6 +244,7 @@ HEADERS = \
   dbEdgePairs.h \
   dbEdgeProcessor.h \
   dbEdges.h \
+  dbEdgesLocalOperations.h \
   dbEdgesToContours.h \
   dbFillTool.h \
   dbFuzzyCellMapping.h \
@@ -260,6 +262,7 @@ HEADERS = \
   dbLayoutLayers.h \
   dbLayoutQuery.h \
   dbLayoutStateModel.h \
+  dbLayoutToNetlistEnums.h \
   dbLayoutUtils.h \
   dbLibrary.h \
   dbLibraryManager.h \
@@ -288,6 +291,7 @@ HEADERS = \
   dbPolygonTools.h \
   dbPolygonGenerators.h \
   dbPropertiesRepository.h \
+  dbPropertyConstraint.h \
   dbReader.h \
   dbRecursiveInstanceIterator.h \
   dbRecursiveShapeIterator.h \
@@ -372,6 +376,7 @@ HEADERS = \
   dbRegionUtils.h \
   dbEdgesUtils.h \
   dbRegionProcessors.h \
+  gsiDeclDbContainerHelpers.h \
   gsiDeclDbHelpers.h \
   dbNetlistCompare.h \
   dbNetlistReader.h \

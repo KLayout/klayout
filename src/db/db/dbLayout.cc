@@ -490,7 +490,7 @@ Layout::operator= (const Layout &d)
 const db::Technology *
 Layout::technology () const
 {
-  return db::Technologies::instance ()->technology_by_name (m_tech_name);
+  return db::Technologies::instance ()->has_technology (m_tech_name) ? db::Technologies::instance ()->technology_by_name (m_tech_name) : 0;
 }
 
 void

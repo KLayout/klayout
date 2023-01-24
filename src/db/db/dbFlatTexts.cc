@@ -32,7 +32,7 @@ namespace db
 //  FlatTexts implementation
 
 FlatTexts::FlatTexts ()
-  : MutableTexts (), mp_texts (new db::Shapes (false))
+  : MutableTexts (), mp_texts (new db::Shapes (false)), mp_properties_repository (new db::PropertiesRepository ())
 {
   //  .. nothing yet ..
 }
@@ -43,13 +43,13 @@ FlatTexts::~FlatTexts ()
 }
 
 FlatTexts::FlatTexts (const FlatTexts &other)
-  : MutableTexts (other), mp_texts (other.mp_texts)
+  : MutableTexts (other), mp_texts (other.mp_texts), mp_properties_repository (other.mp_properties_repository)
 {
   //  .. nothing yet ..
 }
 
 FlatTexts::FlatTexts (const db::Shapes &texts)
-  : MutableTexts (), mp_texts (new db::Shapes (texts))
+  : MutableTexts (), mp_texts (new db::Shapes (texts)), mp_properties_repository (new db::PropertiesRepository ())
 {
   //  .. nothing yet ..
 }
@@ -121,7 +121,7 @@ TextsDelegate *FlatTexts::add (const Texts &other) const
   std::unique_ptr<FlatTexts> new_texts (new FlatTexts (*this));
   new_texts->invalidate_cache ();
 
-  FlatTexts *other_flat = dynamic_cast<FlatTexts *> (other.delegate ());
+  const FlatTexts *other_flat = dynamic_cast<const FlatTexts *> (other.delegate ());
   if (other_flat) {
 
     new_texts->raw_texts ().insert (other_flat->raw_texts ().get_layer<db::Text, db::unstable_layer_tag> ().begin (), other_flat->raw_texts ().get_layer<db::Text, db::unstable_layer_tag> ().end ());
@@ -150,7 +150,7 @@ TextsDelegate *FlatTexts::add_in_place (const Texts &other)
 
   db::Shapes &texts = *mp_texts;
 
-  FlatTexts *other_flat = dynamic_cast<FlatTexts *> (other.delegate ());
+  const FlatTexts *other_flat = dynamic_cast<const FlatTexts *> (other.delegate ());
   if (other_flat) {
 
     texts.insert (other_flat->raw_texts ().get_layer<db::Text, db::unstable_layer_tag> ().begin (), other_flat->raw_texts ().get_layer<db::Text, db::unstable_layer_tag> ().end ());
@@ -186,6 +186,29 @@ bool FlatTexts::has_valid_texts () const
 const db::RecursiveShapeIterator *FlatTexts::iter () const
 {
   return 0;
+}
+
+void FlatTexts::apply_property_translator (const db::PropertiesTranslator &pt)
+{
+  if ((mp_texts->type_mask () & db::ShapeIterator::Properties) != 0) {
+
+    db::Shapes new_texts (mp_texts->is_editable ());
+    new_texts.assign (*mp_texts, pt);
+    mp_texts->swap (new_texts);
+
+    invalidate_cache ();
+
+  }
+}
+
+db::PropertiesRepository *FlatTexts::properties_repository ()
+{
+  return mp_properties_repository.get_non_const ();
+}
+
+const db::PropertiesRepository *FlatTexts::properties_repository () const
+{
+  return mp_properties_repository.get_const ();
 }
 
 void

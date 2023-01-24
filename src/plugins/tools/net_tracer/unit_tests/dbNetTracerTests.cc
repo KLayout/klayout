@@ -340,7 +340,7 @@ TEST(6)
   tc.add (connection ("1-10", "2", "3"));
   tc.add (connection ("3", "4", "5"));
 
-  run_test (_this, file, tc, db::LayerProperties (1, 0), db::Point (-2250, -900), file_au, "IN_B");
+  run_test (_this, file, tc, db::LayerProperties (1, 0), db::Point (-2250, -900), file_au, "A");
 }
 
 TEST(6b)

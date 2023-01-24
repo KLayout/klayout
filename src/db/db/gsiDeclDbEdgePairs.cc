@@ -31,6 +31,8 @@
 #include "dbEdgesUtils.h"
 #include "dbEdgePairFilters.h"
 
+#include "gsiDeclDbContainerHelpers.h"
+
 namespace gsi
 {
 
@@ -912,7 +914,9 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
   method_ext ("to_s", &to_string1, gsi::arg ("max_count"),
     "@brief Converts the edge pair collection to a string\n"
     "This version allows specification of the maximum number of edge pairs contained in the string."
-  ),
+  ) +
+  gsi::make_property_methods<db::EdgePairs> ()
+  ,
   "@brief EdgePairs (a collection of edge pairs)\n"
   "\n"
   "Edge pairs are used mainly in the context of the DRC functions (width_check, space_check etc.) of \\Region and \\Edges. "

@@ -39,9 +39,9 @@
 namespace db {
 
 /**
- *  @brief A template base class for edge processors
+ *  @brief A template base class for a shape processors
  *
- *  A polygon processor can turn a edge into something else.
+ *  A shape processor can turn a shape into something else.
  */
 template <class Shape, class Result>
 class DB_PUBLIC_TEMPLATE shape_collection_processor
@@ -209,6 +209,7 @@ shape_collection_processed_impl (const db::DeepLayer &input, const shape_collect
         }
 
         shape_collection_processor_delivery<Result> delivery (&layout, st);
+        shape_collection_processor_delivery<db::object_with_properties<Result> > delivery_wp (&layout, st);
 
         const db::ICplxTrans &tr = v->first;
         db::ICplxTrans trinv = tr.inverted ();
@@ -220,7 +221,11 @@ shape_collection_processed_impl (const db::DeepLayer &input, const shape_collect
           heap.clear ();
           filter.process (s, heap);
           for (typename std::vector<Result>::const_iterator i = heap.begin (); i != heap.end (); ++i) {
-            delivery.put (i->transformed (trinv));
+            if (si->prop_id ()) {
+              delivery_wp.put (db::object_with_properties<Result> (i->transformed (trinv), si->prop_id ()));
+            } else {
+              delivery.put (i->transformed (trinv));
+            }
           }
         }
 
@@ -230,6 +235,7 @@ shape_collection_processed_impl (const db::DeepLayer &input, const shape_collect
 
       db::Shapes &st = c->shapes (res->deep_layer ().layer ());
       shape_collection_processor_delivery<Result> delivery (&layout, &st);
+      shape_collection_processor_delivery<db::object_with_properties<Result> > delivery_wp (&layout, &st);
 
       for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
         Shape s;
@@ -237,7 +243,11 @@ shape_collection_processed_impl (const db::DeepLayer &input, const shape_collect
         heap.clear ();
         filter.process (s, heap);
         for (typename std::vector<Result>::const_iterator i = heap.begin (); i != heap.end (); ++i) {
-          delivery.put (*i);
+          if (si->prop_id ()) {
+            delivery_wp.put (db::object_with_properties<Result> (*i, si->prop_id ()));
+          } else {
+            delivery.put (*i);
+          }
         }
       }
 

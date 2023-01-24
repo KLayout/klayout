@@ -634,6 +634,58 @@ END
 
   end
 
+  def test_15_BuildNetShapes
+
+    l2n = RBA::LayoutToNetlist::new
+
+    input = File.join($ut_testsrc, "testdata", "algo", "l2n_reader_in.txt")
+    l2n.read(input)
+
+    # build_all_nets using Region#net
+
+    metal1 = l2n.layer_by_name("metal1")
+
+    metal1_all = metal1.nets(l2n)
+    metal1_vdd = metal1.nets(l2n, nil, l2n.netlist.nets_by_name("VDD"))
+    metal1_all_wp = metal1.nets(l2n, 1)
+
+    ly = RBA::Layout::new
+    tc = ly.create_cell("TOP")
+    metal1_all.insert_into(ly, tc.cell_index, ly.layer(1, 0))
+    metal1_vdd.insert_into(ly, tc.cell_index, ly.layer(2, 0))
+    metal1_all_wp.insert_into(ly, tc.cell_index, ly.layer(3, 0))
+
+    si = tc.begin_shapes_rec(ly.layer(1, 0))
+    assert_equal(si.each.count, 111)
+
+    si = tc.begin_shapes_rec(ly.layer(1, 0))
+    si.each do |i|
+      assert_equal(i.shape.prop_id, 0)
+    end
+
+    # VDD net is smaller
+    si = tc.begin_shapes_rec(ly.layer(2, 0))
+    assert_equal(si.each.count, 20)
+    assert_equal(tc.dbbox(ly.layer(2, 0)).to_s, "(-0.18,2.42;23.94,3.18)")
+
+    si = tc.begin_shapes_rec(ly.layer(3, 0))
+    assert_equal(si.each.count, 111)
+
+    # properties are net names + ID
+    si = tc.begin_shapes_rec(ly.layer(3, 0))
+    net_names = []
+    si.each do |i|
+      ly.properties(i.shape.prop_id).each do |k,v|
+        if k == 1
+          net_names << v[0]
+        end
+      end
+    end
+
+    assert_equal(net_names.sort.uniq.join(";"), "$10;$11;$12;$13;$14;$15;$16;$17;$18;$19;$20;$21;$22;$5;$6;$7;$8;$9;FB;OSC;VDD;VSS")
+
+  end
+
   def test_20_Antenna
 
     # --- simple antenna check

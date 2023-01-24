@@ -25,6 +25,7 @@
 #include "dbRegionUtils.h"
 #include "dbLocalOperationUtils.h"
 #include "dbHierProcessor.h"
+#include "dbEdgeBoolean.h"
 
 namespace db
 {
@@ -95,6 +96,9 @@ private:
 
 // ---------------------------------------------------------------------------------------------------------------
 
+namespace
+{
+
 static inline bool shields_interaction (const db::EdgePair &ep, const db::Edge &q)
 {
   db::Edge pe1 (ep.first ().p1 (), ep.second ().p2 ());
@@ -121,16 +125,6 @@ static bool shields_interaction (const db::EdgePair &ep, const P &poly)
   return false;
 }
 
-template <class TS, class TI>
-check_local_operation<TS, TI>::check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool is_merged, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options)
-  : m_check (check), m_different_polygons (different_polygons), m_is_merged (is_merged), m_has_other (has_other), m_other_is_merged (other_is_merged), m_options (options)
-{
-  //  .. nothing yet ..
-}
-
-namespace
-{
-
 template <class T, class S>
 void insert_into_hash (std::unordered_set<T> &, const S &)
 {
@@ -141,8 +135,6 @@ template <class T>
 void insert_into_hash (std::unordered_set<T> &hash, const T &shape)
 {
   hash.insert (shape);
-}
-
 }
 
 template <class TS>
@@ -195,13 +187,20 @@ static bool rect_filter_can_be_waived (uint32_t error_pattern, uint32_t rect_fil
   return can_be_waived;
 }
 
+}
+
+
+template <class TS, class TI>
+check_local_operation_base<TS, TI>::check_local_operation_base (const EdgeRelationFilter &check, bool different_polygons, bool is_merged, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options)
+  : m_check (check), m_different_polygons (different_polygons), m_is_merged (is_merged), m_has_other (has_other), m_other_is_merged (other_is_merged), m_options (options)
+{
+  //  .. nothing yet ..
+}
+
 template <class TS, class TI>
 void
-check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+check_local_operation_base<TS, TI>::compute_results (db::Layout *layout, const std::vector<const TS *> &subjects, const std::set<const TI *> &intruders, std::unordered_set<db::EdgePair> &result, std::unordered_set<db::EdgePair> &intra_polygon_result) const
 {
-  tl_assert (results.size () == 1);
-  std::unordered_set<db::EdgePair> result, intra_polygon_result;
-
   //  NOTE: the rectangle and opposite filters are unsymmetric
   bool symmetric_edge_pairs = ! m_has_other && m_options.opposite_filter == db::NoOppositeFilter && m_options.rect_filter == RectFilter::NoRectFilter;
 
@@ -214,14 +213,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
   db::EdgeProcessor ep;
   ep.set_base_verbosity (50);
 
-  std::set<unsigned int> ids;
-  for (auto i = interactions.begin (); i != interactions.end (); ++i) {
-    for (auto j = i->second.begin (); j != i->second.end (); ++j) {
-      ids.insert (*j);
-    }
-  }
-
-  bool take_all = edge_check.has_negative_edge_output () || interactions.num_intruders () == 0;
+  bool take_all = edge_check.has_negative_edge_output () || intruders.empty ();
 
   db::Box common_box;
   if (! take_all) {
@@ -229,14 +221,14 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
     db::Vector e (edge_check.distance (), edge_check.distance ());
 
     db::Box subject_box;
-    for (auto i = interactions.begin (); i != interactions.end (); ++i) {
-      subject_box += db::box_convert<TS> () (interactions.subject_shape (i->first));
+    for (auto i = subjects.begin (); i != subjects.end (); ++i) {
+      subject_box += db::box_convert<TS> () (**i);
     }
 
     if (edge_check.requires_different_layers ()) {
       db::Box intruder_box;
-      for (auto id = ids.begin (); id != ids.end (); ++id) {
-        intruder_box += db::box_convert<TI> () (interactions.intruder_shape (*id).second);
+      for (auto i = intruders.begin (); i != intruders.end (); ++i) {
+        intruder_box += db::box_convert<TI> () (**i);
       }
       common_box = subject_box.enlarged (e) & intruder_box.enlarged (e);
     } else {
@@ -249,14 +241,13 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
 
     size_t n = 0;
 
-    if (m_is_merged || (interactions.size () == 1 && interactions.subject_shape (interactions.begin ()->first).is_box ())) {
+    if (m_is_merged || (subjects.size () == 1 && subjects.front ()->is_box ())) {
 
-      for (auto i = interactions.begin (); i != interactions.end (); ++i) {
-        const TS &subject = interactions.subject_shape (i->first);
+      for (auto i = subjects.begin (); i != subjects.end (); ++i) {
         if (! take_all) {
-          poly_check.enter (subject, n, common_box);
+          poly_check.enter (**i, n, common_box);
         } else {
-          poly_check.enter (subject, n);
+          poly_check.enter (**i, n);
         }
         n += 2;
       }
@@ -268,9 +259,8 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
       ep.clear ();
       size_t nn = 0;
 
-      for (auto i = interactions.begin (); i != interactions.end (); ++i) {
-        const TS &is = interactions.subject_shape (i->first);
-        for (typename TS::polygon_edge_iterator e = is.begin_edge (); ! e.at_end (); ++e) {
+      for (auto i = subjects.begin (); i != subjects.end (); ++i) {
+        for (auto e = (*i)->begin_edge (); ! e.at_end (); ++e) {
           ep.insert (*e, nn);
         }
         ++nn;
@@ -296,11 +286,11 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
 
     //  merge the intruders to remove inner edges
 
-    if (ids.empty ()) {
+    if (intruders.empty ()) {
 
       //  empty intruders
 
-    } else if (! m_other_is_merged && (ids.size () > 1 || ! interactions.intruder_shape (*ids.begin ()).second.is_box ())) {
+    } else if (! m_other_is_merged && (intruders.size () > 1 || ! (*intruders.begin ())->is_box ())) {
 
       //  NOTE: this local merge is not necessarily giving the same results than a global merge before running
       //  the processor. Reason: the search range is limited, hence not all necessary components may have been
@@ -309,9 +299,8 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
       ep.clear ();
       size_t nn = 0;
 
-      for (auto id = ids.begin (); id != ids.end (); ++id) {
-        const TI &is = interactions.intruder_shape (*id).second;
-        for (auto e = is.begin_edge (); ! e.at_end (); ++e) {
+      for (auto i = intruders.begin (); i != intruders.end (); ++i) {
+        for (auto e = (*i)->begin_edge (); ! e.at_end (); ++e) {
           ep.insert (*e, nn);
         }
         ++nn;
@@ -338,11 +327,11 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
     } else {
 
       n = 1;
-      for (auto id = ids.begin (); id != ids.end (); ++id) {
+      for (auto i = intruders.begin (); i != intruders.end (); ++i) {
         if (! take_all) {
-          poly_check.enter (interactions.intruder_shape (*id).second, n, common_box);
+          poly_check.enter (**i, n, common_box);
         } else {
-          poly_check.enter (interactions.intruder_shape (*id).second, n);
+          poly_check.enter (**i, n);
         }
         n += 2;
       }
@@ -351,41 +340,39 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
 
   } else {
 
-    if (m_is_merged || (interactions.size () == 1 && ids.empty () && interactions.subject_shape (interactions.begin ()->first).is_box ())) {
+    if (m_is_merged || (subjects.size () == 1 && intruders.empty () && subjects.front ()->is_box ())) {
 
       //  no merge required
 
       //  NOTE: we need to eliminate identical shapes from intruders and subjects because those will shield
 
       size_t n = 0;
-      std::unordered_set<TI> subjects;
+      std::unordered_set<TI> subjects_hash;
 
-      for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+      for (auto i = subjects.begin (); i != subjects.end (); ++i) {
         //  we can't directly insert because TS may be != TI
-        const TS &ts = interactions.subject_shape (i->first);
-        insert_into_hash (subjects, ts);
+        insert_into_hash (subjects_hash, **i);
         if (! take_all) {
-          poly_check.enter (ts, n, common_box);
+          poly_check.enter (**i, n, common_box);
         } else {
-          poly_check.enter (ts, n);
+          poly_check.enter (**i, n);
         }
         n += 2;
       }
 
       n = 1;
 
-      for (auto id = ids.begin (); id != ids.end (); ++id) {
-        const TI &ti = interactions.intruder_shape (*id).second;
-        if (subjects.find (ti) == subjects.end ()) {
+      for (auto i = intruders.begin (); i != intruders.end (); ++i) {
+        if (subjects_hash.find (**i) == subjects_hash.end ()) {
           if (! take_all) {
-            poly_check.enter (ti, n, common_box);
+            poly_check.enter (**i, n, common_box);
           } else {
-            poly_check.enter (ti, n);
+            poly_check.enter (**i, n);
           }
         }
       }
 
-    } else if (ids.empty ()) {
+    } else if (intruders.empty ()) {
 
       //  merge needed for the subject shapes - no intruders present so this is the simple case
 
@@ -394,9 +381,8 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
       ep.clear ();
       size_t nn = 0;
 
-      for (auto i = interactions.begin (); i != interactions.end (); ++i) {
-        const TS &ts = interactions.subject_shape (i->first);
-        for (auto e = ts.begin_edge (); ! e.at_end (); ++e) {
+      for (auto i = subjects.begin (); i != subjects.end (); ++i) {
+        for (auto e = (*i)->begin_edge (); ! e.at_end (); ++e) {
           ep.insert (*e, nn);
         }
         ++nn;
@@ -427,17 +413,15 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
       ep.clear ();
       size_t nn = 0;
 
-      for (auto i = interactions.begin (); i != interactions.end (); ++i) {
-        const TS &ts = interactions.subject_shape (i->first);
-        for (auto e = ts.begin_edge (); ! e.at_end (); ++e) {
+      for (auto i = subjects.begin (); i != subjects.end (); ++i) {
+        for (auto e = (*i)->begin_edge (); ! e.at_end (); ++e) {
           ep.insert (*e, nn);
         }
         ++nn;
       }
 
-      for (auto id = ids.begin (); id != ids.end (); ++id) {
-        const TI &ti = interactions.intruder_shape (*id).second;
-        for (auto e = ti.begin_edge (); ! e.at_end (); ++e) {
+      for (auto i = intruders.begin (); i != intruders.end (); ++i) {
+        for (auto e = (*i)->begin_edge (); ! e.at_end (); ++e) {
           ep.insert (*e, nn);
         }
         ++nn;
@@ -453,16 +437,14 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
       std::vector<typename TS::edge_type> subject_edges;
 
       size_t sz = 0;
-      for (auto i = interactions.begin (); i != interactions.end (); ++i) {
-        const TS &ts = interactions.subject_shape (i->first);
-        sz += ts.vertices ();
+      for (auto i = subjects.begin (); i != subjects.end (); ++i) {
+        sz += (*i)->vertices ();
       }
 
       subject_edges.reserve (sz);
 
-      for (auto i = interactions.begin (); i != interactions.end (); ++i) {
-        const TS &ts = interactions.subject_shape (i->first);
-        for (auto e = ts.begin_edge (); ! e.at_end (); ++e) {
+      for (auto i = subjects.begin (); i != subjects.end (); ++i) {
+        for (auto e = (*i)->begin_edge (); ! e.at_end (); ++e) {
           subject_edges.push_back (*e);
         }
       }
@@ -507,201 +489,245 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
   do {
     poly_check.process ();
   } while (edge_check.prepare_next_pass ());
+}
 
-  //  detect and remove parts of the result which have or do not have results "opposite"
-  //  ("opposite" is defined by the projection of edges "through" the subject shape)
-  if (m_options.opposite_filter != db::NoOppositeFilter && (! result.empty () || ! intra_polygon_result.empty ())) {
+template <class TS, class TI>
+void
+check_local_operation_base<TS, TI>::apply_opposite_filter (const std::vector<const TS *> &subjects, std::unordered_set<db::EdgePair> &result, std::unordered_set<db::EdgePair> &intra_polygon_result) const
+{
+  db::EdgeRelationFilter opp (db::WidthRelation, std::numeric_limits<db::EdgeRelationFilter::distance_type>::max (), db::Projection);
 
-    db::EdgeRelationFilter opp (db::WidthRelation, std::numeric_limits<db::EdgeRelationFilter::distance_type>::max (), db::Projection);
+  std::unordered_set<db::EdgePair> cleaned_result;
 
-    std::unordered_set<db::EdgePair> cleaned_result;
+  if (m_has_other) {
 
-    if (m_has_other) {
+    tl_assert (intra_polygon_result.empty ());
 
-      tl_assert (intra_polygon_result.empty ());
+    //  filter out opposite edges: this is the case of two-layer checks where we can maintain the edge pairs but
+    //  strip them of the filtered-out part.
 
-      //  filter out opposite edges: this is the case of two-layer checks where we can maintain the edge pairs but
-      //  strip them of the filtered-out part.
+    std::vector<db::Edge> projections;
+    for (std::unordered_set<db::EdgePair>::const_iterator ep1 = result.begin (); ep1 != result.end (); ++ep1) {
 
-      std::vector<db::Edge> projections;
-      for (std::unordered_set<db::EdgePair>::const_iterator ep1 = result.begin (); ep1 != result.end (); ++ep1) {
+      projections.clear ();
 
-        projections.clear ();
+      for (std::unordered_set<db::EdgePair>::const_iterator ep2 = result.begin (); ep2 != result.end (); ++ep2) {
 
-        for (std::unordered_set<db::EdgePair>::const_iterator ep2 = result.begin (); ep2 != result.end (); ++ep2) {
+        if (ep1 == ep2) {
+          continue;
+        }
 
-          if (ep1 == ep2) {
-            continue;
+        db::EdgePair ep_opp;
+        if (opp.check (ep1->first (), ep2->first (), &ep_opp)) {
+
+          bool shielded = false;
+          for (auto i = subjects.begin (); i != subjects.end () && ! shielded; ++i) {
+            shielded = shields_interaction (ep_opp, **i);
           }
 
-          db::EdgePair ep_opp;
-          if (opp.check (ep1->first (), ep2->first (), &ep_opp)) {
-
-            bool shielded = false;
-            for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end () && ! shielded; ++i) {
-              shielded = shields_interaction (ep_opp, interactions.subject_shape (i->first));
-            }
-
-            if (! shielded) {
-              projections.push_back (ep_opp.first ());
-            }
-
+          if (! shielded) {
+            projections.push_back (ep_opp.first ());
           }
 
         }
 
-        if (! projections.empty ()) {
-          db::Edges ce;
-          if (m_options.opposite_filter == db::OnlyOpposite) {
-            ce = db::Edges (ep1->first ()) & db::Edges (projections.begin (), projections.end ());
-          } else if (m_options.opposite_filter == db::NotOpposite) {
-            ce = db::Edges (ep1->first ()) - db::Edges (projections.begin (), projections.end ());
-          }
-          for (db::Edges::const_iterator re = ce.begin (); ! re.at_end (); ++re) {
-            cleaned_result.insert (db::EdgePair (*re, ep1->second ()));
-          }
+      }
+
+      if (! projections.empty ()) {
+        db::Edges ce;
+        if (m_options.opposite_filter == db::OnlyOpposite) {
+          ce = db::Edges (ep1->first ()) & db::Edges (projections.begin (), projections.end ());
         } else if (m_options.opposite_filter == db::NotOpposite) {
-          cleaned_result.insert (*ep1);
+          ce = db::Edges (ep1->first ()) - db::Edges (projections.begin (), projections.end ());
         }
-
-      }
-
-    } else {
-
-      //  this is the single-layer case where we cannot maintain the edge pairs as we don't know how the
-      //  other side will be filtered. For the filtering we only need the first edges and both edges of the
-      //  intra-polygon checks
-
-      std::unordered_set<db::Edge> edges;
-
-      for (std::unordered_set<db::EdgePair>::const_iterator ep = result.begin (); ep != result.end (); ++ep) {
-        edges.insert (ep->first ());
-      }
-
-      for (std::unordered_set<db::EdgePair>::const_iterator ep = intra_polygon_result.begin (); ep != intra_polygon_result.end (); ++ep) {
-        edges.insert (ep->first ());
-        edges.insert (ep->second ());
-      }
-
-      //  filter out opposite edges
-      std::vector<db::Edge> projections;
-      for (std::unordered_set<db::Edge>::const_iterator e1 = edges.begin (); e1 != edges.end (); ++e1) {
-
-        projections.clear ();
-
-        for (std::unordered_set<db::Edge>::const_iterator e2 = edges.begin (); e2 != edges.end (); ++e2) {
-
-          if (e1 == e2) {
-            continue;
-          }
-
-          db::EdgePair ep_opp;
-          if (opp.check (*e1, *e2, &ep_opp)) {
-
-            bool shielded = false;
-            for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end () && ! shielded; ++i) {
-              shielded = shields_interaction (ep_opp, interactions.subject_shape (i->first));
-            }
-
-            if (! shielded) {
-              projections.push_back (ep_opp.first ());
-            }
-
-          }
-
+        for (db::Edges::const_iterator re = ce.begin (); ! re.at_end (); ++re) {
+          cleaned_result.insert (db::EdgePair (*re, ep1->second ()));
         }
-
-        if (! projections.empty ()) {
-          db::Edges ce;
-          if (m_options.opposite_filter == db::OnlyOpposite) {
-            ce = db::Edges (*e1) & db::Edges (projections.begin (), projections.end ());
-          } else if (m_options.opposite_filter == db::NotOpposite) {
-            ce = db::Edges (*e1) - db::Edges (projections.begin (), projections.end ());
-          }
-          for (db::Edges::const_iterator re = ce.begin (); ! re.at_end (); ++re) {
-            cleaned_result.insert (db::EdgePair (*re, re->swapped_points ()));
-          }
-        } else if (m_options.opposite_filter == db::NotOpposite) {
-          cleaned_result.insert (db::EdgePair (*e1, e1->swapped_points ()));
-        }
-
+      } else if (m_options.opposite_filter == db::NotOpposite) {
+        cleaned_result.insert (*ep1);
       }
 
     }
-
-    result.swap (cleaned_result);
 
   } else {
 
-    result.insert (intra_polygon_result.begin (), intra_polygon_result.end ());
+    //  this is the single-layer case where we cannot maintain the edge pairs as we don't know how the
+    //  other side will be filtered. For the filtering we only need the first edges and both edges of the
+    //  intra-polygon checks
 
-  }
+    std::unordered_set<db::Edge> edges;
 
-  //  implements error filtering on rectangles
-  if (m_options.rect_filter != RectFilter::NoRectFilter && ! result.empty ()) {
+    for (std::unordered_set<db::EdgePair>::const_iterator ep = result.begin (); ep != result.end (); ++ep) {
+      edges.insert (ep->first ());
+    }
 
-    std::unordered_set<db::EdgePair> waived;
+    for (std::unordered_set<db::EdgePair>::const_iterator ep = intra_polygon_result.begin (); ep != intra_polygon_result.end (); ++ep) {
+      edges.insert (ep->first ());
+      edges.insert (ep->second ());
+    }
 
-    for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+    //  filter out opposite edges
+    std::vector<db::Edge> projections;
+    for (std::unordered_set<db::Edge>::const_iterator e1 = edges.begin (); e1 != edges.end (); ++e1) {
 
-      const TS &subject = interactions.subject_shape (i->first);
-      if (! subject.is_box ()) {
-        continue;
-      }
+      projections.clear ();
 
-      std::map<db::Edge, uint32_t> edges_with_errors;
-      unsigned int error_pattern = compute_error_pattern (subject, result, edges_with_errors);
+      for (std::unordered_set<db::Edge>::const_iterator e2 = edges.begin (); e2 != edges.end (); ++e2) {
 
-      if (rect_filter_can_be_waived (error_pattern, (uint32_t) m_options.rect_filter)) {
+        if (e1 == e2) {
+          continue;
+        }
 
-        for (std::unordered_set<db::EdgePair>::const_iterator ep = result.begin (); ep != result.end (); ++ep) {
-          if (edges_with_errors.find (ep->first ()) != edges_with_errors.end ()) {
-            waived.insert (*ep);
+        db::EdgePair ep_opp;
+        if (opp.check (*e1, *e2, &ep_opp)) {
+
+          bool shielded = false;
+          for (auto i = subjects.begin (); i != subjects.end () && ! shielded; ++i) {
+            shielded = shields_interaction (ep_opp, **i);
           }
+
+          if (! shielded) {
+            projections.push_back (ep_opp.first ());
+          }
+
         }
 
       }
 
-    }
-
-    if (! waived.empty ()) {
-      for (std::unordered_set<db::EdgePair>::const_iterator i = waived.begin (); i != waived.end (); ++i) {
-        result.erase (*i);
+      if (! projections.empty ()) {
+        db::Edges ce;
+        if (m_options.opposite_filter == db::OnlyOpposite) {
+          ce = db::Edges (*e1) & db::Edges (projections.begin (), projections.end ());
+        } else if (m_options.opposite_filter == db::NotOpposite) {
+          ce = db::Edges (*e1) - db::Edges (projections.begin (), projections.end ());
+        }
+        for (db::Edges::const_iterator re = ce.begin (); ! re.at_end (); ++re) {
+          cleaned_result.insert (db::EdgePair (*re, re->swapped_points ()));
+        }
+      } else if (m_options.opposite_filter == db::NotOpposite) {
+        cleaned_result.insert (db::EdgePair (*e1, e1->swapped_points ()));
       }
+
     }
 
-    if (! m_has_other) {
+  }
 
-      //  this is the case of single-layer interaction. We need to separate the results
-      //  from edge pairs into single edges (basically returning the first edge only)
-      //  Reasoning: we cannot say what's going to happen on the other side of the
-      //  error - it may not be waived and we cannot waive half of an edge pair.
+  result.swap (cleaned_result);
+}
 
-      for (std::unordered_set<db::EdgePair>::const_iterator i = result.begin (); i != result.end (); ++i) {
-        results.front ().insert (db::EdgePair (i->first (), i->first ().swapped_points ()));
+template <class TS, class TI>
+void
+check_local_operation_base<TS, TI>::apply_rectangle_filter (const std::vector<const TS *> &subjects, std::unordered_set<db::EdgePair> &result) const
+{
+  std::unordered_set<db::EdgePair> waived;
+
+  for (auto i = subjects.begin (); i != subjects.end (); ++i) {
+
+    const TS &subject = **i;
+    if (! subject.is_box ()) {
+      continue;
+    }
+
+    std::map<db::Edge, uint32_t> edges_with_errors;
+    unsigned int error_pattern = compute_error_pattern (subject, result, edges_with_errors);
+
+    if (rect_filter_can_be_waived (error_pattern, (uint32_t) m_options.rect_filter)) {
+
+      for (std::unordered_set<db::EdgePair>::const_iterator ep = result.begin (); ep != result.end (); ++ep) {
+        if (edges_with_errors.find (ep->first ()) != edges_with_errors.end ()) {
+          waived.insert (*ep);
+        }
       }
-      result.clear ();
 
     }
 
+  }
+
+  if (! waived.empty ()) {
+    for (std::unordered_set<db::EdgePair>::const_iterator i = waived.begin (); i != waived.end (); ++i) {
+      result.erase (*i);
+    }
+  }
+
+  if (! m_has_other) {
+
+    //  this is the case of single-layer interaction. We need to separate the results
+    //  from edge pairs into single edges (basically returning the first edge only)
+    //  Reasoning: we cannot say what's going to happen on the other side of the
+    //  error - it may not be waived and we cannot waive half of an edge pair.
+
+    std::unordered_set<db::EdgePair> filtered;
+    for (std::unordered_set<db::EdgePair>::const_iterator i = result.begin (); i != result.end (); ++i) {
+      filtered.insert (db::EdgePair (i->first (), i->first ().swapped_points ()));
+    }
+
+    result.swap (filtered);
+
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+
+template <class TS, class TI>
+check_local_operation<TS, TI>::check_local_operation (const EdgeRelationFilter &check, bool different_polygons, bool is_merged, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options)
+  : check_local_operation_base<TS, TI> (check, different_polygons, is_merged, has_other, other_is_merged, options)
+{
+  //  .. nothing yet ..
+}
+
+template <class TS, class TI>
+void
+check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+{
+  std::vector<const TS *> subjects;
+  subjects.reserve (interactions.size ());
+
+  std::set<const TI *> intruders;
+
+  for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+    subjects.push_back (&interactions.subject_shape (i->first));
+    for (auto ii = i->second.begin (); ii != i->second.end (); ++ii) {
+      intruders.insert (&interactions.intruder_shape (*ii).second);
+    }
+  }
+
+  tl_assert (results.size () == 1);
+
+  std::unordered_set<db::EdgePair> result, intra_polygon_result;
+
+  //  perform the basic check
+  check_local_operation_base<TS, TI>::compute_results (layout, subjects, intruders, result, intra_polygon_result);
+
+  //  detect and remove parts of the result which have or do not have results "opposite"
+  //  ("opposite" is defined by the projection of edges "through" the subject shape)
+  if (check_local_operation_base<TS, TI>::m_options.opposite_filter != db::NoOppositeFilter && (! result.empty () || ! intra_polygon_result.empty ())) {
+    check_local_operation_base<TS, TI>::apply_opposite_filter (subjects, result, intra_polygon_result);
+  } else {
+    result.insert (intra_polygon_result.begin (), intra_polygon_result.end ());
+  }
+
+  //  implements error filtering on rectangles
+  if (check_local_operation_base<TS, TI>::m_options.rect_filter != RectFilter::NoRectFilter && ! result.empty ()) {
+    check_local_operation_base<TS, TI>::apply_rectangle_filter (subjects, result);
   }
 
   results.front ().insert (result.begin (), result.end ());
 }
+
 
 template <class TS, class TI>
 db::Coord
 check_local_operation<TS, TI>::dist () const
 {
   //  TODO: will the distance be sufficient? Or should we take somewhat more?
-  return m_check.distance ();
+  return check_local_operation_base<TS, TI>::m_check.distance ();
 }
 
 template <class TS, class TI>
 OnEmptyIntruderHint
 check_local_operation<TS, TI>::on_empty_intruder_hint () const
 {
-  return m_different_polygons ? OnEmptyIntruderHint::Drop : OnEmptyIntruderHint::Ignore;
+  return check_local_operation_base<TS, TI>::m_different_polygons ? OnEmptyIntruderHint::Drop : OnEmptyIntruderHint::Ignore;
 }
 
 template <class TS, class TI>
@@ -714,6 +740,79 @@ check_local_operation<TS, TI>::description () const
 //  explicit instantiations
 template class DB_PUBLIC check_local_operation<db::PolygonRef, db::PolygonRef>;
 template class DB_PUBLIC check_local_operation<db::Polygon, db::Polygon>;
+
+// ---------------------------------------------------------------------------------------------------------------
+
+template <class TS, class TI>
+check_local_operation_with_properties<TS, TI>::check_local_operation_with_properties (const EdgeRelationFilter &check, bool different_polygons, bool is_merged, bool has_other, bool other_is_merged, const db::RegionCheckOptions &options, db::PropertiesRepository *target_pr, const db::PropertiesRepository *subject_pr, const db::PropertiesRepository *intruder_pr)
+  : check_local_operation_base<TS, TI> (check, different_polygons, is_merged, has_other, other_is_merged, options), m_pms (target_pr, subject_pr), m_pmi (target_pr, intruder_pr)
+{
+  //  .. nothing yet ..
+}
+
+template <class TS, class TI>
+void
+check_local_operation_with_properties<TS, TI>::do_compute_local (db::Layout *layout, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+{
+  tl_assert (results.size () == 1);
+
+  auto by_prop_id = separate_interactions_by_properties (interactions, check_local_operation_base<TS, TI>::m_options.prop_constraint, m_pms, m_pmi);
+
+  for (auto s2p = by_prop_id.begin (); s2p != by_prop_id.end (); ++s2p) {
+
+    std::unordered_set<db::EdgePair> result, intra_polygon_result;
+
+    const std::vector<const TS *> &subjects = s2p->second.first;
+    const std::set<const TI *> &intruders = s2p->second.second;
+
+    //  perform the basic check
+    check_local_operation_base<TS, TI>::compute_results (layout, subjects, intruders, result, intra_polygon_result);
+
+    //  detect and remove parts of the result which have or do not have results "opposite"
+    //  ("opposite" is defined by the projection of edges "through" the subject shape)
+    if (check_local_operation_base<TS, TI>::m_options.opposite_filter != db::NoOppositeFilter && (! result.empty () || ! intra_polygon_result.empty ())) {
+      check_local_operation_base<TS, TI>::apply_opposite_filter (subjects, result, intra_polygon_result);
+    } else {
+      result.insert (intra_polygon_result.begin (), intra_polygon_result.end ());
+    }
+
+    //  implements error filtering on rectangles
+    if (check_local_operation_base<TS, TI>::m_options.rect_filter != RectFilter::NoRectFilter && ! result.empty ()) {
+      check_local_operation_base<TS, TI>::apply_rectangle_filter (subjects, result);
+    }
+
+    for (auto r = result.begin (); r != result.end (); ++r) {
+      results.front ().insert (db::EdgePairWithProperties (*r, pc_norm (check_local_operation_base<TS, TI>::m_options.prop_constraint, s2p->first)));
+    }
+
+  }
+}
+
+template <class TS, class TI>
+db::Coord
+check_local_operation_with_properties<TS, TI>::dist () const
+{
+  //  TODO: will the distance be sufficient? Or should we take somewhat more?
+  return check_local_operation_base<TS, TI>::m_check.distance ();
+}
+
+template <class TS, class TI>
+OnEmptyIntruderHint
+check_local_operation_with_properties<TS, TI>::on_empty_intruder_hint () const
+{
+  return check_local_operation_base<TS, TI>::m_different_polygons ? OnEmptyIntruderHint::Drop : OnEmptyIntruderHint::Ignore;
+}
+
+template <class TS, class TI>
+std::string
+check_local_operation_with_properties<TS, TI>::description () const
+{
+  return tl::to_string (tr ("Generic DRC check"));
+}
+
+//  explicit instantiations
+template class DB_PUBLIC check_local_operation_with_properties<db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC check_local_operation_with_properties<db::Polygon, db::Polygon>;
 
 // ---------------------------------------------------------------------------------------------------------------
 
@@ -1429,5 +1528,564 @@ std::string interacting_with_text_local_operation<TS, TI, TR>::description () co
 //  explicit instantiations
 template class DB_PUBLIC interacting_with_text_local_operation<db::PolygonRef, db::TextRef, db::PolygonRef>;
 template class DB_PUBLIC interacting_with_text_local_operation<db::Polygon, db::Text, db::Polygon>;
+
+// ---------------------------------------------------------------------------------------------
+//  BoolAndOrNotLocalOperation implementation
+
+template <class TS, class TI, class TR>
+bool_and_or_not_local_operation<TS, TI, TR>::bool_and_or_not_local_operation (bool is_and)
+  : m_is_and (is_and)
+{
+  //  .. nothing yet ..
+}
+
+template <class TS, class TI, class TR>
+OnEmptyIntruderHint
+bool_and_or_not_local_operation<TS, TI, TR>::on_empty_intruder_hint () const
+{
+  return m_is_and ? Drop : Copy;
+}
+
+template <class TS, class TI, class TR>
+std::string
+bool_and_or_not_local_operation<TS, TI, TR>::description () const
+{
+  return m_is_and ? tl::to_string (tr ("AND operation")) : tl::to_string (tr ("NOT operation"));
+}
+
+template <class TS, class TI, class TR>
+void
+bool_and_or_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  tl_assert (results.size () == 1);
+  std::unordered_set<TR> &result = results.front ();
+
+  db::EdgeProcessor ep;
+
+  size_t p1 = 0, p2 = 1;
+
+  std::set<TI> others;
+  for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+    for (auto j = i->second.begin (); j != i->second.end (); ++j) {
+      others.insert (interactions.intruder_shape (*j).second);
+    }
+  }
+
+  for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+
+    const TR &subject = interactions.subject_shape (i->first);
+    if (others.find (subject) != others.end ()) {
+      if (m_is_and) {
+        result.insert (subject);
+      }
+    } else if (i->second.empty ()) {
+      //  shortcut (not: keep, and: drop)
+      if (! m_is_and) {
+        result.insert (subject);
+      }
+    } else {
+      for (auto e = subject.begin_edge (); ! e.at_end(); ++e) {
+        ep.insert (*e, p1);
+      }
+      p1 += 2;
+    }
+
+  }
+
+  if (! others.empty () && p1 > 0) {
+
+    for (auto o = others.begin (); o != others.end (); ++o) {
+      for (auto e = o->begin_edge (); ! e.at_end(); ++e) {
+        ep.insert (*e, p2);
+      }
+      p2 += 2;
+    }
+
+    db::BooleanOp op (m_is_and ? db::BooleanOp::And : db::BooleanOp::ANotB);
+    db::polygon_ref_generator<TR> pr (layout, result);
+    db::PolygonSplitter splitter (pr, area_ratio, max_vertex_count);
+    db::PolygonGenerator pg (splitter, true, true);
+    ep.set_base_verbosity (50);
+    ep.process (pg, op);
+
+  }
+}
+
+template class DB_PUBLIC bool_and_or_not_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC bool_and_or_not_local_operation<db::Polygon, db::Polygon, db::Polygon>;
+
+// ---------------------------------------------------------------------------------------------
+//  BoolAndOrNotLocalOperationWithProperties implementation
+
+template <class TS, class TI, class TR>
+bool_and_or_not_local_operation_with_properties<TS, TI, TR>::bool_and_or_not_local_operation_with_properties (bool is_and, db::PropertiesRepository *target_pr, const db::PropertiesRepository *subject_pr, const db::PropertiesRepository *intruder_pr, db::PropertyConstraint property_constraint)
+  : m_is_and (is_and), m_property_constraint (property_constraint), m_pms (target_pr, subject_pr), m_pmi (target_pr, intruder_pr)
+{
+  //  .. nothing yet ..
+}
+
+template <class TS, class TI, class TR>
+OnEmptyIntruderHint
+bool_and_or_not_local_operation_with_properties<TS, TI, TR>::on_empty_intruder_hint () const
+{
+  return m_is_and ? Drop : Copy;
+}
+
+template <class TS, class TI, class TR>
+std::string
+bool_and_or_not_local_operation_with_properties<TS, TI, TR>::description () const
+{
+  return m_is_and ? tl::to_string (tr ("AND operation")) : tl::to_string (tr ("NOT operation"));
+}
+
+template <class TS, class TI, class TR>
+void
+bool_and_or_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &results, size_t max_vertex_count, double area_ratio) const
+{
+  tl_assert (results.size () == 1);
+  std::unordered_set<db::object_with_properties<TR> > &result = results.front ();
+
+  db::EdgeProcessor ep;
+
+  std::map<db::properties_id_type, std::pair<tl::slist<TS>, std::set<TI> > > by_prop_id;
+
+  for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+
+    const db::object_with_properties<TS> &subject = interactions.subject_shape (i->first);
+
+    if (i->second.empty ()) {
+
+      if (! m_is_and) {
+        result.insert (db::object_with_properties<TR> (subject, m_pms (subject.properties_id ())));
+      }
+
+    } else {
+
+      db::properties_id_type prop_id_s = m_pms (subject.properties_id ());
+
+      auto &shapes_by_prop = by_prop_id [prop_id_s];
+      shapes_by_prop.first.push_front (subject);
+
+      for (auto j = i->second.begin (); j != i->second.end (); ++j) {
+        const db::object_with_properties<TI> &intruder = interactions.intruder_shape (*j).second;
+        if (pc_match (m_property_constraint, prop_id_s, m_pmi (intruder.properties_id ()))) {
+          shapes_by_prop.second.insert (intruder);
+        }
+      }
+
+    }
+
+  }
+
+  for (auto p2s = by_prop_id.begin (); p2s != by_prop_id.end (); ++p2s) {
+
+    ep.clear ();
+    size_t p1 = 0, p2 = 1;
+
+    const std::set<TI> &others = p2s->second.second;
+    db::properties_id_type prop_id = pc_norm (m_property_constraint, p2s->first);
+
+    for (auto s = p2s->second.first.begin (); s != p2s->second.first.end (); ++s) {
+
+      const TS &subject = *s;
+      if (others.find (subject) != others.end ()) {
+        if (m_is_and) {
+          result.insert (db::object_with_properties<TR> (subject, prop_id));
+        }
+      } else if (others.empty ()) {
+        //  shortcut (not: keep, and: drop)
+        if (! m_is_and) {
+          result.insert (db::object_with_properties<TR> (subject, prop_id));
+        }
+      } else {
+        for (auto e = subject.begin_edge (); ! e.at_end(); ++e) {
+          ep.insert (*e, p1);
+        }
+        p1 += 2;
+      }
+
+    }
+
+    if (! others.empty () && p1 > 0) {
+
+      for (auto o = others.begin (); o != others.end (); ++o) {
+        for (auto e = o->begin_edge (); ! e.at_end(); ++e) {
+          ep.insert (*e, p2);
+        }
+        p2 += 2;
+      }
+
+      db::BooleanOp op (m_is_and ? db::BooleanOp::And : db::BooleanOp::ANotB);
+      db::polygon_ref_generator_with_properties<db::object_with_properties<TR> > pr (layout, result, prop_id);
+      db::PolygonSplitter splitter (pr, area_ratio, max_vertex_count);
+      db::PolygonGenerator pg (splitter, true, true);
+      ep.set_base_verbosity (50);
+      ep.process (pg, op);
+
+    }
+
+  }
+}
+
+template class DB_PUBLIC bool_and_or_not_local_operation_with_properties<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC bool_and_or_not_local_operation_with_properties<db::Polygon, db::Polygon, db::Polygon>;
+
+// ---------------------------------------------------------------------------------------------
+//  TwoBoolAndNotLocalOperation implementation
+
+template <class TS, class TI, class TR>
+two_bool_and_not_local_operation<TS, TI, TR>::two_bool_and_not_local_operation ()
+  : db::local_operation<TS, TI, TR> ()
+{
+  //  .. nothing yet ..
+}
+
+template <class TS, class TI, class TR>
+void
+two_bool_and_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio) const
+{
+  tl_assert (results.size () == 2);
+
+  db::EdgeProcessor ep;
+
+  std::unordered_set<TR> &result0 = results [0];
+  std::unordered_set<TR> &result1 = results [1];
+
+  size_t p1 = 0, p2 = 1;
+
+  std::set<TI> others;
+  for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+    for (auto j = i->second.begin (); j != i->second.end (); ++j) {
+      others.insert (interactions.intruder_shape (*j).second);
+    }
+  }
+
+  for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+
+    const TS &subject = interactions.subject_shape (i->first);
+    if (others.find (subject) != others.end ()) {
+      result0.insert (subject);
+    } else if (i->second.empty ()) {
+      //  shortcut (not: keep, and: drop)
+      result1.insert (subject);
+    } else {
+      for (auto e = subject.begin_edge (); ! e.at_end(); ++e) {
+        ep.insert (*e, p1);
+      }
+      p1 += 2;
+    }
+
+  }
+
+  if (! others.empty () && p1 > 0) {
+
+    for (auto o = others.begin (); o != others.end (); ++o) {
+      for (auto e = o->begin_edge (); ! e.at_end(); ++e) {
+        ep.insert (*e, p2);
+      }
+      p2 += 2;
+    }
+
+    db::BooleanOp op0 (db::BooleanOp::And);
+    db::polygon_ref_generator<TR> pr0 (layout, result0);
+    db::PolygonSplitter splitter0 (pr0, area_ratio, max_vertex_count);
+    db::PolygonGenerator pg0 (splitter0, true, true);
+
+    db::BooleanOp op1 (db::BooleanOp::ANotB);
+    db::polygon_ref_generator<TR> pr1 (layout, result1);
+    db::PolygonSplitter splitter1 (pr1, area_ratio, max_vertex_count);
+    db::PolygonGenerator pg1 (splitter1, true, true);
+
+    ep.set_base_verbosity (50);
+
+    std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > procs;
+    procs.push_back (std::make_pair (&pg0, &op0));
+    procs.push_back (std::make_pair (&pg1, &op1));
+    ep.process (procs);
+
+  }
+
+}
+
+template <class TS, class TI, class TR>
+std::string two_bool_and_not_local_operation<TS, TI, TR>::description () const
+{
+  return tl::to_string (tr ("ANDNOT operation"));
+}
+
+template class DB_PUBLIC two_bool_and_not_local_operation<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC two_bool_and_not_local_operation<db::Polygon, db::Polygon, db::Polygon>;
+
+// ---------------------------------------------------------------------------------------------
+//  TwoBoolAndNotLocalOperationWithProperties implementation
+
+template <class TS, class TI, class TR>
+two_bool_and_not_local_operation_with_properties<TS, TI, TR>::two_bool_and_not_local_operation_with_properties (db::PropertiesRepository *target1_pr, db::PropertiesRepository *target2_pr, const db::PropertiesRepository *subject_pr, const db::PropertiesRepository *intruder_pr, db::PropertyConstraint property_constraint)
+  : db::local_operation<db::object_with_properties<TS>, db::object_with_properties<TI>, db::object_with_properties<TR> > (),
+    m_property_constraint (property_constraint), m_pms (target1_pr, subject_pr), m_pmi (target1_pr, intruder_pr), m_pm12 (target2_pr, target1_pr)
+{
+  //  .. nothing yet ..
+}
+
+template <class TS, class TI, class TR>
+void
+two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &results, size_t max_vertex_count, double area_ratio) const
+{
+  tl_assert (results.size () == 2);
+  std::unordered_set<db::object_with_properties<TR> > &result0 = results [0];
+  std::unordered_set<db::object_with_properties<TR> > &result1 = results [1];
+
+  db::EdgeProcessor ep;
+
+  std::map<db::properties_id_type, std::pair<tl::slist<TS>, std::set<TI> > > by_prop_id;
+
+  for (auto i = interactions.begin (); i != interactions.end (); ++i) {
+
+    const db::object_with_properties<TS> &subject = interactions.subject_shape (i->first);
+
+    if (i->second.empty ()) {
+
+      result1.insert (db::object_with_properties<TR> (subject, m_pms (subject.properties_id ())));
+
+    } else {
+
+      db::properties_id_type prop_id_s = m_pms (subject.properties_id ());
+
+      auto &shapes_by_prop = by_prop_id [prop_id_s];
+      shapes_by_prop.first.push_front (subject);
+
+      for (auto j = i->second.begin (); j != i->second.end (); ++j) {
+        const db::object_with_properties<TI> &intruder = interactions.intruder_shape (*j).second;
+        if (pc_match (m_property_constraint, prop_id_s, m_pmi (intruder.properties_id ()))) {
+          shapes_by_prop.second.insert (intruder);
+        }
+      }
+
+    }
+
+  }
+
+  for (auto p2s = by_prop_id.begin (); p2s != by_prop_id.end (); ++p2s) {
+
+    ep.clear ();
+    size_t p1 = 0, p2 = 1;
+
+    const std::set<TR> &others = p2s->second.second;
+    db::properties_id_type prop_id = pc_norm (m_property_constraint, p2s->first);
+
+    for (auto s = p2s->second.first.begin (); s != p2s->second.first.end (); ++s) {
+
+      const TR &subject = *s;
+      if (others.find (subject) != others.end ()) {
+        result0.insert (db::object_with_properties<TR> (subject, prop_id));
+      } else if (others.empty ()) {
+        //  shortcut (not: keep, and: drop)
+        result1.insert (db::object_with_properties<TR> (subject, m_pm12 (prop_id)));
+      } else {
+        for (auto e = subject.begin_edge (); ! e.at_end(); ++e) {
+          ep.insert (*e, p1);
+        }
+        p1 += 2;
+      }
+
+    }
+
+    if (! others.empty () && p1 > 0) {
+
+      for (auto o = others.begin (); o != others.end (); ++o) {
+        for (auto e = o->begin_edge (); ! e.at_end(); ++e) {
+          ep.insert (*e, p2);
+        }
+        p2 += 2;
+      }
+
+      std::unordered_set<TR> result0_wo_props;
+      std::unordered_set<TR> result1_wo_props;
+
+      db::BooleanOp op0 (db::BooleanOp::And);
+      db::polygon_ref_generator<TR> pr0 (layout, result0_wo_props);
+      db::PolygonSplitter splitter0 (pr0, area_ratio, max_vertex_count);
+      db::PolygonGenerator pg0 (splitter0, true, true);
+
+      db::BooleanOp op1 (db::BooleanOp::ANotB);
+      db::polygon_ref_generator<TR> pr1 (layout, result1_wo_props);
+      db::PolygonSplitter splitter1 (pr1, area_ratio, max_vertex_count);
+      db::PolygonGenerator pg1 (splitter1, true, true);
+
+      ep.set_base_verbosity (50);
+
+      std::vector<std::pair<db::EdgeSink *, db::EdgeEvaluatorBase *> > procs;
+      procs.push_back (std::make_pair (&pg0, &op0));
+      procs.push_back (std::make_pair (&pg1, &op1));
+      ep.process (procs);
+
+      for (auto r = result0_wo_props.begin (); r != result0_wo_props.end (); ++r) {
+        result0.insert (db::object_with_properties<TR> (*r, prop_id));
+      }
+      for (auto r = result1_wo_props.begin (); r != result1_wo_props.end (); ++r) {
+        result1.insert (db::object_with_properties<TR> (*r, m_pm12 (prop_id)));
+      }
+
+    }
+
+  }
+}
+
+template <class TS, class TI, class TR>
+std::string two_bool_and_not_local_operation_with_properties<TS, TI, TR>::description () const
+{
+  return tl::to_string (tr ("ANDNOT operation"));
+}
+
+template class DB_PUBLIC two_bool_and_not_local_operation_with_properties<db::PolygonRef, db::PolygonRef, db::PolygonRef>;
+template class DB_PUBLIC two_bool_and_not_local_operation_with_properties<db::Polygon, db::Polygon, db::Polygon>;
+
+// ---------------------------------------------------------------------------------------------
+
+SelfOverlapMergeLocalOperation::SelfOverlapMergeLocalOperation (unsigned int wrap_count)
+  : m_wrap_count (wrap_count)
+{
+  //  .. nothing yet ..
+}
+
+void
+SelfOverlapMergeLocalOperation::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+{
+  tl_assert (results.size () == 1);
+  std::unordered_set<db::PolygonRef> &result = results.front ();
+
+  if (m_wrap_count == 0) {
+    return;
+  }
+
+  db::EdgeProcessor ep;
+
+  size_t p1 = 0, p2 = 1;
+  std::set<unsigned int> seen;
+
+  for (shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
+
+    if (seen.find (i->first) == seen.end ()) {
+      seen.insert (i->first);
+      const db::PolygonRef &subject = interactions.subject_shape (i->first);
+      for (db::PolygonRef::polygon_edge_iterator e = subject.begin_edge (); ! e.at_end(); ++e) {
+        ep.insert (*e, p1);
+      }
+      p1 += 2;
+    }
+
+    for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator2 o = i->second.begin (); o != i->second.end (); ++o) {
+      //  don't take the same (really the same, not an identical one) shape twice - the interaction
+      //  set does not take care to list just one copy of the same item on the intruder side.
+      if (seen.find (*o) == seen.end ()) {
+        seen.insert (*o);
+        const db::PolygonRef &intruder = interactions.intruder_shape (*o).second;
+        for (db::PolygonRef::polygon_edge_iterator e = intruder.begin_edge (); ! e.at_end(); ++e) {
+          ep.insert (*e, p2);
+        }
+        p2 += 2;
+      }
+    }
+
+  }
+
+  db::MergeOp op (m_wrap_count - 1);
+  db::PolygonRefGenerator pr (layout, result);
+  db::PolygonGenerator pg (pr, true, true);
+  ep.set_base_verbosity (50);
+  ep.process (pg, op);
+}
+
+OnEmptyIntruderHint SelfOverlapMergeLocalOperation::on_empty_intruder_hint () const
+{
+  return m_wrap_count > 1 ? Drop : Copy;
+}
+
+std::string SelfOverlapMergeLocalOperation::description () const
+{
+  return tl::sprintf (tl::to_string (tr ("Self-overlap (wrap count %d)")), int (m_wrap_count));
+}
+
+// ---------------------------------------------------------------------------------------------
+
+PolygonToEdgeLocalOperation::PolygonToEdgeLocalOperation (db::PropertiesRepository *target_pr, const db::PropertiesRepository *source_pr)
+  : local_operation<db::PolygonRefWithProperties, db::PolygonRefWithProperties, db::EdgeWithProperties> (), m_pm (target_pr, source_pr)
+{
+  //  .. nothing yet ..
+}
+
+std::string
+PolygonToEdgeLocalOperation::description () const
+{
+  return std::string ("polygon to edges");
+}
+
+void
+PolygonToEdgeLocalOperation::do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::EdgeWithProperties> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+{
+  db::EdgeProcessor ep;
+  ep.set_base_verbosity (50);
+
+  auto by_prop_id = separate_interactions_by_properties (interactions, db::SamePropertiesConstraint, m_pm, m_pm);
+  for (auto shapes_by_prop_id = by_prop_id.begin (); shapes_by_prop_id != by_prop_id.end (); ++shapes_by_prop_id) {
+
+    db::properties_id_type prop_id = shapes_by_prop_id->first;
+
+    for (auto s = shapes_by_prop_id->second.first.begin (); s != shapes_by_prop_id->second.first.end (); ++s) {
+      ep.insert (**s);
+    }
+
+    db::property_injector<db::Edge, std::unordered_set<db::EdgeWithProperties> > results_with_properties (&results.front (), prop_id);
+
+    if (shapes_by_prop_id->second.second.empty ()) {
+
+      db::edge_to_edge_set_generator<db::property_injector<db::Edge, std::unordered_set<db::EdgeWithProperties> > > eg (results_with_properties, prop_id);
+      db::MergeOp op (0);
+      ep.process (eg, op);
+
+    } else {
+
+      //  With intruders: to compute our local contribution we take the edges without and with intruders
+      //  and deliver what is in both sets
+
+      db::MergeOp op (0);
+
+      std::vector<Edge> edges1;
+      db::EdgeContainer ec1 (edges1);
+      ep.process (ec1, op);
+
+      ep.clear ();
+
+      for (auto s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
+        ep.insert (s->second);
+      }
+      for (auto i = interactions.begin_intruders (); i != interactions.end_intruders (); ++i) {
+        ep.insert (i->second.second);
+      }
+
+      std::vector<Edge> edges2;
+      db::EdgeContainer ec2 (edges2);
+      ep.process (ec2, op);
+
+      //  Runs the boolean AND between the result with and without intruders
+
+      db::box_scanner<db::Edge, size_t> scanner;
+      scanner.reserve (edges1.size () + edges2.size ());
+
+      for (std::vector<Edge>::const_iterator i = edges1.begin (); i != edges1.end (); ++i) {
+        scanner.insert (i.operator-> (), 0);
+      }
+      for (std::vector<Edge>::const_iterator i = edges2.begin (); i != edges2.end (); ++i) {
+        scanner.insert (i.operator-> (), 1);
+      }
+
+      EdgeBooleanClusterCollector<db::property_injector<Edge, std::unordered_set<db::EdgeWithProperties> > > cluster_collector (&results_with_properties, EdgeAnd);
+      scanner.process (cluster_collector, 1, db::box_convert<db::Edge> ());
+
+    }
+
+  }
+
+}
 
 }

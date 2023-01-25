@@ -26,6 +26,11 @@ module LVS
       super
     end
 
+    # avoids lengthy error messages
+    def inspect
+      "LVSEngine(...)"
+    end
+
     # %LVS%
     # @name netter
     # @brief Creates a new netter object

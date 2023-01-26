@@ -2476,10 +2476,10 @@ TEST(44_SizeWithProperties)
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (2, 0)), r2);
 
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (10, 0)), r1.sized (200));
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1.sized (250, 50));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (11, 0)), r1.sized (250, 50, 2));
 
   target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (20, 0)), r2.sized (200));
-  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r2.sized (250, 50));
+  target.insert (target_top_cell_index, target.get_layer (db::LayerProperties (21, 0)), r2.sized (250, 50, 2));
 
   CHECKPOINT();
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_region_au44.gds");

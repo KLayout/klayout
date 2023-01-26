@@ -535,6 +535,21 @@ class LAYLayoutView_TestClass < TestBase
 
   end
 
+  # issue-1259
+  def test_7
+
+    # standalone layout view
+    lv = RBA::LayoutView::new(true)
+    
+    assert_equal(lv.is_editable, true)
+
+    lv.create_layout(true)
+
+    layout = lv.active_cellview.layout
+    assert_equal(layout.is_editable, true)
+
+  end
+
 end
 
 load("test_epilogue.rb")

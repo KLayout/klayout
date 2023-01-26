@@ -3231,11 +3231,11 @@ LayoutViewBase::add_layout (lay::LayoutHandle *layout_handle, bool add_cellview,
       std::vector <db::cell_index_type> p;
       p.push_back (*top);
       select_cell (p, cv_index);
-    } else {
-      //  even if there is no cell, select the cellview item
-      //  to support applications with an active cellview (that is however invalid)
-      set_active_cellview_index (cv_index);
     }
+
+    //  even if there is no cell, select the cellview item
+    //  to support applications with an active cellview (that is however invalid)
+    set_active_cellview_index (cv_index);
 
     if (initialize_layers) {
 
@@ -3404,6 +3404,9 @@ LayoutViewBase::load_layout (const std::string &filename, const db::LoadLayoutOp
       p.push_back (*top);
       select_cell (p, cv_index);
     }
+
+    //  force "active_cellview_changed" event
+    m_active_cellview_index = -1;
 
     //  even if there is no cell, select the cellview item
     //  to support applications with an active cellview (that is however invalid)

@@ -2931,6 +2931,7 @@ MainWindow::close_view (int index)
 
         //  last view closed
 
+        lay::LayoutView::set_current (0);
         current_view_changed ();
 
         clear_current_pos ();

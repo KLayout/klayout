@@ -1,3 +1,23 @@
+0.28.4           (2023-01-29):
+* Bugfix: %GITHUB%/issues/1267 Editor options not visible initially on layout view
+* Bugfix: %GITHUB%/issues/1260 Internal error on package install
+* Bugfix: %GITHUB%/issues/1259 Qt-less LayoutView creates non-editable Layout initially even if editing is requested? 
+* Bugfix: %GITHUB%/issues/1253 Library browser does not always display all libraries
+* Bugfix: %GITHUB%/issues/1237 Python error messages should include more information
+* Bugfix: Technology indicator is cleared after last view is closed
+* Bugfix: Partial mode did not support Ctrl/Shift to confine movement direction
+* Bugfix: Avoid very long error messages in DRC/LVS scripts (listing all details of the engine)
+* Bugfix: "clone panel" did not copy custom layer stipples
+* Bugfix: Generic "drc" sizing has to use twice the size range to catch all possible interactions
+* Bugfix: DRC check (e.g. "sep") against second layer of "raw" type did not work in deep mode
+* Bugfix: DRC grid check markers are now exactly aligned with vertexes they are supposed to mark
+* Bugifx: DRC interact of polygons with texts was not working properly
+* Enhancement: New feature: "Screenshot to clipboard"
+* Enhancement: Introducing properties in DRC and net tagging by properties 
+  - This enables implementation of "connected" or "unconnected" mode checks
+  - This is the first release, so the feature is somewhat experimental
+  - For details check the documentation: look for "DRC Runsets" and browse to "DRC and user properties"
+ 
 0.28.3           (2023-01-12):
 * Bugfix: %GITHUB%/issues/1247 Layer stipples not updated after editing custom stipples with high-DPI displays
 * Bugfix: %GITHUB%/issues/1245 Connectivity not preserved when loading/saving technology

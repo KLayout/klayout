@@ -75,6 +75,11 @@ module DRC
 
     end
 
+    # avoids lengthy error messages
+    def inspect
+      "DRCEngine(...)"
+    end
+
     # for testing
     def force_gc(f)
       @force_gc = f

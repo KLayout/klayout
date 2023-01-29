@@ -86,7 +86,7 @@ TechnologyController::initialized (lay::Dispatcher *dispatcher)
   tl_assert (dispatcher == mp_dispatcher);
 
   update_menu (mp_dispatcher);
-  connect_events ();
+  view_changed ();
 
   if (lay::SaltController::instance ()) {
     connect (lay::SaltController::instance (), SIGNAL (salt_changed ()), this, SLOT (sync_with_external_sources ()));
@@ -121,8 +121,10 @@ TechnologyController::get_menu_entries (std::vector<lay::MenuEntry> &menu_entrie
 }
 
 void
-TechnologyController::connect_events ()
+TechnologyController::view_changed ()
 {
+  update_active_technology ();
+
   //  NOTE: the whole concept is a but strange here: the goal is to
   //  connect to the current view's active_cellview_changed event and
   //  the active cellview's technology_changed event. We could register
@@ -140,15 +142,13 @@ TechnologyController::connect_events ()
 
     //  NOTE: the "real" call needs to come before the re-connect handler because
     //  the latter will remove the update call
-    mp_mw->current_view_changed_event.add (this, &TechnologyController::update_active_technology);
-    mp_mw->current_view_changed_event.add (this, &TechnologyController::connect_events);
+    mp_mw->current_view_changed_event.add (this, &TechnologyController::view_changed);
 
     if (mp_mw->current_view ()) {
 
       //  NOTE: the "real" call needs to come before the re-connect handler because
       //  the latter will remove the update call
-      mp_mw->current_view ()->active_cellview_changed_event.add (this, &TechnologyController::update_active_technology);
-      mp_mw->current_view ()->active_cellview_changed_event.add (this, &TechnologyController::connect_events);
+      mp_mw->current_view ()->active_cellview_changed_event.add (this, &TechnologyController::view_changed);
 
       if (mp_mw->current_view ()->active_cellview_index () >= 0 && mp_mw->current_view ()->active_cellview_index () <= int (mp_mw->current_view ()->cellviews ())) {
         mp_mw->current_view ()->active_cellview ()->technology_changed_event.add (this, &TechnologyController::update_active_technology);
@@ -178,20 +178,19 @@ TechnologyController::update_active_technology ()
 
   }
 
-  if (mp_active_technology != active_tech) {
 
-    mp_active_technology = active_tech;
+  mp_active_technology = active_tech;
 
-    if (mp_mw) {
-      if (active_tech) {
-        mp_mw->tech_message (tech_string_from_name (active_tech->name ()));
-      } else {
-        mp_mw->tech_message (std::string ());
-      }
+  if (mp_mw) {
+    if (active_tech) {
+      mp_mw->tech_message (tech_string_from_name (active_tech->name ()));
+    } else {
+      mp_mw->tech_message (std::string ());
     }
+  }
 
+  if (mp_active_technology != active_tech) {
     emit active_technology_changed ();
-
   }
 
 #if 0 

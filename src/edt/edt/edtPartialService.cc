@@ -1294,8 +1294,10 @@ PartialService::snap (const db::DPoint &p) const
 }
 
 db::DVector
-PartialService::snap (const db::DVector &v) const
+PartialService::snap (const db::DVector &v_org) const
 {
+  db::DVector v = lay::snap_angle (v_org, move_ac ());
+
   //  snap according to the grid
   if (m_edit_grid == db::DVector ()) {
     return lay::snap_xy (db::DPoint () + v, m_global_grid) - db::DPoint ();
@@ -1312,7 +1314,7 @@ lay::PointSnapToObjectResult
 PartialService::snap2 (const db::DPoint &p) const
 {
   double snap_range = ui ()->mouse_event_trans ().inverted ().ctrans (sr_pixels);
-  return lay::obj_snap (m_snap_to_objects ? view () : 0, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, snap_range);
+  return lay::obj_snap (m_snap_to_objects ? view () : 0, m_start, p, m_edit_grid == db::DVector () ? m_global_grid : m_edit_grid, move_ac (), snap_range);
 }
 
 void
@@ -1549,18 +1551,23 @@ PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, boo
 
     m_alt_ac = ac_from_buttons (buttons);
 
-    lay::PointSnapToObjectResult snap_details;
-
     //  drag the vertex or edge/segment
-    if (is_single_point_selection ()) {
-      //  for a single selected point, m_start is the original position and we snap the target -
+    if (m_selection.size () == 1 && ! m_selection.begin ()->first.is_cell_inst () && (m_selection.begin ()->second.size () == 1 /*p*/ || m_selection.begin ()->second.size () == 3 /*p1,p2,edge*/)) {
+
+      lay::PointSnapToObjectResult snap_details;
+
+      //  for a single selected point or edge, m_start is the original position and we snap the target -
       //  thus, we can bring the point on grid or to an object's edge or vertex
       snap_details = snap2 (p);
       m_current = snap_details.snapped_point;
       mouse_cursor_from_snap_details (snap_details);
+
     } else {
+
+      //  snap movement to angle and grid without object
       m_current = m_start + snap (p - m_start);
       clear_mouse_cursors ();
+
     }
 
     selection_to_view ();
@@ -1718,13 +1725,7 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
 
       //  heuristically, if there is just one edge selected: do not confine to the movement
       //  angle constraint - the edge usually is confined enough
-      db::DTrans move_trans;
-      if (m_selection.size () == 1 && m_selection.begin ()->second.size () == 3 /*p1,p2,edge*/) {
-        move_trans = db::DTrans (m_current - m_start);
-      } else {
-        //  TODO: DTrans should have a ctor that takes a vector
-        move_trans = db::DTrans (lay::snap_angle (m_current - m_start, move_ac ()));
-      }
+      db::DTrans move_trans = db::DTrans (m_current - m_start);
 
       transform_selection (move_trans);
 

@@ -679,6 +679,8 @@ protected:
 
 private:
   using LayoutViewBase::ui;
+
+  void activate_editor_option_pages ();
 };
 
 /**

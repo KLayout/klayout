@@ -138,7 +138,7 @@ private:
   db::Technology *mp_active_technology;
 
   void update_active_technology ();
-  void connect_events ();
+  void view_changed ();
   void technologies_changed ();
   void technology_changed (db::Technology *);
   bool configure (const std::string &name, const std::string &value);

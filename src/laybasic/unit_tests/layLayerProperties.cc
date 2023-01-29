@@ -1309,6 +1309,7 @@ TEST (16)
 
   int cv1 = view.create_layout ("", true, false);
   db::Layout &ly1 = view.cellview (cv1)->layout ();
+  EXPECT_EQ (ly1.is_editable (), is_editable ());
   ly1.insert_layer (db::LayerProperties (1, 0));
   ly1.insert_layer (db::LayerProperties (2, 0));
 

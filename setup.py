@@ -905,7 +905,9 @@ lay = Extension(config.root + '.laycore',
 # Core setup function
 
 if __name__ == "__main__":
-    (Path(__file__).parent / "src/py.typed").touch()
+    typed_file = Path(__file__).parent / "src/pymod/distutils_src/klayout/py.typed"
+    typed_file.parent.mkdir(parents=True, exist_ok=True)
+    typed_file.touch()
     setup(
         name=config.root,
         version=config.version(),
@@ -931,6 +933,7 @@ if __name__ == "__main__":
             "": "src/pymod/distutils_src"
         },  # https://github.com/pypa/setuptools/issues/230
         package_data={config.root: ["src/pymod/distutils_src/klayout/*.pyi"]},
+        data_files=[(config.root, ["src/pymod/distutils_src/klayout/py.typed"])],
         include_package_data=True,
         ext_modules=[_tl, _gsi, _pya, _rba, _db, _lib, _rdb, _lym, _laybasic, _layview, _ant, _edt, _img] 
             + db_plugins 

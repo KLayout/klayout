@@ -663,13 +663,13 @@ CODE
         else
 
           if a.is_a?(String)
-            net_a = circuit_a.net_by_name(a) || raise("Not a valid net name in extracted netlist in 'same_nets': #{a} (for circuit #{circuit_a})")
+            net_a = circuit_a.net_by_name(a)
           else
             net_a = a
           end
 
           if b.is_a?(String)
-            net_b = circuit_b.net_by_name(b) || raise("Not a valid net name in extracted netlist in 'same_nets': #{b} (for circuit #{circuit_b})")
+            net_b = circuit_b.net_by_name(b)
           else
             net_b = b
           end

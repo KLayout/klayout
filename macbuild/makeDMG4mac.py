@@ -77,13 +77,13 @@ def SetGlobals():
     Usage  = "\n"
     Usage += "---------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'makeDMG4mac.py' >>\n"
-    Usage += "       for making a DMG file of KLayout 0.28.3 or later on different Apple macOS / Mac OSX platforms.\n"
+    Usage += "       for making a DMG file of KLayout 0.28.4 or later on different Apple macOS / Mac OSX platforms.\n"
     Usage += "\n"
     Usage += "$ [python] ./makeDMG4mac.py\n"
     Usage += "   option & argument    : descriptions                                               | default value\n"
     Usage += "   ----------------------------------------------------------------------------------+-----------------\n"
     Usage += "   <-p|--pkg <dir>>     : package directory created by `build4mac.py` with [-y|-Y]   | ``\n"
-    Usage += "                        : like 'LW-qt5MP.pkg.macos-Catalina-release-Rmp31Pmp38'      | \n"
+    Usage += "                        : like 'LW-qt5MP.pkg.macos-Catalina-release-Rmp32Pmp39'      | \n"
     Usage += "   <-c|--clean>         : clean the work directory                                   | disabled\n"
     Usage += "   <-m|--make>          : make a compressed DMG file                                 | disabled\n"
     Usage += "                        :   <-c|--clean> and <-m|--make> are mutually exclusive      | \n"
@@ -208,17 +208,17 @@ def SetGlobals():
 #
 # The package directory name should look like:
 #     * LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
-#     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb31Phb38  --- (1)
-#     * LW-qt5MP.pkg.macos-Catalina-release-Rmp31Pmp38
-#     * HW-qt5Brew.pkg.macos-Catalina-release-RsysPhb38
+#     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb32Phb39  --- (1)
+#     * LW-qt5MP.pkg.macos-Catalina-release-Rmp32Pmp39
+#     * HW-qt5Brew.pkg.macos-Catalina-release-RsysPhb39
 #
 #     * LW-qt6Ana3.pkg.macos-Catalina-release-Rana3Pana3
-#     * LW-qt6Brew.pkg.macos-Catalina-release-Rhb31Phb38
-#     * LW-qt6MP.pkg.macos-Catalina-release-Rmp31Pmp38
-#     * HW-qt6Brew.pkg.macos-Catalina-release-RsysPhb38
+#     * LW-qt6Brew.pkg.macos-Catalina-release-Rhb32Phb39
+#     * LW-qt6MP.pkg.macos-Catalina-release-Rmp32Pmp39
+#     * HW-qt6Brew.pkg.macos-Catalina-release-RsysPhb39
 #
 # Generated DMG will be, for example,
-#     (1) ---> LW-klayout-0.28.2-macOS-Catalina-1-qt5Brew-Rhb31Phb38.dmg
+#     (1) ---> LW-klayout-0.28.4-macOS-Catalina-1-qt5Brew-Rhb32Phb39.dmg
 #
 # @return on success, positive integer in [MB] that tells approx. occupied disc space;
 #         on failure, -1
@@ -259,15 +259,15 @@ def CheckPkgDirectory():
     # [2] Identify (Qt, Ruby, Python) from PkgDir
     #     * ST-qt5MP.pkg.macos-Catalina-release-RsysPsys     # 'ST' has been restored in 0.28.3
     #     * LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
-    #     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb31Phb38
-    #     * LW-qt5MP.pkg.macos-Catalina-release-Rmp31Pmp38
-    #     * HW-qt5Brew.pkg.macos-Catalina-release-RsysPhb38
-    #     * EX-qt5MP.pkg.macos-Catalina-release-Rhb31Pmp38
+    #     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb32Phb39
+    #     * LW-qt5MP.pkg.macos-Catalina-release-Rmp32Pmp39
+    #     * HW-qt5Brew.pkg.macos-Catalina-release-RsysPhb39
+    #     * EX-qt5MP.pkg.macos-Catalina-release-Rhb32Pmp39
     #
     #     * LW-qt6Ana3.pkg.macos-Catalina-release-Rana3Pana3
-    #     * LW-qt6Brew.pkg.macos-Catalina-release-Rhb31Phb38
-    #     * LW-qt6MP.pkg.macos-Catalina-release-Rmp31Pmp38
-    #     * HW-qt6Brew.pkg.macos-Catalina-release-RsysPhb38
+    #     * LW-qt6Brew.pkg.macos-Catalina-release-Rhb32Phb39
+    #     * LW-qt6MP.pkg.macos-Catalina-release-Rmp32Pmp39
+    #     * HW-qt6Brew.pkg.macos-Catalina-release-RsysPhb39
     #-----------------------------------------------------------------------------------------------
     patQRP = u'(ST|LW|HW|EX)([-])([qt5|qt6][0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-]release[-])([0-9A-Za-z]+)'
     regQRP = re.compile(patQRP)
@@ -296,23 +296,25 @@ def CheckPkgDirectory():
         #-----------------------------------------------------------------------------
         LatestOSMacPorts   = Platform == LatestOS
         LatestOSMacPorts  &= PackagePrefix == "LW"
-        LatestOSMacPorts  &= QtIdentification in ["qt5MP", "qt6MP"]
-        LatestOSMacPorts  &= RubyPythonID in ["Rmp31Pmp38", "Rmp31Pmp39"]
+        LatestOSMacPorts  &= QtIdentification in [ "qt5MP", "qt6MP" ]
+        LatestOSMacPorts  &= RubyPythonID in [ "Rmp31Pmp38", "Rmp31Pmp39", \
+                                               "Rmp32Pmp38", "Rmp32Pmp39" ]
 
         LatestOSHomebrew   = Platform == LatestOS
         LatestOSHomebrew  &= PackagePrefix == "LW"
-        LatestOSHomebrew  &= QtIdentification in ["qt5Brew", "qt6Brew"]
-        LatestOSHomebrew  &= RubyPythonID in ["Rhb31Phb38", "Rhb31Phb39", "Rhb31Phbauto"]
+        LatestOSHomebrew  &= QtIdentification in [ "qt5Brew", "qt6Brew" ]
+        LatestOSHomebrew  &= RubyPythonID in [ "Rhb31Phb38", "Rhb31Phb39", "Rhb31Phbauto", \
+                                               "Rhb32Phb38", "Rhb32Phb39", "Rhb32Phbauto" ]
 
         LatestOSAnaconda3  = Platform == LatestOS
         LatestOSAnaconda3 &= PackagePrefix == "LW"
-        LatestOSAnaconda3 &= QtIdentification in ["qt5Ana3"]
-        LatestOSAnaconda3 &= RubyPythonID in ["Rana3Pana3"]
+        LatestOSAnaconda3 &= QtIdentification in [ "qt5Ana3" ]
+        LatestOSAnaconda3 &= RubyPythonID in [ "Rana3Pana3" ]
 
         LatestOSHomebrewH  = Platform == LatestOS
         LatestOSHomebrewH &= PackagePrefix == "HW"
-        LatestOSHomebrewH &= QtIdentification in ["qt5Brew", "qt6Brew"]
-        LatestOSHomebrewH &= RubyPythonID in ["RsysPhb38", "RsysPhb39", "RsysPhbauto"] # Sys-Homebre hybrid
+        LatestOSHomebrewH &= QtIdentification in [ "qt5Brew", "qt6Brew" ]
+        LatestOSHomebrewH &= RubyPythonID in [ "RsysPhb39", "RsysPhb39", "RsysPhbauto" ] # Sys-Homebre hybrid
 
         if LatestOSMacPorts:
             mydic  = DicLightHeavyW["ports"]
@@ -648,10 +650,12 @@ def MakeTargetDMGFile(msg=""):
     command = "/usr/bin/osascript %s %s" % (AppleScriptDMG, VolumeDMG)
     process = subprocess.Popen( command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True )
     output, error = process.communicate()
-    if not output == "":
-        print( "        STDOUT: %s" % output )
-    if not error == "":
-        print( "        STDERR: %s" % error )
+    outputStr = output.decode("utf-8")
+    errorStr  = error.decode("utf-8")
+    if not outputStr == "":
+        print( "        STDOUT: %s" % outputStr )
+    if not errorStr == "":
+        print( "        STDERR: %s" % errorStr )
 
     #--------------------------------------------------------
     # (8) Copy the custom volume icon

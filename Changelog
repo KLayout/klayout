@@ -1,4 +1,4 @@
-0.28.4           (2023-01-29):
+0.28.4           (2023-02-02):
 * Bugfix: %GITHUB%/issues/1267 Editor options not visible initially on layout view
 * Bugfix: %GITHUB%/issues/1260 Internal error on package install
 * Bugfix: %GITHUB%/issues/1259 Qt-less LayoutView creates non-editable Layout initially even if editing is requested? 
@@ -11,7 +11,8 @@
 * Bugfix: Generic "drc" sizing has to use twice the size range to catch all possible interactions
 * Bugfix: DRC check (e.g. "sep") against second layer of "raw" type did not work in deep mode
 * Bugfix: DRC grid check markers are now exactly aligned with vertexes they are supposed to mark
-* Bugifx: DRC interact of polygons with texts was not working properly
+* Bugfix: DRC interact of polygons with texts was not working properly
+* Bugfix: LVS: same_nets with two arguments was not working as described
 * Enhancement: New feature: "Screenshot to clipboard"
 * Enhancement: Introducing properties in DRC and net tagging by properties 
   - This enables implementation of "connected" or "unconnected" mode checks

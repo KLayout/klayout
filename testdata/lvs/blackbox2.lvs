@@ -6,7 +6,7 @@ schematic("blackbox_schematic.cir")
 
 deep
 
-same_nets!("TOP", "*", "*")
+same_nets!("TOP", "*")
 
 m1          = input(1, 0)
 via         = input(2, 0)

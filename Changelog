@@ -13,6 +13,7 @@
 * Bugfix: DRC grid check markers are now exactly aligned with vertexes they are supposed to mark
 * Bugfix: DRC interact of polygons with texts was not working properly
 * Bugfix: LVS: same_nets with two arguments was not working as described
+* Bugfix: py.typed included in Python wheel now.
 * Enhancement: New feature: "Screenshot to clipboard"
 * Enhancement: Introducing properties in DRC and net tagging by properties 
   - This enables implementation of "connected" or "unconnected" mode checks

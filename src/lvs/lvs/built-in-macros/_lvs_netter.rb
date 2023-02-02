@@ -587,7 +587,7 @@ CODE
         raise("Too many arguments to 'same_nets' (need max 4)")
       end
 
-      if args.size == 3
+      if args.size == 2
         ( ca, a ) = args
         cb = nil
         ca.is_a?(String) || raise("Circuit argument of 'same_nets' must be a string")
@@ -620,7 +620,7 @@ CODE
 
       cs = !(nl_a.is_case_sensitive? && nl_b.is_case_sensitive?)
 
-      if ca.is_a?(String) && !cb
+      if ca.is_a?(String) && (!cb || cb == "*")
 
         n2c = {}
         nl_a.circuits_by_name(ca).each { |c| name = cs ? c.name.upcase : c.name; n2c[name] ||= [ nil, nil ]; n2c[name][0] = c }
@@ -647,7 +647,7 @@ CODE
 
       circuits.each do |circuit_a, circuit_b|
 
-        if a.is_a?(String) && !b
+        if a.is_a?(String) && (!b || b == "*")
 
           n2n = {}
           circuit_a.nets_by_name(a).each { |n| name = cs ? n.name.upcase : n.name; n2n[name] ||= [ nil, nil ]; n2n[name][0] = n }

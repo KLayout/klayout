@@ -2022,3 +2022,45 @@ TEST(44_SizeWithProperties)
   db::compare_layouts (_this, target, tl::testdata () + "/algo/flat_region_au44.gds");
 }
 
+TEST(100_Issue1275)
+{
+  db::Point pts[] = {
+    db::Point (-21983, -43808),
+    db::Point (-37841, 16636),
+    db::Point (-20484, 35228),
+    db::Point (30428, 41627),
+    db::Point (38312, 28960),
+    db::Point (-7811, -37922)
+  };
+
+  db::Polygon polygon;
+  polygon.assign_hull (&pts[0], &pts[sizeof(pts) / sizeof(pts[0])]);
+
+  db::Region region;
+
+  region.insert (polygon);
+  region.smooth (100, false);
+
+  EXPECT_EQ (region.sized (100).to_string (), "(-22037,-43939;-22054,-43930;-37952,16664;-20532,35323;30479,41734;38432,28957;-7745,-38003)");
+
+  region = db::Region ();
+  region.insert (polygon);
+  region = region.smoothed (100, false);
+
+  EXPECT_EQ (region.sized (100).to_string (), "(-22037,-43939;-22054,-43930;-37952,16664;-20532,35323;30479,41734;38432,28957;-7745,-38003)");
+
+  db::RegionAreaFilter rf (0, 10000000000, false);
+
+  region = db::Region ();
+  region.insert (polygon);
+  region.filter (rf);
+
+  EXPECT_EQ (region.sized (100).to_string (), "(-22037,-43939;-22054,-43930;-37952,16664;-20532,35323;30479,41734;38432,28957;-7745,-38003)");
+
+  region = db::Region ();
+  region.insert (polygon);
+  region = region.filtered (rf);
+
+  EXPECT_EQ (region.sized (100).to_string (), "(-22037,-43939;-22054,-43930;-37952,16664;-20532,35323;30479,41734;38432,28957;-7745,-38003)");
+}
+

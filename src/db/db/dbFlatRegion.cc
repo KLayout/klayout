@@ -201,6 +201,7 @@ RegionDelegate *FlatRegion::filter_in_place (const PolygonFilterBase &filter)
   poly_layer_wp.erase (pw_wp, poly_layer_wp.end ());
 
   mp_merged_polygons->clear ();
+  invalidate_cache ();
   m_is_merged = filter.requires_raw_input () ? false : merged_semantics ();
 
   return this;
@@ -230,6 +231,7 @@ RegionDelegate *FlatRegion::process_in_place (const PolygonProcessorBase &filter
   poly_layer_wp.swap (out_wp);
 
   mp_merged_polygons->clear ();
+  invalidate_cache ();
   m_is_merged = filter.result_is_merged () && merged_semantics ();
 
   if (filter.result_must_not_be_merged ()) {

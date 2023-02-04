@@ -1,3 +1,6 @@
+0.28.5           (2023-02-05):
+* Bugfix: %GITHUB%/issues/1275 Region.sized after .smooth returns empty region
+  
 0.28.4           (2023-02-02):
 * Bugfix: %GITHUB%/issues/1267 Editor options not visible initially on layout view
 * Bugfix: %GITHUB%/issues/1260 Internal error on package install

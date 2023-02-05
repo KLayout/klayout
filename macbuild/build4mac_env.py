@@ -85,7 +85,7 @@ Qt6Brew = { 'qmake' : '%s/opt/qt@6/bin/qmake' % DefaultHomebrewRoot,
 RubyNil  = [ 'nil' ]
 RubySys  = [ 'RubyElCapitan', 'RubySierra', 'RubyHighSierra', 'RubyMojave' ]
 RubySys += [ 'RubyCatalina', 'RubyBigSur', 'RubyMonterey', 'RubyVentura' ]
-RubyExt  = [ 'Ruby31MacPorts', 'Ruby31Brew', 'RubyAnaconda3' ]
+RubyExt  = [ 'Ruby31MacPorts', 'Ruby32MacPorts', 'Ruby31Brew', 'Ruby32Brew', 'RubyAnaconda3' ]
 Rubies   = RubyNil + RubySys + RubyExt
 
 #-----------------------------------------------------
@@ -192,6 +192,14 @@ Ruby31MacPorts  = { 'exe': '/opt/local/bin/ruby3.1',
                     'lib': '/opt/local/lib/libruby.3.1.dylib'
                   }
 
+# Ruby 3.2 from MacPorts (https://www.macports.org/) *+*+*+ EXPERIMENTAL *+*+*+
+#  install with 'sudo port install ruby32'
+# [Key Type Name] = 'MP32'
+Ruby32MacPorts  = { 'exe': '/opt/local/bin/ruby3.2',
+                    'inc': '/opt/local/include/ruby-3.2.0',
+                    'lib': '/opt/local/lib/libruby.3.2.dylib'
+                  }
+
 # Ruby 3.1 from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
 #   install with 'brew install ruby@3.1'
 # [Key Type Name] = 'HB31'
@@ -199,6 +207,15 @@ HBRuby31Path    = '%s/opt/ruby@3.1' % DefaultHomebrewRoot
 Ruby31Brew      = { 'exe': '%s/bin/ruby' % HBRuby31Path,
                     'inc': '%s/include/ruby-3.1.0' % HBRuby31Path,
                     'lib': '%s/lib/libruby.3.1.dylib' % HBRuby31Path
+                  }
+
+# Ruby 3.2 from Homebrew *+*+*+ EXPERIMENTAL *+*+*+
+#   install with 'brew install ruby@3.2'
+# [Key Type Name] = 'HB32'
+HBRuby32Path    = '%s/opt/ruby@3.2' % DefaultHomebrewRoot
+Ruby32Brew      = { 'exe': '%s/bin/ruby' % HBRuby32Path,
+                    'inc': '%s/include/ruby-3.2.0' % HBRuby32Path,
+                    'lib': '%s/lib/libruby.3.2.dylib' % HBRuby32Path
                   }
 
 # Ruby 3.1 bundled with anaconda3 installed under /Applications/anaconda3/ *+*+*+ EXPERIMENTAL *+*+*+
@@ -222,7 +239,9 @@ RubyDictionary  = { 'nil'           : None,
                     'RubyMonterey'  : RubyMonterey,
                     'RubyVentura'   : RubyVentura,
                     'Ruby31MacPorts': Ruby31MacPorts,
+                    'Ruby32MacPorts': Ruby32MacPorts,
                     'Ruby31Brew'    : Ruby31Brew,
+                    'Ruby32Brew'    : Ruby32Brew,
                     'RubyAnaconda3' : RubyAnaconda3
                   }
 

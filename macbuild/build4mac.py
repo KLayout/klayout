@@ -157,16 +157,16 @@ def Get_Default_Config():
     # Set the default modules
     if   Platform == "Ventura":
         ModuleQt     = "Qt5Brew"
-        ModuleRuby   = "Ruby31Brew"
-        ModulePython = "Python38Brew"
+        ModuleRuby   = "Ruby32Brew"
+        ModulePython = "Python39Brew"
     elif Platform == "Monterey":
         ModuleQt     = "Qt5Brew"
-        ModuleRuby   = "Ruby31Brew"
-        ModulePython = "Python38Brew"
+        ModuleRuby   = "Ruby32Brew"
+        ModulePython = "Python39Brew"
     elif Platform == "BigSur":
         ModuleQt     = "Qt5Brew"
-        ModuleRuby   = "RubyBigSur"
-        ModulePython = "PythonBigSur"
+        ModuleRuby   = "Ruby32Brew"
+        ModulePython = "Python39Brew"
     elif Platform == "Catalina":
         ModuleQt     = "Qt5MacPorts"
         ModuleRuby   = "RubyCatalina"

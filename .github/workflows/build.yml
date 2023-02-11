@@ -40,7 +40,7 @@ jobs:
           HOST_CCACHE_DIR="$(ccache -k cache_dir)"
           mkdir -p $HOST_CCACHE_DIR
       - name: Build wheels  # check https://cibuildwheel.readthedocs.io/en/stable/setup/#github-actions
-        uses: pypa/cibuildwheel@v2.11.3
+        uses: pypa/cibuildwheel@v2.12.0
         # to supply options, put them in 'env', like:
         # env:
         #   CIBW_SOME_OPTION: value
@@ -77,7 +77,7 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         path: dist/*.tar.gz
-     
+
   upload_to_test_pypy:
     needs: [build, make_sdist]
     runs-on: ubuntu-latest

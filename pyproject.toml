@@ -26,3 +26,4 @@ environment-pass = ["HOST_CCACHE_DIR"]
 [tool.cibuildwheel.macos]
 # Don't repair macOS wheels
 repair-wheel-command = ""
+before-all = "brew deps --tree --installed"

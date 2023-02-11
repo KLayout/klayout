@@ -66,6 +66,7 @@ import platform
 from distutils.errors import CompileError
 import distutils.command.build_ext
 import setuptools.command.build_ext
+from setuptools.command.build_ext import build_ext as _build_ext
 import multiprocessing
 
 # for Jenkins we do not want to be greedy
@@ -137,6 +138,24 @@ def quote_path(path):
     else:
         return path
 
+import subprocess
+
+def check_libpng():
+    """ Check if libpng is available (Linux & Macos only)"""
+    try:
+        subprocess.check_call(["libpng-config", "--version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return True
+    except FileNotFoundError as e:
+        # libpng is not present.
+        if True: # change to False to enable installation without libpng
+            raise RuntimeError("libpng missing. libpng-config is not available") from e
+        return False
+
+def libpng_cflags():
+    return subprocess.check_output(["libpng-config", "--cflags"]).decode().split()
+
+def libpng_ldflags():
+    return subprocess.check_output(["libpng-config", "--ldflags"]).decode().split()
 
 # TODO: delete (Obsolete)
 # patch get_ext_filename
@@ -161,6 +180,12 @@ distutils.command.build_ext.build_ext.get_ext_filename = patched_get_ext_filenam
 
 # end patch get_ext_filename
 
+# TODO: customize this object instead of introspecting and patching distutils (if possible)
+class klayout_build_ext(_build_ext):
+    """ Customize build extension class to check for dependencies before installing."""
+    def finalize_options(self) -> None:
+        ret = super().finalize_options()
+        return ret
 
 # patch CCompiler's library_filename for _dbpi libraries (SOs)
 # Its default is to have .so for shared objects, instead of dylib,
@@ -221,7 +246,6 @@ def always_link_shared_object(
         build_temp,
         target_lang,
     )
-
 
 setuptools.command.build_ext.libtype = "shared"
 setuptools.command.build_ext.link_shared_object = always_link_shared_object
@@ -321,6 +345,9 @@ class Config(object):
                 "-Wno-strict-aliasing",  # Avoids many "type-punned pointer" warnings
                 "-std=c++11",  # because we use unordered_map/unordered_set
             ]
+        if platform.system() == "Darwin" and mod == "_tl":
+            if check_libpng():
+                args += libpng_cflags()
         return args
 
     def libraries(self, mod):
@@ -330,9 +357,14 @@ class Config(object):
         if platform.system() == "Windows":
             if mod == "_tl":
                 return ["libcurl", "expat", "pthreadVCE2", "zlib", "wsock32", "libpng16"]
+        elif platform.system() == "Darwin":
+            if mod == "_tl":
+                libs = ["curl", "expat"]  # libpng is included by libpng_ldflags
+                return libs
         else:
             if mod == "_tl":
-                return ["curl", "expat", "png"]
+                libs = ["curl", "expat", "png"]
+                return libs
         return []
 
     def link_args(self, mod):
@@ -361,6 +393,8 @@ class Config(object):
                     "-Wl,-install_name,@rpath/%s" % self.libname_of(mod, is_lib=True),
                 ]
             args += ["-Wl,-rpath,@loader_path/"]
+            if mod == "_tl" and check_libpng():
+                args += libpng_ldflags()
             return args
         else:
             # this makes the libraries suitable for linking with a path -
@@ -385,14 +419,19 @@ class Config(object):
         """
         Returns the macros to use for building
         """
-        return [
-            ("HAVE_PNG", 1),
+        macros = [
             ("HAVE_CURL", 1),
             ("HAVE_EXPAT", 1),
             ("KLAYOUT_MAJOR_VERSION", self.major_version()),
             ("KLAYOUT_MINOR_VERSION", self.minor_version()),
             ("GSI_ALIAS_INSPECT", 1),
         ]
+
+        if platform.system() == "Darwin" and check_libpng():
+                macros += [("HAVE_PNG", 1)]
+        else:
+            macros += [("HAVE_PNG", 1)]
+        return macros
 
     def minor_version(self):
         """
@@ -611,9 +650,9 @@ _laybasic = Library(
     define_macros=config.macros() + [('MAKE_LAYBASIC_LIBRARY', 1)],
     include_dirs=[_rdb_path, _db_path, _tl_path, _gsi_path],
     extra_objects=[
-        config.path_of('_rdb', _rdb_path), 
-        config.path_of('_tl', _tl_path), 
-        config.path_of('_gsi', _gsi_path), 
+        config.path_of('_rdb', _rdb_path),
+        config.path_of('_tl', _tl_path),
+        config.path_of('_gsi', _gsi_path),
         config.path_of('_db', _db_path)
     ],
     language='c++',
@@ -635,10 +674,10 @@ _layview = Library(
     define_macros=config.macros() + [('MAKE_LAYVIEW_LIBRARY', 1)],
     include_dirs=[_laybasic_path, _rdb_path, _db_path, _tl_path, _gsi_path],
     extra_objects=[
-        config.path_of('_laybasic', _laybasic_path), 
-        config.path_of('_rdb', _rdb_path), 
-        config.path_of('_tl', _tl_path), 
-        config.path_of('_gsi', _gsi_path), 
+        config.path_of('_laybasic', _laybasic_path),
+        config.path_of('_rdb', _rdb_path),
+        config.path_of('_tl', _tl_path),
+        config.path_of('_gsi', _gsi_path),
         config.path_of('_db', _db_path)
     ],
     language='c++',
@@ -660,9 +699,9 @@ _lym = Library(
     define_macros=config.macros() + [('MAKE_LYM_LIBRARY', 1)],
     include_dirs=[_pya_path, _rba_path, _tl_path, _gsi_path],
     extra_objects=[
-        config.path_of('_rba', _rba_path), 
-        config.path_of('_pya', _pya_path), 
-        config.path_of('_tl', _tl_path), 
+        config.path_of('_rba', _rba_path),
+        config.path_of('_pya', _pya_path),
+        config.path_of('_tl', _tl_path),
         config.path_of('_gsi', _gsi_path)
     ],
     language='c++',
@@ -684,11 +723,11 @@ _ant = Library(
     define_macros=config.macros() + [('MAKE_ANT_LIBRARY', 1)],
     include_dirs=[_laybasic_path, _layview_path, _rdb_path, _db_path, _tl_path, _gsi_path],
     extra_objects=[
-        config.path_of('_laybasic', _laybasic_path), 
-        config.path_of('_layview', _layview_path), 
-        config.path_of('_rdb', _rdb_path), 
-        config.path_of('_tl', _tl_path), 
-        config.path_of('_gsi', _gsi_path), 
+        config.path_of('_laybasic', _laybasic_path),
+        config.path_of('_layview', _layview_path),
+        config.path_of('_rdb', _rdb_path),
+        config.path_of('_tl', _tl_path),
+        config.path_of('_gsi', _gsi_path),
         config.path_of('_db', _db_path)
     ],
     language='c++',
@@ -710,11 +749,11 @@ _img = Library(
     define_macros=config.macros() + [('MAKE_IMG_LIBRARY', 1)],
     include_dirs=[_laybasic_path, _layview_path, _rdb_path, _db_path, _tl_path, _gsi_path],
     extra_objects=[
-        config.path_of('_laybasic', _laybasic_path), 
-        config.path_of('_layview', _layview_path), 
-        config.path_of('_rdb', _rdb_path), 
-        config.path_of('_tl', _tl_path), 
-        config.path_of('_gsi', _gsi_path), 
+        config.path_of('_laybasic', _laybasic_path),
+        config.path_of('_layview', _layview_path),
+        config.path_of('_rdb', _rdb_path),
+        config.path_of('_tl', _tl_path),
+        config.path_of('_gsi', _gsi_path),
         config.path_of('_db', _db_path)
     ],
     language='c++',
@@ -736,11 +775,11 @@ _edt = Library(
     define_macros=config.macros() + [('MAKE_EDT_LIBRARY', 1)],
     include_dirs=[_laybasic_path, _layview_path, _rdb_path, _db_path, _tl_path, _gsi_path],
     extra_objects=[
-        config.path_of('_laybasic', _laybasic_path), 
-        config.path_of('_layview', _layview_path), 
-        config.path_of('_rdb', _rdb_path), 
-        config.path_of('_tl', _tl_path), 
-        config.path_of('_gsi', _gsi_path), 
+        config.path_of('_laybasic', _laybasic_path),
+        config.path_of('_layview', _layview_path),
+        config.path_of('_rdb', _rdb_path),
+        config.path_of('_tl', _tl_path),
+        config.path_of('_gsi', _gsi_path),
         config.path_of('_db', _db_path)
     ],
     language='c++',
@@ -879,23 +918,23 @@ lay_sources = set(glob.glob(os.path.join(lay_path, "*.cc")))
 
 lay = Extension(config.root + '.laycore',
                 define_macros=config.macros(),
-                include_dirs=[_laybasic_path, 
-                              _layview_path, 
-                              _img_path, 
-                              _ant_path, 
-                              _edt_path, 
-                              _lym_path, 
-                              _tl_path, 
-                              _gsi_path, 
+                include_dirs=[_laybasic_path,
+                              _layview_path,
+                              _img_path,
+                              _ant_path,
+                              _edt_path,
+                              _lym_path,
+                              _tl_path,
+                              _gsi_path,
                               _pya_path],
-                extra_objects=[config.path_of('_laybasic', _laybasic_path), 
-                               config.path_of('_layview', _layview_path), 
-                               config.path_of('_img', _img_path), 
-                               config.path_of('_ant', _ant_path), 
-                               config.path_of('_edt', _edt_path), 
-                               config.path_of('_lym', _lym_path), 
-                               config.path_of('_tl', _tl_path), 
-                               config.path_of('_gsi', _gsi_path), 
+                extra_objects=[config.path_of('_laybasic', _laybasic_path),
+                               config.path_of('_layview', _layview_path),
+                               config.path_of('_img', _img_path),
+                               config.path_of('_ant', _ant_path),
+                               config.path_of('_edt', _edt_path),
+                               config.path_of('_lym', _lym_path),
+                               config.path_of('_tl', _tl_path),
+                               config.path_of('_gsi', _gsi_path),
                                config.path_of('_pya', _pya_path)],
                 extra_link_args=config.link_args('laycore'),
                 extra_compile_args=config.compile_args('laycore'),
@@ -935,7 +974,8 @@ if __name__ == "__main__":
         package_data={config.root: ["src/pymod/distutils_src/klayout/*.pyi"]},
         data_files=[(config.root, ["src/pymod/distutils_src/klayout/py.typed"])],
         include_package_data=True,
-        ext_modules=[_tl, _gsi, _pya, _rba, _db, _lib, _rdb, _lym, _laybasic, _layview, _ant, _edt, _img] 
-            + db_plugins 
-            + [tl, db, lib, rdb, lay]
+        ext_modules=[_tl, _gsi, _pya, _rba, _db, _lib, _rdb, _lym, _laybasic, _layview, _ant, _edt, _img]
+            + db_plugins
+            + [tl, db, lib, rdb, lay],
+        cmdclass={'build_ext': klayout_build_ext}
     )

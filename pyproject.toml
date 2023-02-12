@@ -24,5 +24,9 @@ before-build = "ccache -s"
 environment-pass = ["HOST_CCACHE_DIR"]
 
 [tool.cibuildwheel.macos]
-# Don't repair macOS wheels
-repair-wheel-command = ""
+before-all = [
+  "brew install libpng",
+  "brew deps --tree --installed",
+]
+# Repair macOS wheels (include libpng with the wheel, for example)
+repair-wheel-command = "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v --ignore-missing-dependencies {wheel}"

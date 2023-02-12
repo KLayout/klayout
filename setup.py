@@ -427,7 +427,8 @@ class Config(object):
             ("GSI_ALIAS_INSPECT", 1),
         ]
 
-        if platform.system() == "Darwin" and check_libpng():
+        if platform.system() == "Darwin":
+            if check_libpng():
                 macros += [("HAVE_PNG", 1)]
         else:
             macros += [("HAVE_PNG", 1)]
@@ -940,6 +941,17 @@ lay = Extension(config.root + '.laycore',
                 extra_compile_args=config.compile_args('laycore'),
                 sources=list(lay_sources))
 
+# Patching versioneer's get_versions
+# Ordinarily it returns a version like 0.28.5+1.12bac3..
+# I patch it so it now returns the same version as config.version
+import versioneer
+_oldv_get_versions = versioneer.get_versions  # type: ignore
+def _v_get_versions(*args, **kwargs):
+    ret =_oldv_get_versions(*args, **kwargs)
+    ret['version'] = config.version()
+    return ret
+versioneer.get_versions = _v_get_versions  # type: ignore
+
 # ------------------------------------------------------------------
 # Core setup function
 
@@ -971,11 +983,11 @@ if __name__ == "__main__":
         package_dir={
             "": "src/pymod/distutils_src"
         },  # https://github.com/pypa/setuptools/issues/230
-        package_data={config.root: ["src/pymod/distutils_src/klayout/*.pyi"]},
+        package_data={config.root: ["src/pymod/distutils_src/klayout/*.pyi", "version.sh"]},
         data_files=[(config.root, ["src/pymod/distutils_src/klayout/py.typed"])],
         include_package_data=True,
         ext_modules=[_tl, _gsi, _pya, _rba, _db, _lib, _rdb, _lym, _laybasic, _layview, _ant, _edt, _img]
             + db_plugins
             + [tl, db, lib, rdb, lay],
-        cmdclass={'build_ext': klayout_build_ext}
+        cmdclass=versioneer.get_cmdclass({'build_ext': klayout_build_ext})  # type: ignore
     )

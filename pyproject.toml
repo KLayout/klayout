@@ -30,3 +30,16 @@ before-all = [
 ]
 # Repair macOS wheels (include libpng with the wheel, for example)
 repair-wheel-command = "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v --ignore-missing-dependencies {wheel}"
+
+# Tool for managing _version.py (used for klayout.__version__)
+[build-system]
+requires = ["setuptools", "versioneer[toml]"]
+build-backend = "setuptools.build_meta"
+
+[tool.versioneer]
+VCS = "git"
+style = "pep440"
+versionfile_source = "src/pymod/distutils_src/klayout/_version.py"
+versionfile_build = "klayout/_version.py"
+tag_prefix = "v"
+parentdir_prefix = "klayout-"

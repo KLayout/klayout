@@ -106,10 +106,10 @@ PYTHONTEST (dbLayoutToNetlist, "dbLayoutToNetlist.py")
 PYTHONTEST (dbLayoutVsSchematic, "dbLayoutVsSchematic.py")
 PYTHONTEST (dbNetlistCrossReference, "dbNetlistCrossReference.py")
 PYTHONTEST (layLayers, "layLayers.py")
+PYTHONTEST (layPixelBuffer, "layPixelBuffer.py")
 PYTHONTEST (tlTest, "tlTest.py")
 #if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
 PYTHONTEST (qtbinding, "qtbinding.py")
 #endif
 
 #endif
-

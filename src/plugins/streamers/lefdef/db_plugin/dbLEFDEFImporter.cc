@@ -1990,7 +1990,11 @@ LEFDEFImporter::read (tl::InputStream &stream, db::Layout &layout, LEFDEFReaderS
 void 
 LEFDEFImporter::error (const std::string &msg)
 {
-  throw LEFDEFReaderException (msg, int (mp_stream->line_number ()), m_cellname, m_fn);
+  if (m_sections.empty ()) {
+    throw LEFDEFReaderException (msg, int (mp_stream->line_number ()), m_cellname, m_fn);
+  } else {
+    throw LEFDEFReaderException (msg + tl::sprintf (tl::to_string (tr (" (inside %s)")), tl::join (m_sections, "/")), int (mp_stream->line_number ()), m_cellname, m_fn);
+  }
 }
 
 void 
@@ -2138,6 +2142,18 @@ LEFDEFImporter::get ()
   std::string r;
   r.swap (m_last_token);
   return r;
+}
+
+void
+LEFDEFImporter::enter_section (const std::string &name)
+{
+  m_sections.push_back (name);
+}
+
+void
+LEFDEFImporter::leave_section ()
+{
+  m_sections.pop_back ();
 }
 
 const std::string &

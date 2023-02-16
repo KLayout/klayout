@@ -317,6 +317,12 @@ TEST(lef7)
   run_test (_this, "lef7", "lef:in_tech.lef+lef:in.lef", "au.oas.gz", options);
 }
 
+TEST(lef8)
+{
+  //  this is rather a smoke test and throws a number of warnings
+  run_test (_this, "lef8", "lef:tech.lef+lef:a.lef", "au.oas.gz", default_options ());
+}
+
 TEST(def1)
 {
   run_test (_this, "def1", "lef:in.lef+def:in.def", "au2.oas.gz", default_options ());
@@ -418,6 +424,7 @@ TEST(def15)
 
 TEST(def16)
 {
+  //  this is rather a smoke test
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_macro_resolution_mode (1);
   run_test (_this, "def16", "lef:a.lef+lef:tech.lef+def:a.def", "au.oas.gz", opt);

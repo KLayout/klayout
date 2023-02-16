@@ -404,14 +404,14 @@ LEFImporter::read_nondefaultrule (db::Layout &layout)
   //  read NONDEFAULTRULE sections
   std::string n = get ();
 
-  while (! test ("END")) {
+  while (! at_end () && ! test ("END")) {
 
     if (test ("LAYER")) {
 
       std::string l = get ();
 
       //  read the width for the layer
-      while (! test ("END")) {
+      while (! at_end () && ! test ("END")) {
         if (test ("WIDTH")) {
           double w = get_double ();
           test (";");
@@ -452,7 +452,7 @@ LEFImporter::read_nondefaultrule (db::Layout &layout)
 void
 LEFImporter::read_viadef_by_rule (RuleBasedViaGenerator *vg, ViaDesc &via_desc, const std::string & /*n*/, double dbu)
 {
-  while (! test ("END")) {
+  while (! at_end () && ! test ("END")) {
 
     double x, y;
 
@@ -1181,7 +1181,7 @@ LEFImporter::do_read (db::Layout &layout)
       LEFDEFSection section (this, "BEGINEXT");
 
       //  read over BEGINEXT sections
-      while (! test ("ENDEXT")) {
+      while (! at_end () && ! test ("ENDEXT")) {
         take ();
       }
 

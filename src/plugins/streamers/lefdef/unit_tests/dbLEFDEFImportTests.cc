@@ -320,6 +320,7 @@ TEST(lef7)
 TEST(lef8)
 {
   //  this is rather a smoke test and throws a number of warnings
+  //  (complete example)
   run_test (_this, "lef8", "lef:tech.lef+lef:a.lef", "au.oas.gz", default_options ());
 }
 
@@ -425,6 +426,7 @@ TEST(def15)
 TEST(def16)
 {
   //  this is rather a smoke test
+  //  (complete example)
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_macro_resolution_mode (1);
   run_test (_this, "def16", "lef:a.lef+lef:tech.lef+def:a.def", "au.oas.gz", opt);
@@ -966,5 +968,11 @@ TEST(205_lef_resistance)
   lefdef_opt.set_lef_labels_suffix (".LEFLABEL");
 
   run_test (_this, "issue-1214", "read:merged.nom.lef", "au.oas.gz", lefdef_opt, false);
+}
+
+//  issue 1282
+TEST(206_lef_spacing)
+{
+  run_test (_this, "issue-1282", "read:a.lef", 0, default_options (), false);
 }
 

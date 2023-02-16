@@ -22,20 +22,23 @@ import dbLayoutToNetlist
 import dbLayoutVsSchematic
 import dbNetlistCrossReference
 import layLayers
-  
+import layPixelBuffer
+
 if __name__ == '__main__':
-  suite = unittest.TestLoader().loadTestsFromTestCase(tlTest.TLTest)
-  suite = unittest.TestLoader().loadTestsFromTestCase(dbPCells.DBPCellTests)
-  suite = unittest.TestLoader().loadTestsFromTestCase(dbLayoutTest.DBLayoutTest)
-  suite = unittest.TestLoader().loadTestsFromTestCase(dbPolygonTest.DBPolygonTests)
-  suite = unittest.TestLoader().loadTestsFromTestCase(dbReaders.DBReadersTests)
-  suite = unittest.TestLoader().loadTestsFromTestCase(dbRegionTest.DBRegionTest)
-  suite = unittest.TestLoader().loadTestsFromTestCase(dbTransTest.DBTransTests)
-  suite = unittest.TestLoader().loadTestsFromTestCase(dbLayoutToNetlist.DBLayoutToNetlistTests)
-  suite = unittest.TestLoader().loadTestsFromTestCase(dbLayoutVsSchematic.DBLayoutVsSchematicTests)
-  suite = unittest.TestLoader().loadTestsFromTestCase(dbNetlistCrossReference.DBNetlistCrossReferenceTests)
-  suite = unittest.TestLoader().loadTestsFromTestCase(layLayers.LAYLayersTests)
+  loader = unittest.TestLoader()
+  suite = unittest.TestSuite()
+  suite.addTests(loader.loadTestsFromTestCase(tlTest.TLTest))
+  suite.addTests(loader.loadTestsFromTestCase(dbPCells.DBPCellTests))
+  suite.addTests(loader.loadTestsFromTestCase(dbLayoutTest.DBLayoutTest))
+  suite.addTests(loader.loadTestsFromTestCase(dbPolygonTest.DBPolygonTests))
+  suite.addTests(loader.loadTestsFromTestCase(dbReaders.DBReadersTests))
+  suite.addTests(loader.loadTestsFromTestCase(dbRegionTest.DBRegionTest))
+  suite.addTests(loader.loadTestsFromTestCase(dbTransTest.DBTransTests))
+  suite.addTests(loader.loadTestsFromTestCase(dbLayoutToNetlist.DBLayoutToNetlistTests))
+  suite.addTests(loader.loadTestsFromTestCase(dbLayoutVsSchematic.DBLayoutVsSchematicTests))
+  suite.addTests(loader.loadTestsFromTestCase(dbNetlistCrossReference.DBNetlistCrossReferenceTests))
+  suite.addTests(loader.loadTestsFromTestCase(layLayers.LAYLayersTests))
+  suite.addTests(loader.loadTestsFromTestCase(layPixelBuffer.LAYPixelBufferTests))
 
   if not unittest.TextTestRunner(verbosity = 1).run(suite).wasSuccessful():
     sys.exit(1)
-

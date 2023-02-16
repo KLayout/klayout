@@ -46,7 +46,7 @@ class DBLayoutToNetlistTests(unittest.TestCase):
     self.assertEqual(l2n.internal_layout().top_cell().name, ly.top_cell().name)
     self.assertEqual(l2n.internal_top_cell().name, ly.top_cell().name)
 
-    self.assertNotEqual(l2n.layer_of(r), ly.layer(6, 0))  # would be a strange coincidence ... 
+    self.assertNotEqual(l2n.layer_of(r), ly.layer(6, 0))  # would be a strange coincidence ...
 
     cm = l2n.const_cell_mapping_into(ly, ly.top_cell())
     for ci in range(0, l2n.internal_layout().cells()):
@@ -80,7 +80,7 @@ class DBLayoutToNetlistTests(unittest.TestCase):
     rvia1       = l2n.make_polygon_layer( ly.layer(7, 0), "via1" )
     rmetal2     = l2n.make_polygon_layer( ly.layer(8, 0), "metal2" )
     rmetal2_lbl = l2n.make_text_layer(    ly.layer(8, 1), "metal2_lbl" )
-    
+
     # Intra-layer
     l2n.connect(rmetal1)
     l2n.connect(rvia1)
@@ -92,7 +92,7 @@ class DBLayoutToNetlistTests(unittest.TestCase):
     l2n.connect(rmetal1,    rmetal1_lbl)   #  attaches labels
     l2n.connect(rmetal2,    rmetal2_lbl)   #  attaches labels
 
-    # Perform netlist extraction 
+    # Perform netlist extraction
     l2n.extract_netlist()
 
     self.assertEqual(str(l2n.netlist()), """circuit TRANS ($1=$1,$2=$2);
@@ -137,7 +137,7 @@ end;
     self.assertEqual(",".join(a), "$2")
     self.assertEqual(str(t), "r0 *1 2.64,0")
 
-    self.assertEqual(str(l2n.shapes_of_net(n, rmetal1, True)), 
+    self.assertEqual(str(l2n.shapes_of_net(n, rmetal1, True)),
         "(-980,-420;-980,2420;-620,2420;-620,-420);(-800,820;-800,1180;580,1180;580,820);(-980,2420;-980,3180;-620,3180;-620,2420);(-980,-380;-980,380;-620,380;-620,-380)")
 
     shapes = pya.Shapes()
@@ -145,7 +145,7 @@ end;
     r = pya.Region()
     for s in shapes.each():
       r.insert(s.polygon)
-    self.assertEqual(str(r), 
+    self.assertEqual(str(r),
         "(-980,-420;-980,2420;-620,2420;-620,-420);(-800,820;-800,1180;580,1180;580,820);(-980,2420;-980,3180;-620,3180;-620,2420);(-980,-380;-980,380;-620,380;-620,-380)")
 
   def test_10_LayoutToNetlistExtractionWithoutDevices(self):
@@ -169,7 +169,7 @@ end;
     rvia1       = l2n.make_polygon_layer( ly.layer(7, 0), "via1" )
     rmetal2     = l2n.make_polygon_layer( ly.layer(8, 0), "metal2" )
     rmetal2_lbl = l2n.make_text_layer(    ly.layer(8, 1), "metal2_lbl" )
-    
+
     rsd         = ractive - rpoly
 
     l2n.register(rsd, "sd")
@@ -194,7 +194,7 @@ end;
     l2n.connect(rmetal1,    rmetal1_lbl)   #  attaches labels
     l2n.connect(rmetal2,    rmetal2_lbl)   #  attaches labels
 
-    # Perform netlist extraction 
+    # Perform netlist extraction
     l2n.extract_netlist()
 
     self.assertEqual(str(l2n.netlist()), """circuit TRANS ($1=$1,$2=$2,$3=$3);
@@ -247,7 +247,7 @@ end;
     rnactive    = ractive - rnwell
     rngate      = rnactive & rpoly
     rnsd        = rnactive - rngate
-    
+
     # PMOS transistor device extraction
     pmos_ex = pya.DeviceExtractorMOS3Transistor("PMOS")
     l2n.extract_devices(pmos_ex, { "SD": rpsd, "G": rpgate, "P": rpoly })
@@ -282,8 +282,8 @@ end;
     l2n.connect(rpoly,      rpoly_lbl)     #  attaches labels
     l2n.connect(rmetal1,    rmetal1_lbl)   #  attaches labels
     l2n.connect(rmetal2,    rmetal2_lbl)   #  attaches labels
-    
-    # Perform netlist extraction 
+
+    # Perform netlist extraction
     l2n.extract_netlist()
 
     self.assertEqual(str(l2n.netlist()), """circuit RINGO ();
@@ -397,8 +397,8 @@ end;
     # Global connections
     l2n.connect_global(rptie, "BULK")
     l2n.connect_global(rbulk, "BULK")
-    
-    # Perform netlist extraction 
+
+    # Perform netlist extraction
     l2n.extract_netlist()
 
     self.assertEqual(str(l2n.netlist()), """circuit RINGO ();
@@ -455,7 +455,7 @@ end;
   def test_13_ReadAndWrite(self):
 
     ut_testsrc = os.getenv("TESTSRC")
-    ut_testtmp = os.getenv("TESTTMP")
+    ut_testtmp = os.getenv("TESTTMP", "")
 
     l2n = pya.LayoutToNetlist()
 
@@ -725,4 +725,3 @@ if __name__ == '__main__':
 
   if not unittest.TextTestRunner(verbosity = 1).run(suite).wasSuccessful():
     sys.exit(1)
-

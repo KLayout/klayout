@@ -98,7 +98,7 @@ class DBLayoutVsSchematicTests(unittest.TestCase):
     lvs.connect(metal2)
     lvs.connect(ptie)
     lvs.connect(ntie)
-    
+
     # inter-layer
     lvs.connect(psd,       diff_cont)
     lvs.connect(nsd,       diff_cont)
@@ -113,7 +113,7 @@ class DBLayoutVsSchematicTests(unittest.TestCase):
     lvs.connect(poly,      poly_lbl)     #  attaches labels
     lvs.connect(metal1,    metal1_lbl)   #  attaches labels
     lvs.connect(metal2,    metal2_lbl)   #  attaches labels
-    
+
     # global
     lvs.connect_global(ptie, "BULK")
     lvs.connect_global(bulk, "BULK")
@@ -144,7 +144,7 @@ class DBLayoutVsSchematicTests(unittest.TestCase):
   def test_3_ReadAndWrite(self):
 
     ut_testsrc = os.getenv("TESTSRC")
-    ut_testtmp = os.getenv("TESTTMP")
+    ut_testtmp = os.getenv("TESTTMP", "")
 
     lvs = pya.LayoutVsSchematic()
 
@@ -181,4 +181,3 @@ if __name__ == '__main__':
 
   if not unittest.TextTestRunner(verbosity = 1).run(suite).wasSuccessful():
     sys.exit(1)
-

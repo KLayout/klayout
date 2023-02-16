@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>622</width>
+    <width>669</width>
     <height>621</height>
    </rect>
   </property>
@@ -1142,10 +1142,34 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>fmt_le</tabstop>
+  <tabstop>main_position</tabstop>
+  <tabstop>main_xalign</tabstop>
+  <tabstop>main_yalign</tabstop>
   <tabstop>fmt_x_le</tabstop>
+  <tabstop>xlabel_xalign</tabstop>
+  <tabstop>xlabel_yalign</tabstop>
   <tabstop>fmt_y_le</tabstop>
+  <tabstop>ylabel_xalign</tabstop>
+  <tabstop>ylabel_yalign</tabstop>
   <tabstop>style_cb</tabstop>
   <tabstop>outline_cb</tabstop>
+  <tabstop>segments_tab</tabstop>
+  <tabstop>x0</tabstop>
+  <tabstop>y0</tabstop>
+  <tabstop>x1</tabstop>
+  <tabstop>y1</tabstop>
+  <tabstop>x2</tabstop>
+  <tabstop>y2</tabstop>
+  <tabstop>swap_points</tabstop>
+  <tabstop>p1_to_layout</tabstop>
+  <tabstop>p2_to_layout</tabstop>
+  <tabstop>both_to_layout</tabstop>
+  <tabstop>dx</tabstop>
+  <tabstop>dy</tabstop>
+  <tabstop>dd</tabstop>
+  <tabstop>point_list</tabstop>
+  <tabstop>points_edit</tabstop>
  </tabstops>
  <resources/>
  <connections/>

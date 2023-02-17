@@ -23,11 +23,11 @@ import sys
 
 def compare(pb1, pb2):
 
-  if pb1.width != pb2.width or pb1.height != pb2.height:
+  if pb1.width() != pb2.width() or pb1.height() != pb2.height():
     return False
 
-  for x in range(0, pb1.width):
-    for y in range(0, pb1.height):
+  for x in range(0, pb1.width()):
+    for y in range(0, pb1.height()):
       if pb1.pixel(x, y) != pb2.pixel(x, y):
         return False
 
@@ -55,7 +55,7 @@ class LAYPixelBufferTests(unittest.TestCase):
 
     pb.write_png(tmp)
     pb_copy = pya.PixelBuffer.read_png(tmp)
-    self.assertEqual(pb, pb_copy)
+    self.assertEqual(compare(pb, pb_copy), True)
 
 
 # run unit tests

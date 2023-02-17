@@ -667,12 +667,18 @@ class LAYLayers_TestClass < TestBase
     p.clear_line_style
     assert_equal( p.has_line_style?, false )
 
+    assert_equal( p.is_expanded?, false )
+    p.expanded = true
+    assert_equal( p.is_expanded?, true )
+
     pp = RBA::LayerPropertiesNode::new
     assert_equal( pp == p, false )
     assert_equal( pp != p, true )
+    assert_equal( pp.is_expanded?, false )
     pp = p.dup
     assert_equal( pp == p, true )
     assert_equal( pp != p, false )
+    assert_equal( pp.is_expanded?, true )
 
   end
 

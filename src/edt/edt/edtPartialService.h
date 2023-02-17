@@ -363,7 +363,9 @@ private:
   void resize_markers (size_t n, bool transient);
   void resize_inst_markers (size_t n, bool transient);
   bool is_single_point_selection () const;
+  bool is_single_edge_selection () const;
   db::DPoint single_selected_point () const;
+  db::DEdge single_selected_edge () const;
   bool handle_guiding_shape_changes ();
   void transform_selection (const db::DTrans &move_trans);
 };

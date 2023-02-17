@@ -21,27 +21,41 @@ import unittest
 import os
 import sys
 
+def compare(pb1, pb2):
+
+  if pb1.width != pb2.width or pb1.height != pb2.height:
+    return False
+
+  for x in range(0, pb1.width):
+    for y in range(0, pb1.height):
+      if pb1.pixel(x, y) != pb2.pixel(x, y):
+        return False
+
+  return True
+
+
 class LAYPixelBufferTests(unittest.TestCase):
 
-    def test_4(self):
-        pb = pya.PixelBuffer(10, 20)
-        pb.transparent = True
-        pb.fill(0xf0010203)
+  def test_1(self):
 
-        png = pb.to_png_data()
+    pb = pya.PixelBuffer(10, 20)
+    pb.transparent = True
+    pb.fill(0xf0010203)
 
-        # some range because implementations may differ
-        self.assertGreater(len(png), 20)
-        self.assertLess(len(png), 200)
-        pb_copy = pya.PixelBuffer.from_png_data(png)
-        self.assertEqual(pb, pb_copy)
+    png = pb.to_png_data()
 
-        ut_testtmp = os.getenv("TESTTMP", ".")
-        tmp = os.path.join(ut_testtmp, "tmp.png")
+    # some range because implementations may differ
+    self.assertGreater(len(png), 20)
+    self.assertLess(len(png), 200)
+    pb_copy = pya.PixelBuffer.from_png_data(png)
+    self.assertEqual(pb, pb_copy)
 
-        pb.write_png(tmp)
-        pb_copy = pya.PixelBuffer.read_png(tmp)
-        self.assertEqual(pb, pb_copy)
+    ut_testtmp = os.getenv("TESTTMP", ".")
+    tmp = os.path.join(ut_testtmp, "tmp.png")
+
+    pb.write_png(tmp)
+    pb_copy = pya.PixelBuffer.read_png(tmp)
+    self.assertEqual(pb, pb_copy)
 
 
 # run unit tests

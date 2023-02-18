@@ -48,7 +48,7 @@ class LAYPixelBufferTests(unittest.TestCase):
     self.assertGreater(len(png), 20)
     self.assertLess(len(png), 200)
     pb_copy = pya.PixelBuffer.from_png_data(png)
-    self.assertEqual(pb, pb_copy)
+    self.assertEqual(compare(pb, pb_copy), True)
 
     ut_testtmp = os.getenv("TESTTMP", ".")
     tmp = os.path.join(ut_testtmp, "tmp.png")

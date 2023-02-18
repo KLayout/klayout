@@ -1552,15 +1552,19 @@ PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, boo
     m_alt_ac = ac_from_buttons (buttons);
 
     //  drag the vertex or edge/segment
-    if (m_selection.size () == 1 && ! m_selection.begin ()->first.is_cell_inst () && (m_selection.begin ()->second.size () == 1 /*p*/ || m_selection.begin ()->second.size () == 3 /*p1,p2,edge*/)) {
+    if (is_single_point_selection () || is_single_edge_selection ()) {
 
       lay::PointSnapToObjectResult snap_details;
 
       //  for a single selected point or edge, m_start is the original position and we snap the target -
       //  thus, we can bring the point on grid or to an object's edge or vertex
       snap_details = snap2 (p);
-      m_current = snap_details.snapped_point;
-      mouse_cursor_from_snap_details (snap_details);
+      if (snap_details.object_snap == lay::PointSnapToObjectResult::NoObject) {
+        m_current = m_start + snap (p - m_start);
+      } else {
+        m_current = snap_details.snapped_point;
+        mouse_cursor_from_snap_details (snap_details);
+      }
 
     } else {
 
@@ -1599,6 +1603,17 @@ PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, boo
 
   //  pass on this event to other handlers
   return false;
+}
+
+static db::DPoint
+projected_to_edge (const db::DEdge &edge, const db::DPoint &p)
+{
+  if (edge.is_degenerate ()) {
+    return edge.p1 ();
+  } else {
+    db::DVector v = edge.d () * (1.0 / edge.length ());
+    return edge.p1 () + v * db::sprod (p - edge.p1 (), v);
+  }
 }
 
 bool  
@@ -1674,8 +1689,12 @@ PartialService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bo
 
       if (is_single_point_selection ()) {
         //  for a single selected point we use the original point as the start location which 
-        //  allows bringing a to grid
+        //  allows bringing it to grid
         m_current = m_start = single_selected_point ();
+      } else if (is_single_edge_selection ()) {
+        //  for an edge selection use the point projected to edge as the start location which
+        //  allows bringing it to grid
+        m_current = m_start = projected_to_edge (single_selected_edge (), p);
       } else {
         m_current = m_start = p;
       }
@@ -1863,8 +1882,12 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
 
         if (is_single_point_selection ()) {
           //  for a single selected point we use the original point as the start location which 
-          //  allows bringing a to grid
+          //  allows bringing it to grid
           m_current = m_start = single_selected_point ();
+        } else if (is_single_edge_selection ()) {
+          //  for an edge selection use the point projected to edge as the start location which
+          //  allows bringing it to grid
+          m_current = m_start = projected_to_edge (single_selected_edge (), p);
         } else {
           m_current = m_start = p;
         }
@@ -2388,6 +2411,28 @@ bool
 PartialService::is_single_point_selection () const
 {
   return (m_selection.size () == 1 && ! m_selection.begin ()->first.is_cell_inst () && m_selection.begin ()->second.size () == 1 /*p*/);
+}
+
+db::DEdge
+PartialService::single_selected_edge () const
+{
+  //  build the transformation variants cache and
+  //  use only the first one of the explicit transformations
+  //  TODO: clarify how this can be implemented in a more generic form or leave it thus.
+  TransformationVariants tv (view ());
+  const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (m_selection.begin ()->first.cv_index (), m_selection.begin ()->first.layer ());
+
+  const lay::CellView &cv = view ()->cellview (m_selection.begin ()->first.cv_index ());
+  db::ICplxTrans gt (cv.context_trans () * m_selection.begin ()->first.trans ());
+  db::CplxTrans tt = (*tv_list)[0] * db::CplxTrans (cv->layout ().dbu ()) * gt;
+
+  return tt * *m_selection.begin ()->second.begin ();
+}
+
+bool
+PartialService::is_single_edge_selection () const
+{
+  return (m_selection.size () == 1 && ! m_selection.begin ()->first.is_cell_inst () && m_selection.begin ()->second.size () == 3 /*p1,p2,edge*/);
 }
 
 bool

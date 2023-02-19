@@ -277,81 +277,88 @@ static void run_test2 (tl::TestBase *_this, const char *lef_dir, const char *fil
   }
 }
 
-TEST(1)
+TEST(lef1)
 {
   run_test (_this, "lef1", "lef:in.lef", 0, default_options ());
 }
 
-TEST(2)
+TEST(lef2)
 {
   //  Also tests ability of plugin to properly read LEF
   run_test (_this, "lef2", "read:in.lef", "au.oas.gz", default_options ());
 }
 
-TEST(3)
+TEST(lef3)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_cell_outline_layer ("OUTLINE (2/0)");
   run_test (_this, "lef3", "lef:in.lef", "au.oas.gz", options);
 }
 
-TEST(4)
+TEST(lef4)
 {
   run_test (_this, "lef4", "lef:in.lef", 0, default_options ());
 }
 
-TEST(5)
+TEST(lef5)
 {
   run_test (_this, "lef5", "lef:in.lef", 0, default_options ());
 }
 
-TEST(6)
+TEST(lef6)
 {
   run_test (_this, "lef6", "lef:in.lef", 0, default_options ());
 }
 
-TEST(7)
+TEST(lef7)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_cell_outline_layer ("OUTLINE (8/0)");
   run_test (_this, "lef7", "lef:in_tech.lef+lef:in.lef", "au.oas.gz", options);
 }
 
-TEST(10)
+TEST(lef8)
+{
+  //  this is rather a smoke test and throws a number of warnings
+  //  (complete example)
+  run_test (_this, "lef8", "lef:tech.lef+lef:a.lef", "au.oas.gz", default_options ());
+}
+
+TEST(def1)
 {
   run_test (_this, "def1", "lef:in.lef+def:in.def", "au2.oas.gz", default_options ());
 }
 
-TEST(11)
+TEST(def2)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_cell_outline_layer ("OUTLINE (10/0)");
   run_test (_this, "def2", "lef:0.lef+lef:1.lef+def:in.def.gz", "au.oas.gz", options);
 }
 
-TEST(12)
+TEST(def3)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_cell_outline_layer ("OUTLINE (13/0)");
   run_test (_this, "def3", "lef:in.lef+def:in.def", "au.oas.gz", options);
 }
 
-TEST(13)
+TEST(def4)
 {
   run_test (_this, "def4", "lef:in.lef+def:in.def", "au2.oas.gz", default_options ());
 }
 
-TEST(14)
+TEST(def5)
 {
   run_test (_this, "def5", "lef:in.lef+def:in.def", "au.oas.gz", default_options ());
 }
 
-TEST(15)
+TEST(def6)
 {
   run_test (_this, "def6", "lef:cells.lef+lef:tech.lef+def:in.def.gz", "au-new.oas.gz", default_options ());
 }
 
-TEST(16)
+TEST(def7)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_placement_blockage_layer ("PLACEMENT_BLK (11/0)");
@@ -361,12 +368,12 @@ TEST(16)
   run_test (_this, "def7", "map:in.map+lef:cells.lef+lef:tech.lef+def:in.def.gz", "au2_with_map_file-new.oas.gz", options);
 }
 
-TEST(17)
+TEST(def8)
 {
   run_test (_this, "def8", "lef:tech.lef+def:in.def", "au.oas.gz", default_options ());
 }
 
-TEST(18)
+TEST(def9)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_separate_groups (true);
@@ -375,45 +382,54 @@ TEST(18)
   run_test (_this, "def9", "lef:tech.lef+lef:cells_modified.lef+def:in.def", "au_nogroups-new.oas.gz", default_options ());
 }
 
-TEST(19)
+TEST(def10)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_cell_outline_layer ("OUTLINE (2/0)");
   run_test (_this, "def10", "def:in.def", "au.oas.gz", opt);
 }
 
-TEST(20)
+TEST(def11)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_cell_outline_layer ("OUTLINE (12/0)");
   run_test (_this, "def11", "lef:test.lef+def:test.def", "au.oas.gz", opt);
 }
 
-TEST(21)
+TEST(def12)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_cell_outline_layer ("OUTLINE (20/0)");
   run_test (_this, "def12", "lef:test.lef+def:test.def", "au-new.oas.gz", opt);
 }
 
-TEST(22)
+TEST(def13)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   run_test (_this, "def13", "map:test.map+lef:test.lef_5.8+def:top.def.gz", "au2.oas.gz", opt);
 }
 
-TEST(23)
+TEST(def14)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_macro_resolution_mode (1);
   run_test (_this, "def14", "map:test.map+lef:tech.lef+lef:stdlib.lef+def:test.def", "au.oas.gz", opt);
 }
 
-TEST(24)
+TEST(def15)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_macro_resolution_mode (1);
   run_test (_this, "def15", "map:test.map+lef:tech.lef+def:test.def", "au2.oas.gz", opt);
+}
+
+TEST(def16)
+{
+  //  this is rather a smoke test
+  //  (complete example)
+  db::LEFDEFReaderOptions opt = default_options ();
+  opt.set_macro_resolution_mode (1);
+  run_test (_this, "def16", "lef:a.lef+lef:tech.lef+def:a.def", "au.oas.gz", opt);
 }
 
 TEST(100)
@@ -952,5 +968,11 @@ TEST(205_lef_resistance)
   lefdef_opt.set_lef_labels_suffix (".LEFLABEL");
 
   run_test (_this, "issue-1214", "read:merged.nom.lef", "au.oas.gz", lefdef_opt, false);
+}
+
+//  issue 1282
+TEST(206_lef_spacing)
+{
+  run_test (_this, "issue-1282", "read:a.lef", 0, default_options (), false);
 }
 

@@ -51,6 +51,7 @@ namespace lay
 
 class LayoutViewBase;
 class LayerPropertiesConstIterator;
+class LayerPropertiesIterator;
 
 /**
  *  @brief A helper class implementing a cache for the "test shapes in view" feature
@@ -108,6 +109,16 @@ public:
   virtual QModelIndex parent (const QModelIndex &index) const;
 
   /**
+   *  @brief Sets the expanded state for a given model index
+   */
+  void set_expanded (const QModelIndex &index, bool ex);
+
+  /**
+   *  @brief Gets the expanded state for a given model index
+   */
+  bool expanded (const QModelIndex &index) const;
+
+  /**
    *  @brief Provides an icon for a given layer style
    */
   static QIcon icon_for_layer (const lay::LayerPropertiesConstIterator &iter, lay::LayoutViewBase *view, unsigned int w, unsigned int h, double dpr, unsigned int di_offset, bool no_state = false);
@@ -126,6 +137,11 @@ public:
    *  @brief Converts a QModelIndex to an iterator
    */
   lay::LayerPropertiesConstIterator iterator (const QModelIndex &index) const;
+
+  /**
+   *  @brief Converts a QModelIndex to an iterator (non-const)
+   */
+  lay::LayerPropertiesIterator iterator_nc (const QModelIndex &index);
 
   /**
    *  @brief Gets a flag indicating that an entry is hidden

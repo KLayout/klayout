@@ -135,6 +135,7 @@ TEST (1)
     "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
     "<layer-properties>\n"
     " <properties>\n"
+    "  <expanded>false</expanded>\n"
     "  <frame-color/>\n"
     "  <fill-color/>\n"
     "  <frame-brightness>0</frame-brightness>\n"

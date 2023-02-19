@@ -1880,6 +1880,21 @@ LayoutViewBase::replace_layer_node (unsigned int index, const LayerPropertiesCon
   }
 }
 
+void
+LayoutViewBase::set_layer_node_expanded (unsigned int index, const LayerPropertiesConstIterator &iter, bool ex)
+{
+  if (ex != iter->expanded ()) {
+
+    LayerPropertiesIterator non_const_iter (get_properties (index), iter.uint ());
+    non_const_iter->set_expanded (ex);
+
+    if (index == current_layer_list ()) {
+      layer_list_changed_event (8 /*expanded state needs update*/);
+    }
+
+  }
+}
+
 void 
 LayoutViewBase::set_properties (unsigned int index, const LayerPropertiesConstIterator &iter, const LayerProperties &props)
 {

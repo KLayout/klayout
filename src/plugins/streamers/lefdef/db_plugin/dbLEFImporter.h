@@ -152,6 +152,7 @@ private:
   void read_viadef_by_geometry (GeometryBasedLayoutGenerator *lg, ViaDesc &desc, const std::string &n, double dbu);
   void read_layer (Layout &layout);
   void read_macro (Layout &layout);
+  void skip_entry ();
 };
 
 }

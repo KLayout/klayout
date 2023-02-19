@@ -205,6 +205,7 @@ LayerControlPanel::LayerControlPanel (lay::LayoutViewBase *view, db::Manager *ma
     db::Object (manager),
     mp_view (view), 
     m_needs_update (true), 
+    m_expanded_state_needs_update (false),
     m_tabs_need_update (true), 
     m_hidden_flags_need_update (true),
     m_in_update (false),
@@ -1696,6 +1697,7 @@ LayerControlPanel::cancel_updates ()
 {
   m_in_update = false;
   m_needs_update = false;
+  m_expanded_state_needs_update = false;
   m_hidden_flags_need_update = false;
   m_tabs_need_update = false;
 }
@@ -1874,11 +1876,13 @@ LayerControlPanel::do_update_content ()
   }
 
   if (m_hidden_flags_need_update) {
-
     do_update_hidden_flags ();
-
     m_hidden_flags_need_update = false;
+  }
 
+  if (m_expanded_state_needs_update) {
+    restore_expanded ();
+    m_expanded_state_needs_update = false;
   }
 }
 
@@ -1994,6 +1998,11 @@ void
 LayerControlPanel::update_required (int f)
 {
   //  the name of a layer list has changed
+  if ((f & 8) != 0) {
+    m_expanded_state_needs_update = true;
+  }
+
+  //  the name of a layer list has changed
   if ((f & 4) != 0) {
     m_tabs_need_update = true;
   }
@@ -2032,18 +2041,18 @@ LayerControlPanel::current_index_changed (const QModelIndex &index)
 void
 LayerControlPanel::group_collapsed (const QModelIndex &index)
 {
-  lay::LayerPropertiesConstIterator iter = mp_model->iterator (index);
+  auto iter = mp_model->iterator_nc (index);
   if (! iter.is_null () && ! iter.at_end ()) {
-    m_expanded.erase (iter->id ());
+    iter->set_expanded_silent (false);
   }
 }
 
 void
 LayerControlPanel::group_expanded (const QModelIndex &index)
 {
-  lay::LayerPropertiesConstIterator iter = mp_model->iterator (index);
+  auto iter = mp_model->iterator_nc (index);
   if (! iter.is_null () && ! iter.at_end ()) {
-    m_expanded.insert (iter->id ());
+    iter->set_expanded_silent (true);
   }
 }
 
@@ -2052,33 +2061,16 @@ LayerControlPanel::restore_expanded ()
 {
   mp_layer_list->blockSignals (true);
 
-#if 1
-  //  By keeping m_expanded, we can preserve the expansion state of different tabs.
-  //  However we will always continue filling m_expanded.
   lay::LayerPropertiesConstIterator l = mp_view->begin_layers ();
   while (! l.at_end ()) {
-    if (m_expanded.find (l->id ()) != m_expanded.end ()) {
-      QModelIndex index = mp_model->index (l, 0);
+    QModelIndex index = mp_model->index (l, 0);
+    if (l->expanded ()) {
       mp_layer_list->expand (index);
+    } else {
+      mp_layer_list->collapse (index);
     }
     ++l;
   }
-#else
-  //  this solution will forget the other tab's expansion flags.
-  std::set<unsigned int> new_expanded;
-
-  lay::LayerPropertiesConstIterator l = mp_view->begin_layers ();
-  while (! l.at_end ()) {
-    if (m_expanded.find (l->id ()) != m_expanded.end ()) {
-      new_expanded.insert (l->id ());
-      QModelIndex index = mp_model->index (l, 0);
-      mp_layer_list->expand (index);
-    }
-    ++l;
-  }
-
-  m_expanded.swap (new_expanded);
-#endif
 
   mp_layer_list->blockSignals (false);
 }
@@ -2287,7 +2279,7 @@ public:
 
     menu_entries.push_back (lay::menu_item ("cm_lv_select_all", "select_all", at, tl::to_string (QObject::tr ("Select All"))));
     //  It is not sure, whether "expandAll" destabilizes the tree widget:
-    //  menu_entries.push_back (lay::menu_item ("cm_lv_expand_all", "expand_all", at, tl::to_string (QObject::tr ("Expand All")));
+    //  menu_entries.push_back (lay::menu_item ("cm_lv_expand_all", "expand_all", at, tl::to_string (QObject::tr ("Expand All"))));
     menu_entries.push_back (lay::separator ("tab_group", at));
     menu_entries.push_back (lay::submenu ("tab_menu", at, tl::to_string (QObject::tr ("Tabs"))));
 

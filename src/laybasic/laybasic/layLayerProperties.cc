@@ -591,6 +591,12 @@ LayerProperties::need_realize (unsigned int flags, bool /*force*/)
   }
 }
 
+void
+LayerProperties::expanded_state_changed ()
+{
+  //  .. no effect ..
+}
+
 void 
 LayerProperties::do_realize (const LayoutViewBase *view) const
 {
@@ -651,7 +657,7 @@ static unsigned int s_unique_id = 0;
 
 LayerPropertiesNode::LayerPropertiesNode ()
   : LayerProperties (),
-    m_list_index (0)
+    m_list_index (0), m_expanded (false)
 {
   m_id = ++s_unique_id;
 }
@@ -663,7 +669,7 @@ LayerPropertiesNode::~LayerPropertiesNode ()
 
 LayerPropertiesNode::LayerPropertiesNode (const LayerProperties &d)
   : LayerProperties (d),
-    m_list_index (0)
+    m_list_index (0), m_expanded (false)
 {
   m_id = ++s_unique_id;
 }
@@ -671,6 +677,7 @@ LayerPropertiesNode::LayerPropertiesNode (const LayerProperties &d)
 LayerPropertiesNode::LayerPropertiesNode (const LayerPropertiesNode &d)
   : LayerProperties (d), tl::Object (),
     m_list_index (0),
+    m_expanded (d.m_expanded),
     m_children (d.m_children),
     m_id (d.m_id)
 {
@@ -687,6 +694,7 @@ LayerPropertiesNode::operator= (const LayerPropertiesNode &d)
     LayerProperties::operator= (d);
 
     m_children = d.m_children;
+    m_expanded = d.m_expanded;
     m_id = d.m_id;
 
     for (iterator c = m_children.begin (); c != m_children.end (); ++c) {
@@ -705,12 +713,21 @@ LayerPropertiesNode::operator== (const LayerPropertiesNode &d) const
   if (! LayerProperties::operator== (d)) {
     return false;
   }
-  return m_children == d.m_children;
+  return m_children == d.m_children && m_expanded == d.m_expanded;
 }
 
 LayoutViewBase *LayerPropertiesNode::view() const
 {
   return const_cast<lay::LayoutViewBase *> (mp_view.get ());
+}
+
+void
+LayerPropertiesNode::set_expanded (bool ex)
+{
+  if (expanded () != ex) {
+    m_expanded = ex;
+    expanded_state_changed ();
+  }
 }
 
 unsigned int
@@ -738,6 +755,12 @@ LayerPropertiesNode::realize_source () const
   }
   merge_source (mp_parent.get ());
   do_realize (mp_view.get ());
+}
+
+void
+LayerPropertiesNode::expanded_state_changed ()
+{
+  touch ();
 }
 
 void
@@ -1763,8 +1786,9 @@ struct LineStyleIndexConverter
 static const tl::XMLElementList layer_element = tl::XMLElementList (
   //  HINT: these make_member calls want to be qualified: otherwise an internal error
   //  was observed ..
-  tl::make_member<tl::color_t, LayerPropertiesNode> (&LayerPropertiesNode::frame_color_loc,      &LayerPropertiesNode::set_frame_color_code, "frame-color",        UIntColorConverter ()) + 
-  tl::make_member<tl::color_t, LayerPropertiesNode> (&LayerPropertiesNode::fill_color_loc,       &LayerPropertiesNode::set_fill_color_code,  "fill-color",         UIntColorConverter ()) + 
+  tl::make_member<bool, LayerPropertiesNode>         (&LayerPropertiesNode::expanded,             &LayerPropertiesNode::set_expanded,         "expanded") +
+  tl::make_member<tl::color_t, LayerPropertiesNode>  (&LayerPropertiesNode::frame_color_loc,      &LayerPropertiesNode::set_frame_color_code, "frame-color",        UIntColorConverter ()) +
+  tl::make_member<tl::color_t, LayerPropertiesNode>  (&LayerPropertiesNode::fill_color_loc,       &LayerPropertiesNode::set_fill_color_code,  "fill-color",         UIntColorConverter ()) +
   tl::make_member<int, LayerPropertiesNode>          (&LayerPropertiesNode::frame_brightness_loc, &LayerPropertiesNode::set_frame_brightness, "frame-brightness") + 
   tl::make_member<int, LayerPropertiesNode>          (&LayerPropertiesNode::fill_brightness_loc,  &LayerPropertiesNode::set_fill_brightness,  "fill-brightness") + 
   tl::make_member<int, LayerPropertiesNode>          (&LayerPropertiesNode::dither_pattern_loc,   &LayerPropertiesNode::set_dither_pattern,   "dither-pattern",     DitherPatternIndexConverter ()) + 
@@ -2058,6 +2082,16 @@ LayerPropertiesNodeRef::need_realize (unsigned int flags, bool force)
     *mp_node = *this;
     m_synched_gen_id = mp_node->gen_id ();
 
+  }
+}
+
+void
+LayerPropertiesNodeRef::expanded_state_changed ()
+{
+  LayerPropertiesNode::expanded_state_changed ();
+
+  if (is_valid ()) {
+    view ()->set_layer_node_expanded (m_iter, expanded ());
   }
 }
 

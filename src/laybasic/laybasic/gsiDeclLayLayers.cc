@@ -1189,6 +1189,16 @@ Class<lay::LayerPropertiesNode> decl_LayerPropertiesNode (
     "Unlike the name suggests, this node will still contain a hierarchy of nodes below if the original "
     "node did so."
   ) +
+  method ("is_expanded?", &lay::LayerPropertiesNode::expanded,
+    "@brief Gets a value indicating whether the layer tree node is expanded.\n"
+    "This predicate has been introduced in version 0.28.6."
+  ) +
+  method ("expanded=", &lay::LayerPropertiesNode::set_expanded, gsi::arg ("ex"),
+    "@brief Set a value indicating whether the layer tree node is expanded.\n"
+    "Setting this value to 'true' will expand (open) the tree node. Setting it to 'false' will collapse the node.\n"
+    "\n"
+    "This predicate has been introduced in version 0.28.6."
+  ) +
   method_ext ("add_child", &add_child0,
     "@brief Add a child entry\n"
     "@return A reference to the node created\n"

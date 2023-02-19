@@ -756,7 +756,20 @@ LayerTreeModel::iterator (const QModelIndex &index) const
   return lay::LayerPropertiesConstIterator ();
 }
 
-QModelIndex 
+lay::LayerPropertiesIterator
+LayerTreeModel::iterator_nc (const QModelIndex &index)
+{
+  if (index.isValid ()) {
+    size_t iter_index = size_t (index.internalPointer ());
+    if (mp_view->layer_lists () > 0 && iter_index >= m_id_start && iter_index < m_id_end) {
+      return lay::LayerPropertiesIterator (mp_view->get_properties (), iter_index - m_id_start);
+    }
+  }
+
+  return lay::LayerPropertiesIterator ();
+}
+
+QModelIndex
 LayerTreeModel::index (lay::LayerPropertiesConstIterator iter, int column) const
 {
   try {

@@ -318,7 +318,6 @@ Editables::transient_to_selection ()
 {
   bool had_transient_selection = false;
   bool had_selection = false;
-  cancel_edits ();
   for (iterator e = begin (); e != end (); ++e) {
     if (e->has_selection ()) {
       had_selection = true;

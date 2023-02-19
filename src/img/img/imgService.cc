@@ -418,7 +418,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     mp_transient_view (0),
     m_move_mode (Service::move_none),
     m_moved_landmark (0),
-    m_keep_selection_for_landmark (false),
+    m_keep_selection_for_move (false),
     m_images_visible (true)
 { 
   // place images behind the grid
@@ -623,7 +623,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
           
         m_move_mode = mm;
         m_moved_landmark = ml;
-        m_keep_selection_for_landmark = true;
+        m_keep_selection_for_move = true;
           
         //  found a handle of one of the selected object: make the moved image the selection
         clear_selection ();
@@ -660,7 +660,7 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
 
           m_move_mode = mm;
           m_moved_landmark = ml;
-          m_keep_selection_for_landmark = false;
+          m_keep_selection_for_move = false;
             
           //  found anything: make the moved image the selection
           clear_selection ();
@@ -893,7 +893,7 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
       image_changed_event (id);
 
       //  clear the selection (that was artificially created before)
-      if (! m_keep_selection_for_landmark) {
+      if (! m_keep_selection_for_move) {
         clear_selection ();
       } else {
         selection_to_view ();
@@ -907,7 +907,11 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
       image_changed_event (id);
 
       //  clear the selection (that was artificially created before)
-      clear_selection ();
+      if (! m_keep_selection_for_move) {
+        clear_selection ();
+      } else {
+        selection_to_view ();
+      }
 
     }
 
@@ -956,6 +960,7 @@ Service::find_image (const db::DPoint &p, const db::DBox &search_box, double l, 
 void
 Service::selection_to_view (img::View::Mode mode)
 {
+  clear_transient_selection ();
   image_selection_changed_event ();
 
   //  the selection objects need to be recreated since we destroyed the old images
@@ -1006,8 +1011,10 @@ Service::transform (const db::DCplxTrans &trans)
 void 
 Service::edit_cancel () 
 {
-  m_move_mode = move_none;
-  selection_to_view ();
+  if (m_move_mode != move_none) {
+    m_move_mode = move_none;
+    selection_to_view ();
+  }
 }
 
 void 

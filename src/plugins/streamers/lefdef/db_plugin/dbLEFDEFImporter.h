@@ -1706,8 +1706,31 @@ private:
   db::property_names_id_type m_pin_prop_name_id;
   db::LEFDEFReaderOptions m_options;
   int m_warn_level;
+  std::vector<std::string> m_sections;
+
+  friend class LEFDEFSection;
 
   const std::string &next ();
+  void enter_section (const std::string &name);
+  void leave_section ();
+};
+
+class DB_PLUGIN_PUBLIC LEFDEFSection
+{
+public:
+  LEFDEFSection (LEFDEFImporter *importer, const std::string &name)
+    : mp_importer (importer)
+  {
+    mp_importer->enter_section (name);
+  }
+
+  ~LEFDEFSection ()
+  {
+    mp_importer->leave_section ();
+  }
+
+private:
+  LEFDEFImporter *mp_importer;
 };
 
 class DB_PLUGIN_PUBLIC LEFDEFReader

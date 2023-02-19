@@ -133,6 +133,12 @@ Object::Object (const ant::Object &d)
   //  .. nothing else ..
 }
 
+Object::~Object ()
+{
+  //  .. nothing yet ..
+}
+
+
 Object &
 Object::operator= (const ant::Object &d)
 {

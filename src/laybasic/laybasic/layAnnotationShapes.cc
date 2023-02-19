@@ -195,7 +195,7 @@ AnnotationShapes::replace (iterator pos, const shape_type &&sh)
       manager ()->queue (this, new AnnotationLayerOp (true /*insert*/, sh));
     }
     invalidate_state ();  //  HINT: must come before the change is done!
-    m_layer.replace (pos, sh);
+    m_layer.replace (pos, std::move (sh));
   }
   return *pos;
 }

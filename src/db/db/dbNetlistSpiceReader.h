@@ -163,9 +163,9 @@ public:
   static bool try_read_value (const std::string &s, double &v, const std::map<std::string, double> &variables);
 
 private:
-  static double read_atomic_value (tl::Extractor &ex, const std::map<std::string, double> &variables);
-  static double read_dot_expr (tl::Extractor &ex, const std::map<std::string, double> &variables);
-  static double read_bar_expr (tl::Extractor &ex, const std::map<std::string, double> &variables);
+  static double read_atomic_value (tl::Extractor &ex, const std::map<std::string, double> &variables, bool *status);
+  static double read_dot_expr (tl::Extractor &ex, const std::map<std::string, double> &variables, bool *status);
+  static double read_bar_expr (tl::Extractor &ex, const std::map<std::string, double> &variables, bool *status);
 };
 
 /**

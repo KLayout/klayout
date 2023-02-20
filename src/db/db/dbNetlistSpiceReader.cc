@@ -218,29 +218,29 @@ void NetlistSpiceReaderDelegate::parse_element_components (const std::string &s,
   }
 }
 
-double NetlistSpiceReaderDelegate::read_atomic_value (tl::Extractor &ex, const std::map<std::string, double> &variables)
+double NetlistSpiceReaderDelegate::read_atomic_value (tl::Extractor &ex, const std::map<std::string, double> &variables, bool *status)
 {
+  double v = 0.0;
   std::string var;
 
   if (ex.test ("(")) {
 
-    double v = read_dot_expr (ex, variables);
-    ex.expect (")");
+    double v = read_dot_expr (ex, variables, status);
+    if (status && !*status) {
+      return 0.0;
+    }
+    if (status) {
+      *status = ex.test (")");
+    } else {
+      ex.expect (")");
+    }
     return v;
 
-  } else if (ex.try_read_word (var)) {
+  } else if (ex.try_read (v)) {
 
-    auto v = variables.find (tl::to_upper_case (var));
-    if (v != variables.end ()) {
-      return v->second;
-    } else {
-      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Undefined parameter '%s'")), var));
+    if (status) {
+      *status = true;
     }
-
-  } else {
-
-    double v = 0.0;
-    ex.read (v);
 
     double f = 1.0;
     if (*ex == 't' || *ex == 'T') {
@@ -272,18 +272,49 @@ double NetlistSpiceReaderDelegate::read_atomic_value (tl::Extractor &ex, const s
     v *= f;
     return v;
 
+  } else if (ex.try_read_word (var)) {
+
+    auto v = variables.find (tl::to_upper_case (var));
+    if (v != variables.end ()) {
+      if (status) {
+        *status = true;
+      }
+      return v->second;
+    } else if (status) {
+      *status = false;
+    } else {
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Undefined parameter '%s'")), var));
+    }
+
+  } else {
+
+    if (status) {
+      *status = false;
+    } else {
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Expected number of variable name here: '...%s'")), ex.get ()));
+    }
+
   }
 }
 
-double NetlistSpiceReaderDelegate::read_bar_expr (tl::Extractor &ex, const std::map<std::string, double> &variables)
+double NetlistSpiceReaderDelegate::read_bar_expr (tl::Extractor &ex, const std::map<std::string, double> &variables, bool *status)
 {
-  double v = read_atomic_value (ex, variables);
+  double v = read_atomic_value (ex, variables, status);
+  if (status && !*status) {
+    return 0.0;
+  }
   while (true) {
     if (ex.test ("+")) {
-      double vv = read_atomic_value (ex, variables);
+      double vv = read_atomic_value (ex, variables, status);
+      if (status && !*status) {
+        return 0.0;
+      }
       v += vv;
-    } else if (ex.test ("+")) {
-      double vv = read_atomic_value (ex, variables);
+    } else if (ex.test ("-")) {
+      double vv = read_atomic_value (ex, variables, status);
+      if (status && !*status) {
+        return 0.0;
+      }
       v -= vv;
     } else {
       break;
@@ -292,15 +323,24 @@ double NetlistSpiceReaderDelegate::read_bar_expr (tl::Extractor &ex, const std::
   return v;
 }
 
-double NetlistSpiceReaderDelegate::read_dot_expr (tl::Extractor &ex, const std::map<std::string, double> &variables)
+double NetlistSpiceReaderDelegate::read_dot_expr (tl::Extractor &ex, const std::map<std::string, double> &variables, bool *status)
 {
-  double v = read_bar_expr (ex, variables);
+  double v = read_bar_expr (ex, variables, status);
+  if (status && !*status) {
+    return 0.0;
+  }
   while (true) {
     if (ex.test ("*")) {
-      double vv = read_bar_expr (ex, variables);
+      double vv = read_bar_expr (ex, variables, status);
+      if (status && !*status) {
+        return 0.0;
+      }
       v *= vv;
     } else if (ex.test ("/")) {
-      double vv = read_bar_expr (ex, variables);
+      double vv = read_bar_expr (ex, variables, status);
+      if (status && !*status) {
+        return 0.0;
+      }
       v /= vv;
     } else {
       break;
@@ -311,20 +351,19 @@ double NetlistSpiceReaderDelegate::read_dot_expr (tl::Extractor &ex, const std::
 
 double NetlistSpiceReaderDelegate::read_value (tl::Extractor &ex, const std::map<std::string, double> &variables)
 {
-  return read_dot_expr (ex, variables);
+  try {
+    return read_dot_expr (ex, variables, 0);
+  } catch (tl::Exception &error) {
+    throw SpiceReaderDelegateException (error.msg ());
+  }
 }
 
 bool NetlistSpiceReaderDelegate::try_read_value (const std::string &s, double &value, const std::map<std::string, double> &variables)
 {
-  tl::Extractor ve (s.c_str ());
-  double vv = 0;
-  if (ve.try_read (vv) || ve.test ("(")) {
-    ve = tl::Extractor (s.c_str ());
-    value = read_value (ve, variables);
-    return true;
-  } else {
-    return false;
-  }
+  bool status = false;
+  tl::Extractor ex (s.c_str ());
+  value = read_dot_expr (ex, variables, &status);
+  return status;
 }
 
 void NetlistSpiceReaderDelegate::parse_element (const std::string &s, const std::string &element, std::string &model, double &value, std::vector<std::string> &nn, std::map<std::string, double> &pv, const std::map<std::string, double> &variables)

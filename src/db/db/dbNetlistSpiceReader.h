@@ -43,6 +43,18 @@ class DeviceClass;
 class Device;
 
 /**
+ *  @brief A specific SPICE reader exception that allows attaching location information
+ */
+class SpiceReaderDelegateException
+  : public tl::Exception
+{
+public:
+  SpiceReaderDelegateException (const std::string &msg)
+    : tl::Exception (msg)
+  { }
+};
+
+/**
  *  @brief A specialized exception class to handle netlist reader delegate errors
  */
 class DB_PUBLIC NetlistSpiceReaderDelegateError

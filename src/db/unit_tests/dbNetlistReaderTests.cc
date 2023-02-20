@@ -185,15 +185,19 @@ TEST(5_CircuitParameters)
 
   EXPECT_EQ (nl.to_string (),
     "circuit SUBCKT ($1=$1,'A[5]<1>'='A[5]<1>','V42(%)'='V42(%)',Z=Z,GND=GND,GND$1=GND$1);\n"
-    "  subcircuit HVPMOS D_$1 ($1='V42(%)',$2=$3,$3=Z,$4=$1);\n"
-    "  subcircuit HVPMOS D_$2 ($1='V42(%)',$2='A[5]<1>',$3=$3,$4=$1);\n"
-    "  subcircuit HVNMOS D_$3 ($1=GND,$2=$3,$3=GND,$4=GND$1);\n"
-    "  subcircuit HVNMOS D_$4 ($1=GND,$2=$3,$3=Z,$4=GND$1);\n"
-    "  subcircuit HVNMOS D_$5 ($1=GND,$2='A[5]<1>',$3=$3,$4=GND$1);\n"
+    "  subcircuit 'HVPMOS(AD=0.18,AS=0.18,L=0.2,PD=2.16,PS=2.16,W=1)' D_$1 ($1='V42(%)',$2=$3,$3=Z,$4=$1);\n"
+    "  subcircuit 'HVPMOS(AD=0.18,AS=0.18,L=0.2,PD=2.16,PS=2.16,W=1)' D_$2 ($1='V42(%)',$2='A[5]<1>',$3=$3,$4=$1);\n"
+    "  subcircuit 'HVNMOS(AD=0,AS=0,L=1.13,PD=6,PS=6,W=2.12)' D_$3 ($1=GND,$2=$3,$3=GND,$4=GND$1);\n"
+    "  subcircuit 'HVNMOS(AD=0.19,AS=0.19,L=0.4,PD=1.16,PS=1.16,W=0.4)' D_$4 ($1=GND,$2=$3,$3=Z,$4=GND$1);\n"
+    "  subcircuit 'HVNMOS(AD=0.19,AS=0.19,L=0.4,PD=1.76,PS=1.76,W=0.4)' D_$5 ($1=GND,$2='A[5]<1>',$3=$3,$4=GND$1);\n"
     "end;\n"
-    "circuit HVPMOS ($1=(null),$2=(null),$3=(null),$4=(null));\n"
+    "circuit 'HVPMOS(AD=0.18,AS=0.18,L=0.2,PD=2.16,PS=2.16,W=1)' ($1=$0,$2=$0,$3=$0,$4=$0);\n"
     "end;\n"
-    "circuit HVNMOS ($1=(null),$2=(null),$3=(null),$4=(null));\n"
+    "circuit 'HVNMOS(AD=0,AS=0,L=1.13,PD=6,PS=6,W=2.12)' ($1=$0,$2=$0,$3=$0,$4=$0);\n"
+    "end;\n"
+    "circuit 'HVNMOS(AD=0.19,AS=0.19,L=0.4,PD=1.16,PS=1.16,W=0.4)' ($1=$0,$2=$0,$3=$0,$4=$0);\n"
+    "end;\n"
+    "circuit 'HVNMOS(AD=0.19,AS=0.19,L=0.4,PD=1.76,PS=1.76,W=0.4)' ($1=$0,$2=$0,$3=$0,$4=$0);\n"
     "end;\n"
   );
 }
@@ -262,6 +266,9 @@ TEST(6_ReaderWithDelegate)
   reader.read (is, nl);
 
   EXPECT_EQ (nl.to_string (),
+    "circuit .TOP ();\n"
+    "  subcircuit SUBCKT SUBCKT ($1=IN,A=OUT,VDD=VDD,Z=Z,GND=VSS,GND$1=VSS);\n"
+    "end;\n"
     "circuit SUBCKT ($1=$1,A=A,VDD=VDD,Z=Z,GND=GND,GND$1=GND$1);\n"
     "  device HVPMOS $1 (S=VDD,G=$3,D=Z,B=$1) (L=0.3,W=1.5,AS=0.27,AD=0.27,PS=3.24,PD=3.24);\n"
     "  device HVPMOS $2 (S=VDD,G=A,D=$3,B=$1) (L=0.3,W=1.5,AS=0.27,AD=0.27,PS=3.24,PD=3.24);\n"
@@ -269,9 +276,6 @@ TEST(6_ReaderWithDelegate)
     "  device HVNMOS $4 (S=GND,G=$3,D=Z,B=GND$1) (L=0.6,W=0.6,AS=0.285,AD=0.285,PS=1.74,PD=1.74);\n"
     "  device HVNMOS $5 (S=GND,G=A,D=$3,B=GND$1) (L=0.6,W=0.6,AS=0.285,AD=0.285,PS=2.64,PD=2.64);\n"
     "  device RES $1 (A=A,B=Z) (R=100000,L=0,W=0,A=0,P=0);\n"
-    "end;\n"
-    "circuit .TOP ();\n"
-    "  subcircuit SUBCKT SUBCKT ($1=IN,A=OUT,VDD=VDD,Z=Z,GND=VSS,GND$1=VSS);\n"
     "end;\n"
   );
 }
@@ -527,15 +531,15 @@ TEST(13_NoGlobalNetsIfNotUsed)
     "  subcircuit C3 '3' (VDD=VDD,GND=GND);\n"
     "  subcircuit C4 '4' (VDD=VDD,GND=GND);\n"
     "end;\n"
+    "circuit C1 (VDD=VDD,GND=GND);\n"
+    "  subcircuit FILLER_CAP '1' (VDD=VDD,GND=GND);\n"
+    "  subcircuit DUMMY '2' ();\n"
+    "end;\n"
     "circuit FILLER_CAP (VDD=VDD,GND=GND);\n"
     "  device NMOS '1' (S=GND,G=VDD,D=GND,B=GND) (L=10,W=10,AS=0,AD=0,PS=0,PD=0);\n"
     "end;\n"
     "circuit DUMMY ();\n"
     "  device NMOS '1' (S=A,G=A,D=A,B=B) (L=1,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "end;\n"
-    "circuit C1 (VDD=VDD,GND=GND);\n"
-    "  subcircuit FILLER_CAP '1' (VDD=VDD,GND=GND);\n"
-    "  subcircuit DUMMY '2' ();\n"
     "end;\n"
     "circuit C2 ();\n"
     "  subcircuit DUMMY '1' ();\n"
@@ -578,15 +582,19 @@ TEST(15_ContinuationWithBlanks)
 
   EXPECT_EQ (nl.to_string (),
     "circuit SUBCKT ($1=$1,'A[5]<1>'='A[5]<1>','V42(%)'='V42(%)',Z=Z,GND=GND,GND$1=GND$1);\n"
-    "  subcircuit HVPMOS D_$1 ($1='V42(%)',$2=$3,$3=Z,$4=$1);\n"
-    "  subcircuit HVPMOS D_$2 ($1='V42(%)',$2='A[5]<1>',$3=$3,$4=$1);\n"
-    "  subcircuit HVNMOS D_$3 ($1=GND,$2=$3,$3=GND,$4=GND$1);\n"
-    "  subcircuit HVNMOS D_$4 ($1=GND,$2=$3,$3=Z,$4=GND$1);\n"
-    "  subcircuit HVNMOS D_$5 ($1=GND,$2='A[5]<1>',$3=$3,$4=GND$1);\n"
+    "  subcircuit 'HVPMOS(AD=0.18,AS=0.18,L=0.2,PD=2.16,PS=2.16,W=1)' D_$1 ($1='V42(%)',$2=$3,$3=Z,$4=$1);\n"
+    "  subcircuit 'HVPMOS(AD=0.18,AS=0.18,L=0.2,PD=2.16,PS=2.16,W=1)' D_$2 ($1='V42(%)',$2='A[5]<1>',$3=$3,$4=$1);\n"
+    "  subcircuit 'HVNMOS(AD=0,AS=0,L=1.13,PD=6,PS=6,W=2.12)' D_$3 ($1=GND,$2=$3,$3=GND,$4=GND$1);\n"
+    "  subcircuit 'HVNMOS(AD=0.19,AS=0.19,L=0.4,PD=1.16,PS=1.16,W=0.4)' D_$4 ($1=GND,$2=$3,$3=Z,$4=GND$1);\n"
+    "  subcircuit 'HVNMOS(AD=0.19,AS=0.19,L=0.4,PD=1.76,PS=1.76,W=0.4)' D_$5 ($1=GND,$2='A[5]<1>',$3=$3,$4=GND$1);\n"
     "end;\n"
-    "circuit HVPMOS ($1=(null),$2=(null),$3=(null),$4=(null));\n"
+    "circuit 'HVPMOS(AD=0.18,AS=0.18,L=0.2,PD=2.16,PS=2.16,W=1)' ($1=$0,$2=$0,$3=$0,$4=$0);\n"
     "end;\n"
-    "circuit HVNMOS ($1=(null),$2=(null),$3=(null),$4=(null));\n"
+    "circuit 'HVNMOS(AD=0,AS=0,L=1.13,PD=6,PS=6,W=2.12)' ($1=$0,$2=$0,$3=$0,$4=$0);\n"
+    "end;\n"
+    "circuit 'HVNMOS(AD=0.19,AS=0.19,L=0.4,PD=1.16,PS=1.16,W=0.4)' ($1=$0,$2=$0,$3=$0,$4=$0);\n"
+    "end;\n"
+    "circuit 'HVNMOS(AD=0.19,AS=0.19,L=0.4,PD=1.76,PS=1.76,W=0.4)' ($1=$0,$2=$0,$3=$0,$4=$0);\n"
     "end;\n"
   );
 }

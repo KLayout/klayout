@@ -127,7 +127,7 @@ public:
    *  @param nn Out parameter: the net names
    *  @param pv Out parameter: the parameter values (key/value pairs)
    */
-  virtual void parse_element (const std::string &s, const std::string &element, std::string &model, double &value, std::vector<std::string> &nn, std::map<std::string, double> &pv);
+  virtual void parse_element (const std::string &s, const std::string &element, std::string &model, double &value, std::vector<std::string> &nn, std::map<std::string, double> &pv, const std::map<std::string, double> &params);
 
   /**
    *  @brief Produces an error with the given message
@@ -138,22 +138,22 @@ public:
    *  @brief Reads a set of string components and parameters from the string
    *  A special key "param:" is recognized for starting a parameter list.
    */
-  void parse_element_components (const std::string &s, std::vector<std::string> &strings, std::map<std::string, double> &pv);
+  static void parse_element_components (const std::string &s, std::vector<std::string> &strings, std::map<std::string, double> &pv, const std::map<std::string, double> &variables);
 
   /**
    *  @brief Reads a value from the extractor (with formula evaluation)
    */
-  double read_value (tl::Extractor &ex);
+  static double read_value (tl::Extractor &ex, const std::map<std::string, double> &variables);
 
   /**
    *  @brief Tries to read a value from the extractor (with formula evaluation)
    */
-  bool try_read_value (const std::string &s, double &v);
+  static bool try_read_value (const std::string &s, double &v, const std::map<std::string, double> &variables);
 
 private:
-  double read_atomic_value (tl::Extractor &ex);
-  double read_dot_expr (tl::Extractor &ex);
-  double read_bar_expr (tl::Extractor &ex);
+  static double read_atomic_value (tl::Extractor &ex, const std::map<std::string, double> &variables);
+  static double read_dot_expr (tl::Extractor &ex, const std::map<std::string, double> &variables);
+  static double read_bar_expr (tl::Extractor &ex, const std::map<std::string, double> &variables);
 };
 
 /**
@@ -169,70 +169,7 @@ public:
   virtual void read (tl::InputStream &stream, db::Netlist &netlist);
 
 private:
-
-  class SpiceReaderStream
-  {
-  public:
-    SpiceReaderStream ();
-    ~SpiceReaderStream ();
-
-    void set_stream (tl::InputStream &stream);
-    void set_stream (tl::InputStream *stream);
-    void close ();
-
-    std::pair<std::string, bool> get_line();
-    int line_number () const;
-    std::string source () const;
-    bool at_end () const;
-
-    void swap (SpiceReaderStream &other)
-    {
-      std::swap (mp_stream, other.mp_stream);
-      std::swap (m_owns_stream, other.m_owns_stream);
-      std::swap (mp_text_stream, other.mp_text_stream);
-      std::swap (m_line_number, other.m_line_number);
-      std::swap (m_stored_line, other.m_stored_line);
-      std::swap (m_has_stored_line, other.m_has_stored_line);
-    }
-
-  private:
-    tl::InputStream *mp_stream;
-    bool m_owns_stream;
-    tl::TextInputStream *mp_text_stream;
-    int m_line_number;
-    std::string m_stored_line;
-    bool m_has_stored_line;
-  };
-
-  db::Netlist *mp_netlist;
-  db::Circuit *mp_circuit;
-  db::Circuit *mp_anonymous_top_circuit;
-  tl::weak_ptr<NetlistSpiceReaderDelegate> mp_delegate;
-  std::list<SpiceReaderStream> m_streams;
-  SpiceReaderStream m_stream;
-  std::unique_ptr<std::map<std::string, db::Net *> > mp_nets_by_name;
-  std::map<std::string, bool> m_captured;
-  std::vector<std::string> m_global_nets;
-  std::set<std::string> m_global_net_names;
-  std::set<const db::Circuit *> m_circuits_read;
-
-  void push_stream (const std::string &path);
-  void pop_stream ();
-  bool at_end ();
-  bool read_element (tl::Extractor &ex, const std::string &element, const std::string &name);
-  void read_subcircuit (const std::string &sc_name, const std::string &nc_name, const std::vector<db::Net *> &nets);
-  void read_circuit (tl::Extractor &ex, const std::string &name);
-  void skip_circuit (tl::Extractor &ex);
-  bool read_card ();
-  std::string read_name (tl::Extractor &ex);
-  std::string get_line ();
-  void error (const std::string &msg);
-  void warn (const std::string &msg);
-  void finish ();
-  db::Net *make_net (const std::string &name);
-  void ensure_circuit ();
-  bool subcircuit_captured (const std::string &nc_name);
-  void build_global_nets ();
+  friend class SpiceReaderDict;
 };
 
 }

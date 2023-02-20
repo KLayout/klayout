@@ -2456,7 +2456,7 @@ class NetlistSpiceReaderDelegateImpl
 {
 public:
   NetlistSpiceReaderDelegateImpl ()
-    : db::NetlistSpiceReaderDelegate ()
+    : db::NetlistSpiceReaderDelegate (), mp_variables (0)
   {
     //  .. nothing yet ..
   }
@@ -2566,15 +2566,16 @@ public:
   ParseElementData parse_element_helper (const std::string &s, const std::string &element)
   {
     ParseElementData data;
-    db::NetlistSpiceReaderDelegate::parse_element (s, element, data.model_name_nc (), data.value_nc (), data.net_names_nc (), data.parameters_nc ());
+    db::NetlistSpiceReaderDelegate::parse_element (s, element, data.model_name_nc (), data.value_nc (), data.net_names_nc (), data.parameters_nc (), variables ());
     return data;
   }
 
-  virtual void parse_element (const std::string &s, const std::string &element, std::string &model, double &value, std::vector<std::string> &nn, std::map<std::string, double> &pv)
+  virtual void parse_element (const std::string &s, const std::string &element, std::string &model, double &value, std::vector<std::string> &nn, std::map<std::string, double> &pv, const std::map<std::string, double> &variables)
   {
     try {
 
       m_error.clear ();
+      mp_variables = &variables;
 
       ParseElementData data;
       if (cb_parse_element.can_issue ()) {
@@ -2588,12 +2589,18 @@ public:
       nn = data.net_names ();
       pv = data.parameters ();
 
+      mp_variables = 0;
+
     } catch (tl::Exception &) {
+      mp_variables = 0;
       if (! m_error.empty ()) {
         db::NetlistSpiceReaderDelegate::error (m_error);
       } else {
         throw;
       }
+    } catch (...) {
+      mp_variables = 0;
+      throw;
     }
   }
 
@@ -2616,6 +2623,12 @@ public:
     }
   }
 
+  const std::map<std::string, double> &variables () const
+  {
+    static std::map<std::string, double> empty;
+    return mp_variables ? *mp_variables : empty;
+  }
+
   gsi::Callback cb_start;
   gsi::Callback cb_finish;
   gsi::Callback cb_control_statement;
@@ -2626,6 +2639,7 @@ public:
 
 private:
   std::string m_error;
+  const std::map<std::string, double> *mp_variables;
 };
 
 static void start_fb (NetlistSpiceReaderDelegateImpl *delegate, db::Netlist *netlist)
@@ -2663,20 +2677,20 @@ static ParseElementData parse_element_fb (NetlistSpiceReaderDelegateImpl *delega
   return delegate->parse_element_helper (s, element);
 }
 
-static tl::Variant value_from_string (NetlistSpiceReaderDelegateImpl *delegate, const std::string &s)
+static tl::Variant value_from_string (NetlistSpiceReaderDelegateImpl * /*delegate*/, const std::string &s, const std::map<std::string, double> &variables)
 {
   tl::Variant res;
   double v = 0.0;
-  if (delegate->try_read_value (s, v)) {
+  if (db::NetlistSpiceReaderDelegate::try_read_value (s, v, variables)) {
     res = v;
   }
   return res;
 }
 
-static ParseElementComponentsData parse_element_components (NetlistSpiceReaderDelegateImpl *delegate, const std::string &s)
+static ParseElementComponentsData parse_element_components (NetlistSpiceReaderDelegateImpl * /*delegate*/, const std::string &s, const std::map<std::string, double> &variables)
 {
   ParseElementComponentsData data;
-  delegate->parse_element_components (s, data.strings_nc (), data.parameters_nc ());
+  db::NetlistSpiceReaderDelegate::parse_element_components (s, data.strings_nc (), data.parameters_nc (), variables);
   return data;
 }
 
@@ -2765,6 +2779,13 @@ Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "Netl
     "\n"
     "This method has been introduced in version 0.27.1\n"
   ) +
+  gsi::method ("variables", &NetlistSpiceReaderDelegateImpl::variables,
+    "@brief Gets the variables defined inside the SPICE file during execution of 'parse_element'\n"
+    "In order to evaluate formulas, this method allows accessing the variables that are "
+    "present during the execution of the SPICE reader.\n"
+    "\n"
+    "This method has been introduced in version 0.28.7."
+  ) +
   gsi::callback ("parse_element", &NetlistSpiceReaderDelegateImpl::parse_element_helper, &NetlistSpiceReaderDelegateImpl::cb_parse_element,
     gsi::arg ("s"), gsi::arg ("element"),
     "@brief Parses an element card\n"
@@ -2800,22 +2821,26 @@ Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "Netl
     "@brief Issues an error with the given message.\n"
     "Use this method to generate an error."
   ) +
-  gsi::method_ext ("value_from_string", &value_from_string, gsi::arg ("s"),
+  gsi::method_ext ("value_from_string", &value_from_string, gsi::arg ("s"), gsi::arg ("variables", std::map<std::string, double> (), "{}"),
     "@brief Translates a string into a value\n"
     "This function simplifies the implementation of SPICE readers by providing a translation of a unit-annotated string "
     "into double values. For example, '1k' is translated to 1000.0. In addition, simple formula evaluation is supported, e.g "
     "'(1+3)*2' is translated into 8.0.\n"
     "\n"
-    "This method has been introduced in version 0.27.1\n"
+    "The variables dictionary defines named variables with the given values.\n"
+    "\n"
+    "This method has been introduced in version 0.27.1. The variables argument has been added in version 0.28.7.\n"
   ) +
-  gsi::method_ext ("parse_element_components", &parse_element_components, gsi::arg ("s"),
+  gsi::method_ext ("parse_element_components", &parse_element_components, gsi::arg ("s"), gsi::arg ("variables", std::map<std::string, double> (), "{}"),
     "@brief Parses a string into string and parameter components.\n"
     "This method is provided to simplify the implementation of 'parse_element'. It takes a string and splits it into "
     "string arguments and parameter values. For example, 'a b c=6' renders two string arguments in 'nn' and one parameter ('C'->6.0). "
     "It returns data \\ParseElementComponentsData object with the strings and parameters.\n"
     "The parameter names are already translated to upper case.\n"
     "\n"
-    "This method has been introduced in version 0.27.1\n"
+    "The variables dictionary defines named variables with the given values.\n"
+    "\n"
+    "This method has been introduced in version 0.27.1. The variables argument has been added in version 0.28.7.\n"
   ),
   "@brief Provides a delegate for the SPICE reader for translating device statements\n"
   "Supply a customized class to provide a specialized reading scheme for devices. "

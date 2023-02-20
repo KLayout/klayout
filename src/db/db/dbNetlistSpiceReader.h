@@ -169,7 +169,7 @@ public:
   virtual void read (tl::InputStream &stream, db::Netlist &netlist);
 
 private:
-  friend class SpiceReaderDict;
+  tl::weak_ptr<NetlistSpiceReaderDelegate> mp_delegate;
 };
 
 }

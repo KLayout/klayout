@@ -186,7 +186,7 @@ static std::string parse_component (tl::Extractor &ex)
   return std::string (cp0, cp - cp0);
 }
 
-void NetlistSpiceReaderDelegate::parse_element_components (const std::string &s, std::vector<std::string> &strings, std::map<std::string, double> &pv)
+void NetlistSpiceReaderDelegate::parse_element_components (const std::string &s, std::vector<std::string> &strings, std::map<std::string, double> &pv, const std::map<std::string, double> &variables)
 {
   tl::Extractor ex (s.c_str ());
   bool in_params = false;
@@ -204,7 +204,7 @@ void NetlistSpiceReaderDelegate::parse_element_components (const std::string &s,
 
       if (ex.try_read_word (n) && ex.test ("=")) {
         //  a parameter. Note that parameter names are always made upper case.
-        pv.insert (std::make_pair (tl::to_upper_case (n), read_value (ex)));
+        pv.insert (std::make_pair (tl::to_upper_case (n), read_value (ex, variables)));
       } else {
         ex = ex0;
         if (in_params) {
@@ -228,14 +228,13 @@ double NetlistSpiceReaderDelegate::read_atomic_value (tl::Extractor &ex, const s
     ex.expect (")");
     return v;
 
-  } else if (try_read_word (var)) {
+  } else if (ex.try_read_word (var)) {
 
     auto v = variables.find (tl::to_upper_case (var));
     if (v != variables.end ()) {
       return v->second;
     } else {
-      error (tl::sprintf (tl::to_string (tr ("Undefined parameter '%s'")), var));
-      return 0.0;
+      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Undefined parameter '%s'")), var));
     }
 
   } else {
@@ -328,9 +327,9 @@ bool NetlistSpiceReaderDelegate::try_read_value (const std::string &s, double &v
   }
 }
 
-void NetlistSpiceReaderDelegate::parse_element (const std::string &s, const std::string &element, std::string &model, double &value, std::vector<std::string> &nn, std::map<std::string, double> &pv)
+void NetlistSpiceReaderDelegate::parse_element (const std::string &s, const std::string &element, std::string &model, double &value, std::vector<std::string> &nn, std::map<std::string, double> &pv, const std::map<std::string, double> &variables)
 {
-  parse_element_components (s, nn, pv);
+  parse_element_components (s, nn, pv, variables);
 
   //  interpret the parameters according to the code
   if (element == "X") {
@@ -377,7 +376,7 @@ void NetlistSpiceReaderDelegate::parse_element (const std::string &s, const std:
 
     } else if (nn.size () >= 3) {
 
-      if (try_read_value (nn.back (), value)) {
+      if (try_read_value (nn.back (), value, variables)) {
 
         //  Rname n1 n2 value
         //  Rname n1 n2 n3 value
@@ -389,7 +388,7 @@ void NetlistSpiceReaderDelegate::parse_element (const std::string &s, const std:
         //  Rname n1 n2 n3 value model [params]
         model = nn.back ();
         nn.pop_back ();
-        if (! try_read_value (nn.back (), value)) {
+        if (! try_read_value (nn.back (), value, variables)) {
           error (tl::to_string (tr ("Can't find a value for a R, C or L device")));
         } else {
           nn.pop_back ();
@@ -786,7 +785,7 @@ struct ParametersLessFunction
 {
   typedef std::map<std::string, double> parameters_type;
 
-  bool operator< (const parameters_type &a, const parameters_type &b)
+  bool operator() (const parameters_type &a, const parameters_type &b) const
   {
     if (a.size () != b.size ()) {
       return a.size () < b.size ();
@@ -825,6 +824,8 @@ public:
   typedef std::list<SpiceCard> cards_type;
   typedef cards_type::const_iterator cards_iterator;
   typedef std::map<std::string, double> parameters_type;
+  typedef std::vector<std::string> pin_list_type;
+  typedef pin_list_type::const_iterator pin_const_iterator;
 
   SpiceCachedCircuit (const std::string &name)
     : m_name (name)
@@ -832,14 +833,32 @@ public:
     //  .. nothing yet ..
   }
 
+  const std::string &name () const
+  {
+    return m_name;
+  }
+
   void set_parameters (const parameters_type &pv)
   {
     m_parameters = pv;
   }
 
-  parameters_type &parameters () const
+  const parameters_type &parameters () const
   {
     return m_parameters;
+  }
+
+  void make_parameter (const std::string &name, double value)
+  {
+    for (auto p = m_pins.begin (); p != m_pins.end (); ++p) {
+      if (*p == name) {
+        //  remove pin and make parameter
+        m_pins.erase (p);
+        break;
+      }
+    }
+
+    m_parameters [name] = value;
   }
 
   cards_iterator begin_cards () const
@@ -854,12 +873,38 @@ public:
 
   void add_card (const SpiceCard &card)
   {
-    m_cars.push_back (card);
+    m_cards.push_back (card);
+  }
+
+  size_t pin_count () const
+  {
+    return m_pins.size ();
+  }
+
+  pin_const_iterator begin_pins () const
+  {
+    return m_pins.begin ();
+  }
+
+  pin_const_iterator end_pins () const
+  {
+    return m_pins.end ();
+  }
+
+  void set_pins (const pin_list_type &pins)
+  {
+    m_pins = pins;
+  }
+
+  void set_pins (pin_list_type &&pins)
+  {
+    m_pins = std::move (pins);
   }
 
 private:
   std::string m_name;
   parameters_type m_parameters;
+  pin_list_type m_pins;
   cards_type m_cards;
 };
 
@@ -868,10 +913,10 @@ class SpiceCircuitDict
 public:
   typedef std::map<std::string, double> parameters_type;
 
-  SpiceCircuitDict ();
+  SpiceCircuitDict (NetlistSpiceReader *reader, NetlistSpiceReaderDelegate *delegate);
   ~SpiceCircuitDict ();
 
-  void read (NetlistSpiceReader::SpiceReaderStream &stream);
+  void read (tl::InputStream &stream);
   void build (db::Netlist *netlist);
   void finish ();
 
@@ -884,12 +929,13 @@ private:
   std::list<SpiceReaderStream> m_streams;
   SpiceReaderStream m_stream;
   int m_file_id;
-  std::map<const SpiceCachedCircuit *, std::map<parameters_type, db::Circuit *, ParametersLessFunction> m_circuits;
+  std::map<const SpiceCachedCircuit *, std::map<parameters_type, db::Circuit *, ParametersLessFunction> > m_circuits;
   std::map<std::string, SpiceCachedCircuit *> m_cached_circuits;
   SpiceCachedCircuit *mp_circuit;
   SpiceCachedCircuit *mp_anonymous_top_level_circuit;
   std::set<std::string> m_called_circuits;
   db::Circuit *mp_netlist_circuit;
+  db::Circuit *mp_anonymous_top_level_netlist_circuit;
   std::unique_ptr<std::map<std::string, db::Net *> > mp_nets_by_name;
   std::map<std::string, bool> m_captured;
   std::vector<std::string> m_global_nets;
@@ -903,7 +949,7 @@ private:
   void read_circuit (tl::Extractor &ex, const std::string &name);
   bool read_card ();
   void ensure_circuit ();
-  Circuit *build_circuit(SpiceCachedCircuit *circuit, const parameters_type &pv);
+  Circuit *build_circuit (const SpiceCachedCircuit *circuit, const parameters_type &pv, bool anonymous_top_level = false);
   std::string read_name (tl::Extractor &ex);
   std::string get_line ();
   void error (const std::string &msg);
@@ -913,10 +959,10 @@ private:
   const std::string &file_path (int file_id) const;
   int file_id (const std::string &path);
   db::Circuit *circuit_for (const SpiceCachedCircuit *cached_circuit, const parameters_type &pv);
-  void register_circuit_for (const SpiceCachedCircuit *cc, const parameters_type &pv, db::Circuit *circuit);
+  void register_circuit_for (const SpiceCachedCircuit *cc, const parameters_type &pv, db::Circuit *circuit, bool anonymous_top_level);
   const SpiceCachedCircuit *cached_circuit (const std::string &name) const;
   SpiceCachedCircuit *create_cached_circuit (const std::string &name);
-  void make_net (const std::string &name);
+  Net *make_net(const std::string &name);
   void process_card (const SpiceCard &card);
   bool subcircuit_captured (const std::string &nc_name);
   bool process_element (tl::Extractor &ex, const std::string &prefix, const std::string &name, const SpiceCard &card);
@@ -926,6 +972,8 @@ private:
 SpiceCircuitDict::SpiceCircuitDict (NetlistSpiceReader *reader, NetlistSpiceReaderDelegate *delegate)
   : mp_reader (reader), mp_delegate (delegate)
 {
+  mp_netlist = 0;
+  mp_netlist_circuit = mp_anonymous_top_level_netlist_circuit = 0;
   m_file_id = -1;
   mp_circuit = mp_anonymous_top_level_circuit = 0;
 }
@@ -936,6 +984,7 @@ SpiceCircuitDict::~SpiceCircuitDict ()
     delete c->second;
   }
   m_cached_circuits.clear ();
+
   m_circuits.clear ();
   mp_reader = 0;
   mp_delegate = 0;
@@ -981,9 +1030,12 @@ SpiceCircuitDict::circuit_for (const SpiceCachedCircuit *cc, const parameters_ty
 }
 
 void
-SpiceCircuitDict::register_circuit_for (const SpiceCachedCircuit *cc, const parameters_type &pv, db::Circuit *circuit)
+SpiceCircuitDict::register_circuit_for (const SpiceCachedCircuit *cc, const parameters_type &pv, db::Circuit *circuit, bool anonymous_top_level)
 {
-  m_circuits [cc][pv] = c;
+  m_circuits [cc][pv] = circuit;
+  if (anonymous_top_level) {
+    mp_anonymous_top_level_netlist_circuit = circuit;
+  }
 }
 
 const SpiceCachedCircuit *
@@ -1007,22 +1059,24 @@ SpiceCircuitDict::create_cached_circuit (const std::string &name)
 }
 
 void
-SpiceCircuitDict::read (NetlistSpiceReader::SpiceReaderStream &stream)
+SpiceCircuitDict::read (tl::InputStream &stream)
 {
   m_stream.set_stream (stream);
-  mp_netlist = 0;
 
+  mp_netlist = 0;
+  mp_netlist_circuit = 0;
+  mp_anonymous_top_level_netlist_circuit = 0;
   mp_circuit = 0;
   mp_anonymous_top_level_circuit = 0;
   m_global_nets.clear ();
   m_called_circuits.clear ();
+  m_variables.clear ();
+
+  m_file_id = file_id (stream.source ());
 
   while (! at_end ()) {
     read_card ();
   }
-
-  NetlistSpiceReader::SpiceReaderStream null_stream;
-  m_stream.set_stream (null_stream);
 }
 
 void
@@ -1203,10 +1257,10 @@ SpiceCircuitDict::read_card ()
 
       name = tl::to_upper_case (name);
 
-      //  @@@ parameter assignment
-      double value = read_value (); // @@@ must be possible to compute
-      //  @@@ set variable
-      mp_circuit->make_parameter (name, value); // @@@ turn circuit "pin" into model parameter
+      double value = NetlistSpiceReaderDelegate::read_value (ex, m_variables);
+      m_variables [name] = value;
+
+      mp_circuit->make_parameter (name, value);
 
     }
 
@@ -1220,7 +1274,7 @@ SpiceCircuitDict::read_card ()
 
       std::vector<std::string> nn;
       parameters_type pv;
-      NetlistSpiceReaderDelegate::parse_element_components (ex2.get (), nn, pv);
+      NetlistSpiceReaderDelegate::parse_element_components (ex2.get (), nn, pv, m_variables);
 
       if (! nn.empty ()) {
         m_called_circuits.insert (nn.back ());
@@ -1228,7 +1282,7 @@ SpiceCircuitDict::read_card ()
 
     }
 
-    mp_circuit->add_card (SpiceCard (m_file_id, m_stream.line_number (), l);
+    mp_circuit->add_card (SpiceCard (m_file_id, m_stream.line_number (), l));
 
   } else {
     warn (tl::to_string (tr ("Line ignored")));
@@ -1244,7 +1298,7 @@ SpiceCircuitDict::ensure_circuit ()
 
     //  TODO: make top name configurable
     mp_circuit = new SpiceCachedCircuit (".TOP");
-    mp_anonymous_top_circuit = mp_circuit;
+    mp_anonymous_top_level_circuit = mp_circuit;
 
   }
 }
@@ -1254,7 +1308,7 @@ SpiceCircuitDict::read_circuit (tl::Extractor &ex, const std::string &nc)
 {
   std::vector<std::string> nn;
   std::map<std::string, double> pv;
-  NetlistSpiceReaderDelegate::parse_element_components (ex.skip (), nn, pv);
+  NetlistSpiceReaderDelegate::parse_element_components (ex.skip (), nn, pv, m_variables);
 
   if (cached_circuit (nc)) {
     error (tl::sprintf (tl::to_string (tr ("Redefinition of circuit %s")), nc));
@@ -1265,6 +1319,8 @@ SpiceCircuitDict::read_circuit (tl::Extractor &ex, const std::string &nc)
   cc->set_parameters (pv);
 
   std::swap (cc, mp_circuit);
+  std::map<std::string, double> vars = pv;
+  m_variables.swap (vars);
 
   while (! at_end ()) {
     if (read_card ()) {
@@ -1273,6 +1329,7 @@ SpiceCircuitDict::read_circuit (tl::Extractor &ex, const std::string &nc)
   }
 
   std::swap (cc, mp_circuit);
+  m_variables.swap (vars);
 }
 
 void
@@ -1292,15 +1349,20 @@ SpiceCircuitDict::finish ()
 void
 SpiceCircuitDict::build (db::Netlist *netlist)
 {
-  mp_netlist = &netlist;
+  m_variables.clear ();
+  mp_netlist_circuit = 0;
+  mp_anonymous_top_level_netlist_circuit = 0;
+  mp_circuit = 0;
+  mp_anonymous_top_level_circuit = 0;
+  mp_netlist = netlist;
   m_captured.clear ();
 
-  mp_delegate->start (&netlist);
+  mp_delegate->start (netlist);
 
   for (auto c = m_cached_circuits.begin (); c != m_cached_circuits.end (); ++c) {
     if (m_called_circuits.find (c->first) == m_called_circuits.end () && mp_delegate->wants_subcircuit (c->first)) {
       //  we have a top circuit candidate
-      build_circuit (c->second, c->second->parameters ());
+      build_circuit (c->second, c->second->parameters (), c->second == mp_anonymous_top_level_circuit);
     }
   }
 
@@ -1310,8 +1372,46 @@ SpiceCircuitDict::build (db::Netlist *netlist)
   mp_netlist = 0;
 }
 
+static std::string
+make_circuit_name (const std::string &name, const std::map<std::string, double> &pv)
+{
+  std::string res = name;
+
+  res += "(";
+  for (auto p = pv.begin (); p != pv.end (); ++p) {
+    if (p != pv.begin ()) {
+      res += ",";
+    }
+    res += p->first;
+    res += "=";
+    if (p->second < 0.5e-12) {
+      res += tl::sprintf ("%.gF", p->second * 1e15);
+    } else if (p->second < 0.5e-9) {
+      res += tl::sprintf ("%.gP", p->second * 1e12);
+    } else if (p->second < 0.5e-6) {
+      res += tl::sprintf ("%.gN", p->second * 1e9);
+    } else if (p->second < 0.5e-3) {
+      res += tl::sprintf ("%.gU", p->second * 1e6);
+    } else if (p->second < 0.5) {
+      res += tl::sprintf ("%.gM", p->second * 1e3);
+    } else if (p->second < 0.5e3) {
+      res += tl::sprintf ("%.g", p->second);
+    } else if (p->second < 0.5e6) {
+      res += tl::sprintf ("%.gK", p->second * 1e-3);
+    } else if (p->second < 0.5e9) {
+      res += tl::sprintf ("%.gMEG", p->second * 1e-6);
+    } else if (p->second < 0.5e12) {
+      res += tl::sprintf ("%.gG", p->second * 1e-9);
+    } else {
+      res += tl::sprintf ("%.g", p->second);
+    }
+  }
+
+  return res;
+}
+
 db::Circuit *
-SpiceCircuitDict::build_circuit (SpiceCachedCircuit *cc, const parameters_type &pv)
+SpiceCircuitDict::build_circuit (const SpiceCachedCircuit *cc, const parameters_type &pv, bool anonymous_top_level)
 {
   db::Circuit *c = circuit_for (cc, pv);
   if (c) {
@@ -1320,27 +1420,33 @@ SpiceCircuitDict::build_circuit (SpiceCachedCircuit *cc, const parameters_type &
 
   c = new db::Circuit ();
   mp_netlist->add_circuit (c);
-  c->set_name (nc); // @@@ unique name!!!!
+  if (pv.empty ()) {
+    c->set_name (cc->name ());
+  } else {
+    c->set_name (make_circuit_name (cc->name (), pv));
+  }
 
   for (auto p = cc->begin_pins (); p != cc->end_pins (); ++p) {
     //  we'll make the names later
     c->add_pin (std::string ());
   }
 
-  register_circuit_for (cc, pv, c);
+  register_circuit_for (cc, pv, c, anonymous_top_level);
 
   std::unique_ptr<std::map<std::string, db::Net *> > n2n (mp_nets_by_name.release ());
   mp_nets_by_name.reset (0);
 
-  std::swap (var, m_variables);
+  std::map<std::string, double> vars;
+
+  std::swap (vars, m_variables);
   std::swap (c, mp_netlist_circuit);
   std::swap (cc, mp_circuit);
 
   //  produce the explicit pins
-  for (std::vector<std::string>::const_iterator i = nn.begin (); i != nn.end (); ++i) {
+  for (auto i = cc->begin_pins (); i != cc->end_pins (); ++i) {
     db::Net *net = make_net (*i);
     //  use the net name to name the pin (otherwise SPICE pins are always unnamed)
-    size_t pin_id = i - nn.begin ();
+    size_t pin_id = i - cc->begin_pins ();
     if (! i->empty ()) {
       c->add_pin (net->name ());
     } else {
@@ -1357,10 +1463,12 @@ SpiceCircuitDict::build_circuit (SpiceCachedCircuit *cc, const parameters_type &
 
   std::swap (cc, mp_circuit);
   std::swap (c, mp_netlist_circuit);
-  std::swap (var, m_variables);
+  std::swap (vars, m_variables);
+
+  return c;
 }
 
-void
+db::Net *
 SpiceCircuitDict::make_net (const std::string &name)
 {
   if (! mp_nets_by_name.get ()) {
@@ -1374,7 +1482,7 @@ SpiceCircuitDict::make_net (const std::string &name)
 
     net = new db::Net ();
     net->set_name (name);
-    mp_circuit->add_net (net);
+    mp_netlist_circuit->add_net (net);
 
     mp_nets_by_name->insert (std::make_pair (name, net));
 
@@ -1388,27 +1496,27 @@ SpiceCircuitDict::make_net (const std::string &name)
 void
 SpiceCircuitDict::process_card (const SpiceCard &card)
 {
-  tl::Extractor ex (card->text.c_str ());
+  tl::Extractor ex (card.text.c_str ());
 
   std::string name;
   if (ex.try_read_word (name) && ex.test ("=")) {
 
-    m_variables.insert (std::make_pair (tl::to_upper_case (word), read_value (ex)));
+    m_variables.insert (std::make_pair (tl::to_upper_case (name), NetlistSpiceReaderDelegate::read_value (ex, m_variables)));
 
   } else {
 
-    ex = tl::Extractor (card->text.c_str ());
+    ex = tl::Extractor (card.text.c_str ());
     ex.skip ();
 
-    if (is_alpha (*ex)) {
+    if (isalpha (*ex)) {
 
       ++ex;
       name = read_name (ex);
 
       std::string prefix;
-      prefix.push_back (to_upper (*ex));
+      prefix.push_back (toupper (*ex));
 
-      if (! process_element (ex, es, name, card)) {
+      if (! process_element (ex, prefix, name, card)) {
         warn (tl::sprintf (tl::to_string (tr ("Element type '%s' ignored")), prefix), card);
       }
 
@@ -1441,7 +1549,7 @@ SpiceCircuitDict::process_element (tl::Extractor &ex, const std::string &prefix,
   std::string model;
   double value = 0.0;
 
-  mp_delegate->parse_element (ex.skip (), prefix, model, value, nn, pv);
+  mp_delegate->parse_element (ex.skip (), prefix, model, value, nn, pv, m_variables);
 
   model = mp_netlist->normalize_name (model);
 
@@ -1452,7 +1560,7 @@ SpiceCircuitDict::process_element (tl::Extractor &ex, const std::string &prefix,
 
   if (prefix == "X" && ! subcircuit_captured (model)) {
 
-    db::SpiceCachedCircuit *cc = cached_circuit (model);
+    const db::SpiceCachedCircuit *cc = cached_circuit (model);
     if (! cc) {
       error (tl::sprintf (tl::to_string (tr ("Subcircuit '%s' not found in netlist")), model), card);
     }
@@ -1473,7 +1581,7 @@ SpiceCircuitDict::process_element (tl::Extractor &ex, const std::string &prefix,
     return true;
 
   } else {
-    return mp_delegate->element (mp_circuit, element, name, model, value, nets, pv);
+    return mp_delegate->element (mp_netlist_circuit, prefix, name, model, value, nets, pv);
   }
 }
 
@@ -1484,7 +1592,7 @@ SpiceCircuitDict::build_global_nets ()
 
     for (db::Netlist::bottom_up_circuit_iterator c = mp_netlist->begin_bottom_up (); c != mp_netlist->end_bottom_up (); ++c) {
 
-      if (c.operator-> () == mp_anonymous_top_circuit) {
+      if (c.operator-> () == mp_anonymous_top_level_netlist_circuit) {
         //  no pins for the anonymous top circuit
         continue;
       }
@@ -1522,7 +1630,7 @@ SpiceCircuitDict::build_global_nets ()
 // ------------------------------------------------------------------------------------------------------
 
 NetlistSpiceReader::NetlistSpiceReader (NetlistSpiceReaderDelegate *delegate)
-  : mp_netlist (0), mp_delegate (delegate), m_stream ()
+  : mp_delegate (delegate)
 {
   static NetlistSpiceReaderDelegate std_delegate;
   if (! delegate) {
@@ -1542,7 +1650,7 @@ void NetlistSpiceReader::read (tl::InputStream &stream, db::Netlist &netlist)
   //  SPICE netlists are case insensitive
   netlist.set_case_sensitive (false);
 
-  SpiceCircuitDict dict (this, mp_delegate);
+  SpiceCircuitDict dict (this, mp_delegate.get ());
 
   try {
 

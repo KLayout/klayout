@@ -1541,11 +1541,6 @@ SpiceNetlistBuilder::build_circuit (const SpiceCachedCircuit *cc, const paramete
     c->set_name (make_circuit_name (cc->name (), pv));
   }
 
-  for (auto p = cc->begin_pins (); p != cc->end_pins (); ++p) {
-    //  we'll make the names later
-    c->add_pin (std::string ());
-  }
-
   register_circuit_for (cc, pv, c, anonymous_top_level);
 
   std::unique_ptr<std::map<std::string, db::Net *> > n2n (mp_nets_by_name.release ());

@@ -43,15 +43,32 @@ class DeviceClass;
 class Device;
 
 /**
- *  @brief A specific SPICE reader exception that allows attaching location information
+ *  @brief A class implementing the expression parser
+ *
+ *  This class is exposed mainly for testing purposes.
  */
-class SpiceReaderDelegateException
-  : public tl::Exception
+class DB_PUBLIC SpiceExpressionParser
 {
 public:
-  SpiceReaderDelegateException (const std::string &msg)
-    : tl::Exception (msg)
-  { }
+  typedef std::map<std::string, tl::Variant> variables_type;
+
+  SpiceExpressionParser (const variables_type *vars);
+
+  tl::Variant read (tl::Extractor &ex) const;
+  bool try_read (tl::Extractor &ex, tl::Variant &v) const;
+
+private:
+  const variables_type *mp_variables;
+
+  tl::Variant read_atomic_value (tl::Extractor &ex, bool *status) const;
+  tl::Variant read_dot_expr (tl::Extractor &ex, bool *status) const;
+  tl::Variant read_bar_expr (tl::Extractor &ex, bool *status) const;
+  tl::Variant read_pwr_expr (tl::Extractor &ex, bool *status) const;
+  tl::Variant read_compare_expr (tl::Extractor &ex, bool *status) const;
+  tl::Variant read_logical_op (tl::Extractor &ex, bool *status) const;
+  tl::Variant read_ternary_op (tl::Extractor &ex, bool *status) const;
+  tl::Variant read_tl_expr (tl::Extractor &ex, bool *status) const;
+  tl::Variant eval_func (const std::string &name, const std::vector<tl::Variant> &params, bool *status) const;
 };
 
 /**
@@ -161,11 +178,6 @@ public:
    *  @brief Tries to read a value from the extractor (with formula evaluation)
    */
   static bool try_read_value (const std::string &s, double &v, const std::map<std::string, double> &variables);
-
-private:
-  static double read_atomic_value (tl::Extractor &ex, const std::map<std::string, double> &variables, bool *status);
-  static double read_dot_expr (tl::Extractor &ex, const std::map<std::string, double> &variables, bool *status);
-  static double read_bar_expr (tl::Extractor &ex, const std::map<std::string, double> &variables, bool *status);
 };
 
 /**

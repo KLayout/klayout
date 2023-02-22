@@ -26,50 +26,13 @@
 #include "dbCommon.h"
 #include "dbNetlistReader.h"
 #include "tlStream.h"
-
-#include <string>
-#include <set>
-#include <map>
-#include <memory>
-#include <list>
+#include "tlObject.h"
 
 namespace db
 {
 
 class Netlist;
-class Net;
-class Circuit;
-class DeviceClass;
-class Device;
-
-/**
- *  @brief A class implementing the expression parser
- *
- *  This class is exposed mainly for testing purposes.
- */
-class DB_PUBLIC SpiceExpressionParser
-{
-public:
-  typedef std::map<std::string, tl::Variant> variables_type;
-
-  SpiceExpressionParser (const variables_type *vars);
-
-  tl::Variant read (tl::Extractor &ex) const;
-  bool try_read (tl::Extractor &ex, tl::Variant &v) const;
-
-private:
-  const variables_type *mp_variables;
-
-  tl::Variant read_atomic_value (tl::Extractor &ex, bool *status) const;
-  tl::Variant read_dot_expr (tl::Extractor &ex, bool *status) const;
-  tl::Variant read_bar_expr (tl::Extractor &ex, bool *status) const;
-  tl::Variant read_pwr_expr (tl::Extractor &ex, bool *status) const;
-  tl::Variant read_compare_expr (tl::Extractor &ex, bool *status) const;
-  tl::Variant read_logical_op (tl::Extractor &ex, bool *status) const;
-  tl::Variant read_ternary_op (tl::Extractor &ex, bool *status) const;
-  tl::Variant read_tl_expr (tl::Extractor &ex, bool *status) const;
-  tl::Variant eval_func (const std::string &name, const std::vector<tl::Variant> &params, bool *status) const;
-};
+class NetlistSpiceReaderDelegate;
 
 /**
  *  @brief A specialized exception class to handle netlist reader delegate errors
@@ -81,103 +44,6 @@ public:
   NetlistSpiceReaderDelegateError (const std::string &msg)
     : tl::Exception (msg)
   { }
-};
-
-/**
- *  @brief A delegate to handle various forms of devices and translates them
- *
- *  The reader delegate can be configured to receive subcircuit elements too.
- *  In this case, parameters are allowed.
- *  For receiving subcircuit elements, the delegate needs to indicate
- *  this by returning true upon "wants_subcircuit".
- */
-class DB_PUBLIC NetlistSpiceReaderDelegate
-  : public tl::Object
-{
-public:
-  NetlistSpiceReaderDelegate ();
-  virtual ~NetlistSpiceReaderDelegate ();
-
-  /**
-   *  @brief Called when the netlist reading starts
-   */
-  virtual void start (db::Netlist *netlist);
-
-  /**
-   *  @brief Called when the netlist reading ends
-   */
-  virtual void finish (db::Netlist *netlist);
-
-  /**
-   *  @brief Called when an unknown control statement is encountered
-   *
-   *  Returns true if the statement is understood.
-   */
-  virtual bool control_statement (const std::string &line);
-
-  /**
-   *  @brief Returns true, if the delegate wants subcircuit elements with this name
-   *
-   *  The name is always upper case.
-   */
-  virtual bool wants_subcircuit (const std::string &circuit_name);
-
-  /**
-   *  @brief This method translates a raw net name to a valid net name
-   *
-   *  The default implementation will unescape backslash sequences into plain characters.
-   */
-  virtual std::string translate_net_name (const std::string &nn);
-
-  /**
-   *  @brief Makes a device from an element line
-   *
-   *  @param circuit The circuit that is currently read.
-   *  @param element The upper-case element code ("M", "R", ...).
-   *  @param name The element's name.
-   *  @param model The upper-case model name (may be empty).
-   *  @param value The default value (e.g. resistance for resistors) and may be zero.
-   *  @param nets The nets given in the element line.
-   *  @param parameters The parameters of the element statement (parameter names are upper case).
-   *
-   *  The default implementation will create corresponding devices for
-   *  some known elements using the Spice writer's parameter conventions.
-   *
-   *  This method returns true, if the element was read.
-   */
-  virtual bool element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &params);
-
-  /**
-   *  @brief Parses an element from a line
-   *
-   *  @param s The line to parse (the part after the element and name)
-   *  @param model Out parameter: the model name if given
-   *  @param value Out parameter: the value if given (for R, L, C)
-   *  @param nn Out parameter: the net names
-   *  @param pv Out parameter: the parameter values (key/value pairs)
-   */
-  virtual void parse_element (const std::string &s, const std::string &element, std::string &model, double &value, std::vector<std::string> &nn, std::map<std::string, double> &pv, const std::map<std::string, double> &params);
-
-  /**
-   *  @brief Produces an error with the given message
-   */
-  virtual void error (const std::string &msg);
-
-  /**
-   *  @brief Reads a set of string components and parameters from the string
-   *  A special key "param:" is recognized for starting a parameter list.
-   */
-  static void parse_element_components (const std::string &s, std::vector<std::string> &strings, std::map<std::string, double> &pv, const std::map<std::string, double> &variables);
-
-  /**
-   *  @brief Reads a value from the extractor (with formula evaluation)
-   */
-  static double read_value (tl::Extractor &ex, const std::map<std::string, double> &variables);
-
-  /**
-   *  @brief Tries to read a value from the extractor (with formula evaluation)
-   */
-  static bool try_read_value (const std::string &s, double &v, const std::map<std::string, double> &variables);
 };
 
 /**

@@ -21,6 +21,7 @@
 */
 
 #include "dbNetlistSpiceReader.h"
+#include "dbNetlistSpiceReaderDelegate.h"
 #include "dbNetlist.h"
 #include "dbNetlistDeviceClasses.h"
 

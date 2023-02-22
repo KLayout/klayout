@@ -60,6 +60,8 @@ SOURCES = \
   dbNetlistCompareCore.cc \
   dbNetlistCompareGraph.cc \
   dbNetlistCompareUtils.cc \
+  dbNetlistSpiceReaderDelegate.cc \
+  dbNetlistSpiceReaderExpressionParser.cc \
   dbObject.cc \
   dbPath.cc \
   dbPCellDeclaration.cc \
@@ -279,6 +281,8 @@ HEADERS = \
   dbNetlistCompareCore.h \
   dbNetlistCompareGraph.h \
   dbNetlistCompareUtils.h \
+  dbNetlistSpiceReaderDelegate.h \
+  dbNetlistSpiceReaderExpressionParser.h \
   dbObject.h \
   dbObjectTag.h \
   dbObjectWithProperties.h \

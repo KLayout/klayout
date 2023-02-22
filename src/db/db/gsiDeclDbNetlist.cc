@@ -26,6 +26,7 @@
 #include "dbNetlistSpiceWriter.h"
 #include "dbNetlistReader.h"
 #include "dbNetlistSpiceReader.h"
+#include "dbNetlistSpiceReaderDelegate.h"
 #include "tlException.h"
 #include "tlInternational.h"
 #include "tlStream.h"

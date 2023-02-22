@@ -181,34 +181,6 @@ SpiceReaderStream::set_stream (tl::InputStream *stream)
 
 // ------------------------------------------------------------------------------------------------------
 
-// @@@ remove
-struct ParametersLessFunction
-{
-  typedef std::map<std::string, double> parameters_type;
-
-  bool operator() (const parameters_type &a, const parameters_type &b) const
-  {
-    if (a.size () != b.size ()) {
-      return a.size () < b.size ();
-    }
-
-    auto ia = a.begin ();
-    auto ib = b.begin ();
-    while (ia != a.end ()) {
-      if (ia->first != ib->first) {
-        return ia->first < ib->first;
-      }
-      double avg = 0.5 * fabs (ia->second + ib->second);
-      if (fabs (ia->second - ib->second) > avg * 1e-13) {
-        return ia->second < ib->second;
-      }
-      ++ia, ++ib;
-    }
-
-    return false;
-  }
-};
-
 struct SpiceCard
 {
   SpiceCard (int _file_id, int _line, const std::string &_text)
@@ -225,7 +197,7 @@ class SpiceCachedCircuit
 public:
   typedef std::list<SpiceCard> cards_type;
   typedef cards_type::const_iterator cards_iterator;
-  typedef std::map<std::string, double> parameters_type;
+  typedef NetlistSpiceReader::parameters_type parameters_type;
   typedef std::vector<std::string> pin_list_type;
   typedef pin_list_type::const_iterator pin_const_iterator;
 
@@ -250,7 +222,7 @@ public:
     return m_parameters;
   }
 
-  void make_parameter (const std::string &name, double value)
+  void make_parameter (const std::string &name, const tl::Variant &value)
   {
     for (auto p = m_pins.begin (); p != m_pins.end (); ++p) {
       if (*p == name) {
@@ -321,7 +293,7 @@ read_name (tl::Extractor &ex, const db::Netlist *netlist)
 class SpiceCircuitDict
 {
 public:
-  typedef std::map<std::string, double> parameters_type;
+  typedef NetlistSpiceReader::parameters_type parameters_type;
   typedef std::map<std::string, SpiceCachedCircuit *> circuits_type;
   typedef circuits_type::const_iterator circuits_iterator;
   typedef std::vector<std::string> global_nets_type;
@@ -381,7 +353,7 @@ private:
   SpiceCachedCircuit *mp_circuit;
   SpiceCachedCircuit *mp_anonymous_top_level_circuit;
   std::set<std::string> m_called_circuits;
-  std::map<std::string, double> m_variables;
+  NetlistSpiceReader::parameters_type m_variables;
   std::set<std::string> m_global_net_names;
   std::vector<std::string> m_global_nets;
 
@@ -664,7 +636,7 @@ SpiceCircuitDict::read_card ()
 
       name = tl::to_upper_case (name);
 
-      double value = NetlistSpiceReaderDelegate::read_value (ex, m_variables);
+      tl::Variant value = NetlistSpiceReaderDelegate::read_value (ex, m_variables);
       m_variables [name] = value;
 
       mp_circuit->make_parameter (name, value);
@@ -716,7 +688,7 @@ void
 SpiceCircuitDict::read_circuit (tl::Extractor &ex, const std::string &nc)
 {
   std::vector<std::string> nn;
-  std::map<std::string, double> pv;
+  NetlistSpiceReader::parameters_type pv;
   NetlistSpiceReaderDelegate::parse_element_components (ex.skip (), nn, pv, m_variables);
 
   if (cached_circuit (nc)) {
@@ -728,7 +700,7 @@ SpiceCircuitDict::read_circuit (tl::Extractor &ex, const std::string &nc)
   cc->set_parameters (pv);
 
   std::swap (cc, mp_circuit);
-  std::map<std::string, double> vars = pv;
+  NetlistSpiceReader::parameters_type vars = pv;
   m_variables.swap (vars);
 
   while (! at_end ()) {
@@ -753,7 +725,7 @@ SpiceCircuitDict::finish ()
 class SpiceNetlistBuilder
 {
 public:
-  typedef std::map<std::string, double> parameters_type;
+  typedef NetlistSpiceReader::parameters_type parameters_type;
 
   SpiceNetlistBuilder (SpiceCircuitDict *dict, Netlist *netlist, NetlistSpiceReaderDelegate *delegate);
 
@@ -770,12 +742,12 @@ private:
   Netlist *mp_netlist;
   bool m_strict;
   const SpiceCachedCircuit *mp_circuit;
-  std::map<const SpiceCachedCircuit *, std::map<parameters_type, db::Circuit *, ParametersLessFunction> > m_circuits;
+  std::map<const SpiceCachedCircuit *, std::map<parameters_type, db::Circuit *> > m_circuits;
   db::Circuit *mp_netlist_circuit;
   db::Circuit *mp_anonymous_top_level_netlist_circuit;
   std::unique_ptr<std::map<std::string, db::Net *> > mp_nets_by_name;
   std::map<std::string, bool> m_captured;
-  std::map<std::string, double> m_variables;
+  NetlistSpiceReader::parameters_type m_variables;
   const SpiceCard *mp_current_card;
 
   db::Circuit *circuit_for (const SpiceCachedCircuit *cached_circuit, const parameters_type &pv);
@@ -878,7 +850,7 @@ SpiceNetlistBuilder::build ()
 }
 
 static std::string
-make_circuit_name (const std::string &name, const std::map<std::string, double> &pv)
+make_circuit_name (const std::string &name, const NetlistSpiceReader::parameters_type &pv)
 {
   std::string res = name;
 
@@ -889,29 +861,30 @@ make_circuit_name (const std::string &name, const std::map<std::string, double> 
     }
     res += p->first;
     res += "=";
-    double va = fabs (p->second);
+    double v = p->second.to_double ();
+    double va = fabs (v);
     if (va < 1e-15) {
-      res += tl::sprintf ("%g", p->second);
+      res += tl::sprintf ("%g", v);
     } else if (va < 0.1e-12) {
-      res += tl::sprintf ("%gF", p->second * 1e15);
+      res += tl::sprintf ("%gF", v * 1e15);
     } else if (va < 0.1e-9) {
-      res += tl::sprintf ("%gP", p->second * 1e12);
+      res += tl::sprintf ("%gP", v * 1e12);
     } else if (va < 0.1e-6) {
-      res += tl::sprintf ("%gN", p->second * 1e9);
+      res += tl::sprintf ("%gN", v * 1e9);
     } else if (va < 0.1e-3) {
-      res += tl::sprintf ("%gU", p->second * 1e6);
+      res += tl::sprintf ("%gU", v * 1e6);
     } else if (va< 0.1) {
-      res += tl::sprintf ("%gM", p->second * 1e3);
+      res += tl::sprintf ("%gM", v * 1e3);
     } else if (va < 0.1e3) {
-      res += tl::sprintf ("%g", p->second);
+      res += tl::sprintf ("%g", v);
     } else if (va < 0.1e6) {
-      res += tl::sprintf ("%gK", p->second * 1e-3);
+      res += tl::sprintf ("%gK", v * 1e-3);
     } else if (va < 0.1e9) {
-      res += tl::sprintf ("%gMEG", p->second * 1e-6);
+      res += tl::sprintf ("%gMEG", v * 1e-6);
     } else if (va < 0.1e12) {
-      res += tl::sprintf ("%gG", p->second * 1e-9);
+      res += tl::sprintf ("%gG", v * 1e-9);
     } else {
-      res += tl::sprintf ("%g", p->second);
+      res += tl::sprintf ("%g", v);
     }
   }
   res += ")";
@@ -940,7 +913,7 @@ SpiceNetlistBuilder::build_circuit (const SpiceCachedCircuit *cc, const paramete
   std::unique_ptr<std::map<std::string, db::Net *> > n2n (mp_nets_by_name.release ());
   mp_nets_by_name.reset (0);
 
-  std::map<std::string, double> vars;
+  NetlistSpiceReader::parameters_type vars;
 
   std::swap (vars, m_variables);
   std::swap (c, mp_netlist_circuit);
@@ -1052,7 +1025,7 @@ SpiceNetlistBuilder::process_element (tl::Extractor &ex, const std::string &pref
 {
   //  generic parse
   std::vector<std::string> nn;
-  std::map<std::string, double> pv;
+  NetlistSpiceReader::parameters_type pv;
   std::string model;
   double value = 0.0;
 

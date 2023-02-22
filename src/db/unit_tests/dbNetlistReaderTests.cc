@@ -214,7 +214,7 @@ public:
     return circuit_name == "HVNMOS" || circuit_name == "HVPMOS";
   }
 
-  bool element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &params)
+  bool element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, tl::Variant> &params)
   {
     if (element == "X") {
 
@@ -240,9 +240,9 @@ public:
 
       const std::vector<db::DeviceParameterDefinition> &td = cls->parameter_definitions ();
       for (std::vector<db::DeviceParameterDefinition>::const_iterator i = td.begin (); i != td.end (); ++i) {
-        std::map<std::string, double>::const_iterator pi = params.find (i->name ());
+        auto pi = params.find (i->name ());
         if (pi != params.end ()) {
-          device->set_parameter_value (i->id (), pi->second * 1.5);
+          device->set_parameter_value (i->id (), pi->second.to_double () * 1.5);
         }
       }
 

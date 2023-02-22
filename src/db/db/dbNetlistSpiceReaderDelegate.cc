@@ -176,7 +176,7 @@ static std::string parse_component (tl::Extractor &ex)
   return std::string (cp0, cp - cp0);
 }
 
-void NetlistSpiceReaderDelegate::parse_element_components (const std::string &s, std::vector<std::string> &strings, std::map<std::string, double> &pv, const std::map<std::string, double> &variables)
+void NetlistSpiceReaderDelegate::parse_element_components (const std::string &s, std::vector<std::string> &strings, std::map<std::string, tl::Variant> &pv, const std::map<std::string, tl::Variant> &variables)
 {
   tl::Extractor ex (s.c_str ());
   bool in_params = false;
@@ -208,7 +208,7 @@ void NetlistSpiceReaderDelegate::parse_element_components (const std::string &s,
   }
 }
 
-void NetlistSpiceReaderDelegate::parse_element (const std::string &s, const std::string &element, std::string &model, double &value, std::vector<std::string> &nn, std::map<std::string, double> &pv, const std::map<std::string, double> &variables)
+void NetlistSpiceReaderDelegate::parse_element (const std::string &s, const std::string &element, std::string &model, double &value, std::vector<std::string> &nn, std::map<std::string, tl::Variant> &pv, const std::map<std::string, tl::Variant> &variables)
 {
   parse_element_components (s, nn, pv, variables);
 
@@ -242,11 +242,11 @@ void NetlistSpiceReaderDelegate::parse_element (const std::string &s, const std:
       error (tl::to_string (tr ("Not enough specs for a R, C or L device")));
     }
 
-    std::map<std::string, double>::const_iterator rv = pv.find (element);
+    auto rv = pv.find (element);
     if (rv != pv.end ()) {
 
       //  value given by parameter
-      value = rv->second;
+      value = rv->second.to_double ();
 
       if (nn.size () >= 3) {
         //  Rname n1 n2 model [params]
@@ -309,14 +309,14 @@ void NetlistSpiceReaderDelegate::parse_element (const std::string &s, const std:
   }
 }
 
-bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &pv)
+bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, tl::Variant> &pv)
 {
-  std::map<std::string, double> params = pv;
+  std::map<std::string, tl::Variant> params = pv;
 
   double mult = 1.0;
-  std::map<std::string, double>::const_iterator mp = params.find ("M");
+  auto mp = params.find ("M");
   if (mp != params.end ()) {
-    mult = mp->second;
+    mult = mp->second.to_double ();
   }
 
   if (mult < 1e-10) {
@@ -422,10 +422,9 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
     }
 
     //  Apply multiplier to "A"
-    std::map<std::string, double>::iterator p;
-    p = params.find ("A");
+    auto p = params.find ("A");
     if (p != params.end ()) {
-      p->second *= mult;
+      p->second = tl::Variant (p->second.to_double () * mult);
     }
 
   } else if (element == "Q") {
@@ -457,10 +456,9 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
     }
 
     //  Apply multiplier to "AE"
-    std::map<std::string, double>::iterator p;
-    p = params.find ("AE");
+    auto p = params.find ("AE");
     if (p != params.end ()) {
-      p->second *= mult;
+      p->second = tl::Variant (p->second.to_double () * mult);
     }
 
   } else if (element == "M") {
@@ -481,10 +479,9 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
     }
 
     //  Apply multiplier to "W"
-    std::map<std::string, double>::iterator p;
-    p = params.find ("W");
+    auto p = params.find ("W");
     if (p != params.end ()) {
-      p->second *= mult;
+      p->second = tl::Variant (p->second.to_double () * mult);
     }
 
   } else {
@@ -514,9 +511,9 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
   std::vector<db::DeviceParameterDefinition> &pd = cls->parameter_definitions_non_const ();
   for (std::vector<db::DeviceParameterDefinition>::iterator i = pd.begin (); i != pd.end (); ++i) {
-    std::map<std::string, double>::const_iterator v = params.find (i->name ());
+    auto v = params.find (i->name ());
     if (v != params.end ()) {
-      device->set_parameter_value (i->id (), v->second / i->si_scaling ());
+      device->set_parameter_value (i->id (), v->second.to_double () / i->si_scaling ());
     } else if (i->id () == defp) {
       device->set_parameter_value (i->id (), value / i->si_scaling ());
     }
@@ -526,7 +523,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 }
 
 double
-NetlistSpiceReaderDelegate::read_value (tl::Extractor &ex, const std::map<std::string, double> &variables)
+NetlistSpiceReaderDelegate::read_value (tl::Extractor &ex, const std::map<std::string, tl::Variant> &variables)
 {
   std::map<std::string, tl::Variant> vvariables;
   for (auto i = variables.begin (); i != variables.end (); ++i) {
@@ -538,7 +535,7 @@ NetlistSpiceReaderDelegate::read_value (tl::Extractor &ex, const std::map<std::s
 }
 
 bool
-NetlistSpiceReaderDelegate::try_read_value (const std::string &s, double &v, const std::map<std::string, double> &variables)
+NetlistSpiceReaderDelegate::try_read_value (const std::string &s, double &v, const std::map<std::string, tl::Variant> &variables)
 {
   std::map<std::string, tl::Variant> vvariables;
   for (auto i = variables.begin (); i != variables.end (); ++i) {

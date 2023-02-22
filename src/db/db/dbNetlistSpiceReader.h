@@ -25,8 +25,13 @@
 
 #include "dbCommon.h"
 #include "dbNetlistReader.h"
+
 #include "tlStream.h"
 #include "tlObject.h"
+#include "tlVariant.h"
+
+#include <map>
+#include <string>
 
 namespace db
 {
@@ -53,6 +58,8 @@ class DB_PUBLIC NetlistSpiceReader
   : public NetlistReader
 {
 public:
+  typedef std::map<std::string, tl::Variant> parameters_type;
+
   NetlistSpiceReader (NetlistSpiceReaderDelegate *delegate = 0);
   virtual ~NetlistSpiceReader ();
 

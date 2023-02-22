@@ -102,7 +102,7 @@ public:
    *
    *  This method returns true, if the element was read.
    */
-  virtual bool element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &params);
+  virtual bool element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, tl::Variant> &params);
 
   /**
    *  @brief Parses an element from a line
@@ -113,7 +113,7 @@ public:
    *  @param nn Out parameter: the net names
    *  @param pv Out parameter: the parameter values (key/value pairs)
    */
-  virtual void parse_element (const std::string &s, const std::string &element, std::string &model, double &value, std::vector<std::string> &nn, std::map<std::string, double> &pv, const std::map<std::string, double> &params);
+  virtual void parse_element (const std::string &s, const std::string &element, std::string &model, double &value, std::vector<std::string> &nn, std::map<std::string, tl::Variant> &pv, const std::map<std::string, tl::Variant> &params);
 
   /**
    *  @brief Produces an error with the given message
@@ -124,17 +124,17 @@ public:
    *  @brief Reads a set of string components and parameters from the string
    *  A special key "param:" is recognized for starting a parameter list.
    */
-  static void parse_element_components (const std::string &s, std::vector<std::string> &strings, std::map<std::string, double> &pv, const std::map<std::string, double> &variables);
+  static void parse_element_components (const std::string &s, std::vector<std::string> &strings, std::map<std::string, tl::Variant> &pv, const std::map<std::string, tl::Variant> &variables);
 
   /**
    *  @brief Reads a value from the extractor (with formula evaluation)
    */
-  static double read_value (tl::Extractor &ex, const std::map<std::string, double> &variables);
+  static double read_value (tl::Extractor &ex, const std::map<std::string, tl::Variant> &variables);
 
   /**
    *  @brief Tries to read a value from the extractor (with formula evaluation)
    */
-  static bool try_read_value (const std::string &s, double &v, const std::map<std::string, double> &variables);
+  static bool try_read_value (const std::string &s, double &v, const std::map<std::string, tl::Variant> &variables);
 };
 
 }

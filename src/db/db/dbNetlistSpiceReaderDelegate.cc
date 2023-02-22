@@ -193,14 +193,28 @@ void NetlistSpiceReaderDelegate::parse_element_components (const std::string &s,
       std::string n;
 
       if (ex.try_read_word (n) && ex.test ("=")) {
+
         //  a parameter. Note that parameter names are always made upper case.
         pv.insert (std::make_pair (tl::to_upper_case (n), read_value (ex, variables)));
+
       } else {
+
+        //  a net/model component
         ex = ex0;
         if (in_params) {
           ex.error (tl::to_string (tr ("Invalid syntax for parameter assignment - needs keyword followed by '='")));
         }
-        strings.push_back (parse_component (ex));
+
+        std::string comp_name = parse_component (ex);
+
+        //  resolve variables if string type
+        auto v = variables.find (comp_name);
+        if (v != variables.end () && v->second.is_a_string ()) {
+          comp_name = v->second.to_string ();
+        }
+
+        strings.push_back (comp_name);
+
       }
 
     }
@@ -525,24 +539,14 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 double
 NetlistSpiceReaderDelegate::read_value (tl::Extractor &ex, const std::map<std::string, tl::Variant> &variables)
 {
-  std::map<std::string, tl::Variant> vvariables;
-  for (auto i = variables.begin (); i != variables.end (); ++i) {
-    vvariables.insert (std::make_pair (i->first, tl::Variant (i->second)));
-  }
-
-  NetlistSpiceReaderExpressionParser parser (&vvariables);
+  NetlistSpiceReaderExpressionParser parser (&variables);
   return parser.read (ex).to_double ();
 }
 
 bool
 NetlistSpiceReaderDelegate::try_read_value (const std::string &s, double &v, const std::map<std::string, tl::Variant> &variables)
 {
-  std::map<std::string, tl::Variant> vvariables;
-  for (auto i = variables.begin (); i != variables.end (); ++i) {
-    vvariables.insert (std::make_pair (i->first, tl::Variant (i->second)));
-  }
-
-  NetlistSpiceReaderExpressionParser parser (&vvariables);
+  NetlistSpiceReaderExpressionParser parser (&variables);
 
   tl::Variant vv;
   tl::Extractor ex (s.c_str ());

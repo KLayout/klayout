@@ -48,7 +48,9 @@ public:
   NetlistSpiceReaderExpressionParser (const variables_type *vars);
 
   tl::Variant read (tl::Extractor &ex) const;
+  tl::Variant read (const std::string &s) const;
   bool try_read (tl::Extractor &ex, tl::Variant &v) const;
+  bool try_read (const std::string &s, tl::Variant &v) const;
 
 private:
   const variables_type *mp_variables;

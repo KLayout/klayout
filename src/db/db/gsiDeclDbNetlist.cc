@@ -2688,10 +2688,10 @@ static tl::Variant value_from_string (NetlistSpiceReaderDelegateImpl * /*delegat
   return res;
 }
 
-static ParseElementComponentsData parse_element_components (NetlistSpiceReaderDelegateImpl * /*delegate*/, const std::string &s, const db::NetlistSpiceReader::parameters_type &variables)
+static ParseElementComponentsData parse_element_components (NetlistSpiceReaderDelegateImpl *delegate, const std::string &s, const db::NetlistSpiceReader::parameters_type &variables)
 {
   ParseElementComponentsData data;
-  db::NetlistSpiceReaderDelegate::parse_element_components (s, data.strings_nc (), data.parameters_nc (), variables);
+  delegate->parse_element_components (s, data.strings_nc (), data.parameters_nc (), variables);
   return data;
 }
 

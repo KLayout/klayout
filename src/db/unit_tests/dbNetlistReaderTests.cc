@@ -22,6 +22,7 @@
 
 #include "dbNetlistSpiceReader.h"
 #include "dbNetlistSpiceReaderDelegate.h"
+#include "dbNetlistSpiceReaderExpressionParser.h"
 #include "dbNetlist.h"
 #include "dbNetlistDeviceClasses.h"
 
@@ -176,11 +177,23 @@ TEST(4_ReaderWithUnconnectedPins)
 
 TEST(5_CircuitParameters)
 {
-  db::Netlist nl;
-
   std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader5.cir");
 
   db::NetlistSpiceReader reader;
+  reader.set_strict (true);
+
+  try {
+    db::Netlist nl;
+    tl::InputStream is (path);
+    reader.read (is, nl);
+    //  strict mode makes this sample fail
+    EXPECT_EQ (true, false);
+  } catch (...) {
+    //  ..
+  }
+
+  db::Netlist nl;
+  reader.set_strict (false);
   tl::InputStream is (path);
   reader.read (is, nl);
 
@@ -619,4 +632,187 @@ TEST(16_issue898)
     "  device NMOS '0' (S=GND,G=VDD,D=GND,B=GND) (L=10,W=10,AS=0,AD=0,PS=0,PD=0);\n"
     "end;\n"
   );
+}
+
+TEST(17_RecursiveExpansion)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader17.cir");
+
+  db::NetlistSpiceReader reader;
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit .TOP ();\n"
+    "  subcircuit 'SUB1(L=0.15,W=1.5)' SUB1A (N1=A,N2=B,N3=C);\n"
+    "  subcircuit 'SUB1(L=0.25,W=3)' SUB1B (N1=A,N2=B,N3=C);\n"
+    "end;\n"
+    "circuit 'SUB1(L=0.15,W=1.5)' (N1=N1,N2=N2,N3=N3);\n"
+    "  subcircuit 'SUB2(L=0.15,M=1,W=1.5)' SUB2A (N1=N1,N2=N2,N3=N3);\n"
+    "  subcircuit 'SUB2(L=0.15,M=2,W=1.5)' SUB2B (N1=N1,N2=N2,N3=N3);\n"
+    "end;\n"
+    "circuit 'SUB2(L=0.15,M=1,W=1.5)' (N1=N1,N2=N2,N3=N3);\n"
+    "  device NMOS NMOS (S=N1,G=N2,D=N3,B=N1) (L=150000,W=1500000,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+    "circuit 'SUB2(L=0.15,M=2,W=1.5)' (N1=N1,N2=N2,N3=N3);\n"
+    "  device NMOS NMOS (S=N1,G=N2,D=N3,B=N1) (L=150000,W=3000000,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+    "circuit 'SUB1(L=0.25,W=3)' (N1=N1,N2=N2,N3=N3);\n"
+    "  subcircuit 'SUB2(L=0.25,M=1,W=3)' SUB2A (N1=N1,N2=N2,N3=N3);\n"
+    "  subcircuit 'SUB2(L=0.25,M=2,W=3)' SUB2B (N1=N1,N2=N2,N3=N3);\n"
+    "end;\n"
+    "circuit 'SUB2(L=0.25,M=1,W=3)' (N1=N1,N2=N2,N3=N3);\n"
+    "  device NMOS NMOS (S=N1,G=N2,D=N3,B=N1) (L=250000,W=3000000,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+    "circuit 'SUB2(L=0.25,M=2,W=3)' (N1=N1,N2=N2,N3=N3);\n"
+    "  device NMOS NMOS (S=N1,G=N2,D=N3,B=N1) (L=250000,W=6000000,AS=0,AD=0,PS=0,PD=0);\n"
+    "end;\n"
+  );
+}
+
+TEST(18_XSchemOutput)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader18.cir");
+
+  db::NetlistSpiceReader reader;
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit .TOP ();\n"
+    "  subcircuit 'PMOS4_STANDARD(L=0.15U,NF=4,W=1.5U)' XPMOS (D=Q,G=I,S=VDD,B=VDD);\n"
+    "  subcircuit 'NMOS4_STANDARD(L=0.15U,NF=4,W=1.5U)' XNMOS (D=Q,G=I,S=VSS,B=VSS);\n"
+    "  subcircuit 'NMOS4_STANDARD(L=0.15U,NF=2,W=1.5U)' XDUMMY0 (D=VSS,G=VSS,S=VSS,B=VSS);\n"
+    "  subcircuit 'NMOS4_STANDARD(L=0.15U,NF=2,W=1.5U)' XDUMMY1 (D=VSS,G=VSS,S=VSS,B=VSS);\n"
+    "  subcircuit 'PMOS4_STANDARD(L=0.15U,NF=2,W=1.5U)' XDUMMY2 (D=VDD,G=VDD,S=VDD,B=VDD);\n"
+    "  subcircuit 'PMOS4_STANDARD(L=0.15U,NF=2,W=1.5U)' XDUMMY3 (D=VDD,G=VDD,S=VDD,B=VDD);\n"
+    "end;\n"
+    "circuit 'PMOS4_STANDARD(L=0.15U,NF=4,W=1.5U)' (D=D,G=G,S=S,B=B);\n"
+    "  device SKY130_FD_PR__PFET_01V8 M1 (S=D,G=G,D=S,B=B) (L=0.15,W=6,AS=0.32625,AD=0.2175,PS=2.685,PD=1.79);\n"
+    "end;\n"
+    "circuit 'NMOS4_STANDARD(L=0.15U,NF=4,W=1.5U)' (D=D,G=G,S=S,B=B);\n"
+    "  device SKY130_FD_PR__NFET_01V8 M1 (S=D,G=G,D=S,B=B) (L=0.15,W=6,AS=0.32625,AD=0.2175,PS=2.685,PD=1.79);\n"
+    "end;\n"
+    "circuit 'NMOS4_STANDARD(L=0.15U,NF=2,W=1.5U)' (D=D,G=G,S=S,B=B);\n"
+    "  device SKY130_FD_PR__NFET_01V8 M1 (S=D,G=G,D=S,B=B) (L=0.15,W=3,AS=0.435,AD=0.2175,PS=3.58,PD=1.79);\n"
+    "end;\n"
+    "circuit 'PMOS4_STANDARD(L=0.15U,NF=2,W=1.5U)' (D=D,G=G,S=S,B=B);\n"
+    "  device SKY130_FD_PR__PFET_01V8 M1 (S=D,G=G,D=S,B=B) (L=0.15,W=3,AS=0.435,AD=0.2175,PS=3.58,PD=1.79);\n"
+    "end;\n"
+  );
+}
+
+TEST(100_ExpressionParser)
+{
+  std::map<std::string, tl::Variant> vars;
+  vars["A"] = 17.5;
+  vars["B"] = 42;
+  vars["S"] = "string";
+
+  tl::Variant v;
+
+  db::NetlistSpiceReaderExpressionParser parser (&vars);
+
+  EXPECT_EQ (parser.read ("1.75").to_string (), "1.75");
+  EXPECT_EQ (parser.read ("-1.75").to_string (), "-1.75");
+  EXPECT_EQ (parser.read ("-a*0.1").to_string (), "-1.75");
+  EXPECT_EQ (parser.read ("-A*0.1").to_string (), "-1.75");
+  EXPECT_EQ (parser.read ("b/6").to_string (), "7");
+  EXPECT_EQ (parser.read ("B/6").to_string (), "7");
+  EXPECT_EQ (parser.read ("s").to_string (), "string");
+  EXPECT_EQ (parser.read ("S").to_string (), "string");
+  EXPECT_EQ (parser.read ("!0").to_string (), "true");
+  EXPECT_EQ (parser.read ("!1").to_string (), "false");
+  EXPECT_EQ (parser.read ("4*2+1").to_string (), "9");
+  EXPECT_EQ (parser.read ("4*2-1").to_string (), "7");
+  EXPECT_EQ (parser.read ("4/2-1").to_string (), "1");
+  EXPECT_EQ (parser.read ("4%2-1").to_string (), "-1");
+  EXPECT_EQ (parser.read ("5%2-1").to_string (), "0");
+  EXPECT_EQ (parser.read ("2**2*2+1").to_string (), "9");
+  EXPECT_EQ (parser.read ("2**2*(2+1)").to_string (), "12");
+  EXPECT_EQ (parser.read ("pow(2,2)*(2+1)").to_string (), "12");
+  EXPECT_EQ (parser.read ("POW(2,2)*(2+1)").to_string (), "12");
+  EXPECT_EQ (parser.read ("pwr(2,2)*(2+1)").to_string (), "12");
+  EXPECT_EQ (parser.read ("PWR(2,2)*(2+1)").to_string (), "12");
+  EXPECT_EQ (parser.read ("3==2+1").to_string (), "true");
+  EXPECT_EQ (parser.read ("4==2+1").to_string (), "false");
+  EXPECT_EQ (parser.read ("3!=2+1").to_string (), "false");
+  EXPECT_EQ (parser.read ("4!=2+1").to_string (), "true");
+  EXPECT_EQ (parser.read ("2<2+1").to_string (), "true");
+  EXPECT_EQ (parser.read ("3<2+1").to_string (), "false");
+  EXPECT_EQ (parser.read ("4<2+1").to_string (), "false");
+  EXPECT_EQ (parser.read ("2<=2+1").to_string (), "true");
+  EXPECT_EQ (parser.read ("3<=2+1").to_string (), "true");
+  EXPECT_EQ (parser.read ("4<=2+1").to_string (), "false");
+  EXPECT_EQ (parser.read ("2>2+1").to_string (), "false");
+  EXPECT_EQ (parser.read ("3>2+1").to_string (), "false");
+  EXPECT_EQ (parser.read ("4>2+1").to_string (), "true");
+  EXPECT_EQ (parser.read ("2>=2+1").to_string (), "false");
+  EXPECT_EQ (parser.read ("3>=2+1").to_string (), "true");
+  EXPECT_EQ (parser.read ("4>=2+1").to_string (), "true");
+  EXPECT_EQ (parser.read ("1==2||2==2").to_string (), "true");
+  EXPECT_EQ (parser.read ("1==2||3==2").to_string (), "false");
+  EXPECT_EQ (parser.read ("1==2&&2==2").to_string (), "false");
+  EXPECT_EQ (parser.read ("1==1&&2==2").to_string (), "true");
+  EXPECT_EQ (parser.read ("1==2?2:3").to_string (), "3");
+  EXPECT_EQ (parser.read ("ternery_fcn(1==2,2,3)").to_string (), "3");
+  EXPECT_EQ (parser.read ("1==1?2:3").to_string (), "2");
+  EXPECT_EQ (parser.read ("ternery_fcn(1==1,2,3)").to_string (), "2");
+
+  EXPECT_EQ (parser.read ("sin(0)").to_string (), "0");
+  EXPECT_EQ (parser.read ("sin(atan(1.0)*2)").to_string (), "1");
+  EXPECT_EQ (parser.read ("cos(0)").to_string (), "1");
+  EXPECT_EQ (parser.read ("cos(atan(1.0)*2)").to_string (), "0");
+  EXPECT_EQ (parser.read ("tan(0)").to_string (), "0");
+  EXPECT_EQ (parser.read ("tan(atan(1.0))").to_string (), "1");
+  EXPECT_EQ (parser.read ("sin(asin(0.5))").to_string (), "0.5");
+  EXPECT_EQ (parser.read ("cos(acos(0.5))").to_string (), "0.5");
+  EXPECT_EQ (parser.read ("ln(exp(0.5))").to_string (), "0.5");
+  EXPECT_EQ (parser.read ("exp(0.0)").to_string (), "1");
+  EXPECT_EQ (parser.read ("log(10**0.5)").to_string (), "0.5");
+  EXPECT_EQ (parser.read ("int(-0.5)").to_string (), "0");
+  EXPECT_EQ (parser.read ("int(-1.5)").to_string (), "-1");
+  EXPECT_EQ (parser.read ("int(0.5)").to_string (), "0");
+  EXPECT_EQ (parser.read ("int(1.5)").to_string (), "1");
+  EXPECT_EQ (parser.read ("floor(-0.5)").to_string (), "-1");
+  EXPECT_EQ (parser.read ("floor(-1.5)").to_string (), "-2");
+  EXPECT_EQ (parser.read ("floor(0.5)").to_string (), "0");
+  EXPECT_EQ (parser.read ("floor(1.5)").to_string (), "1");
+  EXPECT_EQ (parser.read ("ceil(-0.5)").to_string (), "0");
+  EXPECT_EQ (parser.read ("ceil(-1.5)").to_string (), "-1");
+  EXPECT_EQ (parser.read ("ceil(0.5)").to_string (), "1");
+  EXPECT_EQ (parser.read ("ceil(1.5)").to_string (), "2");
+  EXPECT_EQ (parser.read ("nint(-0.5)").to_string (), "0");
+  EXPECT_EQ (parser.read ("nint(-1.5)").to_string (), "-2");
+  EXPECT_EQ (parser.read ("nint(0.5)").to_string (), "0");
+  EXPECT_EQ (parser.read ("nint(1.5)").to_string (), "2");
+  EXPECT_EQ (parser.read ("min(4,1,3)").to_string (), "1");
+  EXPECT_EQ (parser.read ("min(4,3)").to_string (), "3");
+  EXPECT_EQ (parser.read ("min(4)").to_string (), "4");
+  EXPECT_EQ (parser.read ("max(1,4,3)").to_string (), "4");
+  EXPECT_EQ (parser.read ("max(4,3)").to_string (), "4");
+  EXPECT_EQ (parser.read ("max(4)").to_string (), "4");
+  EXPECT_EQ (parser.read ("max(a,b)").to_string (), "42");
+
+  EXPECT_EQ (parser.try_read ("a syntax error", v), false);
+  v = tl::Variant ();
+  EXPECT_EQ (parser.try_read ("1+2*(2+1)-1", v), true);
+  EXPECT_EQ (v.to_string (), "6");
+  EXPECT_EQ (parser.try_read ("{1+2*(2+1)-1)", v), false);
+  EXPECT_EQ (parser.try_read ("'1+2*(2+1)-1)", v), false);
+  EXPECT_EQ (parser.try_read ("\"1+2*(2+1)-1)", v), false);
+  EXPECT_EQ (parser.try_read ("\"1+2*(2+1)-1'", v), false);
+  v = tl::Variant ();
+  EXPECT_EQ (parser.try_read ("{1+2*(2+1)-1}", v), true);
+  EXPECT_EQ (v.to_string (), "6");
+  v = tl::Variant ();
+  EXPECT_EQ (parser.try_read ("'1+2*(2+1)-1'", v), true);
+  EXPECT_EQ (v.to_string (), "6");
+  v = tl::Variant ();
+  EXPECT_EQ (parser.try_read ("\"1+2*(2+1)-1\"", v), true);
+  EXPECT_EQ (v.to_string (), "6");
 }

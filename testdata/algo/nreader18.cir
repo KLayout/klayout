@@ -1,0 +1,59 @@
+** sch_path:
+*+ /home/matthias/dev/bag/mosaic_bag/opensource_db_template/inverter1_generated_sky130_fd_pr/inverter1/inverter1.sch
+**.subckt inverter1 I Q VDD VSS
+*.ipin I
+*.opin Q
+*.iopin VDD
+*.iopin VSS
+XXpmos Q I VDD VDD pmos4_standard w=1.5u l=150n nf=4
+XXnmos Q I VSS VSS nmos4_standard w=1.5u l=150n nf=4
+XXDUMMY0 VSS VSS VSS VSS nmos4_standard w=1.5u l=150n nf=2
+XXDUMMY1 VSS VSS VSS VSS nmos4_standard w=1.5u l=150n nf=2
+XXDUMMY2 VDD VDD VDD VDD pmos4_standard w=1.5u l=150n nf=2
+XXDUMMY3 VDD VDD VDD VDD pmos4_standard w=1.5u l=150n nf=2
+**.ends
+
+* expanding   symbol:  BAG_prim/pmos4_standard/pmos4_standard.sym # of pins=4
+** sym_path:
+*+ /home/matthias/dev/bag/mosaic_bag/opensource_db_template/BAG2_technology_definition/BAG_prim/pmos4_standard/pmos4_standard.sym
+** sch_path:
+*+ /home/matthias/dev/bag/mosaic_bag/opensource_db_template/BAG2_technology_definition/BAG_prim/pmos4_standard/pmos4_standard.sch
+.subckt pmos4_standard  D G S B  model  w  l  nf
+w=100n
+l=18n
+nf=4
+model=pmos4_standard
+spiceprefix=X
+
+*.iopin D
+*.iopin G
+*.iopin S
+*.iopin B
+MM1 D G S B sky130_fd_pr__pfet_01v8 L=l W=w ad='int((nf+1)/2) * W/nf * 0.29u' as='int((nf+2)/2) * W/nf * 0.29u'
++ pd='2*int((nf+1)/2) * (W + 0.29u)/nf' ps='2*int((nf+2)/2) * (W + 0.29u)/nf' nrd='0.29u / W' nrs='0.29u / W'
++ sa=0 sb=0 sd=0 mult=1 m=nf
+.ends
+
+
+* expanding   symbol:  BAG_prim/nmos4_standard/nmos4_standard.sym # of pins=4
+** sym_path:
+*+ /home/matthias/dev/bag/mosaic_bag/opensource_db_template/BAG2_technology_definition/BAG_prim/nmos4_standard/nmos4_standard.sym
+** sch_path:
+*+ /home/matthias/dev/bag/mosaic_bag/opensource_db_template/BAG2_technology_definition/BAG_prim/nmos4_standard/nmos4_standard.sch
+.subckt nmos4_standard  D G S B  model  w  l  nf
+w=100n
+l=18n
+nf=4
+model=nmos4_standard
+spiceprefix=X
+
+*.iopin D
+*.iopin G
+*.iopin S
+*.iopin B
+MM1 D G S B sky130_fd_pr__nfet_01v8 L=l W=w ad='int((nf+1)/2) * W/nf * 0.29u' as='int((nf+2)/2) * W/nf * 0.29u'
++ pd='2*int((nf+1)/2) * (W + 0.29u)/nf' ps='2*int((nf+2)/2) * (W + 0.29u)/nf' nrd='0.29u / W' nrs='0.29u / W'
++ sa=0 sb=0 sd=0 mult=1 m=nf
+.ends
+
+.end

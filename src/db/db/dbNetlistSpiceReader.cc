@@ -453,7 +453,7 @@ SpiceCircuitDict::read (tl::InputStream &stream)
       read_card ();
     }
 
-  } catch (NetlistSpiceReaderDelegateError &ex) {
+  } catch (NetlistSpiceReaderError &ex) {
 
     //  Translate the exception and add a location
     error (ex.msg ());
@@ -612,6 +612,8 @@ SpiceCircuitDict::read_card ()
         std::string name;
         ex.read_word (name);
 
+        name = mp_netlist->normalize_name (name);
+
         ex.test ("=");
 
         tl::Variant value = NetlistSpiceReaderExpressionParser (&m_variables).read (ex);
@@ -634,16 +636,14 @@ SpiceCircuitDict::read_card ()
 
     if (ex.test ("=")) {
 
-      name = tl::to_upper_case (name);
+      name = mp_netlist->normalize_name (name);
 
       tl::Variant value = NetlistSpiceReaderDelegate::read_value (ex, m_variables);
       m_variables [name] = value;
 
       mp_circuit->make_parameter (name, value);
 
-    }
-
-    if (name[0] == 'X') {
+    } else if (name[0] == 'X') {
 
       //  register circuit calls so we can figure out the top level circuits
 
@@ -653,7 +653,7 @@ SpiceCircuitDict::read_card ()
 
       std::vector<std::string> nn;
       parameters_type pv;
-      NetlistSpiceReaderDelegate::parse_element_components (ex2.get (), nn, pv, m_variables);
+      mp_delegate->parse_element_components (ex2.get (), nn, pv, m_variables);
 
       if (! nn.empty ()) {
         m_called_circuits.insert (nn.back ());
@@ -689,7 +689,7 @@ SpiceCircuitDict::read_circuit (tl::Extractor &ex, const std::string &nc)
 {
   std::vector<std::string> nn;
   NetlistSpiceReader::parameters_type pv;
-  NetlistSpiceReaderDelegate::parse_element_components (ex.skip (), nn, pv, m_variables);
+  mp_delegate->parse_element_components (ex.skip (), nn, pv, m_variables);
 
   if (cached_circuit (nc)) {
     error (tl::sprintf (tl::to_string (tr ("Redefinition of circuit %s")), nc));
@@ -764,7 +764,7 @@ private:
 };
 
 SpiceNetlistBuilder::SpiceNetlistBuilder (SpiceCircuitDict *dict, Netlist *netlist, NetlistSpiceReaderDelegate *delegate)
-  : mp_dict (dict), mp_delegate (delegate), mp_netlist (netlist), m_strict (false)
+  : mp_dict (dict), mp_delegate (delegate), mp_netlist (netlist), m_strict (true)
 {
   mp_circuit = 0;
   mp_netlist_circuit = 0;
@@ -829,7 +829,7 @@ SpiceNetlistBuilder::build ()
     mp_current_card = 0;
     m_captured.clear ();
 
-    mp_delegate->start (mp_netlist);
+    mp_delegate->do_start ();
 
     for (auto c = mp_dict->begin_circuits (); c != mp_dict->end_circuits (); ++c) {
       if (mp_dict->is_top_circuit (c->first) && ! subcircuit_captured (c->first)) {
@@ -839,9 +839,9 @@ SpiceNetlistBuilder::build ()
     }
 
     build_global_nets ();
-    mp_delegate->finish (mp_netlist);
+    mp_delegate->do_finish ();
 
-  } catch (NetlistSpiceReaderDelegateError &ex) {
+  } catch (NetlistSpiceReaderError &ex) {
 
     //  translate the error and add a source location
     error (ex.msg ());
@@ -913,7 +913,10 @@ SpiceNetlistBuilder::build_circuit (const SpiceCachedCircuit *cc, const paramete
   std::unique_ptr<std::map<std::string, db::Net *> > n2n (mp_nets_by_name.release ());
   mp_nets_by_name.reset (0);
 
-  NetlistSpiceReader::parameters_type vars;
+  NetlistSpiceReader::parameters_type vars = cc->parameters ();
+  for (auto p = pv.begin (); p != pv.end (); ++p) {
+    vars [p->first] = p->second;
+  }
 
   std::swap (vars, m_variables);
   std::swap (c, mp_netlist_circuit);
@@ -981,7 +984,7 @@ SpiceNetlistBuilder::process_card (const SpiceCard &card)
   std::string name;
   if (ex.try_read_word (name) && ex.test ("=")) {
 
-    m_variables.insert (std::make_pair (tl::to_upper_case (name), NetlistSpiceReaderDelegate::read_value (ex, m_variables)));
+    m_variables.insert (std::make_pair (mp_netlist->normalize_name (name), NetlistSpiceReaderDelegate::read_value (ex, m_variables)));
 
   } else {
 
@@ -1035,7 +1038,7 @@ SpiceNetlistBuilder::process_element (tl::Extractor &ex, const std::string &pref
 
   std::vector<db::Net *> nets;
   for (std::vector<std::string>::const_iterator i = nn.begin (); i != nn.end (); ++i) {
-    nets.push_back (make_net (mp_delegate->translate_net_name (mp_netlist->normalize_name (*i))));
+    nets.push_back (make_net (mp_delegate->translate_net_name (*i)));
   }
 
   if (prefix == "X" && ! subcircuit_captured (model)) {
@@ -1118,7 +1121,7 @@ SpiceNetlistBuilder::build_global_nets ()
 // ------------------------------------------------------------------------------------------------------
 
 NetlistSpiceReader::NetlistSpiceReader (NetlistSpiceReaderDelegate *delegate)
-  : mp_delegate (delegate)
+  : mp_delegate (delegate), m_strict (false)
 {
   static NetlistSpiceReaderDelegate std_delegate;
   if (! delegate) {
@@ -1135,20 +1138,32 @@ void NetlistSpiceReader::read (tl::InputStream &stream, db::Netlist &netlist)
 {
   tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("Reading netlist ")) + stream.source ());
 
-  //  SPICE netlists are case insensitive
-  netlist.set_case_sensitive (false);
-
-  SpiceCircuitDict dict (this, &netlist, mp_delegate.get ());
   try {
-    dict.read (stream);
-    dict.finish ();
+
+    mp_delegate->set_netlist (&netlist);
+
+    //  SPICE netlists are case insensitive
+    netlist.set_case_sensitive (false);
+
+    SpiceCircuitDict dict (this, &netlist, mp_delegate.get ());
+    try {
+      dict.read (stream);
+      dict.finish ();
+    } catch (...) {
+      dict.finish ();
+      throw;
+    }
+
+    SpiceNetlistBuilder builder (&dict, &netlist, mp_delegate.get ());
+    builder.set_strict (m_strict);
+    builder.build ();
+
+    mp_delegate->set_netlist (0);
+
   } catch (...) {
-    dict.finish ();
+    mp_delegate->set_netlist (0);
     throw;
   }
-
-  SpiceNetlistBuilder builder (&dict, &netlist, mp_delegate.get ());
-  builder.build ();
 }
 
 }

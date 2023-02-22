@@ -42,11 +42,11 @@ class NetlistSpiceReaderDelegate;
 /**
  *  @brief A specialized exception class to handle netlist reader delegate errors
  */
-class DB_PUBLIC NetlistSpiceReaderDelegateError
+class DB_PUBLIC NetlistSpiceReaderError
   : public tl::Exception
 {
 public:
-  NetlistSpiceReaderDelegateError (const std::string &msg)
+  NetlistSpiceReaderError (const std::string &msg)
     : tl::Exception (msg)
   { }
 };
@@ -65,8 +65,18 @@ public:
 
   virtual void read (tl::InputStream &stream, db::Netlist &netlist);
 
+  /**
+   *  @brief Sets or resets strict mode
+   *  In strict mode, all subcircuits need to be present in the net list for example.
+   */
+  void set_strict (bool s)
+  {
+    m_strict = s;
+  }
+
 private:
   tl::weak_ptr<NetlistSpiceReaderDelegate> mp_delegate;
+  bool m_strict;
 };
 
 }

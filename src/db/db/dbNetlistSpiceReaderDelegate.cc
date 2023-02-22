@@ -123,7 +123,7 @@ std::string NetlistSpiceReaderDelegate::translate_net_name (const std::string &n
 
 void NetlistSpiceReaderDelegate::error (const std::string &msg)
 {
-  throw NetlistSpiceReaderDelegateError (msg);
+  throw NetlistSpiceReaderError (msg);
 }
 
 template <class Cls>
@@ -194,8 +194,8 @@ void NetlistSpiceReaderDelegate::parse_element_components (const std::string &s,
 
       if (ex.try_read_word (n) && ex.test ("=")) {
 
-        //  a parameter. Note that parameter names are always made upper case.
-        pv.insert (std::make_pair (tl::to_upper_case (n), read_value (ex, variables)));
+        //  a parameter
+        pv [mp_netlist ? mp_netlist->normalize_name (n) : n] = read_value (ex, variables);
 
       } else {
 
@@ -207,13 +207,24 @@ void NetlistSpiceReaderDelegate::parse_element_components (const std::string &s,
 
         std::string comp_name = parse_component (ex);
 
-        //  resolve variables if string type
-        auto v = variables.find (comp_name);
-        if (v != variables.end () && v->second.is_a_string ()) {
-          comp_name = v->second.to_string ();
+        if (mp_netlist) {
+          comp_name = mp_netlist->normalize_name (comp_name);
         }
 
-        strings.push_back (comp_name);
+        //  resolve variables if string type
+        auto v = variables.find (comp_name);
+        if (v != variables.end ()) {
+          if (v->second.is_a_string ()) {
+            strings.push_back (v->second.to_string ());
+          } else if (v->second.can_convert_to_double ()) {
+            //  NOTE: this allows using a variable name "x" instead of "x=x"
+            pv [comp_name] = v->second;
+          } else {
+            strings.push_back (comp_name);
+          }
+        } else {
+          strings.push_back (comp_name);
+        }
 
       }
 
@@ -536,11 +547,11 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
   return true;
 }
 
-double
+tl::Variant
 NetlistSpiceReaderDelegate::read_value (tl::Extractor &ex, const std::map<std::string, tl::Variant> &variables)
 {
   NetlistSpiceReaderExpressionParser parser (&variables);
-  return parser.read (ex).to_double ();
+  return parser.read (ex);
 }
 
 bool
@@ -552,6 +563,9 @@ NetlistSpiceReaderDelegate::try_read_value (const std::string &s, double &v, con
   tl::Extractor ex (s.c_str ());
   bool res = parser.try_read (ex, vv);
 
+  if (res && ! vv.can_convert_to_double ()) {
+    res = false;
+  }
   if (res) {
     v = vv.to_double ();
   }

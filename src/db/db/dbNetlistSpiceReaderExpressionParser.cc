@@ -30,6 +30,20 @@ namespace db
 
 // ------------------------------------------------------------------------------------------------------
 
+static bool to_bool (const tl::Variant &v)
+{
+  if (v.is_bool ()) {
+    return v.to_bool ();
+  } else if (v.is_nil ()) {
+    return false;
+  } else if (v.can_convert_to_double ()) {
+    return v.to_double () != 0.0;
+  } else {
+    return true;
+  }
+}
+// ------------------------------------------------------------------------------------------------------
+
 NetlistSpiceReaderExpressionParser::NetlistSpiceReaderExpressionParser (const variables_type *vars)
 {
   static variables_type empty_variables;
@@ -40,55 +54,55 @@ NetlistSpiceReaderExpressionParser::NetlistSpiceReaderExpressionParser (const va
 //  https://nmg.gitlab.io/ngspice-manual/circuitdescription/paramparametricnetlists/syntaxofexpressions.html
 
 static double sqrt_f (double v)   { return sqrt (v); }
-static double sin_f (double v)    { return sin (v);  }
-static double cos_f (double v)    { return cos (v);  }
-static double tan_f (double v)    { return tan (v);  }
-static double sinh_f (double v)   { return sinh (v);  }
-static double cosh_f (double v)   { return cosh (v);  }
-static double tanh_f (double v)   { return tanh (v);  }
-static double asin_f (double v)   { return asin (v);  }
-static double acos_f (double v)   { return acos (v);  }
-static double atan_f (double v)   { return atan (v);  }
-static double asinh_f (double v)  { return asinh (v);  }
-static double acosh_f (double v)  { return acosh (v);  }
-static double atanh_f (double v)  { return atanh (v);  }
-static double exp_f (double v)    { return exp (v);  }
-static double ln_f (double v)     { return log (v);  }
-static double log_f (double v)    { return log10 (v);  }
-static double abs_f (double v)    { return abs (v);  }
-static double nint_f (double v)   { return round (v);  }
-static double floor_f (double v)  { return floor (v);  }
-static double ceil_f (double v)   { return ceil (v);  }
-static double sgn_f (double v)    { return v == 0.0 ? 0.0 : (v < 0.0 ? -1.0 : 1.0);  }
-static double int_f (double v)    { return sgn_f (v) * floor (sgn_f (v) * v);  }
+static double sin_f (double v)    { return sin (v); }
+static double cos_f (double v)    { return cos (v); }
+static double tan_f (double v)    { return tan (v); }
+static double sinh_f (double v)   { return sinh (v); }
+static double cosh_f (double v)   { return cosh (v); }
+static double tanh_f (double v)   { return tanh (v); }
+static double asin_f (double v)   { return asin (v); }
+static double acos_f (double v)   { return acos (v); }
+static double atan_f (double v)   { return atan (v); }
+static double asinh_f (double v)  { return asinh (v); }
+static double acosh_f (double v)  { return acosh (v); }
+static double atanh_f (double v)  { return atanh (v); }
+static double exp_f (double v)    { return exp (v); }
+static double ln_f (double v)     { return log (v); }
+static double log_f (double v)    { return log10 (v); }
+static double abs_f (double v)    { return abs (v); }
+static double nint_f (double v)   { return nearbyint (v); } //  we basically should we the rounding mode before ...
+static double floor_f (double v)  { return floor (v); }
+static double ceil_f (double v)   { return ceil (v); }
+static double sgn_f (double v)    { return v == 0.0 ? 0.0 : (v < 0.0 ? -1.0 : 1.0); }
+static double int_f (double v)    { return sgn_f (v) * floor (sgn_f (v) * v); }
 
 tl::Variant
 NetlistSpiceReaderExpressionParser::eval_func (const std::string &name, const std::vector<tl::Variant> &params, bool * /*status*/) const
 {
   double (*f) (double) = 0;
 
-  if (name == "sqrt") { f = sqrt_f; } else
-  if (name == "sin") { f = sin_f; } else
-  if (name == "cos") { f = cos_f; } else
-  if (name == "tan") { f = tan_f; } else
-  if (name == "sinh") { f = sinh_f; } else
-  if (name == "cosh") { f = cosh_f; } else
-  if (name == "tanh") { f = tanh_f; } else
-  if (name == "asin") { f = asin_f; } else
-  if (name == "acos") { f = acos_f; } else
-  if (name == "atan" || name == "arctan") { f = atan_f; } else
-  if (name == "asinh") { f = asinh_f; } else
-  if (name == "acosh") { f = acosh_f; } else
-  if (name == "atanh") { f = atanh_f; } else
-  if (name == "exp") { f = exp_f; } else
-  if (name == "ln") { f = ln_f; } else
-  if (name == "log") { f = log_f; } else
-  if (name == "abs") { f = abs_f; } else
-  if (name == "nint") { f = nint_f; } else
-  if (name == "floor") { f = floor_f; } else
-  if (name == "ceil") { f = ceil_f; } else
-  if (name == "sgn") { f = sgn_f; } else
-  if (name == "int") { f = int_f; }
+  if (name == "SQRT") { f = sqrt_f; } else
+  if (name == "SIN") { f = sin_f; } else
+  if (name == "COS") { f = cos_f; } else
+  if (name == "TAN") { f = tan_f; } else
+  if (name == "SINH") { f = sinh_f; } else
+  if (name == "COSH") { f = cosh_f; } else
+  if (name == "TANH") { f = tanh_f; } else
+  if (name == "ASIN") { f = asin_f; } else
+  if (name == "ACOS") { f = acos_f; } else
+  if (name == "ATAN" || name == "arctan") { f = atan_f; } else
+  if (name == "ASINH") { f = asinh_f; } else
+  if (name == "ACOSH") { f = acosh_f; } else
+  if (name == "ATANH") { f = atanh_f; } else
+  if (name == "EXP") { f = exp_f; } else
+  if (name == "LN") { f = ln_f; } else
+  if (name == "LOG") { f = log_f; } else
+  if (name == "ABS") { f = abs_f; } else
+  if (name == "NINT") { f = nint_f; } else
+  if (name == "FLOOR") { f = floor_f; } else
+  if (name == "CEIL") { f = ceil_f; } else
+  if (name == "SGN") { f = sgn_f; } else
+  if (name == "INT") { f = int_f; }
 
   if (f != 0) {
 
@@ -98,7 +112,7 @@ NetlistSpiceReaderExpressionParser::eval_func (const std::string &name, const st
       return tl::Variant ((*f) (params.front ().to_double ()));
     }
 
-  } else if (name == "pwr" || name == "pow") {
+  } else if (name == "PWR" || name == "POW") {
 
     if (params.size () < 2 || ! params [0].can_convert_to_double () || ! params [1].can_convert_to_double ()) {
       return tl::Variant ();
@@ -106,15 +120,15 @@ NetlistSpiceReaderExpressionParser::eval_func (const std::string &name, const st
       return tl::Variant (pow (params [0].to_double (), params [1].to_double ()));
     }
 
-  } else if (name == "ternary_fcn") {
+  } else if (name == "TERNERY_FCN") {
 
     if (params.size () < 3) {
       return tl::Variant ();
     } else {
-      return params [0].to_bool () ? params [1] : params [2];
+      return to_bool (params [0]) ? params [1] : params [2];
     }
 
-  } else if (name == "min") {
+  } else if (name == "MIN") {
 
     if (params.size () < 1) {
       return tl::Variant ();
@@ -128,7 +142,7 @@ NetlistSpiceReaderExpressionParser::eval_func (const std::string &name, const st
     }
     return v;
 
-  } else if (name == "max") {
+  } else if (name == "MAX") {
 
     if (params.size () < 1) {
       return tl::Variant ();
@@ -167,7 +181,7 @@ NetlistSpiceReaderExpressionParser::read_atomic_value (tl::Extractor &ex, bool *
   } else if (ex.test ("!")) {
 
     tl::Variant v = read_atomic_value (ex, status);
-    return tl::Variant (! v.to_bool ());
+    return tl::Variant (! to_bool (v));
 
   } else if (ex.test ("(")) {
 
@@ -220,6 +234,8 @@ NetlistSpiceReaderExpressionParser::read_atomic_value (tl::Extractor &ex, bool *
 
   } else if (ex.try_read_word (var)) {
 
+    var = tl::to_upper_case (var);
+
     if (ex.test ("(")) {
 
       //  a function
@@ -247,7 +263,7 @@ NetlistSpiceReaderExpressionParser::read_atomic_value (tl::Extractor &ex, bool *
 
     } else {
 
-      auto vi = mp_variables->find (tl::to_upper_case (var));
+      auto vi = mp_variables->find (var);
       if (vi != mp_variables->end ()) {
         return vi->second;
       } else {
@@ -434,13 +450,13 @@ tl::Variant NetlistSpiceReaderExpressionParser::read_logical_op (tl::Extractor &
       if (status && !*status) {
         return tl::Variant ();
       }
-      v = tl::Variant (v.to_bool () && vv.to_bool ());
+      v = tl::Variant (to_bool (v) && to_bool (vv));
     } else if (ex.test ("||")) {
       tl::Variant vv = read_compare_expr (ex, status);
       if (status && !*status) {
         return tl::Variant ();
       }
-      v = tl::Variant (v.to_bool () && vv.to_bool ());
+      v = tl::Variant (to_bool (v) || to_bool (vv));
     } else {
       break;
     }
@@ -470,7 +486,7 @@ tl::Variant NetlistSpiceReaderExpressionParser::read_ternary_op (tl::Extractor &
     if (status && !*status) {
       return tl::Variant ();
     }
-    v = v.to_bool () ? vv1 : vv2;
+    v = to_bool (v) ? vv1 : vv2;
   }
 
   return v;
@@ -494,6 +510,12 @@ static const char *start_quote (tl::Extractor &ex)
   }
 }
 
+tl::Variant NetlistSpiceReaderExpressionParser::read (const std::string &s) const
+{
+  tl::Extractor ex (s.c_str ());
+  return read (ex);
+}
+
 tl::Variant NetlistSpiceReaderExpressionParser::read (tl::Extractor &ex) const
 {
   try {
@@ -509,8 +531,15 @@ tl::Variant NetlistSpiceReaderExpressionParser::read (tl::Extractor &ex) const
     return res;
 
   } catch (tl::Exception &error) {
-    throw NetlistSpiceReaderDelegateError (error.msg ());
+    //  recast the exception, so we can process it later
+    throw NetlistSpiceReaderError (error.msg ());
   }
+}
+
+bool NetlistSpiceReaderExpressionParser::try_read (const std::string &s, tl::Variant &value) const
+{
+  tl::Extractor ex (s.c_str ());
+  return try_read (ex, value);
 }
 
 bool NetlistSpiceReaderExpressionParser::try_read (tl::Extractor &ex, tl::Variant &value) const

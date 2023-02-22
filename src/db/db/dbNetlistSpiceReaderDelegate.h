@@ -124,17 +124,44 @@ public:
    *  @brief Reads a set of string components and parameters from the string
    *  A special key "param:" is recognized for starting a parameter list.
    */
-  static void parse_element_components (const std::string &s, std::vector<std::string> &strings, std::map<std::string, tl::Variant> &pv, const std::map<std::string, tl::Variant> &variables);
+  void parse_element_components (const std::string &s, std::vector<std::string> &strings, std::map<std::string, tl::Variant> &pv, const std::map<std::string, tl::Variant> &variables);
 
   /**
    *  @brief Reads a value from the extractor (with formula evaluation)
    */
-  static double read_value (tl::Extractor &ex, const std::map<std::string, tl::Variant> &variables);
+  static tl::Variant read_value(tl::Extractor &ex, const std::map<std::string, tl::Variant> &variables);
 
   /**
    *  @brief Tries to read a value from the extractor (with formula evaluation)
    */
   static bool try_read_value (const std::string &s, double &v, const std::map<std::string, tl::Variant> &variables);
+
+  /**
+   *  @brief External interface for start
+   */
+  void do_start ()
+  {
+    start (mp_netlist);
+  }
+
+  /**
+   *  @brief External interface for finish
+   */
+  void do_finish ()
+  {
+    finish (mp_netlist);
+  }
+
+  /**
+   *  @brief Sets the netlist
+   */
+  void set_netlist (db::Netlist *netlist)
+  {
+    mp_netlist = netlist;
+  }
+
+private:
+  db::Netlist *mp_netlist;
 };
 
 }

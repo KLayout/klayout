@@ -1063,6 +1063,8 @@ TEST(5)
 TEST(6)
 {
   volatile double a = 10.0;
+  EXPECT_EQ (tl::Variant (0.0) == tl::Variant (0.0), true);
+
   EXPECT_EQ (tl::Variant (0.1) == tl::Variant (1.0 / a), true);
   EXPECT_EQ (tl::Variant (0.1) == tl::Variant (0.1 * (1.0 + 1e-14)), true);
   EXPECT_EQ (tl::Variant (0.1) == tl::Variant (0.1 * (1.0 + 0.9e-13)), true);

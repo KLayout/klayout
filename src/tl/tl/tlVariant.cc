@@ -1060,7 +1060,7 @@ static const double epsilon = 1e-13;
 static inline bool fequal (double a, double b)
 {
   double avg = 0.5 * (fabs (a) + fabs (b));
-  return fabs (a - b) < epsilon * avg;
+  return fabs (a - b) <= epsilon * avg;
 }
 
 static inline bool fless (double a, double b)

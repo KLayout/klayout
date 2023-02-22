@@ -87,6 +87,7 @@ static std::string unescape_name (const std::string &n)
 // ------------------------------------------------------------------------------------------------------
 
 NetlistSpiceReaderDelegate::NetlistSpiceReaderDelegate ()
+  : mp_netlist (0)
 {
   //  .. nothing yet ..
 }
@@ -195,7 +196,7 @@ void NetlistSpiceReaderDelegate::parse_element_components (const std::string &s,
       if (ex.try_read_word (n) && ex.test ("=")) {
 
         //  a parameter
-        pv [mp_netlist ? mp_netlist->normalize_name (n) : n] = read_value (ex, variables);
+        pv [mp_netlist ? mp_netlist->normalize_name (n) : tl::to_upper_case (n)] = read_value (ex, variables);
 
       } else {
 
@@ -206,10 +207,7 @@ void NetlistSpiceReaderDelegate::parse_element_components (const std::string &s,
         }
 
         std::string comp_name = parse_component (ex);
-
-        if (mp_netlist) {
-          comp_name = mp_netlist->normalize_name (comp_name);
-        }
+        comp_name = mp_netlist ? mp_netlist->normalize_name (comp_name) : tl::to_upper_case (comp_name);
 
         //  resolve variables if string type
         auto v = variables.find (comp_name);

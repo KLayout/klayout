@@ -5,6 +5,7 @@ properties([disableConcurrentBuilds()])
 
 //  from shared library
 target = osconfig()
+docker_args = docker_args()
 
 currentBuild.description = "Pipelined " + target
 
@@ -22,7 +23,7 @@ node("linux") {
 
   stage("Building target ${target}") {
         
-    withDockerContainer(image: "jenkins-${target}") {
+    withDockerContainer(image: "jenkins-${target}", args: docker_args) {
       //  from shared library
       build(target, target_dir)
     }
@@ -43,7 +44,7 @@ node("linux") {
     "Unit testing": {
             
       ut_result = "no-result"
-      withDockerContainer(image: "jenkins-${target}") {
+      withDockerContainer(image: "jenkins-${target}", args: docker_args) {
         ut_result = run_ut(target)
       }
             
@@ -52,7 +53,7 @@ node("linux") {
     }, 
     "Installtest": {
             
-      withDockerContainer(image: "jenkins-${target}-basic") {
+      withDockerContainer(image: "jenkins-${target}-basic", args: docker_args) {
         //  from shared library
         installtest_nopython(target, target_dir)
       }

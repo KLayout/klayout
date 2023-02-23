@@ -177,7 +177,7 @@ public:
   virtual void plugin_removed (lay::PluginDeclaration *cls)
   {
     if (mp_delegate) {
-      mp_delegate->plugin_registered (cls);
+      mp_delegate->plugin_removed (cls);
     }
   }
 

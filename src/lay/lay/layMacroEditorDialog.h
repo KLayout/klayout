@@ -302,6 +302,7 @@ private:
   bool configure (const std::string &name, const std::string &value);
   void config_finalize ();
   void translate_pseudo_id (size_t &file_id, int &line);
+  void exit_if_needed ();
 
   lay::Dispatcher *mp_plugin_root;
   lym::MacroCollection *mp_root;

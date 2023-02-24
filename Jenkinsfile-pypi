@@ -14,7 +14,7 @@ currentBuild.description = "PyPI deployment " + platform
 docker_image = "jenkins-manylinux2014_x86_64-pypi"
 target = platform + ".whl"
 
-node("master") {
+node("linux") {
 
   stage("Checkout sources") {
     checkout scm

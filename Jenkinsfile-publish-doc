@@ -3,7 +3,7 @@
 
 properties([disableConcurrentBuilds()])
 
-node("master") {
+node("linux") {
 
   stage("Checkout sources") {
     checkout scm

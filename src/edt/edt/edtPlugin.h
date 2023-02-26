@@ -47,6 +47,17 @@ namespace edt
   };
 
   /**
+   * @brief Returns a value indicating whether polygons are enabled in the "Select" menu
+   */
+  bool polygons_enabled ();
+
+  //  other types ...
+  bool paths_enabled ();
+  bool boxes_enabled ();
+  bool texts_enabled ();
+  bool instances_enabled ();
+
+  /**
    *  @brief Commits the current configuration for the recently used configuration list
    */
   void commit_recent (lay::LayoutViewBase *view);

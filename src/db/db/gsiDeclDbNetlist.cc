@@ -2714,7 +2714,7 @@ Class<ParseElementComponentsData> db_ParseElementComponentsData ("db", "ParseEle
   "This is a structure with two members: 'strings' for the string arguments and 'parameters' for the "
   "named arguments.\n"
   "\n"
-  "This helper class has been introduced in version 0.27.1. Starting with version 0.28.7, named parameters can be string types too.\n"
+  "This helper class has been introduced in version 0.27.1. Starting with version 0.28.6, named parameters can be string types too.\n"
 );
 
 Class<ParseElementData> db_ParseElementData ("db", "ParseElementData",
@@ -2746,7 +2746,7 @@ Class<ParseElementData> db_ParseElementData ("db", "ParseElementData",
   "This is a structure with four members: 'model_name' for the model name, 'value' for the default numerical value, 'net_names' for the net names and 'parameters' for the "
   "named parameters.\n"
   "\n"
-  "This helper class has been introduced in version 0.27.1. Starting with version 0.28.7, named parameters can be string types too.\n"
+  "This helper class has been introduced in version 0.27.1. Starting with version 0.28.6, named parameters can be string types too.\n"
 );
 
 Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "NetlistSpiceReaderDelegate",
@@ -2787,7 +2787,7 @@ Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "Netl
     "In order to evaluate formulas, this method allows accessing the variables that are "
     "present during the execution of the SPICE reader.\n"
     "\n"
-    "This method has been introduced in version 0.28.7."
+    "This method has been introduced in version 0.28.6."
   ) +
   gsi::callback ("parse_element", &NetlistSpiceReaderDelegateImpl::parse_element_helper, &NetlistSpiceReaderDelegateImpl::cb_parse_element,
     gsi::arg ("s"), gsi::arg ("element"),
@@ -2820,7 +2820,7 @@ Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "Netl
     "\n"
     "The method must return true, if the element was was understood and false otherwise.\n"
     "\n"
-    "Starting with version 0.28.7, the parameter values can be strings too."
+    "Starting with version 0.28.6, the parameter values can be strings too."
   ) +
   gsi::method ("error", &NetlistSpiceReaderDelegateImpl::error, gsi::arg ("msg"),
     "@brief Issues an error with the given message.\n"
@@ -2834,7 +2834,7 @@ Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "Netl
     "\n"
     "The variables dictionary defines named variables with the given values.\n"
     "\n"
-    "This method has been introduced in version 0.27.1. The variables argument has been added in version 0.28.7.\n"
+    "This method has been introduced in version 0.27.1. The variables argument has been added in version 0.28.6.\n"
   ) +
   gsi::method_ext ("parse_element_components", &parse_element_components, gsi::arg ("s"), gsi::arg ("variables", db::NetlistSpiceReader::parameters_type (), "{}"),
     "@brief Parses a string into string and parameter components.\n"
@@ -2845,7 +2845,7 @@ Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "Netl
     "\n"
     "The variables dictionary defines named variables with the given values.\n"
     "\n"
-    "This method has been introduced in version 0.27.1. The variables argument has been added in version 0.28.7.\n"
+    "This method has been introduced in version 0.27.1. The variables argument has been added in version 0.28.6.\n"
   ),
   "@brief Provides a delegate for the SPICE reader for translating device statements\n"
   "Supply a customized class to provide a specialized reading scheme for devices. "

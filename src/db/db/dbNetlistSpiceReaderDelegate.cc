@@ -124,7 +124,7 @@ std::string NetlistSpiceReaderDelegate::translate_net_name (const std::string &n
 
 void NetlistSpiceReaderDelegate::error (const std::string &msg)
 {
-  throw NetlistSpiceReaderError (msg);
+  throw tl::Exception (msg);
 }
 
 template <class Cls>

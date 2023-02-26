@@ -40,18 +40,6 @@ class Netlist;
 class NetlistSpiceReaderDelegate;
 
 /**
- *  @brief A specialized exception class to handle netlist reader delegate errors
- */
-class DB_PUBLIC NetlistSpiceReaderError
-  : public tl::Exception
-{
-public:
-  NetlistSpiceReaderError (const std::string &msg)
-    : tl::Exception (msg)
-  { }
-};
-
-/**
  *  @brief A SPICE format reader for netlists
  */
 class DB_PUBLIC NetlistSpiceReader

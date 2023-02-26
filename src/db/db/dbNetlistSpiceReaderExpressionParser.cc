@@ -518,22 +518,15 @@ tl::Variant NetlistSpiceReaderExpressionParser::read (const std::string &s) cons
 
 tl::Variant NetlistSpiceReaderExpressionParser::read (tl::Extractor &ex) const
 {
-  try {
+  tl::Variant res;
 
-    tl::Variant res;
-
-    const char *endquote = start_quote (ex);
-    res = read_tl_expr (ex, 0);
-    if (endquote) {
-      ex.test (endquote);
-    }
-
-    return res;
-
-  } catch (tl::Exception &error) {
-    //  recast the exception, so we can process it later
-    throw NetlistSpiceReaderError (error.msg ());
+  const char *endquote = start_quote (ex);
+  res = read_tl_expr (ex, 0);
+  if (endquote) {
+    ex.test (endquote);
   }
+
+  return res;
 }
 
 bool NetlistSpiceReaderExpressionParser::try_read (const std::string &s, tl::Variant &value) const

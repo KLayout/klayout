@@ -636,13 +636,15 @@ TEST(16_issue898)
 
 TEST(17_RecursiveExpansion)
 {
-  db::Netlist nl;
+  db::Netlist nl, nl2;
 
-  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader17.cir");
+  {
+    std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader17.cir");
 
-  db::NetlistSpiceReader reader;
-  tl::InputStream is (path);
-  reader.read (is, nl);
+    db::NetlistSpiceReader reader;
+    tl::InputStream is (path);
+    reader.read (is, nl);
+  }
 
   EXPECT_EQ (nl.to_string (),
     "circuit .TOP ();\n"
@@ -670,6 +672,16 @@ TEST(17_RecursiveExpansion)
     "  device NMOS NMOS (S=N1,G=N2,D=N3,B=N1) (L=250000,W=6000000,AS=0,AD=0,PS=0,PD=0);\n"
     "end;\n"
   );
+
+  {
+    std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader17b.cir");
+
+    db::NetlistSpiceReader reader;
+    tl::InputStream is (path);
+    reader.read (is, nl2);
+  }
+
+  EXPECT_EQ (nl2.to_string (), nl.to_string ());
 }
 
 TEST(18_XSchemOutput)

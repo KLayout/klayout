@@ -46,6 +46,31 @@ static const char *allowed_name_chars = "_.:,!+$/&\\#[]|<>";
 
 // ------------------------------------------------------------------------------------------------------
 
+void
+read_param_card (tl::Extractor &ex, const db::Netlist *netlist, std::map<std::string, tl::Variant> &variables)
+{
+  //  Syntax is:
+  //    .param <name> = <value> [ <name> = <value> ... ]
+  //  taken from:
+  //    https://nmg.gitlab.io/ngspice-manual/circuitdescription/paramparametricnetlists/paramline.html
+
+  while (! ex.at_end ()) {
+
+    std::string name;
+    ex.read_word (name);
+
+    name = netlist->normalize_name (name);
+
+    ex.test ("=");
+
+    tl::Variant value = NetlistSpiceReaderExpressionParser (&variables).read (ex);
+    variables [name] = value;
+
+  }
+}
+
+// ------------------------------------------------------------------------------------------------------
+
 class SpiceReaderStream
 {
 public:
@@ -453,7 +478,7 @@ SpiceCircuitDict::read (tl::InputStream &stream)
       read_card ();
     }
 
-  } catch (NetlistSpiceReaderError &ex) {
+  } catch (tl::Exception &ex) {
 
     //  Translate the exception and add a location
     error (ex.msg ());
@@ -570,58 +595,43 @@ SpiceCircuitDict::read_card ()
   tl::Extractor ex (l.c_str ());
   std::string name;
 
-  if (ex.test_without_case (".")) {
+  if (ex.test_without_case (".model")) {
 
-    //  control statement
-    if (ex.test_without_case ("model")) {
+    //  ignore model statements
 
-      //  ignore model statements
+  } else if (ex.test_without_case (".global")) {
 
-    } else if (ex.test_without_case ("global")) {
-
-      while (! ex.at_end ()) {
-        std::string n = mp_delegate->translate_net_name (read_name (ex, mp_netlist));
-        if (m_global_net_names.find (n) == m_global_net_names.end ()) {
-          m_global_nets.push_back (n);
-          m_global_net_names.insert (n);
-        }
+    while (! ex.at_end ()) {
+      std::string n = mp_delegate->translate_net_name (read_name (ex, mp_netlist));
+      if (m_global_net_names.find (n) == m_global_net_names.end ()) {
+        m_global_nets.push_back (n);
+        m_global_net_names.insert (n);
       }
+    }
 
-    } else if (ex.test_without_case ("subckt")) {
+  } else if (ex.test_without_case (".subckt")) {
 
-      std::string nc = read_name (ex, mp_netlist);
-      read_circuit (ex, nc);
+    std::string nc = read_name (ex, mp_netlist);
+    read_circuit (ex, nc);
 
-    } else if (ex.test_without_case ("ends")) {
+  } else if (ex.test_without_case (".ends")) {
 
-      return true;
+    return true;
 
-    } else if (ex.test_without_case ("end")) {
+  } else if (ex.test_without_case (".end")) {
 
-      //  ignore end statements
+    //  ignore end statements
 
-    } else if (ex.test_without_case ("param")) {
+  } else if (ex.test_without_case (".param")) {
 
-      //  Syntax is:
-      //    .param <name> = <value> [ <name> = <value> ... ]
-      //  taken from:
-      //    https://nmg.gitlab.io/ngspice-manual/circuitdescription/paramparametricnetlists/paramline.html
+    read_param_card (ex, mp_netlist, m_variables);
 
-      while (! ex.at_end ()) {
+    ensure_circuit ();
+    mp_circuit->add_card (SpiceCard (m_file_id, m_stream.line_number (), l));
 
-        std::string name;
-        ex.read_word (name);
+  } else if (ex.test (".")) {
 
-        name = mp_netlist->normalize_name (name);
-
-        ex.test ("=");
-
-        tl::Variant value = NetlistSpiceReaderExpressionParser (&m_variables).read (ex);
-        m_variables [name] = value;
-
-      }
-
-    } else if (! mp_delegate->control_statement (l)) {
+    if (! mp_delegate->control_statement (l)) {
 
       std::string s;
       ex.read_word (s);
@@ -841,7 +851,7 @@ SpiceNetlistBuilder::build ()
     build_global_nets ();
     mp_delegate->do_finish ();
 
-  } catch (NetlistSpiceReaderError &ex) {
+  } catch (tl::Exception &ex) {
 
     //  translate the error and add a source location
     error (ex.msg ());
@@ -861,30 +871,34 @@ make_circuit_name (const std::string &name, const NetlistSpiceReader::parameters
     }
     res += p->first;
     res += "=";
-    double v = p->second.to_double ();
-    double va = fabs (v);
-    if (va < 1e-15) {
-      res += tl::sprintf ("%g", v);
-    } else if (va < 0.1e-12) {
-      res += tl::sprintf ("%gF", v * 1e15);
-    } else if (va < 0.1e-9) {
-      res += tl::sprintf ("%gP", v * 1e12);
-    } else if (va < 0.1e-6) {
-      res += tl::sprintf ("%gN", v * 1e9);
-    } else if (va < 0.1e-3) {
-      res += tl::sprintf ("%gU", v * 1e6);
-    } else if (va< 0.1) {
-      res += tl::sprintf ("%gM", v * 1e3);
-    } else if (va < 0.1e3) {
-      res += tl::sprintf ("%g", v);
-    } else if (va < 0.1e6) {
-      res += tl::sprintf ("%gK", v * 1e-3);
-    } else if (va < 0.1e9) {
-      res += tl::sprintf ("%gMEG", v * 1e-6);
-    } else if (va < 0.1e12) {
-      res += tl::sprintf ("%gG", v * 1e-9);
+    if (p->second.can_convert_to_double()) {
+      double v = p->second.to_double ();
+      double va = fabs (v);
+      if (va < 1e-15) {
+        res += tl::sprintf ("%g", v);
+      } else if (va < 0.1e-12) {
+        res += tl::sprintf ("%gF", v * 1e15);
+      } else if (va < 0.1e-9) {
+        res += tl::sprintf ("%gP", v * 1e12);
+      } else if (va < 0.1e-6) {
+        res += tl::sprintf ("%gN", v * 1e9);
+      } else if (va < 0.1e-3) {
+        res += tl::sprintf ("%gU", v * 1e6);
+      } else if (va< 0.1) {
+        res += tl::sprintf ("%gM", v * 1e3);
+      } else if (va < 0.1e3) {
+        res += tl::sprintf ("%g", v);
+      } else if (va < 0.1e6) {
+        res += tl::sprintf ("%gK", v * 1e-3);
+      } else if (va < 0.1e9) {
+        res += tl::sprintf ("%gMEG", v * 1e-6);
+      } else if (va < 0.1e12) {
+        res += tl::sprintf ("%gG", v * 1e-9);
+      } else {
+        res += tl::sprintf ("%g", v);
+      }
     } else {
-      res += tl::sprintf ("%g", v);
+      res += p->second.to_string ();
     }
   }
   res += ")";
@@ -898,6 +912,12 @@ SpiceNetlistBuilder::build_circuit (const SpiceCachedCircuit *cc, const paramete
   db::Circuit *c = circuit_for (cc, pv);
   if (c) {
     return c;
+  }
+
+  for (auto p = pv.begin (); p != pv.end (); ++p) {
+    if (cc->parameters ().find (p->first) == cc->parameters ().end ()) {
+      warn (tl::sprintf (tl::to_string (tr ("Not a known parameter for circuit '%s': '%s'")), cc->name (), p->first));
+    }
   }
 
   c = new db::Circuit ();
@@ -991,7 +1011,11 @@ SpiceNetlistBuilder::process_card (const SpiceCard &card)
     ex = tl::Extractor (card.text.c_str ());
     ex.skip ();
 
-    if (isalpha (*ex)) {
+    if (ex.test_without_case (".param")) {
+
+      read_param_card (ex, mp_netlist, m_variables);
+
+    } else if (isalpha (*ex)) {
 
       std::string prefix;
       prefix.push_back (toupper (*ex));

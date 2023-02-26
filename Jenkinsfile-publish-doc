@@ -3,14 +3,14 @@
 
 properties([disableConcurrentBuilds()])
 
-node("master") {
+node("linux") {
 
   stage("Checkout sources") {
     checkout scm
   }
 
   stage("Producing doc") {
-    sh "./scripts/extract_user_doc.sh -i " + BRANCH_NAME
+    linux_sh "./scripts/extract_user_doc.sh -i " + BRANCH_NAME
   }
 
   stage("Publish doc") {

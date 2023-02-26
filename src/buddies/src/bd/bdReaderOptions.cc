@@ -260,17 +260,23 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
   }
 
   {
-    std::string group ("[" + m_group_prefix + " options - CIF and DXF specific]");
+    std::string group ("[" + m_group_prefix + " options - generic]");
 
     cmd << tl::arg (group +
                     "-" + m_prefix + "d|--" + m_long_prefix + "dbu-in=dbu", this, &GenericReaderOptions::set_dbu, "Specifies the database unit to use",
-                    "This option specifies the database unit the resulting layer will have. "
-                    "The value is given in micrometer units. The default value is 1nm (0.001)."
+                    "This option specifies the database unit the resulting layout will have. "
+                    "The value is given in micrometer units. The default value is 1nm (0.001). "
+                    "Note that for DEF, UNITS is not taken for the database unit, but this value is used instead.\n"
+                    "\n"
+                    "CAUTION: for GDS2 and OASIS, this value is ignored and the database unit of the first file "
+                    "is used instead. Beware of trouble when blending multiple GDS or OASIS files with different database units."
                    )
         << tl::arg (group +
                     "#--" + m_long_prefix + "keep-layer-names", this, &GenericReaderOptions::set_read_named_layers, "Keeps layer names",
                     "If this option is used, layers names are kept as pure names and no attempt is made to\n"
-                    "translate them into GDS layer/datatypes."
+                    "translate them into GDS layer/datatypes.\n"
+                    "\n"
+                    "This option does not apply to GDS2 and OASIS files."
                    )
       ;
   }

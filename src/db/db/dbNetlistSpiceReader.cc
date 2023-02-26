@@ -420,6 +420,7 @@ void NetlistSpiceReaderDelegate::parse_element (const std::string &s, const std:
 bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::string &element, const std::string &name, const std::string &model, double value, const std::vector<db::Net *> &nets, const std::map<std::string, double> &pv)
 {
   std::map<std::string, double> params = pv;
+  std::vector<size_t> terminal_order;
 
   double mult = 1.0;
   std::map<std::string, double>::const_iterator mp = params.find ("M");
@@ -595,6 +596,12 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
       p->second *= mult;
     }
 
+    //  issue #1304
+    terminal_order.push_back (DeviceClassMOS4Transistor::terminal_id_D);
+    terminal_order.push_back (DeviceClassMOS4Transistor::terminal_id_G);
+    terminal_order.push_back (DeviceClassMOS4Transistor::terminal_id_S);
+    terminal_order.push_back (DeviceClassMOS4Transistor::terminal_id_B);
+
   } else {
     error (tl::sprintf (tl::to_string (tr ("Not a known element type: '%s'")), element));
   }
@@ -607,8 +614,14 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
   db::Device *device = new db::Device (cls, name);
   circuit->add_device (device);
 
-  for (std::vector<db::DeviceTerminalDefinition>::const_iterator t = td.begin (); t != td.end (); ++t) {
-    device->connect_terminal (t->id (), nets [t - td.begin ()]);
+  if (terminal_order.empty ()) {
+    for (auto t = td.begin (); t != td.end (); ++t) {
+      device->connect_terminal (t->id (), nets [t - td.begin ()]);
+    }
+  } else {
+    for (auto t = terminal_order.begin (); t != terminal_order.end (); ++t) {
+      device->connect_terminal (*t, nets [t - terminal_order.begin ()]);
+    }
   }
 
   size_t defp = std::numeric_limits<size_t>::max ();

@@ -5305,6 +5305,7 @@ LayoutViewBase::paste_interactive ()
 void
 LayoutViewBase::copy ()
 {
+  cancel_edits ();
   if (! lay::Editables::has_selection ()) {
     //  try to use the transient selection for the real one
     lay::Editables::transient_to_selection ();
@@ -5316,6 +5317,7 @@ LayoutViewBase::copy ()
 void
 LayoutViewBase::cut ()
 {
+  cancel_edits ();
   if (! lay::Editables::has_selection ()) {
     //  try to use the transient selection for the real one
     lay::Editables::transient_to_selection ();

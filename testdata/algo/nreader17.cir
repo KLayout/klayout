@@ -1,0 +1,15 @@
+
+* recursive expansion of parametrized subcircuits
+
+Xsub1a a b c sub1 w=1.5 l=0.15
+Xsub1b a b c sub1 w=3.0 l=0.25
+
+.subckt sub1 n1 n2 n3 w=1.0 l=0.5
+  Xsub2a n1 n2 n3 sub2 w l m=1
+  Xsub2b n1 n2 n3 sub2 w l m=2
+.ends 
+
+.subckt sub2 n1 n2 n3 w=0.0 l=0.0 m=0
+  Mnmos n1 n2 n3 n1 nmos w=w l=l m=m
+.ends 
+

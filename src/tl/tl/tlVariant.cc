@@ -27,6 +27,7 @@
 
 #include <string.h>
 #include <limits>
+#include <cmath>
 
 #if defined(HAVE_QT)
 
@@ -1054,6 +1055,18 @@ normalized_type (Variant::type type1, Variant::type type2)
   }
 }
 
+static const double epsilon = 1e-13;
+
+static inline bool fequal (double a, double b)
+{
+  double avg = 0.5 * (fabs (a) + fabs (b));
+  return fabs (a - b) <= epsilon * avg;
+}
+
+static inline bool fless (double a, double b)
+{
+  return fequal (a, b) ? false : a < b;
+}
 
 bool 
 Variant::operator== (const tl::Variant &d) const
@@ -1083,7 +1096,7 @@ Variant::operator== (const tl::Variant &d) const
   } else if (t == t_id) {
     return m_var.m_id == d.m_var.m_id;
   } else if (t == t_double) {
-    return to_double () == d.to_double ();
+    return fequal (to_double (), d.to_double ());
   } else if (t == t_string) {
     return strcmp (to_string (), d.to_string ()) == 0;
   } else if (t == t_bytearray) {
@@ -1139,7 +1152,7 @@ Variant::operator< (const tl::Variant &d) const
   } else if (t == t_id) {
     return m_var.m_id < d.m_var.m_id;
   } else if (t == t_double) {
-    return to_double () < d.to_double ();
+    return fless (to_double (), d.to_double ());
   } else if (t == t_string) {
     return strcmp (to_string (), d.to_string ()) < 0;
   } else if (t == t_bytearray) {

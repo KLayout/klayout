@@ -1009,6 +1009,7 @@ View::ruler (const ant::Object *r)
 void 
 View::render (const lay::Viewport &vp, lay::ViewObjectCanvas &canvas) 
 { 
+  //  .. nothing yet ..
   if (! mp_ruler) {
     return;
   }
@@ -1700,6 +1701,7 @@ Service::end_move (const db::DPoint &, lay::angle_constraint_type)
 void
 Service::selection_to_view ()
 {
+  clear_transient_selection ();
   annotation_selection_changed_event ();
 
   //  the selection objects need to be recreated since we destroyed the old rulers

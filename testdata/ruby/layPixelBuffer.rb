@@ -139,25 +139,16 @@ class LAYPixelBuffer_TestClass < TestBase
       assert_equal(compare(pb, pb_copy), true)
     end
 
-    png = nil
-    begin
-      png = pb.to_png_data
-    rescue => ex
-      # No PNG support
-    end
+    png = pb.to_png_data
 
-    if png
+    assert_equal(png.size > 20 && png.size < 200, true)  # some range because implementations may differ
+    pb_copy = RBA::PixelBuffer.from_png_data(png)
+    assert_equal(compare(pb, pb_copy), true)
 
-      assert_equal(png.size > 20 && png.size < 200, true)  # some range because implementations may differ
-      pb_copy = RBA::PixelBuffer.from_png_data(png)
-      assert_equal(compare(pb, pb_copy), true)
-
-      tmp = File::join($ut_testtmp, "tmp.png")
-      pb.write_png(tmp)
-      pb_copy = RBA::PixelBuffer.read_png(tmp)
-      assert_equal(compare(pb, pb_copy), true)
-
-    end
+    tmp = File::join($ut_testtmp, "tmp.png")
+    pb.write_png(tmp)
+    pb_copy = RBA::PixelBuffer.read_png(tmp)
+    assert_equal(compare(pb, pb_copy), true)
 
   end
 

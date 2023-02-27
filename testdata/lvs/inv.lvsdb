@@ -197,9 +197,9 @@ reference(
    param(AD 0)
    param(PS 0)
    param(PD 0)
-   terminal(S 6)
+   terminal(S 3)
    terminal(G 2)
-   terminal(D 3)
+   terminal(D 6)
    terminal(B 4)
   )
   device(2 NMOS
@@ -210,9 +210,9 @@ reference(
    param(AD 0)
    param(PS 0)
    param(PD 0)
-   terminal(S 3)
+   terminal(S 1)
    terminal(G 2)
-   terminal(D 1)
+   terminal(D 3)
    terminal(B 5)
   )
 

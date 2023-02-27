@@ -159,6 +159,7 @@ TEST(11_device_scaling)
 TEST(12_simple_dmos)
 {
   run_test (_this, "ringo_simple_dmos", "ringo.gds");
+  run_test (_this, "ringo_simple_dmos_fixed", "ringo_fixed_sources.gds");
 }
 
 TEST(13_simple_ringo_device_subcircuits)

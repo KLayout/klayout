@@ -2426,6 +2426,14 @@ PartialService::single_selected_edge () const
   db::ICplxTrans gt (cv.context_trans () * m_selection.begin ()->first.trans ());
   db::CplxTrans tt = (*tv_list)[0] * db::CplxTrans (cv->layout ().dbu ()) * gt;
 
+  //  pick the edge from the selection (there is: p1, p2 and the edge between them)
+  for (auto s = m_selection.begin ()->second.begin (); s != m_selection.begin ()->second.end (); ++s) {
+    if (s->n != s->nn) {
+      return tt * *s;
+    }
+  }
+
+  //  fallback: should not happen
   return tt * *m_selection.begin ()->second.begin ();
 }
 

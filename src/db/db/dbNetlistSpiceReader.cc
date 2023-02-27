@@ -480,8 +480,9 @@ SpiceCircuitDict::read (tl::InputStream &stream)
 
   } catch (tl::Exception &ex) {
 
-    //  Translate the exception and add a location
-    error (ex.msg ());
+    //  Add a location to the exception
+    std::string fmt_msg = ex.msg () + tl::sprintf (tl::to_string (tr (" in %s, line %d")), m_stream.source (), m_stream.line_number ());
+    throw tl::Exception (fmt_msg);
 
   }
 }
@@ -532,8 +533,7 @@ SpiceCircuitDict::at_end ()
 void
 SpiceCircuitDict::error (const std::string &msg)
 {
-  std::string fmt_msg = tl::sprintf ("%s in %s, line %d", msg, m_stream.source (), m_stream.line_number ());
-  throw tl::Exception (fmt_msg);
+  throw tl::Exception (msg);
 }
 
 void
@@ -785,12 +785,7 @@ SpiceNetlistBuilder::SpiceNetlistBuilder (SpiceCircuitDict *dict, Netlist *netli
 void
 SpiceNetlistBuilder::error (const std::string &msg)
 {
-  if (mp_current_card) {
-    std::string fmt_msg = tl::sprintf ("%s in %s, line %d", msg, mp_dict->file_path (mp_current_card->file_id), mp_current_card->line);
-    throw tl::Exception (fmt_msg);
-  } else {
-    throw tl::Exception (msg);
-  }
+  throw tl::Exception (msg);
 }
 
 void
@@ -853,8 +848,13 @@ SpiceNetlistBuilder::build ()
 
   } catch (tl::Exception &ex) {
 
-    //  translate the error and add a source location
-    error (ex.msg ());
+    //  add a source location to the exception
+    if (mp_current_card) {
+      std::string fmt_msg = ex.msg () + tl::sprintf (tl::to_string (tr (" in %s, line %d")), mp_dict->file_path (mp_current_card->file_id), mp_current_card->line);
+      throw tl::Exception (fmt_msg);
+    } else {
+      throw;
+    }
 
   }
 }
@@ -912,12 +912,6 @@ SpiceNetlistBuilder::build_circuit (const SpiceCachedCircuit *cc, const paramete
   db::Circuit *c = circuit_for (cc, pv);
   if (c) {
     return c;
-  }
-
-  for (auto p = pv.begin (); p != pv.end (); ++p) {
-    if (cc->parameters ().find (p->first) == cc->parameters ().end ()) {
-      warn (tl::sprintf (tl::to_string (tr ("Not a known parameter for circuit '%s': '%s'")), cc->name (), p->first));
-    }
   }
 
   c = new db::Circuit ();
@@ -1077,6 +1071,13 @@ SpiceNetlistBuilder::process_element (tl::Extractor &ex, const std::string &pref
         std::vector<std::string> pins;
         pins.resize (nn.size ());
         cc_nc->set_pins (pins);
+      }
+    } else {
+      //  issue warnings on unknown parameters which are skipped otherwise
+      for (auto p = pv.begin (); p != pv.end (); ++p) {
+        if (cc->parameters ().find (p->first) == cc->parameters ().end ()) {
+          warn (tl::sprintf (tl::to_string (tr ("Not a known parameter for circuit '%s': '%s'")), cc->name (), p->first));
+        }
       }
     }
 

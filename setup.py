@@ -975,7 +975,7 @@ if __name__ == "__main__":
         data_files=[(config.root, ["src/pymod/distutils_src/klayout/py.typed"])],
         include_package_data=True,
         install_requires = [
-            'importlib-metadata == 4.8.3 ; python_version < "3.8"',
+            'importlib-metadata <= 4.8.3 ; python_version < "3.8"',
         ],
         ext_modules=[_tl, _gsi, _pya, _rba, _db, _lib, _rdb, _lym, _laybasic, _layview, _ant, _edt, _img]
             + db_plugins

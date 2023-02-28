@@ -98,12 +98,12 @@ jobs:
       echo PATH=%PATH%
       set TESTSRC=.
       pip install klayout --no-index -f dist
-      python testdata/pymod/import_db.py
-      python testdata/pymod/import_rdb.py
-      python testdata/pymod/import_tl.py
-      python testdata/pymod/import_lib.py
-      python testdata/pymod/import_lay.py
-      python testdata/pymod/pya_tests.py
+      python testdata/pymod/import_db.py || exit 1
+      python testdata/pymod/import_rdb.py || exit 1
+      python testdata/pymod/import_tl.py || exit 1
+      python testdata/pymod/import_lib.py || exit 1
+      python testdata/pymod/import_lay.py || exit 1
+      python testdata/pymod/pya_tests.py || exit 1
     displayName: 'Test KLayout pymod'
 
   - task: CopyFiles@2

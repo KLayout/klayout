@@ -542,10 +542,12 @@ config.add_extension(_gsi)
 _pya_path = os.path.join("src", "pya", "pya")
 _pya_sources = set(glob.glob(os.path.join(_pya_path, "*.cc")))
 
+_version_path = os.path.join("src", "version")
+
 _pya = Library(
     config.root + "._pya",
-    define_macros=config.macros() + [("MAKE_PYA_LIBRARY", 1)],
-    include_dirs=[_tl_path, _gsi_path],
+    define_macros=config.macros() + [("MAKE_PYA_LIBRARY", 1), ("KLAYOUT_VERSION", config.version())],
+    include_dirs=[_version_path, _tl_path, _gsi_path],
     extra_objects=[config.path_of("_tl", _tl_path), config.path_of("_gsi", _gsi_path)],
     language="c++",
     libraries=config.libraries('_pya'),
@@ -974,9 +976,6 @@ if __name__ == "__main__":
         package_data={config.root: ["src/pymod/distutils_src/klayout/*.pyi"]},
         data_files=[(config.root, ["src/pymod/distutils_src/klayout/py.typed"])],
         include_package_data=True,
-        install_requires = [
-            'importlib-metadata <= 4.8.3 ; python_version < "3.8"',
-        ],
         ext_modules=[_tl, _gsi, _pya, _rba, _db, _lib, _rdb, _lym, _laybasic, _layview, _ant, _edt, _img]
             + db_plugins
             + [tl, db, lib, rdb, lay],

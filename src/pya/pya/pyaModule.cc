@@ -34,6 +34,8 @@
 #include "pyaInternal.h"
 #include "pyaCallables.h"
 
+#include "version.h"
+
 #include <map>
 
 namespace pya
@@ -148,7 +150,7 @@ PythonModule::init (const char *mod_name, const char *description)
   memcpy ((void *) mp_mod_def, (const void *) &mod_def, sizeof (PyModuleDef));
 
   module = PyModule_Create ((PyModuleDef *) mp_mod_def);
-
+  
 #endif
 
   mp_module = PythonRef (module);
@@ -663,7 +665,13 @@ PythonModule::make_classes (const char *mod_name)
     all_list = PythonRef (PyObject_GetAttrString (module, "__all__"));
   }
 
+  //  Establish __doc__
   PyObject_SetAttrString (module, "__doc__", PythonRef (c2python (m_mod_description)).get ());
+  PyList_Append (all_list.get (), PythonRef (c2python ("__doc__")).get ());
+
+  //  Establish __version__
+  PyObject_SetAttrString (module, "__version__", PythonRef (c2python (prg_version)).get ());
+  PyList_Append (all_list.get (), PythonRef (c2python ("__version__")).get ());
 
   //  Build a class for descriptors for static attributes
   PYAStaticAttributeDescriptorObject::make_class (module);

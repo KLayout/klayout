@@ -24,18 +24,20 @@ import dbNetlistCrossReference
 import layLayers
   
 if __name__ == '__main__':
-  suite = unittest.TestLoader().loadTestsFromTestCase(tlTest.TLTest)
-  suite = unittest.TestLoader().loadTestsFromTestCase(dbPCells.DBPCellTests)
-  suite = unittest.TestLoader().loadTestsFromTestCase(dbLayoutTest.DBLayoutTest)
-  suite = unittest.TestLoader().loadTestsFromTestCase(dbPolygonTest.DBPolygonTests)
-  suite = unittest.TestLoader().loadTestsFromTestCase(dbReaders.DBReadersTests)
-  suite = unittest.TestLoader().loadTestsFromTestCase(dbRegionTest.DBRegionTest)
-  suite = unittest.TestLoader().loadTestsFromTestCase(dbTransTest.DBTransTests)
-  suite = unittest.TestLoader().loadTestsFromTestCase(dbLayoutToNetlist.DBLayoutToNetlistTests)
-  suite = unittest.TestLoader().loadTestsFromTestCase(dbLayoutVsSchematic.DBLayoutVsSchematicTests)
-  suite = unittest.TestLoader().loadTestsFromTestCase(dbNetlistCrossReference.DBNetlistCrossReferenceTests)
-  suite = unittest.TestLoader().loadTestsFromTestCase(layLayers.LAYLayersTests)
 
-  if not unittest.TextTestRunner(verbosity = 1).run(suite).wasSuccessful():
-    sys.exit(1)
+  for suite in [
+    unittest.TestLoader().loadTestsFromTestCase(tlTest.TLTest),
+    unittest.TestLoader().loadTestsFromTestCase(dbPCells.DBPCellTests),
+    unittest.TestLoader().loadTestsFromTestCase(dbLayoutTest.DBLayoutTest),
+    unittest.TestLoader().loadTestsFromTestCase(dbPolygonTest.DBPolygonTests),
+    unittest.TestLoader().loadTestsFromTestCase(dbReaders.DBReadersTests),
+    unittest.TestLoader().loadTestsFromTestCase(dbRegionTest.DBRegionTest),
+    unittest.TestLoader().loadTestsFromTestCase(dbTransTest.DBTransTests),
+    unittest.TestLoader().loadTestsFromTestCase(dbLayoutToNetlist.DBLayoutToNetlistTests),
+    unittest.TestLoader().loadTestsFromTestCase(dbLayoutVsSchematic.DBLayoutVsSchematicTests),
+    unittest.TestLoader().loadTestsFromTestCase(dbNetlistCrossReference.DBNetlistCrossReferenceTests),
+    unittest.TestLoader().loadTestsFromTestCase(layLayers.LAYLayersTests)
+  ]:
+    if not unittest.TextTestRunner(verbosity = 1).run(suite).wasSuccessful():
+      sys.exit(1)
 

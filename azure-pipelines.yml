@@ -108,7 +108,7 @@ jobs:
         python testdata/pymod/import_lib.py
         python testdata/pymod/import_lay.py
         python testdata/pymod/pya_tests.py
-      displayName: 'Test KLayout pymod'
+    displayName: 'Test KLayout pymod'
 
   - task: CopyFiles@2
     condition: always()

@@ -39,7 +39,7 @@ if __name__ == '__main__':
     # unittest.TestLoader().loadTestsFromTestCase(dbLayoutVsSchematic.DBLayoutVsSchematicTests),
     unittest.TestLoader().loadTestsFromTestCase(dbNetlistCrossReference.DBNetlistCrossReferenceTests),
     unittest.TestLoader().loadTestsFromTestCase(layLayers.LAYLayersTests),
-    suite.addTests(loader.loadTestsFromTestCase(layPixelBuffer.LAYPixelBufferTests))
+    unittest.TestLoader().loadTestsFromTestCase(layLayers.LAYPixelBufferTests)
   ]:
     if not unittest.TextTestRunner(verbosity = 1).run(suite).wasSuccessful():
       sys.exit(1)

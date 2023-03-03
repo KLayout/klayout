@@ -336,6 +336,17 @@ public:
   }
 
   /**
+   *  @brief Sets a value indicating whether the given node is expanded in the layer tree
+   *
+   *  @param iter Points to the layer node to be modified
+   *  @param ex True if the layer node shall be expanded, false if it shall be collapsed
+   */
+  void set_layer_node_expanded (const LayerPropertiesConstIterator &iter, bool ex)
+  {
+    set_layer_node_expanded (current_layer_list (), iter, ex);
+  }
+
+  /**
    *  @brief Set the layer properties of a layer with the given position (by iterator) for the layer list with the given index
    *
    *  @param index The layer list's index
@@ -343,6 +354,15 @@ public:
    *  @param props The properties to replace the current properties
    */
   void set_properties (unsigned int index, const LayerPropertiesConstIterator &iter, const LayerProperties &props);
+
+  /**
+   *  @brief Sets a value indicating whether the given node is expanded in the layer tree
+   *
+   *  @param index The layer list's index
+   *  @param iter Points to the layer node to be modified
+   *  @param ex True if the layer node shall be expanded, false if it shall be collapsed
+   */
+  void set_layer_node_expanded (unsigned int index, const LayerPropertiesConstIterator &iter, bool ex);
 
   /**
    *  @brief Expand the layer properties of all tabs 

@@ -352,6 +352,7 @@ private:
   LayerTreeModel *mp_model;
   lay::LayoutViewBase *mp_view;
   bool m_needs_update;
+  bool m_expanded_state_needs_update;
   bool m_tabs_need_update;
   bool m_hidden_flags_need_update;
   bool m_in_update;
@@ -360,7 +361,6 @@ private:
   int m_oversampling;
   bool m_hrm;
   tl::DeferredMethod<LayerControlPanel> m_do_update_content_dm;
-  std::set<unsigned int> m_expanded;
   bool m_no_stipples;
   QLabel *m_no_stipples_label;
   lay::DecoratedLineEdit *mp_search_edit_box;

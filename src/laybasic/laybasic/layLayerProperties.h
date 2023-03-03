@@ -920,6 +920,11 @@ protected:
   virtual void need_realize (unsigned int flags, bool force = false);
 
   /**
+   *  @brief indicates a change of the collapsed/expanded state
+   */
+  virtual void expanded_state_changed ();
+
+  /**
    *  @brief Fetches the current status from the original properties for the LayerPropertiesNodeRef implementation
    */
   virtual void refresh () const { }
@@ -1070,6 +1075,20 @@ public:
   }
 
   /**
+   *  @brief Sets the expanded state of the layer properties tree node
+   */
+  void set_expanded (bool ex);
+
+  /**
+   *  @brief Gets the expanded state of the layer properties node
+   */
+  bool expanded () const
+  {
+    refresh ();
+    return m_expanded;
+  }
+
+  /**
    *  @brief Child layers: begin iterator
    */
   const_iterator begin_children () const
@@ -1207,14 +1226,21 @@ public:
   virtual void realize_source () const;
   virtual void realize_visual () const;
 
+  void set_expanded_silent (bool ex)
+  {
+    m_expanded = ex;
+  }
+
 protected: 
   virtual void need_realize (unsigned int flags, bool force);
+  virtual void expanded_state_changed ();
   void set_parent (const LayerPropertiesNode *);
 
 private:
   //  A reference to the view 
   tl::weak_ptr<lay::LayoutViewBase> mp_view;
   unsigned int m_list_index;
+  bool m_expanded;
   //  the parent node
   tl::weak_ptr<LayerPropertiesNode> mp_parent;
   //  the list of children
@@ -2009,8 +2035,9 @@ private:
   tl::weak_ptr<LayerPropertiesNode> mp_node;
   size_t m_synched_gen_id;
 
-  void need_realize (unsigned int flags, bool force);
-  void refresh () const;
+  virtual void need_realize (unsigned int flags, bool force);
+  virtual void expanded_state_changed ();
+  virtual void refresh () const;
 };
 
 }

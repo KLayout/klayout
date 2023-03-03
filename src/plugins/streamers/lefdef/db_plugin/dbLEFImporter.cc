@@ -388,9 +388,7 @@ LEFImporter::read_geometries (GeometryBasedLayoutGenerator *lg, double dbu, Laye
     } else if (test ("PROPERTY")) {
 
       //  skip properties
-      while (! at_end () && ! test (";")) {
-        take ();
-      }
+      skip_entry ();
 
     } else {
       //  stop at unknown token
@@ -406,22 +404,20 @@ LEFImporter::read_nondefaultrule (db::Layout &layout)
   //  read NONDEFAULTRULE sections
   std::string n = get ();
 
-  while (! test ("END") || ! test (n)) {
+  while (! at_end () && ! test ("END")) {
 
     if (test ("LAYER")) {
 
       std::string l = get ();
 
       //  read the width for the layer
-      while (! test ("END")) {
+      while (! at_end () && ! test ("END")) {
         if (test ("WIDTH")) {
           double w = get_double ();
           test (";");
           m_nondefault_widths[n][l] = std::make_pair (w, w);
         } else {
-          while (! at_end () && ! test (";")) {
-            take ();
-          }
+          skip_entry ();
         }
       }
 
@@ -432,18 +428,31 @@ LEFImporter::read_nondefaultrule (db::Layout &layout)
       read_viadef (layout, n);
 
     } else {
-      while (! at_end () && ! test (";")) {
-        take ();
+
+      std::string token = get ();
+
+      if (token == "SPACING") {
+        //  read over sections we do not need
+        while (! at_end () && ! test ("END")) {
+          skip_entry ();
+        }
+        test (token);
+      } else if (token != ";") {
+        //  read over lines we do not need
+        skip_entry ();
       }
+
     }
 
   }
+
+  test (n);
 }
 
 void
 LEFImporter::read_viadef_by_rule (RuleBasedViaGenerator *vg, ViaDesc &via_desc, const std::string & /*n*/, double dbu)
 {
-  while (! test ("END")) {
+  while (! at_end () && ! test ("END")) {
 
     double x, y;
 
@@ -557,6 +566,13 @@ LEFImporter::read_viadef_by_geometry (GeometryBasedLayoutGenerator *lg, ViaDesc 
       get_double ();
       test (";");
 
+    } else if (test ("FOREIGN")) {
+
+      //  undocumented
+      while (! at_end () && ! test (";")) {
+        take ();
+      }
+
     } else if (test ("LAYER")) {
 
       layer_name = get ();
@@ -631,9 +647,7 @@ LEFImporter::read_viadef_by_geometry (GeometryBasedLayoutGenerator *lg, ViaDesc 
     } else if (test ("PROPERTY")) {
 
       //  skip properties
-      while (! at_end () && ! test (";")) {
-        take ();
-      }
+      skip_entry ();
 
     } else {
       //  stop at unknown token
@@ -663,7 +677,7 @@ LEFImporter::read_viadef (Layout &layout, const std::string &nondefaultrule)
 
   ViaDesc &via_desc = m_vias[n];
 
-  while (test ("DEFAULT") || test ("TOPOFSTACKONLY"))
+  while (test ("DEFAULT") || test ("TOPOFSTACKONLY") || test("GENERATED"))
     ;
   test (";");
 
@@ -746,55 +760,51 @@ LEFImporter::read_layer (Layout & /*layout*/)
       //  blocks following a semicolon
       take ();
       if (test ("FREQUENCY")) {
-        while (! test ("TABLEENTRIES")) {
+        while (! at_end () && ! test ("TABLEENTRIES")) {
           take ();
         }
       }
-      while (! at_end () && ! test (";")) {
-        take ();
-      }
+      skip_entry ();
 
     } else if (test ("PROPERTY")) {
 
-      std::string name = get ();
-      tl::Variant value = get ();
+      while (! test (";") && ! at_end ()) {
 
-      if (name == "LEF58_MINWIDTH") {
+        std::string name = get ();
+        tl::Variant value = get ();
 
-        //  Cadence extension
-        tl::Extractor ex (value.to_string ());
-        double v = 0.0;
-        if (ex.test ("MINWIDTH") && ex.try_read (v)) {
-          if (ex.test ("WRONGDIRECTION")) {
-            wmin_wrongdir = v;
-          } else {
-            wmin = v;
+        if (name == "LEF58_MINWIDTH") {
+
+          //  Cadence extension
+          tl::Extractor ex (value.to_string ());
+          double v = 0.0;
+          if (ex.test ("MINWIDTH") && ex.try_read (v)) {
+            if (ex.test ("WRONGDIRECTION")) {
+              wmin_wrongdir = v;
+            } else {
+              wmin = v;
+            }
           }
-        }
 
-      } else if (name == "LEF58_WIDTH") {
+        } else if (name == "LEF58_WIDTH") {
 
-        //  Cadence extension
-        tl::Extractor ex (value.to_string ());
-        double v = 0.0;
-        if (ex.test ("WIDTH") && ex.try_read (v)) {
-          if (ex.test ("WRONGDIRECTION")) {
-            w_wrongdir = v;
-          } else {
-            w = v;
+          //  Cadence extension
+          tl::Extractor ex (value.to_string ());
+          double v = 0.0;
+          if (ex.test ("WIDTH") && ex.try_read (v)) {
+            if (ex.test ("WRONGDIRECTION")) {
+              w_wrongdir = v;
+            } else {
+              w = v;
+            }
           }
+
         }
 
       }
-
-      expect (";");
 
     } else {
-
-      while (! at_end () && ! test (";")) {
-        take ();
-      }
-
+      skip_entry ();
     }
   }
 
@@ -865,6 +875,8 @@ LEFImporter::read_macro (Layout &layout)
 
     } else if (test ("PIN")) {
 
+      LEFDEFSection section (this, "PIN");
+
       std::string pn = get ();
       std::string dir;
 
@@ -880,6 +892,8 @@ LEFImporter::read_macro (Layout &layout)
           test (";");
 
         } else if (test ("PORT")) {
+
+          LEFDEFSection section (this, "PORT");
 
           //  produce pin labels
           //  TODO: put a label on every single object?
@@ -916,9 +930,7 @@ LEFImporter::read_macro (Layout &layout)
           expect ("END");
 
         } else {
-          while (! at_end () && ! test (";")) {
-            take ();
-          }
+          skip_entry ();
         }
       }
 
@@ -926,12 +938,19 @@ LEFImporter::read_macro (Layout &layout)
 
     } else if (test ("FOREIGN")) {
 
+      LEFDEFSection section (this, "FOREIGN");
+
       std::string cn = get ();
 
       db::Point vec;
       db::FTrans ft;
       if (! peek (";")) {
-        vec = get_point (1.0 / layout.dbu ());
+        if (test ("(")) {
+          vec = get_point (1.0 / layout.dbu ());
+          expect (")");
+        } else {
+          vec = get_point (1.0 / layout.dbu ());
+        }
         ft = get_orient (true);
       }
 
@@ -940,7 +959,7 @@ LEFImporter::read_macro (Layout &layout)
       if (options ().macro_resolution_mode () != 1) {
 
         if (! foreign_name.empty ()) {
-          error (tl::to_string (tr ("Duplicate FOREIGN definition")));
+          warn (tl::to_string (tr ("Duplicate FOREIGN definition")));
         }
 
         //  What is the definition of the FOREIGN transformation?
@@ -956,6 +975,8 @@ LEFImporter::read_macro (Layout &layout)
 
     } else if (test ("OBS")) {
 
+      LEFDEFSection section (this, "OBS");
+
       if (reader_state ()->tech_comp ()->produce_obstructions ()) {
         read_geometries (mg, layout.dbu (), Obstructions);
       } else {
@@ -966,8 +987,10 @@ LEFImporter::read_macro (Layout &layout)
 
     } else if (test ("DENSITY")) {
 
+      LEFDEFSection section (this, "DENSITY");
+
       //  read over DENSITY statements
-      while (! test ("END")) {
+      while (! at_end () && ! test ("END")) {
         if (test ("LAYER")) {
           get ();
           expect (";");
@@ -980,17 +1003,27 @@ LEFImporter::read_macro (Layout &layout)
         }
       }
 
-      expect ("END");
-
     } else if (test ("FIXEDMASK")) {
 
       mg->set_fixedmask (true);
       expect (";");
 
     } else {
-      while (! at_end () && ! test (";")) {
-        take ();
+
+      std::string token = get ();
+      LEFDEFSection section (this, token);
+
+      if (token == "TIMING") {
+        //  read over sections we do not need
+        while (! at_end () && ! test ("END")) {
+          skip_entry ();
+        }
+        test (token);
+      } else if (token != ";") {
+        //  read over lines we do not need
+        skip_entry ();
       }
+
     }
 
   }
@@ -1031,17 +1064,16 @@ LEFImporter::do_read (db::Layout &layout)
 
     } else if (test ("UNITS")) {
 
-      //  read over SPACING sections
-      while (! test ("END")) {
+      LEFDEFSection section (this, "UNITS");
+
+      while (! at_end () && ! test ("END")) {
         if (test ("DATABASE")) {
           expect ("MICRONS");
           //  TODO: what to do with that value
           /* dbu_mic = */ get_double ();
           expect (";");
         } else {
-          while (! at_end () && ! test (";")) {
-            take ();
-          }
+          skip_entry ();
         }
       }
 
@@ -1049,63 +1081,135 @@ LEFImporter::do_read (db::Layout &layout)
 
     } else if (test ("SPACING")) {
 
+      LEFDEFSection section (this, "SPACING");
+
       //  read over SPACING sections
-      while (! test ("END") || ! test ("SPACING")) {
-        take ();
+      while (! at_end () && ! test ("END")) {
+        skip_entry ();
       }
+
+      test ("SPACING");
 
     } else if (test ("PROPERTYDEFINITIONS")) {
 
+      LEFDEFSection section (this, "PROPERTYDEFINITIONS");
+
       //  read over PROPERTYDEFINITIONS sections
-      while (! test ("END") || ! test ("PROPERTYDEFINITIONS")) {
-        take ();
+      while (! at_end () && ! test ("END")) {
+        skip_entry ();
       }
 
+      test ("PROPERTYDEFINITIONS");
+
     } else if (test ("NONDEFAULTRULE")) {
+
+      LEFDEFSection section (this, "NONDEFAULTRULE");
 
       read_nondefaultrule (layout);
 
     } else if (test ("SITE")) {
 
-      //  read over SITE sections
+      LEFDEFSection section (this, "NONDEFAULTRULE");
+
+      //  read over SITE or VIARULE sections
       std::string n = get ();
-      while (! test ("END") || ! test (n)) {
-        take ();
+      while (! at_end () && ! test ("END")) {
+        skip_entry ();
       }
+
+      test (n);
 
     } else if (test ("VIARULE")) {
 
-      //  read over VIARULE sections
+      LEFDEFSection section (this, "VIARULE");
+
+      //  read over SITE or VIARULE sections
       std::string n = get ();
-      while (! test ("END") || ! test (n)) {
-        take ();
+      while (! at_end () && ! test ("END")) {
+        skip_entry ();
       }
+
+      test (n);
+
+    } else if (test ("NOISETABLE")) {
+
+      LEFDEFSection section (this, "NOISETABLE");
+
+      //  read over NOISETABLE sections
+      while (! at_end () && ! test ("END")) {
+        skip_entry ();
+      }
+
+      test ("NOISETABLE");
+
+    } else if (test ("IRDROP")) {
+
+      LEFDEFSection section (this, "IRDROP");
+
+      //  read over IRDROP sections
+      while (! at_end () && ! test ("END")) {
+        skip_entry ();
+      }
+
+      test ("IRDROP");
+
+    } else if (test ("ARRAY")) {
+
+      LEFDEFSection section (this, "ARRAY");
+
+      //  read over ARRAY sections
+      std::string n = get ();
+      while (! at_end () && ! test ("END")) {
+        if (test ("FLOORPLAN")) {
+          while (! at_end () && ! test ("END")) {
+            skip_entry ();
+          }
+        } else {
+          skip_entry ();
+        }
+      }
+
+      test (n);
 
     } else if (test ("VIA")) {
 
+      LEFDEFSection section (this, "VIA");
       read_viadef (layout, std::string ());
 
     } else if (test ("BEGINEXT")) {
 
+      LEFDEFSection section (this, "BEGINEXT");
+
       //  read over BEGINEXT sections
-      while (! test ("ENDEXT")) {
+      while (! at_end () && ! test ("ENDEXT")) {
         take ();
       }
 
     } else if (test ("LAYER")) {
 
+      LEFDEFSection section (this, "LAYER");
       read_layer (layout);
 
     } else if (test ("MACRO")) {
 
+      LEFDEFSection section (this, "MACRO");
       read_macro (layout);
 
     } else {
-      while (! at_end () && ! test (";")) {
-        take ();
-      }
+
+      //  read over entries we do not need
+      skip_entry ();
+
     }
 
+  }
+}
+
+void
+LEFImporter::skip_entry ()
+{
+  while (! at_end () && ! test (";")) {
+    take ();
   }
 }
 

@@ -2143,6 +2143,10 @@ ms_extraction (db::EdgeProcessor &ep, bool resolve_holes)
 static db::Polygon 
 do_minkowski_sum (const db::Polygon &a, const db::Edge &b, bool resolve_holes)
 {
+  if (a.begin_hull () == a.end_hull ()) {
+    return db::Polygon ();
+  }
+
   db::EdgeProcessor ep;
   db::ms_production (a, b.p1 (), b.p2 (), ep);
   return db::ms_extraction (ep, resolve_holes);
@@ -2161,7 +2165,9 @@ minkowski_sum (const db::Polygon &a, const db::Edge &b, bool rh)
 static db::Polygon 
 do_minkowski_sum (const db::Polygon &a, const db::Polygon &b, bool resolve_holes)
 {
-  tl_assert (a.begin_hull () != a.end_hull ());
+  if (a.begin_hull () == a.end_hull () || b.begin_hull () == b.end_hull ()) {
+    return db::Polygon ();
+  }
 
   db::Vector p0 = *a.begin_hull () - db::Point ();
 

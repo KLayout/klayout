@@ -331,7 +331,7 @@ Object::seg_p2 (size_t seg_index, const db::DPoint &p)
 void
 Object::p1 (const db::DPoint &p)
 {
-  if (! p1 ().equal (p)) {
+  if (m_points.size () < 1 || ! p1 ().equal (p)) {
     if (m_points.size () < 1) {
       m_points.push_back (p);
     } else {
@@ -348,7 +348,7 @@ Object::p1 (const db::DPoint &p)
 void
 Object::p2 (const db::DPoint &p)
 {
-  if (! p2 ().equal (p)) {
+  if (m_points.size () < 2 || ! p2 ().equal (p)) {
     if (m_points.size () < 2) {
       if (m_points.empty ()) {
         m_points.push_back (db::DPoint ());

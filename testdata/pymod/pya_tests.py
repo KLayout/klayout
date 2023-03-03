@@ -22,7 +22,8 @@ import dbLayoutToNetlist
 import dbLayoutVsSchematic
 import dbNetlistCrossReference
 import layLayers
-  
+import layPixelBuffer
+
 if __name__ == '__main__':
 
   for suite in [
@@ -37,7 +38,8 @@ if __name__ == '__main__':
     # unittest.TestLoader().loadTestsFromTestCase(dbLayoutToNetlist.DBLayoutToNetlistTests),
     # unittest.TestLoader().loadTestsFromTestCase(dbLayoutVsSchematic.DBLayoutVsSchematicTests),
     unittest.TestLoader().loadTestsFromTestCase(dbNetlistCrossReference.DBNetlistCrossReferenceTests),
-    unittest.TestLoader().loadTestsFromTestCase(layLayers.LAYLayersTests)
+    unittest.TestLoader().loadTestsFromTestCase(layLayers.LAYLayersTests),
+    suite.addTests(loader.loadTestsFromTestCase(layPixelBuffer.LAYPixelBufferTests))
   ]:
     if not unittest.TextTestRunner(verbosity = 1).run(suite).wasSuccessful():
       sys.exit(1)

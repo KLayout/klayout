@@ -782,7 +782,7 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
       }
     }
 
-    while (test ("+")) {
+    while ((in_subnet && ! at_end ()) || test ("+")) {
 
       bool was_shield = false;
       unsigned int mask = 0;
@@ -820,6 +820,8 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
 
       } else {
 
+        bool any = false;
+
         bool prefixed = false;
         bool can_have_rect_polygon_or_via = true;
 
@@ -830,8 +832,6 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
           prefixed = true;
           can_have_rect_polygon_or_via = test ("+");
         }
-
-        bool any = false;
 
         if (can_have_rect_polygon_or_via) {
           if (test ("SHAPE")) {
@@ -882,22 +882,29 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
 
         } else if (can_have_rect_polygon_or_via && test ("VIA")) {
 
+          //  For the via, the masks are encoded in a three-digit number (<mask-top> <mask-cut> <mask_bottom>)
+          unsigned int mask_top = (mask / 100) % 10;
+          unsigned int mask_cut = (mask / 10) % 10;
+          unsigned int mask_bottom = mask % 10;
+
           std::string vn = get ();
           db::FTrans ft = get_orient (true /*optional*/);
 
-          test ("(");
-          db::Vector pt = get_vector (scale);
-          test (")");
+          while (test ("(")) {
 
-          std::map<std::string, ViaDesc>::const_iterator vd = m_via_desc.find (vn);
-          if (vd != m_via_desc.end ()) {
-            //  TODO: no mask specification here?
-            db::Cell *cell = reader_state ()->via_cell (vn, nondefaultrule, layout, 0, 0, 0, &m_lef_importer);
-            if (cell) {
-              design.insert (db::CellInstArray (db::CellInst (cell->cell_index ()), db::Trans (ft.rot (), pt)));
+            db::Vector pt = get_vector (scale);
+            test (")");
+
+            std::map<std::string, ViaDesc>::const_iterator vd = m_via_desc.find (vn);
+            if (vd != m_via_desc.end ()) {
+              db::Cell *cell = reader_state ()->via_cell (vn, nondefaultrule, layout, mask_bottom, mask_cut, mask_top, &m_lef_importer);
+              if (cell) {
+                design.insert (db::CellInstArray (db::CellInst (cell->cell_index ()), db::Trans (ft.rot (), pt)));
+              }
+            } else {
+              warn (tl::to_string (tr ("Invalid via name: ")) + vn);
             }
-          } else {
-            error (tl::to_string (tr ("Invalid via name: ")) + vn);
+
           }
 
           any = true;
@@ -1120,9 +1127,9 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
     if (vd.m1.empty () && vd.m2.empty ()) {
 
       //  analyze the layers to find the metals
-      if (routing_layers.size () == 2) {
-        vd.m1 = routing_layers[0];
-        vd.m2 = routing_layers[1];
+      if (routing_layers.size () == 2 || routing_layers.size () == 1) {
+        vd.m1 = routing_layers.front ();
+        vd.m2 = routing_layers.back ();
       } else {
         warn (tl::to_string (tr ("Cannot determine routing layers for via: ")) + n);
       }
@@ -1204,7 +1211,7 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
 
         double x = 0.0, y = 0.0;
 
-        while (! at_end () && ! test ("+") && ! test (";")) {
+        while (! at_end () && ! peek ("+") && ! peek (";")) {
 
           test ("(");
           if (! test ("*")) {
@@ -1237,8 +1244,36 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
 
       } else if (test ("VIA")) {
 
-        //  TODO: implement
-        error (tl::to_string (tr ("VIA not supported on pins currently")));
+        //  TODO: clarify - VIA on pins is regarded VIA purpose, not PIN and gives a separate cell
+
+        std::string vn = get ();
+
+        unsigned int mask = 0;
+        if (test ("MASK")) {
+          mask = get_mask (get_long ());
+        }
+
+        while (test ("(")) {
+
+          db::Vector pt = get_vector (scale);
+          test (")");
+
+          unsigned int mask_top = (mask / 100) % 10;
+          unsigned int mask_cut = (mask / 10) % 10;
+          unsigned int mask_bottom = mask % 10;
+
+          std::map<std::string, ViaDesc>::const_iterator vd = m_via_desc.find (vn);
+          if (vd != m_via_desc.end ()) {
+            std::string nondefaultrule;
+            db::Cell *cell = reader_state ()->via_cell (vn, nondefaultrule, layout, mask_bottom, mask_cut, mask_top, &m_lef_importer);
+            if (cell) {
+              design.insert (db::CellInstArray (db::CellInst (cell->cell_index ()), db::Trans (pt)));
+            }
+          } else {
+            warn (tl::to_string (tr ("Invalid via name: ")) + vn);
+          }
+
+        }
 
       } else {
         while (! peek ("+") && ! peek ("-") && ! peek (";")) {
@@ -1391,12 +1426,48 @@ DEFImporter::read_fills (db::Layout &layout, db::Cell &design, double scale)
 
     } else if (test ("VIA")) {
 
-      //  TODO: implement
-      warn (tl::to_string (tr ("VIA not supported on fills currently")));
+      //  TODO: clarify - VIA on fill is regarded VIA purpose, not PIN and gives a separate cell
 
-      while (! at_end () && ! test (";")) {
-        take ();
+      std::string vn = get ();
+
+      unsigned int mask = 0;
+      while (test ("+")) {
+        if (test ("MASK")) {
+          mask = get_mask (get_long ());
+        } else if (test ("OPC")) {
+          //  ignore
+        } else {
+          error (tl::to_string (tr ("Expected 'MASK' or 'OPC' inside fill/VIA definition")));
+        }
       }
+
+      if (peek ("+") && test ("MASK")) {
+        mask = get_mask (get_long ());
+      }
+
+      unsigned int mask_top = (mask / 100) % 10;
+      unsigned int mask_cut = (mask / 10) % 10;
+      unsigned int mask_bottom = mask % 10;
+
+      while (test ("(")) {
+
+        db::Vector pt = get_vector (scale);
+        test (")");
+
+        std::map<std::string, ViaDesc>::const_iterator vd = m_via_desc.find (vn);
+        if (vd != m_via_desc.end ()) {
+          std::string nondefaultrule;
+          db::Cell *cell = reader_state ()->via_cell (vn, nondefaultrule, layout, mask_bottom, mask_cut, mask_top, &m_lef_importer);
+          if (cell) {
+            design.insert (db::CellInstArray (db::CellInst (cell->cell_index ()), db::Trans (pt)));
+          }
+        } else {
+          warn (tl::to_string (tr ("Invalid via name: ")) + vn);
+        }
+
+      }
+
+      test (";");
 
     } else {
       error (tl::to_string (tr ("'LAYER' or 'VIA' keyword expected")));
@@ -1432,7 +1503,7 @@ DEFImporter::read_styles (double scale)
 
     }
 
-    m_styles.insert (std::make_pair (sn, db::Polygon ())).first->second.assign_hull (points.begin (), points.end ());
+    m_styles.insert (std::make_pair (sn, db::Polygon ())).first->second.assign_hull (points.begin (), points.end (), false /*don't compress*/);
 
   }
 }

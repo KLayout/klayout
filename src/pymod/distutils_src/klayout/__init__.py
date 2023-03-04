@@ -1,1 +1,3 @@
-# klayout library definition file
+
+from .tl import __version__
+

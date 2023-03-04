@@ -38,7 +38,7 @@ HEADERS += \
   pyaSignalHandler.h \
   pyaStatusChangedListener.h
 
-INCLUDEPATH += "$$PYTHONINCLUDE" $$TL_INC $$GSI_INC
+INCLUDEPATH += "$$PYTHONINCLUDE" $$VERSION_INC $$TL_INC $$GSI_INC
 DEPENDPATH += "$$PYTHONINCLUDE" $$TL_INC $$GSI_INC
 LIBS += "$$PYTHONLIBFILE" -L$$DESTDIR -lklayout_tl -lklayout_gsi
 

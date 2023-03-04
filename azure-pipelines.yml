@@ -94,16 +94,20 @@ jobs:
       bash `pwd`/ci-scripts/windows/fix_wheel.sh `pwd`/dist/*.whl "`pwd`/klayout-microbits/klayout-microbits-4.0/msvc2017/$PYTHON_ARCHITECTURE"
     displayName: 'Copy klayout bits dlls into wheel'
 
-  - script: |
-      echo PATH=%PATH%
-      set TESTSRC=.
-      pip install klayout --no-index -f dist
-      python testdata/pymod/import_db.py
-      python testdata/pymod/import_rdb.py
-      python testdata/pymod/import_tl.py
-      python testdata/pymod/import_lib.py
-      python testdata/pymod/import_lay.py
-      python testdata/pymod/pya_tests.py
+  - task: Bash@3
+    inputs:
+      targetType: 'inline'
+      script: |
+        set -e
+        echo $PATH
+        export TESTSRC=.
+        pip install klayout --no-index -f dist
+        python testdata/pymod/import_db.py
+        python testdata/pymod/import_rdb.py
+        python testdata/pymod/import_tl.py
+        python testdata/pymod/import_lib.py
+        python testdata/pymod/import_lay.py
+        python testdata/pymod/pya_tests.py
     displayName: 'Test KLayout pymod'
 
   - task: CopyFiles@2

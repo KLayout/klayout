@@ -116,6 +116,9 @@ class DBNetlistReaderTests_TestClass < TestBase
     assert_equal(nl.description, "Read by MyDelegate (sucessfully)")
 
     assert_equal(nl.to_s, <<"END")
+circuit .TOP ();
+  subcircuit SUBCKT SUBCKT ($1=IN,A=OUT,VDD=VDD,Z=Z,GND=VSS,GND$1=VSS);
+end;
 circuit SUBCKT ($1=$1,A=A,VDD=VDD,Z=Z,GND=GND,GND$1=GND$1);
   device HVPMOS $1 (S=VDD,G=$3,D=Z,B=$1) (L=0.3,W=1.5,AS=0.27,AD=0.27,PS=3.24,PD=3.24);
   device HVPMOS $2 (S=VDD,G=A,D=$3,B=$1) (L=0.3,W=1.5,AS=0.27,AD=0.27,PS=3.24,PD=3.24);
@@ -123,9 +126,6 @@ circuit SUBCKT ($1=$1,A=A,VDD=VDD,Z=Z,GND=GND,GND$1=GND$1);
   device HVNMOS $4 (S=GND,G=$3,D=Z,B=GND$1) (L=0.6,W=0.6,AS=0.285,AD=0.285,PS=1.74,PD=1.74);
   device HVNMOS $5 (S=GND,G=A,D=$3,B=GND$1) (L=0.6,W=0.6,AS=0.285,AD=0.285,PS=2.64,PD=2.64);
   device RES $1 (A=A,B=Z) (R=100000,L=0,W=0,A=0,P=0);
-end;
-circuit .TOP ();
-  subcircuit SUBCKT SUBCKT ($1=IN,A=OUT,VDD=VDD,Z=Z,GND=VSS,GND$1=VSS);
 end;
 END
 
@@ -147,6 +147,9 @@ END
     assert_equal(nl.description, "Read by MyDelegate2 (sucessfully)")
 
     assert_equal(nl.to_s, <<"END")
+circuit .TOP ();
+  subcircuit SUBCKT SUBCKT ($1=IN,A=OUT,VXX=VXX,Z=Z,GND=VSS,GND$1=VSS);
+end;
 circuit SUBCKT ($1=$1,A=A,VXX=VXX,Z=Z,GND=GND,GND$1=GND$1);
   device HVPMOS $1 (S=VXX,G=$3,D=Z,B=$1) (L=0.3,W=1.5,AS=0.27,AD=0.27,PS=3.24,PD=3.24);
   device HVPMOS $2 (S=VXX,G=A,D=$3,B=$1) (L=0.3,W=1.5,AS=0.27,AD=0.27,PS=3.24,PD=3.24);
@@ -154,9 +157,6 @@ circuit SUBCKT ($1=$1,A=A,VXX=VXX,Z=Z,GND=GND,GND$1=GND$1);
   device HVNMOS $4 (S=GND,G=$3,D=Z,B=GND$1) (L=0.6,W=0.6,AS=0.285,AD=0.285,PS=1.74,PD=1.74);
   device HVNMOS $5 (S=GND,G=A,D=$3,B=GND$1) (L=0.6,W=0.6,AS=0.285,AD=0.285,PS=2.64,PD=2.64);
   device WIDERSTAND $1 (A=A,B=Z) (R=100000,L=0,W=0,A=0,P=0);
-end;
-circuit .TOP ();
-  subcircuit SUBCKT SUBCKT ($1=IN,A=OUT,VXX=VXX,Z=Z,GND=VSS,GND$1=VSS);
 end;
 END
 
@@ -212,7 +212,7 @@ END
     pd.net_names = [ "x", "y", "z" ]
     assert_equal(pd.net_names.join(","), "x,y,z")
     pd.parameters = { "A" => 17.5, "B" => 1 }
-    assert_equal(pd.parameters.inspect, "{\"A\"=>17.5, \"B\"=>1.0}")
+    assert_equal(pd.parameters.inspect, "{\"A\"=>17.5, \"B\"=>1}")
 
   end
 
@@ -222,7 +222,7 @@ END
     pd.strings = [ "x", "y", "z" ]
     assert_equal(pd.strings.join(","), "x,y,z")
     pd.parameters = { "A" => 17.5, "B" => 1 }
-    assert_equal(pd.parameters.inspect, "{\"A\"=>17.5, \"B\"=>1.0}")
+    assert_equal(pd.parameters.inspect, "{\"A\"=>17.5, \"B\"=>1}")
 
   end
 
@@ -230,7 +230,7 @@ END
 
     dg = RBA::NetlistSpiceReaderDelegate::new
     pd = dg.parse_element_components("17 5 1e-9 a=17 b=1k")
-    assert_equal(pd.strings.join(","), "17,5,1e-9")
+    assert_equal(pd.strings.join(","), "17,5,1E-9")
     assert_equal(pd.parameters.inspect, "{\"A\"=>17.0, \"B\"=>1000.0}")
 
   end

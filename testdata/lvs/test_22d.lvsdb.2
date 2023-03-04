@@ -93,7 +93,7 @@ layout(
    rect(l22 (-210 -75) (420 150))
   )
   terminal(D
-   polygon(l2 (-210 75) (0 760) (525 0) (0 -420) (-105 0) (0 -340))
+   polygon(l2 (-210 75) (0 340) (-105 0) (0 420) (525 0) (0 -760))
   )
   terminal(B
    rect(l1 (-210 -75) (420 150))
@@ -101,13 +101,13 @@ layout(
  )
  device(D$sky130_fd_pr__nfet_01v8__model$1 sky130_fd_pr__nfet_01v8__model
   terminal(S
-   polygon(l2 (-600 -550) (0 760) (525 0) (0 -420) (-105 0) (0 -340))
+   polygon(l2 (180 -550) (0 340) (-105 0) (0 420) (525 0) (0 -760))
   )
   terminal(G
    rect(l22 (-75 -210) (150 420))
   )
   terminal(D
-   rect(l2 (75 -210) (265 420))
+   rect(l2 (-340 -210) (265 420))
   )
   terminal(B
    rect(l1 (-75 -210) (150 420))
@@ -121,7 +121,7 @@ layout(
    rect(l22 (-210 -75) (420 150))
   )
   terminal(D
-   polygon(l2 (-210 75) (0 340) (-105 0) (0 420) (525 0) (0 -760))
+   polygon(l2 (-210 75) (0 760) (525 0) (0 -420) (-105 0) (0 -340))
   )
   terminal(B
    rect(l1 (-210 -75) (420 150))
@@ -129,13 +129,13 @@ layout(
  )
  device(D$sky130_fd_pr__nfet_01v8__model$3 sky130_fd_pr__nfet_01v8__model
   terminal(S
-   polygon(l2 (180 -550) (0 340) (-105 0) (0 420) (525 0) (0 -760))
+   polygon(l2 (-600 -550) (0 760) (525 0) (0 -420) (-105 0) (0 -340))
   )
   terminal(G
    rect(l22 (-75 -210) (150 420))
   )
   terminal(D
-   rect(l2 (-340 -210) (265 420))
+   rect(l2 (75 -210) (265 420))
   )
   terminal(B
    rect(l1 (-75 -210) (150 420))
@@ -285,8 +285,8 @@ layout(
    rect(l2 (-2430 -1410) (250 720))
    rect(l2 (-250 270) (265 420))
    rect(l2 (1915 -1410) (250 720))
-   rect(l6 (-250 -720) (250 720))
    rect(l6 (-2430 -720) (250 720))
+   rect(l6 (1930 -720) (250 720))
   )
 
   # Outgoing pins and their connections to nets
@@ -298,32 +298,6 @@ layout(
 
   # Devices and their connections
   device(1 D$sky130_fd_pr__nfet_01v8__model
-   location(1575 215)
-   param(L 0.15)
-   param(W 0.42)
-   param(AS 0.1113)
-   param(AD 0.18165)
-   param(PS 1.37)
-   param(PD 1.285)
-   terminal(S 8)
-   terminal(G 6)
-   terminal(D 4)
-   terminal(B 10)
-  )
-  device(2 D$sky130_fd_pr__nfet_01v8__model$1
-   location(1965 840)
-   param(L 0.15)
-   param(W 0.42)
-   param(AS 0.18165)
-   param(AD 0.1113)
-   param(PS 1.285)
-   param(PD 1.37)
-   terminal(S 4)
-   terminal(G 3)
-   terminal(D 10)
-   terminal(B 10)
-  )
-  device(3 D$sky130_fd_pr__nfet_01v8__model$2
    location(605 215)
    param(L 0.15)
    param(W 0.42)
@@ -336,7 +310,7 @@ layout(
    terminal(D 3)
    terminal(B 10)
   )
-  device(4 D$sky130_fd_pr__nfet_01v8__model$3
+  device(2 D$sky130_fd_pr__nfet_01v8__model$1
    location(215 840)
    param(L 0.15)
    param(W 0.42)
@@ -346,6 +320,32 @@ layout(
    param(PD 1.37)
    terminal(S 3)
    terminal(G 4)
+   terminal(D 10)
+   terminal(B 10)
+  )
+  device(3 D$sky130_fd_pr__nfet_01v8__model$2
+   location(1575 215)
+   param(L 0.15)
+   param(W 0.42)
+   param(AS 0.1113)
+   param(AD 0.18165)
+   param(PS 1.37)
+   param(PD 1.285)
+   terminal(S 8)
+   terminal(G 6)
+   terminal(D 4)
+   terminal(B 10)
+  )
+  device(4 D$sky130_fd_pr__nfet_01v8__model$3
+   location(1965 840)
+   param(L 0.15)
+   param(W 0.42)
+   param(AS 0.18165)
+   param(AD 0.1113)
+   param(PS 1.285)
+   param(PD 1.37)
+   terminal(S 4)
+   terminal(G 3)
    terminal(D 10)
    terminal(B 10)
   )
@@ -652,9 +652,9 @@ reference(
    param(AD 0)
    param(PS 0)
    param(PD 0)
-   terminal(S 1)
+   terminal(S 7)
    terminal(G 6)
-   terminal(D 7)
+   terminal(D 1)
    terminal(B 1)
   )
   device(2 SKY130_FD_PR__PFET_01V8__MODEL
@@ -665,9 +665,9 @@ reference(
    param(AD 0)
    param(PS 0)
    param(PD 0)
-   terminal(S 6)
+   terminal(S 1)
    terminal(G 7)
-   terminal(D 1)
+   terminal(D 6)
    terminal(B 1)
   )
   device(3 SKY130_FD_PR__NFET_01V8__MODEL
@@ -678,9 +678,9 @@ reference(
    param(AD 0)
    param(PS 0)
    param(PD 0)
-   terminal(S 2)
+   terminal(S 7)
    terminal(G 6)
-   terminal(D 7)
+   terminal(D 2)
    terminal(B 2)
   )
   device(4 SKY130_FD_PR__NFET_01V8__MODEL
@@ -691,9 +691,9 @@ reference(
    param(AD 0)
    param(PS 0)
    param(PD 0)
-   terminal(S 6)
+   terminal(S 2)
    terminal(G 7)
-   terminal(D 2)
+   terminal(D 6)
    terminal(B 2)
   )
   device(5 SKY130_FD_PR__NFET_01V8__MODEL
@@ -704,9 +704,9 @@ reference(
    param(AD 0)
    param(PS 0)
    param(PD 0)
-   terminal(S 4)
+   terminal(S 7)
    terminal(G 3)
-   terminal(D 7)
+   terminal(D 4)
    terminal(B 2)
   )
   device(6 SKY130_FD_PR__NFET_01V8__MODEL
@@ -717,9 +717,9 @@ reference(
    param(AD 0)
    param(PS 0)
    param(PD 0)
-   terminal(S 5)
+   terminal(S 6)
    terminal(G 3)
-   terminal(D 6)
+   terminal(D 5)
    terminal(B 2)
   )
 
@@ -941,10 +941,10 @@ xref(
    pin(0 0 match)
    pin(4 1 match)
    pin(1 2 match)
-   device(4 3 match)
-   device(2 4 match)
-   device(3 5 match)
-   device(1 6 match)
+   device(2 3 match)
+   device(4 4 match)
+   device(1 5 match)
+   device(3 6 match)
    device(6 1 match)
    device(5 2 match)
   )

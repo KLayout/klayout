@@ -1,0 +1,24 @@
+
+* recursive expansion of parametrized subcircuits
+
+.param w1 1.5 w2 {w1*2}
+.param l1 0.15 l2 'l1+0.1'
+
+Xsub1a a b c sub1 w=w1 l=l1
+Xsub1b a b c sub1 w=w2 l=l2
+
+.subckt sub1 n1 n2 n3 w l
+  * declares w and l parameters instead of nodes:
+  w = 1.0
+  l = 1.0
+  .param w1 = w
+  .param l1 = l
+  Xsub2a n1 n2 n3 sub2 w=w1 l=l1 m=1
+  .param w2 "w+0.0" l2 l*(0.5+0.5)
+  Xsub2b n1 n2 n3 sub2 w=w2 l=l2 m=2
+.ends 
+
+.subckt sub2 n1 n2 n3 w=0.0 l=0.0 m=0
+  Mnmos n1 n2 n3 n1 nmos w=w l=l m=m
+.ends 
+

@@ -160,12 +160,21 @@ void NetlistSpiceWriterDelegate::write_device (const db::Device &dev) const
 
     os << "M";
     os << format_name (dev.expanded_name ());
-    os << format_terminals (dev);
+
+    //  issue #1304
+    os << " ";
+    os << net_to_string (dev.net_for_terminal (db::DeviceClassMOS3Transistor::terminal_id_D));
+    os << " ";
+    os << net_to_string (dev.net_for_terminal (db::DeviceClassMOS3Transistor::terminal_id_G));
+    os << " ";
+    os << net_to_string (dev.net_for_terminal (db::DeviceClassMOS3Transistor::terminal_id_S));
+      os << " ";
 
     if (! mos4) {
       //  we assume for the MOS3 type the bulk is connected to Source
-      os << " ";
       os << net_to_string (dev.net_for_terminal (db::DeviceClassMOS3Transistor::terminal_id_S));
+    } else {
+      os << net_to_string (dev.net_for_terminal (db::DeviceClassMOS4Transistor::terminal_id_B));
     }
 
     //  Use device class name for the model

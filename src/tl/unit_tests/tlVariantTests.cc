@@ -1059,7 +1059,35 @@ TEST(5)
   EXPECT_EQ (m [" 3"], 0);
 }
 
+//  fuzzy compare of doubles
+TEST(6)
+{
+  volatile double a = 10.0;
+  EXPECT_EQ (tl::Variant (0.0) == tl::Variant (0.0), true);
+
+  EXPECT_EQ (tl::Variant (0.1) == tl::Variant (1.0 / a), true);
+  EXPECT_EQ (tl::Variant (0.1) == tl::Variant (0.1 * (1.0 + 1e-14)), true);
+  EXPECT_EQ (tl::Variant (0.1) == tl::Variant (0.1 * (1.0 + 0.9e-13)), true);
+  EXPECT_EQ (tl::Variant (0.1) == tl::Variant (0.1 * (1.0 + 1.1e-13)), false);
+  EXPECT_EQ (tl::Variant (0.1) == tl::Variant (0.1 * (1.0 + 1e-12)), false);
+  EXPECT_EQ (tl::Variant (-0.1) == tl::Variant (-0.1 * (1.0 + 0.9e-13)), true);
+  EXPECT_EQ (tl::Variant (-0.1) == tl::Variant (-0.1 * (1.0 + 1.1e-13)), false);
+  EXPECT_EQ (tl::Variant (0.1) == tl::Variant (-0.1 * (1.0 + 0.9e-13)), false);
+  EXPECT_EQ (tl::Variant (0.1) == tl::Variant (-0.1 * (1.0 + 1.1e-13)), false);
+
+  EXPECT_EQ (tl::Variant (0.1) < tl::Variant (1.0 / a), false);
+  EXPECT_EQ (tl::Variant (0.1) < tl::Variant (0.1 * (1.0 + 1e-14)), false);
+  EXPECT_EQ (tl::Variant (0.1) < tl::Variant (0.1 * (1.0 + 0.9e-13)), false);
+  EXPECT_EQ (tl::Variant (0.1) < tl::Variant (0.1 * (1.0 + 1.1e-13)), true);
+  EXPECT_EQ (tl::Variant (0.1) < tl::Variant (0.1 * (1.0 + 1e-12)), true);
+  EXPECT_EQ (tl::Variant (-0.1) < tl::Variant (-0.1 * (1.0 + 0.9e-13)), false);
+  EXPECT_EQ (tl::Variant (-0.1) < tl::Variant (-0.1 * (1.0 + 1.1e-13)), false);
+  EXPECT_EQ (tl::Variant (0.1) < tl::Variant (-0.1 * (1.0 + 0.9e-13)), false);
+  EXPECT_EQ (tl::Variant (0.1) < tl::Variant (-0.1 * (1.0 + 1.1e-13)), false);
+  EXPECT_EQ (tl::Variant (-0.1 * (1.0 + 0.9e-13)) < tl::Variant (-0.1), false);
+  EXPECT_EQ (tl::Variant (-0.1 * (1.0 + 1.1e-13)) < tl::Variant (-0.1), true);
+  EXPECT_EQ (tl::Variant (-0.1 * (1.0 + 0.9e-13)) < tl::Variant (0.1), true);
+  EXPECT_EQ (tl::Variant (-0.1 * (1.0 + 1.1e-13)) < tl::Variant (0.1), true);
 }
 
-
-
+}

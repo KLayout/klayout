@@ -1,8 +1,8 @@
 
 .subckt ND2X1 1 2 3 4 5 6 7
-  m$1 2 6 1 4 MLVPMOS L=0.25um W=1.5um
-  m$2 1 5 2 4 MLVPMOS L=0.25um W=1.5um 
-  m$3 3 6 8 7 MLVNMOS L=0.25um W=0.95um 
-  m$4 8 5 2 7 MLVNMOS L=0.25um W=0.95um 
+  m$1 1 6 2 4 MLVPMOS L=0.25um W=1.5um
+  m$2 2 5 1 4 MLVPMOS L=0.25um W=1.5um 
+  m$3 8 6 3 7 MLVNMOS L=0.25um W=0.95um 
+  m$4 2 5 8 7 MLVNMOS L=0.25um W=0.95um 
 .ends ND2X1
 

@@ -447,9 +447,9 @@ reference(
    param(AD 1.4)
    param(PS 6.85)
    param(PD 6.85)
-   terminal(S 3)
+   terminal(S 5)
    terminal(G 2)
-   terminal(D 5)
+   terminal(D 3)
    terminal(B 1)
   )
   device(2 NMOS
@@ -460,14 +460,45 @@ reference(
    param(AD 1.4)
    param(PS 6.85)
    param(PD 6.85)
-   terminal(S 3)
+   terminal(S 4)
    terminal(G 2)
-   terminal(D 4)
+   terminal(D 3)
    terminal(B 6)
   )
 
  )
  circuit(INV2PAIR
+
+  # Nets
+  net(1 name('1'))
+  net(2 name('2'))
+  net(3 name('3'))
+  net(4 name('4'))
+  net(5 name('5'))
+  net(6 name('6'))
+  net(7 name('7'))
+
+  # Outgoing pins and their connections to nets
+  pin(1 name('1'))
+  pin(2 name('2'))
+  pin(3 name('3'))
+  pin(4 name('4'))
+  pin(5 name('5'))
+  pin(6 name('6'))
+  pin(7 name('7'))
+
+  # Subcircuits and their connections
+  circuit(1 INV2 name($2)
+   pin(0 7)
+   pin(1 4)
+   pin(2 6)
+   pin(3 3)
+   pin(4 2)
+   pin(5 1)
+  )
+
+ )
+ circuit(INV2PAIRX
 
   # Nets
   net(1 name('1'))
@@ -564,37 +595,6 @@ reference(
    pin(4 10)
    pin(5 5)
    pin(6 3)
-  )
-
- )
- circuit(INV2PAIRX
-
-  # Nets
-  net(1 name('1'))
-  net(2 name('2'))
-  net(3 name('3'))
-  net(4 name('4'))
-  net(5 name('5'))
-  net(6 name('6'))
-  net(7 name('7'))
-
-  # Outgoing pins and their connections to nets
-  pin(1 name('1'))
-  pin(2 name('2'))
-  pin(3 name('3'))
-  pin(4 name('4'))
-  pin(5 name('5'))
-  pin(6 name('6'))
-  pin(7 name('7'))
-
-  # Subcircuits and their connections
-  circuit(1 INV2 name($2)
-   pin(0 7)
-   pin(1 4)
-   pin(2 6)
-   pin(3 3)
-   pin(4 2)
-   pin(5 1)
   )
 
  )

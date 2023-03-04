@@ -287,6 +287,24 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl5 (
   "edt::Service(CellInstances)"
 );
 
+template <class Service>
+bool is_enabled ()
+{
+  for (auto p = tl::Registrar<lay::PluginDeclaration>::begin (); p != tl::Registrar<lay::PluginDeclaration>::end (); ++p) {
+    auto pd = dynamic_cast<const edt::PluginDeclaration<Service> *> (p.operator-> ());
+    if (pd) {
+      return pd->editable_enabled ();
+    }
+  }
+  return false;
+}
+
+bool polygons_enabled () { return is_enabled<edt::PolygonService> (); }
+bool paths_enabled () { return is_enabled<edt::PathService> (); }
+bool boxes_enabled () { return is_enabled<edt::BoxService> (); }
+bool texts_enabled () { return is_enabled<edt::TextService> (); }
+bool instances_enabled () { return is_enabled<edt::InstService> (); }
+
 class MainPluginDeclaration
   : public lay::PluginDeclaration
 {

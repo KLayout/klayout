@@ -2700,7 +2700,26 @@ PartialService::partial_select (const db::DBox &box, lay::Editable::SelectionMod
 
   } else {
 
-    PartialShapeFinder finder (box.is_point (), m_top_level_sel, db::ShapeIterator::All);
+    int shape_flags = 0;
+    if (edt::polygons_enabled ()) {
+      shape_flags |= db::ShapeIterator::Polygons;
+    }
+    if (edt::paths_enabled ()) {
+      //  Note: points, edges and edge pairs don't have seperate entires, so
+      //  we count them as paths here
+      shape_flags |= db::ShapeIterator::Paths;
+      shape_flags |= db::ShapeIterator::Edges;
+      shape_flags |= db::ShapeIterator::EdgePairs;
+      shape_flags |= db::ShapeIterator::Points;
+    }
+    if (edt::boxes_enabled ()) {
+      shape_flags |= db::ShapeIterator::Boxes;
+    }
+    if (edt::texts_enabled ()) {
+      shape_flags |= db::ShapeIterator::Texts;
+    }
+
+    PartialShapeFinder finder (box.is_point (), m_top_level_sel, db::ShapeIterator::flags_type (shape_flags));
     finder.find (view (), search_box);
 
     //  We must make sure that guiding shapes are only selected alone. The first selected object will 
@@ -2750,7 +2769,7 @@ PartialService::partial_select (const db::DBox &box, lay::Editable::SelectionMod
     }
 
     //  check, if there is a selected instance inside the box - in this case, we do not do a new selection
-    if (! box.is_point ()) {
+    if (! box.is_point () && edt::instances_enabled ()) {
 
       lay::InstFinder inst_finder (box.is_point (), m_top_level_sel, true /*full arrays*/, true /*enclose*/, 0 /*no excludes*/, true /*visible layers*/);
       inst_finder.find (view (), search_box);

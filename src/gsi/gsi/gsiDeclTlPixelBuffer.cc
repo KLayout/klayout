@@ -249,7 +249,7 @@ static tl::BitmapBuffer read_bitmap_buffer (const std::string &file)
 #if defined(HAVE_PNG)
   tl::InputStream stream (file);
   return tl::BitmapBuffer::read_png (stream);
-#elif defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
+#elif defined(HAVE_QT)
   //  QImage is fallback
   QImage img;
   img.load (tl::to_qstring (file), "PNG");
@@ -267,7 +267,7 @@ static tl::BitmapBuffer bitmap_buffer_from_png (const std::vector<char> &data)
   tl::InputMemoryStream data_stream (data.begin ().operator-> (), data.size ());
   tl::InputStream stream (data_stream);
   return tl::BitmapBuffer::read_png (stream);
-#elif defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
+#elif defined(HAVE_QT)
   //  QImage is fallback
   tl_assert (data.size () < std::numeric_limits<int>::max ());
   QImage img = QImage::fromData ((const uchar *) data.begin ().operator-> (), int (data.size ()));
@@ -283,7 +283,7 @@ static void write_bitmap_buffer (const tl::BitmapBuffer *pb, const std::string &
 #if defined(HAVE_PNG)
   tl::OutputStream stream (file);
   pb->write_png (stream);
-#elif defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
+#elif defined(HAVE_QT)
   //  QImage is fallback
   QImage img = pb->to_image ();
   img.save (tl::to_qstring (file), "PNG");
@@ -302,7 +302,7 @@ static std::vector<char> bitmap_buffer_to_png (const tl::BitmapBuffer *pb)
     pb->write_png (stream);
   }
   return std::vector<char> (data_stream.data (), data_stream.data () + data_stream.size ());
-#elif defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
+#elif defined(HAVE_QT)
   //  QImage is fallback
   QImage img = pb->to_image ();
   QBuffer data;

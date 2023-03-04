@@ -506,7 +506,7 @@ private:
   //  The index of the landmark being moved
   size_t m_moved_landmark;
   //  Flag indicating that we want to keep the selection after the landmark was moved
-  bool m_keep_selection_for_landmark;
+  bool m_keep_selection_for_move;
   //  Flag indicating whether images are visible
   bool m_images_visible;
 

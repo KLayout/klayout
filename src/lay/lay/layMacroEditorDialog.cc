@@ -3152,11 +3152,6 @@ MacroEditorDialog::translate_pseudo_id (size_t &file_id, int &line)
   }
 }
 
-static void exit_from_macro ()
-{
-  throw tl::ExitException ();
-}
-
 void   
 MacroEditorDialog::exception_thrown (gsi::Interpreter *interpreter, size_t file_id, int line, const std::string &eclass, const std::string &emsg, const gsi::StackTraceProvider *stack_trace_provider)
 {
@@ -3165,9 +3160,7 @@ MacroEditorDialog::exception_thrown (gsi::Interpreter *interpreter, size_t file_
     return;
   }
 
-  if (!m_in_exec) {
-    exit_from_macro ();
-  }
+  exit_if_needed ();
 
   //  avoid recursive breakpoints and exception catches from the console while in a breakpoint or exception stop
   if (lay::BusySection::is_busy ()) {
@@ -3251,17 +3244,25 @@ MacroEditorDialog::exception_thrown (gsi::Interpreter *interpreter, size_t file_
     throw;
   }
 
-  if (! m_in_exec) {
-    exit_from_macro ();
+  exit_if_needed ();
+}
+
+void
+MacroEditorDialog::exit_if_needed ()
+{
+  //  Exit if a stop is requested.
+  //  NOTE: we must not raise ExitException from outside events (e.g. PyQt5 events)
+  //  as ExitException would otherwise terminate the application.
+  //  "mp_exec_controller" is 0 in that case.
+  if (! m_in_exec && mp_exec_controller != 0) {
+    throw tl::ExitException ();
   }
 }
 
 void   
 MacroEditorDialog::trace (gsi::Interpreter *interpreter, size_t file_id, int line, const gsi::StackTraceProvider *stack_trace_provider)
 {
-  if (!m_in_exec) {
-    exit_from_macro ();
-  }
+  exit_if_needed ();
 
   //  avoid recursive breakpoints and exception catches from the console while in a breakpoint or exception stop
   if (lay::BusySection::is_busy ()) {
@@ -3310,9 +3311,7 @@ MacroEditorDialog::trace (gsi::Interpreter *interpreter, size_t file_id, int lin
       throw;
     }
 
-    if (! m_in_exec) {
-      exit_from_macro ();
-    }
+    exit_if_needed ();
 
   } else if (++m_trace_count == 20) {
 
@@ -3328,9 +3327,7 @@ MacroEditorDialog::trace (gsi::Interpreter *interpreter, size_t file_id, int lin
       m_last_process_events = tl::Clock::current ();
       m_process_events_interval = std::max (0.05, std::min (2.0, (m_last_process_events - start).seconds () * 5.0));
 
-      if (!m_in_exec) {
-        exit_from_macro ();
-      }
+      exit_if_needed ();
 
     }
 

@@ -138,6 +138,11 @@ public:
   Object &operator= (const ant::Object &d);
 
   /**
+   *  @brief Destructor
+   */
+  ~Object ();
+
+  /**
    *  @brief Less operator
    */
   bool operator< (const ant::Object &b) const;

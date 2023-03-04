@@ -590,6 +590,7 @@ LayoutView::show_properties ()
     return;
   }
 
+  cancel_edits ();
   if (! has_selection ()) {
     //  try to use the transient selection for the real one
     transient_to_selection ();

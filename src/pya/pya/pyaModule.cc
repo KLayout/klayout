@@ -60,6 +60,7 @@ set_type_attr (PyTypeObject *type, const std::string &name, PythonRef &attr)
 
 std::map<const gsi::MethodBase *, std::string> PythonModule::m_python_doc;
 std::vector<const gsi::ClassBase *> PythonModule::m_classes;
+std::map<PyTypeObject *, const gsi::ClassBase *> PythonModule::m_class_by_type;
 
 const std::string pymod_name ("klayout");
 
@@ -253,7 +254,26 @@ public:
 
     PyTypeObject *pt = PythonClassClientData::py_type (*cls, as_static);
     if (pt != 0) {
+
+      if (! mp_module->is_class_of_module (cls)) {
+
+        //  class is already built, but not member of the module yet (e.g.
+        //  on duplicate import into a new module object): add now without building again
+
+        mp_module->register_class (cls);
+        tl_assert (mp_module->cls_for_type (pt) == cls);
+
+        //  add to the parent class as child class or add to module
+
+        if (! cls->parent ()) {
+          PyList_Append (m_all_list, PythonRef (c2python (cls->name ())).get ());
+          PyModule_AddObject (mp_module->module (), cls->name ().c_str (), (PyObject *) pt);
+        }
+
+      }
+
       return pt;
+
     }
 
     PythonRef bases;
@@ -717,6 +737,11 @@ PythonModule::make_classes (const char *mod_name)
 
 const gsi::ClassBase *PythonModule::cls_for_type (PyTypeObject *type)
 {
+  auto cls = m_class_by_type.find (type);
+  if (cls != m_class_by_type.end ()) {
+    return cls->second;
+  }
+
   //  GSI classes store their class index inside the __gsi_id__ attribute
   if (PyObject_HasAttrString ((PyObject *) type, "__gsi_id__")) {
 
@@ -724,7 +749,9 @@ const gsi::ClassBase *PythonModule::cls_for_type (PyTypeObject *type)
     if (cls_id != NULL && pya::test_type<size_t> (cls_id)) {
       size_t i = pya::python2c<size_t> (cls_id);
       if (i < m_classes.size ()) {
-        return m_classes [i];
+        const gsi::ClassBase *gsi_cls = m_classes [i];
+        m_class_by_type.insert (std::make_pair (type, gsi_cls));
+        return gsi_cls;
       }
     }
 

@@ -1400,10 +1400,55 @@ class BasicTest(unittest.TestCase):
     def f4():
       n[0] = n[0] + 2
 
+    n[0] = 0
     e.e0(f4)
     e.s1()
-    self.assertEqual( 4, n[0] )
+    self.assertEqual( 2, n[0] )
 
+    # remove event handler -> no events triggered anymore
+    n[0] = 0
+    e.e0 -= f4
+    e.s1()
+    self.assertEqual( 0, n[0] )
+
+    # adding again will re-activate it
+    e.e0 += f4
+    n[0] = 0
+    e.s1()
+    self.assertEqual( 2, n[0] )
+
+    # two events at once
+    def f5():
+      n[0] = n[0] + 10
+    n[0] = 0
+    e.e0 += f5
+    e.s1()
+    self.assertEqual( 12, n[0] )
+
+    # clearing events
+    e.e0.clear()
+    e.s1()
+    n[0] = 0
+    self.assertEqual( 0, n[0] )
+
+    # synonyms: add, connect
+    e.e0.add(f4)
+    e.e0.connect(f5)
+    n[0] = 0
+    e.s1()
+    self.assertEqual( 12, n[0] )
+
+    # synonyms: remove, disconnect
+    e.e0.disconnect(f4)
+    n[0] = 0
+    e.s1()
+    self.assertEqual( 10, n[0] )
+    n[0] = 0
+    e.e0.remove(f5)
+    e.s1()
+    self.assertEqual( 0, n[0] )
+
+    # another signal
     e.s2()
     self.assertEqual( 100, n[1] )
     e.m = 1

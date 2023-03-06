@@ -627,7 +627,9 @@ PYASignal::make_class (PyObject *module)
 
   static PyMethodDef signal_methods[] = {
       {"add", (PyCFunction) &pya_signal_add, METH_VARARGS, "internal signal proxy object: += operator" },
+      {"connect", (PyCFunction) &pya_signal_add, METH_VARARGS, "synonym to 'add' or '+='" },
       {"remove", (PyCFunction) &pya_signal_remove, METH_VARARGS, "internal signal proxy object: -= operator" },
+      {"disconnect", (PyCFunction) &pya_signal_remove, METH_VARARGS, "synonym to 'remove' or '-='" },
       {"set", (PyCFunction) &pya_signal_set, METH_VARARGS, "internal signal proxy object: assignment" },
       {"clear", (PyCFunction) &pya_signal_clear, METH_NOARGS, "internal signal proxy object: clears all receivers" },
       {NULL,  NULL},

@@ -39,6 +39,18 @@ namespace tl
 std::string TL_PUBLIC get_env (const std::string &name, const std::string &def_value = std::string ());
 
 /**
+ *  @brief Sets the value of the given environment variable
+ *
+ *  On Windows, the variable is removed when the value is an empty string.
+ */
+void TL_PUBLIC set_env (const std::string &name, const std::string &value);
+
+/**
+ *  @brief Unsets the given environment variable
+ */
+void TL_PUBLIC unset_env (const std::string &name);
+
+/**
  *  @brief Gets the value if the given environment variable is set
  */
 bool TL_PUBLIC has_env (const std::string &name);

@@ -200,6 +200,11 @@ std::vector<std::string> TL_PUBLIC split_path (const std::string &p, bool keep_l
 std::string TL_PUBLIC get_inst_path ();
 
 /**
+ *  @brief Gets the path of the binary executing
+ */
+std::string TL_PUBLIC get_exe_file ();
+
+/**
  *  @brief Gets the absolute path of the module (DLL/.so) which contains the given address
  *  "address" is supposed to be the address of a function inside the module.
  */

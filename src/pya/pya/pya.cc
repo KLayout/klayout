@@ -40,10 +40,6 @@
 #include "tlString.h"
 #include "tlInternational.h"
 
-#if defined(HAVE_QT)
-#  include <QCoreApplication>
-#endif
-
 //  For the installation path
 #ifdef _WIN32
 #  include <windows.h>
@@ -225,10 +221,7 @@ PythonInterpreter::PythonInterpreter (bool embedded)
 
   tl::SelfTimer timer (tl::verbosity () >= 21, "Initializing Python");
 
-  std::string app_path;
-#if defined(HAVE_QT)
-  app_path = tl::to_string (QCoreApplication::applicationFilePath ());
-#endif
+  std::string app_path = tl::get_exe_file ();
 
 #if PY_MAJOR_VERSION >= 3
 

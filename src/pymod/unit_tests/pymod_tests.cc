@@ -51,6 +51,8 @@ int run_pymodtest (tl::TestBase *_this, const std::string &fn)
   fp += "/pymod/";
   fp += fn;
 
+  int status = 0;
+
   std::string text;
   {
     std::string cmd;
@@ -71,12 +73,14 @@ int run_pymodtest (tl::TestBase *_this, const std::string &fn)
     tl::InputPipe pipe (cmd);
     tl::InputStream is (pipe);
     text = is.read_all ();
+
+    status = pipe.wait ();
   }
 
   tl::info << text;
   EXPECT_EQ (text.find ("OK") != std::string::npos, true);
 
-  return 0;
+  return status;
 }
 
 #define PYMODTEST(n, file) \
@@ -88,6 +92,8 @@ PYMODTEST (import_tl, "import_tl.py")
 PYMODTEST (import_db, "import_db.py")
 PYMODTEST (import_rdb, "import_rdb.py")
 PYMODTEST (import_lay, "import_lay.py")
+PYMODTEST (import_lib, "import_lib.py")
+PYMODTEST (pya_tests, "pya_tests.py")
 
 #if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
 
@@ -142,7 +148,5 @@ PYMODTEST (import_QtCore5Compat, "import_QtCore5Compat.py")
 #endif
 
 #endif
-
-PYMODTEST (import_pya, "pya_tests.py")
 
 #endif

@@ -459,7 +459,7 @@ class _PCellDeclarationHelper(pya.PCellDeclaration):
 
   def produce(self, layout, layers, parameters, cell):
     """
-    coerce parameters (make consistent)
+    produces the layout
     """
     self.init_values(parameters, layers)
     self.cell = cell

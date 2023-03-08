@@ -20,7 +20,6 @@
 
 */
 
-#include "../pymodHelper.h"
-
-#include "QtXmlMain.h"
-DEFINE_PYMOD(QtXml, "QtXml", "KLayout/Qt module 'QtXml'")
+//  To force linking of the QtDesigner module
+#include "../../gsiqt/qtbasic/gsiQtDesignerExternals.h"
+FORCE_LINK_GSI_QTDESIGNER

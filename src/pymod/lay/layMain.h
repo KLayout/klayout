@@ -20,7 +20,16 @@
 
 */
 
-#include "../pymodHelper.h"
+//  to force linking of the layview module
+#if defined(HAVE_QT)
+#  include "../../lay/lay/layForceLink.h"
+#else
+#  include "../../layview/layview/layviewForceLink.h"
+#endif
 
-#include "QtXmlMain.h"
-DEFINE_PYMOD(QtXml, "QtXml", "KLayout/Qt module 'QtXml'")
+//  Force-include other dependencies
+//  NOTE: these libraries contribute to the "lay" module space. Hence we have to include them.
+#include "../../ant/ant/antForceLink.h"
+#include "../../img/img/imgForceLink.h"
+#include "../../edt/edt/edtForceLink.h"
+#include "../../lym/lym/lymForceLink.h"

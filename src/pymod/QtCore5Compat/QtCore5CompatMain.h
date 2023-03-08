@@ -20,7 +20,6 @@
 
 */
 
-#include "../pymodHelper.h"
-
-#include "QtXmlMain.h"
-DEFINE_PYMOD(QtXml, "QtXml", "KLayout/Qt module 'QtXml'")
+//  To force linking of the QtCore5Compat module
+#include "../../gsiqt/qtbasic/gsiQtCore5CompatExternals.h"
+FORCE_LINK_GSI_QTCORE5COMPAT

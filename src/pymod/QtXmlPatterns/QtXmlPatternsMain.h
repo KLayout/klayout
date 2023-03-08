@@ -20,7 +20,11 @@
 
 */
 
-#include "../pymodHelper.h"
+//  To force linking of the QtXmlPatterns module
+#include "../../gsiqt/qtbasic/gsiQtXmlPatternsExternals.h"
+FORCE_LINK_GSI_QTXMLPATTERNS
 
-#include "QtXmlMain.h"
-DEFINE_PYMOD(QtXml, "QtXml", "KLayout/Qt module 'QtXml'")
+//  To force linking of the QtNetwork module (some arguments
+//  are QNetworkAccessManager)
+#include "../../gsiqt/qtbasic/gsiQtNetworkExternals.h"
+FORCE_LINK_GSI_QTNETWORK

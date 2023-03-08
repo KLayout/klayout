@@ -22,7 +22,5 @@
 
 #include "../pymodHelper.h"
 
-//  to force linking of the ant module
-#  include "../../ant/ant/antForceLink.h"
-
+#include "antMain.h"
 DEFINE_PYMOD(antcore, "ant", "KLayout core module 'ant'")

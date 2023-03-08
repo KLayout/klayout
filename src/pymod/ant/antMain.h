@@ -20,7 +20,5 @@
 
 */
 
-#include "../pymodHelper.h"
-
-#include "QtXmlMain.h"
-DEFINE_PYMOD(QtXml, "QtXml", "KLayout/Qt module 'QtXml'")
+//  to force linking of the ant module
+#include "../../ant/ant/antForceLink.h"

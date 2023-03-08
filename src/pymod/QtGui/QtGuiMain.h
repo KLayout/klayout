@@ -20,7 +20,11 @@
 
 */
 
-#include "../pymodHelper.h"
+//  To force linking of the QtGui module
+#include "../../gsiqt/qtbasic/gsiQtGuiExternals.h"
+FORCE_LINK_GSI_QTGUI
 
-#include "QtXmlMain.h"
-DEFINE_PYMOD(QtXml, "QtXml", "KLayout/Qt module 'QtXml'")
+//  This is required because QAction and QWidget are used are arguments in QtGui, but are
+//  defined in QtWidgets
+#include "../../gsiqt/qtbasic/gsiQtWidgetsExternals.h"
+FORCE_LINK_GSI_QTWIDGETS

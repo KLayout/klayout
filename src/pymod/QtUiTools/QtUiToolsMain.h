@@ -20,7 +20,10 @@
 
 */
 
-#include "../pymodHelper.h"
+//  To force linking of the QtCore module
+#include "../../gsiqt/qtbasic/gsiQtCoreExternals.h"
+FORCE_LINK_GSI_QTCORE
 
-#include "QtXmlMain.h"
-DEFINE_PYMOD(QtXml, "QtXml", "KLayout/Qt module 'QtXml'")
+#  include "../../gsiqt/qtbasic/gsiQtUiToolsExternals.h"
+FORCE_LINK_GSI_QTUITOOLS
+

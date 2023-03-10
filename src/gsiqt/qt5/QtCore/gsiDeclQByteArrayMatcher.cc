@@ -27,6 +27,7 @@
 *  This file has been created automatically
 */
 
+#include <limits>
 #include <QByteArrayMatcher>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"

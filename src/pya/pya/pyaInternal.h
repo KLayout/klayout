@@ -302,6 +302,7 @@ struct PythonClassClientData
   : public gsi::PerClassClientSpecificData
 {
   PythonClassClientData (const gsi::ClassBase *_cls, PyTypeObject *_py_type, PyTypeObject *_py_type_static, PythonModule *module);
+  ~PythonClassClientData ();
 
   PythonPtr py_type_object;
   PythonPtr py_type_object_static;

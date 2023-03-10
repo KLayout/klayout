@@ -859,6 +859,14 @@ PythonClassClientData::PythonClassClientData (const gsi::ClassBase *_cls, PyType
   //  .. nothing yet ..
 }
 
+PythonClassClientData::~PythonClassClientData ()
+{
+  //  This destructor is called from the exit code. Python may have shut down already.
+  //  We must not try to release the objects in that case and simply don't care about them any longer.
+  py_type_object.release ();
+  py_type_object_static.release ();
+}
+
 PyTypeObject *
 PythonClassClientData::py_type (const gsi::ClassBase &cls_decl, bool as_static)
 {

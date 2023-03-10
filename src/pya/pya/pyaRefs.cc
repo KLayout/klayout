@@ -151,6 +151,13 @@ PythonPtr::~PythonPtr ()
   Py_XDECREF (mp_obj);
 }
 
+PyObject *PythonPtr::release ()
+{
+  PyObject *obj = mp_obj;
+  mp_obj = NULL;
+  return obj;
+}
+
 PythonPtr::operator bool () const
 {
   return mp_obj != NULL;

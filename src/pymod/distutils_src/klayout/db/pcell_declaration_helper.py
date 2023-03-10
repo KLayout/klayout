@@ -1,5 +1,3 @@
-from klayout.db import Trans, PCellDeclaration, PCellParameterDeclaration
-
 
 class _PCellDeclarationHelperLayerDescriptor(object):
   """
@@ -43,16 +41,17 @@ class _PCellDeclarationHelperParameterDescriptor(object):
     else:
       self.value = value
 
-class _PCellDeclarationHelper(PCellDeclaration):
+class _PCellDeclarationHelperMixin:
   """  
-  A helper class that somewhat simplifies the implementation
-  of a PCell
+  A mixin class that somewhat simplifies the implementation of a PCell
+  Needed to build PCellDeclarationHelper
   """
 
-  def __init__(self):
+  def __init__(self, *args, **kwargs):
     """
-    initialize this instance
+    initializes this instance
     """
+    super().__init__(*args, **kwargs)
     # "private" attributes
     self._param_decls = []
     self._param_values = None
@@ -93,7 +92,7 @@ class _PCellDeclarationHelper(PCellDeclaration):
       self._layer_param_index.append(param_index)
       
     # store the parameter declarations
-    pdecl = PCellParameterDeclaration(name, value_type, description)
+    pdecl = self._make_parameter_declaration(name, value_type, description)
     self._param_decls.append(pdecl)    
     
     # set additional attributes of the parameters
@@ -116,24 +115,33 @@ class _PCellDeclarationHelper(PCellDeclaration):
   
   def display_text(self, parameters):
     """
-    implementation of display_text
+    Reimplementation of PCellDeclaration.display_text
+
+    This function delegates the implementation to self.display_text_impl
+    after configuring the PCellDeclaration object.
     """
     self._param_values = parameters
     try:
       text = self.display_text_impl()
     finally:
-      self._param_values = None
+      self.finish()
     return text
   
   def get_parameters(self):
     """
-    gets the parameters
+    Reimplementation of PCellDeclaration.get_parameters
+
+    This function uses the collected parameters to feed the 
+    PCell declaration.
     """
     return self._param_decls
 
   def get_values(self):
     """
-    gets the temporary parameter values
+    Gets the temporary parameter values used for the current evaluation
+
+    Call this function to get the a current parameter values. This 
+    is an array of variants in the order the parameters are declared.
     """
     v = self._param_values
     self._param_values = None
@@ -141,7 +149,8 @@ class _PCellDeclarationHelper(PCellDeclaration):
   
   def init_values(self, values = None, layers = None, states = None):
     """
-    initializes the temporary parameter values
+    initializes the temporary parameter values for the current evaluation
+
     "values" are the original values. If "None" is given, the
     default values will be used. 
     "layers" are the layer indexes corresponding to the layer
@@ -161,7 +170,7 @@ class _PCellDeclarationHelper(PCellDeclaration):
 
   def finish(self):
     """
-    Needs to be called at the end of an implementation
+    Is called at the end of an implementation of a PCellDeclaration method
     """
     self._param_values = None
     self._param_states = None
@@ -173,7 +182,9 @@ class _PCellDeclarationHelper(PCellDeclaration):
     
   def get_layers(self, parameters):
     """
-    gets the layer definitions
+    Reimplements PCellDeclaration.get_layers.
+
+    Gets the layer definitions from all layer parameters.
     """
     layers = []
     for i in self._layer_param_index:
@@ -182,7 +193,10 @@ class _PCellDeclarationHelper(PCellDeclaration):
     
   def callback(self, layout, name, states):
     """
-    callback (change state on parameter change)
+    Reimplements PCellDeclaration.callback (change state on parameter change)
+
+    The function delegates the implementation to callback_impl
+    after updating the state of this object with the current parameters.
     """
     self.init_values(states = states)
     self.layout = layout
@@ -193,7 +207,10 @@ class _PCellDeclarationHelper(PCellDeclaration):
 
   def coerce_parameters(self, layout, parameters):
     """
-    coerce parameters (make consistent)
+    Reimplements PCellDeclaration.coerce parameters (make consistent)
+
+    The function delegates the implementation to coerce_parameters_impl
+    after updating the state of this object with the current parameters.
     """
     self.init_values(parameters)
     self.layout = layout
@@ -206,7 +223,10 @@ class _PCellDeclarationHelper(PCellDeclaration):
 
   def produce(self, layout, layers, parameters, cell):
     """
-    produces the layout
+    Reimplements PCellDeclaration.produce (produces the layout)
+
+    The function delegates the implementation to produce_impl
+    after updating the state of this object with the current parameters.
     """
     self.init_values(parameters, layers)
     self.cell = cell
@@ -218,7 +238,10 @@ class _PCellDeclarationHelper(PCellDeclaration):
 
   def can_create_from_shape(self, layout, shape, layer):
     """
-    produce a helper for can_create_from_shape
+    Reimplements PCellDeclaration.can_create_from_shape
+
+    The function delegates the implementation to can_create_from_shape_impl
+    after updating the state of this object with the current parameters.
     """
     self.layout = layout
     self.shape = shape
@@ -231,21 +254,28 @@ class _PCellDeclarationHelper(PCellDeclaration):
   
   def transformation_from_shape(self, layout, shape, layer):
     """
-    produce a helper for parameters_from_shape
+    Reimplements PCellDeclaration.transformation_from_shape
+
+    The function delegates the implementation to transformation_from_shape_impl
+    after updating the state of this object with the current parameters.
     """
     self.layout = layout
     self.shape = shape
     self.layer = layer
     try:
       t = self.transformation_from_shape_impl()
+      if t is None:
+        t = self._make_default_trans()
     finally:
       self.finish()
     return t
   
   def parameters_from_shape(self, layout, shape, layer):
     """
-    produce a helper for parameters_from_shape
-    with this helper, the implementation can use the parameter setters
+    Reimplements PCellDeclaration.parameters_from_shape
+
+    The function delegates the implementation to parameters_from_shape_impl
+    after updating the state of this object with the current parameters.
     """
     self.init_values()
     self.layout = layout
@@ -298,13 +328,10 @@ class _PCellDeclarationHelper(PCellDeclaration):
     """
     default implementation
     """
-    return Trans()
+    return None
   
-# import the Type... constants from PCellParameterDeclaration
-for k in dir(PCellParameterDeclaration):
-  if k.startswith("Type"):
-    setattr(_PCellDeclarationHelper, k, getattr(PCellParameterDeclaration, k))
 
-# Inject the PCellDeclarationHelper into module for consistency:
-PCellDeclarationHelper = _PCellDeclarationHelper
+__all__ = [ "_PCellDeclarationHelperLayerDescriptor", 
+            "_PCellDeclarationHelperParameterDescriptor", 
+            "_PCellDeclarationHelperMixin" ]
 

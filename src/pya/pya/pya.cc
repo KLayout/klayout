@@ -162,38 +162,6 @@ private:
 
 static const char *pya_module_name = "pya";
 
-#if PY_MAJOR_VERSION < 3
-
-static PyObject *
-init_pya_module ()
-{
-  static PyMethodDef module_methods[] = {
-    {NULL}  // Sentinel
-  };
-  return Py_InitModule3 (pya_module_name, module_methods, "KLayout Python API.");
-}
-
-#else
-
-static PyObject *
-init_pya_module ()
-{
-  static struct PyModuleDef moduledef = {
-    PyModuleDef_HEAD_INIT,
-    pya_module_name,        // m_name
-    "KLayout Python API.",  // m_doc
-    -1,                     // m_size
-    NULL,                   // m_methods
-    NULL,                   // m_reload
-    NULL,                   // m_traverse
-    NULL,                   // m_clear
-    NULL,                   // m_free
-  };
-  return PyModule_Create (&moduledef);
-}
-
-#endif
-
 static void reset_interpreter ()
 {
   delete sp_interpreter;
@@ -328,14 +296,6 @@ PythonInterpreter::PythonInterpreter (bool embedded)
   PySys_SetArgv (1, argv);
 #endif
 
-  PyObject *module = init_pya_module ();
-  if (module == NULL) {
-    check_error ();
-    return;
-  }
-
-  PyImport_ImportModule (pya_module_name);
-
 #else
 
   //  Python 3 requires a unicode string for the application name
@@ -346,7 +306,6 @@ PythonInterpreter::PythonInterpreter (bool embedded)
   Py_DECREF (an);
   Py_SetProgramName (mp_py3_app_name);
 
-  PyImport_AppendInittab (pya_module_name, &init_pya_module);
   Py_InitializeEx (0 /*don't set signals*/);
 
   //  Set dummy argv[]
@@ -354,28 +313,9 @@ PythonInterpreter::PythonInterpreter (bool embedded)
   wchar_t *argv[1] = { mp_py3_app_name };
   PySys_SetArgvEx (1, argv, 0);
 
-  //  Import the module
-  PyObject *module = PyImport_ImportModule (pya_module_name);
-  if (module == NULL) {
-    check_error ();
-    return;
-  }
-
 #endif
 
-  //  Build two objects that provide a way to redirect stdout, stderr
-  //  and instantiate them two times for stdout and stderr.
-  PYAChannelObject::make_class (module);
-  m_stdout_channel = PythonRef (PYAChannelObject::create (gsi::Console::OS_stdout));
-  m_stdout = PythonPtr (m_stdout_channel.get ());
-  m_stderr_channel = PythonRef (PYAChannelObject::create (gsi::Console::OS_stderr));
-  m_stderr = PythonPtr (m_stderr_channel.get ());
-
   sp_interpreter = this;
-
-  m_pya_module.reset (new pya::PythonModule ());
-  m_pya_module->init (pya_module_name, module);
-  m_pya_module->make_classes ();
 
   //  Add a reference to the "pymod" directory close to our own library.
   //  We can put build-in modules there.
@@ -383,6 +323,20 @@ PythonInterpreter::PythonInterpreter (bool embedded)
   if (! module_path.empty ()) {
     add_path (tl::combine_path (tl::absolute_path (module_path), "pymod"));
   }
+
+  PyObject *pya_module = PyImport_ImportModule (pya_module_name);
+  if (pya_module == NULL) {
+    check_error ();
+    return;
+  }
+
+  //  Build two objects that provide a way to redirect stdout, stderr
+  //  and instantiate them two times for stdout and stderr.
+  PYAChannelObject::make_class (pya_module);
+  m_stdout_channel = PythonRef (PYAChannelObject::create (gsi::Console::OS_stdout));
+  m_stdout = PythonPtr (m_stdout_channel.get ());
+  m_stderr_channel = PythonRef (PYAChannelObject::create (gsi::Console::OS_stderr));
+  m_stderr = PythonPtr (m_stderr_channel.get ());
 }
 
 PythonInterpreter::~PythonInterpreter ()

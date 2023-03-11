@@ -133,7 +133,7 @@ echo "Modifying control file .."
 strip ${bindir}/*
 strip ${libdir}/db_plugins/*.so*
 strip ${libdir}/lay_plugins/*.so*
-strip ${libdir}/pymod/*.so*
+strip ${libdir}/pymod/klayout/*.so*
 
 size=`du -ck usr | grep total | sed "s/ *total//"`
 

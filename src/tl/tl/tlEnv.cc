@@ -25,6 +25,7 @@
 #include "tlString.h"
 
 #include <string>
+#include <string.h>
 
 #ifdef _WIN32
 #  include <windows.h>

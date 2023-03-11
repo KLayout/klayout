@@ -23,3 +23,6 @@
 //  To force linking of the QtCore5Compat module
 #include "../../gsiqt/qtbasic/gsiQtCore5CompatExternals.h"
 FORCE_LINK_GSI_QTCORE5COMPAT
+#undef FORCE_LINK_GSI_QTCORE5COMPAT
+#define FORCE_LINK_GSI_QTCORE5COMPAT
+

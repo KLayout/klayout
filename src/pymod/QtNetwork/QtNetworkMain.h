@@ -23,3 +23,5 @@
 //  To force linking of the QtNetwork module
 #include "../../gsiqt/qtbasic/gsiQtNetworkExternals.h"
 FORCE_LINK_GSI_QTNETWORK
+#undef FORCE_LINK_GSI_QTNETWORK
+#define FORCE_LINK_GSI_QTNETWORK

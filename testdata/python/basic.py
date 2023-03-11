@@ -2020,11 +2020,11 @@ class BasicTest(unittest.TestCase):
     # Hint: QApplication creates some leaks (FT, GTK). Hence it must not be used in the leak_check case ..
     if not leak_check:
       a = pya.QCoreApplication.instance()
-      self.assertEqual("<class 'pya.Application'>", str(type(a)))
+      self.assertEqual("<class 'klayout.pyacore.Application'>", str(type(a)))
       qd = pya.QDialog()
       pya.QApplication.setActiveWindow(qd)
       self.assertEqual(repr(pya.QApplication.activeWindow), repr(qd))
-      self.assertEqual("<class 'pya.QDialog'>", str(type(pya.QApplication.activeWindow)))
+      self.assertEqual("<class 'klayout.pyacore.QDialog'>", str(type(pya.QApplication.activeWindow)))
       qd._destroy()
       self.assertEqual(repr(pya.QApplication.activeWindow), "None")
 

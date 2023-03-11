@@ -23,3 +23,5 @@
 //  To force linking of the QtDesigner module
 #include "../../gsiqt/qtbasic/gsiQtDesignerExternals.h"
 FORCE_LINK_GSI_QTDESIGNER
+#undef FORCE_LINK_GSI_QTDESIGNER
+#define FORCE_LINK_GSI_QTDESIGNER

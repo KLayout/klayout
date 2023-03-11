@@ -23,3 +23,5 @@
 //  To force linking of the QtWidgets module
 #include "../../gsiqt/qtbasic/gsiQtWidgetsExternals.h"
 FORCE_LINK_GSI_QTWIDGETS
+#undef FORCE_LINK_GSI_QTWIDGETS
+#define FORCE_LINK_GSI_QTWIDGETS

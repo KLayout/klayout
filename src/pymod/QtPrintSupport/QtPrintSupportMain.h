@@ -23,3 +23,5 @@
 //  To force linking of the QtPrintSupport module
 #include "../../gsiqt/qtbasic/gsiQtPrintSupportExternals.h"
 FORCE_LINK_GSI_QTPRINTSUPPORT
+#undef FORCE_LINK_GSI_QTPRINTSUPPORT
+#define FORCE_LINK_GSI_QTPRINTSUPPORT

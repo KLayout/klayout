@@ -23,3 +23,5 @@
 //  To force linking of the QtSvg module
 #include "../../gsiqt/qtbasic/gsiQtSvgExternals.h"
 FORCE_LINK_GSI_QTSVG
+#undef FORCE_LINK_GSI_QTSVG
+#define FORCE_LINK_GSI_QTSVG

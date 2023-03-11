@@ -30,37 +30,37 @@
 
 #if defined(HAVE_QT)
 #  if defined(HAVE_QTBINDINGS)
-#    include "QtCore/QtCoreMain.h"
-#    include "QtGui/QtGuiMain.h"
+#    include "../QtCore/QtCoreMain.h"
+#    include "../QtGui/QtGuiMain.h"
 #    if defined(INCLUDE_QTNETWORK)
-#      include "QtNetwork/QtNetworkMain.h"
+#      include "../QtNetwork/QtNetworkMain.h"
 #    endif
 #    if defined(INCLUDE_QTWIDGETS)
-#      include "QtWidgets/QtWidgetsMain.h"
+#      include "../QtWidgets/QtWidgetsMain.h"
 #    endif
 #    if defined(INCLUDE_QTPRINTSUPPORT)
-#      include "QtPrintSupport/QtPrintSupportMain.h"
+#      include "../QtPrintSupport/QtPrintSupportMain.h"
 #    endif
 #    if defined(INCLUDE_QTSVG)
-#      include "QtSvg/QtSvgMain.h"
+#      include "../QtSvg/QtSvgMain.h"
 #    endif
 #    if defined(INCLUDE_QTXML)
-#      include "QtXml/QtXmlMain.h"
+#      include "../QtXml/QtXmlMain.h"
 #    endif
 #    if defined(INCLUDE_QTXMLPATTERNS)
-#      include "QtXmlPatterns/QtXmlPatternsMain.h"
+#      include "../QtXmlPatterns/QtXmlPatternsMain.h"
 #    endif
 #    if defined(INCLUDE_QTSQL)
-#      include "QtSql/QtSqlMain.h"
+#      include "../QtSql/QtSqlMain.h"
 #    endif
 #    if defined(INCLUDE_QTDESIGNER)
-#      include "QtDesigner/QtDesignerMain.h"
+#      include "../QtDesigner/QtDesignerMain.h"
 #    endif
 #    if defined(INCLUDE_QTUITOOLS)
-#      include "QtUiTools/QtUiToolsMain.h"
+#      include "../QtUiTools/QtUiToolsMain.h"
 #    endif
 #    if defined(INCLUDE_QTCORE5COMPAT)
-#      include "QtCore5Compat/QtCore5CompatMain.h"
+#      include "../QtCore5Compat/QtCore5CompatMain.h"
 #    endif
 #  endif
 #endif

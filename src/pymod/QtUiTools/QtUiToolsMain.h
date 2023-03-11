@@ -23,7 +23,11 @@
 //  To force linking of the QtCore module
 #include "../../gsiqt/qtbasic/gsiQtCoreExternals.h"
 FORCE_LINK_GSI_QTCORE
+#undef FORCE_LINK_GSI_QTCORE
+#define FORCE_LINK_GSI_QTCORE
 
 #  include "../../gsiqt/qtbasic/gsiQtUiToolsExternals.h"
 FORCE_LINK_GSI_QTUITOOLS
+#undef FORCE_LINK_GSI_QTUITOOLS
+#define FORCE_LINK_GSI_QTUITOOLS
 

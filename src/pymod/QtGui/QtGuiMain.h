@@ -23,8 +23,12 @@
 //  To force linking of the QtGui module
 #include "../../gsiqt/qtbasic/gsiQtGuiExternals.h"
 FORCE_LINK_GSI_QTGUI
+#undef FORCE_LINK_GSI_QTGUI
+#define FORCE_LINK_GSI_QTGUI
 
 //  This is required because QAction and QWidget are used are arguments in QtGui, but are
 //  defined in QtWidgets
 #include "../../gsiqt/qtbasic/gsiQtWidgetsExternals.h"
 FORCE_LINK_GSI_QTWIDGETS
+#undef FORCE_LINK_GSI_QTWIDGETS
+#define FORCE_LINK_GSI_QTWIDGETS

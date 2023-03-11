@@ -209,9 +209,14 @@ class PropertyStub(Stub):
 class ClassStub(Stub):
     indent_docstring: bool = True
 
+def get_child_classes(c: ktl.Class):
+    child_classes = []
+    for c_child in c.each_child_class():
+        child_classes.append(c_child)
+    return sorted(child_classes, key=lambda cls: cls.name())
 
 def get_py_child_classes(c: ktl.Class):
-    for c_child in c.each_child_class():
+    for c_child in get_child_classes(c):
         yield c_child
 
 
@@ -390,9 +395,9 @@ def get_py_methods(
                 )
             )
 
-    boundmethods = sorted(boundmethods)
-    properties = sorted(properties)
-    classmethods = sorted(classmethods)
+    boundmethods = sorted(boundmethods, key=lambda m: m.signature)
+    properties = sorted(properties, key=lambda m: m.signature)
+    classmethods = sorted(classmethods, key=lambda m: m.signature)
 
     return_list: List[Stub] = properties + classmethods + boundmethods
 
@@ -415,7 +420,7 @@ def get_class_stub(
         signature="class " + full_name + base, docstring=c.doc(), name=full_name
     )
     child_attributes = get_py_methods(c)
-    for child_c in c.each_child_class():
+    for child_c in get_child_classes(c):
         _cstub.child_stubs.append(
             get_class_stub(
                 child_c,
@@ -434,7 +439,7 @@ def get_classes(module: str) -> List[ktl.Class]:
         if c.module() != module:
             continue
         _classes.append(c)
-    return _classes
+    return sorted(_classes, key=lambda cls: cls.name())
 
 
 def get_module_stubs(module: str) -> List[ClassStub]:
@@ -457,7 +462,7 @@ def print_mod(module, dependencies):
 
 if __name__ == "__main__":
     if len(argv) < 2:
-        print("Specity module in argument")
+        print("Specify module in argument")
         exit(1)
     if len(argv) == 2:
         print_mod(argv[1], [])

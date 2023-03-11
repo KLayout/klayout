@@ -1302,6 +1302,16 @@ TEST(47_fillWithOverlappingBoxesTiled)
   run_test (_this, "47", false);
 }
 
+TEST(47b_fillWithUsingOutput)
+{
+  run_test (_this, "47b", false);
+}
+
+TEST(47bd_fillWithUsingOutputDeep)
+{
+  run_test (_this, "47b", true);
+}
+
 TEST(48_drcWithFragments)
 {
   run_test (_this, "48", false);

@@ -867,7 +867,9 @@ void DeepShapeStore::remove_ref (unsigned int layout, unsigned int layer)
 unsigned int
 DeepShapeStore::layout_for_iter (const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans)
 {
-  layout_map_type::iterator l = m_layout_map.find (std::make_pair (si, trans));
+  size_t gen_id = si.layout () ? si.layout ()->hier_generation_id () : 0;
+
+  layout_map_type::iterator l = m_layout_map.find (std::make_pair (si, std::make_pair (gen_id, trans)));
   if (l == m_layout_map.end () || m_layouts[l->second] == 0) {
 
     unsigned int layout_index;
@@ -886,7 +888,7 @@ DeepShapeStore::layout_for_iter (const db::RecursiveShapeIterator &si, const db:
       layout.dbu (si.layout ()->dbu () / trans.mag ());
     }
 
-    m_layout_map[std::make_pair (si, trans)] = layout_index;
+    m_layout_map[std::make_pair (si, std::make_pair (gen_id, trans))] = layout_index;
     return layout_index;
 
   } else {
@@ -896,7 +898,8 @@ DeepShapeStore::layout_for_iter (const db::RecursiveShapeIterator &si, const db:
 
 void DeepShapeStore::make_layout (unsigned int layout_index, const db::RecursiveShapeIterator &si, const db::ICplxTrans &trans)
 {
-  tl_assert (m_layout_map.find (std::make_pair (si, trans)) == m_layout_map.end ());
+  size_t gen_id = si.layout () ? si.layout ()->hier_generation_id () : 0;
+  tl_assert (m_layout_map.find (std::make_pair (si, std::make_pair (gen_id, trans))) == m_layout_map.end ());
 
   while (m_layouts.size () <= layout_index) {
     m_layouts.push_back (0);
@@ -909,7 +912,7 @@ void DeepShapeStore::make_layout (unsigned int layout_index, const db::Recursive
     layout.dbu (si.layout ()->dbu () / trans.mag ());
   }
 
-  m_layout_map[std::make_pair (si, trans)] = layout_index;
+  m_layout_map[std::make_pair (si, std::make_pair (gen_id, trans))] = layout_index;
 }
 
 DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator &si, double max_area_ratio, size_t max_vertex_count, const db::ICplxTrans &trans)

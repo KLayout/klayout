@@ -298,7 +298,7 @@ private:
 
 struct DB_PUBLIC RecursiveShapeIteratorCompareForTargetHierarchy
 {
-  bool operator () (const std::pair<db::RecursiveShapeIterator, db::ICplxTrans> &a, const std::pair<db::RecursiveShapeIterator, db::ICplxTrans> &b) const
+  bool operator () (const std::pair<db::RecursiveShapeIterator, std::pair<size_t, db::ICplxTrans> > &a, const std::pair<db::RecursiveShapeIterator, std::pair<size_t, db::ICplxTrans> > &b) const
   {
     int cmp_iter = db::compare_iterators_with_respect_to_target_hierarchy (a.first, b.first);
     if (cmp_iter != 0) {
@@ -865,7 +865,7 @@ private:
 
   void issue_variants (unsigned int layout, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_map);
 
-  typedef std::map<std::pair<db::RecursiveShapeIterator, db::ICplxTrans>, unsigned int, RecursiveShapeIteratorCompareForTargetHierarchy> layout_map_type;
+  typedef std::map<std::pair<db::RecursiveShapeIterator, std::pair<size_t, db::ICplxTrans> >, unsigned int, RecursiveShapeIteratorCompareForTargetHierarchy> layout_map_type;
 
   //  no copying
   DeepShapeStore (const DeepShapeStore &);

@@ -1685,6 +1685,20 @@ AreaMap::bbox () const
 // -------------------------------------------------------------------------
 //  Implementation of rasterize
 
+static bool edge_is_partially_left_of (const db::Edge &e, const db::Edge &e_original, db::Coord x)
+{
+  Coord xmin = db::edge_xmin (e);
+  if (xmin < x) {
+    return true;
+  } else if (xmin == x && e_original.dx () != 0) {
+    //  the skew edge is cut partially rendering a straight vertical line (due to rounding)
+    //  which we will count as "left of"
+    return true;
+  } else {
+    return false;
+  }
+}
+
 bool
 rasterize (const db::Polygon &polygon, db::AreaMap &am)
 {
@@ -1801,7 +1815,7 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
         for (std::vector <db::Edge>::iterator e = cc; e != ff; ++e) {
 
           std::pair<bool, db::Edge> ec = e->clipped (left);
-          if (ec.first && db::edge_xmin (ec.second) < x) {
+          if (ec.first && edge_is_partially_left_of (ec.second, *e, x)) {
             a += area_type (ec.second.dy ()) * area_type (px);
           }
 
@@ -1818,7 +1832,7 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
         for (std::vector <db::Edge>::iterator e = cc; e != ff; ++e) {
 
           std::pair<bool, db::Edge> ec = e->clipped (cell);
-          if (ec.first && db::edge_xmin (ec.second) < xx) {
+          if (ec.first && edge_is_partially_left_of (ec.second, *e, xx)) {
             aa += (area_type (ec.second.dy ()) * area_type (2 * xx - (ec.second.p2 ().x () + ec.second.p1 ().x ()))) / 2;
             a += area_type (ec.second.dy ()) * area_type (px);
           }
@@ -1832,7 +1846,7 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
         for (std::vector <db::Edge>::iterator e = cc; e != ff; ++e) {
 
           std::pair<bool, db::Edge> ec = e->clipped (cell);
-          if (ec.first && db::edge_xmin (ec.second) < xx) {
+          if (ec.first && edge_is_partially_left_of (ec.second, *e, xx)) {
             aa += (area_type (ec.second.dy ()) * area_type (2 * xx - (ec.second.p2 ().x () + ec.second.p1 ().x ()))) / 2;
           }
 
@@ -1843,7 +1857,7 @@ rasterize (const db::Polygon &polygon, db::AreaMap &am)
         for (std::vector <db::Edge>::iterator e = cc; e != fff; ++e) {
 
           std::pair<bool, db::Edge> wide_ec = e->clipped (wide_cell);
-          if (wide_ec.first && db::edge_xmin (wide_ec.second) < x + dx) {
+          if (wide_ec.first && edge_is_partially_left_of (wide_ec.second, *e, x + dx)) {
             a += area_type (wide_ec.second.dy ()) * area_type (px);
           }
 

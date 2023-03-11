@@ -313,3 +313,35 @@ TEST(4c)
   CHECKPOINT();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au4c.gds");
 }
+
+//  issue #1309
+TEST(5)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/fill_tool5.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type fill_cell = ly.cell_by_name ("FILL_CELL").second;
+  db::cell_index_type top_cell = ly.cell_by_name ("TOP").second;
+  unsigned int fill_layer = ly.get_layer (db::LayerProperties (1, 0));
+
+  db::Region fill_region (db::RecursiveShapeIterator (ly, ly.cell (top_cell), fill_layer));
+
+  db::Region remaining_polygons;
+
+  db::Vector rs (50, 0);
+  db::Vector cs (0, 50);
+  db::Box fc_box (db::Point (), db::Point (rs.x (), cs.y ()));
+  db::fill_region (&ly.cell (top_cell), fill_region, fill_cell, fc_box, rs, cs, db::Point (), false, &remaining_polygons);
+
+  unsigned int l100 = ly.insert_layer (db::LayerProperties (100, 0));
+  remaining_polygons.insert_into (&ly, top_cell, l100);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/fill_tool_au5.oas", db::WriteOAS);
+}

@@ -54,10 +54,25 @@ INSTALLS = lib_target
   msvc {
     QMAKE_POST_LINK += && $(COPY) $$shell_path($$PWD/distutils_src/klayout/$$PYI) $$shell_path($$DESTDIR_PYMOD)
   } else {
-    QMAKE_POST_LINK += && $(MKDIR) $$DESTDIR_PYMOD/$$REALMODULE && $(COPY) $$PWD/distutils_src/klayout/$$PYI $$DESTDIR_PYMOD
+    QMAKE_POST_LINK += && $(MKDIR) $$DESTDIR_PYMOD && $(COPY) $$PWD/distutils_src/klayout/$$PYI $$DESTDIR_PYMOD
   }
 
   POST_TARGETDEPS += $$PWD/distutils_src/klayout/$$PYI
+
+  # INSTALLS needs to be inside a lib or app templates.
+  modpyi_target.path = $$PREFIX/pymod/klayout
+  # This would be nice:
+  #   init_target.files += $$DESTDIR_PYMOD/$$REALMODULE/*
+  # but some Qt versions need this explicitly:
+  msvc {
+    modpyi_target.extra = $(INSTALL_PROGRAM) $$shell_path($$DESTDIR_PYMOD/$$PYI) $$shell_path($(INSTALLROOT)$$PREFIX/pymod/klayout)
+  } else {
+    modpyi_target.extra = $(INSTALL_PROGRAM) $$DESTDIR_PYMOD/$$PYI $(INSTALLROOT)$$PREFIX/pymod/klayout
+  }
+
+  # Not yet. As long as .pyi files are not generated automatically,
+  # this does not make much sense:
+  # INSTALLS += modpyi_target
 
 }
 

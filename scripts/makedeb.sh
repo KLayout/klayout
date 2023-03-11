@@ -107,7 +107,7 @@ cp -pd $bininstdir/klayout makedeb-tmp/${bindir}
 cp -pd $bininstdir/lib*so* makedeb-tmp/${libdir}
 cp -pd $bininstdir/db_plugins/lib*so* makedeb-tmp/${libdir}/db_plugins
 cp -pd $bininstdir/lay_plugins/lib*so* makedeb-tmp/${libdir}/lay_plugins
-cp -rpd $bininstdir/pymod makedeb-tmp/${libdir}/pymod
+cp -rpd $bininstdir/pymod/* makedeb-tmp/${libdir}/pymod
 
 cd makedeb-tmp
 

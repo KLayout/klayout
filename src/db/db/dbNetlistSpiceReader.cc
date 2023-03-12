@@ -1203,9 +1203,9 @@ SpiceNetlistBuilder::build_global_nets ()
 NetlistSpiceReader::NetlistSpiceReader (NetlistSpiceReaderDelegate *delegate)
   : mp_delegate (delegate), m_strict (false)
 {
-  static NetlistSpiceReaderDelegate std_delegate;
   if (! delegate) {
-    mp_delegate.reset (&std_delegate);
+    mp_default_delegate.reset (new NetlistSpiceReaderDelegate ());
+    mp_delegate.reset (mp_default_delegate.get ());
   }
 }
 

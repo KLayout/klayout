@@ -2769,6 +2769,16 @@ Class<ParseElementData> db_ParseElementData ("db", "ParseElementData",
   "This helper class has been introduced in version 0.27.1. Starting with version 0.28.6, named parameters can be string types too.\n"
 );
 
+static double get_delegate_scale (const db::NetlistSpiceReaderDelegate *delegate)
+{
+  return delegate->options ().scale;
+}
+
+static void apply_parameter_scaling (const db::NetlistSpiceReaderDelegate *delegate, db::Device *device)
+{
+  delegate->apply_parameter_scaling (device);
+}
+
 Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "NetlistSpiceReaderDelegate",
   gsi::method_ext ("start", &start_fb, "@hide") +
   gsi::method_ext ("finish", &finish_fb, "@hide") +
@@ -2845,6 +2855,21 @@ Class<NetlistSpiceReaderDelegateImpl> db_NetlistSpiceReaderDelegate ("db", "Netl
   gsi::method ("error", &NetlistSpiceReaderDelegateImpl::error, gsi::arg ("msg"),
     "@brief Issues an error with the given message.\n"
     "Use this method to generate an error."
+  ) +
+  gsi::method_ext ("get_scale", &get_delegate_scale,
+    "@brief Gets the scale factor set with '.options scale=...'\n"
+    "This method has been introduced in version 0.28.6."
+  ) +
+  gsi::method_ext ("apply_parameter_scaling", &apply_parameter_scaling, gsi::arg ("device"),
+    "@brief Applies parameter scaling to the given device\n"
+    "Applies SI scaling (according to the parameter's si_scaling attribute) and "
+    "geometry scaling (according to the parameter's geo_scale_exponent attribute) to "
+    "the device parameters. Use this method of finish the device when you have created "
+    "a custom device yourself.\n"
+    "\n"
+    "The geometry scale is taken from the '.options scale=...' control statement.\n"
+    "\n"
+    "This method has been introduced in version 0.28.6."
   ) +
   gsi::method_ext ("value_from_string", &value_from_string, gsi::arg ("s"), gsi::arg ("variables", db::NetlistSpiceReader::parameters_type (), "{}"),
     "@brief Translates a string into a value\n"

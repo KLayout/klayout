@@ -99,7 +99,7 @@ NetlistSpiceReaderOptions::NetlistSpiceReaderOptions ()
 // ------------------------------------------------------------------------------------------------------
 
 NetlistSpiceReaderDelegate::NetlistSpiceReaderDelegate ()
-  : mp_netlist (0)
+  : mp_netlist (0), m_options ()
 {
   //  .. nothing yet ..
 }
@@ -107,6 +107,22 @@ NetlistSpiceReaderDelegate::NetlistSpiceReaderDelegate ()
 NetlistSpiceReaderDelegate::~NetlistSpiceReaderDelegate ()
 {
   //  .. nothing yet ..
+}
+
+void NetlistSpiceReaderDelegate::set_netlist (db::Netlist *netlist)
+{
+  m_options = NetlistSpiceReaderOptions ();
+  mp_netlist = netlist;
+}
+
+void NetlistSpiceReaderDelegate::do_start ()
+{
+  start (mp_netlist);
+}
+
+void NetlistSpiceReaderDelegate::do_finish ()
+{
+  finish (mp_netlist);
 }
 
 void NetlistSpiceReaderDelegate::start (db::Netlist * /*netlist*/)
@@ -609,10 +625,25 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
     } else {
       continue;
     }
-    device->set_parameter_value (i->id (), pv / i->si_scaling () * pow (m_options.scale, i->geo_scaling_exponent ()));
+    device->set_parameter_value (i->id (), pv);
   }
 
+  apply_parameter_scaling (device);
   return true;
+}
+
+void
+NetlistSpiceReaderDelegate::apply_parameter_scaling (db::Device *device) const
+{
+  if (! device || ! device->device_class ()) {
+    return;
+  }
+
+  const std::vector<db::DeviceParameterDefinition> &pd = device->device_class ()->parameter_definitions ();
+  for (auto i = pd.begin (); i != pd.end (); ++i) {
+    double pv = device->parameter_value (i->id ());
+    device->set_parameter_value (i->id (), pv / i->si_scaling () * pow (m_options.scale, i->geo_scaling_exponent ()));
+  }
 }
 
 tl::Variant

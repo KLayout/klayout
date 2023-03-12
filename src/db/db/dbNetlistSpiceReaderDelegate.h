@@ -66,15 +66,15 @@ public:
   /**
    *  @brief Gets the reader options
    */
-  NetlistSpiceReaderOptions &options ()
+  const NetlistSpiceReaderOptions &options () const
   {
     return m_options;
   }
 
   /**
-   *  @brief Gets the reader options
+   *  @brief Gets the reader options (non-const)
    */
-  const NetlistSpiceReaderOptions &options () const
+  NetlistSpiceReaderOptions &options ()
   {
     return m_options;
   }
@@ -162,26 +162,22 @@ public:
   /**
    *  @brief External interface for start
    */
-  void do_start ()
-  {
-    start (mp_netlist);
-  }
+  void do_start ();
 
   /**
    *  @brief External interface for finish
    */
-  void do_finish ()
-  {
-    finish (mp_netlist);
-  }
+  void do_finish ();
 
   /**
    *  @brief Sets the netlist
    */
-  void set_netlist (db::Netlist *netlist)
-  {
-    mp_netlist = netlist;
-  }
+  void set_netlist (db::Netlist *netlist);
+
+  /**
+   *  @brief Applies SI and geometry scaling to the device parameters
+   */
+  void apply_parameter_scaling (db::Device *device) const;
 
 private:
   db::Netlist *mp_netlist;

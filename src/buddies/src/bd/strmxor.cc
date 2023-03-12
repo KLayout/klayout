@@ -78,6 +78,15 @@ public:
     }
   }
 
+  void operator() (const db::Box &box)
+  {
+    if (m_healing && ! box.inside (mp_tile->enlarged (db::Vector (-1, -1)))) {
+      mp_receiver->keep_for_healing (db::Polygon (box));
+    } else {
+      m_count += 1;
+    }
+  }
+
   size_t count () const
   {
     return m_count;
@@ -164,6 +173,15 @@ public:
       mp_receiver->keep_for_healing (*mp_trans * poly);
     } else {
       mp_receiver->output (*mp_trans * poly);
+    }
+  }
+
+  void operator() (const db::Box &box)
+  {
+    if (m_healing && ! box.inside (mp_tile->enlarged (db::Vector (-1, -1)))) {
+      mp_receiver->keep_for_healing (*mp_trans * db::Polygon (box));
+    } else {
+      mp_receiver->output (*mp_trans * db::Polygon (box));
     }
   }
 

@@ -487,10 +487,10 @@ DeviceClassResistor::DeviceClassResistor ()
   equivalent_terminal_id (terminal_id_A, terminal_id_B);
 
   add_parameter_definition (db::DeviceParameterDefinition ("R", "Resistance (Ohm)", 0.0));
-  add_parameter_definition (db::DeviceParameterDefinition ("L", "Length (micrometer)", 0.0, false, 1e-6));
-  add_parameter_definition (db::DeviceParameterDefinition ("W", "Width (micrometer)", 0.0, false, 1e-6));
-  add_parameter_definition (db::DeviceParameterDefinition ("A", "Area (square micrometer)", 0.0, false, 1e-12));
-  add_parameter_definition (db::DeviceParameterDefinition ("P", "Perimeter (micrometer)", 0.0, false, 1e-6));
+  add_parameter_definition (db::DeviceParameterDefinition ("L", "Length (micrometer)", 0.0, false, 1e-6, 1.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("W", "Width (micrometer)", 0.0, false, 1e-6, 1.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("A", "Area (square micrometer)", 0.0, false, 1e-12, 2.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("P", "Perimeter (micrometer)", 0.0, false, 1e-6, 1.0));
 }
 
 // ------------------------------------------------------------------------------------
@@ -526,8 +526,8 @@ DeviceClassCapacitor::DeviceClassCapacitor ()
   equivalent_terminal_id (terminal_id_A, terminal_id_B);
 
   add_parameter_definition (db::DeviceParameterDefinition ("C", "Capacitance (Farad)", 0.0));
-  add_parameter_definition (db::DeviceParameterDefinition ("A", "Area (square micrometer)", 0.0, false, 1e-12));
-  add_parameter_definition (db::DeviceParameterDefinition ("P", "Perimeter (micrometer)", 0.0, false, 1e-6));
+  add_parameter_definition (db::DeviceParameterDefinition ("A", "Area (square micrometer)", 0.0, false, 1e-12, 2.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("P", "Perimeter (micrometer)", 0.0, false, 1e-6, 1.0));
 }
 
 // ------------------------------------------------------------------------------------
@@ -580,8 +580,8 @@ DeviceClassDiode::DeviceClassDiode ()
   add_terminal_definition (db::DeviceTerminalDefinition ("A", "Anode"));
   add_terminal_definition (db::DeviceTerminalDefinition ("C", "Cathode"));
 
-  add_parameter_definition (db::DeviceParameterDefinition ("A", "Area (square micrometer)", 0.0, false, 1e-12));
-  add_parameter_definition (db::DeviceParameterDefinition ("P", "Perimeter (micrometer)", 0.0, false, 1e-6));
+  add_parameter_definition (db::DeviceParameterDefinition ("A", "Area (square micrometer)", 0.0, false, 1e-12, 2.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("P", "Perimeter (micrometer)", 0.0, false, 1e-6, 1.0));
 }
 
 // ------------------------------------------------------------------------------------
@@ -608,12 +608,12 @@ DeviceClassMOS3Transistor::DeviceClassMOS3Transistor ()
   add_terminal_definition (db::DeviceTerminalDefinition ("D", "Drain"));
   equivalent_terminal_id (terminal_id_D, terminal_id_S);
 
-  add_parameter_definition (db::DeviceParameterDefinition ("L", "Gate length (micrometer)", 0.0, true, 1e-6));
-  add_parameter_definition (db::DeviceParameterDefinition ("W", "Gate width (micrometer)", 0.0, true, 1e-6));
-  add_parameter_definition (db::DeviceParameterDefinition ("AS", "Source area (square micrometer)", 0.0, false, 1e-12));
-  add_parameter_definition (db::DeviceParameterDefinition ("AD", "Drain area (square micrometer)", 0.0, false, 1e-12));
-  add_parameter_definition (db::DeviceParameterDefinition ("PS", "Source perimeter (micrometer)", 0.0, false, 1e-6));
-  add_parameter_definition (db::DeviceParameterDefinition ("PD", "Drain perimeter (micrometer)", 0.0, false, 1e-6));
+  add_parameter_definition (db::DeviceParameterDefinition ("L", "Gate length (micrometer)", 0.0, true, 1e-6, 1.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("W", "Gate width (micrometer)", 0.0, true, 1e-6, 1.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("AS", "Source area (square micrometer)", 0.0, false, 1e-12, 2.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("AD", "Drain area (square micrometer)", 0.0, false, 1e-12, 2.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("PS", "Source perimeter (micrometer)", 0.0, false, 1e-6, 1.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("PD", "Drain perimeter (micrometer)", 0.0, false, 1e-6, 1.0));
 }
 
 bool
@@ -886,12 +886,12 @@ DeviceClassBJT3Transistor::DeviceClassBJT3Transistor ()
   add_terminal_definition (db::DeviceTerminalDefinition ("E", "Emitter"));
 
   //  NOTE: the emitter area and the emitter count are the primary parameters
-  add_parameter_definition (db::DeviceParameterDefinition ("AE", "Emitter area (square micrometer)", 0.0, true, 1e-12));
-  add_parameter_definition (db::DeviceParameterDefinition ("PE", "Emitter perimeter (micrometer)", 0.0, false, 1e-6));
-  add_parameter_definition (db::DeviceParameterDefinition ("AB", "Base area (square micrometer)", 0.0, false, 1e-12));
-  add_parameter_definition (db::DeviceParameterDefinition ("PB", "Base perimeter (micrometer)", 0.0, false, 1e-6));
-  add_parameter_definition (db::DeviceParameterDefinition ("AC", "Collector area (square micrometer)", 0.0, false, 1e-12));
-  add_parameter_definition (db::DeviceParameterDefinition ("PC", "Collector perimeter (micrometer)", 0.0, false, 1e-6));
+  add_parameter_definition (db::DeviceParameterDefinition ("AE", "Emitter area (square micrometer)", 0.0, true, 1e-12, 2.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("PE", "Emitter perimeter (micrometer)", 0.0, false, 1e-6, 1.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("AB", "Base area (square micrometer)", 0.0, false, 1e-12, 2.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("PB", "Base perimeter (micrometer)", 0.0, false, 1e-6, 1.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("AC", "Collector area (square micrometer)", 0.0, false, 1e-12, 2.0));
+  add_parameter_definition (db::DeviceParameterDefinition ("PC", "Collector perimeter (micrometer)", 0.0, false, 1e-6, 1.0));
   add_parameter_definition (db::DeviceParameterDefinition ("NE", "Emitter count", 1.0, true));
 }
 

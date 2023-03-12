@@ -790,19 +790,20 @@ Class<db::DeviceTerminalDefinition> decl_dbDeviceTerminalDefinition ("db", "Devi
   "This class has been added in version 0.26."
 );
 
-static db::DeviceParameterDefinition *new_parameter_definition (const std::string &name, const std::string &description, double default_value, bool is_primary, double si_scaling)
+static db::DeviceParameterDefinition *new_parameter_definition (const std::string &name, const std::string &description, double default_value, bool is_primary, double si_scaling, double geo_scaling_exponent)
 {
-  return new db::DeviceParameterDefinition (name, description, default_value, is_primary, si_scaling);
+  return new db::DeviceParameterDefinition (name, description, default_value, is_primary, si_scaling, geo_scaling_exponent);
 }
 
 Class<db::DeviceParameterDefinition> decl_dbDeviceParameterDefinition ("db", "DeviceParameterDefinition",
-  gsi::constructor ("new", &gsi::new_parameter_definition, gsi::arg ("name"), gsi::arg ("description", std::string ()), gsi::arg ("default_value", 0.0), gsi::arg ("is_primary", true), gsi::arg ("si_scaling", 1.0),
+  gsi::constructor ("new", &gsi::new_parameter_definition, gsi::arg ("name"), gsi::arg ("description", std::string ()), gsi::arg ("default_value", 0.0), gsi::arg ("is_primary", true), gsi::arg ("si_scaling", 1.0), gsi::arg ("geo_scaling_exponent", 0.0),
     "@brief Creates a new parameter definition.\n"
     "@param name The name of the parameter\n"
     "@param description The human-readable description\n"
     "@param default_value The initial value\n"
     "@param is_primary True, if the parameter is a primary parameter (see \\is_primary=)\n"
     "@param si_scaling The scaling factor to SI units\n"
+    "@param geo_scaling_exponent Indicates how the parameter scales with geometrical scaling (0: no scaling, 1.0: linear, 2.0: quadratic)\n"
   ) +
   gsi::method ("name", &db::DeviceParameterDefinition::name,
     "@brief Gets the name of the parameter."
@@ -834,7 +835,26 @@ Class<db::DeviceParameterDefinition> decl_dbDeviceParameterDefinition ("db", "De
   ) +
   gsi::method ("si_scaling", &db::DeviceParameterDefinition::si_scaling,
     "@brief Gets the scaling factor to SI units.\n"
-    "For parameters in micrometers for example, this factor will be 1e-6."
+    "For parameters in micrometers - for example W and L of MOS devices - this factor can be set to 1e-6 to reflect "
+    "the unit."
+  ) +
+  gsi::method ("si_scaling=", &db::DeviceParameterDefinition::set_si_scaling,
+    "@brief Sets the scaling factor to SI units.\n"
+    "\n"
+    "This setter has been added in version 0.28.6."
+  ) +
+  gsi::method ("geo_scaling_exponent", &db::DeviceParameterDefinition::geo_scaling_exponent,
+    "@brief Gets the geometry scaling exponent.\n"
+    "This value is used when applying '.options scale' in the SPICE reader for example. "
+    "It is zero for 'no scaling', 1.0 for linear scaling and 2.0 for quadratic scaling.\n"
+    "\n"
+    "This attribute has been added in version 0.28.6."
+  ) +
+  gsi::method ("geo_scaling_exponent=", &db::DeviceParameterDefinition::set_geo_scaling_exponent,
+    "@brief Sets the geometry scaling exponent.\n"
+    "See \\geo_scaling_exponent for details.\n"
+    "\n"
+    "This attribute has been added in version 0.28.6."
   ) +
   gsi::method ("id", &db::DeviceParameterDefinition::id,
     "@brief Gets the ID of the parameter.\n"

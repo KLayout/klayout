@@ -45,7 +45,7 @@ class DB_PUBLIC NetlistSpiceReaderExpressionParser
 public:
   typedef std::map<std::string, tl::Variant> variables_type;
 
-  NetlistSpiceReaderExpressionParser (const variables_type *vars);
+  NetlistSpiceReaderExpressionParser (const variables_type *vars, double def_scale = 1.0);
 
   tl::Variant read (tl::Extractor &ex) const;
   tl::Variant read (const std::string &s) const;
@@ -54,6 +54,7 @@ public:
 
 private:
   const variables_type *mp_variables;
+  double m_def_scale;
 
   tl::Variant read_atomic_value (tl::Extractor &ex, bool *status) const;
   tl::Variant read_dot_expr (tl::Extractor &ex, bool *status) const;

@@ -40,6 +40,14 @@ class Circuit;
 class DeviceClass;
 class Device;
 
+struct DB_PUBLIC NetlistSpiceReaderOptions
+{
+  NetlistSpiceReaderOptions ();
+
+  double scale;
+  double defad, defas, defw, defl;
+};
+
 /**
  *  @brief A delegate to handle various forms of devices and translates them
  *
@@ -54,6 +62,22 @@ class DB_PUBLIC NetlistSpiceReaderDelegate
 public:
   NetlistSpiceReaderDelegate ();
   virtual ~NetlistSpiceReaderDelegate ();
+
+  /**
+   *  @brief Gets the reader options
+   */
+  NetlistSpiceReaderOptions &options ()
+  {
+    return m_options;
+  }
+
+  /**
+   *  @brief Gets the reader options
+   */
+  const NetlistSpiceReaderOptions &options () const
+  {
+    return m_options;
+  }
 
   /**
    *  @brief Called when the netlist reading starts
@@ -122,7 +146,6 @@ public:
 
   /**
    *  @brief Reads a set of string components and parameters from the string
-   *  A special key "param:" is recognized for starting a parameter list.
    */
   void parse_element_components (const std::string &s, std::vector<std::string> &strings, std::map<std::string, tl::Variant> &pv, const std::map<std::string, tl::Variant> &variables);
 
@@ -162,6 +185,9 @@ public:
 
 private:
   db::Netlist *mp_netlist;
+  NetlistSpiceReaderOptions m_options;
+
+  void def_values_per_element (const std::string &element, std::map<std::string, tl::Variant> &pv);
 };
 
 }

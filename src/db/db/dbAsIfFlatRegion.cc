@@ -1146,14 +1146,14 @@ AsIfFlatRegion::run_check (db::edge_relation_type rel, bool different_polygons, 
   check.set_min_projection (options.min_projection);
   check.set_max_projection (options.max_projection);
 
-  std::vector<generic_shape_iterator<db::Polygon> > others;
+  std::vector<db::RegionIterator> others;
   std::vector<bool> foreign;
   bool has_other = false;
   bool other_is_merged = true;
 
   if (other == subject_regionptr () || other == foreign_regionptr ()) {
     foreign.push_back (other == foreign_regionptr ());
-    others.push_back (begin_merged ());
+    others.push_back (polygons);
     other_is_merged = primary_is_merged;
   } else {
     foreign.push_back (false);

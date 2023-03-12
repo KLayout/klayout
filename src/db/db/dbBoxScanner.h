@@ -376,15 +376,12 @@ private:
 
         while (cc != current) {
           rec.finish (cc->first, cc->second);
-          typename std::set<std::pair<const Obj *, const Obj *> >::iterator s;
-          s = seen.lower_bound (std::make_pair (cc->first, (const Obj *)0));
+          auto s = seen.lower_bound (std::make_pair (cc->first, (const Obj *)0));
+          auto s0 = s;
           while (s != seen.end () && s->first == cc->first) {
-            seen.erase (s++);
+            ++s;
           }
-          s = seen.lower_bound (std::make_pair ((const Obj *)0, cc->first));
-          while (s != seen.end () && s->second == cc->first) {
-            seen.erase (s++);
-          }
+          seen.erase (s0, s);
           ++cc;
         }
 
@@ -429,8 +426,8 @@ private:
           for (iterator_type i = f0; i != f; ++i) {
             for (iterator_type j = c; j < i; ++j) {
               if (bs_boxes_overlap (bc (*i->first), bc (*j->first), enl)) {
-                if (seen.insert (std::make_pair (i->first, j->first)).second) {
-                  seen.insert (std::make_pair (j->first, i->first));
+                if (seen.find (std::make_pair (i->first, j->first)) == seen.end () && seen.find (std::make_pair (j->first, i->first)) == seen.end ()) {
+                  seen.insert (std::make_pair (i->first, j->first));
                   rec.add (i->first, i->second, j->first, j->second);
                   if (rec.stop ()) {
                     return false;
@@ -791,21 +788,23 @@ private:
 
         while (cc1 != current1) {
           rec.finish1 (cc1->first, cc1->second);
-          typename std::set<std::pair<const Obj1 *, const Obj2 *> >::iterator s;
-          s = seen1.lower_bound (std::make_pair (cc1->first, (const Obj2 *)0));
+          auto s = seen1.lower_bound (std::make_pair (cc1->first, (const Obj2 *)0));
+          auto s0 = s;
           while (s != seen1.end () && s->first == cc1->first) {
-            seen1.erase (s++);
+            ++s;
           }
+          seen1.erase (s0, s);
           ++cc1;
         }
 
         while (cc2 != current2) {
           rec.finish2 (cc2->first, cc2->second);
-          typename std::set<std::pair<const Obj2 *, const Obj1 *> >::iterator s;
-          s = seen2.lower_bound (std::make_pair (cc2->first, (const Obj1 *)0));
+          auto s = seen2.lower_bound (std::make_pair (cc2->first, (const Obj1 *)0));
+          auto s0 = s;
           while (s != seen2.end () && s->first == cc2->first) {
-            seen2.erase (s++);
+            ++s;
           }
+          seen2.erase (s0, s);
           ++cc2;
         }
 
@@ -883,7 +882,7 @@ private:
             x = xx;
 
             if (m_report_progress) {
-              progress->set (std::min (f1 - m_pp1.begin (), f2 - m_pp2.begin ()));
+              progress->set ((f1 - m_pp1.begin ()) + (f2 - m_pp2.begin ()));
             }
 
           }

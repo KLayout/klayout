@@ -99,7 +99,7 @@ TEST(1A_Flat)
     reader.read (layout);
   }
 
-  db::compare_layouts (this, layout, au, db::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
     "Layer 10/0 is not present in first layout, but in second\n"
     "Result summary (layers without differences are not shown):\n"
@@ -141,7 +141,7 @@ TEST(1A_Deep)
     reader.read (layout);
   }
 
-  db::compare_layouts (this, layout, au, db::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
     "Layer 10/0 is not present in first layout, but in second\n"
     "Result summary (layers without differences are not shown):\n"
@@ -321,7 +321,7 @@ TEST(2_Flat)
     reader.read (layout);
   }
 
-  db::compare_layouts (this, layout, au, db::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
     ""
   );
@@ -354,7 +354,7 @@ TEST(2_Deep)
     reader.read (layout);
   }
 
-  db::compare_layouts (this, layout, au, db::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
     ""
   );
@@ -387,7 +387,7 @@ TEST(3_Flat)
     reader.read (layout);
   }
 
-  db::compare_layouts (this, layout, au, db::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
     "Layer 10/0 is not present in first layout, but in second\n"
   );
@@ -453,7 +453,7 @@ TEST(3_FlatHeal)
     reader.read (layout);
   }
 
-  db::compare_layouts (this, layout, au, db::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
     "Layer 10/0 is not present in first layout, but in second\n"
   );
@@ -520,7 +520,7 @@ TEST(3_Deep)
     reader.read (layout);
   }
 
-  db::compare_layouts (this, layout, au, db::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
     "Layer 10/0 is not present in first layout, but in second\n"
   );
@@ -553,7 +553,7 @@ TEST(4_Flat)
     reader.read (layout);
   }
 
-  db::compare_layouts (this, layout, au, db::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
     "Layer 10/0 is not present in first layout, but in second\n"
   );
@@ -586,7 +586,7 @@ TEST(4_FlatHeal)
     reader.read (layout);
   }
 
-  db::compare_layouts (this, layout, au, db::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
     "Layer 10/0 is not present in first layout, but in second\n"
   );
@@ -619,7 +619,7 @@ TEST(4_Deep)
     reader.read (layout);
   }
 
-  db::compare_layouts (this, layout, au, db::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
     "Layer 10/0 is not present in first layout, but in second\n"
   );
@@ -652,7 +652,7 @@ TEST(5_Flat)
     reader.read (layout);
   }
 
-  db::compare_layouts (this, layout, au, db::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
     "Layer 10/0 is not present in first layout, but in second\n"
   );
@@ -685,7 +685,7 @@ TEST(5_Deep)
     reader.read (layout);
   }
 
-  db::compare_layouts (this, layout, au, db::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
     "Layer 10/0 is not present in first layout, but in second\n"
   );
@@ -718,7 +718,7 @@ TEST(6_Flat)
     reader.read (layout);
   }
 
-  db::compare_layouts (this, layout, au, db::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
     "Layer 10/0 is not present in first layout, but in second\n"
   );
@@ -751,7 +751,7 @@ TEST(6_Deep)
     reader.read (layout);
   }
 
-  db::compare_layouts (this, layout, au, db::NoNormalization);
+  db::compare_layouts (this, layout, au, db::NormalizationMode (db::NoNormalization | db::AsPolygons));
   EXPECT_EQ (cap.captured_text (),
     "Layer 10/0 is not present in first layout, but in second\n"
   );

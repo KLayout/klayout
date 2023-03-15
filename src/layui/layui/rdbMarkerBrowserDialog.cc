@@ -266,7 +266,7 @@ BEGIN_PROTECTED
 
   try {
 
-    view ()->manager ()->transaction (tl::to_string (QObject::tr ("Export Markers"))); 
+    db::Transaction transaction (view ()->is_editable () ? view ()->manager () : 0, tl::to_string (QObject::tr ("Export Markers")));
 
     std::vector <const Category *> categories;
     for (rdb::Categories::const_iterator cat = rdb->categories ().begin (); cat != rdb->categories ().end (); ++cat) {
@@ -355,11 +355,9 @@ BEGIN_PROTECTED
 
     }
 
-    view ()->manager ()->commit ();
     view ()->update_content ();
 
   } catch (...) {
-    view ()->manager ()->commit ();
     view ()->update_content ();
     throw;
   }

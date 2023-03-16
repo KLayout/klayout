@@ -141,14 +141,14 @@ struct box_defs
       "box is also an empty box. The width, height, p1 and p2 attributes of an empty box are undefined. "
       "Use \\empty? to get a value indicating whether the box is empty.\n"
     ) +
-    constructor ("new", &new_sq,
+    constructor ("new", &new_sq, gsi::arg ("w"),
       "@brief Creates a square with the given dimensions centered around the origin\n"
       "\n"
       "Note that for integer-unit boxes, the dimension has to be an even number to avoid rounding.\n"
       "\n"
       "This convenience constructor has been introduced in version 0.28."
     ) +
-    constructor ("new", &new_wh,
+    constructor ("new", &new_wh, gsi::arg ("w"), gsi::arg ("h"),
       "@brief Creates a rectangle with given width and height, centered around the origin\n"
       "\n"
       "Note that for integer-unit boxes, the dimensions have to be an even number to avoid rounding.\n"

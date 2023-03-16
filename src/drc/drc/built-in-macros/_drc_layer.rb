@@ -5148,9 +5148,6 @@ CODE
 
       m = with_left ? "fill_with_left" : "fill"
 
-      # generation of new cells not tested in deep mode
-      @deep && raise("#{m} command not supported in deep mode currently")
-
       (@engine._output_layout && @engine._output_cell) || raise("#{m} command needs an output layout and output cell")
 
       source = @engine.source

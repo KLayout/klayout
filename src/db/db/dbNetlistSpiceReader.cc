@@ -388,6 +388,7 @@ private:
   void read_subcircuit (const std::string &sc_name, const std::string &nc_name, const std::vector<db::Net *> &nets);
   void read_circuit (tl::Extractor &ex, const std::string &name);
   bool read_card ();
+  void read_options (tl::Extractor &ex);
   void ensure_circuit ();
   std::string get_line ();
   void error (const std::string &msg);
@@ -614,6 +615,10 @@ SpiceCircuitDict::read_card ()
     std::string nc = read_name (ex, mp_netlist);
     read_circuit (ex, nc);
 
+  } else if (ex.test_without_case (".options")) {
+
+    read_options (ex);
+
   } else if (ex.test_without_case (".ends")) {
 
     return true;
@@ -678,6 +683,56 @@ SpiceCircuitDict::read_card ()
   }
 
   return false;
+}
+
+void
+SpiceCircuitDict::read_options (tl::Extractor &ex)
+{
+  while (! ex.at_end ()) {
+
+    std::string n;
+    ex.read_word_or_quoted (n, allowed_name_chars);
+    n = tl::to_lower_case (n);
+
+    double v = 0.0;
+    std::string w;
+    if (ex.test ("=")) {
+      if (ex.try_read (v)) {
+        //  take value
+      } else {
+        //  skip until end or next space
+        ex.skip ();
+        while (! ex.at_end () && ! isspace (*ex)) {
+          ++ex;
+        }
+      }
+    }
+
+    //  TODO: further options?
+    const double min_value = 1e-18;
+    if (n == "scale") {
+      if (v > min_value) {
+        mp_delegate->options ().scale = v;
+      }
+    } else if (n == "defad") {
+      if (v > min_value) {
+        mp_delegate->options ().defad = v;
+      }
+    } else if (n == "defas") {
+      if (v > min_value) {
+        mp_delegate->options ().defas = v;
+      }
+    } else if (n == "defl") {
+      if (v > min_value) {
+        mp_delegate->options ().defl = v;
+      }
+    } else if (n == "defw") {
+      if (v > min_value) {
+        mp_delegate->options ().defw = v;
+      }
+    }
+
+  }
 }
 
 void
@@ -1148,9 +1203,9 @@ SpiceNetlistBuilder::build_global_nets ()
 NetlistSpiceReader::NetlistSpiceReader (NetlistSpiceReaderDelegate *delegate)
   : mp_delegate (delegate), m_strict (false)
 {
-  static NetlistSpiceReaderDelegate std_delegate;
   if (! delegate) {
-    mp_delegate.reset (&std_delegate);
+    mp_default_delegate.reset (new NetlistSpiceReaderDelegate ());
+    mp_delegate.reset (mp_default_delegate.get ());
   }
 }
 

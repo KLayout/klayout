@@ -146,7 +146,7 @@ public:
    *  @brief Creates an empty device parameter definition
    */
   DeviceParameterDefinition ()
-    : m_name (), m_description (), m_default_value (0.0), m_id (0), m_is_primary (true), m_si_scaling (1.0)
+    : m_name (), m_description (), m_default_value (0.0), m_id (0), m_is_primary (true), m_si_scaling (1.0), m_geo_scaling (0.0)
   {
     //  .. nothing yet ..
   }
@@ -154,8 +154,8 @@ public:
   /**
    *  @brief Creates a device parameter definition with the given name and description
    */
-  DeviceParameterDefinition (const std::string &name, const std::string &description, double default_value = 0.0, bool is_primary = true, double si_scaling = 1.0)
-    : m_name (name), m_description (description), m_default_value (default_value), m_id (0), m_is_primary (is_primary), m_si_scaling (si_scaling)
+  DeviceParameterDefinition (const std::string &name, const std::string &description, double default_value = 0.0, bool is_primary = true, double si_scaling = 1.0, double geo_scaling = 0.0)
+    : m_name (name), m_description (description), m_default_value (default_value), m_id (0), m_is_primary (is_primary), m_si_scaling (si_scaling), m_geo_scaling (geo_scaling)
   {
     //  .. nothing yet ..
   }
@@ -193,17 +193,9 @@ public:
   }
 
   /**
-   *  @brief Gets the parameter default value
-   */
-  double default_value () const
-  {
-    return m_default_value;
-  }
-
-  /**
    *  @brief Gets the SI unit scaling factor
    *
-   *  Some parameters are given in micrometers for example. This
+   *  Some parameters are given in micrometers - for example W and L of MOS devices. This
    *  scaling factor gives the translation to SI units (1e-6 for micrometers).
    */
   double si_scaling () const
@@ -212,7 +204,43 @@ public:
   }
 
   /**
-   *  @brief Sets the parameter description
+   *  @brief Set the SI unit scaling factor
+   */
+  void set_si_scaling (double s)
+  {
+    m_si_scaling = s;
+  }
+
+  /**
+   *  @brief Gets the geometry scaling exponent
+   *
+   *  The geometry scaling exponent is used for example when applying .option scale
+   *  in Spice reading. It is 0 for "no scaling", 1 for linear scaling and 2 for
+   *  quadratic scaling.
+   */
+  double geo_scaling_exponent () const
+  {
+    return m_geo_scaling;
+  }
+
+  /**
+   *  @brief Sets the geometry scaling exponent
+   */
+  void set_geo_scaling_exponent (double e)
+  {
+    m_geo_scaling = e;
+  }
+
+  /**
+   *  @brief Gets the parameter default value
+   */
+  double default_value () const
+  {
+    return m_default_value;
+  }
+
+  /**
+   *  @brief Sets the parameter default value
    */
   void set_default_value (double d)
   {
@@ -267,6 +295,7 @@ private:
   size_t m_id;
   bool m_is_primary;
   double m_si_scaling;
+  double m_geo_scaling;
 
   void set_id (size_t id)
   {

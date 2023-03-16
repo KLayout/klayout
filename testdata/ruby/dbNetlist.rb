@@ -625,14 +625,9 @@ class DBNetlist_TestClass < TestBase
     dc.terminal_definitions.each { |pd| names << pd.name }
     assert_equal(names, [])
 
-    pd = RBA::DeviceParameterDefinition::new("P1", "Parameter 1", 2.0)
-    assert_equal(pd.default_value, 2.0)
+    pd = RBA::DeviceParameterDefinition::new("P1", "Parameter 1")
     pd.default_value = 1.0
-    assert_equal(pd.default_value, 1.0)
-    pd.is_primary = false
-    assert_equal(pd.is_primary?, false)
     pd.is_primary = true
-    assert_equal(pd.is_primary?, true)
 
     dc.add_parameter(pd)
 
@@ -1178,6 +1173,24 @@ END
 
     dpc += RBA::EqualDeviceParameters::ignore(3)
     assert_equal(dpc.to_string, "#1:A0/R0;#2:A1/R0.25;#3:ignore")
+
+  end
+
+  def test_16_deviceParameterObject
+
+    pd = RBA::DeviceParameterDefinition::new("P1", "Parameter 1", 2.0, false, 17.5, 2.0)
+    assert_equal(pd.default_value, 2.0)
+    pd.default_value = 1.0
+    assert_equal(pd.default_value, 1.0)
+    assert_equal(pd.is_primary?, false)
+    pd.is_primary = true
+    assert_equal(pd.is_primary?, true)
+    assert_equal(pd.si_scaling, 17.5)
+    pd.si_scaling = 1.0
+    assert_equal(pd.si_scaling, 1.0)
+    assert_equal(pd.geo_scaling_exponent, 2.0)
+    pd.geo_scaling_exponent = 1.0
+    assert_equal(pd.geo_scaling_exponent, 1.0)
 
   end
 

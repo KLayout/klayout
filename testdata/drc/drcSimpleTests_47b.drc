@@ -1,0 +1,23 @@
+
+source $drc_test_source
+
+if $drc_test_deep
+  deep
+end
+
+to_fill = input(1, 0)
+
+# Create a fill pattern with a 0.025x0.025 µm box at 2/0
+pattern = fill_pattern("FILL_CELL").shape(2, 0, box(0, 0, 0.025, 0.025))
+
+# place every 25 nm
+to_fill.fill(pattern, hstep(0.025), vstep(0.025))
+
+# compute remaining parts
+l2 = input(2, 0)
+(to_fill - l2).output(100, 0)
+
+# we cannot use input(..) on the fill output if we use
+# a separate target layout, so wo do this:
+layout.layout.write($drc_test_target)
+

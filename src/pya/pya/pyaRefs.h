@@ -211,6 +211,14 @@ public:
     return mp_obj < other.mp_obj;
   }
 
+  /**
+   *  @brief Releases the object
+   *
+   *  This method returns and resets the raw pointer without changing the
+   *  reference count.
+   */
+  PyObject *release ();
+
 private:
   PyObject *mp_obj;
 };

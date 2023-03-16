@@ -59,7 +59,7 @@ public:
       mp_shapes->insert (t.box ().transformed (m_trans));
     } else {
       if (mp_shapes->cell () && mp_shapes->cell ()->layout ()) {
-        db::PolygonRef pr (mp_shapes->cell ()->layout ()->shape_repository (), t.transformed (m_trans));
+        db::PolygonRef pr (t.transformed (m_trans), mp_shapes->cell ()->layout ()->shape_repository ());
         mp_shapes->insert (pr);
       } else {
         mp_shapes->insert (t.transformed (m_trans));

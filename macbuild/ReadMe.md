@@ -1,9 +1,9 @@
-Relevant KLayout version: 0.28.4<br>
+Relevant KLayout version: 0.28.6<br>
 Author: Kazzz-S<br>
-Last modified: 2023-02-01<br>
+Last modified: 2023-03-19<br>
 
 # 1. Introduction
-This directory **`macbuild`** contains various files required for building KLayout (http://www.klayout.de/) version 0.28.4 or later for different 64-bit macOS, including:
+This directory **`macbuild`** contains various files required for building KLayout (http://www.klayout.de/) version 0.28.6 or later for different 64-bit macOS, including:
 * Catalina    (10.15.7) : the primary development environment
 * Big Sur     (11.x)    : experimental; Apple (M1|M2) chip is not tested since the author does not own an (M1|M2) Mac
 * Monterey    (12.x)    : -- ditto --
@@ -73,7 +73,7 @@ You need to have the followings:
 ```
 ---------------------------------------------------------------------------------------------------------
 << Usage of 'build4mac.py' >>
-       for building KLayout 0.28.4 or later on different Apple macOS / Mac OSX platforms.
+       for building KLayout 0.28.6 or later on different Apple macOS / Mac OSX platforms.
 
 $ [python] ./build4mac.py
    option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)| default value
@@ -130,7 +130,7 @@ $ [python] ./build4mac.py
 ```
 ---------------------------------------------------------------------------------------------------------
 << Usage of 'build4mac.py' >>
-       for building KLayout 0.28.4 or later on different Apple macOS / Mac OSX platforms.
+       for building KLayout 0.28.6 or later on different Apple macOS / Mac OSX platforms.
 
 $ [python] ./build4mac.py
    option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)| default value
@@ -236,7 +236,7 @@ $ ./build4mac.py -q qt5macports -r mp32 -p mp39
 2. Confirm successful build (it will take about one hour, depending on your machine spec).
 3. Rerun **`build4mac.py`** with the same options used in 1. PLUS "-Y" to deploy executables and libraries under **`klayout.app`** bundle.<br>
    The buddy command-line tools (strm*) will also be deployed under **klayout.app/Contents/Buddy/** in this step.<br>
-   If you use `--buildPymod` option in Step-1 and Step-3, the KLayout Python Module (\*.whl, \*.egg) will be built and deployed under **klayout.app/Contents/pymod-dist/**.
+   If you use `--buildPymod` option in Step-1 and Step-3, the KLayout Python Module (\*.whl) will be built and deployed under **klayout.app/Contents/pymod-dist/**.
 
 ```
 $ ./build4mac.py -q qt5macports -r mp32 -p mp39 -Y
@@ -263,7 +263,7 @@ $ ./build4mac.py -q qt5brew -r hb32 -p hb39
 2. Confirm successful build (it will take about one hour, depending on your machine spec).
 3. Rerun **`build4mac.py`** with the same options used in 1. PLUS "-Y" to deploy executables and libraries under **`klayout.app`** bundle.<br>
    The buddy command-line tools (strm*) will also be deployed under **klayout.app/Contents/Buddy/** in this step.<br>
-   If you use `--buildPymod` option in Step-1 and Step-3, the KLayout Python Module (\*.whl, \*.egg) will be built and deployed under **klayout.app/Contents/pymod-dist/**.
+   If you use `--buildPymod` option in Step-1 and Step-3, the KLayout Python Module (\*.whl) will be built and deployed under **klayout.app/Contents/pymod-dist/**.
 
 ```
 $ ./build4mac.py -q qt5brew -r hb32 -p hb39 -Y
@@ -316,7 +316,7 @@ $ ./build4mac.py -q qt5ana3 -r ana3 -p ana3
 2. Confirm successful build (it will take about one hour, depending on your machine spec).
 3. Rerun **`build4mac.py`** with the same options used in 1. PLUS "-Y" to deploy executables and libraries under **`klayout.app`** bundle.<br>
    The buddy command-line tools (strm*) will also be deployed under **klayout.app/Contents/Buddy/** in this step.<br>
-   If you use `--buildPymod` option in Step-1 and Step-3, the KLayout Python Module (\*.whl, \*.egg) will be built and deployed under **klayout.app/Contents/pymod-dist/**.
+   If you use `--buildPymod` option in Step-1 and Step-3, the KLayout Python Module (\*.whl) will be built and deployed under **klayout.app/Contents/pymod-dist/**.
 
 ```
 $ ./build4mac.py -q qt5ana3 -r ana3 -p ana3 -Y
@@ -352,8 +352,8 @@ $ cd /where/'build.sh'/exists
 $ ./makeDMG4mac.py -p LW-qt5MP.pkg.macos-Catalina-release-Rmp32Pmp39 -m
 ```
 This command will generate the two files below:<br>
-* **`LW-klayout-0.28.4-macOS-Catalina-1-qt5MP-Rmp32Pmp39.dmg`**      ---(1) the main DMG file
-* **`LW-klayout-0.28.4-macOS-Catalina-1-qt5MP-Rmp32Pmp39.dmg.md5`**  ---(2) MD5-value text file
+* **`LW-klayout-0.28.6-macOS-Catalina-1-qt5MP-Rmp32Pmp39.dmg`**      ---(1) the main DMG file
+* **`LW-klayout-0.28.6-macOS-Catalina-1-qt5MP-Rmp32Pmp39.dmg.md5`**  ---(2) MD5-value text file
 
 # Known issues
 Because we assume some specific versions of non-OS-standard Ruby and Python, updating MacPorts, Homebrew, or Anaconda3 may cause build- and link errors.<br>

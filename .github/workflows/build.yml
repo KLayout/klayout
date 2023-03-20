@@ -4,11 +4,22 @@ name: Build Python Wheels
 
 on:
   pull_request:
-  push:
+  # Running on PRs is enough
+  # push:
   release:
     types: [published]
 
 jobs:
+  free-disk-space:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+      with:
+        android: false
+        dotnet: false
+        haskell: false
+
   build:
     runs-on: ${{ matrix.os }}
     strategy:

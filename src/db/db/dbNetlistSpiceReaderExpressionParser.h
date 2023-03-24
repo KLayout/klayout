@@ -46,6 +46,7 @@ public:
   typedef std::map<std::string, tl::Variant> variables_type;
 
   NetlistSpiceReaderExpressionParser (const variables_type *vars, double def_scale = 1.0);
+  NetlistSpiceReaderExpressionParser (const variables_type *vars1, const variables_type *vars2, double def_scale = 1.0);
 
   tl::Variant read (tl::Extractor &ex) const;
   tl::Variant read (const std::string &s) const;
@@ -53,7 +54,7 @@ public:
   bool try_read (const std::string &s, tl::Variant &v) const;
 
 private:
-  const variables_type *mp_variables;
+  const variables_type *mp_variables1, *mp_variables2;
   double m_def_scale;
 
   tl::Variant read_atomic_value (tl::Extractor &ex, bool *status) const;

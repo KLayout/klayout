@@ -1,0 +1,37 @@
+
+.subckt test
+
+* Variations are:
+* (1) Cname n1 n2 C=value [other params]
+* (2) Cname n1 n2 value [params]
+* (3) Cname n1 n2 model C=value [other params]
+*     Cname n1 n2 n3 C=value [other params] -> not supported, cannot tell from (3) without further analysis
+* (4) Cname n1 n2 model value [params]
+*     Cname n1 n2 n3 value [params] -> not supported, cannot tell from (4) without further analysis
+* (5) Cname n1 n2 n3 model C=value [other params]
+* (6) Cname n1 n2 value model [params]
+* (7) Cname n1 n2 n3 model value [params]
+* (8) Cname n1 n2 n3 value model [params]
+
+* ngspice takes second C parameter (5p)
+c1 a b M=1 l=50.000u w=50.000u c=2.5p c=5p
+* ngspice ignores C parameter and uses 2.5p
+c2a a b M=1 l=50.000u w=50.000u 2.5p c=5p
+* ngspice ignores C parameter and uses 2.5p
+c2b a b 2.5p M=1 l=50.000u w=50.000u c=5p
+* ngspice ignores first C parameter and uses 5p
+c3 a b cap_model1 c=2.5p M=1 l=50.000u w=50.000u c=5p
+* ngspice ignores C parameter and uses 2.5p
+c4 a b cap_model1 2.5p M=1 l=50.000u w=50.000u c=5p
+* ngspice ignores first C parameter and uses 5p
+c5 a b c cap_model2 M=1 l=50.000u w=50.000u c=2.5p c=5p
+* C parameter must not be present for this to be recognized as value
+c6 a b 2.5p cap_model1 M=1 l=50.000u w=50.000u
+* ngspice ignores C parameter and uses 2.5p
+c7a a b c cap_model2 2.5p M=1 l=50.000u w=50.000u c=5p
+* ngspice ignores C parameter and uses 2.5p
+c7b a b c cap_model2 M=1 l=50.000u w=50.000u 2.5p c=5p
+* ngspice ignores C parameter and uses 2.5p
+c8 a b c 2.5p cap_model2 M=1 l=50.000u w=50.000u c=5p
+.ends
+

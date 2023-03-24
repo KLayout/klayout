@@ -47,6 +47,7 @@ public:
   virtual void finish (bool);
 
   void keep_for_healing (const db::Polygon &poly);
+  void keep_for_healing (const db::Box &box);
 
 private:
   size_t *mp_count;
@@ -73,6 +74,15 @@ public:
   {
     if (m_healing && ! poly.box ().inside (mp_tile->enlarged (db::Vector (-1, -1)))) {
       mp_receiver->keep_for_healing (poly);
+    } else {
+      m_count += 1;
+    }
+  }
+
+  void operator() (const db::Box &box)
+  {
+    if (m_healing && ! box.inside (mp_tile->enlarged (db::Vector (-1, -1)))) {
+      mp_receiver->keep_for_healing (box);
     } else {
       m_count += 1;
     }
@@ -111,6 +121,12 @@ HealingCountingReceiver::keep_for_healing (const db::Polygon &poly)
 }
 
 void
+HealingCountingReceiver::keep_for_healing (const db::Box &box)
+{
+  m_for_healing.insert (box);
+}
+
+void
 HealingCountingReceiver::finish (bool)
 {
   if (m_healing) {
@@ -132,7 +148,9 @@ public:
   void finish (bool /*success*/);
 
   void keep_for_healing (const db::Polygon &poly);
+  void keep_for_healing (const db::Box &box);
   void output (const db::Polygon &poly);
+  void output (const db::Box &poly);
 
 private:
   db::Layout *mp_layout;
@@ -164,6 +182,23 @@ public:
       mp_receiver->keep_for_healing (*mp_trans * poly);
     } else {
       mp_receiver->output (*mp_trans * poly);
+    }
+  }
+
+  void operator() (const db::Box &box)
+  {
+    if (m_healing && ! box.inside (mp_tile->enlarged (db::Vector (-1, -1)))) {
+      if (mp_trans->is_complex ()) {
+        mp_receiver->keep_for_healing (*mp_trans * db::Polygon (box));
+      } else {
+        mp_receiver->keep_for_healing (*mp_trans * box);
+      }
+    } else {
+      if (mp_trans->is_complex ()) {
+        mp_receiver->output (*mp_trans * db::Polygon (box));
+      } else {
+        mp_receiver->output (*mp_trans * box);
+      }
     }
   }
 
@@ -212,9 +247,21 @@ HealingTileLayoutOutputReceiver::keep_for_healing (const db::Polygon &poly)
 }
 
 void
+HealingTileLayoutOutputReceiver::keep_for_healing (const db::Box &box)
+{
+  m_for_healing.insert (box);
+}
+
+void
 HealingTileLayoutOutputReceiver::output (const db::Polygon &poly)
 {
   mp_cell->shapes (m_layer).insert (poly);
+}
+
+void
+HealingTileLayoutOutputReceiver::output (const db::Box &box)
+{
+  mp_cell->shapes (m_layer).insert (box);
 }
 
 // ---------------------------------------------------------------------

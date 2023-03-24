@@ -4,7 +4,8 @@ name: Build Python Wheels
 
 on:
   pull_request:
-  push:
+  # Running on PRs is enough
+  # push:
   release:
     types: [published]
 
@@ -23,6 +24,13 @@ jobs:
           - os: "ubuntu-latest"
             cibuild: "*musllinux*"
     steps:
+      - name: Free Disk Space (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        uses: jlumbroso/free-disk-space@main
+        with:
+          android: false
+          dotnet: false
+          haskell: false
       - uses: hmarr/debug-action@v2
       - name: Cancel Workflow Action
         uses: styfle/cancel-workflow-action@0.9.1

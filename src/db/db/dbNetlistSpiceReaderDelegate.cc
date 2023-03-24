@@ -86,8 +86,20 @@ static std::string unescape_name (const std::string &n)
 
 // ------------------------------------------------------------------------------------------------------
 
+NetlistSpiceReaderOptions::NetlistSpiceReaderOptions ()
+{
+  scale = 1.0;
+  defad = 0.0;
+  defas = 0.0;
+  //  ngspice defaults:
+  defw = 100e-6;
+  defl = 100e-6;
+}
+
+// ------------------------------------------------------------------------------------------------------
+
 NetlistSpiceReaderDelegate::NetlistSpiceReaderDelegate ()
-  : mp_netlist (0)
+  : mp_netlist (0), m_options ()
 {
   //  .. nothing yet ..
 }
@@ -95,6 +107,22 @@ NetlistSpiceReaderDelegate::NetlistSpiceReaderDelegate ()
 NetlistSpiceReaderDelegate::~NetlistSpiceReaderDelegate ()
 {
   //  .. nothing yet ..
+}
+
+void NetlistSpiceReaderDelegate::set_netlist (db::Netlist *netlist)
+{
+  m_options = NetlistSpiceReaderOptions ();
+  mp_netlist = netlist;
+}
+
+void NetlistSpiceReaderDelegate::do_start ()
+{
+  start (mp_netlist);
+}
+
+void NetlistSpiceReaderDelegate::do_finish ()
+{
+  finish (mp_netlist);
 }
 
 void NetlistSpiceReaderDelegate::start (db::Netlist * /*netlist*/)
@@ -107,7 +135,7 @@ void NetlistSpiceReaderDelegate::finish (db::Netlist * /*netlist*/)
   //  .. nothing yet ..
 }
 
-bool NetlistSpiceReaderDelegate::control_statement(const std::string & /*line*/)
+bool NetlistSpiceReaderDelegate::control_statement (const std::string & /*line*/)
 {
   return false;
 }
@@ -196,7 +224,8 @@ void NetlistSpiceReaderDelegate::parse_element_components (const std::string &s,
       if (ex.try_read_word (n) && ex.test ("=")) {
 
         //  a parameter
-        pv [mp_netlist ? mp_netlist->normalize_name (n) : tl::to_upper_case (n)] = read_value (ex, variables);
+        std::string pn = mp_netlist ? mp_netlist->normalize_name (n) : tl::to_upper_case (n);
+        pv [pn] = read_value (ex, variables);
 
       } else {
 
@@ -231,8 +260,21 @@ void NetlistSpiceReaderDelegate::parse_element_components (const std::string &s,
   }
 }
 
+void NetlistSpiceReaderDelegate::def_values_per_element (const std::string &element, std::map<std::string, tl::Variant> &pv)
+{
+  if (element == "M") {
+
+    pv.insert (std::make_pair ("W", m_options.defw));
+    pv.insert (std::make_pair ("L", m_options.defl));
+    pv.insert (std::make_pair ("AD", m_options.defad));
+    pv.insert (std::make_pair ("AS", m_options.defas));
+
+  }
+}
+
 void NetlistSpiceReaderDelegate::parse_element (const std::string &s, const std::string &element, std::string &model, double &value, std::vector<std::string> &nn, std::map<std::string, tl::Variant> &pv, const std::map<std::string, tl::Variant> &variables)
 {
+  def_values_per_element (element, pv);
   parse_element_components (s, nn, pv, variables);
 
   //  interpret the parameters according to the code
@@ -337,6 +379,8 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
   std::map<std::string, tl::Variant> params = pv;
   std::vector<size_t> terminal_order;
 
+  size_t defp = std::numeric_limits<size_t>::max ();
+
   double mult = 1.0;
   auto mp = params.find ("M");
   if (mp != params.end ()) {
@@ -378,8 +422,19 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
       error (tl::to_string (tr ("A 'R' element requires two or three nets")));
     }
 
-    //  Apply multiplier
+    //  Apply multiplier (divider, according to ngspice manual)
     value /= mult;
+
+    defp = db::DeviceClassResistor::param_id_R;
+
+    //  Apply multiplier to other parameters
+    static const char *scale_params[] = { "A", "P", "W" };
+    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params[0]); ++i) {
+      auto p = params.find (scale_params [i]);
+      if (p != params.end ()) {
+        p->second = tl::Variant (p->second.to_double () * mult);
+      }
+    }
 
   } else if (element == "L") {
 
@@ -398,8 +453,10 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
       error (tl::to_string (tr ("A 'L' element requires two nets")));
     }
 
-    //  Apply multiplier
+    //  Apply multiplier (divider, according to ngspice manual)
     value /= mult;
+
+    defp = db::DeviceClassInductor::param_id_L;
 
   } else if (element == "C") {
 
@@ -432,6 +489,17 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
     //  Apply multiplier
     value *= mult;
 
+    defp = db::DeviceClassCapacitor::param_id_C;
+
+    //  Apply multiplier to other parameters
+    static const char *scale_params[] = { "A", "P" };
+    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params[0]); ++i) {
+      auto p = params.find (scale_params [i]);
+      if (p != params.end ()) {
+        p->second = tl::Variant (p->second.to_double () * mult);
+      }
+    }
+
   } else if (element == "D") {
 
     if (cls) {
@@ -445,10 +513,13 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
       cls = make_device_class<db::DeviceClassDiode> (circuit, cn);
     }
 
-    //  Apply multiplier to "A"
-    auto p = params.find ("A");
-    if (p != params.end ()) {
-      p->second = tl::Variant (p->second.to_double () * mult);
+    //  Apply multiplier
+    static const char *scale_params[] = { "A", "P" };
+    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params[0]); ++i) {
+      auto p = params.find (scale_params [i]);
+      if (p != params.end ()) {
+        p->second = tl::Variant (p->second.to_double () * mult);
+      }
     }
 
   } else if (element == "Q") {
@@ -479,10 +550,13 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
       }
     }
 
-    //  Apply multiplier to "AE"
-    auto p = params.find ("AE");
-    if (p != params.end ()) {
-      p->second = tl::Variant (p->second.to_double () * mult);
+    //  Apply multiplier
+    static const char *scale_params[] = { "AE", "PE", "AB", "PB", "AC", "PC" };
+    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params[0]); ++i) {
+      auto p = params.find (scale_params [i]);
+      if (p != params.end ()) {
+        p->second = tl::Variant (p->second.to_double () * mult);
+      }
     }
 
   } else if (element == "M") {
@@ -502,10 +576,13 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
       }
     }
 
-    //  Apply multiplier to "W"
-    auto p = params.find ("W");
-    if (p != params.end ()) {
-      p->second = tl::Variant (p->second.to_double () * mult);
+    //  Apply multiplier
+    static const char *scale_params[] = { "W", "AD", "AS", "PD", "PS" };
+    for (size_t i = 0; i < sizeof (scale_params) / sizeof (scale_params[0]); ++i) {
+      auto p = params.find (scale_params [i]);
+      if (p != params.end ()) {
+        p->second = tl::Variant (p->second.to_double () * mult);
+      }
     }
 
     //  issue #1304
@@ -537,26 +614,36 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
   }
 
 
-  size_t defp = std::numeric_limits<size_t>::max ();
-  if (dynamic_cast<db::DeviceClassCapacitor *> (cls)) {
-    defp = db::DeviceClassCapacitor::param_id_C;
-  } else if (dynamic_cast<db::DeviceClassResistor *> (cls)) {
-    defp = db::DeviceClassResistor::param_id_R;
-  } else if (dynamic_cast<db::DeviceClassInductor *> (cls)) {
-    defp = db::DeviceClassInductor::param_id_L;
-  }
-
   std::vector<db::DeviceParameterDefinition> &pd = cls->parameter_definitions_non_const ();
   for (std::vector<db::DeviceParameterDefinition>::iterator i = pd.begin (); i != pd.end (); ++i) {
     auto v = params.find (i->name ());
+    double pv = 0.0;
     if (v != params.end ()) {
-      device->set_parameter_value (i->id (), v->second.to_double () / i->si_scaling ());
+      pv = v->second.to_double ();
     } else if (i->id () == defp) {
-      device->set_parameter_value (i->id (), value / i->si_scaling ());
+      pv = value;
+    } else {
+      continue;
     }
+    device->set_parameter_value (i->id (), pv);
   }
 
+  apply_parameter_scaling (device);
   return true;
+}
+
+void
+NetlistSpiceReaderDelegate::apply_parameter_scaling (db::Device *device) const
+{
+  if (! device || ! device->device_class ()) {
+    return;
+  }
+
+  const std::vector<db::DeviceParameterDefinition> &pd = device->device_class ()->parameter_definitions ();
+  for (auto i = pd.begin (); i != pd.end (); ++i) {
+    double pv = device->parameter_value (i->id ());
+    device->set_parameter_value (i->id (), pv / i->si_scaling () * pow (m_options.scale, i->geo_scaling_exponent ()));
+  }
 }
 
 tl::Variant

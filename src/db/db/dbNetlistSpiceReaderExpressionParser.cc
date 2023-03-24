@@ -44,7 +44,8 @@ static bool to_bool (const tl::Variant &v)
 }
 // ------------------------------------------------------------------------------------------------------
 
-NetlistSpiceReaderExpressionParser::NetlistSpiceReaderExpressionParser (const variables_type *vars)
+NetlistSpiceReaderExpressionParser::NetlistSpiceReaderExpressionParser (const variables_type *vars, double def_scale)
+  : m_def_scale (def_scale)
 {
   static variables_type empty_variables;
   mp_variables = vars ? vars : &empty_variables;
@@ -202,7 +203,7 @@ NetlistSpiceReaderExpressionParser::read_atomic_value (tl::Extractor &ex, bool *
       *status = true;
     }
 
-    double f = 1.0;
+    double f = m_def_scale;
     if (*ex == 't' || *ex == 'T') {
       f = 1e12;
     } else if (*ex == 'g' || *ex == 'G') {

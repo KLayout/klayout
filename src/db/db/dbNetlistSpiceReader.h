@@ -32,6 +32,7 @@
 
 #include <map>
 #include <string>
+#include <memory>
 
 namespace db
 {
@@ -64,6 +65,7 @@ public:
 
 private:
   tl::weak_ptr<NetlistSpiceReaderDelegate> mp_delegate;
+  std::unique_ptr<NetlistSpiceReaderDelegate> mp_default_delegate;
   bool m_strict;
 };
 

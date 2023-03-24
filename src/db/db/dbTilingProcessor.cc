@@ -52,6 +52,31 @@ public:
     mp_shapes->insert (t.transformed (m_trans));
   }
 
+  template <class P>
+  void insert_polygon (const P &p)
+  {
+    if (p.is_box () && ! m_trans.is_complex ()) {
+      mp_shapes->insert (p.box ().transformed (m_trans));
+    } else {
+      if (mp_shapes->cell () && mp_shapes->cell ()->layout ()) {
+        db::polygon_ref<P, db::Disp> pr (p.transformed (m_trans), mp_shapes->cell ()->layout ()->shape_repository ());
+        mp_shapes->insert (pr);
+      } else {
+        mp_shapes->insert (p.transformed (m_trans));
+      }
+    }
+  }
+
+  void operator() (const db::Polygon &p)
+  {
+    insert_polygon (p);
+  }
+
+  void operator() (const db::SimplePolygon &p)
+  {
+    insert_polygon (p);
+  }
+
   void operator() (const db::EdgePair &ep)
   {
     mp_shapes->insert (ep.normalized ().to_polygon (m_ep_sizing).transformed (m_trans));

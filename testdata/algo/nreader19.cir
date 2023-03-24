@@ -1,0 +1,27 @@
+* Test
+
+.options scale=1e-6
+
+.model sky130_fd_pr__pfet_01v8 NMOS level=8 version=3.3.0
+.model sky130_fd_pr__nfet_01v8 NMOS level=8 version=3.3.0
+
+XXpmos Q I VDD VDD pmos4_standard w=1.5 l=0.15 nf=4
+XXnmos Q I VSS VSS nmos4_standard w=1.5 l=0.15 nf=4
+XXDUMMY0 VSS VSS VSS VSS nmos4_standard w=1.5 l=0.15 nf=2
+XXDUMMY1 VSS VSS VSS VSS nmos4_standard w=1.5 l=0.15 nf=2
+XXDUMMY2 VDD VDD VDD VDD pmos4_standard w=1.5 l=0.15 nf=2
+XXDUMMY3 VDD VDD VDD VDD pmos4_standard w=1.5 l=0.15 nf=2
+
+.subckt pmos4_standard  D G S B  w=0.1  l=0.018  nf=4
+MM1 D G S B sky130_fd_pr__pfet_01v8 L=l W='w * nf ' ad='int((nf+1)/2) * W/nf * 0.29' as='int((nf+2)/2) * W/nf * 0.29'
++ pd='2*int((nf+1)/2) * (W/nf + 0.29)' ps='2*int((nf+2)/2) * (W/nf + 0.29)' nrd='0.29 / W' nrs='0.29 / W'
++ m=1
+.ends
+
+.subckt nmos4_standard  D G S B  w=0.1  l=0.018  nf=4
+MM1 D G S B sky130_fd_pr__nfet_01v8 L=l W='w * nf ' ad='int((nf+1)/2) * W/nf * 0.29' as='int((nf+2)/2) * W/nf * 0.29'
++ pd='2*int((nf+1)/2) * (W/nf + 0.29)' ps='2*int((nf+2)/2) * (W/nf + 0.29)' nrd='0.29 / W' nrs='0.29 / W'
++ m=1
+.ends
+
+.end

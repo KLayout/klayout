@@ -142,9 +142,33 @@ private:
  *  This function is responsible for preparing (i.e. clipping) and delivering the output.
  */
 template <class X>
+void insert (X &inserter, const db::Box &o, const db::Box &tile, bool clip)
+{
+  if (clip) {
+    //  clipping
+    db::Box oc = o & tile;
+    if (! oc.empty () && oc.width () > 0 && oc.height () > 0) {
+      inserter (oc);
+    }
+  } else {
+    //  no clipping
+    inserter (o);
+  }
+}
+
+/**
+ *  @brief Delivery of tiling processor output
+ *  This utility is put between the container and the receiver.
+ *  The inserter is an object having an operator() that takes the object.
+ *  This function is responsible for preparing (i.e. clipping) and delivering the output.
+ */
+template <class X>
 void insert (X &inserter, const db::Polygon &o, const db::Box &tile, bool clip)
 {
-  if (clip && ! o.box ().inside (tile)) {
+  if (o.is_box ()) {
+    //  simple case: box
+    insert (inserter, o.box (), tile, clip);
+  } else if (clip && ! o.box ().inside (tile)) {
     //  apply clipping
     if (o.box ().touches (tile)) {
       std::vector <db::Polygon> clipped_poly;
@@ -168,7 +192,10 @@ void insert (X &inserter, const db::Polygon &o, const db::Box &tile, bool clip)
 template <class X>
 void insert (X &inserter, const db::SimplePolygon &o, const db::Box &tile, bool clip)
 {
-  if (clip && ! o.box ().inside (tile)) {
+  if (o.is_box ()) {
+    //  simple case: box
+    insert (inserter, o.box (), tile, clip);
+  } else if (clip && ! o.box ().inside (tile)) {
     //  apply clipping
     if (o.box ().touches (tile)) {
       std::vector <db::SimplePolygon> clipped_poly;
@@ -235,27 +262,6 @@ void insert (X &inserter, const db::Text &o, const db::Box &tile, bool clip)
     //  clipping
     if (o.box ().inside (tile)) {
       inserter (o);
-    }
-  } else {
-    //  no clipping
-    inserter (o);
-  }
-}
-
-/**
- *  @brief Delivery of tiling processor output
- *  This utility is put between the container and the receiver.
- *  The inserter is an object having an operator() that takes the object.
- *  This function is responsible for preparing (i.e. clipping) and delivering the output.
- */
-template <class X>
-void insert (X &inserter, const db::Box &o, const db::Box &tile, bool clip)
-{
-  if (clip) {
-    //  clipping
-    db::Box oc = o & tile;
-    if (! oc.empty ()) {
-      inserter (oc);
     }
   } else {
     //  no clipping

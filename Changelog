@@ -1,3 +1,23 @@
+0.28.6           (2023-03-16):
+* Enhancement: %GITHUB%/issues/1249 Include expanded/collapsed state of layer properties into session
+* Bugfix: %GITHUB%/issues/1265 Issues installing klayout with pip on macOS related to libpng
+* Enhancement: %GITHUB%/issues/1271 __version__ attribute in Python modules available now
+* Bugfix: %GITHUB%/issues/1287 Goto Position (CRTL+G) is not showing the origin (0,0)
+* Bugfix: %GITHUB%/issues/1291 Better compatibility of PyQt5 and KLayout (i.e. debugger does not crash)
+* Enhancement: %GITHUB%/issues/1294 Persisting layer properties in sessions
+* Bugfix: %GITHUB%/issues/1302 Select filter is not applied in partial mode
+* Bugfix: %GITHUB%/issues/1304 Spice netlist reader: should read "M" terminals in DGS order
+* Bugfix: %GITHUB%/issues/1309 Incomplete fill (polygon rasterizer issue)
+* Bugfix: %GITHUB%/issues/1315 Cannot export layers from Marker Browser in viewer mode
+* Bugfix/enhancement: some LEF/DEF parser issues solved with the help of a new complete sample case
+* Bugfix: Avoid a segfault while editing a ruler. This happens is both a selection and a transient selection is active.
+* Enhancement: Some enhancements for image editing (e.g. selection remains after moving handles)
+* Enhancement: klayout.db Python module is auto-loaded for providing stream readers
+* Enhancement: Spice reader now supports parametric subcircuits
+* Enhancement: Build issue fixed for Qt 5.15.2 bindings
+* Enhancement: Including Python's matplotlib into Windows binaries
+* Bugfix: Reading fillcell-generated inputs again into DRC deck now also works for deep mode
+  
 0.28.5           (2023-02-05):
 * Bugfix: %GITHUB%/issues/1275 Region.sized after .smooth returns empty region
   

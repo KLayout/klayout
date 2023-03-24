@@ -321,7 +321,9 @@ PythonInterpreter::PythonInterpreter (bool embedded)
   //  We can put build-in modules there.
   std::string module_path = tl::get_module_path ((void *) &reset_interpreter);
   if (! module_path.empty ()) {
-    add_path (tl::combine_path (tl::absolute_path (module_path), "pymod"));
+    add_path (tl::combine_path (tl::absolute_path (module_path), "pymod"), true /*prepend*/);
+  } else {
+    tl::warn << tl::to_string (tr ("Unable to find built-in Python module library path"));
   }
 
   PyObject *pya_module = PyImport_ImportModule (pya_module_name);
@@ -368,11 +370,15 @@ PythonInterpreter::make_string (const std::string &s)
 }
 
 void
-PythonInterpreter::add_path (const std::string &p)
+PythonInterpreter::add_path (const std::string &p, bool prepend)
 {
   PyObject *path = PySys_GetObject ((char *) "path");
   if (path != NULL && PyList_Check (path)) {
-    PyList_Append (path, c2python (p));
+    if (prepend) {
+      PyList_Insert (path, 0, c2python (p));
+    } else {
+      PyList_Append (path, c2python (p));
+    }
   }
 }
 

@@ -108,7 +108,7 @@ public:
   /**
    *  @brief Add the given path to the search path
    */
-  void add_path (const std::string &path);
+  void add_path (const std::string &path, bool prepend = false);
 
   /**
    *  @brief Adds a package location to this interpreter

@@ -814,6 +814,28 @@ TEST(20_precendence)
   );
 }
 
+//  issue #1320, .lib support
+TEST(21_lib)
+{
+  db::Netlist nl;
+
+  std::string path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader21.cir");
+
+  db::NetlistSpiceReader reader;
+  tl::InputStream is (path);
+  reader.read (is, nl);
+
+  EXPECT_EQ (nl.to_string (),
+    "circuit .TOP ();\n"
+    "  device CAP '10' (A='1',B='2') (C=1e-12,A=0,P=0);\n"
+    "  device CAP '1' (A='1',B='2') (C=1e-10,A=0,P=0);\n"
+    "  device CAP '2A' (A='1',B='2') (C=1.01e-10,A=0,P=0);\n"
+    "  device CAP '2B' (A='1',B='2') (C=1.02e-10,A=0,P=0);\n"
+    "  device CAP '100' (A='1',B='2') (C=1.5e-11,A=0,P=0);\n"
+    "end;\n"
+  );
+}
+
 TEST(100_ExpressionParser)
 {
   std::map<std::string, tl::Variant> vars;

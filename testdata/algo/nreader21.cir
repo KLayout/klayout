@@ -1,0 +1,6 @@
+
+.lib nreader21_lib1.cir lib1
+.lib nreader21_lib1.cir lib2
+
+C100 1 2 15p
+

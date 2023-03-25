@@ -322,6 +322,26 @@ static void _call_f_setType_2399 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
+// void QSqlError::swap(QSqlError &other)
+
+
+static void _init_f_swap_1525 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<QSqlError & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_swap_1525 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QSqlError &arg1 = gsi::arg_reader<QSqlError & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QSqlError *)cls)->swap (arg1);
+}
+
+
 // QString QSqlError::text()
 
 
@@ -373,6 +393,7 @@ static gsi::Methods methods_QSqlError () {
   methods += new qt_gsi::GenericMethod ("setDriverText|driverText=", "@brief Method void QSqlError::setDriverText(const QString &driverText)\n", false, &_init_f_setDriverText_2025, &_call_f_setDriverText_2025);
   methods += new qt_gsi::GenericMethod ("setNumber|number=", "@brief Method void QSqlError::setNumber(int number)\n", false, &_init_f_setNumber_767, &_call_f_setNumber_767);
   methods += new qt_gsi::GenericMethod ("setType|type=", "@brief Method void QSqlError::setType(QSqlError::ErrorType type)\n", false, &_init_f_setType_2399, &_call_f_setType_2399);
+  methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QSqlError::swap(QSqlError &other)\n", false, &_init_f_swap_1525, &_call_f_swap_1525);
   methods += new qt_gsi::GenericMethod ("text", "@brief Method QString QSqlError::text()\n", true, &_init_f_text_c0, &_call_f_text_c0);
   methods += new qt_gsi::GenericMethod (":type", "@brief Method QSqlError::ErrorType QSqlError::type()\n", true, &_init_f_type_c0, &_call_f_type_c0);
   return methods;

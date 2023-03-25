@@ -611,33 +611,33 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QAudioDecoderControl::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QAudioDecoderControl::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QAudioDecoderControl::event(arg1);
+    return QAudioDecoderControl::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QAudioDecoderControl_Adaptor, bool, QEvent *>(&QAudioDecoderControl_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QAudioDecoderControl_Adaptor, bool, QEvent *>(&QAudioDecoderControl_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QAudioDecoderControl::event(arg1);
+      return QAudioDecoderControl::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QAudioDecoderControl::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QAudioDecoderControl::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QAudioDecoderControl::eventFilter(arg1, arg2);
+    return QAudioDecoderControl::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QAudioDecoderControl_Adaptor, bool, QObject *, QEvent *>(&QAudioDecoderControl_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QAudioDecoderControl_Adaptor, bool, QObject *, QEvent *>(&QAudioDecoderControl_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QAudioDecoderControl::eventFilter(arg1, arg2);
+      return QAudioDecoderControl::eventFilter(watched, event);
     }
   }
 
@@ -794,33 +794,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QAudioDecoderControl::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QAudioDecoderControl::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QAudioDecoderControl::childEvent(arg1);
+    QAudioDecoderControl::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QAudioDecoderControl_Adaptor, QChildEvent *>(&QAudioDecoderControl_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QAudioDecoderControl_Adaptor, QChildEvent *>(&QAudioDecoderControl_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QAudioDecoderControl::childEvent(arg1);
+      QAudioDecoderControl::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QAudioDecoderControl::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QAudioDecoderControl::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QAudioDecoderControl::customEvent(arg1);
+    QAudioDecoderControl::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QAudioDecoderControl_Adaptor, QEvent *>(&QAudioDecoderControl_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QAudioDecoderControl_Adaptor, QEvent *>(&QAudioDecoderControl_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QAudioDecoderControl::customEvent(arg1);
+      QAudioDecoderControl::customEvent(event);
     }
   }
 
@@ -839,18 +839,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QAudioDecoderControl::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QAudioDecoderControl::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QAudioDecoderControl::timerEvent(arg1);
+    QAudioDecoderControl::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QAudioDecoderControl_Adaptor, QTimerEvent *>(&QAudioDecoderControl_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QAudioDecoderControl_Adaptor, QTimerEvent *>(&QAudioDecoderControl_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QAudioDecoderControl::timerEvent(arg1);
+      QAudioDecoderControl::timerEvent(event);
     }
   }
 
@@ -929,11 +929,11 @@ static void _set_callback_cbs_bufferAvailable_c0_0 (void *cls, const gsi::Callba
 }
 
 
-// void QAudioDecoderControl::childEvent(QChildEvent *)
+// void QAudioDecoderControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -953,11 +953,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QAudioDecoderControl::customEvent(QEvent *)
+// void QAudioDecoderControl::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1020,11 +1020,11 @@ static void _set_callback_cbs_duration_c0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QAudioDecoderControl::event(QEvent *)
+// bool QAudioDecoderControl::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -1043,13 +1043,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QAudioDecoderControl::eventFilter(QObject *, QEvent *)
+// bool QAudioDecoderControl::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -1340,11 +1340,11 @@ static void _set_callback_cbs_stop_0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QAudioDecoderControl::timerEvent(QTimerEvent *)
+// void QAudioDecoderControl::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1376,17 +1376,17 @@ static gsi::Methods methods_QAudioDecoderControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("audioFormat", "@hide", true, &_init_cbs_audioFormat_c0_0, &_call_cbs_audioFormat_c0_0, &_set_callback_cbs_audioFormat_c0_0);
   methods += new qt_gsi::GenericMethod ("bufferAvailable", "@brief Virtual method bool QAudioDecoderControl::bufferAvailable()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_bufferAvailable_c0_0, &_call_cbs_bufferAvailable_c0_0);
   methods += new qt_gsi::GenericMethod ("bufferAvailable", "@hide", true, &_init_cbs_bufferAvailable_c0_0, &_call_cbs_bufferAvailable_c0_0, &_set_callback_cbs_bufferAvailable_c0_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QAudioDecoderControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QAudioDecoderControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAudioDecoderControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAudioDecoderControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QAudioDecoderControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("duration", "@brief Virtual method qint64 QAudioDecoderControl::duration()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_duration_c0_0, &_call_cbs_duration_c0_0);
   methods += new qt_gsi::GenericMethod ("duration", "@hide", true, &_init_cbs_duration_c0_0, &_call_cbs_duration_c0_0, &_set_callback_cbs_duration_c0_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAudioDecoderControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAudioDecoderControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QAudioDecoderControl::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QAudioDecoderControl::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QAudioDecoderControl::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("position", "@brief Virtual method qint64 QAudioDecoderControl::position()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_position_c0_0, &_call_cbs_position_c0_0);
@@ -1412,7 +1412,7 @@ static gsi::Methods methods_QAudioDecoderControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("state", "@hide", true, &_init_cbs_state_c0_0, &_call_cbs_state_c0_0, &_set_callback_cbs_state_c0_0);
   methods += new qt_gsi::GenericMethod ("stop", "@brief Virtual method void QAudioDecoderControl::stop()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_stop_0_0, &_call_cbs_stop_0_0);
   methods += new qt_gsi::GenericMethod ("stop", "@hide", false, &_init_cbs_stop_0_0, &_call_cbs_stop_0_0, &_set_callback_cbs_stop_0_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QAudioDecoderControl::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QAudioDecoderControl::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

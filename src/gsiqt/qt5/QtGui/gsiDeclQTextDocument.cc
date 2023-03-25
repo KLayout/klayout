@@ -276,7 +276,7 @@ static void _call_f_clearUndoRedoStacks_2502 (const qt_gsi::GenericMethod * /*de
 
 static void _init_f_clone_c1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<QTextDocument * > ();
 }
@@ -285,7 +285,7 @@ static void _call_f_clone_c1302 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QTextDocument * > ((QTextDocument *)((QTextDocument *)cls)->clone (arg1));
 }
 
@@ -427,7 +427,7 @@ static void _init_f_find_c5920 (qt_gsi::GenericMethod *decl)
   decl->add_arg<const QString & > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("from", true, "0");
   decl->add_arg<int > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("options", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("options", true, "QTextDocument::FindFlags()");
   decl->add_arg<QFlags<QTextDocument::FindFlag> > (argspec_2);
   decl->set_return<QTextCursor > ();
 }
@@ -438,7 +438,7 @@ static void _call_f_find_c5920 (const qt_gsi::GenericMethod * /*decl*/, void *cl
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
-  QFlags<QTextDocument::FindFlag> arg3 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (0, heap);
+  QFlags<QTextDocument::FindFlag> arg3 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (QTextDocument::FindFlags(), heap);
   ret.write<QTextCursor > ((QTextCursor)((QTextDocument *)cls)->find (arg1, arg2, arg3));
 }
 
@@ -452,7 +452,7 @@ static void _init_f_find_c7606 (qt_gsi::GenericMethod *decl)
   decl->add_arg<const QString & > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("cursor");
   decl->add_arg<const QTextCursor & > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("options", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("options", true, "QTextDocument::FindFlags()");
   decl->add_arg<QFlags<QTextDocument::FindFlag> > (argspec_2);
   decl->set_return<QTextCursor > ();
 }
@@ -463,7 +463,7 @@ static void _call_f_find_c7606 (const qt_gsi::GenericMethod * /*decl*/, void *cl
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   const QTextCursor &arg2 = gsi::arg_reader<const QTextCursor & >() (args, heap);
-  QFlags<QTextDocument::FindFlag> arg3 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (0, heap);
+  QFlags<QTextDocument::FindFlag> arg3 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (QTextDocument::FindFlags(), heap);
   ret.write<QTextCursor > ((QTextCursor)((QTextDocument *)cls)->find (arg1, arg2, arg3));
 }
 
@@ -477,7 +477,7 @@ static void _init_f_find_c5876 (qt_gsi::GenericMethod *decl)
   decl->add_arg<const QRegExp & > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("from", true, "0");
   decl->add_arg<int > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("options", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("options", true, "QTextDocument::FindFlags()");
   decl->add_arg<QFlags<QTextDocument::FindFlag> > (argspec_2);
   decl->set_return<QTextCursor > ();
 }
@@ -488,7 +488,7 @@ static void _call_f_find_c5876 (const qt_gsi::GenericMethod * /*decl*/, void *cl
   tl::Heap heap;
   const QRegExp &arg1 = gsi::arg_reader<const QRegExp & >() (args, heap);
   int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
-  QFlags<QTextDocument::FindFlag> arg3 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (0, heap);
+  QFlags<QTextDocument::FindFlag> arg3 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (QTextDocument::FindFlags(), heap);
   ret.write<QTextCursor > ((QTextCursor)((QTextDocument *)cls)->find (arg1, arg2, arg3));
 }
 
@@ -502,7 +502,7 @@ static void _init_f_find_c7562 (qt_gsi::GenericMethod *decl)
   decl->add_arg<const QRegExp & > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("cursor");
   decl->add_arg<const QTextCursor & > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("options", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("options", true, "QTextDocument::FindFlags()");
   decl->add_arg<QFlags<QTextDocument::FindFlag> > (argspec_2);
   decl->set_return<QTextCursor > ();
 }
@@ -513,7 +513,7 @@ static void _call_f_find_c7562 (const qt_gsi::GenericMethod * /*decl*/, void *cl
   tl::Heap heap;
   const QRegExp &arg1 = gsi::arg_reader<const QRegExp & >() (args, heap);
   const QTextCursor &arg2 = gsi::arg_reader<const QTextCursor & >() (args, heap);
-  QFlags<QTextDocument::FindFlag> arg3 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (0, heap);
+  QFlags<QTextDocument::FindFlag> arg3 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (QTextDocument::FindFlags(), heap);
   ret.write<QTextCursor > ((QTextCursor)((QTextDocument *)cls)->find (arg1, arg2, arg3));
 }
 
@@ -527,7 +527,7 @@ static void _init_f_find_c7083 (qt_gsi::GenericMethod *decl)
   decl->add_arg<const QRegularExpression & > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("from", true, "0");
   decl->add_arg<int > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("options", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("options", true, "QTextDocument::FindFlags()");
   decl->add_arg<QFlags<QTextDocument::FindFlag> > (argspec_2);
   decl->set_return<QTextCursor > ();
 }
@@ -538,7 +538,7 @@ static void _call_f_find_c7083 (const qt_gsi::GenericMethod * /*decl*/, void *cl
   tl::Heap heap;
   const QRegularExpression &arg1 = gsi::arg_reader<const QRegularExpression & >() (args, heap);
   int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
-  QFlags<QTextDocument::FindFlag> arg3 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (0, heap);
+  QFlags<QTextDocument::FindFlag> arg3 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (QTextDocument::FindFlags(), heap);
   ret.write<QTextCursor > ((QTextCursor)((QTextDocument *)cls)->find (arg1, arg2, arg3));
 }
 
@@ -552,7 +552,7 @@ static void _init_f_find_c8769 (qt_gsi::GenericMethod *decl)
   decl->add_arg<const QRegularExpression & > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("cursor");
   decl->add_arg<const QTextCursor & > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("options", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("options", true, "QTextDocument::FindFlags()");
   decl->add_arg<QFlags<QTextDocument::FindFlag> > (argspec_2);
   decl->set_return<QTextCursor > ();
 }
@@ -563,7 +563,7 @@ static void _call_f_find_c8769 (const qt_gsi::GenericMethod * /*decl*/, void *cl
   tl::Heap heap;
   const QRegularExpression &arg1 = gsi::arg_reader<const QRegularExpression & >() (args, heap);
   const QTextCursor &arg2 = gsi::arg_reader<const QTextCursor & >() (args, heap);
-  QFlags<QTextDocument::FindFlag> arg3 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (0, heap);
+  QFlags<QTextDocument::FindFlag> arg3 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (QTextDocument::FindFlags(), heap);
   ret.write<QTextCursor > ((QTextCursor)((QTextDocument *)cls)->find (arg1, arg2, arg3));
 }
 
@@ -1434,6 +1434,21 @@ static void _call_f_toPlainText_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
+// QString QTextDocument::toRawText()
+
+
+static void _init_f_toRawText_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QString > ();
+}
+
+static void _call_f_toRawText_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QString > ((QString)((QTextDocument *)cls)->toRawText ());
+}
+
+
 // void QTextDocument::undo(QTextCursor *cursor)
 
 
@@ -1616,6 +1631,7 @@ static gsi::Methods methods_QTextDocument () {
   methods += new qt_gsi::GenericMethod (":textWidth", "@brief Method double QTextDocument::textWidth()\n", true, &_init_f_textWidth_c0, &_call_f_textWidth_c0);
   methods += new qt_gsi::GenericMethod ("toHtml", "@brief Method QString QTextDocument::toHtml(const QByteArray &encoding)\n", true, &_init_f_toHtml_c2309, &_call_f_toHtml_c2309);
   methods += new qt_gsi::GenericMethod ("toPlainText", "@brief Method QString QTextDocument::toPlainText()\n", true, &_init_f_toPlainText_c0, &_call_f_toPlainText_c0);
+  methods += new qt_gsi::GenericMethod ("toRawText", "@brief Method QString QTextDocument::toRawText()\n", true, &_init_f_toRawText_c0, &_call_f_toRawText_c0);
   methods += new qt_gsi::GenericMethod ("undo", "@brief Method void QTextDocument::undo(QTextCursor *cursor)\n", false, &_init_f_undo_1762, &_call_f_undo_1762);
   methods += new qt_gsi::GenericMethod ("undo", "@brief Method void QTextDocument::undo()\n", false, &_init_f_undo_0, &_call_f_undo_0);
   methods += new qt_gsi::GenericMethod (":useDesignMetrics", "@brief Method bool QTextDocument::useDesignMetrics()\n", true, &_init_f_useDesignMetrics_c0, &_call_f_useDesignMetrics_c0);
@@ -1754,33 +1770,33 @@ public:
     emit QTextDocument::documentLayoutChanged();
   }
 
-  //  [adaptor impl] bool QTextDocument::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QTextDocument::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QTextDocument::event(arg1);
+    return QTextDocument::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QTextDocument_Adaptor, bool, QEvent *>(&QTextDocument_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QTextDocument_Adaptor, bool, QEvent *>(&QTextDocument_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QTextDocument::event(arg1);
+      return QTextDocument::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QTextDocument::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QTextDocument::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QTextDocument::eventFilter(arg1, arg2);
+    return QTextDocument::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QTextDocument_Adaptor, bool, QObject *, QEvent *>(&QTextDocument_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QTextDocument_Adaptor, bool, QObject *, QEvent *>(&QTextDocument_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QTextDocument::eventFilter(arg1, arg2);
+      return QTextDocument::eventFilter(watched, event);
     }
   }
 
@@ -1815,18 +1831,18 @@ public:
     emit QTextDocument::undoCommandAdded();
   }
 
-  //  [adaptor impl] void QTextDocument::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QTextDocument::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QTextDocument::childEvent(arg1);
+    QTextDocument::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QTextDocument_Adaptor, QChildEvent *>(&QTextDocument_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QTextDocument_Adaptor, QChildEvent *>(&QTextDocument_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QTextDocument::childEvent(arg1);
+      QTextDocument::childEvent(event);
     }
   }
 
@@ -1845,18 +1861,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTextDocument::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QTextDocument::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QTextDocument::customEvent(arg1);
+    QTextDocument::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QTextDocument_Adaptor, QEvent *>(&QTextDocument_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QTextDocument_Adaptor, QEvent *>(&QTextDocument_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QTextDocument::customEvent(arg1);
+      QTextDocument::customEvent(event);
     }
   }
 
@@ -1890,18 +1906,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTextDocument::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QTextDocument::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QTextDocument::timerEvent(arg1);
+    QTextDocument::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QTextDocument_Adaptor, QTimerEvent *>(&QTextDocument_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QTextDocument_Adaptor, QTimerEvent *>(&QTextDocument_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QTextDocument::timerEvent(arg1);
+      QTextDocument::timerEvent(event);
     }
   }
 
@@ -1922,7 +1938,7 @@ QTextDocument_Adaptor::~QTextDocument_Adaptor() { }
 
 static void _init_ctor_QTextDocument_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QTextDocument_Adaptor> ();
 }
@@ -1931,7 +1947,7 @@ static void _call_ctor_QTextDocument_Adaptor_1302 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QTextDocument_Adaptor *> (new QTextDocument_Adaptor (arg1));
 }
 
@@ -1942,7 +1958,7 @@ static void _init_ctor_QTextDocument_Adaptor_3219 (qt_gsi::GenericStaticMethod *
 {
   static gsi::ArgSpecBase argspec_0 ("text");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_1);
   decl->set_return_new<QTextDocument_Adaptor> ();
 }
@@ -1952,7 +1968,7 @@ static void _call_ctor_QTextDocument_Adaptor_3219 (const qt_gsi::GenericStaticMe
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QTextDocument_Adaptor *> (new QTextDocument_Adaptor (arg1, arg2));
 }
 
@@ -1993,11 +2009,11 @@ static void _call_emitter_blockCountChanged_767 (const qt_gsi::GenericMethod * /
 }
 
 
-// void QTextDocument::childEvent(QChildEvent *)
+// void QTextDocument::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2116,11 +2132,11 @@ static void _call_emitter_cursorPositionChanged_2453 (const qt_gsi::GenericMetho
 }
 
 
-// void QTextDocument::customEvent(QEvent *)
+// void QTextDocument::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2144,7 +2160,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2153,7 +2169,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QTextDocument_Adaptor *)cls)->emitter_QTextDocument_destroyed_1302 (arg1);
 }
 
@@ -2196,11 +2212,11 @@ static void _call_emitter_documentLayoutChanged_0 (const qt_gsi::GenericMethod *
 }
 
 
-// bool QTextDocument::event(QEvent *)
+// bool QTextDocument::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -2219,13 +2235,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QTextDocument::eventFilter(QObject *, QEvent *)
+// bool QTextDocument::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -2389,11 +2405,11 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QTextDocument::timerEvent(QTimerEvent *)
+// void QTextDocument::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2456,7 +2472,7 @@ static gsi::Methods methods_QTextDocument_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTextDocument::QTextDocument(const QString &text, QObject *parent)\nThis method creates an object of class QTextDocument.", &_init_ctor_QTextDocument_Adaptor_3219, &_call_ctor_QTextDocument_Adaptor_3219);
   methods += new qt_gsi::GenericMethod ("emit_baseUrlChanged", "@brief Emitter for signal void QTextDocument::baseUrlChanged(const QUrl &url)\nCall this method to emit this signal.", false, &_init_emitter_baseUrlChanged_1701, &_call_emitter_baseUrlChanged_1701);
   methods += new qt_gsi::GenericMethod ("emit_blockCountChanged", "@brief Emitter for signal void QTextDocument::blockCountChanged(int newBlockCount)\nCall this method to emit this signal.", false, &_init_emitter_blockCountChanged_767, &_call_emitter_blockCountChanged_767);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QTextDocument::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QTextDocument::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Virtual method void QTextDocument::clear()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_clear_0_0, &_call_cbs_clear_0_0);
   methods += new qt_gsi::GenericMethod ("clear", "@hide", false, &_init_cbs_clear_0_0, &_call_cbs_clear_0_0, &_set_callback_cbs_clear_0_0);
@@ -2465,15 +2481,15 @@ static gsi::Methods methods_QTextDocument_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*createObject", "@brief Virtual method QTextObject *QTextDocument::createObject(const QTextFormat &f)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_createObject_2432_0, &_call_cbs_createObject_2432_0);
   methods += new qt_gsi::GenericMethod ("*createObject", "@hide", false, &_init_cbs_createObject_2432_0, &_call_cbs_createObject_2432_0, &_set_callback_cbs_createObject_2432_0);
   methods += new qt_gsi::GenericMethod ("emit_cursorPositionChanged", "@brief Emitter for signal void QTextDocument::cursorPositionChanged(const QTextCursor &cursor)\nCall this method to emit this signal.", false, &_init_emitter_cursorPositionChanged_2453, &_call_emitter_cursorPositionChanged_2453);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QTextDocument::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QTextDocument::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QTextDocument::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QTextDocument::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("emit_documentLayoutChanged", "@brief Emitter for signal void QTextDocument::documentLayoutChanged()\nCall this method to emit this signal.", false, &_init_emitter_documentLayoutChanged_0, &_call_emitter_documentLayoutChanged_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QTextDocument::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QTextDocument::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QTextDocument::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QTextDocument::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QTextDocument::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("*loadResource", "@brief Virtual method QVariant QTextDocument::loadResource(int type, const QUrl &name)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_loadResource_2360_0, &_call_cbs_loadResource_2360_0);
@@ -2484,7 +2500,7 @@ static gsi::Methods methods_QTextDocument_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_redoAvailable", "@brief Emitter for signal void QTextDocument::redoAvailable(bool)\nCall this method to emit this signal.", false, &_init_emitter_redoAvailable_864, &_call_emitter_redoAvailable_864);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QTextDocument::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QTextDocument::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QTextDocument::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QTextDocument::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("emit_undoAvailable", "@brief Emitter for signal void QTextDocument::undoAvailable(bool)\nCall this method to emit this signal.", false, &_init_emitter_undoAvailable_864, &_call_emitter_undoAvailable_864);
   methods += new qt_gsi::GenericMethod ("emit_undoCommandAdded", "@brief Emitter for signal void QTextDocument::undoCommandAdded()\nCall this method to emit this signal.", false, &_init_emitter_undoCommandAdded_0, &_call_emitter_undoCommandAdded_0);

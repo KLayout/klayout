@@ -330,33 +330,33 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QAudioInputSelectorControl::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QAudioInputSelectorControl::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QAudioInputSelectorControl::event(arg1);
+    return QAudioInputSelectorControl::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QAudioInputSelectorControl_Adaptor, bool, QEvent *>(&QAudioInputSelectorControl_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QAudioInputSelectorControl_Adaptor, bool, QEvent *>(&QAudioInputSelectorControl_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QAudioInputSelectorControl::event(arg1);
+      return QAudioInputSelectorControl::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QAudioInputSelectorControl::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QAudioInputSelectorControl::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QAudioInputSelectorControl::eventFilter(arg1, arg2);
+    return QAudioInputSelectorControl::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QAudioInputSelectorControl_Adaptor, bool, QObject *, QEvent *>(&QAudioInputSelectorControl_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QAudioInputSelectorControl_Adaptor, bool, QObject *, QEvent *>(&QAudioInputSelectorControl_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QAudioInputSelectorControl::eventFilter(arg1, arg2);
+      return QAudioInputSelectorControl::eventFilter(watched, event);
     }
   }
 
@@ -392,33 +392,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QAudioInputSelectorControl::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QAudioInputSelectorControl::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QAudioInputSelectorControl::childEvent(arg1);
+    QAudioInputSelectorControl::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QAudioInputSelectorControl_Adaptor, QChildEvent *>(&QAudioInputSelectorControl_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QAudioInputSelectorControl_Adaptor, QChildEvent *>(&QAudioInputSelectorControl_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QAudioInputSelectorControl::childEvent(arg1);
+      QAudioInputSelectorControl::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QAudioInputSelectorControl::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QAudioInputSelectorControl::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QAudioInputSelectorControl::customEvent(arg1);
+    QAudioInputSelectorControl::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QAudioInputSelectorControl_Adaptor, QEvent *>(&QAudioInputSelectorControl_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QAudioInputSelectorControl_Adaptor, QEvent *>(&QAudioInputSelectorControl_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QAudioInputSelectorControl::customEvent(arg1);
+      QAudioInputSelectorControl::customEvent(event);
     }
   }
 
@@ -437,18 +437,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QAudioInputSelectorControl::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QAudioInputSelectorControl::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QAudioInputSelectorControl::timerEvent(arg1);
+    QAudioInputSelectorControl::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QAudioInputSelectorControl_Adaptor, QTimerEvent *>(&QAudioInputSelectorControl_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QAudioInputSelectorControl_Adaptor, QTimerEvent *>(&QAudioInputSelectorControl_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QAudioInputSelectorControl::timerEvent(arg1);
+      QAudioInputSelectorControl::timerEvent(event);
     }
   }
 
@@ -519,11 +519,11 @@ static void _set_callback_cbs_availableInputs_c0_0 (void *cls, const gsi::Callba
 }
 
 
-// void QAudioInputSelectorControl::childEvent(QChildEvent *)
+// void QAudioInputSelectorControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -543,11 +543,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QAudioInputSelectorControl::customEvent(QEvent *)
+// void QAudioInputSelectorControl::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -610,11 +610,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QAudioInputSelectorControl::event(QEvent *)
+// bool QAudioInputSelectorControl::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -633,13 +633,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QAudioInputSelectorControl::eventFilter(QObject *, QEvent *)
+// bool QAudioInputSelectorControl::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -770,11 +770,11 @@ static void _set_callback_cbs_setActiveInput_2025_0 (void *cls, const gsi::Callb
 }
 
 
-// void QAudioInputSelectorControl::timerEvent(QTimerEvent *)
+// void QAudioInputSelectorControl::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -806,17 +806,17 @@ static gsi::Methods methods_QAudioInputSelectorControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("activeInput", "@hide", true, &_init_cbs_activeInput_c0_0, &_call_cbs_activeInput_c0_0, &_set_callback_cbs_activeInput_c0_0);
   methods += new qt_gsi::GenericMethod ("availableInputs", "@brief Virtual method QList<QString> QAudioInputSelectorControl::availableInputs()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_availableInputs_c0_0, &_call_cbs_availableInputs_c0_0);
   methods += new qt_gsi::GenericMethod ("availableInputs", "@hide", true, &_init_cbs_availableInputs_c0_0, &_call_cbs_availableInputs_c0_0, &_set_callback_cbs_availableInputs_c0_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QAudioInputSelectorControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QAudioInputSelectorControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAudioInputSelectorControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAudioInputSelectorControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("defaultInput", "@brief Virtual method QString QAudioInputSelectorControl::defaultInput()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_defaultInput_c0_0, &_call_cbs_defaultInput_c0_0);
   methods += new qt_gsi::GenericMethod ("defaultInput", "@hide", true, &_init_cbs_defaultInput_c0_0, &_call_cbs_defaultInput_c0_0, &_set_callback_cbs_defaultInput_c0_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QAudioInputSelectorControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAudioInputSelectorControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAudioInputSelectorControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QAudioInputSelectorControl::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QAudioInputSelectorControl::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("inputDescription", "@brief Virtual method QString QAudioInputSelectorControl::inputDescription(const QString &name)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_inputDescription_c2025_0, &_call_cbs_inputDescription_c2025_0);
   methods += new qt_gsi::GenericMethod ("inputDescription", "@hide", true, &_init_cbs_inputDescription_c2025_0, &_call_cbs_inputDescription_c2025_0, &_set_callback_cbs_inputDescription_c2025_0);
@@ -826,7 +826,7 @@ static gsi::Methods methods_QAudioInputSelectorControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QAudioInputSelectorControl::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("setActiveInput", "@brief Virtual method void QAudioInputSelectorControl::setActiveInput(const QString &name)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setActiveInput_2025_0, &_call_cbs_setActiveInput_2025_0);
   methods += new qt_gsi::GenericMethod ("setActiveInput", "@hide", false, &_init_cbs_setActiveInput_2025_0, &_call_cbs_setActiveInput_2025_0, &_set_callback_cbs_setActiveInput_2025_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QAudioInputSelectorControl::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QAudioInputSelectorControl::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

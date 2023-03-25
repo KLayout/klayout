@@ -384,6 +384,44 @@ static void _call_f_isItemSelected_c2897 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
+// bool QTableWidget::isPersistentEditorOpen(const QModelIndex &index)
+
+
+static void _init_f_isPersistentEditorOpen_c2395 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("index");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isPersistentEditorOpen_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  ret.write<bool > ((bool)((QTableWidget *)cls)->isPersistentEditorOpen (arg1));
+}
+
+
+// bool QTableWidget::isPersistentEditorOpen(QTableWidgetItem *item)
+
+
+static void _init_f_isPersistentEditorOpen_c2202 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("item");
+  decl->add_arg<QTableWidgetItem * > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isPersistentEditorOpen_c2202 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QTableWidgetItem *arg1 = gsi::arg_reader<QTableWidgetItem * >() (args, heap);
+  ret.write<bool > ((bool)((QTableWidget *)cls)->isPersistentEditorOpen (arg1));
+}
+
+
 // bool QTableWidget::isSortingEnabled()
 
 
@@ -1234,6 +1272,8 @@ static gsi::Methods methods_QTableWidget () {
   methods += new qt_gsi::GenericMethod ("insertColumn", "@brief Method void QTableWidget::insertColumn(int column)\n", false, &_init_f_insertColumn_767, &_call_f_insertColumn_767);
   methods += new qt_gsi::GenericMethod ("insertRow", "@brief Method void QTableWidget::insertRow(int row)\n", false, &_init_f_insertRow_767, &_call_f_insertRow_767);
   methods += new qt_gsi::GenericMethod ("isItemSelected?", "@brief Method bool QTableWidget::isItemSelected(const QTableWidgetItem *item)\n", true, &_init_f_isItemSelected_c2897, &_call_f_isItemSelected_c2897);
+  methods += new qt_gsi::GenericMethod ("isPersistentEditorOpen?", "@brief Method bool QTableWidget::isPersistentEditorOpen(const QModelIndex &index)\n", true, &_init_f_isPersistentEditorOpen_c2395, &_call_f_isPersistentEditorOpen_c2395);
+  methods += new qt_gsi::GenericMethod ("isPersistentEditorOpen?", "@brief Method bool QTableWidget::isPersistentEditorOpen(QTableWidgetItem *item)\n", true, &_init_f_isPersistentEditorOpen_c2202, &_call_f_isPersistentEditorOpen_c2202);
   methods += new qt_gsi::GenericMethod ("isSortingEnabled?|:sortingEnabled", "@brief Method bool QTableWidget::isSortingEnabled()\n", true, &_init_f_isSortingEnabled_c0, &_call_f_isSortingEnabled_c0);
   methods += new qt_gsi::GenericMethod ("item", "@brief Method QTableWidgetItem *QTableWidget::item(int row, int column)\n", true, &_init_f_item_c1426, &_call_f_item_c1426);
   methods += new qt_gsi::GenericMethod ("itemAt", "@brief Method QTableWidgetItem *QTableWidget::itemAt(const QPoint &p)\n", true, &_init_f_itemAt_c1916, &_call_f_itemAt_c1916);
@@ -1409,6 +1449,11 @@ public:
   //  [expose] int QTableWidget::horizontalStepsPerItem()
   int fp_QTableWidget_horizontalStepsPerItem_c0 () const {
     return QTableWidget::horizontalStepsPerItem();
+  }
+
+  //  [expose] QModelIndex QTableWidget::indexFromItem(const QTableWidgetItem *item)
+  QModelIndex fp_QTableWidget_indexFromItem_c2897 (const QTableWidgetItem *item) const {
+    return QTableWidget::indexFromItem(item);
   }
 
   //  [expose] QModelIndex QTableWidget::indexFromItem(QTableWidgetItem *item)
@@ -1960,18 +2005,18 @@ public:
     emit QTableWidget::windowTitleChanged(title);
   }
 
-  //  [adaptor impl] void QTableWidget::actionEvent(QActionEvent *)
-  void cbs_actionEvent_1823_0(QActionEvent *arg1)
+  //  [adaptor impl] void QTableWidget::actionEvent(QActionEvent *event)
+  void cbs_actionEvent_1823_0(QActionEvent *event)
   {
-    QTableWidget::actionEvent(arg1);
+    QTableWidget::actionEvent(event);
   }
 
-  virtual void actionEvent(QActionEvent *arg1)
+  virtual void actionEvent(QActionEvent *event)
   {
     if (cb_actionEvent_1823_0.can_issue()) {
-      cb_actionEvent_1823_0.issue<QTableWidget_Adaptor, QActionEvent *>(&QTableWidget_Adaptor::cbs_actionEvent_1823_0, arg1);
+      cb_actionEvent_1823_0.issue<QTableWidget_Adaptor, QActionEvent *>(&QTableWidget_Adaptor::cbs_actionEvent_1823_0, event);
     } else {
-      QTableWidget::actionEvent(arg1);
+      QTableWidget::actionEvent(event);
     }
   }
 
@@ -1990,18 +2035,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTableWidget::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QTableWidget::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QTableWidget::childEvent(arg1);
+    QTableWidget::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QTableWidget_Adaptor, QChildEvent *>(&QTableWidget_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QTableWidget_Adaptor, QChildEvent *>(&QTableWidget_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QTableWidget::childEvent(arg1);
+      QTableWidget::childEvent(event);
     }
   }
 
@@ -2020,18 +2065,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTableWidget::closeEvent(QCloseEvent *)
-  void cbs_closeEvent_1719_0(QCloseEvent *arg1)
+  //  [adaptor impl] void QTableWidget::closeEvent(QCloseEvent *event)
+  void cbs_closeEvent_1719_0(QCloseEvent *event)
   {
-    QTableWidget::closeEvent(arg1);
+    QTableWidget::closeEvent(event);
   }
 
-  virtual void closeEvent(QCloseEvent *arg1)
+  virtual void closeEvent(QCloseEvent *event)
   {
     if (cb_closeEvent_1719_0.can_issue()) {
-      cb_closeEvent_1719_0.issue<QTableWidget_Adaptor, QCloseEvent *>(&QTableWidget_Adaptor::cbs_closeEvent_1719_0, arg1);
+      cb_closeEvent_1719_0.issue<QTableWidget_Adaptor, QCloseEvent *>(&QTableWidget_Adaptor::cbs_closeEvent_1719_0, event);
     } else {
-      QTableWidget::closeEvent(arg1);
+      QTableWidget::closeEvent(event);
     }
   }
 
@@ -2080,18 +2125,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTableWidget::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QTableWidget::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QTableWidget::customEvent(arg1);
+    QTableWidget::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QTableWidget_Adaptor, QEvent *>(&QTableWidget_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QTableWidget_Adaptor, QEvent *>(&QTableWidget_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QTableWidget::customEvent(arg1);
+      QTableWidget::customEvent(event);
     }
   }
 
@@ -2230,18 +2275,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTableWidget::enterEvent(QEvent *)
-  void cbs_enterEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QTableWidget::enterEvent(QEvent *event)
+  void cbs_enterEvent_1217_0(QEvent *event)
   {
-    QTableWidget::enterEvent(arg1);
+    QTableWidget::enterEvent(event);
   }
 
-  virtual void enterEvent(QEvent *arg1)
+  virtual void enterEvent(QEvent *event)
   {
     if (cb_enterEvent_1217_0.can_issue()) {
-      cb_enterEvent_1217_0.issue<QTableWidget_Adaptor, QEvent *>(&QTableWidget_Adaptor::cbs_enterEvent_1217_0, arg1);
+      cb_enterEvent_1217_0.issue<QTableWidget_Adaptor, QEvent *>(&QTableWidget_Adaptor::cbs_enterEvent_1217_0, event);
     } else {
-      QTableWidget::enterEvent(arg1);
+      QTableWidget::enterEvent(event);
     }
   }
 
@@ -2260,18 +2305,18 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QTableWidget::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QTableWidget::eventFilter(QObject *object, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *object, QEvent *event)
   {
-    return QTableWidget::eventFilter(arg1, arg2);
+    return QTableWidget::eventFilter(object, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *object, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QTableWidget_Adaptor, bool, QObject *, QEvent *>(&QTableWidget_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QTableWidget_Adaptor, bool, QObject *, QEvent *>(&QTableWidget_Adaptor::cbs_eventFilter_2411_0, object, event);
     } else {
-      return QTableWidget::eventFilter(arg1, arg2);
+      return QTableWidget::eventFilter(object, event);
     }
   }
 
@@ -2320,18 +2365,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTableWidget::hideEvent(QHideEvent *)
-  void cbs_hideEvent_1595_0(QHideEvent *arg1)
+  //  [adaptor impl] void QTableWidget::hideEvent(QHideEvent *event)
+  void cbs_hideEvent_1595_0(QHideEvent *event)
   {
-    QTableWidget::hideEvent(arg1);
+    QTableWidget::hideEvent(event);
   }
 
-  virtual void hideEvent(QHideEvent *arg1)
+  virtual void hideEvent(QHideEvent *event)
   {
     if (cb_hideEvent_1595_0.can_issue()) {
-      cb_hideEvent_1595_0.issue<QTableWidget_Adaptor, QHideEvent *>(&QTableWidget_Adaptor::cbs_hideEvent_1595_0, arg1);
+      cb_hideEvent_1595_0.issue<QTableWidget_Adaptor, QHideEvent *>(&QTableWidget_Adaptor::cbs_hideEvent_1595_0, event);
     } else {
-      QTableWidget::hideEvent(arg1);
+      QTableWidget::hideEvent(event);
     }
   }
 
@@ -2440,33 +2485,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTableWidget::keyReleaseEvent(QKeyEvent *)
-  void cbs_keyReleaseEvent_1514_0(QKeyEvent *arg1)
+  //  [adaptor impl] void QTableWidget::keyReleaseEvent(QKeyEvent *event)
+  void cbs_keyReleaseEvent_1514_0(QKeyEvent *event)
   {
-    QTableWidget::keyReleaseEvent(arg1);
+    QTableWidget::keyReleaseEvent(event);
   }
 
-  virtual void keyReleaseEvent(QKeyEvent *arg1)
+  virtual void keyReleaseEvent(QKeyEvent *event)
   {
     if (cb_keyReleaseEvent_1514_0.can_issue()) {
-      cb_keyReleaseEvent_1514_0.issue<QTableWidget_Adaptor, QKeyEvent *>(&QTableWidget_Adaptor::cbs_keyReleaseEvent_1514_0, arg1);
+      cb_keyReleaseEvent_1514_0.issue<QTableWidget_Adaptor, QKeyEvent *>(&QTableWidget_Adaptor::cbs_keyReleaseEvent_1514_0, event);
     } else {
-      QTableWidget::keyReleaseEvent(arg1);
+      QTableWidget::keyReleaseEvent(event);
     }
   }
 
-  //  [adaptor impl] void QTableWidget::leaveEvent(QEvent *)
-  void cbs_leaveEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QTableWidget::leaveEvent(QEvent *event)
+  void cbs_leaveEvent_1217_0(QEvent *event)
   {
-    QTableWidget::leaveEvent(arg1);
+    QTableWidget::leaveEvent(event);
   }
 
-  virtual void leaveEvent(QEvent *arg1)
+  virtual void leaveEvent(QEvent *event)
   {
     if (cb_leaveEvent_1217_0.can_issue()) {
-      cb_leaveEvent_1217_0.issue<QTableWidget_Adaptor, QEvent *>(&QTableWidget_Adaptor::cbs_leaveEvent_1217_0, arg1);
+      cb_leaveEvent_1217_0.issue<QTableWidget_Adaptor, QEvent *>(&QTableWidget_Adaptor::cbs_leaveEvent_1217_0, event);
     } else {
-      QTableWidget::leaveEvent(arg1);
+      QTableWidget::leaveEvent(event);
     }
   }
 
@@ -2590,18 +2635,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTableWidget::moveEvent(QMoveEvent *)
-  void cbs_moveEvent_1624_0(QMoveEvent *arg1)
+  //  [adaptor impl] void QTableWidget::moveEvent(QMoveEvent *event)
+  void cbs_moveEvent_1624_0(QMoveEvent *event)
   {
-    QTableWidget::moveEvent(arg1);
+    QTableWidget::moveEvent(event);
   }
 
-  virtual void moveEvent(QMoveEvent *arg1)
+  virtual void moveEvent(QMoveEvent *event)
   {
     if (cb_moveEvent_1624_0.can_issue()) {
-      cb_moveEvent_1624_0.issue<QTableWidget_Adaptor, QMoveEvent *>(&QTableWidget_Adaptor::cbs_moveEvent_1624_0, arg1);
+      cb_moveEvent_1624_0.issue<QTableWidget_Adaptor, QMoveEvent *>(&QTableWidget_Adaptor::cbs_moveEvent_1624_0, event);
     } else {
-      QTableWidget::moveEvent(arg1);
+      QTableWidget::moveEvent(event);
     }
   }
 
@@ -2785,18 +2830,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTableWidget::showEvent(QShowEvent *)
-  void cbs_showEvent_1634_0(QShowEvent *arg1)
+  //  [adaptor impl] void QTableWidget::showEvent(QShowEvent *event)
+  void cbs_showEvent_1634_0(QShowEvent *event)
   {
-    QTableWidget::showEvent(arg1);
+    QTableWidget::showEvent(event);
   }
 
-  virtual void showEvent(QShowEvent *arg1)
+  virtual void showEvent(QShowEvent *event)
   {
     if (cb_showEvent_1634_0.can_issue()) {
-      cb_showEvent_1634_0.issue<QTableWidget_Adaptor, QShowEvent *>(&QTableWidget_Adaptor::cbs_showEvent_1634_0, arg1);
+      cb_showEvent_1634_0.issue<QTableWidget_Adaptor, QShowEvent *>(&QTableWidget_Adaptor::cbs_showEvent_1634_0, event);
     } else {
-      QTableWidget::showEvent(arg1);
+      QTableWidget::showEvent(event);
     }
   }
 
@@ -2860,18 +2905,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTableWidget::tabletEvent(QTabletEvent *)
-  void cbs_tabletEvent_1821_0(QTabletEvent *arg1)
+  //  [adaptor impl] void QTableWidget::tabletEvent(QTabletEvent *event)
+  void cbs_tabletEvent_1821_0(QTabletEvent *event)
   {
-    QTableWidget::tabletEvent(arg1);
+    QTableWidget::tabletEvent(event);
   }
 
-  virtual void tabletEvent(QTabletEvent *arg1)
+  virtual void tabletEvent(QTabletEvent *event)
   {
     if (cb_tabletEvent_1821_0.can_issue()) {
-      cb_tabletEvent_1821_0.issue<QTableWidget_Adaptor, QTabletEvent *>(&QTableWidget_Adaptor::cbs_tabletEvent_1821_0, arg1);
+      cb_tabletEvent_1821_0.issue<QTableWidget_Adaptor, QTabletEvent *>(&QTableWidget_Adaptor::cbs_tabletEvent_1821_0, event);
     } else {
-      QTableWidget::tabletEvent(arg1);
+      QTableWidget::tabletEvent(event);
     }
   }
 
@@ -3153,7 +3198,7 @@ QTableWidget_Adaptor::~QTableWidget_Adaptor() { }
 
 static void _init_ctor_QTableWidget_Adaptor_1315 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_0);
   decl->set_return_new<QTableWidget_Adaptor> ();
 }
@@ -3162,7 +3207,7 @@ static void _call_ctor_QTableWidget_Adaptor_1315 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
   ret.write<QTableWidget_Adaptor *> (new QTableWidget_Adaptor (arg1));
 }
 
@@ -3175,7 +3220,7 @@ static void _init_ctor_QTableWidget_Adaptor_2633 (qt_gsi::GenericStaticMethod *d
   decl->add_arg<int > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("columns");
   decl->add_arg<int > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("parent", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_2);
   decl->set_return_new<QTableWidget_Adaptor> ();
 }
@@ -3186,16 +3231,16 @@ static void _call_ctor_QTableWidget_Adaptor_2633 (const qt_gsi::GenericStaticMet
   tl::Heap heap;
   int arg1 = gsi::arg_reader<int >() (args, heap);
   int arg2 = gsi::arg_reader<int >() (args, heap);
-  QWidget *arg3 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QWidget *arg3 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
   ret.write<QTableWidget_Adaptor *> (new QTableWidget_Adaptor (arg1, arg2, arg3));
 }
 
 
-// void QTableWidget::actionEvent(QActionEvent *)
+// void QTableWidget::actionEvent(QActionEvent *event)
 
 static void _init_cbs_actionEvent_1823_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QActionEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3383,11 +3428,11 @@ static void _set_callback_cbs_changeEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
-// void QTableWidget::childEvent(QChildEvent *)
+// void QTableWidget::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3452,11 +3497,11 @@ static void _set_callback_cbs_closeEditor_4926_0 (void *cls, const gsi::Callback
 }
 
 
-// void QTableWidget::closeEvent(QCloseEvent *)
+// void QTableWidget::closeEvent(QCloseEvent *event)
 
 static void _init_cbs_closeEvent_1719_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QCloseEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3714,11 +3759,11 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 }
 
 
-// void QTableWidget::customEvent(QEvent *)
+// void QTableWidget::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3794,7 +3839,7 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3803,7 +3848,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QTableWidget_Adaptor *)cls)->emitter_QTableWidget_destroyed_1302 (arg1);
 }
 
@@ -4113,11 +4158,11 @@ static void _set_callback_cbs_editorDestroyed_1302_0 (void *cls, const gsi::Call
 }
 
 
-// void QTableWidget::enterEvent(QEvent *)
+// void QTableWidget::enterEvent(QEvent *event)
 
 static void _init_cbs_enterEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -4178,13 +4223,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QTableWidget::eventFilter(QObject *, QEvent *)
+// bool QTableWidget::eventFilter(QObject *object, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("object");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -4360,11 +4405,11 @@ static void _set_callback_cbs_heightForWidth_c767_0 (void *cls, const gsi::Callb
 }
 
 
-// void QTableWidget::hideEvent(QHideEvent *)
+// void QTableWidget::hideEvent(QHideEvent *event)
 
 static void _init_cbs_hideEvent_1595_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QHideEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -4503,6 +4548,24 @@ static void _call_cbs_indexAt_c1916_0 (const qt_gsi::GenericMethod * /*decl*/, v
 static void _set_callback_cbs_indexAt_c1916_0 (void *cls, const gsi::Callback &cb)
 {
   ((QTableWidget_Adaptor *)cls)->cb_indexAt_c1916_0 = cb;
+}
+
+
+// exposed QModelIndex QTableWidget::indexFromItem(const QTableWidgetItem *item)
+
+static void _init_fp_indexFromItem_c2897 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("item");
+  decl->add_arg<const QTableWidgetItem * > (argspec_0);
+  decl->set_return<QModelIndex > ();
+}
+
+static void _call_fp_indexFromItem_c2897 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QTableWidgetItem *arg1 = gsi::arg_reader<const QTableWidgetItem * >() (args, heap);
+  ret.write<QModelIndex > ((QModelIndex)((QTableWidget_Adaptor *)cls)->fp_QTableWidget_indexFromItem_c2897 (arg1));
 }
 
 
@@ -4837,11 +4900,11 @@ static void _set_callback_cbs_keyPressEvent_1514_0 (void *cls, const gsi::Callba
 }
 
 
-// void QTableWidget::keyReleaseEvent(QKeyEvent *)
+// void QTableWidget::keyReleaseEvent(QKeyEvent *event)
 
 static void _init_cbs_keyReleaseEvent_1514_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QKeyEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -4885,11 +4948,11 @@ static void _set_callback_cbs_keyboardSearch_2025_0 (void *cls, const gsi::Callb
 }
 
 
-// void QTableWidget::leaveEvent(QEvent *)
+// void QTableWidget::leaveEvent(QEvent *event)
 
 static void _init_cbs_leaveEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -5115,11 +5178,11 @@ static void _set_callback_cbs_moveCursor_6476_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QTableWidget::moveEvent(QMoveEvent *)
+// void QTableWidget::moveEvent(QMoveEvent *event)
 
 static void _init_cbs_moveEvent_1624_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMoveEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -5940,11 +6003,11 @@ static void _set_callback_cbs_sharedPainter_c0_0 (void *cls, const gsi::Callback
 }
 
 
-// void QTableWidget::showEvent(QShowEvent *)
+// void QTableWidget::showEvent(QShowEvent *event)
 
 static void _init_cbs_showEvent_1634_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QShowEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -6116,11 +6179,11 @@ static void _set_callback_cbs_supportedDropActions_c0_0 (void *cls, const gsi::C
 }
 
 
-// void QTableWidget::tabletEvent(QTabletEvent *)
+// void QTableWidget::tabletEvent(QTabletEvent *event)
 
 static void _init_cbs_tabletEvent_1821_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTabletEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -6542,7 +6605,7 @@ static gsi::Methods methods_QTableWidget_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTableWidget::QTableWidget(QWidget *parent)\nThis method creates an object of class QTableWidget.", &_init_ctor_QTableWidget_Adaptor_1315, &_call_ctor_QTableWidget_Adaptor_1315);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTableWidget::QTableWidget(int rows, int columns, QWidget *parent)\nThis method creates an object of class QTableWidget.", &_init_ctor_QTableWidget_Adaptor_2633, &_call_ctor_QTableWidget_Adaptor_2633);
-  methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QTableWidget::actionEvent(QActionEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
+  methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QTableWidget::actionEvent(QActionEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("*actionEvent", "@hide", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0, &_set_callback_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("emit_activated", "@brief Emitter for signal void QTableWidget::activated(const QModelIndex &index)\nCall this method to emit this signal.", false, &_init_emitter_activated_2395, &_call_emitter_activated_2395);
   methods += new qt_gsi::GenericMethod ("emit_cellActivated", "@brief Emitter for signal void QTableWidget::cellActivated(int row, int column)\nCall this method to emit this signal.", false, &_init_emitter_cellActivated_1426, &_call_emitter_cellActivated_1426);
@@ -6553,12 +6616,12 @@ static gsi::Methods methods_QTableWidget_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_cellPressed", "@brief Emitter for signal void QTableWidget::cellPressed(int row, int column)\nCall this method to emit this signal.", false, &_init_emitter_cellPressed_1426, &_call_emitter_cellPressed_1426);
   methods += new qt_gsi::GenericMethod ("*changeEvent", "@brief Virtual method void QTableWidget::changeEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*changeEvent", "@hide", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0, &_set_callback_cbs_changeEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QTableWidget::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QTableWidget::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("emit_clicked", "@brief Emitter for signal void QTableWidget::clicked(const QModelIndex &index)\nCall this method to emit this signal.", false, &_init_emitter_clicked_2395, &_call_emitter_clicked_2395);
   methods += new qt_gsi::GenericMethod ("*closeEditor", "@brief Virtual method void QTableWidget::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_closeEditor_4926_0, &_call_cbs_closeEditor_4926_0);
   methods += new qt_gsi::GenericMethod ("*closeEditor", "@hide", false, &_init_cbs_closeEditor_4926_0, &_call_cbs_closeEditor_4926_0, &_set_callback_cbs_closeEditor_4926_0);
-  methods += new qt_gsi::GenericMethod ("*closeEvent", "@brief Virtual method void QTableWidget::closeEvent(QCloseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0);
+  methods += new qt_gsi::GenericMethod ("*closeEvent", "@brief Virtual method void QTableWidget::closeEvent(QCloseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0);
   methods += new qt_gsi::GenericMethod ("*closeEvent", "@hide", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0, &_set_callback_cbs_closeEvent_1719_0);
   methods += new qt_gsi::GenericMethod ("*columnCountChanged", "@brief Method void QTableWidget::columnCountChanged(int oldCount, int newCount)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_columnCountChanged_1426, &_call_fp_columnCountChanged_1426);
   methods += new qt_gsi::GenericMethod ("*columnMoved", "@brief Method void QTableWidget::columnMoved(int column, int oldIndex, int newIndex)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_columnMoved_2085, &_call_fp_columnMoved_2085);
@@ -6567,17 +6630,17 @@ static gsi::Methods methods_QTableWidget_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*commitData", "@hide", false, &_init_cbs_commitData_1315_0, &_call_cbs_commitData_1315_0, &_set_callback_cbs_commitData_1315_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QTableWidget::contextMenuEvent(QContextMenuEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0, &_set_callback_cbs_contextMenuEvent_2363_0);
-  methods += new qt_gsi::GenericMethod ("*qt_create", "@brief Method void QTableWidget::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
+  methods += new qt_gsi::GenericMethod ("*create|qt_create", "@brief Method void QTableWidget::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
   methods += new qt_gsi::GenericMethod ("emit_currentCellChanged", "@brief Emitter for signal void QTableWidget::currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)\nCall this method to emit this signal.", false, &_init_emitter_currentCellChanged_2744, &_call_emitter_currentCellChanged_2744);
   methods += new qt_gsi::GenericMethod ("*currentChanged", "@brief Virtual method void QTableWidget::currentChanged(const QModelIndex &current, const QModelIndex &previous)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_currentChanged_4682_0, &_call_cbs_currentChanged_4682_0);
   methods += new qt_gsi::GenericMethod ("*currentChanged", "@hide", false, &_init_cbs_currentChanged_4682_0, &_call_cbs_currentChanged_4682_0, &_set_callback_cbs_currentChanged_4682_0);
   methods += new qt_gsi::GenericMethod ("emit_currentItemChanged", "@brief Emitter for signal void QTableWidget::currentItemChanged(QTableWidgetItem *current, QTableWidgetItem *previous)\nCall this method to emit this signal.", false, &_init_emitter_currentItemChanged_4296, &_call_emitter_currentItemChanged_4296);
   methods += new qt_gsi::GenericMethod ("emit_customContextMenuRequested", "@brief Emitter for signal void QTableWidget::customContextMenuRequested(const QPoint &pos)\nCall this method to emit this signal.", false, &_init_emitter_customContextMenuRequested_1916, &_call_emitter_customContextMenuRequested_1916);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QTableWidget::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QTableWidget::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*dataChanged", "@brief Virtual method void QTableWidget::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dataChanged_7048_1, &_call_cbs_dataChanged_7048_1);
   methods += new qt_gsi::GenericMethod ("*dataChanged", "@hide", false, &_init_cbs_dataChanged_7048_1, &_call_cbs_dataChanged_7048_1, &_set_callback_cbs_dataChanged_7048_1);
-  methods += new qt_gsi::GenericMethod ("*qt_destroy", "@brief Method void QTableWidget::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
+  methods += new qt_gsi::GenericMethod ("*destroy|qt_destroy", "@brief Method void QTableWidget::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QTableWidget::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*dirtyRegionOffset", "@brief Method QPoint QTableWidget::dirtyRegionOffset()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_dirtyRegionOffset_c0, &_call_fp_dirtyRegionOffset_c0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QTableWidget::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
@@ -6602,12 +6665,12 @@ static gsi::Methods methods_QTableWidget_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*edit", "@hide", false, &_init_cbs_edit_6773_0, &_call_cbs_edit_6773_0, &_set_callback_cbs_edit_6773_0);
   methods += new qt_gsi::GenericMethod ("*editorDestroyed", "@brief Virtual method void QTableWidget::editorDestroyed(QObject *editor)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_editorDestroyed_1302_0, &_call_cbs_editorDestroyed_1302_0);
   methods += new qt_gsi::GenericMethod ("*editorDestroyed", "@hide", false, &_init_cbs_editorDestroyed_1302_0, &_call_cbs_editorDestroyed_1302_0, &_set_callback_cbs_editorDestroyed_1302_0);
-  methods += new qt_gsi::GenericMethod ("*enterEvent", "@brief Virtual method void QTableWidget::enterEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*enterEvent", "@brief Virtual method void QTableWidget::enterEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*enterEvent", "@hide", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0, &_set_callback_cbs_enterEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_entered", "@brief Emitter for signal void QTableWidget::entered(const QModelIndex &index)\nCall this method to emit this signal.", false, &_init_emitter_entered_2395, &_call_emitter_entered_2395);
   methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QTableWidget::event(QEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("*eventFilter", "@brief Virtual method bool QTableWidget::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("*eventFilter", "@brief Virtual method bool QTableWidget::eventFilter(QObject *object, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*executeDelayedItemsLayout", "@brief Method void QTableWidget::executeDelayedItemsLayout()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_executeDelayedItemsLayout_0, &_call_fp_executeDelayedItemsLayout_0);
   methods += new qt_gsi::GenericMethod ("*focusInEvent", "@brief Virtual method void QTableWidget::focusInEvent(QFocusEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0);
@@ -6622,7 +6685,7 @@ static gsi::Methods methods_QTableWidget_Adaptor () {
   methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@hide", true, &_init_cbs_hasHeightForWidth_c0_0, &_call_cbs_hasHeightForWidth_c0_0, &_set_callback_cbs_hasHeightForWidth_c0_0);
   methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Virtual method int QTableWidget::heightForWidth(int)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_heightForWidth_c767_0, &_call_cbs_heightForWidth_c767_0);
   methods += new qt_gsi::GenericMethod ("heightForWidth", "@hide", true, &_init_cbs_heightForWidth_c767_0, &_call_cbs_heightForWidth_c767_0, &_set_callback_cbs_heightForWidth_c767_0);
-  methods += new qt_gsi::GenericMethod ("*hideEvent", "@brief Virtual method void QTableWidget::hideEvent(QHideEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_hideEvent_1595_0, &_call_cbs_hideEvent_1595_0);
+  methods += new qt_gsi::GenericMethod ("*hideEvent", "@brief Virtual method void QTableWidget::hideEvent(QHideEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_hideEvent_1595_0, &_call_cbs_hideEvent_1595_0);
   methods += new qt_gsi::GenericMethod ("*hideEvent", "@hide", false, &_init_cbs_hideEvent_1595_0, &_call_cbs_hideEvent_1595_0, &_set_callback_cbs_hideEvent_1595_0);
   methods += new qt_gsi::GenericMethod ("*horizontalOffset", "@brief Virtual method int QTableWidget::horizontalOffset()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_horizontalOffset_c0_0, &_call_cbs_horizontalOffset_c0_0);
   methods += new qt_gsi::GenericMethod ("*horizontalOffset", "@hide", true, &_init_cbs_horizontalOffset_c0_0, &_call_cbs_horizontalOffset_c0_0, &_set_callback_cbs_horizontalOffset_c0_0);
@@ -6634,6 +6697,7 @@ static gsi::Methods methods_QTableWidget_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_iconSizeChanged", "@brief Emitter for signal void QTableWidget::iconSizeChanged(const QSize &size)\nCall this method to emit this signal.", false, &_init_emitter_iconSizeChanged_1805, &_call_emitter_iconSizeChanged_1805);
   methods += new qt_gsi::GenericMethod ("indexAt", "@brief Virtual method QModelIndex QTableWidget::indexAt(const QPoint &p)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_indexAt_c1916_0, &_call_cbs_indexAt_c1916_0);
   methods += new qt_gsi::GenericMethod ("indexAt", "@hide", true, &_init_cbs_indexAt_c1916_0, &_call_cbs_indexAt_c1916_0, &_set_callback_cbs_indexAt_c1916_0);
+  methods += new qt_gsi::GenericMethod ("*indexFromItem", "@brief Method QModelIndex QTableWidget::indexFromItem(const QTableWidgetItem *item)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_indexFromItem_c2897, &_call_fp_indexFromItem_c2897);
   methods += new qt_gsi::GenericMethod ("*indexFromItem", "@brief Method QModelIndex QTableWidget::indexFromItem(QTableWidgetItem *item)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_indexFromItem_c2202, &_call_fp_indexFromItem_c2202);
   methods += new qt_gsi::GenericMethod ("*initPainter", "@brief Virtual method void QTableWidget::initPainter(QPainter *painter)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0);
   methods += new qt_gsi::GenericMethod ("*initPainter", "@hide", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0, &_set_callback_cbs_initPainter_c1426_0);
@@ -6656,11 +6720,11 @@ static gsi::Methods methods_QTableWidget_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*items", "@brief Method QList<QTableWidgetItem*> QTableWidget::items(const QMimeData *data)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_items_c2168, &_call_fp_items_c2168);
   methods += new qt_gsi::GenericMethod ("*keyPressEvent", "@brief Virtual method void QTableWidget::keyPressEvent(QKeyEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyPressEvent_1514_0, &_call_cbs_keyPressEvent_1514_0);
   methods += new qt_gsi::GenericMethod ("*keyPressEvent", "@hide", false, &_init_cbs_keyPressEvent_1514_0, &_call_cbs_keyPressEvent_1514_0, &_set_callback_cbs_keyPressEvent_1514_0);
-  methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@brief Virtual method void QTableWidget::keyReleaseEvent(QKeyEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0);
+  methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@brief Virtual method void QTableWidget::keyReleaseEvent(QKeyEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0);
   methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@hide", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0, &_set_callback_cbs_keyReleaseEvent_1514_0);
   methods += new qt_gsi::GenericMethod ("keyboardSearch", "@brief Virtual method void QTableWidget::keyboardSearch(const QString &search)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyboardSearch_2025_0, &_call_cbs_keyboardSearch_2025_0);
   methods += new qt_gsi::GenericMethod ("keyboardSearch", "@hide", false, &_init_cbs_keyboardSearch_2025_0, &_call_cbs_keyboardSearch_2025_0, &_set_callback_cbs_keyboardSearch_2025_0);
-  methods += new qt_gsi::GenericMethod ("*leaveEvent", "@brief Virtual method void QTableWidget::leaveEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*leaveEvent", "@brief Virtual method void QTableWidget::leaveEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*leaveEvent", "@hide", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0, &_set_callback_cbs_leaveEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*metric", "@brief Virtual method int QTableWidget::metric(QPaintDevice::PaintDeviceMetric)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0);
   methods += new qt_gsi::GenericMethod ("*metric", "@hide", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0, &_set_callback_cbs_metric_c3445_0);
@@ -6680,7 +6744,7 @@ static gsi::Methods methods_QTableWidget_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@hide", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0, &_set_callback_cbs_mouseReleaseEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*moveCursor", "@brief Virtual method QModelIndex QTableWidget::moveCursor(QAbstractItemView::CursorAction cursorAction, QFlags<Qt::KeyboardModifier> modifiers)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveCursor_6476_0, &_call_cbs_moveCursor_6476_0);
   methods += new qt_gsi::GenericMethod ("*moveCursor", "@hide", false, &_init_cbs_moveCursor_6476_0, &_call_cbs_moveCursor_6476_0, &_set_callback_cbs_moveCursor_6476_0);
-  methods += new qt_gsi::GenericMethod ("*moveEvent", "@brief Virtual method void QTableWidget::moveEvent(QMoveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0);
+  methods += new qt_gsi::GenericMethod ("*moveEvent", "@brief Virtual method void QTableWidget::moveEvent(QMoveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*moveEvent", "@hide", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0, &_set_callback_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@brief Virtual method bool QTableWidget::nativeEvent(const QByteArray &eventType, void *message, long int *result)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@hide", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0, &_set_callback_cbs_nativeEvent_4678_0);
@@ -6738,7 +6802,7 @@ static gsi::Methods methods_QTableWidget_Adaptor () {
   methods += new qt_gsi::GenericMethod ("setupViewport", "@hide", false, &_init_cbs_setupViewport_1315_0, &_call_cbs_setupViewport_1315_0, &_set_callback_cbs_setupViewport_1315_0);
   methods += new qt_gsi::GenericMethod ("*sharedPainter", "@brief Virtual method QPainter *QTableWidget::sharedPainter()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_sharedPainter_c0_0, &_call_cbs_sharedPainter_c0_0);
   methods += new qt_gsi::GenericMethod ("*sharedPainter", "@hide", true, &_init_cbs_sharedPainter_c0_0, &_call_cbs_sharedPainter_c0_0, &_set_callback_cbs_sharedPainter_c0_0);
-  methods += new qt_gsi::GenericMethod ("*showEvent", "@brief Virtual method void QTableWidget::showEvent(QShowEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_showEvent_1634_0, &_call_cbs_showEvent_1634_0);
+  methods += new qt_gsi::GenericMethod ("*showEvent", "@brief Virtual method void QTableWidget::showEvent(QShowEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_showEvent_1634_0, &_call_cbs_showEvent_1634_0);
   methods += new qt_gsi::GenericMethod ("*showEvent", "@hide", false, &_init_cbs_showEvent_1634_0, &_call_cbs_showEvent_1634_0, &_set_callback_cbs_showEvent_1634_0);
   methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Virtual method QSize QTableWidget::sizeHint()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0);
   methods += new qt_gsi::GenericMethod ("sizeHint", "@hide", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0, &_set_callback_cbs_sizeHint_c0_0);
@@ -6753,7 +6817,7 @@ static gsi::Methods methods_QTableWidget_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*stopAutoScroll", "@brief Method void QTableWidget::stopAutoScroll()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_stopAutoScroll_0, &_call_fp_stopAutoScroll_0);
   methods += new qt_gsi::GenericMethod ("*supportedDropActions", "@brief Virtual method QFlags<Qt::DropAction> QTableWidget::supportedDropActions()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_supportedDropActions_c0_0, &_call_cbs_supportedDropActions_c0_0);
   methods += new qt_gsi::GenericMethod ("*supportedDropActions", "@hide", true, &_init_cbs_supportedDropActions_c0_0, &_call_cbs_supportedDropActions_c0_0, &_set_callback_cbs_supportedDropActions_c0_0);
-  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QTableWidget::tabletEvent(QTabletEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
+  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QTableWidget::tabletEvent(QTabletEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
   methods += new qt_gsi::GenericMethod ("*tabletEvent", "@hide", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0, &_set_callback_cbs_tabletEvent_1821_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QTableWidget::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);

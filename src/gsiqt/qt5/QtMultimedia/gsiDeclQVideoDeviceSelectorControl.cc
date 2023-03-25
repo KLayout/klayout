@@ -173,12 +173,12 @@ static void _call_f_selectedDeviceChanged_767 (const qt_gsi::GenericMethod * /*d
 }
 
 
-// void QVideoDeviceSelectorControl::selectedDeviceChanged(const QString &deviceName)
+// void QVideoDeviceSelectorControl::selectedDeviceChanged(const QString &name)
 
 
 static void _init_f_selectedDeviceChanged_2025 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("deviceName");
+  static gsi::ArgSpecBase argspec_0 ("name");
   decl->add_arg<const QString & > (argspec_0);
   decl->set_return<void > ();
 }
@@ -276,7 +276,7 @@ static gsi::Methods methods_QVideoDeviceSelectorControl () {
   methods += new qt_gsi::GenericMethod ("devicesChanged", "@brief Method void QVideoDeviceSelectorControl::devicesChanged()\n", false, &_init_f_devicesChanged_0, &_call_f_devicesChanged_0);
   methods += new qt_gsi::GenericMethod (":selectedDevice", "@brief Method int QVideoDeviceSelectorControl::selectedDevice()\n", true, &_init_f_selectedDevice_c0, &_call_f_selectedDevice_c0);
   methods += new qt_gsi::GenericMethod ("selectedDeviceChanged_int", "@brief Method void QVideoDeviceSelectorControl::selectedDeviceChanged(int index)\n", false, &_init_f_selectedDeviceChanged_767, &_call_f_selectedDeviceChanged_767);
-  methods += new qt_gsi::GenericMethod ("selectedDeviceChanged_string", "@brief Method void QVideoDeviceSelectorControl::selectedDeviceChanged(const QString &deviceName)\n", false, &_init_f_selectedDeviceChanged_2025, &_call_f_selectedDeviceChanged_2025);
+  methods += new qt_gsi::GenericMethod ("selectedDeviceChanged_string", "@brief Method void QVideoDeviceSelectorControl::selectedDeviceChanged(const QString &name)\n", false, &_init_f_selectedDeviceChanged_2025, &_call_f_selectedDeviceChanged_2025);
   methods += new qt_gsi::GenericMethod ("setSelectedDevice|selectedDevice=", "@brief Method void QVideoDeviceSelectorControl::setSelectedDevice(int index)\n", false, &_init_f_setSelectedDevice_767, &_call_f_setSelectedDevice_767);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QVideoDeviceSelectorControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QVideoDeviceSelectorControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
@@ -388,33 +388,33 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QVideoDeviceSelectorControl::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QVideoDeviceSelectorControl::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QVideoDeviceSelectorControl::event(arg1);
+    return QVideoDeviceSelectorControl::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QVideoDeviceSelectorControl_Adaptor, bool, QEvent *>(&QVideoDeviceSelectorControl_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QVideoDeviceSelectorControl_Adaptor, bool, QEvent *>(&QVideoDeviceSelectorControl_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QVideoDeviceSelectorControl::event(arg1);
+      return QVideoDeviceSelectorControl::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QVideoDeviceSelectorControl::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QVideoDeviceSelectorControl::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QVideoDeviceSelectorControl::eventFilter(arg1, arg2);
+    return QVideoDeviceSelectorControl::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QVideoDeviceSelectorControl_Adaptor, bool, QObject *, QEvent *>(&QVideoDeviceSelectorControl_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QVideoDeviceSelectorControl_Adaptor, bool, QObject *, QEvent *>(&QVideoDeviceSelectorControl_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QVideoDeviceSelectorControl::eventFilter(arg1, arg2);
+      return QVideoDeviceSelectorControl::eventFilter(watched, event);
     }
   }
 
@@ -449,33 +449,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QVideoDeviceSelectorControl::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QVideoDeviceSelectorControl::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QVideoDeviceSelectorControl::childEvent(arg1);
+    QVideoDeviceSelectorControl::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QVideoDeviceSelectorControl_Adaptor, QChildEvent *>(&QVideoDeviceSelectorControl_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QVideoDeviceSelectorControl_Adaptor, QChildEvent *>(&QVideoDeviceSelectorControl_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QVideoDeviceSelectorControl::childEvent(arg1);
+      QVideoDeviceSelectorControl::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QVideoDeviceSelectorControl::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QVideoDeviceSelectorControl::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QVideoDeviceSelectorControl::customEvent(arg1);
+    QVideoDeviceSelectorControl::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QVideoDeviceSelectorControl_Adaptor, QEvent *>(&QVideoDeviceSelectorControl_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QVideoDeviceSelectorControl_Adaptor, QEvent *>(&QVideoDeviceSelectorControl_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QVideoDeviceSelectorControl::customEvent(arg1);
+      QVideoDeviceSelectorControl::customEvent(event);
     }
   }
 
@@ -494,18 +494,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QVideoDeviceSelectorControl::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QVideoDeviceSelectorControl::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QVideoDeviceSelectorControl::timerEvent(arg1);
+    QVideoDeviceSelectorControl::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QVideoDeviceSelectorControl_Adaptor, QTimerEvent *>(&QVideoDeviceSelectorControl_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QVideoDeviceSelectorControl_Adaptor, QTimerEvent *>(&QVideoDeviceSelectorControl_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QVideoDeviceSelectorControl::timerEvent(arg1);
+      QVideoDeviceSelectorControl::timerEvent(event);
     }
   }
 
@@ -539,11 +539,11 @@ static void _call_ctor_QVideoDeviceSelectorControl_Adaptor_0 (const qt_gsi::Gene
 }
 
 
-// void QVideoDeviceSelectorControl::childEvent(QChildEvent *)
+// void QVideoDeviceSelectorControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -563,11 +563,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QVideoDeviceSelectorControl::customEvent(QEvent *)
+// void QVideoDeviceSelectorControl::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -695,11 +695,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QVideoDeviceSelectorControl::event(QEvent *)
+// bool QVideoDeviceSelectorControl::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -718,13 +718,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QVideoDeviceSelectorControl::eventFilter(QObject *, QEvent *)
+// bool QVideoDeviceSelectorControl::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -851,11 +851,11 @@ static void _set_callback_cbs_setSelectedDevice_767_0 (void *cls, const gsi::Cal
 }
 
 
-// void QVideoDeviceSelectorControl::timerEvent(QTimerEvent *)
+// void QVideoDeviceSelectorControl::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -883,9 +883,9 @@ gsi::Class<QVideoDeviceSelectorControl> &qtdecl_QVideoDeviceSelectorControl ();
 static gsi::Methods methods_QVideoDeviceSelectorControl_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QVideoDeviceSelectorControl::QVideoDeviceSelectorControl()\nThis method creates an object of class QVideoDeviceSelectorControl.", &_init_ctor_QVideoDeviceSelectorControl_Adaptor_0, &_call_ctor_QVideoDeviceSelectorControl_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QVideoDeviceSelectorControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QVideoDeviceSelectorControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QVideoDeviceSelectorControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QVideoDeviceSelectorControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("defaultDevice", "@brief Virtual method int QVideoDeviceSelectorControl::defaultDevice()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_defaultDevice_c0_0, &_call_cbs_defaultDevice_c0_0);
   methods += new qt_gsi::GenericMethod ("defaultDevice", "@hide", true, &_init_cbs_defaultDevice_c0_0, &_call_cbs_defaultDevice_c0_0, &_set_callback_cbs_defaultDevice_c0_0);
@@ -897,9 +897,9 @@ static gsi::Methods methods_QVideoDeviceSelectorControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("deviceName", "@hide", true, &_init_cbs_deviceName_c767_0, &_call_cbs_deviceName_c767_0, &_set_callback_cbs_deviceName_c767_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QVideoDeviceSelectorControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QVideoDeviceSelectorControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QVideoDeviceSelectorControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QVideoDeviceSelectorControl::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QVideoDeviceSelectorControl::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QVideoDeviceSelectorControl::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QVideoDeviceSelectorControl::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
@@ -909,7 +909,7 @@ static gsi::Methods methods_QVideoDeviceSelectorControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QVideoDeviceSelectorControl::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("setSelectedDevice", "@brief Virtual method void QVideoDeviceSelectorControl::setSelectedDevice(int index)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setSelectedDevice_767_0, &_call_cbs_setSelectedDevice_767_0);
   methods += new qt_gsi::GenericMethod ("setSelectedDevice", "@hide", false, &_init_cbs_setSelectedDevice_767_0, &_call_cbs_setSelectedDevice_767_0, &_set_callback_cbs_setSelectedDevice_767_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QVideoDeviceSelectorControl::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QVideoDeviceSelectorControl::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

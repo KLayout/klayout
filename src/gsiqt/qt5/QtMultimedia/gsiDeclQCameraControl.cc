@@ -91,12 +91,12 @@ static void _call_f_captureMode_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// void QCameraControl::captureModeChanged(QFlags<QCamera::CaptureMode>)
+// void QCameraControl::captureModeChanged(QFlags<QCamera::CaptureMode> mode)
 
 
 static void _init_f_captureModeChanged_3027 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("mode");
   decl->add_arg<QFlags<QCamera::CaptureMode> > (argspec_0);
   decl->set_return<void > ();
 }
@@ -321,7 +321,7 @@ static gsi::Methods methods_QCameraControl () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("canChangeProperty", "@brief Method bool QCameraControl::canChangeProperty(QCameraControl::PropertyChangeType changeType, QCamera::Status status)\n", true, &_init_f_canChangeProperty_c5578, &_call_f_canChangeProperty_c5578);
   methods += new qt_gsi::GenericMethod (":captureMode", "@brief Method QFlags<QCamera::CaptureMode> QCameraControl::captureMode()\n", true, &_init_f_captureMode_c0, &_call_f_captureMode_c0);
-  methods += new qt_gsi::GenericMethod ("captureModeChanged", "@brief Method void QCameraControl::captureModeChanged(QFlags<QCamera::CaptureMode>)\n", false, &_init_f_captureModeChanged_3027, &_call_f_captureModeChanged_3027);
+  methods += new qt_gsi::GenericMethod ("captureModeChanged", "@brief Method void QCameraControl::captureModeChanged(QFlags<QCamera::CaptureMode> mode)\n", false, &_init_f_captureModeChanged_3027, &_call_f_captureModeChanged_3027);
   methods += new qt_gsi::GenericMethod ("error", "@brief Method void QCameraControl::error(int error, const QString &errorString)\n", false, &_init_f_error_2684, &_call_f_error_2684);
   methods += new qt_gsi::GenericMethod ("isCaptureModeSupported?", "@brief Method bool QCameraControl::isCaptureModeSupported(QFlags<QCamera::CaptureMode> mode)\n", true, &_init_f_isCaptureModeSupported_c3027, &_call_f_isCaptureModeSupported_c3027);
   methods += new qt_gsi::GenericMethod ("setCaptureMode|captureMode=", "@brief Method void QCameraControl::setCaptureMode(QFlags<QCamera::CaptureMode>)\n", false, &_init_f_setCaptureMode_3027, &_call_f_setCaptureMode_3027);
@@ -410,33 +410,33 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QCameraControl::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QCameraControl::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QCameraControl::event(arg1);
+    return QCameraControl::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QCameraControl_Adaptor, bool, QEvent *>(&QCameraControl_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QCameraControl_Adaptor, bool, QEvent *>(&QCameraControl_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QCameraControl::event(arg1);
+      return QCameraControl::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QCameraControl::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QCameraControl::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QCameraControl::eventFilter(arg1, arg2);
+    return QCameraControl::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QCameraControl_Adaptor, bool, QObject *, QEvent *>(&QCameraControl_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QCameraControl_Adaptor, bool, QObject *, QEvent *>(&QCameraControl_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QCameraControl::eventFilter(arg1, arg2);
+      return QCameraControl::eventFilter(watched, event);
     }
   }
 
@@ -518,33 +518,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QCameraControl::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QCameraControl::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QCameraControl::childEvent(arg1);
+    QCameraControl::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QCameraControl_Adaptor, QChildEvent *>(&QCameraControl_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QCameraControl_Adaptor, QChildEvent *>(&QCameraControl_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QCameraControl::childEvent(arg1);
+      QCameraControl::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QCameraControl::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QCameraControl::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QCameraControl::customEvent(arg1);
+    QCameraControl::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QCameraControl_Adaptor, QEvent *>(&QCameraControl_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QCameraControl_Adaptor, QEvent *>(&QCameraControl_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QCameraControl::customEvent(arg1);
+      QCameraControl::customEvent(event);
     }
   }
 
@@ -563,18 +563,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QCameraControl::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QCameraControl::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QCameraControl::timerEvent(arg1);
+    QCameraControl::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QCameraControl_Adaptor, QTimerEvent *>(&QCameraControl_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QCameraControl_Adaptor, QTimerEvent *>(&QCameraControl_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QCameraControl::timerEvent(arg1);
+      QCameraControl::timerEvent(event);
     }
   }
 
@@ -654,11 +654,11 @@ static void _set_callback_cbs_captureMode_c0_0 (void *cls, const gsi::Callback &
 }
 
 
-// void QCameraControl::childEvent(QChildEvent *)
+// void QCameraControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -678,11 +678,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QCameraControl::customEvent(QEvent *)
+// void QCameraControl::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -726,11 +726,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QCameraControl::event(QEvent *)
+// bool QCameraControl::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -749,13 +749,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QCameraControl::eventFilter(QObject *, QEvent *)
+// bool QCameraControl::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -948,11 +948,11 @@ static void _set_callback_cbs_status_c0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QCameraControl::timerEvent(QTimerEvent *)
+// void QCameraControl::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -984,15 +984,15 @@ static gsi::Methods methods_QCameraControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("canChangeProperty", "@hide", true, &_init_cbs_canChangeProperty_c5578_0, &_call_cbs_canChangeProperty_c5578_0, &_set_callback_cbs_canChangeProperty_c5578_0);
   methods += new qt_gsi::GenericMethod ("captureMode", "@brief Virtual method QFlags<QCamera::CaptureMode> QCameraControl::captureMode()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_captureMode_c0_0, &_call_cbs_captureMode_c0_0);
   methods += new qt_gsi::GenericMethod ("captureMode", "@hide", true, &_init_cbs_captureMode_c0_0, &_call_cbs_captureMode_c0_0, &_set_callback_cbs_captureMode_c0_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QCameraControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QCameraControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QCameraControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QCameraControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QCameraControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QCameraControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QCameraControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QCameraControl::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QCameraControl::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("isCaptureModeSupported", "@brief Virtual method bool QCameraControl::isCaptureModeSupported(QFlags<QCamera::CaptureMode> mode)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isCaptureModeSupported_c3027_0, &_call_cbs_isCaptureModeSupported_c3027_0);
   methods += new qt_gsi::GenericMethod ("isCaptureModeSupported", "@hide", true, &_init_cbs_isCaptureModeSupported_c3027_0, &_call_cbs_isCaptureModeSupported_c3027_0, &_set_callback_cbs_isCaptureModeSupported_c3027_0);
@@ -1008,7 +1008,7 @@ static gsi::Methods methods_QCameraControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("state", "@hide", true, &_init_cbs_state_c0_0, &_call_cbs_state_c0_0, &_set_callback_cbs_state_c0_0);
   methods += new qt_gsi::GenericMethod ("status", "@brief Virtual method QCamera::Status QCameraControl::status()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_status_c0_0, &_call_cbs_status_c0_0);
   methods += new qt_gsi::GenericMethod ("status", "@hide", true, &_init_cbs_status_c0_0, &_call_cbs_status_c0_0, &_set_callback_cbs_status_c0_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QCameraControl::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QCameraControl::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

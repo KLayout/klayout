@@ -392,6 +392,25 @@ static void _call_f_isAbsolute_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
+// bool QDir::isEmpty(QFlags<QDir::Filter> filters)
+
+
+static void _init_f_isEmpty_c2230 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("filters", true, "QDir::Filters(QDir::AllEntries | QDir::NoDotAndDotDot)");
+  decl->add_arg<QFlags<QDir::Filter> > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isEmpty_c2230 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QFlags<QDir::Filter> arg1 = args ? gsi::arg_reader<QFlags<QDir::Filter> >() (args, heap) : gsi::arg_maker<QFlags<QDir::Filter> >() (QDir::Filters(QDir::AllEntries | QDir::NoDotAndDotDot), heap);
+  ret.write<bool > ((bool)((QDir *)cls)->isEmpty (arg1));
+}
+
+
 // bool QDir::isReadable()
 
 
@@ -1053,6 +1072,21 @@ static void _call_f_isRelativePath_2025 (const qt_gsi::GenericStaticMethod * /*d
 }
 
 
+// static QChar QDir::listSeparator()
+
+
+static void _init_f_listSeparator_0 (qt_gsi::GenericStaticMethod *decl)
+{
+  decl->set_return<qt_gsi::Converter<QChar>::target_type > ();
+}
+
+static void _call_f_listSeparator_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<qt_gsi::Converter<QChar>::target_type > ((qt_gsi::Converter<QChar>::target_type)qt_gsi::CppToQtAdaptor<QChar>(QDir::listSeparator ()));
+}
+
+
 // static bool QDir::match(const QStringList &filters, const QString &fileName)
 
 
@@ -1296,6 +1330,7 @@ static gsi::Methods methods_QDir () {
   methods += new qt_gsi::GenericMethod ("filePath", "@brief Method QString QDir::filePath(const QString &fileName)\n", true, &_init_f_filePath_c2025, &_call_f_filePath_c2025);
   methods += new qt_gsi::GenericMethod (":filter", "@brief Method QFlags<QDir::Filter> QDir::filter()\n", true, &_init_f_filter_c0, &_call_f_filter_c0);
   methods += new qt_gsi::GenericMethod ("isAbsolute?", "@brief Method bool QDir::isAbsolute()\n", true, &_init_f_isAbsolute_c0, &_call_f_isAbsolute_c0);
+  methods += new qt_gsi::GenericMethod ("isEmpty?", "@brief Method bool QDir::isEmpty(QFlags<QDir::Filter> filters)\n", true, &_init_f_isEmpty_c2230, &_call_f_isEmpty_c2230);
   methods += new qt_gsi::GenericMethod ("isReadable?", "@brief Method bool QDir::isReadable()\n", true, &_init_f_isReadable_c0, &_call_f_isReadable_c0);
   methods += new qt_gsi::GenericMethod ("isRelative?", "@brief Method bool QDir::isRelative()\n", true, &_init_f_isRelative_c0, &_call_f_isRelative_c0);
   methods += new qt_gsi::GenericMethod ("isRoot?", "@brief Method bool QDir::isRoot()\n", true, &_init_f_isRoot_c0, &_call_f_isRoot_c0);
@@ -1333,6 +1368,7 @@ static gsi::Methods methods_QDir () {
   methods += new qt_gsi::GenericStaticMethod ("homePath", "@brief Static method QString QDir::homePath()\nThis method is static and can be called without an instance.", &_init_f_homePath_0, &_call_f_homePath_0);
   methods += new qt_gsi::GenericStaticMethod ("isAbsolutePath?", "@brief Static method bool QDir::isAbsolutePath(const QString &path)\nThis method is static and can be called without an instance.", &_init_f_isAbsolutePath_2025, &_call_f_isAbsolutePath_2025);
   methods += new qt_gsi::GenericStaticMethod ("isRelativePath?", "@brief Static method bool QDir::isRelativePath(const QString &path)\nThis method is static and can be called without an instance.", &_init_f_isRelativePath_2025, &_call_f_isRelativePath_2025);
+  methods += new qt_gsi::GenericStaticMethod ("listSeparator", "@brief Static method QChar QDir::listSeparator()\nThis method is static and can be called without an instance.", &_init_f_listSeparator_0, &_call_f_listSeparator_0);
   methods += new qt_gsi::GenericStaticMethod ("match", "@brief Static method bool QDir::match(const QStringList &filters, const QString &fileName)\nThis method is static and can be called without an instance.", &_init_f_match_4354, &_call_f_match_4354);
   methods += new qt_gsi::GenericStaticMethod ("match", "@brief Static method bool QDir::match(const QString &filter, const QString &fileName)\nThis method is static and can be called without an instance.", &_init_f_match_3942, &_call_f_match_3942);
   methods += new qt_gsi::GenericStaticMethod ("nameFiltersFromString", "@brief Static method QStringList QDir::nameFiltersFromString(const QString &nameFilter)\nThis method is static and can be called without an instance.", &_init_f_nameFiltersFromString_2025, &_call_f_nameFiltersFromString_2025);

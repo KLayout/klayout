@@ -548,33 +548,33 @@ public:
     return QRadioData::senderSignalIndex();
   }
 
-  //  [adaptor impl] bool QRadioData::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QRadioData::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QRadioData::event(arg1);
+    return QRadioData::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QRadioData_Adaptor, bool, QEvent *>(&QRadioData_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QRadioData_Adaptor, bool, QEvent *>(&QRadioData_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QRadioData::event(arg1);
+      return QRadioData::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QRadioData::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QRadioData::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QRadioData::eventFilter(arg1, arg2);
+    return QRadioData::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QRadioData_Adaptor, bool, QObject *, QEvent *>(&QRadioData_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QRadioData_Adaptor, bool, QObject *, QEvent *>(&QRadioData_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QRadioData::eventFilter(arg1, arg2);
+      return QRadioData::eventFilter(watched, event);
     }
   }
 
@@ -593,33 +593,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QRadioData::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QRadioData::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QRadioData::childEvent(arg1);
+    QRadioData::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QRadioData_Adaptor, QChildEvent *>(&QRadioData_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QRadioData_Adaptor, QChildEvent *>(&QRadioData_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QRadioData::childEvent(arg1);
+      QRadioData::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QRadioData::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QRadioData::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QRadioData::customEvent(arg1);
+    QRadioData::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QRadioData_Adaptor, QEvent *>(&QRadioData_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QRadioData_Adaptor, QEvent *>(&QRadioData_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QRadioData::customEvent(arg1);
+      QRadioData::customEvent(event);
     }
   }
 
@@ -653,18 +653,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QRadioData::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QRadioData::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QRadioData::timerEvent(arg1);
+    QRadioData::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QRadioData_Adaptor, QTimerEvent *>(&QRadioData_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QRadioData_Adaptor, QTimerEvent *>(&QRadioData_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QRadioData::timerEvent(arg1);
+      QRadioData::timerEvent(event);
     }
   }
 
@@ -686,7 +686,7 @@ static void _init_ctor_QRadioData_Adaptor_2976 (qt_gsi::GenericStaticMethod *dec
 {
   static gsi::ArgSpecBase argspec_0 ("mediaObject");
   decl->add_arg<QMediaObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_1);
   decl->set_return_new<QRadioData_Adaptor> ();
 }
@@ -696,16 +696,16 @@ static void _call_ctor_QRadioData_Adaptor_2976 (const qt_gsi::GenericStaticMetho
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QMediaObject *arg1 = gsi::arg_reader<QMediaObject * >() (args, heap);
-  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QRadioData_Adaptor *> (new QRadioData_Adaptor (arg1, arg2));
 }
 
 
-// void QRadioData::childEvent(QChildEvent *)
+// void QRadioData::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -725,11 +725,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QRadioData::customEvent(QEvent *)
+// void QRadioData::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -773,11 +773,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QRadioData::event(QEvent *)
+// bool QRadioData::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -796,13 +796,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QRadioData::eventFilter(QObject *, QEvent *)
+// bool QRadioData::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -928,11 +928,11 @@ static void _set_callback_cbs_setMediaObject_1782_0 (void *cls, const gsi::Callb
 }
 
 
-// void QRadioData::timerEvent(QTimerEvent *)
+// void QRadioData::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -960,15 +960,15 @@ gsi::Class<QRadioData> &qtdecl_QRadioData ();
 static gsi::Methods methods_QRadioData_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QRadioData::QRadioData(QMediaObject *mediaObject, QObject *parent)\nThis method creates an object of class QRadioData.", &_init_ctor_QRadioData_Adaptor_2976, &_call_ctor_QRadioData_Adaptor_2976);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QRadioData::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QRadioData::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QRadioData::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QRadioData::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QRadioData::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QRadioData::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QRadioData::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QRadioData::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QRadioData::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QRadioData::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("mediaObject", "@brief Virtual method QMediaObject *QRadioData::mediaObject()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_mediaObject_c0_0, &_call_cbs_mediaObject_c0_0);
@@ -978,7 +978,7 @@ static gsi::Methods methods_QRadioData_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QRadioData::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("*setMediaObject", "@brief Virtual method bool QRadioData::setMediaObject(QMediaObject *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setMediaObject_1782_0, &_call_cbs_setMediaObject_1782_0);
   methods += new qt_gsi::GenericMethod ("*setMediaObject", "@hide", false, &_init_cbs_setMediaObject_1782_0, &_call_cbs_setMediaObject_1782_0, &_set_callback_cbs_setMediaObject_1782_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QRadioData::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QRadioData::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

@@ -343,33 +343,33 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QCameraExposureControl::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QCameraExposureControl::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QCameraExposureControl::event(arg1);
+    return QCameraExposureControl::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QCameraExposureControl_Adaptor, bool, QEvent *>(&QCameraExposureControl_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QCameraExposureControl_Adaptor, bool, QEvent *>(&QCameraExposureControl_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QCameraExposureControl::event(arg1);
+      return QCameraExposureControl::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QCameraExposureControl::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QCameraExposureControl::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QCameraExposureControl::eventFilter(arg1, arg2);
+    return QCameraExposureControl::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QCameraExposureControl_Adaptor, bool, QObject *, QEvent *>(&QCameraExposureControl_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QCameraExposureControl_Adaptor, bool, QObject *, QEvent *>(&QCameraExposureControl_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QCameraExposureControl::eventFilter(arg1, arg2);
+      return QCameraExposureControl::eventFilter(watched, event);
     }
   }
 
@@ -439,33 +439,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QCameraExposureControl::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QCameraExposureControl::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QCameraExposureControl::childEvent(arg1);
+    QCameraExposureControl::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QCameraExposureControl_Adaptor, QChildEvent *>(&QCameraExposureControl_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QCameraExposureControl_Adaptor, QChildEvent *>(&QCameraExposureControl_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QCameraExposureControl::childEvent(arg1);
+      QCameraExposureControl::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QCameraExposureControl::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QCameraExposureControl::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QCameraExposureControl::customEvent(arg1);
+    QCameraExposureControl::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QCameraExposureControl_Adaptor, QEvent *>(&QCameraExposureControl_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QCameraExposureControl_Adaptor, QEvent *>(&QCameraExposureControl_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QCameraExposureControl::customEvent(arg1);
+      QCameraExposureControl::customEvent(event);
     }
   }
 
@@ -484,18 +484,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QCameraExposureControl::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QCameraExposureControl::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QCameraExposureControl::timerEvent(arg1);
+    QCameraExposureControl::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QCameraExposureControl_Adaptor, QTimerEvent *>(&QCameraExposureControl_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QCameraExposureControl_Adaptor, QTimerEvent *>(&QCameraExposureControl_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QCameraExposureControl::timerEvent(arg1);
+      QCameraExposureControl::timerEvent(event);
     }
   }
 
@@ -551,11 +551,11 @@ static void _set_callback_cbs_actualValue_c4602_0 (void *cls, const gsi::Callbac
 }
 
 
-// void QCameraExposureControl::childEvent(QChildEvent *)
+// void QCameraExposureControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -575,11 +575,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QCameraExposureControl::customEvent(QEvent *)
+// void QCameraExposureControl::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -623,11 +623,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QCameraExposureControl::event(QEvent *)
+// bool QCameraExposureControl::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -646,13 +646,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QCameraExposureControl::eventFilter(QObject *, QEvent *)
+// bool QCameraExposureControl::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -834,11 +834,11 @@ static void _set_callback_cbs_supportedParameterRange_c5544_0 (void *cls, const 
 }
 
 
-// void QCameraExposureControl::timerEvent(QTimerEvent *)
+// void QCameraExposureControl::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -868,15 +868,15 @@ static gsi::Methods methods_QCameraExposureControl_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCameraExposureControl::QCameraExposureControl()\nThis method creates an object of class QCameraExposureControl.", &_init_ctor_QCameraExposureControl_Adaptor_0, &_call_ctor_QCameraExposureControl_Adaptor_0);
   methods += new qt_gsi::GenericMethod ("actualValue", "@brief Virtual method QVariant QCameraExposureControl::actualValue(QCameraExposureControl::ExposureParameter parameter)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_actualValue_c4602_0, &_call_cbs_actualValue_c4602_0);
   methods += new qt_gsi::GenericMethod ("actualValue", "@hide", true, &_init_cbs_actualValue_c4602_0, &_call_cbs_actualValue_c4602_0, &_set_callback_cbs_actualValue_c4602_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QCameraExposureControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QCameraExposureControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QCameraExposureControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QCameraExposureControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QCameraExposureControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QCameraExposureControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QCameraExposureControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QCameraExposureControl::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QCameraExposureControl::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("isParameterSupported", "@brief Virtual method bool QCameraExposureControl::isParameterSupported(QCameraExposureControl::ExposureParameter parameter)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isParameterSupported_c4602_0, &_call_cbs_isParameterSupported_c4602_0);
   methods += new qt_gsi::GenericMethod ("isParameterSupported", "@hide", true, &_init_cbs_isParameterSupported_c4602_0, &_call_cbs_isParameterSupported_c4602_0, &_set_callback_cbs_isParameterSupported_c4602_0);
@@ -890,7 +890,7 @@ static gsi::Methods methods_QCameraExposureControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("setValue", "@hide", false, &_init_cbs_setValue_6613_0, &_call_cbs_setValue_6613_0, &_set_callback_cbs_setValue_6613_0);
   methods += new qt_gsi::GenericMethod ("supportedParameterRange", "@brief Virtual method QList<QVariant> QCameraExposureControl::supportedParameterRange(QCameraExposureControl::ExposureParameter parameter, bool *continuous)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_supportedParameterRange_c5544_0, &_call_cbs_supportedParameterRange_c5544_0);
   methods += new qt_gsi::GenericMethod ("supportedParameterRange", "@hide", true, &_init_cbs_supportedParameterRange_c5544_0, &_call_cbs_supportedParameterRange_c5544_0, &_set_callback_cbs_supportedParameterRange_c5544_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QCameraExposureControl::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QCameraExposureControl::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

@@ -266,33 +266,33 @@ public:
     emit QFileSelector::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QFileSelector::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QFileSelector::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QFileSelector::event(arg1);
+    return QFileSelector::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QFileSelector_Adaptor, bool, QEvent *>(&QFileSelector_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QFileSelector_Adaptor, bool, QEvent *>(&QFileSelector_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QFileSelector::event(arg1);
+      return QFileSelector::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QFileSelector::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QFileSelector::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QFileSelector::eventFilter(arg1, arg2);
+    return QFileSelector::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QFileSelector_Adaptor, bool, QObject *, QEvent *>(&QFileSelector_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QFileSelector_Adaptor, bool, QObject *, QEvent *>(&QFileSelector_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QFileSelector::eventFilter(arg1, arg2);
+      return QFileSelector::eventFilter(watched, event);
     }
   }
 
@@ -303,33 +303,33 @@ public:
     throw tl::Exception ("Can't emit private signal 'void QFileSelector::objectNameChanged(const QString &objectName)'");
   }
 
-  //  [adaptor impl] void QFileSelector::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QFileSelector::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QFileSelector::childEvent(arg1);
+    QFileSelector::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QFileSelector_Adaptor, QChildEvent *>(&QFileSelector_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QFileSelector_Adaptor, QChildEvent *>(&QFileSelector_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QFileSelector::childEvent(arg1);
+      QFileSelector::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QFileSelector::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QFileSelector::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QFileSelector::customEvent(arg1);
+    QFileSelector::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QFileSelector_Adaptor, QEvent *>(&QFileSelector_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QFileSelector_Adaptor, QEvent *>(&QFileSelector_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QFileSelector::customEvent(arg1);
+      QFileSelector::customEvent(event);
     }
   }
 
@@ -348,18 +348,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QFileSelector::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QFileSelector::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QFileSelector::timerEvent(arg1);
+    QFileSelector::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QFileSelector_Adaptor, QTimerEvent *>(&QFileSelector_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QFileSelector_Adaptor, QTimerEvent *>(&QFileSelector_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QFileSelector::timerEvent(arg1);
+      QFileSelector::timerEvent(event);
     }
   }
 
@@ -377,7 +377,7 @@ QFileSelector_Adaptor::~QFileSelector_Adaptor() { }
 
 static void _init_ctor_QFileSelector_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QFileSelector_Adaptor> ();
 }
@@ -386,16 +386,16 @@ static void _call_ctor_QFileSelector_Adaptor_1302 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QFileSelector_Adaptor *> (new QFileSelector_Adaptor (arg1));
 }
 
 
-// void QFileSelector::childEvent(QChildEvent *)
+// void QFileSelector::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -415,11 +415,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QFileSelector::customEvent(QEvent *)
+// void QFileSelector::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -443,7 +443,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -452,7 +452,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QFileSelector_Adaptor *)cls)->emitter_QFileSelector_destroyed_1302 (arg1);
 }
 
@@ -481,11 +481,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QFileSelector::event(QEvent *)
+// bool QFileSelector::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -504,13 +504,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QFileSelector::eventFilter(QObject *, QEvent *)
+// bool QFileSelector::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -612,11 +612,11 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QFileSelector::timerEvent(QTimerEvent *)
+// void QFileSelector::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -644,23 +644,23 @@ gsi::Class<QFileSelector> &qtdecl_QFileSelector ();
 static gsi::Methods methods_QFileSelector_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QFileSelector::QFileSelector(QObject *parent)\nThis method creates an object of class QFileSelector.", &_init_ctor_QFileSelector_Adaptor_1302, &_call_ctor_QFileSelector_Adaptor_1302);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QFileSelector::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QFileSelector::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QFileSelector::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QFileSelector::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QFileSelector::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QFileSelector::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QFileSelector::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QFileSelector::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QFileSelector::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QFileSelector::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QFileSelector::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QFileSelector::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QFileSelector::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QFileSelector::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QFileSelector::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QFileSelector::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QFileSelector::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

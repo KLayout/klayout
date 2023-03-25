@@ -909,33 +909,33 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QRadioTunerControl::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QRadioTunerControl::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QRadioTunerControl::event(arg1);
+    return QRadioTunerControl::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QRadioTunerControl_Adaptor, bool, QEvent *>(&QRadioTunerControl_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QRadioTunerControl_Adaptor, bool, QEvent *>(&QRadioTunerControl_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QRadioTunerControl::event(arg1);
+      return QRadioTunerControl::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QRadioTunerControl::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QRadioTunerControl::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QRadioTunerControl::eventFilter(arg1, arg2);
+    return QRadioTunerControl::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QRadioTunerControl_Adaptor, bool, QObject *, QEvent *>(&QRadioTunerControl_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QRadioTunerControl_Adaptor, bool, QObject *, QEvent *>(&QRadioTunerControl_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QRadioTunerControl::eventFilter(arg1, arg2);
+      return QRadioTunerControl::eventFilter(watched, event);
     }
   }
 
@@ -1278,33 +1278,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QRadioTunerControl::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QRadioTunerControl::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QRadioTunerControl::childEvent(arg1);
+    QRadioTunerControl::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QRadioTunerControl_Adaptor, QChildEvent *>(&QRadioTunerControl_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QRadioTunerControl_Adaptor, QChildEvent *>(&QRadioTunerControl_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QRadioTunerControl::childEvent(arg1);
+      QRadioTunerControl::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QRadioTunerControl::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QRadioTunerControl::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QRadioTunerControl::customEvent(arg1);
+    QRadioTunerControl::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QRadioTunerControl_Adaptor, QEvent *>(&QRadioTunerControl_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QRadioTunerControl_Adaptor, QEvent *>(&QRadioTunerControl_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QRadioTunerControl::customEvent(arg1);
+      QRadioTunerControl::customEvent(event);
     }
   }
 
@@ -1323,18 +1323,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QRadioTunerControl::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QRadioTunerControl::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QRadioTunerControl::timerEvent(arg1);
+    QRadioTunerControl::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QRadioTunerControl_Adaptor, QTimerEvent *>(&QRadioTunerControl_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QRadioTunerControl_Adaptor, QTimerEvent *>(&QRadioTunerControl_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QRadioTunerControl::timerEvent(arg1);
+      QRadioTunerControl::timerEvent(event);
     }
   }
 
@@ -1413,11 +1413,11 @@ static void _set_callback_cbs_cancelSearch_0_0 (void *cls, const gsi::Callback &
 }
 
 
-// void QRadioTunerControl::childEvent(QChildEvent *)
+// void QRadioTunerControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1437,11 +1437,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QRadioTunerControl::customEvent(QEvent *)
+// void QRadioTunerControl::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1523,11 +1523,11 @@ static void _set_callback_cbs_errorString_c0_0 (void *cls, const gsi::Callback &
 }
 
 
-// bool QRadioTunerControl::event(QEvent *)
+// bool QRadioTunerControl::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -1546,13 +1546,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QRadioTunerControl::eventFilter(QObject *, QEvent *)
+// bool QRadioTunerControl::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -2081,11 +2081,11 @@ static void _set_callback_cbs_stop_0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QRadioTunerControl::timerEvent(QTimerEvent *)
+// void QRadioTunerControl::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2135,9 +2135,9 @@ static gsi::Methods methods_QRadioTunerControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("band", "@hide", true, &_init_cbs_band_c0_0, &_call_cbs_band_c0_0, &_set_callback_cbs_band_c0_0);
   methods += new qt_gsi::GenericMethod ("cancelSearch", "@brief Virtual method void QRadioTunerControl::cancelSearch()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_cancelSearch_0_0, &_call_cbs_cancelSearch_0_0);
   methods += new qt_gsi::GenericMethod ("cancelSearch", "@hide", false, &_init_cbs_cancelSearch_0_0, &_call_cbs_cancelSearch_0_0, &_set_callback_cbs_cancelSearch_0_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QRadioTunerControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QRadioTunerControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QRadioTunerControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QRadioTunerControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QRadioTunerControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
@@ -2145,9 +2145,9 @@ static gsi::Methods methods_QRadioTunerControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("error", "@hide", true, &_init_cbs_error_c0_0, &_call_cbs_error_c0_0, &_set_callback_cbs_error_c0_0);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Virtual method QString QRadioTunerControl::errorString()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0);
   methods += new qt_gsi::GenericMethod ("errorString", "@hide", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0, &_set_callback_cbs_errorString_c0_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QRadioTunerControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QRadioTunerControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QRadioTunerControl::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QRadioTunerControl::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("frequency", "@brief Virtual method int QRadioTunerControl::frequency()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_frequency_c0_0, &_call_cbs_frequency_c0_0);
   methods += new qt_gsi::GenericMethod ("frequency", "@hide", true, &_init_cbs_frequency_c0_0, &_call_cbs_frequency_c0_0, &_set_callback_cbs_frequency_c0_0);
@@ -2195,7 +2195,7 @@ static gsi::Methods methods_QRadioTunerControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("stereoMode", "@hide", true, &_init_cbs_stereoMode_c0_0, &_call_cbs_stereoMode_c0_0, &_set_callback_cbs_stereoMode_c0_0);
   methods += new qt_gsi::GenericMethod ("stop", "@brief Virtual method void QRadioTunerControl::stop()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_stop_0_0, &_call_cbs_stop_0_0);
   methods += new qt_gsi::GenericMethod ("stop", "@hide", false, &_init_cbs_stop_0_0, &_call_cbs_stop_0_0, &_set_callback_cbs_stop_0_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QRadioTunerControl::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QRadioTunerControl::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("volume", "@brief Virtual method int QRadioTunerControl::volume()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_volume_c0_0, &_call_cbs_volume_c0_0);
   methods += new qt_gsi::GenericMethod ("volume", "@hide", true, &_init_cbs_volume_c0_0, &_call_cbs_volume_c0_0, &_set_callback_cbs_volume_c0_0);

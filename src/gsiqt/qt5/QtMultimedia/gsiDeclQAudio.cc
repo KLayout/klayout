@@ -88,6 +88,35 @@ static gsi::ClassExt<QAudio_Namespace> decl_QAudio_Mode_Enums_as_child (decl_QAu
 }
 
 
+//  Implementation of the enum wrapper class for QAudio::Role
+namespace qt_gsi
+{
+
+static gsi::Enum<QAudio::Role> decl_QAudio_Role_Enum ("QtMultimedia", "QAudio_Role",
+    gsi::enum_const ("UnknownRole", QAudio::UnknownRole, "@brief Enum constant QAudio::UnknownRole") +
+    gsi::enum_const ("MusicRole", QAudio::MusicRole, "@brief Enum constant QAudio::MusicRole") +
+    gsi::enum_const ("VideoRole", QAudio::VideoRole, "@brief Enum constant QAudio::VideoRole") +
+    gsi::enum_const ("VoiceCommunicationRole", QAudio::VoiceCommunicationRole, "@brief Enum constant QAudio::VoiceCommunicationRole") +
+    gsi::enum_const ("AlarmRole", QAudio::AlarmRole, "@brief Enum constant QAudio::AlarmRole") +
+    gsi::enum_const ("NotificationRole", QAudio::NotificationRole, "@brief Enum constant QAudio::NotificationRole") +
+    gsi::enum_const ("RingtoneRole", QAudio::RingtoneRole, "@brief Enum constant QAudio::RingtoneRole") +
+    gsi::enum_const ("AccessibilityRole", QAudio::AccessibilityRole, "@brief Enum constant QAudio::AccessibilityRole") +
+    gsi::enum_const ("SonificationRole", QAudio::SonificationRole, "@brief Enum constant QAudio::SonificationRole") +
+    gsi::enum_const ("GameRole", QAudio::GameRole, "@brief Enum constant QAudio::GameRole") +
+    gsi::enum_const ("CustomRole", QAudio::CustomRole, "@brief Enum constant QAudio::CustomRole"),
+  "@qt\n@brief This class represents the QAudio::Role enum");
+
+static gsi::QFlagsClass<QAudio::Role > decl_QAudio_Role_Enums ("QtMultimedia", "QAudio_QFlags_Role",
+  "@qt\n@brief This class represents the QFlags<QAudio::Role> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<QAudio_Namespace> inject_QAudio_Role_Enum_in_parent (decl_QAudio_Role_Enum.defs ());
+static gsi::ClassExt<QAudio_Namespace> decl_QAudio_Role_Enum_as_child (decl_QAudio_Role_Enum, "Role");
+static gsi::ClassExt<QAudio_Namespace> decl_QAudio_Role_Enums_as_child (decl_QAudio_Role_Enums, "QFlags_Role");
+
+}
+
+
 //  Implementation of the enum wrapper class for QAudio::State
 namespace qt_gsi
 {
@@ -96,7 +125,8 @@ static gsi::Enum<QAudio::State> decl_QAudio_State_Enum ("QtMultimedia", "QAudio_
     gsi::enum_const ("ActiveState", QAudio::ActiveState, "@brief Enum constant QAudio::ActiveState") +
     gsi::enum_const ("SuspendedState", QAudio::SuspendedState, "@brief Enum constant QAudio::SuspendedState") +
     gsi::enum_const ("StoppedState", QAudio::StoppedState, "@brief Enum constant QAudio::StoppedState") +
-    gsi::enum_const ("IdleState", QAudio::IdleState, "@brief Enum constant QAudio::IdleState"),
+    gsi::enum_const ("IdleState", QAudio::IdleState, "@brief Enum constant QAudio::IdleState") +
+    gsi::enum_const ("InterruptedState", QAudio::InterruptedState, "@brief Enum constant QAudio::InterruptedState"),
   "@qt\n@brief This class represents the QAudio::State enum");
 
 static gsi::QFlagsClass<QAudio::State > decl_QAudio_State_Enums ("QtMultimedia", "QAudio_QFlags_State",
@@ -106,6 +136,28 @@ static gsi::QFlagsClass<QAudio::State > decl_QAudio_State_Enums ("QtMultimedia",
 static gsi::ClassExt<QAudio_Namespace> inject_QAudio_State_Enum_in_parent (decl_QAudio_State_Enum.defs ());
 static gsi::ClassExt<QAudio_Namespace> decl_QAudio_State_Enum_as_child (decl_QAudio_State_Enum, "State");
 static gsi::ClassExt<QAudio_Namespace> decl_QAudio_State_Enums_as_child (decl_QAudio_State_Enums, "QFlags_State");
+
+}
+
+
+//  Implementation of the enum wrapper class for QAudio::VolumeScale
+namespace qt_gsi
+{
+
+static gsi::Enum<QAudio::VolumeScale> decl_QAudio_VolumeScale_Enum ("QtMultimedia", "QAudio_VolumeScale",
+    gsi::enum_const ("LinearVolumeScale", QAudio::LinearVolumeScale, "@brief Enum constant QAudio::LinearVolumeScale") +
+    gsi::enum_const ("CubicVolumeScale", QAudio::CubicVolumeScale, "@brief Enum constant QAudio::CubicVolumeScale") +
+    gsi::enum_const ("LogarithmicVolumeScale", QAudio::LogarithmicVolumeScale, "@brief Enum constant QAudio::LogarithmicVolumeScale") +
+    gsi::enum_const ("DecibelVolumeScale", QAudio::DecibelVolumeScale, "@brief Enum constant QAudio::DecibelVolumeScale"),
+  "@qt\n@brief This class represents the QAudio::VolumeScale enum");
+
+static gsi::QFlagsClass<QAudio::VolumeScale > decl_QAudio_VolumeScale_Enums ("QtMultimedia", "QAudio_QFlags_VolumeScale",
+  "@qt\n@brief This class represents the QFlags<QAudio::VolumeScale> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<QAudio_Namespace> inject_QAudio_VolumeScale_Enum_in_parent (decl_QAudio_VolumeScale_Enum.defs ());
+static gsi::ClassExt<QAudio_Namespace> decl_QAudio_VolumeScale_Enum_as_child (decl_QAudio_VolumeScale_Enum, "VolumeScale");
+static gsi::ClassExt<QAudio_Namespace> decl_QAudio_VolumeScale_Enums_as_child (decl_QAudio_VolumeScale_Enums, "QFlags_VolumeScale");
 
 }
 

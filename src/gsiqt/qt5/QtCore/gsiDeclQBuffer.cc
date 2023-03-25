@@ -57,7 +57,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 
 static void _init_ctor_QBuffer_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QBuffer> ();
 }
@@ -66,7 +66,7 @@ static void _call_ctor_QBuffer_1302 (const qt_gsi::GenericStaticMethod * /*decl*
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QBuffer *> (new QBuffer (arg1));
 }
 
@@ -78,7 +78,7 @@ static void _init_ctor_QBuffer_2812 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("buf");
   decl->add_arg<QByteArray * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_1);
   decl->set_return_new<QBuffer> ();
 }
@@ -88,7 +88,7 @@ static void _call_ctor_QBuffer_2812 (const qt_gsi::GenericStaticMethod * /*decl*
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QByteArray *arg1 = gsi::arg_reader<QByteArray * >() (args, heap);
-  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QBuffer *> (new QBuffer (arg1, arg2));
 }
 
@@ -389,6 +389,8 @@ static gsi::Methods methods_QBuffer () {
   methods += new qt_gsi::GenericMethod ("size", "@brief Method qint64 QBuffer::size()\nThis is a reimplementation of QIODevice::size", true, &_init_f_size_c0, &_call_f_size_c0);
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QBuffer::aboutToClose()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64 > ("bytesWritten(qint64)", "bytesWritten", gsi::arg("bytes"), "@brief Signal declaration for QBuffer::bytesWritten(qint64 bytes)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int, qint64 > ("channelBytesWritten(int, qint64)", "channelBytesWritten", gsi::arg("channel"), gsi::arg("bytes"), "@brief Signal declaration for QBuffer::channelBytesWritten(int channel, qint64 bytes)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("channelReadyRead(int)", "channelReadyRead", gsi::arg("channel"), "@brief Signal declaration for QBuffer::channelReadyRead(int channel)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QBuffer::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QBuffer::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("readChannelFinished()", "readChannelFinished", "@brief Signal declaration for QBuffer::readChannelFinished()\nYou can bind a procedure to this signal.");

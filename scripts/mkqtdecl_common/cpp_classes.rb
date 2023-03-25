@@ -155,16 +155,15 @@ end
 # part.
 class CPPMemberPointer < CPPOuterType
 
-  attr_accessor :qid, :inner, :cv
-  def_initializer :qid, :inner, :cv
+  attr_accessor :qid, :inner
+  def_initializer :qid, :inner
 
   def to_s
-    self.qid.to_s + "::* " + self.inner.to_s + (self.cv ? " " + self.cv.to_s : "")
+    self.qid.to_s + "::* " + self.inner.to_s
   end
 
   def dump(i)
     i + "CPPMemberPointer\n" + i + " inner:\n" + self.inner.dump(i + "  ") + 
-    i + " cv:\n" + self.cv.dump(i + "  ") + 
     i + " qid: " + self.qid.to_s
   end
 

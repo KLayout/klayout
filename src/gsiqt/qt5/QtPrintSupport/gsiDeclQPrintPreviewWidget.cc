@@ -714,18 +714,18 @@ public:
     QPrintPreviewWidget::updateMicroFocus();
   }
 
-  //  [adaptor impl] bool QPrintPreviewWidget::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QPrintPreviewWidget::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QPrintPreviewWidget::eventFilter(arg1, arg2);
+    return QPrintPreviewWidget::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QPrintPreviewWidget_Adaptor, bool, QObject *, QEvent *>(&QPrintPreviewWidget_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QPrintPreviewWidget_Adaptor, bool, QObject *, QEvent *>(&QPrintPreviewWidget_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QPrintPreviewWidget::eventFilter(arg1, arg2);
+      return QPrintPreviewWidget::eventFilter(watched, event);
     }
   }
 
@@ -834,18 +834,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::actionEvent(QActionEvent *)
-  void cbs_actionEvent_1823_0(QActionEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::actionEvent(QActionEvent *event)
+  void cbs_actionEvent_1823_0(QActionEvent *event)
   {
-    QPrintPreviewWidget::actionEvent(arg1);
+    QPrintPreviewWidget::actionEvent(event);
   }
 
-  virtual void actionEvent(QActionEvent *arg1)
+  virtual void actionEvent(QActionEvent *event)
   {
     if (cb_actionEvent_1823_0.can_issue()) {
-      cb_actionEvent_1823_0.issue<QPrintPreviewWidget_Adaptor, QActionEvent *>(&QPrintPreviewWidget_Adaptor::cbs_actionEvent_1823_0, arg1);
+      cb_actionEvent_1823_0.issue<QPrintPreviewWidget_Adaptor, QActionEvent *>(&QPrintPreviewWidget_Adaptor::cbs_actionEvent_1823_0, event);
     } else {
-      QPrintPreviewWidget::actionEvent(arg1);
+      QPrintPreviewWidget::actionEvent(event);
     }
   }
 
@@ -864,63 +864,63 @@ public:
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QPrintPreviewWidget::childEvent(arg1);
+    QPrintPreviewWidget::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QPrintPreviewWidget_Adaptor, QChildEvent *>(&QPrintPreviewWidget_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QPrintPreviewWidget_Adaptor, QChildEvent *>(&QPrintPreviewWidget_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QPrintPreviewWidget::childEvent(arg1);
+      QPrintPreviewWidget::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::closeEvent(QCloseEvent *)
-  void cbs_closeEvent_1719_0(QCloseEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::closeEvent(QCloseEvent *event)
+  void cbs_closeEvent_1719_0(QCloseEvent *event)
   {
-    QPrintPreviewWidget::closeEvent(arg1);
+    QPrintPreviewWidget::closeEvent(event);
   }
 
-  virtual void closeEvent(QCloseEvent *arg1)
+  virtual void closeEvent(QCloseEvent *event)
   {
     if (cb_closeEvent_1719_0.can_issue()) {
-      cb_closeEvent_1719_0.issue<QPrintPreviewWidget_Adaptor, QCloseEvent *>(&QPrintPreviewWidget_Adaptor::cbs_closeEvent_1719_0, arg1);
+      cb_closeEvent_1719_0.issue<QPrintPreviewWidget_Adaptor, QCloseEvent *>(&QPrintPreviewWidget_Adaptor::cbs_closeEvent_1719_0, event);
     } else {
-      QPrintPreviewWidget::closeEvent(arg1);
+      QPrintPreviewWidget::closeEvent(event);
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::contextMenuEvent(QContextMenuEvent *)
-  void cbs_contextMenuEvent_2363_0(QContextMenuEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::contextMenuEvent(QContextMenuEvent *event)
+  void cbs_contextMenuEvent_2363_0(QContextMenuEvent *event)
   {
-    QPrintPreviewWidget::contextMenuEvent(arg1);
+    QPrintPreviewWidget::contextMenuEvent(event);
   }
 
-  virtual void contextMenuEvent(QContextMenuEvent *arg1)
+  virtual void contextMenuEvent(QContextMenuEvent *event)
   {
     if (cb_contextMenuEvent_2363_0.can_issue()) {
-      cb_contextMenuEvent_2363_0.issue<QPrintPreviewWidget_Adaptor, QContextMenuEvent *>(&QPrintPreviewWidget_Adaptor::cbs_contextMenuEvent_2363_0, arg1);
+      cb_contextMenuEvent_2363_0.issue<QPrintPreviewWidget_Adaptor, QContextMenuEvent *>(&QPrintPreviewWidget_Adaptor::cbs_contextMenuEvent_2363_0, event);
     } else {
-      QPrintPreviewWidget::contextMenuEvent(arg1);
+      QPrintPreviewWidget::contextMenuEvent(event);
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QPrintPreviewWidget::customEvent(arg1);
+    QPrintPreviewWidget::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QPrintPreviewWidget_Adaptor, QEvent *>(&QPrintPreviewWidget_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QPrintPreviewWidget_Adaptor, QEvent *>(&QPrintPreviewWidget_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QPrintPreviewWidget::customEvent(arg1);
+      QPrintPreviewWidget::customEvent(event);
     }
   }
 
@@ -939,108 +939,108 @@ public:
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::dragEnterEvent(QDragEnterEvent *)
-  void cbs_dragEnterEvent_2109_0(QDragEnterEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::dragEnterEvent(QDragEnterEvent *event)
+  void cbs_dragEnterEvent_2109_0(QDragEnterEvent *event)
   {
-    QPrintPreviewWidget::dragEnterEvent(arg1);
+    QPrintPreviewWidget::dragEnterEvent(event);
   }
 
-  virtual void dragEnterEvent(QDragEnterEvent *arg1)
+  virtual void dragEnterEvent(QDragEnterEvent *event)
   {
     if (cb_dragEnterEvent_2109_0.can_issue()) {
-      cb_dragEnterEvent_2109_0.issue<QPrintPreviewWidget_Adaptor, QDragEnterEvent *>(&QPrintPreviewWidget_Adaptor::cbs_dragEnterEvent_2109_0, arg1);
+      cb_dragEnterEvent_2109_0.issue<QPrintPreviewWidget_Adaptor, QDragEnterEvent *>(&QPrintPreviewWidget_Adaptor::cbs_dragEnterEvent_2109_0, event);
     } else {
-      QPrintPreviewWidget::dragEnterEvent(arg1);
+      QPrintPreviewWidget::dragEnterEvent(event);
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::dragLeaveEvent(QDragLeaveEvent *)
-  void cbs_dragLeaveEvent_2092_0(QDragLeaveEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::dragLeaveEvent(QDragLeaveEvent *event)
+  void cbs_dragLeaveEvent_2092_0(QDragLeaveEvent *event)
   {
-    QPrintPreviewWidget::dragLeaveEvent(arg1);
+    QPrintPreviewWidget::dragLeaveEvent(event);
   }
 
-  virtual void dragLeaveEvent(QDragLeaveEvent *arg1)
+  virtual void dragLeaveEvent(QDragLeaveEvent *event)
   {
     if (cb_dragLeaveEvent_2092_0.can_issue()) {
-      cb_dragLeaveEvent_2092_0.issue<QPrintPreviewWidget_Adaptor, QDragLeaveEvent *>(&QPrintPreviewWidget_Adaptor::cbs_dragLeaveEvent_2092_0, arg1);
+      cb_dragLeaveEvent_2092_0.issue<QPrintPreviewWidget_Adaptor, QDragLeaveEvent *>(&QPrintPreviewWidget_Adaptor::cbs_dragLeaveEvent_2092_0, event);
     } else {
-      QPrintPreviewWidget::dragLeaveEvent(arg1);
+      QPrintPreviewWidget::dragLeaveEvent(event);
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::dragMoveEvent(QDragMoveEvent *)
-  void cbs_dragMoveEvent_2006_0(QDragMoveEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::dragMoveEvent(QDragMoveEvent *event)
+  void cbs_dragMoveEvent_2006_0(QDragMoveEvent *event)
   {
-    QPrintPreviewWidget::dragMoveEvent(arg1);
+    QPrintPreviewWidget::dragMoveEvent(event);
   }
 
-  virtual void dragMoveEvent(QDragMoveEvent *arg1)
+  virtual void dragMoveEvent(QDragMoveEvent *event)
   {
     if (cb_dragMoveEvent_2006_0.can_issue()) {
-      cb_dragMoveEvent_2006_0.issue<QPrintPreviewWidget_Adaptor, QDragMoveEvent *>(&QPrintPreviewWidget_Adaptor::cbs_dragMoveEvent_2006_0, arg1);
+      cb_dragMoveEvent_2006_0.issue<QPrintPreviewWidget_Adaptor, QDragMoveEvent *>(&QPrintPreviewWidget_Adaptor::cbs_dragMoveEvent_2006_0, event);
     } else {
-      QPrintPreviewWidget::dragMoveEvent(arg1);
+      QPrintPreviewWidget::dragMoveEvent(event);
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::dropEvent(QDropEvent *)
-  void cbs_dropEvent_1622_0(QDropEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::dropEvent(QDropEvent *event)
+  void cbs_dropEvent_1622_0(QDropEvent *event)
   {
-    QPrintPreviewWidget::dropEvent(arg1);
+    QPrintPreviewWidget::dropEvent(event);
   }
 
-  virtual void dropEvent(QDropEvent *arg1)
+  virtual void dropEvent(QDropEvent *event)
   {
     if (cb_dropEvent_1622_0.can_issue()) {
-      cb_dropEvent_1622_0.issue<QPrintPreviewWidget_Adaptor, QDropEvent *>(&QPrintPreviewWidget_Adaptor::cbs_dropEvent_1622_0, arg1);
+      cb_dropEvent_1622_0.issue<QPrintPreviewWidget_Adaptor, QDropEvent *>(&QPrintPreviewWidget_Adaptor::cbs_dropEvent_1622_0, event);
     } else {
-      QPrintPreviewWidget::dropEvent(arg1);
+      QPrintPreviewWidget::dropEvent(event);
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::enterEvent(QEvent *)
-  void cbs_enterEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::enterEvent(QEvent *event)
+  void cbs_enterEvent_1217_0(QEvent *event)
   {
-    QPrintPreviewWidget::enterEvent(arg1);
+    QPrintPreviewWidget::enterEvent(event);
   }
 
-  virtual void enterEvent(QEvent *arg1)
+  virtual void enterEvent(QEvent *event)
   {
     if (cb_enterEvent_1217_0.can_issue()) {
-      cb_enterEvent_1217_0.issue<QPrintPreviewWidget_Adaptor, QEvent *>(&QPrintPreviewWidget_Adaptor::cbs_enterEvent_1217_0, arg1);
+      cb_enterEvent_1217_0.issue<QPrintPreviewWidget_Adaptor, QEvent *>(&QPrintPreviewWidget_Adaptor::cbs_enterEvent_1217_0, event);
     } else {
-      QPrintPreviewWidget::enterEvent(arg1);
+      QPrintPreviewWidget::enterEvent(event);
     }
   }
 
-  //  [adaptor impl] bool QPrintPreviewWidget::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QPrintPreviewWidget::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QPrintPreviewWidget::event(arg1);
+    return QPrintPreviewWidget::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QPrintPreviewWidget_Adaptor, bool, QEvent *>(&QPrintPreviewWidget_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QPrintPreviewWidget_Adaptor, bool, QEvent *>(&QPrintPreviewWidget_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QPrintPreviewWidget::event(arg1);
+      return QPrintPreviewWidget::event(_event);
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::focusInEvent(QFocusEvent *)
-  void cbs_focusInEvent_1729_0(QFocusEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::focusInEvent(QFocusEvent *event)
+  void cbs_focusInEvent_1729_0(QFocusEvent *event)
   {
-    QPrintPreviewWidget::focusInEvent(arg1);
+    QPrintPreviewWidget::focusInEvent(event);
   }
 
-  virtual void focusInEvent(QFocusEvent *arg1)
+  virtual void focusInEvent(QFocusEvent *event)
   {
     if (cb_focusInEvent_1729_0.can_issue()) {
-      cb_focusInEvent_1729_0.issue<QPrintPreviewWidget_Adaptor, QFocusEvent *>(&QPrintPreviewWidget_Adaptor::cbs_focusInEvent_1729_0, arg1);
+      cb_focusInEvent_1729_0.issue<QPrintPreviewWidget_Adaptor, QFocusEvent *>(&QPrintPreviewWidget_Adaptor::cbs_focusInEvent_1729_0, event);
     } else {
-      QPrintPreviewWidget::focusInEvent(arg1);
+      QPrintPreviewWidget::focusInEvent(event);
     }
   }
 
@@ -1059,33 +1059,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::focusOutEvent(QFocusEvent *)
-  void cbs_focusOutEvent_1729_0(QFocusEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::focusOutEvent(QFocusEvent *event)
+  void cbs_focusOutEvent_1729_0(QFocusEvent *event)
   {
-    QPrintPreviewWidget::focusOutEvent(arg1);
+    QPrintPreviewWidget::focusOutEvent(event);
   }
 
-  virtual void focusOutEvent(QFocusEvent *arg1)
+  virtual void focusOutEvent(QFocusEvent *event)
   {
     if (cb_focusOutEvent_1729_0.can_issue()) {
-      cb_focusOutEvent_1729_0.issue<QPrintPreviewWidget_Adaptor, QFocusEvent *>(&QPrintPreviewWidget_Adaptor::cbs_focusOutEvent_1729_0, arg1);
+      cb_focusOutEvent_1729_0.issue<QPrintPreviewWidget_Adaptor, QFocusEvent *>(&QPrintPreviewWidget_Adaptor::cbs_focusOutEvent_1729_0, event);
     } else {
-      QPrintPreviewWidget::focusOutEvent(arg1);
+      QPrintPreviewWidget::focusOutEvent(event);
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::hideEvent(QHideEvent *)
-  void cbs_hideEvent_1595_0(QHideEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::hideEvent(QHideEvent *event)
+  void cbs_hideEvent_1595_0(QHideEvent *event)
   {
-    QPrintPreviewWidget::hideEvent(arg1);
+    QPrintPreviewWidget::hideEvent(event);
   }
 
-  virtual void hideEvent(QHideEvent *arg1)
+  virtual void hideEvent(QHideEvent *event)
   {
     if (cb_hideEvent_1595_0.can_issue()) {
-      cb_hideEvent_1595_0.issue<QPrintPreviewWidget_Adaptor, QHideEvent *>(&QPrintPreviewWidget_Adaptor::cbs_hideEvent_1595_0, arg1);
+      cb_hideEvent_1595_0.issue<QPrintPreviewWidget_Adaptor, QHideEvent *>(&QPrintPreviewWidget_Adaptor::cbs_hideEvent_1595_0, event);
     } else {
-      QPrintPreviewWidget::hideEvent(arg1);
+      QPrintPreviewWidget::hideEvent(event);
     }
   }
 
@@ -1119,48 +1119,48 @@ public:
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::keyPressEvent(QKeyEvent *)
-  void cbs_keyPressEvent_1514_0(QKeyEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::keyPressEvent(QKeyEvent *event)
+  void cbs_keyPressEvent_1514_0(QKeyEvent *event)
   {
-    QPrintPreviewWidget::keyPressEvent(arg1);
+    QPrintPreviewWidget::keyPressEvent(event);
   }
 
-  virtual void keyPressEvent(QKeyEvent *arg1)
+  virtual void keyPressEvent(QKeyEvent *event)
   {
     if (cb_keyPressEvent_1514_0.can_issue()) {
-      cb_keyPressEvent_1514_0.issue<QPrintPreviewWidget_Adaptor, QKeyEvent *>(&QPrintPreviewWidget_Adaptor::cbs_keyPressEvent_1514_0, arg1);
+      cb_keyPressEvent_1514_0.issue<QPrintPreviewWidget_Adaptor, QKeyEvent *>(&QPrintPreviewWidget_Adaptor::cbs_keyPressEvent_1514_0, event);
     } else {
-      QPrintPreviewWidget::keyPressEvent(arg1);
+      QPrintPreviewWidget::keyPressEvent(event);
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::keyReleaseEvent(QKeyEvent *)
-  void cbs_keyReleaseEvent_1514_0(QKeyEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::keyReleaseEvent(QKeyEvent *event)
+  void cbs_keyReleaseEvent_1514_0(QKeyEvent *event)
   {
-    QPrintPreviewWidget::keyReleaseEvent(arg1);
+    QPrintPreviewWidget::keyReleaseEvent(event);
   }
 
-  virtual void keyReleaseEvent(QKeyEvent *arg1)
+  virtual void keyReleaseEvent(QKeyEvent *event)
   {
     if (cb_keyReleaseEvent_1514_0.can_issue()) {
-      cb_keyReleaseEvent_1514_0.issue<QPrintPreviewWidget_Adaptor, QKeyEvent *>(&QPrintPreviewWidget_Adaptor::cbs_keyReleaseEvent_1514_0, arg1);
+      cb_keyReleaseEvent_1514_0.issue<QPrintPreviewWidget_Adaptor, QKeyEvent *>(&QPrintPreviewWidget_Adaptor::cbs_keyReleaseEvent_1514_0, event);
     } else {
-      QPrintPreviewWidget::keyReleaseEvent(arg1);
+      QPrintPreviewWidget::keyReleaseEvent(event);
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::leaveEvent(QEvent *)
-  void cbs_leaveEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::leaveEvent(QEvent *event)
+  void cbs_leaveEvent_1217_0(QEvent *event)
   {
-    QPrintPreviewWidget::leaveEvent(arg1);
+    QPrintPreviewWidget::leaveEvent(event);
   }
 
-  virtual void leaveEvent(QEvent *arg1)
+  virtual void leaveEvent(QEvent *event)
   {
     if (cb_leaveEvent_1217_0.can_issue()) {
-      cb_leaveEvent_1217_0.issue<QPrintPreviewWidget_Adaptor, QEvent *>(&QPrintPreviewWidget_Adaptor::cbs_leaveEvent_1217_0, arg1);
+      cb_leaveEvent_1217_0.issue<QPrintPreviewWidget_Adaptor, QEvent *>(&QPrintPreviewWidget_Adaptor::cbs_leaveEvent_1217_0, event);
     } else {
-      QPrintPreviewWidget::leaveEvent(arg1);
+      QPrintPreviewWidget::leaveEvent(event);
     }
   }
 
@@ -1179,78 +1179,78 @@ public:
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::mouseDoubleClickEvent(QMouseEvent *)
-  void cbs_mouseDoubleClickEvent_1738_0(QMouseEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::mouseDoubleClickEvent(QMouseEvent *event)
+  void cbs_mouseDoubleClickEvent_1738_0(QMouseEvent *event)
   {
-    QPrintPreviewWidget::mouseDoubleClickEvent(arg1);
+    QPrintPreviewWidget::mouseDoubleClickEvent(event);
   }
 
-  virtual void mouseDoubleClickEvent(QMouseEvent *arg1)
+  virtual void mouseDoubleClickEvent(QMouseEvent *event)
   {
     if (cb_mouseDoubleClickEvent_1738_0.can_issue()) {
-      cb_mouseDoubleClickEvent_1738_0.issue<QPrintPreviewWidget_Adaptor, QMouseEvent *>(&QPrintPreviewWidget_Adaptor::cbs_mouseDoubleClickEvent_1738_0, arg1);
+      cb_mouseDoubleClickEvent_1738_0.issue<QPrintPreviewWidget_Adaptor, QMouseEvent *>(&QPrintPreviewWidget_Adaptor::cbs_mouseDoubleClickEvent_1738_0, event);
     } else {
-      QPrintPreviewWidget::mouseDoubleClickEvent(arg1);
+      QPrintPreviewWidget::mouseDoubleClickEvent(event);
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::mouseMoveEvent(QMouseEvent *)
-  void cbs_mouseMoveEvent_1738_0(QMouseEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::mouseMoveEvent(QMouseEvent *event)
+  void cbs_mouseMoveEvent_1738_0(QMouseEvent *event)
   {
-    QPrintPreviewWidget::mouseMoveEvent(arg1);
+    QPrintPreviewWidget::mouseMoveEvent(event);
   }
 
-  virtual void mouseMoveEvent(QMouseEvent *arg1)
+  virtual void mouseMoveEvent(QMouseEvent *event)
   {
     if (cb_mouseMoveEvent_1738_0.can_issue()) {
-      cb_mouseMoveEvent_1738_0.issue<QPrintPreviewWidget_Adaptor, QMouseEvent *>(&QPrintPreviewWidget_Adaptor::cbs_mouseMoveEvent_1738_0, arg1);
+      cb_mouseMoveEvent_1738_0.issue<QPrintPreviewWidget_Adaptor, QMouseEvent *>(&QPrintPreviewWidget_Adaptor::cbs_mouseMoveEvent_1738_0, event);
     } else {
-      QPrintPreviewWidget::mouseMoveEvent(arg1);
+      QPrintPreviewWidget::mouseMoveEvent(event);
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::mousePressEvent(QMouseEvent *)
-  void cbs_mousePressEvent_1738_0(QMouseEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::mousePressEvent(QMouseEvent *event)
+  void cbs_mousePressEvent_1738_0(QMouseEvent *event)
   {
-    QPrintPreviewWidget::mousePressEvent(arg1);
+    QPrintPreviewWidget::mousePressEvent(event);
   }
 
-  virtual void mousePressEvent(QMouseEvent *arg1)
+  virtual void mousePressEvent(QMouseEvent *event)
   {
     if (cb_mousePressEvent_1738_0.can_issue()) {
-      cb_mousePressEvent_1738_0.issue<QPrintPreviewWidget_Adaptor, QMouseEvent *>(&QPrintPreviewWidget_Adaptor::cbs_mousePressEvent_1738_0, arg1);
+      cb_mousePressEvent_1738_0.issue<QPrintPreviewWidget_Adaptor, QMouseEvent *>(&QPrintPreviewWidget_Adaptor::cbs_mousePressEvent_1738_0, event);
     } else {
-      QPrintPreviewWidget::mousePressEvent(arg1);
+      QPrintPreviewWidget::mousePressEvent(event);
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::mouseReleaseEvent(QMouseEvent *)
-  void cbs_mouseReleaseEvent_1738_0(QMouseEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::mouseReleaseEvent(QMouseEvent *event)
+  void cbs_mouseReleaseEvent_1738_0(QMouseEvent *event)
   {
-    QPrintPreviewWidget::mouseReleaseEvent(arg1);
+    QPrintPreviewWidget::mouseReleaseEvent(event);
   }
 
-  virtual void mouseReleaseEvent(QMouseEvent *arg1)
+  virtual void mouseReleaseEvent(QMouseEvent *event)
   {
     if (cb_mouseReleaseEvent_1738_0.can_issue()) {
-      cb_mouseReleaseEvent_1738_0.issue<QPrintPreviewWidget_Adaptor, QMouseEvent *>(&QPrintPreviewWidget_Adaptor::cbs_mouseReleaseEvent_1738_0, arg1);
+      cb_mouseReleaseEvent_1738_0.issue<QPrintPreviewWidget_Adaptor, QMouseEvent *>(&QPrintPreviewWidget_Adaptor::cbs_mouseReleaseEvent_1738_0, event);
     } else {
-      QPrintPreviewWidget::mouseReleaseEvent(arg1);
+      QPrintPreviewWidget::mouseReleaseEvent(event);
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::moveEvent(QMoveEvent *)
-  void cbs_moveEvent_1624_0(QMoveEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::moveEvent(QMoveEvent *event)
+  void cbs_moveEvent_1624_0(QMoveEvent *event)
   {
-    QPrintPreviewWidget::moveEvent(arg1);
+    QPrintPreviewWidget::moveEvent(event);
   }
 
-  virtual void moveEvent(QMoveEvent *arg1)
+  virtual void moveEvent(QMoveEvent *event)
   {
     if (cb_moveEvent_1624_0.can_issue()) {
-      cb_moveEvent_1624_0.issue<QPrintPreviewWidget_Adaptor, QMoveEvent *>(&QPrintPreviewWidget_Adaptor::cbs_moveEvent_1624_0, arg1);
+      cb_moveEvent_1624_0.issue<QPrintPreviewWidget_Adaptor, QMoveEvent *>(&QPrintPreviewWidget_Adaptor::cbs_moveEvent_1624_0, event);
     } else {
-      QPrintPreviewWidget::moveEvent(arg1);
+      QPrintPreviewWidget::moveEvent(event);
     }
   }
 
@@ -1269,18 +1269,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::paintEvent(QPaintEvent *)
-  void cbs_paintEvent_1725_0(QPaintEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::paintEvent(QPaintEvent *event)
+  void cbs_paintEvent_1725_0(QPaintEvent *event)
   {
-    QPrintPreviewWidget::paintEvent(arg1);
+    QPrintPreviewWidget::paintEvent(event);
   }
 
-  virtual void paintEvent(QPaintEvent *arg1)
+  virtual void paintEvent(QPaintEvent *event)
   {
     if (cb_paintEvent_1725_0.can_issue()) {
-      cb_paintEvent_1725_0.issue<QPrintPreviewWidget_Adaptor, QPaintEvent *>(&QPrintPreviewWidget_Adaptor::cbs_paintEvent_1725_0, arg1);
+      cb_paintEvent_1725_0.issue<QPrintPreviewWidget_Adaptor, QPaintEvent *>(&QPrintPreviewWidget_Adaptor::cbs_paintEvent_1725_0, event);
     } else {
-      QPrintPreviewWidget::paintEvent(arg1);
+      QPrintPreviewWidget::paintEvent(event);
     }
   }
 
@@ -1299,18 +1299,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::resizeEvent(QResizeEvent *)
-  void cbs_resizeEvent_1843_0(QResizeEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::resizeEvent(QResizeEvent *event)
+  void cbs_resizeEvent_1843_0(QResizeEvent *event)
   {
-    QPrintPreviewWidget::resizeEvent(arg1);
+    QPrintPreviewWidget::resizeEvent(event);
   }
 
-  virtual void resizeEvent(QResizeEvent *arg1)
+  virtual void resizeEvent(QResizeEvent *event)
   {
     if (cb_resizeEvent_1843_0.can_issue()) {
-      cb_resizeEvent_1843_0.issue<QPrintPreviewWidget_Adaptor, QResizeEvent *>(&QPrintPreviewWidget_Adaptor::cbs_resizeEvent_1843_0, arg1);
+      cb_resizeEvent_1843_0.issue<QPrintPreviewWidget_Adaptor, QResizeEvent *>(&QPrintPreviewWidget_Adaptor::cbs_resizeEvent_1843_0, event);
     } else {
-      QPrintPreviewWidget::resizeEvent(arg1);
+      QPrintPreviewWidget::resizeEvent(event);
     }
   }
 
@@ -1329,63 +1329,63 @@ public:
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::showEvent(QShowEvent *)
-  void cbs_showEvent_1634_0(QShowEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::showEvent(QShowEvent *event)
+  void cbs_showEvent_1634_0(QShowEvent *event)
   {
-    QPrintPreviewWidget::showEvent(arg1);
+    QPrintPreviewWidget::showEvent(event);
   }
 
-  virtual void showEvent(QShowEvent *arg1)
+  virtual void showEvent(QShowEvent *event)
   {
     if (cb_showEvent_1634_0.can_issue()) {
-      cb_showEvent_1634_0.issue<QPrintPreviewWidget_Adaptor, QShowEvent *>(&QPrintPreviewWidget_Adaptor::cbs_showEvent_1634_0, arg1);
+      cb_showEvent_1634_0.issue<QPrintPreviewWidget_Adaptor, QShowEvent *>(&QPrintPreviewWidget_Adaptor::cbs_showEvent_1634_0, event);
     } else {
-      QPrintPreviewWidget::showEvent(arg1);
+      QPrintPreviewWidget::showEvent(event);
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::tabletEvent(QTabletEvent *)
-  void cbs_tabletEvent_1821_0(QTabletEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::tabletEvent(QTabletEvent *event)
+  void cbs_tabletEvent_1821_0(QTabletEvent *event)
   {
-    QPrintPreviewWidget::tabletEvent(arg1);
+    QPrintPreviewWidget::tabletEvent(event);
   }
 
-  virtual void tabletEvent(QTabletEvent *arg1)
+  virtual void tabletEvent(QTabletEvent *event)
   {
     if (cb_tabletEvent_1821_0.can_issue()) {
-      cb_tabletEvent_1821_0.issue<QPrintPreviewWidget_Adaptor, QTabletEvent *>(&QPrintPreviewWidget_Adaptor::cbs_tabletEvent_1821_0, arg1);
+      cb_tabletEvent_1821_0.issue<QPrintPreviewWidget_Adaptor, QTabletEvent *>(&QPrintPreviewWidget_Adaptor::cbs_tabletEvent_1821_0, event);
     } else {
-      QPrintPreviewWidget::tabletEvent(arg1);
+      QPrintPreviewWidget::tabletEvent(event);
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QPrintPreviewWidget::timerEvent(arg1);
+    QPrintPreviewWidget::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QPrintPreviewWidget_Adaptor, QTimerEvent *>(&QPrintPreviewWidget_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QPrintPreviewWidget_Adaptor, QTimerEvent *>(&QPrintPreviewWidget_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QPrintPreviewWidget::timerEvent(arg1);
+      QPrintPreviewWidget::timerEvent(event);
     }
   }
 
-  //  [adaptor impl] void QPrintPreviewWidget::wheelEvent(QWheelEvent *)
-  void cbs_wheelEvent_1718_0(QWheelEvent *arg1)
+  //  [adaptor impl] void QPrintPreviewWidget::wheelEvent(QWheelEvent *event)
+  void cbs_wheelEvent_1718_0(QWheelEvent *event)
   {
-    QPrintPreviewWidget::wheelEvent(arg1);
+    QPrintPreviewWidget::wheelEvent(event);
   }
 
-  virtual void wheelEvent(QWheelEvent *arg1)
+  virtual void wheelEvent(QWheelEvent *event)
   {
     if (cb_wheelEvent_1718_0.can_issue()) {
-      cb_wheelEvent_1718_0.issue<QPrintPreviewWidget_Adaptor, QWheelEvent *>(&QPrintPreviewWidget_Adaptor::cbs_wheelEvent_1718_0, arg1);
+      cb_wheelEvent_1718_0.issue<QPrintPreviewWidget_Adaptor, QWheelEvent *>(&QPrintPreviewWidget_Adaptor::cbs_wheelEvent_1718_0, event);
     } else {
-      QPrintPreviewWidget::wheelEvent(arg1);
+      QPrintPreviewWidget::wheelEvent(event);
     }
   }
 
@@ -1444,9 +1444,9 @@ static void _init_ctor_QPrintPreviewWidget_Adaptor_5037 (qt_gsi::GenericStaticMe
 {
   static gsi::ArgSpecBase argspec_0 ("printer");
   decl->add_arg<QPrinter * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("flags", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("flags", true, "Qt::WindowFlags()");
   decl->add_arg<QFlags<Qt::WindowType> > (argspec_2);
   decl->set_return_new<QPrintPreviewWidget_Adaptor> ();
 }
@@ -1456,8 +1456,8 @@ static void _call_ctor_QPrintPreviewWidget_Adaptor_5037 (const qt_gsi::GenericSt
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QPrinter *arg1 = gsi::arg_reader<QPrinter * >() (args, heap);
-  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
-  QFlags<Qt::WindowType> arg3 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (0, heap);
+  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
+  QFlags<Qt::WindowType> arg3 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (Qt::WindowFlags(), heap);
   ret.write<QPrintPreviewWidget_Adaptor *> (new QPrintPreviewWidget_Adaptor (arg1, arg2, arg3));
 }
 
@@ -1466,9 +1466,9 @@ static void _call_ctor_QPrintPreviewWidget_Adaptor_5037 (const qt_gsi::GenericSt
 
 static void _init_ctor_QPrintPreviewWidget_Adaptor_3702 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("flags", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("flags", true, "Qt::WindowFlags()");
   decl->add_arg<QFlags<Qt::WindowType> > (argspec_1);
   decl->set_return_new<QPrintPreviewWidget_Adaptor> ();
 }
@@ -1477,17 +1477,17 @@ static void _call_ctor_QPrintPreviewWidget_Adaptor_3702 (const qt_gsi::GenericSt
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
-  QFlags<Qt::WindowType> arg2 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (0, heap);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
+  QFlags<Qt::WindowType> arg2 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (Qt::WindowFlags(), heap);
   ret.write<QPrintPreviewWidget_Adaptor *> (new QPrintPreviewWidget_Adaptor (arg1, arg2));
 }
 
 
-// void QPrintPreviewWidget::actionEvent(QActionEvent *)
+// void QPrintPreviewWidget::actionEvent(QActionEvent *event)
 
 static void _init_cbs_actionEvent_1823_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QActionEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1531,11 +1531,11 @@ static void _set_callback_cbs_changeEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
-// void QPrintPreviewWidget::childEvent(QChildEvent *)
+// void QPrintPreviewWidget::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1555,11 +1555,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QPrintPreviewWidget::closeEvent(QCloseEvent *)
+// void QPrintPreviewWidget::closeEvent(QCloseEvent *event)
 
 static void _init_cbs_closeEvent_1719_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QCloseEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1579,11 +1579,11 @@ static void _set_callback_cbs_closeEvent_1719_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QPrintPreviewWidget::contextMenuEvent(QContextMenuEvent *)
+// void QPrintPreviewWidget::contextMenuEvent(QContextMenuEvent *event)
 
 static void _init_cbs_contextMenuEvent_2363_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QContextMenuEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1628,11 +1628,11 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// void QPrintPreviewWidget::customEvent(QEvent *)
+// void QPrintPreviewWidget::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1698,11 +1698,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// void QPrintPreviewWidget::dragEnterEvent(QDragEnterEvent *)
+// void QPrintPreviewWidget::dragEnterEvent(QDragEnterEvent *event)
 
 static void _init_cbs_dragEnterEvent_2109_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDragEnterEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1722,11 +1722,11 @@ static void _set_callback_cbs_dragEnterEvent_2109_0 (void *cls, const gsi::Callb
 }
 
 
-// void QPrintPreviewWidget::dragLeaveEvent(QDragLeaveEvent *)
+// void QPrintPreviewWidget::dragLeaveEvent(QDragLeaveEvent *event)
 
 static void _init_cbs_dragLeaveEvent_2092_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDragLeaveEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1746,11 +1746,11 @@ static void _set_callback_cbs_dragLeaveEvent_2092_0 (void *cls, const gsi::Callb
 }
 
 
-// void QPrintPreviewWidget::dragMoveEvent(QDragMoveEvent *)
+// void QPrintPreviewWidget::dragMoveEvent(QDragMoveEvent *event)
 
 static void _init_cbs_dragMoveEvent_2006_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDragMoveEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1770,11 +1770,11 @@ static void _set_callback_cbs_dragMoveEvent_2006_0 (void *cls, const gsi::Callba
 }
 
 
-// void QPrintPreviewWidget::dropEvent(QDropEvent *)
+// void QPrintPreviewWidget::dropEvent(QDropEvent *event)
 
 static void _init_cbs_dropEvent_1622_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDropEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1794,11 +1794,11 @@ static void _set_callback_cbs_dropEvent_1622_0 (void *cls, const gsi::Callback &
 }
 
 
-// void QPrintPreviewWidget::enterEvent(QEvent *)
+// void QPrintPreviewWidget::enterEvent(QEvent *event)
 
 static void _init_cbs_enterEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1818,11 +1818,11 @@ static void _set_callback_cbs_enterEvent_1217_0 (void *cls, const gsi::Callback 
 }
 
 
-// bool QPrintPreviewWidget::event(QEvent *)
+// bool QPrintPreviewWidget::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -1841,13 +1841,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QPrintPreviewWidget::eventFilter(QObject *, QEvent *)
+// bool QPrintPreviewWidget::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -1867,11 +1867,11 @@ static void _set_callback_cbs_eventFilter_2411_0 (void *cls, const gsi::Callback
 }
 
 
-// void QPrintPreviewWidget::focusInEvent(QFocusEvent *)
+// void QPrintPreviewWidget::focusInEvent(QFocusEvent *event)
 
 static void _init_cbs_focusInEvent_1729_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QFocusEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1928,11 +1928,11 @@ static void _set_callback_cbs_focusNextPrevChild_864_0 (void *cls, const gsi::Ca
 }
 
 
-// void QPrintPreviewWidget::focusOutEvent(QFocusEvent *)
+// void QPrintPreviewWidget::focusOutEvent(QFocusEvent *event)
 
 static void _init_cbs_focusOutEvent_1729_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QFocusEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2008,11 +2008,11 @@ static void _set_callback_cbs_heightForWidth_c767_0 (void *cls, const gsi::Callb
 }
 
 
-// void QPrintPreviewWidget::hideEvent(QHideEvent *)
+// void QPrintPreviewWidget::hideEvent(QHideEvent *event)
 
 static void _init_cbs_hideEvent_1595_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QHideEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2121,11 +2121,11 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
-// void QPrintPreviewWidget::keyPressEvent(QKeyEvent *)
+// void QPrintPreviewWidget::keyPressEvent(QKeyEvent *event)
 
 static void _init_cbs_keyPressEvent_1514_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QKeyEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2145,11 +2145,11 @@ static void _set_callback_cbs_keyPressEvent_1514_0 (void *cls, const gsi::Callba
 }
 
 
-// void QPrintPreviewWidget::keyReleaseEvent(QKeyEvent *)
+// void QPrintPreviewWidget::keyReleaseEvent(QKeyEvent *event)
 
 static void _init_cbs_keyReleaseEvent_1514_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QKeyEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2169,11 +2169,11 @@ static void _set_callback_cbs_keyReleaseEvent_1514_0 (void *cls, const gsi::Call
 }
 
 
-// void QPrintPreviewWidget::leaveEvent(QEvent *)
+// void QPrintPreviewWidget::leaveEvent(QEvent *event)
 
 static void _init_cbs_leaveEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2235,11 +2235,11 @@ static void _set_callback_cbs_minimumSizeHint_c0_0 (void *cls, const gsi::Callba
 }
 
 
-// void QPrintPreviewWidget::mouseDoubleClickEvent(QMouseEvent *)
+// void QPrintPreviewWidget::mouseDoubleClickEvent(QMouseEvent *event)
 
 static void _init_cbs_mouseDoubleClickEvent_1738_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMouseEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2259,11 +2259,11 @@ static void _set_callback_cbs_mouseDoubleClickEvent_1738_0 (void *cls, const gsi
 }
 
 
-// void QPrintPreviewWidget::mouseMoveEvent(QMouseEvent *)
+// void QPrintPreviewWidget::mouseMoveEvent(QMouseEvent *event)
 
 static void _init_cbs_mouseMoveEvent_1738_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMouseEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2283,11 +2283,11 @@ static void _set_callback_cbs_mouseMoveEvent_1738_0 (void *cls, const gsi::Callb
 }
 
 
-// void QPrintPreviewWidget::mousePressEvent(QMouseEvent *)
+// void QPrintPreviewWidget::mousePressEvent(QMouseEvent *event)
 
 static void _init_cbs_mousePressEvent_1738_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMouseEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2307,11 +2307,11 @@ static void _set_callback_cbs_mousePressEvent_1738_0 (void *cls, const gsi::Call
 }
 
 
-// void QPrintPreviewWidget::mouseReleaseEvent(QMouseEvent *)
+// void QPrintPreviewWidget::mouseReleaseEvent(QMouseEvent *event)
 
 static void _init_cbs_mouseReleaseEvent_1738_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMouseEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2331,11 +2331,11 @@ static void _set_callback_cbs_mouseReleaseEvent_1738_0 (void *cls, const gsi::Ca
 }
 
 
-// void QPrintPreviewWidget::moveEvent(QMoveEvent *)
+// void QPrintPreviewWidget::moveEvent(QMoveEvent *event)
 
 static void _init_cbs_moveEvent_1624_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMoveEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2403,11 +2403,11 @@ static void _set_callback_cbs_paintEngine_c0_0 (void *cls, const gsi::Callback &
 }
 
 
-// void QPrintPreviewWidget::paintEvent(QPaintEvent *)
+// void QPrintPreviewWidget::paintEvent(QPaintEvent *event)
 
 static void _init_cbs_paintEvent_1725_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QPaintEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2468,11 +2468,11 @@ static void _set_callback_cbs_redirected_c1225_0 (void *cls, const gsi::Callback
 }
 
 
-// void QPrintPreviewWidget::resizeEvent(QResizeEvent *)
+// void QPrintPreviewWidget::resizeEvent(QResizeEvent *event)
 
 static void _init_cbs_resizeEvent_1843_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QResizeEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2563,11 +2563,11 @@ static void _set_callback_cbs_sharedPainter_c0_0 (void *cls, const gsi::Callback
 }
 
 
-// void QPrintPreviewWidget::showEvent(QShowEvent *)
+// void QPrintPreviewWidget::showEvent(QShowEvent *event)
 
 static void _init_cbs_showEvent_1634_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QShowEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2606,11 +2606,11 @@ static void _set_callback_cbs_sizeHint_c0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QPrintPreviewWidget::tabletEvent(QTabletEvent *)
+// void QPrintPreviewWidget::tabletEvent(QTabletEvent *event)
 
 static void _init_cbs_tabletEvent_1821_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTabletEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2630,11 +2630,11 @@ static void _set_callback_cbs_tabletEvent_1821_0 (void *cls, const gsi::Callback
 }
 
 
-// void QPrintPreviewWidget::timerEvent(QTimerEvent *)
+// void QPrintPreviewWidget::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2669,11 +2669,11 @@ static void _call_fp_updateMicroFocus_0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// void QPrintPreviewWidget::wheelEvent(QWheelEvent *)
+// void QPrintPreviewWidget::wheelEvent(QWheelEvent *event)
 
 static void _init_cbs_wheelEvent_1718_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QWheelEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2702,49 +2702,49 @@ static gsi::Methods methods_QPrintPreviewWidget_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPrintPreviewWidget::QPrintPreviewWidget(QPrinter *printer, QWidget *parent, QFlags<Qt::WindowType> flags)\nThis method creates an object of class QPrintPreviewWidget.", &_init_ctor_QPrintPreviewWidget_Adaptor_5037, &_call_ctor_QPrintPreviewWidget_Adaptor_5037);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPrintPreviewWidget::QPrintPreviewWidget(QWidget *parent, QFlags<Qt::WindowType> flags)\nThis method creates an object of class QPrintPreviewWidget.", &_init_ctor_QPrintPreviewWidget_Adaptor_3702, &_call_ctor_QPrintPreviewWidget_Adaptor_3702);
-  methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QPrintPreviewWidget::actionEvent(QActionEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
+  methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QPrintPreviewWidget::actionEvent(QActionEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("*actionEvent", "@hide", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0, &_set_callback_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("*changeEvent", "@brief Virtual method void QPrintPreviewWidget::changeEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*changeEvent", "@hide", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0, &_set_callback_cbs_changeEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QPrintPreviewWidget::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QPrintPreviewWidget::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*closeEvent", "@brief Virtual method void QPrintPreviewWidget::closeEvent(QCloseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0);
+  methods += new qt_gsi::GenericMethod ("*closeEvent", "@brief Virtual method void QPrintPreviewWidget::closeEvent(QCloseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0);
   methods += new qt_gsi::GenericMethod ("*closeEvent", "@hide", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0, &_set_callback_cbs_closeEvent_1719_0);
-  methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QPrintPreviewWidget::contextMenuEvent(QContextMenuEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
+  methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QPrintPreviewWidget::contextMenuEvent(QContextMenuEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0, &_set_callback_cbs_contextMenuEvent_2363_0);
-  methods += new qt_gsi::GenericMethod ("*qt_create", "@brief Method void QPrintPreviewWidget::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QPrintPreviewWidget::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*create|qt_create", "@brief Method void QPrintPreviewWidget::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QPrintPreviewWidget::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*qt_destroy", "@brief Method void QPrintPreviewWidget::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
+  methods += new qt_gsi::GenericMethod ("*destroy|qt_destroy", "@brief Method void QPrintPreviewWidget::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QPrintPreviewWidget::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@brief Virtual method void QPrintPreviewWidget::dragEnterEvent(QDragEnterEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0);
+  methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@brief Virtual method void QPrintPreviewWidget::dragEnterEvent(QDragEnterEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0);
   methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@hide", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0, &_set_callback_cbs_dragEnterEvent_2109_0);
-  methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@brief Virtual method void QPrintPreviewWidget::dragLeaveEvent(QDragLeaveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0);
+  methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@brief Virtual method void QPrintPreviewWidget::dragLeaveEvent(QDragLeaveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0);
   methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@hide", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0, &_set_callback_cbs_dragLeaveEvent_2092_0);
-  methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@brief Virtual method void QPrintPreviewWidget::dragMoveEvent(QDragMoveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0);
+  methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@brief Virtual method void QPrintPreviewWidget::dragMoveEvent(QDragMoveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0);
   methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@hide", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0, &_set_callback_cbs_dragMoveEvent_2006_0);
-  methods += new qt_gsi::GenericMethod ("*dropEvent", "@brief Virtual method void QPrintPreviewWidget::dropEvent(QDropEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0);
+  methods += new qt_gsi::GenericMethod ("*dropEvent", "@brief Virtual method void QPrintPreviewWidget::dropEvent(QDropEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0);
   methods += new qt_gsi::GenericMethod ("*dropEvent", "@hide", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0, &_set_callback_cbs_dropEvent_1622_0);
-  methods += new qt_gsi::GenericMethod ("*enterEvent", "@brief Virtual method void QPrintPreviewWidget::enterEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*enterEvent", "@brief Virtual method void QPrintPreviewWidget::enterEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*enterEvent", "@hide", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0, &_set_callback_cbs_enterEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QPrintPreviewWidget::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QPrintPreviewWidget::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QPrintPreviewWidget::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QPrintPreviewWidget::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("*focusInEvent", "@brief Virtual method void QPrintPreviewWidget::focusInEvent(QFocusEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0);
+  methods += new qt_gsi::GenericMethod ("*focusInEvent", "@brief Virtual method void QPrintPreviewWidget::focusInEvent(QFocusEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusInEvent", "@hide", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0, &_set_callback_cbs_focusInEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusNextChild", "@brief Method bool QPrintPreviewWidget::focusNextChild()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_focusNextChild_0, &_call_fp_focusNextChild_0);
   methods += new qt_gsi::GenericMethod ("*focusNextPrevChild", "@brief Virtual method bool QPrintPreviewWidget::focusNextPrevChild(bool next)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusNextPrevChild_864_0, &_call_cbs_focusNextPrevChild_864_0);
   methods += new qt_gsi::GenericMethod ("*focusNextPrevChild", "@hide", false, &_init_cbs_focusNextPrevChild_864_0, &_call_cbs_focusNextPrevChild_864_0, &_set_callback_cbs_focusNextPrevChild_864_0);
-  methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@brief Virtual method void QPrintPreviewWidget::focusOutEvent(QFocusEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0);
+  methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@brief Virtual method void QPrintPreviewWidget::focusOutEvent(QFocusEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@hide", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0, &_set_callback_cbs_focusOutEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusPreviousChild", "@brief Method bool QPrintPreviewWidget::focusPreviousChild()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_focusPreviousChild_0, &_call_fp_focusPreviousChild_0);
   methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@brief Virtual method bool QPrintPreviewWidget::hasHeightForWidth()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_hasHeightForWidth_c0_0, &_call_cbs_hasHeightForWidth_c0_0);
   methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@hide", true, &_init_cbs_hasHeightForWidth_c0_0, &_call_cbs_hasHeightForWidth_c0_0, &_set_callback_cbs_hasHeightForWidth_c0_0);
   methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Virtual method int QPrintPreviewWidget::heightForWidth(int)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_heightForWidth_c767_0, &_call_cbs_heightForWidth_c767_0);
   methods += new qt_gsi::GenericMethod ("heightForWidth", "@hide", true, &_init_cbs_heightForWidth_c767_0, &_call_cbs_heightForWidth_c767_0, &_set_callback_cbs_heightForWidth_c767_0);
-  methods += new qt_gsi::GenericMethod ("*hideEvent", "@brief Virtual method void QPrintPreviewWidget::hideEvent(QHideEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_hideEvent_1595_0, &_call_cbs_hideEvent_1595_0);
+  methods += new qt_gsi::GenericMethod ("*hideEvent", "@brief Virtual method void QPrintPreviewWidget::hideEvent(QHideEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_hideEvent_1595_0, &_call_cbs_hideEvent_1595_0);
   methods += new qt_gsi::GenericMethod ("*hideEvent", "@hide", false, &_init_cbs_hideEvent_1595_0, &_call_cbs_hideEvent_1595_0, &_set_callback_cbs_hideEvent_1595_0);
   methods += new qt_gsi::GenericMethod ("*initPainter", "@brief Virtual method void QPrintPreviewWidget::initPainter(QPainter *painter)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0);
   methods += new qt_gsi::GenericMethod ("*initPainter", "@hide", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0, &_set_callback_cbs_initPainter_c1426_0);
@@ -2753,36 +2753,36 @@ static gsi::Methods methods_QPrintPreviewWidget_Adaptor () {
   methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@brief Virtual method QVariant QPrintPreviewWidget::inputMethodQuery(Qt::InputMethodQuery)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_inputMethodQuery_c2420_0, &_call_cbs_inputMethodQuery_c2420_0);
   methods += new qt_gsi::GenericMethod ("inputMethodQuery", "@hide", true, &_init_cbs_inputMethodQuery_c2420_0, &_call_cbs_inputMethodQuery_c2420_0, &_set_callback_cbs_inputMethodQuery_c2420_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QPrintPreviewWidget::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
-  methods += new qt_gsi::GenericMethod ("*keyPressEvent", "@brief Virtual method void QPrintPreviewWidget::keyPressEvent(QKeyEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyPressEvent_1514_0, &_call_cbs_keyPressEvent_1514_0);
+  methods += new qt_gsi::GenericMethod ("*keyPressEvent", "@brief Virtual method void QPrintPreviewWidget::keyPressEvent(QKeyEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyPressEvent_1514_0, &_call_cbs_keyPressEvent_1514_0);
   methods += new qt_gsi::GenericMethod ("*keyPressEvent", "@hide", false, &_init_cbs_keyPressEvent_1514_0, &_call_cbs_keyPressEvent_1514_0, &_set_callback_cbs_keyPressEvent_1514_0);
-  methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@brief Virtual method void QPrintPreviewWidget::keyReleaseEvent(QKeyEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0);
+  methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@brief Virtual method void QPrintPreviewWidget::keyReleaseEvent(QKeyEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0);
   methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@hide", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0, &_set_callback_cbs_keyReleaseEvent_1514_0);
-  methods += new qt_gsi::GenericMethod ("*leaveEvent", "@brief Virtual method void QPrintPreviewWidget::leaveEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*leaveEvent", "@brief Virtual method void QPrintPreviewWidget::leaveEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*leaveEvent", "@hide", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0, &_set_callback_cbs_leaveEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*metric", "@brief Virtual method int QPrintPreviewWidget::metric(QPaintDevice::PaintDeviceMetric)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0);
   methods += new qt_gsi::GenericMethod ("*metric", "@hide", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0, &_set_callback_cbs_metric_c3445_0);
   methods += new qt_gsi::GenericMethod ("minimumSizeHint", "@brief Virtual method QSize QPrintPreviewWidget::minimumSizeHint()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_minimumSizeHint_c0_0, &_call_cbs_minimumSizeHint_c0_0);
   methods += new qt_gsi::GenericMethod ("minimumSizeHint", "@hide", true, &_init_cbs_minimumSizeHint_c0_0, &_call_cbs_minimumSizeHint_c0_0, &_set_callback_cbs_minimumSizeHint_c0_0);
-  methods += new qt_gsi::GenericMethod ("*mouseDoubleClickEvent", "@brief Virtual method void QPrintPreviewWidget::mouseDoubleClickEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseDoubleClickEvent_1738_0, &_call_cbs_mouseDoubleClickEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mouseDoubleClickEvent", "@brief Virtual method void QPrintPreviewWidget::mouseDoubleClickEvent(QMouseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseDoubleClickEvent_1738_0, &_call_cbs_mouseDoubleClickEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseDoubleClickEvent", "@hide", false, &_init_cbs_mouseDoubleClickEvent_1738_0, &_call_cbs_mouseDoubleClickEvent_1738_0, &_set_callback_cbs_mouseDoubleClickEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*mouseMoveEvent", "@brief Virtual method void QPrintPreviewWidget::mouseMoveEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseMoveEvent_1738_0, &_call_cbs_mouseMoveEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mouseMoveEvent", "@brief Virtual method void QPrintPreviewWidget::mouseMoveEvent(QMouseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseMoveEvent_1738_0, &_call_cbs_mouseMoveEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseMoveEvent", "@hide", false, &_init_cbs_mouseMoveEvent_1738_0, &_call_cbs_mouseMoveEvent_1738_0, &_set_callback_cbs_mouseMoveEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*mousePressEvent", "@brief Virtual method void QPrintPreviewWidget::mousePressEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mousePressEvent_1738_0, &_call_cbs_mousePressEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mousePressEvent", "@brief Virtual method void QPrintPreviewWidget::mousePressEvent(QMouseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mousePressEvent_1738_0, &_call_cbs_mousePressEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mousePressEvent", "@hide", false, &_init_cbs_mousePressEvent_1738_0, &_call_cbs_mousePressEvent_1738_0, &_set_callback_cbs_mousePressEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@brief Virtual method void QPrintPreviewWidget::mouseReleaseEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@brief Virtual method void QPrintPreviewWidget::mouseReleaseEvent(QMouseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@hide", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0, &_set_callback_cbs_mouseReleaseEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*moveEvent", "@brief Virtual method void QPrintPreviewWidget::moveEvent(QMoveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0);
+  methods += new qt_gsi::GenericMethod ("*moveEvent", "@brief Virtual method void QPrintPreviewWidget::moveEvent(QMoveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*moveEvent", "@hide", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0, &_set_callback_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@brief Virtual method bool QPrintPreviewWidget::nativeEvent(const QByteArray &eventType, void *message, long int *result)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@hide", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0, &_set_callback_cbs_nativeEvent_4678_0);
   methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Virtual method QPaintEngine *QPrintPreviewWidget::paintEngine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0);
   methods += new qt_gsi::GenericMethod ("paintEngine", "@hide", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0, &_set_callback_cbs_paintEngine_c0_0);
-  methods += new qt_gsi::GenericMethod ("*paintEvent", "@brief Virtual method void QPrintPreviewWidget::paintEvent(QPaintEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_paintEvent_1725_0, &_call_cbs_paintEvent_1725_0);
+  methods += new qt_gsi::GenericMethod ("*paintEvent", "@brief Virtual method void QPrintPreviewWidget::paintEvent(QPaintEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_paintEvent_1725_0, &_call_cbs_paintEvent_1725_0);
   methods += new qt_gsi::GenericMethod ("*paintEvent", "@hide", false, &_init_cbs_paintEvent_1725_0, &_call_cbs_paintEvent_1725_0, &_set_callback_cbs_paintEvent_1725_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QPrintPreviewWidget::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*redirected", "@brief Virtual method QPaintDevice *QPrintPreviewWidget::redirected(QPoint *offset)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_redirected_c1225_0, &_call_cbs_redirected_c1225_0);
   methods += new qt_gsi::GenericMethod ("*redirected", "@hide", true, &_init_cbs_redirected_c1225_0, &_call_cbs_redirected_c1225_0, &_set_callback_cbs_redirected_c1225_0);
-  methods += new qt_gsi::GenericMethod ("*resizeEvent", "@brief Virtual method void QPrintPreviewWidget::resizeEvent(QResizeEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_resizeEvent_1843_0, &_call_cbs_resizeEvent_1843_0);
+  methods += new qt_gsi::GenericMethod ("*resizeEvent", "@brief Virtual method void QPrintPreviewWidget::resizeEvent(QResizeEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_resizeEvent_1843_0, &_call_cbs_resizeEvent_1843_0);
   methods += new qt_gsi::GenericMethod ("*resizeEvent", "@hide", false, &_init_cbs_resizeEvent_1843_0, &_call_cbs_resizeEvent_1843_0, &_set_callback_cbs_resizeEvent_1843_0);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QPrintPreviewWidget::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QPrintPreviewWidget::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
@@ -2790,16 +2790,16 @@ static gsi::Methods methods_QPrintPreviewWidget_Adaptor () {
   methods += new qt_gsi::GenericMethod ("setVisible", "@hide", false, &_init_cbs_setVisible_864_0, &_call_cbs_setVisible_864_0, &_set_callback_cbs_setVisible_864_0);
   methods += new qt_gsi::GenericMethod ("*sharedPainter", "@brief Virtual method QPainter *QPrintPreviewWidget::sharedPainter()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_sharedPainter_c0_0, &_call_cbs_sharedPainter_c0_0);
   methods += new qt_gsi::GenericMethod ("*sharedPainter", "@hide", true, &_init_cbs_sharedPainter_c0_0, &_call_cbs_sharedPainter_c0_0, &_set_callback_cbs_sharedPainter_c0_0);
-  methods += new qt_gsi::GenericMethod ("*showEvent", "@brief Virtual method void QPrintPreviewWidget::showEvent(QShowEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_showEvent_1634_0, &_call_cbs_showEvent_1634_0);
+  methods += new qt_gsi::GenericMethod ("*showEvent", "@brief Virtual method void QPrintPreviewWidget::showEvent(QShowEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_showEvent_1634_0, &_call_cbs_showEvent_1634_0);
   methods += new qt_gsi::GenericMethod ("*showEvent", "@hide", false, &_init_cbs_showEvent_1634_0, &_call_cbs_showEvent_1634_0, &_set_callback_cbs_showEvent_1634_0);
   methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Virtual method QSize QPrintPreviewWidget::sizeHint()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0);
   methods += new qt_gsi::GenericMethod ("sizeHint", "@hide", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0, &_set_callback_cbs_sizeHint_c0_0);
-  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QPrintPreviewWidget::tabletEvent(QTabletEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
+  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QPrintPreviewWidget::tabletEvent(QTabletEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
   methods += new qt_gsi::GenericMethod ("*tabletEvent", "@hide", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0, &_set_callback_cbs_tabletEvent_1821_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QPrintPreviewWidget::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QPrintPreviewWidget::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*updateMicroFocus", "@brief Method void QPrintPreviewWidget::updateMicroFocus()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_updateMicroFocus_0, &_call_fp_updateMicroFocus_0);
-  methods += new qt_gsi::GenericMethod ("*wheelEvent", "@brief Virtual method void QPrintPreviewWidget::wheelEvent(QWheelEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0);
+  methods += new qt_gsi::GenericMethod ("*wheelEvent", "@brief Virtual method void QPrintPreviewWidget::wheelEvent(QWheelEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0);
   methods += new qt_gsi::GenericMethod ("*wheelEvent", "@hide", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0, &_set_callback_cbs_wheelEvent_1718_0);
   return methods;
 }

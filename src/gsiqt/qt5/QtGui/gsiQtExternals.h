@@ -433,6 +433,10 @@ class QPlatformSurfaceEvent;
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPlatformSurfaceEvent> &qtdecl_QPlatformSurfaceEvent (); }
 
+class QPointingDeviceUniqueId;
+
+namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPointingDeviceUniqueId> &qtdecl_QPointingDeviceUniqueId (); }
+
 class QPolygon;
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QPolygon> &qtdecl_QPolygon (); }
@@ -472,6 +476,10 @@ namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QRegularExpressionValidator> &qtdecl
 class QResizeEvent;
 
 namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QResizeEvent> &qtdecl_QResizeEvent (); }
+
+class QRgba64;
+
+namespace gsi { GSI_QTGUI_PUBLIC gsi::Class<QRgba64> &qtdecl_QRgba64 (); }
 
 class QScreen;
 

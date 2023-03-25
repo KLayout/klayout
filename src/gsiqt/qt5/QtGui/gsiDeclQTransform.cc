@@ -157,6 +157,25 @@ static void _call_ctor_QTransform_2023 (const qt_gsi::GenericStaticMethod * /*de
 }
 
 
+//  Constructor QTransform::QTransform(const QTransform &other)
+
+
+static void _init_ctor_QTransform_2350 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<const QTransform & > (argspec_0);
+  decl->set_return_new<QTransform> ();
+}
+
+static void _call_ctor_QTransform_2350 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QTransform &arg1 = gsi::arg_reader<const QTransform & >() (args, heap);
+  ret.write<QTransform *> (new QTransform (arg1));
+}
+
+
 // QTransform QTransform::adjoint()
 
 
@@ -237,7 +256,7 @@ static void _call_f_dy_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gs
 
 static void _init_f_inverted_c1050 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("invertible", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("invertible", true, "nullptr");
   decl->add_arg<bool * > (argspec_0);
   decl->set_return<QTransform > ();
 }
@@ -246,7 +265,7 @@ static void _call_f_inverted_c1050 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool *arg1 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg1 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<QTransform > ((QTransform)((QTransform *)cls)->inverted (arg1));
 }
 
@@ -1272,6 +1291,7 @@ static gsi::Methods methods_QTransform () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTransform::QTransform(double h11, double h12, double h13, double h21, double h22, double h23, double h31, double h32, double h33)\nThis method creates an object of class QTransform.", &_init_ctor_QTransform_8775, &_call_ctor_QTransform_8775);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTransform::QTransform(double h11, double h12, double h21, double h22, double dx, double dy)\nThis method creates an object of class QTransform.", &_init_ctor_QTransform_5886, &_call_ctor_QTransform_5886);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTransform::QTransform(const QMatrix &mtx)\nThis method creates an object of class QTransform.", &_init_ctor_QTransform_2023, &_call_ctor_QTransform_2023);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTransform::QTransform(const QTransform &other)\nThis method creates an object of class QTransform.", &_init_ctor_QTransform_2350, &_call_ctor_QTransform_2350);
   methods += new qt_gsi::GenericMethod ("adjoint", "@brief Method QTransform QTransform::adjoint()\n", true, &_init_f_adjoint_c0, &_call_f_adjoint_c0);
   methods += new qt_gsi::GenericMethod ("det", "@brief Method double QTransform::det()\n", true, &_init_f_det_c0, &_call_f_det_c0);
   methods += new qt_gsi::GenericMethod ("determinant", "@brief Method double QTransform::determinant()\n", true, &_init_f_determinant_c0, &_call_f_determinant_c0);

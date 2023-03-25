@@ -222,33 +222,33 @@ public:
     return QCameraViewfinderSettingsControl::senderSignalIndex();
   }
 
-  //  [adaptor impl] bool QCameraViewfinderSettingsControl::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QCameraViewfinderSettingsControl::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QCameraViewfinderSettingsControl::event(arg1);
+    return QCameraViewfinderSettingsControl::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QCameraViewfinderSettingsControl_Adaptor, bool, QEvent *>(&QCameraViewfinderSettingsControl_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QCameraViewfinderSettingsControl_Adaptor, bool, QEvent *>(&QCameraViewfinderSettingsControl_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QCameraViewfinderSettingsControl::event(arg1);
+      return QCameraViewfinderSettingsControl::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QCameraViewfinderSettingsControl::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QCameraViewfinderSettingsControl::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QCameraViewfinderSettingsControl::eventFilter(arg1, arg2);
+    return QCameraViewfinderSettingsControl::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QCameraViewfinderSettingsControl_Adaptor, bool, QObject *, QEvent *>(&QCameraViewfinderSettingsControl_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QCameraViewfinderSettingsControl_Adaptor, bool, QObject *, QEvent *>(&QCameraViewfinderSettingsControl_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QCameraViewfinderSettingsControl::eventFilter(arg1, arg2);
+      return QCameraViewfinderSettingsControl::eventFilter(watched, event);
     }
   }
 
@@ -301,33 +301,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QCameraViewfinderSettingsControl::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QCameraViewfinderSettingsControl::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QCameraViewfinderSettingsControl::childEvent(arg1);
+    QCameraViewfinderSettingsControl::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QCameraViewfinderSettingsControl_Adaptor, QChildEvent *>(&QCameraViewfinderSettingsControl_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QCameraViewfinderSettingsControl_Adaptor, QChildEvent *>(&QCameraViewfinderSettingsControl_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QCameraViewfinderSettingsControl::childEvent(arg1);
+      QCameraViewfinderSettingsControl::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QCameraViewfinderSettingsControl::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QCameraViewfinderSettingsControl::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QCameraViewfinderSettingsControl::customEvent(arg1);
+    QCameraViewfinderSettingsControl::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QCameraViewfinderSettingsControl_Adaptor, QEvent *>(&QCameraViewfinderSettingsControl_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QCameraViewfinderSettingsControl_Adaptor, QEvent *>(&QCameraViewfinderSettingsControl_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QCameraViewfinderSettingsControl::customEvent(arg1);
+      QCameraViewfinderSettingsControl::customEvent(event);
     }
   }
 
@@ -346,18 +346,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QCameraViewfinderSettingsControl::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QCameraViewfinderSettingsControl::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QCameraViewfinderSettingsControl::timerEvent(arg1);
+    QCameraViewfinderSettingsControl::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QCameraViewfinderSettingsControl_Adaptor, QTimerEvent *>(&QCameraViewfinderSettingsControl_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QCameraViewfinderSettingsControl_Adaptor, QTimerEvent *>(&QCameraViewfinderSettingsControl_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QCameraViewfinderSettingsControl::timerEvent(arg1);
+      QCameraViewfinderSettingsControl::timerEvent(event);
     }
   }
 
@@ -388,11 +388,11 @@ static void _call_ctor_QCameraViewfinderSettingsControl_Adaptor_0 (const qt_gsi:
 }
 
 
-// void QCameraViewfinderSettingsControl::childEvent(QChildEvent *)
+// void QCameraViewfinderSettingsControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -412,11 +412,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QCameraViewfinderSettingsControl::customEvent(QEvent *)
+// void QCameraViewfinderSettingsControl::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -460,11 +460,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QCameraViewfinderSettingsControl::event(QEvent *)
+// bool QCameraViewfinderSettingsControl::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -483,13 +483,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QCameraViewfinderSettingsControl::eventFilter(QObject *, QEvent *)
+// bool QCameraViewfinderSettingsControl::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -623,11 +623,11 @@ static void _set_callback_cbs_setViewfinderParameter_7830_0 (void *cls, const gs
 }
 
 
-// void QCameraViewfinderSettingsControl::timerEvent(QTimerEvent *)
+// void QCameraViewfinderSettingsControl::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -678,15 +678,15 @@ gsi::Class<QCameraViewfinderSettingsControl> &qtdecl_QCameraViewfinderSettingsCo
 static gsi::Methods methods_QCameraViewfinderSettingsControl_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCameraViewfinderSettingsControl::QCameraViewfinderSettingsControl()\nThis method creates an object of class QCameraViewfinderSettingsControl.", &_init_ctor_QCameraViewfinderSettingsControl_Adaptor_0, &_call_ctor_QCameraViewfinderSettingsControl_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QCameraViewfinderSettingsControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QCameraViewfinderSettingsControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QCameraViewfinderSettingsControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QCameraViewfinderSettingsControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QCameraViewfinderSettingsControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QCameraViewfinderSettingsControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QCameraViewfinderSettingsControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QCameraViewfinderSettingsControl::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QCameraViewfinderSettingsControl::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QCameraViewfinderSettingsControl::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("isViewfinderParameterSupported", "@brief Virtual method bool QCameraViewfinderSettingsControl::isViewfinderParameterSupported(QCameraViewfinderSettingsControl::ViewfinderParameter parameter)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isViewfinderParameterSupported_c5819_0, &_call_cbs_isViewfinderParameterSupported_c5819_0);
@@ -696,7 +696,7 @@ static gsi::Methods methods_QCameraViewfinderSettingsControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QCameraViewfinderSettingsControl::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("setViewfinderParameter", "@brief Virtual method void QCameraViewfinderSettingsControl::setViewfinderParameter(QCameraViewfinderSettingsControl::ViewfinderParameter parameter, const QVariant &value)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setViewfinderParameter_7830_0, &_call_cbs_setViewfinderParameter_7830_0);
   methods += new qt_gsi::GenericMethod ("setViewfinderParameter", "@hide", false, &_init_cbs_setViewfinderParameter_7830_0, &_call_cbs_setViewfinderParameter_7830_0, &_set_callback_cbs_setViewfinderParameter_7830_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QCameraViewfinderSettingsControl::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QCameraViewfinderSettingsControl::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("viewfinderParameter", "@brief Virtual method QVariant QCameraViewfinderSettingsControl::viewfinderParameter(QCameraViewfinderSettingsControl::ViewfinderParameter parameter)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_viewfinderParameter_c5819_0, &_call_cbs_viewfinderParameter_c5819_0);
   methods += new qt_gsi::GenericMethod ("viewfinderParameter", "@hide", true, &_init_cbs_viewfinderParameter_c5819_0, &_call_cbs_viewfinderParameter_c5819_0, &_set_callback_cbs_viewfinderParameter_c5819_0);

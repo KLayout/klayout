@@ -436,8 +436,8 @@ public:
 
   virtual ~QMediaObject_Adaptor();
 
-  //  [expose] void QMediaObject::addPropertyWatch(QByteArray const &name)
-  void fp_QMediaObject_addPropertyWatch_2309 (QByteArray const &name) {
+  //  [expose] void QMediaObject::addPropertyWatch(const QByteArray &name)
+  void fp_QMediaObject_addPropertyWatch_2309 (const QByteArray &name) {
     QMediaObject::addPropertyWatch(name);
   }
 
@@ -451,8 +451,8 @@ public:
     return QMediaObject::receivers(signal);
   }
 
-  //  [expose] void QMediaObject::removePropertyWatch(QByteArray const &name)
-  void fp_QMediaObject_removePropertyWatch_2309 (QByteArray const &name) {
+  //  [expose] void QMediaObject::removePropertyWatch(const QByteArray &name)
+  void fp_QMediaObject_removePropertyWatch_2309 (const QByteArray &name) {
     QMediaObject::removePropertyWatch(name);
   }
 
@@ -496,33 +496,33 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QMediaObject::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QMediaObject::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QMediaObject::event(arg1);
+    return QMediaObject::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QMediaObject_Adaptor, bool, QEvent *>(&QMediaObject_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QMediaObject_Adaptor, bool, QEvent *>(&QMediaObject_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QMediaObject::event(arg1);
+      return QMediaObject::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QMediaObject::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QMediaObject::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QMediaObject::eventFilter(arg1, arg2);
+    return QMediaObject::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QMediaObject_Adaptor, bool, QObject *, QEvent *>(&QMediaObject_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QMediaObject_Adaptor, bool, QObject *, QEvent *>(&QMediaObject_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QMediaObject::eventFilter(arg1, arg2);
+      return QMediaObject::eventFilter(watched, event);
     }
   }
 
@@ -571,33 +571,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMediaObject::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QMediaObject::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QMediaObject::childEvent(arg1);
+    QMediaObject::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QMediaObject_Adaptor, QChildEvent *>(&QMediaObject_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QMediaObject_Adaptor, QChildEvent *>(&QMediaObject_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QMediaObject::childEvent(arg1);
+      QMediaObject::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QMediaObject::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QMediaObject::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QMediaObject::customEvent(arg1);
+    QMediaObject::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QMediaObject_Adaptor, QEvent *>(&QMediaObject_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QMediaObject_Adaptor, QEvent *>(&QMediaObject_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QMediaObject::customEvent(arg1);
+      QMediaObject::customEvent(event);
     }
   }
 
@@ -616,18 +616,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMediaObject::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QMediaObject::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QMediaObject::timerEvent(arg1);
+    QMediaObject::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QMediaObject_Adaptor, QTimerEvent *>(&QMediaObject_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QMediaObject_Adaptor, QTimerEvent *>(&QMediaObject_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QMediaObject::timerEvent(arg1);
+      QMediaObject::timerEvent(event);
     }
   }
 
@@ -646,12 +646,12 @@ public:
 
 QMediaObject_Adaptor::~QMediaObject_Adaptor() { }
 
-// exposed void QMediaObject::addPropertyWatch(QByteArray const &name)
+// exposed void QMediaObject::addPropertyWatch(const QByteArray &name)
 
 static void _init_fp_addPropertyWatch_2309 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("name");
-  decl->add_arg<QByteArray const & > (argspec_0);
+  decl->add_arg<const QByteArray & > (argspec_0);
   decl->set_return<void > ();
 }
 
@@ -659,7 +659,7 @@ static void _call_fp_addPropertyWatch_2309 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QByteArray const &arg1 = gsi::arg_reader<QByteArray const & >() (args, heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaObject_Adaptor *)cls)->fp_QMediaObject_addPropertyWatch_2309 (arg1);
 }
@@ -707,11 +707,11 @@ static void _set_callback_cbs_bind_1302_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QMediaObject::childEvent(QChildEvent *)
+// void QMediaObject::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -731,11 +731,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QMediaObject::customEvent(QEvent *)
+// void QMediaObject::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -779,11 +779,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QMediaObject::event(QEvent *)
+// bool QMediaObject::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -802,13 +802,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QMediaObject::eventFilter(QObject *, QEvent *)
+// bool QMediaObject::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -883,12 +883,12 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// exposed void QMediaObject::removePropertyWatch(QByteArray const &name)
+// exposed void QMediaObject::removePropertyWatch(const QByteArray &name)
 
 static void _init_fp_removePropertyWatch_2309 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("name");
-  decl->add_arg<QByteArray const & > (argspec_0);
+  decl->add_arg<const QByteArray & > (argspec_0);
   decl->set_return<void > ();
 }
 
@@ -896,7 +896,7 @@ static void _call_fp_removePropertyWatch_2309 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QByteArray const &arg1 = gsi::arg_reader<QByteArray const & >() (args, heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaObject_Adaptor *)cls)->fp_QMediaObject_removePropertyWatch_2309 (arg1);
 }
@@ -949,11 +949,11 @@ static void _set_callback_cbs_service_c0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QMediaObject::timerEvent(QTimerEvent *)
+// void QMediaObject::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1004,31 +1004,31 @@ gsi::Class<QMediaObject> &qtdecl_QMediaObject ();
 
 static gsi::Methods methods_QMediaObject_Adaptor () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("*addPropertyWatch", "@brief Method void QMediaObject::addPropertyWatch(QByteArray const &name)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_addPropertyWatch_2309, &_call_fp_addPropertyWatch_2309);
+  methods += new qt_gsi::GenericMethod ("*addPropertyWatch", "@brief Method void QMediaObject::addPropertyWatch(const QByteArray &name)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_addPropertyWatch_2309, &_call_fp_addPropertyWatch_2309);
   methods += new qt_gsi::GenericMethod ("availability", "@brief Virtual method QMultimedia::AvailabilityStatus QMediaObject::availability()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_availability_c0_0, &_call_cbs_availability_c0_0);
   methods += new qt_gsi::GenericMethod ("availability", "@hide", true, &_init_cbs_availability_c0_0, &_call_cbs_availability_c0_0, &_set_callback_cbs_availability_c0_0);
   methods += new qt_gsi::GenericMethod ("bind", "@brief Virtual method bool QMediaObject::bind(QObject *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_bind_1302_0, &_call_cbs_bind_1302_0);
   methods += new qt_gsi::GenericMethod ("bind", "@hide", false, &_init_cbs_bind_1302_0, &_call_cbs_bind_1302_0, &_set_callback_cbs_bind_1302_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QMediaObject::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QMediaObject::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMediaObject::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMediaObject::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QMediaObject::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMediaObject::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMediaObject::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QMediaObject::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QMediaObject::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("isAvailable", "@brief Virtual method bool QMediaObject::isAvailable()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isAvailable_c0_0, &_call_cbs_isAvailable_c0_0);
   methods += new qt_gsi::GenericMethod ("isAvailable", "@hide", true, &_init_cbs_isAvailable_c0_0, &_call_cbs_isAvailable_c0_0, &_set_callback_cbs_isAvailable_c0_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QMediaObject::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QMediaObject::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
-  methods += new qt_gsi::GenericMethod ("*removePropertyWatch", "@brief Method void QMediaObject::removePropertyWatch(QByteArray const &name)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_removePropertyWatch_2309, &_call_fp_removePropertyWatch_2309);
+  methods += new qt_gsi::GenericMethod ("*removePropertyWatch", "@brief Method void QMediaObject::removePropertyWatch(const QByteArray &name)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_removePropertyWatch_2309, &_call_fp_removePropertyWatch_2309);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QMediaObject::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QMediaObject::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("service", "@brief Virtual method QMediaService *QMediaObject::service()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_service_c0_0, &_call_cbs_service_c0_0);
   methods += new qt_gsi::GenericMethod ("service", "@hide", true, &_init_cbs_service_c0_0, &_call_cbs_service_c0_0, &_set_callback_cbs_service_c0_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QMediaObject::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QMediaObject::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("unbind", "@brief Virtual method void QMediaObject::unbind(QObject *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_unbind_1302_0, &_call_cbs_unbind_1302_0);
   methods += new qt_gsi::GenericMethod ("unbind", "@hide", false, &_init_cbs_unbind_1302_0, &_call_cbs_unbind_1302_0, &_set_callback_cbs_unbind_1302_0);

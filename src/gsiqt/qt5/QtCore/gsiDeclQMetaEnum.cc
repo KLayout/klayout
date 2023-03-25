@@ -66,6 +66,21 @@ static void _call_f_enclosingMetaObject_c0 (const qt_gsi::GenericMethod * /*decl
 }
 
 
+// const char *QMetaEnum::enumName()
+
+
+static void _init_f_enumName_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<const char * > ();
+}
+
+static void _call_f_enumName_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<const char * > ((const char *)((QMetaEnum *)cls)->enumName ());
+}
+
+
 // bool QMetaEnum::isFlag()
 
 
@@ -78,6 +93,21 @@ static void _call_f_isFlag_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<bool > ((bool)((QMetaEnum *)cls)->isFlag ());
+}
+
+
+// bool QMetaEnum::isScoped()
+
+
+static void _init_f_isScoped_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isScoped_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QMetaEnum *)cls)->isScoped ());
 }
 
 
@@ -137,7 +167,7 @@ static void _init_f_keyToValue_c2673 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("key");
   decl->add_arg<const char * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
   decl->add_arg<bool * > (argspec_1);
   decl->set_return<int > ();
 }
@@ -147,7 +177,7 @@ static void _call_f_keyToValue_c2673 (const qt_gsi::GenericMethod * /*decl*/, vo
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<int > ((int)((QMetaEnum *)cls)->keyToValue (arg1, arg2));
 }
 
@@ -159,7 +189,7 @@ static void _init_f_keysToValue_c2673 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("keys");
   decl->add_arg<const char * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
   decl->add_arg<bool * > (argspec_1);
   decl->set_return<int > ();
 }
@@ -169,7 +199,7 @@ static void _call_f_keysToValue_c2673 (const qt_gsi::GenericMethod * /*decl*/, v
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<int > ((int)((QMetaEnum *)cls)->keysToValue (arg1, arg2));
 }
 
@@ -269,7 +299,9 @@ static gsi::Methods methods_QMetaEnum () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMetaEnum::QMetaEnum()\nThis method creates an object of class QMetaEnum.", &_init_ctor_QMetaEnum_0, &_call_ctor_QMetaEnum_0);
   methods += new qt_gsi::GenericMethod ("enclosingMetaObject", "@brief Method const QMetaObject *QMetaEnum::enclosingMetaObject()\n", true, &_init_f_enclosingMetaObject_c0, &_call_f_enclosingMetaObject_c0);
+  methods += new qt_gsi::GenericMethod ("enumName", "@brief Method const char *QMetaEnum::enumName()\n", true, &_init_f_enumName_c0, &_call_f_enumName_c0);
   methods += new qt_gsi::GenericMethod ("isFlag?", "@brief Method bool QMetaEnum::isFlag()\n", true, &_init_f_isFlag_c0, &_call_f_isFlag_c0);
+  methods += new qt_gsi::GenericMethod ("isScoped?", "@brief Method bool QMetaEnum::isScoped()\n", true, &_init_f_isScoped_c0, &_call_f_isScoped_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QMetaEnum::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("key", "@brief Method const char *QMetaEnum::key(int index)\n", true, &_init_f_key_c767, &_call_f_key_c767);
   methods += new qt_gsi::GenericMethod ("keyCount", "@brief Method int QMetaEnum::keyCount()\n", true, &_init_f_keyCount_c0, &_call_f_keyCount_c0);

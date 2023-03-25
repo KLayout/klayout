@@ -211,19 +211,19 @@ end
 
 module PPointer
   def cpp
-    CPPCV::wrap(cvspec.nonterminal? && cvspec.cv.to_symbol, CPPPointer::new(itspec.nonterminal? ? itspec.it.cpp_reduced : CPPAnonymousId::new))
+    CPPPointer::new(itspec.nonterminal? ? itspec.it.cpp_reduced : CPPAnonymousId::new)
   end
 end
 
 module PReference
   def cpp
-    CPPCV::wrap(cvspec.nonterminal? && cvspec.cv.to_symbol, CPPReference::new(itspec.nonterminal? ? itspec.it.cpp_reduced : CPPAnonymousId::new))
+    CPPReference::new(itspec.nonterminal? ? itspec.it.cpp_reduced : CPPAnonymousId::new)
   end
 end
 
 module PMemberPointer
   def cpp
-    CPPMemberPointer::new(cspec.qid.cpp, itspec.nonterminal? ? itspec.it.cpp_reduced : CPPAnonymousId::new, cvspec.nonterminal? && cvspec.cv.to_symbol)
+    CPPMemberPointer::new(cspec.qid.cpp, itspec.nonterminal? ? itspec.it.cpp_reduced : CPPAnonymousId::new)
   end
 end
 
@@ -247,7 +247,7 @@ end
 
 module PInnerTypeWithCV
   def cpp
-    CPPCV::wrap(cvspec.to_symbol, it.cpp_reduced)
+    CPPCV::wrap(cvspec.nonterminal? && cvspec.cv.to_symbol, it.cpp_reduced)
   end
 end
 
@@ -293,7 +293,7 @@ module PType
 
   def cpp
     # This is the class/struct/union/enum declaration if there is one
-    d = ct.cpp
+    d = dct.ct.cpp
     if d.is_a?(Array)
       r = d.select { |i| i.is_a?(CPPStruct) || i.is_a?(CPPEnum) }
     elsif d.is_a?(CPPStruct) || d.is_a?(CPPEnum)
@@ -302,7 +302,7 @@ module PType
       r = []
     end
     # Create each declaration
-    ot = CPPCV::wrap(cvspec.nonterminal? && cvspec.cv.to_symbol, ct.cpp_reduced)
+    ot = CPPCV::wrap(dct.cvspec.nonterminal? && dct.cvspec.cv.to_symbol, dct.ct.cpp_reduced)
     if il.nonterminal? 
       r << CPPType::new(ot, il.t1.cpp_reduced, il.i1.nonterminal? ? il.i1.is1.text_value : nil)
       il.tt.elements.each do |t|
@@ -324,7 +324,7 @@ end
 
 module PTypeWoComma
   def cpp
-    ot = CPPCV::wrap(cvspec.nonterminal? && cvspec.cv.to_symbol, ct.cpp_reduced)
+    ot = CPPCV::wrap(dct.cvspec.nonterminal? && dct.cvspec.cv.to_symbol, dct.ct.cpp_reduced)
     if il.nonterminal?
       CPPType::new(ot, il.t.cpp_reduced, il.i.nonterminal? ? il.i.is.text_value : nil)
     else
@@ -335,7 +335,7 @@ end
 
 module PTypeForTemplate
   def cpp
-    ot = CPPCV::wrap(cvspec.nonterminal? && cvspec.cv.to_symbol, ct.cpp_reduced)
+    ot = CPPCV::wrap(dct.cvspec.nonterminal? && dct.cvspec.cv.to_symbol, dct.ct.cpp_reduced)
     CPPType::new(ot, il.nonterminal? ? il.t.cpp_reduced : CPPAnonymousId::new, nil)
   end
 end

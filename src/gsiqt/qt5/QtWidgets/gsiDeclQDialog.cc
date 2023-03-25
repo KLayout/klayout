@@ -820,18 +820,18 @@ public:
     emit QDialog::windowTitleChanged(title);
   }
 
-  //  [adaptor impl] void QDialog::actionEvent(QActionEvent *)
-  void cbs_actionEvent_1823_0(QActionEvent *arg1)
+  //  [adaptor impl] void QDialog::actionEvent(QActionEvent *event)
+  void cbs_actionEvent_1823_0(QActionEvent *event)
   {
-    QDialog::actionEvent(arg1);
+    QDialog::actionEvent(event);
   }
 
-  virtual void actionEvent(QActionEvent *arg1)
+  virtual void actionEvent(QActionEvent *event)
   {
     if (cb_actionEvent_1823_0.can_issue()) {
-      cb_actionEvent_1823_0.issue<QDialog_Adaptor, QActionEvent *>(&QDialog_Adaptor::cbs_actionEvent_1823_0, arg1);
+      cb_actionEvent_1823_0.issue<QDialog_Adaptor, QActionEvent *>(&QDialog_Adaptor::cbs_actionEvent_1823_0, event);
     } else {
-      QDialog::actionEvent(arg1);
+      QDialog::actionEvent(event);
     }
   }
 
@@ -850,18 +850,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDialog::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QDialog::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QDialog::childEvent(arg1);
+    QDialog::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QDialog_Adaptor, QChildEvent *>(&QDialog_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QDialog_Adaptor, QChildEvent *>(&QDialog_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QDialog::childEvent(arg1);
+      QDialog::childEvent(event);
     }
   }
 
@@ -895,18 +895,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDialog::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QDialog::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QDialog::customEvent(arg1);
+    QDialog::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QDialog_Adaptor, QEvent *>(&QDialog_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QDialog_Adaptor, QEvent *>(&QDialog_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QDialog::customEvent(arg1);
+      QDialog::customEvent(event);
     }
   }
 
@@ -925,93 +925,93 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDialog::dragEnterEvent(QDragEnterEvent *)
-  void cbs_dragEnterEvent_2109_0(QDragEnterEvent *arg1)
+  //  [adaptor impl] void QDialog::dragEnterEvent(QDragEnterEvent *event)
+  void cbs_dragEnterEvent_2109_0(QDragEnterEvent *event)
   {
-    QDialog::dragEnterEvent(arg1);
+    QDialog::dragEnterEvent(event);
   }
 
-  virtual void dragEnterEvent(QDragEnterEvent *arg1)
+  virtual void dragEnterEvent(QDragEnterEvent *event)
   {
     if (cb_dragEnterEvent_2109_0.can_issue()) {
-      cb_dragEnterEvent_2109_0.issue<QDialog_Adaptor, QDragEnterEvent *>(&QDialog_Adaptor::cbs_dragEnterEvent_2109_0, arg1);
+      cb_dragEnterEvent_2109_0.issue<QDialog_Adaptor, QDragEnterEvent *>(&QDialog_Adaptor::cbs_dragEnterEvent_2109_0, event);
     } else {
-      QDialog::dragEnterEvent(arg1);
+      QDialog::dragEnterEvent(event);
     }
   }
 
-  //  [adaptor impl] void QDialog::dragLeaveEvent(QDragLeaveEvent *)
-  void cbs_dragLeaveEvent_2092_0(QDragLeaveEvent *arg1)
+  //  [adaptor impl] void QDialog::dragLeaveEvent(QDragLeaveEvent *event)
+  void cbs_dragLeaveEvent_2092_0(QDragLeaveEvent *event)
   {
-    QDialog::dragLeaveEvent(arg1);
+    QDialog::dragLeaveEvent(event);
   }
 
-  virtual void dragLeaveEvent(QDragLeaveEvent *arg1)
+  virtual void dragLeaveEvent(QDragLeaveEvent *event)
   {
     if (cb_dragLeaveEvent_2092_0.can_issue()) {
-      cb_dragLeaveEvent_2092_0.issue<QDialog_Adaptor, QDragLeaveEvent *>(&QDialog_Adaptor::cbs_dragLeaveEvent_2092_0, arg1);
+      cb_dragLeaveEvent_2092_0.issue<QDialog_Adaptor, QDragLeaveEvent *>(&QDialog_Adaptor::cbs_dragLeaveEvent_2092_0, event);
     } else {
-      QDialog::dragLeaveEvent(arg1);
+      QDialog::dragLeaveEvent(event);
     }
   }
 
-  //  [adaptor impl] void QDialog::dragMoveEvent(QDragMoveEvent *)
-  void cbs_dragMoveEvent_2006_0(QDragMoveEvent *arg1)
+  //  [adaptor impl] void QDialog::dragMoveEvent(QDragMoveEvent *event)
+  void cbs_dragMoveEvent_2006_0(QDragMoveEvent *event)
   {
-    QDialog::dragMoveEvent(arg1);
+    QDialog::dragMoveEvent(event);
   }
 
-  virtual void dragMoveEvent(QDragMoveEvent *arg1)
+  virtual void dragMoveEvent(QDragMoveEvent *event)
   {
     if (cb_dragMoveEvent_2006_0.can_issue()) {
-      cb_dragMoveEvent_2006_0.issue<QDialog_Adaptor, QDragMoveEvent *>(&QDialog_Adaptor::cbs_dragMoveEvent_2006_0, arg1);
+      cb_dragMoveEvent_2006_0.issue<QDialog_Adaptor, QDragMoveEvent *>(&QDialog_Adaptor::cbs_dragMoveEvent_2006_0, event);
     } else {
-      QDialog::dragMoveEvent(arg1);
+      QDialog::dragMoveEvent(event);
     }
   }
 
-  //  [adaptor impl] void QDialog::dropEvent(QDropEvent *)
-  void cbs_dropEvent_1622_0(QDropEvent *arg1)
+  //  [adaptor impl] void QDialog::dropEvent(QDropEvent *event)
+  void cbs_dropEvent_1622_0(QDropEvent *event)
   {
-    QDialog::dropEvent(arg1);
+    QDialog::dropEvent(event);
   }
 
-  virtual void dropEvent(QDropEvent *arg1)
+  virtual void dropEvent(QDropEvent *event)
   {
     if (cb_dropEvent_1622_0.can_issue()) {
-      cb_dropEvent_1622_0.issue<QDialog_Adaptor, QDropEvent *>(&QDialog_Adaptor::cbs_dropEvent_1622_0, arg1);
+      cb_dropEvent_1622_0.issue<QDialog_Adaptor, QDropEvent *>(&QDialog_Adaptor::cbs_dropEvent_1622_0, event);
     } else {
-      QDialog::dropEvent(arg1);
+      QDialog::dropEvent(event);
     }
   }
 
-  //  [adaptor impl] void QDialog::enterEvent(QEvent *)
-  void cbs_enterEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QDialog::enterEvent(QEvent *event)
+  void cbs_enterEvent_1217_0(QEvent *event)
   {
-    QDialog::enterEvent(arg1);
+    QDialog::enterEvent(event);
   }
 
-  virtual void enterEvent(QEvent *arg1)
+  virtual void enterEvent(QEvent *event)
   {
     if (cb_enterEvent_1217_0.can_issue()) {
-      cb_enterEvent_1217_0.issue<QDialog_Adaptor, QEvent *>(&QDialog_Adaptor::cbs_enterEvent_1217_0, arg1);
+      cb_enterEvent_1217_0.issue<QDialog_Adaptor, QEvent *>(&QDialog_Adaptor::cbs_enterEvent_1217_0, event);
     } else {
-      QDialog::enterEvent(arg1);
+      QDialog::enterEvent(event);
     }
   }
 
-  //  [adaptor impl] bool QDialog::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QDialog::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QDialog::event(arg1);
+    return QDialog::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QDialog_Adaptor, bool, QEvent *>(&QDialog_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QDialog_Adaptor, bool, QEvent *>(&QDialog_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QDialog::event(arg1);
+      return QDialog::event(_event);
     }
   }
 
@@ -1030,18 +1030,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDialog::focusInEvent(QFocusEvent *)
-  void cbs_focusInEvent_1729_0(QFocusEvent *arg1)
+  //  [adaptor impl] void QDialog::focusInEvent(QFocusEvent *event)
+  void cbs_focusInEvent_1729_0(QFocusEvent *event)
   {
-    QDialog::focusInEvent(arg1);
+    QDialog::focusInEvent(event);
   }
 
-  virtual void focusInEvent(QFocusEvent *arg1)
+  virtual void focusInEvent(QFocusEvent *event)
   {
     if (cb_focusInEvent_1729_0.can_issue()) {
-      cb_focusInEvent_1729_0.issue<QDialog_Adaptor, QFocusEvent *>(&QDialog_Adaptor::cbs_focusInEvent_1729_0, arg1);
+      cb_focusInEvent_1729_0.issue<QDialog_Adaptor, QFocusEvent *>(&QDialog_Adaptor::cbs_focusInEvent_1729_0, event);
     } else {
-      QDialog::focusInEvent(arg1);
+      QDialog::focusInEvent(event);
     }
   }
 
@@ -1060,33 +1060,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDialog::focusOutEvent(QFocusEvent *)
-  void cbs_focusOutEvent_1729_0(QFocusEvent *arg1)
+  //  [adaptor impl] void QDialog::focusOutEvent(QFocusEvent *event)
+  void cbs_focusOutEvent_1729_0(QFocusEvent *event)
   {
-    QDialog::focusOutEvent(arg1);
+    QDialog::focusOutEvent(event);
   }
 
-  virtual void focusOutEvent(QFocusEvent *arg1)
+  virtual void focusOutEvent(QFocusEvent *event)
   {
     if (cb_focusOutEvent_1729_0.can_issue()) {
-      cb_focusOutEvent_1729_0.issue<QDialog_Adaptor, QFocusEvent *>(&QDialog_Adaptor::cbs_focusOutEvent_1729_0, arg1);
+      cb_focusOutEvent_1729_0.issue<QDialog_Adaptor, QFocusEvent *>(&QDialog_Adaptor::cbs_focusOutEvent_1729_0, event);
     } else {
-      QDialog::focusOutEvent(arg1);
+      QDialog::focusOutEvent(event);
     }
   }
 
-  //  [adaptor impl] void QDialog::hideEvent(QHideEvent *)
-  void cbs_hideEvent_1595_0(QHideEvent *arg1)
+  //  [adaptor impl] void QDialog::hideEvent(QHideEvent *event)
+  void cbs_hideEvent_1595_0(QHideEvent *event)
   {
-    QDialog::hideEvent(arg1);
+    QDialog::hideEvent(event);
   }
 
-  virtual void hideEvent(QHideEvent *arg1)
+  virtual void hideEvent(QHideEvent *event)
   {
     if (cb_hideEvent_1595_0.can_issue()) {
-      cb_hideEvent_1595_0.issue<QDialog_Adaptor, QHideEvent *>(&QDialog_Adaptor::cbs_hideEvent_1595_0, arg1);
+      cb_hideEvent_1595_0.issue<QDialog_Adaptor, QHideEvent *>(&QDialog_Adaptor::cbs_hideEvent_1595_0, event);
     } else {
-      QDialog::hideEvent(arg1);
+      QDialog::hideEvent(event);
     }
   }
 
@@ -1135,33 +1135,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDialog::keyReleaseEvent(QKeyEvent *)
-  void cbs_keyReleaseEvent_1514_0(QKeyEvent *arg1)
+  //  [adaptor impl] void QDialog::keyReleaseEvent(QKeyEvent *event)
+  void cbs_keyReleaseEvent_1514_0(QKeyEvent *event)
   {
-    QDialog::keyReleaseEvent(arg1);
+    QDialog::keyReleaseEvent(event);
   }
 
-  virtual void keyReleaseEvent(QKeyEvent *arg1)
+  virtual void keyReleaseEvent(QKeyEvent *event)
   {
     if (cb_keyReleaseEvent_1514_0.can_issue()) {
-      cb_keyReleaseEvent_1514_0.issue<QDialog_Adaptor, QKeyEvent *>(&QDialog_Adaptor::cbs_keyReleaseEvent_1514_0, arg1);
+      cb_keyReleaseEvent_1514_0.issue<QDialog_Adaptor, QKeyEvent *>(&QDialog_Adaptor::cbs_keyReleaseEvent_1514_0, event);
     } else {
-      QDialog::keyReleaseEvent(arg1);
+      QDialog::keyReleaseEvent(event);
     }
   }
 
-  //  [adaptor impl] void QDialog::leaveEvent(QEvent *)
-  void cbs_leaveEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QDialog::leaveEvent(QEvent *event)
+  void cbs_leaveEvent_1217_0(QEvent *event)
   {
-    QDialog::leaveEvent(arg1);
+    QDialog::leaveEvent(event);
   }
 
-  virtual void leaveEvent(QEvent *arg1)
+  virtual void leaveEvent(QEvent *event)
   {
     if (cb_leaveEvent_1217_0.can_issue()) {
-      cb_leaveEvent_1217_0.issue<QDialog_Adaptor, QEvent *>(&QDialog_Adaptor::cbs_leaveEvent_1217_0, arg1);
+      cb_leaveEvent_1217_0.issue<QDialog_Adaptor, QEvent *>(&QDialog_Adaptor::cbs_leaveEvent_1217_0, event);
     } else {
-      QDialog::leaveEvent(arg1);
+      QDialog::leaveEvent(event);
     }
   }
 
@@ -1180,78 +1180,78 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDialog::mouseDoubleClickEvent(QMouseEvent *)
-  void cbs_mouseDoubleClickEvent_1738_0(QMouseEvent *arg1)
+  //  [adaptor impl] void QDialog::mouseDoubleClickEvent(QMouseEvent *event)
+  void cbs_mouseDoubleClickEvent_1738_0(QMouseEvent *event)
   {
-    QDialog::mouseDoubleClickEvent(arg1);
+    QDialog::mouseDoubleClickEvent(event);
   }
 
-  virtual void mouseDoubleClickEvent(QMouseEvent *arg1)
+  virtual void mouseDoubleClickEvent(QMouseEvent *event)
   {
     if (cb_mouseDoubleClickEvent_1738_0.can_issue()) {
-      cb_mouseDoubleClickEvent_1738_0.issue<QDialog_Adaptor, QMouseEvent *>(&QDialog_Adaptor::cbs_mouseDoubleClickEvent_1738_0, arg1);
+      cb_mouseDoubleClickEvent_1738_0.issue<QDialog_Adaptor, QMouseEvent *>(&QDialog_Adaptor::cbs_mouseDoubleClickEvent_1738_0, event);
     } else {
-      QDialog::mouseDoubleClickEvent(arg1);
+      QDialog::mouseDoubleClickEvent(event);
     }
   }
 
-  //  [adaptor impl] void QDialog::mouseMoveEvent(QMouseEvent *)
-  void cbs_mouseMoveEvent_1738_0(QMouseEvent *arg1)
+  //  [adaptor impl] void QDialog::mouseMoveEvent(QMouseEvent *event)
+  void cbs_mouseMoveEvent_1738_0(QMouseEvent *event)
   {
-    QDialog::mouseMoveEvent(arg1);
+    QDialog::mouseMoveEvent(event);
   }
 
-  virtual void mouseMoveEvent(QMouseEvent *arg1)
+  virtual void mouseMoveEvent(QMouseEvent *event)
   {
     if (cb_mouseMoveEvent_1738_0.can_issue()) {
-      cb_mouseMoveEvent_1738_0.issue<QDialog_Adaptor, QMouseEvent *>(&QDialog_Adaptor::cbs_mouseMoveEvent_1738_0, arg1);
+      cb_mouseMoveEvent_1738_0.issue<QDialog_Adaptor, QMouseEvent *>(&QDialog_Adaptor::cbs_mouseMoveEvent_1738_0, event);
     } else {
-      QDialog::mouseMoveEvent(arg1);
+      QDialog::mouseMoveEvent(event);
     }
   }
 
-  //  [adaptor impl] void QDialog::mousePressEvent(QMouseEvent *)
-  void cbs_mousePressEvent_1738_0(QMouseEvent *arg1)
+  //  [adaptor impl] void QDialog::mousePressEvent(QMouseEvent *event)
+  void cbs_mousePressEvent_1738_0(QMouseEvent *event)
   {
-    QDialog::mousePressEvent(arg1);
+    QDialog::mousePressEvent(event);
   }
 
-  virtual void mousePressEvent(QMouseEvent *arg1)
+  virtual void mousePressEvent(QMouseEvent *event)
   {
     if (cb_mousePressEvent_1738_0.can_issue()) {
-      cb_mousePressEvent_1738_0.issue<QDialog_Adaptor, QMouseEvent *>(&QDialog_Adaptor::cbs_mousePressEvent_1738_0, arg1);
+      cb_mousePressEvent_1738_0.issue<QDialog_Adaptor, QMouseEvent *>(&QDialog_Adaptor::cbs_mousePressEvent_1738_0, event);
     } else {
-      QDialog::mousePressEvent(arg1);
+      QDialog::mousePressEvent(event);
     }
   }
 
-  //  [adaptor impl] void QDialog::mouseReleaseEvent(QMouseEvent *)
-  void cbs_mouseReleaseEvent_1738_0(QMouseEvent *arg1)
+  //  [adaptor impl] void QDialog::mouseReleaseEvent(QMouseEvent *event)
+  void cbs_mouseReleaseEvent_1738_0(QMouseEvent *event)
   {
-    QDialog::mouseReleaseEvent(arg1);
+    QDialog::mouseReleaseEvent(event);
   }
 
-  virtual void mouseReleaseEvent(QMouseEvent *arg1)
+  virtual void mouseReleaseEvent(QMouseEvent *event)
   {
     if (cb_mouseReleaseEvent_1738_0.can_issue()) {
-      cb_mouseReleaseEvent_1738_0.issue<QDialog_Adaptor, QMouseEvent *>(&QDialog_Adaptor::cbs_mouseReleaseEvent_1738_0, arg1);
+      cb_mouseReleaseEvent_1738_0.issue<QDialog_Adaptor, QMouseEvent *>(&QDialog_Adaptor::cbs_mouseReleaseEvent_1738_0, event);
     } else {
-      QDialog::mouseReleaseEvent(arg1);
+      QDialog::mouseReleaseEvent(event);
     }
   }
 
-  //  [adaptor impl] void QDialog::moveEvent(QMoveEvent *)
-  void cbs_moveEvent_1624_0(QMoveEvent *arg1)
+  //  [adaptor impl] void QDialog::moveEvent(QMoveEvent *event)
+  void cbs_moveEvent_1624_0(QMoveEvent *event)
   {
-    QDialog::moveEvent(arg1);
+    QDialog::moveEvent(event);
   }
 
-  virtual void moveEvent(QMoveEvent *arg1)
+  virtual void moveEvent(QMoveEvent *event)
   {
     if (cb_moveEvent_1624_0.can_issue()) {
-      cb_moveEvent_1624_0.issue<QDialog_Adaptor, QMoveEvent *>(&QDialog_Adaptor::cbs_moveEvent_1624_0, arg1);
+      cb_moveEvent_1624_0.issue<QDialog_Adaptor, QMoveEvent *>(&QDialog_Adaptor::cbs_moveEvent_1624_0, event);
     } else {
-      QDialog::moveEvent(arg1);
+      QDialog::moveEvent(event);
     }
   }
 
@@ -1270,18 +1270,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDialog::paintEvent(QPaintEvent *)
-  void cbs_paintEvent_1725_0(QPaintEvent *arg1)
+  //  [adaptor impl] void QDialog::paintEvent(QPaintEvent *event)
+  void cbs_paintEvent_1725_0(QPaintEvent *event)
   {
-    QDialog::paintEvent(arg1);
+    QDialog::paintEvent(event);
   }
 
-  virtual void paintEvent(QPaintEvent *arg1)
+  virtual void paintEvent(QPaintEvent *event)
   {
     if (cb_paintEvent_1725_0.can_issue()) {
-      cb_paintEvent_1725_0.issue<QDialog_Adaptor, QPaintEvent *>(&QDialog_Adaptor::cbs_paintEvent_1725_0, arg1);
+      cb_paintEvent_1725_0.issue<QDialog_Adaptor, QPaintEvent *>(&QDialog_Adaptor::cbs_paintEvent_1725_0, event);
     } else {
-      QDialog::paintEvent(arg1);
+      QDialog::paintEvent(event);
     }
   }
 
@@ -1345,48 +1345,48 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDialog::tabletEvent(QTabletEvent *)
-  void cbs_tabletEvent_1821_0(QTabletEvent *arg1)
+  //  [adaptor impl] void QDialog::tabletEvent(QTabletEvent *event)
+  void cbs_tabletEvent_1821_0(QTabletEvent *event)
   {
-    QDialog::tabletEvent(arg1);
+    QDialog::tabletEvent(event);
   }
 
-  virtual void tabletEvent(QTabletEvent *arg1)
+  virtual void tabletEvent(QTabletEvent *event)
   {
     if (cb_tabletEvent_1821_0.can_issue()) {
-      cb_tabletEvent_1821_0.issue<QDialog_Adaptor, QTabletEvent *>(&QDialog_Adaptor::cbs_tabletEvent_1821_0, arg1);
+      cb_tabletEvent_1821_0.issue<QDialog_Adaptor, QTabletEvent *>(&QDialog_Adaptor::cbs_tabletEvent_1821_0, event);
     } else {
-      QDialog::tabletEvent(arg1);
+      QDialog::tabletEvent(event);
     }
   }
 
-  //  [adaptor impl] void QDialog::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QDialog::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QDialog::timerEvent(arg1);
+    QDialog::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QDialog_Adaptor, QTimerEvent *>(&QDialog_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QDialog_Adaptor, QTimerEvent *>(&QDialog_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QDialog::timerEvent(arg1);
+      QDialog::timerEvent(event);
     }
   }
 
-  //  [adaptor impl] void QDialog::wheelEvent(QWheelEvent *)
-  void cbs_wheelEvent_1718_0(QWheelEvent *arg1)
+  //  [adaptor impl] void QDialog::wheelEvent(QWheelEvent *event)
+  void cbs_wheelEvent_1718_0(QWheelEvent *event)
   {
-    QDialog::wheelEvent(arg1);
+    QDialog::wheelEvent(event);
   }
 
-  virtual void wheelEvent(QWheelEvent *arg1)
+  virtual void wheelEvent(QWheelEvent *event)
   {
     if (cb_wheelEvent_1718_0.can_issue()) {
-      cb_wheelEvent_1718_0.issue<QDialog_Adaptor, QWheelEvent *>(&QDialog_Adaptor::cbs_wheelEvent_1718_0, arg1);
+      cb_wheelEvent_1718_0.issue<QDialog_Adaptor, QWheelEvent *>(&QDialog_Adaptor::cbs_wheelEvent_1718_0, event);
     } else {
-      QDialog::wheelEvent(arg1);
+      QDialog::wheelEvent(event);
     }
   }
 
@@ -1448,9 +1448,9 @@ QDialog_Adaptor::~QDialog_Adaptor() { }
 
 static void _init_ctor_QDialog_Adaptor_3702 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("f", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("f", true, "Qt::WindowFlags()");
   decl->add_arg<QFlags<Qt::WindowType> > (argspec_1);
   decl->set_return_new<QDialog_Adaptor> ();
 }
@@ -1459,8 +1459,8 @@ static void _call_ctor_QDialog_Adaptor_3702 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
-  QFlags<Qt::WindowType> arg2 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (0, heap);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
+  QFlags<Qt::WindowType> arg2 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (Qt::WindowFlags(), heap);
   ret.write<QDialog_Adaptor *> (new QDialog_Adaptor (arg1, arg2));
 }
 
@@ -1499,11 +1499,11 @@ static void _call_emitter_accepted_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// void QDialog::actionEvent(QActionEvent *)
+// void QDialog::actionEvent(QActionEvent *event)
 
 static void _init_cbs_actionEvent_1823_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QActionEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1566,11 +1566,11 @@ static void _set_callback_cbs_changeEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
-// void QDialog::childEvent(QChildEvent *)
+// void QDialog::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1681,11 +1681,11 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 }
 
 
-// void QDialog::customEvent(QEvent *)
+// void QDialog::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1731,7 +1731,7 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1740,7 +1740,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QDialog_Adaptor *)cls)->emitter_QDialog_destroyed_1302 (arg1);
 }
 
@@ -1793,11 +1793,11 @@ static void _set_callback_cbs_done_767_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QDialog::dragEnterEvent(QDragEnterEvent *)
+// void QDialog::dragEnterEvent(QDragEnterEvent *event)
 
 static void _init_cbs_dragEnterEvent_2109_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDragEnterEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1817,11 +1817,11 @@ static void _set_callback_cbs_dragEnterEvent_2109_0 (void *cls, const gsi::Callb
 }
 
 
-// void QDialog::dragLeaveEvent(QDragLeaveEvent *)
+// void QDialog::dragLeaveEvent(QDragLeaveEvent *event)
 
 static void _init_cbs_dragLeaveEvent_2092_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDragLeaveEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1841,11 +1841,11 @@ static void _set_callback_cbs_dragLeaveEvent_2092_0 (void *cls, const gsi::Callb
 }
 
 
-// void QDialog::dragMoveEvent(QDragMoveEvent *)
+// void QDialog::dragMoveEvent(QDragMoveEvent *event)
 
 static void _init_cbs_dragMoveEvent_2006_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDragMoveEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1865,11 +1865,11 @@ static void _set_callback_cbs_dragMoveEvent_2006_0 (void *cls, const gsi::Callba
 }
 
 
-// void QDialog::dropEvent(QDropEvent *)
+// void QDialog::dropEvent(QDropEvent *event)
 
 static void _init_cbs_dropEvent_1622_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDropEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1889,11 +1889,11 @@ static void _set_callback_cbs_dropEvent_1622_0 (void *cls, const gsi::Callback &
 }
 
 
-// void QDialog::enterEvent(QEvent *)
+// void QDialog::enterEvent(QEvent *event)
 
 static void _init_cbs_enterEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1913,11 +1913,11 @@ static void _set_callback_cbs_enterEvent_1217_0 (void *cls, const gsi::Callback 
 }
 
 
-// bool QDialog::event(QEvent *)
+// bool QDialog::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -1999,11 +1999,11 @@ static void _call_emitter_finished_767 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// void QDialog::focusInEvent(QFocusEvent *)
+// void QDialog::focusInEvent(QFocusEvent *event)
 
 static void _init_cbs_focusInEvent_1729_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QFocusEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2060,11 +2060,11 @@ static void _set_callback_cbs_focusNextPrevChild_864_0 (void *cls, const gsi::Ca
 }
 
 
-// void QDialog::focusOutEvent(QFocusEvent *)
+// void QDialog::focusOutEvent(QFocusEvent *event)
 
 static void _init_cbs_focusOutEvent_1729_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QFocusEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2140,11 +2140,11 @@ static void _set_callback_cbs_heightForWidth_c767_0 (void *cls, const gsi::Callb
 }
 
 
-// void QDialog::hideEvent(QHideEvent *)
+// void QDialog::hideEvent(QHideEvent *event)
 
 static void _init_cbs_hideEvent_1595_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QHideEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2277,11 +2277,11 @@ static void _set_callback_cbs_keyPressEvent_1514_0 (void *cls, const gsi::Callba
 }
 
 
-// void QDialog::keyReleaseEvent(QKeyEvent *)
+// void QDialog::keyReleaseEvent(QKeyEvent *event)
 
 static void _init_cbs_keyReleaseEvent_1514_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QKeyEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2301,11 +2301,11 @@ static void _set_callback_cbs_keyReleaseEvent_1514_0 (void *cls, const gsi::Call
 }
 
 
-// void QDialog::leaveEvent(QEvent *)
+// void QDialog::leaveEvent(QEvent *event)
 
 static void _init_cbs_leaveEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2367,11 +2367,11 @@ static void _set_callback_cbs_minimumSizeHint_c0_0 (void *cls, const gsi::Callba
 }
 
 
-// void QDialog::mouseDoubleClickEvent(QMouseEvent *)
+// void QDialog::mouseDoubleClickEvent(QMouseEvent *event)
 
 static void _init_cbs_mouseDoubleClickEvent_1738_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMouseEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2391,11 +2391,11 @@ static void _set_callback_cbs_mouseDoubleClickEvent_1738_0 (void *cls, const gsi
 }
 
 
-// void QDialog::mouseMoveEvent(QMouseEvent *)
+// void QDialog::mouseMoveEvent(QMouseEvent *event)
 
 static void _init_cbs_mouseMoveEvent_1738_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMouseEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2415,11 +2415,11 @@ static void _set_callback_cbs_mouseMoveEvent_1738_0 (void *cls, const gsi::Callb
 }
 
 
-// void QDialog::mousePressEvent(QMouseEvent *)
+// void QDialog::mousePressEvent(QMouseEvent *event)
 
 static void _init_cbs_mousePressEvent_1738_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMouseEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2439,11 +2439,11 @@ static void _set_callback_cbs_mousePressEvent_1738_0 (void *cls, const gsi::Call
 }
 
 
-// void QDialog::mouseReleaseEvent(QMouseEvent *)
+// void QDialog::mouseReleaseEvent(QMouseEvent *event)
 
 static void _init_cbs_mouseReleaseEvent_1738_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMouseEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2463,11 +2463,11 @@ static void _set_callback_cbs_mouseReleaseEvent_1738_0 (void *cls, const gsi::Ca
 }
 
 
-// void QDialog::moveEvent(QMoveEvent *)
+// void QDialog::moveEvent(QMoveEvent *event)
 
 static void _init_cbs_moveEvent_1624_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMoveEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2573,11 +2573,11 @@ static void _set_callback_cbs_paintEngine_c0_0 (void *cls, const gsi::Callback &
 }
 
 
-// void QDialog::paintEvent(QPaintEvent *)
+// void QDialog::paintEvent(QPaintEvent *event)
 
 static void _init_cbs_paintEvent_1725_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QPaintEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2810,11 +2810,11 @@ static void _set_callback_cbs_sizeHint_c0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QDialog::tabletEvent(QTabletEvent *)
+// void QDialog::tabletEvent(QTabletEvent *event)
 
 static void _init_cbs_tabletEvent_1821_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTabletEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2834,11 +2834,11 @@ static void _set_callback_cbs_tabletEvent_1821_0 (void *cls, const gsi::Callback
 }
 
 
-// void QDialog::timerEvent(QTimerEvent *)
+// void QDialog::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2873,11 +2873,11 @@ static void _call_fp_updateMicroFocus_0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// void QDialog::wheelEvent(QWheelEvent *)
+// void QDialog::wheelEvent(QWheelEvent *event)
 
 static void _init_cbs_wheelEvent_1718_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QWheelEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2962,57 +2962,57 @@ static gsi::Methods methods_QDialog_Adaptor () {
   methods += new qt_gsi::GenericMethod ("accept", "@brief Virtual method void QDialog::accept()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_accept_0_0, &_call_cbs_accept_0_0);
   methods += new qt_gsi::GenericMethod ("accept", "@hide", false, &_init_cbs_accept_0_0, &_call_cbs_accept_0_0, &_set_callback_cbs_accept_0_0);
   methods += new qt_gsi::GenericMethod ("emit_accepted", "@brief Emitter for signal void QDialog::accepted()\nCall this method to emit this signal.", false, &_init_emitter_accepted_0, &_call_emitter_accepted_0);
-  methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QDialog::actionEvent(QActionEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
+  methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QDialog::actionEvent(QActionEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("*actionEvent", "@hide", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0, &_set_callback_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("*adjustPosition", "@brief Method void QDialog::adjustPosition(QWidget *)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_adjustPosition_1315, &_call_fp_adjustPosition_1315);
   methods += new qt_gsi::GenericMethod ("*changeEvent", "@brief Virtual method void QDialog::changeEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*changeEvent", "@hide", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0, &_set_callback_cbs_changeEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QDialog::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QDialog::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*closeEvent", "@brief Virtual method void QDialog::closeEvent(QCloseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0);
   methods += new qt_gsi::GenericMethod ("*closeEvent", "@hide", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0, &_set_callback_cbs_closeEvent_1719_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QDialog::contextMenuEvent(QContextMenuEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0, &_set_callback_cbs_contextMenuEvent_2363_0);
-  methods += new qt_gsi::GenericMethod ("*qt_create", "@brief Method void QDialog::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
+  methods += new qt_gsi::GenericMethod ("*create|qt_create", "@brief Method void QDialog::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
   methods += new qt_gsi::GenericMethod ("emit_customContextMenuRequested", "@brief Emitter for signal void QDialog::customContextMenuRequested(const QPoint &pos)\nCall this method to emit this signal.", false, &_init_emitter_customContextMenuRequested_1916, &_call_emitter_customContextMenuRequested_1916);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QDialog::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QDialog::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*qt_destroy", "@brief Method void QDialog::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
+  methods += new qt_gsi::GenericMethod ("*destroy|qt_destroy", "@brief Method void QDialog::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QDialog::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QDialog::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("done", "@brief Virtual method void QDialog::done(int)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_done_767_0, &_call_cbs_done_767_0);
   methods += new qt_gsi::GenericMethod ("done", "@hide", false, &_init_cbs_done_767_0, &_call_cbs_done_767_0, &_set_callback_cbs_done_767_0);
-  methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@brief Virtual method void QDialog::dragEnterEvent(QDragEnterEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0);
+  methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@brief Virtual method void QDialog::dragEnterEvent(QDragEnterEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0);
   methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@hide", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0, &_set_callback_cbs_dragEnterEvent_2109_0);
-  methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@brief Virtual method void QDialog::dragLeaveEvent(QDragLeaveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0);
+  methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@brief Virtual method void QDialog::dragLeaveEvent(QDragLeaveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0);
   methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@hide", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0, &_set_callback_cbs_dragLeaveEvent_2092_0);
-  methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@brief Virtual method void QDialog::dragMoveEvent(QDragMoveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0);
+  methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@brief Virtual method void QDialog::dragMoveEvent(QDragMoveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0);
   methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@hide", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0, &_set_callback_cbs_dragMoveEvent_2006_0);
-  methods += new qt_gsi::GenericMethod ("*dropEvent", "@brief Virtual method void QDialog::dropEvent(QDropEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0);
+  methods += new qt_gsi::GenericMethod ("*dropEvent", "@brief Virtual method void QDialog::dropEvent(QDropEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0);
   methods += new qt_gsi::GenericMethod ("*dropEvent", "@hide", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0, &_set_callback_cbs_dropEvent_1622_0);
-  methods += new qt_gsi::GenericMethod ("*enterEvent", "@brief Virtual method void QDialog::enterEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*enterEvent", "@brief Virtual method void QDialog::enterEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*enterEvent", "@hide", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0, &_set_callback_cbs_enterEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QDialog::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QDialog::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*eventFilter", "@brief Virtual method bool QDialog::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("exec", "@brief Virtual method int QDialog::exec()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_exec_0_0, &_call_cbs_exec_0_0);
   methods += new qt_gsi::GenericMethod ("exec", "@hide", false, &_init_cbs_exec_0_0, &_call_cbs_exec_0_0, &_set_callback_cbs_exec_0_0);
   methods += new qt_gsi::GenericMethod ("emit_finished", "@brief Emitter for signal void QDialog::finished(int result)\nCall this method to emit this signal.", false, &_init_emitter_finished_767, &_call_emitter_finished_767);
-  methods += new qt_gsi::GenericMethod ("*focusInEvent", "@brief Virtual method void QDialog::focusInEvent(QFocusEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0);
+  methods += new qt_gsi::GenericMethod ("*focusInEvent", "@brief Virtual method void QDialog::focusInEvent(QFocusEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusInEvent", "@hide", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0, &_set_callback_cbs_focusInEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusNextChild", "@brief Method bool QDialog::focusNextChild()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_focusNextChild_0, &_call_fp_focusNextChild_0);
   methods += new qt_gsi::GenericMethod ("*focusNextPrevChild", "@brief Virtual method bool QDialog::focusNextPrevChild(bool next)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusNextPrevChild_864_0, &_call_cbs_focusNextPrevChild_864_0);
   methods += new qt_gsi::GenericMethod ("*focusNextPrevChild", "@hide", false, &_init_cbs_focusNextPrevChild_864_0, &_call_cbs_focusNextPrevChild_864_0, &_set_callback_cbs_focusNextPrevChild_864_0);
-  methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@brief Virtual method void QDialog::focusOutEvent(QFocusEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0);
+  methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@brief Virtual method void QDialog::focusOutEvent(QFocusEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@hide", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0, &_set_callback_cbs_focusOutEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusPreviousChild", "@brief Method bool QDialog::focusPreviousChild()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_focusPreviousChild_0, &_call_fp_focusPreviousChild_0);
   methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@brief Virtual method bool QDialog::hasHeightForWidth()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_hasHeightForWidth_c0_0, &_call_cbs_hasHeightForWidth_c0_0);
   methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@hide", true, &_init_cbs_hasHeightForWidth_c0_0, &_call_cbs_hasHeightForWidth_c0_0, &_set_callback_cbs_hasHeightForWidth_c0_0);
   methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Virtual method int QDialog::heightForWidth(int)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_heightForWidth_c767_0, &_call_cbs_heightForWidth_c767_0);
   methods += new qt_gsi::GenericMethod ("heightForWidth", "@hide", true, &_init_cbs_heightForWidth_c767_0, &_call_cbs_heightForWidth_c767_0, &_set_callback_cbs_heightForWidth_c767_0);
-  methods += new qt_gsi::GenericMethod ("*hideEvent", "@brief Virtual method void QDialog::hideEvent(QHideEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_hideEvent_1595_0, &_call_cbs_hideEvent_1595_0);
+  methods += new qt_gsi::GenericMethod ("*hideEvent", "@brief Virtual method void QDialog::hideEvent(QHideEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_hideEvent_1595_0, &_call_cbs_hideEvent_1595_0);
   methods += new qt_gsi::GenericMethod ("*hideEvent", "@hide", false, &_init_cbs_hideEvent_1595_0, &_call_cbs_hideEvent_1595_0, &_set_callback_cbs_hideEvent_1595_0);
   methods += new qt_gsi::GenericMethod ("*initPainter", "@brief Virtual method void QDialog::initPainter(QPainter *painter)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0);
   methods += new qt_gsi::GenericMethod ("*initPainter", "@hide", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0, &_set_callback_cbs_initPainter_c1426_0);
@@ -3023,23 +3023,23 @@ static gsi::Methods methods_QDialog_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QDialog::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("*keyPressEvent", "@brief Virtual method void QDialog::keyPressEvent(QKeyEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyPressEvent_1514_0, &_call_cbs_keyPressEvent_1514_0);
   methods += new qt_gsi::GenericMethod ("*keyPressEvent", "@hide", false, &_init_cbs_keyPressEvent_1514_0, &_call_cbs_keyPressEvent_1514_0, &_set_callback_cbs_keyPressEvent_1514_0);
-  methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@brief Virtual method void QDialog::keyReleaseEvent(QKeyEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0);
+  methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@brief Virtual method void QDialog::keyReleaseEvent(QKeyEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0);
   methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@hide", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0, &_set_callback_cbs_keyReleaseEvent_1514_0);
-  methods += new qt_gsi::GenericMethod ("*leaveEvent", "@brief Virtual method void QDialog::leaveEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*leaveEvent", "@brief Virtual method void QDialog::leaveEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*leaveEvent", "@hide", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0, &_set_callback_cbs_leaveEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*metric", "@brief Virtual method int QDialog::metric(QPaintDevice::PaintDeviceMetric)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0);
   methods += new qt_gsi::GenericMethod ("*metric", "@hide", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0, &_set_callback_cbs_metric_c3445_0);
   methods += new qt_gsi::GenericMethod ("minimumSizeHint", "@brief Virtual method QSize QDialog::minimumSizeHint()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_minimumSizeHint_c0_0, &_call_cbs_minimumSizeHint_c0_0);
   methods += new qt_gsi::GenericMethod ("minimumSizeHint", "@hide", true, &_init_cbs_minimumSizeHint_c0_0, &_call_cbs_minimumSizeHint_c0_0, &_set_callback_cbs_minimumSizeHint_c0_0);
-  methods += new qt_gsi::GenericMethod ("*mouseDoubleClickEvent", "@brief Virtual method void QDialog::mouseDoubleClickEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseDoubleClickEvent_1738_0, &_call_cbs_mouseDoubleClickEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mouseDoubleClickEvent", "@brief Virtual method void QDialog::mouseDoubleClickEvent(QMouseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseDoubleClickEvent_1738_0, &_call_cbs_mouseDoubleClickEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseDoubleClickEvent", "@hide", false, &_init_cbs_mouseDoubleClickEvent_1738_0, &_call_cbs_mouseDoubleClickEvent_1738_0, &_set_callback_cbs_mouseDoubleClickEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*mouseMoveEvent", "@brief Virtual method void QDialog::mouseMoveEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseMoveEvent_1738_0, &_call_cbs_mouseMoveEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mouseMoveEvent", "@brief Virtual method void QDialog::mouseMoveEvent(QMouseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseMoveEvent_1738_0, &_call_cbs_mouseMoveEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseMoveEvent", "@hide", false, &_init_cbs_mouseMoveEvent_1738_0, &_call_cbs_mouseMoveEvent_1738_0, &_set_callback_cbs_mouseMoveEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*mousePressEvent", "@brief Virtual method void QDialog::mousePressEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mousePressEvent_1738_0, &_call_cbs_mousePressEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mousePressEvent", "@brief Virtual method void QDialog::mousePressEvent(QMouseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mousePressEvent_1738_0, &_call_cbs_mousePressEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mousePressEvent", "@hide", false, &_init_cbs_mousePressEvent_1738_0, &_call_cbs_mousePressEvent_1738_0, &_set_callback_cbs_mousePressEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@brief Virtual method void QDialog::mouseReleaseEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@brief Virtual method void QDialog::mouseReleaseEvent(QMouseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@hide", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0, &_set_callback_cbs_mouseReleaseEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*moveEvent", "@brief Virtual method void QDialog::moveEvent(QMoveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0);
+  methods += new qt_gsi::GenericMethod ("*moveEvent", "@brief Virtual method void QDialog::moveEvent(QMoveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*moveEvent", "@hide", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0, &_set_callback_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@brief Virtual method bool QDialog::nativeEvent(const QByteArray &eventType, void *message, long int *result)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@hide", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0, &_set_callback_cbs_nativeEvent_4678_0);
@@ -3048,7 +3048,7 @@ static gsi::Methods methods_QDialog_Adaptor () {
   methods += new qt_gsi::GenericMethod ("open", "@hide", false, &_init_cbs_open_0_0, &_call_cbs_open_0_0, &_set_callback_cbs_open_0_0);
   methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Virtual method QPaintEngine *QDialog::paintEngine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0);
   methods += new qt_gsi::GenericMethod ("paintEngine", "@hide", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0, &_set_callback_cbs_paintEngine_c0_0);
-  methods += new qt_gsi::GenericMethod ("*paintEvent", "@brief Virtual method void QDialog::paintEvent(QPaintEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_paintEvent_1725_0, &_call_cbs_paintEvent_1725_0);
+  methods += new qt_gsi::GenericMethod ("*paintEvent", "@brief Virtual method void QDialog::paintEvent(QPaintEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_paintEvent_1725_0, &_call_cbs_paintEvent_1725_0);
   methods += new qt_gsi::GenericMethod ("*paintEvent", "@hide", false, &_init_cbs_paintEvent_1725_0, &_call_cbs_paintEvent_1725_0, &_set_callback_cbs_paintEvent_1725_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QDialog::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*redirected", "@brief Virtual method QPaintDevice *QDialog::redirected(QPoint *offset)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_redirected_c1225_0, &_call_cbs_redirected_c1225_0);
@@ -3068,12 +3068,12 @@ static gsi::Methods methods_QDialog_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*showEvent", "@hide", false, &_init_cbs_showEvent_1634_0, &_call_cbs_showEvent_1634_0, &_set_callback_cbs_showEvent_1634_0);
   methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Virtual method QSize QDialog::sizeHint()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0);
   methods += new qt_gsi::GenericMethod ("sizeHint", "@hide", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0, &_set_callback_cbs_sizeHint_c0_0);
-  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QDialog::tabletEvent(QTabletEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
+  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QDialog::tabletEvent(QTabletEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
   methods += new qt_gsi::GenericMethod ("*tabletEvent", "@hide", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0, &_set_callback_cbs_tabletEvent_1821_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QDialog::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QDialog::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*updateMicroFocus", "@brief Method void QDialog::updateMicroFocus()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_updateMicroFocus_0, &_call_fp_updateMicroFocus_0);
-  methods += new qt_gsi::GenericMethod ("*wheelEvent", "@brief Virtual method void QDialog::wheelEvent(QWheelEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0);
+  methods += new qt_gsi::GenericMethod ("*wheelEvent", "@brief Virtual method void QDialog::wheelEvent(QWheelEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0);
   methods += new qt_gsi::GenericMethod ("*wheelEvent", "@hide", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0, &_set_callback_cbs_wheelEvent_1718_0);
   methods += new qt_gsi::GenericMethod ("emit_windowIconChanged", "@brief Emitter for signal void QDialog::windowIconChanged(const QIcon &icon)\nCall this method to emit this signal.", false, &_init_emitter_windowIconChanged_1787, &_call_emitter_windowIconChanged_1787);
   methods += new qt_gsi::GenericMethod ("emit_windowIconTextChanged", "@brief Emitter for signal void QDialog::windowIconTextChanged(const QString &iconText)\nCall this method to emit this signal.", false, &_init_emitter_windowIconTextChanged_2025, &_call_emitter_windowIconTextChanged_2025);

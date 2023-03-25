@@ -323,33 +323,33 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QMediaGaplessPlaybackControl::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QMediaGaplessPlaybackControl::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QMediaGaplessPlaybackControl::event(arg1);
+    return QMediaGaplessPlaybackControl::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QMediaGaplessPlaybackControl_Adaptor, bool, QEvent *>(&QMediaGaplessPlaybackControl_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QMediaGaplessPlaybackControl_Adaptor, bool, QEvent *>(&QMediaGaplessPlaybackControl_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QMediaGaplessPlaybackControl::event(arg1);
+      return QMediaGaplessPlaybackControl::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QMediaGaplessPlaybackControl::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QMediaGaplessPlaybackControl::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QMediaGaplessPlaybackControl::eventFilter(arg1, arg2);
+    return QMediaGaplessPlaybackControl::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QMediaGaplessPlaybackControl_Adaptor, bool, QObject *, QEvent *>(&QMediaGaplessPlaybackControl_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QMediaGaplessPlaybackControl_Adaptor, bool, QObject *, QEvent *>(&QMediaGaplessPlaybackControl_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QMediaGaplessPlaybackControl::eventFilter(arg1, arg2);
+      return QMediaGaplessPlaybackControl::eventFilter(watched, event);
     }
   }
 
@@ -415,33 +415,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMediaGaplessPlaybackControl::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QMediaGaplessPlaybackControl::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QMediaGaplessPlaybackControl::childEvent(arg1);
+    QMediaGaplessPlaybackControl::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QMediaGaplessPlaybackControl_Adaptor, QChildEvent *>(&QMediaGaplessPlaybackControl_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QMediaGaplessPlaybackControl_Adaptor, QChildEvent *>(&QMediaGaplessPlaybackControl_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QMediaGaplessPlaybackControl::childEvent(arg1);
+      QMediaGaplessPlaybackControl::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QMediaGaplessPlaybackControl::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QMediaGaplessPlaybackControl::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QMediaGaplessPlaybackControl::customEvent(arg1);
+    QMediaGaplessPlaybackControl::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QMediaGaplessPlaybackControl_Adaptor, QEvent *>(&QMediaGaplessPlaybackControl_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QMediaGaplessPlaybackControl_Adaptor, QEvent *>(&QMediaGaplessPlaybackControl_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QMediaGaplessPlaybackControl::customEvent(arg1);
+      QMediaGaplessPlaybackControl::customEvent(event);
     }
   }
 
@@ -460,18 +460,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMediaGaplessPlaybackControl::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QMediaGaplessPlaybackControl::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QMediaGaplessPlaybackControl::timerEvent(arg1);
+    QMediaGaplessPlaybackControl::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QMediaGaplessPlaybackControl_Adaptor, QTimerEvent *>(&QMediaGaplessPlaybackControl_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QMediaGaplessPlaybackControl_Adaptor, QTimerEvent *>(&QMediaGaplessPlaybackControl_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QMediaGaplessPlaybackControl::timerEvent(arg1);
+      QMediaGaplessPlaybackControl::timerEvent(event);
     }
   }
 
@@ -504,11 +504,11 @@ static void _call_ctor_QMediaGaplessPlaybackControl_Adaptor_0 (const qt_gsi::Gen
 }
 
 
-// void QMediaGaplessPlaybackControl::childEvent(QChildEvent *)
+// void QMediaGaplessPlaybackControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -547,11 +547,11 @@ static void _set_callback_cbs_crossfadeTime_c0_0 (void *cls, const gsi::Callback
 }
 
 
-// void QMediaGaplessPlaybackControl::customEvent(QEvent *)
+// void QMediaGaplessPlaybackControl::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -595,11 +595,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QMediaGaplessPlaybackControl::event(QEvent *)
+// bool QMediaGaplessPlaybackControl::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -618,13 +618,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QMediaGaplessPlaybackControl::eventFilter(QObject *, QEvent *)
+// bool QMediaGaplessPlaybackControl::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -794,11 +794,11 @@ static void _set_callback_cbs_setNextMedia_2605_0 (void *cls, const gsi::Callbac
 }
 
 
-// void QMediaGaplessPlaybackControl::timerEvent(QTimerEvent *)
+// void QMediaGaplessPlaybackControl::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -826,17 +826,17 @@ gsi::Class<QMediaGaplessPlaybackControl> &qtdecl_QMediaGaplessPlaybackControl ()
 static gsi::Methods methods_QMediaGaplessPlaybackControl_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMediaGaplessPlaybackControl::QMediaGaplessPlaybackControl()\nThis method creates an object of class QMediaGaplessPlaybackControl.", &_init_ctor_QMediaGaplessPlaybackControl_Adaptor_0, &_call_ctor_QMediaGaplessPlaybackControl_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QMediaGaplessPlaybackControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QMediaGaplessPlaybackControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("crossfadeTime", "@brief Virtual method double QMediaGaplessPlaybackControl::crossfadeTime()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_crossfadeTime_c0_0, &_call_cbs_crossfadeTime_c0_0);
   methods += new qt_gsi::GenericMethod ("crossfadeTime", "@hide", true, &_init_cbs_crossfadeTime_c0_0, &_call_cbs_crossfadeTime_c0_0, &_set_callback_cbs_crossfadeTime_c0_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMediaGaplessPlaybackControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMediaGaplessPlaybackControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QMediaGaplessPlaybackControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMediaGaplessPlaybackControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMediaGaplessPlaybackControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QMediaGaplessPlaybackControl::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QMediaGaplessPlaybackControl::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("isCrossfadeSupported", "@brief Virtual method bool QMediaGaplessPlaybackControl::isCrossfadeSupported()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isCrossfadeSupported_c0_0, &_call_cbs_isCrossfadeSupported_c0_0);
   methods += new qt_gsi::GenericMethod ("isCrossfadeSupported", "@hide", true, &_init_cbs_isCrossfadeSupported_c0_0, &_call_cbs_isCrossfadeSupported_c0_0, &_set_callback_cbs_isCrossfadeSupported_c0_0);
@@ -850,7 +850,7 @@ static gsi::Methods methods_QMediaGaplessPlaybackControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("setCrossfadeTime", "@hide", false, &_init_cbs_setCrossfadeTime_1071_0, &_call_cbs_setCrossfadeTime_1071_0, &_set_callback_cbs_setCrossfadeTime_1071_0);
   methods += new qt_gsi::GenericMethod ("setNextMedia", "@brief Virtual method void QMediaGaplessPlaybackControl::setNextMedia(const QMediaContent &media)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setNextMedia_2605_0, &_call_cbs_setNextMedia_2605_0);
   methods += new qt_gsi::GenericMethod ("setNextMedia", "@hide", false, &_init_cbs_setNextMedia_2605_0, &_call_cbs_setNextMedia_2605_0, &_set_callback_cbs_setNextMedia_2605_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QMediaGaplessPlaybackControl::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QMediaGaplessPlaybackControl::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

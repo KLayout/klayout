@@ -141,12 +141,12 @@ static void _call_f_nativeResolution_c0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// void QAbstractVideoSurface::nativeResolutionChanged(const QSize &)
+// void QAbstractVideoSurface::nativeResolutionChanged(const QSize &resolution)
 
 
 static void _init_f_nativeResolutionChanged_1805 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("resolution");
   decl->add_arg<const QSize & > (argspec_0);
   decl->set_return<void > ();
 }
@@ -250,12 +250,12 @@ static void _call_f_supportedFormatsChanged_0 (const qt_gsi::GenericMethod * /*d
 }
 
 
-// QList<QVideoFrame::PixelFormat> QAbstractVideoSurface::supportedPixelFormats(QAbstractVideoBuffer::HandleType handleType)
+// QList<QVideoFrame::PixelFormat> QAbstractVideoSurface::supportedPixelFormats(QAbstractVideoBuffer::HandleType type)
 
 
 static void _init_f_supportedPixelFormats_c3564 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("handleType", true, "QAbstractVideoBuffer::NoHandle");
+  static gsi::ArgSpecBase argspec_0 ("type", true, "QAbstractVideoBuffer::NoHandle");
   decl->add_arg<const qt_gsi::Converter<QAbstractVideoBuffer::HandleType>::target_type & > (argspec_0);
   decl->set_return<QList<QVideoFrame::PixelFormat> > ();
 }
@@ -365,13 +365,13 @@ static gsi::Methods methods_QAbstractVideoSurface () {
   methods += new qt_gsi::GenericMethod ("isActive?", "@brief Method bool QAbstractVideoSurface::isActive()\n", true, &_init_f_isActive_c0, &_call_f_isActive_c0);
   methods += new qt_gsi::GenericMethod ("isFormatSupported?", "@brief Method bool QAbstractVideoSurface::isFormatSupported(const QVideoSurfaceFormat &format)\n", true, &_init_f_isFormatSupported_c3227, &_call_f_isFormatSupported_c3227);
   methods += new qt_gsi::GenericMethod (":nativeResolution", "@brief Method QSize QAbstractVideoSurface::nativeResolution()\n", true, &_init_f_nativeResolution_c0, &_call_f_nativeResolution_c0);
-  methods += new qt_gsi::GenericMethod ("nativeResolutionChanged", "@brief Method void QAbstractVideoSurface::nativeResolutionChanged(const QSize &)\n", false, &_init_f_nativeResolutionChanged_1805, &_call_f_nativeResolutionChanged_1805);
+  methods += new qt_gsi::GenericMethod ("nativeResolutionChanged", "@brief Method void QAbstractVideoSurface::nativeResolutionChanged(const QSize &resolution)\n", false, &_init_f_nativeResolutionChanged_1805, &_call_f_nativeResolutionChanged_1805);
   methods += new qt_gsi::GenericMethod ("nearestFormat", "@brief Method QVideoSurfaceFormat QAbstractVideoSurface::nearestFormat(const QVideoSurfaceFormat &format)\n", true, &_init_f_nearestFormat_c3227, &_call_f_nearestFormat_c3227);
   methods += new qt_gsi::GenericMethod ("present", "@brief Method bool QAbstractVideoSurface::present(const QVideoFrame &frame)\n", false, &_init_f_present_2388, &_call_f_present_2388);
   methods += new qt_gsi::GenericMethod ("start", "@brief Method bool QAbstractVideoSurface::start(const QVideoSurfaceFormat &format)\n", false, &_init_f_start_3227, &_call_f_start_3227);
   methods += new qt_gsi::GenericMethod ("stop", "@brief Method void QAbstractVideoSurface::stop()\n", false, &_init_f_stop_0, &_call_f_stop_0);
   methods += new qt_gsi::GenericMethod ("supportedFormatsChanged", "@brief Method void QAbstractVideoSurface::supportedFormatsChanged()\n", false, &_init_f_supportedFormatsChanged_0, &_call_f_supportedFormatsChanged_0);
-  methods += new qt_gsi::GenericMethod ("supportedPixelFormats", "@brief Method QList<QVideoFrame::PixelFormat> QAbstractVideoSurface::supportedPixelFormats(QAbstractVideoBuffer::HandleType handleType)\n", true, &_init_f_supportedPixelFormats_c3564, &_call_f_supportedPixelFormats_c3564);
+  methods += new qt_gsi::GenericMethod ("supportedPixelFormats", "@brief Method QList<QVideoFrame::PixelFormat> QAbstractVideoSurface::supportedPixelFormats(QAbstractVideoBuffer::HandleType type)\n", true, &_init_f_supportedPixelFormats_c3564, &_call_f_supportedPixelFormats_c3564);
   methods += new qt_gsi::GenericMethod ("surfaceFormat", "@brief Method QVideoSurfaceFormat QAbstractVideoSurface::surfaceFormat()\n", true, &_init_f_surfaceFormat_c0, &_call_f_surfaceFormat_c0);
   methods += new qt_gsi::GenericMethod ("surfaceFormatChanged", "@brief Method void QAbstractVideoSurface::surfaceFormatChanged(const QVideoSurfaceFormat &format)\n", false, &_init_f_surfaceFormatChanged_3227, &_call_f_surfaceFormatChanged_3227);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QAbstractVideoSurface::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
@@ -438,33 +438,33 @@ public:
     QAbstractVideoSurface::setNativeResolution(resolution);
   }
 
-  //  [adaptor impl] bool QAbstractVideoSurface::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QAbstractVideoSurface::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QAbstractVideoSurface::event(arg1);
+    return QAbstractVideoSurface::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QAbstractVideoSurface_Adaptor, bool, QEvent *>(&QAbstractVideoSurface_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QAbstractVideoSurface_Adaptor, bool, QEvent *>(&QAbstractVideoSurface_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QAbstractVideoSurface::event(arg1);
+      return QAbstractVideoSurface::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QAbstractVideoSurface::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QAbstractVideoSurface::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QAbstractVideoSurface::eventFilter(arg1, arg2);
+    return QAbstractVideoSurface::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QAbstractVideoSurface_Adaptor, bool, QObject *, QEvent *>(&QAbstractVideoSurface_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QAbstractVideoSurface_Adaptor, bool, QObject *, QEvent *>(&QAbstractVideoSurface_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QAbstractVideoSurface::eventFilter(arg1, arg2);
+      return QAbstractVideoSurface::eventFilter(watched, event);
     }
   }
 
@@ -544,49 +544,49 @@ public:
     }
   }
 
-  //  [adaptor impl] QList<QVideoFrame::PixelFormat> QAbstractVideoSurface::supportedPixelFormats(QAbstractVideoBuffer::HandleType handleType)
-  QList<QVideoFrame::PixelFormat> cbs_supportedPixelFormats_c3564_1(const qt_gsi::Converter<QAbstractVideoBuffer::HandleType>::target_type & handleType) const
+  //  [adaptor impl] QList<QVideoFrame::PixelFormat> QAbstractVideoSurface::supportedPixelFormats(QAbstractVideoBuffer::HandleType type)
+  QList<QVideoFrame::PixelFormat> cbs_supportedPixelFormats_c3564_1(const qt_gsi::Converter<QAbstractVideoBuffer::HandleType>::target_type & type) const
   {
-    __SUPPRESS_UNUSED_WARNING (handleType);
+    __SUPPRESS_UNUSED_WARNING (type);
     throw qt_gsi::AbstractMethodCalledException("supportedPixelFormats");
   }
 
-  virtual QList<QVideoFrame::PixelFormat> supportedPixelFormats(QAbstractVideoBuffer::HandleType handleType) const
+  virtual QList<QVideoFrame::PixelFormat> supportedPixelFormats(QAbstractVideoBuffer::HandleType type) const
   {
     if (cb_supportedPixelFormats_c3564_1.can_issue()) {
-      return cb_supportedPixelFormats_c3564_1.issue<QAbstractVideoSurface_Adaptor, QList<QVideoFrame::PixelFormat>, const qt_gsi::Converter<QAbstractVideoBuffer::HandleType>::target_type &>(&QAbstractVideoSurface_Adaptor::cbs_supportedPixelFormats_c3564_1, qt_gsi::CppToQtAdaptor<QAbstractVideoBuffer::HandleType>(handleType));
+      return cb_supportedPixelFormats_c3564_1.issue<QAbstractVideoSurface_Adaptor, QList<QVideoFrame::PixelFormat>, const qt_gsi::Converter<QAbstractVideoBuffer::HandleType>::target_type &>(&QAbstractVideoSurface_Adaptor::cbs_supportedPixelFormats_c3564_1, qt_gsi::CppToQtAdaptor<QAbstractVideoBuffer::HandleType>(type));
     } else {
       throw qt_gsi::AbstractMethodCalledException("supportedPixelFormats");
     }
   }
 
-  //  [adaptor impl] void QAbstractVideoSurface::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QAbstractVideoSurface::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QAbstractVideoSurface::childEvent(arg1);
+    QAbstractVideoSurface::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QAbstractVideoSurface_Adaptor, QChildEvent *>(&QAbstractVideoSurface_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QAbstractVideoSurface_Adaptor, QChildEvent *>(&QAbstractVideoSurface_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QAbstractVideoSurface::childEvent(arg1);
+      QAbstractVideoSurface::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QAbstractVideoSurface::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QAbstractVideoSurface::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QAbstractVideoSurface::customEvent(arg1);
+    QAbstractVideoSurface::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QAbstractVideoSurface_Adaptor, QEvent *>(&QAbstractVideoSurface_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QAbstractVideoSurface_Adaptor, QEvent *>(&QAbstractVideoSurface_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QAbstractVideoSurface::customEvent(arg1);
+      QAbstractVideoSurface::customEvent(event);
     }
   }
 
@@ -605,18 +605,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QAbstractVideoSurface::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QAbstractVideoSurface::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QAbstractVideoSurface::timerEvent(arg1);
+    QAbstractVideoSurface::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QAbstractVideoSurface_Adaptor, QTimerEvent *>(&QAbstractVideoSurface_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QAbstractVideoSurface_Adaptor, QTimerEvent *>(&QAbstractVideoSurface_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QAbstractVideoSurface::timerEvent(arg1);
+      QAbstractVideoSurface::timerEvent(event);
     }
   }
 
@@ -640,7 +640,7 @@ QAbstractVideoSurface_Adaptor::~QAbstractVideoSurface_Adaptor() { }
 
 static void _init_ctor_QAbstractVideoSurface_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QAbstractVideoSurface_Adaptor> ();
 }
@@ -649,16 +649,16 @@ static void _call_ctor_QAbstractVideoSurface_Adaptor_1302 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QAbstractVideoSurface_Adaptor *> (new QAbstractVideoSurface_Adaptor (arg1));
 }
 
 
-// void QAbstractVideoSurface::childEvent(QChildEvent *)
+// void QAbstractVideoSurface::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -678,11 +678,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QAbstractVideoSurface::customEvent(QEvent *)
+// void QAbstractVideoSurface::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -726,11 +726,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QAbstractVideoSurface::event(QEvent *)
+// bool QAbstractVideoSurface::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -749,13 +749,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QAbstractVideoSurface::eventFilter(QObject *, QEvent *)
+// bool QAbstractVideoSurface::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -989,11 +989,11 @@ static void _set_callback_cbs_stop_0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// QList<QVideoFrame::PixelFormat> QAbstractVideoSurface::supportedPixelFormats(QAbstractVideoBuffer::HandleType handleType)
+// QList<QVideoFrame::PixelFormat> QAbstractVideoSurface::supportedPixelFormats(QAbstractVideoBuffer::HandleType type)
 
 static void _init_cbs_supportedPixelFormats_c3564_1 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("handleType");
+  static gsi::ArgSpecBase argspec_0 ("type");
   decl->add_arg<const qt_gsi::Converter<QAbstractVideoBuffer::HandleType>::target_type & > (argspec_0);
   decl->set_return<QList<QVideoFrame::PixelFormat> > ();
 }
@@ -1012,11 +1012,11 @@ static void _set_callback_cbs_supportedPixelFormats_c3564_1 (void *cls, const gs
 }
 
 
-// void QAbstractVideoSurface::timerEvent(QTimerEvent *)
+// void QAbstractVideoSurface::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1044,15 +1044,15 @@ gsi::Class<QAbstractVideoSurface> &qtdecl_QAbstractVideoSurface ();
 static gsi::Methods methods_QAbstractVideoSurface_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAbstractVideoSurface::QAbstractVideoSurface(QObject *parent)\nThis method creates an object of class QAbstractVideoSurface.", &_init_ctor_QAbstractVideoSurface_Adaptor_1302, &_call_ctor_QAbstractVideoSurface_Adaptor_1302);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QAbstractVideoSurface::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QAbstractVideoSurface::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAbstractVideoSurface::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAbstractVideoSurface::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QAbstractVideoSurface::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAbstractVideoSurface::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAbstractVideoSurface::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QAbstractVideoSurface::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QAbstractVideoSurface::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("isFormatSupported", "@brief Virtual method bool QAbstractVideoSurface::isFormatSupported(const QVideoSurfaceFormat &format)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isFormatSupported_c3227_0, &_call_cbs_isFormatSupported_c3227_0);
   methods += new qt_gsi::GenericMethod ("isFormatSupported", "@hide", true, &_init_cbs_isFormatSupported_c3227_0, &_call_cbs_isFormatSupported_c3227_0, &_set_callback_cbs_isFormatSupported_c3227_0);
@@ -1070,9 +1070,9 @@ static gsi::Methods methods_QAbstractVideoSurface_Adaptor () {
   methods += new qt_gsi::GenericMethod ("start", "@hide", false, &_init_cbs_start_3227_0, &_call_cbs_start_3227_0, &_set_callback_cbs_start_3227_0);
   methods += new qt_gsi::GenericMethod ("stop", "@brief Virtual method void QAbstractVideoSurface::stop()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_stop_0_0, &_call_cbs_stop_0_0);
   methods += new qt_gsi::GenericMethod ("stop", "@hide", false, &_init_cbs_stop_0_0, &_call_cbs_stop_0_0, &_set_callback_cbs_stop_0_0);
-  methods += new qt_gsi::GenericMethod ("supportedPixelFormats", "@brief Virtual method QList<QVideoFrame::PixelFormat> QAbstractVideoSurface::supportedPixelFormats(QAbstractVideoBuffer::HandleType handleType)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_supportedPixelFormats_c3564_1, &_call_cbs_supportedPixelFormats_c3564_1);
+  methods += new qt_gsi::GenericMethod ("supportedPixelFormats", "@brief Virtual method QList<QVideoFrame::PixelFormat> QAbstractVideoSurface::supportedPixelFormats(QAbstractVideoBuffer::HandleType type)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_supportedPixelFormats_c3564_1, &_call_cbs_supportedPixelFormats_c3564_1);
   methods += new qt_gsi::GenericMethod ("supportedPixelFormats", "@hide", true, &_init_cbs_supportedPixelFormats_c3564_1, &_call_cbs_supportedPixelFormats_c3564_1, &_set_callback_cbs_supportedPixelFormats_c3564_1);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QAbstractVideoSurface::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QAbstractVideoSurface::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

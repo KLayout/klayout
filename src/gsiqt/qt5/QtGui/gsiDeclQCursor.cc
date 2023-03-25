@@ -257,6 +257,26 @@ static void _call_f_shape_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
+// void QCursor::swap(QCursor &other)
+
+
+static void _init_f_swap_1337 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<QCursor & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_swap_1337 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QCursor &arg1 = gsi::arg_reader<QCursor & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QCursor *)cls)->swap (arg1);
+}
+
+
 // static QPoint QCursor::pos()
 
 
@@ -383,6 +403,16 @@ static void _call_f_setPos_3119 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 }
 
 
+//  bool ::operator==(const QCursor &lhs, const QCursor &rhs)
+static bool op_QCursor_operator_eq__eq__3956(const QCursor *_self, const QCursor &rhs) {
+  return ::operator==(*_self, rhs);
+}
+
+//  bool ::operator!=(const QCursor &lhs, const QCursor &rhs)
+static bool op_QCursor_operator_excl__eq__3956(const QCursor *_self, const QCursor &rhs) {
+  return ::operator!=(*_self, rhs);
+}
+
 
 namespace gsi
 {
@@ -401,12 +431,15 @@ static gsi::Methods methods_QCursor () {
   methods += new qt_gsi::GenericMethod ("pixmap", "@brief Method QPixmap QCursor::pixmap()\n", true, &_init_f_pixmap_c0, &_call_f_pixmap_c0);
   methods += new qt_gsi::GenericMethod ("setShape|shape=", "@brief Method void QCursor::setShape(Qt::CursorShape newShape)\n", false, &_init_f_setShape_1884, &_call_f_setShape_1884);
   methods += new qt_gsi::GenericMethod (":shape", "@brief Method Qt::CursorShape QCursor::shape()\n", true, &_init_f_shape_c0, &_call_f_shape_c0);
+  methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QCursor::swap(QCursor &other)\n", false, &_init_f_swap_1337, &_call_f_swap_1337);
   methods += new qt_gsi::GenericStaticMethod (":pos", "@brief Static method QPoint QCursor::pos()\nThis method is static and can be called without an instance.", &_init_f_pos_0, &_call_f_pos_0);
   methods += new qt_gsi::GenericStaticMethod ("pos", "@brief Static method QPoint QCursor::pos(const QScreen *screen)\nThis method is static and can be called without an instance.", &_init_f_pos_2006, &_call_f_pos_2006);
   methods += new qt_gsi::GenericStaticMethod ("setPos", "@brief Static method void QCursor::setPos(int x, int y)\nThis method is static and can be called without an instance.", &_init_f_setPos_1426, &_call_f_setPos_1426);
   methods += new qt_gsi::GenericStaticMethod ("setPos", "@brief Static method void QCursor::setPos(QScreen *screen, int x, int y)\nThis method is static and can be called without an instance.", &_init_f_setPos_2629, &_call_f_setPos_2629);
   methods += new qt_gsi::GenericStaticMethod ("setPos|pos=", "@brief Static method void QCursor::setPos(const QPoint &p)\nThis method is static and can be called without an instance.", &_init_f_setPos_1916, &_call_f_setPos_1916);
   methods += new qt_gsi::GenericStaticMethod ("setPos", "@brief Static method void QCursor::setPos(QScreen *screen, const QPoint &p)\nThis method is static and can be called without an instance.", &_init_f_setPos_3119, &_call_f_setPos_3119);
+  methods += gsi::method_ext("==", &::op_QCursor_operator_eq__eq__3956, gsi::arg ("rhs"), "@brief Operator bool ::operator==(const QCursor &lhs, const QCursor &rhs)\nThis is the mapping of the global operator to the instance method.");
+  methods += gsi::method_ext("!=", &::op_QCursor_operator_excl__eq__3956, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(const QCursor &lhs, const QCursor &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }
 

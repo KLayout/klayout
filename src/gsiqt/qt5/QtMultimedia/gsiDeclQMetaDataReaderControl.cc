@@ -287,33 +287,33 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QMetaDataReaderControl::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QMetaDataReaderControl::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QMetaDataReaderControl::event(arg1);
+    return QMetaDataReaderControl::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QMetaDataReaderControl_Adaptor, bool, QEvent *>(&QMetaDataReaderControl_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QMetaDataReaderControl_Adaptor, bool, QEvent *>(&QMetaDataReaderControl_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QMetaDataReaderControl::event(arg1);
+      return QMetaDataReaderControl::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QMetaDataReaderControl::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QMetaDataReaderControl::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QMetaDataReaderControl::eventFilter(arg1, arg2);
+    return QMetaDataReaderControl::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QMetaDataReaderControl_Adaptor, bool, QObject *, QEvent *>(&QMetaDataReaderControl_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QMetaDataReaderControl_Adaptor, bool, QObject *, QEvent *>(&QMetaDataReaderControl_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QMetaDataReaderControl::eventFilter(arg1, arg2);
+      return QMetaDataReaderControl::eventFilter(watched, event);
     }
   }
 
@@ -348,33 +348,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMetaDataReaderControl::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QMetaDataReaderControl::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QMetaDataReaderControl::childEvent(arg1);
+    QMetaDataReaderControl::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QMetaDataReaderControl_Adaptor, QChildEvent *>(&QMetaDataReaderControl_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QMetaDataReaderControl_Adaptor, QChildEvent *>(&QMetaDataReaderControl_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QMetaDataReaderControl::childEvent(arg1);
+      QMetaDataReaderControl::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QMetaDataReaderControl::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QMetaDataReaderControl::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QMetaDataReaderControl::customEvent(arg1);
+    QMetaDataReaderControl::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QMetaDataReaderControl_Adaptor, QEvent *>(&QMetaDataReaderControl_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QMetaDataReaderControl_Adaptor, QEvent *>(&QMetaDataReaderControl_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QMetaDataReaderControl::customEvent(arg1);
+      QMetaDataReaderControl::customEvent(event);
     }
   }
 
@@ -393,18 +393,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMetaDataReaderControl::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QMetaDataReaderControl::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QMetaDataReaderControl::timerEvent(arg1);
+    QMetaDataReaderControl::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QMetaDataReaderControl_Adaptor, QTimerEvent *>(&QMetaDataReaderControl_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QMetaDataReaderControl_Adaptor, QTimerEvent *>(&QMetaDataReaderControl_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QMetaDataReaderControl::timerEvent(arg1);
+      QMetaDataReaderControl::timerEvent(event);
     }
   }
 
@@ -454,11 +454,11 @@ static void _set_callback_cbs_availableMetaData_c0_0 (void *cls, const gsi::Call
 }
 
 
-// void QMetaDataReaderControl::childEvent(QChildEvent *)
+// void QMetaDataReaderControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -478,11 +478,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QMetaDataReaderControl::customEvent(QEvent *)
+// void QMetaDataReaderControl::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -526,11 +526,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QMetaDataReaderControl::event(QEvent *)
+// bool QMetaDataReaderControl::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -549,13 +549,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QMetaDataReaderControl::eventFilter(QObject *, QEvent *)
+// bool QMetaDataReaderControl::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -681,11 +681,11 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QMetaDataReaderControl::timerEvent(QTimerEvent *)
+// void QMetaDataReaderControl::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -715,15 +715,15 @@ static gsi::Methods methods_QMetaDataReaderControl_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMetaDataReaderControl::QMetaDataReaderControl()\nThis method creates an object of class QMetaDataReaderControl.", &_init_ctor_QMetaDataReaderControl_Adaptor_0, &_call_ctor_QMetaDataReaderControl_Adaptor_0);
   methods += new qt_gsi::GenericMethod ("availableMetaData", "@brief Virtual method QStringList QMetaDataReaderControl::availableMetaData()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_availableMetaData_c0_0, &_call_cbs_availableMetaData_c0_0);
   methods += new qt_gsi::GenericMethod ("availableMetaData", "@hide", true, &_init_cbs_availableMetaData_c0_0, &_call_cbs_availableMetaData_c0_0, &_set_callback_cbs_availableMetaData_c0_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QMetaDataReaderControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QMetaDataReaderControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMetaDataReaderControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMetaDataReaderControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QMetaDataReaderControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMetaDataReaderControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMetaDataReaderControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QMetaDataReaderControl::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QMetaDataReaderControl::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("isMetaDataAvailable", "@brief Virtual method bool QMetaDataReaderControl::isMetaDataAvailable()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isMetaDataAvailable_c0_0, &_call_cbs_isMetaDataAvailable_c0_0);
   methods += new qt_gsi::GenericMethod ("isMetaDataAvailable", "@hide", true, &_init_cbs_isMetaDataAvailable_c0_0, &_call_cbs_isMetaDataAvailable_c0_0, &_set_callback_cbs_isMetaDataAvailable_c0_0);
@@ -733,7 +733,7 @@ static gsi::Methods methods_QMetaDataReaderControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QMetaDataReaderControl::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QMetaDataReaderControl::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QMetaDataReaderControl::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QMetaDataReaderControl::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QMetaDataReaderControl::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

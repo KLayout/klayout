@@ -127,7 +127,7 @@ static void _call_f_clearPluginPaths_0 (const qt_gsi::GenericMethod * /*decl*/, 
 
 static void _init_f_createAction_3219 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("name", true, "QString()");
   decl->add_arg<const QString & > (argspec_1);
@@ -138,7 +138,7 @@ static void _call_f_createAction_3219 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QAction * > ((QAction *)((QUiLoader *)cls)->createAction (arg1, arg2));
 }
@@ -149,7 +149,7 @@ static void _call_f_createAction_3219 (const qt_gsi::GenericMethod * /*decl*/, v
 
 static void _init_f_createActionGroup_3219 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("name", true, "QString()");
   decl->add_arg<const QString & > (argspec_1);
@@ -160,7 +160,7 @@ static void _call_f_createActionGroup_3219 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QActionGroup * > ((QActionGroup *)((QUiLoader *)cls)->createActionGroup (arg1, arg2));
 }
@@ -173,7 +173,7 @@ static void _init_f_createLayout_5136 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("className");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("name", true, "QString()");
   decl->add_arg<const QString & > (argspec_2);
@@ -185,7 +185,7 @@ static void _call_f_createLayout_5136 (const qt_gsi::GenericMethod * /*decl*/, v
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   const QString &arg3 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QLayout * > ((QLayout *)((QUiLoader *)cls)->createLayout (arg1, arg2, arg3));
 }
@@ -198,7 +198,7 @@ static void _init_f_createWidget_5149 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("className");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("name", true, "QString()");
   decl->add_arg<const QString & > (argspec_2);
@@ -210,7 +210,7 @@ static void _call_f_createWidget_5149 (const qt_gsi::GenericMethod * /*decl*/, v
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
   const QString &arg3 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QWidget * > ((QWidget *)((QUiLoader *)cls)->createWidget (arg1, arg2, arg3));
 }
@@ -268,7 +268,7 @@ static void _init_f_load_2654 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("device");
   decl->add_arg<QIODevice * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parentWidget", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parentWidget", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_1);
   decl->set_return<QWidget * > ();
 }
@@ -278,7 +278,7 @@ static void _call_f_load_2654 (const qt_gsi::GenericMethod * /*decl*/, void *cls
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
-  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
   ret.write<QWidget * > ((QWidget *)((QUiLoader *)cls)->load (arg1, arg2));
 }
 
@@ -560,63 +560,63 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QUiLoader::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QUiLoader::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QUiLoader::event(arg1);
+    return QUiLoader::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QUiLoader_Adaptor, bool, QEvent *>(&QUiLoader_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QUiLoader_Adaptor, bool, QEvent *>(&QUiLoader_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QUiLoader::event(arg1);
+      return QUiLoader::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QUiLoader::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QUiLoader::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QUiLoader::eventFilter(arg1, arg2);
+    return QUiLoader::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QUiLoader_Adaptor, bool, QObject *, QEvent *>(&QUiLoader_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QUiLoader_Adaptor, bool, QObject *, QEvent *>(&QUiLoader_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QUiLoader::eventFilter(arg1, arg2);
+      return QUiLoader::eventFilter(watched, event);
     }
   }
 
-  //  [adaptor impl] void QUiLoader::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QUiLoader::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QUiLoader::childEvent(arg1);
+    QUiLoader::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QUiLoader_Adaptor, QChildEvent *>(&QUiLoader_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QUiLoader_Adaptor, QChildEvent *>(&QUiLoader_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QUiLoader::childEvent(arg1);
+      QUiLoader::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QUiLoader::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QUiLoader::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QUiLoader::customEvent(arg1);
+    QUiLoader::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QUiLoader_Adaptor, QEvent *>(&QUiLoader_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QUiLoader_Adaptor, QEvent *>(&QUiLoader_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QUiLoader::customEvent(arg1);
+      QUiLoader::customEvent(event);
     }
   }
 
@@ -635,18 +635,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QUiLoader::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QUiLoader::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QUiLoader::timerEvent(arg1);
+    QUiLoader::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QUiLoader_Adaptor, QTimerEvent *>(&QUiLoader_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QUiLoader_Adaptor, QTimerEvent *>(&QUiLoader_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QUiLoader::timerEvent(arg1);
+      QUiLoader::timerEvent(event);
     }
   }
 
@@ -668,7 +668,7 @@ QUiLoader_Adaptor::~QUiLoader_Adaptor() { }
 
 static void _init_ctor_QUiLoader_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QUiLoader_Adaptor> ();
 }
@@ -677,16 +677,16 @@ static void _call_ctor_QUiLoader_Adaptor_1302 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QUiLoader_Adaptor *> (new QUiLoader_Adaptor (arg1));
 }
 
 
-// void QUiLoader::childEvent(QChildEvent *)
+// void QUiLoader::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -816,11 +816,11 @@ static void _set_callback_cbs_createWidget_5149_2 (void *cls, const gsi::Callbac
 }
 
 
-// void QUiLoader::customEvent(QEvent *)
+// void QUiLoader::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -864,11 +864,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QUiLoader::event(QEvent *)
+// bool QUiLoader::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -887,13 +887,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QUiLoader::eventFilter(QObject *, QEvent *)
+// bool QUiLoader::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -977,11 +977,11 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QUiLoader::timerEvent(QTimerEvent *)
+// void QUiLoader::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1009,7 +1009,7 @@ gsi::Class<QUiLoader> &qtdecl_QUiLoader ();
 static gsi::Methods methods_QUiLoader_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QUiLoader::QUiLoader(QObject *parent)\nThis method creates an object of class QUiLoader.", &_init_ctor_QUiLoader_Adaptor_1302, &_call_ctor_QUiLoader_Adaptor_1302);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QUiLoader::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QUiLoader::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("createAction", "@brief Virtual method QAction *QUiLoader::createAction(QObject *parent, const QString &name)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_createAction_3219_2, &_call_cbs_createAction_3219_2);
   methods += new qt_gsi::GenericMethod ("createAction", "@hide", false, &_init_cbs_createAction_3219_2, &_call_cbs_createAction_3219_2, &_set_callback_cbs_createAction_3219_2);
@@ -1019,19 +1019,19 @@ static gsi::Methods methods_QUiLoader_Adaptor () {
   methods += new qt_gsi::GenericMethod ("createLayout", "@hide", false, &_init_cbs_createLayout_5136_2, &_call_cbs_createLayout_5136_2, &_set_callback_cbs_createLayout_5136_2);
   methods += new qt_gsi::GenericMethod ("createWidget", "@brief Virtual method QWidget *QUiLoader::createWidget(const QString &className, QWidget *parent, const QString &name)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_createWidget_5149_2, &_call_cbs_createWidget_5149_2);
   methods += new qt_gsi::GenericMethod ("createWidget", "@hide", false, &_init_cbs_createWidget_5149_2, &_call_cbs_createWidget_5149_2, &_set_callback_cbs_createWidget_5149_2);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QUiLoader::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QUiLoader::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QUiLoader::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QUiLoader::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QUiLoader::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QUiLoader::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QUiLoader::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QUiLoader::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QUiLoader::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QUiLoader::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QUiLoader::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QUiLoader::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QUiLoader::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

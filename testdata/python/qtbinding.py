@@ -649,6 +649,43 @@ class QtBindingTest(unittest.TestCase):
     self.assertEqual(item.background(0).color.green, 255)
     self.assertEqual(item.background(0).color.blue, 0)
 
+  def test_55(self):
+
+    # addWidget to QHBoxLayout keeps object managed
+    window = pya.QDialog()
+    layout = pya.QHBoxLayout(window)
+
+    w = pya.QPushButton()
+    oid = str(w)
+    layout.addWidget(w)
+    self.assertEqual(str(layout.itemAt(0).widget()), oid)
+
+    # try to kill the object
+    w = None
+
+    # still there
+    w = layout.itemAt(0).widget()
+    self.assertEqual(w._destroyed(), False)
+    self.assertEqual(str(w), oid)
+
+    # killing the window kills the layout kills the widget
+    window._destroy()
+    self.assertEqual(window._destroyed(), True)
+    self.assertEqual(layout._destroyed(), True)
+    self.assertEqual(w._destroyed(), True)
+
+  def test_56(self):
+
+    # Creating QImage from binary data
+
+    bstr = b'\x01\x02\x03\x04\x11\x12\x13\x14\x21\x22\x33\x34' + b'\x31\x32\x33\x34\x41\x42\x43\x44\x51\x52\x53\x54' + b'\x61\x62\x63\x64\x71\x72\x73\x74\x81\x82\x83\x84' + b'\x91\x92\x93\x94\xa1\xa2\xa3\xa4\xb1\xb2\xb3\xb4'
+
+    image = pya.QImage(bstr, 3, 4, pya.QImage.Format_ARGB32)
+    self.assertEqual("%08x" % image.pixel(0, 0), "04030201")
+    self.assertEqual("%08x" % image.pixel(1, 0), "14131211")
+    self.assertEqual("%08x" % image.pixel(0, 2), "64636261")
+
+
 # run unit tests
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(QtBindingTest)

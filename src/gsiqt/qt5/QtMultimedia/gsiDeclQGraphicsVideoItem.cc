@@ -186,7 +186,7 @@ static void _init_f_paint_6301 (qt_gsi::GenericMethod *decl)
   decl->add_arg<QPainter * > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("option");
   decl->add_arg<const QStyleOptionGraphicsItem * > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("widget", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("widget", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_2);
   decl->set_return<void > ();
 }
@@ -197,7 +197,7 @@ static void _call_f_paint_6301 (const qt_gsi::GenericMethod * /*decl*/, void *cl
   tl::Heap heap;
   QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   const QStyleOptionGraphicsItem *arg2 = gsi::arg_reader<const QStyleOptionGraphicsItem * >() (args, heap);
-  QWidget *arg3 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QWidget *arg3 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsVideoItem *)cls)->paint (arg1, arg2, arg3);
 }
@@ -549,18 +549,18 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QGraphicsVideoItem::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QGraphicsVideoItem::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QGraphicsVideoItem::eventFilter(arg1, arg2);
+    return QGraphicsVideoItem::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QGraphicsVideoItem_Adaptor, bool, QObject *, QEvent *>(&QGraphicsVideoItem_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QGraphicsVideoItem_Adaptor, bool, QObject *, QEvent *>(&QGraphicsVideoItem_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QGraphicsVideoItem::eventFilter(arg1, arg2);
+      return QGraphicsVideoItem::eventFilter(watched, event);
     }
   }
 
@@ -654,18 +654,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QGraphicsVideoItem::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QGraphicsVideoItem::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QGraphicsVideoItem::childEvent(arg1);
+    QGraphicsVideoItem::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QGraphicsVideoItem_Adaptor, QChildEvent *>(&QGraphicsVideoItem_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QGraphicsVideoItem_Adaptor, QChildEvent *>(&QGraphicsVideoItem_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QGraphicsVideoItem::childEvent(arg1);
+      QGraphicsVideoItem::childEvent(event);
     }
   }
 
@@ -684,18 +684,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QGraphicsVideoItem::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QGraphicsVideoItem::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QGraphicsVideoItem::customEvent(arg1);
+    QGraphicsVideoItem::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QGraphicsVideoItem_Adaptor, QEvent *>(&QGraphicsVideoItem_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QGraphicsVideoItem_Adaptor, QEvent *>(&QGraphicsVideoItem_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QGraphicsVideoItem::customEvent(arg1);
+      QGraphicsVideoItem::customEvent(event);
     }
   }
 
@@ -1170,7 +1170,7 @@ QGraphicsVideoItem_Adaptor::~QGraphicsVideoItem_Adaptor() { }
 
 static void _init_ctor_QGraphicsVideoItem_Adaptor_1919 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QGraphicsItem * > (argspec_0);
   decl->set_return_new<QGraphicsVideoItem_Adaptor> ();
 }
@@ -1179,7 +1179,7 @@ static void _call_ctor_QGraphicsVideoItem_Adaptor_1919 (const qt_gsi::GenericSta
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
+  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (nullptr, heap);
   ret.write<QGraphicsVideoItem_Adaptor *> (new QGraphicsVideoItem_Adaptor (arg1));
 }
 
@@ -1242,11 +1242,11 @@ static void _set_callback_cbs_boundingRect_c0_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QGraphicsVideoItem::childEvent(QChildEvent *)
+// void QGraphicsVideoItem::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1365,11 +1365,11 @@ static void _set_callback_cbs_contextMenuEvent_3674_0 (void *cls, const gsi::Cal
 }
 
 
-// void QGraphicsVideoItem::customEvent(QEvent *)
+// void QGraphicsVideoItem::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1532,13 +1532,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QGraphicsVideoItem::eventFilter(QObject *, QEvent *)
+// bool QGraphicsVideoItem::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -2339,7 +2339,7 @@ static gsi::Methods methods_QGraphicsVideoItem_Adaptor () {
   methods += new qt_gsi::GenericMethod ("advance", "@hide", false, &_init_cbs_advance_767_0, &_call_cbs_advance_767_0, &_set_callback_cbs_advance_767_0);
   methods += new qt_gsi::GenericMethod ("boundingRect", "@brief Virtual method QRectF QGraphicsVideoItem::boundingRect()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_boundingRect_c0_0, &_call_cbs_boundingRect_c0_0);
   methods += new qt_gsi::GenericMethod ("boundingRect", "@hide", true, &_init_cbs_boundingRect_c0_0, &_call_cbs_boundingRect_c0_0, &_set_callback_cbs_boundingRect_c0_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QGraphicsVideoItem::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QGraphicsVideoItem::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("collidesWithItem", "@brief Virtual method bool QGraphicsVideoItem::collidesWithItem(const QGraphicsItem *other, Qt::ItemSelectionMode mode)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_collidesWithItem_c4977_1, &_call_cbs_collidesWithItem_c4977_1);
   methods += new qt_gsi::GenericMethod ("collidesWithItem", "@hide", true, &_init_cbs_collidesWithItem_c4977_1, &_call_cbs_collidesWithItem_c4977_1, &_set_callback_cbs_collidesWithItem_c4977_1);
@@ -2349,7 +2349,7 @@ static gsi::Methods methods_QGraphicsVideoItem_Adaptor () {
   methods += new qt_gsi::GenericMethod ("contains", "@hide", true, &_init_cbs_contains_c1986_0, &_call_cbs_contains_c1986_0, &_set_callback_cbs_contains_c1986_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QGraphicsVideoItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_3674_0, &_call_cbs_contextMenuEvent_3674_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_3674_0, &_call_cbs_contextMenuEvent_3674_0, &_set_callback_cbs_contextMenuEvent_3674_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QGraphicsVideoItem::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QGraphicsVideoItem::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QGraphicsVideoItem::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
@@ -2363,7 +2363,7 @@ static gsi::Methods methods_QGraphicsVideoItem_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*dropEvent", "@hide", false, &_init_cbs_dropEvent_3315_0, &_call_cbs_dropEvent_3315_0, &_set_callback_cbs_dropEvent_3315_0);
   methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QGraphicsVideoItem::event(QEvent *ev)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QGraphicsVideoItem::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QGraphicsVideoItem::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*extension", "@brief Virtual method QVariant QGraphicsVideoItem::extension(const QVariant &variant)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_extension_c2119_0, &_call_cbs_extension_c2119_0);
   methods += new qt_gsi::GenericMethod ("*extension", "@hide", true, &_init_cbs_extension_c2119_0, &_call_cbs_extension_c2119_0, &_set_callback_cbs_extension_c2119_0);

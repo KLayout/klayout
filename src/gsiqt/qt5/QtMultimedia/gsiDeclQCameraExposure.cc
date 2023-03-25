@@ -594,12 +594,12 @@ static void _call_f_shutterSpeed_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// void QCameraExposure::shutterSpeedChanged(double)
+// void QCameraExposure::shutterSpeedChanged(double speed)
 
 
 static void _init_f_shutterSpeedChanged_1071 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("speed");
   decl->add_arg<double > (argspec_0);
   decl->set_return<void > ();
 }
@@ -650,7 +650,7 @@ static void _call_f_spotMeteringPoint_c0 (const qt_gsi::GenericMethod * /*decl*/
 
 static void _init_f_supportedApertures_c1050 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("continuous", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("continuous", true, "nullptr");
   decl->add_arg<bool * > (argspec_0);
   decl->set_return<QList<qreal> > ();
 }
@@ -659,7 +659,7 @@ static void _call_f_supportedApertures_c1050 (const qt_gsi::GenericMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool *arg1 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg1 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<QList<qreal> > ((QList<qreal>)((QCameraExposure *)cls)->supportedApertures (arg1));
 }
 
@@ -669,7 +669,7 @@ static void _call_f_supportedApertures_c1050 (const qt_gsi::GenericMethod * /*de
 
 static void _init_f_supportedIsoSensitivities_c1050 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("continuous", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("continuous", true, "nullptr");
   decl->add_arg<bool * > (argspec_0);
   decl->set_return<QList<int> > ();
 }
@@ -678,7 +678,7 @@ static void _call_f_supportedIsoSensitivities_c1050 (const qt_gsi::GenericMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool *arg1 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg1 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<QList<int> > ((QList<int>)((QCameraExposure *)cls)->supportedIsoSensitivities (arg1));
 }
 
@@ -688,7 +688,7 @@ static void _call_f_supportedIsoSensitivities_c1050 (const qt_gsi::GenericMethod
 
 static void _init_f_supportedShutterSpeeds_c1050 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("continuous", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("continuous", true, "nullptr");
   decl->add_arg<bool * > (argspec_0);
   decl->set_return<QList<qreal> > ();
 }
@@ -697,7 +697,7 @@ static void _call_f_supportedShutterSpeeds_c1050 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool *arg1 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg1 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<QList<qreal> > ((QList<qreal>)((QCameraExposure *)cls)->supportedShutterSpeeds (arg1));
 }
 
@@ -790,7 +790,7 @@ static gsi::Methods methods_QCameraExposure () {
   methods += new qt_gsi::GenericMethod ("setMeteringMode|meteringMode=", "@brief Method void QCameraExposure::setMeteringMode(QCameraExposure::MeteringMode mode)\n", false, &_init_f_setMeteringMode_3293, &_call_f_setMeteringMode_3293);
   methods += new qt_gsi::GenericMethod ("setSpotMeteringPoint|spotMeteringPoint=", "@brief Method void QCameraExposure::setSpotMeteringPoint(const QPointF &point)\n", false, &_init_f_setSpotMeteringPoint_1986, &_call_f_setSpotMeteringPoint_1986);
   methods += new qt_gsi::GenericMethod (":shutterSpeed", "@brief Method double QCameraExposure::shutterSpeed()\n", true, &_init_f_shutterSpeed_c0, &_call_f_shutterSpeed_c0);
-  methods += new qt_gsi::GenericMethod ("shutterSpeedChanged", "@brief Method void QCameraExposure::shutterSpeedChanged(double)\n", false, &_init_f_shutterSpeedChanged_1071, &_call_f_shutterSpeedChanged_1071);
+  methods += new qt_gsi::GenericMethod ("shutterSpeedChanged", "@brief Method void QCameraExposure::shutterSpeedChanged(double speed)\n", false, &_init_f_shutterSpeedChanged_1071, &_call_f_shutterSpeedChanged_1071);
   methods += new qt_gsi::GenericMethod ("shutterSpeedRangeChanged", "@brief Method void QCameraExposure::shutterSpeedRangeChanged()\n", false, &_init_f_shutterSpeedRangeChanged_0, &_call_f_shutterSpeedRangeChanged_0);
   methods += new qt_gsi::GenericMethod (":spotMeteringPoint", "@brief Method QPointF QCameraExposure::spotMeteringPoint()\n", true, &_init_f_spotMeteringPoint_c0, &_call_f_spotMeteringPoint_c0);
   methods += new qt_gsi::GenericMethod ("supportedApertures", "@brief Method QList<qreal> QCameraExposure::supportedApertures(bool *continuous)\n", true, &_init_f_supportedApertures_c1050, &_call_f_supportedApertures_c1050);

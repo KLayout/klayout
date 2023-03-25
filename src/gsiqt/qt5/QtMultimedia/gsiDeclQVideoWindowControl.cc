@@ -671,33 +671,33 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QVideoWindowControl::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QVideoWindowControl::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QVideoWindowControl::event(arg1);
+    return QVideoWindowControl::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QVideoWindowControl_Adaptor, bool, QEvent *>(&QVideoWindowControl_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QVideoWindowControl_Adaptor, bool, QEvent *>(&QVideoWindowControl_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QVideoWindowControl::event(arg1);
+      return QVideoWindowControl::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QVideoWindowControl::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QVideoWindowControl::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QVideoWindowControl::eventFilter(arg1, arg2);
+    return QVideoWindowControl::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QVideoWindowControl_Adaptor, bool, QObject *, QEvent *>(&QVideoWindowControl_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QVideoWindowControl_Adaptor, bool, QObject *, QEvent *>(&QVideoWindowControl_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QVideoWindowControl::eventFilter(arg1, arg2);
+      return QVideoWindowControl::eventFilter(watched, event);
     }
   }
 
@@ -919,33 +919,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QVideoWindowControl::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QVideoWindowControl::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QVideoWindowControl::childEvent(arg1);
+    QVideoWindowControl::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QVideoWindowControl_Adaptor, QChildEvent *>(&QVideoWindowControl_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QVideoWindowControl_Adaptor, QChildEvent *>(&QVideoWindowControl_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QVideoWindowControl::childEvent(arg1);
+      QVideoWindowControl::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QVideoWindowControl::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QVideoWindowControl::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QVideoWindowControl::customEvent(arg1);
+    QVideoWindowControl::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QVideoWindowControl_Adaptor, QEvent *>(&QVideoWindowControl_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QVideoWindowControl_Adaptor, QEvent *>(&QVideoWindowControl_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QVideoWindowControl::customEvent(arg1);
+      QVideoWindowControl::customEvent(event);
     }
   }
 
@@ -964,18 +964,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QVideoWindowControl::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QVideoWindowControl::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QVideoWindowControl::timerEvent(arg1);
+    QVideoWindowControl::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QVideoWindowControl_Adaptor, QTimerEvent *>(&QVideoWindowControl_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QVideoWindowControl_Adaptor, QTimerEvent *>(&QVideoWindowControl_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QVideoWindowControl::timerEvent(arg1);
+      QVideoWindowControl::timerEvent(event);
     }
   }
 
@@ -1059,11 +1059,11 @@ static void _set_callback_cbs_brightness_c0_0 (void *cls, const gsi::Callback &c
 }
 
 
-// void QVideoWindowControl::childEvent(QChildEvent *)
+// void QVideoWindowControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1102,11 +1102,11 @@ static void _set_callback_cbs_contrast_c0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QVideoWindowControl::customEvent(QEvent *)
+// void QVideoWindowControl::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1169,11 +1169,11 @@ static void _set_callback_cbs_displayRect_c0_0 (void *cls, const gsi::Callback &
 }
 
 
-// bool QVideoWindowControl::event(QEvent *)
+// bool QVideoWindowControl::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -1192,13 +1192,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QVideoWindowControl::eventFilter(QObject *, QEvent *)
+// bool QVideoWindowControl::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -1570,11 +1570,11 @@ static void _set_callback_cbs_setWinId_696_0 (void *cls, const gsi::Callback &cb
 }
 
 
-// void QVideoWindowControl::timerEvent(QTimerEvent *)
+// void QVideoWindowControl::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1625,19 +1625,19 @@ static gsi::Methods methods_QVideoWindowControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("aspectRatioMode", "@hide", true, &_init_cbs_aspectRatioMode_c0_0, &_call_cbs_aspectRatioMode_c0_0, &_set_callback_cbs_aspectRatioMode_c0_0);
   methods += new qt_gsi::GenericMethod ("brightness", "@brief Virtual method int QVideoWindowControl::brightness()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_brightness_c0_0, &_call_cbs_brightness_c0_0);
   methods += new qt_gsi::GenericMethod ("brightness", "@hide", true, &_init_cbs_brightness_c0_0, &_call_cbs_brightness_c0_0, &_set_callback_cbs_brightness_c0_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QVideoWindowControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QVideoWindowControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("contrast", "@brief Virtual method int QVideoWindowControl::contrast()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_contrast_c0_0, &_call_cbs_contrast_c0_0);
   methods += new qt_gsi::GenericMethod ("contrast", "@hide", true, &_init_cbs_contrast_c0_0, &_call_cbs_contrast_c0_0, &_set_callback_cbs_contrast_c0_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QVideoWindowControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QVideoWindowControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QVideoWindowControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("displayRect", "@brief Virtual method QRect QVideoWindowControl::displayRect()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_displayRect_c0_0, &_call_cbs_displayRect_c0_0);
   methods += new qt_gsi::GenericMethod ("displayRect", "@hide", true, &_init_cbs_displayRect_c0_0, &_call_cbs_displayRect_c0_0, &_set_callback_cbs_displayRect_c0_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QVideoWindowControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QVideoWindowControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QVideoWindowControl::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QVideoWindowControl::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("hue", "@brief Virtual method int QVideoWindowControl::hue()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_hue_c0_0, &_call_cbs_hue_c0_0);
   methods += new qt_gsi::GenericMethod ("hue", "@hide", true, &_init_cbs_hue_c0_0, &_call_cbs_hue_c0_0, &_set_callback_cbs_hue_c0_0);
@@ -1669,7 +1669,7 @@ static gsi::Methods methods_QVideoWindowControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("setSaturation", "@hide", false, &_init_cbs_setSaturation_767_0, &_call_cbs_setSaturation_767_0, &_set_callback_cbs_setSaturation_767_0);
   methods += new qt_gsi::GenericMethod ("setWinId", "@brief Virtual method void QVideoWindowControl::setWinId(WId id)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setWinId_696_0, &_call_cbs_setWinId_696_0);
   methods += new qt_gsi::GenericMethod ("setWinId", "@hide", false, &_init_cbs_setWinId_696_0, &_call_cbs_setWinId_696_0, &_set_callback_cbs_setWinId_696_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QVideoWindowControl::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QVideoWindowControl::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("winId", "@brief Virtual method WId QVideoWindowControl::winId()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_winId_c0_0, &_call_cbs_winId_c0_0);
   methods += new qt_gsi::GenericMethod ("winId", "@hide", true, &_init_cbs_winId_c0_0, &_call_cbs_winId_c0_0, &_set_callback_cbs_winId_c0_0);

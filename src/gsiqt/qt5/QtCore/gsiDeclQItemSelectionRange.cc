@@ -72,14 +72,14 @@ static void _call_ctor_QItemSelectionRange_3220 (const qt_gsi::GenericStaticMeth
 }
 
 
-//  Constructor QItemSelectionRange::QItemSelectionRange(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+//  Constructor QItemSelectionRange::QItemSelectionRange(const QModelIndex &topL, const QModelIndex &bottomR)
 
 
 static void _init_ctor_QItemSelectionRange_4682 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("topLeft");
+  static gsi::ArgSpecBase argspec_0 ("topL");
   decl->add_arg<const QModelIndex & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("bottomRight");
+  static gsi::ArgSpecBase argspec_1 ("bottomR");
   decl->add_arg<const QModelIndex & > (argspec_1);
   decl->set_return_new<QItemSelectionRange> ();
 }
@@ -353,6 +353,25 @@ static void _call_f_operator_lt__c3220 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
+// QItemSelectionRange &QItemSelectionRange::operator=(const QItemSelectionRange &other)
+
+
+static void _init_f_operator_eq__3220 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<const QItemSelectionRange & > (argspec_0);
+  decl->set_return<QItemSelectionRange & > ();
+}
+
+static void _call_f_operator_eq__3220 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QItemSelectionRange &arg1 = gsi::arg_reader<const QItemSelectionRange & >() (args, heap);
+  ret.write<QItemSelectionRange & > ((QItemSelectionRange &)((QItemSelectionRange *)cls)->operator= (arg1));
+}
+
+
 // bool QItemSelectionRange::operator==(const QItemSelectionRange &other)
 
 
@@ -399,6 +418,26 @@ static void _call_f_right_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<int > ((int)((QItemSelectionRange *)cls)->right ());
+}
+
+
+// void QItemSelectionRange::swap(QItemSelectionRange &other)
+
+
+static void _init_f_swap_2525 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<QItemSelectionRange & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_swap_2525 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QItemSelectionRange &arg1 = gsi::arg_reader<QItemSelectionRange & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QItemSelectionRange *)cls)->swap (arg1);
 }
 
 
@@ -455,7 +494,7 @@ static gsi::Methods methods_QItemSelectionRange () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QItemSelectionRange::QItemSelectionRange()\nThis method creates an object of class QItemSelectionRange.", &_init_ctor_QItemSelectionRange_0, &_call_ctor_QItemSelectionRange_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QItemSelectionRange::QItemSelectionRange(const QItemSelectionRange &other)\nThis method creates an object of class QItemSelectionRange.", &_init_ctor_QItemSelectionRange_3220, &_call_ctor_QItemSelectionRange_3220);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QItemSelectionRange::QItemSelectionRange(const QModelIndex &topLeft, const QModelIndex &bottomRight)\nThis method creates an object of class QItemSelectionRange.", &_init_ctor_QItemSelectionRange_4682, &_call_ctor_QItemSelectionRange_4682);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QItemSelectionRange::QItemSelectionRange(const QModelIndex &topL, const QModelIndex &bottomR)\nThis method creates an object of class QItemSelectionRange.", &_init_ctor_QItemSelectionRange_4682, &_call_ctor_QItemSelectionRange_4682);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QItemSelectionRange::QItemSelectionRange(const QModelIndex &index)\nThis method creates an object of class QItemSelectionRange.", &_init_ctor_QItemSelectionRange_2395, &_call_ctor_QItemSelectionRange_2395);
   methods += new qt_gsi::GenericMethod ("bottom", "@brief Method int QItemSelectionRange::bottom()\n", true, &_init_f_bottom_c0, &_call_f_bottom_c0);
   methods += new qt_gsi::GenericMethod ("bottomRight", "@brief Method const QPersistentModelIndex &QItemSelectionRange::bottomRight()\n", true, &_init_f_bottomRight_c0, &_call_f_bottomRight_c0);
@@ -471,9 +510,11 @@ static gsi::Methods methods_QItemSelectionRange () {
   methods += new qt_gsi::GenericMethod ("model", "@brief Method const QAbstractItemModel *QItemSelectionRange::model()\n", true, &_init_f_model_c0, &_call_f_model_c0);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QItemSelectionRange::operator!=(const QItemSelectionRange &other)\n", true, &_init_f_operator_excl__eq__c3220, &_call_f_operator_excl__eq__c3220);
   methods += new qt_gsi::GenericMethod ("<", "@brief Method bool QItemSelectionRange::operator<(const QItemSelectionRange &other)\n", true, &_init_f_operator_lt__c3220, &_call_f_operator_lt__c3220);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QItemSelectionRange &QItemSelectionRange::operator=(const QItemSelectionRange &other)\n", false, &_init_f_operator_eq__3220, &_call_f_operator_eq__3220);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QItemSelectionRange::operator==(const QItemSelectionRange &other)\n", true, &_init_f_operator_eq__eq__c3220, &_call_f_operator_eq__eq__c3220);
   methods += new qt_gsi::GenericMethod ("parent", "@brief Method QModelIndex QItemSelectionRange::parent()\n", true, &_init_f_parent_c0, &_call_f_parent_c0);
   methods += new qt_gsi::GenericMethod ("right", "@brief Method int QItemSelectionRange::right()\n", true, &_init_f_right_c0, &_call_f_right_c0);
+  methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QItemSelectionRange::swap(QItemSelectionRange &other)\n", false, &_init_f_swap_2525, &_call_f_swap_2525);
   methods += new qt_gsi::GenericMethod ("top", "@brief Method int QItemSelectionRange::top()\n", true, &_init_f_top_c0, &_call_f_top_c0);
   methods += new qt_gsi::GenericMethod ("topLeft", "@brief Method const QPersistentModelIndex &QItemSelectionRange::topLeft()\n", true, &_init_f_topLeft_c0, &_call_f_topLeft_c0);
   methods += new qt_gsi::GenericMethod ("width", "@brief Method int QItemSelectionRange::width()\n", true, &_init_f_width_c0, &_call_f_width_c0);

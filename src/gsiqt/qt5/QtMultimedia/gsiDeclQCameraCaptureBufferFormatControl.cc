@@ -69,26 +69,6 @@ static void _call_f_bufferFormat_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// void QCameraCaptureBufferFormatControl::bufferFormatChanged(QVideoFrame::PixelFormat format)
-
-
-static void _init_f_bufferFormatChanged_2758 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("format");
-  decl->add_arg<const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_bufferFormatChanged_2758 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCameraCaptureBufferFormatControl *)cls)->bufferFormatChanged (qt_gsi::QtToCppAdaptor<QVideoFrame::PixelFormat>(arg1).cref());
-}
-
-
 // void QCameraCaptureBufferFormatControl::setBufferFormat(QVideoFrame::PixelFormat format)
 
 
@@ -181,9 +161,11 @@ static gsi::Methods methods_QCameraCaptureBufferFormatControl () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":bufferFormat", "@brief Method QVideoFrame::PixelFormat QCameraCaptureBufferFormatControl::bufferFormat()\n", true, &_init_f_bufferFormat_c0, &_call_f_bufferFormat_c0);
-  methods += new qt_gsi::GenericMethod ("bufferFormatChanged", "@brief Method void QCameraCaptureBufferFormatControl::bufferFormatChanged(QVideoFrame::PixelFormat format)\n", false, &_init_f_bufferFormatChanged_2758, &_call_f_bufferFormatChanged_2758);
   methods += new qt_gsi::GenericMethod ("setBufferFormat|bufferFormat=", "@brief Method void QCameraCaptureBufferFormatControl::setBufferFormat(QVideoFrame::PixelFormat format)\n", false, &_init_f_setBufferFormat_2758, &_call_f_setBufferFormat_2758);
   methods += new qt_gsi::GenericMethod ("supportedBufferFormats", "@brief Method QList<QVideoFrame::PixelFormat> QCameraCaptureBufferFormatControl::supportedBufferFormats()\n", true, &_init_f_supportedBufferFormats_c0, &_call_f_supportedBufferFormats_c0);
+  methods += gsi::qt_signal<const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & > ("bufferFormatChanged(QVideoFrame::PixelFormat)", "bufferFormatChanged", gsi::arg("format"), "@brief Signal declaration for QCameraCaptureBufferFormatControl::bufferFormatChanged(QVideoFrame::PixelFormat format)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QCameraCaptureBufferFormatControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QCameraCaptureBufferFormatControl::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QCameraCaptureBufferFormatControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QCameraCaptureBufferFormatControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -247,6 +229,18 @@ public:
     }
   }
 
+  //  [emitter impl] void QCameraCaptureBufferFormatControl::bufferFormatChanged(QVideoFrame::PixelFormat format)
+  void emitter_QCameraCaptureBufferFormatControl_bufferFormatChanged_2758(QVideoFrame::PixelFormat format)
+  {
+    emit QCameraCaptureBufferFormatControl::bufferFormatChanged(format);
+  }
+
+  //  [emitter impl] void QCameraCaptureBufferFormatControl::destroyed(QObject *)
+  void emitter_QCameraCaptureBufferFormatControl_destroyed_1302(QObject *arg1)
+  {
+    emit QCameraCaptureBufferFormatControl::destroyed(arg1);
+  }
+
   //  [adaptor impl] bool QCameraCaptureBufferFormatControl::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -275,6 +269,13 @@ public:
     } else {
       return QCameraCaptureBufferFormatControl::eventFilter(watched, event);
     }
+  }
+
+  //  [emitter impl] void QCameraCaptureBufferFormatControl::objectNameChanged(const QString &objectName)
+  void emitter_QCameraCaptureBufferFormatControl_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QCameraCaptureBufferFormatControl::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QCameraCaptureBufferFormatControl::setBufferFormat(QVideoFrame::PixelFormat format)
@@ -414,6 +415,24 @@ static void _set_callback_cbs_bufferFormat_c0_0 (void *cls, const gsi::Callback 
 }
 
 
+// emitter void QCameraCaptureBufferFormatControl::bufferFormatChanged(QVideoFrame::PixelFormat format)
+
+static void _init_emitter_bufferFormatChanged_2758 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("format");
+  decl->add_arg<const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_bufferFormatChanged_2758 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QVideoFrame::PixelFormat>::target_type & >() (args, heap);
+  ((QCameraCaptureBufferFormatControl_Adaptor *)cls)->emitter_QCameraCaptureBufferFormatControl_bufferFormatChanged_2758 (arg1);
+}
+
+
 // void QCameraCaptureBufferFormatControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
@@ -459,6 +478,24 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QCameraCaptureBufferFormatControl_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
+}
+
+
+// emitter void QCameraCaptureBufferFormatControl::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QCameraCaptureBufferFormatControl_Adaptor *)cls)->emitter_QCameraCaptureBufferFormatControl_destroyed_1302 (arg1);
 }
 
 
@@ -550,6 +587,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
   tl::Heap heap;
   const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QCameraCaptureBufferFormatControl_Adaptor *)cls)->fp_QCameraCaptureBufferFormatControl_isSignalConnected_c2394 (arg1));
+}
+
+
+// emitter void QCameraCaptureBufferFormatControl::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QCameraCaptureBufferFormatControl_Adaptor *)cls)->emitter_QCameraCaptureBufferFormatControl_objectNameChanged_4567 (arg1);
 }
 
 
@@ -676,10 +731,12 @@ static gsi::Methods methods_QCameraCaptureBufferFormatControl_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCameraCaptureBufferFormatControl::QCameraCaptureBufferFormatControl()\nThis method creates an object of class QCameraCaptureBufferFormatControl.", &_init_ctor_QCameraCaptureBufferFormatControl_Adaptor_0, &_call_ctor_QCameraCaptureBufferFormatControl_Adaptor_0);
   methods += new qt_gsi::GenericMethod ("bufferFormat", "@brief Virtual method QVideoFrame::PixelFormat QCameraCaptureBufferFormatControl::bufferFormat()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_bufferFormat_c0_0, &_call_cbs_bufferFormat_c0_0);
   methods += new qt_gsi::GenericMethod ("bufferFormat", "@hide", true, &_init_cbs_bufferFormat_c0_0, &_call_cbs_bufferFormat_c0_0, &_set_callback_cbs_bufferFormat_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_bufferFormatChanged", "@brief Emitter for signal void QCameraCaptureBufferFormatControl::bufferFormatChanged(QVideoFrame::PixelFormat format)\nCall this method to emit this signal.", false, &_init_emitter_bufferFormatChanged_2758, &_call_emitter_bufferFormatChanged_2758);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QCameraCaptureBufferFormatControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QCameraCaptureBufferFormatControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QCameraCaptureBufferFormatControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QCameraCaptureBufferFormatControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QCameraCaptureBufferFormatControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
@@ -687,6 +744,7 @@ static gsi::Methods methods_QCameraCaptureBufferFormatControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QCameraCaptureBufferFormatControl::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QCameraCaptureBufferFormatControl::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QCameraCaptureBufferFormatControl::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QCameraCaptureBufferFormatControl::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QCameraCaptureBufferFormatControl::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QCameraCaptureBufferFormatControl::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);

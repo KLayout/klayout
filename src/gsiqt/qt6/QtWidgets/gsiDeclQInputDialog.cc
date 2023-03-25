@@ -1175,7 +1175,7 @@ static gsi::Methods methods_QInputDialog () {
   methods += new qt_gsi::GenericMethod (":doubleDecimals", "@brief Method int QInputDialog::doubleDecimals()\n", true, &_init_f_doubleDecimals_c0, &_call_f_doubleDecimals_c0);
   methods += new qt_gsi::GenericMethod (":doubleMaximum", "@brief Method double QInputDialog::doubleMaximum()\n", true, &_init_f_doubleMaximum_c0, &_call_f_doubleMaximum_c0);
   methods += new qt_gsi::GenericMethod (":doubleMinimum", "@brief Method double QInputDialog::doubleMinimum()\n", true, &_init_f_doubleMinimum_c0, &_call_f_doubleMinimum_c0);
-  methods += new qt_gsi::GenericMethod ("doubleStep", "@brief Method double QInputDialog::doubleStep()\n", true, &_init_f_doubleStep_c0, &_call_f_doubleStep_c0);
+  methods += new qt_gsi::GenericMethod (":doubleStep", "@brief Method double QInputDialog::doubleStep()\n", true, &_init_f_doubleStep_c0, &_call_f_doubleStep_c0);
   methods += new qt_gsi::GenericMethod (":doubleValue", "@brief Method double QInputDialog::doubleValue()\n", true, &_init_f_doubleValue_c0, &_call_f_doubleValue_c0);
   methods += new qt_gsi::GenericMethod (":inputMode", "@brief Method QInputDialog::InputMode QInputDialog::inputMode()\n", true, &_init_f_inputMode_c0, &_call_f_inputMode_c0);
   methods += new qt_gsi::GenericMethod (":intMaximum", "@brief Method int QInputDialog::intMaximum()\n", true, &_init_f_intMaximum_c0, &_call_f_intMaximum_c0);
@@ -1196,7 +1196,7 @@ static gsi::Methods methods_QInputDialog () {
   methods += new qt_gsi::GenericMethod ("setDoubleMaximum|doubleMaximum=", "@brief Method void QInputDialog::setDoubleMaximum(double max)\n", false, &_init_f_setDoubleMaximum_1071, &_call_f_setDoubleMaximum_1071);
   methods += new qt_gsi::GenericMethod ("setDoubleMinimum|doubleMinimum=", "@brief Method void QInputDialog::setDoubleMinimum(double min)\n", false, &_init_f_setDoubleMinimum_1071, &_call_f_setDoubleMinimum_1071);
   methods += new qt_gsi::GenericMethod ("setDoubleRange", "@brief Method void QInputDialog::setDoubleRange(double min, double max)\n", false, &_init_f_setDoubleRange_2034, &_call_f_setDoubleRange_2034);
-  methods += new qt_gsi::GenericMethod ("setDoubleStep", "@brief Method void QInputDialog::setDoubleStep(double step)\n", false, &_init_f_setDoubleStep_1071, &_call_f_setDoubleStep_1071);
+  methods += new qt_gsi::GenericMethod ("setDoubleStep|doubleStep=", "@brief Method void QInputDialog::setDoubleStep(double step)\n", false, &_init_f_setDoubleStep_1071, &_call_f_setDoubleStep_1071);
   methods += new qt_gsi::GenericMethod ("setDoubleValue|doubleValue=", "@brief Method void QInputDialog::setDoubleValue(double value)\n", false, &_init_f_setDoubleValue_1071, &_call_f_setDoubleValue_1071);
   methods += new qt_gsi::GenericMethod ("setInputMode|inputMode=", "@brief Method void QInputDialog::setInputMode(QInputDialog::InputMode mode)\n", false, &_init_f_setInputMode_2670, &_call_f_setInputMode_2670);
   methods += new qt_gsi::GenericMethod ("setIntMaximum|intMaximum=", "@brief Method void QInputDialog::setIntMaximum(int max)\n", false, &_init_f_setIntMaximum_767, &_call_f_setIntMaximum_767);

@@ -73,26 +73,6 @@ static void _call_f_actualValue_c4602 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// void QCameraExposureControl::actualValueChanged(int parameter)
-
-
-static void _init_f_actualValueChanged_767 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("parameter");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_actualValueChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCameraExposureControl *)cls)->actualValueChanged (arg1);
-}
-
-
 // bool QCameraExposureControl::isParameterSupported(QCameraExposureControl::ExposureParameter parameter)
 
 
@@ -112,26 +92,6 @@ static void _call_f_isParameterSupported_c4602 (const qt_gsi::GenericMethod * /*
 }
 
 
-// void QCameraExposureControl::parameterRangeChanged(int parameter)
-
-
-static void _init_f_parameterRangeChanged_767 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("parameter");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_parameterRangeChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCameraExposureControl *)cls)->parameterRangeChanged (arg1);
-}
-
-
 // QVariant QCameraExposureControl::requestedValue(QCameraExposureControl::ExposureParameter parameter)
 
 
@@ -148,26 +108,6 @@ static void _call_f_requestedValue_c4602 (const qt_gsi::GenericMethod * /*decl*/
   tl::Heap heap;
   const qt_gsi::Converter<QCameraExposureControl::ExposureParameter>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCameraExposureControl::ExposureParameter>::target_type & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QCameraExposureControl *)cls)->requestedValue (qt_gsi::QtToCppAdaptor<QCameraExposureControl::ExposureParameter>(arg1).cref()));
-}
-
-
-// void QCameraExposureControl::requestedValueChanged(int parameter)
-
-
-static void _init_f_requestedValueChanged_767 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("parameter");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_requestedValueChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCameraExposureControl *)cls)->requestedValueChanged (arg1);
 }
 
 
@@ -272,13 +212,15 @@ static gsi::Methods methods_QCameraExposureControl () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("actualValue", "@brief Method QVariant QCameraExposureControl::actualValue(QCameraExposureControl::ExposureParameter parameter)\n", true, &_init_f_actualValue_c4602, &_call_f_actualValue_c4602);
-  methods += new qt_gsi::GenericMethod ("actualValueChanged", "@brief Method void QCameraExposureControl::actualValueChanged(int parameter)\n", false, &_init_f_actualValueChanged_767, &_call_f_actualValueChanged_767);
   methods += new qt_gsi::GenericMethod ("isParameterSupported?", "@brief Method bool QCameraExposureControl::isParameterSupported(QCameraExposureControl::ExposureParameter parameter)\n", true, &_init_f_isParameterSupported_c4602, &_call_f_isParameterSupported_c4602);
-  methods += new qt_gsi::GenericMethod ("parameterRangeChanged", "@brief Method void QCameraExposureControl::parameterRangeChanged(int parameter)\n", false, &_init_f_parameterRangeChanged_767, &_call_f_parameterRangeChanged_767);
   methods += new qt_gsi::GenericMethod ("requestedValue", "@brief Method QVariant QCameraExposureControl::requestedValue(QCameraExposureControl::ExposureParameter parameter)\n", true, &_init_f_requestedValue_c4602, &_call_f_requestedValue_c4602);
-  methods += new qt_gsi::GenericMethod ("requestedValueChanged", "@brief Method void QCameraExposureControl::requestedValueChanged(int parameter)\n", false, &_init_f_requestedValueChanged_767, &_call_f_requestedValueChanged_767);
   methods += new qt_gsi::GenericMethod ("setValue", "@brief Method bool QCameraExposureControl::setValue(QCameraExposureControl::ExposureParameter parameter, const QVariant &value)\n", false, &_init_f_setValue_6613, &_call_f_setValue_6613);
   methods += new qt_gsi::GenericMethod ("supportedParameterRange", "@brief Method QList<QVariant> QCameraExposureControl::supportedParameterRange(QCameraExposureControl::ExposureParameter parameter, bool *continuous)\n", true, &_init_f_supportedParameterRange_c5544, &_call_f_supportedParameterRange_c5544);
+  methods += gsi::qt_signal<int > ("actualValueChanged(int)", "actualValueChanged", gsi::arg("parameter"), "@brief Signal declaration for QCameraExposureControl::actualValueChanged(int parameter)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QCameraExposureControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QCameraExposureControl::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("parameterRangeChanged(int)", "parameterRangeChanged", gsi::arg("parameter"), "@brief Signal declaration for QCameraExposureControl::parameterRangeChanged(int parameter)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("requestedValueChanged(int)", "requestedValueChanged", gsi::arg("parameter"), "@brief Signal declaration for QCameraExposureControl::requestedValueChanged(int parameter)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QCameraExposureControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QCameraExposureControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -343,6 +285,18 @@ public:
     }
   }
 
+  //  [emitter impl] void QCameraExposureControl::actualValueChanged(int parameter)
+  void emitter_QCameraExposureControl_actualValueChanged_767(int parameter)
+  {
+    emit QCameraExposureControl::actualValueChanged(parameter);
+  }
+
+  //  [emitter impl] void QCameraExposureControl::destroyed(QObject *)
+  void emitter_QCameraExposureControl_destroyed_1302(QObject *arg1)
+  {
+    emit QCameraExposureControl::destroyed(arg1);
+  }
+
   //  [adaptor impl] bool QCameraExposureControl::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -389,6 +343,19 @@ public:
     }
   }
 
+  //  [emitter impl] void QCameraExposureControl::objectNameChanged(const QString &objectName)
+  void emitter_QCameraExposureControl_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QCameraExposureControl::objectNameChanged(const QString &objectName)'");
+  }
+
+  //  [emitter impl] void QCameraExposureControl::parameterRangeChanged(int parameter)
+  void emitter_QCameraExposureControl_parameterRangeChanged_767(int parameter)
+  {
+    emit QCameraExposureControl::parameterRangeChanged(parameter);
+  }
+
   //  [adaptor impl] QVariant QCameraExposureControl::requestedValue(QCameraExposureControl::ExposureParameter parameter)
   QVariant cbs_requestedValue_c4602_0(const qt_gsi::Converter<QCameraExposureControl::ExposureParameter>::target_type & parameter) const
   {
@@ -403,6 +370,12 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("requestedValue");
     }
+  }
+
+  //  [emitter impl] void QCameraExposureControl::requestedValueChanged(int parameter)
+  void emitter_QCameraExposureControl_requestedValueChanged_767(int parameter)
+  {
+    emit QCameraExposureControl::requestedValueChanged(parameter);
   }
 
   //  [adaptor impl] bool QCameraExposureControl::setValue(QCameraExposureControl::ExposureParameter parameter, const QVariant &value)
@@ -551,6 +524,24 @@ static void _set_callback_cbs_actualValue_c4602_0 (void *cls, const gsi::Callbac
 }
 
 
+// emitter void QCameraExposureControl::actualValueChanged(int parameter)
+
+static void _init_emitter_actualValueChanged_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parameter");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_actualValueChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QCameraExposureControl_Adaptor *)cls)->emitter_QCameraExposureControl_actualValueChanged_767 (arg1);
+}
+
+
 // void QCameraExposureControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
@@ -596,6 +587,24 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QCameraExposureControl_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
+}
+
+
+// emitter void QCameraExposureControl::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QCameraExposureControl_Adaptor *)cls)->emitter_QCameraExposureControl_destroyed_1302 (arg1);
 }
 
 
@@ -713,6 +722,42 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QCameraExposureControl::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QCameraExposureControl_Adaptor *)cls)->emitter_QCameraExposureControl_objectNameChanged_4567 (arg1);
+}
+
+
+// emitter void QCameraExposureControl::parameterRangeChanged(int parameter)
+
+static void _init_emitter_parameterRangeChanged_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parameter");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_parameterRangeChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QCameraExposureControl_Adaptor *)cls)->emitter_QCameraExposureControl_parameterRangeChanged_767 (arg1);
+}
+
+
 // exposed int QCameraExposureControl::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -751,6 +796,24 @@ static void _call_cbs_requestedValue_c4602_0 (const qt_gsi::GenericMethod * /*de
 static void _set_callback_cbs_requestedValue_c4602_0 (void *cls, const gsi::Callback &cb)
 {
   ((QCameraExposureControl_Adaptor *)cls)->cb_requestedValue_c4602_0 = cb;
+}
+
+
+// emitter void QCameraExposureControl::requestedValueChanged(int parameter)
+
+static void _init_emitter_requestedValueChanged_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parameter");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_requestedValueChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QCameraExposureControl_Adaptor *)cls)->emitter_QCameraExposureControl_requestedValueChanged_767 (arg1);
 }
 
 
@@ -868,10 +931,12 @@ static gsi::Methods methods_QCameraExposureControl_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCameraExposureControl::QCameraExposureControl()\nThis method creates an object of class QCameraExposureControl.", &_init_ctor_QCameraExposureControl_Adaptor_0, &_call_ctor_QCameraExposureControl_Adaptor_0);
   methods += new qt_gsi::GenericMethod ("actualValue", "@brief Virtual method QVariant QCameraExposureControl::actualValue(QCameraExposureControl::ExposureParameter parameter)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_actualValue_c4602_0, &_call_cbs_actualValue_c4602_0);
   methods += new qt_gsi::GenericMethod ("actualValue", "@hide", true, &_init_cbs_actualValue_c4602_0, &_call_cbs_actualValue_c4602_0, &_set_callback_cbs_actualValue_c4602_0);
+  methods += new qt_gsi::GenericMethod ("emit_actualValueChanged", "@brief Emitter for signal void QCameraExposureControl::actualValueChanged(int parameter)\nCall this method to emit this signal.", false, &_init_emitter_actualValueChanged_767, &_call_emitter_actualValueChanged_767);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QCameraExposureControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QCameraExposureControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QCameraExposureControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QCameraExposureControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QCameraExposureControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
@@ -881,9 +946,12 @@ static gsi::Methods methods_QCameraExposureControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("isParameterSupported", "@brief Virtual method bool QCameraExposureControl::isParameterSupported(QCameraExposureControl::ExposureParameter parameter)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isParameterSupported_c4602_0, &_call_cbs_isParameterSupported_c4602_0);
   methods += new qt_gsi::GenericMethod ("isParameterSupported", "@hide", true, &_init_cbs_isParameterSupported_c4602_0, &_call_cbs_isParameterSupported_c4602_0, &_set_callback_cbs_isParameterSupported_c4602_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QCameraExposureControl::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QCameraExposureControl::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
+  methods += new qt_gsi::GenericMethod ("emit_parameterRangeChanged", "@brief Emitter for signal void QCameraExposureControl::parameterRangeChanged(int parameter)\nCall this method to emit this signal.", false, &_init_emitter_parameterRangeChanged_767, &_call_emitter_parameterRangeChanged_767);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QCameraExposureControl::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("requestedValue", "@brief Virtual method QVariant QCameraExposureControl::requestedValue(QCameraExposureControl::ExposureParameter parameter)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_requestedValue_c4602_0, &_call_cbs_requestedValue_c4602_0);
   methods += new qt_gsi::GenericMethod ("requestedValue", "@hide", true, &_init_cbs_requestedValue_c4602_0, &_call_cbs_requestedValue_c4602_0, &_set_callback_cbs_requestedValue_c4602_0);
+  methods += new qt_gsi::GenericMethod ("emit_requestedValueChanged", "@brief Emitter for signal void QCameraExposureControl::requestedValueChanged(int parameter)\nCall this method to emit this signal.", false, &_init_emitter_requestedValueChanged_767, &_call_emitter_requestedValueChanged_767);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QCameraExposureControl::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QCameraExposureControl::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("setValue", "@brief Virtual method bool QCameraExposureControl::setValue(QCameraExposureControl::ExposureParameter parameter, const QVariant &value)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setValue_6613_0, &_call_cbs_setValue_6613_0);

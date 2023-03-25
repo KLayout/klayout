@@ -197,6 +197,8 @@ static gsi::Methods methods_QCameraImageProcessingControl () {
   methods += new qt_gsi::GenericMethod ("isParameterValueSupported?", "@brief Method bool QCameraImageProcessingControl::isParameterValueSupported(QCameraImageProcessingControl::ProcessingParameter parameter, const QVariant &value)\n", true, &_init_f_isParameterValueSupported_c7484, &_call_f_isParameterValueSupported_c7484);
   methods += new qt_gsi::GenericMethod ("parameter", "@brief Method QVariant QCameraImageProcessingControl::parameter(QCameraImageProcessingControl::ProcessingParameter parameter)\n", true, &_init_f_parameter_c5473, &_call_f_parameter_c5473);
   methods += new qt_gsi::GenericMethod ("setParameter", "@brief Method void QCameraImageProcessingControl::setParameter(QCameraImageProcessingControl::ProcessingParameter parameter, const QVariant &value)\n", false, &_init_f_setParameter_7484, &_call_f_setParameter_7484);
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QCameraImageProcessingControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QCameraImageProcessingControl::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QCameraImageProcessingControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QCameraImageProcessingControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -243,6 +245,12 @@ public:
   //  [expose] int QCameraImageProcessingControl::senderSignalIndex()
   int fp_QCameraImageProcessingControl_senderSignalIndex_c0 () const {
     return QCameraImageProcessingControl::senderSignalIndex();
+  }
+
+  //  [emitter impl] void QCameraImageProcessingControl::destroyed(QObject *)
+  void emitter_QCameraImageProcessingControl_destroyed_1302(QObject *arg1)
+  {
+    emit QCameraImageProcessingControl::destroyed(arg1);
   }
 
   //  [adaptor impl] bool QCameraImageProcessingControl::event(QEvent *event)
@@ -306,6 +314,13 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("isParameterValueSupported");
     }
+  }
+
+  //  [emitter impl] void QCameraImageProcessingControl::objectNameChanged(const QString &objectName)
+  void emitter_QCameraImageProcessingControl_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QCameraImageProcessingControl::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] QVariant QCameraImageProcessingControl::parameter(QCameraImageProcessingControl::ProcessingParameter parameter)
@@ -477,6 +492,24 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QCameraImageProcessingControl::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QCameraImageProcessingControl_Adaptor *)cls)->emitter_QCameraImageProcessingControl_destroyed_1302 (arg1);
+}
+
+
 // void QCameraImageProcessingControl::disconnectNotify(const QMetaMethod &signal)
 
 static void _init_cbs_disconnectNotify_2394_0 (qt_gsi::GenericMethod *decl)
@@ -617,6 +650,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QCameraImageProcessingControl::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QCameraImageProcessingControl_Adaptor *)cls)->emitter_QCameraImageProcessingControl_objectNameChanged_4567 (arg1);
+}
+
+
 // QVariant QCameraImageProcessingControl::parameter(QCameraImageProcessingControl::ProcessingParameter parameter)
 
 static void _init_cbs_parameter_c5473_0 (qt_gsi::GenericMethod *decl)
@@ -749,6 +800,7 @@ static gsi::Methods methods_QCameraImageProcessingControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QCameraImageProcessingControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QCameraImageProcessingControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QCameraImageProcessingControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QCameraImageProcessingControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
@@ -760,6 +812,7 @@ static gsi::Methods methods_QCameraImageProcessingControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("isParameterValueSupported", "@brief Virtual method bool QCameraImageProcessingControl::isParameterValueSupported(QCameraImageProcessingControl::ProcessingParameter parameter, const QVariant &value)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isParameterValueSupported_c7484_0, &_call_cbs_isParameterValueSupported_c7484_0);
   methods += new qt_gsi::GenericMethod ("isParameterValueSupported", "@hide", true, &_init_cbs_isParameterValueSupported_c7484_0, &_call_cbs_isParameterValueSupported_c7484_0, &_set_callback_cbs_isParameterValueSupported_c7484_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QCameraImageProcessingControl::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QCameraImageProcessingControl::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("parameter", "@brief Virtual method QVariant QCameraImageProcessingControl::parameter(QCameraImageProcessingControl::ProcessingParameter parameter)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_parameter_c5473_0, &_call_cbs_parameter_c5473_0);
   methods += new qt_gsi::GenericMethod ("parameter", "@hide", true, &_init_cbs_parameter_c5473_0, &_call_cbs_parameter_c5473_0, &_set_callback_cbs_parameter_c5473_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QCameraImageProcessingControl::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);

@@ -2153,7 +2153,7 @@ static gsi::Methods methods_QColor () {
   methods += new qt_gsi::GenericMethod (":redF", "@brief Method float QColor::redF()\n", true, &_init_f_redF_c0, &_call_f_redF_c0);
   methods += new qt_gsi::GenericMethod (":rgb", "@brief Method unsigned int QColor::rgb()\n", true, &_init_f_rgb_c0, &_call_f_rgb_c0);
   methods += new qt_gsi::GenericMethod (":rgba", "@brief Method unsigned int QColor::rgba()\n", true, &_init_f_rgba_c0, &_call_f_rgba_c0);
-  methods += new qt_gsi::GenericMethod ("rgba64", "@brief Method QRgba64 QColor::rgba64()\n", true, &_init_f_rgba64_c0, &_call_f_rgba64_c0);
+  methods += new qt_gsi::GenericMethod (":rgba64", "@brief Method QRgba64 QColor::rgba64()\n", true, &_init_f_rgba64_c0, &_call_f_rgba64_c0);
   methods += new qt_gsi::GenericMethod ("saturation", "@brief Method int QColor::saturation()\n", true, &_init_f_saturation_c0, &_call_f_saturation_c0);
   methods += new qt_gsi::GenericMethod ("saturationF", "@brief Method float QColor::saturationF()\n", true, &_init_f_saturationF_c0, &_call_f_saturationF_c0);
   methods += new qt_gsi::GenericMethod ("setAlpha|alpha=", "@brief Method void QColor::setAlpha(int alpha)\n", false, &_init_f_setAlpha_767, &_call_f_setAlpha_767);
@@ -2176,7 +2176,7 @@ static gsi::Methods methods_QColor () {
   methods += new qt_gsi::GenericMethod ("setRgb|rgb=", "@brief Method void QColor::setRgb(unsigned int rgb)\n", false, &_init_f_setRgb_1772, &_call_f_setRgb_1772);
   methods += new qt_gsi::GenericMethod ("setRgbF", "@brief Method void QColor::setRgbF(float r, float g, float b, float a)\n", false, &_init_f_setRgbF_3556, &_call_f_setRgbF_3556);
   methods += new qt_gsi::GenericMethod ("setRgba|rgba=", "@brief Method void QColor::setRgba(unsigned int rgba)\n", false, &_init_f_setRgba_1772, &_call_f_setRgba_1772);
-  methods += new qt_gsi::GenericMethod ("setRgba64", "@brief Method void QColor::setRgba64(QRgba64 rgba)\n", false, &_init_f_setRgba64_1003, &_call_f_setRgba64_1003);
+  methods += new qt_gsi::GenericMethod ("setRgba64|rgba64=", "@brief Method void QColor::setRgba64(QRgba64 rgba)\n", false, &_init_f_setRgba64_1003, &_call_f_setRgba64_1003);
   methods += new qt_gsi::GenericMethod ("spec", "@brief Method QColor::Spec QColor::spec()\n", true, &_init_f_spec_c0, &_call_f_spec_c0);
   methods += new qt_gsi::GenericMethod ("toCmyk", "@brief Method QColor QColor::toCmyk()\n", true, &_init_f_toCmyk_c0, &_call_f_toCmyk_c0);
   methods += new qt_gsi::GenericMethod ("toExtendedRgb", "@brief Method QColor QColor::toExtendedRgb()\n", true, &_init_f_toExtendedRgb_c0, &_call_f_toExtendedRgb_c0);

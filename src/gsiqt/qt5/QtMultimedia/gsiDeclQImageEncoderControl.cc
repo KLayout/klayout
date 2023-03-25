@@ -208,6 +208,8 @@ static gsi::Methods methods_QImageEncoderControl () {
   methods += new qt_gsi::GenericMethod ("setImageSettings|imageSettings=", "@brief Method void QImageEncoderControl::setImageSettings(const QImageEncoderSettings &settings)\n", false, &_init_f_setImageSettings_3430, &_call_f_setImageSettings_3430);
   methods += new qt_gsi::GenericMethod ("supportedImageCodecs", "@brief Method QStringList QImageEncoderControl::supportedImageCodecs()\n", true, &_init_f_supportedImageCodecs_c0, &_call_f_supportedImageCodecs_c0);
   methods += new qt_gsi::GenericMethod ("supportedResolutions", "@brief Method QList<QSize> QImageEncoderControl::supportedResolutions(const QImageEncoderSettings &settings, bool *continuous)\n", true, &_init_f_supportedResolutions_c4372, &_call_f_supportedResolutions_c4372);
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QImageEncoderControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QImageEncoderControl::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QImageEncoderControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QImageEncoderControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -254,6 +256,12 @@ public:
   //  [expose] int QImageEncoderControl::senderSignalIndex()
   int fp_QImageEncoderControl_senderSignalIndex_c0 () const {
     return QImageEncoderControl::senderSignalIndex();
+  }
+
+  //  [emitter impl] void QImageEncoderControl::destroyed(QObject *)
+  void emitter_QImageEncoderControl_destroyed_1302(QObject *arg1)
+  {
+    emit QImageEncoderControl::destroyed(arg1);
   }
 
   //  [adaptor impl] bool QImageEncoderControl::event(QEvent *event)
@@ -315,6 +323,13 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("imageSettings");
     }
+  }
+
+  //  [emitter impl] void QImageEncoderControl::objectNameChanged(const QString &objectName)
+  void emitter_QImageEncoderControl_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QImageEncoderControl::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QImageEncoderControl::setImageSettings(const QImageEncoderSettings &settings)
@@ -502,6 +517,24 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QImageEncoderControl::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QImageEncoderControl_Adaptor *)cls)->emitter_QImageEncoderControl_destroyed_1302 (arg1);
+}
+
+
 // void QImageEncoderControl::disconnectNotify(const QMetaMethod &signal)
 
 static void _init_cbs_disconnectNotify_2394_0 (qt_gsi::GenericMethod *decl)
@@ -632,6 +665,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
   tl::Heap heap;
   const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QImageEncoderControl_Adaptor *)cls)->fp_QImageEncoderControl_isSignalConnected_c2394 (arg1));
+}
+
+
+// emitter void QImageEncoderControl::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QImageEncoderControl_Adaptor *)cls)->emitter_QImageEncoderControl_objectNameChanged_4567 (arg1);
 }
 
 
@@ -786,6 +837,7 @@ static gsi::Methods methods_QImageEncoderControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QImageEncoderControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QImageEncoderControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QImageEncoderControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QImageEncoderControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
@@ -797,6 +849,7 @@ static gsi::Methods methods_QImageEncoderControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("imageSettings", "@brief Virtual method QImageEncoderSettings QImageEncoderControl::imageSettings()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_imageSettings_c0_0, &_call_cbs_imageSettings_c0_0);
   methods += new qt_gsi::GenericMethod ("imageSettings", "@hide", true, &_init_cbs_imageSettings_c0_0, &_call_cbs_imageSettings_c0_0, &_set_callback_cbs_imageSettings_c0_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QImageEncoderControl::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QImageEncoderControl::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QImageEncoderControl::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QImageEncoderControl::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QImageEncoderControl::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);

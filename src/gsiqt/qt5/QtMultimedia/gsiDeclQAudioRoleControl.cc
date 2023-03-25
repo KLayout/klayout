@@ -69,26 +69,6 @@ static void _call_f_audioRole_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// void QAudioRoleControl::audioRoleChanged(QAudio::Role role)
-
-
-static void _init_f_audioRoleChanged_1533 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("role");
-  decl->add_arg<const qt_gsi::Converter<QAudio::Role>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_audioRoleChanged_1533 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QAudio::Role>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAudio::Role>::target_type & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAudioRoleControl *)cls)->audioRoleChanged (qt_gsi::QtToCppAdaptor<QAudio::Role>(arg1).cref());
-}
-
-
 // void QAudioRoleControl::setAudioRole(QAudio::Role role)
 
 
@@ -180,10 +160,12 @@ namespace gsi
 static gsi::Methods methods_QAudioRoleControl () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("audioRole", "@brief Method QAudio::Role QAudioRoleControl::audioRole()\n", true, &_init_f_audioRole_c0, &_call_f_audioRole_c0);
-  methods += new qt_gsi::GenericMethod ("audioRoleChanged", "@brief Method void QAudioRoleControl::audioRoleChanged(QAudio::Role role)\n", false, &_init_f_audioRoleChanged_1533, &_call_f_audioRoleChanged_1533);
-  methods += new qt_gsi::GenericMethod ("setAudioRole", "@brief Method void QAudioRoleControl::setAudioRole(QAudio::Role role)\n", false, &_init_f_setAudioRole_1533, &_call_f_setAudioRole_1533);
+  methods += new qt_gsi::GenericMethod (":audioRole", "@brief Method QAudio::Role QAudioRoleControl::audioRole()\n", true, &_init_f_audioRole_c0, &_call_f_audioRole_c0);
+  methods += new qt_gsi::GenericMethod ("setAudioRole|audioRole=", "@brief Method void QAudioRoleControl::setAudioRole(QAudio::Role role)\n", false, &_init_f_setAudioRole_1533, &_call_f_setAudioRole_1533);
   methods += new qt_gsi::GenericMethod ("supportedAudioRoles", "@brief Method QList<QAudio::Role> QAudioRoleControl::supportedAudioRoles()\n", true, &_init_f_supportedAudioRoles_c0, &_call_f_supportedAudioRoles_c0);
+  methods += gsi::qt_signal<const qt_gsi::Converter<QAudio::Role>::target_type & > ("audioRoleChanged(QAudio::Role)", "audioRoleChanged", gsi::arg("role"), "@brief Signal declaration for QAudioRoleControl::audioRoleChanged(QAudio::Role role)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAudioRoleControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QAudioRoleControl::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QAudioRoleControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QAudioRoleControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -247,6 +229,18 @@ public:
     }
   }
 
+  //  [emitter impl] void QAudioRoleControl::audioRoleChanged(QAudio::Role role)
+  void emitter_QAudioRoleControl_audioRoleChanged_1533(QAudio::Role role)
+  {
+    emit QAudioRoleControl::audioRoleChanged(role);
+  }
+
+  //  [emitter impl] void QAudioRoleControl::destroyed(QObject *)
+  void emitter_QAudioRoleControl_destroyed_1302(QObject *arg1)
+  {
+    emit QAudioRoleControl::destroyed(arg1);
+  }
+
   //  [adaptor impl] bool QAudioRoleControl::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -275,6 +269,13 @@ public:
     } else {
       return QAudioRoleControl::eventFilter(watched, event);
     }
+  }
+
+  //  [emitter impl] void QAudioRoleControl::objectNameChanged(const QString &objectName)
+  void emitter_QAudioRoleControl_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QAudioRoleControl::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QAudioRoleControl::setAudioRole(QAudio::Role role)
@@ -414,6 +415,24 @@ static void _set_callback_cbs_audioRole_c0_0 (void *cls, const gsi::Callback &cb
 }
 
 
+// emitter void QAudioRoleControl::audioRoleChanged(QAudio::Role role)
+
+static void _init_emitter_audioRoleChanged_1533 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("role");
+  decl->add_arg<const qt_gsi::Converter<QAudio::Role>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_audioRoleChanged_1533 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QAudio::Role>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAudio::Role>::target_type & >() (args, heap);
+  ((QAudioRoleControl_Adaptor *)cls)->emitter_QAudioRoleControl_audioRoleChanged_1533 (arg1);
+}
+
+
 // void QAudioRoleControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
@@ -459,6 +478,24 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QAudioRoleControl_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
+}
+
+
+// emitter void QAudioRoleControl::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QAudioRoleControl_Adaptor *)cls)->emitter_QAudioRoleControl_destroyed_1302 (arg1);
 }
 
 
@@ -550,6 +587,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
   tl::Heap heap;
   const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QAudioRoleControl_Adaptor *)cls)->fp_QAudioRoleControl_isSignalConnected_c2394 (arg1));
+}
+
+
+// emitter void QAudioRoleControl::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QAudioRoleControl_Adaptor *)cls)->emitter_QAudioRoleControl_objectNameChanged_4567 (arg1);
 }
 
 
@@ -676,10 +731,12 @@ static gsi::Methods methods_QAudioRoleControl_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAudioRoleControl::QAudioRoleControl()\nThis method creates an object of class QAudioRoleControl.", &_init_ctor_QAudioRoleControl_Adaptor_0, &_call_ctor_QAudioRoleControl_Adaptor_0);
   methods += new qt_gsi::GenericMethod ("audioRole", "@brief Virtual method QAudio::Role QAudioRoleControl::audioRole()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_audioRole_c0_0, &_call_cbs_audioRole_c0_0);
   methods += new qt_gsi::GenericMethod ("audioRole", "@hide", true, &_init_cbs_audioRole_c0_0, &_call_cbs_audioRole_c0_0, &_set_callback_cbs_audioRole_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_audioRoleChanged", "@brief Emitter for signal void QAudioRoleControl::audioRoleChanged(QAudio::Role role)\nCall this method to emit this signal.", false, &_init_emitter_audioRoleChanged_1533, &_call_emitter_audioRoleChanged_1533);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QAudioRoleControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAudioRoleControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QAudioRoleControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QAudioRoleControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAudioRoleControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
@@ -687,6 +744,7 @@ static gsi::Methods methods_QAudioRoleControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QAudioRoleControl::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QAudioRoleControl::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QAudioRoleControl::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QAudioRoleControl::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QAudioRoleControl::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QAudioRoleControl::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);

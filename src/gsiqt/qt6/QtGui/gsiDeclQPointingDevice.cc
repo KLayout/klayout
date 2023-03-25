@@ -74,35 +74,6 @@ static void _call_f_buttonCount_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// void QPointingDevice::grabChanged(QObject *grabber, QPointingDevice::GrabTransition transition, const QPointerEvent *event, const QEventPoint &point)
-
-
-static void _init_f_grabChanged_c9569 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("grabber");
-  decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("transition");
-  decl->add_arg<const qt_gsi::Converter<QPointingDevice::GrabTransition>::target_type & > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("event");
-  decl->add_arg<const QPointerEvent * > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("point");
-  decl->add_arg<const QEventPoint & > (argspec_3);
-  decl->set_return<void > ();
-}
-
-static void _call_f_grabChanged_c9569 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
-  const qt_gsi::Converter<QPointingDevice::GrabTransition>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QPointingDevice::GrabTransition>::target_type & >() (args, heap);
-  const QPointerEvent *arg3 = gsi::arg_reader<const QPointerEvent * >() (args, heap);
-  const QEventPoint &arg4 = gsi::arg_reader<const QEventPoint & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QPointingDevice *)cls)->grabChanged (arg1, qt_gsi::QtToCppAdaptor<QPointingDevice::GrabTransition>(arg2).cref(), arg3, arg4);
-}
-
-
 // int QPointingDevice::maximumPoints()
 
 
@@ -277,15 +248,18 @@ namespace gsi
 static gsi::Methods methods_QPointingDevice () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("buttonCount", "@brief Method int QPointingDevice::buttonCount()\n", true, &_init_f_buttonCount_c0, &_call_f_buttonCount_c0);
-  methods += new qt_gsi::GenericMethod ("grabChanged", "@brief Method void QPointingDevice::grabChanged(QObject *grabber, QPointingDevice::GrabTransition transition, const QPointerEvent *event, const QEventPoint &point)\n", true, &_init_f_grabChanged_c9569, &_call_f_grabChanged_c9569);
-  methods += new qt_gsi::GenericMethod ("maximumPoints", "@brief Method int QPointingDevice::maximumPoints()\n", true, &_init_f_maximumPoints_c0, &_call_f_maximumPoints_c0);
+  methods += new qt_gsi::GenericMethod (":buttonCount", "@brief Method int QPointingDevice::buttonCount()\n", true, &_init_f_buttonCount_c0, &_call_f_buttonCount_c0);
+  methods += new qt_gsi::GenericMethod (":maximumPoints", "@brief Method int QPointingDevice::maximumPoints()\n", true, &_init_f_maximumPoints_c0, &_call_f_maximumPoints_c0);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QPointingDevice::operator==(const QPointingDevice &other)\n", true, &_init_f_operator_eq__eq__c2826, &_call_f_operator_eq__eq__c2826);
-  methods += new qt_gsi::GenericMethod ("pointerType", "@brief Method QPointingDevice::PointerType QPointingDevice::pointerType()\n", true, &_init_f_pointerType_c0, &_call_f_pointerType_c0);
+  methods += new qt_gsi::GenericMethod (":pointerType", "@brief Method QPointingDevice::PointerType QPointingDevice::pointerType()\n", true, &_init_f_pointerType_c0, &_call_f_pointerType_c0);
   methods += new qt_gsi::GenericMethod ("setCapabilities", "@brief Method void QPointingDevice::setCapabilities(QFlags<QInputDevice::Capability> caps)\n", false, &_init_f_setCapabilities_3475, &_call_f_setCapabilities_3475);
   methods += new qt_gsi::GenericMethod ("setMaximumTouchPoints", "@brief Method void QPointingDevice::setMaximumTouchPoints(int c)\n", false, &_init_f_setMaximumTouchPoints_767, &_call_f_setMaximumTouchPoints_767);
   methods += new qt_gsi::GenericMethod ("setType", "@brief Method void QPointingDevice::setType(QInputDevice::DeviceType devType)\n", false, &_init_f_setType_2763, &_call_f_setType_2763);
-  methods += new qt_gsi::GenericMethod ("uniqueId", "@brief Method QPointingDeviceUniqueId QPointingDevice::uniqueId()\n", true, &_init_f_uniqueId_c0, &_call_f_uniqueId_c0);
+  methods += new qt_gsi::GenericMethod (":uniqueId", "@brief Method QPointingDeviceUniqueId QPointingDevice::uniqueId()\n", true, &_init_f_uniqueId_c0, &_call_f_uniqueId_c0);
+  methods += gsi::qt_signal<QRect > ("availableVirtualGeometryChanged(QRect)", "availableVirtualGeometryChanged", gsi::arg("area"), "@brief Signal declaration for QPointingDevice::availableVirtualGeometryChanged(QRect area)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QPointingDevice::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject *, const qt_gsi::Converter<QPointingDevice::GrabTransition>::target_type &, const QPointerEvent *, const QEventPoint & > ("grabChanged(QObject *, QPointingDevice::GrabTransition, const QPointerEvent *, const QEventPoint &)", "grabChanged", gsi::arg("grabber"), gsi::arg("transition"), gsi::arg("event"), gsi::arg("point"), "@brief Signal declaration for QPointingDevice::grabChanged(QObject *grabber, QPointingDevice::GrabTransition transition, const QPointerEvent *event, const QEventPoint &point)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QPointingDevice::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("primaryPointingDevice", "@brief Static method const QPointingDevice *QPointingDevice::primaryPointingDevice(const QString &seatName)\nThis method is static and can be called without an instance.", &_init_f_primaryPointingDevice_2025, &_call_f_primaryPointingDevice_2025);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QPointingDevice::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;
@@ -364,6 +338,18 @@ public:
     return QPointingDevice::senderSignalIndex();
   }
 
+  //  [emitter impl] void QPointingDevice::availableVirtualGeometryChanged(QRect area)
+  void emitter_QPointingDevice_availableVirtualGeometryChanged_915(QRect area)
+  {
+    emit QPointingDevice::availableVirtualGeometryChanged(area);
+  }
+
+  //  [emitter impl] void QPointingDevice::destroyed(QObject *)
+  void emitter_QPointingDevice_destroyed_1302(QObject *arg1)
+  {
+    emit QPointingDevice::destroyed(arg1);
+  }
+
   //  [adaptor impl] bool QPointingDevice::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -392,6 +378,19 @@ public:
     } else {
       return QPointingDevice::eventFilter(watched, event);
     }
+  }
+
+  //  [emitter impl] void QPointingDevice::grabChanged(QObject *grabber, QPointingDevice::GrabTransition transition, const QPointerEvent *event, const QEventPoint &point)
+  void emitter_QPointingDevice_grabChanged_c9569(QObject *grabber, QPointingDevice::GrabTransition transition, const QPointerEvent *event, const QEventPoint &point)
+  {
+    emit QPointingDevice::grabChanged(grabber, transition, event, point);
+  }
+
+  //  [emitter impl] void QPointingDevice::objectNameChanged(const QString &objectName)
+  void emitter_QPointingDevice_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QPointingDevice::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QPointingDevice::childEvent(QChildEvent *event)
@@ -527,6 +526,24 @@ static void _call_ctor_QPointingDevice_Adaptor_19111 (const qt_gsi::GenericStati
 }
 
 
+// emitter void QPointingDevice::availableVirtualGeometryChanged(QRect area)
+
+static void _init_emitter_availableVirtualGeometryChanged_915 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("area");
+  decl->add_arg<QRect > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_availableVirtualGeometryChanged_915 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QRect arg1 = gsi::arg_reader<QRect >() (args, heap);
+  ((QPointingDevice_Adaptor *)cls)->emitter_QPointingDevice_availableVirtualGeometryChanged_915 (arg1);
+}
+
+
 // void QPointingDevice::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
@@ -572,6 +589,24 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QPointingDevice_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
+}
+
+
+// emitter void QPointingDevice::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QPointingDevice_Adaptor *)cls)->emitter_QPointingDevice_destroyed_1302 (arg1);
 }
 
 
@@ -648,6 +683,33 @@ static void _set_callback_cbs_eventFilter_2411_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QPointingDevice::grabChanged(QObject *grabber, QPointingDevice::GrabTransition transition, const QPointerEvent *event, const QEventPoint &point)
+
+static void _init_emitter_grabChanged_c9569 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("grabber");
+  decl->add_arg<QObject * > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("transition");
+  decl->add_arg<const qt_gsi::Converter<QPointingDevice::GrabTransition>::target_type & > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("event");
+  decl->add_arg<const QPointerEvent * > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("point");
+  decl->add_arg<const QEventPoint & > (argspec_3);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_grabChanged_c9569 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  const qt_gsi::Converter<QPointingDevice::GrabTransition>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QPointingDevice::GrabTransition>::target_type & >() (args, heap);
+  const QPointerEvent *arg3 = gsi::arg_reader<const QPointerEvent * >() (args, heap);
+  const QEventPoint &arg4 = gsi::arg_reader<const QEventPoint & >() (args, heap);
+  ((QPointingDevice_Adaptor *)cls)->emitter_QPointingDevice_grabChanged_c9569 (arg1, arg2, arg3, arg4);
+}
+
+
 // exposed bool QPointingDevice::isSignalConnected(const QMetaMethod &signal)
 
 static void _init_fp_isSignalConnected_c2394 (qt_gsi::GenericMethod *decl)
@@ -663,6 +725,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
   tl::Heap heap;
   const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QPointingDevice_Adaptor *)cls)->fp_QPointingDevice_isSignalConnected_c2394 (arg1));
+}
+
+
+// emitter void QPointingDevice::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QPointingDevice_Adaptor *)cls)->emitter_QPointingDevice_objectNameChanged_4567 (arg1);
 }
 
 
@@ -745,17 +825,21 @@ static gsi::Methods methods_QPointingDevice_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPointingDevice::QPointingDevice(QObject *parent)\nThis method creates an object of class QPointingDevice.", &_init_ctor_QPointingDevice_Adaptor_1302, &_call_ctor_QPointingDevice_Adaptor_1302);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPointingDevice::QPointingDevice(const QString &name, qint64 systemId, QInputDevice::DeviceType devType, QPointingDevice::PointerType pType, QFlags<QInputDevice::Capability> caps, int maxPoints, int buttonCount, const QString &seatName, QPointingDeviceUniqueId uniqueId, QObject *parent)\nThis method creates an object of class QPointingDevice.", &_init_ctor_QPointingDevice_Adaptor_19111, &_call_ctor_QPointingDevice_Adaptor_19111);
+  methods += new qt_gsi::GenericMethod ("emit_availableVirtualGeometryChanged", "@brief Emitter for signal void QPointingDevice::availableVirtualGeometryChanged(QRect area)\nCall this method to emit this signal.", false, &_init_emitter_availableVirtualGeometryChanged_915, &_call_emitter_availableVirtualGeometryChanged_915);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QPointingDevice::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QPointingDevice::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QPointingDevice::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QPointingDevice::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QPointingDevice::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QPointingDevice::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("emit_grabChanged", "@brief Emitter for signal void QPointingDevice::grabChanged(QObject *grabber, QPointingDevice::GrabTransition transition, const QPointerEvent *event, const QEventPoint &point)\nCall this method to emit this signal.", true, &_init_emitter_grabChanged_c9569, &_call_emitter_grabChanged_c9569);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QPointingDevice::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QPointingDevice::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QPointingDevice::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QPointingDevice::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QPointingDevice::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);

@@ -220,10 +220,10 @@ static gsi::Methods methods_QHistoryState () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":defaultState", "@brief Method QAbstractState *QHistoryState::defaultState()\n", true, &_init_f_defaultState_c0, &_call_f_defaultState_c0);
-  methods += new qt_gsi::GenericMethod ("defaultTransition", "@brief Method QAbstractTransition *QHistoryState::defaultTransition()\n", true, &_init_f_defaultTransition_c0, &_call_f_defaultTransition_c0);
+  methods += new qt_gsi::GenericMethod (":defaultTransition", "@brief Method QAbstractTransition *QHistoryState::defaultTransition()\n", true, &_init_f_defaultTransition_c0, &_call_f_defaultTransition_c0);
   methods += new qt_gsi::GenericMethod (":historyType", "@brief Method QHistoryState::HistoryType QHistoryState::historyType()\n", true, &_init_f_historyType_c0, &_call_f_historyType_c0);
   methods += new qt_gsi::GenericMethod ("setDefaultState|defaultState=", "@brief Method void QHistoryState::setDefaultState(QAbstractState *state)\n", false, &_init_f_setDefaultState_2036, &_call_f_setDefaultState_2036);
-  methods += new qt_gsi::GenericMethod ("setDefaultTransition", "@brief Method void QHistoryState::setDefaultTransition(QAbstractTransition *transition)\n", false, &_init_f_setDefaultTransition_2590, &_call_f_setDefaultTransition_2590);
+  methods += new qt_gsi::GenericMethod ("setDefaultTransition|defaultTransition=", "@brief Method void QHistoryState::setDefaultTransition(QAbstractTransition *transition)\n", false, &_init_f_setDefaultTransition_2590, &_call_f_setDefaultTransition_2590);
   methods += new qt_gsi::GenericMethod ("setHistoryType|historyType=", "@brief Method void QHistoryState::setHistoryType(QHistoryState::HistoryType type)\n", false, &_init_f_setHistoryType_3072, &_call_f_setHistoryType_3072);
   methods += gsi::qt_signal<bool > ("activeChanged(bool)", "activeChanged", gsi::arg("active"), "@brief Signal declaration for QHistoryState::activeChanged(bool active)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("defaultStateChanged()", "defaultStateChanged", "@brief Signal declaration for QHistoryState::defaultStateChanged()\nYou can bind a procedure to this signal.");

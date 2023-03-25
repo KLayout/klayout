@@ -1345,7 +1345,7 @@ static gsi::Methods methods_QPrinter () {
   methods += new qt_gsi::GenericMethod (":paperSize", "@brief Method QPagedPaintDevice::PageSize QPrinter::paperSize()\n", true, &_init_f_paperSize_c0, &_call_f_paperSize_c0);
   methods += new qt_gsi::GenericMethod ("paperSize", "@brief Method QSizeF QPrinter::paperSize(QPrinter::Unit unit)\n", true, &_init_f_paperSize_c1789, &_call_f_paperSize_c1789);
   methods += new qt_gsi::GenericMethod (":paperSource", "@brief Method QPrinter::PaperSource QPrinter::paperSource()\n", true, &_init_f_paperSource_c0, &_call_f_paperSource_c0);
-  methods += new qt_gsi::GenericMethod ("pdfVersion", "@brief Method QPagedPaintDevice::PdfVersion QPrinter::pdfVersion()\n", true, &_init_f_pdfVersion_c0, &_call_f_pdfVersion_c0);
+  methods += new qt_gsi::GenericMethod (":pdfVersion", "@brief Method QPagedPaintDevice::PdfVersion QPrinter::pdfVersion()\n", true, &_init_f_pdfVersion_c0, &_call_f_pdfVersion_c0);
   methods += new qt_gsi::GenericMethod ("printEngine", "@brief Method QPrintEngine *QPrinter::printEngine()\n", true, &_init_f_printEngine_c0, &_call_f_printEngine_c0);
   methods += new qt_gsi::GenericMethod (":printProgram", "@brief Method QString QPrinter::printProgram()\n", true, &_init_f_printProgram_c0, &_call_f_printProgram_c0);
   methods += new qt_gsi::GenericMethod (":printRange", "@brief Method QPrinter::PrintRange QPrinter::printRange()\n", true, &_init_f_printRange_c0, &_call_f_printRange_c0);
@@ -1376,7 +1376,7 @@ static gsi::Methods methods_QPrinter () {
   methods += new qt_gsi::GenericMethod ("setPaperSize|paperSize=", "@brief Method void QPrinter::setPaperSize(QPagedPaintDevice::PageSize)\n", false, &_init_f_setPaperSize_3006, &_call_f_setPaperSize_3006);
   methods += new qt_gsi::GenericMethod ("setPaperSize", "@brief Method void QPrinter::setPaperSize(const QSizeF &paperSize, QPrinter::Unit unit)\n", false, &_init_f_setPaperSize_3556, &_call_f_setPaperSize_3556);
   methods += new qt_gsi::GenericMethod ("setPaperSource|paperSource=", "@brief Method void QPrinter::setPaperSource(QPrinter::PaperSource)\n", false, &_init_f_setPaperSource_2502, &_call_f_setPaperSource_2502);
-  methods += new qt_gsi::GenericMethod ("setPdfVersion", "@brief Method void QPrinter::setPdfVersion(QPagedPaintDevice::PdfVersion version)\n", false, &_init_f_setPdfVersion_3238, &_call_f_setPdfVersion_3238);
+  methods += new qt_gsi::GenericMethod ("setPdfVersion|pdfVersion=", "@brief Method void QPrinter::setPdfVersion(QPagedPaintDevice::PdfVersion version)\n", false, &_init_f_setPdfVersion_3238, &_call_f_setPdfVersion_3238);
   methods += new qt_gsi::GenericMethod ("setPrintProgram|printProgram=", "@brief Method void QPrinter::setPrintProgram(const QString &)\n", false, &_init_f_setPrintProgram_2025, &_call_f_setPrintProgram_2025);
   methods += new qt_gsi::GenericMethod ("setPrintRange|printRange=", "@brief Method void QPrinter::setPrintRange(QPrinter::PrintRange range)\n", false, &_init_f_setPrintRange_2391, &_call_f_setPrintRange_2391);
   methods += new qt_gsi::GenericMethod ("setPrinterName|printerName=", "@brief Method void QPrinter::setPrinterName(const QString &)\n", false, &_init_f_setPrinterName_2025, &_call_f_setPrinterName_2025);

@@ -264,10 +264,10 @@ static gsi::Methods methods_QMouseEvent () {
   methods += new qt_gsi::GenericMethod ("globalPos", "@brief Method QPoint QMouseEvent::globalPos()\n", true, &_init_f_globalPos_c0, &_call_f_globalPos_c0);
   methods += new qt_gsi::GenericMethod ("globalX", "@brief Method int QMouseEvent::globalX()\n", true, &_init_f_globalX_c0, &_call_f_globalX_c0);
   methods += new qt_gsi::GenericMethod ("globalY", "@brief Method int QMouseEvent::globalY()\n", true, &_init_f_globalY_c0, &_call_f_globalY_c0);
-  methods += new qt_gsi::GenericMethod ("localPos", "@brief Method const QPointF &QMouseEvent::localPos()\n", true, &_init_f_localPos_c0, &_call_f_localPos_c0);
+  methods += new qt_gsi::GenericMethod (":localPos", "@brief Method const QPointF &QMouseEvent::localPos()\n", true, &_init_f_localPos_c0, &_call_f_localPos_c0);
   methods += new qt_gsi::GenericMethod ("pos", "@brief Method QPoint QMouseEvent::pos()\n", true, &_init_f_pos_c0, &_call_f_pos_c0);
   methods += new qt_gsi::GenericMethod ("screenPos", "@brief Method const QPointF &QMouseEvent::screenPos()\n", true, &_init_f_screenPos_c0, &_call_f_screenPos_c0);
-  methods += new qt_gsi::GenericMethod ("setLocalPos", "@brief Method void QMouseEvent::setLocalPos(const QPointF &localPosition)\n", false, &_init_f_setLocalPos_1986, &_call_f_setLocalPos_1986);
+  methods += new qt_gsi::GenericMethod ("setLocalPos|localPos=", "@brief Method void QMouseEvent::setLocalPos(const QPointF &localPosition)\n", false, &_init_f_setLocalPos_1986, &_call_f_setLocalPos_1986);
   methods += new qt_gsi::GenericMethod ("source", "@brief Method Qt::MouseEventSource QMouseEvent::source()\n", true, &_init_f_source_c0, &_call_f_source_c0);
   methods += new qt_gsi::GenericMethod ("windowPos", "@brief Method const QPointF &QMouseEvent::windowPos()\n", true, &_init_f_windowPos_c0, &_call_f_windowPos_c0);
   methods += new qt_gsi::GenericMethod ("x", "@brief Method int QMouseEvent::x()\n", true, &_init_f_x_c0, &_call_f_x_c0);

@@ -677,10 +677,10 @@ static gsi::Methods methods_QSqlField () {
   methods += new qt_gsi::GenericMethod ("setRequired", "@brief Method void QSqlField::setRequired(bool required)\n", false, &_init_f_setRequired_864, &_call_f_setRequired_864);
   methods += new qt_gsi::GenericMethod ("setRequiredStatus|requiredStatus=", "@brief Method void QSqlField::setRequiredStatus(QSqlField::RequiredStatus status)\n", false, &_init_f_setRequiredStatus_2898, &_call_f_setRequiredStatus_2898);
   methods += new qt_gsi::GenericMethod ("setSqlType", "@brief Method void QSqlField::setSqlType(int type)\n", false, &_init_f_setSqlType_767, &_call_f_setSqlType_767);
-  methods += new qt_gsi::GenericMethod ("setTableName", "@brief Method void QSqlField::setTableName(const QString &tableName)\n", false, &_init_f_setTableName_2025, &_call_f_setTableName_2025);
+  methods += new qt_gsi::GenericMethod ("setTableName|tableName=", "@brief Method void QSqlField::setTableName(const QString &tableName)\n", false, &_init_f_setTableName_2025, &_call_f_setTableName_2025);
   methods += new qt_gsi::GenericMethod ("setType|type=", "@brief Method void QSqlField::setType(QVariant::Type type)\n", false, &_init_f_setType_1776, &_call_f_setType_1776);
   methods += new qt_gsi::GenericMethod ("setValue|value=", "@brief Method void QSqlField::setValue(const QVariant &value)\n", false, &_init_f_setValue_2119, &_call_f_setValue_2119);
-  methods += new qt_gsi::GenericMethod ("tableName", "@brief Method QString QSqlField::tableName()\n", true, &_init_f_tableName_c0, &_call_f_tableName_c0);
+  methods += new qt_gsi::GenericMethod (":tableName", "@brief Method QString QSqlField::tableName()\n", true, &_init_f_tableName_c0, &_call_f_tableName_c0);
   methods += new qt_gsi::GenericMethod (":type", "@brief Method QVariant::Type QSqlField::type()\n", true, &_init_f_type_c0, &_call_f_type_c0);
   methods += new qt_gsi::GenericMethod ("typeID", "@brief Method int QSqlField::typeID()\n", true, &_init_f_typeID_c0, &_call_f_typeID_c0);
   methods += new qt_gsi::GenericMethod (":value", "@brief Method QVariant QSqlField::value()\n", true, &_init_f_value_c0, &_call_f_value_c0);

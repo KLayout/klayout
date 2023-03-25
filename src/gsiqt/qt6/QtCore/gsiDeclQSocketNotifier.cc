@@ -189,8 +189,8 @@ static gsi::Methods methods_QSocketNotifier () {
   methods += new qt_gsi::GenericMethod ("isEnabled?|:enabled", "@brief Method bool QSocketNotifier::isEnabled()\n", true, &_init_f_isEnabled_c0, &_call_f_isEnabled_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QSocketNotifier::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("setEnabled|enabled=", "@brief Method void QSocketNotifier::setEnabled(bool)\n", false, &_init_f_setEnabled_864, &_call_f_setEnabled_864);
-  methods += new qt_gsi::GenericMethod ("setSocket", "@brief Method void QSocketNotifier::setSocket(QIntegerForSizeof<void *>::Signed socket)\n", false, &_init_f_setSocket_3614, &_call_f_setSocket_3614);
-  methods += new qt_gsi::GenericMethod ("socket", "@brief Method QIntegerForSizeof<void *>::Signed QSocketNotifier::socket()\n", true, &_init_f_socket_c0, &_call_f_socket_c0);
+  methods += new qt_gsi::GenericMethod ("setSocket|socket=", "@brief Method void QSocketNotifier::setSocket(QIntegerForSizeof<void *>::Signed socket)\n", false, &_init_f_setSocket_3614, &_call_f_setSocket_3614);
+  methods += new qt_gsi::GenericMethod (":socket", "@brief Method QIntegerForSizeof<void *>::Signed QSocketNotifier::socket()\n", true, &_init_f_socket_c0, &_call_f_socket_c0);
   methods += new qt_gsi::GenericMethod ("type", "@brief Method QSocketNotifier::Type QSocketNotifier::type()\n", true, &_init_f_type_c0, &_call_f_type_c0);
   methods += gsi::qt_signal<QSocketDescriptor, const qt_gsi::Converter<QSocketNotifier::Type>::target_type & > ("activated(QSocketDescriptor, QSocketNotifier::Type)", "activated", gsi::arg("socket"), gsi::arg("activationEvent"), "@brief Signal declaration for QSocketNotifier::activated(QSocketDescriptor socket, QSocketNotifier::Type activationEvent)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QSocketNotifier::destroyed(QObject *)\nYou can bind a procedure to this signal.");

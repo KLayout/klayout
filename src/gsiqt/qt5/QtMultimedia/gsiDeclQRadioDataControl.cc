@@ -54,26 +54,6 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// void QRadioDataControl::alternativeFrequenciesEnabledChanged(bool enabled)
-
-
-static void _init_f_alternativeFrequenciesEnabledChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("enabled");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_alternativeFrequenciesEnabledChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QRadioDataControl *)cls)->alternativeFrequenciesEnabledChanged (arg1);
-}
-
-
 // QRadioData::Error QRadioDataControl::error()
 
 
@@ -86,26 +66,6 @@ static void _call_f_error_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qt_gsi::Converter<QRadioData::Error>::target_type > ((qt_gsi::Converter<QRadioData::Error>::target_type)qt_gsi::CppToQtAdaptor<QRadioData::Error>(((QRadioDataControl *)cls)->error ()));
-}
-
-
-// void QRadioDataControl::error(QRadioData::Error err)
-
-
-static void _init_f_error_2028 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("err");
-  decl->add_arg<const qt_gsi::Converter<QRadioData::Error>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_error_2028 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QRadioData::Error>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QRadioData::Error>::target_type & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QRadioDataControl *)cls)->error (qt_gsi::QtToCppAdaptor<QRadioData::Error>(arg1).cref());
 }
 
 
@@ -154,26 +114,6 @@ static void _call_f_programType_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// void QRadioDataControl::programTypeChanged(QRadioData::ProgramType programType)
-
-
-static void _init_f_programTypeChanged_2652 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("programType");
-  decl->add_arg<const qt_gsi::Converter<QRadioData::ProgramType>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_programTypeChanged_2652 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QRadioData::ProgramType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QRadioData::ProgramType>::target_type & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QRadioDataControl *)cls)->programTypeChanged (qt_gsi::QtToCppAdaptor<QRadioData::ProgramType>(arg1).cref());
-}
-
-
 // QString QRadioDataControl::programTypeName()
 
 
@@ -189,26 +129,6 @@ static void _call_f_programTypeName_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// void QRadioDataControl::programTypeNameChanged(QString programTypeName)
-
-
-static void _init_f_programTypeNameChanged_1148 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("programTypeName");
-  decl->add_arg<QString > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_programTypeNameChanged_1148 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QString arg1 = gsi::arg_reader<QString >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QRadioDataControl *)cls)->programTypeNameChanged (arg1);
-}
-
-
 // QString QRadioDataControl::radioText()
 
 
@@ -221,26 +141,6 @@ static void _call_f_radioText_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QString > ((QString)((QRadioDataControl *)cls)->radioText ());
-}
-
-
-// void QRadioDataControl::radioTextChanged(QString radioText)
-
-
-static void _init_f_radioTextChanged_1148 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("radioText");
-  decl->add_arg<QString > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_radioTextChanged_1148 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QString arg1 = gsi::arg_reader<QString >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QRadioDataControl *)cls)->radioTextChanged (arg1);
 }
 
 
@@ -279,26 +179,6 @@ static void _call_f_stationId_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// void QRadioDataControl::stationIdChanged(QString stationId)
-
-
-static void _init_f_stationIdChanged_1148 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("stationId");
-  decl->add_arg<QString > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_stationIdChanged_1148 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QString arg1 = gsi::arg_reader<QString >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QRadioDataControl *)cls)->stationIdChanged (arg1);
-}
-
-
 // QString QRadioDataControl::stationName()
 
 
@@ -311,26 +191,6 @@ static void _call_f_stationName_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QString > ((QString)((QRadioDataControl *)cls)->stationName ());
-}
-
-
-// void QRadioDataControl::stationNameChanged(QString stationName)
-
-
-static void _init_f_stationNameChanged_1148 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("stationName");
-  decl->add_arg<QString > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_stationNameChanged_1148 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QString arg1 = gsi::arg_reader<QString >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QRadioDataControl *)cls)->stationNameChanged (arg1);
 }
 
 
@@ -390,22 +250,24 @@ namespace gsi
 static gsi::Methods methods_QRadioDataControl () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("alternativeFrequenciesEnabledChanged", "@brief Method void QRadioDataControl::alternativeFrequenciesEnabledChanged(bool enabled)\n", false, &_init_f_alternativeFrequenciesEnabledChanged_864, &_call_f_alternativeFrequenciesEnabledChanged_864);
   methods += new qt_gsi::GenericMethod ("error", "@brief Method QRadioData::Error QRadioDataControl::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
-  methods += new qt_gsi::GenericMethod ("error_sig", "@brief Method void QRadioDataControl::error(QRadioData::Error err)\n", false, &_init_f_error_2028, &_call_f_error_2028);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QRadioDataControl::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
   methods += new qt_gsi::GenericMethod ("isAlternativeFrequenciesEnabled?|:alternativeFrequenciesEnabled", "@brief Method bool QRadioDataControl::isAlternativeFrequenciesEnabled()\n", true, &_init_f_isAlternativeFrequenciesEnabled_c0, &_call_f_isAlternativeFrequenciesEnabled_c0);
   methods += new qt_gsi::GenericMethod ("programType", "@brief Method QRadioData::ProgramType QRadioDataControl::programType()\n", true, &_init_f_programType_c0, &_call_f_programType_c0);
-  methods += new qt_gsi::GenericMethod ("programTypeChanged", "@brief Method void QRadioDataControl::programTypeChanged(QRadioData::ProgramType programType)\n", false, &_init_f_programTypeChanged_2652, &_call_f_programTypeChanged_2652);
   methods += new qt_gsi::GenericMethod ("programTypeName", "@brief Method QString QRadioDataControl::programTypeName()\n", true, &_init_f_programTypeName_c0, &_call_f_programTypeName_c0);
-  methods += new qt_gsi::GenericMethod ("programTypeNameChanged", "@brief Method void QRadioDataControl::programTypeNameChanged(QString programTypeName)\n", false, &_init_f_programTypeNameChanged_1148, &_call_f_programTypeNameChanged_1148);
   methods += new qt_gsi::GenericMethod ("radioText", "@brief Method QString QRadioDataControl::radioText()\n", true, &_init_f_radioText_c0, &_call_f_radioText_c0);
-  methods += new qt_gsi::GenericMethod ("radioTextChanged", "@brief Method void QRadioDataControl::radioTextChanged(QString radioText)\n", false, &_init_f_radioTextChanged_1148, &_call_f_radioTextChanged_1148);
   methods += new qt_gsi::GenericMethod ("setAlternativeFrequenciesEnabled|alternativeFrequenciesEnabled=", "@brief Method void QRadioDataControl::setAlternativeFrequenciesEnabled(bool enabled)\n", false, &_init_f_setAlternativeFrequenciesEnabled_864, &_call_f_setAlternativeFrequenciesEnabled_864);
   methods += new qt_gsi::GenericMethod ("stationId", "@brief Method QString QRadioDataControl::stationId()\n", true, &_init_f_stationId_c0, &_call_f_stationId_c0);
-  methods += new qt_gsi::GenericMethod ("stationIdChanged", "@brief Method void QRadioDataControl::stationIdChanged(QString stationId)\n", false, &_init_f_stationIdChanged_1148, &_call_f_stationIdChanged_1148);
   methods += new qt_gsi::GenericMethod ("stationName", "@brief Method QString QRadioDataControl::stationName()\n", true, &_init_f_stationName_c0, &_call_f_stationName_c0);
-  methods += new qt_gsi::GenericMethod ("stationNameChanged", "@brief Method void QRadioDataControl::stationNameChanged(QString stationName)\n", false, &_init_f_stationNameChanged_1148, &_call_f_stationNameChanged_1148);
+  methods += gsi::qt_signal<bool > ("alternativeFrequenciesEnabledChanged(bool)", "alternativeFrequenciesEnabledChanged", gsi::arg("enabled"), "@brief Signal declaration for QRadioDataControl::alternativeFrequenciesEnabledChanged(bool enabled)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QRadioDataControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QRadioData::Error>::target_type & > ("error(QRadioData::Error)", "error_sig", gsi::arg("err"), "@brief Signal declaration for QRadioDataControl::error(QRadioData::Error err)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QRadioDataControl::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QRadioData::ProgramType>::target_type & > ("programTypeChanged(QRadioData::ProgramType)", "programTypeChanged", gsi::arg("programType"), "@brief Signal declaration for QRadioDataControl::programTypeChanged(QRadioData::ProgramType programType)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QString > ("programTypeNameChanged(QString)", "programTypeNameChanged", gsi::arg("programTypeName"), "@brief Signal declaration for QRadioDataControl::programTypeNameChanged(QString programTypeName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QString > ("radioTextChanged(QString)", "radioTextChanged", gsi::arg("radioText"), "@brief Signal declaration for QRadioDataControl::radioTextChanged(QString radioText)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QString > ("stationIdChanged(QString)", "stationIdChanged", gsi::arg("stationId"), "@brief Signal declaration for QRadioDataControl::stationIdChanged(QString stationId)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QString > ("stationNameChanged(QString)", "stationNameChanged", gsi::arg("stationName"), "@brief Signal declaration for QRadioDataControl::stationNameChanged(QString stationName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QRadioDataControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QRadioDataControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -448,6 +310,18 @@ public:
     return QRadioDataControl::senderSignalIndex();
   }
 
+  //  [emitter impl] void QRadioDataControl::alternativeFrequenciesEnabledChanged(bool enabled)
+  void emitter_QRadioDataControl_alternativeFrequenciesEnabledChanged_864(bool enabled)
+  {
+    emit QRadioDataControl::alternativeFrequenciesEnabledChanged(enabled);
+  }
+
+  //  [emitter impl] void QRadioDataControl::destroyed(QObject *)
+  void emitter_QRadioDataControl_destroyed_1302(QObject *arg1)
+  {
+    emit QRadioDataControl::destroyed(arg1);
+  }
+
   //  [adaptor impl] QRadioData::Error QRadioDataControl::error()
   qt_gsi::Converter<QRadioData::Error>::target_type cbs_error_c0_0() const
   {
@@ -461,6 +335,12 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("error");
     }
+  }
+
+  //  [emitter impl] void QRadioDataControl::error(QRadioData::Error err)
+  void emitter_QRadioDataControl_error_2028(QRadioData::Error err)
+  {
+    emit QRadioDataControl::error(err);
   }
 
   //  [adaptor impl] QString QRadioDataControl::errorString()
@@ -523,6 +403,13 @@ public:
     }
   }
 
+  //  [emitter impl] void QRadioDataControl::objectNameChanged(const QString &objectName)
+  void emitter_QRadioDataControl_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QRadioDataControl::objectNameChanged(const QString &objectName)'");
+  }
+
   //  [adaptor impl] QRadioData::ProgramType QRadioDataControl::programType()
   qt_gsi::Converter<QRadioData::ProgramType>::target_type cbs_programType_c0_0() const
   {
@@ -536,6 +423,12 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("programType");
     }
+  }
+
+  //  [emitter impl] void QRadioDataControl::programTypeChanged(QRadioData::ProgramType programType)
+  void emitter_QRadioDataControl_programTypeChanged_2652(QRadioData::ProgramType programType)
+  {
+    emit QRadioDataControl::programTypeChanged(programType);
   }
 
   //  [adaptor impl] QString QRadioDataControl::programTypeName()
@@ -553,6 +446,12 @@ public:
     }
   }
 
+  //  [emitter impl] void QRadioDataControl::programTypeNameChanged(QString programTypeName)
+  void emitter_QRadioDataControl_programTypeNameChanged_1148(QString programTypeName)
+  {
+    emit QRadioDataControl::programTypeNameChanged(programTypeName);
+  }
+
   //  [adaptor impl] QString QRadioDataControl::radioText()
   QString cbs_radioText_c0_0() const
   {
@@ -566,6 +465,12 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("radioText");
     }
+  }
+
+  //  [emitter impl] void QRadioDataControl::radioTextChanged(QString radioText)
+  void emitter_QRadioDataControl_radioTextChanged_1148(QString radioText)
+  {
+    emit QRadioDataControl::radioTextChanged(radioText);
   }
 
   //  [adaptor impl] void QRadioDataControl::setAlternativeFrequenciesEnabled(bool enabled)
@@ -599,6 +504,12 @@ public:
     }
   }
 
+  //  [emitter impl] void QRadioDataControl::stationIdChanged(QString stationId)
+  void emitter_QRadioDataControl_stationIdChanged_1148(QString stationId)
+  {
+    emit QRadioDataControl::stationIdChanged(stationId);
+  }
+
   //  [adaptor impl] QString QRadioDataControl::stationName()
   QString cbs_stationName_c0_0() const
   {
@@ -612,6 +523,12 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("stationName");
     }
+  }
+
+  //  [emitter impl] void QRadioDataControl::stationNameChanged(QString stationName)
+  void emitter_QRadioDataControl_stationNameChanged_1148(QString stationName)
+  {
+    emit QRadioDataControl::stationNameChanged(stationName);
   }
 
   //  [adaptor impl] void QRadioDataControl::childEvent(QChildEvent *event)
@@ -693,6 +610,24 @@ public:
 
 QRadioDataControl_Adaptor::~QRadioDataControl_Adaptor() { }
 
+// emitter void QRadioDataControl::alternativeFrequenciesEnabledChanged(bool enabled)
+
+static void _init_emitter_alternativeFrequenciesEnabledChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("enabled");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_alternativeFrequenciesEnabledChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QRadioDataControl_Adaptor *)cls)->emitter_QRadioDataControl_alternativeFrequenciesEnabledChanged_864 (arg1);
+}
+
+
 // void QRadioDataControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
@@ -741,6 +676,24 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QRadioDataControl::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QRadioDataControl_Adaptor *)cls)->emitter_QRadioDataControl_destroyed_1302 (arg1);
+}
+
+
 // void QRadioDataControl::disconnectNotify(const QMetaMethod &signal)
 
 static void _init_cbs_disconnectNotify_2394_0 (qt_gsi::GenericMethod *decl)
@@ -781,6 +734,24 @@ static void _call_cbs_error_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *
 static void _set_callback_cbs_error_c0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QRadioDataControl_Adaptor *)cls)->cb_error_c0_0 = cb;
+}
+
+
+// emitter void QRadioDataControl::error(QRadioData::Error err)
+
+static void _init_emitter_error_2028 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("err");
+  decl->add_arg<const qt_gsi::Converter<QRadioData::Error>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_error_2028 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QRadioData::Error>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QRadioData::Error>::target_type & >() (args, heap);
+  ((QRadioDataControl_Adaptor *)cls)->emitter_QRadioDataControl_error_2028 (arg1);
 }
 
 
@@ -889,6 +860,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QRadioDataControl::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QRadioDataControl_Adaptor *)cls)->emitter_QRadioDataControl_objectNameChanged_4567 (arg1);
+}
+
+
 // QRadioData::ProgramType QRadioDataControl::programType()
 
 static void _init_cbs_programType_c0_0 (qt_gsi::GenericMethod *decl)
@@ -905,6 +894,24 @@ static void _call_cbs_programType_c0_0 (const qt_gsi::GenericMethod * /*decl*/, 
 static void _set_callback_cbs_programType_c0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QRadioDataControl_Adaptor *)cls)->cb_programType_c0_0 = cb;
+}
+
+
+// emitter void QRadioDataControl::programTypeChanged(QRadioData::ProgramType programType)
+
+static void _init_emitter_programTypeChanged_2652 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("programType");
+  decl->add_arg<const qt_gsi::Converter<QRadioData::ProgramType>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_programTypeChanged_2652 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QRadioData::ProgramType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QRadioData::ProgramType>::target_type & >() (args, heap);
+  ((QRadioDataControl_Adaptor *)cls)->emitter_QRadioDataControl_programTypeChanged_2652 (arg1);
 }
 
 
@@ -927,6 +934,24 @@ static void _set_callback_cbs_programTypeName_c0_0 (void *cls, const gsi::Callba
 }
 
 
+// emitter void QRadioDataControl::programTypeNameChanged(QString programTypeName)
+
+static void _init_emitter_programTypeNameChanged_1148 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("programTypeName");
+  decl->add_arg<QString > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_programTypeNameChanged_1148 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QString arg1 = gsi::arg_reader<QString >() (args, heap);
+  ((QRadioDataControl_Adaptor *)cls)->emitter_QRadioDataControl_programTypeNameChanged_1148 (arg1);
+}
+
+
 // QString QRadioDataControl::radioText()
 
 static void _init_cbs_radioText_c0_0 (qt_gsi::GenericMethod *decl)
@@ -943,6 +968,24 @@ static void _call_cbs_radioText_c0_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 static void _set_callback_cbs_radioText_c0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QRadioDataControl_Adaptor *)cls)->cb_radioText_c0_0 = cb;
+}
+
+
+// emitter void QRadioDataControl::radioTextChanged(QString radioText)
+
+static void _init_emitter_radioTextChanged_1148 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("radioText");
+  decl->add_arg<QString > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_radioTextChanged_1148 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QString arg1 = gsi::arg_reader<QString >() (args, heap);
+  ((QRadioDataControl_Adaptor *)cls)->emitter_QRadioDataControl_radioTextChanged_1148 (arg1);
 }
 
 
@@ -1035,6 +1078,24 @@ static void _set_callback_cbs_stationId_c0_0 (void *cls, const gsi::Callback &cb
 }
 
 
+// emitter void QRadioDataControl::stationIdChanged(QString stationId)
+
+static void _init_emitter_stationIdChanged_1148 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("stationId");
+  decl->add_arg<QString > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_stationIdChanged_1148 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QString arg1 = gsi::arg_reader<QString >() (args, heap);
+  ((QRadioDataControl_Adaptor *)cls)->emitter_QRadioDataControl_stationIdChanged_1148 (arg1);
+}
+
+
 // QString QRadioDataControl::stationName()
 
 static void _init_cbs_stationName_c0_0 (qt_gsi::GenericMethod *decl)
@@ -1051,6 +1112,24 @@ static void _call_cbs_stationName_c0_0 (const qt_gsi::GenericMethod * /*decl*/, 
 static void _set_callback_cbs_stationName_c0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QRadioDataControl_Adaptor *)cls)->cb_stationName_c0_0 = cb;
+}
+
+
+// emitter void QRadioDataControl::stationNameChanged(QString stationName)
+
+static void _init_emitter_stationNameChanged_1148 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("stationName");
+  decl->add_arg<QString > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_stationNameChanged_1148 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QString arg1 = gsi::arg_reader<QString >() (args, heap);
+  ((QRadioDataControl_Adaptor *)cls)->emitter_QRadioDataControl_stationNameChanged_1148 (arg1);
 }
 
 
@@ -1085,14 +1164,17 @@ gsi::Class<QRadioDataControl> &qtdecl_QRadioDataControl ();
 
 static gsi::Methods methods_QRadioDataControl_Adaptor () {
   gsi::Methods methods;
+  methods += new qt_gsi::GenericMethod ("emit_alternativeFrequenciesEnabledChanged", "@brief Emitter for signal void QRadioDataControl::alternativeFrequenciesEnabledChanged(bool enabled)\nCall this method to emit this signal.", false, &_init_emitter_alternativeFrequenciesEnabledChanged_864, &_call_emitter_alternativeFrequenciesEnabledChanged_864);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QRadioDataControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QRadioDataControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QRadioDataControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QRadioDataControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("error", "@brief Virtual method QRadioData::Error QRadioDataControl::error()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_error_c0_0, &_call_cbs_error_c0_0);
   methods += new qt_gsi::GenericMethod ("error", "@hide", true, &_init_cbs_error_c0_0, &_call_cbs_error_c0_0, &_set_callback_cbs_error_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_error_sig", "@brief Emitter for signal void QRadioDataControl::error(QRadioData::Error err)\nCall this method to emit this signal.", false, &_init_emitter_error_2028, &_call_emitter_error_2028);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Virtual method QString QRadioDataControl::errorString()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0);
   methods += new qt_gsi::GenericMethod ("errorString", "@hide", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0, &_set_callback_cbs_errorString_c0_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QRadioDataControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
@@ -1102,12 +1184,16 @@ static gsi::Methods methods_QRadioDataControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("isAlternativeFrequenciesEnabled", "@brief Virtual method bool QRadioDataControl::isAlternativeFrequenciesEnabled()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isAlternativeFrequenciesEnabled_c0_0, &_call_cbs_isAlternativeFrequenciesEnabled_c0_0);
   methods += new qt_gsi::GenericMethod ("isAlternativeFrequenciesEnabled", "@hide", true, &_init_cbs_isAlternativeFrequenciesEnabled_c0_0, &_call_cbs_isAlternativeFrequenciesEnabled_c0_0, &_set_callback_cbs_isAlternativeFrequenciesEnabled_c0_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QRadioDataControl::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QRadioDataControl::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("programType", "@brief Virtual method QRadioData::ProgramType QRadioDataControl::programType()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_programType_c0_0, &_call_cbs_programType_c0_0);
   methods += new qt_gsi::GenericMethod ("programType", "@hide", true, &_init_cbs_programType_c0_0, &_call_cbs_programType_c0_0, &_set_callback_cbs_programType_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_programTypeChanged", "@brief Emitter for signal void QRadioDataControl::programTypeChanged(QRadioData::ProgramType programType)\nCall this method to emit this signal.", false, &_init_emitter_programTypeChanged_2652, &_call_emitter_programTypeChanged_2652);
   methods += new qt_gsi::GenericMethod ("programTypeName", "@brief Virtual method QString QRadioDataControl::programTypeName()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_programTypeName_c0_0, &_call_cbs_programTypeName_c0_0);
   methods += new qt_gsi::GenericMethod ("programTypeName", "@hide", true, &_init_cbs_programTypeName_c0_0, &_call_cbs_programTypeName_c0_0, &_set_callback_cbs_programTypeName_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_programTypeNameChanged", "@brief Emitter for signal void QRadioDataControl::programTypeNameChanged(QString programTypeName)\nCall this method to emit this signal.", false, &_init_emitter_programTypeNameChanged_1148, &_call_emitter_programTypeNameChanged_1148);
   methods += new qt_gsi::GenericMethod ("radioText", "@brief Virtual method QString QRadioDataControl::radioText()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_radioText_c0_0, &_call_cbs_radioText_c0_0);
   methods += new qt_gsi::GenericMethod ("radioText", "@hide", true, &_init_cbs_radioText_c0_0, &_call_cbs_radioText_c0_0, &_set_callback_cbs_radioText_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_radioTextChanged", "@brief Emitter for signal void QRadioDataControl::radioTextChanged(QString radioText)\nCall this method to emit this signal.", false, &_init_emitter_radioTextChanged_1148, &_call_emitter_radioTextChanged_1148);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QRadioDataControl::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QRadioDataControl::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QRadioDataControl::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
@@ -1115,8 +1201,10 @@ static gsi::Methods methods_QRadioDataControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("setAlternativeFrequenciesEnabled", "@hide", false, &_init_cbs_setAlternativeFrequenciesEnabled_864_0, &_call_cbs_setAlternativeFrequenciesEnabled_864_0, &_set_callback_cbs_setAlternativeFrequenciesEnabled_864_0);
   methods += new qt_gsi::GenericMethod ("stationId", "@brief Virtual method QString QRadioDataControl::stationId()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_stationId_c0_0, &_call_cbs_stationId_c0_0);
   methods += new qt_gsi::GenericMethod ("stationId", "@hide", true, &_init_cbs_stationId_c0_0, &_call_cbs_stationId_c0_0, &_set_callback_cbs_stationId_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_stationIdChanged", "@brief Emitter for signal void QRadioDataControl::stationIdChanged(QString stationId)\nCall this method to emit this signal.", false, &_init_emitter_stationIdChanged_1148, &_call_emitter_stationIdChanged_1148);
   methods += new qt_gsi::GenericMethod ("stationName", "@brief Virtual method QString QRadioDataControl::stationName()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_stationName_c0_0, &_call_cbs_stationName_c0_0);
   methods += new qt_gsi::GenericMethod ("stationName", "@hide", true, &_init_cbs_stationName_c0_0, &_call_cbs_stationName_c0_0, &_set_callback_cbs_stationName_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_stationNameChanged", "@brief Emitter for signal void QRadioDataControl::stationNameChanged(QString stationName)\nCall this method to emit this signal.", false, &_init_emitter_stationNameChanged_1148, &_call_emitter_stationNameChanged_1148);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QRadioDataControl::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;

@@ -1009,7 +1009,7 @@ static gsi::Methods methods_QImageReader () {
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QImageReader::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
   methods += new qt_gsi::GenericMethod (":fileName", "@brief Method QString QImageReader::fileName()\n", true, &_init_f_fileName_c0, &_call_f_fileName_c0);
   methods += new qt_gsi::GenericMethod (":format", "@brief Method QByteArray QImageReader::format()\n", true, &_init_f_format_c0, &_call_f_format_c0);
-  methods += new qt_gsi::GenericMethod ("gamma", "@brief Method float QImageReader::gamma()\n", true, &_init_f_gamma_c0, &_call_f_gamma_c0);
+  methods += new qt_gsi::GenericMethod (":gamma", "@brief Method float QImageReader::gamma()\n", true, &_init_f_gamma_c0, &_call_f_gamma_c0);
   methods += new qt_gsi::GenericMethod ("imageCount", "@brief Method int QImageReader::imageCount()\n", true, &_init_f_imageCount_c0, &_call_f_imageCount_c0);
   methods += new qt_gsi::GenericMethod ("imageFormat", "@brief Method QImage::Format QImageReader::imageFormat()\n", true, &_init_f_imageFormat_c0, &_call_f_imageFormat_c0);
   methods += new qt_gsi::GenericMethod ("jumpToImage", "@brief Method bool QImageReader::jumpToImage(int imageNumber)\n", false, &_init_f_jumpToImage_767, &_call_f_jumpToImage_767);
@@ -1029,7 +1029,7 @@ static gsi::Methods methods_QImageReader () {
   methods += new qt_gsi::GenericMethod ("setDevice|device=", "@brief Method void QImageReader::setDevice(QIODevice *device)\n", false, &_init_f_setDevice_1447, &_call_f_setDevice_1447);
   methods += new qt_gsi::GenericMethod ("setFileName|fileName=", "@brief Method void QImageReader::setFileName(const QString &fileName)\n", false, &_init_f_setFileName_2025, &_call_f_setFileName_2025);
   methods += new qt_gsi::GenericMethod ("setFormat|format=", "@brief Method void QImageReader::setFormat(const QByteArray &format)\n", false, &_init_f_setFormat_2309, &_call_f_setFormat_2309);
-  methods += new qt_gsi::GenericMethod ("setGamma", "@brief Method void QImageReader::setGamma(float gamma)\n", false, &_init_f_setGamma_970, &_call_f_setGamma_970);
+  methods += new qt_gsi::GenericMethod ("setGamma|gamma=", "@brief Method void QImageReader::setGamma(float gamma)\n", false, &_init_f_setGamma_970, &_call_f_setGamma_970);
   methods += new qt_gsi::GenericMethod ("setQuality|quality=", "@brief Method void QImageReader::setQuality(int quality)\n", false, &_init_f_setQuality_767, &_call_f_setQuality_767);
   methods += new qt_gsi::GenericMethod ("setScaledClipRect|scaledClipRect=", "@brief Method void QImageReader::setScaledClipRect(const QRect &rect)\n", false, &_init_f_setScaledClipRect_1792, &_call_f_setScaledClipRect_1792);
   methods += new qt_gsi::GenericMethod ("setScaledSize|scaledSize=", "@brief Method void QImageReader::setScaledSize(const QSize &size)\n", false, &_init_f_setScaledSize_1805, &_call_f_setScaledSize_1805);

@@ -892,7 +892,7 @@ namespace gsi
 static gsi::Methods methods_QCalendarWidget () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("calendar", "@brief Method QCalendar QCalendarWidget::calendar()\n", true, &_init_f_calendar_c0, &_call_f_calendar_c0);
+  methods += new qt_gsi::GenericMethod (":calendar", "@brief Method QCalendar QCalendarWidget::calendar()\n", true, &_init_f_calendar_c0, &_call_f_calendar_c0);
   methods += new qt_gsi::GenericMethod (":dateEditAcceptDelay", "@brief Method int QCalendarWidget::dateEditAcceptDelay()\n", true, &_init_f_dateEditAcceptDelay_c0, &_call_f_dateEditAcceptDelay_c0);
   methods += new qt_gsi::GenericMethod ("dateTextFormat", "@brief Method QMap<QDate, QTextCharFormat> QCalendarWidget::dateTextFormat()\n", true, &_init_f_dateTextFormat_c0, &_call_f_dateTextFormat_c0);
   methods += new qt_gsi::GenericMethod ("dateTextFormat", "@brief Method QTextCharFormat QCalendarWidget::dateTextFormat(QDate date)\n", true, &_init_f_dateTextFormat_c899, &_call_f_dateTextFormat_c899);
@@ -908,7 +908,7 @@ static gsi::Methods methods_QCalendarWidget () {
   methods += new qt_gsi::GenericMethod ("monthShown", "@brief Method int QCalendarWidget::monthShown()\n", true, &_init_f_monthShown_c0, &_call_f_monthShown_c0);
   methods += new qt_gsi::GenericMethod (":selectedDate", "@brief Method QDate QCalendarWidget::selectedDate()\n", true, &_init_f_selectedDate_c0, &_call_f_selectedDate_c0);
   methods += new qt_gsi::GenericMethod (":selectionMode", "@brief Method QCalendarWidget::SelectionMode QCalendarWidget::selectionMode()\n", true, &_init_f_selectionMode_c0, &_call_f_selectionMode_c0);
-  methods += new qt_gsi::GenericMethod ("setCalendar", "@brief Method void QCalendarWidget::setCalendar(QCalendar calendar)\n", false, &_init_f_setCalendar_1311, &_call_f_setCalendar_1311);
+  methods += new qt_gsi::GenericMethod ("setCalendar|calendar=", "@brief Method void QCalendarWidget::setCalendar(QCalendar calendar)\n", false, &_init_f_setCalendar_1311, &_call_f_setCalendar_1311);
   methods += new qt_gsi::GenericMethod ("setCurrentPage", "@brief Method void QCalendarWidget::setCurrentPage(int year, int month)\n", false, &_init_f_setCurrentPage_1426, &_call_f_setCurrentPage_1426);
   methods += new qt_gsi::GenericMethod ("setDateEditAcceptDelay|dateEditAcceptDelay=", "@brief Method void QCalendarWidget::setDateEditAcceptDelay(int delay)\n", false, &_init_f_setDateEditAcceptDelay_767, &_call_f_setDateEditAcceptDelay_767);
   methods += new qt_gsi::GenericMethod ("setDateEditEnabled|dateEditEnabled=", "@brief Method void QCalendarWidget::setDateEditEnabled(bool enable)\n", false, &_init_f_setDateEditEnabled_864, &_call_f_setDateEditEnabled_864);

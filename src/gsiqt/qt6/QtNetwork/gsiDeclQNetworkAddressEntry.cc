@@ -447,7 +447,7 @@ static gsi::Methods methods_QNetworkAddressEntry () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QNetworkAddressEntry::QNetworkAddressEntry(const QNetworkAddressEntry &other)\nThis method creates an object of class QNetworkAddressEntry.", &_init_ctor_QNetworkAddressEntry_3380, &_call_ctor_QNetworkAddressEntry_3380);
   methods += new qt_gsi::GenericMethod (":broadcast", "@brief Method QHostAddress QNetworkAddressEntry::broadcast()\n", true, &_init_f_broadcast_c0, &_call_f_broadcast_c0);
   methods += new qt_gsi::GenericMethod ("clearAddressLifetime", "@brief Method void QNetworkAddressEntry::clearAddressLifetime()\n", false, &_init_f_clearAddressLifetime_0, &_call_f_clearAddressLifetime_0);
-  methods += new qt_gsi::GenericMethod ("dnsEligibility", "@brief Method QNetworkAddressEntry::DnsEligibilityStatus QNetworkAddressEntry::dnsEligibility()\n", true, &_init_f_dnsEligibility_c0, &_call_f_dnsEligibility_c0);
+  methods += new qt_gsi::GenericMethod (":dnsEligibility", "@brief Method QNetworkAddressEntry::DnsEligibilityStatus QNetworkAddressEntry::dnsEligibility()\n", true, &_init_f_dnsEligibility_c0, &_call_f_dnsEligibility_c0);
   methods += new qt_gsi::GenericMethod (":ip", "@brief Method QHostAddress QNetworkAddressEntry::ip()\n", true, &_init_f_ip_c0, &_call_f_ip_c0);
   methods += new qt_gsi::GenericMethod ("isLifetimeKnown?", "@brief Method bool QNetworkAddressEntry::isLifetimeKnown()\n", true, &_init_f_isLifetimeKnown_c0, &_call_f_isLifetimeKnown_c0);
   methods += new qt_gsi::GenericMethod ("isPermanent?", "@brief Method bool QNetworkAddressEntry::isPermanent()\n", true, &_init_f_isPermanent_c0, &_call_f_isPermanent_c0);
@@ -460,7 +460,7 @@ static gsi::Methods methods_QNetworkAddressEntry () {
   methods += new qt_gsi::GenericMethod (":prefixLength", "@brief Method int QNetworkAddressEntry::prefixLength()\n", true, &_init_f_prefixLength_c0, &_call_f_prefixLength_c0);
   methods += new qt_gsi::GenericMethod ("setAddressLifetime", "@brief Method void QNetworkAddressEntry::setAddressLifetime(QDeadlineTimer preferred, QDeadlineTimer validity)\n", false, &_init_f_setAddressLifetime_3532, &_call_f_setAddressLifetime_3532);
   methods += new qt_gsi::GenericMethod ("setBroadcast|broadcast=", "@brief Method void QNetworkAddressEntry::setBroadcast(const QHostAddress &newBroadcast)\n", false, &_init_f_setBroadcast_2518, &_call_f_setBroadcast_2518);
-  methods += new qt_gsi::GenericMethod ("setDnsEligibility", "@brief Method void QNetworkAddressEntry::setDnsEligibility(QNetworkAddressEntry::DnsEligibilityStatus status)\n", false, &_init_f_setDnsEligibility_4699, &_call_f_setDnsEligibility_4699);
+  methods += new qt_gsi::GenericMethod ("setDnsEligibility|dnsEligibility=", "@brief Method void QNetworkAddressEntry::setDnsEligibility(QNetworkAddressEntry::DnsEligibilityStatus status)\n", false, &_init_f_setDnsEligibility_4699, &_call_f_setDnsEligibility_4699);
   methods += new qt_gsi::GenericMethod ("setIp|ip=", "@brief Method void QNetworkAddressEntry::setIp(const QHostAddress &newIp)\n", false, &_init_f_setIp_2518, &_call_f_setIp_2518);
   methods += new qt_gsi::GenericMethod ("setNetmask|netmask=", "@brief Method void QNetworkAddressEntry::setNetmask(const QHostAddress &newNetmask)\n", false, &_init_f_setNetmask_2518, &_call_f_setNetmask_2518);
   methods += new qt_gsi::GenericMethod ("setPrefixLength|prefixLength=", "@brief Method void QNetworkAddressEntry::setPrefixLength(int length)\n", false, &_init_f_setPrefixLength_767, &_call_f_setPrefixLength_767);

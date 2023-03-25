@@ -516,8 +516,8 @@ static gsi::Methods methods_QUndoStack () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("beginMacro", "@brief Method void QUndoStack::beginMacro(const QString &text)\n", false, &_init_f_beginMacro_2025, &_call_f_beginMacro_2025);
-  methods += new qt_gsi::GenericMethod ("canRedo", "@brief Method bool QUndoStack::canRedo()\n", true, &_init_f_canRedo_c0, &_call_f_canRedo_c0);
-  methods += new qt_gsi::GenericMethod ("canUndo", "@brief Method bool QUndoStack::canUndo()\n", true, &_init_f_canUndo_c0, &_call_f_canUndo_c0);
+  methods += new qt_gsi::GenericMethod (":canRedo", "@brief Method bool QUndoStack::canRedo()\n", true, &_init_f_canRedo_c0, &_call_f_canRedo_c0);
+  methods += new qt_gsi::GenericMethod (":canUndo", "@brief Method bool QUndoStack::canUndo()\n", true, &_init_f_canUndo_c0, &_call_f_canUndo_c0);
   methods += new qt_gsi::GenericMethod ("cleanIndex", "@brief Method int QUndoStack::cleanIndex()\n", true, &_init_f_cleanIndex_c0, &_call_f_cleanIndex_c0);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QUndoStack::clear()\n", false, &_init_f_clear_0, &_call_f_clear_0);
   methods += new qt_gsi::GenericMethod ("command", "@brief Method const QUndoCommand *QUndoStack::command(int index)\n", true, &_init_f_command_c767, &_call_f_command_c767);
@@ -527,10 +527,10 @@ static gsi::Methods methods_QUndoStack () {
   methods += new qt_gsi::GenericMethod ("endMacro", "@brief Method void QUndoStack::endMacro()\n", false, &_init_f_endMacro_0, &_call_f_endMacro_0);
   methods += new qt_gsi::GenericMethod (":index", "@brief Method int QUndoStack::index()\n", true, &_init_f_index_c0, &_call_f_index_c0);
   methods += new qt_gsi::GenericMethod ("isActive?|:active", "@brief Method bool QUndoStack::isActive()\n", true, &_init_f_isActive_c0, &_call_f_isActive_c0);
-  methods += new qt_gsi::GenericMethod ("isClean?", "@brief Method bool QUndoStack::isClean()\n", true, &_init_f_isClean_c0, &_call_f_isClean_c0);
+  methods += new qt_gsi::GenericMethod ("isClean?|:clean", "@brief Method bool QUndoStack::isClean()\n", true, &_init_f_isClean_c0, &_call_f_isClean_c0);
   methods += new qt_gsi::GenericMethod ("push", "@brief Method void QUndoStack::push(QUndoCommand *cmd)\n", false, &_init_f_push_1812, &_call_f_push_1812);
   methods += new qt_gsi::GenericMethod ("redo", "@brief Method void QUndoStack::redo()\n", false, &_init_f_redo_0, &_call_f_redo_0);
-  methods += new qt_gsi::GenericMethod ("redoText", "@brief Method QString QUndoStack::redoText()\n", true, &_init_f_redoText_c0, &_call_f_redoText_c0);
+  methods += new qt_gsi::GenericMethod (":redoText", "@brief Method QString QUndoStack::redoText()\n", true, &_init_f_redoText_c0, &_call_f_redoText_c0);
   methods += new qt_gsi::GenericMethod ("resetClean", "@brief Method void QUndoStack::resetClean()\n", false, &_init_f_resetClean_0, &_call_f_resetClean_0);
   methods += new qt_gsi::GenericMethod ("setActive|active=", "@brief Method void QUndoStack::setActive(bool active)\n", false, &_init_f_setActive_864, &_call_f_setActive_864);
   methods += new qt_gsi::GenericMethod ("setClean", "@brief Method void QUndoStack::setClean()\n", false, &_init_f_setClean_0, &_call_f_setClean_0);
@@ -539,7 +539,7 @@ static gsi::Methods methods_QUndoStack () {
   methods += new qt_gsi::GenericMethod ("text", "@brief Method QString QUndoStack::text(int idx)\n", true, &_init_f_text_c767, &_call_f_text_c767);
   methods += new qt_gsi::GenericMethod ("undo", "@brief Method void QUndoStack::undo()\n", false, &_init_f_undo_0, &_call_f_undo_0);
   methods += new qt_gsi::GenericMethod (":undoLimit", "@brief Method int QUndoStack::undoLimit()\n", true, &_init_f_undoLimit_c0, &_call_f_undoLimit_c0);
-  methods += new qt_gsi::GenericMethod ("undoText", "@brief Method QString QUndoStack::undoText()\n", true, &_init_f_undoText_c0, &_call_f_undoText_c0);
+  methods += new qt_gsi::GenericMethod (":undoText", "@brief Method QString QUndoStack::undoText()\n", true, &_init_f_undoText_c0, &_call_f_undoText_c0);
   methods += gsi::qt_signal<bool > ("canRedoChanged(bool)", "canRedoChanged", gsi::arg("canRedo"), "@brief Signal declaration for QUndoStack::canRedoChanged(bool canRedo)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("canUndoChanged(bool)", "canUndoChanged", gsi::arg("canUndo"), "@brief Signal declaration for QUndoStack::canUndoChanged(bool canUndo)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("cleanChanged(bool)", "cleanChanged", gsi::arg("clean"), "@brief Signal declaration for QUndoStack::cleanChanged(bool clean)\nYou can bind a procedure to this signal.");

@@ -345,7 +345,7 @@ static gsi::Methods methods_QTextTableFormat () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTextTableFormat::QTextTableFormat()\nThis method creates an object of class QTextTableFormat.", &_init_ctor_QTextTableFormat_0, &_call_ctor_QTextTableFormat_0);
   methods += new qt_gsi::GenericMethod (":alignment", "@brief Method QFlags<Qt::AlignmentFlag> QTextTableFormat::alignment()\n", true, &_init_f_alignment_c0, &_call_f_alignment_c0);
-  methods += new qt_gsi::GenericMethod ("borderCollapse", "@brief Method bool QTextTableFormat::borderCollapse()\n", true, &_init_f_borderCollapse_c0, &_call_f_borderCollapse_c0);
+  methods += new qt_gsi::GenericMethod (":borderCollapse", "@brief Method bool QTextTableFormat::borderCollapse()\n", true, &_init_f_borderCollapse_c0, &_call_f_borderCollapse_c0);
   methods += new qt_gsi::GenericMethod (":cellPadding", "@brief Method double QTextTableFormat::cellPadding()\n", true, &_init_f_cellPadding_c0, &_call_f_cellPadding_c0);
   methods += new qt_gsi::GenericMethod (":cellSpacing", "@brief Method double QTextTableFormat::cellSpacing()\n", true, &_init_f_cellSpacing_c0, &_call_f_cellSpacing_c0);
   methods += new qt_gsi::GenericMethod ("clearColumnWidthConstraints", "@brief Method void QTextTableFormat::clearColumnWidthConstraints()\n", false, &_init_f_clearColumnWidthConstraints_0, &_call_f_clearColumnWidthConstraints_0);
@@ -354,7 +354,7 @@ static gsi::Methods methods_QTextTableFormat () {
   methods += new qt_gsi::GenericMethod (":headerRowCount", "@brief Method int QTextTableFormat::headerRowCount()\n", true, &_init_f_headerRowCount_c0, &_call_f_headerRowCount_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QTextTableFormat::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("setAlignment|alignment=", "@brief Method void QTextTableFormat::setAlignment(QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_setAlignment_2750, &_call_f_setAlignment_2750);
-  methods += new qt_gsi::GenericMethod ("setBorderCollapse", "@brief Method void QTextTableFormat::setBorderCollapse(bool borderCollapse)\n", false, &_init_f_setBorderCollapse_864, &_call_f_setBorderCollapse_864);
+  methods += new qt_gsi::GenericMethod ("setBorderCollapse|borderCollapse=", "@brief Method void QTextTableFormat::setBorderCollapse(bool borderCollapse)\n", false, &_init_f_setBorderCollapse_864, &_call_f_setBorderCollapse_864);
   methods += new qt_gsi::GenericMethod ("setCellPadding|cellPadding=", "@brief Method void QTextTableFormat::setCellPadding(double padding)\n", false, &_init_f_setCellPadding_1071, &_call_f_setCellPadding_1071);
   methods += new qt_gsi::GenericMethod ("setCellSpacing|cellSpacing=", "@brief Method void QTextTableFormat::setCellSpacing(double spacing)\n", false, &_init_f_setCellSpacing_1071, &_call_f_setCellSpacing_1071);
   methods += new qt_gsi::GenericMethod ("setColumnWidthConstraints|columnWidthConstraints=", "@brief Method void QTextTableFormat::setColumnWidthConstraints(const QList<QTextLength> &constraints)\n", false, &_init_f_setColumnWidthConstraints_3040, &_call_f_setColumnWidthConstraints_3040);

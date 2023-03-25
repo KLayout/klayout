@@ -567,11 +567,11 @@ static gsi::Methods methods_QDoubleSpinBox () {
   methods += new qt_gsi::GenericMethod ("setPrefix|prefix=", "@brief Method void QDoubleSpinBox::setPrefix(const QString &prefix)\n", false, &_init_f_setPrefix_2025, &_call_f_setPrefix_2025);
   methods += new qt_gsi::GenericMethod ("setRange", "@brief Method void QDoubleSpinBox::setRange(double min, double max)\n", false, &_init_f_setRange_2034, &_call_f_setRange_2034);
   methods += new qt_gsi::GenericMethod ("setSingleStep|singleStep=", "@brief Method void QDoubleSpinBox::setSingleStep(double val)\n", false, &_init_f_setSingleStep_1071, &_call_f_setSingleStep_1071);
-  methods += new qt_gsi::GenericMethod ("setStepType", "@brief Method void QDoubleSpinBox::setStepType(QAbstractSpinBox::StepType stepType)\n", false, &_init_f_setStepType_2990, &_call_f_setStepType_2990);
+  methods += new qt_gsi::GenericMethod ("setStepType|stepType=", "@brief Method void QDoubleSpinBox::setStepType(QAbstractSpinBox::StepType stepType)\n", false, &_init_f_setStepType_2990, &_call_f_setStepType_2990);
   methods += new qt_gsi::GenericMethod ("setSuffix|suffix=", "@brief Method void QDoubleSpinBox::setSuffix(const QString &suffix)\n", false, &_init_f_setSuffix_2025, &_call_f_setSuffix_2025);
   methods += new qt_gsi::GenericMethod ("setValue|value=", "@brief Method void QDoubleSpinBox::setValue(double val)\n", false, &_init_f_setValue_1071, &_call_f_setValue_1071);
   methods += new qt_gsi::GenericMethod (":singleStep", "@brief Method double QDoubleSpinBox::singleStep()\n", true, &_init_f_singleStep_c0, &_call_f_singleStep_c0);
-  methods += new qt_gsi::GenericMethod ("stepType", "@brief Method QAbstractSpinBox::StepType QDoubleSpinBox::stepType()\n", true, &_init_f_stepType_c0, &_call_f_stepType_c0);
+  methods += new qt_gsi::GenericMethod (":stepType", "@brief Method QAbstractSpinBox::StepType QDoubleSpinBox::stepType()\n", true, &_init_f_stepType_c0, &_call_f_stepType_c0);
   methods += new qt_gsi::GenericMethod (":suffix", "@brief Method QString QDoubleSpinBox::suffix()\n", true, &_init_f_suffix_c0, &_call_f_suffix_c0);
   methods += new qt_gsi::GenericMethod ("textFromValue", "@brief Method QString QDoubleSpinBox::textFromValue(double val)\n", true, &_init_f_textFromValue_c1071, &_call_f_textFromValue_c1071);
   methods += new qt_gsi::GenericMethod ("validate", "@brief Method QValidator::State QDoubleSpinBox::validate(QString &input, int &pos)\nThis is a reimplementation of QAbstractSpinBox::validate", true, &_init_f_validate_c2171, &_call_f_validate_c2171);

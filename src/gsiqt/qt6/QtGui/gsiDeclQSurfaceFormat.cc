@@ -829,7 +829,7 @@ static gsi::Methods methods_QSurfaceFormat () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSurfaceFormat::QSurfaceFormat(const QSurfaceFormat &other)\nThis method creates an object of class QSurfaceFormat.", &_init_ctor_QSurfaceFormat_2724, &_call_ctor_QSurfaceFormat_2724);
   methods += new qt_gsi::GenericMethod (":alphaBufferSize", "@brief Method int QSurfaceFormat::alphaBufferSize()\n", true, &_init_f_alphaBufferSize_c0, &_call_f_alphaBufferSize_c0);
   methods += new qt_gsi::GenericMethod (":blueBufferSize", "@brief Method int QSurfaceFormat::blueBufferSize()\n", true, &_init_f_blueBufferSize_c0, &_call_f_blueBufferSize_c0);
-  methods += new qt_gsi::GenericMethod ("colorSpace", "@brief Method const QColorSpace &QSurfaceFormat::colorSpace()\n", true, &_init_f_colorSpace_c0, &_call_f_colorSpace_c0);
+  methods += new qt_gsi::GenericMethod (":colorSpace", "@brief Method const QColorSpace &QSurfaceFormat::colorSpace()\n", true, &_init_f_colorSpace_c0, &_call_f_colorSpace_c0);
   methods += new qt_gsi::GenericMethod (":depthBufferSize", "@brief Method int QSurfaceFormat::depthBufferSize()\n", true, &_init_f_depthBufferSize_c0, &_call_f_depthBufferSize_c0);
   methods += new qt_gsi::GenericMethod (":greenBufferSize", "@brief Method int QSurfaceFormat::greenBufferSize()\n", true, &_init_f_greenBufferSize_c0, &_call_f_greenBufferSize_c0);
   methods += new qt_gsi::GenericMethod ("hasAlpha", "@brief Method bool QSurfaceFormat::hasAlpha()\n", true, &_init_f_hasAlpha_c0, &_call_f_hasAlpha_c0);
@@ -843,8 +843,8 @@ static gsi::Methods methods_QSurfaceFormat () {
   methods += new qt_gsi::GenericMethod (":samples", "@brief Method int QSurfaceFormat::samples()\n", true, &_init_f_samples_c0, &_call_f_samples_c0);
   methods += new qt_gsi::GenericMethod ("setAlphaBufferSize|alphaBufferSize=", "@brief Method void QSurfaceFormat::setAlphaBufferSize(int size)\n", false, &_init_f_setAlphaBufferSize_767, &_call_f_setAlphaBufferSize_767);
   methods += new qt_gsi::GenericMethod ("setBlueBufferSize|blueBufferSize=", "@brief Method void QSurfaceFormat::setBlueBufferSize(int size)\n", false, &_init_f_setBlueBufferSize_767, &_call_f_setBlueBufferSize_767);
-  methods += new qt_gsi::GenericMethod ("setColorSpace", "@brief Method void QSurfaceFormat::setColorSpace(const QColorSpace &colorSpace)\n", false, &_init_f_setColorSpace_2397, &_call_f_setColorSpace_2397);
-  methods += new qt_gsi::GenericMethod ("setColorSpace", "@brief Method void QSurfaceFormat::setColorSpace(QSurfaceFormat::ColorSpace colorSpace)\n", false, &_init_f_setColorSpace_2966, &_call_f_setColorSpace_2966);
+  methods += new qt_gsi::GenericMethod ("setColorSpace|colorSpace=", "@brief Method void QSurfaceFormat::setColorSpace(const QColorSpace &colorSpace)\n", false, &_init_f_setColorSpace_2397, &_call_f_setColorSpace_2397);
+  methods += new qt_gsi::GenericMethod ("setColorSpace|colorSpace=", "@brief Method void QSurfaceFormat::setColorSpace(QSurfaceFormat::ColorSpace colorSpace)\n", false, &_init_f_setColorSpace_2966, &_call_f_setColorSpace_2966);
   methods += new qt_gsi::GenericMethod ("setDepthBufferSize|depthBufferSize=", "@brief Method void QSurfaceFormat::setDepthBufferSize(int size)\n", false, &_init_f_setDepthBufferSize_767, &_call_f_setDepthBufferSize_767);
   methods += new qt_gsi::GenericMethod ("setGreenBufferSize|greenBufferSize=", "@brief Method void QSurfaceFormat::setGreenBufferSize(int size)\n", false, &_init_f_setGreenBufferSize_767, &_call_f_setGreenBufferSize_767);
   methods += new qt_gsi::GenericMethod ("setMajorVersion|majorVersion=", "@brief Method void QSurfaceFormat::setMajorVersion(int majorVersion)\n", false, &_init_f_setMajorVersion_767, &_call_f_setMajorVersion_767);

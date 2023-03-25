@@ -413,14 +413,16 @@ static gsi::Methods methods_QUiLoader () {
   methods += new qt_gsi::GenericMethod ("createLayout", "@brief Method QLayout *QUiLoader::createLayout(const QString &className, QObject *parent, const QString &name)\n", false, &_init_f_createLayout_5136, &_call_f_createLayout_5136);
   methods += new qt_gsi::GenericMethod ("createWidget", "@brief Method QWidget *QUiLoader::createWidget(const QString &className, QWidget *parent, const QString &name)\n", false, &_init_f_createWidget_5149, &_call_f_createWidget_5149);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QUiLoader::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
-  methods += new qt_gsi::GenericMethod ("isLanguageChangeEnabled?", "@brief Method bool QUiLoader::isLanguageChangeEnabled()\n", true, &_init_f_isLanguageChangeEnabled_c0, &_call_f_isLanguageChangeEnabled_c0);
-  methods += new qt_gsi::GenericMethod ("isTranslationEnabled?", "@brief Method bool QUiLoader::isTranslationEnabled()\n", true, &_init_f_isTranslationEnabled_c0, &_call_f_isTranslationEnabled_c0);
+  methods += new qt_gsi::GenericMethod ("isLanguageChangeEnabled?|:languageChangeEnabled", "@brief Method bool QUiLoader::isLanguageChangeEnabled()\n", true, &_init_f_isLanguageChangeEnabled_c0, &_call_f_isLanguageChangeEnabled_c0);
+  methods += new qt_gsi::GenericMethod ("isTranslationEnabled?|:translationEnabled", "@brief Method bool QUiLoader::isTranslationEnabled()\n", true, &_init_f_isTranslationEnabled_c0, &_call_f_isTranslationEnabled_c0);
   methods += new qt_gsi::GenericMethod ("load", "@brief Method QWidget *QUiLoader::load(QIODevice *device, QWidget *parentWidget)\n", false, &_init_f_load_2654, &_call_f_load_2654);
   methods += new qt_gsi::GenericMethod ("pluginPaths", "@brief Method QStringList QUiLoader::pluginPaths()\n", true, &_init_f_pluginPaths_c0, &_call_f_pluginPaths_c0);
-  methods += new qt_gsi::GenericMethod ("setLanguageChangeEnabled", "@brief Method void QUiLoader::setLanguageChangeEnabled(bool enabled)\n", false, &_init_f_setLanguageChangeEnabled_864, &_call_f_setLanguageChangeEnabled_864);
-  methods += new qt_gsi::GenericMethod ("setTranslationEnabled", "@brief Method void QUiLoader::setTranslationEnabled(bool enabled)\n", false, &_init_f_setTranslationEnabled_864, &_call_f_setTranslationEnabled_864);
-  methods += new qt_gsi::GenericMethod ("setWorkingDirectory", "@brief Method void QUiLoader::setWorkingDirectory(const QDir &dir)\n", false, &_init_f_setWorkingDirectory_1681, &_call_f_setWorkingDirectory_1681);
-  methods += new qt_gsi::GenericMethod ("workingDirectory", "@brief Method QDir QUiLoader::workingDirectory()\n", true, &_init_f_workingDirectory_c0, &_call_f_workingDirectory_c0);
+  methods += new qt_gsi::GenericMethod ("setLanguageChangeEnabled|languageChangeEnabled=", "@brief Method void QUiLoader::setLanguageChangeEnabled(bool enabled)\n", false, &_init_f_setLanguageChangeEnabled_864, &_call_f_setLanguageChangeEnabled_864);
+  methods += new qt_gsi::GenericMethod ("setTranslationEnabled|translationEnabled=", "@brief Method void QUiLoader::setTranslationEnabled(bool enabled)\n", false, &_init_f_setTranslationEnabled_864, &_call_f_setTranslationEnabled_864);
+  methods += new qt_gsi::GenericMethod ("setWorkingDirectory|workingDirectory=", "@brief Method void QUiLoader::setWorkingDirectory(const QDir &dir)\n", false, &_init_f_setWorkingDirectory_1681, &_call_f_setWorkingDirectory_1681);
+  methods += new qt_gsi::GenericMethod (":workingDirectory", "@brief Method QDir QUiLoader::workingDirectory()\n", true, &_init_f_workingDirectory_c0, &_call_f_workingDirectory_c0);
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QUiLoader::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QUiLoader::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QUiLoader::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;
 }
@@ -534,6 +536,12 @@ public:
     }
   }
 
+  //  [emitter impl] void QUiLoader::destroyed(QObject *)
+  void emitter_QUiLoader_destroyed_1302(QObject *arg1)
+  {
+    emit QUiLoader::destroyed(arg1);
+  }
+
   //  [adaptor impl] bool QUiLoader::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -562,6 +570,13 @@ public:
     } else {
       return QUiLoader::eventFilter(watched, event);
     }
+  }
+
+  //  [emitter impl] void QUiLoader::objectNameChanged(const QString &objectName)
+  void emitter_QUiLoader_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QUiLoader::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QUiLoader::childEvent(QChildEvent *event)
@@ -814,6 +829,24 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QUiLoader::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QUiLoader_Adaptor *)cls)->emitter_QUiLoader_destroyed_1302 (arg1);
+}
+
+
 // void QUiLoader::disconnectNotify(const QMetaMethod &signal)
 
 static void _init_cbs_disconnectNotify_2394_0 (qt_gsi::GenericMethod *decl)
@@ -902,6 +935,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
   tl::Heap heap;
   const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QUiLoader_Adaptor *)cls)->fp_QUiLoader_isSignalConnected_c2394 (arg1));
+}
+
+
+// emitter void QUiLoader::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QUiLoader_Adaptor *)cls)->emitter_QUiLoader_objectNameChanged_4567 (arg1);
 }
 
 
@@ -995,6 +1046,7 @@ static gsi::Methods methods_QUiLoader_Adaptor () {
   methods += new qt_gsi::GenericMethod ("createWidget", "@hide", false, &_init_cbs_createWidget_5149_2, &_call_cbs_createWidget_5149_2, &_set_callback_cbs_createWidget_5149_2);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QUiLoader::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QUiLoader::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QUiLoader::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QUiLoader::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
@@ -1002,6 +1054,7 @@ static gsi::Methods methods_QUiLoader_Adaptor () {
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QUiLoader::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QUiLoader::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QUiLoader::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QUiLoader::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QUiLoader::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QUiLoader::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);

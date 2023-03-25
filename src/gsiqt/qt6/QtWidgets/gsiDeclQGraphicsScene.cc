@@ -1713,7 +1713,7 @@ static gsi::Methods methods_QGraphicsScene () {
   methods += new qt_gsi::GenericMethod ("createItemGroup", "@brief Method QGraphicsItemGroup *QGraphicsScene::createItemGroup(const QList<QGraphicsItem *> &items)\n", false, &_init_f_createItemGroup_3411, &_call_f_createItemGroup_3411);
   methods += new qt_gsi::GenericMethod ("destroyItemGroup", "@brief Method void QGraphicsScene::destroyItemGroup(QGraphicsItemGroup *group)\n", false, &_init_f_destroyItemGroup_2444, &_call_f_destroyItemGroup_2444);
   methods += new qt_gsi::GenericMethod (":focusItem", "@brief Method QGraphicsItem *QGraphicsScene::focusItem()\n", true, &_init_f_focusItem_c0, &_call_f_focusItem_c0);
-  methods += new qt_gsi::GenericMethod ("focusOnTouch", "@brief Method bool QGraphicsScene::focusOnTouch()\n", true, &_init_f_focusOnTouch_c0, &_call_f_focusOnTouch_c0);
+  methods += new qt_gsi::GenericMethod (":focusOnTouch", "@brief Method bool QGraphicsScene::focusOnTouch()\n", true, &_init_f_focusOnTouch_c0, &_call_f_focusOnTouch_c0);
   methods += new qt_gsi::GenericMethod (":font", "@brief Method QFont QGraphicsScene::font()\n", true, &_init_f_font_c0, &_call_f_font_c0);
   methods += new qt_gsi::GenericMethod (":foregroundBrush", "@brief Method QBrush QGraphicsScene::foregroundBrush()\n", true, &_init_f_foregroundBrush_c0, &_call_f_foregroundBrush_c0);
   methods += new qt_gsi::GenericMethod ("hasFocus", "@brief Method bool QGraphicsScene::hasFocus()\n", true, &_init_f_hasFocus_c0, &_call_f_hasFocus_c0);
@@ -1747,7 +1747,7 @@ static gsi::Methods methods_QGraphicsScene () {
   methods += new qt_gsi::GenericMethod ("setBspTreeDepth|bspTreeDepth=", "@brief Method void QGraphicsScene::setBspTreeDepth(int depth)\n", false, &_init_f_setBspTreeDepth_767, &_call_f_setBspTreeDepth_767);
   methods += new qt_gsi::GenericMethod ("setFocus", "@brief Method void QGraphicsScene::setFocus(Qt::FocusReason focusReason)\n", false, &_init_f_setFocus_1877, &_call_f_setFocus_1877);
   methods += new qt_gsi::GenericMethod ("setFocusItem", "@brief Method void QGraphicsScene::setFocusItem(QGraphicsItem *item, Qt::FocusReason focusReason)\n", false, &_init_f_setFocusItem_3688, &_call_f_setFocusItem_3688);
-  methods += new qt_gsi::GenericMethod ("setFocusOnTouch", "@brief Method void QGraphicsScene::setFocusOnTouch(bool enabled)\n", false, &_init_f_setFocusOnTouch_864, &_call_f_setFocusOnTouch_864);
+  methods += new qt_gsi::GenericMethod ("setFocusOnTouch|focusOnTouch=", "@brief Method void QGraphicsScene::setFocusOnTouch(bool enabled)\n", false, &_init_f_setFocusOnTouch_864, &_call_f_setFocusOnTouch_864);
   methods += new qt_gsi::GenericMethod ("setFont|font=", "@brief Method void QGraphicsScene::setFont(const QFont &font)\n", false, &_init_f_setFont_1801, &_call_f_setFont_1801);
   methods += new qt_gsi::GenericMethod ("setForegroundBrush|foregroundBrush=", "@brief Method void QGraphicsScene::setForegroundBrush(const QBrush &brush)\n", false, &_init_f_setForegroundBrush_1910, &_call_f_setForegroundBrush_1910);
   methods += new qt_gsi::GenericMethod ("setItemIndexMethod|itemIndexMethod=", "@brief Method void QGraphicsScene::setItemIndexMethod(QGraphicsScene::ItemIndexMethod method)\n", false, &_init_f_setItemIndexMethod_3456, &_call_f_setItemIndexMethod_3456);

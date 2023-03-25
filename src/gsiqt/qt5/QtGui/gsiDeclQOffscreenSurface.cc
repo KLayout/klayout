@@ -351,11 +351,11 @@ static gsi::Methods methods_QOffscreenSurface () {
   methods += new qt_gsi::GenericMethod ("destroy|qt_destroy", "@brief Method void QOffscreenSurface::destroy()\n", false, &_init_f_destroy_0, &_call_f_destroy_0);
   methods += new qt_gsi::GenericMethod (":format", "@brief Method QSurfaceFormat QOffscreenSurface::format()\nThis is a reimplementation of QSurface::format", true, &_init_f_format_c0, &_call_f_format_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QOffscreenSurface::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
-  methods += new qt_gsi::GenericMethod ("nativeHandle", "@brief Method void *QOffscreenSurface::nativeHandle()\n", true, &_init_f_nativeHandle_c0, &_call_f_nativeHandle_c0);
+  methods += new qt_gsi::GenericMethod (":nativeHandle", "@brief Method void *QOffscreenSurface::nativeHandle()\n", true, &_init_f_nativeHandle_c0, &_call_f_nativeHandle_c0);
   methods += new qt_gsi::GenericMethod ("requestedFormat", "@brief Method QSurfaceFormat QOffscreenSurface::requestedFormat()\n", true, &_init_f_requestedFormat_c0, &_call_f_requestedFormat_c0);
   methods += new qt_gsi::GenericMethod (":screen", "@brief Method QScreen *QOffscreenSurface::screen()\n", true, &_init_f_screen_c0, &_call_f_screen_c0);
   methods += new qt_gsi::GenericMethod ("setFormat|format=", "@brief Method void QOffscreenSurface::setFormat(const QSurfaceFormat &format)\n", false, &_init_f_setFormat_2724, &_call_f_setFormat_2724);
-  methods += new qt_gsi::GenericMethod ("setNativeHandle", "@brief Method void QOffscreenSurface::setNativeHandle(void *handle)\n", false, &_init_f_setNativeHandle_1056, &_call_f_setNativeHandle_1056);
+  methods += new qt_gsi::GenericMethod ("setNativeHandle|nativeHandle=", "@brief Method void QOffscreenSurface::setNativeHandle(void *handle)\n", false, &_init_f_setNativeHandle_1056, &_call_f_setNativeHandle_1056);
   methods += new qt_gsi::GenericMethod ("setScreen|screen=", "@brief Method void QOffscreenSurface::setScreen(QScreen *screen)\n", false, &_init_f_setScreen_1311, &_call_f_setScreen_1311);
   methods += new qt_gsi::GenericMethod ("size", "@brief Method QSize QOffscreenSurface::size()\nThis is a reimplementation of QSurface::size", true, &_init_f_size_c0, &_call_f_size_c0);
   methods += new qt_gsi::GenericMethod ("surfaceType", "@brief Method QSurface::SurfaceType QOffscreenSurface::surfaceType()\nThis is a reimplementation of QSurface::surfaceType", true, &_init_f_surfaceType_c0, &_call_f_surfaceType_c0);

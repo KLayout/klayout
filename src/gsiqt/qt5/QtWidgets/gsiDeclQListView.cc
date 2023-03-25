@@ -833,7 +833,7 @@ static gsi::Methods methods_QListView () {
   methods += new qt_gsi::GenericMethod ("isRowHidden?", "@brief Method bool QListView::isRowHidden(int row)\n", true, &_init_f_isRowHidden_c767, &_call_f_isRowHidden_c767);
   methods += new qt_gsi::GenericMethod ("isSelectionRectVisible?|:selectionRectVisible", "@brief Method bool QListView::isSelectionRectVisible()\n", true, &_init_f_isSelectionRectVisible_c0, &_call_f_isSelectionRectVisible_c0);
   methods += new qt_gsi::GenericMethod ("isWrapping?|:isWrapping", "@brief Method bool QListView::isWrapping()\n", true, &_init_f_isWrapping_c0, &_call_f_isWrapping_c0);
-  methods += new qt_gsi::GenericMethod ("itemAlignment", "@brief Method QFlags<Qt::AlignmentFlag> QListView::itemAlignment()\n", true, &_init_f_itemAlignment_c0, &_call_f_itemAlignment_c0);
+  methods += new qt_gsi::GenericMethod (":itemAlignment", "@brief Method QFlags<Qt::AlignmentFlag> QListView::itemAlignment()\n", true, &_init_f_itemAlignment_c0, &_call_f_itemAlignment_c0);
   methods += new qt_gsi::GenericMethod (":layoutMode", "@brief Method QListView::LayoutMode QListView::layoutMode()\n", true, &_init_f_layoutMode_c0, &_call_f_layoutMode_c0);
   methods += new qt_gsi::GenericMethod (":modelColumn", "@brief Method int QListView::modelColumn()\n", true, &_init_f_modelColumn_c0, &_call_f_modelColumn_c0);
   methods += new qt_gsi::GenericMethod (":movement", "@brief Method QListView::Movement QListView::movement()\n", true, &_init_f_movement_c0, &_call_f_movement_c0);
@@ -843,7 +843,7 @@ static gsi::Methods methods_QListView () {
   methods += new qt_gsi::GenericMethod ("setBatchSize|batchSize=", "@brief Method void QListView::setBatchSize(int batchSize)\n", false, &_init_f_setBatchSize_767, &_call_f_setBatchSize_767);
   methods += new qt_gsi::GenericMethod ("setFlow|flow=", "@brief Method void QListView::setFlow(QListView::Flow flow)\n", false, &_init_f_setFlow_1864, &_call_f_setFlow_1864);
   methods += new qt_gsi::GenericMethod ("setGridSize|gridSize=", "@brief Method void QListView::setGridSize(const QSize &size)\n", false, &_init_f_setGridSize_1805, &_call_f_setGridSize_1805);
-  methods += new qt_gsi::GenericMethod ("setItemAlignment", "@brief Method void QListView::setItemAlignment(QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_setItemAlignment_2750, &_call_f_setItemAlignment_2750);
+  methods += new qt_gsi::GenericMethod ("setItemAlignment|itemAlignment=", "@brief Method void QListView::setItemAlignment(QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_setItemAlignment_2750, &_call_f_setItemAlignment_2750);
   methods += new qt_gsi::GenericMethod ("setLayoutMode|layoutMode=", "@brief Method void QListView::setLayoutMode(QListView::LayoutMode mode)\n", false, &_init_f_setLayoutMode_2483, &_call_f_setLayoutMode_2483);
   methods += new qt_gsi::GenericMethod ("setModelColumn|modelColumn=", "@brief Method void QListView::setModelColumn(int column)\n", false, &_init_f_setModelColumn_767, &_call_f_setModelColumn_767);
   methods += new qt_gsi::GenericMethod ("setMovement|movement=", "@brief Method void QListView::setMovement(QListView::Movement movement)\n", false, &_init_f_setMovement_2299, &_call_f_setMovement_2299);

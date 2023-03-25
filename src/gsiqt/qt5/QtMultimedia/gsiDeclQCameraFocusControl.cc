@@ -71,26 +71,6 @@ static void _call_f_customFocusPoint_c0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// void QCameraFocusControl::customFocusPointChanged(const QPointF &point)
-
-
-static void _init_f_customFocusPointChanged_1986 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("point");
-  decl->add_arg<const QPointF & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_customFocusPointChanged_1986 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCameraFocusControl *)cls)->customFocusPointChanged (arg1);
-}
-
-
 // QFlags<QCameraFocus::FocusMode> QCameraFocusControl::focusMode()
 
 
@@ -103,26 +83,6 @@ static void _call_f_focusMode_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QFlags<QCameraFocus::FocusMode> > ((QFlags<QCameraFocus::FocusMode>)((QCameraFocusControl *)cls)->focusMode ());
-}
-
-
-// void QCameraFocusControl::focusModeChanged(QFlags<QCameraFocus::FocusMode> mode)
-
-
-static void _init_f_focusModeChanged_3327 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("mode");
-  decl->add_arg<QFlags<QCameraFocus::FocusMode> > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_focusModeChanged_3327 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QFlags<QCameraFocus::FocusMode> arg1 = gsi::arg_reader<QFlags<QCameraFocus::FocusMode> >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCameraFocusControl *)cls)->focusModeChanged (arg1);
 }
 
 
@@ -141,26 +101,6 @@ static void _call_f_focusPointMode_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// void QCameraFocusControl::focusPointModeChanged(QCameraFocus::FocusPointMode mode)
-
-
-static void _init_f_focusPointModeChanged_3153 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("mode");
-  decl->add_arg<const qt_gsi::Converter<QCameraFocus::FocusPointMode>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_focusPointModeChanged_3153 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QCameraFocus::FocusPointMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCameraFocus::FocusPointMode>::target_type & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCameraFocusControl *)cls)->focusPointModeChanged (qt_gsi::QtToCppAdaptor<QCameraFocus::FocusPointMode>(arg1).cref());
-}
-
-
 // QList<QCameraFocusZone> QCameraFocusControl::focusZones()
 
 
@@ -173,22 +113,6 @@ static void _call_f_focusZones_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QList<QCameraFocusZone> > ((QList<QCameraFocusZone>)((QCameraFocusControl *)cls)->focusZones ());
-}
-
-
-// void QCameraFocusControl::focusZonesChanged()
-
-
-static void _init_f_focusZonesChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_focusZonesChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCameraFocusControl *)cls)->focusZonesChanged ();
 }
 
 
@@ -347,18 +271,20 @@ static gsi::Methods methods_QCameraFocusControl () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":customFocusPoint", "@brief Method QPointF QCameraFocusControl::customFocusPoint()\n", true, &_init_f_customFocusPoint_c0, &_call_f_customFocusPoint_c0);
-  methods += new qt_gsi::GenericMethod ("customFocusPointChanged", "@brief Method void QCameraFocusControl::customFocusPointChanged(const QPointF &point)\n", false, &_init_f_customFocusPointChanged_1986, &_call_f_customFocusPointChanged_1986);
   methods += new qt_gsi::GenericMethod (":focusMode", "@brief Method QFlags<QCameraFocus::FocusMode> QCameraFocusControl::focusMode()\n", true, &_init_f_focusMode_c0, &_call_f_focusMode_c0);
-  methods += new qt_gsi::GenericMethod ("focusModeChanged", "@brief Method void QCameraFocusControl::focusModeChanged(QFlags<QCameraFocus::FocusMode> mode)\n", false, &_init_f_focusModeChanged_3327, &_call_f_focusModeChanged_3327);
   methods += new qt_gsi::GenericMethod (":focusPointMode", "@brief Method QCameraFocus::FocusPointMode QCameraFocusControl::focusPointMode()\n", true, &_init_f_focusPointMode_c0, &_call_f_focusPointMode_c0);
-  methods += new qt_gsi::GenericMethod ("focusPointModeChanged", "@brief Method void QCameraFocusControl::focusPointModeChanged(QCameraFocus::FocusPointMode mode)\n", false, &_init_f_focusPointModeChanged_3153, &_call_f_focusPointModeChanged_3153);
   methods += new qt_gsi::GenericMethod ("focusZones", "@brief Method QList<QCameraFocusZone> QCameraFocusControl::focusZones()\n", true, &_init_f_focusZones_c0, &_call_f_focusZones_c0);
-  methods += new qt_gsi::GenericMethod ("focusZonesChanged", "@brief Method void QCameraFocusControl::focusZonesChanged()\n", false, &_init_f_focusZonesChanged_0, &_call_f_focusZonesChanged_0);
   methods += new qt_gsi::GenericMethod ("isFocusModeSupported?", "@brief Method bool QCameraFocusControl::isFocusModeSupported(QFlags<QCameraFocus::FocusMode> mode)\n", true, &_init_f_isFocusModeSupported_c3327, &_call_f_isFocusModeSupported_c3327);
   methods += new qt_gsi::GenericMethod ("isFocusPointModeSupported?", "@brief Method bool QCameraFocusControl::isFocusPointModeSupported(QCameraFocus::FocusPointMode mode)\n", true, &_init_f_isFocusPointModeSupported_c3153, &_call_f_isFocusPointModeSupported_c3153);
   methods += new qt_gsi::GenericMethod ("setCustomFocusPoint|customFocusPoint=", "@brief Method void QCameraFocusControl::setCustomFocusPoint(const QPointF &point)\n", false, &_init_f_setCustomFocusPoint_1986, &_call_f_setCustomFocusPoint_1986);
   methods += new qt_gsi::GenericMethod ("setFocusMode|focusMode=", "@brief Method void QCameraFocusControl::setFocusMode(QFlags<QCameraFocus::FocusMode> mode)\n", false, &_init_f_setFocusMode_3327, &_call_f_setFocusMode_3327);
   methods += new qt_gsi::GenericMethod ("setFocusPointMode|focusPointMode=", "@brief Method void QCameraFocusControl::setFocusPointMode(QCameraFocus::FocusPointMode mode)\n", false, &_init_f_setFocusPointMode_3153, &_call_f_setFocusPointMode_3153);
+  methods += gsi::qt_signal<const QPointF & > ("customFocusPointChanged(const QPointF &)", "customFocusPointChanged", gsi::arg("point"), "@brief Signal declaration for QCameraFocusControl::customFocusPointChanged(const QPointF &point)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QCameraFocusControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QFlags<QCameraFocus::FocusMode> > ("focusModeChanged(QFlags<QCameraFocus::FocusMode>)", "focusModeChanged", gsi::arg("mode"), "@brief Signal declaration for QCameraFocusControl::focusModeChanged(QFlags<QCameraFocus::FocusMode> mode)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QCameraFocus::FocusPointMode>::target_type & > ("focusPointModeChanged(QCameraFocus::FocusPointMode)", "focusPointModeChanged", gsi::arg("mode"), "@brief Signal declaration for QCameraFocusControl::focusPointModeChanged(QCameraFocus::FocusPointMode mode)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("focusZonesChanged()", "focusZonesChanged", "@brief Signal declaration for QCameraFocusControl::focusZonesChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QCameraFocusControl::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QCameraFocusControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QCameraFocusControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -422,6 +348,18 @@ public:
     }
   }
 
+  //  [emitter impl] void QCameraFocusControl::customFocusPointChanged(const QPointF &point)
+  void emitter_QCameraFocusControl_customFocusPointChanged_1986(const QPointF &point)
+  {
+    emit QCameraFocusControl::customFocusPointChanged(point);
+  }
+
+  //  [emitter impl] void QCameraFocusControl::destroyed(QObject *)
+  void emitter_QCameraFocusControl_destroyed_1302(QObject *arg1)
+  {
+    emit QCameraFocusControl::destroyed(arg1);
+  }
+
   //  [adaptor impl] bool QCameraFocusControl::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -467,6 +405,12 @@ public:
     }
   }
 
+  //  [emitter impl] void QCameraFocusControl::focusModeChanged(QFlags<QCameraFocus::FocusMode> mode)
+  void emitter_QCameraFocusControl_focusModeChanged_3327(QFlags<QCameraFocus::FocusMode> mode)
+  {
+    emit QCameraFocusControl::focusModeChanged(mode);
+  }
+
   //  [adaptor impl] QCameraFocus::FocusPointMode QCameraFocusControl::focusPointMode()
   qt_gsi::Converter<QCameraFocus::FocusPointMode>::target_type cbs_focusPointMode_c0_0() const
   {
@@ -482,6 +426,12 @@ public:
     }
   }
 
+  //  [emitter impl] void QCameraFocusControl::focusPointModeChanged(QCameraFocus::FocusPointMode mode)
+  void emitter_QCameraFocusControl_focusPointModeChanged_3153(QCameraFocus::FocusPointMode mode)
+  {
+    emit QCameraFocusControl::focusPointModeChanged(mode);
+  }
+
   //  [adaptor impl] QList<QCameraFocusZone> QCameraFocusControl::focusZones()
   QList<QCameraFocusZone> cbs_focusZones_c0_0() const
   {
@@ -495,6 +445,12 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("focusZones");
     }
+  }
+
+  //  [emitter impl] void QCameraFocusControl::focusZonesChanged()
+  void emitter_QCameraFocusControl_focusZonesChanged_0()
+  {
+    emit QCameraFocusControl::focusZonesChanged();
   }
 
   //  [adaptor impl] bool QCameraFocusControl::isFocusModeSupported(QFlags<QCameraFocus::FocusMode> mode)
@@ -527,6 +483,13 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("isFocusPointModeSupported");
     }
+  }
+
+  //  [emitter impl] void QCameraFocusControl::objectNameChanged(const QString &objectName)
+  void emitter_QCameraFocusControl_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QCameraFocusControl::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QCameraFocusControl::setCustomFocusPoint(const QPointF &point)
@@ -737,6 +700,42 @@ static void _set_callback_cbs_customFocusPoint_c0_0 (void *cls, const gsi::Callb
 }
 
 
+// emitter void QCameraFocusControl::customFocusPointChanged(const QPointF &point)
+
+static void _init_emitter_customFocusPointChanged_1986 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("point");
+  decl->add_arg<const QPointF & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_customFocusPointChanged_1986 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  ((QCameraFocusControl_Adaptor *)cls)->emitter_QCameraFocusControl_customFocusPointChanged_1986 (arg1);
+}
+
+
+// emitter void QCameraFocusControl::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QCameraFocusControl_Adaptor *)cls)->emitter_QCameraFocusControl_destroyed_1302 (arg1);
+}
+
+
 // void QCameraFocusControl::disconnectNotify(const QMetaMethod &signal)
 
 static void _init_cbs_disconnectNotify_2394_0 (qt_gsi::GenericMethod *decl)
@@ -829,6 +828,24 @@ static void _set_callback_cbs_focusMode_c0_0 (void *cls, const gsi::Callback &cb
 }
 
 
+// emitter void QCameraFocusControl::focusModeChanged(QFlags<QCameraFocus::FocusMode> mode)
+
+static void _init_emitter_focusModeChanged_3327 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("mode");
+  decl->add_arg<QFlags<QCameraFocus::FocusMode> > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_focusModeChanged_3327 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QFlags<QCameraFocus::FocusMode> arg1 = gsi::arg_reader<QFlags<QCameraFocus::FocusMode> >() (args, heap);
+  ((QCameraFocusControl_Adaptor *)cls)->emitter_QCameraFocusControl_focusModeChanged_3327 (arg1);
+}
+
+
 // QCameraFocus::FocusPointMode QCameraFocusControl::focusPointMode()
 
 static void _init_cbs_focusPointMode_c0_0 (qt_gsi::GenericMethod *decl)
@@ -848,6 +865,24 @@ static void _set_callback_cbs_focusPointMode_c0_0 (void *cls, const gsi::Callbac
 }
 
 
+// emitter void QCameraFocusControl::focusPointModeChanged(QCameraFocus::FocusPointMode mode)
+
+static void _init_emitter_focusPointModeChanged_3153 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("mode");
+  decl->add_arg<const qt_gsi::Converter<QCameraFocus::FocusPointMode>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_focusPointModeChanged_3153 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QCameraFocus::FocusPointMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCameraFocus::FocusPointMode>::target_type & >() (args, heap);
+  ((QCameraFocusControl_Adaptor *)cls)->emitter_QCameraFocusControl_focusPointModeChanged_3153 (arg1);
+}
+
+
 // QList<QCameraFocusZone> QCameraFocusControl::focusZones()
 
 static void _init_cbs_focusZones_c0_0 (qt_gsi::GenericMethod *decl)
@@ -864,6 +899,20 @@ static void _call_cbs_focusZones_c0_0 (const qt_gsi::GenericMethod * /*decl*/, v
 static void _set_callback_cbs_focusZones_c0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QCameraFocusControl_Adaptor *)cls)->cb_focusZones_c0_0 = cb;
+}
+
+
+// emitter void QCameraFocusControl::focusZonesChanged()
+
+static void _init_emitter_focusZonesChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_focusZonesChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QCameraFocusControl_Adaptor *)cls)->emitter_QCameraFocusControl_focusZonesChanged_0 ();
 }
 
 
@@ -928,6 +977,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
   tl::Heap heap;
   const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QCameraFocusControl_Adaptor *)cls)->fp_QCameraFocusControl_isSignalConnected_c2394 (arg1));
+}
+
+
+// emitter void QCameraFocusControl::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QCameraFocusControl_Adaptor *)cls)->emitter_QCameraFocusControl_objectNameChanged_4567 (arg1);
 }
 
 
@@ -1087,6 +1154,8 @@ static gsi::Methods methods_QCameraFocusControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("customFocusPoint", "@brief Virtual method QPointF QCameraFocusControl::customFocusPoint()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_customFocusPoint_c0_0, &_call_cbs_customFocusPoint_c0_0);
   methods += new qt_gsi::GenericMethod ("customFocusPoint", "@hide", true, &_init_cbs_customFocusPoint_c0_0, &_call_cbs_customFocusPoint_c0_0, &_set_callback_cbs_customFocusPoint_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_customFocusPointChanged", "@brief Emitter for signal void QCameraFocusControl::customFocusPointChanged(const QPointF &point)\nCall this method to emit this signal.", false, &_init_emitter_customFocusPointChanged_1986, &_call_emitter_customFocusPointChanged_1986);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QCameraFocusControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QCameraFocusControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QCameraFocusControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
@@ -1095,15 +1164,19 @@ static gsi::Methods methods_QCameraFocusControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("focusMode", "@brief Virtual method QFlags<QCameraFocus::FocusMode> QCameraFocusControl::focusMode()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_focusMode_c0_0, &_call_cbs_focusMode_c0_0);
   methods += new qt_gsi::GenericMethod ("focusMode", "@hide", true, &_init_cbs_focusMode_c0_0, &_call_cbs_focusMode_c0_0, &_set_callback_cbs_focusMode_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_focusModeChanged", "@brief Emitter for signal void QCameraFocusControl::focusModeChanged(QFlags<QCameraFocus::FocusMode> mode)\nCall this method to emit this signal.", false, &_init_emitter_focusModeChanged_3327, &_call_emitter_focusModeChanged_3327);
   methods += new qt_gsi::GenericMethod ("focusPointMode", "@brief Virtual method QCameraFocus::FocusPointMode QCameraFocusControl::focusPointMode()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_focusPointMode_c0_0, &_call_cbs_focusPointMode_c0_0);
   methods += new qt_gsi::GenericMethod ("focusPointMode", "@hide", true, &_init_cbs_focusPointMode_c0_0, &_call_cbs_focusPointMode_c0_0, &_set_callback_cbs_focusPointMode_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_focusPointModeChanged", "@brief Emitter for signal void QCameraFocusControl::focusPointModeChanged(QCameraFocus::FocusPointMode mode)\nCall this method to emit this signal.", false, &_init_emitter_focusPointModeChanged_3153, &_call_emitter_focusPointModeChanged_3153);
   methods += new qt_gsi::GenericMethod ("focusZones", "@brief Virtual method QList<QCameraFocusZone> QCameraFocusControl::focusZones()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_focusZones_c0_0, &_call_cbs_focusZones_c0_0);
   methods += new qt_gsi::GenericMethod ("focusZones", "@hide", true, &_init_cbs_focusZones_c0_0, &_call_cbs_focusZones_c0_0, &_set_callback_cbs_focusZones_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_focusZonesChanged", "@brief Emitter for signal void QCameraFocusControl::focusZonesChanged()\nCall this method to emit this signal.", false, &_init_emitter_focusZonesChanged_0, &_call_emitter_focusZonesChanged_0);
   methods += new qt_gsi::GenericMethod ("isFocusModeSupported", "@brief Virtual method bool QCameraFocusControl::isFocusModeSupported(QFlags<QCameraFocus::FocusMode> mode)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isFocusModeSupported_c3327_0, &_call_cbs_isFocusModeSupported_c3327_0);
   methods += new qt_gsi::GenericMethod ("isFocusModeSupported", "@hide", true, &_init_cbs_isFocusModeSupported_c3327_0, &_call_cbs_isFocusModeSupported_c3327_0, &_set_callback_cbs_isFocusModeSupported_c3327_0);
   methods += new qt_gsi::GenericMethod ("isFocusPointModeSupported", "@brief Virtual method bool QCameraFocusControl::isFocusPointModeSupported(QCameraFocus::FocusPointMode mode)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isFocusPointModeSupported_c3153_0, &_call_cbs_isFocusPointModeSupported_c3153_0);
   methods += new qt_gsi::GenericMethod ("isFocusPointModeSupported", "@hide", true, &_init_cbs_isFocusPointModeSupported_c3153_0, &_call_cbs_isFocusPointModeSupported_c3153_0, &_set_callback_cbs_isFocusPointModeSupported_c3153_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QCameraFocusControl::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QCameraFocusControl::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QCameraFocusControl::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QCameraFocusControl::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QCameraFocusControl::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);

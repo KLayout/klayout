@@ -522,7 +522,7 @@ static gsi::Methods methods_QTextBrowser () {
   methods += new qt_gsi::GenericMethod ("setSearchPaths|searchPaths=", "@brief Method void QTextBrowser::setSearchPaths(const QStringList &paths)\n", false, &_init_f_setSearchPaths_2437, &_call_f_setSearchPaths_2437);
   methods += new qt_gsi::GenericMethod ("setSource", "@brief Method void QTextBrowser::setSource(const QUrl &name, QTextDocument::ResourceType type)\n", false, &_init_f_setSource_4736, &_call_f_setSource_4736);
   methods += new qt_gsi::GenericMethod (":source", "@brief Method QUrl QTextBrowser::source()\n", true, &_init_f_source_c0, &_call_f_source_c0);
-  methods += new qt_gsi::GenericMethod ("sourceType", "@brief Method QTextDocument::ResourceType QTextBrowser::sourceType()\n", true, &_init_f_sourceType_c0, &_call_f_sourceType_c0);
+  methods += new qt_gsi::GenericMethod (":sourceType", "@brief Method QTextDocument::ResourceType QTextBrowser::sourceType()\n", true, &_init_f_sourceType_c0, &_call_f_sourceType_c0);
   methods += gsi::qt_signal<const QUrl & > ("anchorClicked(const QUrl &)", "anchorClicked", gsi::arg("arg1"), "@brief Signal declaration for QTextBrowser::anchorClicked(const QUrl &)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("backwardAvailable(bool)", "backwardAvailable", gsi::arg("arg1"), "@brief Signal declaration for QTextBrowser::backwardAvailable(bool)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("copyAvailable(bool)", "copyAvailable", gsi::arg("b"), "@brief Signal declaration for QTextBrowser::copyAvailable(bool b)\nYou can bind a procedure to this signal.");

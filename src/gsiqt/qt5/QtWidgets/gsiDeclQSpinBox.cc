@@ -486,11 +486,11 @@ static gsi::Methods methods_QSpinBox () {
   methods += new qt_gsi::GenericMethod ("setPrefix|prefix=", "@brief Method void QSpinBox::setPrefix(const QString &prefix)\n", false, &_init_f_setPrefix_2025, &_call_f_setPrefix_2025);
   methods += new qt_gsi::GenericMethod ("setRange", "@brief Method void QSpinBox::setRange(int min, int max)\n", false, &_init_f_setRange_1426, &_call_f_setRange_1426);
   methods += new qt_gsi::GenericMethod ("setSingleStep|singleStep=", "@brief Method void QSpinBox::setSingleStep(int val)\n", false, &_init_f_setSingleStep_767, &_call_f_setSingleStep_767);
-  methods += new qt_gsi::GenericMethod ("setStepType", "@brief Method void QSpinBox::setStepType(QAbstractSpinBox::StepType stepType)\n", false, &_init_f_setStepType_2990, &_call_f_setStepType_2990);
+  methods += new qt_gsi::GenericMethod ("setStepType|stepType=", "@brief Method void QSpinBox::setStepType(QAbstractSpinBox::StepType stepType)\n", false, &_init_f_setStepType_2990, &_call_f_setStepType_2990);
   methods += new qt_gsi::GenericMethod ("setSuffix|suffix=", "@brief Method void QSpinBox::setSuffix(const QString &suffix)\n", false, &_init_f_setSuffix_2025, &_call_f_setSuffix_2025);
   methods += new qt_gsi::GenericMethod ("setValue|value=", "@brief Method void QSpinBox::setValue(int val)\n", false, &_init_f_setValue_767, &_call_f_setValue_767);
   methods += new qt_gsi::GenericMethod (":singleStep", "@brief Method int QSpinBox::singleStep()\n", true, &_init_f_singleStep_c0, &_call_f_singleStep_c0);
-  methods += new qt_gsi::GenericMethod ("stepType", "@brief Method QAbstractSpinBox::StepType QSpinBox::stepType()\n", true, &_init_f_stepType_c0, &_call_f_stepType_c0);
+  methods += new qt_gsi::GenericMethod (":stepType", "@brief Method QAbstractSpinBox::StepType QSpinBox::stepType()\n", true, &_init_f_stepType_c0, &_call_f_stepType_c0);
   methods += new qt_gsi::GenericMethod (":suffix", "@brief Method QString QSpinBox::suffix()\n", true, &_init_f_suffix_c0, &_call_f_suffix_c0);
   methods += new qt_gsi::GenericMethod (":value", "@brief Method int QSpinBox::value()\n", true, &_init_f_value_c0, &_call_f_value_c0);
   methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QSpinBox::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");

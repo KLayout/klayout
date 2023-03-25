@@ -259,6 +259,8 @@ static gsi::Methods methods_QAbstractAudioDeviceInfo () {
   methods += new qt_gsi::GenericMethod ("supportedSampleRates", "@brief Method QList<int> QAbstractAudioDeviceInfo::supportedSampleRates()\n", false, &_init_f_supportedSampleRates_0, &_call_f_supportedSampleRates_0);
   methods += new qt_gsi::GenericMethod ("supportedSampleSizes", "@brief Method QList<int> QAbstractAudioDeviceInfo::supportedSampleSizes()\n", false, &_init_f_supportedSampleSizes_0, &_call_f_supportedSampleSizes_0);
   methods += new qt_gsi::GenericMethod ("supportedSampleTypes", "@brief Method QList<QAudioFormat::SampleType> QAbstractAudioDeviceInfo::supportedSampleTypes()\n", false, &_init_f_supportedSampleTypes_0, &_call_f_supportedSampleTypes_0);
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAbstractAudioDeviceInfo::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QAbstractAudioDeviceInfo::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QAbstractAudioDeviceInfo::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QAbstractAudioDeviceInfo::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -305,6 +307,12 @@ public:
   //  [expose] int QAbstractAudioDeviceInfo::senderSignalIndex()
   int fp_QAbstractAudioDeviceInfo_senderSignalIndex_c0 () const {
     return QAbstractAudioDeviceInfo::senderSignalIndex();
+  }
+
+  //  [emitter impl] void QAbstractAudioDeviceInfo::destroyed(QObject *)
+  void emitter_QAbstractAudioDeviceInfo_destroyed_1302(QObject *arg1)
+  {
+    emit QAbstractAudioDeviceInfo::destroyed(arg1);
   }
 
   //  [adaptor impl] QString QAbstractAudioDeviceInfo::deviceName()
@@ -366,6 +374,13 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("isFormatSupported");
     }
+  }
+
+  //  [emitter impl] void QAbstractAudioDeviceInfo::objectNameChanged(const QString &objectName)
+  void emitter_QAbstractAudioDeviceInfo_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QAbstractAudioDeviceInfo::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] QAudioFormat QAbstractAudioDeviceInfo::preferredFormat()
@@ -614,6 +629,24 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QAbstractAudioDeviceInfo::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QAbstractAudioDeviceInfo_Adaptor *)cls)->emitter_QAbstractAudioDeviceInfo_destroyed_1302 (arg1);
+}
+
+
 // QString QAbstractAudioDeviceInfo::deviceName()
 
 static void _init_cbs_deviceName_c0_0 (qt_gsi::GenericMethod *decl)
@@ -744,6 +777,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
   tl::Heap heap;
   const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QAbstractAudioDeviceInfo_Adaptor *)cls)->fp_QAbstractAudioDeviceInfo_isSignalConnected_c2394 (arg1));
+}
+
+
+// emitter void QAbstractAudioDeviceInfo::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QAbstractAudioDeviceInfo_Adaptor *)cls)->emitter_QAbstractAudioDeviceInfo_objectNameChanged_4567 (arg1);
 }
 
 
@@ -962,6 +1013,7 @@ static gsi::Methods methods_QAbstractAudioDeviceInfo_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAbstractAudioDeviceInfo::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QAbstractAudioDeviceInfo::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("deviceName", "@brief Virtual method QString QAbstractAudioDeviceInfo::deviceName()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_deviceName_c0_0, &_call_cbs_deviceName_c0_0);
   methods += new qt_gsi::GenericMethod ("deviceName", "@hide", true, &_init_cbs_deviceName_c0_0, &_call_cbs_deviceName_c0_0, &_set_callback_cbs_deviceName_c0_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QAbstractAudioDeviceInfo::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
@@ -973,6 +1025,7 @@ static gsi::Methods methods_QAbstractAudioDeviceInfo_Adaptor () {
   methods += new qt_gsi::GenericMethod ("isFormatSupported", "@brief Virtual method bool QAbstractAudioDeviceInfo::isFormatSupported(const QAudioFormat &format)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isFormatSupported_c2509_0, &_call_cbs_isFormatSupported_c2509_0);
   methods += new qt_gsi::GenericMethod ("isFormatSupported", "@hide", true, &_init_cbs_isFormatSupported_c2509_0, &_call_cbs_isFormatSupported_c2509_0, &_set_callback_cbs_isFormatSupported_c2509_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QAbstractAudioDeviceInfo::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QAbstractAudioDeviceInfo::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("preferredFormat", "@brief Virtual method QAudioFormat QAbstractAudioDeviceInfo::preferredFormat()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_preferredFormat_c0_0, &_call_cbs_preferredFormat_c0_0);
   methods += new qt_gsi::GenericMethod ("preferredFormat", "@hide", true, &_init_cbs_preferredFormat_c0_0, &_call_cbs_preferredFormat_c0_0, &_set_callback_cbs_preferredFormat_c0_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QAbstractAudioDeviceInfo::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);

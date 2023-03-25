@@ -398,9 +398,9 @@ static gsi::Methods methods_QPointerEvent () {
   methods += new qt_gsi::GenericMethod ("pointingDevice", "@brief Method const QPointingDevice *QPointerEvent::pointingDevice()\n", true, &_init_f_pointingDevice_c0, &_call_f_pointingDevice_c0);
   methods += new qt_gsi::GenericMethod ("points", "@brief Method const QList<QEventPoint> &QPointerEvent::points()\n", true, &_init_f_points_c0, &_call_f_points_c0);
   methods += new qt_gsi::GenericMethod ("removePassiveGrabber", "@brief Method bool QPointerEvent::removePassiveGrabber(const QEventPoint &point, QObject *grabber)\n", false, &_init_f_removePassiveGrabber_3624, &_call_f_removePassiveGrabber_3624);
-  methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Method void QPointerEvent::setAccepted(bool accepted)\nThis is a reimplementation of QEvent::setAccepted", false, &_init_f_setAccepted_864, &_call_f_setAccepted_864);
+  methods += new qt_gsi::GenericMethod ("setAccepted|accepted=", "@brief Method void QPointerEvent::setAccepted(bool accepted)\nThis is a reimplementation of QEvent::setAccepted", false, &_init_f_setAccepted_864, &_call_f_setAccepted_864);
   methods += new qt_gsi::GenericMethod ("setExclusiveGrabber", "@brief Method void QPointerEvent::setExclusiveGrabber(const QEventPoint &point, QObject *exclusiveGrabber)\n", false, &_init_f_setExclusiveGrabber_3624, &_call_f_setExclusiveGrabber_3624);
-  methods += new qt_gsi::GenericMethod ("setTimestamp", "@brief Method void QPointerEvent::setTimestamp(quint64 timestamp)\nThis is a reimplementation of QInputEvent::setTimestamp", false, &_init_f_setTimestamp_1103, &_call_f_setTimestamp_1103);
+  methods += new qt_gsi::GenericMethod ("setTimestamp|timestamp=", "@brief Method void QPointerEvent::setTimestamp(quint64 timestamp)\nThis is a reimplementation of QInputEvent::setTimestamp", false, &_init_f_setTimestamp_1103, &_call_f_setTimestamp_1103);
   return methods;
 }
 

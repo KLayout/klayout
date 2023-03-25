@@ -2081,7 +2081,7 @@ static gsi::Methods methods_QWindow () {
   methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method void QWindow::setVisible(bool visible)\n", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
   methods += new qt_gsi::GenericMethod ("setWidth|width=", "@brief Method void QWindow::setWidth(int arg)\n", false, &_init_f_setWidth_767, &_call_f_setWidth_767);
   methods += new qt_gsi::GenericMethod ("setWindowState|windowState=", "@brief Method void QWindow::setWindowState(Qt::WindowState state)\n", false, &_init_f_setWindowState_1894, &_call_f_setWindowState_1894);
-  methods += new qt_gsi::GenericMethod ("setWindowStates", "@brief Method void QWindow::setWindowStates(QFlags<Qt::WindowState> states)\n", false, &_init_f_setWindowStates_2590, &_call_f_setWindowStates_2590);
+  methods += new qt_gsi::GenericMethod ("setWindowStates|windowStates=", "@brief Method void QWindow::setWindowStates(QFlags<Qt::WindowState> states)\n", false, &_init_f_setWindowStates_2590, &_call_f_setWindowStates_2590);
   methods += new qt_gsi::GenericMethod ("setX|x=", "@brief Method void QWindow::setX(int arg)\n", false, &_init_f_setX_767, &_call_f_setX_767);
   methods += new qt_gsi::GenericMethod ("setY|y=", "@brief Method void QWindow::setY(int arg)\n", false, &_init_f_setY_767, &_call_f_setY_767);
   methods += new qt_gsi::GenericMethod ("show", "@brief Method void QWindow::show()\n", false, &_init_f_show_0, &_call_f_show_0);
@@ -2100,7 +2100,7 @@ static gsi::Methods methods_QWindow () {
   methods += new qt_gsi::GenericMethod (":width", "@brief Method int QWindow::width()\n", true, &_init_f_width_c0, &_call_f_width_c0);
   methods += new qt_gsi::GenericMethod ("winId", "@brief Method WId QWindow::winId()\n", true, &_init_f_winId_c0, &_call_f_winId_c0);
   methods += new qt_gsi::GenericMethod (":windowState", "@brief Method Qt::WindowState QWindow::windowState()\n", true, &_init_f_windowState_c0, &_call_f_windowState_c0);
-  methods += new qt_gsi::GenericMethod ("windowStates", "@brief Method QFlags<Qt::WindowState> QWindow::windowStates()\n", true, &_init_f_windowStates_c0, &_call_f_windowStates_c0);
+  methods += new qt_gsi::GenericMethod (":windowStates", "@brief Method QFlags<Qt::WindowState> QWindow::windowStates()\n", true, &_init_f_windowStates_c0, &_call_f_windowStates_c0);
   methods += new qt_gsi::GenericMethod (":x", "@brief Method int QWindow::x()\n", true, &_init_f_x_c0, &_call_f_x_c0);
   methods += new qt_gsi::GenericMethod (":y", "@brief Method int QWindow::y()\n", true, &_init_f_y_c0, &_call_f_y_c0);
   methods += gsi::qt_signal ("activeChanged()", "activeChanged", "@brief Signal declaration for QWindow::activeChanged()\nYou can bind a procedure to this signal.");

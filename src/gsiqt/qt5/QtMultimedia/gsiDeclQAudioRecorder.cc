@@ -74,26 +74,6 @@ static void _call_f_audioInput_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// void QAudioRecorder::audioInputChanged(const QString &name)
-
-
-static void _init_f_audioInputChanged_2025 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("name");
-  decl->add_arg<const QString & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_audioInputChanged_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAudioRecorder *)cls)->audioInputChanged (arg1);
-}
-
-
 // QString QAudioRecorder::audioInputDescription(const QString &name)
 
 
@@ -125,22 +105,6 @@ static void _call_f_audioInputs_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QStringList > ((QStringList)((QAudioRecorder *)cls)->audioInputs ());
-}
-
-
-// void QAudioRecorder::availableAudioInputsChanged()
-
-
-static void _init_f_availableAudioInputsChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_availableAudioInputsChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAudioRecorder *)cls)->availableAudioInputsChanged ();
 }
 
 
@@ -236,12 +200,27 @@ static gsi::Methods methods_QAudioRecorder () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":audioInput", "@brief Method QString QAudioRecorder::audioInput()\n", true, &_init_f_audioInput_c0, &_call_f_audioInput_c0);
-  methods += new qt_gsi::GenericMethod ("audioInputChanged", "@brief Method void QAudioRecorder::audioInputChanged(const QString &name)\n", false, &_init_f_audioInputChanged_2025, &_call_f_audioInputChanged_2025);
   methods += new qt_gsi::GenericMethod ("audioInputDescription", "@brief Method QString QAudioRecorder::audioInputDescription(const QString &name)\n", true, &_init_f_audioInputDescription_c2025, &_call_f_audioInputDescription_c2025);
   methods += new qt_gsi::GenericMethod ("audioInputs", "@brief Method QStringList QAudioRecorder::audioInputs()\n", true, &_init_f_audioInputs_c0, &_call_f_audioInputs_c0);
-  methods += new qt_gsi::GenericMethod ("availableAudioInputsChanged", "@brief Method void QAudioRecorder::availableAudioInputsChanged()\n", false, &_init_f_availableAudioInputsChanged_0, &_call_f_availableAudioInputsChanged_0);
   methods += new qt_gsi::GenericMethod ("defaultAudioInput", "@brief Method QString QAudioRecorder::defaultAudioInput()\n", true, &_init_f_defaultAudioInput_c0, &_call_f_defaultAudioInput_c0);
   methods += new qt_gsi::GenericMethod ("setAudioInput|audioInput=", "@brief Method void QAudioRecorder::setAudioInput(const QString &name)\n", false, &_init_f_setAudioInput_2025, &_call_f_setAudioInput_2025);
+  methods += gsi::qt_signal<const QUrl & > ("actualLocationChanged(const QUrl &)", "actualLocationChanged", gsi::arg("location"), "@brief Signal declaration for QAudioRecorder::actualLocationChanged(const QUrl &location)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("audioInputChanged(const QString &)", "audioInputChanged", gsi::arg("name"), "@brief Signal declaration for QAudioRecorder::audioInputChanged(const QString &name)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("availabilityChanged(bool)", "availabilityChanged_bool", gsi::arg("available"), "@brief Signal declaration for QAudioRecorder::availabilityChanged(bool available)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & > ("availabilityChanged(QMultimedia::AvailabilityStatus)", "availabilityChanged_status", gsi::arg("availability"), "@brief Signal declaration for QAudioRecorder::availabilityChanged(QMultimedia::AvailabilityStatus availability)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("availableAudioInputsChanged()", "availableAudioInputsChanged", "@brief Signal declaration for QAudioRecorder::availableAudioInputsChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAudioRecorder::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<qint64 > ("durationChanged(qint64)", "durationChanged", gsi::arg("duration"), "@brief Signal declaration for QAudioRecorder::durationChanged(qint64 duration)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QMediaRecorder::Error>::target_type & > ("error(QMediaRecorder::Error)", "error", gsi::arg("error"), "@brief Signal declaration for QAudioRecorder::error(QMediaRecorder::Error error)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("metaDataAvailableChanged(bool)", "metaDataAvailableChanged", gsi::arg("available"), "@brief Signal declaration for QAudioRecorder::metaDataAvailableChanged(bool available)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("metaDataChanged()", "metaDataChanged", "@brief Signal declaration for QAudioRecorder::metaDataChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString &, const QVariant & > ("metaDataChanged(const QString &, const QVariant &)", "metaDataChanged_kv", gsi::arg("key"), gsi::arg("value"), "@brief Signal declaration for QAudioRecorder::metaDataChanged(const QString &key, const QVariant &value)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("metaDataWritableChanged(bool)", "metaDataWritableChanged", gsi::arg("writable"), "@brief Signal declaration for QAudioRecorder::metaDataWritableChanged(bool writable)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("mutedChanged(bool)", "mutedChanged", gsi::arg("muted"), "@brief Signal declaration for QAudioRecorder::mutedChanged(bool muted)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QAudioRecorder::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QMediaRecorder::State>::target_type & > ("stateChanged(QMediaRecorder::State)", "stateChanged", gsi::arg("state"), "@brief Signal declaration for QAudioRecorder::stateChanged(QMediaRecorder::State state)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QMediaRecorder::Status>::target_type & > ("statusChanged(QMediaRecorder::Status)", "statusChanged", gsi::arg("status"), "@brief Signal declaration for QAudioRecorder::statusChanged(QMediaRecorder::Status status)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<double > ("volumeChanged(double)", "volumeChanged", gsi::arg("volume"), "@brief Signal declaration for QAudioRecorder::volumeChanged(double volume)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QAudioRecorder::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QAudioRecorder::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -296,6 +275,54 @@ public:
     return QAudioRecorder::senderSignalIndex();
   }
 
+  //  [emitter impl] void QAudioRecorder::actualLocationChanged(const QUrl &location)
+  void emitter_QAudioRecorder_actualLocationChanged_1701(const QUrl &location)
+  {
+    emit QAudioRecorder::actualLocationChanged(location);
+  }
+
+  //  [emitter impl] void QAudioRecorder::audioInputChanged(const QString &name)
+  void emitter_QAudioRecorder_audioInputChanged_2025(const QString &name)
+  {
+    emit QAudioRecorder::audioInputChanged(name);
+  }
+
+  //  [emitter impl] void QAudioRecorder::availabilityChanged(bool available)
+  void emitter_QAudioRecorder_availabilityChanged_864(bool available)
+  {
+    emit QAudioRecorder::availabilityChanged(available);
+  }
+
+  //  [emitter impl] void QAudioRecorder::availabilityChanged(QMultimedia::AvailabilityStatus availability)
+  void emitter_QAudioRecorder_availabilityChanged_3555(QMultimedia::AvailabilityStatus availability)
+  {
+    emit QAudioRecorder::availabilityChanged(availability);
+  }
+
+  //  [emitter impl] void QAudioRecorder::availableAudioInputsChanged()
+  void emitter_QAudioRecorder_availableAudioInputsChanged_0()
+  {
+    emit QAudioRecorder::availableAudioInputsChanged();
+  }
+
+  //  [emitter impl] void QAudioRecorder::destroyed(QObject *)
+  void emitter_QAudioRecorder_destroyed_1302(QObject *arg1)
+  {
+    emit QAudioRecorder::destroyed(arg1);
+  }
+
+  //  [emitter impl] void QAudioRecorder::durationChanged(qint64 duration)
+  void emitter_QAudioRecorder_durationChanged_986(qint64 duration)
+  {
+    emit QAudioRecorder::durationChanged(duration);
+  }
+
+  //  [emitter impl] void QAudioRecorder::error(QMediaRecorder::Error error)
+  void emitter_QAudioRecorder_error_2457(QMediaRecorder::Error _error)
+  {
+    emit QAudioRecorder::error(_error);
+  }
+
   //  [adaptor impl] bool QAudioRecorder::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -339,6 +366,61 @@ public:
     } else {
       return QAudioRecorder::mediaObject();
     }
+  }
+
+  //  [emitter impl] void QAudioRecorder::metaDataAvailableChanged(bool available)
+  void emitter_QAudioRecorder_metaDataAvailableChanged_864(bool available)
+  {
+    emit QAudioRecorder::metaDataAvailableChanged(available);
+  }
+
+  //  [emitter impl] void QAudioRecorder::metaDataChanged()
+  void emitter_QAudioRecorder_metaDataChanged_0()
+  {
+    emit QAudioRecorder::metaDataChanged();
+  }
+
+  //  [emitter impl] void QAudioRecorder::metaDataChanged(const QString &key, const QVariant &value)
+  void emitter_QAudioRecorder_metaDataChanged_4036(const QString &key, const QVariant &value)
+  {
+    emit QAudioRecorder::metaDataChanged(key, value);
+  }
+
+  //  [emitter impl] void QAudioRecorder::metaDataWritableChanged(bool writable)
+  void emitter_QAudioRecorder_metaDataWritableChanged_864(bool writable)
+  {
+    emit QAudioRecorder::metaDataWritableChanged(writable);
+  }
+
+  //  [emitter impl] void QAudioRecorder::mutedChanged(bool muted)
+  void emitter_QAudioRecorder_mutedChanged_864(bool muted)
+  {
+    emit QAudioRecorder::mutedChanged(muted);
+  }
+
+  //  [emitter impl] void QAudioRecorder::objectNameChanged(const QString &objectName)
+  void emitter_QAudioRecorder_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QAudioRecorder::objectNameChanged(const QString &objectName)'");
+  }
+
+  //  [emitter impl] void QAudioRecorder::stateChanged(QMediaRecorder::State state)
+  void emitter_QAudioRecorder_stateChanged_2448(QMediaRecorder::State state)
+  {
+    emit QAudioRecorder::stateChanged(state);
+  }
+
+  //  [emitter impl] void QAudioRecorder::statusChanged(QMediaRecorder::Status status)
+  void emitter_QAudioRecorder_statusChanged_2579(QMediaRecorder::Status status)
+  {
+    emit QAudioRecorder::statusChanged(status);
+  }
+
+  //  [emitter impl] void QAudioRecorder::volumeChanged(double volume)
+  void emitter_QAudioRecorder_volumeChanged_1071(double volume)
+  {
+    emit QAudioRecorder::volumeChanged(volume);
   }
 
   //  [adaptor impl] void QAudioRecorder::childEvent(QChildEvent *event)
@@ -446,6 +528,92 @@ static void _call_ctor_QAudioRecorder_Adaptor_1302 (const qt_gsi::GenericStaticM
 }
 
 
+// emitter void QAudioRecorder::actualLocationChanged(const QUrl &location)
+
+static void _init_emitter_actualLocationChanged_1701 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("location");
+  decl->add_arg<const QUrl & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_actualLocationChanged_1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
+  ((QAudioRecorder_Adaptor *)cls)->emitter_QAudioRecorder_actualLocationChanged_1701 (arg1);
+}
+
+
+// emitter void QAudioRecorder::audioInputChanged(const QString &name)
+
+static void _init_emitter_audioInputChanged_2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("name");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_audioInputChanged_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QAudioRecorder_Adaptor *)cls)->emitter_QAudioRecorder_audioInputChanged_2025 (arg1);
+}
+
+
+// emitter void QAudioRecorder::availabilityChanged(bool available)
+
+static void _init_emitter_availabilityChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("available");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_availabilityChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QAudioRecorder_Adaptor *)cls)->emitter_QAudioRecorder_availabilityChanged_864 (arg1);
+}
+
+
+// emitter void QAudioRecorder::availabilityChanged(QMultimedia::AvailabilityStatus availability)
+
+static void _init_emitter_availabilityChanged_3555 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("availability");
+  decl->add_arg<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_availabilityChanged_3555 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & >() (args, heap);
+  ((QAudioRecorder_Adaptor *)cls)->emitter_QAudioRecorder_availabilityChanged_3555 (arg1);
+}
+
+
+// emitter void QAudioRecorder::availableAudioInputsChanged()
+
+static void _init_emitter_availableAudioInputsChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_availableAudioInputsChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QAudioRecorder_Adaptor *)cls)->emitter_QAudioRecorder_availableAudioInputsChanged_0 ();
+}
+
+
 // void QAudioRecorder::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
@@ -494,6 +662,24 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QAudioRecorder::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QAudioRecorder_Adaptor *)cls)->emitter_QAudioRecorder_destroyed_1302 (arg1);
+}
+
+
 // void QAudioRecorder::disconnectNotify(const QMetaMethod &signal)
 
 static void _init_cbs_disconnectNotify_2394_0 (qt_gsi::GenericMethod *decl)
@@ -515,6 +701,42 @@ static void _call_cbs_disconnectNotify_2394_0 (const qt_gsi::GenericMethod * /*d
 static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Callback &cb)
 {
   ((QAudioRecorder_Adaptor *)cls)->cb_disconnectNotify_2394_0 = cb;
+}
+
+
+// emitter void QAudioRecorder::durationChanged(qint64 duration)
+
+static void _init_emitter_durationChanged_986 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("duration");
+  decl->add_arg<qint64 > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_durationChanged_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
+  ((QAudioRecorder_Adaptor *)cls)->emitter_QAudioRecorder_durationChanged_986 (arg1);
+}
+
+
+// emitter void QAudioRecorder::error(QMediaRecorder::Error error)
+
+static void _init_emitter_error_2457 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("error");
+  decl->add_arg<const qt_gsi::Converter<QMediaRecorder::Error>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_error_2457 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QMediaRecorder::Error>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMediaRecorder::Error>::target_type & >() (args, heap);
+  ((QAudioRecorder_Adaptor *)cls)->emitter_QAudioRecorder_error_2457 (arg1);
 }
 
 
@@ -604,6 +826,113 @@ static void _set_callback_cbs_mediaObject_c0_0 (void *cls, const gsi::Callback &
 }
 
 
+// emitter void QAudioRecorder::metaDataAvailableChanged(bool available)
+
+static void _init_emitter_metaDataAvailableChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("available");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_metaDataAvailableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QAudioRecorder_Adaptor *)cls)->emitter_QAudioRecorder_metaDataAvailableChanged_864 (arg1);
+}
+
+
+// emitter void QAudioRecorder::metaDataChanged()
+
+static void _init_emitter_metaDataChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_metaDataChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QAudioRecorder_Adaptor *)cls)->emitter_QAudioRecorder_metaDataChanged_0 ();
+}
+
+
+// emitter void QAudioRecorder::metaDataChanged(const QString &key, const QVariant &value)
+
+static void _init_emitter_metaDataChanged_4036 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("key");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("value");
+  decl->add_arg<const QVariant & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_metaDataChanged_4036 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
+  ((QAudioRecorder_Adaptor *)cls)->emitter_QAudioRecorder_metaDataChanged_4036 (arg1, arg2);
+}
+
+
+// emitter void QAudioRecorder::metaDataWritableChanged(bool writable)
+
+static void _init_emitter_metaDataWritableChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("writable");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_metaDataWritableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QAudioRecorder_Adaptor *)cls)->emitter_QAudioRecorder_metaDataWritableChanged_864 (arg1);
+}
+
+
+// emitter void QAudioRecorder::mutedChanged(bool muted)
+
+static void _init_emitter_mutedChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("muted");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_mutedChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QAudioRecorder_Adaptor *)cls)->emitter_QAudioRecorder_mutedChanged_864 (arg1);
+}
+
+
+// emitter void QAudioRecorder::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QAudioRecorder_Adaptor *)cls)->emitter_QAudioRecorder_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QAudioRecorder::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -673,6 +1002,42 @@ static void _set_callback_cbs_setMediaObject_1782_0 (void *cls, const gsi::Callb
 }
 
 
+// emitter void QAudioRecorder::stateChanged(QMediaRecorder::State state)
+
+static void _init_emitter_stateChanged_2448 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("state");
+  decl->add_arg<const qt_gsi::Converter<QMediaRecorder::State>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_stateChanged_2448 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QMediaRecorder::State>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMediaRecorder::State>::target_type & >() (args, heap);
+  ((QAudioRecorder_Adaptor *)cls)->emitter_QAudioRecorder_stateChanged_2448 (arg1);
+}
+
+
+// emitter void QAudioRecorder::statusChanged(QMediaRecorder::Status status)
+
+static void _init_emitter_statusChanged_2579 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("status");
+  decl->add_arg<const qt_gsi::Converter<QMediaRecorder::Status>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_statusChanged_2579 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QMediaRecorder::Status>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMediaRecorder::Status>::target_type & >() (args, heap);
+  ((QAudioRecorder_Adaptor *)cls)->emitter_QAudioRecorder_statusChanged_2579 (arg1);
+}
+
+
 // void QAudioRecorder::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
@@ -697,6 +1062,24 @@ static void _set_callback_cbs_timerEvent_1730_0 (void *cls, const gsi::Callback 
 }
 
 
+// emitter void QAudioRecorder::volumeChanged(double volume)
+
+static void _init_emitter_volumeChanged_1071 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("volume");
+  decl->add_arg<double > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_volumeChanged_1071 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  ((QAudioRecorder_Adaptor *)cls)->emitter_QAudioRecorder_volumeChanged_1071 (arg1);
+}
+
+
 namespace gsi
 {
 
@@ -705,12 +1088,20 @@ gsi::Class<QAudioRecorder> &qtdecl_QAudioRecorder ();
 static gsi::Methods methods_QAudioRecorder_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAudioRecorder::QAudioRecorder(QObject *parent)\nThis method creates an object of class QAudioRecorder.", &_init_ctor_QAudioRecorder_Adaptor_1302, &_call_ctor_QAudioRecorder_Adaptor_1302);
+  methods += new qt_gsi::GenericMethod ("emit_actualLocationChanged", "@brief Emitter for signal void QAudioRecorder::actualLocationChanged(const QUrl &location)\nCall this method to emit this signal.", false, &_init_emitter_actualLocationChanged_1701, &_call_emitter_actualLocationChanged_1701);
+  methods += new qt_gsi::GenericMethod ("emit_audioInputChanged", "@brief Emitter for signal void QAudioRecorder::audioInputChanged(const QString &name)\nCall this method to emit this signal.", false, &_init_emitter_audioInputChanged_2025, &_call_emitter_audioInputChanged_2025);
+  methods += new qt_gsi::GenericMethod ("emit_availabilityChanged_bool", "@brief Emitter for signal void QAudioRecorder::availabilityChanged(bool available)\nCall this method to emit this signal.", false, &_init_emitter_availabilityChanged_864, &_call_emitter_availabilityChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_availabilityChanged_status", "@brief Emitter for signal void QAudioRecorder::availabilityChanged(QMultimedia::AvailabilityStatus availability)\nCall this method to emit this signal.", false, &_init_emitter_availabilityChanged_3555, &_call_emitter_availabilityChanged_3555);
+  methods += new qt_gsi::GenericMethod ("emit_availableAudioInputsChanged", "@brief Emitter for signal void QAudioRecorder::availableAudioInputsChanged()\nCall this method to emit this signal.", false, &_init_emitter_availableAudioInputsChanged_0, &_call_emitter_availableAudioInputsChanged_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QAudioRecorder::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAudioRecorder::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QAudioRecorder::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QAudioRecorder::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("emit_durationChanged", "@brief Emitter for signal void QAudioRecorder::durationChanged(qint64 duration)\nCall this method to emit this signal.", false, &_init_emitter_durationChanged_986, &_call_emitter_durationChanged_986);
+  methods += new qt_gsi::GenericMethod ("emit_error", "@brief Emitter for signal void QAudioRecorder::error(QMediaRecorder::Error error)\nCall this method to emit this signal.", false, &_init_emitter_error_2457, &_call_emitter_error_2457);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAudioRecorder::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QAudioRecorder::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
@@ -718,13 +1109,22 @@ static gsi::Methods methods_QAudioRecorder_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QAudioRecorder::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("mediaObject", "@brief Virtual method QMediaObject *QAudioRecorder::mediaObject()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_mediaObject_c0_0, &_call_cbs_mediaObject_c0_0);
   methods += new qt_gsi::GenericMethod ("mediaObject", "@hide", true, &_init_cbs_mediaObject_c0_0, &_call_cbs_mediaObject_c0_0, &_set_callback_cbs_mediaObject_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_metaDataAvailableChanged", "@brief Emitter for signal void QAudioRecorder::metaDataAvailableChanged(bool available)\nCall this method to emit this signal.", false, &_init_emitter_metaDataAvailableChanged_864, &_call_emitter_metaDataAvailableChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_metaDataChanged", "@brief Emitter for signal void QAudioRecorder::metaDataChanged()\nCall this method to emit this signal.", false, &_init_emitter_metaDataChanged_0, &_call_emitter_metaDataChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_metaDataChanged_kv", "@brief Emitter for signal void QAudioRecorder::metaDataChanged(const QString &key, const QVariant &value)\nCall this method to emit this signal.", false, &_init_emitter_metaDataChanged_4036, &_call_emitter_metaDataChanged_4036);
+  methods += new qt_gsi::GenericMethod ("emit_metaDataWritableChanged", "@brief Emitter for signal void QAudioRecorder::metaDataWritableChanged(bool writable)\nCall this method to emit this signal.", false, &_init_emitter_metaDataWritableChanged_864, &_call_emitter_metaDataWritableChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_mutedChanged", "@brief Emitter for signal void QAudioRecorder::mutedChanged(bool muted)\nCall this method to emit this signal.", false, &_init_emitter_mutedChanged_864, &_call_emitter_mutedChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QAudioRecorder::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QAudioRecorder::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QAudioRecorder::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QAudioRecorder::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("*setMediaObject", "@brief Virtual method bool QAudioRecorder::setMediaObject(QMediaObject *object)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setMediaObject_1782_0, &_call_cbs_setMediaObject_1782_0);
   methods += new qt_gsi::GenericMethod ("*setMediaObject", "@hide", false, &_init_cbs_setMediaObject_1782_0, &_call_cbs_setMediaObject_1782_0, &_set_callback_cbs_setMediaObject_1782_0);
+  methods += new qt_gsi::GenericMethod ("emit_stateChanged", "@brief Emitter for signal void QAudioRecorder::stateChanged(QMediaRecorder::State state)\nCall this method to emit this signal.", false, &_init_emitter_stateChanged_2448, &_call_emitter_stateChanged_2448);
+  methods += new qt_gsi::GenericMethod ("emit_statusChanged", "@brief Emitter for signal void QAudioRecorder::statusChanged(QMediaRecorder::Status status)\nCall this method to emit this signal.", false, &_init_emitter_statusChanged_2579, &_call_emitter_statusChanged_2579);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QAudioRecorder::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("emit_volumeChanged", "@brief Emitter for signal void QAudioRecorder::volumeChanged(double volume)\nCall this method to emit this signal.", false, &_init_emitter_volumeChanged_1071, &_call_emitter_volumeChanged_1071);
   return methods;
 }
 

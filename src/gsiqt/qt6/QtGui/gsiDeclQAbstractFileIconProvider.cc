@@ -136,8 +136,8 @@ static gsi::Methods methods_QAbstractFileIconProvider () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericMethod ("icon", "@brief Method QIcon QAbstractFileIconProvider::icon(QAbstractFileIconProvider::IconType)\n", true, &_init_f_icon_c3884, &_call_f_icon_c3884);
   methods += new qt_gsi::GenericMethod ("icon", "@brief Method QIcon QAbstractFileIconProvider::icon(const QFileInfo &)\n", true, &_init_f_icon_c2174, &_call_f_icon_c2174);
-  methods += new qt_gsi::GenericMethod ("options", "@brief Method QFlags<QAbstractFileIconProvider::Option> QAbstractFileIconProvider::options()\n", true, &_init_f_options_c0, &_call_f_options_c0);
-  methods += new qt_gsi::GenericMethod ("setOptions", "@brief Method void QAbstractFileIconProvider::setOptions(QFlags<QAbstractFileIconProvider::Option>)\n", false, &_init_f_setOptions_4402, &_call_f_setOptions_4402);
+  methods += new qt_gsi::GenericMethod (":options", "@brief Method QFlags<QAbstractFileIconProvider::Option> QAbstractFileIconProvider::options()\n", true, &_init_f_options_c0, &_call_f_options_c0);
+  methods += new qt_gsi::GenericMethod ("setOptions|options=", "@brief Method void QAbstractFileIconProvider::setOptions(QFlags<QAbstractFileIconProvider::Option>)\n", false, &_init_f_setOptions_4402, &_call_f_setOptions_4402);
   methods += new qt_gsi::GenericMethod ("type", "@brief Method QString QAbstractFileIconProvider::type(const QFileInfo &)\n", true, &_init_f_type_c2174, &_call_f_type_c2174);
   return methods;
 }

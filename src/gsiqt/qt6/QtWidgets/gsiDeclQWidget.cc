@@ -4758,7 +4758,7 @@ static gsi::Methods methods_QWidget () {
   methods += new qt_gsi::GenericMethod ("hasFocus|:focus", "@brief Method bool QWidget::hasFocus()\n", true, &_init_f_hasFocus_c0, &_call_f_hasFocus_c0);
   methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@brief Method bool QWidget::hasHeightForWidth()\n", true, &_init_f_hasHeightForWidth_c0, &_call_f_hasHeightForWidth_c0);
   methods += new qt_gsi::GenericMethod ("hasMouseTracking|:mouseTracking", "@brief Method bool QWidget::hasMouseTracking()\n", true, &_init_f_hasMouseTracking_c0, &_call_f_hasMouseTracking_c0);
-  methods += new qt_gsi::GenericMethod ("hasTabletTracking", "@brief Method bool QWidget::hasTabletTracking()\n", true, &_init_f_hasTabletTracking_c0, &_call_f_hasTabletTracking_c0);
+  methods += new qt_gsi::GenericMethod ("hasTabletTracking|:tabletTracking", "@brief Method bool QWidget::hasTabletTracking()\n", true, &_init_f_hasTabletTracking_c0, &_call_f_hasTabletTracking_c0);
   methods += new qt_gsi::GenericMethod (":height", "@brief Method int QWidget::height()\n", true, &_init_f_height_c0, &_call_f_height_c0);
   methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Method int QWidget::heightForWidth(int)\n", true, &_init_f_heightForWidth_c767, &_call_f_heightForWidth_c767);
   methods += new qt_gsi::GenericMethod ("hide", "@brief Method void QWidget::hide()\n", false, &_init_f_hide_0, &_call_f_hide_0);
@@ -4835,7 +4835,7 @@ static gsi::Methods methods_QWidget () {
   methods += new qt_gsi::GenericMethod ("resize", "@brief Method void QWidget::resize(const QSize &)\n", false, &_init_f_resize_1805, &_call_f_resize_1805);
   methods += new qt_gsi::GenericMethod ("restoreGeometry", "@brief Method bool QWidget::restoreGeometry(const QByteArray &geometry)\n", false, &_init_f_restoreGeometry_2309, &_call_f_restoreGeometry_2309);
   methods += new qt_gsi::GenericMethod ("saveGeometry", "@brief Method QByteArray QWidget::saveGeometry()\n", true, &_init_f_saveGeometry_c0, &_call_f_saveGeometry_c0);
-  methods += new qt_gsi::GenericMethod ("screen", "@brief Method QScreen *QWidget::screen()\n", true, &_init_f_screen_c0, &_call_f_screen_c0);
+  methods += new qt_gsi::GenericMethod (":screen", "@brief Method QScreen *QWidget::screen()\n", true, &_init_f_screen_c0, &_call_f_screen_c0);
   methods += new qt_gsi::GenericMethod ("scroll", "@brief Method void QWidget::scroll(int dx, int dy)\n", false, &_init_f_scroll_1426, &_call_f_scroll_1426);
   methods += new qt_gsi::GenericMethod ("scroll", "@brief Method void QWidget::scroll(int dx, int dy, const QRect &)\n", false, &_init_f_scroll_3110, &_call_f_scroll_3110);
   methods += new qt_gsi::GenericMethod ("setAcceptDrops|acceptDrops=", "@brief Method void QWidget::setAcceptDrops(bool on)\n", false, &_init_f_setAcceptDrops_864, &_call_f_setAcceptDrops_864);
@@ -4884,7 +4884,7 @@ static gsi::Methods methods_QWidget () {
   methods += new qt_gsi::GenericMethod ("setPalette|palette=", "@brief Method void QWidget::setPalette(const QPalette &)\n", false, &_init_f_setPalette_2113, &_call_f_setPalette_2113);
   methods += new qt_gsi::GenericMethod ("setParent", "@brief Method void QWidget::setParent(QWidget *parent)\n", false, &_init_f_setParent_1315, &_call_f_setParent_1315);
   methods += new qt_gsi::GenericMethod ("setParent", "@brief Method void QWidget::setParent(QWidget *parent, QFlags<Qt::WindowType> f)\n", false, &_init_f_setParent_3702, &_call_f_setParent_3702);
-  methods += new qt_gsi::GenericMethod ("setScreen", "@brief Method void QWidget::setScreen(QScreen *)\n", false, &_init_f_setScreen_1311, &_call_f_setScreen_1311);
+  methods += new qt_gsi::GenericMethod ("setScreen|screen=", "@brief Method void QWidget::setScreen(QScreen *)\n", false, &_init_f_setScreen_1311, &_call_f_setScreen_1311);
   methods += new qt_gsi::GenericMethod ("setShortcutAutoRepeat", "@brief Method void QWidget::setShortcutAutoRepeat(int id, bool enable)\n", false, &_init_f_setShortcutAutoRepeat_1523, &_call_f_setShortcutAutoRepeat_1523);
   methods += new qt_gsi::GenericMethod ("setShortcutEnabled", "@brief Method void QWidget::setShortcutEnabled(int id, bool enable)\n", false, &_init_f_setShortcutEnabled_1523, &_call_f_setShortcutEnabled_1523);
   methods += new qt_gsi::GenericMethod ("setSizeIncrement|sizeIncrement=", "@brief Method void QWidget::setSizeIncrement(const QSize &)\n", false, &_init_f_setSizeIncrement_1805, &_call_f_setSizeIncrement_1805);
@@ -4894,7 +4894,7 @@ static gsi::Methods methods_QWidget () {
   methods += new qt_gsi::GenericMethod ("setStatusTip|statusTip=", "@brief Method void QWidget::setStatusTip(const QString &)\n", false, &_init_f_setStatusTip_2025, &_call_f_setStatusTip_2025);
   methods += new qt_gsi::GenericMethod ("setStyle|style=", "@brief Method void QWidget::setStyle(QStyle *)\n", false, &_init_f_setStyle_1232, &_call_f_setStyle_1232);
   methods += new qt_gsi::GenericMethod ("setStyleSheet|styleSheet=", "@brief Method void QWidget::setStyleSheet(const QString &styleSheet)\n", false, &_init_f_setStyleSheet_2025, &_call_f_setStyleSheet_2025);
-  methods += new qt_gsi::GenericMethod ("setTabletTracking", "@brief Method void QWidget::setTabletTracking(bool enable)\n", false, &_init_f_setTabletTracking_864, &_call_f_setTabletTracking_864);
+  methods += new qt_gsi::GenericMethod ("setTabletTracking|tabletTracking=", "@brief Method void QWidget::setTabletTracking(bool enable)\n", false, &_init_f_setTabletTracking_864, &_call_f_setTabletTracking_864);
   methods += new qt_gsi::GenericMethod ("setToolTip|toolTip=", "@brief Method void QWidget::setToolTip(const QString &)\n", false, &_init_f_setToolTip_2025, &_call_f_setToolTip_2025);
   methods += new qt_gsi::GenericMethod ("setToolTipDuration|toolTipDuration=", "@brief Method void QWidget::setToolTipDuration(int msec)\n", false, &_init_f_setToolTipDuration_767, &_call_f_setToolTipDuration_767);
   methods += new qt_gsi::GenericMethod ("setUpdatesEnabled|updatesEnabled=", "@brief Method void QWidget::setUpdatesEnabled(bool enable)\n", false, &_init_f_setUpdatesEnabled_864, &_call_f_setUpdatesEnabled_864);

@@ -122,22 +122,6 @@ static void _call_f_deviceName_c767 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// void QVideoDeviceSelectorControl::devicesChanged()
-
-
-static void _init_f_devicesChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_devicesChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QVideoDeviceSelectorControl *)cls)->devicesChanged ();
-}
-
-
 // int QVideoDeviceSelectorControl::selectedDevice()
 
 
@@ -150,46 +134,6 @@ static void _call_f_selectedDevice_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<int > ((int)((QVideoDeviceSelectorControl *)cls)->selectedDevice ());
-}
-
-
-// void QVideoDeviceSelectorControl::selectedDeviceChanged(int index)
-
-
-static void _init_f_selectedDeviceChanged_767 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("index");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_selectedDeviceChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QVideoDeviceSelectorControl *)cls)->selectedDeviceChanged (arg1);
-}
-
-
-// void QVideoDeviceSelectorControl::selectedDeviceChanged(const QString &name)
-
-
-static void _init_f_selectedDeviceChanged_2025 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("name");
-  decl->add_arg<const QString & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_selectedDeviceChanged_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QVideoDeviceSelectorControl *)cls)->selectedDeviceChanged (arg1);
 }
 
 
@@ -273,11 +217,13 @@ static gsi::Methods methods_QVideoDeviceSelectorControl () {
   methods += new qt_gsi::GenericMethod ("deviceCount", "@brief Method int QVideoDeviceSelectorControl::deviceCount()\n", true, &_init_f_deviceCount_c0, &_call_f_deviceCount_c0);
   methods += new qt_gsi::GenericMethod ("deviceDescription", "@brief Method QString QVideoDeviceSelectorControl::deviceDescription(int index)\n", true, &_init_f_deviceDescription_c767, &_call_f_deviceDescription_c767);
   methods += new qt_gsi::GenericMethod ("deviceName", "@brief Method QString QVideoDeviceSelectorControl::deviceName(int index)\n", true, &_init_f_deviceName_c767, &_call_f_deviceName_c767);
-  methods += new qt_gsi::GenericMethod ("devicesChanged", "@brief Method void QVideoDeviceSelectorControl::devicesChanged()\n", false, &_init_f_devicesChanged_0, &_call_f_devicesChanged_0);
   methods += new qt_gsi::GenericMethod (":selectedDevice", "@brief Method int QVideoDeviceSelectorControl::selectedDevice()\n", true, &_init_f_selectedDevice_c0, &_call_f_selectedDevice_c0);
-  methods += new qt_gsi::GenericMethod ("selectedDeviceChanged_int", "@brief Method void QVideoDeviceSelectorControl::selectedDeviceChanged(int index)\n", false, &_init_f_selectedDeviceChanged_767, &_call_f_selectedDeviceChanged_767);
-  methods += new qt_gsi::GenericMethod ("selectedDeviceChanged_string", "@brief Method void QVideoDeviceSelectorControl::selectedDeviceChanged(const QString &name)\n", false, &_init_f_selectedDeviceChanged_2025, &_call_f_selectedDeviceChanged_2025);
   methods += new qt_gsi::GenericMethod ("setSelectedDevice|selectedDevice=", "@brief Method void QVideoDeviceSelectorControl::setSelectedDevice(int index)\n", false, &_init_f_setSelectedDevice_767, &_call_f_setSelectedDevice_767);
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QVideoDeviceSelectorControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("devicesChanged()", "devicesChanged", "@brief Signal declaration for QVideoDeviceSelectorControl::devicesChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QVideoDeviceSelectorControl::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("selectedDeviceChanged(int)", "selectedDeviceChanged_int", gsi::arg("index"), "@brief Signal declaration for QVideoDeviceSelectorControl::selectedDeviceChanged(int index)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("selectedDeviceChanged(const QString &)", "selectedDeviceChanged_string", gsi::arg("name"), "@brief Signal declaration for QVideoDeviceSelectorControl::selectedDeviceChanged(const QString &name)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QVideoDeviceSelectorControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QVideoDeviceSelectorControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -341,6 +287,12 @@ public:
     }
   }
 
+  //  [emitter impl] void QVideoDeviceSelectorControl::destroyed(QObject *)
+  void emitter_QVideoDeviceSelectorControl_destroyed_1302(QObject *arg1)
+  {
+    emit QVideoDeviceSelectorControl::destroyed(arg1);
+  }
+
   //  [adaptor impl] int QVideoDeviceSelectorControl::deviceCount()
   int cbs_deviceCount_c0_0() const
   {
@@ -388,6 +340,12 @@ public:
     }
   }
 
+  //  [emitter impl] void QVideoDeviceSelectorControl::devicesChanged()
+  void emitter_QVideoDeviceSelectorControl_devicesChanged_0()
+  {
+    emit QVideoDeviceSelectorControl::devicesChanged();
+  }
+
   //  [adaptor impl] bool QVideoDeviceSelectorControl::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -418,6 +376,13 @@ public:
     }
   }
 
+  //  [emitter impl] void QVideoDeviceSelectorControl::objectNameChanged(const QString &objectName)
+  void emitter_QVideoDeviceSelectorControl_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QVideoDeviceSelectorControl::objectNameChanged(const QString &objectName)'");
+  }
+
   //  [adaptor impl] int QVideoDeviceSelectorControl::selectedDevice()
   int cbs_selectedDevice_c0_0() const
   {
@@ -431,6 +396,18 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("selectedDevice");
     }
+  }
+
+  //  [emitter impl] void QVideoDeviceSelectorControl::selectedDeviceChanged(int index)
+  void emitter_QVideoDeviceSelectorControl_selectedDeviceChanged_767(int index)
+  {
+    emit QVideoDeviceSelectorControl::selectedDeviceChanged(index);
+  }
+
+  //  [emitter impl] void QVideoDeviceSelectorControl::selectedDeviceChanged(const QString &name)
+  void emitter_QVideoDeviceSelectorControl_selectedDeviceChanged_2025(const QString &name)
+  {
+    emit QVideoDeviceSelectorControl::selectedDeviceChanged(name);
   }
 
   //  [adaptor impl] void QVideoDeviceSelectorControl::setSelectedDevice(int index)
@@ -606,6 +583,24 @@ static void _set_callback_cbs_defaultDevice_c0_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QVideoDeviceSelectorControl::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QVideoDeviceSelectorControl_Adaptor *)cls)->emitter_QVideoDeviceSelectorControl_destroyed_1302 (arg1);
+}
+
+
 // int QVideoDeviceSelectorControl::deviceCount()
 
 static void _init_cbs_deviceCount_c0_0 (qt_gsi::GenericMethod *decl)
@@ -668,6 +663,20 @@ static void _call_cbs_deviceName_c767_0 (const qt_gsi::GenericMethod * /*decl*/,
 static void _set_callback_cbs_deviceName_c767_0 (void *cls, const gsi::Callback &cb)
 {
   ((QVideoDeviceSelectorControl_Adaptor *)cls)->cb_deviceName_c767_0 = cb;
+}
+
+
+// emitter void QVideoDeviceSelectorControl::devicesChanged()
+
+static void _init_emitter_devicesChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_devicesChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QVideoDeviceSelectorControl_Adaptor *)cls)->emitter_QVideoDeviceSelectorControl_devicesChanged_0 ();
 }
 
 
@@ -762,6 +771,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QVideoDeviceSelectorControl::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QVideoDeviceSelectorControl_Adaptor *)cls)->emitter_QVideoDeviceSelectorControl_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QVideoDeviceSelectorControl::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -796,6 +823,42 @@ static void _call_cbs_selectedDevice_c0_0 (const qt_gsi::GenericMethod * /*decl*
 static void _set_callback_cbs_selectedDevice_c0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QVideoDeviceSelectorControl_Adaptor *)cls)->cb_selectedDevice_c0_0 = cb;
+}
+
+
+// emitter void QVideoDeviceSelectorControl::selectedDeviceChanged(int index)
+
+static void _init_emitter_selectedDeviceChanged_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("index");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_selectedDeviceChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QVideoDeviceSelectorControl_Adaptor *)cls)->emitter_QVideoDeviceSelectorControl_selectedDeviceChanged_767 (arg1);
+}
+
+
+// emitter void QVideoDeviceSelectorControl::selectedDeviceChanged(const QString &name)
+
+static void _init_emitter_selectedDeviceChanged_2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("name");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_selectedDeviceChanged_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QVideoDeviceSelectorControl_Adaptor *)cls)->emitter_QVideoDeviceSelectorControl_selectedDeviceChanged_2025 (arg1);
 }
 
 
@@ -889,12 +952,14 @@ static gsi::Methods methods_QVideoDeviceSelectorControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("defaultDevice", "@brief Virtual method int QVideoDeviceSelectorControl::defaultDevice()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_defaultDevice_c0_0, &_call_cbs_defaultDevice_c0_0);
   methods += new qt_gsi::GenericMethod ("defaultDevice", "@hide", true, &_init_cbs_defaultDevice_c0_0, &_call_cbs_defaultDevice_c0_0, &_set_callback_cbs_defaultDevice_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QVideoDeviceSelectorControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("deviceCount", "@brief Virtual method int QVideoDeviceSelectorControl::deviceCount()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_deviceCount_c0_0, &_call_cbs_deviceCount_c0_0);
   methods += new qt_gsi::GenericMethod ("deviceCount", "@hide", true, &_init_cbs_deviceCount_c0_0, &_call_cbs_deviceCount_c0_0, &_set_callback_cbs_deviceCount_c0_0);
   methods += new qt_gsi::GenericMethod ("deviceDescription", "@brief Virtual method QString QVideoDeviceSelectorControl::deviceDescription(int index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_deviceDescription_c767_0, &_call_cbs_deviceDescription_c767_0);
   methods += new qt_gsi::GenericMethod ("deviceDescription", "@hide", true, &_init_cbs_deviceDescription_c767_0, &_call_cbs_deviceDescription_c767_0, &_set_callback_cbs_deviceDescription_c767_0);
   methods += new qt_gsi::GenericMethod ("deviceName", "@brief Virtual method QString QVideoDeviceSelectorControl::deviceName(int index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_deviceName_c767_0, &_call_cbs_deviceName_c767_0);
   methods += new qt_gsi::GenericMethod ("deviceName", "@hide", true, &_init_cbs_deviceName_c767_0, &_call_cbs_deviceName_c767_0, &_set_callback_cbs_deviceName_c767_0);
+  methods += new qt_gsi::GenericMethod ("emit_devicesChanged", "@brief Emitter for signal void QVideoDeviceSelectorControl::devicesChanged()\nCall this method to emit this signal.", false, &_init_emitter_devicesChanged_0, &_call_emitter_devicesChanged_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QVideoDeviceSelectorControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QVideoDeviceSelectorControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
@@ -902,9 +967,12 @@ static gsi::Methods methods_QVideoDeviceSelectorControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QVideoDeviceSelectorControl::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QVideoDeviceSelectorControl::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QVideoDeviceSelectorControl::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QVideoDeviceSelectorControl::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("selectedDevice", "@brief Virtual method int QVideoDeviceSelectorControl::selectedDevice()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_selectedDevice_c0_0, &_call_cbs_selectedDevice_c0_0);
   methods += new qt_gsi::GenericMethod ("selectedDevice", "@hide", true, &_init_cbs_selectedDevice_c0_0, &_call_cbs_selectedDevice_c0_0, &_set_callback_cbs_selectedDevice_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_selectedDeviceChanged_int", "@brief Emitter for signal void QVideoDeviceSelectorControl::selectedDeviceChanged(int index)\nCall this method to emit this signal.", false, &_init_emitter_selectedDeviceChanged_767, &_call_emitter_selectedDeviceChanged_767);
+  methods += new qt_gsi::GenericMethod ("emit_selectedDeviceChanged_string", "@brief Emitter for signal void QVideoDeviceSelectorControl::selectedDeviceChanged(const QString &name)\nCall this method to emit this signal.", false, &_init_emitter_selectedDeviceChanged_2025, &_call_emitter_selectedDeviceChanged_2025);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QVideoDeviceSelectorControl::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QVideoDeviceSelectorControl::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("setSelectedDevice", "@brief Virtual method void QVideoDeviceSelectorControl::setSelectedDevice(int index)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setSelectedDevice_767_0, &_call_cbs_setSelectedDevice_767_0);

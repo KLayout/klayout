@@ -830,7 +830,7 @@ static gsi::Methods methods_QXmlStreamReader () {
   methods += new qt_gsi::GenericMethod ("columnNumber", "@brief Method qint64 QXmlStreamReader::columnNumber()\n", true, &_init_f_columnNumber_c0, &_call_f_columnNumber_c0);
   methods += new qt_gsi::GenericMethod (":device", "@brief Method QIODevice *QXmlStreamReader::device()\n", true, &_init_f_device_c0, &_call_f_device_c0);
   methods += new qt_gsi::GenericMethod ("entityDeclarations", "@brief Method QList<QXmlStreamEntityDeclaration> QXmlStreamReader::entityDeclarations()\n", true, &_init_f_entityDeclarations_c0, &_call_f_entityDeclarations_c0);
-  methods += new qt_gsi::GenericMethod ("entityExpansionLimit", "@brief Method int QXmlStreamReader::entityExpansionLimit()\n", true, &_init_f_entityExpansionLimit_c0, &_call_f_entityExpansionLimit_c0);
+  methods += new qt_gsi::GenericMethod (":entityExpansionLimit", "@brief Method int QXmlStreamReader::entityExpansionLimit()\n", true, &_init_f_entityExpansionLimit_c0, &_call_f_entityExpansionLimit_c0);
   methods += new qt_gsi::GenericMethod (":entityResolver", "@brief Method QXmlStreamEntityResolver *QXmlStreamReader::entityResolver()\n", true, &_init_f_entityResolver_c0, &_call_f_entityResolver_c0);
   methods += new qt_gsi::GenericMethod ("error", "@brief Method QXmlStreamReader::Error QXmlStreamReader::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QXmlStreamReader::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
@@ -856,7 +856,7 @@ static gsi::Methods methods_QXmlStreamReader () {
   methods += new qt_gsi::GenericMethod ("readNext", "@brief Method QXmlStreamReader::TokenType QXmlStreamReader::readNext()\n", false, &_init_f_readNext_0, &_call_f_readNext_0);
   methods += new qt_gsi::GenericMethod ("readNextStartElement", "@brief Method bool QXmlStreamReader::readNextStartElement()\n", false, &_init_f_readNextStartElement_0, &_call_f_readNextStartElement_0);
   methods += new qt_gsi::GenericMethod ("setDevice|device=", "@brief Method void QXmlStreamReader::setDevice(QIODevice *device)\n", false, &_init_f_setDevice_1447, &_call_f_setDevice_1447);
-  methods += new qt_gsi::GenericMethod ("setEntityExpansionLimit", "@brief Method void QXmlStreamReader::setEntityExpansionLimit(int limit)\n", false, &_init_f_setEntityExpansionLimit_767, &_call_f_setEntityExpansionLimit_767);
+  methods += new qt_gsi::GenericMethod ("setEntityExpansionLimit|entityExpansionLimit=", "@brief Method void QXmlStreamReader::setEntityExpansionLimit(int limit)\n", false, &_init_f_setEntityExpansionLimit_767, &_call_f_setEntityExpansionLimit_767);
   methods += new qt_gsi::GenericMethod ("setEntityResolver|entityResolver=", "@brief Method void QXmlStreamReader::setEntityResolver(QXmlStreamEntityResolver *resolver)\n", false, &_init_f_setEntityResolver_3115, &_call_f_setEntityResolver_3115);
   methods += new qt_gsi::GenericMethod ("setNamespaceProcessing|namespaceProcessing=", "@brief Method void QXmlStreamReader::setNamespaceProcessing(bool)\n", false, &_init_f_setNamespaceProcessing_864, &_call_f_setNamespaceProcessing_864);
   methods += new qt_gsi::GenericMethod ("skipCurrentElement", "@brief Method void QXmlStreamReader::skipCurrentElement()\n", false, &_init_f_skipCurrentElement_0, &_call_f_skipCurrentElement_0);

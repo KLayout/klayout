@@ -1098,7 +1098,7 @@ static gsi::Methods methods_QAction () {
   methods += new qt_gsi::GenericMethod ("isEnabled?|:enabled", "@brief Method bool QAction::isEnabled()\n", true, &_init_f_isEnabled_c0, &_call_f_isEnabled_c0);
   methods += new qt_gsi::GenericMethod ("isIconVisibleInMenu?|:iconVisibleInMenu", "@brief Method bool QAction::isIconVisibleInMenu()\n", true, &_init_f_isIconVisibleInMenu_c0, &_call_f_isIconVisibleInMenu_c0);
   methods += new qt_gsi::GenericMethod ("isSeparator?|:separator", "@brief Method bool QAction::isSeparator()\n", true, &_init_f_isSeparator_c0, &_call_f_isSeparator_c0);
-  methods += new qt_gsi::GenericMethod ("isShortcutVisibleInContextMenu?", "@brief Method bool QAction::isShortcutVisibleInContextMenu()\n", true, &_init_f_isShortcutVisibleInContextMenu_c0, &_call_f_isShortcutVisibleInContextMenu_c0);
+  methods += new qt_gsi::GenericMethod ("isShortcutVisibleInContextMenu?|:shortcutVisibleInContextMenu", "@brief Method bool QAction::isShortcutVisibleInContextMenu()\n", true, &_init_f_isShortcutVisibleInContextMenu_c0, &_call_f_isShortcutVisibleInContextMenu_c0);
   methods += new qt_gsi::GenericMethod ("isVisible?|:visible", "@brief Method bool QAction::isVisible()\n", true, &_init_f_isVisible_c0, &_call_f_isVisible_c0);
   methods += new qt_gsi::GenericMethod (":menu", "@brief Method QMenu *QAction::menu()\n", true, &_init_f_menu_c0, &_call_f_menu_c0);
   methods += new qt_gsi::GenericMethod (":menuRole", "@brief Method QAction::MenuRole QAction::menuRole()\n", true, &_init_f_menuRole_c0, &_call_f_menuRole_c0);
@@ -1121,7 +1121,7 @@ static gsi::Methods methods_QAction () {
   methods += new qt_gsi::GenericMethod ("setSeparator|separator=", "@brief Method void QAction::setSeparator(bool b)\n", false, &_init_f_setSeparator_864, &_call_f_setSeparator_864);
   methods += new qt_gsi::GenericMethod ("setShortcut|shortcut=", "@brief Method void QAction::setShortcut(const QKeySequence &shortcut)\n", false, &_init_f_setShortcut_2516, &_call_f_setShortcut_2516);
   methods += new qt_gsi::GenericMethod ("setShortcutContext|shortcutContext=", "@brief Method void QAction::setShortcutContext(Qt::ShortcutContext context)\n", false, &_init_f_setShortcutContext_2350, &_call_f_setShortcutContext_2350);
-  methods += new qt_gsi::GenericMethod ("setShortcutVisibleInContextMenu", "@brief Method void QAction::setShortcutVisibleInContextMenu(bool show)\n", false, &_init_f_setShortcutVisibleInContextMenu_864, &_call_f_setShortcutVisibleInContextMenu_864);
+  methods += new qt_gsi::GenericMethod ("setShortcutVisibleInContextMenu|shortcutVisibleInContextMenu=", "@brief Method void QAction::setShortcutVisibleInContextMenu(bool show)\n", false, &_init_f_setShortcutVisibleInContextMenu_864, &_call_f_setShortcutVisibleInContextMenu_864);
   methods += new qt_gsi::GenericMethod ("setShortcuts|shortcuts=", "@brief Method void QAction::setShortcuts(const QList<QKeySequence> &shortcuts)\n", false, &_init_f_setShortcuts_3131, &_call_f_setShortcuts_3131);
   methods += new qt_gsi::GenericMethod ("setShortcuts|shortcuts=", "@brief Method void QAction::setShortcuts(QKeySequence::StandardKey)\n", false, &_init_f_setShortcuts_2869, &_call_f_setShortcuts_2869);
   methods += new qt_gsi::GenericMethod ("setStatusTip|statusTip=", "@brief Method void QAction::setStatusTip(const QString &statusTip)\n", false, &_init_f_setStatusTip_2025, &_call_f_setStatusTip_2025);

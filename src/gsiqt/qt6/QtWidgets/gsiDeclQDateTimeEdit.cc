@@ -1023,7 +1023,7 @@ namespace gsi
 static gsi::Methods methods_QDateTimeEdit () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("calendar", "@brief Method QCalendar QDateTimeEdit::calendar()\n", true, &_init_f_calendar_c0, &_call_f_calendar_c0);
+  methods += new qt_gsi::GenericMethod (":calendar", "@brief Method QCalendar QDateTimeEdit::calendar()\n", true, &_init_f_calendar_c0, &_call_f_calendar_c0);
   methods += new qt_gsi::GenericMethod (":calendarPopup", "@brief Method bool QDateTimeEdit::calendarPopup()\n", true, &_init_f_calendarPopup_c0, &_call_f_calendarPopup_c0);
   methods += new qt_gsi::GenericMethod (":calendarWidget", "@brief Method QCalendarWidget *QDateTimeEdit::calendarWidget()\n", true, &_init_f_calendarWidget_c0, &_call_f_calendarWidget_c0);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QDateTimeEdit::clear()\nThis is a reimplementation of QAbstractSpinBox::clear", false, &_init_f_clear_0, &_call_f_clear_0);
@@ -1049,7 +1049,7 @@ static gsi::Methods methods_QDateTimeEdit () {
   methods += new qt_gsi::GenericMethod ("sectionAt", "@brief Method QDateTimeEdit::Section QDateTimeEdit::sectionAt(int index)\n", true, &_init_f_sectionAt_c767, &_call_f_sectionAt_c767);
   methods += new qt_gsi::GenericMethod (":sectionCount", "@brief Method int QDateTimeEdit::sectionCount()\n", true, &_init_f_sectionCount_c0, &_call_f_sectionCount_c0);
   methods += new qt_gsi::GenericMethod ("sectionText", "@brief Method QString QDateTimeEdit::sectionText(QDateTimeEdit::Section section)\n", true, &_init_f_sectionText_c2529, &_call_f_sectionText_c2529);
-  methods += new qt_gsi::GenericMethod ("setCalendar", "@brief Method void QDateTimeEdit::setCalendar(QCalendar calendar)\n", false, &_init_f_setCalendar_1311, &_call_f_setCalendar_1311);
+  methods += new qt_gsi::GenericMethod ("setCalendar|calendar=", "@brief Method void QDateTimeEdit::setCalendar(QCalendar calendar)\n", false, &_init_f_setCalendar_1311, &_call_f_setCalendar_1311);
   methods += new qt_gsi::GenericMethod ("setCalendarPopup|calendarPopup=", "@brief Method void QDateTimeEdit::setCalendarPopup(bool enable)\n", false, &_init_f_setCalendarPopup_864, &_call_f_setCalendarPopup_864);
   methods += new qt_gsi::GenericMethod ("setCalendarWidget|calendarWidget=", "@brief Method void QDateTimeEdit::setCalendarWidget(QCalendarWidget *calendarWidget)\n", false, &_init_f_setCalendarWidget_2109, &_call_f_setCalendarWidget_2109);
   methods += new qt_gsi::GenericMethod ("setCurrentSection|currentSection=", "@brief Method void QDateTimeEdit::setCurrentSection(QDateTimeEdit::Section section)\n", false, &_init_f_setCurrentSection_2529, &_call_f_setCurrentSection_2529);

@@ -69,26 +69,6 @@ static void _call_f_captureDestination_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QCameraCaptureDestinationControl::captureDestinationChanged(QFlags<QCameraImageCapture::CaptureDestination> destination)
-
-
-static void _init_f_captureDestinationChanged_4999 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("destination");
-  decl->add_arg<QFlags<QCameraImageCapture::CaptureDestination> > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_captureDestinationChanged_4999 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QFlags<QCameraImageCapture::CaptureDestination> arg1 = gsi::arg_reader<QFlags<QCameraImageCapture::CaptureDestination> >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCameraCaptureDestinationControl *)cls)->captureDestinationChanged (arg1);
-}
-
-
 // bool QCameraCaptureDestinationControl::isCaptureDestinationSupported(QFlags<QCameraImageCapture::CaptureDestination> destination)
 
 
@@ -185,9 +165,11 @@ static gsi::Methods methods_QCameraCaptureDestinationControl () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":captureDestination", "@brief Method QFlags<QCameraImageCapture::CaptureDestination> QCameraCaptureDestinationControl::captureDestination()\n", true, &_init_f_captureDestination_c0, &_call_f_captureDestination_c0);
-  methods += new qt_gsi::GenericMethod ("captureDestinationChanged", "@brief Method void QCameraCaptureDestinationControl::captureDestinationChanged(QFlags<QCameraImageCapture::CaptureDestination> destination)\n", false, &_init_f_captureDestinationChanged_4999, &_call_f_captureDestinationChanged_4999);
   methods += new qt_gsi::GenericMethod ("isCaptureDestinationSupported?", "@brief Method bool QCameraCaptureDestinationControl::isCaptureDestinationSupported(QFlags<QCameraImageCapture::CaptureDestination> destination)\n", true, &_init_f_isCaptureDestinationSupported_c4999, &_call_f_isCaptureDestinationSupported_c4999);
   methods += new qt_gsi::GenericMethod ("setCaptureDestination|captureDestination=", "@brief Method void QCameraCaptureDestinationControl::setCaptureDestination(QFlags<QCameraImageCapture::CaptureDestination> destination)\n", false, &_init_f_setCaptureDestination_4999, &_call_f_setCaptureDestination_4999);
+  methods += gsi::qt_signal<QFlags<QCameraImageCapture::CaptureDestination> > ("captureDestinationChanged(QFlags<QCameraImageCapture::CaptureDestination>)", "captureDestinationChanged", gsi::arg("destination"), "@brief Signal declaration for QCameraCaptureDestinationControl::captureDestinationChanged(QFlags<QCameraImageCapture::CaptureDestination> destination)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QCameraCaptureDestinationControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QCameraCaptureDestinationControl::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QCameraCaptureDestinationControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QCameraCaptureDestinationControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -251,6 +233,18 @@ public:
     }
   }
 
+  //  [emitter impl] void QCameraCaptureDestinationControl::captureDestinationChanged(QFlags<QCameraImageCapture::CaptureDestination> destination)
+  void emitter_QCameraCaptureDestinationControl_captureDestinationChanged_4999(QFlags<QCameraImageCapture::CaptureDestination> destination)
+  {
+    emit QCameraCaptureDestinationControl::captureDestinationChanged(destination);
+  }
+
+  //  [emitter impl] void QCameraCaptureDestinationControl::destroyed(QObject *)
+  void emitter_QCameraCaptureDestinationControl_destroyed_1302(QObject *arg1)
+  {
+    emit QCameraCaptureDestinationControl::destroyed(arg1);
+  }
+
   //  [adaptor impl] bool QCameraCaptureDestinationControl::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -295,6 +289,13 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("isCaptureDestinationSupported");
     }
+  }
+
+  //  [emitter impl] void QCameraCaptureDestinationControl::objectNameChanged(const QString &objectName)
+  void emitter_QCameraCaptureDestinationControl_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QCameraCaptureDestinationControl::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QCameraCaptureDestinationControl::setCaptureDestination(QFlags<QCameraImageCapture::CaptureDestination> destination)
@@ -419,6 +420,24 @@ static void _set_callback_cbs_captureDestination_c0_0 (void *cls, const gsi::Cal
 }
 
 
+// emitter void QCameraCaptureDestinationControl::captureDestinationChanged(QFlags<QCameraImageCapture::CaptureDestination> destination)
+
+static void _init_emitter_captureDestinationChanged_4999 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("destination");
+  decl->add_arg<QFlags<QCameraImageCapture::CaptureDestination> > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_captureDestinationChanged_4999 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QFlags<QCameraImageCapture::CaptureDestination> arg1 = gsi::arg_reader<QFlags<QCameraImageCapture::CaptureDestination> >() (args, heap);
+  ((QCameraCaptureDestinationControl_Adaptor *)cls)->emitter_QCameraCaptureDestinationControl_captureDestinationChanged_4999 (arg1);
+}
+
+
 // void QCameraCaptureDestinationControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
@@ -464,6 +483,24 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QCameraCaptureDestinationControl_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
+}
+
+
+// emitter void QCameraCaptureDestinationControl::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QCameraCaptureDestinationControl_Adaptor *)cls)->emitter_QCameraCaptureDestinationControl_destroyed_1302 (arg1);
 }
 
 
@@ -581,6 +618,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QCameraCaptureDestinationControl::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QCameraCaptureDestinationControl_Adaptor *)cls)->emitter_QCameraCaptureDestinationControl_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QCameraCaptureDestinationControl::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -685,10 +740,12 @@ static gsi::Methods methods_QCameraCaptureDestinationControl_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCameraCaptureDestinationControl::QCameraCaptureDestinationControl()\nThis method creates an object of class QCameraCaptureDestinationControl.", &_init_ctor_QCameraCaptureDestinationControl_Adaptor_0, &_call_ctor_QCameraCaptureDestinationControl_Adaptor_0);
   methods += new qt_gsi::GenericMethod ("captureDestination", "@brief Virtual method QFlags<QCameraImageCapture::CaptureDestination> QCameraCaptureDestinationControl::captureDestination()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_captureDestination_c0_0, &_call_cbs_captureDestination_c0_0);
   methods += new qt_gsi::GenericMethod ("captureDestination", "@hide", true, &_init_cbs_captureDestination_c0_0, &_call_cbs_captureDestination_c0_0, &_set_callback_cbs_captureDestination_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_captureDestinationChanged", "@brief Emitter for signal void QCameraCaptureDestinationControl::captureDestinationChanged(QFlags<QCameraImageCapture::CaptureDestination> destination)\nCall this method to emit this signal.", false, &_init_emitter_captureDestinationChanged_4999, &_call_emitter_captureDestinationChanged_4999);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QCameraCaptureDestinationControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QCameraCaptureDestinationControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QCameraCaptureDestinationControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QCameraCaptureDestinationControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QCameraCaptureDestinationControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
@@ -698,6 +755,7 @@ static gsi::Methods methods_QCameraCaptureDestinationControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("isCaptureDestinationSupported", "@brief Virtual method bool QCameraCaptureDestinationControl::isCaptureDestinationSupported(QFlags<QCameraImageCapture::CaptureDestination> destination)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isCaptureDestinationSupported_c4999_0, &_call_cbs_isCaptureDestinationSupported_c4999_0);
   methods += new qt_gsi::GenericMethod ("isCaptureDestinationSupported", "@hide", true, &_init_cbs_isCaptureDestinationSupported_c4999_0, &_call_cbs_isCaptureDestinationSupported_c4999_0, &_set_callback_cbs_isCaptureDestinationSupported_c4999_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QCameraCaptureDestinationControl::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QCameraCaptureDestinationControl::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QCameraCaptureDestinationControl::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QCameraCaptureDestinationControl::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QCameraCaptureDestinationControl::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);

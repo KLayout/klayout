@@ -103,65 +103,6 @@ static void _call_f_metaData_c2025 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// void QMetaDataReaderControl::metaDataAvailableChanged(bool available)
-
-
-static void _init_f_metaDataAvailableChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("available");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_metaDataAvailableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMetaDataReaderControl *)cls)->metaDataAvailableChanged (arg1);
-}
-
-
-// void QMetaDataReaderControl::metaDataChanged()
-
-
-static void _init_f_metaDataChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_metaDataChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMetaDataReaderControl *)cls)->metaDataChanged ();
-}
-
-
-// void QMetaDataReaderControl::metaDataChanged(const QString &key, const QVariant &value)
-
-
-static void _init_f_metaDataChanged_4036 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("value");
-  decl->add_arg<const QVariant & > (argspec_1);
-  decl->set_return<void > ();
-}
-
-static void _call_f_metaDataChanged_4036 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMetaDataReaderControl *)cls)->metaDataChanged (arg1, arg2);
-}
-
-
 // static QString QMetaDataReaderControl::tr(const char *s, const char *c, int n)
 
 
@@ -221,9 +162,11 @@ static gsi::Methods methods_QMetaDataReaderControl () {
   methods += new qt_gsi::GenericMethod ("availableMetaData", "@brief Method QStringList QMetaDataReaderControl::availableMetaData()\n", true, &_init_f_availableMetaData_c0, &_call_f_availableMetaData_c0);
   methods += new qt_gsi::GenericMethod ("isMetaDataAvailable?", "@brief Method bool QMetaDataReaderControl::isMetaDataAvailable()\n", true, &_init_f_isMetaDataAvailable_c0, &_call_f_isMetaDataAvailable_c0);
   methods += new qt_gsi::GenericMethod ("metaData", "@brief Method QVariant QMetaDataReaderControl::metaData(const QString &key)\n", true, &_init_f_metaData_c2025, &_call_f_metaData_c2025);
-  methods += new qt_gsi::GenericMethod ("metaDataAvailableChanged", "@brief Method void QMetaDataReaderControl::metaDataAvailableChanged(bool available)\n", false, &_init_f_metaDataAvailableChanged_864, &_call_f_metaDataAvailableChanged_864);
-  methods += new qt_gsi::GenericMethod ("metaDataChanged", "@brief Method void QMetaDataReaderControl::metaDataChanged()\n", false, &_init_f_metaDataChanged_0, &_call_f_metaDataChanged_0);
-  methods += new qt_gsi::GenericMethod ("metaDataChanged_kv", "@brief Method void QMetaDataReaderControl::metaDataChanged(const QString &key, const QVariant &value)\n", false, &_init_f_metaDataChanged_4036, &_call_f_metaDataChanged_4036);
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QMetaDataReaderControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("metaDataAvailableChanged(bool)", "metaDataAvailableChanged", gsi::arg("available"), "@brief Signal declaration for QMetaDataReaderControl::metaDataAvailableChanged(bool available)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("metaDataChanged()", "metaDataChanged", "@brief Signal declaration for QMetaDataReaderControl::metaDataChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString &, const QVariant & > ("metaDataChanged(const QString &, const QVariant &)", "metaDataChanged_kv", gsi::arg("key"), gsi::arg("value"), "@brief Signal declaration for QMetaDataReaderControl::metaDataChanged(const QString &key, const QVariant &value)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QMetaDataReaderControl::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QMetaDataReaderControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QMetaDataReaderControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -287,6 +230,12 @@ public:
     }
   }
 
+  //  [emitter impl] void QMetaDataReaderControl::destroyed(QObject *)
+  void emitter_QMetaDataReaderControl_destroyed_1302(QObject *arg1)
+  {
+    emit QMetaDataReaderControl::destroyed(arg1);
+  }
+
   //  [adaptor impl] bool QMetaDataReaderControl::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -346,6 +295,31 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("metaData");
     }
+  }
+
+  //  [emitter impl] void QMetaDataReaderControl::metaDataAvailableChanged(bool available)
+  void emitter_QMetaDataReaderControl_metaDataAvailableChanged_864(bool available)
+  {
+    emit QMetaDataReaderControl::metaDataAvailableChanged(available);
+  }
+
+  //  [emitter impl] void QMetaDataReaderControl::metaDataChanged()
+  void emitter_QMetaDataReaderControl_metaDataChanged_0()
+  {
+    emit QMetaDataReaderControl::metaDataChanged();
+  }
+
+  //  [emitter impl] void QMetaDataReaderControl::metaDataChanged(const QString &key, const QVariant &value)
+  void emitter_QMetaDataReaderControl_metaDataChanged_4036(const QString &key, const QVariant &value)
+  {
+    emit QMetaDataReaderControl::metaDataChanged(key, value);
+  }
+
+  //  [emitter impl] void QMetaDataReaderControl::objectNameChanged(const QString &objectName)
+  void emitter_QMetaDataReaderControl_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QMetaDataReaderControl::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QMetaDataReaderControl::childEvent(QChildEvent *event)
@@ -502,6 +476,24 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QMetaDataReaderControl::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QMetaDataReaderControl_Adaptor *)cls)->emitter_QMetaDataReaderControl_destroyed_1302 (arg1);
+}
+
+
 // void QMetaDataReaderControl::disconnectNotify(const QMetaMethod &signal)
 
 static void _init_cbs_disconnectNotify_2394_0 (qt_gsi::GenericMethod *decl)
@@ -635,6 +627,77 @@ static void _set_callback_cbs_metaData_c2025_0 (void *cls, const gsi::Callback &
 }
 
 
+// emitter void QMetaDataReaderControl::metaDataAvailableChanged(bool available)
+
+static void _init_emitter_metaDataAvailableChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("available");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_metaDataAvailableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QMetaDataReaderControl_Adaptor *)cls)->emitter_QMetaDataReaderControl_metaDataAvailableChanged_864 (arg1);
+}
+
+
+// emitter void QMetaDataReaderControl::metaDataChanged()
+
+static void _init_emitter_metaDataChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_metaDataChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QMetaDataReaderControl_Adaptor *)cls)->emitter_QMetaDataReaderControl_metaDataChanged_0 ();
+}
+
+
+// emitter void QMetaDataReaderControl::metaDataChanged(const QString &key, const QVariant &value)
+
+static void _init_emitter_metaDataChanged_4036 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("key");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("value");
+  decl->add_arg<const QVariant & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_metaDataChanged_4036 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
+  ((QMetaDataReaderControl_Adaptor *)cls)->emitter_QMetaDataReaderControl_metaDataChanged_4036 (arg1, arg2);
+}
+
+
+// emitter void QMetaDataReaderControl::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QMetaDataReaderControl_Adaptor *)cls)->emitter_QMetaDataReaderControl_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QMetaDataReaderControl::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -719,6 +782,7 @@ static gsi::Methods methods_QMetaDataReaderControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMetaDataReaderControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QMetaDataReaderControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QMetaDataReaderControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMetaDataReaderControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
@@ -730,6 +794,10 @@ static gsi::Methods methods_QMetaDataReaderControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QMetaDataReaderControl::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("metaData", "@brief Virtual method QVariant QMetaDataReaderControl::metaData(const QString &key)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_metaData_c2025_0, &_call_cbs_metaData_c2025_0);
   methods += new qt_gsi::GenericMethod ("metaData", "@hide", true, &_init_cbs_metaData_c2025_0, &_call_cbs_metaData_c2025_0, &_set_callback_cbs_metaData_c2025_0);
+  methods += new qt_gsi::GenericMethod ("emit_metaDataAvailableChanged", "@brief Emitter for signal void QMetaDataReaderControl::metaDataAvailableChanged(bool available)\nCall this method to emit this signal.", false, &_init_emitter_metaDataAvailableChanged_864, &_call_emitter_metaDataAvailableChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_metaDataChanged", "@brief Emitter for signal void QMetaDataReaderControl::metaDataChanged()\nCall this method to emit this signal.", false, &_init_emitter_metaDataChanged_0, &_call_emitter_metaDataChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_metaDataChanged_kv", "@brief Emitter for signal void QMetaDataReaderControl::metaDataChanged(const QString &key, const QVariant &value)\nCall this method to emit this signal.", false, &_init_emitter_metaDataChanged_4036, &_call_emitter_metaDataChanged_4036);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QMetaDataReaderControl::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QMetaDataReaderControl::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QMetaDataReaderControl::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QMetaDataReaderControl::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);

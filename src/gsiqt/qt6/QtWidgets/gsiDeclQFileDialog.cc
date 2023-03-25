@@ -1394,11 +1394,11 @@ static gsi::Methods methods_QFileDialog () {
   methods += new qt_gsi::GenericMethod ("setOptions|options=", "@brief Method void QFileDialog::setOptions(QFlags<QFileDialog::Option> options)\n", false, &_init_f_setOptions_2938, &_call_f_setOptions_2938);
   methods += new qt_gsi::GenericMethod ("setProxyModel|proxyModel=", "@brief Method void QFileDialog::setProxyModel(QAbstractProxyModel *model)\n", false, &_init_f_setProxyModel_2566, &_call_f_setProxyModel_2566);
   methods += new qt_gsi::GenericMethod ("setSidebarUrls|sidebarUrls=", "@brief Method void QFileDialog::setSidebarUrls(const QList<QUrl> &urls)\n", false, &_init_f_setSidebarUrls_2316, &_call_f_setSidebarUrls_2316);
-  methods += new qt_gsi::GenericMethod ("setSupportedSchemes", "@brief Method void QFileDialog::setSupportedSchemes(const QStringList &schemes)\n", false, &_init_f_setSupportedSchemes_2437, &_call_f_setSupportedSchemes_2437);
+  methods += new qt_gsi::GenericMethod ("setSupportedSchemes|supportedSchemes=", "@brief Method void QFileDialog::setSupportedSchemes(const QStringList &schemes)\n", false, &_init_f_setSupportedSchemes_2437, &_call_f_setSupportedSchemes_2437);
   methods += new qt_gsi::GenericMethod ("setViewMode|viewMode=", "@brief Method void QFileDialog::setViewMode(QFileDialog::ViewMode mode)\n", false, &_init_f_setViewMode_2409, &_call_f_setViewMode_2409);
   methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method void QFileDialog::setVisible(bool visible)\nThis is a reimplementation of QDialog::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
   methods += new qt_gsi::GenericMethod (":sidebarUrls", "@brief Method QList<QUrl> QFileDialog::sidebarUrls()\n", true, &_init_f_sidebarUrls_c0, &_call_f_sidebarUrls_c0);
-  methods += new qt_gsi::GenericMethod ("supportedSchemes", "@brief Method QStringList QFileDialog::supportedSchemes()\n", true, &_init_f_supportedSchemes_c0, &_call_f_supportedSchemes_c0);
+  methods += new qt_gsi::GenericMethod (":supportedSchemes", "@brief Method QStringList QFileDialog::supportedSchemes()\n", true, &_init_f_supportedSchemes_c0, &_call_f_supportedSchemes_c0);
   methods += new qt_gsi::GenericMethod ("testOption", "@brief Method bool QFileDialog::testOption(QFileDialog::Option option)\n", true, &_init_f_testOption_c2242, &_call_f_testOption_c2242);
   methods += new qt_gsi::GenericMethod (":viewMode", "@brief Method QFileDialog::ViewMode QFileDialog::viewMode()\n", true, &_init_f_viewMode_c0, &_call_f_viewMode_c0);
   methods += gsi::qt_signal ("accepted()", "accepted", "@brief Signal declaration for QFileDialog::accepted()\nYou can bind a procedure to this signal.");

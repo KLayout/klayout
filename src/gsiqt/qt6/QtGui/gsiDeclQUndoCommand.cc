@@ -229,10 +229,10 @@ static gsi::Methods methods_QUndoCommand () {
   methods += new qt_gsi::GenericMethod ("child", "@brief Method const QUndoCommand *QUndoCommand::child(int index)\n", true, &_init_f_child_c767, &_call_f_child_c767);
   methods += new qt_gsi::GenericMethod ("childCount", "@brief Method int QUndoCommand::childCount()\n", true, &_init_f_childCount_c0, &_call_f_childCount_c0);
   methods += new qt_gsi::GenericMethod ("id", "@brief Method int QUndoCommand::id()\n", true, &_init_f_id_c0, &_call_f_id_c0);
-  methods += new qt_gsi::GenericMethod ("isObsolete?", "@brief Method bool QUndoCommand::isObsolete()\n", true, &_init_f_isObsolete_c0, &_call_f_isObsolete_c0);
+  methods += new qt_gsi::GenericMethod ("isObsolete?|:obsolete", "@brief Method bool QUndoCommand::isObsolete()\n", true, &_init_f_isObsolete_c0, &_call_f_isObsolete_c0);
   methods += new qt_gsi::GenericMethod ("mergeWith", "@brief Method bool QUndoCommand::mergeWith(const QUndoCommand *other)\n", false, &_init_f_mergeWith_2507, &_call_f_mergeWith_2507);
   methods += new qt_gsi::GenericMethod ("redo", "@brief Method void QUndoCommand::redo()\n", false, &_init_f_redo_0, &_call_f_redo_0);
-  methods += new qt_gsi::GenericMethod ("setObsolete", "@brief Method void QUndoCommand::setObsolete(bool obsolete)\n", false, &_init_f_setObsolete_864, &_call_f_setObsolete_864);
+  methods += new qt_gsi::GenericMethod ("setObsolete|obsolete=", "@brief Method void QUndoCommand::setObsolete(bool obsolete)\n", false, &_init_f_setObsolete_864, &_call_f_setObsolete_864);
   methods += new qt_gsi::GenericMethod ("setText|text=", "@brief Method void QUndoCommand::setText(const QString &text)\n", false, &_init_f_setText_2025, &_call_f_setText_2025);
   methods += new qt_gsi::GenericMethod (":text", "@brief Method QString QUndoCommand::text()\n", true, &_init_f_text_c0, &_call_f_text_c0);
   methods += new qt_gsi::GenericMethod ("undo", "@brief Method void QUndoCommand::undo()\n", false, &_init_f_undo_0, &_call_f_undo_0);

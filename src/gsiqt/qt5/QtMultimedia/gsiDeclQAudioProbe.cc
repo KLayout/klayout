@@ -57,42 +57,6 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// void QAudioProbe::audioBufferProbed(const QAudioBuffer &buffer)
-
-
-static void _init_f_audioBufferProbed_2494 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("buffer");
-  decl->add_arg<const QAudioBuffer & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_audioBufferProbed_2494 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QAudioBuffer &arg1 = gsi::arg_reader<const QAudioBuffer & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAudioProbe *)cls)->audioBufferProbed (arg1);
-}
-
-
-// void QAudioProbe::flush()
-
-
-static void _init_f_flush_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_flush_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAudioProbe *)cls)->flush ();
-}
-
-
 // bool QAudioProbe::isActive()
 
 
@@ -202,11 +166,13 @@ namespace gsi
 static gsi::Methods methods_QAudioProbe () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("audioBufferProbed", "@brief Method void QAudioProbe::audioBufferProbed(const QAudioBuffer &buffer)\n", false, &_init_f_audioBufferProbed_2494, &_call_f_audioBufferProbed_2494);
-  methods += new qt_gsi::GenericMethod ("flush", "@brief Method void QAudioProbe::flush()\n", false, &_init_f_flush_0, &_call_f_flush_0);
   methods += new qt_gsi::GenericMethod ("isActive?", "@brief Method bool QAudioProbe::isActive()\n", true, &_init_f_isActive_c0, &_call_f_isActive_c0);
   methods += new qt_gsi::GenericMethod ("setSource", "@brief Method bool QAudioProbe::setSource(QMediaObject *source)\n", false, &_init_f_setSource_1782, &_call_f_setSource_1782);
   methods += new qt_gsi::GenericMethod ("setSource", "@brief Method bool QAudioProbe::setSource(QMediaRecorder *source)\n", false, &_init_f_setSource_2005, &_call_f_setSource_2005);
+  methods += gsi::qt_signal<const QAudioBuffer & > ("audioBufferProbed(const QAudioBuffer &)", "audioBufferProbed", gsi::arg("buffer"), "@brief Signal declaration for QAudioProbe::audioBufferProbed(const QAudioBuffer &buffer)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAudioProbe::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("flush()", "flush", "@brief Signal declaration for QAudioProbe::flush()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QAudioProbe::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QAudioProbe::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QAudioProbe::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -261,6 +227,18 @@ public:
     return QAudioProbe::senderSignalIndex();
   }
 
+  //  [emitter impl] void QAudioProbe::audioBufferProbed(const QAudioBuffer &buffer)
+  void emitter_QAudioProbe_audioBufferProbed_2494(const QAudioBuffer &buffer)
+  {
+    emit QAudioProbe::audioBufferProbed(buffer);
+  }
+
+  //  [emitter impl] void QAudioProbe::destroyed(QObject *)
+  void emitter_QAudioProbe_destroyed_1302(QObject *arg1)
+  {
+    emit QAudioProbe::destroyed(arg1);
+  }
+
   //  [adaptor impl] bool QAudioProbe::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -289,6 +267,19 @@ public:
     } else {
       return QAudioProbe::eventFilter(watched, event);
     }
+  }
+
+  //  [emitter impl] void QAudioProbe::flush()
+  void emitter_QAudioProbe_flush_0()
+  {
+    emit QAudioProbe::flush();
+  }
+
+  //  [emitter impl] void QAudioProbe::objectNameChanged(const QString &objectName)
+  void emitter_QAudioProbe_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QAudioProbe::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QAudioProbe::childEvent(QChildEvent *event)
@@ -379,6 +370,24 @@ static void _call_ctor_QAudioProbe_Adaptor_1302 (const qt_gsi::GenericStaticMeth
 }
 
 
+// emitter void QAudioProbe::audioBufferProbed(const QAudioBuffer &buffer)
+
+static void _init_emitter_audioBufferProbed_2494 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("buffer");
+  decl->add_arg<const QAudioBuffer & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_audioBufferProbed_2494 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QAudioBuffer &arg1 = gsi::arg_reader<const QAudioBuffer & >() (args, heap);
+  ((QAudioProbe_Adaptor *)cls)->emitter_QAudioProbe_audioBufferProbed_2494 (arg1);
+}
+
+
 // void QAudioProbe::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
@@ -424,6 +433,24 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QAudioProbe_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
+}
+
+
+// emitter void QAudioProbe::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QAudioProbe_Adaptor *)cls)->emitter_QAudioProbe_destroyed_1302 (arg1);
 }
 
 
@@ -500,6 +527,20 @@ static void _set_callback_cbs_eventFilter_2411_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QAudioProbe::flush()
+
+static void _init_emitter_flush_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_flush_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QAudioProbe_Adaptor *)cls)->emitter_QAudioProbe_flush_0 ();
+}
+
+
 // exposed bool QAudioProbe::isSignalConnected(const QMetaMethod &signal)
 
 static void _init_fp_isSignalConnected_c2394 (qt_gsi::GenericMethod *decl)
@@ -515,6 +556,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
   tl::Heap heap;
   const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QAudioProbe_Adaptor *)cls)->fp_QAudioProbe_isSignalConnected_c2394 (arg1));
+}
+
+
+// emitter void QAudioProbe::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QAudioProbe_Adaptor *)cls)->emitter_QAudioProbe_objectNameChanged_4567 (arg1);
 }
 
 
@@ -596,17 +655,21 @@ gsi::Class<QAudioProbe> &qtdecl_QAudioProbe ();
 static gsi::Methods methods_QAudioProbe_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAudioProbe::QAudioProbe(QObject *parent)\nThis method creates an object of class QAudioProbe.", &_init_ctor_QAudioProbe_Adaptor_1302, &_call_ctor_QAudioProbe_Adaptor_1302);
+  methods += new qt_gsi::GenericMethod ("emit_audioBufferProbed", "@brief Emitter for signal void QAudioProbe::audioBufferProbed(const QAudioBuffer &buffer)\nCall this method to emit this signal.", false, &_init_emitter_audioBufferProbed_2494, &_call_emitter_audioBufferProbed_2494);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QAudioProbe::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAudioProbe::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QAudioProbe::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QAudioProbe::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAudioProbe::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QAudioProbe::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("emit_flush", "@brief Emitter for signal void QAudioProbe::flush()\nCall this method to emit this signal.", false, &_init_emitter_flush_0, &_call_emitter_flush_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QAudioProbe::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QAudioProbe::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QAudioProbe::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QAudioProbe::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QAudioProbe::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);

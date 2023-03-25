@@ -867,7 +867,7 @@ static gsi::Methods methods_QTextLayout () {
   methods += new qt_gsi::GenericMethod ("drawCursor", "@brief Method void QTextLayout::drawCursor(QPainter *p, const QPointF &pos, int cursorPosition, int width)\n", true, &_init_f_drawCursor_c4622, &_call_f_drawCursor_c4622);
   methods += new qt_gsi::GenericMethod ("endLayout", "@brief Method void QTextLayout::endLayout()\n", false, &_init_f_endLayout_0, &_call_f_endLayout_0);
   methods += new qt_gsi::GenericMethod (":font", "@brief Method QFont QTextLayout::font()\n", true, &_init_f_font_c0, &_call_f_font_c0);
-  methods += new qt_gsi::GenericMethod ("formats", "@brief Method QList<QTextLayout::FormatRange> QTextLayout::formats()\n", true, &_init_f_formats_c0, &_call_f_formats_c0);
+  methods += new qt_gsi::GenericMethod (":formats", "@brief Method QList<QTextLayout::FormatRange> QTextLayout::formats()\n", true, &_init_f_formats_c0, &_call_f_formats_c0);
   methods += new qt_gsi::GenericMethod ("glyphRuns", "@brief Method QList<QGlyphRun> QTextLayout::glyphRuns(int from, int length)\n", true, &_init_f_glyphRuns_c1426, &_call_f_glyphRuns_c1426);
   methods += new qt_gsi::GenericMethod ("isValidCursorPosition?", "@brief Method bool QTextLayout::isValidCursorPosition(int pos)\n", true, &_init_f_isValidCursorPosition_c767, &_call_f_isValidCursorPosition_c767);
   methods += new qt_gsi::GenericMethod ("leftCursorPosition", "@brief Method int QTextLayout::leftCursorPosition(int oldPos)\n", true, &_init_f_leftCursorPosition_c767, &_call_f_leftCursorPosition_c767);
@@ -886,7 +886,7 @@ static gsi::Methods methods_QTextLayout () {
   methods += new qt_gsi::GenericMethod ("setCursorMoveStyle|cursorMoveStyle=", "@brief Method void QTextLayout::setCursorMoveStyle(Qt::CursorMoveStyle style)\n", false, &_init_f_setCursorMoveStyle_2323, &_call_f_setCursorMoveStyle_2323);
   methods += new qt_gsi::GenericMethod ("setFlags", "@brief Method void QTextLayout::setFlags(int flags)\n", false, &_init_f_setFlags_767, &_call_f_setFlags_767);
   methods += new qt_gsi::GenericMethod ("setFont|font=", "@brief Method void QTextLayout::setFont(const QFont &f)\n", false, &_init_f_setFont_1801, &_call_f_setFont_1801);
-  methods += new qt_gsi::GenericMethod ("setFormats", "@brief Method void QTextLayout::setFormats(const QList<QTextLayout::FormatRange> &overrides)\n", false, &_init_f_setFormats_4294, &_call_f_setFormats_4294);
+  methods += new qt_gsi::GenericMethod ("setFormats|formats=", "@brief Method void QTextLayout::setFormats(const QList<QTextLayout::FormatRange> &overrides)\n", false, &_init_f_setFormats_4294, &_call_f_setFormats_4294);
   methods += new qt_gsi::GenericMethod ("setPosition|position=", "@brief Method void QTextLayout::setPosition(const QPointF &p)\n", false, &_init_f_setPosition_1986, &_call_f_setPosition_1986);
   methods += new qt_gsi::GenericMethod ("setPreeditArea", "@brief Method void QTextLayout::setPreeditArea(int position, const QString &text)\n", false, &_init_f_setPreeditArea_2684, &_call_f_setPreeditArea_2684);
   methods += new qt_gsi::GenericMethod ("setRawFont", "@brief Method void QTextLayout::setRawFont(const QRawFont &rawFont)\n", false, &_init_f_setRawFont_2099, &_call_f_setRawFont_2099);

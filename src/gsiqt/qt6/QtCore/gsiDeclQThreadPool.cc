@@ -412,11 +412,11 @@ static gsi::Methods methods_QThreadPool () {
   methods += new qt_gsi::GenericMethod ("reserveThread", "@brief Method void QThreadPool::reserveThread()\n", false, &_init_f_reserveThread_0, &_call_f_reserveThread_0);
   methods += new qt_gsi::GenericMethod ("setExpiryTimeout|expiryTimeout=", "@brief Method void QThreadPool::setExpiryTimeout(int expiryTimeout)\n", false, &_init_f_setExpiryTimeout_767, &_call_f_setExpiryTimeout_767);
   methods += new qt_gsi::GenericMethod ("setMaxThreadCount|maxThreadCount=", "@brief Method void QThreadPool::setMaxThreadCount(int maxThreadCount)\n", false, &_init_f_setMaxThreadCount_767, &_call_f_setMaxThreadCount_767);
-  methods += new qt_gsi::GenericMethod ("setStackSize", "@brief Method void QThreadPool::setStackSize(unsigned int stackSize)\n", false, &_init_f_setStackSize_1772, &_call_f_setStackSize_1772);
-  methods += new qt_gsi::GenericMethod ("setThreadPriority", "@brief Method void QThreadPool::setThreadPriority(QThread::Priority priority)\n", false, &_init_f_setThreadPriority_2099, &_call_f_setThreadPriority_2099);
-  methods += new qt_gsi::GenericMethod ("stackSize", "@brief Method unsigned int QThreadPool::stackSize()\n", true, &_init_f_stackSize_c0, &_call_f_stackSize_c0);
+  methods += new qt_gsi::GenericMethod ("setStackSize|stackSize=", "@brief Method void QThreadPool::setStackSize(unsigned int stackSize)\n", false, &_init_f_setStackSize_1772, &_call_f_setStackSize_1772);
+  methods += new qt_gsi::GenericMethod ("setThreadPriority|threadPriority=", "@brief Method void QThreadPool::setThreadPriority(QThread::Priority priority)\n", false, &_init_f_setThreadPriority_2099, &_call_f_setThreadPriority_2099);
+  methods += new qt_gsi::GenericMethod (":stackSize", "@brief Method unsigned int QThreadPool::stackSize()\n", true, &_init_f_stackSize_c0, &_call_f_stackSize_c0);
   methods += new qt_gsi::GenericMethod ("start", "@brief Method void QThreadPool::start(QRunnable *runnable, int priority)\n", false, &_init_f_start_2185, &_call_f_start_2185);
-  methods += new qt_gsi::GenericMethod ("threadPriority", "@brief Method QThread::Priority QThreadPool::threadPriority()\n", true, &_init_f_threadPriority_c0, &_call_f_threadPriority_c0);
+  methods += new qt_gsi::GenericMethod (":threadPriority", "@brief Method QThread::Priority QThreadPool::threadPriority()\n", true, &_init_f_threadPriority_c0, &_call_f_threadPriority_c0);
   methods += new qt_gsi::GenericMethod ("tryStart", "@brief Method bool QThreadPool::tryStart(QRunnable *runnable)\n", false, &_init_f_tryStart_1526, &_call_f_tryStart_1526);
   methods += new qt_gsi::GenericMethod ("tryTake", "@brief Method bool QThreadPool::tryTake(QRunnable *runnable)\n", false, &_init_f_tryTake_1526, &_call_f_tryTake_1526);
   methods += new qt_gsi::GenericMethod ("waitForDone", "@brief Method bool QThreadPool::waitForDone(int msecs)\n", false, &_init_f_waitForDone_767, &_call_f_waitForDone_767);

@@ -1843,7 +1843,7 @@ static gsi::Methods methods_QTextEdit () {
   methods += new qt_gsi::GenericMethod ("setPlainText|plainText=", "@brief Method void QTextEdit::setPlainText(const QString &text)\n", false, &_init_f_setPlainText_2025, &_call_f_setPlainText_2025);
   methods += new qt_gsi::GenericMethod ("setReadOnly|readOnly=", "@brief Method void QTextEdit::setReadOnly(bool ro)\n", false, &_init_f_setReadOnly_864, &_call_f_setReadOnly_864);
   methods += new qt_gsi::GenericMethod ("setTabChangesFocus|tabChangesFocus=", "@brief Method void QTextEdit::setTabChangesFocus(bool b)\n", false, &_init_f_setTabChangesFocus_864, &_call_f_setTabChangesFocus_864);
-  methods += new qt_gsi::GenericMethod ("setTabStopDistance", "@brief Method void QTextEdit::setTabStopDistance(double distance)\n", false, &_init_f_setTabStopDistance_1071, &_call_f_setTabStopDistance_1071);
+  methods += new qt_gsi::GenericMethod ("setTabStopDistance|tabStopDistance=", "@brief Method void QTextEdit::setTabStopDistance(double distance)\n", false, &_init_f_setTabStopDistance_1071, &_call_f_setTabStopDistance_1071);
   methods += new qt_gsi::GenericMethod ("setTabStopWidth|tabStopWidth=", "@brief Method void QTextEdit::setTabStopWidth(int width)\n", false, &_init_f_setTabStopWidth_767, &_call_f_setTabStopWidth_767);
   methods += new qt_gsi::GenericMethod ("setText", "@brief Method void QTextEdit::setText(const QString &text)\n", false, &_init_f_setText_2025, &_call_f_setText_2025);
   methods += new qt_gsi::GenericMethod ("setTextBackgroundColor|textBackgroundColor=", "@brief Method void QTextEdit::setTextBackgroundColor(const QColor &c)\n", false, &_init_f_setTextBackgroundColor_1905, &_call_f_setTextBackgroundColor_1905);
@@ -1853,7 +1853,7 @@ static gsi::Methods methods_QTextEdit () {
   methods += new qt_gsi::GenericMethod ("setUndoRedoEnabled|undoRedoEnabled=", "@brief Method void QTextEdit::setUndoRedoEnabled(bool enable)\n", false, &_init_f_setUndoRedoEnabled_864, &_call_f_setUndoRedoEnabled_864);
   methods += new qt_gsi::GenericMethod ("setWordWrapMode|wordWrapMode=", "@brief Method void QTextEdit::setWordWrapMode(QTextOption::WrapMode policy)\n", false, &_init_f_setWordWrapMode_2486, &_call_f_setWordWrapMode_2486);
   methods += new qt_gsi::GenericMethod (":tabChangesFocus", "@brief Method bool QTextEdit::tabChangesFocus()\n", true, &_init_f_tabChangesFocus_c0, &_call_f_tabChangesFocus_c0);
-  methods += new qt_gsi::GenericMethod ("tabStopDistance", "@brief Method double QTextEdit::tabStopDistance()\n", true, &_init_f_tabStopDistance_c0, &_call_f_tabStopDistance_c0);
+  methods += new qt_gsi::GenericMethod (":tabStopDistance", "@brief Method double QTextEdit::tabStopDistance()\n", true, &_init_f_tabStopDistance_c0, &_call_f_tabStopDistance_c0);
   methods += new qt_gsi::GenericMethod (":tabStopWidth", "@brief Method int QTextEdit::tabStopWidth()\n", true, &_init_f_tabStopWidth_c0, &_call_f_tabStopWidth_c0);
   methods += new qt_gsi::GenericMethod (":textBackgroundColor", "@brief Method QColor QTextEdit::textBackgroundColor()\n", true, &_init_f_textBackgroundColor_c0, &_call_f_textBackgroundColor_c0);
   methods += new qt_gsi::GenericMethod (":textColor", "@brief Method QColor QTextEdit::textColor()\n", true, &_init_f_textColor_c0, &_call_f_textColor_c0);

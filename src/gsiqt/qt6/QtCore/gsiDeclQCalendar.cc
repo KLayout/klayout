@@ -71,25 +71,6 @@ static void _call_ctor_QCalendar_2072 (const qt_gsi::GenericStaticMethod * /*dec
 }
 
 
-//  Constructor QCalendar::QCalendar(QLatin1String name)
-
-
-static void _init_ctor_QCalendar_1701 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("name");
-  decl->add_arg<QLatin1String > (argspec_0);
-  decl->set_return_new<QCalendar> ();
-}
-
-static void _call_ctor_QCalendar_1701 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
-  ret.write<QCalendar *> (new QCalendar (arg1));
-}
-
-
 //  Constructor QCalendar::QCalendar(QCalendar::SystemId id)
 
 
@@ -589,7 +570,6 @@ static gsi::Methods methods_QCalendar () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCalendar::QCalendar()\nThis method creates an object of class QCalendar.", &_init_ctor_QCalendar_0, &_call_ctor_QCalendar_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCalendar::QCalendar(QCalendar::System system)\nThis method creates an object of class QCalendar.", &_init_ctor_QCalendar_2072, &_call_ctor_QCalendar_2072);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCalendar::QCalendar(QLatin1String name)\nThis method creates an object of class QCalendar.", &_init_ctor_QCalendar_1701, &_call_ctor_QCalendar_1701);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCalendar::QCalendar(QCalendar::SystemId id)\nThis method creates an object of class QCalendar.", &_init_ctor_QCalendar_2245, &_call_ctor_QCalendar_2245);
   methods += new qt_gsi::GenericMethod ("dateFromParts", "@brief Method QDate QCalendar::dateFromParts(int year, int month, int day)\n", true, &_init_f_dateFromParts_c2085, &_call_f_dateFromParts_c2085);
   methods += new qt_gsi::GenericMethod ("dateFromParts", "@brief Method QDate QCalendar::dateFromParts(const QCalendar::YearMonthDay &parts)\n", true, &_init_f_dateFromParts_c3509, &_call_f_dateFromParts_c3509);

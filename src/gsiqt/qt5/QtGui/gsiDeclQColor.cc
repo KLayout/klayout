@@ -155,25 +155,6 @@ static void _call_ctor_QColor_1731 (const qt_gsi::GenericStaticMethod * /*decl*/
 }
 
 
-//  Constructor QColor::QColor(QLatin1String name)
-
-
-static void _init_ctor_QColor_1701 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("name");
-  decl->add_arg<QLatin1String > (argspec_0);
-  decl->set_return_new<QColor> ();
-}
-
-static void _call_ctor_QColor_1701 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
-  ret.write<QColor *> (new QColor (arg1));
-}
-
-
 //  Constructor QColor::QColor(QColor::Spec spec)
 
 
@@ -1455,26 +1436,6 @@ static void _call_f_setNamedColor_2025 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// void QColor::setNamedColor(QLatin1String name)
-
-
-static void _init_f_setNamedColor_1701 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("name");
-  decl->add_arg<QLatin1String > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_setNamedColor_1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QColor *)cls)->setNamedColor (arg1);
-}
-
-
 // void QColor::setRed(int red)
 
 
@@ -2117,25 +2078,6 @@ static void _call_f_isValidColor_2025 (const qt_gsi::GenericStaticMethod * /*dec
 }
 
 
-// static bool QColor::isValidColor(QLatin1String)
-
-
-static void _init_f_isValidColor_1701 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<QLatin1String > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_isValidColor_1701 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
-  ret.write<bool > ((bool)QColor::isValidColor (arg1));
-}
-
-
 
 namespace gsi
 {
@@ -2148,7 +2090,6 @@ static gsi::Methods methods_QColor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QColor::QColor(unsigned int rgb)\nThis method creates an object of class QColor.", &_init_ctor_QColor_1772, &_call_ctor_QColor_1772);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QColor::QColor(QRgba64 rgba64)\nThis method creates an object of class QColor.", &_init_ctor_QColor_1003, &_call_ctor_QColor_1003);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QColor::QColor(const char *aname)\nThis method creates an object of class QColor.", &_init_ctor_QColor_1731, &_call_ctor_QColor_1731);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QColor::QColor(QLatin1String name)\nThis method creates an object of class QColor.", &_init_ctor_QColor_1701, &_call_ctor_QColor_1701);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QColor::QColor(QColor::Spec spec)\nThis method creates an object of class QColor.", &_init_ctor_QColor_1539, &_call_ctor_QColor_1539);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QColor::QColor(const QColor &color)\nThis method creates an object of class QColor.", &_init_ctor_QColor_1905, &_call_ctor_QColor_1905);
   methods += new qt_gsi::GenericMethod (":alpha", "@brief Method int QColor::alpha()\n", true, &_init_f_alpha_c0, &_call_f_alpha_c0);
@@ -2215,7 +2156,6 @@ static gsi::Methods methods_QColor () {
   methods += new qt_gsi::GenericMethod ("setHsv", "@brief Method void QColor::setHsv(int h, int s, int v, int a)\n", false, &_init_f_setHsv_2744, &_call_f_setHsv_2744);
   methods += new qt_gsi::GenericMethod ("setHsvF", "@brief Method void QColor::setHsvF(double h, double s, double v, double a)\n", false, &_init_f_setHsvF_3960, &_call_f_setHsvF_3960);
   methods += new qt_gsi::GenericMethod ("setNamedColor", "@brief Method void QColor::setNamedColor(const QString &name)\n", false, &_init_f_setNamedColor_2025, &_call_f_setNamedColor_2025);
-  methods += new qt_gsi::GenericMethod ("setNamedColor", "@brief Method void QColor::setNamedColor(QLatin1String name)\n", false, &_init_f_setNamedColor_1701, &_call_f_setNamedColor_1701);
   methods += new qt_gsi::GenericMethod ("setRed|red=", "@brief Method void QColor::setRed(int red)\n", false, &_init_f_setRed_767, &_call_f_setRed_767);
   methods += new qt_gsi::GenericMethod ("setRedF|redF=", "@brief Method void QColor::setRedF(double red)\n", false, &_init_f_setRedF_1071, &_call_f_setRedF_1071);
   methods += new qt_gsi::GenericMethod ("setRgb", "@brief Method void QColor::setRgb(int r, int g, int b, int a)\n", false, &_init_f_setRgb_2744, &_call_f_setRgb_2744);
@@ -2246,7 +2186,6 @@ static gsi::Methods methods_QColor () {
   methods += new qt_gsi::GenericStaticMethod ("fromRgba64", "@brief Static method QColor QColor::fromRgba64(unsigned short int r, unsigned short int g, unsigned short int b, unsigned short int a)\nThis method is static and can be called without an instance.", &_init_f_fromRgba64_9580, &_call_f_fromRgba64_9580);
   methods += new qt_gsi::GenericStaticMethod ("fromRgba64", "@brief Static method QColor QColor::fromRgba64(QRgba64 rgba)\nThis method is static and can be called without an instance.", &_init_f_fromRgba64_1003, &_call_f_fromRgba64_1003);
   methods += new qt_gsi::GenericStaticMethod ("isValidColor?", "@brief Static method bool QColor::isValidColor(const QString &name)\nThis method is static and can be called without an instance.", &_init_f_isValidColor_2025, &_call_f_isValidColor_2025);
-  methods += new qt_gsi::GenericStaticMethod ("isValidColor?", "@brief Static method bool QColor::isValidColor(QLatin1String)\nThis method is static and can be called without an instance.", &_init_f_isValidColor_1701, &_call_f_isValidColor_1701);
   return methods;
 }
 

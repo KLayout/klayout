@@ -277,25 +277,6 @@ static void _call_f_operator_index__c2025 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// const QJsonValue QJsonDocument::operator[](QLatin1String key)
-
-
-static void _init_f_operator_index__c1701 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QLatin1String > (argspec_0);
-  decl->set_return<const QJsonValue > ();
-}
-
-static void _call_f_operator_index__c1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
-  ret.write<const QJsonValue > ((const QJsonValue)((QJsonDocument *)cls)->operator[] (arg1));
-}
-
-
 // const QJsonValue QJsonDocument::operator[](int i)
 
 
@@ -566,7 +547,6 @@ static gsi::Methods methods_QJsonDocument () {
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QJsonDocument::operator!=(const QJsonDocument &other)\n", true, &_init_f_operator_excl__eq__c2635, &_call_f_operator_excl__eq__c2635);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QJsonDocument::operator==(const QJsonDocument &other)\n", true, &_init_f_operator_eq__eq__c2635, &_call_f_operator_eq__eq__c2635);
   methods += new qt_gsi::GenericMethod ("[]", "@brief Method const QJsonValue QJsonDocument::operator[](const QString &key)\n", true, &_init_f_operator_index__c2025, &_call_f_operator_index__c2025);
-  methods += new qt_gsi::GenericMethod ("[]", "@brief Method const QJsonValue QJsonDocument::operator[](QLatin1String key)\n", true, &_init_f_operator_index__c1701, &_call_f_operator_index__c1701);
   methods += new qt_gsi::GenericMethod ("[]", "@brief Method const QJsonValue QJsonDocument::operator[](int i)\n", true, &_init_f_operator_index__c767, &_call_f_operator_index__c767);
   methods += new qt_gsi::GenericMethod ("rawData", "@brief Method const char *QJsonDocument::rawData(int *size)\n", true, &_init_f_rawData_c953, &_call_f_rawData_c953);
   methods += new qt_gsi::GenericMethod ("setArray|array=", "@brief Method void QJsonDocument::setArray(const QJsonArray &array)\n", false, &_init_f_setArray_2315, &_call_f_setArray_2315);

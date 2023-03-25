@@ -370,25 +370,6 @@ static void _call_f_operator_index__c2025 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// const QJsonValue QJsonValue::operator[](QLatin1String key)
-
-
-static void _init_f_operator_index__c1701 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QLatin1String > (argspec_0);
-  decl->set_return<const QJsonValue > ();
-}
-
-static void _call_f_operator_index__c1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
-  ret.write<const QJsonValue > ((const QJsonValue)((QJsonValue *)cls)->operator[] (arg1));
-}
-
-
 // const QJsonValue QJsonValue::operator[](int i)
 
 
@@ -661,7 +642,6 @@ static gsi::Methods methods_QJsonValue () {
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QJsonValue::operator!=(const QJsonValue &other)\n", true, &_init_f_operator_excl__eq__c2313, &_call_f_operator_excl__eq__c2313);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QJsonValue::operator==(const QJsonValue &other)\n", true, &_init_f_operator_eq__eq__c2313, &_call_f_operator_eq__eq__c2313);
   methods += new qt_gsi::GenericMethod ("[]", "@brief Method const QJsonValue QJsonValue::operator[](const QString &key)\n", true, &_init_f_operator_index__c2025, &_call_f_operator_index__c2025);
-  methods += new qt_gsi::GenericMethod ("[]", "@brief Method const QJsonValue QJsonValue::operator[](QLatin1String key)\n", true, &_init_f_operator_index__c1701, &_call_f_operator_index__c1701);
   methods += new qt_gsi::GenericMethod ("[]", "@brief Method const QJsonValue QJsonValue::operator[](int i)\n", true, &_init_f_operator_index__c767, &_call_f_operator_index__c767);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QJsonValue::swap(QJsonValue &other)\n", false, &_init_f_swap_1618, &_call_f_swap_1618);
   methods += new qt_gsi::GenericMethod ("toArray", "@brief Method QJsonArray QJsonValue::toArray()\n", true, &_init_f_toArray_c0, &_call_f_toArray_c0);

@@ -812,6 +812,15 @@ class QtBinding_TestClass < TestBase
 
   end
 
+  def test_57
+
+    # QColor with string parameter (suppressing QLatin1String)
+
+    color = RBA::QColor::new("blue")
+    assert_equal(color.name(), "#0000ff")
+
+  end
+
 end 
 
 load("test_epilogue.rb")

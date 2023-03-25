@@ -88,25 +88,6 @@ static void _call_ctor_QAnyStringView_2025 (const qt_gsi::GenericStaticMethod * 
 }
 
 
-//  Constructor QAnyStringView::QAnyStringView(QLatin1String str)
-
-
-static void _init_ctor_QAnyStringView_1701 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("str");
-  decl->add_arg<QLatin1String > (argspec_0);
-  decl->set_return_new<QAnyStringView> ();
-}
-
-static void _call_ctor_QAnyStringView_1701 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
-  ret.write<QAnyStringView *> (new QAnyStringView (arg1));
-}
-
-
 //  Constructor QAnyStringView::QAnyStringView(const QChar &c)
 
 
@@ -332,7 +313,6 @@ static gsi::Methods methods_QAnyStringView () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAnyStringView::QAnyStringView()\nThis method creates an object of class QAnyStringView.", &_init_ctor_QAnyStringView_0, &_call_ctor_QAnyStringView_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAnyStringView::QAnyStringView(const QByteArray &str)\nThis method creates an object of class QAnyStringView.", &_init_ctor_QAnyStringView_2309, &_call_ctor_QAnyStringView_2309);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAnyStringView::QAnyStringView(const QString &str)\nThis method creates an object of class QAnyStringView.", &_init_ctor_QAnyStringView_2025, &_call_ctor_QAnyStringView_2025);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAnyStringView::QAnyStringView(QLatin1String str)\nThis method creates an object of class QAnyStringView.", &_init_ctor_QAnyStringView_1701, &_call_ctor_QAnyStringView_1701);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAnyStringView::QAnyStringView(const QChar &c)\nThis method creates an object of class QAnyStringView.", &_init_ctor_QAnyStringView_1776, &_call_ctor_QAnyStringView_1776);
   methods += new qt_gsi::GenericMethod ("back", "@brief Method QChar QAnyStringView::back()\n", true, &_init_f_back_c0, &_call_f_back_c0);
   methods += new qt_gsi::GenericMethod ("data", "@brief Method const void *QAnyStringView::data()\n", true, &_init_f_data_c0, &_call_f_data_c0);

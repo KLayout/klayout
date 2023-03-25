@@ -685,6 +685,13 @@ class QtBindingTest(unittest.TestCase):
     self.assertEqual("%08x" % image.pixel(1, 0), "14131211")
     self.assertEqual("%08x" % image.pixel(0, 2), "64636261")
 
+  def test_57(self):
+
+    # QColor with string parameter (suppressing QLatin1String)
+
+    color = pya.QColor("blue")
+    self.assertEqual(color.name(), "#0000ff")
+
 
 # run unit tests
 if __name__ == '__main__':

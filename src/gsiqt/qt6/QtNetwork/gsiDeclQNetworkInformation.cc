@@ -186,25 +186,6 @@ static void _call_f_instance_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gs
 }
 
 
-// static bool QNetworkInformation::load(QStringView backend)
-
-
-static void _init_f_load_1559 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("backend");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_load_1559 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<bool > ((bool)QNetworkInformation::load (arg1));
-}
-
-
 // static bool QNetworkInformation::load(QFlags<QNetworkInformation::Feature> features)
 
 
@@ -264,7 +245,6 @@ static gsi::Methods methods_QNetworkInformation () {
   methods += new qt_gsi::GenericMethod ("supports", "@brief Method bool QNetworkInformation::supports(QFlags<QNetworkInformation::Feature> features)\n", true, &_init_f_supports_c3949, &_call_f_supports_c3949);
   methods += new qt_gsi::GenericStaticMethod ("availableBackends", "@brief Static method QStringList QNetworkInformation::availableBackends()\nThis method is static and can be called without an instance.", &_init_f_availableBackends_0, &_call_f_availableBackends_0);
   methods += new qt_gsi::GenericStaticMethod ("instance", "@brief Static method QNetworkInformation *QNetworkInformation::instance()\nThis method is static and can be called without an instance.", &_init_f_instance_0, &_call_f_instance_0);
-  methods += new qt_gsi::GenericStaticMethod ("load", "@brief Static method bool QNetworkInformation::load(QStringView backend)\nThis method is static and can be called without an instance.", &_init_f_load_1559, &_call_f_load_1559);
   methods += new qt_gsi::GenericStaticMethod ("load", "@brief Static method bool QNetworkInformation::load(QFlags<QNetworkInformation::Feature> features)\nThis method is static and can be called without an instance.", &_init_f_load_3949, &_call_f_load_3949);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QNetworkInformation::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;

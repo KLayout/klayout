@@ -610,28 +610,6 @@ static void _call_f_quoteString_c4635 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// QString QLocale::quoteString(QStringView str, QLocale::QuotationStyle style)
-
-
-static void _init_f_quoteString_c4169 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("str");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("style", true, "QLocale::StandardQuotation");
-  decl->add_arg<const qt_gsi::Converter<QLocale::QuotationStyle>::target_type & > (argspec_1);
-  decl->set_return<QString > ();
-}
-
-static void _call_f_quoteString_c4169 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  const qt_gsi::Converter<QLocale::QuotationStyle>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::QuotationStyle>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::QuotationStyle>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::QuotationStyle>(heap, QLocale::StandardQuotation), heap);
-  ret.write<QString > ((QString)((QLocale *)cls)->quoteString (arg1, qt_gsi::QtToCppAdaptor<QLocale::QuotationStyle>(arg2).cref()));
-}
-
-
 // QLocale::Script QLocale::script()
 
 
@@ -1172,28 +1150,6 @@ static void _call_f_toDouble_c2967 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// double QLocale::toDouble(QStringView s, bool *ok)
-
-
-static void _init_f_toDouble_c2501 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("s");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
-  decl->add_arg<bool * > (argspec_1);
-  decl->set_return<double > ();
-}
-
-static void _call_f_toDouble_c2501 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
-  ret.write<double > ((double)((QLocale *)cls)->toDouble (arg1, arg2));
-}
-
-
 // float QLocale::toFloat(const QString &s, bool *ok)
 
 
@@ -1211,28 +1167,6 @@ static void _call_f_toFloat_c2967 (const qt_gsi::GenericMethod * /*decl*/, void 
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
-  ret.write<float > ((float)((QLocale *)cls)->toFloat (arg1, arg2));
-}
-
-
-// float QLocale::toFloat(QStringView s, bool *ok)
-
-
-static void _init_f_toFloat_c2501 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("s");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
-  decl->add_arg<bool * > (argspec_1);
-  decl->set_return<float > ();
-}
-
-static void _call_f_toFloat_c2501 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
   bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<float > ((float)((QLocale *)cls)->toFloat (arg1, arg2));
 }
@@ -1260,28 +1194,6 @@ static void _call_f_toInt_c2967 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// int QLocale::toInt(QStringView s, bool *ok)
-
-
-static void _init_f_toInt_c2501 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("s");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
-  decl->add_arg<bool * > (argspec_1);
-  decl->set_return<int > ();
-}
-
-static void _call_f_toInt_c2501 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
-  ret.write<int > ((int)((QLocale *)cls)->toInt (arg1, arg2));
-}
-
-
 // long int QLocale::toLong(const QString &s, bool *ok)
 
 
@@ -1304,28 +1216,6 @@ static void _call_f_toLong_c2967 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// long int QLocale::toLong(QStringView s, bool *ok)
-
-
-static void _init_f_toLong_c2501 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("s");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
-  decl->add_arg<bool * > (argspec_1);
-  decl->set_return<long int > ();
-}
-
-static void _call_f_toLong_c2501 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
-  ret.write<long int > ((long int)((QLocale *)cls)->toLong (arg1, arg2));
-}
-
-
 // qlonglong QLocale::toLongLong(const QString &s, bool *ok)
 
 
@@ -1343,28 +1233,6 @@ static void _call_f_toLongLong_c2967 (const qt_gsi::GenericMethod * /*decl*/, vo
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
-  ret.write<qlonglong > ((qlonglong)((QLocale *)cls)->toLongLong (arg1, arg2));
-}
-
-
-// qlonglong QLocale::toLongLong(QStringView s, bool *ok)
-
-
-static void _init_f_toLongLong_c2501 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("s");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
-  decl->add_arg<bool * > (argspec_1);
-  decl->set_return<qlonglong > ();
-}
-
-static void _call_f_toLongLong_c2501 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
   bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<qlonglong > ((qlonglong)((QLocale *)cls)->toLongLong (arg1, arg2));
 }
@@ -1406,28 +1274,6 @@ static void _call_f_toShort_c2967 (const qt_gsi::GenericMethod * /*decl*/, void 
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
-  ret.write<short int > ((short int)((QLocale *)cls)->toShort (arg1, arg2));
-}
-
-
-// short int QLocale::toShort(QStringView s, bool *ok)
-
-
-static void _init_f_toShort_c2501 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("s");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
-  decl->add_arg<bool * > (argspec_1);
-  decl->set_return<short int > ();
-}
-
-static void _call_f_toShort_c2501 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
   bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<short int > ((short int)((QLocale *)cls)->toShort (arg1, arg2));
 }
@@ -1701,72 +1547,6 @@ static void _call_f_toString_c4092 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// QString QLocale::toString(QDate date, QStringView format)
-
-
-static void _init_f_toString_c2350 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("date");
-  decl->add_arg<QDate > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format");
-  decl->add_arg<QStringView > (argspec_1);
-  decl->set_return<QString > ();
-}
-
-static void _call_f_toString_c2350 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QDate arg1 = gsi::arg_reader<QDate >() (args, heap);
-  QStringView arg2 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, arg2));
-}
-
-
-// QString QLocale::toString(QTime time, QStringView format)
-
-
-static void _init_f_toString_c2367 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("time");
-  decl->add_arg<QTime > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format");
-  decl->add_arg<QStringView > (argspec_1);
-  decl->set_return<QString > ();
-}
-
-static void _call_f_toString_c2367 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QTime arg1 = gsi::arg_reader<QTime >() (args, heap);
-  QStringView arg2 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, arg2));
-}
-
-
-// QString QLocale::toString(const QDateTime &dateTime, QStringView format)
-
-
-static void _init_f_toString_c3626 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("dateTime");
-  decl->add_arg<const QDateTime & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format");
-  decl->add_arg<QStringView > (argspec_1);
-  decl->set_return<QString > ();
-}
-
-static void _call_f_toString_c3626 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
-  QStringView arg2 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, arg2));
-}
-
-
 // QString QLocale::toString(QDate date, QLocale::FormatType format)
 
 
@@ -1833,31 +1613,6 @@ static void _call_f_toString_c4327 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// QString QLocale::toString(QDate date, QStringView format, QCalendar cal)
-
-
-static void _init_f_toString_c3553 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("date");
-  decl->add_arg<QDate > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format");
-  decl->add_arg<QStringView > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("cal");
-  decl->add_arg<QCalendar > (argspec_2);
-  decl->set_return<QString > ();
-}
-
-static void _call_f_toString_c3553 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QDate arg1 = gsi::arg_reader<QDate >() (args, heap);
-  QStringView arg2 = gsi::arg_reader<QStringView >() (args, heap);
-  QCalendar arg3 = gsi::arg_reader<QCalendar >() (args, heap);
-  ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, arg2, arg3));
-}
-
-
 // QString QLocale::toString(QDate date, QLocale::FormatType format, QCalendar cal)
 
 
@@ -1905,31 +1660,6 @@ static void _call_f_toString_c5530 (const qt_gsi::GenericMethod * /*decl*/, void
   const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (args, heap);
   QCalendar arg3 = gsi::arg_reader<QCalendar >() (args, heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, qt_gsi::QtToCppAdaptor<QLocale::FormatType>(arg2).cref(), arg3));
-}
-
-
-// QString QLocale::toString(const QDateTime &dateTime, QStringView format, QCalendar cal)
-
-
-static void _init_f_toString_c4829 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("dateTime");
-  decl->add_arg<const QDateTime & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format");
-  decl->add_arg<QStringView > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("cal");
-  decl->add_arg<QCalendar > (argspec_2);
-  decl->set_return<QString > ();
-}
-
-static void _call_f_toString_c4829 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
-  QStringView arg2 = gsi::arg_reader<QStringView >() (args, heap);
-  QCalendar arg3 = gsi::arg_reader<QCalendar >() (args, heap);
-  ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, arg2, arg3));
 }
 
 
@@ -1999,28 +1729,6 @@ static void _call_f_toUInt_c2967 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// unsigned int QLocale::toUInt(QStringView s, bool *ok)
-
-
-static void _init_f_toUInt_c2501 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("s");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
-  decl->add_arg<bool * > (argspec_1);
-  decl->set_return<unsigned int > ();
-}
-
-static void _call_f_toUInt_c2501 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
-  ret.write<unsigned int > ((unsigned int)((QLocale *)cls)->toUInt (arg1, arg2));
-}
-
-
 // unsigned long int QLocale::toULong(const QString &s, bool *ok)
 
 
@@ -2038,28 +1746,6 @@ static void _call_f_toULong_c2967 (const qt_gsi::GenericMethod * /*decl*/, void 
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
-  ret.write<unsigned long int > ((unsigned long int)((QLocale *)cls)->toULong (arg1, arg2));
-}
-
-
-// unsigned long int QLocale::toULong(QStringView s, bool *ok)
-
-
-static void _init_f_toULong_c2501 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("s");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
-  decl->add_arg<bool * > (argspec_1);
-  decl->set_return<unsigned long int > ();
-}
-
-static void _call_f_toULong_c2501 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
   bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<unsigned long int > ((unsigned long int)((QLocale *)cls)->toULong (arg1, arg2));
 }
@@ -2087,28 +1773,6 @@ static void _call_f_toULongLong_c2967 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// qulonglong QLocale::toULongLong(QStringView s, bool *ok)
-
-
-static void _init_f_toULongLong_c2501 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("s");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
-  decl->add_arg<bool * > (argspec_1);
-  decl->set_return<qulonglong > ();
-}
-
-static void _call_f_toULongLong_c2501 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
-  ret.write<qulonglong > ((qulonglong)((QLocale *)cls)->toULongLong (arg1, arg2));
-}
-
-
 // unsigned short int QLocale::toUShort(const QString &s, bool *ok)
 
 
@@ -2126,28 +1790,6 @@ static void _call_f_toUShort_c2967 (const qt_gsi::GenericMethod * /*decl*/, void
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
-  ret.write<unsigned short int > ((unsigned short int)((QLocale *)cls)->toUShort (arg1, arg2));
-}
-
-
-// unsigned short int QLocale::toUShort(QStringView s, bool *ok)
-
-
-static void _init_f_toUShort_c2501 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("s");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
-  decl->add_arg<bool * > (argspec_1);
-  decl->set_return<unsigned short int > ();
-}
-
-static void _call_f_toUShort_c2501 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
   bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<unsigned short int > ((unsigned short int)((QLocale *)cls)->toUShort (arg1, arg2));
 }
@@ -2229,82 +1871,6 @@ static void _call_f_c_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::Seri
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QLocale > ((QLocale)QLocale::c ());
-}
-
-
-// static QLocale::Country QLocale::codeToCountry(QStringView countryCode)
-
-
-static void _init_f_codeToCountry_1559 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("countryCode");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<qt_gsi::Converter<QLocale::Country>::target_type > ();
-}
-
-static void _call_f_codeToCountry_1559 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<qt_gsi::Converter<QLocale::Country>::target_type > ((qt_gsi::Converter<QLocale::Country>::target_type)qt_gsi::CppToQtAdaptor<QLocale::Country>(QLocale::codeToCountry (arg1)));
-}
-
-
-// static QLocale::Language QLocale::codeToLanguage(QStringView languageCode)
-
-
-static void _init_f_codeToLanguage_1559 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("languageCode");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<qt_gsi::Converter<QLocale::Language>::target_type > ();
-}
-
-static void _call_f_codeToLanguage_1559 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<qt_gsi::Converter<QLocale::Language>::target_type > ((qt_gsi::Converter<QLocale::Language>::target_type)qt_gsi::CppToQtAdaptor<QLocale::Language>(QLocale::codeToLanguage (arg1)));
-}
-
-
-// static QLocale::Script QLocale::codeToScript(QStringView scriptCode)
-
-
-static void _init_f_codeToScript_1559 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("scriptCode");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<qt_gsi::Converter<QLocale::Script>::target_type > ();
-}
-
-static void _call_f_codeToScript_1559 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<qt_gsi::Converter<QLocale::Script>::target_type > ((qt_gsi::Converter<QLocale::Script>::target_type)qt_gsi::CppToQtAdaptor<QLocale::Script>(QLocale::codeToScript (arg1)));
-}
-
-
-// static QLocale::Territory QLocale::codeToTerritory(QStringView territoryCode)
-
-
-static void _init_f_codeToTerritory_1559 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("territoryCode");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<QLocale::Territory > ();
-}
-
-static void _call_f_codeToTerritory_1559 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QLocale::Territory > ((QLocale::Territory)QLocale::codeToTerritory (arg1));
 }
 
 
@@ -2578,7 +2144,6 @@ static gsi::Methods methods_QLocale () {
   methods += new qt_gsi::GenericMethod ("pmText", "@brief Method QString QLocale::pmText()\n", true, &_init_f_pmText_c0, &_call_f_pmText_c0);
   methods += new qt_gsi::GenericMethod ("positiveSign", "@brief Method QString QLocale::positiveSign()\n", true, &_init_f_positiveSign_c0, &_call_f_positiveSign_c0);
   methods += new qt_gsi::GenericMethod ("quoteString", "@brief Method QString QLocale::quoteString(const QString &str, QLocale::QuotationStyle style)\n", true, &_init_f_quoteString_c4635, &_call_f_quoteString_c4635);
-  methods += new qt_gsi::GenericMethod ("quoteString", "@brief Method QString QLocale::quoteString(QStringView str, QLocale::QuotationStyle style)\n", true, &_init_f_quoteString_c4169, &_call_f_quoteString_c4169);
   methods += new qt_gsi::GenericMethod ("script", "@brief Method QLocale::Script QLocale::script()\n", true, &_init_f_script_c0, &_call_f_script_c0);
   methods += new qt_gsi::GenericMethod ("setNumberOptions|numberOptions=", "@brief Method void QLocale::setNumberOptions(QFlags<QLocale::NumberOption> options)\n", false, &_init_f_setNumberOptions_3171, &_call_f_setNumberOptions_3171);
   methods += new qt_gsi::GenericMethod ("standaloneDayName", "@brief Method QString QLocale::standaloneDayName(int, QLocale::FormatType format)\n", true, &_init_f_standaloneDayName_c2919, &_call_f_standaloneDayName_c2919);
@@ -2604,18 +2169,12 @@ static gsi::Methods methods_QLocale () {
   methods += new qt_gsi::GenericMethod ("toDateTime", "@brief Method QDateTime QLocale::toDateTime(const QString &string, QLocale::FormatType format, QCalendar cal)\n", true, &_init_f_toDateTime_c5380, &_call_f_toDateTime_c5380);
   methods += new qt_gsi::GenericMethod ("toDateTime", "@brief Method QDateTime QLocale::toDateTime(const QString &string, const QString &format, QCalendar cal)\n", true, &_init_f_toDateTime_c5145, &_call_f_toDateTime_c5145);
   methods += new qt_gsi::GenericMethod ("toDouble", "@brief Method double QLocale::toDouble(const QString &s, bool *ok)\n", true, &_init_f_toDouble_c2967, &_call_f_toDouble_c2967);
-  methods += new qt_gsi::GenericMethod ("toDouble", "@brief Method double QLocale::toDouble(QStringView s, bool *ok)\n", true, &_init_f_toDouble_c2501, &_call_f_toDouble_c2501);
   methods += new qt_gsi::GenericMethod ("toFloat", "@brief Method float QLocale::toFloat(const QString &s, bool *ok)\n", true, &_init_f_toFloat_c2967, &_call_f_toFloat_c2967);
-  methods += new qt_gsi::GenericMethod ("toFloat", "@brief Method float QLocale::toFloat(QStringView s, bool *ok)\n", true, &_init_f_toFloat_c2501, &_call_f_toFloat_c2501);
   methods += new qt_gsi::GenericMethod ("toInt", "@brief Method int QLocale::toInt(const QString &s, bool *ok)\n", true, &_init_f_toInt_c2967, &_call_f_toInt_c2967);
-  methods += new qt_gsi::GenericMethod ("toInt", "@brief Method int QLocale::toInt(QStringView s, bool *ok)\n", true, &_init_f_toInt_c2501, &_call_f_toInt_c2501);
   methods += new qt_gsi::GenericMethod ("toLong", "@brief Method long int QLocale::toLong(const QString &s, bool *ok)\n", true, &_init_f_toLong_c2967, &_call_f_toLong_c2967);
-  methods += new qt_gsi::GenericMethod ("toLong", "@brief Method long int QLocale::toLong(QStringView s, bool *ok)\n", true, &_init_f_toLong_c2501, &_call_f_toLong_c2501);
   methods += new qt_gsi::GenericMethod ("toLongLong", "@brief Method qlonglong QLocale::toLongLong(const QString &s, bool *ok)\n", true, &_init_f_toLongLong_c2967, &_call_f_toLongLong_c2967);
-  methods += new qt_gsi::GenericMethod ("toLongLong", "@brief Method qlonglong QLocale::toLongLong(QStringView s, bool *ok)\n", true, &_init_f_toLongLong_c2501, &_call_f_toLongLong_c2501);
   methods += new qt_gsi::GenericMethod ("toLower", "@brief Method QString QLocale::toLower(const QString &str)\n", true, &_init_f_toLower_c2025, &_call_f_toLower_c2025);
   methods += new qt_gsi::GenericMethod ("toShort", "@brief Method short int QLocale::toShort(const QString &s, bool *ok)\n", true, &_init_f_toShort_c2967, &_call_f_toShort_c2967);
-  methods += new qt_gsi::GenericMethod ("toShort", "@brief Method short int QLocale::toShort(QStringView s, bool *ok)\n", true, &_init_f_toShort_c2501, &_call_f_toShort_c2501);
   methods += new qt_gsi::GenericMethod ("toString_ll", "@brief Method QString QLocale::toString(qlonglong i)\n", true, &_init_f_toString_c1413, &_call_f_toString_c1413);
   methods += new qt_gsi::GenericMethod ("toString_ull", "@brief Method QString QLocale::toString(qulonglong i)\n", true, &_init_f_toString_c1530, &_call_f_toString_c1530);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(long int i)\n", true, &_init_f_toString_c1343, &_call_f_toString_c1343);
@@ -2629,35 +2188,22 @@ static gsi::Methods methods_QLocale () {
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(QDate date, const QString &format)\n", true, &_init_f_toString_c2816, &_call_f_toString_c2816);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(QTime time, const QString &format)\n", true, &_init_f_toString_c2833, &_call_f_toString_c2833);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(const QDateTime &dateTime, const QString &format)\n", true, &_init_f_toString_c4092, &_call_f_toString_c4092);
-  methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(QDate date, QStringView format)\n", true, &_init_f_toString_c2350, &_call_f_toString_c2350);
-  methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(QTime time, QStringView format)\n", true, &_init_f_toString_c2367, &_call_f_toString_c2367);
-  methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(const QDateTime &dateTime, QStringView format)\n", true, &_init_f_toString_c3626, &_call_f_toString_c3626);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(QDate date, QLocale::FormatType format)\n", true, &_init_f_toString_c3051, &_call_f_toString_c3051);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(QTime time, QLocale::FormatType format)\n", true, &_init_f_toString_c3068, &_call_f_toString_c3068);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(const QDateTime &dateTime, QLocale::FormatType format)\n", true, &_init_f_toString_c4327, &_call_f_toString_c4327);
-  methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(QDate date, QStringView format, QCalendar cal)\n", true, &_init_f_toString_c3553, &_call_f_toString_c3553);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(QDate date, QLocale::FormatType format, QCalendar cal)\n", true, &_init_f_toString_c4254, &_call_f_toString_c4254);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(const QDateTime &dateTime, QLocale::FormatType format, QCalendar cal)\n", true, &_init_f_toString_c5530, &_call_f_toString_c5530);
-  methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(const QDateTime &dateTime, QStringView format, QCalendar cal)\n", true, &_init_f_toString_c4829, &_call_f_toString_c4829);
   methods += new qt_gsi::GenericMethod ("toTime", "@brief Method QTime QLocale::toTime(const QString &string, QLocale::FormatType)\n", true, &_init_f_toTime_c4177, &_call_f_toTime_c4177);
   methods += new qt_gsi::GenericMethod ("toTime", "@brief Method QTime QLocale::toTime(const QString &string, const QString &format)\n", true, &_init_f_toTime_c3942, &_call_f_toTime_c3942);
   methods += new qt_gsi::GenericMethod ("toUInt", "@brief Method unsigned int QLocale::toUInt(const QString &s, bool *ok)\n", true, &_init_f_toUInt_c2967, &_call_f_toUInt_c2967);
-  methods += new qt_gsi::GenericMethod ("toUInt", "@brief Method unsigned int QLocale::toUInt(QStringView s, bool *ok)\n", true, &_init_f_toUInt_c2501, &_call_f_toUInt_c2501);
   methods += new qt_gsi::GenericMethod ("toULong", "@brief Method unsigned long int QLocale::toULong(const QString &s, bool *ok)\n", true, &_init_f_toULong_c2967, &_call_f_toULong_c2967);
-  methods += new qt_gsi::GenericMethod ("toULong", "@brief Method unsigned long int QLocale::toULong(QStringView s, bool *ok)\n", true, &_init_f_toULong_c2501, &_call_f_toULong_c2501);
   methods += new qt_gsi::GenericMethod ("toULongLong", "@brief Method qulonglong QLocale::toULongLong(const QString &s, bool *ok)\n", true, &_init_f_toULongLong_c2967, &_call_f_toULongLong_c2967);
-  methods += new qt_gsi::GenericMethod ("toULongLong", "@brief Method qulonglong QLocale::toULongLong(QStringView s, bool *ok)\n", true, &_init_f_toULongLong_c2501, &_call_f_toULongLong_c2501);
   methods += new qt_gsi::GenericMethod ("toUShort", "@brief Method unsigned short int QLocale::toUShort(const QString &s, bool *ok)\n", true, &_init_f_toUShort_c2967, &_call_f_toUShort_c2967);
-  methods += new qt_gsi::GenericMethod ("toUShort", "@brief Method unsigned short int QLocale::toUShort(QStringView s, bool *ok)\n", true, &_init_f_toUShort_c2501, &_call_f_toUShort_c2501);
   methods += new qt_gsi::GenericMethod ("toUpper", "@brief Method QString QLocale::toUpper(const QString &str)\n", true, &_init_f_toUpper_c2025, &_call_f_toUpper_c2025);
   methods += new qt_gsi::GenericMethod ("uiLanguages", "@brief Method QStringList QLocale::uiLanguages()\n", true, &_init_f_uiLanguages_c0, &_call_f_uiLanguages_c0);
   methods += new qt_gsi::GenericMethod ("weekdays", "@brief Method QList<Qt::DayOfWeek> QLocale::weekdays()\n", true, &_init_f_weekdays_c0, &_call_f_weekdays_c0);
   methods += new qt_gsi::GenericMethod ("zeroDigit", "@brief Method QString QLocale::zeroDigit()\n", true, &_init_f_zeroDigit_c0, &_call_f_zeroDigit_c0);
   methods += new qt_gsi::GenericStaticMethod ("c", "@brief Static method QLocale QLocale::c()\nThis method is static and can be called without an instance.", &_init_f_c_0, &_call_f_c_0);
-  methods += new qt_gsi::GenericStaticMethod ("codeToCountry", "@brief Static method QLocale::Country QLocale::codeToCountry(QStringView countryCode)\nThis method is static and can be called without an instance.", &_init_f_codeToCountry_1559, &_call_f_codeToCountry_1559);
-  methods += new qt_gsi::GenericStaticMethod ("codeToLanguage", "@brief Static method QLocale::Language QLocale::codeToLanguage(QStringView languageCode)\nThis method is static and can be called without an instance.", &_init_f_codeToLanguage_1559, &_call_f_codeToLanguage_1559);
-  methods += new qt_gsi::GenericStaticMethod ("codeToScript", "@brief Static method QLocale::Script QLocale::codeToScript(QStringView scriptCode)\nThis method is static and can be called without an instance.", &_init_f_codeToScript_1559, &_call_f_codeToScript_1559);
-  methods += new qt_gsi::GenericStaticMethod ("codeToTerritory", "@brief Static method QLocale::Territory QLocale::codeToTerritory(QStringView territoryCode)\nThis method is static and can be called without an instance.", &_init_f_codeToTerritory_1559, &_call_f_codeToTerritory_1559);
   methods += new qt_gsi::GenericStaticMethod ("countriesForLanguage", "@brief Static method QList<QLocale::Country> QLocale::countriesForLanguage(QLocale::Language lang)\nThis method is static and can be called without an instance.", &_init_f_countriesForLanguage_2029, &_call_f_countriesForLanguage_2029);
   methods += new qt_gsi::GenericStaticMethod ("countryToCode", "@brief Static method QString QLocale::countryToCode(QLocale::Country country)\nThis method is static and can be called without an instance.", &_init_f_countryToCode_1981, &_call_f_countryToCode_1981);
   methods += new qt_gsi::GenericStaticMethod ("countryToString", "@brief Static method QString QLocale::countryToString(QLocale::Country country)\nThis method is static and can be called without an instance.", &_init_f_countryToString_1981, &_call_f_countryToString_1981);

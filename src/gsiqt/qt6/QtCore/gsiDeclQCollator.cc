@@ -155,28 +155,6 @@ static void _call_f_compare_c4770 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// int QCollator::compare(QStringView s1, QStringView s2)
-
-
-static void _init_f_compare_c3010 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("s1");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("s2");
-  decl->add_arg<QStringView > (argspec_1);
-  decl->set_return<int > ();
-}
-
-static void _call_f_compare_c3010 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  QStringView arg2 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<int > ((int)((QCollator *)cls)->compare (arg1, arg2));
-}
-
-
 // bool QCollator::ignorePunctuation()
 
 
@@ -240,28 +218,6 @@ static void _call_f_operator_func__c3942 (const qt_gsi::GenericMethod * /*decl*/
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
-  ret.write<bool > ((bool)((QCollator *)cls)->operator() (arg1, arg2));
-}
-
-
-// bool QCollator::operator()(QStringView s1, QStringView s2)
-
-
-static void _init_f_operator_func__c3010 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("s1");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("s2");
-  decl->add_arg<QStringView > (argspec_1);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_operator_func__c3010 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  QStringView arg2 = gsi::arg_reader<QStringView >() (args, heap);
   ret.write<bool > ((bool)((QCollator *)cls)->operator() (arg1, arg2));
 }
 
@@ -416,12 +372,10 @@ static gsi::Methods methods_QCollator () {
   methods += new qt_gsi::GenericMethod (":caseSensitivity", "@brief Method Qt::CaseSensitivity QCollator::caseSensitivity()\n", true, &_init_f_caseSensitivity_c0, &_call_f_caseSensitivity_c0);
   methods += new qt_gsi::GenericMethod ("compare", "@brief Method int QCollator::compare(const QString &s1, const QString &s2)\n", true, &_init_f_compare_c3942, &_call_f_compare_c3942);
   methods += new qt_gsi::GenericMethod ("compare", "@brief Method int QCollator::compare(const QChar *s1, int len1, const QChar *s2, int len2)\n", true, &_init_f_compare_c4770, &_call_f_compare_c4770);
-  methods += new qt_gsi::GenericMethod ("compare", "@brief Method int QCollator::compare(QStringView s1, QStringView s2)\n", true, &_init_f_compare_c3010, &_call_f_compare_c3010);
   methods += new qt_gsi::GenericMethod (":ignorePunctuation", "@brief Method bool QCollator::ignorePunctuation()\n", true, &_init_f_ignorePunctuation_c0, &_call_f_ignorePunctuation_c0);
   methods += new qt_gsi::GenericMethod (":locale", "@brief Method QLocale QCollator::locale()\n", true, &_init_f_locale_c0, &_call_f_locale_c0);
   methods += new qt_gsi::GenericMethod (":numericMode", "@brief Method bool QCollator::numericMode()\n", true, &_init_f_numericMode_c0, &_call_f_numericMode_c0);
   methods += new qt_gsi::GenericMethod ("()", "@brief Method bool QCollator::operator()(const QString &s1, const QString &s2)\n", true, &_init_f_operator_func__c3942, &_call_f_operator_func__c3942);
-  methods += new qt_gsi::GenericMethod ("()", "@brief Method bool QCollator::operator()(QStringView s1, QStringView s2)\n", true, &_init_f_operator_func__c3010, &_call_f_operator_func__c3010);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QCollator &QCollator::operator=(const QCollator &)\n", false, &_init_f_operator_eq__2226, &_call_f_operator_eq__2226);
   methods += new qt_gsi::GenericMethod ("setCaseSensitivity|caseSensitivity=", "@brief Method void QCollator::setCaseSensitivity(Qt::CaseSensitivity cs)\n", false, &_init_f_setCaseSensitivity_2324, &_call_f_setCaseSensitivity_2324);
   methods += new qt_gsi::GenericMethod ("setIgnorePunctuation|ignorePunctuation=", "@brief Method void QCollator::setIgnorePunctuation(bool on)\n", false, &_init_f_setIgnorePunctuation_864, &_call_f_setIgnorePunctuation_864);

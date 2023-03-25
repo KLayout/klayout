@@ -2053,6 +2053,59 @@ class QImage_Adaptor : public QImage, public qt_gsi::QtObjectBase
 {
 public:
 
+  //  NOTE: QImage does not take ownership of the data, so 
+  //  we will provide a buffer to do so. This requires an additional 
+  //  copy, but as GSI is not guaranteeing the lifetime of the 
+  //  data, this is required here.
+  class DataHolder
+  {
+  public:
+
+    DataHolder() : mp_data(0) { }
+    DataHolder(unsigned char *data) : mp_data(data) { }
+
+    ~DataHolder() 
+    { 
+      if (mp_data) {
+        delete[](mp_data); 
+      }
+      mp_data = 0;
+    }
+
+    static unsigned char *alloc(const std::string &data)
+    {
+      unsigned char *ptr = new unsigned char[data.size()];
+      memcpy(ptr, data.c_str(), data.size());
+      return ptr;
+    }
+
+  private:
+    unsigned char *mp_data;
+  };
+
+  static QImage_Adaptor *new_qimage_from_data1(const std::string &data, int width, int height, int bytesPerLine, QImage::Format format) 
+  {
+    return new QImage_Adaptor(DataHolder::alloc(data), width, height, bytesPerLine, format);
+  }
+
+  static QImage_Adaptor *new_qimage_from_data2(const std::string &data, int width, int height, QImage::Format format) 
+  {
+    return new QImage_Adaptor(DataHolder::alloc(data), width, height, format);
+  }
+
+  QImage_Adaptor(unsigned char *data, int width, int height, int bytesPerLine, QImage::Format format)
+    : QImage(data, width, height, bytesPerLine, format), m_holder(data)
+  {
+  }
+
+  QImage_Adaptor(unsigned char *data, int width, int height, QImage::Format format)
+    : QImage (data, width, height, format), m_holder(data)
+  {
+  }
+
+  DataHolder m_holder;
+
+
   virtual ~QImage_Adaptor();
 
   //  [adaptor ctor] QImage::QImage()
@@ -2584,6 +2637,15 @@ static gsi::Methods methods_QImage_Adaptor () {
 }
 
 gsi::Class<QImage_Adaptor> decl_QImage_Adaptor (qtdecl_QImage (), "QtGui", "QImage",
+  gsi::constructor("new", &QImage_Adaptor::new_qimage_from_data1, gsi::arg ("data"), gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("bytesPerLine"), gsi::arg ("format"),
+    "@brief QImage::QImage(const uchar *data, int width, int height, int bytesPerLine)\n"
+    "The cleanupFunction parameter is available currently."
+  ) +
+  gsi::constructor("new", &QImage_Adaptor::new_qimage_from_data2, gsi::arg ("data"), gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("format"),
+    "@brief QImage::QImage(const uchar *data, int width, int height)\n"
+    "The cleanupFunction parameter is available currently."
+  )
++
   methods_QImage_Adaptor (),
   "@qt\n@brief Binding of QImage");
 

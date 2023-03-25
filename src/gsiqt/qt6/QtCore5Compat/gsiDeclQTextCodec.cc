@@ -90,25 +90,6 @@ static void _call_f_canEncode_c2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// bool QTextCodec::canEncode(QStringView)
-
-
-static void _init_f_canEncode_c1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_canEncode_c1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<bool > ((bool)((QTextCodec *)cls)->canEncode (arg1));
-}
-
-
 // QByteArray QTextCodec::fromUnicode(const QString &uc)
 
 
@@ -124,25 +105,6 @@ static void _call_f_fromUnicode_c2025 (const qt_gsi::GenericMethod * /*decl*/, v
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  ret.write<QByteArray > ((QByteArray)((QTextCodec *)cls)->fromUnicode (arg1));
-}
-
-
-// QByteArray QTextCodec::fromUnicode(QStringView uc)
-
-
-static void _init_f_fromUnicode_c1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("uc");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<QByteArray > ();
-}
-
-static void _call_f_fromUnicode_c1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
   ret.write<QByteArray > ((QByteArray)((QTextCodec *)cls)->fromUnicode (arg1));
 }
 
@@ -467,9 +429,7 @@ static gsi::Methods methods_QTextCodec () {
   methods += new qt_gsi::GenericMethod ("aliases", "@brief Method QList<QByteArray> QTextCodec::aliases()\n", true, &_init_f_aliases_c0, &_call_f_aliases_c0);
   methods += new qt_gsi::GenericMethod ("canEncode", "@brief Method bool QTextCodec::canEncode(QChar)\n", true, &_init_f_canEncode_c899, &_call_f_canEncode_c899);
   methods += new qt_gsi::GenericMethod ("canEncode", "@brief Method bool QTextCodec::canEncode(const QString &)\n", true, &_init_f_canEncode_c2025, &_call_f_canEncode_c2025);
-  methods += new qt_gsi::GenericMethod ("canEncode", "@brief Method bool QTextCodec::canEncode(QStringView)\n", true, &_init_f_canEncode_c1559, &_call_f_canEncode_c1559);
   methods += new qt_gsi::GenericMethod ("fromUnicode", "@brief Method QByteArray QTextCodec::fromUnicode(const QString &uc)\n", true, &_init_f_fromUnicode_c2025, &_call_f_fromUnicode_c2025);
-  methods += new qt_gsi::GenericMethod ("fromUnicode", "@brief Method QByteArray QTextCodec::fromUnicode(QStringView uc)\n", true, &_init_f_fromUnicode_c1559, &_call_f_fromUnicode_c1559);
   methods += new qt_gsi::GenericMethod ("makeDecoder", "@brief Method QTextDecoder *QTextCodec::makeDecoder(QTextCodec::ConversionFlags flags)\n", true, &_init_f_makeDecoder_c3087, &_call_f_makeDecoder_c3087);
   methods += new qt_gsi::GenericMethod ("makeEncoder", "@brief Method QTextEncoder *QTextCodec::makeEncoder(QTextCodec::ConversionFlags flags)\n", true, &_init_f_makeEncoder_c3087, &_call_f_makeEncoder_c3087);
   methods += new qt_gsi::GenericMethod ("mibEnum", "@brief Method int QTextCodec::mibEnum()\n", true, &_init_f_mibEnum_c0, &_call_f_mibEnum_c0);

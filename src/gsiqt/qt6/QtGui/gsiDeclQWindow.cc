@@ -2068,9 +2068,9 @@ static gsi::Methods methods_QWindow () {
   methods += new qt_gsi::GenericMethod (":baseSize", "@brief Method QSize QWindow::baseSize()\n", true, &_init_f_baseSize_c0, &_call_f_baseSize_c0);
   methods += new qt_gsi::GenericMethod ("close", "@brief Method bool QWindow::close()\n", false, &_init_f_close_0, &_call_f_close_0);
   methods += new qt_gsi::GenericMethod (":contentOrientation", "@brief Method Qt::ScreenOrientation QWindow::contentOrientation()\n", true, &_init_f_contentOrientation_c0, &_call_f_contentOrientation_c0);
-  methods += new qt_gsi::GenericMethod ("qt_create", "@brief Method void QWindow::create()\n", false, &_init_f_create_0, &_call_f_create_0);
+  methods += new qt_gsi::GenericMethod ("create|qt_create", "@brief Method void QWindow::create()\n", false, &_init_f_create_0, &_call_f_create_0);
   methods += new qt_gsi::GenericMethod (":cursor", "@brief Method QCursor QWindow::cursor()\n", true, &_init_f_cursor_c0, &_call_f_cursor_c0);
-  methods += new qt_gsi::GenericMethod ("qt_destroy", "@brief Method void QWindow::destroy()\n", false, &_init_f_destroy_0, &_call_f_destroy_0);
+  methods += new qt_gsi::GenericMethod ("destroy|qt_destroy", "@brief Method void QWindow::destroy()\n", false, &_init_f_destroy_0, &_call_f_destroy_0);
   methods += new qt_gsi::GenericMethod ("devicePixelRatio", "@brief Method double QWindow::devicePixelRatio()\n", true, &_init_f_devicePixelRatio_c0, &_call_f_devicePixelRatio_c0);
   methods += new qt_gsi::GenericMethod (":filePath", "@brief Method QString QWindow::filePath()\n", true, &_init_f_filePath_c0, &_call_f_filePath_c0);
   methods += new qt_gsi::GenericMethod (":flags", "@brief Method QFlags<Qt::WindowType> QWindow::flags()\n", true, &_init_f_flags_c0, &_call_f_flags_c0);
@@ -2105,7 +2105,7 @@ static gsi::Methods methods_QWindow () {
   methods += new qt_gsi::GenericMethod (":opacity", "@brief Method double QWindow::opacity()\n", true, &_init_f_opacity_c0, &_call_f_opacity_c0);
   methods += new qt_gsi::GenericMethod ("parent", "@brief Method QWindow *QWindow::parent(QWindow::AncestorMode mode)\n", true, &_init_f_parent_c2485, &_call_f_parent_c2485);
   methods += new qt_gsi::GenericMethod (":position", "@brief Method QPoint QWindow::position()\n", true, &_init_f_position_c0, &_call_f_position_c0);
-  methods += new qt_gsi::GenericMethod ("qt_raise", "@brief Method void QWindow::raise()\n", false, &_init_f_raise_0, &_call_f_raise_0);
+  methods += new qt_gsi::GenericMethod ("raise|qt_raise", "@brief Method void QWindow::raise()\n", false, &_init_f_raise_0, &_call_f_raise_0);
   methods += new qt_gsi::GenericMethod ("reportContentOrientationChange", "@brief Method void QWindow::reportContentOrientationChange(Qt::ScreenOrientation orientation)\n", false, &_init_f_reportContentOrientationChange_2521, &_call_f_reportContentOrientationChange_2521);
   methods += new qt_gsi::GenericMethod ("requestActivate", "@brief Method void QWindow::requestActivate()\n", false, &_init_f_requestActivate_0, &_call_f_requestActivate_0);
   methods += new qt_gsi::GenericMethod ("requestUpdate", "@brief Method void QWindow::requestUpdate()\n", false, &_init_f_requestUpdate_0, &_call_f_requestUpdate_0);

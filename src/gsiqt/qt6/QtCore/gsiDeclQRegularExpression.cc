@@ -151,34 +151,6 @@ static void _call_f_globalMatch_c10730 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// QRegularExpressionMatchIterator QRegularExpression::globalMatch(QStringView subjectView, qsizetype offset, QRegularExpression::MatchType matchType, QFlags<QRegularExpression::MatchOption> matchOptions)
-
-
-static void _init_f_globalMatch_c10264 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("subjectView");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("offset", true, "0");
-  decl->add_arg<qsizetype > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("matchType", true, "QRegularExpression::NormalMatch");
-  decl->add_arg<const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("matchOptions", true, "QRegularExpression::NoMatchOption");
-  decl->add_arg<QFlags<QRegularExpression::MatchOption> > (argspec_3);
-  decl->set_return<QRegularExpressionMatchIterator > ();
-}
-
-static void _call_f_globalMatch_c10264 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  qsizetype arg2 = args ? gsi::arg_reader<qsizetype >() (args, heap) : gsi::arg_maker<qsizetype >() (0, heap);
-  const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QRegularExpression::MatchType>(heap, QRegularExpression::NormalMatch), heap);
-  QFlags<QRegularExpression::MatchOption> arg4 = args ? gsi::arg_reader<QFlags<QRegularExpression::MatchOption> >() (args, heap) : gsi::arg_maker<QFlags<QRegularExpression::MatchOption> >() (QRegularExpression::NoMatchOption, heap);
-  ret.write<QRegularExpressionMatchIterator > ((QRegularExpressionMatchIterator)((QRegularExpression *)cls)->globalMatch (arg1, arg2, qt_gsi::QtToCppAdaptor<QRegularExpression::MatchType>(arg3).cref(), arg4));
-}
-
-
 // bool QRegularExpression::isValid()
 
 
@@ -215,34 +187,6 @@ static void _call_f_match_c10730 (const qt_gsi::GenericMethod * /*decl*/, void *
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  qsizetype arg2 = args ? gsi::arg_reader<qsizetype >() (args, heap) : gsi::arg_maker<qsizetype >() (0, heap);
-  const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QRegularExpression::MatchType>(heap, QRegularExpression::NormalMatch), heap);
-  QFlags<QRegularExpression::MatchOption> arg4 = args ? gsi::arg_reader<QFlags<QRegularExpression::MatchOption> >() (args, heap) : gsi::arg_maker<QFlags<QRegularExpression::MatchOption> >() (QRegularExpression::NoMatchOption, heap);
-  ret.write<QRegularExpressionMatch > ((QRegularExpressionMatch)((QRegularExpression *)cls)->match (arg1, arg2, qt_gsi::QtToCppAdaptor<QRegularExpression::MatchType>(arg3).cref(), arg4));
-}
-
-
-// QRegularExpressionMatch QRegularExpression::match(QStringView subjectView, qsizetype offset, QRegularExpression::MatchType matchType, QFlags<QRegularExpression::MatchOption> matchOptions)
-
-
-static void _init_f_match_c10264 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("subjectView");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("offset", true, "0");
-  decl->add_arg<qsizetype > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("matchType", true, "QRegularExpression::NormalMatch");
-  decl->add_arg<const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("matchOptions", true, "QRegularExpression::NoMatchOption");
-  decl->add_arg<QFlags<QRegularExpression::MatchOption> > (argspec_3);
-  decl->set_return<QRegularExpressionMatch > ();
-}
-
-static void _call_f_match_c10264 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
   qsizetype arg2 = args ? gsi::arg_reader<qsizetype >() (args, heap) : gsi::arg_maker<qsizetype >() (0, heap);
   const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & arg3 = args ? gsi::arg_reader<const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QRegularExpression::MatchType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QRegularExpression::MatchType>(heap, QRegularExpression::NormalMatch), heap);
   QFlags<QRegularExpression::MatchOption> arg4 = args ? gsi::arg_reader<QFlags<QRegularExpression::MatchOption> >() (args, heap) : gsi::arg_maker<QFlags<QRegularExpression::MatchOption> >() (QRegularExpression::NoMatchOption, heap);
@@ -462,25 +406,6 @@ static void _call_f_anchoredPattern_2025 (const qt_gsi::GenericStaticMethod * /*
 }
 
 
-// static QString QRegularExpression::anchoredPattern(QStringView expression)
-
-
-static void _init_f_anchoredPattern_1559 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("expression");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<QString > ();
-}
-
-static void _call_f_anchoredPattern_1559 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QString > ((QString)QRegularExpression::anchoredPattern (arg1));
-}
-
-
 // static QString QRegularExpression::escape(const QString &str)
 
 
@@ -497,50 +422,6 @@ static void _call_f_escape_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, g
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)QRegularExpression::escape (arg1));
-}
-
-
-// static QString QRegularExpression::escape(QStringView str)
-
-
-static void _init_f_escape_1559 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("str");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<QString > ();
-}
-
-static void _call_f_escape_1559 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QString > ((QString)QRegularExpression::escape (arg1));
-}
-
-
-// static QRegularExpression QRegularExpression::fromWildcard(QStringView pattern, Qt::CaseSensitivity cs, QFlags<QRegularExpression::WildcardConversionOption> options)
-
-
-static void _init_f_fromWildcard_9295 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("pattern");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("cs", true, "Qt::CaseInsensitive");
-  decl->add_arg<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("options", true, "QRegularExpression::DefaultWildcardConversion");
-  decl->add_arg<QFlags<QRegularExpression::WildcardConversionOption> > (argspec_2);
-  decl->set_return<QRegularExpression > ();
-}
-
-static void _call_f_fromWildcard_9295 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::CaseSensitivity>(heap, Qt::CaseInsensitive), heap);
-  QFlags<QRegularExpression::WildcardConversionOption> arg3 = args ? gsi::arg_reader<QFlags<QRegularExpression::WildcardConversionOption> >() (args, heap) : gsi::arg_maker<QFlags<QRegularExpression::WildcardConversionOption> >() (QRegularExpression::DefaultWildcardConversion, heap);
-  ret.write<QRegularExpression > ((QRegularExpression)QRegularExpression::fromWildcard (arg1, qt_gsi::QtToCppAdaptor<Qt::CaseSensitivity>(arg2).cref(), arg3));
 }
 
 
@@ -566,28 +447,6 @@ static void _call_f_wildcardToRegularExpression_7545 (const qt_gsi::GenericStati
 }
 
 
-// static QString QRegularExpression::wildcardToRegularExpression(QStringView str, QFlags<QRegularExpression::WildcardConversionOption> options)
-
-
-static void _init_f_wildcardToRegularExpression_7079 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("str");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("options", true, "QRegularExpression::DefaultWildcardConversion");
-  decl->add_arg<QFlags<QRegularExpression::WildcardConversionOption> > (argspec_1);
-  decl->set_return<QString > ();
-}
-
-static void _call_f_wildcardToRegularExpression_7079 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  QFlags<QRegularExpression::WildcardConversionOption> arg2 = args ? gsi::arg_reader<QFlags<QRegularExpression::WildcardConversionOption> >() (args, heap) : gsi::arg_maker<QFlags<QRegularExpression::WildcardConversionOption> >() (QRegularExpression::DefaultWildcardConversion, heap);
-  ret.write<QString > ((QString)QRegularExpression::wildcardToRegularExpression (arg1, arg2));
-}
-
-
 
 namespace gsi
 {
@@ -600,10 +459,8 @@ static gsi::Methods methods_QRegularExpression () {
   methods += new qt_gsi::GenericMethod ("captureCount", "@brief Method int QRegularExpression::captureCount()\n", true, &_init_f_captureCount_c0, &_call_f_captureCount_c0);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QRegularExpression::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
   methods += new qt_gsi::GenericMethod ("globalMatch", "@brief Method QRegularExpressionMatchIterator QRegularExpression::globalMatch(const QString &subject, qsizetype offset, QRegularExpression::MatchType matchType, QFlags<QRegularExpression::MatchOption> matchOptions)\n", true, &_init_f_globalMatch_c10730, &_call_f_globalMatch_c10730);
-  methods += new qt_gsi::GenericMethod ("globalMatch", "@brief Method QRegularExpressionMatchIterator QRegularExpression::globalMatch(QStringView subjectView, qsizetype offset, QRegularExpression::MatchType matchType, QFlags<QRegularExpression::MatchOption> matchOptions)\n", true, &_init_f_globalMatch_c10264, &_call_f_globalMatch_c10264);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QRegularExpression::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("match", "@brief Method QRegularExpressionMatch QRegularExpression::match(const QString &subject, qsizetype offset, QRegularExpression::MatchType matchType, QFlags<QRegularExpression::MatchOption> matchOptions)\n", true, &_init_f_match_c10730, &_call_f_match_c10730);
-  methods += new qt_gsi::GenericMethod ("match", "@brief Method QRegularExpressionMatch QRegularExpression::match(QStringView subjectView, qsizetype offset, QRegularExpression::MatchType matchType, QFlags<QRegularExpression::MatchOption> matchOptions)\n", true, &_init_f_match_c10264, &_call_f_match_c10264);
   methods += new qt_gsi::GenericMethod ("namedCaptureGroups", "@brief Method QStringList QRegularExpression::namedCaptureGroups()\n", true, &_init_f_namedCaptureGroups_c0, &_call_f_namedCaptureGroups_c0);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QRegularExpression::operator!=(const QRegularExpression &re)\n", true, &_init_f_operator_excl__eq__c3188, &_call_f_operator_excl__eq__c3188);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QRegularExpression &QRegularExpression::operator=(const QRegularExpression &re)\n", false, &_init_f_operator_eq__3188, &_call_f_operator_eq__3188);
@@ -616,12 +473,8 @@ static gsi::Methods methods_QRegularExpression () {
   methods += new qt_gsi::GenericMethod ("setPatternOptions|patternOptions=", "@brief Method void QRegularExpression::setPatternOptions(QFlags<QRegularExpression::PatternOption> options)\n", false, &_init_f_setPatternOptions_4490, &_call_f_setPatternOptions_4490);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QRegularExpression::swap(QRegularExpression &other)\n", false, &_init_f_swap_2493, &_call_f_swap_2493);
   methods += new qt_gsi::GenericStaticMethod ("anchoredPattern", "@brief Static method QString QRegularExpression::anchoredPattern(const QString &expression)\nThis method is static and can be called without an instance.", &_init_f_anchoredPattern_2025, &_call_f_anchoredPattern_2025);
-  methods += new qt_gsi::GenericStaticMethod ("anchoredPattern", "@brief Static method QString QRegularExpression::anchoredPattern(QStringView expression)\nThis method is static and can be called without an instance.", &_init_f_anchoredPattern_1559, &_call_f_anchoredPattern_1559);
   methods += new qt_gsi::GenericStaticMethod ("escape", "@brief Static method QString QRegularExpression::escape(const QString &str)\nThis method is static and can be called without an instance.", &_init_f_escape_2025, &_call_f_escape_2025);
-  methods += new qt_gsi::GenericStaticMethod ("escape", "@brief Static method QString QRegularExpression::escape(QStringView str)\nThis method is static and can be called without an instance.", &_init_f_escape_1559, &_call_f_escape_1559);
-  methods += new qt_gsi::GenericStaticMethod ("fromWildcard", "@brief Static method QRegularExpression QRegularExpression::fromWildcard(QStringView pattern, Qt::CaseSensitivity cs, QFlags<QRegularExpression::WildcardConversionOption> options)\nThis method is static and can be called without an instance.", &_init_f_fromWildcard_9295, &_call_f_fromWildcard_9295);
   methods += new qt_gsi::GenericStaticMethod ("wildcardToRegularExpression", "@brief Static method QString QRegularExpression::wildcardToRegularExpression(const QString &str, QFlags<QRegularExpression::WildcardConversionOption> options)\nThis method is static and can be called without an instance.", &_init_f_wildcardToRegularExpression_7545, &_call_f_wildcardToRegularExpression_7545);
-  methods += new qt_gsi::GenericStaticMethod ("wildcardToRegularExpression", "@brief Static method QString QRegularExpression::wildcardToRegularExpression(QStringView str, QFlags<QRegularExpression::WildcardConversionOption> options)\nThis method is static and can be called without an instance.", &_init_f_wildcardToRegularExpression_7079, &_call_f_wildcardToRegularExpression_7079);
   return methods;
 }
 

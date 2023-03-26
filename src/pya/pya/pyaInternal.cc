@@ -521,6 +521,22 @@ MethodTable::add_method (const std::string &name, const gsi::MethodBase *mb)
       mp_module->add_python_doc (mb, tl::to_string (tr ("This method is also available as 'str(object)'")));
     }
 
+  } else if (name == "to_i" && mb->compatible_with_num_args (0)) {
+
+    //  The hash method is also routed via the tp_int implementation
+    add_method_basic ("__int__", mb);
+
+    add_method_basic (name, mb);
+    mp_module->add_python_doc (mb, tl::to_string (tr ("This method is also available as 'int(object)'")));
+
+  } else if (name == "to_f" && mb->compatible_with_num_args (0)) {
+
+    //  The hash method is also routed via the tp_int implementation
+    add_method_basic ("__float__", mb);
+
+    add_method_basic (name, mb);
+    mp_module->add_python_doc (mb, tl::to_string (tr ("This method is also available as 'float(object)'")));
+
   } else if (name == "hash" && mb->compatible_with_num_args (0)) {
 
     //  The hash method is also routed via the tp_hash implementation

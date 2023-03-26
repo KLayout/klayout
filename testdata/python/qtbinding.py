@@ -696,6 +696,12 @@ class QtBindingTest(unittest.TestCase):
 
     # The various ways to refer to enums
 
+    self.assertEqual(pya.Qt.MouseButton(4).to_i(), 4)
+    self.assertEqual(pya.Qt_MouseButton(4).to_i(), 4)
+    self.assertEqual(pya.Qt_MouseButton(4).__int__(), 4)
+    self.assertEqual(pya.Qt_MouseButton(4).__hash__(), 4)
+    self.assertEqual(int(pya.Qt_MouseButton(4)), 4)
+    self.assertEqual(str(pya.Qt_MouseButton(4)), "MiddleButton")
     self.assertEqual(pya.Qt.MouseButton.LeftButton.to_i(), 1)
     self.assertEqual(pya.Qt_MouseButton.LeftButton.to_i(), 1)
     self.assertEqual(pya.Qt.LeftButton.to_i(), 1)
@@ -705,6 +711,18 @@ class QtBindingTest(unittest.TestCase):
     self.assertEqual(type(pya.Qt.MouseButton.LeftButton | pya.Qt.MouseButton.RightButton).__name__, "Qt_QFlags_MouseButton")
     self.assertEqual((pya.Qt.LeftButton | pya.Qt.RightButton).to_i(), 3)
     self.assertEqual(type(pya.Qt.LeftButton | pya.Qt.RightButton).__name__, "Qt_QFlags_MouseButton")
+
+  def test_59(self):
+
+    # Enums can act as hash keys
+
+    h = {}
+    h[pya.Qt.MouseButton.LeftButton] = "left"
+    h[pya.Qt.MouseButton.RightButton] = "right"
+    self.assertEqual(pya.Qt.MouseButton.LeftButton in h, True)
+    self.assertEqual(h[pya.Qt.MouseButton.LeftButton], "left")
+    self.assertEqual(h[pya.Qt.MouseButton.RightButton], "right")
+    self.assertEqual(pya.Qt.MouseButton.MiddleButton in h, False)
 
 # run unit tests
 if __name__ == '__main__':

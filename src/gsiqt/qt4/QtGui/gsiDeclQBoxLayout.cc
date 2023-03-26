@@ -119,6 +119,7 @@ static void _call_f_addSpacerItem_1708 (const qt_gsi::GenericMethod * /*decl*/, 
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QSpacerItem *arg1 = gsi::arg_reader<QSpacerItem * >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBoxLayout *)cls)->addSpacerItem (arg1);
 }
@@ -203,6 +204,7 @@ static void _call_f_addWidget_4616 (const qt_gsi::GenericMethod * /*decl*/, void
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   QFlags<Qt::AlignmentFlag> arg3 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
@@ -309,6 +311,7 @@ static void _call_f_insertLayout_2659 (const qt_gsi::GenericMethod * /*decl*/, v
   tl::Heap heap;
   int arg1 = gsi::arg_reader<int >() (args, heap);
   QLayout *arg2 = gsi::arg_reader<QLayout * >() (args, heap);
+  qt_gsi::qt_keep (arg2);
   int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBoxLayout *)cls)->insertLayout (arg1, arg2, arg3);
@@ -333,6 +336,7 @@ static void _call_f_insertSpacerItem_2367 (const qt_gsi::GenericMethod * /*decl*
   tl::Heap heap;
   int arg1 = gsi::arg_reader<int >() (args, heap);
   QSpacerItem *arg2 = gsi::arg_reader<QSpacerItem * >() (args, heap);
+  qt_gsi::qt_keep (arg2);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBoxLayout *)cls)->insertSpacerItem (arg1, arg2);
 }
@@ -406,6 +410,7 @@ static void _call_f_insertWidget_5275 (const qt_gsi::GenericMethod * /*decl*/, v
   tl::Heap heap;
   int arg1 = gsi::arg_reader<int >() (args, heap);
   QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg2);
   int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
   QFlags<Qt::AlignmentFlag> arg4 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (0, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
@@ -1686,6 +1691,7 @@ static void _call_fp_insertItem_2399 (const qt_gsi::GenericMethod * /*decl*/, vo
   tl::Heap heap;
   int arg1 = gsi::arg_reader<int >() (args, heap);
   QLayoutItem *arg2 = gsi::arg_reader<QLayoutItem * >() (args, heap);
+  qt_gsi::qt_keep (arg2);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QBoxLayout_Adaptor *)cls)->fp_QBoxLayout_insertItem_2399 (arg1, arg2);
 }

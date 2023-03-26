@@ -337,7 +337,7 @@ public:
 
     for (auto cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
       if (! cc->name ().empty ()) {
-        PyTypeObject *child_class = make_class (cc.operator-> (), as_static);
+        PyTypeObject *child_class = make_class (cc->declaration (), as_static);
         PythonRef attr ((PyObject *) child_class, false /*borrowed*/);
         set_type_attr (type, cc->name ().c_str (), attr);
       }

@@ -1654,7 +1654,7 @@ public:
     for (auto cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
       if (! cc->name ().empty ()) {
         if (! is_registered (cc->declaration (), false)) {
-          make_class (cc->declaration (), false, klass, cc->declaration ());
+          make_class (cc->declaration (), false, klass, cls);
         } else {
           VALUE child_class = ruby_cls (cc->declaration (), false);
           rb_define_const (klass, cc->name ().c_str (), child_class);

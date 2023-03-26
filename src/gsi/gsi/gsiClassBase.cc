@@ -651,9 +651,24 @@ static void collect_classes (const gsi::ClassBase *cls, std::list<const gsi::Cla
 {
   unsorted_classes.push_back (cls);
 
-  for (tl::weak_collection<gsi::ClassBase>::const_iterator cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
+  for (auto cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
     collect_classes (cc.operator-> (), unsorted_classes);
   }
+}
+
+static bool all_parts_available (const gsi::ClassBase *cls, const std::set<const gsi::ClassBase *> &taken)
+{
+  if (cls->declaration () && cls->declaration () != cls && taken.find (cls->declaration ()) == taken.end ()) {
+    return false;
+  }
+
+  for (auto cc = cls->begin_child_classes (); cc != cls->end_child_classes (); ++cc) {
+    if (! all_parts_available (cc.operator-> (), taken)) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 std::list<const gsi::ClassBase *>
@@ -687,7 +702,7 @@ ClassBase::classes_in_definition_order (const char *mod_name)
         continue;
       }
 
-      if ((*c)->declaration () && (*c)->declaration () != *c && taken.find ((*c)->declaration ()) == taken.end ()) {
+      if (! all_parts_available (*c, taken)) {
         //  can't produce this class yet - it's a reference to another class which is not produced yet.
         more_classes.push_back (*c);
         continue;

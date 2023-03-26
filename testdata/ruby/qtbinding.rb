@@ -828,7 +828,7 @@ class QtBinding_TestClass < TestBase
     assert_equal(RBA::Qt::MouseButton::new(4).to_i, 4)
     assert_equal(RBA::Qt_MouseButton::new(4).to_i, 4)
     assert_equal(RBA::Qt_MouseButton::new(4).hash, 4)
-    assert_equal(RBA::Qt_MouseButton::new(4).to_s, "MiddleButton")
+    assert_equal(RBA::Qt_MouseButton::new(1).to_s, "LeftButton")
     assert_equal(RBA::Qt_MouseButton::LeftButton.to_i, 1)
     assert_equal(RBA::Qt::LeftButton.to_i, 1)
     assert_equal((RBA::Qt_MouseButton::LeftButton | RBA::Qt_MouseButton::RightButton).to_i, 3)
@@ -849,7 +849,7 @@ class QtBinding_TestClass < TestBase
     h[RBA::Qt::MouseButton::RightButton] = "right"
     assert_equal(h[RBA::Qt::MouseButton::LeftButton], "left")
     assert_equal(h[RBA::Qt::MouseButton::RightButton], "right")
-    assert_equal(h[RBA::Qt::MouseButton::MiddleButton], nil)
+    assert_equal(h[RBA::Qt::MouseButton::NoButton], nil)
 
   end
 

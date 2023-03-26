@@ -44,7 +44,6 @@ SOURCES += \
   $$PWD/gsiDeclQNetworkReply.cc \
   $$PWD/gsiDeclQNetworkRequest.cc \
   $$PWD/gsiDeclQNetworkSession.cc \
-  $$PWD/gsiDeclQPasswordDigestor.cc \
   $$PWD/gsiDeclQSsl.cc \
   $$PWD/gsiDeclQSslCertificate.cc \
   $$PWD/gsiDeclQSslCertificateExtension.cc \

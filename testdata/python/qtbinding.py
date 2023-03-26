@@ -701,7 +701,7 @@ class QtBindingTest(unittest.TestCase):
     self.assertEqual(pya.Qt_MouseButton(4).__int__(), 4)
     self.assertEqual(pya.Qt_MouseButton(4).__hash__(), 4)
     self.assertEqual(int(pya.Qt_MouseButton(4)), 4)
-    self.assertEqual(str(pya.Qt_MouseButton(4)), "MiddleButton")
+    self.assertEqual(str(pya.Qt_MouseButton(1)), "LeftButton")
     self.assertEqual(pya.Qt.MouseButton.LeftButton.to_i(), 1)
     self.assertEqual(pya.Qt_MouseButton.LeftButton.to_i(), 1)
     self.assertEqual(pya.Qt.LeftButton.to_i(), 1)
@@ -722,7 +722,7 @@ class QtBindingTest(unittest.TestCase):
     self.assertEqual(pya.Qt.MouseButton.LeftButton in h, True)
     self.assertEqual(h[pya.Qt.MouseButton.LeftButton], "left")
     self.assertEqual(h[pya.Qt.MouseButton.RightButton], "right")
-    self.assertEqual(pya.Qt.MouseButton.MiddleButton in h, False)
+    self.assertEqual(pya.Qt.MouseButton.NoButton in h, False)
 
 # run unit tests
 if __name__ == '__main__':

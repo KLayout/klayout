@@ -680,11 +680,11 @@ static gsi::Methods methods_QNetworkRequest () {
   methods += new qt_gsi::GenericMethod ("setPriority|priority=", "@brief Method void QNetworkRequest::setPriority(QNetworkRequest::Priority priority)\n", false, &_init_f_setPriority_2990, &_call_f_setPriority_2990);
   methods += new qt_gsi::GenericMethod ("setRawHeader", "@brief Method void QNetworkRequest::setRawHeader(const QByteArray &headerName, const QByteArray &value)\n", false, &_init_f_setRawHeader_4510, &_call_f_setRawHeader_4510);
   methods += new qt_gsi::GenericMethod ("setSslConfiguration|sslConfiguration=", "@brief Method void QNetworkRequest::setSslConfiguration(const QSslConfiguration &configuration)\n", false, &_init_f_setSslConfiguration_3068, &_call_f_setSslConfiguration_3068);
-  methods += new qt_gsi::GenericMethod ("setTransferTimeout|transferTimeout=", "@brief Method void QNetworkRequest::setTransferTimeout(int timeout)\n", false, &_init_f_setTransferTimeout_767, &_call_f_setTransferTimeout_767);
+  methods += new qt_gsi::GenericMethod ("setTransferTimeout", "@brief Method void QNetworkRequest::setTransferTimeout(int timeout)\n", false, &_init_f_setTransferTimeout_767, &_call_f_setTransferTimeout_767);
   methods += new qt_gsi::GenericMethod ("setUrl|url=", "@brief Method void QNetworkRequest::setUrl(const QUrl &url)\n", false, &_init_f_setUrl_1701, &_call_f_setUrl_1701);
   methods += new qt_gsi::GenericMethod (":sslConfiguration", "@brief Method QSslConfiguration QNetworkRequest::sslConfiguration()\n", true, &_init_f_sslConfiguration_c0, &_call_f_sslConfiguration_c0);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QNetworkRequest::swap(QNetworkRequest &other)\n", false, &_init_f_swap_2190, &_call_f_swap_2190);
-  methods += new qt_gsi::GenericMethod (":transferTimeout", "@brief Method int QNetworkRequest::transferTimeout()\n", true, &_init_f_transferTimeout_c0, &_call_f_transferTimeout_c0);
+  methods += new qt_gsi::GenericMethod ("transferTimeout", "@brief Method int QNetworkRequest::transferTimeout()\n", true, &_init_f_transferTimeout_c0, &_call_f_transferTimeout_c0);
   methods += new qt_gsi::GenericMethod (":url", "@brief Method QUrl QNetworkRequest::url()\n", true, &_init_f_url_c0, &_call_f_url_c0);
   return methods;
 }

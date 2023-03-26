@@ -1032,7 +1032,7 @@ static gsi::Methods methods_QCamera () {
   methods += new qt_gsi::GenericMethod ("isAvailable?", "@brief Method bool QCamera::isAvailable()\n", true, &_init_f_isAvailable_c0, &_call_f_isAvailable_c0);
   methods += new qt_gsi::GenericMethod ("isExposureModeSupported?", "@brief Method bool QCamera::isExposureModeSupported(QCamera::ExposureMode mode)\n", true, &_init_f_isExposureModeSupported_c2466, &_call_f_isExposureModeSupported_c2466);
   methods += new qt_gsi::GenericMethod ("isFlashModeSupported?", "@brief Method bool QCamera::isFlashModeSupported(QCamera::FlashMode mode)\n", true, &_init_f_isFlashModeSupported_c2101, &_call_f_isFlashModeSupported_c2101);
-  methods += new qt_gsi::GenericMethod ("isFlashReady?|:flashReady", "@brief Method bool QCamera::isFlashReady()\n", true, &_init_f_isFlashReady_c0, &_call_f_isFlashReady_c0);
+  methods += new qt_gsi::GenericMethod ("isFlashReady?", "@brief Method bool QCamera::isFlashReady()\n", true, &_init_f_isFlashReady_c0, &_call_f_isFlashReady_c0);
   methods += new qt_gsi::GenericMethod ("isFocusModeSupported?", "@brief Method bool QCamera::isFocusModeSupported(QCamera::FocusMode mode)\n", true, &_init_f_isFocusModeSupported_c2119, &_call_f_isFocusModeSupported_c2119);
   methods += new qt_gsi::GenericMethod ("isTorchModeSupported?", "@brief Method bool QCamera::isTorchModeSupported(QCamera::TorchMode mode)\n", true, &_init_f_isTorchModeSupported_c2119, &_call_f_isTorchModeSupported_c2119);
   methods += new qt_gsi::GenericMethod ("isWhiteBalanceModeSupported?", "@brief Method bool QCamera::isWhiteBalanceModeSupported(QCamera::WhiteBalanceMode mode)\n", true, &_init_f_isWhiteBalanceModeSupported_c2798, &_call_f_isWhiteBalanceModeSupported_c2798);

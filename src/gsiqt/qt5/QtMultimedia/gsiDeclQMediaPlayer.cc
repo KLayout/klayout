@@ -836,7 +836,7 @@ static gsi::Methods methods_QMediaPlayer () {
   methods += new qt_gsi::GenericMethod ("currentNetworkConfiguration", "@brief Method QNetworkConfiguration QMediaPlayer::currentNetworkConfiguration()\n", true, &_init_f_currentNetworkConfiguration_c0, &_call_f_currentNetworkConfiguration_c0);
   methods += new qt_gsi::GenericMethod (":customAudioRole", "@brief Method QString QMediaPlayer::customAudioRole()\n", true, &_init_f_customAudioRole_c0, &_call_f_customAudioRole_c0);
   methods += new qt_gsi::GenericMethod (":duration", "@brief Method qint64 QMediaPlayer::duration()\n", true, &_init_f_duration_c0, &_call_f_duration_c0);
-  methods += new qt_gsi::GenericMethod (":error", "@brief Method QMediaPlayer::Error QMediaPlayer::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
+  methods += new qt_gsi::GenericMethod ("error", "@brief Method QMediaPlayer::Error QMediaPlayer::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QMediaPlayer::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
   methods += new qt_gsi::GenericMethod ("isAudioAvailable?|:audioAvailable", "@brief Method bool QMediaPlayer::isAudioAvailable()\n", true, &_init_f_isAudioAvailable_c0, &_call_f_isAudioAvailable_c0);
   methods += new qt_gsi::GenericMethod ("isMuted?|:muted", "@brief Method bool QMediaPlayer::isMuted()\n", true, &_init_f_isMuted_c0, &_call_f_isMuted_c0);

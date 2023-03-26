@@ -176,7 +176,7 @@ static gsi::Methods methods_QVideoSink () {
   methods += new qt_gsi::GenericMethod ("setVideoFrame|videoFrame=", "@brief Method void QVideoSink::setVideoFrame(const QVideoFrame &frame)\n", false, &_init_f_setVideoFrame_2388, &_call_f_setVideoFrame_2388);
   methods += new qt_gsi::GenericMethod (":subtitleText", "@brief Method QString QVideoSink::subtitleText()\n", true, &_init_f_subtitleText_c0, &_call_f_subtitleText_c0);
   methods += new qt_gsi::GenericMethod (":videoFrame", "@brief Method QVideoFrame QVideoSink::videoFrame()\n", true, &_init_f_videoFrame_c0, &_call_f_videoFrame_c0);
-  methods += new qt_gsi::GenericMethod (":videoSize", "@brief Method QSize QVideoSink::videoSize()\n", true, &_init_f_videoSize_c0, &_call_f_videoSize_c0);
+  methods += new qt_gsi::GenericMethod ("videoSize", "@brief Method QSize QVideoSink::videoSize()\n", true, &_init_f_videoSize_c0, &_call_f_videoSize_c0);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QVideoSink::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QVideoSink::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("subtitleTextChanged(const QString &)", "subtitleTextChanged", gsi::arg("subtitleText"), "@brief Signal declaration for QVideoSink::subtitleTextChanged(const QString &subtitleText)\nYou can bind a procedure to this signal.");

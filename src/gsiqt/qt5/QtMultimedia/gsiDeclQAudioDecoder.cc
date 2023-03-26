@@ -421,7 +421,7 @@ static gsi::Methods methods_QAudioDecoder () {
   methods += new qt_gsi::GenericMethod ("bind", "@brief Method bool QAudioDecoder::bind(QObject *)\nThis is a reimplementation of QMediaObject::bind", false, &_init_f_bind_1302, &_call_f_bind_1302);
   methods += new qt_gsi::GenericMethod (":bufferAvailable", "@brief Method bool QAudioDecoder::bufferAvailable()\n", true, &_init_f_bufferAvailable_c0, &_call_f_bufferAvailable_c0);
   methods += new qt_gsi::GenericMethod ("duration", "@brief Method qint64 QAudioDecoder::duration()\n", true, &_init_f_duration_c0, &_call_f_duration_c0);
-  methods += new qt_gsi::GenericMethod (":error", "@brief Method QAudioDecoder::Error QAudioDecoder::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
+  methods += new qt_gsi::GenericMethod ("error", "@brief Method QAudioDecoder::Error QAudioDecoder::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QAudioDecoder::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
   methods += new qt_gsi::GenericMethod ("position", "@brief Method qint64 QAudioDecoder::position()\n", true, &_init_f_position_c0, &_call_f_position_c0);
   methods += new qt_gsi::GenericMethod ("read", "@brief Method QAudioBuffer QAudioDecoder::read()\n", true, &_init_f_read_c0, &_call_f_read_c0);

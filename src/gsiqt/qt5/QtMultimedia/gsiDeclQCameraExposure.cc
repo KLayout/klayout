@@ -634,7 +634,7 @@ static gsi::Methods methods_QCameraExposure () {
   methods += new qt_gsi::GenericMethod ("isAvailable?", "@brief Method bool QCameraExposure::isAvailable()\n", true, &_init_f_isAvailable_c0, &_call_f_isAvailable_c0);
   methods += new qt_gsi::GenericMethod ("isExposureModeSupported?", "@brief Method bool QCameraExposure::isExposureModeSupported(QCameraExposure::ExposureMode mode)\n", true, &_init_f_isExposureModeSupported_c3325, &_call_f_isExposureModeSupported_c3325);
   methods += new qt_gsi::GenericMethod ("isFlashModeSupported?", "@brief Method bool QCameraExposure::isFlashModeSupported(QFlags<QCameraExposure::FlashMode> mode)\n", true, &_init_f_isFlashModeSupported_c3656, &_call_f_isFlashModeSupported_c3656);
-  methods += new qt_gsi::GenericMethod ("isFlashReady?|:flashReady", "@brief Method bool QCameraExposure::isFlashReady()\n", true, &_init_f_isFlashReady_c0, &_call_f_isFlashReady_c0);
+  methods += new qt_gsi::GenericMethod ("isFlashReady?", "@brief Method bool QCameraExposure::isFlashReady()\n", true, &_init_f_isFlashReady_c0, &_call_f_isFlashReady_c0);
   methods += new qt_gsi::GenericMethod ("isMeteringModeSupported?", "@brief Method bool QCameraExposure::isMeteringModeSupported(QCameraExposure::MeteringMode mode)\n", true, &_init_f_isMeteringModeSupported_c3293, &_call_f_isMeteringModeSupported_c3293);
   methods += new qt_gsi::GenericMethod (":isoSensitivity", "@brief Method int QCameraExposure::isoSensitivity()\n", true, &_init_f_isoSensitivity_c0, &_call_f_isoSensitivity_c0);
   methods += new qt_gsi::GenericMethod (":meteringMode", "@brief Method QCameraExposure::MeteringMode QCameraExposure::meteringMode()\n", true, &_init_f_meteringMode_c0, &_call_f_meteringMode_c0);

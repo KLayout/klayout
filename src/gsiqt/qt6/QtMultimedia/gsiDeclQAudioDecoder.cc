@@ -349,7 +349,7 @@ static gsi::Methods methods_QAudioDecoder () {
   methods += new qt_gsi::GenericMethod (":audioFormat", "@brief Method QAudioFormat QAudioDecoder::audioFormat()\n", true, &_init_f_audioFormat_c0, &_call_f_audioFormat_c0);
   methods += new qt_gsi::GenericMethod (":bufferAvailable", "@brief Method bool QAudioDecoder::bufferAvailable()\n", true, &_init_f_bufferAvailable_c0, &_call_f_bufferAvailable_c0);
   methods += new qt_gsi::GenericMethod ("duration", "@brief Method qint64 QAudioDecoder::duration()\n", true, &_init_f_duration_c0, &_call_f_duration_c0);
-  methods += new qt_gsi::GenericMethod (":error", "@brief Method QAudioDecoder::Error QAudioDecoder::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
+  methods += new qt_gsi::GenericMethod ("error", "@brief Method QAudioDecoder::Error QAudioDecoder::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QAudioDecoder::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
   methods += new qt_gsi::GenericMethod ("isDecoding?|:isDecoding", "@brief Method bool QAudioDecoder::isDecoding()\n", true, &_init_f_isDecoding_c0, &_call_f_isDecoding_c0);
   methods += new qt_gsi::GenericMethod ("isSupported?", "@brief Method bool QAudioDecoder::isSupported()\n", true, &_init_f_isSupported_c0, &_call_f_isSupported_c0);

@@ -821,6 +821,22 @@ class QtBinding_TestClass < TestBase
 
   end
 
+  def test_58
+
+    # The various ways to refer to enums
+
+    assert_equal(RBA::Qt::MouseButton::LeftButton.to_i, 1)
+    assert_equal(RBA::Qt_MouseButton::LeftButton.to_i, 1)
+    assert_equal(RBA::Qt::LeftButton.to_i, 1)
+    assert_equal((RBA::Qt_MouseButton::LeftButton | RBA::Qt_MouseButton::RightButton).to_i, 3)
+    assert_equal((RBA::Qt_MouseButton::LeftButton | RBA::Qt_MouseButton::RightButton).class.to_s, "RBA::Qt_QFlags_MouseButton")
+    assert_equal((RBA::Qt::MouseButton::LeftButton | RBA::Qt::MouseButton::RightButton).to_i, 3)
+    assert_equal((RBA::Qt::MouseButton::LeftButton | RBA::Qt::MouseButton::RightButton).class.to_s, "RBA::Qt_QFlags_MouseButton")
+    assert_equal((RBA::Qt::LeftButton | RBA::Qt::RightButton).to_i, 3)
+    assert_equal((RBA::Qt::LeftButton | RBA::Qt::RightButton).class.to_s, "RBA::Qt_QFlags_MouseButton")
+
+  end
+
 end 
 
 load("test_epilogue.rb")

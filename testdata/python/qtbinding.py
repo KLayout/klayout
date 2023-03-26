@@ -692,6 +692,19 @@ class QtBindingTest(unittest.TestCase):
     color = pya.QColor("blue")
     self.assertEqual(color.name(), "#0000ff")
 
+  def test_58(self):
+
+    # The various ways to refer to enums
+
+    self.assertEqual(pya.Qt.MouseButton.LeftButton.to_i(), 1)
+    self.assertEqual(pya.Qt_MouseButton.LeftButton.to_i(), 1)
+    self.assertEqual(pya.Qt.LeftButton.to_i(), 1)
+    self.assertEqual((pya.Qt_MouseButton.LeftButton | pya.Qt_MouseButton.RightButton).to_i(), 3)
+    self.assertEqual(type(pya.Qt_MouseButton.LeftButton | pya.Qt_MouseButton.RightButton).__name__, "Qt_QFlags_MouseButton")
+    self.assertEqual((pya.Qt.MouseButton.LeftButton | pya.Qt.MouseButton.RightButton).to_i(), 3)
+    self.assertEqual(type(pya.Qt.MouseButton.LeftButton | pya.Qt.MouseButton.RightButton).__name__, "Qt_QFlags_MouseButton")
+    self.assertEqual((pya.Qt.LeftButton | pya.Qt.RightButton).to_i(), 3)
+    self.assertEqual(type(pya.Qt.LeftButton | pya.Qt.RightButton).__name__, "Qt_QFlags_MouseButton")
 
 # run unit tests
 if __name__ == '__main__':

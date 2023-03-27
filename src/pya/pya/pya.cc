@@ -326,18 +326,6 @@ PythonInterpreter::PythonInterpreter (bool embedded)
     tl::warn << tl::to_string (tr ("Unable to find built-in Python module library path"));
   }
 
-  //  Supply a DLL load path for certain Python versions and on Windows
-  define_variable ("__klayout_dll_path", tl::dirname (app_path));
-  //  NOTE: there is no API I know of ...
-  eval_string (
-    "import os\n"
-    "try:\n"
-    "  global __klayout_dll_path\n"
-    "  os.add_dll_directory(__klayout_dll_path)\n"
-    "except:\n"
-    "  pass\n"    //  on Windows or older versions of Python
-  );
-
   //  Import the pya module
   PyObject *pya_module = PyImport_ImportModule (pya_module_name);
   if (pya_module == NULL) {

@@ -490,7 +490,6 @@ main_cont (int &argc, char **argv)
 
   try {
 
-    pya::PythonInterpreter::initialize ();
     gsi::initialize_external ();
 
     //  Search and initialize plugin unit tests

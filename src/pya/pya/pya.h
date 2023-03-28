@@ -248,6 +248,7 @@ public:
 
   /**
    *  @brief Provide a first (basic) initialization
+   *  Calling this method will load all Python functions and plugins and provide the pya module.
    */
   static void initialize ();
 

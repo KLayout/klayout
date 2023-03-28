@@ -102,11 +102,11 @@ pya_channel_init (PyObject *self, PyObject *, PyObject *)
 }
 
 void
-PYAChannelObject::make_class (PyObject *module)
+PYAChannelObject::make_class ()
 {
   static PyTypeObject channel_type = {
     PyVarObject_HEAD_INIT (&PyType_Type, 0)
-    "pya._Channel",             // tp_name
+    "__PYA_Channel",            // tp_name
     sizeof (PYAChannelObject)   // tp_size
   };
 
@@ -124,7 +124,8 @@ PYAChannelObject::make_class (PyObject *module)
   PyType_Ready (&channel_type);
   Py_INCREF (&channel_type);
 
-  PyModule_AddObject (module, "_Channel", (PyObject *) &channel_type);
+  PyObject *module = PyImport_AddModule("__main__");
+  PyModule_AddObject (module, "__PYA_Channel", (PyObject *) &channel_type);
 
   cls = &channel_type;
 }

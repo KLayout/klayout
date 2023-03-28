@@ -65,8 +65,6 @@
 # include "gsiQtDesignerExternals.h"
 # include "gsiQtUiToolsExternals.h"
 
-//  pulls in the Qt GSI binding modules - need to be force loaded so they are available
-//  the pya Python module (Python >= 3.8 does not recognize DLL paths on Windows)
 FORCE_LINK_GSI_QTCORE
 FORCE_LINK_GSI_QTGUI
 FORCE_LINK_GSI_QTWIDGETS
@@ -282,9 +280,6 @@ klayout_main_cont (int &argc, char **argv)
   int result = 0;
 
   try {
-
-    //  initialize the Python interpreter
-    pya::PythonInterpreter::initialize ();
 
     //  this registers the gsi definitions
     gsi::initialize_external ();

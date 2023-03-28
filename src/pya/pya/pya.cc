@@ -326,16 +326,9 @@ PythonInterpreter::PythonInterpreter (bool embedded)
     tl::warn << tl::to_string (tr ("Unable to find built-in Python module library path"));
   }
 
-  //  Import the pya module
-  PyObject *pya_module = PyImport_ImportModule (pya_module_name);
-  if (pya_module == NULL) {
-    check_error ();
-    return;
-  }
-
   //  Build two objects that provide a way to redirect stdout, stderr
   //  and instantiate them two times for stdout and stderr.
-  PYAChannelObject::make_class (pya_module);
+  PYAChannelObject::make_class ();
   m_stdout_channel = PythonRef (PYAChannelObject::create (gsi::Console::OS_stdout));
   m_stdout = PythonPtr (m_stdout_channel.get ());
   m_stderr_channel = PythonRef (PYAChannelObject::create (gsi::Console::OS_stderr));
@@ -601,7 +594,11 @@ PythonInterpreter::available () const
 void
 PythonInterpreter::initialize ()
 {
-  // .. no implementation required ..
+  //  Import the pya module
+  PyObject *pya_module = PyImport_ImportModule (pya_module_name);
+  if (pya_module == NULL) {
+    check_error ();
+  }
 }
 
 size_t

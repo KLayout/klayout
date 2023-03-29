@@ -266,8 +266,8 @@ public:
         //  add to the parent class as child class or add to module
 
         if (! cls->parent ()) {
-          PyList_Append (m_all_list, PythonRef (c2python (cls->name ())).get ());
-          PyModule_AddObject (mp_module->module (), cls->name ().c_str (), (PyObject *) pt);
+          PyList_Append (m_all_list, c2python (cls->name ()));
+          PyModule_AddObjectRef (mp_module->module (), cls->name ().c_str (), (PyObject *) pt);
         }
 
       }

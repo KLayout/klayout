@@ -267,7 +267,8 @@ public:
 
         if (! cls->parent ()) {
           PyList_Append (m_all_list, c2python (cls->name ()));
-          PyModule_AddObjectRef (mp_module->module (), cls->name ().c_str (), (PyObject *) pt);
+          Py_INCREF ((PyObject *) pt);
+          PyModule_AddObject (mp_module->module (), cls->name ().c_str (), (PyObject *) pt);
         }
 
       }

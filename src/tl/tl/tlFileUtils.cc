@@ -908,11 +908,11 @@ get_inst_path ()
 std::string
 get_exe_file ()
 {
-  static std::string s_inst_path;
-  if (s_inst_path.empty ()) {
-    s_inst_path = tl::absolute_file_path (get_inst_path_internal ());
+  static std::string s_exe_file;
+  if (s_exe_file.empty ()) {
+    s_exe_file = tl::absolute_file_path (get_inst_path_internal ());
   }
-  return s_inst_path;
+  return s_exe_file;
 }
 
 std::string

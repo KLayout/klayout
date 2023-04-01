@@ -20,6 +20,11 @@
 
 */
 
+#include "tlUnitTest.h"
+#include "tlStream.h"
+#include "tlFileUtils.h"
+#include "tlEnv.h"
+
 //  Oh my god ... STRINGIFY(s) will get the argument with MACROS REPLACED.
 //  So if the PYTHONPATH is something like build.linux-released, the "linux" macro
 //  set to 1 will make this "build.1-release". So STRINGIFY isn't a real solution.
@@ -30,22 +35,11 @@
 #define STRINGIFY(s) _STRINGIFY(s)
 #define _STRINGIFY(s) #s
 
-#include "tlUnitTest.h"
-#include "tlStream.h"
-
 int run_pymodtest (tl::TestBase *_this, const std::string &fn)
 {
-  static std::string pypath;
-  if (pypath.empty ()) {
-    pypath = "PYTHONPATH=";
-    pypath += STRINGIFY (PYTHONPATH);
-  }
-#if defined(_WIN32)
-  _putenv (const_cast<char *> (pypath.c_str ()));
-#else
-  putenv (const_cast<char *> (pypath.c_str ()));
-#endif
-  tl::info << pypath;
+  static std::string pypath = tl::combine_path (tl::get_inst_path (), "pymod");
+  tl::info << "PYTHONPATH=" << pypath;
+  tl::set_env ("PYTHONPATH", pypath);
 
   std::string fp (tl::testdata ());
   fp += "/pymod/";

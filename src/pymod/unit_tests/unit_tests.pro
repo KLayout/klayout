@@ -14,20 +14,14 @@ msvc {
   # "\\\\" is actually *one* backslash for replacement string and *two* backslashes in the
   # substitution string in qmake ... so we replace \ by \\ here:
   PYTHON_ESCAPED = $$replace(PYTHON, "\\\\", "\\\\")
-  PYTHONPATH = $$shell_path($$DESTDIR_UT/pymod)
-  PYTHONPATH_ESCAPED = $$replace(PYTHONPATH, "\\\\", "\\\\")
 
   QMAKE_CXXFLAGS += \
-    "-DPYTHON=\"$$PYTHON_ESCAPED\"" \
-    "-DPYTHONPATH=\"$$PYTHONPATH_ESCAPED\""
+    "-DPYTHON=\"$$PYTHON_ESCAPED\""
 
 } else {
 
-  PYTHONPATH = $$DESTDIR_UT/pymod
-
   DEFINES += \
     PYTHON=$$PYTHON \
-    PYTHONPATH=$$PYTHONPATH
 
 }
 

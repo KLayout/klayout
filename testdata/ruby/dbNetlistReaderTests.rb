@@ -167,6 +167,7 @@ END
     nl = RBA::Netlist::new
 
     input = File.join($ut_testsrc, "testdata", "algo", "nreader6.cir")
+    input = File.absolute_path(input)
 
     mydelegate = MyNetlistSpiceReaderDelegate::new
 

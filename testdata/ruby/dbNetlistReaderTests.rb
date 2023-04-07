@@ -186,6 +186,14 @@ END
     rescue Exception => ex
       msg = ex.message
     end
+
+    # normalize paths for Windows
+    msg = msg.gsub("\\", "/")
+    input = input.gsub("\\", "/")
+
+    puts "INFO: msg is '#{msg}'"
+    puts "INFO: input is '#{input}'"
+
     assert_equal(msg.sub(input, "<INPUT>"), "Nothing implemented in <INPUT>, line 22 in Netlist::read")
 
     assert_equal(nl.description, "Read by MyDelegate")

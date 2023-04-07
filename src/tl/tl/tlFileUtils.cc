@@ -53,6 +53,7 @@
 #  include <dirent.h>
 #  include <libproc.h>
 #  include <dlfcn.h>
+#  include <pwd.h>
 
 #else
 
@@ -884,8 +885,10 @@ get_home_path ()
     return tl::get_env ("HOMEDRIVE") + tl::get_env ("HOMEPATH");
   } else if (tl::has_env ("HOMESHARE") && tl::has_env ("HOMEPATH")) {
     return tl::get_env ("HOMESHARE") + tl::get_env ("HOMEPATH");
+  } else if (tl::has_env ("USERPROFILE")) {
+    return tl::get_env ("USERPROFILE");
   }
-  tl::warn << tl::to_string (tr ("Unable to get home directory (no HOMEDRIVE/HOMEPATH or HOMESHARE/HOMEPATH environment variables)"));
+  tl::warn << tl::to_string (tr ("Unable to get home directory (no HOMEDRIVE/HOMEPATH, HOMESHARE/HOMEPATH or USERPROFILE environment variables)"));
 #endif
   return std::string (".");
 }

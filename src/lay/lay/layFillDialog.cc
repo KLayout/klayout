@@ -102,10 +102,12 @@ FillDialog::menu_activated (const std::string &symbol)
 {
   if (symbol == "fill_tool::show") {
 
-    lay::CellView cv = mp_view->cellview (mp_view->active_cellview_index ());
+    int cv_index = mp_view->active_cellview_index ();
+
+    lay::CellView cv = mp_view->cellview (cv_index);
     if (cv.is_valid ()) {
-      cb_layer->set_layout (&cv->layout ());
-      fc_boundary_layer->set_layout (&cv->layout ());
+      cb_layer->set_view (mp_view, cv_index);
+      fc_boundary_layer->set_view (mp_view, cv_index);
       show ();
     }
 

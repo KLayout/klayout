@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>ReplacePropertiesText</class>
- <widget class="QWidget" name="ReplacePropertiesText" >
-  <property name="geometry" >
+ <widget class="QWidget" name="ReplacePropertiesText">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,125 +10,133 @@
     <height>269</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" >
-   <property name="margin" >
+  <layout class="QGridLayout">
+   <property name="margin" stdset="0">
     <number>9</number>
    </property>
-   <property name="spacing" >
+   <property name="spacing">
     <number>6</number>
    </property>
-   <item row="2" column="2" >
-    <widget class="QComboBox" name="text_orientation" >
+   <item row="2" column="2">
+    <widget class="QComboBox" name="text_orientation">
      <item>
-      <property name="text" >
+      <property name="text">
        <string/>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>R0</string>
       </property>
-      <property name="icon" >
-       <iconset resource="layResources.qrc" >:/r0_24px.png</iconset>
+      <property name="icon">
+       <iconset resource="../../icons/icons.qrc">
+        <normaloff>:/r0_24px.png</normaloff>:/r0_24px.png</iconset>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>R90</string>
       </property>
-      <property name="icon" >
-       <iconset resource="layResources.qrc" >:/r90_24px.png</iconset>
+      <property name="icon">
+       <iconset resource="../../icons/icons.qrc">
+        <normaloff>:/r90_24px.png</normaloff>:/r90_24px.png</iconset>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>R180</string>
       </property>
-      <property name="icon" >
-       <iconset resource="layResources.qrc" >:/r180_24px.png</iconset>
+      <property name="icon">
+       <iconset resource="../../icons/icons.qrc">
+        <normaloff>:/r180_24px.png</normaloff>:/r180_24px.png</iconset>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>R270</string>
       </property>
-      <property name="icon" >
-       <iconset resource="layResources.qrc" >:/r270_24px.png</iconset>
+      <property name="icon">
+       <iconset resource="../../icons/icons.qrc">
+        <normaloff>:/r270_24px.png</normaloff>:/r270_24px.png</iconset>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>M0</string>
       </property>
-      <property name="icon" >
-       <iconset resource="layResources.qrc" >:/m0_24px.png</iconset>
+      <property name="icon">
+       <iconset resource="../../icons/icons.qrc">
+        <normaloff>:/m0_24px.png</normaloff>:/m0_24px.png</iconset>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>M45</string>
       </property>
-      <property name="icon" >
-       <iconset resource="layResources.qrc" >:/m45_24px.png</iconset>
+      <property name="icon">
+       <iconset resource="../../icons/icons.qrc">
+        <normaloff>:/m45_24px.png</normaloff>:/m45_24px.png</iconset>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>M90</string>
       </property>
-      <property name="icon" >
-       <iconset resource="layResources.qrc" >:/m90_24px.png</iconset>
+      <property name="icon">
+       <iconset resource="../../icons/icons.qrc">
+        <normaloff>:/m90_24px.png</normaloff>:/m90_24px.png</iconset>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>M135</string>
       </property>
-      <property name="icon" >
-       <iconset resource="layResources.qrc" >:/m135_24px.png</iconset>
+      <property name="icon">
+       <iconset resource="../../icons/icons.qrc">
+        <normaloff>:/m135_24px.png</normaloff>:/m135_24px.png</iconset>
       </property>
      </item>
     </widget>
    </item>
-   <item row="1" column="0" >
-    <widget class="QLabel" name="label_57" >
-     <property name="text" >
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_57">
+     <property name="text">
       <string>Text</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="1" >
-    <widget class="QLabel" name="label_67" >
-     <property name="text" >
+   <item row="0" column="1">
+    <widget class="QLabel" name="label_67">
+     <property name="text">
       <string/>
      </property>
-     <property name="pixmap" >
-      <pixmap resource="layResources.qrc" >:/right_16px@2x.png</pixmap>
+     <property name="pixmap">
+      <pixmap resource="../../icons/icons.qrc">:/right_16px@2x.png</pixmap>
      </property>
     </widget>
    </item>
-   <item row="2" column="1" >
-    <widget class="QLabel" name="label_65" >
-     <property name="text" >
+   <item row="2" column="1">
+    <widget class="QLabel" name="label_65">
+     <property name="text">
       <string/>
      </property>
-     <property name="pixmap" >
-      <pixmap resource="layResources.qrc" >:/right_16px@2x.png</pixmap>
+     <property name="pixmap">
+      <pixmap resource="../../icons/icons.qrc">:/right_16px@2x.png</pixmap>
      </property>
     </widget>
    </item>
-   <item row="3" column="2" >
-    <widget class="QLineEdit" name="text_size" />
+   <item row="3" column="2">
+    <widget class="QLineEdit" name="text_size"/>
    </item>
-   <item row="4" column="0" colspan="3" >
+   <item row="4" column="0" colspan="3">
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>200</width>
        <height>40</height>
@@ -135,56 +144,66 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="1" >
-    <widget class="QLabel" name="label_64" >
-     <property name="text" >
+   <item row="1" column="1">
+    <widget class="QLabel" name="label_64">
+     <property name="text">
       <string/>
      </property>
-     <property name="pixmap" >
-      <pixmap resource="layResources.qrc" >:/right_16px@2x.png</pixmap>
+     <property name="pixmap">
+      <pixmap resource="../../icons/icons.qrc">:/right_16px@2x.png</pixmap>
      </property>
     </widget>
    </item>
-   <item row="2" column="0" >
-    <widget class="QLabel" name="label_58" >
-     <property name="text" >
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_58">
+     <property name="text">
       <string>Orientation</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="1" >
-    <widget class="QLabel" name="label_66" >
-     <property name="text" >
+   <item row="3" column="1">
+    <widget class="QLabel" name="label_66">
+     <property name="text">
       <string/>
      </property>
-     <property name="pixmap" >
-      <pixmap resource="layResources.qrc" >:/right_16px@2x.png</pixmap>
+     <property name="pixmap">
+      <pixmap resource="../../icons/icons.qrc">:/right_16px@2x.png</pixmap>
      </property>
     </widget>
    </item>
-   <item row="3" column="0" >
-    <widget class="QLabel" name="label_56" >
-     <property name="text" >
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_56">
+     <property name="text">
       <string>Size</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="2" >
-    <widget class="QLineEdit" name="text_string" />
+   <item row="1" column="2">
+    <widget class="QLineEdit" name="text_string"/>
    </item>
-   <item row="0" column="0" >
-    <widget class="QLabel" name="label_55" >
-     <property name="text" >
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_55">
+     <property name="text">
       <string>Layer</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="2" >
-    <widget class="lay::LayerSelectionComboBox" name="text_layer" />
+   <item row="0" column="2">
+    <widget class="lay::LayerSelectionComboBox" name="text_layer">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QComboBox::AdjustToContents</enum>
+     </property>
+    </widget>
    </item>
-   <item row="3" column="3" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
+   <item row="3" column="3">
+    <widget class="QLabel" name="label">
+     <property name="text">
       <string>µm</string>
      </property>
     </widget>
@@ -198,6 +217,8 @@
    <header>layWidgets.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../icons/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

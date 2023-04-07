@@ -71,6 +71,9 @@ int run_pymodtest (tl::TestBase *_this, const std::string &fn)
     tl::InputPipe pipe (cmd);
     tl::InputStream is (pipe);
     text = is.read_all ();
+
+    //  subprocess exits without error
+    EXPECT_EQ (pipe.wait(), 0);
   }
 
   tl::info << text;
@@ -88,6 +91,9 @@ PYMODTEST (import_tl, "import_tl.py")
 PYMODTEST (import_db, "import_db.py")
 PYMODTEST (import_rdb, "import_rdb.py")
 PYMODTEST (import_lay, "import_lay.py")
+
+//  others
+PYMODTEST (issue1327, "issue1327.py")
 
 #if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
 

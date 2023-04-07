@@ -805,6 +805,9 @@ TEST (19)
   std::string home = tl::get_home_path ();
   //  no specific value, just something ...
   EXPECT_EQ (home.size () > 5, true);
+#if defined(HAVE_QT)
+  EXPECT_EQ (home, tl::to_string (QDir::homePath ()));
+#endif
 }
 
 //  absolute path with "~" expansion

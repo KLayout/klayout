@@ -806,7 +806,7 @@ TEST (19)
   //  no specific value, just something ...
   EXPECT_EQ (home.size () > 5, true);
 #if defined(HAVE_QT)
-  EXPECT_EQ (home, tl::to_string (QDir::homePath ()));
+  EXPECT_EQ (tl::replaced (home, "\\", "/"), tl::replaced (tl::to_string (QDir::homePath ()), "\\", "/"));
 #endif
 }
 

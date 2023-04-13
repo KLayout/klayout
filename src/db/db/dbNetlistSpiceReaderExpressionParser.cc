@@ -47,8 +47,15 @@ static bool to_bool (const tl::Variant &v)
 NetlistSpiceReaderExpressionParser::NetlistSpiceReaderExpressionParser (const variables_type *vars, double def_scale)
   : m_def_scale (def_scale)
 {
-  static variables_type empty_variables;
-  mp_variables = vars ? vars : &empty_variables;
+  mp_variables1 = vars;
+  mp_variables2 = 0;
+}
+
+NetlistSpiceReaderExpressionParser::NetlistSpiceReaderExpressionParser (const variables_type *vars1, const variables_type *vars2, double def_scale)
+  : m_def_scale (def_scale)
+{
+  mp_variables1 = vars1;
+  mp_variables2 = vars2;
 }
 
 //  expression syntax taken from ngspice:
@@ -264,13 +271,20 @@ NetlistSpiceReaderExpressionParser::read_atomic_value (tl::Extractor &ex, bool *
 
     } else {
 
-      auto vi = mp_variables->find (var);
-      if (vi != mp_variables->end ()) {
-        return vi->second;
-      } else {
-        //  keep word as string value
-        return tl::Variant (var);
+      if (mp_variables1) {
+        auto vi = mp_variables1->find (var);
+        if (vi != mp_variables1->end ()) {
+          return vi->second;
+        }
       }
+      if (mp_variables2) {
+        auto vi = mp_variables2->find (var);
+        if (vi != mp_variables2->end ()) {
+          return vi->second;
+        }
+      }
+      //  keep word as string value
+      return tl::Variant (var);
 
     }
 

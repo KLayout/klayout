@@ -225,7 +225,7 @@ void NetlistSpiceReaderDelegate::parse_element_components (const std::string &s,
 
         //  a parameter
         std::string pn = mp_netlist ? mp_netlist->normalize_name (n) : tl::to_upper_case (n);
-        pv [pn] = read_value (ex, variables);
+        pv [pn] = read_value (ex, variables, pv);
 
       } else {
 
@@ -304,44 +304,81 @@ void NetlistSpiceReaderDelegate::parse_element (const std::string &s, const std:
     //  (same for C, L instead of R)
 
     if (nn.size () < 2) {
-      error (tl::to_string (tr ("Not enough specs for a R, C or L device")));
+      error (tl::to_string (tr ("Not enough specs (nodes, value, model) for a R, C or L device")));
+    } else if (nn.size () > 5) {
+      error (tl::to_string (tr ("Too many specs (nodes, value, model) for a R, C or L device")));
     }
 
+    //  Variations are (here for "C" element):
+    //  (1) Cname n1 n2 C=value [other params]
+    //  (2) Cname n1 n2 value [params]
+    //  (3) Cname n1 n2 model C=value [other params]
+    //      Cname n1 n2 n3 C=value [other params] -> not supported, cannot tell from (3) without further analysis
+    //  (4) Cname n1 n2 model value [params]
+    //      Cname n1 n2 n3 value [params] -> not supported, cannot tell from (4) without further analysis
+    //  (5) Cname n1 n2 n3 model C=value [other params]
+    //  (6) Cname n1 n2 value model [params]
+    //  (7) Cname n1 n2 n3 model value [params]
+    //  (8) Cname n1 n2 n3 value model [params]
+
     auto rv = pv.find (element);
-    if (rv != pv.end ()) {
 
-      //  value given by parameter
-      value = rv->second.to_double ();
-
-      if (nn.size () >= 3) {
-        //  Rname n1 n2 model [params]
-        //  Rname n1 n2 n3 model [params]
-        model = nn.back ();
-        nn.pop_back ();
+    bool has_value = false;
+    if (nn.size () == 2) {
+      if (rv != pv.end ()) {
+        value = rv->second.to_double ();   //  (1)
+        has_value = true;
       }
-
-    } else if (nn.size () >= 3) {
-
+    } else if (nn.size () == 3) {
       if (try_read_value (nn.back (), value, variables)) {
-
-        //  Rname n1 n2 value
-        //  Rname n1 n2 n3 value
+        has_value = true;     //  (2)
         nn.pop_back ();
-
       } else {
-
-        //  Rname n1 n2 value model [params]
-        //  Rname n1 n2 n3 value model [params]
+        model = nn.back ();   //  (3)
+        nn.pop_back ();
+        if (rv != pv.end ()) {
+          value = rv->second.to_double ();
+          has_value = true;
+        }
+      }
+    } else if (nn.size () == 4) {
+      if (try_read_value (nn.back (), value, variables)) {
+        has_value = true;     //  (4)
+        nn.pop_back ();
+      } else if (rv != pv.end ()) {
+        value = rv->second.to_double ();   //  (5)
+        has_value = true;
         model = nn.back ();
         nn.pop_back ();
-        if (! try_read_value (nn.back (), value, variables)) {
-          error (tl::to_string (tr ("Can't find a value for a R, C or L device")));
-        } else {
-          nn.pop_back ();
-        }
-
+      } else if (try_read_value (nn[2], value, variables)) {
+        has_value = true;     //  (6)
+        model = nn.back ();
+        nn.pop_back ();
+        nn.pop_back ();
+      } else {
+        model = nn.back ();   //  fall back to (5)
+        nn.pop_back ();
       }
+    } else {
+      if (try_read_value (nn.back (), value, variables)) {
+        has_value = true;     //  (7)
+        nn.pop_back ();
+        model = nn.back ();
+        nn.pop_back ();
+      } else if (try_read_value (nn[3], value, variables)) {
+        has_value = true;     //  (8)
+        model = nn.back ();
+        nn.pop_back ();
+        nn.pop_back ();
+      }
+    }
 
+    if (rv != pv.end ()) {
+      pv.erase (rv);
+    }
+
+    if (! has_value) {
+      error (tl::to_string (tr ("Can't find a value for a R, C or L device")));
     }
 
   } else {
@@ -650,6 +687,13 @@ tl::Variant
 NetlistSpiceReaderDelegate::read_value (tl::Extractor &ex, const std::map<std::string, tl::Variant> &variables)
 {
   NetlistSpiceReaderExpressionParser parser (&variables);
+  return parser.read (ex);
+}
+
+tl::Variant
+NetlistSpiceReaderDelegate::read_value (tl::Extractor &ex, const std::map<std::string, tl::Variant> &variables1, const std::map<std::string, tl::Variant> &variables2)
+{
+  NetlistSpiceReaderExpressionParser parser (&variables1, &variables2);
   return parser.read (ex);
 }
 

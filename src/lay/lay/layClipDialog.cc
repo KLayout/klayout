@@ -91,9 +91,11 @@ ClipDialog::menu_activated (const std::string &symbol)
 {
   if (symbol == "clip_tool::show") {
 
-    lay::CellView cv = view ()->cellview (view ()->active_cellview_index ());
+    int cv_index = view ()->active_cellview_index ();
+
+    lay::CellView cv = view ()->cellview (cv_index);
     if (cv.is_valid ()) {
-      cb_layer->set_layout (&cv->layout ());
+      cb_layer->set_view (view (), cv_index);
       show ();
       activate ();
     }

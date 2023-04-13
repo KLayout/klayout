@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>SearchPropertiesBox</class>
- <widget class="QWidget" name="SearchPropertiesBox" >
-  <property name="geometry" >
+ <widget class="QWidget" name="SearchPropertiesBox">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,80 +10,80 @@
     <height>331</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" >
-   <property name="margin" >
+  <layout class="QGridLayout">
+   <property name="margin" stdset="0">
     <number>9</number>
    </property>
-   <property name="spacing" >
+   <property name="spacing">
     <number>6</number>
    </property>
-   <item row="4" column="2" >
-    <widget class="QLineEdit" name="box_height_value" />
+   <item row="4" column="2">
+    <widget class="QLineEdit" name="box_height_value"/>
    </item>
-   <item row="4" column="3" >
-    <widget class="QLabel" name="label_3" >
-     <property name="text" >
+   <item row="4" column="3">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
       <string>µm</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="3" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
+   <item row="1" column="3">
+    <widget class="QLabel" name="label">
+     <property name="text">
       <string>µm²</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1" >
-    <widget class="QComboBox" name="box_height_op" >
+   <item row="4" column="1">
+    <widget class="QComboBox" name="box_height_op">
      <item>
-      <property name="text" >
+      <property name="text">
        <string>==</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>!=</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>&lt;</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>&lt;=</string>
       </property>
      </item>
      <item>
-      <property name="text" >
-       <string>></string>
+      <property name="text">
+       <string>&gt;</string>
       </property>
      </item>
      <item>
-      <property name="text" >
-       <string>>=</string>
+      <property name="text">
+       <string>&gt;=</string>
       </property>
      </item>
     </widget>
    </item>
-   <item row="1" column="0" >
-    <widget class="QLabel" name="label_12" >
-     <property name="text" >
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_12">
+     <property name="text">
       <string>Area</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="0" colspan="4" >
+   <item row="5" column="0" colspan="4">
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>200</width>
        <height>281</height>
@@ -90,158 +91,168 @@
      </property>
     </spacer>
    </item>
-   <item row="0" column="2" >
-    <widget class="lay::LayerSelectionComboBox" name="box_layer" />
+   <item row="0" column="2">
+    <widget class="lay::LayerSelectionComboBox" name="box_layer">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QComboBox::AdjustToContents</enum>
+     </property>
+    </widget>
    </item>
-   <item row="3" column="1" >
-    <widget class="QComboBox" name="box_width_op" >
+   <item row="3" column="1">
+    <widget class="QComboBox" name="box_width_op">
      <item>
-      <property name="text" >
+      <property name="text">
        <string>==</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>!=</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>&lt;</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>&lt;=</string>
       </property>
      </item>
      <item>
-      <property name="text" >
-       <string>></string>
+      <property name="text">
+       <string>&gt;</string>
       </property>
      </item>
      <item>
-      <property name="text" >
-       <string>>=</string>
+      <property name="text">
+       <string>&gt;=</string>
       </property>
      </item>
     </widget>
    </item>
-   <item row="3" column="3" >
-    <widget class="QLabel" name="label_2" >
-     <property name="text" >
+   <item row="3" column="3">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
       <string>µm</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="0" >
-    <widget class="QLabel" name="label_10" >
-     <property name="text" >
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_10">
+     <property name="text">
       <string>Width</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="2" >
-    <widget class="QLineEdit" name="box_area_value" />
+   <item row="1" column="2">
+    <widget class="QLineEdit" name="box_area_value"/>
    </item>
-   <item row="1" column="1" >
-    <widget class="QComboBox" name="box_area_op" >
+   <item row="1" column="1">
+    <widget class="QComboBox" name="box_area_op">
      <item>
-      <property name="text" >
+      <property name="text">
        <string>==</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>!=</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>&lt;</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>&lt;=</string>
       </property>
      </item>
      <item>
-      <property name="text" >
-       <string>></string>
+      <property name="text">
+       <string>&gt;</string>
       </property>
      </item>
      <item>
-      <property name="text" >
-       <string>>=</string>
+      <property name="text">
+       <string>&gt;=</string>
       </property>
      </item>
     </widget>
    </item>
-   <item row="3" column="2" >
-    <widget class="QLineEdit" name="box_width_value" />
+   <item row="3" column="2">
+    <widget class="QLineEdit" name="box_width_value"/>
    </item>
-   <item row="4" column="0" >
-    <widget class="QLabel" name="label_13" >
-     <property name="text" >
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_13">
+     <property name="text">
       <string>Height</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="0" >
-    <widget class="QLabel" name="label_11" >
-     <property name="text" >
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_11">
+     <property name="text">
       <string>Layer</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="0" >
-    <widget class="QLabel" name="label_4" >
-     <property name="text" >
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
       <string>Perimeter</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="1" >
-    <widget class="QComboBox" name="box_perimeter_op" >
+   <item row="2" column="1">
+    <widget class="QComboBox" name="box_perimeter_op">
      <item>
-      <property name="text" >
+      <property name="text">
        <string>==</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>!=</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>&lt;</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>&lt;=</string>
       </property>
      </item>
      <item>
-      <property name="text" >
-       <string>></string>
+      <property name="text">
+       <string>&gt;</string>
       </property>
      </item>
      <item>
-      <property name="text" >
-       <string>>=</string>
+      <property name="text">
+       <string>&gt;=</string>
       </property>
      </item>
     </widget>
    </item>
-   <item row="2" column="2" >
-    <widget class="QLineEdit" name="box_perimeter_value" />
+   <item row="2" column="2">
+    <widget class="QLineEdit" name="box_perimeter_value"/>
    </item>
-   <item row="2" column="3" >
-    <widget class="QLabel" name="label_5" >
-     <property name="text" >
+   <item row="2" column="3">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
       <string>µm</string>
      </property>
     </widget>

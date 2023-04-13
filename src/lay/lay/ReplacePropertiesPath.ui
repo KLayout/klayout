@@ -1,37 +1,38 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>ReplacePropertiesPath</class>
- <widget class="QWidget" name="ReplacePropertiesPath" >
-  <property name="geometry" >
+ <widget class="QWidget" name="ReplacePropertiesPath">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>239</width>
+    <width>246</width>
     <height>241</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" >
-   <property name="margin" >
+  <layout class="QGridLayout">
+   <property name="margin" stdset="0">
     <number>9</number>
    </property>
-   <property name="spacing" >
+   <property name="spacing">
     <number>6</number>
    </property>
-   <item row="1" column="0" >
-    <widget class="QLabel" name="label_55" >
-     <property name="text" >
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_55">
+     <property name="text">
       <string>Width</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="3" >
+   <item row="2" column="0" colspan="3">
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>200</width>
        <height>40</height>
@@ -39,42 +40,52 @@
      </property>
     </spacer>
    </item>
-   <item row="0" column="0" >
-    <widget class="QLabel" name="label_54" >
-     <property name="text" >
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_54">
+     <property name="text">
       <string>Layer</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="2" >
-    <widget class="lay::LayerSelectionComboBox" name="path_layer" />
-   </item>
-   <item row="1" column="1" >
-    <widget class="QLabel" name="label_61" >
-     <property name="text" >
-      <string/>
+   <item row="0" column="2">
+    <widget class="lay::LayerSelectionComboBox" name="path_layer">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <property name="pixmap" >
-      <pixmap resource="layResources.qrc" >:/right_16px@2x.png</pixmap>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2" >
-    <widget class="QLineEdit" name="path_width" />
-   </item>
-   <item row="0" column="1" >
-    <widget class="QLabel" name="label_62" >
-     <property name="text" >
-      <string/>
-     </property>
-     <property name="pixmap" >
-      <pixmap resource="layResources.qrc" >:/right_16px@2x.png</pixmap>
+     <property name="sizeAdjustPolicy">
+      <enum>QComboBox::AdjustToContents</enum>
      </property>
     </widget>
    </item>
-   <item row="1" column="3" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
+   <item row="1" column="1">
+    <widget class="QLabel" name="label_61">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="../../icons/icons.qrc">:/right_16px@2x.png</pixmap>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QLineEdit" name="path_width"/>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="label_62">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="../../icons/icons.qrc">:/right_16px@2x.png</pixmap>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QLabel" name="label">
+     <property name="text">
       <string>µm</string>
      </property>
     </widget>
@@ -88,6 +99,8 @@
    <header>layWidgets.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../icons/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

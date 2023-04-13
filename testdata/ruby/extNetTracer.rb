@@ -158,6 +158,39 @@ class EXT_TestClass < TestBase
 
   end
 
+  # Technology component
+  def test_4
+
+    c1 = RBA::NetTracerConnectivity::new
+    c1.connection("1/0", "3/0")
+    c1.name = "1to3"
+
+    c2 = RBA::NetTracerConnectivity::new
+    c2.connection("2/0", "3/0")
+    c2.name = "2to3"
+
+    tc = RBA::NetTracerTechnologyComponent::new
+    names = tc.each.collect { |c| c.name }.join(";")
+    assert_equal(names, "")
+
+    tc.add(c1)
+    names = tc.each.collect { |c| c.name }.join(";")
+    assert_equal(names, "1to3")
+
+    tc.add(c2)
+    names = tc.each.collect { |c| c.name }.join(";")
+    assert_equal(names, "1to3;2to3")
+
+    tc.clear
+    names = tc.each.collect { |c| c.name }.join(";")
+    assert_equal(names, "")
+
+    tc.add(c2)
+    names = tc.each.collect { |c| c.name }.join(";")
+    assert_equal(names, "2to3")
+
+  end
+
 end
 
 load("test_epilogue.rb")

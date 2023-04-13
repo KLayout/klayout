@@ -147,6 +147,14 @@ DB_PUBLIC gsi::Class<db::TechnologyComponent> &decl_dbTechnologyComponent ();
 gsi::Class<db::NetTracerTechnologyComponent> decl_NetTracerTechnologyComponent (decl_dbTechnologyComponent (), "db", "NetTracerTechnologyComponent",
   gsi::iterator ("each", static_cast<db::NetTracerTechnologyComponent::const_iterator (db::NetTracerTechnologyComponent::*) () const> (&db::NetTracerTechnologyComponent::begin), static_cast<db::NetTracerTechnologyComponent::const_iterator (db::NetTracerTechnologyComponent::*) () const> (&db::NetTracerTechnologyComponent::end),
     "@brief Gets the connectivity definitions from the net tracer technology component.\n"
+  ) +
+  gsi::method ("clear", &db::NetTracerTechnologyComponent::clear,
+    "@brief Removes all connectivity definitions.\n"
+    "This method has been introduced in version 0.28.7"
+  ) +
+  gsi::method ("add", &db::NetTracerTechnologyComponent::push_back, gsi::arg ("connection"),
+    "@brief Adds a connectivity definition.\n"
+    "This method has been introduced in version 0.28.7"
   ),
   "@brief Represents the technology information for the net tracer.\n"
   "This class has been redefined in version 0.28 and re-introduced in version 0.28.3. Since version 0.28, "

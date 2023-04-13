@@ -500,7 +500,7 @@ TEST(11_ErrorOnCircuitRedefinition)
     msg = ex.msg ();
   }
 
-  EXPECT_EQ (tl::replaced (msg, path, "?"), "Redefinition of circuit SUBCKT in ?, line 20");
+  EXPECT_EQ (tl::replaced (msg, tl::absolute_file_path (path), "?"), "Redefinition of circuit SUBCKT in ?, line 20");
 }
 
 TEST(12_IgnoreDuplicateGlobals)
@@ -580,7 +580,7 @@ TEST(14_IncludeWithError)
     reader.read (is, nl);
     EXPECT_EQ (true, false);  //  must not happen
   } catch (tl::Exception &ex) {
-    EXPECT_EQ (ex.msg (), "'M' element must have four nodes in " + std::string (tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader14x.cir")) + ", line 3");
+    EXPECT_EQ (ex.msg (), "'M' element must have four nodes in " + std::string (tl::absolute_file_path (tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "nreader14x.cir"))) + ", line 3");
   }
 }
 

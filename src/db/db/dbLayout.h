@@ -1952,7 +1952,7 @@ public:
   explicit LayoutLocker (db::Layout *layout = 0, bool no_update = false)
     : mp_layout (layout), m_no_update (no_update)
   {
-    if (mp_layout) {
+    if (mp_layout.get ()) {
       mp_layout->start_changes ();
     }
   }
@@ -1965,7 +1965,7 @@ public:
   LayoutLocker (const LayoutLocker &other)
     : mp_layout (other.mp_layout), m_no_update (other.m_no_update)
   {
-    if (mp_layout) {
+    if (mp_layout.get ()) {
       mp_layout->start_changes ();
     }
   }
@@ -1976,17 +1976,17 @@ public:
       return *this;
     }
 
-    set (other.mp_layout, other.m_no_update);
+    set (const_cast<db::Layout *> (other.mp_layout.get ()), other.m_no_update);
     return *this;
   }
 
 private:
-  db::Layout *mp_layout;
+  tl::weak_ptr<db::Layout> mp_layout;
   bool m_no_update;
 
   void set (db::Layout *layout, bool no_update)
   {
-    if (mp_layout) {
+    if (mp_layout.get ()) {
       if (m_no_update) {
         mp_layout->end_changes_no_update ();
       } else {
@@ -1995,7 +1995,7 @@ private:
     }
     mp_layout = layout;
     m_no_update = no_update;
-    if (mp_layout) {
+    if (mp_layout.get ()) {
       mp_layout->start_changes ();
     }
   }

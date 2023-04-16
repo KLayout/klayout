@@ -41,19 +41,21 @@ namespace db
  */
 struct DB_PUBLIC MetaInfo
 {
-  MetaInfo (const std::string &d, const tl::Variant &v)
-    : description (d), value (v)
+  MetaInfo (const std::string &d, const tl::Variant &v, bool p = false)
+    : description (d), value (v), persisted (p)
   {
     //  .. nothing else ..
   }
 
   MetaInfo ()
+    : persisted (false)
   {
     //  .. nothing else ..
   }
 
   std::string description;
   tl::Variant value;
+  bool persisted;
 };
 
 /**

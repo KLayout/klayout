@@ -612,7 +612,7 @@ StatisticsSource::get (const std::string &url)
       }
 
       os <<       "<tr>" << std::endl
-         <<         "<td>" << layout.get_properties (*l).to_string () << "</td>" << std::endl
+         <<         "<td>" << tl::escaped_to_html (layout.get_properties (*l).to_string (), true) << "</td>" << std::endl
          // Boxes (total, single, array)
          <<         "<td>" << st_hier.box_total () << "<br></br>" << st_flat.box_total () << "</td>" << std::endl
          <<         "<td>" << st_hier.box_single () << "<br></br>" << st_flat.box_single () << "</td>" << std::endl
@@ -678,19 +678,19 @@ StatisticsSource::get (const std::string &url)
 
     os << "<html>" << std::endl
        <<   "<body>" << std::endl
-       <<     "<h2>" << tl::to_string (QObject::tr ("Common Statistics For '")) << m_h->name () << "'</h2>" << std::endl
+       <<     "<h2>" << tl::to_string (QObject::tr ("Common Statistics For '")) << tl::escaped_to_html (m_h->name (), true) << "'</h2>" << std::endl
        <<     "<p>" << std::endl
        <<     "<table>" << std::endl
        <<       "<tr>"
-       <<         "<td>" << tl::to_string (QObject::tr ("Path")) << ":&nbsp;</td><td>" << m_h->filename () << "</td>"
+       <<         "<td>" << tl::to_string (QObject::tr ("Path")) << ":&nbsp;</td><td>" << tl::escaped_to_html (m_h->filename (), true) << "</td>"
        <<       "</tr>" << std::endl;
     if (! m_h->save_options ().format ().empty ()) {
       os <<       "<tr>"
-         <<         "<td>" << tl::to_string (QObject::tr ("Format")) << ":&nbsp;</td><td>" << m_h->save_options ().format () << "</td>"
+         <<         "<td>" << tl::to_string (QObject::tr ("Format")) << ":&nbsp;</td><td>" << tl::escaped_to_html (m_h->save_options ().format (), true) << "</td>"
          <<       "</tr>" << std::endl;
     }
     os <<       "<tr>"
-       <<         "<td>" << tl::to_string (QObject::tr ("Technology")) << ":&nbsp;</td><td>" << m_h->technology ()->description () << format_tech_name (m_h->tech_name ()) << "</td>"
+       <<         "<td>" << tl::to_string (QObject::tr ("Technology")) << ":&nbsp;</td><td>" << tl::escaped_to_html (m_h->technology ()->description (), true) << tl::escaped_to_html (format_tech_name (m_h->tech_name ()), true) << "</td>"
        <<       "</tr>" << std::endl
        <<       "<tr>"
        <<         "<td>" << tl::to_string (QObject::tr ("Database unit")) << ":&nbsp;</td><td>" << tl::sprintf ("%.12g ", layout.dbu ()) << tl::to_string (QObject::tr ("micron")) << "</td>"
@@ -702,13 +702,17 @@ StatisticsSource::get (const std::string &url)
        <<         "<td>" << tl::to_string (QObject::tr ("Number of layers")) << ":&nbsp;</td><td>" << num_layers << "</td>"
        <<       "</tr>" << std::endl;
     for (db::Layout::meta_info_iterator meta = layout.begin_meta (); meta != layout.end_meta (); ++meta) {
-      os <<     "<tr><td>" << meta->description << "</td><td>" << meta->value << "</td></tr>" << std::endl;
+      std::string d = meta->second.description;
+      if (!d.empty ()) {
+        d = layout.meta_info_name (meta->first);
+      }
+      os <<     "<tr><td>" << tl::escaped_to_html (d, true) << "</td><td>" << tl::escaped_to_html (meta->second.value.to_string (), true) << "</td></tr>" << std::endl;
     }
     os <<     "</table>" << std::endl
        <<     "<h2>" << tl::to_string (QObject::tr ("Top Cells")) << "</h2>" << std::endl
        <<     "<table>" << std::endl;
     for (db::Layout::top_down_const_iterator tc = layout.begin_top_down (); tc != layout.end_top_cells (); ++tc) {
-      os <<     "<tr><td>" << layout.cell_name (*tc) << "</td></tr>" << std::endl;
+      os <<     "<tr><td>" << tl::escaped_to_html (layout.cell_name (*tc), true) << "</td></tr>" << std::endl;
     }
     os <<     "</table>" << std::endl;
     os <<     "</p>" << std::endl;
@@ -733,7 +737,7 @@ StatisticsSource::get (const std::string &url)
     if (! layers_sorted_by_ld.empty ()) {
 
       os <<     "<h2>" << tl::to_string (QObject::tr ("Layers (sorted by layer and datatype)")) << "</h2>" << std::endl
-         <<     "<p><a href=\"" << tl::to_string (s_per_layer_stat_path_ld) << "\">Detailed layer statistics</a></p>" << std::endl
+         <<     "<p><a href=\"" << tl::escaped_to_html (tl::to_string (s_per_layer_stat_path_ld), true) << "\">Detailed layer statistics</a></p>" << std::endl
          <<     "<p>" << std::endl
          <<     "<table>" << std::endl
          <<     "<tr><td><b>" << tl::to_string (QObject::tr ("Layer/Datatype")) << "</b>&nbsp;&nbsp;</td>";
@@ -748,7 +752,7 @@ StatisticsSource::get (const std::string &url)
           os << "<tr>"
              <<   "<td>" << tl::sprintf ("%d/%d", lp.layer, lp.datatype) << "</td>";
           if (! layers_with_oasis_names.empty ()) {
-            os <<   "<td>" << lp.name << "</td>";
+            os <<   "<td>" << tl::escaped_to_html (lp.name, true) << "</td>";
           }
           os << "</tr>" << std::endl;
         }
@@ -762,7 +766,7 @@ StatisticsSource::get (const std::string &url)
     if (! layers_with_oasis_names.empty ()) {
 
       os <<     "<h2>" << tl::to_string (QObject::tr ("Layers (sorted by layer names)")) << "</h2>" << std::endl
-         <<     "<p><a href=\"" << tl::to_string (s_per_layer_stat_path_name) << "\">Detailed layer statistics</a></p>" << std::endl
+         <<     "<p><a href=\"" << tl::escaped_to_html (tl::to_string (s_per_layer_stat_path_name), true) << "\">Detailed layer statistics</a></p>" << std::endl
          <<     "<p>" << std::endl
          <<     "<table>" << std::endl
          <<     "<tr><td><b>" << tl::to_string (QObject::tr ("Layer name")) << "</b>&nbsp;&nbsp;</td><td><b>" << tl::to_string (QObject::tr ("Layer/Datatype")) << "</b></td></tr>" << std::endl;
@@ -772,7 +776,7 @@ StatisticsSource::get (const std::string &url)
           const db::LayerProperties &lp = layout.get_properties (*i);
           if (! lp.name.empty ()) {
             os << "<tr>"
-               <<   "<td>" << lp.name << "</td>"
+               <<   "<td>" << tl::escaped_to_html (lp.name, true) << "</td>"
                <<   "<td>" << tl::sprintf ("%d/%d", lp.layer, lp.datatype) << "</td>"
                << "</tr>" << std::endl;
           }

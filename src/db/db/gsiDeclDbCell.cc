@@ -1010,7 +1010,18 @@ static const tl::Variant &cell_meta_info_value (db::Cell *cell, const std::strin
     static tl::Variant null_value;
     return null_value;
   } else {
-    return cell->layout ()->meta_info_value (cell->cell_index (), name);
+    return cell->layout ()->meta_info (cell->cell_index (), name).value;
+  }
+}
+
+static MetaInfo cell_meta_info (db::Cell *cell, const std::string &name)
+{
+  if (! cell->layout ()) {
+    static MetaInfo null_value;
+    return null_value;
+  } else {
+    const db::MetaInfo &value = cell->layout ()->meta_info (cell->cell_index (), name);
+    return MetaInfo (name, value);
   }
 }
 
@@ -1841,7 +1852,16 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "@brief Gets the meta information value for a given name\n"
     "See \\LayoutMetaInfo for details about cells and meta information.\n"
     "\n"
-    "If no meta information with the given name exists, an nil value will be returned.\n"
+    "If no meta information with the given name exists, a nil value will be returned.\n"
+    "A more generic version that delivers all fields of the meta information is \\meta_info.\n"
+    "\n"
+    "This method has been introduced in version 0.28.7."
+  ) +
+  gsi::method_ext ("meta_info", &cell_meta_info, gsi::arg ("name"),
+    "@brief Gets the meta information for a given name\n"
+    "See \\LayoutMetaInfo for details about cells and meta information.\n"
+    "\n"
+    "If no meta information with the given name exists, a default object with empty fields will be returned.\n"
     "\n"
     "This method has been introduced in version 0.28.7."
   ) +

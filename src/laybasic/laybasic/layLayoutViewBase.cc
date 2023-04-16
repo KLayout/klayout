@@ -3202,6 +3202,25 @@ LayoutViewBase::reload_layout (unsigned int cv_index)
   goto_view (state);
 }
 
+static void
+get_lyp_from_meta_info (const db::Layout &layout, std::string &lyp_file, bool &add_other_layers)
+{
+  db::Layout::meta_info_name_id_type layer_properties_file_name_id = layout.meta_info_name_id ("layer-properties-file");
+  db::Layout::meta_info_name_id_type layer_properties_add_other_layers_name_id = layout.meta_info_name_id ("layer-properties-add-other-layers");
+
+  for (db::Layout::meta_info_iterator meta = layout.begin_meta (); meta != layout.end_meta (); ++meta) {
+    if (meta->first == layer_properties_file_name_id) {
+      lyp_file = meta->second.value.to_string ();
+    }
+    if (meta->first == layer_properties_add_other_layers_name_id) {
+      try {
+        add_other_layers = meta->second.value.to_bool ();
+      } catch (...) {
+      }
+    }
+  }
+}
+
 unsigned int 
 LayoutViewBase::add_layout (lay::LayoutHandle *layout_handle, bool add_cellview, bool initialize_layers)
 {
@@ -3266,17 +3285,7 @@ LayoutViewBase::add_layout (lay::LayoutHandle *layout_handle, bool add_cellview,
       }
 
       //  Give the layout object a chance to specify a certain layer property file
-      for (db::Layout::meta_info_iterator meta = cv->layout ().begin_meta (); meta != cv->layout ().end_meta (); ++meta) {
-        if (meta->name == "layer-properties-file") {
-          lyp_file = meta->value;
-        }
-        if (meta->name == "layer-properties-add-other-layers") {
-          try {
-            tl::from_string (meta->value, add_other_layers);
-          } catch (...) {
-          }
-        }
-      }
+      get_lyp_from_meta_info (cv->layout (), lyp_file, add_other_layers);
 
       //  interpolate the layout properties file name
       tl::Eval expr;
@@ -3438,17 +3447,7 @@ LayoutViewBase::load_layout (const std::string &filename, const db::LoadLayoutOp
     }
 
     //  Give the layout object a chance to specify a certain layer property file
-    for (db::Layout::meta_info_iterator meta = cv->layout().begin_meta (); meta != cv->layout().end_meta (); ++meta) {
-      if (meta->name == "layer-properties-file") {
-        lyp_file = meta->value;
-      }
-      if (meta->name == "layer-properties-add-other-layers") {
-        try {
-          tl::from_string (meta->value, add_other_layers);
-        } catch (...) {
-        }
-      }
-    }
+    get_lyp_from_meta_info (cv->layout (), lyp_file, add_other_layers);
 
     //  interpolate the layout properties file name
     tl::Eval expr;

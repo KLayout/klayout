@@ -908,6 +908,18 @@ static void layout_add_meta_info (db::Layout *layout, const MetaInfo &mi)
   layout->add_meta_info (mi.name, db::MetaInfo (mi.description, mi.value));
 }
 
+static MetaInfo layout_get_meta_info (db::Layout *layout, const std::string &name)
+{
+  const db::MetaInfo &value = layout->meta_info (name);
+  return MetaInfo (name, value);
+}
+
+static const tl::Variant &layout_get_meta_info_value (db::Layout *layout, const std::string &name)
+{
+  const db::MetaInfo &value = layout->meta_info (name);
+  return value.value;
+}
+
 static MetaInfoIterator layout_each_meta_info (const db::Layout *layout)
 {
   return MetaInfoIterator (layout, layout->begin_meta (), layout->end_meta ());
@@ -1052,13 +1064,22 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  gsi::method ("meta_info_value", static_cast<const tl::Variant &(db::Layout::*) (const std::string &name) const> (&db::Layout::meta_info_value), gsi::arg ("name"),
+  gsi::method_ext ("meta_info_value", &layout_get_meta_info_value, gsi::arg ("name"),
     "@brief Gets the meta information value for a given name\n"
     "See \\LayoutMetaInfo for details about layouts and meta information.\n"
     "\n"
-    "If no meta information with the given name exists, an nil value will be returned.\n"
+    "If no meta information with the given name exists, a nil value will be returned.\n"
+    "A more generic version that delivers all fields of the meta information is \\meta_info.\n"
     "\n"
     "This method has been introduced in version 0.25. Starting with version 0.28.7, the value is of variant type instead of string only.\n"
+  ) +
+  gsi::method_ext ("meta_info", &layout_get_meta_info, gsi::arg ("name"),
+    "@brief Gets the meta information for a given name\n"
+    "See \\LayoutMetaInfo for details about layouts and meta information.\n"
+    "\n"
+    "If no meta information with the given name exists, a default object with empty fields will be returned.\n"
+    "\n"
+    "This method has been introduced in version 0.28.7.\n"
   ) +
   gsi::iterator_ext ("each_meta_info", &layout_each_meta_info,
     "@brief Iterates over the meta information of the layout\n"

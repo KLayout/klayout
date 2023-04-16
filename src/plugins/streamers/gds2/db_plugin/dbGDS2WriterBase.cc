@@ -86,9 +86,9 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
 
   db::GDS2WriterOptions gds2_options = options.get_options<db::GDS2WriterOptions> ();
 
-  layout.add_meta_info (MetaInfo ("dbuu", tl::to_string (tr ("Database unit in user units")), tl::to_string (dbu / std::max (1e-9, gds2_options.user_units))));
-  layout.add_meta_info (MetaInfo ("dbum", tl::to_string (tr ("Database unit in meter")), tl::to_string (dbu * 1e-6)));
-  layout.add_meta_info (MetaInfo ("libname", tl::to_string (tr ("Library name")), gds2_options.libname));
+  layout.add_meta_info ("dbuu", MetaInfo (tl::to_string (tr ("Database unit in user units")), tl::to_string (dbu / std::max (1e-9, gds2_options.user_units))));
+  layout.add_meta_info ("dbum", MetaInfo (tl::to_string (tr ("Database unit in meter")), tl::to_string (dbu * 1e-6)));
+  layout.add_meta_info ("libname", MetaInfo (tl::to_string (tr ("Library name")), gds2_options.libname));
 
   std::vector <std::pair <unsigned int, db::LayerProperties> > layers;
   options.get_valid_layers (layout, layers, db::SaveLayoutOptions::LP_AssignNumber);
@@ -123,8 +123,8 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
   }
 
   std::string str_time = tl::sprintf ("%d/%d/%d %d:%02d:%02d", time_data[1], time_data[2], time_data[0], time_data[3], time_data[4], time_data[5]); 
-  layout.add_meta_info (MetaInfo ("mod_time", tl::to_string (tr ("Modification Time")), str_time));
-  layout.add_meta_info (MetaInfo ("access_time", tl::to_string (tr ("Access Time")), str_time));
+  layout.add_meta_info ("mod_time", MetaInfo (tl::to_string (tr ("Modification Time")), str_time));
+  layout.add_meta_info ("access_time", MetaInfo (tl::to_string (tr ("Access Time")), str_time));
 
   bool multi_xy = gds2_options.multi_xy_records;
   size_t max_cellname_length = std::max (gds2_options.max_cellname_length, (unsigned int)8);

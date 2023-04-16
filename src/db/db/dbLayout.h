@@ -466,8 +466,8 @@ public:
   typedef std::map<std::pair<lib_id_type, cell_index_type>, cell_index_type> lib_proxy_map;
   typedef LayerIterator layer_iterator;
   typedef size_t meta_info_name_id_type;
-  typedef std::map<meta_info_name_id_type, MetaInfo> meta_info;
-  typedef meta_info::const_iterator meta_info_iterator;
+  typedef std::map<meta_info_name_id_type, MetaInfo> meta_info_map;
+  typedef meta_info_map::const_iterator meta_info_iterator;
 
   /**
    *  @brief A helper functor to compare "const char *" by the content
@@ -1876,15 +1876,15 @@ public:
    *  @brief Gets the meta info value for a meta info object with the given name
    *  If no object with that name exists, an empty string is returned
    */
-  const tl::Variant &meta_info_value (const std::string &name) const
+  const MetaInfo &meta_info (const std::string &name) const
   {
-    return meta_info_value (meta_info_name_id (name));
+    return meta_info (meta_info_name_id (name));
   }
 
   /**
    *  @brief Gets the meta info value for a meta info object with the given name ID
    */
-  const tl::Variant &meta_info_value (meta_info_name_id_type name_id) const;
+  const MetaInfo &meta_info (meta_info_name_id_type name_id) const;
 
   /**
    *  @brief Clears the meta information for a specific cell
@@ -1927,16 +1927,16 @@ public:
    *  @brief Gets the meta info value for a meta info object with the given name for the given cell
    *  If no object with that name exists, an empty string is returned
    */
-  const tl::Variant &meta_info_value (db::cell_index_type ci, const std::string &name) const
+  const MetaInfo &meta_info (db::cell_index_type ci, const std::string &name) const
   {
-    return meta_info_value (ci, meta_info_name_id (name));
+    return meta_info (ci, meta_info_name_id (name));
   }
 
   /**
    *  @brief Gets the meta info value for a meta info object with the given name ID for the given cell
    *  If no object with that name exists, an empty string is returned
    */
-  const tl::Variant &meta_info_value (db::cell_index_type ci, meta_info_name_id_type name_id) const;
+  const MetaInfo &meta_info (db::cell_index_type ci, meta_info_name_id_type name_id) const;
 
   /**
    *  @brief This event is triggered when the technology changes
@@ -1980,8 +1980,8 @@ private:
   bool m_editable;
   std::map<std::string, meta_info_name_id_type> m_meta_info_name_map;
   std::vector<std::string> m_meta_info_names;
-  meta_info m_meta_info;
-  std::map<db::cell_index_type, meta_info> m_meta_info_by_cell;
+  meta_info_map m_meta_info;
+  std::map<db::cell_index_type, meta_info_map> m_meta_info_by_cell;
 
   std::string m_tech_name;
   tl::Mutex m_lock;

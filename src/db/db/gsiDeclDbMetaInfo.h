@@ -35,17 +35,22 @@ namespace gsi
 
 struct MetaInfo
 {
-  MetaInfo (const std::string &n, const std::string &d, const tl::Variant &v)
-    : name (n), description (d), value (v)
+  MetaInfo (const std::string &n, const std::string &d, const tl::Variant &v, bool p)
+    : name (n), description (d), value (v), persisted (p)
+  { }
+
+  MetaInfo (const std::string &n, const db::MetaInfo &mi)
+    : name (n), description (mi.description), value (mi.value), persisted (mi.persisted)
   { }
 
   MetaInfo ()
-    : name (), description (), value ()
+    : name (), description (), value (), persisted (false)
   { }
 
   std::string name;
   std::string description;
   tl::Variant value;
+  bool persisted;
 };
 
 struct MetaInfoIterator
@@ -79,7 +84,7 @@ struct MetaInfoIterator
   MetaInfo operator* () const
   {
     if (mp_layout) {
-      return MetaInfo (mp_layout->meta_info_name (m_b->first), m_b->second.description, m_b->second.value);
+      return MetaInfo (mp_layout->meta_info_name (m_b->first), m_b->second);
     } else {
       return MetaInfo ();
     }

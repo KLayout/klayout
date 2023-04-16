@@ -185,8 +185,8 @@ GDS2ReaderBase::do_read (db::Layout &layout)
   unsigned int mod_time[6] = { 0, 0, 0, 0, 0, 0 };
   unsigned int access_time[6] = { 0, 0, 0, 0, 0, 0 };
   get_time (mod_time, access_time);
-  layout.add_meta_info (MetaInfo ("mod_time", tl::to_string (tr ("Modification Time")), tl::sprintf ("%d/%d/%d %d:%02d:%02d", mod_time[1], mod_time[2], mod_time[0], mod_time[3], mod_time[4], mod_time[5])));
-  layout.add_meta_info (MetaInfo ("access_time", tl::to_string (tr ("Access Time")), tl::sprintf ("%d/%d/%d %d:%02d:%02d", access_time[1], access_time[2], access_time[0], access_time[3], access_time[4], access_time[5])));
+  layout.add_meta_info ("mod_time", MetaInfo (tl::to_string (tr ("Modification Time")), tl::sprintf ("%d/%d/%d %d:%02d:%02d", mod_time[1], mod_time[2], mod_time[0], mod_time[3], mod_time[4], mod_time[5])));
+  layout.add_meta_info ("access_time", MetaInfo (tl::to_string (tr ("Access Time")), tl::sprintf ("%d/%d/%d %d:%02d:%02d", access_time[1], access_time[2], access_time[0], access_time[3], access_time[4], access_time[5])));
 
   long attr = 0;
   db::PropertiesRepository::properties_set layout_properties;
@@ -234,9 +234,9 @@ GDS2ReaderBase::do_read (db::Layout &layout)
       double dbuu = get_double ();
       double dbum = get_double ();
       
-      layout.add_meta_info (MetaInfo ("dbuu", tl::to_string (tr ("Database unit in user units")), tl::to_string (dbuu)));
-      layout.add_meta_info (MetaInfo ("dbum", tl::to_string (tr ("Database unit in meter")), tl::to_string (dbum)));
-      layout.add_meta_info (MetaInfo ("libname", tl::to_string (tr ("Library name")), m_libname));
+      layout.add_meta_info ("dbuu", MetaInfo (tl::to_string (tr ("Database unit in user units")), tl::to_string (dbuu)));
+      layout.add_meta_info ("dbum", MetaInfo (tl::to_string (tr ("Database unit in meter")), tl::to_string (dbum)));
+      layout.add_meta_info ("libname", MetaInfo (tl::to_string (tr ("Library name")), m_libname));
 
       m_dbuu = dbuu;
       m_dbu = dbum * 1e6; /*in micron*/

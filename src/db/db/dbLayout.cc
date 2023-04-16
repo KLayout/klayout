@@ -1753,7 +1753,7 @@ Layout::do_update ()
   delete pr;
 }
 
-static Layout::meta_info s_empty_meta;
+static Layout::meta_info_map s_empty_meta;
 
 Layout::meta_info_iterator
 Layout::begin_meta (db::cell_index_type ci) const
@@ -1823,12 +1823,12 @@ Layout::remove_meta_info (meta_info_name_id_type name_id)
   m_meta_info.erase (name_id);
 }
 
-const tl::Variant &
-Layout::meta_info_value (meta_info_name_id_type name_id) const
+const MetaInfo &
+Layout::meta_info (meta_info_name_id_type name_id) const
 {
   auto n = m_meta_info.find (name_id);
-  static tl::Variant null_value;
-  return n != m_meta_info.end () ? n->second.value : null_value;
+  static MetaInfo null_value;
+  return n != m_meta_info.end () ? n->second : null_value;
 }
 
 void
@@ -1852,18 +1852,18 @@ Layout::remove_meta_info (db::cell_index_type ci, meta_info_name_id_type name_id
   }
 }
 
-const tl::Variant &
-Layout::meta_info_value (db::cell_index_type ci, meta_info_name_id_type name_id) const
+const MetaInfo &
+Layout::meta_info (db::cell_index_type ci, meta_info_name_id_type name_id) const
 {
   auto c = m_meta_info_by_cell.find (ci);
   if (c != m_meta_info_by_cell.end ()) {
     auto i = c->second.find (name_id);
     if (i != c->second.end ()) {
-      return i->second.value;
+      return i->second;
     }
   }
 
-  static tl::Variant null_value;
+  static MetaInfo null_value;
   return null_value;
 }
 

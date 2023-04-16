@@ -54,6 +54,11 @@
 #include "tlDeferredExecution.h"
 #include "dbInstElement.h"
 
+#if defined(HAVE_QT)
+# include <QImage>
+class QWidget;
+#endif
+
 namespace rdb {
   class Database;
 }
@@ -979,6 +984,16 @@ public:
    *  The colors will are converted to "on" pixels with a green channel value >= 50%.
    */
   tl::BitmapBuffer get_pixels_with_options_mono (unsigned int width, unsigned int height, int linewidth, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box);
+
+#if defined(HAVE_QT)
+  /**
+   *  @brief Gets the widget object that view is embedded in
+   */
+  virtual QWidget *widget ()
+  {
+    return 0;
+  }
+#endif
 
   /**
    *  @brief Hierarchy level selection setter

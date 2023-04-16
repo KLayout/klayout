@@ -1056,7 +1056,7 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "@brief Clears the meta information of the layout\n"
     "See \\LayoutMetaInfo for details about layouts and meta information."
     "\n"
-    "This method has been introduced in version 0.28.7."
+    "This method has been introduced in version 0.28.8."
   ) +
   gsi::method ("remove_meta_info", static_cast<void (db::Layout::*) (const std::string &name)> (&db::Layout::remove_meta_info), gsi::arg ("name"),
     "@brief Removes meta information from the layout\n"
@@ -1071,7 +1071,7 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "If no meta information with the given name exists, a nil value will be returned.\n"
     "A more generic version that delivers all fields of the meta information is \\meta_info.\n"
     "\n"
-    "This method has been introduced in version 0.25. Starting with version 0.28.7, the value is of variant type instead of string only.\n"
+    "This method has been introduced in version 0.25. Starting with version 0.28.8, the value is of variant type instead of string only.\n"
   ) +
   gsi::method_ext ("meta_info", &layout_get_meta_info, gsi::arg ("name"),
     "@brief Gets the meta information for a given name\n"
@@ -1079,7 +1079,7 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "If no meta information with the given name exists, a default object with empty fields will be returned.\n"
     "\n"
-    "This method has been introduced in version 0.28.7.\n"
+    "This method has been introduced in version 0.28.8.\n"
   ) +
   gsi::iterator_ext ("each_meta_info", &layout_each_meta_info,
     "@brief Iterates over the meta information of the layout\n"

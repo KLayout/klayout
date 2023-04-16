@@ -1834,19 +1834,19 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "@brief Adds meta information to the cell\n"
     "See \\LayoutMetaInfo for details about cells and meta information.\n"
     "\n"
-    "This method has been introduced in version 0.28.7."
+    "This method has been introduced in version 0.28.8."
   ) +
   gsi::method_ext ("clear_meta_info", &cell_clear_meta_info,
     "@brief Clears the meta information of the cell\n"
     "See \\LayoutMetaInfo for details about cells and meta information.\n"
     "\n"
-    "This method has been introduced in version 0.28.7."
+    "This method has been introduced in version 0.28.8."
   ) +
   gsi::method_ext ("remove_meta_info", &cell_remove_meta_info, gsi::arg ("name"),
     "@brief Removes meta information from the cell\n"
     "See \\LayoutMetaInfo for details about cells and meta information.\n"
     "\n"
-    "This method has been introduced in version 0.28.7."
+    "This method has been introduced in version 0.28.8."
   ) +
   gsi::method_ext ("meta_info_value", &cell_meta_info_value, gsi::arg ("name"),
     "@brief Gets the meta information value for a given name\n"
@@ -1855,7 +1855,7 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "If no meta information with the given name exists, a nil value will be returned.\n"
     "A more generic version that delivers all fields of the meta information is \\meta_info.\n"
     "\n"
-    "This method has been introduced in version 0.28.7."
+    "This method has been introduced in version 0.28.8."
   ) +
   gsi::method_ext ("meta_info", &cell_meta_info, gsi::arg ("name"),
     "@brief Gets the meta information for a given name\n"
@@ -1863,13 +1863,13 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "If no meta information with the given name exists, a default object with empty fields will be returned.\n"
     "\n"
-    "This method has been introduced in version 0.28.7."
+    "This method has been introduced in version 0.28.8."
   ) +
   gsi::iterator_ext ("each_meta_info", &cell_each_meta_info,
     "@brief Iterates over the meta information of the cell\n"
     "See \\LayoutMetaInfo for details about cells and meta information.\n"
     "\n"
-    "This method has been introduced in version 0.28.7."
+    "This method has been introduced in version 0.28.8."
   ) +
   gsi::method_ext ("write", &write_simple, gsi::arg ("file_name"),
     "@brief Writes the cell to a layout file\n"

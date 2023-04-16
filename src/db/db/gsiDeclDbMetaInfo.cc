@@ -81,7 +81,7 @@ Class<MetaInfo> decl_LayoutMetaInfo ("db", "LayoutMetaInfo",
     "@param description An optional description text\n"
     "@param persisted If true, the meta information will be persisted in some file formats, like GDS2\n"
     "\n"
-    "The 'persisted' attribute has been introduced in version 0.28.7.\n"
+    "The 'persisted' attribute has been introduced in version 0.28.8.\n"
   ) +
   gsi::method_ext ("name", &layout_meta_get_name,
     "@brief Gets the name of the layout meta info object\n"
@@ -103,11 +103,11 @@ Class<MetaInfo> decl_LayoutMetaInfo ("db", "LayoutMetaInfo",
   ) +
   gsi::method_ext ("persisted", &layout_meta_get_persisted,
     "@brief Gets a value indicating whether the meta information will be persisted\n"
-    "This predicate was introduced in version 0.28.7.\n"
+    "This predicate was introduced in version 0.28.8.\n"
   ) +
   gsi::method_ext ("persisted=", &layout_meta_set_persisted,
     "@brief Sets a value indicating whether the meta information will be persisted\n"
-    "This predicate was introduced in version 0.28.7.\n"
+    "This predicate was introduced in version 0.28.8.\n"
   ),
   "@brief A piece of layout meta information\n"
   "Layout meta information is basically additional data that can be attached to a layout. "
@@ -121,7 +121,7 @@ Class<MetaInfo> decl_LayoutMetaInfo ("db", "LayoutMetaInfo",
   "See also \\Layout#each_meta_info, \\Layout#meta_info_value, \\Layout#meta_info and \\Layout#remove_meta_info as "
   "well as the corresponding \\Cell methods.\n"
   "\n"
-  "This class has been introduced in version 0.25 and was extended in version 0.28.7."
+  "This class has been introduced in version 0.25 and was extended in version 0.28.8."
 );
 
 }

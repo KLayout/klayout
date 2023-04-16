@@ -28,9 +28,10 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         uses: jlumbroso/free-disk-space@main
         with:
-          android: false
-          dotnet: false
-          haskell: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false # not working currently
       - uses: hmarr/debug-action@v2
       - name: Cancel Workflow Action
         uses: styfle/cancel-workflow-action@0.9.1

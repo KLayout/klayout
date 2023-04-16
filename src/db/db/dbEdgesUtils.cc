@@ -384,6 +384,8 @@ struct DetectTagEdgeSink
   DetectTagEdgeSink (int tag)
     : fail_tag (tag), result (true) { }
 
+  virtual void put (const db::Edge &) { }
+
   virtual void put (const db::Edge &, int tag)
   {
     if (tag == fail_tag) {

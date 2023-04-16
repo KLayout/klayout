@@ -465,7 +465,8 @@ public:
   typedef pcell_name_map::const_iterator pcell_iterator;
   typedef std::map<std::pair<lib_id_type, cell_index_type>, cell_index_type> lib_proxy_map;
   typedef LayerIterator layer_iterator;
-  typedef std::vector<MetaInfo> meta_info;
+  typedef size_t meta_info_name_id_type;
+  typedef std::map<meta_info_name_id_type, MetaInfo> meta_info;
   typedef meta_info::const_iterator meta_info_iterator;
 
   /**
@@ -1813,28 +1814,129 @@ public:
   }
 
   /**
+   *  @brief Delivers the meta information (begin iterator) per cell
+   */
+  meta_info_iterator begin_meta (db::cell_index_type ci) const;
+
+  /**
+   *  @brief Delivers the meta information (end iterator) per cell
+   */
+  meta_info_iterator end_meta (db::cell_index_type ci) const;
+
+  /**
+   *  @brief Gets the meta informatio name by ID
+   */
+  const std::string &meta_info_name (meta_info_name_id_type name_id) const;
+
+  /**
+   *  @brief Gets the meta information name ID for a specific string
+   */
+  meta_info_name_id_type meta_info_name_id (const std::string &name) const;
+
+  /**
+   *  @brief Gets the meta information name ID for a specific string (const version)
+   */
+  meta_info_name_id_type meta_info_name_id (const std::string &name);
+
+  /**
    *  @brief Clears the meta information
    */
   void clear_meta ();
 
   /**
    *  @brief Adds meta information
-   *  The given meta information object is appended at the end of the meta information list.
+   *  The given meta information object is added to the meta information list.
    *  If a meta info object with the same name already exists it is overwritten.
    */
-  void add_meta_info (const MetaInfo &i);
+  void add_meta_info (const std::string &name, const MetaInfo &i)
+  {
+    add_meta_info (meta_info_name_id (name), i);
+  }
+
+  /**
+   *  @brief Adds meta information (variant with name ID)
+   */
+  void add_meta_info (meta_info_name_id_type name_id, const MetaInfo &i);
 
   /**
    *  @brief Removes the meta information object with the given name
    *  The method will do nothing if no object with that name exists.
    */
-  void remove_meta_info (const std::string &name);
+  void remove_meta_info (const std::string &name)
+  {
+    remove_meta_info (meta_info_name_id (name));
+  }
+
+  /**
+   *  @brief Removes the meta information object with the given name ID
+   */
+  void remove_meta_info (meta_info_name_id_type name_id);
 
   /**
    *  @brief Gets the meta info value for a meta info object with the given name
    *  If no object with that name exists, an empty string is returned
    */
-  const std::string &meta_info_value (const std::string &name) const;
+  const tl::Variant &meta_info_value (const std::string &name) const
+  {
+    return meta_info_value (meta_info_name_id (name));
+  }
+
+  /**
+   *  @brief Gets the meta info value for a meta info object with the given name ID
+   */
+  const tl::Variant &meta_info_value (meta_info_name_id_type name_id) const;
+
+  /**
+   *  @brief Clears the meta information for a specific cell
+   */
+  void clear_meta (db::cell_index_type ci);
+
+  /**
+   *  @brief Adds meta information for a given cell
+   *  The given meta information object is to the meta information list for the given cell.
+   *  If a meta info object with the same name already exists it is overwritten.
+   */
+  void add_meta_info (db::cell_index_type ci, const std::string &name, const MetaInfo &i)
+  {
+    add_meta_info (ci, meta_info_name_id (name), i);
+  }
+
+  /**
+   *  @brief Adds meta information for a given cell (version with name ID)
+   *  The given meta information object is appended at the end of the meta information list.
+   *  If a meta info object with the same name already exists it is overwritten.
+   */
+  void add_meta_info (db::cell_index_type ci, meta_info_name_id_type name_id, const MetaInfo &i);
+
+  /**
+   *  @brief Removes the meta information object with the given name from the given cell
+   *  The method will do nothing if no object with that name exists.
+   */
+  void remove_meta_info (db::cell_index_type ci, const std::string &name)
+  {
+    remove_meta_info (ci, meta_info_name_id (name));
+  }
+
+  /**
+   *  @brief Removes the meta information object with the given name ID from the given cell
+   *  The method will do nothing if no object with that name exists.
+   */
+  void remove_meta_info (db::cell_index_type ci, meta_info_name_id_type name_id);
+
+  /**
+   *  @brief Gets the meta info value for a meta info object with the given name for the given cell
+   *  If no object with that name exists, an empty string is returned
+   */
+  const tl::Variant &meta_info_value (db::cell_index_type ci, const std::string &name) const
+  {
+    return meta_info_value (ci, meta_info_name_id (name));
+  }
+
+  /**
+   *  @brief Gets the meta info value for a meta info object with the given name ID for the given cell
+   *  If no object with that name exists, an empty string is returned
+   */
+  const tl::Variant &meta_info_value (db::cell_index_type ci, meta_info_name_id_type name_id) const;
 
   /**
    *  @brief This event is triggered when the technology changes
@@ -1876,7 +1978,11 @@ private:
   lib_proxy_map m_lib_proxy_map;
   bool m_do_cleanup;
   bool m_editable;
+  std::map<std::string, meta_info_name_id_type> m_meta_info_name_map;
+  std::vector<std::string> m_meta_info_names;
   meta_info m_meta_info;
+  std::map<db::cell_index_type, meta_info> m_meta_info_by_cell;
+
   std::string m_tech_name;
   tl::Mutex m_lock;
 

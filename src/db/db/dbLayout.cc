@@ -1204,6 +1204,11 @@ Layout::take_cell (cell_index_type ci)
 
   m_cell_ptrs [ci] = 0;
 
+  auto mi = m_meta_info_by_cell.find (ci);
+  if (mi != m_meta_info_by_cell.end ()) {
+    m_meta_info_by_cell.erase (mi);
+  }
+
   //  Using free cell indices does have one significant drawback:
   //  The cellview references cannot be uniquely classified as being invalid - because the
   //  ID might be reused. This causes problems, when a cell is being deleted and subsequently a
@@ -1748,6 +1753,58 @@ Layout::do_update ()
   delete pr;
 }
 
+static Layout::meta_info s_empty_meta;
+
+Layout::meta_info_iterator
+Layout::begin_meta (db::cell_index_type ci) const
+{
+  auto m = m_meta_info_by_cell.find (ci);
+  if (m != m_meta_info_by_cell.find (ci)) {
+    return m->second.begin ();
+  } else {
+    return s_empty_meta.begin ();
+  }
+}
+
+Layout::meta_info_iterator
+Layout::end_meta (db::cell_index_type ci) const
+{
+  auto m = m_meta_info_by_cell.find (ci);
+  if (m != m_meta_info_by_cell.find (ci)) {
+    return m->second.end ();
+  } else {
+    return s_empty_meta.end ();
+  }
+}
+
+const std::string &
+Layout::meta_info_name (Layout::meta_info_name_id_type name_id) const
+{
+  static std::string empty;
+  return name_id < m_meta_info_names.size () ? m_meta_info_names[name_id] : empty;
+}
+
+Layout::meta_info_name_id_type
+Layout::meta_info_name_id (const std::string &name)
+{
+  auto n = m_meta_info_name_map.find (name);
+  if (n != m_meta_info_name_map.end ()) {
+    return n->second;
+  } else {
+    size_t id = m_meta_info_names.size ();
+    m_meta_info_names.push_back (name);
+    m_meta_info_name_map.insert (std::make_pair (name, id));
+    return id;
+  }
+}
+
+Layout::meta_info_name_id_type
+Layout::meta_info_name_id (const std::string &name) const
+{
+  auto n = m_meta_info_name_map.find (name);
+  return n != m_meta_info_name_map.end () ? n->second : std::numeric_limits<meta_info_name_id_type>::max ();
+}
+
 void
 Layout::clear_meta ()
 {
@@ -1755,39 +1812,59 @@ Layout::clear_meta ()
 }
 
 void
-Layout::add_meta_info (const MetaInfo &i)
+Layout::add_meta_info (meta_info_name_id_type name_id, const MetaInfo &i)
 {
-  for (meta_info::iterator m = m_meta_info.begin (); m != m_meta_info.end (); ++m) {
-    if (m->name == i.name) {
-      *m = i;
-      return;
-    }
-  }
-  m_meta_info.push_back (i);
+  m_meta_info[name_id] = i;
 }
 
 void
-Layout::remove_meta_info (const std::string &name)
+Layout::remove_meta_info (meta_info_name_id_type name_id)
 {
-  for (meta_info::iterator m = m_meta_info.begin (); m != m_meta_info.end (); ++m) {
-    if (m->name == name) {
-      m_meta_info.erase (m);
-      return;
-    }
+  m_meta_info.erase (name_id);
+}
+
+const tl::Variant &
+Layout::meta_info_value (meta_info_name_id_type name_id) const
+{
+  auto n = m_meta_info.find (name_id);
+  static tl::Variant null_value;
+  return n != m_meta_info.end () ? n->second.value : null_value;
+}
+
+void
+Layout::clear_meta (db::cell_index_type ci)
+{
+  m_meta_info_by_cell.erase (ci);
+}
+
+void
+Layout::add_meta_info (db::cell_index_type ci, meta_info_name_id_type name_id, const MetaInfo &i)
+{
+  m_meta_info_by_cell[ci][name_id] = i;
+}
+
+void
+Layout::remove_meta_info (db::cell_index_type ci, meta_info_name_id_type name_id)
+{
+  auto c = m_meta_info_by_cell.find (ci);
+  if (c != m_meta_info_by_cell.end ()) {
+    c->second.erase (name_id);
   }
 }
 
-const std::string &
-Layout::meta_info_value (const std::string &name) const
+const tl::Variant &
+Layout::meta_info_value (db::cell_index_type ci, meta_info_name_id_type name_id) const
 {
-  for (meta_info::const_iterator m = m_meta_info.begin (); m != m_meta_info.end (); ++m) {
-    if (m->name == name) {
-      return m->value;
+  auto c = m_meta_info_by_cell.find (ci);
+  if (c != m_meta_info_by_cell.end ()) {
+    auto i = c->second.find (name_id);
+    if (i != c->second.end ()) {
+      return i->second.value;
     }
   }
 
-  static const std::string s_empty;
-  return s_empty;
+  static tl::Variant null_value;
+  return null_value;
 }
 
 void 

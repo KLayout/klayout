@@ -36,14 +36,13 @@ namespace db
  *
  *  In the meta information block, the reader provides additional information
  *  about the file and content etc.
- *  "name" is a unique name that can be used to identify the information.
  *  "description" is a "speaking" description of the information.
  *  "value" is the value of the specific part of meta information.
  */
 struct DB_PUBLIC MetaInfo
 {
-  MetaInfo (const std::string &n, const std::string &d, const std::string &v)
-    : name (n), description (d), value (v)
+  MetaInfo (const std::string &d, const tl::Variant &v)
+    : description (d), value (v)
   {
     //  .. nothing else ..
   }
@@ -53,9 +52,8 @@ struct DB_PUBLIC MetaInfo
     //  .. nothing else ..
   }
 
-  std::string name;
   std::string description;
-  std::string value;
+  tl::Variant value;
 };
 
 /**
@@ -63,7 +61,6 @@ struct DB_PUBLIC MetaInfo
  */
 inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, const MetaInfo &v, bool no_self, void *parent)
 {
-  db::mem_stat (stat, purpose, cat, v.name, no_self, parent);
   db::mem_stat (stat, purpose, cat, v.description, no_self, parent);
   db::mem_stat (stat, purpose, cat, v.value, no_self, parent);
 }

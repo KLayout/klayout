@@ -2564,6 +2564,8 @@ Layout::get_context_info (cell_index_type cell_index, std::vector <std::string> 
 bool
 Layout::get_context_info (cell_index_type cell_index, LayoutOrCellContextInfo &info) const
 {
+  bool any_meta = false;
+
   auto cmi = m_meta_info_by_cell.find (cell_index);
   if (cmi != m_meta_info_by_cell.end ()) {
     for (auto i = cmi->second.begin (); i != cmi->second.end (); ++i) {
@@ -2571,6 +2573,7 @@ Layout::get_context_info (cell_index_type cell_index, LayoutOrCellContextInfo &i
         std::pair<tl::Variant, std::string> &mi = info.meta_info [m_meta_info_names [i->first] ];
         mi.first = i->second.value;
         mi.second = i->second.description;
+        any_meta = true;
       }
     }
   }
@@ -2590,7 +2593,7 @@ Layout::get_context_info (cell_index_type cell_index, LayoutOrCellContextInfo &i
 
     const db::Library *lib = db::LibraryManager::instance ().lib (lib_proxy->lib_id ());
     if (! lib) {
-      return false; //  abort
+      return any_meta; //  abort
     } else {
 
       //  one level of library indirection

@@ -37,8 +37,6 @@ namespace db
 {
 
 // ---------------------------------------------------------------
-
-// ---------------------------------------------------------------
 //  OASISReader
 
 OASISReader::OASISReader (tl::InputStream &s)
@@ -680,6 +678,8 @@ OASISReader::do_read (db::Layout &layout)
   m_instances_with_props.clear ();
 
   db::PropertiesRepository::properties_set layout_properties;
+  bool has_context = false;
+  std::vector <std::string> context_strings;
 
   mark_start_table ();
 
@@ -1000,7 +1000,16 @@ OASISReader::do_read (db::Layout &layout)
         read_properties (layout.properties_repository ());
       }
 
-      store_last_properties (layout.properties_repository (), layout_properties, true);
+      if (! mm_last_property_is_sprop.get () && mm_last_property_name.get () == m_klayout_context_property_name_id) {
+        has_context = true;
+        context_strings.reserve (mm_last_value_list.get ().size ());
+        for (std::vector<tl::Variant>::const_iterator v = mm_last_value_list.get ().begin (); v != mm_last_value_list.get ().end (); ++v) {
+          context_strings.push_back (v->to_string ());
+        }
+      } else {
+        //  store cell properties
+        store_last_properties (layout.properties_repository (), layout_properties, true);
+      }
 
       mark_start_table ();
 
@@ -1101,6 +1110,12 @@ OASISReader::do_read (db::Layout &layout)
   if (! layout_properties.empty ()) {
     layout.prop_id (layout.properties_repository ().properties_id (layout_properties));
     layout_properties.clear ();
+  }
+
+  if (has_context) {
+    //  Restore layout meta info
+    LayoutOrCellContextInfo info = LayoutOrCellContextInfo::deserialize (context_strings.begin (), context_strings.end ());
+    layout.fill_meta_info_from_context (info);
   }
 
   size_t pt = m_stream.pos ();
@@ -3246,7 +3261,7 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
           context_strings.push_back (v->to_string ());
         }
       } else {
-        //  store cell properties
+        //  store layout properties
         store_last_properties (layout.properties_repository (), cell_properties, true);
       }
 
@@ -3344,10 +3359,12 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
     m_instances_with_props.clear ();
   }
 
-  //  Restore proxy cell (link to PCell or Library)
+  //  Restore proxy cell (link to PCell or Library) and cell meta info
   if (has_context) {
     CommonReaderLayerMapping layer_mapping (this, &layout);
-    layout.recover_proxy_as (cell_index, context_strings.begin (), context_strings.end (), &layer_mapping);
+    LayoutOrCellContextInfo info = LayoutOrCellContextInfo::deserialize (context_strings.begin (), context_strings.end ());
+    layout.recover_proxy_as (cell_index, info, &layer_mapping);
+    layout.fill_meta_info_from_context (cell_index, info);
   }
 
   m_cellname = "";

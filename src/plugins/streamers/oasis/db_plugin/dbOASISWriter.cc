@@ -1383,17 +1383,13 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
     if (options.write_context_info () && m_propnames.find (std::string (klayout_context_name)) == m_propnames.end ()) {
 
       bool has_context = false;
-      {
-        LayoutOrCellContextInfo info;
-        has_context = layout.has_context_info () && layout.get_context_info (info);
-      }
       for (auto cell = cells.begin (); cell != cells.end () && ! has_context; ++cell) {
         LayoutOrCellContextInfo ci;
         has_context = layout.has_context_info (*cell) && layout.get_context_info (*cell, ci);
       }
 
       if (has_context) {
-        m_propnames.insert (std::make_pair (std::string (klayout_context_name), ++m_propname_id));
+        m_propnames.insert (std::make_pair (std::string (klayout_context_name), m_propname_id++));
         begin_table (propnames_table_pos);
         write_record_id (7);
         write_nstring (klayout_context_name);
@@ -1465,19 +1461,6 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
 
       //  emit property string id's required for the PCell and meta info context information
       std::vector <std::string> context_prop_strings;
-
-      if (layout.has_context_info () && layout.get_context_info (context_prop_strings)) {
-
-        for (std::vector <std::string>::const_iterator c = context_prop_strings.begin (); c != context_prop_strings.end (); ++c) {
-          if (m_propstrings.insert (std::make_pair (*c, m_propstring_id)).second) {
-            begin_table (propstrings_table_pos);
-            write_record_id (9);
-            write_bstring (c->c_str ());
-            ++m_propstring_id;
-          }
-        }
-
-      }
 
       for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end (); ++cell) {
 

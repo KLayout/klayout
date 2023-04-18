@@ -289,13 +289,19 @@ GDS2ReaderBase::do_read (db::Layout &layout)
       db::cell_index_type cell_index = make_cell (layout, m_cellname);
 
       bool ignore_cell = false;
-      std::map <tl::string, std::vector <std::string> >::const_iterator ctx = m_context_info.find (m_cellname);
+      auto ctx = m_context_info.find (m_cellname);
       if (ctx != m_context_info.end ()) {
+
         CommonReaderLayerMapping layer_mapping (this, &layout);
-        if (layout.recover_proxy_as (cell_index, ctx->second.begin (), ctx->second.end (), &layer_mapping)) {
+        LayoutOrCellContextInfo ci = LayoutOrCellContextInfo::deserialize (ctx->second.begin (), ctx->second.end ());
+
+        if (layout.recover_proxy_as (cell_index, ci, &layer_mapping)) {
           //  ignore everything in that cell since it is created by the import:
           ignore_cell = true;
         }
+
+        layout.fill_meta_info_from_context (cell_index, ci);
+
       }
       
       db::Cell *cell = 0;
@@ -386,6 +392,13 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
   }
 
+  //  deserialize global context information
+  auto ctx = m_context_info.find (std::string ());
+  if (ctx != m_context_info.end ()) {
+    LayoutOrCellContextInfo ci = LayoutOrCellContextInfo::deserialize (ctx->second.begin (), ctx->second.end ());
+    layout.fill_meta_info_from_context (ci);
+  }
+
   //  check, if the last record is a ENDLIB
   if (rec_id != sENDLIB) {
     error (tl::to_string (tr ("ENDLIB record expected")));
@@ -396,11 +409,15 @@ void
 GDS2ReaderBase::read_context_info_cell ()
 {
   short rec_id = 0;
+  std::string cn;
 
   //  read cell content
   while ((rec_id = get_record ()) != sENDSTR) { 
 
     progress_checkpoint ();
+
+    bool valid_hook = false;
+    cn.clear ();
 
     if (rec_id == sSREF) {
 
@@ -411,7 +428,7 @@ GDS2ReaderBase::read_context_info_cell ()
         error (tl::to_string (tr ("SNAME record expected")));
       }
 
-      std::string cn = get_string ();
+      cn = get_string ();
 
       rec_id = get_record ();
       while (rec_id == sSTRANS || rec_id == sANGLE || rec_id == sMAG) {
@@ -420,6 +437,24 @@ GDS2ReaderBase::read_context_info_cell ()
       if (rec_id != sXY) {
         error (tl::to_string (tr ("XY record expected")));
       }
+
+      valid_hook = true;
+
+    } else if (rec_id == sBOUNDARY) {
+
+      rec_id = get_record ();
+      while (rec_id == sLAYER || rec_id == sDATATYPE) {
+        rec_id = get_record ();
+      }
+      if (rec_id != sXY) {
+        error (tl::to_string (tr ("XY record expected")));
+      }
+
+      valid_hook = true;
+
+    }
+
+    if (valid_hook) {
 
       std::vector <std::string> &strings = m_context_info.insert (std::make_pair (cn, std::vector <std::string> ())).first->second;
 

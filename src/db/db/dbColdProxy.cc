@@ -49,8 +49,8 @@ ColdProxy::cold_proxies_per_lib_name (const std::string &libname)
   }
 }
 
-ColdProxy::ColdProxy (db::cell_index_type ci, db::Layout &layout, const ProxyContextInfo &info)
-  : Cell (ci, layout), mp_context_info (new ProxyContextInfo (info))
+ColdProxy::ColdProxy (db::cell_index_type ci, db::Layout &layout, const LayoutOrCellContextInfo &info)
+  : Cell (ci, layout), mp_context_info (new LayoutOrCellContextInfo (info))
 {
   if (! info.lib_name.empty ()) {
     tl::MutexLocker locker (&s_map_mutex);

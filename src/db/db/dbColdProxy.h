@@ -35,7 +35,7 @@
 namespace db
 {
 
-struct ProxyContextInfo;
+struct LayoutOrCellContextInfo;
 
 /**
  *  @brief A cell specialization: a cold proxy representing a library or PCell which has gone out of scope
@@ -53,7 +53,7 @@ public:
    *
    *  Creates a cold proxy represented by the ProxyContextInfo data.
    */
-  ColdProxy (db::cell_index_type ci, db::Layout &layout, const ProxyContextInfo &info);
+  ColdProxy (db::cell_index_type ci, db::Layout &layout, const LayoutOrCellContextInfo &info);
 
   /**
    *  @brief The destructor
@@ -68,7 +68,7 @@ public:
   /**
    *  @brief Get the library id 
    */
-  const ProxyContextInfo &context_info () const
+  const LayoutOrCellContextInfo &context_info () const
   {
     return *mp_context_info;
   }
@@ -102,7 +102,7 @@ public:
   virtual std::string get_qualified_name () const;
 
 private:
-  ProxyContextInfo *mp_context_info;
+  LayoutOrCellContextInfo *mp_context_info;
 
   ColdProxy (const ColdProxy &d);
   ColdProxy &operator= (const ColdProxy &d);

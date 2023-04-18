@@ -73,6 +73,109 @@ inline int scale (double sf, int value)
 }
 
 void
+GDS2WriterBase::write_context_cell (db::Layout &layout, const short *time_data, const std::vector<db::cell_index_type> &cells)
+{
+  write_record_size (4 + 12 * 2);
+  write_record (sBGNSTR);
+  write_time (time_data);
+  write_time (time_data);
+
+  write_string_record (sSTRNAME, "$$$CONTEXT_INFO$$$");
+
+  std::vector <std::string> context_prop_strings;
+
+  if (layout.has_context_info ()) {
+
+    //  Use a dummy BOUNDARY element to attach the global context
+
+    write_record_size (4);
+    write_record (sBOUNDARY);
+
+    write_record_size (6);
+    write_record (sLAYER);
+    write_short (0);
+
+    write_record_size (6);
+    write_record (sDATATYPE);
+    write_short (0);
+
+    write_record_size (4 + 5 * 2 * 4);
+    write_record (sXY);
+    for (unsigned int i = 0; i < 10; ++i) {
+      write_int (0);
+    }
+
+    context_prop_strings.clear ();
+
+    if (layout.get_context_info (context_prop_strings)) {
+
+      //  Hint: write in the reverse order since this way, the reader is more efficient (it knows how many strings
+      //  will arrive)
+      for (std::vector <std::string>::const_iterator s = context_prop_strings.end (); s != context_prop_strings.begin (); ) {
+
+        --s;
+
+        write_record_size (6);
+        write_record (sPROPATTR);
+        write_short (short (std::distance (std::vector <std::string>::const_iterator (context_prop_strings.begin ()), s)));  //  = user string
+
+        write_string_record (sPROPVALUE, *s);
+
+      }
+
+    }
+
+    write_record_size (4);
+    write_record (sENDEL);
+
+  }
+
+  for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end (); ++cell) {
+
+    if (layout.has_context_info (*cell)) {
+
+      write_record_size (4);
+      write_record (sSREF);
+
+      write_string_record (sSNAME, m_cell_name_map.cell_name (*cell));
+
+      write_record_size (12);
+      write_record (sXY);
+      write_int (0);
+      write_int (0);
+
+      context_prop_strings.clear ();
+
+      if (layout.get_context_info (*cell, context_prop_strings)) {
+
+        //  Hint: write in the reverse order since this way, the reader is more efficient (it knows how many strings
+        //  will arrive)
+        for (std::vector <std::string>::const_iterator s = context_prop_strings.end (); s != context_prop_strings.begin (); ) {
+
+          --s;
+
+          write_record_size (6);
+          write_record (sPROPATTR);
+          write_short (short (std::distance (std::vector <std::string>::const_iterator (context_prop_strings.begin ()), s)));  //  = user string
+
+          write_string_record (sPROPVALUE, *s);
+
+        }
+
+      }
+
+      write_record_size (4);
+      write_record (sENDEL);
+
+    }
+
+  }
+
+  write_record_size (4);
+  write_record (sENDSTR);
+}
+
+void
 GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options)
 {
   set_stream (stream);
@@ -178,73 +281,17 @@ GDS2WriterBase::write (db::Layout &layout, tl::OutputStream &stream, const db::S
 
   //  write context info
   
-  bool any_proxy = false;
+  bool has_context = false;
 
   if (options.write_context_info ()) {
-    for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end () && !any_proxy; ++cell) {
-      const db::Cell &cref = layout.cell (*cell);
-      if (cref.is_proxy () && ! cref.is_top ()) {
-        any_proxy = true;
-      }
+    has_context = layout.has_context_info ();
+    for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end () && !has_context; ++cell) {
+      has_context = layout.has_context_info (*cell);
     }
   }
 
-  if (any_proxy) {
-
-    write_record_size (4 + 12 * 2);
-    write_record (sBGNSTR);
-    write_time (time_data);
-    write_time (time_data);
-
-    write_string_record (sSTRNAME, "$$$CONTEXT_INFO$$$");
-
-    std::vector <std::string> context_prop_strings;
-
-    for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end (); ++cell) {
-
-      const db::Cell &cref = layout.cell (*cell);
-      if (cref.is_proxy () && ! cref.is_top ()) {
-
-        write_record_size (4);
-        write_record (sSREF);
-
-        write_string_record (sSNAME, m_cell_name_map.cell_name (*cell));
-
-        write_record_size (12);
-        write_record (sXY);
-        write_int (0);
-        write_int (0);
-
-        context_prop_strings.clear ();
-
-        if (layout.get_context_info (*cell, context_prop_strings)) {
-
-          //  Hint: write in the reverse order since this way, the reader is more efficient (it knows how many strings
-          //  will arrive)
-          for (std::vector <std::string>::const_iterator s = context_prop_strings.end (); s != context_prop_strings.begin (); ) {
-
-            --s;
-
-            write_record_size (6);
-            write_record (sPROPATTR);
-            write_short (short (std::distance (std::vector <std::string>::const_iterator (context_prop_strings.begin ()), s)));  //  = user string
-
-            write_string_record (sPROPVALUE, *s);
-
-          }
-
-        }
-
-        write_record_size (4);
-        write_record (sENDEL);
-
-      }
-
-    }
-
-    write_record_size (4);
-    write_record (sENDSTR);
-
+  if (has_context) {
+    write_context_cell (layout, time_data, cells);
   }
 
   //  body

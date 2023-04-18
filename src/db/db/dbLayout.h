@@ -417,14 +417,15 @@ public:
 /**
  *  @brief A binary object representing context information for regenerating library proxies and PCells
  */
-struct DB_PUBLIC ProxyContextInfo
+struct DB_PUBLIC LayoutOrCellContextInfo
 {
   std::string lib_name;
   std::string cell_name;
   std::string pcell_name;
   std::map<std::string, tl::Variant> pcell_parameters;
+  std::map<std::string, std::pair<tl::Variant, std::string> > meta_info;
 
-  static ProxyContextInfo deserialize (std::vector<std::string>::const_iterator from, std::vector<std::string>::const_iterator to);
+  static LayoutOrCellContextInfo deserialize (std::vector<std::string>::const_iterator from, std::vector<std::string>::const_iterator to);
   void serialize (std::vector<std::string> &strings);
 };
 
@@ -1015,27 +1016,69 @@ public:
   /**
    *  @brief Creates a cold proxy representing the given context information
    */
-  cell_index_type create_cold_proxy (const db::ProxyContextInfo &info);
+  cell_index_type create_cold_proxy (const db::LayoutOrCellContextInfo &info);
 
   /**
    *  @brief Subsitutes the given cell by a cold proxy representing the given context information
    */
-  void create_cold_proxy_as (const db::ProxyContextInfo &info, cell_index_type cell_index);
+  void create_cold_proxy_as (const db::LayoutOrCellContextInfo &info, cell_index_type cell_index);
+
+  /**
+   *  @brief Gets a value indicating whether layout context info is provided / needed
+   */
+  bool has_context_info() const;
+
+  /**
+   *  @brief Gets a value indicating whether layout context info is provided / needed
+   */
+  bool has_context_info(cell_index_type cell_index) const;
+
+  /**
+   *  @brief Get the context information for the layout (for writing into a file)
+   *
+   *  The context information is a sequence of strings which is pushed onto the given
+   *  vector. It can be used to fill meta information with fill_meta_info_from_context.
+   */
+  bool get_context_info (std::vector <std::string> &strings) const;
+
+  /**
+   *  @brief Gets the context information as a binary object
+   */
+  bool get_context_info (LayoutOrCellContextInfo &context_info) const;
+
+  /**
+   *  @brief Fills the layout's meta information from the context
+   */
+  void fill_meta_info_from_context (std::vector <std::string>::const_iterator from, std::vector <std::string>::const_iterator to);
+
+  /**
+   *  @brief Fills the layout's meta information from the binary context
+   */
+  void fill_meta_info_from_context (const LayoutOrCellContextInfo &context_info);
 
   /**
    *  @brief Get the context information for a given cell (for writing into a file)
    *
    *  The context information is a sequence of strings which is pushed onto the given
-   *  vector. It can be used to recover a respective proxy cell with the recover_proxy method.
-   *  If the given cell is not a valid proxy or library references are missing, the method
-   *  will return false.
+   *  vector. It can be used to recover a respective proxy cell with the recover_proxy method
+   *  or to fill meta information using fill_meta_info_from_context.
    */
   bool get_context_info (cell_index_type cell_index, std::vector <std::string> &context_info) const;
 
   /**
    *  @brief Gets the context information as a binary object
    */
-  bool get_context_info (cell_index_type cell_index, ProxyContextInfo &context_info) const;
+  bool get_context_info (cell_index_type cell_index, LayoutOrCellContextInfo &context_info) const;
+
+  /**
+   *  @brief Fills the layout's meta information from the context
+   */
+  void fill_meta_info_from_context (cell_index_type cell_index, std::vector <std::string>::const_iterator from, std::vector <std::string>::const_iterator to);
+
+  /**
+   *  @brief Fills the layout's meta information from the binary context
+   */
+  void fill_meta_info_from_context (cell_index_type cell_index, const LayoutOrCellContextInfo &context_info);
 
   /**
    *  @brief Recover a proxy cell from the given context info.
@@ -1051,7 +1094,7 @@ public:
   /**
    *  @brief Recover a proxy cell from the given binary context info object.
    */
-  db::Cell *recover_proxy (const ProxyContextInfo &context_info);
+  db::Cell *recover_proxy (const LayoutOrCellContextInfo &context_info);
 
   /**
    *  @brief Recover a proxy cell from the given context info.
@@ -1073,7 +1116,7 @@ public:
    *
    *  See the string-based version of "recover_proxy_as" for details.
    */
-  bool recover_proxy_as (cell_index_type cell_index, const ProxyContextInfo &context_info, ImportLayerMapping *layer_mapping = 0);
+  bool recover_proxy_as (cell_index_type cell_index, const LayoutOrCellContextInfo &context_info, ImportLayerMapping *layer_mapping = 0);
 
   /**
    *  @brief Restores proxies as far as possible
@@ -2026,7 +2069,7 @@ private:
   /**
    *  @brief Recovers a proxy without considering the library from context_info
    */
-  db::Cell *recover_proxy_no_lib (const ProxyContextInfo &context_info);
+  db::Cell *recover_proxy_no_lib (const LayoutOrCellContextInfo &context_info);
 };
 
 /**

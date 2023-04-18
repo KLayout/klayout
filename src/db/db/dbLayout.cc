@@ -258,12 +258,12 @@ private:
 // -----------------------------------------------------------------
 //  Implementation of the ProxyContextInfo class
 
-ProxyContextInfo
-ProxyContextInfo::deserialize (std::vector<std::string>::const_iterator from, std::vector<std::string>::const_iterator to)
+LayoutOrCellContextInfo
+LayoutOrCellContextInfo::deserialize (std::vector<std::string>::const_iterator from, std::vector<std::string>::const_iterator to)
 {
-  ProxyContextInfo info;
+  LayoutOrCellContextInfo info;
 
-  for (std::vector<std::string>::const_iterator i = from; i != to; ++i) {
+  for (auto i = from; i != to; ++i) {
 
     tl::Extractor ex (i->c_str ());
 
@@ -290,6 +290,20 @@ ProxyContextInfo::deserialize (std::vector<std::string>::const_iterator from, st
 
       info.cell_name = ex.skip ();
 
+    } else if (ex.test ("META(")) {
+
+      std::pair<std::string, std::pair<tl::Variant, std::string> > vv;
+
+      ex.read_word_or_quoted (vv.first);
+      if (ex.test (",")) {
+        ex.read_word_or_quoted (vv.second.second);
+      }
+      ex.test (")");
+      ex.test ("=");
+      ex.read (vv.second.first);
+
+      info.meta_info.insert(vv);
+
     }
 
   }
@@ -298,12 +312,12 @@ ProxyContextInfo::deserialize (std::vector<std::string>::const_iterator from, st
 }
 
 void
-ProxyContextInfo::serialize (std::vector<std::string> &strings)
+LayoutOrCellContextInfo::serialize (std::vector<std::string> &strings)
 {
   if (! lib_name.empty ()) {
     strings.push_back ("LIB=" + lib_name);
   }
-  for (std::map<std::string, tl::Variant> ::const_iterator p = pcell_parameters.begin (); p != pcell_parameters.end (); ++p) {
+  for (auto p = pcell_parameters.begin (); p != pcell_parameters.end (); ++p) {
     strings.push_back ("P(" + tl::to_word_or_quoted_string (p->first) + ")=" + p->second.to_parsable_string ());
   }
   if (! pcell_name.empty ()) {
@@ -311,6 +325,20 @@ ProxyContextInfo::serialize (std::vector<std::string> &strings)
   }
   if (! cell_name.empty ()) {
     strings.push_back ("CELL=" + cell_name);
+  }
+
+  std::string mv;
+  for (auto m = meta_info.begin (); m != meta_info.end (); ++m) {
+    mv.clear ();
+    mv += "META(";
+    mv += tl::to_word_or_quoted_string (m->first);
+    if (! m->second.second.empty ()) {
+      mv += ",";
+      mv += tl::to_word_or_quoted_string (m->second.second);
+    }
+    mv += ")=";
+    mv += m->second.first.to_parsable_string ();
+    strings.push_back (mv);
   }
 }
 
@@ -593,7 +621,7 @@ Layout::set_technology_name (const std::string &tech)
       if (! pn.first) {
 
         //  substitute by a cold proxy
-        db::ProxyContextInfo info;
+        db::LayoutOrCellContextInfo info;
         get_context_info (ci, info);
         create_cold_proxy_as (info, ci);
 
@@ -606,7 +634,7 @@ Layout::set_technology_name (const std::string &tech)
         if (! old_pcell_decl || ! new_pcell_decl) {
 
           //  substitute by a cold proxy
-          db::ProxyContextInfo info;
+          db::LayoutOrCellContextInfo info;
           get_context_info (ci, info);
           create_cold_proxy_as (info, ci);
 
@@ -633,7 +661,7 @@ Layout::set_technology_name (const std::string &tech)
       if (! cn.first) {
 
         //  unlink this proxy: substitute by a cold proxy
-        db::ProxyContextInfo info;
+        db::LayoutOrCellContextInfo info;
         get_context_info (ci, info);
         create_cold_proxy_as (info, ci);
 
@@ -650,7 +678,7 @@ Layout::set_technology_name (const std::string &tech)
       db::cell_index_type ci = (*lp)->Cell::cell_index ();
 
       //  substitute by a cold proxy
-      db::ProxyContextInfo info;
+      db::LayoutOrCellContextInfo info;
       get_context_info (ci, info);
       create_cold_proxy_as (info, ci);
 
@@ -2447,9 +2475,84 @@ Layout::get_pcell_variant_cell (cell_index_type cell_index, const std::vector<tl
 }
 
 bool
+Layout::has_context_info () const
+{
+  for (auto i = m_meta_info.begin (); i != m_meta_info.end (); ++i) {
+    if (i->second.persisted) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool
+Layout::has_context_info (cell_index_type cell_index) const
+{
+  auto c = m_meta_info_by_cell.find (cell_index);
+  if (c != m_meta_info_by_cell.end ()) {
+    for (auto i = c->second.begin (); i != c->second.end (); ++i) {
+      if (i->second.persisted) {
+        return true;
+      }
+    }
+  }
+
+  const db::Cell &cref = cell (cell_index);
+  if (cref.is_proxy () && ! cref.is_top ()) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool
+Layout::get_context_info (std::vector <std::string> &strings) const
+{
+  LayoutOrCellContextInfo info;
+  if (! get_context_info (info)) {
+    return false;
+  } else {
+    info.serialize (strings);
+    return true;
+  }
+}
+
+bool
+Layout::get_context_info (LayoutOrCellContextInfo &info) const
+{
+  for (auto i = m_meta_info.begin (); i != m_meta_info.end (); ++i) {
+    if (i->second.persisted) {
+      std::pair<tl::Variant, std::string> &mi = info.meta_info [m_meta_info_names [i->first] ];
+      mi.first = i->second.value;
+      mi.second = i->second.description;
+    }
+  }
+
+  return true;
+}
+
+void
+Layout::fill_meta_info_from_context (std::vector <std::string>::const_iterator from, std::vector <std::string>::const_iterator to)
+{
+  fill_meta_info_from_context (LayoutOrCellContextInfo::deserialize (from, to));
+}
+
+void
+Layout::fill_meta_info_from_context (const LayoutOrCellContextInfo &context_info)
+{
+  if (! context_info.meta_info.empty ()) {
+    for (auto i = context_info.meta_info.begin (); i != context_info.meta_info.end (); ++i) {
+      meta_info_name_id_type name_id = meta_info_name_id (i->first);
+      m_meta_info [name_id] = MetaInfo (i->second.second, i->second.first, true);
+    }
+  }
+}
+
+bool
 Layout::get_context_info (cell_index_type cell_index, std::vector <std::string> &strings) const
 {
-  ProxyContextInfo info;
+  LayoutOrCellContextInfo info;
   if (! get_context_info (cell_index, info)) {
     return false;
   } else {
@@ -2459,8 +2562,19 @@ Layout::get_context_info (cell_index_type cell_index, std::vector <std::string> 
 }
 
 bool
-Layout::get_context_info (cell_index_type cell_index, ProxyContextInfo &info) const
+Layout::get_context_info (cell_index_type cell_index, LayoutOrCellContextInfo &info) const
 {
+  auto cmi = m_meta_info_by_cell.find (cell_index);
+  if (cmi != m_meta_info_by_cell.end ()) {
+    for (auto i = cmi->second.begin (); i != cmi->second.end (); ++i) {
+      if (i->second.persisted) {
+        std::pair<tl::Variant, std::string> &mi = info.meta_info [m_meta_info_names [i->first] ];
+        mi.first = i->second.value;
+        mi.second = i->second.description;
+      }
+    }
+  }
+
   const db::Cell *cptr = &cell (cell_index);
 
   const db::ColdProxy *cold_proxy = dynamic_cast <const db::ColdProxy *> (cptr);
@@ -2510,6 +2624,27 @@ Layout::get_context_info (cell_index_type cell_index, ProxyContextInfo &info) co
 }
 
 void
+Layout::fill_meta_info_from_context (cell_index_type cell_index, std::vector <std::string>::const_iterator from, std::vector <std::string>::const_iterator to)
+{
+  fill_meta_info_from_context (cell_index, LayoutOrCellContextInfo::deserialize (from, to));
+}
+
+void
+Layout::fill_meta_info_from_context (cell_index_type cell_index, const LayoutOrCellContextInfo &context_info)
+{
+  if (! context_info.meta_info.empty ()) {
+
+    meta_info_map &mi = m_meta_info_by_cell [cell_index];
+
+    for (auto i = context_info.meta_info.begin (); i != context_info.meta_info.end (); ++i) {
+      meta_info_name_id_type name_id = meta_info_name_id (i->first);
+      mi [name_id] = MetaInfo (i->second.second, i->second.first, true);
+    }
+
+  }
+}
+
+void
 Layout::restore_proxies (ImportLayerMapping *layer_mapping)
 {
   std::vector<db::ColdProxy *> cold_proxies;
@@ -2540,11 +2675,11 @@ Layout::recover_proxy_as (cell_index_type cell_index, std::vector <std::string>:
     return false;
   }
 
-  return recover_proxy_as (cell_index, ProxyContextInfo::deserialize (from, to), layer_mapping);
+  return recover_proxy_as (cell_index, LayoutOrCellContextInfo::deserialize (from, to), layer_mapping);
 }
 
 bool
-Layout::recover_proxy_as (cell_index_type cell_index, const ProxyContextInfo &info, ImportLayerMapping *layer_mapping)
+Layout::recover_proxy_as (cell_index_type cell_index, const LayoutOrCellContextInfo &info, ImportLayerMapping *layer_mapping)
 {
   if (! info.lib_name.empty ()) {
 
@@ -2594,11 +2729,11 @@ Layout::recover_proxy (std::vector <std::string>::const_iterator from, std::vect
     return 0;
   }
 
-  return recover_proxy (ProxyContextInfo::deserialize (from, to));
+  return recover_proxy (LayoutOrCellContextInfo::deserialize (from, to));
 }
 
 db::Cell *
-Layout::recover_proxy (const ProxyContextInfo &info)
+Layout::recover_proxy (const LayoutOrCellContextInfo &info)
 {
   if (! info.lib_name.empty ()) {
 
@@ -2626,7 +2761,7 @@ Layout::recover_proxy (const ProxyContextInfo &info)
 }
 
 db::Cell *
-Layout::recover_proxy_no_lib (const ProxyContextInfo &info)
+Layout::recover_proxy_no_lib (const LayoutOrCellContextInfo &info)
 {
   if (! info.pcell_name.empty ()) {
 
@@ -2723,7 +2858,7 @@ Layout::get_lib_proxy (Library *lib, cell_index_type cell_index)
 }
 
 cell_index_type
-Layout::create_cold_proxy (const db::ProxyContextInfo &info)
+Layout::create_cold_proxy (const db::LayoutOrCellContextInfo &info)
 {
   //  create a new unique name
   std::string b;
@@ -2754,7 +2889,7 @@ Layout::create_cold_proxy (const db::ProxyContextInfo &info)
 }
 
 void
-Layout::create_cold_proxy_as (const db::ProxyContextInfo &info, cell_index_type target_cell_index)
+Layout::create_cold_proxy_as (const db::LayoutOrCellContextInfo &info, cell_index_type target_cell_index)
 {
   tl_assert (m_cell_ptrs [target_cell_index] != 0);
 

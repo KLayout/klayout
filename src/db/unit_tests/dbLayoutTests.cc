@@ -543,7 +543,7 @@ TEST(5)
   db::Layout l (&m);
   EXPECT_EQ (l.technology_name (), "");
 
-  db::ProxyContextInfo info;
+  db::LayoutOrCellContextInfo info;
   info.lib_name = "LIB";
   info.cell_name = "LIBCELL";
 
@@ -624,7 +624,7 @@ TEST(6)
 
   EXPECT_EQ (l.technology_name (), "");
 
-  db::ProxyContextInfo info;
+  db::LayoutOrCellContextInfo info;
   info.lib_name = "Basic";
   info.pcell_name = "CIRCLE";
   info.pcell_parameters ["actual_radius"] = tl::Variant (10.0);
@@ -644,7 +644,7 @@ TEST(6)
 
   EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {CIRCLE}\nboundary 1 0 {-4142 -10000} {-10000 -4142} {-10000 4142} {-4142 10000} {4142 10000} {10000 4142} {10000 -4142} {4142 -10000} {-4142 -10000}\nend_cell\nend_lib\n");
 
-  db::ProxyContextInfo info2;
+  db::LayoutOrCellContextInfo info2;
   l.get_context_info (cell->cell_index (), info2);
   info2.pcell_parameters ["actual_radius"] = tl::Variant (5.0);
 

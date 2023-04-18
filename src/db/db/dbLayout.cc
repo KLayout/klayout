@@ -342,6 +342,18 @@ LayoutOrCellContextInfo::serialize (std::vector<std::string> &strings)
   }
 }
 
+bool
+LayoutOrCellContextInfo::has_proxy_info () const
+{
+  return !pcell_name.empty () || !lib_name.empty ();
+}
+
+bool
+LayoutOrCellContextInfo::has_meta_info () const
+{
+  return !meta_info.empty ();
+}
+
 // -----------------------------------------------------------------
 //  Implementation of the Layout class
 

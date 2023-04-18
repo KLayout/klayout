@@ -427,6 +427,9 @@ struct DB_PUBLIC LayoutOrCellContextInfo
 
   static LayoutOrCellContextInfo deserialize (std::vector<std::string>::const_iterator from, std::vector<std::string>::const_iterator to);
   void serialize (std::vector<std::string> &strings);
+
+  bool has_proxy_info () const;
+  bool has_meta_info () const;
 };
 
 /**

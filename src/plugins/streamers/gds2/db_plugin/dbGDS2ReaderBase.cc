@@ -295,7 +295,7 @@ GDS2ReaderBase::do_read (db::Layout &layout)
         CommonReaderLayerMapping layer_mapping (this, &layout);
         LayoutOrCellContextInfo ci = LayoutOrCellContextInfo::deserialize (ctx->second.begin (), ctx->second.end ());
 
-        if (layout.recover_proxy_as (cell_index, ci, &layer_mapping)) {
+        if (ci.has_proxy_info () && layout.recover_proxy_as (cell_index, ci, &layer_mapping)) {
           //  ignore everything in that cell since it is created by the import:
           ignore_cell = true;
         }

@@ -597,6 +597,10 @@ OASISReader::read_offset_table ()
 
 static const char magic_bytes[] = { "%SEMI-OASIS\015\012" };
 
+static const char *klayout_context_propname = "KLAYOUT_CONTEXT";
+static const char *s_gds_property_propname = "S_GDS_PROPERTY";
+
+
 void 
 OASISReader::do_read (db::Layout &layout)
 {
@@ -604,8 +608,8 @@ OASISReader::do_read (db::Layout &layout)
   char *mb;
 
   //  prepare
-  m_s_gds_property_name_id = layout.properties_repository ().prop_name_id ("S_GDS_PROPERTY");
-  m_klayout_context_property_name_id = layout.properties_repository ().prop_name_id ("KLAYOUT_CONTEXT");
+  m_s_gds_property_name_id = layout.properties_repository ().prop_name_id (s_gds_property_propname);
+  m_klayout_context_property_name_id = layout.properties_repository ().prop_name_id (klayout_context_propname);
 
   //  read magic bytes
   mb = (char *) m_stream.get (sizeof (magic_bytes) - 1);
@@ -678,8 +682,7 @@ OASISReader::do_read (db::Layout &layout)
   m_instances_with_props.clear ();
 
   db::PropertiesRepository::properties_set layout_properties;
-  bool has_context = false;
-  std::vector <std::string> context_strings;
+  std::vector <tl::Variant> context_properties;
 
   mark_start_table ();
 
@@ -827,16 +830,25 @@ OASISReader::do_read (db::Layout &layout)
       std::map <unsigned long, db::property_names_id_type>::iterator pf = m_propname_forward_references.find (id);
       if (pf != m_propname_forward_references.end ()) {
 
-        if (name == "S_GDS_PROPERTY") {
+        bool is_s_gds_property = false;
+        bool is_klayout_context_property = false;
+
+        if (name == s_gds_property_propname) {
+          is_s_gds_property = true;
+        } else if (name == klayout_context_propname) {
+          is_klayout_context_property = true;
+        }
+
+        //  handle special case of forward references to S_GDS_PROPERTY and KLAYOUT_CONTEXT
+        if (is_s_gds_property || is_klayout_context_property) {
 
           db::PropertiesRepository &rep = layout.properties_repository ();
-          db::property_names_id_type s_gds_name_id = pf->second;
 
           //  exchange the properties in the repository: first locate all
           //  property sets that are affected
           std::vector <db::properties_id_type> pids;
           for (db::PropertiesRepository::iterator p = rep.begin (); p != rep.end (); ++p) {
-            if (p->second.find (s_gds_name_id) != p->second.end ()) {
+            if (p->second.find (pf->second) != p->second.end ()) {
               pids.push_back (p->first);
             }
           }
@@ -848,13 +860,25 @@ OASISReader::do_read (db::Layout &layout)
             db::PropertiesRepository::properties_set new_set;
 
             for (db::PropertiesRepository::properties_set::const_iterator s = old_set.begin (); s != old_set.end (); ++s) {
-              if (s->first == s_gds_name_id) {
+              if (s->first == pf->second && is_s_gds_property) {
 
+                //  S_GDS_PROPERTY translation
                 if (!s->second.is_list () || s->second.get_list ().size () != 2) {
                   error (tl::to_string (tr ("S_GDS_PROPERTY must have a value list with exactly two elements")));
                 }
 
                 new_set.insert (std::make_pair (rep.prop_name_id (s->second.get_list () [0]), s->second.get_list () [1]));
+
+              } else if (s->first == pf->second && is_klayout_context_property) {
+
+                //  feed context strings from klayout context property
+                if (s->second.is_list ()) {
+                  for (auto l = s->second.begin (); l != s->second.end (); ++l) {
+                    context_properties.push_back (*l);
+                  }
+                } else {
+                  context_properties.push_back (s->second);
+                }
 
               } else {
                 new_set.insert (*s);
@@ -1001,11 +1025,7 @@ OASISReader::do_read (db::Layout &layout)
       }
 
       if (! mm_last_property_is_sprop.get () && mm_last_property_name.get () == m_klayout_context_property_name_id) {
-        has_context = true;
-        context_strings.reserve (mm_last_value_list.get ().size ());
-        for (std::vector<tl::Variant>::const_iterator v = mm_last_value_list.get ().begin (); v != mm_last_value_list.get ().end (); ++v) {
-          context_strings.push_back (v->to_string ());
-        }
+        context_properties.insert (context_properties.end (), mm_last_value_list.get ().begin (), mm_last_value_list.get ().end ());
       } else {
         //  store cell properties
         store_last_properties (layout.properties_repository (), layout_properties, true);
@@ -1112,12 +1132,6 @@ OASISReader::do_read (db::Layout &layout)
     layout_properties.clear ();
   }
 
-  if (has_context) {
-    //  Restore layout meta info
-    LayoutOrCellContextInfo info = LayoutOrCellContextInfo::deserialize (context_strings.begin (), context_strings.end ());
-    layout.fill_meta_info_from_context (info);
-  }
-
   size_t pt = m_stream.pos ();
 
   if (table_offsets_at_end) {
@@ -1153,54 +1167,14 @@ OASISReader::do_read (db::Layout &layout)
   //  resolve all propvalue forward referenced
   if (! m_propvalue_forward_references.empty ()) {
 
+    for (auto i = context_properties.begin (); i != context_properties.end (); ++i) {
+      replace_forward_references_in_variant (*i);
+    }
+
     for (db::PropertiesRepository::non_const_iterator pi = layout.properties_repository ().begin_non_const (); pi != layout.properties_repository ().end_non_const (); ++pi) {
-
       for (db::PropertiesRepository::properties_set::iterator ps = pi->second.begin (); ps != pi->second.end (); ++ps) {
-
-        if (ps->second.is_id ()) {
-
-          unsigned long id = (unsigned long) ps->second.to_id ();
-          std::map <unsigned long, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
-          if (fw != m_propvalue_forward_references.end ()) {
-            ps->second = tl::Variant (fw->second);
-          } else {
-            error (tl::sprintf (tl::to_string (tr ("No property value defined for property value id %ld")), id));
-          }
-
-        } else if (ps->second.is_list ()) {
-
-          //  Replace list elements as well
-          //  TODO: Q: can there be a list of lists? would need recursive replacement -> make that a method of tl::Variant
-
-          const std::vector<tl::Variant> &l = ps->second.get_list ();
-          bool needs_replacement = false;
-          for (std::vector<tl::Variant>::const_iterator ll = l.begin (); ll != l.end () && ! needs_replacement; ++ll) {
-            needs_replacement = ll->is_id ();
-          }
-
-          if (needs_replacement) {
-
-            std::vector<tl::Variant> new_list (l);
-            for (std::vector<tl::Variant>::iterator ll = new_list.begin (); ll != new_list.end (); ++ll) {
-              if (ll->is_id ()) {
-                unsigned long id = (unsigned long) ll->to_id ();
-                std::map <unsigned long, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
-                if (fw != m_propvalue_forward_references.end ()) {
-                  *ll = tl::Variant (fw->second);
-                } else {
-                  error (tl::sprintf (tl::to_string (tr ("No property value defined for property value id %ld")), id));
-                }
-              }
-            }
-
-            ps->second = tl::Variant (new_list.begin (), new_list.end ());
-
-          }
-
-        }
-
+        replace_forward_references_in_variant (ps->second);
       }
-
     }
 
     m_propvalue_forward_references.clear ();
@@ -1228,6 +1202,17 @@ OASISReader::do_read (db::Layout &layout)
 
   }
 
+  //  Restore layout meta info
+  if (! context_properties.empty ()) {
+    std::vector<std::string> context_strings;
+    context_strings.reserve (context_properties.size ());
+    for (auto s = context_properties.begin (); s != context_properties.end (); ++s) {
+      context_strings.push_back (s->to_string ());
+    }
+    LayoutOrCellContextInfo info = LayoutOrCellContextInfo::deserialize (context_strings.begin (), context_strings.end ());
+    layout.fill_meta_info_from_context (info);
+  }
+
   //  Check the table offsets vs. real occurrence
   if (m_first_cellname != 0 && m_first_cellname != m_table_cellname && m_expect_strict_mode == 1) {
     warn (tl::sprintf (tl::to_string (tr ("CELLNAME table offset does not match first occurrence of CELLNAME in strict mode - %s vs. %s")), m_table_cellname, m_first_cellname));
@@ -1243,6 +1228,52 @@ OASISReader::do_read (db::Layout &layout)
   }
   if (m_first_textstring != 0 && m_first_textstring != m_table_textstring && m_expect_strict_mode == 1) {
     warn (tl::sprintf (tl::to_string (tr ("TEXTSTRING table offset does not match first occurrence of TEXTSTRING in strict mode - %s vs. %s")), m_table_textstring, m_first_textstring));
+  }
+}
+
+void
+OASISReader::replace_forward_references_in_variant (tl::Variant &v)
+{
+  if (v.is_id ()) {
+
+    unsigned long id = (unsigned long) v.to_id ();
+    std::map <unsigned long, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
+    if (fw != m_propvalue_forward_references.end ()) {
+      v = tl::Variant (fw->second);
+    } else {
+      error (tl::sprintf (tl::to_string (tr ("No property value defined for property value id %ld")), id));
+    }
+
+  } else if (v.is_list ()) {
+
+    //  Replace list elements as well
+    //  TODO: Q: can there be a list of lists? would need recursive replacement -> make that a method of tl::Variant
+
+    const std::vector<tl::Variant> &l = v.get_list ();
+    bool needs_replacement = false;
+    for (std::vector<tl::Variant>::const_iterator ll = l.begin (); ll != l.end () && ! needs_replacement; ++ll) {
+      needs_replacement = ll->is_id ();
+    }
+
+    if (needs_replacement) {
+
+      std::vector<tl::Variant> new_list (l);
+      for (std::vector<tl::Variant>::iterator ll = new_list.begin (); ll != new_list.end (); ++ll) {
+        if (ll->is_id ()) {
+          unsigned long id = (unsigned long) ll->to_id ();
+          std::map <unsigned long, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
+          if (fw != m_propvalue_forward_references.end ()) {
+            *ll = tl::Variant (fw->second);
+          } else {
+            error (tl::sprintf (tl::to_string (tr ("No property value defined for property value id %ld")), id));
+          }
+        }
+      }
+
+      v = tl::Variant (new_list.begin (), new_list.end ());
+
+    }
+
   }
 }
 
@@ -3363,7 +3394,9 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
   if (has_context) {
     CommonReaderLayerMapping layer_mapping (this, &layout);
     LayoutOrCellContextInfo info = LayoutOrCellContextInfo::deserialize (context_strings.begin (), context_strings.end ());
-    layout.recover_proxy_as (cell_index, info, &layer_mapping);
+    if (info.has_proxy_info ()) {
+      layout.recover_proxy_as (cell_index, info, &layer_mapping);
+    }
     layout.fill_meta_info_from_context (cell_index, info);
   }
 

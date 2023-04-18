@@ -210,6 +210,7 @@ private:
   void read_properties (db::PropertiesRepository &rep);
   void store_last_properties (db::PropertiesRepository &rep, db::PropertiesRepository::properties_set &properties, bool ignore_special);
   std::pair <bool, db::properties_id_type> read_element_properties (db::PropertiesRepository &rep, bool ignore_special);
+  void replace_forward_references_in_variant (tl::Variant &v);
 
   unsigned char get_byte ()
   {

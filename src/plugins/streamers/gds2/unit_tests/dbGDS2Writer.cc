@@ -1193,6 +1193,80 @@ TEST(121)
   run_test (_this, "t121.oas.gz", "t121_au.gds.gz", true, opt);
 }
 
+//  Meta info
+TEST(130)
+{
+  db::Layout layout_org;
+
+  layout_org.add_cell ("U");
+  db::cell_index_type ci = layout_org.add_cell ("X");
+
+  layout_org.add_meta_info ("a", db::MetaInfo ("description", 17.5, true));
+  layout_org.add_meta_info ("b", db::MetaInfo ("", "value", true));
+
+  layout_org.add_meta_info (ci, "a", db::MetaInfo ("dd", true, true));
+  layout_org.add_meta_info (ci, "c", db::MetaInfo ("d", -1, true));
+
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_130.gds");
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::SaveLayoutOptions options;
+    db::Writer writer (options);
+    writer.write (layout_org, out);
+  }
+
+  db::Layout layout_read;
+
+  {
+    tl::InputStream in (tmp_file);
+    db::Reader reader (in);
+    reader.read (layout_read);
+  }
+
+  EXPECT_EQ (layout_read.meta_info ("x").value.to_string (), "nil");
+  EXPECT_EQ (layout_read.meta_info ("a").value.to_string (), "17.5");
+  EXPECT_EQ (layout_read.meta_info ("a").description, "description");
+  EXPECT_EQ (layout_read.meta_info ("b").value.to_string (), "value");
+  EXPECT_EQ (layout_read.meta_info ("b").description, "");
+
+  db::cell_index_type ci2 = layout_read.cell_by_name ("X").second;
+
+  EXPECT_EQ (layout_read.meta_info (ci2, "x").value.to_string (), "nil");
+  EXPECT_EQ (layout_read.meta_info (ci2, "a").value.to_string (), "true");
+  EXPECT_EQ (layout_read.meta_info (ci2, "a").description, "dd");
+  EXPECT_EQ (layout_read.meta_info (ci2, "c").value.to_string (), "-1");
+  EXPECT_EQ (layout_read.meta_info (ci2, "c").description, "d");
+
+  tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_130b.gds");
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::SaveLayoutOptions options;
+    options.set_write_context_info (false);
+    db::Writer writer (options);
+    writer.write (layout_org, out);
+  }
+
+  layout_read = db::Layout ();
+
+  {
+    tl::InputStream in (tmp_file);
+    db::Reader reader (in);
+    reader.read (layout_read);
+  }
+
+  EXPECT_EQ (layout_read.meta_info ("x").value.to_string (), "nil");
+  EXPECT_EQ (layout_read.meta_info ("a").value.to_string (), "nil");
+  EXPECT_EQ (layout_read.meta_info ("b").value.to_string (), "nil");
+
+  ci2 = layout_read.cell_by_name ("X").second;
+
+  EXPECT_EQ (layout_read.meta_info (ci2, "x").value.to_string (), "nil");
+  EXPECT_EQ (layout_read.meta_info ("a").value.to_string (), "nil");
+  EXPECT_EQ (layout_read.meta_info ("b").value.to_string (), "nil");
+}
+
 //  Extreme fracturing by max. points
 TEST(166)
 {

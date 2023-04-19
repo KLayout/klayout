@@ -1248,7 +1248,7 @@ OASISWriter::write_propstring_table (size_t &propstrings_table_pos, const std::v
     tl_assert (p->first == (unsigned long)(p - rev_ps.begin ()));
     begin_table (propstrings_table_pos);
     write_record_id (9);
-    write_nstring (p->second->c_str ());
+    write_bstring (p->second->c_str ());
   }
 
   //  collect and write the future property strings

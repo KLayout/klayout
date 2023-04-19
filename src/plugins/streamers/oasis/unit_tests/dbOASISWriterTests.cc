@@ -33,7 +33,7 @@
 
 #include <cstdlib>
 
-void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int compr, bool recompress)
+void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int compr, bool recompress, bool tables_at_end)
 {
   {
     db::Manager m (false);
@@ -60,6 +60,7 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
       db::OASISWriterOptions oasis_options;
       oasis_options.write_cblocks = false;
       oasis_options.strict_mode = false;
+      oasis_options.tables_at_end = tables_at_end;
       options.set_options (oasis_options);
       writer.write (layout, stream, options);
     }
@@ -115,6 +116,7 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
       db::OASISWriterOptions oasis_options;
       oasis_options.write_cblocks = true;
       oasis_options.strict_mode = true;
+      oasis_options.tables_at_end = tables_at_end;
       options.set_options (oasis_options);
       writer.write (layout, stream, options);
     }
@@ -164,6 +166,7 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
       db::OASISWriterOptions oasis_options;
       oasis_options.write_cblocks = false;
       oasis_options.strict_mode = false;
+      oasis_options.tables_at_end = tables_at_end;
       oasis_options.write_std_properties = 2;
       options.set_options (oasis_options);
       writer.write (layout, stream, options);
@@ -214,6 +217,7 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
       db::OASISWriterOptions oasis_options;
       oasis_options.write_cblocks = true;
       oasis_options.strict_mode = true;
+      oasis_options.tables_at_end = tables_at_end;
       oasis_options.write_std_properties = 2;
       options.set_options (oasis_options);
       writer.write (layout, stream, options);
@@ -255,6 +259,7 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
     db::OASISWriterOptions oasis_options;
     oasis_options.compression_level = compr;
     oasis_options.recompress = recompress;
+    oasis_options.tables_at_end = tables_at_end;
     options.set_options (oasis_options);
     options.set_scale_factor (3.0);
     options.set_dbu (0.0005);
@@ -308,11 +313,14 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
 void run_test (tl::TestBase *_this, const char *file, bool scaling_test = true)
 {
   for (int recompress = 0; recompress < 2; ++recompress) {
-    run_test (_this, file, scaling_test, 0, recompress);
-    run_test (_this, file, scaling_test, 1, recompress);
-    run_test (_this, file, scaling_test, 2, recompress);
-    run_test (_this, file, scaling_test, 10, recompress);
+    run_test (_this, file, scaling_test, 0, recompress, false);
+    run_test (_this, file, scaling_test, 1, recompress, false);
+    run_test (_this, file, scaling_test, 2, recompress, false);
+    run_test (_this, file, scaling_test, 10, recompress, false);
   }
+
+  //  tables at end
+  run_test (_this, file, scaling_test, 2, false, true);
 }
 
 TEST(1)

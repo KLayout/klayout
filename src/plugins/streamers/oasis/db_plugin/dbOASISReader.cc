@@ -600,6 +600,16 @@ static const char magic_bytes[] = { "%SEMI-OASIS\015\012" };
 static const char *klayout_context_propname = "KLAYOUT_CONTEXT";
 static const char *s_gds_property_propname = "S_GDS_PROPERTY";
 
+static LayoutOrCellContextInfo
+make_context_info (const std::vector<tl::Variant> &context_properties)
+{
+  std::vector<std::string> context_strings;
+  context_strings.reserve (context_properties.size ());
+  for (auto s = context_properties.begin (); s != context_properties.end (); ++s) {
+    context_strings.push_back (s->to_string ());
+  }
+  return LayoutOrCellContextInfo::deserialize (context_strings.begin (), context_strings.end ());
+}
 
 void
 OASISReader::do_read (db::Layout &layout)
@@ -677,6 +687,8 @@ OASISReader::do_read (db::Layout &layout)
   m_textstrings.clear ();
   m_propstrings.clear ();
   m_propnames.clear ();
+
+  m_context_strings_per_cell.clear ();
 
   m_instances.clear ();
   m_instances_with_props.clear ();
@@ -878,20 +890,28 @@ OASISReader::do_read (db::Layout &layout)
           //  exchange the properties in the repository
 
           //  first locate all property sets that are affected
-          std::vector <db::properties_id_type> pids;
-          for (db::PropertiesRepository::iterator p = rep.begin (); p != rep.end (); ++p) {
+          std::map<db::properties_id_type, std::vector<db::cell_index_type> > cells_by_pid;
+          for (auto p = rep.begin (); p != rep.end (); ++p) {
             if (p->second.find (pf->second) != p->second.end ()) {
-              pids.push_back (p->first);
+              cells_by_pid.insert (std::make_pair (p->first, std::vector<db::cell_index_type> ()));
+            }
+          }
+
+          //  find cells using a specific pid
+          for (auto i = layout.begin (); i != layout.end (); ++i) {
+            auto cc = cells_by_pid.find (i->prop_id ());
+            if (cc != cells_by_pid.end ()) {
+              cc->second.push_back (i->cell_index ());
             }
           }
 
           //  create new property sets for the ones we found
-          for (std::vector <db::properties_id_type>::const_iterator pid = pids.begin (); pid != pids.end (); ++pid) {
+          for (auto pid = cells_by_pid.begin (); pid != cells_by_pid.end (); ++pid) {
 
-            const db::PropertiesRepository::properties_set &old_set = rep.properties (*pid);
+            const db::PropertiesRepository::properties_set &old_set = rep.properties (pid->first);
             db::PropertiesRepository::properties_set new_set;
 
-            for (db::PropertiesRepository::properties_set::const_iterator s = old_set.begin (); s != old_set.end (); ++s) {
+            for (auto s = old_set.begin (); s != old_set.end (); ++s) {
               if (s->first == pf->second && is_s_gds_property) {
 
                 //  S_GDS_PROPERTY translation
@@ -903,7 +923,9 @@ OASISReader::do_read (db::Layout &layout)
 
               } else if (s->first == pf->second && is_klayout_context_property) {
 
-                if (*pid == layout.prop_id ()) {
+                auto pid2c = cells_by_pid.find (pid->first);
+
+                if (pid->first == layout.prop_id ()) {
                   //  feed context strings from klayout context property
                   if (s->second.is_list ()) {
                     for (auto l = s->second.begin (); l != s->second.end (); ++l) {
@@ -912,9 +934,18 @@ OASISReader::do_read (db::Layout &layout)
                   } else {
                     context_properties.push_back (s->second);
                   }
-                } else {
-                  //  TODO: should update that in cells (in case we encounter forward-referenced context properties
-                  //  for cells)
+                }
+
+                //  feed cell-specific context strings from klayout context property
+                for (auto c = pid2c->second.begin (); c != pid2c->second.end (); ++c) {
+                  std::vector<tl::Variant> &vl = m_context_strings_per_cell [*c];
+                  if (s->second.is_list ()) {
+                    for (auto l = s->second.begin (); l != s->second.end (); ++l) {
+                      vl.push_back (*l);
+                    }
+                  } else {
+                    vl.push_back (s->second);
+                  }
                 }
 
               } else {
@@ -922,7 +953,7 @@ OASISReader::do_read (db::Layout &layout)
               }
             }
 
-            rep.change_properties (*pid, new_set);
+            rep.change_properties (pid->first, new_set);
 
           }
 
@@ -1207,6 +1238,11 @@ OASISReader::do_read (db::Layout &layout)
     for (auto i = context_properties.begin (); i != context_properties.end (); ++i) {
       replace_forward_references_in_variant (*i);
     }
+    for (auto c = m_context_strings_per_cell.begin (); c != m_context_strings_per_cell.end (); ++c) {
+      for (auto i = c->second.begin (); i != c->second.end (); ++i) {
+        replace_forward_references_in_variant (*i);
+      }
+    }
 
     for (db::PropertiesRepository::non_const_iterator pi = layout.properties_repository ().begin_non_const (); pi != layout.properties_repository ().end_non_const (); ++pi) {
       for (db::PropertiesRepository::properties_set::iterator ps = pi->second.begin (); ps != pi->second.end (); ++ps) {
@@ -1241,13 +1277,20 @@ OASISReader::do_read (db::Layout &layout)
 
   //  Restore layout meta info
   if (! context_properties.empty ()) {
-    std::vector<std::string> context_strings;
-    context_strings.reserve (context_properties.size ());
-    for (auto s = context_properties.begin (); s != context_properties.end (); ++s) {
-      context_strings.push_back (s->to_string ());
-    }
-    LayoutOrCellContextInfo info = LayoutOrCellContextInfo::deserialize (context_strings.begin (), context_strings.end ());
+    LayoutOrCellContextInfo info = make_context_info (context_properties);
     layout.fill_meta_info_from_context (info);
+  }
+
+  //  Restore proxy cell (link to PCell or Library) and cell meta info
+  if (! m_context_strings_per_cell.empty ()) {
+    CommonReaderLayerMapping layer_mapping (this, &layout);
+    for (auto cc = m_context_strings_per_cell.begin (); cc != m_context_strings_per_cell.end (); ++cc) {
+      LayoutOrCellContextInfo info = make_context_info (cc->second);
+      if (info.has_proxy_info ()) {
+        layout.recover_proxy_as (cc->first, info, &layer_mapping);
+      }
+      layout.fill_meta_info_from_context (cc->first, info);
+    }
   }
 
   //  Check the table offsets vs. real occurrence
@@ -3255,7 +3298,7 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
   bool xy_absolute = true;
 
   bool has_context = false;
-  std::vector <std::string> context_strings;
+  std::vector <tl::Variant> context_strings;
   db::PropertiesRepository::properties_set cell_properties;
 
   //  read next record
@@ -3326,7 +3369,7 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
         has_context = true;
         context_strings.reserve (mm_last_value_list.get ().size ());
         for (std::vector<tl::Variant>::const_iterator v = mm_last_value_list.get ().begin (); v != mm_last_value_list.get ().end (); ++v) {
-          context_strings.push_back (v->to_string ());
+          context_strings.push_back (*v);
         }
       } else {
         //  store layout properties
@@ -3427,14 +3470,9 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
     m_instances_with_props.clear ();
   }
 
-  //  Restore proxy cell (link to PCell or Library) and cell meta info
+  //  store the context strings for later
   if (has_context) {
-    CommonReaderLayerMapping layer_mapping (this, &layout);
-    LayoutOrCellContextInfo info = LayoutOrCellContextInfo::deserialize (context_strings.begin (), context_strings.end ());
-    if (info.has_proxy_info ()) {
-      layout.recover_proxy_as (cell_index, info, &layer_mapping);
-    }
-    layout.fill_meta_info_from_context (cell_index, info);
+    m_context_strings_per_cell [cell_index].swap (context_strings);
   }
 
   m_cellname = "";

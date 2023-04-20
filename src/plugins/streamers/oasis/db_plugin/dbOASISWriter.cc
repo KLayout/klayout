@@ -1691,17 +1691,29 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
 
         write_record_id (28);
         write_byte (char (0xf6));
+        unsigned long pnid = 0;
         std::map <std::string, unsigned long>::const_iterator pni = m_propnames.find (klayout_context_name);
-        tl_assert (pni != m_propnames.end ());
-        write (pni->second);
+        if (pni == m_propnames.end ()) {
+          pnid = m_propname_id++;
+          m_propnames.insert (std::make_pair (klayout_context_name, pnid));
+        } else {
+          pnid = pni->second;
+        }
+        write (pnid);
 
         write ((unsigned long) context_prop_strings.size ());
 
         for (std::vector <std::string>::const_iterator c = context_prop_strings.begin (); c != context_prop_strings.end (); ++c) {
           write_byte (14); // b-string by reference number
+          unsigned long psid = 0;
           std::map <std::string, unsigned long>::const_iterator psi = m_propstrings.find (*c);
-          tl_assert (psi != m_propstrings.end ());
-          write (psi->second);
+          if (psi == m_propstrings.end ()) {
+            psid = m_propstring_id++;
+            m_propstrings.insert (std::make_pair (*c, psid)).second;
+          } else {
+            psid = psi->second;
+          }
+          write (psid);
         }
 
         mm_last_property_name = klayout_context_name;

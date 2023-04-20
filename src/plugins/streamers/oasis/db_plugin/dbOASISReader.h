@@ -172,6 +172,8 @@ private:
   std::map <unsigned long, std::string> m_propstrings;
   std::map <unsigned long, std::string> m_propnames;
 
+  std::map <db::cell_index_type, std::vector<tl::Variant> > m_context_strings_per_cell;
+
   tl::vector<db::CellInstArray> m_instances;
   tl::vector<db::CellInstArrayWithProperties> m_instances_with_props;
 

@@ -1870,7 +1870,8 @@ TEST(120_IrregularInstRepetitions)
 }
 
 //  Meta info
-TEST(130)
+static void
+run_test130 (tl::TestBase *_this, bool strict, bool tables_at_end)
 {
   db::Layout layout_org;
 
@@ -1883,12 +1884,16 @@ TEST(130)
   layout_org.add_meta_info (ci, "a", db::MetaInfo ("dd", true, true));
   layout_org.add_meta_info (ci, "c", db::MetaInfo ("d", -1, true));
 
-  std::string tmp_file = tl::TestBase::tmp_file ("tmp_OASISWriter_130.oas");
+  std::string tmp_file = _this->tmp_file ("tmp_OASISWriter1.oas");
 
   {
     tl::OutputStream out (tmp_file);
+    db::OASISWriterOptions oasis_options;
+    oasis_options.strict_mode = strict;
+    oasis_options.tables_at_end = tables_at_end;
     db::SaveLayoutOptions options;
     options.set_format ("OASIS");
+    options.set_options (oasis_options);
     db::Writer writer (options);
     writer.write (layout_org, out);
   }
@@ -1915,12 +1920,16 @@ TEST(130)
   EXPECT_EQ (layout_read.meta_info (ci2, "c").value.to_string (), "-1");
   EXPECT_EQ (layout_read.meta_info (ci2, "c").description, "d");
 
-  tmp_file = tl::TestBase::tmp_file ("tmp_OASISWriter_130b.oas");
+  tmp_file = _this->tmp_file ("tmp_OASISWriter2.oas");
 
   {
     tl::OutputStream out (tmp_file);
+    db::OASISWriterOptions oasis_options;
+    oasis_options.strict_mode = strict;
+    oasis_options.tables_at_end = tables_at_end;
     db::SaveLayoutOptions options;
     options.set_format ("OASIS");
+    options.set_options (oasis_options);
     options.set_write_context_info (false);
     db::Writer writer (options);
     writer.write (layout_org, out);
@@ -1943,5 +1952,27 @@ TEST(130)
   EXPECT_EQ (layout_read.meta_info (ci2, "x").value.to_string (), "nil");
   EXPECT_EQ (layout_read.meta_info ("a").value.to_string (), "nil");
   EXPECT_EQ (layout_read.meta_info ("b").value.to_string (), "nil");
+}
+
+//  Meta info
+
+TEST(130a)
+{
+  run_test130 (_this, false, false);
+}
+
+TEST(130b)
+{
+  run_test130 (_this, true, false);
+}
+
+TEST(130c)
+{
+  run_test130 (_this, false, true);
+}
+
+TEST(130d)
+{
+  run_test130 (_this, true, true);
 }
 

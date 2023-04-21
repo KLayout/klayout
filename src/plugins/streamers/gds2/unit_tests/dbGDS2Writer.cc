@@ -1194,7 +1194,7 @@ TEST(121)
 }
 
 //  Meta info
-TEST(130)
+TEST(130a)
 {
   db::Layout layout_org;
 
@@ -1207,7 +1207,19 @@ TEST(130)
   layout_org.add_meta_info (ci, "a", db::MetaInfo ("dd", true, true));
   layout_org.add_meta_info (ci, "c", db::MetaInfo ("d", -1, true));
 
-  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_130.gds");
+  //  complex type
+  tl::Variant v2;
+  v2.set_array ();
+  v2.insert ("x", "value_for_x");
+  v2.insert ("y", db::DBox (1.5, 2.5, 3.5, 4.5));
+  tl::Variant v1;
+  v1.set_list (0);
+  v1.push (-1.5);
+  v1.push (v2);
+  layout_org.add_meta_info (ci, "complex", db::MetaInfo ("", v1, true));
+  layout_org.add_meta_info ("complex", db::MetaInfo ("", v1, true));
+
+  std::string tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_130a.gds");
 
   {
     tl::OutputStream out (tmp_file);
@@ -1224,11 +1236,19 @@ TEST(130)
     reader.read (layout_read);
   }
 
+  EXPECT_EQ (layout_read.has_meta_info ("x"), false);
+  EXPECT_EQ (layout_read.has_meta_info ("a"), true);
   EXPECT_EQ (layout_read.meta_info ("x").value.to_string (), "nil");
   EXPECT_EQ (layout_read.meta_info ("a").value.to_string (), "17.5");
   EXPECT_EQ (layout_read.meta_info ("a").description, "description");
+  EXPECT_EQ (layout_read.has_meta_info ("b"), true);
   EXPECT_EQ (layout_read.meta_info ("b").value.to_string (), "value");
   EXPECT_EQ (layout_read.meta_info ("b").description, "");
+  EXPECT_EQ (layout_read.has_meta_info ("complex"), true);
+  EXPECT_EQ (layout_read.meta_info ("complex").value.is_list (), true);
+  EXPECT_EQ (layout_read.meta_info ("complex").value.size (), size_t (2));
+  EXPECT_EQ (layout_read.meta_info ("complex").value.begin () [1].is_array (), true);
+  EXPECT_EQ (layout_read.meta_info ("complex").value.to_string (), "-1.5,x=>value_for_x,y=>(1.5,2.5;3.5,4.5)");
 
   db::cell_index_type ci2 = layout_read.cell_by_name ("X").second;
 
@@ -1237,6 +1257,10 @@ TEST(130)
   EXPECT_EQ (layout_read.meta_info (ci2, "a").description, "dd");
   EXPECT_EQ (layout_read.meta_info (ci2, "c").value.to_string (), "-1");
   EXPECT_EQ (layout_read.meta_info (ci2, "c").description, "d");
+  EXPECT_EQ (layout_read.meta_info (ci2, "complex").value.is_list (), true);
+  EXPECT_EQ (layout_read.meta_info (ci2, "complex").value.size (), size_t (2));
+  EXPECT_EQ (layout_read.meta_info (ci2, "complex").value.begin () [1].is_array (), true);
+  EXPECT_EQ (layout_read.meta_info (ci2, "complex").value.to_string (), "-1.5,x=>value_for_x,y=>(1.5,2.5;3.5,4.5)");
 
   tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_130b.gds");
 

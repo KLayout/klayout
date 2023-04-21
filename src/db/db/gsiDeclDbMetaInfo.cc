@@ -86,26 +86,26 @@ Class<MetaInfo> decl_LayoutMetaInfo ("db", "LayoutMetaInfo",
   gsi::method_ext ("name", &layout_meta_get_name,
     "@brief Gets the name of the layout meta info object\n"
   ) +
-  gsi::method_ext ("name=", &layout_meta_set_name,
+  gsi::method_ext ("name=", &layout_meta_set_name, gsi::arg ("name"),
     "@brief Sets the name of the layout meta info object\n"
   ) +
   gsi::method_ext ("value", &layout_meta_get_value,
     "@brief Gets the value of the layout meta info object\n"
   ) +
-  gsi::method_ext ("value=", &layout_meta_set_value,
+  gsi::method_ext ("value=", &layout_meta_set_value, gsi::arg ("value"),
     "@brief Sets the value of the layout meta info object\n"
   ) +
   gsi::method_ext ("description", &layout_meta_get_description,
     "@brief Gets the description of the layout meta info object\n"
   ) +
-  gsi::method_ext ("description=", &layout_meta_set_description,
+  gsi::method_ext ("description=", &layout_meta_set_description, gsi::arg ("description"),
     "@brief Sets the description of the layout meta info object\n"
   ) +
   gsi::method_ext ("is_persisted?", &layout_meta_get_persisted,
     "@brief Gets a value indicating whether the meta information will be persisted\n"
     "This predicate was introduced in version 0.28.8.\n"
   ) +
-  gsi::method_ext ("persisted=", &layout_meta_set_persisted,
+  gsi::method_ext ("persisted=", &layout_meta_set_persisted, gsi::arg ("flag"),
     "@brief Sets a value indicating whether the meta information will be persisted\n"
     "This predicate was introduced in version 0.28.8.\n"
   ),
@@ -131,11 +131,36 @@ Class<MetaInfo> decl_LayoutMetaInfo ("db", "LayoutMetaInfo",
   "    keys for user properties. @/li\n"
   "@/ul\n"
   "\n"
-  "Note that only meta information marked with \\is_persisted? == true are stored in GDS or OASIS files. "
+  "Elementary (serializable) objects are: \\Box, \\DBox, \\Edge, \\DEdge, \\EdgePair, \\DEdgePair, "
+  "\\EdgePairs, \\Edges, \\LayerProperties, \\Matrix2d, \\Matrix3d, \\Path, \\DPath, \\Point, \\DPoint, "
+  "\\Polygon, \\DPolygon, \\SimplePolygon, \\DSimplePolygon, \\Region, \\Text, \\DText, \\Texts, "
+  "\\Trans, \\DTrans, \\CplxTrans, \\ICplxTrans, \\DCplxTrans, \\VCplxTrans, \\Vector, \\DVector "
+  "(list may not be complete).\n"
+  "\n"
+  "KLayout itself also generates meta information with specific keys. "
+  "For disambiguation, namespaces can be established by prefixing "
+  "the key strings with some unique identifier in XML fashion, like a domain name - "
+  "e.g. 'example.com:key'.\n"
+  "\n"
+  "@b Note: @/b only meta information marked with \\is_persisted? == true is stored in GDS or OASIS files. "
   "This is not the default setting, so you need to explicitly set that flag.\n"
   "\n"
   "See also \\Layout#each_meta_info, \\Layout#meta_info_value, \\Layout#meta_info and \\Layout#remove_meta_info as "
   "well as the corresponding \\Cell methods.\n"
+  "\n"
+  "An example of how to attach persisted meta information to a cell is here:\n"
+  "\n"
+  "@code\n"
+  "ly = RBA::Layout::new\n"
+  "c1 = ly.create_cell(\"C1\")\n"
+  "\n"
+  "mi = RBA::LayoutMetaInfo::new(\"the-answer\", 42.0)\n"
+  "mi.persisted = true\n"
+  "c1.add_meta_info(mi)\n"
+  "\n"
+  "# will now hold this piece of meta information attached to cell 'C1':\n"
+  "ly.write(\"to.gds\")\n"
+  "@/code\n"
   "\n"
   "This class has been introduced in version 0.25 and was extended in version 0.28.8."
 );

@@ -1933,6 +1933,19 @@ public:
   const MetaInfo &meta_info (meta_info_name_id_type name_id) const;
 
   /**
+   *  @brief Gets a value indicating whether a meta info with the given name is present
+   */
+  bool has_meta_info (const std::string &name) const
+  {
+    return has_meta_info (meta_info_name_id (name));
+  }
+
+  /**
+   *  @brief Gets a value indicating whether a meta info with the given name is present
+   */
+  bool has_meta_info (meta_info_name_id_type name_id) const;
+
+  /**
    *  @brief Clears the meta information for a specific cell
    */
   void clear_meta (db::cell_index_type ci);
@@ -1953,6 +1966,19 @@ public:
    *  If a meta info object with the same name already exists it is overwritten.
    */
   void add_meta_info (db::cell_index_type ci, meta_info_name_id_type name_id, const MetaInfo &i);
+
+  /**
+   *  @brief Gets a value indicating whether a meta info with the given name is present for the given cell
+   */
+  bool has_meta_info (db::cell_index_type ci, const std::string &name) const
+  {
+    return has_meta_info (ci, meta_info_name_id (name));
+  }
+
+  /**
+   *  @brief Gets a value indicating whether a meta info with the given name is present for the given cell
+   */
+  bool has_meta_info (db::cell_index_type ci, meta_info_name_id_type name_id) const;
 
   /**
    *  @brief Removes the meta information object with the given name from the given cell

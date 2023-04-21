@@ -1044,36 +1044,39 @@ class DBLayoutTests2_TestClass < TestBase
   end
 
   # Meta information
-  def test_12
+  def test_12a
 
     mi = RBA::LayoutMetaInfo::new("myinfo", "a")
 
     assert_equal(mi.name, "myinfo")
     assert_equal(mi.description, "")
     assert_equal(mi.value, "a")
+    assert_equal(mi.is_persisted?, false)
 
     mi.name = "x"
     mi.description = "y"
     mi.value = "z"
+    mi.persisted = true
 
     assert_equal(mi.name, "x")
     assert_equal(mi.description, "y")
     assert_equal(mi.value, "z")
+    assert_equal(mi.is_persisted?, true)
 
     ly = RBA::Layout::new
 
     ly.add_meta_info(RBA::LayoutMetaInfo::new("myinfo", "a"))
-    ly.add_meta_info(RBA::LayoutMetaInfo::new("another", "42", "description"))
+    ly.add_meta_info(RBA::LayoutMetaInfo::new("another", 42, "description"))
 
     assert_equal(ly.meta_info_value("myinfo"), "a")
-    assert_equal(ly.meta_info_value("doesnotexist"), "")
-    assert_equal(ly.meta_info_value("another"), "42")
+    assert_equal(ly.meta_info_value("doesnotexist"), nil)
+    assert_equal(ly.meta_info_value("another"), 42)
 
     a = []
     ly.each_meta_info { |mi| a << mi.name }
     assert_equal(a.join(","), "myinfo,another")
     a = []
-    ly.each_meta_info { |mi| a << mi.value }
+    ly.each_meta_info { |mi| a << mi.value.to_s }
     assert_equal(a.join(","), "a,42")
     a = []
     ly.each_meta_info { |mi| a << mi.description }
@@ -1081,13 +1084,64 @@ class DBLayoutTests2_TestClass < TestBase
 
     ly.add_meta_info(RBA::LayoutMetaInfo::new("myinfo", "b"))
     assert_equal(ly.meta_info_value("myinfo"), "b")
-    assert_equal(ly.meta_info_value("doesnotexist"), "")
-    assert_equal(ly.meta_info_value("another"), "42")
+    assert_equal(ly.meta_info_value("doesnotexist"), nil)
+    assert_equal(ly.meta_info_value("another"), 42)
+
+    ly.remove_meta_info("doesnotexist")  # should not fail
 
     ly.remove_meta_info("myinfo")
-    assert_equal(ly.meta_info_value("myinfo"), "")
-    assert_equal(ly.meta_info_value("doesnotexist"), "")
-    assert_equal(ly.meta_info_value("another"), "42")
+    assert_equal(ly.meta_info_value("myinfo"), nil)
+    assert_equal(ly.meta_info_value("doesnotexist"), nil)
+    assert_equal(ly.meta_info_value("another"), 42)
+
+    assert_equal(ly.meta_info("doesnotexist"), nil)
+    assert_equal(ly.meta_info("another").value, 42)
+    assert_equal(ly.meta_info("another").description, "description")
+
+    ly.clear_meta_info
+    assert_equal(ly.meta_info_value("another"), nil)
+    assert_equal(ly.meta_info("another"), nil)
+
+    # cellwise
+
+    c1 = ly.create_cell("X")
+    c2 = ly.create_cell("U")
+
+    c1.add_meta_info(RBA::LayoutMetaInfo::new("a", true))
+    c1.add_meta_info(RBA::LayoutMetaInfo::new("b", [ 1, 17, 42 ]))
+
+    assert_equal(c2.meta_info("a"), nil)
+    assert_equal(c2.meta_info_value("a"), nil)
+
+    a = []
+    c2.each_meta_info { |mi| a << mi.value.to_s }
+    assert_equal(a.join(","), "")
+
+    assert_equal(c1.meta_info("a").value, true)
+    assert_equal(c1.meta_info("b").value, [ 1, 17, 42 ])
+    assert_equal(c1.meta_info_value("b"), [ 1, 17, 42 ])
+
+    a = []
+    c1.each_meta_info { |mi| a << mi.value.to_s }
+    assert_equal(a.join(","), "true,[1, 17, 42]")
+
+    c1.remove_meta_info("doesnotexist")   # should not fail
+
+    a = []
+    c1.each_meta_info { |mi| a << mi.value.to_s }
+    assert_equal(a.join(","), "true,[1, 17, 42]")
+
+    c1.remove_meta_info("b")
+
+    a = []
+    c1.each_meta_info { |mi| a << mi.value.to_s }
+    assert_equal(a.join(","), "true")
+
+    c1.clear_meta_info
+
+    a = []
+    c1.each_meta_info { |mi| a << mi.value.to_s }
+    assert_equal(a.join(","), "")
 
   end
 

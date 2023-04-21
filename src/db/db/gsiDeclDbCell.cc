@@ -1014,14 +1014,15 @@ static const tl::Variant &cell_meta_info_value (db::Cell *cell, const std::strin
   }
 }
 
-static MetaInfo cell_meta_info (db::Cell *cell, const std::string &name)
+static MetaInfo *cell_meta_info (db::Cell *cell, const std::string &name)
 {
   if (! cell->layout ()) {
-    static MetaInfo null_value;
-    return null_value;
-  } else {
+    return 0;
+  } else if (cell->layout ()->has_meta_info (cell->cell_index (), name)) {
     const db::MetaInfo &value = cell->layout ()->meta_info (cell->cell_index (), name);
-    return MetaInfo (name, value);
+    return new MetaInfo (name, value);
+  } else {
+    return 0;
   }
 }
 
@@ -1857,7 +1858,7 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "\n"
     "This method has been introduced in version 0.28.8."
   ) +
-  gsi::method_ext ("meta_info", &cell_meta_info, gsi::arg ("name"),
+  gsi::factory_ext ("meta_info", &cell_meta_info, gsi::arg ("name"),
     "@brief Gets the meta information for a given name\n"
     "See \\LayoutMetaInfo for details about cells and meta information.\n"
     "\n"

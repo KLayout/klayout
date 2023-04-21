@@ -908,10 +908,14 @@ static void layout_add_meta_info (db::Layout *layout, const MetaInfo &mi)
   layout->add_meta_info (mi.name, db::MetaInfo (mi.description, mi.value));
 }
 
-static MetaInfo layout_get_meta_info (db::Layout *layout, const std::string &name)
+static MetaInfo *layout_get_meta_info (db::Layout *layout, const std::string &name)
 {
-  const db::MetaInfo &value = layout->meta_info (name);
-  return MetaInfo (name, value);
+  if (layout->has_meta_info (name)) {
+    const db::MetaInfo &value = layout->meta_info (name);
+    return new MetaInfo (name, value);
+  } else {
+    return 0;
+  }
 }
 
 static const tl::Variant &layout_get_meta_info_value (db::Layout *layout, const std::string &name)
@@ -1073,11 +1077,11 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been introduced in version 0.25. Starting with version 0.28.8, the value is of variant type instead of string only.\n"
   ) +
-  gsi::method_ext ("meta_info", &layout_get_meta_info, gsi::arg ("name"),
+  gsi::factory_ext ("meta_info", &layout_get_meta_info, gsi::arg ("name"),
     "@brief Gets the meta information for a given name\n"
     "See \\LayoutMetaInfo for details about layouts and meta information.\n"
     "\n"
-    "If no meta information with the given name exists, a default object with empty fields will be returned.\n"
+    "If no meta information with the given name exists, nil is returned.\n"
     "\n"
     "This method has been introduced in version 0.28.8.\n"
   ) +

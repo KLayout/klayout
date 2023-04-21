@@ -1799,7 +1799,7 @@ Layout::meta_info_iterator
 Layout::begin_meta (db::cell_index_type ci) const
 {
   auto m = m_meta_info_by_cell.find (ci);
-  if (m != m_meta_info_by_cell.find (ci)) {
+  if (m != m_meta_info_by_cell.end ()) {
     return m->second.begin ();
   } else {
     return s_empty_meta.begin ();
@@ -1810,7 +1810,7 @@ Layout::meta_info_iterator
 Layout::end_meta (db::cell_index_type ci) const
 {
   auto m = m_meta_info_by_cell.find (ci);
-  if (m != m_meta_info_by_cell.find (ci)) {
+  if (m != m_meta_info_by_cell.end ()) {
     return m->second.end ();
   } else {
     return s_empty_meta.end ();
@@ -1871,6 +1871,12 @@ Layout::meta_info (meta_info_name_id_type name_id) const
   return n != m_meta_info.end () ? n->second : null_value;
 }
 
+bool
+Layout::has_meta_info (meta_info_name_id_type name_id) const
+{
+  return m_meta_info.find (name_id) != m_meta_info.end ();
+}
+
 void
 Layout::clear_meta (db::cell_index_type ci)
 {
@@ -1907,7 +1913,18 @@ Layout::meta_info (db::cell_index_type ci, meta_info_name_id_type name_id) const
   return null_value;
 }
 
-void 
+bool
+Layout::has_meta_info (db::cell_index_type ci, meta_info_name_id_type name_id) const
+{
+  auto c = m_meta_info_by_cell.find (ci);
+  if (c != m_meta_info_by_cell.end ()) {
+    return c->second.find (name_id) != c->second.end ();
+  } else {
+    return false;
+  }
+}
+
+void
 Layout::swap_layers (unsigned int a, unsigned int b)
 {
   tl_assert (m_layers.layer_state (a) != LayoutLayers::Free);

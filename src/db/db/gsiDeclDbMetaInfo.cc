@@ -27,7 +27,7 @@
 namespace gsi
 {
 
-static MetaInfo *layout_meta_info_ctor (const std::string &name, const std::string &value, const std::string &description, bool persisted)
+static MetaInfo *layout_meta_info_ctor (const std::string &name, const tl::Variant &value, const std::string &description, bool persisted)
 {
   return new MetaInfo (name, description, value, persisted);
 }
@@ -101,7 +101,7 @@ Class<MetaInfo> decl_LayoutMetaInfo ("db", "LayoutMetaInfo",
   gsi::method_ext ("description=", &layout_meta_set_description,
     "@brief Sets the description of the layout meta info object\n"
   ) +
-  gsi::method_ext ("persisted", &layout_meta_get_persisted,
+  gsi::method_ext ("is_persisted?", &layout_meta_get_persisted,
     "@brief Gets a value indicating whether the meta information will be persisted\n"
     "This predicate was introduced in version 0.28.8.\n"
   ) +
@@ -117,6 +117,22 @@ Class<MetaInfo> decl_LayoutMetaInfo ("db", "LayoutMetaInfo",
   "Multiple layout meta information objects can be attached to one layout using \\Layout#add_meta_info. "
   "Meta information is identified by a unique name and carries a string value plus an optional description string. "
   "The description string is for information only and is not evaluated by code.\n"
+  "\n"
+  "Meta information can be attached to the layout object and to cells. It is similar to "
+  "user properties. The differences are:\n"
+  "\n"
+  "@ul\n"
+  "@li Meta information is stored differently in GDS and OASIS files using the context information added "
+  "    by KLayout to annotated PCell or library cells too. Hence meta information does not pollute "
+  "    the standard user properties space. @/li\n"
+  "@li The value of meta information can be complex serializable types such as lists, hashes and elementary "
+  "    objects such as \\Box or \\DBox. Scalar types include floats and booleans. @/li\n"
+  "@li Meta information keys are strings and are supported also for GDS which only accepts integer number "
+  "    keys for user properties. @/li\n"
+  "@/ul\n"
+  "\n"
+  "Note that only meta information marked with \\is_persisted? == true are stored in GDS or OASIS files. "
+  "This is not the default setting, so you need to explicitly set that flag.\n"
   "\n"
   "See also \\Layout#each_meta_info, \\Layout#meta_info_value, \\Layout#meta_info and \\Layout#remove_meta_info as "
   "well as the corresponding \\Cell methods.\n"

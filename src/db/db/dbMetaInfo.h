@@ -31,6 +31,9 @@
 namespace db
 {
 
+//  Switch for version-agnostic code
+#define KLAYOUT_META_INFO_V2
+
 /**
  *  @brief A structure describing the meta information from the reader
  *

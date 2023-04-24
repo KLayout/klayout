@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       max-parallel: 12
       matrix:
-        os: [ubuntu-20.04, macos-11]
+        os: [ubuntu-20.04]
     steps:
       - name: Free Disk Space (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
@@ -64,7 +64,7 @@ jobs:
         with:
           path: ./wheelhouse/*.whl
         
-  build_m1:
+  build_mac:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -114,7 +114,7 @@ jobs:
         path: dist/*.tar.gz
 
   upload_to_test_pypy:
-    needs: [build, make_sdist, build_m1]
+    needs: [build, make_sdist, build_mac]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/download-artifact@v2
@@ -130,7 +130,7 @@ jobs:
         repository_url: https://test.pypi.org/legacy/
 
   upload_to_pypi:
-    needs: [build, make_sdist, build_m1]
+    needs: [build, make_sdist, build_mac]
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
     steps:

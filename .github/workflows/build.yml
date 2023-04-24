@@ -63,6 +63,38 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           path: ./wheelhouse/*.whl
+        
+  build_m1:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      max-parallel: 12
+      matrix:
+        os: [macos-11]
+    steps:
+      - uses: hmarr/debug-action@v2
+      - name: Cancel Workflow Action
+        uses: styfle/cancel-workflow-action@0.9.1
+      - uses: actions/checkout@v3
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ github.job }}-${{ matrix.os }}-${{ matrix.cibuild }}  # Make cache specific to OS
+          max-size: "5G"
+      - name: Install dependencies
+        run: |
+          env
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+          echo "/usr/lib/ccache:/usr/local/opt/ccache/libexec" >> $GITHUB_PATH
+          HOST_CCACHE_DIR="$(ccache -k cache_dir)"
+          mkdir -p $HOST_CCACHE_DIR
+      - name: Build wheels  # check https://cibuildwheel.readthedocs.io/en/stable/setup/#github-actions
+        uses: pypa/cibuildwheel@v2.12.3
+        env:
+          CIBW_BUILD: ${{ matrix.cibuild }}
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./wheelhouse/*.whl
 
 # The following was taken from https://cibuildwheel.readthedocs.io/en/stable/deliver-to-pypi/
   make_sdist:
@@ -82,7 +114,7 @@ jobs:
         path: dist/*.tar.gz
 
   upload_to_test_pypy:
-    needs: [build, make_sdist]
+    needs: [build, make_sdist, build_m1]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/download-artifact@v2
@@ -98,7 +130,7 @@ jobs:
         repository_url: https://test.pypi.org/legacy/
 
   upload_to_pypi:
-    needs: [build, make_sdist]
+    needs: [build, make_sdist, build_m1]
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
     steps:

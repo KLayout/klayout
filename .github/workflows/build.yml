@@ -91,7 +91,7 @@ jobs:
       - name: Build wheels  # check https://cibuildwheel.readthedocs.io/en/stable/setup/#github-actions
         uses: pypa/cibuildwheel@v2.12.3
         env:
-          CIBW_BUILD: ${{ matrix.cibuild }}
+          CIBW_ARCHS_MACOS: x86_64 arm64
       - uses: actions/upload-artifact@v2
         with:
           path: ./wheelhouse/*.whl

@@ -762,6 +762,14 @@ public:
   cell_index_type add_cell (const char *name = 0);
 
   /**
+   *  @brief Adds a cell using another cell as a template
+   *
+   *  This method will use the name of the other cell and initialize the
+   *  new cell with the meta info from the other cell.
+   */
+  cell_index_type add_cell (const db::Layout &other, db::cell_index_type ci);
+
+  /**
    *  @brief Add a cell without a name
    *
    *  The cell is created, but cannot be found by name. The name returned is an empty string.
@@ -1905,6 +1913,17 @@ public:
   void add_meta_info (meta_info_name_id_type name_id, const MetaInfo &i);
 
   /**
+   *  @brief Adds meta information from a sequence
+   */
+  template <class I>
+  void add_meta_info (const I &b, const I &e)
+  {
+    for (I i = b; i != e; ++i) {
+      m_meta_info.insert (b, e);
+    }
+  }
+
+  /**
    *  @brief Removes the meta information object with the given name
    *  The method will do nothing if no object with that name exists.
    */
@@ -1966,6 +1985,17 @@ public:
    *  If a meta info object with the same name already exists it is overwritten.
    */
   void add_meta_info (db::cell_index_type ci, meta_info_name_id_type name_id, const MetaInfo &i);
+
+  /**
+   *  @brief Adds meta information from a sequence
+   */
+  template <class I>
+  void add_meta_info (db::cell_index_type ci, const I &b, const I &e)
+  {
+    for (I i = b; i != e; ++i) {
+      m_meta_info_by_cell [ci].insert (b, e);
+    }
+  }
 
   /**
    *  @brief Gets a value indicating whether a meta info with the given name is present for the given cell

@@ -556,7 +556,7 @@ make_clip_variants (const db::Layout &layout,
   for (std::map <std::pair <db::cell_index_type, db::Box>, db::cell_index_type>::iterator v = variants.begin (); v != variants.end (); ++v) {
     if (v->first.second != layout.cell (v->first.first).bbox () || &layout != &target_layout) {
       //  need for a new cell
-      v->second = target_layout.add_cell (layout.cell_name (v->first.first));
+      v->second = target_layout.add_cell (layout, v->first.first);
     } else {
       v->second = v->first.first;
     }

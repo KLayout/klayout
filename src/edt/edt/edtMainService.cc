@@ -800,7 +800,7 @@ MainService::cm_make_cell_variants ()
         if (needs_variant) {
 
           //  need to create a variant: create a new cell
-          db::cell_index_type new_cell_index = layout.add_cell (layout.cell_name (elem.inst_ptr.cell_index ()));
+          db::cell_index_type new_cell_index = layout.add_cell (layout, elem.inst_ptr.cell_index ());
 
           //  prepare a new variant cell
           db::Cell &new_cell = layout.cell (new_cell_index);

@@ -521,7 +521,13 @@ Layout::operator= (const Layout &d)
     }
 
     m_dbu = d.m_dbu;
+
     m_meta_info = d.m_meta_info;
+    m_meta_info_by_cell = d.m_meta_info_by_cell;
+    m_meta_info_names = d.m_meta_info_names;
+    m_meta_info_name_map = d.m_meta_info_name_map;
+
+    m_tech_name = d.m_tech_name;
 
   }
   return *this;
@@ -1297,7 +1303,15 @@ Layout::uniquify_cell_name (const char *name) const
   }
 }
 
-cell_index_type 
+cell_index_type
+Layout::add_cell (const db::Layout &other, db::cell_index_type ci)
+{
+  cell_index_type ci_new = add_cell (other.cell_name (ci));
+  add_meta_info (ci_new, other.begin_meta (ci), other.end_meta (ci));
+  return ci_new;
+}
+
+cell_index_type
 Layout::add_cell (const char *name)
 {
   std::string b;

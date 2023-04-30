@@ -880,6 +880,20 @@ gsi::Class<db::LEFDEFReaderOptions> decl_lefdef_config ("db", "LEFDEFReaderConfi
     "\n"
     "This property has been added in version 0.27.\n"
   ) +
+  gsi::method ("joined_paths", &db::LEFDEFReaderOptions::joined_paths,
+    "@brief Gets a value indicating whether to create joined paths for wires.\n"
+    "If this property is set to true, wires are represented by multi-segment paths as far as possible "
+    "(this will fail for 45 degree path segments for example). By defauls, wires are represented "
+    "by multiple straight segments.\n"
+    "\n"
+    "This property has been added in version 0.28.8.\n"
+  ) +
+  gsi::method ("joined_paths=", &db::LEFDEFReaderOptions::set_joined_paths, gsi::arg ("flag"),
+    "@brief Sets a value indicating whether to create joined paths for wires.\n"
+    "See \\joined_paths for details about this property.\n"
+    "\n"
+    "This property has been added in version 0.28.8.\n"
+  ) +
   gsi::method ("map_file", &db::LEFDEFReaderOptions::map_file,
     "@brief Gets the layer map file to use.\n"
     "If a layer map file is given, the reader will pull the layer mapping from this file. The layer mapping rules "

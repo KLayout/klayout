@@ -760,6 +760,16 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "\n"
     "This event has been added in version 0.25.\n"
   ) +
+  gsi::event ("on_session_about_to_be_restored", &lay::MainWindow::begin_restore_session,
+    "@brief An event indicating that a session is about to be restored\n"
+    "\n"
+    "This event has been added in version 0.28.8.\n"
+  ) +
+  gsi::event ("on_session_restored", &lay::MainWindow::end_restore_session,
+    "@brief An event indicating that a session was restored\n"
+    "\n"
+    "This event has been added in version 0.28.8.\n"
+  ) +
   gsi::method ("show_macro_editor", &lay::MainWindow::show_macro_editor, gsi::arg ("cat", std::string ()), gsi::arg ("add", false),
     "@brief Shows the macro editor\n"
     "If 'cat' is given, this category will be selected in the category tab. "

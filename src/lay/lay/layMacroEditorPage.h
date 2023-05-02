@@ -246,6 +246,7 @@ public:
 
   int current_line () const;
   int current_pos () const;
+  bool has_multi_block_selection () const;
 
   void set_debugging_on (bool debugging_on);
 
@@ -313,6 +314,7 @@ private:
   void fill_completer_list ();
   void complete ();
   QTextCursor get_completer_cursor (int &pos0, int &pos);
+  void replace_in_selection (const QString &replace, bool first);
 
   bool eventFilter (QObject *watched, QEvent *event);
 };

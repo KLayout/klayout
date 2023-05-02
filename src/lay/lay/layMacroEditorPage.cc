@@ -1196,63 +1196,96 @@ MacroEditorPage::replace_and_find_next (const QString &replace)
     return;
   }
 
-  QTextCursor c = mp_text->textCursor ();
-  if (c.hasSelection ()) {
-    QTextBlock b = c.block ();
-    int o = std::max (0, c.position () - b.position ());
-    if (m_current_search.indexIn (b.text (), o) == o) {
-      c.insertText (interpolate_string (replace, m_current_search));
-    }
-  }
-
+  replace_in_selection (replace, true);
   find_next ();
 }
 
-void 
+void
 MacroEditorPage::replace_all (const QString &replace)
 {
   if (! mp_macro || mp_macro->is_readonly ()) {
     return;
   }
 
+  replace_in_selection (replace, false);
+}
+
+void
+MacroEditorPage::replace_in_selection (const QString &replace, bool first)
+{
   const QTextDocument *doc = mp_text->document ();
 
   QTextBlock bs = doc->begin (), be = doc->end ();
+  int ps = 0;
+  int pe = be.length ();
 
   QTextCursor c = mp_text->textCursor ();
   if (c.hasSelection ()) {
-    QTextBlock s = mp_text->document ()->findBlock (mp_text->textCursor ().selectionStart ());
-    QTextBlock e = mp_text->document ()->findBlock (mp_text->textCursor ().selectionEnd ());
-    if (e != s) {
-      bs = s;
-      be = e;
-    }
+
+    ps = mp_text->textCursor ().selectionStart ();
+    pe = mp_text->textCursor ().selectionEnd ();
+
+    bs = mp_text->document ()->findBlock (ps);
+    be = mp_text->document ()->findBlock (pe);
+    ps -= bs.position ();
+    pe -= be.position ();
+
+  } else if (first) {
+
+    //  don't replace first entry without selection
+    return;
+
   }
 
   c.beginEditBlock ();
 
-  for (QTextBlock b = bs; b != be; b = b.next()) {
+  bool done = false;
+
+  for (QTextBlock b = bs; ; b = b.next()) {
 
     int o = 0;
 
-    while (true) {
+    while (!done) {
+
+      bool substitute = false;
 
       int i = m_current_search.indexIn (b.text (), o);
       if (i < 0) {
         break;
+      } else if (b == bs && i < ps) {
+        //  ignore
+      } else if (b == be && i >= pe) {
+        //  ignore
+        done = true;
       } else if (m_current_search.matchedLength () == 0) {
         break;  //  avoid an infinite loop
+      } else {
+        substitute = true;
       }
 
-      QString r = interpolate_string (replace, m_current_search);
+      if (substitute) {
 
-      c.setPosition (i + b.position () + m_current_search.matchedLength ());
-      c.setPosition (i + b.position (), QTextCursor::KeepAnchor);
-      c.insertText (r);
+        QString r = interpolate_string (replace, m_current_search);
 
-      o = i + r.size ();
+        c.setPosition (i + b.position () + m_current_search.matchedLength ());
+        c.setPosition (i + b.position (), QTextCursor::KeepAnchor);
+        c.insertText (r);
 
-   }
+        o = i + r.size ();
+
+        done = first;
+
+      } else {
+
+        o = i + m_current_search.matchedLength ();
+
+      }
+
+    }
+
+    if (b == be || done) {
+      break;
+    }
 
   }
 
@@ -1379,6 +1412,19 @@ int
 MacroEditorPage::current_pos () const
 {
   return mp_text->textCursor ().position () - mp_text->textCursor ().block ().position ();
+}
+
+bool
+MacroEditorPage::has_multi_block_selection () const
+{
+  QTextCursor c = mp_text->textCursor ();
+  if (c.selectionStart () != c.selectionEnd ()) {
+    QTextBlock s = mp_text->document ()->findBlock (c.selectionStart ());
+    QTextBlock e = mp_text->document ()->findBlock (c.selectionEnd ());
+    return e != s;
+  } else {
+    return false;
+  }
 }
 
 bool

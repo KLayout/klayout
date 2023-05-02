@@ -703,7 +703,7 @@ StatisticsSource::get (const std::string &url)
        <<       "</tr>" << std::endl;
     for (db::Layout::meta_info_iterator meta = layout.begin_meta (); meta != layout.end_meta (); ++meta) {
       std::string d = meta->second.description;
-      if (!d.empty ()) {
+      if (d.empty ()) {
         d = layout.meta_info_name (meta->first);
       }
       os <<     "<tr><td>" << tl::escaped_to_html (d, true) << "</td><td>" << tl::escaped_to_html (meta->second.value.to_string (), true) << "</td></tr>" << std::endl;

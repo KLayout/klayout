@@ -1307,7 +1307,16 @@ cell_index_type
 Layout::add_cell (const db::Layout &other, db::cell_index_type ci)
 {
   cell_index_type ci_new = add_cell (other.cell_name (ci));
-  add_meta_info (ci_new, other.begin_meta (ci), other.end_meta (ci));
+  cell (ci_new).set_ghost_cell (other.cell (ci).is_ghost_cell ());
+
+  if (&other == this) {
+    add_meta_info (ci_new, other.begin_meta (ci), other.end_meta (ci));
+  } else {
+    for (auto m = other.begin_meta (ci); m != other.end_meta (ci); ++m) {
+      add_meta_info (ci_new, meta_info_name_id (other.meta_info_name (m->first)), m->second);
+    }
+  }
+
   return ci_new;
 }
 

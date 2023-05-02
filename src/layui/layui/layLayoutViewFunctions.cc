@@ -440,7 +440,7 @@ LayoutViewFunctions::cm_cell_user_properties ()
     db::properties_id_type prop_id = cell.prop_id ();
 
     lay::UserPropertiesForm props_form (parent_widget ());
-    if (props_form.show (view (), cv_index, prop_id)) {
+    if (props_form.show (view (), cv_index, prop_id, layout.begin_meta (cell.cell_index ()), layout.end_meta (cell.cell_index ()))) {
 
       view ()->transaction (tl::to_string (tr ("Edit cell's user properties")));
       cell.prop_id (prop_id);

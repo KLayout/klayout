@@ -1220,15 +1220,18 @@ MacroEditorPage::replace_in_selection (const QString &replace, bool first)
   int pe = be.length ();
 
   QTextCursor c = mp_text->textCursor ();
-  if (c.hasSelection ()) {
+  bool has_selection = c.hasSelection ();
+  bool anchor_at_end = false;
 
-    ps = mp_text->textCursor ().selectionStart ();
-    pe = mp_text->textCursor ().selectionEnd ();
+  if (has_selection) {
+
+    anchor_at_end = (c.selectionStart () == c.position ());
+
+    ps = c.selectionStart ();
+    pe = c.selectionEnd ();
 
     bs = mp_text->document ()->findBlock (ps);
     be = mp_text->document ()->findBlock (pe);
-    ps -= bs.position ();
-    pe -= be.position ();
 
   } else if (first) {
 
@@ -1236,6 +1239,9 @@ MacroEditorPage::replace_in_selection (const QString &replace, bool first)
     return;
 
   }
+
+  ps -= bs.position ();
+  pe -= be.position ();
 
   c.beginEditBlock ();
 
@@ -1252,13 +1258,13 @@ MacroEditorPage::replace_in_selection (const QString &replace, bool first)
       int i = m_current_search.indexIn (b.text (), o);
       if (i < 0) {
         break;
-      } else if (b == bs && i < ps) {
-        //  ignore
-      } else if (b == be && i >= pe) {
-        //  ignore
-        done = true;
       } else if (m_current_search.matchedLength () == 0) {
         break;  //  avoid an infinite loop
+      } else if (b == bs && i < ps) {
+        //  ignore
+      } else if (b == be && i + m_current_search.matchedLength () > pe) {
+        //  ignore
+        done = true;
       } else {
         substitute = true;
       }
@@ -1273,7 +1279,16 @@ MacroEditorPage::replace_in_selection (const QString &replace, bool first)
 
         o = i + r.size ();
 
-        done = first;
+        if (first) {
+
+          //  in single-selection mode, put cursor past substitution
+          c.setPosition (i + b.position ());
+          has_selection = false;
+          done = true;
+
+        } else if (b == be) {
+          pe += int (r.size ()) - int (m_current_search.matchedLength ());
+        }
 
       } else {
 
@@ -1289,6 +1304,13 @@ MacroEditorPage::replace_in_selection (const QString &replace, bool first)
 
   }
 
+  if (has_selection) {
+    //  restore selection which might have changed due to insert
+    c.setPosition (anchor_at_end ? be.position () + pe : bs.position () + ps);
+    c.setPosition (!anchor_at_end ? be.position () + pe : bs.position () + ps, QTextCursor::KeepAnchor);
+  }
+
+  mp_text->setTextCursor (c);
   c.endEditBlock ();
 }
 

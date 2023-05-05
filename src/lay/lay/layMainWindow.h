@@ -533,28 +533,6 @@ public:
   std::string all_layout_file_formats () const;
 
   /**
-   *  @brief An event indicating that the current view has changed
-   *  This event is fired if the current view was changed.
-   *  The current view's reference is updated if the event is issued.
-   */
-  tl::Event current_view_changed_event;
-
-  /**
-   *  @brief An event indicating that a view was closed
-   *  If a view is closed, this event is triggered. When the signal is sent,
-   *  the view still points to the view being closed which is still valid.
-   *  The integer parameter will receive the index of the view about to be closed.
-   */
-  tl::event<int> view_closed_event;
-
-  /**
-   *  @brief An event indicating that a new view is created
-   *  If a new view is created, this event will be triggered.
-   *  The integer parameter will receive the index of the view that was created.
-   */
-  tl::event<int> view_created_event;
-
-  /**
    *  @brief Adds an entry to the MRU list with the initial technology
    */
   void add_mru (const std::string &fn);
@@ -594,6 +572,38 @@ public:
    *  @brief Reimplementation of the dropEvent event handler
    */
   void dropEvent(QDropEvent *event);
+
+  /**
+   *  @brief An event indicating that the current view has changed
+   *  This event is fired if the current view was changed.
+   *  The current view's reference is updated if the event is issued.
+   */
+  tl::Event current_view_changed_event;
+
+  /**
+   *  @brief An event indicating that a view was closed
+   *  If a view is closed, this event is triggered. When the signal is sent,
+   *  the view still points to the view being closed which is still valid.
+   *  The integer parameter will receive the index of the view about to be closed.
+   */
+  tl::event<int> view_closed_event;
+
+  /**
+   *  @brief An event indicating that a new view is created
+   *  If a new view is created, this event will be triggered.
+   *  The integer parameter will receive the index of the view that was created.
+   */
+  tl::event<int> view_created_event;
+
+  /**
+   *  @brief An event indicating the start of a session restore
+   */
+  tl::Event begin_restore_session;
+
+  /**
+   *  @brief An event indicating the end of a session restore
+   */
+  tl::Event end_restore_session;
 
 signals:
   void closed ();

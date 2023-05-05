@@ -2062,8 +2062,17 @@ MainWindow::restore_session (const std::string &fn)
   m_current_session = fn;
   lay::Session session;
   session.load (fn);
-  session.restore (*this);
-  read_dock_widget_state ();
+
+  begin_restore_session ();
+  try {
+    session.restore (*this);
+    read_dock_widget_state ();
+    end_restore_session ();
+  } catch (...) {
+    read_dock_widget_state ();
+    end_restore_session ();
+    throw;
+  }
 }
 
 void

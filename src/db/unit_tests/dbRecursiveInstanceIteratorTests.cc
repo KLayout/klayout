@@ -24,12 +24,14 @@
 #include "dbRecursiveInstanceIterator.h"
 #include "dbRegion.h"
 #include "dbLayoutDiff.h"
+#include "dbReader.h"
 #include "tlString.h"
 #include "tlUnitTest.h"
+#include "tlStream.h"
 
 #include <vector>
 
-std::string collect(db::RecursiveInstanceIterator &s, const db::Layout &layout)
+std::string collect (db::RecursiveInstanceIterator &s, const db::Layout &layout)
 {
   std::string res;
   while (! s.at_end ()) {
@@ -47,13 +49,26 @@ std::string collect(db::RecursiveInstanceIterator &s, const db::Layout &layout)
   return res;
 }
 
-std::string collect_with_copy(db::RecursiveInstanceIterator s, const db::Layout &layout)
+std::string collect_with_copy (db::RecursiveInstanceIterator s, const db::Layout &layout)
 {
   s.reset ();
   return collect (s, layout);
 }
 
-TEST(1) 
+std::string collect2 (db::RecursiveInstanceIterator &s, const db::Layout &layout)
+{
+  std::string res;
+  while (! s.at_end ()) {
+    if (! res.empty ()) {
+      res += "\n";
+    }
+    res += std::string (layout.cell_name (s->inst_ptr.cell_index ())) + "@" + (s.trans () * s.instance ().complex_trans ()).to_string ();
+    ++s;
+  }
+  return res;
+}
+
+TEST(1)
 {
   db::Manager m (true);
   db::Layout g (&m);
@@ -659,4 +674,118 @@ TEST(5)
   i1.reset ();
   x = collect(i1, *g);
   EXPECT_EQ (x, "");
+}
+
+//  issue-1353
+TEST(6)
+{
+  db::Layout layout;
+
+  {
+    std::string fn (tl::testdata ());
+    fn += "/gds/issue-1353.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  std::string x;
+
+  db::cell_index_type c1 = layout.cell_by_name ("TOP_CELL_3_C").second;
+  db::cell_index_type c2 = layout.cell_by_name ("TOP_CELL_3_B").second;
+  db::RecursiveInstanceIterator i1 (layout, layout.cell (c1));
+
+  x = collect2(i1, layout);
+  EXPECT_EQ (x,
+    //  depth-first traversal
+    "CHILD_CELL_3_1_1@r0 *1 30000,0\n"
+    "CHILD_CELL_3_1@r0 *1 30000,0\n"
+    "CHILD_CELL_3@r0 *1 30000,0\n"
+    "CHILD_CELL_3_1_1@r0 *1 55000,0\n"
+    "CHILD_CELL_3_1@r0 *1 55000,0\n"
+    "CHILD_CELL_3@r0 *1 55000,0\n"
+    "CHILD_CELL_3_1_1@r0 *1 55000,20000\n"
+    "CHILD_CELL_3_1@r0 *1 55000,20000\n"
+    "CHILD_CELL_3@r0 *1 55000,20000\n"
+    "CHILD_CELL_3_1_1@r0 *1 55000,40000\n"
+    "CHILD_CELL_3_1@r0 *1 55000,40000\n"
+    "CHILD_CELL_3@r0 *1 55000,40000\n"
+    "CHILD_CELL_3_1_1@r0 *1 75000,0\n"
+    "CHILD_CELL_3_1@r0 *1 75000,0\n"
+    "CHILD_CELL_3@r0 *1 75000,0\n"
+    "CHILD_CELL_3_1_1@r0 *1 75000,20000\n"
+    "CHILD_CELL_3_1@r0 *1 75000,20000\n"
+    "CHILD_CELL_3@r0 *1 75000,20000\n"
+    "CHILD_CELL_3_1_1@r0 *1 75000,40000\n"
+    "CHILD_CELL_3_1@r0 *1 75000,40000\n"
+    "CHILD_CELL_3@r0 *1 75000,40000\n"
+    "CHILD_CELL_3_1_1@r0 *1 95000,0\n"
+    "CHILD_CELL_3_1@r0 *1 95000,0\n"
+    "CHILD_CELL_3@r0 *1 95000,0\n"
+    "CHILD_CELL_3_1_1@r0 *1 95000,20000\n"
+    "CHILD_CELL_3_1@r0 *1 95000,20000\n"
+    "CHILD_CELL_3@r0 *1 95000,20000\n"
+    "CHILD_CELL_3_1_1@r0 *1 95000,40000\n"
+    "CHILD_CELL_3_1@r0 *1 95000,40000\n"
+    "CHILD_CELL_3@r0 *1 95000,40000\n"
+    "CHILD_CELL_3_1_1@r0 *1 30000,20000\n"
+    "CHILD_CELL_3_1@r0 *1 30000,20000\n"
+    "CHILD_CELL_3@r0 *1 30000,20000\n"
+    "CHILD_CELL_3_1_1@r0 *1 30000,40000\n"
+    "CHILD_CELL_3_1@r0 *1 30000,40000\n"
+    "CHILD_CELL_3@r0 *1 30000,40000"
+  );
+
+  std::set<db::cell_index_type> t;
+  t.insert (layout.cell_by_name ("TOP_CELL_3_1_1").second);
+  i1.set_targets (t);
+
+  x = collect2(i1, layout);
+  EXPECT_EQ (x,
+    "CHILD_CELL_3_1_1@r0 *1 30000,0\n"
+    "CHILD_CELL_3_1_1@r0 *1 55000,0\n"
+    "CHILD_CELL_3_1_1@r0 *1 55000,20000\n"
+    "CHILD_CELL_3_1_1@r0 *1 55000,40000\n"
+    "CHILD_CELL_3_1_1@r0 *1 75000,0\n"
+    "CHILD_CELL_3_1_1@r0 *1 75000,20000\n"
+    "CHILD_CELL_3_1_1@r0 *1 75000,40000\n"
+    "CHILD_CELL_3_1_1@r0 *1 95000,0\n"
+    "CHILD_CELL_3_1_1@r0 *1 95000,20000\n"
+    "CHILD_CELL_3_1_1@r0 *1 95000,40000\n"
+    "CHILD_CELL_3_1_1@r0 *1 30000,20000\n"
+    "CHILD_CELL_3_1_1@r0 *1 30000,40000"
+  );
+
+  db::RecursiveInstanceIterator i2 (layout, layout.cell (c2));
+  i2.set_targets (t);
+
+  x = collect2(i2, layout);
+  EXPECT_EQ (x,
+    "CHILD_CELL_3_1_1@r0 *1 30000,0\n"
+    "CHILD_CELL_3_1_1@r0 *1 55000,0\n"
+    "CHILD_CELL_3_1_1@r0 *1 55000,20000\n"
+    "CHILD_CELL_3_1_1@r0 *1 55000,40000\n"
+    "CHILD_CELL_3_1_1@r0 *1 75000,0\n"
+    "CHILD_CELL_3_1_1@r0 *1 75000,20000\n"
+    "CHILD_CELL_3_1_1@r0 *1 75000,40000\n"
+    "CHILD_CELL_3_1_1@r0 *1 95000,0\n"
+    "CHILD_CELL_3_1_1@r0 *1 95000,20000\n"
+    "CHILD_CELL_3_1_1@r0 *1 95000,40000\n"
+    "CHILD_CELL_3_1_1@r0 *1 30000,20000\n"
+    "CHILD_CELL_3_1_1@r0 *1 30000,40000\n"
+    "CHILD_CELL_3_1_1@r0 *1 120000,20000\n"
+    "CHILD_CELL_3_1_1@r0 *1 120000,40000\n"
+    "CHILD_CELL_3_1_1@r0 *1 120000,0"
+  );
+
+  std::set<db::cell_index_type> sc;
+  sc.insert (layout.cell_by_name ("CHILD_CELL_3").second);
+  i2.unselect_cells (sc);
+
+  x = collect2(i2, layout);
+  EXPECT_EQ (x,
+    "CHILD_CELL_3_1_1@r0 *1 120000,20000\n"
+    "CHILD_CELL_3_1_1@r0 *1 120000,40000\n"
+    "CHILD_CELL_3_1_1@r0 *1 120000,0"
+  );
 }

@@ -447,8 +447,8 @@ RecursiveInstanceIterator::next (RecursiveInstanceReceiver *receiver)
     } else {
       ++m_inst;
       new_inst (receiver);
-      next_instance (receiver);
     }
+    next_instance (receiver);
   }
 }
 
@@ -463,35 +463,42 @@ RecursiveInstanceIterator::next_instance (RecursiveInstanceReceiver *receiver) c
 {
   while (true) {
 
-    if (! m_inst.at_end ()) {
+    while (true) {
 
-      if (int (m_inst_iterators.size ()) < m_max_depth && (m_all_targets || m_target_tree.find (m_inst->cell_index ()) != m_target_tree.end ())) {
-        down (receiver);
-      }
+      if (! m_inst.at_end ()) {
 
-    } else {
+        if (int (m_inst_iterators.size ()) < m_max_depth && (m_all_targets || m_target_tree.find (m_inst->cell_index ()) != m_target_tree.end ())) {
+          down (receiver);
+        } else {
+          break;
+        }
 
-      if (! m_inst_iterators.empty ()) {
-        //  no more instances: up and next instance
-        up (receiver);
       } else {
+
+        if (! m_inst_iterators.empty ()) {
+          //  no more instances: up and next instance
+          up (receiver);
+        }
         break;
+
       }
 
     }
 
-    if (! m_inst.at_end ()) {
-      if (! needs_visit ()) {
-        ++m_inst_array;
-        if (! m_inst_array.at_end ()) {
-          new_inst_member (receiver);
-        } else {
-          ++m_inst;
-          new_inst (receiver);
-        }
+    if (m_inst.at_end ()) {
+      break;
+    }
+
+    if (! needs_visit ()) {
+      ++m_inst_array;
+      if (! m_inst_array.at_end ()) {
+        new_inst_member (receiver);
       } else {
-        break;
+        ++m_inst;
+        new_inst (receiver);
       }
+    } else {
+      break;
     }
 
   }

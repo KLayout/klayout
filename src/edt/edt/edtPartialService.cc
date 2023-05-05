@@ -243,9 +243,14 @@ insert_point_path (const db::Path &p, const std::set<EdgeWithIndex> &sel, db::Po
       ctr.push_back (p1);
       if (! found && sel.find (EdgeWithIndex (db::Edge (p1, p2), n, n + 1, 0)) != sel.end ()) {
         //  project the point onto the edge
-        std::pair <bool, db::Point> projected = db::Edge (p1, p2).projected (ins);
+        db::Edge e (p1, p2);
+        std::pair <bool, db::Point> projected = e.projected (ins);
         if (projected.first) {
-          ins = projected.second;
+          if (e.is_ortho ()) {
+            //  NOTE: for skew edges we use the original point as the projected one usually
+            //  is off-grid.
+            ins = projected.second;
+          }
           ctr.push_back (ins);
           found = true;
         }
@@ -262,22 +267,28 @@ insert_point_path (const db::Path &p, const std::set<EdgeWithIndex> &sel, db::Po
 }
 
 static void 
-remove_redundant_points (std::vector <db::Point> &ctr)
+remove_redundant_points (std::vector <db::Point> &ctr, bool cyclic)
 {
   //  compress contour (remove redundant points)
   //  and assign to path
 
   std::vector<db::Point>::iterator wp = ctr.begin ();
   std::vector<db::Point>::const_iterator rp = ctr.begin ();
-  db::Point pm1 = *rp;
-  if (wp != ctr.end ()) {
-    ++wp;
-    ++rp;
+  db::Point pm1;
+  if (rp != ctr.end ()) {
+    if (cyclic) {
+      pm1 = ctr.back ();
+    } else {
+      pm1 = ctr.front ();
+      ++wp;
+      ++rp;
+    }
     while (rp != ctr.end ()) {
       db::Point p0 = *rp;
       if (p0 != pm1) {
         *wp++ = p0;
       }
+      pm1 = p0;
       ++rp;
     }
   }
@@ -304,7 +315,7 @@ del_points_path (const db::Path &p, const std::set<EdgeWithIndex> &sel)
     }
   }
 
-  remove_redundant_points (ctr);
+  remove_redundant_points (ctr, false);
   new_path.assign (ctr.begin (), ctr.end ());
 
   return new_path;
@@ -357,7 +368,7 @@ modify_path (db::Path &p, const std::map <PointWithIndex, db::Point> &new_points
   }
 
   if (compress) {
-    remove_redundant_points (ctr);
+    remove_redundant_points (ctr, false);
   }
 
   p.assign (ctr.begin (), ctr.end ());
@@ -384,10 +395,14 @@ insert_point_poly (const db::Polygon &p, const std::set<EdgeWithIndex> &sel, db:
 
       ctr.push_back ((*e).p1 ());
       if (! found && sel.find (EdgeWithIndex (*e, n, nn, c)) != sel.end ()) {
-        //  project the point onto the edge
+        //  project the point onto the edge - use the first edge the point projects to
         std::pair <bool, db::Point> projected = (*e).projected (ins);
         if (projected.first) {
-          ins = projected.second;
+          if ((*e).is_ortho ()) {
+            //  NOTE: for skew edges we use the original point as the projected one usually
+            //  is off-grid.
+            ins = projected.second;
+          }
           ctr.push_back (ins);
           found = true;
         }
@@ -397,7 +412,7 @@ insert_point_poly (const db::Polygon &p, const std::set<EdgeWithIndex> &sel, db:
 
     if (found) {
 
-      remove_redundant_points (ctr);
+      remove_redundant_points (ctr, true);
 
       new_poly = p;
       if (c == 0) {
@@ -433,7 +448,7 @@ del_points_poly (const db::Polygon &p, const std::set<EdgeWithIndex> &sel)
       }
     }
 
-    remove_redundant_points (ctr);
+    remove_redundant_points (ctr, true);
 
     if (c == 0) {
       new_poly.assign_hull (ctr.begin (), ctr.end (), false /*compress*/);
@@ -495,7 +510,7 @@ modify_polygon (db::Polygon &p,
     }
 
     if (compress) {
-      remove_redundant_points (ctr);
+      remove_redundant_points (ctr, true);
     }
 
     if (c == 0) {

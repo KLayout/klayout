@@ -111,12 +111,9 @@ URI::URI (const std::string &uri)
   }
   m_scheme = unescape (m_scheme);
 
-  bool prefer_authority = true;
-  if (m_scheme == "file") {
-    prefer_authority = false;
-    //  other schemes?
-  } else if (m_scheme.empty ()) {
-    prefer_authority = false;
+  bool prefer_authority = false;
+  if (m_scheme == "http" || m_scheme == "https") {
+    prefer_authority = true;
   }
 
   ex0 = ex;

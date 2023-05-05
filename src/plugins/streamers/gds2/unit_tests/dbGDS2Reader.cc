@@ -229,7 +229,7 @@ TEST(1)
   db::LayerMap map = reader.read (layout);
 
   EXPECT_EQ (fabs (layout.dbu () / 0.001 - 1.0) < 1e-6, true);
-  EXPECT_EQ (layout.meta_info_value ("libname"), "LIB.DB");
+  EXPECT_EQ (layout.meta_info ("libname").value.to_string (), "LIB.DB");
 
   EXPECT_EQ (layout.layers (), size_t (11));
   EXPECT_EQ (map.mapping_str (0), "2/0 : 2/0");
@@ -289,7 +289,7 @@ TEST(2)
     db::Reader reader (file);
     map = reader.read (layout_none, options);
     EXPECT_EQ (fabs (layout_none.dbu () / 0.001 - 1.0) < 1e-6, true);
-    EXPECT_EQ (layout.meta_info_value ("libname"), "LIB.DB");
+    EXPECT_EQ (layout.meta_info ("libname").value.to_string (), "LIB.DB");
   }
 
   EXPECT_EQ (layout_none.layers (), size_t (0));

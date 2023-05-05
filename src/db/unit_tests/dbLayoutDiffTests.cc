@@ -66,6 +66,9 @@ public:
   void begin_edge_differences ();
   void detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::Edge, db::properties_id_type> > &a, const std::vector <std::pair <db::Edge, db::properties_id_type> > &b);
   void end_edge_differences ();
+  void begin_edge_pair_differences ();
+  void detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &a, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &b);
+  void end_edge_pair_differences ();
   void begin_text_differences ();
   void detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::Text, db::properties_id_type> > &a, const std::vector <std::pair <db::Text, db::properties_id_type> > &b);
   void end_text_differences ();
@@ -336,6 +339,26 @@ TestDifferenceReceiver::detailed_diff (const db::PropertiesRepository &pr, const
 
 void
 TestDifferenceReceiver::end_edge_differences ()
+{
+}
+
+void
+TestDifferenceReceiver::begin_edge_pair_differences ()
+{
+  m_os << "layout_diff: edge pairs differ for layer " << m_layer.to_string () << " in cell " << m_cellname << std::endl;
+}
+
+void
+TestDifferenceReceiver::detailed_diff (const db::PropertiesRepository &pr, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &a, const std::vector <std::pair <db::EdgePair, db::properties_id_type> > &b)
+{
+  m_os << "Not in b but in a:" << std::endl;
+  print_diffs (pr, a, b);
+  m_os << "Not in a but in b:" << std::endl;
+  print_diffs (pr, b, a);
+}
+
+void
+TestDifferenceReceiver::end_edge_pair_differences ()
 {
 }
 

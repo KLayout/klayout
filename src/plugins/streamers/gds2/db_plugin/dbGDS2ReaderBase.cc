@@ -185,8 +185,8 @@ GDS2ReaderBase::do_read (db::Layout &layout)
   unsigned int mod_time[6] = { 0, 0, 0, 0, 0, 0 };
   unsigned int access_time[6] = { 0, 0, 0, 0, 0, 0 };
   get_time (mod_time, access_time);
-  layout.add_meta_info (MetaInfo ("mod_time", tl::to_string (tr ("Modification Time")), tl::sprintf ("%d/%d/%d %d:%02d:%02d", mod_time[1], mod_time[2], mod_time[0], mod_time[3], mod_time[4], mod_time[5])));
-  layout.add_meta_info (MetaInfo ("access_time", tl::to_string (tr ("Access Time")), tl::sprintf ("%d/%d/%d %d:%02d:%02d", access_time[1], access_time[2], access_time[0], access_time[3], access_time[4], access_time[5])));
+  layout.add_meta_info ("mod_time", MetaInfo (tl::to_string (tr ("Modification Time")), tl::sprintf ("%d/%d/%d %d:%02d:%02d", mod_time[1], mod_time[2], mod_time[0], mod_time[3], mod_time[4], mod_time[5])));
+  layout.add_meta_info ("access_time", MetaInfo (tl::to_string (tr ("Access Time")), tl::sprintf ("%d/%d/%d %d:%02d:%02d", access_time[1], access_time[2], access_time[0], access_time[3], access_time[4], access_time[5])));
 
   long attr = 0;
   db::PropertiesRepository::properties_set layout_properties;
@@ -234,9 +234,9 @@ GDS2ReaderBase::do_read (db::Layout &layout)
       double dbuu = get_double ();
       double dbum = get_double ();
       
-      layout.add_meta_info (MetaInfo ("dbuu", tl::to_string (tr ("Database unit in user units")), tl::to_string (dbuu)));
-      layout.add_meta_info (MetaInfo ("dbum", tl::to_string (tr ("Database unit in meter")), tl::to_string (dbum)));
-      layout.add_meta_info (MetaInfo ("libname", tl::to_string (tr ("Library name")), m_libname));
+      layout.add_meta_info ("dbuu", MetaInfo (tl::to_string (tr ("Database unit in user units")), tl::to_string (dbuu)));
+      layout.add_meta_info ("dbum", MetaInfo (tl::to_string (tr ("Database unit in meter")), tl::to_string (dbum)));
+      layout.add_meta_info ("libname", MetaInfo (tl::to_string (tr ("Library name")), m_libname));
 
       m_dbuu = dbuu;
       m_dbu = dbum * 1e6; /*in micron*/
@@ -289,13 +289,19 @@ GDS2ReaderBase::do_read (db::Layout &layout)
       db::cell_index_type cell_index = make_cell (layout, m_cellname);
 
       bool ignore_cell = false;
-      std::map <tl::string, std::vector <std::string> >::const_iterator ctx = m_context_info.find (m_cellname);
+      auto ctx = m_context_info.find (m_cellname);
       if (ctx != m_context_info.end ()) {
+
         CommonReaderLayerMapping layer_mapping (this, &layout);
-        if (layout.recover_proxy_as (cell_index, ctx->second.begin (), ctx->second.end (), &layer_mapping)) {
+        LayoutOrCellContextInfo ci = LayoutOrCellContextInfo::deserialize (ctx->second.begin (), ctx->second.end ());
+
+        if (ci.has_proxy_info () && layout.recover_proxy_as (cell_index, ci, &layer_mapping)) {
           //  ignore everything in that cell since it is created by the import:
           ignore_cell = true;
         }
+
+        layout.fill_meta_info_from_context (cell_index, ci);
+
       }
       
       db::Cell *cell = 0;
@@ -386,6 +392,13 @@ GDS2ReaderBase::do_read (db::Layout &layout)
 
   }
 
+  //  deserialize global context information
+  auto ctx = m_context_info.find (std::string ());
+  if (ctx != m_context_info.end ()) {
+    LayoutOrCellContextInfo ci = LayoutOrCellContextInfo::deserialize (ctx->second.begin (), ctx->second.end ());
+    layout.fill_meta_info_from_context (ci);
+  }
+
   //  check, if the last record is a ENDLIB
   if (rec_id != sENDLIB) {
     error (tl::to_string (tr ("ENDLIB record expected")));
@@ -396,11 +409,15 @@ void
 GDS2ReaderBase::read_context_info_cell ()
 {
   short rec_id = 0;
+  std::string cn;
 
   //  read cell content
   while ((rec_id = get_record ()) != sENDSTR) { 
 
     progress_checkpoint ();
+
+    bool valid_hook = false;
+    cn.clear ();
 
     if (rec_id == sSREF) {
 
@@ -411,7 +428,7 @@ GDS2ReaderBase::read_context_info_cell ()
         error (tl::to_string (tr ("SNAME record expected")));
       }
 
-      std::string cn = get_string ();
+      cn = get_string ();
 
       rec_id = get_record ();
       while (rec_id == sSTRANS || rec_id == sANGLE || rec_id == sMAG) {
@@ -420,6 +437,24 @@ GDS2ReaderBase::read_context_info_cell ()
       if (rec_id != sXY) {
         error (tl::to_string (tr ("XY record expected")));
       }
+
+      valid_hook = true;
+
+    } else if (rec_id == sBOUNDARY) {
+
+      rec_id = get_record ();
+      while (rec_id == sLAYER || rec_id == sDATATYPE) {
+        rec_id = get_record ();
+      }
+      if (rec_id != sXY) {
+        error (tl::to_string (tr ("XY record expected")));
+      }
+
+      valid_hook = true;
+
+    }
+
+    if (valid_hook) {
 
       std::vector <std::string> &strings = m_context_info.insert (std::make_pair (cn, std::vector <std::string> ())).first->second;
 

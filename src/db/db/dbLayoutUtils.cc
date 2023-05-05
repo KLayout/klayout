@@ -218,7 +218,7 @@ merge_layouts (db::Layout &target,
   std::map<db::cell_index_type, db::cell_index_type> new_cell_mapping;
   for (std::set<db::cell_index_type>::const_iterator c = all_cells_to_copy.begin (); c != all_cells_to_copy.end (); ++c) {
     if (cell_mapping.find (*c) == cell_mapping.end ()) {
-      new_cell_mapping.insert (std::make_pair (*c, target.add_cell (source.cell_name (*c))));
+      new_cell_mapping.insert (std::make_pair (*c, target.add_cell (source, *c)));
     }
   }
 

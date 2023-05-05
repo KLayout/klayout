@@ -666,9 +666,11 @@ OASISWriter::OASISWriter ()
     mp_layout (0),
     mp_cell (0),
     m_layer (0), m_datatype (0),
+    m_write_context_info (false),
     m_in_cblock (false),
     m_propname_id (0),
     m_propstring_id (0),
+    m_textstring_id (0),
     m_proptables_written (false),
     m_progress (tl::to_string (tr ("Writing OASIS file")), 10000)
 {
@@ -1150,6 +1152,313 @@ OASISWriter::reset_modal_variables ()
   mm_last_value_list.reset ();
 }
 
+void
+OASISWriter::write_propname_table (size_t &propnames_table_pos, const std::vector<db::cell_index_type> &cells, const db::Layout &layout, const std::vector<std::pair<unsigned int, LayerProperties> > &layers)
+{
+  //  write the property names collected so far in the order of the ID's.
+
+  std::vector<std::pair<unsigned long, std::string> > rev_pn;
+  rev_pn.reserve (m_propnames.size ());
+  for (auto p = m_propnames.begin (); p != m_propnames.end (); ++p) {
+    rev_pn.push_back (std::make_pair (p->second, p->first));
+  }
+  std::sort (rev_pn.begin (), rev_pn.end ());
+
+  for (auto p = rev_pn.begin (); p != rev_pn.end (); ++p) {
+    tl_assert (p->first == (unsigned long)(p - rev_pn.begin ()));
+    begin_table (propnames_table_pos);
+    write_record_id (7);
+    write_nstring (p->second.c_str ());
+  }
+
+  //  collect and write the future property names
+
+  std::set <db::properties_id_type> prop_ids_done;
+
+  for (auto cell = cells.begin (); cell != cells.end (); ++cell) {
+
+    const db::Cell &cref (layout.cell (*cell));
+
+    if (cref.prop_id () != 0) {
+      begin_table (propnames_table_pos);
+      emit_propname_def (cref.prop_id ());
+    }
+
+    for (db::Cell::const_iterator inst = cref.begin (); ! inst.at_end (); ++inst) {
+      if (inst->has_prop_id () && inst->prop_id () != 0 && prop_ids_done.find (inst->prop_id ()) == prop_ids_done.end ()) {
+        prop_ids_done.insert (inst->prop_id ());
+        begin_table (propnames_table_pos);
+        emit_propname_def (inst->prop_id ());
+        m_progress.set (mp_stream->pos ());
+      }
+    }
+
+    for (auto l = layers.begin (); l != layers.end (); ++l) {
+      db::ShapeIterator shape (cref.shapes (l->first).begin (db::ShapeIterator::Properties | db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::Paths | db::ShapeIterator::Texts));
+      while (! shape.at_end ()) {
+        if (shape->has_prop_id () && shape->prop_id () != 0 && prop_ids_done.find (shape->prop_id ()) == prop_ids_done.end ()) {
+          prop_ids_done.insert (shape->prop_id ());
+          begin_table (propnames_table_pos);
+          emit_propname_def (shape->prop_id ());
+          m_progress.set (mp_stream->pos ());
+        }
+        shape.finish_array ();
+      }
+    }
+
+  }
+
+  //  if needed, emit property name required for the PCell or meta info context information
+
+  if (m_write_context_info && m_propnames.find (std::string (klayout_context_name)) == m_propnames.end ()) {
+
+    bool has_context = false;
+    for (auto cell = cells.begin (); cell != cells.end () && ! has_context; ++cell) {
+      LayoutOrCellContextInfo ci;
+      has_context = layout.has_context_info (*cell) && layout.get_context_info (*cell, ci);
+    }
+
+    if (has_context) {
+      m_propnames.insert (std::make_pair (std::string (klayout_context_name), m_propname_id++));
+      begin_table (propnames_table_pos);
+      write_record_id (7);
+      write_nstring (klayout_context_name);
+    }
+
+  }
+
+  end_table (propnames_table_pos);
+}
+
+void
+OASISWriter::write_propstring_table (size_t &propstrings_table_pos, const std::vector<db::cell_index_type> &cells, const db::Layout &layout, const std::vector<std::pair<unsigned int, LayerProperties> > &layers)
+{
+  //  write the property strings collected so far in the order of the ID's.
+
+  std::vector<std::pair<unsigned long, const std::string *> > rev_ps;
+  rev_ps.reserve (m_propstrings.size ());
+  for (auto p = m_propstrings.begin (); p != m_propstrings.end (); ++p) {
+    rev_ps.push_back (std::make_pair (p->second, &p->first));
+  }
+  std::sort (rev_ps.begin (), rev_ps.end ());
+
+  tl_assert (rev_ps.size () == size_t (m_propstring_id));
+
+  for (auto p = rev_ps.begin (); p != rev_ps.end (); ++p) {
+    tl_assert (p->first == (unsigned long)(p - rev_ps.begin ()));
+    begin_table (propstrings_table_pos);
+    write_record_id (9);
+    write_bstring (p->second->c_str ());
+  }
+
+  //  collect and write the future property strings
+
+  std::set <db::properties_id_type> prop_ids_done;
+
+  for (auto cell = cells.begin (); cell != cells.end (); ++cell) {
+
+    const db::Cell &cref (layout.cell (*cell));
+
+    if (cref.prop_id () != 0 && prop_ids_done.find (cref.prop_id ()) == prop_ids_done.end ()) {
+      prop_ids_done.insert (cref.prop_id ());
+      begin_table (propstrings_table_pos);
+      emit_propstring_def (cref.prop_id ());
+    }
+
+    for (db::Cell::const_iterator inst = cref.begin (); ! inst.at_end (); ++inst) {
+      if (inst->has_prop_id () && inst->prop_id () != 0 && prop_ids_done.find (inst->prop_id ()) == prop_ids_done.end ()) {
+        prop_ids_done.insert (inst->prop_id ());
+        begin_table (propstrings_table_pos);
+        emit_propstring_def (inst->prop_id ());
+        m_progress.set (mp_stream->pos ());
+      }
+    }
+
+    for (auto l = layers.begin (); l != layers.end (); ++l) {
+      db::ShapeIterator shape (cref.shapes (l->first).begin (db::ShapeIterator::Properties | db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::Paths | db::ShapeIterator::Texts));
+      while (! shape.at_end ()) {
+        if (shape->has_prop_id () && shape->prop_id () != 0 && prop_ids_done.find (shape->prop_id ()) == prop_ids_done.end ()) {
+          prop_ids_done.insert (shape->prop_id ());
+          begin_table (propstrings_table_pos);
+          emit_propstring_def (shape->prop_id ());
+          m_progress.set (mp_stream->pos ());
+        }
+        shape.finish_array ();
+      }
+    }
+
+  }
+
+  if (m_write_context_info) {
+
+    //  emit property string id's required for the PCell and meta info context information
+    std::vector <std::string> context_prop_strings;
+
+    for (auto cell = cells.begin (); cell != cells.end (); ++cell) {
+
+      m_progress.set (mp_stream->pos ());
+      context_prop_strings.clear ();
+
+      if (layout.has_context_info (*cell) && layout.get_context_info (*cell, context_prop_strings)) {
+
+        for (auto c = context_prop_strings.begin (); c != context_prop_strings.end (); ++c) {
+          if (m_propstrings.insert (std::make_pair (*c, m_propstring_id)).second) {
+            begin_table (propstrings_table_pos);
+            write_record_id (9);
+            write_bstring (c->c_str ());
+            ++m_propstring_id;
+          }
+        }
+
+      }
+
+    }
+
+  }
+
+  end_table (propstrings_table_pos);
+}
+
+void
+OASISWriter::write_cellname_table (size_t &cellnames_table_pos, const std::vector<db::cell_index_type> &cells_by_index, const std::map<db::cell_index_type, size_t> *cell_positions, const db::Layout &layout)
+{
+  bool sequential = true;
+  for (auto cell = cells_by_index.begin (); cell != cells_by_index.end () && sequential; ++cell) {
+    sequential = (*cell == db::cell_index_type (cell - cells_by_index.begin ()));
+  }
+
+  //  CELLNAME (implicit or explicit)
+  for (auto cell = cells_by_index.begin (); cell != cells_by_index.end (); ++cell) {
+
+    begin_table (cellnames_table_pos);
+
+    write_record_id (sequential ? 3 : 4);
+    write_nstring (layout.cell_name (*cell));
+    if (! sequential) {
+      write ((unsigned long) *cell);
+    }
+
+    if (m_options.write_std_properties > 1) {
+
+      reset_modal_variables ();
+
+      //  write S_BOUNDING_BOX entries
+
+      std::vector<tl::Variant> values;
+
+      //  TODO: how to set the "depends on external cells" flag?
+      db::Box bbox = layout.cell (*cell).bbox ();
+      if (bbox.empty ()) {
+        //  empty box
+        values.push_back (tl::Variant ((unsigned int) 0x2));
+        bbox = db::Box (0, 0, 0, 0);
+      } else {
+        values.push_back (tl::Variant ((unsigned int) 0x0));
+      }
+
+      values.push_back (tl::Variant (bbox.left ()));
+      values.push_back (tl::Variant (bbox.bottom ()));
+      values.push_back (tl::Variant (bbox.width ()));
+      values.push_back (tl::Variant (bbox.height ()));
+
+      write_property_def (s_bounding_box_name, values, true);
+
+      //  PROPERTY record with S_CELL_OFFSET
+      if (cell_positions) {
+        std::map<db::cell_index_type, size_t>::const_iterator pp = cell_positions->find (*cell);
+        if (pp != cell_positions->end ()) {
+          write_property_def (s_cell_offset_name, tl::Variant (pp->second), true);
+        } else {
+          write_property_def (s_cell_offset_name, tl::Variant (size_t (0)), true);
+        }
+      }
+
+    }
+
+  }
+
+  end_table (cellnames_table_pos);
+}
+
+void
+OASISWriter::write_textstring_table (size_t &textstrings_table_pos, const std::vector<db::cell_index_type> &cells, const db::Layout &layout, const std::vector<std::pair<unsigned int, LayerProperties> > &layers)
+{
+  //  write present text strings
+
+  //  collect present strings by ID
+  std::vector<std::pair<unsigned long, const std::string *> > rev_ts;
+  rev_ts.reserve (m_textstrings.size ());
+  for (auto p = m_textstrings.begin (); p != m_textstrings.end (); ++p) {
+    rev_ts.push_back (std::make_pair (p->second, &p->first));
+  }
+  std::sort (rev_ts.begin (), rev_ts.end ());
+
+  tl_assert (rev_ts.size () == size_t (m_textstring_id));
+
+  for (auto t = rev_ts.begin (); t != rev_ts.end (); ++t) {
+    tl_assert (t->first == (unsigned long)(t - rev_ts.begin ()));
+    begin_table (textstrings_table_pos);
+    write_record_id (5);
+    write_nstring (t->second->c_str ());
+  }
+
+  //  collect future test strings
+
+  for (auto cell = cells.begin (); cell != cells.end (); ++cell) {
+
+    const db::Cell &cref (layout.cell (*cell));
+    for (auto l = layers.begin (); l != layers.end (); ++l) {
+      db::ShapeIterator shape (cref.shapes (l->first).begin (db::ShapeIterator::Texts));
+      while (! shape.at_end ()) {
+        if (m_textstrings.insert (std::make_pair (shape->text_string (), m_textstring_id)).second) {
+          begin_table (textstrings_table_pos);
+          write_record_id (5);
+          write_astring (shape->text_string ());
+          ++m_textstring_id;
+          m_progress.set (mp_stream->pos ());
+        }
+        ++shape;
+      }
+    }
+
+  }
+
+  end_table (textstrings_table_pos);
+}
+
+void
+OASISWriter::write_layername_table (size_t &layernames_table_pos, const std::vector <std::pair <unsigned int, db::LayerProperties> > &layers)
+{
+  for (auto l = layers.begin (); l != layers.end (); ++l) {
+
+    if (! l->second.name.empty ()) {
+
+      begin_table (layernames_table_pos);
+
+      //  write mappings to text layer and shape layers
+      write_record_id (11);
+      write_nstring (l->second.name.c_str ());
+      write_byte (3);
+      write ((unsigned long) l->second.layer);
+      write_byte (3);
+      write ((unsigned long) l->second.datatype);
+
+      write_record_id (12);
+      write_nstring (l->second.name.c_str ());
+      write_byte (3);
+      write ((unsigned long) l->second.layer);
+      write_byte (3);
+      write ((unsigned long) l->second.datatype);
+
+      m_progress.set (mp_stream->pos ());
+
+    }
+
+  }
+
+  end_table (layernames_table_pos);
+}
+
 static bool must_write_cell (const db::Cell &cref)
 {
   //  Don't write proxy cells which are not employed
@@ -1162,6 +1471,7 @@ static bool skip_cell_body (const db::Cell &cref)
   return cref.is_ghost_cell () && cref.empty ();
 }
 
+
 void 
 OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLayoutOptions &options)
 {
@@ -1172,6 +1482,7 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
   m_layer = m_datatype = 0;
   m_in_cblock = false;
   m_cblock_buffer.clear ();
+  m_write_context_info = options.write_context_info ();
 
   m_options = options.get_options<OASISWriterOptions> ();
   mp_stream = &stream;
@@ -1252,6 +1563,7 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
   //  We will collect the standard properties here:
   
   m_propstring_id = m_propname_id = 0;
+  m_textstring_id = 0;
   m_proptables_written = false;
   std::vector<std::pair<std::string, unsigned int> > init_props;
 
@@ -1303,305 +1615,46 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
     write_props (layout.prop_id ());
   }
 
-  //  build property name and value string tables
-  
-  {
-
-    //  write the property names collected so far in the order of the ID's.
-    
-    std::vector<std::pair<unsigned long, std::string> > rev_pn;
-    rev_pn.reserve (m_propnames.size ());
-    for (std::map <std::string, unsigned long>::const_iterator p = m_propnames.begin (); p != m_propnames.end (); ++p) {
-      rev_pn.push_back (std::make_pair (p->second, p->first));
-    }
-    std::sort (rev_pn.begin (), rev_pn.end ());
-
-    for (std::vector<std::pair<unsigned long, std::string> >::const_iterator p = rev_pn.begin (); p != rev_pn.end (); ++p) {
-      tl_assert (p->first == (unsigned long)(p - rev_pn.begin ()));
-      begin_table (propnames_table_pos);
-      write_record_id (7);
-      write_nstring (p->second.c_str ());
-    }
-
-    //  collect and write the future property names
-
-    std::set <db::properties_id_type> prop_ids_done;
-
-    for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end (); ++cell) {
-
-      const db::Cell &cref (layout.cell (*cell));
-
-      if (cref.prop_id () != 0) {
-        begin_table (propnames_table_pos);
-        emit_propname_def (cref.prop_id ());
-      }
-
-      for (db::Cell::const_iterator inst = cref.begin (); ! inst.at_end (); ++inst) {
-        if (inst->has_prop_id () && inst->prop_id () != 0 && prop_ids_done.find (inst->prop_id ()) == prop_ids_done.end ()) {
-          prop_ids_done.insert (inst->prop_id ());
-          begin_table (propnames_table_pos);
-          emit_propname_def (inst->prop_id ());
-          m_progress.set (mp_stream->pos ());
-        }
-      }
-
-      for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-        db::ShapeIterator shape (cref.shapes (l->first).begin (db::ShapeIterator::Properties | db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::Paths | db::ShapeIterator::Texts));
-        while (! shape.at_end ()) {
-          if (shape->has_prop_id () && shape->prop_id () != 0 && prop_ids_done.find (shape->prop_id ()) == prop_ids_done.end ()) {
-            prop_ids_done.insert (shape->prop_id ());
-            begin_table (propnames_table_pos);
-            emit_propname_def (shape->prop_id ());
-            m_progress.set (mp_stream->pos ());
-          }
-          shape.finish_array ();
-        }
-      }
-
-    }
-
-    if (options.write_context_info ()) {
-
-      //  emit property name required for the PCell context information
-      std::vector <std::string> context_prop_strings;
-      for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end (); ++cell) {
-
-        const db::Cell &cref (layout.cell (*cell));
-        if (cref.is_proxy () && ! cref.is_top () && layout.get_context_info (*cell, context_prop_strings)) {
-
-          if (m_propnames.insert (std::make_pair (std::string (klayout_context_name), m_propname_id)).second) {
-            begin_table (propnames_table_pos);
-            write_record_id (7);
-            write_nstring (klayout_context_name);
-            ++m_propname_id;
-          }
-          break;
-
-        }
-
-      }
-
-    }
-
-    end_table (propnames_table_pos);
-
-  }
-
-  {
-
-    //  write the property strings collected so far in the order of the ID's.
-    
-    std::vector<std::pair<unsigned long, std::string> > rev_ps;
-    rev_ps.reserve (m_propstrings.size ());
-    for (std::map <std::string, unsigned long>::const_iterator p = m_propstrings.begin (); p != m_propstrings.end (); ++p) {
-      rev_ps.push_back (std::make_pair (p->second, p->first));
-    }
-    std::sort (rev_ps.begin (), rev_ps.end ());
-
-    for (std::vector<std::pair<unsigned long, std::string> >::const_iterator p = rev_ps.begin (); p != rev_ps.end (); ++p) {
-      tl_assert (p->first == (unsigned long)(p - rev_ps.begin ()));
-      begin_table (propstrings_table_pos);
-      write_record_id (9);
-      write_nstring (p->second.c_str ());
-    }
-
-    //  collect and write the future property strings
-
-    std::set <db::properties_id_type> prop_ids_done;
-
-    for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end (); ++cell) {
-
-      const db::Cell &cref (layout.cell (*cell));
-
-      if (cref.prop_id () != 0 && prop_ids_done.find (cref.prop_id ()) == prop_ids_done.end ()) {
-        prop_ids_done.insert (cref.prop_id ());
-        begin_table (propnames_table_pos);
-        emit_propstring_def (cref.prop_id ());
-      }
-
-      for (db::Cell::const_iterator inst = cref.begin (); ! inst.at_end (); ++inst) {
-        if (inst->has_prop_id () && inst->prop_id () != 0 && prop_ids_done.find (inst->prop_id ()) == prop_ids_done.end ()) {
-          prop_ids_done.insert (inst->prop_id ());
-          begin_table (propstrings_table_pos);
-          emit_propstring_def (inst->prop_id ());
-          m_progress.set (mp_stream->pos ());
-        }
-      }
-
-      for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-        db::ShapeIterator shape (cref.shapes (l->first).begin (db::ShapeIterator::Properties | db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::Paths | db::ShapeIterator::Texts));
-        while (! shape.at_end ()) {
-          if (shape->has_prop_id () && shape->prop_id () != 0 && prop_ids_done.find (shape->prop_id ()) == prop_ids_done.end ()) {
-            prop_ids_done.insert (shape->prop_id ());
-            begin_table (propstrings_table_pos);
-            emit_propstring_def (shape->prop_id ());
-            m_progress.set (mp_stream->pos ());
-          }
-          shape.finish_array ();
-        }
-      }
-
-    }
-
-    if (options.write_context_info ()) {
-
-      //  emit property string id's required for the PCell context information
-      std::vector <std::string> context_prop_strings;
-      for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end (); ++cell) {
-
-        m_progress.set (mp_stream->pos ());
-
-        const db::Cell &cref (layout.cell (*cell));
-        if (cref.is_proxy () && ! cref.is_top ()) {
-
-          context_prop_strings.clear ();
-          if (layout.get_context_info (*cell, context_prop_strings)) {
-
-            for (std::vector <std::string>::const_iterator c = context_prop_strings.begin (); c != context_prop_strings.end (); ++c) {
-              if (m_propstrings.insert (std::make_pair (*c, m_propstring_id)).second) {
-                begin_table (propstrings_table_pos);
-                write_record_id (9);
-                write_bstring (c->c_str ());
-                ++m_propstring_id;
-              }
-            }
-
-          }
-
-        }
-
-      }
-
-    }
-
-    end_table (propstrings_table_pos);
-
-  }
-
-  //  Now we cannot open new property ID's in strict mode
-  m_proptables_written = true;
-
-  //  build cell name table now in non-strict mode (in strict mode it is written at the 
-  //  end because then we have the cell positions fo S_CELL_OFFSET)
-
-  if (! m_options.strict_mode) {
-
-    size_t pos = 0;
-
-    bool sequential = true;
-    for (std::vector<db::cell_index_type>::const_iterator cell = cells_by_index.begin (); cell != cells_by_index.end () && sequential; ++cell) {
-      sequential = (*cell == db::cell_index_type (cell - cells_by_index.begin ()));
-    }
-
-    //  CELLNAME (implicit or explicit)
-    for (std::vector<db::cell_index_type>::const_iterator cell = cells_by_index.begin (); cell != cells_by_index.end (); ++cell) {
-
-      begin_table (pos);
-
-      write_record_id (sequential ? 3 : 4);
-      write_nstring (layout.cell_name (*cell));
-      if (! sequential) {
-        write ((unsigned long) *cell);
-      }
-
-      if (m_options.write_std_properties > 1) {
-
-        reset_modal_variables ();
-
-        //  write S_BOUNDING_BOX entries
-
-        std::vector<tl::Variant> values;
-
-        //  TODO: how to set the "depends on external cells" flag?
-        db::Box bbox = layout.cell (*cell).bbox ();
-        if (bbox.empty ()) {
-          //  empty box 
-          values.push_back (tl::Variant ((unsigned int) 0x2)); 
-          bbox = db::Box (0, 0, 0, 0);
-        } else {
-          values.push_back (tl::Variant ((unsigned int) 0x0)); 
-        }
-
-        values.push_back (tl::Variant (bbox.left ())); 
-        values.push_back (tl::Variant (bbox.bottom ())); 
-        values.push_back (tl::Variant (bbox.width ()));
-        values.push_back (tl::Variant (bbox.height ()));
-
-        write_property_def (s_bounding_box_name, values, true);
-
-      }
-
-    }
-
-    end_table (pos);
-
-  }
-
-  //  build text string table
-
-  {
-
-    unsigned int id = 0;
-
-    for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end (); ++cell) {
-
-      const db::Cell &cref (layout.cell (*cell));
-      for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-        db::ShapeIterator shape (cref.shapes (l->first).begin (db::ShapeIterator::Texts));
-        while (! shape.at_end ()) {
-          if (m_textstrings.insert (std::make_pair (shape->text_string (), id)).second) {
-            begin_table (textstrings_table_pos);
-            write_record_id (5);
-            write_astring (shape->text_string ());
-            ++id;
-            m_progress.set (mp_stream->pos ());
-          }
-          ++shape;
-        }
-      }
-
-    }
-
-    end_table (textstrings_table_pos);
-
-  }
-
-  //  write layernames table
-
-  {
-
-    for (std::vector <std::pair <unsigned int, db::LayerProperties> >::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-
-      if (! l->second.name.empty ()) {
-
-        begin_table (layernames_table_pos);
-
-        //  write mappings to text layer and shape layers
-        write_record_id (11);
-        write_nstring (l->second.name.c_str ());
-        write_byte (3);
-        write ((unsigned long) l->second.layer);
-        write_byte (3);
-        write ((unsigned long) l->second.datatype);
-
-        write_record_id (12);
-        write_nstring (l->second.name.c_str ());
-        write_byte (3);
-        write ((unsigned long) l->second.layer);
-        write_byte (3);
-        write ((unsigned long) l->second.datatype);
-
-        m_progress.set (mp_stream->pos ());
-
-      }
-
-    }
-
-    end_table (layernames_table_pos);
-
-  }
-
   std::vector <std::string> context_prop_strings;
+
+  //  write the global layout context information
+
+  if (options.write_context_info () && layout.has_context_info () && layout.get_context_info (context_prop_strings)) {
+
+    std::vector<tl::Variant> values;
+    values.reserve (context_prop_strings.size ());
+    for (auto i = context_prop_strings.begin (); i != context_prop_strings.end (); ++i) {
+      values.push_back (tl::Variant (*i));
+    }
+
+    write_property_def (klayout_context_name, values, false);
+
+    context_prop_strings.clear ();
+
+  }
+
+  //  write the tables
+
+  if (! m_options.tables_at_end) {
+
+    write_propname_table (propnames_table_pos, cells, layout, layers);
+    write_propstring_table (propstrings_table_pos, cells, layout, layers);
+
+    //  Now we cannot open new property ID's in strict mode
+    m_proptables_written = true;
+
+    //  build cell name table now in non-strict mode (in strict mode it is written at the
+    //  end because then we have the cell positions fo S_CELL_OFFSET)
+    if (! m_options.strict_mode) {
+      write_cellname_table (cellnames_table_pos, cells_by_index, 0, layout);
+    }
+
+    write_textstring_table (textstrings_table_pos, cells, layout, layers);
+    write_layername_table (layernames_table_pos, layers);
+
+  }
+
+  //  write cells
 
   for (std::vector<db::cell_index_type>::const_iterator cell = cells.begin (); cell != cells.end (); ++cell) {
 
@@ -1630,7 +1683,7 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
     }
 
     //  context information as property named KLAYOUT_CONTEXT
-    if (cref.is_proxy () && options.write_context_info ()) {
+    if (options.write_context_info () && layout.has_context_info (*cell)) {
 
       context_prop_strings.clear ();
 
@@ -1638,17 +1691,29 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
 
         write_record_id (28);
         write_byte (char (0xf6));
+        unsigned long pnid = 0;
         std::map <std::string, unsigned long>::const_iterator pni = m_propnames.find (klayout_context_name);
-        tl_assert (pni != m_propnames.end ());
-        write (pni->second);
+        if (pni == m_propnames.end ()) {
+          pnid = m_propname_id++;
+          m_propnames.insert (std::make_pair (klayout_context_name, pnid));
+        } else {
+          pnid = pni->second;
+        }
+        write (pnid);
 
         write ((unsigned long) context_prop_strings.size ());
 
         for (std::vector <std::string>::const_iterator c = context_prop_strings.begin (); c != context_prop_strings.end (); ++c) {
           write_byte (14); // b-string by reference number
+          unsigned long psid = 0;
           std::map <std::string, unsigned long>::const_iterator psi = m_propstrings.find (*c);
-          tl_assert (psi != m_propstrings.end ());
-          write (psi->second);
+          if (psi == m_propstrings.end ()) {
+            psid = m_propstring_id++;
+            m_propstrings.insert (std::make_pair (*c, psid)).second;
+          } else {
+            psid = psi->second;
+          }
+          write (psid);
         }
 
         mm_last_property_name = klayout_context_name;
@@ -1686,66 +1751,31 @@ OASISWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::Save
 
   }
 
+  //  write the tables if at end
+
+  if (m_options.tables_at_end) {
+
+    //  do not consider future items as everything has been collected
+    std::vector<cell_index_type> no_cells;
+    std::vector <std::pair <unsigned int, db::LayerProperties> > no_layers;
+
+    write_propname_table (propnames_table_pos, no_cells, layout, no_layers);
+    write_propstring_table (propstrings_table_pos, no_cells, layout, no_layers);
+
+    //  Now we cannot open new property ID's in strict mode
+    m_proptables_written = true;
+
+    write_textstring_table (textstrings_table_pos, no_cells, layout, no_layers);
+
+    //  write all layers here
+    write_layername_table (layernames_table_pos, layers);
+
+  }
+
   //  write cell table at the end in strict mode (in that mode we need the cell positions
   //  for the S_CELL_OFFSET properties)
-  
-  if (m_options.strict_mode) {
-
-    bool sequential = true;
-    for (std::vector<db::cell_index_type>::const_iterator cell = cells_by_index.begin (); cell != cells_by_index.end () && sequential; ++cell) {
-      sequential = (*cell == db::cell_index_type (cell - cells_by_index.begin ()));
-    }
-
-    for (std::vector<db::cell_index_type>::const_iterator cell = cells_by_index.begin (); cell != cells_by_index.end (); ++cell) {
-      
-      begin_table (cellnames_table_pos);
-
-      //  CELLNAME (explicit)
-      write_record_id (sequential ? 3 : 4);
-      write_nstring (layout.cell_name (*cell));
-      if (! sequential) {
-        write ((unsigned long) *cell);
-      }
-
-      reset_modal_variables ();
-
-      if (m_options.write_std_properties > 1) {
-
-        //  write S_BOUNDING_BOX entries
-
-        std::vector<tl::Variant> values;
-
-        //  TODO: how to set the "depends on external cells" flag?
-        db::Box bbox = layout.cell (*cell).bbox ();
-        if (bbox.empty ()) {
-          //  empty box 
-          values.push_back (tl::Variant ((unsigned int) 0x2)); 
-          bbox = db::Box (0, 0, 0, 0);
-        } else {
-          values.push_back (tl::Variant ((unsigned int) 0x0)); 
-        }
-
-        values.push_back (tl::Variant (bbox.left ())); 
-        values.push_back (tl::Variant (bbox.bottom ())); 
-        values.push_back (tl::Variant (bbox.width ()));
-        values.push_back (tl::Variant (bbox.height ()));
-
-        write_property_def (s_bounding_box_name, values, true);
-
-      }
-
-      //  PROPERTY record with S_CELL_OFFSET
-      std::map<db::cell_index_type, size_t>::const_iterator pp = cell_positions.find (*cell);
-      if (pp != cell_positions.end ()) {
-        write_property_def (s_cell_offset_name, tl::Variant (pp->second), true);
-      } else {
-        write_property_def (s_cell_offset_name, tl::Variant (size_t (0)), true);
-      }
-
-    }
-
-    end_table (cellnames_table_pos);
-
+  if (m_options.tables_at_end || m_options.strict_mode) {
+    write_cellname_table (cellnames_table_pos, cells_by_index, &cell_positions, layout);
   }
 
   //  END record
@@ -2341,9 +2371,15 @@ OASISWriter::write (const db::Text &text, db::properties_id_type prop_id, const 
   m_progress.set (mp_stream->pos ());
 
   db::Trans trans = text.trans ();
+
+  unsigned long text_id = 0;
   std::map <std::string, unsigned long>::const_iterator ts = m_textstrings.find (text.string ());
-  tl_assert (ts != m_textstrings.end ());
-  unsigned long text_id = ts->second;
+  if (ts == m_textstrings.end ()) {
+    text_id = m_textstring_id++;
+    m_textstrings.insert (std::make_pair (text.string (), text_id));
+  } else {
+    text_id = ts->second;
+  }
 
   unsigned char info = 0x20;
 

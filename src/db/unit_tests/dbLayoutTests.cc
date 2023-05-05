@@ -543,7 +543,7 @@ TEST(5)
   db::Layout l (&m);
   EXPECT_EQ (l.technology_name (), "");
 
-  db::ProxyContextInfo info;
+  db::LayoutOrCellContextInfo info;
   info.lib_name = "LIB";
   info.cell_name = "LIBCELL";
 
@@ -624,7 +624,7 @@ TEST(6)
 
   EXPECT_EQ (l.technology_name (), "");
 
-  db::ProxyContextInfo info;
+  db::LayoutOrCellContextInfo info;
   info.lib_name = "Basic";
   info.pcell_name = "CIRCLE";
   info.pcell_parameters ["actual_radius"] = tl::Variant (10.0);
@@ -644,7 +644,7 @@ TEST(6)
 
   EXPECT_EQ (l2s (l), "begin_lib 0.001\nbegin_cell {CIRCLE}\nboundary 1 0 {-4142 -10000} {-10000 -4142} {-10000 4142} {-4142 10000} {4142 10000} {10000 4142} {10000 -4142} {4142 -10000} {-4142 -10000}\nend_cell\nend_lib\n");
 
-  db::ProxyContextInfo info2;
+  db::LayoutOrCellContextInfo info2;
   l.get_context_info (cell->cell_index (), info2);
   info2.pcell_parameters ["actual_radius"] = tl::Variant (5.0);
 
@@ -677,7 +677,7 @@ TEST(7_LayerProperties)
   db::Layout l (&m);
 
   EXPECT_EQ (l.is_valid_layer (0), false);
-  EXPECT_EQ (l.guiding_shape_layer (), 0);
+  EXPECT_EQ (l.guiding_shape_layer (), (unsigned int) 0);
   EXPECT_EQ (l.is_special_layer (0), true);
   EXPECT_EQ (int (l.layers ()), 1);
 
@@ -736,4 +736,62 @@ TEST(7_LayerProperties)
   EXPECT_EQ (int (l.layers ()), 0);
   EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (1, 0)), -1);
   EXPECT_EQ (l.get_layer_maybe (db::LayerProperties (2, 0)), -1);
+}
+
+TEST(8_MetaInfo)
+{
+  db::Layout ly;
+
+  EXPECT_EQ (ly.meta_info_name_id ("a"), (unsigned int) 0);
+  EXPECT_EQ (ly.meta_info_name_id ("b"), (unsigned int) 1);
+  EXPECT_EQ (ly.meta_info_name_id ("a"), (unsigned int) 0);
+  EXPECT_EQ (ly.has_context_info (), false);
+
+  ly.add_meta_info ("a", db::MetaInfo ("description", tl::Variant (17.5), false));
+  ly.add_meta_info ("b", db::MetaInfo ("", tl::Variant ("value"), true));
+
+  EXPECT_EQ (ly.has_context_info (), true);
+
+  EXPECT_EQ (ly.meta_info ("x").value.to_string (), "nil");
+  EXPECT_EQ (ly.meta_info ("x").description, "");
+  EXPECT_EQ (ly.meta_info ("x").persisted, false);
+
+  EXPECT_EQ (ly.meta_info ("a").value.to_string (), "17.5");
+  EXPECT_EQ (ly.meta_info ("a").description, "description");
+  EXPECT_EQ (ly.meta_info ("a").persisted, false);
+
+  EXPECT_EQ (ly.meta_info (1).value.to_string (), "value");
+  EXPECT_EQ (ly.meta_info (1).description, "");
+  EXPECT_EQ (ly.meta_info (1).persisted, true);
+
+  db::cell_index_type ci = ly.add_cell ("X");
+
+  EXPECT_EQ (ly.has_context_info (ci), false);
+
+  ly.add_meta_info (ci, "a", db::MetaInfo ("dd", tl::Variant (-1), false));
+  ly.add_meta_info (ci, "b", db::MetaInfo ("d", tl::Variant ("u"), true));
+
+  EXPECT_EQ (ly.has_context_info (ci), true);
+
+  EXPECT_EQ (ly.meta_info (ci, "x").value.to_string (), "nil");
+  EXPECT_EQ (ly.meta_info (ci, "x").description, "");
+  EXPECT_EQ (ly.meta_info (ci, "x").persisted, false);
+
+  EXPECT_EQ (ly.meta_info (ci, "a").value.to_string (), "-1");
+  EXPECT_EQ (ly.meta_info (ci, "a").description, "dd");
+  EXPECT_EQ (ly.meta_info (ci, "a").persisted, false);
+
+  EXPECT_EQ (ly.meta_info (ci, 1).value.to_string (), "u");
+  EXPECT_EQ (ly.meta_info (ci, 1).description, "d");
+  EXPECT_EQ (ly.meta_info (ci, 1).persisted, true);
+
+  EXPECT_EQ (ly.has_context_info (), true);
+  ly.clear_meta ();
+  EXPECT_EQ (ly.has_context_info (), false);
+  EXPECT_EQ (ly.meta_info ("a").value.to_string (), "nil");
+
+  EXPECT_EQ (ly.has_context_info (ci), true);
+  ly.clear_meta (ci);
+  EXPECT_EQ (ly.has_context_info (ci), false);
+  EXPECT_EQ (ly.meta_info (ci, "a").value.to_string (), "nil");
 }

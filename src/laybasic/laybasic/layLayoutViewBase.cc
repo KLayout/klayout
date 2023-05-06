@@ -3852,13 +3852,26 @@ LayoutViewBase::pan_center (const db::DPoint &p)
 void
 LayoutViewBase::zoom_in ()
 {
-  shift_window (zoom_factor, 0.0, 0.0);
+  zoom_by (zoom_factor);
 }
 
 void
 LayoutViewBase::zoom_out ()
 {
-  shift_window (1.0 / zoom_factor, 0.0, 0.0);
+  zoom_by (1.0 / zoom_factor);
+}
+
+void
+LayoutViewBase::zoom_by (double f)
+{
+  db::DBox b = mp_canvas->viewport ().box ();
+
+  db::DPoint c = b.center ();
+  if (mp_canvas->mouse_in_window ()) {
+    c = mp_canvas->mouse_position_um ();
+  }
+
+  zoom_box ((b.moved (db::DPoint () - c) * f).moved (c - db::DPoint ()));
 }
 
 void

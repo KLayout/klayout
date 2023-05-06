@@ -2881,6 +2881,8 @@ private:
   bool has_max_hier () const;
   int max_hier_level () const;
 
+  void zoom_by (double f);
+
   void update_event_handlers ();
   void viewport_changed ();
   void cellview_changed (unsigned int index);

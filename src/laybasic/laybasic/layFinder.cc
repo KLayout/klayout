@@ -894,5 +894,5 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
 
 }
 
-} // namespace edt
+} // namespace lay
 

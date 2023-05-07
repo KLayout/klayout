@@ -987,6 +987,37 @@ TL_PUBLIC uint32_t utf32_upcase (uint32_t c32);
  */
 TL_PUBLIC uint32_t utf32_from_utf8 (const char *&cp, const char *cpe = 0);
 
+/**
+ *  @brief Checks if the next characters are CR, LF or CR+LF and skips them
+ *
+ *  This function returns true, if a line separated was found and skipped
+ */
+TL_PUBLIC bool skip_newline (const char *&cp);
+
+/**
+ *  @brief checks if the given character is a CR character
+ */
+inline bool is_cr (char c)
+{
+  return c == '\015';
+}
+
+/**
+ *  @brief checks if the given character is a LF character
+ */
+inline bool is_lf (char c)
+{
+  return c == '\012';
+}
+
+/**
+ *  @brief checks if the given character is a CR or LF character
+ */
+inline bool is_newline (char c)
+{
+  return is_cr (c) || is_lf (c);
+}
+
 } // namespace tl
 
 #endif

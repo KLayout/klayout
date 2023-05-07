@@ -51,11 +51,10 @@ public:
   void inc ();
 
 private:
-  bool m_new_char;
   unsigned int m_line;
+  const char *mp_cp;
   std::string m_string;
   unsigned int m_edge, m_edge_end;
-  unsigned int m_index, m_end;
   std::vector<db::DPoint> m_linestarts;
   db::DPoint m_pos;
   db::DVector m_delta;
@@ -177,14 +176,16 @@ struct DB_PUBLIC_TEMPLATE hershey
   /**
    *  @brief Obtain the size of the text
    *
-   *  @return The bounding box of the text with the scaling applied
+   *  @return The bounding box of the text with the scaling and justification applied
    */
-  box<C> bbox () const
+  db::DBox bbox () const
   {
-    db::DBox b = hershey_text_box (m_string, m_font);
-    db::point<C> p1 (coord_traits::rounded (b.p1 ().x () / m_scale), coord_traits::rounded (b.p1 ().y () / m_scale));
-    db::point<C> p2 (coord_traits::rounded (b.p2 ().x () / m_scale), coord_traits::rounded (b.p2 ().y () / m_scale));
-    return box<C> (p1, p2);
+    db::DBox b = hershey_text_box (m_string, m_font) * (1.0 / m_scale);
+    if (! m_linestarts.empty ()) {
+      return b.moved (m_linestarts.front () - db::DPoint ());
+    } else {
+      return b;
+    }
   }
 
   /**

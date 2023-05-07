@@ -1721,6 +1721,14 @@ public:
     return mp_canvas;
   }
 
+  /**
+   *  @brief Gets the canvas object (const version)
+   */
+  const lay::LayoutCanvas *canvas () const
+  {
+    return mp_canvas;
+  }
+
 #if defined(HAVE_QT)
   /**
    *  @brief Gets the layer control panel

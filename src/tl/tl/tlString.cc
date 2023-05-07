@@ -211,6 +211,22 @@ inline bool safe_isspace (char c)
 }
 
 // -------------------------------------------------------------------------
+//  Utility: skip a newline
+
+bool skip_newline (const char *&cp)
+{
+  if (*cp == '\012' || *cp == '\015') {
+    if (*cp == '\015' && cp[1] == '\012') {
+      ++cp;
+    }
+    ++cp;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// -------------------------------------------------------------------------
 //  Utility: a strtod version that is independent of the locale
 
 static std::string micron_format ("%.5f");

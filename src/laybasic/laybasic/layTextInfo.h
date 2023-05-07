@@ -46,9 +46,8 @@ public:
    *  @brief Constructor
    *
    *  @param view The LayoutView from which to take the text display parameters
-   *  @param vp_trans The effective micron-to-pixel transformation
    */
-  TextInfo (const LayoutViewBase *view, const db::DCplxTrans &vp_trans);
+  TextInfo (const LayoutViewBase *view);
 
   /**
    *  @brief Constructor
@@ -59,7 +58,7 @@ public:
    *  @param resolution The resolution value (logical pixel size per physical unit pixel)
    *  @param vp_trans The effective micron-to-pixel transformation
    */
-  TextInfo (double default_text_size, const db::Font &default_font, bool apply_text_trans, double resolution, const db::DCplxTrans &vp_trans);
+  TextInfo (double default_text_size, const db::Font &default_font, bool apply_text_trans, double resolution);
 
   /**
    *  @brief Gets the visual bounding box of the given DText object
@@ -67,11 +66,11 @@ public:
    *  The visual bounding box is returned in micrometer units.
    *  It encloses the glyphs of the text, taking into account the
    *  text view settings by the view.
+   *
+   *  @param text The text object
+   *  @param vp_trans The effective micron-to-pixel transformation
    */
-  db::DBox operator() (const db::DText &text) const
-  {
-    return get_bbox (text);
-  }
+  db::DBox bbox (const db::DText &text, const db::DCplxTrans &vp_trans) const;
   
 private:
   double m_default_text_size;
@@ -79,8 +78,6 @@ private:
   bool m_apply_text_trans;
   double m_resolution;
   db::DCplxTrans m_vp_trans;
-
-  db::DBox get_bbox (const db::DText &text) const;
 };
 
 }

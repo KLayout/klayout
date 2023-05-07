@@ -742,7 +742,7 @@ public:
   }
 
 private:
-  virtual void visit_cell (const db::Cell &cell, const db::Box &search_box, const db::ICplxTrans &t, int /*level*/);
+  virtual void visit_cell (const db::Cell &cell, const db::Box &hit_box, const db::Box &scan_box, const db::DCplxTrans &vp, const db::ICplxTrans &t, int level);
 
   founds_vector_type m_founds;
 };
@@ -751,25 +751,25 @@ private:
 //  PartialShapeFinder implementation
 
 PartialShapeFinder::PartialShapeFinder (bool point_mode, bool top_level_sel, db::ShapeIterator::flags_type flags)
-  : lay::ShapeFinder (point_mode, top_level_sel, flags)
+  : lay::ShapeFinder (point_mode, top_level_sel, flags, 0)
 {
   set_test_count (point_sel_tests);
 }
 
 void 
-PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const db::ICplxTrans &t, int /*level*/)
+PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db::Box &scan_box, const db::DCplxTrans &vp, const db::ICplxTrans &t, int /*level*/)
 {
   if (! point_mode ()) {
 
     for (std::vector<int>::const_iterator l = layers ().begin (); l != layers ().end (); ++l) {
 
-      if (layers ().size () == 1 || (layers ().size () > 1 && cell.bbox ((unsigned int) *l).touches (search_box))) {
+      if (layers ().size () == 1 || (layers ().size () > 1 && cell.bbox ((unsigned int) *l).touches (scan_box))) {
 
         checkpoint ();
 
         const db::Shapes &shapes = cell.shapes (*l);
 
-        db::ShapeIterator shape = shapes.begin_touching (search_box, flags (), prop_sel (), inv_prop_sel ());
+        db::ShapeIterator shape = shapes.begin_touching (scan_box, flags (), prop_sel (), inv_prop_sel ());
         while (! shape.at_end ()) {
 
           checkpoint ();
@@ -799,9 +799,9 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box,
                 ++ee;
                 unsigned int nn = ee.at_end () ? 0 : n + 1;
 
-                if (search_box.contains ((*e).p1 ())) {
+                if (hit_box.contains ((*e).p1 ())) {
                   edges.push_back (EdgeWithIndex (db::Edge ((*e).p1 (), (*e).p1 ()), n, n, c));
-                  if (search_box.contains ((*e).p2 ())) {
+                  if (hit_box.contains ((*e).p2 ())) {
                     edges.push_back (EdgeWithIndex (*e, n, nn, c));
                   } 
                 } 
@@ -816,9 +816,9 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box,
             db::Point pl;
             unsigned int n = 0;
             for (db::Shape::point_iterator pt = shape->begin_point (); pt != shape->end_point (); ++pt, ++n) {
-              if (search_box.contains (*pt)) {
+              if (hit_box.contains (*pt)) {
                 edges.push_back (EdgeWithIndex (db::Edge (*pt, *pt), n, n, 0));
-                if (pl_set && search_box.contains (pl)) {
+                if (pl_set && hit_box.contains (pl)) {
                   edges.push_back (EdgeWithIndex (db::Edge (pl, *pt), n - 1, n, 0));
                 }
               }
@@ -840,9 +840,9 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box,
               ++ee;
               unsigned int nn = ee.at_end () ? 0 : n + 1;
 
-              if (search_box.contains ((*e).p1 ())) {
+              if (hit_box.contains ((*e).p1 ())) {
                 edges.push_back (EdgeWithIndex (db::Edge ((*e).p1 (), (*e).p1 ()), n, n, 0));
-                if (search_box.contains ((*e).p2 ())) {
+                if (hit_box.contains ((*e).p2 ())) {
                   edges.push_back (EdgeWithIndex (*e, n, nn, 0));
                 } 
               } 
@@ -852,8 +852,21 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box,
           } else if (shape->is_text ()) {
 
             db::Point tp (shape->text_trans () * db::Point ());
-            if (search_box.contains (tp)) {
-              edges.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
+
+            if (text_info ()) {
+
+              db::CplxTrans t_dbu = db::CplxTrans (layout ().dbu ()) * t;
+              db::Box tb = t_dbu.inverted () * text_info ()->bbox (t_dbu * shape->text (), vp);
+              if (tb.inside (hit_box)) {
+                edges.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
+              }
+
+            } else {
+
+              if (hit_box.contains (tp)) {
+                edges.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
+              }
+
             }
 
           }
@@ -875,14 +888,14 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box,
 
     for (std::vector<int>::const_iterator l = layers ().begin (); l != layers ().end (); ++l) {
 
-      if (layers ().size () == 1 || (layers ().size () > 1 && cell.bbox ((unsigned int) *l).touches (search_box))) {
+      if (layers ().size () == 1 || (layers ().size () > 1 && cell.bbox ((unsigned int) *l).touches (hit_box))) {
 
         checkpoint ();
 
         const db::Shapes &shapes = cell.shapes (*l);
         std::vector <EdgeWithIndex> edge_sel;
 
-        db::ShapeIterator shape = shapes.begin_touching (search_box, flags (), prop_sel (), inv_prop_sel ());
+        db::ShapeIterator shape = shapes.begin_touching (scan_box, flags (), prop_sel (), inv_prop_sel ());
         while (! shape.at_end ()) {
 
           bool match = false;
@@ -983,11 +996,27 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box,
           } else if (shape->is_text ()) {
 
             db::Point tp (shape->text_trans () * db::Point ());
-            if (search_box.contains (tp)) {
-              d = tp.distance (search_box.center ());
-              edge_sel.clear ();
-              edge_sel.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
-              match = true;
+
+            if (text_info ()) {
+
+              db::CplxTrans t_dbu = db::CplxTrans (layout ().dbu ()) * t;
+              db::Box tb (t_dbu.inverted () * text_info ()->bbox (t_dbu * shape->text (), vp));
+              if (tb.contains (hit_box.center ())) {
+                d = tp.distance (hit_box.center ());
+                edge_sel.clear ();
+                edge_sel.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
+                match = true;
+              }
+
+            } else {
+
+              if (hit_box.contains (tp)) {
+                d = tp.distance (hit_box.center ());
+                edge_sel.clear ();
+                edge_sel.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
+                match = true;
+              }
+
             }
 
           }

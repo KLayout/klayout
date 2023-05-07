@@ -29,28 +29,26 @@
 namespace lay
 {
 
-TextInfo::TextInfo (const LayoutViewBase *view, const db::DCplxTrans &vp_trans)
+TextInfo::TextInfo (const LayoutViewBase *view)
   : m_default_text_size (view->default_text_size ()),
     m_default_font (db::Font (view->text_font ())),
     m_apply_text_trans (view->apply_text_trans ()),
-    m_resolution (view->canvas ()->resolution ()),
-    m_vp_trans (vp_trans)
+    m_resolution (view->canvas ()->resolution ())
 {
   //  .. nothing yet ..
 }
 
-TextInfo::TextInfo (double default_text_size, const db::Font &default_font, bool apply_text_trans, double resolution, const db::DCplxTrans &vp_trans)
+TextInfo::TextInfo (double default_text_size, const db::Font &default_font, bool apply_text_trans, double resolution)
   : m_default_text_size (default_text_size),
     m_default_font (default_font),
     m_apply_text_trans (apply_text_trans),
-    m_resolution (resolution),
-    m_vp_trans (vp_trans)
+    m_resolution (resolution)
 {
   //  .. nothing yet ..
 }
 
 db::DBox
-TextInfo::get_bbox (const db::DText &text) const
+TextInfo::bbox (const db::DText &text, const db::DCplxTrans &vp_trans) const
 {
   //  offset in pixels (space between origin and text)
   const double offset = 2.0;
@@ -60,10 +58,10 @@ TextInfo::get_bbox (const db::DText &text) const
   db::Font font = text.font () == db::NoFont ? m_default_font : text.font ();
 
   if (m_apply_text_trans && font != db::NoFont && font != db::DefaultFont) {
-    fp = db::DFTrans (m_vp_trans.fp_trans () * text.trans ().fp_trans ());
-    h = m_vp_trans.ctrans (text.size () > 0 ? text.size () : m_default_text_size);
+    fp = db::DFTrans (vp_trans.fp_trans () * text.trans ().fp_trans ());
+    h = vp_trans.ctrans (text.size () > 0 ? text.size () : m_default_text_size);
   } else {
-    h = m_vp_trans.ctrans (m_default_text_size);
+    h = vp_trans.ctrans (m_default_text_size);
   }
 
   db::HAlign halign = text.halign ();
@@ -156,12 +154,12 @@ TextInfo::get_bbox (const db::DText &text) const
 
     }
 
-    return db::DBox (xleft, ybottom, xright, ytop).transformed (m_vp_trans.inverted ());
+    return db::DBox (xleft, ybottom, xright, ytop).transformed (vp_trans.inverted ());
 
   } else {
 
     db::DHershey ht (text.string (), font);
-    ht.justify (b.transformed (m_vp_trans.inverted ()), halign, valign);
+    ht.justify (b.transformed (vp_trans.inverted ()), halign, valign);
     return ht.bbox ();
 
   }

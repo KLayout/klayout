@@ -472,6 +472,8 @@ Service::selection_bbox ()
   //  TODO: this is done multiple times - once for each service!
   TransformationVariants tv (view ());
 
+  lay::TextInfo text_info (view ());
+
   db::DBox box;
   for (objects::const_iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
 
@@ -486,7 +488,11 @@ Service::selection_bbox ()
       const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (r->cv_index (), r->layer ());
       if (tv_list != 0) {
         for (std::vector<db::DCplxTrans>::const_iterator t = tv_list->begin (); t != tv_list->end (); ++t) {
-          box += *t * (ctx_trans * r->shape ().bbox ());
+          if (r->shape ().is_text ()) {
+            box += *t * text_info.bbox (ctx_trans * r->shape ().text (), *t);
+          } else {
+            box += *t * (ctx_trans * r->shape ().bbox ());
+          }
         }
       }
 

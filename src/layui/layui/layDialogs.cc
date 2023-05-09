@@ -1192,7 +1192,9 @@ UserPropertiesForm::set_meta_info (db::Layout::meta_info_iterator begin_meta, db
   m_begin_meta = begin_meta;
   m_end_meta = end_meta;
 
+#if QT_VERSION >= 0x50F00
   mp_ui->mode_tab->setTabVisible (2, m_begin_meta != m_end_meta);
+#endif
 
   mp_ui->meta_info_list->clear ();
 

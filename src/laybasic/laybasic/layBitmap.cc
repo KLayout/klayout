@@ -847,7 +847,7 @@ Bitmap::render_text (const lay::RenderText &text)
 
       if (y > -0.5 && y < double (height () + ff.height () - 1) - 0.5) {
 
-        for ( ; cp1 != cp; ++cp1) {
+        while (cp1 != cp) {
 
           uint32_t c = tl::utf32_from_utf8 (cp1, cp);
           if (c < uint32_t (ff.first_char ()) || c >= uint32_t (ff.n_chars ()) + ff.first_char ()) {

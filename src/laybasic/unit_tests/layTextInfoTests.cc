@@ -46,7 +46,7 @@ TEST(1)
 
   lay::TextInfo ti (&lv);
   EXPECT_EQ (ti.bbox (text, db::DCplxTrans ()).to_string (), "(12,22;36,37)");
-  EXPECT_EQ (ti.bbox (text, db::DCplxTrans (2.0)).to_string (), "(6,11;18,18.5)");
+  EXPECT_EQ (ti.bbox (text, db::DCplxTrans (2.0)).to_string (), "(11,21;23,28.5)");
   EXPECT_EQ (ti.bbox (text2, db::DCplxTrans ()).to_string (), "(12,22;60,52)");
 
   text3 = text2;

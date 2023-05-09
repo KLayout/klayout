@@ -83,7 +83,7 @@ TextInfo::bbox (const db::DText &text, const db::DCplxTrans &vp_trans) const
 
   db::DVector tp1 (fx * offset, fy * offset + (fy - 1) * 0.5 * h);
   db::DVector tp2 (fx * offset, fy * offset + (fy + 1) * 0.5 * h);
-  db::DPoint dp = db::DPoint () + text.trans ().disp ();
+  db::DPoint dp = vp_trans * (db::DPoint () + text.trans ().disp ());
 
   db::DBox b (dp + fp (tp1), dp + fp (tp2));
 

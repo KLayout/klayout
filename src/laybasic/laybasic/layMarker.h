@@ -226,6 +226,12 @@ public:
 protected:
   void get_bitmaps (const Viewport &vp, ViewObjectCanvas &canvas, lay::CanvasPlane *&fill, lay::CanvasPlane *&frame, lay::CanvasPlane *&vertex, lay::CanvasPlane *&text);
 
+  lay::LayoutViewBase *view ()
+  {
+    return mp_view;
+  }
+
+private:
   tl::Color m_color;
   tl::Color m_frame_color;
   char m_line_width, m_vertex_size, m_halo;

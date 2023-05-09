@@ -192,11 +192,6 @@ public:
    */
   LayoutViewBase (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
 
-  /**
-   *  @brief Constructor
-   */
-  LayoutViewBase (lay::LayoutView *ui, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
-
   /** 
    *  @brief Destructor
    */
@@ -2861,8 +2856,6 @@ private:
 
   tl::Clock m_clock, m_last_checked;
 
-  void init (db::Manager *mgr);
-
   void do_prop_changed ();
   void do_redraw (int layer);
   void do_redraw ();
@@ -2891,6 +2884,13 @@ private:
   void merge_dither_pattern (lay::LayerPropertiesList &props);
 
 protected:
+  /**
+   *  @brief Constructor for calling from a LayoutView
+   */
+  LayoutViewBase (lay::LayoutView *ui, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
+
+  void init (db::Manager *mgr);
+
   lay::Plugin *active_plugin () const
   {
     return mp_active_plugin;

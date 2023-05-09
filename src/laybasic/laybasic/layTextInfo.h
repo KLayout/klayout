@@ -77,7 +77,6 @@ private:
   db::Font m_default_font;
   bool m_apply_text_trans;
   double m_resolution;
-  db::DCplxTrans m_vp_trans;
 };
 
 }

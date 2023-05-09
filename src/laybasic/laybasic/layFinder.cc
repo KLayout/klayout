@@ -118,7 +118,7 @@ Finder::start (lay::LayoutViewBase *view, unsigned int cv_index, const std::vect
     m_region = it * region;
     m_scan_region = it * scan_region;
 
-    do_find (*cv.cell (), int (cv.specific_path ().size ()), *t, cv.context_trans ());
+    do_find (*cv.cell (), int (cv.specific_path ().size ()), view->viewport ().trans () * *t, cv.context_trans ());
 
   }
 }
@@ -185,7 +185,7 @@ Finder::do_find (const db::Cell &cell, int level, const db::DCplxTrans &vp, cons
     }
 
   } else if (level < m_max_level 
-      && (t * m_cell_box_convert (cell)).touches (m_region) 
+      && (t * m_cell_box_convert (cell)).touches (m_scan_region)
       && (mp_view->select_inside_pcells_mode () || !cell.is_proxy ()) 
       && !mp_view->is_cell_hidden (cell.cell_index (), m_cv_index)) {
 
@@ -387,6 +387,7 @@ ShapeFinder::find_internal (lay::LayoutViewBase *view, unsigned int cv_index, co
   db::DBox scan_region_mu = region_mu;
   if (mp_text_info) {
     //  for catching all labels we search the whole view area
+    //  @@@ multiple passes - with and without texts (with texts with big area)
     scan_region_mu = view->viewport ().box ();
   }
 
@@ -580,7 +581,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
               }
 
               if (! match && box.contains (hit_box.center ())) {
-                d = t.ctrans (poly_dist (poly.begin_edge (), point)); 
+                d = t.ctrans (poly_dist (poly.begin_edge (), point));
                 match = true;
               }
 

@@ -104,21 +104,22 @@ TextInfo::bbox (const db::DText &text, const db::DCplxTrans &vp_trans) const
 
     //  compute the actual top left position
     double ytop;
+    double htot = double (ff.line_height () * (lines - 1) + ff.height ());
     if (valign == db::VAlignBottom || valign == db::NoVAlign) {
       ytop = b.bottom ();
-      ytop += double (ff.line_height () * (lines - 1) + ff.height ());
+      ytop += htot;
     } else if (valign == db::VAlignCenter) {
       ytop = b.center ().y ();
-      ytop += double ((ff.line_height () * (lines - 1) + ff.height ()) / 2);
+      ytop += htot * 0.5;
     } else {
       ytop = b.top ();
     }
 
     //  compute the bottom position
-    double ybottom = ytop - ff.line_height () * (lines - 1);
+    double ybottom = ytop - htot;
 
     //  left and right position
-    bool first = false;
+    bool first = true;
     double xleft = 0.0, xright = 0.0;
 
     const char *cp = text.string ();
@@ -140,7 +141,6 @@ TextInfo::bbox (const db::DText &text, const db::DCplxTrans &vp_trans) const
       } else {
         xl = b.left ();
       }
-      xl -= 0.5;
 
       double xr = xl + double (ff.width () * length);
 

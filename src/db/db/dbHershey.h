@@ -180,12 +180,11 @@ struct DB_PUBLIC_TEMPLATE hershey
    */
   db::DBox bbox () const
   {
-    db::DBox b = hershey_text_box (m_string, m_font) * (1.0 / m_scale);
+    db::DBox b = hershey_text_box (m_string, m_font);
     if (! m_linestarts.empty ()) {
-      return b.moved (m_linestarts.front () - db::DPoint ());
-    } else {
-      return b;
+      b.move (m_linestarts.back () - db::DPoint ());
     }
+    return b * m_scale;
   }
 
   /**

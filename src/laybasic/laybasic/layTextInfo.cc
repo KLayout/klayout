@@ -53,14 +53,14 @@ TextInfo::bbox (const db::DText &text, const db::DCplxTrans &vp_trans) const
   //  offset in pixels (space between origin and text)
   const double offset = 2.0;
 
-  db::DFTrans fp (db::DFTrans::r0);
+  db::DTrans tt = text.trans ();
   db::DCoord h;
   db::Font font = text.font () == db::NoFont ? m_default_font : text.font ();
 
   if (m_apply_text_trans && font != db::NoFont && font != db::DefaultFont) {
-    fp = db::DFTrans (vp_trans.fp_trans () * text.trans ().fp_trans ());
     h = vp_trans.ctrans (text.size () > 0 ? text.size () : m_default_text_size);
   } else {
+    tt = db::DTrans (tt.disp ());
     h = vp_trans.ctrans (m_default_text_size);
   }
 
@@ -83,9 +83,9 @@ TextInfo::bbox (const db::DText &text, const db::DCplxTrans &vp_trans) const
 
   db::DVector tp1 (fx * offset, fy * offset + (fy - 1) * 0.5 * h);
   db::DVector tp2 (fx * offset, fy * offset + (fy + 1) * 0.5 * h);
-  db::DPoint dp = vp_trans * (db::DPoint () + text.trans ().disp ());
+  db::DPoint dp = vp_trans * db::DPoint ();
 
-  db::DBox b (dp + fp (tp1), dp + fp (tp2));
+  db::DBox b (dp + tp1, dp + tp2);
 
   if (font == db::DefaultFont) {
 
@@ -154,13 +154,13 @@ TextInfo::bbox (const db::DText &text, const db::DCplxTrans &vp_trans) const
 
     }
 
-    return db::DBox (xleft, ybottom, xright, ytop).transformed (vp_trans.inverted ());
+    return db::DBox (xleft, ybottom, xright, ytop).transformed (vp_trans.inverted ()).transformed (tt);
 
   } else {
 
     db::DHershey ht (text.string (), font);
     ht.justify (b.transformed (vp_trans.inverted ()), halign, valign);
-    return ht.bbox ();
+    return ht.bbox ().transformed (tt);
 
   }
 }

@@ -384,13 +384,6 @@ ShapeFinder::find_internal (lay::LayoutViewBase *view, unsigned int cv_index, co
 
   m_topcell = cv.cell_index ();
 
-  db::DBox scan_region_mu = region_mu;
-  if (mp_text_info) {
-    //  for catching all labels we search the whole view area
-    //  @@@ multiple passes - with and without texts (with texts with big area)
-    scan_region_mu = view->viewport ().box ();
-  }
-
   mp_prop_sel = prop_sel;
   m_inv_prop_sel = inv_prop_sel;
 
@@ -405,12 +398,33 @@ ShapeFinder::find_internal (lay::LayoutViewBase *view, unsigned int cv_index, co
     max_level = hier_sel.to_level (ctx_path_length, max_level);
   }
 
-  //  actually find
+  auto flags_saved = m_flags;
+
   try {
-    start (view, m_cv_index, trans_mu, region_mu, scan_region_mu, min_level, max_level, layers);
+
+    if ((m_flags & db::ShapeIterator::Texts) != 0 && mp_text_info) {
+
+      m_flags = db::ShapeIterator::Texts;
+
+      //  for catching all labels we search the whole view area
+      db::DBox scan_region_mu = view->viewport ().box ();
+      start (view, m_cv_index, trans_mu, region_mu, scan_region_mu, min_level, max_level, layers);
+
+      m_flags = db::ShapeIterator::flags_type (flags_saved - db::ShapeIterator::Texts);
+
+    }
+
+    //  another pass with tight search box and without texts
+    start (view, m_cv_index, trans_mu, region_mu, region_mu, min_level, max_level, layers);
+
   } catch (StopException) {
-    // ..
+    //  ...
+  } catch (...) {
+    m_flags = flags_saved;
+    throw;
   }
+
+  m_flags = flags_saved;
 
   //  return true if anything was found
   return ! m_founds.empty ();
@@ -471,7 +485,9 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
           db::Box bbox;
           if (text_info () && shape->is_text ()) {
             db::CplxTrans t_dbu = db::CplxTrans (layout ().dbu ()) * t;
-            bbox = t_dbu.inverted () * text_info ()->bbox (t_dbu * shape->text (), vp);
+            db::Text text;
+            shape->text (text);
+            bbox = t_dbu.inverted () * text_info ()->bbox (t_dbu * text, vp);
           } else {
             bbox = shape->bbox ();
           }
@@ -565,7 +581,9 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
             db::Box box = shape->bbox ();
             if (text_info () && shape->is_text ()) {
               db::CplxTrans t_dbu = db::CplxTrans (layout ().dbu ()) * t;
-              box = t_dbu.inverted () * text_info ()->bbox (t_dbu * shape->text (), vp);
+              db::Text text;
+              shape->text (text);
+              box = t_dbu.inverted () * text_info ()->bbox (t_dbu * text, vp);
             }
 
             //  point-like boxes are handles which attract the finder

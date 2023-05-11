@@ -177,12 +177,15 @@ hershey_text_box (const std::string &s, unsigned int f)
   }
   hl += h;
 
-  return db::DBox (0, 0, wl, hl);
+  return db::DBox (0, fp->ymin, wl, hl);
 }
 
 void
-hershey_justify (const std::string &s, unsigned int f, db::DBox bx, HAlign halign, VAlign valign, std::vector<db::DPoint> &linestarts)
+hershey_justify (const std::string &s, unsigned int f, db::DBox bx, HAlign halign, VAlign valign, std::vector<db::DPoint> &linestarts, double &left, double &bottom)
 {
+  left = 0.0;
+  bottom = 0.0;
+
   HersheyFont *fp = fonts [f];
 
   int hl = 0;
@@ -234,6 +237,13 @@ hershey_justify (const std::string &s, unsigned int f, db::DBox bx, HAlign halig
       p += db::DVector (0, l->y ());
     }
     *l = p;
+    if (l == linestarts.begin ()) {
+      left = l->x ();
+      bottom = l->y ();
+    } else {
+      left = std::min (left, l->x ());
+      bottom = std::min (bottom, l->y ());
+    }
   }
 }
 

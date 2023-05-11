@@ -856,7 +856,9 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
             if (text_info ()) {
 
               db::CplxTrans t_dbu = db::CplxTrans (layout ().dbu ()) * t;
-              db::Box tb = t_dbu.inverted () * text_info ()->bbox (t_dbu * shape->text (), vp);
+              db::Text text;
+              shape->text (text);
+              db::Box tb = t_dbu.inverted () * text_info ()->bbox (t_dbu * text, vp);
               if (tb.inside (hit_box)) {
                 edges.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
               }
@@ -1000,7 +1002,9 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
             if (text_info ()) {
 
               db::CplxTrans t_dbu = db::CplxTrans (layout ().dbu ()) * t;
-              db::Box tb (t_dbu.inverted () * text_info ()->bbox (t_dbu * shape->text (), vp));
+              db::Text text;
+              shape->text (text);
+              db::Box tb (t_dbu.inverted () * text_info ()->bbox (t_dbu * text, vp));
               if (tb.contains (hit_box.center ())) {
                 d = tp.distance (hit_box.center ());
                 edge_sel.clear ();

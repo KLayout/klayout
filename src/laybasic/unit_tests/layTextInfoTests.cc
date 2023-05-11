@@ -44,46 +44,70 @@ TEST(1)
 
   db::DText text3;
 
+  //  Default font
   lay::TextInfo ti (&lv);
   EXPECT_EQ (ti.bbox (text, db::DCplxTrans ()).to_string (), "(12,22;36,37)");
   EXPECT_EQ (ti.bbox (text, db::DCplxTrans (2.0)).to_string (), "(11,21;23,28.5)");
   EXPECT_EQ (ti.bbox (text2, db::DCplxTrans ()).to_string (), "(12,22;60,52)");
 
+  //  valign
   text3 = text2;
   text3.valign (db::VAlignCenter);
   EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(12,5;60,35)");
   text3.valign (db::VAlignTop);
   EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(12,-12;60,18)");
 
+  //  halign
   text3 = text2;
   text3.halign (db::HAlignCenter);
   EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(-14,22;34,52)");
   text3.halign (db::HAlignRight);
   EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(-40,22;8,52)");
 
+  //  Herschey font
   lv.text_font (db::Font::StickFont);
   ti = lay::TextInfo (&lv);
 
-  EXPECT_EQ (ti.bbox (text, db::DCplxTrans ()).to_string (), "(12,22;72,47)");
-  EXPECT_EQ (ti.bbox (text2, db::DCplxTrans ()).to_string (), "(12,22;134,83)");
+  EXPECT_EQ (ti.bbox (text, db::DCplxTrans ()).to_string (), "(12,15;72,47)");
+  EXPECT_EQ (ti.bbox (text2, db::DCplxTrans ()).to_string (), "(12,15;134,83)");
 
+  //  valign
   text3 = text2;
   text3.valign (db::VAlignCenter);
-  EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(12,-10.5;134,50.5)");
+  EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(12,-17.5;134,50.5)");
   text3.valign (db::VAlignTop);
-  EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(12,-43;134,18)");
+  EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(12,-50;134,18)");
 
+  //  halign
   text3 = text2;
   text3.halign (db::HAlignCenter);
-  EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(-51,22;71,83)");
+  EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(-51,15;71,83)");
   text3.halign (db::HAlignRight);
-  EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(-114,22;8,83)");
+  EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(-114,15;8,83)");
 
+  //  smaller size as default
   lv.default_text_size (4.2);
   ti = lay::TextInfo (&lv);
 
-  EXPECT_EQ (ti.bbox (text, db::DCplxTrans ()).to_string (), "(12,22;24,27)");
-  EXPECT_EQ (ti.bbox (text2, db::DCplxTrans ()).to_string (), "(12,22;36.4,34.2)");
+  EXPECT_EQ (ti.bbox (text, db::DCplxTrans ()).to_string (), "(12,20.6;24,27)");
+  EXPECT_EQ (ti.bbox (text2, db::DCplxTrans ()).to_string (), "(12,20.6;36.4,34.2)");
 
+  //  text with explicit size
+  text3 = text2;
+  text3.size (21);
+  EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(12,15;134,83)");
 
+  //  text with rotation
+  text3.trans (db::DTrans (1, db::DVector (10.0, 20.0)));
+  EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(-53,22;15,144)");
+
+  //  text with rotation and default font (-> rotation ignored)
+  text3.font (db::Font::DefaultFont);
+  EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(12,22;60,52)");
+  text3.font (db::Font::StickFont);
+
+  //  apply_text_trans = false
+  lv.apply_text_trans (false);
+  ti = lay::TextInfo (&lv);
+  EXPECT_EQ (ti.bbox (text3, db::DCplxTrans ()).to_string (), "(12,20.6;36.4,34.2)");
 }

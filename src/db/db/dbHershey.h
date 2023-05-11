@@ -38,7 +38,7 @@ struct HersheyFont;
 DB_PUBLIC int hershey_font_width (unsigned int f);
 DB_PUBLIC int hershey_font_height (unsigned int f);
 DB_PUBLIC db::DBox hershey_text_box (const std::string &s, unsigned int f);
-DB_PUBLIC void hershey_justify (const std::string &s, unsigned int f, db::DBox bx, HAlign halign, VAlign valign, std::vector<db::DPoint> &linestarts);
+DB_PUBLIC void hershey_justify (const std::string &s, unsigned int f, db::DBox bx, HAlign halign, VAlign valign, std::vector<db::DPoint> &linestarts, double &left, double &bottom);
 DB_PUBLIC std::vector<std::string> hershey_font_names ();
 DB_PUBLIC size_t hershey_count_edges (const std::string &s, unsigned int f);
 
@@ -137,7 +137,8 @@ struct DB_PUBLIC_TEMPLATE hershey
   hershey () 
     : m_string (), 
       m_font (DefaultFont),
-      m_scale (1.0)
+      m_scale (1.0),
+      m_left (0.0), m_bottom (0.0)
   {
     // .. nothing yet ..
   }
@@ -150,7 +151,8 @@ struct DB_PUBLIC_TEMPLATE hershey
   hershey (const std::string &s, Font f) 
     : m_string (s), 
       m_font (f),
-      m_scale (1.0)
+      m_scale (1.0),
+      m_left (0.0), m_bottom (0.0)
   {
     // .. nothing yet ..
   }
@@ -181,9 +183,7 @@ struct DB_PUBLIC_TEMPLATE hershey
   db::DBox bbox () const
   {
     db::DBox b = hershey_text_box (m_string, m_font);
-    if (! m_linestarts.empty ()) {
-      b.move (m_linestarts.back () - db::DPoint ());
-    }
+    b.move (db::DVector (m_left, m_bottom));
     return b * m_scale;
   }
 
@@ -220,7 +220,7 @@ struct DB_PUBLIC_TEMPLATE hershey
 
         db::DPoint p1 (b.p1 ().x () / m_scale, b.p1 ().y () / m_scale);
         db::DPoint p2 (b.p2 ().x () / m_scale, b.p2 ().y () / m_scale);
-        hershey_justify (m_string, m_font, db::DBox (p1, p2), halign, valign, m_linestarts);
+        hershey_justify (m_string, m_font, db::DBox (p1, p2), halign, valign, m_linestarts, m_left, m_bottom);
 
       } else {
 
@@ -245,7 +245,7 @@ struct DB_PUBLIC_TEMPLATE hershey
         if (m_scale > 1e-6) {
           db::DPoint p1 (b.p1 ().x () / m_scale, b.p1 ().y () / m_scale);
           db::DPoint p2 (b.p2 ().x () / m_scale, b.p2 ().y () / m_scale);
-          hershey_justify (m_string, m_font, db::DBox (p1, p2), halign, valign, m_linestarts);
+          hershey_justify (m_string, m_font, db::DBox (p1, p2), halign, valign, m_linestarts, m_left, m_bottom);
         }
 
       }
@@ -294,6 +294,7 @@ private:
   Font m_font;
   double m_scale;
   std::vector <db::DPoint> m_linestarts;
+  double m_left, m_bottom;
 };
 
 /**

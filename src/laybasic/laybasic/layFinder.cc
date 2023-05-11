@@ -137,8 +137,11 @@ Finder::test_edge (const db::ICplxTrans &trans, const db::Edge &edg, double &dis
     double d1 = p1.double_distance (m_region.center ());
     double d2 = p2.double_distance (m_region.center ());
 
-    //  snap to the point - nothing can get closer
-    distance = 0.0;
+    double d = std::min (d1, d2);
+    if (! match || d < distance) {
+      distance = d;
+    }
+
     if (d1 < d2) {
       ret = 1;
     } else {

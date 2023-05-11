@@ -51,17 +51,17 @@ db::DBox
 TextInfo::bbox (const db::DText &text, const db::DCplxTrans &vp_trans) const
 {
   //  offset in pixels (space between origin and text)
-  const double offset = 2.0;
+  const double offset = 2.0 / vp_trans.mag ();
 
   db::DTrans tt = text.trans ();
   db::DCoord h;
   db::Font font = text.font () == db::NoFont ? m_default_font : text.font ();
 
   if (m_apply_text_trans && font != db::NoFont && font != db::DefaultFont) {
-    h = vp_trans.ctrans (text.size () > 0 ? text.size () : m_default_text_size);
+    h = text.size () > 0 ? text.size () : m_default_text_size;
   } else {
-    tt = db::DTrans (tt.disp ());
-    h = vp_trans.ctrans (m_default_text_size);
+    tt = db::DTrans (vp_trans.fp_trans ().inverted ().angle (), tt.disp ());
+    h = m_default_text_size;
   }
 
   db::HAlign halign = text.halign ();
@@ -81,13 +81,12 @@ TextInfo::bbox (const db::DText &text, const db::DCplxTrans &vp_trans) const
     fx = -1.0;
   }
 
-  db::DVector tp1 (fx * offset, fy * offset + (fy - 1) * 0.5 * h);
-  db::DVector tp2 (fx * offset, fy * offset + (fy + 1) * 0.5 * h);
-  db::DPoint dp = vp_trans * db::DPoint ();
-
-  db::DBox b (dp + tp1, dp + tp2);
+  db::DPoint dp1 (fx * offset, fy * offset + (fy - 1) * 0.5 * h);
+  db::DPoint dp2 (fx * offset, fy * offset + (fy + 1) * 0.5 * h);
 
   if (font == db::DefaultFont) {
+
+    db::DBox b (dp1 * vp_trans.mag (), dp2 * vp_trans.mag ());
 
     const lay::FixedFont &ff = lay::FixedFont::get_font (m_resolution);
 
@@ -154,12 +153,12 @@ TextInfo::bbox (const db::DText &text, const db::DCplxTrans &vp_trans) const
 
     }
 
-    return db::DBox (xleft, ybottom, xright, ytop).transformed (vp_trans.inverted ()).transformed (tt);
+    return (db::DBox (xleft, ybottom, xright, ytop) * (1.0 / vp_trans.mag ())).transformed (tt);
 
   } else {
 
     db::DHershey ht (text.string (), font);
-    ht.justify (b.transformed (vp_trans.inverted ()), halign, valign);
+    ht.justify (db::DBox (dp1, dp2), halign, valign);
     return ht.bbox ().transformed (tt);
 
   }

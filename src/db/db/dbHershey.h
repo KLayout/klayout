@@ -224,7 +224,7 @@ struct DB_PUBLIC_TEMPLATE hershey
 
       } else {
 
-        if (b.width () > 0 && b.height () > 0) {
+        if (coord_traits::less (0, b.width ()) && coord_traits::less (0, b.height ())) {
 
           db::DBox tbx (hershey_text_box (m_string, m_font));
           double fx = double (b.width ()) / double (tbx.width ());
@@ -232,11 +232,11 @@ struct DB_PUBLIC_TEMPLATE hershey
           double f = std::min (fx, fy);
           m_scale = f * (1.0 - 2.0 * margin);
 
-        } else if (b.width () > 0) {
+        } else if (coord_traits::less (0, b.width ())) {
 
           m_scale = double (b.width ()) / double (hershey_font_width (m_font));
 
-        } else if (b.height () > 0) {
+        } else if (coord_traits::less (0, b.height ())) {
 
           m_scale = double (b.height ()) / double (hershey_font_height (m_font));
 

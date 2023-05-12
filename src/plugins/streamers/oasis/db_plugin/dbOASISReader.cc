@@ -37,12 +37,10 @@ namespace db
 {
 
 // ---------------------------------------------------------------
-
-// ---------------------------------------------------------------
 //  OASISReader
 
 OASISReader::OASISReader (tl::InputStream &s)
-  : m_stream (s), 
+  : m_stream (s),
     m_progress (tl::to_string (tr ("Reading OASIS file")), 10000),
     m_dbu (0.001),
     m_expect_strict_mode (-1),
@@ -113,7 +111,7 @@ OASISReader::init (const db::LoadLayoutOptions &options)
   m_expect_strict_mode = oasis_options.expect_strict_mode;
 }
 
-inline long long 
+inline long long
 OASISReader::get_long_long ()
 {
   unsigned long long u = get_ulong_long ();
@@ -124,13 +122,13 @@ OASISReader::get_long_long ()
   }
 }
 
-inline unsigned long long 
+inline unsigned long long
 OASISReader::get_ulong_long ()
 {
   unsigned long long v = 0;
   unsigned long long vm = 1;
   char c;
-  
+
   do {
     unsigned char *b = (unsigned char *) m_stream.get (1);
     if (! b) {
@@ -138,7 +136,7 @@ OASISReader::get_ulong_long ()
       return 0;
     }
     c = *b;
-    if (vm > std::numeric_limits <unsigned long long>::max () / 128 && 
+    if (vm > std::numeric_limits <unsigned long long>::max () / 128 &&
         (unsigned long long) (c & 0x7f) > (std::numeric_limits <unsigned long long>::max () / vm)) {
       error (tl::to_string (tr ("Unsigned long value overflow")));
     }
@@ -149,7 +147,7 @@ OASISReader::get_ulong_long ()
   return v;
 }
 
-inline long 
+inline long
 OASISReader::get_long ()
 {
   unsigned long u = get_ulong ();
@@ -170,13 +168,13 @@ OASISReader::get_ulong_for_divider ()
   return l;
 }
 
-inline unsigned long 
+inline unsigned long
 OASISReader::get_ulong ()
 {
   unsigned long v = 0;
   unsigned long vm = 1;
   char c;
-  
+
   do {
     unsigned char *b = (unsigned char *) m_stream.get (1);
     if (! b) {
@@ -184,7 +182,7 @@ OASISReader::get_ulong ()
       return 0;
     }
     c = *b;
-    if (vm > std::numeric_limits <unsigned long>::max () / 128 && 
+    if (vm > std::numeric_limits <unsigned long>::max () / 128 &&
         (unsigned long) (c & 0x7f) > (std::numeric_limits <unsigned long>::max () / vm)) {
       error (tl::to_string (tr ("Unsigned long value overflow")));
     }
@@ -195,7 +193,7 @@ OASISReader::get_ulong ()
   return v;
 }
 
-inline int 
+inline int
 OASISReader::get_int ()
 {
   unsigned int u = get_uint ();
@@ -206,13 +204,13 @@ OASISReader::get_int ()
   }
 }
 
-inline unsigned int 
+inline unsigned int
 OASISReader::get_uint ()
 {
   unsigned int v = 0;
   unsigned int vm = 1;
   char c;
-  
+
   do {
     unsigned char *b = (unsigned char *) m_stream.get (1);
     if (! b) {
@@ -220,7 +218,7 @@ OASISReader::get_uint ()
       return 0;
     }
     c = *b;
-    if (vm > std::numeric_limits <unsigned int>::max () / 128 && 
+    if (vm > std::numeric_limits <unsigned int>::max () / 128 &&
         (unsigned int) (c & 0x7f) > (std::numeric_limits <unsigned int>::max () / vm)) {
       error (tl::to_string (tr ("Unsigned integer value overflow")));
     }
@@ -231,7 +229,7 @@ OASISReader::get_uint ()
   return v;
 }
 
-std::string 
+std::string
 OASISReader::get_str ()
 {
   std::string s;
@@ -260,11 +258,11 @@ OASISReader::get_real ()
 
   if (t == 0) {
 
-    return double (get_ulong ()); 
+    return double (get_ulong ());
 
   } else if (t == 1) {
 
-    return -double (get_ulong ()); 
+    return -double (get_ulong ());
 
   } else if (t == 2) {
 
@@ -447,7 +445,7 @@ OASISReader::get_gdelta (long grid)
         ly > (long long) (std::numeric_limits <db::Coord>::max ())) {
       error (tl::to_string (tr ("Coordinate value overflow")));
     }
-    
+
     return db::Vector (db::Coord (lx), db::Coord (ly));
 
   } else {
@@ -482,13 +480,13 @@ OASISReader::get_gdelta (long grid)
   }
 }
 
-void 
+void
 OASISReader::error (const std::string &msg)
 {
   throw OASISReaderException (msg, m_stream.pos (), m_cellname.c_str ());
 }
 
-void 
+void
 OASISReader::warn (const std::string &msg, int wl)
 {
   if (warn_level () < wl) {
@@ -499,7 +497,7 @@ OASISReader::warn (const std::string &msg, int wl)
     error (msg);
   } else {
     // TODO: compress
-    tl::warn << msg 
+    tl::warn << msg
              << tl::to_string (tr (" (position=")) << m_stream.pos ()
              << tl::to_string (tr (", cell=")) << m_cellname
              << ")";
@@ -518,7 +516,7 @@ struct LNameJoinOp1
 };
 
 /**
- *  @brief A helper class to join two layer map members 
+ *  @brief A helper class to join two layer map members
  *  This implementation basically merged the datatype maps.
  */
 struct LNameJoinOp2
@@ -535,16 +533,16 @@ struct LNameJoinOp2
  *
  *  This method will update m_table_start which is the location used as
  *  the start position of a strict mode table. Every record except CBLOCK
- *  will update this position to point after the record. Hence m_table_start 
- *  points to the beginning of a table when PROPNAME, CELLNAME or any 
+ *  will update this position to point after the record. Hence m_table_start
+ *  points to the beginning of a table when PROPNAME, CELLNAME or any
  *  other table-contained record is encountered.
  *  Since CBLOCK does not update this record, the position of the table will
  *  be the location of CBLOCK rather than that of the name record itself.
- *  PAD records will also call this method, so the beginning of a table 
+ *  PAD records will also call this method, so the beginning of a table
  *  is right after any preceding PAD records and exactly at the location
  *  of the first name record after PADs.
  */
-void 
+void
 OASISReader::mark_start_table ()
 {
   //  we need to this this to really finish a CBLOCK - this is a flaw
@@ -556,7 +554,7 @@ OASISReader::mark_start_table ()
   m_table_start = m_stream.pos ();
 }
 
-void 
+void
 OASISReader::read_offset_table ()
 {
   unsigned int of = 0;
@@ -599,15 +597,29 @@ OASISReader::read_offset_table ()
 
 static const char magic_bytes[] = { "%SEMI-OASIS\015\012" };
 
-void 
+static const char *klayout_context_propname = "KLAYOUT_CONTEXT";
+static const char *s_gds_property_propname = "S_GDS_PROPERTY";
+
+static LayoutOrCellContextInfo
+make_context_info (const std::vector<tl::Variant> &context_properties)
+{
+  std::vector<std::string> context_strings;
+  context_strings.reserve (context_properties.size ());
+  for (auto s = context_properties.begin (); s != context_properties.end (); ++s) {
+    context_strings.push_back (s->to_string ());
+  }
+  return LayoutOrCellContextInfo::deserialize (context_strings.begin (), context_strings.end ());
+}
+
+void
 OASISReader::do_read (db::Layout &layout)
 {
   unsigned char r;
   char *mb;
 
   //  prepare
-  m_s_gds_property_name_id = layout.properties_repository ().prop_name_id ("S_GDS_PROPERTY");
-  m_klayout_context_property_name_id = layout.properties_repository ().prop_name_id ("KLAYOUT_CONTEXT");
+  m_s_gds_property_name_id = layout.properties_repository ().prop_name_id (s_gds_property_propname);
+  m_klayout_context_property_name_id = layout.properties_repository ().prop_name_id (klayout_context_propname);
 
   //  read magic bytes
   mb = (char *) m_stream.get (sizeof (magic_bytes) - 1);
@@ -676,10 +688,13 @@ OASISReader::do_read (db::Layout &layout)
   m_propstrings.clear ();
   m_propnames.clear ();
 
+  m_context_strings_per_cell.clear ();
+
   m_instances.clear ();
   m_instances_with_props.clear ();
 
   db::PropertiesRepository::properties_set layout_properties;
+  std::vector <tl::Variant> context_properties;
 
   mark_start_table ();
 
@@ -827,41 +842,118 @@ OASISReader::do_read (db::Layout &layout)
       std::map <unsigned long, db::property_names_id_type>::iterator pf = m_propname_forward_references.find (id);
       if (pf != m_propname_forward_references.end ()) {
 
-        if (name == "S_GDS_PROPERTY") {
+        bool is_s_gds_property = false;
+        bool is_klayout_context_property = false;
+
+        if (name == s_gds_property_propname) {
+          is_s_gds_property = true;
+        } else if (name == klayout_context_propname) {
+          is_klayout_context_property = true;
+        }
+
+        //  handle special case of forward references to S_GDS_PROPERTY and KLAYOUT_CONTEXT
+        if (is_s_gds_property || is_klayout_context_property) {
 
           db::PropertiesRepository &rep = layout.properties_repository ();
-          db::property_names_id_type s_gds_name_id = pf->second;
 
-          //  exchange the properties in the repository: first locate all
-          //  property sets that are affected
-          std::vector <db::properties_id_type> pids;
-          for (db::PropertiesRepository::iterator p = rep.begin (); p != rep.end (); ++p) {
-            if (p->second.find (s_gds_name_id) != p->second.end ()) {
-              pids.push_back (p->first);
+          //  exchange properties in layout_properties
+          db::PropertiesRepository::properties_set new_set;
+
+          for (db::PropertiesRepository::properties_set::const_iterator s = layout_properties.begin (); s != layout_properties.end (); ++s) {
+            if (s->first == pf->second && is_s_gds_property) {
+
+              //  S_GDS_PROPERTY translation
+              if (!s->second.is_list () || s->second.get_list ().size () != 2) {
+                error (tl::to_string (tr ("S_GDS_PROPERTY must have a value list with exactly two elements")));
+              }
+
+              new_set.insert (std::make_pair (rep.prop_name_id (s->second.get_list () [0]), s->second.get_list () [1]));
+
+            } else if (s->first == pf->second && is_klayout_context_property) {
+
+              //  feed context strings from klayout context property
+              if (s->second.is_list ()) {
+                for (auto l = s->second.begin (); l != s->second.end (); ++l) {
+                  context_properties.push_back (*l);
+                }
+              } else {
+                context_properties.push_back (s->second);
+              }
+
+            } else {
+              new_set.insert (*s);
+            }
+          }
+
+          new_set.swap (layout_properties);
+
+          //  exchange the properties in the repository
+
+          //  first locate all property sets that are affected
+          std::map<db::properties_id_type, std::vector<db::cell_index_type> > cells_by_pid;
+          for (auto p = rep.begin (); p != rep.end (); ++p) {
+            if (p->second.find (pf->second) != p->second.end ()) {
+              cells_by_pid.insert (std::make_pair (p->first, std::vector<db::cell_index_type> ()));
+            }
+          }
+
+          //  find cells using a specific pid
+          for (auto i = layout.begin (); i != layout.end (); ++i) {
+            auto cc = cells_by_pid.find (i->prop_id ());
+            if (cc != cells_by_pid.end ()) {
+              cc->second.push_back (i->cell_index ());
             }
           }
 
           //  create new property sets for the ones we found
-          for (std::vector <db::properties_id_type>::const_iterator pid = pids.begin (); pid != pids.end (); ++pid) {
+          for (auto pid = cells_by_pid.begin (); pid != cells_by_pid.end (); ++pid) {
 
-            const db::PropertiesRepository::properties_set &old_set = rep.properties (*pid);
+            const db::PropertiesRepository::properties_set &old_set = rep.properties (pid->first);
             db::PropertiesRepository::properties_set new_set;
 
-            for (db::PropertiesRepository::properties_set::const_iterator s = old_set.begin (); s != old_set.end (); ++s) {
-              if (s->first == s_gds_name_id) {
+            for (auto s = old_set.begin (); s != old_set.end (); ++s) {
+              if (s->first == pf->second && is_s_gds_property) {
 
+                //  S_GDS_PROPERTY translation
                 if (!s->second.is_list () || s->second.get_list ().size () != 2) {
                   error (tl::to_string (tr ("S_GDS_PROPERTY must have a value list with exactly two elements")));
                 }
 
                 new_set.insert (std::make_pair (rep.prop_name_id (s->second.get_list () [0]), s->second.get_list () [1]));
 
+              } else if (s->first == pf->second && is_klayout_context_property) {
+
+                auto pid2c = cells_by_pid.find (pid->first);
+
+                if (pid->first == layout.prop_id ()) {
+                  //  feed context strings from klayout context property
+                  if (s->second.is_list ()) {
+                    for (auto l = s->second.begin (); l != s->second.end (); ++l) {
+                      context_properties.push_back (*l);
+                    }
+                  } else {
+                    context_properties.push_back (s->second);
+                  }
+                }
+
+                //  feed cell-specific context strings from klayout context property
+                for (auto c = pid2c->second.begin (); c != pid2c->second.end (); ++c) {
+                  std::vector<tl::Variant> &vl = m_context_strings_per_cell [*c];
+                  if (s->second.is_list ()) {
+                    for (auto l = s->second.begin (); l != s->second.end (); ++l) {
+                      vl.push_back (*l);
+                    }
+                  } else {
+                    vl.push_back (s->second);
+                  }
+                }
+
               } else {
                 new_set.insert (*s);
               }
             }
 
-            rep.change_properties (*pid, new_set);
+            rep.change_properties (pid->first, new_set);
 
           }
 
@@ -940,7 +1032,7 @@ OASISReader::do_read (db::Layout &layout)
         layout_properties.clear ();
       }
 
-      //  read a layer name 
+      //  read a layer name
       std::string name = get_str ();
 
       db::ld_type dt1 = 0, dt2 = std::numeric_limits<db::ld_type>::max () - 1;
@@ -1000,7 +1092,12 @@ OASISReader::do_read (db::Layout &layout)
         read_properties (layout.properties_repository ());
       }
 
-      store_last_properties (layout.properties_repository (), layout_properties, true);
+      if (! mm_last_property_is_sprop.get () && mm_last_property_name.get () == m_klayout_context_property_name_id) {
+        context_properties.insert (context_properties.end (), mm_last_value_list.get ().begin (), mm_last_value_list.get ().end ());
+      } else {
+        //  store cell properties
+        store_last_properties (layout.properties_repository (), layout_properties, true);
+      }
 
       mark_start_table ();
 
@@ -1138,54 +1235,19 @@ OASISReader::do_read (db::Layout &layout)
   //  resolve all propvalue forward referenced
   if (! m_propvalue_forward_references.empty ()) {
 
-    for (db::PropertiesRepository::non_const_iterator pi = layout.properties_repository ().begin_non_const (); pi != layout.properties_repository ().end_non_const (); ++pi) {
-
-      for (db::PropertiesRepository::properties_set::iterator ps = pi->second.begin (); ps != pi->second.end (); ++ps) {
-
-        if (ps->second.is_id ()) {
-
-          unsigned long id = (unsigned long) ps->second.to_id ();
-          std::map <unsigned long, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
-          if (fw != m_propvalue_forward_references.end ()) {
-            ps->second = tl::Variant (fw->second);
-          } else {
-            error (tl::sprintf (tl::to_string (tr ("No property value defined for property value id %ld")), id));
-          }
-
-        } else if (ps->second.is_list ()) {
-
-          //  Replace list elements as well
-          //  TODO: Q: can there be a list of lists? would need recursive replacement -> make that a method of tl::Variant
-
-          const std::vector<tl::Variant> &l = ps->second.get_list ();
-          bool needs_replacement = false;
-          for (std::vector<tl::Variant>::const_iterator ll = l.begin (); ll != l.end () && ! needs_replacement; ++ll) {
-            needs_replacement = ll->is_id ();
-          }
-
-          if (needs_replacement) {
-
-            std::vector<tl::Variant> new_list (l);
-            for (std::vector<tl::Variant>::iterator ll = new_list.begin (); ll != new_list.end (); ++ll) {
-              if (ll->is_id ()) {
-                unsigned long id = (unsigned long) ll->to_id ();
-                std::map <unsigned long, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
-                if (fw != m_propvalue_forward_references.end ()) {
-                  *ll = tl::Variant (fw->second);
-                } else {
-                  error (tl::sprintf (tl::to_string (tr ("No property value defined for property value id %ld")), id));
-                }
-              }
-            }
-
-            ps->second = tl::Variant (new_list.begin (), new_list.end ());
-
-          }
-
-        }
-
+    for (auto i = context_properties.begin (); i != context_properties.end (); ++i) {
+      replace_forward_references_in_variant (*i);
+    }
+    for (auto c = m_context_strings_per_cell.begin (); c != m_context_strings_per_cell.end (); ++c) {
+      for (auto i = c->second.begin (); i != c->second.end (); ++i) {
+        replace_forward_references_in_variant (*i);
       }
+    }
 
+    for (db::PropertiesRepository::non_const_iterator pi = layout.properties_repository ().begin_non_const (); pi != layout.properties_repository ().end_non_const (); ++pi) {
+      for (db::PropertiesRepository::properties_set::iterator ps = pi->second.begin (); ps != pi->second.end (); ++ps) {
+        replace_forward_references_in_variant (ps->second);
+      }
     }
 
     m_propvalue_forward_references.clear ();
@@ -1213,6 +1275,24 @@ OASISReader::do_read (db::Layout &layout)
 
   }
 
+  //  Restore layout meta info
+  if (! context_properties.empty ()) {
+    LayoutOrCellContextInfo info = make_context_info (context_properties);
+    layout.fill_meta_info_from_context (info);
+  }
+
+  //  Restore proxy cell (link to PCell or Library) and cell meta info
+  if (! m_context_strings_per_cell.empty ()) {
+    CommonReaderLayerMapping layer_mapping (this, &layout);
+    for (auto cc = m_context_strings_per_cell.begin (); cc != m_context_strings_per_cell.end (); ++cc) {
+      LayoutOrCellContextInfo info = make_context_info (cc->second);
+      if (info.has_proxy_info ()) {
+        layout.recover_proxy_as (cc->first, info, &layer_mapping);
+      }
+      layout.fill_meta_info_from_context (cc->first, info);
+    }
+  }
+
   //  Check the table offsets vs. real occurrence
   if (m_first_cellname != 0 && m_first_cellname != m_table_cellname && m_expect_strict_mode == 1) {
     warn (tl::sprintf (tl::to_string (tr ("CELLNAME table offset does not match first occurrence of CELLNAME in strict mode - %s vs. %s")), m_table_cellname, m_first_cellname));
@@ -1228,6 +1308,52 @@ OASISReader::do_read (db::Layout &layout)
   }
   if (m_first_textstring != 0 && m_first_textstring != m_table_textstring && m_expect_strict_mode == 1) {
     warn (tl::sprintf (tl::to_string (tr ("TEXTSTRING table offset does not match first occurrence of TEXTSTRING in strict mode - %s vs. %s")), m_table_textstring, m_first_textstring));
+  }
+}
+
+void
+OASISReader::replace_forward_references_in_variant (tl::Variant &v)
+{
+  if (v.is_id ()) {
+
+    unsigned long id = (unsigned long) v.to_id ();
+    std::map <unsigned long, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
+    if (fw != m_propvalue_forward_references.end ()) {
+      v = tl::Variant (fw->second);
+    } else {
+      error (tl::sprintf (tl::to_string (tr ("No property value defined for property value id %ld")), id));
+    }
+
+  } else if (v.is_list ()) {
+
+    //  Replace list elements as well
+    //  TODO: Q: can there be a list of lists? would need recursive replacement -> make that a method of tl::Variant
+
+    const std::vector<tl::Variant> &l = v.get_list ();
+    bool needs_replacement = false;
+    for (std::vector<tl::Variant>::const_iterator ll = l.begin (); ll != l.end () && ! needs_replacement; ++ll) {
+      needs_replacement = ll->is_id ();
+    }
+
+    if (needs_replacement) {
+
+      std::vector<tl::Variant> new_list (l);
+      for (std::vector<tl::Variant>::iterator ll = new_list.begin (); ll != new_list.end (); ++ll) {
+        if (ll->is_id ()) {
+          unsigned long id = (unsigned long) ll->to_id ();
+          std::map <unsigned long, std::string>::const_iterator fw = m_propvalue_forward_references.find (id);
+          if (fw != m_propvalue_forward_references.end ()) {
+            *ll = tl::Variant (fw->second);
+          } else {
+            error (tl::sprintf (tl::to_string (tr ("No property value defined for property value id %ld")), id));
+          }
+        }
+      }
+
+      v = tl::Variant (new_list.begin (), new_list.end ());
+
+    }
+
   }
 }
 
@@ -1251,7 +1377,7 @@ OASISReader::store_last_properties (db::PropertiesRepository &rep, db::Propertie
     //  Special properties are not turned into user properties except S_GDS_PROPERTY.
     //  This is mode is used for cells and layouts so the standard properties do not appear as user properties.
     //  For shapes we need to keep the special ones since they may be forward-references S_GDS_PROPERTY names.
-    
+
   } else if (mm_last_value_list.get ().size () == 0) {
     properties.insert (std::make_pair (mm_last_property_name.get (), tl::Variant ()));
   } else if (mm_last_value_list.get ().size () == 1) {
@@ -1261,7 +1387,7 @@ OASISReader::store_last_properties (db::PropertiesRepository &rep, db::Propertie
   }
 }
 
-std::pair <bool, db::properties_id_type> 
+std::pair <bool, db::properties_id_type>
 OASISReader::read_element_properties (db::PropertiesRepository &rep, bool ignore_special)
 {
   db::PropertiesRepository::properties_set properties;
@@ -1276,7 +1402,7 @@ OASISReader::read_element_properties (db::PropertiesRepository &rep, bool ignore
 
       //  skip PAD.
       mark_start_table ();
-     
+
     } else if (m == 34 /*CBLOCK*/) {
 
       unsigned int type = get_uint ();
@@ -1311,7 +1437,7 @@ OASISReader::read_element_properties (db::PropertiesRepository &rep, bool ignore
 
     }
 
-  } 
+  }
 
   if (! properties.empty ()) {
     return std::make_pair (true, rep.properties_id (properties));
@@ -1320,7 +1446,7 @@ OASISReader::read_element_properties (db::PropertiesRepository &rep, bool ignore
   }
 }
 
-void 
+void
 OASISReader::read_properties (db::PropertiesRepository &rep)
 {
   unsigned char m = get_byte ();
@@ -1429,12 +1555,12 @@ OASISReader::read_properties (db::PropertiesRepository &rep)
 }
 
 
-      
-void 
+
+void
 OASISReader::read_pointlist (modal_variable <std::vector <db::Point> > &pointlist, bool for_polygon)
 {
   unsigned int type = get_uint ();
-  
+
   unsigned long n = 0;
   get (n);
   if (n == 0) {
@@ -1525,13 +1651,13 @@ OASISReader::read_repetition ()
 {
   unsigned int type = get_uint ();
   if (type == 0) {
-    
+
     //  reuse modal variable
 
   } else if (type == 1) {
 
     unsigned long nx = 0, ny = 0;
-    get (nx); 
+    get (nx);
     get (ny);
 
     db::Coord dx = get_ucoord ();
@@ -1542,7 +1668,7 @@ OASISReader::read_repetition ()
   } else if (type == 2) {
 
     unsigned long nx = 0;
-    get (nx); 
+    get (nx);
 
     db::Coord dx = get_ucoord ();
 
@@ -1558,7 +1684,7 @@ OASISReader::read_repetition ()
     mm_repetition = new RegularRepetition (db::Vector (0, 0), db::Vector (0, dy), 1, dy == 0 ? 1 : ny + 2);
 
   } else if (type == 4 || type == 5) {
-    
+
     IrregularRepetition *rep = new IrregularRepetition ();
     mm_repetition = rep;
 
@@ -1583,7 +1709,7 @@ OASISReader::read_repetition ()
     }
 
   } else if (type == 6 || type == 7) {
-    
+
     IrregularRepetition *rep = new IrregularRepetition ();
     mm_repetition = rep;
 
@@ -1611,7 +1737,7 @@ OASISReader::read_repetition ()
 
     unsigned long n = 0, m = 0;
 
-    get (n); 
+    get (n);
     get (m);
     db::Vector dn = get_gdelta ();
     db::Vector dm = get_gdelta ();
@@ -1621,7 +1747,7 @@ OASISReader::read_repetition ()
   } else if (type == 9) {
 
     unsigned long n = 0;
-    get (n); 
+    get (n);
     db::Vector dn = get_gdelta ();
 
     mm_repetition = new RegularRepetition (dn, db::Vector (0, 0), dn == db::Vector () ? 1 : n + 2, 1);
@@ -1658,10 +1784,10 @@ OASISReader::read_repetition ()
   return mm_repetition.get ().size () > 1;
 }
 
-void 
+void
 OASISReader::do_read_placement (unsigned char r,
                                 bool xy_absolute,
-                                db::Layout &layout, 
+                                db::Layout &layout,
                                 tl::vector<db::CellInstArray> &instances,
                                 tl::vector<db::CellInstArrayWithProperties> &instances_with_props)
 {
@@ -1688,7 +1814,7 @@ OASISReader::do_read_placement (unsigned char r,
 
     }
 
-  } 
+  }
 
   double mag = 1.0;
   bool mag_set = false;
@@ -1726,7 +1852,7 @@ OASISReader::do_read_placement (unsigned char r,
   } else {
     angle = ((m & 0x06) >> 1);
   }
-      
+
   mirror = (m & 0x01) != 0;
 
   if (m & 0x20) {
@@ -1764,10 +1890,10 @@ OASISReader::do_read_placement (unsigned char r,
       db::CellInstArray inst;
 
       if (mag_set || angle < 0) {
-        inst = db::CellInstArray (db::CellInst (mm_placement_cell.get ()), 
+        inst = db::CellInstArray (db::CellInst (mm_placement_cell.get ()),
                                   db::ICplxTrans (mag, angle_deg, mirror, pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb);
       } else {
-        inst = db::CellInstArray (db::CellInst (mm_placement_cell.get ()), 
+        inst = db::CellInstArray (db::CellInst (mm_placement_cell.get ()),
                                   db::Trans (angle, mirror, pos), layout.array_repository (), a, b, (unsigned long) na, (unsigned long) nb);
       }
 
@@ -1859,9 +1985,9 @@ OASISReader::do_read_placement (unsigned char r,
   }
 }
 
-void 
+void
 OASISReader::do_read_text (bool xy_absolute,
-                           db::cell_index_type cell_index, 
+                           db::cell_index_type cell_index,
                            db::Layout &layout)
 {
   unsigned char m = get_byte ();
@@ -1905,7 +2031,7 @@ OASISReader::do_read_text (bool xy_absolute,
       mm_text_string = get_str ();
 
     }
-  } 
+  }
 
   if (m & 0x1) {
     mm_textlayer = get_uint ();
@@ -1984,7 +2110,7 @@ OASISReader::do_read_text (bool xy_absolute,
         array.insert (db::Vector ());
         array.insert (points->begin (), points->end ());
         array.sort ();
-        
+
         if (pp.first) {
           cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::text_ptr_array_type> (db::Shape::text_ptr_array_type (text_ptr, db::Disp (pos), layout.array_repository ().insert (array)), pp.second));
         } else {
@@ -2032,9 +2158,9 @@ OASISReader::do_read_text (bool xy_absolute,
   }
 }
 
-void 
+void
 OASISReader::do_read_rectangle (bool xy_absolute,
-                                db::cell_index_type cell_index, 
+                                db::cell_index_type cell_index,
                                 db::Layout &layout)
 {
   unsigned char m = get_byte ();
@@ -2049,13 +2175,13 @@ OASISReader::do_read_rectangle (bool xy_absolute,
 
   if (m & 0x40) {
     mm_geometry_w = get_ucoord_as_distance ();
-  } 
+  }
   if (m & 0x80) {
     mm_geometry_h = mm_geometry_w; // TODO: really?
   } else {
     if (m & 0x20) {
       mm_geometry_h = get_ucoord_as_distance ();
-    } 
+    }
   }
 
   if (m & 0x10) {
@@ -2114,7 +2240,7 @@ OASISReader::do_read_rectangle (bool xy_absolute,
         array.insert (db::Vector ());
         array.insert (points->begin (), points->end ());
         array.sort ();
-        
+
         if (pp.first) {
           cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::box_array_type> (db::Shape::box_array_type (box, db::UnitTrans (), layout.array_repository ().insert (array)), pp.second));
         } else {
@@ -2139,7 +2265,7 @@ OASISReader::do_read_rectangle (bool xy_absolute,
     }
 
   } else {
-    
+
     std::pair<bool, db::properties_id_type> pp = read_element_properties (layout.properties_repository (), false);
 
     if (ll.first) {
@@ -2156,7 +2282,7 @@ OASISReader::do_read_rectangle (bool xy_absolute,
   }
 }
 
-void  
+void
 OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, db::Layout &layout)
 {
   unsigned char m = get_byte ();
@@ -2244,7 +2370,7 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
           array.insert (db::Vector ());
           array.insert (points->begin (), points->end ());
           array.sort ();
-          
+
           if (pp.first) {
             cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::simple_polygon_ptr_array_type> (db::Shape::simple_polygon_ptr_array_type (poly_ptr, db::Disp (d + pos), layout.array_repository ().insert (array)), pp.second));
           } else {
@@ -2264,7 +2390,7 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
             }
             ++p;
           }
-      
+
         }
 
       }
@@ -2299,7 +2425,7 @@ OASISReader::do_read_polygon (bool xy_absolute, db::cell_index_type cell_index, 
   }
 }
 
-void  
+void
 OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db::Layout &layout)
 {
   unsigned char m = get_byte ();
@@ -2413,7 +2539,7 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
           array.insert (db::Vector ());
           array.insert (points->begin (), points->end ());
           array.sort ();
-          
+
           if (pp.first) {
             cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::path_ptr_array_type> (db::Shape::path_ptr_array_type (path_ptr, db::Disp (d + pos), layout.array_repository ().insert (array)), pp.second));
           } else {
@@ -2435,7 +2561,7 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
           }
 
         }
-        
+
       }
 
     }
@@ -2470,7 +2596,7 @@ OASISReader::do_read_path (bool xy_absolute, db::cell_index_type cell_index, db:
   }
 }
 
-void  
+void
 OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index_type cell_index, db::Layout &layout)
 {
   unsigned char m = get_byte ();
@@ -2582,7 +2708,7 @@ OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index
         array.insert (db::Vector ());
         array.insert (points->begin (), points->end ());
         array.sort ();
-        
+
         if (pp.first) {
           cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::simple_polygon_ptr_array_type> (db::Shape::simple_polygon_ptr_array_type (poly_ptr, db::Disp (d + pos), layout.array_repository ().insert (array)), pp.second));
         } else {
@@ -2629,7 +2755,7 @@ OASISReader::do_read_trapezoid (unsigned char r, bool xy_absolute,db::cell_index
   }
 }
 
-void  
+void
 OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index, db::Layout &layout)
 {
   unsigned char m = get_byte ();
@@ -2690,21 +2816,21 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
     },
     //  type 1
     {
-      { 0, 0, 0, 0 },  
+      { 0, 0, 0, 0 },
       { 0, 0, 0, 1 },
       { 1, 0, 0, 1 },
       { 1, -1, 0, 0 }
     },
     //  type 2
     {
-      { 0, 0, 0, 0 },  
+      { 0, 0, 0, 0 },
       { 0, 1, 0, 1 },
       { 1, 0, 0, 1 },
       { 1, 0, 0, 0 }
     },
     //  type 3
     {
-      { 0, 1, 0, 0 },  
+      { 0, 1, 0, 0 },
       { 0, 0, 0, 1 },
       { 1, 0, 0, 1 },
       { 1, 0, 0, 0 }
@@ -2718,147 +2844,147 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
     },
     //  type 5
     {
-      { 0, 1, 0, 0 },  
+      { 0, 1, 0, 0 },
       { 0, 0, 0, 1 },
       { 1, 0, 0, 1 },
       { 1, -1, 0, 0 }
     },
     //  type 6
     {
-      { 0, 0, 0, 0 },  
+      { 0, 0, 0, 0 },
       { 0, 1, 0, 1 },
       { 1, 0, 0, 1 },
       { 1, -1, 0, 0 }
     },
     //  type 7
     {
-      { 0, 1, 0, 0 },  
+      { 0, 1, 0, 0 },
       { 0, 0, 0, 1 },
       { 1, -1, 0, 1 },
       { 1, 0, 0, 0 }
     },
     //  type 8
     {
-      { 0, 0, 0, 0 },  
+      { 0, 0, 0, 0 },
       { 0, 0, 0, 1 },
       { 1, 0, -1, 1 },
       { 1, 0, 0, 0 }
     },
     //  type 9
     {
-      { 0, 0, 0, 0 },  
+      { 0, 0, 0, 0 },
       { 0, 0, -1, 1 },
       { 1, 0, 0, 1 },
       { 1, 0, 0, 0 }
     },
     //  type 10
     {
-      { 0, 0, 0, 0 },  
+      { 0, 0, 0, 0 },
       { 0, 0, 0, 1 },
       { 1, 0, 0, 1 },
       { 1, 0, 1, 0 }
     },
     //  type 11
     {
-      { 0, 0, 1, 0 },  
+      { 0, 0, 1, 0 },
       { 0, 0, 0, 1 },
       { 1, 0, 0, 1 },
       { 1, 0, 0, 0 }
     },
     //  type 12
     {
-      { 0, 0, 0, 0 },  
+      { 0, 0, 0, 0 },
       { 0, 0, 0, 1 },
       { 1, 0, -1, 1 },
       { 1, 0, 1, 0 }
     },
     //  type 13
     {
-      { 0, 0, 1, 0 },  
+      { 0, 0, 1, 0 },
       { 0, 0, -1, 1 },
       { 1, 0, 0, 1 },
       { 1, 0, 0, 0 }
     },
     //  type 14
     {
-      { 0, 0, 0, 0 },  
+      { 0, 0, 0, 0 },
       { 0, 0, -1, 1 },
       { 1, 0, 0, 1 },
       { 1, 0, 1, 0 }
     },
     //  type 15
     {
-      { 0, 0, 1, 0 },  
+      { 0, 0, 1, 0 },
       { 0, 0, 0, 1 },
       { 1, 0, -1, 1 },
       { 1, 0, 0, 0 }
     },
     //  type 16
     {
-      { 0, 0, 0, 0 },  
+      { 0, 0, 0, 0 },
       { 0, 0, 1, 0 },
       { 1, 0, 0, 0 },
       { 0, 0, 0, 0 }
     },
     //  type 17
     {
-      { 0, 0, 0, 0 },  
+      { 0, 0, 0, 0 },
       { 0, 0, 1, 0 },
       { 1, 0, 1, 0 },
       { 0, 0, 0, 0 }
     },
     //  type 18
     {
-      { 0, 0, 0, 0 },  
+      { 0, 0, 0, 0 },
       { 1, 0, 1, 0 },
       { 1, 0, 0, 0 },
       { 0, 0, 0, 0 }
     },
     //  type 19
     {
-      { 0, 0, 1, 0 },  
+      { 0, 0, 1, 0 },
       { 1, 0, 1, 0 },
       { 1, 0, 0, 0 },
       { 0, 0, 1, 0 }
     },
     //  type 20
     {
-      { 0, 0, 0, 0 },  
+      { 0, 0, 0, 0 },
       { 0, 1, 0, 1 },
       { 0, 2, 0, 0 },
       { 0, 0, 0, 0 }
     },
     //  type 21
     {
-      { 0, 0, 0, 1 },  
+      { 0, 0, 0, 1 },
       { 0, 2, 0, 1 },
       { 0, 1, 0, 0 },
       { 0, 0, 0, 1 }
     },
     //  type 22
     {
-      { 0, 0, 0, 0 },  
+      { 0, 0, 0, 0 },
       { 0, 0, 2, 0 },
       { 1, 0, 1, 0 },
       { 0, 0, 0, 0 }
     },
     //  type 23
     {
-      { 1, 0, 0, 0 },  
+      { 1, 0, 0, 0 },
       { 0, 0, 1, 0 },
       { 1, 0, 2, 0 },
       { 1, 0, 0, 0 }
     },
     //  type 24
     {
-      { 0, 0, 0, 0 },  
+      { 0, 0, 0, 0 },
       { 0, 0, 0, 1 },
       { 1, 0, 0, 1 },
       { 1, 0, 0, 0 }
     },
     //  type 25
     {
-      { 0, 0, 0, 0 },  
+      { 0, 0, 0, 0 },
       { 0, 0, 1, 0 },
       { 1, 0, 1, 0 },
       { 1, 0, 0, 0 }
@@ -2884,7 +3010,7 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
     if (m[3] != 0) y += m[3] * mm_geometry_h.get ();
 
     pts [i] = db::Point (x, y);
-    
+
     if (x > w) w = x;
     if (y > h) h = y;
 
@@ -2941,7 +3067,7 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
         array.insert (db::Vector ());
         array.insert (points->begin (), points->end ());
         array.sort ();
-        
+
         if (pp.first) {
           cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::simple_polygon_ptr_array_type> (db::Shape::simple_polygon_ptr_array_type (poly_ptr, db::Disp (d + pos), layout.array_repository ().insert (array)), pp.second));
         } else {
@@ -2988,7 +3114,7 @@ OASISReader::do_read_ctrapezoid (bool xy_absolute,db::cell_index_type cell_index
   }
 }
 
-void  
+void
 OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, db::Layout &layout)
 {
   unsigned char m = get_byte ();
@@ -3077,7 +3203,7 @@ OASISReader::do_read_circle (bool xy_absolute, db::cell_index_type cell_index, d
         array.insert (db::Vector ());
         array.insert (points->begin (), points->end ());
         array.sort ();
-        
+
         if (pp.first) {
           cell.shapes (ll.second).insert (db::object_with_properties<db::Shape::path_ptr_array_type> (db::Shape::path_ptr_array_type (path_ptr, db::Disp (pos), layout.array_repository ().insert (array)), pp.second));
         } else {
@@ -3160,10 +3286,10 @@ OASISReader::reset_modal_variables ()
   mm_last_value_list.reset ();
 }
 
-void 
+void
 OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
 {
-  //  clears current instance list 
+  //  clears current instance list
   m_instances.clear ();
   m_instances_with_props.clear ();
 
@@ -3172,7 +3298,7 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
   bool xy_absolute = true;
 
   bool has_context = false;
-  std::vector <std::string> context_strings;
+  std::vector <tl::Variant> context_strings;
   db::PropertiesRepository::properties_set cell_properties;
 
   //  read next record
@@ -3243,10 +3369,10 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
         has_context = true;
         context_strings.reserve (mm_last_value_list.get ().size ());
         for (std::vector<tl::Variant>::const_iterator v = mm_last_value_list.get ().begin (); v != mm_last_value_list.get ().end (); ++v) {
-          context_strings.push_back (v->to_string ());
+          context_strings.push_back (*v);
         }
       } else {
-        //  store cell properties
+        //  store layout properties
         store_last_properties (layout.properties_repository (), cell_properties, true);
       }
 
@@ -3330,11 +3456,11 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
     layout.cell (cell_index).prop_id (layout.properties_repository ().properties_id (cell_properties));
   }
 
-  //  insert all instances collected (inserting them once is 
+  //  insert all instances collected (inserting them once is
   //  more effective than doing this every time)
   if (! m_instances.empty ()) {
     layout.cell (cell_index).insert (m_instances.begin (), m_instances.end ());
-    //  clear immediately, because if the cell is cleared before the instances are deleted, the 
+    //  clear immediately, because if the cell is cleared before the instances are deleted, the
     //  array pointers (living in the repository) may no longer be valid
     m_instances.clear ();
   }
@@ -3344,10 +3470,9 @@ OASISReader::do_read_cell (db::cell_index_type cell_index, db::Layout &layout)
     m_instances_with_props.clear ();
   }
 
-  //  Restore proxy cell (link to PCell or Library)
+  //  store the context strings for later
   if (has_context) {
-    CommonReaderLayerMapping layer_mapping (this, &layout);
-    layout.recover_proxy_as (cell_index, context_strings.begin (), context_strings.end (), &layer_mapping);
+    m_context_strings_per_cell [cell_index].swap (context_strings);
   }
 
   m_cellname = "";

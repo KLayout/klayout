@@ -30,10 +30,18 @@
 #include "layViewOp.h"
 #include "layRenderer.h"
 #include "layLayoutViewBase.h"
+#include "layTextInfo.h"
 #include "tlAssert.h"
 
 namespace lay
 {
+
+static db::DVector text_box_enlargement (const db::DCplxTrans &vp_trans)
+{
+  //  4.0 is the text box border in pixels
+  double b = 4.0 / vp_trans.mag ();
+  return db::DVector (b, b);
+}
 
 // ------------------------------------------------------------------------
 
@@ -625,11 +633,28 @@ ShapeMarker::render (const Viewport &vp, ViewObjectCanvas &canvas)
   if (trans_vector ()) {
     for (std::vector<db::DCplxTrans>::const_iterator tr = trans_vector ()->begin (); tr != trans_vector ()->end (); ++tr) {
       db::CplxTrans t = vp.trans () * *tr * trans ();
+      if (m_shape.is_text () && text) {
+        //  draw a frame around the text
+        lay::TextInfo ti (view ());
+        db::DCplxTrans vp_trans = vp.trans () * *tr;
+        db::Text t;
+        m_shape.text (t);
+        db::DBox box = ti.bbox (trans () * t, vp_trans).enlarged (text_box_enlargement (vp_trans));
+        r.draw (box, vp_trans, 0, text, 0, 0);
+      }
       r.draw (m_shape, t, fill, contour, vertex, text);
       r.draw_propstring (m_shape, &ly->properties_repository (), text, t);
     }
   } else {
     db::CplxTrans t = vp.trans () * trans ();
+    if (m_shape.is_text () && text) {
+      //  draw a frame around the text
+      lay::TextInfo ti (view ());
+      db::Text t;
+      m_shape.text (t);
+      db::DBox box = ti.bbox (trans () * t, vp.trans ()).enlarged (text_box_enlargement (vp.trans ()));
+      r.draw (box, vp.trans (), 0, text, 0, 0);
+    }
     r.draw (m_shape, t, fill, contour, vertex, text);
     r.draw_propstring (m_shape, &ly->properties_repository (), text, t);
   }
@@ -1081,8 +1106,16 @@ Marker::draw (lay::Renderer &r, const db::CplxTrans &t, lay::CanvasPlane *fill, 
   } else if (m_type == DPath) {
     r.draw (*m_object.dpath, db::DCplxTrans (t), fill, contour, vertex, text);
   } else if (m_type == Text) {
+    //  TODO: in order to draw the box we'd need a separation of dbu-to-micron and micron-to-pixel transformations ...
     r.draw (*m_object.text, t, fill, contour, vertex, text);
   } else if (m_type == DText) {
+    if (view () && text) {
+      //  draw a frame around the text
+      lay::TextInfo ti (view ());
+      db::DCplxTrans dt (t);
+      db::DBox box = ti.bbox (*m_object.dtext, dt).enlarged (text_box_enlargement (dt));
+      r.draw (box, dt, 0, text, 0, 0);
+    }
     r.draw (*m_object.dtext, db::DCplxTrans (t), fill, contour, vertex, text);
   } else if (m_type == Edge) {
     r.draw (*m_object.edge, t, fill, contour, vertex, text);
@@ -1279,6 +1312,12 @@ DMarker::render (const Viewport &vp, ViewObjectCanvas &canvas)
   } else if (m_type == Path) {
     r.draw (*m_object.path, t, fill, contour, vertex, text);
   } else if (m_type == Text) {
+    if (view () && text) {
+      //  draw a frame around the text
+      lay::TextInfo ti (view ());
+      db::DBox box = ti.bbox (*m_object.text, t).enlarged (text_box_enlargement (t));
+      r.draw (box, t, 0, text, 0, 0);
+    }
     r.draw (*m_object.text, t, fill, contour, vertex, text);
   } else if (m_type == Edge) {
     r.draw (*m_object.edge, t, fill, contour, vertex, text);

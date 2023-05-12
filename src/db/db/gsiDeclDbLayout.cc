@@ -22,6 +22,7 @@
 
 
 #include "gsiDecl.h"
+#include "gsiDeclDbMetaInfo.h"
 #include "dbLayout.h"
 #include "dbClip.h"
 #include "dbRecursiveShapeIterator.h"
@@ -902,39 +903,30 @@ static db::Cell *create_cell4 (db::Layout *layout, const std::string &name, cons
   return &layout->cell (layout->get_lib_proxy (lib, lib_cell));
 }
 
-static db::MetaInfo *layout_meta_info_ctor (const std::string &name, const std::string &value, const std::string &description)
+static void layout_add_meta_info (db::Layout *layout, const MetaInfo &mi)
 {
-  return new db::MetaInfo (name, description, value);
+  layout->add_meta_info (mi.name, db::MetaInfo (mi.description, mi.value));
 }
 
-static void layout_meta_set_name (db::MetaInfo *mi, const std::string &n)
+static MetaInfo *layout_get_meta_info (db::Layout *layout, const std::string &name)
 {
-  mi->name = n;
+  if (layout->has_meta_info (name)) {
+    const db::MetaInfo &value = layout->meta_info (name);
+    return new MetaInfo (name, value);
+  } else {
+    return 0;
+  }
 }
 
-static const std::string &layout_meta_get_name (const db::MetaInfo *mi)
+static const tl::Variant &layout_get_meta_info_value (db::Layout *layout, const std::string &name)
 {
-  return mi->name;
+  const db::MetaInfo &value = layout->meta_info (name);
+  return value.value;
 }
 
-static void layout_meta_set_value (db::MetaInfo *mi, const std::string &n)
+static MetaInfoIterator layout_each_meta_info (const db::Layout *layout)
 {
-  mi->value = n;
-}
-
-static const std::string &layout_meta_get_value (const db::MetaInfo *mi)
-{
-  return mi->value;
-}
-
-static void layout_meta_set_description (db::MetaInfo *mi, const std::string &n)
-{
-  mi->description = n;
-}
-
-static const std::string &layout_meta_get_description (const db::MetaInfo *mi)
-{
-  return mi->description;
+  return MetaInfoIterator (layout, layout->begin_meta (), layout->end_meta ());
 }
 
 static void scale_and_snap1 (db::Layout *layout, db::Cell &cell, db::Coord g, db::Coord m, db::Coord d)
@@ -997,45 +989,6 @@ static void move_tree_shapes3 (db::Layout *layout, db::Layout &source_layout, co
   db::move_shapes (*layout, source_layout, trans, cm.source_cells (), cm.table (), lm.table ());
 }
 
-Class<db::MetaInfo> decl_LayoutMetaInfo ("db", "LayoutMetaInfo",
-  gsi::constructor ("new", &layout_meta_info_ctor, gsi::arg ("name"), gsi::arg ("value"), gsi::arg ("description", std::string ()),
-    "@brief Creates a layout meta info object\n"
-    "@param name The name\n"
-    "@param value The value\n"
-    "@param description An optional description text\n"
-  ) +
-  gsi::method_ext ("name", &layout_meta_get_name,
-    "@brief Gets the name of the layout meta info object\n"
-  ) +
-  gsi::method_ext ("name=", &layout_meta_set_name,
-    "@brief Sets the name of the layout meta info object\n"
-  ) +
-  gsi::method_ext ("value", &layout_meta_get_value,
-    "@brief Gets the value of the layout meta info object\n"
-  ) +
-  gsi::method_ext ("value=", &layout_meta_set_value,
-    "@brief Sets the value of the layout meta info object\n"
-  ) +
-  gsi::method_ext ("description", &layout_meta_get_description,
-    "@brief Gets the description of the layout meta info object\n"
-  ) +
-  gsi::method_ext ("description=", &layout_meta_set_description,
-    "@brief Sets the description of the layout meta info object\n"
-  ),
-  "@brief A piece of layout meta information\n"
-  "Layout meta information is basically additional data that can be attached to a layout. "
-  "Layout readers may generate meta information and some writers will add layout information to "
-  "the layout object. Some writers will also read meta information to determine certain attributes.\n"
-  "\n"
-  "Multiple layout meta information objects can be attached to one layout using \\Layout#add_meta_info. "
-  "Meta information is identified by a unique name and carries a string value plus an optional description string. "
-  "The description string is for information only and is not evaluated by code.\n"
-  "\n"
-  "See also \\Layout#each_meta_info and \\Layout#meta_info_value and \\Layout#remove_meta_info"
-  "\n"
-  "This class has been introduced in version 0.25."
-);
-
 static void dtransform (db::Layout *layout, const db::DTrans &trans)
 {
   db::CplxTrans dbu_trans (layout->dbu ());
@@ -1097,27 +1050,42 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been introduced in version 0.27.9."
   ) +
-  gsi::method ("add_meta_info", &db::Layout::add_meta_info, gsi::arg ("info"),
+  gsi::method_ext ("add_meta_info", &layout_add_meta_info, gsi::arg ("info"),
     "@brief Adds meta information to the layout\n"
     "See \\LayoutMetaInfo for details about layouts and meta information."
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  gsi::method ("remove_meta_info", &db::Layout::remove_meta_info, gsi::arg ("name"),
+  gsi::method ("clear_meta_info", static_cast<void (db::Layout::*) ()> (&db::Layout::clear_meta),
+    "@brief Clears the meta information of the layout\n"
+    "See \\LayoutMetaInfo for details about layouts and meta information."
+    "\n"
+    "This method has been introduced in version 0.28.8."
+  ) +
+  gsi::method ("remove_meta_info", static_cast<void (db::Layout::*) (const std::string &name)> (&db::Layout::remove_meta_info), gsi::arg ("name"),
     "@brief Removes meta information from the layout\n"
     "See \\LayoutMetaInfo for details about layouts and meta information."
     "\n"
     "This method has been introduced in version 0.25."
   ) +
-  gsi::method ("meta_info_value", &db::Layout::meta_info_value, gsi::arg ("name"),
+  gsi::method_ext ("meta_info_value", &layout_get_meta_info_value, gsi::arg ("name"),
     "@brief Gets the meta information value for a given name\n"
     "See \\LayoutMetaInfo for details about layouts and meta information.\n"
     "\n"
-    "If no meta information with the given name exists, an empty string will be returned.\n"
+    "If no meta information with the given name exists, a nil value will be returned.\n"
+    "A more generic version that delivers all fields of the meta information is \\meta_info.\n"
     "\n"
-    "This method has been introduced in version 0.25."
+    "This method has been introduced in version 0.25. Starting with version 0.28.8, the value is of variant type instead of string only.\n"
   ) +
-  gsi::iterator ("each_meta_info", &db::Layout::begin_meta, &db::Layout::end_meta,
+  gsi::factory_ext ("meta_info", &layout_get_meta_info, gsi::arg ("name"),
+    "@brief Gets the meta information for a given name\n"
+    "See \\LayoutMetaInfo for details about layouts and meta information.\n"
+    "\n"
+    "If no meta information with the given name exists, nil is returned.\n"
+    "\n"
+    "This method has been introduced in version 0.28.8.\n"
+  ) +
+  gsi::iterator_ext ("each_meta_info", &layout_each_meta_info,
     "@brief Iterates over the meta information of the layout\n"
     "See \\LayoutMetaInfo for details about layouts and meta information.\n"
     "\n"

@@ -23,6 +23,7 @@
 
 #include "tlProgress.h"
 #include "layFinder.h"
+#include "layTextInfo.h"
 
 namespace lay
 {
@@ -86,10 +87,11 @@ Finder::closer (double d)
 }
 
 void 
-Finder::start (lay::LayoutViewBase *view, const lay::CellView &cv, unsigned int cv_index, const std::vector<db::ICplxTrans> &trans, const db::Box &region, int min_level, int max_level, const std::vector<int> &layers)
+Finder::start (lay::LayoutViewBase *view, unsigned int cv_index, const std::vector<db::DCplxTrans> &trans, const db::DBox &region, const db::DBox &scan_region, int min_level, int max_level, const std::vector<int> &layers)
 {
+  const lay::CellView &cv = view->cellview (cv_index);
+
   m_layers = layers;
-  m_region = region; 
   mp_layout = &cv->layout ();
   mp_view = view;
   m_cv_index = cv_index;
@@ -97,17 +99,27 @@ Finder::start (lay::LayoutViewBase *view, const lay::CellView &cv, unsigned int 
   m_max_level = std::max (m_min_level, std::min (max_level, m_top_level_sel ? ((int) cv.specific_path ().size () + 1) : max_level));
 
   if (layers.size () == 1) {
+
     m_box_convert = db::box_convert <db::CellInst> (*mp_layout, (unsigned int) layers [0]);
     m_cell_box_convert = db::box_convert <db::Cell> ((unsigned int) layers [0]);
+
   } else {
+
     m_box_convert = db::box_convert <db::CellInst> (*mp_layout);
     m_cell_box_convert = db::box_convert <db::Cell> ();
+
   }
 
   m_path.erase (m_path.begin (), m_path.end ());
 
-  for (std::vector<db::ICplxTrans>::const_iterator t = trans.begin (); t != trans.end (); ++t) {
-    do_find (*cv.cell (), int (cv.specific_path ().size ()), *t * cv.context_trans ());
+  for (std::vector<db::DCplxTrans>::const_iterator t = trans.begin (); t != trans.end (); ++t) {
+
+    db::VCplxTrans it = (*t * db::CplxTrans (mp_layout->dbu ())).inverted ();
+    m_region = it * region;
+    m_scan_region = it * scan_region;
+
+    do_find (*cv.cell (), int (cv.specific_path ().size ()), view->viewport ().trans () * *t, cv.context_trans ());
+
   }
 }
 
@@ -125,8 +137,11 @@ Finder::test_edge (const db::ICplxTrans &trans, const db::Edge &edg, double &dis
     double d1 = p1.double_distance (m_region.center ());
     double d2 = p2.double_distance (m_region.center ());
 
-    //  snap to the point - nothing can get closer
-    distance = 0.0;
+    double d = std::min (d1, d2);
+    if (! match || d < distance) {
+      distance = d;
+    }
+
     if (d1 < d2) {
       ret = 1;
     } else {
@@ -155,7 +170,7 @@ Finder::test_edge (const db::ICplxTrans &trans, const db::Edge &edg, double &dis
 }
 
 void
-Finder::do_find (const db::Cell &cell, int level, const db::ICplxTrans &t)
+Finder::do_find (const db::Cell &cell, int level, const db::DCplxTrans &vp, const db::ICplxTrans &t)
 {
   if (level <= m_max_level /*take level of cell itself*/ 
       && cell.is_proxy () 
@@ -164,33 +179,38 @@ Finder::do_find (const db::Cell &cell, int level, const db::ICplxTrans &t)
 
     //  when looking at the guiding shape layer, we can visit this cell as well allowing to find the guiding shapes
 
-    db::Box touch_box (t.inverted () * m_region);
+    db::ICplxTrans it = t.inverted ();
+    db::Box scan_box (it * m_scan_region);
+    db::Box hit_box (it * m_region);
 
     if (level >= m_min_level) {
-      visit_cell (cell, touch_box, t, level);
+      visit_cell (cell, hit_box, scan_box, vp, t, level);
     }
 
   } else if (level < m_max_level 
-      && (t * m_cell_box_convert (cell)).touches (m_region) 
+      && (t * m_cell_box_convert (cell)).touches (m_scan_region)
       && (mp_view->select_inside_pcells_mode () || !cell.is_proxy ()) 
       && !mp_view->is_cell_hidden (cell.cell_index (), m_cv_index)) {
 
-    db::Box touch_box (t.inverted () * m_region);
+    db::ICplxTrans it = t.inverted ();
+    db::Box scan_box (it * m_scan_region);
+    db::Box hit_box (it * m_region);
 
     if (level >= m_min_level) {
-      visit_cell (cell, touch_box, t, level);
+      visit_cell (cell, hit_box, scan_box, vp, t, level);
     }
 
-    db::Cell::touching_iterator inst = cell.begin_touching (touch_box); 
+    db::Cell::touching_iterator inst = cell.begin_touching (scan_box);
     while (! inst.at_end ()) {
 
       const db::CellInstArray &cell_inst = inst->cell_inst ();
-      for (db::CellInstArray::iterator p = cell_inst.begin_touching (touch_box, m_box_convert); ! p.at_end (); ++p) {
+      for (db::CellInstArray::iterator p = cell_inst.begin_touching (scan_box, m_box_convert); ! p.at_end (); ++p) {
 
         m_path.push_back (db::InstElement (*inst, p));
 
         do_find (mp_layout->cell (cell_inst.object ().cell_index ()), 
                  level + 1,
+                 vp,
                  t * cell_inst.complex_trans (*p));
 
         m_path.pop_back ();
@@ -211,6 +231,7 @@ ShapeFinder::ShapeFinder (bool point_mode, bool top_level_sel, db::ShapeIterator
   : Finder (point_mode, top_level_sel), 
     mp_excludes ((excludes && !excludes->empty ()) ? excludes : 0),
     m_flags (flags), m_cv_index (0), m_topcell (0), 
+    mp_text_info (0),
     mp_prop_sel (0), m_inv_prop_sel (false), mp_progress (0)
 {
   m_tries = point_sel_tests;
@@ -274,6 +295,9 @@ ShapeFinder::find (LayoutViewBase *view, const db::DBox &region_mu)
 
   m_context_layers.clear ();
   m_cells_with_context.clear ();
+
+  lay::TextInfo text_info (view);
+  mp_text_info = (m_flags & db::ShapeIterator::Texts) != 0 ? &text_info : 0;
 
   std::vector<lay::LayerPropertiesConstIterator> lprops;
   for (lay::LayerPropertiesConstIterator lp = view->begin_layers (); ! lp.at_end (); ++lp) {
@@ -340,6 +364,9 @@ ShapeFinder::find (lay::LayoutViewBase *view, const lay::LayerProperties &lprops
   m_cells_with_context.clear ();
   m_context_layers.clear ();
 
+  lay::TextInfo text_info (view);
+  mp_text_info = (m_flags & db::ShapeIterator::Texts) != 0 ? &text_info : 0;
+
   std::vector<int> layers;
   layers.push_back (lprops.layer_index ());
   bool result = find_internal (view, lprops.cellview_index (), &lprops.prop_sel (), lprops.inverse_prop_sel (), lprops.hier_levels (), lprops.trans (), layers, region_mu);
@@ -360,14 +387,6 @@ ShapeFinder::find_internal (lay::LayoutViewBase *view, unsigned int cv_index, co
 
   m_topcell = cv.cell_index ();
 
-  double dbu = cv->layout ().dbu ();
-  db::Box region = db::VCplxTrans (1.0 / dbu) * region_mu;
-  std::vector<db::ICplxTrans> trans;
-  trans.reserve(trans_mu.size());
-  for (std::vector<db::DCplxTrans>::const_iterator t = trans_mu.begin(); t != trans_mu.end(); ++t) {
-    trans.push_back(db::VCplxTrans(1.0 / dbu) * *t * db::CplxTrans(dbu));
-  }
-
   mp_prop_sel = prop_sel;
   m_inv_prop_sel = inv_prop_sel;
 
@@ -382,12 +401,33 @@ ShapeFinder::find_internal (lay::LayoutViewBase *view, unsigned int cv_index, co
     max_level = hier_sel.to_level (ctx_path_length, max_level);
   }
 
-  //  actually find
+  auto flags_saved = m_flags;
+
   try {
-    start (view, cv, m_cv_index, trans, region, min_level, max_level, layers);
+
+    if ((m_flags & db::ShapeIterator::Texts) != 0 && mp_text_info) {
+
+      m_flags = db::ShapeIterator::Texts;
+
+      //  for catching all labels we search the whole view area
+      db::DBox scan_region_mu = view->viewport ().box ();
+      start (view, m_cv_index, trans_mu, region_mu, scan_region_mu, min_level, max_level, layers);
+
+      m_flags = db::ShapeIterator::flags_type (flags_saved - db::ShapeIterator::Texts);
+
+    }
+
+    //  another pass with tight search box and without texts
+    start (view, m_cv_index, trans_mu, region_mu, region_mu, min_level, max_level, layers);
+
   } catch (StopException) {
-    // ..
+    //  ...
+  } catch (...) {
+    m_flags = flags_saved;
+    throw;
   }
+
+  m_flags = flags_saved;
 
   //  return true if anything was found
   return ! m_founds.empty ();
@@ -406,7 +446,7 @@ ShapeFinder::checkpoint ()
 }
 
 void 
-ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const db::ICplxTrans &t, int /*level*/)
+ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db::Box &scan_box, const db::DCplxTrans &vp, const db::ICplxTrans &t, int /*level*/)
 {
   if (! m_context_layers.empty ()) {
 
@@ -436,17 +476,27 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const 
 
     for (std::vector<int>::const_iterator l = layers ().begin (); l != layers ().end (); ++l) {
 
-      if (layers ().size () == 1 || (layers ().size () > 1 && cell.bbox ((unsigned int) *l).touches (search_box))) {
+      if (layers ().size () == 1 || (layers ().size () > 1 && cell.bbox ((unsigned int) *l).touches (scan_box))) {
 
         const db::Shapes &shapes = cell.shapes ((unsigned int) *l);
 
-        db::ShapeIterator shape = shapes.begin_touching (search_box, m_flags, mp_prop_sel, m_inv_prop_sel);
+        db::ShapeIterator shape = shapes.begin_touching (scan_box, m_flags, mp_prop_sel, m_inv_prop_sel);
         while (! shape.at_end ()) {
 
           checkpoint ();
 
+          db::Box bbox;
+          if (text_info () && shape->is_text ()) {
+            db::CplxTrans t_dbu = db::CplxTrans (layout ().dbu ()) * t;
+            db::Text text;
+            shape->text (text);
+            bbox = t_dbu.inverted () * text_info ()->bbox (t_dbu * text, vp);
+          } else {
+            bbox = shape->bbox ();
+          }
+
           //  in box mode, just test the boxes
-          if (shape->bbox ().inside (search_box)) {
+          if (bbox.inside (hit_box)) {
 
             m_founds.push_back (lay::ObjectInstPath ());
             m_founds.back ().set_cv_index (m_cv_index);
@@ -474,13 +524,13 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const 
 
     for (std::vector<int>::const_iterator l = layers ().begin (); l != layers ().end (); ++l) {
 
-      if (layers ().size () == 1 || (layers ().size () > 1 && cell.bbox ((unsigned int) *l).touches (search_box))) {
+      if (layers ().size () == 1 || (layers ().size () > 1 && cell.bbox ((unsigned int) *l).touches (scan_box))) {
 
         checkpoint ();
 
         const db::Shapes &shapes = cell.shapes (*l);
 
-        db::ShapeIterator shape = shapes.begin_touching (search_box, m_flags, mp_prop_sel, m_inv_prop_sel);
+        db::ShapeIterator shape = shapes.begin_touching (scan_box, m_flags, mp_prop_sel, m_inv_prop_sel);
         while (! shape.at_end ()) {
 
           bool match = false;
@@ -488,7 +538,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const 
 
           checkpoint ();
 
-          db::Point point (search_box.center ());
+          db::Point point (hit_box.center ());
 
           //  in point mode, test the edges and use a "closest" criterion
           if (shape->is_polygon ()) {
@@ -529,9 +579,15 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const 
               match = true;
             }
 
-          } else if (shape->is_box ()) {
+          } else if (shape->is_box () || shape->is_text ()) {
 
-            const db::Box &box = shape->box ();
+            db::Box box = shape->bbox ();
+            if (text_info () && shape->is_text ()) {
+              db::CplxTrans t_dbu = db::CplxTrans (layout ().dbu ()) * t;
+              db::Text text;
+              shape->text (text);
+              box = t_dbu.inverted () * text_info ()->bbox (t_dbu * text, vp);
+            }
 
             //  point-like boxes are handles which attract the finder
             if (box.width () == 0 && box.height () == 0) {
@@ -545,19 +601,11 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const 
                 test_edge (t, *e, d, match);
               }
 
-              if (! match && box.contains (search_box.center ())) {
-                d = t.ctrans (poly_dist (poly.begin_edge (), point)); 
+              if (! match && box.contains (hit_box.center ())) {
+                d = t.ctrans (poly_dist (poly.begin_edge (), point));
                 match = true;
               }
 
-            }
-
-          } else if (shape->is_text ()) {
-
-            db::Point tp (shape->text_trans () * db::Point ());
-            if (search_box.contains (tp)) {
-              d = t.ctrans (tp.distance (search_box.center ()));
-              match = true;
             }
 
           }
@@ -679,14 +727,11 @@ InstFinder::find_internal (LayoutViewBase *view, unsigned int cv_index, const db
   m_topcell = cv.cell ()->cell_index ();
   mp_view = view;
 
-  double dbu = cv->layout ().dbu ();
-  db::Box region = db::VCplxTrans (1.0 / dbu) * region_mu;
-
   //  actually find
   try {
-    std::vector<db::ICplxTrans> tv;
-    tv.push_back (db::VCplxTrans (1.0 / dbu) * trans_mu * db::CplxTrans (dbu));
-    start (view, cv, cv_index, tv, region, view->get_min_hier_levels (), view->get_max_hier_levels (), std::vector<int> ());
+    std::vector<db::DCplxTrans> tv;
+    tv.push_back (trans_mu);
+    start (view, cv_index, tv, region_mu, region_mu, view->get_min_hier_levels (), view->get_max_hier_levels (), std::vector<int> ());
   } catch (StopException) {
     // ..
   }
@@ -696,7 +741,7 @@ InstFinder::find_internal (LayoutViewBase *view, unsigned int cv_index, const db
 }
 
 void 
-InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const db::ICplxTrans &t, int level)
+InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const db::Box & /*scan_box*/, const db::DCplxTrans & /*vp*/, const db::ICplxTrans &t, int level)
 {
   if (! point_mode ()) {
 
@@ -894,5 +939,5 @@ InstFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const d
 
 }
 
-} // namespace edt
+} // namespace lay
 

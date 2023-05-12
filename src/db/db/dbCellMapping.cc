@@ -356,7 +356,7 @@ CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &
         && (! exclude_cells || exclude_cells->find (*b) == exclude_cells->end ())
         && (! include_cells || include_cells->find (*b) != include_cells->end ())) {
 
-      db::cell_index_type new_cell = layout_a.add_cell (layout_b.cell_name (*b));
+      db::cell_index_type new_cell = layout_a.add_cell (layout_b, *b);
       new_cells.push_back (new_cell);
       new_cells_b.push_back (*b);
 

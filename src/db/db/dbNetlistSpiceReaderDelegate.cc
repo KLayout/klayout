@@ -381,6 +381,9 @@ void NetlistSpiceReaderDelegate::parse_element (const std::string &s, const std:
       error (tl::to_string (tr ("Can't find a value for a R, C or L device")));
     }
 
+    //  store the value under the element name always
+    pv[element] = tl::Variant (value);
+
   } else {
 
     //  others: n-terminal devices with a model (last node)
@@ -415,8 +418,6 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 {
   std::map<std::string, tl::Variant> params = pv;
   std::vector<size_t> terminal_order;
-
-  size_t defp = std::numeric_limits<size_t>::max ();
 
   double mult = 1.0;
   auto mp = params.find ("M");
@@ -461,8 +462,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
     //  Apply multiplier (divider, according to ngspice manual)
     value /= mult;
-
-    defp = db::DeviceClassResistor::param_id_R;
+    params["R"] = tl::Variant (value);
 
     //  Apply multiplier to other parameters
     static const char *scale_params[] = { "A", "P", "W" };
@@ -492,8 +492,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
     //  Apply multiplier (divider, according to ngspice manual)
     value /= mult;
-
-    defp = db::DeviceClassInductor::param_id_L;
+    params["L"] = tl::Variant (value);
 
   } else if (element == "C") {
 
@@ -525,8 +524,7 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
 
     //  Apply multiplier
     value *= mult;
-
-    defp = db::DeviceClassCapacitor::param_id_C;
+    params["C"] = tl::Variant (value);
 
     //  Apply multiplier to other parameters
     static const char *scale_params[] = { "A", "P" };
@@ -657,8 +655,6 @@ bool NetlistSpiceReaderDelegate::element (db::Circuit *circuit, const std::strin
     double pv = 0.0;
     if (v != params.end ()) {
       pv = v->second.to_double ();
-    } else if (i->id () == defp) {
-      pv = value;
     } else {
       continue;
     }

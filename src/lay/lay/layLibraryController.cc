@@ -200,9 +200,10 @@ LibraryController::sync_files ()
             reader.read (lib->layout ());
 
             //  Use the libname if there is one
+            db::Layout::meta_info_name_id_type libname_name_id = lib->layout ().meta_info_name_id ("libname");
             for (db::Layout::meta_info_iterator m = lib->layout ().begin_meta (); m != lib->layout ().end_meta (); ++m) {
-              if (m->name == "libname" && ! m->value.empty ()) {
-                lib->set_name (m->value);
+              if (m->first == libname_name_id && ! m->second.value.is_nil ()) {
+                lib->set_name (m->second.value.to_string ());
                 break;
               }
             }

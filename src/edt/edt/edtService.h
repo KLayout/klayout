@@ -32,6 +32,7 @@
 #include "layMarker.h"
 #include "laySnap.h"
 #include "layObjectInstPath.h"
+#include "layTextInfo.h"
 #include "tlColor.h"
 #include "dbLayout.h"
 #include "dbShape.h"

@@ -44,6 +44,8 @@ namespace tl
 namespace lay
 {
 
+class TextInfo;
+
 /**
  *  @brief A generic finder class
  *
@@ -152,8 +154,17 @@ protected:
    *  are used). For each matching cell, the "visit_cell" method is called. A 
    *  path of instantiations up to the top cell is maintained and accessible by
    *  the path() accessor.
+   *
+   *  @param view The layout view to run the scan on
+   *  @param cv_index The cell view to run the scan on
+   *  @param trans A set of visual transformations applied to the display (layer properties transformations) in micron space
+   *  @param region The hit region which the object is checked against
+   *  @param scan_region The region where the object is looked up (can be bigger than the hit region for visual label box detection)
+   *  @param min_level The minimum hierarchy level to check
+   *  @param max_level The maximum hierarchy level to check
+   *  @param layers A set of layers to check
    */
-  void start (LayoutViewBase *view, const lay::CellView &cv, unsigned int cv_index, const std::vector<db::ICplxTrans> &trans, const db::Box &region, int min_level, int max_level, const std::vector<int> &layers = std::vector<int> ());
+  void start (LayoutViewBase *view, unsigned int cv_index, const std::vector<db::DCplxTrans> &trans, const db::DBox &region, const db::DBox &scan_region, int min_level, int max_level, const std::vector<int> &layers = std::vector<int> ());
 
   /**
    *  @brief Provide a basic edge test facility
@@ -172,7 +183,7 @@ protected:
   unsigned int test_edge (const db::ICplxTrans &trans, const db::Edge &edge, double &distance, bool &match);
 
 private:
-  void do_find (const db::Cell &cell, int level, const db::ICplxTrans &t);
+  void do_find (const db::Cell &cell, int level, const db::DCplxTrans &vp, const db::ICplxTrans &t);
 
   /**
    *  @brief Visitor sugar function
@@ -181,7 +192,7 @@ private:
    *  cell. It may use the "closer" method to determine if something is closer
    *  to whatever.
    */
-  virtual void visit_cell (const db::Cell &cell, const db::Box &search_box, const db::ICplxTrans &t, int level) = 0;
+  virtual void visit_cell (const db::Cell &cell, const db::Box &hit_box, const db::Box &scan_box, const db::DCplxTrans &vp, const db::ICplxTrans &t, int level) = 0;
 
   int m_min_level, m_max_level;
   std::vector<db::InstElement> m_path;
@@ -189,6 +200,7 @@ private:
   lay::LayoutViewBase *mp_view;
   unsigned int m_cv_index;
   db::Box m_region;
+  db::Box m_scan_region;
   std::vector<int> m_layers;
   double m_distance;
   bool m_point_mode;
@@ -233,7 +245,12 @@ protected:
     return m_flags;
   }
 
-  unsigned int cv_index () const 
+  const lay::TextInfo *text_info () const
+  {
+    return mp_text_info;
+  }
+
+  unsigned int cv_index () const
   {
     return m_cv_index;
   }
@@ -261,7 +278,8 @@ protected:
   void checkpoint ();
 
 private:
-  virtual void visit_cell (const db::Cell &cell, const db::Box &search_box, const db::ICplxTrans &t, int /*level*/);
+  virtual void visit_cell (const db::Cell &cell, const db::Box &hit_box, const db::Box &scan_box, const db::DCplxTrans &vp, const db::ICplxTrans &t, int level);
+
   bool find_internal (LayoutViewBase *view,
                       unsigned int cv_index,
                       const std::set<db::properties_id_type> *prop_sel,
@@ -276,6 +294,7 @@ private:
   db::ShapeIterator::flags_type m_flags;
   unsigned int m_cv_index;
   db::cell_index_type m_topcell;
+  const lay::TextInfo *mp_text_info;
   const std::set<db::properties_id_type> *mp_prop_sel;
   bool m_inv_prop_sel;
   int m_tries;
@@ -314,7 +333,8 @@ public:
   }
 
 private:
-  virtual void visit_cell (const db::Cell &cell, const db::Box &search_box, const db::ICplxTrans &t, int level);
+  virtual void visit_cell (const db::Cell &cell, const db::Box &hit_box, const db::Box &scan_box, const db::DCplxTrans &vp, const db::ICplxTrans &t, int level);
+
   bool find_internal (LayoutViewBase *view, unsigned int cv_index, const db::DCplxTrans &trans_mu, const db::DBox &region_mu);
 
   unsigned int m_cv_index;

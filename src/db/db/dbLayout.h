@@ -417,15 +417,19 @@ public:
 /**
  *  @brief A binary object representing context information for regenerating library proxies and PCells
  */
-struct DB_PUBLIC ProxyContextInfo
+struct DB_PUBLIC LayoutOrCellContextInfo
 {
   std::string lib_name;
   std::string cell_name;
   std::string pcell_name;
   std::map<std::string, tl::Variant> pcell_parameters;
+  std::map<std::string, std::pair<tl::Variant, std::string> > meta_info;
 
-  static ProxyContextInfo deserialize (std::vector<std::string>::const_iterator from, std::vector<std::string>::const_iterator to);
+  static LayoutOrCellContextInfo deserialize (std::vector<std::string>::const_iterator from, std::vector<std::string>::const_iterator to);
   void serialize (std::vector<std::string> &strings);
+
+  bool has_proxy_info () const;
+  bool has_meta_info () const;
 };
 
 /**
@@ -465,8 +469,9 @@ public:
   typedef pcell_name_map::const_iterator pcell_iterator;
   typedef std::map<std::pair<lib_id_type, cell_index_type>, cell_index_type> lib_proxy_map;
   typedef LayerIterator layer_iterator;
-  typedef std::vector<MetaInfo> meta_info;
-  typedef meta_info::const_iterator meta_info_iterator;
+  typedef size_t meta_info_name_id_type;
+  typedef std::map<meta_info_name_id_type, MetaInfo> meta_info_map;
+  typedef meta_info_map::const_iterator meta_info_iterator;
 
   /**
    *  @brief A helper functor to compare "const char *" by the content
@@ -757,6 +762,14 @@ public:
   cell_index_type add_cell (const char *name = 0);
 
   /**
+   *  @brief Adds a cell using another cell as a template
+   *
+   *  This method will use the name of the other cell and initialize the
+   *  new cell with the meta info from the other cell.
+   */
+  cell_index_type add_cell (const db::Layout &other, db::cell_index_type ci);
+
+  /**
    *  @brief Add a cell without a name
    *
    *  The cell is created, but cannot be found by name. The name returned is an empty string.
@@ -1014,27 +1027,69 @@ public:
   /**
    *  @brief Creates a cold proxy representing the given context information
    */
-  cell_index_type create_cold_proxy (const db::ProxyContextInfo &info);
+  cell_index_type create_cold_proxy (const db::LayoutOrCellContextInfo &info);
 
   /**
    *  @brief Subsitutes the given cell by a cold proxy representing the given context information
    */
-  void create_cold_proxy_as (const db::ProxyContextInfo &info, cell_index_type cell_index);
+  void create_cold_proxy_as (const db::LayoutOrCellContextInfo &info, cell_index_type cell_index);
+
+  /**
+   *  @brief Gets a value indicating whether layout context info is provided / needed
+   */
+  bool has_context_info() const;
+
+  /**
+   *  @brief Gets a value indicating whether layout context info is provided / needed
+   */
+  bool has_context_info(cell_index_type cell_index) const;
+
+  /**
+   *  @brief Get the context information for the layout (for writing into a file)
+   *
+   *  The context information is a sequence of strings which is pushed onto the given
+   *  vector. It can be used to fill meta information with fill_meta_info_from_context.
+   */
+  bool get_context_info (std::vector <std::string> &strings) const;
+
+  /**
+   *  @brief Gets the context information as a binary object
+   */
+  bool get_context_info (LayoutOrCellContextInfo &context_info) const;
+
+  /**
+   *  @brief Fills the layout's meta information from the context
+   */
+  void fill_meta_info_from_context (std::vector <std::string>::const_iterator from, std::vector <std::string>::const_iterator to);
+
+  /**
+   *  @brief Fills the layout's meta information from the binary context
+   */
+  void fill_meta_info_from_context (const LayoutOrCellContextInfo &context_info);
 
   /**
    *  @brief Get the context information for a given cell (for writing into a file)
    *
    *  The context information is a sequence of strings which is pushed onto the given
-   *  vector. It can be used to recover a respective proxy cell with the recover_proxy method.
-   *  If the given cell is not a valid proxy or library references are missing, the method
-   *  will return false.
+   *  vector. It can be used to recover a respective proxy cell with the recover_proxy method
+   *  or to fill meta information using fill_meta_info_from_context.
    */
   bool get_context_info (cell_index_type cell_index, std::vector <std::string> &context_info) const;
 
   /**
    *  @brief Gets the context information as a binary object
    */
-  bool get_context_info (cell_index_type cell_index, ProxyContextInfo &context_info) const;
+  bool get_context_info (cell_index_type cell_index, LayoutOrCellContextInfo &context_info) const;
+
+  /**
+   *  @brief Fills the layout's meta information from the context
+   */
+  void fill_meta_info_from_context (cell_index_type cell_index, std::vector <std::string>::const_iterator from, std::vector <std::string>::const_iterator to);
+
+  /**
+   *  @brief Fills the layout's meta information from the binary context
+   */
+  void fill_meta_info_from_context (cell_index_type cell_index, const LayoutOrCellContextInfo &context_info);
 
   /**
    *  @brief Recover a proxy cell from the given context info.
@@ -1050,7 +1105,7 @@ public:
   /**
    *  @brief Recover a proxy cell from the given binary context info object.
    */
-  db::Cell *recover_proxy (const ProxyContextInfo &context_info);
+  db::Cell *recover_proxy (const LayoutOrCellContextInfo &context_info);
 
   /**
    *  @brief Recover a proxy cell from the given context info.
@@ -1072,7 +1127,7 @@ public:
    *
    *  See the string-based version of "recover_proxy_as" for details.
    */
-  bool recover_proxy_as (cell_index_type cell_index, const ProxyContextInfo &context_info, ImportLayerMapping *layer_mapping = 0);
+  bool recover_proxy_as (cell_index_type cell_index, const LayoutOrCellContextInfo &context_info, ImportLayerMapping *layer_mapping = 0);
 
   /**
    *  @brief Restores proxies as far as possible
@@ -1813,28 +1868,177 @@ public:
   }
 
   /**
+   *  @brief Delivers the meta information (begin iterator) per cell
+   */
+  meta_info_iterator begin_meta (db::cell_index_type ci) const;
+
+  /**
+   *  @brief Delivers the meta information (end iterator) per cell
+   */
+  meta_info_iterator end_meta (db::cell_index_type ci) const;
+
+  /**
+   *  @brief Gets the meta informatio name by ID
+   */
+  const std::string &meta_info_name (meta_info_name_id_type name_id) const;
+
+  /**
+   *  @brief Gets the meta information name ID for a specific string
+   */
+  meta_info_name_id_type meta_info_name_id (const std::string &name) const;
+
+  /**
+   *  @brief Gets the meta information name ID for a specific string (const version)
+   */
+  meta_info_name_id_type meta_info_name_id (const std::string &name);
+
+  /**
    *  @brief Clears the meta information
    */
   void clear_meta ();
 
   /**
    *  @brief Adds meta information
-   *  The given meta information object is appended at the end of the meta information list.
+   *  The given meta information object is added to the meta information list.
    *  If a meta info object with the same name already exists it is overwritten.
    */
-  void add_meta_info (const MetaInfo &i);
+  void add_meta_info (const std::string &name, const MetaInfo &i)
+  {
+    add_meta_info (meta_info_name_id (name), i);
+  }
+
+  /**
+   *  @brief Adds meta information (variant with name ID)
+   */
+  void add_meta_info (meta_info_name_id_type name_id, const MetaInfo &i);
+
+  /**
+   *  @brief Adds meta information from a sequence
+   */
+  template <class I>
+  void add_meta_info (const I &b, const I &e)
+  {
+    for (I i = b; i != e; ++i) {
+      m_meta_info.insert (b, e);
+    }
+  }
 
   /**
    *  @brief Removes the meta information object with the given name
    *  The method will do nothing if no object with that name exists.
    */
-  void remove_meta_info (const std::string &name);
+  void remove_meta_info (const std::string &name)
+  {
+    remove_meta_info (meta_info_name_id (name));
+  }
+
+  /**
+   *  @brief Removes the meta information object with the given name ID
+   */
+  void remove_meta_info (meta_info_name_id_type name_id);
 
   /**
    *  @brief Gets the meta info value for a meta info object with the given name
    *  If no object with that name exists, an empty string is returned
    */
-  const std::string &meta_info_value (const std::string &name) const;
+  const MetaInfo &meta_info (const std::string &name) const
+  {
+    return meta_info (meta_info_name_id (name));
+  }
+
+  /**
+   *  @brief Gets the meta info value for a meta info object with the given name ID
+   */
+  const MetaInfo &meta_info (meta_info_name_id_type name_id) const;
+
+  /**
+   *  @brief Gets a value indicating whether a meta info with the given name is present
+   */
+  bool has_meta_info (const std::string &name) const
+  {
+    return has_meta_info (meta_info_name_id (name));
+  }
+
+  /**
+   *  @brief Gets a value indicating whether a meta info with the given name is present
+   */
+  bool has_meta_info (meta_info_name_id_type name_id) const;
+
+  /**
+   *  @brief Clears the meta information for a specific cell
+   */
+  void clear_meta (db::cell_index_type ci);
+
+  /**
+   *  @brief Adds meta information for a given cell
+   *  The given meta information object is to the meta information list for the given cell.
+   *  If a meta info object with the same name already exists it is overwritten.
+   */
+  void add_meta_info (db::cell_index_type ci, const std::string &name, const MetaInfo &i)
+  {
+    add_meta_info (ci, meta_info_name_id (name), i);
+  }
+
+  /**
+   *  @brief Adds meta information for a given cell (version with name ID)
+   *  The given meta information object is appended at the end of the meta information list.
+   *  If a meta info object with the same name already exists it is overwritten.
+   */
+  void add_meta_info (db::cell_index_type ci, meta_info_name_id_type name_id, const MetaInfo &i);
+
+  /**
+   *  @brief Adds meta information from a sequence
+   */
+  template <class I>
+  void add_meta_info (db::cell_index_type ci, const I &b, const I &e)
+  {
+    for (I i = b; i != e; ++i) {
+      m_meta_info_by_cell [ci].insert (b, e);
+    }
+  }
+
+  /**
+   *  @brief Gets a value indicating whether a meta info with the given name is present for the given cell
+   */
+  bool has_meta_info (db::cell_index_type ci, const std::string &name) const
+  {
+    return has_meta_info (ci, meta_info_name_id (name));
+  }
+
+  /**
+   *  @brief Gets a value indicating whether a meta info with the given name is present for the given cell
+   */
+  bool has_meta_info (db::cell_index_type ci, meta_info_name_id_type name_id) const;
+
+  /**
+   *  @brief Removes the meta information object with the given name from the given cell
+   *  The method will do nothing if no object with that name exists.
+   */
+  void remove_meta_info (db::cell_index_type ci, const std::string &name)
+  {
+    remove_meta_info (ci, meta_info_name_id (name));
+  }
+
+  /**
+   *  @brief Removes the meta information object with the given name ID from the given cell
+   *  The method will do nothing if no object with that name exists.
+   */
+  void remove_meta_info (db::cell_index_type ci, meta_info_name_id_type name_id);
+
+  /**
+   *  @brief Gets the meta info value for a meta info object with the given name for the given cell
+   *  If no object with that name exists, an empty string is returned
+   */
+  const MetaInfo &meta_info (db::cell_index_type ci, const std::string &name) const
+  {
+    return meta_info (ci, meta_info_name_id (name));
+  }
+
+  /**
+   *  @brief Gets the meta info value for a meta info object with the given name ID for the given cell
+   *  If no object with that name exists, an empty string is returned
+   */
+  const MetaInfo &meta_info (db::cell_index_type ci, meta_info_name_id_type name_id) const;
 
   /**
    *  @brief This event is triggered when the technology changes
@@ -1876,7 +2080,11 @@ private:
   lib_proxy_map m_lib_proxy_map;
   bool m_do_cleanup;
   bool m_editable;
-  meta_info m_meta_info;
+  std::map<std::string, meta_info_name_id_type> m_meta_info_name_map;
+  std::vector<std::string> m_meta_info_names;
+  meta_info_map m_meta_info;
+  std::map<db::cell_index_type, meta_info_map> m_meta_info_by_cell;
+
   std::string m_tech_name;
   tl::Mutex m_lock;
 
@@ -1920,7 +2128,7 @@ private:
   /**
    *  @brief Recovers a proxy without considering the library from context_info
    */
-  db::Cell *recover_proxy_no_lib (const ProxyContextInfo &context_info);
+  db::Cell *recover_proxy_no_lib (const LayoutOrCellContextInfo &context_info);
 };
 
 /**

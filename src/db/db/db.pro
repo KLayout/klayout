@@ -124,6 +124,7 @@ SOURCES = \
   gsiDeclDbLibrary.cc \
   gsiDeclDbManager.cc \
   gsiDeclDbMatrix.cc \
+  gsiDeclDbMetaInfo.cc \
   gsiDeclDbPath.cc \
   gsiDeclDbPoint.cc \
   gsiDeclDbPolygon.cc \

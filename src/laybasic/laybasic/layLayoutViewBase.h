@@ -1721,6 +1721,14 @@ public:
     return mp_canvas;
   }
 
+  /**
+   *  @brief Gets the canvas object (const version)
+   */
+  const lay::LayoutCanvas *canvas () const
+  {
+    return mp_canvas;
+  }
+
 #if defined(HAVE_QT)
   /**
    *  @brief Gets the layer control panel
@@ -2880,6 +2888,8 @@ private:
   void abstract_mode_enabled (bool e);
   bool has_max_hier () const;
   int max_hier_level () const;
+
+  void zoom_by (double f);
 
   void update_event_handlers ();
   void viewport_changed ();

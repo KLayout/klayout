@@ -172,6 +172,8 @@ private:
   std::map <unsigned long, std::string> m_propstrings;
   std::map <unsigned long, std::string> m_propnames;
 
+  std::map <db::cell_index_type, std::vector<tl::Variant> > m_context_strings_per_cell;
+
   tl::vector<db::CellInstArray> m_instances;
   tl::vector<db::CellInstArrayWithProperties> m_instances_with_props;
 
@@ -210,6 +212,7 @@ private:
   void read_properties (db::PropertiesRepository &rep);
   void store_last_properties (db::PropertiesRepository &rep, db::PropertiesRepository::properties_set &properties, bool ignore_special);
   std::pair <bool, db::properties_id_type> read_element_properties (db::PropertiesRepository &rep, bool ignore_special);
+  void replace_forward_references_in_variant (tl::Variant &v);
 
   unsigned char get_byte ()
   {

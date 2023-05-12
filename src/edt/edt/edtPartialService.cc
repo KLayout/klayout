@@ -243,9 +243,14 @@ insert_point_path (const db::Path &p, const std::set<EdgeWithIndex> &sel, db::Po
       ctr.push_back (p1);
       if (! found && sel.find (EdgeWithIndex (db::Edge (p1, p2), n, n + 1, 0)) != sel.end ()) {
         //  project the point onto the edge
-        std::pair <bool, db::Point> projected = db::Edge (p1, p2).projected (ins);
+        db::Edge e (p1, p2);
+        std::pair <bool, db::Point> projected = e.projected (ins);
         if (projected.first) {
-          ins = projected.second;
+          if (e.is_ortho ()) {
+            //  NOTE: for skew edges we use the original point as the projected one usually
+            //  is off-grid.
+            ins = projected.second;
+          }
           ctr.push_back (ins);
           found = true;
         }
@@ -262,22 +267,28 @@ insert_point_path (const db::Path &p, const std::set<EdgeWithIndex> &sel, db::Po
 }
 
 static void 
-remove_redundant_points (std::vector <db::Point> &ctr)
+remove_redundant_points (std::vector <db::Point> &ctr, bool cyclic)
 {
   //  compress contour (remove redundant points)
   //  and assign to path
 
   std::vector<db::Point>::iterator wp = ctr.begin ();
   std::vector<db::Point>::const_iterator rp = ctr.begin ();
-  db::Point pm1 = *rp;
-  if (wp != ctr.end ()) {
-    ++wp;
-    ++rp;
+  db::Point pm1;
+  if (rp != ctr.end ()) {
+    if (cyclic) {
+      pm1 = ctr.back ();
+    } else {
+      pm1 = ctr.front ();
+      ++wp;
+      ++rp;
+    }
     while (rp != ctr.end ()) {
       db::Point p0 = *rp;
       if (p0 != pm1) {
         *wp++ = p0;
       }
+      pm1 = p0;
       ++rp;
     }
   }
@@ -304,7 +315,7 @@ del_points_path (const db::Path &p, const std::set<EdgeWithIndex> &sel)
     }
   }
 
-  remove_redundant_points (ctr);
+  remove_redundant_points (ctr, false);
   new_path.assign (ctr.begin (), ctr.end ());
 
   return new_path;
@@ -357,7 +368,7 @@ modify_path (db::Path &p, const std::map <PointWithIndex, db::Point> &new_points
   }
 
   if (compress) {
-    remove_redundant_points (ctr);
+    remove_redundant_points (ctr, false);
   }
 
   p.assign (ctr.begin (), ctr.end ());
@@ -384,10 +395,14 @@ insert_point_poly (const db::Polygon &p, const std::set<EdgeWithIndex> &sel, db:
 
       ctr.push_back ((*e).p1 ());
       if (! found && sel.find (EdgeWithIndex (*e, n, nn, c)) != sel.end ()) {
-        //  project the point onto the edge
+        //  project the point onto the edge - use the first edge the point projects to
         std::pair <bool, db::Point> projected = (*e).projected (ins);
         if (projected.first) {
-          ins = projected.second;
+          if ((*e).is_ortho ()) {
+            //  NOTE: for skew edges we use the original point as the projected one usually
+            //  is off-grid.
+            ins = projected.second;
+          }
           ctr.push_back (ins);
           found = true;
         }
@@ -397,7 +412,7 @@ insert_point_poly (const db::Polygon &p, const std::set<EdgeWithIndex> &sel, db:
 
     if (found) {
 
-      remove_redundant_points (ctr);
+      remove_redundant_points (ctr, true);
 
       new_poly = p;
       if (c == 0) {
@@ -433,7 +448,7 @@ del_points_poly (const db::Polygon &p, const std::set<EdgeWithIndex> &sel)
       }
     }
 
-    remove_redundant_points (ctr);
+    remove_redundant_points (ctr, true);
 
     if (c == 0) {
       new_poly.assign_hull (ctr.begin (), ctr.end (), false /*compress*/);
@@ -495,7 +510,7 @@ modify_polygon (db::Polygon &p,
     }
 
     if (compress) {
-      remove_redundant_points (ctr);
+      remove_redundant_points (ctr, true);
     }
 
     if (c == 0) {
@@ -727,7 +742,7 @@ public:
   }
 
 private:
-  virtual void visit_cell (const db::Cell &cell, const db::Box &search_box, const db::ICplxTrans &t, int /*level*/);
+  virtual void visit_cell (const db::Cell &cell, const db::Box &hit_box, const db::Box &scan_box, const db::DCplxTrans &vp, const db::ICplxTrans &t, int level);
 
   founds_vector_type m_founds;
 };
@@ -736,25 +751,25 @@ private:
 //  PartialShapeFinder implementation
 
 PartialShapeFinder::PartialShapeFinder (bool point_mode, bool top_level_sel, db::ShapeIterator::flags_type flags)
-  : lay::ShapeFinder (point_mode, top_level_sel, flags)
+  : lay::ShapeFinder (point_mode, top_level_sel, flags, 0)
 {
   set_test_count (point_sel_tests);
 }
 
 void 
-PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box, const db::ICplxTrans &t, int /*level*/)
+PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db::Box &scan_box, const db::DCplxTrans &vp, const db::ICplxTrans &t, int /*level*/)
 {
   if (! point_mode ()) {
 
     for (std::vector<int>::const_iterator l = layers ().begin (); l != layers ().end (); ++l) {
 
-      if (layers ().size () == 1 || (layers ().size () > 1 && cell.bbox ((unsigned int) *l).touches (search_box))) {
+      if (layers ().size () == 1 || (layers ().size () > 1 && cell.bbox ((unsigned int) *l).touches (scan_box))) {
 
         checkpoint ();
 
         const db::Shapes &shapes = cell.shapes (*l);
 
-        db::ShapeIterator shape = shapes.begin_touching (search_box, flags (), prop_sel (), inv_prop_sel ());
+        db::ShapeIterator shape = shapes.begin_touching (scan_box, flags (), prop_sel (), inv_prop_sel ());
         while (! shape.at_end ()) {
 
           checkpoint ();
@@ -784,9 +799,9 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box,
                 ++ee;
                 unsigned int nn = ee.at_end () ? 0 : n + 1;
 
-                if (search_box.contains ((*e).p1 ())) {
+                if (hit_box.contains ((*e).p1 ())) {
                   edges.push_back (EdgeWithIndex (db::Edge ((*e).p1 (), (*e).p1 ()), n, n, c));
-                  if (search_box.contains ((*e).p2 ())) {
+                  if (hit_box.contains ((*e).p2 ())) {
                     edges.push_back (EdgeWithIndex (*e, n, nn, c));
                   } 
                 } 
@@ -801,9 +816,9 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box,
             db::Point pl;
             unsigned int n = 0;
             for (db::Shape::point_iterator pt = shape->begin_point (); pt != shape->end_point (); ++pt, ++n) {
-              if (search_box.contains (*pt)) {
+              if (hit_box.contains (*pt)) {
                 edges.push_back (EdgeWithIndex (db::Edge (*pt, *pt), n, n, 0));
-                if (pl_set && search_box.contains (pl)) {
+                if (pl_set && hit_box.contains (pl)) {
                   edges.push_back (EdgeWithIndex (db::Edge (pl, *pt), n - 1, n, 0));
                 }
               }
@@ -825,9 +840,9 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box,
               ++ee;
               unsigned int nn = ee.at_end () ? 0 : n + 1;
 
-              if (search_box.contains ((*e).p1 ())) {
+              if (hit_box.contains ((*e).p1 ())) {
                 edges.push_back (EdgeWithIndex (db::Edge ((*e).p1 (), (*e).p1 ()), n, n, 0));
-                if (search_box.contains ((*e).p2 ())) {
+                if (hit_box.contains ((*e).p2 ())) {
                   edges.push_back (EdgeWithIndex (*e, n, nn, 0));
                 } 
               } 
@@ -837,8 +852,23 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box,
           } else if (shape->is_text ()) {
 
             db::Point tp (shape->text_trans () * db::Point ());
-            if (search_box.contains (tp)) {
-              edges.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
+
+            if (text_info ()) {
+
+              db::CplxTrans t_dbu = db::CplxTrans (layout ().dbu ()) * t;
+              db::Text text;
+              shape->text (text);
+              db::Box tb = t_dbu.inverted () * text_info ()->bbox (t_dbu * text, vp);
+              if (tb.inside (hit_box)) {
+                edges.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
+              }
+
+            } else {
+
+              if (hit_box.contains (tp)) {
+                edges.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
+              }
+
             }
 
           }
@@ -860,14 +890,14 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box,
 
     for (std::vector<int>::const_iterator l = layers ().begin (); l != layers ().end (); ++l) {
 
-      if (layers ().size () == 1 || (layers ().size () > 1 && cell.bbox ((unsigned int) *l).touches (search_box))) {
+      if (layers ().size () == 1 || (layers ().size () > 1 && cell.bbox ((unsigned int) *l).touches (hit_box))) {
 
         checkpoint ();
 
         const db::Shapes &shapes = cell.shapes (*l);
         std::vector <EdgeWithIndex> edge_sel;
 
-        db::ShapeIterator shape = shapes.begin_touching (search_box, flags (), prop_sel (), inv_prop_sel ());
+        db::ShapeIterator shape = shapes.begin_touching (scan_box, flags (), prop_sel (), inv_prop_sel ());
         while (! shape.at_end ()) {
 
           bool match = false;
@@ -968,11 +998,29 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &search_box,
           } else if (shape->is_text ()) {
 
             db::Point tp (shape->text_trans () * db::Point ());
-            if (search_box.contains (tp)) {
-              d = tp.distance (search_box.center ());
-              edge_sel.clear ();
-              edge_sel.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
-              match = true;
+
+            if (text_info ()) {
+
+              db::CplxTrans t_dbu = db::CplxTrans (layout ().dbu ()) * t;
+              db::Text text;
+              shape->text (text);
+              db::Box tb (t_dbu.inverted () * text_info ()->bbox (t_dbu * text, vp));
+              if (tb.contains (hit_box.center ())) {
+                d = tp.distance (hit_box.center ());
+                edge_sel.clear ();
+                edge_sel.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
+                match = true;
+              }
+
+            } else {
+
+              if (hit_box.contains (tp)) {
+                d = tp.distance (hit_box.center ());
+                edge_sel.clear ();
+                edge_sel.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
+                match = true;
+              }
+
             }
 
           }

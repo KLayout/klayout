@@ -237,9 +237,19 @@ public:
   typedef pin_list_type::const_iterator pin_const_iterator;
 
   SpiceCachedCircuit (const std::string &name)
-    : m_name (name)
+    : m_name (name), m_anonymous (false)
   {
     //  .. nothing yet ..
+  }
+
+  bool is_anonymous () const
+  {
+    return m_anonymous;
+  }
+
+  void set_anonymous (bool f)
+  {
+    m_anonymous = f;
   }
 
   const std::string &name () const
@@ -315,6 +325,7 @@ private:
   parameters_type m_parameters;
   pin_list_type m_pins;
   cards_type m_cards;
+  bool m_anonymous;
 };
 
 static std::string
@@ -1182,12 +1193,15 @@ SpiceNetlistBuilder::process_element (tl::Extractor &ex, const std::string &pref
         error (tl::sprintf (tl::to_string (tr ("Subcircuit '%s' not found in netlist")), model));
       } else {
         db::SpiceCachedCircuit *cc_nc = mp_dict->create_cached_circuit (model);
+        cc_nc->set_anonymous (true);
         cc = cc_nc;
         std::vector<std::string> pins;
         pins.resize (nn.size ());
         cc_nc->set_pins (pins);
       }
-    } else {
+    }
+
+    if (! cc->is_anonymous ()) {
       //  issue warnings on unknown parameters which are skipped otherwise
       for (auto p = pv.begin (); p != pv.end (); ++p) {
         if (cc->parameters ().find (p->first) == cc->parameters ().end ()) {

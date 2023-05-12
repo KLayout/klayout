@@ -1146,7 +1146,7 @@ public:
 
     std::string lyr_file = data.get_layer_properties_file ();
     if (! lyr_file.empty ()) {
-      layout.add_meta_info (db::MetaInfo ("layer-properties-file", "Layer Properties File", lyr_file));
+      layout.add_meta_info ("layer-properties-file", db::MetaInfo ("Layer Properties File", lyr_file));
     }
 
     return m_layers;

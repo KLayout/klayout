@@ -201,7 +201,8 @@ ClipboardData::do_insert (db::Layout &layout, const db::ICplxTrans *trans, db::C
           cell_map.insert (std::make_pair (c->cell_index (), pc->cell_index ()));
         } else {
           //  fallback: create a new cell
-          cell_map.insert (std::make_pair (c->cell_index (), layout.add_cell (m_layout.cell_name (c->cell_index ()))));
+          db::cell_index_type ci = layout.add_cell (m_layout, c->cell_index ());
+          cell_map.insert (std::make_pair (c->cell_index (), ci));
         }
 
       } else {
@@ -217,7 +218,8 @@ ClipboardData::do_insert (db::Layout &layout, const db::ICplxTrans *trans, db::C
             cell_map.insert (std::make_pair (c->cell_index (), tc));
           }
         } else {
-          cell_map.insert (std::make_pair (c->cell_index (), layout.add_cell (m_layout.cell_name (c->cell_index ()))));
+          db::cell_index_type ci = layout.add_cell (m_layout, c->cell_index ());
+          cell_map.insert (std::make_pair (c->cell_index (), ci));
         }
 
       }
@@ -313,7 +315,7 @@ ClipboardData::cell_for_cell (const db::Layout &layout, db::cell_index_type cell
     return cm->second;
   }
 
-  db::cell_index_type target_cell_index = m_layout.add_cell (layout.cell_name (cell_index));
+  db::cell_index_type target_cell_index = m_layout.add_cell (layout, cell_index);
   m_cell_index_map.insert (std::make_pair (cell_index, target_cell_index));
 
   if (incomplete) {

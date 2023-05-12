@@ -791,35 +791,6 @@ Bitmap::render_contour (std::vector<lay::RenderEdge> &edges)
   }
 }
 
-static unsigned char next_char_latin1_from_utf8 (const char *&cp, const char *cpf = 0)
-{
-  unsigned char c = *cp;
-  if ((c & 0xe0) == 0xc0) {
-    if ((cp[1] & 0xc0) == 0x80 && (! cpf || cpf > cp + 1)) {
-      unsigned int x = ((unsigned int) ((unsigned char) c & 0x1f) << 6) | (unsigned int) (cp[1] & 0x3f);
-      cp += 1;
-      if (x < 255) {
-        c = x;
-      } else {
-        c = '?';
-      }
-    } else {
-      c = '?';
-    }
-  } else if ((c & 0xf0) == 0xe0) {
-    if ((cp[1] & 0xc0) == 0x80 && (cp[2] & 0xc0) == 0x80 && (! cpf || cpf > cp + 2)) {
-      cp += 2;
-    }
-    c = '?';
-  } else if ((c & 0xf8) == 0xf0) {
-    if ((cp[1] & 0xc0) == 0x80 && (cp[2] & 0xc0) == 0x80 && (cp[3] & 0xc0) == 0x80 && (! cpf || cpf > cp + 3)) {
-      cp += 3;
-    }
-    c = '?';
-  } 
-  return c;
-}
-
 void
 Bitmap::render_text (const lay::RenderText &text)
 {
@@ -830,12 +801,11 @@ Bitmap::render_text (const lay::RenderText &text)
     //  count the lines and max. characters per line
 
     unsigned int lines = 1;
-    for (const char *cp = text.text.c_str (); *cp; ++cp) {
-      if (*cp == '\012' || *cp == '\015') {
-        if (*cp == '\015' && cp[1] == '\012') {
-          ++cp;
-        }
+    for (const char *cp = text.text.c_str (); *cp; ) {
+      if (tl::skip_newline (cp)) {
         ++lines;
+      } else {
+        ++cp;
       }
     }
 
@@ -858,10 +828,9 @@ Bitmap::render_text (const lay::RenderText &text)
 
       unsigned int length = 0;
       const char *cp = cp1; 
-      while (*cp && *cp != '\012' && *cp != '\015') {
-        next_char_latin1_from_utf8 (cp);
+      while (*cp && !tl::is_newline (*cp)) {
+        tl::utf32_from_utf8 (cp);
         ++length;
-        ++cp; 
       }
 
       double xx;
@@ -878,13 +847,15 @@ Bitmap::render_text (const lay::RenderText &text)
 
       if (y > -0.5 && y < double (height () + ff.height () - 1) - 0.5) {
 
-        for ( ; cp1 != cp; ++cp1) {
+        while (cp1 != cp) {
 
-          unsigned char c = next_char_latin1_from_utf8 (cp1, cp);
+          uint32_t c = tl::utf32_from_utf8 (cp1, cp);
+          if (c < uint32_t (ff.first_char ()) || c >= uint32_t (ff.n_chars ()) + ff.first_char ()) {
+            //  NOTE: '?' needs to be a valid character always
+            c = uint32_t ('?');
+          }
 
-          size_t cc = c; // to suppress a compiler warning ..
-          if (c >= ff.first_char () && cc < size_t (ff.n_chars ()) + size_t (ff.first_char ())
-              && xx > -100.0 && xx < double (width ())) {
+          if (xx > -100.0 && xx < double (width ())) {
             fill_pattern (int (y + 0.5), int (floor (xx)), ff.data () + (c - ff.first_char ()) * ff.height () * ff.stride (), ff.stride (), ff.height ());
           }
 
@@ -897,11 +868,7 @@ Bitmap::render_text (const lay::RenderText &text)
       }
 
       //  next line
-      if (*cp1 == '\012' || *cp1 == '\015') {
-        if (*cp1 == '\015' && cp1[1] == '\012') {
-          ++cp1;
-        }
-        ++cp1;
+      if (tl::skip_newline (cp1)) {
         y -= double (ff.line_height ());
       }
 

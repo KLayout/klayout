@@ -386,9 +386,6 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
   connect (actionUseRegularExpressions, SIGNAL (triggered ()), this, SLOT (search_editing ()));
   connect (actionCaseSensitive, SIGNAL (triggered ()), this, SLOT (search_editing ()));
 
-  addAction (actionSearchReplace);
-  connect (actionSearchReplace, SIGNAL (triggered ()), this, SLOT (search_replace ()));
-
   searchEditBox->set_clear_button_enabled (true);
   searchEditBox->set_options_button_enabled (true);
   searchEditBox->set_options_menu (m);
@@ -1974,7 +1971,7 @@ MacroEditorDialog::find_next_button_clicked ()
 
   apply_search (true);
   page->find_next ();
-  if (sender () != searchEditBox && sender () != replaceText) {
+  if (! searchEditBox->hasFocus () && ! replaceText->hasFocus ()) {
     set_editor_focus ();
   }
 }
@@ -1989,7 +1986,7 @@ MacroEditorDialog::find_prev_button_clicked ()
 
   apply_search (true);
   page->find_prev ();
-  if (sender () != searchEditBox && sender () != replaceText) {
+  if (! searchEditBox->hasFocus () && ! replaceText->hasFocus ()) {
     set_editor_focus ();
   }
 }
@@ -2004,7 +2001,7 @@ MacroEditorDialog::replace_next_button_clicked ()
 
   apply_search (true);
   page->replace_and_find_next (replaceText->text ());
-  if (sender () != replaceText) {
+  if (! searchEditBox->hasFocus () && ! replaceText->hasFocus ()) {
     set_editor_focus ();
   }
 }
@@ -2035,12 +2032,6 @@ MacroEditorDialog::search_requested (const QString &s)
 }
 
 void
-MacroEditorDialog::search_replace ()
-{
-  searchEditBox->setFocus (Qt::TabFocusReason);
-}
-
-void
 MacroEditorDialog::search_editing ()
 {
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
@@ -2050,7 +2041,9 @@ MacroEditorDialog::search_editing ()
 
   apply_search ();
   page->find_reset (); //  search from the initial position
-  page->find_next ();
+  if (! page->has_multi_block_selection ()) {
+    page->find_next ();
+  }
 }
 
 void 
@@ -2083,7 +2076,9 @@ MacroEditorDialog::do_search_edited ()
 
   apply_search ();
   page->find_reset (); //  search from the initial position
-  page->find_next ();
+  if (! page->has_multi_block_selection ()) {
+    page->find_next ();
+  }
   set_editor_focus ();
 }
 

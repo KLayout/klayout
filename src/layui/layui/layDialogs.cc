@@ -1186,8 +1186,34 @@ UserPropertiesForm::set_properties (const db::PropertiesRepository::properties_s
   mp_ui->text_edit->setPlainText (tl::to_qstring (text));
 }
 
+void
+UserPropertiesForm::set_meta_info (db::Layout::meta_info_iterator begin_meta, db::Layout::meta_info_iterator end_meta, const db::Layout &layout)
+{
+  m_begin_meta = begin_meta;
+  m_end_meta = end_meta;
+
+#if QT_VERSION >= 0x50F00
+  mp_ui->mode_tab->setTabVisible (2, m_begin_meta != m_end_meta);
+#endif
+
+  mp_ui->meta_info_list->clear ();
+
+  for (auto m = m_begin_meta; m != m_end_meta; ++m) {
+    QTreeWidgetItem *entry = new QTreeWidgetItem (mp_ui->meta_info_list);
+    entry->setText (0, tl::to_qstring ((m->second.persisted ? "*" : "") + layout.meta_info_name (m->first)));
+    entry->setText (1, tl::to_qstring (m->second.description));
+    entry->setText (2, tl::to_qstring (m->second.value.to_parsable_string ()));
+  }
+}
+
 bool
 UserPropertiesForm::show (LayoutViewBase *view, unsigned int cv_index, db::properties_id_type &prop_id)
+{
+  return show (view, cv_index, prop_id, db::Layout::meta_info_iterator (), db::Layout::meta_info_iterator ());
+}
+
+bool
+UserPropertiesForm::show (LayoutViewBase *view, unsigned int cv_index, db::properties_id_type &prop_id, db::Layout::meta_info_iterator begin_meta, db::Layout::meta_info_iterator end_meta)
 {
   bool ret = false;
 
@@ -1208,6 +1234,8 @@ BEGIN_PROTECTED
 
   const db::PropertiesRepository::properties_set &props = mp_prep->properties (prop_id);
   set_properties (props);
+
+  set_meta_info (begin_meta, end_meta, cv->layout ());
 
   if (exec ()) {
 

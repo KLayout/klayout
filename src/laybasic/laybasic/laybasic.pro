@@ -52,6 +52,7 @@ SOURCES += \
   layEditable.cc \
   layEditorServiceBase.cc \
   layFinder.cc \
+  layTextInfo.cc \
   layFixedFont.cc \
   layLayoutCanvas.cc \
   layLineStylePalette.cc \
@@ -104,6 +105,7 @@ HEADERS += \
   layEditorServiceBase.h \
   layLayoutCanvas.h \
   layFinder.h \
+  layTextInfo.h \
   layFixedFont.h \
   layLayoutViewBase.h \
   layLineStylePalette.h \

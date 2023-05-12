@@ -30,6 +30,8 @@ namespace lay
 LayoutView::LayoutView (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options)
   : LayoutViewBase (this, mgr, editable, plugin_parent, options)
 {
+  //  NOTE: it's important to call LayoutViewBase::init from a fully constructed LayoutView (issue #1360)
+  LayoutViewBase::init (mgr);
   config_setup ();
   finish ();
 }
@@ -37,6 +39,8 @@ LayoutView::LayoutView (db::Manager *mgr, bool editable, lay::Plugin *plugin_par
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options)
   : LayoutViewBase (this, mgr, editable, plugin_parent, options)
 {
+  //  NOTE: it's important to call LayoutViewBase::init from a fully constructed LayoutView (issue #1360)
+  LayoutViewBase::init (mgr);
   copy_from (source);
   config_setup ();
   finish ();

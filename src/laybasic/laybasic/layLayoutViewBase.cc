@@ -260,8 +260,6 @@ LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, db::Manager *manager, bool 
 {
   //  either it's us or the parent has a dispatcher
   tl_assert (dispatcher () != 0);
-
-  init (manager);
 }
 
 void

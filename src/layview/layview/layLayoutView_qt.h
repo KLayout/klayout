@@ -627,7 +627,7 @@ private:
   bool event_filter (QObject *obj, QEvent *ev, bool &taken);
   QSize size_hint () const;
 
-  void init_ui ();
+  void init_ui (db::Manager *manager);
   void do_setup_editor_options_pages ();
 
   QWidget *layer_control_frame () { return mp_control_frame; }

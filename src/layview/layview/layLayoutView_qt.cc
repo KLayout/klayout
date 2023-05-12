@@ -279,7 +279,7 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
-  init_ui ();
+  init_ui (manager);
 }
 
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
@@ -290,7 +290,7 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
-  init_ui ();
+  init_ui (manager);
 
   copy_from (source);
 
@@ -306,7 +306,7 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
-  init_ui ();
+  init_ui (manager);
 }
 
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, LayoutViewWidget *widget, unsigned int options)
@@ -317,7 +317,7 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
-  init_ui ();
+  init_ui (manager);
 
   copy_from (source);
 
@@ -349,7 +349,7 @@ LayoutView::event_filter (QObject *obj, QEvent *event, bool &taken)
 }
 
 void
-LayoutView::init_ui ()
+LayoutView::init_ui (db::Manager *mgr)
 {
   m_activated = true;
   m_always_show_source = false;
@@ -372,6 +372,10 @@ LayoutView::init_ui ()
   mp_editor_options_frame = 0;
   mp_min_hier_spbx = 0;
   mp_max_hier_spbx = 0;
+
+  //  NOTE: it's important to call LayoutViewBase::init from LayoutView because creating the plugins will need a
+  //  fully constructed LayoutView (issue #1360)
+  LayoutViewBase::init (mgr);
 
   if (mp_widget) {
 

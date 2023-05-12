@@ -767,6 +767,28 @@ class QtBinding_TestClass < TestBase
 
   end
 
+  def test_60
+
+    # findChild, findChildren
+
+    w = RBA::QWidget::new
+    w.objectName = "w"
+    w1 = RBA::QWidget::new(w)
+    w1.objectName = "w1"
+    w2 = RBA::QWidget::new(w1)
+    w2.objectName = "w2"
+
+    assert_equal(w.findChild.objectName, "w1")
+    assert_equal(w.findChild("w2").objectName, "w2")
+
+    assert_equal(w.findChildren().collect { |c| c.objectName }.join(","), "w1,w2")
+    assert_equal(w.findChildren("w2").collect { |c| c.objectName }.join(","), "w2")
+
+    assert_equal(w.findChildren(RBA::QRegularExpression::new("^.2$")).collect { |c| c.objectName }.join(","), "w2")
+    assert_equal(w.findChildren(RBA::QRegularExpression::new("^w.$")).collect { |c| c.objectName }.join(","), "w1,w2")
+
+  end
+
 end 
 
 load("test_epilogue.rb")

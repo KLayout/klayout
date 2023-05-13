@@ -399,6 +399,7 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
   replaceText->setPlaceholderText (tr ("Replace text ..."));
 #endif
 
+  connect (closeButton, SIGNAL (clicked ()), this, SLOT (close_button_clicked ()));
   connect (forwardButton, SIGNAL (clicked ()), this, SLOT (forward ()));
   connect (backwardButton, SIGNAL (clicked ()), this, SLOT (backward ()));
 
@@ -2362,7 +2363,7 @@ END_PROTECTED
 void
 MacroEditorDialog::tab_close_requested (int index)
 {
-  if (m_in_exec) {
+  if (m_in_exec || index < 0) {
     return;
   }
 
@@ -3736,8 +3737,12 @@ MacroEditorDialog::run (int stop_stack_depth, lym::Macro *macro)
     set_run_macro (macro);
 
     try {
+
+      write_str (tl::sprintf (tl::to_string (tr ("Running macro %s\n")), macro->path ()).c_str (), OS_echo);
+
       macro->run ();
       m_stop_stack_depth = -1;
+
     } catch (tl::ExitException &) {
       m_stop_stack_depth = -1;
       //  .. ignore exit exceptions ..

@@ -784,8 +784,15 @@ class QtBinding_TestClass < TestBase
     assert_equal(w.findChildren().collect { |c| c.objectName }.join(","), "w1,w2")
     assert_equal(w.findChildren("w2").collect { |c| c.objectName }.join(","), "w2")
 
-    assert_equal(w.findChildren(RBA::QRegularExpression::new("^.2$")).collect { |c| c.objectName }.join(","), "w2")
-    assert_equal(w.findChildren(RBA::QRegularExpression::new("^w.$")).collect { |c| c.objectName }.join(","), "w1,w2")
+    begin
+      # Qt5++
+      re_cls = RBA::QRegularExpression
+    rescue => ex
+      # Qt4
+      re_cls = RBA::QRegExp
+    end
+    assert_equal(w.findChildren(re_cls::new("^.2$")).collect { |c| c.objectName }.join(","), "w2")
+    assert_equal(w.findChildren(re_cls::new("^w.$")).collect { |c| c.objectName }.join(","), "w1,w2")
 
   end
 

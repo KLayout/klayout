@@ -55,6 +55,8 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 
 #if QT_VERSION < 0x50000
 
+#include <QRegExp>
+
   QObject *find_child_impl (QObject *object, const QString &name) 
   { 
     return object->findChild<QObject *> (name); 
@@ -63,7 +65,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
   { 
     return object->findChildren<QObject *> (name); 
   }
-  QList<QObject *> find_children_impl2 (QObject *object, const QRegularExpression &re)
+  QList<QObject *> find_children_impl2 (QObject *object, const QRegExp &re)
   { 
     return object->findChildren<QObject *> (re); 
   }

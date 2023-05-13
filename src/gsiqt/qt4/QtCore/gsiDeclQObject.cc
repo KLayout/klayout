@@ -51,7 +51,40 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
   ret.write<const QMetaObject &> (QObject::staticMetaObject);
 }
 
-  QObject *find_child_impl (QObject *object, const QString &name) { return object->findChild<QObject *> (name); }
+
+#if QT_VERSION < 0x50000
+
+#include <QRegExp>
+
+  QObject *find_child_impl (QObject *object, const QString &name) 
+  { 
+    return object->findChild<QObject *> (name); 
+  }
+  QList<QObject *> find_children_impl (QObject *object, const QString &name)
+  { 
+    return object->findChildren<QObject *> (name); 
+  }
+  QList<QObject *> find_children_impl2 (QObject *object, const QRegExp &re)
+  { 
+    return object->findChildren<QObject *> (re); 
+  }
+#else
+
+#include <QRegularExpression>
+
+  QObject *find_child_impl (QObject *object, const QString &name, Qt::FindChildOptions options)
+  { 
+    return object->findChild<QObject *> (name, options); 
+  }
+  QList<QObject *> find_children_impl (QObject *object, const QString &name, Qt::FindChildOptions options)
+  { 
+    return object->findChildren<QObject *> (name, options); 
+  }
+  QList<QObject *> find_children_impl2 (QObject *object, const QRegularExpression &re, Qt::FindChildOptions options)
+  { 
+    return object->findChildren<QObject *> (re, options); 
+  }
+#endif
 
 // bool QObject::blockSignals(bool b)
 
@@ -757,7 +790,15 @@ static gsi::Methods methods_QObject () {
 }
 
 qt_gsi::QtNativeClass<QObject> decl_QObject ("QtCore", "QObject_Native",
-  gsi::method_ext("findChild", &find_child_impl, "@brief Specialisation for findChild (uses QObject as T).") 
+#if QT_VERSION < 0x50000
+  gsi::method_ext("findChild", &find_child_impl, gsi::arg("name", QString(), "null"), "@brief Specialisation for findChild (uses QObject as T).") +
+  gsi::method_ext("findChildren", &find_children_impl, gsi::arg("name", QString(), "null"), "@brief Specialisation for findChildren (uses QObject as T).") +
+  gsi::method_ext("findChildren", &find_children_impl2, gsi::arg("re"), "@brief Specialisation for findChildren (uses QObject as T).") 
+#else
+  gsi::method_ext("findChild", &find_child_impl, gsi::arg("name", QString(), "null"), gsi::arg("options", Qt::FindChildrenRecursively, "Qt::FindChildrenRecursively"), "@brief Specialisation for findChild (uses QObject as T).") +
+  gsi::method_ext("findChildren", &find_children_impl, gsi::arg("name", QString(), "null"), gsi::arg("options", Qt::FindChildrenRecursively, "Qt::FindChildrenRecursively"), "@brief Specialisation for findChildren (uses QObject as T).") +
+  gsi::method_ext("findChildren", &find_children_impl2, gsi::arg("re"), gsi::arg("options", Qt::FindChildrenRecursively, "Qt::FindChildrenRecursively"), "@brief Specialisation for findChildren (uses QObject as T).") 
+#endif
 +
   methods_QObject (),
   "@hide\n@alias QObject");

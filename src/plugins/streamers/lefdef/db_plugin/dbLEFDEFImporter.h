@@ -874,6 +874,16 @@ public:
     m_separate_groups = f;
   }
 
+  bool joined_paths () const
+  {
+    return m_joined_paths;
+  }
+
+  void set_joined_paths (bool f)
+  {
+    m_joined_paths = f;
+  }
+
   const std::string &map_file () const
   {
     return m_map_file;
@@ -1009,6 +1019,7 @@ private:
   std::map<unsigned int, std::string> m_special_routing_suffixes;
   std::map<unsigned int, int> m_special_routing_datatypes;
   bool m_separate_groups;
+  bool m_joined_paths;
   std::string m_map_file;
   unsigned int m_macro_resolution_mode;
   bool m_read_lef_with_def;

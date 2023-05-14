@@ -57,6 +57,7 @@
 
 #include <QImage>
 #include <QPointer>
+#include <QVBoxLayout>
 
 class QSpinBox;
 
@@ -684,6 +685,91 @@ private:
 };
 
 /**
+ *  @brief Descriptor for a notification inside the layout view
+ *
+ *  Notifications are popups added at the top of the view to indicate need for reloading for example.
+ *  Notifications have a name, a title, optional actions (id, title) and a parameter (e.g. file path to reload).
+ *  Actions are mapped to QPushButtons.
+ */
+class LAYVIEW_PUBLIC LayoutViewNotification
+{
+public:
+  LayoutViewNotification (const std::string &name, const std::string &title, const tl::Variant &parameter = tl::Variant ())
+    : m_name (name), m_title (title), m_parameter (parameter)
+  {
+    //  .. nothing yet ..
+  }
+
+  void add_action (const std::string &name, const std::string &title)
+  {
+    m_actions.push_back (std::make_pair (name, title));
+  }
+
+  const std::vector<std::pair<std::string, std::string> > &actions () const
+  {
+    return m_actions;
+  }
+
+  const std::string &name () const
+  {
+    return m_name;
+  }
+
+  const std::string &title () const
+  {
+    return m_title;
+  }
+
+  const tl::Variant &parameter () const
+  {
+    return m_parameter;
+  }
+
+  bool operator<(const LayoutViewNotification &other) const
+  {
+    if (m_name != other.name ()) {
+      return m_name < other.name ();
+    }
+    return m_parameter < other.parameter ();
+  }
+
+  bool operator==(const LayoutViewNotification &other) const
+  {
+    if (m_name != other.name ()) {
+      return false;
+    }
+    return m_parameter == other.parameter ();
+  }
+
+private:
+  std::string m_name;
+  std::string m_title;
+  tl::Variant m_parameter;
+  std::vector<std::pair<std::string, std::string> > m_actions;
+};
+
+/**
+ *  @brief A widget representing a notification
+ */
+class LAYVIEW_PUBLIC LayoutViewNotificationWidget
+  : public QFrame
+{
+Q_OBJECT
+
+public:
+  LayoutViewNotificationWidget (LayoutViewWidget *parent, const LayoutViewNotification *notification);
+
+private slots:
+  void action_triggered ();
+  void close_triggered ();
+
+private:
+  LayoutViewWidget *mp_parent;
+  const LayoutViewNotification *mp_notification;
+  std::map<QObject *, std::string> m_action_buttons;
+};
+
+/**
  *  @brief The layout view widget
  *
  *  This is a LayoutView which actually is a widget. It can be used in a widget tree
@@ -709,6 +795,16 @@ public:
    *  @brief Destructor
    */
   ~LayoutViewWidget ();
+
+  /**
+   *  @brief Adds a notification
+   */
+  void add_notification (const LayoutViewNotification &notificaton);
+
+  /**
+   *  @brief Removes a notification
+   */
+  void remove_notification (const LayoutViewNotification &notificaton);
 
   /**
    *  @brief Gets the LayoutView embedded into this widget
@@ -817,10 +913,25 @@ signals:
 
 private:
   friend class LayoutView;
+  friend class LayoutViewNotificationWidget;
 
   void view_deleted (lay::LayoutView *view);
+  void notification_action (const LayoutViewNotification &notification, const std::string &action);
+
+  void resizeEvent (QResizeEvent *event);
+
+  struct CompareNotificationPointers
+  {
+    bool operator() (const LayoutViewNotification *a, const LayoutViewNotification *b) const
+    {
+      return *a < *b;
+    }
+  };
 
   LayoutView *mp_view;
+  QVBoxLayout *mp_layout;
+  std::list<lay::LayoutViewNotification> m_notifications;
+  std::map<const LayoutViewNotification *, QWidget *, CompareNotificationPointers> m_notification_widgets;
 };
 
 /**

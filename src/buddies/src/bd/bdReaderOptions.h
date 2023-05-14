@@ -185,6 +185,7 @@ private:
   std::vector<std::string> m_lefdef_lef_files;
   bool m_lefdef_read_lef_with_def;
   bool m_lefdef_separate_groups;
+  bool m_lefdef_joined_paths;
   std::string m_lefdef_map_file;
   int m_lefdef_macro_resolution_mode;
   std::vector<std::string> m_lefdef_lef_layout_files;

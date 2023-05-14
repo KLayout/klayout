@@ -1752,8 +1752,21 @@ set_hidden_flags_rec (LayerTreeModel *model, QTreeView *tree_view, const QModelI
       }
 
     } else {
-      tree_view->setRowHidden (r, parent, false);
+
       set_hidden_flags_rec (model, tree_view, index);
+
+      //  hide a group entry if all children are hidden
+
+      bool hide = true;
+      int rrows = model->rowCount (index);
+      for (int rr = 0; rr < rrows; ++rr) {
+        if (! tree_view->isRowHidden (rr, index)) {
+          hide = false;
+        }
+      }
+
+      tree_view->setRowHidden (r, parent, hide);
+
     }
 
   }

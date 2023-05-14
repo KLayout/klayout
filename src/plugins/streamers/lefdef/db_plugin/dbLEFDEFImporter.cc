@@ -515,6 +515,7 @@ LEFDEFReaderOptions::LEFDEFReaderOptions ()
     m_special_routing_suffix (""),
     m_special_routing_datatype (0),
     m_separate_groups (false),
+    m_joined_paths (false),
     m_map_file (),
     m_macro_resolution_mode (0),
     m_read_lef_with_def (true),
@@ -592,6 +593,7 @@ LEFDEFReaderOptions &LEFDEFReaderOptions::operator= (const LEFDEFReaderOptions &
     m_special_routing_datatype = d.m_special_routing_datatype;
     m_special_routing_datatypes = d.m_special_routing_datatypes;
     m_separate_groups = d.m_separate_groups;
+    m_joined_paths = d.m_joined_paths;
     m_map_file = d.m_map_file;
     m_macro_resolution_mode = d.m_macro_resolution_mode;
     m_lef_files = d.m_lef_files;

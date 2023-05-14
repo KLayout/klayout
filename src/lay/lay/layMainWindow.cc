@@ -590,12 +590,7 @@ MainWindow::file_changed_timer ()
 
   }
 
-  //  Prevent recursive signals
-  m_file_changed_timer.blockSignals (true);
-
-  std::set<QString> reloaded_files;
-
-BEGIN_PROTECTED
+  std::set<QString> notified_files;
 
   //  Make the names unique
   std::sort (m_changed_files.begin (), m_changed_files.end ());
@@ -605,68 +600,38 @@ BEGIN_PROTECTED
     return;
   }
 
-  QString msg;
-
-  if (m_changed_files.size () == 1) {
-    msg = QObject::tr ("The following file has been changed on disk:\n\n");
-    for (std::vector<QString>::const_iterator f = m_changed_files.begin (); f != m_changed_files.end (); ++f) {
-      msg += QString::fromUtf8 ("  %1\n").arg (*f);
-    }
-    msg += tr ("\nReload this file?");
-  } else {
-    msg = QObject::tr ("The following files have been changed on disk:\n\n");
-    for (std::vector<QString>::const_iterator f = m_changed_files.begin (); f != m_changed_files.end (); ++f) {
-      msg += QString::fromUtf8 ("  %1\n").arg (*f);
-    }
-    msg += tr ("\nReload these files?");
-  }
+  //  adds a notification to the involved views that the file has changed
 
   std::vector<QString> changed_files;
   changed_files.swap (m_changed_files);
 
-  if (QMessageBox::question (this, tr ("Reload Files"), msg, QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+  std::map<QString, std::vector<std::pair<lay::LayoutViewWidget *, int> > > views_per_file;
 
-    m_file_changed_timer.blockSignals (false);
-
-    std::map<QString, std::pair<lay::LayoutViewWidget *, int> > views_per_file;
-
-    for (std::vector<lay::LayoutViewWidget *>::iterator v = mp_views.begin (); v != mp_views.end (); ++v) {
-      for (int cv = 0; cv < int ((*v)->view ()->cellviews ()); ++cv) {
-        views_per_file [tl::to_qstring ((*v)->view ()->cellview (cv)->filename ())] = std::make_pair (*v, cv);
-      }
+  for (auto v = mp_views.begin (); v != mp_views.end (); ++v) {
+    for (int cv = 0; cv < int ((*v)->view ()->cellviews ()); ++cv) {
+      views_per_file [tl::to_qstring ((*v)->view ()->cellview (cv)->filename ())].push_back (std::make_pair (*v, cv));
     }
-
-    for (std::vector<QString>::const_iterator f = changed_files.begin (); f != changed_files.end (); ++f) {
-      std::map<QString, std::pair<lay::LayoutViewWidget *, int> >::const_iterator v = views_per_file.find (*f);
-      if (v != views_per_file.end ()) {
-        v->second.first->view ()->reload_layout (v->second.second);
-        reloaded_files.insert (*f);
-      }
-    }
-
   }
 
-END_PROTECTED
+  for (auto f = changed_files.begin (); f != changed_files.end (); ++f) {
 
-  m_file_changed_timer.blockSignals (false);
+    auto v = views_per_file.find (*f);
+    if (v != views_per_file.end ()) {
 
-  //  While the message box was open, new request might have collected - remove
-  //  the ones we just reloaded and restart the timer
-  if (! m_changed_files.empty ()) {
+      for (auto w = v->second.begin (); w != v->second.end (); ++w) {
 
-    std::vector<QString> changed_files;
-    changed_files.swap (m_changed_files);
-    for (std::vector<QString>::const_iterator f = changed_files.begin (); f != changed_files.end (); ++f) {
-      if (reloaded_files.find (*f) == reloaded_files.end ()) {
-        m_changed_files.push_back (*f);
+        std::string title;
+        if (w->first->view ()->cellviews () > 1) {
+          title = tl::sprintf (tl::to_string (tr ("Layout file @%d (%s) has changed on disk")), w->second + 1, tl::filename (tl::to_string (*f)));
+        } else {
+          title = tl::sprintf (tl::to_string (tr ("Layout file (%s) has changed on disk")), tl::filename (tl::to_string (*f)));
+        }
+
+        lay::LayoutViewNotification n ("reload", title, tl::Variant (tl::to_string (*f)));
+        n.add_action ("reload", tl::to_string (tr ("Reload")));
+        w->first->add_notification (n);
+
       }
-    }
-
-    if (! m_changed_files.empty ()) {
-
-      //  Wait a little to let more to allow for more reload requests to collect
-      m_file_changed_timer.setInterval (300);
-      m_file_changed_timer.start ();
 
     }
 

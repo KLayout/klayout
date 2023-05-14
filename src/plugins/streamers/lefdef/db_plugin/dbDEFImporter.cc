@@ -424,25 +424,25 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
           }
         }
 
-#if 0
-        //  single path
-        db::Path p (pt0, pt + 1, wxy, be, ee, false);
-        if (prop_id != 0) {
-          design.shapes (layer).insert (db::object_with_properties<db::Path> (p, prop_id));
-        } else {
-          design.shapes (layer).insert (p);
-        }
-#else
-        //  multipart paths
-        for (std::vector<db::Point>::const_iterator i = pt0; i != pt; ++i) {
-          db::Path p (i, i + 2, wxy, i == pt0 ? be : wxy / 2, i + 1 != pt ? wxy / 2 : ee, false);
+        if (options ().joined_paths ()) {
+          //  single path
+          db::Path p (pt0, pt + 1, wxy, be, ee, false);
           if (prop_id != 0) {
             design.shapes (layer).insert (db::object_with_properties<db::Path> (p, prop_id));
           } else {
             design.shapes (layer).insert (p);
           }
+        } else {
+          //  multipart paths
+          for (std::vector<db::Point>::const_iterator i = pt0; i != pt; ++i) {
+            db::Path p (i, i + 2, wxy, i == pt0 ? be : wxy / 2, i + 1 != pt ? wxy / 2 : ee, false);
+            if (prop_id != 0) {
+              design.shapes (layer).insert (db::object_with_properties<db::Path> (p, prop_id));
+            } else {
+              design.shapes (layer).insert (p);
+            }
+          }
         }
-#endif
 
         was_path_before = true;
 

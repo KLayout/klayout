@@ -118,6 +118,7 @@ GenericReaderOptions::GenericReaderOptions ()
 
   m_lefdef_read_lef_with_def = load_options.get_option_by_name ("lefdef_config.read_lef_with_def").to_bool ();
   m_lefdef_separate_groups = load_options.get_option_by_name ("lefdef_config.separate_groups").to_bool ();
+  m_lefdef_joined_paths = load_options.get_option_by_name ("lefdef_config.joined_paths").to_bool ();
   m_lefdef_map_file = load_options.get_option_by_name ("lefdef_config.map_file").to_string ();
   m_lefdef_macro_resolution_mode = load_options.get_option_by_name ("lefdef_config.macro_resolution_mode").to_int ();
 }
@@ -440,6 +441,11 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "#--" + m_long_prefix + "lefdef-separate-groups", &m_lefdef_separate_groups, "Specifies to separate groups of regions into a hierarchy",
                     "This option is used together with '--" + m_long_prefix + "lefdef-produce-regions'. If given, the region polygons will be put "
                     "into a cell hierarchy where the cells indicate the region groups.\n"
+                   )
+        << tl::arg (group +
+                    "#--" + m_long_prefix + "lefdef-joined-paths", &m_lefdef_joined_paths, "Specifies to produce joined paths for wires",
+                    "If given, multi-segment paths are created for wires if possible (this will fail for 45 degree segments for example). "
+                    "By default, individual straight segments will be produced."
                    )
         << tl::arg (group +
                     "#!--" + m_long_prefix + "lefdef-dont-produce-via-geometry", &m_lefdef_produce_via_geometry, "Skips vias when producing geometry",
@@ -793,6 +799,7 @@ GenericReaderOptions::configure (db::LoadLayoutOptions &load_options)
   load_options.set_option_by_name ("lefdef_config.lef_files", tl::Variant (m_lefdef_lef_files.begin (), m_lefdef_lef_files.end ()));
   load_options.set_option_by_name ("lefdef_config.read_lef_with_def", m_lefdef_read_lef_with_def);
   load_options.set_option_by_name ("lefdef_config.separate_groups", m_lefdef_separate_groups);
+  load_options.set_option_by_name ("lefdef_config.joined_paths", m_lefdef_joined_paths);
   load_options.set_option_by_name ("lefdef_config.map_file", m_lefdef_map_file);
   load_options.set_option_by_name ("lefdef_config.macro_resolution_mode", m_lefdef_macro_resolution_mode);
   load_options.set_option_by_name ("lefdef_config.macro_resolution_mode", m_lefdef_macro_resolution_mode);

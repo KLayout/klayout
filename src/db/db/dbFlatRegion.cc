@@ -313,6 +313,7 @@ RegionDelegate *FlatRegion::add (const Region &other) const
   if (other_flat) {
 
     new_region->raw_polygons ().insert (other_flat->raw_polygons ().get_layer<db::Polygon, db::unstable_layer_tag> ().begin (), other_flat->raw_polygons ().get_layer<db::Polygon, db::unstable_layer_tag> ().end ());
+    new_region->raw_polygons ().insert (other_flat->raw_polygons ().get_layer<db::PolygonWithProperties, db::unstable_layer_tag> ().begin (), other_flat->raw_polygons ().get_layer<db::PolygonWithProperties, db::unstable_layer_tag> ().end ());
 
   } else {
 
@@ -343,6 +344,7 @@ RegionDelegate *FlatRegion::add_in_place (const Region &other)
   if (other_flat) {
 
     polygons.insert (other_flat->raw_polygons ().get_layer<db::Polygon, db::unstable_layer_tag> ().begin (), other_flat->raw_polygons ().get_layer<db::Polygon, db::unstable_layer_tag> ().end ());
+    polygons.insert (other_flat->raw_polygons ().get_layer<db::PolygonWithProperties, db::unstable_layer_tag> ().begin (), other_flat->raw_polygons ().get_layer<db::PolygonWithProperties, db::unstable_layer_tag> ().end ());
 
   } else {
 

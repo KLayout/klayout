@@ -888,10 +888,12 @@ gsi::Console *PythonInterpreter::current_console () const
 
 void PythonInterpreter::begin_execution ()
 {
-  m_file_id_map.clear ();
   m_block_exceptions = false;
-  if (m_current_exec_level++ == 0 && mp_current_exec_handler) {
-    mp_current_exec_handler->start_exec (this);
+  if (m_current_exec_level++ == 0) {
+    m_file_id_map.clear ();
+    if (mp_current_exec_handler) {
+      mp_current_exec_handler->start_exec (this);
+    }
   }
 }
 

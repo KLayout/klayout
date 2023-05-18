@@ -2081,6 +2081,24 @@ TEST(50_PropertiesFlat)
   EXPECT_EQ (s.at_end (), true);
 }
 
+//  "+" operator with properties (issue #1373)
+TEST(50b_PropertiesFlat)
+{
+  db::Region r, rr;
+
+  r.insert (db::Box (0, 0, 10, 20));
+  rr.insert (db::Box (0, 0, 100, 200));
+  rr.insert (db::BoxWithProperties (db::Box (1, 2, 101, 202), 1));
+
+  EXPECT_EQ ((db::Region () + rr).to_string (), "(0,0;0,200;100,200;100,0);(1,2;1,202;101,202;101,2)");
+  EXPECT_EQ ((rr + db::Region ()).to_string (), "(0,0;0,200;100,200;100,0);(1,2;1,202;101,202;101,2)");
+  EXPECT_EQ ((r + rr).to_string (), "(0,0;0,20;10,20;10,0);(0,0;0,200;100,200;100,0);(1,2;1,202;101,202;101,2)");
+
+  r += rr;
+
+  EXPECT_EQ (r.to_string (), "(0,0;0,20;10,20;10,0);(0,0;0,200;100,200;100,0);(1,2;1,202;101,202;101,2)");
+}
+
 TEST(51_PropertiesFlatFromLayout)
 {
   db::Layout ly;

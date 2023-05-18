@@ -865,6 +865,8 @@ PolygonGenerator::produce_poly (const PGPolyContour &c)
 
       }
 
+      m_poly.sort_holes ();
+
     }
 
     mp_psink->put (m_poly);

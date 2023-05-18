@@ -1044,6 +1044,19 @@ private:
   }
 };
 
+} // namespace db
+
+namespace std
+{
+
+//  injecting a global std::swap for polygons into the
+//  std namespace
+template <class C>
+void swap (db::polygon_contour<C> &a, db::polygon_contour<C> &b)
+{
+  a.swap (b);
+}
+
 }
 
 namespace db
@@ -2047,7 +2060,7 @@ public:
    *  @param remove_reflected True, if reflecting spikes shall be removed on compression
    */
   template <class I> 
-  void insert_hole (I start, I end, bool compress = default_compression<C> (), bool remove_reflected = false) 
+  void insert_hole (I start, I end, bool compress = default_compression<C> (), bool remove_reflected = false)
   {
     insert_hole (start, end, db::unit_trans<C> (), compress, remove_reflected);
   }
@@ -2073,21 +2086,17 @@ public:
     //  add the hole
     contour_type &h = add_hole ();
     h.assign (start, end, op, true, compress, true /*normalize*/, remove_reflected);
+  }
 
-    //  and keep the list sorted by swapping the 
-    //  elements and move the last one to the right 
-    //  position
-    //  KLUDGE: this is probably a performance bottleneck from applications
-    //  with polygons with may holes ..
-    if (holes () > 1) {
-      typename contour_list_type::iterator ins_pos = std::lower_bound (m_ctrs.begin () + 1, m_ctrs.end () - 1, h);
-      typename contour_list_type::iterator p = m_ctrs.end () - 1;
-      if (ins_pos != p) {
-        while (p != ins_pos) {
-          p->swap (p [-1]);
-          --p;
-        }
-      }
+  /**
+   *  @brief Sort the holes
+   *
+   *  Sorting the holes makes certain algorithms more effective.
+   */
+  void sort_holes ()
+  {
+    if (! m_ctrs.empty ()) {
+      std::sort (m_ctrs.begin () + 1, m_ctrs.end ());
     }
   }
 
@@ -2885,6 +2894,16 @@ public:
   }
 
   /**
+   *  @brief A dummy implementation of "sort_holes" provided for template instantiation
+   *
+   *  Asserts, if begin called.
+   */
+  void sort_holes ()
+  {
+    tl_assert (false);
+  }
+
+  /**
    *  @brief A dummy implementation of "hole" provided for template instantiation
    *
    *  Asserts, if begin called.
@@ -3530,7 +3549,7 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
 namespace std
 {
 
-//  injecting a global std::swap for polygons into the 
+//  injecting a global std::swap for polygons into the
 //  std namespace
 template <class C>
 void swap (db::polygon<C> &a, db::polygon<C> &b)

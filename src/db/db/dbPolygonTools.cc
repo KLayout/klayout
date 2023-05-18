@@ -456,6 +456,8 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, c
         }
       }
 
+      hull->sort_holes ();
+
       right_of_line->put (*hull);
 
     }
@@ -858,6 +860,8 @@ smooth (const db::Polygon &polygon, db::Coord d, bool keep_hv)
         new_poly.insert_hole (new_pts.begin (), new_pts.end (), false /*don't compress*/);
       }
     }
+
+    new_poly.sort_holes ();
 
   }
 
@@ -1351,6 +1355,8 @@ do_extract_rad (const db::polygon<C> &polygon, double &rinner, double &router, u
 
     }
 
+    new_polygon->sort_holes ();
+
   } else {
 
     if (! do_extract_rad_from_contour (polygon.begin_hull (), polygon.end_hull (), rinner, router, n, (std::vector<db::point<C> > *) 0, false)) {
@@ -1541,6 +1547,8 @@ do_compute_rounded (const db::polygon<C> &polygon, double rinner, double router,
     compute_rounded_contour (polygon.begin_hole (h), polygon.end_hole (h), new_pts, rinner, router, n);
     new_poly.insert_hole (new_pts.begin (), new_pts.end (), false /*don't compress*/);
   }
+
+  new_poly.sort_holes ();
 
   return new_poly;
 }
@@ -2882,6 +2890,8 @@ snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coord gy, std::vecto
 
   }
 
+  pnew.sort_holes ();
+
   return pnew;
 }
 
@@ -2920,6 +2930,8 @@ scaled_and_snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coord mx,
     }
 
   }
+
+  pnew.sort_holes ();
 
   return pnew;
 }

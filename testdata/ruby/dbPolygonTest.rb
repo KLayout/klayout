@@ -128,6 +128,8 @@ class DBPolygon_TestClass < TestBase
     b.assign_hole(1, [ RBA::DPoint::new( 15, 25 ), RBA::DPoint::new( 25, 25 ), RBA::DPoint::new( 25, 65 ) ])
     assert_equal( b.to_s, "(0,1;1,5;1,1/10,20;20,20;20,60)" )
     b.insert_hole( [ RBA::DPoint::new( 1, 2 ), RBA::DPoint::new( 2, 2 ), RBA::DPoint::new( 2, 6 ) ] )
+    assert_equal( b.to_s, "(0,1;1,5;1,1/10,20;20,20;20,60/1,2;2,2;2,6)" )
+    b.sort_holes
     assert_equal( b.to_s, "(0,1;1,5;1,1/1,2;2,2;2,6/10,20;20,20;20,60)" )
     b.assign_hole(0, [ RBA::DPoint::new( 15, 25 ), RBA::DPoint::new( 25, 25 ), RBA::DPoint::new( 25, 65 ) ])
     assert_equal( b.to_s, "(0,1;1,5;1,1/15,25;25,25;25,65/10,20;20,20;20,60)" )
@@ -251,6 +253,8 @@ class DBPolygon_TestClass < TestBase
     b.assign_hole(1, [ RBA::Point::new( 15, 25 ), RBA::Point::new( 25, 25 ), RBA::Point::new( 25, 65 ) ])
     assert_equal( b.to_s, "(0,1;1,5;1,1/10,20;20,20;20,60)" )
     b.insert_hole( [ RBA::Point::new( 1, 2 ), RBA::Point::new( 2, 2 ), RBA::Point::new( 2, 6 ) ] )
+    assert_equal( b.to_s, "(0,1;1,5;1,1/10,20;20,20;20,60/1,2;2,2;2,6)" )
+    b.sort_holes
     assert_equal( b.to_s, "(0,1;1,5;1,1/1,2;2,2;2,6/10,20;20,20;20,60)" )
     b.assign_hole(0, [ RBA::Point::new( 15, 25 ), RBA::Point::new( 25, 25 ), RBA::Point::new( 25, 65 ) ])
     assert_equal( b.to_s, "(0,1;1,5;1,1/15,25;25,25;25,65/10,20;20,20;20,60)" )

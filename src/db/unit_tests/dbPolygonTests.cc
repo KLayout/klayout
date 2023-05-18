@@ -128,6 +128,7 @@ TEST(1)
   db::Polygon pp;
   pp.insert_hole (c3.begin (), c3.end ());
   pp.insert_hole (c2.begin (), c2.end ());
+  pp.sort_holes ();
   pp.assign_hull (c1.begin (), c1.end ());
   EXPECT_EQ (pp.area (), 1000*100-2*380*80);
   EXPECT_EQ (pp.area2 (), 2*(1000*100-2*380*80));

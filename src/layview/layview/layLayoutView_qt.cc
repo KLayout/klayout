@@ -506,11 +506,6 @@ LayoutView::init_ui (db::Manager *mgr)
 
     mp_connector = new LayoutViewSignalConnector (mp_widget, this);
 
-    QVBoxLayout *vbl = new QVBoxLayout (mp_widget);
-    vbl->setContentsMargins (0, 0, 0, 0);
-    vbl->setSpacing (0);
-    vbl->addWidget (canvas ()->widget ());
-
     if ((options () & LV_NoHierarchyPanel) == 0 && (options () & LV_Naked) == 0) {
 
       QFrame *hierarchy_frame = new QFrame (0);

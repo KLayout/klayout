@@ -85,15 +85,12 @@ Requires: libqt4-x11 >= 4.8.6
 # OpenSuSE Leap 15 requirements
 Requires:	ruby >= 2.5
 Requires:	python3 >= 3.6
-Requires: libqt4-x11 >= 4.8.7
-%define buildopt -j2
-%endif
-
-%if "%{target_system}" == "opensuse15"
-# OpenSuSE Leap 15 requirements
-Requires:	ruby >= 2.5
-Requires:	python3 >= 3.6
-Requires: libqt4-x11 >= 4.8.7
+Requires: libqt5-qtbase >= 5.15.2
+Requires: libQt5PrintSupport5 >= 5.15.2
+Requires: libQt5Designer5 >= 5.15.2
+Requires: libQt5Multimedia5 >= 5.15.2
+Requires: libQt5Svg5 >= 5.15.2
+Requires: libQt5XmlPatterns5 >= 5.15.2
 %define buildopt -j2
 %endif
 

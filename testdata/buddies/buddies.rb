@@ -72,15 +72,15 @@ class Buddies_TestClass < TestBase
       else
         out_file = File.join($ut_testtmp, "out_" + bin)
       end
-      if File.exists?(out_file)
+      if File.exist?(out_file)
         File.unlink(out_file)
       end
-      assert_equal(File.exists?(out_file), false)
+      assert_equal(File.exist?(out_file), false)
 
       in_file = File.join(File.dirname(__FILE__), "test1.gds")
 
       log = bin + "\n" + `#{self.buddy_bin(bin)} #{in_file} #{out_file} 2>&1`
-      assert_equal(File.exists?(out_file), true)
+      assert_equal(File.exist?(out_file), true)
       assert_equal(log, bin + "\n")
 
       File.open(out_file, "rb") do |file|
@@ -96,16 +96,16 @@ class Buddies_TestClass < TestBase
   def test_strmxor
 
     out_file = File.join($ut_testtmp, "out")
-    if File.exists?(out_file)
+    if File.exist?(out_file)
       File.unlink(out_file)
     end
-    assert_equal(File.exists?(out_file), false)
+    assert_equal(File.exist?(out_file), false)
 
     in_file1 = File.join(File.dirname(__FILE__), "test1.gds")
     in_file2 = File.join(File.dirname(__FILE__), "test2.gds")
 
     log = "strmxor\n" + `#{self.buddy_bin("strmxor")} #{in_file1} #{in_file2} #{out_file} 2>&1`
-    assert_equal(File.exists?(out_file), true)
+    assert_equal(File.exist?(out_file), true)
     assert_equal(log, <<"END")
 strmxor
 Warning: Layer 1/0 is not present in second layout, but in first
@@ -141,15 +141,15 @@ END
   def test_strmclip
 
     out_file = File.join($ut_testtmp, "out")
-    if File.exists?(out_file)
+    if File.exist?(out_file)
       File.unlink(out_file)
     end
-    assert_equal(File.exists?(out_file), false)
+    assert_equal(File.exist?(out_file), false)
 
     in_file = File.join(File.dirname(__FILE__), "test1.gds")
 
     log = "strmclip\n" + `#{self.buddy_bin("strmclip")} #{in_file} #{out_file} 2>&1`
-    assert_equal(File.exists?(out_file), true)
+    assert_equal(File.exist?(out_file), true)
     assert_equal(log, "strmclip\n")
 
   end

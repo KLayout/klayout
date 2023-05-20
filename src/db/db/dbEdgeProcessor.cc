@@ -44,6 +44,8 @@
 namespace db
 {
 
+const double fill_factor = 1.5;
+
 // -------------------------------------------------------------------------------
 //  Some utilities ..
 
@@ -1125,14 +1127,28 @@ get_intersections_per_band_90 (std::vector <CutPoints> &cutpoints, std::vector <
   std::vector <WorkEdge>::iterator f = current;
   for (std::vector <WorkEdge>::iterator c = current; c != future; ) {
 
-    while (f != future && edge_xmin (*f) <= x) {
-      ++f;
-    }
+    size_t n = 0;
+    db::Coord xx = x;
 
-    db::Coord xx = std::numeric_limits <db::Coord>::max ();
-    if (f != future) {
-      xx = edge_xmin (*f);
-    }
+    //  fetch as many cells as to fill in roughly 50% more
+    //  (this is an empirical performance improvement factor)
+    do {
+
+      while (f != future && edge_xmin (*f) <= xx) {
+        ++f;
+      }
+
+      if (f != future) {
+        xx = edge_xmin (*f);
+      } else {
+        xx = std::numeric_limits <db::Coord>::max ();
+      }
+
+      if (n == 0) {
+        n = std::distance (c, f);
+      }
+
+    } while (f != future && std::distance (c, f) < long (n * fill_factor));
 
 #ifdef DEBUG_EDGE_PROCESSOR
     printf ("edges %d..%d:", x, xx); 
@@ -1356,14 +1372,28 @@ get_intersections_per_band_any (std::vector <CutPoints> &cutpoints, std::vector 
   std::vector <WorkEdge>::iterator f = current;
   for (std::vector <WorkEdge>::iterator c = current; c != future; ) {
 
-    while (f != future && edge_xmin_at_yinterval_double (*f, dy, dyy) <= x) {
-      ++f;
-    }
+    size_t n = 0;
+    db::Coord xx = x;
 
-    db::Coord xx = std::numeric_limits <db::Coord>::max ();
-    if (f != future) {
-      xx = edge_xmin_at_yinterval_double (*f, dy, dyy);
-    }
+    //  fetch as many cells as to fill in roughly 50% more
+    //  (this is an empirical performance improvement factor)
+    do {
+
+      while (f != future && edge_xmin_at_yinterval_double (*f, dy, dyy) <= xx) {
+        ++f;
+      }
+
+      if (f != future) {
+        xx = edge_xmin_at_yinterval_double (*f, dy, dyy);
+      } else {
+        xx = std::numeric_limits <db::Coord>::max ();
+      }
+
+      if (n == 0) {
+        n = std::distance (c, f);
+      }
+
+    } while (f != future && std::distance (c, f) < long (n * fill_factor));
 
 #ifdef DEBUG_EDGE_PROCESSOR
     printf ("edges %d..%d:", x, xx); 
@@ -2259,7 +2289,7 @@ EdgeProcessor::redo_or_process (const std::vector<std::pair<db::EdgeSink *, db::
         progress->set (size_t (double (todo_next - todo) * p) + todo);
       }
 
-      size_t n = std::distance (current, future);
+      size_t n = 0;
       db::Coord yy = y;
 
       //  Use as many scanlines as to fetch approx. 50% new edges into the scanline (this
@@ -2276,7 +2306,11 @@ EdgeProcessor::redo_or_process (const std::vector<std::pair<db::EdgeSink *, db::
           yy = std::numeric_limits <db::Coord>::max ();
         }
 
-      } while (future != mp_work_edges->end () && std::distance (current, future) < long (n + n / 2));
+        if (n == 0) {
+          n = std::distance (current, future);
+        }
+
+      } while (future != mp_work_edges->end () && std::distance (current, future) < long (n * fill_factor));
 
       bool is90 = true;
 

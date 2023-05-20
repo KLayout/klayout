@@ -1095,14 +1095,14 @@ EdgeProcessor::clear ()
 }
 
 static void
-add_hparallel_cutpoints (WorkEdge &e1, WorkEdge &e2, std::vector <CutPoints> &cutpoints)
+add_hparallel_cutpoints (WorkEdge &e1, WorkEdge &e2, const db::Box &cell, std::vector <CutPoints> &cutpoints)
 {
   db::Coord e1_xmin = std::min (e1.x1 (), e1.x2 ());
   db::Coord e1_xmax = std::max (e1.x1 (), e1.x2 ());
-  if (e2.x1 () > e1_xmin && e2.x1 () < e1_xmax) {
+  if (e2.x1 () > e1_xmin && e2.x1 () < e1_xmax && cell.contains (e2.p1 ())) {
     e1.make_cutpoints (cutpoints)->add (e2.p1 (), &cutpoints, false);
   }
-  if (e2.x2 () > e1_xmin && e2.x2 () < e1_xmax) {
+  if (e2.x2 () > e1_xmin && e2.x2 () < e1_xmax && cell.contains (e2.p2 ())) {
     e1.make_cutpoints (cutpoints)->add (e2.p2 (), &cutpoints, false);
   }
 }
@@ -1165,15 +1165,15 @@ get_intersections_per_band_90 (std::vector <CutPoints> &cutpoints, std::vector <
 
                 //  parallel horizontal edges: produce the end points of each other edge as cutpoints
                 if (c1->p1 ().y () == c2->p1 ().y ()) {
-                  add_hparallel_cutpoints (*c1, *c2, cutpoints);
-                  add_hparallel_cutpoints (*c2, *c1, cutpoints);
+                  add_hparallel_cutpoints (*c1, *c2, cell, cutpoints);
+                  add_hparallel_cutpoints (*c2, *c1, cell, cutpoints);
                 }
 
               } else if (c1->p1 () != c2->p1 () && c1->p2 () != c2->p1 () &&
                          c1->p1 () != c2->p2 () && c1->p2 () != c2->p2 ()) {
 
                 std::pair <bool, db::Point> cp = c1->intersect_point (*c2);
-                if (cp.first) {
+                if (cp.first && cell.contains (cp.second)) {
 
                   //  add a cut point to c1 and c2 (c2 only if necessary)
                   c1->make_cutpoints (cutpoints)->add (cp.second, &cutpoints, true);
@@ -1197,7 +1197,7 @@ get_intersections_per_band_90 (std::vector <CutPoints> &cutpoints, std::vector <
                            c1->p1 () != c2->p2 () && c1->p2 () != c2->p2 ()) {
 
               std::pair <bool, db::Point> cp = c1->intersect_point (*c2);
-              if (cp.first) {
+              if (cp.first && cell.contains (cp.second)) {
                 
                 //  add a cut point to c1 and c2
                 c2->make_cutpoints (cutpoints)->add (cp.second, &cutpoints, true);
@@ -1398,15 +1398,15 @@ get_intersections_per_band_any (std::vector <CutPoints> &cutpoints, std::vector 
 
                 //  parallel horizontal edges: produce the end points of each other edge as cutpoints
                 if (c1->p1 ().y () == c2->p1 ().y ()) {
-                  add_hparallel_cutpoints (*c1, *c2, cutpoints);
-                  add_hparallel_cutpoints (*c2, *c1, cutpoints);
+                  add_hparallel_cutpoints (*c1, *c2, cell, cutpoints);
+                  add_hparallel_cutpoints (*c2, *c1, cell, cutpoints);
                 }
 
               } else if (c1->p1 () != c2->p1 () && c1->p2 () != c2->p1 () &&
                          c1->p1 () != c2->p2 () && c1->p2 () != c2->p2 ()) {
 
                 std::pair <bool, db::Point> cp = safe_intersect_point (*c1, *c2);
-                if (cp.first) {
+                if (cp.first && cell.contains (cp.second)) {
 
                   bool on_edge1 = is_point_on_exact (*c1, cp.second);
 
@@ -1478,7 +1478,7 @@ get_intersections_per_band_any (std::vector <CutPoints> &cutpoints, std::vector 
                            c1->p1 () != c2->p2 () && c1->p2 () != c2->p2 ()) {
 
               std::pair <bool, db::Point> cp = safe_intersect_point (*c1, *c2);
-              if (cp.first) {
+              if (cp.first && cell.contains (cp.second)) {
                 
                 bool on_edge1 = true;
                 bool on_edge2 = is_point_on_exact (*c2, cp.second);

@@ -1521,7 +1521,11 @@ get_intersections_per_band_any (std::vector <CutPoints> &cutpoints, std::vector 
             bool on_edge = is_point_on_exact (*cc, *wp);
             cc->make_cutpoints (cutpoints)->add (*wp, &cutpoints, !on_edge);
 #ifdef DEBUG_EDGE_PROCESSOR
-            printf ("intersection point %s gives strong cutpoint in %s.\n", wp->first.to_string ().c_str (), cc->to_string ().c_str ());
+            if (!on_edge) {
+              printf ("intersection point %s gives strong cutpoint in %s.\n", wp->to_string ().c_str (), cc->to_string ().c_str ());
+            } else {
+              printf ("intersection point %s gives weak cutpoint in %s.\n", wp->to_string ().c_str (), cc->to_string ().c_str ());
+            }
 #endif
           }
         }

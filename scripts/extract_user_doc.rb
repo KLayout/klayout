@@ -231,7 +231,7 @@ hs.urls.each do |url|
     t = HEADER + xml2html(t) + TAIL
 
     tt = nil
-    if File.exists?(fn) 
+    if File.exist?(fn) 
       File.open(fn, "rb") { |f| tt = f.read }
     end
 

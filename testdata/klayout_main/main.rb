@@ -45,7 +45,7 @@ class KLayoutMain_TestClass < TestBase
   def klayout_bin
     # special location for MacOS
     file = File.join(RBA::Application::instance.inst_path, "klayout.app", "Contents", "MacOS", "klayout")
-    if !File.exists?(file)
+    if !File.exist?(file)
       file = File.join(RBA::Application::instance.inst_path, "klayout")
     end
     return file

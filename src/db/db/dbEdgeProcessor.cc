@@ -1406,7 +1406,7 @@ get_intersections_per_band_any (std::vector <CutPoints> &cutpoints, std::vector 
 
       db::Box cell (x, y, xx, yy);
 
-      std::map<db::Point, std::set<const WorkEdge *> > weak_points;    // holds points that need to go in all other edges except to ones listed in the value
+      std::set<db::Point> weak_points;    // holds points that need to go in all other edges
       p1_weak.clear ();
 
       for (std::vector <WorkEdge>::iterator c1 = c; c1 != f; ++c1) {
@@ -1437,28 +1437,8 @@ get_intersections_per_band_any (std::vector <CutPoints> &cutpoints, std::vector 
 
                 std::pair <bool, db::Point> cp = safe_intersect_point (*c1, *c2);
                 if (cp.first && cell.contains (cp.second)) {
-
-                  bool on_edge1 = is_point_on_exact (*c1, cp.second);
-
-                  //  add a cut point to c1 and c2 (points not on the edge give strong attractors)
-                  c1->make_cutpoints (cutpoints)->add (cp.second, &cutpoints, !on_edge1);
-                  if (with_h) {
-                    c2->make_cutpoints (cutpoints)->add (cp.second, &cutpoints, false);
-                  }
-
-#ifdef DEBUG_EDGE_PROCESSOR
-                  if (on_edge1) {
-                    printf ("weak intersection point %s between %s and %s.\n", cp.second.to_string ().c_str (), c1->to_string ().c_str (), c2->to_string ().c_str ());
-                  } else {
-                    printf ("intersection point %s between %s and %s.\n", cp.second.to_string ().c_str (), c1->to_string ().c_str (), c2->to_string ().c_str ());
-                  }
-#endif
-
                   //  Stash the cutpoint as it must be inserted into other edges as well.
-                  std::set<const WorkEdge *> &except = weak_points[cp.second];
-                  except.insert (c1.operator-> ());
-                  except.insert (c2.operator-> ());
-
+                  weak_points.insert (cp.second);
                 }
 
               }
@@ -1500,31 +1480,8 @@ get_intersections_per_band_any (std::vector <CutPoints> &cutpoints, std::vector 
 
               std::pair <bool, db::Point> cp = safe_intersect_point (*c1, *c2);
               if (cp.first && cell.contains (cp.second)) {
-
-                bool on_edge1 = true;
-                bool on_edge2 = is_point_on_exact (*c2, cp.second);
-
-                //  add a cut point to c1 and c2
-                if (with_h || c1->dy () != 0) {
-                  on_edge1 = is_point_on_exact (*c1, cp.second);
-                  c1->make_cutpoints (cutpoints)->add (cp.second, &cutpoints, !on_edge1);
-                }
-
-                c2->make_cutpoints (cutpoints)->add (cp.second, &cutpoints, !on_edge2);
-
-#ifdef DEBUG_EDGE_PROCESSOR
-                if (!on_edge1 || !on_edge2) {
-                  printf ("intersection point %s between %s and %s.\n", cp.second.to_string ().c_str (), c1->to_string ().c_str (), c2->to_string ().c_str ());
-                } else {
-                  printf ("weak intersection point %s between %s and %s.\n", cp.second.to_string ().c_str (), c1->to_string ().c_str (), c2->to_string ().c_str ());
-                }
-#endif
-
                 //  Stash the cutpoint as it must be inserted into other edges as well.
-                std::set<const WorkEdge *> &except = weak_points[cp.second];
-                except.insert (c1.operator-> ());
-                except.insert (c2.operator-> ());
-
+                weak_points.insert (cp.second);
               }
 
             } 
@@ -1560,8 +1517,9 @@ get_intersections_per_band_any (std::vector <CutPoints> &cutpoints, std::vector 
       for (auto wp = weak_points.begin (); wp != weak_points.end (); ++wp) {
 
         for (std::vector <WorkEdge>::iterator cc = c; cc != f; ++cc) {
-          if ((with_h || cc->dy () != 0) && wp->second.find (cc.operator->()) == wp->second.end () && is_point_on_fuzzy (*cc, wp->first)) {
-            cc->make_cutpoints (cutpoints)->add (wp->first, &cutpoints, true);
+          if ((with_h || cc->dy () != 0) && is_point_on_fuzzy (*cc, *wp)) {
+            bool on_edge = is_point_on_exact (*cc, *wp);
+            cc->make_cutpoints (cutpoints)->add (*wp, &cutpoints, !on_edge);
 #ifdef DEBUG_EDGE_PROCESSOR
             printf ("intersection point %s gives strong cutpoint in %s.\n", wp->first.to_string ().c_str (), cc->to_string ().c_str ());
 #endif

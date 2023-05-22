@@ -1,3 +1,35 @@
+0.28.8           (2023-05-23):
+* Enhancement: %GITHUB%/issues/1314 Storing (arbitrary) data in metadata
+  - Meta information can be attached to layout and cells
+  - Meta information has a string key and arbitrary value (hash, list supported)
+  - Optionally, meta information can be made persistent and
+    is stored in the (KLayout specific) context section of GDS2 and OASIS
+  - Meta information is shown in the user properties dialog, but is not editable
+  - Meta information is similar, but not the same than user properties
+* Enhancement: %GITHUB%/issues/1324 Feature request: hide empty groups
+* Enhancement: %GITHUB%/issues/1345 feature request: create a def single/mulitpart path import option
+* Enhancement: %GITHUB%/issues/1348 "Reload Files" popup prevents closing KLayout
+* Enhancement: %GITHUB%/issues/1349 Add application events for indicating start/finish of restoring session
+* Bugfix: %GITHUB%/issues/1353 Bug in RecursiveInstanceIterator
+* Enhancement: %GITHUB%/issues/1357 Add binding for QObject::findChildren 
+* Bugfix: %GITHUB%/issues/1360 LayoutView not promoted to correct class after Plugin initialization
+* Bugfix: %GITHUB%/issues/1366 Slow merging of polygons from width check edge pairs
+* Bugfix: %GITHUB%/issues/1373 Region "+" skips shapes with user properties on second input
+* Enhancement: Ruby debugger performance improvement - with debugger enabled, Ruby script execution was very slow
+* Enhancement: Polygon "decompose_convex" tries harder to avoid generating thin slivers
+* (Significant) Enhancement: Selection of labels now considers label area, not just label origin point
+* Bugfix: Making 'R', 'L' and 'C' parameters for the respective Spice elements beside "value"
+* Enhancement: Zoom In/Out menu functions now use the current mouse position for the zoom fixpoint (important when binding them to a key)
+* Bugfix: More consistent behavior of RBA/pya: enum classes are properly made available (was for example RBA::Qt::Qt_Keys instead of RBA::Qt_Keys and pya.Qt.Keys was no fully initialized type object)
+* Bugfix: Netlist reader: anonymous circuits (without definition) will not fail because of unknown parameters
+* Bugfix: Closed paths lost last point after editing in partial edit mode
+* Enhancement: Somewhat better grid snapping in partial edit mode
+* Bugfixes/enhancements: Macro editor
+  - fixed missing icons for "back" and "forward"
+  - enhancements for "search & replace" 
+  - Ctrl+R and Ctrl+Shift+R for replace and "replace all"
+  - Fixed tool tips for buttons
+
 0.28.7           (2023-04-22):
 * Enhancement: %GITHUB%/issues/1320 Support for .lib statement in Spice
 * Bugfix: %GITHUB%/issues/1321 Tilde expansion in paths (e.g. "~/test.gds") on Linux

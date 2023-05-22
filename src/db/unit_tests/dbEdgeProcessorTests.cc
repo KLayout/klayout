@@ -2781,3 +2781,40 @@ TEST(135b)
   EXPECT_EQ (run_test135b (_this, db::Trans (db::Trans::m90)), "(-78,25;-33,34;-36,33;-37,33)");
   EXPECT_EQ (run_test135b (_this, db::Trans (db::Trans::m135)), "(-26,-78;-35,-33;-33,-36;-33,-37)");
 }
+
+//  issue #1366
+TEST(136)
+{
+  db::Layout layout_1;
+  unsigned int l_l20000d0;
+
+  {
+    std::string fn (tl::testdata ());
+    fn += "/bool/";
+    fn += "issue_1366.oas";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+
+    db::LoadLayoutOptions options;
+    reader.read (layout_1, options);
+
+    l_l20000d0 = layout_1.get_layer (db::LayerProperties (20000, 0));
+  }
+
+  db::ShapeProcessor proc;
+
+  db::Layout lr;
+  lr.dbu (0.0001);
+  db::Cell *lr_top = &lr.cell (lr.add_cell ("TOP"));
+
+  unsigned int lr_l100d0 = lr.insert_layer (db::LayerProperties (100, 0));
+
+  proc.merge (layout_1, layout_1.cell (*layout_1.begin_top_down ()), l_l20000d0,
+              lr_top->shapes (lr_l100d0), false /*hierarchical*/, 0, true /*resolve holes*/, true /*min coherence*/);
+
+  std::string au_fn (tl::testdata ());
+  au_fn += "/bool/";
+  au_fn += "issue_1366_au.gds";
+
+  db::compare_layouts (_this, lr, au_fn);
+}

@@ -2486,9 +2486,11 @@ RubyInterpreter::begin_exec ()
 {
   d->exit_on_next = false;
   d->block_exceptions = false;
-  d->file_id_map.clear ();
-  if (d->current_exec_level++ == 0 && d->current_exec_handler) {
-    d->current_exec_handler->start_exec (this);
+  if (d->current_exec_level++ == 0) {
+    d->file_id_map.clear ();
+    if (d->current_exec_handler) {
+      d->current_exec_handler->start_exec (this);
+    }
   }
 }
 

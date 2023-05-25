@@ -905,7 +905,7 @@ static db::Cell *create_cell4 (db::Layout *layout, const std::string &name, cons
 
 static void layout_add_meta_info (db::Layout *layout, const MetaInfo &mi)
 {
-  layout->add_meta_info (mi.name, db::MetaInfo (mi.description, mi.value));
+  layout->add_meta_info (mi.name, db::MetaInfo (mi.description, mi.value, mi.persisted));
 }
 
 static MetaInfo *layout_get_meta_info (db::Layout *layout, const std::string &name)

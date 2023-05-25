@@ -1000,7 +1000,7 @@ static void cell_remove_meta_info (db::Cell *cell, const std::string &name)
 static void cell_add_meta_info (db::Cell *cell, const MetaInfo &mi)
 {
   if (cell->layout ()) {
-    cell->layout ()->add_meta_info (cell->cell_index (), mi.name, db::MetaInfo (mi.description, mi.value));
+    cell->layout ()->add_meta_info (cell->cell_index (), mi.name, db::MetaInfo (mi.description, mi.value, mi.persisted));
   }
 }
 

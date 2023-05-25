@@ -1066,7 +1066,7 @@ class DBLayoutTests2_TestClass < TestBase
     ly = RBA::Layout::new
 
     ly.add_meta_info(RBA::LayoutMetaInfo::new("myinfo", "a"))
-    ly.add_meta_info(RBA::LayoutMetaInfo::new("another", 42, "description"))
+    ly.add_meta_info(RBA::LayoutMetaInfo::new("another", 42, "description", true))
 
     assert_equal(ly.meta_info_value("myinfo"), "a")
     assert_equal(ly.meta_info_value("doesnotexist"), nil)
@@ -1081,6 +1081,9 @@ class DBLayoutTests2_TestClass < TestBase
     a = []
     ly.each_meta_info { |mi| a << mi.description }
     assert_equal(a.join(","), ",description")
+    a = []
+    ly.each_meta_info { |mi| a << mi.is_persisted?.to_s }
+    assert_equal(a.join(","), "false,true")
 
     ly.add_meta_info(RBA::LayoutMetaInfo::new("myinfo", "b"))
     assert_equal(ly.meta_info_value("myinfo"), "b")
@@ -1108,7 +1111,7 @@ class DBLayoutTests2_TestClass < TestBase
     c2 = ly.create_cell("U")
 
     c1.add_meta_info(RBA::LayoutMetaInfo::new("a", true))
-    c1.add_meta_info(RBA::LayoutMetaInfo::new("b", [ 1, 17, 42 ]))
+    c1.add_meta_info(RBA::LayoutMetaInfo::new("b", [ 1, 17, 42 ], "description", true))
 
     assert_equal(c2.meta_info("a"), nil)
     assert_equal(c2.meta_info_value("a"), nil)
@@ -1124,6 +1127,14 @@ class DBLayoutTests2_TestClass < TestBase
     a = []
     c1.each_meta_info { |mi| a << mi.value.to_s }
     assert_equal(a.join(","), "true,[1, 17, 42]")
+
+    a = []
+    c1.each_meta_info { |mi| a << mi.description }
+    assert_equal(a.join(","), ",description")
+
+    a = []
+    c1.each_meta_info { |mi| a << mi.is_persisted?.to_s }
+    assert_equal(a.join(","), "false,true")
 
     c1.remove_meta_info("doesnotexist")   # should not fail
 

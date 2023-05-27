@@ -71,6 +71,7 @@ module DRC
 
       @verbose = false
       @profile = false
+      @profile_n = 0
       @profile_info = {}
 
       @in_context = nil
@@ -717,12 +718,20 @@ module DRC
     # @name profile
     # @brief Profiles the script and provides a runtime + memory statistics
     # @synopsis profile
-    # @synopsis profile(m)
+    # @synopsis profile(n)
     # Turns profiling on or off (default). In profiling mode, the 
     # system will collect statistics about rules executed, their execution time
-    # and memory information.
-    def profile(f = true)
-      @profile = f
+    # and memory information. The argument specifies how many operations to 
+    # print at the end of the run. Without an argument, all operations are
+    # printed. Passing "false" for the argument will disable profiling. This is the
+    # default.
+
+    def profile(n = 0)
+      if !n.is_a?(1.class) && n != nil && n != false
+        raise("Argument to 'profile' must be either an integer number or nil")
+      end
+      @profile = !!n
+      @profile_n = [n || 0, 0].max
     end
 
     # %DRC%
@@ -2541,14 +2550,12 @@ CODE
       max_len_time  = [ @profile_info.values.collect { |v| ("%.3f" % (v[1] + v[2])).to_s.size }.max, time_title.size ].max
       max_len_mem   = [ @profile_info.values.collect { |v| v[3].to_s.size }.max, memory_title.size ].max
 
-      fmt = "  " +
-            "%-" + max_len_desc.to_s + "s  " +
+      fmt = "%-" + max_len_desc.to_s + "s  " +
             "%-" + max_len_calls.to_s + "d  " +
             "%-" + max_len_time.to_s + ".3f  " + 
             "%-" + max_len_mem.to_s + ".0f" 
 
-      fmt_title = "  " +
-                  "%-" + max_len_desc.to_s + "s  " +
+      fmt_title = "%-" + max_len_desc.to_s + "s  " +
                   "%-" + max_len_calls.to_s + "s  " +
                   "%-" + max_len_time.to_s + "s  " + 
                   "%-" + max_len_mem.to_s + "s" 
@@ -2557,30 +2564,28 @@ CODE
         [ desc, calls, sys_time + user_time, memory.to_f / 1024.0 ]
       end
 
-      nmax = 50
-
       self.log("")
-      self.log("Operations by execution time")
+      self.log("Operations by execution time\n")
       self.log(fmt_title % titles)
       n = 1
       pi.sort { |a,b| b[2] <=> a[2] }.each do |info|
         self.log(fmt % info)
         n += 1
-        if n > nmax
-          self.log("  ... (%d entries skipped)" % (pi.size - nmax))
+        if @profile_n > 0 && n > @profile_n
+          self.log("... (%d entries skipped)" % (pi.size - nmax))
           break
         end
       end
 
       self.log("")
-      self.log("Operations by memory adder")
+      self.log("Operations by memory adder\n")
       self.log(fmt_title % titles)
       n = 1
       pi.sort { |a,b| b[3] <=> a[3] }.each do |info|
         self.log(fmt % info)
         n += 1
-        if n > nmax
-          self.log("  ... (%d entries skipped)" % (pi.size - nmax))
+        if @profile_n > 0 && n > @profile_n
+          self.log("... (%d entries skipped)" % (pi.size - nmax))
           break
         end
       end

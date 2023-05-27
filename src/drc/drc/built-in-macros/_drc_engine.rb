@@ -70,6 +70,8 @@ module DRC
       dss._destroy
 
       @verbose = false
+      @profile = false
+      @profile_info = {}
 
       @in_context = nil
 
@@ -709,6 +711,18 @@ module DRC
       self._context("capacitor_with_bulk") do
         RBA::DeviceExtractorCapacitorWithBulk::new(name, area_cap, _make_factory(cls))
       end
+    end
+
+    # %DRC%
+    # @name profile
+    # @brief Profiles the script and provides a runtime + memory statistics
+    # @synopsis profile
+    # @synopsis profile(m)
+    # Turns profiling on or off (default). In profiling mode, the 
+    # system will collect statistics about rules executed, their execution time
+    # and memory information.
+    def profile(f = true)
+      @profile = f
     end
 
     # %DRC%
@@ -2267,13 +2281,16 @@ CODE
       end
       
       t = RBA::Timer::new
+
       t.start
       self._process_events
       if @force_gc || Time::now - @time > 0.5
         GC.start    # force a garbage collection before the operation to free unused memory
         @time = Time::now
       end
+      mem_before = RBA::Timer::memory_size
       res = yield
+      mem_after = RBA::Timer::memory_size
       t.stop
 
       begin
@@ -2283,12 +2300,22 @@ CODE
           # Report result statistics
           _result_info(res, 1)
 
-          mem = RBA::Timer::memory_size
-          if mem > 0
-            info("Elapsed: #{'%.3f'%(t.sys+t.user)}s  Memory: #{'%.2f'%(mem/(1024*1024))}M", 1)
+          if mem_after > 0
+            info("Elapsed: #{'%.3f'%(t.sys+t.user)}s  Memory: #{'%.2f'%(mem_after/(1024*1024))}M", 1)
           else
             info("Elapsed: #{'%.3f'%(t.sys+t.user)}s", 1)
           end
+
+        end
+
+        if @profile
+
+          # calls, sys time (in sec), user time (in sec), memory added (in bytes)
+          info = (@profile_info[desc] ||= [ 0, 0.0, 0.0, 0 ])
+          info[0] += 1
+          info[1] += t.sys
+          info[2] += t.user
+          info[3] += mem_after - mem_before
 
         end
 
@@ -2500,6 +2527,65 @@ CODE
       end
       output_cell
     end
+
+    def _dump_profile
+
+      desc_title = "Operation"
+      calls_title = "# calls"
+      time_title = "Time (s)"
+      memory_title = "Memory (k)"
+      titles = [ desc_title, calls_title, time_title, memory_title ]
+
+      max_len_desc  = [ @profile_info.keys.collect { |s| s.size }.max, desc_title.size ].max
+      max_len_calls = [ @profile_info.values.collect { |v| v[0].to_s.size }.max, calls_title.size ].max
+      max_len_time  = [ @profile_info.values.collect { |v| ("%.3f" % (v[1] + v[2])).to_s.size }.max, time_title.size ].max
+      max_len_mem   = [ @profile_info.values.collect { |v| v[3].to_s.size }.max, memory_title.size ].max
+
+      fmt = "  " +
+            "%-" + max_len_desc.to_s + "s  " +
+            "%-" + max_len_calls.to_s + "d  " +
+            "%-" + max_len_time.to_s + ".3f  " + 
+            "%-" + max_len_mem.to_s + ".0f" 
+
+      fmt_title = "  " +
+                  "%-" + max_len_desc.to_s + "s  " +
+                  "%-" + max_len_calls.to_s + "s  " +
+                  "%-" + max_len_time.to_s + "s  " + 
+                  "%-" + max_len_mem.to_s + "s" 
+
+      pi = @profile_info.keys.collect { |s| [s] + @profile_info[s] }.collect do |desc,calls,sys_time,user_time,memory|
+        [ desc, calls, sys_time + user_time, memory.to_f / 1024.0 ]
+      end
+
+      nmax = 50
+
+      self.log("")
+      self.log("Operations by execution time")
+      self.log(fmt_title % titles)
+      n = 1
+      pi.sort { |a,b| b[2] <=> a[2] }.each do |info|
+        self.log(fmt % info)
+        n += 1
+        if n > nmax
+          self.log("  ... (%d entries skipped)" % (pi.size - nmax))
+          break
+        end
+      end
+
+      self.log("")
+      self.log("Operations by memory adder")
+      self.log(fmt_title % titles)
+      n = 1
+      pi.sort { |a,b| b[3] <=> a[3] }.each do |info|
+        self.log(fmt % info)
+        n += 1
+        if n > nmax
+          self.log("  ... (%d entries skipped)" % (pi.size - nmax))
+          break
+        end
+      end
+
+    end
     
     def _start(job_description)
     
@@ -2547,6 +2633,11 @@ CODE
           gzip = opt.set_format_from_filename(@output_layout_file)
           info("Writing layout file: #{@output_layout_file} ..")
           @output_layout.write(@output_layout_file, gzip, opt)
+        end
+
+        # dump the profile information
+        if @profile
+          _dump_profile
         end
         
         # create the new layers as visual layers if necessary

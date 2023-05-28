@@ -2619,6 +2619,10 @@ CODE
 
     def _dump_profile
 
+      if @profile_info.empty?
+        return
+      end
+
       desc_title = "Operation"
       calls_title = "# calls"
       time_title = "Time (s)"
@@ -2711,7 +2715,7 @@ CODE
         end
 
         # dump the profile information
-        if @profile
+        if @profile && final
           _dump_profile
         end
         

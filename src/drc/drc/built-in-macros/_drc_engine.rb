@@ -32,6 +32,9 @@ module DRC
     def finish(final)
       # reimplement
     end
+    def write
+      # reimplement
+    end
     def layout
       nil
     end
@@ -58,6 +61,10 @@ module DRC
     end
 
     def finish(final, view)
+      write
+    end
+
+    def write
       if @file_name
         opt = RBA::SaveLayoutOptions::new
         gzip = opt.set_format_from_filename(@file_name)
@@ -101,13 +108,17 @@ module DRC
     end
 
     def finish(final, view)
+      write
+      if final && view
+        view.show_rdb(@rdb_index, view.active_cellview_index)
+      end
+    end
+
+    def write
       if @file_name
         rdb_file = @engine._make_path(@file_name)
         @engine.info("Writing report database: #{rdb_file} ..")
         @rdb.save(rdb_file)
-      end
-      if final && view
-        view.show_rdb(@rdb_index, view.active_cellview_index)
       end
     end
 
@@ -2372,7 +2383,7 @@ CODE
 
       t.start
       self._process_events
-      if @force_gc || Time::now - @time > 0.5
+      if @force_gc || Time::now - @time > 0.5 || @profile
         GC.start    # force a garbage collection before the operation to free unused memory
         @time = Time::now
       end

@@ -106,6 +106,8 @@ private:
   virtual void get_time (unsigned int *mod_time, unsigned int *access_time);
   virtual GDS2XY *get_xy_data (unsigned int &length);
   virtual void progress_checkpoint ();
+
+  void record_underflow_error ();
 };
 
 }

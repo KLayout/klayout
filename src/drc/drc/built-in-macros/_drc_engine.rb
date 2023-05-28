@@ -32,9 +32,6 @@ module DRC
     def finish(final)
       # reimplement
     end
-    def destroy
-      # reimplement
-    end
     def layout
       nil
     end
@@ -67,10 +64,6 @@ module DRC
         @engine.info("Writing layout file: #{@file_name} ..")
         @layout.write(@file_name, gzip, opt)
       end
-    end
-
-    def destroy
-      @layout._destroy
     end
 
     def layout
@@ -116,10 +109,6 @@ module DRC
       if final && view
         view.show_rdb(@rdb_index, view.active_cellview_index)
       end
-    end
-
-    def destroy
-      @rdb._destroy
     end
 
     def rdb
@@ -1483,9 +1472,7 @@ module DRC
         # finish what we got so far
         _finish(false)
 
-        @def_output && @def_output.destroy
         @def_output = nil
-
         @def_output = _make_report(description, filename, cellname)
 
       end
@@ -1597,7 +1584,7 @@ module DRC
         if ! @def_output
           if @def_layout
             # establish a new default output from the default layout on this occasion
-            @def_output = LayoutOutputChannel(self, @def_layout, cellname.to_s, nil)
+            @def_output = LayoutOutputChannel::new(self, @def_layout, cellname.to_s, nil)
           end
         else
           @def_output.cellname = cellname.to_s
@@ -1639,9 +1626,7 @@ module DRC
         # finish what we got so far
         _finish(false)
 
-        @def_output && @def_output.destroy
         @def_output = nil
-
         @def_output = _make_target(arg, cellname)
 
       end
@@ -2815,10 +2800,8 @@ CODE
       ensure
 
         @output_layers = []
-        @def_output && @def_output.destroy
         @def_output = nil
         if final
-          @other_outputs.each { |o| o.destroy }
           @other_outputs = []
         end
         @show_l2ndb = nil
@@ -3116,7 +3099,7 @@ CODE
       channel = args.find { |a| a.is_a?(OutputChannel) }
       if ! channel
         if ! @def_output
-          @def_output = LayoutOutputChannel(self, self._output_layout, self._output_cell, nil)
+          @def_output = LayoutOutputChannel::new(self, self._output_layout, self._output_cell, nil)
         end
         channel = @def_output
       end

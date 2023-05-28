@@ -2656,7 +2656,7 @@ CODE
         self.log(fmt % info)
         n += 1
         if @profile_n > 0 && n > @profile_n
-          self.log("... (%d entries skipped)" % (pi.size - nmax))
+          self.log("... (%d entries skipped)" % (pi.size - @profile_n))
           break
         end
       end
@@ -2669,7 +2669,7 @@ CODE
         self.log(fmt % info)
         n += 1
         if @profile_n > 0 && n > @profile_n
-          self.log("... (%d entries skipped)" % (pi.size - nmax))
+          self.log("... (%d entries skipped)" % (pi.size - @profile_n))
           break
         end
       end

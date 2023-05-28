@@ -13,6 +13,125 @@ module DRC
     end
   end
 
+  class OutputChannel
+    def initialize(engine)
+      @engine = engine
+    end
+    def is_rdb?
+      false
+    end
+    def cellname=(cellname)
+      # reimplement
+    end
+    def cell
+      # reimplement
+    end
+    def write
+      # reimplement
+    end
+    def finish(final)
+      # reimplement
+    end
+    def destroy
+      # reimplement
+    end
+    def layout
+      nil
+    end
+    def rdb
+      nil
+    end
+  end
+
+  class LayoutOutputChannel < OutputChannel
+
+    def initialize(engine, layout, cell, file_name)
+      super(engine)
+      @layout = layout
+      @cell = cell
+      @file_name = file_name
+    end
+
+    def cellname=(cellname)
+      @cell = @layout.cell(cellname) || @layout.create_cell(cellname)
+    end
+
+    def is_rdb?
+      false
+    end
+
+    def finish(final, view)
+      if @file_name
+        opt = RBA::SaveLayoutOptions::new
+        gzip = opt.set_format_from_filename(@file_name)
+        @engine.info("Writing layout file: #{@file_name} ..")
+        @layout.write(@file_name, gzip, opt)
+      end
+    end
+
+    def destroy
+      @layout._destroy
+    end
+
+    def layout
+      @layout
+    end
+
+    def cell
+      @cell
+    end
+
+  end
+
+  class RDBOutputChannel < OutputChannel
+
+    def initialize(engine, rdb, rdb_index, cellname, file_name)
+      super(engine)
+      @rdb = rdb
+      @rdb_index = rdb_index
+      @cell = cellname && rdb.create_cell(cellname)
+      @file_name = file_name
+    end
+
+    def cellname=(cellname)
+      @cell = nil
+      @rdb.each_cell do |c|
+        if c.name == cellname
+          @cell = c
+        end
+      end
+      @cell ||= @rdb.create_cell(cellname)
+    end
+
+    def is_rdb?
+      true
+    end
+
+    def finish(final, view)
+      if @file_name
+        rdb_file = @engine._make_path(@file_name)
+        @engine.info("Writing report database: #{rdb_file} ..")
+        @rdb.save(rdb_file)
+      end
+      if final && view
+        view.show_rdb(@rdb_index, view.active_cellview_index)
+      end
+    end
+
+    def destroy
+      @rdb._destroy
+    end
+
+    def rdb
+      @rdb
+    end
+
+    def cell
+      @cell
+    end
+
+  end
+
   # The DRC engine
   
   # %DRC%
@@ -40,11 +159,9 @@ module DRC
       @def_source = nil
       @dbu_read = false
       use_dbu(@def_layout && @def_layout.dbu)
-      @output_layout = nil
-      @output_rdb = nil
-      @output_rdb_file = nil
-      @output_rdb_cell = nil
       @show_l2ndb = nil
+      @def_output = nil
+      @other_outputs = []
       @output_l2ndb_file = nil
       @target_netlist_file = nil
       @target_netlist_format = nil
@@ -1363,43 +1480,41 @@ module DRC
 
       self._context("report") do
 
-        @output_rdb_file = filename
+        # finish what we got so far
+        _finish(false)
 
-        name = filename && File::basename(filename)
-        name ||= "DRC"
-        
-        @output_rdb_index = nil
+        @def_output && @def_output.destroy
+        @def_output = nil
 
-        view = RBA::LayoutView::current
-        if view
-          if self._rdb_index
-            @output_rdb = RBA::ReportDatabase::new("")   # reuse existing name
-            @output_rdb_index = view.replace_rdb(self._rdb_index, @output_rdb)
-          else
-            @output_rdb = RBA::ReportDatabase::new(name)
-            @output_rdb_index = view.add_rdb(@output_rdb)
-          end
-        else
-          @output_rdb = RBA::ReportDatabase::new(name)
-        end
-        
-        @output_layout = nil
-        @output_cell = nil
-        @output_layout_file = nil
-
-        cn = nil
-        cn ||= @def_cell && @def_cell.name
-        cn ||= source && source.cell_name
-        cn ||= cellname
-
-        cn || raise("No cell name specified - either the source was not specified before 'report' or there is no default source. In the latter case, specify a cell name as the third parameter")
-
-        @output_rdb_cell = @output_rdb.create_cell(cn)
-        @output_rdb.generator = self._generator
-        @output_rdb.top_cell_name = cn
-        @output_rdb.description = description
+        @def_output = _make_report(description, filename, cellname)
 
       end
+      
+    end
+
+    # %DRC%
+    # @name new_report
+    # @brief Creates a new report database object for use in "output"
+    # @synopsis new_report(description [, filename [, cellname ] ])
+    # 
+    # This method creates an independent report object. This object
+    # can be used in "output" to send a layer to a different report than
+    # the default report or target.
+    #
+    # Arguments are the same than for \global#report.
+    #
+    # See \Layer#output for details about this feature.
+
+    def new_report(description, filename = nil, cellname = nil)
+
+      output = nil
+
+      self._context("new_report") do
+        output = _make_report(description, filename, cellname)
+        @other_outputs << output
+      end
+
+      output
       
     end
 
@@ -1479,25 +1594,13 @@ module DRC
         # finish what we got so far
         _flush
         
-        if @output_rdb
-        
-          cell = nil
-          @output_rdb.each_cell do |c|
-            if c.name == cellname
-              cell = c
-            end
+        if ! @def_output
+          if @def_layout
+            # establish a new default output from the default layout on this occasion
+            @def_output = LayoutOutputChannel(self, @def_layout, cellname.to_s, nil)
           end
-          
-          cell ||= @output_rdb.create_cell(cellname)
-          @output_rdb_cell = cell
-          
         else
-        
-          @output_layout ||= @def_layout
-          if @output_layout
-            @output_cell = @output_layout.cell(cellname.to_s) || @output_layout.create_cell(cellname.to_s)
-          end
-          
+          @def_output.cellname = cellname.to_s
         end
 
       end
@@ -1535,51 +1638,42 @@ module DRC
     
         # finish what we got so far
         _finish(false)
-            
-        if arg.is_a?(String)
-        
-          if arg =~ /^@(\d+|\+)/
-            view = RBA::LayoutView::current
-            view || raise("No view open")
-            if $1 == "+"
-              n = view.create_layout(true)
-              cellname ||= (@def_cell ? @def_cell.name : "TOP")
-            else
-              n = $1.to_i - 1
-            end
-            (n >= 0 && view.cellviews > n) || raise("Invalid layout index @#{n + 1}")
-            cv = view.cellview(n)
-            cv.is_valid? || raise("Invalid layout @#{n + 1}")
-            @output_layout = cv.layout
-            @output_cell = cellname ? (@output_layout.cell(cellname.to_s) || @output_layout.create_cell(cellname.to_s)) : cv.cell
-            cv.cell = @output_cell
-            @output_layout_file = nil
-          else
-            @output_layout = RBA::Layout::new
-            @output_cell = cellname && @output_layout.create_cell(cellname.to_s)
-            @output_layout_file = arg
-          end
-          
-        elsif arg.is_a?(RBA::Layout)
-        
-          @output_layout = arg
-          @output_cell = cellname && (@output_layout.cell(cellname.to_s) || @output_layout.create_cell(cellname.to_s))
-          @output_layout_file = nil
-          
-        elsif arg.is_a?(RBA::Cell)
-        
-          @output_layout = arg.layout
-          @output_cell = arg
-          @output_layout_file = nil
 
-        else
-          raise("Invalid argument '" + arg.inspect + "'")
-        end
-    
+        @def_output && @def_output.destroy
+        @def_output = nil
+
+        @def_output = _make_target(arg, cellname)
+
       end
 
     end
-    
+            
+    # %DRC%
+    # @name new_target
+    # @brief Creates a new layout target object for use in "output"
+    # @synopsis new_target(what [, cellname])
+    # 
+    # This method creates an independent target object. This object
+    # can be used in "output" to send a layer to a different layout file than
+    # the default report or target.
+    #
+    # Arguments are the same than for \global#target.
+    #
+    # See \Layer#output for details about this feature.
+
+    def new_target(arg, cellname = nil)
+
+      output = nil
+
+      self._context("new_target") do
+        output = _make_target(arg, cellname)
+        @other_outputs << output
+      end
+
+      output
+      
+    end
+
     # %DRC%
     # @name box 
     # @brief Creates a box object
@@ -2513,8 +2607,8 @@ CODE
     end
 
     def _output_layout
-      if @output_layout 
-        output = @output_layout
+      if @def_output && @def_output.layout
+        output = @def_output.layout
       else
         output = @def_layout
         output || raise("No output layout specified")
@@ -2523,15 +2617,16 @@ CODE
     end
     
     def _output_cell
-      if @output_layout 
-        if @output_cell
-          output_cell = @output_cell
+      if @def_output && @def_output.layout 
+        if @def_output.cell
+          output_cell = @def_output.cell
         elsif @def_cell
-          output_cell = @output_layout.cell(@def_cell.name) || @output_layout.create_cell(@def_cell.name)
+          output_layout = @def_output.layout
+          output_cell = output_layout.cell(@def_cell.name) || output_layout.create_cell(@def_cell.name)
         end
         output_cell || raise("No output cell specified (see 'target' instruction)")
       else
-        output_cell = @output_cell || @def_cell
+        output_cell = @def_cell
         output_cell || raise("No output cell specified")
       end
       output_cell
@@ -2619,25 +2714,15 @@ CODE
       begin
 
         _flush    
-        
+
         view = RBA::LayoutView::current
 
-        # save the report database if requested
-        if @output_rdb_file && final
-          rdb_file = _make_path(@output_rdb_file)
-          info("Writing report database: #{rdb_file} ..")
-          @output_rdb.save(rdb_file)
-        end
-        if @output_rdb && final && view
-          view.show_rdb(@output_rdb_index, view.active_cellview_index)
-        end
-      
-        # save the output file if requested
-        if @output_layout && @output_layout_file
-          opt = RBA::SaveLayoutOptions::new
-          gzip = opt.set_format_from_filename(@output_layout_file)
-          info("Writing layout file: #{@output_layout_file} ..")
-          @output_layout.write(@output_layout_file, gzip, opt)
+        @def_output && @def_output.finish(final, view)
+
+        if final
+          @other_outputs.each do |output|
+            output.finish(final, view)
+          end
         end
 
         # dump the profile information
@@ -2648,7 +2733,7 @@ CODE
         # create the new layers as visual layers if necessary
         if view
         
-          output = @output_layout || @def_layout
+          output = ( @def_output && @def_output.layout ) || @def_layout
           cv_index = nil
           view.cellviews.times do |cvi|
             view.cellview(cvi).layout == output && cv_index = cvi
@@ -2730,13 +2815,12 @@ CODE
       ensure
 
         @output_layers = []
-        @output_layout = nil
-        @output_layout_file = nil
-        @output_cell = nil
-        @output_rdb_file = nil
-        @output_rdb_cell = nil
-        @output_rdb = nil
-        @output_rdb_index = nil
+        @def_output && @def_output.destroy
+        @def_output = nil
+        if final
+          @other_outputs.each { |o| o.destroy }
+          @other_outputs = []
+        end
         @show_l2ndb = nil
         @output_l2ndb_file = nil
 
@@ -3029,21 +3113,36 @@ CODE
     
     def _output(data, *args)
 
-      if @output_rdb
+      channel = args.find { |a| a.is_a?(OutputChannel) }
+      if ! channel
+        if ! @def_output
+          @def_output = LayoutOutputChannel(self, self._output_layout, self._output_cell, nil)
+        end
+        channel = @def_output
+      end
+
+      args = args.select { |a| !a.is_a?(OutputChannel) }
+
+      if channel.rdb
         
         if args.size < 1
           raise("Invalid number of arguments - category name and optional description expected")
         end
 
-        cat = @output_rdb.create_category(args[0].to_s)
+        output_rdb = channel.rdb
+        output_cell = channel.cell
+
+        cat = output_rdb.create_category(args[0].to_s)
         args[1] && cat.description = args[1]
 
-        cat.scan_collection(@output_rdb_cell, RBA::CplxTrans::new(self.dbu), data)
+        cat.scan_collection(output_cell, RBA::CplxTrans::new(self.dbu), data)
       
-      else 
+      end
 
-        output = self._output_layout
-        output_cell = self._output_cell
+      if channel.layout
+
+        output = channel.layout
+        output_cell = channel.cell
 
         info = nil
         if args.size == 1
@@ -3073,14 +3172,16 @@ CODE
 
         begin
 
-          if !@used_output_layers[li]
-            @output_layers.push(li)
-            # Note: to avoid issues with output onto the input layer, we
-            # output to a temp layer and later swap both. The simple implementation
-            # did a clear here and the effect of that was that the data potentially
-            # got invalidated.
-            tmp = output.insert_layer(RBA::LayerInfo::new)
-            @used_output_layers[li] = true
+          if channel == @def_output
+            if !@used_output_layers[li]
+              @output_layers.push(li)
+              # Note: to avoid issues with output onto the input layer, we
+              # output to a temp layer and later swap both. The simple implementation
+              # did a clear here and the effect of that was that the data potentially
+              # got invalidated.
+              tmp = output.insert_layer(RBA::LayerInfo::new)
+              @used_output_layers[li] = true
+            end
           end
 
           # insert the data into the output layer
@@ -3116,7 +3217,111 @@ CODE
       @layout_sources[name] = src
       src
     end
+    
+    def _make_report(description, filename, cellname)
 
+      output_rdb_file = filename
+
+      name = filename && File::basename(filename)
+      name ||= "DRC"
+      
+      output_rdb_index = nil
+
+      view = RBA::LayoutView::current
+      if view
+        if self._rdb_index
+          output_rdb = RBA::ReportDatabase::new("")   # reuse existing name
+          output_rdb_index = view.replace_rdb(self._rdb_index, output_rdb)
+        else
+          output_rdb = RBA::ReportDatabase::new(name)
+          output_rdb_index = view.add_rdb(output_rdb)
+        end
+      else
+        output_rdb = RBA::ReportDatabase::new(name)
+      end
+      
+      cn = cellname && cellname.to_s
+      cn ||= @def_cell && @def_cell.name
+      cn ||= source && source.cell_name
+
+      cn || raise("No cell name specified - either the source was not specified before 'report' or there is no default source. In the latter case, specify a cell name as the third parameter")
+
+      output_rdb.generator = self._generator
+      output_rdb.top_cell_name = cn
+      output_rdb.description = description
+
+      RDBOutputChannel::new(self, output_rdb, output_rdb_index, cn, output_rdb_file)
+      
+    end
+
+    def _make_target(arg, cellname = nil)
+
+      if arg.is_a?(String)
+      
+        if arg =~ /^@(\d+|\+)/
+
+          view = RBA::LayoutView::current
+          view || raise("No view open")
+          if $1 == "+"
+            n = view.create_layout(true)
+            cellname ||= (@def_cell ? @def_cell.name : "TOP")
+          else
+            n = $1.to_i - 1
+          end
+
+          (n >= 0 && view.cellviews > n) || raise("Invalid layout index @#{n + 1}")
+
+          cv = view.cellview(n)
+          cv.is_valid? || raise("Invalid layout @#{n + 1}")
+
+          output_layout = cv.layout
+          output_cell = cellname ? (output_layout.cell(cellname.to_s) || output_layout.create_cell(cellname.to_s)) : cv.cell
+          cv.cell = output_cell
+          output_layout_file = nil
+
+        else
+
+          cn = cellname && cellname.to_s
+          cn ||= @def_cell && @def_cell.name
+          cn ||= source && source.cell_name
+
+          cn || raise("No cell name specified - either the source was not specified before 'report' or there is no default source. In the latter case, specify a cell name as the third parameter")
+
+          output_layout = RBA::Layout::new
+          output_cell = output_layout.create_cell(cn)
+          output_layout_file = arg
+
+        end
+        
+      elsif arg.is_a?(RBA::Layout)
+      
+        output_layout = arg
+
+        output_cell = cellname && (output_layout.cell(cellname.to_s) || output_layout.create_cell(cellname.to_s))
+        if ! output_cell
+          begin
+            output_cell = output_layout.top_cell
+          rescue 
+            raise("No cell name specified and the layout does not have a unique top cell - specify the name of the top cell to write the output to")
+          end
+        end
+
+        output_layout_file = nil
+        
+      elsif arg.is_a?(RBA::Cell)
+      
+        output_layout = arg.layout
+        output_cell = arg
+        output_layout_file = nil
+
+      else
+        raise("Invalid argument '" + arg.inspect + "'")
+      end
+    
+      output = LayoutOutputChannel::new(self, output_layout, output_cell, output_layout_file)
+
+    end
+    
   end
  
 end

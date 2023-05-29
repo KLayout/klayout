@@ -71,15 +71,12 @@ jobs:
         with:
           path: ./wheelhouse/*.whl
 
-# The following was taken from https://cibuildwheel.readthedocs.io/en/stable/deliver-to-pypi/
+  # The following was taken from https://cibuildwheel.readthedocs.io/en/stable/deliver-to-pypi/
   make_sdist:
     name: Make SDist
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0  # Optional, use if you use setuptools_scm
-        submodules: true  # Optional, use if you have submodules
+    - uses: actions/checkout@v3
 
     - name: Build SDist
       run: pipx run build --sdist
@@ -88,8 +85,48 @@ jobs:
       with:
         path: dist/*.tar.gz
 
-  upload_to_test_pypy:
+  test_pyi:
     needs: [build, make_sdist]
+    name: Test if pyi stubs are up-to-date
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        # https://github.com/EndBug/add-and-commit#working-with-prs
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - uses: actions/checkout@v3
+        if: ${{ github.event_name != 'pull_request' }}
+      - uses: actions/download-artifact@v3
+        with:
+          name: artifact
+          path: dist
+      - name: Install klayout from wheels
+        run: pip install --no-index --find-links dist/ klayout
+      - name: Build stubs
+        run: ./scripts/make_stubs.sh
+      - name: Verify Changed files
+        uses: tj-actions/verify-changed-files@v14
+        id: verify-changed-files
+        with:
+          files: |
+             src/**/*.pyi
+      - name: Show changed pyi stubs
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+        run: |
+          echo "Changed files: ${{ steps.verify-changed-files.outputs.changed_files }}"
+      - uses: EndBug/add-and-commit@v9
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+        with:
+          add: 'src'
+          default_author: github_actions
+          message: 'Auto-updated pyi stubs'
+      - name: Failing because pyi stubs are outdated
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+        run: exit 1
+
+  upload_to_test_pypy:
+    needs: [test_pyi]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/download-artifact@v3
@@ -102,10 +139,10 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.test_pypi_password }}
-        repository_url: https://test.pypi.org/legacy/
+        repository-url: https://test.pypi.org/legacy/
 
   upload_to_pypi:
-    needs: [build, make_sdist]
+    needs: [test_pyi]
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
     steps:

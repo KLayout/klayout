@@ -1377,7 +1377,15 @@ public:
    */
   void move_layer (unsigned int src, unsigned int dest);
 
-  /**  
+  /**
+   *  @brief Move a layer (selected shape types only)
+   *
+   *  Move a layer from the source to the target. The target is not cleared before, so that this method
+   *  merges shapes from the source with the target layer. The source layer is empty after that operation.
+   */
+  void move_layer (unsigned int src, unsigned int dest, unsigned int flags);
+
+  /**
    *  @brief Copy a layer
    *
    *  Copy a layer from the source to the target. The target is not cleared before, so that this method 
@@ -1385,14 +1393,29 @@ public:
    */
   void copy_layer (unsigned int src, unsigned int dest);
 
-  /**  
+  /**
+   *  @brief Copy a layer (selected shape types only)
+   *
+   *  Copy a layer from the source to the target. The target is not cleared before, so that this method
+   *  merges shapes from the source with the target layer.
+   */
+  void copy_layer (unsigned int src, unsigned int dest, unsigned int flags);
+
+  /**
    *  @brief Clear a layer
    *
    *  Clears the layer: removes all shapes.
    */
   void clear_layer (unsigned int n);
 
-  /**  
+  /**
+   *  @brief Clear a layer (selected shapes only)
+   *
+   *  Clears the layer: removes the shapes of the type given the flags (ShapeIterator::shapes_type)
+   */
+  void clear_layer (unsigned int n, unsigned int flags);
+
+  /**
    *  @brief Delete a layer
    *
    *  This does free the shapes of the cells and remembers the

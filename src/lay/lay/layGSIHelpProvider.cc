@@ -118,6 +118,10 @@ std::string escape_xml_with_formatting (const std::string &s, bool &in_code)
         r += "<u>";
       } else if (sc.test ("@/u")) {
         r += "</u>";
+      } else if (sc.test ("@tt")) {
+        r += "<tt>";
+      } else if (sc.test ("@/tt")) {
+        r += "</tt>";
       } else if (sc.test ("@i")) {
         r += "<i>";
       } else if (sc.test ("@/i")) {

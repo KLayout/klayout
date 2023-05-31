@@ -1682,29 +1682,53 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "@param a The first of the layers to swap.\n"
     "@param b The second of the layers to swap.\n"
   ) +
-  gsi::method ("move_layer", &db::Layout::move_layer, gsi::arg ("src"), gsi::arg ("dest"),
+  gsi::method ("move_layer", static_cast<void (db::Layout::*) (unsigned int, unsigned int)> (&db::Layout::move_layer), gsi::arg ("src"), gsi::arg ("dest"),
     "@brief Moves a layer\n"
     "\n"
-    "This method was introduced in version 0.19.\n"
-    "\n"
-    "Move a layer from the source to the target. The target is not cleared before, so that this method \n"
-    "merges shapes from the source with the target layer. The source layer is empty after that operation.\n"
+    "Moves a layer from the source to the destination layer. The target is not cleared before, so that this method \n"
+    "merges shapes from the source with the destination layer. The source layer is empty after that operation.\n"
     "\n"
     "@param src The layer index of the source layer.\n"
     "@param dest The layer index of the destination layer.\n"
+    "\n"
+    "This method was introduced in version 0.19.\n"
   ) +
-  gsi::method ("copy_layer", &db::Layout::copy_layer, gsi::arg ("src"), gsi::arg ("dest"),
+  gsi::method ("move_layer", static_cast<void (db::Layout::*) (unsigned int, unsigned int, unsigned int)> (&db::Layout::move_layer), gsi::arg ("src"), gsi::arg ("dest"), gsi::arg ("flags"),
+    "@brief Moves a layer (selected shape types only)\n"
+    "\n"
+    "Moves a layer from the source to the destination layer. The target is not cleared before, so that this method \n"
+    "merges shapes from the source with the destination layer. The copied shapes are removed from the source layer.\n"
+    "\n"
+    "@param src The layer index of the source layer.\n"
+    "@param dest The layer index of the destination layer.\n"
+    "@param flags A combination of the shape type flags from \\Shapes, S... constants\n"
+    "\n"
+    "This method variant has been introduced in version 0.28.9.\n"
+  ) +
+  gsi::method ("copy_layer", static_cast<void (db::Layout::*) (unsigned int, unsigned int)> (&db::Layout::copy_layer), gsi::arg ("src"), gsi::arg ("dest"),
     "@brief Copies a layer\n"
     "\n"
-    "This method was introduced in version 0.19.\n"
-    "\n"
-    "Copy a layer from the source to the target. The target is not cleared before, so that this method \n"
-    "merges shapes from the source with the target layer.\n"
+    "Copies a layer from the source to the destination layer. The destination layer is not cleared before, so that this method \n"
+    "merges shapes from the source with the destination layer.\n"
     "\n"
     "@param src The layer index of the source layer.\n"
     "@param dest The layer index of the destination layer.\n"
+    "\n"
+    "This method was introduced in version 0.19.\n"
   ) +
-  gsi::method ("clear_layer", &db::Layout::clear_layer, gsi::arg ("layer_index"),
+  gsi::method ("copy_layer", static_cast<void (db::Layout::*) (unsigned int, unsigned int, unsigned int)> (&db::Layout::copy_layer), gsi::arg ("src"), gsi::arg ("dest"), gsi::arg ("flags"),
+    "@brief Copies a layer (selected shape types only)\n"
+    "\n"
+    "Copies a layer from the source to the destination layer. The destination layer is not cleared before, so that this method \n"
+    "merges shapes from the source with the destination layer.\n"
+    "\n"
+    "@param src The layer index of the source layer.\n"
+    "@param dest The layer index of the destination layer.\n"
+    "@param flags A combination of the shape type flags from \\Shapes, S... constants\n"
+    "\n"
+    "This method variant has been introduced in version 0.28.9.\n"
+  ) +
+  gsi::method ("clear_layer", static_cast<void (db::Layout::*) (unsigned int)> (&db::Layout::clear_layer), gsi::arg ("layer_index"),
     "@brief Clears a layer\n"
     "\n"
     "Clears the layer: removes all shapes.\n"
@@ -1712,6 +1736,16 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "This method was introduced in version 0.19.\n"
     "\n"
     "@param layer_index The index of the layer to delete.\n"
+  ) +                               
+  gsi::method ("clear_layer", static_cast<void (db::Layout::*) (unsigned int, unsigned int)> (&db::Layout::clear_layer), gsi::arg ("layer_index"), gsi::arg ("flags"),
+    "@brief Clears a layer (given shape types only)\n"
+    "\n"
+    "Clears the layer: removes all shapes for the given shape types.\n"
+    "\n"
+    "This method was introduced in version 0.28.9.\n"
+    "\n"
+    "@param layer_index The index of the layer to delete.\n"
+    "@param flags The type selector for the shapes to delete (see \\Shapes class, S... constants).\n"
   ) +
   gsi::method ("delete_layer", &db::Layout::delete_layer, gsi::arg ("layer_index"),
     "@brief Deletes a layer\n"

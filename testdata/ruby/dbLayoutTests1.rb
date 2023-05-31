@@ -1971,6 +1971,66 @@ class DBLayoutTests1_TestClass < TestBase
 
   end
 
+  def test_23
+
+    # layer operations with shape types
+   
+    m = RBA::Manager::new
+
+    l = RBA::Layout.new(m)
+    l1 = l.insert_layer(RBA::LayerInfo.new(1, 0))
+    l2 = l.insert_layer(RBA::LayerInfo.new(2, 0))
+    c0 = l.cell(l.add_cell("c0"))
+    c1 = l.cell(l.add_cell("c1"))
+  
+    c0.shapes(l1).insert(RBA::Box::new(1, 2, 3, 4))
+    c1.shapes(l1).insert(RBA::Polygon::new(RBA::Box::new(1, 2, 3, 4)))
+
+    str1 = l.each_cell.collect { |c| c.name + ":" + c.shapes(l1).each.collect { |sh| sh.to_s }.join(";") }.join("\n")
+    assert_equal(str1, "c0:box (1,2;3,4)\nc1:polygon (1,2;1,4;3,4;3,2)")
+
+    m.transaction("T")
+    l.clear_layer(l1, RBA::Shapes::SPolygons)
+    m.commit
+
+    str1 = l.each_cell.collect { |c| c.name + ":" + c.shapes(l1).each.collect { |sh| sh.to_s }.join(";") }.join("\n")
+    assert_equal(str1, "c0:box (1,2;3,4)\nc1:")
+
+    m.undo 
+
+    str1 = l.each_cell.collect { |c| c.name + ":" + c.shapes(l1).each.collect { |sh| sh.to_s }.join(";") }.join("\n")
+    assert_equal(str1, "c0:box (1,2;3,4)\nc1:polygon (1,2;1,4;3,4;3,2)")
+
+    m.transaction("T")
+    l.move_layer(l1, l2, RBA::Shapes::SPolygons)
+    m.commit
+
+    str1 = l.each_cell.collect { |c| c.name + ":" + c.shapes(l1).each.collect { |sh| sh.to_s }.join(";") }.join("\n")
+    assert_equal(str1, "c0:box (1,2;3,4)\nc1:")
+
+    str2 = l.each_cell.collect { |c| c.name + ":" + c.shapes(l2).each.collect { |sh| sh.to_s }.join(";") }.join("\n")
+    assert_equal(str2, "c0:\nc1:polygon (1,2;1,4;3,4;3,2)")
+
+    m.undo 
+
+    str1 = l.each_cell.collect { |c| c.name + ":" + c.shapes(l1).each.collect { |sh| sh.to_s }.join(";") }.join("\n")
+    assert_equal(str1, "c0:box (1,2;3,4)\nc1:polygon (1,2;1,4;3,4;3,2)")
+
+    str2 = l.each_cell.collect { |c| c.name + ":" + c.shapes(l2).each.collect { |sh| sh.to_s }.join(";") }.join("\n")
+    assert_equal(str2, "c0:\nc1:")
+
+    m.transaction("T")
+    l.copy_layer(l1, l2, RBA::Shapes::SPolygons)
+    m.commit
+
+    str1 = l.each_cell.collect { |c| c.name + ":" + c.shapes(l1).each.collect { |sh| sh.to_s }.join(";") }.join("\n")
+    assert_equal(str1, "c0:box (1,2;3,4)\nc1:polygon (1,2;1,4;3,4;3,2)")
+
+    str2 = l.each_cell.collect { |c| c.name + ":" + c.shapes(l2).each.collect { |sh| sh.to_s }.join(";") }.join("\n")
+    assert_equal(str2, "c0:\nc1:polygon (1,2;1,4;3,4;3,2)")
+
+  end
+
   # Iterating while flatten
   def test_issue200
 

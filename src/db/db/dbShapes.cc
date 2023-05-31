@@ -81,6 +81,12 @@ inline bool needs_translate (object_tag<Sh> /*tag*/)
   return tl::is_equal_type<typename shape_traits<Sh>::can_deref, tl::True> () || tl::is_equal_type<typename shape_traits<Sh>::is_array, tl::True> ();
 }
 
+inline bool type_mask_applies (const db::LayerBase *layer, unsigned int flags)
+{
+  unsigned int tm = layer->type_mask ();
+  return (((flags & db::ShapeIterator::Properties) == 0 || (tm & db::ShapeIterator::Properties) != 0) && (flags & tm) != 0);
+}
+
 // ---------------------------------------------------------------------------------------
 //  layer_op implementation
 
@@ -214,7 +220,13 @@ Shapes::insert (const Shapes &d)
 }
 
 void
-Shapes::do_insert (const Shapes &d)
+Shapes::insert (const Shapes &d, unsigned int flags)
+{
+  do_insert (d, flags);
+}
+
+void
+Shapes::do_insert (const Shapes &d, unsigned int flags)
 {
   //  shortcut for "nothing to do"
   if (d.empty ()) {
@@ -228,10 +240,12 @@ Shapes::do_insert (const Shapes &d)
 
       m_layers.reserve (d.m_layers.size ());
       for (tl::vector<LayerBase *>::const_iterator l = d.m_layers.begin (); l != d.m_layers.end (); ++l) {
-        m_layers.push_back ((*l)->clone ());
-        if (manager () && manager ()->transacting ()) {
-          check_is_editable_for_undo_redo ();
-          manager ()->queue (this, new FullLayerOp (true, m_layers.back ()));
+        if (type_mask_applies (*l, flags)) {
+          m_layers.push_back ((*l)->clone ());
+          if (manager () && manager ()->transacting ()) {
+            check_is_editable_for_undo_redo ();
+            manager ()->queue (this, new FullLayerOp (true, m_layers.back ()));
+          }
         }
       }
 
@@ -239,7 +253,9 @@ Shapes::do_insert (const Shapes &d)
 
     } else {
       for (tl::vector<LayerBase *>::const_iterator l = d.m_layers.begin (); l != d.m_layers.end (); ++l) {
-        (*l)->insert_into (this);
+        if (type_mask_applies (*l, flags)) {
+          (*l)->insert_into (this);
+        }
       }
     }
 
@@ -247,14 +263,18 @@ Shapes::do_insert (const Shapes &d)
 
     //  the target is standalone - dereference
     for (tl::vector<LayerBase *>::const_iterator l = d.m_layers.begin (); l != d.m_layers.end (); ++l) {
-      (*l)->deref_into (this);
+      if (type_mask_applies (*l, flags)) {
+        (*l)->deref_into (this);
+      }
     }
 
   } else {
 
     //  both shape containers are in separate spaces - translate
     for (tl::vector<LayerBase *>::const_iterator l = d.m_layers.begin (); l != d.m_layers.end (); ++l) {
-      (*l)->translate_into (this, shape_repository (), array_repository ());
+      if (type_mask_applies (*l, flags)) {
+        (*l)->translate_into (this, shape_repository (), array_repository ());
+      }
     }
 
   }
@@ -1042,6 +1062,41 @@ Shapes::clear ()
     }
 
     m_layers.clear ();
+
+  }
+}
+
+void
+Shapes::clear (unsigned int flags)
+{
+  if (!m_layers.empty ()) {
+
+    invalidate_state ();  //  HINT: must come before the change is done!
+
+    tl::vector<LayerBase *> new_layers;
+
+    for (tl::vector<LayerBase *>::const_iterator l = m_layers.end (); l != m_layers.begin (); ) {
+
+      //  because the undo stack will do a push, we need to remove layers from the back (this is the last undo
+      //  element to be executed)
+      --l;
+
+      if (type_mask_applies (*l, flags)) {
+
+        if (manager () && manager ()->transacting ()) {
+          check_is_editable_for_undo_redo ();
+          manager ()->queue (this, new FullLayerOp (false, (*l)));
+        } else {
+          delete *l;
+        }
+
+      } else {
+        new_layers.push_back (*l);
+      }
+
+    }
+
+    m_layers.swap (new_layers);
 
   }
 }

@@ -108,47 +108,47 @@ static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin (const db
   return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin (flags));
 }
 
-static gsi::layout_locking_iterator1<db::Shapes::shape_iterator>begin_all (const db::Shapes *s)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_all (const db::Shapes *s)
 {
   return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin (db::ShapeIterator::All));
 }
 
-static gsi::layout_locking_iterator1<db::Shapes::shape_iterator>begin_overlapping (const db::Shapes *s, unsigned int flags, const db::Box &region)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_overlapping (const db::Shapes *s, unsigned int flags, const db::Box &region)
 {
   return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_overlapping (region, flags));
 }
 
-static gsi::layout_locking_iterator1<db::Shapes::shape_iterator>begin_doverlapping (const db::Shapes *s, unsigned int flags, const db::DBox &region)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_doverlapping (const db::Shapes *s, unsigned int flags, const db::DBox &region)
 {
   return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_overlapping (db::CplxTrans (shapes_dbu (s)).inverted () * region, flags));
 }
 
-static gsi::layout_locking_iterator1<db::Shapes::shape_iterator>begin_overlapping_all (const db::Shapes *s, const db::Box &region)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_overlapping_all (const db::Shapes *s, const db::Box &region)
 {
   return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_overlapping (region, db::ShapeIterator::All));
 }
 
-static gsi::layout_locking_iterator1<db::Shapes::shape_iterator>begin_doverlapping_all (const db::Shapes *s, const db::DBox &region)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_doverlapping_all (const db::Shapes *s, const db::DBox &region)
 {
   return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_overlapping (db::CplxTrans (shapes_dbu (s)).inverted () * region, db::ShapeIterator::All));
 }
 
-static gsi::layout_locking_iterator1<db::Shapes::shape_iterator>begin_touching (const db::Shapes *s, unsigned int flags, const db::Box &region)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_touching (const db::Shapes *s, unsigned int flags, const db::Box &region)
 {
   return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_touching (region, flags));
 }
 
-static gsi::layout_locking_iterator1<db::Shapes::shape_iterator>begin_dtouching (const db::Shapes *s, unsigned int flags, const db::DBox &region)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_dtouching (const db::Shapes *s, unsigned int flags, const db::DBox &region)
 {
   return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_touching (db::CplxTrans (shapes_dbu (s)).inverted () * region, flags));
 }
 
-static gsi::layout_locking_iterator1<db::Shapes::shape_iterator>begin_touching_all (const db::Shapes *s, const db::Box &region)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_touching_all (const db::Shapes *s, const db::Box &region)
 {
   return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_touching (region, db::ShapeIterator::All));
 }
 
-static gsi::layout_locking_iterator1<db::Shapes::shape_iterator>begin_dtouching_all (const db::Shapes *s, const db::DBox &region)
+static gsi::layout_locking_iterator1<db::Shapes::shape_iterator> begin_dtouching_all (const db::Shapes *s, const db::DBox &region)
 {
   return gsi::layout_locking_iterator1<db::Shapes::shape_iterator> (s->layout (), s->begin_touching (db::CplxTrans (shapes_dbu (s)).inverted () * region, db::ShapeIterator::All));
 }
@@ -251,12 +251,7 @@ static void insert_shapes (db::Shapes *sh, const db::Shapes &s)
 
 static void insert_shapes_with_flags (db::Shapes *sh, const db::Shapes &s, unsigned int flags)
 {
-  //  NOTE: if the source (r) is from the same layout than the shapes live in, we better
-  //  lock the layout against updates while inserting
-  db::LayoutLocker locker (sh->layout ());
-  for (db::Shapes::shape_iterator i = s.begin (flags); !i.at_end(); ++i) {
-    sh->insert (*i);
-  }
+  sh->insert (s, flags);
 }
 
 static void insert_shapes_with_trans (db::Shapes *sh, const db::Shapes &s, const db::ICplxTrans &trans)
@@ -1264,9 +1259,15 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "@brief Returns a value indicating whether the shapes container is empty\n"
     "This method has been introduced in version 0.20.\n"
   ) +
-  gsi::method ("clear", &db::Shapes::clear, 
+  gsi::method ("clear", static_cast<void (db::Shapes::*) ()> (&db::Shapes::clear),
     "@brief Clears the shape container\n"
-    "This method has been introduced in version 0.16. It can only be used in editable mode."
+    "This method has been introduced in version 0.16."
+  ) +
+  gsi::method ("clear", static_cast<void (db::Shapes::*) (unsigned int)> (&db::Shapes::clear), gsi::arg ("flags"),
+    "@brief Clears certain shape types from the shape container\n"
+    "Only shapes matching the shape types from 'flags' are removed. 'flags' is a combination of the S... constants.\n"
+    "\n"
+    "This method has been introduced in version 0.28.9."
   ) +
   gsi::method_ext ("size", &shapes_size,
     "@brief Gets the number of shapes in this container\n"
@@ -1296,10 +1297,19 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "returned for future references."
   ) +
   gsi::method ("SAll|#s_all", &s_all,
-    "@brief Indicates that all shapes shall be retrieved"
+    "@brief Indicates that all shapes shall be retrieved\n"
+    "You can use this constant to construct 'except' classes - e.g. "
+    "to specify 'all shape types except boxes' use\n"
+    "\n"
+    "@code SAll - SBoxes @/code\n"
   ) +
   gsi::method ("SAllWithProperties|#s_all_with_properties", &s_all_with_properties,
-    "@brief Indicates that all shapes with properties shall be retrieved"
+    "@brief Indicates that all shapes with properties shall be retrieved\n"
+    "Using this selector means to retrieve only shapes with properties."
+    "You can use this constant to construct 'except' classes - e.g. "
+    "to specify 'all shape types with properties except boxes' use\n"
+    "\n"
+    "@code SAllWithProperties - SBoxes @/code\n"
   ) +
   gsi::method ("SPolygons|#s_polygons", &s_polygons,
     "@brief Indicates that polygons shall be retrieved"
@@ -1333,7 +1343,10 @@ Class<db::Shapes> decl_Shapes ("db", "Shapes",
     "@brief Indicates that user objects shall be retrieved"
   ) +
   gsi::method ("SProperties|#s_properties", &s_properties,
-    "@brief Indicates that only shapes with properties shall be retrieved"
+    "@brief Indicates that only shapes with properties shall be retrieved\n"
+    "You can or-combine this flag with the plain shape types to select a "
+    "certain shape type, but only those shapes with properties. For example to "
+    "select boxes with properties, use 'SProperties | SBoxes'."
   ) +
   gsi::method_ext ("dump_mem_statistics", &dump_mem_statistics, gsi::arg<bool> ("detailed", false),
     "@hide"

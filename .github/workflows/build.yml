@@ -74,15 +74,12 @@ jobs:
         with:
           path: ./wheelhouse/*.whl
 
-# The following was taken from https://cibuildwheel.readthedocs.io/en/stable/deliver-to-pypi/
+  # The following was taken from https://cibuildwheel.readthedocs.io/en/stable/deliver-to-pypi/
   make_sdist:
     name: Make SDist
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0  # Optional, use if you use setuptools_scm
-        submodules: true  # Optional, use if you have submodules
+    - uses: actions/checkout@v3
 
     - name: Build SDist
       run: pipx run build --sdist
@@ -105,7 +102,7 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.test_pypi_password }}
-        repository_url: https://test.pypi.org/legacy/
+        repository-url: https://test.pypi.org/legacy/
 
   upload_to_pypi:
     needs: [build, make_sdist]

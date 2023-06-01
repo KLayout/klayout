@@ -2740,8 +2740,6 @@ CODE
           end
           if cv_index
           
-            view = RBA::LayoutView::current
-            
             # clear selection
             view.cancel 
       
@@ -3281,7 +3279,7 @@ CODE
 
           cn = cellname && cellname.to_s
           cn ||= @def_cell && @def_cell.name
-          cn ||= source && source.cell_name
+          cn ||= @def_source && @def_source.cell_obj && @def_source.cell_obj.name
 
           cn || raise("No cell name specified - either the source was not specified before 'report' or there is no default source. In the latter case, specify a cell name as the third parameter")
 

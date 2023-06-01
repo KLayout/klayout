@@ -4,8 +4,11 @@ name: Build Python Wheels
 
 on:
   pull_request:
-  # Running on PRs is enough
-  # push:
+  # Running on PRs and main branch only
+  # pull requests should be able to access cache from main branch
+  push:
+    branches:
+      - master
   release:
     types: [published]
 

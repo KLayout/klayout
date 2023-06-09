@@ -938,6 +938,7 @@ TEST(two_1)
   db::box_convert<db::Box> bc1;
   db::box_convert<db::SimplePolygon> bc2;
   bs.set_scanner_threshold (0);
+  bs.set_scanner_threshold1 (0);
   bs.process (tr, 1, bc1, bc2);
   EXPECT_EQ (tr.str, "[i](2-12)(2-14)(4-12)(4-14)(2-15)(4-15)(5-12)(5-14)(5-15)(2-13)(4-13)(3-12)(3-14)(3-13)(3-15)(5-13)(0-10)<2><5><4><3><12><15><14><13>(0-11)(1-10)(1-11)<0><1><10><11>[f]");
 }
@@ -974,6 +975,7 @@ TEST(two_1a)
   db::box_convert<db::Box> bc1;
   db::box_convert<db::SimplePolygon> bc2;
   bs.set_scanner_threshold (0);
+  bs.set_scanner_threshold1 (0);
   bs.process (tr, 1, bc1, bc2);
   EXPECT_EQ (tr.str, "[i](2-11)(2-12)(1-11)(1-12)<1><2><11><12>(0-10)<0><10>[f]");
 }
@@ -1010,6 +1012,7 @@ TEST(two_1b)
   db::box_convert<db::Box> bc1;
   db::box_convert<db::SimplePolygon> bc2;
   bs.set_scanner_threshold (0);
+  bs.set_scanner_threshold1 (0);
   EXPECT_EQ (bs.process (tr, 1, bc1, bc2), true);
   EXPECT_EQ (tr.str, "[i](1-12)(2-12)(1-11)(2-11)<1><2><11><12>(0-10)<0><10>[f]");
 
@@ -1046,14 +1049,15 @@ TEST(two_1c)
   db::box_convert<db::Box> bc1;
   db::box_convert<db::SimplePolygon> bc2;
   bs.set_scanner_threshold (0);
+  bs.set_scanner_threshold1 (0);
   EXPECT_EQ (bs.process (tr, 1, bc1, bc2), true);
   EXPECT_EQ (tr.str, "[i]<0><10>(1-12)(2-12)(1-11)(2-11)<1><2><12><11>[f]");
 }
 
-void run_test2_two (tl::TestBase *_this, size_t n, double ff, db::Coord spread, bool touch = true)
+void run_test2_two (tl::TestBase *_this, size_t n1, size_t n2, double ff, db::Coord spread, bool touch = true, bool no_shortcut = true)
 {
   std::vector<db::Box> bb;
-  for (size_t i = 0; i < n; ++i) {
+  for (size_t i = 0; i < n1; ++i) {
     db::Coord x = rand () % spread;
     db::Coord y = rand () % spread;
     bb.push_back (db::Box (x, y, x + 100, y + 100));
@@ -1061,7 +1065,7 @@ void run_test2_two (tl::TestBase *_this, size_t n, double ff, db::Coord spread, 
   }
 
   std::vector<db::SimplePolygon> bb2;
-  for (size_t i = 0; i < n; ++i) {
+  for (size_t i = 0; i < n2; ++i) {
     db::Coord x = rand () % spread;
     db::Coord y = rand () % spread;
     bb2.push_back (db::SimplePolygon (db::Box (x, y, x + 100, y + 100)));
@@ -1082,7 +1086,10 @@ void run_test2_two (tl::TestBase *_this, size_t n, double ff, db::Coord spread, 
   db::box_convert<db::SimplePolygon> bc2;
   {
     tl::SelfTimer timer ("box-scanner");
-    bs.set_scanner_threshold (0);
+    if (no_shortcut) {
+      bs.set_scanner_threshold (0);
+      bs.set_scanner_threshold1 (0);
+    }
     bs.process (tr, touch ? 1 : 0, bc1, bc2);
   }
 
@@ -1118,45 +1125,60 @@ void run_test2_two (tl::TestBase *_this, size_t n, double ff, db::Coord spread, 
 
 TEST(two_2a)
 {
-  run_test2_two(_this, 10, 0.0, 1000);
+  run_test2_two(_this, 10, 10, 0.0, 1000);
+  run_test2_two(_this, 10, 10, 0.0, 1000, true, false /*sub-threshold*/);
 }
 
 TEST(two_2b)
 {
-  run_test2_two(_this, 10, 0.0, 100);
+  run_test2_two(_this, 10, 10, 0.0, 100);
+  run_test2_two(_this, 10, 10, 0.0, 100, true, false /*sub-threshold*/);
 }
 
 TEST(two_2c)
 {
-  run_test2_two(_this, 10, 0.0, 10);
+  run_test2_two(_this, 10, 10, 0.0, 10);
+  run_test2_two(_this, 10, 10, 0.0, 10, true, false /*sub-threshold*/);
 }
 
 TEST(two_2d)
 {
-  run_test2_two(_this, 1000, 0.0, 1000);
+  run_test2_two(_this, 1000, 1000, 0.0, 1000);
 }
 
 TEST(two_2e)
 {
-  run_test2_two(_this, 1000, 2, 1000);
+  run_test2_two(_this, 1000, 1000, 2, 1000);
 }
 
 TEST(two_2f)
 {
-  run_test2_two(_this, 1000, 2, 1000, false);
+  run_test2_two(_this, 1000, 1000, 2, 1000, false);
 }
 
 TEST(two_2g)
 {
-  run_test2_two(_this, 1000, 2, 500);
+  run_test2_two(_this, 1000, 1000, 2, 500);
 }
 
 TEST(two_2h)
 {
-  run_test2_two(_this, 1000, 2, 100);
+  run_test2_two(_this, 1000, 1000, 2, 100);
 }
 
 TEST(two_2i)
 {
-  run_test2_two(_this, 10000, 2, 10000);
+  run_test2_two(_this, 10000, 1000, 2, 10000);
+}
+
+TEST(two_2j)
+{
+  run_test2_two(_this, 3, 1000, 0.0, 1000);
+  run_test2_two(_this, 3, 1000, 0.0, 1000, true, false /*sub-threshold*/);
+}
+
+TEST(two_2k)
+{
+  run_test2_two(_this, 1000, 3, 0.0, 1000);
+  run_test2_two(_this, 1000, 3, 0.0, 1000, true, false /*sub-threshold*/);
 }

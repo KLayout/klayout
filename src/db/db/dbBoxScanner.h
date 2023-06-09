@@ -538,7 +538,7 @@ public:
    *  @brief Default ctor
    */
   box_scanner2 (bool report_progress = false, const std::string &progress_desc = std::string ())
-    : m_fill_factor (2), m_scanner_thr (100),
+    : m_fill_factor (2), m_scanner_thr (100), m_scanner_thr1 (10),
       m_report_progress (report_progress), m_progress_desc (progress_desc)
   {
     //  .. nothing yet ..
@@ -562,6 +562,26 @@ public:
   size_t scanner_threshold () const
   {
     return m_scanner_thr;
+  }
+
+  /**
+   *  @brief Sets the scanner threshold per class
+   *
+   *  This value determines for how many elements in one class the implementation switches to the scanner
+   *  implementation instead of the plain element-by-element interaction test.
+   *  The default value is 10.
+   */
+  void set_scanner_threshold1 (size_t n)
+  {
+    m_scanner_thr1 = n;
+  }
+
+  /**
+   *  @brief Gets the scanner threshold per class
+   */
+  size_t scanner_threshold1 () const
+  {
+    return m_scanner_thr1;
   }
 
   /**
@@ -667,7 +687,7 @@ private:
   container_type1 m_pp1;
   container_type2 m_pp2;
   double m_fill_factor;
-  size_t m_scanner_thr;
+  size_t m_scanner_thr, m_scanner_thr1;
   bool m_report_progress;
   std::string m_progress_desc;
 
@@ -732,7 +752,7 @@ private:
         rec.finish2 (i->first, i->second);
       }
 
-    } else if (m_pp1.size () + m_pp2.size () <= m_scanner_thr) {
+    } else if (m_pp1.size () + m_pp2.size () <= m_scanner_thr || m_pp2.size () <= m_scanner_thr1 || m_pp1.size () <= m_scanner_thr1) {
 
       //  below m_scanner_thr elements use the brute force approach which is faster in that case
 

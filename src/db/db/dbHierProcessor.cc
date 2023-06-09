@@ -1239,7 +1239,8 @@ private:
   void
   collect_instance_interactions (const db::CellInstArray *inst1, const db::CellInstArray *inst2)
   {
-    //  TODO: this algorithm is not in particular effective for identical arrays
+    //  TODO: this algorithm is not in particular effective for identical arrays or for arrays
+    //  vs. single instances
 
     const db::Cell &cell1 = mp_subject_layout->cell (inst1->object ().cell_index ());
     const db::Cell &cell2 = mp_intruder_layout->cell (inst2->object ().cell_index ());

@@ -1278,3 +1278,9 @@ TEST(FlatOperation)
   run_test_bool22_flat (_this, "hlp17_flat.oas", TMAndNot, 100, 101);
 }
 
+TEST(Arrays)
+{
+  //  Large arrays, NOT
+  run_test_bool2 (_this, "hlp18.oas", TMNot, 100);
+}
+

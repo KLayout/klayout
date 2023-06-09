@@ -1278,7 +1278,7 @@ private:
           db::Box ibox2 = tn2 * cell2.bbox (m_intruder_layer).enlarged (db::Vector (m_dist, m_dist));
 
           db::Box cbox = ibox1 & ibox2;
-          if (! cbox.empty () && cell1.has_shapes_touching (m_subject_layer, safe_box_enlarged (tni1 * cbox, -1, -1))) {
+          if (! cbox.empty () && (cbox == ibox1 || cell1.has_shapes_touching (m_subject_layer, safe_box_enlarged (tni1 * cbox, -1, -1)))) {
 
             db::ICplxTrans tn21 = tni1 * tn2;
 

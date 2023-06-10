@@ -5007,6 +5007,26 @@ CODE
     #
     # See \global#report and \global#target on how to configure output to a target layout
     # or report database. 
+    # 
+    # See also \global#new_target and \global#new_report on how to create additional 
+    # targets for output. This allows saving certain layers to different files than
+    # the standard target or report. To do so, create a new target or report using one
+    # of these functions and pass that object to the corresponding "output" call as
+    # an additional argument.
+    #
+    # Example:
+    #
+    # @code
+    # check1 = ...
+    # check2 = ...
+    # check3 = ...
+    #
+    # second_report = new_report("Only for check2", "check2.lyrdb")
+    #
+    # check1.output("Check 1")
+    # check2.output("Check 2", second_report)
+    # check3.output("Check 3")
+    # @/code
     
     def output(*args)
       @engine._context("output") do

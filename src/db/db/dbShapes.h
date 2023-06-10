@@ -629,6 +629,18 @@ public:
   void insert (const Shapes &d);
 
   /**
+   *  @brief Insert all shapes from another container using the given shape types only
+   *
+   *  This method insert all shapes from the given shape container.
+   *
+   *  HINT: This method can duplicate shape containers from one layout to another.
+   *  The current implementation does not translate property Id's.
+   *  It is mainly intended for 1-to-1 copies of layouts where the whole
+   *  property repository is copied.
+   */
+  void insert (const Shapes &d, unsigned int types);
+
+  /**
    *  @brief Assignment operator with transformation
    *
    *  HINT: This method can duplicate shape containers from one layout to another.
@@ -1220,6 +1232,11 @@ public:
   void clear ();
 
   /**
+   *  @brief Clears the collection (given shape types only)
+   */
+  void clear (unsigned int types);
+
+  /**
    *  @brief Report the type mask of the objects stored herein
    *
    *  The type mask is composed of the bits that are passed to the 
@@ -1515,7 +1532,7 @@ private:
   db::Cell *mp_cell;  //  HINT: contains "dirty" in bit 0 and "editable" in bit 1
 
   void invalidate_state ();
-  void do_insert (const Shapes &d);
+  void do_insert (const Shapes &d, unsigned int flags = db::ShapeIterator::All);
   void check_is_editable_for_undo_redo () const;
 
   //  gets the layers array

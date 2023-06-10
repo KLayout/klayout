@@ -64,6 +64,11 @@ cronology::events::event_collection<event_compute_results, event_compute_local_c
 namespace db
 {
 
+//  Heuristic parameter to control the recursion of the cell-to-cell intruder
+//  detection: do not recurse if the intruder cell's bounding box is smaller
+//  than the overlap box times this factor.
+const double area_ratio_for_recursion = 3.0;
+
 // ---------------------------------------------------------------------------------------------
 //  Shape reference translator
 
@@ -367,6 +372,32 @@ db::Box safe_box_enlarged (const db::Box &box, db::Coord dx, db::Coord dy)
       dy = -h2;
     }
     return box.enlarged (db::Vector (dx, dy));
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+//  Debugging utility: dump the cell contexts
+
+template <class TS, class TI, class TR>
+static void dump_cell_contexts (local_processor_contexts<TS, TI, TR> &contexts, const db::Layout *subject_layout, const db::Layout *intruder_layout)
+{
+  for (auto cc = contexts.begin (); cc != contexts.end (); ++cc) {
+    tl::info << "Cell " << subject_layout->cell_name (cc->first->cell_index ()) << ":";
+    int i = 0;
+    for (auto c = cc->second.begin (); c != cc->second.end (); ++c) {
+      tl::info << "  Context #" << ++i;
+      tl::info << "    Instances:";
+      for (auto i = c->first.first.begin (); i != c->first.first.end (); ++i) {
+        const db::CellInstArray &ci = *i;
+        tl::info << "      " << intruder_layout->cell_name (ci.object ().cell_index ()) << " @ " << ci.complex_trans (*ci.begin ()).to_string () << " (" << ci.size () << ")";
+      }
+      tl::info << "    Shapes:";
+      for (auto i = c->first.second.begin (); i != c->first.second.end (); ++i) {
+        for (auto s = i->second.begin (); s != i->second.end (); ++s) {
+          tl::info << "      " << intruder_layout->get_properties (i->first).to_string () << ": " << s->to_string ();
+        }
+      }
+    }
   }
 }
 
@@ -1208,7 +1239,8 @@ private:
   void
   collect_instance_interactions (const db::CellInstArray *inst1, const db::CellInstArray *inst2)
   {
-    //  TODO: this algorithm is not in particular effective for identical arrays
+    //  TODO: this algorithm is not in particular effective for identical arrays or for arrays
+    //  vs. single instances
 
     const db::Cell &cell1 = mp_subject_layout->cell (inst1->object ().cell_index ());
     const db::Cell &cell2 = mp_intruder_layout->cell (inst2->object ().cell_index ());
@@ -1247,7 +1279,7 @@ private:
           db::Box ibox2 = tn2 * cell2.bbox (m_intruder_layer).enlarged (db::Vector (m_dist, m_dist));
 
           db::Box cbox = ibox1 & ibox2;
-          if (! cbox.empty () && cell1.has_shapes_touching (m_subject_layer, safe_box_enlarged (tni1 * cbox, -1, -1))) {
+          if (! cbox.empty () && (cbox == ibox1 || cell1.has_shapes_touching (m_subject_layer, safe_box_enlarged (tni1 * cbox, -1, -1)))) {
 
             db::ICplxTrans tn21 = tni1 * tn2;
 
@@ -1282,9 +1314,11 @@ private:
     db::ICplxTrans tni2 = tn21.inverted () * tni1;
     db::Box tbox2 = safe_box_enlarged (tni2 * cbox, -1, -1);
 
-    if (! intruder_cell.shapes (m_intruder_layer).begin_touching (tbox2, ShapeIterator::All).at_end ()) {
+    //  do not recurse further if we're overlapping with shapes from the intruder
+    //  or the intruder cell is not much bigger than the region of interest (cbox)
+    if (intruder_cell.bbox (m_intruder_layer).area () < area_ratio_for_recursion * cbox.area ()
+        || ! intruder_cell.shapes (m_intruder_layer).begin_touching (tbox2, ShapeIterator::All).at_end ()) {
 
-      //  we're overlapping with shapes from the intruder - do not recursive further
       interactions.push_back (std::make_pair (intruder_cell.cell_index (), tn21));
       return;
 
@@ -1782,6 +1816,11 @@ template <class TS, class TI, class TR>
 void
 local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, TR> &contexts, const local_operation<TS, TI, TR> *op, const std::vector<unsigned int> &output_layers) const
 {
+#if 0
+  //  debugging
+  dump_cell_contexts (contexts, mp_subject_layout, mp_intruder_layout ? mp_intruder_layout : mp_subject_layout);
+#endif
+
   tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 10, tl::to_string (tr ("Computing results for ")) + description (op));
 
   //  avoids updates while we work on the layout

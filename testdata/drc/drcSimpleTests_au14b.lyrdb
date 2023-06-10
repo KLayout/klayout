@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<report-database>
+ <description>Report 1</description>
+ <original-file/>
+ <generator>drc: script='.drc'</generator>
+ <top-cell>TOP</top-cell>
+ <tags>
+ </tags>
+ <categories>
+  <category>
+   <name>l2 space &lt; 1µm</name>
+   <description/>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>l1 width &lt; 1µm</name>
+   <description/>
+   <categories>
+   </categories>
+  </category>
+ </categories>
+ <cells>
+  <cell>
+   <name>TOP</name>
+   <variant/>
+   <references>
+   </references>
+  </cell>
+ </cells>
+ <items>
+  <item>
+   <tags/>
+   <category>'l2 space &lt; 1\302\265m'</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <image/>
+   <values>
+    <value>edge-pair: (-0.2,0.7;1,0.7)|(1,1.1;-0.2,1.1)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'l1 width &lt; 1\302\265m'</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <image/>
+   <values>
+    <value>edge-pair: (0,0;0,0.9)|(0.3,0.9;0.3,0)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'l1 width &lt; 1\302\265m'</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <image/>
+   <values>
+    <value>edge-pair: (0.3,0;0,0)|(0,0.9;0.3,0.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'l1 width &lt; 1\302\265m'</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <image/>
+   <values>
+    <value>edge-pair: (0.5,0;0.5,0.9)|(0.8,0.9;0.8,0)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'l1 width &lt; 1\302\265m'</category>
+   <cell>TOP</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <image/>
+   <values>
+    <value>edge-pair: (0.8,0;0.5,0)|(0.5,0.9;0.8,0.9)</value>
+   </values>
+  </item>
+ </items>
+</report-database>

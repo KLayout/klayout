@@ -127,11 +127,19 @@ GDS2Reader::get_record ()
   return rec_id;
 }
 
+void
+GDS2Reader::record_underflow_error ()
+{
+  error (tl::to_string (tr ("Record too short")));
+}
+
 inline int 
 GDS2Reader::get_int ()
 {
   unsigned char *b = mp_rec_buf + m_recptr;
-  m_recptr += 4;
+  if ((m_recptr += 4) > m_reclen) {
+    record_underflow_error ();
+  }
 
   int32_t l = *((int32_t *)b);
   gds2h (l);
@@ -142,7 +150,9 @@ inline short
 GDS2Reader::get_short ()
 {
   unsigned char *b = mp_rec_buf + m_recptr;
-  m_recptr += 2;
+  if ((m_recptr += 2) > m_reclen) {
+    record_underflow_error ();
+  }
 
   int16_t s = *((int16_t *)b);
   gds2h (s);
@@ -153,7 +163,9 @@ inline unsigned short
 GDS2Reader::get_ushort ()
 {
   unsigned char *b = mp_rec_buf + m_recptr;
-  m_recptr += 2;
+  if ((m_recptr += 2) > m_reclen) {
+    record_underflow_error ();
+  }
 
   uint16_t s = *((uint16_t *)b);
   gds2h ((int16_t &) s);
@@ -164,7 +176,9 @@ inline double
 GDS2Reader::get_double ()
 {
   unsigned char *b = mp_rec_buf + m_recptr;
-  m_recptr += 8;
+  if ((m_recptr += 8) > m_reclen) {
+    record_underflow_error ();
+  }
 
   uint32_t l0 = ((uint32_t *)b) [0];
   gds2h ((int32_t &) l0);

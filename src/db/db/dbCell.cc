@@ -187,6 +187,17 @@ Cell::clear (unsigned int index)
   }
 }
 
+void
+Cell::clear (unsigned int index, unsigned int types)
+{
+  shapes_map::iterator s = m_shapes_map.find(index);
+  if (s != m_shapes_map.end() && ! s->second.empty ()) {
+    mp_layout->invalidate_bboxes (index);  //  HINT: must come before the change is done!
+    s->second.clear (types);
+    m_bbox_needs_update = true;
+  }
+}
+
 Cell::shapes_type &
 Cell::shapes (unsigned int index) 
 {
@@ -345,11 +356,34 @@ Cell::copy (unsigned int src, unsigned int dest)
 }
 
 void
+Cell::copy (unsigned int src, unsigned int dest, unsigned int types)
+{
+  if (src != dest) {
+    shapes (dest).insert (shapes (src), types);
+  } else {
+    //  When duplicating the layer, first create a copy to avoid problems with non-stable containers
+    //  Hint: using the assignment and not the copy ctor does not copy the db::Manager association.
+    db::Shapes shape_copy;
+    shape_copy.insert (shapes (src), types);
+    shapes (dest).insert (shape_copy);
+  }
+}
+
+void
 Cell::move (unsigned int src, unsigned int dest)
 {
   if (src != dest) {
     copy (src, dest);
     clear (src);
+  }
+}
+
+void
+Cell::move (unsigned int src, unsigned int dest, unsigned int types)
+{
+  if (src != dest) {
+    copy (src, dest, types);
+    clear (src, types);
   }
 }
 

@@ -1925,6 +1925,51 @@ TEST(7)
   }
 }
 
+//  copy, move, clear with shape types
+TEST(8)
+{
+  db::Manager m (true);
+
+  db::Layout layout (true, &m);
+  unsigned int lindex1 = layout.insert_layer ();
+  unsigned int lindex2 = layout.insert_layer ();
+
+  db::Cell &topcell = layout.cell (layout.add_cell ("TOP"));
+
+  topcell.shapes (lindex1).insert (db::Box (1, 2, 3, 4));
+  topcell.shapes (lindex1).insert (db::Polygon (db::Box (1, 2, 3, 4)));
+
+  {
+    db::Transaction trans (&m, "T1");
+    topcell.shapes (lindex2).insert (topcell.shapes (lindex1));
+    EXPECT_EQ (shapes_to_string (_this, topcell.shapes (lindex2)), "polygon (1,2;1,4;3,4;3,2) #0\nbox (1,2;3,4) #0\n");
+  }
+
+  m.undo ();
+  EXPECT_EQ (shapes_to_string (_this, topcell.shapes (lindex2)), "");
+
+  {
+    db::Transaction trans (&m, "T1");
+    topcell.shapes (lindex2).insert (topcell.shapes (lindex1), db::ShapeIterator::Boxes);
+    EXPECT_EQ (shapes_to_string (_this, topcell.shapes (lindex2)), "box (1,2;3,4) #0\n");
+  }
+
+  m.undo ();
+  EXPECT_EQ (shapes_to_string (_this, topcell.shapes (lindex2)), "");
+
+  topcell.shapes (lindex2).insert (topcell.shapes (lindex1));
+  EXPECT_EQ (shapes_to_string (_this, topcell.shapes (lindex2)), "polygon (1,2;1,4;3,4;3,2) #0\nbox (1,2;3,4) #0\n");
+
+  {
+    db::Transaction trans (&m, "T1");
+    topcell.shapes (lindex2).clear (db::ShapeIterator::Polygons);
+    EXPECT_EQ (shapes_to_string (_this, topcell.shapes (lindex2)), "box (1,2;3,4) #0\n");
+  }
+
+  m.undo ();
+  EXPECT_EQ (shapes_to_string (_this, topcell.shapes (lindex2)), shapes_to_string (_this, topcell.shapes (lindex1)));
+}
+
 TEST(10A)
 {
   if (db::default_editable_mode ()) { 

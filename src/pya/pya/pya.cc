@@ -34,6 +34,7 @@
 #include "gsiDecl.h"
 #include "gsiDeclBasic.h"
 #include "tlLog.h"
+#include "tlEnv.h"
 #include "tlStream.h"
 #include "tlTimer.h"
 #include "tlFileUtils.h"
@@ -140,6 +141,16 @@ public:
 
   virtual size_t scope_index () const
   {
+    static int consider_scope = -1;
+
+    //  disable scoped debugging (e.g. DRC script lines) if $KLAYOUT_PYA_DEBUG_SCOPE is set.
+    if (consider_scope < 0) {
+      consider_scope = tl::app_flag ("pya-debug-scope") ? 0 : 1;
+    }
+    if (! consider_scope) {
+      return 0;
+    }
+
     if (! m_scope.empty ()) {
       for (size_t i = 0; i < m_stack_trace.size (); ++i) {
         if (m_stack_trace [i].file == m_scope) {

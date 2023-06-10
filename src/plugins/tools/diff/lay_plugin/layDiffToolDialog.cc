@@ -46,6 +46,7 @@ std::string cfg_diff_smart ("diff-smart");
 std::string cfg_diff_summarize ("diff-summarize");
 std::string cfg_diff_expand_cell_arrays ("diff-expand-cell-arrays");
 std::string cfg_diff_exact ("diff-exact");
+std::string cfg_diff_ignore_duplicates ("diff-ignore-duplicates");
 
 // ------------------------------------------------------------------------------
 //  RdbDifferenceReceiver definition
@@ -650,6 +651,9 @@ DiffToolDialog::exec_dialog (lay::LayoutViewBase *view)
   if (config_root->config_get (cfg_diff_exact, f)) {
     mp_ui->exact_cbx->setChecked (f);
   }
+  if (config_root->config_get (cfg_diff_ignore_duplicates, f)) {
+    mp_ui->ignore_duplicates_cbx->setChecked (f);
+  }
 
   update ();
 
@@ -686,6 +690,7 @@ BEGIN_PROTECTED
   config_root->config_set (cfg_diff_summarize, mp_ui->summarize_cbx->isChecked ());
   config_root->config_set (cfg_diff_expand_cell_arrays, mp_ui->expand_cell_arrays_cbx->isChecked ());
   config_root->config_set (cfg_diff_exact, mp_ui->exact_cbx->isChecked ());
+  config_root->config_set (cfg_diff_ignore_duplicates, mp_ui->ignore_duplicates_cbx->isChecked ());
   config_root->config_end ();
 
   QDialog::accept ();
@@ -712,6 +717,7 @@ DiffToolDialog::run_diff ()
   bool summarize = !run_xor && mp_ui->summarize_cbx->isChecked ();
   bool expand_cell_arrays = !run_xor && mp_ui->expand_cell_arrays_cbx->isChecked ();
   bool exact = !run_xor && mp_ui->exact_cbx->isChecked ();
+  bool ignore_duplicates = mp_ui->ignore_duplicates_cbx->isChecked ();
 
   int cv_index_a = mp_ui->layouta->current_cv_index ();
   int cv_index_b = mp_ui->layoutb->current_cv_index ();
@@ -739,6 +745,9 @@ DiffToolDialog::run_diff ()
   }
   if (smart) {
     flags |= db::layout_diff::f_smart_cell_mapping;
+  }
+  if (ignore_duplicates) {
+    flags |= db::layout_diff::f_ignore_duplicates;
   }
 
   //  TODO: make an parameter

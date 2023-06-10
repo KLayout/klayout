@@ -1971,7 +1971,19 @@ Layout::move_layer (unsigned int src, unsigned int dest)
   }
 }
 
-void 
+void
+Layout::move_layer (unsigned int src, unsigned int dest, unsigned int flags)
+{
+  tl_assert (m_layers.layer_state (src) != LayoutLayers::Free);
+  tl_assert (m_layers.layer_state (dest) != LayoutLayers::Free);
+
+  //  move the shapes
+  for (iterator c = begin (); c != end (); ++c) {
+    c->move (src, dest, flags);
+  }
+}
+
+void
 Layout::copy_layer (unsigned int src, unsigned int dest)
 {
   tl_assert (m_layers.layer_state (src) != LayoutLayers::Free);
@@ -1983,7 +1995,19 @@ Layout::copy_layer (unsigned int src, unsigned int dest)
   }
 }
 
-void 
+void
+Layout::copy_layer (unsigned int src, unsigned int dest, unsigned int flags)
+{
+  tl_assert (m_layers.layer_state (src) != LayoutLayers::Free);
+  tl_assert (m_layers.layer_state (dest) != LayoutLayers::Free);
+
+  //  copy the shapes
+  for (iterator c = begin (); c != end (); ++c) {
+    c->copy (src, dest, flags);
+  }
+}
+
+void
 Layout::clear_layer (unsigned int n)
 {
   tl_assert (m_layers.layer_state (n) != LayoutLayers::Free);
@@ -1994,7 +2018,18 @@ Layout::clear_layer (unsigned int n)
   }
 }
 
-void 
+void
+Layout::clear_layer (unsigned int n, unsigned int flags)
+{
+  tl_assert (m_layers.layer_state (n) != LayoutLayers::Free);
+
+  //  clear the shapes
+  for (iterator c = begin (); c != end (); ++c) {
+    c->clear (n, flags);
+  }
+}
+
+void
 Layout::delete_layer (unsigned int n)
 {
   tl_assert (m_layers.layer_state (n) != LayoutLayers::Free);

@@ -111,7 +111,7 @@ RubyStackTraceProvider::scope_index (const std::vector<tl::BacktraceElement> &bt
 
     //  disable scoped debugging (e.g. DRC script lines) if $KLAYOUT_RBA_DEBUG_SCOPE is set.
     if (consider_scope < 0) {
-      consider_scope = tl::has_env ("KLAYOUT_RBA_DEBUG_SCOPE") ? 0 : 1;
+      consider_scope = tl::app_flag ("rba-debug-scope") ? 0 : 1;
     }
     if (! consider_scope) {
       return 0;

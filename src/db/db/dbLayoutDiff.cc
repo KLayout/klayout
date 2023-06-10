@@ -69,8 +69,10 @@ collect_cells (const db::Layout &l, const db::Cell *top, std::map <std::string, 
 }
 
 static void
-collect_insts_of_unmapped_cells (const db::Layout & /*l*/, const db::Cell *cell, unsigned int /*flags*/, const std::map <db::cell_index_type, db::cell_index_type> &cci, std::vector <db::CellInstArrayWithProperties> &insts)
+collect_insts_of_unmapped_cells (const db::Layout & /*l*/, const db::Cell *cell, unsigned int /*flags*/, const std::map <db::cell_index_type, db::cell_index_type> &cci, std::vector <db::CellInstArrayWithProperties> &insts, bool no_duplicates)
 {
+  size_t n_before = insts.size ();
+
   for (db::Cell::const_iterator i = cell->begin (); !i.at_end (); ++i) {
 
     std::map <db::cell_index_type, db::cell_index_type>::const_iterator ccii = cci.find (i->cell_index ());
@@ -80,6 +82,13 @@ collect_insts_of_unmapped_cells (const db::Layout & /*l*/, const db::Cell *cell,
       insts.push_back (new_inst);
 
     }
+  }
+
+  if (no_duplicates) {
+
+    std::sort (insts.begin () + n_before, insts.end ());
+    insts.erase (std::unique (insts.begin () + n_before, insts.end ()), insts.end ());
+
   }
 }
 
@@ -102,7 +111,7 @@ rewrite_instances_to (std::vector <db::CellInstArrayWithProperties> &insts, unsi
 }
 
 static void
-collect_insts (const db::Layout & /*l*/, const db::Cell *cell, unsigned int flags, const std::map <db::cell_index_type, db::cell_index_type> &cci, std::vector <db::CellInstArrayWithProperties> &insts, PropertyMapper &pn)
+collect_insts (const db::Layout & /*l*/, const db::Cell *cell, unsigned int flags, const std::map <db::cell_index_type, db::cell_index_type> &cci, std::vector <db::CellInstArrayWithProperties> &insts, PropertyMapper &pn, bool no_duplicates)
 {
   insts.clear ();
 
@@ -148,6 +157,10 @@ collect_insts (const db::Layout & /*l*/, const db::Cell *cell, unsigned int flag
   }
 
   std::sort (insts.begin (), insts.end ());
+
+  if (no_duplicates) {
+    insts.erase (std::unique (insts.begin (), insts.end ()), insts.end ());
+  }
 }
 
 /**
@@ -178,10 +191,10 @@ int compare_seq (I b1, I e1, I b2, I e2, Op op)
 /**
  *  @brief Reduces two vectors to the common objects as determined by the compare operator
  *  If the iterate parameter is true, the reduction is repeated until no more reduction can be 
- *  achieved. This is useful with tolerances since the sorted is not strict in that case.
+ *  achieved. This is useful with tolerances since the sorting is not strict in that case.
  */
 template <class X, class Op>
-void reduce (std::vector<X> &a, std::vector<X> &b, Op op, bool iterate)
+void reduce (std::vector<X> &a, std::vector<X> &b, Op op, bool iterate, bool no_duplicates)
 {
   do {
 
@@ -196,12 +209,29 @@ void reduce (std::vector<X> &a, std::vector<X> &b, Op op, bool iterate)
 
     while (ra != a.end () && rb != b.end ()) {
       if (op (*ra, *rb)) {
-        *wa++ = *ra++;
+        typename std::vector<X>::const_iterator r = ra++;
+        *wa = *r;
+        while (no_duplicates && ra != a.end () && !op (*ra, *r) && !op(*r, *ra)) {
+          ++ra;
+        }
+        ++wa;
       } else if (op (*rb, *ra)) {
-        *wb++ = *rb++;
+        typename std::vector<X>::const_iterator r = rb++;
+        *wb = *r;
+        while (no_duplicates && rb != b.end () && !op (*rb, *r) && !op(*r, *rb)) {
+          ++rb;
+        }
+        ++wb;
       } else {
-        ++ra;
-        ++rb;
+        typename std::vector<X>::const_iterator r;
+        r = ra++;
+        while (no_duplicates && ra != a.end () && !op (*ra, *r) && !op(*r, *ra)) {
+          ++ra;
+        }
+        r = rb++;
+        while (no_duplicates && rb != b.end () && !op (*rb, *r) && !op(*r, *rb)) {
+          ++rb;
+        }
       }
     }
 
@@ -211,14 +241,22 @@ void reduce (std::vector<X> &a, std::vector<X> &b, Op op, bool iterate)
 
     if (ra != wa) {
       while (ra != a.end ()) {
-        *wa++ = *ra++;
+        typename std::vector<X>::const_iterator r = ra++;
+        *wa++ = *r;
+        while (no_duplicates && ra != a.end () && !op (*ra, *r) && !op(*r, *ra)) {
+          ++ra;
+        }
       }
       a.erase (wa, a.end ());
     }
 
     if (rb != wb) {
       while (rb != b.end ()) {
-        *wb++ = *rb++;
+        typename std::vector<X>::const_iterator r = rb++;
+        *wb++ = *r;
+        while (no_duplicates && rb != b.end () && !op (*rb, *r) && !op(*r, *rb)) {
+          ++rb;
+        }
       }
       b.erase (wb, b.end ());
     }
@@ -405,7 +443,7 @@ struct PolygonCompareOpWithTolerance
       m_eb.push_back (*e);
     }
 
-    reduce (m_ea, m_eb, EdgeCompareOpWithTolerance (m_tolerance), m_tolerance > 0);
+    reduce (m_ea, m_eb, EdgeCompareOpWithTolerance (m_tolerance), m_tolerance > 0, false);
 
     return compare_seq (m_ea.begin (), m_ea.end (), m_eb.begin (), m_eb.end (), EdgeCompareOpWithTolerance (m_tolerance)) < 0;
   }
@@ -665,6 +703,7 @@ do_compare_layouts (const db::Layout &a, const db::Cell *top_a, const db::Layout
   }
 
   bool verbose = (flags & layout_diff::f_verbose);
+  bool no_duplicates = (flags & layout_diff::f_ignore_duplicates);
 
   db::Layout n, na, nb;
   na.properties_repository () = a.properties_repository ();
@@ -897,20 +936,20 @@ do_compare_layouts (const db::Layout &a, const db::Cell *top_a, const db::Layout
       r.bbox_differs (cell_a->bbox (), cell_b->bbox ());
     }
 
-    collect_insts (a, cell_a, flags, common_cell_indices_a, insts_a, prop_normalize_a);
-    collect_insts (b, cell_b, flags, common_cell_indices_b, insts_b, prop_normalize_b);
+    collect_insts (a, cell_a, flags, common_cell_indices_a, insts_a, prop_normalize_a, no_duplicates);
+    collect_insts (b, cell_b, flags, common_cell_indices_b, insts_b, prop_normalize_b, no_duplicates);
 
     std::vector <db::CellInstArrayWithProperties> anotb;
     std::set_difference (insts_a.begin (), insts_a.end (), insts_b.begin (), insts_b.end (), std::back_inserter (anotb));
 
     rewrite_instances_to (anotb, flags, common_cells_a, prop_remap_to_a);
-    collect_insts_of_unmapped_cells (a, cell_a, flags, common_cell_indices_a, anotb);
+    collect_insts_of_unmapped_cells (a, cell_a, flags, common_cell_indices_a, anotb, no_duplicates);
 
     std::vector <db::CellInstArrayWithProperties> bnota;
     std::set_difference (insts_b.begin (), insts_b.end (), insts_a.begin (), insts_a.end (), std::back_inserter (bnota));
 
     rewrite_instances_to (bnota, flags, common_cells_b, prop_remap_to_b);
-    collect_insts_of_unmapped_cells (b, cell_b, flags, common_cell_indices_b, bnota);
+    collect_insts_of_unmapped_cells (b, cell_b, flags, common_cell_indices_b, bnota, no_duplicates);
 
     if (! anotb.empty () || ! bnota.empty ()) {
 
@@ -979,7 +1018,7 @@ do_compare_layouts (const db::Layout &a, const db::Cell *top_a, const db::Layout
         collect_polygons (b, cell_b, layer_b, flags, polygons_b, prop_normalize_b);
       }
 
-      reduce (polygons_a, polygons_b, make_polygon_compare_func (tolerance), tolerance > 0);
+      reduce (polygons_a, polygons_b, make_polygon_compare_func (tolerance), tolerance > 0, no_duplicates);
 
       if (!polygons_a.empty () || !polygons_b.empty ()) {
         differs = true;
@@ -1007,7 +1046,7 @@ do_compare_layouts (const db::Layout &a, const db::Cell *top_a, const db::Layout
           collect_paths (b, cell_b, layer_b, flags, paths_b, prop_normalize_b);
         }
 
-        reduce (paths_a, paths_b, make_path_compare_func (tolerance), tolerance > 0);
+        reduce (paths_a, paths_b, make_path_compare_func (tolerance), tolerance > 0, no_duplicates);
 
         if (!paths_a.empty () || !paths_b.empty ()) {
           differs = true;
@@ -1034,7 +1073,7 @@ do_compare_layouts (const db::Layout &a, const db::Cell *top_a, const db::Layout
         collect_texts (b, cell_b, layer_b, flags, texts_b, prop_normalize_b);
       }
 
-      reduce (texts_a, texts_b, make_text_compare_func (tolerance), tolerance > 0);
+      reduce (texts_a, texts_b, make_text_compare_func (tolerance), tolerance > 0, no_duplicates);
 
       if (!texts_a.empty () || !texts_b.empty ()) {
         differs = true;
@@ -1061,7 +1100,7 @@ do_compare_layouts (const db::Layout &a, const db::Cell *top_a, const db::Layout
           collect_boxes (b, cell_b, layer_b, flags, boxes_b, prop_normalize_b);
         }
 
-        reduce (boxes_a, boxes_b, make_box_compare_func (tolerance), tolerance > 0);
+        reduce (boxes_a, boxes_b, make_box_compare_func (tolerance), tolerance > 0, no_duplicates);
 
         if (!boxes_a.empty () || !boxes_b.empty ()) {
           differs = true;
@@ -1088,7 +1127,7 @@ do_compare_layouts (const db::Layout &a, const db::Cell *top_a, const db::Layout
         collect_edges (b, cell_b, layer_b, flags, edges_b, prop_normalize_b);
       }
 
-      reduce (edges_a, edges_b, make_edge_compare_func (tolerance), tolerance > 0);
+      reduce (edges_a, edges_b, make_edge_compare_func (tolerance), tolerance > 0, no_duplicates);
 
       if (!edges_a.empty () || !edges_b.empty ()) {
         differs = true;
@@ -1113,7 +1152,7 @@ do_compare_layouts (const db::Layout &a, const db::Cell *top_a, const db::Layout
         collect_edge_pairs (b, cell_b, layer_b, flags, edge_pairs_b, prop_normalize_b);
       }
 
-      reduce (edge_pairs_a, edge_pairs_b, make_edge_pair_compare_func (tolerance), tolerance > 0);
+      reduce (edge_pairs_a, edge_pairs_b, make_edge_pair_compare_func (tolerance), tolerance > 0, no_duplicates);
 
       if (!edge_pairs_a.empty () || !edge_pairs_b.empty ()) {
         differs = true;

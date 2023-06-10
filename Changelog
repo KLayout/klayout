@@ -1,3 +1,14 @@
+0.28.9           (2023-06-10):
+* Enhancement: %GITHUB%/issues/1281 Layout diff can ignore shape or instance duplicates
+* Bugfix: %GITHUB%/issues/1393 GDS2Text format not supported in Python module
+* Bugfix: "add meta info" did not take "persisted" flag
+* Enhancement: "profile" feature for DRC and LVS
+* Enhancement: DRC can write to multiple targets now
+  - new functions "new_report", "new_target": create output channel objects
+    that can be used to redirect "output" to specific other channels
+* Bugfix: GDS2 reader should not segfault on certain broken files
+* Enhancement: performance improvement of hierarchical XOR in certain cases
+  
 0.28.8           (2023-05-23):
 * Enhancement: %GITHUB%/issues/1314 Storing (arbitrary) data in metadata
   - Meta information can be attached to layout and cells

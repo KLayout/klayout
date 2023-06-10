@@ -337,11 +337,11 @@ class ActionBase:
     def icon(self) -> None:
         r"""
         WARNING: This variable can only be set, not retrieved.
-        @brief Sets the icon to the given image file
+        @brief Sets the icon to the given \QIcon object
 
-        @param file The image file to load for the icon
+        @param qicon The QIcon object
 
-        Passing an empty string will reset the icon.
+        This variant has been added in version 0.28.
         """
     default_shortcut: str
     r"""
@@ -1539,6 +1539,11 @@ class BitmapBuffer:
         This method may not be available if PNG support is not compiled into KLayout.
         """
     @classmethod
+    def from_qimage(cls, qimage: QtGui.QImage_Native) -> BitmapBuffer:
+        r"""
+        @brief Creates a pixel buffer object from a QImage object
+        """
+    @classmethod
     def new(cls, width: int, height: int) -> BitmapBuffer:
         r"""
         @brief Creates a pixel buffer object
@@ -1672,6 +1677,10 @@ class BitmapBuffer:
         @brief Converts the pixel buffer to a PNG byte stream
         This method may not be available if PNG support is not compiled into KLayout.
         """
+    def to_qimage(self) -> QtGui.QImage_Native:
+        r"""
+        @brief Converts the pixel buffer to a \QImage object
+        """
     def width(self) -> int:
         r"""
         @brief Gets the width of the pixel buffer in pixels
@@ -1682,7 +1691,7 @@ class BitmapBuffer:
         This method may not be available if PNG support is not compiled into KLayout.
         """
 
-class BrowserDialog:
+class BrowserDialog(QDialog_Native):
     r"""
     @brief A HTML display and browser dialog
 
@@ -1755,6 +1764,20 @@ class BrowserDialog:
         """
     @overload
     @classmethod
+    def new(cls, parent: QtWidgets.QWidget_Native, html: str) -> BrowserDialog:
+        r"""
+        @brief Creates a HTML browser window with a static HTML content
+        This method variant with a parent argument has been introduced in version 0.24.2.
+        """
+    @overload
+    @classmethod
+    def new(cls, parent: QtWidgets.QWidget_Native, source: BrowserSource) -> BrowserDialog:
+        r"""
+        @brief Creates a HTML browser window with a \BrowserSource as the source of HTML code
+        This method variant with a parent argument has been introduced in version 0.24.2.
+        """
+    @overload
+    @classmethod
     def new(cls, source: BrowserSource) -> BrowserDialog:
         r"""
         @brief Creates a HTML browser window with a \BrowserSource as the source of HTML code
@@ -1765,6 +1788,18 @@ class BrowserDialog:
         r"""
         @brief Creates a HTML browser window with a static HTML content
         This method has been introduced in version 0.23.
+        """
+    @overload
+    def __init__(self, parent: QtWidgets.QWidget_Native, html: str) -> None:
+        r"""
+        @brief Creates a HTML browser window with a static HTML content
+        This method variant with a parent argument has been introduced in version 0.24.2.
+        """
+    @overload
+    def __init__(self, parent: QtWidgets.QWidget_Native, source: BrowserSource) -> None:
+        r"""
+        @brief Creates a HTML browser window with a \BrowserSource as the source of HTML code
+        This method variant with a parent argument has been introduced in version 0.24.2.
         """
     @overload
     def __init__(self, source: BrowserSource) -> None:
@@ -1809,23 +1844,6 @@ class BrowserDialog:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
-    def create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
-    def destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-    def destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
-        """
     def exec_(self) -> int:
         r"""
         @brief Executes the HTML browser dialog as a modal window
@@ -1833,16 +1851,6 @@ class BrowserDialog:
     def execute(self) -> int:
         r"""
         @brief Executes the HTML browser dialog as a modal window
-        """
-    def hide(self) -> None:
-        r"""
-        @brief Hides the HTML browser window
-        """
-    def is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
         """
     def load(self, url: str) -> None:
         r"""
@@ -1890,9 +1898,122 @@ class BrowserDialog:
 
         Setting the source should be the first thing done after the BrowserDialog object is created. It will not have any effect after the browser has loaded the first page. In particular, \home= should be called after the source was set.
         """
-    def show(self) -> None:
+
+class BrowserPanel(QWidget_Native):
+    r"""
+    @brief A HTML display and browser widget
+
+    This widget provides the functionality of \BrowserDialog within a widget. It can be embedded into other dialogs. For details about the use model of this class see \BrowserDialog.
+
+    This class has been introduced in version 0.25.
+    """
+    @property
+    def home(self) -> None:
         r"""
-        @brief Shows the HTML browser window in a non-modal way
+        WARNING: This variable can only be set, not retrieved.
+        @brief Sets the browser widget's initial and current URL which is selected if the "home" location is chosen
+        The home URL is the one shown initially and the one which is selected when the "home" button is pressed. The default location is "int:/index.html".
+        """
+    @property
+    def label(self) -> None:
+        r"""
+        WARNING: This variable can only be set, not retrieved.
+        @brief Sets the label text
+
+        The label is shown left of the navigation buttons.
+        By default, no label is specified.
+        """
+    @property
+    def source(self) -> None:
+        r"""
+        WARNING: This variable can only be set, not retrieved.
+        @brief Connects to a source object
+
+        Setting the source should be the first thing done after the BrowserDialog object is created. It will not have any effect after the browser has loaded the first page. In particular, \home= should be called after the source was set.
+        """
+    @overload
+    @classmethod
+    def new(cls, parent: QtWidgets.QWidget_Native) -> BrowserPanel:
+        r"""
+        @brief Creates a HTML browser widget
+        """
+    @overload
+    @classmethod
+    def new(cls, parent: QtWidgets.QWidget_Native, source: BrowserSource_Native) -> BrowserPanel:
+        r"""
+        @brief Creates a HTML browser widget with a \BrowserSource as the source of HTML code
+        """
+    @overload
+    def __init__(self, parent: QtWidgets.QWidget_Native) -> None:
+        r"""
+        @brief Creates a HTML browser widget
+        """
+    @overload
+    def __init__(self, parent: QtWidgets.QWidget_Native, source: BrowserSource_Native) -> None:
+        r"""
+        @brief Creates a HTML browser widget with a \BrowserSource as the source of HTML code
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def load(self, url: str) -> None:
+        r"""
+        @brief Loads the given URL into the browser widget
+        Typically the URL has the "int:" scheme so the HTML code is taken from the \BrowserSource object.
+        """
+    def reload(self) -> None:
+        r"""
+        @brief Reloads the current page
+        """
+    def search(self, search_item: str) -> None:
+        r"""
+        @brief Issues a search request using the given search item and the search URL specified with \set_search_url
+
+        See \search_url= for a description of the search mechanism.
+        """
+    def set_search_url(self, url: str, query_item: str) -> None:
+        r"""
+        @brief Enables the search field and specifies the search URL generated for a search
+
+        If a search URL is set, the search box right to the navigation bar will be enabled. When a text is entered into the search box, the browser will navigate to an URL composed of the search URL, the search item and the search text, i.e. "myurl?item=search_text".
+        """
+    def url(self) -> str:
+        r"""
+        @brief Gets the URL currently shown
         """
 
 class BrowserSource:
@@ -1996,6 +2117,12 @@ class BrowserSource:
     def dup(self) -> BrowserSource:
         r"""
         @brief Creates a copy of self
+        """
+    def get_image(self, url: str) -> QtGui.QImage_Native:
+        r"""
+        @brief Gets the image object for a specific URL
+
+        This method has been introduced in version 0.28.
         """
     def is_const_object(self) -> bool:
         r"""
@@ -2103,6 +2230,9 @@ class BrowserSource_Native:
         @brief Creates a copy of self
         """
     def get(self, arg0: str) -> str:
+        r"""
+        """
+    def get_image(self, url: str) -> QtGui.QImage_Native:
         r"""
         """
     def is_const_object(self) -> bool:
@@ -3236,7 +3366,7 @@ class FileDialog:
         In that case, only const methods may be called on self.
         """
 
-class HelpDialog:
+class HelpDialog(QDialog_Native):
     r"""
     @brief The help dialog
 
@@ -3244,8 +3374,16 @@ class HelpDialog:
 
     This class has been added in version 0.25.
     """
+    @overload
     @classmethod
     def new(cls, modal: bool) -> HelpDialog:
+        r"""
+        @brief Creates a new help dialog
+        If the modal flag is true, the dialog will be shown as a modal window.
+        """
+    @overload
+    @classmethod
+    def new(cls, parent: QtWidgets.QWidget_Native, modal: bool) -> HelpDialog:
         r"""
         @brief Creates a new help dialog
         If the modal flag is true, the dialog will be shown as a modal window.
@@ -3287,33 +3425,6 @@ class HelpDialog:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
-    def create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
-    def destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-    def destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
-        """
-    def exec_(self) -> int:
-        r"""
-        @brief Executes the dialog (shows it modally)
-        """
-    def is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
-        """
     def load(self, url: str) -> None:
         r"""
         @brief Loads the specified URL
@@ -3323,10 +3434,6 @@ class HelpDialog:
         r"""
         @brief Issues a search on the specified topic
         This method will call the search page with the given topic.
-        """
-    def show(self) -> None:
-        r"""
-        @brief Shows the dialog
         """
 
 class HelpSource(BrowserSource_Native):
@@ -3392,6 +3499,10 @@ class HelpSource(BrowserSource_Native):
         Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def get_dom(self, path: str) -> QtXml.QDomDocument:
+        r"""
+        @brief Reserved for internal use
         """
     def get_option(self, key: str) -> Any:
         r"""
@@ -6293,12 +6404,12 @@ class LayoutViewBase:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -7491,6 +7602,33 @@ class LayoutViewBase:
         @param cv_index The cellview index for which to get the current path from (usually this will be the active cellview index)
         This method is was deprecated in version 0.25 since from then, the \CellView object can be used to obtain an manipulate the selected cell.
         """
+    def get_image(self, width: int, height: int) -> QtGui.QImage_Native:
+        r"""
+        @brief Gets the layout image as a \QImage
+
+        @param width The width of the image to render in pixel.
+        @param height The height of the image to render in pixel.
+
+        The image contains the current scene (layout, annotations etc.).
+        The image is drawn synchronously with the given width and height. Drawing may take some time. 
+        """
+    def get_image_with_options(self, width: int, height: int, linewidth: Optional[int] = ..., oversampling: Optional[int] = ..., resolution: Optional[float] = ..., target: Optional[db.DBox] = ..., monochrome: Optional[bool] = ...) -> QtGui.QImage_Native:
+        r"""
+        @brief Gets the layout image as a \QImage (with options)
+
+        @param width The width of the image to render in pixel.
+        @param height The height of the image to render in pixel.
+        @param linewidth The width of a line in pixels (usually 1) or 0 for default.
+        @param oversampling The oversampling factor (1..3) or 0 for default.
+        @param resolution The resolution (pixel size compared to a screen pixel size, i.e 1/oversampling) or 0 for default.
+        @param target_box The box to draw or an empty box for default.
+        @param monochrome If true, monochrome images will be produced.
+
+        The image contains the current scene (layout, annotations etc.).
+        The image is drawn synchronously with the given width and height. Drawing may take some time. Monochrome images don't have background or annotation objects currently.
+
+        This method has been introduced in version 0.23.10.
+        """
     def get_line_style(self, index: int) -> str:
         r"""
         @brief Gets the line style string for the style with the given index
@@ -7540,6 +7678,12 @@ class LayoutViewBase:
         The image is drawn synchronously with the given width and height. Drawing may take some time. Monochrome images don't have background or annotation objects currently.
 
         This method has been introduced in 0.28.
+        """
+    def get_screenshot(self) -> QtGui.QImage_Native:
+        r"""
+        @brief Gets a screenshot as a \QImage
+
+        Getting the image requires the drawing to be complete. Ideally, synchronous mode is switched on for the application to guarantee this condition. The image will have the size of the viewport showing the current layout.
         """
     def get_screenshot_pixels(self) -> PixelBuffer:
         r"""
@@ -8444,6 +8588,12 @@ class LayoutViewBase:
         @brief Returns the viewport width in pixels
         This method was introduced in version 0.18.
         """
+    def widget(self) -> QtWidgets.QWidget_Native:
+        r"""
+        @brief Gets the QWidget object of the view
+
+        This method has been introduced in version 0.28.7.
+        """
     def zoom_box(self, box: db.DBox) -> None:
         r"""
         @brief Sets the viewport to the given box
@@ -8467,6 +8617,119 @@ class LayoutViewBase:
     def zoom_out(self) -> None:
         r"""
         @brief Zooms out somewhat
+        """
+
+class LayoutViewWidget(QFrame_Native):
+    r"""
+    This object produces a widget which embeds a LayoutView. This widget can be used inside Qt widget hierarchies.
+    To access the \LayoutView object within, use \view.
+
+    This class has been introduced in version 0.28.
+    """
+    @classmethod
+    def new(cls, parent: QtWidgets.QWidget_Native, editable: Optional[bool] = ..., manager: Optional[db.Manager] = ..., options: Optional[int] = ...) -> LayoutViewWidget:
+        r"""
+        @brief Creates a standalone view widget
+
+        @param parent The parent widget in which to embed the view
+        @param editable True to make the view editable
+        @param manager The \Manager object to enable undo/redo
+        @param options A combination of the values in the LV_... constants from \LayoutViewBase
+
+        This constructor has been introduced in version 0.25.
+        It has been enhanced with the arguments in version 0.27.
+        """
+    def __init__(self, parent: QtWidgets.QWidget_Native, editable: Optional[bool] = ..., manager: Optional[db.Manager] = ..., options: Optional[int] = ...) -> None:
+        r"""
+        @brief Creates a standalone view widget
+
+        @param parent The parent widget in which to embed the view
+        @param editable True to make the view editable
+        @param manager The \Manager object to enable undo/redo
+        @param options A combination of the values in the LV_... constants from \LayoutViewBase
+
+        This constructor has been introduced in version 0.25.
+        It has been enhanced with the arguments in version 0.27.
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def bookmarks_frame(self) -> QtWidgets.QWidget_Native:
+        r"""
+        @brief Gets the bookmarks side widget
+        For details about side widgets see \layer_control_frame.
+
+        This method has been introduced in version 0.27
+        """
+    def hierarchy_control_frame(self) -> QtWidgets.QWidget_Native:
+        r"""
+        @brief Gets the cell view (hierarchy view) side widget
+        For details about side widgets see \layer_control_frame.
+
+        This method has been introduced in version 0.27
+        """
+    def layer_control_frame(self) -> QtWidgets.QWidget_Native:
+        r"""
+        @brief Gets the layer control side widget
+        A 'side widget' is a widget attached to the view. It does not have a parent, so you can embed it into a different context. Please note that with embedding through 'setParent' it will be destroyed when your parent widget gets destroyed. It will be lost then to the view.
+
+        The side widget can be configured through the views configuration interface.
+
+        This method has been introduced in version 0.27
+        """
+    def layer_toolbox_frame(self) -> QtWidgets.QWidget_Native:
+        r"""
+        @brief Gets the layer toolbox side widget
+        A 'side widget' is a widget attached to the view. It does not have a parent, so you can embed it into a different context. Please note that with embedding through 'setParent' it will be destroyed when your parent widget gets destroyed. It will be lost then to the view.
+
+        The side widget can be configured through the views configuration interface.
+
+        This method has been introduced in version 0.28
+        """
+    def libraries_frame(self) -> QtWidgets.QWidget_Native:
+        r"""
+        @brief Gets the library view side widget
+        For details about side widgets see \layer_control_frame.
+
+        This method has been introduced in version 0.27
+        """
+    def view(self) -> LayoutView:
+        r"""
+        @brief Gets the embedded view object.
         """
 
 class Macro:
@@ -8547,12 +8810,12 @@ class Macro:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -9426,7 +9689,7 @@ class MacroInterpreter:
         Registration of the interpreter makes the object known to the system. After registration, macros whose interpreter is set to 'dsl' can use this object to run the script. For executing a script, the system will call the interpreter's \execute method.
         """
 
-class MainWindow:
+class MainWindow(QMainWindow_Native):
     r"""
     @brief The main application window and central controller object
 
@@ -9490,6 +9753,30 @@ class MainWindow:
 
     Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods (add_current_view_observer/remove_current_view_observer) have been removed in 0.25.
     """
+    on_session_about_to_be_restored: None
+    r"""
+    Getter:
+    @brief An event indicating that a session is about to be restored
+
+    This event has been added in version 0.28.8.
+
+    Setter:
+    @brief An event indicating that a session is about to be restored
+
+    This event has been added in version 0.28.8.
+    """
+    on_session_restored: None
+    r"""
+    Getter:
+    @brief An event indicating that a session was restored
+
+    This event has been added in version 0.28.8.
+
+    Setter:
+    @brief An event indicating that a session was restored
+
+    This event has been added in version 0.28.8.
+    """
     on_view_closed: None
     r"""
     Getter:
@@ -9540,15 +9827,6 @@ class MainWindow:
         NOTE: currently this method delivers a superset of all available symbols. Depending on the context, no all symbols may trigger actual functionality.
 
         This method has been introduced in version 0.27.
-        """
-    @classmethod
-    def new(cls) -> MainWindow:
-        r"""
-        @brief Creates a new object of this class
-        """
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
         """
     def _create(self) -> None:
         r"""
@@ -10346,11 +10624,6 @@ class MainWindow:
 
         This method has been introduced in version 0.27.
         """
-    def create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
     @overload
     def create_layout(self, mode: int) -> CellView:
         r"""
@@ -10397,18 +10670,6 @@ class MainWindow:
         @brief Returns a reference to the current view's object
 
         @return A reference to a \LayoutView object representing the current view.
-        """
-    def destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-    def destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
     def dispatcher(self) -> Dispatcher:
         r"""
@@ -10491,12 +10752,6 @@ class MainWindow:
         If the given view is not a view object within the main window, a negative value will be returned.
 
         This method has been added in version 0.25.
-        """
-    def is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
         """
     @overload
     def load_layout(self, filename: str, mode: Optional[int] = ...) -> CellView:
@@ -10975,7 +11230,7 @@ class Marker:
         The set method has been added in version 0.20.
         """
 
-class MessageBox:
+class MessageBox(QMainWindow_Native):
     r"""
     @brief Various methods to display message boxes
     This class provides some basic message boxes. This functionality is provided through the static (class) methods \warning, \question and so on.
@@ -11074,11 +11329,6 @@ class MessageBox:
         @return The button constant describing the button that was pressed
         """
     @classmethod
-    def new(cls) -> MessageBox:
-        r"""
-        @brief Creates a new object of this class
-        """
-    @classmethod
     def question(cls, title: str, text: str, buttons: int) -> int:
         r"""
         @brief Open a question message box
@@ -11103,10 +11353,6 @@ class MessageBox:
     def __deepcopy__(self) -> MessageBox:
         r"""
         @brief Creates a copy of self
-        """
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
         """
     def _create(self) -> None:
         r"""
@@ -11145,36 +11391,13 @@ class MessageBox:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
-    def assign(self, other: MessageBox) -> None:
+    def assign(self, other: QObject_Native) -> None:
         r"""
         @brief Assigns another object to self
-        """
-    def create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
-    def destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-    def destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
     def dup(self) -> MessageBox:
         r"""
         @brief Creates a copy of self
-        """
-    def is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
         """
 
 class NetlistBrowserDialog:
@@ -11950,6 +12173,11 @@ class PixelBuffer:
         This method may not be available if PNG support is not compiled into KLayout.
         """
     @classmethod
+    def from_qimage(cls, qimage: QtGui.QImage_Native) -> PixelBuffer:
+        r"""
+        @brief Creates a pixel buffer object from a QImage object
+        """
+    @classmethod
     def new(cls, width: int, height: int) -> PixelBuffer:
         r"""
         @brief Creates a pixel buffer object
@@ -12058,6 +12286,12 @@ class PixelBuffer:
         r"""
         @brief Creates a copy of self
         """
+    @overload
+    def fill(self, color: QtGui.QColor) -> None:
+        r"""
+        @brief Fills the pixel buffer with the given QColor
+        """
+    @overload
     def fill(self, color: int) -> None:
         r"""
         @brief Fills the pixel buffer with the given pixel value
@@ -12094,6 +12328,10 @@ class PixelBuffer:
         r"""
         @brief Converts the pixel buffer to a PNG byte stream
         This method may not be available if PNG support is not compiled into KLayout.
+        """
+    def to_qimage(self) -> QtGui.QImage_Native:
+        r"""
+        @brief Converts the pixel buffer to a \QImage object
         """
     def width(self) -> int:
         r"""

@@ -1930,7 +1930,7 @@ TEST(8)
 {
   db::Manager m (true);
 
-  db::Layout layout (&m);
+  db::Layout layout (true, &m);
   unsigned int lindex1 = layout.insert_layer ();
   unsigned int lindex2 = layout.insert_layer ();
 

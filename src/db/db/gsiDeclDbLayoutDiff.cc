@@ -397,6 +397,10 @@ static unsigned int f_silent () {
   return db::layout_diff::f_silent;
 }
 
+static unsigned int f_ignore_duplicates () {
+  return db::layout_diff::f_ignore_duplicates;
+}
+
 static unsigned int f_no_text_orientation () {
   return db::layout_diff::f_no_text_orientation;
 }
@@ -447,6 +451,13 @@ gsi::Class<LayoutDiff> decl_LayoutDiff ("db", "LayoutDiff",
     "\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
     "compared with other constants to form a flag set."
+  ) +
+  gsi::constant ("IgnoreDuplicates", &f_ignore_duplicates,
+    "@brief Ignore duplicate instances or shapes\n"
+    "With this option present, duplicate instances or shapes are ignored and "
+    "duplication does not count as a difference.\n"
+    "\n"
+    "This option has been introduced in version 0.28.9."
   ) +
   gsi::constant ("NoTextOrientation", &f_no_text_orientation,
     "@brief Ignore text orientation\n"

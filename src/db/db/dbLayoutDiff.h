@@ -74,11 +74,14 @@ const unsigned int f_paths_as_polygons = 0x100;
 //  Derive smart cell mapping instead of name mapping (available only if top cells are specified)
 const unsigned int f_smart_cell_mapping = 0x200;
 
-//  Don't summarize missing layers
+//  Don't summarize missing layers - print them in detail
 const unsigned int f_dont_summarize_missing_layers = 0x400;
 
 //  Ignore text details (font, size, presentation)
 const unsigned int f_no_text_details = 0x800;
+
+//  Ignore duplicate instances or shapes
+const unsigned int f_ignore_duplicates = 0x1000;
 
 }
 

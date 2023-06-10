@@ -105,6 +105,8 @@ TestDifferenceReceiver::print_cell_inst (const db::CellInstArrayWithProperties &
   }
   if (ci.properties_id () != 0) {
     m_os << " [" << ci.properties_id () << "]" << std::endl;
+  } else {
+    m_os << "" << std::endl;
   }
 }
 
@@ -489,7 +491,9 @@ TEST(1)
     "  c4 m45 *1 -10,20\n"
     "  c4 m45 *1 -10,20\n"
     "Not in b but in a:\n"
-    "  c5x r0 *1 10,-20  c5x m45 *1 -10,20Not in a but in b:\n"
+    "  c5x r0 *1 10,-20\n"
+    "  c5x m45 *1 -10,20\n"
+    "Not in a but in b:\n"
   );
 
   g = h;
@@ -951,7 +955,7 @@ TEST(3)
   c2h.shapes (0).insert (db::Polygon (db::Box (1, 2, 1003, 1006)));
 
   r.clear ();
-  eq = db::compare_layouts (g, h, db::layout_diff::f_verbose, 0, r); 
+  eq = db::compare_layouts (g, h, db::layout_diff::f_verbose, 0, r);
 
   EXPECT_EQ (eq, false);
   EXPECT_EQ (r.text (), 
@@ -965,7 +969,7 @@ TEST(3)
   );
 
   r.clear ();
-  eq = db::compare_layouts (g, h, db::layout_diff::f_verbose, 1, r); 
+  eq = db::compare_layouts (g, h, db::layout_diff::f_verbose, 1, r);
 
   EXPECT_EQ (eq, false);
   EXPECT_EQ (r.text (), 
@@ -1497,6 +1501,207 @@ TEST(7)
 
   EXPECT_EQ (eq, true);
   EXPECT_EQ (r.text (), "");
+}
+
+TEST(8)
+{
+  db::Layout g;
+  g.insert_layer (0);
+  g.set_properties (0, db::LayerProperties (17, 0));
+  g.insert_layer (1);
+  g.set_properties (1, db::LayerProperties (42, 1));
+
+  db::cell_index_type c1i = g.add_cell ("c1");
+  db::cell_index_type c2i = g.add_cell ("c2x");
+  db::cell_index_type c3i = g.add_cell ("c3");
+  db::cell_index_type c4i = g.add_cell ("c4");
+  db::cell_index_type c5i = g.add_cell ("c5x");
+
+  {
+
+    db::Cell &c1 (g.cell (c1i));
+    db::Cell &c2 (g.cell (c2i));
+    db::Cell &c3 (g.cell (c3i));
+    db::Cell &c4 (g.cell (c4i));
+    db::Cell &c5 (g.cell (c5i));
+    c2.shapes (0).insert (db::Box (0, 1, 2, 3));
+
+    db::FTrans f (1, true);
+    db::Vector p (-10, 20);
+    db::Trans t (f.rot (), p);
+    db::Vector pp (10, -20);
+    db::Trans tt (0, pp);
+
+    //  c4->c1 (aref)
+    c4.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t, db::Vector(1, 1), db::Vector (0, 2), 2, 3));
+    //  c5->c1
+    c5.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+    //  c3->c5 (3x)
+    c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
+    c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), tt));
+    c3.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c5.cell_index ()), t));
+    //  c4->c3
+    c4.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c3.cell_index ()), t));
+    //  c4->c1
+    c4.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
+    //  c2->c1 (2x)
+    c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), t));
+    c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1.cell_index ()), tt));
+    //  c2->c4 (2x)
+    c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+    c2.insert (db::array <db::CellInst, db::Trans> (db::CellInst (c4.cell_index ()), t));
+
+  }
+
+  db::Layout h = g;
+
+  TestDifferenceReceiver r;
+  bool eq;
+
+  g.cell (c2i).shapes (0).insert (db::Box (1, 2, 1001, 1002));
+  g.cell (c2i).shapes (0).insert (db::Box (2, 3, 1002, 1003));
+  g.cell (c2i).shapes (0).insert (db::Box (2, 3, 1002, 1003));
+  g.cell (c2i).shapes (0).insert (db::Box (3, 4, 1003, 1004));
+  g.cell (c2i).shapes (0).insert (db::Box (3, 4, 1003, 1004));
+
+  h.cell (c2i).shapes (0).insert (db::Box (1, 2, 1001, 1002));
+  h.cell (c2i).shapes (0).insert (db::Box (1, 2, 1001, 1002));
+  h.cell (c2i).shapes (0).insert (db::Box (2, 3, 1002, 1003));
+  h.cell (c2i).shapes (0).insert (db::Box (4, 5, 1004, 1005));
+  h.cell (c2i).shapes (0).insert (db::Box (4, 5, 1004, 1005));
+
+  r.clear ();
+  eq = db::compare_layouts (g, h, db::layout_diff::f_verbose, 0, r);
+
+  EXPECT_EQ (eq, false);
+  EXPECT_EQ (r.text (),
+    "layout_diff: boxes differ for layer 17/0 in cell c2x\n"
+    "Not in b but in a:\n"
+    "  (2,3;1002,1003)\n"
+    "  (3,4;1003,1004)\n"
+    "  (3,4;1003,1004)\n"
+    "Not in a but in b:\n"
+    "  (1,2;1001,1002)\n"
+    "  (4,5;1004,1005)\n"
+    "  (4,5;1004,1005)\n"
+  );
+
+  r.clear ();
+  eq = db::compare_layouts (g, h, db::layout_diff::f_verbose + db::layout_diff::f_ignore_duplicates, 0, r);
+
+  EXPECT_EQ (eq, false);
+  EXPECT_EQ (r.text (),
+    "layout_diff: boxes differ for layer 17/0 in cell c2x\n"
+    "Not in b but in a:\n"
+    "  (3,4;1003,1004)\n"
+    "Not in a but in b:\n"
+    "  (4,5;1004,1005)\n"
+  );
+
+  //  duplicate instances
+  {
+    db::FTrans f (1, true);
+    db::Vector p (-10, 20);
+    db::Trans t (f.rot (), p);
+
+    h.cell(c4i).insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1i), t, db::Vector(1, 1), db::Vector (0, 2), 2, 3));
+    h.cell(c4i).insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1i), t));
+    h.cell(c4i).insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1i), t));
+
+    g.cell(c5i).insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1i), t));
+    g.cell(c5i).insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1i), t, db::Vector(1, 1), db::Vector (0, 2), 2, 3));
+    g.cell(c5i).insert (db::array <db::CellInst, db::Trans> (db::CellInst (c1i), t, db::Vector(1, 1), db::Vector (0, 2), 2, 3));
+
+    db::cell_index_type c6i = g.add_cell ("c6");
+    g.cell(c5i).insert (db::array <db::CellInst, db::Trans> (db::CellInst (c6i), t));
+    g.cell(c5i).insert (db::array <db::CellInst, db::Trans> (db::CellInst (c6i), t));
+
+  }
+
+  r.clear ();
+  eq = db::compare_layouts (g, h, db::layout_diff::f_verbose, 0, r);
+
+  EXPECT_EQ (eq, false);
+  EXPECT_EQ (r.text (),
+    "layout_diff: cell c6 is not present in layout b, but in a\n"
+    "layout_diff: boxes differ for layer 17/0 in cell c2x\n"
+    "Not in b but in a:\n"
+    "  (2,3;1002,1003)\n"
+    "  (3,4;1003,1004)\n"
+    "  (3,4;1003,1004)\n"
+    "Not in a but in b:\n"
+    "  (1,2;1001,1002)\n"
+    "  (4,5;1004,1005)\n"
+    "  (4,5;1004,1005)\n"
+    "layout_diff: instances differ in cell c4\n"
+    "list for a:\n"
+    "  c1 r0 *1 10,-20\n"
+    "  c1 m45 *1 -10,20[a=1,1, b=0,2, na=2, nb=3]\n"
+    "  c3 m45 *1 -10,20\n"
+    "list for b:\n"
+    "  c1 r0 *1 10,-20\n"
+    "  c1 m45 *1 -10,20\n"
+    "  c1 m45 *1 -10,20\n"
+    "  c1 m45 *1 -10,20[a=1,1, b=0,2, na=2, nb=3]\n"
+    "  c1 m45 *1 -10,20[a=1,1, b=0,2, na=2, nb=3]\n"
+    "  c3 m45 *1 -10,20\n"
+    "Not in b but in a:\n"
+    "Not in a but in b:\n"
+    "  c1 m45 *1 -10,20\n"
+    "  c1 m45 *1 -10,20\n"
+    "  c1 m45 *1 -10,20[a=1,1, b=0,2, na=2, nb=3]\n"
+    "layout_diff: instances differ in cell c5x\n"
+    "list for a:\n"
+    "  c1 m45 *1 -10,20\n"
+    "  c1 m45 *1 -10,20\n"
+    "  c1 m45 *1 -10,20[a=1,1, b=0,2, na=2, nb=3]\n"
+    "  c1 m45 *1 -10,20[a=1,1, b=0,2, na=2, nb=3]\n"
+    "list for b:\n"
+    "  c1 m45 *1 -10,20\n"
+    "Not in b but in a:\n"
+    "  c1 m45 *1 -10,20\n"
+    "  c1 m45 *1 -10,20[a=1,1, b=0,2, na=2, nb=3]\n"
+    "  c1 m45 *1 -10,20[a=1,1, b=0,2, na=2, nb=3]\n"
+    "  c6 m45 *1 -10,20\n"
+    "  c6 m45 *1 -10,20\n"
+    "Not in a but in b:\n"
+  );
+
+  r.clear ();
+  eq = db::compare_layouts (g, h, db::layout_diff::f_verbose + db::layout_diff::f_ignore_duplicates, 0, r);
+
+  EXPECT_EQ (eq, false);
+  EXPECT_EQ (r.text (),
+    "layout_diff: cell c6 is not present in layout b, but in a\n"
+    "layout_diff: boxes differ for layer 17/0 in cell c2x\n"
+    "Not in b but in a:\n"
+    "  (3,4;1003,1004)\n"
+    "Not in a but in b:\n"
+    "  (4,5;1004,1005)\n"
+    "layout_diff: instances differ in cell c4\n"
+    "list for a:\n"
+    "  c1 r0 *1 10,-20\n"
+    "  c1 m45 *1 -10,20[a=1,1, b=0,2, na=2, nb=3]\n"
+    "  c3 m45 *1 -10,20\n"
+    "list for b:\n"
+    "  c1 r0 *1 10,-20\n"
+    "  c1 m45 *1 -10,20\n"
+    "  c1 m45 *1 -10,20[a=1,1, b=0,2, na=2, nb=3]\n"
+    "  c3 m45 *1 -10,20\n"
+    "Not in b but in a:\n"
+    "Not in a but in b:\n"
+    "  c1 m45 *1 -10,20\n"
+    "layout_diff: instances differ in cell c5x\n"
+    "list for a:\n"
+    "  c1 m45 *1 -10,20\n"
+    "  c1 m45 *1 -10,20[a=1,1, b=0,2, na=2, nb=3]\n"
+    "list for b:\n"
+    "  c1 m45 *1 -10,20\n"
+    "Not in b but in a:\n"
+    "  c1 m45 *1 -10,20[a=1,1, b=0,2, na=2, nb=3]\n"
+    "  c6 m45 *1 -10,20\n"
+    "Not in a but in b:\n"
+  );
 }
 
 

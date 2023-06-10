@@ -41,6 +41,7 @@ BD_PUBLIC int strmcmp (int argc, char *argv[])
   std::string infile_a, infile_b;
   std::string top_a, top_b;
   bool silent = false;
+  bool ignore_duplicates = false;
   bool no_text_orientation = true;
   bool no_text_details = true;
   bool no_properties = false;
@@ -106,6 +107,10 @@ BD_PUBLIC int strmcmp (int argc, char *argv[])
       << tl::arg ("--expand-arrays",           &flatten_array_insts, "Expands array instances before compare",
                   "With this option, arrays are equivalent single instances are treated identical."
                  )
+      << tl::arg ("-1|--ignore-duplicates",    &ignore_duplicates, "Ignore duplicate instances and shapes",
+                  "With this option, duplicate instances or shapes are ignored and duplication "
+                  "does not count as a difference."
+                 )
       << tl::arg ("-l|--layer-details",        &dont_summarize_missing_layers, "Prints details about differences for missing layers",
                   "With this option, missing layers are treated as \"empty\" and details about differences to "
                   "other, non-empty layers are printed. Essentially the content of the non-empty counterpart "
@@ -154,6 +159,9 @@ BD_PUBLIC int strmcmp (int argc, char *argv[])
   unsigned int flags = 0;
   if (silent) {
     flags |= db::layout_diff::f_silent;
+  }
+  if (ignore_duplicates) {
+    flags |= db::layout_diff::f_ignore_duplicates;
   }
   if (no_text_orientation) {
     flags |= db::layout_diff::f_no_text_orientation;

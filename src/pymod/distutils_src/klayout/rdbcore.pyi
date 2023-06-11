@@ -701,6 +701,12 @@ class RdbItemValue:
 
         This method has been introduced in version 0.22.
         """
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts a value to a string
+        The string can be used by the string constructor to create another object from it.
+        @return The string
+        """
     def __str__(self) -> str:
         r"""
         @brief Converts a value to a string

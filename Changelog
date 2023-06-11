@@ -8,6 +8,9 @@
     that can be used to redirect "output" to specific other channels
 * Bugfix: GDS2 reader should not segfault on certain broken files
 * Enhancement: performance improvement of hierarchical XOR in certain cases
+* Enhancement: New methods
+  * Layout#copy_layer, Layout#move_layer and Layout#clear_layer with shape type selector
+  * Shapes#clear with shape type selector
   
 0.28.8           (2023-05-23):
 * Enhancement: %GITHUB%/issues/1314 Storing (arbitrary) data in metadata

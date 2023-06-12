@@ -1156,6 +1156,35 @@ class DBLayoutTest(unittest.TestCase):
     self.assertEqual(shape.property(42), None)
     self.assertEqual(shape.property(42.0), None)
 
+  # Bug #1397
+  def test_bug1397(self):
+
+    testtmp = os.getenv("TESTTMP_WITH_NAME", os.getenv("TESTTMP", "."))
+    tmp = os.path.join(testtmp, "tmp.gds")
+
+    l = pya.Layout()
+
+    c = l.create_cell("test_cell")
+
+    li = pya.LayerInfo(1, 0)
+    t = pya.Trans.R180
+    c.add_meta_info(pya.LayoutMetaInfo("kfactory:li", li, None, True))
+    c.add_meta_info(pya.LayoutMetaInfo("kfactory:t", t, None, True))
+
+    l.write(tmp)
+
+    l2 = pya.Layout()
+    l2.read(tmp)
+
+    c2 = l2.cell("test_cell")
+
+    li = c2.meta_info("kfactory:li").value
+    self.assertEqual(li.layer, 1)
+    self.assertEqual(li.datatype, 0)
+
+    t = c2.meta_info("kfactory:t").value
+    self.assertEqual(str(t), "r180 0,0")
+    
 
 # run unit tests
 if __name__ == '__main__':

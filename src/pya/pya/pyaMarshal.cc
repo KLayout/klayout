@@ -690,6 +690,11 @@ PyObject *object_from_variant (tl::Variant &var, PYAObjectBase *self, const gsi:
 
       }
 
+    } else {
+
+      //  This is the case for return values that prefer to be copied (e.g. from const &)
+      prefer_copy = atype.prefer_copy ();
+
     }
 
     return object_to_python (obj, self, cls, pass_obj, is_const, prefer_copy, can_destroy);

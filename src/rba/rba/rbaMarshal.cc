@@ -711,6 +711,11 @@ static VALUE object_from_variant (tl::Variant &var, Proxy *self, const gsi::ArgT
 
       }
 
+    } else {
+
+      //  This is the case for return values that prefer to be copied (e.g. from const &)
+      prefer_copy = atype.prefer_copy ();
+
     }
 
     return object_to_ruby (obj, self, cls, pass_obj, is_const, prefer_copy, can_destroy);

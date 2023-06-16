@@ -6,6 +6,9 @@ include($$PWD/../../lib.pri)
 
 DEFINES += MAKE_TL_LIBRARY
 
+CONFIG += precompile_header
+PRECOMPILED_HEADER = stable.h
+
 FORMS =
 
 SOURCES = \

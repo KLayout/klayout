@@ -472,15 +472,15 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "\n"
     "This method has been added in version 0.24."
   ) +
-  gsi::method ("message", &lay::MainWindow::message, gsi::arg ("message"), gsi::arg ("time"),
+  gsi::method ("message", &lay::MainWindow::message, gsi::arg ("message"), gsi::arg ("time", -1, "infinite"),
     "@brief Displays a message in the status bar\n"
     "\n"
     "@param message The message to display\n"
-    "@param time The time how long to display the message in ms\n"
+    "@param time The time how long to display the message in ms. A negative value means 'infinitely'.\n"
     "\n"
     "This given message is shown in the status bar for the given time.\n" 
     "\n"
-    "This method has been added in version 0.18."
+    "This method has been added in version 0.18. The 'time' parameter was made optional in version 0.28.10."
   ) +
   gsi::method ("resize", (void (lay::MainWindow::*)(int, int)) &lay::MainWindow::resize, gsi::arg ("width"), gsi::arg ("height"),
     "@brief Resizes the window\n"

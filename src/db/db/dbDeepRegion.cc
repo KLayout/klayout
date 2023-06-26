@@ -1916,6 +1916,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 
   //  force different polygons in the different properties case to skip intra-polygon checks
   if (pc_always_different (options.prop_constraint)) {
+    //  TODO: this forces merged primaries, so maybe that is not a good optimization?
     different_polygons = true;
   }
 

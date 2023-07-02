@@ -363,7 +363,7 @@ clip_cell (const db::Layout &layout,
               target_cell.shapes (l).insert (db::PathRef (path, target_layout.shape_repository ()));
             }
 
-          } else if (sh->is_polygon () || sh->is_simple_polygon () || sh->is_path ()) {
+          } else if (sh->is_simple_polygon () || sh->is_path ()) {
 
             db::SimplePolygon poly;
 
@@ -371,17 +371,12 @@ clip_cell (const db::Layout &layout,
               db::Path path;
               sh->path (path);
               poly = path.simple_polygon ();
-            } else if (sh->is_polygon ()) {
-              db::Polygon ppoly;
-              sh->polygon (ppoly);
-              poly = db::SimplePolygon (ppoly);
             } else {
               sh->simple_polygon (poly);
             }
 
-            std::vector <db::SimplePolygon> clipped_polygons;
-
             if (! poly.box ().inside (clip_box)) {
+              std::vector <db::SimplePolygon> clipped_polygons;
               clip_poly (poly, clip_box, clipped_polygons);
               for (std::vector <db::SimplePolygon>::const_iterator cp = clipped_polygons.begin (); cp != clipped_polygons.end (); ++cp) {
                 if (sh->has_prop_id ()) {
@@ -395,6 +390,29 @@ clip_cell (const db::Layout &layout,
                 target_cell.shapes (l).insert (db::SimplePolygonRefWithProperties (db::SimplePolygonRef (poly, target_layout.shape_repository ()), sh->prop_id ()));
               } else {
                 target_cell.shapes (l).insert (db::SimplePolygonRef (poly, target_layout.shape_repository ()));
+              }
+            }
+
+          } else if (sh->is_polygon ()) {
+
+            db::Polygon poly;
+            sh->polygon (poly);
+
+            if (! poly.box ().inside (clip_box)) {
+              std::vector <db::Polygon> clipped_polygons;
+              clip_poly (poly, clip_box, clipped_polygons);
+              for (std::vector <db::Polygon>::const_iterator cp = clipped_polygons.begin (); cp != clipped_polygons.end (); ++cp) {
+                if (sh->has_prop_id ()) {
+                  target_cell.shapes (l).insert (db::PolygonRefWithProperties (db::PolygonRef (*cp, target_layout.shape_repository ()), sh->prop_id ()));
+                } else {
+                  target_cell.shapes (l).insert (db::PolygonRef (*cp, target_layout.shape_repository ()));
+                }
+              }
+            } else {
+              if (sh->has_prop_id ()) {
+                target_cell.shapes (l).insert (db::PolygonRefWithProperties (db::PolygonRef (poly, target_layout.shape_repository ()), sh->prop_id ()));
+              } else {
+                target_cell.shapes (l).insert (db::PolygonRef (poly, target_layout.shape_repository ()));
               }
             }
 

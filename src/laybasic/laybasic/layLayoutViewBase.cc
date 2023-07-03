@@ -3095,7 +3095,7 @@ LayoutViewBase::reload_layout (unsigned int cv_index)
   //  when reading the file, it must have the layers created as well
   lay::CellView cv_empty;
 
-  handle = new lay::LayoutHandle (new db::Layout (manager ()), filename);
+  handle = new lay::LayoutHandle (new db::Layout (is_editable (), manager ()), filename);
   handle->set_tech_name (technology);
   cv_empty.set (handle);
 
@@ -3108,7 +3108,7 @@ LayoutViewBase::reload_layout (unsigned int cv_index)
 
   //  create a new handle
   lay::CellView cv;
-  handle = new lay::LayoutHandle (new db::Layout (manager ()), filename);
+  handle = new lay::LayoutHandle (new db::Layout (is_editable (), manager ()), filename);
   cv.set (handle);
 
   try {
@@ -3337,7 +3337,7 @@ LayoutViewBase::create_layout (const std::string &technology, bool add_cellview,
 {
   const db::Technology *tech = db::Technologies::instance ()->technology_by_name (technology);
 
-  db::Layout *layout = new db::Layout (m_editable, manager ());
+  db::Layout *layout = new db::Layout (is_editable (), manager ());
   if (tech) {
     layout->dbu (tech->dbu ());
   }
@@ -3364,7 +3364,7 @@ LayoutViewBase::load_layout (const std::string &filename, const db::LoadLayoutOp
 
   //  create a new layout handle 
   lay::CellView cv;
-  lay::LayoutHandle *handle = new lay::LayoutHandle (new db::Layout (manager ()), filename);
+  lay::LayoutHandle *handle = new lay::LayoutHandle (new db::Layout (is_editable (), manager ()), filename);
   cv.set (handle);
 
   unsigned int cv_index;

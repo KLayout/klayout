@@ -266,9 +266,13 @@ ShapeEditService::deliver_shape (const db::Polygon &poly)
 {
   if (m_combine_mode == CM_Add) {
 
-    manager ()->transaction (tl::to_string (tr ("Create polygon")));
+    if (manager ()) {
+      manager ()->transaction (tl::to_string (tr ("Create polygon")));
+    }
     cell ().shapes (layer ()).insert (poly);
-    manager ()->commit ();
+    if (manager ()) {
+      manager ()->commit ();
+    }
 
   } else {
 
@@ -326,7 +330,9 @@ ShapeEditService::deliver_shape (const db::Polygon &poly)
       result = input;
     }
 
-    manager ()->transaction (tl::to_string (tr ("Combine shape with background")));
+    if (manager ()) {
+      manager ()->transaction (tl::to_string (tr ("Combine shape with background")));
+    }
 
     //  Erase existing shapes
     for (std::vector<db::Shape>::const_iterator s = shapes.begin (); s != shapes.end (); ++s) {
@@ -341,7 +347,9 @@ ShapeEditService::deliver_shape (const db::Polygon &poly)
       cell ().shapes (layer ()).insert (*p);
     }
 
-    manager ()->commit ();
+    if (manager ()) {
+      manager ()->commit ();
+    }
 
   }
 }
@@ -350,9 +358,13 @@ void
 ShapeEditService::deliver_shape (const db::Path &path)
 {
   if (m_combine_mode == CM_Add) {
-    manager ()->transaction (tl::to_string (tr ("Create path")));
+    if (manager ()) {
+      manager ()->transaction (tl::to_string (tr ("Create path")));
+    }
     cell ().shapes (layer ()).insert (path);
-    manager ()->commit ();
+    if (manager ()) {
+      manager ()->commit ();
+    }
   } else {
     deliver_shape (path.polygon ());
   }
@@ -362,9 +374,13 @@ void
 ShapeEditService::deliver_shape (const db::Box &box)
 {
   if (m_combine_mode == CM_Add) {
-    manager ()->transaction (tl::to_string (tr ("Create box")));
+    if (manager ()) {
+      manager ()->transaction (tl::to_string (tr ("Create box")));
+    }
     cell ().shapes (layer ()).insert (box);
-    manager ()->commit ();
+    if (manager ()) {
+      manager ()->commit ();
+    }
   } else {
     deliver_shape (db::Polygon (box));
   }
@@ -912,9 +928,13 @@ TextService::do_finish_edit ()
 {
   get_edit_layer ();
 
-  manager ()->transaction (tl::to_string (tr ("Create text")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (tr ("Create text")));
+  }
   cell ().shapes (layer ()).insert (get_text ());
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 
   commit_recent (view ());
 
@@ -1634,11 +1654,15 @@ InstService::do_finish_edit ()
         throw tl::Exception (tl::to_string (tr ("Inserting this instance would create a recursive hierarchy")));
       }
 
-      manager ()->transaction (tl::to_string (tr ("Create instance")), m_reference_transaction_id);
+      if (manager ()) {
+        manager ()->transaction (tl::to_string (tr ("Create instance")), m_reference_transaction_id);
+      }
       m_reference_transaction_id = 0;
       db::Instance i = cv->layout ().cell (cv.cell_index ()).insert (inst);
       cv->layout ().cleanup ();
-      manager ()->commit ();
+      if (manager ()) {
+        manager ()->commit ();
+      }
 
       commit_recent (view ());
 

@@ -103,9 +103,13 @@ LayoutPropertiesForm::commit ()
   }
 
   if (fabs (dbu - layout.dbu ()) > 1e-6) {
-    mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Change layout's database unit"))); 
+    if (mp_view->manager ()) {
+      mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Change layout's database unit")));
+    }
     layout.dbu (dbu);
-    mp_view->manager ()->commit ();
+    if (mp_view->manager ()) {
+      mp_view->manager ()->commit ();
+    }
   }
 
   //  get the selected technology name
@@ -156,9 +160,13 @@ LayoutPropertiesForm::prop_pb_clicked ()
   lay::UserPropertiesForm props_form (this);
   if (props_form.show (mp_view, m_index, prop_id, layout.begin_meta (), layout.end_meta ())) {
 
-    mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Edit layout's user properties"))); 
+    if (mp_view->manager ()) {
+      mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Edit layout's user properties")));
+    }
     layout.prop_id (prop_id);
-    mp_view->manager ()->commit ();
+    if (mp_view->manager ()) {
+      mp_view->manager ()->commit ();
+    }
 
   }
 }

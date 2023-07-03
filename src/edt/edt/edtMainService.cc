@@ -427,7 +427,9 @@ MainService::cm_flatten_insts ()
 
   view ()->cancel_edits ();
 
-  manager ()->transaction (tl::to_string (tr ("Flatten instances")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (tr ("Flatten instances")));
+  }
 
   std::set<db::Layout *> needs_cleanup;
 
@@ -470,7 +472,9 @@ MainService::cm_flatten_insts ()
   //  The selection is no longer valid
   view ()->clear_selection ();
 
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void  
@@ -479,7 +483,9 @@ MainService::cm_move_hier_up ()
   view ()->cancel_edits ();
   check_no_guiding_shapes ();
 
-  manager ()->transaction (tl::to_string (tr ("Move up in hierarchy")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (tr ("Move up in hierarchy")));
+  }
 
   std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
@@ -529,7 +535,9 @@ MainService::cm_move_hier_up ()
 
   }
 
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 /**
@@ -735,7 +743,9 @@ MainService::cm_make_cell_variants ()
 
   view ()->cancel_edits ();
 
-  manager ()->transaction (tl::to_string (tr ("Make cell variants for selection")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (tr ("Make cell variants for selection")));
+  }
 
   std::vector<lay::ObjectInstPath> new_selection;
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
@@ -906,7 +916,9 @@ MainService::cm_make_cell_variants ()
     i0 += n;
   }
 
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void  
@@ -947,7 +959,9 @@ MainService::cm_resolve_arefs ()
 
   std::vector<lay::ObjectInstPath> new_selection;
 
-  manager ()->transaction (tl::to_string (tr ("Resolve array references")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (tr ("Resolve array references")));
+  }
 
   for (std::vector<lay::ObjectInstPath>::const_iterator p = insts_to_resolve.begin (); p != insts_to_resolve.end (); ++p) {
 
@@ -986,7 +1000,9 @@ MainService::cm_resolve_arefs ()
 
   inst_service->set_selection (new_selection.begin (), new_selection.end ());
 
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void  
@@ -1041,7 +1057,9 @@ MainService::cm_make_cell ()
 
     view ()->cancel_edits ();
 
-    manager ()->transaction (tl::to_string (tr ("Make cell from selection")));
+    if (manager ()) {
+      manager ()->transaction (tl::to_string (tr ("Make cell from selection")));
+    }
 
     db::cell_index_type target_ci = cv->layout ().add_cell (m_make_cell_name.c_str ());
     //  create target cell
@@ -1090,7 +1108,9 @@ MainService::cm_make_cell ()
 
     }
 
-    manager ()->commit ();
+    if (manager ()) {
+      manager ()->commit ();
+    }
 
   }
 
@@ -1106,7 +1126,9 @@ MainService::cm_convert_to_cell ()
 
   try {
 
-    manager ()->transaction (tl::to_string (tr ("Convert to static cell")));
+    if (manager ()) {
+      manager ()->transaction (tl::to_string (tr ("Convert to static cell")));
+    }
 
     std::vector<edt::Service *> edt_services = view ()->get_plugins <edt::Service> ();
 
@@ -1158,10 +1180,14 @@ MainService::cm_convert_to_cell ()
     //  The selection might no longer be valid
     view ()->clear_selection ();
 
-    manager ()->commit ();
+    if (manager ()) {
+      manager ()->commit ();
+    }
 
   } catch (...) {
-    manager ()->commit ();
+    if (manager ()) {
+      manager ()->commit ();
+    }
     throw;
   }
 }
@@ -1265,7 +1291,9 @@ MainService::cm_convert_to_pcell ()
 
   try {
 
-    manager ()->transaction (tl::to_string (tr ("Convert to PCell")));
+    if (manager ()) {
+      manager ()->transaction (tl::to_string (tr ("Convert to PCell")));
+    }
 
     std::vector<edt::Service::obj_iterator> to_delete;
     std::vector<lay::ObjectInstPath> new_selection;
@@ -1351,10 +1379,14 @@ MainService::cm_convert_to_pcell ()
 #endif
     }
 
-    manager ()->commit ();
+    if (manager ()) {
+      manager ()->commit ();
+    }
 
   } catch (...) {
-    manager ()->commit ();
+    if (manager ()) {
+      manager ()->commit ();
+    }
     throw;
   }
 }
@@ -1546,7 +1578,9 @@ MainService::cm_round_corners ()
   ep.merge (out, primary, 0 /*min_wc*/, true /*resolve holes*/, true /*min coherence*/);
 
   view ()->cancel_edits ();
-  manager ()->transaction (tl::to_string (tr ("Corner rounding operation on selection")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (tr ("Corner rounding operation on selection")));
+  }
 
   //  Delete the current selection
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
@@ -1586,7 +1620,9 @@ MainService::cm_round_corners ()
     }
   }
 
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void
@@ -1672,7 +1708,9 @@ MainService::cm_size ()
   ep.size (primary, idx, idy, out, 2 /*mode, TODO: make variable*/, true /*resolve holes*/, true /*min coherence*/);
 
   view ()->cancel_edits ();
-  manager ()->transaction (tl::to_string (tr ("Sizing operation on selection")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (tr ("Sizing operation on selection")));
+  }
 
   //  Delete the current selection
   for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
@@ -1712,7 +1750,9 @@ MainService::cm_size ()
     }
   }
 
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void
@@ -1792,7 +1832,9 @@ MainService::boolean_op (int mode)
   }
 
   view ()->cancel_edits ();
-  manager ()->transaction (tl::to_string (tr ("Boolean operation on selection")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (tr ("Boolean operation on selection")));
+  }
 
   //  Delete the current selection
   //  NOTE: we delete only those shapes from the primary layer and keep shapes from other layers.
@@ -1835,7 +1877,9 @@ MainService::boolean_op (int mode)
     }
   }
 
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 
@@ -1955,7 +1999,9 @@ MainService::cm_align ()
   if (! prim_box.empty ()) {
 
     view ()->cancel_edits ();
-    manager ()->transaction (tl::to_string (tr ("Alignment")));
+    if (manager ()) {
+      manager ()->transaction (tl::to_string (tr ("Alignment")));
+    }
 
     //  do the alignment
     for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
@@ -1996,7 +2042,9 @@ MainService::cm_align ()
 
     }
 
-    manager ()->commit ();
+    if (manager ()) {
+      manager ()->commit ();
+    }
 
   }
 }
@@ -2096,7 +2144,9 @@ MainService::cm_distribute ()
 
   {
     view ()->cancel_edits ();
-    manager ()->transaction (tl::to_string (tr ("Distribution")));
+    if (manager ()) {
+      manager ()->transaction (tl::to_string (tr ("Distribution")));
+    }
 
     //  do the distribution
     for (std::vector<edt::Service *>::const_iterator es = edt_services.begin (); es != edt_services.end (); ++es) {
@@ -2111,7 +2161,9 @@ MainService::cm_distribute ()
 
     }
 
-    manager ()->commit ();
+    if (manager ()) {
+      manager ()->commit ();
+    }
 
   }
 }
@@ -2151,10 +2203,12 @@ MainService::cm_make_array ()
   bool has_undo = (m_array_na * m_array_nb < 1000);
 
   //  No undo support currently - the undo buffering is pretty inefficient right now.
-  if (! has_undo) {
-    manager ()->clear ();
-  } else {
-    manager ()->transaction (tl::to_string (tr ("Make array")));
+  if (manager ()) {
+    if (! has_undo) {
+      manager ()->clear ();
+    } else {
+      manager ()->transaction (tl::to_string (tr ("Make array")));
+    }
   }
 
   tl::RelativeProgress progress (tl::to_string (tr ("Make array")), (size_t (m_array_na) * size_t (m_array_nb) - 1) * n, 1000);
@@ -2221,7 +2275,7 @@ MainService::cm_make_array ()
 
   }
 
-  if (has_undo) {
+  if (has_undo && manager ()) {
     manager ()->commit ();
   }
 }
@@ -2383,7 +2437,9 @@ MainService::cm_change_layer ()
 
     view ()->cancel_edits ();
 
-    manager ()->transaction (tl::to_string (tr ("Change layer")));
+    if (manager ()) {
+      manager ()->transaction (tl::to_string (tr ("Change layer")));
+    }
 
     db::Layout &layout = view ()->cellview (cv_index)->layout ();
 
@@ -2441,7 +2497,9 @@ MainService::cm_change_layer ()
     //  The selection is no longer valid
     view ()->clear_selection ();
 
-    manager ()->commit ();
+    if (manager ()) {
+      manager ()->commit ();
+    }
 
   } else {
     throw tl::Exception (tl::to_string (tr ("Nothing selected to switch layers for")));

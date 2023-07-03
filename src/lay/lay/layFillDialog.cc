@@ -553,13 +553,19 @@ BEGIN_PROTECTED
 
   FillParameters fp = get_fill_parameters ();
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Fill")));
+  if (mp_view->manager ()) {
+    mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Fill")));
+  }
 
   try {
     generate_fill (fp);
-    mp_view->manager ()->commit ();
+    if (mp_view->manager ()) {
+      mp_view->manager ()->commit ();
+    }
   } catch (...) {
-    mp_view->manager ()->cancel ();
+    if (mp_view->manager ()) {
+      mp_view->manager ()->cancel ();
+    }
     throw;
   }
 

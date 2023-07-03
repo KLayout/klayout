@@ -1788,7 +1788,9 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
       //  stop dragging
       ui ()->ungrab_mouse (this);
       
-      manager ()->transaction (tl::to_string (tr ("Partial move")));
+      if (manager ()) {
+        manager ()->transaction (tl::to_string (tr ("Partial move")));
+      }
 
       //  heuristically, if there is just one edge selected: do not confine to the movement
       //  angle constraint - the edge usually is confined enough
@@ -1796,7 +1798,9 @@ PartialService::mouse_click_event (const db::DPoint &p, unsigned int buttons, bo
 
       transform_selection (move_trans);
 
-      manager ()->commit ();
+      if (manager ()) {
+        manager ()->commit ();
+      }
 
     }
 
@@ -1983,7 +1987,9 @@ PartialService::mouse_double_click_event (const db::DPoint &p, unsigned int butt
       partial_objects::iterator r = m_selection.begin (); // we assert above that we have at least one selected element
       if (! r->first.is_cell_inst ()) {
 
-        manager ()->transaction (tl::to_string (tr ("Insert point")));
+        if (manager ()) {
+          manager ()->transaction (tl::to_string (tr ("Insert point")));
+        }
 
         //  snap the point
         db::DPoint new_point_d = snap (p);
@@ -2050,7 +2056,9 @@ PartialService::mouse_double_click_event (const db::DPoint &p, unsigned int butt
 
           handle_guiding_shape_changes ();
 
-          manager ()->commit ();
+          if (manager ()) {
+            manager ()->commit ();
+          }
 
           selection_to_view ();
 

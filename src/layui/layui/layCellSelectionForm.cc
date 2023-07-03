@@ -510,9 +510,13 @@ CellSelectionForm::show_cell ()
   QModelIndexList sel = mp_ui->lv_cells->selectionModel ()->selectedIndexes ();
   for (QModelIndexList::const_iterator s = sel.begin (); s != sel.end (); ++s) {
     db::cell_index_type ci = model->cell (*s)->cell_index ();
-    mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Show cells")));
+    if (mp_view->manager ()) {
+      mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Show cells")));
+    }
     mp_view->show_cell (ci, m_current_cv);
-    mp_view->manager ()->commit ();
+    if (mp_view->manager ()) {
+      mp_view->manager ()->commit ();
+    }
   }
 
   model->signal_data_changed ();
@@ -532,9 +536,13 @@ CellSelectionForm::hide_cell ()
   QModelIndexList sel = mp_ui->lv_cells->selectionModel ()->selectedIndexes ();
   for (QModelIndexList::const_iterator s = sel.begin (); s != sel.end (); ++s) {
     db::cell_index_type ci = model->cell (*s)->cell_index ();
-    mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Hide cells")));
+    if (mp_view->manager ()) {
+      mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Hide cells")));
+    }
     mp_view->hide_cell (ci, m_current_cv);
-    mp_view->manager ()->commit ();
+    if (mp_view->manager ()) {
+      mp_view->manager ()->commit ();
+    }
   }
 
   model->signal_data_changed ();

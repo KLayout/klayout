@@ -231,9 +231,11 @@ EditStipplesForm::sel_changed (QListWidgetItem *, QListWidgetItem *)
     return;
   }
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Current pattern")));
-  manager ()->queue (this, new CurrentPatternOp (m_selected, mp_ui->stipple_items->currentRow ()));
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Current pattern")));
+    manager ()->queue (this, new CurrentPatternOp (m_selected, mp_ui->stipple_items->currentRow ()));
+    manager ()->commit ();
+  }
 
   update_current_item ();
 }
@@ -280,7 +282,9 @@ EditStipplesForm::select_item (int index)
   mp_ui->stipple_items->setCurrentItem (mp_ui->stipple_items->item (index));
   mp_ui->stipple_items->scrollToItem (mp_ui->stipple_items->currentItem ());
 
-  manager ()->queue (this, new CurrentPatternOp (m_selected, index));
+  if (manager ()) {
+    manager ()->queue (this, new CurrentPatternOp (m_selected, index));
+  }
 
   update_current_item ();
 
@@ -290,7 +294,9 @@ EditStipplesForm::select_item (int index)
 void
 EditStipplesForm::new_button_clicked ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("New pattern")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("New pattern")));
+  }
 
   lay::DitherPatternInfo p;
   unsigned int oi = m_pattern.begin ()[m_pattern.add_pattern (p)].order_index () - 1;
@@ -298,13 +304,17 @@ EditStipplesForm::new_button_clicked ()
   update ();
   select_item (oi + std::distance (m_pattern.begin (), m_pattern.begin_custom ()));
 
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 
 EditStipplesForm::clone_button_clicked ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("Clone pattern")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Clone pattern")));
+  }
 
   lay::DitherPattern::iterator c = current ();
 
@@ -329,7 +339,9 @@ EditStipplesForm::clone_button_clicked ()
   update ();
   select_item (oi + std::distance (m_pattern.begin (), m_pattern.begin_custom ()));
 
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 
@@ -347,7 +359,9 @@ EditStipplesForm::delete_button_clicked ()
       }
     }
 
-    manager ()->transaction (tl::to_string (QObject::tr ("Delete pattern")));
+    if (manager ()) {
+      manager ()->transaction (tl::to_string (QObject::tr ("Delete pattern")));
+    }
 
     if (mp_ui->stipple_items->currentRow () + 1 == mp_ui->stipple_items->count ()) {
       select_item (mp_ui->stipple_items->currentRow () - 1);
@@ -359,7 +373,9 @@ EditStipplesForm::delete_button_clicked ()
     m_pattern.renumber ();
     update ();
 
-    manager ()->commit ();
+    if (manager ()) {
+      manager ()->commit ();
+    }
 
   }
 
@@ -379,7 +395,9 @@ EditStipplesForm::up_button_clicked ()
       for (lay::DitherPattern::iterator i = m_pattern.begin_custom (); i != m_pattern.end (); ++i) {
         if (i->order_index () == oi - 1) {
 
-          manager ()->transaction (tl::to_string (QObject::tr ("Move pattern up")));
+          if (manager ()) {
+            manager ()->transaction (tl::to_string (QObject::tr ("Move pattern up")));
+          }
 
           lay::DitherPatternInfo info;
           info = *i;
@@ -393,7 +411,9 @@ EditStipplesForm::up_button_clicked ()
           update ();
           select_item (oi - 2 + std::distance (m_pattern.begin (), m_pattern.begin_custom ()));
 
-          manager ()->commit ();
+          if (manager ()) {
+            manager ()->commit ();
+          }
 
           return;
 
@@ -417,7 +437,9 @@ EditStipplesForm::down_button_clicked ()
     for (lay::DitherPattern::iterator i = m_pattern.begin_custom (); i != m_pattern.end (); ++i) {
       if (i->order_index () == oi + 1) {
 
-        manager ()->transaction (tl::to_string (QObject::tr ("Move pattern down")));
+        if (manager ()) {
+          manager ()->transaction (tl::to_string (QObject::tr ("Move pattern down")));
+        }
 
         lay::DitherPatternInfo info;
         info = *i;
@@ -431,7 +453,9 @@ EditStipplesForm::down_button_clicked ()
         update ();
         select_item (oi + std::distance (m_pattern.begin (), m_pattern.begin_custom ()));
 
-        manager ()->commit ();
+        if (manager ()) {
+          manager ()->commit ();
+        }
 
         return;
 
@@ -455,81 +479,121 @@ EditStipplesForm::editor_size_changed ()
 void
 EditStipplesForm::size_changed ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("Change pattern size")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Change pattern size")));
+  }
   mp_ui->editor->set_size (mp_ui->w_spin_box->value (), mp_ui->h_spin_box->value ());
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 
 EditStipplesForm::invert_button_clicked ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("Invert pattern")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Invert pattern")));
+  }
   mp_ui->editor->invert ();
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 
 EditStipplesForm::clear_button_clicked ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("Clear pattern")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Clear pattern")));
+  }
   mp_ui->editor->clear ();
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 
 EditStipplesForm::rotate_button_clicked ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("Rotate pattern")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Rotate pattern")));
+  }
   mp_ui->editor->rotate (90);
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 
 EditStipplesForm::fliph_button_clicked ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("Flip horizontal")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Flip horizontal")));
+  }
   mp_ui->editor->fliph ();
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 
 EditStipplesForm::flipv_button_clicked ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("Flip vertical")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Flip vertical")));
+  }
   mp_ui->editor->flipv ();
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 
 EditStipplesForm::sleft_button_clicked ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("Shift left")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Shift left")));
+  }
   mp_ui->editor->shift (-1, 0);
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 
 EditStipplesForm::sup_button_clicked ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("Shift up")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Shift up")));
+  }
   mp_ui->editor->shift (0, 1);
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 
 EditStipplesForm::sright_button_clicked ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("Shift right")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Shift right")));
+  }
   mp_ui->editor->shift (1, 0);
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 
 EditStipplesForm::sdown_button_clicked ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("Shift down")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Shift down")));
+  }
   mp_ui->editor->shift (0, -1);
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 

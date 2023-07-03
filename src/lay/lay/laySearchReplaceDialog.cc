@@ -1814,10 +1814,14 @@ BEGIN_PROTECTED
 
   cancel_exec ();
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Delete all")));
+  if (mp_view->manager ()) {
+    mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Delete all")));
+  }
   mp_view->cancel ();
   issue_query (build_delete_expression (), 0, false);
-  mp_view->manager ()->commit ();
+  if (mp_view->manager ()) {
+    mp_view->manager ()->commit ();
+  }
 
 END_PROTECTED
 }
@@ -1862,15 +1866,19 @@ BEGIN_PROTECTED
 
   if (! sel.empty ()) {
 
-    if (sender () == delete_selected_button) {
-      mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Delete selected")));
-    } else {
-      mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Replace selected")));
+    if (mp_view->manager ()) {
+      if (sender () == delete_selected_button) {
+        mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Delete selected")));
+      } else {
+        mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Replace selected")));
+      }
     }
 
     mp_view->cancel ();
     issue_query (m_execute_query, &selected_items, false);
-    mp_view->manager ()->commit ();
+    if (mp_view->manager ()) {
+      mp_view->manager ()->commit ();
+    }
 
     issue_query (m_find_query, 0, true);
 
@@ -1889,10 +1897,14 @@ BEGIN_PROTECTED
   m_execute_query.clear ();
   m_find_query.clear ();
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Replace all")));
+  if (mp_view->manager ()) {
+    mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Replace all")));
+  }
   mp_view->cancel ();
   issue_query (build_replace_expression (), 0, false);
-  mp_view->manager ()->commit ();
+  if (mp_view->manager ()) {
+    mp_view->manager ()->commit ();
+  }
 
 END_PROTECTED
 }
@@ -1907,10 +1919,14 @@ BEGIN_PROTECTED
   m_execute_query.clear ();
   m_find_query.clear ();
 
-  mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Execute custom query")));
+  if (mp_view->manager ()) {
+    mp_view->manager ()->transaction (tl::to_string (QObject::tr ("Execute custom query")));
+  }
   mp_view->cancel ();
   issue_query (tl::to_string (custom_query->toPlainText ()), 0, true);
-  mp_view->manager ()->commit ();
+  if (mp_view->manager ()) {
+    mp_view->manager ()->commit ();
+  }
 
 END_PROTECTED
 }

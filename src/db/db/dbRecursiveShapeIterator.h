@@ -914,6 +914,11 @@ public:
   virtual ~RecursiveShapeReceiver () { }
 
   /**
+   *  @brief Returns true, if the receivers wants the full hierarchy and not just non-empty cells
+   */
+  virtual bool wants_all_cells () const { return false; }
+
+  /**
    *  @brief Called once when the iterator begins pushing
    */
   virtual void begin (const RecursiveShapeIterator * /*iter*/) { }

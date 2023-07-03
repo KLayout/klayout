@@ -295,6 +295,7 @@ public:
    */
   void set_shape_receiver (HierarchyBuilderShapeReceiver *pipe);
 
+  virtual bool wants_all_cells () const { return true; }
   virtual void begin (const RecursiveShapeIterator *iter);
   virtual void end (const RecursiveShapeIterator *iter);
   virtual void enter_cell (const RecursiveShapeIterator *iter, const db::Cell *cell, const db::Box &region, const box_tree_type *complex_region);

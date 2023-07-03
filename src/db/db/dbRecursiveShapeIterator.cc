@@ -693,7 +693,11 @@ RecursiveShapeIterator::next_shape (RecursiveShapeReceiver *receiver) const
 
         //  determine whether the cell is empty with respect to the layers specified
         bool is_empty = false;
-        if (! m_has_layers) {
+        if (receiver && receiver->wants_all_cells ()) {
+
+          //  don't skip empty cells in that case
+
+        } else if (! m_has_layers) {
 
           is_empty = mp_layout->cell (m_inst->cell_index ()).bbox (m_layer).empty ();
 

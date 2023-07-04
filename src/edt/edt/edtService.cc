@@ -489,7 +489,9 @@ Service::selection_bbox ()
       if (tv_list != 0) {
         for (std::vector<db::DCplxTrans>::const_iterator t = tv_list->begin (); t != tv_list->end (); ++t) {
           if (r->shape ().is_text ()) {
-            box += *t * text_info.bbox (ctx_trans * r->shape ().text (), *t);
+            db::Text text;
+            r->shape ().text (text);
+            box += *t * text_info.bbox (ctx_trans * text, *t);
           } else {
             box += *t * (ctx_trans * r->shape ().bbox ());
           }

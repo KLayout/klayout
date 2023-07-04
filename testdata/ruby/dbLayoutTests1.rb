@@ -25,6 +25,29 @@ load("test_prologue.rb")
 
 class DBLayoutTests1_TestClass < TestBase
 
+  def dump_layer(l, layer, cell_name)
+    s = []
+    cell_index = l.cell_by_name(cell_name)
+    iter = l.begin_shapes(cell_index, layer)
+    while !iter.at_end
+      poly = iter.shape.polygon.transformed(iter.trans)
+      s.push(poly.is_box? ? poly.bbox.to_s : poly.to_s)
+      iter.next
+    end
+    return s.join("; ")
+  end
+
+  def dump_layer_i(l, layer, cell_index)
+    s = []
+    iter = l.begin_shapes(cell_index, layer)
+    while !iter.at_end
+      poly = iter.shape.polygon.transformed(iter.trans)
+      s.push(poly.is_box? ? poly.bbox.to_s : poly.to_s)
+      iter.next
+    end
+    return s.join("; ")
+  end
+
   def test_1
 
     # LayerInfo tests
@@ -659,27 +682,6 @@ class DBLayoutTests1_TestClass < TestBase
     c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
     c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
 
-    def dump_layer(l, layer, cell_name)
-      s = []
-      cell_index = l.cell_by_name(cell_name)
-      iter = l.begin_shapes(cell_index, layer)
-      while !iter.at_end
-        s.push(iter.shape.box.transformed(iter.trans).to_s)
-        iter.next
-      end
-      return s.join("; ")
-    end
-
-    def dump_layer_i(l, layer, cell_index)
-      s = []
-      iter = l.begin_shapes(cell_index, layer)
-      while !iter.at_end
-        s.push(iter.shape.box.transformed(iter.trans).to_s)
-        iter.next
-      end
-      return s.join("; ")
-    end
-
     assert_equal(dump_layer(l, 0, "c0"), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1100,1100); (1200,0;2200,1100); (-1200,0;-100,1000)")
     assert_equal(dump_layer(l, 1, "c0"), "")
 
@@ -854,31 +856,11 @@ class DBLayoutTests1_TestClass < TestBase
 
   def test_7
 
-    def dump_layer(l, layer, cell_name)
-      s = []
-      cell_index = l.cell_by_name(cell_name)
-      iter = l.begin_shapes(cell_index, layer)
-      while !iter.at_end
-        s.push(iter.shape.box.transformed(iter.trans).to_s)
-        iter.next
-      end
-      return s.join("; ")
-    end
-
-    def dump_layer_i(l, layer, cell_index)
-      s = []
-      iter = l.begin_shapes(cell_index, layer)
-      while !iter.at_end
-        s.push(iter.shape.box.transformed(iter.trans).to_s)
-        iter.next
-      end
-      return s.join("; ")
-    end
-
     # clip tests
    
     l = RBA::Layout.new
     l.insert_layer_at(0, RBA::LayerInfo.new(1, 0))
+    l.insert_layer_at(1, RBA::LayerInfo.new(2, 0))
     c0 = l.cell(l.add_cell("c0"))
     c1 = l.cell(l.add_cell("c1"))
     c2 = l.cell(l.add_cell("c2"))
@@ -890,14 +872,25 @@ class DBLayoutTests1_TestClass < TestBase
     c2.shapes(0).insert(b)
     c3.shapes(0).insert(b)
 
+    bh = (RBA::Region.new(RBA::Box.new(0, 100, 1000, 1200)) - RBA::Region.new(RBA::Box.new(100, 200, 900, 1100)))[0]
+    c0.shapes(1).insert(bh)
+    c1.shapes(1).insert(bh)
+    c2.shapes(1).insert(bh)
+    c3.shapes(1).insert(bh)
+
     tt = RBA::Trans.new
     c0.insert(RBA::CellInstArray.new(c1.cell_index, tt))
     c0.insert(RBA::CellInstArray.new(c2.cell_index, RBA::Trans.new(RBA::Point.new(100, -100))))
     c0.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(1)))
     c2.insert(RBA::CellInstArray.new(c3.cell_index, RBA::Trans.new(RBA::Point.new(1100, 0))))
 
+    ci = l.clip(c0.cell_index, RBA::Box.new(0, 0, 1000, 1200))
+    assert_equal(dump_layer_i(l, 0, ci), "(0,100;1000,1200); (0,100;1000,1200); (100,0;1000,1100)")
+    assert_equal(dump_layer_i(l, 1, ci), "(0,100;0,1200;1000,1200;1000,100/100,200;900,200;900,1100;100,1100); (0,100;0,1200;1000,1200;1000,100/100,200;900,200;900,1100;100,1100); (100,0;100,1100;1000,1100;1000,1000;200,1000;200,100;1000,100;1000,0)")
+
     ci = l.clip(c0.cell_index, RBA::Box.new(0, 0, 200, 200))
     assert_equal(dump_layer_i(l, 0, ci), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
+    assert_equal(dump_layer_i(l, 1, ci), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
 
     cic = l.clip(c0, RBA::Box.new(0, 0, 200, 200))
     assert_equal(dump_layer_i(l, 0, cic.cell_index), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
@@ -911,6 +904,8 @@ class DBLayoutTests1_TestClass < TestBase
     ci = l.multi_clip(c0.cell_index, [RBA::Box.new(0, 0, 200, 200),RBA::Box.new(1000, 0, 1300, 200)])
     assert_equal(dump_layer_i(l, 0, ci[0]), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
     assert_equal(dump_layer_i(l, 0, ci[1]), "(1000,0;1100,200); (1200,0;1300,200)")
+    assert_equal(dump_layer_i(l, 1, ci[0]), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")
+    assert_equal(dump_layer_i(l, 1, ci[1]), "(1000,0;1100,200); (1200,0;1300,200)")
 
     cic = l.multi_clip(c0, [RBA::Box.new(0, 0, 200, 200),RBA::Box.new(1000, 0, 1300, 200)])
     assert_equal(dump_layer_i(l, 0, cic[0].cell_index), "(0,100;200,200); (0,100;200,200); (100,0;200,200)")

@@ -234,7 +234,7 @@ merge_layouts (db::Layout &target,
   //  provide the property mapper
   db::PropertyMapper pm (&target, &source);
 
-  tl::RelativeProgress progress (tl::to_string (tr ("Merge cells")), all_cells_to_copy.size (), 1);
+  tl::RelativeProgress progress (tl::to_string (tr ("Merge layouts")), all_cells_to_copy.size (), 1);
 
   //  actually to the mapping
   for (std::set<db::cell_index_type>::const_iterator c = all_cells_to_copy.begin (); c != all_cells_to_copy.end (); ++c) {
@@ -346,7 +346,7 @@ copy_or_move_shapes (db::Layout &target,
   //  provide the property mapper
   db::PropertyMapper pm (&target, &source);
 
-  tl::RelativeProgress progress (tl::to_string (tr ("Merge cells")), all_cells_to_copy.size () * layer_mapping.size (), 1);
+  tl::RelativeProgress progress (tl::to_string (tr ("Copy shapes")), all_cells_to_copy.size () * layer_mapping.size (), 1);
 
   //  and copy
   for (std::set<db::cell_index_type>::const_iterator c = all_cells_to_copy.begin (); c != all_cells_to_copy.end (); ++c) {

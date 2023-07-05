@@ -1,3 +1,12 @@
+0.28.10          (2023-07-05):
+* Bugfix: %GITHUB%/issues/1397 LayoutMetaInfo serialization/deserialization problem
+* Bugfix: %GITHUB%/issues/1404 Better support for editing mode in Qt-less LayoutView
+* Bugfix: %GITHUB%/issues/1407 Clip functions do not support polygons with holes
+* Bugfix: %GITHUB%/issues/1409 Text edit issue (internal error)
+* Enhancements: 
+  - Made 'time' parameter optional for MainWindow#message
+  - strmxor performance with --deep enhanced
+
 0.28.9           (2023-06-10):
 * Enhancement: %GITHUB%/issues/1281 Layout diff can ignore shape or instance duplicates
 * Bugfix: %GITHUB%/issues/1393 GDS2Text format not supported in Python module
@@ -9,8 +18,8 @@
 * Bugfix: GDS2 reader should not segfault on certain broken files
 * Enhancement: performance improvement of hierarchical XOR in certain cases
 * Enhancement: New methods
-  * Layout#copy_layer, Layout#move_layer and Layout#clear_layer with shape type selector
-  * Shapes#clear with shape type selector
+  - Layout#copy_layer, Layout#move_layer and Layout#clear_layer with shape type selector
+  - Shapes#clear with shape type selector
   
 0.28.8           (2023-05-23):
 * Enhancement: %GITHUB%/issues/1314 Storing (arbitrary) data in metadata

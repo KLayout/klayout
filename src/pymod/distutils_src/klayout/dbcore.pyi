@@ -11271,7 +11271,8 @@ class DText:
     Setter:
     @brief Sets the horizontal alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     size: float
     r"""
@@ -12879,6 +12880,19 @@ class DeepShapeStore:
 
     Setter:
     @brief Sets the number of threads to allocate for the hierarchical processor
+    """
+    wants_all_cells: bool
+    r"""
+    Getter:
+    @brief Gets a flag wether to copy the full hierarchy for the working layouts
+    This attribute has been introduced in version 0.28.10.
+    Setter:
+    @brief Sets a flag wether to copy the full hierarchy for the working layouts
+
+    The DeepShapeStore object keeps a copy of the original hierarchy internally for the working layouts.
+    By default, this hierarchy is mapping only non-empty cells. While the operations proceed, more cells may need to be added. This conservative approach saves some memory, but the update operations may reduce overall performance. Setting this flag to 'true' switches to a mode where the full hierarchy is copied always. This will take more memory but may save CPU time.
+
+    This attribute has been introduced in version 0.28.10.
     """
     @classmethod
     def instance_count(cls) -> int:
@@ -28707,12 +28721,12 @@ class LayoutToNetlist:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -28737,12 +28751,12 @@ class LayoutToNetlist:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -33581,16 +33595,16 @@ class Netlist:
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index (const version).
+        @brief Gets the circuit object for a given cell index.
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
-
-        This constness variant has been introduced in version 0.26.8.
         """
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index.
+        @brief Gets the circuit object for a given cell index (const version).
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
+
+        This constness variant has been introduced in version 0.26.8.
         """
     @overload
     def circuit_by_name(self, name: str) -> Circuit:
@@ -33679,22 +33693,16 @@ class Netlist:
     @overload
     def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits bottom-up
-        Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
-        """
-    @overload
-    def each_circuit_bottom_up(self) -> Iterator[Circuit]:
-        r"""
         @brief Iterates over the circuits bottom-up (const version)
         Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
 
         This constness variant has been introduced in version 0.26.8.
         """
     @overload
-    def each_circuit_top_down(self) -> Iterator[Circuit]:
+    def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits top-down
-        Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
+        @brief Iterates over the circuits bottom-up
+        Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
         """
     @overload
     def each_circuit_top_down(self) -> Iterator[Circuit]:
@@ -33703,6 +33711,12 @@ class Netlist:
         Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
 
         This constness variant has been introduced in version 0.26.8.
+        """
+    @overload
+    def each_circuit_top_down(self) -> Iterator[Circuit]:
+        r"""
+        @brief Iterates over the circuits top-down
+        Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
         """
     @overload
     def each_device_class(self) -> Iterator[DeviceClass]:
@@ -36294,12 +36308,12 @@ class PCellParameterState:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -39071,12 +39085,12 @@ class PropertyConstraint:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -39101,12 +39115,12 @@ class PropertyConstraint:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -40539,12 +40553,12 @@ class Region(ShapeCollection):
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -40645,12 +40659,12 @@ class Region(ShapeCollection):
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -44610,10 +44624,11 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a path.
     Setter:
-    @brief Replaces the shape by the given path (in micrometer units)
-    This method replaces the shape by the given path, like \path= with a \Path argument does. This version translates the path from micrometer units to database units internally.
+    @brief Replaces the shape by the given path object
+    This method replaces the shape by the given path object. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     path_bgnext: int
     r"""
@@ -44721,11 +44736,10 @@ class Shape:
     Starting with version 0.23, this method returns nil, if the shape does not represent a geometrical primitive that can be converted to a polygon.
 
     Setter:
-    @brief Replaces the shape by the given polygon object
-    This method replaces the shape by the given polygon object. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given polygon (in micrometer units)
+    This method replaces the shape by the given polygon, like \polygon= with a \Polygon argument does. This version translates the polygon from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     prop_id: int
     r"""
@@ -44764,10 +44778,11 @@ class Shape:
     Starting with version 0.23, this method returns nil, if the shape does not represent a geometrical primitive that can be converted to a simple polygon.
 
     Setter:
-    @brief Replaces the shape by the given simple polygon (in micrometer units)
-    This method replaces the shape by the given text, like \simple_polygon= with a \SimplePolygon argument does. This version translates the polygon from micrometer units to database units internally.
+    @brief Replaces the shape by the given simple polygon object
+    This method replaces the shape by the given simple polygon object. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     text: Any
     r"""
@@ -47987,15 +48002,15 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit.
-        """
-    @overload
-    def circuit_ref(self) -> Circuit:
-        r"""
         @brief Gets the circuit referenced by the subcircuit (non-const version).
 
 
         This constness variant has been introduced in version 0.26.8
+        """
+    @overload
+    def circuit_ref(self) -> Circuit:
+        r"""
+        @brief Gets the circuit referenced by the subcircuit.
         """
     @overload
     def connect_pin(self, pin: Pin, net: Net) -> None:
@@ -48520,7 +48535,8 @@ class Text:
     Setter:
     @brief Sets the horizontal alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     size: int
     r"""
@@ -48556,7 +48572,8 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     x: int
     r"""
@@ -51592,12 +51609,12 @@ class VAlign:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __init__(self, i: int) -> None:

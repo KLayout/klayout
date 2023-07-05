@@ -2630,7 +2630,7 @@ CODE
     # @brief Returns the intersection points of intersecting edge segments for two edge collections
     # @synopsis layer.intersections(edges)
     # This operation is similar to the "&" operator, but it does also report intersection points
-    # between non-colinear, but intersection edges. Such points are reported as point-like,
+    # between non-colinear, but intersecting edges. Such points are reported as point-like,
     # degenerated edge objects.
     #
     # This method is available for edge layers. The argument must be an edge layer.

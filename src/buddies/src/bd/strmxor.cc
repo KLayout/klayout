@@ -754,6 +754,7 @@ bool run_deep_xor (const XORData &xor_data)
 {
   db::DeepShapeStore dss;
   dss.set_threads (xor_data.threads);
+  dss.set_wants_all_cells (true);  //  saves time for less cell mapping operations
 
   double dbu = std::min (xor_data.layout_a->dbu (), xor_data.layout_b->dbu ());
 

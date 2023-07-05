@@ -728,6 +728,23 @@ public:
   int threads () const;
 
   /**
+   *  @brief Sets a flag indicating whether the working layouts will store the whole original hierarchy
+   *
+   *  Setting this flag to true will make the deep shape store copy the
+   *  hierarchy exactly from the origin layouts. This will take somewhat
+   *  more memory but avoid future cell hierarchy mapping operations.
+   *
+   *  If set to false, only the needed parts of the hierarchy are copied.
+   *  This part may need to grow when further operations are triggered.
+   */
+  void set_wants_all_cells (bool f);
+
+  /**
+   *  @brief Gets a flag indicating whether the working layouts will store the whole original hierarchy
+   */
+  bool wants_all_cells () const;
+
+  /**
    *  @brief Sets a flag indicating whether to reject odd polygons
    *
    *  Some kind of "odd" (e.g. non-orientable) polygons may spoil the functionality
@@ -878,6 +895,7 @@ private:
   DeepShapeStoreState m_state;
   std::list<DeepShapeStoreState> m_state_stack;
   bool m_keep_layouts;
+  bool m_wants_all_cells;
   tl::Mutex m_lock;
 
   struct DeliveryMappingCacheKey

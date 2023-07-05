@@ -151,10 +151,6 @@ public:
 
     }
 
-    std::set<db::cell_index_type> callers_b;
-    m_layout_b.cell (cell_b).collect_caller_cells (callers_b, selection_cone_b, -1);
-    callers_b.insert (cell_b);
-
     m_repr_set = false;
 
     std::map<db::cell_index_type, db::ICplxTrans>::const_iterator r = m_repr.find (cell_b);
@@ -164,7 +160,11 @@ public:
         return false;
       }
     }
-    
+
+    std::set<db::cell_index_type> callers_b;
+    m_layout_b.cell (cell_b).collect_caller_cells (callers_b, selection_cone_b, -1);
+    callers_b.insert (cell_b);
+
     trans_set_t trans (m_trans);
 
     double mag = m_layout_b.dbu () / m_layout_a.dbu ();

@@ -68,38 +68,50 @@ def Get_Build_Target_Dict():
 ## To get the build option dictionary
 #
 # @param[in] targetDic  build target dictionary
+# @param[in] platform   platform name
 #
-# @return a dictionary; key=mnemonic, value=build option list
+# @return (dictionary1, dictionary2)-tupple
+#          dictionary1: key=mnemonic, value=build option list
+#          dictionary2: key=mnemonic, value=log file name
 #------------------------------------------------------------------------------
-def Get_Build_Options( targetDic ):
+def Get_Build_Options( targetDic, platform ):
     if QtType == 5:
         qtType = "Qt5"
     else:
         qtType = "Qt6"
 
     buildOp = dict()
+    logfile = dict()
     for key in targetDic.keys():
         target = targetDic[key]
         if target == "std": # use 'Qt5MacPorts' that provides Qt 5.15.2~ to run on "Big Sur", too
-            buildOp["std"]     = [ '-q', '%sMacPorts' % qtType, '-r', 'sys',  '-p', 'sys'    ]
+            buildOp["std"] = [ '-q', '%sMacPorts' % qtType, '-r', 'sys',  '-p', 'sys' ]
+            logfile["std"] = "%sMP.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "release", "RsysPsys")
         elif target == "ports":
-            buildOp["ports"]   = [ '-q', '%sMacPorts' % qtType, '-r', 'MP32', '-p', 'MP39'   ]
+            buildOp["ports"] = [ '-q', '%sMacPorts' % qtType, '-r', 'MP32', '-p', 'MP39' ]
+            logfile["ports"] = "%sMP.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "release", "Rmp32Pmp39")
         elif target == "brew":
-            buildOp["brew"]    = [ '-q', '%sBrew' % qtType,     '-r', 'HB32', '-p', 'HB39'   ]
+            buildOp["brew"] = [ '-q', '%sBrew' % qtType,     '-r', 'HB32', '-p', 'HB39' ]
+            logfile["brew"] = "%sBrew.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "release", "Rhb32Phb39")
         elif target == "brewHW":
-            buildOp["brewHW"]  = [ '-q', '%sBrew' % qtType,     '-r', 'sys',  '-p', 'HB39'   ]
+            buildOp["brewHW"] = [ '-q', '%sBrew' % qtType,     '-r', 'sys',  '-p', 'HB39' ]
+            logfile["brewHW"] = "%sBrew.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "release", "RsysPhb39")
         elif target == "ana3":
-            buildOp["ana3"]    = [ '-q', '%sAna3' % qtType,     '-r', 'Ana3', '-p', 'Ana3'   ]
+            buildOp["ana3"] = [ '-q', '%sAna3' % qtType,     '-r', 'Ana3', '-p', 'Ana3' ]
+            logfile["ana3"] = "%sAna3.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "release", "Rana3Pana3")
         elif target == "brewA":
-            buildOp["brewA"]   = [ '-q', '%sBrew' % qtType,     '-r', 'HB32', '-p', 'HBAuto' ]
+            buildOp["brewA"] = [ '-q', '%sBrew' % qtType,     '-r', 'HB32', '-p', 'HBAuto' ]
+            logfile["brewA"] = "%sBrew.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "release", "Rhb32Phbauto")
         elif target == "brewAHW":
             buildOp["brewAHW"] = [ '-q', '%sBrew' % qtType,     '-r', 'sys',  '-p', 'HBAuto' ]
+            logfile["brewAHW"] = "%sBrew.build.macos-%s-%s-%s.log" % (qtType.lower(), platform, "release", "RsysPhbauto")
 
     if WithPymod:
         buildOp["ports"] = buildOp["ports"] + ['--buildPymod']
         buildOp["brew"]  = buildOp["brew"]  + ['--buildPymod']
         buildOp["ana3"]  = buildOp["ana3"]  + ['--buildPymod']
-    return buildOp
+
+    return (buildOp, logfile)
 
 #------------------------------------------------------------------------------
 ## To get the ".macQAT" dictionary for QA Test
@@ -371,18 +383,33 @@ def Parse_CommandLine_Arguments():
 ## To build and deploy
 #------------------------------------------------------------------------------
 def Build_Deploy():
-    pyBuilder = "./build4mac.py"
-    buildOp   = Get_Build_Options( Get_Build_Target_Dict() )
+    pyBuilder  = "./build4mac.py"
+    myPlatform = Test_My_Platform()
+    buildOp, logfile = Get_Build_Options( Get_Build_Target_Dict(), myPlatform )
 
     for key in Target:
         if key == "ana3" and QtType == 6: # anaconda3 does not provide Qt6 so far
             continue
+        deplog = logfile[key].replace( ".log", ".dep.log" )
 
         command1 = [ pyBuilder ] + buildOp[key]
+
         if key in [ "std", "brewHW", "brewAHW" ] :
-            command2 = [ pyBuilder ] + buildOp[key] + ['-y']
+            command2  = "time"
+            command2 += " \\\n  %s" % pyBuilder
+            for option in buildOp[key]:
+                command2 += " \\\n  %s" % option
+            command2 += " \\\n  %s" % '-y'
+            command2 += "  2>&1 | tee %s; \\\n" % deplog
+            command2 += "test ${PIPESTATUS[0]} -eq 0"  # tee always exits with 0
         else:
-            command2 = [ pyBuilder ] + buildOp[key] + ['-Y']
+            command2  = "time"
+            command2 += " \\\n  %s" % pyBuilder
+            for option in buildOp[key]:
+                command2 += " \\\n  %s" % option
+            command2 += " \\\n  %s" % '-Y'
+            command2 += "  2>&1 | tee %s; \\\n" % deplog
+            command2 += "test ${PIPESTATUS[0]} -eq 0"  # tee always exits with 0
 
         if DryRun:
             print( "### Target = <%s> ###" % key )
@@ -405,7 +432,7 @@ def Build_Deploy():
             print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
             print( "", file=sys.stderr )
 
-        if subprocess.call( command2, shell=False ) != 0:
+        if subprocess.call( command2, shell=True ) != 0:
             print( "", file=sys.stderr )
             print( "-----------------------------------------------------------------", file=sys.stderr )
             print( "!!! <%s>: failed to deploy KLayout" % pyBuilder, file=sys.stderr )

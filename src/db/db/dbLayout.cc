@@ -2706,7 +2706,7 @@ Layout::get_context_info (cell_index_type cell_index, LayoutOrCellContextInfo &i
     const db::PCellHeader *header = ly->pcell_header (pcell_variant->pcell_id ());
     info.pcell_name = header->get_name ();
 
-  } else {
+  } else if (ly != this) {
     info.cell_name = ly->cell_name (cptr->cell_index ());
   }
 

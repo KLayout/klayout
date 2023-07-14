@@ -75,9 +75,19 @@ public:
   void add_mouse_cursor (const db::DPoint &pt, bool emphasize = false);
 
   /**
+   *  @brief Adds a mouse cursor to the given point in layout space
+   */
+  void add_mouse_cursor (const db::Point &pt, unsigned int cv_index, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool emphasize = false);
+
+  /**
    *  @brief Adds an edge marker for the given edge
    */
-  void add_edge_marker (const db::DEdge &e, bool emphasize);
+  void add_edge_marker (const db::DEdge &e, bool emphasize = false);
+
+  /**
+   *  @brief Adds an edge marker for the given edge in layout space
+   */
+  void add_edge_marker (const db::Edge &e, unsigned int cv_index, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool emphasize = false);
 
   /**
    *  @brief Resets the mouse cursor
@@ -132,6 +142,7 @@ protected:
 
 private:
   //  The marker representing the mouse cursor
+  lay::LayoutViewBase *mp_view;
   std::vector<lay::ViewObject *> m_mouse_cursor_markers;
   tl::Color m_cursor_color;
   bool m_cursor_enabled;

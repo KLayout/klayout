@@ -176,11 +176,18 @@ protected:
    *
    *  "trans" is the transformation to be applied to the edge before the test.
    *
+   *  If "points" is true, only points are tested, otherwise edges are tested.
+   *
    *  This method returns a mask indicating which point of the edge was matching.
    *  Bit 0 of this mask indicates the first point is matching, bit 1 indicates the
    *  second point is matching.
    */
-  unsigned int test_edge (const db::ICplxTrans &trans, const db::Edge &edge, double &distance, bool &match);
+  unsigned int test_edge (const db::ICplxTrans &trans, const db::Edge &edge, bool points, double &distance, bool &match);
+
+  /**
+   *  @brief Tests an edge in point mode and edge mode (later)
+   */
+  void test_edge (const db::ICplxTrans &trans, const db::Edge &edge, double &distance, bool &match);
 
 private:
   void do_find (const db::Cell &cell, int level, const db::DCplxTrans &vp, const db::ICplxTrans &t);

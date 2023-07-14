@@ -210,6 +210,7 @@ EditorServiceBase::EditorServiceBase (LayoutViewBase *view)
   : lay::ViewService (view->canvas ()),
     lay::Editable (view),
     lay::Plugin (view),
+    mp_view (view),
     m_cursor_enabled (true),
     m_has_tracking_position (false)
 {
@@ -230,9 +231,27 @@ EditorServiceBase::add_mouse_cursor (const db::DPoint &pt, bool emphasize)
 }
 
 void
+EditorServiceBase::add_mouse_cursor (const db::Point &pt, unsigned int cv_index, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool emphasize)
+{
+  double dbu = mp_view->cellview (cv_index)->layout ().dbu ();
+  for (auto t = tv.begin (); t != tv.end (); ++t) {
+    add_mouse_cursor (*t * db::CplxTrans (dbu) * gt * pt, emphasize);
+  }
+}
+
+void
 EditorServiceBase::add_edge_marker (const db::DEdge &e, bool emphasize)
 {
   m_mouse_cursor_markers.push_back (new EdgeMarkerViewObject (this, ui (), e, emphasize));
+}
+
+void
+EditorServiceBase::add_edge_marker (const db::Edge &e, unsigned int cv_index, const db::ICplxTrans &gt, const std::vector<db::DCplxTrans> &tv, bool emphasize)
+{
+  double dbu = mp_view->cellview (cv_index)->layout ().dbu ();
+  for (auto t = tv.begin (); t != tv.end (); ++t) {
+    add_edge_marker (*t * db::CplxTrans (dbu) * gt * e, emphasize);
+  }
 }
 
 void

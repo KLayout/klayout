@@ -38,7 +38,7 @@ class GDS2FormatDeclaration
   virtual std::string format_name () const { return "GDS2"; }
   virtual std::string format_desc () const { return "GDS2"; }
   virtual std::string format_title () const { return "GDS2"; }
-  virtual std::string file_format () const { return "GDS2 files (*.GDS *.gds *.gds.gz *.GDS.gz *.GDS2 *.gds2 *.gds2.gz *.GDS2.gz)"; }
+  virtual std::string file_format () const { return "GDS2 files (*.gds *.GDS *.gds.gz *.GDS.gz *.GDS2 *.gds2 *.gds2.gz *.GDS2.gz)"; }
 
   virtual bool detect (tl::InputStream &stream) const 
   {

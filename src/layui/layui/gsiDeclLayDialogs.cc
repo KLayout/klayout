@@ -26,6 +26,7 @@
 #include "gsiDeclBasic.h"
 #include "layBrowserDialog.h"
 #include "layBrowserPanel.h"
+#include "layFileDialog.h"
 
 #include <QMessageBox>
 #include <QInputDialog>
@@ -926,11 +927,30 @@ static tl::Variant ask_open_file_name (const std::string &title, const std::stri
 
 static tl::Variant ask_save_file_name (const std::string &title, const std::string &dir, const std::string &filter)
 {
-  QString f = QFileDialog::getSaveFileName (QApplication::activeWindow (), tl::to_qstring (title), tl::to_qstring (dir), tl::to_qstring (filter));
+  QString selected_filter;
+
+  QString f = QFileDialog::getSaveFileName (QApplication::activeWindow (), tl::to_qstring (title), tl::to_qstring (dir), tl::to_qstring (filter), &selected_filter);
   if (f.isEmpty ()) {
     return tl::Variant ();
   } else {
-    return tl::Variant (tl::to_string (f));
+    return tl::Variant (lay::FileDialog::add_default_extension (tl::to_string (f), selected_filter));
+  }
+}
+
+static tl::Variant ask_save_file_name2 (const std::string &title, const std::string &dir, const std::string &filter)
+{
+  QString selected_filter;
+  QString qfilter = tl::to_qstring (filter);
+
+  QString f = QFileDialog::getSaveFileName (QApplication::activeWindow (), tl::to_qstring (title), tl::to_qstring (dir), qfilter, &selected_filter);
+  if (f.isEmpty ()) {
+    return tl::Variant ();
+  } else {
+    tl::Variant v;
+    v.set_list ();
+    v.push (lay::FileDialog::add_default_extension (tl::to_string (f), selected_filter));
+    v.push (lay::FileDialog::find_selected_filter (qfilter, selected_filter));
+    return v;
   }
 }
 
@@ -1012,6 +1032,16 @@ Class<FileDialog> decl_FileDialog ("lay", "FileDialog",
     "@return The path of the file chosen or \"nil\" if \"Cancel\" was pressed\n"
     "\n"
     "This method has been introduced in version 0.23. It is somewhat easier to use than the get_... equivalent.\n"
+  ) +
+  gsi::method ("ask_save_file_name_with_filter", &ask_save_file_name2, gsi::arg ("title"), gsi::arg ("dir"), gsi::arg ("filter"),
+    "@brief Select one file for writing\n"
+    "\n"
+    "@param title The title of the dialog\n"
+    "@param dir The directory selected initially\n"
+    "@param filter The filters available, for example \"Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)\"\n"
+    "@return \"nil\" if \"Cancel\" was pressed, otherwise a pair: The path of the file chosen and the index selected file type (-1 if no specific type was selected)\n"
+    "\n"
+    "This method has been introduced in version 0.28.11.\n"
   ),
   "@brief Various methods to request a file name\n"
   "\n"

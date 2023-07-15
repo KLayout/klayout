@@ -60,7 +60,6 @@ set_type_attr (PyTypeObject *type, const std::string &name, PythonRef &attr)
 
 std::map<const gsi::MethodBase *, std::string> PythonModule::m_python_doc;
 std::vector<const gsi::ClassBase *> PythonModule::m_classes;
-std::map<PyTypeObject *, const gsi::ClassBase *> PythonModule::m_class_by_type;
 
 const std::string pymod_name ("klayout");
 
@@ -738,27 +737,7 @@ PythonModule::make_classes (const char *mod_name)
 
 const gsi::ClassBase *PythonModule::cls_for_type (PyTypeObject *type)
 {
-  auto cls = m_class_by_type.find (type);
-  if (cls != m_class_by_type.end ()) {
-    return cls->second;
-  }
-
-  //  GSI classes store their class index inside the __gsi_id__ attribute
-  if (PyObject_HasAttrString ((PyObject *) type, "__gsi_id__")) {
-
-    PyObject *cls_id = PyObject_GetAttrString ((PyObject *) type, "__gsi_id__");
-    if (cls_id != NULL && pya::test_type<size_t> (cls_id)) {
-      size_t i = pya::python2c<size_t> (cls_id);
-      if (i < m_classes.size ()) {
-        const gsi::ClassBase *gsi_cls = m_classes [i];
-        m_class_by_type.insert (std::make_pair (type, gsi_cls));
-        return gsi_cls;
-      }
-    }
-
-  }
-
-  return 0;
+  return PythonClassClientData::cls_for_type (type);
 }
 
 PyTypeObject *PythonModule::type_for_cls (const gsi::ClassBase *cls)

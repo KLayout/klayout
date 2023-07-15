@@ -809,7 +809,6 @@ class QtBinding_TestClass < TestBase
     assert_equal("%08x" % image.pixel(1, 0), "14131211")
     assert_equal("%08x" % image.pixel(0, 2), "64636261")
 
-
   end
 
   def test_57
@@ -850,6 +849,8 @@ class QtBinding_TestClass < TestBase
     assert_equal(h[RBA::Qt::MouseButton::LeftButton], "left")
     assert_equal(h[RBA::Qt::MouseButton::RightButton], "right")
     assert_equal(h[RBA::Qt::MouseButton::NoButton], nil)
+
+  end
 
   def test_60
 

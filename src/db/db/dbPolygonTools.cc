@@ -456,6 +456,8 @@ static bool _cut_polygon_internal (const PolygonType &input, const Edge &line, c
         }
       }
 
+      hull->sort_holes ();
+
       right_of_line->put (*hull);
 
     }
@@ -858,6 +860,8 @@ smooth (const db::Polygon &polygon, db::Coord d, bool keep_hv)
         new_poly.insert_hole (new_pts.begin (), new_pts.end (), false /*don't compress*/);
       }
     }
+
+    new_poly.sort_holes ();
 
   }
 
@@ -1351,6 +1355,8 @@ do_extract_rad (const db::polygon<C> &polygon, double &rinner, double &router, u
 
     }
 
+    new_polygon->sort_holes ();
+
   } else {
 
     if (! do_extract_rad_from_contour (polygon.begin_hull (), polygon.end_hull (), rinner, router, n, (std::vector<db::point<C> > *) 0, false)) {
@@ -1541,6 +1547,8 @@ do_compute_rounded (const db::polygon<C> &polygon, double rinner, double router,
     compute_rounded_contour (polygon.begin_hole (h), polygon.end_hole (h), new_pts, rinner, router, n);
     new_poly.insert_hole (new_pts.begin (), new_pts.end (), false /*don't compress*/);
   }
+
+  new_poly.sort_holes ();
 
   return new_poly;
 }
@@ -2300,9 +2308,11 @@ static void decompose_convex_helper (int depth, PreferredOrientation po, const d
 
   db::Box bbox = sp.box ();
   db::coord_traits<db::Coord>::area_type atot = 0;
+  db::coord_traits<db::Coord>::distance_type min_edge = std::numeric_limits<db::coord_traits<db::Coord>::distance_type>::max ();
   for (size_t i = 0; i < n; ++i) {
     db::Edge ep (sp.hull ()[(i + n - 1) % n], sp.hull ()[i]);
     atot += db::vprod (ep.p2 () - db::Point (), ep.p1 () - db::Point ());
+    min_edge = std::min (min_edge, ep.length ());
   }
 
   std::set<db::Point> skipped;
@@ -2449,9 +2459,14 @@ static void decompose_convex_helper (int depth, PreferredOrientation po, const d
               int cr = 0;
               if (x.second == efc.p1 ()) {
                 if (db::vprod (efc, efp) < 0) {
-                  cr = 2;   //  cut terminates at another concave corner
+                  cr = 3;   //  cut terminates at another concave corner
                 } else {
-                  cr = 1;   //  cut terminates at a convex corner
+                  cr = 2;   //  cut terminates at a convex corner
+                }
+              } else {
+                db::coord_traits<db::Coord>::distance_type el = std::min (x.second.distance (efc.p1 ()), x.second.distance (efc.p2 ()));
+                if (el >= min_edge) {
+                  cr = 1;   //  does not induce shorter edge than we have so far
                 }
               }
 
@@ -2882,6 +2897,8 @@ snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coord gy, std::vecto
 
   }
 
+  pnew.sort_holes ();
+
   return pnew;
 }
 
@@ -2920,6 +2937,8 @@ scaled_and_snapped_polygon (const db::Polygon &poly, db::Coord gx, db::Coord mx,
     }
 
   }
+
+  pnew.sort_holes ();
 
   return pnew;
 }

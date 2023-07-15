@@ -25,22 +25,13 @@
 #ifndef HDR_layDialogs
 #define HDR_layDialogs
 
-#include "dbPoint.h"
-#include "dbVector.h"
-#include "dbTypes.h"
-#include "dbPropertiesRepository.h"
+#include "dbLayout.h"
 #include "layuiCommon.h"
 
 #include <QDialog>
 #include <memory>
 
 class QTreeWidgetItem;
-
-namespace db
-{
-  class Layout;
-  struct LayerProperties;
-}
 
 namespace lay
 {
@@ -431,6 +422,7 @@ public:
   virtual ~UserPropertiesForm ();
 
   bool show (lay::LayoutViewBase *view, unsigned int cv_index, db::properties_id_type &prop_id);
+  bool show (lay::LayoutViewBase *view, unsigned int cv_index, db::properties_id_type &prop_id, db::Layout::meta_info_iterator begin_meta, db::Layout::meta_info_iterator end_meta);
 
 public slots:
   void add ();
@@ -442,11 +434,13 @@ public slots:
 private:
   db::PropertiesRepository::properties_set get_properties (int tab);
   void set_properties (const db::PropertiesRepository::properties_set &props);
+  void set_meta_info (db::Layout::meta_info_iterator begin_meta, db::Layout::meta_info_iterator end_meta, const db::Layout &layout);
   void accept ();
 
   bool m_editable;
   db::PropertiesRepository *mp_prep;
   Ui::UserPropertiesForm *mp_ui;
+  db::Layout::meta_info_iterator m_begin_meta, m_end_meta;
   std::unique_ptr<lay::GenericSyntaxHighlighterAttributes> mp_hl_attributes, mp_hl_basic_attributes;
 };
 

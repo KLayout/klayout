@@ -38,7 +38,7 @@ struct HersheyFont;
 DB_PUBLIC int hershey_font_width (unsigned int f);
 DB_PUBLIC int hershey_font_height (unsigned int f);
 DB_PUBLIC db::DBox hershey_text_box (const std::string &s, unsigned int f);
-DB_PUBLIC void hershey_justify (const std::string &s, unsigned int f, db::DBox bx, HAlign halign, VAlign valign, std::vector<db::DPoint> &linestarts);
+DB_PUBLIC void hershey_justify (const std::string &s, unsigned int f, db::DBox bx, HAlign halign, VAlign valign, std::vector<db::DPoint> &linestarts, double &left, double &bottom);
 DB_PUBLIC std::vector<std::string> hershey_font_names ();
 DB_PUBLIC size_t hershey_count_edges (const std::string &s, unsigned int f);
 
@@ -51,11 +51,10 @@ public:
   void inc ();
 
 private:
-  bool m_new_char;
   unsigned int m_line;
+  const char *mp_cp;
   std::string m_string;
   unsigned int m_edge, m_edge_end;
-  unsigned int m_index, m_end;
   std::vector<db::DPoint> m_linestarts;
   db::DPoint m_pos;
   db::DVector m_delta;
@@ -138,7 +137,8 @@ struct DB_PUBLIC_TEMPLATE hershey
   hershey () 
     : m_string (), 
       m_font (DefaultFont),
-      m_scale (1.0)
+      m_scale (1.0),
+      m_left (0.0), m_bottom (0.0)
   {
     // .. nothing yet ..
   }
@@ -151,7 +151,8 @@ struct DB_PUBLIC_TEMPLATE hershey
   hershey (const std::string &s, Font f) 
     : m_string (s), 
       m_font (f),
-      m_scale (1.0)
+      m_scale (1.0),
+      m_left (0.0), m_bottom (0.0)
   {
     // .. nothing yet ..
   }
@@ -177,14 +178,13 @@ struct DB_PUBLIC_TEMPLATE hershey
   /**
    *  @brief Obtain the size of the text
    *
-   *  @return The bounding box of the text with the scaling applied
+   *  @return The bounding box of the text with the scaling and justification applied
    */
-  box<C> bbox () const
+  db::DBox bbox () const
   {
     db::DBox b = hershey_text_box (m_string, m_font);
-    db::point<C> p1 (coord_traits::rounded (b.p1 ().x () / m_scale), coord_traits::rounded (b.p1 ().y () / m_scale));
-    db::point<C> p2 (coord_traits::rounded (b.p2 ().x () / m_scale), coord_traits::rounded (b.p2 ().y () / m_scale));
-    return box<C> (p1, p2);
+    b.move (db::DVector (m_left, m_bottom));
+    return b * m_scale;
   }
 
   /**
@@ -220,11 +220,11 @@ struct DB_PUBLIC_TEMPLATE hershey
 
         db::DPoint p1 (b.p1 ().x () / m_scale, b.p1 ().y () / m_scale);
         db::DPoint p2 (b.p2 ().x () / m_scale, b.p2 ().y () / m_scale);
-        hershey_justify (m_string, m_font, db::DBox (p1, p2), halign, valign, m_linestarts);
+        hershey_justify (m_string, m_font, db::DBox (p1, p2), halign, valign, m_linestarts, m_left, m_bottom);
 
       } else {
 
-        if (b.width () > 0 && b.height () > 0) {
+        if (coord_traits::less (0, b.width ()) && coord_traits::less (0, b.height ())) {
 
           db::DBox tbx (hershey_text_box (m_string, m_font));
           double fx = double (b.width ()) / double (tbx.width ());
@@ -232,11 +232,11 @@ struct DB_PUBLIC_TEMPLATE hershey
           double f = std::min (fx, fy);
           m_scale = f * (1.0 - 2.0 * margin);
 
-        } else if (b.width () > 0) {
+        } else if (coord_traits::less (0, b.width ())) {
 
           m_scale = double (b.width ()) / double (hershey_font_width (m_font));
 
-        } else if (b.height () > 0) {
+        } else if (coord_traits::less (0, b.height ())) {
 
           m_scale = double (b.height ()) / double (hershey_font_height (m_font));
 
@@ -245,7 +245,7 @@ struct DB_PUBLIC_TEMPLATE hershey
         if (m_scale > 1e-6) {
           db::DPoint p1 (b.p1 ().x () / m_scale, b.p1 ().y () / m_scale);
           db::DPoint p2 (b.p2 ().x () / m_scale, b.p2 ().y () / m_scale);
-          hershey_justify (m_string, m_font, db::DBox (p1, p2), halign, valign, m_linestarts);
+          hershey_justify (m_string, m_font, db::DBox (p1, p2), halign, valign, m_linestarts, m_left, m_bottom);
         }
 
       }
@@ -294,6 +294,7 @@ private:
   Font m_font;
   double m_scale;
   std::vector <db::DPoint> m_linestarts;
+  double m_left, m_bottom;
 };
 
 /**

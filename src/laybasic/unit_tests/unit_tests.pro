@@ -14,6 +14,7 @@ SOURCES = \
   layParsedLayerSource.cc \
   layRenderer.cc \
   layAbstractMenuTests.cc \
+  layTextInfoTests.cc \
   laySnapTests.cc
 
 INCLUDEPATH += $$TL_INC $$LAYBASIC_INC $$DB_INC $$GSI_INC $$OUT_PWD/../laybasic

@@ -962,10 +962,31 @@ DeepRegion::xor_with (const Region &other, db::PropertyConstraint property_const
 
     //  Implement XOR as (A-B)+(B-A) - only this implementation
     //  is compatible with the local processor scheme
-    DeepLayer n1 (and_or_not_with (other_deep, false, property_constraint));
-    DeepLayer n2 (other_deep->and_or_not_with (this, false, property_constraint));
 
+    //  Prepare a version of "other_deep" that is mapped into the hierarchy space
+    //  of "this"
+    std::unique_ptr<DeepRegion> other_deep_mapped;
+    if (&other_deep->deep_layer ().layout () == &deep_layer ().layout ()) {
+      //  shallow copy for reconfiguration (progress etc.)
+      other_deep_mapped.reset (new DeepRegion (other_deep->deep_layer ()));
+    } else {
+      //  deep copy with mapped hierarchy
+      other_deep_mapped.reset (new DeepRegion (deep_layer ().derived ()));
+      other_deep_mapped->deep_layer ().add_from (other_deep->deep_layer ());
+    }
+
+    other_deep_mapped->set_strict_handling (strict_handling ());
+    other_deep_mapped->set_base_verbosity (base_verbosity ());
+    if (report_progress ()) {
+      other_deep_mapped->enable_progress (progress_desc () + tl::to_string (tr (" - reverse part")));
+    } else {
+      other_deep_mapped->disable_progress ();
+    }
+
+    DeepLayer n1 (and_or_not_with (other_deep_mapped.get (), false, property_constraint));
+    DeepLayer n2 (other_deep_mapped->and_or_not_with (this, false, property_constraint));
     n1.add_from (n2);
+
     return new DeepRegion (n1);
 
   }
@@ -1895,6 +1916,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 
   //  force different polygons in the different properties case to skip intra-polygon checks
   if (pc_always_different (options.prop_constraint)) {
+    //  TODO: this forces merged primaries, so maybe that is not a good optimization?
     different_polygons = true;
   }
 

@@ -203,9 +203,11 @@ EditLineStylesForm::sel_changed (QListWidgetItem *, QListWidgetItem *)
     return;
   }
 
-  manager ()->transaction (tl::to_string (QObject::tr ("Current style")));
-  manager ()->queue (this, new CurrentStyleOp (m_selected, mp_ui->style_items->currentRow ()));
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Current style")));
+    manager ()->queue (this, new CurrentStyleOp (m_selected, mp_ui->style_items->currentRow ()));
+    manager ()->commit ();
+  }
 
   update_current_item ();
 }
@@ -257,7 +259,9 @@ EditLineStylesForm::select_item (int index)
 void
 EditLineStylesForm::new_button_clicked ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("New style")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("New style")));
+  }
 
   lay::LineStyleInfo s;
   s.set_pattern (0x55555555, 32);
@@ -266,13 +270,17 @@ EditLineStylesForm::new_button_clicked ()
   update ();
   select_item (oi + std::distance (m_styles.begin (), m_styles.begin_custom ()));
 
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 
 EditLineStylesForm::clone_button_clicked ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("Clone style")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Clone style")));
+  }
 
   lay::LineStyles::iterator c = current ();
 
@@ -297,7 +305,9 @@ EditLineStylesForm::clone_button_clicked ()
   update ();
   select_item (oi + std::distance (m_styles.begin (), m_styles.begin_custom ()));
 
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 
@@ -315,7 +325,9 @@ EditLineStylesForm::delete_button_clicked ()
       }
     }
 
-    manager ()->transaction (tl::to_string (QObject::tr ("Delete style")));
+    if (manager ()) {
+      manager ()->transaction (tl::to_string (QObject::tr ("Delete style")));
+    }
 
     if (mp_ui->style_items->currentRow () + 1 == mp_ui->style_items->count ()) {
       select_item (mp_ui->style_items->currentRow () - 1);
@@ -327,7 +339,9 @@ EditLineStylesForm::delete_button_clicked ()
     m_styles.renumber ();
     update ();
 
-    manager ()->commit ();
+    if (manager ()) {
+      manager ()->commit ();
+    }
 
   }
 
@@ -347,7 +361,9 @@ EditLineStylesForm::up_button_clicked ()
       for (lay::LineStyles::iterator i = m_styles.begin_custom (); i != m_styles.end (); ++i) {
         if (i->order_index () == oi - 1) {
 
-          manager ()->transaction (tl::to_string (QObject::tr ("Move style up")));
+          if (manager ()) {
+            manager ()->transaction (tl::to_string (QObject::tr ("Move style up")));
+          }
 
           lay::LineStyleInfo info;
           info = *i;
@@ -361,7 +377,9 @@ EditLineStylesForm::up_button_clicked ()
           update ();
           select_item (oi - 2 + std::distance (m_styles.begin (), m_styles.begin_custom ()));
 
-          manager ()->commit ();
+          if (manager ()) {
+            manager ()->commit ();
+          }
 
           return;
 
@@ -385,7 +403,9 @@ EditLineStylesForm::down_button_clicked ()
     for (lay::LineStyles::iterator i = m_styles.begin_custom (); i != m_styles.end (); ++i) {
       if (i->order_index () == oi + 1) {
 
-        manager ()->transaction (tl::to_string (QObject::tr ("Move style down")));
+        if (manager ()) {
+          manager ()->transaction (tl::to_string (QObject::tr ("Move style down")));
+        }
 
         lay::LineStyleInfo info;
         info = *i;
@@ -399,7 +419,9 @@ EditLineStylesForm::down_button_clicked ()
         update ();
         select_item (oi + std::distance (m_styles.begin (), m_styles.begin_custom ()));
 
-        manager ()->commit ();
+        if (manager ()) {
+          manager ()->commit ();
+        }
 
         return;
 
@@ -420,49 +442,73 @@ EditLineStylesForm::editor_size_changed ()
 void
 EditLineStylesForm::size_changed ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("Change style size")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Change style size")));
+  }
   mp_ui->editor->set_size (mp_ui->w_spin_box->value ());
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 
 EditLineStylesForm::invert_button_clicked ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("Invert style")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Invert style")));
+  }
   mp_ui->editor->invert ();
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 
 EditLineStylesForm::clear_button_clicked ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("Clear style")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Clear style")));
+  }
   mp_ui->editor->clear ();
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 
 EditLineStylesForm::fliph_button_clicked ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("Flip style")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Flip style")));
+  }
   mp_ui->editor->fliph ();
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 
 EditLineStylesForm::sleft_button_clicked ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("Shift left")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Shift left")));
+  }
   mp_ui->editor->shift (-1);
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 
 EditLineStylesForm::sright_button_clicked ()
 {
-  manager ()->transaction (tl::to_string (QObject::tr ("Shift right")));
+  if (manager ()) {
+    manager ()->transaction (tl::to_string (QObject::tr ("Shift right")));
+  }
   mp_ui->editor->shift (1);
-  manager ()->commit ();
+  if (manager ()) {
+    manager ()->commit ();
+  }
 }
 
 void 

@@ -111,6 +111,21 @@ Class<db::DeepShapeStore> decl_dbDeepShapeStore ("db", "DeepShapeStore",
   gsi::method ("threads", &db::DeepShapeStore::threads,
     "@brief Gets the number of threads.\n"
   ) +
+  gsi::method ("wants_all_cells=", &db::DeepShapeStore::set_wants_all_cells, gsi::arg ("flag"),
+    "@brief Sets a flag wether to copy the full hierarchy for the working layouts\n"
+    "\n"
+    "The DeepShapeStore object keeps a copy of the original hierarchy internally for the working layouts.\n"
+    "By default, this hierarchy is mapping only non-empty cells. While the operations proceed, more cells "
+    "may need to be added. This conservative approach saves some memory, but the update operations may "
+    "reduce overall performance. Setting this flag to 'true' switches to a mode where the full "
+    "hierarchy is copied always. This will take more memory but may save CPU time.\n"
+    "\n"
+    "This attribute has been introduced in version 0.28.10."
+  ) +
+  gsi::method ("wants_all_cells", &db::DeepShapeStore::wants_all_cells,
+    "@brief Gets a flag wether to copy the full hierarchy for the working layouts\n"
+    "This attribute has been introduced in version 0.28.10."
+  ) +
   gsi::method ("reject_odd_polygons=", &db::DeepShapeStore::set_reject_odd_polygons, gsi::arg ("count"),
     "@brief Sets a flag indicating whether to reject odd polygons\n"
     "\n"

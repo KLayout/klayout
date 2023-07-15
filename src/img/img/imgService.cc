@@ -1481,9 +1481,13 @@ Service::menu_activated (const std::string &symbol)
 {
   if (symbol == "img::clear_all_images") {
 
-    manager ()->transaction (tl::to_string (tr ("Clear all images")));
+    if (manager ()) {
+      manager ()->transaction (tl::to_string (tr ("Clear all images")));
+    }
     clear_images ();
-    manager ()->commit ();
+    if (manager ()) {
+      manager ()->commit ();
+    }
 
   } else if (symbol == "img::add_image") {
 
@@ -1601,10 +1605,14 @@ Service::add_image ()
 
     clear_selection ();
 
-    manager ()->transaction (tl::to_string (tr ("Add image")));
+    if (manager ()) {
+      manager ()->transaction (tl::to_string (tr ("Add image")));
+    }
     new_image->set_z_position (top_z_position ());
     mp_view->annotation_shapes ().insert (db::DUserObject (new_image));
-    manager ()->commit ();
+    if (manager ()) {
+      manager ()->commit ();
+    }
 
   } else {
     delete new_image;

@@ -335,11 +335,17 @@ static void save_image_with_options (lay::LayoutViewBase *view, const std::strin
   view->save_image_with_options (fn, width, height, linewidth, oversampling, resolution, tl::Color (), tl::Color (), tl::Color (), target_box, monochrome);
 }
 
-#if defined(HAVE_QTBINDINGS)
+#if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
 static QImage get_image_with_options (lay::LayoutViewBase *view, unsigned int width, unsigned int height, int linewidth, int oversampling, double resolution, const db::DBox &target_box, bool monochrome)
 {
   return view->get_image_with_options (width, height, linewidth, oversampling, resolution, tl::Color (), tl::Color (), tl::Color (), target_box, monochrome);
 }
+
+static QWidget *widget (lay::LayoutViewBase *view)
+{
+  return view->widget ();
+}
+
 #endif
 
 static std::vector<std::string> 
@@ -1158,7 +1164,12 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutVi
     "The image is drawn synchronously with the given width and height. Drawing may take some time. "
     "Monochrome images don't have background or annotation objects currently.\n"
     "\n"
-    "This method has been introduced in 0.23.10.\n"
+    "This method has been introduced in version 0.23.10.\n"
+  ) +
+  gsi::method_ext ("widget", &widget,
+    "@brief Gets the QWidget object of the view\n"
+    "\n"
+    "This method has been introduced in version 0.28.7.\n"
   ) +
 #endif
   gsi::method ("get_screenshot_pixels", static_cast<tl::PixelBuffer (lay::LayoutViewBase::*) ()> (&lay::LayoutViewBase::get_screenshot_pb),

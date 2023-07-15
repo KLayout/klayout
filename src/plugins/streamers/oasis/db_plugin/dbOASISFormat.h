@@ -101,7 +101,8 @@ public:
    *  @brief The constructor
    */
   OASISWriterOptions ()
-    : compression_level (2), write_cblocks (true), strict_mode (true), recompress (false), permissive (false), write_std_properties (1), subst_char ("*")
+    : compression_level (2), write_cblocks (true), strict_mode (true), recompress (false), permissive (false),
+      write_std_properties (1), subst_char ("*"), tables_at_end (false)
   {
     //  .. nothing yet ..
   }
@@ -165,6 +166,11 @@ public:
    *  substituting invalid characters in a-strings and n-strings.
    */
   std::string subst_char;
+
+  /**
+   *  @brief Hidden option, for testing mainly: write tables at end to force forward references
+   */
+  bool tables_at_end;
 
   /** 
    *  @brief Implementation of FormatSpecificWriterOptions

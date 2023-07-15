@@ -90,6 +90,9 @@ PYMODTEST (import_lay, "import_lay.py")
 PYMODTEST (import_lib, "import_lib.py")
 PYMODTEST (pya_tests, "pya_tests.py")
 
+//  others
+PYMODTEST (issue1327, "issue1327.py")
+
 #if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)
 
 PYMODTEST (import_QtCore, "import_QtCore.py")

@@ -306,6 +306,15 @@ class Box:
         @brief Returns true if this box is not equal to the other box
         Returns true, if this box and the given box are not equal 
         """
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief Returns a string representing this box
+
+        This string can be turned into a box again by using \from_s
+        . If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
+        """
     @overload
     def __rmul__(self, box: Box) -> Box:
         r"""
@@ -812,6 +821,13 @@ class Cell:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+    def add_meta_info(self, info: LayoutMetaInfo) -> None:
+        r"""
+        @brief Adds meta information to the cell
+        See \LayoutMetaInfo for details about cells and meta information.
+
+        This method has been introduced in version 0.28.8.
+        """
     def basic_name(self) -> str:
         r"""
         @brief Returns the name of the library or PCell or the real name of the cell
@@ -1061,6 +1077,13 @@ class Cell:
         r"""
         @brief Clears the instance list
         """
+    def clear_meta_info(self) -> None:
+        r"""
+        @brief Clears the meta information of the cell
+        See \LayoutMetaInfo for details about cells and meta information.
+
+        This method has been introduced in version 0.28.8.
+        """
     def clear_shapes(self) -> None:
         r"""
         @brief Clears all shapes in the cell
@@ -1280,6 +1303,13 @@ class Cell:
         @brief Iterates over all child instances (which may actually be instance arrays)
 
         Starting with version 0.15, this iterator delivers \Instance objects rather than \CellInstArray objects.
+        """
+    def each_meta_info(self) -> Iterator[LayoutMetaInfo]:
+        r"""
+        @brief Iterates over the meta information of the cell
+        See \LayoutMetaInfo for details about cells and meta information.
+
+        This method has been introduced in version 0.28.8.
         """
     @overload
     def each_overlapping_inst(self, b: Box) -> Iterator[Instance]:
@@ -1741,6 +1771,25 @@ class Cell:
 
         This method has been introduced in version 0.22.
         """
+    def meta_info(self, name: str) -> LayoutMetaInfo:
+        r"""
+        @brief Gets the meta information for a given name
+        See \LayoutMetaInfo for details about cells and meta information.
+
+        If no meta information with the given name exists, a default object with empty fields will be returned.
+
+        This method has been introduced in version 0.28.8.
+        """
+    def meta_info_value(self, name: str) -> Any:
+        r"""
+        @brief Gets the meta information value for a given name
+        See \LayoutMetaInfo for details about cells and meta information.
+
+        If no meta information with the given name exists, a nil value will be returned.
+        A more generic version that delivers all fields of the meta information is \meta_info.
+
+        This method has been introduced in version 0.28.8.
+        """
     @overload
     def move(self, src: int, dest: int) -> None:
         r"""
@@ -2072,6 +2121,13 @@ class Cell:
         You can use \Layout#refresh to refresh all cells from a layout.
 
         This method has been introduced in version 0.22.
+        """
+    def remove_meta_info(self, name: str) -> None:
+        r"""
+        @brief Removes meta information from the cell
+        See \LayoutMetaInfo for details about cells and meta information.
+
+        This method has been introduced in version 0.28.8.
         """
     @overload
     def replace(self, instance: Instance, cell_inst_array: CellInstArray) -> Instance:
@@ -2730,6 +2786,12 @@ class CellInstArray:
     def __ne__(self, other: object) -> bool:
         r"""
         @brief Compares two arrays for inequality
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts the array to a string
+
+        This method was introduced in version 0.22.
         """
     def __str__(self) -> str:
         r"""
@@ -3864,12 +3926,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -4078,12 +4140,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -4138,12 +4200,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -4168,12 +4230,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -4228,12 +4290,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -5402,6 +5464,14 @@ class CplxTrans:
         r"""
         @brief Tests for inequality
         """
+    def __repr__(self, lazy: Optional[bool] = ..., dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion
+        If 'lazy' is true, some parts are omitted when not required.
+        If a DBU is given, the output units will be micrometers.
+
+        The lazy and DBU arguments have been added in version 0.27.6.
+        """
     @overload
     def __rmul__(self, box: Box) -> DBox:
         r"""
@@ -6087,6 +6157,15 @@ class DBox:
         r"""
         @brief Returns true if this box is not equal to the other box
         Returns true, if this box and the given box are not equal 
+        """
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief Returns a string representing this box
+
+        This string can be turned into a box again by using \from_s
+        . If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
         """
     @overload
     def __rmul__(self, box: DBox) -> DBox:
@@ -6850,6 +6929,10 @@ class DCellInstArray:
         r"""
         @brief Compares two arrays for inequality
         """
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts the array to a string
+        """
     def __str__(self) -> str:
         r"""
         @brief Converts the array to a string
@@ -7538,6 +7621,14 @@ class DCplxTrans:
         r"""
         @brief Tests for inequality
         """
+    def __repr__(self, lazy: Optional[bool] = ..., dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion
+        If 'lazy' is true, some parts are omitted when not required.
+        If a DBU is given, the output units will be micrometers.
+
+        The lazy and DBU arguments have been added in version 0.27.6.
+        """
     @overload
     def __rmul__(self, box: DBox) -> DBox:
         r"""
@@ -8110,6 +8201,13 @@ class DEdge:
         r"""
         @brief Inequality test
         @param e The object to compare against
+        """
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief Returns a string representing the edge
+         If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
         """
     def __rmul__(self, scale_factor: float) -> DEdge:
         r"""
@@ -8755,6 +8853,13 @@ class DEdgePair:
 
         This method has been introduced in version 0.25.
         """
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief Returns a string representing the edge pair
+         If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
+        """
     def __str__(self, dbu: Optional[float] = ...) -> str:
         r"""
         @brief Returns a string representing the edge pair
@@ -9174,6 +9279,10 @@ class DPath:
         r"""
         @brief Inequality test
         @param p The object to compare against
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert to a string
         """
     def __rmul__(self, f: float) -> DPath:
         r"""
@@ -9595,6 +9704,13 @@ class DPoint:
 
         This method has been added in version 0.23.
         """
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion.
+        If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
+        """
     def __rmul__(self, f: float) -> DPoint:
         r"""
         @brief Scaling by some factor
@@ -9949,6 +10065,10 @@ class DPolygon:
         r"""
         @brief Returns a value indicating whether the polygons are not equal
         @param p The object to compare against
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
         """
     def __rmul__(self, f: float) -> DPolygon:
         r"""
@@ -10397,6 +10517,13 @@ class DPolygon:
 
         This method has been introduced in version 0.23.
         """
+    def sort_holes(self) -> None:
+        r"""
+        @brief Brings the holes in a specific order
+        This function is normalize the hole order so the comparison of two polygons does not depend on the order the holes were inserted. Polygons generated by KLayout's alorithms have their holes sorted.
+
+        This method has been introduced in version 0.28.8.
+        """
     def split(self) -> List[DPolygon]:
         r"""
         @brief Splits the polygon into two or more parts
@@ -10683,6 +10810,10 @@ class DSimplePolygon:
         r"""
         @brief Returns a value indicating whether self is not equal to p
         @param p The object to compare against
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
         """
     def __rmul__(self, f: float) -> DSimplePolygon:
         r"""
@@ -11177,7 +11308,8 @@ class DText:
     Setter:
     @brief Sets the vertical alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     x: float
     r"""
@@ -11330,6 +11462,13 @@ class DText:
 
 
         Return true, if this text object and the given text are not equal 
+        """
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief Converts the object to a string.
+        If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
         """
     def __str__(self, dbu: Optional[float] = ...) -> str:
         r"""
@@ -11959,6 +12098,13 @@ class DTrans:
         r"""
         @brief Tests for inequality
         """
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion
+        If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
+        """
     @overload
     def __rmul__(self, box: DBox) -> DBox:
         r"""
@@ -12448,6 +12594,13 @@ class DVector:
 
         Returns a new vector with -x,-y.
         """
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion
+        If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
+        """
     @overload
     def __rmul__(self, f: float) -> DVector:
         r"""
@@ -12727,6 +12880,19 @@ class DeepShapeStore:
 
     Setter:
     @brief Sets the number of threads to allocate for the hierarchical processor
+    """
+    wants_all_cells: bool
+    r"""
+    Getter:
+    @brief Gets a flag wether to copy the full hierarchy for the working layouts
+    This attribute has been introduced in version 0.28.10.
+    Setter:
+    @brief Sets a flag wether to copy the full hierarchy for the working layouts
+
+    The DeepShapeStore object keeps a copy of the original hierarchy internally for the working layouts.
+    By default, this hierarchy is mapping only non-empty cells. While the operations proceed, more cells may need to be added. This conservative approach saves some memory, but the update operations may reduce overall performance. Setting this flag to 'true' switches to a mode where the full hierarchy is copied always. This will take more memory but may save CPU time.
+
+    This attribute has been introduced in version 0.28.10.
     """
     @classmethod
     def instance_count(cls) -> int:
@@ -13087,7 +13253,7 @@ class Device(NetlistObject):
     @overload
     def net_for_terminal(self, terminal_name: str) -> Net:
         r"""
-        @brief Gets the net connected to the specified terminal.
+        @brief Gets the net connected to the specified terminal (non-const version).
         If the terminal is not connected, nil is returned for the net.
 
         This convenience method has been introduced in version 0.27.3.
@@ -13095,7 +13261,7 @@ class Device(NetlistObject):
     @overload
     def net_for_terminal(self, terminal_name: str) -> Net:
         r"""
-        @brief Gets the net connected to the specified terminal (non-const version).
+        @brief Gets the net connected to the specified terminal.
         If the terminal is not connected, nil is returned for the net.
 
         This convenience method has been introduced in version 0.27.3.
@@ -15380,6 +15546,19 @@ class DeviceParameterDefinition:
     Setter:
     @brief Sets the description of the parameter.
     """
+    geo_scaling_exponent: float
+    r"""
+    Getter:
+    @brief Gets the geometry scaling exponent.
+    This value is used when applying '.options scale' in the SPICE reader for example. It is zero for 'no scaling', 1.0 for linear scaling and 2.0 for quadratic scaling.
+
+    This attribute has been added in version 0.28.6.
+    Setter:
+    @brief Sets the geometry scaling exponent.
+    See \geo_scaling_exponent for details.
+
+    This attribute has been added in version 0.28.6.
+    """
     is_primary: bool
     r"""
     Getter:
@@ -15397,8 +15576,18 @@ class DeviceParameterDefinition:
     Setter:
     @brief Sets the name of the parameter.
     """
+    si_scaling: float
+    r"""
+    Getter:
+    @brief Gets the scaling factor to SI units.
+    For parameters in micrometers - for example W and L of MOS devices - this factor can be set to 1e-6 to reflect the unit.
+    Setter:
+    @brief Sets the scaling factor to SI units.
+
+    This setter has been added in version 0.28.6.
+    """
     @classmethod
-    def new(cls, name: str, description: Optional[str] = ..., default_value: Optional[float] = ..., is_primary: Optional[bool] = ..., si_scaling: Optional[float] = ...) -> DeviceParameterDefinition:
+    def new(cls, name: str, description: Optional[str] = ..., default_value: Optional[float] = ..., is_primary: Optional[bool] = ..., si_scaling: Optional[float] = ..., geo_scaling_exponent: Optional[float] = ...) -> DeviceParameterDefinition:
         r"""
         @brief Creates a new parameter definition.
         @param name The name of the parameter
@@ -15406,6 +15595,7 @@ class DeviceParameterDefinition:
         @param default_value The initial value
         @param is_primary True, if the parameter is a primary parameter (see \is_primary=)
         @param si_scaling The scaling factor to SI units
+        @param geo_scaling_exponent Indicates how the parameter scales with geometrical scaling (0: no scaling, 1.0: linear, 2.0: quadratic)
         """
     def __copy__(self) -> DeviceParameterDefinition:
         r"""
@@ -15415,7 +15605,7 @@ class DeviceParameterDefinition:
         r"""
         @brief Creates a copy of self
         """
-    def __init__(self, name: str, description: Optional[str] = ..., default_value: Optional[float] = ..., is_primary: Optional[bool] = ..., si_scaling: Optional[float] = ...) -> None:
+    def __init__(self, name: str, description: Optional[str] = ..., default_value: Optional[float] = ..., is_primary: Optional[bool] = ..., si_scaling: Optional[float] = ..., geo_scaling_exponent: Optional[float] = ...) -> None:
         r"""
         @brief Creates a new parameter definition.
         @param name The name of the parameter
@@ -15423,6 +15613,7 @@ class DeviceParameterDefinition:
         @param default_value The initial value
         @param is_primary True, if the parameter is a primary parameter (see \is_primary=)
         @param si_scaling The scaling factor to SI units
+        @param geo_scaling_exponent Indicates how the parameter scales with geometrical scaling (0: no scaling, 1.0: linear, 2.0: quadratic)
         """
     def _create(self) -> None:
         r"""
@@ -15496,11 +15687,6 @@ class DeviceParameterDefinition:
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
-        """
-    def si_scaling(self) -> float:
-        r"""
-        @brief Gets the scaling factor to SI units.
-        For parameters in micrometers for example, this factor will be 1e-6.
         """
 
 class DeviceReconnectedTerminal:
@@ -15918,6 +16104,13 @@ class Edge:
         r"""
         @brief Inequality test
         @param e The object to compare against
+        """
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief Returns a string representing the edge
+         If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
         """
     def __rmul__(self, scale_factor: float) -> Edge:
         r"""
@@ -16567,6 +16760,13 @@ class EdgePair:
 
         This method has been introduced in version 0.25.
         """
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief Returns a string representing the edge pair
+         If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
+        """
     def __str__(self, dbu: Optional[float] = ...) -> str:
         r"""
         @brief Returns a string representing the edge pair
@@ -17052,6 +17252,11 @@ class EdgePairs(ShapeCollection):
         The count is computed 'as if flat', i.e. edge pairs inside a cell are multiplied by the number of times a cell is instantiated.
 
         Starting with version 0.27, the method is called 'count' for consistency with \Region. 'size' is still provided as an alias.
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts the edge pair collection to a string
+        The length of the output is limited to 20 edge pairs to avoid giant strings on large regions. For full output use "to_s" with a maximum count parameter.
         """
     def __str__(self) -> str:
         r"""
@@ -19359,6 +19564,11 @@ class Edges(ShapeCollection):
 
         The boolean OR is implemented by merging the edges of both edge sets. To simply join the edge collections without merging, the + operator is more efficient.
         """
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts the edge collection to a string
+        The length of the output is limited to 20 edges to avoid giant strings on large regions. For full output use "to_s" with a maximum count parameter.
+        """
     def __str__(self) -> str:
         r"""
         @brief Converts the edge collection to a string
@@ -21150,12 +21360,12 @@ class GenericNetlistCompareLogger(NetlistCompareLogger):
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -21289,12 +21499,12 @@ class HAlign:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -21319,12 +21529,12 @@ class HAlign:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -21948,6 +22158,14 @@ class ICplxTrans:
         r"""
         @brief Tests for inequality
         """
+    def __repr__(self, lazy: Optional[bool] = ..., dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion
+        If 'lazy' is true, some parts are omitted when not required.
+        If a DBU is given, the output units will be micrometers.
+
+        The lazy and DBU arguments have been added in version 0.27.6.
+        """
     @overload
     def __rmul__(self, box: Box) -> Box:
         r"""
@@ -22490,6 +22708,11 @@ class IMatrix2d:
         @param v The vector to transform.
         @return The transformed vector
         """
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert the matrix to a string.
+        @return The string representing this matrix
+        """
     @overload
     def __rmul__(self, box: Box) -> Box:
         r"""
@@ -22898,6 +23121,11 @@ class IMatrix3d:
         @brief Transforms a vector with this matrix.
         @param v The vector to transform.
         @return The transformed vector
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert the matrix to a string.
+        @return The string representing this matrix
         """
     @overload
     def __rmul__(self, box: Box) -> Box:
@@ -23383,10 +23611,9 @@ class Instance:
     @brief Gets the complex transformation of the instance or the first instance in the array
     This method is always valid compared to \trans, since simple transformations can be expressed as complex transformations as well.
     Setter:
-    @brief Sets the complex transformation of the instance or the first instance in the array (in micrometer units)
-    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
+    @brief Sets the complex transformation of the instance or the first instance in the array
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23.
     """
     da: DVector
     r"""
@@ -23561,6 +23788,12 @@ class Instance:
         r"""
         @brief Tests for inequality of two Instance objects
         Warning: this operator returns true if both objects refer to the same instance, not just identical ones.
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Creates a string showing the contents of the reference
+
+        This method has been introduced with version 0.16.
         """
     def __setitem__(self, key: Any, value: Any) -> None:
         r"""
@@ -23807,14 +24040,14 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This method has been introduced in version 0.22.
+        This const version of the method has been introduced in version 0.25.
         """
     @overload
     def layout(self) -> Layout:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This const version of the method has been introduced in version 0.25.
+        This method has been introduced in version 0.22.
         """
     def pcell_declaration(self) -> PCellDeclaration_Native:
         r"""
@@ -24072,6 +24305,20 @@ class LEFDEFReaderConfiguration:
     See \instance_property_name for details.
 
     This method has been introduced in version 0.26.4.
+    """
+    joined_paths: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether to create joined paths for wires.
+    If this property is set to true, wires are represented by multi-segment paths as far as possible (this will fail for 45 degree path segments for example). By defauls, wires are represented by multiple straight segments.
+
+    This property has been added in version 0.28.8.
+
+    Setter:
+    @brief Sets a value indicating whether to create joined paths for wires.
+    See \joined_paths for details about this property.
+
+    This property has been added in version 0.28.8.
     """
     labels_datatype: int
     r"""
@@ -25106,6 +25353,16 @@ class LayerInfo:
         @return True, if both are not equal
 
         This method was added in version 0.18.
+        """
+    def __repr__(self, as_target: Optional[bool] = ...) -> str:
+        r"""
+        @brief Convert the layer info object to a string
+        @return The string
+
+        If 'as_target' is true, wildcard and relative specifications are formatted such such.
+
+        This method was added in version 0.18.
+        The 'as_target' argument has been added in version 0.26.5.
         """
     def __str__(self, as_target: Optional[bool] = ...) -> str:
         r"""
@@ -26246,6 +26503,7 @@ class Layout:
 
         Clears the layout completely.
         """
+    @overload
     def clear_layer(self, layer_index: int) -> None:
         r"""
         @brief Clears a layer
@@ -26255,6 +26513,24 @@ class Layout:
         This method was introduced in version 0.19.
 
         @param layer_index The index of the layer to delete.
+        """
+    @overload
+    def clear_layer(self, layer_index: int, flags: int) -> None:
+        r"""
+        @brief Clears a layer (given shape types only)
+
+        Clears the layer: removes all shapes for the given shape types.
+
+        This method was introduced in version 0.28.9.
+
+        @param layer_index The index of the layer to delete.
+        @param flags The type selector for the shapes to delete (see \Shapes class, S... constants).
+        """
+    def clear_meta_info(self) -> None:
+        r"""
+        @brief Clears the meta information of the layout
+        See \LayoutMetaInfo for details about layouts and meta information.
+        This method has been introduced in version 0.28.8.
         """
     @overload
     def clip(self, cell: Cell, box: Box) -> Cell:
@@ -26352,17 +26628,32 @@ class Layout:
 
         This method has been added in version 0.23.
         """
+    @overload
     def copy_layer(self, src: int, dest: int) -> None:
         r"""
         @brief Copies a layer
 
-        This method was introduced in version 0.19.
-
-        Copy a layer from the source to the target. The target is not cleared before, so that this method 
-        merges shapes from the source with the target layer.
+        Copies a layer from the source to the destination layer. The destination layer is not cleared before, so that this method 
+        merges shapes from the source with the destination layer.
 
         @param src The layer index of the source layer.
         @param dest The layer index of the destination layer.
+
+        This method was introduced in version 0.19.
+        """
+    @overload
+    def copy_layer(self, src: int, dest: int, flags: int) -> None:
+        r"""
+        @brief Copies a layer (selected shape types only)
+
+        Copies a layer from the source to the destination layer. The destination layer is not cleared before, so that this method 
+        merges shapes from the source with the destination layer.
+
+        @param src The layer index of the source layer.
+        @param dest The layer index of the destination layer.
+        @param flags A combination of the shape type flags from \Shapes, S... constants
+
+        This method variant has been introduced in version 0.28.9.
         """
     @overload
     def copy_tree_shapes(self, source_layout: Layout, cell_mapping: CellMapping) -> None:
@@ -26837,26 +27128,51 @@ class Layout:
         @brief Gets the library this layout lives in or nil if the layout is not part of a library
         This attribute has been introduced in version 0.27.5.
         """
-    def meta_info_value(self, name: str) -> str:
+    def meta_info(self, name: str) -> LayoutMetaInfo:
+        r"""
+        @brief Gets the meta information for a given name
+        See \LayoutMetaInfo for details about layouts and meta information.
+
+        If no meta information with the given name exists, nil is returned.
+
+        This method has been introduced in version 0.28.8.
+        """
+    def meta_info_value(self, name: str) -> Any:
         r"""
         @brief Gets the meta information value for a given name
         See \LayoutMetaInfo for details about layouts and meta information.
 
-        If no meta information with the given name exists, an empty string will be returned.
+        If no meta information with the given name exists, a nil value will be returned.
+        A more generic version that delivers all fields of the meta information is \meta_info.
 
-        This method has been introduced in version 0.25.
+        This method has been introduced in version 0.25. Starting with version 0.28.8, the value is of variant type instead of string only.
         """
+    @overload
     def move_layer(self, src: int, dest: int) -> None:
         r"""
         @brief Moves a layer
 
-        This method was introduced in version 0.19.
-
-        Move a layer from the source to the target. The target is not cleared before, so that this method 
-        merges shapes from the source with the target layer. The source layer is empty after that operation.
+        Moves a layer from the source to the destination layer. The target is not cleared before, so that this method 
+        merges shapes from the source with the destination layer. The source layer is empty after that operation.
 
         @param src The layer index of the source layer.
         @param dest The layer index of the destination layer.
+
+        This method was introduced in version 0.19.
+        """
+    @overload
+    def move_layer(self, src: int, dest: int, flags: int) -> None:
+        r"""
+        @brief Moves a layer (selected shape types only)
+
+        Moves a layer from the source to the destination layer. The target is not cleared before, so that this method 
+        merges shapes from the source with the destination layer. The copied shapes are removed from the source layer.
+
+        @param src The layer index of the source layer.
+        @param dest The layer index of the destination layer.
+        @param flags A combination of the shape type flags from \Shapes, S... constants
+
+        This method variant has been introduced in version 0.28.9.
         """
     @overload
     def move_tree_shapes(self, source_layout: Layout, cell_mapping: CellMapping) -> None:
@@ -27337,6 +27653,13 @@ class LayoutDiff:
     r"""
     @brief Compare array instances instance by instance
     This constant can be used for the flags parameter of \compare_layouts and \compare_cells. It can be compared with other constants to form a flag set.
+    """
+    IgnoreDuplicates: ClassVar[int]
+    r"""
+    @brief Ignore duplicate instances or shapes
+    With this option present, duplicate instances or shapes are ignored and duplication does not count as a difference.
+
+    This option has been introduced in version 0.28.9.
     """
     NoLayerNames: ClassVar[int]
     r"""
@@ -27889,8 +28212,37 @@ class LayoutMetaInfo:
 
     Multiple layout meta information objects can be attached to one layout using \Layout#add_meta_info. Meta information is identified by a unique name and carries a string value plus an optional description string. The description string is for information only and is not evaluated by code.
 
-    See also \Layout#each_meta_info and \Layout#meta_info_value and \Layout#remove_meta_info
-    This class has been introduced in version 0.25.
+    Meta information can be attached to the layout object and to cells. It is similar to user properties. The differences are:
+
+    @ul
+    @li Meta information is stored differently in GDS and OASIS files using the context information added     by KLayout to annotated PCell or library cells too. Hence meta information does not pollute     the standard user properties space. @/li
+    @li The value of meta information can be complex serializable types such as lists, hashes and elementary     objects such as \Box or \DBox. Scalar types include floats and booleans. @/li
+    @li Meta information keys are strings and are supported also for GDS which only accepts integer number     keys for user properties. @/li
+    @/ul
+
+    Elementary (serializable) objects are: \Box, \DBox, \Edge, \DEdge, \EdgePair, \DEdgePair, \EdgePairs, \Edges, \LayerProperties, \Matrix2d, \Matrix3d, \Path, \DPath, \Point, \DPoint, \Polygon, \DPolygon, \SimplePolygon, \DSimplePolygon, \Region, \Text, \DText, \Texts, \Trans, \DTrans, \CplxTrans, \ICplxTrans, \DCplxTrans, \VCplxTrans, \Vector, \DVector (list may not be complete).
+
+    KLayout itself also generates meta information with specific keys. For disambiguation, namespaces can be established by prefixing the key strings with some unique identifier in XML fashion, like a domain name - e.g. 'example.com:key'.
+
+    @b Note: @/b only meta information marked with \is_persisted? == true is stored in GDS or OASIS files. This is not the default setting, so you need to explicitly set that flag.
+
+    See also \Layout#each_meta_info, \Layout#meta_info_value, \Layout#meta_info and \Layout#remove_meta_info as well as the corresponding \Cell methods.
+
+    An example of how to attach persisted meta information to a cell is here:
+
+    @code
+    ly = RBA::Layout::new
+    c1 = ly.create_cell("C1")
+
+    mi = RBA::LayoutMetaInfo::new("the-answer", 42.0)
+    mi.persisted = true
+    c1.add_meta_info(mi)
+
+    # will now hold this piece of meta information attached to cell 'C1':
+    ly.write("to.gds")
+    @/code
+
+    This class has been introduced in version 0.25 and was extended in version 0.28.8.
     """
     description: str
     r"""
@@ -27908,7 +28260,17 @@ class LayoutMetaInfo:
     Setter:
     @brief Sets the name of the layout meta info object
     """
-    value: str
+    persisted: bool
+    r"""
+    Getter:
+    @brief Gets a value indicating whether the meta information will be persisted
+    This predicate was introduced in version 0.28.8.
+
+    Setter:
+    @brief Sets a value indicating whether the meta information will be persisted
+    This predicate was introduced in version 0.28.8.
+    """
+    value: Any
     r"""
     Getter:
     @brief Gets the value of the layout meta info object
@@ -27917,12 +28279,15 @@ class LayoutMetaInfo:
     @brief Sets the value of the layout meta info object
     """
     @classmethod
-    def new(cls, name: str, value: str, description: Optional[str] = ...) -> LayoutMetaInfo:
+    def new(cls, name: str, value: Any, description: Optional[str] = ..., persisted: Optional[bool] = ...) -> LayoutMetaInfo:
         r"""
         @brief Creates a layout meta info object
         @param name The name
         @param value The value
         @param description An optional description text
+        @param persisted If true, the meta information will be persisted in some file formats, like GDS2
+
+        The 'persisted' attribute has been introduced in version 0.28.8.
         """
     def __copy__(self) -> LayoutMetaInfo:
         r"""
@@ -27932,12 +28297,15 @@ class LayoutMetaInfo:
         r"""
         @brief Creates a copy of self
         """
-    def __init__(self, name: str, value: str, description: Optional[str] = ...) -> None:
+    def __init__(self, name: str, value: Any, description: Optional[str] = ..., persisted: Optional[bool] = ...) -> None:
         r"""
         @brief Creates a layout meta info object
         @param name The name
         @param value The value
         @param description An optional description text
+        @param persisted If true, the meta information will be persisted in some file formats, like GDS2
+
+        The 'persisted' attribute has been introduced in version 0.28.8.
         """
     def _create(self) -> None:
         r"""
@@ -28006,6 +28374,11 @@ class LayoutMetaInfo:
         @brief Returns a value indicating whether the reference is a const reference
         This method returns true, if self is a const reference.
         In that case, only const methods may be called on self.
+        """
+    def is_persisted(self) -> bool:
+        r"""
+        @brief Gets a value indicating whether the meta information will be persisted
+        This predicate was introduced in version 0.28.8.
         """
 
 class LayoutQuery:
@@ -28348,12 +28721,12 @@ class LayoutToNetlist:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -28378,12 +28751,12 @@ class LayoutToNetlist:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -29665,12 +30038,12 @@ class LoadLayoutOptions:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -30428,15 +30801,6 @@ class LoadLayoutOptions:
     This attribute has been added in version 0.28.
     """
     @classmethod
-    def from_technology(cls, technology: str) -> LoadLayoutOptions:
-        r"""
-        @brief Gets the reader options of a given technology
-        @param technology The name of the technology to apply
-        Returns the reader options of a specific technology. If the technology name is not valid or an empty string, the reader options of the default technology are returned.
-
-        This method has been introduced in version 0.25
-        """
-    @classmethod
     def new(cls) -> LoadLayoutOptions:
         r"""
         @brief Creates a new object of this class
@@ -30954,6 +31318,11 @@ class Matrix2d:
         @param v The vector to transform.
         @return The transformed vector
         """
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert the matrix to a string.
+        @return The string representing this matrix
+        """
     @overload
     def __rmul__(self, box: DBox) -> DBox:
         r"""
@@ -31395,6 +31764,11 @@ class Matrix3d:
         @param v The vector to transform.
         @return The transformed vector
         """
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert the matrix to a string.
+        @return The string representing this matrix
+        """
     @overload
     def __rmul__(self, box: DBox) -> DBox:
         r"""
@@ -31821,6 +32195,12 @@ class Net(NetlistObject):
     @brief Sets the name of the net.
     The name of the net is used for naming the net in schematic files for example. The name of the net has to be unique.
     """
+    def __repr__(self) -> str:
+        r"""
+        @brief Gets the qualified name.
+        The qualified name is like the expanded name, but the circuit's name is preceded
+        (i.e. 'CIRCUIT:NET') if available.
+        """
     def __str__(self) -> str:
         r"""
         @brief Gets the qualified name.
@@ -32445,14 +32825,14 @@ class NetTerminalRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to.
+        @brief Gets the net this terminal reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this terminal reference is attached to.
         """
     def terminal_def(self) -> DeviceTerminalDefinition:
         r"""
@@ -33081,9 +33461,19 @@ class NetTracerTechnologyComponent(TechnologyComponent):
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+    def add(self, connection: NetTracerConnectivity) -> None:
+        r"""
+        @brief Adds a connectivity definition.
+        This method has been introduced in version 0.28.7
+        """
     def assign(self, other: TechnologyComponent) -> None:
         r"""
         @brief Assigns another object to self
+        """
+    def clear(self) -> None:
+        r"""
+        @brief Removes all connectivity definitions.
+        This method has been introduced in version 0.28.7
         """
     def dup(self) -> NetTracerTechnologyComponent:
         r"""
@@ -33130,6 +33520,11 @@ class Netlist:
     def __init__(self) -> None:
         r"""
         @brief Creates a new object of this class
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts the netlist to a string representation.
+        This method is intended for test purposes mainly.
         """
     def __str__(self) -> str:
         r"""
@@ -33312,16 +33707,16 @@ class Netlist:
     @overload
     def each_circuit_top_down(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits top-down
-        Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
-        """
-    @overload
-    def each_circuit_top_down(self) -> Iterator[Circuit]:
-        r"""
         @brief Iterates over the circuits top-down (const version)
         Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
 
         This constness variant has been introduced in version 0.26.8.
+        """
+    @overload
+    def each_circuit_top_down(self) -> Iterator[Circuit]:
+        r"""
+        @brief Iterates over the circuits top-down
+        Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
         """
     @overload
     def each_device_class(self) -> Iterator[DeviceClass]:
@@ -34760,14 +35155,6 @@ class NetlistSpiceReader(NetlistReader):
         r"""
         @brief Creates a new reader with a delegate.
         """
-    def __copy__(self) -> NetlistSpiceReader:
-        r"""
-        @brief Creates a copy of self
-        """
-    def __deepcopy__(self) -> NetlistSpiceReader:
-        r"""
-        @brief Creates a copy of self
-        """
     @overload
     def __init__(self) -> None:
         r"""
@@ -34814,14 +35201,6 @@ class NetlistSpiceReader(NetlistReader):
         Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
-        """
-    def assign(self, other: NetlistReader) -> None:
-        r"""
-        @brief Assigns another object to self
-        """
-    def dup(self) -> NetlistSpiceReader:
-        r"""
-        @brief Creates a copy of self
         """
 
 class NetlistSpiceReaderDelegate:
@@ -34887,6 +35266,15 @@ class NetlistSpiceReaderDelegate:
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
         """
+    def apply_parameter_scaling(self, device: Device) -> None:
+        r"""
+        @brief Applies parameter scaling to the given device
+        Applies SI scaling (according to the parameter's si_scaling attribute) and geometry scaling (according to the parameter's geo_scale_exponent attribute) to the device parameters. Use this method of finish the device when you have created a custom device yourself.
+
+        The geometry scale is taken from the '.options scale=...' control statement.
+
+        This method has been introduced in version 0.28.6.
+        """
     def assign(self, other: NetlistSpiceReaderDelegate) -> None:
         r"""
         @brief Assigns another object to self
@@ -34928,6 +35316,11 @@ class NetlistSpiceReaderDelegate:
     def finish(self, arg0: Netlist) -> None:
         r"""
         @hide
+        """
+    def get_scale(self) -> float:
+        r"""
+        @brief Gets the scale factor set with '.options scale=...'
+        This method has been introduced in version 0.28.6.
         """
     def is_const_object(self) -> bool:
         r"""
@@ -35915,12 +36308,12 @@ class PCellParameterState:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -36798,6 +37191,10 @@ class Path:
         @brief Inequality test
         @param p The object to compare against
         """
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert to a string
+        """
     def __rmul__(self, f: float) -> Path:
         r"""
         @brief Scaling by some factor
@@ -37284,6 +37681,13 @@ class Point:
 
         This method has been added in version 0.23.
         """
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion.
+        If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
+        """
     def __rmul__(self, f: float) -> Point:
         r"""
         @brief Scaling by some factor
@@ -37685,6 +38089,10 @@ class Polygon:
         r"""
         @brief Returns a value indicating whether the polygons are not equal
         @param p The object to compare against
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
         """
     def __rmul__(self, f: float) -> Polygon:
         r"""
@@ -38294,6 +38702,13 @@ class Polygon:
 
         This method was introduced in version 0.23. The 'keep_hv' optional parameter was added in version 0.27.
         """
+    def sort_holes(self) -> None:
+        r"""
+        @brief Brings the holes in a specific order
+        This function is normalize the hole order so the comparison of two polygons does not depend on the order the holes were inserted. Polygons generated by KLayout's alorithms have their holes sorted.
+
+        This method has been introduced in version 0.28.8.
+        """
     def split(self) -> List[Polygon]:
         r"""
         @brief Splits the polygon into two or more parts
@@ -38485,12 +38900,12 @@ class PreferredOrientation:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -38670,12 +39085,12 @@ class PropertyConstraint:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -38700,12 +39115,12 @@ class PropertyConstraint:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -40138,12 +40553,12 @@ class Region(ShapeCollection):
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -40168,12 +40583,12 @@ class Region(ShapeCollection):
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -40889,6 +41304,11 @@ class Region(ShapeCollection):
         @return The resulting region
 
         The boolean OR is implemented by merging the polygons of both regions. To simply join the regions without merging, the + operator is more efficient.
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts the region to a string
+        The length of the output is limited to 20 polygons to avoid giant strings on large regions. For full output use "to_s" with a maximum count parameter.
         """
     def __str__(self) -> str:
         r"""
@@ -44672,6 +45092,12 @@ class Shape:
         r"""
         @brief Inequality operator
         """
+    def __repr__(self) -> str:
+        r"""
+        @brief Create a string showing the contents of the reference
+
+        This method has been introduced with version 0.16.
+        """
     def __str__(self) -> str:
         r"""
         @brief Create a string showing the contents of the reference
@@ -45543,10 +45969,16 @@ class Shapes:
     SAll: ClassVar[int]
     r"""
     @brief Indicates that all shapes shall be retrieved
+    You can use this constant to construct 'except' classes - e.g. to specify 'all shape types except boxes' use
+
+    @code SAll - SBoxes @/code
     """
     SAllWithProperties: ClassVar[int]
     r"""
     @brief Indicates that all shapes with properties shall be retrieved
+    Using this selector means to retrieve only shapes with properties.You can use this constant to construct 'except' classes - e.g. to specify 'all shape types with properties except boxes' use
+
+    @code SAllWithProperties - SBoxes @/code
     """
     SBoxes: ClassVar[int]
     r"""
@@ -45576,6 +46008,7 @@ class Shapes:
     SProperties: ClassVar[int]
     r"""
     @brief Indicates that only shapes with properties shall be retrieved
+    You can or-combine this flag with the plain shape types to select a certain shape type, but only those shapes with properties. For example to select boxes with properties, use 'SProperties | SBoxes'.
     """
     SRegions: ClassVar[int]
     r"""
@@ -45600,11 +46033,17 @@ class Shapes:
     def s_all(cls) -> int:
         r"""
         @brief Indicates that all shapes shall be retrieved
+        You can use this constant to construct 'except' classes - e.g. to specify 'all shape types except boxes' use
+
+        @code SAll - SBoxes @/code
         """
     @classmethod
     def s_all_with_properties(cls) -> int:
         r"""
         @brief Indicates that all shapes with properties shall be retrieved
+        Using this selector means to retrieve only shapes with properties.You can use this constant to construct 'except' classes - e.g. to specify 'all shape types with properties except boxes' use
+
+        @code SAllWithProperties - SBoxes @/code
         """
     @classmethod
     def s_boxes(cls) -> int:
@@ -45641,6 +46080,7 @@ class Shapes:
     def s_properties(cls) -> int:
         r"""
         @brief Indicates that only shapes with properties shall be retrieved
+        You can or-combine this flag with the plain shape types to select a certain shape type, but only those shapes with properties. For example to select boxes with properties, use 'SProperties | SBoxes'.
         """
     @classmethod
     def s_regions(cls) -> int:
@@ -45731,10 +46171,19 @@ class Shapes:
 
         This method has been added in version 0.28.
         """
+    @overload
     def clear(self) -> None:
         r"""
         @brief Clears the shape container
-        This method has been introduced in version 0.16. It can only be used in editable mode.
+        This method has been introduced in version 0.16.
+        """
+    @overload
+    def clear(self, flags: int) -> None:
+        r"""
+        @brief Clears certain shape types from the shape container
+        Only shapes matching the shape types from 'flags' are removed. 'flags' is a combination of the S... constants.
+
+        This method has been introduced in version 0.28.9.
         """
     def create(self) -> None:
         r"""
@@ -46959,6 +47408,10 @@ class SimplePolygon:
         @brief Returns a value indicating whether self is not equal to p
         @param p The object to compare against
         """
+    def __repr__(self) -> str:
+        r"""
+        @brief Returns a string representing the polygon
+        """
     def __rmul__(self, f: float) -> SimplePolygon:
         r"""
         @brief Scales the polygon by some factor
@@ -47535,16 +47988,16 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in.
-        This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
-        """
-    @overload
-    def circuit(self) -> Circuit:
-        r"""
         @brief Gets the circuit the subcircuit lives in (non-const version).
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
 
         This constness variant has been introduced in version 0.26.8
+        """
+    @overload
+    def circuit(self) -> Circuit:
+        r"""
+        @brief Gets the circuit the subcircuit lives in.
+        This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
         """
     @overload
     def circuit_ref(self) -> Circuit:
@@ -48119,7 +48572,8 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     x: int
     r"""
@@ -48270,6 +48724,13 @@ class Text:
 
 
         Return true, if this text object and the given text are not equal 
+        """
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief Converts the object to a string.
+        If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
         """
     def __str__(self, dbu: Optional[float] = ...) -> str:
         r"""
@@ -48997,6 +49458,11 @@ class Texts(ShapeCollection):
 
         Starting with version 0.27, the method is called 'count' for consistency with \Region. 'size' is still provided as an alias.
         """
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts the text collection to a string
+        The length of the output is limited to 20 texts to avoid giant strings on large collections. For full output use "to_s" with a maximum count parameter.
+        """
     def __str__(self) -> str:
         r"""
         @brief Converts the text collection to a string
@@ -49066,26 +49532,9 @@ class Texts(ShapeCollection):
 
         Starting with version 0.27, the method is called 'count' for consistency with \Region. 'size' is still provided as an alias.
         """
-    def create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
     def data_id(self) -> int:
         r"""
         @brief Returns the data ID (a unique identifier for the underlying data storage)
-        """
-    def destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-    def destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
         """
     def disable_progress(self) -> None:
         r"""
@@ -49186,12 +49635,6 @@ class Texts(ShapeCollection):
         @brief Returns the texts from this text collection which are inside or on the edge of polygons from the given region
 
         @return A new text collection containing the texts inside or on the edge of polygons from the region
-        """
-    def is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
         """
     def is_deep(self) -> bool:
         r"""
@@ -49922,14 +50365,6 @@ class TilingProcessor:
         @param edges The \Edges object to which the data is sent
         """
     @overload
-    def output(self, name: str, image: lay.BasicImage) -> None:
-        r"""
-        @brief Specifies output to an image
-        This method will establish an output channel which delivers float data to image data. The image is a monochrome image where each pixel corresponds to a single tile. This method for example is useful to collect density information into an image. The image is configured such that each pixel covers one tile.
-
-        The name is the name which must be used in the _output function of the scripts in order to address that channel.
-        """
-    @overload
     def output(self, name: str, layout: Layout, cell: int, layer_index: int) -> None:
         r"""
         @brief Specifies output to a layout layer
@@ -49954,14 +50389,6 @@ class TilingProcessor:
         @param layout The layout to which the data is sent
         @param cell The index of the cell to which the data is sent
         @param lp The layer specification where the output will be sent to
-        """
-    @overload
-    def output(self, name: str, rdb: rdb.ReportDatabase, cell_id: int, category_id: int) -> None:
-        r"""
-        @brief Specifies output to a report database
-        This method will establish an output channel for the processor. The output sent to that channel will be put into the report database given by the "rdb" parameter. "cell_id" specifies the cell and "category_id" the category to use.
-
-        The name is the name which must be used in the _output function of the scripts in order to address that channel.
         """
     @overload
     def output(self, name: str, rec: TileOutputReceiverBase) -> None:
@@ -50504,6 +50931,13 @@ class Trans:
         r"""
         @brief Tests for inequality
         """
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion
+        If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
+        """
     @overload
     def __rmul__(self, box: Box) -> Box:
         r"""
@@ -50866,12 +51300,12 @@ class TrapezoidDecompositionMode:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -51175,12 +51609,12 @@ class VAlign:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -51820,6 +52254,14 @@ class VCplxTrans:
         r"""
         @brief Tests for inequality
         """
+    def __repr__(self, lazy: Optional[bool] = ..., dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion
+        If 'lazy' is true, some parts are omitted when not required.
+        If a DBU is given, the output units will be micrometers.
+
+        The lazy and DBU arguments have been added in version 0.27.6.
+        """
     @overload
     def __rmul__(self, box: DBox) -> Box:
         r"""
@@ -52368,6 +52810,13 @@ class Vector:
 
 
         Returns a new vector with -x,-y.
+        """
+    def __repr__(self, dbu: Optional[float] = ...) -> str:
+        r"""
+        @brief String conversion
+        If a DBU is given, the output units will be micrometers.
+
+        The DBU argument has been added in version 0.27.6.
         """
     @overload
     def __rmul__(self, f: float) -> Vector:

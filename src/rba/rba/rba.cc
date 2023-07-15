@@ -111,7 +111,7 @@ RubyStackTraceProvider::scope_index (const std::vector<tl::BacktraceElement> &bt
 
     //  disable scoped debugging (e.g. DRC script lines) if $KLAYOUT_RBA_DEBUG_SCOPE is set.
     if (consider_scope < 0) {
-      consider_scope = tl::has_env ("KLAYOUT_RBA_DEBUG_SCOPE") ? 0 : 1;
+      consider_scope = tl::app_flag ("rba-debug-scope") ? 0 : 1;
     }
     if (! consider_scope) {
       return 0;
@@ -2490,9 +2490,11 @@ RubyInterpreter::begin_exec ()
 {
   d->exit_on_next = false;
   d->block_exceptions = false;
-  d->file_id_map.clear ();
-  if (d->current_exec_level++ == 0 && d->current_exec_handler) {
-    d->current_exec_handler->start_exec (this);
+  if (d->current_exec_level++ == 0) {
+    d->file_id_map.clear ();
+    if (d->current_exec_handler) {
+      d->current_exec_handler->start_exec (this);
+    }
   }
 }
 

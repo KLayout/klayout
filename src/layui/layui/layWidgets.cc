@@ -403,7 +403,9 @@ BEGIN_PROTECTED
         }
       }
 
-      mp_private->view->manager ()->transaction (tl::to_string (QObject::tr ("New layer"))); 
+      if (mp_private->view->manager ()) {
+        mp_private->view->manager ()->transaction (tl::to_string (QObject::tr ("New layer")));
+      }
 
       unsigned int l = cv->layout ().insert_layer (lp);
       std::vector <unsigned int> nl;
@@ -411,7 +413,9 @@ BEGIN_PROTECTED
       mp_private->view->add_new_layers (nl, mp_private->cv_index);
       mp_private->view->update_content ();
 
-      mp_private->view->manager ()->commit ();
+      if (mp_private->view->manager ()) {
+        mp_private->view->manager ()->commit ();
+      }
 
       //  NOTE: add_new_layers has triggered update_layer_list which already added the new layer
       set_current_layer (lp);

@@ -151,10 +151,6 @@ public:
 
     }
 
-    std::set<db::cell_index_type> callers_b;
-    m_layout_b.cell (cell_b).collect_caller_cells (callers_b, selection_cone_b, -1);
-    callers_b.insert (cell_b);
-
     m_repr_set = false;
 
     std::map<db::cell_index_type, db::ICplxTrans>::const_iterator r = m_repr.find (cell_b);
@@ -164,7 +160,11 @@ public:
         return false;
       }
     }
-    
+
+    std::set<db::cell_index_type> callers_b;
+    m_layout_b.cell (cell_b).collect_caller_cells (callers_b, selection_cone_b, -1);
+    callers_b.insert (cell_b);
+
     trans_set_t trans (m_trans);
 
     double mag = m_layout_b.dbu () / m_layout_a.dbu ();
@@ -356,7 +356,7 @@ CellMapping::do_create_missing_mapping (db::Layout &layout_a, const db::Layout &
         && (! exclude_cells || exclude_cells->find (*b) == exclude_cells->end ())
         && (! include_cells || include_cells->find (*b) != include_cells->end ())) {
 
-      db::cell_index_type new_cell = layout_a.add_cell (layout_b.cell_name (*b));
+      db::cell_index_type new_cell = layout_a.add_cell (layout_b, *b);
       new_cells.push_back (new_cell);
       new_cells_b.push_back (*b);
 

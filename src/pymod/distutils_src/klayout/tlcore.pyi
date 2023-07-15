@@ -320,6 +320,10 @@ class ArgType:
         r"""
         @brief Inequality of two types
         """
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert to a string
+        """
     def __str__(self) -> str:
         r"""
         @brief Convert to a string
@@ -2268,6 +2272,10 @@ class Timer:
         r"""
         @brief Creates a new object of this class
         """
+    def __repr__(self) -> str:
+        r"""
+        @brief Produces a string with the currently elapsed times
+        """
     def __str__(self) -> str:
         r"""
         @brief Produces a string with the currently elapsed times
@@ -2411,6 +2419,10 @@ class Value:
         r"""
         @brief Constructs a non-nil object with the given value.
         This constructor has been introduced in version 0.22.
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Convert this object to a string
         """
     def __str__(self) -> str:
         r"""

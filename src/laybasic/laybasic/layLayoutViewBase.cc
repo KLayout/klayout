@@ -260,8 +260,6 @@ LayoutViewBase::LayoutViewBase (lay::LayoutView *ui, db::Manager *manager, bool 
 {
   //  either it's us or the parent has a dispatcher
   tl_assert (dispatcher () != 0);
-
-  init (manager);
 }
 
 void
@@ -3097,7 +3095,7 @@ LayoutViewBase::reload_layout (unsigned int cv_index)
   //  when reading the file, it must have the layers created as well
   lay::CellView cv_empty;
 
-  handle = new lay::LayoutHandle (new db::Layout (manager ()), filename);
+  handle = new lay::LayoutHandle (new db::Layout (is_editable (), manager ()), filename);
   handle->set_tech_name (technology);
   cv_empty.set (handle);
 
@@ -3110,7 +3108,7 @@ LayoutViewBase::reload_layout (unsigned int cv_index)
 
   //  create a new handle
   lay::CellView cv;
-  handle = new lay::LayoutHandle (new db::Layout (manager ()), filename);
+  handle = new lay::LayoutHandle (new db::Layout (is_editable (), manager ()), filename);
   cv.set (handle);
 
   try {
@@ -3202,6 +3200,25 @@ LayoutViewBase::reload_layout (unsigned int cv_index)
   goto_view (state);
 }
 
+static void
+get_lyp_from_meta_info (const db::Layout &layout, std::string &lyp_file, bool &add_other_layers)
+{
+  db::Layout::meta_info_name_id_type layer_properties_file_name_id = layout.meta_info_name_id ("layer-properties-file");
+  db::Layout::meta_info_name_id_type layer_properties_add_other_layers_name_id = layout.meta_info_name_id ("layer-properties-add-other-layers");
+
+  for (db::Layout::meta_info_iterator meta = layout.begin_meta (); meta != layout.end_meta (); ++meta) {
+    if (meta->first == layer_properties_file_name_id) {
+      lyp_file = meta->second.value.to_string ();
+    }
+    if (meta->first == layer_properties_add_other_layers_name_id) {
+      try {
+        add_other_layers = meta->second.value.to_bool ();
+      } catch (...) {
+      }
+    }
+  }
+}
+
 unsigned int 
 LayoutViewBase::add_layout (lay::LayoutHandle *layout_handle, bool add_cellview, bool initialize_layers)
 {
@@ -3266,17 +3283,7 @@ LayoutViewBase::add_layout (lay::LayoutHandle *layout_handle, bool add_cellview,
       }
 
       //  Give the layout object a chance to specify a certain layer property file
-      for (db::Layout::meta_info_iterator meta = cv->layout ().begin_meta (); meta != cv->layout ().end_meta (); ++meta) {
-        if (meta->name == "layer-properties-file") {
-          lyp_file = meta->value;
-        }
-        if (meta->name == "layer-properties-add-other-layers") {
-          try {
-            tl::from_string (meta->value, add_other_layers);
-          } catch (...) {
-          }
-        }
-      }
+      get_lyp_from_meta_info (cv->layout (), lyp_file, add_other_layers);
 
       //  interpolate the layout properties file name
       tl::Eval expr;
@@ -3330,7 +3337,7 @@ LayoutViewBase::create_layout (const std::string &technology, bool add_cellview,
 {
   const db::Technology *tech = db::Technologies::instance ()->technology_by_name (technology);
 
-  db::Layout *layout = new db::Layout (m_editable, manager ());
+  db::Layout *layout = new db::Layout (is_editable (), manager ());
   if (tech) {
     layout->dbu (tech->dbu ());
   }
@@ -3357,7 +3364,7 @@ LayoutViewBase::load_layout (const std::string &filename, const db::LoadLayoutOp
 
   //  create a new layout handle 
   lay::CellView cv;
-  lay::LayoutHandle *handle = new lay::LayoutHandle (new db::Layout (manager ()), filename);
+  lay::LayoutHandle *handle = new lay::LayoutHandle (new db::Layout (is_editable (), manager ()), filename);
   cv.set (handle);
 
   unsigned int cv_index;
@@ -3438,17 +3445,7 @@ LayoutViewBase::load_layout (const std::string &filename, const db::LoadLayoutOp
     }
 
     //  Give the layout object a chance to specify a certain layer property file
-    for (db::Layout::meta_info_iterator meta = cv->layout().begin_meta (); meta != cv->layout().end_meta (); ++meta) {
-      if (meta->name == "layer-properties-file") {
-        lyp_file = meta->value;
-      }
-      if (meta->name == "layer-properties-add-other-layers") {
-        try {
-          tl::from_string (meta->value, add_other_layers);
-        } catch (...) {
-        }
-      }
-    }
+    get_lyp_from_meta_info (cv->layout (), lyp_file, add_other_layers);
 
     //  interpolate the layout properties file name
     tl::Eval expr;
@@ -3853,13 +3850,26 @@ LayoutViewBase::pan_center (const db::DPoint &p)
 void
 LayoutViewBase::zoom_in ()
 {
-  shift_window (zoom_factor, 0.0, 0.0);
+  zoom_by (zoom_factor);
 }
 
 void
 LayoutViewBase::zoom_out ()
 {
-  shift_window (1.0 / zoom_factor, 0.0, 0.0);
+  zoom_by (1.0 / zoom_factor);
+}
+
+void
+LayoutViewBase::zoom_by (double f)
+{
+  db::DBox b = mp_canvas->viewport ().box ();
+
+  db::DPoint c = b.center ();
+  if (mp_canvas->mouse_in_window ()) {
+    c = mp_canvas->mouse_position_um ();
+  }
+
+  zoom_box ((b.moved (db::DPoint () - c) * f).moved (c - db::DPoint ()));
 }
 
 void

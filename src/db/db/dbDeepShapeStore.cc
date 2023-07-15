@@ -487,13 +487,13 @@ static unsigned int init_layer (db::Layout &layout, const db::RecursiveShapeIter
 }
 
 DeepShapeStore::DeepShapeStore ()
-  : m_keep_layouts (true)
+  : m_keep_layouts (true), m_wants_all_cells (false)
 {
   ++s_instance_count;
 }
 
 DeepShapeStore::DeepShapeStore (const std::string &topcell_name, double dbu)
-  : m_keep_layouts (true)
+  : m_keep_layouts (true), m_wants_all_cells (false)
 {
   ++s_instance_count;
 
@@ -765,6 +765,16 @@ double DeepShapeStore::max_area_ratio () const
   return m_state.max_area_ratio ();
 }
 
+void DeepShapeStore::set_wants_all_cells (bool f)
+{
+  m_wants_all_cells = f;
+}
+
+bool DeepShapeStore::wants_all_cells () const
+{
+  return m_wants_all_cells;
+}
+
 void DeepShapeStore::set_reject_odd_polygons (bool f)
 {
   m_state.set_reject_odd_polygons (f);
@@ -928,6 +938,8 @@ DeepLayer DeepShapeStore::create_polygon_layer (const db::RecursiveShapeIterator
 
   db::Layout &layout = m_layouts[layout_index]->layout;
   db::HierarchyBuilder &builder = m_layouts[layout_index]->builder;
+
+  builder.set_wants_all_cells (m_wants_all_cells);
 
   unsigned int layer_index = init_layer (layout, si);
   builder.set_target_layer (layer_index);

@@ -39,6 +39,8 @@
 #include <QHBoxLayout>
 #include <QMessageBox>
 #include <QApplication>
+#include <QPushButton>
+#include <QToolButton>
 
 #include "tlInternational.h"
 #include "tlExpression.h"
@@ -76,6 +78,7 @@
 #include "layEditorOptionsPages.h"
 #include "layUtils.h"
 #include "layPropertiesDialog.h"
+#include "layQtTools.h"
 #include "dbClipboard.h"
 #include "dbLayout.h"
 #include "dbLayoutUtils.h"
@@ -95,11 +98,69 @@ namespace lay
 {
 
 // -------------------------------------------------------------
+//  LayoutViewNotificationWidget implementation
+
+LayoutViewNotificationWidget::LayoutViewNotificationWidget (LayoutViewWidget *parent, const LayoutViewNotification *notification)
+  : QFrame (parent), mp_parent (parent), mp_notification (notification)
+{
+  setBackgroundRole (QPalette::ToolTipBase);
+  setAutoFillBackground (true);
+
+  QHBoxLayout *layout = new QHBoxLayout (this);
+  layout->setContentsMargins (4, 4, 4, 4);
+
+  QLabel *title_label = new QLabel (this);
+  layout->addWidget (title_label, 1);
+  title_label->setText (tl::to_qstring (notification->title ()));
+  title_label->setForegroundRole (QPalette::ToolTipText);
+  title_label->setWordWrap (true);
+  activate_help_links (title_label);
+
+  for (auto a = notification->actions ().begin (); a != notification->actions ().end (); ++a) {
+
+    QPushButton *pb = new QPushButton (this);
+    layout->addWidget (pb);
+
+    pb->setText (tl::to_qstring (a->second));
+    m_action_buttons.insert (std::make_pair (pb, a->first));
+    connect (pb, SIGNAL (clicked ()), this, SLOT (action_triggered ()));
+
+  }
+
+  QToolButton *close_button = new QToolButton ();
+  close_button->setIcon (QIcon (":clear_edit_16px.png"));
+  close_button->setAutoRaise (true);
+  layout->addWidget (close_button);
+
+  connect (close_button, SIGNAL (clicked ()), this, SLOT (close_triggered ()));
+}
+
+void
+LayoutViewNotificationWidget::action_triggered ()
+{
+  auto a = m_action_buttons.find (sender ());
+  if (a != m_action_buttons.end ()) {
+    mp_parent->notification_action (*mp_notification, a->second);
+  }
+}
+
+void
+LayoutViewNotificationWidget::close_triggered ()
+{
+  mp_parent->remove_notification (*mp_notification);
+}
+
+// -------------------------------------------------------------
 //  LayoutViewWidget implementation
 
 LayoutViewWidget::LayoutViewWidget (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent, unsigned int options)
   : QFrame (parent), mp_view (0)
 {
+  mp_layout = new QVBoxLayout (this);
+  mp_layout->setContentsMargins (0, 0, 0, 0);
+  mp_layout->setSpacing (0);
+  mp_layout->addStretch (1);
+
   //  NOTE: construction the LayoutView may trigger events (script code executed etc.) which must
   //  not meet an invalid mp_view pointer (e.g. in eventFilter). Hence, mp_view is 0 first, and set only
   //  after the LayoutView is successfully constructed.
@@ -110,6 +171,11 @@ LayoutViewWidget::LayoutViewWidget (db::Manager *mgr, bool editable, lay::Plugin
 LayoutViewWidget::LayoutViewWidget (lay::LayoutView *source, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, QWidget *parent, unsigned int options)
   : QFrame (parent), mp_view (0)
 {
+  mp_layout = new QVBoxLayout (this);
+  mp_layout->setContentsMargins (0, 0, 0, 0);
+  mp_layout->setSpacing (0);
+  mp_layout->addStretch (1);
+
   //  NOTE: construction the LayoutView may trigger events (script code executed etc.) which must
   //  not meet an invalid mp_view pointer (e.g. in eventFilter). Hence, mp_view is 0 first, and set only
   //  after the LayoutView is successfully constructed.
@@ -125,6 +191,55 @@ LayoutViewWidget::~LayoutViewWidget ()
 }
 
 void
+LayoutViewWidget::add_notification (const LayoutViewNotification &notificaton)
+{
+  if (m_notification_widgets.find (&notificaton) == m_notification_widgets.end ()) {
+    m_notifications.push_back (notificaton);
+    QWidget *w = new LayoutViewNotificationWidget (this, &m_notifications.back ());
+    m_notification_widgets.insert (std::make_pair (&m_notifications.back (), w));
+    mp_layout->insertWidget (0, w);
+  }
+}
+
+void
+LayoutViewWidget::remove_notification (const LayoutViewNotification &notification)
+{
+  auto nw = m_notification_widgets.find (&notification);
+  if (nw != m_notification_widgets.end ()) {
+
+    nw->second->deleteLater ();
+    m_notification_widgets.erase (nw);
+
+    for (auto n = m_notifications.begin (); n != m_notifications.end (); ++n) {
+      if (*n == notification) {
+        m_notifications.erase (n);
+        break;
+      }
+    }
+
+  }
+}
+
+void
+LayoutViewWidget::notification_action (const LayoutViewNotification &notification, const std::string &action)
+{
+  if (action == "reload") {
+
+    std::string fn = notification.parameter ().to_string ();
+
+    for (unsigned int cvi = 0; cvi < mp_view->cellviews (); ++cvi) {
+      const lay::CellView &cv = mp_view->cellview (cvi);
+      if (cv->filename () == fn) {
+        mp_view->reload_layout (cvi);
+      }
+    }
+
+    remove_notification (notification);
+
+  }
+}
+
+void
 LayoutViewWidget::view_deleted (lay::LayoutView *view)
 {
   if (view != mp_view) {
@@ -133,6 +248,14 @@ LayoutViewWidget::view_deleted (lay::LayoutView *view)
 
   //  creates a new view so the view is never invalid
   mp_view = new LayoutView (view->manager (), view->is_editable (), view->plugin_parent (), this, view->options ());
+}
+
+void
+LayoutViewWidget::resizeEvent (QResizeEvent *)
+{
+  if (mp_view && mp_view->canvas ()) {
+    mp_view->canvas ()->resize (width (), height ());
+  }
 }
 
 QSize
@@ -279,7 +402,7 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
-  init_ui ();
+  init_ui (manager);
 }
 
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, unsigned int options)
@@ -290,7 +413,7 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
-  init_ui ();
+  init_ui (manager);
 
   copy_from (source);
 
@@ -306,7 +429,7 @@ LayoutView::LayoutView (db::Manager *manager, bool editable, lay::Plugin *plugin
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
-  init_ui ();
+  init_ui (manager);
 }
 
 LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool editable, lay::Plugin *plugin_parent, LayoutViewWidget *widget, unsigned int options)
@@ -317,7 +440,7 @@ LayoutView::LayoutView (lay::LayoutView *source, db::Manager *manager, bool edit
   //  ensures the deferred method scheduler is present
   tl::DeferredMethodScheduler::instance ();
 
-  init_ui ();
+  init_ui (manager);
 
   copy_from (source);
 
@@ -349,7 +472,7 @@ LayoutView::event_filter (QObject *obj, QEvent *event, bool &taken)
 }
 
 void
-LayoutView::init_ui ()
+LayoutView::init_ui (db::Manager *mgr)
 {
   m_activated = true;
   m_always_show_source = false;
@@ -373,16 +496,15 @@ LayoutView::init_ui ()
   mp_min_hier_spbx = 0;
   mp_max_hier_spbx = 0;
 
+  //  NOTE: it's important to call LayoutViewBase::init from LayoutView because creating the plugins will need a
+  //  fully constructed LayoutView (issue #1360)
+  LayoutViewBase::init (mgr);
+
   if (mp_widget) {
 
     canvas ()->init_ui (mp_widget);
 
     mp_connector = new LayoutViewSignalConnector (mp_widget, this);
-
-    QVBoxLayout *vbl = new QVBoxLayout (mp_widget);
-    vbl->setContentsMargins (0, 0, 0, 0);
-    vbl->setSpacing (0);
-    vbl->addWidget (canvas ()->widget ());
 
     if ((options () & LV_NoHierarchyPanel) == 0 && (options () & LV_Naked) == 0) {
 

@@ -137,6 +137,16 @@ public:
 
   virtual size_t scope_index () const
   {
+    static int consider_scope = -1;
+
+    //  disable scoped debugging (e.g. DRC script lines) if $KLAYOUT_PYA_DEBUG_SCOPE is set.
+    if (consider_scope < 0) {
+      consider_scope = tl::app_flag ("pya-debug-scope") ? 0 : 1;
+    }
+    if (! consider_scope) {
+      return 0;
+    }
+
     if (! m_scope.empty ()) {
       for (size_t i = 0; i < m_stack_trace.size (); ++i) {
         if (m_stack_trace [i].file == m_scope) {
@@ -856,10 +866,12 @@ gsi::Console *PythonInterpreter::current_console () const
 
 void PythonInterpreter::begin_execution ()
 {
-  m_file_id_map.clear ();
   m_block_exceptions = false;
-  if (m_current_exec_level++ == 0 && mp_current_exec_handler) {
-    mp_current_exec_handler->start_exec (this);
+  if (m_current_exec_level++ == 0) {
+    m_file_id_map.clear ();
+    if (mp_current_exec_handler) {
+      mp_current_exec_handler->start_exec (this);
+    }
   }
 }
 

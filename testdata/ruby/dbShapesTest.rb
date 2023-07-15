@@ -1595,6 +1595,34 @@ class DBShapes_TestClass < TestBase
 
   end
 
+  # Shapes with shape-type specific insert and clear
+  def test_11
+
+    s = RBA::Shapes::new
+    s.insert(RBA::Box::new(1, 2, 3, 4))
+    s.insert(RBA::Polygon::new(RBA::Box::new(1, 2, 3, 4)))
+
+    assert_equal(s.each.collect { |sh| sh.to_s }.join("; "), "polygon (1,2;1,4;3,4;3,2); box (1,2;3,4)")
+
+    s2 = RBA::Shapes::new
+    s2.insert(s)
+
+    assert_equal(s2.each.collect { |sh| sh.to_s }.join("; "), "polygon (1,2;1,4;3,4;3,2); box (1,2;3,4)")
+
+    s2.clear(RBA::Shapes::SPolygons)
+
+    assert_equal(s2.each.collect { |sh| sh.to_s }.join("; "), "box (1,2;3,4)")
+
+    s2.clear
+    
+    assert_equal(s2.each.collect { |sh| sh.to_s }.join("; "), "")
+
+    s2.insert(s, RBA::Shapes::SPolygons)
+
+    assert_equal(s2.each.collect { |sh| sh.to_s }.join("; "), "polygon (1,2;1,4;3,4;3,2)")
+
+  end
+
 end
 
 load("test_epilogue.rb")

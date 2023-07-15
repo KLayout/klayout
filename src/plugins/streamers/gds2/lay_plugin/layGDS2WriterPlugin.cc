@@ -145,9 +145,10 @@ public:
     //  Initialize the libname property from meta data with key "libname".
     db::GDS2WriterOptions *options = dynamic_cast<db::GDS2WriterOptions *> (o);
     if (options) {
+      db::Layout::meta_info_name_id_type libname_name_id = lh.layout().meta_info_name_id ("libname");
       for (db::Layout::meta_info_iterator meta = lh.layout().begin_meta (); meta != lh.layout().end_meta (); ++meta) {
-        if (meta->name == "libname" && !meta->value.empty ()) {
-          options->libname = meta->value;
+        if (meta->first == libname_name_id && !meta->second.value.is_nil ()) {
+          options->libname = meta->second.value.to_string ();
         }
       }
     }

@@ -401,6 +401,8 @@ TEST (10)
     EXPECT_EQ (tl::extension_last ("\\hello\\.world.gz"), "gz");
     EXPECT_EQ (tl::extension_last ("/hello//world/"), "");
 
+    EXPECT_EQ (tl::is_absolute ("~/world"), true);
+    EXPECT_EQ (tl::is_absolute ("~"), true);
     EXPECT_EQ (tl::is_absolute ("world"), false);
     EXPECT_EQ (tl::is_absolute ("world/"), false);
     EXPECT_EQ (tl::is_absolute ("hello//world/"), false);
@@ -795,4 +797,22 @@ TEST (18)
     tl::InputStream is (zfile);
     EXPECT_EQ (is.read_all (), "hello, world!\n");
   }
+}
+
+//  get_home_path
+TEST (19)
+{
+  std::string home = tl::get_home_path ();
+  //  no specific value, just something ...
+  EXPECT_EQ (home.size () > 5, true);
+#if defined(HAVE_QT)
+  EXPECT_EQ (tl::replaced (home, "\\", "/"), tl::replaced (tl::to_string (QDir::homePath ()), "\\", "/"));
+#endif
+}
+
+//  absolute path with "~" expansion
+TEST (20)
+{
+  EXPECT_EQ (tl::absolute_file_path ("~"), tl::get_home_path ());
+  EXPECT_EQ (tl::absolute_file_path (tl::combine_path ("~", "test")), tl::combine_path (tl::get_home_path (), "test"));
 }

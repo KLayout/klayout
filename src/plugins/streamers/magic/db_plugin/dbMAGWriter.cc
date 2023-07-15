@@ -82,11 +82,14 @@ MAGWriter::write (db::Layout &layout, tl::OutputStream &stream, const db::SaveLa
 
   double lambda = m_options.lambda;
   if (lambda <= 0.0) {
-    const std::string &lv = layout.meta_info_value ("lambda");
-    if (lv.empty ()) {
+    const tl::Variant &lv = layout.meta_info ("lambda").value;
+    if (lv.is_nil ()) {
       throw tl::Exception (tl::to_string (tr ("No lambda value configured for MAG writer and no 'lambda' metadata present in layout.")));
+    } else if (lv.is_a_string ()) {
+      tl::from_string (lv.to_string (), lambda);
+    } else if (lv.can_convert_to_double ()) {
+      lambda = lv.to_double ();
     }
-    tl::from_string (lv, lambda);
   }
 
   m_sf = layout.dbu () / lambda;

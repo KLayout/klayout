@@ -24,6 +24,7 @@
 #include "tlStream.h"
 #include "tlLog.h"
 #include "tlInternational.h"
+#include "tlEnv.h"
 
 #include <cctype>
 
@@ -52,6 +53,7 @@
 #  include <dirent.h>
 #  include <libproc.h>
 #  include <dlfcn.h>
+#  include <pwd.h>
 
 #else
 
@@ -59,6 +61,7 @@
 #  include <unistd.h>
 #  include <dirent.h>
 #  include <dlfcn.h>
+#  include <pwd.h>
 
 #endif
 
@@ -629,7 +632,7 @@ bool chdir (const std::string &path)
 
 static std::pair<std::string, bool> absolute_path_of_existing (const std::string &s)
 {
-#if defined (_WIN32)
+#if defined(_WIN32)
 
   wchar_t *fp = _wfullpath (NULL, tl::to_wstring (s).c_str (), 0);
   if (fp == NULL) {
@@ -657,6 +660,11 @@ static std::pair<std::string, bool> absolute_path_of_existing (const std::string
 
 bool is_absolute (const std::string &s)
 {
+  //  ~ paths are always absolute, because the home directory is
+  if (s.size () > 0 && s[0] == '~') {
+    return true;
+  }
+
   std::vector<std::string> parts = split_path (s);
   if (parts.size () > 1 && is_drive (parts [0])) {
     return is_part_with_separator (parts [1]);
@@ -669,6 +677,11 @@ bool is_absolute (const std::string &s)
 
 std::string absolute_file_path (const std::string &s)
 {
+  //  ~ paths are always absolute, because the home directory is
+  if (s.size () > 0 && s[0] == '~') {
+    return get_home_path () + std::string (s, 1);
+  }
+
   std::vector<std::string> parts = split_path (s);
   if (parts.empty ()) {
     return current_dir ();
@@ -854,10 +867,36 @@ bool is_same_file (const std::string &a, const std::string &b)
 #endif
 }
 
+std::string
+get_home_path ()
+{
+#if !defined(_WIN32)
+  if (tl::has_env ("HOME")) {
+    return tl::get_env ("HOME");
+  } else {
+    struct passwd *pwd = getpwuid (getuid ());
+    if (pwd) {
+      return std::string (pwd->pw_dir);
+    }
+  }
+  tl::warn << tl::to_string (tr ("Unable to get home directory (set HOME environment variable)"));
+#else
+  if (tl::has_env ("HOMEDRIVE") && tl::has_env ("HOMEPATH")) {
+    return tl::get_env ("HOMEDRIVE") + tl::get_env ("HOMEPATH");
+  } else if (tl::has_env ("HOMESHARE") && tl::has_env ("HOMEPATH")) {
+    return tl::get_env ("HOMESHARE") + tl::get_env ("HOMEPATH");
+  } else if (tl::has_env ("USERPROFILE")) {
+    return tl::get_env ("USERPROFILE");
+  }
+  tl::warn << tl::to_string (tr ("Unable to get home directory (no HOMEDRIVE/HOMEPATH, HOMESHARE/HOMEPATH or USERPROFILE environment variables)"));
+#endif
+  return std::string (".");
+}
+
 static std::string
 get_inst_path_internal ()
 {
-#ifdef _WIN32
+#if defined(_WIN32)
 
   wchar_t buffer[MAX_PATH];
   int len;

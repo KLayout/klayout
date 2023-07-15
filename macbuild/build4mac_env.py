@@ -196,7 +196,7 @@ Ruby31MacPorts  = { 'exe': '/opt/local/bin/ruby3.1',
 #  install with 'sudo port install ruby32'
 # [Key Type Name] = 'MP32'
 Ruby32MacPorts  = { 'exe': '/opt/local/bin/ruby3.2',
-                    'inc': '/opt/local/include/ruby-3.2.1',
+                    'inc': '/opt/local/include/ruby-3.2.2',
                     'lib': '/opt/local/lib/libruby.3.2.dylib'
                   }
 

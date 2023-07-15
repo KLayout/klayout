@@ -155,6 +155,11 @@ public:
   static tl::Variant read_value(tl::Extractor &ex, const std::map<std::string, tl::Variant> &variables);
 
   /**
+   *  @brief Reads a value from the extractor (with formula evaluation and two levels of variables)
+   */
+  static tl::Variant read_value(tl::Extractor &ex, const std::map<std::string, tl::Variant> &variables1, const std::map<std::string, tl::Variant> &variables2);
+
+  /**
    *  @brief Tries to read a value from the extractor (with formula evaluation)
    */
   static bool try_read_value (const std::string &s, double &v, const std::map<std::string, tl::Variant> &variables);

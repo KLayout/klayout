@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>MergeOptionsDialog</class>
- <widget class="QDialog" name="MergeOptionsDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="MergeOptionsDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,125 +10,125 @@
     <height>331</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Merge Operation</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="spacing" >
+  <layout class="QVBoxLayout">
+   <property name="spacing">
     <number>6</number>
    </property>
-   <property name="margin" >
+   <property name="margin" stdset="0">
     <number>9</number>
    </property>
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
       <string>Merge Operation Setup</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
+     <layout class="QGridLayout">
+      <property name="margin" stdset="0">
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="spacing">
        <number>6</number>
       </property>
-      <item row="7" column="1" colspan="3" >
-       <widget class="QComboBox" name="hier_mode_cbx" >
+      <item row="7" column="1" colspan="3">
+       <widget class="QComboBox" name="hier_mode_cbx">
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Flat</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Top cell only</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Individually for current and subcells (semi hierarchical)</string>
          </property>
         </item>
        </widget>
       </item>
-      <item row="5" column="3" >
-       <widget class="QLabel" name="label_10" >
-        <property name="text" >
+      <item row="5" column="3">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
          <string>(Layer is overwritten)</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="2" >
-       <widget class="QLabel" name="label_8" >
-        <property name="text" >
+      <item row="4" column="2">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
          <string>Layer</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="1" >
-       <widget class="lay::CellViewSelectionComboBox" name="cvr_cbx" />
+      <item row="5" column="1">
+       <widget class="lay::CellViewSelectionComboBox" name="cvr_cbx"/>
       </item>
-      <item row="3" column="1" >
-       <widget class="QLineEdit" name="threshold_le" />
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="threshold_le"/>
       </item>
-      <item row="6" column="0" colspan="4" >
-       <widget class="Line" name="line_2" >
-        <property name="orientation" >
+      <item row="6" column="0" colspan="4">
+       <widget class="Line" name="line_2">
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
-      <item row="7" column="0" >
-       <widget class="QLabel" name="label_7" >
-        <property name="text" >
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
          <string>Hierarchy</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
-       <widget class="lay::CellViewSelectionComboBox" name="cv_cbx" />
+      <item row="1" column="1">
+       <widget class="lay::CellViewSelectionComboBox" name="cv_cbx"/>
       </item>
-      <item row="5" column="0" >
-       <widget class="QLabel" name="label_3" >
-        <property name="text" >
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
          <string>Result</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label" >
-        <property name="text" >
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
          <string>Source</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="2" >
-       <widget class="QLabel" name="label_6" >
-        <property name="text" >
+      <item row="0" column="2">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
          <string>Layer</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="4" >
-       <widget class="Line" name="line" >
-        <property name="orientation" >
+      <item row="2" column="0" colspan="4">
+       <widget class="Line" name="line">
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
-      <item row="8" column="1" colspan="3" >
-       <widget class="QCheckBox" name="min_coherence_cb" >
-        <property name="text" >
+      <item row="8" column="1" colspan="3">
+       <widget class="QCheckBox" name="min_coherence_cb">
+        <property name="text">
          <string>Minimum coherence (for touching corners)</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="3" >
+      <item row="1" column="3">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" stdset="0" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>40</width>
           <height>20</height>
@@ -135,36 +136,44 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="2" >
-       <widget class="lay::LayerSelectionComboBox" name="layer_cbx" />
+      <item row="1" column="2">
+       <widget class="lay::LayerSelectionComboBox" name="layer_cbx">
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToContents</enum>
+        </property>
+       </widget>
       </item>
-      <item row="5" column="2" >
-       <widget class="lay::LayerSelectionComboBox" name="layerr_cbx" />
+      <item row="5" column="2">
+       <widget class="lay::LayerSelectionComboBox" name="layerr_cbx">
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToContents</enum>
+        </property>
+       </widget>
       </item>
-      <item row="3" column="2" colspan="2" >
-       <widget class="QLabel" name="label_2" >
-        <property name="text" >
+      <item row="3" column="2" colspan="2">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
          <string>(0: all polygons, 1: at least two overlapping ...)</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QLabel" name="label_5" >
-        <property name="text" >
+      <item row="0" column="1">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
          <string>Layout and cell</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="1" >
-       <widget class="QLabel" name="label_9" >
-        <property name="text" >
+      <item row="4" column="1">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
          <string>Layout and cell</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0" >
-       <widget class="QLabel" name="label_4" >
-        <property name="text" >
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
          <string>Overlap threshold</string>
         </property>
        </widget>
@@ -174,10 +183,10 @@
    </item>
    <item>
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" stdset="0" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>506</width>
        <height>51</height>
@@ -186,11 +195,11 @@
     </spacer>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox" >
-     <property name="orientation" >
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="standardButtons" >
+     <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
@@ -199,12 +208,12 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>lay::CellViewSelectionComboBox</class>
+   <class>lay::LayerSelectionComboBox</class>
    <extends>QComboBox</extends>
    <header>layWidgets.h</header>
   </customwidget>
   <customwidget>
-   <class>lay::LayerSelectionComboBox</class>
+   <class>lay::CellViewSelectionComboBox</class>
    <extends>QComboBox</extends>
    <header>layWidgets.h</header>
   </customwidget>
@@ -217,11 +226,11 @@
    <receiver>MergeOptionsDialog</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>248</x>
      <y>254</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>157</x>
      <y>274</y>
     </hint>
@@ -233,11 +242,11 @@
    <receiver>MergeOptionsDialog</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>316</x>
      <y>260</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
     </hint>

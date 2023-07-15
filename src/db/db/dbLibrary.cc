@@ -205,7 +205,7 @@ Library::remap_to (db::Library *other)
       if (! pn.first) {
 
         //  substitute by a cold proxy
-        db::ProxyContextInfo info;
+        db::LayoutOrCellContextInfo info;
         r->first->get_context_info (ci, info);
         r->first->create_cold_proxy_as (info, ci);
 
@@ -216,7 +216,7 @@ Library::remap_to (db::Library *other)
         if (! old_pcell_decl || ! new_pcell_decl) {
 
           //  substitute by a cold proxy
-          db::ProxyContextInfo info;
+          db::LayoutOrCellContextInfo info;
           r->first->get_context_info (ci, info);
           r->first->create_cold_proxy_as (info, ci);
 
@@ -254,7 +254,7 @@ Library::remap_to (db::Library *other)
       if (! cn.first) {
 
         //  substitute by a cold proxy
-        db::ProxyContextInfo info;
+        db::LayoutOrCellContextInfo info;
         r->first->get_context_info (ci, info);
         r->first->create_cold_proxy_as (info, ci);
 

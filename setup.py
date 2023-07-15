@@ -805,11 +805,13 @@ for pi in dbpi_dirs:
     mod_name = "_" + os.path.split(os.path.split(pi)[-2])[-1] + "_dbpi"
 
     pi_sources = glob.glob(os.path.join(pi, "*.cc"))
+    pi_sources += glob.glob(os.path.join(pi, "contrib", "*.cc"))
 
     pi_ext = Library(
         config.root + ".db_plugins." + mod_name,
         define_macros=config.macros() + [("MAKE_DB_PLUGIN_LIBRARY", 1)],
         include_dirs=[
+            pi,
             os.path.join("src", "plugins", "common"),
             _db_path,
             _tl_path,

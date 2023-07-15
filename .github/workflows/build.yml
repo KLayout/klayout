@@ -4,8 +4,11 @@ name: Build Python Wheels
 
 on:
   pull_request:
-  # Running on PRs is enough
-  # push:
+  # Running on PRs and main branch only
+  # pull requests should be able to access cache from main branch
+  push:
+    branches:
+      - master
   release:
     types: [published]
 
@@ -28,12 +31,13 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         uses: jlumbroso/free-disk-space@main
         with:
-          android: false
-          dotnet: false
-          haskell: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false # not working currently
       - uses: hmarr/debug-action@v2
       - name: Cancel Workflow Action
-        uses: styfle/cancel-workflow-action@0.9.1
+        uses: styfle/cancel-workflow-action@0.11.0
       - uses: actions/checkout@v3
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2
@@ -48,12 +52,13 @@ jobs:
           HOST_CCACHE_DIR="$(ccache -k cache_dir)"
           mkdir -p $HOST_CCACHE_DIR
       - name: Build wheels  # check https://cibuildwheel.readthedocs.io/en/stable/setup/#github-actions
-        uses: pypa/cibuildwheel@v2.12.0
+        uses: pypa/cibuildwheel@v2.13.1
         # to supply options, put them in 'env', like:
         # env:
         #   CIBW_SOME_OPTION: value
         env:
           CIBW_BUILD: ${{ matrix.cibuild }}
+
       - name: Download Cache from Docker (linux only)
         if: ${{ runner.os == 'Linux' }}
         # hack until https://github.com/pypa/cibuildwheel/issues/1030 is fixed
@@ -65,24 +70,21 @@ jobs:
           mv ./wheelhouse/.ccache $HOST_CCACHE_DIR
           ls -la $HOST_CCACHE_DIR
           ccache -s
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
 
-# The following was taken from https://cibuildwheel.readthedocs.io/en/stable/deliver-to-pypi/
+  # The following was taken from https://cibuildwheel.readthedocs.io/en/stable/deliver-to-pypi/
   make_sdist:
     name: Make SDist
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0  # Optional, use if you use setuptools_scm
-        submodules: true  # Optional, use if you have submodules
+    - uses: actions/checkout@v3
 
     - name: Build SDist
       run: pipx run build --sdist
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         path: dist/*.tar.gz
 
@@ -90,29 +92,29 @@ jobs:
     needs: [build, make_sdist]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v3
       with:
         name: artifact
         path: dist
 
-    - uses: pypa/gh-action-pypi-publish@v1.4.2
+    - uses: pypa/gh-action-pypi-publish@v1.8.7
       continue-on-error: true   # might fail if we don't bump the version
       with:
         user: __token__
         password: ${{ secrets.test_pypi_password }}
-        repository_url: https://test.pypi.org/legacy/
+        repository-url: https://test.pypi.org/legacy/
 
   upload_to_pypi:
     needs: [build, make_sdist]
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
     steps:
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v3
       with:
         name: artifact
         path: dist
 
-    - uses: pypa/gh-action-pypi-publish@v1.4.2
+    - uses: pypa/gh-action-pypi-publish@v1.8.7
       with:
         user: __token__
         password: ${{ secrets.pypi_password }}

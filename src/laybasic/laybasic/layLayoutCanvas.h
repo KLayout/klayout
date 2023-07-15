@@ -321,6 +321,11 @@ public:
   }
 
   /**
+   *  @brief Reimplementation of ViewObjectCanvas: Resolution
+   */
+  double resolution () const;
+
+  /**
    *  @brief Reimplementation of ViewObjectCanvas: Background color 
    */
   tl::Color background_color () const
@@ -444,8 +449,6 @@ private:
   void do_redraw_all (bool force_redraw = true);
 
   void prepare_drawing ();
-  virtual double resolution () const;
-
   const std::vector<ViewOp> &scaled_view_ops (unsigned int lw);
 };
 

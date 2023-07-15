@@ -155,16 +155,11 @@ X$2 VSS IN OUT SUBSTRATE NMOS PARAMS: L=0.25 W=0.9 AS=0.405 AD=0.405 PS=2.7
 
   <p>
   Currently SPICE is understood with some limitations:
+  Only a subset of elements is implemented by default. These are
+  "M" (gives "MOS4" device classes), "Q" (gives BJT3 or BJT4 device
+  classes), "R" (gives Resistor device classes), "C" (gives
+  Capacitor device classes) and "D" (gives diode device classes).
   </p>
-
-  <ul>
-    <li>Parametrized circuits are not permitted except for device subcircuits 
-        (with a delegate)</li>
-    <li>Only a subset of elements is implemented by default. These are
-        "M" (gives "MOS4" device classes), "Q" (gives BJT3 or BJT4 device
-        classes), "R" (gives Resistor device classes), "C" (gives
-        Capacitor device classes) and "D" (gives diode device classes).</li>
-  </ul>
 
   <p>
   As for the SPICE reader, a delegate can be provided to customize the reader.

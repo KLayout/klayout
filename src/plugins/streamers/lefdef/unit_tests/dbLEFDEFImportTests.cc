@@ -976,3 +976,13 @@ TEST(206_lef_spacing)
   run_test (_this, "issue-1282", "read:a.lef", 0, default_options (), false);
 }
 
+//  issue-1345
+TEST(207_joined_paths)
+{
+  db::LEFDEFReaderOptions lefdef_opt = default_options ();
+  lefdef_opt.set_joined_paths (true);
+  run_test (_this, "issue-1345", "lef:in.lef+def:in.def", "au.oas.gz", lefdef_opt, false);
+
+  run_test (_this, "issue-1345", "lef:in.lef+def:in.def", "au-nojoin.oas.gz", default_options (), false);
+}
+

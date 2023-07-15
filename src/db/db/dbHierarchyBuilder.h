@@ -295,6 +295,7 @@ public:
    */
   void set_shape_receiver (HierarchyBuilderShapeReceiver *pipe);
 
+  virtual bool wants_all_cells () const { return m_wants_all_cells; }
   virtual void begin (const RecursiveShapeIterator *iter);
   virtual void end (const RecursiveShapeIterator *iter);
   virtual void enter_cell (const RecursiveShapeIterator *iter, const db::Cell *cell, const db::Box &region, const box_tree_type *complex_region);
@@ -309,6 +310,14 @@ public:
   void set_target_layer (unsigned int target_layer)
   {
     m_target_layer = target_layer;
+  }
+
+  /**
+   *  @brief Sets the target layer - shapes will be put there
+   */
+  void set_wants_all_cells (bool f)
+  {
+    m_wants_all_cells = f;
   }
 
   /**
@@ -416,6 +425,7 @@ private:
   cell_map_type::const_iterator m_cm_entry;
   bool m_cm_new_entry;
   unsigned int m_target_layer;
+  bool m_wants_all_cells;
   std::vector<std::pair<bool, std::vector<db::Cell *> > > m_cell_stack;
   db::Cell *mp_initial_cell;
 

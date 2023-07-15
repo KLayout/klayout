@@ -54,6 +54,11 @@
 #include "tlDeferredExecution.h"
 #include "dbInstElement.h"
 
+#if defined(HAVE_QT)
+# include <QImage>
+class QWidget;
+#endif
+
 namespace rdb {
   class Database;
 }
@@ -186,11 +191,6 @@ public:
    *  @brief Stand-alone Constructor
    */
   LayoutViewBase (db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
-
-  /**
-   *  @brief Constructor
-   */
-  LayoutViewBase (lay::LayoutView *ui, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
 
   /** 
    *  @brief Destructor
@@ -980,6 +980,16 @@ public:
    */
   tl::BitmapBuffer get_pixels_with_options_mono (unsigned int width, unsigned int height, int linewidth, tl::Color background, tl::Color foreground, tl::Color active_color, const db::DBox &target_box);
 
+#if defined(HAVE_QT)
+  /**
+   *  @brief Gets the widget object that view is embedded in
+   */
+  virtual QWidget *widget ()
+  {
+    return 0;
+  }
+#endif
+
   /**
    *  @brief Hierarchy level selection setter
    */
@@ -1702,6 +1712,14 @@ public:
    *  @brief Gets the canvas object (where the layout is drawn and view objects are placed)
    */
   lay::LayoutCanvas *canvas ()
+  {
+    return mp_canvas;
+  }
+
+  /**
+   *  @brief Gets the canvas object (const version)
+   */
+  const lay::LayoutCanvas *canvas () const
   {
     return mp_canvas;
   }
@@ -2846,8 +2864,6 @@ private:
 
   tl::Clock m_clock, m_last_checked;
 
-  void init (db::Manager *mgr);
-
   void do_prop_changed ();
   void do_redraw (int layer);
   void do_redraw ();
@@ -2866,6 +2882,8 @@ private:
   bool has_max_hier () const;
   int max_hier_level () const;
 
+  void zoom_by (double f);
+
   void update_event_handlers ();
   void viewport_changed ();
   void cellview_changed (unsigned int index);
@@ -2876,6 +2894,13 @@ private:
   void merge_dither_pattern (lay::LayerPropertiesList &props);
 
 protected:
+  /**
+   *  @brief Constructor for calling from a LayoutView
+   */
+  LayoutViewBase (lay::LayoutView *ui, db::Manager *mgr, bool editable, lay::Plugin *plugin_parent, unsigned int options = (unsigned int) LV_Normal);
+
+  void init (db::Manager *mgr);
+
   lay::Plugin *active_plugin () const
   {
     return mp_active_plugin;

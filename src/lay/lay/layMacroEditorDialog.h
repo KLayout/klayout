@@ -245,7 +245,6 @@ protected slots:
   void file_changed (const QString &path);
   void file_removed (const QString &path);
   void clear_log ();
-  void search_replace ();
   void apply_search ()
   {
     apply_search (false);

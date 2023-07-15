@@ -183,11 +183,25 @@ public:
   void copy (unsigned int src, unsigned int dest);
 
   /**
+   *  @brief Copy the shapes from layer src to dest (only shapes from given classes)
+   *
+   *  The target layer is not overwritten. Instead, the shapes are added to the target layer's shapes.
+   */
+  void copy (unsigned int src, unsigned int dest, unsigned int types);
+
+  /**
    *  @brief Move the shapes from layer src to dest
    *
    *  The target layer is not overwritten. Instead, the shapes are added to the target layer's shapes.
    */
   void move (unsigned int src, unsigned int dest);
+
+  /**
+   *  @brief Move the shapes from layer src to dest (only shapes from given classes)
+   *
+   *  The target layer is not overwritten. Instead, the shapes are added to the target layer's shapes.
+   */
+  void move (unsigned int src, unsigned int dest, unsigned int types);
 
   /**
    *  @brief Swap the layers given
@@ -199,7 +213,12 @@ public:
    */
   void clear (unsigned int index);
 
-  /** 
+  /**
+   *  @brief Clear the shapes on the given layer (only the shapes from the given classes)
+   */
+  void clear (unsigned int index, unsigned int types);
+
+  /**
    *  @brief Erase a cell instance given by a instance proxy
    *
    *  Erasing a cell instance will destroy the sorting order and invalidate

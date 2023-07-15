@@ -185,7 +185,7 @@ l.output("OUT")
 l.output(17, 0, "OUT")</pre>
 
   <p>
-  Output can be sent to other layouts using the "target" function:
+  Output can be sent to other layouts using the <a href="/about/drc_ref_global.xml#target">target</a> function:
   </p>
 
   <pre>
@@ -196,7 +196,7 @@ target("@2")
 target("out.gds", "OUT_TOP")</pre>
 
   <p>
-  Output can also be sent to a report database:
+  Output can also be sent to a report database using the <a href="/about/drc_ref_global.xml#report">report</a> function:
   </p>
 
   <pre>
@@ -233,6 +233,38 @@ l.output("check1", "The first check")</pre>
   taken to place the input statement after the output statement. Otherwise the results will be
   unpredictable.
   </p>
+
+  <p>
+  It is possible to open "side" reports and targets and send layers to these
+  outputs without closing the default output. 
+  </p>
+
+  <p>
+  To open a "side report", use <a href="/about/drc_ref_global.xml#new_report">new_report</a>
+  in the same way you use "report". Instead of switching the output, this function will return a 
+  new report object that can be included in the argument list of "output" 
+  for the layer that is to be sent to that side report:
+  </p>
+
+  <pre>
+# opens a new side report
+side_report = new_report("Another report")
+...
+# Send data from layer l to new category "check1" to the side report
+l.output(side_report, "check1", "The first check")</pre>
+
+  <p>
+  In the same way, "side targets" can be opened using <a href="/about/drc_ref_global.xml#new_target">new_target</a>.
+  Such side targets open a way to write certain layers to other layout files.
+  This is very handy for debugging:
+  </p>
+
+  <pre>
+# opens a new side target for debugging
+debug_out = new_target("debug.gds")
+...
+# Send data from layer l to the debug output, layer 100/0
+l.output(debug_out, 100, 0)</pre>
 
 
   <h2>Dimension specifications</h2>
@@ -710,12 +742,12 @@ overlaps = layer.size(0.2).raw.merged(2)</pre>
   </p>
 
   <pre>
-  layer = input(1, 0)
-  layer.raw.sized(0.1).output(100, 0)
+layer = input(1, 0)
+layer.raw.sized(0.1).output(100, 0)
 
-  # this check will now be done on a raw layer, since the 
-  # previous raw call was putting the layer into raw mode
-  layer.width(0.2).ouput(101, 0)</pre>
+# this check will now be done on a raw layer, since the 
+# previous raw call was putting the layer into raw mode
+layer.width(0.2).ouput(101, 0)</pre>
 
   <p>
   The following two images show the effect of raw and clean mode:
@@ -792,20 +824,18 @@ overlaps = layer.size(0.2).raw.merged(2)</pre>
   </p>
 
   <pre>
-  ...
-  drc_w = input(1, 0).width(0.2)
-  ...
-  </pre>
+...
+drc_w = input(1, 0).width(0.2)
+...</pre>
 
   <p>
   can be written as:
   </p>
 
   <pre>
-  ...
-  drc_w = input(1, 0).drc(width &lt; 0.2)
-  ...
-  </pre>
+...
+drc_w = input(1, 0).drc(width &lt; 0.2)
+...</pre>
 
   <p>
   The <a href="/about/drc_ref_layer.xml#drc">drc</a> method is the "universal DRC" method.
@@ -845,12 +875,11 @@ overlaps = layer.size(0.2).raw.merged(2)</pre>
   </p>
 
   <pre>
-  ...
-  l1 = input(1, 0)
-  l2 = input(2, 0)
-  drc_sep = l1.drc(separation(l2) &lt;= 0.5)
-  ...
-  </pre>
+...
+l1 = input(1, 0)
+l2 = input(2, 0)
+drc_sep = l1.drc(separation(l2) &lt;= 0.5)
+...</pre>
 
   <p>
   Options are also specified together with the measurement and follow the same notation
@@ -858,10 +887,9 @@ overlaps = layer.size(0.2).raw.merged(2)</pre>
   </p>
 
   <pre>
-  ...
-  drc_w = input(1, 0).drc(width(projection) &lt; 0.2)
-  ...
-  </pre>
+...
+drc_w = input(1, 0).drc(width(projection) &lt; 0.2)
+...</pre>
 
   <p>
   However, the universal DRC is much more than a convenient way to write checks: 
@@ -879,10 +907,9 @@ overlaps = layer.size(0.2).raw.merged(2)</pre>
   </p>
 
   <pre>
-  ...
-  drc_ws = input(1, 0).drc((width &lt; 0.2) &amp; (space &lt; 0.3))
-  ...
-  </pre>
+...
+drc_ws = input(1, 0).drc((width &lt; 0.2) &amp; (space &lt; 0.3))
+...</pre>
 
   <p>
   The boolean AND is computed between the edges on the primary shape and returns the
@@ -891,12 +918,11 @@ overlaps = layer.size(0.2).raw.merged(2)</pre>
   </p>
 
   <pre>
-  ...
-  drc_ws1 = input(1, 0).width(0.2).edges
-  drc_ws2 = input(1, 0).space(0.3).edges
-  drc_ws = drc_ws1 &amp; drc_ws2
-  ...
-  </pre>
+...
+drc_ws1 = input(1, 0).width(0.2).edges
+drc_ws2 = input(1, 0).space(0.3).edges
+drc_ws = drc_ws1 &amp; drc_ws2
+...</pre>
 
   <p>
   The reason is that performing the boolean computation in the local loop can be 
@@ -933,11 +959,10 @@ overlaps = layer.size(0.2).raw.merged(2)</pre>
   </p>
 
   <pre>
-  ...
-  drc_w = input(1, 0).width(0.2)
-  log("Number of width violations: #{drc_w.data.size}")
-  ...
-  </pre>
+...
+drc_w = input(1, 0).width(0.2)
+log("Number of width violations: #{drc_w.data.size}")
+...</pre>
 
   <p>
   The <a href="/about/drc_ref_global.xml#error">error</a> function can be used to output error messages
@@ -946,11 +971,23 @@ overlaps = layer.size(0.2).raw.merged(2)</pre>
   </p>
 
   <pre>
-  log_file("drc_log.txt")
-  verbose(true)
-  info("This message will be sent to the log file")
-  ...
-  </pre>
+log_file("drc_log.txt")
+verbose(true)
+info("This message will be sent to the log file")
+...</pre>
+
+  <p>
+  The <a href="/about/drc_ref_global.xml#profile">profile</a> function will collect profiling 
+  information during the DRC run. At the end of the script, the operations are printed to the log
+  output, sorted by their CPU time and approximate memory footprint. "profile" can be given a 
+  numerical argument indicating the number of operations to print. Lower-ranking operations are
+  skipped in that case. By default, all operations are printed.
+  </p>
+
+  <pre>
+# enables profiling
+profile
+...</pre>
   
 
   <h2>The tiling option</h2>
@@ -1003,8 +1040,7 @@ threads(4)
 # Disable tiling
 flat
 
-... non-tiled operations ...
-</pre>
+... non-tiled operations ...</pre>
 
   <p>
   Some operations implicitly specify a tile border. If the tile border is known (see length example above), explicit borders

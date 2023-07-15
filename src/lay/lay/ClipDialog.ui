@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>ClipDialog</class>
- <widget class="QDialog" name="ClipDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="ClipDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,49 +10,47 @@
     <height>421</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Clip Tool</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
+  <layout class="QVBoxLayout">
+   <property name="spacing">
     <number>6</number>
    </property>
+   <property name="margin" stdset="0">
+    <number>9</number>
+   </property>
    <item>
-    <widget class="QFrame" name="frame_3" >
-     <property name="frameShape" >
+    <widget class="QFrame" name="frame_3">
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" >
-      <property name="margin" >
-       <number>0</number>
-      </property>
-      <property name="spacing" >
+     <layout class="QHBoxLayout">
+      <property name="spacing">
        <number>6</number>
       </property>
+      <property name="margin" stdset="0">
+       <number>0</number>
+      </property>
       <item>
-       <widget class="QLabel" name="label_13" >
-        <property name="text" >
+       <widget class="QLabel" name="label_13">
+        <property name="text">
          <string>Clip result cell name</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="le_cell_name" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>7</hsizetype>
-          <vsizetype>0</vsizetype>
+       <widget class="QLineEdit" name="le_cell_name">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>CLIP</string>
         </property>
        </widget>
@@ -61,13 +60,13 @@
    </item>
    <item>
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeType" >
+     <property name="sizeType">
       <enum>QSizePolicy::Fixed</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
        <height>10</height>
@@ -76,48 +75,48 @@
     </spacer>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
       <string>Clip Box Specification</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
+     <layout class="QGridLayout">
+      <property name="margin" stdset="0">
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="spacing">
        <number>6</number>
       </property>
-      <item row="2" column="0" >
-       <widget class="QFrame" name="frame" >
-        <property name="frameShape" >
+      <item row="2" column="0">
+       <widget class="QFrame" name="frame">
+        <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
-        <property name="frameShadow" >
+        <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QVBoxLayout" >
-         <property name="margin" >
-          <number>0</number>
-         </property>
-         <property name="spacing" >
+        <layout class="QVBoxLayout">
+         <property name="spacing">
           <number>6</number>
          </property>
+         <property name="margin" stdset="0">
+          <number>0</number>
+         </property>
          <item>
-          <widget class="QRadioButton" name="rb_box2" >
-           <property name="text" >
+          <widget class="QRadioButton" name="rb_box2">
+           <property name="text">
             <string>Single box with ...</string>
            </property>
-           <property name="autoExclusive" >
+           <property name="autoExclusive">
             <bool>false</bool>
            </property>
           </widget>
          </item>
          <item>
           <spacer>
-           <property name="orientation" >
+           <property name="orientation">
             <enum>Qt::Vertical</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
              <height>40</height>
@@ -128,40 +127,40 @@
         </layout>
        </widget>
       </item>
-      <item row="1" column="0" >
-       <widget class="QFrame" name="frame_2" >
-        <property name="frameShape" >
+      <item row="1" column="0">
+       <widget class="QFrame" name="frame_2">
+        <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
-        <property name="frameShadow" >
+        <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QVBoxLayout" >
-         <property name="margin" >
-          <number>0</number>
-         </property>
-         <property name="spacing" >
+        <layout class="QVBoxLayout">
+         <property name="spacing">
           <number>6</number>
          </property>
+         <property name="margin" stdset="0">
+          <number>0</number>
+         </property>
          <item>
-          <widget class="QRadioButton" name="rb_box1" >
-           <property name="text" >
+          <widget class="QRadioButton" name="rb_box1">
+           <property name="text">
             <string>Single box with ...</string>
            </property>
-           <property name="checked" >
+           <property name="checked">
             <bool>true</bool>
            </property>
-           <property name="autoExclusive" >
+           <property name="autoExclusive">
             <bool>false</bool>
            </property>
           </widget>
          </item>
          <item>
           <spacer>
-           <property name="orientation" >
+           <property name="orientation">
             <enum>Qt::Vertical</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
              <height>40</height>
@@ -172,12 +171,12 @@
         </layout>
        </widget>
       </item>
-      <item row="0" column="2" >
+      <item row="0" column="2">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>231</width>
           <height>20</height>
@@ -185,176 +184,180 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="0" >
-       <widget class="QRadioButton" name="rb_shapes" >
-        <property name="text" >
+      <item row="0" column="0">
+       <widget class="QRadioButton" name="rb_shapes">
+        <property name="text">
          <string>Shapes on layer (multi clip)</string>
         </property>
-        <property name="autoExclusive" >
+        <property name="autoExclusive">
          <bool>false</bool>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" colspan="2" >
-       <widget class="QGroupBox" name="grp_box1" >
-        <property name="title" >
+      <item row="1" column="1" colspan="2">
+       <widget class="QGroupBox" name="grp_box1">
+        <property name="title">
          <string>Box Boundaries</string>
         </property>
-        <layout class="QGridLayout" >
-         <property name="margin" >
+        <layout class="QGridLayout">
+         <property name="margin" stdset="0">
           <number>9</number>
          </property>
-         <property name="spacing" >
+         <property name="spacing">
           <number>6</number>
          </property>
-         <item row="1" column="3" >
-          <widget class="QLabel" name="label_6" >
-           <property name="text" >
+         <item row="1" column="3">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
             <string>y =</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="0" >
-          <widget class="QLabel" name="label_5" >
-           <property name="text" >
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
             <string>2nd corner</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1" >
-          <widget class="QLabel" name="label_4" >
-           <property name="text" >
+         <item row="1" column="1">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
             <string>x =</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="0" >
-          <widget class="QLabel" name="label_3" >
-           <property name="text" >
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
             <string>1st corner</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1" >
-          <widget class="QLabel" name="label" >
-           <property name="text" >
+         <item row="0" column="1">
+          <widget class="QLabel" name="label">
+           <property name="text">
             <string>x =</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="3" >
-          <widget class="QLabel" name="label_2" >
-           <property name="text" >
+         <item row="0" column="3">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
             <string>y =</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="4" >
-          <widget class="QLineEdit" name="le_y2" />
+         <item row="1" column="4">
+          <widget class="QLineEdit" name="le_y2"/>
          </item>
-         <item row="1" column="2" >
-          <widget class="QLineEdit" name="le_x2" />
+         <item row="1" column="2">
+          <widget class="QLineEdit" name="le_x2"/>
          </item>
-         <item row="0" column="4" >
-          <widget class="QLineEdit" name="le_y1" />
+         <item row="0" column="4">
+          <widget class="QLineEdit" name="le_y1"/>
          </item>
-         <item row="0" column="2" >
-          <widget class="QLineEdit" name="le_x1" />
+         <item row="0" column="2">
+          <widget class="QLineEdit" name="le_x1"/>
          </item>
         </layout>
        </widget>
       </item>
-      <item row="2" column="1" colspan="2" >
-       <widget class="QGroupBox" name="grp_box2" >
-        <property name="title" >
+      <item row="2" column="1" colspan="2">
+       <widget class="QGroupBox" name="grp_box2">
+        <property name="title">
          <string>Box Center And Dimensions</string>
         </property>
-        <layout class="QGridLayout" >
-         <property name="margin" >
+        <layout class="QGridLayout">
+         <property name="margin" stdset="0">
           <number>9</number>
          </property>
-         <property name="spacing" >
+         <property name="spacing">
           <number>6</number>
          </property>
-         <item row="1" column="3" >
-          <widget class="QLabel" name="label_7" >
-           <property name="text" >
+         <item row="1" column="3">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
             <string>h =</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="0" >
-          <widget class="QLabel" name="label_8" >
-           <property name="text" >
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_8">
+           <property name="text">
             <string>Dimensions</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1" >
-          <widget class="QLabel" name="label_9" >
-           <property name="text" >
+         <item row="1" column="1">
+          <widget class="QLabel" name="label_9">
+           <property name="text">
             <string>w =</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="0" >
-          <widget class="QLabel" name="label_10" >
-           <property name="text" >
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_10">
+           <property name="text">
             <string>Center</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1" >
-          <widget class="QLabel" name="label_11" >
-           <property name="text" >
+         <item row="0" column="1">
+          <widget class="QLabel" name="label_11">
+           <property name="text">
             <string>x =</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="3" >
-          <widget class="QLabel" name="label_12" >
-           <property name="text" >
+         <item row="0" column="3">
+          <widget class="QLabel" name="label_12">
+           <property name="text">
             <string>y =</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="4" >
-          <widget class="QLineEdit" name="le_h" />
+         <item row="1" column="4">
+          <widget class="QLineEdit" name="le_h"/>
          </item>
-         <item row="1" column="2" >
-          <widget class="QLineEdit" name="le_w" />
+         <item row="1" column="2">
+          <widget class="QLineEdit" name="le_w"/>
          </item>
-         <item row="0" column="4" >
-          <widget class="QLineEdit" name="le_y" />
+         <item row="0" column="4">
+          <widget class="QLineEdit" name="le_y"/>
          </item>
-         <item row="0" column="2" >
-          <widget class="QLineEdit" name="le_x" />
+         <item row="0" column="2">
+          <widget class="QLineEdit" name="le_x"/>
          </item>
         </layout>
        </widget>
       </item>
-      <item row="3" column="0" colspan="2" >
-       <widget class="QRadioButton" name="rb_rulers" >
-        <property name="text" >
+      <item row="3" column="0" colspan="2">
+       <widget class="QRadioButton" name="rb_rulers">
+        <property name="text">
          <string>From ruler start and end points (multi clip)</string>
         </property>
-        <property name="autoExclusive" >
+        <property name="autoExclusive">
          <bool>false</bool>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="lay::LayerSelectionComboBox" name="cb_layer" />
+      <item row="0" column="1">
+       <widget class="lay::LayerSelectionComboBox" name="cb_layer">
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToContents</enum>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
    </item>
    <item>
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
        <height>40</height>
@@ -363,12 +366,12 @@
     </spacer>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="button_box" >
-     <property name="orientation" >
+    <widget class="QDialogButtonBox" name="button_box">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="standardButtons" >
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
@@ -406,11 +409,11 @@
    <receiver>ClipDialog</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>248</x>
      <y>254</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>157</x>
      <y>274</y>
     </hint>
@@ -422,11 +425,11 @@
    <receiver>ClipDialog</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>316</x>
      <y>260</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
     </hint>

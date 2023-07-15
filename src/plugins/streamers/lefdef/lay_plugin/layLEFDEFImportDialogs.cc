@@ -521,6 +521,7 @@ LEFDEFReaderOptionsEditor::commit (db::FormatSpecificReaderOptions *options, con
   data->set_lef_labels_suffix (tl::to_string (suffix_lef_labels->text ()));
   data->set_lef_labels_datatype (datatype_lef_labels->text ().toInt ());
   data->set_separate_groups (separate_groups->isChecked ());
+  data->set_joined_paths (joined_paths->isChecked ());
   data->set_read_lef_with_def (read_lef_with_def->isChecked ());
   data->set_map_file (tl::to_string (mapfile_path->text ()));
   data->set_macro_resolution_mode (macro_resolution_mode->currentIndex ());
@@ -595,6 +596,7 @@ LEFDEFReaderOptionsEditor::setup (const db::FormatSpecificReaderOptions *options
   suffix_lef_labels->setText (tl::to_qstring (data->lef_labels_suffix ()));
   datatype_lef_labels->setText (QString::number (data->lef_labels_datatype ()));
   separate_groups->setChecked (data->separate_groups ());
+  joined_paths->setChecked (data->joined_paths ());
   read_lef_with_def->setChecked (data->read_lef_with_def ());
   mapfile_path->setText (tl::to_qstring (data->map_file ()));
   layer_map_mode->setCurrentIndex (data->map_file ().empty () ? 1 : 0);

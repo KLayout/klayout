@@ -316,7 +316,7 @@ MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl:
     error (tl::to_string (tr ("Could not find 'magic' header line - is this a MAGIC file?")));
   }
 
-  layout.add_meta_info (db::MetaInfo ("lambda", "lambda value (tech scaling)", tl::to_string (m_lambda)));
+  layout.add_meta_info ("lambda", db::MetaInfo ("lambda value (tech scaling)", tl::to_string (m_lambda)));
 
   bool valid_layer = false;
   unsigned int current_layer = 0;
@@ -339,11 +339,11 @@ MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl:
       if (&m_stream == &stream) {
 
         //  initial file - store technology
-        layout.add_meta_info (db::MetaInfo ("magic_technology", tl::to_string (tr ("MAGIC technology string")), m_tech));
+        layout.add_meta_info ("magic_technology", db::MetaInfo (tl::to_string (tr ("MAGIC technology string")), m_tech));
 
         //  propose this is the KLayout technology unless a good one is given
         if (! mp_klayout_tech) {
-          layout.add_meta_info (db::MetaInfo ("technology", tl::to_string (tr ("Technology name")), m_tech));
+          layout.add_meta_info ("technology", db::MetaInfo (tl::to_string (tr ("Technology name")), m_tech));
         }
 
       }
@@ -357,7 +357,7 @@ MAGReader::do_read_part (db::Layout &layout, db::cell_index_type cell_index, tl:
 
       if (&m_stream == &stream) {
         //  initial file - store timestamp
-        layout.add_meta_info (db::MetaInfo ("magic_timestamp", "MAGIC main file timestamp", tl::to_string (ts)));
+        layout.add_meta_info ("magic_timestamp", db::MetaInfo ("MAGIC main file timestamp", tl::to_string (ts)));
       }
 
       ex.expect_end ();

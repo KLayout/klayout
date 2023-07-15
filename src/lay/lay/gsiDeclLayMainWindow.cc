@@ -472,15 +472,15 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "\n"
     "This method has been added in version 0.24."
   ) +
-  gsi::method ("message", &lay::MainWindow::message, gsi::arg ("message"), gsi::arg ("time"),
+  gsi::method ("message", &lay::MainWindow::message, gsi::arg ("message"), gsi::arg ("time", -1, "infinite"),
     "@brief Displays a message in the status bar\n"
     "\n"
     "@param message The message to display\n"
-    "@param time The time how long to display the message in ms\n"
+    "@param time The time how long to display the message in ms. A negative value means 'infinitely'.\n"
     "\n"
     "This given message is shown in the status bar for the given time.\n" 
     "\n"
-    "This method has been added in version 0.18."
+    "This method has been added in version 0.18. The 'time' parameter was made optional in version 0.28.10."
   ) +
   gsi::method ("resize", (void (lay::MainWindow::*)(int, int)) &lay::MainWindow::resize, gsi::arg ("width"), gsi::arg ("height"),
     "@brief Resizes the window\n"
@@ -759,6 +759,16 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "This event is triggered after a view was closed. For example, because the tab was closed.\n"
     "\n"
     "This event has been added in version 0.25.\n"
+  ) +
+  gsi::event ("on_session_about_to_be_restored", &lay::MainWindow::begin_restore_session,
+    "@brief An event indicating that a session is about to be restored\n"
+    "\n"
+    "This event has been added in version 0.28.8.\n"
+  ) +
+  gsi::event ("on_session_restored", &lay::MainWindow::end_restore_session,
+    "@brief An event indicating that a session was restored\n"
+    "\n"
+    "This event has been added in version 0.28.8.\n"
   ) +
   gsi::method ("show_macro_editor", &lay::MainWindow::show_macro_editor, gsi::arg ("cat", std::string ()), gsi::arg ("add", false),
     "@brief Shows the macro editor\n"

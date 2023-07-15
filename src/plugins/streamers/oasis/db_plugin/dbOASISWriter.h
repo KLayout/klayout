@@ -203,12 +203,14 @@ private:
   const db::Cell *mp_cell;
   int m_layer;
   int m_datatype;
+  bool m_write_context_info;
   std::vector<db::Vector> m_pointlist;
   tl::OutputMemoryStream m_cblock_buffer;
   tl::OutputMemoryStream m_cblock_compressed;
   bool m_in_cblock;
   unsigned long m_propname_id;
   unsigned long m_propstring_id;
+  unsigned long m_textstring_id;
   bool m_proptables_written;
 
   std::map <std::string, unsigned long> m_textstrings;
@@ -308,6 +310,12 @@ private:
   void write_pointlist (const std::vector<db::Vector> &pointlist, bool for_polygons);
 
   void write_inst_with_rep (const db::CellInstArray &inst, db::properties_id_type prop_id, const db::Vector &disp, const db::Repetition &rep);
+
+  void write_propname_table (size_t &propnames_table_pos, const std::vector<db::cell_index_type> &cells, const Layout &layout, const std::vector<std::pair<unsigned int, LayerProperties> > &layers);
+  void write_propstring_table (size_t &propstrings_table_pos, const std::vector<db::cell_index_type> &cells, const Layout &layout, const std::vector<std::pair<unsigned int, LayerProperties> > &layers);
+  void write_cellname_table (size_t &cellnames_table_pos, const std::vector<db::cell_index_type> &cells_by_index, const std::map<cell_index_type, size_t> *cell_positions, const Layout &layout);
+  void write_textstring_table (size_t &textstrings_table_pos, const std::vector<db::cell_index_type> &cells, const Layout &layout, const std::vector<std::pair<unsigned int, LayerProperties> > &layers);
+  void write_layername_table (size_t &layernames_table_pos, const std::vector<std::pair<unsigned int, LayerProperties> > &layers);
 };
 
 } // namespace db

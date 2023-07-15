@@ -44,6 +44,8 @@
 namespace db
 {
 
+const double fill_factor = 1.5;
+
 // -------------------------------------------------------------------------------
 //  Some utilities ..
 
@@ -1095,14 +1097,14 @@ EdgeProcessor::clear ()
 }
 
 static void
-add_hparallel_cutpoints (WorkEdge &e1, WorkEdge &e2, std::vector <CutPoints> &cutpoints)
+add_hparallel_cutpoints (WorkEdge &e1, WorkEdge &e2, const db::Box &cell, std::vector <CutPoints> &cutpoints)
 {
   db::Coord e1_xmin = std::min (e1.x1 (), e1.x2 ());
   db::Coord e1_xmax = std::max (e1.x1 (), e1.x2 ());
-  if (e2.x1 () > e1_xmin && e2.x1 () < e1_xmax) {
+  if (e2.x1 () > e1_xmin && e2.x1 () < e1_xmax && cell.contains (e2.p1 ())) {
     e1.make_cutpoints (cutpoints)->add (e2.p1 (), &cutpoints, false);
   }
-  if (e2.x2 () > e1_xmin && e2.x2 () < e1_xmax) {
+  if (e2.x2 () > e1_xmin && e2.x2 () < e1_xmax && cell.contains (e2.p2 ())) {
     e1.make_cutpoints (cutpoints)->add (e2.p2 (), &cutpoints, false);
   }
 }
@@ -1125,14 +1127,28 @@ get_intersections_per_band_90 (std::vector <CutPoints> &cutpoints, std::vector <
   std::vector <WorkEdge>::iterator f = current;
   for (std::vector <WorkEdge>::iterator c = current; c != future; ) {
 
-    while (f != future && edge_xmin (*f) <= x) {
-      ++f;
-    }
+    size_t n = 0;
+    db::Coord xx = x;
 
-    db::Coord xx = std::numeric_limits <db::Coord>::max ();
-    if (f != future) {
-      xx = edge_xmin (*f);
-    }
+    //  fetch as many cells as to fill in roughly 50% more
+    //  (this is an empirical performance improvement factor)
+    do {
+
+      while (f != future && edge_xmin (*f) <= xx) {
+        ++f;
+      }
+
+      if (f != future) {
+        xx = edge_xmin (*f);
+      } else {
+        xx = std::numeric_limits <db::Coord>::max ();
+      }
+
+      if (n == 0) {
+        n = std::distance (c, f);
+      }
+
+    } while (f != future && std::distance (c, f) < long (n * fill_factor));
 
 #ifdef DEBUG_EDGE_PROCESSOR
     printf ("edges %d..%d:", x, xx); 
@@ -1165,15 +1181,15 @@ get_intersections_per_band_90 (std::vector <CutPoints> &cutpoints, std::vector <
 
                 //  parallel horizontal edges: produce the end points of each other edge as cutpoints
                 if (c1->p1 ().y () == c2->p1 ().y ()) {
-                  add_hparallel_cutpoints (*c1, *c2, cutpoints);
-                  add_hparallel_cutpoints (*c2, *c1, cutpoints);
+                  add_hparallel_cutpoints (*c1, *c2, cell, cutpoints);
+                  add_hparallel_cutpoints (*c2, *c1, cell, cutpoints);
                 }
 
               } else if (c1->p1 () != c2->p1 () && c1->p2 () != c2->p1 () &&
                          c1->p1 () != c2->p2 () && c1->p2 () != c2->p2 ()) {
 
                 std::pair <bool, db::Point> cp = c1->intersect_point (*c2);
-                if (cp.first) {
+                if (cp.first && cell.contains (cp.second)) {
 
                   //  add a cut point to c1 and c2 (c2 only if necessary)
                   c1->make_cutpoints (cutpoints)->add (cp.second, &cutpoints, true);
@@ -1197,7 +1213,7 @@ get_intersections_per_band_90 (std::vector <CutPoints> &cutpoints, std::vector <
                            c1->p1 () != c2->p2 () && c1->p2 () != c2->p2 ()) {
 
               std::pair <bool, db::Point> cp = c1->intersect_point (*c2);
-              if (cp.first) {
+              if (cp.first && cell.contains (cp.second)) {
                 
                 //  add a cut point to c1 and c2
                 c2->make_cutpoints (cutpoints)->add (cp.second, &cutpoints, true);
@@ -1336,10 +1352,9 @@ public:
 static void 
 get_intersections_per_band_any (std::vector <CutPoints> &cutpoints, std::vector <WorkEdge>::iterator current, std::vector <WorkEdge>::iterator future, db::Coord y, db::Coord yy, bool with_h)
 {
-  std::vector <WorkEdge *> p1_weak; // holds weak interactions of edge endpoints with other edges
-  std::vector <WorkEdge *> ip_weak;
   double dy = y - 0.5;
   double dyy = yy + 0.5;
+  std::vector <std::pair<const WorkEdge *, WorkEdge *> > p1_weak;   // holds weak interactions of edge endpoints with other edges
 
   std::sort (current, future, edge_xmin_at_yinterval_double_compare<db::Coord> (dy, dyy));
 
@@ -1356,14 +1371,28 @@ get_intersections_per_band_any (std::vector <CutPoints> &cutpoints, std::vector 
   std::vector <WorkEdge>::iterator f = current;
   for (std::vector <WorkEdge>::iterator c = current; c != future; ) {
 
-    while (f != future && edge_xmin_at_yinterval_double (*f, dy, dyy) <= x) {
-      ++f;
-    }
+    size_t n = 0;
+    db::Coord xx = x;
 
-    db::Coord xx = std::numeric_limits <db::Coord>::max ();
-    if (f != future) {
-      xx = edge_xmin_at_yinterval_double (*f, dy, dyy);
-    }
+    //  fetch as many cells as to fill in roughly 50% more
+    //  (this is an empirical performance improvement factor)
+    do {
+
+      while (f != future && edge_xmin_at_yinterval_double (*f, dy, dyy) <= xx) {
+        ++f;
+      }
+
+      if (f != future) {
+        xx = edge_xmin_at_yinterval_double (*f, dy, dyy);
+      } else {
+        xx = std::numeric_limits <db::Coord>::max ();
+      }
+
+      if (n == 0) {
+        n = std::distance (c, f);
+      }
+
+    } while (f != future && std::distance (c, f) < long (n * fill_factor));
 
 #ifdef DEBUG_EDGE_PROCESSOR
     printf ("edges %d..%d:", x, xx); 
@@ -1377,9 +1406,10 @@ get_intersections_per_band_any (std::vector <CutPoints> &cutpoints, std::vector 
 
       db::Box cell (x, y, xx, yy);
 
-      for (std::vector <WorkEdge>::iterator c1 = c; c1 != f; ++c1) {
+      std::set<db::Point> weak_points;    // holds points that need to go in all other edges
+      p1_weak.clear ();
 
-        p1_weak.clear (); 
+      for (std::vector <WorkEdge>::iterator c1 = c; c1 != f; ++c1) {
 
         bool c1p1_in_cell = cell.contains (c1->p1 ());
         bool c1p2_in_cell = cell.contains (c1->p2 ());
@@ -1398,46 +1428,17 @@ get_intersections_per_band_any (std::vector <CutPoints> &cutpoints, std::vector 
 
                 //  parallel horizontal edges: produce the end points of each other edge as cutpoints
                 if (c1->p1 ().y () == c2->p1 ().y ()) {
-                  add_hparallel_cutpoints (*c1, *c2, cutpoints);
-                  add_hparallel_cutpoints (*c2, *c1, cutpoints);
+                  add_hparallel_cutpoints (*c1, *c2, cell, cutpoints);
+                  add_hparallel_cutpoints (*c2, *c1, cell, cutpoints);
                 }
 
               } else if (c1->p1 () != c2->p1 () && c1->p2 () != c2->p1 () &&
                          c1->p1 () != c2->p2 () && c1->p2 () != c2->p2 ()) {
 
                 std::pair <bool, db::Point> cp = safe_intersect_point (*c1, *c2);
-                if (cp.first) {
-
-                  bool on_edge1 = is_point_on_exact (*c1, cp.second);
-
-                  //  add a cut point to c1 and c2 (points not on the edge give strong attractors)
-                  c1->make_cutpoints (cutpoints)->add (cp.second, &cutpoints, !on_edge1);
-                  if (with_h) {
-                    c2->make_cutpoints (cutpoints)->add (cp.second, &cutpoints, false);
-                  }
-
-#ifdef DEBUG_EDGE_PROCESSOR
-                  if (on_edge1) {
-                    printf ("weak intersection point %s between %s and %s.\n", cp.second.to_string ().c_str (), c1->to_string ().c_str (), c2->to_string ().c_str ());
-                  } else {
-                    printf ("intersection point %s between %s and %s.\n", cp.second.to_string ().c_str (), c1->to_string ().c_str (), c2->to_string ().c_str ());
-                  }
-#endif
-
-                  //  The new cutpoint must be inserted into other edges as well.
-                  ip_weak.clear ();
-                  for (std::vector <WorkEdge>::iterator cc = c; cc != f; ++cc) {
-                    if ((with_h || cc->dy () != 0) && cc != c1 && cc != c2 && is_point_on_fuzzy (*cc, cp.second)) {
-                      ip_weak.push_back (&*cc);
-                    }
-                  }
-                  for (std::vector <WorkEdge *>::iterator icc = ip_weak.begin (); icc != ip_weak.end (); ++icc) {
-                    (*icc)->make_cutpoints (cutpoints)->add (cp.second, &cutpoints, true);
-#ifdef DEBUG_EDGE_PROCESSOR
-                    printf ("intersection point %s gives cutpoint in %s.\n", cp.second.to_string ().c_str (), (*icc)->to_string ().c_str ());
-#endif
-                  }
-
+                if (cp.first && cell.contains (cp.second)) {
+                  //  Stash the cutpoint as it must be inserted into other edges as well.
+                  weak_points.insert (cp.second);
                 }
 
               }
@@ -1478,41 +1479,9 @@ get_intersections_per_band_any (std::vector <CutPoints> &cutpoints, std::vector 
                            c1->p1 () != c2->p2 () && c1->p2 () != c2->p2 ()) {
 
               std::pair <bool, db::Point> cp = safe_intersect_point (*c1, *c2);
-              if (cp.first) {
-                
-                bool on_edge1 = true;
-                bool on_edge2 = is_point_on_exact (*c2, cp.second);
-
-                //  add a cut point to c1 and c2
-                if (with_h || c1->dy () != 0) {
-                  on_edge1 = is_point_on_exact (*c1, cp.second);
-                  c1->make_cutpoints (cutpoints)->add (cp.second, &cutpoints, !on_edge1);
-                }
-
-                c2->make_cutpoints (cutpoints)->add (cp.second, &cutpoints, !on_edge2);
-
-#ifdef DEBUG_EDGE_PROCESSOR
-                if (!on_edge1 || !on_edge2) {
-                  printf ("intersection point %s between %s and %s.\n", cp.second.to_string ().c_str (), c1->to_string ().c_str (), c2->to_string ().c_str ()); 
-                } else {
-                  printf ("weak intersection point %s between %s and %s.\n", cp.second.to_string ().c_str (), c1->to_string ().c_str (), c2->to_string ().c_str ()); 
-                }
-#endif
-
-                //  The new cutpoint must be inserted into other edges as well.
-                ip_weak.clear ();
-                for (std::vector <WorkEdge>::iterator cc = c; cc != f; ++cc) {
-                  if ((with_h || cc->dy () != 0) && cc != c1 && cc != c2 && is_point_on_fuzzy (*cc, cp.second)) {
-                    ip_weak.push_back (&*cc);
-                  }
-                }
-                for (std::vector <WorkEdge *>::iterator icc = ip_weak.begin (); icc != ip_weak.end (); ++icc) {
-                  (*icc)->make_cutpoints (cutpoints)->add (cp.second, &cutpoints, true);
-#ifdef DEBUG_EDGE_PROCESSOR
-                  printf ("intersection point %s gives cutpoint in %s.\n", cp.second.to_string ().c_str (), (*icc)->to_string ().c_str ());
-#endif
-                }
-
+              if (cp.first && cell.contains (cp.second)) {
+                //  Stash the cutpoint as it must be inserted into other edges as well.
+                weak_points.insert (cp.second);
               }
 
             } 
@@ -1532,7 +1501,7 @@ get_intersections_per_band_any (std::vector <CutPoints> &cutpoints, std::vector 
 #endif
                 c2->make_cutpoints (cutpoints)->add (c1->p1 (), &cutpoints, true);
               } else {
-                p1_weak.push_back (&*c2);
+                p1_weak.push_back (std::make_pair (c1.operator-> (), c2.operator-> ()));
               }
             }
 
@@ -1540,38 +1509,70 @@ get_intersections_per_band_any (std::vector <CutPoints> &cutpoints, std::vector 
 
         }
 
-        if (! p1_weak.empty ()) {
+      }
 
-          bool strong = false;
-          for (std::vector<WorkEdge *>::const_iterator cp = p1_weak.begin (); cp != p1_weak.end () && ! strong; ++cp) {
-            if ((*cp)->data > 0 && cutpoints [(*cp)->data - 1].strong_cutpoints) {
-              strong = true;
-            }
-          }
+      //  insert weak intersection points into all relevant edges - weak into edges
+      //  where the point is on and strong into edges where the point is on in a fuzzy way.
 
-          p1_weak.back ()->make_cutpoints (cutpoints);
-          size_t n = p1_weak.back ()->data - 1;
-          for (std::vector<WorkEdge *>::const_iterator cp = p1_weak.begin (); cp != p1_weak.end (); ++cp) {
+      for (auto wp = weak_points.begin (); wp != weak_points.end (); ++wp) {
 
-            (*cp)->make_cutpoints (cutpoints);
-            size_t nn = (*cp)->data - 1;
-            if (strong) {
-              cutpoints [nn].add (c1->p1 (), &cutpoints);
+        for (std::vector <WorkEdge>::iterator cc = c; cc != f; ++cc) {
+          if ((with_h || cc->dy () != 0) && is_point_on_fuzzy (*cc, *wp)) {
+            bool on_edge = is_point_on_exact (*cc, *wp);
+            cc->make_cutpoints (cutpoints)->add (*wp, &cutpoints, !on_edge);
 #ifdef DEBUG_EDGE_PROCESSOR
-              printf ("Insert strong attractor %s in %s.\n", c1->p1 ().to_string ().c_str (), (*cp)->to_string ().c_str ()); 
-#endif
+            if (!on_edge) {
+              printf ("intersection point %s gives strong cutpoint in %s.\n", wp->to_string ().c_str (), cc->to_string ().c_str ());
             } else {
-              cutpoints [nn].add_attractor (c1->p1 (), n);
-#ifdef DEBUG_EDGE_PROCESSOR
-              printf ("Insert weak attractor %s in %s.\n", c1->p1 ().to_string ().c_str (), (*cp)->to_string ().c_str ()); 
-#endif
+              printf ("intersection point %s gives weak cutpoint in %s.\n", wp->to_string ().c_str (), cc->to_string ().c_str ());
             }
-
-            n = nn;
-
+#endif
           }
+        }
+
+      }
+
+      //  go through the list of "p1 to other edges" and insert p1 either as cutpoint
+      //  (if there are other strong cutpoints already) or weak attractor.
+
+      auto p1w_from = p1_weak.begin ();
+      while (p1w_from != p1_weak.end ()) {
+
+        bool strong = false;
+        auto p1w_to = p1w_from;
+        while (p1w_to != p1_weak.end () && p1w_to->first == p1w_from->first) {
+          if (p1w_to->second->data > 0 && cutpoints [p1w_to->second->data - 1].strong_cutpoints) {
+            strong = true;
+          }
+          ++p1w_to;
+        }
+
+        db::Point p1 = p1w_from->first->p1 ();
+
+        p1w_to [-1].second->make_cutpoints (cutpoints);
+        size_t n = p1w_to [-1].second->data - 1;
+
+        for (auto cp = p1w_from; cp != p1w_to; ++cp) {
+
+          cp->second->make_cutpoints (cutpoints);
+          size_t nn = cp->second->data - 1;
+          if (strong) {
+            cutpoints [nn].add (p1, &cutpoints);
+#ifdef DEBUG_EDGE_PROCESSOR
+            printf ("Insert strong attractor %s in %s.\n", cp->first->p1 ().to_string ().c_str (), cp->second->to_string ().c_str ());
+#endif
+          } else {
+            cutpoints [nn].add_attractor (p1, n);
+#ifdef DEBUG_EDGE_PROCESSOR
+            printf ("Insert weak attractor %s in %s.\n", cp->first->p1 ().to_string ().c_str (), cp->second->to_string ().c_str ());
+#endif
+          }
+
+          n = nn;
 
         }
+
+        p1w_from = p1w_to;
 
       }
 
@@ -2259,7 +2260,7 @@ EdgeProcessor::redo_or_process (const std::vector<std::pair<db::EdgeSink *, db::
         progress->set (size_t (double (todo_next - todo) * p) + todo);
       }
 
-      size_t n = std::distance (current, future);
+      size_t n = 0;
       db::Coord yy = y;
 
       //  Use as many scanlines as to fetch approx. 50% new edges into the scanline (this
@@ -2276,7 +2277,11 @@ EdgeProcessor::redo_or_process (const std::vector<std::pair<db::EdgeSink *, db::
           yy = std::numeric_limits <db::Coord>::max ();
         }
 
-      } while (future != mp_work_edges->end () && std::distance (current, future) < long (n + n / 2));
+        if (n == 0) {
+          n = std::distance (current, future);
+        }
+
+      } while (future != mp_work_edges->end () && std::distance (current, future) < long (n * fill_factor));
 
       bool is90 = true;
 

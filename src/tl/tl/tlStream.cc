@@ -666,15 +666,15 @@ TextInputStream::reset ()
 InputFile::InputFile (const std::string &path)
   : m_fd (-1)
 {
-  m_source = path;
+  m_source = tl::absolute_file_path (path);;
 #if defined(_WIN32)
-  int fd = _wopen (tl::to_wstring (path).c_str (), _O_BINARY | _O_RDONLY | _O_SEQUENTIAL);
+  int fd = _wopen (tl::to_wstring (m_source).c_str (), _O_BINARY | _O_RDONLY | _O_SEQUENTIAL);
   if (fd < 0) {
     throw FileOpenErrorException (m_source, errno);
   }
   m_fd = fd;
 #else
-  int fd = open (path.c_str (), O_RDONLY);
+  int fd = open (m_source.c_str (), O_RDONLY);
   if (fd < 0) {
     throw FileOpenErrorException (m_source, errno);
   }
@@ -747,15 +747,15 @@ InputFile::filename () const
 InputZLibFile::InputZLibFile (const std::string &path)
   : mp_d (new ZLibFilePrivate ())
 {
-  m_source = path;
+  m_source = tl::absolute_file_path (path);
 #if defined(_WIN32)
-  int fd = _wopen (tl::to_wstring (path).c_str (), _O_BINARY | _O_RDONLY | _O_SEQUENTIAL);
+  int fd = _wopen (tl::to_wstring (m_source).c_str (), _O_BINARY | _O_RDONLY | _O_SEQUENTIAL);
   if (fd < 0) {
     throw FileOpenErrorException (m_source, errno);
   }
   mp_d->zs = gzdopen (fd, "rb");
 #else
-  mp_d->zs = gzopen (tl::string_to_system (path).c_str (), "rb");
+  mp_d->zs = gzopen (tl::string_to_system (m_source).c_str (), "rb");
 #endif
   if (mp_d->zs == NULL) {
     throw FileOpenErrorException (m_source, errno);
@@ -1035,10 +1035,10 @@ OutputStream::seek (size_t pos)
 //  OutputFileBase implementation
 
 OutputFileBase::OutputFileBase (const std::string &path, int keep_backups)
-  : m_keep_backups (keep_backups), m_path (path), m_has_error (false)
+  : m_keep_backups (keep_backups), m_path (tl::absolute_file_path (path)), m_has_error (false)
 {
-  if (tl::file_exists (path)) {
-    m_backup_path = path + ".~backup";
+  if (tl::file_exists (m_path)) {
+    m_backup_path = m_path + ".~backup";
     if (tl::file_exists (m_backup_path)) {
       if (! tl::rm_file (m_backup_path)) {
         tl::warn << tl::sprintf (tl::to_string (tr ("Could not create backup file: unable to remove existing file '%s'")), m_backup_path);
@@ -1046,8 +1046,8 @@ OutputFileBase::OutputFileBase (const std::string &path, int keep_backups)
       }
     }
     if (! m_backup_path.empty ()) {
-      if (! tl::rename_file (path, tl::filename (m_backup_path))) {
-        tl::warn << tl::sprintf (tl::to_string (tr ("Could not create backup file: unable to rename original file '%s' to backup file")), path, m_backup_path);
+      if (! tl::rename_file (m_path, tl::filename (m_backup_path))) {
+        tl::warn << tl::sprintf (tl::to_string (tr ("Could not create backup file: unable to rename original file '%s' to backup file")), m_path, m_backup_path);
         m_backup_path = std::string ();
       }
     }

@@ -33,7 +33,7 @@
 
 #include <cstdlib>
 
-void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int compr, bool recompress)
+void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int compr, bool recompress, bool tables_at_end)
 {
   {
     db::Manager m (false);
@@ -60,6 +60,7 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
       db::OASISWriterOptions oasis_options;
       oasis_options.write_cblocks = false;
       oasis_options.strict_mode = false;
+      oasis_options.tables_at_end = tables_at_end;
       options.set_options (oasis_options);
       writer.write (layout, stream, options);
     }
@@ -115,6 +116,7 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
       db::OASISWriterOptions oasis_options;
       oasis_options.write_cblocks = true;
       oasis_options.strict_mode = true;
+      oasis_options.tables_at_end = tables_at_end;
       options.set_options (oasis_options);
       writer.write (layout, stream, options);
     }
@@ -164,6 +166,7 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
       db::OASISWriterOptions oasis_options;
       oasis_options.write_cblocks = false;
       oasis_options.strict_mode = false;
+      oasis_options.tables_at_end = tables_at_end;
       oasis_options.write_std_properties = 2;
       options.set_options (oasis_options);
       writer.write (layout, stream, options);
@@ -214,6 +217,7 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
       db::OASISWriterOptions oasis_options;
       oasis_options.write_cblocks = true;
       oasis_options.strict_mode = true;
+      oasis_options.tables_at_end = tables_at_end;
       oasis_options.write_std_properties = 2;
       options.set_options (oasis_options);
       writer.write (layout, stream, options);
@@ -255,6 +259,7 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
     db::OASISWriterOptions oasis_options;
     oasis_options.compression_level = compr;
     oasis_options.recompress = recompress;
+    oasis_options.tables_at_end = tables_at_end;
     options.set_options (oasis_options);
     options.set_scale_factor (3.0);
     options.set_dbu (0.0005);
@@ -308,11 +313,14 @@ void run_test (tl::TestBase *_this, const char *file, bool scaling_test, int com
 void run_test (tl::TestBase *_this, const char *file, bool scaling_test = true)
 {
   for (int recompress = 0; recompress < 2; ++recompress) {
-    run_test (_this, file, scaling_test, 0, recompress);
-    run_test (_this, file, scaling_test, 1, recompress);
-    run_test (_this, file, scaling_test, 2, recompress);
-    run_test (_this, file, scaling_test, 10, recompress);
+    run_test (_this, file, scaling_test, 0, recompress, false);
+    run_test (_this, file, scaling_test, 1, recompress, false);
+    run_test (_this, file, scaling_test, 2, recompress, false);
+    run_test (_this, file, scaling_test, 10, recompress, false);
   }
+
+  //  tables at end
+  run_test (_this, file, scaling_test, 2, false, true);
 }
 
 TEST(1)
@@ -1860,3 +1868,111 @@ TEST(120_IrregularInstRepetitions)
   }
 
 }
+
+//  Meta info
+static void
+run_test130 (tl::TestBase *_this, bool strict, bool tables_at_end)
+{
+  db::Layout layout_org;
+
+  layout_org.add_cell ("U");
+  db::cell_index_type ci = layout_org.add_cell ("X");
+
+  layout_org.add_meta_info ("a", db::MetaInfo ("description", 17.5, true));
+  layout_org.add_meta_info ("b", db::MetaInfo ("", "value", true));
+
+  layout_org.add_meta_info (ci, "a", db::MetaInfo ("dd", true, true));
+  layout_org.add_meta_info (ci, "c", db::MetaInfo ("d", -1, true));
+
+  std::string tmp_file = _this->tmp_file ("tmp_OASISWriter1.oas");
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::OASISWriterOptions oasis_options;
+    oasis_options.strict_mode = strict;
+    oasis_options.tables_at_end = tables_at_end;
+    db::SaveLayoutOptions options;
+    options.set_format ("OASIS");
+    options.set_options (oasis_options);
+    db::Writer writer (options);
+    writer.write (layout_org, out);
+  }
+
+  db::Layout layout_read;
+
+  {
+    tl::InputStream in (tmp_file);
+    db::Reader reader (in);
+    reader.read (layout_read);
+  }
+
+  EXPECT_EQ (layout_read.meta_info ("x").value.to_string (), "nil");
+  EXPECT_EQ (layout_read.meta_info ("a").value.to_string (), "17.5");
+  EXPECT_EQ (layout_read.meta_info ("a").description, "description");
+  EXPECT_EQ (layout_read.meta_info ("b").value.to_string (), "value");
+  EXPECT_EQ (layout_read.meta_info ("b").description, "");
+
+  db::cell_index_type ci2 = layout_read.cell_by_name ("X").second;
+
+  EXPECT_EQ (layout_read.meta_info (ci2, "x").value.to_string (), "nil");
+  EXPECT_EQ (layout_read.meta_info (ci2, "a").value.to_string (), "true");
+  EXPECT_EQ (layout_read.meta_info (ci2, "a").description, "dd");
+  EXPECT_EQ (layout_read.meta_info (ci2, "c").value.to_string (), "-1");
+  EXPECT_EQ (layout_read.meta_info (ci2, "c").description, "d");
+
+  tmp_file = _this->tmp_file ("tmp_OASISWriter2.oas");
+
+  {
+    tl::OutputStream out (tmp_file);
+    db::OASISWriterOptions oasis_options;
+    oasis_options.strict_mode = strict;
+    oasis_options.tables_at_end = tables_at_end;
+    db::SaveLayoutOptions options;
+    options.set_format ("OASIS");
+    options.set_options (oasis_options);
+    options.set_write_context_info (false);
+    db::Writer writer (options);
+    writer.write (layout_org, out);
+  }
+
+  layout_read = db::Layout ();
+
+  {
+    tl::InputStream in (tmp_file);
+    db::Reader reader (in);
+    reader.read (layout_read);
+  }
+
+  EXPECT_EQ (layout_read.meta_info ("x").value.to_string (), "nil");
+  EXPECT_EQ (layout_read.meta_info ("a").value.to_string (), "nil");
+  EXPECT_EQ (layout_read.meta_info ("b").value.to_string (), "nil");
+
+  ci2 = layout_read.cell_by_name ("X").second;
+
+  EXPECT_EQ (layout_read.meta_info (ci2, "x").value.to_string (), "nil");
+  EXPECT_EQ (layout_read.meta_info ("a").value.to_string (), "nil");
+  EXPECT_EQ (layout_read.meta_info ("b").value.to_string (), "nil");
+}
+
+//  Meta info
+
+TEST(130a)
+{
+  run_test130 (_this, false, false);
+}
+
+TEST(130b)
+{
+  run_test130 (_this, true, false);
+}
+
+TEST(130c)
+{
+  run_test130 (_this, false, true);
+}
+
+TEST(130d)
+{
+  run_test130 (_this, true, true);
+}
+

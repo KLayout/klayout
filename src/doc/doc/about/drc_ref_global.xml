@@ -1182,6 +1182,36 @@ See <a href="/about/drc_ref_netter.xml#netlist">Netter#netlist</a> for a descrip
 <p>
 See <a href="/about/drc_ref_netter.xml">Netter</a> for more details
 </p>
+<a name="new_report"/><h2>"new_report" - Creates a new report database object for use in "output"</h2>
+<keyword name="new_report"/>
+<p>Usage:</p>
+<ul>
+<li><tt>new_report(description [, filename [, cellname ] ])</tt></li>
+</ul>
+<p>
+This method creates an independent report object. This object
+can be used in "output" to send a layer to a different report than
+the default report or target.
+</p><p>
+Arguments are the same than for <a href="/about/drc_ref_global.xml#report">report</a>.
+</p><p>
+See <a href="/about/drc_ref_layer.xml#output">Layer#output</a> for details about this feature.
+</p>
+<a name="new_target"/><h2>"new_target" - Creates a new layout target object for use in "output"</h2>
+<keyword name="new_target"/>
+<p>Usage:</p>
+<ul>
+<li><tt>new_target(what [, cellname])</tt></li>
+</ul>
+<p>
+This method creates an independent target object. This object
+can be used in "output" to send a layer to a different layout file than
+the default report or target.
+</p><p>
+Arguments are the same than for <a href="/about/drc_ref_global.xml#target">target</a>.
+</p><p>
+See <a href="/about/drc_ref_layer.xml#output">Layer#output</a> for details about this feature.
+</p>
 <a name="no_borders"/><h2>"no_borders" - Reset the tile borders</h2>
 <keyword name="no_borders"/>
 <p>Usage:</p>
@@ -1412,6 +1442,21 @@ See <a href="/about/drc_ref_source.xml#polygons">Source#polygons</a> for a descr
 <p>
 The primary input of the universal DRC function is the layer the <a href="/about/drc_ref_layer.xml#drc">Layer#drc</a> function
 is called on.
+</p>
+<a name="profile"/><h2>"profile" - Profiles the script and provides a runtime + memory statistics</h2>
+<keyword name="profile"/>
+<p>Usage:</p>
+<ul>
+<li><tt>profile</tt></li>
+<li><tt>profile(n)</tt></li>
+</ul>
+<p>
+Turns profiling on or off (default). In profiling mode, the 
+system will collect statistics about rules executed, their execution time
+and memory information. The argument specifies how many operations to 
+print at the end of the run. Without an argument, all operations are
+printed. Passing "false" for the argument will disable profiling. This is the
+default.
 </p>
 <a name="props_copy"/><h2>"props_copy" - Specifies "copy properties" on operations supporting user properties constraints</h2>
 <keyword name="props_copy"/>

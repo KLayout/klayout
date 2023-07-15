@@ -24,6 +24,8 @@
 #include "dbGDS2Reader.h"
 #include "dbGDS2Writer.h"
 #include "dbLayoutDiff.h"
+#include "dbLibraryManager.h"
+#include "dbLibrary.h"
 #include "dbShapeProcessor.h"
 #include "dbWriter.h"
 #include "dbTextWriter.h"
@@ -1198,14 +1200,29 @@ TEST(130a)
 {
   db::Layout layout_org;
 
+  db::Library *lib = db::LibraryManager::instance ().lib_ptr_by_name ("Basic");
+  std::pair<bool, db::pcell_id_type> pc = lib->layout ().pcell_by_name ("TEXT");
+
   layout_org.add_cell ("U");
   db::cell_index_type ci = layout_org.add_cell ("X");
+
+  std::map<std::string, tl::Variant> params;
+  params.insert (std::make_pair ("text", "ABC"));
+  params.insert (std::make_pair ("layer", db::LayerProperties (1, 0)));
+  db::cell_index_type lib_cell = lib->layout ().get_pcell_variant_dict (pc.second, params);
+  db::cell_index_type cil = layout_org.get_lib_proxy (lib, lib_cell);
+
+  //  the proxy needs an instance otherwise it is cleaned away before writing
+  layout_org.cell (ci).insert (db::CellInstArray (cil, db::Trans ()));
 
   layout_org.add_meta_info ("a", db::MetaInfo ("description", 17.5, true));
   layout_org.add_meta_info ("b", db::MetaInfo ("", "value", true));
 
   layout_org.add_meta_info (ci, "a", db::MetaInfo ("dd", true, true));
   layout_org.add_meta_info (ci, "c", db::MetaInfo ("d", -1, true));
+
+  layout_org.add_meta_info (cil, "x", db::MetaInfo ("", 42, true));
+  layout_org.add_meta_info (cil, "y", db::MetaInfo ("", -17, true));
 
   //  complex type
   tl::Variant v2;
@@ -1251,6 +1268,7 @@ TEST(130a)
   EXPECT_EQ (layout_read.meta_info ("complex").value.to_string (), "-1.5,x=>value_for_x,y=>(1.5,2.5;3.5,4.5)");
 
   db::cell_index_type ci2 = layout_read.cell_by_name ("X").second;
+  db::cell_index_type cil2 = layout_read.cell_by_name ("TEXT").second;
 
   EXPECT_EQ (layout_read.meta_info (ci2, "x").value.to_string (), "nil");
   EXPECT_EQ (layout_read.meta_info (ci2, "a").value.to_string (), "true");
@@ -1261,6 +1279,9 @@ TEST(130a)
   EXPECT_EQ (layout_read.meta_info (ci2, "complex").value.size (), size_t (2));
   EXPECT_EQ (layout_read.meta_info (ci2, "complex").value.begin () [1].is_array (), true);
   EXPECT_EQ (layout_read.meta_info (ci2, "complex").value.to_string (), "-1.5,x=>value_for_x,y=>(1.5,2.5;3.5,4.5)");
+
+  EXPECT_EQ (layout_read.meta_info (cil2, "x").value.to_string (), "42");
+  EXPECT_EQ (layout_read.meta_info (cil2, "y").value.to_string (), "-17");
 
   tmp_file = tl::TestBase::tmp_file ("tmp_GDS2Writer_130b.gds");
 

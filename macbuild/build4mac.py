@@ -1241,6 +1241,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     MacBinDir      = parameters['bin']
     MacBuildDir    = parameters['build']
     MacBuildLog    = parameters['logfile']
+    Platform       = parameters['Platform']
 
     AbsMacPkgDir   = "%s/%s" % (ProjectDir, MacPkgDir)
     AbsMacBinDir   = "%s/%s" % (ProjectDir, MacBinDir)
@@ -1686,19 +1687,56 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             depdict         = WalkFrameworkPaths( pythonFrameworkPath, search_path_filter=filterreg )
             PerformChanges( depdict, replacePairs, bundleExecPathAbs )
 
-            print( "   [9.2.4] Patching openssl@1.1, gdbm, readline, sqlite, xz" )
-            usrLocalPath    = '%s/opt/' % DefaultHomebrewRoot
-            appUsrLocalPath = '@executable_path/../Frameworks/'
-            replacePairs    = [ (usrLocalPath, appUsrLocalPath, True) ]
-            replacePairs.extend( [ (openssl_version, '@executable_path/../Frameworks/openssl@1.1', True)
-                for openssl_version in glob.glob( '%s/Cellar/openssl@1.1/*' % DefaultHomebrewRoot ) ] )
-            filterreg = r'\t+%s/(opt|Cellar)' % DefaultHomebrewRoot
-            depdict   = WalkFrameworkPaths( [pythonFrameworkPath + '/../openssl@1.1',
-                                             pythonFrameworkPath + '/../gdbm',
-                                             pythonFrameworkPath + '/../readline',
-                                             pythonFrameworkPath + '/../sqlite',
-                                             pythonFrameworkPath + '/../xz'], search_path_filter=filterreg )
-
+            #---------------------------------------------------------------------------------------------------
+            # As of 2023-07-09 (KLayout 0.28.10),
+            #   python@3.9 (Python 3.9.17) in [ 'Ventura', 'Monterey', 'BigSur' ] depends on openssl@3
+            #     % brew deps python@3.9
+            #     ca-certificates
+            #     gdbm
+            #     mpdecimal
+            #     openssl@3 <===
+            #     readline
+            #     sqlite
+            #     xz
+            #
+            #   python@3.9 (Python 3.9.16; already stopped upgrading) in ['Catalina'] depends on openssl@1.1
+            #     ca-certificates
+            #     gdbm
+            #     gettext
+            #     mpdecimal
+            #     openssl@1.1 <===
+            #     readline
+            #     sqlite
+            #     xz
+            #---------------------------------------------------------------------------------------------------
+            if Platform in ['Catalina']:
+                print( "   [9.2.4] Patching openssl@1.1, gdbm, mpdecimal, readline, sqlite, xz" )
+                usrLocalPath    = '%s/opt/' % DefaultHomebrewRoot
+                appUsrLocalPath = '@executable_path/../Frameworks/'
+                replacePairs    = [ (usrLocalPath, appUsrLocalPath, True) ]
+                replacePairs.extend( [ (openssl_version, '@executable_path/../Frameworks/openssl@1.1', True)
+                    for openssl_version in glob.glob( '%s/Cellar/openssl@1.1/*' % DefaultHomebrewRoot ) ] )
+                filterreg = r'\t+%s/(opt|Cellar)' % DefaultHomebrewRoot
+                depdict   = WalkFrameworkPaths( [pythonFrameworkPath + '/../openssl@1.1',
+                                                 pythonFrameworkPath + '/../gdbm',
+                                                 pythonFrameworkPath + '/../mpdecimal',
+                                                 pythonFrameworkPath + '/../readline',
+                                                 pythonFrameworkPath + '/../sqlite',
+                                                 pythonFrameworkPath + '/../xz'], search_path_filter=filterreg )
+            else: # [ 'Ventura', 'Monterey', 'BigSur' ]
+                print( "   [9.2.4] Patching openssl@3, gdbm, mpdecimal, readline, sqlite, xz" )
+                usrLocalPath    = '%s/opt/' % DefaultHomebrewRoot
+                appUsrLocalPath = '@executable_path/../Frameworks/'
+                replacePairs    = [ (usrLocalPath, appUsrLocalPath, True) ]
+                replacePairs.extend( [ (openssl_version, '@executable_path/../Frameworks/openssl@3', True)
+                    for openssl_version in glob.glob( '%s/Cellar/openssl@3/*' % DefaultHomebrewRoot ) ] )
+                filterreg = r'\t+%s/(opt|Cellar)' % DefaultHomebrewRoot
+                depdict   = WalkFrameworkPaths( [pythonFrameworkPath + '/../openssl@3',
+                                                 pythonFrameworkPath + '/../gdbm',
+                                                 pythonFrameworkPath + '/../mpdecimal',
+                                                 pythonFrameworkPath + '/../readline',
+                                                 pythonFrameworkPath + '/../sqlite',
+                                                 pythonFrameworkPath + '/../xz'], search_path_filter=filterreg )
             PerformChanges( depdict, replacePairs, bundleExecPathAbs )
 
             print( "  [9.3] Relinking dylib dependencies for klayout" )

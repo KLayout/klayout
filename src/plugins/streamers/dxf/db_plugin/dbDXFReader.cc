@@ -817,12 +817,12 @@ static db::DPoint
 b_spline_point (double x, const std::vector<std::pair<db::DPoint, double> > &control_points, int p, const std::vector<double> &t, int &k)
 {
   k = (int) (std::lower_bound (t.begin (), t.end (), x - 1e-6) - t.begin ());
-  if (k < p) {
-    return control_points.front ().first;
-  } else if (k > (int) control_points.size ()) {
-    return control_points.back ().first;
-  }
   --k;
+  if (k < p) {
+    k = p;
+  } else if (k >= (int) control_points.size ()) {
+    k = (int) control_points.size () - 1;
+  }
 
   std::vector<db::DPoint> d;
   std::vector<double> dw;

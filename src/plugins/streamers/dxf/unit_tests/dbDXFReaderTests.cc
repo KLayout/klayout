@@ -517,10 +517,22 @@ TEST(34)
 }
 
 //  issue #1422
-TEST(35)
+TEST(35a)
 {
   db::DXFReaderOptions opt;
   run_test_public (_this, "issue_1422a.dxf", "issue_1422a_au.gds.gz", opt);
+}
+
+//  issue #1422
+TEST(35b)
+{
+  db::DXFReaderOptions opt;
   run_test_public (_this, "issue_1422b.dxf", "issue_1422b_au.gds.gz", opt);
+}
+
+//  issue #1422
+TEST(35c)
+{
+  db::DXFReaderOptions opt;
   run_test_public (_this, "issue_1422c.dxf", "issue_1422c_au.gds.gz", opt);
 }

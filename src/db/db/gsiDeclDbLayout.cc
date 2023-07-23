@@ -128,6 +128,19 @@ size_t hash_value (const db::LayerProperties *l)
   return std::hfunc (*l);
 }
 
+static bool log_equal_ext (const db::LayerProperties *lp1, const db::LayerProperties &lp2)
+{
+  if (lp1->log_equal (lp2)) {
+    return true;
+  }
+  //  compare by name as fallback if one argument is named and the other is not
+  //  (this gives a way to look up
+  if ((lp1->is_named () || lp2.is_named()) && ! lp1->name.empty () && ! lp2.name.empty ()) {
+    return lp1->name == lp2.name;
+  }
+  return false;
+}
+
 //  since there already exists a "LayerProperties" object, we call this one "LayerInfo"
 Class<db::LayerProperties> decl_LayerInfo ("db", "LayerInfo",
   gsi::constructor ("new", &ctor_layer_info_default, 
@@ -194,14 +207,15 @@ Class<db::LayerProperties> decl_LayerInfo ("db", "LayerInfo",
     "\n"
     "This method was added in version 0.18.\n"
   ) +
-  gsi::method ("is_equivalent?", &db::LayerProperties::log_equal, gsi::arg ("b"),
+  gsi::method_ext ("is_equivalent?", &log_equal_ext, gsi::arg ("b"),
     "@brief Equivalence of two layer info objects\n"
     "@return True, if both are equivalent\n"
     "\n"
-    "First, layer and datatype are compared. The name is of second order and used only if no layer or datatype is given.\n"
+    "First, layer and datatype are compared. The name is of second order and used only if no layer or datatype is given "
+    "for one of the operands.\n"
     "This is basically a weak comparison that reflects the search preferences.\n"
     "\n"
-    "This method was added in version 0.18.\n"
+    "This method was added in version 0.18 and modified to compare non-named vs. named layers in version 0.28.11.\n"
   ) +
   gsi::method_ext ("hash", &hash_value,
     "@brief Computes a hash value\n"
@@ -506,7 +520,7 @@ static tl::Variant find_layer (db::Layout *l, const db::LayerProperties &lp)
   } else {
     //  if we have a layer with the requested properties already, return this.
     for (db::Layout::layer_iterator li = l->begin_layers (); li != l->end_layers (); ++li) {
-      if ((*li).second->log_equal (lp)) {
+      if (log_equal_ext ((*li).second, lp)) {
         return tl::Variant ((*li).first);
       }
     }
@@ -530,7 +544,7 @@ static tl::Variant find_layer3 (db::Layout *l, int ln, int dn, const std::string
   return find_layer (l, db::LayerProperties (ln, dn, name));
 }
 
-static std::vector<unsigned int> layer_indices (const db::Layout *l)
+static std::vector<unsigned int> layer_indexes (const db::Layout *l)
 {
   std::vector<unsigned int> layers;
   for (unsigned int i = 0; i < l->layers (); ++i) {
@@ -1755,7 +1769,7 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "@param layer_index The index of the layer to delete.\n"
   ) +
-  gsi::method_ext ("layer_indexes|#layer_indices", &layer_indices,
+  gsi::method_ext ("layer_indexes|#layer_indices", &layer_indexes,
     "@brief Gets a list of valid layer's indices\n"
     "This method returns an array with layer indices representing valid layers.\n"
     "\n"

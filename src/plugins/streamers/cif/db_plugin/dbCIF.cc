@@ -54,7 +54,7 @@ public:
   virtual std::string format_name () const { return "CIF"; }
   virtual std::string format_desc () const { return "CIF"; }
   virtual std::string format_title () const { return "CIF (Caltech interchange format)"; }
-  virtual std::string file_format () const { return "CIF files (*.CIF *.cif *.cif.gz *.CIF.gz)"; }
+  virtual std::string file_format () const { return "CIF files (*.cif *.CIF *.cif.gz *.CIF.gz)"; }
 
   static tl::Extractor &skip_blanks (tl::Extractor &ex)
   {

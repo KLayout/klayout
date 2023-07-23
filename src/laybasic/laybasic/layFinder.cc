@@ -123,47 +123,74 @@ Finder::start (lay::LayoutViewBase *view, unsigned int cv_index, const std::vect
   }
 }
 
+void
+Finder::test_edge (const db::ICplxTrans &trans, const db::Edge &edge, double &distance, bool &match)
+{
+  if (test_edge (trans, edge, true, distance, match) == 0) {
+    test_edge (trans, edge, false, distance, match);
+  }
+}
+
 unsigned int
-Finder::test_edge (const db::ICplxTrans &trans, const db::Edge &edg, double &distance, bool &match)
+Finder::test_edge (const db::ICplxTrans &trans, const db::Edge &edg, bool points, double &distance, bool &match)
 {
   db::Point p1 = trans * edg.p1 ();
   db::Point p2 = trans * edg.p2 ();
 
   unsigned int ret = 0;
 
-  //  we hit the region with the edge end points - take the closest vertex
-  if (m_region.contains (p1) || m_region.contains (p2)) {
+  if (points) {
 
-    double d1 = p1.double_distance (m_region.center ());
-    double d2 = p2.double_distance (m_region.center ());
+    //  we hit the region with the edge end points - take the closest vertex
+    if (m_region.contains (p1) || m_region.contains (p2)) {
 
-    double d = std::min (d1, d2);
-    if (! match || d < distance) {
-      distance = d;
+      double d1 = p1.double_distance (m_region.center ());
+      double d2 = p2.double_distance (m_region.center ());
+      if (d1 < d2) {
+        ret = 1;
+      } else {
+        ret = 2;
+      }
+
+      double d = std::min (d1, d2);
+      //  add a penalty of 1 DBU for being on the wrong
+      //  side of the edge - this favors the right edge
+      //  in case of butting corners
+      if (ret == 1) {
+        if (db::sprod_sign (m_region.center () - p1, p2 - p1) < 0) {
+          d += trans.ctrans (1);
+        }
+      } else {
+        if (db::sprod_sign (m_region.center () - p2, p1 - p2) < 0) {
+          d += trans.ctrans (1);
+        }
+      }
+
+      if (! match || d < distance) {
+        distance = d;
+      }
+
+      match = true;
+
     }
 
-    if (d1 < d2) {
-      ret = 1;
-    } else {
-      ret = 2;
-    }
-
-    match = true;
-
-  }
+  } else {
   
-  //  if the edge cuts through the active region: test the
-  //  edge as a whole
-  if (ret == 0) {
+    //  if the edge cuts through the active region: test the
+    //  edge as a whole
     db::Edge edg_trans (p1, p2);
     if (edg_trans.clipped (m_region).first) {
+
       double d = edg_trans.distance_abs (m_region.center ());
       if (! match || d < distance) {
         distance = d;
-        ret = 3;
       }
+
+      ret = 3;
       match = true;
+
     }
+
   }
 
   return ret;

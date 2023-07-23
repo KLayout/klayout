@@ -26,6 +26,7 @@
 
 #include "ui_LogViewerDialog.h"
 #include "tlLog.h"
+#include "tlTimer.h"
 #include "layCommon.h"
 
 #include <QTimer>
@@ -220,6 +221,7 @@ signals:
   void attention_changed (bool f);
 
 private:
+  tl::Clock m_last_yield;
   QTimer m_timer;
   mutable QMutex m_lock;
   LogReceiver m_error_receiver;

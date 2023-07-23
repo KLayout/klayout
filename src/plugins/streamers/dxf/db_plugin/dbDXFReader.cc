@@ -814,15 +814,15 @@ De Boor algorithm for NURBS
 */
 
 static db::DPoint
-b_spline_point (double x, const std::vector<std::pair<db::DPoint, double> > &control_points, int p, const std::vector<double> &t)
+b_spline_point (double x, const std::vector<std::pair<db::DPoint, double> > &control_points, int p, const std::vector<double> &t, int &k)
 {
-  int k = (int) (std::lower_bound (t.begin (), t.end (), x + 1e-6) - t.begin ());
-  if (k <= p) {
-    return control_points.front ().first;
-  } else if (k > (int) control_points.size ()) {
-    return control_points.back ().first;
-  }
+  k = (int) (std::lower_bound (t.begin (), t.end (), x - 1e-6) - t.begin ());
   --k;
+  if (k < p) {
+    k = p;
+  } else if (k >= (int) control_points.size ()) {
+    k = (int) control_points.size () - 1;
+  }
 
   std::vector<db::DPoint> d;
   std::vector<double> dw;
@@ -878,14 +878,16 @@ spline_interpolate (std::list<db::DPoint> &curve_points,
   std::list<db::DPoint>::iterator pe = pm;
   ++pe;
 
-  db::DPoint s1 = b_spline_point (t_start + 0.5 * dt, control_points, degree, knots);
-  db::DPoint s2 = b_spline_point (t_start + 1.5 * dt, control_points, degree, knots);
+  int k1 = 0, k2 = 0;
+
+  db::DPoint s1 = b_spline_point (t_start + 0.5 * dt, control_points, degree, knots, k1);
+  db::DPoint s2 = b_spline_point (t_start + 1.5 * dt, control_points, degree, knots, k2);
 
   db::DVector p1 (s1, *current_curve_point);
   db::DVector p2 (*pm, s1);
   double pl1 = p1.length(), pl2 = p2.length();
 
-  if (curve_points.size () < control_points.size () - degree - 1) {
+  if (k1 != k2) {
 
     curve_points.insert (pm, s1);
     spline_interpolate (curve_points, current_curve_point, t_start, dt * 0.5, control_points, degree, knots, sin_da, accu);
@@ -958,12 +960,12 @@ DXFReader::spline_interpolation (std::vector<std::pair<db::DPoint, double> > &co
   double accu = std::max (m_circle_accuracy, m_dbu / m_unit);
 
   std::list<db::DPoint> new_points;
-  new_points.push_back (control_points.front ().first);
 
   double dt = 0.5 * (tn - t0);
 
-  for (double t = t0 + dt; t < tn + 1e-6; t += dt) {
-    db::DPoint s = b_spline_point (t, control_points, degree, knots);
+  for (double t = t0; t < tn + 1e-6; t += dt) {
+    int k = 0;
+    db::DPoint s = b_spline_point (t, control_points, degree, knots, k);
     new_points.push_back (s);
   }
 

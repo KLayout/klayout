@@ -1168,7 +1168,7 @@ class GerberFormatDeclaration
   virtual std::string format_name () const { return "GerberPCB"; }
   virtual std::string format_desc () const { return "Gerber PCB"; }
   virtual std::string format_title () const { return "Gerber PCB (project files)"; }
-  virtual std::string file_format () const { return "Gerber PCB project files (*.pcb)"; }
+  virtual std::string file_format () const { return "Gerber PCB project files (*.pcb *.PCB)"; }
 
   virtual bool detect (tl::InputStream &stream) const
   {

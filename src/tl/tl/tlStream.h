@@ -928,6 +928,22 @@ public:
    */
   virtual void reject ();
 
+  /**
+   *  @brief Gets the actual path
+   */
+  const std::string &path () const
+  {
+    return m_path;
+  }
+
+  /**
+   *  @brief Gets the path of the backup file
+   */
+  const std::string &backup_path () const
+  {
+    return m_backup_path;
+  }
+
 protected:
   virtual void seek_file (size_t s) = 0;
   virtual void write_file (const char *b, size_t n) = 0;
@@ -990,7 +1006,6 @@ private:
   OutputZLibFile (const OutputZLibFile &);
   OutputZLibFile &operator= (const OutputZLibFile &);
 
-  std::string m_source;
   ZLibFilePrivate *mp_d;
 };
 
@@ -1051,7 +1066,6 @@ private:
   OutputFile (const OutputFile &);
   OutputFile &operator= (const OutputFile &);
 
-  std::string m_source;
   int m_fd;
 };
 

@@ -1480,6 +1480,18 @@ GuiApplication::initialize ()
 bool
 GuiApplication::notify (QObject *receiver, QEvent *e)
 {
+  QWheelEvent *wheel_event = dynamic_cast<QWheelEvent *>(e);
+  if (wheel_event) {
+    //  intercept wheel events targeting QComboBox objects to avoid
+    //  changing them through wheel actions.
+    for (auto r = receiver; r != 0; r = r->parent ()) {
+      if (dynamic_cast<QComboBox *>(r)) {
+        //  stop further processing
+        return true;
+      }
+    }
+  }
+
   if (dynamic_cast<QPaintEvent *> (e)) {
     //  NOTE: we don't want recursive paint events - the painters are not reentrant.
     //  Hence we disable process_events_impl (specifically for progress reporters).
@@ -1543,18 +1555,18 @@ GuiApplication::force_update_app_menu ()
 #endif
 }
 
-#if defined(__APPLE__)
-// By Thomas Lima (March 7, 2018)
-// 
-// This event interceptor catches MacOS "Open With" event, and KLayout should respond 
-// similarly to the Drop event in MainWindow::dropEvent.
-// 
-// This particular implementation always creates a new window.
-//
-// This was implemented with the inspiration of http://doc.qt.io/qt-5/qfileopenevent.html
 bool
 GuiApplication::event (QEvent *event)
 {
+#if defined(__APPLE__)
+  // By Thomas Lima (March 7, 2018)
+  //
+  // This event interceptor catches MacOS "Open With" event, and KLayout should respond
+  // similarly to the Drop event in MainWindow::dropEvent.
+  //
+  // This particular implementation always creates a new window.
+  //
+  // This was implemented with the inspiration of http://doc.qt.io/qt-5/qfileopenevent.html
   if (event->type() == QEvent::FileOpen) {
       QFileOpenEvent *openEvent = static_cast<QFileOpenEvent *>(event);
       if (mp_mw)
@@ -1566,10 +1578,10 @@ GuiApplication::event (QEvent *event)
         mp_mw->add_mru (file, tech);
       }
   }
+#endif
 
   return QApplication::event(event);
 }
-#endif
 
 
 int

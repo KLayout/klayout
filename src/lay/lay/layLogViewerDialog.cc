@@ -120,6 +120,8 @@ LogFile::LogFile (size_t max_entries, bool register_global)
 {
   connect (&m_timer, SIGNAL (timeout ()), this, SLOT (timeout ()));
 
+  m_last_yield = tl::Clock::current ();
+
   m_timer.setSingleShot (true);
   m_timer.setInterval (0);
 
@@ -190,6 +192,9 @@ LogFile::timeout ()
   bool attn = false, last_attn = false;
 
   m_lock.lock ();
+
+  m_last_yield = tl::Clock::current ();
+
   if (m_generation_id != m_last_generation_id) {
     attn = m_has_errors || m_has_warnings;
     last_attn = m_last_attn;
@@ -197,6 +202,7 @@ LogFile::timeout ()
     m_last_generation_id = m_generation_id;
     changed = true;
   }
+
   m_lock.unlock ();
 
   if (changed) {
@@ -254,7 +260,9 @@ LogFile::yield ()
 {
   //  will update on next processEvents
   if (lay::ApplicationBase::instance ()->qapp_gui () && QThread::currentThread () == lay::ApplicationBase::instance ()->qapp_gui ()->thread ()) {
-    m_timer.start ();
+    if ((tl::Clock::current () - m_last_yield).seconds () > 0.2) {
+      m_timer.start ();
+    }
   }
 }
 

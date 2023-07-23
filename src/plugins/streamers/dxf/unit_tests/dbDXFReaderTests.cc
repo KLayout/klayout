@@ -182,7 +182,7 @@ TEST(15)
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("TEXT:4,IGBT:5,Wire:7,Ceramic:11,LAYER_1:14,Diode:18,'DBC TOP Plate':19,'Terminal Position':20");
   opt.create_other_layers = true;
-  run_test (_this, "t15.dxf.gz", "t15_au2.gds.gz", opt);
+  run_test (_this, "t15.dxf.gz", "t15_au2_2.gds.gz", opt);
 }
 
 TEST(16)
@@ -190,7 +190,7 @@ TEST(16)
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("TEXT:4,IGBT:5,Wire:7,Ceramic:11,LAYER_1:14,Diode:18,'DBC TOP Plate':19,'Terminal Position':20");
   opt.create_other_layers = true;
-  run_test (_this, "t16.dxf.gz", "t16_au2.gds.gz", opt);
+  run_test (_this, "t16.dxf.gz", "t16_au2_2.gds.gz", opt);
 }
 
 TEST(17)
@@ -198,7 +198,7 @@ TEST(17)
   db::DXFReaderOptions opt;
   opt.layer_map = string2lm ("TEXT:4,IGBT:5,Wire:7,Ceramic:11,LAYER_1:14,Diode:18,'DBC TOP Plate':19,'Terminal Position':20");
   opt.create_other_layers = true;
-  run_test (_this, "t17.dxf.gz", "t17_au2.gds.gz", opt);
+  run_test (_this, "t17.dxf.gz", "t17_au2_2.gds.gz", opt);
 }
 
 TEST(18)
@@ -514,4 +514,25 @@ TEST(34)
   opt.polyline_mode = 3;
 
   run_test_public (_this, "issue_1173.dxf", "issue_1173_au.gds.gz", opt);
+}
+
+//  issue #1422
+TEST(35a)
+{
+  db::DXFReaderOptions opt;
+  run_test_public (_this, "issue_1422a.dxf", "issue_1422a_au.gds.gz", opt);
+}
+
+//  issue #1422
+TEST(35b)
+{
+  db::DXFReaderOptions opt;
+  run_test_public (_this, "issue_1422b.dxf", "issue_1422b_au.gds.gz", opt);
+}
+
+//  issue #1422
+TEST(35c)
+{
+  db::DXFReaderOptions opt;
+  run_test_public (_this, "issue_1422c.dxf", "issue_1422c_au.gds.gz", opt);
 }

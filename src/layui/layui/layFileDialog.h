@@ -65,19 +65,26 @@ public:
   ~FileDialog ();
 
   /**
-   *  @brief Get a file name to read
+   *  @brief Gets a file name to read
    */
   bool get_open (std::string &file_name, const std::string &title = std::string ());
 
   /**
-   *  @brief Read multiple files names
+   *  @brief Reads multiple files names
    */
   bool get_open (std::vector<std::string> &file_names, const std::string &dir = std::string (), const std::string &title = std::string ());
 
   /**
-   *  @brief Get a file name to save
+   *  @brief Gets a file name to save
    */
   bool get_save (std::string &file_name, const std::string &title = std::string ());
+
+  /**
+   *  @brief Gets the selected filter or -1 if no specific filter was selected
+   *
+   *  This value is only set after get_open or get_save returned true
+   */
+  int selected_filter () const;
 
   /**
    *  @brief Make the file names use UTF8 encoding 
@@ -86,6 +93,16 @@ public:
    *  file names should be handled properly by QString and tl::Stream.
    */
   static void set_utf8 (bool utf);
+
+  /**
+   *  @brief Gets the index of the selected filter from the filter list
+   */
+  static int find_selected_filter (const QString &filters, const QString &selected_filter);
+
+  /**
+   *  @brief Adds the default extension unless there is one already
+   */
+  static std::string add_default_extension (const std::string &path, const QString &selected_filter);
 
 private:
   QDir m_dir;

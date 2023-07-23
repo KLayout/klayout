@@ -459,12 +459,9 @@ public:
   void force_update_app_menu ();
 
   /**
-   *  @brief Handles MacOS file open
-   *  This function is used to process the "Open With" event sent by MacOS.
+   *  @brief Handles events
    */
-#ifdef __APPLE__
   bool event (QEvent *event);
-#endif
 
 protected:
   virtual void setup ();

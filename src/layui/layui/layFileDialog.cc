@@ -32,6 +32,8 @@
 
 #include "layFileDialog.h"
 #include "tlInternational.h"
+#include "tlString.h"
+#include "tlFileUtils.h"
 
 namespace lay
 {
@@ -60,32 +62,53 @@ FileDialog::~FileDialog ()
   //  .. nothing yet ..
 }
 
-//  not used if standard dialogs are used (disabled to avoid compiler warning):
-#if 0
-static void
-split_filters (const QString &filters, QStringList &slist)
+int
+FileDialog::find_selected_filter (const QString &fs, const QString &selected_filter)
 {
-  QString s;
-  for (const char *cp = filters.ascii (); *cp; ++cp) {
-    if (cp[0] == ';' && cp[1] == ';') {
-      slist << s;
-      ++cp;
-      s = "";
-    } else {
-      s += *cp;
+  QStringList filters = fs.split (tl::to_qstring (";;"));
+
+  for (auto f = filters.begin (); f != filters.end (); ++f) {
+    if (*f == selected_filter) {
+      return int (f - filters.begin ());
     }
   }
 
-  if (s != "") {
-    slist << s;
-  }
+  return -1;
 }
-#endif
+
+std::string
+FileDialog::add_default_extension (const std::string &path, const QString &selected_filter)
+{
+  if (tl::extension (path).empty ()) {
+
+    std::string sf = tl::to_string (selected_filter);
+
+    auto star = sf.find ("*.");
+    if (star != std::string::npos) {
+
+      tl::Extractor ex (sf.c_str () + star + 2);
+      std::string ext;
+
+      if (ex.try_read_word (ext)) {
+        return path + "." + ext;
+      }
+
+    }
+
+  }
+
+  return path;
+}
+
+int
+FileDialog::selected_filter () const
+{
+  return find_selected_filter (m_filters, m_sel_filter);
+}
 
 bool 
 FileDialog::get_open (std::string &fp, const std::string &title) 
 {
-#if 1
   //  Use the standard (system) dialogs:
 
   QString file_name;
@@ -107,54 +130,11 @@ FileDialog::get_open (std::string &fp, const std::string &title)
   } else {
     return false;
   }
-#else
-  QString file_name;
-  if (! fp.empty ()) {
-    QFileInfo fi (fp.c_str ());
-    m_dir = fi.absoluteDir ();
-    file_name = fi.fileName ();
-  }
-
-  QFileDialog fdia (QApplication::activeWindow ());
-
-  fdia.setDirectory (m_dir);
-  if (m_def_suffix != "") {
-    fdia.setDefaultSuffix (m_def_suffix);
-  }
-
-  QStringList types;
-  split_filters (m_filters, types);
-  fdia.setFilters (types);
-
-  fdia.setReadOnly (true);
-  fdia.setViewMode (QFileDialog::Detail);
-  fdia.setFileMode (QFileDialog::ExistingFile);
-  fdia.setAcceptMode (QFileDialog::AcceptOpen);
-  fdia.setConfirmOverwrite (true);
-  fdia.setCaption (QString (tl::to_string (QObject::tr ("Open ")).c_str ()) + (title.empty () ? m_title : tl::to_qstring (title)));
-  if (! file_name.isEmpty ()) {
-    fdia.selectFile (file_name);
-  }
-
-  QStringList files;
-  if (fdia.exec ()) {
-    files = fdia.selectedFiles();
-    if (files.size () > 0) {
-      fp = tl::to_string (files [0]);
-      QFileInfo fi (files [0]);
-      m_dir = fi.absoluteDir ();
-      return true;
-    }
-  }
-
-  return false;
-#endif
 }
 
 bool 
 FileDialog::get_open (std::vector<std::string> &fp, const std::string &dir, const std::string &title) 
 {
-#if 1
   //  Use the standard (system) dialogs:
 
   if (! dir.empty ()) {
@@ -175,68 +155,11 @@ FileDialog::get_open (std::vector<std::string> &fp, const std::string &dir, cons
   } else {
     return false;
   }
-#else
-  if (! dir.empty ()) {
-    QDir fi (dir.c_str ());
-    m_dir = fi.absolutePath ();
-  }
-
-  QStringList file_names;
-  for (std::vector<std::string>::const_iterator f = fp.begin (); f != fp.end (); ++f) {
-    QFileInfo fi (f->c_str ());
-    m_dir = fi.absoluteDir ();
-    file_names << QString (f->c_str ());
-  }
-
-  QFileDialog fdia (QApplication::activeWindow ());
-
-  fdia.setDirectory (m_dir);
-  if (m_def_suffix != "") {
-    fdia.setDefaultSuffix (m_def_suffix);
-  }
-
-  QStringList types;
-  split_filters (m_filters, types);
-  fdia.setFilters (types);
-
-  fdia.setReadOnly (true);
-  fdia.setViewMode (QFileDialog::Detail);
-  fdia.setFileMode (QFileDialog::ExistingFiles);
-  fdia.setAcceptMode (QFileDialog::AcceptOpen);
-  fdia.setConfirmOverwrite (true);
-  fdia.setCaption (QString (tl::to_string (QObject::tr ("Open ")).c_str ()) + (title.empty () ? m_title : tl::to_qstring (title)));
-
-  for (QStringList::iterator f = file_names.begin (); f != file_names.end (); ++f) {
-    fdia.selectFile (*f);
-  }
-
-  QStringList files;
-  if (fdia.exec ()) {
-
-    files = fdia.selectedFiles();
-    if (! files.isEmpty ()) {
-
-      fp.clear ();
-      for (QStringList::iterator f = files.begin (); f != files.end (); ++f) {
-        fp.push_back (tl::to_string (*f));
-        QFileInfo fi (*f);
-        m_dir = fi.absoluteDir ();
-      }
-
-      return true;
-
-    }
-
-  }
-
-  return false;
-#endif
 }
 
 bool 
 FileDialog::get_save (std::string &fp, const std::string &title) 
 {
-#if 1
   //  Use the standard (system) dialogs:
 
   QString file_name;
@@ -251,55 +174,16 @@ FileDialog::get_save (std::string &fp, const std::string &title)
   QString f = QFileDialog::getSaveFileName (QApplication::activeWindow (), (title.empty () ? m_title : tl::to_qstring (title)), file_name, m_filters, &m_sel_filter);
 
   if (! f.isEmpty ()) {
-    fp = tl::to_string (f);
+
+    fp = add_default_extension (tl::to_string (f), m_sel_filter);
+
     QFileInfo fi (f);
     m_dir = fi.absoluteDir ();
     return true;
+
   } else {
     return false;
   }
-#else
-  QString file_name;
-  if (! fp.empty ()) {
-    QFileInfo fi (fp.c_str ());
-    m_dir = fi.absoluteDir ();
-    file_name = fi.fileName ();
-  }
-
-  QFileDialog fdia (QApplication::activeWindow ());
-
-  fdia.setDirectory (m_dir);
-  if (m_def_suffix != "") {
-    fdia.setDefaultSuffix (m_def_suffix);
-  }
-
-  QStringList types;
-  split_filters (m_filters, types);
-  fdia.setFilters (types);
-
-  fdia.setReadOnly (false);
-  fdia.setViewMode (QFileDialog::Detail);
-  fdia.setFileMode (QFileDialog::AnyFile);
-  fdia.setAcceptMode (QFileDialog::AcceptSave);
-  fdia.setConfirmOverwrite (true);
-  fdia.setCaption (QString (tl::to_string (QObject::tr ("Save ")).c_str ()) + (title.empty () ? m_title : tl::to_qstring (title)));
-  if (! file_name.isEmpty ()) {
-    fdia.selectFile (file_name);
-  }
-
-  QStringList files;
-  if (fdia.exec ()) {
-    files = fdia.selectedFiles();
-    if (files.size () > 0) {
-      fp = tl::to_string (files [0]);
-      QFileInfo fi (files [0]);
-      m_dir = fi.absoluteDir ();
-      return true;
-    }
-  }
-
-  return false;
-#endif
 }
 
 } // namespace lay

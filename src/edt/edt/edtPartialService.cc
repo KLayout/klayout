@@ -774,7 +774,6 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
 
           checkpoint ();
 
-          //  in point mode just store that found that has the least "distance"
           m_founds.push_back (founds_vector_type::value_type ());
 
           lay::ObjectInstPath &inst_path = m_founds.back ().first;
@@ -786,7 +785,8 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
           inst_path.set_layer (*l);
           inst_path.set_shape (*shape);
 
-          //  in point mode, test the edges and use a "closest" criterion
+          //  in box mode, select the edges depending on whether an endpoint is inside the
+          //  box or not
           if (shape->is_polygon ()) {
 
             for (unsigned int c = 0; c < shape->holes () + 1; ++c) {
@@ -897,154 +897,163 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
         const db::Shapes &shapes = cell.shapes (*l);
         std::vector <EdgeWithIndex> edge_sel;
 
-        db::ShapeIterator shape = shapes.begin_touching (scan_box, flags (), prop_sel (), inv_prop_sel ());
-        while (! shape.at_end ()) {
+        //  two passes - one with points, second with edges
 
-          bool match = false;
-          double d = std::numeric_limits<double>::max ();
+        bool any = false;
+        for (int pass = 0; pass < 2 && ! any; ++pass) {
 
-          edge_sel.clear ();
+          db::ShapeIterator shape = shapes.begin_touching (scan_box, flags (), prop_sel (), inv_prop_sel ());
+          while (! shape.at_end ()) {
 
-          checkpoint ();
+            bool match = false;
+            double d = std::numeric_limits<double>::max ();
 
-          //  in point mode, test the edges and use a "closest" criterion
-          if (shape->is_polygon ()) {
+            edge_sel.clear ();
 
-            for (unsigned int c = 0; c < shape->holes () + 1; ++c) {
+            checkpoint ();
+
+            //  in point mode, test the edges and use a "closest" criterion
+            if (shape->is_polygon ()) {
+
+              for (unsigned int c = 0; c < shape->holes () + 1; ++c) {
+
+                unsigned int n = 0;
+                db::Shape::polygon_edge_iterator ee;
+                for (db::Shape::polygon_edge_iterator e = shape->begin_edge (c); ! e.at_end (); e = ee, ++n) {
+
+                  ee = e;
+                  ++ee;
+                  unsigned int nn = ee.at_end () ? 0 : n + 1;
+
+                  unsigned int r = test_edge (t, *e, pass == 0, d, match);
+                  if (r) {
+                    edge_sel.clear ();
+                    if ((r & 1) != 0) {
+                      edge_sel.push_back (EdgeWithIndex (db::Edge ((*e).p1 (), (*e).p1 ()), n, n, c));
+                    }
+                    if ((r & 2) != 0) {
+                      edge_sel.push_back (EdgeWithIndex (db::Edge ((*e).p2 (), (*e).p2 ()), nn, nn, c));
+                    }
+                    if (r == 3) {
+                      edge_sel.push_back (EdgeWithIndex (*e, n, nn, c));
+                    }
+                  }
+
+                }
+
+              }
+
+            } else if (shape->is_path ()) {
+
+              //  test the "spine"
+              db::Shape::point_iterator pt = shape->begin_point ();
+              if (pt != shape->end_point ()) {
+                db::Point p (*pt);
+                ++pt;
+                unsigned int n = 0;
+                for (; pt != shape->end_point (); ++pt, ++n) {
+                  unsigned int r = test_edge (t, db::Edge (p, *pt), pass == 0, d, match);
+                  if (r) {
+                    edge_sel.clear ();
+                    if ((r & 1) != 0) {
+                      edge_sel.push_back (EdgeWithIndex (db::Edge (p, p), n, n, 0));
+                    }
+                    if ((r & 2) != 0) {
+                      edge_sel.push_back (EdgeWithIndex (db::Edge (*pt, *pt), n + 1, n + 1, 0));
+                    }
+                    if (r == 3) {
+                      edge_sel.push_back (EdgeWithIndex (db::Edge (p, *pt), n, n + 1, 0));
+                    }
+                  }
+                  p = *pt;
+                }
+              }
+
+            } else if (shape->is_box ()) {
+
+              const db::Box &box = shape->box ();
+
+              //  convert to polygon and test those edges
+              db::Polygon poly (box);
 
               unsigned int n = 0;
               db::Shape::polygon_edge_iterator ee;
-              for (db::Shape::polygon_edge_iterator e = shape->begin_edge (c); ! e.at_end (); e = ee, ++n) {
+              for (db::Shape::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); e = ee, ++n) {
 
                 ee = e;
                 ++ee;
                 unsigned int nn = ee.at_end () ? 0 : n + 1;
 
-                unsigned int r = test_edge (t, *e, d, match);
+                unsigned int r = test_edge (t, *e, pass == 0, d, match);
                 if (r) {
                   edge_sel.clear ();
-                  if ((r & 1) == 1) {
-                    edge_sel.push_back (EdgeWithIndex (db::Edge ((*e).p1 (), (*e).p1 ()), n, n, c));
+                  if ((r & 1) != 0) {
+                    edge_sel.push_back (EdgeWithIndex (db::Edge ((*e).p1 (), (*e).p1 ()), n, n, 0));
                   }
-                  if ((r & 2) == 2) {
-                    edge_sel.push_back (EdgeWithIndex (db::Edge ((*e).p2 (), (*e).p2 ()), nn, nn, c));
+                  if ((r & 2) != 0) {
+                    edge_sel.push_back (EdgeWithIndex (db::Edge ((*e).p2 (), (*e).p2 ()), nn, nn, 0));
                   }
                   if (r == 3) {
-                    edge_sel.push_back (EdgeWithIndex (*e, n, nn, c));
+                    edge_sel.push_back (EdgeWithIndex (*e, n, nn, 0));
                   }
                 }
 
               }
 
-            }
+            } else if (shape->is_text ()) {
 
-          } else if (shape->is_path ()) {
+              db::Point tp (shape->text_trans () * db::Point ());
 
-            //  test the "spine"
-            db::Shape::point_iterator pt = shape->begin_point (); 
-            if (pt != shape->end_point ()) {
-              db::Point p (*pt);
-              ++pt;
-              unsigned int n = 0;
-              for (; pt != shape->end_point (); ++pt, ++n) {
-                unsigned int r = test_edge (t, db::Edge (p, *pt), d, match);
-                if (r) {
+              if (text_info ()) {
+
+                db::CplxTrans t_dbu = db::CplxTrans (layout ().dbu ()) * t;
+                db::Text text;
+                shape->text (text);
+                db::Box tb (t_dbu.inverted () * text_info ()->bbox (t_dbu * text, vp));
+                if (tb.contains (hit_box.center ())) {
+                  d = tp.distance (hit_box.center ());
                   edge_sel.clear ();
-                  if ((r & 1) == 1) {
-                    edge_sel.push_back (EdgeWithIndex (db::Edge (p, p), n, n, 0));
-                  }
-                  if ((r & 2) == 2) {
-                    edge_sel.push_back (EdgeWithIndex (db::Edge (*pt, *pt), n + 1, n + 1, 0));
-                  }
-                  if (r == 3) {
-                    edge_sel.push_back (EdgeWithIndex (db::Edge (p, *pt), n, n + 1, 0));
-                  }
+                  edge_sel.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
+                  match = true;
                 }
-                p = *pt;
-              }
-            }
 
-          } else if (shape->is_box ()) {
+              } else {
 
-            const db::Box &box = shape->box ();
-
-            //  convert to polygon and test those edges
-            db::Polygon poly (box);
-
-            unsigned int n = 0;
-            db::Shape::polygon_edge_iterator ee;
-            for (db::Shape::polygon_edge_iterator e = poly.begin_edge (); ! e.at_end (); e = ee, ++n) {
-
-              ee = e;
-              ++ee;
-              unsigned int nn = ee.at_end () ? 0 : n + 1;
-
-              unsigned int r = test_edge (t, *e, d, match);
-              if (r) {
-                edge_sel.clear ();
-                if ((r & 1) == 1) {
-                  edge_sel.push_back (EdgeWithIndex (db::Edge ((*e).p1 (), (*e).p1 ()), n, n, 0));
+                if (hit_box.contains (tp)) {
+                  d = tp.distance (hit_box.center ());
+                  edge_sel.clear ();
+                  edge_sel.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
+                  match = true;
                 }
-                if ((r & 2) == 2) {
-                  edge_sel.push_back (EdgeWithIndex (db::Edge ((*e).p2 (), (*e).p2 ()), nn, nn, 0));
-                }
-                if (r == 3) {
-                  edge_sel.push_back (EdgeWithIndex (*e, n, nn, 0));
-                }
+
               }
 
             }
 
-          } else if (shape->is_text ()) {
+            if (match && closer (d)) {
 
-            db::Point tp (shape->text_trans () * db::Point ());
-
-            if (text_info ()) {
-
-              db::CplxTrans t_dbu = db::CplxTrans (layout ().dbu ()) * t;
-              db::Text text;
-              shape->text (text);
-              db::Box tb (t_dbu.inverted () * text_info ()->bbox (t_dbu * text, vp));
-              if (tb.contains (hit_box.center ())) {
-                d = tp.distance (hit_box.center ());
-                edge_sel.clear ();
-                edge_sel.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
-                match = true;
+              //  in point mode just store that found that has the least "distance"
+              if (m_founds.empty ()) {
+                m_founds.push_back (founds_vector_type::value_type ());
               }
 
-            } else {
+              lay::ObjectInstPath &inst_path = m_founds.back ().first;
 
-              if (hit_box.contains (tp)) {
-                d = tp.distance (hit_box.center ());
-                edge_sel.clear ();
-                edge_sel.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
-                match = true;
-              }
+              inst_path.set_cv_index (cv_index ());
+              inst_path.set_topcell (topcell ());
+              inst_path.assign_path (path ().begin (), path ().end ());
+              inst_path.set_layer (*l);
+              inst_path.set_shape (*shape);
+
+              m_founds.back ().second = edge_sel;
+
+              any = true;
 
             }
+
+            ++shape;
 
           }
-
-          if (match && closer (d)) {
-
-            //  in point mode just store that found that has the least "distance"
-            if (m_founds.empty ()) {
-              m_founds.push_back (founds_vector_type::value_type ());
-            }
-
-            lay::ObjectInstPath &inst_path = m_founds.back ().first;
-
-            inst_path.set_cv_index (cv_index ());
-            inst_path.set_topcell (topcell ());
-            inst_path.assign_path (path ().begin (), path ().end ());
-            inst_path.set_layer (*l);
-            inst_path.set_shape (*shape);
-
-            m_founds.back ().second = edge_sel;
-
-          }
-
-          ++shape;
 
         }
 
@@ -1153,6 +1162,7 @@ PartialService::timeout ()
   m_hover = true;
   
   mp_view->clear_transient_selection ();
+  clear_mouse_cursors ();
 
   //  compute search box
   double l = catch_distance ();
@@ -2413,6 +2423,10 @@ PartialService::enter_edge (const EdgeWithIndex &e, size_t &nmarker, partial_obj
       db::DEdge ee = db::DEdge (db::DPoint (ep2) + ((db::DPoint (ep1) - db::DPoint (ep2)) * 0.25), db::DPoint (ep2));
       marker->set (ee, db::DCplxTrans (gt), tv);
 
+      if (transient && sel->second.size () == 1) {
+        add_mouse_cursor (ep2, sel->first.cv_index (), gt, tv, true);
+      }
+
     } 
 
     if (p1_sel && !p12_sel) {
@@ -2423,12 +2437,22 @@ PartialService::enter_edge (const EdgeWithIndex &e, size_t &nmarker, partial_obj
       db::DEdge ee = db::DEdge (db::DPoint (ep1), db::DPoint (ep1) + ((db::DPoint (ep2) - db::DPoint (ep1)) * 0.25));
       marker->set (ee, db::DCplxTrans (gt), tv);
 
-    } 
+      if (transient && sel->second.size () == 1) {
+        add_mouse_cursor (ep1, sel->first.cv_index (), gt, tv, true);
+      }
+
+    }
 
     if (p12_sel) {
+
       lay::Marker *marker = new_marker (nmarker, sel->first.cv_index (), transient);
       marker->set_vertex_size (0);
       marker->set (enew, gt, tv);
+
+      if (transient) {
+        add_edge_marker (enew, sel->first.cv_index (), gt, tv, true);
+      }
+
     }
 
   }

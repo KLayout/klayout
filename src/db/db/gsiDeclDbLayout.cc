@@ -213,7 +213,23 @@ Class<db::LayerProperties> decl_LayerInfo ("db", "LayerInfo",
     "\n"
     "First, layer and datatype are compared. The name is of second order and used only if no layer or datatype is given "
     "for one of the operands.\n"
-    "This is basically a weak comparison that reflects the search preferences.\n"
+    "This is basically a weak comparison that reflects the search preferences. It is the basis for \\Layout#find_layer.\n"
+    "Here are some examples:\n"
+    "\n"
+    "@code\n"
+    "# no match as layer/datatypes or names differ:\n"
+    "RBA::LayerInfo::new(1, 17).is_equivalent?(RBA::LayerInfo::new(1, 18)) -> false\n"
+    "RBA::LayerInfo::new('metal1').is_equivalent?(RBA::LayerInfo::new('m1')) -> false\n"
+    "# exact match for numbered or named layers:\n"
+    "RBA::LayerInfo::new(1, 17).is_equivalent?(RBA::LayerInfo::new(1, 17)) -> true\n"
+    "RBA::LayerInfo::new('metal1').is_equivalent?(RBA::LayerInfo::new('metal1')) -> true\n"
+    "# match as names are second priority over layer/datatypes:\n"
+    "RBA::LayerInfo::new(1, 17, 'metal1').is_equivalent?(RBA::LayerInfo::new(1, 17, 'm1')) -> true\n"
+    "# match as name matching is fallback:\n"
+    "RBA::LayerInfo::new(1, 17, 'metal1').is_equivalent?(RBA::LayerInfo::new('metal1')) -> true\n"
+    "# no match as neither names or layer/datatypes match:\n"
+    "RBA::LayerInfo::new(1, 17, 'metal1').is_equivalent?(RBA::LayerInfo::new('m1')) -> false\n"
+    "@/code\n"
     "\n"
     "This method was added in version 0.18 and modified to compare non-named vs. named layers in version 0.28.11.\n"
   ) +
@@ -518,7 +534,13 @@ static tl::Variant find_layer (db::Layout *l, const db::LayerProperties &lp)
     //  for a null layer info always return nil
     return tl::Variant ();
   } else {
-    //  if we have a layer with the requested properties already, return this.
+    //  if we have a layer with the requested properties already, return this one.
+    //  first pass: exact match
+    int index = l->get_layer_maybe (lp);
+    if (index >= 0) {
+      return tl::Variant ((unsigned int) index);
+    }
+    //  second pass: relaxed match
     for (db::Layout::layer_iterator li = l->begin_layers (); li != l->end_layers (); ++li) {
       if (log_equal_ext ((*li).second, lp)) {
         return tl::Variant ((*li).first);
@@ -1569,7 +1591,19 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "If a layer with the given properties already exists, this method will return the index of that layer."
     "If no such layer exists, it will return nil.\n"
     "\n"
-    "This method has been introduced in version 0.23.\n"
+    "In contrast to \\layer, this method will also find layers matching by name only. "
+    "For example:\n"
+    "\n"
+    "@code\n"
+    "# finds layer '17/0' and 'name (17/0)':\n"
+    "index = layout.find_layer(RBA::LayerInfo::new(17, 0))\n"
+    "# finds layer 'name' (first priority), but also 'name (17/0)' (second priority):\n"
+    "index = layout.find_layer(RBA::LayerInfo::new('name'))\n"
+    "# note that this will not match layer 'name (17/0)' and create a new name-only layer:\n"
+    "index = layout.layer(RBA::LayerInfo::new('name'))\n"
+    "@/code\n"
+    "\n"
+    "This method has been introduced in version 0.23 and has been extended to name queries in version 0.28.11.\n"
   ) +
   gsi::method_ext ("find_layer", &find_layer1, gsi::arg ("name"),
     "@brief Finds a layer with the given name\n"
@@ -1577,7 +1611,17 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "If a layer with the given name already exists, this method will return the index of that layer."
     "If no such layer exists, it will return nil.\n"
     "\n"
-    "This method has been introduced in version 0.23.\n"
+    "In contrast to \\layer, this method will also find numbered layers if the name matches. "
+    "For example:\n"
+    "\n"
+    "@code\n"
+    "# finds layer 'name' (first priority), but also 'name (17/0)' (second priority):\n"
+    "index = layout.find_layer('name')\n"
+    "# note that this will not match layer 'name (17/0)' and create a new name-only layer:\n"
+    "index = layout.layer('name')\n"
+    "@/code\n"
+    "\n"
+    "This method has been introduced in version 0.23 and has been extended to name queries in version 0.28.11.\n"
   ) +
   gsi::method_ext ("find_layer", &find_layer2, gsi::arg ("layer"), gsi::arg ("datatype"),
     "@brief Finds a layer with the given layer and datatype number\n"

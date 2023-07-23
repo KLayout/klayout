@@ -212,6 +212,7 @@ class DBLayoutTests1_TestClass < TestBase
     assert_equal(a, nil)
 
     ly = RBA::Layout.new
+    li0 = ly.layer("hello")
     li = ly.layer("hallo")
     a = ly.find_layer(3, 0)
     assert_equal(a, nil)
@@ -223,6 +224,11 @@ class DBLayoutTests1_TestClass < TestBase
     assert_equal(a, nil)
     a = ly.find_layer(1, 0, "hallo")
     assert_equal(a, li)
+    li2 = ly.layer(1, 0, "hello")
+    a = ly.find_layer(1, 0, "hello")
+    assert_equal(a, li2)
+    a = ly.find_layer("hello")
+    assert_equal(a, li0)
 
   end
 

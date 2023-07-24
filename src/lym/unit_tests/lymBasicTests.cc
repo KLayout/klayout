@@ -129,6 +129,29 @@ TEST(3_RubyInclude)
   EXPECT_EQ (np (console.text ()), np ("An error in " + tl::testsrc () + "/testdata/lym/b_inc.rb:3\n"));
 }
 
+TEST(4_RubyIncludeFromXML)
+{
+  tl_assert (rba::RubyInterpreter::instance () != 0);
+
+  lym::Macro macro;
+
+  macro.set_file_path (tl::testsrc () + "/testdata/lym/m4.rb");
+  macro.set_interpreter (lym::Macro::Ruby);
+  macro.load ();
+
+  TestCollectorConsole console;
+  rba::RubyInterpreter::instance ()->push_console (&console);
+  try {
+    EXPECT_EQ (macro.run (), 0);
+    rba::RubyInterpreter::instance ()->remove_console (&console);
+  } catch (...) {
+    rba::RubyInterpreter::instance ()->remove_console (&console);
+    throw;
+  }
+
+  EXPECT_EQ (np (console.text ()), np ("An error in " + tl::testsrc () + "/testdata/lym/b_inc.lym:3\n"));
+}
+
 TEST(11_DRCBasic)
 {
   tl_assert (rba::RubyInterpreter::instance () != 0);

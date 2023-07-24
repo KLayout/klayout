@@ -51,11 +51,35 @@ MacroInterpreter::can_run (const lym::Macro *macro)
   return false;
 }
 
+namespace
+{
+
+class MacroIncludeFileResolver
+  : public tl::IncludeFileResolver
+{
+public:
+  MacroIncludeFileResolver () { }
+
+  std::string get_text (const std::string &path) const
+  {
+    //  Use lym::Macro to resolve texts - this strips the XML envelope.
+    //  Intentionally not compatibility check is made to allow using any
+    //  type of input and specifically any extension.
+    lym::Macro macro;
+    macro.load_from (path);
+    return macro.text ();
+  }
+};
+
+}
+
 std::pair<std::string, std::string>
 MacroInterpreter::include_expansion (const lym::Macro *macro)
 {
+  MacroIncludeFileResolver include_file_resolver;
+
   std::pair<std::string, std::string> res;
-  res.first = tl::IncludeExpander::expand (macro->path (), macro->text (), res.second).to_string ();
+  res.first = tl::IncludeExpander::expand (macro->path (), macro->text (), res.second, &include_file_resolver).to_string ();
 
   if (res.first != macro->path ()) {
 

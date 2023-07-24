@@ -32,6 +32,9 @@
 namespace tl
 {
 
+// -----------------------------------------------------------------------------------------------------
+//  IncludeExpander implementation
+
 static const char *valid_fn_chars = "@_:,.\\/-+";
 
 IncludeExpander::IncludeExpander ()
@@ -40,30 +43,30 @@ IncludeExpander::IncludeExpander ()
 }
 
 IncludeExpander
-IncludeExpander::expand (const std::string &path, std::string &expanded_text)
+IncludeExpander::expand (const std::string &path, std::string &expanded_text, const IncludeFileResolver *resolver)
 {
   IncludeExpander ie;
   int lc = 1;
   tl::InputStream is (path);
-  ie.read (path, is, expanded_text, ie, lc);
+  ie.read (path, is, expanded_text, lc, resolver);
   return ie;
 }
 
 IncludeExpander
-IncludeExpander::expand (const std::string &path, const std::string &original_text, std::string &expanded_text)
+IncludeExpander::expand (const std::string &path, const std::string &original_text, std::string &expanded_text, const IncludeFileResolver *resolver)
 {
   IncludeExpander ie;
   int lc = 1;
   tl::InputMemoryStream ms (original_text.c_str (), original_text.size ());
   tl::InputStream is (ms);
-  ie.read (path, is, expanded_text, ie, lc);
+  ie.read (path, is, expanded_text, lc, resolver);
   return ie;
 }
 
 void
-IncludeExpander::read (const std::string &path, tl::InputStream &is, std::string &expanded_text, IncludeExpander &ie, int &line_counter)
+IncludeExpander::read (const std::string &path, tl::InputStream &is, std::string &expanded_text, int &line_counter, const IncludeFileResolver *resolver)
 {
-  ie.m_sections [line_counter] = std::make_pair (path, 1 - line_counter);
+  m_sections [line_counter] = std::make_pair (path, 1 - line_counter);
 
   tl::TextInputStream text (is);
 
@@ -100,8 +103,17 @@ IncludeExpander::read (const std::string &path, tl::InputStream &is, std::string
         include_path = current_uri.resolved (new_uri).to_abstract_path ();
       }
 
-      tl::InputStream is (include_path);
-      read (include_path, is, expanded_text, ie, line_counter);
+      std::string include_text;
+      if (resolver) {
+        include_text = resolver->get_text (include_path);
+      } else {
+        tl::InputStream iis (include_path);
+        include_text = iis.read_all ();
+      }
+
+      tl::InputMemoryStream ms (include_text.c_str (), include_text.size ());
+      tl::InputStream is (ms);
+      read (include_path, is, expanded_text, line_counter, resolver);
 
       emit_section = true;
 
@@ -109,7 +121,7 @@ IncludeExpander::read (const std::string &path, tl::InputStream &is, std::string
 
       if (emit_section) {
         emit_section = false;
-        ie.m_sections [line_counter] = std::make_pair (path, lnum - line_counter);
+        m_sections [line_counter] = std::make_pair (path, lnum - line_counter);
       }
 
       expanded_text += l;

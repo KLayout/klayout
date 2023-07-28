@@ -45,7 +45,7 @@ TEST (basic)
   try {
     pya::PythonInterpreter::instance ()->eval_string ("raise Exception(\"an error\")");
   } catch (tl::ScriptError &ex) {
-    EXPECT_EQ (ex.basic_msg (), std::string ("an error"));
+    EXPECT_EQ (ex.basic_msg (), std::string ("Exception: an error"));
     EXPECT_EQ (ex.cls () == std::string ("exceptions.Exception") || ex.cls () == std::string ("Exception"), true);
     err = true;
   }
@@ -56,7 +56,7 @@ TEST (basic)
   try {
     pya::PythonInterpreter::instance ()->eval_string ("Quatsch");
   } catch (tl::ScriptError &ex) {
-    EXPECT_EQ (ex.basic_msg (), std::string ("name 'Quatsch' is not defined"));
+    EXPECT_EQ (ex.basic_msg (), std::string ("NameError: name 'Quatsch' is not defined"));
     EXPECT_EQ (ex.cls () == std::string ("exceptions.NameError") || ex.cls () == std::string ("NameError"), true);
     err = true;
   }

@@ -124,9 +124,9 @@ static void ui_exception_handler_tl (const tl::Exception &ex, QWidget *parent)
 
     if (gsi_excpt->line () > 0) {
       tl::error << gsi_excpt->sourcefile () << ":" << gsi_excpt->line () << ": " 
-                << gsi_excpt->msg () << tl::to_string (QObject::tr (" (class ")) << gsi_excpt->cls () << ")";
+                << gsi_excpt->msg ();
     } else {
-      tl::error << gsi_excpt->msg () << tl::to_string (QObject::tr (" (class ")) << gsi_excpt->cls () << ")";
+      tl::error << gsi_excpt->msg ();
     }
 
     lay::RuntimeErrorForm error_dialog (parent, "ruby_error_form", gsi_excpt);

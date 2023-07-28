@@ -263,7 +263,7 @@ static std::vector<db::LayerProperties> get_layer_declarations_native (const db:
   std::vector<db::PCellLayerDeclaration> lp = pd->db::PCellDeclaration::get_layer_declarations (parameters);
   std::vector<db::LayerProperties> ret;
   for (std::vector<db::PCellLayerDeclaration>::const_iterator l = lp.begin (); l != lp.end (); ++l) {
-    ret.push_back (db::LayerProperties(*l));
+    ret.push_back (db::LayerProperties (*l));
   }
   return ret;
 }

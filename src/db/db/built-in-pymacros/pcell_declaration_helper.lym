@@ -430,7 +430,10 @@ class _PCellDeclarationHelper(pya.PCellDeclaration):
     """
     layers = []
     for i in self._layer_param_index:
-      layers.append(parameters[i])
+      if parameters[i] is not None:
+        layers.append(parameters[i])
+      else:
+        layers.append(pya.LayerInfo())
     return layers
     
   def callback(self, layout, name, states):

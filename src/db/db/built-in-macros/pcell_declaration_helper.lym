@@ -408,7 +408,7 @@ module RBA
     
     # get the layer definitions
     def get_layers(parameters)
-      @layer_param_index.collect { |i| parameters[i] }
+      @layer_param_index.collect { |i| parameters[i] || RBA::LayerInfo::new }
     end
       
     # coerce parameters (make consistent)

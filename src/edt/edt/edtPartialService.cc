@@ -849,6 +849,14 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
 
             }
 
+          } else if (shape->is_point ()) {
+
+            db::Point tp (shape->point ());
+
+            if (hit_box.contains (tp)) {
+              edges.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
+            }
+
           } else if (shape->is_text ()) {
 
             db::Point tp (shape->text_trans () * db::Point ());
@@ -998,6 +1006,17 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
                   }
                 }
 
+              }
+
+            } else if (shape->is_point ()) {
+
+              db::Point tp (shape->point ());
+
+              if (hit_box.contains (tp)) {
+                d = tp.distance (hit_box.center ());
+                edge_sel.clear ();
+                edge_sel.push_back (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0));
+                match = true;
               }
 
             } else if (shape->is_text ()) {
@@ -1258,6 +1277,11 @@ PartialService::timeout ()
           db::Point tp (r->first.shape ().text_trans () * db::Point ());
           enter_edge (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0), n_marker, r, new_points, new_edges, gt, *tv_list, true);
 
+        } else if (r->first.shape ().is_point ()) {
+
+          db::Point tp (r->first.shape ().point ());
+          enter_edge (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0), n_marker, r, new_points, new_edges, gt, *tv_list, true);
+
         }
 
       }
@@ -1477,6 +1501,17 @@ PartialService::transform_selection (const db::DTrans &move_trans)
         if (np != new_points.end ()) {
           t.transform (db::Trans (np->second - tp));
           shape = shapes.replace (shape, t);
+        }
+
+      } else if (shape.is_point ()) {
+
+        db::Point p;
+        shape.point (p);
+
+        std::map <PointWithIndex, db::Point>::const_iterator np = new_points.find (PointWithIndex (p, 0, 0));
+
+        if (np != new_points.end ()) {
+          shape = shapes.replace (shape, np->second);
         }
 
       }
@@ -2204,7 +2239,7 @@ PartialService::del ()
           shapes_to_delete_by_cell.insert (std::make_pair (std::make_pair (r->first.cell_index (), std::make_pair (r->first.cv_index (), r->first.layer ())), std::vector <partial_objects::const_iterator> ())).first->second.push_back (r);
         }
 
-      } else if (shape.is_text ()) {
+      } else if (shape.is_text () || shape.is_point ()) {
 
         shapes_to_delete_by_cell.insert (std::make_pair (std::make_pair (r->first.cell_index (), std::make_pair (r->first.cv_index (), r->first.layer ())), std::vector <partial_objects::const_iterator> ())).first->second.push_back (r);
 
@@ -2682,6 +2717,11 @@ PartialService::do_selection_to_view ()
           } else if (r->first.shape ().is_text ()) {
 
             db::Point tp (r->first.shape ().text_trans () * db::Point ());
+            enter_edge (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0), n_marker, r, new_points, new_edges, gt, *tv_list, false);
+
+          } else if (r->first.shape ().is_point ()) {
+
+            db::Point tp (r->first.shape ().point ());
             enter_edge (EdgeWithIndex (db::Edge (tp, tp), 0, 0, 0), n_marker, r, new_points, new_edges, gt, *tv_list, false);
 
           }

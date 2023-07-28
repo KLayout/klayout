@@ -1108,7 +1108,20 @@ Service::transient_select (const db::DPoint &pos)
 
       lay::ShapeMarker *marker = new lay::ShapeMarker (view (), r->cv_index ());
       marker->set (r->shape (), gt, mp_view->cv_transform_variants (r->cv_index (), r->layer ()));
-      marker->set_vertex_size (0);
+
+      bool is_point = false;
+      if (r->shape ().is_edge () || r->shape ().is_box ()) {
+        is_point = r->shape ().bbox ().is_point ();
+      } else if (r->shape ().is_point ()) {
+        is_point = true;
+      }
+
+      if (is_point) {
+        marker->set_vertex_shape (lay::ViewOp::Cross);
+        marker->set_vertex_size (9 /*cross vertex size*/);
+      } else {
+        marker->set_vertex_size (0);
+      }
       marker->set_line_width (1);
       marker->set_halo (0);
 
@@ -1602,7 +1615,15 @@ Service::do_selection_to_view ()
         } 
 
         marker->set (r->shape (), gt, *tv_list);
-        if (r->shape ().is_text ()) {
+
+        bool is_point = false;
+        if (r->shape ().is_text () || r->shape ().is_point ()) {
+          is_point = true;
+        } else if (r->shape ().is_edge () || r->shape ().is_box ()) {
+          is_point = r->shape ().bbox ().is_point ();
+        }
+
+        if (is_point) {
           //  show the origins as crosses for texts
           marker->set_vertex_shape (lay::ViewOp::Cross);
           marker->set_vertex_size (9 /*cross vertex size*/);

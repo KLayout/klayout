@@ -260,19 +260,19 @@ get_parameters_from_pcell_and_guiding_shapes (db::Layout *layout, db::cell_index
         std::map <std::string, size_t>::const_iterator pnm = pname_map.find (pv->second.to_string ());
         if (pnm != pname_map.end ()) {
 
+          db::CplxTrans dbu_trans (layout->dbu ());
+
           if (sh->is_box ()) {
-            if (sh->box ().width () == 0 && sh->box ().height () == 0) {
-              parameters_for_pcell [pnm->second] = tl::Variant (sh->box ().lower_left () * layout->dbu ()); 
-            } else {
-              parameters_for_pcell [pnm->second] = tl::Variant (sh->box () * layout->dbu ()); 
-            }
+            parameters_for_pcell [pnm->second] = tl::Variant (dbu_trans * sh->box ());
           } else if (sh->is_edge ()) {
-            parameters_for_pcell [pnm->second] = tl::Variant (sh->edge () * layout->dbu ()); 
+            parameters_for_pcell [pnm->second] = tl::Variant (dbu_trans * sh->edge ());
+          } else if (sh->is_point ()) {
+            parameters_for_pcell [pnm->second] = tl::Variant (dbu_trans * sh->point ());
           } else if (sh->is_polygon ()) {
             //  Hint: we don't compress since we don't want to loose information
-            parameters_for_pcell [pnm->second] = tl::Variant (sh->polygon ().transformed (db::CplxTrans (layout->dbu ()), false)); 
+            parameters_for_pcell [pnm->second] = tl::Variant (sh->polygon ().transformed (dbu_trans, false));
           } else if (sh->is_path ()) {
-            parameters_for_pcell [pnm->second] = tl::Variant (db::CplxTrans (layout->dbu ()) * sh->path ()); 
+            parameters_for_pcell [pnm->second] = tl::Variant (dbu_trans * sh->path ());
           }
 
         }
@@ -315,7 +315,7 @@ get_parameters_from_pcell_and_guiding_shapes (db::Layout *layout, db::cell_index
       } else if (org_parameters[i].is_user<db::DPoint> ()) {
 
         db::DPoint p = org_parameters[i].to_user<db::DPoint> ();
-        guiding_shapes.insert (db::BoxWithProperties(db::Box (db::DBox (p, p) * (1.0 / layout->dbu ())), layout->properties_repository ().properties_id (props)));
+        guiding_shapes.insert (db::PointWithProperties(db::Point (p * (1.0 / layout->dbu ())), layout->properties_repository ().properties_id (props)));
 
       } else if (org_parameters[i].is_user<db::DPolygon> ()) {
 

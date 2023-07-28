@@ -427,7 +427,7 @@ BitmapRenderer::draw (const db::Shape &shape, const db::CplxTrans &trans,
     db::Box bbox = shape.bbox ();
     double threshold = 1.0 / trans.mag ();
 
-    if (bbox.width () <= threshold && bbox.height () <= threshold) {
+    if (bbox.width () <= threshold && bbox.height () <= threshold && !shape.is_point ()) {
 
       db::DPoint dc = trans * bbox.center ();
       if (fill && ! shape.is_edge ()) {
@@ -440,7 +440,7 @@ BitmapRenderer::draw (const db::Shape &shape, const db::CplxTrans &trans,
         render_dot (dc.x (), dc.y (), vertices);
       }
 
-    } else if (shape.is_box ()) {
+    } else if (shape.is_box () || shape.is_point ()) {
 
       draw (bbox, trans, fill, frame, vertices, text);
 

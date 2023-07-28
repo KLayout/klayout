@@ -92,3 +92,6 @@ LIBS += -L$$DESTDIR -lklayout_tl -lklayout_gsi -lklayout_laybasic -lklayout_layv
 
 }
 
+FORMS += \
+  PointPropertiesPage.ui
+

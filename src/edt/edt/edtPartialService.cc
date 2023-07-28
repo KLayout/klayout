@@ -2795,6 +2795,9 @@ PartialService::partial_select (const db::DBox &box, lay::Editable::SelectionMod
     if (edt::boxes_enabled ()) {
       shape_flags |= db::ShapeIterator::Boxes;
     }
+    if (edt::points_enabled ()) {
+      shape_flags |= db::ShapeIterator::Points;
+    }
     if (edt::texts_enabled ()) {
       shape_flags |= db::ShapeIterator::Texts;
     }

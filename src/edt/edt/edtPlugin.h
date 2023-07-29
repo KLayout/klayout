@@ -54,6 +54,7 @@ namespace edt
   //  other types ...
   bool paths_enabled ();
   bool boxes_enabled ();
+  bool points_enabled ();
   bool texts_enabled ();
   bool instances_enabled ();
 

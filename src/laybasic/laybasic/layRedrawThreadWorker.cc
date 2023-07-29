@@ -1059,7 +1059,7 @@ RedrawThreadWorker::any_shapes (db::cell_index_type cell_index, unsigned int lev
     int ret = false;
 
     const db::Cell &cell = mp_layout->cell (cell_index);
-    if (! cell.shapes (m_layer).begin (db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::Paths | db::ShapeIterator::Boxes, mp_prop_sel, m_inv_prop_sel).at_end ()) {
+    if (! cell.shapes (m_layer).begin (db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::Paths | db::ShapeIterator::Boxes | db::ShapeIterator::Points, mp_prop_sel, m_inv_prop_sel).at_end ()) {
       ret = true;
     } else if (levels > 1) {
       for (db::Cell::child_cell_iterator cc = cell.begin_child_cells (); !cc.at_end () && !ret; ++cc) {
@@ -1624,7 +1624,7 @@ RedrawThreadWorker::draw_layer_wo_cache (int from_level, int to_level, db::cell_
       size_t current_quad_id = 0;
       size_t current_array_quad_id = 0;
 
-      db::ShapeIterator shape (shapes.begin_touching (*v, db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::Paths, mp_prop_sel, m_inv_prop_sel));
+      db::ShapeIterator shape (shapes.begin_touching (*v, db::ShapeIterator::Boxes | db::ShapeIterator::Polygons | db::ShapeIterator::Edges | db::ShapeIterator::Paths | db::ShapeIterator::Points, mp_prop_sel, m_inv_prop_sel));
       while (! shape.at_end ()) {
 
         test_snapshot (update_snapshot); 

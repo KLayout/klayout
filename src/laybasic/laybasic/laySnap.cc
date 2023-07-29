@@ -598,7 +598,7 @@ private:
 
       const db::Shapes &shapes = cell.shapes (l);
 
-      db::ShapeIterator shape = shapes.begin_touching (touch_box, db::ShapeIterator::Polygons | db::ShapeIterator::Paths | db::ShapeIterator::Boxes, mp_prop_sel, m_inv_prop_sel);
+      db::ShapeIterator shape = shapes.begin_touching (touch_box, db::ShapeIterator::Polygons | db::ShapeIterator::Paths | db::ShapeIterator::Boxes | db::ShapeIterator::Points, mp_prop_sel, m_inv_prop_sel);
       while (! shape.at_end () && m_tests > 0) {
 
         --m_tests;
@@ -652,6 +652,12 @@ private:
           test_edge (t * db::Edge (db::Point (box.left (), box.top ()), box.p2 ()));
           test_edge (t * db::Edge (box.p2 (), db::Point (box.right (), box.bottom ())));
           test_edge (t * db::Edge (db::Point (box.right (), box.bottom ()), box.p1 ()));
+
+        } else if (shape->is_point ()) {
+
+          const db::Point &p = shape->point ();
+
+          test_edge (t * db::Edge (p, p));
 
         }
 

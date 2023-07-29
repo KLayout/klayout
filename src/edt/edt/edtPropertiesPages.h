@@ -31,6 +31,7 @@
 #include "edtService.h"
 #include "ui_PolygonPropertiesPage.h"
 #include "ui_BoxPropertiesPage.h"
+#include "ui_PointPropertiesPage.h"
 #include "ui_PathPropertiesPage.h"
 #include "ui_EditablePathPropertiesPage.h"
 #include "ui_TextPropertiesPage.h"
@@ -150,6 +151,34 @@ private:
 
   db::Box get_box (int mode) const;
   void set_box (const db::Box &box);
+};
+
+class PointPropertiesPage
+  : public ShapePropertiesPage,
+    public Ui::PointPropertiesPage
+{
+Q_OBJECT
+
+public:
+  PointPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent);
+
+  virtual std::string description (size_t entry) const;
+  virtual std::string description () const { return ShapePropertiesPage::description (); }
+  virtual void do_update (const db::Shape &shape, double dbu, const std::string &lname);
+  virtual ChangeApplicator *create_applicator (db::Shapes &shapes, const db::Shape &shape, double dbu);
+
+public slots:
+  void changed ();
+
+protected:
+  virtual QCheckBox *dbu_checkbox () const { return dbu_cb; }
+  virtual QCheckBox *abs_checkbox () const { return abs_cb; }
+
+private:
+  double m_dbu;
+
+  db::Point get_point () const;
+  void set_point (const db::Point &point);
 };
 
 class TextPropertiesPage

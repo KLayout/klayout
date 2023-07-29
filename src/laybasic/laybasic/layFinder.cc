@@ -606,7 +606,7 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
               match = true;
             }
 
-          } else if (shape->is_box () || shape->is_text ()) {
+          } else if (shape->is_box () || shape->is_point () || shape->is_text ()) {
 
             db::Box box = shape->bbox ();
             if (text_info () && shape->is_text ()) {

@@ -854,6 +854,124 @@ BoxPropertiesPage::changed ()
 }
 
 // -------------------------------------------------------------------------
+//  PointPropertiesPage implementation
+
+PointPropertiesPage::PointPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)
+  : ShapePropertiesPage (tl::to_string (tr ("Points")), service, manager, parent),
+    m_dbu (1.0)
+{
+  setupUi (this);
+  setup ();
+
+  if (! readonly ()) {
+
+    connect (x_le, SIGNAL (editingFinished ()), this, SLOT (changed ()));
+    connect (y_le, SIGNAL (editingFinished ()), this, SLOT (changed ()));
+
+  } else {
+
+    x_le->setReadOnly (true);
+    y_le->setReadOnly (true);
+
+  }
+
+  connect (inst_pb, SIGNAL (clicked ()), this, SLOT (show_inst ()));
+  connect (prop_pb, SIGNAL (clicked ()), this, SLOT (show_props ()));
+}
+
+std::string
+PointPropertiesPage::description (size_t entry) const
+{
+  const db::Shape &sh = shape (entry);
+  db::CplxTrans dbu_trans (dbu (entry));
+  return ShapePropertiesPage::description (entry) + " - " + tl::sprintf (tl::to_string (tr ("Point%s")), (dbu_trans * sh.point ()).to_string ());
+}
+
+void
+PointPropertiesPage::do_update (const db::Shape &shape, double dbu, const std::string &lname)
+{
+  m_dbu = dbu;
+
+  layer_lbl->setText (tl::to_qstring (lname));
+
+  db::Point point;
+  shape.point (point);
+  set_point (point);
+}
+
+ChangeApplicator *
+PointPropertiesPage::create_applicator (db::Shapes & /*shapes*/, const db::Shape &shape, double dbu)
+{
+  m_dbu = dbu;
+
+  db::Point point = get_point ();
+
+  db::Point org_point;
+  shape.point (org_point);
+
+  if (point != org_point) {
+    return new PointDimensionsChangeApplicator (point, org_point);
+  } else {
+    return 0;
+  }
+}
+
+db::Point
+PointPropertiesPage::get_point () const
+{
+  bool has_error = false;
+  double x = 0.0, y = 0.0;
+
+  try {
+    tl::from_string_ext (tl::to_string (x_le->text ()), x);
+    lay::indicate_error (x_le, (tl::Exception *) 0);
+  } catch (tl::Exception &ex) {
+    lay::indicate_error (x_le, &ex);
+    has_error = true;
+  }
+
+  try {
+    tl::from_string_ext (tl::to_string (y_le->text ()), y);
+    lay::indicate_error (y_le, (tl::Exception *) 0);
+  } catch (tl::Exception &ex) {
+    lay::indicate_error (y_le, &ex);
+    has_error = true;
+  }
+
+  if (has_error) {
+    throw tl::Exception (tl::to_string (tr ("Invalid values - see highlighted entry boxes")));
+  }
+
+  db::VCplxTrans t = db::VCplxTrans (trans ().inverted ());
+  bool du = dbu_units ();
+
+  return point_from_dpoint (db::DPoint (x, y), m_dbu, du, t);
+}
+
+void
+PointPropertiesPage::set_point (const db::Point &point)
+{
+  db::CplxTrans t = db::CplxTrans (trans ());
+  db::DPoint pt = db::DPoint (t (point));
+
+  bool du = dbu_units ();
+
+  x_le->setText (tl::to_qstring (coord_to_string (pt.x (), m_dbu, du)));
+  y_le->setText (tl::to_qstring (coord_to_string (pt.y (), m_dbu, du)));
+}
+
+void
+PointPropertiesPage::changed ()
+{
+  try {
+    set_point (get_point ());
+  } catch (...) {
+  }
+
+  emit edited ();
+}
+
+// -------------------------------------------------------------------------
 //  TextPropertiesPage implementation
 
 TextPropertiesPage::TextPropertiesPage (edt::Service *service, db::Manager *manager, QWidget *parent)

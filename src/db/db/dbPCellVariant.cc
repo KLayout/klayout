@@ -199,51 +199,51 @@ PCellVariant::update (ImportLayerMapping *layer_mapping)
 
         if (m_parameters[i].is_user<db::DBox> ()) {
 
-          shapes (layout ()->guiding_shape_layer ()).insert (db::BoxWithProperties(db::Box (m_parameters[i].to_user<db::DBox> () * (1.0 / layout ()->dbu ())), layout ()->properties_repository ().properties_id (props)));
+          shapes (layout ()->guiding_shape_layer ()).insert (db::BoxWithProperties (db::Box (m_parameters[i].to_user<db::DBox> () * (1.0 / layout ()->dbu ())), layout ()->properties_repository ().properties_id (props)));
 
         } else if (m_parameters[i].is_user<db::Box> ()) {
 
-          shapes (layout ()->guiding_shape_layer ()).insert (db::BoxWithProperties(m_parameters[i].to_user<db::Box> (), layout ()->properties_repository ().properties_id (props)));
+          shapes (layout ()->guiding_shape_layer ()).insert (db::BoxWithProperties (m_parameters[i].to_user<db::Box> (), layout ()->properties_repository ().properties_id (props)));
 
         } else if (m_parameters[i].is_user<db::DEdge> ()) {
 
-          shapes (layout ()->guiding_shape_layer ()).insert (db::EdgeWithProperties(db::Edge (m_parameters[i].to_user<db::DEdge> () * (1.0 / layout ()->dbu ())), layout ()->properties_repository ().properties_id (props)));
+          shapes (layout ()->guiding_shape_layer ()).insert (db::EdgeWithProperties (db::Edge (m_parameters[i].to_user<db::DEdge> () * (1.0 / layout ()->dbu ())), layout ()->properties_repository ().properties_id (props)));
 
         } else if (m_parameters[i].is_user<db::Edge> ()) {
 
-          shapes (layout ()->guiding_shape_layer ()).insert (db::EdgeWithProperties(m_parameters[i].to_user<db::Edge> (), layout ()->properties_repository ().properties_id (props)));
+          shapes (layout ()->guiding_shape_layer ()).insert (db::EdgeWithProperties (m_parameters[i].to_user<db::Edge> (), layout ()->properties_repository ().properties_id (props)));
 
         } else if (m_parameters[i].is_user<db::DPoint> ()) {
 
           db::DPoint p = m_parameters[i].to_user<db::DPoint> ();
-          shapes (layout ()->guiding_shape_layer ()).insert (db::BoxWithProperties(db::Box (db::DBox (p, p) * (1.0 / layout ()->dbu ())), layout ()->properties_repository ().properties_id (props)));
+          shapes (layout ()->guiding_shape_layer ()).insert (db::PointWithProperties (db::Point (p * (1.0 / layout ()->dbu ())), layout ()->properties_repository ().properties_id (props)));
 
         } else if (m_parameters[i].is_user<db::Point> ()) {
 
           db::Point p = m_parameters[i].to_user<db::Point> ();
-          shapes (layout ()->guiding_shape_layer ()).insert (db::BoxWithProperties(db::Box (p, p), layout ()->properties_repository ().properties_id (props)));
+          shapes (layout ()->guiding_shape_layer ()).insert (db::PointWithProperties (p, layout ()->properties_repository ().properties_id (props)));
 
         } else if (m_parameters[i].is_user<db::DPolygon> ()) {
 
           db::complex_trans<db::DCoord, db::Coord> dbu_trans (1.0 / layout ()->dbu ());
           db::Polygon poly = m_parameters[i].to_user<db::DPolygon> ().transformed (dbu_trans, false);
           //  Hint: we don't compress the polygon since we don't want to loose information
-          shapes (layout ()->guiding_shape_layer ()).insert (db::PolygonWithProperties(poly, layout ()->properties_repository ().properties_id (props)));
+          shapes (layout ()->guiding_shape_layer ()).insert (db::PolygonWithProperties (poly, layout ()->properties_repository ().properties_id (props)));
 
         } else if (m_parameters[i].is_user<db::Polygon> ()) {
 
           db::Polygon poly = m_parameters[i].to_user<db::Polygon> ();
           //  Hint: we don't compress the polygon since we don't want to loose information
-          shapes (layout ()->guiding_shape_layer ()).insert (db::PolygonWithProperties(poly, layout ()->properties_repository ().properties_id (props)));
+          shapes (layout ()->guiding_shape_layer ()).insert (db::PolygonWithProperties (poly, layout ()->properties_repository ().properties_id (props)));
 
         } else if (m_parameters[i].is_user<db::DPath> ()) {
 
           db::complex_trans<db::DCoord, db::Coord> dbu_trans (1.0 / layout ()->dbu ());
-          shapes (layout ()->guiding_shape_layer ()).insert (db::PathWithProperties(dbu_trans * m_parameters[i].to_user<db::DPath> (), layout ()->properties_repository ().properties_id (props)));
+          shapes (layout ()->guiding_shape_layer ()).insert (db::PathWithProperties (dbu_trans * m_parameters[i].to_user<db::DPath> (), layout ()->properties_repository ().properties_id (props)));
 
         } else if (m_parameters[i].is_user<db::Path> ()) {
 
-          shapes (layout ()->guiding_shape_layer ()).insert (db::PathWithProperties(m_parameters[i].to_user<db::Path> (), layout ()->properties_repository ().properties_id (props)));
+          shapes (layout ()->guiding_shape_layer ()).insert (db::PathWithProperties (m_parameters[i].to_user<db::Path> (), layout ()->properties_repository ().properties_id (props)));
 
         }
 

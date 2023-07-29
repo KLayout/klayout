@@ -851,6 +851,30 @@ Object::Object (const std::string &filename, const db::DCplxTrans &trans)
   m_updates_enabled = true;
 }
 
+Object::Object (const tl::PixelBuffer &pixel_buffer, const db::DCplxTrans &trans)
+  : m_filename ("<object>"), m_trans (trans), m_id (make_id ()), m_min_value (0.0), m_max_value (1.0), m_min_value_set (false), m_max_value_set (false), m_visible (true), m_z_position (0)
+{
+  m_updates_enabled = false;
+  mp_pixel_data = 0;
+
+  mp_data = 0;
+  create_from_pixel_buffer (pixel_buffer);
+  m_updates_enabled = true;
+}
+
+#if defined(HAVE_QT)
+Object::Object (const QImage &qimage, const db::DCplxTrans &trans)
+  : m_filename ("<object>"), m_trans (trans), m_id (make_id ()), m_min_value (0.0), m_max_value (1.0), m_min_value_set (false), m_max_value_set (false), m_visible (true), m_z_position (0)
+{
+  m_updates_enabled = false;
+  mp_pixel_data = 0;
+
+  mp_data = 0;
+  create_from_qimage (qimage);
+  m_updates_enabled = true;
+}
+#endif
+
 Object::Object (size_t w, size_t h, const db::Matrix3d &trans, bool color, bool byte_data)
   : m_trans (trans), m_id (make_id ()), m_min_value (0.0), m_max_value (1.0), m_min_value_set (false), m_max_value_set (false), m_visible (true), m_z_position (0)
 {
@@ -933,6 +957,31 @@ Object::Object (const std::string &filename, const db::Matrix3d &trans)
   read_file ();
   m_updates_enabled = true;
 }
+
+Object::Object (const tl::PixelBuffer &pixel_buffer, const db::Matrix3d &trans)
+  : m_filename ("<object>"), m_trans (trans), m_id (make_id ()), m_min_value (0.0), m_max_value (1.0), m_min_value_set (false), m_max_value_set (false), m_visible (true), m_z_position (0)
+{
+  m_updates_enabled = false;
+  mp_pixel_data = 0;
+
+  mp_data = 0;
+  create_from_pixel_buffer (pixel_buffer);
+  read_file ();
+  m_updates_enabled = true;
+}
+
+#if defined(HAVE_QT)
+Object::Object (const QImage &qimage, const db::Matrix3d &trans)
+  : m_filename ("<object>"), m_trans (trans), m_id (make_id ()), m_min_value (0.0), m_max_value (1.0), m_min_value_set (false), m_max_value_set (false), m_visible (true), m_z_position (0)
+{
+  m_updates_enabled = false;
+  mp_pixel_data = 0;
+
+  mp_data = 0;
+  create_from_qimage (qimage);
+  m_updates_enabled = true;
+}
+#endif
 
 Object::Object (const img::Object &d)
 {
@@ -1566,65 +1615,7 @@ Object::read_file ()
 #if defined(HAVE_QT)
 
   QImage qimage (tl::to_qstring (m_filename));
-
-  if (! qimage.isNull ()) {
-
-    if (! m_min_value_set) {
-      m_min_value = 0.0;
-    }
-
-    if (! m_max_value_set) {
-      m_max_value = 255.0;
-    }
-
-    m_min_value_set = true;
-    m_max_value_set = true;
-
-    size_t w = qimage.width (), h = qimage.height ();
-
-    mp_data = new DataHeader (w, h, ! qimage.isGrayscale (), true);
-    mp_data->add_ref ();
-
-    size_t i = 0;
-
-    if (is_color ()) {
-
-      unsigned char *red   = mp_data->byte_data (0);
-      unsigned char *green = mp_data->byte_data (1);
-      unsigned char *blue  = mp_data->byte_data (2);
-      unsigned char *msk   = qimage.hasAlphaChannel () ? mp_data->set_mask () : 0;
-     
-      for (size_t y = 0; y < h; ++y) {
-        for (size_t x = 0; x < w; ++x) {
-          QRgb rgb = qimage.pixel (QPoint (int (x), int (h - y - 1)));
-          red[i] = qRed (rgb);
-          green[i] = qGreen (rgb);
-          blue[i] = qBlue (rgb);
-          if (msk) {
-            msk[i] = qAlpha (rgb) > 128;
-          }
-          ++i;
-        }
-      }
-
-    } else {
-
-      unsigned char *d = mp_data->byte_data ();
-      unsigned char *msk = qimage.hasAlphaChannel () ? mp_data->set_mask () : 0;
-
-      for (size_t y = 0; y < h; ++y) {
-        for (size_t x = 0; x < w; ++x) {
-          QRgb rgb = qimage.pixel (QPoint (int (x), int (h - y - 1)));
-          *d++ = qGreen (rgb);
-          if (msk) {
-            msk[i] = qAlpha (rgb) > 128;
-          }
-        }
-      }
-
-    }
-
-  }
+  create_from_qimage (qimage);
 
 #elif defined(HAVE_PNG)
 
@@ -1635,6 +1626,82 @@ Object::read_file ()
     img = tl::PixelBuffer::read_png (stream);
   }
 
+  create_from_pixel_buffer (img);
+
+#else
+  throw tl::Exception ("No PNG support compiled in - cannot load PNG files");
+#endif
+}
+
+#if defined(HAVE_QT)
+void
+Object::create_from_qimage (const QImage &qimage)
+{
+  if (qimage.isNull ()) {
+    return;
+  }
+
+  if (! m_min_value_set) {
+    m_min_value = 0.0;
+  }
+
+  if (! m_max_value_set) {
+    m_max_value = 255.0;
+  }
+
+  m_min_value_set = true;
+  m_max_value_set = true;
+
+  size_t w = qimage.width (), h = qimage.height ();
+
+  mp_data = new DataHeader (w, h, ! qimage.isGrayscale (), true);
+  mp_data->add_ref ();
+
+  size_t i = 0;
+
+  if (is_color ()) {
+
+    unsigned char *red   = mp_data->byte_data (0);
+    unsigned char *green = mp_data->byte_data (1);
+    unsigned char *blue  = mp_data->byte_data (2);
+    unsigned char *msk   = qimage.hasAlphaChannel () ? mp_data->set_mask () : 0;
+
+    for (size_t y = 0; y < h; ++y) {
+      for (size_t x = 0; x < w; ++x) {
+        QRgb rgb = qimage.pixel (QPoint (int (x), int (h - y - 1)));
+        red[i] = qRed (rgb);
+        green[i] = qGreen (rgb);
+        blue[i] = qBlue (rgb);
+        if (msk) {
+          msk[i] = qAlpha (rgb) > 128;
+        }
+        ++i;
+      }
+    }
+
+  } else {
+
+    unsigned char *d = mp_data->byte_data ();
+    unsigned char *msk = qimage.hasAlphaChannel () ? mp_data->set_mask () : 0;
+
+    for (size_t y = 0; y < h; ++y) {
+      for (size_t x = 0; x < w; ++x) {
+        QRgb rgb = qimage.pixel (QPoint (int (x), int (h - y - 1)));
+        *d++ = qGreen (rgb);
+        if (msk) {
+          msk[i] = qAlpha (rgb) > 128;
+        }
+      }
+    }
+
+  }
+
+}
+#endif
+
+void
+Object::create_from_pixel_buffer (const tl::PixelBuffer &img)
+{
   bool is_color = false;
   for (unsigned int i = 0; i < img.height () && ! is_color; ++i) {
     const tl::color_t *d = img.scan_line (i);
@@ -1700,10 +1767,6 @@ Object::read_file ()
     }
 
   }
-
-#else
-  throw tl::Exception ("No PNG support compiled in - cannot load PNG files");
-#endif
 }
 
 void 

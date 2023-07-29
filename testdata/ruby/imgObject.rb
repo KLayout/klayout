@@ -415,6 +415,38 @@ class IMG_TestClass < TestBase
 
   end
 
+  # Construction from PixelBuffer
+  def test_6
+
+    fn = ENV["TESTSRC"] + "/testdata/img/gs.png"
+    pb = RBA::PixelBuffer::read_png(fn)
+
+    image = RBA::Image.new(pb)
+    assert_equal(image.trans.to_s, "r0 *1 -513.5,-349")
+
+    assert_equal(image.width, 1027)
+    assert_equal(image.height, 698)
+
+  end
+
+  # Construction from QImage
+  def test_7
+
+    if RBA.constants.find { |x| x == :QImage }
+
+      fn = ENV["TESTSRC"] + "/testdata/img/gs.png"
+      qimage = RBA::QImage::new(fn)
+
+      image = RBA::Image.new(qimage)
+      assert_equal(image.trans.to_s, "r0 *1 -513.5,-349")
+
+      assert_equal(image.width, 1027)
+      assert_equal(image.height, 698)
+
+    end
+
+  end
+
 end
 
 load("test_epilogue.rb")

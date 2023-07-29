@@ -30,6 +30,10 @@
 #include "dbTilingProcessor.h"
 #include "layLayoutViewBase.h"
 
+#if defined(HAVE_QT)
+#  include <QImage>
+#endif
+
 namespace gsi
 {
 
@@ -437,27 +441,22 @@ static ImageRef *new_image ()
   return new ImageRef ();
 }
 
-static ImageRef *new_image_f (const std::string &filename)
-{
-  return new ImageRef (img::Object (filename, db::DCplxTrans ()));
-}
-
 static ImageRef *new_image_ft (const std::string &filename, const db::DCplxTrans &trans)
 {
   return new ImageRef (img::Object (filename, trans));
 }
 
-/* 
-static ImageRef *new_image_whc (size_t w, size_t h, bool color)
+static ImageRef *new_image_pbt (const tl::PixelBuffer &pixel_buffer, const db::DCplxTrans &trans)
 {
-  return new ImageRef (img::Object (w, h, db::DCplxTrans (), color));
+  return new ImageRef (img::Object (pixel_buffer, trans));
 }
 
-static ImageRef *new_image_whtc (size_t w, size_t h, const db::DCplxTrans &trans, bool color)
+#if HAVE_QT
+static ImageRef *new_image_qit (const QImage &image, const db::DCplxTrans &trans)
 {
-  return new ImageRef (img::Object (w, h, trans, color));
+  return new ImageRef (img::Object (image, trans));
 }
-*/
+#endif
 
 static ImageRef *new_image_whd (size_t w, size_t h, const std::vector<double> &data)
 {
@@ -576,17 +575,8 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "This will create an empty image without data and no particular pixel width or related.\n"
     "Use the \\read_file or \\set_data methods to set image properties and pixel values.\n"
   ) +
-  gsi::constructor ("new", &gsi::new_image_f, gsi::arg ("filename"),
-    "@brief Constructor from a image file \n"
-    "\n"
-    "This constructor creates an image object from a file (which can have any format supported by Qt) and \n"
-    "a unit transformation. The image will originally be put to position 0,0 (lower left corner) and each pixel\n"
-    "will have a size of 1 (micron). \n"
-    "\n"
-    "@param filename The path to the image file to load.\n"
-  ) +
-  gsi::constructor ("new", &gsi::new_image_ft, gsi::arg ("filename"), gsi::arg ("trans"),
-    "@brief Constructor from a image file \n"
+  gsi::constructor ("new", &gsi::new_image_ft, gsi::arg ("filename"), gsi::arg ("trans", db::DCplxTrans (), "unity"),
+    "@brief Constructor from a image file\n"
     "\n"
     "This constructor creates an image object from a file (which can have any format supported by Qt) and \n"
     "a transformation. The image will originally be put to position 0,0 (lower left corner) and each pixel\n"
@@ -595,6 +585,31 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "@param filename The path to the image file to load.\n"
     "@param trans The transformation to apply to the image when displaying it.\n"
   ) +
+  gsi::constructor ("new", &gsi::new_image_pbt, gsi::arg ("pixels"), gsi::arg ("trans", db::DCplxTrans (), "unity"),
+    "@brief Constructor from a image pixel buffer\n"
+    "\n"
+    "This constructor creates an image object from a pixel buffer object. This object holds RGB or mono image data similar to "
+    "QImage, except it is available also when Qt is not available (e.g. inside the Python module).\n"
+    "\n"
+    "The image will originally be put to position 0,0 (lower left corner) and each pixel\n"
+    "will have a size of 1. The transformation describes how to transform this image into micron space.\n"
+    "\n"
+    "@param filename The path to the image file to load.\n"
+    "@param trans The transformation to apply to the image when displaying it.\n"
+  ) +
+#if defined(HAVE_QT)
+  gsi::constructor ("new", &gsi::new_image_qit, gsi::arg ("image"), gsi::arg ("trans", db::DCplxTrans (), "unity"),
+    "@brief Constructor from a image pixel buffer\n"
+    "\n"
+    "This constructor creates an image object from a pixel QImage object and uses RGB or mono image data to generate the image.\n"
+    "\n"
+    "The image will originally be put to position 0,0 (lower left corner) and each pixel\n"
+    "will have a size of 1. The transformation describes how to transform this image into micron space.\n"
+    "\n"
+    "@param filename The path to the image file to load.\n"
+    "@param trans The transformation to apply to the image when displaying it.\n"
+  ) +
+#endif
   gsi::constructor ("new", &gsi::new_image_whd, gsi::arg ("w"), gsi::arg ("h"), gsi::arg ("data"),
     "@brief Constructor for a monochrome image with the given pixel values\n"
     "\n"
@@ -624,39 +639,6 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "@param trans The transformation from pixel space to micron space\n"
     "@param d The data (see method description)\n"
   ) +
-  /*  HINT: these declarations cannot be used currently since any array is case to the boolean color parameter
-  gsi::constructor ("new", &img::new_image_whc, gsi::arg ("w"), gsi::arg ("h"), gsi::arg ("color"),
-    "@brief Constructor for monochrome or color images with zero pixel values\n"
-    "\n"
-    "This constructor creates an image object from a data set describing one monochrome channel\n"
-    "or three color channels.\n"
-    "Each channel consists of an array of x*y values where the first \"x\" values describe the first (lowest!) row\n"
-    "and so on. Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to \n"
-    "the common convention for image data.\n"
-    "The data fields can be accessed with the \"data\", \"set_data\", \"pixel\" or \"set_pixel\" methods.\n"
-    "Initially the pixel width and height will be 1 micron and the data range will be 0 to 1.0 (black to white level). \n"
-    "\n"
-    "@param w The width of the image\n"
-    "@param h The height of the image\n"
-    "@param color True to create a color image.\n"
-  ) +
-  gsi::constructor ("new", &img::new_image_whtc, gsi::arg ("w"), gsi::arg ("h"), gsi::arg ("trans"), gsi::arg ("color"),
-    "@brief Constructor for monochrome or color images with zero pixel values\n"
-    "\n"
-    "This constructor creates an image object from a data set describing one monochrome channel\n"
-    "or three color channels.\n"
-    "Each channel consists of an array of x*y values where the first \"x\" values describe the first (lowest!) row\n"
-    "and so on. Note, that the rows are oriented in the mathematical sense (first one is the lowest) contrary to \n"
-    "the common convention for image data.\n"
-    "The data fields can be accessed with the \"data\", \"set_data\", \"pixel\" or \"set_pixel\" methods.\n"
-    "Initially the pixel width and height will be 1 micron and the data range will be 0 to 1.0 (black to white level). \n"
-    "\n"
-    "@param w The width of the image\n"
-    "@param h The height of the image\n"
-    "@param trans The transformation to apply to the image when displaying it\n"
-    "@param color True to create a color image.\n"
-  ) +
-  */
   gsi::constructor ("new", &gsi::new_image_whrgb, gsi::arg ("w"), gsi::arg ("h"), gsi::arg ("red"), gsi::arg ("green"), gsi::arg ("blue"),
     "@brief Constructor for a color image with the given pixel values\n"
     "\n"

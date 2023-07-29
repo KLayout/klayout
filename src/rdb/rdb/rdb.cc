@@ -156,6 +156,49 @@ template <> RDB_PUBLIC std::string Value<db::DText>::to_display_string () const
   return to_string ();
 }
 
+//  is_shape implementations
+
+template <> RDB_PUBLIC bool Value<double>::is_shape () const
+{
+  return false;
+}
+
+template <> RDB_PUBLIC bool Value<std::string>::is_shape () const
+{
+  return false;
+}
+
+template <> RDB_PUBLIC bool Value<db::DPolygon>::is_shape () const
+{
+  return true;
+}
+
+template <> RDB_PUBLIC bool Value<db::DEdge>::is_shape () const
+{
+  return true;
+}
+
+template <> RDB_PUBLIC bool Value<db::DEdgePair>::is_shape () const
+{
+  return true;
+}
+
+template <> RDB_PUBLIC bool Value<db::DBox>::is_shape () const
+{
+  return true;
+}
+
+template <> RDB_PUBLIC bool Value<db::DPath>::is_shape () const
+{
+  return true;
+}
+
+template <> RDB_PUBLIC bool Value<db::DText>::is_shape () const
+{
+  return true;
+}
+
+
 bool ValueBase::compare (const ValueBase *a, const ValueBase *b) 
 {
   //  compare is the intrinsic compare of equal type and type index for different types.

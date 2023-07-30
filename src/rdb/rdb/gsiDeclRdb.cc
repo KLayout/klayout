@@ -184,7 +184,7 @@ Class<rdb::Cell> decl_RdbCell ("rdb", "RdbCell",
     "@brief Gets the cell name\n"
     "The cell name is an string that identifies the category in the database. "
     "Additionally, a cell may carry a variant identifier which is a string that uniquely identifies a cell "
-    "in the context of it's variants. The \"qualified name\" contains both the cell name and the variant name. "
+    "in the context of its variants. The \"qualified name\" contains both the cell name and the variant name. "
     "Cell names are also used to identify report database cell's with layout cells. "
     "@return The cell name\n"
   ) +
@@ -347,7 +347,7 @@ Class<rdb::Category> decl_RdbCategory ("rdb", "RdbCategory",
   ) +
   gsi::method_ext ("scan_layer", &scan_layer, gsi::arg ("layout"), gsi::arg ("layer"), gsi::arg ("cell", (const db::Cell *) 0, "nil"), gsi::arg ("levels", -1), gsi::arg ("with_properties", true),
     "@brief Scans a layer from a layout into this category, starting with a given cell and a depth specification\n"
-    "Creates RDB items for each polygon or edge shape read from the cell and it's children in the layout on the given layer and puts them into this category.\n"
+    "Creates RDB items for each polygon or edge shape read from the cell and its children in the layout on the given layer and puts them into this category.\n"
     "New cells will be generated when required.\n"
     "\"levels\" is the number of hierarchy levels to take the child cells from. 0 means to use only \"cell\" and don't descend, -1 means \"all levels\".\n"  
     "Other settings like database unit, description, top cell etc. are not made in the RDB.\n"
@@ -1031,7 +1031,7 @@ Class<rdb::Database> decl_ReportDatabase ("rdb", "ReportDatabase",
   ) + 
   gsi::method ("description", &rdb::Database::description, 
     "@brief Gets the databases description\n"
-    "The description is a general purpose string that is supposed to further describe the database and it's content "
+    "The description is a general purpose string that is supposed to further describe the database and its content "
     "in a human-readable form.\n"
     "@return The description string\n"
   ) +

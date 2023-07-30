@@ -7,7 +7,7 @@
 @args id, ...
 This method implements Ruby's fallback mechanism and adds some convenience to 
 QObject: through that implementation, each child object can be accessed through
-it's name. That method will deliver a reference to the child object or nil if there
+its name. That method will deliver a reference to the child object or nil if there
 is no child element with that name.
 For example:
 

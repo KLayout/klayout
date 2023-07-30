@@ -62,7 +62,7 @@ namespace gsi
     gsi::method ("spline_interpolation", &db::UtilsDummy::spi1, gsi::arg ("control_points"), gsi::arg ("weights"), gsi::arg ("degree"), gsi::arg ("knots"), gsi::arg ("relative_accuracy"), gsi::arg ("absolute_accuracy"),
      "@brief This function computes the Spline curve for a given set of control points (point, weight), degree and knots.\n"
      "\n"
-     "The knot vector needs to be padded and it's size must fulfill the condition:\n"
+     "The knot vector needs to be padded and its size must fulfill the condition:\n"
      "\n"
      "@code\n"
      "  knots.size == control_points.size + degree + 1\n"

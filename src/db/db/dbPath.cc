@@ -277,7 +277,7 @@ void path<C>::create_shifted_points (C start, C end, C width, bool forward, Iter
     Iter ppp = pp;
     ++ppp;
 
-    //  Compute the unit vector of the line and it's normal (times width)
+    //  Compute the unit vector of the line and its normal (times width)
 
     db::DVector ed (*pp - *p);
     ed *= 1.0 / ed.double_length ();
@@ -383,7 +383,7 @@ void path<C>::create_shifted_points (C start, C end, C width, bool forward, Iter
 
           //  Segments are too short - the won't intersect: In this case we create a loop of three 
           //  points which define the area in self-overlapping way but confined to the path within
-          //  the limits of it's width. 
+          //  the limits of its width.
           //  HINT: the execution of this code is a pretty strong evidence for the existence to loops 
           //  in the contour delivered. A proof however is missing ..
           *pts++ = *pp + vector<C> (nd);

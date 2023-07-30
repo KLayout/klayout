@@ -191,7 +191,7 @@ HierarchyBuilder::reset ()
 void
 HierarchyBuilder::register_variant (db::cell_index_type non_var, db::cell_index_type var)
 {
-  //  non_var (despite it's name) may be a variant created previously.
+  //  non_var (despite its name) may be a variant created previously.
   variant_to_original_target_map_type::const_iterator v = m_variants_to_original_target_map.find (non_var);
   if (v != m_variants_to_original_target_map.end ()) {
     non_var = v->second;

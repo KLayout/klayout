@@ -496,7 +496,7 @@ struct writer
 
       if (atype.is_ref () || atype.is_ptr ()) {
 
-        // TODO: morph the variant to the requested type and pass it's pointer (requires a non-const reference for arg)
+        // TODO: morph the variant to the requested type and pass its pointer (requires a non-const reference for arg)
         // -> we would have a reference that can modify the argument (out parameter).
         R *v = new R (var2c<R>::get (*arg));
         heap->push (v);
@@ -542,7 +542,7 @@ struct writer<StringType>
 
     } else {
 
-      // TODO: morph the variant to the requested type and pass it's pointer (requires a non-const reference for arg)
+      // TODO: morph the variant to the requested type and pass its pointer (requires a non-const reference for arg)
       // -> we would have a reference that can modify the argument (out parameter).
       // NOTE: by convention we pass the ownership to the receiver for adaptors.
       aa->write<void *> ((void *)new StringAdaptorImpl<std::string> (arg->to_string ()));

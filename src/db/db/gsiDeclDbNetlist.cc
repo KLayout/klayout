@@ -1701,7 +1701,7 @@ Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
   ) +
   gsi::method ("flatten_subcircuit", &db::Circuit::flatten_subcircuit, gsi::arg ("subcircuit"),
     "@brief Flattens a subcircuit\n"
-    "This method will substitute the given subcircuit by it's contents. The subcircuit is removed "
+    "This method will substitute the given subcircuit by its contents. The subcircuit is removed "
     "after this."
   ) +
   gsi::iterator ("each_subcircuit", (db::Circuit::subcircuit_iterator (db::Circuit::*) ()) &db::Circuit::begin_subcircuits, (db::Circuit::subcircuit_iterator (db::Circuit::*) ()) &db::Circuit::end_subcircuits,
@@ -1986,7 +1986,7 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
   ) +
   gsi::method ("flatten_circuit", &db::Netlist::flatten_circuit, gsi::arg ("circuit"),
     "@brief Flattens a subcircuit\n"
-    "This method will substitute all instances (subcircuits) of the given circuit by it's "
+    "This method will substitute all instances (subcircuits) of the given circuit by its "
     "contents. After this, the circuit is removed."
   ) +
   gsi::method_ext ("flatten_circuit", &flatten_circuit_by_name, gsi::arg ("pattern"),

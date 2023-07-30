@@ -1356,7 +1356,7 @@ void
 LayoutView::cut ()
 {
   if (mp_hierarchy_panel && mp_hierarchy_panel->has_focus ()) {
-    //  TODO: currently the hierarchy panel's cut function does it's own transaction handling.
+    //  TODO: currently the hierarchy panel's cut function does its own transaction handling.
     //  Otherwise the cut function is not working propertly.
     mp_hierarchy_panel->cut ();
   } else if (mp_control_panel && mp_control_panel->has_focus ()) {

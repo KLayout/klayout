@@ -1241,7 +1241,7 @@ Class<lay::LayerPropertiesNode> decl_LayerPropertiesNode (
     "Each layer properties node object has a unique ID that is created \n"
     "when a new LayerPropertiesNode object is instantiated. The ID is\n"
     "copied when the object is copied. The ID can be used to identify the\n"
-    "object irregardless of it's content.\n"
+    "object irregardless of its content.\n"
   ),
   "@brief A layer properties node structure\n"
   "\n"
@@ -1441,7 +1441,7 @@ Class<lay::LayerPropertiesConstIterator> decl_LayerPropertiesIterator (
     "@brief Returns the index of the child within the parent\n"
     "\n"
     "This method returns the index of that the properties node the iterator points to in the list\n"
-    "of children of it's parent. If the element does not have a parent, the \n"
+    "of children of its parent. If the element does not have a parent, the \n"
     "index of the element in the global list is returned.\n"
   ),  
   "@brief Layer properties iterator\n"

@@ -34,7 +34,7 @@ class PCell(pya.PCellDeclarationHelper):
     return "TODO: create description"
   
   def coerce_parameters_impl(self):
-    # TODO: use x to access parameter x and set_x to modify it's value 
+    # TODO: use x to access parameter x and set_x to modify its value
   
   def produce_impl(self):
     # TODO: produce the cell content 

@@ -136,11 +136,11 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                   "\n"
                   "Multiple operations can be specified by combining them with a comma. "
                   "Positive and negative selection happens in the order given. Hence it's possible "
-                  "to select a cell with it's children and then unselect some children of this cell.\n"
+                  "to select a cell with its children and then unselect some children of this cell.\n"
                   "\n"
                   "Examples:\n\n"
                   "* \"TOP1,TOP2\" - Select cells TOP1 and TOP2 with all of their children\n"
-                  "* \"(TOP)\" - Select only cell TOP, but none of it's child cells\n"
+                  "* \"(TOP)\" - Select only cell TOP, but none of its child cells\n"
                   "* \"TOP,-A\" - Select cell TOP (plus children), then remove A (with children)"
                  );
 

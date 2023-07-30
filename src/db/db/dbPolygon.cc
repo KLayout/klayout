@@ -32,7 +32,7 @@ db::DEdge compute_shifted (const db::edge<C> &e, C dx, C dy, double ext, int nsi
 {
   tl_assert (! e.is_degenerate ()); // no coincident points allowed
 
-  //  Compute the unit vector of the line and it's normal (times width)
+  //  Compute the unit vector of the line and its normal (times width)
   db::DVector ec (e.d ());
   ec *= 1.0 / ec.double_length ();
   db::DVector nc (-ec.y (), ec.x ());
@@ -47,7 +47,7 @@ db::DEdge compute_shifted (const db::edge<C> &e, C dx, C dy, double ext, int nsi
 
 /**
  *  @brief Smart multiplication of a vector with a distance
- *  This function tries to keep the length of the vector on grid if it's 
+ *  This function tries to keep the length of the vector on grid if its
  *  a 45 degree or horizontal/vertical one.
  */
 template <class C>

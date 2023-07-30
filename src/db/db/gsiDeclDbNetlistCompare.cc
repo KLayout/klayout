@@ -454,7 +454,7 @@ Class<GenericNetlistCompareLogger> decl_GenericNetlistCompareLogger (decl_dbNetl
   ),
   "@brief An event receiver for the netlist compare feature.\n"
   "The \\NetlistComparer class will send compare events to a logger derived from this class. "
-  "Use this class to implement your own logger class. You can override on of it's methods to receive certain "
+  "Use this class to implement your own logger class. You can override on of its methods to receive certain "
   "kind of events."
   "\n"
   "This class has been introduced in version 0.26.\n"

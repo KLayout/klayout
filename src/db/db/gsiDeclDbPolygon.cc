@@ -372,7 +372,7 @@ struct simple_polygon_defs
     method ("is_box?", &C::is_box,
       "@brief Returns a value indicating whether the polygon is a simple box.\n"
       "\n"
-      "A polygon is a box if it is identical to it's bounding box.\n"
+      "A polygon is a box if it is identical to its bounding box.\n"
       "\n"
       "@return True if the polygon is a box.\n"
       "\n"
@@ -1380,7 +1380,7 @@ struct polygon_defs
     method ("is_box?", &C::is_box,
       "@brief Returns true, if the polygon is a simple box.\n"
       "\n"
-      "A polygon is a box if it is identical to it's bounding box.\n"
+      "A polygon is a box if it is identical to its bounding box.\n"
       "\n"
       "@return True if the polygon is a box.\n"
       "\n"

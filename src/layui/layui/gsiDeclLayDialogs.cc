@@ -344,7 +344,7 @@ Class<BrowserDialog_Stub> decl_BrowserDialog (QT_EXTERNAL_BASE (QDialog) "lay", 
   "The browser dialog displays HTML code in a browser panel. The HTML code is delivered through a separate "
   "object of class \\BrowserSource which acts as a \"server\" for a specific kind of URL scheme. Whenever the "
   "browser sees a URL starting with \"int:\" it will ask the connected BrowserSource object for the HTML code "
-  "of that page using it's 'get' method. The task of the BrowserSource object is to format the data requested "
+  "of that page using its 'get' method. The task of the BrowserSource object is to format the data requested "
   "in HTML and deliver it.\n"
   "\n"
   "One use case for that class is the implementation of rich data browsers for structured information. In a "
@@ -699,7 +699,7 @@ Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param value The initial value for the input field\n"
-    "@return A \\StringValue object with has_value? set to true, if \"Ok\" was pressed and the value given in it's value attribute\n"
+    "@return A \\StringValue object with has_value? set to true, if \"Ok\" was pressed and the value given in its value attribute\n"
     "Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent."
   ) +
   gsi::method ("#get_item", &get_item, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("items"), gsi::arg ("value"),
@@ -708,7 +708,7 @@ Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
     "@param label The label text to display for the dialog\n"
     "@param items The list of items to show in the selection element\n"
     "@param selection The initial selection (index of the element selected initially)\n"
-    "@return A \\StringValue object with has_value? set to true, if \"Ok\" was pressed and the value given in it's value attribute\n"
+    "@return A \\StringValue object with has_value? set to true, if \"Ok\" was pressed and the value given in its value attribute\n"
     "Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent."
   ) +
   gsi::method ("#get_string_password", &get_string_password, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("value"),
@@ -716,7 +716,7 @@ Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param value The initial value for the input field\n"
-    "@return A \\StringValue object with has_value? set to true, if \"Ok\" was pressed and the value given in it's value attribute\n"
+    "@return A \\StringValue object with has_value? set to true, if \"Ok\" was pressed and the value given in its value attribute\n"
     "Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent."
   ) +
   gsi::method ("#get_double", &get_double, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("value"), gsi::arg ("digits"),
@@ -725,7 +725,7 @@ Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
     "@param label The label text to display for the dialog\n"
     "@param value The initial value for the input field\n"
     "@param digits The number of digits allowed\n"
-    "@return A \\DoubleValue object with has_value? set to true, if \"Ok\" was pressed and the value given in it's value attribute\n"
+    "@return A \\DoubleValue object with has_value? set to true, if \"Ok\" was pressed and the value given in its value attribute\n"
     "Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent."
   ) +
   gsi::method ("#get_double_ex", &get_double_ex, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("value"), gsi::arg ("min"), gsi::arg ("max"), gsi::arg ("digits"),
@@ -736,7 +736,7 @@ Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
     "@param min The minimum value allowed\n"
     "@param max The maximum value allowed\n"
     "@param digits The number of digits allowed\n"
-    "@return A \\DoubleValue object with has_value? set to true, if \"Ok\" was pressed and the value given in it's value attribute\n"
+    "@return A \\DoubleValue object with has_value? set to true, if \"Ok\" was pressed and the value given in its value attribute\n"
     "Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent."
   ) +
   gsi::method ("#get_int", &get_int, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("value"),
@@ -744,7 +744,7 @@ Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
     "@param title The title to display for the dialog\n"
     "@param label The label text to display for the dialog\n"
     "@param value The initial value for the input field\n"
-    "@return A \\IntValue object with has_value? set to true, if \"Ok\" was pressed and the value given in it's value attribute\n"
+    "@return A \\IntValue object with has_value? set to true, if \"Ok\" was pressed and the value given in its value attribute\n"
     "Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent."
   ) +
   gsi::method ("#get_int_ex", &get_int_ex, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("value"), gsi::arg ("min"), gsi::arg ("max"), gsi::arg ("step"),
@@ -755,7 +755,7 @@ Class<InputDialog> decl_InputDialog ("lay", "InputDialog",
     "@param min The minimum value allowed\n"
     "@param max The maximum value allowed\n"
     "@param step The step size for the spin buttons\n"
-    "@return A \\IntValue object with has_value? set to true, if \"Ok\" was pressed and the value given in it's value attribute\n"
+    "@return A \\IntValue object with has_value? set to true, if \"Ok\" was pressed and the value given in its value attribute\n"
     "Starting from 0.22, this method is deprecated and it is recommended to use the ask_... equivalent."
   ) +
   gsi::method ("ask_string", &ask_string, gsi::arg ("title"), gsi::arg ("label"), gsi::arg ("value"),

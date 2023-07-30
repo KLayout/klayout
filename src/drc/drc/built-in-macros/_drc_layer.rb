@@ -630,7 +630,7 @@ CODE
     # @synopsis layer.with_area_ratio(min .. max)
     # @synopsis layer.with_area_ratio(value)
     # @synopsis layer.with_area_ratio(min, max)
-    # The area ratio is a measure how far a polygon is approximated by it's
+    # The area ratio is a measure how far a polygon is approximated by its
     # bounding box. The value is always larger or equal to 1. Boxes have a 
     # area ratio of 1. Larger values mean more empty area inside the bounding box.
     # 
@@ -648,7 +648,7 @@ CODE
     
     # %DRC%
     # @name with_relative_height
-    # @brief Selects polygons by the ratio of the height vs. width of it's bounding box
+    # @brief Selects polygons by the ratio of the height vs. width of its bounding box
     # @synopsis layer.with_relative_height(min .. max)
     # @synopsis layer.with_relative_height(value)
     # @synopsis layer.with_relative_height(min, max)

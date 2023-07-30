@@ -580,7 +580,7 @@ SaltGrainPropertiesDialog::accept ()
     if (d->version.empty ()) {
       dependencies_alert->warn () << tr ("No version specified for dependency '%1'").arg (tl::to_qstring (d->name)) << tl::endl
                                   << tr ("Please consider giving a version here. Versions help deciding whether a package needs to be updated.") << tl::endl
-                                  << tr ("If the dependency package has a version itself, the version is automatically set to it's current version.");
+                                  << tr ("If the dependency package has a version itself, the version is automatically set to its current version.");
     }
 
     if (!d->url.empty ()) {

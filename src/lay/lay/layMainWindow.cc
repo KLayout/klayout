@@ -541,7 +541,7 @@ MainWindow::init_menu ()
   }
 
   //  if not in editable mode, hide all entries from "edit_mode" group
-  //  TODO: later do this on each change of the view - each view might get it's own editable mode
+  //  TODO: later do this on each change of the view - each view might get its own editable mode
   bool view_mode = (lay::ApplicationBase::instance () && !lay::ApplicationBase::instance ()->is_editable ());
 
   std::vector<std::string> edit_mode_grp = menu ()->group ("edit_mode");
@@ -742,7 +742,7 @@ MainWindow::about_to_exec ()
     }
   }
 
-  //  TODO: later, each view may get it's own editable flag
+  //  TODO: later, each view may get its own editable flag
   if (lay::ApplicationBase::instance () && !lay::ApplicationBase::instance ()->is_editable ()) {
     TipDialog td (this,
                   tl::to_string (QObject::tr ("KLayout has been started in viewer mode. In this mode, editor functions are not available.\n\nTo enable these functions, start KLayout in editor mode by using the \"-e\" command line switch or select it as the default mode in the setup dialog. Choose \"Setup\" in the \"File\" menu and check \"Use editing mode by default\" on the \"Editing Mode\" page in the \"Application\" section.")),

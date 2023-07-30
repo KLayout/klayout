@@ -132,7 +132,7 @@ Class<db::CellMapping> decl_CellMapping ("db", "CellMapping",
     "If used as a pseudo-target for the cell mapping, this index indicates "
     "that the cell shall be dropped rather than created on the target side "
     "or skipped by flattening. Instead, all shapes of this cell are discarded "
-    "and it's children are not translated unless explicitly requested or "
+    "and its children are not translated unless explicitly requested or "
     "if required are children for other cells.\n"
     "\n"
     "This constant has been introduced in version 0.25."

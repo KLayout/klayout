@@ -54,7 +54,7 @@ void
 BitmapRenderer::clear ()
 {
   //  this implementation is efficient but does not free memory - 
-  //  the idea is to let the BitmapRenderer object manage it's workspace.
+  //  the idea is to let the BitmapRenderer object manage its workspace.
   m_edges.erase (m_edges.begin (), m_edges.end ());
   //  might be manhattan
   m_ortho = true;

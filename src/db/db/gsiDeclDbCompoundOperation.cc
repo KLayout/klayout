@@ -727,7 +727,7 @@ Class<db::CompoundRegionOperationNode> decl_CompoundRegionOperationNode ("db", "
     "If 'is_square' is true, only squares will be selected. If 'inverse' is true, the non-rectangle/non-square shapes are returned.\n"
   ) +
   gsi::constructor ("new_edges", &new_edges, gsi::arg ("input"),
-    "@brief Creates a node converting polygons into it's edges.\n"
+    "@brief Creates a node converting polygons into its edges.\n"
   ) +
   gsi::constructor ("new_edge_length_filter", &new_edge_length_filter, gsi::arg ("input"), gsi::arg ("inverse", false), gsi::arg ("lmin", 0), gsi::arg ("lmax", std::numeric_limits<db::Edge::distance_type>::max (), "max"),
     "@brief Creates a node filtering edges by their length.\n"

@@ -325,7 +325,7 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
     "This method is supposed to set up the device extractor. This involves three basic steps:\n"
     "defining the name, the device class and setting up the device layers.\n"
     "\n"
-    "Use \\name= to give the extractor and it's device class a name.\n"
+    "Use \\name= to give the extractor and its device class a name.\n"
     "Use \\register_device_class to register the device class you need.\n"
     "Defined the layers by calling \\define_layer once or several times.\n"
   ) +
@@ -377,7 +377,7 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
    "@return The layer descriptor object created for this layer (use 'index' to get the layer's index)\n"
    "As \\define_layer, this method allows specification of device extraction layer. In addition to \\define_layout, it features "
    "a fallback layer. If in the device extraction statement, the primary layer is not given, "
-   "the fallback layer will be used. Hence, this layer is optional. The fallback layer is given by it's "
+   "the fallback layer will be used. Hence, this layer is optional. The fallback layer is given by its "
    "index and must be defined before the layer using the fallback layer is defined. "
    "For the index, 0 is the first layer defined, 1 the second and so forth."
   ) +

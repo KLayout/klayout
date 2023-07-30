@@ -335,7 +335,7 @@ module DRC
     #
     # Some filters operate on properties of the full, local, per-primary shape set. 
     # While the loop is executed, the DRC expressions will collect shapes, either
-    # from the primary, it's neighborhood (secondaries) or from deriving shape sets.
+    # from the primary, its neighborhood (secondaries) or from deriving shape sets.
     #
     # Obviously the primary is a simple one: it consists of a single shape, because
     # this is how the loop operates. Derived shape sets however can be more complex.
@@ -528,7 +528,7 @@ module DRC
     #
     # This feature opens new options for processing layouts beyond the 
     # abilities of the classical DRC concept. For classic DRC, intra-layer interactions
-    # are always symmetric: a polygon cannot be considered separated from it's neighbors
+    # are always symmetric: a polygon cannot be considered separated from its neighbors
     # on the same layer.
     # 
     # The following example computes every part of the input which is closer than

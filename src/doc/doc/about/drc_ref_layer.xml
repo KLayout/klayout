@@ -676,7 +676,7 @@ out = l1.drc((secondary(l2) &amp; primary).area &gt; 1.0)
 </p><p>
 Some filters operate on properties of the full, local, per-primary shape set. 
 While the loop is executed, the DRC expressions will collect shapes, either
-from the primary, it's neighborhood (secondaries) or from deriving shape sets.
+from the primary, its neighborhood (secondaries) or from deriving shape sets.
 </p><p>
 Obviously the primary is a simple one: it consists of a single shape, because
 this is how the loop operates. Derived shape sets however can be more complex.
@@ -1537,7 +1537,7 @@ from the other layer. Two polygons overlapping or touching at two locations are 
 </ul>
 <p>
 This operation is similar to the "&amp;" operator, but it does also report intersection points
-between non-colinear, but intersection edges. Such points are reported as point-like,
+between non-colinear, but intersecting edges. Such points are reported as point-like,
 degenerated edge objects.
 </p><p>
 This method is available for edge layers. The argument must be an edge layer.
@@ -3609,7 +3609,7 @@ This method is available for polygon or edge pair layers.
 <li><tt>layer.with_area_ratio(min, max)</tt></li>
 </ul>
 <p>
-The area ratio is a measure how far a polygon is approximated by it's
+The area ratio is a measure how far a polygon is approximated by its
 bounding box. The value is always larger or equal to 1. Boxes have a 
 area ratio of 1. Larger values mean more empty area inside the bounding box.
 </p><p>
@@ -3883,7 +3883,7 @@ upper limit.
 </p><p>
 This method is available for polygon layers only.
 </p>
-<a name="with_relative_height"/><h2>"with_relative_height" - Selects polygons by the ratio of the height vs. width of it's bounding box</h2>
+<a name="with_relative_height"/><h2>"with_relative_height" - Selects polygons by the ratio of the height vs. width of its bounding box</h2>
 <keyword name="with_relative_height"/>
 <p>Usage:</p>
 <ul>

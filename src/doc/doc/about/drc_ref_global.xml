@@ -768,7 +768,7 @@ is called on. This operation represents all "other" primary polygons while
 </p><p>
 This feature opens new options for processing layouts beyond the 
 abilities of the classical DRC concept. For classic DRC, intra-layer interactions
-are always symmetric: a polygon cannot be considered separated from it's neighbors
+are always symmetric: a polygon cannot be considered separated from its neighbors
 on the same layer.
 </p><p>
 The following example computes every part of the input which is closer than

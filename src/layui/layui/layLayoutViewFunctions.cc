@@ -1177,7 +1177,7 @@ LayoutViewFunctions::do_cm_duplicate (bool interactive)
   db::Clipboard::instance ().swap (saved_clipboard);
 
   try {
-    view ()->copy ();
+    view ()->copy_view_objects ();
     view ()->clear_selection ();
     view ()->cancel ();
     if (interactive) {

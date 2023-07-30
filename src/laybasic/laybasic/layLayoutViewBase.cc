@@ -5297,11 +5297,7 @@ LayoutViewBase::paste_interactive ()
 
   std::unique_ptr<db::Transaction> trans (new db::Transaction (manager (), tl::to_string (tr ("Paste and move"))));
 
-  {
-    //  let the receivers sort out who is pasting what ..
-    do_paste ();
-    lay::Editables::paste ();
-  }
+  lay::Editables::paste ();
 
   //  temporarily close the transaction and pass to the move service for appending it's own
   //  operations.
@@ -5314,6 +5310,12 @@ LayoutViewBase::paste_interactive ()
 
 void
 LayoutViewBase::copy ()
+{
+  copy_view_objects ();
+}
+
+void
+LayoutViewBase::copy_view_objects ()
 {
   cancel_edits ();
   if (! lay::Editables::has_selection ()) {

@@ -265,6 +265,13 @@ public:
   virtual void copy ();
 
   /**
+   *  @brief Copies to clipboard (view objects only)
+   *
+   *  This version does not look for copy sources in the tree views.
+   */
+  void copy_view_objects ();
+
+  /**
    *  @brief Cuts to clipboard
    *
    *  This reimplementation of the lay::Editables interface additionally

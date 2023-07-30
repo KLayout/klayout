@@ -227,6 +227,7 @@ void Macro::save_to (const std::string &path)
 void Macro::load_from (const std::string &fn)
 {
   m_format = NoFormat;
+  m_interpreter = None;
 
   std::pair<bool, std::string> f = format_from_filename (fn, m_interpreter, m_dsl_interpreter, m_autorun_default, m_format);
   if (f.first) {
@@ -252,12 +253,23 @@ void Macro::load_from (const std::string &fn)
       tl::InputStream stream (path);
       tl::TextInputStream text_stream (stream);
       m_text = text_stream.read_all ();
-      sync_properties_with_text ();
+
+      if (m_format == PlainTextWithHashAnnotationsFormat) {
+        sync_properties_with_text ();
+      }
 
     }
 
   } else {
-    throw tl::Exception (tl::to_string (tr ("Unable to determine format for file from suffix or format spec ")) + fn);
+
+    if (tl::verbosity () >= 20) {
+      tl::log << "Loading macro from " << fn;
+    }
+
+    tl::InputStream stream (fn);
+    tl::TextInputStream text_stream (stream);
+    m_text = text_stream.read_all ();
+
   }
 
   m_modified = true;
@@ -268,6 +280,7 @@ void Macro::load_from (const std::string &fn)
 void Macro::load_from_string (const std::string &text, const std::string &url)
 {
   m_format = NoFormat;
+  m_interpreter = None;
 
   if (tl::verbosity () >= 20) {
     tl::log << "Loading macro from " << url;
@@ -294,7 +307,7 @@ void Macro::load_from_string (const std::string &text, const std::string &url)
     }
 
   } else {
-    throw tl::Exception (tl::to_string (tr ("Unable to determine format for file from suffix ")) + url);
+    m_text = text;
   }
 
   m_modified = true;

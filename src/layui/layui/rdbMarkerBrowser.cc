@@ -42,6 +42,7 @@ namespace rdb
 
 std::string cfg_rdb_context_mode ("rdb-context-mode");
 std::string cfg_rdb_show_all ("rdb-show-all");
+std::string cfg_rdb_list_shapes ("rdb-list-shapes");
 std::string cfg_rdb_window_state ("rdb-window-state-v2");  // v2: 0.24++
 std::string cfg_rdb_window_mode ("rdb-window-mode");
 std::string cfg_rdb_window_dim ("rdb-window-dim");

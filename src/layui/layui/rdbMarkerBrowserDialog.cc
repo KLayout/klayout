@@ -48,6 +48,7 @@ namespace rdb
 
 extern std::string cfg_rdb_context_mode;
 extern std::string cfg_rdb_show_all;
+extern std::string cfg_rdb_list_shapes;
 extern std::string cfg_rdb_window_state;
 extern std::string cfg_rdb_window_mode;
 extern std::string cfg_rdb_window_dim;
@@ -445,12 +446,17 @@ MarkerBrowserDialog::configure (const std::string &name, const std::string &valu
   bool need_update = false;
   bool taken = true;
   bool show_all = mp_ui->browser_frame->show_all ();
+  bool list_shapes = mp_ui->browser_frame->list_shapes ();
 
   if (name == cfg_rdb_context_mode) {
 
     context_mode_type context = m_context;
     MarkerBrowserContextModeConverter ().from_string (value, context);
     need_update = lay::test_and_set (m_context, context);
+
+  } else if (name == cfg_rdb_list_shapes) {
+
+    tl::from_string (value, list_shapes);
 
   } else if (name == cfg_rdb_show_all) {
 
@@ -540,6 +546,7 @@ MarkerBrowserDialog::configure (const std::string &name, const std::string &valu
   }
 
   mp_ui->browser_frame->show_all (show_all);
+  mp_ui->browser_frame->list_shapes (list_shapes);
 
   return taken;
 }

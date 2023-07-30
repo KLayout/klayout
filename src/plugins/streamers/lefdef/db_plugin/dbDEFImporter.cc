@@ -526,6 +526,8 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
           sn = get_long ();
         } else if (test ("SHAPE")) {
           take ();
+        } else {
+          error (tl::to_string (tr ("Expected STYLE OR SHAPE specification following '+'")));
         }
 
       }

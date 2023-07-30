@@ -1028,7 +1028,9 @@ private:
   void validate_pixel_data () const;
   void allocate (bool color);
   void read_file ();
+#if defined(HAVE_QT)
   void create_from_qimage (const QImage &qimage);
+#endif
   void create_from_pixel_buffer (const tl::PixelBuffer &img);
 };
 

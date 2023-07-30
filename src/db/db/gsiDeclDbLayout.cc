@@ -128,6 +128,19 @@ size_t hash_value (const db::LayerProperties *l)
   return std::hfunc (*l);
 }
 
+static bool log_equal_ext (const db::LayerProperties *lp1, const db::LayerProperties &lp2)
+{
+  if (lp1->log_equal (lp2)) {
+    return true;
+  }
+  //  compare by name as fallback if one argument is named and the other is not
+  //  (this gives a way to look up
+  if ((lp1->is_named () || lp2.is_named()) && ! lp1->name.empty () && ! lp2.name.empty ()) {
+    return lp1->name == lp2.name;
+  }
+  return false;
+}
+
 //  since there already exists a "LayerProperties" object, we call this one "LayerInfo"
 Class<db::LayerProperties> decl_LayerInfo ("db", "LayerInfo",
   gsi::constructor ("new", &ctor_layer_info_default, 
@@ -194,14 +207,31 @@ Class<db::LayerProperties> decl_LayerInfo ("db", "LayerInfo",
     "\n"
     "This method was added in version 0.18.\n"
   ) +
-  gsi::method ("is_equivalent?", &db::LayerProperties::log_equal, gsi::arg ("b"),
+  gsi::method_ext ("is_equivalent?", &log_equal_ext, gsi::arg ("b"),
     "@brief Equivalence of two layer info objects\n"
     "@return True, if both are equivalent\n"
     "\n"
-    "First, layer and datatype are compared. The name is of second order and used only if no layer or datatype is given.\n"
-    "This is basically a weak comparison that reflects the search preferences.\n"
+    "First, layer and datatype are compared. The name is of second order and used only if no layer or datatype is given "
+    "for one of the operands.\n"
+    "This is basically a weak comparison that reflects the search preferences. It is the basis for \\Layout#find_layer.\n"
+    "Here are some examples:\n"
     "\n"
-    "This method was added in version 0.18.\n"
+    "@code\n"
+    "# no match as layer/datatypes or names differ:\n"
+    "RBA::LayerInfo::new(1, 17).is_equivalent?(RBA::LayerInfo::new(1, 18)) -> false\n"
+    "RBA::LayerInfo::new('metal1').is_equivalent?(RBA::LayerInfo::new('m1')) -> false\n"
+    "# exact match for numbered or named layers:\n"
+    "RBA::LayerInfo::new(1, 17).is_equivalent?(RBA::LayerInfo::new(1, 17)) -> true\n"
+    "RBA::LayerInfo::new('metal1').is_equivalent?(RBA::LayerInfo::new('metal1')) -> true\n"
+    "# match as names are second priority over layer/datatypes:\n"
+    "RBA::LayerInfo::new(1, 17, 'metal1').is_equivalent?(RBA::LayerInfo::new(1, 17, 'm1')) -> true\n"
+    "# match as name matching is fallback:\n"
+    "RBA::LayerInfo::new(1, 17, 'metal1').is_equivalent?(RBA::LayerInfo::new('metal1')) -> true\n"
+    "# no match as neither names or layer/datatypes match:\n"
+    "RBA::LayerInfo::new(1, 17, 'metal1').is_equivalent?(RBA::LayerInfo::new('m1')) -> false\n"
+    "@/code\n"
+    "\n"
+    "This method was added in version 0.18 and modified to compare non-named vs. named layers in version 0.28.11.\n"
   ) +
   gsi::method_ext ("hash", &hash_value,
     "@brief Computes a hash value\n"
@@ -504,9 +534,15 @@ static tl::Variant find_layer (db::Layout *l, const db::LayerProperties &lp)
     //  for a null layer info always return nil
     return tl::Variant ();
   } else {
-    //  if we have a layer with the requested properties already, return this.
+    //  if we have a layer with the requested properties already, return this one.
+    //  first pass: exact match
+    int index = l->get_layer_maybe (lp);
+    if (index >= 0) {
+      return tl::Variant ((unsigned int) index);
+    }
+    //  second pass: relaxed match
     for (db::Layout::layer_iterator li = l->begin_layers (); li != l->end_layers (); ++li) {
-      if ((*li).second->log_equal (lp)) {
+      if (log_equal_ext ((*li).second, lp)) {
         return tl::Variant ((*li).first);
       }
     }
@@ -530,7 +566,7 @@ static tl::Variant find_layer3 (db::Layout *l, int ln, int dn, const std::string
   return find_layer (l, db::LayerProperties (ln, dn, name));
 }
 
-static std::vector<unsigned int> layer_indices (const db::Layout *l)
+static std::vector<unsigned int> layer_indexes (const db::Layout *l)
 {
   std::vector<unsigned int> layers;
   for (unsigned int i = 0; i < l->layers (); ++i) {
@@ -1555,7 +1591,19 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "If a layer with the given properties already exists, this method will return the index of that layer."
     "If no such layer exists, it will return nil.\n"
     "\n"
-    "This method has been introduced in version 0.23.\n"
+    "In contrast to \\layer, this method will also find layers matching by name only. "
+    "For example:\n"
+    "\n"
+    "@code\n"
+    "# finds layer '17/0' and 'name (17/0)':\n"
+    "index = layout.find_layer(RBA::LayerInfo::new(17, 0))\n"
+    "# finds layer 'name' (first priority), but also 'name (17/0)' (second priority):\n"
+    "index = layout.find_layer(RBA::LayerInfo::new('name'))\n"
+    "# note that this will not match layer 'name (17/0)' and create a new name-only layer:\n"
+    "index = layout.layer(RBA::LayerInfo::new('name'))\n"
+    "@/code\n"
+    "\n"
+    "This method has been introduced in version 0.23 and has been extended to name queries in version 0.28.11.\n"
   ) +
   gsi::method_ext ("find_layer", &find_layer1, gsi::arg ("name"),
     "@brief Finds a layer with the given name\n"
@@ -1563,7 +1611,17 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "If a layer with the given name already exists, this method will return the index of that layer."
     "If no such layer exists, it will return nil.\n"
     "\n"
-    "This method has been introduced in version 0.23.\n"
+    "In contrast to \\layer, this method will also find numbered layers if the name matches. "
+    "For example:\n"
+    "\n"
+    "@code\n"
+    "# finds layer 'name' (first priority), but also 'name (17/0)' (second priority):\n"
+    "index = layout.find_layer('name')\n"
+    "# note that this will not match layer 'name (17/0)' and create a new name-only layer:\n"
+    "index = layout.layer('name')\n"
+    "@/code\n"
+    "\n"
+    "This method has been introduced in version 0.23 and has been extended to name queries in version 0.28.11.\n"
   ) +
   gsi::method_ext ("find_layer", &find_layer2, gsi::arg ("layer"), gsi::arg ("datatype"),
     "@brief Finds a layer with the given layer and datatype number\n"
@@ -1755,7 +1813,7 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "@param layer_index The index of the layer to delete.\n"
   ) +
-  gsi::method_ext ("layer_indexes|#layer_indices", &layer_indices,
+  gsi::method_ext ("layer_indexes|#layer_indices", &layer_indexes,
     "@brief Gets a list of valid layer's indices\n"
     "This method returns an array with layer indices representing valid layers.\n"
     "\n"

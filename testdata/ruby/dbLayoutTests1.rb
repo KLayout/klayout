@@ -64,16 +64,38 @@ class DBLayoutTests1_TestClass < TestBase
     assert_equal(l3.anonymous?, false)
     assert_equal(l3.is_named?, true)
     assert_equal(l3.is_equivalent?(l2), false)
-    l3.layer = 1
-    l3.datatype = 100
-    assert_equal(l3.is_named?, false)
-    assert_equal(l3.is_equivalent?(l2), true)
+    assert_equal(l2.is_equivalent?(l3), false)
+    l4 = RBA::LayerInfo::new(1, 100, "aber")
+    assert_equal(l4.to_s, "aber (1/100)")
+    assert_equal(l4.anonymous?, false)
+    assert_equal(l4.is_named?, false)
+    assert_equal(l4.is_equivalent?(l2), true)
+    assert_equal(l2.is_equivalent?(l4), true)
+    assert_equal(l4.is_equivalent?(l3), true)
+    assert_equal(l3.is_equivalent?(l4), true)
+    assert_equal(l4.is_equivalent?(RBA::LayerInfo::new(1, 100, "xyz")), true)
+    assert_equal(l4.is_equivalent?(RBA::LayerInfo::new(1, 101, "aber")), false)
 
-    l1.assign(l3)
+    l1.assign(l4)
+
     assert_equal(l1.to_s, "aber (1/100)")
     assert_equal(l1.is_named?, false)
-    assert_equal(l1.is_equivalent?(l3), true)
-    assert_equal(l1 == l3, true)
+    assert_equal(l1.is_equivalent?(l4), true)
+    assert_equal(l1 == l4, true)
+
+    l1.layer = -1
+    l1.datatype = -1
+    assert_equal(l1.is_named?, true)
+    assert_equal(l1.to_s, "aber")
+
+    l1.name = "xyz"
+    assert_equal(l1.is_named?, true)
+    assert_equal(l1.to_s, "xyz")
+
+    l1.layer = 100
+    l1.datatype = 0
+    assert_equal(l1.is_named?, false)
+    assert_equal(l1.to_s, "xyz (100/0)")
 
   end
 
@@ -164,15 +186,49 @@ class DBLayoutTests1_TestClass < TestBase
     assert_equal(a, nil)
     a = ly.find_layer(RBA::LayerInfo.new(2, 0))
     assert_equal(a, li)
+    a = ly.find_layer(3, 0, "hallo")
+    assert_equal(a, nil)
     li2 = ly.layer("hallo")
     a = ly.find_layer("hillo")
     assert_equal(a, nil)
     a = ly.find_layer("hallo")
     assert_equal(a, li2)
     a = ly.find_layer(3, 0, "hallo")
-    assert_equal(a, nil)
+    assert_equal(a, li2)
     a = ly.find_layer(2, 0, "hallo")
     assert_equal(a, li)
+
+    ly = RBA::Layout.new
+    li = ly.layer(2, 0, "hallo")
+    a = ly.find_layer(3, 0)
+    assert_equal(a, nil)
+    a = ly.find_layer(2, 0)
+    assert_equal(a, li)
+    a = ly.find_layer("hallo")
+    assert_equal(a, li)
+    a = ly.find_layer(2, 0, "hillo")
+    assert_equal(a, li)
+    a = ly.find_layer(1, 0, "hallo")
+    assert_equal(a, nil)
+
+    ly = RBA::Layout.new
+    li0 = ly.layer("hello")
+    li = ly.layer("hallo")
+    a = ly.find_layer(3, 0)
+    assert_equal(a, nil)
+    a = ly.find_layer(2, 0)
+    assert_equal(a, nil)
+    a = ly.find_layer("hallo")
+    assert_equal(a, li)
+    a = ly.find_layer(2, 0, "hillo")
+    assert_equal(a, nil)
+    a = ly.find_layer(1, 0, "hallo")
+    assert_equal(a, li)
+    li2 = ly.layer(1, 0, "hello")
+    a = ly.find_layer(1, 0, "hello")
+    assert_equal(a, li2)
+    a = ly.find_layer("hello")
+    assert_equal(a, li0)
 
   end
 

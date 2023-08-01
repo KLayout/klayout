@@ -2317,7 +2317,11 @@ CODE
         c !~ /drc.lym:/ && c !~ /_drc_\w+\.rb:/ && c !~ /\(eval\)/
       end
       if cc =~ /(.*)\s*:\s*(\d+)\s*:\s*in.*$/
-        return File::basename($1) + ":" + $2
+        path = $1
+        line = $2.to_i
+        real_path = RBA::Macro::real_path(path, line)
+        real_line = RBA::Macro::real_line(path, line)
+        return File::basename(real_path) + ":" + real_line.to_s
       else
         return cc
       end

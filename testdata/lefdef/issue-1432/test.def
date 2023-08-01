@@ -1,0 +1,8 @@
+VERSION 5.8 ;
+DESIGN test ;
+UNITS DISTANCE MICRONS 1000 ;
+DIEAREA ( -1 -1 ) ( 8 8 ) ;
+NETS 1 ;
+- dummy + ROUTED M1 ( 0 0 ) ( 5 0 ) VIRTUAL ( 7 1 ) RECT ( -3 0 -1 2 ) ( 7 7 ) ;
+END NETS
+END DESIGN

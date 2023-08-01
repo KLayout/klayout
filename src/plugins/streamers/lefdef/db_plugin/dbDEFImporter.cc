@@ -588,9 +588,6 @@ DEFImporter::read_single_net (std::string &nondefaultrule, Layout &layout, db::C
           error (tl::to_string (tr ("RECT routing specification not followed by coordinate list")));
         }
 
-        //  breaks wiring
-        pts.clear ();
-
         //  rect spec
 
         double x1 = get_double ();

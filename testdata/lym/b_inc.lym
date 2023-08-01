@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category/>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <priority>0</priority>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>ruby</interpreter>
+ <dsl-interpreter-name/>
+ <text>
+def f
+  raise("An error")
+end
+</text>
+</klayout-macro>

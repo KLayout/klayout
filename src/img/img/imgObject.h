@@ -21,7 +21,6 @@
 */
 
 
-
 #ifndef HDR_imgObject
 #define HDR_imgObject
 
@@ -34,9 +33,14 @@
 #include "dbPolygon.h"
 #include "tlDataMapping.h"
 #include "tlColor.h"
+#include "tlPixelBuffer.h"
 
 #include <string>
 #include <vector>
+
+#if defined(HAVE_QT)
+class QImage;
+#endif
 
 namespace img {
   
@@ -294,6 +298,26 @@ public:
   Object (const std::string &filename, const db::DCplxTrans &trans);
 
   /**
+   *  @brief Constructor from a PixelBuffer object
+   *
+   *  This constructor creates an image object from a PixelBuffer object.
+   *  The image will originally be put to position 0, 0 (lower left corner) and each pixel
+   *  will have a size of 1. The transformation describes how to transform this image into micron space.
+   */
+  Object (const tl::PixelBuffer &pixel_buffer, const db::DCplxTrans &trans);
+
+#if defined(HAVE_QT)
+  /**
+   *  @brief Constructor from a QImage object
+   *
+   *  This constructor creates an image object from a QImage object.
+   *  The image will originally be put to position 0, 0 (lower left corner) and each pixel
+   *  will have a size of 1. The transformation describes how to transform this image into micron space.
+   */
+  Object (const QImage &image, const db::DCplxTrans &trans);
+#endif
+
+  /**
    *  @brief Constructor for monochrome or color images with zero pixel values
    *
    *  This constructor creates an image object from a data set describing one monochrome channel
@@ -417,6 +441,26 @@ public:
    *  will have a size of 1. The transformation describes how to transform this image into micron space.
    */
   Object (const std::string &filename, const db::Matrix3d &trans);
+
+  /**
+   *  @brief Constructor from a PixelBuffer object
+   *
+   *  This constructor creates an image object from a PixelBuffer object.
+   *  The image will originally be put to position 0, 0 (lower left corner) and each pixel
+   *  will have a size of 1. The transformation describes how to transform this image into micron space.
+   */
+  Object (const tl::PixelBuffer &pixel_buffer, const db::Matrix3d &trans);
+
+#if defined(HAVE_QT)
+  /**
+   *  @brief Constructor from a QImage object
+   *
+   *  This constructor creates an image object from a QImage object.
+   *  The image will originally be put to position 0, 0 (lower left corner) and each pixel
+   *  will have a size of 1. The transformation describes how to transform this image into micron space.
+   */
+  Object (const QImage &image, const db::Matrix3d &trans);
+#endif
 
   /**
    *  @brief Copy constructor
@@ -984,6 +1028,10 @@ private:
   void validate_pixel_data () const;
   void allocate (bool color);
   void read_file ();
+#if defined(HAVE_QT)
+  void create_from_qimage (const QImage &qimage);
+#endif
+  void create_from_pixel_buffer (const tl::PixelBuffer &img);
 };
 
 }

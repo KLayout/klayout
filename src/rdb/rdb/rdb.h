@@ -438,6 +438,8 @@ public:
 
   virtual std::string to_display_string () const = 0;
 
+  virtual bool is_shape () const = 0;
+
   virtual ValueBase *clone () const = 0;
 
   virtual int type_index () const = 0;
@@ -507,6 +509,8 @@ public:
   {
     return m_value < static_cast<const Value<C> *> (other)->m_value;
   }
+
+  bool is_shape () const;
 
   std::string to_string () const;
 

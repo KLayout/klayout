@@ -986,3 +986,9 @@ TEST(207_joined_paths)
   run_test (_this, "issue-1345", "lef:in.lef+def:in.def", "au-nojoin.oas.gz", default_options (), false);
 }
 
+//  issue-1432
+TEST(208_nets_and_rects)
+{
+  run_test (_this, "issue-1432", "map:test.map+lef:test.lef+def:test.def", "au.oas", default_options (), false);
+}
+

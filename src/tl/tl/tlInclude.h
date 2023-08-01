@@ -35,6 +35,21 @@ namespace tl
 class InputStream;
 
 /**
+ *  @brief An interface providing the include file resolver
+ *
+ *  The task of this object is to obtain the text for an include file path.
+ *  The path already underwent variable interpolation and relative path resolution.
+ */
+class TL_PUBLIC IncludeFileResolver
+{
+public:
+  IncludeFileResolver () { }
+  virtual ~IncludeFileResolver () { }
+
+  virtual std::string get_text (const std::string &path) const = 0;
+};
+
+/**
  *  @brief Provide the basic include expansion and file/line mapping mechanism
  *
  *  The Expander object performs the file expansion and also stores the information
@@ -59,7 +74,7 @@ public:
    *
    *  This method will deliver the expanded text and the include expander object.
    */
-  static IncludeExpander expand (const std::string &path, std::string &expanded_text);
+  static IncludeExpander expand (const std::string &path, std::string &expanded_text, const IncludeFileResolver *resolver = 0);
 
   /**
    *  @brief Provides include expansion
@@ -67,7 +82,7 @@ public:
    *  This method will deliver the expanded text and the include expander object.
    *  This version also takes the actual text of the original file.
    */
-  static IncludeExpander expand (const std::string &path, const std::string &original_text, std::string &expanded_text);
+  static IncludeExpander expand (const std::string &path, const std::string &original_text, std::string &expanded_text, const IncludeFileResolver *resolver = 0);
 
   /**
    *  @brief Serializes the include expander information into a string
@@ -98,7 +113,7 @@ public:
 private:
   std::map<int, std::pair<std::string, int> > m_sections;
 
-  void read (const std::string &path, tl::InputStream &is, std::string &expanded_text, IncludeExpander &ie, int &line_counter);
+  void read (const std::string &path, tl::InputStream &is, std::string &expanded_text, int &line_counter, const IncludeFileResolver *mp_resolver);
 };
 
 }

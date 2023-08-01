@@ -104,6 +104,21 @@ public:
   void show_all (bool f);
 
   /**
+   *  @brief Gets a value indicating whether to list the shapes in the info panel
+   */
+  bool list_shapes () const
+  {
+    return m_list_shapes;
+  }
+
+  /**
+   *  @brief Sets a value indicating whether to list the shapes in the info panel
+   *
+   *  If this property is set to false, shapes will not be listed in the info panel.
+   */
+  void list_shapes (bool f);
+
+  /**
    *  @brief Update the contents 
    *
    *  This method must be called when the database has been updated.
@@ -176,6 +191,7 @@ public slots:
   void waive ();
   void unwaive ();
   void show_all_clicked ();
+  void list_shapes_clicked ();
   void info_anchor_clicked (const QUrl &link);
   void filter_changed ();
 
@@ -184,6 +200,7 @@ private:
   bool m_update_needed;
   rdb::Database *mp_database;
   bool m_show_all;
+  bool m_list_shapes;
   QAction *m_show_all_action;
   lay::LayoutViewBase *mp_view;
   unsigned int m_cv_index;

@@ -853,7 +853,7 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
 
             db::Point tp (shape->text_trans () * db::Point ());
 
-            if (text_info ()) {
+            if (text_info () && ! text_info ()->point_mode ()) {
 
               db::CplxTrans t_dbu = db::CplxTrans (layout ().dbu ()) * t;
               db::Text text;
@@ -1004,7 +1004,7 @@ PartialShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, co
 
               db::Point tp (shape->text_trans () * db::Point ());
 
-              if (text_info ()) {
+              if (text_info () && ! text_info ()->point_mode ()) {
 
                 db::CplxTrans t_dbu = db::CplxTrans (layout ().dbu ()) * t;
                 db::Text text;

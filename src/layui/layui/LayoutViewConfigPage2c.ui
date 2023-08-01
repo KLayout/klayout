@@ -184,6 +184,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="text_point_mode_cb">
+     <property name="text">
+      <string>Texts are points (active area is origin)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QCheckBox" name="sel_inside_pcells_cb">
      <property name="text">
       <string>PCell content is selectable (Caution: PCell recomputation may conflict with edits)</string>

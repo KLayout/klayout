@@ -451,7 +451,7 @@ static ImageRef *new_image_pbt (const tl::PixelBuffer &pixel_buffer, const db::D
   return new ImageRef (img::Object (pixel_buffer, trans));
 }
 
-#if HAVE_QT
+#if defined(HAVE_QTBINDINGS)
 static ImageRef *new_image_qit (const QImage &image, const db::DCplxTrans &trans)
 {
   return new ImageRef (img::Object (image, trans));
@@ -597,7 +597,7 @@ gsi::Class<ImageRef> decl_Image (decl_BasicImage, "lay", "Image",
     "@param filename The path to the image file to load.\n"
     "@param trans The transformation to apply to the image when displaying it.\n"
   ) +
-#if defined(HAVE_QT)
+#if defined(HAVE_QTBINDINGS)
   gsi::constructor ("new", &gsi::new_image_qit, gsi::arg ("image"), gsi::arg ("trans", db::DCplxTrans (), "unity"),
     "@brief Constructor from a image pixel buffer\n"
     "\n"

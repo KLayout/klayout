@@ -2912,7 +2912,7 @@ CODE
 
     def _make_path(file)
       # resolves the file path relative to the source's path
-      sp = self.source.path
+      sp = (@def_source || @def_layout) && self.source.path
       if sp
         if File.respond_to?(:absolute_path)
           return File::absolute_path(file, File::dirname(sp))
@@ -3242,7 +3242,7 @@ CODE
       
       cn = cellname && cellname.to_s
       cn ||= @def_cell && @def_cell.name
-      cn ||= source && source.cell_name
+      cn ||= @def_source && @def_source.cell_obj && @def_source.cell_obj.name
 
       cn || raise("No cell name specified - either the source was not specified before 'report' or there is no default source. In the latter case, specify a cell name as the third parameter")
 
@@ -3285,7 +3285,7 @@ CODE
           cn ||= @def_cell && @def_cell.name
           cn ||= @def_source && @def_source.cell_obj && @def_source.cell_obj.name
 
-          cn || raise("No cell name specified - either the source was not specified before 'report' or there is no default source. In the latter case, specify a cell name as the third parameter")
+          cn || raise("No cell name specified - either the source was not specified before 'report' or there is no default source. In the latter case, specify a cell name as the second parameter")
 
           output_layout = RBA::Layout::new
           output_cell = output_layout.create_cell(cn)

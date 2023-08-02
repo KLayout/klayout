@@ -105,7 +105,7 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
   if (format.empty () || format == gds2_format_name || format == gds2text_format_name) {
     cmd << tl::arg (group +
                     "#--keep-instances",      &m_keep_instances, "Keeps instances of dropped cells",
-                    "If given, instances of dropped cell's won't be removed. Hence, ghost cells are "
+                    "If given, instances of dropped cells won't be removed. Hence, ghost cells are "
                     "produced. The resulting layout may not be readable by consumers that require "
                     "all instantiated cells to be present as actual cells.\n"
                     "Dropped cells are those which are removed by a negative cell selection (see "

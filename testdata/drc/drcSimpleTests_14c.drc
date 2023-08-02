@@ -1,0 +1,27 @@
+
+lyin = layout($drc_test_source)
+cn = lyin.layout.top_cell.name
+
+lyin2 = layout($drc_test_source)
+
+target($drc_test_target, cn)
+
+l1 = lyin.input(1, 0)
+l2 = lyin2.input(2, 0)
+
+tcopy = new_target($drc_test_target2, cn)
+rcopy = new_report("Report 2", $drc_test_report2, cn)
+
+l1.output(tcopy, 101, 0)
+l2.output(tcopy, 102, 0)
+
+l1.output(1, 0)
+l1.space(1.0.um).output(100, 0)
+
+report("Report 1", $drc_test_report, cn)
+
+l2.space(1.0.um).output("l2 space < 1µm")
+l1.width(1.0.um).output("l1 width < 1µm")
+
+l1.sep(l2, 1.0.um).output(rcopy, "l1 sep l2 < 1µm")
+

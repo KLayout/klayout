@@ -800,6 +800,77 @@ TEST(14b_SideTargetsAndReports)
   compare_text_files (report2, au_report2);
 }
 
+TEST(14c_OnlySpecialInputsAndReports)
+{
+  std::string rs = tl::testdata ();
+  rs += "/drc/drcSimpleTests_14c.drc";
+
+  //  apart from that it's a variant of 14b ...
+
+  std::string input = tl::testdata ();
+  input += "/drc/drcSimpleTests_14b.gds";
+
+  std::string au = tl::testdata ();
+  au += "/drc/drcSimpleTests_au14b.gds";
+
+  std::string au2 = tl::testdata ();
+  au2 += "/drc/drcSimpleTests_au14b_2.gds";
+
+  std::string au_report = tl::testdata ();
+  au_report += "/drc/drcSimpleTests_au14b.lyrdb";
+
+  std::string au_report2 = tl::testdata ();
+  au_report2 += "/drc/drcSimpleTests_au14b_2.lyrdb";
+
+  std::string output = this->tmp_file ("tmp.gds");
+  std::string output2 = this->tmp_file ("tmp2.gds");
+  std::string report = this->tmp_file ("tmp.lydrc");
+  std::string report2 = this->tmp_file ("tmp2.lydrc");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+        "$drc_test_target2 = '%s'\n"
+        "$drc_test_report = '%s'\n"
+        "$drc_test_report2 = '%s'\n"
+      , input, output, output2, report, report2)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  db::Layout layout;
+
+  {
+    tl::InputStream stream (output);
+    db::Reader reader (stream);
+    reader.read (layout);
+  }
+
+  db::compare_layouts (_this, layout, au, db::NoNormalization);
+
+  db::Layout layout2;
+
+  {
+    tl::InputStream stream (output2);
+    db::Reader reader (stream);
+    reader.read (layout2);
+  }
+
+  db::compare_layouts (_this, layout2, au2, db::NoNormalization);
+
+  compare_text_files (report, au_report);
+  compare_text_files (report2, au_report2);
+}
+
 TEST(15_issue548)
 {
   std::string rs = tl::testdata ();

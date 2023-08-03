@@ -37,14 +37,29 @@ namespace db
 // -----------------------------------------------------------------------------------
 //  Path resolution utility
 
-std::string correct_path (const std::string &fn, const db::Layout &layout, const std::string &base_path)
+std::string correct_path (const std::string &fn_in, const db::Layout &layout, const std::string &base_path)
 {
+  const db::Technology *tech = layout.technology ();
+
+  //  Allow LEF reference through expressions, i.e.
+  //    $(base_path) - path of the main file
+  //    $(tech_dir)  - the location of the .lyt file if a technology is specified
+  //    $(tech_name) - the name of the technology if one is specified
+  //  In addition expressions are interpolated, e.g. "$(env('HOME'))".
+
+  tl::Eval expr;
+  expr.set_var ("base_path", base_path);
+  if (tech) {
+    expr.set_var ("tech_dir", tech->base_path ());
+    expr.set_var ("tech_name", tech->name ());
+  }
+
+  std::string fn = expr.interpolate (fn_in);
+
   if (! tl::is_absolute (fn)) {
 
     //  if a technology is given and the file can be found in the technology's base path, take it
     //  from there.
-    const db::Technology *tech = layout.technology ();
-
     if (tech && ! tech->base_path ().empty ()) {
       std::string new_fn = tl::combine_path (tech->base_path (), fn);
       if (tl::file_exists (new_fn)) {

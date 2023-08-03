@@ -493,6 +493,7 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
   connect (replaceModeButton, SIGNAL (clicked ()), this, SLOT (replace_mode_button_clicked ()));
   connect (replaceNextButton, SIGNAL (clicked ()), this, SLOT (replace_next_button_clicked ()));
   connect (findNextButton, SIGNAL (clicked ()), this, SLOT (find_next_button_clicked ()));
+  connect (findPrevButton, SIGNAL (clicked ()), this, SLOT (find_prev_button_clicked ()));
   connect (replaceAllButton, SIGNAL (clicked ()), this, SLOT (replace_all_button_clicked ()));
   connect (allVariables, SIGNAL (clicked (bool)), variableList, SLOT (set_show_all (bool)));
 
@@ -2021,7 +2022,7 @@ MacroEditorDialog::replace_all_button_clicked ()
 }
 
 void
-MacroEditorDialog::search_requested (const QString &s)
+MacroEditorDialog::search_requested (const QString &s, bool prev)
 {
   if (! s.isNull ()) {
     searchEditBox->setText (s);
@@ -2029,7 +2030,21 @@ MacroEditorDialog::search_requested (const QString &s)
     searchEditBox->selectAll ();
   }
   searchEditBox->setFocus ();
-  search_editing ();
+
+  MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
+  if (! page) {
+    return;
+  }
+
+  apply_search ();
+  page->find_reset (); //  search from the initial position
+  if (! page->has_multi_block_selection ()) {
+    if (! prev) {
+      page->find_next ();
+    } else {
+      page->find_prev ();
+    }
+  }
 }
 
 void
@@ -3511,7 +3526,7 @@ MacroEditorDialog::create_page (lym::Macro *macro)
   editor->exec_model ()->set_run_mode (m_in_exec);
   editor->connect_macro (macro);
   connect (editor.get (), SIGNAL (help_requested (const QString &)), this, SLOT (help_requested (const QString &)));
-  connect (editor.get (), SIGNAL (search_requested (const QString &)), this, SLOT (search_requested (const QString &)));
+  connect (editor.get (), SIGNAL (search_requested (const QString &, bool)), this, SLOT (search_requested (const QString &, bool)));
   connect (editor.get (), SIGNAL (edit_trace (bool)), this, SLOT (add_edit_trace (bool)));
   return editor.release ();
 }

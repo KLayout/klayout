@@ -222,7 +222,7 @@ private slots:
   void find_next_button_clicked ();
   void find_prev_button_clicked ();
   void help_requested (const QString &s);
-  void search_requested (const QString &s);
+  void search_requested (const QString &s, bool prev);
   void macro_changed (lym::Macro *macro);
   void macro_deleted (lym::Macro *macro);
   void macro_collection_deleted (lym::MacroCollection *collection);

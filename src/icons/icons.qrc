@@ -284,5 +284,9 @@
         <file alias="bookmark_16px@2x.png">images/bookmark_16px@2x.png</file>
         <file alias="bookmark_24px.png">images/bookmark_24px.png</file>
         <file alias="bookmark_24px@2x.png">images/bookmark_24px@2x.png</file>
+        <file alias="find_next_16px.png">images/find_next_16px.png</file>
+        <file alias="find_next_16px@2x.png">images/find_next_16px@2x.png</file>
+        <file alias="find_prev_16px.png">images/find_prev_16px.png</file>
+        <file alias="find_prev_16px@2x.png">images/find_prev_16px@2x.png</file>
     </qresource>
 </RCC>

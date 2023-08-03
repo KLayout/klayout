@@ -1077,12 +1077,10 @@ MacroEditorPage::find_prev ()
     first = false;
 
     int i = -1;
-    int l = 0;
     int p = 0;
     while (true) {
       int ii = m_current_search.indexIn (b.text (), p);
       if (ii >= 0 && (o < 0 || ii < o)) {
-        l = m_current_search.matchedLength ();
         i = ii;
         p = ii + 1;
       } else {
@@ -1091,8 +1089,7 @@ MacroEditorPage::find_prev ()
     }
     if (i >= 0) {
       QTextCursor newc (b);
-      newc.setPosition (i + b.position () + l);
-      newc.setPosition (i + b.position (), QTextCursor::KeepAnchor);
+      newc.setPosition (i + b.position ());
       m_ignore_cursor_changed_event = true;
       mp_text->setTextCursor (newc);
       m_ignore_cursor_changed_event = false;
@@ -1136,8 +1133,7 @@ MacroEditorPage::find_next ()
     int i = m_current_search.indexIn (b.text (), o);
     if (i >= 0) {
       QTextCursor newc (b);
-      newc.setPosition (i + b.position () + m_current_search.matchedLength ());
-      newc.setPosition (i + b.position (), QTextCursor::KeepAnchor);
+      newc.setPosition (i + b.position ());
       m_ignore_cursor_changed_event = true;
       mp_text->setTextCursor (newc);
       m_ignore_cursor_changed_event = false;
@@ -1156,6 +1152,39 @@ MacroEditorPage::find_next ()
   }
 
   return false;
+}
+
+bool
+MacroEditorPage::select_match_here ()
+{
+  if (m_current_search == QRegExp ()) {
+    return false;
+  }
+
+  QTextCursor c = mp_text->textCursor ();
+  if (c.isNull ()) {
+    return false;
+  }
+
+  if (c.hasSelection ()) {
+    return true;
+  }
+
+  QTextBlock b = c.block ();
+  int pos = c.position () - b.position ();
+  int i = m_current_search.indexIn (b.text (), pos);
+  if (i == pos) {
+    QTextCursor newc (b);
+    newc.setPosition (i + b.position () + m_current_search.matchedLength ());
+    newc.setPosition (i + b.position (), QTextCursor::KeepAnchor);
+    m_ignore_cursor_changed_event = true;
+    mp_text->setTextCursor (newc);
+    m_ignore_cursor_changed_event = false;
+    emit edit_trace (false);
+    return true;
+  } else {
+    return false;
+  }
 }
 
 void
@@ -1196,7 +1225,9 @@ MacroEditorPage::replace_and_find_next (const QString &replace)
     return;
   }
 
-  replace_in_selection (replace, true);
+  if (select_match_here ()) {
+    replace_in_selection (replace, true);
+  }
   find_next ();
 }
 
@@ -1280,12 +1311,8 @@ MacroEditorPage::replace_in_selection (const QString &replace, bool first)
         o = i + r.size ();
 
         if (first) {
-
-          //  in single-selection mode, put cursor past substitution
-          c.setPosition (i + b.position ());
           has_selection = false;
           done = true;
-
         } else if (b == be) {
           pe += int (r.size ()) - int (m_current_search.matchedLength ());
         }
@@ -1734,6 +1761,11 @@ static bool is_find_key (QKeyEvent *ke)
   return ke->key () == Qt::Key_F && (ke->modifiers () & Qt::ControlModifier) != 0;
 }
 
+static bool is_find_backwards_key (QKeyEvent *ke)
+{
+  return ke->key () == Qt::Key_F && (ke->modifiers () & Qt::ControlModifier) != 0 && (ke->modifiers () & Qt::ShiftModifier) != 0;
+}
+
 static bool is_up_key (QKeyEvent *ke)
 {
   return ke->key () == Qt::Key_Up;
@@ -1755,6 +1787,7 @@ static bool is_any_known_key (QKeyEvent *ke)
          is_help_key (ke) ||
          is_find_next_key (ke) ||
          is_find_key (ke) ||
+         is_find_backwards_key (ke) ||
          is_up_key (ke) ||
          is_down_key (ke);
 }
@@ -1848,19 +1881,21 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
         QApplication::sendEvent (mp_completer_list, event);
         return true;
 
-      } else if (is_find_key (ke)) {
+      } else if (is_find_key (ke) || is_find_backwards_key (ke)) {
+
+        bool prev = is_find_backwards_key (ke);
 
         QTextCursor c = mp_text->textCursor ();
         if (c.selectionStart () != c.selectionEnd ()) {
           QTextBlock s = mp_text->document ()->findBlock (c.selectionStart ());
           QTextBlock e = mp_text->document ()->findBlock (c.selectionEnd ());
           if (e == s) {
-            emit search_requested (c.selectedText ());
+            emit search_requested (c.selectedText (), prev);
           } else {
-            emit search_requested (QString ());
+            emit search_requested (QString (), prev);
           }
         } else {
-          emit search_requested (QString ());
+          emit search_requested (QString (), prev);
         }
 
         return true;

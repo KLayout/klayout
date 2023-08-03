@@ -882,6 +882,15 @@ TEST(131_patternname)
   run_test (_this, "patternname", "map:v.map+lef:v.lef+def:v.def", "au.oas.gz", default_options (), false);
 }
 
+TEST(132_issue1307_pin_names)
+{
+  db::LEFDEFReaderOptions opt = default_options ();
+  opt.set_produce_pin_names (true);
+  opt.set_pin_property_name (2);
+  opt.set_cell_outline_layer ("OUTLINE (13/0)");
+  run_test (_this, "issue-1307c", "lef:in.lef+def:in.def", "au.oas", opt, false);
+}
+
 TEST(200_lefdef_plugin)
 {
   db::Layout ly;

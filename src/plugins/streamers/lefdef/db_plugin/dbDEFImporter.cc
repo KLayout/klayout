@@ -1153,8 +1153,7 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
 {
   while (test ("-")) {
 
-    take (); // pin name
-
+    std::string pin_name = get ();
     std::string net;
     std::string dir;
     std::map <std::pair<std::string, unsigned int>, std::vector <db::Polygon> > geometry;
@@ -1281,7 +1280,7 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
       if (flush || ! peek ("+")) {
 
         //  TODO: put a label on every single object?
-        std::string label = net;
+        std::string label = pin_name;
         /* don't add the direction currently, a name is sufficient
         if (! dir.empty ()) {
           label += ":";
@@ -1296,9 +1295,14 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
           if (! dl.empty ()) {
 
             db::properties_id_type prop_id = 0;
-            if (produce_pin_props ()) {
+            if (produce_pin_props () || produce_net_props ()) {
               db::PropertiesRepository::properties_set props;
-              props.insert (std::make_pair (pin_prop_name_id (), tl::Variant (label)));
+              if (produce_pin_props ()) {
+                props.insert (std::make_pair (pin_prop_name_id (), tl::Variant (label)));
+              }
+              if (produce_net_props ()) {
+                props.insert (std::make_pair (net_prop_name_id (), tl::Variant (net)));
+              }
               prop_id = layout.properties_repository ().properties_id (props);
             }
 

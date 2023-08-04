@@ -893,16 +893,18 @@ LEFDEFReaderOptions::special_routing_datatype_str () const
 LEFDEFReaderState::LEFDEFReaderState (const LEFDEFReaderOptions *tc, db::Layout &layout, const std::string &base_path)
   : mp_importer (0), m_create_layers (true), m_has_explicit_layer_mapping (false), m_laynum (1), mp_tech_comp (tc)
 {
-  if (! tc->map_file ().empty ()) {
+  if (! tc) {
+
+    //  use default options
+
+  } else if (! tc->map_file ().empty ()) {
 
     read_map_file (tc->map_file (), layout, base_path);
 
   } else {
 
-    if (tc) {
-      m_layer_map = tc->layer_map ();
-      m_create_layers = tc->read_all_layers ();
-    }
+    m_layer_map = tc->layer_map ();
+    m_create_layers = tc->read_all_layers ();
 
   }
 }
@@ -1007,7 +1009,6 @@ LEFDEFReaderState::read_map_file (const std::string &filename, db::Layout &layou
 
   //  build an explicit layer mapping now.
 
-  tl_assert (m_has_explicit_layer_mapping);
   m_layers.clear ();
   m_layer_map.clear ();
 
@@ -1030,9 +1031,12 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
 
   tl::log << tl::to_string (tr ("Reading LEF/DEF map file")) << " " << file_stream.absolute_path ();
 
+  //  Purpose name to purpose code
   std::map<std::string, LayerPurpose> purpose_translation;
   purpose_translation ["LEFPIN"] = LEFPins;
   purpose_translation ["PIN"] = Pins;
+  purpose_translation ["LEFPINNAME"] = LEFLabel;
+  purpose_translation ["PINNAME"] = Label;
   purpose_translation ["FILL"] = Fills;
   purpose_translation ["FILLOPC"] = FillsOPC;
   purpose_translation ["LEFOBS"] = Obstructions;
@@ -1041,6 +1045,11 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
   purpose_translation ["VIA"] = ViaGeometry;
   purpose_translation ["BLOCKAGE"] = Blockage;
   purpose_translation ["ALL"] = All;
+
+  //  List of purposes corresponding to ALL
+  LayerPurpose all_purposes[] = {
+    LEFPins, Pins, Fills, FillsOPC, Obstructions, SpecialRouting, Routing, ViaGeometry
+  };
 
   while (! ts.at_end ()) {
 
@@ -1229,10 +1238,8 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
 
           } else if (i->second == All) {
 
-            for (std::map<std::string, LayerPurpose>::const_iterator p = purpose_translation.begin (); p != purpose_translation.end (); ++p) {
-              if (p->second != All && p->second != Blockage) {
-                translated_purposes.insert (LayerDetailsKey (p->second, mask, via_size));
-              }
+            for (LayerPurpose *p = all_purposes; p != all_purposes + sizeof (all_purposes) / sizeof (all_purposes[0]); ++p) {
+              translated_purposes.insert (LayerDetailsKey (*p, mask, via_size));
             }
 
           } else {

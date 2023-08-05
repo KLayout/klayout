@@ -432,7 +432,7 @@ ShapeFinder::find_internal (lay::LayoutViewBase *view, unsigned int cv_index, co
 
   try {
 
-    if ((m_flags & db::ShapeIterator::Texts) != 0 && mp_text_info) {
+    if ((m_flags & db::ShapeIterator::Texts) != 0 && mp_text_info && ! mp_text_info->point_mode ()) {
 
       m_flags = db::ShapeIterator::Texts;
 

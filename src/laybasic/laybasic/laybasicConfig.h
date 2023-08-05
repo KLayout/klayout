@@ -95,6 +95,7 @@ static const std::string cfg_global_trans ("global-trans");
 static const std::string cfg_no_stipple ("no-stipple");
 static const std::string cfg_stipple_offset ("stipple-offset");
 static const std::string cfg_default_text_size ("default-text-size");
+static const std::string cfg_text_point_mode ("text-point-mode");
 static const std::string cfg_text_font ("text-font");
 static const std::string cfg_full_hier_new_cell ("full-hierarchy-new-cell");
 static const std::string cfg_initial_hier_depth ("initial-hier-depth");

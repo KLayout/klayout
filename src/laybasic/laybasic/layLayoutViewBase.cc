@@ -345,6 +345,7 @@ LayoutViewBase::init (db::Manager *mgr)
   m_show_properties = false;
   m_apply_text_trans = true;
   m_default_text_size = 0.1;
+  m_text_point_mode = false;
   m_text_font = 0;
   m_show_markers = true;
   m_no_stipples = false;
@@ -982,6 +983,13 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
     double sz;
     tl::from_string (value, sz);
     default_text_size (sz);
+    return true;
+
+  } else if (name == cfg_text_point_mode) {
+
+    bool flag;
+    tl::from_string (value, flag);
+    text_point_mode (flag);
     return true;
 
   } else if (name == cfg_text_font) {
@@ -5174,7 +5182,16 @@ LayoutViewBase::default_text_size (double fs)
   }
 }
 
-void 
+void
+LayoutViewBase::text_point_mode (bool pm)
+{
+  if (m_text_point_mode != pm) {
+    m_text_point_mode = pm;
+    redraw ();
+  }
+}
+
+void
 LayoutViewBase::clear_ruler_new_cell (bool f)
 {
   m_clear_ruler_new_cell = f;

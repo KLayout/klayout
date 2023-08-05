@@ -372,6 +372,10 @@ LayoutViewConfigPage2c::setup (lay::Dispatcher *root)
   root->config_get (cfg_sel_inside_pcells_mode, ipm);
   mp_ui->sel_inside_pcells_cb->setChecked (ipm);
 
+  bool tpm = 0;
+  root->config_get (cfg_text_point_mode, tpm);
+  mp_ui->text_point_mode_cb->setChecked (tpm);
+
   unsigned int sr = 0;
   root->config_get (cfg_search_range, sr);
   mp_ui->search_range_spinbx->setValue (sr);
@@ -392,6 +396,7 @@ LayoutViewConfigPage2c::commit (lay::Dispatcher *root)
   root->config_set (cfg_sel_halo, mp_ui->halo_cb->isChecked ());
   root->config_set (cfg_sel_transient_mode, mp_ui->transient_mode_cb->isChecked ());
   root->config_set (cfg_sel_inside_pcells_mode, mp_ui->sel_inside_pcells_cb->isChecked ());
+  root->config_set (cfg_text_point_mode, mp_ui->text_point_mode_cb->isChecked ());
   root->config_set (cfg_search_range, (unsigned int) mp_ui->search_range_spinbx->value ());
   root->config_set (cfg_search_range_box, (unsigned int) mp_ui->search_range_box_spinbx->value ());
 }

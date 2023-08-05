@@ -1102,7 +1102,7 @@ class DBShapes_TestClass < TestBase
 
     arr = []
     shapes.each( RBA::Shapes::SAll ) { |s| arr.push( s.to_s ) } 
-    assert_equal( arr, ["edge (1,2;3,4)", "text ('text',r0 100,200)", "text ('blabla',m0 100,200) prop_id=1"] )
+    assert_equal( arr, ["edge (1,2;3,4)", "text ('text',r0 100,200)", "text ('blabla',m0 100,200) f=3 ha=c va=b prop_id=1"] )
 
     assert_equal( s1.is_valid?, true )
     assert_equal( s1.shapes.is_valid?(s1), true )
@@ -1316,7 +1316,7 @@ class DBShapes_TestClass < TestBase
 
     arr = []
     shapes.each( RBA::Shapes::SAll ) { |s| arr.push( s.to_s ) } 
-    assert_equal( arr, ["edge (1,2;3,4)", "text ('text',r0 100,200)", "text ('blabla',m0 100,200) prop_id=1"] )
+    assert_equal( arr, ["edge (1,2;3,4)", "text ('text',r0 100,200)", "text ('blabla',m0 100,200) f=3 ha=c va=b prop_id=1"] )
 
     assert_equal( s1.is_valid?, true )
     assert_equal( s1.shapes.is_valid?(s1), true )

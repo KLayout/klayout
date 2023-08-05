@@ -102,20 +102,20 @@ class DBText_TestClass < TestBase
 
     b = a.dup
 
-    assert_equal( a.moved( RBA::DPoint::new( 0, 1 ) ).to_s, "('hallo',m45 5,8)" )
+    assert_equal( a.moved( RBA::DPoint::new( 0, 1 ) ).to_s, "('hallo',m45 5,8) s=23 f=8 ha=r va=b" )
     a.move( RBA::DPoint::new( 1, 0 ) )
-    assert_equal( a.to_s, "('hallo',m45 6,7)" )
+    assert_equal( a.to_s, "('hallo',m45 6,7) s=23 f=8 ha=r va=b" )
 
     b = b.transformed( RBA::DTrans::new( RBA::DTrans::R0, RBA::DPoint::new( 1, 0 )) )
-    assert_equal( b.to_s, "('hallo',m45 6,7)" )
+    assert_equal( b.to_s, "('hallo',m45 6,7) s=23 f=8 ha=r va=b" )
 
     m = RBA::DCplxTrans::new( RBA::DTrans::new, 1.5 )
     assert_equal( a.transformed(m).class.to_s, "RBA::DText" )
-    assert_equal( a.transformed(m).to_s, "('hallo',m45 9,10.5)" )
+    assert_equal( a.transformed(m).to_s, "('hallo',m45 9,10.5) s=34.5 f=8 ha=r va=b" )
 
     m = RBA::VCplxTrans::new( 1000.0 )
     assert_equal( a.transformed(m).class.to_s, "RBA::Text" )
-    assert_equal( a.transformed(m).to_s, "('hallo',m45 6000,7000)" )
+    assert_equal( a.transformed(m).to_s, "('hallo',m45 6000,7000) s=23000 f=8 ha=r va=b" )
 
   end
 
@@ -196,16 +196,16 @@ class DBText_TestClass < TestBase
 
     b = a.dup
 
-    assert_equal( a.moved( RBA::Point::new( 0, 1 ) ).to_s, "('hallo',m45 5,8)" )
+    assert_equal( a.moved( RBA::Point::new( 0, 1 ) ).to_s, "('hallo',m45 5,8) s=23 f=8 ha=l va=t" )
     a.move( RBA::Point::new( 1, 0 ) )
-    assert_equal( a.to_s, "('hallo',m45 6,7)" )
+    assert_equal( a.to_s, "('hallo',m45 6,7) s=23 f=8 ha=l va=t" )
 
     b = b.transformed( RBA::Trans::new( RBA::Trans::R0, RBA::Point::new( 1, 0 )) )
-    assert_equal( b.to_s, "('hallo',m45 6,7)" )
+    assert_equal( b.to_s, "('hallo',m45 6,7) s=23 f=8 ha=l va=t" )
 
     m = RBA::CplxTrans::new( RBA::Trans::new, 1.5 )
-    assert_equal( a.transformed(m).to_s, "('hallo',m45 9,10.5)" )
-    assert_equal( a.transformed(RBA::ICplxTrans::new(m)).to_s, "('hallo',m45 9,11)" )
+    assert_equal( a.transformed(m).to_s, "('hallo',m45 9,10.5) s=34.5 f=8 ha=l va=t" )
+    assert_equal( a.transformed(RBA::ICplxTrans::new(m)).to_s, "('hallo',m45 9,11) s=35 f=8 ha=l va=t" )
 
   end
 

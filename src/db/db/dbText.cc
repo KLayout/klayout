@@ -121,22 +121,22 @@ std::string text<C>::to_string (double dbu) const
   return s;
 }
 
-template class text<Coord>;
-template class text<DCoord>;
+template class DB_PUBLIC text<Coord>;
+template class DB_PUBLIC text<DCoord>;
 
 }
 
 namespace tl
 {
 
-template<> void extractor_impl (tl::Extractor &ex, db::Text &p)
+template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::Text &p)
 {
   if (! test_extractor_impl (ex, p)) {
     ex.error (tl::to_string (tr ("Expected a text specification")));
   }
 }
 
-template<> void extractor_impl (tl::Extractor &ex, db::DText &p)
+template<> DB_PUBLIC void extractor_impl (tl::Extractor &ex, db::DText &p)
 {
   if (! test_extractor_impl (ex, p)) {
     ex.error (tl::to_string (tr ("Expected a text specification")));
@@ -189,12 +189,12 @@ template<class C> bool _test_extractor_impl (tl::Extractor &ex, db::text<C> &t)
   }
 }
 
-template<> bool test_extractor_impl (tl::Extractor &ex, db::Text &p)
+template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::Text &p)
 {
   return _test_extractor_impl (ex, p);
 }
 
-template<> bool test_extractor_impl (tl::Extractor &ex, db::DText &p)
+template<> DB_PUBLIC bool test_extractor_impl (tl::Extractor &ex, db::DText &p)
 {
   return _test_extractor_impl (ex, p);
 }

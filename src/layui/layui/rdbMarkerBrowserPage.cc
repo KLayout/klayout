@@ -1838,7 +1838,7 @@ MarkerBrowserPage::marker_double_clicked (const QModelIndex &)
 }
 
 void 
-MarkerBrowserPage::set_window (rdb::window_type window, double window_dim, rdb::context_mode_type context)
+MarkerBrowserPage::set_window (rdb::window_type window, const lay::Margin &window_dim, rdb::context_mode_type context)
 {
   if (window != m_window || window_dim != m_window_dim || context != m_context) {
     m_window = window;
@@ -2280,15 +2280,17 @@ MarkerBrowserPage::do_update_markers ()
 
     if (mp_view && ! m_markers_bbox.empty ()) {
 
+      double wdim = m_window_dim.get (m_markers_bbox);
+
       if (m_window == FitCell) {
         mp_view->zoom_fit ();
       } else if (m_window == FitMarker) {
-        mp_view->zoom_box (m_markers_bbox.enlarged (db::DVector (m_window_dim, m_window_dim)));
+        mp_view->zoom_box (m_markers_bbox.enlarged (db::DVector (wdim, wdim)));
       } else if (m_window == Center) {
         mp_view->pan_center (m_markers_bbox.p1 () + (m_markers_bbox.p2 () - m_markers_bbox.p1 ()) * 0.5);
       } else if (m_window == CenterSize) {
-        double w = std::max (m_markers_bbox.width (), m_window_dim);
-        double h = std::max (m_markers_bbox.height (), m_window_dim);
+        double w = std::max (m_markers_bbox.width (), wdim);
+        double h = std::max (m_markers_bbox.height (), wdim);
         db::DPoint center (m_markers_bbox.p1 () + (m_markers_bbox.p2 () - m_markers_bbox.p1 ()) * 0.5);
         db::DVector d (w * 0.5, h * 0.5);
         mp_view->zoom_box (db::DBox (center - d, center + d));

@@ -28,6 +28,8 @@
 namespace lay
 {
 
+static const double delta = 1e-10;
+
 Margin::Margin (double value, bool relative)
   : m_relative_value (0.0), m_absolute_value (0.0), m_relative_mode (relative)
 {
@@ -38,21 +40,27 @@ Margin::Margin (double value, bool relative)
   }
 }
 
+bool
+Margin::operator== (const lay::Margin &other) const
+{
+  return m_relative_mode == other.m_relative_mode &&
+         fabs (m_absolute_value - other.m_absolute_value) < delta &&
+         fabs (m_relative_value - other.m_relative_value) < delta;
+}
+
 std::string
 Margin::to_string () const
 {
-  const double min_value = 1e-10;
-
   std::string res;
   if (m_relative_mode) {
     res = std::string ("*") + tl::to_string (m_relative_value);
-    if (fabs (m_absolute_value) > min_value) {
+    if (fabs (m_absolute_value) > delta) {
       res += " ";
       res += tl::to_string (m_absolute_value);
     }
   } else {
     res = tl::to_string (m_absolute_value);
-    if (fabs (m_relative_value) > min_value) {
+    if (fabs (m_relative_value) > delta) {
       res += " *";
       res += tl::to_string (m_relative_value);
     }

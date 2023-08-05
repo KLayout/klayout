@@ -470,9 +470,8 @@ MarkerBrowserDialog::configure (const std::string &name, const std::string &valu
 
   } else if (name == cfg_rdb_window_dim) {
 
-    double wdim = m_window_dim;
-    tl::from_string (value, wdim);
-    if (fabs (wdim - m_window_dim) > 1e-6) {
+    lay::Margin wdim = lay::Margin::from_string (value);
+    if (wdim != m_window_dim) {
       m_window_dim = wdim;
       need_update = true;
     }

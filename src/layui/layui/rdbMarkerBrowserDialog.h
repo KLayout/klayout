@@ -27,6 +27,7 @@
 
 #include "layuiCommon.h"
 #include "layBrowser.h"
+#include "layMargin.h"
 #include "tlColor.h"
 #include "rdbMarkerBrowser.h"
 
@@ -78,7 +79,7 @@ private:
   Ui::MarkerBrowserDialog *mp_ui;
   context_mode_type m_context;
   window_type m_window;
-  double m_window_dim;
+  lay::Margin m_window_dim;
   unsigned int m_max_marker_count;
   tl::Color m_marker_color;
   int m_marker_line_width;

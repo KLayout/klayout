@@ -50,6 +50,19 @@ public:
   Margin (double value = 0.0, bool relative = false);
 
   /**
+   *  @brief Equality
+   */
+  bool operator== (const lay::Margin &other) const;
+
+  /**
+   *  @brief Inequality
+   */
+  bool operator!= (const lay::Margin &other) const
+  {
+    return ! operator== (other);
+  }
+
+  /**
    *  @brief Gets the relative value
    */
   double relative_value () const

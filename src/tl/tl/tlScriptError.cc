@@ -79,14 +79,30 @@ BacktraceElement::to_string() const
 // -------------------------------------------------------------------
 //  ScriptError implementation
 
+static std::string make_basic_msg (const char *text, const char *cls)
+{
+  std::string msg;
+  if (*cls) {
+    msg = cls;
+  }
+  if (*cls && *text) {
+    msg += ": ";
+  }
+  if (*text) {
+    msg += text;
+  }
+  return msg;
+}
+
+
 ScriptError::ScriptError (const char *msg, const char *cls, const std::vector<BacktraceElement> &backtrace)
-  : tl::Exception (msg), m_line (-1), m_cls (cls), m_backtrace (backtrace)
+  : tl::Exception (make_basic_msg (msg, cls)), m_line (-1), m_cls (cls), m_backtrace (backtrace)
 {
   //  .. nothing yet ..
 }
 
 ScriptError::ScriptError (const char *msg, const char *sourcefile, int line, const char *cls, const std::vector<BacktraceElement> &backtrace)
-  : tl::Exception (msg), m_sourcefile (sourcefile), m_line (line), m_cls (cls), m_backtrace (backtrace)
+  : tl::Exception (make_basic_msg (msg, cls)), m_sourcefile (sourcefile), m_line (line), m_cls (cls), m_backtrace (backtrace)
 {
   translate_includes ();
 }
@@ -103,8 +119,8 @@ ScriptError::msg () const
   std::string m = basic_msg ();
 
   if (! m_context.empty ()) {
-      m += tl::to_string (tr (" in ")) + m_context;
-    }
+    m += tl::to_string (tr (" in ")) + m_context;
+  }
 
   for (std::vector<BacktraceElement>::const_iterator bt = backtrace ().begin (); bt != backtrace ().end (); ++bt) {
     m += "\n  ";

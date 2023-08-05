@@ -225,7 +225,7 @@ private:
 };
 
 /**
- *  @brief The template providing a binding of a "free iterator" (one that provides it's own at_end method)
+ *  @brief The template providing a binding of a "free iterator" (one that provides its own at_end method)
  */
 template <class I>
 class FreeIterAdaptor 

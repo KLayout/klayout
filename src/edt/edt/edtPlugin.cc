@@ -245,8 +245,12 @@ public:
   
   virtual bool implements_mouse_mode (std::string &title) const
   {
-    title = m_mouse_mode;
-    return true;
+    if (! m_mouse_mode.empty ()) {
+      title = m_mouse_mode;
+      return true;
+    } else {
+      return false;
+    }
   }
 
 private:
@@ -282,6 +286,11 @@ static tl::RegisteredClass<lay::PluginDeclaration> config_decl4 (
   "edt::Service(Paths)"
 );
 static tl::RegisteredClass<lay::PluginDeclaration> config_decl5 (
+  new edt::PluginDeclaration<edt::PointService> (tl::to_string (tr ("Points")), std::string (), 0, &get_shape_editor_options_pages),
+  4014,
+  "edt::Service(Points)"
+);
+static tl::RegisteredClass<lay::PluginDeclaration> config_decl6 (
   new edt::PluginDeclaration<edt::InstService> (tl::to_string (tr ("Instances")), "instance:edit_mode\t" + tl::to_string (tr ("Instance")) + "\t<:instance_24px.png>" + tl::to_string (tr ("{Create a cell instance}")), &get_inst_options, &get_inst_editor_options_pages),
   4020, 
   "edt::Service(CellInstances)"
@@ -302,6 +311,7 @@ bool is_enabled ()
 bool polygons_enabled () { return is_enabled<edt::PolygonService> (); }
 bool paths_enabled () { return is_enabled<edt::PathService> (); }
 bool boxes_enabled () { return is_enabled<edt::BoxService> (); }
+bool points_enabled () { return is_enabled<edt::PointService> (); }
 bool texts_enabled () { return is_enabled<edt::TextService> (); }
 bool instances_enabled () { return is_enabled<edt::InstService> (); }
 

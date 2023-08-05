@@ -1358,7 +1358,7 @@ Layout::add_cell (const char *name)
   m_cells.push_back_ptr (new_cell);
   m_cell_ptrs [new_index] = new_cell;
 
-  //  enter it's index and cell_name
+  //  enter its index and cell_name
   register_cell_name (name, new_index);
 
   if (manager () && manager ()->transacting ()) {
@@ -1380,7 +1380,7 @@ Layout::add_anonymous_cell ()
   m_cells.push_back_ptr (new_cell);
   m_cell_ptrs [new_index] = new_cell;
 
-  //  enter it's index and cell_name
+  //  enter its index and cell_name
   register_cell_name (0, new_index);
 
   if (manager () && manager ()->transacting ()) {
@@ -1393,7 +1393,7 @@ Layout::add_anonymous_cell ()
 void 
 Layout::register_cell_name (const char *name, cell_index_type ci)
 {
-  //  enter it's index and cell_name
+  //  enter its index and cell_name
   char *cp;
 
   if (name == 0) {
@@ -2254,7 +2254,7 @@ Layout::get_pcell_variant_dict (pcell_id_type pcell_id, const std::map<std::stri
     m_cells.push_back_ptr (variant);
     m_cell_ptrs [new_index] = variant;
 
-    //  enter it's index and cell_name
+    //  enter its index and cell_name
     register_cell_name (b.c_str (), new_index);
 
     if (manager () && manager ()->transacting ()) {
@@ -2293,7 +2293,7 @@ Layout::get_pcell_variant (pcell_id_type pcell_id, const std::vector<tl::Variant
     m_cells.push_back_ptr (variant);
     m_cell_ptrs [new_index] = variant;
 
-    //  enter it's index and cell_name
+    //  enter its index and cell_name
     register_cell_name (b.c_str (), new_index);
 
     if (manager () && manager ()->transacting ()) {
@@ -2932,7 +2932,7 @@ Layout::get_lib_proxy (Library *lib, cell_index_type cell_index)
     m_cells.push_back_ptr (proxy);
     m_cell_ptrs [new_index] = proxy;
 
-    //  enter it's index and cell_name
+    //  enter its index and cell_name
     register_cell_name (b.c_str (), new_index);
 
     if (manager () && manager ()->transacting ()) {
@@ -2968,7 +2968,7 @@ Layout::create_cold_proxy (const db::LayoutOrCellContextInfo &info)
   m_cells.push_back_ptr (proxy);
   m_cell_ptrs [new_index] = proxy;
 
-  //  enter it's index and cell_name
+  //  enter its index and cell_name
   register_cell_name (b.c_str (), new_index);
 
   if (manager () && manager ()->transacting ()) {

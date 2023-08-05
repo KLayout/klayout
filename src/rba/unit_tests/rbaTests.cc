@@ -45,7 +45,7 @@ TEST (basic)
   try {
     rba::RubyInterpreter::instance ()->eval_string ("raise \"an error\"");
   } catch (tl::Exception &ex) {
-    EXPECT_EQ (std::string (ex.msg (), 0, 8), std::string ("an error"));
+    EXPECT_EQ (std::string (ex.msg (), 0, 22), std::string ("RuntimeError: an error"));
     err = true;
   }
 
@@ -56,8 +56,8 @@ TEST (basic)
   try {
     rba::RubyInterpreter::instance ()->eval_string ("Quatsch");
   } catch (tl::Exception &ex) {
-    EXPECT_EQ (std::string (ex.msg (), 0, 30) == std::string ("uninitialized constant Quatsch") ||
-               std::string (ex.msg (), 0, 38) == std::string ("uninitialized constant Object::Quatsch"),
+    EXPECT_EQ (std::string (ex.msg (), 0, 41) == std::string ("NameError: uninitialized constant Quatsch") ||
+               std::string (ex.msg (), 0, 49) == std::string ("NameError: uninitialized constant Object::Quatsch"),
                true);
     err = true;
   }

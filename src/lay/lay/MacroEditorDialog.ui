@@ -463,10 +463,6 @@
              <property name="text">
               <string>...</string>
              </property>
-             <property name="icon">
-              <iconset resource="../../icons/icons.qrc">
-               <normaloff>:/breakpoint_16px.png</normaloff>:/breakpoint_16px.png</iconset>
-             </property>
              <property name="shortcut">
               <string>F9</string>
              </property>
@@ -636,10 +632,27 @@
              </property>
              <property name="icon">
               <iconset resource="../../icons/icons.qrc">
-               <normaloff>:/find_16px.png</normaloff>:/find_16px.png</iconset>
+               <normaloff>:/find_next_16px.png</normaloff>:/find_next_16px.png</iconset>
              </property>
              <property name="shortcut">
               <string>Ctrl+F</string>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="findPrevButton">
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../icons/icons.qrc">
+               <normaloff>:/find_prev_16px.png</normaloff>:/find_prev_16px.png</iconset>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+Shift+F</string>
              </property>
              <property name="autoRaise">
               <bool>true</bool>

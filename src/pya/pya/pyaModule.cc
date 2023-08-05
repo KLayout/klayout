@@ -456,24 +456,27 @@ public:
 
         std::string name = mt->name (mid);
 
-        //  does this method hide a property? -> append "_" in that case
-        std::pair<bool, size_t> t = mt->find_property (mt->is_static (mid), name);
-        if (t.first) {
-          name += "_";
-        }
-
         //  needs static/non-static disambiguation?
-        t = mt->find_method (! mt->is_static (mid), name);
+        std::pair<bool, size_t> t = mt->find_method (! mt->is_static (mid), name);
         if (t.first) {
 
           disambiguated_names.push_back (name);
           if (mt->is_static (mid)) {
             name = "_class_" + name;
+            mp_module->add_python_doc (*cls, mt, int (mid), tl::sprintf (tl::to_string (tr ("This class method is available as '%s' in Python")), name));
           } else {
             name = "_inst_" + name;
+            mp_module->add_python_doc (*cls, mt, int (mid), tl::sprintf (tl::to_string (tr ("This instance method is available as '%s' in Python")), name));
           }
 
-          mp_module->add_python_doc (*cls, mt, int (mid), tl::sprintf (tl::to_string (tr ("This attribute is available as '%s' in Python")), name));
+        } else {
+
+          //  does this method hide a property? -> append "_" in that case
+          t = mt->find_property (mt->is_static (mid), name);
+          if (t.first) {
+            name += "_";
+            mp_module->add_python_doc (*cls, mt, int (mid), tl::sprintf (tl::to_string (tr ("This method is available as '%s' in Python to distiguish it from the property with the same name")), name));
+          }
 
         }
 

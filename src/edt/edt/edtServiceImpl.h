@@ -67,6 +67,7 @@ protected:
   void deliver_shape (const db::Polygon &poly);
   void deliver_shape (const db::Path &path);
   void deliver_shape (const db::Box &box);
+  void deliver_shape (const db::Point &point);
   virtual void current_layer_changed () { }
 
 private:
@@ -138,6 +139,33 @@ private:
 
   void update_marker ();
   db::Box get_box () const;
+};
+
+/**
+ *  @brief Implementation of edt::Service for point editing
+ */
+class PointService
+  : public ShapeEditService
+{
+public:
+  PointService (db::Manager *manager, lay::LayoutViewBase *view);
+
+#if defined(HAVE_QT)
+  virtual std::vector<lay::PropertiesPage *> properties_pages (db::Manager *manager, QWidget *parent);
+#endif
+  virtual void do_begin_edit (const db::DPoint &p);
+  virtual void do_mouse_move (const db::DPoint &p);
+  virtual void do_mouse_move_inactive (const db::DPoint &p);
+  virtual bool do_mouse_click (const db::DPoint &p);
+  virtual void do_finish_edit ();
+  virtual void do_cancel_edit ();
+  virtual bool selection_applies (const lay::ObjectInstPath &sel) const;
+
+private:
+  db::DPoint m_p;
+
+  void update_marker ();
+  db::Point get_point () const;
 };
 
 /**

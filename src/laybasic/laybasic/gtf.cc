@@ -1532,7 +1532,7 @@ Recorder::eventFilter (QObject *object, QEvent *event)
 
       if (event->type() == QEvent::MouseButtonPress) {
 
-        //  send the test event to make the object print it's content
+        //  send the test event to make the object print its content
         QEvent event (QEvent::MaxUser);
         event.ignore ();
 

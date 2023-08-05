@@ -120,7 +120,7 @@ gsi::Class<db::TechnologyComponent> technology_component_decl ("db", "Technology
   "@brief A part of a technology definition\n"
   "Technology components extend technology definitions (class \\Technology) by "
   "specialized subfeature definitions. For example, the net tracer supplies "
-  "it's technology-dependent specification through a technology component called "
+  "its technology-dependent specification through a technology component called "
   "\\NetTracerTechnology.\n"
   "\n"
   "Components are managed within technologies and can be accessed from a technology "

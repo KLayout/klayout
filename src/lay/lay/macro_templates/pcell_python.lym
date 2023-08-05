@@ -34,11 +34,11 @@ class PCell(pya.PCellDeclarationHelper):
     return "TODO: create description"
   
   def coerce_parameters_impl(self):
-    # TODO: use x to access parameter x and set_x to modify it's value 
+    # TODO: use x to access parameter x and set_x to modify its value
   
   def produce_impl(self):
     # TODO: produce the cell content 
-    # i.e. self.cell().shapes(self.l_layer).insert(pya.Polygon(...))
+    # i.e. self.cell.shapes(self.l_layer).insert(pya.Polygon(...))
 
   # optional:
   # def can_create_from_shape_impl(self):

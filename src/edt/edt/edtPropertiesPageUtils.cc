@@ -198,6 +198,42 @@ db::Shape BoxDimensionsChangeApplicator::do_apply (db::Shapes &shapes, const db:
 }
 
 // -------------------------------------------------------------------------
+//  PointDimensionsChangeApplicator implementation
+
+PointDimensionsChangeApplicator::PointDimensionsChangeApplicator (const db::Point &point, const db::Point &org_point)
+  : m_point (point), m_org_point (org_point)
+{
+  //  .. nothing yet ..
+}
+
+db::Shape PointDimensionsChangeApplicator::do_apply (db::Shapes &shapes, const db::Shape &shape, double /*dbu*/, bool relative) const
+{
+  db::Point org_point;
+  shape.point (org_point);
+
+  db::Point new_point;
+  if (relative) {
+    new_point = org_point + (m_point - m_org_point);
+  } else if (m_point != m_org_point) {
+    new_point = org_point;
+    if (m_point.x () != m_org_point.x ()) {
+      new_point.set_x (m_point.x ());
+    }
+    if (m_point.y () != m_org_point.y ()) {
+      new_point.set_y (m_point.y ());
+    }
+  }
+
+  if (new_point != org_point) {
+    //  shape changed - replace the old by the new one
+    return shapes.replace (shape, new_point);
+  } else {
+    //  shape did not change
+    return shape;
+  }
+}
+
+// -------------------------------------------------------------------------
 //  PolygonChangeApplicator implementation
 
 PolygonChangeApplicator::PolygonChangeApplicator (const db::Polygon &poly, const db::Polygon &org_poly)

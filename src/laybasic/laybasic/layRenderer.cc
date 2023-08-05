@@ -65,6 +65,8 @@ Renderer::draw_propstring (const db::Shape &shape, const db::PropertiesRepositor
     dp = trans * (db::Point () + shape.text_trans ().disp ());
   } else if (shape.is_box ()) {
     dp = trans (shape.box ().p1 ());
+  } else if (shape.is_point ()) {
+    dp = trans (shape.point ());
   } else if (shape.is_polygon ()) {
     db::Shape::polygon_edge_iterator e = shape.begin_edge (); 
     dp = trans ((*e).p1 ());

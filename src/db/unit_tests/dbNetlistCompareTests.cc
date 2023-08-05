@@ -2409,7 +2409,7 @@ TEST(15_EmptySubCircuitWithoutPinNames)
     "  subcircuit TRANS $3 ($1=OUT,$2=$5,$3=$2);\n"
     "  subcircuit TRANS $4 ($1=OUT,$2=$4,$3=$2);\n"
     "end;\n"
-    //  This circuit is an abstract and it's pins are not defined by the pin names ->
+    //  This circuit is an abstract and its pins are not defined by the pin names ->
     //  they are internally marked as swappable
     "circuit TRANS ($1=$1,$2=$2,$3=$3);\n"
     "end;\n";
@@ -4152,7 +4152,7 @@ TEST(23_NodesRemovedWithError)
     "  subcircuit INV2PAIR $5 ($2=$I25,$3=VDD,$4=VSS,$5=$I6,$6=$I7);\n"
     "end;\n"
     "circuit INV2PAIR ($2=$I8,$3=$I5,$4=$I4,$5=$I3,$6=$I2);\n"
-    //  NOTE: $1 pin should not be connected to different nets, although it's not functional
+    //  NOTE: $1 pin should not be connected to different nets, although its not functional
     "  subcircuit INV2 $1 ($1=$3,IN=$I3,$3=$I7,OUT=$I6,VSS=$I4,VDD=$I5);\n"
     "  subcircuit INV2 $2 ($1=$6,IN=$I6,$3=$I8,OUT=$I2,VSS=$I4,VDD=$I5);\n"
     "end;\n"

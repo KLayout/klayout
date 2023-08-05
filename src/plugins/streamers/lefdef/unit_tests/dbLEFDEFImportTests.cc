@@ -540,6 +540,10 @@ TEST(111_mapfile)
   options.set_map_file ("test.map");
 
   run_test (_this, "mapfile", "read:in.def", "au.oas.gz", options, false);
+
+  options.set_map_file ("test-nonames.map");
+
+  run_test (_this, "mapfile", "read:in.def", "au.oas.gz", options, false);
 }
 
 TEST(112_via_properties)

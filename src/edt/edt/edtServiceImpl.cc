@@ -386,6 +386,20 @@ ShapeEditService::deliver_shape (const db::Box &box)
   }
 }
 
+void
+ShapeEditService::deliver_shape (const db::Point &point)
+{
+  if (m_combine_mode == CM_Add) {
+    if (manager ()) {
+      manager ()->transaction (tl::to_string (tr ("Create point")));
+    }
+    cell ().shapes (layer ()).insert (point);
+    if (manager ()) {
+      manager ()->commit ();
+    }
+  }
+}
+
 // -----------------------------------------------------------------------------
 //  PolygonService implementation
 
@@ -814,6 +828,103 @@ bool
 BoxService::selection_applies (const lay::ObjectInstPath &sel) const
 {
   return !sel.is_cell_inst () && sel.shape ().is_box ();
+}
+
+// -----------------------------------------------------------------------------
+//  PointService implementation
+
+PointService::PointService (db::Manager *manager, lay::LayoutViewBase *view)
+  : ShapeEditService (manager, view, db::ShapeIterator::Points)
+{
+  //  .. nothing yet ..
+}
+
+#if defined(HAVE_QT)
+std::vector<lay::PropertiesPage *>
+PointService::properties_pages (db::Manager *manager, QWidget *parent)
+{
+  std::vector<lay::PropertiesPage *> pages;
+  pages.push_back (new edt::PointPropertiesPage (this, manager, parent));
+  return pages;
+}
+#endif
+
+void
+PointService::do_begin_edit (const db::DPoint &p)
+{
+  get_edit_layer ();
+
+  db::DPoint pp = snap2 (p);
+  m_p = pp;
+
+  set_edit_marker (new lay::Marker (view (), cv_index ()));
+  update_marker ();
+}
+
+db::Point
+PointService::get_point () const
+{
+  return db::Point (trans () * m_p);
+}
+
+void
+PointService::update_marker ()
+{
+  lay::Marker *marker = dynamic_cast<lay::Marker *> (edit_marker ());
+  if (marker) {
+
+    db::Point pt = get_point ();
+    marker->set (db::Box (pt, pt), db::VCplxTrans (1.0 / layout ().dbu ()) * trans ().inverted ());
+
+    view ()->message (std::string ("x: ") +
+                      tl::micron_to_string (m_p.x ()) +
+                      std::string ("  y: ") +
+                      tl::micron_to_string (m_p.y ()));
+
+  }
+}
+
+void
+PointService::do_mouse_move_inactive (const db::DPoint &p)
+{
+  lay::PointSnapToObjectResult snap_details = snap2_details (p);
+  mouse_cursor_from_snap_details (snap_details);
+}
+
+void
+PointService::do_mouse_move (const db::DPoint &p)
+{
+  do_mouse_move_inactive (p);
+
+  set_cursor (lay::Cursor::cross);
+  m_p = snap2 (p);
+  update_marker ();
+}
+
+bool
+PointService::do_mouse_click (const db::DPoint &p)
+{
+  do_mouse_move (p);
+  return true;
+}
+
+void
+PointService::do_finish_edit ()
+{
+  deliver_shape (get_point ());
+  commit_recent (view ());
+}
+
+void
+PointService::do_cancel_edit ()
+{
+  //  .. nothing yet ..
+}
+
+bool
+PointService::selection_applies (const lay::ObjectInstPath &sel) const
+{
+  return !sel.is_cell_inst () && sel.shape ().is_point ();
 }
 
 // -----------------------------------------------------------------------------

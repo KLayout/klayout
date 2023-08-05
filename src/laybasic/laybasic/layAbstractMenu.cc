@@ -52,7 +52,7 @@ namespace lay
 
 #if defined(__APPLE__)
 
-//  On MacOS, the main menu bar and it's decendent children
+//  On MacOS, the main menu bar and its decendent children
 //  can't be modified using "removeAction", followed by "addAction"
 //  to achieve a move operation.If we try to do so, segmentation faults happen
 //  in the timer event that presumably tries to merge the menu bar

@@ -328,11 +328,11 @@ gsi::ClassExt<db::LoadLayoutOptions> dxf_reader_options (
     "This method has been added in version 0.25.3."
   ) +
   gsi::method_ext ("dxf_keep_other_cells=", &set_dxf_keep_other_cells, gsi::arg ("value"),
-    "@brief If this option is set to true, all cells are kept, not only the top cell and it's children\n"
+    "@brief If this option is set to true, all cells are kept, not only the top cell and its children\n"
     "\nThis property has been added in version 0.21.15.\n"
   ) +
   gsi::method_ext ("dxf_keep_other_cells?|#dxf_keep_other_cells", &get_dxf_keep_other_cells,
-    "@brief If this option is true, all cells are kept, not only the top cell and it's children\n"
+    "@brief If this option is true, all cells are kept, not only the top cell and its children\n"
     "\nThis property has been added in version 0.21.15.\n"
   ) +
   gsi::method_ext ("dxf_polyline_mode=", &set_dxf_polyline_mode, gsi::arg ("mode"),

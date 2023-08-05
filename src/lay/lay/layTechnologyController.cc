@@ -609,6 +609,9 @@ TechnologyController::rescan (db::Technologies &technologies)
   for (std::vector<db::Technology>::const_iterator t = m_temp_tech.begin (); t != m_temp_tech.end (); ++t) {
 
     db::Technology *tech = new db::Technology (*t);
+    if (tl::verbosity () >= 20) {
+      tl::info << "Registering special technology from " << tech->tech_file_path () << " as " << tech->name ();
+    }
     tech->set_persisted (false);                //  don't save that one in the configuration
     tech->set_tech_file_path (std::string ());  //  don't save to a file either
     tech->set_readonly (true);                  //  don't edit

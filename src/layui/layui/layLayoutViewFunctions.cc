@@ -735,7 +735,7 @@ void
 LayoutViewFunctions::cm_cell_cut ()
 {
   if (view ()->hierarchy_panel ()) {
-    //  TODO: currently the hierarchy panel's cut function does it's own transaction handling.
+    //  TODO: currently the hierarchy panel's cut function does its own transaction handling.
     //  Otherwise the cut function is not working propertly.
     view ()->hierarchy_panel ()->cut ();
   }
@@ -1177,7 +1177,7 @@ LayoutViewFunctions::do_cm_duplicate (bool interactive)
   db::Clipboard::instance ().swap (saved_clipboard);
 
   try {
-    view ()->copy ();
+    view ()->copy_view_objects ();
     view ()->clear_selection ();
     view ()->cancel ();
     if (interactive) {
@@ -1873,12 +1873,12 @@ LayoutViewFunctions::cm_edit_layer ()
 {
   lay::LayerPropertiesConstIterator sel = view ()->current_layer ();
   if (sel.is_null ()) {
-    throw tl::Exception (tl::to_string (tr ("No layer selected for editing it's properties")));
+    throw tl::Exception (tl::to_string (tr ("No layer selected for editing its properties")));
   }
 
   int index = sel->cellview_index ();
   if (sel->has_children () || index < 0 || int (view ()->cellviews ()) <= index || sel->layer_index () < 0) {
-    throw tl::Exception (tl::to_string (tr ("No valid layer selected for editing it's properties")));
+    throw tl::Exception (tl::to_string (tr ("No valid layer selected for editing its properties")));
   }
 
   const lay::CellView &cv = view ()->cellview (index);

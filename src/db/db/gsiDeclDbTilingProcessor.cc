@@ -174,7 +174,7 @@ gsi::Class<db::TileOutputReceiver> &dbdecl_TileOutputReceiverBase ()
 gsi::Class<TileOutputReceiver_Impl> decl_TileOutputReceiver (decl_TileOutputReceiverBase, "db", "TileOutputReceiver",
   gsi::callback ("begin", &TileOutputReceiver_Impl::begin, &TileOutputReceiver_Impl::begin_cb, gsi::arg ("nx"), gsi::arg ("ny"), gsi::arg ("p0"), gsi::arg ("dx"), gsi::arg ("dy"), gsi::arg ("frame"),
     "@brief Initiates the delivery\n"
-    "This method is called before the first tile delivers it's data.\n"
+    "This method is called before the first tile delivers its data.\n"
     "\n"
     "@param nx The number of tiles in x direction\n"
     "@param ny The number of tiles in y direction\n"

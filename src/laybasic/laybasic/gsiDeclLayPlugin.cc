@@ -730,7 +730,7 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
   callback ("config_finalize", &gsi::PluginBase::config_finalize, &gsi::PluginBase::f_config_finalize,
     "@brief Sends the post-configuration request to the plugin\n"
     "After all configuration parameters have been sent, 'config_finalize' is called to given the plugin a chance to "
-    "update it's internal state according to the new configuration.\n"
+    "update its internal state according to the new configuration.\n"
   ) +
   callback ("key_event", &gsi::PluginBase::key_event, &gsi::PluginBase::f_key_event, gsi::arg ("key"), gsi::arg ("buttons"),
     "@brief Handles the key pressed event\n"
@@ -840,7 +840,7 @@ Class<gsi::PluginBase> decl_Plugin ("lay", "Plugin",
   ),
   "@brief The plugin object\n"
   "\n"
-  "This class provides the actual plugin implementation. Each view gets it's own instance of the plugin class. The plugin factory \\PluginFactory class "
+  "This class provides the actual plugin implementation. Each view gets its own instance of the plugin class. The plugin factory \\PluginFactory class "
   "must be specialized to provide a factory for new objects of the Plugin class. See the documentation there for details about the plugin mechanism and "
   "the basic concepts.\n"
   "\n"

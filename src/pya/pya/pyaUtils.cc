@@ -44,17 +44,19 @@ void check_error ()
 {
   PyObject *py_exc_type = NULL, *py_exc_value = NULL, *py_exc_traceback = NULL;
   PyErr_Fetch (&py_exc_type, &py_exc_value, &py_exc_traceback);
-  PythonRef exc_type (py_exc_type);
-  PythonRef exc_value (py_exc_value);
-  PythonRef exc_traceback (py_exc_traceback);
+  if (py_exc_type != NULL) {
 
-  std::string exc_cls ("unknown");
-  const char *c = ((PyTypeObject *) exc_type.get ())->tp_name;
-  if (c) {
-    exc_cls = c;
-  }
+    PyErr_NormalizeException (&py_exc_type, &py_exc_value, &py_exc_traceback);
 
-  if (exc_type) {
+    PythonRef exc_type (py_exc_type);
+    PythonRef exc_value (py_exc_value);
+    PythonRef exc_traceback (py_exc_traceback);
+
+    std::string exc_cls ("unknown");
+    const char *c = ((PyTypeObject *) exc_type.get ())->tp_name;
+    if (c) {
+      exc_cls = c;
+    }
 
     //  fetch traceback
     //  TODO: really decref the stack trace? how about the other objects in the stack trace?

@@ -271,7 +271,7 @@ public:
 
 signals:
   void help_requested (const QString &s);
-  void search_requested (const QString &s);
+  void search_requested (const QString &s, bool backward);
   void edit_trace (bool);
 
 public slots:
@@ -314,6 +314,7 @@ private:
   void fill_completer_list ();
   void complete ();
   QTextCursor get_completer_cursor (int &pos0, int &pos);
+  bool select_match_here ();
   void replace_in_selection (const QString &replace, bool first);
 
   bool eventFilter (QObject *watched, QEvent *event);

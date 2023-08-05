@@ -105,7 +105,7 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
   if (format.empty () || format == gds2_format_name || format == gds2text_format_name) {
     cmd << tl::arg (group +
                     "#--keep-instances",      &m_keep_instances, "Keeps instances of dropped cells",
-                    "If given, instances of dropped cell's won't be removed. Hence, ghost cells are "
+                    "If given, instances of dropped cells won't be removed. Hence, ghost cells are "
                     "produced. The resulting layout may not be readable by consumers that require "
                     "all instantiated cells to be present as actual cells.\n"
                     "Dropped cells are those which are removed by a negative cell selection (see "
@@ -136,11 +136,11 @@ GenericWriterOptions::add_options (tl::CommandLineOptions &cmd, const std::strin
                   "\n"
                   "Multiple operations can be specified by combining them with a comma. "
                   "Positive and negative selection happens in the order given. Hence it's possible "
-                  "to select a cell with it's children and then unselect some children of this cell.\n"
+                  "to select a cell with its children and then unselect some children of this cell.\n"
                   "\n"
                   "Examples:\n\n"
                   "* \"TOP1,TOP2\" - Select cells TOP1 and TOP2 with all of their children\n"
-                  "* \"(TOP)\" - Select only cell TOP, but none of it's child cells\n"
+                  "* \"(TOP)\" - Select only cell TOP, but none of its child cells\n"
                   "* \"TOP,-A\" - Select cell TOP (plus children), then remove A (with children)"
                  );
 

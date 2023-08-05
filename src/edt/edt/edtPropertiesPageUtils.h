@@ -132,6 +132,22 @@ private:
 };
 
 /**
+ *  @brief A point change applicator
+ */
+class PointDimensionsChangeApplicator
+  : public ChangeApplicator
+{
+public:
+  PointDimensionsChangeApplicator (const db::Point &point, const db::Point &org_point);
+
+  bool supports_relative_mode () const { return true; }
+  db::Shape do_apply (db::Shapes &shapes, const db::Shape &shape, double dbu, bool relative) const;
+
+private:
+  db::Point m_point, m_org_point;
+};
+
+/**
  *  @brief A polygon change applicator
  */
 class PolygonChangeApplicator

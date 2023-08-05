@@ -358,10 +358,10 @@ class _PCellDeclarationHelper(pya.PCellDeclaration):
       pdecl.unit = unit
     if not (choices is None):
       if not isinstance(choices, list) and not isinstance(choices, tuple):
-        raise "choices value must be an list/tuple of two-element arrays (description, value)"
+        raise TypeError("choices value must be an list/tuple of two-element arrays (description, value)")
       for c in choices:
         if (not isinstance(choices, list) and not isinstance(choices, tuple)) or len(c) != 2:
-          raise "choices value must be an list/tuple of two-element arrays (description, value)"
+          raise TypeError("choices value must be an list/tuple of two-element arrays (description, value)")
         pdecl.add_choice(c[0],c[1])
     
     # return the declaration object for further operations
@@ -430,7 +430,10 @@ class _PCellDeclarationHelper(pya.PCellDeclaration):
     """
     layers = []
     for i in self._layer_param_index:
-      layers.append(parameters[i])
+      if parameters[i] is not None:
+        layers.append(parameters[i])
+      else:
+        layers.append(pya.LayerInfo())
     return layers
     
   def callback(self, layout, name, states):

@@ -40,10 +40,10 @@ class QtLifetimeMonitor
 };
 
 /**
- *  @brief A helper object that is attached to a QObject to monitor it's lifetime
+ *  @brief A helper object that is attached to a QObject to monitor its lifetime
  *
  *  This object will be put into the properties table of the QObject (more precisely: a copy).
- *  When the QObject is destroyed, it's properties are destroyed too and through reference
+ *  When the QObject is destroyed, its properties are destroyed too and through reference
  *  counting the destruction of the QObject is detected. The monitoring itself is implemented
  *  through a gsi::ObjectBase object which plugs seamlessly into the gsi type system:
  *

@@ -327,6 +327,10 @@ Plugin::~Plugin ()
   if (mp_parent) {
     mp_parent->unregister_plugin (this);
   }
+  //  remove us from the children's parent
+  for (auto c = m_children.begin (); c != m_children.end (); ++c) {
+    c->mp_parent = 0;
+  }
 }
 
 void 

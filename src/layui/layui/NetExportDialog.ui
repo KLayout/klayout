@@ -216,7 +216,7 @@
       <item row="1" column="0" colspan="2">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>If this option is selected, the subcircuits parts of a net are represented by individual cells. Otherwise the net with it's subcircuit parts is exported as a whole (flattened).</string>
+         <string>If this option is selected, the subcircuits parts of a net are represented by individual cells. Otherwise the net with its subcircuit parts is exported as a whole (flattened).</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>

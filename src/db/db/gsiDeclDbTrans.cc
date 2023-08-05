@@ -739,7 +739,7 @@ struct cplx_trans_defs
     method ("invert", &C::invert,
       "@brief Inverts the transformation (in place)\n"
       "\n"
-      "Inverts the transformation and replaces this transformation by it's\n"
+      "Inverts the transformation and replaces this transformation by its\n"
       "inverted one.\n"
       "\n"
       "@return The inverted transformation\n"

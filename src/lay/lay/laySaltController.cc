@@ -201,10 +201,10 @@ SaltController::install_packages (const std::vector<std::string> &packages, bool
     }
 
     if (n.find ("http:") == 0 || n.find ("https:") == 0 || n.find ("file:") == 0 || n[0] == '/' || n[0] == '\\') {
-      //  it's a URL
+      //  its a URL
       manager.register_download (std::string (), std::string (), n, v);
     } else {
-      //  it's a plain name
+      //  its a plain name
       manager.register_download (n, std::string (), std::string (), v);
     }
 

@@ -2537,6 +2537,7 @@ public:
   {
     mp_polygon_service = view->get_plugin <edt::PolygonService> ();
     mp_box_service = view->get_plugin <edt::BoxService> ();
+    mp_point_service = view->get_plugin <edt::PointService> ();
     mp_text_service = view->get_plugin <edt::TextService> ();
     mp_path_service = view->get_plugin <edt::PathService> ();
     mp_inst_service = view->get_plugin <edt::InstService> ();
@@ -2587,6 +2588,7 @@ public:
 private:
   edt::PolygonService *mp_polygon_service;
   edt::BoxService *mp_box_service;
+  edt::PointService *mp_point_service;
   edt::TextService *mp_text_service;
   edt::PathService *mp_path_service;
   edt::InstService *mp_inst_service;

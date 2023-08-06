@@ -27,6 +27,7 @@
 #include "ui_SearchReplaceDialog.h"
 
 #include "layBrowser.h"
+#include "layMargin.h"
 #include "rdb.h"
 #include "dbLayout.h"
 #include "dbShape.h"
@@ -180,7 +181,7 @@ private:
   int m_current_mode;
 
   window_type m_window;
-  double m_window_dim;
+  lay::Margin m_window_dim;
   unsigned int m_max_item_count;
   std::vector<lay::MarkerBase *> mp_markers;
 

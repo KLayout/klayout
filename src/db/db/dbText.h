@@ -276,7 +276,7 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
  */
 
 template <class C>
-class DB_PUBLIC_TEMPLATE text
+class DB_PUBLIC text
 {
 public:
   typedef C coord_type;

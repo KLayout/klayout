@@ -1,53 +1,52 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>BrowseInstancesConfigPage</class>
- <widget class="QFrame" name="BrowseInstancesConfigPage" >
-  <property name="geometry" >
+ <widget class="QFrame" name="BrowseInstancesConfigPage">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>499</width>
-    <height>148</height>
+    <height>151</height>
    </rect>
   </property>
-  <property name="sizePolicy" >
-   <sizepolicy>
-    <hsizetype>5</hsizetype>
-    <vsizetype>5</vsizetype>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Browse Cell Instances</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
+  <layout class="QVBoxLayout">
+   <property name="spacing">
     <number>6</number>
    </property>
+   <property name="margin" stdset="0">
+    <number>9</number>
+   </property>
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
       <string>Instance Browser Setup</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
+     <layout class="QGridLayout">
+      <property name="margin" stdset="0">
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="spacing">
        <number>6</number>
       </property>
-      <item row="0" column="2" >
+      <item row="0" column="2">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Minimum</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>16</width>
           <height>27</height>
@@ -55,62 +54,62 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="3" colspan="2" >
-       <widget class="QLineEdit" name="le_cell_name" >
-        <property name="enabled" >
+      <item row="0" column="3" colspan="2">
+       <widget class="QLineEdit" name="le_cell_name">
+        <property name="enabled">
          <bool>false</bool>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="3" >
-       <widget class="QLabel" name="label" >
-        <property name="text" >
+      <item row="2" column="0" colspan="3">
+       <widget class="QLabel" name="label">
+        <property name="text">
          <string>Maximum number of instances to show</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QComboBox" name="cbx_context" >
+      <item row="0" column="1">
+       <widget class="QComboBox" name="cbx_context">
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Show in context of cell ..</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Show in context of any top cell</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Show in parent cell</string>
          </property>
         </item>
        </widget>
       </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="textLabel1" >
-        <property name="text" >
+      <item row="0" column="0">
+       <widget class="QLabel" name="textLabel1">
+        <property name="text">
          <string>Context   </string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="textLabel1_2" >
-        <property name="text" >
+      <item row="1" column="0">
+       <widget class="QLabel" name="textLabel1_2">
+        <property name="text">
          <string>Window</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="2" >
+      <item row="1" column="2">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeType" >
+        <property name="sizeType">
          <enum>QSizePolicy::Minimum</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>16</width>
           <height>25</height>
@@ -118,58 +117,55 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="1" >
-       <widget class="QComboBox" name="cbx_window" >
+      <item row="1" column="1">
+       <widget class="QComboBox" name="cbx_window">
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Don't change</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Fit whole context cell</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Fit marker with margin ..</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Center marker</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Center marker with size ..</string>
          </property>
         </item>
        </widget>
       </item>
-      <item row="1" column="3" >
-       <widget class="QLineEdit" name="le_window" >
-        <property name="enabled" >
-         <bool>false</bool>
-        </property>
-       </widget>
+      <item row="1" column="3" colspan="2">
+       <widget class="lay::MarginWidget" name="mrg_window" native="true"/>
       </item>
-      <item row="2" column="3" >
-       <widget class="QLineEdit" name="le_max_count" />
-      </item>
-      <item row="1" column="4" >
-       <widget class="QLabel" name="textLabel2" >
-        <property name="text" >
-         <string>µm</string>
-        </property>
-       </widget>
+      <item row="2" column="3" colspan="2">
+       <widget class="QLineEdit" name="le_max_count"/>
       </item>
      </layout>
     </widget>
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>lay::MarginWidget</class>
+   <extends>QWidget</extends>
+   <header>layWidgets.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

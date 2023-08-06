@@ -1081,7 +1081,7 @@ ColorButton::browse_selected ()
 //  MarginWidget implementation
 
 MarginWidget::MarginWidget (QWidget *parent, const char *name)
-  : QFrame (parent)
+  : QFrame (parent), m_margin ()
 {
   if (name) {
     setObjectName (name);
@@ -1105,13 +1105,12 @@ MarginWidget::MarginWidget (QWidget *parent, const char *name)
   QComboBox *mode = new QComboBox (this);
   mode->addItem (tl::to_qstring ("µm"));
   mode->addItem (tl::to_qstring ("%"));
-  mode->setCurrentIndex (0);
   mp_mode_cb = mode;
   layout->addWidget (mode);
 
   connect (mode, SIGNAL (currentIndexChanged (int)), this, SLOT (mode_selection_changed ()));
 
-  mode_selection_changed ();
+  set_margin (lay::Margin ());
 }
 
 lay::Margin
@@ -1122,16 +1121,21 @@ MarginWidget::get_margin () const
   tl::from_string (tl::to_string (mp_rel_edit->text ()), rel);
   tl::from_string (tl::to_string (mp_abs_edit->text ()), abs);
 
-  lay::Margin m;
+  lay::Margin m = m_margin;
   m.set_relative_mode (rel_mode);
-  m.set_absolute_value (abs);
-  m.set_relative_value (rel * 0.01);
+  if (rel_mode) {
+    m.set_relative_value (rel * 0.01);
+  } else {
+    m.set_absolute_value (abs);
+  }
   return m;
 }
 
 void
 MarginWidget::set_margin (const lay::Margin &margin)
 {
+  m_margin = margin;
+
   mp_abs_edit->setText (tl::to_qstring (tl::to_string (margin.absolute_value ())));
   mp_rel_edit->setText (tl::to_qstring (tl::to_string (margin.relative_value () * 100.0)));
   mp_mode_cb->setCurrentIndex (margin.relative_mode () ? 1 : 0);

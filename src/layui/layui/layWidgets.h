@@ -341,6 +341,7 @@ private:
   QLineEdit *mp_abs_edit;
   QLineEdit *mp_rel_edit;
   QComboBox *mp_mode_cb;
+  lay::Margin m_margin;
 };
 
 /**

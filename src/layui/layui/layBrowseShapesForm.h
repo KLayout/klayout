@@ -29,6 +29,7 @@
 #include "ui_BrowseShapesConfigPage.h"
 
 #include "layLayoutViewBase.h"
+#include "layMargin.h"
 #include "layPluginConfigPage.h"
 #include "layBrowser.h"
 #include "layMarker.h"
@@ -99,7 +100,7 @@ private:
   mode_type m_mode;
   window_type m_window;
 
-  double m_window_dim;
+  lay::Margin m_window_dim;
   std::string m_context_cell;
 
   unsigned int m_max_inst_count;

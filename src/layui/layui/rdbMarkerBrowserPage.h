@@ -27,6 +27,7 @@
 
 #include "ui_MarkerBrowserPage.h"
 #include "rdbMarkerBrowser.h"
+#include "layMargin.h"
 #include "tlDeferredExecution.h"
 #include "tlColor.h"
 #include "dbBox.h"
@@ -137,7 +138,7 @@ public:
   /**
    *  @brief Set the window type and window dimensions
    */
-  void set_window (rdb::window_type window_type, double window_dim, rdb::context_mode_type context);
+  void set_window (rdb::window_type window_type, const lay::Margin &window_dim, rdb::context_mode_type context);
 
   /**
    *  @brief Set the maximum number of markers shown in the marker selection list
@@ -212,7 +213,7 @@ private:
   bool m_in_directory_selection_change;
   rdb::context_mode_type m_context;
   rdb::window_type m_window;
-  double m_window_dim;
+  lay::Margin m_window_dim;
   size_t m_max_marker_count;
   tl::Color m_marker_color;
   int m_marker_line_width;

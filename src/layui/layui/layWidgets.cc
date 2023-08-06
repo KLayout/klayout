@@ -1078,6 +1078,85 @@ ColorButton::browse_selected ()
 }
 
 // -------------------------------------------------------------
+//  MarginWidget implementation
+
+MarginWidget::MarginWidget (QWidget *parent, const char *name)
+  : QFrame (parent), m_margin ()
+{
+  if (name) {
+    setObjectName (name);
+  }
+
+  setFrameStyle (QFrame::NoFrame);
+
+  QHBoxLayout *layout = new QHBoxLayout (this);
+  layout->setMargin (0);
+
+  QLineEdit *le = new QLineEdit (this);
+  mp_abs_edit = le;
+  le->setSizePolicy (QSizePolicy (QSizePolicy::Fixed, QSizePolicy::Preferred));
+  layout->addWidget (le);
+
+  le = new QLineEdit (this);
+  mp_rel_edit = le;
+  le->setSizePolicy (QSizePolicy (QSizePolicy::Fixed, QSizePolicy::Preferred));
+  layout->addWidget (le);
+
+  QComboBox *mode = new QComboBox (this);
+  mode->addItem (tl::to_qstring ("µm"));
+  mode->addItem (tl::to_qstring ("%"));
+  mp_mode_cb = mode;
+  layout->addWidget (mode);
+
+  connect (mode, SIGNAL (currentIndexChanged (int)), this, SLOT (mode_selection_changed ()));
+
+  set_margin (lay::Margin ());
+}
+
+lay::Margin
+MarginWidget::get_margin () const
+{
+  bool rel_mode = mp_mode_cb->currentIndex () == 1;
+  double rel = 0.0, abs = 0.0;
+  tl::from_string (tl::to_string (mp_rel_edit->text ()), rel);
+  tl::from_string (tl::to_string (mp_abs_edit->text ()), abs);
+
+  lay::Margin m = m_margin;
+  m.set_relative_mode (rel_mode);
+  if (rel_mode) {
+    m.set_relative_value (rel * 0.01);
+  } else {
+    m.set_absolute_value (abs);
+  }
+  return m;
+}
+
+void
+MarginWidget::set_margin (const lay::Margin &margin)
+{
+  m_margin = margin;
+
+  mp_abs_edit->setText (tl::to_qstring (tl::to_string (margin.absolute_value ())));
+  mp_rel_edit->setText (tl::to_qstring (tl::to_string (margin.relative_value () * 100.0)));
+  mp_mode_cb->setCurrentIndex (margin.relative_mode () ? 1 : 0);
+  mode_selection_changed ();
+}
+
+void
+MarginWidget::mode_selection_changed ()
+{
+  bool rel_mode = mp_mode_cb->currentIndex () == 1;
+  //  NOTE: first hiding and then showing avoids layout flicker ..
+  mp_rel_edit->hide ();
+  mp_abs_edit->hide ();
+  if (rel_mode) {
+    mp_rel_edit->show ();
+  } else {
+    mp_abs_edit->show ();
+  }
+}
+
+// -------------------------------------------------------------
 //  DecoratedLineEdit implementation
 
 const int le_frame_width = 4; //  TODO: obtain from style?

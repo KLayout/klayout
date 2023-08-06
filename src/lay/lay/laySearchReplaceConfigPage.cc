@@ -87,9 +87,9 @@ SearchReplaceConfigPage::setup (lay::Dispatcher *root)
   cbx_window->setCurrentIndex (int (wmode));
 
   //  window dimension
-  double wdim = 1.0;
-  root->config_get (cfg_sr_window_dim, wdim);
-  le_window->setText (tl::to_qstring (tl::to_string (wdim)));
+  std::string wdim_str;
+  root->config_get (cfg_sr_window_dim, wdim_str);
+  mrg_window->set_margin (lay::Margin::from_string (wdim_str));
     
   //  max. instance count
   unsigned int max_item_count = 1000;
@@ -103,20 +103,19 @@ SearchReplaceConfigPage::setup (lay::Dispatcher *root)
 void
 SearchReplaceConfigPage::window_changed (int m)
 {
-  le_window->setEnabled (m == int (SearchReplaceDialog::FitMarker) || m == int (SearchReplaceDialog::CenterSize));
+  mrg_window->setEnabled (m == int (SearchReplaceDialog::FitMarker) || m == int (SearchReplaceDialog::CenterSize));
 }
 
 void 
 SearchReplaceConfigPage::commit (lay::Dispatcher *root)
 {
-  double dim = 1.0;
-  tl::from_string_ext (tl::to_string (le_window->text ()), dim);
+  lay::Margin dim = mrg_window->get_margin ();
 
   unsigned int max_item_count = 1000;
   tl::from_string_ext (tl::to_string (le_max_items->text ()), max_item_count);
 
   root->config_set (cfg_sr_window_mode, SearchReplaceDialog::window_type (cbx_window->currentIndex ()), SearchReplaceWindowModeConverter ());
-  root->config_set (cfg_sr_window_dim, dim);
+  root->config_set (cfg_sr_window_dim, dim.to_string ());
   root->config_set (cfg_sr_max_item_count, max_item_count);
 }
 

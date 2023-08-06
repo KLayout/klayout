@@ -200,9 +200,9 @@ BrowseInstancesConfigPage::setup (lay::Dispatcher *root)
   cbx_window->setCurrentIndex (int (wmode));
 
   //  window dimension
-  double wdim = 1.0;
-  root->config_get (cfg_cib_window_dim, wdim);
-  le_window->setText (tl::to_qstring (tl::to_string (wdim)));
+  std::string wdim_str;
+  root->config_get (cfg_cib_window_dim, wdim_str);
+  mrg_window->set_margin (lay::Margin::from_string (wdim_str));
     
   //  max. instance count
   unsigned int max_inst_count = 1000;
@@ -223,22 +223,19 @@ BrowseInstancesConfigPage::context_changed (int m)
 void
 BrowseInstancesConfigPage::window_changed (int m)
 {
-  le_window->setEnabled (m == int (BrowseInstancesForm::FitMarker) || m == int (BrowseInstancesForm::CenterSize));
+  mrg_window->setEnabled (m == int (BrowseInstancesForm::FitMarker) || m == int (BrowseInstancesForm::CenterSize));
 }
 
 void 
 BrowseInstancesConfigPage::commit (lay::Dispatcher *root)
 {
-  double dim = 1.0;
-  tl::from_string_ext (tl::to_string (le_window->text ()), dim);
-
   unsigned int max_inst_count = 1000;
   tl::from_string_ext (tl::to_string (le_max_count->text ()), max_inst_count);
 
   root->config_set (cfg_cib_context_cell, tl::to_string (le_cell_name->text ()));
   root->config_set (cfg_cib_context_mode, BrowseInstancesForm::mode_type (cbx_context->currentIndex ()), BrowseInstancesContextModeConverter ());
   root->config_set (cfg_cib_window_mode, BrowseInstancesForm::window_type (cbx_window->currentIndex ()), BrowseInstancesWindowModeConverter ());
-  root->config_set (cfg_cib_window_dim, dim);
+  root->config_set (cfg_cib_window_dim, mrg_window->get_margin ().to_string ());
   root->config_set (cfg_cib_max_inst_count, max_inst_count);
 }
 
@@ -306,7 +303,7 @@ BrowseInstancesForm::BrowseInstancesForm (lay::Dispatcher *root, LayoutViewBase 
     m_ef_enabled (true),
     m_mode (AnyTop),
     m_window (FitMarker),
-    m_window_dim (0.0),
+    m_window_dim (),
     m_max_inst_count (0),
     m_current_count (0)
 {
@@ -390,9 +387,8 @@ BrowseInstancesForm::configure (const std::string &name, const std::string &valu
 
   } else if (name == cfg_cib_window_dim) {
 
-    double wdim = m_window_dim;
-    tl::from_string (value, wdim);
-    if (fabs (wdim - m_window_dim) > 1e-6) {
+    lay::Margin wdim = lay::Margin::from_string (value);
+    if (wdim != m_window_dim) {
       m_window_dim = wdim;
       need_update = true;
     }
@@ -787,16 +783,18 @@ BrowseInstancesForm::highlight_current ()
 
   if (index_set) {
 
+    double window_dim = m_window_dim.get (dbox);
+
     view ()->select_cell (index, m_cv_index);
     if (m_window == FitCell) {
       view ()->zoom_fit ();
     } else if (m_window == FitMarker) {
-      view ()->zoom_box (dbox.enlarged (db::DVector (m_window_dim, m_window_dim)));
+      view ()->zoom_box (dbox.enlarged (db::DVector (window_dim, window_dim)));
     } else if (m_window == Center) {
       view ()->pan_center (dbox.p1 () + (dbox.p2 () - dbox.p1 ()) * 0.5);
     } else if (m_window == CenterSize) {
-      double w = std::max (dbox.width (), m_window_dim);
-      double h = std::max (dbox.height (), m_window_dim);
+      double w = std::max (dbox.width (), window_dim);
+      double h = std::max (dbox.height (), window_dim);
       db::DPoint center (dbox.p1 () + (dbox.p2 () - dbox.p1 ()) * 0.5);
       db::DVector d (w * 0.5, h * 0.5);
       view ()->zoom_box (db::DBox (center - d, center + d));

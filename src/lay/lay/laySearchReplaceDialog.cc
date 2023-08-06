@@ -1125,9 +1125,8 @@ SearchReplaceDialog::configure (const std::string &name, const std::string &valu
 
   } else if (name == cfg_sr_window_dim) {
 
-    double wdim = m_window_dim;
-    tl::from_string (value, wdim);
-    if (fabs (wdim - m_window_dim) > 1e-6) {
+    lay::Margin wdim = lay::Margin::from_string (value);
+    if (wdim != m_window_dim) {
       m_window_dim = wdim;
       need_update = true;
     }
@@ -1754,15 +1753,17 @@ SearchReplaceDialog::result_selection_changed ()
 
     if (! dbox.empty ()) {
 
+      double window_dim = m_window_dim.get (dbox);
+
       if (m_window == FitCell) {
         view ()->zoom_fit ();
       } else if (m_window == FitMarker) {
-        view ()->zoom_box (dbox.enlarged (db::DVector (m_window_dim, m_window_dim)));
+        view ()->zoom_box (dbox.enlarged (db::DVector (window_dim, window_dim)));
       } else if (m_window == Center) {
         view ()->pan_center (dbox.p1 () + (dbox.p2 () - dbox.p1 ()) * 0.5);
       } else if (m_window == CenterSize) {
-        double w = std::max (dbox.width (), m_window_dim);
-        double h = std::max (dbox.height (), m_window_dim);
+        double w = std::max (dbox.width (), window_dim);
+        double h = std::max (dbox.height (), window_dim);
         db::DPoint center (dbox.p1 () + (dbox.p2 () - dbox.p1 ()) * 0.5);
         db::DVector d (w * 0.5, h * 0.5);
         view ()->zoom_box (db::DBox (center - d, center + d));

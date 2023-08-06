@@ -133,4 +133,68 @@ TEST(3)
   EXPECT_EQ (std::string (s2b.text_string ()), "U");
 }
 
+std::string string_trip (const db::Text &t)
+{
+  std::string s = t.to_string ();
+  tl::Extractor ex (s.c_str ());
 
+  db::Text t2;
+  ex.read (t2);
+
+  return t2.to_string ();
+}
+
+TEST(4)
+{
+  db::Text t ("abc", db::Trans (db::Trans::r90));
+
+  EXPECT_EQ (t.to_string (), "('abc',r90 0,0)");
+  EXPECT_EQ (string_trip (t), t.to_string ());
+
+  t.size (150);
+
+  EXPECT_EQ (t.to_string (), "('abc',r90 0,0) s=150");
+  EXPECT_EQ (string_trip (t), t.to_string ());
+
+  t.size (0);
+
+  EXPECT_EQ (t.to_string (), "('abc',r90 0,0)");
+  EXPECT_EQ (string_trip (t), t.to_string ());
+
+  t.halign (db::HAlignCenter);
+
+  EXPECT_EQ (t.to_string (), "('abc',r90 0,0) ha=c");
+  EXPECT_EQ (string_trip (t), t.to_string ());
+
+  t.halign (db::HAlignLeft);
+
+  EXPECT_EQ (t.to_string (), "('abc',r90 0,0) ha=l");
+  EXPECT_EQ (string_trip (t), t.to_string ());
+
+  t.halign (db::HAlignRight);
+
+  EXPECT_EQ (t.to_string (), "('abc',r90 0,0) ha=r");
+  EXPECT_EQ (string_trip (t), t.to_string ());
+
+  t.valign (db::VAlignCenter);
+
+  EXPECT_EQ (t.to_string (), "('abc',r90 0,0) ha=r va=c");
+  EXPECT_EQ (string_trip (t), t.to_string ());
+
+  t.valign (db::VAlignTop);
+
+  EXPECT_EQ (t.to_string (), "('abc',r90 0,0) ha=r va=t");
+  EXPECT_EQ (string_trip (t), t.to_string ());
+
+  t.valign (db::VAlignBottom);
+
+  EXPECT_EQ (t.to_string (), "('abc',r90 0,0) ha=r va=b");
+  EXPECT_EQ (string_trip (t), t.to_string ());
+
+  t.halign (db::NoHAlign);
+  t.valign (db::NoVAlign);
+  t.font (db::Font (17));
+
+  EXPECT_EQ (t.to_string (), "('abc',r90 0,0) f=17");
+  EXPECT_EQ (string_trip (t), t.to_string ());
+}

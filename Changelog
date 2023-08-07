@@ -1,3 +1,50 @@
+0.28.11          (2023-08-09):
+* Bugfix: %GITHUB%/issues/1307 (partial) LEF/DEF PIN labels are taken from NET, not PIN name
+* Bugfix: %GITHUB%/issues/1415 GDS2 files with meta info are not read by old versions of KLayout 
+* Bugfix: %GITHUB%/issues/1422 DXF file parsing error, about spline curve
+* Bugfix: %GITHUB%/issues/1425 Python Binding / Layout / find_layer broken for layer "name"
+* Bugfix: %GITHUB%/issues/1428 Feature request: "%include" in macros should allow including XML files too 
+* Bugfix: %GITHUB%/issues/1430 Add option to filter out geometric primitives from Marker Database Browser Info widget
+* Bugfix: %GITHUB%/issues/1432 strm2oas def ignores path segment after + VIRTUAL + RECT
+* Bugfix: %GITHUB%/issues/1433 Fix def syntax error in testdata/lefdef/viasize2/test.def
+* Bugfix: %GITHUB%/issues/1453 Zoom (in) function with selected layers significantly slower in newer releases
+* Enhancement: %GITHUB%/issues/1438 Provide a configuration option to switch back to old-style text selection (at origin only)
+* Enhancement: %GITHUB%/issues/1440 Relative margin for Marker Database Browser
+* Enhancement: %GITHUB%/issues/1441 Support for label position in Marker Database Browser
+* Enhancements: 
+  - Add a default extension to file names unless one is given
+  - Selection on partial mode enhanced: allow selection of edge 
+    ends if edges overlap, graphical indicator for selected partial
+  - Wheel events do no longer change Combo Box selections
+  - DRC/LVS: log output overhead reduced for faster execution in 
+    small layout cases
+  - Added RBA::Image/pya.Image constructor taking QImage and PixelBuffer
+  - Point objects are native citizens now of the database and act as
+    representatives for handles, better editing and visualization of
+    the latter
+  - Macro editor has "find previous" button now
+  - Mitigate the effect of overriding a globally-defined technology 
+    with -nn on the command line by creating tech variants
+  - LEF/DEF map files now allow LEFPINNAME and PINNAME purpose to
+    map pin labels in a more consistent way
+* Bugfix:
+  - Tilde expansion wasn't working for layout write
+  - Python specific API documentation did not mention disambiguation
+    for property/method ambiguity
+  - Python error messages are more readable and contain the exception
+    class
+  - PCell layer-type parameters did not work without a default value
+  - Point-like PCell handles now cannot be spoiled any longer in partial 
+    mode
+  - "Duplicate" was also duplicating cells or layers depending on the
+    scope which was irritating. Now it's confined to geometry
+  - DRC/LVS logs list the correct line also with include files
+  - "report" wasn't working in DRC/LVS scripts for scripts only using
+    external sources
+  - Fixed a potential segfault on application exit
+  - Enhancements to the macro editor's search & replace function - 
+    "replace and search next" wasn't working properly and other flaws
+
 0.28.10          (2023-07-05):
 * Bugfix: %GITHUB%/issues/1397 LayoutMetaInfo serialization/deserialization problem
 * Bugfix: %GITHUB%/issues/1404 Better support for editing mode in Qt-less LayoutView

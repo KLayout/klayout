@@ -475,6 +475,8 @@ ShapeFinder::checkpoint ()
 void 
 ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db::Box &scan_box, const db::DCplxTrans &vp, const db::ICplxTrans &t, int /*level*/)
 {
+  checkpoint ();
+
   if (! m_context_layers.empty ()) {
 
     std::map<db::cell_index_type, bool>::const_iterator ctx = m_cells_with_context.find (cell.cell_index ());
@@ -499,11 +501,11 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
 
   if (! point_mode ()) {
 
-    checkpoint ();
-
     for (std::vector<int>::const_iterator l = layers ().begin (); l != layers ().end (); ++l) {
 
       if (layers ().size () == 1 || (layers ().size () > 1 && cell.bbox ((unsigned int) *l).touches (scan_box))) {
+
+        checkpoint ();
 
         const db::Shapes &shapes = cell.shapes ((unsigned int) *l);
 
@@ -559,6 +561,8 @@ ShapeFinder::visit_cell (const db::Cell &cell, const db::Box &hit_box, const db:
 
         db::ShapeIterator shape = shapes.begin_touching (scan_box, m_flags, mp_prop_sel, m_inv_prop_sel);
         while (! shape.at_end ()) {
+
+          checkpoint ();
 
           bool match = false;
           double d = std::numeric_limits<double>::max ();

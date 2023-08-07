@@ -52,7 +52,7 @@ jobs:
           HOST_CCACHE_DIR="$(ccache -k cache_dir)"
           mkdir -p $HOST_CCACHE_DIR
       - name: Build wheels  # check https://cibuildwheel.readthedocs.io/en/stable/setup/#github-actions
-        uses: pypa/cibuildwheel@v2.13.1
+        uses: pypa/cibuildwheel@v2.14.1
         # to supply options, put them in 'env', like:
         # env:
         #   CIBW_SOME_OPTION: value
@@ -97,7 +97,7 @@ jobs:
         name: artifact
         path: dist
 
-    - uses: pypa/gh-action-pypi-publish@v1.8.7
+    - uses: pypa/gh-action-pypi-publish@v1.8.8
       continue-on-error: true   # might fail if we don't bump the version
       with:
         user: __token__
@@ -114,7 +114,7 @@ jobs:
         name: artifact
         path: dist
 
-    - uses: pypa/gh-action-pypi-publish@v1.8.7
+    - uses: pypa/gh-action-pypi-publish@v1.8.8
       with:
         user: __token__
         password: ${{ secrets.pypi_password }}

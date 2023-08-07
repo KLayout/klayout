@@ -1196,6 +1196,22 @@ public:
   }
 
   /**
+   *  @brief Sets text point mode
+   *
+   *  In point mode, the text is treated like a point.
+   *  Selection happens at the texts' origin.
+   */
+  void text_point_mode (bool pm);
+
+  /**
+   *  @brief Gets text point mode
+   */
+  bool text_point_mode () const
+  {
+    return m_text_point_mode;
+  }
+
+  /**
    *  @brief Show or hide markers
    */
   void show_markers (bool f);
@@ -2811,6 +2827,7 @@ private:
   tl::Color m_text_color;
   bool m_apply_text_trans;
   double m_default_text_size;
+  bool m_text_point_mode;
   unsigned int m_text_font;
   bool m_show_markers;
   bool m_no_stipples;

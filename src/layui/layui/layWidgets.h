@@ -26,6 +26,7 @@
 #define HDR_layWidgets
 
 #include "layuiCommon.h"
+#include "layMargin.h"
 
 #include "tlObject.h"
 #include "tlDeferredExecution.h"
@@ -314,6 +315,33 @@ private:
 
 private slots:
   virtual void selected ();
+};
+
+/**
+ *  @brief Margin edit box
+ *
+ *  This class implements a special widget to edit a lay::Margin object.
+ *  This object allows specification of a relative or absolute margin.
+ */
+class LAYUI_PUBLIC MarginWidget
+  : public QFrame
+{
+Q_OBJECT
+
+public:
+  MarginWidget (QWidget *parent, const char *name = 0);
+
+  lay::Margin get_margin () const;
+  void set_margin (const lay::Margin &margin);
+
+protected slots:
+  void mode_selection_changed ();
+
+private:
+  QLineEdit *mp_abs_edit;
+  QLineEdit *mp_rel_edit;
+  QComboBox *mp_mode_cb;
+  lay::Margin m_margin;
 };
 
 /**

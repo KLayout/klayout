@@ -50,17 +50,6 @@ public:
   TextInfo (const LayoutViewBase *view);
 
   /**
-   *  @brief Constructor
-   *
-   *  @param default_text_size The default text size in micron
-   *  @param default_font The default font
-   *  @param apply_text_trans True if text transformations are to be applied
-   *  @param resolution The resolution value (logical pixel size per physical unit pixel)
-   *  @param vp_trans The effective micron-to-pixel transformation
-   */
-  TextInfo (double default_text_size, const db::Font &default_font, bool apply_text_trans, double resolution);
-
-  /**
    *  @brief Gets the visual bounding box of the given DText object
    *
    *  The visual bounding box is returned in micrometer units.
@@ -71,12 +60,23 @@ public:
    *  @param vp_trans The effective micron-to-pixel transformation
    */
   db::DBox bbox (const db::DText &text, const db::DCplxTrans &vp_trans) const;
+
+  /**
+   *  @brief Gets a value indicating whether the text info uses point mode
+   *
+   *  In point mode, a text is considered a point-like object.
+   */
+  bool point_mode () const
+  {
+    return m_point_mode;
+  }
   
 private:
   double m_default_text_size;
   db::Font m_default_font;
   bool m_apply_text_trans;
   double m_resolution;
+  bool m_point_mode;
 };
 
 }

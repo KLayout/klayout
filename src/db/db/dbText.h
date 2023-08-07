@@ -276,7 +276,7 @@ inline void mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int
  */
 
 template <class C>
-class DB_PUBLIC_TEMPLATE text
+class DB_PUBLIC text
 {
 public:
   typedef C coord_type;
@@ -757,10 +757,7 @@ public:
   /**
    *  @brief String conversion
    */
-  std::string to_string (double dbu = 0.0) const
-  {
-    return std::string ("(") + tl::to_quoted_string (string ()) + "," + m_trans.to_string (dbu) + ")";
-  }
+  std::string to_string (double dbu = 0.0) const;
 
   /**
    *  @brief Reduce the text

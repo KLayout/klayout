@@ -1167,7 +1167,7 @@ TEST(5)
   EXPECT_EQ (r.text (),  
     "layout_diff: texts differ for layer 17/0 in cell c2x\n"
     "Not in b but in a:\n"
-    "  ('X',r90 2,3)\n"
+    "  ('X',r90 2,3) s=17\n"
     "Not in a but in b:\n"
   );
 
@@ -1198,10 +1198,10 @@ TEST(5)
     "layout_diff: texts differ for layer 17/0 in cell c2x\n"
     "Not in b but in a:\n"
     "Not in a but in b:\n"
-    "  ('X',r90 2,3)\n"
-    "  ('Y',r90 2,3)\n"
-    "  ('X',r90 3,4)\n"
-    "  ('X',r180 2,3)\n"
+    "  ('X',r90 2,3) s=18\n"
+    "  ('Y',r90 2,3) s=17\n"
+    "  ('X',r90 3,4) s=17\n"
+    "  ('X',r180 2,3) s=17\n"
   );
 
   //  two more to match more of h:
@@ -1216,8 +1216,8 @@ TEST(5)
     "layout_diff: texts differ for layer 17/0 in cell c2x\n"
     "Not in b but in a:\n"
     "Not in a but in b:\n"
-    "  ('Y',r90 2,3)\n"
-    "  ('X',r180 2,3)\n"
+    "  ('Y',r90 2,3) s=17\n"
+    "  ('X',r180 2,3) s=17\n"
   );
 }
 

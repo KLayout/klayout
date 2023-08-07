@@ -33,16 +33,8 @@ TextInfo::TextInfo (const LayoutViewBase *view)
   : m_default_text_size (view->default_text_size ()),
     m_default_font (db::Font (view->text_font ())),
     m_apply_text_trans (view->apply_text_trans ()),
-    m_resolution (view->canvas ()->resolution ())
-{
-  //  .. nothing yet ..
-}
-
-TextInfo::TextInfo (double default_text_size, const db::Font &default_font, bool apply_text_trans, double resolution)
-  : m_default_text_size (default_text_size),
-    m_default_font (default_font),
-    m_apply_text_trans (apply_text_trans),
-    m_resolution (resolution)
+    m_resolution (view->canvas ()->resolution ()),
+    m_point_mode (view->text_point_mode ())
 {
   //  .. nothing yet ..
 }
@@ -50,6 +42,10 @@ TextInfo::TextInfo (double default_text_size, const db::Font &default_font, bool
 db::DBox
 TextInfo::bbox (const db::DText &text, const db::DCplxTrans &vp_trans) const
 {
+  if (m_point_mode) {
+    return text.box ();
+  }
+
   //  offset in pixels (space between origin and text)
   const double offset = 2.0 / vp_trans.mag ();
 

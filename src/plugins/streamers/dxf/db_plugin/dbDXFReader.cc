@@ -1805,7 +1805,10 @@ DXFReader::read_entities (db::Layout &layout, db::Cell &cell, const db::DVector 
             std::list<db::DPoint>::const_iterator ii = i;
             ++ii;
             while (ii != new_points.end ()) {
-              edges.push_back (safe_from_double (db::DEdge (tt.trans (*i), tt.trans (*ii))));
+              db::Edge edge = safe_from_double (db::DEdge (tt.trans (*i), tt.trans (*ii)));
+              if (! edge.is_degenerate ()) {
+                edges.push_back (edge);
+              }
               ++i;
               ++ii;
             }

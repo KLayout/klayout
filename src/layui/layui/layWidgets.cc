@@ -1090,7 +1090,7 @@ MarginWidget::MarginWidget (QWidget *parent, const char *name)
   setFrameStyle (QFrame::NoFrame);
 
   QHBoxLayout *layout = new QHBoxLayout (this);
-  layout->setMargin (0);
+  layout->setContentsMargins (0, 0, 0, 0);
 
   QLineEdit *le = new QLineEdit (this);
   mp_abs_edit = le;

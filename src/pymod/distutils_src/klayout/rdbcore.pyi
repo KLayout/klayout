@@ -176,7 +176,7 @@ class RdbCategory:
     def scan_layer(self, layout: db.Layout, layer: int, cell: Optional[db.Cell] = ..., levels: Optional[int] = ..., with_properties: Optional[bool] = ...) -> None:
         r"""
         @brief Scans a layer from a layout into this category, starting with a given cell and a depth specification
-        Creates RDB items for each polygon or edge shape read from the cell and it's children in the layout on the given layer and puts them into this category.
+        Creates RDB items for each polygon or edge shape read from the cell and its children in the layout on the given layer and puts them into this category.
         New cells will be generated when required.
         "levels" is the number of hierarchy levels to take the child cells from. 0 means to use only "cell" and don't descend, -1 means "all levels".
         Other settings like database unit, description, top cell etc. are not made in the RDB.
@@ -299,7 +299,7 @@ class RdbCell:
     def name(self) -> str:
         r"""
         @brief Gets the cell name
-        The cell name is an string that identifies the category in the database. Additionally, a cell may carry a variant identifier which is a string that uniquely identifies a cell in the context of it's variants. The "qualified name" contains both the cell name and the variant name. Cell names are also used to identify report database cell's with layout cells. @return The cell name
+        The cell name is an string that identifies the category in the database. Additionally, a cell may carry a variant identifier which is a string that uniquely identifies a cell in the context of its variants. The "qualified name" contains both the cell name and the variant name. Cell names are also used to identify report database cell's with layout cells. @return The cell name
         """
     def num_items(self) -> int:
         r"""
@@ -995,7 +995,7 @@ class ReportDatabase:
     r"""
     Getter:
     @brief Gets the databases description
-    The description is a general purpose string that is supposed to further describe the database and it's content in a human-readable form.
+    The description is a general purpose string that is supposed to further describe the database and its content in a human-readable form.
     @return The description string
 
     Setter:

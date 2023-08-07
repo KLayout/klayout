@@ -1826,9 +1826,9 @@ class CellView:
     is addressed by an cell_index or a cell object reference.
     The layout pointer can be nil, indicating that the cell view is invalid.
 
-    The cell is not only identified by it's index or object but also 
+    The cell is not only identified by its index or object but also 
     by the path leading to that cell. This path indicates how to find the
-    cell in the hierarchical context of it's parent cells. 
+    cell in the hierarchical context of its parent cells. 
 
     The path is in fact composed of two parts: first in an unspecific fashion,
     just describing which parent cells are used. The target of this path
@@ -1874,7 +1874,7 @@ class CellView:
 
     This method will construct any path to this cell, not a 
     particular one. It will clear the context path
-    and update the context and target cell. Note that the cell is specified by it's index.
+    and update the context and target cell. Note that the cell is specified by its index.
     """
     cell_name: str
     r"""
@@ -2148,7 +2148,7 @@ class CellView:
 
         This method will construct any path to this cell, not a 
         particular one. It will clear the context path
-        and update the context and target cell. Note that the cell is specified by it's index.
+        and update the context and target cell. Note that the cell is specified by its index.
         """
     def set_cell_name(self, cell_name: str) -> None:
         r"""
@@ -2698,24 +2698,26 @@ class Image(BasicImage):
         """
     @overload
     @classmethod
-    def new(cls, filename: str) -> Image:
+    def new(cls, filename: str, trans: Optional[db.DCplxTrans] = ...) -> Image:
         r"""
-        @brief Constructor from a image file 
-
-        This constructor creates an image object from a file (which can have any format supported by Qt) and 
-        a unit transformation. The image will originally be put to position 0,0 (lower left corner) and each pixel
-        will have a size of 1 (micron). 
-
-        @param filename The path to the image file to load.
-        """
-    @overload
-    @classmethod
-    def new(cls, filename: str, trans: db.DCplxTrans) -> Image:
-        r"""
-        @brief Constructor from a image file 
+        @brief Constructor from a image file
 
         This constructor creates an image object from a file (which can have any format supported by Qt) and 
         a transformation. The image will originally be put to position 0,0 (lower left corner) and each pixel
+        will have a size of 1. The transformation describes how to transform this image into micron space.
+
+        @param filename The path to the image file to load.
+        @param trans The transformation to apply to the image when displaying it.
+        """
+    @overload
+    @classmethod
+    def new(cls, pixels: PixelBuffer, trans: Optional[db.DCplxTrans] = ...) -> Image:
+        r"""
+        @brief Constructor from a image pixel buffer
+
+        This constructor creates an image object from a pixel buffer object. This object holds RGB or mono image data similar to QImage, except it is available also when Qt is not available (e.g. inside the Python module).
+
+        The image will originally be put to position 0,0 (lower left corner) and each pixel
         will have a size of 1. The transformation describes how to transform this image into micron space.
 
         @param filename The path to the image file to load.
@@ -2812,23 +2814,25 @@ class Image(BasicImage):
         Use the \read_file or \set_data methods to set image properties and pixel values.
         """
     @overload
-    def __init__(self, filename: str) -> None:
+    def __init__(self, filename: str, trans: Optional[db.DCplxTrans] = ...) -> None:
         r"""
-        @brief Constructor from a image file 
-
-        This constructor creates an image object from a file (which can have any format supported by Qt) and 
-        a unit transformation. The image will originally be put to position 0,0 (lower left corner) and each pixel
-        will have a size of 1 (micron). 
-
-        @param filename The path to the image file to load.
-        """
-    @overload
-    def __init__(self, filename: str, trans: db.DCplxTrans) -> None:
-        r"""
-        @brief Constructor from a image file 
+        @brief Constructor from a image file
 
         This constructor creates an image object from a file (which can have any format supported by Qt) and 
         a transformation. The image will originally be put to position 0,0 (lower left corner) and each pixel
+        will have a size of 1. The transformation describes how to transform this image into micron space.
+
+        @param filename The path to the image file to load.
+        @param trans The transformation to apply to the image when displaying it.
+        """
+    @overload
+    def __init__(self, pixels: PixelBuffer, trans: Optional[db.DCplxTrans] = ...) -> None:
+        r"""
+        @brief Constructor from a image pixel buffer
+
+        This constructor creates an image object from a pixel buffer object. This object holds RGB or mono image data similar to QImage, except it is available also when Qt is not available (e.g. inside the Python module).
+
+        The image will originally be put to position 0,0 (lower left corner) and each pixel
         will have a size of 1. The transformation describes how to transform this image into micron space.
 
         @param filename The path to the image file to load.
@@ -4453,7 +4457,7 @@ class LayerPropertiesIterator:
         @brief Returns the index of the child within the parent
 
         This method returns the index of that the properties node the iterator points to in the list
-        of children of it's parent. If the element does not have a parent, the 
+        of children of its parent. If the element does not have a parent, the 
         index of the element in the global list is returned.
         """
     def create(self) -> None:
@@ -4702,7 +4706,7 @@ class LayerPropertiesNode(LayerProperties):
         Each layer properties node object has a unique ID that is created 
         when a new LayerPropertiesNode object is instantiated. The ID is
         copied when the object is copied. The ID can be used to identify the
-        object irregardless of it's content.
+        object irregardless of its content.
         """
     def is_expanded(self) -> bool:
         r"""
@@ -5381,7 +5385,7 @@ class LayoutViewBase:
 
     If a file is loaded, this event is triggered.
     When this event is triggered, the file was already loaded and the new file is the new active cellview.
-    Despite it's name, this event is also triggered if a layout object is loaded into the view.
+    Despite its name, this event is also triggered if a layout object is loaded into the view.
 
     Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods (add_file_open_observer/remove_file_open_observer) have been removed in 0.25.
 
@@ -5390,7 +5394,7 @@ class LayoutViewBase:
 
     If a file is loaded, this event is triggered.
     When this event is triggered, the file was already loaded and the new file is the new active cellview.
-    Despite it's name, this event is also triggered if a layout object is loaded into the view.
+    Despite its name, this event is also triggered if a layout object is loaded into the view.
 
     Before version 0.25 this event was based on the observer pattern obsolete now. The corresponding methods (add_file_open_observer/remove_file_open_observer) have been removed in 0.25.
     """
@@ -5446,7 +5450,7 @@ class LayoutViewBase:
     Getter:
     @brief An event indicating that the layer list has changed
 
-    This event is triggered after the layer list has changed it's configuration.
+    This event is triggered after the layer list has changed its configuration.
     The integer argument gives a hint about the nature of the changed:
     Bit 0 is set, if the properties (visibility, color etc.) of one or more layers have changed. Bit 1 is
     set if the hierarchy has changed. Bit 2 is set, if layer names have changed.
@@ -5455,7 +5459,7 @@ class LayoutViewBase:
     Setter:
     @brief An event indicating that the layer list has changed
 
-    This event is triggered after the layer list has changed it's configuration.
+    This event is triggered after the layer list has changed its configuration.
     The integer argument gives a hint about the nature of the changed:
     Bit 0 is set, if the properties (visibility, color etc.) of one or more layers have changed. Bit 1 is
     set if the hierarchy has changed. Bit 2 is set, if layer names have changed.
@@ -6067,7 +6071,7 @@ class LayoutViewBase:
         r"""
         @brief Hierarchically iterates over the layers in the given layer list
 
-        This version of this method allows specification of the layer list to be iterated over. The layer list is specified by it's index which is a value between 0 and \num_layer_lists-1.For details see the parameter-less version of this method.
+        This version of this method allows specification of the layer list to be iterated over. The layer list is specified by its index which is a value between 0 and \num_layer_lists-1.For details see the parameter-less version of this method.
 
         This method was introduced in version 0.25.
         """
@@ -7200,12 +7204,12 @@ class Macro:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -7230,12 +7234,12 @@ class Macro:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -8926,7 +8930,7 @@ class Plugin:
     r"""
     @brief The plugin object
 
-    This class provides the actual plugin implementation. Each view gets it's own instance of the plugin class. The plugin factory \PluginFactory class must be specialized to provide a factory for new objects of the Plugin class. See the documentation there for details about the plugin mechanism and the basic concepts.
+    This class provides the actual plugin implementation. Each view gets its own instance of the plugin class. The plugin factory \PluginFactory class must be specialized to provide a factory for new objects of the Plugin class. See the documentation there for details about the plugin mechanism and the basic concepts.
 
     This class has been introduced in version 0.22.
     """

@@ -1042,7 +1042,7 @@ class Cell:
         If necessary, this method creates a new variant and replaces the given instance
         by an instance of this variant.
 
-        The parameters are given in the order the parameters are declared. Use \pcell_declaration on the instance to get the PCell declaration object of the cell. That PCellDeclaration object delivers the parameter declaration with it's 'get_parameters' method.
+        The parameters are given in the order the parameters are declared. Use \pcell_declaration on the instance to get the PCell declaration object of the cell. That PCellDeclaration object delivers the parameter declaration with its 'get_parameters' method.
         Each parameter in the variant list passed to the second list of values corresponds to one parameter declaration.
 
         There is a more convenient method (\change_pcell_parameter) that changes a single parameter by name.
@@ -2318,7 +2318,7 @@ class Cell:
         @brief Transforms the instance into a new coordinate system with the given transformation
         @return A reference (an \Instance object) to the new instance
 
-        In contrast to the \transform method, this method allows propagation of the transformation into child cells. More precisely: it applies just a part of the given transformation to the instance, such that when transforming the cell instantiated and it's shapes with the same transformation, the result will reflect the desired transformation. Mathematically spoken, the transformation of the instance (A) is transformed with the given transformation T using "A' = T * A * Tinv" where Tinv is the inverse of T. In effect, the transformation T commutes with the new instance transformation A' and can be applied to child cells as well. This method is therefore useful to transform a hierarchy of cells.
+        In contrast to the \transform method, this method allows propagation of the transformation into child cells. More precisely: it applies just a part of the given transformation to the instance, such that when transforming the cell instantiated and its shapes with the same transformation, the result will reflect the desired transformation. Mathematically spoken, the transformation of the instance (A) is transformed with the given transformation T using "A' = T * A * Tinv" where Tinv is the inverse of T. In effect, the transformation T commutes with the new instance transformation A' and can be applied to child cells as well. This method is therefore useful to transform a hierarchy of cells.
 
         This method has been introduced in version 0.23.
         The original instance may be deleted and re-inserted by this method. Therefore, a new reference is returned.
@@ -2361,7 +2361,7 @@ class Cell:
     def write(self, file_name: str) -> None:
         r"""
         @brief Writes the cell to a layout file
-        The format of the file will be determined from the file name. Only the cell and it's subtree below will be saved.
+        The format of the file will be determined from the file name. Only the cell and its subtree below will be saved.
 
         This method has been introduced in version 0.23.
         """
@@ -2369,7 +2369,7 @@ class Cell:
     def write(self, file_name: str, options: SaveLayoutOptions) -> None:
         r"""
         @brief Writes the cell to a layout file
-        The format of the file will be determined from the file name. Only the cell and it's subtree below will be saved.
+        The format of the file will be determined from the file name. Only the cell and its subtree below will be saved.
         In contrast to the other 'write' method, this version allows one to specify save options, i.e. scaling etc.
 
         This method has been introduced in version 0.23.
@@ -3053,7 +3053,7 @@ class CellMapping:
     r"""
     @brief A constant indicating the request to drop a cell
 
-    If used as a pseudo-target for the cell mapping, this index indicates that the cell shall be dropped rather than created on the target side or skipped by flattening. Instead, all shapes of this cell are discarded and it's children are not translated unless explicitly requested or if required are children for other cells.
+    If used as a pseudo-target for the cell mapping, this index indicates that the cell shall be dropped rather than created on the target side or skipped by flattening. Instead, all shapes of this cell are discarded and its children are not translated unless explicitly requested or if required are children for other cells.
 
     This constant has been introduced in version 0.25.
     """
@@ -3684,7 +3684,7 @@ class Circuit(NetlistObject):
     def flatten_subcircuit(self, subcircuit: SubCircuit) -> None:
         r"""
         @brief Flattens a subcircuit
-        This method will substitute the given subcircuit by it's contents. The subcircuit is removed after this.
+        This method will substitute the given subcircuit by its contents. The subcircuit is removed after this.
         """
     def has_refs(self) -> bool:
         r"""
@@ -3926,12 +3926,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -4012,12 +4012,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -4200,12 +4200,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -4290,12 +4290,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -4320,12 +4320,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -4452,7 +4452,7 @@ class CompoundRegionOperationNode:
     @classmethod
     def new_edges(cls, input: CompoundRegionOperationNode) -> CompoundRegionOperationNode:
         r"""
-        @brief Creates a node converting polygons into it's edges.
+        @brief Creates a node converting polygons into its edges.
         """
     @classmethod
     def new_empty(cls, type: CompoundRegionOperationNode.ResultType) -> CompoundRegionOperationNode:
@@ -5668,7 +5668,7 @@ class CplxTrans:
         r"""
         @brief Inverts the transformation (in place)
 
-        Inverts the transformation and replaces this transformation by it's
+        Inverts the transformation and replaces this transformation by its
         inverted one.
 
         @return The inverted transformation
@@ -7825,7 +7825,7 @@ class DCplxTrans:
         r"""
         @brief Inverts the transformation (in place)
 
-        Inverts the transformation and replaces this transformation by it's
+        Inverts the transformation and replaces this transformation by its
         inverted one.
 
         @return The inverted transformation
@@ -10293,7 +10293,7 @@ class DPolygon:
         r"""
         @brief Returns true, if the polygon is a simple box.
 
-        A polygon is a box if it is identical to it's bounding box.
+        A polygon is a box if it is identical to its bounding box.
 
         @return True if the polygon is a box.
 
@@ -10962,7 +10962,7 @@ class DSimplePolygon:
         r"""
         @brief Returns a value indicating whether the polygon is a simple box.
 
-        A polygon is a box if it is identical to it's bounding box.
+        A polygon is a box if it is identical to its bounding box.
 
         @return True if the polygon is a box.
 
@@ -11308,8 +11308,7 @@ class DText:
     Setter:
     @brief Sets the vertical alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     x: float
     r"""
@@ -21157,7 +21156,7 @@ class GenericDeviceExtractor(DeviceExtractorBase):
         r"""
         @brief Defines a layer with a fallback layer.
         @return The layer descriptor object created for this layer (use 'index' to get the layer's index)
-        As \define_layer, this method allows specification of device extraction layer. In addition to \define_layout, it features a fallback layer. If in the device extraction statement, the primary layer is not given, the fallback layer will be used. Hence, this layer is optional. The fallback layer is given by it's index and must be defined before the layer using the fallback layer is defined. For the index, 0 is the first layer defined, 1 the second and so forth.
+        As \define_layer, this method allows specification of device extraction layer. In addition to \define_layout, it features a fallback layer. If in the device extraction statement, the primary layer is not given, the fallback layer will be used. Hence, this layer is optional. The fallback layer is given by its index and must be defined before the layer using the fallback layer is defined. For the index, 0 is the first layer defined, 1 the second and so forth.
         """
     @overload
     def define_terminal(self, device: Device, terminal_id: int, layer_index: int, point: Point) -> None:
@@ -21321,7 +21320,7 @@ class GenericDeviceParameterCompare(EqualDeviceParameters):
 class GenericNetlistCompareLogger(NetlistCompareLogger):
     r"""
     @brief An event receiver for the netlist compare feature.
-    The \NetlistComparer class will send compare events to a logger derived from this class. Use this class to implement your own logger class. You can override on of it's methods to receive certain kind of events.
+    The \NetlistComparer class will send compare events to a logger derived from this class. Use this class to implement your own logger class. You can override on of its methods to receive certain kind of events.
     This class has been introduced in version 0.26.
     """
     class Severity:
@@ -21529,12 +21528,12 @@ class HAlign:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -22362,7 +22361,7 @@ class ICplxTrans:
         r"""
         @brief Inverts the transformation (in place)
 
-        Inverts the transformation and replaces this transformation by it's
+        Inverts the transformation and replaces this transformation by its
         inverted one.
 
         @return The inverted transformation
@@ -23551,11 +23550,11 @@ class Instance:
 
     Starting with version 0.25 the displacement is of vector type.
     Setter:
-    @brief Sets the displacement vector for the 'a' axis
+    @brief Sets the displacement vector for the 'a' axis in micrometer units
 
-    If the instance was not an array instance before it is made one.
+    Like \a= with an integer displacement, this method will set the displacement vector but it accepts a vector in micrometer units that is of \DVector type. The vector will be translated to database units internally.
 
-    This method has been introduced in version 0.23. Starting with version 0.25 the displacement is of vector type.
+    This method has been introduced in version 0.25.
     """
     b: Vector
     r"""
@@ -23860,14 +23859,14 @@ class Instance:
         r"""
         @brief Gets the bounding box of the instance for a given layer
         @param layer_index The index of the layer the bounding box will be computed for.
-        The bounding box incorporates all instances that the array represents. It gives the overall extension of the child cell as seen in the calling cell (or all array members if the instance forms an array) for the given layer. If the layer is empty in this cell and all it's children', an empty bounding box will be returned. 
+        The bounding box incorporates all instances that the array represents. It gives the overall extension of the child cell as seen in the calling cell (or all array members if the instance forms an array) for the given layer. If the layer is empty in this cell and all its children', an empty bounding box will be returned. 
         This method has been introduced in version 0.25. 'bbox' is the preferred synonym for it since version 0.28.
         """
     def bbox_per_layer(self, layer_index: int) -> Box:
         r"""
         @brief Gets the bounding box of the instance for a given layer
         @param layer_index The index of the layer the bounding box will be computed for.
-        The bounding box incorporates all instances that the array represents. It gives the overall extension of the child cell as seen in the calling cell (or all array members if the instance forms an array) for the given layer. If the layer is empty in this cell and all it's children', an empty bounding box will be returned. 
+        The bounding box incorporates all instances that the array represents. It gives the overall extension of the child cell as seen in the calling cell (or all array members if the instance forms an array) for the given layer. If the layer is empty in this cell and all its children', an empty bounding box will be returned. 
         This method has been introduced in version 0.25. 'bbox' is the preferred synonym for it since version 0.28.
         """
     def change_pcell_parameter(self, name: str, value: Any) -> None:
@@ -24040,14 +24039,14 @@ class Instance:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This const version of the method has been introduced in version 0.25.
+        This method has been introduced in version 0.22.
         """
     @overload
     def layout(self) -> Layout:
         r"""
         @brief Gets the layout this instance is contained in
 
-        This method has been introduced in version 0.22.
+        This const version of the method has been introduced in version 0.25.
         """
     def pcell_declaration(self) -> PCellDeclaration_Native:
         r"""
@@ -25461,10 +25460,26 @@ class LayerInfo:
         @brief Equivalence of two layer info objects
         @return True, if both are equivalent
 
-        First, layer and datatype are compared. The name is of second order and used only if no layer or datatype is given.
-        This is basically a weak comparison that reflects the search preferences.
+        First, layer and datatype are compared. The name is of second order and used only if no layer or datatype is given for one of the operands.
+        This is basically a weak comparison that reflects the search preferences. It is the basis for \Layout#find_layer.
+        Here are some examples:
 
-        This method was added in version 0.18.
+        @code
+        # no match as layer/datatypes or names differ:
+        RBA::LayerInfo::new(1, 17).is_equivalent?(RBA::LayerInfo::new(1, 18)) -> false
+        RBA::LayerInfo::new('metal1').is_equivalent?(RBA::LayerInfo::new('m1')) -> false
+        # exact match for numbered or named layers:
+        RBA::LayerInfo::new(1, 17).is_equivalent?(RBA::LayerInfo::new(1, 17)) -> true
+        RBA::LayerInfo::new('metal1').is_equivalent?(RBA::LayerInfo::new('metal1')) -> true
+        # match as names are second priority over layer/datatypes:
+        RBA::LayerInfo::new(1, 17, 'metal1').is_equivalent?(RBA::LayerInfo::new(1, 17, 'm1')) -> true
+        # match as name matching is fallback:
+        RBA::LayerInfo::new(1, 17, 'metal1').is_equivalent?(RBA::LayerInfo::new('metal1')) -> true
+        # no match as neither names or layer/datatypes match:
+        RBA::LayerInfo::new(1, 17, 'metal1').is_equivalent?(RBA::LayerInfo::new('m1')) -> false
+        @/code
+
+        This method was added in version 0.18 and modified to compare non-named vs. named layers in version 0.28.11.
         """
     def is_named(self) -> bool:
         r"""
@@ -26867,7 +26882,18 @@ class Layout:
 
         If a layer with the given properties already exists, this method will return the index of that layer.If no such layer exists, it will return nil.
 
-        This method has been introduced in version 0.23.
+        In contrast to \layer, this method will also find layers matching by name only. For example:
+
+        @code
+        # finds layer '17/0' and 'name (17/0)':
+        index = layout.find_layer(RBA::LayerInfo::new(17, 0))
+        # finds layer 'name' (first priority), but also 'name (17/0)' (second priority):
+        index = layout.find_layer(RBA::LayerInfo::new('name'))
+        # note that this will not match layer 'name (17/0)' and create a new name-only layer:
+        index = layout.layer(RBA::LayerInfo::new('name'))
+        @/code
+
+        This method has been introduced in version 0.23 and has been extended to name queries in version 0.28.11.
         """
     @overload
     def find_layer(self, layer: int, datatype: int) -> Any:
@@ -26894,7 +26920,16 @@ class Layout:
 
         If a layer with the given name already exists, this method will return the index of that layer.If no such layer exists, it will return nil.
 
-        This method has been introduced in version 0.23.
+        In contrast to \layer, this method will also find numbered layers if the name matches. For example:
+
+        @code
+        # finds layer 'name' (first priority), but also 'name (17/0)' (second priority):
+        index = layout.find_layer('name')
+        # note that this will not match layer 'name (17/0)' and create a new name-only layer:
+        index = layout.layer('name')
+        @/code
+
+        This method has been introduced in version 0.23 and has been extended to name queries in version 0.28.11.
         """
     def flatten(self, cell_index: int, levels: int, prune: bool) -> None:
         r"""
@@ -26952,7 +26987,7 @@ class Layout:
         r"""
         @brief Inserts an edge pair collection into the given cell and layer
         If the edge pair collection is (conceptionally) flat, it will be inserted into the cell's shapes list as a flat sequence of edge pairs.
-        If the edge pair collection is deep (hierarchical), it will create a subhierarchy below the given cell and it's edge pairs will be put into the respective cells. Suitable subcells will be picked for inserting the edge pairs. If a hierarchy already exists below the given cell, the algorithm will try to reuse this hierarchy.
+        If the edge pair collection is deep (hierarchical), it will create a subhierarchy below the given cell and its edge pairs will be put into the respective cells. Suitable subcells will be picked for inserting the edge pairs. If a hierarchy already exists below the given cell, the algorithm will try to reuse this hierarchy.
 
         This method has been introduced in version 0.27.
         """
@@ -26961,7 +26996,7 @@ class Layout:
         r"""
         @brief Inserts an edge collection into the given cell and layer
         If the edge collection is (conceptionally) flat, it will be inserted into the cell's shapes list as a flat sequence of edges.
-        If the edge collection is deep (hierarchical), it will create a subhierarchy below the given cell and it's edges will be put into the respective cells. Suitable subcells will be picked for inserting the edges. If a hierarchy already exists below the given cell, the algorithm will try to reuse this hierarchy.
+        If the edge collection is deep (hierarchical), it will create a subhierarchy below the given cell and its edges will be put into the respective cells. Suitable subcells will be picked for inserting the edges. If a hierarchy already exists below the given cell, the algorithm will try to reuse this hierarchy.
 
         This method has been introduced in version 0.26.
         """
@@ -26970,7 +27005,7 @@ class Layout:
         r"""
         @brief Inserts a region into the given cell and layer
         If the region is (conceptionally) a flat region, it will be inserted into the cell's shapes list as a flat sequence of polygons.
-        If the region is a deep (hierarchical) region, it will create a subhierarchy below the given cell and it's shapes will be put into the respective cells. Suitable subcells will be picked for inserting the shapes. If a hierarchy already exists below the given cell, the algorithm will try to reuse this hierarchy.
+        If the region is a deep (hierarchical) region, it will create a subhierarchy below the given cell and its shapes will be put into the respective cells. Suitable subcells will be picked for inserting the shapes. If a hierarchy already exists below the given cell, the algorithm will try to reuse this hierarchy.
 
         This method has been introduced in version 0.26.
         """
@@ -26979,7 +27014,7 @@ class Layout:
         r"""
         @brief Inserts an text collection into the given cell and layer
         If the text collection is (conceptionally) flat, it will be inserted into the cell's shapes list as a flat sequence of texts.
-        If the text collection is deep (hierarchical), it will create a subhierarchy below the given cell and it's texts will be put into the respective cells. Suitable subcells will be picked for inserting the texts. If a hierarchy already exists below the given cell, the algorithm will try to reuse this hierarchy.
+        If the text collection is deep (hierarchical), it will create a subhierarchy below the given cell and its texts will be put into the respective cells. Suitable subcells will be picked for inserting the texts. If a hierarchy already exists below the given cell, the algorithm will try to reuse this hierarchy.
 
         This method has been introduced in version 0.27.
         """
@@ -28663,7 +28698,7 @@ class LayoutToNetlist:
     @li Preparation
         In this step, the device recognition and extraction layers are drawn from
         the framework. Derived can now be computed using boolean operations.
-        Methods to use in this step are \make_layer and it's variants.
+        Methods to use in this step are \make_layer and its variants.
         Layer preparation is not necessarily required to happen before all
         other steps. Layers can be computed shortly before they are required.
     @/li
@@ -28674,7 +28709,7 @@ class LayoutToNetlist:
         may be specified here. Layer preparation may happen between calls to \extract_devices.
     @/li
     @li Once the devices are derived, the netlist connectivity can be defined and the
-        netlist extracted. The connectivity is defined with \connect and it's
+        netlist extracted. The connectivity is defined with \connect and its
         flavours. The actual netlist extraction happens with \extract_netlist.
     @/li
     @li After netlist extraction, the information is ready to be retrieved.
@@ -28721,12 +28756,12 @@ class LayoutToNetlist:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -28751,12 +28786,12 @@ class LayoutToNetlist:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -29207,7 +29242,7 @@ class LayoutToNetlist:
     def connect(self, l: Region) -> None:
         r"""
         @brief Defines an intra-layer connection for the given layer.
-        The layer is either an original layer created with \make_includelayer and it's variants or
+        The layer is either an original layer created with \make_includelayer and its variants or
         a derived layer. Certain limitations apply. It's safe to use
         boolean operations for deriving layers. Other operations are applicable as long as they are
         capable of delivering hierarchical layers.
@@ -29273,7 +29308,7 @@ class LayoutToNetlist:
         @brief Extracts devices
         See the class description for more details.
         This method will run device extraction for the given extractor. The layer map is specific
-        for the extractor and uses the region objects derived with \make_layer and it's variants.
+        for the extractor and uses the region objects derived with \make_layer and its variants.
 
         In addition, derived regions can be passed too. Certain limitations apply. It's safe to use
         boolean operations for deriving layers. Other operations are applicable as long as they are
@@ -30008,12 +30043,12 @@ class LoadLayoutOptions:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -30038,12 +30073,12 @@ class LoadLayoutOptions:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -30291,12 +30326,12 @@ class LoadLayoutOptions:
     dxf_keep_other_cells: bool
     r"""
     Getter:
-    @brief If this option is true, all cells are kept, not only the top cell and it's children
+    @brief If this option is true, all cells are kept, not only the top cell and its children
 
     This property has been added in version 0.21.15.
 
     Setter:
-    @brief If this option is set to true, all cells are kept, not only the top cell and it's children
+    @brief If this option is set to true, all cells are kept, not only the top cell and its children
 
     This property has been added in version 0.21.15.
     """
@@ -32567,14 +32602,14 @@ class NetPinRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this pin reference is attached to.
         """
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to.
+        @brief Gets the net this pin reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
     def pin(self) -> Pin:
         r"""
@@ -33595,16 +33630,16 @@ class Netlist:
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index.
-        If the cell index is not valid or no circuit is registered with this index, nil is returned.
-        """
-    @overload
-    def circuit_by_cell_index(self, cell_index: int) -> Circuit:
-        r"""
         @brief Gets the circuit object for a given cell index (const version).
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
 
         This constness variant has been introduced in version 0.26.8.
+        """
+    @overload
+    def circuit_by_cell_index(self, cell_index: int) -> Circuit:
+        r"""
+        @brief Gets the circuit object for a given cell index.
+        If the cell index is not valid or no circuit is registered with this index, nil is returned.
         """
     @overload
     def circuit_by_name(self, name: str) -> Circuit:
@@ -33739,7 +33774,7 @@ class Netlist:
     def flatten_circuit(self, circuit: Circuit) -> None:
         r"""
         @brief Flattens a subcircuit
-        This method will substitute all instances (subcircuits) of the given circuit by it's contents. After this, the circuit is removed.
+        This method will substitute all instances (subcircuits) of the given circuit by its contents. After this, the circuit is removed.
         """
     @overload
     def flatten_circuit(self, pattern: str) -> None:
@@ -36278,12 +36313,12 @@ class PCellParameterState:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -38340,7 +38375,7 @@ class Polygon:
         r"""
         @brief Returns true, if the polygon is a simple box.
 
-        A polygon is a box if it is identical to it's bounding box.
+        A polygon is a box if it is identical to its bounding box.
 
         @return True if the polygon is a box.
 
@@ -38900,12 +38935,12 @@ class PreferredOrientation:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -39085,12 +39120,12 @@ class PropertyConstraint:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -39115,12 +39150,12 @@ class PropertyConstraint:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -40583,12 +40618,12 @@ class Region(ShapeCollection):
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -40689,12 +40724,12 @@ class Region(ShapeCollection):
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -44262,11 +44297,10 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a box.
     Setter:
-    @brief Replaces the shape by the given box
-    This method replaces the shape by the given box. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given box (in micrometer units)
+    This method replaces the shape by the given box, like \box= with a \Box argument does. This version translates the box from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     box_center: Point
     r"""
@@ -44572,10 +44606,11 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent an edge.
     Setter:
-    @brief Replaces the shape by the given edge (in micrometer units)
-    This method replaces the shape by the given edge, like \edge= with a \Edge argument does. This version translates the edge from micrometer units to database units internally.
+    @brief Replaces the shape by the given edge
+    This method replaces the shape by the given edge. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     edge_pair: Any
     r"""
@@ -44624,11 +44659,10 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a path.
     Setter:
-    @brief Replaces the shape by the given path object
-    This method replaces the shape by the given path object. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given path (in micrometer units)
+    This method replaces the shape by the given path, like \path= with a \Path argument does. This version translates the path from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     path_bgnext: int
     r"""
@@ -44736,10 +44770,11 @@ class Shape:
     Starting with version 0.23, this method returns nil, if the shape does not represent a geometrical primitive that can be converted to a polygon.
 
     Setter:
-    @brief Replaces the shape by the given polygon (in micrometer units)
-    This method replaces the shape by the given polygon, like \polygon= with a \Polygon argument does. This version translates the polygon from micrometer units to database units internally.
+    @brief Replaces the shape by the given polygon object
+    This method replaces the shape by the given polygon object. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     prop_id: int
     r"""
@@ -47559,7 +47594,7 @@ class SimplePolygon:
         r"""
         @brief Returns a value indicating whether the polygon is a simple box.
 
-        A polygon is a box if it is identical to it's bounding box.
+        A polygon is a box if it is identical to its bounding box.
 
         @return True if the polygon is a box.
 
@@ -48386,7 +48421,7 @@ class Technology:
 class TechnologyComponent:
     r"""
     @brief A part of a technology definition
-    Technology components extend technology definitions (class \Technology) by specialized subfeature definitions. For example, the net tracer supplies it's technology-dependent specification through a technology component called \NetTracerTechnology.
+    Technology components extend technology definitions (class \Technology) by specialized subfeature definitions. For example, the net tracer supplies its technology-dependent specification through a technology component called \NetTracerTechnology.
 
     Components are managed within technologies and can be accessed from a technology using \Technology#component.
 
@@ -48572,8 +48607,7 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     x: int
     r"""
@@ -51451,7 +51485,7 @@ class Utils:
         r"""
         @brief This function computes the Spline curve for a given set of control points (point, weight), degree and knots.
 
-        The knot vector needs to be padded and it's size must fulfill the condition:
+        The knot vector needs to be padded and its size must fulfill the condition:
 
         @code
           knots.size == control_points.size + degree + 1
@@ -51609,12 +51643,12 @@ class VAlign:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -52458,7 +52492,7 @@ class VCplxTrans:
         r"""
         @brief Inverts the transformation (in place)
 
-        Inverts the transformation and replaces this transformation by it's
+        Inverts the transformation and replaces this transformation by its
         inverted one.
 
         @return The inverted transformation

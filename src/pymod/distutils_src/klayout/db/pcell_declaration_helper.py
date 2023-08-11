@@ -1,5 +1,5 @@
 
-from ...dbcore import LayerInfo
+from klayout.db import LayerInfo
 
 class _PCellDeclarationHelperLayerDescriptor(object):
   """

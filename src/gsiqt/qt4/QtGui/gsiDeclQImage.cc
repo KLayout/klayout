@@ -1713,6 +1713,59 @@ class QImage_Adaptor : public QImage, public qt_gsi::QtObjectBase
 {
 public:
 
+  //  NOTE: QImage does not take ownership of the data, so 
+  //  we will provide a buffer to do so. This requires an additional 
+  //  copy, but as GSI is not guaranteeing the lifetime of the 
+  //  data, this is required here.
+  class DataHolder
+  {
+  public:
+
+    DataHolder() : mp_data(0) { }
+    DataHolder(unsigned char *data) : mp_data(data) { }
+
+    ~DataHolder() 
+    { 
+      if (mp_data) {
+        delete[](mp_data); 
+      }
+      mp_data = 0;
+    }
+
+    static unsigned char *alloc(const std::string &data)
+    {
+      unsigned char *ptr = new unsigned char[data.size()];
+      memcpy(ptr, data.c_str(), data.size());
+      return ptr;
+    }
+
+  private:
+    unsigned char *mp_data;
+  };
+
+  static QImage_Adaptor *new_qimage_from_data1(const std::string &data, int width, int height, int bytesPerLine, QImage::Format format) 
+  {
+    return new QImage_Adaptor(DataHolder::alloc(data), width, height, bytesPerLine, format);
+  }
+
+  static QImage_Adaptor *new_qimage_from_data2(const std::string &data, int width, int height, QImage::Format format) 
+  {
+    return new QImage_Adaptor(DataHolder::alloc(data), width, height, format);
+  }
+
+  QImage_Adaptor(unsigned char *data, int width, int height, int bytesPerLine, QImage::Format format)
+    : QImage(data, width, height, bytesPerLine, format), m_holder(data)
+  {
+  }
+
+  QImage_Adaptor(unsigned char *data, int width, int height, QImage::Format format)
+    : QImage (data, width, height, format), m_holder(data)
+  {
+  }
+
+  DataHolder m_holder;
+
+
   virtual ~QImage_Adaptor();
 
   //  [adaptor ctor] QImage::QImage()
@@ -1729,18 +1782,6 @@ public:
 
   //  [adaptor ctor] QImage::QImage(int width, int height, QImage::Format format)
   QImage_Adaptor(int width, int height, QImage::Format format) : QImage(width, height, format)
-  {
-    qt_gsi::QtObjectBase::init (this);
-  }
-
-  //  [adaptor ctor] QImage::QImage(const unsigned char *data, int width, int height, QImage::Format format)
-  QImage_Adaptor(const unsigned char *data, int width, int height, QImage::Format format) : QImage(data, width, height, format)
-  {
-    qt_gsi::QtObjectBase::init (this);
-  }
-
-  //  [adaptor ctor] QImage::QImage(const unsigned char *data, int width, int height, int bytesPerLine, QImage::Format format)
-  QImage_Adaptor(const unsigned char *data, int width, int height, int bytesPerLine, QImage::Format format) : QImage(data, width, height, bytesPerLine, format)
   {
     qt_gsi::QtObjectBase::init (this);
   }
@@ -1858,63 +1899,6 @@ static void _call_ctor_QImage_Adaptor_3051 (const qt_gsi::GenericStaticMethod * 
 }
 
 
-//  Constructor QImage::QImage(const unsigned char *data, int width, int height, QImage::Format format) (adaptor class)
-
-static void _init_ctor_QImage_Adaptor_5679 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("data");
-  decl->add_arg<const unsigned char * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("width");
-  decl->add_arg<int > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("height");
-  decl->add_arg<int > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("format");
-  decl->add_arg<const qt_gsi::Converter<QImage::Format>::target_type & > (argspec_3);
-  decl->set_return_new<QImage_Adaptor> ();
-}
-
-static void _call_ctor_QImage_Adaptor_5679 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const unsigned char *arg1 = gsi::arg_reader<const unsigned char * >() (args, heap);
-  int arg2 = gsi::arg_reader<int >() (args, heap);
-  int arg3 = gsi::arg_reader<int >() (args, heap);
-  const qt_gsi::Converter<QImage::Format>::target_type & arg4 = gsi::arg_reader<const qt_gsi::Converter<QImage::Format>::target_type & >() (args, heap);
-  ret.write<QImage_Adaptor *> (new QImage_Adaptor (arg1, arg2, arg3, qt_gsi::QtToCppAdaptor<QImage::Format>(arg4).cref()));
-}
-
-
-//  Constructor QImage::QImage(const unsigned char *data, int width, int height, int bytesPerLine, QImage::Format format) (adaptor class)
-
-static void _init_ctor_QImage_Adaptor_6338 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("data");
-  decl->add_arg<const unsigned char * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("width");
-  decl->add_arg<int > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("height");
-  decl->add_arg<int > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("bytesPerLine");
-  decl->add_arg<int > (argspec_3);
-  static gsi::ArgSpecBase argspec_4 ("format");
-  decl->add_arg<const qt_gsi::Converter<QImage::Format>::target_type & > (argspec_4);
-  decl->set_return_new<QImage_Adaptor> ();
-}
-
-static void _call_ctor_QImage_Adaptor_6338 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const unsigned char *arg1 = gsi::arg_reader<const unsigned char * >() (args, heap);
-  int arg2 = gsi::arg_reader<int >() (args, heap);
-  int arg3 = gsi::arg_reader<int >() (args, heap);
-  int arg4 = gsi::arg_reader<int >() (args, heap);
-  const qt_gsi::Converter<QImage::Format>::target_type & arg5 = gsi::arg_reader<const qt_gsi::Converter<QImage::Format>::target_type & >() (args, heap);
-  ret.write<QImage_Adaptor *> (new QImage_Adaptor (arg1, arg2, arg3, arg4, qt_gsi::QtToCppAdaptor<QImage::Format>(arg5).cref()));
-}
-
-
 //  Constructor QImage::QImage(const QString &fileName, const char *format) (adaptor class)
 
 static void _init_ctor_QImage_Adaptor_3648 (qt_gsi::GenericStaticMethod *decl)
@@ -2006,8 +1990,6 @@ static gsi::Methods methods_QImage_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QImage::QImage()\nThis method creates an object of class QImage.", &_init_ctor_QImage_Adaptor_0, &_call_ctor_QImage_Adaptor_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QImage::QImage(const QSize &size, QImage::Format format)\nThis method creates an object of class QImage.", &_init_ctor_QImage_Adaptor_3430, &_call_ctor_QImage_Adaptor_3430);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QImage::QImage(int width, int height, QImage::Format format)\nThis method creates an object of class QImage.", &_init_ctor_QImage_Adaptor_3051, &_call_ctor_QImage_Adaptor_3051);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QImage::QImage(const unsigned char *data, int width, int height, QImage::Format format)\nThis method creates an object of class QImage.", &_init_ctor_QImage_Adaptor_5679, &_call_ctor_QImage_Adaptor_5679);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QImage::QImage(const unsigned char *data, int width, int height, int bytesPerLine, QImage::Format format)\nThis method creates an object of class QImage.", &_init_ctor_QImage_Adaptor_6338, &_call_ctor_QImage_Adaptor_6338);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QImage::QImage(const QString &fileName, const char *format)\nThis method creates an object of class QImage.", &_init_ctor_QImage_Adaptor_3648, &_call_ctor_QImage_Adaptor_3648);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QImage::QImage(const QImage &)\nThis method creates an object of class QImage.", &_init_ctor_QImage_Adaptor_1877, &_call_ctor_QImage_Adaptor_1877);
   methods += new qt_gsi::GenericMethod ("*metric", "@brief Virtual method int QImage::metric(QPaintDevice::PaintDeviceMetric metric)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0);
@@ -2018,6 +2000,15 @@ static gsi::Methods methods_QImage_Adaptor () {
 }
 
 gsi::Class<QImage_Adaptor> decl_QImage_Adaptor (qtdecl_QImage (), "QtGui", "QImage",
+  gsi::constructor("new", &QImage_Adaptor::new_qimage_from_data1, gsi::arg ("data"), gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("bytesPerLine"), gsi::arg ("format"),
+    "@brief QImage::QImage(const uchar *data, int width, int height, int bytesPerLine)\n"
+    "The cleanupFunction parameter is available currently."
+  ) +
+  gsi::constructor("new", &QImage_Adaptor::new_qimage_from_data2, gsi::arg ("data"), gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("format"),
+    "@brief QImage::QImage(const uchar *data, int width, int height)\n"
+    "The cleanupFunction parameter is available currently."
+  )
++
   methods_QImage_Adaptor (),
   "@qt\n@brief Binding of QImage");
 

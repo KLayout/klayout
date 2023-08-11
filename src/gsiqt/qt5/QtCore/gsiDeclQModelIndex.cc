@@ -291,6 +291,44 @@ static void _call_f_sibling_c1426 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
+// QModelIndex QModelIndex::siblingAtColumn(int column)
+
+
+static void _init_f_siblingAtColumn_c767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("column");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<QModelIndex > ();
+}
+
+static void _call_f_siblingAtColumn_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ret.write<QModelIndex > ((QModelIndex)((QModelIndex *)cls)->siblingAtColumn (arg1));
+}
+
+
+// QModelIndex QModelIndex::siblingAtRow(int row)
+
+
+static void _init_f_siblingAtRow_c767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("row");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<QModelIndex > ();
+}
+
+static void _call_f_siblingAtRow_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ret.write<QModelIndex > ((QModelIndex)((QModelIndex *)cls)->siblingAtRow (arg1));
+}
+
+
 
 namespace gsi
 {
@@ -312,6 +350,8 @@ static gsi::Methods methods_QModelIndex () {
   methods += new qt_gsi::GenericMethod ("parent", "@brief Method QModelIndex QModelIndex::parent()\n", true, &_init_f_parent_c0, &_call_f_parent_c0);
   methods += new qt_gsi::GenericMethod ("row", "@brief Method int QModelIndex::row()\n", true, &_init_f_row_c0, &_call_f_row_c0);
   methods += new qt_gsi::GenericMethod ("sibling", "@brief Method QModelIndex QModelIndex::sibling(int row, int column)\n", true, &_init_f_sibling_c1426, &_call_f_sibling_c1426);
+  methods += new qt_gsi::GenericMethod ("siblingAtColumn", "@brief Method QModelIndex QModelIndex::siblingAtColumn(int column)\n", true, &_init_f_siblingAtColumn_c767, &_call_f_siblingAtColumn_c767);
+  methods += new qt_gsi::GenericMethod ("siblingAtRow", "@brief Method QModelIndex QModelIndex::siblingAtRow(int row)\n", true, &_init_f_siblingAtRow_c767, &_call_f_siblingAtRow_c767);
   return methods;
 }
 

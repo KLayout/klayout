@@ -143,6 +143,21 @@ static void _call_f_globalY_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
+// bool QWheelEvent::inverted()
+
+
+static void _init_f_inverted_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_inverted_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QWheelEvent *)cls)->inverted ());
+}
+
+
 // Qt::Orientation QWheelEvent::orientation()
 
 
@@ -275,6 +290,7 @@ static gsi::Methods methods_QWheelEvent () {
   methods += new qt_gsi::GenericMethod ("globalPosF", "@brief Method const QPointF &QWheelEvent::globalPosF()\n", true, &_init_f_globalPosF_c0, &_call_f_globalPosF_c0);
   methods += new qt_gsi::GenericMethod ("globalX", "@brief Method int QWheelEvent::globalX()\n", true, &_init_f_globalX_c0, &_call_f_globalX_c0);
   methods += new qt_gsi::GenericMethod ("globalY", "@brief Method int QWheelEvent::globalY()\n", true, &_init_f_globalY_c0, &_call_f_globalY_c0);
+  methods += new qt_gsi::GenericMethod ("inverted", "@brief Method bool QWheelEvent::inverted()\n", true, &_init_f_inverted_c0, &_call_f_inverted_c0);
   methods += new qt_gsi::GenericMethod ("orientation", "@brief Method Qt::Orientation QWheelEvent::orientation()\n", true, &_init_f_orientation_c0, &_call_f_orientation_c0);
   methods += new qt_gsi::GenericMethod ("phase", "@brief Method Qt::ScrollPhase QWheelEvent::phase()\n", true, &_init_f_phase_c0, &_call_f_phase_c0);
   methods += new qt_gsi::GenericMethod ("pixelDelta", "@brief Method QPoint QWheelEvent::pixelDelta()\n", true, &_init_f_pixelDelta_c0, &_call_f_pixelDelta_c0);
@@ -341,6 +357,24 @@ public:
 
   //  [adaptor ctor] QWheelEvent::QWheelEvent(const QPointF &pos, const QPointF &globalPos, QPoint pixelDelta, QPoint angleDelta, int qt4Delta, Qt::Orientation qt4Orientation, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::ScrollPhase phase, Qt::MouseEventSource source)
   QWheelEvent_Adaptor(const QPointF &pos, const QPointF &globalPos, QPoint pixelDelta, QPoint angleDelta, int qt4Delta, Qt::Orientation qt4Orientation, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::ScrollPhase phase, Qt::MouseEventSource source) : QWheelEvent(pos, globalPos, pixelDelta, angleDelta, qt4Delta, qt4Orientation, buttons, modifiers, phase, source)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
+  //  [adaptor ctor] QWheelEvent::QWheelEvent(const QPointF &pos, const QPointF &globalPos, QPoint pixelDelta, QPoint angleDelta, int qt4Delta, Qt::Orientation qt4Orientation, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::ScrollPhase phase, Qt::MouseEventSource source, bool inverted)
+  QWheelEvent_Adaptor(const QPointF &pos, const QPointF &globalPos, QPoint pixelDelta, QPoint angleDelta, int qt4Delta, Qt::Orientation qt4Orientation, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::ScrollPhase phase, Qt::MouseEventSource source, bool inverted) : QWheelEvent(pos, globalPos, pixelDelta, angleDelta, qt4Delta, qt4Orientation, buttons, modifiers, phase, source, inverted)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
+  //  [adaptor ctor] QWheelEvent::QWheelEvent(QPointF pos, QPointF globalPos, QPoint pixelDelta, QPoint angleDelta, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::ScrollPhase phase, bool inverted, Qt::MouseEventSource source)
+  QWheelEvent_Adaptor(QPointF pos, QPointF globalPos, QPoint pixelDelta, QPoint angleDelta, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::ScrollPhase phase, bool inverted) : QWheelEvent(pos, globalPos, pixelDelta, angleDelta, buttons, modifiers, phase, inverted)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
+  //  [adaptor ctor] QWheelEvent::QWheelEvent(QPointF pos, QPointF globalPos, QPoint pixelDelta, QPoint angleDelta, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::ScrollPhase phase, bool inverted, Qt::MouseEventSource source)
+  QWheelEvent_Adaptor(QPointF pos, QPointF globalPos, QPoint pixelDelta, QPoint angleDelta, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::ScrollPhase phase, bool inverted, Qt::MouseEventSource source) : QWheelEvent(pos, globalPos, pixelDelta, angleDelta, buttons, modifiers, phase, inverted, source)
   {
     qt_gsi::QtObjectBase::init (this);
   }
@@ -539,6 +573,96 @@ static void _call_ctor_QWheelEvent_Adaptor_17715 (const qt_gsi::GenericStaticMet
 }
 
 
+//  Constructor QWheelEvent::QWheelEvent(const QPointF &pos, const QPointF &globalPos, QPoint pixelDelta, QPoint angleDelta, int qt4Delta, Qt::Orientation qt4Orientation, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::ScrollPhase phase, Qt::MouseEventSource source, bool inverted) (adaptor class)
+
+static void _init_ctor_QWheelEvent_Adaptor_18471 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("pos");
+  decl->add_arg<const QPointF & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("globalPos");
+  decl->add_arg<const QPointF & > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("pixelDelta");
+  decl->add_arg<QPoint > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("angleDelta");
+  decl->add_arg<QPoint > (argspec_3);
+  static gsi::ArgSpecBase argspec_4 ("qt4Delta");
+  decl->add_arg<int > (argspec_4);
+  static gsi::ArgSpecBase argspec_5 ("qt4Orientation");
+  decl->add_arg<const qt_gsi::Converter<Qt::Orientation>::target_type & > (argspec_5);
+  static gsi::ArgSpecBase argspec_6 ("buttons");
+  decl->add_arg<QFlags<Qt::MouseButton> > (argspec_6);
+  static gsi::ArgSpecBase argspec_7 ("modifiers");
+  decl->add_arg<QFlags<Qt::KeyboardModifier> > (argspec_7);
+  static gsi::ArgSpecBase argspec_8 ("phase");
+  decl->add_arg<const qt_gsi::Converter<Qt::ScrollPhase>::target_type & > (argspec_8);
+  static gsi::ArgSpecBase argspec_9 ("source");
+  decl->add_arg<const qt_gsi::Converter<Qt::MouseEventSource>::target_type & > (argspec_9);
+  static gsi::ArgSpecBase argspec_10 ("inverted");
+  decl->add_arg<bool > (argspec_10);
+  decl->set_return_new<QWheelEvent_Adaptor> ();
+}
+
+static void _call_ctor_QWheelEvent_Adaptor_18471 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
+  QPoint arg3 = gsi::arg_reader<QPoint >() (args, heap);
+  QPoint arg4 = gsi::arg_reader<QPoint >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg6 = gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap);
+  QFlags<Qt::MouseButton> arg7 = gsi::arg_reader<QFlags<Qt::MouseButton> >() (args, heap);
+  QFlags<Qt::KeyboardModifier> arg8 = gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap);
+  const qt_gsi::Converter<Qt::ScrollPhase>::target_type & arg9 = gsi::arg_reader<const qt_gsi::Converter<Qt::ScrollPhase>::target_type & >() (args, heap);
+  const qt_gsi::Converter<Qt::MouseEventSource>::target_type & arg10 = gsi::arg_reader<const qt_gsi::Converter<Qt::MouseEventSource>::target_type & >() (args, heap);
+  bool arg11 = gsi::arg_reader<bool >() (args, heap);
+  ret.write<QWheelEvent_Adaptor *> (new QWheelEvent_Adaptor (arg1, arg2, arg3, arg4, arg5, qt_gsi::QtToCppAdaptor<Qt::Orientation>(arg6).cref(), arg7, arg8, qt_gsi::QtToCppAdaptor<Qt::ScrollPhase>(arg9).cref(), qt_gsi::QtToCppAdaptor<Qt::MouseEventSource>(arg10).cref(), arg11));
+}
+
+
+//  Constructor QWheelEvent::QWheelEvent(QPointF pos, QPointF globalPos, QPoint pixelDelta, QPoint angleDelta, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::ScrollPhase phase, bool inverted, Qt::MouseEventSource source) (adaptor class)
+
+static void _init_ctor_QWheelEvent_Adaptor_14253 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("pos");
+  decl->add_arg<QPointF > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("globalPos");
+  decl->add_arg<QPointF > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("pixelDelta");
+  decl->add_arg<QPoint > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("angleDelta");
+  decl->add_arg<QPoint > (argspec_3);
+  static gsi::ArgSpecBase argspec_4 ("buttons");
+  decl->add_arg<QFlags<Qt::MouseButton> > (argspec_4);
+  static gsi::ArgSpecBase argspec_5 ("modifiers");
+  decl->add_arg<QFlags<Qt::KeyboardModifier> > (argspec_5);
+  static gsi::ArgSpecBase argspec_6 ("phase");
+  decl->add_arg<const qt_gsi::Converter<Qt::ScrollPhase>::target_type & > (argspec_6);
+  static gsi::ArgSpecBase argspec_7 ("inverted");
+  decl->add_arg<bool > (argspec_7);
+  static gsi::ArgSpecBase argspec_8 ("source", true, "Qt::MouseEventNotSynthesized");
+  decl->add_arg<const qt_gsi::Converter<Qt::MouseEventSource>::target_type & > (argspec_8);
+  decl->set_return_new<QWheelEvent_Adaptor> ();
+}
+
+static void _call_ctor_QWheelEvent_Adaptor_14253 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QPointF arg1 = gsi::arg_reader<QPointF >() (args, heap);
+  QPointF arg2 = gsi::arg_reader<QPointF >() (args, heap);
+  QPoint arg3 = gsi::arg_reader<QPoint >() (args, heap);
+  QPoint arg4 = gsi::arg_reader<QPoint >() (args, heap);
+  QFlags<Qt::MouseButton> arg5 = gsi::arg_reader<QFlags<Qt::MouseButton> >() (args, heap);
+  QFlags<Qt::KeyboardModifier> arg6 = gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap);
+  const qt_gsi::Converter<Qt::ScrollPhase>::target_type & arg7 = gsi::arg_reader<const qt_gsi::Converter<Qt::ScrollPhase>::target_type & >() (args, heap);
+  bool arg8 = gsi::arg_reader<bool >() (args, heap);
+  const qt_gsi::Converter<Qt::MouseEventSource>::target_type & arg9 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::MouseEventSource>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::MouseEventSource>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::MouseEventSource>(heap, Qt::MouseEventNotSynthesized), heap);
+  ret.write<QWheelEvent_Adaptor *> (new QWheelEvent_Adaptor (arg1, arg2, arg3, arg4, arg5, arg6, qt_gsi::QtToCppAdaptor<Qt::ScrollPhase>(arg7).cref(), arg8, qt_gsi::QtToCppAdaptor<Qt::MouseEventSource>(arg9).cref()));
+}
+
+
 namespace gsi
 {
 
@@ -551,6 +675,8 @@ static gsi::Methods methods_QWheelEvent_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QWheelEvent::QWheelEvent(const QPointF &pos, const QPointF &globalPos, QPoint pixelDelta, QPoint angleDelta, int qt4Delta, Qt::Orientation qt4Orientation, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers)\nThis method creates an object of class QWheelEvent.", &_init_ctor_QWheelEvent_Adaptor_13653, &_call_ctor_QWheelEvent_Adaptor_13653);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QWheelEvent::QWheelEvent(const QPointF &pos, const QPointF &globalPos, QPoint pixelDelta, QPoint angleDelta, int qt4Delta, Qt::Orientation qt4Orientation, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::ScrollPhase phase)\nThis method creates an object of class QWheelEvent.", &_init_ctor_QWheelEvent_Adaptor_15414, &_call_ctor_QWheelEvent_Adaptor_15414);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QWheelEvent::QWheelEvent(const QPointF &pos, const QPointF &globalPos, QPoint pixelDelta, QPoint angleDelta, int qt4Delta, Qt::Orientation qt4Orientation, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::ScrollPhase phase, Qt::MouseEventSource source)\nThis method creates an object of class QWheelEvent.", &_init_ctor_QWheelEvent_Adaptor_17715, &_call_ctor_QWheelEvent_Adaptor_17715);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QWheelEvent::QWheelEvent(const QPointF &pos, const QPointF &globalPos, QPoint pixelDelta, QPoint angleDelta, int qt4Delta, Qt::Orientation qt4Orientation, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::ScrollPhase phase, Qt::MouseEventSource source, bool inverted)\nThis method creates an object of class QWheelEvent.", &_init_ctor_QWheelEvent_Adaptor_18471, &_call_ctor_QWheelEvent_Adaptor_18471);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QWheelEvent::QWheelEvent(QPointF pos, QPointF globalPos, QPoint pixelDelta, QPoint angleDelta, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::ScrollPhase phase, bool inverted, Qt::MouseEventSource source)\nThis method creates an object of class QWheelEvent.", &_init_ctor_QWheelEvent_Adaptor_14253, &_call_ctor_QWheelEvent_Adaptor_14253);
   return methods;
 }
 

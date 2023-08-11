@@ -483,6 +483,26 @@ static void _call_f_size_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
+// void QJsonObject::swap(QJsonObject &other)
+
+
+static void _init_f_swap_1708 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<QJsonObject & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_swap_1708 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QJsonObject &arg1 = gsi::arg_reader<QJsonObject & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QJsonObject *)cls)->swap (arg1);
+}
+
+
 // QJsonValue QJsonObject::take(const QString &key)
 
 
@@ -621,6 +641,7 @@ static gsi::Methods methods_QJsonObject () {
   methods += new qt_gsi::GenericMethod ("[]", "@brief Method QJsonValueRef QJsonObject::operator[](const QString &key)\n", false, &_init_f_operator_index__2025, &_call_f_operator_index__2025);
   methods += new qt_gsi::GenericMethod ("remove", "@brief Method void QJsonObject::remove(const QString &key)\n", false, &_init_f_remove_2025, &_call_f_remove_2025);
   methods += new qt_gsi::GenericMethod ("size", "@brief Method int QJsonObject::size()\n", true, &_init_f_size_c0, &_call_f_size_c0);
+  methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QJsonObject::swap(QJsonObject &other)\n", false, &_init_f_swap_1708, &_call_f_swap_1708);
   methods += new qt_gsi::GenericMethod ("take", "@brief Method QJsonValue QJsonObject::take(const QString &key)\n", false, &_init_f_take_2025, &_call_f_take_2025);
   methods += new qt_gsi::GenericMethod ("toVariantHash", "@brief Method QHash<QString, QVariant> QJsonObject::toVariantHash()\n", true, &_init_f_toVariantHash_c0, &_call_f_toVariantHash_c0);
   methods += new qt_gsi::GenericMethod ("toVariantMap", "@brief Method QMap<QString, QVariant> QJsonObject::toVariantMap()\n", true, &_init_f_toVariantMap_c0, &_call_f_toVariantMap_c0);

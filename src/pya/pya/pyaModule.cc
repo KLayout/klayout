@@ -253,7 +253,27 @@ public:
 
     PyTypeObject *pt = PythonClassClientData::py_type (*cls, as_static);
     if (pt != 0) {
+
+      if (! mp_module->is_class_of_module (cls)) {
+
+        //  class is already built, but not member of the module yet (e.g.
+        //  on duplicate import into a new module object): add now without building again
+
+        mp_module->register_class (cls);
+        tl_assert (mp_module->cls_for_type (pt) == cls);
+
+        //  add to the parent class as child class or add to module
+
+        if (! cls->parent ()) {
+          PyList_Append (m_all_list, c2python (cls->name ()));
+          Py_INCREF ((PyObject *) pt);
+          PyModule_AddObject (mp_module->module (), cls->name ().c_str (), (PyObject *) pt);
+        }
+
+      }
+
       return pt;
+
     }
 
     PythonRef bases;
@@ -720,20 +740,7 @@ PythonModule::make_classes (const char *mod_name)
 
 const gsi::ClassBase *PythonModule::cls_for_type (PyTypeObject *type)
 {
-  //  GSI classes store their class index inside the __gsi_id__ attribute
-  if (PyObject_HasAttrString ((PyObject *) type, "__gsi_id__")) {
-
-    PyObject *cls_id = PyObject_GetAttrString ((PyObject *) type, "__gsi_id__");
-    if (cls_id != NULL && pya::test_type<size_t> (cls_id)) {
-      size_t i = pya::python2c<size_t> (cls_id);
-      if (i < m_classes.size ()) {
-        return m_classes [i];
-      }
-    }
-
-  }
-
-  return 0;
+  return PythonClassClientData::cls_for_type (type);
 }
 
 PyTypeObject *PythonModule::type_for_cls (const gsi::ClassBase *cls)

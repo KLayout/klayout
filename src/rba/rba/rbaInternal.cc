@@ -811,7 +811,11 @@ SignalHandler::define_class (VALUE module, const char *name)
   rb_define_method (klass, "set", (ruby_func) &SignalHandler::static_assign, 1);
   rb_define_method (klass, "clear", (ruby_func) &SignalHandler::static_clear, 0);
   rb_define_method (klass, "+", (ruby_func) &SignalHandler::static_add, 1);
+  rb_define_method (klass, "add", (ruby_func) &SignalHandler::static_add, 1);
+  rb_define_method (klass, "connect", (ruby_func) &SignalHandler::static_add, 1);
   rb_define_method (klass, "-", (ruby_func) &SignalHandler::static_remove, 1);
+  rb_define_method (klass, "remove", (ruby_func) &SignalHandler::static_remove, 1);
+  rb_define_method (klass, "disconnect", (ruby_func) &SignalHandler::static_remove, 1);
 }
 
 void SignalHandler::call (const gsi::MethodBase *meth, gsi::SerialArgs &args, gsi::SerialArgs &ret) const

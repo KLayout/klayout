@@ -118,6 +118,21 @@ static void _call_f_blueBufferSize_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
+// QSurfaceFormat::ColorSpace QSurfaceFormat::colorSpace()
+
+
+static void _init_f_colorSpace_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<qt_gsi::Converter<QSurfaceFormat::ColorSpace>::target_type > ();
+}
+
+static void _call_f_colorSpace_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<qt_gsi::Converter<QSurfaceFormat::ColorSpace>::target_type > ((qt_gsi::Converter<QSurfaceFormat::ColorSpace>::target_type)qt_gsi::CppToQtAdaptor<QSurfaceFormat::ColorSpace>(((QSurfaceFormat *)cls)->colorSpace ()));
+}
+
+
 // int QSurfaceFormat::depthBufferSize()
 
 
@@ -324,6 +339,26 @@ static void _call_f_setBlueBufferSize_767 (const qt_gsi::GenericMethod * /*decl*
   int arg1 = gsi::arg_reader<int >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSurfaceFormat *)cls)->setBlueBufferSize (arg1);
+}
+
+
+// void QSurfaceFormat::setColorSpace(QSurfaceFormat::ColorSpace colorSpace)
+
+
+static void _init_f_setColorSpace_2966 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("colorSpace");
+  decl->add_arg<const qt_gsi::Converter<QSurfaceFormat::ColorSpace>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setColorSpace_2966 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QSurfaceFormat::ColorSpace>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSurfaceFormat::ColorSpace>::target_type & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QSurfaceFormat *)cls)->setColorSpace (qt_gsi::QtToCppAdaptor<QSurfaceFormat::ColorSpace>(arg1).cref());
 }
 
 
@@ -822,6 +857,7 @@ static gsi::Methods methods_QSurfaceFormat () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSurfaceFormat::QSurfaceFormat(const QSurfaceFormat &other)\nThis method creates an object of class QSurfaceFormat.", &_init_ctor_QSurfaceFormat_2724, &_call_ctor_QSurfaceFormat_2724);
   methods += new qt_gsi::GenericMethod (":alphaBufferSize", "@brief Method int QSurfaceFormat::alphaBufferSize()\n", true, &_init_f_alphaBufferSize_c0, &_call_f_alphaBufferSize_c0);
   methods += new qt_gsi::GenericMethod (":blueBufferSize", "@brief Method int QSurfaceFormat::blueBufferSize()\n", true, &_init_f_blueBufferSize_c0, &_call_f_blueBufferSize_c0);
+  methods += new qt_gsi::GenericMethod (":colorSpace", "@brief Method QSurfaceFormat::ColorSpace QSurfaceFormat::colorSpace()\n", true, &_init_f_colorSpace_c0, &_call_f_colorSpace_c0);
   methods += new qt_gsi::GenericMethod (":depthBufferSize", "@brief Method int QSurfaceFormat::depthBufferSize()\n", true, &_init_f_depthBufferSize_c0, &_call_f_depthBufferSize_c0);
   methods += new qt_gsi::GenericMethod (":greenBufferSize", "@brief Method int QSurfaceFormat::greenBufferSize()\n", true, &_init_f_greenBufferSize_c0, &_call_f_greenBufferSize_c0);
   methods += new qt_gsi::GenericMethod ("hasAlpha", "@brief Method bool QSurfaceFormat::hasAlpha()\n", true, &_init_f_hasAlpha_c0, &_call_f_hasAlpha_c0);
@@ -835,6 +871,7 @@ static gsi::Methods methods_QSurfaceFormat () {
   methods += new qt_gsi::GenericMethod (":samples", "@brief Method int QSurfaceFormat::samples()\n", true, &_init_f_samples_c0, &_call_f_samples_c0);
   methods += new qt_gsi::GenericMethod ("setAlphaBufferSize|alphaBufferSize=", "@brief Method void QSurfaceFormat::setAlphaBufferSize(int size)\n", false, &_init_f_setAlphaBufferSize_767, &_call_f_setAlphaBufferSize_767);
   methods += new qt_gsi::GenericMethod ("setBlueBufferSize|blueBufferSize=", "@brief Method void QSurfaceFormat::setBlueBufferSize(int size)\n", false, &_init_f_setBlueBufferSize_767, &_call_f_setBlueBufferSize_767);
+  methods += new qt_gsi::GenericMethod ("setColorSpace|colorSpace=", "@brief Method void QSurfaceFormat::setColorSpace(QSurfaceFormat::ColorSpace colorSpace)\n", false, &_init_f_setColorSpace_2966, &_call_f_setColorSpace_2966);
   methods += new qt_gsi::GenericMethod ("setDepthBufferSize|depthBufferSize=", "@brief Method void QSurfaceFormat::setDepthBufferSize(int size)\n", false, &_init_f_setDepthBufferSize_767, &_call_f_setDepthBufferSize_767);
   methods += new qt_gsi::GenericMethod ("setGreenBufferSize|greenBufferSize=", "@brief Method void QSurfaceFormat::setGreenBufferSize(int size)\n", false, &_init_f_setGreenBufferSize_767, &_call_f_setGreenBufferSize_767);
   methods += new qt_gsi::GenericMethod ("setMajorVersion|majorVersion=", "@brief Method void QSurfaceFormat::setMajorVersion(int majorVersion)\n", false, &_init_f_setMajorVersion_767, &_call_f_setMajorVersion_767);
@@ -871,6 +908,26 @@ gsi::Class<QSurfaceFormat> decl_QSurfaceFormat ("QtGui", "QSurfaceFormat",
 
 
 GSI_QTGUI_PUBLIC gsi::Class<QSurfaceFormat> &qtdecl_QSurfaceFormat () { return decl_QSurfaceFormat; }
+
+}
+
+
+//  Implementation of the enum wrapper class for QSurfaceFormat::ColorSpace
+namespace qt_gsi
+{
+
+static gsi::Enum<QSurfaceFormat::ColorSpace> decl_QSurfaceFormat_ColorSpace_Enum ("QtGui", "QSurfaceFormat_ColorSpace",
+    gsi::enum_const ("DefaultColorSpace", QSurfaceFormat::DefaultColorSpace, "@brief Enum constant QSurfaceFormat::DefaultColorSpace") +
+    gsi::enum_const ("sRGBColorSpace", QSurfaceFormat::sRGBColorSpace, "@brief Enum constant QSurfaceFormat::sRGBColorSpace"),
+  "@qt\n@brief This class represents the QSurfaceFormat::ColorSpace enum");
+
+static gsi::QFlagsClass<QSurfaceFormat::ColorSpace > decl_QSurfaceFormat_ColorSpace_Enums ("QtGui", "QSurfaceFormat_QFlags_ColorSpace",
+  "@qt\n@brief This class represents the QFlags<QSurfaceFormat::ColorSpace> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<QSurfaceFormat> inject_QSurfaceFormat_ColorSpace_Enum_in_parent (decl_QSurfaceFormat_ColorSpace_Enum.defs ());
+static gsi::ClassExt<QSurfaceFormat> decl_QSurfaceFormat_ColorSpace_Enum_as_child (decl_QSurfaceFormat_ColorSpace_Enum, "ColorSpace");
+static gsi::ClassExt<QSurfaceFormat> decl_QSurfaceFormat_ColorSpace_Enums_as_child (decl_QSurfaceFormat_ColorSpace_Enums, "QFlags_ColorSpace");
 
 }
 

@@ -32,6 +32,7 @@
 #include <QEvent>
 #include <QHostAddress>
 #include <QMetaMethod>
+#include <QNetworkDatagram>
 #include <QNetworkInterface>
 #include <QNetworkProxy>
 #include <QObject>
@@ -61,7 +62,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 
 static void _init_ctor_QUdpSocket_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QUdpSocket> ();
 }
@@ -70,7 +71,7 @@ static void _call_ctor_QUdpSocket_1302 (const qt_gsi::GenericStaticMethod * /*de
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QUdpSocket *> (new QUdpSocket (arg1));
 }
 
@@ -202,6 +203,25 @@ static void _call_f_pendingDatagramSize_c0 (const qt_gsi::GenericMethod * /*decl
 }
 
 
+// QNetworkDatagram QUdpSocket::receiveDatagram(qint64 maxSize)
+
+
+static void _init_f_receiveDatagram_986 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("maxSize", true, "-1");
+  decl->add_arg<qint64 > (argspec_0);
+  decl->set_return<QNetworkDatagram > ();
+}
+
+static void _call_f_receiveDatagram_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qint64 arg1 = args ? gsi::arg_reader<qint64 >() (args, heap) : gsi::arg_maker<qint64 >() (-1, heap);
+  ret.write<QNetworkDatagram > ((QNetworkDatagram)((QUdpSocket *)cls)->receiveDatagram (arg1));
+}
+
+
 // void QUdpSocket::setMulticastInterface(const QNetworkInterface &iface)
 
 
@@ -219,6 +239,25 @@ static void _call_f_setMulticastInterface_3053 (const qt_gsi::GenericMethod * /*
   const QNetworkInterface &arg1 = gsi::arg_reader<const QNetworkInterface & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QUdpSocket *)cls)->setMulticastInterface (arg1);
+}
+
+
+// qint64 QUdpSocket::writeDatagram(const QNetworkDatagram &datagram)
+
+
+static void _init_f_writeDatagram_2941 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("datagram");
+  decl->add_arg<const QNetworkDatagram & > (argspec_0);
+  decl->set_return<qint64 > ();
+}
+
+static void _call_f_writeDatagram_2941 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QNetworkDatagram &arg1 = gsi::arg_reader<const QNetworkDatagram & >() (args, heap);
+  ret.write<qint64 > ((qint64)((QUdpSocket *)cls)->writeDatagram (arg1));
 }
 
 
@@ -340,11 +379,15 @@ static gsi::Methods methods_QUdpSocket () {
   methods += new qt_gsi::GenericMethod ("leaveMulticastGroup", "@brief Method bool QUdpSocket::leaveMulticastGroup(const QHostAddress &groupAddress, const QNetworkInterface &iface)\n", false, &_init_f_leaveMulticastGroup_5463, &_call_f_leaveMulticastGroup_5463);
   methods += new qt_gsi::GenericMethod (":multicastInterface", "@brief Method QNetworkInterface QUdpSocket::multicastInterface()\n", true, &_init_f_multicastInterface_c0, &_call_f_multicastInterface_c0);
   methods += new qt_gsi::GenericMethod ("pendingDatagramSize", "@brief Method qint64 QUdpSocket::pendingDatagramSize()\n", true, &_init_f_pendingDatagramSize_c0, &_call_f_pendingDatagramSize_c0);
+  methods += new qt_gsi::GenericMethod ("receiveDatagram", "@brief Method QNetworkDatagram QUdpSocket::receiveDatagram(qint64 maxSize)\n", false, &_init_f_receiveDatagram_986, &_call_f_receiveDatagram_986);
   methods += new qt_gsi::GenericMethod ("setMulticastInterface|multicastInterface=", "@brief Method void QUdpSocket::setMulticastInterface(const QNetworkInterface &iface)\n", false, &_init_f_setMulticastInterface_3053, &_call_f_setMulticastInterface_3053);
+  methods += new qt_gsi::GenericMethod ("writeDatagram", "@brief Method qint64 QUdpSocket::writeDatagram(const QNetworkDatagram &datagram)\n", false, &_init_f_writeDatagram_2941, &_call_f_writeDatagram_2941);
   methods += new qt_gsi::GenericMethod ("writeDatagram", "@brief Method qint64 QUdpSocket::writeDatagram(const char *data, qint64 len, const QHostAddress &host, quint16 port)\n", false, &_init_f_writeDatagram_6011, &_call_f_writeDatagram_6011);
   methods += new qt_gsi::GenericMethod ("writeDatagram", "@brief Method qint64 QUdpSocket::writeDatagram(const QByteArray &datagram, const QHostAddress &host, quint16 port)\n", false, &_init_f_writeDatagram_5711, &_call_f_writeDatagram_5711);
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QUdpSocket::aboutToClose()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64 > ("bytesWritten(qint64)", "bytesWritten", gsi::arg("bytes"), "@brief Signal declaration for QUdpSocket::bytesWritten(qint64 bytes)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int, qint64 > ("channelBytesWritten(int, qint64)", "channelBytesWritten", gsi::arg("channel"), gsi::arg("bytes"), "@brief Signal declaration for QUdpSocket::channelBytesWritten(int channel, qint64 bytes)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("channelReadyRead(int)", "channelReadyRead", gsi::arg("channel"), "@brief Signal declaration for QUdpSocket::channelReadyRead(int channel)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("connected()", "connected", "@brief Signal declaration for QUdpSocket::connected()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QUdpSocket::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("disconnected()", "disconnected", "@brief Signal declaration for QUdpSocket::disconnected()\nYou can bind a procedure to this signal.");

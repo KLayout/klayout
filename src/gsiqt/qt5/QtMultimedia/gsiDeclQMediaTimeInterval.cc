@@ -155,6 +155,25 @@ static void _call_f_normalized_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
+// QMediaTimeInterval &QMediaTimeInterval::operator=(const QMediaTimeInterval &)
+
+
+static void _init_f_operator_eq__3110 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<const QMediaTimeInterval & > (argspec_0);
+  decl->set_return<QMediaTimeInterval & > ();
+}
+
+static void _call_f_operator_eq__3110 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QMediaTimeInterval &arg1 = gsi::arg_reader<const QMediaTimeInterval & >() (args, heap);
+  ret.write<QMediaTimeInterval & > ((QMediaTimeInterval &)((QMediaTimeInterval *)cls)->operator= (arg1));
+}
+
+
 // qint64 QMediaTimeInterval::start()
 
 
@@ -212,6 +231,7 @@ static gsi::Methods methods_QMediaTimeInterval () {
   methods += new qt_gsi::GenericMethod ("end", "@brief Method qint64 QMediaTimeInterval::end()\n", true, &_init_f_end_c0, &_call_f_end_c0);
   methods += new qt_gsi::GenericMethod ("isNormal?", "@brief Method bool QMediaTimeInterval::isNormal()\n", true, &_init_f_isNormal_c0, &_call_f_isNormal_c0);
   methods += new qt_gsi::GenericMethod ("normalized", "@brief Method QMediaTimeInterval QMediaTimeInterval::normalized()\n", true, &_init_f_normalized_c0, &_call_f_normalized_c0);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QMediaTimeInterval &QMediaTimeInterval::operator=(const QMediaTimeInterval &)\n", false, &_init_f_operator_eq__3110, &_call_f_operator_eq__3110);
   methods += new qt_gsi::GenericMethod ("start", "@brief Method qint64 QMediaTimeInterval::start()\n", true, &_init_f_start_c0, &_call_f_start_c0);
   methods += new qt_gsi::GenericMethod ("translated", "@brief Method QMediaTimeInterval QMediaTimeInterval::translated(qint64 offset)\n", true, &_init_f_translated_c986, &_call_f_translated_c986);
   methods += gsi::method_ext("==", &::op_QMediaTimeInterval_operator_eq__eq__6112, gsi::arg ("arg2"), "@brief Operator bool ::operator==(const QMediaTimeInterval &, const QMediaTimeInterval &)\nThis is the mapping of the global operator to the instance method.");

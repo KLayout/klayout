@@ -202,14 +202,14 @@ static gsi::Methods methods_QSinglePointEvent () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericMethod ("button", "@brief Method Qt::MouseButton QSinglePointEvent::button()\n", true, &_init_f_button_c0, &_call_f_button_c0);
   methods += new qt_gsi::GenericMethod ("buttons", "@brief Method QFlags<Qt::MouseButton> QSinglePointEvent::buttons()\n", true, &_init_f_buttons_c0, &_call_f_buttons_c0);
-  methods += new qt_gsi::GenericMethod ("exclusivePointGrabber", "@brief Method QObject *QSinglePointEvent::exclusivePointGrabber()\n", true, &_init_f_exclusivePointGrabber_c0, &_call_f_exclusivePointGrabber_c0);
+  methods += new qt_gsi::GenericMethod (":exclusivePointGrabber", "@brief Method QObject *QSinglePointEvent::exclusivePointGrabber()\n", true, &_init_f_exclusivePointGrabber_c0, &_call_f_exclusivePointGrabber_c0);
   methods += new qt_gsi::GenericMethod ("globalPosition", "@brief Method QPointF QSinglePointEvent::globalPosition()\n", true, &_init_f_globalPosition_c0, &_call_f_globalPosition_c0);
   methods += new qt_gsi::GenericMethod ("isBeginEvent?", "@brief Method bool QSinglePointEvent::isBeginEvent()\nThis is a reimplementation of QPointerEvent::isBeginEvent", true, &_init_f_isBeginEvent_c0, &_call_f_isBeginEvent_c0);
   methods += new qt_gsi::GenericMethod ("isEndEvent?", "@brief Method bool QSinglePointEvent::isEndEvent()\nThis is a reimplementation of QPointerEvent::isEndEvent", true, &_init_f_isEndEvent_c0, &_call_f_isEndEvent_c0);
   methods += new qt_gsi::GenericMethod ("isUpdateEvent?", "@brief Method bool QSinglePointEvent::isUpdateEvent()\nThis is a reimplementation of QPointerEvent::isUpdateEvent", true, &_init_f_isUpdateEvent_c0, &_call_f_isUpdateEvent_c0);
   methods += new qt_gsi::GenericMethod ("position", "@brief Method QPointF QSinglePointEvent::position()\n", true, &_init_f_position_c0, &_call_f_position_c0);
   methods += new qt_gsi::GenericMethod ("scenePosition", "@brief Method QPointF QSinglePointEvent::scenePosition()\n", true, &_init_f_scenePosition_c0, &_call_f_scenePosition_c0);
-  methods += new qt_gsi::GenericMethod ("setExclusivePointGrabber", "@brief Method void QSinglePointEvent::setExclusivePointGrabber(QObject *exclusiveGrabber)\n", false, &_init_f_setExclusivePointGrabber_1302, &_call_f_setExclusivePointGrabber_1302);
+  methods += new qt_gsi::GenericMethod ("setExclusivePointGrabber|exclusivePointGrabber=", "@brief Method void QSinglePointEvent::setExclusivePointGrabber(QObject *exclusiveGrabber)\n", false, &_init_f_setExclusivePointGrabber_1302, &_call_f_setExclusivePointGrabber_1302);
   return methods;
 }
 

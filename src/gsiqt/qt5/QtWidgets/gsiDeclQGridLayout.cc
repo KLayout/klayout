@@ -76,7 +76,7 @@ static void _init_f_addItem_7018 (qt_gsi::GenericMethod *decl)
   decl->add_arg<int > (argspec_3);
   static gsi::ArgSpecBase argspec_4 ("columnSpan", true, "1");
   decl->add_arg<int > (argspec_4);
-  static gsi::ArgSpecBase argspec_5 ("arg6", true, "0");
+  static gsi::ArgSpecBase argspec_5 ("arg6", true, "Qt::Alignment()");
   decl->add_arg<QFlags<Qt::AlignmentFlag> > (argspec_5);
   decl->set_return<void > ();
 }
@@ -86,11 +86,12 @@ static void _call_f_addItem_7018 (const qt_gsi::GenericMethod * /*decl*/, void *
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QLayoutItem *arg1 = gsi::arg_reader<QLayoutItem * >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   int arg2 = gsi::arg_reader<int >() (args, heap);
   int arg3 = gsi::arg_reader<int >() (args, heap);
   int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1, heap);
   int arg5 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1, heap);
-  QFlags<Qt::AlignmentFlag> arg6 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (0, heap);
+  QFlags<Qt::AlignmentFlag> arg6 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (Qt::Alignment(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGridLayout *)cls)->addItem (arg1, arg2, arg3, arg4, arg5, arg6);
 }
@@ -107,7 +108,7 @@ static void _init_f_addLayout_5301 (qt_gsi::GenericMethod *decl)
   decl->add_arg<int > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("column");
   decl->add_arg<int > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("arg4", true, "0");
+  static gsi::ArgSpecBase argspec_3 ("arg4", true, "Qt::Alignment()");
   decl->add_arg<QFlags<Qt::AlignmentFlag> > (argspec_3);
   decl->set_return<void > ();
 }
@@ -120,7 +121,7 @@ static void _call_f_addLayout_5301 (const qt_gsi::GenericMethod * /*decl*/, void
   qt_gsi::qt_keep (arg1);
   int arg2 = gsi::arg_reader<int >() (args, heap);
   int arg3 = gsi::arg_reader<int >() (args, heap);
-  QFlags<Qt::AlignmentFlag> arg4 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (0, heap);
+  QFlags<Qt::AlignmentFlag> arg4 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (Qt::Alignment(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGridLayout *)cls)->addLayout (arg1, arg2, arg3, arg4);
 }
@@ -141,7 +142,7 @@ static void _init_f_addLayout_6619 (qt_gsi::GenericMethod *decl)
   decl->add_arg<int > (argspec_3);
   static gsi::ArgSpecBase argspec_4 ("columnSpan");
   decl->add_arg<int > (argspec_4);
-  static gsi::ArgSpecBase argspec_5 ("arg6", true, "0");
+  static gsi::ArgSpecBase argspec_5 ("arg6", true, "Qt::Alignment()");
   decl->add_arg<QFlags<Qt::AlignmentFlag> > (argspec_5);
   decl->set_return<void > ();
 }
@@ -156,7 +157,7 @@ static void _call_f_addLayout_6619 (const qt_gsi::GenericMethod * /*decl*/, void
   int arg3 = gsi::arg_reader<int >() (args, heap);
   int arg4 = gsi::arg_reader<int >() (args, heap);
   int arg5 = gsi::arg_reader<int >() (args, heap);
-  QFlags<Qt::AlignmentFlag> arg6 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (0, heap);
+  QFlags<Qt::AlignmentFlag> arg6 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (Qt::Alignment(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGridLayout *)cls)->addLayout (arg1, arg2, arg3, arg4, arg5, arg6);
 }
@@ -177,6 +178,7 @@ static void _call_f_addWidget_1315 (const qt_gsi::GenericMethod * /*decl*/, void
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGridLayout *)cls)->addWidget (arg1);
 }
@@ -193,7 +195,7 @@ static void _init_f_addWidget_5275 (qt_gsi::GenericMethod *decl)
   decl->add_arg<int > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("column");
   decl->add_arg<int > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("arg4", true, "0");
+  static gsi::ArgSpecBase argspec_3 ("arg4", true, "Qt::Alignment()");
   decl->add_arg<QFlags<Qt::AlignmentFlag> > (argspec_3);
   decl->set_return<void > ();
 }
@@ -203,9 +205,10 @@ static void _call_f_addWidget_5275 (const qt_gsi::GenericMethod * /*decl*/, void
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   int arg2 = gsi::arg_reader<int >() (args, heap);
   int arg3 = gsi::arg_reader<int >() (args, heap);
-  QFlags<Qt::AlignmentFlag> arg4 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (0, heap);
+  QFlags<Qt::AlignmentFlag> arg4 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (Qt::Alignment(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGridLayout *)cls)->addWidget (arg1, arg2, arg3, arg4);
 }
@@ -226,7 +229,7 @@ static void _init_f_addWidget_6593 (qt_gsi::GenericMethod *decl)
   decl->add_arg<int > (argspec_3);
   static gsi::ArgSpecBase argspec_4 ("columnSpan");
   decl->add_arg<int > (argspec_4);
-  static gsi::ArgSpecBase argspec_5 ("arg6", true, "0");
+  static gsi::ArgSpecBase argspec_5 ("arg6", true, "Qt::Alignment()");
   decl->add_arg<QFlags<Qt::AlignmentFlag> > (argspec_5);
   decl->set_return<void > ();
 }
@@ -236,11 +239,12 @@ static void _call_f_addWidget_6593 (const qt_gsi::GenericMethod * /*decl*/, void
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   int arg2 = gsi::arg_reader<int >() (args, heap);
   int arg3 = gsi::arg_reader<int >() (args, heap);
   int arg4 = gsi::arg_reader<int >() (args, heap);
   int arg5 = gsi::arg_reader<int >() (args, heap);
-  QFlags<Qt::AlignmentFlag> arg6 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (0, heap);
+  QFlags<Qt::AlignmentFlag> arg6 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (Qt::Alignment(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGridLayout *)cls)->addWidget (arg1, arg2, arg3, arg4, arg5, arg6);
 }
@@ -1098,33 +1102,33 @@ public:
     emit QGridLayout::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QGridLayout::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QGridLayout::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QGridLayout::event(arg1);
+    return QGridLayout::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QGridLayout_Adaptor, bool, QEvent *>(&QGridLayout_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QGridLayout_Adaptor, bool, QEvent *>(&QGridLayout_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QGridLayout::event(arg1);
+      return QGridLayout::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QGridLayout::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QGridLayout::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QGridLayout::eventFilter(arg1, arg2);
+    return QGridLayout::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QGridLayout_Adaptor, bool, QObject *, QEvent *>(&QGridLayout_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QGridLayout_Adaptor, bool, QObject *, QEvent *>(&QGridLayout_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QGridLayout::eventFilter(arg1, arg2);
+      return QGridLayout::eventFilter(watched, event);
     }
   }
 
@@ -1420,18 +1424,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QGridLayout::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QGridLayout::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QGridLayout::customEvent(arg1);
+    QGridLayout::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QGridLayout_Adaptor, QEvent *>(&QGridLayout_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QGridLayout_Adaptor, QEvent *>(&QGridLayout_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QGridLayout::customEvent(arg1);
+      QGridLayout::customEvent(event);
     }
   }
 
@@ -1450,18 +1454,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QGridLayout::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QGridLayout::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QGridLayout::timerEvent(arg1);
+    QGridLayout::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QGridLayout_Adaptor, QTimerEvent *>(&QGridLayout_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QGridLayout_Adaptor, QTimerEvent *>(&QGridLayout_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QGridLayout::timerEvent(arg1);
+      QGridLayout::timerEvent(event);
     }
   }
 
@@ -1688,11 +1692,11 @@ static void _set_callback_cbs_count_c0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QGridLayout::customEvent(QEvent *)
+// void QGridLayout::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1716,7 +1720,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1725,7 +1729,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QGridLayout_Adaptor *)cls)->emitter_QGridLayout_destroyed_1302 (arg1);
 }
 
@@ -1754,11 +1758,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QGridLayout::event(QEvent *)
+// bool QGridLayout::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -1777,13 +1781,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QGridLayout::eventFilter(QObject *, QEvent *)
+// bool QGridLayout::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -2215,11 +2219,11 @@ static void _set_callback_cbs_takeAt_767_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QGridLayout::timerEvent(QTimerEvent *)
+// void QGridLayout::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2298,14 +2302,14 @@ static gsi::Methods methods_QGridLayout_Adaptor () {
   methods += new qt_gsi::GenericMethod ("controlTypes", "@hide", true, &_init_cbs_controlTypes_c0_0, &_call_cbs_controlTypes_c0_0, &_set_callback_cbs_controlTypes_c0_0);
   methods += new qt_gsi::GenericMethod ("count", "@brief Virtual method int QGridLayout::count()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_count_c0_0, &_call_cbs_count_c0_0);
   methods += new qt_gsi::GenericMethod ("count", "@hide", true, &_init_cbs_count_c0_0, &_call_cbs_count_c0_0, &_set_callback_cbs_count_c0_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QGridLayout::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QGridLayout::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QGridLayout::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QGridLayout::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QGridLayout::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QGridLayout::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QGridLayout::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QGridLayout::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("expandingDirections", "@brief Virtual method QFlags<Qt::Orientation> QGridLayout::expandingDirections()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_expandingDirections_c0_0, &_call_cbs_expandingDirections_c0_0);
   methods += new qt_gsi::GenericMethod ("expandingDirections", "@hide", true, &_init_cbs_expandingDirections_c0_0, &_call_cbs_expandingDirections_c0_0, &_set_callback_cbs_expandingDirections_c0_0);
@@ -2344,7 +2348,7 @@ static gsi::Methods methods_QGridLayout_Adaptor () {
   methods += new qt_gsi::GenericMethod ("spacerItem", "@hide", false, &_init_cbs_spacerItem_0_0, &_call_cbs_spacerItem_0_0, &_set_callback_cbs_spacerItem_0_0);
   methods += new qt_gsi::GenericMethod ("takeAt", "@brief Virtual method QLayoutItem *QGridLayout::takeAt(int index)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_takeAt_767_0, &_call_cbs_takeAt_767_0);
   methods += new qt_gsi::GenericMethod ("takeAt", "@hide", false, &_init_cbs_takeAt_767_0, &_call_cbs_takeAt_767_0, &_set_callback_cbs_takeAt_767_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QGridLayout::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QGridLayout::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("widget", "@brief Virtual method QWidget *QGridLayout::widget()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_widget_0_0, &_call_cbs_widget_0_0);
   methods += new qt_gsi::GenericMethod ("widget", "@hide", false, &_init_cbs_widget_0_0, &_call_cbs_widget_0_0, &_set_callback_cbs_widget_0_0);

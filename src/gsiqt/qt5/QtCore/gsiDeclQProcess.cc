@@ -58,7 +58,7 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 
 static void _init_ctor_QProcess_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QProcess> ();
 }
@@ -67,7 +67,7 @@ static void _call_ctor_QProcess_1302 (const qt_gsi::GenericStaticMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QProcess *> (new QProcess (arg1));
 }
 
@@ -794,6 +794,25 @@ static void _call_f_start_3242 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
+// bool QProcess::startDetached(qint64 *pid)
+
+
+static void _init_f_startDetached_1172 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("pid", true, "nullptr");
+  decl->add_arg<qint64 * > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_startDetached_1172 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qint64 *arg1 = args ? gsi::arg_reader<qint64 * >() (args, heap) : gsi::arg_maker<qint64 * >() (nullptr, heap);
+  ret.write<bool > ((bool)((QProcess *)cls)->startDetached (arg1));
+}
+
+
 // QProcess::ProcessState QProcess::state()
 
 
@@ -983,7 +1002,7 @@ static void _init_f_startDetached_7335 (qt_gsi::GenericStaticMethod *decl)
   decl->add_arg<const QStringList & > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("workingDirectory");
   decl->add_arg<const QString & > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("pid", true, "0");
+  static gsi::ArgSpecBase argspec_3 ("pid", true, "nullptr");
   decl->add_arg<qint64 * > (argspec_3);
   decl->set_return<bool > ();
 }
@@ -995,7 +1014,7 @@ static void _call_f_startDetached_7335 (const qt_gsi::GenericStaticMethod * /*de
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   const QStringList &arg2 = gsi::arg_reader<const QStringList & >() (args, heap);
   const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
-  qint64 *arg4 = args ? gsi::arg_reader<qint64 * >() (args, heap) : gsi::arg_maker<qint64 * >() (0, heap);
+  qint64 *arg4 = args ? gsi::arg_reader<qint64 * >() (args, heap) : gsi::arg_maker<qint64 * >() (nullptr, heap);
   ret.write<bool > ((bool)QProcess::startDetached (arg1, arg2, arg3, arg4));
 }
 
@@ -1155,6 +1174,7 @@ static gsi::Methods methods_QProcess () {
   methods += new qt_gsi::GenericMethod ("start", "@brief Method void QProcess::start(const QString &program, const QStringList &arguments, QFlags<QIODevice::OpenModeFlag> mode)\n", false, &_init_f_start_7488, &_call_f_start_7488);
   methods += new qt_gsi::GenericMethod ("start", "@brief Method void QProcess::start(const QString &command, QFlags<QIODevice::OpenModeFlag> mode)\n", false, &_init_f_start_5159, &_call_f_start_5159);
   methods += new qt_gsi::GenericMethod ("start", "@brief Method void QProcess::start(QFlags<QIODevice::OpenModeFlag> mode)\n", false, &_init_f_start_3242, &_call_f_start_3242);
+  methods += new qt_gsi::GenericMethod ("startDetached", "@brief Method bool QProcess::startDetached(qint64 *pid)\n", false, &_init_f_startDetached_1172, &_call_f_startDetached_1172);
   methods += new qt_gsi::GenericMethod ("state", "@brief Method QProcess::ProcessState QProcess::state()\n", true, &_init_f_state_c0, &_call_f_state_c0);
   methods += new qt_gsi::GenericMethod ("terminate", "@brief Method void QProcess::terminate()\n", false, &_init_f_terminate_0, &_call_f_terminate_0);
   methods += new qt_gsi::GenericMethod ("waitForBytesWritten", "@brief Method bool QProcess::waitForBytesWritten(int msecs)\nThis is a reimplementation of QIODevice::waitForBytesWritten", false, &_init_f_waitForBytesWritten_767, &_call_f_waitForBytesWritten_767);
@@ -1164,8 +1184,11 @@ static gsi::Methods methods_QProcess () {
   methods += new qt_gsi::GenericMethod (":workingDirectory", "@brief Method QString QProcess::workingDirectory()\n", true, &_init_f_workingDirectory_c0, &_call_f_workingDirectory_c0);
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QProcess::aboutToClose()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64 > ("bytesWritten(qint64)", "bytesWritten", gsi::arg("bytes"), "@brief Signal declaration for QProcess::bytesWritten(qint64 bytes)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int, qint64 > ("channelBytesWritten(int, qint64)", "channelBytesWritten", gsi::arg("channel"), gsi::arg("bytes"), "@brief Signal declaration for QProcess::channelBytesWritten(int channel, qint64 bytes)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("channelReadyRead(int)", "channelReadyRead", gsi::arg("channel"), "@brief Signal declaration for QProcess::channelReadyRead(int channel)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QProcess::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<QProcess::ProcessError>::target_type & > ("error(QProcess::ProcessError)", "error_sig", gsi::arg("error"), "@brief Signal declaration for QProcess::error(QProcess::ProcessError error)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QProcess::ProcessError>::target_type & > ("errorOccurred(QProcess::ProcessError)", "errorOccurred", gsi::arg("error"), "@brief Signal declaration for QProcess::errorOccurred(QProcess::ProcessError error)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("finished(int)", "finished_int", gsi::arg("exitCode"), "@brief Signal declaration for QProcess::finished(int exitCode)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int, const qt_gsi::Converter<QProcess::ExitStatus>::target_type & > ("finished(int, QProcess::ExitStatus)", "finished", gsi::arg("exitCode"), gsi::arg("exitStatus"), "@brief Signal declaration for QProcess::finished(int exitCode, QProcess::ExitStatus exitStatus)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QProcess::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");

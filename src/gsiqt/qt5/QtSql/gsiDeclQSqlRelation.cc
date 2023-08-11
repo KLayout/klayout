@@ -120,6 +120,26 @@ static void _call_f_isValid_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
+// void QSqlRelation::swap(QSqlRelation &other)
+
+
+static void _init_f_swap_1833 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<QSqlRelation & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_swap_1833 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QSqlRelation &arg1 = gsi::arg_reader<QSqlRelation & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QSqlRelation *)cls)->swap (arg1);
+}
+
+
 // QString QSqlRelation::tableName()
 
 
@@ -146,6 +166,7 @@ static gsi::Methods methods_QSqlRelation () {
   methods += new qt_gsi::GenericMethod ("displayColumn", "@brief Method QString QSqlRelation::displayColumn()\n", true, &_init_f_displayColumn_c0, &_call_f_displayColumn_c0);
   methods += new qt_gsi::GenericMethod ("indexColumn", "@brief Method QString QSqlRelation::indexColumn()\n", true, &_init_f_indexColumn_c0, &_call_f_indexColumn_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QSqlRelation::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
+  methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QSqlRelation::swap(QSqlRelation &other)\n", false, &_init_f_swap_1833, &_call_f_swap_1833);
   methods += new qt_gsi::GenericMethod ("tableName", "@brief Method QString QSqlRelation::tableName()\n", true, &_init_f_tableName_c0, &_call_f_tableName_c0);
   return methods;
 }

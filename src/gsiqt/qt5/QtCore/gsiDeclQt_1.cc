@@ -38,6 +38,31 @@
 class Qt_Namespace { };
 
 
+//  Implementation of the enum wrapper class for Qt::DayOfWeek
+namespace qt_gsi
+{
+
+static gsi::Enum<Qt::DayOfWeek> decl_Qt_DayOfWeek_Enum ("QtCore", "Qt_DayOfWeek",
+    gsi::enum_const ("Monday", Qt::Monday, "@brief Enum constant Qt::Monday") +
+    gsi::enum_const ("Tuesday", Qt::Tuesday, "@brief Enum constant Qt::Tuesday") +
+    gsi::enum_const ("Wednesday", Qt::Wednesday, "@brief Enum constant Qt::Wednesday") +
+    gsi::enum_const ("Thursday", Qt::Thursday, "@brief Enum constant Qt::Thursday") +
+    gsi::enum_const ("Friday", Qt::Friday, "@brief Enum constant Qt::Friday") +
+    gsi::enum_const ("Saturday", Qt::Saturday, "@brief Enum constant Qt::Saturday") +
+    gsi::enum_const ("Sunday", Qt::Sunday, "@brief Enum constant Qt::Sunday"),
+  "@qt\n@brief This class represents the Qt::DayOfWeek enum");
+
+static gsi::QFlagsClass<Qt::DayOfWeek > decl_Qt_DayOfWeek_Enums ("QtCore", "Qt_QFlags_DayOfWeek",
+  "@qt\n@brief This class represents the QFlags<Qt::DayOfWeek> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<Qt_Namespace> inject_Qt_DayOfWeek_Enum_in_parent (decl_Qt_DayOfWeek_Enum.defs ());
+static gsi::ClassExt<Qt_Namespace> decl_Qt_DayOfWeek_Enum_as_child (decl_Qt_DayOfWeek_Enum, "DayOfWeek");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_DayOfWeek_Enums_as_child (decl_Qt_DayOfWeek_Enums, "QFlags_DayOfWeek");
+
+}
+
+
 //  Implementation of the enum wrapper class for Qt::DockWidgetArea
 namespace qt_gsi
 {
@@ -124,6 +149,32 @@ static gsi::QFlagsClass<Qt::Edge > decl_Qt_Edge_Enums ("QtCore", "Qt_QFlags_Edge
 static gsi::ClassExt<Qt_Namespace> inject_Qt_Edge_Enum_in_parent (decl_Qt_Edge_Enum.defs ());
 static gsi::ClassExt<Qt_Namespace> decl_Qt_Edge_Enum_as_child (decl_Qt_Edge_Enum, "Edge");
 static gsi::ClassExt<Qt_Namespace> decl_Qt_Edge_Enums_as_child (decl_Qt_Edge_Enums, "QFlags_Edge");
+
+}
+
+
+//  Implementation of the enum wrapper class for Qt::EnterKeyType
+namespace qt_gsi
+{
+
+static gsi::Enum<Qt::EnterKeyType> decl_Qt_EnterKeyType_Enum ("QtCore", "Qt_EnterKeyType",
+    gsi::enum_const ("EnterKeyDefault", Qt::EnterKeyDefault, "@brief Enum constant Qt::EnterKeyDefault") +
+    gsi::enum_const ("EnterKeyReturn", Qt::EnterKeyReturn, "@brief Enum constant Qt::EnterKeyReturn") +
+    gsi::enum_const ("EnterKeyDone", Qt::EnterKeyDone, "@brief Enum constant Qt::EnterKeyDone") +
+    gsi::enum_const ("EnterKeyGo", Qt::EnterKeyGo, "@brief Enum constant Qt::EnterKeyGo") +
+    gsi::enum_const ("EnterKeySend", Qt::EnterKeySend, "@brief Enum constant Qt::EnterKeySend") +
+    gsi::enum_const ("EnterKeySearch", Qt::EnterKeySearch, "@brief Enum constant Qt::EnterKeySearch") +
+    gsi::enum_const ("EnterKeyNext", Qt::EnterKeyNext, "@brief Enum constant Qt::EnterKeyNext") +
+    gsi::enum_const ("EnterKeyPrevious", Qt::EnterKeyPrevious, "@brief Enum constant Qt::EnterKeyPrevious"),
+  "@qt\n@brief This class represents the Qt::EnterKeyType enum");
+
+static gsi::QFlagsClass<Qt::EnterKeyType > decl_Qt_EnterKeyType_Enums ("QtCore", "Qt_QFlags_EnterKeyType",
+  "@qt\n@brief This class represents the QFlags<Qt::EnterKeyType> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<Qt_Namespace> inject_Qt_EnterKeyType_Enum_in_parent (decl_Qt_EnterKeyType_Enum.defs ());
+static gsi::ClassExt<Qt_Namespace> decl_Qt_EnterKeyType_Enum_as_child (decl_Qt_EnterKeyType_Enum, "EnterKeyType");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_EnterKeyType_Enums_as_child (decl_Qt_EnterKeyType_Enums, "QFlags_EnterKeyType");
 
 }
 
@@ -408,14 +459,12 @@ namespace qt_gsi
 {
 
 static gsi::Enum<Qt::Initialization> decl_Qt_Initialization_Enum ("QtCore", "Qt_Initialization",
-    gsi::enum_const ("Uninitialized", Qt::Uninitialized, "@brief Enum constant Qt::Uninitialized"),
+    gsi::enum_const ("Uninitialized", Qt::Initialization::Uninitialized, "@brief Enum constant Qt::Initialization::Uninitialized"),
   "@qt\n@brief This class represents the Qt::Initialization enum");
 
 static gsi::QFlagsClass<Qt::Initialization > decl_Qt_Initialization_Enums ("QtCore", "Qt_QFlags_Initialization",
   "@qt\n@brief This class represents the QFlags<Qt::Initialization> flag set");
 
-//  Inject the declarations into the parent
-static gsi::ClassExt<Qt_Namespace> inject_Qt_Initialization_Enum_in_parent (decl_Qt_Initialization_Enum.defs ());
 static gsi::ClassExt<Qt_Namespace> decl_Qt_Initialization_Enum_as_child (decl_Qt_Initialization_Enum, "Initialization");
 static gsi::ClassExt<Qt_Namespace> decl_Qt_Initialization_Enums_as_child (decl_Qt_Initialization_Enums, "QFlags_Initialization");
 
@@ -439,6 +488,8 @@ static gsi::Enum<Qt::InputMethodHint> decl_Qt_InputMethodHint_Enum ("QtCore", "Q
     gsi::enum_const ("ImhTime", Qt::ImhTime, "@brief Enum constant Qt::ImhTime") +
     gsi::enum_const ("ImhPreferLatin", Qt::ImhPreferLatin, "@brief Enum constant Qt::ImhPreferLatin") +
     gsi::enum_const ("ImhMultiLine", Qt::ImhMultiLine, "@brief Enum constant Qt::ImhMultiLine") +
+    gsi::enum_const ("ImhNoEditMenu", Qt::ImhNoEditMenu, "@brief Enum constant Qt::ImhNoEditMenu") +
+    gsi::enum_const ("ImhNoTextHandles", Qt::ImhNoTextHandles, "@brief Enum constant Qt::ImhNoTextHandles") +
     gsi::enum_const ("ImhDigitsOnly", Qt::ImhDigitsOnly, "@brief Enum constant Qt::ImhDigitsOnly") +
     gsi::enum_const ("ImhFormattedNumbersOnly", Qt::ImhFormattedNumbersOnly, "@brief Enum constant Qt::ImhFormattedNumbersOnly") +
     gsi::enum_const ("ImhUppercaseOnly", Qt::ImhUppercaseOnly, "@brief Enum constant Qt::ImhUppercaseOnly") +
@@ -480,6 +531,9 @@ static gsi::Enum<Qt::InputMethodQuery> decl_Qt_InputMethodQuery_Enum ("QtCore", 
     gsi::enum_const ("ImAbsolutePosition", Qt::ImAbsolutePosition, "@brief Enum constant Qt::ImAbsolutePosition") +
     gsi::enum_const ("ImTextBeforeCursor", Qt::ImTextBeforeCursor, "@brief Enum constant Qt::ImTextBeforeCursor") +
     gsi::enum_const ("ImTextAfterCursor", Qt::ImTextAfterCursor, "@brief Enum constant Qt::ImTextAfterCursor") +
+    gsi::enum_const ("ImEnterKeyType", Qt::ImEnterKeyType, "@brief Enum constant Qt::ImEnterKeyType") +
+    gsi::enum_const ("ImAnchorRectangle", Qt::ImAnchorRectangle, "@brief Enum constant Qt::ImAnchorRectangle") +
+    gsi::enum_const ("ImInputItemClipRectangle", Qt::ImInputItemClipRectangle, "@brief Enum constant Qt::ImInputItemClipRectangle") +
     gsi::enum_const ("ImPlatformData", Qt::ImPlatformData, "@brief Enum constant Qt::ImPlatformData") +
     gsi::enum_const ("ImQueryInput", Qt::ImQueryInput, "@brief Enum constant Qt::ImQueryInput") +
     gsi::enum_const ("ImQueryAll", Qt::ImQueryAll, "@brief Enum constant Qt::ImQueryAll"),
@@ -492,75 +546,6 @@ static gsi::QFlagsClass<Qt::InputMethodQuery > decl_Qt_InputMethodQuery_Enums ("
 static gsi::ClassExt<Qt_Namespace> inject_Qt_InputMethodQuery_Enum_in_parent (decl_Qt_InputMethodQuery_Enum.defs ());
 static gsi::ClassExt<Qt_Namespace> decl_Qt_InputMethodQuery_Enum_as_child (decl_Qt_InputMethodQuery_Enum, "InputMethodQuery");
 static gsi::ClassExt<Qt_Namespace> decl_Qt_InputMethodQuery_Enums_as_child (decl_Qt_InputMethodQuery_Enums, "QFlags_InputMethodQuery");
-
-}
-
-
-//  Implementation of the enum wrapper class for Qt::ItemDataRole
-namespace qt_gsi
-{
-
-static gsi::Enum<Qt::ItemDataRole> decl_Qt_ItemDataRole_Enum ("QtCore", "Qt_ItemDataRole",
-    gsi::enum_const ("DisplayRole", Qt::DisplayRole, "@brief Enum constant Qt::DisplayRole") +
-    gsi::enum_const ("DecorationRole", Qt::DecorationRole, "@brief Enum constant Qt::DecorationRole") +
-    gsi::enum_const ("EditRole", Qt::EditRole, "@brief Enum constant Qt::EditRole") +
-    gsi::enum_const ("ToolTipRole", Qt::ToolTipRole, "@brief Enum constant Qt::ToolTipRole") +
-    gsi::enum_const ("StatusTipRole", Qt::StatusTipRole, "@brief Enum constant Qt::StatusTipRole") +
-    gsi::enum_const ("WhatsThisRole", Qt::WhatsThisRole, "@brief Enum constant Qt::WhatsThisRole") +
-    gsi::enum_const ("FontRole", Qt::FontRole, "@brief Enum constant Qt::FontRole") +
-    gsi::enum_const ("TextAlignmentRole", Qt::TextAlignmentRole, "@brief Enum constant Qt::TextAlignmentRole") +
-    gsi::enum_const ("BackgroundColorRole", Qt::BackgroundColorRole, "@brief Enum constant Qt::BackgroundColorRole") +
-    gsi::enum_const ("BackgroundRole", Qt::BackgroundRole, "@brief Enum constant Qt::BackgroundRole") +
-    gsi::enum_const ("TextColorRole", Qt::TextColorRole, "@brief Enum constant Qt::TextColorRole") +
-    gsi::enum_const ("ForegroundRole", Qt::ForegroundRole, "@brief Enum constant Qt::ForegroundRole") +
-    gsi::enum_const ("CheckStateRole", Qt::CheckStateRole, "@brief Enum constant Qt::CheckStateRole") +
-    gsi::enum_const ("AccessibleTextRole", Qt::AccessibleTextRole, "@brief Enum constant Qt::AccessibleTextRole") +
-    gsi::enum_const ("AccessibleDescriptionRole", Qt::AccessibleDescriptionRole, "@brief Enum constant Qt::AccessibleDescriptionRole") +
-    gsi::enum_const ("SizeHintRole", Qt::SizeHintRole, "@brief Enum constant Qt::SizeHintRole") +
-    gsi::enum_const ("InitialSortOrderRole", Qt::InitialSortOrderRole, "@brief Enum constant Qt::InitialSortOrderRole") +
-    gsi::enum_const ("DisplayPropertyRole", Qt::DisplayPropertyRole, "@brief Enum constant Qt::DisplayPropertyRole") +
-    gsi::enum_const ("DecorationPropertyRole", Qt::DecorationPropertyRole, "@brief Enum constant Qt::DecorationPropertyRole") +
-    gsi::enum_const ("ToolTipPropertyRole", Qt::ToolTipPropertyRole, "@brief Enum constant Qt::ToolTipPropertyRole") +
-    gsi::enum_const ("StatusTipPropertyRole", Qt::StatusTipPropertyRole, "@brief Enum constant Qt::StatusTipPropertyRole") +
-    gsi::enum_const ("WhatsThisPropertyRole", Qt::WhatsThisPropertyRole, "@brief Enum constant Qt::WhatsThisPropertyRole") +
-    gsi::enum_const ("UserRole", Qt::UserRole, "@brief Enum constant Qt::UserRole"),
-  "@qt\n@brief This class represents the Qt::ItemDataRole enum");
-
-static gsi::QFlagsClass<Qt::ItemDataRole > decl_Qt_ItemDataRole_Enums ("QtCore", "Qt_QFlags_ItemDataRole",
-  "@qt\n@brief This class represents the QFlags<Qt::ItemDataRole> flag set");
-
-//  Inject the declarations into the parent
-static gsi::ClassExt<Qt_Namespace> inject_Qt_ItemDataRole_Enum_in_parent (decl_Qt_ItemDataRole_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ItemDataRole_Enum_as_child (decl_Qt_ItemDataRole_Enum, "ItemDataRole");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ItemDataRole_Enums_as_child (decl_Qt_ItemDataRole_Enums, "QFlags_ItemDataRole");
-
-}
-
-
-//  Implementation of the enum wrapper class for Qt::ItemFlag
-namespace qt_gsi
-{
-
-static gsi::Enum<Qt::ItemFlag> decl_Qt_ItemFlag_Enum ("QtCore", "Qt_ItemFlag",
-    gsi::enum_const ("NoItemFlags", Qt::NoItemFlags, "@brief Enum constant Qt::NoItemFlags") +
-    gsi::enum_const ("ItemIsSelectable", Qt::ItemIsSelectable, "@brief Enum constant Qt::ItemIsSelectable") +
-    gsi::enum_const ("ItemIsEditable", Qt::ItemIsEditable, "@brief Enum constant Qt::ItemIsEditable") +
-    gsi::enum_const ("ItemIsDragEnabled", Qt::ItemIsDragEnabled, "@brief Enum constant Qt::ItemIsDragEnabled") +
-    gsi::enum_const ("ItemIsDropEnabled", Qt::ItemIsDropEnabled, "@brief Enum constant Qt::ItemIsDropEnabled") +
-    gsi::enum_const ("ItemIsUserCheckable", Qt::ItemIsUserCheckable, "@brief Enum constant Qt::ItemIsUserCheckable") +
-    gsi::enum_const ("ItemIsEnabled", Qt::ItemIsEnabled, "@brief Enum constant Qt::ItemIsEnabled") +
-    gsi::enum_const ("ItemIsTristate", Qt::ItemIsTristate, "@brief Enum constant Qt::ItemIsTristate") +
-    gsi::enum_const ("ItemNeverHasChildren", Qt::ItemNeverHasChildren, "@brief Enum constant Qt::ItemNeverHasChildren") +
-    gsi::enum_const ("ItemIsUserTristate", Qt::ItemIsUserTristate, "@brief Enum constant Qt::ItemIsUserTristate"),
-  "@qt\n@brief This class represents the Qt::ItemFlag enum");
-
-static gsi::QFlagsClass<Qt::ItemFlag > decl_Qt_ItemFlag_Enums ("QtCore", "Qt_QFlags_ItemFlag",
-  "@qt\n@brief This class represents the QFlags<Qt::ItemFlag> flag set");
-
-//  Inject the declarations into the parent
-static gsi::ClassExt<Qt_Namespace> inject_Qt_ItemFlag_Enum_in_parent (decl_Qt_ItemFlag_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ItemFlag_Enum_as_child (decl_Qt_ItemFlag_Enum, "ItemFlag");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ItemFlag_Enums_as_child (decl_Qt_ItemFlag_Enums, "QFlags_ItemFlag");
 
 }
 

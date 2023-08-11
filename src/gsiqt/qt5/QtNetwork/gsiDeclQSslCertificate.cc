@@ -243,6 +243,21 @@ static void _call_f_isSelfSigned_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
+// QString QSslCertificate::issuerDisplayName()
+
+
+static void _init_f_issuerDisplayName_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QString > ();
+}
+
+static void _call_f_issuerDisplayName_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QString > ((QString)((QSslCertificate *)cls)->issuerDisplayName ());
+}
+
+
 // QStringList QSslCertificate::issuerInfo(QSslCertificate::SubjectInfo info)
 
 
@@ -380,6 +395,21 @@ static void _call_f_serialNumber_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QByteArray > ((QByteArray)((QSslCertificate *)cls)->serialNumber ());
+}
+
+
+// QString QSslCertificate::subjectDisplayName()
+
+
+static void _init_f_subjectDisplayName_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QString > ();
+}
+
+static void _call_f_subjectDisplayName_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QString > ((QString)((QSslCertificate *)cls)->subjectDisplayName ());
 }
 
 
@@ -596,7 +626,7 @@ static void _init_f_importPkcs12_9509 (qt_gsi::GenericStaticMethod *decl)
   decl->add_arg<QSslKey * > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("cert");
   decl->add_arg<QSslCertificate * > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("caCertificates", true, "0");
+  static gsi::ArgSpecBase argspec_3 ("caCertificates", true, "nullptr");
   decl->add_arg<QList<QSslCertificate> * > (argspec_3);
   static gsi::ArgSpecBase argspec_4 ("passPhrase", true, "QByteArray()");
   decl->add_arg<const QByteArray & > (argspec_4);
@@ -610,7 +640,7 @@ static void _call_f_importPkcs12_9509 (const qt_gsi::GenericStaticMethod * /*dec
   QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   QSslKey *arg2 = gsi::arg_reader<QSslKey * >() (args, heap);
   QSslCertificate *arg3 = gsi::arg_reader<QSslCertificate * >() (args, heap);
-  QList<QSslCertificate> *arg4 = args ? gsi::arg_reader<QList<QSslCertificate> * >() (args, heap) : gsi::arg_maker<QList<QSslCertificate> * >() (0, heap);
+  QList<QSslCertificate> *arg4 = args ? gsi::arg_reader<QList<QSslCertificate> * >() (args, heap) : gsi::arg_maker<QList<QSslCertificate> * >() (nullptr, heap);
   const QByteArray &arg5 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
   ret.write<bool > ((bool)QSslCertificate::importPkcs12 (arg1, arg2, arg3, arg4, arg5));
 }
@@ -656,6 +686,7 @@ static gsi::Methods methods_QSslCertificate () {
   methods += new qt_gsi::GenericMethod ("isBlacklisted?", "@brief Method bool QSslCertificate::isBlacklisted()\n", true, &_init_f_isBlacklisted_c0, &_call_f_isBlacklisted_c0);
   methods += new qt_gsi::GenericMethod ("isNull?", "@brief Method bool QSslCertificate::isNull()\n", true, &_init_f_isNull_c0, &_call_f_isNull_c0);
   methods += new qt_gsi::GenericMethod ("isSelfSigned?", "@brief Method bool QSslCertificate::isSelfSigned()\n", true, &_init_f_isSelfSigned_c0, &_call_f_isSelfSigned_c0);
+  methods += new qt_gsi::GenericMethod ("issuerDisplayName", "@brief Method QString QSslCertificate::issuerDisplayName()\n", true, &_init_f_issuerDisplayName_c0, &_call_f_issuerDisplayName_c0);
   methods += new qt_gsi::GenericMethod ("issuerInfo", "@brief Method QStringList QSslCertificate::issuerInfo(QSslCertificate::SubjectInfo info)\n", true, &_init_f_issuerInfo_c3178, &_call_f_issuerInfo_c3178);
   methods += new qt_gsi::GenericMethod ("issuerInfo", "@brief Method QStringList QSslCertificate::issuerInfo(const QByteArray &attribute)\n", true, &_init_f_issuerInfo_c2309, &_call_f_issuerInfo_c2309);
   methods += new qt_gsi::GenericMethod ("issuerInfoAttributes", "@brief Method QList<QByteArray> QSslCertificate::issuerInfoAttributes()\n", true, &_init_f_issuerInfoAttributes_c0, &_call_f_issuerInfoAttributes_c0);
@@ -664,6 +695,7 @@ static gsi::Methods methods_QSslCertificate () {
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QSslCertificate::operator==(const QSslCertificate &other)\n", true, &_init_f_operator_eq__eq__c2823, &_call_f_operator_eq__eq__c2823);
   methods += new qt_gsi::GenericMethod ("publicKey", "@brief Method QSslKey QSslCertificate::publicKey()\n", true, &_init_f_publicKey_c0, &_call_f_publicKey_c0);
   methods += new qt_gsi::GenericMethod ("serialNumber", "@brief Method QByteArray QSslCertificate::serialNumber()\n", true, &_init_f_serialNumber_c0, &_call_f_serialNumber_c0);
+  methods += new qt_gsi::GenericMethod ("subjectDisplayName", "@brief Method QString QSslCertificate::subjectDisplayName()\n", true, &_init_f_subjectDisplayName_c0, &_call_f_subjectDisplayName_c0);
   methods += new qt_gsi::GenericMethod ("subjectInfo", "@brief Method QStringList QSslCertificate::subjectInfo(QSslCertificate::SubjectInfo info)\n", true, &_init_f_subjectInfo_c3178, &_call_f_subjectInfo_c3178);
   methods += new qt_gsi::GenericMethod ("subjectInfo", "@brief Method QStringList QSslCertificate::subjectInfo(const QByteArray &attribute)\n", true, &_init_f_subjectInfo_c2309, &_call_f_subjectInfo_c2309);
   methods += new qt_gsi::GenericMethod ("subjectInfoAttributes", "@brief Method QList<QByteArray> QSslCertificate::subjectInfoAttributes()\n", true, &_init_f_subjectInfoAttributes_c0, &_call_f_subjectInfoAttributes_c0);

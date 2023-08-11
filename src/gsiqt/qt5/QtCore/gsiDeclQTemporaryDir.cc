@@ -84,6 +84,40 @@ static void _call_f_autoRemove_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
+// QString QTemporaryDir::errorString()
+
+
+static void _init_f_errorString_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QString > ();
+}
+
+static void _call_f_errorString_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QString > ((QString)((QTemporaryDir *)cls)->errorString ());
+}
+
+
+// QString QTemporaryDir::filePath(const QString &fileName)
+
+
+static void _init_f_filePath_c2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("fileName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<QString > ();
+}
+
+static void _call_f_filePath_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ret.write<QString > ((QString)((QTemporaryDir *)cls)->filePath (arg1));
+}
+
+
 // bool QTemporaryDir::isValid()
 
 
@@ -158,6 +192,8 @@ static gsi::Methods methods_QTemporaryDir () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTemporaryDir::QTemporaryDir()\nThis method creates an object of class QTemporaryDir.", &_init_ctor_QTemporaryDir_0, &_call_ctor_QTemporaryDir_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTemporaryDir::QTemporaryDir(const QString &templateName)\nThis method creates an object of class QTemporaryDir.", &_init_ctor_QTemporaryDir_2025, &_call_ctor_QTemporaryDir_2025);
   methods += new qt_gsi::GenericMethod (":autoRemove", "@brief Method bool QTemporaryDir::autoRemove()\n", true, &_init_f_autoRemove_c0, &_call_f_autoRemove_c0);
+  methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QTemporaryDir::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
+  methods += new qt_gsi::GenericMethod ("filePath", "@brief Method QString QTemporaryDir::filePath(const QString &fileName)\n", true, &_init_f_filePath_c2025, &_call_f_filePath_c2025);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QTemporaryDir::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("path", "@brief Method QString QTemporaryDir::path()\n", true, &_init_f_path_c0, &_call_f_path_c0);
   methods += new qt_gsi::GenericMethod ("remove", "@brief Method bool QTemporaryDir::remove()\n", false, &_init_f_remove_0, &_call_f_remove_0);

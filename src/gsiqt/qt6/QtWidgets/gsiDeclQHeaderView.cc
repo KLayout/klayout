@@ -1262,26 +1262,6 @@ static void _call_f_sizeHint_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// void QHeaderView::sortIndicatorClearableChanged(bool clearable)
-
-
-static void _init_f_sortIndicatorClearableChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("clearable");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_sortIndicatorClearableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QHeaderView *)cls)->sortIndicatorClearableChanged (arg1);
-}
-
-
 // Qt::SortOrder QHeaderView::sortIndicatorOrder()
 
 
@@ -1443,9 +1423,9 @@ static gsi::Methods methods_QHeaderView () {
   methods += new qt_gsi::GenericMethod ("hiddenSectionCount", "@brief Method int QHeaderView::hiddenSectionCount()\n", true, &_init_f_hiddenSectionCount_c0, &_call_f_hiddenSectionCount_c0);
   methods += new qt_gsi::GenericMethod ("hideSection", "@brief Method void QHeaderView::hideSection(int logicalIndex)\n", false, &_init_f_hideSection_767, &_call_f_hideSection_767);
   methods += new qt_gsi::GenericMethod (":highlightSections", "@brief Method bool QHeaderView::highlightSections()\n", true, &_init_f_highlightSections_c0, &_call_f_highlightSections_c0);
-  methods += new qt_gsi::GenericMethod ("isFirstSectionMovable?", "@brief Method bool QHeaderView::isFirstSectionMovable()\n", true, &_init_f_isFirstSectionMovable_c0, &_call_f_isFirstSectionMovable_c0);
+  methods += new qt_gsi::GenericMethod ("isFirstSectionMovable?|:firstSectionMovable", "@brief Method bool QHeaderView::isFirstSectionMovable()\n", true, &_init_f_isFirstSectionMovable_c0, &_call_f_isFirstSectionMovable_c0);
   methods += new qt_gsi::GenericMethod ("isSectionHidden?", "@brief Method bool QHeaderView::isSectionHidden(int logicalIndex)\n", true, &_init_f_isSectionHidden_c767, &_call_f_isSectionHidden_c767);
-  methods += new qt_gsi::GenericMethod ("isSortIndicatorClearable?", "@brief Method bool QHeaderView::isSortIndicatorClearable()\n", true, &_init_f_isSortIndicatorClearable_c0, &_call_f_isSortIndicatorClearable_c0);
+  methods += new qt_gsi::GenericMethod ("isSortIndicatorClearable?|:sortIndicatorClearable", "@brief Method bool QHeaderView::isSortIndicatorClearable()\n", true, &_init_f_isSortIndicatorClearable_c0, &_call_f_isSortIndicatorClearable_c0);
   methods += new qt_gsi::GenericMethod ("isSortIndicatorShown?|:sortIndicatorShown", "@brief Method bool QHeaderView::isSortIndicatorShown()\n", true, &_init_f_isSortIndicatorShown_c0, &_call_f_isSortIndicatorShown_c0);
   methods += new qt_gsi::GenericMethod ("length", "@brief Method int QHeaderView::length()\n", true, &_init_f_length_c0, &_call_f_length_c0);
   methods += new qt_gsi::GenericMethod ("logicalIndex", "@brief Method int QHeaderView::logicalIndex(int visualIndex)\n", true, &_init_f_logicalIndex_c767, &_call_f_logicalIndex_c767);
@@ -1476,7 +1456,7 @@ static gsi::Methods methods_QHeaderView () {
   methods += new qt_gsi::GenericMethod ("setCascadingSectionResizes|cascadingSectionResizes=", "@brief Method void QHeaderView::setCascadingSectionResizes(bool enable)\n", false, &_init_f_setCascadingSectionResizes_864, &_call_f_setCascadingSectionResizes_864);
   methods += new qt_gsi::GenericMethod ("setDefaultAlignment|defaultAlignment=", "@brief Method void QHeaderView::setDefaultAlignment(QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_setDefaultAlignment_2750, &_call_f_setDefaultAlignment_2750);
   methods += new qt_gsi::GenericMethod ("setDefaultSectionSize|defaultSectionSize=", "@brief Method void QHeaderView::setDefaultSectionSize(int size)\n", false, &_init_f_setDefaultSectionSize_767, &_call_f_setDefaultSectionSize_767);
-  methods += new qt_gsi::GenericMethod ("setFirstSectionMovable", "@brief Method void QHeaderView::setFirstSectionMovable(bool movable)\n", false, &_init_f_setFirstSectionMovable_864, &_call_f_setFirstSectionMovable_864);
+  methods += new qt_gsi::GenericMethod ("setFirstSectionMovable|firstSectionMovable=", "@brief Method void QHeaderView::setFirstSectionMovable(bool movable)\n", false, &_init_f_setFirstSectionMovable_864, &_call_f_setFirstSectionMovable_864);
   methods += new qt_gsi::GenericMethod ("setHighlightSections|highlightSections=", "@brief Method void QHeaderView::setHighlightSections(bool highlight)\n", false, &_init_f_setHighlightSections_864, &_call_f_setHighlightSections_864);
   methods += new qt_gsi::GenericMethod ("setMaximumSectionSize|maximumSectionSize=", "@brief Method void QHeaderView::setMaximumSectionSize(int size)\n", false, &_init_f_setMaximumSectionSize_767, &_call_f_setMaximumSectionSize_767);
   methods += new qt_gsi::GenericMethod ("setMinimumSectionSize|minimumSectionSize=", "@brief Method void QHeaderView::setMinimumSectionSize(int size)\n", false, &_init_f_setMinimumSectionSize_767, &_call_f_setMinimumSectionSize_767);
@@ -1491,13 +1471,12 @@ static gsi::Methods methods_QHeaderView () {
   methods += new qt_gsi::GenericMethod ("setSectionsClickable|sectionsClickable=", "@brief Method void QHeaderView::setSectionsClickable(bool clickable)\n", false, &_init_f_setSectionsClickable_864, &_call_f_setSectionsClickable_864);
   methods += new qt_gsi::GenericMethod ("setSectionsMovable|sectionsMovable=", "@brief Method void QHeaderView::setSectionsMovable(bool movable)\n", false, &_init_f_setSectionsMovable_864, &_call_f_setSectionsMovable_864);
   methods += new qt_gsi::GenericMethod ("setSortIndicator", "@brief Method void QHeaderView::setSortIndicator(int logicalIndex, Qt::SortOrder order)\n", false, &_init_f_setSortIndicator_2340, &_call_f_setSortIndicator_2340);
-  methods += new qt_gsi::GenericMethod ("setSortIndicatorClearable", "@brief Method void QHeaderView::setSortIndicatorClearable(bool clearable)\n", false, &_init_f_setSortIndicatorClearable_864, &_call_f_setSortIndicatorClearable_864);
+  methods += new qt_gsi::GenericMethod ("setSortIndicatorClearable|sortIndicatorClearable=", "@brief Method void QHeaderView::setSortIndicatorClearable(bool clearable)\n", false, &_init_f_setSortIndicatorClearable_864, &_call_f_setSortIndicatorClearable_864);
   methods += new qt_gsi::GenericMethod ("setSortIndicatorShown|sortIndicatorShown=", "@brief Method void QHeaderView::setSortIndicatorShown(bool show)\n", false, &_init_f_setSortIndicatorShown_864, &_call_f_setSortIndicatorShown_864);
   methods += new qt_gsi::GenericMethod ("setStretchLastSection|stretchLastSection=", "@brief Method void QHeaderView::setStretchLastSection(bool stretch)\n", false, &_init_f_setStretchLastSection_864, &_call_f_setStretchLastSection_864);
   methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method void QHeaderView::setVisible(bool v)\nThis is a reimplementation of QWidget::setVisible", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
   methods += new qt_gsi::GenericMethod ("showSection", "@brief Method void QHeaderView::showSection(int logicalIndex)\n", false, &_init_f_showSection_767, &_call_f_showSection_767);
   methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QHeaderView::sizeHint()\nThis is a reimplementation of QAbstractScrollArea::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
-  methods += new qt_gsi::GenericMethod ("sortIndicatorClearableChanged", "@brief Method void QHeaderView::sortIndicatorClearableChanged(bool clearable)\n", false, &_init_f_sortIndicatorClearableChanged_864, &_call_f_sortIndicatorClearableChanged_864);
   methods += new qt_gsi::GenericMethod ("sortIndicatorOrder", "@brief Method Qt::SortOrder QHeaderView::sortIndicatorOrder()\n", true, &_init_f_sortIndicatorOrder_c0, &_call_f_sortIndicatorOrder_c0);
   methods += new qt_gsi::GenericMethod ("sortIndicatorSection", "@brief Method int QHeaderView::sortIndicatorSection()\n", true, &_init_f_sortIndicatorSection_c0, &_call_f_sortIndicatorSection_c0);
   methods += new qt_gsi::GenericMethod (":stretchLastSection", "@brief Method bool QHeaderView::stretchLastSection()\n", true, &_init_f_stretchLastSection_c0, &_call_f_stretchLastSection_c0);
@@ -1524,6 +1503,7 @@ static gsi::Methods methods_QHeaderView () {
   methods += gsi::qt_signal<int > ("sectionPressed(int)", "sectionPressed", gsi::arg("logicalIndex"), "@brief Signal declaration for QHeaderView::sectionPressed(int logicalIndex)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int, int, int > ("sectionResized(int, int, int)", "sectionResized", gsi::arg("logicalIndex"), gsi::arg("oldSize"), gsi::arg("newSize"), "@brief Signal declaration for QHeaderView::sectionResized(int logicalIndex, int oldSize, int newSize)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int, const qt_gsi::Converter<Qt::SortOrder>::target_type & > ("sortIndicatorChanged(int, Qt::SortOrder)", "sortIndicatorChanged", gsi::arg("logicalIndex"), gsi::arg("order"), "@brief Signal declaration for QHeaderView::sortIndicatorChanged(int logicalIndex, Qt::SortOrder order)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("sortIndicatorClearableChanged(bool)", "sortIndicatorClearableChanged", gsi::arg("clearable"), "@brief Signal declaration for QHeaderView::sortIndicatorClearableChanged(bool clearable)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("viewportEntered()", "viewportEntered", "@brief Signal declaration for QHeaderView::viewportEntered()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QIcon & > ("windowIconChanged(const QIcon &)", "windowIconChanged", gsi::arg("icon"), "@brief Signal declaration for QHeaderView::windowIconChanged(const QIcon &icon)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("windowIconTextChanged(const QString &)", "windowIconTextChanged", gsi::arg("iconText"), "@brief Signal declaration for QHeaderView::windowIconTextChanged(const QString &iconText)\nYou can bind a procedure to this signal.");
@@ -2099,6 +2079,12 @@ public:
   void emitter_QHeaderView_sortIndicatorChanged_2340(int logicalIndex, Qt::SortOrder order)
   {
     emit QHeaderView::sortIndicatorChanged(logicalIndex, order);
+  }
+
+  //  [emitter impl] void QHeaderView::sortIndicatorClearableChanged(bool clearable)
+  void emitter_QHeaderView_sortIndicatorClearableChanged_864(bool clearable)
+  {
+    emit QHeaderView::sortIndicatorClearableChanged(clearable);
   }
 
   //  [emitter impl] void QHeaderView::viewportEntered()
@@ -6037,6 +6023,24 @@ static void _call_emitter_sortIndicatorChanged_2340 (const qt_gsi::GenericMethod
 }
 
 
+// emitter void QHeaderView::sortIndicatorClearableChanged(bool clearable)
+
+static void _init_emitter_sortIndicatorClearableChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("clearable");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_sortIndicatorClearableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QHeaderView_Adaptor *)cls)->emitter_QHeaderView_sortIndicatorClearableChanged_864 (arg1);
+}
+
+
 // exposed void QHeaderView::startAutoScroll()
 
 static void _init_fp_startAutoScroll_0 (qt_gsi::GenericMethod *decl)
@@ -6536,7 +6540,7 @@ static gsi::Methods methods_QHeaderView_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*commitData", "@hide", false, &_init_cbs_commitData_1315_0, &_call_cbs_commitData_1315_0, &_set_callback_cbs_commitData_1315_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QHeaderView::contextMenuEvent(QContextMenuEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0, &_set_callback_cbs_contextMenuEvent_2363_0);
-  methods += new qt_gsi::GenericMethod ("*qt_create", "@brief Method void QHeaderView::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
+  methods += new qt_gsi::GenericMethod ("*create|qt_create", "@brief Method void QHeaderView::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
   methods += new qt_gsi::GenericMethod ("*currentChanged", "@brief Virtual method void QHeaderView::currentChanged(const QModelIndex &current, const QModelIndex &old)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_currentChanged_4682_0, &_call_cbs_currentChanged_4682_0);
   methods += new qt_gsi::GenericMethod ("*currentChanged", "@hide", false, &_init_cbs_currentChanged_4682_0, &_call_cbs_currentChanged_4682_0, &_set_callback_cbs_currentChanged_4682_0);
   methods += new qt_gsi::GenericMethod ("emit_customContextMenuRequested", "@brief Emitter for signal void QHeaderView::customContextMenuRequested(const QPoint &pos)\nCall this method to emit this signal.", false, &_init_emitter_customContextMenuRequested_1916, &_call_emitter_customContextMenuRequested_1916);
@@ -6544,7 +6548,7 @@ static gsi::Methods methods_QHeaderView_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*dataChanged", "@brief Virtual method void QHeaderView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dataChanged_6833_1, &_call_cbs_dataChanged_6833_1);
   methods += new qt_gsi::GenericMethod ("*dataChanged", "@hide", false, &_init_cbs_dataChanged_6833_1, &_call_cbs_dataChanged_6833_1, &_set_callback_cbs_dataChanged_6833_1);
-  methods += new qt_gsi::GenericMethod ("*qt_destroy", "@brief Method void QHeaderView::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
+  methods += new qt_gsi::GenericMethod ("*destroy|qt_destroy", "@brief Method void QHeaderView::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QHeaderView::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*dirtyRegionOffset", "@brief Method QPoint QHeaderView::dirtyRegionOffset()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_dirtyRegionOffset_c0, &_call_fp_dirtyRegionOffset_c0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QHeaderView::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
@@ -6720,6 +6724,7 @@ static gsi::Methods methods_QHeaderView_Adaptor () {
   methods += new qt_gsi::GenericMethod ("sizeHintForRow", "@brief Virtual method int QHeaderView::sizeHintForRow(int row)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_sizeHintForRow_c767_0, &_call_cbs_sizeHintForRow_c767_0);
   methods += new qt_gsi::GenericMethod ("sizeHintForRow", "@hide", true, &_init_cbs_sizeHintForRow_c767_0, &_call_cbs_sizeHintForRow_c767_0, &_set_callback_cbs_sizeHintForRow_c767_0);
   methods += new qt_gsi::GenericMethod ("emit_sortIndicatorChanged", "@brief Emitter for signal void QHeaderView::sortIndicatorChanged(int logicalIndex, Qt::SortOrder order)\nCall this method to emit this signal.", false, &_init_emitter_sortIndicatorChanged_2340, &_call_emitter_sortIndicatorChanged_2340);
+  methods += new qt_gsi::GenericMethod ("emit_sortIndicatorClearableChanged", "@brief Emitter for signal void QHeaderView::sortIndicatorClearableChanged(bool clearable)\nCall this method to emit this signal.", false, &_init_emitter_sortIndicatorClearableChanged_864, &_call_emitter_sortIndicatorClearableChanged_864);
   methods += new qt_gsi::GenericMethod ("*startAutoScroll", "@brief Method void QHeaderView::startAutoScroll()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_startAutoScroll_0, &_call_fp_startAutoScroll_0);
   methods += new qt_gsi::GenericMethod ("*startDrag", "@brief Virtual method void QHeaderView::startDrag(QFlags<Qt::DropAction> supportedActions)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_startDrag_2456_0, &_call_cbs_startDrag_2456_0);
   methods += new qt_gsi::GenericMethod ("*startDrag", "@hide", false, &_init_cbs_startDrag_2456_0, &_call_cbs_startDrag_2456_0, &_set_callback_cbs_startDrag_2456_0);

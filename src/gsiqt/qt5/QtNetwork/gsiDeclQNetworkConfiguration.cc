@@ -129,6 +129,21 @@ static void _call_f_children_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
+// int QNetworkConfiguration::connectTimeout()
+
+
+static void _init_f_connectTimeout_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<int > ();
+}
+
+static void _call_f_connectTimeout_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<int > ((int)((QNetworkConfiguration *)cls)->connectTimeout ());
+}
+
+
 // QString QNetworkConfiguration::identifier()
 
 
@@ -261,6 +276,25 @@ static void _call_f_purpose_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
+// bool QNetworkConfiguration::setConnectTimeout(int timeout)
+
+
+static void _init_f_setConnectTimeout_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("timeout");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_setConnectTimeout_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ret.write<bool > ((bool)((QNetworkConfiguration *)cls)->setConnectTimeout (arg1));
+}
+
+
 // QFlags<QNetworkConfiguration::StateFlag> QNetworkConfiguration::state()
 
 
@@ -323,6 +357,7 @@ static gsi::Methods methods_QNetworkConfiguration () {
   methods += new qt_gsi::GenericMethod ("bearerTypeFamily", "@brief Method QNetworkConfiguration::BearerType QNetworkConfiguration::bearerTypeFamily()\n", true, &_init_f_bearerTypeFamily_c0, &_call_f_bearerTypeFamily_c0);
   methods += new qt_gsi::GenericMethod ("bearerTypeName", "@brief Method QString QNetworkConfiguration::bearerTypeName()\n", true, &_init_f_bearerTypeName_c0, &_call_f_bearerTypeName_c0);
   methods += new qt_gsi::GenericMethod ("children", "@brief Method QList<QNetworkConfiguration> QNetworkConfiguration::children()\n", true, &_init_f_children_c0, &_call_f_children_c0);
+  methods += new qt_gsi::GenericMethod ("connectTimeout", "@brief Method int QNetworkConfiguration::connectTimeout()\n", true, &_init_f_connectTimeout_c0, &_call_f_connectTimeout_c0);
   methods += new qt_gsi::GenericMethod ("identifier", "@brief Method QString QNetworkConfiguration::identifier()\n", true, &_init_f_identifier_c0, &_call_f_identifier_c0);
   methods += new qt_gsi::GenericMethod ("isRoamingAvailable?", "@brief Method bool QNetworkConfiguration::isRoamingAvailable()\n", true, &_init_f_isRoamingAvailable_c0, &_call_f_isRoamingAvailable_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QNetworkConfiguration::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
@@ -331,6 +366,7 @@ static gsi::Methods methods_QNetworkConfiguration () {
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QNetworkConfiguration &QNetworkConfiguration::operator=(const QNetworkConfiguration &other)\n", false, &_init_f_operator_eq__3508, &_call_f_operator_eq__3508);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QNetworkConfiguration::operator==(const QNetworkConfiguration &other)\n", true, &_init_f_operator_eq__eq__c3508, &_call_f_operator_eq__eq__c3508);
   methods += new qt_gsi::GenericMethod ("purpose", "@brief Method QNetworkConfiguration::Purpose QNetworkConfiguration::purpose()\n", true, &_init_f_purpose_c0, &_call_f_purpose_c0);
+  methods += new qt_gsi::GenericMethod ("setConnectTimeout", "@brief Method bool QNetworkConfiguration::setConnectTimeout(int timeout)\n", false, &_init_f_setConnectTimeout_767, &_call_f_setConnectTimeout_767);
   methods += new qt_gsi::GenericMethod ("state", "@brief Method QFlags<QNetworkConfiguration::StateFlag> QNetworkConfiguration::state()\n", true, &_init_f_state_c0, &_call_f_state_c0);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QNetworkConfiguration::swap(QNetworkConfiguration &other)\n", false, &_init_f_swap_2813, &_call_f_swap_2813);
   methods += new qt_gsi::GenericMethod ("type", "@brief Method QNetworkConfiguration::Type QNetworkConfiguration::type()\n", true, &_init_f_type_c0, &_call_f_type_c0);

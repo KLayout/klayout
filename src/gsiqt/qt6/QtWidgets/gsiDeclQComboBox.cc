@@ -1354,46 +1354,6 @@ static void _call_f_sizeHint_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// void QComboBox::textActivated(const QString &)
-
-
-static void _init_f_textActivated_2025 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<const QString & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_textActivated_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QComboBox *)cls)->textActivated (arg1);
-}
-
-
-// void QComboBox::textHighlighted(const QString &)
-
-
-static void _init_f_textHighlighted_2025 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<const QString & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_textHighlighted_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QComboBox *)cls)->textHighlighted (arg1);
-}
-
-
 // const QValidator *QComboBox::validator()
 
 
@@ -1491,7 +1451,7 @@ static gsi::Methods methods_QComboBox () {
   methods += new qt_gsi::GenericMethod (":minimumSizeHint", "@brief Method QSize QComboBox::minimumSizeHint()\nThis is a reimplementation of QWidget::minimumSizeHint", true, &_init_f_minimumSizeHint_c0, &_call_f_minimumSizeHint_c0);
   methods += new qt_gsi::GenericMethod (":model", "@brief Method QAbstractItemModel *QComboBox::model()\n", true, &_init_f_model_c0, &_call_f_model_c0);
   methods += new qt_gsi::GenericMethod (":modelColumn", "@brief Method int QComboBox::modelColumn()\n", true, &_init_f_modelColumn_c0, &_call_f_modelColumn_c0);
-  methods += new qt_gsi::GenericMethod ("placeholderText", "@brief Method QString QComboBox::placeholderText()\n", true, &_init_f_placeholderText_c0, &_call_f_placeholderText_c0);
+  methods += new qt_gsi::GenericMethod (":placeholderText", "@brief Method QString QComboBox::placeholderText()\n", true, &_init_f_placeholderText_c0, &_call_f_placeholderText_c0);
   methods += new qt_gsi::GenericMethod ("removeItem", "@brief Method void QComboBox::removeItem(int index)\n", false, &_init_f_removeItem_767, &_call_f_removeItem_767);
   methods += new qt_gsi::GenericMethod (":rootModelIndex", "@brief Method QModelIndex QComboBox::rootModelIndex()\n", true, &_init_f_rootModelIndex_c0, &_call_f_rootModelIndex_c0);
   methods += new qt_gsi::GenericMethod ("setCompleter|completer=", "@brief Method void QComboBox::setCompleter(QCompleter *c)\n", false, &_init_f_setCompleter_1642, &_call_f_setCompleter_1642);
@@ -1513,7 +1473,7 @@ static gsi::Methods methods_QComboBox () {
   methods += new qt_gsi::GenericMethod ("setMinimumContentsLength|minimumContentsLength=", "@brief Method void QComboBox::setMinimumContentsLength(int characters)\n", false, &_init_f_setMinimumContentsLength_767, &_call_f_setMinimumContentsLength_767);
   methods += new qt_gsi::GenericMethod ("setModel|model=", "@brief Method void QComboBox::setModel(QAbstractItemModel *model)\n", false, &_init_f_setModel_2419, &_call_f_setModel_2419);
   methods += new qt_gsi::GenericMethod ("setModelColumn|modelColumn=", "@brief Method void QComboBox::setModelColumn(int visibleColumn)\n", false, &_init_f_setModelColumn_767, &_call_f_setModelColumn_767);
-  methods += new qt_gsi::GenericMethod ("setPlaceholderText", "@brief Method void QComboBox::setPlaceholderText(const QString &placeholderText)\n", false, &_init_f_setPlaceholderText_2025, &_call_f_setPlaceholderText_2025);
+  methods += new qt_gsi::GenericMethod ("setPlaceholderText|placeholderText=", "@brief Method void QComboBox::setPlaceholderText(const QString &placeholderText)\n", false, &_init_f_setPlaceholderText_2025, &_call_f_setPlaceholderText_2025);
   methods += new qt_gsi::GenericMethod ("setRootModelIndex|rootModelIndex=", "@brief Method void QComboBox::setRootModelIndex(const QModelIndex &index)\n", false, &_init_f_setRootModelIndex_2395, &_call_f_setRootModelIndex_2395);
   methods += new qt_gsi::GenericMethod ("setSizeAdjustPolicy|sizeAdjustPolicy=", "@brief Method void QComboBox::setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy policy)\n", false, &_init_f_setSizeAdjustPolicy_3080, &_call_f_setSizeAdjustPolicy_3080);
   methods += new qt_gsi::GenericMethod ("setValidator|validator=", "@brief Method void QComboBox::setValidator(const QValidator *v)\n", false, &_init_f_setValidator_2332, &_call_f_setValidator_2332);
@@ -1521,8 +1481,6 @@ static gsi::Methods methods_QComboBox () {
   methods += new qt_gsi::GenericMethod ("showPopup", "@brief Method void QComboBox::showPopup()\n", false, &_init_f_showPopup_0, &_call_f_showPopup_0);
   methods += new qt_gsi::GenericMethod (":sizeAdjustPolicy", "@brief Method QComboBox::SizeAdjustPolicy QComboBox::sizeAdjustPolicy()\n", true, &_init_f_sizeAdjustPolicy_c0, &_call_f_sizeAdjustPolicy_c0);
   methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QComboBox::sizeHint()\nThis is a reimplementation of QWidget::sizeHint", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
-  methods += new qt_gsi::GenericMethod ("textActivated", "@brief Method void QComboBox::textActivated(const QString &)\n", false, &_init_f_textActivated_2025, &_call_f_textActivated_2025);
-  methods += new qt_gsi::GenericMethod ("textHighlighted", "@brief Method void QComboBox::textHighlighted(const QString &)\n", false, &_init_f_textHighlighted_2025, &_call_f_textHighlighted_2025);
   methods += new qt_gsi::GenericMethod (":validator", "@brief Method const QValidator *QComboBox::validator()\n", true, &_init_f_validator_c0, &_call_f_validator_c0);
   methods += new qt_gsi::GenericMethod (":view", "@brief Method QAbstractItemView *QComboBox::view()\n", true, &_init_f_view_c0, &_call_f_view_c0);
   methods += gsi::qt_signal<int > ("activated(int)", "activated", gsi::arg("index"), "@brief Signal declaration for QComboBox::activated(int index)\nYou can bind a procedure to this signal.");
@@ -1533,6 +1491,8 @@ static gsi::Methods methods_QComboBox () {
   methods += gsi::qt_signal<const QString & > ("editTextChanged(const QString &)", "editTextChanged", gsi::arg("arg1"), "@brief Signal declaration for QComboBox::editTextChanged(const QString &)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("highlighted(int)", "highlighted", gsi::arg("index"), "@brief Signal declaration for QComboBox::highlighted(int index)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QComboBox::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("textActivated(const QString &)", "textActivated", gsi::arg("arg1"), "@brief Signal declaration for QComboBox::textActivated(const QString &)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("textHighlighted(const QString &)", "textHighlighted", gsi::arg("arg1"), "@brief Signal declaration for QComboBox::textHighlighted(const QString &)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QIcon & > ("windowIconChanged(const QIcon &)", "windowIconChanged", gsi::arg("icon"), "@brief Signal declaration for QComboBox::windowIconChanged(const QIcon &icon)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("windowIconTextChanged(const QString &)", "windowIconTextChanged", gsi::arg("iconText"), "@brief Signal declaration for QComboBox::windowIconTextChanged(const QString &iconText)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("windowTitleChanged(const QString &)", "windowTitleChanged", gsi::arg("title"), "@brief Signal declaration for QComboBox::windowTitleChanged(const QString &title)\nYou can bind a procedure to this signal.");
@@ -1841,6 +1801,18 @@ public:
     } else {
       return QComboBox::sizeHint();
     }
+  }
+
+  //  [emitter impl] void QComboBox::textActivated(const QString &)
+  void emitter_QComboBox_textActivated_2025(const QString &arg1)
+  {
+    emit QComboBox::textActivated(arg1);
+  }
+
+  //  [emitter impl] void QComboBox::textHighlighted(const QString &)
+  void emitter_QComboBox_textHighlighted_2025(const QString &arg1)
+  {
+    emit QComboBox::textHighlighted(arg1);
   }
 
   //  [emitter impl] void QComboBox::windowIconChanged(const QIcon &icon)
@@ -3866,6 +3838,42 @@ static void _set_callback_cbs_tabletEvent_1821_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QComboBox::textActivated(const QString &)
+
+static void _init_emitter_textActivated_2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_textActivated_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QComboBox_Adaptor *)cls)->emitter_QComboBox_textActivated_2025 (arg1);
+}
+
+
+// emitter void QComboBox::textHighlighted(const QString &)
+
+static void _init_emitter_textHighlighted_2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_textHighlighted_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QComboBox_Adaptor *)cls)->emitter_QComboBox_textHighlighted_2025 (arg1);
+}
+
+
 // void QComboBox::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
@@ -4006,13 +4014,13 @@ static gsi::Methods methods_QComboBox_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*closeEvent", "@hide", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0, &_set_callback_cbs_closeEvent_1719_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QComboBox::contextMenuEvent(QContextMenuEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0, &_set_callback_cbs_contextMenuEvent_2363_0);
-  methods += new qt_gsi::GenericMethod ("*qt_create", "@brief Method void QComboBox::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
+  methods += new qt_gsi::GenericMethod ("*create|qt_create", "@brief Method void QComboBox::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
   methods += new qt_gsi::GenericMethod ("emit_currentIndexChanged", "@brief Emitter for signal void QComboBox::currentIndexChanged(int index)\nCall this method to emit this signal.", false, &_init_emitter_currentIndexChanged_767, &_call_emitter_currentIndexChanged_767);
   methods += new qt_gsi::GenericMethod ("emit_currentTextChanged", "@brief Emitter for signal void QComboBox::currentTextChanged(const QString &)\nCall this method to emit this signal.", false, &_init_emitter_currentTextChanged_2025, &_call_emitter_currentTextChanged_2025);
   methods += new qt_gsi::GenericMethod ("emit_customContextMenuRequested", "@brief Emitter for signal void QComboBox::customContextMenuRequested(const QPoint &pos)\nCall this method to emit this signal.", false, &_init_emitter_customContextMenuRequested_1916, &_call_emitter_customContextMenuRequested_1916);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QComboBox::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*qt_destroy", "@brief Method void QComboBox::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
+  methods += new qt_gsi::GenericMethod ("*destroy|qt_destroy", "@brief Method void QComboBox::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QComboBox::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QComboBox::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
@@ -4105,6 +4113,8 @@ static gsi::Methods methods_QComboBox_Adaptor () {
   methods += new qt_gsi::GenericMethod ("sizeHint", "@hide", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0, &_set_callback_cbs_sizeHint_c0_0);
   methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QComboBox::tabletEvent(QTabletEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
   methods += new qt_gsi::GenericMethod ("*tabletEvent", "@hide", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0, &_set_callback_cbs_tabletEvent_1821_0);
+  methods += new qt_gsi::GenericMethod ("emit_textActivated", "@brief Emitter for signal void QComboBox::textActivated(const QString &)\nCall this method to emit this signal.", false, &_init_emitter_textActivated_2025, &_call_emitter_textActivated_2025);
+  methods += new qt_gsi::GenericMethod ("emit_textHighlighted", "@brief Emitter for signal void QComboBox::textHighlighted(const QString &)\nCall this method to emit this signal.", false, &_init_emitter_textHighlighted_2025, &_call_emitter_textHighlighted_2025);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QComboBox::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*updateMicroFocus", "@brief Method void QComboBox::updateMicroFocus(Qt::InputMethodQuery query)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_updateMicroFocus_2420, &_call_fp_updateMicroFocus_2420);

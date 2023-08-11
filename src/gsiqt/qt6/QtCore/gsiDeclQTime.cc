@@ -325,25 +325,6 @@ static void _call_f_toString_c2025 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// QString QTime::toString(QStringView format)
-
-
-static void _init_f_toString_c1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("format");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<QString > ();
-}
-
-static void _call_f_toString_c1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QString > ((QString)((QTime *)cls)->toString (arg1));
-}
-
-
 // static QTime QTime::currentTime()
 
 
@@ -375,72 +356,6 @@ static void _call_f_fromMSecsSinceStartOfDay_767 (const qt_gsi::GenericStaticMet
   tl::Heap heap;
   int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QTime > ((QTime)QTime::fromMSecsSinceStartOfDay (arg1));
-}
-
-
-// static QTime QTime::fromString(QStringView string, Qt::DateFormat format)
-
-
-static void _init_f_fromString_3199 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("string");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format", true, "Qt::TextDate");
-  decl->add_arg<const qt_gsi::Converter<Qt::DateFormat>::target_type & > (argspec_1);
-  decl->set_return<QTime > ();
-}
-
-static void _call_f_fromString_3199 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  const qt_gsi::Converter<Qt::DateFormat>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::DateFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::DateFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::DateFormat>(heap, Qt::TextDate), heap);
-  ret.write<QTime > ((QTime)QTime::fromString (arg1, qt_gsi::QtToCppAdaptor<Qt::DateFormat>(arg2).cref()));
-}
-
-
-// static QTime QTime::fromString(QStringView string, QStringView format)
-
-
-static void _init_f_fromString_3010 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("string");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format");
-  decl->add_arg<QStringView > (argspec_1);
-  decl->set_return<QTime > ();
-}
-
-static void _call_f_fromString_3010 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  QStringView arg2 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QTime > ((QTime)QTime::fromString (arg1, arg2));
-}
-
-
-// static QTime QTime::fromString(const QString &string, QStringView format)
-
-
-static void _init_f_fromString_3476 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("string");
-  decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format");
-  decl->add_arg<QStringView > (argspec_1);
-  decl->set_return<QTime > ();
-}
-
-static void _call_f_fromString_3476 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  QStringView arg2 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QTime > ((QTime)QTime::fromString (arg1, arg2));
 }
 
 
@@ -538,12 +453,8 @@ static gsi::Methods methods_QTime () {
   methods += new qt_gsi::GenericMethod ("setHMS", "@brief Method bool QTime::setHMS(int h, int m, int s, int ms)\n", false, &_init_f_setHMS_2744, &_call_f_setHMS_2744);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QTime::toString(Qt::DateFormat f)\n", true, &_init_f_toString_c1748, &_call_f_toString_c1748);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QTime::toString(const QString &format)\n", true, &_init_f_toString_c2025, &_call_f_toString_c2025);
-  methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QTime::toString(QStringView format)\n", true, &_init_f_toString_c1559, &_call_f_toString_c1559);
   methods += new qt_gsi::GenericStaticMethod ("currentTime", "@brief Static method QTime QTime::currentTime()\nThis method is static and can be called without an instance.", &_init_f_currentTime_0, &_call_f_currentTime_0);
   methods += new qt_gsi::GenericStaticMethod ("fromMSecsSinceStartOfDay", "@brief Static method QTime QTime::fromMSecsSinceStartOfDay(int msecs)\nThis method is static and can be called without an instance.", &_init_f_fromMSecsSinceStartOfDay_767, &_call_f_fromMSecsSinceStartOfDay_767);
-  methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QTime QTime::fromString(QStringView string, Qt::DateFormat format)\nThis method is static and can be called without an instance.", &_init_f_fromString_3199, &_call_f_fromString_3199);
-  methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QTime QTime::fromString(QStringView string, QStringView format)\nThis method is static and can be called without an instance.", &_init_f_fromString_3010, &_call_f_fromString_3010);
-  methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QTime QTime::fromString(const QString &string, QStringView format)\nThis method is static and can be called without an instance.", &_init_f_fromString_3476, &_call_f_fromString_3476);
   methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QTime QTime::fromString(const QString &string, Qt::DateFormat format)\nThis method is static and can be called without an instance.", &_init_f_fromString_3665, &_call_f_fromString_3665);
   methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QTime QTime::fromString(const QString &string, const QString &format)\nThis method is static and can be called without an instance.", &_init_f_fromString_3942, &_call_f_fromString_3942);
   methods += new qt_gsi::GenericStaticMethod ("isValid?", "@brief Static method bool QTime::isValid(int h, int m, int s, int ms)\nThis method is static and can be called without an instance.", &_init_f_isValid_2744, &_call_f_isValid_2744);

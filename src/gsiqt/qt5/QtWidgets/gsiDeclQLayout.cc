@@ -111,6 +111,7 @@ static void _call_f_addWidget_1315 (const qt_gsi::GenericMethod * /*decl*/, void
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout *)cls)->addWidget (arg1);
 }
@@ -250,6 +251,25 @@ static void _call_f_indexOf_c1315 (const qt_gsi::GenericMethod * /*decl*/, void 
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  ret.write<int > ((int)((QLayout *)cls)->indexOf (arg1));
+}
+
+
+// int QLayout::indexOf(QLayoutItem *)
+
+
+static void _init_f_indexOf_c1740 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<QLayoutItem * > (argspec_0);
+  decl->set_return<int > ();
+}
+
+static void _call_f_indexOf_c1740 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QLayoutItem *arg1 = gsi::arg_reader<QLayoutItem * >() (args, heap);
   ret.write<int > ((int)((QLayout *)cls)->indexOf (arg1));
 }
 
@@ -970,6 +990,7 @@ static gsi::Methods methods_QLayout () {
   methods += new qt_gsi::GenericMethod (":geometry", "@brief Method QRect QLayout::geometry()\nThis is a reimplementation of QLayoutItem::geometry", true, &_init_f_geometry_c0, &_call_f_geometry_c0);
   methods += new qt_gsi::GenericMethod ("getContentsMargins", "@brief Method void QLayout::getContentsMargins(int *left, int *top, int *right, int *bottom)\n", true, &_init_f_getContentsMargins_c3488, &_call_f_getContentsMargins_c3488);
   methods += new qt_gsi::GenericMethod ("indexOf", "@brief Method int QLayout::indexOf(QWidget *)\n", true, &_init_f_indexOf_c1315, &_call_f_indexOf_c1315);
+  methods += new qt_gsi::GenericMethod ("indexOf", "@brief Method int QLayout::indexOf(QLayoutItem *)\n", true, &_init_f_indexOf_c1740, &_call_f_indexOf_c1740);
   methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method void QLayout::invalidate()\nThis is a reimplementation of QLayoutItem::invalidate", false, &_init_f_invalidate_0, &_call_f_invalidate_0);
   methods += new qt_gsi::GenericMethod ("isEmpty?", "@brief Method bool QLayout::isEmpty()\nThis is a reimplementation of QLayoutItem::isEmpty", true, &_init_f_isEmpty_c0, &_call_f_isEmpty_c0);
   methods += new qt_gsi::GenericMethod ("isEnabled?|:enabled", "@brief Method bool QLayout::isEnabled()\n", true, &_init_f_isEnabled_c0, &_call_f_isEnabled_c0);
@@ -1146,33 +1167,33 @@ public:
     emit QLayout::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QLayout::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QLayout::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QLayout::event(arg1);
+    return QLayout::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QLayout_Adaptor, bool, QEvent *>(&QLayout_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QLayout_Adaptor, bool, QEvent *>(&QLayout_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QLayout::event(arg1);
+      return QLayout::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QLayout::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QLayout::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QLayout::eventFilter(arg1, arg2);
+    return QLayout::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QLayout_Adaptor, bool, QObject *, QEvent *>(&QLayout_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QLayout_Adaptor, bool, QObject *, QEvent *>(&QLayout_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QLayout::eventFilter(arg1, arg2);
+      return QLayout::eventFilter(watched, event);
     }
   }
 
@@ -1455,18 +1476,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QLayout::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QLayout::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QLayout::customEvent(arg1);
+    QLayout::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QLayout_Adaptor, QEvent *>(&QLayout_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QLayout_Adaptor, QEvent *>(&QLayout_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QLayout::customEvent(arg1);
+      QLayout::customEvent(event);
     }
   }
 
@@ -1485,18 +1506,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QLayout::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QLayout::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QLayout::timerEvent(arg1);
+    QLayout::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QLayout_Adaptor, QTimerEvent *>(&QLayout_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QLayout_Adaptor, QTimerEvent *>(&QLayout_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QLayout::timerEvent(arg1);
+      QLayout::timerEvent(event);
     }
   }
 
@@ -1723,11 +1744,11 @@ static void _set_callback_cbs_count_c0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QLayout::customEvent(QEvent *)
+// void QLayout::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1751,7 +1772,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1760,7 +1781,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QLayout_Adaptor *)cls)->emitter_QLayout_destroyed_1302 (arg1);
 }
 
@@ -1789,11 +1810,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QLayout::event(QEvent *)
+// bool QLayout::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -1812,13 +1833,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QLayout::eventFilter(QObject *, QEvent *)
+// bool QLayout::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -2250,11 +2271,11 @@ static void _set_callback_cbs_takeAt_767_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QLayout::timerEvent(QTimerEvent *)
+// void QLayout::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2333,14 +2354,14 @@ static gsi::Methods methods_QLayout_Adaptor () {
   methods += new qt_gsi::GenericMethod ("controlTypes", "@hide", true, &_init_cbs_controlTypes_c0_0, &_call_cbs_controlTypes_c0_0, &_set_callback_cbs_controlTypes_c0_0);
   methods += new qt_gsi::GenericMethod ("count", "@brief Virtual method int QLayout::count()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_count_c0_0, &_call_cbs_count_c0_0);
   methods += new qt_gsi::GenericMethod ("count", "@hide", true, &_init_cbs_count_c0_0, &_call_cbs_count_c0_0, &_set_callback_cbs_count_c0_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QLayout::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QLayout::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QLayout::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QLayout::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QLayout::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QLayout::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QLayout::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QLayout::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("expandingDirections", "@brief Virtual method QFlags<Qt::Orientation> QLayout::expandingDirections()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_expandingDirections_c0_0, &_call_cbs_expandingDirections_c0_0);
   methods += new qt_gsi::GenericMethod ("expandingDirections", "@hide", true, &_init_cbs_expandingDirections_c0_0, &_call_cbs_expandingDirections_c0_0, &_set_callback_cbs_expandingDirections_c0_0);
@@ -2379,7 +2400,7 @@ static gsi::Methods methods_QLayout_Adaptor () {
   methods += new qt_gsi::GenericMethod ("spacerItem", "@hide", false, &_init_cbs_spacerItem_0_0, &_call_cbs_spacerItem_0_0, &_set_callback_cbs_spacerItem_0_0);
   methods += new qt_gsi::GenericMethod ("takeAt", "@brief Virtual method QLayoutItem *QLayout::takeAt(int index)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_takeAt_767_0, &_call_cbs_takeAt_767_0);
   methods += new qt_gsi::GenericMethod ("takeAt", "@hide", false, &_init_cbs_takeAt_767_0, &_call_cbs_takeAt_767_0, &_set_callback_cbs_takeAt_767_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QLayout::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QLayout::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("widget", "@brief Virtual method QWidget *QLayout::widget()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_widget_0_0, &_call_cbs_widget_0_0);
   methods += new qt_gsi::GenericMethod ("widget", "@hide", false, &_init_cbs_widget_0_0, &_call_cbs_widget_0_0, &_set_callback_cbs_widget_0_0);

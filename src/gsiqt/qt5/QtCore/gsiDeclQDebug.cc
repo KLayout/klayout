@@ -279,6 +279,26 @@ static void _call_f_setAutoInsertSpaces_864 (const qt_gsi::GenericMethod * /*dec
 }
 
 
+// void QDebug::setVerbosity(int verbosityLevel)
+
+
+static void _init_f_setVerbosity_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("verbosityLevel");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setVerbosity_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QDebug *)cls)->setVerbosity (arg1);
+}
+
+
 // QDebug &QDebug::space()
 
 
@@ -314,6 +334,21 @@ static void _call_f_swap_1186 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+// int QDebug::verbosity()
+
+
+static void _init_f_verbosity_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<int > ();
+}
+
+static void _call_f_verbosity_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<int > ((int)((QDebug *)cls)->verbosity ());
+}
+
+
 
 namespace gsi
 {
@@ -334,8 +369,10 @@ static gsi::Methods methods_QDebug () {
   methods += new qt_gsi::GenericMethod ("quote", "@brief Method QDebug &QDebug::quote()\n", false, &_init_f_quote_0, &_call_f_quote_0);
   methods += new qt_gsi::GenericMethod ("resetFormat", "@brief Method QDebug &QDebug::resetFormat()\n", false, &_init_f_resetFormat_0, &_call_f_resetFormat_0);
   methods += new qt_gsi::GenericMethod ("setAutoInsertSpaces|autoInsertSpaces=", "@brief Method void QDebug::setAutoInsertSpaces(bool b)\n", false, &_init_f_setAutoInsertSpaces_864, &_call_f_setAutoInsertSpaces_864);
+  methods += new qt_gsi::GenericMethod ("setVerbosity|verbosity=", "@brief Method void QDebug::setVerbosity(int verbosityLevel)\n", false, &_init_f_setVerbosity_767, &_call_f_setVerbosity_767);
   methods += new qt_gsi::GenericMethod ("space", "@brief Method QDebug &QDebug::space()\n", false, &_init_f_space_0, &_call_f_space_0);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QDebug::swap(QDebug &other)\n", false, &_init_f_swap_1186, &_call_f_swap_1186);
+  methods += new qt_gsi::GenericMethod (":verbosity", "@brief Method int QDebug::verbosity()\n", true, &_init_f_verbosity_c0, &_call_f_verbosity_c0);
   return methods;
 }
 

@@ -172,7 +172,9 @@ PluginDeclaration::init_menu (lay::Dispatcher *dispatcher)
 
     mp_editable_mode_action.reset (new Action (title));
 #if defined(HAVE_QT)
-    gtf::action_connect (mp_editable_mode_action->qaction (), SIGNAL (triggered ()), this, SLOT (toggle_editable_enabled ()));
+    if (mp_editable_mode_action->qaction ()) {
+      gtf::action_connect (mp_editable_mode_action->qaction (), SIGNAL (triggered ()), this, SLOT (toggle_editable_enabled ()));
+    }
 #endif
     mp_editable_mode_action->set_checkable (true);
     mp_editable_mode_action->set_checked (m_editable_enabled);

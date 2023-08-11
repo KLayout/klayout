@@ -111,6 +111,7 @@ static gsi::Enum<Qt::ApplicationAttribute> decl_Qt_ApplicationAttribute_Enum ("Q
     gsi::enum_const ("AA_DontShowIconsInMenus", Qt::AA_DontShowIconsInMenus, "@brief Enum constant Qt::AA_DontShowIconsInMenus") +
     gsi::enum_const ("AA_NativeWindows", Qt::AA_NativeWindows, "@brief Enum constant Qt::AA_NativeWindows") +
     gsi::enum_const ("AA_DontCreateNativeWidgetSiblings", Qt::AA_DontCreateNativeWidgetSiblings, "@brief Enum constant Qt::AA_DontCreateNativeWidgetSiblings") +
+    gsi::enum_const ("AA_PluginApplication", Qt::AA_PluginApplication, "@brief Enum constant Qt::AA_PluginApplication") +
     gsi::enum_const ("AA_MacPluginApplication", Qt::AA_MacPluginApplication, "@brief Enum constant Qt::AA_MacPluginApplication") +
     gsi::enum_const ("AA_DontUseNativeMenuBar", Qt::AA_DontUseNativeMenuBar, "@brief Enum constant Qt::AA_DontUseNativeMenuBar") +
     gsi::enum_const ("AA_MacDontSwapCtrlAndMeta", Qt::AA_MacDontSwapCtrlAndMeta, "@brief Enum constant Qt::AA_MacDontSwapCtrlAndMeta") +
@@ -125,6 +126,17 @@ static gsi::Enum<Qt::ApplicationAttribute> decl_Qt_ApplicationAttribute_Enum ("Q
     gsi::enum_const ("AA_UseSoftwareOpenGL", Qt::AA_UseSoftwareOpenGL, "@brief Enum constant Qt::AA_UseSoftwareOpenGL") +
     gsi::enum_const ("AA_ShareOpenGLContexts", Qt::AA_ShareOpenGLContexts, "@brief Enum constant Qt::AA_ShareOpenGLContexts") +
     gsi::enum_const ("AA_SetPalette", Qt::AA_SetPalette, "@brief Enum constant Qt::AA_SetPalette") +
+    gsi::enum_const ("AA_EnableHighDpiScaling", Qt::AA_EnableHighDpiScaling, "@brief Enum constant Qt::AA_EnableHighDpiScaling") +
+    gsi::enum_const ("AA_DisableHighDpiScaling", Qt::AA_DisableHighDpiScaling, "@brief Enum constant Qt::AA_DisableHighDpiScaling") +
+    gsi::enum_const ("AA_UseStyleSheetPropagationInWidgetStyles", Qt::AA_UseStyleSheetPropagationInWidgetStyles, "@brief Enum constant Qt::AA_UseStyleSheetPropagationInWidgetStyles") +
+    gsi::enum_const ("AA_DontUseNativeDialogs", Qt::AA_DontUseNativeDialogs, "@brief Enum constant Qt::AA_DontUseNativeDialogs") +
+    gsi::enum_const ("AA_SynthesizeMouseForUnhandledTabletEvents", Qt::AA_SynthesizeMouseForUnhandledTabletEvents, "@brief Enum constant Qt::AA_SynthesizeMouseForUnhandledTabletEvents") +
+    gsi::enum_const ("AA_CompressHighFrequencyEvents", Qt::AA_CompressHighFrequencyEvents, "@brief Enum constant Qt::AA_CompressHighFrequencyEvents") +
+    gsi::enum_const ("AA_DontCheckOpenGLContextThreadAffinity", Qt::AA_DontCheckOpenGLContextThreadAffinity, "@brief Enum constant Qt::AA_DontCheckOpenGLContextThreadAffinity") +
+    gsi::enum_const ("AA_DisableShaderDiskCache", Qt::AA_DisableShaderDiskCache, "@brief Enum constant Qt::AA_DisableShaderDiskCache") +
+    gsi::enum_const ("AA_DontShowShortcutsInContextMenus", Qt::AA_DontShowShortcutsInContextMenus, "@brief Enum constant Qt::AA_DontShowShortcutsInContextMenus") +
+    gsi::enum_const ("AA_CompressTabletEvents", Qt::AA_CompressTabletEvents, "@brief Enum constant Qt::AA_CompressTabletEvents") +
+    gsi::enum_const ("AA_DisableWindowContextHelpButton", Qt::AA_DisableWindowContextHelpButton, "@brief Enum constant Qt::AA_DisableWindowContextHelpButton") +
     gsi::enum_const ("AA_AttributeCount", Qt::AA_AttributeCount, "@brief Enum constant Qt::AA_AttributeCount"),
   "@qt\n@brief This class represents the Qt::ApplicationAttribute enum");
 
@@ -324,6 +336,26 @@ static gsi::ClassExt<Qt_Namespace> decl_Qt_CheckState_Enums_as_child (decl_Qt_Ch
 }
 
 
+//  Implementation of the enum wrapper class for Qt::ChecksumType
+namespace qt_gsi
+{
+
+static gsi::Enum<Qt::ChecksumType> decl_Qt_ChecksumType_Enum ("QtCore", "Qt_ChecksumType",
+    gsi::enum_const ("ChecksumIso3309", Qt::ChecksumIso3309, "@brief Enum constant Qt::ChecksumIso3309") +
+    gsi::enum_const ("ChecksumItuV41", Qt::ChecksumItuV41, "@brief Enum constant Qt::ChecksumItuV41"),
+  "@qt\n@brief This class represents the Qt::ChecksumType enum");
+
+static gsi::QFlagsClass<Qt::ChecksumType > decl_Qt_ChecksumType_Enums ("QtCore", "Qt_QFlags_ChecksumType",
+  "@qt\n@brief This class represents the QFlags<Qt::ChecksumType> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<Qt_Namespace> inject_Qt_ChecksumType_Enum_in_parent (decl_Qt_ChecksumType_Enum.defs ());
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ChecksumType_Enum_as_child (decl_Qt_ChecksumType_Enum, "ChecksumType");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ChecksumType_Enums_as_child (decl_Qt_ChecksumType_Enums, "QFlags_ChecksumType");
+
+}
+
+
 //  Implementation of the enum wrapper class for Qt::ClipOperation
 namespace qt_gsi
 {
@@ -510,7 +542,8 @@ static gsi::Enum<Qt::DateFormat> decl_Qt_DateFormat_Enum ("QtCore", "Qt_DateForm
     gsi::enum_const ("SystemLocaleLongDate", Qt::SystemLocaleLongDate, "@brief Enum constant Qt::SystemLocaleLongDate") +
     gsi::enum_const ("DefaultLocaleShortDate", Qt::DefaultLocaleShortDate, "@brief Enum constant Qt::DefaultLocaleShortDate") +
     gsi::enum_const ("DefaultLocaleLongDate", Qt::DefaultLocaleLongDate, "@brief Enum constant Qt::DefaultLocaleLongDate") +
-    gsi::enum_const ("RFC2822Date", Qt::RFC2822Date, "@brief Enum constant Qt::RFC2822Date"),
+    gsi::enum_const ("RFC2822Date", Qt::RFC2822Date, "@brief Enum constant Qt::RFC2822Date") +
+    gsi::enum_const ("ISODateWithMs", Qt::ISODateWithMs, "@brief Enum constant Qt::ISODateWithMs"),
   "@qt\n@brief This class represents the Qt::DateFormat enum");
 
 static gsi::QFlagsClass<Qt::DateFormat > decl_Qt_DateFormat_Enums ("QtCore", "Qt_QFlags_DateFormat",
@@ -520,31 +553,6 @@ static gsi::QFlagsClass<Qt::DateFormat > decl_Qt_DateFormat_Enums ("QtCore", "Qt
 static gsi::ClassExt<Qt_Namespace> inject_Qt_DateFormat_Enum_in_parent (decl_Qt_DateFormat_Enum.defs ());
 static gsi::ClassExt<Qt_Namespace> decl_Qt_DateFormat_Enum_as_child (decl_Qt_DateFormat_Enum, "DateFormat");
 static gsi::ClassExt<Qt_Namespace> decl_Qt_DateFormat_Enums_as_child (decl_Qt_DateFormat_Enums, "QFlags_DateFormat");
-
-}
-
-
-//  Implementation of the enum wrapper class for Qt::DayOfWeek
-namespace qt_gsi
-{
-
-static gsi::Enum<Qt::DayOfWeek> decl_Qt_DayOfWeek_Enum ("QtCore", "Qt_DayOfWeek",
-    gsi::enum_const ("Monday", Qt::Monday, "@brief Enum constant Qt::Monday") +
-    gsi::enum_const ("Tuesday", Qt::Tuesday, "@brief Enum constant Qt::Tuesday") +
-    gsi::enum_const ("Wednesday", Qt::Wednesday, "@brief Enum constant Qt::Wednesday") +
-    gsi::enum_const ("Thursday", Qt::Thursday, "@brief Enum constant Qt::Thursday") +
-    gsi::enum_const ("Friday", Qt::Friday, "@brief Enum constant Qt::Friday") +
-    gsi::enum_const ("Saturday", Qt::Saturday, "@brief Enum constant Qt::Saturday") +
-    gsi::enum_const ("Sunday", Qt::Sunday, "@brief Enum constant Qt::Sunday"),
-  "@qt\n@brief This class represents the Qt::DayOfWeek enum");
-
-static gsi::QFlagsClass<Qt::DayOfWeek > decl_Qt_DayOfWeek_Enums ("QtCore", "Qt_QFlags_DayOfWeek",
-  "@qt\n@brief This class represents the QFlags<Qt::DayOfWeek> flag set");
-
-//  Inject the declarations into the parent
-static gsi::ClassExt<Qt_Namespace> inject_Qt_DayOfWeek_Enum_in_parent (decl_Qt_DayOfWeek_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_DayOfWeek_Enum_as_child (decl_Qt_DayOfWeek_Enum, "DayOfWeek");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_DayOfWeek_Enums_as_child (decl_Qt_DayOfWeek_Enums, "QFlags_DayOfWeek");
 
 }
 

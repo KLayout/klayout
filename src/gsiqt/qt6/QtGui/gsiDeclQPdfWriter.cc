@@ -357,13 +357,13 @@ static gsi::Methods methods_QPdfWriter () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("addFileAttachment", "@brief Method void QPdfWriter::addFileAttachment(const QString &fileName, const QByteArray &data, const QString &mimeType)\n", false, &_init_f_addFileAttachment_6143, &_call_f_addFileAttachment_6143);
   methods += new qt_gsi::GenericMethod (":creator", "@brief Method QString QPdfWriter::creator()\n", true, &_init_f_creator_c0, &_call_f_creator_c0);
-  methods += new qt_gsi::GenericMethod ("documentXmpMetadata", "@brief Method QByteArray QPdfWriter::documentXmpMetadata()\n", true, &_init_f_documentXmpMetadata_c0, &_call_f_documentXmpMetadata_c0);
+  methods += new qt_gsi::GenericMethod (":documentXmpMetadata", "@brief Method QByteArray QPdfWriter::documentXmpMetadata()\n", true, &_init_f_documentXmpMetadata_c0, &_call_f_documentXmpMetadata_c0);
   methods += new qt_gsi::GenericMethod ("newPage", "@brief Method bool QPdfWriter::newPage()\nThis is a reimplementation of QPagedPaintDevice::newPage", false, &_init_f_newPage_0, &_call_f_newPage_0);
-  methods += new qt_gsi::GenericMethod ("pdfVersion", "@brief Method QPagedPaintDevice::PdfVersion QPdfWriter::pdfVersion()\n", true, &_init_f_pdfVersion_c0, &_call_f_pdfVersion_c0);
+  methods += new qt_gsi::GenericMethod (":pdfVersion", "@brief Method QPagedPaintDevice::PdfVersion QPdfWriter::pdfVersion()\n", true, &_init_f_pdfVersion_c0, &_call_f_pdfVersion_c0);
   methods += new qt_gsi::GenericMethod (":resolution", "@brief Method int QPdfWriter::resolution()\n", true, &_init_f_resolution_c0, &_call_f_resolution_c0);
   methods += new qt_gsi::GenericMethod ("setCreator|creator=", "@brief Method void QPdfWriter::setCreator(const QString &creator)\n", false, &_init_f_setCreator_2025, &_call_f_setCreator_2025);
-  methods += new qt_gsi::GenericMethod ("setDocumentXmpMetadata", "@brief Method void QPdfWriter::setDocumentXmpMetadata(const QByteArray &xmpMetadata)\n", false, &_init_f_setDocumentXmpMetadata_2309, &_call_f_setDocumentXmpMetadata_2309);
-  methods += new qt_gsi::GenericMethod ("setPdfVersion", "@brief Method void QPdfWriter::setPdfVersion(QPagedPaintDevice::PdfVersion version)\n", false, &_init_f_setPdfVersion_3238, &_call_f_setPdfVersion_3238);
+  methods += new qt_gsi::GenericMethod ("setDocumentXmpMetadata|documentXmpMetadata=", "@brief Method void QPdfWriter::setDocumentXmpMetadata(const QByteArray &xmpMetadata)\n", false, &_init_f_setDocumentXmpMetadata_2309, &_call_f_setDocumentXmpMetadata_2309);
+  methods += new qt_gsi::GenericMethod ("setPdfVersion|pdfVersion=", "@brief Method void QPdfWriter::setPdfVersion(QPagedPaintDevice::PdfVersion version)\n", false, &_init_f_setPdfVersion_3238, &_call_f_setPdfVersion_3238);
   methods += new qt_gsi::GenericMethod ("setResolution|resolution=", "@brief Method void QPdfWriter::setResolution(int resolution)\n", false, &_init_f_setResolution_767, &_call_f_setResolution_767);
   methods += new qt_gsi::GenericMethod ("setTitle|title=", "@brief Method void QPdfWriter::setTitle(const QString &title)\n", false, &_init_f_setTitle_2025, &_call_f_setTitle_2025);
   methods += new qt_gsi::GenericMethod (":title", "@brief Method QString QPdfWriter::title()\n", true, &_init_f_title_c0, &_call_f_title_c0);

@@ -484,26 +484,6 @@ static void _call_f_showShortcutsInContextMenus_c0 (const qt_gsi::GenericMethod 
 }
 
 
-// void QStyleHints::showShortcutsInContextMenusChanged(bool)
-
-
-static void _init_f_showShortcutsInContextMenusChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_showShortcutsInContextMenusChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QStyleHints *)cls)->showShortcutsInContextMenusChanged (arg1);
-}
-
-
 // bool QStyleHints::singleClickActivation()
 
 
@@ -674,10 +654,10 @@ static gsi::Methods methods_QStyleHints () {
   methods += new qt_gsi::GenericMethod (":fontSmoothingGamma", "@brief Method double QStyleHints::fontSmoothingGamma()\n", true, &_init_f_fontSmoothingGamma_c0, &_call_f_fontSmoothingGamma_c0);
   methods += new qt_gsi::GenericMethod (":keyboardAutoRepeatRate", "@brief Method int QStyleHints::keyboardAutoRepeatRate()\n", true, &_init_f_keyboardAutoRepeatRate_c0, &_call_f_keyboardAutoRepeatRate_c0);
   methods += new qt_gsi::GenericMethod (":keyboardInputInterval", "@brief Method int QStyleHints::keyboardInputInterval()\n", true, &_init_f_keyboardInputInterval_c0, &_call_f_keyboardInputInterval_c0);
-  methods += new qt_gsi::GenericMethod ("mouseDoubleClickDistance", "@brief Method int QStyleHints::mouseDoubleClickDistance()\n", true, &_init_f_mouseDoubleClickDistance_c0, &_call_f_mouseDoubleClickDistance_c0);
+  methods += new qt_gsi::GenericMethod (":mouseDoubleClickDistance", "@brief Method int QStyleHints::mouseDoubleClickDistance()\n", true, &_init_f_mouseDoubleClickDistance_c0, &_call_f_mouseDoubleClickDistance_c0);
   methods += new qt_gsi::GenericMethod (":mouseDoubleClickInterval", "@brief Method int QStyleHints::mouseDoubleClickInterval()\n", true, &_init_f_mouseDoubleClickInterval_c0, &_call_f_mouseDoubleClickInterval_c0);
   methods += new qt_gsi::GenericMethod (":mousePressAndHoldInterval", "@brief Method int QStyleHints::mousePressAndHoldInterval()\n", true, &_init_f_mousePressAndHoldInterval_c0, &_call_f_mousePressAndHoldInterval_c0);
-  methods += new qt_gsi::GenericMethod ("mouseQuickSelectionThreshold", "@brief Method int QStyleHints::mouseQuickSelectionThreshold()\n", true, &_init_f_mouseQuickSelectionThreshold_c0, &_call_f_mouseQuickSelectionThreshold_c0);
+  methods += new qt_gsi::GenericMethod (":mouseQuickSelectionThreshold", "@brief Method int QStyleHints::mouseQuickSelectionThreshold()\n", true, &_init_f_mouseQuickSelectionThreshold_c0, &_call_f_mouseQuickSelectionThreshold_c0);
   methods += new qt_gsi::GenericMethod (":passwordMaskCharacter", "@brief Method QChar QStyleHints::passwordMaskCharacter()\n", true, &_init_f_passwordMaskCharacter_c0, &_call_f_passwordMaskCharacter_c0);
   methods += new qt_gsi::GenericMethod (":passwordMaskDelay", "@brief Method int QStyleHints::passwordMaskDelay()\n", true, &_init_f_passwordMaskDelay_c0, &_call_f_passwordMaskDelay_c0);
   methods += new qt_gsi::GenericMethod ("setCursorFlashTime", "@brief Method void QStyleHints::setCursorFlashTime(int cursorFlashTime)\n", false, &_init_f_setCursorFlashTime_767, &_call_f_setCursorFlashTime_767);
@@ -685,26 +665,25 @@ static gsi::Methods methods_QStyleHints () {
   methods += new qt_gsi::GenericMethod ("setKeyboardInputInterval", "@brief Method void QStyleHints::setKeyboardInputInterval(int keyboardInputInterval)\n", false, &_init_f_setKeyboardInputInterval_767, &_call_f_setKeyboardInputInterval_767);
   methods += new qt_gsi::GenericMethod ("setMouseDoubleClickInterval", "@brief Method void QStyleHints::setMouseDoubleClickInterval(int mouseDoubleClickInterval)\n", false, &_init_f_setMouseDoubleClickInterval_767, &_call_f_setMouseDoubleClickInterval_767);
   methods += new qt_gsi::GenericMethod ("setMousePressAndHoldInterval", "@brief Method void QStyleHints::setMousePressAndHoldInterval(int mousePressAndHoldInterval)\n", false, &_init_f_setMousePressAndHoldInterval_767, &_call_f_setMousePressAndHoldInterval_767);
-  methods += new qt_gsi::GenericMethod ("setMouseQuickSelectionThreshold", "@brief Method void QStyleHints::setMouseQuickSelectionThreshold(int threshold)\n", false, &_init_f_setMouseQuickSelectionThreshold_767, &_call_f_setMouseQuickSelectionThreshold_767);
-  methods += new qt_gsi::GenericMethod ("setShowShortcutsInContextMenus", "@brief Method void QStyleHints::setShowShortcutsInContextMenus(bool showShortcutsInContextMenus)\n", false, &_init_f_setShowShortcutsInContextMenus_864, &_call_f_setShowShortcutsInContextMenus_864);
+  methods += new qt_gsi::GenericMethod ("setMouseQuickSelectionThreshold|mouseQuickSelectionThreshold=", "@brief Method void QStyleHints::setMouseQuickSelectionThreshold(int threshold)\n", false, &_init_f_setMouseQuickSelectionThreshold_767, &_call_f_setMouseQuickSelectionThreshold_767);
+  methods += new qt_gsi::GenericMethod ("setShowShortcutsInContextMenus|showShortcutsInContextMenus=", "@brief Method void QStyleHints::setShowShortcutsInContextMenus(bool showShortcutsInContextMenus)\n", false, &_init_f_setShowShortcutsInContextMenus_864, &_call_f_setShowShortcutsInContextMenus_864);
   methods += new qt_gsi::GenericMethod ("setStartDragDistance", "@brief Method void QStyleHints::setStartDragDistance(int startDragDistance)\n", false, &_init_f_setStartDragDistance_767, &_call_f_setStartDragDistance_767);
   methods += new qt_gsi::GenericMethod ("setStartDragTime", "@brief Method void QStyleHints::setStartDragTime(int startDragTime)\n", false, &_init_f_setStartDragTime_767, &_call_f_setStartDragTime_767);
   methods += new qt_gsi::GenericMethod ("setTabFocusBehavior", "@brief Method void QStyleHints::setTabFocusBehavior(Qt::TabFocusBehavior tabFocusBehavior)\n", false, &_init_f_setTabFocusBehavior_2356, &_call_f_setTabFocusBehavior_2356);
-  methods += new qt_gsi::GenericMethod ("setUseHoverEffects", "@brief Method void QStyleHints::setUseHoverEffects(bool useHoverEffects)\n", false, &_init_f_setUseHoverEffects_864, &_call_f_setUseHoverEffects_864);
+  methods += new qt_gsi::GenericMethod ("setUseHoverEffects|useHoverEffects=", "@brief Method void QStyleHints::setUseHoverEffects(bool useHoverEffects)\n", false, &_init_f_setUseHoverEffects_864, &_call_f_setUseHoverEffects_864);
   methods += new qt_gsi::GenericMethod ("setWheelScrollLines", "@brief Method void QStyleHints::setWheelScrollLines(int scrollLines)\n", false, &_init_f_setWheelScrollLines_767, &_call_f_setWheelScrollLines_767);
   methods += new qt_gsi::GenericMethod (":showIsFullScreen", "@brief Method bool QStyleHints::showIsFullScreen()\n", true, &_init_f_showIsFullScreen_c0, &_call_f_showIsFullScreen_c0);
-  methods += new qt_gsi::GenericMethod ("showIsMaximized", "@brief Method bool QStyleHints::showIsMaximized()\n", true, &_init_f_showIsMaximized_c0, &_call_f_showIsMaximized_c0);
-  methods += new qt_gsi::GenericMethod ("showShortcutsInContextMenus", "@brief Method bool QStyleHints::showShortcutsInContextMenus()\n", true, &_init_f_showShortcutsInContextMenus_c0, &_call_f_showShortcutsInContextMenus_c0);
-  methods += new qt_gsi::GenericMethod ("showShortcutsInContextMenusChanged", "@brief Method void QStyleHints::showShortcutsInContextMenusChanged(bool)\n", false, &_init_f_showShortcutsInContextMenusChanged_864, &_call_f_showShortcutsInContextMenusChanged_864);
+  methods += new qt_gsi::GenericMethod (":showIsMaximized", "@brief Method bool QStyleHints::showIsMaximized()\n", true, &_init_f_showIsMaximized_c0, &_call_f_showIsMaximized_c0);
+  methods += new qt_gsi::GenericMethod (":showShortcutsInContextMenus", "@brief Method bool QStyleHints::showShortcutsInContextMenus()\n", true, &_init_f_showShortcutsInContextMenus_c0, &_call_f_showShortcutsInContextMenus_c0);
   methods += new qt_gsi::GenericMethod (":singleClickActivation", "@brief Method bool QStyleHints::singleClickActivation()\n", true, &_init_f_singleClickActivation_c0, &_call_f_singleClickActivation_c0);
   methods += new qt_gsi::GenericMethod (":startDragDistance", "@brief Method int QStyleHints::startDragDistance()\n", true, &_init_f_startDragDistance_c0, &_call_f_startDragDistance_c0);
   methods += new qt_gsi::GenericMethod (":startDragTime", "@brief Method int QStyleHints::startDragTime()\n", true, &_init_f_startDragTime_c0, &_call_f_startDragTime_c0);
   methods += new qt_gsi::GenericMethod (":startDragVelocity", "@brief Method int QStyleHints::startDragVelocity()\n", true, &_init_f_startDragVelocity_c0, &_call_f_startDragVelocity_c0);
   methods += new qt_gsi::GenericMethod (":tabFocusBehavior", "@brief Method Qt::TabFocusBehavior QStyleHints::tabFocusBehavior()\n", true, &_init_f_tabFocusBehavior_c0, &_call_f_tabFocusBehavior_c0);
-  methods += new qt_gsi::GenericMethod ("touchDoubleTapDistance", "@brief Method int QStyleHints::touchDoubleTapDistance()\n", true, &_init_f_touchDoubleTapDistance_c0, &_call_f_touchDoubleTapDistance_c0);
-  methods += new qt_gsi::GenericMethod ("useHoverEffects", "@brief Method bool QStyleHints::useHoverEffects()\n", true, &_init_f_useHoverEffects_c0, &_call_f_useHoverEffects_c0);
+  methods += new qt_gsi::GenericMethod (":touchDoubleTapDistance", "@brief Method int QStyleHints::touchDoubleTapDistance()\n", true, &_init_f_touchDoubleTapDistance_c0, &_call_f_touchDoubleTapDistance_c0);
+  methods += new qt_gsi::GenericMethod (":useHoverEffects", "@brief Method bool QStyleHints::useHoverEffects()\n", true, &_init_f_useHoverEffects_c0, &_call_f_useHoverEffects_c0);
   methods += new qt_gsi::GenericMethod (":useRtlExtensions", "@brief Method bool QStyleHints::useRtlExtensions()\n", true, &_init_f_useRtlExtensions_c0, &_call_f_useRtlExtensions_c0);
-  methods += new qt_gsi::GenericMethod ("wheelScrollLines", "@brief Method int QStyleHints::wheelScrollLines()\n", true, &_init_f_wheelScrollLines_c0, &_call_f_wheelScrollLines_c0);
+  methods += new qt_gsi::GenericMethod (":wheelScrollLines", "@brief Method int QStyleHints::wheelScrollLines()\n", true, &_init_f_wheelScrollLines_c0, &_call_f_wheelScrollLines_c0);
   methods += gsi::qt_signal<int > ("cursorFlashTimeChanged(int)", "cursorFlashTimeChanged", gsi::arg("cursorFlashTime"), "@brief Signal declaration for QStyleHints::cursorFlashTimeChanged(int cursorFlashTime)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QStyleHints::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("keyboardInputIntervalChanged(int)", "keyboardInputIntervalChanged", gsi::arg("keyboardInputInterval"), "@brief Signal declaration for QStyleHints::keyboardInputIntervalChanged(int keyboardInputInterval)\nYou can bind a procedure to this signal.");
@@ -712,6 +691,7 @@ static gsi::Methods methods_QStyleHints () {
   methods += gsi::qt_signal<int > ("mousePressAndHoldIntervalChanged(int)", "mousePressAndHoldIntervalChanged", gsi::arg("mousePressAndHoldInterval"), "@brief Signal declaration for QStyleHints::mousePressAndHoldIntervalChanged(int mousePressAndHoldInterval)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("mouseQuickSelectionThresholdChanged(int)", "mouseQuickSelectionThresholdChanged", gsi::arg("threshold"), "@brief Signal declaration for QStyleHints::mouseQuickSelectionThresholdChanged(int threshold)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QStyleHints::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("showShortcutsInContextMenusChanged(bool)", "showShortcutsInContextMenusChanged", gsi::arg("arg1"), "@brief Signal declaration for QStyleHints::showShortcutsInContextMenusChanged(bool)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("startDragDistanceChanged(int)", "startDragDistanceChanged", gsi::arg("startDragDistance"), "@brief Signal declaration for QStyleHints::startDragDistanceChanged(int startDragDistance)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("startDragTimeChanged(int)", "startDragTimeChanged", gsi::arg("startDragTime"), "@brief Signal declaration for QStyleHints::startDragTimeChanged(int startDragTime)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<Qt::TabFocusBehavior>::target_type & > ("tabFocusBehaviorChanged(Qt::TabFocusBehavior)", "tabFocusBehaviorChanged", gsi::arg("tabFocusBehavior"), "@brief Signal declaration for QStyleHints::tabFocusBehaviorChanged(Qt::TabFocusBehavior tabFocusBehavior)\nYou can bind a procedure to this signal.");
@@ -829,6 +809,12 @@ public:
   {
     __SUPPRESS_UNUSED_WARNING (objectName);
     throw tl::Exception ("Can't emit private signal 'void QStyleHints::objectNameChanged(const QString &objectName)'");
+  }
+
+  //  [emitter impl] void QStyleHints::showShortcutsInContextMenusChanged(bool)
+  void emitter_QStyleHints_showShortcutsInContextMenusChanged_864(bool arg1)
+  {
+    emit QStyleHints::showShortcutsInContextMenusChanged(arg1);
   }
 
   //  [emitter impl] void QStyleHints::startDragDistanceChanged(int startDragDistance)
@@ -1242,6 +1228,24 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
+// emitter void QStyleHints::showShortcutsInContextMenusChanged(bool)
+
+static void _init_emitter_showShortcutsInContextMenusChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_showShortcutsInContextMenusChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QStyleHints_Adaptor *)cls)->emitter_QStyleHints_showShortcutsInContextMenusChanged_864 (arg1);
+}
+
+
 // emitter void QStyleHints::startDragDistanceChanged(int startDragDistance)
 
 static void _init_emitter_startDragDistanceChanged_767 (qt_gsi::GenericMethod *decl)
@@ -1384,6 +1388,7 @@ static gsi::Methods methods_QStyleHints_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QStyleHints::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QStyleHints::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QStyleHints::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
+  methods += new qt_gsi::GenericMethod ("emit_showShortcutsInContextMenusChanged", "@brief Emitter for signal void QStyleHints::showShortcutsInContextMenusChanged(bool)\nCall this method to emit this signal.", false, &_init_emitter_showShortcutsInContextMenusChanged_864, &_call_emitter_showShortcutsInContextMenusChanged_864);
   methods += new qt_gsi::GenericMethod ("emit_startDragDistanceChanged", "@brief Emitter for signal void QStyleHints::startDragDistanceChanged(int startDragDistance)\nCall this method to emit this signal.", false, &_init_emitter_startDragDistanceChanged_767, &_call_emitter_startDragDistanceChanged_767);
   methods += new qt_gsi::GenericMethod ("emit_startDragTimeChanged", "@brief Emitter for signal void QStyleHints::startDragTimeChanged(int startDragTime)\nCall this method to emit this signal.", false, &_init_emitter_startDragTimeChanged_767, &_call_emitter_startDragTimeChanged_767);
   methods += new qt_gsi::GenericMethod ("emit_tabFocusBehaviorChanged", "@brief Emitter for signal void QStyleHints::tabFocusBehaviorChanged(Qt::TabFocusBehavior tabFocusBehavior)\nCall this method to emit this signal.", false, &_init_emitter_tabFocusBehaviorChanged_2356, &_call_emitter_tabFocusBehaviorChanged_2356);

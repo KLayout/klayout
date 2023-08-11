@@ -93,6 +93,7 @@ mkdir -p makedeb-tmp/${sharedir}/applications
 mkdir -p makedeb-tmp/${sharedir}/pixmaps
 mkdir -p makedeb-tmp/${libdir}/db_plugins
 mkdir -p makedeb-tmp/${libdir}/lay_plugins
+mkdir -p makedeb-tmp/${libdir}/pymod
 mkdir -p makedeb-tmp/${bindir}
 
 cp etc/klayout.desktop makedeb-tmp/${sharedir}/applications
@@ -106,6 +107,7 @@ cp -pd $bininstdir/klayout makedeb-tmp/${bindir}
 cp -pd $bininstdir/lib*so* makedeb-tmp/${libdir}
 cp -pd $bininstdir/db_plugins/lib*so* makedeb-tmp/${libdir}/db_plugins
 cp -pd $bininstdir/lay_plugins/lib*so* makedeb-tmp/${libdir}/lay_plugins
+cp -rpd $bininstdir/pymod/* makedeb-tmp/${libdir}/pymod
 
 cd makedeb-tmp
 
@@ -131,6 +133,7 @@ echo "Modifying control file .."
 strip ${bindir}/*
 strip ${libdir}/db_plugins/*.so*
 strip ${libdir}/lay_plugins/*.so*
+strip ${libdir}/pymod/klayout/*.so*
 
 size=`du -ck usr | grep total | sed "s/ *total//"`
 

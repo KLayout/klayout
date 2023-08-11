@@ -63,7 +63,7 @@ static void _init_f_construct_c2699 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("where");
   decl->add_arg<void * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("copy", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("copy", true, "nullptr");
   decl->add_arg<const void * > (argspec_1);
   decl->set_return<void * > ();
 }
@@ -73,7 +73,7 @@ static void _call_f_construct_c2699 (const qt_gsi::GenericMethod * /*decl*/, voi
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   void *arg1 = gsi::arg_reader<void * >() (args, heap);
-  const void *arg2 = args ? gsi::arg_reader<const void * >() (args, heap) : gsi::arg_maker<const void * >() (0, heap);
+  const void *arg2 = args ? gsi::arg_reader<const void * >() (args, heap) : gsi::arg_maker<const void * >() (nullptr, heap);
   ret.write<void * > ((void *)((QMetaType *)cls)->construct (arg1, arg2));
 }
 
@@ -83,7 +83,7 @@ static void _call_f_construct_c2699 (const qt_gsi::GenericMethod * /*decl*/, voi
 
 static void _init_f_create_c1751 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("copy", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("copy", true, "nullptr");
   decl->add_arg<const void * > (argspec_0);
   decl->set_return<void * > ();
 }
@@ -92,7 +92,7 @@ static void _call_f_create_c1751 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const void *arg1 = args ? gsi::arg_reader<const void * >() (args, heap) : gsi::arg_maker<const void * >() (0, heap);
+  const void *arg1 = args ? gsi::arg_reader<const void * >() (args, heap) : gsi::arg_maker<const void * >() (nullptr, heap);
   ret.write<void * > ((void *)((QMetaType *)cls)->create (arg1));
 }
 
@@ -285,7 +285,7 @@ static void _init_f_create_2410 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("type");
   decl->add_arg<int > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("copy", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("copy", true, "nullptr");
   decl->add_arg<const void * > (argspec_1);
   decl->set_return<void * > ();
 }
@@ -295,7 +295,7 @@ static void _call_f_create_2410 (const qt_gsi::GenericStaticMethod * /*decl*/, g
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   int arg1 = gsi::arg_reader<int >() (args, heap);
-  const void *arg2 = args ? gsi::arg_reader<const void * >() (args, heap) : gsi::arg_maker<const void * >() (0, heap);
+  const void *arg2 = args ? gsi::arg_reader<const void * >() (args, heap) : gsi::arg_maker<const void * >() (nullptr, heap);
   ret.write<void * > ((void *)QMetaType::create (arg1, arg2));
 }
 
@@ -650,8 +650,8 @@ static gsi::Methods methods_QMetaType () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMetaType::QMetaType(const int type)\nThis method creates an object of class QMetaType.", &_init_ctor_QMetaType_1462, &_call_ctor_QMetaType_1462);
   methods += new qt_gsi::GenericMethod ("construct", "@brief Method void *QMetaType::construct(void *where, const void *copy)\n", true, &_init_f_construct_c2699, &_call_f_construct_c2699);
-  methods += new qt_gsi::GenericMethod ("qt_create", "@brief Method void *QMetaType::create(const void *copy)\n", true, &_init_f_create_c1751, &_call_f_create_c1751);
-  methods += new qt_gsi::GenericMethod ("qt_destroy", "@brief Method void QMetaType::destroy(void *data)\n", true, &_init_f_destroy_c1056, &_call_f_destroy_c1056);
+  methods += new qt_gsi::GenericMethod ("create|qt_create", "@brief Method void *QMetaType::create(const void *copy)\n", true, &_init_f_create_c1751, &_call_f_create_c1751);
+  methods += new qt_gsi::GenericMethod ("destroy|qt_destroy", "@brief Method void QMetaType::destroy(void *data)\n", true, &_init_f_destroy_c1056, &_call_f_destroy_c1056);
   methods += new qt_gsi::GenericMethod ("destruct", "@brief Method void QMetaType::destruct(void *data)\n", true, &_init_f_destruct_c1056, &_call_f_destruct_c1056);
   methods += new qt_gsi::GenericMethod ("flags", "@brief Method QFlags<QMetaType::TypeFlag> QMetaType::flags()\n", true, &_init_f_flags_c0, &_call_f_flags_c0);
   methods += new qt_gsi::GenericMethod ("isRegistered?", "@brief Method bool QMetaType::isRegistered()\n", true, &_init_f_isRegistered_c0, &_call_f_isRegistered_c0);
@@ -660,9 +660,9 @@ static gsi::Methods methods_QMetaType () {
   methods += new qt_gsi::GenericStaticMethod ("compare", "@brief Static method bool QMetaType::compare(const void *lhs, const void *rhs, int typeId, int *result)\nThis method is static and can be called without an instance.", &_init_f_compare_4898, &_call_f_compare_4898);
   methods += new qt_gsi::GenericStaticMethod ("construct", "@brief Static method void *QMetaType::construct(int type, void *where, const void *copy)\nThis method is static and can be called without an instance.", &_init_f_construct_3358, &_call_f_construct_3358);
   methods += new qt_gsi::GenericStaticMethod ("convert", "@brief Static method bool QMetaType::convert(const void *from, int fromTypeId, void *to, int toTypeId)\nThis method is static and can be called without an instance.", &_init_f_convert_4017, &_call_f_convert_4017);
-  methods += new qt_gsi::GenericStaticMethod ("qt_create", "@brief Static method void *QMetaType::create(int type, const void *copy)\nThis method is static and can be called without an instance.", &_init_f_create_2410, &_call_f_create_2410);
+  methods += new qt_gsi::GenericStaticMethod ("create|qt_create", "@brief Static method void *QMetaType::create(int type, const void *copy)\nThis method is static and can be called without an instance.", &_init_f_create_2410, &_call_f_create_2410);
   methods += new qt_gsi::GenericStaticMethod ("debugStream", "@brief Static method bool QMetaType::debugStream(QDebug &dbg, const void *rhs, int typeId)\nThis method is static and can be called without an instance.", &_init_f_debugStream_3488, &_call_f_debugStream_3488);
-  methods += new qt_gsi::GenericStaticMethod ("qt_destroy", "@brief Static method void QMetaType::destroy(int type, void *data)\nThis method is static and can be called without an instance.", &_init_f_destroy_1715, &_call_f_destroy_1715);
+  methods += new qt_gsi::GenericStaticMethod ("destroy|qt_destroy", "@brief Static method void QMetaType::destroy(int type, void *data)\nThis method is static and can be called without an instance.", &_init_f_destroy_1715, &_call_f_destroy_1715);
   methods += new qt_gsi::GenericStaticMethod ("destruct", "@brief Static method void QMetaType::destruct(int type, void *where)\nThis method is static and can be called without an instance.", &_init_f_destruct_1715, &_call_f_destruct_1715);
   methods += new qt_gsi::GenericStaticMethod ("equals", "@brief Static method bool QMetaType::equals(const void *lhs, const void *rhs, int typeId, int *result)\nThis method is static and can be called without an instance.", &_init_f_equals_4898, &_call_f_equals_4898);
   methods += new qt_gsi::GenericStaticMethod ("hasRegisteredComparators", "@brief Static method bool QMetaType::hasRegisteredComparators(int typeId)\nThis method is static and can be called without an instance.", &_init_f_hasRegisteredComparators_767, &_call_f_hasRegisteredComparators_767);
@@ -704,7 +704,8 @@ static gsi::Enum<QMetaType::TypeFlag> decl_QMetaType_TypeFlag_Enum ("QtCore", "Q
     gsi::enum_const ("WeakPointerToQObject", QMetaType::WeakPointerToQObject, "@brief Enum constant QMetaType::WeakPointerToQObject") +
     gsi::enum_const ("TrackingPointerToQObject", QMetaType::TrackingPointerToQObject, "@brief Enum constant QMetaType::TrackingPointerToQObject") +
     gsi::enum_const ("WasDeclaredAsMetaType", QMetaType::WasDeclaredAsMetaType, "@brief Enum constant QMetaType::WasDeclaredAsMetaType") +
-    gsi::enum_const ("IsGadget", QMetaType::IsGadget, "@brief Enum constant QMetaType::IsGadget"),
+    gsi::enum_const ("IsGadget", QMetaType::IsGadget, "@brief Enum constant QMetaType::IsGadget") +
+    gsi::enum_const ("PointerToGadget", QMetaType::PointerToGadget, "@brief Enum constant QMetaType::PointerToGadget"),
   "@qt\n@brief This class represents the QMetaType::TypeFlag enum");
 
 static gsi::QFlagsClass<QMetaType::TypeFlag > decl_QMetaType_TypeFlag_Enums ("QtCore", "QMetaType_QFlags_TypeFlag",

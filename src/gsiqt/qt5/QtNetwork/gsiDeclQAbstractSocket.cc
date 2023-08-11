@@ -828,6 +828,8 @@ static gsi::Methods methods_QAbstractSocket () {
   methods += new qt_gsi::GenericMethod ("waitForReadyRead", "@brief Method bool QAbstractSocket::waitForReadyRead(int msecs)\nThis is a reimplementation of QIODevice::waitForReadyRead", false, &_init_f_waitForReadyRead_767, &_call_f_waitForReadyRead_767);
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QAbstractSocket::aboutToClose()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64 > ("bytesWritten(qint64)", "bytesWritten", gsi::arg("bytes"), "@brief Signal declaration for QAbstractSocket::bytesWritten(qint64 bytes)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int, qint64 > ("channelBytesWritten(int, qint64)", "channelBytesWritten", gsi::arg("channel"), gsi::arg("bytes"), "@brief Signal declaration for QAbstractSocket::channelBytesWritten(int channel, qint64 bytes)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("channelReadyRead(int)", "channelReadyRead", gsi::arg("channel"), "@brief Signal declaration for QAbstractSocket::channelReadyRead(int channel)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("connected()", "connected", "@brief Signal declaration for QAbstractSocket::connected()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAbstractSocket::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("disconnected()", "disconnected", "@brief Signal declaration for QAbstractSocket::disconnected()\nYou can bind a procedure to this signal.");
@@ -972,7 +974,8 @@ static gsi::Enum<QAbstractSocket::SocketOption> decl_QAbstractSocket_SocketOptio
     gsi::enum_const ("MulticastLoopbackOption", QAbstractSocket::MulticastLoopbackOption, "@brief Enum constant QAbstractSocket::MulticastLoopbackOption") +
     gsi::enum_const ("TypeOfServiceOption", QAbstractSocket::TypeOfServiceOption, "@brief Enum constant QAbstractSocket::TypeOfServiceOption") +
     gsi::enum_const ("SendBufferSizeSocketOption", QAbstractSocket::SendBufferSizeSocketOption, "@brief Enum constant QAbstractSocket::SendBufferSizeSocketOption") +
-    gsi::enum_const ("ReceiveBufferSizeSocketOption", QAbstractSocket::ReceiveBufferSizeSocketOption, "@brief Enum constant QAbstractSocket::ReceiveBufferSizeSocketOption"),
+    gsi::enum_const ("ReceiveBufferSizeSocketOption", QAbstractSocket::ReceiveBufferSizeSocketOption, "@brief Enum constant QAbstractSocket::ReceiveBufferSizeSocketOption") +
+    gsi::enum_const ("PathMtuSocketOption", QAbstractSocket::PathMtuSocketOption, "@brief Enum constant QAbstractSocket::PathMtuSocketOption"),
   "@qt\n@brief This class represents the QAbstractSocket::SocketOption enum");
 
 static gsi::QFlagsClass<QAbstractSocket::SocketOption > decl_QAbstractSocket_SocketOption_Enums ("QtNetwork", "QAbstractSocket_QFlags_SocketOption",
@@ -1018,6 +1021,7 @@ namespace qt_gsi
 static gsi::Enum<QAbstractSocket::SocketType> decl_QAbstractSocket_SocketType_Enum ("QtNetwork", "QAbstractSocket_SocketType",
     gsi::enum_const ("TcpSocket", QAbstractSocket::TcpSocket, "@brief Enum constant QAbstractSocket::TcpSocket") +
     gsi::enum_const ("UdpSocket", QAbstractSocket::UdpSocket, "@brief Enum constant QAbstractSocket::UdpSocket") +
+    gsi::enum_const ("SctpSocket", QAbstractSocket::SctpSocket, "@brief Enum constant QAbstractSocket::SctpSocket") +
     gsi::enum_const ("UnknownSocketType", QAbstractSocket::UnknownSocketType, "@brief Enum constant QAbstractSocket::UnknownSocketType"),
   "@qt\n@brief This class represents the QAbstractSocket::SocketType enum");
 

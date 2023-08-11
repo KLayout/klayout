@@ -52,6 +52,21 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
+// double QCameraImageProcessing::brightness()
+
+
+static void _init_f_brightness_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<double > ();
+}
+
+static void _call_f_brightness_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<double > ((double)((QCameraImageProcessing *)cls)->brightness ());
+}
+
+
 // QCameraImageProcessing::ColorFilter QCameraImageProcessing::colorFilter()
 
 
@@ -177,6 +192,26 @@ static void _call_f_saturation_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<double > ((double)((QCameraImageProcessing *)cls)->saturation ());
+}
+
+
+// void QCameraImageProcessing::setBrightness(double value)
+
+
+static void _init_f_setBrightness_1071 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("value");
+  decl->add_arg<double > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setBrightness_1071 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QCameraImageProcessing *)cls)->setBrightness (arg1);
 }
 
 
@@ -407,6 +442,7 @@ namespace gsi
 static gsi::Methods methods_QCameraImageProcessing () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
+  methods += new qt_gsi::GenericMethod (":brightness", "@brief Method double QCameraImageProcessing::brightness()\n", true, &_init_f_brightness_c0, &_call_f_brightness_c0);
   methods += new qt_gsi::GenericMethod (":colorFilter", "@brief Method QCameraImageProcessing::ColorFilter QCameraImageProcessing::colorFilter()\n", true, &_init_f_colorFilter_c0, &_call_f_colorFilter_c0);
   methods += new qt_gsi::GenericMethod (":contrast", "@brief Method double QCameraImageProcessing::contrast()\n", true, &_init_f_contrast_c0, &_call_f_contrast_c0);
   methods += new qt_gsi::GenericMethod (":denoisingLevel", "@brief Method double QCameraImageProcessing::denoisingLevel()\n", true, &_init_f_denoisingLevel_c0, &_call_f_denoisingLevel_c0);
@@ -415,6 +451,7 @@ static gsi::Methods methods_QCameraImageProcessing () {
   methods += new qt_gsi::GenericMethod ("isWhiteBalanceModeSupported?", "@brief Method bool QCameraImageProcessing::isWhiteBalanceModeSupported(QCameraImageProcessing::WhiteBalanceMode mode)\n", true, &_init_f_isWhiteBalanceModeSupported_c4334, &_call_f_isWhiteBalanceModeSupported_c4334);
   methods += new qt_gsi::GenericMethod (":manualWhiteBalance", "@brief Method double QCameraImageProcessing::manualWhiteBalance()\n", true, &_init_f_manualWhiteBalance_c0, &_call_f_manualWhiteBalance_c0);
   methods += new qt_gsi::GenericMethod (":saturation", "@brief Method double QCameraImageProcessing::saturation()\n", true, &_init_f_saturation_c0, &_call_f_saturation_c0);
+  methods += new qt_gsi::GenericMethod ("setBrightness|brightness=", "@brief Method void QCameraImageProcessing::setBrightness(double value)\n", false, &_init_f_setBrightness_1071, &_call_f_setBrightness_1071);
   methods += new qt_gsi::GenericMethod ("setColorFilter|colorFilter=", "@brief Method void QCameraImageProcessing::setColorFilter(QCameraImageProcessing::ColorFilter filter)\n", false, &_init_f_setColorFilter_3879, &_call_f_setColorFilter_3879);
   methods += new qt_gsi::GenericMethod ("setContrast|contrast=", "@brief Method void QCameraImageProcessing::setContrast(double value)\n", false, &_init_f_setContrast_1071, &_call_f_setContrast_1071);
   methods += new qt_gsi::GenericMethod ("setDenoisingLevel|denoisingLevel=", "@brief Method void QCameraImageProcessing::setDenoisingLevel(double value)\n", false, &_init_f_setDenoisingLevel_1071, &_call_f_setDenoisingLevel_1071);
@@ -424,6 +461,8 @@ static gsi::Methods methods_QCameraImageProcessing () {
   methods += new qt_gsi::GenericMethod ("setWhiteBalanceMode|whiteBalanceMode=", "@brief Method void QCameraImageProcessing::setWhiteBalanceMode(QCameraImageProcessing::WhiteBalanceMode mode)\n", false, &_init_f_setWhiteBalanceMode_4334, &_call_f_setWhiteBalanceMode_4334);
   methods += new qt_gsi::GenericMethod (":sharpeningLevel", "@brief Method double QCameraImageProcessing::sharpeningLevel()\n", true, &_init_f_sharpeningLevel_c0, &_call_f_sharpeningLevel_c0);
   methods += new qt_gsi::GenericMethod (":whiteBalanceMode", "@brief Method QCameraImageProcessing::WhiteBalanceMode QCameraImageProcessing::whiteBalanceMode()\n", true, &_init_f_whiteBalanceMode_c0, &_call_f_whiteBalanceMode_c0);
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QCameraImageProcessing::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QCameraImageProcessing::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QCameraImageProcessing::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QCameraImageProcessing::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;

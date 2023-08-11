@@ -127,25 +127,6 @@ static void _call_ctor_QNetworkProxyQuery_6320 (const qt_gsi::GenericStaticMetho
 }
 
 
-//  Constructor QNetworkProxyQuery::QNetworkProxyQuery(const QNetworkProxyQuery &other)
-
-
-static void _init_ctor_QNetworkProxyQuery_3220 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QNetworkProxyQuery & > (argspec_0);
-  decl->set_return_new<QNetworkProxyQuery> ();
-}
-
-static void _call_ctor_QNetworkProxyQuery_3220 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QNetworkProxyQuery &arg1 = gsi::arg_reader<const QNetworkProxyQuery & >() (args, heap);
-  ret.write<QNetworkProxyQuery *> (new QNetworkProxyQuery (arg1));
-}
-
-
 //  Constructor QNetworkProxyQuery::QNetworkProxyQuery(const QNetworkConfiguration &networkConfiguration, const QUrl &requestUrl, QNetworkProxyQuery::QueryType queryType)
 
 
@@ -227,6 +208,25 @@ static void _call_ctor_QNetworkProxyQuery_9720 (const qt_gsi::GenericStaticMetho
   const QString &arg3 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & arg4 = args ? gsi::arg_reader<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QNetworkProxyQuery::QueryType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QNetworkProxyQuery::QueryType>(heap, QNetworkProxyQuery::TcpServer), heap);
   ret.write<QNetworkProxyQuery *> (new QNetworkProxyQuery (arg1, arg2, arg3, qt_gsi::QtToCppAdaptor<QNetworkProxyQuery::QueryType>(arg4).cref()));
+}
+
+
+//  Constructor QNetworkProxyQuery::QNetworkProxyQuery(const QNetworkProxyQuery &other)
+
+
+static void _init_ctor_QNetworkProxyQuery_3220 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<const QNetworkProxyQuery & > (argspec_0);
+  decl->set_return_new<QNetworkProxyQuery> ();
+}
+
+static void _call_ctor_QNetworkProxyQuery_3220 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QNetworkProxyQuery &arg1 = gsi::arg_reader<const QNetworkProxyQuery & >() (args, heap);
+  ret.write<QNetworkProxyQuery *> (new QNetworkProxyQuery (arg1));
 }
 
 
@@ -562,10 +562,10 @@ static gsi::Methods methods_QNetworkProxyQuery () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QNetworkProxyQuery::QNetworkProxyQuery(const QUrl &requestUrl, QNetworkProxyQuery::QueryType queryType)\nThis method creates an object of class QNetworkProxyQuery.", &_init_ctor_QNetworkProxyQuery_5004, &_call_ctor_QNetworkProxyQuery_5004);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QNetworkProxyQuery::QNetworkProxyQuery(const QString &hostname, int port, const QString &protocolTag, QNetworkProxyQuery::QueryType queryType)\nThis method creates an object of class QNetworkProxyQuery.", &_init_ctor_QNetworkProxyQuery_7904, &_call_ctor_QNetworkProxyQuery_7904);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QNetworkProxyQuery::QNetworkProxyQuery(quint16 bindPort, const QString &protocolTag, QNetworkProxyQuery::QueryType queryType)\nThis method creates an object of class QNetworkProxyQuery.", &_init_ctor_QNetworkProxyQuery_6320, &_call_ctor_QNetworkProxyQuery_6320);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QNetworkProxyQuery::QNetworkProxyQuery(const QNetworkProxyQuery &other)\nThis method creates an object of class QNetworkProxyQuery.", &_init_ctor_QNetworkProxyQuery_3220, &_call_ctor_QNetworkProxyQuery_3220);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QNetworkProxyQuery::QNetworkProxyQuery(const QNetworkConfiguration &networkConfiguration, const QUrl &requestUrl, QNetworkProxyQuery::QueryType queryType)\nThis method creates an object of class QNetworkProxyQuery.", &_init_ctor_QNetworkProxyQuery_8404, &_call_ctor_QNetworkProxyQuery_8404);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QNetworkProxyQuery::QNetworkProxyQuery(const QNetworkConfiguration &networkConfiguration, const QString &hostname, int port, const QString &protocolTag, QNetworkProxyQuery::QueryType queryType)\nThis method creates an object of class QNetworkProxyQuery.", &_init_ctor_QNetworkProxyQuery_11304, &_call_ctor_QNetworkProxyQuery_11304);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QNetworkProxyQuery::QNetworkProxyQuery(const QNetworkConfiguration &networkConfiguration, quint16 bindPort, const QString &protocolTag, QNetworkProxyQuery::QueryType queryType)\nThis method creates an object of class QNetworkProxyQuery.", &_init_ctor_QNetworkProxyQuery_9720, &_call_ctor_QNetworkProxyQuery_9720);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QNetworkProxyQuery::QNetworkProxyQuery(const QNetworkProxyQuery &other)\nThis method creates an object of class QNetworkProxyQuery.", &_init_ctor_QNetworkProxyQuery_3220, &_call_ctor_QNetworkProxyQuery_3220);
   methods += new qt_gsi::GenericMethod (":localPort", "@brief Method int QNetworkProxyQuery::localPort()\n", true, &_init_f_localPort_c0, &_call_f_localPort_c0);
   methods += new qt_gsi::GenericMethod (":networkConfiguration", "@brief Method QNetworkConfiguration QNetworkProxyQuery::networkConfiguration()\n", true, &_init_f_networkConfiguration_c0, &_call_f_networkConfiguration_c0);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QNetworkProxyQuery::operator!=(const QNetworkProxyQuery &other)\n", true, &_init_f_operator_excl__eq__c3220, &_call_f_operator_excl__eq__c3220);
@@ -604,8 +604,10 @@ namespace qt_gsi
 static gsi::Enum<QNetworkProxyQuery::QueryType> decl_QNetworkProxyQuery_QueryType_Enum ("QtNetwork", "QNetworkProxyQuery_QueryType",
     gsi::enum_const ("TcpSocket", QNetworkProxyQuery::TcpSocket, "@brief Enum constant QNetworkProxyQuery::TcpSocket") +
     gsi::enum_const ("UdpSocket", QNetworkProxyQuery::UdpSocket, "@brief Enum constant QNetworkProxyQuery::UdpSocket") +
+    gsi::enum_const ("SctpSocket", QNetworkProxyQuery::SctpSocket, "@brief Enum constant QNetworkProxyQuery::SctpSocket") +
     gsi::enum_const ("TcpServer", QNetworkProxyQuery::TcpServer, "@brief Enum constant QNetworkProxyQuery::TcpServer") +
-    gsi::enum_const ("UrlRequest", QNetworkProxyQuery::UrlRequest, "@brief Enum constant QNetworkProxyQuery::UrlRequest"),
+    gsi::enum_const ("UrlRequest", QNetworkProxyQuery::UrlRequest, "@brief Enum constant QNetworkProxyQuery::UrlRequest") +
+    gsi::enum_const ("SctpServer", QNetworkProxyQuery::SctpServer, "@brief Enum constant QNetworkProxyQuery::SctpServer"),
   "@qt\n@brief This class represents the QNetworkProxyQuery::QueryType enum");
 
 static gsi::QFlagsClass<QNetworkProxyQuery::QueryType > decl_QNetworkProxyQuery_QueryType_Enums ("QtNetwork", "QNetworkProxyQuery_QFlags_QueryType",

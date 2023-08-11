@@ -491,7 +491,7 @@ QGraphicsLayout_Adaptor::~QGraphicsLayout_Adaptor() { }
 
 static void _init_ctor_QGraphicsLayout_Adaptor_2557 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QGraphicsLayoutItem * > (argspec_0);
   decl->set_return_new<QGraphicsLayout_Adaptor> ();
 }
@@ -500,7 +500,7 @@ static void _call_ctor_QGraphicsLayout_Adaptor_2557 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args ? gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap) : gsi::arg_maker<QGraphicsLayoutItem * >() (0, heap);
+  QGraphicsLayoutItem *arg1 = args ? gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap) : gsi::arg_maker<QGraphicsLayoutItem * >() (nullptr, heap);
   ret.write<QGraphicsLayout_Adaptor *> (new QGraphicsLayout_Adaptor (arg1));
 }
 

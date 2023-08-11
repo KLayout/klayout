@@ -547,13 +547,13 @@ static gsi::Methods methods_QNetworkCookie () {
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QNetworkCookie &QNetworkCookie::operator=(const QNetworkCookie &other)\n", false, &_init_f_operator_eq__2742, &_call_f_operator_eq__2742);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QNetworkCookie::operator==(const QNetworkCookie &other)\n", true, &_init_f_operator_eq__eq__c2742, &_call_f_operator_eq__eq__c2742);
   methods += new qt_gsi::GenericMethod (":path", "@brief Method QString QNetworkCookie::path()\n", true, &_init_f_path_c0, &_call_f_path_c0);
-  methods += new qt_gsi::GenericMethod ("sameSitePolicy", "@brief Method QNetworkCookie::SameSite QNetworkCookie::sameSitePolicy()\n", true, &_init_f_sameSitePolicy_c0, &_call_f_sameSitePolicy_c0);
+  methods += new qt_gsi::GenericMethod (":sameSitePolicy", "@brief Method QNetworkCookie::SameSite QNetworkCookie::sameSitePolicy()\n", true, &_init_f_sameSitePolicy_c0, &_call_f_sameSitePolicy_c0);
   methods += new qt_gsi::GenericMethod ("setDomain|domain=", "@brief Method void QNetworkCookie::setDomain(const QString &domain)\n", false, &_init_f_setDomain_2025, &_call_f_setDomain_2025);
   methods += new qt_gsi::GenericMethod ("setExpirationDate|expirationDate=", "@brief Method void QNetworkCookie::setExpirationDate(const QDateTime &date)\n", false, &_init_f_setExpirationDate_2175, &_call_f_setExpirationDate_2175);
   methods += new qt_gsi::GenericMethod ("setHttpOnly|httpOnly=", "@brief Method void QNetworkCookie::setHttpOnly(bool enable)\n", false, &_init_f_setHttpOnly_864, &_call_f_setHttpOnly_864);
   methods += new qt_gsi::GenericMethod ("setName|name=", "@brief Method void QNetworkCookie::setName(const QByteArray &cookieName)\n", false, &_init_f_setName_2309, &_call_f_setName_2309);
   methods += new qt_gsi::GenericMethod ("setPath|path=", "@brief Method void QNetworkCookie::setPath(const QString &path)\n", false, &_init_f_setPath_2025, &_call_f_setPath_2025);
-  methods += new qt_gsi::GenericMethod ("setSameSitePolicy", "@brief Method void QNetworkCookie::setSameSitePolicy(QNetworkCookie::SameSite sameSite)\n", false, &_init_f_setSameSitePolicy_2776, &_call_f_setSameSitePolicy_2776);
+  methods += new qt_gsi::GenericMethod ("setSameSitePolicy|sameSitePolicy=", "@brief Method void QNetworkCookie::setSameSitePolicy(QNetworkCookie::SameSite sameSite)\n", false, &_init_f_setSameSitePolicy_2776, &_call_f_setSameSitePolicy_2776);
   methods += new qt_gsi::GenericMethod ("setSecure|secure=", "@brief Method void QNetworkCookie::setSecure(bool enable)\n", false, &_init_f_setSecure_864, &_call_f_setSecure_864);
   methods += new qt_gsi::GenericMethod ("setValue|value=", "@brief Method void QNetworkCookie::setValue(const QByteArray &value)\n", false, &_init_f_setValue_2309, &_call_f_setValue_2309);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QNetworkCookie::swap(QNetworkCookie &other)\n", false, &_init_f_swap_2047, &_call_f_swap_2047);

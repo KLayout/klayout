@@ -273,14 +273,14 @@ static gsi::Methods methods_QHstsPolicy () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QHstsPolicy::QHstsPolicy()\nThis method creates an object of class QHstsPolicy.", &_init_ctor_QHstsPolicy_0, &_call_ctor_QHstsPolicy_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QHstsPolicy::QHstsPolicy(const QDateTime &expiry, QFlags<QHstsPolicy::PolicyFlag> flags, const QString &host, QUrl::ParsingMode mode)\nThis method creates an object of class QHstsPolicy.", &_init_ctor_QHstsPolicy_9302, &_call_ctor_QHstsPolicy_9302);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QHstsPolicy::QHstsPolicy(const QHstsPolicy &rhs)\nThis method creates an object of class QHstsPolicy.", &_init_ctor_QHstsPolicy_2436, &_call_ctor_QHstsPolicy_2436);
-  methods += new qt_gsi::GenericMethod ("expiry", "@brief Method QDateTime QHstsPolicy::expiry()\n", true, &_init_f_expiry_c0, &_call_f_expiry_c0);
+  methods += new qt_gsi::GenericMethod (":expiry", "@brief Method QDateTime QHstsPolicy::expiry()\n", true, &_init_f_expiry_c0, &_call_f_expiry_c0);
   methods += new qt_gsi::GenericMethod ("host", "@brief Method QString QHstsPolicy::host(QFlags<QUrl::ComponentFormattingOption> options)\n", true, &_init_f_host_c4267, &_call_f_host_c4267);
-  methods += new qt_gsi::GenericMethod ("includesSubDomains", "@brief Method bool QHstsPolicy::includesSubDomains()\n", true, &_init_f_includesSubDomains_c0, &_call_f_includesSubDomains_c0);
+  methods += new qt_gsi::GenericMethod (":includesSubDomains", "@brief Method bool QHstsPolicy::includesSubDomains()\n", true, &_init_f_includesSubDomains_c0, &_call_f_includesSubDomains_c0);
   methods += new qt_gsi::GenericMethod ("isExpired?", "@brief Method bool QHstsPolicy::isExpired()\n", true, &_init_f_isExpired_c0, &_call_f_isExpired_c0);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QHstsPolicy &QHstsPolicy::operator=(const QHstsPolicy &rhs)\n", false, &_init_f_operator_eq__2436, &_call_f_operator_eq__2436);
-  methods += new qt_gsi::GenericMethod ("setExpiry", "@brief Method void QHstsPolicy::setExpiry(const QDateTime &expiry)\n", false, &_init_f_setExpiry_2175, &_call_f_setExpiry_2175);
+  methods += new qt_gsi::GenericMethod ("setExpiry|expiry=", "@brief Method void QHstsPolicy::setExpiry(const QDateTime &expiry)\n", false, &_init_f_setExpiry_2175, &_call_f_setExpiry_2175);
   methods += new qt_gsi::GenericMethod ("setHost", "@brief Method void QHstsPolicy::setHost(const QString &host, QUrl::ParsingMode mode)\n", false, &_init_f_setHost_3970, &_call_f_setHost_3970);
-  methods += new qt_gsi::GenericMethod ("setIncludesSubDomains", "@brief Method void QHstsPolicy::setIncludesSubDomains(bool include)\n", false, &_init_f_setIncludesSubDomains_864, &_call_f_setIncludesSubDomains_864);
+  methods += new qt_gsi::GenericMethod ("setIncludesSubDomains|includesSubDomains=", "@brief Method void QHstsPolicy::setIncludesSubDomains(bool include)\n", false, &_init_f_setIncludesSubDomains_864, &_call_f_setIncludesSubDomains_864);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QHstsPolicy::swap(QHstsPolicy &other)\n", false, &_init_f_swap_1741, &_call_f_swap_1741);
   return methods;
 }

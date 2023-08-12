@@ -44,7 +44,7 @@ class TriangleEdge;
  *  an integer value that can be used in traversal algorithms
  *  ("level")
  */
-class Vertex
+class DB_PUBLIC Vertex
   : public db::DPoint
 {
 public:
@@ -53,7 +53,10 @@ public:
 
   Vertex ();
   Vertex (const DPoint &p);
+  Vertex (const Vertex &v);
   Vertex (db::DCoord x, db::DCoord y);
+
+  Vertex &operator= (const Vertex &v);
 
   bool is_outside () const;
   std::vector<db::Triangle *> triangles () const;
@@ -64,7 +67,21 @@ public:
   size_t level () const { return m_level; }
   void set_level (size_t l) { m_level = l; }
 
-  std::string to_string () const;
+  std::string to_string (bool with_id = false) const;
+
+  /**
+   *  @brief Returns 1 is the point is inside the circle, 0 if on the circle and -1 if outside
+   *  @@@ TODO: Move to db::DPoint
+   */
+  static int in_circle (const db::DPoint &point, const db::DPoint &center, double radius);
+
+  /**
+   *  @brief Returns 1 is this point is inside the circle, 0 if on the circle and -1 if outside
+   */
+  int in_circle (const db::DPoint &center, double radius) const
+  {
+    return in_circle (*this, center, radius);
+  }
 
 private:
   edges_type m_edges;
@@ -74,7 +91,7 @@ private:
 /**
  *  @brief A class representing an edge in the Delaunay triangulation graph
  */
-class TriangleEdge
+class DB_PUBLIC TriangleEdge
   : public tl::Object
 {
 public:
@@ -136,6 +153,11 @@ public:
   Vertex *v1 () const { return mp_v1; }
   Vertex *v2 () const { return mp_v2; }
 
+  void reverse ()
+  {
+    std::swap (mp_v1, mp_v2);
+  }
+
   Triangle *left  () const { return const_cast<Triangle *> (mp_left.get ()); }
   Triangle *right () const { return const_cast<Triangle *> (mp_right.get ()); }
   void set_left  (Triangle *t) { mp_left  = t; }
@@ -157,7 +179,7 @@ public:
   void set_is_segment (bool is_seg) { m_is_segment = is_seg; }
   bool is_segment () const { return m_is_segment; }
 
-  std::string to_string () const;
+  std::string to_string (bool with_id = false) const;
 
   /**
    *  @brief Converts to an db::DEdge
@@ -186,7 +208,7 @@ public:
   }
 
   /**
-   *  @brief Returns a value indicating wether this edge crosses the other one
+   *  @brief Returns a value indicating whether this edge crosses the other one
    *
    *  "crosses" is true, if both edges share at least one point which is not an endpoint
    *  of one of the edges.
@@ -195,7 +217,7 @@ public:
   static bool crosses (const db::DEdge &e, const db::DEdge &other);
 
   /**
-   *  @brief Returns a value indicating wether this edge crosses the other one
+   *  @brief Returns a value indicating whether this edge crosses the other one
    *
    *  "crosses" is true, if both edges share at least one point which is not an endpoint
    *  of one of the edges.
@@ -206,19 +228,39 @@ public:
   }
 
   /**
-   *  @brief Returns a value indicating wether this edge crosses the other one
+   *  @brief Returns a value indicating whether this edge crosses the other one
+   *
+   *  "crosses" is true, if both edges share at least one point which is not an endpoint
+   *  of one of the edges.
+   */
+  bool crosses (const db::TriangleEdge &other) const
+  {
+    return crosses (edge (), other.edge ());
+  }
+
+  /**
+   *  @brief Returns a value indicating whether this edge crosses the other one
    *  "crosses" is true, if both edges share at least one point.
    *  @@@ TODO: Move to db::DEdge
    */
   static bool crosses_including (const db::DEdge &e, const db::DEdge &other);
 
   /**
-   *  @brief Returns a value indicating wether this edge crosses the other one
+   *  @brief Returns a value indicating whether this edge crosses the other one
    *  "crosses" is true, if both edges share at least one point.
    */
   bool crosses_including (const db::DEdge &other) const
   {
     return crosses_including (edge (), other);
+  }
+
+  /**
+   *  @brief Returns a value indicating whether this edge crosses the other one
+   *  "crosses" is true, if both edges share at least one point.
+   */
+  bool crosses_including (const db::TriangleEdge &other) const
+  {
+    return crosses_including (edge (), other.edge ());
   }
 
   /**
@@ -253,10 +295,22 @@ public:
    *  @brief Gets the side the point is on
    *
    *  -1 is for "left", 0 is "on" and +1 is "right"
+   *  @@@ TODO: correct to same definition as db::Edge (negative)
+   */
+  static int side_of (const db::DEdge &e, const db::DPoint &point)
+  {
+    return -e.side_of (point);
+  }
+
+  /**
+   *  @brief Gets the side the point is on
+   *
+   *  -1 is for "left", 0 is "on" and +1 is "right"
+   *  @@@ TODO: correct to same definition as db::Edge (negative)
    */
   int side_of (const db::DPoint &p) const
   {
-    return edge ().side_of (p);
+    return -edge ().side_of (p);
   }
 
   /**
@@ -317,12 +371,16 @@ private:
   tl::weak_ptr<Triangle> mp_left, mp_right;
   size_t m_level;
   bool m_is_segment;
+
+  //  no copying
+  TriangleEdge &operator= (const TriangleEdge &);
+  TriangleEdge (const TriangleEdge &);
 };
 
 /**
  *  @brief A class representing a triangle
  */
-class Triangle
+class DB_PUBLIC Triangle
   : public tl::Object
 {
 public:
@@ -332,7 +390,7 @@ public:
   bool is_outside () const { return m_is_outside; }
   void set_outside (bool o) { m_is_outside = o; }
 
-  std::string to_string () const;
+  std::string to_string (bool with_id = false) const;
 
   /**
    *  @brief Gets the nth vertex (n wraps around and can be negative)
@@ -379,6 +437,10 @@ private:
   bool m_is_outside;
   tl::weak_ptr<TriangleEdge> mp_e1, mp_e2, mp_e3;
   db::Vertex *mp_v1, *mp_v2, *mp_v3;
+
+  //  no copying
+  Triangle &operator= (const Triangle &);
+  Triangle (const Triangle &);
 };
 
 

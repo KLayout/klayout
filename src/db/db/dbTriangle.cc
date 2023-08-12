@@ -43,6 +43,22 @@ Vertex::Vertex (const db::DPoint &p)
   //  .. nothing yet ..
 }
 
+Vertex::Vertex (const Vertex &v)
+  : DPoint (), m_level (0)
+{
+  operator= (v);
+}
+
+Vertex &Vertex::operator= (const Vertex &v)
+{
+  if (this != &v) {
+    //  NOTE: edges are not copied!
+    db::DPoint::operator= (v);
+    m_level = v.m_level;
+  }
+  return *this;
+}
+
 Vertex::Vertex (db::DCoord x, db::DCoord y)
   : DPoint (x, y), m_level (0)
 {
@@ -76,9 +92,30 @@ Vertex::triangles () const
 }
 
 std::string
-Vertex::to_string () const
+Vertex::to_string (bool with_id) const
 {
-  return db::DPoint::to_string () + tl::sprintf ("[%p]", (void *)this);
+  std::string res = tl::sprintf ("(%.12g, %.12g)", x (), y());
+  if (with_id) {
+    res += tl::sprintf ("[%p]", (void *)this);
+  }
+  return res;
+}
+
+int
+Vertex::in_circle (const DPoint &point, const DPoint &center, double radius)
+{
+  double dx = point.x () - center.x ();
+  double dy = point.y () - center.y ();
+  double d2 = dx * dx + dy * dy;
+  double r2 = radius * radius;
+  double delta = std::max (1.0, fabs (d2 + r2)) * db::epsilon;
+  if (d2 < r2 - delta) {
+    return 1;
+  } else if (d2 < r2 + delta) {
+    return 0;
+  } else {
+    return -1;
+  }
 }
 
 // -------------------------------------------------------------------------------------
@@ -141,9 +178,13 @@ TriangleEdge::common_vertex (const TriangleEdge &other) const
 }
 
 std::string
-TriangleEdge::to_string () const
+TriangleEdge::to_string (bool with_id) const
 {
-  return mp_v1->to_string () + "," + mp_v2->to_string () + tl::sprintf ("[%p]", (void *)this);
+  std::string res = std::string ("(") + mp_v1->to_string (with_id) + ", " + mp_v2->to_string (with_id) + ")";
+  if (with_id) {
+    res += tl::sprintf ("[%p]", (void *)this);
+  }
+  return res;
 }
 
 double
@@ -279,19 +320,20 @@ Triangle::Triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3)
 }
 
 std::string
-Triangle::to_string () const
+Triangle::to_string (bool with_id) const
 {
-  std::string res;
+  std::string res = "(";
   for (int i = 0; i < 3; ++i) {
     if (i > 0) {
       res += ", ";
     }
     if (vertex (i)) {
-      res += vertex (i)->to_string ();
+      res += vertex (i)->to_string (with_id);
     } else {
       res += "(null)";
     }
   }
+  res += ")";
   return res;
 }
 
@@ -395,7 +437,7 @@ Triangle::contains (const db::DPoint &point) const
     int s = db::DEdge (*vl, *v).side_of (point);
     if (s == 0) {
       res = 0;
-    } else if (s < 0) {
+    } else if (s > 0) {
       return -1;
     }
     vl = v;

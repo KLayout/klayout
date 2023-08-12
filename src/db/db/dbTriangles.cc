@@ -441,44 +441,56 @@ Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool insi
 void
 Triangles::insert_new_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out)
 {
-#if 0
-  if len(self.vertexes) <= 3:
-    if len(self.vertexes) == 3:
-      # form the first triangle
-      s1 = TriangleEdge(self.vertexes[0], self.vertexes[1])
-      s2 = TriangleEdge(self.vertexes[1], self.vertexes[2])
-      s3 = TriangleEdge(self.vertexes[2], self.vertexes[0])
-      # avoid degenerate Triangles to happen here @@@
-      if vprod_sign(s1.d(), s2.d()) == 0:
-        self.vertexes = []   # reject some points?
-      else:
-        t = Triangle(s1, s2, s3)
-        if new_triangles_out is not None:
-          new_triangles_out.append(t)
-        self.triangles.append(t)
-    return 0
+  if (mp_triangles.empty ()) {
 
-  new_triangles = []
+    if (m_vertex_heap.size () == 3) {
 
-  # Find closest edge
-  closest_edge = self.find_closest_edge(vertex)
-  assert(closest_edge is not None)
+      std::vector<db::Vertex *> vv;
+      for (auto v = m_vertex_heap.begin (); v != m_vertex_heap.end (); ++v) {
+        vv.push_back (v.operator-> ());
+      }
 
-  s1 = TriangleEdge(vertex, closest_edge.p1)
-  s2 = TriangleEdge(vertex, closest_edge.p2)
+      //  form the first triangle
+      db::TriangleEdge *s1 = create_edge (vv[0], vv[1]);
+      db::TriangleEdge *s2 = create_edge (vv[1], vv[2]);
+      db::TriangleEdge *s3 = create_edge (vv[2], vv[0]);
 
-  t = Triangle(s1, closest_edge, s2)
-  self.triangles.append(t)
-  new_triangles.append(t)
+      if (db::vprod_sign (s1->d (), s2->d ()) == 0) {
+        //  avoid degenerate Triangles to happen here
+        tl_assert (false);
+      } else {
+        db::Triangle *t = create_triangle (s1, s2, s3);
+        if (new_triangles_out) {
+          new_triangles_out->push_back (t);
+        }
+      }
 
-  self._add_more_triangles(new_triangles, closest_edge, closest_edge.p1, vertex, s1)
-  self._add_more_triangles(new_triangles, closest_edge, closest_edge.p2, vertex, s2)
+    }
 
-  if new_triangles_out is not None:
-    new_triangles_out += new_triangles
+    return;
 
-  return self._fix_triangles(new_triangles, [], new_triangles_out)
-#endif
+  }
+
+  std::vector<db::Triangle *> new_triangles;
+
+  //  Find closest edge
+  db::TriangleEdge *closest_edge = find_closest_edge (*vertex);
+  tl_assert (closest_edge != 0);
+
+  db::TriangleEdge *s1 = create_edge (vertex, closest_edge->v1 ());
+  db::TriangleEdge *s2 = create_edge (vertex, closest_edge->v2 ());
+
+  db::Triangle *t = create_triangle (s1, closest_edge, s2);
+  new_triangles.push_back (t);
+
+  add_more_triangles (new_triangles, closest_edge, closest_edge->v1 (), vertex, s1);
+  add_more_triangles (new_triangles, closest_edge, closest_edge->v2 (), vertex, s2);
+
+  if (new_triangles_out) {
+    new_triangles_out->insert (new_triangles_out->end (), new_triangles.begin (), new_triangles.end ());
+  }
+
+  fix_triangles (new_triangles, std::vector<db::TriangleEdge *> (), new_triangles_out);
 }
 
 void

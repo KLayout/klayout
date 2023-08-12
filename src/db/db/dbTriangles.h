@@ -92,7 +92,7 @@ private:
                                  db::TriangleEdge *incoming_edge,
                                  db::Vertex *from_vertex, db::Vertex *to_vertex,
                                  db::TriangleEdge *conn_edge);
-  void insert_new_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out);
+  void insert_new_vertex(db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out);
 };
 
 }

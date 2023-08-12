@@ -33,7 +33,7 @@ namespace db
 {
 
 Triangles::Triangles ()
-  : m_is_constrained (false)
+  : m_is_constrained (false), m_level (0)
 {
   //  .. nothing yet ..
 }
@@ -488,15 +488,114 @@ Triangles::remove_inside_vertex (db::Vertex *vertex, std::vector<db::Triangle *>
   fix_triangles (triangles_to_fix, std::vector<db::TriangleEdge *> (), new_triangles_out);
 }
 
-void
+int
 Triangles::fix_triangles (const std::vector<db::Triangle *> &tris, const std::vector<db::TriangleEdge *> &fixed_edges, std::vector<db::Triangle *> *new_triangles)
 {
+  int flips = 0;
 
-// @@@
+  m_level += 1;
+  for (auto e = fixed_edges.begin (); e != fixed_edges.end (); ++e) {
+    (*e)->set_level (m_level);
+  }
 
+  std::vector<db::TriangleEdge *> queue, todo;
+
+  for (auto t = tris.begin (); t != tris.end (); ++t) {
+    for (int i = 0; i < 3; ++i) {
+      db::TriangleEdge *e = (*t)->edge (i);
+      if (e->level () < m_level && ! e->is_segment ()) {
+        queue.push_back (e);
+      }
+    }
+  }
+
+  while (! queue.empty ()) {
+
+    todo.clear ();
+    todo.swap (queue);
+    std::set<db::TriangleEdge *> queued;
+
+    //  NOTE: we cannot be sure that already treated edges will not become
+    //  illegal by neighbor edges flipping ..
+    //    for s in todo:
+    //      s.level = self.level
+
+    for (auto e = todo.begin (); e != todo.end (); ++e) {
+
+      if (is_illegal_edge (*e)) {
+
+        queued.erase (*e);
+
+        auto pp = flip (*e);
+        auto t1 = pp.first.first;
+        auto t2 = pp.first.second;
+        auto s12 = pp.second;
+
+        if (new_triangles) {
+          new_triangles->push_back (t1);
+          new_triangles->push_back (t2);
+        }
+
+        ++flips;
+        tl_assert (! is_illegal_edge (s12)); // @@@ remove later!
+
+        for (int i = 0; i < 3; ++i) {
+          db::TriangleEdge *s1 = t1->edge (i);
+          if (s1->level () < m_level && ! s1->is_segment () && queued.find (s1) == queued.end ()) {
+            queue.push_back (s1);
+            queued.insert (s1);
+          }
+        }
+
+        for (int i = 0; i < 3; ++i) {
+          db::TriangleEdge *s2 = t2->edge (i);
+          if (s2->level () < m_level && ! s2->is_segment () && queued.find (s2) == queued.end ()) {
+            queue.push_back (s2);
+            queued.insert (s2);
+          }
+        }
+
+      }
+
+    }
+
+    std::vector<db::TriangleEdge *>::iterator wp = queue.begin ();
+    for (auto e = queue.begin (); e != queue.end (); ++e) {
+      if (queued.find (*e) != queued.end ()) {
+        *wp++ = *e;
+      }
+    }
+    queue.erase (wp, queue.end ());
+
+  }
+
+  return flips;
 }
 
-std::pair<std::pair<Triangle *, Triangle *>, TriangleEdge *> Triangles::flip (TriangleEdge *edge)
+bool
+Triangles::is_illegal_edge (db::TriangleEdge *edge)
+{
+  db::Triangle *left = edge->left ();
+  db::Triangle *right = edge->right ();
+  if (!left || !right) {
+    return false;
+  }
+
+  auto lr = left->circumcircle ();
+  if (right->opposite (edge)->in_circle (lr.first, lr.second) > 0) {
+    return true;
+  }
+
+  auto rr = right->circumcircle();
+  if (left->opposite (edge)->in_circle (rr.first, rr.second) > 0) {
+    return true;
+  }
+
+  return false;
+}
+
+std::pair<std::pair<Triangle *, Triangle *>, TriangleEdge *>
+Triangles::flip (TriangleEdge *edge)
 {
   db::Triangle *t1 = edge->left ();
   db::Triangle *t2 = edge->right ();
@@ -972,51 +1071,6 @@ class Triangles(object):
       return True
 
     return False
-
-  def _fix_triangles(self, tris: [Triangle], fixed_edges: [TriangleEdge], new_triangles: [Triangle] = None):
-
-    flips = 0
-
-    self.level += 1
-    for s in fixed_edges:
-      s.level = self.level
-
-    queue = []
-
-    for t in tris:
-      for s in t.edges():
-        if s.level < self.level and not s.is_segment:
-          if s not in queue:
-            queue.append(s)
-
-    while not len(queue) == 0:
-
-      todo = queue
-      queue = []
-
-      # NOTE: we cannot be sure that already treated edges will not become
-      # illegal by neighbor edges flipping ..
-      #  for s in todo:
-      #    s.level = self.level
-
-      for s in todo:
-        if self._is_illegal_edge(s):
-          if s in queue:
-            queue.remove(s)
-          t1, t2, s12 = self.flip(s)
-          if new_triangles is not None:
-            new_triangles.append(t1)
-            new_triangles.append(t2)
-          flips += 1
-          assert(not self._is_illegal_edge(s12))  # @@@ TODO: remove later
-          for s1 in t1.edges():
-            if s1.level < self.level and not s1.is_segment and s1 not in queue:
-              queue.append(s1)
-          for s2 in t2.edges():
-            if s2.level < self.level and not s2.is_segment and s2 not in queue:
-              queue.append(s2)
-
-    return flips
 
   def flipped_edge(self, s: TriangleEdge) -> Edge:
 

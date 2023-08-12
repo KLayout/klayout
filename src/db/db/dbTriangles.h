@@ -64,6 +64,7 @@ private:
   tl::weak_collection<db::TriangleEdge> mp_edges;
   std::list<db::Vertex> m_vertex_heap;
   bool m_is_constrained;
+  size_t m_level;
 
   db::Vertex *create_vertex (double x, double y);
   db::Vertex *create_vertex (const db::DPoint &pt);
@@ -79,8 +80,9 @@ private:
   void remove_outside_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles = 0);
   void remove_inside_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out = 0);
   std::vector<db::Triangle *> fill_concave_corners (const std::vector<TriangleEdge *> &edges);
-  void fix_triangles (const std::vector<db::Triangle *> &tris, const std::vector<db::TriangleEdge *> &fixed_edges, std::vector<db::Triangle *> *new_triangles);
+  int fix_triangles(const std::vector<db::Triangle *> &tris, const std::vector<db::TriangleEdge *> &fixed_edges, std::vector<db::Triangle *> *new_triangles);
   std::pair<std::pair<db::Triangle *, db::Triangle *>, db::TriangleEdge *> flip (TriangleEdge *edge);
+  static bool is_illegal_edge (db::TriangleEdge *edge);
 };
 
 }

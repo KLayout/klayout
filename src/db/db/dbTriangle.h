@@ -167,8 +167,6 @@ public:
 
   Triangle *left  () const { return const_cast<Triangle *> (mp_left.get ()); }
   Triangle *right () const { return const_cast<Triangle *> (mp_right.get ()); }
-  void set_left  (Triangle *t) { mp_left  = t; }
-  void set_right (Triangle *t) { mp_right = t; }
 
   TriangleIterator begin_triangles () const
   {
@@ -382,6 +380,8 @@ public:
   bool has_triangle (const Triangle *t) const;
 
 private:
+  friend class Triangle;
+
   Vertex *mp_v1, *mp_v2;
   tl::weak_ptr<Triangle> mp_left, mp_right;
   size_t m_level;
@@ -390,6 +390,9 @@ private:
   //  no copying
   TriangleEdge &operator= (const TriangleEdge &);
   TriangleEdge (const TriangleEdge &);
+
+  void set_left  (Triangle *t);
+  void set_right (Triangle *t);
 };
 
 /**

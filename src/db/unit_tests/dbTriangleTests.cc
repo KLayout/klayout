@@ -247,27 +247,30 @@ TEST(Triangle_contains)
   db::TriangleEdge s2 (&v2, &v3);
   db::TriangleEdge s3 (&v3, &v1);
 
-  db::Triangle tri (&s1, &s2, &s3);
-
-  EXPECT_EQ (tri.contains (db::DPoint (0, 0)), 0);
-  EXPECT_EQ (tri.contains (db::DPoint (-1, -2)), -1);
-  EXPECT_EQ (tri.contains (db::DPoint (0.5, 1)), 0);
-  EXPECT_EQ (tri.contains (db::DPoint (0.5, 2)), -1);
-  EXPECT_EQ (tri.contains (db::DPoint (2.5, 1)), -1);
-  EXPECT_EQ (tri.contains (db::DPoint (1, -1)), -1);
-  EXPECT_EQ (tri.contains (db::DPoint (1, 1)), 1);
+  {
+    db::Triangle tri (&s1, &s2, &s3);
+    EXPECT_EQ (tri.contains (db::DPoint (0, 0)), 0);
+    EXPECT_EQ (tri.contains (db::DPoint (-1, -2)), -1);
+    EXPECT_EQ (tri.contains (db::DPoint (0.5, 1)), 0);
+    EXPECT_EQ (tri.contains (db::DPoint (0.5, 2)), -1);
+    EXPECT_EQ (tri.contains (db::DPoint (2.5, 1)), -1);
+    EXPECT_EQ (tri.contains (db::DPoint (1, -1)), -1);
+    EXPECT_EQ (tri.contains (db::DPoint (1, 1)), 1);
+  }
 
   s1.reverse ();
   s2.reverse ();
   s3.reverse ();
 
-  db::Triangle tri2 (&s3, &s2, &s1);
-  EXPECT_EQ (tri2.contains(db::DPoint(0, 0)), 0);
-  EXPECT_EQ (tri2.contains(db::DPoint(0.5, 1)), 0);
-  EXPECT_EQ (tri2.contains(db::DPoint(0.5, 2)), -1);
-  EXPECT_EQ (tri2.contains(db::DPoint(2.5, 1)), -1);
-  EXPECT_EQ (tri2.contains(db::DPoint(1, -1)), -1);
-  EXPECT_EQ (tri2.contains(db::DPoint(1, 1)), 1);
+  {
+    db::Triangle tri2 (&s3, &s2, &s1);
+    EXPECT_EQ (tri2.contains(db::DPoint(0, 0)), 0);
+    EXPECT_EQ (tri2.contains(db::DPoint(0.5, 1)), 0);
+    EXPECT_EQ (tri2.contains(db::DPoint(0.5, 2)), -1);
+    EXPECT_EQ (tri2.contains(db::DPoint(2.5, 1)), -1);
+    EXPECT_EQ (tri2.contains(db::DPoint(1, -1)), -1);
+    EXPECT_EQ (tri2.contains(db::DPoint(1, 1)), 1);
+  }
 }
 
 TEST(Triangle_circumcircle)
@@ -445,8 +448,8 @@ TEST(TriangleEdge_can_flip)
   db::TriangleEdge s5 (&v3, &v4);
   db::Triangle t1 (&s1, &s2, &s3);
   db::Triangle t2 (&s3, &s4, &s5);
-  s3.set_left (&t1);
-  s3.set_right (&t2);
+  EXPECT_EQ (s3.left () == &t2, true);
+  EXPECT_EQ (s3.right () == &t1, true);
   EXPECT_EQ (s3.can_flip(), false);
   v1.set_x (0.5);
   EXPECT_EQ (s3.can_flip(), true);

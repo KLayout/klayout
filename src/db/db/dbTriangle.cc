@@ -134,6 +134,20 @@ TriangleEdge::TriangleEdge (Vertex *v1, Vertex *v2)
   v2->m_edges.push_back (this);
 }
 
+void
+TriangleEdge::set_left  (Triangle *t)
+{
+  tl_assert (left () == 0);
+  mp_left = t;
+}
+
+void
+TriangleEdge::set_right (Triangle *t)
+{
+  tl_assert (right () == 0);
+  mp_right = t;
+}
+
 Triangle *
 TriangleEdge::other (const Triangle *t) const
 {

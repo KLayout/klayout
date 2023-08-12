@@ -496,13 +496,38 @@ Triangles::fix_triangles (const std::vector<db::Triangle *> &tris, const std::ve
 
 }
 
-std::pair<std::pair<Triangle *, Triangle *>, TriangleEdge *> Triangles::flip(TriangleEdge *edge)
+std::pair<std::pair<Triangle *, Triangle *>, TriangleEdge *> Triangles::flip (TriangleEdge *edge)
 {
+  db::Triangle *t1 = edge->left ();
+  db::Triangle *t2 = edge->right ();
 
-  // @@@
+  bool outside = t1->is_outside ();
+  tl_assert (t1->is_outside () == outside);
 
+  //  prepare for the new triangle to replace this one
+  t1->unlink ();
+  t2->unlink ();
+
+  db::Vertex *t1_vext = t1->opposite (edge);
+  db::TriangleEdge *t1_sext1 = t1->find_edge_with (t1_vext, edge->v1 ());
+  db::TriangleEdge *t1_sext2 = t1->find_edge_with (t1_vext, edge->v2 ());
+
+  db::Vertex *t2_vext = t2->opposite (edge);
+  db::TriangleEdge *t2_sext1 = t2->find_edge_with (t2_vext, edge->v1 ());
+  db::TriangleEdge *t2_sext2 = t2->find_edge_with (t2_vext, edge->v2 ());
+
+  db::TriangleEdge *s_new = create_edge (t1_vext, t2_vext);
+
+  db::Triangle *t1_new = create_triangle (s_new, t1_sext1, t2_sext1);
+  t1_new->set_outside (outside);
+  db::Triangle *t2_new = create_triangle (s_new, t1_sext2, t2_sext2);
+  t2_new->set_outside (outside);
+
+  remove (t1);
+  remove (t2);
+
+  return std::make_pair (std::make_pair (t1_new, t2_new), s_new);
 }
-
 
 std::vector<db::Triangle *>
 Triangles::fill_concave_corners (const std::vector<db::TriangleEdge *> &edges)
@@ -670,9 +695,6 @@ class Triangles(object):
       return vertex
 
     assert(False)
-
-  def _fill_concave_corners(self, edges: [TriangleEdge]) -> [Triangle]:
-
 
   def find_triangle_for_vertex(self, p: Point) -> [Triangle]:
 
@@ -999,34 +1021,6 @@ class Triangles(object):
   def flipped_edge(self, s: TriangleEdge) -> Edge:
 
     return Edge(s.left.ext_vertex(s), s.right.ext_vertex(s))
-
-  def flip(self, s: TriangleEdge) -> (Triangle, Triangle, TriangleEdge):
-
-    t1 = s.left
-    t2 = s.right
-
-    assert t1.is_outside == t2.is_outside
-
-    s.unlink()
-    self.triangles.remove(t1)
-    self.triangles.remove(t2)
-
-    t1_vext = t1.ext_vertex(s)
-    t1_sext1 = t1.find_edge_with(t1_vext, s.p1)
-    t1_sext2 = t1.find_edge_with(t1_vext, s.p2)
-    t2_vext = t2.ext_vertex(s)
-    t2_sext1 = t2.find_edge_with(t2_vext, s.p1)
-    t2_sext2 = t2.find_edge_with(t2_vext, s.p2)
-    s_new = TriangleEdge(t1_vext, t2_vext)
-    t1_new = Triangle(s_new, t1_sext1, t2_sext1)
-    t1_new.is_outside = t1.is_outside
-    t2_new = Triangle(s_new, t1_sext2, t2_sext2)
-    t2_new.is_outside = t2.is_outside
-
-    self.triangles.append(t1_new)
-    self.triangles.append(t2_new)
-
-    return t1_new, t2_new, s_new
 
   def _ensure_edge_inner(self, edge: Edge) -> [TriangleEdge]:
 

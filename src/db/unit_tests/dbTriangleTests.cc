@@ -356,6 +356,10 @@ TEST(TriangleEdge_triangles)
 
   EXPECT_EQ (e1->common_vertex (e2.get ()) == &v2, true);
   EXPECT_EQ (e2->common_vertex (e4.get ()) == 0, true);
+
+  tri->unlink ();
+  EXPECT_EQ (e1->has_triangle (tri.get ()), false);
+  EXPECT_EQ (e1->has_triangle (tri2.get ()), true);
 }
 
 TEST(TriangleEdge_side_of)

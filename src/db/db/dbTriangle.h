@@ -408,6 +408,8 @@ public:
   Triangle ();
   Triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3);
 
+  void unlink ();
+
   bool is_outside () const { return m_is_outside; }
   void set_outside (bool o) { m_is_outside = o; }
 

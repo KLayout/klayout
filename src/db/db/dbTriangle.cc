@@ -148,14 +148,14 @@ TriangleEdge::TriangleEdge (Vertex *v1, Vertex *v2)
 void
 TriangleEdge::set_left  (Triangle *t)
 {
-  tl_assert (left () == 0);
+  tl_assert (t == 0 || left () == 0);
   mp_left = t;
 }
 
 void
 TriangleEdge::set_right (Triangle *t)
 {
-  tl_assert (right () == 0);
+  tl_assert (t == 0 || right () == 0);
   mp_right = t;
 }
 
@@ -341,6 +341,20 @@ Triangle::Triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3)
       e->set_left (this);
     } else if (side_of > 0) {
       e->set_right (this);
+    }
+  }
+}
+
+void
+Triangle::unlink ()
+{
+  for (int i = 0; i != 3; ++i) {
+    db::TriangleEdge *e = edge (i);
+    if (e->left () == this) {
+      e->set_left (0);
+    }
+    if (e->right () == this) {
+      e->set_right (0);
     }
   }
 }

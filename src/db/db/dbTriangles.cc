@@ -315,9 +315,264 @@ Triangles::insert_point (const db::DPoint &point, std::vector<db::Triangle *> *n
 db::Vertex *
 Triangles::insert (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles)
 {
+  std::vector<db::Triangle *> tris = find_triangle_for_point (*vertex);
 
-  // @@@
+  //  the new vertex is outside the domain
+  if (tris.empty ()) {
+    tl_assert (! m_is_constrained);
+    insert_new_vertex (vertex, new_triangles);
+    return vertex;
+  }
 
+  //  the new vertex is on the edge between two triangles
+  std::vector<db::TriangleEdge *> on_edges;
+  for (int i = 0; i < 3; ++i) {
+    db::TriangleEdge *e = tris.front ()->edge (i);
+    if (e->side_of (*vertex) == 0) {
+      on_edges.push_back (e);
+    }
+  }
+
+  if (! on_edges.empty ()) {
+    if (on_edges.size () == size_t (1)) {
+      split_triangles_on_edge (tris, vertex, on_edges.front (), new_triangles);
+      return vertex;
+    } else {
+      //  the vertex is already present
+      tl_assert (on_edges.size () == size_t (2));
+      return on_edges.front ()->common_vertex (on_edges [1]);
+    }
+  } else if (tris.size () == size_t (1)) {
+    //  the new vertex is inside one triangle
+    split_triangle (tris.front (), vertex, new_triangles);
+    return vertex;
+  }
+
+  tl_assert (false);
+}
+
+std::vector<db::Triangle *>
+Triangles::find_triangle_for_point (const db::DPoint &point)
+{
+  db::TriangleEdge *edge = find_closest_edge (point);
+
+  std::vector<db::Triangle *> res;
+  if (edge) {
+    for (auto t = edge->begin_triangles (); t != edge->end_triangles (); ++t) {
+      if (t->contains (point) >= 0) {
+        res.push_back (t.operator-> ());
+      }
+    }
+  }
+  return res;
+}
+
+db::TriangleEdge *
+Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool inside_only)
+{
+  if (!vstart) {
+    if (! mp_triangles.empty ()) {
+      vstart = mp_triangles.front ()->vertex (0);
+    } else {
+      return 0;
+    }
+  }
+
+  db::DEdge line (*vstart, p);
+
+  double d = -1.0;
+  db::TriangleEdge *edge = 0;
+  db::Vertex *v = vstart;
+
+  while (v) {
+
+    db::Vertex *vnext = 0;
+
+    for (auto e = v->begin_edges (); e != v->end_edges (); ++e) {
+
+      if (inside_only) {
+        //  NOTE: in inside mode we stay on the line of sight as we don't
+        //  want to walk around outside pockets.
+        if (! e->is_segment () && e->is_for_outside_triangles ()) {
+          continue;
+        }
+        if (! e->crosses_including (line)) {
+          continue;
+        }
+      }
+
+      double ds = e->distance (p);
+
+      if (d < 0.0 || ds < d) {
+
+        d = ds;
+        edge = const_cast<db::TriangleEdge *> (e.operator-> ());
+        vnext = edge->other (v);
+
+      } else if (fabs (ds - d) < std::max (1.0, fabs (ds) + fabs (d)) * db::epsilon) {
+
+        //  this differentiation selects the edge which bends further towards
+        //  the target point if both edges share a common point and that
+        //  is the one the determines the distance.
+        db::Vertex *cv = edge->common_vertex (e.operator-> ());
+        if (cv) {
+          db::DVector edge_d = *edge->other (cv) - *cv;
+          db::DVector e_d = *e->other(cv) - *cv;
+          db::DVector r = p - *cv;
+          double edge_sp = db::sprod (r, edge_d) / edge_d.length ();
+          double s_sp = db::sprod (r, e_d) / e_d.length ();
+          if (s_sp > edge_sp) {
+            edge = const_cast<db::TriangleEdge *> (e.operator-> ());
+            vnext = edge->other (v);
+          }
+        }
+
+      }
+
+    }
+
+    v = vnext;
+
+  }
+
+  return edge;
+}
+
+void
+Triangles::insert_new_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out)
+{
+#if 0
+  if len(self.vertexes) <= 3:
+    if len(self.vertexes) == 3:
+      # form the first triangle
+      s1 = TriangleEdge(self.vertexes[0], self.vertexes[1])
+      s2 = TriangleEdge(self.vertexes[1], self.vertexes[2])
+      s3 = TriangleEdge(self.vertexes[2], self.vertexes[0])
+      # avoid degenerate Triangles to happen here @@@
+      if vprod_sign(s1.d(), s2.d()) == 0:
+        self.vertexes = []   # reject some points?
+      else:
+        t = Triangle(s1, s2, s3)
+        if new_triangles_out is not None:
+          new_triangles_out.append(t)
+        self.triangles.append(t)
+    return 0
+
+  new_triangles = []
+
+  # Find closest edge
+  closest_edge = self.find_closest_edge(vertex)
+  assert(closest_edge is not None)
+
+  s1 = TriangleEdge(vertex, closest_edge.p1)
+  s2 = TriangleEdge(vertex, closest_edge.p2)
+
+  t = Triangle(s1, closest_edge, s2)
+  self.triangles.append(t)
+  new_triangles.append(t)
+
+  self._add_more_triangles(new_triangles, closest_edge, closest_edge.p1, vertex, s1)
+  self._add_more_triangles(new_triangles, closest_edge, closest_edge.p2, vertex, s2)
+
+  if new_triangles_out is not None:
+    new_triangles_out += new_triangles
+
+  return self._fix_triangles(new_triangles, [], new_triangles_out)
+#endif
+}
+
+void
+Triangles::add_more_triangles (const std::vector<db::Triangle *> &new_triangles,
+                               db::TriangleEdge *incoming_edge,
+                               db::Vertex *from_vertex, db::Vertex *to_vertex,
+                               db::TriangleEdge *conn_edge)
+{
+#if 0
+  while True:
+
+    next_edge = None
+    for s in from_vertex.edges:
+      if not s.has_vertex(to_vertex) and s.is_outside():
+        # TODO: remove and break
+        assert(next_edge is None)
+        next_edge = s
+
+    assert (next_edge is not None)
+    next_vertex = next_edge.other_vertex(from_vertex)
+
+    d_from_to = sub(to_vertex, from_vertex)
+    incoming_vertex = incoming_edge.other_vertex(from_vertex)
+    if vprod_sign(sub(from_vertex, incoming_vertex), d_from_to) * vprod_sign(sub(from_vertex, next_vertex), d_from_to) >= 0:
+      return
+
+    next_conn_edge = TriangleEdge(next_vertex, to_vertex)
+    t = Triangle(next_conn_edge, next_edge, conn_edge)
+    self.triangles.append(t)
+    new_triangles.append(t)
+
+    incoming_edge = next_edge
+    conn_edge = next_conn_edge
+    from_vertex = next_vertex
+#endif
+}
+
+void
+Triangles::split_triangle (db::Triangle *t, db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out)
+{
+#if 0
+  # TODO: this is not quite efficient
+  self.triangles.remove(t)
+  t.unlink()
+
+  new_edges = {}
+  for v in t.vertexes:
+    new_edges[v] = TriangleEdge(v, vertex)
+
+  new_triangles = []
+  for s in t.edges():
+    new_triangle = Triangle(s, new_edges[s.p1], new_edges[s.p2])
+    if new_triangles_out is not None:
+      new_triangles_out.append(new_triangle)
+    new_triangle.is_outside = t.is_outside
+    new_triangles.append(new_triangle)
+    self.triangles.append(new_triangle)
+
+  return self._fix_triangles(new_triangles, new_edges.values(), new_triangles_out)
+#endif
+}
+
+void
+Triangles::split_triangles_on_edge (const std::vector<db::Triangle *> &tris, db::Vertex *vertex, db::TriangleEdge *split_edge, std::vector<db::Triangle *> *new_triangles_out)
+{
+#if 0
+  split_edge.unlink()
+
+  s1 = TriangleEdge(split_edge.p1, vertex)
+  s2 = TriangleEdge(split_edge.p2, vertex)
+  s1.is_segment = split_edge.is_segment
+  s2.is_segment = split_edge.is_segment
+
+  new_triangles = []
+
+  for t in tris:
+
+    self.triangles.remove(t)
+
+    ext_vertex = t.ext_vertex(split_edge)
+    new_edge = TriangleEdge(ext_vertex, vertex)
+
+    for s in t.edges():
+      if s.has_vertex(ext_vertex):
+        partial = s1 if s.has_vertex(split_edge.p1) else s2
+        new_triangle = Triangle(new_edge, partial, s)
+        if new_triangles_out is not None:
+          new_triangles_out.append(new_triangle)
+        new_triangle.is_outside = t.is_outside
+        new_triangles.append(new_triangle)
+        self.triangles.append(new_triangle)
+
+  return self._fix_triangles(new_triangles, [s1, s2], new_triangles_out)
+#endif
 }
 
 std::vector<db::Vertex *>
@@ -766,34 +1021,6 @@ class Triangles(object):
 
   def insert(self, vertex, new_triangles: [Vertex] = None):
 
-    self.flips = 0
-
-    tris = self.find_triangle_for_vertex(vertex)
-    if len(tris) == 0:
-      assert(not self.is_constrained)
-      self.vertexes.append(vertex)
-      self.flips += self._insert_new_vertex(vertex, new_triangles)
-      return vertex
-
-    # the new vertex is on the edge between two triangles
-    on_edges = [s for s in tris[0].edges() if s.side_of(vertex) == 0]
-
-    if len(on_edges) > 0:
-      if len(on_edges) == 1:
-        self.vertexes.append(vertex)
-        self.flips += self._split_triangles_on_edge(tris, vertex, on_edges[0], new_triangles)
-        return vertex
-      else:
-        # the vertex is already present
-        assert (len(on_edges) == 2)
-        return on_edges[0].common_vertex(on_edges[1])
-    elif len(tris) == 1:
-      # the new vertex is inside one triangle
-      self.vertexes.append(vertex)
-      self.flips += self._split_triangle(tris[0], vertex, new_triangles)
-      return vertex
-
-    assert(False)
 
   def find_triangle_for_vertex(self, p: Point) -> [Triangle]:
 

@@ -50,6 +50,9 @@ public:
   bool check (bool check_delaunay = true) const;
   void dump (const std::string &path) const;
 
+  db::Vertex *create_vertex (double x, double y);
+  db::Vertex *create_vertex (const db::DPoint &pt);
+
   /**
    *  @brief Finds the points within (not "on") a circle of radius "radius" around the given vertex.
    */
@@ -66,8 +69,6 @@ private:
   bool m_is_constrained;
   size_t m_level;
 
-  db::Vertex *create_vertex (double x, double y);
-  db::Vertex *create_vertex (const db::DPoint &pt);
   db::TriangleEdge *create_edge (db::Vertex *v1, db::Vertex *v2);
   db::Triangle *create_triangle (db::TriangleEdge *e1, db::TriangleEdge *e2, db::TriangleEdge *e3);
   void remove (db::Triangle *tri);
@@ -83,6 +84,15 @@ private:
   int fix_triangles(const std::vector<db::Triangle *> &tris, const std::vector<db::TriangleEdge *> &fixed_edges, std::vector<db::Triangle *> *new_triangles);
   std::pair<std::pair<db::Triangle *, db::Triangle *>, db::TriangleEdge *> flip (TriangleEdge *edge);
   static bool is_illegal_edge (db::TriangleEdge *edge);
+  std::vector<db::Triangle *> find_triangle_for_point (const db::DPoint &point);
+  db::TriangleEdge *find_closest_edge (const db::DPoint &p, db::Vertex *vstart = 0, bool inside_only = false);
+  void split_triangle (db::Triangle *t, db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out);
+  void split_triangles_on_edge (const std::vector<db::Triangle *> &tris, db::Vertex *vertex, db::TriangleEdge *split_edge, std::vector<db::Triangle *> *new_triangles_out);
+  void add_more_triangles (const std::vector<db::Triangle *> &new_triangles,
+                                 db::TriangleEdge *incoming_edge,
+                                 db::Vertex *from_vertex, db::Vertex *to_vertex,
+                                 db::TriangleEdge *conn_edge);
+  void insert_new_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out);
 };
 
 }

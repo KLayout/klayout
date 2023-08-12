@@ -34,6 +34,8 @@
 namespace db
 {
 
+class Layout;
+
 class DB_PUBLIC Triangles
 {
 public:
@@ -46,8 +48,12 @@ public:
   db::DBox bbox () const;
 
   bool check (bool check_delaunay = true) const;
+  void dump (const std::string &path) const;
 
-  std::vector<db::Vertex *> find_points_around (const db::Vertex *vertex, double radius);
+  /**
+   *  @brief Finds the points within (not "on") a circle of radius "radius" around the given vertex.
+   */
+  std::vector<db::Vertex *> find_points_around (Vertex *vertex, double radius);
 
   db::Vertex *insert_point (const db::DPoint &point, std::vector<db::Triangle *> *new_triangles = 0);
   db::Vertex *insert (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles = 0);
@@ -68,10 +74,11 @@ private:
   //  NOTE: these functions are SLOW and intended to test purposes only
   std::vector<db::Vertex *> find_touching (const db::DBox &box);
   std::vector<db::Vertex *> find_inside_circle (const db::DPoint &center, double radius);
+  db::Layout *to_layout () const;
 
   void remove_outside_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles = 0);
   void remove_inside_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles = 0);
-  std::vector<db::Triangle *> fill_concave_corners (const std::vector<db::TriangleEdge> &edges);
+  std::vector<db::Triangle *> fill_concave_corners (const std::vector<TriangleEdge *> &edges);
 };
 
 }

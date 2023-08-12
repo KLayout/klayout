@@ -63,6 +63,7 @@ public:
 
   edges_iterator begin_edges () const { return m_edges.begin (); }
   edges_iterator end_edges () const { return m_edges.end (); }
+  size_t num_edges () const { return m_edges.size (); }
 
   size_t level () const { return m_level; }
   void set_level (size_t l) { m_level = l; }

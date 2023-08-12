@@ -145,9 +145,115 @@ Triangles::bbox () const
 bool
 Triangles::check (bool check_delaunay) const
 {
+  bool res = true;
 
-  // @@@
+  if (check_delaunay) {
+    for (auto t = mp_triangles.begin (); t != mp_triangles.end (); ++t) {
+      auto cp = t->circumcircle ();
+      auto vi = find_inside_circle (cp.first, cp.second);
+      if (! vi.empty ()) {
+        res = false;
+        tl::error << "(check error) triangle does not meet Delaunay criterion: " << t->to_string ();
+        for (auto v = vi.begin (); v != vi.end (); ++v) {
+          tl::error << "  vertex inside circumcircle: " << (*v)->to_string (true);
+        }
+      }
+    }
+  }
 
+  for (auto t = mp_triangles.begin (); t != mp_triangles.end (); ++t) {
+    for (int i = 0; i < 3; ++i) {
+      if (! t->edge (i)->has_triangle (t.operator-> ())) {
+        tl::error << "(check error) edges " << t->edge (i)->to_string (true)
+                  << " attached to triangle " << t->to_string (true) << " does not refer to this triangle";
+        res = false;
+      }
+    }
+  }
+
+  for (auto e = mp_edges.begin (); e != mp_edges.end (); ++e) {
+
+    if (e->left () && e->right ()) {
+      if (e->left ()->is_outside () != e->right ()->is_outside () && ! e->is_segment ()) {
+        tl::error << "(check error) edge " << e->to_string (true) << " splits an outside and inside triangle, but is not a segment";
+        res = false;
+      }
+    }
+
+    for (auto t = e->begin_triangles (); t != e->end_triangles (); ++t) {
+      if (! t->has_edge (e.operator-> ())) {
+        tl::error << "(check error) edge " << e->to_string (true) << " not found in adjacent triangle " << t->to_string (true);
+        res = false;
+      }
+    }
+
+  }
+
+#if 0
+  for s in edges:
+
+    for t in [ s.left, s.right ]:
+      if t is not None:
+        if t.s1 != s and t.s2 != s and t.s3 != s:
+          print(f"(check error) edge {repr(s)} not found in adjacent triangle {repr(t)}")
+          res = False
+        if t.p1() != s.p1 and t.p2() != s.p1 and t.p3() != s.p1:
+          print(f"(check error) edge's {repr(s)} p1 not found in adjacent triangle {repr(t)}")
+          res = False
+        if t.p1() != s.p2 and t.p2() != s.p2 and t.p3() != s.p2:
+          print(f"(check error) edge's {repr(s)} p2 not found in adjacent triangle {repr(t)}")
+          res = False
+        pext = [ p for p in t.vertexes if p != s.p1 and p != s.p2 ]
+        if len(pext) != 1:
+          print(f"(check error) adjacent triangle {repr(t)} has none or more than one point not in edge {repr(s)}")
+          res = False
+        else:
+          sgn = 1.0 if t == s.left else -1.0
+          vp = vprod(s.d(), sub(pext[0], s.p1))  # positive if on left side
+          if vp * sgn <= 0.0:
+            side_str = "left" if t == s.left else "right"
+            print(f"(check error) external point {repr(pext[0])} not on {side_str} side of edge {repr(s)}")
+            res = False
+
+  for v in self.vertexes:
+    for s in v.edges:
+      if s not in edges:
+        print(f"(check error) vertex {repr(v)} has orphan edge {repr(s)}")
+        res = False
+
+  for v in self.vertexes:
+    num_outside_edges = 0
+    for s in v.edges:
+      if s.is_outside():
+        num_outside_edges += 1
+    if num_outside_edges > 0 and num_outside_edges != 2:
+      print(f"(check error) vertex {repr(v)} has {num_outside_edges} outside edges (can only be 2)")
+      res = False
+      for s in v.edges:
+        if s.is_outside():
+          print(f"  Outside edge is {repr(s)}")
+
+  vertexes = set()
+  for v in self.vertexes:
+    vertexes.add(v)
+
+  for s in edges:
+    if s.p1 not in vertexes:
+      print(f"(check error) edge's {str(s)} p1 not found in vertex list")
+      res = False
+    if s not in s.p1.edges:
+      print(f"(check error) edge {str(s)} not found in p1's edge list")
+      res = False
+    if s.p2 not in vertexes:
+      print(f"(check error) edge's {str(s)} p2 not found in vertex list")
+      res = False
+    if s not in s.p2.edges:
+      print(f"(check error) edge {str(s)} not found in p2's edge list")
+      res = False
+
+#endif
+
+  return res;
 }
 
 db::Layout *
@@ -246,14 +352,14 @@ Triangles::remove (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangle
 }
 
 std::vector<db::Vertex *>
-Triangles::find_touching (const db::DBox &box)
+Triangles::find_touching (const db::DBox &box) const
 {
   //  NOTE: this is a naive, slow implementation for test purposes
   std::vector<db::Vertex *> res;
   for (auto v = m_vertex_heap.begin (); v != m_vertex_heap.end (); ++v) {
     if (v->begin_edges () != v->end_edges ()) {
       if (box.contains (*v)) {
-        res.push_back (v.operator-> ());
+        res.push_back (const_cast<db::Vertex *> (v.operator-> ()));
       }
     }
   }
@@ -261,14 +367,14 @@ Triangles::find_touching (const db::DBox &box)
 }
 
 std::vector<db::Vertex *>
-Triangles::find_inside_circle (const db::DPoint &center, double radius)
+Triangles::find_inside_circle (const db::DPoint &center, double radius) const
 {
   //  NOTE: this is a naive, slow implementation for test purposes
   std::vector<db::Vertex *> res;
   for (auto v = m_vertex_heap.begin (); v != m_vertex_heap.end (); ++v) {
     if (v->begin_edges () != v->end_edges ()) {
       if (v->in_circle (center, radius) == 1) {
-        res.push_back (v.operator-> ());
+        res.push_back (const_cast<db::Vertex *> (v.operator-> ()));
       }
     }
   }
@@ -1129,102 +1235,5 @@ class Triangles(object):
 
     self.constrain(edge_contours)
 
-
-  def check(self, check_delaunay: bool = True) -> bool:
-
-    res = True
-
-    if check_delaunay:
-      for t in self.triangles:
-        center, radius = t.circumcircle()
-        vi = self.find_inside_circle(center, radius)
-        if len(vi) > 0:
-          res = False
-          print(f"(check error) triangle does not meet Delaunay criterion: {repr(t)}")
-          for v in vi:
-            print(f"  vertex inside circumcircle: {repr(v)}")
-
-    edges = set()
-    for t in self.triangles:
-      edges.add(t.s1)
-      edges.add(t.s2)
-      edges.add(t.s3)
-      for s in t.edges():
-        if not s.has_triangle(t):
-          print(f"(check error) edges {repr(s)} attached to triangle {repr(t)} does not refer to this triangle")
-
-    for s in edges:
-
-      if s.left and s.right:
-        if s.left.is_outside != s.right.is_outside:
-          if not s.is_segment:
-            print(f"(check error) edge {repr(s)} splits an outside and inside triangle, but is not a segment")
-
-      for t in [ s.left, s.right ]:
-        if t is not None:
-          if t.s1 != s and t.s2 != s and t.s3 != s:
-            print(f"(check error) edge {repr(s)} not found in adjacent triangle {repr(t)}")
-            res = False
-          if t.p1() != s.p1 and t.p2() != s.p1 and t.p3() != s.p1:
-            print(f"(check error) edge's {repr(s)} p1 not found in adjacent triangle {repr(t)}")
-            res = False
-          if t.p1() != s.p2 and t.p2() != s.p2 and t.p3() != s.p2:
-            print(f"(check error) edge's {repr(s)} p2 not found in adjacent triangle {repr(t)}")
-            res = False
-          pext = [ p for p in t.vertexes if p != s.p1 and p != s.p2 ]
-          if len(pext) != 1:
-            print(f"(check error) adjacent triangle {repr(t)} has none or more than one point not in edge {repr(s)}")
-            res = False
-          else:
-            sgn = 1.0 if t == s.left else -1.0
-            vp = vprod(s.d(), sub(pext[0], s.p1))  # positive if on left side
-            if vp * sgn <= 0.0:
-              side_str = "left" if t == s.left else "right"
-              print(f"(check error) external point {repr(pext[0])} not on {side_str} side of edge {repr(s)}")
-              res = False
-
-    for v in self.vertexes:
-      for s in v.edges:
-        if s not in edges:
-          print(f"(check error) vertex {repr(v)} has orphan edge {repr(s)}")
-          res = False
-
-    for v in self.vertexes:
-      num_outside_edges = 0
-      for s in v.edges:
-        if s.is_outside():
-          num_outside_edges += 1
-      if num_outside_edges > 0 and num_outside_edges != 2:
-        print(f"(check error) vertex {repr(v)} has {num_outside_edges} outside edges (can only be 2)")
-        res = False
-        for s in v.edges:
-          if s.is_outside():
-            print(f"  Outside edge is {repr(s)}")
-
-    vertexes = set()
-    for v in self.vertexes:
-      vertexes.add(v)
-
-    for s in edges:
-      if s.p1 not in vertexes:
-        print(f"(check error) edge's {str(s)} p1 not found in vertex list")
-        res = False
-      if s not in s.p1.edges:
-        print(f"(check error) edge {str(s)} not found in p1's edge list")
-        res = False
-      if s.p2 not in vertexes:
-        print(f"(check error) edge's {str(s)} p2 not found in vertex list")
-        res = False
-      if s not in s.p2.edges:
-        print(f"(check error) edge {str(s)} not found in p2's edge list")
-        res = False
-
-    return res
-
-  def __str__(self):
-    return ", ".join([ str(t) for t in self.triangles ])
-
-  def dump(self):
-    print(str(self))
 
 #endif

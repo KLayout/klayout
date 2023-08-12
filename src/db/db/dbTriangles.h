@@ -72,8 +72,8 @@ private:
   void remove (db::Triangle *tri);
 
   //  NOTE: these functions are SLOW and intended to test purposes only
-  std::vector<db::Vertex *> find_touching (const db::DBox &box);
-  std::vector<db::Vertex *> find_inside_circle (const db::DPoint &center, double radius);
+  std::vector<db::Vertex *> find_touching (const db::DBox &box) const;
+  std::vector<db::Vertex *> find_inside_circle (const db::DPoint &center, double radius) const;
   db::Layout *to_layout () const;
 
   void remove_outside_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles = 0);

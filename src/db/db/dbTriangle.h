@@ -452,6 +452,22 @@ public:
    */
   int contains (const db::DPoint &point) const;
 
+  /**
+   *  @brief Gets a value indicating whether the triangle has the given vertex
+   */
+  bool has_vertex (const db::Vertex *v) const
+  {
+    return mp_v1 == v || mp_v2 == v || mp_v3 == v;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the triangle has the given edge
+   */
+  bool has_edge (const db::TriangleEdge *e) const
+  {
+    return mp_e1.get () == e || mp_e2.get () == e || mp_e3.get () == e;
+  }
+
 private:
   bool m_is_outside;
   tl::weak_ptr<TriangleEdge> mp_e1, mp_e2, mp_e3;

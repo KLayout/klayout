@@ -91,6 +91,17 @@ Vertex::triangles () const
   return res;
 }
 
+bool
+Vertex::has_edge (const TriangleEdge *edge) const
+{
+  for (auto e = m_edges.begin (); e != m_edges.end (); ++e) {
+    if (e.operator-> () == edge) {
+      return true;
+    }
+  }
+  return false;
+}
+
 std::string
 Vertex::to_string (bool with_id) const
 {

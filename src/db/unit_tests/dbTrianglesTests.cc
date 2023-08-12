@@ -30,4 +30,6 @@ TEST(1)
   tris.init_box (db::DBox (1, 0, 5, 4));
 
   EXPECT_EQ (tris.bbox ().to_string (), "(1,0;5,4)");
+
+  EXPECT_EQ (tris.check (), true);
 }

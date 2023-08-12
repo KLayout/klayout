@@ -65,6 +65,8 @@ public:
   edges_iterator end_edges () const { return m_edges.end (); }
   size_t num_edges () const { return m_edges.size (); }
 
+  bool has_edge (const TriangleEdge *edge) const;
+
   size_t level () const { return m_level; }
   void set_level (size_t l) { m_level = l; }
 

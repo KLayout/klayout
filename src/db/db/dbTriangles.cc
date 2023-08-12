@@ -185,73 +185,52 @@ Triangles::check (bool check_delaunay) const
         tl::error << "(check error) edge " << e->to_string (true) << " not found in adjacent triangle " << t->to_string (true);
         res = false;
       }
+      if (! t->has_vertex (e->v1 ())) {
+        tl::error << "(check error) edges " << e->to_string (true) << " vertex 1 not found in adjacent triangle " << t->to_string (true);
+        res = false;
+      }
+      if (! t->has_vertex (e->v2 ())) {
+        tl::error << "(check error) edges " << e->to_string (true) << " vertex 2 not found in adjacent triangle " << t->to_string (true);
+        res = false;
+      }
+      db::Vertex *vopp = t->opposite (e.operator-> ());
+      double sgn = (e->left () == t.operator-> ()) ? 1.0 : -1.0;
+      double vp = db::vprod (e->d(), *vopp - *e->v1 ());  //  positive if on left side
+      if (vp * sgn <= 0.0) {
+        const char * side_str = sgn > 0.0 ? "left" : "right";
+        tl::error << "(check error) external point " << vopp->to_string (true) << " not on " << side_str << " side of edge " << e->to_string (true);
+        res = false;
+      }
+    }
+
+    if (! e->v1 ()->has_edge (e.operator-> ())) {
+      tl::error << "(check error) edge " << e->to_string (true) << " vertex 1 does not list this edge";
+      res = false;
+    }
+    if (! e->v2 ()->has_edge (e.operator-> ())) {
+      tl::error << "(check error) edge " << e->to_string (true) << " vertex 2 does not list this edge";
+      res = false;
     }
 
   }
 
-#if 0
-  for s in edges:
-
-    for t in [ s.left, s.right ]:
-      if t is not None:
-        if t.s1 != s and t.s2 != s and t.s3 != s:
-          print(f"(check error) edge {repr(s)} not found in adjacent triangle {repr(t)}")
-          res = False
-        if t.p1() != s.p1 and t.p2() != s.p1 and t.p3() != s.p1:
-          print(f"(check error) edge's {repr(s)} p1 not found in adjacent triangle {repr(t)}")
-          res = False
-        if t.p1() != s.p2 and t.p2() != s.p2 and t.p3() != s.p2:
-          print(f"(check error) edge's {repr(s)} p2 not found in adjacent triangle {repr(t)}")
-          res = False
-        pext = [ p for p in t.vertexes if p != s.p1 and p != s.p2 ]
-        if len(pext) != 1:
-          print(f"(check error) adjacent triangle {repr(t)} has none or more than one point not in edge {repr(s)}")
-          res = False
-        else:
-          sgn = 1.0 if t == s.left else -1.0
-          vp = vprod(s.d(), sub(pext[0], s.p1))  # positive if on left side
-          if vp * sgn <= 0.0:
-            side_str = "left" if t == s.left else "right"
-            print(f"(check error) external point {repr(pext[0])} not on {side_str} side of edge {repr(s)}")
-            res = False
-
-  for v in self.vertexes:
-    for s in v.edges:
-      if s not in edges:
-        print(f"(check error) vertex {repr(v)} has orphan edge {repr(s)}")
-        res = False
-
-  for v in self.vertexes:
-    num_outside_edges = 0
-    for s in v.edges:
-      if s.is_outside():
-        num_outside_edges += 1
-    if num_outside_edges > 0 and num_outside_edges != 2:
-      print(f"(check error) vertex {repr(v)} has {num_outside_edges} outside edges (can only be 2)")
-      res = False
-      for s in v.edges:
-        if s.is_outside():
-          print(f"  Outside edge is {repr(s)}")
-
-  vertexes = set()
-  for v in self.vertexes:
-    vertexes.add(v)
-
-  for s in edges:
-    if s.p1 not in vertexes:
-      print(f"(check error) edge's {str(s)} p1 not found in vertex list")
-      res = False
-    if s not in s.p1.edges:
-      print(f"(check error) edge {str(s)} not found in p1's edge list")
-      res = False
-    if s.p2 not in vertexes:
-      print(f"(check error) edge's {str(s)} p2 not found in vertex list")
-      res = False
-    if s not in s.p2.edges:
-      print(f"(check error) edge {str(s)} not found in p2's edge list")
-      res = False
-
-#endif
+  for (auto v = m_vertex_heap.begin (); v != m_vertex_heap.end (); ++v) {
+    unsigned int num_outside_edges = 0;
+    for (auto e = v->begin_edges (); e != v->end_edges (); ++e) {
+      if (e->is_outside ()) {
+        ++num_outside_edges;
+      }
+    }
+    if (num_outside_edges > 0 && num_outside_edges != 2) {
+      tl::error << "(check error) vertex " << v->to_string (true) << " has " << num_outside_edges << " outside edges (can only be 2)";
+      res = false;
+      for (auto e = v->begin_edges (); e != v->end_edges (); ++e) {
+        if (e->is_outside ()) {
+          tl::error << "  Outside edge is " << e->to_string (true);
+        }
+      }
+    }
+  }
 
   return res;
 }

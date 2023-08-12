@@ -278,6 +278,14 @@ public:
   }
 
   /**
+   *  @brief Gets the intersection point
+   */
+  db::DPoint intersection_point (const TriangleEdge &other) const
+  {
+    return intersection_point (edge (), other.edge ());
+  }
+
+  /**
    *  @brief Returns a value indicating whether the point is on the edge
    *  @@@ TODO: Move to db::DEdge
    */

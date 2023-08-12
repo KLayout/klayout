@@ -239,33 +239,34 @@ TEST(TriangleEdge_crosses)
   EXPECT_EQ (s1.crosses_including (db::TriangleEdge (heap.make_vertex (-1, 0.25), heap.make_vertex(2, 0.25))), true);
 }
 
+TEST(TriangleEdge_point_on)
+{
+  VertexHeap heap;
+
+  db::TriangleEdge s1 (heap.make_vertex (0, 0), heap.make_vertex (1, 0.5));
+  EXPECT_EQ (s1.point_on (db::DPoint (0, 0)), false); //  endpoints are not "on"
+  EXPECT_EQ (s1.point_on (db::DPoint (0, -0.5)), false);
+  EXPECT_EQ (s1.point_on (db::DPoint (0.5, 0)), false);
+  EXPECT_EQ (s1.point_on (db::DPoint (0.5, 0.25)), true);
+  EXPECT_EQ (s1.point_on (db::DPoint (1, 0.5)), false); //  endpoints are not "on"
+  EXPECT_EQ (s1.point_on (db::DPoint (1, 1)), false);
+  EXPECT_EQ (s1.point_on (db::DPoint (2, 1)), false);
+}
+
+TEST(TriangleEdge_intersection_point)
+{
+  VertexHeap heap;
+
+  db::TriangleEdge s1 (heap.make_vertex (0, 0), heap.make_vertex (1, 0.5));
+  EXPECT_EQ (s1.intersection_point (db::TriangleEdge (heap.make_vertex (-1, 0.25), heap.make_vertex (2, 0.25))).to_string (), "0.5,0.25");
+}
+
+TEST(TriangleEdge_can_flip)
+{
+}
+
 #if 0
 class TestSegment(unittest.TestCase):
-
-  def test_crosses(self):
-    s1 = t.TriangleEdge(t.Vertex(0, 0), t.Vertex(1, 0.5))
-    EXPECT_EQ (s1.crosses(t.TriangleEdge(t.Vertex(-1, -0.5), t.Vertex(1, -0.5))), False)
-    EXPECT_EQ (s1.crosses(t.TriangleEdge(t.Vertex(-1, 0), t.Vertex(1, 0))), False)  # only cuts
-    EXPECT_EQ (s1.crosses(t.TriangleEdge(t.Vertex(-1, 0.5), t.Vertex(1, 0.5))), False)
-    EXPECT_EQ (s1.crosses(t.TriangleEdge(t.Vertex(-1, 0.5), t.Vertex(2, 0.5))), False)
-    EXPECT_EQ (s1.crosses(t.TriangleEdge(t.Vertex(-1, 0.25), t.Vertex(2, 0.25))), True)
-    EXPECT_EQ (s1.crosses(t.TriangleEdge(t.Vertex(-1, 0.5), t.Vertex(-0.1, 0.5))), False)
-    EXPECT_EQ (s1.crosses(t.TriangleEdge(t.Vertex(-1, 0.6), t.Vertex(0, 0.6))), False)
-    EXPECT_EQ (s1.crosses(t.TriangleEdge(t.Vertex(-1, 1), t.Vertex(1, 1))), False)
-
-  def test_point_on(self):
-    s1 = t.TriangleEdge(t.Vertex(0, 0), t.Vertex(1, 0.5))
-    EXPECT_EQ (s1.point_on(t.Point(0, 0)), False) # endpoints are not "on"
-    EXPECT_EQ (s1.point_on(t.Point(0, -0.5)), False)
-    EXPECT_EQ (s1.point_on(t.Point(0.5, 0)), False)
-    EXPECT_EQ (s1.point_on(t.Point(0.5, 0.25)), True)
-    EXPECT_EQ (s1.point_on(t.Point(1, 0.5)), False) # endpoints are not "on"
-    EXPECT_EQ (s1.point_on(t.Point(1, 1)), False)
-    EXPECT_EQ (s1.point_on(t.Point(2, 1)), False)
-
-  def test_intersection_point(self):
-    s1 = t.TriangleEdge(t.Vertex(0, 0), t.Vertex(1, 0.5))
-    EXPECT_EQ (str(s1.intersection_point(t.TriangleEdge(t.Vertex(-1, 0.25), t.Vertex(2, 0.25)))), "(0.5, 0.25)")
 
   def test_can_flip(self):
     v1 = t.Vertex(2, -1)

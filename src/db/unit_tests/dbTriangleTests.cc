@@ -26,6 +26,103 @@
 
 #include <list>
 
+//  Tests for Vertex class
+
+TEST(Vertex_basic)
+{
+  db::Vertex v;
+
+  v.set_x (1.5);
+  v.set_y (0.5);
+  EXPECT_EQ (v.to_string (), "(1.5, 0.5)");
+  EXPECT_EQ (v.x (), 1.5);
+  EXPECT_EQ (v.y (), 0.5);
+
+  v = db::Vertex (db::DPoint (2, 3));
+  EXPECT_EQ (v.to_string (), "(2, 3)");
+
+  v.set_level (42);
+  EXPECT_EQ (v.level (), size_t (42));
+}
+
+static std::string edges_from_vertex (const db::Vertex &v)
+{
+  std::string res;
+  for (auto e = v.begin_edges (); e != v.end_edges (); ++e) {
+    if (! res.empty ()) {
+      res += ", ";
+    }
+    res += e->to_string ();
+  }
+  return res;
+}
+
+static std::string triangles_from_vertex (const db::Vertex &v)
+{
+  auto tri = v.triangles ();
+  std::string res;
+  for (auto t = tri.begin (); t != tri.end (); ++t) {
+    if (! res.empty ()) {
+      res += ", ";
+    }
+    res += (*t)->to_string ();
+  }
+  return res;
+}
+
+TEST(Vertex_edge_registration)
+{
+  db::Vertex v1 (0, 0);
+  db::Vertex v2 (1, 2);
+  db::Vertex v3 (2, 1);
+
+  std::unique_ptr<db::TriangleEdge> e1 (new db::TriangleEdge (&v1, &v2));
+  EXPECT_EQ (edges_from_vertex (v1), "((0, 0), (1, 2))");
+  EXPECT_EQ (edges_from_vertex (v2), "((0, 0), (1, 2))");
+  EXPECT_EQ (edges_from_vertex (v3), "");
+
+  std::unique_ptr<db::TriangleEdge> e2 (new db::TriangleEdge (&v2, &v3));
+  EXPECT_EQ (edges_from_vertex (v1), "((0, 0), (1, 2))");
+  EXPECT_EQ (edges_from_vertex (v2), "((0, 0), (1, 2)), ((1, 2), (2, 1))");
+  EXPECT_EQ (edges_from_vertex (v3), "((1, 2), (2, 1))");
+
+  e2.reset (0);
+  EXPECT_EQ (edges_from_vertex (v1), "((0, 0), (1, 2))");
+  EXPECT_EQ (edges_from_vertex (v2), "((0, 0), (1, 2))");
+  EXPECT_EQ (edges_from_vertex (v3), "");
+
+  e1.reset (0);
+  EXPECT_EQ (edges_from_vertex (v1), "");
+  EXPECT_EQ (edges_from_vertex (v2), "");
+  EXPECT_EQ (edges_from_vertex (v3), "");
+}
+
+TEST(Vertex_triangles)
+{
+  db::Vertex v1 (0, 0);
+  db::Vertex v2 (1, 2);
+  db::Vertex v3 (2, 1);
+  db::Vertex v4 (-1, 2);
+  EXPECT_EQ (triangles_from_vertex (v1), "");
+
+  std::unique_ptr<db::TriangleEdge> e1 (new db::TriangleEdge (&v1, &v2));
+  std::unique_ptr<db::TriangleEdge> e2 (new db::TriangleEdge (&v2, &v3));
+  std::unique_ptr<db::TriangleEdge> e3 (new db::TriangleEdge (&v3, &v1));
+
+  std::unique_ptr<db::Triangle> tri (new db::Triangle (e1.get (), e2.get (), e3.get ()));
+  EXPECT_EQ (triangles_from_vertex (v1), "((0, 0), (1, 2), (2, 1))");
+  EXPECT_EQ (triangles_from_vertex (v2), "((0, 0), (1, 2), (2, 1))");
+  EXPECT_EQ (triangles_from_vertex (v3), "((0, 0), (1, 2), (2, 1))");
+
+  std::unique_ptr<db::TriangleEdge> e4 (new db::TriangleEdge (&v1, &v4));
+  std::unique_ptr<db::TriangleEdge> e5 (new db::TriangleEdge (&v2, &v4));
+  std::unique_ptr<db::Triangle> tri2 (new db::Triangle (e1.get (), e4.get (), e5.get ()));
+  EXPECT_EQ (triangles_from_vertex (v1), "((0, 0), (-1, 2), (1, 2)), ((0, 0), (1, 2), (2, 1))");
+  EXPECT_EQ (triangles_from_vertex (v2), "((0, 0), (-1, 2), (1, 2)), ((0, 0), (1, 2), (2, 1))");
+  EXPECT_EQ (triangles_from_vertex (v3), "((0, 0), (1, 2), (2, 1))");
+  EXPECT_EQ (triangles_from_vertex (v4), "((0, 0), (-1, 2), (1, 2))");
+}
+
 //  Tests for Triangle class
 
 TEST(Triangle_basic)
@@ -48,6 +145,14 @@ TEST(Triangle_basic)
 
   db::Triangle tri2 (&s11, &s12, &s13);
   EXPECT_EQ (tri2.to_string (), "((0, 0), (1, 2), (2, 1))");
+
+  //  triangle registration
+  EXPECT_EQ (s11.right () == &tri2, true);
+  EXPECT_EQ (s11.left () == 0, true);
+  EXPECT_EQ (s12.left () == &tri2, true);
+  EXPECT_EQ (s12.right () == 0, true);
+  EXPECT_EQ (s13.left () == &tri2, true);
+  EXPECT_EQ (s13.right () == 0, true);
 }
 
 TEST(Triangle_find_segment_with)
@@ -263,48 +368,47 @@ TEST(TriangleEdge_intersection_point)
 
 TEST(TriangleEdge_can_flip)
 {
+  db::Vertex v1 (2, -1);
+  db::Vertex v2 (0, 0);
+  db::Vertex v3 (1, 0);
+  db::Vertex v4 (0.5, 1);
+  db::TriangleEdge s1 (&v1, &v2);
+  db::TriangleEdge s2 (&v1, &v3);
+  db::TriangleEdge s3 (&v2, &v3);
+  db::TriangleEdge s4 (&v2, &v4);
+  db::TriangleEdge s5 (&v3, &v4);
+  db::Triangle t1 (&s1, &s2, &s3);
+  db::Triangle t2 (&s3, &s4, &s5);
+  s3.set_left (&t1);
+  s3.set_right (&t2);
+  EXPECT_EQ (s3.can_flip(), false);
+  v1.set_x (0.5);
+  EXPECT_EQ (s3.can_flip(), true);
+  v1.set_x (-0.25);
+  EXPECT_EQ (s3.can_flip(), true);
+  v1.set_x (-0.5);
+  EXPECT_EQ (s3.can_flip(), false);
+  v1.set_x (-1.0);
+  EXPECT_EQ (s3.can_flip(), false);
 }
 
-#if 0
-class TestSegment(unittest.TestCase):
+TEST(TriangleEdge_distance)
+{
+  db::Vertex v1 (0, 0);
+  db::Vertex v2 (1, 0);
 
-  def test_can_flip(self):
-    v1 = t.Vertex(2, -1)
-    v2 = t.Vertex(0, 0)
-    v3 = t.Vertex(1, 0)
-    v4 = t.Vertex(0.5, 1)
-    s1 = t.TriangleEdge(v1, v2)
-    s2 = t.TriangleEdge(v1, v3)
-    s3 = t.TriangleEdge(v2, v3)
-    s4 = t.TriangleEdge(v2, v4)
-    s5 = t.TriangleEdge(v3, v4)
-    t1 = t.Triangle(s1, s2, s3)
-    t2 = t.Triangle(s3, s4, s5)
-    s3.left = t1
-    s3.right = t2
-    EXPECT_EQ (s3.can_flip(), False)
-    v1.x = 0.5
-    EXPECT_EQ (s3.can_flip(), True)
-    v1.x = -0.25
-    EXPECT_EQ (s3.can_flip(), True)
-    v1.x = -0.5
-    EXPECT_EQ (s3.can_flip(), False)
-    v1.x = -1.0
-    EXPECT_EQ (s3.can_flip(), False)
-
-  def test_distance(self):
-    seg = t.TriangleEdge(t.Vertex(0, 0), t.Vertex(1, 0))
-    EXPECT_EQ (seg.distance(t.Point(0, 0)), 0)
-    EXPECT_EQ (seg.distance(t.Point(0, 1)), 1)
-    EXPECT_EQ (seg.distance(t.Point(1, 2)), 2)
-    EXPECT_EQ (seg.distance(t.Point(1, -1)), 1)
-    EXPECT_EQ (seg.distance(t.Point(2, 0)), 1)
-    EXPECT_EQ (seg.distance(t.Point(-2, 0)), 2)
-    seg.reverse()
-    EXPECT_EQ (seg.distance(t.Point(0, 0)), 0)
-    EXPECT_EQ (seg.distance(t.Point(0, 1)), 1)
-    EXPECT_EQ (seg.distance(t.Point(1, 2)), 2)
-    EXPECT_EQ (seg.distance(t.Point(1, -1)), 1)
-    EXPECT_EQ (seg.distance(t.Point(2, 0)), 1)
-    EXPECT_EQ (seg.distance(t.Point(-2, 0)), 2)
-#endif
+  db::TriangleEdge seg (&v1, &v2);
+  EXPECT_EQ (seg.distance (db::DPoint (0, 0)), 0);
+  EXPECT_EQ (seg.distance (db::DPoint (0, 1)), 1);
+  EXPECT_EQ (seg.distance (db::DPoint (1, 2)), 2);
+  EXPECT_EQ (seg.distance (db::DPoint (1, -1)), 1);
+  EXPECT_EQ (seg.distance (db::DPoint (2, 0)), 1);
+  EXPECT_EQ (seg.distance (db::DPoint (-2, 0)), 2);
+  seg.reverse ();
+  EXPECT_EQ (seg.distance (db::DPoint (0, 0)), 0);
+  EXPECT_EQ (seg.distance (db::DPoint (0, 1)), 1);
+  EXPECT_EQ (seg.distance (db::DPoint (1, 2)), 2);
+  EXPECT_EQ (seg.distance (db::DPoint (1, -1)), 1);
+  EXPECT_EQ (seg.distance (db::DPoint (2, 0)), 1);
+  EXPECT_EQ (seg.distance (db::DPoint (-2, 0)), 2);
+}

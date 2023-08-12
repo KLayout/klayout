@@ -84,6 +84,8 @@ public:
   }
 
 private:
+  friend class TriangleEdge;
+
   edges_type m_edges;
   size_t m_level;
 };
@@ -114,7 +116,7 @@ public:
 
     bool operator== (const TriangleIterator &other) const
     {
-      return mp_edge == other.mp_edge && m_index == other.m_index;
+      return m_index == other.m_index;
     }
 
     bool operator!= (const TriangleIterator &other) const

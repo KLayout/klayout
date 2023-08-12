@@ -130,7 +130,8 @@ TriangleEdge::TriangleEdge ()
 TriangleEdge::TriangleEdge (Vertex *v1, Vertex *v2)
   : mp_v1 (v1), mp_v2 (v2), mp_left (), mp_right (), m_level (0), m_is_segment (false)
 {
-  // .. nothing yet ..
+  v1->m_edges.push_back (this);
+  v2->m_edges.push_back (this);
 }
 
 Triangle *

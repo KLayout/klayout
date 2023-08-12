@@ -77,8 +77,10 @@ private:
   db::Layout *to_layout () const;
 
   void remove_outside_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles = 0);
-  void remove_inside_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles = 0);
+  void remove_inside_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out = 0);
   std::vector<db::Triangle *> fill_concave_corners (const std::vector<TriangleEdge *> &edges);
+  void fix_triangles (const std::vector<db::Triangle *> &tris, const std::vector<db::TriangleEdge *> &fixed_edges, std::vector<db::Triangle *> *new_triangles);
+  std::pair<std::pair<db::Triangle *, db::Triangle *>, db::TriangleEdge *> flip (TriangleEdge *edge);
 };
 
 }

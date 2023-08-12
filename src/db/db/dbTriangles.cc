@@ -309,21 +309,11 @@ Triangles::find_points_around (db::Vertex *vertex, double radius)
 db::Vertex *
 Triangles::insert_point (const db::DPoint &point, std::vector<db::Triangle *> *new_triangles)
 {
-
-  // @@@
-
+  return insert (create_vertex (point), new_triangles);
 }
 
 db::Vertex *
 Triangles::insert (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles)
-{
-
-  // @@@
-
-}
-
-void
-Triangles::remove (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles)
 {
 
   // @@@
@@ -360,22 +350,159 @@ Triangles::find_inside_circle (const db::DPoint &center, double radius) const
   return res;
 }
 
+void
+Triangles::remove (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles)
+{
+  if (vertex->is_outside ()) {
+    remove_outside_vertex (vertex, new_triangles);
+  } else {
+    remove_inside_vertex (vertex, new_triangles);
+  }
+}
 
 void
-Triangles::remove_outside_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles)
+Triangles::remove_outside_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out)
+{
+  auto to_remove = vertex->triangles ();
+
+  std::vector<db::TriangleEdge *> outer_edges;
+  for (auto t = to_remove.begin (); t != to_remove.end (); ++t) {
+    outer_edges.push_back ((*t)->opposite (vertex));
+  }
+
+  for (auto t = to_remove.begin (); t != to_remove.end (); ++t) {
+    remove (*t);
+  }
+
+  auto new_triangles = fill_concave_corners (outer_edges);
+  fix_triangles (new_triangles, std::vector<db::TriangleEdge *> (), new_triangles_out);
+}
+
+void
+Triangles::remove_inside_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out)
+{
+  std::vector<db::Triangle * > triangles_to_fix;
+  std::set<db::Triangle * > triangles_to_fix_set;
+
+  bool make_new_triangle = true;
+
+  while (vertex->num_edges () > 3) {
+
+    db::TriangleEdge *to_flip = 0;
+    for (auto e = vertex->begin_edges (); e != vertex->end_edges () && to_flip == 0; ++e) {
+      if (e->can_flip ()) {
+        to_flip = const_cast<db::TriangleEdge *> (e.operator-> ());
+      }
+    }
+    if (! to_flip) {
+      break;
+    }
+
+    //  NOTE: in the "can_join" case zero-area triangles are created which we will sort out later
+    triangles_to_fix_set.erase (to_flip->left ());
+    triangles_to_fix_set.erase (to_flip->right ());
+
+    auto pp = flip (to_flip);
+    triangles_to_fix.push_back (pp.first.first);
+    triangles_to_fix_set.insert (pp.first.first);
+    triangles_to_fix.push_back (pp.first.second);
+    triangles_to_fix_set.insert (pp.first.second);
+
+  }
+
+  while (vertex->num_edges () > 3) {
+
+    tl_assert (vertex->num_edges () == 4);
+
+    //  This case can happen if two edges attached to the vertex are collinear
+    //  in this case choose the "join" strategy
+    db::TriangleEdge *jseg = 0;
+    for (auto e = vertex->begin_edges (); e != vertex->end_edges () && !jseg; ++e) {
+      if (e->can_join_via (vertex)) {
+        jseg = const_cast <db::TriangleEdge *> (e.operator-> ());
+      }
+    }
+    tl_assert (jseg != 0);
+
+    db::Vertex *v1 = jseg->left ()->opposite (jseg);
+    db::TriangleEdge *s1 = jseg->left ()->opposite (vertex);
+    db::Vertex *v2 = jseg->right ()->opposite (jseg);
+    db::TriangleEdge *s2 = jseg->right ()->opposite (vertex);
+
+    db::TriangleEdge *jseg_opp = 0;
+    for (auto e = vertex->begin_edges (); e != vertex->end_edges () && !jseg_opp; ++e) {
+      if (!e->has_triangle (jseg->left ()) && !e->has_triangle (jseg->right ())) {
+        jseg_opp = const_cast <db::TriangleEdge *> (e.operator-> ());
+      }
+    }
+
+    db::TriangleEdge *s1opp = jseg_opp->left ()->opposite (vertex);
+    db::TriangleEdge *s2opp = jseg_opp->right ()->opposite (vertex);
+
+    db::TriangleEdge *new_edge = create_edge (v1, v2);
+    db::Triangle *t1 = create_triangle (s1, s2, new_edge);
+    db::Triangle *t2 = create_triangle (s1opp, s2opp, new_edge);
+
+    triangles_to_fix.push_back (t1);
+    triangles_to_fix_set.insert (t1);
+    triangles_to_fix.push_back (t2);
+    triangles_to_fix_set.insert (t2);
+
+    make_new_triangle = false;
+
+  }
+
+  auto to_remove = vertex->triangles ();
+
+  std::vector<db::TriangleEdge *> outer_edges;
+  for (auto t = to_remove.begin (); t != to_remove.end (); ++t) {
+    outer_edges.push_back ((*t)->opposite (vertex));
+  }
+
+  for (auto t = to_remove.begin (); t != to_remove.end (); ++t) {
+    triangles_to_fix_set.erase (*t);
+    remove (*t);
+  }
+
+  if (make_new_triangle) {
+
+    tl_assert (outer_edges.size () == size_t (3));
+
+    db::Triangle *nt = create_triangle (outer_edges[0], outer_edges[1], outer_edges[2]);
+    triangles_to_fix.push_back (nt);
+    triangles_to_fix_set.insert (nt);
+
+  }
+
+  std::vector<Triangle *>::iterator wp = triangles_to_fix.begin ();
+  for (auto t = triangles_to_fix.begin (); t != triangles_to_fix.end (); ++t) {
+    if (triangles_to_fix_set.find (*t) != triangles_to_fix_set.end ()) {
+      *wp++ = *t;
+      if (new_triangles_out) {
+        new_triangles_out->push_back (*t);
+      }
+    }
+  }
+  triangles_to_fix.erase (wp, triangles_to_fix.end ());
+
+  fix_triangles (triangles_to_fix, std::vector<db::TriangleEdge *> (), new_triangles_out);
+}
+
+void
+Triangles::fix_triangles (const std::vector<db::Triangle *> &tris, const std::vector<db::TriangleEdge *> &fixed_edges, std::vector<db::Triangle *> *new_triangles)
+{
+
+// @@@
+
+}
+
+std::pair<std::pair<Triangle *, Triangle *>, TriangleEdge *> Triangles::flip(TriangleEdge *edge)
 {
 
   // @@@
 
 }
 
-void
-Triangles::remove_inside_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles)
-{
-
-  // @@@
-
-}
 
 std::vector<db::Triangle *>
 Triangles::fill_concave_corners (const std::vector<db::TriangleEdge *> &edges)
@@ -513,9 +640,6 @@ from .triangle import *
 
 class Triangles(object):
 
-  def insert_point(self, point, new_triangles: [Vertex] = None):
-    return self.insert(Vertex(point.x, point.y), new_triangles)
-
   def insert(self, vertex, new_triangles: [Vertex] = None):
 
     self.flips = 0
@@ -546,110 +670,6 @@ class Triangles(object):
       return vertex
 
     assert(False)
-
-  def remove_vertex(self, vertex: Vertex, new_triangles: [Vertex] = None):
-    if vertex.is_outside():
-      self._remove_outside_vertex(vertex, new_triangles)
-    else:
-      self._remove_inside_vertex(vertex, new_triangles)
-
-  def _remove_outside_vertex(self, vertex: Vertex, new_triangles_out: [Vertex] = None):
-
-    to_remove = vertex.triangles()
-
-    outer_edges = [ t.opposite_edge(vertex) for t in to_remove ]
-
-    for t in to_remove:
-      self.triangles.remove(t)
-      t.unlink()
-
-    self.vertexes.remove(vertex)
-    vertex.unlink()
-
-    new_triangles = self._fill_concave_corners(outer_edges)
-
-    for nt in new_triangles:
-      self.triangles.append(nt)
-
-    self._fix_triangles(new_triangles, [], new_triangles_out)
-
-  def _remove_inside_vertex(self, vertex: Vertex, new_triangles: [Vertex] = None):
-
-    triangles_to_fix = []
-
-    make_new_triangle = True
-
-    while len(vertex.edges) > 3:
-
-      to_flip = next((s for s in vertex.edges if s.can_flip()), None)
-      if to_flip is None:
-        break
-
-      # NOTE: in the "can_join" case zero-area triangles are created which we will sort out later
-      any_flipped = True
-      if to_flip.left in triangles_to_fix:
-        triangles_to_fix.remove(to_flip.left)
-      if to_flip.right in triangles_to_fix:
-        triangles_to_fix.remove(to_flip.right)
-      t1, t2, _ = self.flip(to_flip)
-      triangles_to_fix.append(t1)
-      triangles_to_fix.append(t2)
-
-    if len(vertex.edges) > 3:
-
-      assert(len(vertex.edges) == 4)
-
-      # This case can happen if two edges attached to the vertex are collinear
-      # in this case choose the "join" strategy
-      jseg = next((s for s in vertex.edges if s.can_join_via(vertex)), None)
-      assert(jseg is not None)
-
-      v1 = jseg.left.ext_vertex(jseg)
-      s1 = jseg.left.opposite_edge(vertex)
-      v2 = jseg.right.ext_vertex(jseg)
-      s2 = jseg.right.opposite_edge(vertex)
-
-      jseg_opp = next((s for s in vertex.edges if not s.has_triangle(jseg.left) and not s.has_triangle(jseg.right)), None)
-      assert(jseg_opp is not None)
-
-      s1opp = jseg_opp.left.opposite_edge(vertex)
-      s2opp = jseg_opp.right.opposite_edge(vertex)
-
-      new_edge = TriangleEdge(v1, v2)
-      t1 = Triangle(s1, s2, new_edge)
-      self.triangles.append(t1)
-      t2 = Triangle(s1opp, s2opp, new_edge)
-      self.triangles.append(t2)
-      triangles_to_fix.append(t1)
-      triangles_to_fix.append(t2)
-
-      make_new_triangle = False
-
-    to_remove = vertex.triangles()
-
-    outer_edges = [ t.opposite_edge(vertex) for t in to_remove ]
-
-    for t in to_remove:
-      self.triangles.remove(t)
-      t.unlink()
-      if t in triangles_to_fix:
-        triangles_to_fix.remove(t)
-
-    self.vertexes.remove(vertex)
-    vertex.unlink()
-
-    if make_new_triangle:
-
-      assert(len(outer_edges) == 3)
-
-      nt = Triangle(*outer_edges)
-      self.triangles.append(nt)
-      triangles_to_fix.append(nt)
-
-    if new_triangles is not None:
-      new_triangles += triangles_to_fix
-
-    self._fix_triangles(triangles_to_fix, [], new_triangles)
 
   def _fill_concave_corners(self, edges: [TriangleEdge]) -> [Triangle]:
 

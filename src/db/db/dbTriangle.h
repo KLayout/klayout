@@ -158,6 +158,11 @@ public:
   void reverse ()
   {
     std::swap (mp_v1, mp_v2);
+
+    Triangle *l = mp_left.get ();
+    Triangle *r = mp_right.get ();
+    mp_left = r;
+    mp_right = l;
   }
 
   Triangle *left  () const { return const_cast<Triangle *> (mp_left.get ()); }
@@ -349,7 +354,7 @@ public:
   /**
    *  @brief Gets the common vertex of the other edge and this edge or null if there is no common vertex
    */
-  Vertex *common_vertex (const TriangleEdge &other) const;
+  Vertex *common_vertex (const TriangleEdge *other) const;
 
   /**
    *  @brief Returns a value indicating whether this edge can be flipped

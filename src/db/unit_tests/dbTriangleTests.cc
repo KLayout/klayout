@@ -135,8 +135,15 @@ TEST(Triangle_basic)
   db::TriangleEdge s2 (&v2, &v3);
   db::TriangleEdge s3 (&v3, &v1);
 
+  EXPECT_EQ (s1.v1 () == &v1, true);
+  EXPECT_EQ (s2.v2 () == &v3, true);
+
   db::Triangle tri (&s1, &s2, &s3);
   EXPECT_EQ (tri.to_string (), "((0, 0), (1, 2), (2, 1))");
+  EXPECT_EQ (tri.edge (-1) == &s3, true);
+  EXPECT_EQ (tri.edge (0) == &s1, true);
+  EXPECT_EQ (tri.edge (1) == &s2, true);
+  EXPECT_EQ (tri.edge (3) == &s1, true);
 
   //  ordering
   db::TriangleEdge s11 (&v1, &v2);
@@ -153,6 +160,17 @@ TEST(Triangle_basic)
   EXPECT_EQ (s12.right () == 0, true);
   EXPECT_EQ (s13.left () == &tri2, true);
   EXPECT_EQ (s13.right () == 0, true);
+
+  EXPECT_EQ (s13.to_string (), "((0, 0), (2, 1))");
+  s13.reverse ();
+  EXPECT_EQ (s13.to_string (), "((2, 1), (0, 0))");
+  EXPECT_EQ (s13.right () == &tri2, true);
+  EXPECT_EQ (s13.left () == 0, true);
+
+  //  flags
+  EXPECT_EQ (tri.is_outside (), false);
+  tri.set_outside (true);
+  EXPECT_EQ (tri.is_outside (), true);
 }
 
 TEST(Triangle_find_segment_with)
@@ -287,6 +305,54 @@ TEST(TriangleEdge_basic)
 
   db::TriangleEdge edge (&v1, &v2);
   EXPECT_EQ (edge.to_string (), "((0, 0), (1, 0.5))");
+
+  EXPECT_EQ (edge.is_segment (), false);
+  edge.set_is_segment (true);
+  EXPECT_EQ (edge.is_segment (), true);
+
+  EXPECT_EQ (edge.level (), size_t (0));
+  edge.set_level (42);
+  EXPECT_EQ (edge.level (), size_t (42));
+
+  EXPECT_EQ (edge.other (&v1) == &v2, true);
+  EXPECT_EQ (edge.other (&v2) == &v1, true);
+}
+
+TEST(TriangleEdge_triangles)
+{
+  db::Vertex v1 (0, 0);
+  db::Vertex v2 (1, 2);
+  db::Vertex v3 (2, 1);
+  db::Vertex v4 (-1, 2);
+
+  std::unique_ptr<db::TriangleEdge> e1 (new db::TriangleEdge (&v1, &v2));
+  std::unique_ptr<db::TriangleEdge> e2 (new db::TriangleEdge (&v2, &v3));
+  std::unique_ptr<db::TriangleEdge> e3 (new db::TriangleEdge (&v3, &v1));
+
+  std::unique_ptr<db::Triangle> tri (new db::Triangle (e1.get (), e2.get (), e3.get ()));
+
+  std::unique_ptr<db::TriangleEdge> e4 (new db::TriangleEdge (&v1, &v4));
+  std::unique_ptr<db::TriangleEdge> e5 (new db::TriangleEdge (&v2, &v4));
+  std::unique_ptr<db::Triangle> tri2 (new db::Triangle (e1.get (), e4.get (), e5.get ()));
+
+  EXPECT_EQ (e1->is_outside (), false);
+  EXPECT_EQ (e2->is_outside (), true);
+  EXPECT_EQ (e4->is_outside (), true);
+
+  EXPECT_EQ (e1->is_for_outside_triangles (), false);
+  tri->set_outside (true);
+  EXPECT_EQ (e1->is_for_outside_triangles (), true);
+
+  EXPECT_EQ (e1->has_triangle (tri.get ()), true);
+  EXPECT_EQ (e1->has_triangle (tri2.get ()), true);
+  EXPECT_EQ (e4->has_triangle (tri.get ()), false);
+  EXPECT_EQ (e4->has_triangle (tri2.get ()), true);
+
+  EXPECT_EQ (e1->other (tri.get ()) == tri2.get (), true);
+  EXPECT_EQ (e1->other (tri2.get ()) == tri.get (), true);
+
+  EXPECT_EQ (e1->common_vertex (e2.get ()) == &v2, true);
+  EXPECT_EQ (e2->common_vertex (e4.get ()) == 0, true);
 }
 
 TEST(TriangleEdge_side_of)

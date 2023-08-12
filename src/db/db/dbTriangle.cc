@@ -167,13 +167,13 @@ TriangleEdge::has_vertex (const Vertex *v) const
 }
 
 Vertex *
-TriangleEdge::common_vertex (const TriangleEdge &other) const
+TriangleEdge::common_vertex (const TriangleEdge *other) const
 {
-  if (has_vertex (other.v1 ())) {
-    return (other.v1 ());
+  if (has_vertex (other->v1 ())) {
+    return (other->v1 ());
   }
-  if (has_vertex (other.v2 ())) {
-    return (other.v2 ());
+  if (has_vertex (other->v2 ())) {
+    return (other->v2 ());
   }
   return 0;
 }

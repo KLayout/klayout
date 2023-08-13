@@ -133,13 +133,13 @@ Vertex::in_circle (const DPoint &point, const DPoint &center, double radius)
 //  TriangleEdge implementation
 
 TriangleEdge::TriangleEdge ()
-  : mp_v1 (0), mp_v2 (0), mp_left (), mp_right (), m_level (0), m_is_segment (false)
+  : mp_v1 (0), mp_v2 (0), mp_left (), mp_right (), m_level (0), m_id (0), m_is_segment (false)
 {
   // .. nothing yet ..
 }
 
 TriangleEdge::TriangleEdge (Vertex *v1, Vertex *v2)
-  : mp_v1 (v1), mp_v2 (v2), mp_left (), mp_right (), m_level (0), m_is_segment (false)
+  : mp_v1 (v1), mp_v2 (v2), mp_left (), mp_right (), m_level (0), m_id (0), m_is_segment (false)
 {
   v1->m_edges.push_back (this);
   v2->m_edges.push_back (this);
@@ -148,14 +148,12 @@ TriangleEdge::TriangleEdge (Vertex *v1, Vertex *v2)
 void
 TriangleEdge::set_left  (Triangle *t)
 {
-  tl_assert (t == 0 || left () == 0);
   mp_left = t;
 }
 
 void
 TriangleEdge::set_right (Triangle *t)
 {
-  tl_assert (t == 0 || right () == 0);
   mp_right = t;
 }
 
@@ -305,13 +303,13 @@ TriangleEdge::has_triangle (const Triangle *t) const
 //  Triangle implementation
 
 Triangle::Triangle ()
-  : m_is_outside (false), mp_v1 (0), mp_v2 (0), mp_v3 (0)
+  : m_is_outside (false), mp_v1 (0), mp_v2 (0), mp_v3 (0), m_id (0)
 {
   //  .. nothing yet ..
 }
 
 Triangle::Triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3)
-  : m_is_outside (false), mp_e1 (e1), mp_e2 (e2), mp_e3 (e3)
+  : m_is_outside (false), mp_e1 (e1), mp_e2 (e2), mp_e3 (e3), m_id (0)
 {
   mp_v1 = e1->v1 ();
   mp_v2 = e1->other (mp_v1);
@@ -348,6 +346,7 @@ Triangle::Triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3)
 void
 Triangle::unlink ()
 {
+  //  @@@ Is this really needed???
   for (int i = 0; i != 3; ++i) {
     db::TriangleEdge *e = edge (i);
     if (e->left () == this) {

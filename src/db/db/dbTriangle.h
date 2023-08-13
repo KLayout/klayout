@@ -184,6 +184,9 @@ public:
   void set_level (size_t l) { m_level = l; }
   size_t level () const { return m_level; }
 
+  void set_id (size_t id) { m_id = id; }
+  size_t id () const { return m_id; }
+
   void set_is_segment (bool is_seg) { m_is_segment = is_seg; }
   bool is_segment () const { return m_is_segment; }
 
@@ -388,6 +391,7 @@ private:
   Vertex *mp_v1, *mp_v2;
   tl::weak_ptr<Triangle> mp_left, mp_right;
   size_t m_level;
+  size_t m_id;
   bool m_is_segment;
 
   //  no copying
@@ -396,6 +400,19 @@ private:
 
   void set_left  (Triangle *t);
   void set_right (Triangle *t);
+};
+
+/**
+ *  @brief A compare function that compares triangles by ID
+ *
+ *  The ID acts as a more predicable unique ID for the object in sets and maps.
+ */
+struct TriangleEdgeLessFunc
+{
+  bool operator () (TriangleEdge *a, TriangleEdge *b) const
+  {
+    return a->id () < b->id ();
+  }
 };
 
 /**
@@ -409,6 +426,9 @@ public:
   Triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3);
 
   void unlink ();
+
+  void set_id (size_t id) { m_id = id; }
+  size_t id () const { return m_id; }
 
   bool is_outside () const { return m_is_outside; }
   void set_outside (bool o) { m_is_outside = o; }
@@ -476,12 +496,25 @@ private:
   bool m_is_outside;
   tl::weak_ptr<TriangleEdge> mp_e1, mp_e2, mp_e3;
   db::Vertex *mp_v1, *mp_v2, *mp_v3;
+  size_t m_id;
 
   //  no copying
   Triangle &operator= (const Triangle &);
   Triangle (const Triangle &);
 };
 
+/**
+ *  @brief A compare function that compares triangles by ID
+ *
+ *  The ID acts as a more predicable unique ID for the object in sets and maps.
+ */
+struct TriangleLessFunc
+{
+  bool operator () (Triangle *a, Triangle *b) const
+  {
+    return a->id () < b->id ();
+  }
+};
 
 }
 

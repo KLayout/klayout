@@ -24,6 +24,8 @@
 #include "dbTriangles.h"
 #include "tlUnitTest.h"
 
+#include <set>
+#include <vector>
 #include <cstdlib>
 #include <cmath>
 
@@ -187,7 +189,7 @@ TEST(Triangle_test_heavy_insert)
     }
 
     //  not strictly true, but very likely with at least 10 vertexes:
-    EXPECT_EQ (tris.num_triangles () >= 1, true);
+    EXPECT_EQ (tris.num_triangles () > 0, true);
     EXPECT_EQ (tris.bbox ().to_string (), bbox.to_string ());
 
     bool ok = true;
@@ -211,6 +213,62 @@ TEST(Triangle_test_heavy_insert)
     EXPECT_EQ (ok, true);
 
     EXPECT_EQ (tris.check(), true);
+
+  }
+
+  tl::info << tl::endl << "done.";
+}
+
+TEST(Triangle_test_heavy_remove)
+{
+  tl::info << "Running test_heavy_remove " << tl::noendl;
+
+  for (unsigned int l = 0; l < 100; ++l) {
+
+    srand (l);
+    tl::info << "." << tl::noendl;
+
+    db::Triangles tris;
+    double res = 128.0;
+
+    unsigned int n = rand () % 190 + 10;
+
+    for (unsigned int i = 0; i < n; ++i) {
+      double x = round (flt_rand () * res) * (1.0 / res);
+      double y = round (flt_rand () * res) * (1.0 / res);
+      tris.insert_point (x, y);
+    }
+
+    EXPECT_EQ (tris.check(), true);
+
+    std::set<db::Vertex *> vset;
+    std::vector<db::Vertex *> vertexes;
+    for (auto t = tris.begin (); t != tris.end (); ++t) {
+      for (int i = 0; i < 3; ++i) {
+        db::Vertex *v = t->vertex (i);
+        if (vset.insert (v).second) {
+          vertexes.push_back (v);
+        }
+      }
+    }
+
+    int loop = 0; // @@@
+    while (! vertexes.empty ()) {
+      ++loop; printf("@@@ %d\n", loop); fflush(stdout);
+      if (loop == 38) {
+        printf("@@@BANG!\n"); // @@@
+      }
+
+      unsigned int n = rand () % (unsigned int) vertexes.size ();
+      db::Vertex *v = vertexes [n];
+      tris.remove (v);
+      vertexes.erase (vertexes.begin () + n);
+
+      EXPECT_EQ (tris.check (), true);
+
+    }
+
+    EXPECT_EQ (tris.num_triangles (), size_t (0));
 
   }
 

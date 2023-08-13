@@ -156,6 +156,7 @@ private:
   std::list<db::Vertex> m_vertex_heap;
   bool m_is_constrained;
   size_t m_level;
+  size_t m_id;
 
   db::Vertex *create_vertex (double x, double y);
   db::Vertex *create_vertex (const db::DPoint &pt);

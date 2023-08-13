@@ -65,6 +65,7 @@ db::TriangleEdge *
 Triangles::create_edge (db::Vertex *v1, db::Vertex *v2)
 {
   db::TriangleEdge *res = new db::TriangleEdge (v1, v2);
+  res->set_id (++m_id);
   mp_edges.push_back (res);
   return res;
 }
@@ -73,6 +74,7 @@ db::Triangle *
 Triangles::create_triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3)
 {
   db::Triangle *res = new db::Triangle (e1, e2, e3);
+  res->set_id (++m_id);
   mp_triangles.push_back (res);
   return res;
 }
@@ -180,6 +182,11 @@ Triangles::check (bool check_delaunay) const
       }
     }
 
+    if (!e->left () && !e->right ()) {
+      tl::error << "(check error) found orphan edge " << e->to_string (true);
+      res = false;
+    }
+
     for (auto t = e->begin_triangles (); t != e->end_triangles (); ++t) {
       if (! t->has_edge (e.operator-> ())) {
         tl::error << "(check error) edge " << e->to_string (true) << " not found in adjacent triangle " << t->to_string (true);
@@ -259,7 +266,9 @@ Triangles::to_layout () const
   }
 
   for (auto e = mp_edges.begin (); e != mp_edges.end (); ++e) {
-    top.shapes (l10).insert (dbu_trans * e->edge ());
+    if (e->is_segment ()) {
+      top.shapes (l10).insert (dbu_trans * e->edge ());
+    }
   }
 
   return layout;
@@ -677,8 +686,7 @@ Triangles::remove_outside_vertex (db::Vertex *vertex, std::vector<db::Triangle *
 void
 Triangles::remove_inside_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out)
 {
-  std::vector<db::Triangle * > triangles_to_fix;
-  std::set<db::Triangle * > triangles_to_fix_set;
+  std::set<db::Triangle *, TriangleLessFunc> triangles_to_fix;
 
   bool make_new_triangle = true;
 
@@ -695,18 +703,16 @@ Triangles::remove_inside_vertex (db::Vertex *vertex, std::vector<db::Triangle *>
     }
 
     //  NOTE: in the "can_join" case zero-area triangles are created which we will sort out later
-    triangles_to_fix_set.erase (to_flip->left ());
-    triangles_to_fix_set.erase (to_flip->right ());
+    triangles_to_fix.erase (to_flip->left ());
+    triangles_to_fix.erase (to_flip->right ());
 
     auto pp = flip (to_flip);
-    triangles_to_fix.push_back (pp.first.first);
-    triangles_to_fix_set.insert (pp.first.first);
-    triangles_to_fix.push_back (pp.first.second);
-    triangles_to_fix_set.insert (pp.first.second);
+    triangles_to_fix.insert (pp.first.first);
+    triangles_to_fix.insert (pp.first.second);
 
   }
 
-  while (vertex->num_edges () > 3) {
+  if (vertex->num_edges () > 3) {
 
     tl_assert (vertex->num_edges () == 4);
 
@@ -739,10 +745,8 @@ Triangles::remove_inside_vertex (db::Vertex *vertex, std::vector<db::Triangle *>
     db::Triangle *t1 = create_triangle (s1, s2, new_edge);
     db::Triangle *t2 = create_triangle (s1opp, s2opp, new_edge);
 
-    triangles_to_fix.push_back (t1);
-    triangles_to_fix_set.insert (t1);
-    triangles_to_fix.push_back (t2);
-    triangles_to_fix_set.insert (t2);
+    triangles_to_fix.insert (t1);
+    triangles_to_fix.insert (t2);
 
     make_new_triangle = false;
 
@@ -755,33 +759,28 @@ Triangles::remove_inside_vertex (db::Vertex *vertex, std::vector<db::Triangle *>
     outer_edges.push_back ((*t)->opposite (vertex));
   }
 
-  for (auto t = to_remove.begin (); t != to_remove.end (); ++t) {
-    triangles_to_fix_set.erase (*t);
-    remove (*t);
-  }
-
   if (make_new_triangle) {
 
     tl_assert (outer_edges.size () == size_t (3));
 
     db::Triangle *nt = create_triangle (outer_edges[0], outer_edges[1], outer_edges[2]);
-    triangles_to_fix.push_back (nt);
-    triangles_to_fix_set.insert (nt);
+    triangles_to_fix.insert (nt);
 
   }
 
-  std::vector<Triangle *>::iterator wp = triangles_to_fix.begin ();
-  for (auto t = triangles_to_fix.begin (); t != triangles_to_fix.end (); ++t) {
-    if (triangles_to_fix_set.find (*t) != triangles_to_fix_set.end ()) {
-      *wp++ = *t;
-      if (new_triangles_out) {
-        new_triangles_out->push_back (*t);
-      }
+  for (auto t = to_remove.begin (); t != to_remove.end (); ++t) {
+    triangles_to_fix.erase (*t);
+    remove (*t);
+  }
+
+  if (new_triangles_out) {
+    for (auto t = triangles_to_fix.begin (); t != triangles_to_fix.end (); ++t) {
+      new_triangles_out->push_back (*t);
     }
   }
-  triangles_to_fix.erase (wp, triangles_to_fix.end ());
 
-  fix_triangles (triangles_to_fix, std::vector<db::TriangleEdge *> (), new_triangles_out);
+  std::vector<db::Triangle *> to_fix_a (triangles_to_fix.begin (), triangles_to_fix.end ());
+  fix_triangles (to_fix_a, std::vector<db::TriangleEdge *> (), new_triangles_out);
 }
 
 int
@@ -794,13 +793,13 @@ Triangles::fix_triangles (const std::vector<db::Triangle *> &tris, const std::ve
     (*e)->set_level (m_level);
   }
 
-  std::vector<db::TriangleEdge *> queue, todo;
+  std::set<db::TriangleEdge *, TriangleEdgeLessFunc> queue, todo;
 
   for (auto t = tris.begin (); t != tris.end (); ++t) {
     for (int i = 0; i < 3; ++i) {
       db::TriangleEdge *e = (*t)->edge (i);
       if (e->level () < m_level && ! e->is_segment ()) {
-        queue.push_back (e);
+        queue.insert (e);
       }
     }
   }
@@ -809,7 +808,6 @@ Triangles::fix_triangles (const std::vector<db::Triangle *> &tris, const std::ve
 
     todo.clear ();
     todo.swap (queue);
-    std::set<db::TriangleEdge *> queued;
 
     //  NOTE: we cannot be sure that already treated edges will not become
     //  illegal by neighbor edges flipping ..
@@ -820,7 +818,7 @@ Triangles::fix_triangles (const std::vector<db::Triangle *> &tris, const std::ve
 
       if (is_illegal_edge (*e)) {
 
-        queued.erase (*e);
+        queue.erase (*e);
 
         auto pp = flip (*e);
         auto t1 = pp.first.first;
@@ -837,31 +835,21 @@ Triangles::fix_triangles (const std::vector<db::Triangle *> &tris, const std::ve
 
         for (int i = 0; i < 3; ++i) {
           db::TriangleEdge *s1 = t1->edge (i);
-          if (s1->level () < m_level && ! s1->is_segment () && queued.find (s1) == queued.end ()) {
-            queue.push_back (s1);
-            queued.insert (s1);
+          if (s1->level () < m_level && ! s1->is_segment ()) {
+            queue.insert (s1);
           }
         }
 
         for (int i = 0; i < 3; ++i) {
           db::TriangleEdge *s2 = t2->edge (i);
-          if (s2->level () < m_level && ! s2->is_segment () && queued.find (s2) == queued.end ()) {
-            queue.push_back (s2);
-            queued.insert (s2);
+          if (s2->level () < m_level && ! s2->is_segment ()) {
+            queue.insert (s2);
           }
         }
 
       }
 
     }
-
-    std::vector<db::TriangleEdge *>::iterator wp = queue.begin ();
-    for (auto e = queue.begin (); e != queue.end (); ++e) {
-      if (queued.find (*e) != queued.end ()) {
-        *wp++ = *e;
-      }
-    }
-    queue.erase (wp, queue.end ());
 
   }
 

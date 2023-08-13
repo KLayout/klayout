@@ -24,6 +24,9 @@
 #include "dbTriangles.h"
 #include "tlUnitTest.h"
 
+#include <cstdlib>
+#include <cmath>
+
 TEST(Triangle_basic)
 {
   db::Triangles tris;
@@ -140,4 +143,76 @@ TEST(Triangle_search_edges_crossing)
   auto s2 = tris.find_edge_for_points (*v1, *v5);
   EXPECT_EQ (std::find (xedges.begin (), xedges.end (), s1) != xedges.end (), true);
   EXPECT_EQ (std::find (xedges.begin (), xedges.end (), s2) != xedges.end (), true);
+}
+
+//  Returns a random float number between 0.0 and 1.0
+inline double flt_rand ()
+{
+  return rand () * (1.0 / double (RAND_MAX));
+}
+
+namespace {
+  struct PointLessOp
+  {
+    bool operator() (const db::DPoint &a, const db::DPoint &b) const
+    {
+      return a.less (b);
+    }
+  };
+}
+
+TEST(Triangle_test_heavy_insert)
+{
+  tl::info << "Running test_heavy_insert " << tl::noendl;
+
+  for (unsigned int l = 0; l < 100; ++l) {
+
+    srand (l);
+    tl::info << "." << tl::noendl;
+
+    db::Triangles tris;
+    double res = 128.0;
+
+    unsigned int n = rand () % 190 + 10;
+
+    db::DBox bbox;
+    std::map<db::DPoint, bool, PointLessOp> vmap;
+
+    for (unsigned int i = 0; i < n; ++i) {
+      double x = round (flt_rand () * res) * (1.0 / res);
+      double y = round (flt_rand () * res) * (1.0 / res);
+      db::Vertex *v = tris.insert_point (x, y);
+      bbox += db::DPoint (x, y);
+      vmap.insert (std::make_pair (*v, false));
+    }
+
+    //  not strictly true, but very likely with at least 10 vertexes:
+    EXPECT_EQ (tris.num_triangles () >= 1, true);
+    EXPECT_EQ (tris.bbox ().to_string (), bbox.to_string ());
+
+    bool ok = true;
+    for (auto t = tris.begin (); t != tris.end (); ++t) {
+      for (int i = 0; i < 3; ++i) {
+        auto f = vmap.find (*t->vertex (i));
+        if (f == vmap.end ()) {
+          tl::error << "Could not identify triangle vertex " << t->vertex (i)->to_string () << " as inserted vertex";
+          ok = false;
+        } else {
+          f->second = true;
+        }
+      }
+    }
+    for (auto m = vmap.begin (); m != vmap.end (); ++m) {
+      if (!m->second) {
+        tl::error << "Could not identify vertex " << m->first.to_string () << " with a triangle";
+        ok = false;
+      }
+    }
+    EXPECT_EQ (ok, true);
+
+    EXPECT_EQ (tris.check(), true);
+
+  }
+
+  tl::info << tl::endl << "done.";
 }

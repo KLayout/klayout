@@ -346,7 +346,6 @@ Triangle::Triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3)
 void
 Triangle::unlink ()
 {
-  //  @@@ Is this really needed???
   for (int i = 0; i != 3; ++i) {
     db::TriangleEdge *e = edge (i);
     if (e->left () == this) {

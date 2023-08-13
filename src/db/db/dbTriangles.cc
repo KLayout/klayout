@@ -658,7 +658,9 @@ Triangles::find_inside_circle (const db::DPoint &center, double radius) const
 void
 Triangles::remove (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles)
 {
-  if (vertex->is_outside ()) {
+  if (vertex->begin_edges () == vertex->end_edges ()) {
+    //  removing an orphan vertex -> ignore
+  } else if (vertex->is_outside ()) {
     remove_outside_vertex (vertex, new_triangles);
   } else {
     remove_inside_vertex (vertex, new_triangles);
@@ -676,10 +678,15 @@ Triangles::remove_outside_vertex (db::Vertex *vertex, std::vector<db::Triangle *
   }
 
   for (auto t = to_remove.begin (); t != to_remove.end (); ++t) {
-    remove (*t);
+    (*t)->unlink ();
   }
 
   auto new_triangles = fill_concave_corners (outer_edges);
+
+  for (auto t = to_remove.begin (); t != to_remove.end (); ++t) {
+    remove (*t);
+  }
+
   fix_triangles (new_triangles, std::vector<db::TriangleEdge *> (), new_triangles_out);
 }
 

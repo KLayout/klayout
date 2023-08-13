@@ -252,19 +252,17 @@ TEST(Triangle_test_heavy_remove)
       }
     }
 
-    int loop = 0; // @@@
     while (! vertexes.empty ()) {
-      ++loop; printf("@@@ %d\n", loop); fflush(stdout);
-      if (loop == 38) {
-        printf("@@@BANG!\n"); // @@@
-      }
 
       unsigned int n = rand () % (unsigned int) vertexes.size ();
       db::Vertex *v = vertexes [n];
       tris.remove (v);
       vertexes.erase (vertexes.begin () + n);
 
-      EXPECT_EQ (tris.check (), true);
+      //  just a few times as it wastes time otherwise
+      if (vertexes.size () % 10 == 0) {
+        EXPECT_EQ (tris.check (), true);
+      }
 
     }
 

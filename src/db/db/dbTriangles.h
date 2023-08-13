@@ -39,18 +39,77 @@ class Layout;
 class DB_PUBLIC Triangles
 {
 public:
+  typedef tl::shared_collection<db::Triangle> triangles_type;
+  typedef triangles_type::const_iterator triangle_iterator;
+
   Triangles ();
   ~Triangles ();
 
+  /**
+   *  @brief Initializes the triangle collection with a box
+   *  Two triangles will be created.
+   */
   void init_box (const db::DBox &box);
+
+  /**
+   *  @brief Returns a string representation of the triangle graph.
+   */
   std::string to_string ();
 
+  /**
+   *  @brief Returns the bounding box of the triangle graph.
+   */
   db::DBox bbox () const;
 
+  /**
+   *  @brief Iterates the triangles in the graph (begin iterator)
+   */
+  triangle_iterator begin () const { return mp_triangles.begin (); }
+
+  /**
+   *  @brief Iterates the triangles in the graph (end iterator)
+   */
+  triangle_iterator end () const { return mp_triangles.end (); }
+
+  /**
+   *  @brief Returns the number of triangles in the graph
+   */
+  size_t num_triangles () const { return mp_triangles.size (); }
+
+  /**
+   *  @brief Checks the triangle graph for consistency
+   *  This method is for testing purposes mainly.
+   */
   bool check (bool check_delaunay = true) const;
+
+  /**
+   *  @brief Dumps the triangle graph to a GDS file at the given path
+   *  This method is for testing purposes mainly.
+   */
   void dump (const std::string &path) const;
 
+  /**
+   *  @brief Creates a new layout object representing the triangle graph
+   *  This method is for testing purposes mainly.
+   */
+  db::Layout *to_layout () const;
+
+  /**
+   *  @brief Creates a new vertex object
+   *
+   *  In order to insert the new vertex into the graph, use "insert".
+   *  Normally, "insert_point" should be used which creates a vertex and
+   *  inserts it.
+   */
   db::Vertex *create_vertex (double x, double y);
+
+  /**
+   *  @brief Creates a new vertex object
+   *
+   *  In order to insert the new vertex into the graph, use "insert".
+   *  Normally, "insert_point" should be used which creates a vertex and
+   *  inserts it.
+   */
   db::Vertex *create_vertex (const db::DPoint &pt);
 
   /**
@@ -58,9 +117,36 @@ public:
    */
   std::vector<db::Vertex *> find_points_around (Vertex *vertex, double radius);
 
+  /**
+   *  @brief Inserts a new vertex as the given point
+   *
+   *  If "new_triangles" is not null, it will receive the list of new triangles created during
+   *  the remove step.
+   */
   db::Vertex *insert_point (const db::DPoint &point, std::vector<db::Triangle *> *new_triangles = 0);
+
+  /**
+   *  @brief Inserts the given vertex
+   *
+   *  If "new_triangles" is not null, it will receive the list of new triangles created during
+   *  the remove step.
+   *  The return value is the actual vertex created. It is no necessarily the one passed. When
+   *  a vertex already exists at the given location, the input vertex is ignored and the present
+   *  vertex is returned.
+   */
   db::Vertex *insert (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles = 0);
+
+  /**
+   *  @brief Removes the given vertex
+   *
+   *  If "new_triangles" is not null, it will receive the list of new triangles created during
+   *  the remove step.
+   */
   void remove (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles = 0);
+
+
+  //  exposed for testing purposes:
+  std::pair<std::pair<db::Triangle *, db::Triangle *>, db::TriangleEdge *> flip (TriangleEdge *edge);
 
 private:
   tl::shared_collection<db::Triangle> mp_triangles;
@@ -76,19 +162,17 @@ private:
   //  NOTE: these functions are SLOW and intended to test purposes only
   std::vector<db::Vertex *> find_touching (const db::DBox &box) const;
   std::vector<db::Vertex *> find_inside_circle (const db::DPoint &center, double radius) const;
-  db::Layout *to_layout () const;
 
   void remove_outside_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles = 0);
   void remove_inside_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out = 0);
   std::vector<db::Triangle *> fill_concave_corners (const std::vector<TriangleEdge *> &edges);
   int fix_triangles(const std::vector<db::Triangle *> &tris, const std::vector<db::TriangleEdge *> &fixed_edges, std::vector<db::Triangle *> *new_triangles);
-  std::pair<std::pair<db::Triangle *, db::Triangle *>, db::TriangleEdge *> flip (TriangleEdge *edge);
   static bool is_illegal_edge (db::TriangleEdge *edge);
   std::vector<db::Triangle *> find_triangle_for_point (const db::DPoint &point);
   db::TriangleEdge *find_closest_edge (const db::DPoint &p, db::Vertex *vstart = 0, bool inside_only = false);
   void split_triangle (db::Triangle *t, db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out);
   void split_triangles_on_edge (const std::vector<db::Triangle *> &tris, db::Vertex *vertex, db::TriangleEdge *split_edge, std::vector<db::Triangle *> *new_triangles_out);
-  void add_more_triangles (const std::vector<db::Triangle *> &new_triangles,
+  void add_more_triangles (std::vector<Triangle *> &new_triangles,
                                  db::TriangleEdge *incoming_edge,
                                  db::Vertex *from_vertex, db::Vertex *to_vertex,
                                  db::TriangleEdge *conn_edge);

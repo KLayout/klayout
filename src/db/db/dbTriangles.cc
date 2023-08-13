@@ -313,6 +313,12 @@ Triangles::insert_point (const db::DPoint &point, std::vector<db::Triangle *> *n
 }
 
 db::Vertex *
+Triangles::insert_point (db::DCoord x, db::DCoord y, std::vector<db::Triangle *> *new_triangles)
+{
+  return insert (create_vertex (x, y), new_triangles);
+}
+
+db::Vertex *
 Triangles::insert (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles)
 {
   std::vector<db::Triangle *> tris = find_triangle_for_point (*vertex);
@@ -442,6 +448,8 @@ void
 Triangles::insert_new_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out)
 {
   if (mp_triangles.empty ()) {
+
+    tl_assert (m_vertex_heap.size () <= size_t (3));  //  fails if vertexes were created but not inserted.
 
     if (m_vertex_heap.size () == 3) {
 
@@ -1043,6 +1051,94 @@ Triangles::fill_concave_corners (const std::vector<db::TriangleEdge *> &edges)
   return res;
 }
 
+std::vector<db::TriangleEdge *>
+Triangles::search_edges_crossing (Vertex *from, Vertex *to)
+{
+  db::Vertex *v = from;
+  db::Vertex *vv = to;
+  db::DEdge edge (*from, *to);
+
+  db::Triangle *current_triangle = 0;
+  db::TriangleEdge *next_edge = 0;
+
+  std::vector<db::TriangleEdge *> result;
+
+  for (auto e = v->begin_edges (); e != v->end_edges () && ! next_edge; ++e) {
+    for (auto t = e->begin_triangles (); t != e->end_triangles (); ++t) {
+      db::TriangleEdge *os = t->opposite (v);
+      if (os->has_vertex (vv)) {
+        return result;
+      }
+      if (os->crosses (edge)) {
+        result.push_back (os);
+        current_triangle = t.operator-> ();
+        next_edge = os;
+        break;
+      }
+    }
+  }
+
+  tl_assert (current_triangle != 0);
+
+  while (true) {
+
+    current_triangle = next_edge->other (current_triangle);
+
+    //  Note that we're convex, so there has to be a path across triangles
+    tl_assert (current_triangle != 0);
+
+    db::TriangleEdge *cs = next_edge;
+    next_edge = 0;
+    for (int i = 0; i < 3; ++i) {
+      db::TriangleEdge *e = current_triangle->edge (i);
+      if (e != cs) {
+        if (e->has_vertex (vv)) {
+          return result;
+        }
+        if (e->crosses (edge)) {
+          result.push_back (e);
+          next_edge = e;
+          break;
+        }
+      }
+    }
+
+    tl_assert (next_edge != 0);
+
+  }
+}
+
+db::Vertex *
+Triangles::find_vertex_for_point (const db::DPoint &pt)
+{
+  db::TriangleEdge *edge = find_closest_edge (pt);
+  if (!edge) {
+    return 0;
+  }
+  db::Vertex *v = 0;
+  if (edge->v1 ()->equal (pt)) {
+    v = edge->v1 ();
+  } else if (edge->v2 ()->equal (pt)) {
+    v = edge->v2 ();
+  }
+  return v;
+}
+
+db::TriangleEdge *
+Triangles::find_edge_for_points (const db::DPoint &p1, const db::DPoint &p2)
+{
+  db::Vertex *v = find_vertex_for_point (p1);
+  if (!v) {
+    return 0;
+  }
+  for (auto e = v->begin_edges (); e != v->end_edges (); ++e) {
+    if (e->other (v)->equal (p2)) {
+      return const_cast <db::TriangleEdge *>(e.operator-> ());
+    }
+  }
+  return 0;
+}
+
 }
 
 #if 0
@@ -1051,69 +1147,6 @@ import sys
 from .triangle import *
 
 class Triangles(object):
-
-  def find_edge_for_points(self, p1: Point, p2: Point) -> TriangleEdge:
-
-    v = self.find_vertex_for_point(p1)
-    if v is None:
-      return None
-    for s in v.edges:
-      if equals(s.other_vertex(v), p2):
-        return s
-    return None
-
-  def search_edges_crossing(self, edge: TriangleEdge) -> set:
-    """
-    Finds all edges that cross the given one for a convex triangulation
-
-    Requirements:
-    * self must be a convex triangulation
-    * edge must not contain another vertex from the triangulation except p1 and p2
-    """
-
-    v = edge.p1
-    vv = edge.p2
-
-    current_triangle = None
-    next_edge = None
-
-    result = []
-
-    for s in v.edges:
-      for t in [s.left, s.right]:
-        if t is not None:
-          os = t.opposite_edge(v)
-          if os.has_vertex(vv):
-            return result
-          if os.crosses(edge):
-            result.append(os)
-            current_triangle = t
-            next_edge = os
-            break
-      if next_edge is not None:
-        break
-
-    assert (current_triangle is not None)
-
-    while True:
-
-      current_triangle = next_edge.other(current_triangle)
-
-      # Note that we're convex, so there has to be a path across triangles
-      assert (current_triangle is not None)
-
-      cs = next_edge
-      next_edge = None
-      for s in current_triangle.edges():
-        if s != cs:
-          if s.has_vertex(vv):
-            return result
-          if s.crosses(edge):
-            result.append(s)
-            next_edge = s
-            break
-
-      assert (next_edge is not None)
 
   def _ensure_edge_inner(self, edge: Edge) -> [TriangleEdge]:
 

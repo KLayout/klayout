@@ -95,24 +95,6 @@ public:
   db::Layout *to_layout () const;
 
   /**
-   *  @brief Creates a new vertex object
-   *
-   *  In order to insert the new vertex into the graph, use "insert".
-   *  Normally, "insert_point" should be used which creates a vertex and
-   *  inserts it.
-   */
-  db::Vertex *create_vertex (double x, double y);
-
-  /**
-   *  @brief Creates a new vertex object
-   *
-   *  In order to insert the new vertex into the graph, use "insert".
-   *  Normally, "insert_point" should be used which creates a vertex and
-   *  inserts it.
-   */
-  db::Vertex *create_vertex (const db::DPoint &pt);
-
-  /**
    *  @brief Finds the points within (not "on") a circle of radius "radius" around the given vertex.
    */
   std::vector<db::Vertex *> find_points_around (Vertex *vertex, double radius);
@@ -126,15 +108,12 @@ public:
   db::Vertex *insert_point (const db::DPoint &point, std::vector<db::Triangle *> *new_triangles = 0);
 
   /**
-   *  @brief Inserts the given vertex
+   *  @brief Inserts a new vertex as the given point
    *
    *  If "new_triangles" is not null, it will receive the list of new triangles created during
    *  the remove step.
-   *  The return value is the actual vertex created. It is no necessarily the one passed. When
-   *  a vertex already exists at the given location, the input vertex is ignored and the present
-   *  vertex is returned.
    */
-  db::Vertex *insert (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles = 0);
+  db::Vertex *insert_point (db::DCoord x, db::DCoord y, std::vector<db::Triangle *> *new_triangles = 0);
 
   /**
    *  @brief Removes the given vertex
@@ -146,7 +125,30 @@ public:
 
 
   //  exposed for testing purposes:
+
+  /**
+   *  @brief Flips the given edge
+   */
   std::pair<std::pair<db::Triangle *, db::Triangle *>, db::TriangleEdge *> flip (TriangleEdge *edge);
+
+  /**
+   *  @brief Finds all edges that cross the given one for a convex triangulation
+   *
+   *  Requirements:
+   *  * self must be a convex triangulation
+   *  * edge must not contain another vertex from the triangulation except p1 and p2
+   */
+  std::vector<db::TriangleEdge *> search_edges_crossing (db::Vertex *from, db::Vertex *to);
+
+  /**
+   *  @brief Finds the edge for two given points
+   */
+  db::TriangleEdge *find_edge_for_points (const db::DPoint &p1, const db::DPoint &p2);
+
+  /**
+   *  @brief Finds the vertex for a point
+   */
+  db::Vertex *find_vertex_for_point (const db::DPoint &pt);
 
 private:
   tl::shared_collection<db::Triangle> mp_triangles;
@@ -155,6 +157,8 @@ private:
   bool m_is_constrained;
   size_t m_level;
 
+  db::Vertex *create_vertex (double x, double y);
+  db::Vertex *create_vertex (const db::DPoint &pt);
   db::TriangleEdge *create_edge (db::Vertex *v1, db::Vertex *v2);
   db::Triangle *create_triangle (db::TriangleEdge *e1, db::TriangleEdge *e2, db::TriangleEdge *e3);
   void remove (db::Triangle *tri);
@@ -170,6 +174,7 @@ private:
   static bool is_illegal_edge (db::TriangleEdge *edge);
   std::vector<db::Triangle *> find_triangle_for_point (const db::DPoint &point);
   db::TriangleEdge *find_closest_edge (const db::DPoint &p, db::Vertex *vstart = 0, bool inside_only = false);
+  db::Vertex *insert (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles = 0);
   void split_triangle (db::Triangle *t, db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out);
   void split_triangles_on_edge (const std::vector<db::Triangle *> &tris, db::Vertex *vertex, db::TriangleEdge *split_edge, std::vector<db::Triangle *> *new_triangles_out);
   void add_more_triangles (std::vector<Triangle *> &new_triangles,

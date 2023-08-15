@@ -408,6 +408,17 @@ Triangle::area () const
   return fabs (db::vprod (mp_e1->d (), mp_e2->d ())) * 0.5;
 }
 
+db::DBox
+Triangle::bbox () const
+{
+  db::DBox box;
+  for (int i = 0; i < 3; ++i) {
+    box += *vertex (i);
+  }
+  return box;
+}
+
+
 std::pair<db::DPoint, double>
 Triangle::circumcircle () const
 {

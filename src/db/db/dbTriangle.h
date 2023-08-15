@@ -452,6 +452,11 @@ public:
   double area () const;
 
   /**
+   *  @brief Returns the bounding box of the triangle
+   */
+  db::DBox bbox () const;
+
+  /**
    *  @brief Gets the center point and radius of the circumcircle
    */
   std::pair<db::DPoint, double> circumcircle () const;

@@ -272,3 +272,136 @@ TEST(Triangle_test_heavy_remove)
 
   tl::info << tl::endl << "done.";
 }
+
+TEST(Triangle_test_ensure_edge)
+{
+  srand (0);
+
+  db::Triangles tris;
+  double res = 128.0;
+
+  db::DEdge ee[] = {
+    db::DEdge (0.25, 0.25, 0.25, 0.75),
+    db::DEdge (0.25, 0.75, 0.75, 0.75),
+    db::DEdge (0.75, 0.75, 0.75, 0.25),
+    db::DEdge (0.75, 0.25, 0.25, 0.25)
+  };
+
+  for (unsigned int i = 0; i < 200; ++i) {
+    double x = round (flt_rand () * res) * (1.0 / res);
+    double y = round (flt_rand () * res) * (1.0 / res);
+    bool ok = true;
+    for (int j = 0; j < sizeof (ee) / sizeof (ee[0]); ++j) {
+      if (ee[j].side_of (db::DPoint (x, y)) == 0) {
+        --i;
+        ok = false;
+      }
+    }
+    if (ok) {
+      tris.insert_point (x, y);
+    }
+  }
+
+  for (int i = 0; i < sizeof (ee) / sizeof (ee[0]); ++i) {
+    tris.insert_point (ee[i].p1 ());
+  }
+
+  EXPECT_EQ (tris.check (), true);
+
+  for (int i = 0; i < sizeof (ee) / sizeof (ee[0]); ++i) {
+    tris.ensure_edge (tris.find_vertex_for_point (ee[i].p1 ()), tris.find_vertex_for_point (ee[i].p2 ()));
+  }
+
+  EXPECT_EQ (tris.check (false), true);
+
+  double area_in = 0.0;
+  db::DBox clip_box;
+  for (int i = 0; i < sizeof (ee) / sizeof (ee[0]); ++i) {
+    clip_box += ee[i].p1 ();
+  }
+  for (auto t = tris.begin (); t != tris.end (); ++t) {
+    if (clip_box.overlaps (t->bbox ())) {
+      EXPECT_EQ (t->bbox ().inside (clip_box), true);
+      area_in += t->area ();
+    }
+  }
+
+  EXPECT_EQ (tl::to_string (area_in), "0.25");
+}
+
+#if 0
+def test_heavy_constrain(self):
+
+  print("Running test_heavy_constrain ")
+
+  for l in range(0, 100):
+
+    random.seed(l)
+    print(".", end = '')
+
+    tris = t.Triangles()
+    res = 128.0
+    for i in range(0, int(random.random() * 100) + 3):
+      x = round(random.random() * res) * (1.0 / res)
+      y = round(random.random() * res) * (1.0 / res)
+      tris.insert(t.Vertex(x, y))
+
+    assert (tris.check() == True)
+
+    if len(tris.triangles) < 1:
+      continue
+
+    v1 = tris.insert(t.Vertex(0.25, 0.25))
+    v2 = tris.insert(t.Vertex(0.25, 0.75))
+    v3 = tris.insert(t.Vertex(0.75, 0.75))
+    v4 = tris.insert(t.Vertex(0.75, 0.25))
+    assert (tris.check() == True)
+
+    contour = [ t.Edge(v1, v2), t.Edge(v2, v3), t.Edge(v3, v4), t.Edge(v4, v1) ]
+    tris.constrain([ contour ])
+    assert (tris.check(check_delaunay = False) == True)
+    tris.remove_outside_triangles()
+
+    p1, p2 = tris.bbox()
+    assert(str(p1) == "(0.25, 0.25)")
+    assert(str(p2) == "(0.75, 0.75)")
+
+    assert (tris.check() == True)
+
+  print(" done.")
+
+def test_heavy_find_point_around(self):
+
+  print("Running test_heavy_find_point_around ")
+
+  for l in range(0, 100):
+
+    print(".", end="")
+
+    random.seed(l)
+
+    tris = t.Triangles()
+    res = 128.0
+    for i in range(0, int(random.random() * 100) + 3):
+      x = round(random.random() * res) * (1.0 / res)
+      y = round(random.random() * res) * (1.0 / res)
+      tris.insert(t.Vertex(x, y))
+
+    assert (tris.check() == True)
+
+    for i in range(0, 100):
+
+      n = int(round(random.random() * (len(tris.vertexes) - 1)))
+      vertex = tris.vertexes[n]
+
+      r = round(random.random() * res) * (1.0 / res)
+      p1 = tris.find_points_around(vertex, r)
+      p2 = tris.find_inside_circle(vertex, r)
+      p2 = [ p for p in p2 if p != vertex ]
+
+      assert(len(p1) == len(p2))
+      for p in p1:
+        assert(p in p2)
+
+  print("")
+#endif

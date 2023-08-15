@@ -137,9 +137,7 @@ Triangles::bbox () const
 {
   db::DBox box;
   for (auto t = mp_triangles.begin (); t != mp_triangles.end (); ++t) {
-    for (int i = 0; i < 3; ++i) {
-      box += *t->vertex (i);
-    }
+    box += t->bbox ();
   }
   return box;
 }
@@ -1134,6 +1132,128 @@ Triangles::find_edge_for_points (const db::DPoint &p1, const db::DPoint &p2)
   return 0;
 }
 
+std::vector<db::TriangleEdge *>
+Triangles::ensure_edge_inner (db::Vertex *from, db::Vertex *to)
+{
+  auto crossed_edges = search_edges_crossing (from, to);
+  std::vector<db::TriangleEdge *> result;
+
+  if (crossed_edges.empty ()) {
+
+    //  no crossing edge - there should be a edge already
+    db::TriangleEdge *res = find_edge_for_points (*from, *to);
+    tl_assert (res != 0);
+    result.push_back (res);
+
+  } else if (crossed_edges.size () == 1) {
+
+    //  can be solved by flipping
+    auto pp = flip (crossed_edges.front ());
+    db::TriangleEdge *res = pp.second;
+    tl_assert (res->has_vertex (from) && res->has_vertex (to));
+    result.push_back (res);
+
+  } else {
+
+    //  split edge close to center
+    db::DPoint split_point;
+    double d = -1.0;
+    double l_half = 0.25 * (*to - *from).sq_length ();
+    for (auto e = crossed_edges.begin (); e != crossed_edges.end (); ++e) {
+      db::DPoint p = (*e)->intersection_point (db::DEdge (*from, *to));
+      double dp = fabs ((p - *from).sq_length () - l_half);
+      if (d < 0.0 || dp < d) {
+        dp = d;
+        split_point = p;
+      }
+    }
+
+    db::Vertex *split_vertex = insert_point (split_point);
+
+    result = ensure_edge_inner (from, split_vertex);
+
+    auto result2 = ensure_edge_inner (split_vertex, to);
+    result.insert (result.end (), result2.begin (), result2.end ());
+
+  }
+
+  return result;
+}
+
+std::vector<db::TriangleEdge *>
+Triangles::ensure_edge (db::Vertex *from, db::Vertex *to)
+{
+#if 0
+  //  NOTE: this should not be required if the original segments are non-overlapping
+  //  TODO: this is inefficient
+  for v in self.vertexes:
+    if edge.point_on(v):
+      return self.ensure_edge(Edge(edge.p1, v)) + self.ensure_edge(Edge(v, edge.p2))
+#endif
+
+  auto edges = ensure_edge_inner (from, to);
+  for (auto e = edges.begin (); e != edges.end (); ++e) {
+    //  mark the edges as fixed "forever" so we don't modify them when we ensure other edges
+    (*e)->set_level (std::numeric_limits<size_t>::max ());
+  }
+  return edges;
+}
+
+void
+Triangles::join_edges (std::vector<db::TriangleEdge *> &edges)
+{
+  //  edges are supposed to be ordered
+  for (size_t i = 1; i < edges.size (); ) {
+
+    db::TriangleEdge *s1 = edges [i - 1];
+    db::TriangleEdge *s2 = edges [i];
+    tl_assert (s1->is_segment () == s2->is_segment ());
+    db::Vertex *cp = s1->common_vertex (s2);
+    tl_assert (cp != 0);
+
+    std::vector<db::TriangleEdge *> join_edges;
+    for (auto e = cp->begin_edges (); e != cp->end_edges (); ++e) {
+      if (e.operator-> () != s1 && e.operator-> () != s2) {
+        if (e->can_join_via (cp)) {
+          join_edges.push_back (const_cast<db::TriangleEdge *> (e.operator-> ()));
+        } else {
+          join_edges.clear ();
+          break;
+        }
+      }
+    }
+
+    if (! join_edges.empty ()) {
+
+      tl_assert (join_edges.size () <= 2);
+
+      TriangleEdge *new_edge = create_edge (s1->other (cp), s2->other (cp));
+      new_edge->set_is_segment (s1->is_segment ());
+
+      for (auto js = join_edges.begin (); js != join_edges.end (); ++js) {
+
+        db::Triangle *t1 = (*js)->left ();
+        db::Triangle *t2 = (*js)->right ();
+        db::TriangleEdge *tedge1 = t1->opposite (cp);
+        db::TriangleEdge *tedge2 = t2->opposite (cp);
+        t1->unlink ();
+        t2->unlink ();
+        db::Triangle *tri = create_triangle (tedge1, tedge2, new_edge);
+        tri->set_outside (t1->is_outside ());
+        remove (t1);
+        remove (t2);
+      }
+
+      edges [i - 1] = new_edge;
+      edges.erase (edges.begin () + i);
+
+    } else {
+      ++i;
+    }
+
+  }
+}
+
 }
 
 #if 0
@@ -1142,105 +1262,6 @@ import sys
 from .triangle import *
 
 class Triangles(object):
-
-  def _ensure_edge_inner(self, edge: Edge) -> [TriangleEdge]:
-
-    crossed_edges = self.search_edges_crossing(edge)
-
-    if len(crossed_edges) == 0:
-
-      # no crossing edge - there should be a edge already
-      result = self.find_edge_for_points(edge.p1, edge.p2)
-      assert (result is not None)
-      result = [result]
-
-    elif len(crossed_edges) == 1:
-
-      # can be solved by flipping
-      _, _, result = self.flip(crossed_edges[0])
-      assert (result.has_vertex(edge.p1) and result.has_vertex(edge.p2))
-      result = [result]
-
-    else:
-
-      # split edge close to center
-      split_point = None
-      d = None
-      l_half = 0.25 * square(edge.d())
-      for s in crossed_edges:
-        p = s.intersection_point(edge)
-        dp = abs(square(sub(p, edge.p1)) - l_half)
-        if d is None or dp < d:
-          dp = d
-          split_point = p
-
-      split_vertex = self.insert(Vertex(split_point.x, split_point.y))
-
-      e1 = Edge(edge.p1, split_vertex)
-      e2 = Edge(split_vertex, edge.p2)
-
-      result = self._ensure_edge_inner(e1) + self._ensure_edge_inner(e2)
-
-    return result
-
-  def ensure_edge(self, edge: Edge) -> [TriangleEdge]:
-
-    # NOTE: this should not be required if the original outer edges are non-overlapping
-    # TODO: this is inefficient
-    for v in self.vertexes:
-      if edge.point_on(v):
-        return self.ensure_edge(Edge(edge.p1, v)) + self.ensure_edge(Edge(v, edge.p2))
-
-    edges = self._ensure_edge_inner(edge)
-    for s in edges:
-      # mark the edges as fixed "forever" so we don't modify them when we ensure other edges
-      s.level = sys.maxsize
-    return edges
-
-  def _join_edges(self, edges) -> [TriangleEdge]:
-
-    # edges are supposed to be ordered
-    final_edges = []
-    i = 1
-    while i < len(edges):
-      s1 = edges[i - 1]
-      s2 = edges[i]
-      assert(s1.is_segment == s2.is_segment)
-      cp = s1.common_vertex(s2)
-      assert (cp is not None)
-      join_edges = []
-      for s in cp.edges:
-        if s != s1 and s != s2:
-          if s.can_join_via(cp):
-            join_edges.append(s)
-          else:
-            join_edges = []
-            break
-      if len(join_edges) > 0:
-        assert(len(join_edges) <= 2)
-        new_edge = TriangleEdge(s1.other_vertex(cp), s2.other_vertex(cp))
-        new_edge.is_segment = s1.is_segment
-        for js in join_edges:
-          t1 = js.left
-          t2 = js.right
-          tedge1 = t1.opposite_edge(cp)
-          tedge2 = t2.opposite_edge(cp)
-          t1.unlink()
-          self.triangles.remove(t1)
-          t2.unlink()
-          self.triangles.remove(t2)
-          tri = Triangle(tedge1, tedge2, new_edge)
-          tri.is_outside = t1.is_outside
-          self.triangles.append(tri)
-          js.unlink()
-        self.vertexes.remove(cp)
-        s1.unlink()
-        s2.unlink()
-        edges[i - 1] = new_edge
-        del edges[i]
-      else:
-        i += 1
-
 
   def constrain(self, contours: [[Edge]]) -> object:
 

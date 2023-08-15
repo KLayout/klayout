@@ -150,6 +150,11 @@ public:
    */
   db::Vertex *find_vertex_for_point (const db::DPoint &pt);
 
+  /**
+   *  @brief Ensures all points between from an to are connected by edges and makes these segments
+   */
+  std::vector<db::TriangleEdge *> ensure_edge (db::Vertex *from, db::Vertex *to);
+
 private:
   tl::shared_collection<db::Triangle> mp_triangles;
   tl::weak_collection<db::TriangleEdge> mp_edges;
@@ -183,6 +188,8 @@ private:
                                  db::Vertex *from_vertex, db::Vertex *to_vertex,
                                  db::TriangleEdge *conn_edge);
   void insert_new_vertex(db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out);
+  std::vector<db::TriangleEdge *> ensure_edge_inner (db::Vertex *from, db::Vertex *to);
+  void join_edges (std::vector<TriangleEdge *> &edges);
 };
 
 }

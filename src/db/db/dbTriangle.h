@@ -395,8 +395,8 @@ private:
   bool m_is_segment;
 
   //  no copying
-  TriangleEdge &operator= (const TriangleEdge &);
-  TriangleEdge (const TriangleEdge &);
+  // @@@ TriangleEdge &operator= (const TriangleEdge &);
+  // @@@ TriangleEdge (const TriangleEdge &);
 
   void set_left  (Triangle *t);
   void set_right (Triangle *t);

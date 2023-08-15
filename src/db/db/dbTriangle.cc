@@ -119,7 +119,7 @@ Vertex::in_circle (const DPoint &point, const DPoint &center, double radius)
   double dy = point.y () - center.y ();
   double d2 = dx * dx + dy * dy;
   double r2 = radius * radius;
-  double delta = std::max (1.0, fabs (d2 + r2)) * db::epsilon;
+  double delta = fabs (d2 + r2) * db::epsilon;
   if (d2 < r2 - delta) {
     return 1;
   } else if (d2 < r2 + delta) {
@@ -427,15 +427,15 @@ Triangle::circumcircle () const
   db::DVector n1 = db::DVector (v1.y (), -v1.x ());
   db::DVector n2 = db::DVector (v2.y (), -v2.x ());
 
-  double p1s = vertex(0)->sq_distance (db::DPoint ());
-  double p2s = vertex(1)->sq_distance (db::DPoint ());
-  double p3s = vertex(2)->sq_distance (db::DPoint ());
+  double p1s = v1.sq_length ();
+  double p2s = v2.sq_length ();
 
   double s = db::vprod (v1, v2);
   tl_assert (fabs (s) > db::epsilon);
 
-  db::DPoint center = db::DPoint () + (n2 * (p1s - p2s) - n1 * (p1s - p3s)) * (0.5 / s);
-  double radius = (*vertex (0) - center).length ();
+  db::DVector r = (n1 * p2s - n2 * p1s) * (0.5 / s);
+  db::DPoint center = *vertex (0) + r;
+  double radius = r.length ();
 
   return std::make_pair (center, radius);
 }

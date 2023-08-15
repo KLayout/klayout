@@ -29,7 +29,7 @@
 #include <cstdlib>
 #include <cmath>
 
-TEST(Triangle_basic)
+TEST(Triangles_basic)
 {
   db::Triangles tris;
   tris.init_box (db::DBox (1, 0, 5, 4));
@@ -40,7 +40,7 @@ TEST(Triangle_basic)
   EXPECT_EQ (tris.check (), true);
 }
 
-TEST(Triangle_flip)
+TEST(Triangles_flip)
 {
   db::Triangles tris;
   tris.init_box (db::DBox (0, 0, 1, 1));
@@ -61,7 +61,7 @@ TEST(Triangle_flip)
   EXPECT_EQ (tris.check (), true);
 }
 
-TEST(Triangle_insert)
+TEST(Triangles_insert)
 {
   db::Triangles tris;
   tris.init_box (db::DBox (0, 0, 1, 1));
@@ -71,7 +71,7 @@ TEST(Triangle_insert)
   EXPECT_EQ (tris.check (), true);
 }
 
-TEST(Triangle_split_segment)
+TEST(Triangles_split_segment)
 {
   db::Triangles tris;
   tris.init_box (db::DBox (0, 0, 1, 1));
@@ -81,7 +81,7 @@ TEST(Triangle_split_segment)
   EXPECT_EQ (tris.check(), true);
 }
 
-TEST(Triangle_insert_vertex_twice)
+TEST(Triangles_insert_vertex_twice)
 {
   db::Triangles tris;
   tris.init_box (db::DBox (0, 0, 1, 1));
@@ -93,7 +93,7 @@ TEST(Triangle_insert_vertex_twice)
   EXPECT_EQ (tris.check(), true);
 }
 
-TEST(Triangle_insert_vertex_convex)
+TEST(Triangles_insert_vertex_convex)
 {
   db::Triangles tris;
   tris.insert_point (0.2, 0.2);
@@ -105,7 +105,7 @@ TEST(Triangle_insert_vertex_convex)
   EXPECT_EQ (tris.check(), true);
 }
 
-TEST(Triangle_insert_vertex_convex2)
+TEST(Triangles_insert_vertex_convex2)
 {
   db::Triangles tris;
   tris.insert_point (0.25, 0.1);
@@ -116,7 +116,7 @@ TEST(Triangle_insert_vertex_convex2)
   EXPECT_EQ (tris.check(), true);
 }
 
-TEST(Triangle_insert_vertex_convex3)
+TEST(Triangles_insert_vertex_convex3)
 {
   db::Triangles tris;
   tris.insert_point (0.25, 0.5);
@@ -127,7 +127,7 @@ TEST(Triangle_insert_vertex_convex3)
   EXPECT_EQ (tris.check(), true);
 }
 
-TEST(Triangle_search_edges_crossing)
+TEST(Triangles_search_edges_crossing)
 {
   db::Triangles tris;
   db::Vertex *v1 = tris.insert_point (0.2, 0.2);
@@ -147,6 +147,85 @@ TEST(Triangle_search_edges_crossing)
   EXPECT_EQ (std::find (xedges.begin (), xedges.end (), s2) != xedges.end (), true);
 }
 
+TEST(Triangles_illegal_edge1)
+{
+  db::Vertex v1 (0, 0);
+  db::Vertex v2 (1.6, 1.6);
+  db::Vertex v3 (1, 2);
+  db::Vertex v4 (2, 1);
+
+  {
+    db::TriangleEdge e1 (&v1, &v3);
+    db::TriangleEdge e2 (&v3, &v4);
+    db::TriangleEdge e3 (&v4, &v1);
+
+    db::Triangle t1 (&e1, &e2, &e3);
+
+    db::TriangleEdge ee1 (&v2, &v3);
+    db::TriangleEdge ee2 (&v4, &v2);
+
+    db::Triangle t2 (&ee1, &e2, &ee2);
+
+    EXPECT_EQ (db::Triangles::is_illegal_edge (&e2), true);
+  }
+
+  {
+    //  flipped
+    db::TriangleEdge e1 (&v1, &v2);
+    db::TriangleEdge e2 (&v2, &v3);
+    db::TriangleEdge e3 (&v3, &v1);
+
+    db::Triangle t1 (&e1, &e2, &e3);
+
+    db::TriangleEdge ee1 (&v1, &v4);
+    db::TriangleEdge ee2 (&v4, &v2);
+
+    db::Triangle t2 (&ee1, &ee2, &e1);
+
+    EXPECT_EQ (db::Triangles::is_illegal_edge (&e2), false);
+  }
+}
+
+TEST(Triangles_illegal_edge2)
+{
+  //  numerical border case
+  db::Vertex v1 (773.94756216690905, 114.45875269431208);
+  db::Vertex v2 (773.29574734131643, 113.47402096138073);
+  db::Vertex v3 (773.10652961562653, 114.25497975904504);
+  db::Vertex v4 (774.08856345337881, 113.60495072750861);
+
+  {
+    db::TriangleEdge e1 (&v1, &v2);
+    db::TriangleEdge e2 (&v2, &v4);
+    db::TriangleEdge e3 (&v4, &v1);
+
+    db::Triangle t1 (&e1, &e2, &e3);
+
+    db::TriangleEdge ee1 (&v2, &v3);
+    db::TriangleEdge ee2 (&v3, &v4);
+
+    db::Triangle t2 (&ee1, &ee2, &e2);
+
+    EXPECT_EQ (db::Triangles::is_illegal_edge (&e2), false);
+  }
+
+  {
+    //  flipped
+    db::TriangleEdge e1 (&v1, &v2);
+    db::TriangleEdge e2 (&v2, &v3);
+    db::TriangleEdge e3 (&v3, &v1);
+
+    db::Triangle t1 (&e1, &e2, &e3);
+
+    db::TriangleEdge ee1 (&v1, &v4);
+    db::TriangleEdge ee2 (&v4, &v2);
+
+    db::Triangle t2 (&ee1, &ee2, &e1);
+
+    EXPECT_EQ (db::Triangles::is_illegal_edge (&e1), true);
+  }
+}
+
 //  Returns a random float number between 0.0 and 1.0
 inline double flt_rand ()
 {
@@ -163,7 +242,7 @@ namespace {
   };
 }
 
-TEST(Triangle_test_heavy_insert)
+TEST(Triangles_test_heavy_insert)
 {
   tl::info << "Running test_heavy_insert " << tl::noendl;
 
@@ -219,7 +298,7 @@ TEST(Triangle_test_heavy_insert)
   tl::info << tl::endl << "done.";
 }
 
-TEST(Triangle_test_heavy_remove)
+TEST(Triangles_test_heavy_remove)
 {
   tl::info << "Running test_heavy_remove " << tl::noendl;
 
@@ -273,7 +352,7 @@ TEST(Triangle_test_heavy_remove)
   tl::info << tl::endl << "done.";
 }
 
-TEST(Triangle_test_ensure_edge)
+TEST(Triangles_test_ensure_edge)
 {
   srand (0);
 
@@ -339,7 +418,7 @@ bool safe_inside (const db::DBox &b1, const db::DBox &b2)
          (ct::less (b1.top (), b2.top ())       || ct::equal (b1.top (), b2.top ()));
 }
 
-TEST(Triangle_test_constrain)
+TEST(Triangles_test_constrain)
 {
   srand (0);
 
@@ -398,7 +477,7 @@ TEST(Triangle_test_constrain)
   EXPECT_EQ (tl::to_string (area_in), "0.25");
 }
 
-TEST(Triangle_test_heavy_constrain)
+TEST(Triangles_test_heavy_constrain)
 {
   tl::info << "Running test_heavy_constrain " << tl::noendl;
 
@@ -468,7 +547,7 @@ TEST(Triangle_test_heavy_constrain)
   tl::info << tl::endl << "done.";
 }
 
-TEST(Triangle_test_heavy_find_point_around)
+TEST(Triangles_test_heavy_find_point_around)
 {
   tl::info << "Running Triangle_test_heavy_find_point_around " << tl::noendl;
 
@@ -514,7 +593,7 @@ TEST(Triangle_test_heavy_find_point_around)
   tl::info << tl::endl << "done.";
 }
 
-TEST(Triangle_test_create_constrained_delaunay)
+TEST(Triangles_test_create_constrained_delaunay)
 {
   db::Region r;
   r.insert (db::Box (0, 0, 1000, 1000));
@@ -528,6 +607,8 @@ TEST(Triangle_test_create_constrained_delaunay)
   tri.create_constrained_delaunay (r);
   tri.remove_outside_triangles ();
 
+  EXPECT_EQ (tri.check (), true);
+
   EXPECT_EQ (tri.to_string (),
              "((1000, 0), (0, 0), (200, 200)), "
              "((0, 1000), (200, 200), (0, 0)), "
@@ -538,3 +619,45 @@ TEST(Triangle_test_create_constrained_delaunay)
              "((0, 1000), (800, 800), (200, 800)), "
              "((0, 1000), (200, 800), (200, 200))");
 }
+
+TEST(Triangles_test_triangulate)
+{
+  db::Region r;
+  r.insert (db::Box (0, 0, 1000, 1000));
+
+  db::Region r2;
+  r2.insert (db::Box (200, 200, 800, 800));
+
+  r -= r2;
+
+  db::Triangles::TriangulateParameters param;
+  param.max_area = 0.1;
+
+  db::Triangles tri;
+  tri.triangulate (r, param);
+
+  tri.dump ("debug.gds");
+
+  EXPECT_EQ (tri.check (), true);
+
+}
+
+#if 0
+
+assert tris.check(check_delaunay = False)
+
+amax = 0.0
+l2rmin = 2.0
+for tri in tris.triangles:
+if not tri.is_outside:
+  _, radius = tri.circumcircle()
+  lmin = min([math.sqrt(t.square(s.d())) for s in tri.edges()])
+  l2rmin = min(l2rmin, lmin / radius)
+  amax = max(amax, tri.area())
+print(f"max. area = {'%.5g'%amax}")
+print(f"l/R min = {'%.5g'%l2rmin}")
+
+tris.dump_as_gdstxt("out.txt")
+
+
+#endif

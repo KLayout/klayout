@@ -314,19 +314,19 @@ Triangles::find_points_around (db::Vertex *vertex, double radius)
 }
 
 db::Vertex *
-Triangles::insert_point (const db::DPoint &point, std::vector<db::Triangle *> *new_triangles)
+Triangles::insert_point (const db::DPoint &point, std::list<tl::weak_ptr<db::Triangle> > *new_triangles)
 {
   return insert (create_vertex (point), new_triangles);
 }
 
 db::Vertex *
-Triangles::insert_point (db::DCoord x, db::DCoord y, std::vector<db::Triangle *> *new_triangles)
+Triangles::insert_point (db::DCoord x, db::DCoord y, std::list<tl::weak_ptr<db::Triangle> > *new_triangles)
 {
   return insert (create_vertex (x, y), new_triangles);
 }
 
 db::Vertex *
-Triangles::insert (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles)
+Triangles::insert (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles)
 {
   std::vector<db::Triangle *> tris = find_triangle_for_point (*vertex);
 
@@ -452,7 +452,7 @@ Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool insi
 }
 
 void
-Triangles::insert_new_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out)
+Triangles::insert_new_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles_out)
 {
   if (mp_triangles.empty ()) {
 
@@ -547,7 +547,7 @@ Triangles::add_more_triangles (std::vector<db::Triangle *> &new_triangles,
 }
 
 void
-Triangles::split_triangle (db::Triangle *t, db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out)
+Triangles::split_triangle (db::Triangle *t, db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles_out)
 {
   t->unlink ();
 
@@ -577,7 +577,7 @@ Triangles::split_triangle (db::Triangle *t, db::Vertex *vertex, std::vector<db::
 }
 
 void
-Triangles::split_triangles_on_edge (const std::vector<db::Triangle *> &tris, db::Vertex *vertex, db::TriangleEdge *split_edge, std::vector<db::Triangle *> *new_triangles_out)
+Triangles::split_triangles_on_edge (const std::vector<db::Triangle *> &tris, db::Vertex *vertex, db::TriangleEdge *split_edge, std::list<tl::weak_ptr<db::Triangle> > *new_triangles_out)
 {
   TriangleEdge *s1 = create_edge (split_edge->v1 (), vertex);
   TriangleEdge *s2 = create_edge (split_edge->v2 (), vertex);
@@ -654,7 +654,7 @@ Triangles::find_inside_circle (const db::DPoint &center, double radius) const
 }
 
 void
-Triangles::remove (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles)
+Triangles::remove (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles)
 {
   if (vertex->begin_edges () == vertex->end_edges ()) {
     //  removing an orphan vertex -> ignore
@@ -666,7 +666,7 @@ Triangles::remove (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangle
 }
 
 void
-Triangles::remove_outside_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out)
+Triangles::remove_outside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles_out)
 {
   auto to_remove = vertex->triangles ();
 
@@ -689,7 +689,7 @@ Triangles::remove_outside_vertex (db::Vertex *vertex, std::vector<db::Triangle *
 }
 
 void
-Triangles::remove_inside_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out)
+Triangles::remove_inside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles_out)
 {
   std::set<db::Triangle *, TriangleLessFunc> triangles_to_fix;
 
@@ -789,7 +789,7 @@ Triangles::remove_inside_vertex (db::Vertex *vertex, std::vector<db::Triangle *>
 }
 
 int
-Triangles::fix_triangles (const std::vector<db::Triangle *> &tris, const std::vector<db::TriangleEdge *> &fixed_edges, std::vector<db::Triangle *> *new_triangles)
+Triangles::fix_triangles (const std::vector<db::Triangle *> &tris, const std::vector<db::TriangleEdge *> &fixed_edges, std::list<tl::weak_ptr<db::Triangle> > *new_triangles)
 {
   int flips = 0;
 
@@ -1385,6 +1385,174 @@ Triangles::create_constrained_delaunay (const db::Region &region, double dbu)
   }
 
   constrain (edge_contours);
+}
+
+static bool is_skinny (db::Triangle *tri, const Triangles::TriangulateParameters &param)
+{
+  if (param.b < db::epsilon) {
+    return false;
+  } else {
+    auto cr = tri->circumcircle ();
+    double lmin = tri->edge (0)->d ().sq_length ();
+    for (int i = 1; i < 3; ++i) {
+      lmin = std::min (lmin, tri->edge (i)->d ().sq_length ());
+    }
+    double delta = (fabs (lmin / cr.second) + fabs (param.b)) * db::epsilon;
+    return lmin / cr.second < param.b - delta;
+  }
+}
+
+static bool is_invalid (db::Triangle *tri, const Triangles::TriangulateParameters &param)
+{
+  if (is_skinny (tri, param)) {
+    return true;
+  }
+
+  double amax = param.max_area;
+  if (param.max_area_border > db::epsilon) {
+    bool at_border = false;
+    for (int i = 0; i < 3; ++i) {
+      if (tri->edge (i)->is_segment ()) {
+        at_border = true;
+      }
+    }
+    if (at_border) {
+      amax = param.max_area_border;
+    }
+  }
+
+  if (amax > db::epsilon) {
+    double a = tri->area ();
+    double delta = (fabs (a) + fabs (amax)) * db::epsilon;
+    return tri->area () > amax + delta;
+  } else {
+    return false;
+  }
+}
+
+static unsigned int num_segments (db::Triangle *tri)
+{
+  unsigned int n = 0;
+  for (int i = 0; i < 3; ++i) {
+    if (tri->edge (i)->is_segment ()) {
+      ++n;
+    }
+  }
+  return n;
+}
+
+void
+Triangles::triangulate (const db::Region &region, const TriangulateParameters &parameters, double dbu)
+{
+  create_constrained_delaunay (region, dbu);
+
+  if (parameters.b < db::epsilon && parameters.max_area < db::epsilon && parameters.max_area_border < db::epsilon) {
+
+    //  no refinement requested - we're done.
+    remove_outside_triangles ();
+    return;
+
+  }
+
+  unsigned int nloop = 0;
+  std::list<tl::weak_ptr<db::Triangle> > new_triangles;
+  for (auto t = mp_triangles.begin (); t != mp_triangles.end (); ++t) {
+    new_triangles.push_back (t.operator-> ());
+  }
+
+  // @@@ TODO: break if iteration gets stuck
+  while (nloop < 20) { // @@@
+
+    ++nloop;
+    tl::info << "Iteration " << nloop << " ..";
+
+    std::list<tl::weak_ptr<db::Triangle> > to_consider;
+    for (auto t = new_triangles.begin (); t != new_triangles.end (); ++t) {
+      if (t->get () && ! (*t)->is_outside () && is_invalid (t->get (), parameters)) {
+        to_consider.push_back (*t);
+      }
+    }
+    tl::info << "@@@ to_consider " << to_consider.size();
+
+    if (to_consider.empty ()) {
+      break;
+    }
+
+    new_triangles.clear ();
+
+    for (auto t = to_consider.begin (); t != to_consider.end (); ++t) {
+
+      if (! t->get ()) {
+        //  triangle got removed during loop
+        continue;
+      }
+
+      auto cr = (*t)->circumcircle();
+      auto center = cr.first;
+
+      if ((*t)->contains (center) >= 0) {
+
+        //  heuristics #1: never insert a point into a triangle with more than two segments
+        if (num_segments (t->get ()) <= 1) {
+          //  @@@ print(f"Inserting in-triangle center {repr(center)} of {repr(tri)}")
+          insert_point (center, &new_triangles);
+        }
+
+      } else {
+
+        db::Vertex *vstart = 0;
+        for (int i = 0; i < 3; ++i) {
+          db::TriangleEdge *edge = (*t)->edge (i);
+          vstart = (*t)->opposite (edge);
+          if (edge->side_of (*vstart) * edge->side_of (center) < 0) {
+            break;
+          }
+        }
+
+        db::TriangleEdge *edge = find_closest_edge (center, vstart, true /*inside only*/);
+        tl_assert (edge != 0);
+
+        if (! edge->is_segment () || edge->side_of (*vstart) * edge->side_of (center) >= 0) {
+
+          // @@@ print(f"Inserting out-of-triangle center {repr(center)} of {repr(tri)}")
+          insert_point (center, &new_triangles);
+
+        } else {
+
+          double sr = edge->d ().length () * 0.5;
+          db::DPoint pnew = *edge->v1 () + edge->d () * 0.5;
+
+          // @@@ print(f"split edge {repr(edge)} at {repr(pnew)}")
+          db::Vertex *vnew = insert_point (pnew, &new_triangles);
+          auto vertexes_in_diametral_circle = find_points_around (vnew, sr);
+
+          std::vector<db::Vertex *> to_delete;
+          for (auto v = vertexes_in_diametral_circle.begin (); v != vertexes_in_diametral_circle.end (); ++v) {
+            bool has_segment = false;
+            for (auto e = (*v)->begin_edges (); e != (*v)->end_edges () && ! has_segment; ++e) {
+              has_segment = e->is_segment ();
+            }
+            if (! has_segment) {
+              to_delete.push_back (*v);
+            }
+          }
+
+          // @@@ print(f"  -> found {len(to_delete)} vertexes to remove")
+          for (auto v = to_delete.begin (); v != to_delete.end (); ++v) {
+            remove (*v, &new_triangles);
+          }
+
+        }
+
+      }
+
+    }
+
+    // @@@ tris.dump_as_gdstxt("debug2.txt")
+
+  }
+
+  remove_outside_triangles ();
 }
 
 }

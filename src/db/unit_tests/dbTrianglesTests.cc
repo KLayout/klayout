@@ -329,6 +329,16 @@ TEST(Triangle_test_ensure_edge)
   EXPECT_EQ (tl::to_string (area_in), "0.25");
 }
 
+bool safe_inside (const db::DBox &b1, const db::DBox &b2)
+{
+  typedef db::coord_traits<db::DBox::coord_type> ct;
+
+  return (ct::less (b2.left (), b1.left ())     || ct::equal (b2.left (), b1.left ())) &&
+         (ct::less (b1.right (), b2.right ())   || ct::equal (b1.right (), b2.right ())) &&
+         (ct::less (b2.bottom (), b1.bottom ()) || ct::equal (b2.bottom (), b1.bottom ())) &&
+         (ct::less (b1.top (), b2.top ())       || ct::equal (b1.top (), b2.top ()));
+}
+
 TEST(Triangle_test_constrain)
 {
   srand (0);
@@ -381,11 +391,81 @@ TEST(Triangle_test_constrain)
   }
   for (auto t = tris.begin (); t != tris.end (); ++t) {
     EXPECT_EQ (clip_box.overlaps (t->bbox ()), true);
-    EXPECT_EQ (t->bbox ().inside (clip_box), true);
+    EXPECT_EQ (safe_inside (t->bbox (), clip_box), true);
     area_in += t->area ();
   }
 
   EXPECT_EQ (tl::to_string (area_in), "0.25");
+}
+
+TEST(Triangle_test_heavy_constrain)
+{
+  tl::info << "Running test_heavy_constrain " << tl::noendl;
+
+  for (unsigned int l = 0; l < 100; ++l) {
+
+    srand (l);
+    tl::info << "." << tl::noendl;
+
+    db::Triangles tris;
+    double res = 128.0;
+
+    db::DEdge ee[] = {
+      db::DEdge (0.25, 0.25, 0.25, 0.75),
+      db::DEdge (0.25, 0.75, 0.75, 0.75),
+      db::DEdge (0.75, 0.75, 0.75, 0.25),
+      db::DEdge (0.75, 0.25, 0.25, 0.25)
+    };
+
+    unsigned int n = rand () % 150 + 50;
+
+    for (unsigned int i = 0; i < n; ++i) {
+      double x = round (flt_rand () * res) * (1.0 / res);
+      double y = round (flt_rand () * res) * (1.0 / res);
+      bool ok = true;
+      for (unsigned int j = 0; j < sizeof (ee) / sizeof (ee[0]); ++j) {
+        if (ee[j].side_of (db::DPoint (x, y)) == 0) {
+          --i;
+          ok = false;
+        }
+      }
+      if (ok) {
+        tris.insert_point (x, y);
+      }
+    }
+
+    std::vector<db::Vertex *> contour;
+    for (unsigned int i = 0; i < sizeof (ee) / sizeof (ee[0]); ++i) {
+      contour.push_back (tris.insert_point (ee[i].p1 ()));
+    }
+    std::vector<std::vector<db::Vertex *> > contours;
+    contours.push_back (contour);
+
+    EXPECT_EQ (tris.check (), true);
+
+    tris.constrain (contours);
+    EXPECT_EQ (tris.check (false), true);
+
+    tris.remove_outside_triangles ();
+
+    EXPECT_EQ (tris.check (), true);
+
+    double area_in = 0.0;
+    db::DBox clip_box;
+    for (unsigned int i = 0; i < sizeof (ee) / sizeof (ee[0]); ++i) {
+      clip_box += ee[i].p1 ();
+    }
+    for (auto t = tris.begin (); t != tris.end (); ++t) {
+      EXPECT_EQ (clip_box.overlaps (t->bbox ()), true);
+      EXPECT_EQ (safe_inside (t->bbox (), clip_box), true);
+      area_in += t->area ();
+    }
+
+    EXPECT_EQ (tl::to_string (area_in), "0.25");
+
+  }
+
+  tl::info << tl::endl << "done.";
 }
 
 #if 0

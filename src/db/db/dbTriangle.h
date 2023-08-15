@@ -497,6 +497,26 @@ public:
     return mp_e1.get () == e || mp_e2.get () == e || mp_e3.get () == e;
   }
 
+  /**
+   *  @brief Returns the minimum edge length
+   */
+  double min_edge_length () const;
+
+  /**
+   *  @brief Returns the min edge length to circumcircle radius ratio
+   */
+  double b () const;
+
+  /**
+   *  @brief Returns a value indicating whether the triangle borders to a segment
+   */
+  bool has_segment () const;
+
+  /**
+   *  @brief Returns the number of segments the triangle borders to
+   */
+  unsigned int num_segments () const;
+
 private:
   bool m_is_outside;
   tl::weak_ptr<TriangleEdge> mp_e1, mp_e2, mp_e3;

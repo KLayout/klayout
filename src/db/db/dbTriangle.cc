@@ -494,4 +494,45 @@ Triangle::contains (const db::DPoint &point) const
   return res;
 }
 
+double
+Triangle::min_edge_length () const
+{
+  double lmin = edge (0)->d ().length ();
+  for (int i = 1; i < 3; ++i) {
+    lmin = std::min (lmin, edge (i)->d ().length ());
+  }
+  return lmin;
+}
+
+double
+Triangle::b () const
+{
+  double lmin = min_edge_length ();
+  auto cr = circumcircle ();
+  return lmin / cr.second;
+}
+
+bool
+Triangle::has_segment () const
+{
+  for (int i = 0; i < 3; ++i) {
+    if (edge (i)->is_segment ()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+unsigned int
+Triangle::num_segments () const
+{
+  unsigned int n = 0;
+  for (int i = 0; i < 3; ++i) {
+    if (edge (i)->is_segment ()) {
+      ++n;
+    }
+  }
+  return n;
+}
+
 }

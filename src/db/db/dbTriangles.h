@@ -43,16 +43,17 @@ public:
   struct TriangulateParameters
   {
     TriangulateParameters ()
-      : b (1.0),
+      : min_b (1.0),
         max_area (0.0),
         max_area_border (0.0),
-        max_iterations (std::numeric_limits<size_t>::max ())
+        max_iterations (std::numeric_limits<size_t>::max ()),
+        base_verbosity (30)
     { }
 
     /**
      *  @brief Min. readius-to-shortest edge ratio
      */
-    double b;
+    double min_b;
 
     /**
      *  @brief Max area or zero for "no constraint"
@@ -68,6 +69,11 @@ public:
      *  @brief Max number of iterations
      */
     size_t max_iterations;
+
+    /**
+     *  @brief The verbosity level above which triangulation reports details
+     */
+    int base_verbosity;
   };
 
   typedef tl::shared_collection<db::Triangle> triangles_type;
@@ -114,6 +120,9 @@ public:
 
   /**
    *  @brief Creates a refined Delaunay triangulation for the given region
+   *
+   *  The database unit should be chosen in a way that target area values are "in the order of 1".
+   *  The algorithm becomes numerically unstable area constraints below 1e-4.
    */
   void triangulate (const db::Region &region, const TriangulateParameters &parameters, double dbu = 1.0);
 

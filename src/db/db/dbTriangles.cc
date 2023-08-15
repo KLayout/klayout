@@ -26,6 +26,7 @@
 #include "dbWriter.h"
 #include "tlStream.h"
 #include "tlLog.h"
+#include "tlTimer.h"
 
 #include <set>
 
@@ -1389,16 +1390,12 @@ Triangles::create_constrained_delaunay (const db::Region &region, double dbu)
 
 static bool is_skinny (db::Triangle *tri, const Triangles::TriangulateParameters &param)
 {
-  if (param.b < db::epsilon) {
+  if (param.min_b < db::epsilon) {
     return false;
   } else {
-    auto cr = tri->circumcircle ();
-    double lmin = tri->edge (0)->d ().length ();
-    for (int i = 1; i < 3; ++i) {
-      lmin = std::min (lmin, tri->edge (i)->d ().length ());
-    }
-    double delta = (fabs (lmin / cr.second) + fabs (param.b)) * db::epsilon;
-    return lmin / cr.second < param.b - delta;
+    double b = tri->b ();
+    double delta = (b + param.min_b) * db::epsilon;
+    return b < param.min_b - delta;
   }
 }
 
@@ -1410,43 +1407,28 @@ static bool is_invalid (db::Triangle *tri, const Triangles::TriangulateParameter
 
   double amax = param.max_area;
   if (param.max_area_border > db::epsilon) {
-    bool at_border = false;
-    for (int i = 0; i < 3; ++i) {
-      if (tri->edge (i)->is_segment ()) {
-        at_border = true;
-      }
-    }
-    if (at_border) {
+    if (tri->has_segment ()) {
       amax = param.max_area_border;
     }
   }
 
   if (amax > db::epsilon) {
     double a = tri->area ();
-    double delta = (fabs (a) + fabs (amax)) * db::epsilon;
+    double delta = (a + amax) * db::epsilon;
     return tri->area () > amax + delta;
   } else {
     return false;
   }
 }
 
-static unsigned int num_segments (db::Triangle *tri)
-{
-  unsigned int n = 0;
-  for (int i = 0; i < 3; ++i) {
-    if (tri->edge (i)->is_segment ()) {
-      ++n;
-    }
-  }
-  return n;
-}
-
 void
 Triangles::triangulate (const db::Region &region, const TriangulateParameters &parameters, double dbu)
 {
+  tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
+
   create_constrained_delaunay (region, dbu);
 
-  if (parameters.b < db::epsilon && parameters.max_area < db::epsilon && parameters.max_area_border < db::epsilon) {
+  if (parameters.min_b < db::epsilon && parameters.max_area < db::epsilon && parameters.max_area_border < db::epsilon) {
 
     //  no refinement requested - we're done.
     remove_outside_triangles ();
@@ -1464,7 +1446,9 @@ Triangles::triangulate (const db::Region &region, const TriangulateParameters &p
   while (nloop < parameters.max_iterations) { // @@@
 
     ++nloop;
-    tl::info << "Iteration " << nloop << " ..";
+    if (tl::verbosity () >= parameters.base_verbosity + 10) {
+      tl::info << "Iteration " << nloop << " ..";
+    }
 
     std::list<tl::weak_ptr<db::Triangle> > to_consider;
     for (auto t = new_triangles.begin (); t != new_triangles.end (); ++t) {
@@ -1472,10 +1456,13 @@ Triangles::triangulate (const db::Region &region, const TriangulateParameters &p
         to_consider.push_back (*t);
       }
     }
-    tl::info << "@@@ to_consider " << to_consider.size();
 
     if (to_consider.empty ()) {
       break;
+    }
+
+    if (tl::verbosity () >= parameters.base_verbosity + 10) {
+      tl::info << to_consider.size() << " triangles to consider";
     }
 
     new_triangles.clear ();
@@ -1493,8 +1480,10 @@ Triangles::triangulate (const db::Region &region, const TriangulateParameters &p
       if ((*t)->contains (center) >= 0) {
 
         //  heuristics #1: never insert a point into a triangle with more than two segments
-        if (num_segments (t->get ()) <= 1) {
-          //  @@@ print(f"Inserting in-triangle center {repr(center)} of {repr(tri)}")
+        if (t->get ()->num_segments () <= 1) {
+          if (tl::verbosity () >= parameters.base_verbosity + 20) {
+            tl::info << "Inserting in-triangle center " << center.to_string () << " of " << (*t)->to_string (true);
+          }
           insert_point (center, &new_triangles);
         }
 
@@ -1514,7 +1503,9 @@ Triangles::triangulate (const db::Region &region, const TriangulateParameters &p
 
         if (! edge->is_segment () || edge->side_of (*vstart) * edge->side_of (center) >= 0) {
 
-          // @@@ print(f"Inserting out-of-triangle center {repr(center)} of {repr(tri)}")
+          if (tl::verbosity () >= parameters.base_verbosity + 20) {
+            tl::info << "Inserting out-of-triangle center " << center << " of " << (*t)->to_string (true);
+          }
           insert_point (center, &new_triangles);
 
         } else {
@@ -1522,7 +1513,9 @@ Triangles::triangulate (const db::Region &region, const TriangulateParameters &p
           double sr = edge->d ().length () * 0.5;
           db::DPoint pnew = *edge->v1 () + edge->d () * 0.5;
 
-          // @@@ print(f"split edge {repr(edge)} at {repr(pnew)}")
+          if (tl::verbosity () >= parameters.base_verbosity + 20) {
+            tl::info << "Split edge " << edge->to_string (true) << " at " << pnew.to_string ();
+          }
           db::Vertex *vnew = insert_point (pnew, &new_triangles);
           auto vertexes_in_diametral_circle = find_points_around (vnew, sr);
 
@@ -1537,7 +1530,9 @@ Triangles::triangulate (const db::Region &region, const TriangulateParameters &p
             }
           }
 
-          // @@@ print(f"  -> found {len(to_delete)} vertexes to remove")
+          if (tl::verbosity () >= parameters.base_verbosity + 20) {
+            tl::info << "  -> found " << to_delete.size () << " vertexes to remove";
+          }
           for (auto v = to_delete.begin (); v != to_delete.end (); ++v) {
             remove (*v, &new_triangles);
           }
@@ -1548,10 +1543,11 @@ Triangles::triangulate (const db::Region &region, const TriangulateParameters &p
 
     }
 
-    // @@@ dump ("debug2.gds"); // @@@
-
   }
 
+  if (tl::verbosity () >= parameters.base_verbosity + 20) {
+    tl::info << "Finishing ..";
+  }
   remove_outside_triangles ();
 }
 

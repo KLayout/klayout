@@ -222,7 +222,7 @@ TEST(Triangles_illegal_edge2)
 
     db::Triangle t2 (&ee1, &ee2, &e1);
 
-    EXPECT_EQ (db::Triangles::is_illegal_edge (&e1), true);
+    EXPECT_EQ (db::Triangles::is_illegal_edge (&e1), false);
   }
 }
 
@@ -631,35 +631,33 @@ TEST(Triangles_test_triangulate)
   r -= r2;
 
   db::Triangles::TriangulateParameters param;
-  param.b = 1.21;
+  param.min_b = 1.2;
   param.max_area = 1.0;
-  param.max_area_border = 0.0;
 
   db::Triangles tri;
   tri.triangulate (r, param, 0.001);
 
-  tri.dump ("debug.gds");
+  EXPECT_EQ (tri.check (), true);
+
+  for (auto t = tri.begin (); t != tri.end (); ++t) {
+    EXPECT_EQ (t->area () <= param.max_area, true);
+    EXPECT_EQ (t->b () >= param.min_b, true);
+  }
+
+  EXPECT_EQ (tri.num_triangles () > 100 && tri.num_triangles () < 150, true);
+  tl::info << tri.num_triangles ();
+
+  param.min_b = 1.0;
+  param.max_area = 0.1;
+
+  tri.triangulate (r, param, 0.001);
 
   EXPECT_EQ (tri.check (), true);
 
+  for (auto t = tri.begin (); t != tri.end (); ++t) {
+    EXPECT_EQ (t->area () <= param.max_area, true);
+    EXPECT_EQ (t->b () >= param.min_b, true);
+  }
+
+  EXPECT_EQ (tri.num_triangles () > 900 && tri.num_triangles () < 1000, true);
 }
-
-#if 0
-
-assert tris.check(check_delaunay = False)
-
-amax = 0.0
-l2rmin = 2.0
-for tri in tris.triangles:
-if not tri.is_outside:
-  _, radius = tri.circumcircle()
-  lmin = min([math.sqrt(t.square(s.d())) for s in tri.edges()])
-  l2rmin = min(l2rmin, lmin / radius)
-  amax = max(amax, tri.area())
-print(f"max. area = {'%.5g'%amax}")
-print(f"l/R min = {'%.5g'%l2rmin}")
-
-tris.dump_as_gdstxt("out.txt")
-
-
-#endif

@@ -513,3 +513,28 @@ TEST(Triangle_test_heavy_find_point_around)
 
   tl::info << tl::endl << "done.";
 }
+
+TEST(Triangle_test_create_constrained_delaunay)
+{
+  db::Region r;
+  r.insert (db::Box (0, 0, 1000, 1000));
+
+  db::Region r2;
+  r2.insert (db::Box (200, 200, 800, 800));
+
+  r -= r2;
+
+  db::Triangles tri;
+  tri.create_constrained_delaunay (r);
+  tri.remove_outside_triangles ();
+
+  EXPECT_EQ (tri.to_string (),
+             "((1000, 0), (0, 0), (200, 200)), "
+             "((0, 1000), (200, 200), (0, 0)), "
+             "((1000, 0), (200, 200), (800, 200)), "
+             "((1000, 0), (800, 200), (1000, 1000)), "
+             "((800, 200), (800, 800), (1000, 1000)), "
+             "((0, 1000), (1000, 1000), (800, 800)), "
+             "((0, 1000), (800, 800), (200, 800)), "
+             "((0, 1000), (200, 800), (200, 200))");
+}

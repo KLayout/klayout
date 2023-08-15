@@ -82,11 +82,6 @@ public:
    */
   void clear ();
 
-  /**
-   *  @brief Creates a constrained Delaunay triangulation from the given Region
-   */
-  void create_constrained_delaunay (const db::Region &region, double dbu = 1.0);
-
   //  exposed for testing purposes:
 
   /**
@@ -179,6 +174,11 @@ public:
    *  @brief Removes the outside triangles.
    */
   void remove_outside_triangles ();
+
+  /**
+   *  @brief Creates a constrained Delaunay triangulation from the given Region
+   */
+  void create_constrained_delaunay (const db::Region &region, double dbu = 1.0);
 
   //  NOTE: these functions are SLOW and intended to test purposes only
   std::vector<db::Vertex *> find_touching (const db::DBox &box) const;

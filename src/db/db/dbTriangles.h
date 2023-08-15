@@ -28,6 +28,7 @@
 #include "dbCommon.h"
 #include "dbTriangle.h"
 #include "dbBox.h"
+#include "dbRegion.h"
 
 #include "tlObjectCollection.h"
 
@@ -77,6 +78,18 @@ public:
   size_t num_triangles () const { return mp_triangles.size (); }
 
   /**
+   *  @brief Clears the triangle set
+   */
+  void clear ();
+
+  /**
+   *  @brief Creates a constrained Delaunay triangulation from the given Region
+   */
+  void create_constrained_delaunay (const db::Region &region, double dbu = 1.0);
+
+  //  exposed for testing purposes:
+
+  /**
    *  @brief Checks the triangle graph for consistency
    *  This method is for testing purposes mainly.
    */
@@ -123,9 +136,6 @@ public:
    */
   void remove (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles = 0);
 
-
-  //  exposed for testing purposes:
-
   /**
    *  @brief Flips the given edge
    */
@@ -154,6 +164,21 @@ public:
    *  @brief Ensures all points between from an to are connected by edges and makes these segments
    */
   std::vector<db::TriangleEdge *> ensure_edge (db::Vertex *from, db::Vertex *to);
+
+  /**
+   *  @brief Given a set of contours with edges, mark outer triangles
+   *
+   *  The edges must be made from existing vertexes. Edge orientation is
+   *  clockwise.
+   *
+   *  This will also mark triangles as outside ones.
+   */
+  void constrain (const std::vector<std::vector<Vertex *> > &contours);
+
+  /**
+   *  @brief Removes the outside triangles.
+   */
+  void remove_outside_triangles ();
 
 private:
   tl::shared_collection<db::Triangle> mp_triangles;

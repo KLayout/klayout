@@ -1254,121 +1254,137 @@ Triangles::join_edges (std::vector<db::TriangleEdge *> &edges)
   }
 }
 
+void
+Triangles::constrain (const std::vector<std::vector<db::Vertex *> > &contours)
+{
+  assert (! m_is_constrained);
+
+  std::vector<std::pair<db::DEdge, std::vector<db::TriangleEdge *> > > resolved_edges;
+
+  for (auto c = contours.begin (); c != contours.end (); ++c) {
+    for (auto v = c->begin (); v != c->end (); ++v) {
+      auto vv = v;
+      ++vv;
+      if (vv == c->end ()) {
+        vv = c->begin ();
+      }
+      resolved_edges.push_back (std::make_pair (db::DEdge (**v, **vv), std::vector<db::TriangleEdge *> ()));
+      resolved_edges.back ().second = ensure_edge (*v, *vv);
+    }
+  }
+
+  for (auto tri = mp_triangles.begin (); tri != mp_triangles.end (); ++tri) {
+    tri->set_outside (false);
+    for (int i = 0; i < 3; ++i) {
+      tri->edge (i)->set_is_segment (false);
+    }
+  }
+
+  std::set<db::Triangle *, TriangleLessFunc> new_tri;
+
+  for (auto re = resolved_edges.begin (); re != resolved_edges.end (); ++re) {
+    auto edge = re->first;
+    auto edges = re->second;
+    for (auto e = edges.begin (); e != edges.end (); ++e) {
+      (*e)->set_is_segment (true);
+      db::Triangle *outer_tri = 0;
+      int d = db::sprod_sign (edge.d (), (*e)->d ());
+      if (d > 0) {
+        outer_tri = (*e)->left ();
+      }
+      if (d < 0) {
+        outer_tri = (*e)->right ();
+      }
+      if (outer_tri) {
+        new_tri.insert (outer_tri);
+        outer_tri->set_outside (true);
+      }
+    }
+  }
+
+  while (! new_tri.empty ()) {
+
+    std::set<db::Triangle *, TriangleLessFunc> next_tris;
+
+    for (auto tri = new_tri.begin (); tri != new_tri.end (); ++tri) {
+      for (int i = 0; i < 3; ++i) {
+        auto e = (*tri)->edge (i);
+        if (! e->is_segment ()) {
+          auto ot = e->other (*tri);
+          if (ot && ! ot->is_outside ()) {
+            next_tris.insert (ot);
+            ot->set_outside (true);
+          }
+        }
+      }
+    }
+
+    new_tri.swap (next_tris);
+
+  }
+
+  //  join edges where possible
+  for (auto re = resolved_edges.begin (); re != resolved_edges.end (); ++re) {
+    auto edges = re->second;
+    join_edges (edges);
+  }
+
+  m_is_constrained = true;
 }
 
-#if 0
-import math
-import sys
-from .triangle import *
+void
+Triangles::remove_outside_triangles ()
+{
+  tl_assert (m_is_constrained);
 
-class Triangles(object):
+  //  NOTE: don't remove while iterating
+  std::vector<db::Triangle *> to_remove;
+  for (auto tri = begin (); tri != end (); ++tri) {
+    if (tri->is_outside ()) {
+      to_remove.push_back (const_cast<db::Triangle *> (tri.operator-> ()));
+    }
+  }
 
-  def constrain(self, contours: [[Edge]]) -> object:
+  for (auto t = to_remove.begin (); t != to_remove.end (); ++t) {
+    remove (*t);
+  }
+}
 
-    """
-    Given a set of contours with edges, mark outer triangles
+void
+Triangles::clear ()
+{
+  mp_edges.clear ();
+  mp_triangles.clear ();
+  m_vertex_heap.clear ();
+  m_is_constrained = false;
+  m_level = 0;
+  m_id = 0;
+}
 
-    The edges must be made from existing vertexes. Edge orientation is
-    clockwise.
-    """
+void
+Triangles::create_constrained_delaunay (const db::Region &region, double dbu)
+{
+  clear ();
 
-    assert(not self.is_constrained)
+  std::vector<std::vector<db::Vertex *> > edge_contours;
 
-    resolved_edges = []
+  for (auto p = region.begin_merged (); ! p.at_end (); ++p) {
 
-    for c in contours:
-      for edge in c:
-        edges = self.ensure_edge(edge)
-        resolved_edges.append( (edge, edges) )
+    edge_contours.push_back (std::vector<db::Vertex *> ());
+    for (auto pt = p->begin_hull (); pt != p->end_hull (); ++pt) {
+      edge_contours.back ().push_back (insert_point (db::DPoint (*pt) * dbu));
+    }
 
-    for tri in self.triangles:
-      tri.is_outside = False
-      for s in tri.edges():
-        s.is_segment = False
+    for (unsigned int h = 0; h < p->holes (); ++h) {
+      edge_contours.push_back (std::vector<db::Vertex *> ());
+      for (auto pt = p->begin_hole (h); pt != p->end_hole (h); ++pt) {
+        edge_contours.back ().push_back (insert_point (db::DPoint (*pt) * dbu));
+      }
+    }
 
-    new_tri = set()
+  }
 
-    for re in resolved_edges:
-      edge, edges = re
-      for s in edges:
-        s.is_segment = True
-        outer_tri = None
-        d = sprod_sign(edge.d(), s.d())
-        if d > 0:
-          outer_tri = s.left
-        if d < 0:
-          outer_tri = s.right
-        if outer_tri is not None:
-          assert (outer_tri in self.triangles)
-          new_tri.add(outer_tri)
-          outer_tri.is_outside = True
+  constrain (edge_contours);
+}
 
-    while len(new_tri) > 0:
-
-      next_tris = set()
-
-      for tri in new_tri:
-        for s in tri.edges():
-          if not s.is_segment:
-            ot = s.other(tri)
-            if ot is not None and not ot.is_outside:
-              next_tris.add(ot)
-              ot.is_outside = True
-
-      new_tri = next_tris
-
-    # join edges where possible
-    for re in resolved_edges:
-      _, edges = re
-      self._join_edges(edges)
-
-    self.is_constrained = True
-
-  def remove_outside_triangles(self):
-
-    assert self.is_constrained
-
-    for tri in self.triangles:
-      for s in tri.edges():
-        s.level = 0
-
-    to_remove = [tri for tri in self.triangles if tri.is_outside]
-    for tri in to_remove:
-      for s in tri.edges():
-        if not s.is_segment and s.level == 0:
-          s.level = 1
-          s.unlink()
-      tri.unlink()
-      self.triangles.remove(tri)
-
-    to_remove = [v for v in self.vertexes if len(v.edges) == 0]
-    for v in to_remove:
-      self.vertexes.remove(v)
-
-  def create_constrained_delaunay(self, contours: [[Edge]]):
-
-    edge_contours = []
-
-    for c in contours:
-
-      if len(c) < 3:
-        continue
-
-      edges = []
-      edge_contours.append(edges)
-
-      vl = None
-      vfirst = None
-      for pt in c:
-        v = self.insert(Vertex(pt.x, pt.y))
-        if vfirst is None:
-          vfirst = v
-        else:
-          edges.append(Edge(vl, v))
-        vl = v
-      edges.append(Edge(vl, vfirst))
-
-    self.constrain(edge_contours)
-
-
-#endif
+}

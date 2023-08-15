@@ -1393,9 +1393,9 @@ static bool is_skinny (db::Triangle *tri, const Triangles::TriangulateParameters
     return false;
   } else {
     auto cr = tri->circumcircle ();
-    double lmin = tri->edge (0)->d ().sq_length ();
+    double lmin = tri->edge (0)->d ().length ();
     for (int i = 1; i < 3; ++i) {
-      lmin = std::min (lmin, tri->edge (i)->d ().sq_length ());
+      lmin = std::min (lmin, tri->edge (i)->d ().length ());
     }
     double delta = (fabs (lmin / cr.second) + fabs (param.b)) * db::epsilon;
     return lmin / cr.second < param.b - delta;
@@ -1461,7 +1461,7 @@ Triangles::triangulate (const db::Region &region, const TriangulateParameters &p
   }
 
   // @@@ TODO: break if iteration gets stuck
-  while (nloop < 20) { // @@@
+  while (nloop < parameters.max_iterations) { // @@@
 
     ++nloop;
     tl::info << "Iteration " << nloop << " ..";
@@ -1548,7 +1548,7 @@ Triangles::triangulate (const db::Region &region, const TriangulateParameters &p
 
     }
 
-    // @@@ tris.dump_as_gdstxt("debug2.txt")
+    // @@@ dump ("debug2.gds"); // @@@
 
   }
 

@@ -623,18 +623,20 @@ TEST(Triangles_test_create_constrained_delaunay)
 TEST(Triangles_test_triangulate)
 {
   db::Region r;
-  r.insert (db::Box (0, 0, 1000, 1000));
+  r.insert (db::Box (0, 0, 10000, 10000));
 
   db::Region r2;
-  r2.insert (db::Box (200, 200, 800, 800));
+  r2.insert (db::Box (2000, 2000, 8000, 8000));
 
   r -= r2;
 
   db::Triangles::TriangulateParameters param;
-  param.max_area = 0.1;
+  param.b = 1.21;
+  param.max_area = 1.0;
+  param.max_area_border = 0.0;
 
   db::Triangles tri;
-  tri.triangulate (r, param);
+  tri.triangulate (r, param, 0.001);
 
   tri.dump ("debug.gds");
 

@@ -45,7 +45,8 @@ public:
     TriangulateParameters ()
       : b (1.0),
         max_area (0.0),
-        max_area_border (0.0)
+        max_area_border (0.0),
+        max_iterations (std::numeric_limits<size_t>::max ())
     { }
 
     /**
@@ -62,6 +63,11 @@ public:
      *  @brief Max area for border triangles or zero for "use max_area"
      */
     double max_area_border;
+
+    /**
+     *  @brief Max number of iterations
+     */
+    size_t max_iterations;
   };
 
   typedef tl::shared_collection<db::Triangle> triangles_type;

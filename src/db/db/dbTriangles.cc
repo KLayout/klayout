@@ -301,7 +301,7 @@ Triangles::find_points_around (db::Vertex *vertex, double radius)
     for (auto v = new_vertexes.begin (); v != new_vertexes.end (); ++v) {
       for (auto e = (*v)->begin_edges (); e != (*v)->end_edges (); ++e) {
         db::Vertex *ov = e->other (*v);
-        if (ov->in_circle (*vertex, radius) == 1 && seen.insert (*v).second) {
+        if (ov->in_circle (*vertex, radius) == 1 && seen.insert (ov).second) {
           next_vertexes.push_back (ov);
           res.push_back (ov);
         }

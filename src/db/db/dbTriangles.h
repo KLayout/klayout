@@ -180,6 +180,10 @@ public:
    */
   void remove_outside_triangles ();
 
+  //  NOTE: these functions are SLOW and intended to test purposes only
+  std::vector<db::Vertex *> find_touching (const db::DBox &box) const;
+  std::vector<db::Vertex *> find_inside_circle (const db::DPoint &center, double radius) const;
+
 private:
   tl::shared_collection<db::Triangle> mp_triangles;
   tl::weak_collection<db::TriangleEdge> mp_edges;
@@ -193,10 +197,6 @@ private:
   db::TriangleEdge *create_edge (db::Vertex *v1, db::Vertex *v2);
   db::Triangle *create_triangle (db::TriangleEdge *e1, db::TriangleEdge *e2, db::TriangleEdge *e3);
   void remove (db::Triangle *tri);
-
-  //  NOTE: these functions are SLOW and intended to test purposes only
-  std::vector<db::Vertex *> find_touching (const db::DBox &box) const;
-  std::vector<db::Vertex *> find_inside_circle (const db::DPoint &center, double radius) const;
 
   void remove_outside_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles = 0);
   void remove_inside_vertex (db::Vertex *vertex, std::vector<db::Triangle *> *new_triangles_out = 0);

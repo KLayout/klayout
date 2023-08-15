@@ -468,79 +468,48 @@ TEST(Triangle_test_heavy_constrain)
   tl::info << tl::endl << "done.";
 }
 
-#if 0
-def test_heavy_constrain(self):
+TEST(Triangle_test_heavy_find_point_around)
+{
+  tl::info << "Running Triangle_test_heavy_find_point_around " << tl::noendl;
 
-  print("Running test_heavy_constrain ")
+  for (unsigned int l = 0; l < 100; ++l) {
 
-  for l in range(0, 100):
+    srand (l);
+    tl::info << "." << tl::noendl;
 
-    random.seed(l)
-    print(".", end = '')
+    db::Triangles tris;
+    double res = 128.0;
 
-    tris = t.Triangles()
-    res = 128.0
-    for i in range(0, int(random.random() * 100) + 3):
-      x = round(random.random() * res) * (1.0 / res)
-      y = round(random.random() * res) * (1.0 / res)
-      tris.insert(t.Vertex(x, y))
+    unsigned int n = rand () % 190 + 10;
 
-    assert (tris.check() == True)
+    std::vector<db::Vertex *> vertexes;
 
-    if len(tris.triangles) < 1:
-      continue
+    for (unsigned int i = 0; i < n; ++i) {
+      double x = round (flt_rand () * res) * (1.0 / res);
+      double y = round (flt_rand () * res) * (1.0 / res);
+      vertexes.push_back (tris.insert_point (x, y));
+    }
 
-    v1 = tris.insert(t.Vertex(0.25, 0.25))
-    v2 = tris.insert(t.Vertex(0.25, 0.75))
-    v3 = tris.insert(t.Vertex(0.75, 0.75))
-    v4 = tris.insert(t.Vertex(0.75, 0.25))
-    assert (tris.check() == True)
+    EXPECT_EQ (tris.check(), true);
 
-    contour = [ t.Edge(v1, v2), t.Edge(v2, v3), t.Edge(v3, v4), t.Edge(v4, v1) ]
-    tris.constrain([ contour ])
-    assert (tris.check(check_delaunay = False) == True)
-    tris.remove_outside_triangles()
+    for (int i = 0; i < 100; ++i) {
 
-    p1, p2 = tris.bbox()
-    assert(str(p1) == "(0.25, 0.25)")
-    assert(str(p2) == "(0.75, 0.75)")
+      unsigned int nv = rand () % (unsigned int) vertexes.size ();
+      auto vertex = vertexes [nv];
 
-    assert (tris.check() == True)
+      double r = round (flt_rand () * res) * (1.0 / res);
+      auto p1 = tris.find_points_around (vertex, r);
+      auto p2 = tris.find_inside_circle (*vertex, r);
 
-  print(" done.")
+      std::set<db::Vertex *> sp1 (p1.begin (), p1.end ());
+      std::set<db::Vertex *> sp2 (p2.begin (), p2.end ());
+      sp2.erase (vertex);
 
-def test_heavy_find_point_around(self):
+      EXPECT_EQ (sp1 == sp2, true);
 
-  print("Running test_heavy_find_point_around ")
+    }
 
-  for l in range(0, 100):
+  }
 
-    print(".", end="")
-
-    random.seed(l)
-
-    tris = t.Triangles()
-    res = 128.0
-    for i in range(0, int(random.random() * 100) + 3):
-      x = round(random.random() * res) * (1.0 / res)
-      y = round(random.random() * res) * (1.0 / res)
-      tris.insert(t.Vertex(x, y))
-
-    assert (tris.check() == True)
-
-    for i in range(0, 100):
-
-      n = int(round(random.random() * (len(tris.vertexes) - 1)))
-      vertex = tris.vertexes[n]
-
-      r = round(random.random() * res) * (1.0 / res)
-      p1 = tris.find_points_around(vertex, r)
-      p2 = tris.find_inside_circle(vertex, r)
-      p2 = [ p for p in p2 if p != vertex ]
-
-      assert(len(p1) == len(p2))
-      for p in p1:
-        assert(p in p2)
-
-  print("")
-#endif
+  tl::info << tl::endl << "done.";
+}

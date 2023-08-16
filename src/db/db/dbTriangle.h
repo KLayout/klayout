@@ -477,6 +477,11 @@ public:
   TriangleEdge *find_edge_with (const Vertex *v1, const Vertex *v2) const;
 
   /**
+   *  @brief Finds the common edge for both triangles
+   */
+  TriangleEdge *common_edge (const Triangle *other) const;
+
+  /**
    *  @brief Returns a value indicating whether the point is inside (1), on the triangle (0) or outside (-1)
    */
   int contains (const db::DPoint &point) const;

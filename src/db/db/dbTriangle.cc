@@ -476,6 +476,18 @@ Triangle::find_edge_with (const Vertex *v1, const Vertex *v2) const
   tl_assert (false);
 }
 
+TriangleEdge *
+Triangle::common_edge (const Triangle *other) const
+{
+  for (int i = 0; i < 3; ++i) {
+    TriangleEdge *e = edge (i);
+    if (e->other (this) == other) {
+      return e;
+    }
+  }
+  return 0;
+}
+
 int
 Triangle::contains (const db::DPoint &point) const
 {

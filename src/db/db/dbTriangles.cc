@@ -338,7 +338,7 @@ Triangles::insert (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *n
     return vertex;
   }
 
-  //  the new vertex is on the edge between two triangles
+  //  check, if the new vertex is on an edge (may be edge between triangles or edge on outside)
   std::vector<db::TriangleEdge *> on_edges;
   for (int i = 0; i < 3; ++i) {
     db::TriangleEdge *e = tris.front ()->edge (i);

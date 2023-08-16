@@ -29,7 +29,7 @@
 #include <cstdlib>
 #include <cmath>
 
-TEST(Triangles_basic)
+TEST(basic)
 {
   db::Triangles tris;
   tris.init_box (db::DBox (1, 0, 5, 4));
@@ -40,7 +40,7 @@ TEST(Triangles_basic)
   EXPECT_EQ (tris.check (), true);
 }
 
-TEST(Triangles_flip)
+TEST(flip)
 {
   db::Triangles tris;
   tris.init_box (db::DBox (0, 0, 1, 1));
@@ -61,7 +61,7 @@ TEST(Triangles_flip)
   EXPECT_EQ (tris.check (), true);
 }
 
-TEST(Triangles_insert)
+TEST(insert)
 {
   db::Triangles tris;
   tris.init_box (db::DBox (0, 0, 1, 1));
@@ -71,7 +71,7 @@ TEST(Triangles_insert)
   EXPECT_EQ (tris.check (), true);
 }
 
-TEST(Triangles_split_segment)
+TEST(split_segment)
 {
   db::Triangles tris;
   tris.init_box (db::DBox (0, 0, 1, 1));
@@ -81,7 +81,7 @@ TEST(Triangles_split_segment)
   EXPECT_EQ (tris.check(), true);
 }
 
-TEST(Triangles_insert_vertex_twice)
+TEST(insert_vertex_twice)
 {
   db::Triangles tris;
   tris.init_box (db::DBox (0, 0, 1, 1));
@@ -93,7 +93,7 @@ TEST(Triangles_insert_vertex_twice)
   EXPECT_EQ (tris.check(), true);
 }
 
-TEST(Triangles_insert_vertex_convex)
+TEST(insert_vertex_convex)
 {
   db::Triangles tris;
   tris.insert_point (0.2, 0.2);
@@ -105,7 +105,7 @@ TEST(Triangles_insert_vertex_convex)
   EXPECT_EQ (tris.check(), true);
 }
 
-TEST(Triangles_insert_vertex_convex2)
+TEST(insert_vertex_convex2)
 {
   db::Triangles tris;
   tris.insert_point (0.25, 0.1);
@@ -116,7 +116,7 @@ TEST(Triangles_insert_vertex_convex2)
   EXPECT_EQ (tris.check(), true);
 }
 
-TEST(Triangles_insert_vertex_convex3)
+TEST(insert_vertex_convex3)
 {
   db::Triangles tris;
   tris.insert_point (0.25, 0.5);
@@ -127,7 +127,7 @@ TEST(Triangles_insert_vertex_convex3)
   EXPECT_EQ (tris.check(), true);
 }
 
-TEST(Triangles_search_edges_crossing)
+TEST(search_edges_crossing)
 {
   db::Triangles tris;
   db::Vertex *v1 = tris.insert_point (0.2, 0.2);
@@ -147,7 +147,7 @@ TEST(Triangles_search_edges_crossing)
   EXPECT_EQ (std::find (xedges.begin (), xedges.end (), s2) != xedges.end (), true);
 }
 
-TEST(Triangles_illegal_edge1)
+TEST(illegal_edge1)
 {
   db::Vertex v1 (0, 0);
   db::Vertex v2 (1.6, 1.6);
@@ -186,7 +186,7 @@ TEST(Triangles_illegal_edge1)
   }
 }
 
-TEST(Triangles_illegal_edge2)
+TEST(illegal_edge2)
 {
   //  numerical border case
   db::Vertex v1 (773.94756216690905, 114.45875269431208);
@@ -242,7 +242,26 @@ namespace {
   };
 }
 
-TEST(Triangles_test_heavy_insert)
+TEST(insert_many)
+{
+  srand (0);
+
+  db::Triangles tris;
+  double res = 65536.0;
+
+  db::DBox bbox;
+
+  unsigned int n = 200000;
+  for (unsigned int i = 0; i < n; ++i) {
+    double x = round (flt_rand () * res) * 0.0001;
+    double y = round (flt_rand () * res) * 0.0001;
+    tris.insert_point (x, y);
+  }
+
+  tris.dump ("debug.gds");
+}
+
+TEST(heavy_insert)
 {
   tl::info << "Running test_heavy_insert " << tl::noendl;
 
@@ -268,7 +287,7 @@ TEST(Triangles_test_heavy_insert)
     }
 
     //  not strictly true, but very likely with at least 10 vertexes:
-    EXPECT_EQ (tris.num_triangles () > 0, true);
+    EXPECT_GT (tris.num_triangles (), size_t (0));
     EXPECT_EQ (tris.bbox ().to_string (), bbox.to_string ());
 
     bool ok = true;
@@ -298,7 +317,7 @@ TEST(Triangles_test_heavy_insert)
   tl::info << tl::endl << "done.";
 }
 
-TEST(Triangles_test_heavy_remove)
+TEST(heavy_remove)
 {
   tl::info << "Running test_heavy_remove " << tl::noendl;
 
@@ -352,7 +371,7 @@ TEST(Triangles_test_heavy_remove)
   tl::info << tl::endl << "done.";
 }
 
-TEST(Triangles_test_ensure_edge)
+TEST(ensure_edge)
 {
   srand (0);
 
@@ -418,7 +437,7 @@ bool safe_inside (const db::DBox &b1, const db::DBox &b2)
          (ct::less (b1.top (), b2.top ())       || ct::equal (b1.top (), b2.top ()));
 }
 
-TEST(Triangles_test_constrain)
+TEST(constrain)
 {
   srand (0);
 
@@ -477,7 +496,7 @@ TEST(Triangles_test_constrain)
   EXPECT_EQ (tl::to_string (area_in), "0.25");
 }
 
-TEST(Triangles_test_heavy_constrain)
+TEST(heavy_constrain)
 {
   tl::info << "Running test_heavy_constrain " << tl::noendl;
 
@@ -547,7 +566,7 @@ TEST(Triangles_test_heavy_constrain)
   tl::info << tl::endl << "done.";
 }
 
-TEST(Triangles_test_heavy_find_point_around)
+TEST(heavy_find_point_around)
 {
   tl::info << "Running Triangle_test_heavy_find_point_around " << tl::noendl;
 
@@ -593,7 +612,7 @@ TEST(Triangles_test_heavy_find_point_around)
   tl::info << tl::endl << "done.";
 }
 
-TEST(Triangles_test_create_constrained_delaunay)
+TEST(create_constrained_delaunay)
 {
   db::Region r;
   r.insert (db::Box (0, 0, 1000, 1000));
@@ -620,7 +639,7 @@ TEST(Triangles_test_create_constrained_delaunay)
              "((0, 1000), (200, 800), (200, 200))");
 }
 
-TEST(Triangles_test_triangulate)
+TEST(triangulate)
 {
   db::Region r;
   r.insert (db::Box (0, 0, 10000, 10000));
@@ -640,11 +659,12 @@ TEST(Triangles_test_triangulate)
   EXPECT_EQ (tri.check (), true);
 
   for (auto t = tri.begin (); t != tri.end (); ++t) {
-    EXPECT_EQ (t->area () <= param.max_area, true);
-    EXPECT_EQ (t->b () >= param.min_b, true);
+    EXPECT_LE (t->area (), param.max_area);
+    EXPECT_GE (t->b (), param.min_b);
   }
 
-  EXPECT_EQ (tri.num_triangles () > 100 && tri.num_triangles () < 150, true);
+  EXPECT_GT (tri.num_triangles (), size_t (100));
+  EXPECT_LT (tri.num_triangles (), size_t (150));
   tl::info << tri.num_triangles ();
 
   param.min_b = 1.0;
@@ -655,9 +675,10 @@ TEST(Triangles_test_triangulate)
   EXPECT_EQ (tri.check (), true);
 
   for (auto t = tri.begin (); t != tri.end (); ++t) {
-    EXPECT_EQ (t->area () <= param.max_area, true);
-    EXPECT_EQ (t->b () >= param.min_b, true);
+    EXPECT_LE (t->area (), param.max_area);
+    EXPECT_GE (t->b (), param.min_b);
   }
 
-  EXPECT_EQ (tri.num_triangles () > 900 && tri.num_triangles () < 1000, true);
+  EXPECT_GT (tri.num_triangles (), 900);
+  EXPECT_LT (tri.num_triangles (), 1000);
 }

@@ -133,15 +133,6 @@ bool equals (double a, double b)
   }
 }
 
-bool less (double a, double b)
-{
-  if (equals (a, b)) {
-    return false;
-  } else {
-    return a < b;
-  }
-}
-
 //  TODO: move this to tlString.h
 static std::string replicate (const char *s, size_t n)
 {

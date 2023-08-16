@@ -579,8 +579,8 @@ Path round_path_corners (const Path &path, int rad, int n)
   return Path (round_path_corners (db::DPath (path), double (rad), n, 0.5));
 }
 
-template class DB_PUBLIC path<Coord>;
-template class DB_PUBLIC path<DCoord>;
+template class path<Coord>;
+template class path<DCoord>;
 
 //  explicit instantiations
 template DB_PUBLIC void path<Coord>::create_shifted_points (Coord, Coord, Coord, bool, path<Coord>::pointlist_type::iterator, path<Coord>::pointlist_type::iterator, int, box_inserter<path<Coord>::box_type>) const;

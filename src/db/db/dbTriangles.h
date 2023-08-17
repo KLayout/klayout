@@ -31,6 +31,7 @@
 #include "dbRegion.h"
 
 #include "tlObjectCollection.h"
+#include "tlStableVector.h"
 
 namespace db
 {
@@ -230,6 +231,22 @@ public:
    */
   static bool is_illegal_edge (db::TriangleEdge *edge);
 
+  /**
+   *  @brief Statistics: number of flips (fixing)
+   */
+  size_t flips () const
+  {
+    return m_flips;
+  }
+
+  /**
+   *  @brief Statistics: number of hops (searching)
+   */
+  size_t hops () const
+  {
+    return m_hops;
+  }
+
   //  NOTE: these functions are SLOW and intended to test purposes only
   std::vector<db::Vertex *> find_touching (const db::DBox &box) const;
   std::vector<db::Vertex *> find_inside_circle (const db::DPoint &center, double radius) const;
@@ -237,10 +254,11 @@ public:
 private:
   tl::shared_collection<db::Triangle> mp_triangles;
   tl::weak_collection<db::TriangleEdge> mp_edges;
-  std::list<db::Vertex> m_vertex_heap;
+  tl::stable_vector<db::Vertex> m_vertex_heap;
   bool m_is_constrained;
   size_t m_level;
   size_t m_id;
+  size_t m_flips, m_hops;
 
   db::Vertex *create_vertex (double x, double y);
   db::Vertex *create_vertex (const db::DPoint &pt);
@@ -251,7 +269,7 @@ private:
   void remove_outside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles = 0);
   void remove_inside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles_out = 0);
   std::vector<db::Triangle *> fill_concave_corners (const std::vector<TriangleEdge *> &edges);
-  int fix_triangles(const std::vector<db::Triangle *> &tris, const std::vector<db::TriangleEdge *> &fixed_edges, std::list<tl::weak_ptr<db::Triangle> > *new_triangles);
+  void fix_triangles (const std::vector<db::Triangle *> &tris, const std::vector<db::TriangleEdge *> &fixed_edges, std::list<tl::weak_ptr<db::Triangle> > *new_triangles);
   std::vector<db::Triangle *> find_triangle_for_point (const db::DPoint &point);
   db::TriangleEdge *find_closest_edge (const db::DPoint &p, db::Vertex *vstart = 0, bool inside_only = false);
   db::Vertex *insert (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles = 0);

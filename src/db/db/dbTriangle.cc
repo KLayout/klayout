@@ -309,37 +309,35 @@ Triangle::Triangle ()
 }
 
 Triangle::Triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3)
-  : m_is_outside (false), mp_e1 (e1), mp_e2 (e2), mp_e3 (e3), m_id (0)
+  : m_is_outside (false), mp_e1 (e1), m_id (0)
 {
-  mp_v1 = e1->v1 ();
-  mp_v2 = e1->other (mp_v1);
+  mp_v1 = mp_e1->v1 ();
+  mp_v2 = mp_e1->other (mp_v1);
 
   if (e2->has_vertex (mp_v2)) {
-    mp_v3 = e2->other (mp_v2);
-    tl_assert (e3->other (mp_v3) == mp_v1);
+    mp_e2 = e2;
+    mp_e3 = e3;
   } else {
-    mp_v3 = e3->other (mp_v2);
-    tl_assert (e2->other (mp_v3) == mp_v1);
+    mp_e2 = e3;
+    mp_e3 = e2;
   }
-
-  //  enforce clockwise orientation
-  if (db::vprod_sign (*mp_v3 - *mp_v1, *mp_v2 - *mp_v1) < 0) {
-    std::swap (mp_v3, mp_v2);
-  }
+  mp_v3 = mp_e2->other (mp_v2);
 
   //  establish link to edges
   for (int i = 0; i < 3; ++i) {
     TriangleEdge *e = edge (i);
-    int side_of = 0;
-    for (int j = 0; j < 3; ++j) {
-      side_of += e->side_of (*vertex (j));
-    }
+    int side_of = e->side_of (*vertex (i - 1));
     //  NOTE: in the degenerated case, the triangle is not attached to an edge!
     if (side_of < 0) {
       e->set_left (this);
     } else if (side_of > 0) {
       e->set_right (this);
     }
+  }
+
+  //  enforce clockwise orientation
+  if (db::vprod_sign (*mp_v3 - *mp_v1, *mp_v2 - *mp_v1) < 0) {
+    std::swap (mp_v3, mp_v2);
   }
 }
 

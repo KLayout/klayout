@@ -34,7 +34,7 @@ namespace db
 {
 
 Triangles::Triangles ()
-  : m_is_constrained (false), m_level (0)
+  : m_is_constrained (false), m_level (0), m_flips (0), m_hops (0)
 {
   //  .. nothing yet ..
 }
@@ -385,10 +385,38 @@ db::TriangleEdge *
 Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool inside_only)
 {
   if (!vstart) {
-    if (! mp_triangles.empty ()) {
-      vstart = mp_triangles.front ()->vertex (0);
+
+    if (! mp_edges.empty ()) {
+
+      unsigned int ls = 0;
+      size_t n = m_vertex_heap.size ();
+      size_t m = n;
+
+      //  A sample heuristics that takes a sqrt(N) sample from the
+      //  vertexes to find a good starting point
+
+      vstart = mp_edges.front ()->v1 ();
+      double dmin = vstart->distance (p);
+
+      while (ls * ls < m) {
+        m /= 2;
+        for (size_t i = m / 2; i < n; i += m) {
+          ++ls;
+          db::Vertex *v = (m_vertex_heap.begin () + i).operator-> ();
+          if (v->begin_edges () != v->end_edges ()) {
+            double d = v->distance (p);
+            if (d < dmin) {
+              vstart = v;
+              dmin = d;
+            }
+          }
+        }
+      }
+
     } else {
+
       return 0;
+
     }
   }
 
@@ -444,6 +472,8 @@ Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool insi
       }
 
     }
+
+    ++m_hops;
 
     v = vnext;
 
@@ -789,11 +819,9 @@ Triangles::remove_inside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::
   fix_triangles (to_fix_a, std::vector<db::TriangleEdge *> (), new_triangles_out);
 }
 
-int
+void
 Triangles::fix_triangles (const std::vector<db::Triangle *> &tris, const std::vector<db::TriangleEdge *> &fixed_edges, std::list<tl::weak_ptr<db::Triangle> > *new_triangles)
 {
-  int flips = 0;
-
   m_level += 1;
   for (auto e = fixed_edges.begin (); e != fixed_edges.end (); ++e) {
     (*e)->set_level (m_level);
@@ -836,7 +864,7 @@ Triangles::fix_triangles (const std::vector<db::Triangle *> &tris, const std::ve
           new_triangles->push_back (t2);
         }
 
-        ++flips;
+        ++m_flips;
         tl_assert (! is_illegal_edge (s12)); // @@@ remove later!
 
         for (int i = 0; i < 3; ++i) {
@@ -858,8 +886,6 @@ Triangles::fix_triangles (const std::vector<db::Triangle *> &tris, const std::ve
     }
 
   }
-
-  return flips;
 }
 
 bool

@@ -258,7 +258,9 @@ TEST(insert_many)
     tris.insert_point (x, y);
   }
 
-  tris.dump ("debug.gds");
+  tl::info << "avg. flips = " << double (tris.flips ()) / double (n);
+  tl::info << "avg. hops = " << double (tris.hops ()) / double (n);
+  // @@@ tris.dump ("debug.gds");
 }
 
 TEST(heavy_insert)

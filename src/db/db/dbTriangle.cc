@@ -102,6 +102,21 @@ Vertex::has_edge (const TriangleEdge *edge) const
   return false;
 }
 
+size_t
+Vertex::num_edges (int max_count) const
+{
+  if (max_count < 0) {
+    //  NOTE: this can be slow for a std::list, so we have max_count to limit this effort
+    return mp_edges.size ();
+  } else {
+    size_t n = 0;
+    for (auto i = mp_edges.begin (); i != mp_edges.end () && --max_count >= 0; ++i) {
+      ++n;
+    }
+    return n;
+  }
+}
+
 std::string
 Vertex::to_string (bool with_id) const
 {
@@ -110,18 +125,6 @@ Vertex::to_string (bool with_id) const
     res += tl::sprintf ("[%x]", (size_t)this);
   }
   return res;
-}
-
-void
-Vertex::remove_edge (db::TriangleEdge *edge)
-{
-  for (auto e = mp_edges.begin (); e != mp_edges.end (); ++e) {
-    if (*e == edge) {
-      mp_edges.erase (e);
-      return;
-    }
-  }
-  tl_assert (false);
 }
 
 int
@@ -172,17 +175,20 @@ void
 TriangleEdge::link ()
 {
   mp_v1->mp_edges.push_back (this);
+  m_ec_v1 = --mp_v1->mp_edges.end ();
+
   mp_v2->mp_edges.push_back (this);
+  m_ec_v2 = --mp_v2->mp_edges.end ();
 }
 
 void
 TriangleEdge::unlink ()
 {
   if (mp_v1) {
-    mp_v1->remove_edge (this);
+    mp_v1->remove_edge (m_ec_v1);
   }
   if (mp_v2) {
-    mp_v2->remove_edge (this);
+    mp_v2->remove_edge (m_ec_v2);
   }
   mp_v1 = mp_v2 = 0;
 }

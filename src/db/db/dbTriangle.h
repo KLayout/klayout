@@ -48,8 +48,9 @@ class DB_PUBLIC Vertex
   : public db::DPoint
 {
 public:
-  typedef std::vector<TriangleEdge *> edges_type;
+  typedef std::list<TriangleEdge *> edges_type;
   typedef edges_type::const_iterator edges_iterator;
+  typedef edges_type::iterator edges_iterator_non_const;
 
   Vertex ();
   Vertex (const DPoint &p);
@@ -63,7 +64,7 @@ public:
 
   edges_iterator begin_edges () const { return mp_edges.begin (); }
   edges_iterator end_edges () const { return mp_edges.end (); }
-  size_t num_edges () const { return mp_edges.size (); }
+  size_t num_edges (int max_count = -1) const;
 
   bool has_edge (const TriangleEdge *edge) const;
 
@@ -88,7 +89,11 @@ public:
 
 private:
   friend class TriangleEdge;
-  void remove_edge (db::TriangleEdge *edge);
+
+  void remove_edge (const edges_iterator_non_const &ec)
+  {
+    mp_edges.erase (ec);
+  }
 
   edges_type mp_edges;
   size_t m_level;
@@ -397,6 +402,7 @@ private:
 
   Vertex *mp_v1, *mp_v2;
   Triangle *mp_left, *mp_right;
+  Vertex::edges_iterator_non_const m_ec_v1, m_ec_v2;
   size_t m_level;
   size_t m_id;
   bool m_is_segment;

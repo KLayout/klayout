@@ -724,7 +724,7 @@ Triangles::remove_inside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::
 
   bool make_new_triangle = true;
 
-  while (vertex->num_edges () > 3) {
+  while (vertex->num_edges (4) > 3) {
 
     db::TriangleEdge *to_flip = 0;
     for (auto e = vertex->begin_edges (); e != vertex->end_edges () && to_flip == 0; ++e) {
@@ -746,9 +746,9 @@ Triangles::remove_inside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::
 
   }
 
-  if (vertex->num_edges () > 3) {
+  if (vertex->num_edges (4) > 3) {
 
-    tl_assert (vertex->num_edges () == 4);
+    tl_assert (vertex->num_edges (5) == 4);
 
     //  This case can happen if two edges attached to the vertex are collinear
     //  in this case choose the "join" strategy

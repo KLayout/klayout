@@ -42,7 +42,7 @@ Triangles::Triangles ()
 Triangles::~Triangles ()
 {
   while (! mp_triangles.empty ()) {
-    remove (mp_triangles.front ());
+    remove (mp_triangles.begin ().operator-> ());
   }
 }
 
@@ -63,10 +63,20 @@ Triangles::create_vertex (const db::DPoint &pt)
 db::TriangleEdge *
 Triangles::create_edge (db::Vertex *v1, db::Vertex *v2)
 {
-  m_edges_heap.push_back (db::TriangleEdge (v1, v2));
-  m_edges_heap.back ().link ();
-  m_edges_heap.back ().set_id (++m_id);
-  return &m_edges_heap.back ();
+  db::TriangleEdge *edge = 0;
+
+  if (! m_returned_edges.empty ()) {
+    edge = m_returned_edges.back ();
+    m_returned_edges.pop_back ();
+    *edge = db::TriangleEdge (v1, v2);
+  } else {
+    m_edges_heap.push_back (db::TriangleEdge (v1, v2));
+    edge = &m_edges_heap.back ();
+  }
+
+  edge->link ();
+  edge->set_id (++m_id);
+  return edge;
 }
 
 db::Triangle *
@@ -90,8 +100,10 @@ Triangles::remove (db::Triangle *tri)
 
   //  clean up edges we do no longer need
   for (int i = 0; i < 3; ++i) {
-    if (edges [i] && edges [i]->left () == 0 && edges [i]->right () == 0) {
-      edges [i]->unlink ();
+    db::TriangleEdge *e = edges [i];
+    if (e && e->left () == 0 && e->right () == 0 && e->v1 ()) {
+      e->unlink ();
+      m_returned_edges.push_back (e);
     }
   }
 }
@@ -392,7 +404,7 @@ Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool insi
       //  A sample heuristics that takes a sqrt(N) sample from the
       //  vertexes to find a good starting point
 
-      vstart = mp_triangles.front ()->vertex (0);
+      vstart = mp_triangles.begin ()->vertex (0);
       double dmin = vstart->distance (p);
 
       while (ls * ls < m) {
@@ -1381,6 +1393,7 @@ Triangles::clear ()
   m_edges_heap.clear ();
   mp_triangles.clear ();
   m_vertex_heap.clear ();
+  m_returned_edges.clear ();
   m_is_constrained = false;
   m_level = 0;
   m_id = 0;

@@ -30,6 +30,7 @@
 #include "dbEdge.h"
 
 #include "tlObjectCollection.h"
+#include "tlList.h"
 
 namespace db
 {
@@ -428,7 +429,7 @@ struct TriangleEdgeLessFunc
  *  @brief A class representing a triangle
  */
 class DB_PUBLIC Triangle
-  : public tl::Object
+  : public tl::list_node<Triangle>, public tl::Object
 {
 public:
   Triangle ();

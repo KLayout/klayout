@@ -77,7 +77,7 @@ public:
     int base_verbosity;
   };
 
-  typedef tl::shared_collection<db::Triangle> triangles_type;
+  typedef tl::list<db::Triangle> triangles_type;
   typedef triangles_type::const_iterator triangle_iterator;
 
   Triangles ();
@@ -252,8 +252,9 @@ public:
   std::vector<db::Vertex *> find_inside_circle (const db::DPoint &center, double radius) const;
 
 private:
-  tl::shared_collection<db::Triangle> mp_triangles;
+  tl::list<db::Triangle> mp_triangles;
   tl::stable_vector<db::TriangleEdge> m_edges_heap;
+  std::vector<db::TriangleEdge *> m_returned_edges;
   tl::stable_vector<db::Vertex> m_vertex_heap;
   bool m_is_constrained;
   size_t m_level;

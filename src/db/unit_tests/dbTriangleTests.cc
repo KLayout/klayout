@@ -52,7 +52,7 @@ static std::string edges_from_vertex (const db::Vertex &v)
     if (! res.empty ()) {
       res += ", ";
     }
-    res += e->to_string ();
+    res += (*e)->to_string ();
   }
   return res;
 }
@@ -77,20 +77,24 @@ TEST(Vertex_edge_registration)
   db::Vertex v3 (2, 1);
 
   std::unique_ptr<db::TriangleEdge> e1 (new db::TriangleEdge (&v1, &v2));
+  e1->link ();
   EXPECT_EQ (edges_from_vertex (v1), "((0, 0), (1, 2))");
   EXPECT_EQ (edges_from_vertex (v2), "((0, 0), (1, 2))");
   EXPECT_EQ (edges_from_vertex (v3), "");
 
   std::unique_ptr<db::TriangleEdge> e2 (new db::TriangleEdge (&v2, &v3));
+  e2->link ();
   EXPECT_EQ (edges_from_vertex (v1), "((0, 0), (1, 2))");
   EXPECT_EQ (edges_from_vertex (v2), "((0, 0), (1, 2)), ((1, 2), (2, 1))");
   EXPECT_EQ (edges_from_vertex (v3), "((1, 2), (2, 1))");
 
+  e2->unlink ();
   e2.reset (0);
   EXPECT_EQ (edges_from_vertex (v1), "((0, 0), (1, 2))");
   EXPECT_EQ (edges_from_vertex (v2), "((0, 0), (1, 2))");
   EXPECT_EQ (edges_from_vertex (v3), "");
 
+  e1->unlink ();
   e1.reset (0);
   EXPECT_EQ (edges_from_vertex (v1), "");
   EXPECT_EQ (edges_from_vertex (v2), "");
@@ -106,8 +110,11 @@ TEST(Vertex_triangles)
   EXPECT_EQ (triangles_from_vertex (v1), "");
 
   std::unique_ptr<db::TriangleEdge> e1 (new db::TriangleEdge (&v1, &v2));
+  e1->link ();
   std::unique_ptr<db::TriangleEdge> e2 (new db::TriangleEdge (&v2, &v3));
+  e2->link ();
   std::unique_ptr<db::TriangleEdge> e3 (new db::TriangleEdge (&v3, &v1));
+  e3->link ();
 
   std::unique_ptr<db::Triangle> tri (new db::Triangle (e1.get (), e2.get (), e3.get ()));
   EXPECT_EQ (triangles_from_vertex (v1), "((0, 0), (1, 2), (2, 1))");
@@ -115,12 +122,20 @@ TEST(Vertex_triangles)
   EXPECT_EQ (triangles_from_vertex (v3), "((0, 0), (1, 2), (2, 1))");
 
   std::unique_ptr<db::TriangleEdge> e4 (new db::TriangleEdge (&v1, &v4));
+  e4->link ();
   std::unique_ptr<db::TriangleEdge> e5 (new db::TriangleEdge (&v2, &v4));
+  e5->link ();
   std::unique_ptr<db::Triangle> tri2 (new db::Triangle (e1.get (), e4.get (), e5.get ()));
   EXPECT_EQ (triangles_from_vertex (v1), "((0, 0), (-1, 2), (1, 2)), ((0, 0), (1, 2), (2, 1))");
   EXPECT_EQ (triangles_from_vertex (v2), "((0, 0), (-1, 2), (1, 2)), ((0, 0), (1, 2), (2, 1))");
   EXPECT_EQ (triangles_from_vertex (v3), "((0, 0), (1, 2), (2, 1))");
   EXPECT_EQ (triangles_from_vertex (v4), "((0, 0), (-1, 2), (1, 2))");
+
+  tri->unlink ();
+  EXPECT_EQ (triangles_from_vertex (v1), "((0, 0), (-1, 2), (1, 2))");
+
+  tri2->unlink ();
+  EXPECT_EQ (triangles_from_vertex (v1), "");
 }
 
 //  Tests for Triangle class

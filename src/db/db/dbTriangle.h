@@ -48,7 +48,7 @@ class DB_PUBLIC Vertex
   : public db::DPoint
 {
 public:
-  typedef tl::weak_collection<db::TriangleEdge> edges_type;
+  typedef std::vector<TriangleEdge *> edges_type;
   typedef edges_type::const_iterator edges_iterator;
 
   Vertex ();
@@ -61,9 +61,9 @@ public:
   bool is_outside () const;
   std::vector<db::Triangle *> triangles () const;
 
-  edges_iterator begin_edges () const { return m_edges.begin (); }
-  edges_iterator end_edges () const { return m_edges.end (); }
-  size_t num_edges () const { return m_edges.size (); }
+  edges_iterator begin_edges () const { return mp_edges.begin (); }
+  edges_iterator end_edges () const { return mp_edges.end (); }
+  size_t num_edges () const { return mp_edges.size (); }
 
   bool has_edge (const TriangleEdge *edge) const;
 
@@ -88,8 +88,9 @@ public:
 
 private:
   friend class TriangleEdge;
+  void remove_edge (db::TriangleEdge *edge);
 
-  edges_type m_edges;
+  edges_type mp_edges;
   size_t m_level;
 };
 
@@ -97,7 +98,6 @@ private:
  *  @brief A class representing an edge in the Delaunay triangulation graph
  */
 class DB_PUBLIC TriangleEdge
-  : public tl::Object
 {
 public:
   class TriangleIterator
@@ -153,7 +153,6 @@ public:
   };
 
   TriangleEdge ();
-  TriangleEdge (Vertex *v1, Vertex *v2);
 
   Vertex *v1 () const { return mp_v1; }
   Vertex *v2 () const { return mp_v2; }
@@ -162,14 +161,14 @@ public:
   {
     std::swap (mp_v1, mp_v2);
 
-    Triangle *l = mp_left.get ();
-    Triangle *r = mp_right.get ();
+    Triangle *l = mp_left;
+    Triangle *r = mp_right;
     mp_left = r;
     mp_right = l;
   }
 
-  Triangle *left  () const { return const_cast<Triangle *> (mp_left.get ()); }
-  Triangle *right () const { return const_cast<Triangle *> (mp_right.get ()); }
+  Triangle *left  () const { return mp_left; }
+  Triangle *right () const { return mp_right; }
 
   TriangleIterator begin_triangles () const
   {
@@ -385,18 +384,22 @@ public:
    */
   bool has_triangle (const Triangle *t) const;
 
+  //  --- exposed for test purposes only ---
+
+  TriangleEdge (Vertex *v1, Vertex *v2);
+
+  void unlink ();
+  void link ();
+
 private:
   friend class Triangle;
+  friend class Triangles;
 
   Vertex *mp_v1, *mp_v2;
-  tl::weak_ptr<Triangle> mp_left, mp_right;
+  Triangle *mp_left, *mp_right;
   size_t m_level;
   size_t m_id;
   bool m_is_segment;
-
-  //  no copying
-  // @@@ TriangleEdge &operator= (const TriangleEdge &);
-  // @@@ TriangleEdge (const TriangleEdge &);
 
   void set_left  (Triangle *t);
   void set_right (Triangle *t);
@@ -424,6 +427,8 @@ class DB_PUBLIC Triangle
 public:
   Triangle ();
   Triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3);
+
+  ~Triangle ();
 
   void unlink ();
 
@@ -499,7 +504,7 @@ public:
    */
   bool has_edge (const db::TriangleEdge *e) const
   {
-    return mp_e1.get () == e || mp_e2.get () == e || mp_e3.get () == e;
+    return mp_e1 == e || mp_e2 == e || mp_e3 == e;
   }
 
   /**
@@ -524,7 +529,7 @@ public:
 
 private:
   bool m_is_outside;
-  tl::weak_ptr<TriangleEdge> mp_e1, mp_e2, mp_e3;
+  TriangleEdge *mp_e1, *mp_e2, *mp_e3;
   db::Vertex *mp_v1, *mp_v2, *mp_v3;
   size_t m_id;
 

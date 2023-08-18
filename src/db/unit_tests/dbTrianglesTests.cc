@@ -643,8 +643,6 @@ TEST(create_constrained_delaunay)
 
 TEST(triangulate)
 {
-  tl::equals(1.0, 2.0);
-  return; // @@@
   db::Region r;
   r.insert (db::Box (0, 0, 10000, 10000));
 
@@ -669,7 +667,6 @@ TEST(triangulate)
 
   EXPECT_GT (tri.num_triangles (), size_t (100));
   EXPECT_LT (tri.num_triangles (), size_t (150));
-  tl::info << tri.num_triangles ();
 
   param.min_b = 1.0;
   param.max_area = 0.1;

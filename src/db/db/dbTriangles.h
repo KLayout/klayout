@@ -253,7 +253,7 @@ public:
 
 private:
   tl::shared_collection<db::Triangle> mp_triangles;
-  tl::weak_collection<db::TriangleEdge> mp_edges;
+  tl::stable_vector<db::TriangleEdge> m_edges_heap;
   tl::stable_vector<db::Vertex> m_vertex_heap;
   bool m_is_constrained;
   size_t m_level;

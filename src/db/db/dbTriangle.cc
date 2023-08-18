@@ -68,8 +68,8 @@ Vertex::Vertex (db::DCoord x, db::DCoord y)
 bool
 Vertex::is_outside () const
 {
-  for (auto e = m_edges.begin (); e != m_edges.end (); ++e) {
-    if (e->is_outside ()) {
+  for (auto e = mp_edges.begin (); e != mp_edges.end (); ++e) {
+    if ((*e)->is_outside ()) {
       return true;
     }
   }
@@ -81,8 +81,8 @@ Vertex::triangles () const
 {
   std::set<db::Triangle *> seen;
   std::vector<db::Triangle *> res;
-  for (auto e = m_edges.begin (); e != m_edges.end (); ++e) {
-    for (auto t = e->begin_triangles (); t != e->end_triangles (); ++t) {
+  for (auto e = mp_edges.begin (); e != mp_edges.end (); ++e) {
+    for (auto t = (*e)->begin_triangles (); t != (*e)->end_triangles (); ++t) {
       if (seen.insert (t.operator-> ()).second) {
         res.push_back (t.operator-> ());
       }
@@ -94,8 +94,8 @@ Vertex::triangles () const
 bool
 Vertex::has_edge (const TriangleEdge *edge) const
 {
-  for (auto e = m_edges.begin (); e != m_edges.end (); ++e) {
-    if (e.operator-> () == edge) {
+  for (auto e = mp_edges.begin (); e != mp_edges.end (); ++e) {
+    if (*e == edge) {
       return true;
     }
   }
@@ -107,9 +107,21 @@ Vertex::to_string (bool with_id) const
 {
   std::string res = tl::sprintf ("(%.12g, %.12g)", x (), y());
   if (with_id) {
-    res += tl::sprintf ("[%p]", (void *)this);
+    res += tl::sprintf ("[%x]", (size_t)this);
   }
   return res;
+}
+
+void
+Vertex::remove_edge (db::TriangleEdge *edge)
+{
+  for (auto e = mp_edges.begin (); e != mp_edges.end (); ++e) {
+    if (*e == edge) {
+      mp_edges.erase (e);
+      return;
+    }
+  }
+  tl_assert (false);
 }
 
 int
@@ -141,8 +153,7 @@ TriangleEdge::TriangleEdge ()
 TriangleEdge::TriangleEdge (Vertex *v1, Vertex *v2)
   : mp_v1 (v1), mp_v2 (v2), mp_left (), mp_right (), m_level (0), m_id (0), m_is_segment (false)
 {
-  v1->m_edges.push_back (this);
-  v2->m_edges.push_back (this);
+  //  .. nothing yet ..
 }
 
 void
@@ -157,14 +168,33 @@ TriangleEdge::set_right (Triangle *t)
   mp_right = t;
 }
 
+void
+TriangleEdge::link ()
+{
+  mp_v1->mp_edges.push_back (this);
+  mp_v2->mp_edges.push_back (this);
+}
+
+void
+TriangleEdge::unlink ()
+{
+  if (mp_v1) {
+    mp_v1->remove_edge (this);
+  }
+  if (mp_v2) {
+    mp_v2->remove_edge (this);
+  }
+  mp_v1 = mp_v2 = 0;
+}
+
 Triangle *
 TriangleEdge::other (const Triangle *t) const
 {
-  if (t == mp_left.get ()) {
-    return const_cast<Triangle *> (mp_right.get ());
+  if (t == mp_left) {
+    return mp_right;
   }
-  if (t == mp_right.get ()) {
-    return const_cast<Triangle *> (mp_left.get ());
+  if (t == mp_right) {
+    return mp_left;
   }
   tl_assert (false);
   return 0;
@@ -206,7 +236,7 @@ TriangleEdge::to_string (bool with_id) const
 {
   std::string res = std::string ("(") + mp_v1->to_string (with_id) + ", " + mp_v2->to_string (with_id) + ")";
   if (with_id) {
-    res += tl::sprintf ("[%p]", (void *)this);
+    res += tl::sprintf ("[%x]", (size_t)this);
   }
   return res;
 }
@@ -341,6 +371,11 @@ Triangle::Triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3)
   }
 }
 
+Triangle::~Triangle ()
+{
+  unlink ();
+}
+
 void
 Triangle::unlink ()
 {
@@ -376,7 +411,6 @@ Triangle::to_string (bool with_id) const
 Vertex *
 Triangle::vertex (int n) const
 {
-  tl_assert (mp_e1 && mp_e2 && mp_e3);
   n = (n + 3) % 3;
   if (n == 0) {
     return mp_v1;
@@ -392,11 +426,11 @@ Triangle::edge (int n) const
 {
   n = (n + 3) % 3;
   if (n == 0) {
-    return const_cast<TriangleEdge *> (mp_e1.get ());
+    return mp_e1;
   } else if (n == 1) {
-    return const_cast<TriangleEdge *> (mp_e2.get ());
+    return mp_e2;
   } else {
-    return const_cast<TriangleEdge *> (mp_e3.get ());
+    return mp_e3;
   }
 }
 

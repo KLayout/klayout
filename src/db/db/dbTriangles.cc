@@ -44,8 +44,6 @@ Triangles::~Triangles ()
   while (! mp_triangles.empty ()) {
     remove (mp_triangles.front ());
   }
-
-  tl_assert (mp_edges.empty ());
 }
 
 db::Vertex *
@@ -65,10 +63,10 @@ Triangles::create_vertex (const db::DPoint &pt)
 db::TriangleEdge *
 Triangles::create_edge (db::Vertex *v1, db::Vertex *v2)
 {
-  db::TriangleEdge *res = new db::TriangleEdge (v1, v2);
-  res->set_id (++m_id);
-  mp_edges.push_back (res);
-  return res;
+  m_edges_heap.push_back (db::TriangleEdge (v1, v2));
+  m_edges_heap.back ().link ();
+  m_edges_heap.back ().set_id (++m_id);
+  return &m_edges_heap.back ();
 }
 
 db::Triangle *
@@ -93,7 +91,7 @@ Triangles::remove (db::Triangle *tri)
   //  clean up edges we do no longer need
   for (int i = 0; i < 3; ++i) {
     if (edges [i] && edges [i]->left () == 0 && edges [i]->right () == 0) {
-      delete edges [i];
+      edges [i]->unlink ();
     }
   }
 }
@@ -172,18 +170,17 @@ Triangles::check (bool check_delaunay) const
     }
   }
 
-  for (auto e = mp_edges.begin (); e != mp_edges.end (); ++e) {
+  for (auto e = m_edges_heap.begin (); e != m_edges_heap.end (); ++e) {
+
+    if (!e->left () && !e->right ()) {
+      continue;
+    }
 
     if (e->left () && e->right ()) {
       if (e->left ()->is_outside () != e->right ()->is_outside () && ! e->is_segment ()) {
         tl::error << "(check error) edge " << e->to_string (true) << " splits an outside and inside triangle, but is not a segment";
         res = false;
       }
-    }
-
-    if (!e->left () && !e->right ()) {
-      tl::error << "(check error) found orphan edge " << e->to_string (true);
-      res = false;
     }
 
     for (auto t = e->begin_triangles (); t != e->end_triangles (); ++t) {
@@ -223,7 +220,7 @@ Triangles::check (bool check_delaunay) const
   for (auto v = m_vertex_heap.begin (); v != m_vertex_heap.end (); ++v) {
     unsigned int num_outside_edges = 0;
     for (auto e = v->begin_edges (); e != v->end_edges (); ++e) {
-      if (e->is_outside ()) {
+      if ((*e)->is_outside ()) {
         ++num_outside_edges;
       }
     }
@@ -231,8 +228,8 @@ Triangles::check (bool check_delaunay) const
       tl::error << "(check error) vertex " << v->to_string (true) << " has " << num_outside_edges << " outside edges (can only be 2)";
       res = false;
       for (auto e = v->begin_edges (); e != v->end_edges (); ++e) {
-        if (e->is_outside ()) {
-          tl::error << "  Outside edge is " << e->to_string (true);
+        if ((*e)->is_outside ()) {
+          tl::error << "  Outside edge is " << (*e)->to_string (true);
         }
       }
     }
@@ -264,8 +261,8 @@ Triangles::to_layout () const
     top.shapes (t->is_outside () ? l2 : l1).insert (dbu_trans * poly);
   }
 
-  for (auto e = mp_edges.begin (); e != mp_edges.end (); ++e) {
-    if (e->is_segment ()) {
+  for (auto e = m_edges_heap.begin (); e != m_edges_heap.end (); ++e) {
+    if ((e->left () || e->right ()) && e->is_segment ()) {
       top.shapes (l10).insert (dbu_trans * e->edge ());
     }
   }
@@ -301,7 +298,7 @@ Triangles::find_points_around (db::Vertex *vertex, double radius)
     next_vertexes.clear ();
     for (auto v = new_vertexes.begin (); v != new_vertexes.end (); ++v) {
       for (auto e = (*v)->begin_edges (); e != (*v)->end_edges (); ++e) {
-        db::Vertex *ov = e->other (*v);
+        db::Vertex *ov = (*e)->other (*v);
         if (ov->in_circle (*vertex, radius) == 1 && seen.insert (ov).second) {
           next_vertexes.push_back (ov);
           res.push_back (ov);
@@ -386,7 +383,7 @@ Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool insi
 {
   if (!vstart) {
 
-    if (! mp_edges.empty ()) {
+    if (! mp_triangles.empty ()) {
 
       unsigned int ls = 0;
       size_t n = m_vertex_heap.size ();
@@ -395,13 +392,14 @@ Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool insi
       //  A sample heuristics that takes a sqrt(N) sample from the
       //  vertexes to find a good starting point
 
-      vstart = mp_edges.front ()->v1 ();
+      vstart = mp_triangles.front ()->vertex (0);
       double dmin = vstart->distance (p);
 
       while (ls * ls < m) {
         m /= 2;
         for (size_t i = m / 2; i < n; i += m) {
           ++ls;
+          //  NOTE: this assumes the heap is not too loaded with orphan vertexes
           db::Vertex *v = (m_vertex_heap.begin () + i).operator-> ();
           if (v->begin_edges () != v->end_edges ()) {
             double d = v->distance (p);
@@ -435,20 +433,20 @@ Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool insi
       if (inside_only) {
         //  NOTE: in inside mode we stay on the line of sight as we don't
         //  want to walk around outside pockets.
-        if (! e->is_segment () && e->is_for_outside_triangles ()) {
+        if (! (*e)->is_segment () && (*e)->is_for_outside_triangles ()) {
           continue;
         }
-        if (! e->crosses_including (line)) {
+        if (! (*e)->crosses_including (line)) {
           continue;
         }
       }
 
-      double ds = e->distance (p);
+      double ds = (*e)->distance (p);
 
       if (d < 0.0 || ds < d) {
 
         d = ds;
-        edge = const_cast<db::TriangleEdge *> (e.operator-> ());
+        edge = *e;
         vnext = edge->other (v);
 
       } else if (fabs (ds - d) < std::max (1.0, fabs (ds) + fabs (d)) * db::epsilon) {
@@ -456,15 +454,15 @@ Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool insi
         //  this differentiation selects the edge which bends further towards
         //  the target point if both edges share a common point and that
         //  is the one the determines the distance.
-        db::Vertex *cv = edge->common_vertex (e.operator-> ());
+        db::Vertex *cv = edge->common_vertex (*e);
         if (cv) {
           db::DVector edge_d = *edge->other (cv) - *cv;
-          db::DVector e_d = *e->other(cv) - *cv;
+          db::DVector e_d = *(*e)->other(cv) - *cv;
           db::DVector r = p - *cv;
           double edge_sp = db::sprod (r, edge_d) / edge_d.length ();
           double s_sp = db::sprod (r, e_d) / e_d.length ();
           if (s_sp > edge_sp) {
-            edge = const_cast<db::TriangleEdge *> (e.operator-> ());
+            edge = *e;
             vnext = edge->other (v);
           }
         }
@@ -550,10 +548,10 @@ Triangles::add_more_triangles (std::vector<db::Triangle *> &new_triangles,
     db::TriangleEdge *next_edge = 0;
 
     for (auto e = from_vertex->begin_edges (); e != from_vertex->end_edges (); ++e) {
-      if (! e->has_vertex (to_vertex) && e->is_outside ()) {
+      if (! (*e)->has_vertex (to_vertex) && (*e)->is_outside ()) {
         //  TODO: remove and break
         tl_assert (next_edge == 0);
-        next_edge = const_cast<db::TriangleEdge *> (e.operator-> ());
+        next_edge = *e;
       }
     }
 
@@ -730,8 +728,8 @@ Triangles::remove_inside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::
 
     db::TriangleEdge *to_flip = 0;
     for (auto e = vertex->begin_edges (); e != vertex->end_edges () && to_flip == 0; ++e) {
-      if (e->can_flip ()) {
-        to_flip = const_cast<db::TriangleEdge *> (e.operator-> ());
+      if ((*e)->can_flip ()) {
+        to_flip = *e;
       }
     }
     if (! to_flip) {
@@ -756,8 +754,8 @@ Triangles::remove_inside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::
     //  in this case choose the "join" strategy
     db::TriangleEdge *jseg = 0;
     for (auto e = vertex->begin_edges (); e != vertex->end_edges () && !jseg; ++e) {
-      if (e->can_join_via (vertex)) {
-        jseg = const_cast <db::TriangleEdge *> (e.operator-> ());
+      if ((*e)->can_join_via (vertex)) {
+        jseg = *e;
       }
     }
     tl_assert (jseg != 0);
@@ -769,8 +767,8 @@ Triangles::remove_inside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::
 
     db::TriangleEdge *jseg_opp = 0;
     for (auto e = vertex->begin_edges (); e != vertex->end_edges () && !jseg_opp; ++e) {
-      if (!e->has_triangle (jseg->left ()) && !e->has_triangle (jseg->right ())) {
-        jseg_opp = const_cast <db::TriangleEdge *> (e.operator-> ());
+      if (!(*e)->has_triangle (jseg->left ()) && !(*e)->has_triangle (jseg->right ())) {
+        jseg_opp = *e;
       }
     }
 
@@ -1084,7 +1082,7 @@ Triangles::search_edges_crossing (Vertex *from, Vertex *to)
   std::vector<db::TriangleEdge *> result;
 
   for (auto e = v->begin_edges (); e != v->end_edges () && ! next_edge; ++e) {
-    for (auto t = e->begin_triangles (); t != e->end_triangles (); ++t) {
+    for (auto t = (*e)->begin_triangles (); t != (*e)->end_triangles (); ++t) {
       db::TriangleEdge *os = t->opposite (v);
       if (os->has_vertex (vv)) {
         return result;
@@ -1152,8 +1150,8 @@ Triangles::find_edge_for_points (const db::DPoint &p1, const db::DPoint &p2)
     return 0;
   }
   for (auto e = v->begin_edges (); e != v->end_edges (); ++e) {
-    if (e->other (v)->equal (p2)) {
-      return const_cast <db::TriangleEdge *>(e.operator-> ());
+    if ((*e)->other (v)->equal (p2)) {
+      return *e;
     }
   }
   return 0;
@@ -1240,9 +1238,9 @@ Triangles::join_edges (std::vector<db::TriangleEdge *> &edges)
 
     std::vector<db::TriangleEdge *> join_edges;
     for (auto e = cp->begin_edges (); e != cp->end_edges (); ++e) {
-      if (e.operator-> () != s1 && e.operator-> () != s2) {
-        if (e->can_join_via (cp)) {
-          join_edges.push_back (const_cast<db::TriangleEdge *> (e.operator-> ()));
+      if (*e != s1 && *e != s2) {
+        if ((*e)->can_join_via (cp)) {
+          join_edges.push_back (*e);
         } else {
           join_edges.clear ();
           break;
@@ -1380,7 +1378,7 @@ Triangles::remove_outside_triangles ()
 void
 Triangles::clear ()
 {
-  mp_edges.clear ();
+  m_edges_heap.clear ();
   mp_triangles.clear ();
   m_vertex_heap.clear ();
   m_is_constrained = false;
@@ -1549,7 +1547,7 @@ Triangles::triangulate (const db::Region &region, const TriangulateParameters &p
           for (auto v = vertexes_in_diametral_circle.begin (); v != vertexes_in_diametral_circle.end (); ++v) {
             bool has_segment = false;
             for (auto e = (*v)->begin_edges (); e != (*v)->end_edges () && ! has_segment; ++e) {
-              has_segment = e->is_segment ();
+              has_segment = (*e)->is_segment ();
             }
             if (! has_segment) {
               to_delete.push_back (*v);

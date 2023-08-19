@@ -155,6 +155,16 @@ public:
   void triangulate (const db::Region &region, const TriangulateParameters &parameters, double dbu = 1.0);
 
   /**
+   *  @brief Triangulates a polygon
+   */
+  void triangulate (const db::Polygon &poly, const TriangulateParameters &parameters, double dbu = 1.0);
+
+  /**
+   *  @brief Triangulates a floating-point polygon
+   */
+  void triangulate (const db::DPolygon &poly, const TriangulateParameters &parameters);
+
+  /**
    *  @brief Statistics: number of flips (fixing)
    */
   size_t flips () const
@@ -272,6 +282,16 @@ protected:
   void create_constrained_delaunay (const db::Region &region, double dbu = 1.0);
 
   /**
+   *  @brief Creates a constrained Delaunay triangulation from the given Polygon
+   */
+  void create_constrained_delaunay (const db::Polygon &poly, double dbu = 1.0);
+
+  /**
+   *  @brief Creates a constrained Delaunay triangulation from the given DPolygon
+   */
+  void create_constrained_delaunay (const db::DPolygon &poly);
+
+  /**
    *  @brief Returns a value indicating whether the edge is "illegal" (violates the Delaunay criterion)
    */
   static bool is_illegal_edge (db::TriangleEdge *edge);
@@ -312,6 +332,8 @@ private:
   void insert_new_vertex(db::Vertex *vertex, std::list<tl::weak_ptr<Triangle> > *new_triangles_out);
   std::vector<db::TriangleEdge *> ensure_edge_inner (db::Vertex *from, db::Vertex *to);
   void join_edges (std::vector<TriangleEdge *> &edges);
+  void refine (const TriangulateParameters &param);
+  template<class Poly, class Trans> void make_contours (const Poly &poly, const Trans &trans, std::vector<std::vector<db::Vertex *> > &contours);
 };
 
 }

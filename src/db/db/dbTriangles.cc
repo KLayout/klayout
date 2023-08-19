@@ -1414,6 +1414,23 @@ Triangles::clear ()
   m_id = 0;
 }
 
+template<class Poly, class Trans>
+void
+Triangles::make_contours (const Poly &poly, const Trans &trans, std::vector<std::vector<db::Vertex *> > &edge_contours)
+{
+  edge_contours.push_back (std::vector<db::Vertex *> ());
+  for (auto pt = poly.begin_hull (); pt != poly.end_hull (); ++pt) {
+    edge_contours.back ().push_back (insert_point (trans * *pt));
+  }
+
+  for (unsigned int h = 0; h < poly.holes (); ++h) {
+    edge_contours.push_back (std::vector<db::Vertex *> ());
+    for (auto pt = poly.begin_hole (h); pt != poly.end_hole (h); ++pt) {
+      edge_contours.back ().push_back (insert_point (trans * *pt));
+    }
+  }
+}
+
 void
 Triangles::create_constrained_delaunay (const db::Region &region, double dbu)
 {
@@ -1421,21 +1438,32 @@ Triangles::create_constrained_delaunay (const db::Region &region, double dbu)
 
   std::vector<std::vector<db::Vertex *> > edge_contours;
 
+  db::CplxTrans trans (dbu);
   for (auto p = region.begin_merged (); ! p.at_end (); ++p) {
-
-    edge_contours.push_back (std::vector<db::Vertex *> ());
-    for (auto pt = p->begin_hull (); pt != p->end_hull (); ++pt) {
-      edge_contours.back ().push_back (insert_point (db::DPoint (*pt) * dbu));
-    }
-
-    for (unsigned int h = 0; h < p->holes (); ++h) {
-      edge_contours.push_back (std::vector<db::Vertex *> ());
-      for (auto pt = p->begin_hole (h); pt != p->end_hole (h); ++pt) {
-        edge_contours.back ().push_back (insert_point (db::DPoint (*pt) * dbu));
-      }
-    }
-
+    make_contours (*p, trans, edge_contours);
   }
+
+  constrain (edge_contours);
+}
+
+void
+Triangles::create_constrained_delaunay (const db::Polygon &p, double dbu)
+{
+  clear ();
+
+  std::vector<std::vector<db::Vertex *> > edge_contours;
+  make_contours (p, db::CplxTrans (dbu), edge_contours);
+
+  constrain (edge_contours);
+}
+
+void
+Triangles::create_constrained_delaunay (const db::DPolygon &p)
+{
+  clear ();
+
+  std::vector<std::vector<db::Vertex *> > edge_contours;
+  make_contours (p, db::DUnitTrans (), edge_contours);
 
   constrain (edge_contours);
 }
@@ -1479,7 +1507,30 @@ Triangles::triangulate (const db::Region &region, const TriangulateParameters &p
   tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
 
   create_constrained_delaunay (region, dbu);
+  refine (parameters);
+}
 
+void
+Triangles::triangulate (const db::Polygon &poly, const TriangulateParameters &parameters, double dbu)
+{
+  tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
+
+  create_constrained_delaunay (poly, dbu);
+  refine (parameters);
+}
+
+void
+Triangles::triangulate (const db::DPolygon &poly, const TriangulateParameters &parameters)
+{
+  tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
+
+  create_constrained_delaunay (poly);
+  refine (parameters);
+}
+
+void
+Triangles::refine (const TriangulateParameters &parameters)
+{
   if (parameters.min_b < db::epsilon && parameters.max_area < db::epsilon && parameters.max_area_border < db::epsilon) {
 
     //  no refinement requested - we're done.

@@ -22,7 +22,10 @@
 
 
 #include "dbTriangles.h"
+#include "dbWriter.h"
 #include "tlUnitTest.h"
+#include "tlStream.h"
+#include "tlFileUtils.h"
 
 #include <set>
 #include <vector>
@@ -258,9 +261,8 @@ TEST(insert_many)
     tris.insert_point (x, y);
   }
 
-  tl::info << "avg. flips = " << double (tris.flips ()) / double (n);
-  tl::info << "avg. hops = " << double (tris.hops ()) / double (n);
-  // @@@ tris.dump ("debug.gds");
+  EXPECT_LT (double (tris.flips ()) / double (n), 3.0);
+  EXPECT_LT (double (tris.hops ()) / double (n), 23.0);
 }
 
 TEST(heavy_insert)
@@ -682,4 +684,112 @@ TEST(triangulate)
 
   EXPECT_GT (tri.num_triangles (), size_t (900));
   EXPECT_LT (tri.num_triangles (), size_t (1000));
+}
+
+void read_polygons (const std::string &path, db::Region &region, double dbu)
+{
+  tl::InputStream is (path);
+  tl::TextInputStream ti (is);
+
+  unsigned int nvert = 0, nedges = 0;
+
+  {
+    tl::Extractor ex (ti.get_line ().c_str ());
+    ex.read (nvert);
+    ex.read (nedges);
+  }
+
+  std::vector<db::Point> v;
+  auto dbu_trans = db::CplxTrans (dbu).inverted ();
+  for (unsigned int i = 0; i < nvert; ++i) {
+    double x = 0, y = 0;
+    tl::Extractor ex (ti.get_line ().c_str ());
+    ex.read (x);
+    ex.read (y);
+    v.push_back (dbu_trans * db::DPoint (x, y));
+  }
+
+  unsigned int nstart = 0;
+  bool new_contour = true;
+  std::vector<db::Point> contour;
+
+  for (unsigned int i = 0; i < nedges; ++i) {
+
+    unsigned int n1 = 0, n2 = 0;
+
+    tl::Extractor ex (ti.get_line ().c_str ());
+    ex.read (n1);
+    ex.read (n2);
+
+    if (new_contour) {
+      nstart = n1;
+      new_contour = false;
+    }
+
+    contour.push_back (v[n1]);
+
+    if (n2 == nstart) {
+      //  finish contour
+      db::SimplePolygon sp;
+      sp.assign_hull (contour.begin (), contour.end ());
+      region.insert (sp);
+      new_contour = true;
+      contour.clear ();
+    } else if (n2 <= n1) {
+      tl::error << "Invalid polygon wrap in line " << ti.line_number ();
+      tl_assert (false);
+    }
+
+  }
+}
+
+TEST(triangulate2)
+{
+  double dbu = 0.001;
+
+  db::Region r;
+  read_polygons (tl::combine_path (tl::testsrc (), "testdata/algo/triangles1.txt"), r, dbu);
+
+  //  for debugging purposes dump the inputs
+  if (false) {
+
+    db::Layout layout = db::Layout ();
+    layout.dbu (dbu);
+    db::Cell &top = layout.cell (layout.add_cell ("DUMP"));
+    unsigned int l1 = layout.insert_layer (db::LayerProperties (1, 0));
+    r.insert_into (&layout, top.cell_index (), l1);
+
+    {
+      tl::OutputStream stream ("input.gds");
+      db::SaveLayoutOptions opt;
+      db::Writer writer (opt);
+      writer.write (layout, stream);
+    }
+
+  }
+
+  db::Triangles::TriangulateParameters param;
+  param.min_b = 1.0;
+  param.max_area = 0.1;
+  param.min_length = 0.001;
+
+  db::Triangles tri;
+  tri.triangulate (r, param, dbu);
+
+  EXPECT_EQ (tri.check (false), true);
+
+  //  for debugging:
+  //  tri.dump ("debug.gds", true);
+
+  size_t n_skinny = 0;
+  for (auto t = tri.begin (); t != tri.end (); ++t) {
+    EXPECT_LE (t->area (), param.max_area);
+    if (t->b () < param.min_b) {
+      ++n_skinny;
+    }
+  }
+
+  EXPECT_LT (n_skinny, size_t (20));
+  EXPECT_GT (tri.num_triangles (), size_t (29000));
+  EXPECT_LT (tri.num_triangles (), size_t (30000));
 }

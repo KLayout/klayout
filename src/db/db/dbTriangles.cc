@@ -251,7 +251,7 @@ Triangles::check (bool check_delaunay) const
 }
 
 db::Layout *
-Triangles::to_layout () const
+Triangles::to_layout (bool decompose_by_id) const
 {
   db::Layout *layout = new db::Layout ();
   layout->dbu (0.001);
@@ -262,6 +262,9 @@ Triangles::to_layout () const
   unsigned int l1 = layout->insert_layer (db::LayerProperties (1, 0));
   unsigned int l2 = layout->insert_layer (db::LayerProperties (2, 0));
   unsigned int l10 = layout->insert_layer (db::LayerProperties (10, 0));
+  unsigned int l20 = layout->insert_layer (db::LayerProperties (20, 0));
+  unsigned int l21 = layout->insert_layer (db::LayerProperties (21, 0));
+  unsigned int l22 = layout->insert_layer (db::LayerProperties (22, 0));
 
   for (auto t = mp_triangles.begin (); t != mp_triangles.end (); ++t) {
     db::DPoint pts[3];
@@ -271,6 +274,17 @@ Triangles::to_layout () const
     db::DPolygon poly;
     poly.assign_hull (pts + 0, pts + 3);
     top.shapes (t->is_outside () ? l2 : l1).insert (dbu_trans * poly);
+    if (decompose_by_id) {
+      if ((t->id () & 1) != 0) {
+        top.shapes (l20).insert (dbu_trans * poly);
+      }
+      if ((t->id () & 2) != 0) {
+        top.shapes (l21).insert (dbu_trans * poly);
+      }
+      if ((t->id () & 4) != 0) {
+        top.shapes (l22).insert (dbu_trans * poly);
+      }
+    }
   }
 
   for (auto e = m_edges_heap.begin (); e != m_edges_heap.end (); ++e) {
@@ -283,9 +297,9 @@ Triangles::to_layout () const
 }
 
 void
-Triangles::dump (const std::string &path) const
+Triangles::dump (const std::string &path, bool decompose_by_id) const
 {
-  std::unique_ptr<db::Layout> ly (to_layout ());
+  std::unique_ptr<db::Layout> ly (to_layout (decompose_by_id));
 
   tl::OutputStream stream (path);
 
@@ -1426,7 +1440,7 @@ Triangles::create_constrained_delaunay (const db::Region &region, double dbu)
   constrain (edge_contours);
 }
 
-static bool is_skinny (db::Triangle *tri, const Triangles::TriangulateParameters &param)
+static bool is_skinny (const db::Triangle *tri, const Triangles::TriangulateParameters &param)
 {
   if (param.min_b < db::epsilon) {
     return false;
@@ -1437,7 +1451,7 @@ static bool is_skinny (db::Triangle *tri, const Triangles::TriangulateParameters
   }
 }
 
-static bool is_invalid (db::Triangle *tri, const Triangles::TriangulateParameters &param)
+static bool is_invalid (const db::Triangle *tri, const Triangles::TriangulateParameters &param)
 {
   if (is_skinny (tri, param)) {
     return true;
@@ -1517,7 +1531,7 @@ Triangles::triangulate (const db::Region &region, const TriangulateParameters &p
 
       if ((*t)->contains (center) >= 0) {
 
-        //  heuristics #1: never insert a point into a triangle with more than two segments
+        //  heuristics #1: never insert a point into a triangle with more than one segments
         if (t->get ()->num_segments () <= 1) {
           if (tl::verbosity () >= parameters.base_verbosity + 20) {
             tl::info << "Inserting in-triangle center " << center.to_string () << " of " << (*t)->to_string (true);
@@ -1549,30 +1563,34 @@ Triangles::triangulate (const db::Region &region, const TriangulateParameters &p
         } else {
 
           double sr = edge->d ().length () * 0.5;
-          db::DPoint pnew = *edge->v1 () + edge->d () * 0.5;
+          if (sr >= parameters.min_length) {
 
-          if (tl::verbosity () >= parameters.base_verbosity + 20) {
-            tl::info << "Split edge " << edge->to_string (true) << " at " << pnew.to_string ();
-          }
-          db::Vertex *vnew = insert_point (pnew, &new_triangles);
-          auto vertexes_in_diametral_circle = find_points_around (vnew, sr);
+            db::DPoint pnew = *edge->v1 () + edge->d () * 0.5;
 
-          std::vector<db::Vertex *> to_delete;
-          for (auto v = vertexes_in_diametral_circle.begin (); v != vertexes_in_diametral_circle.end (); ++v) {
-            bool has_segment = false;
-            for (auto e = (*v)->begin_edges (); e != (*v)->end_edges () && ! has_segment; ++e) {
-              has_segment = (*e)->is_segment ();
+            if (tl::verbosity () >= parameters.base_verbosity + 20) {
+              tl::info << "Split edge " << edge->to_string (true) << " at " << pnew.to_string ();
             }
-            if (! has_segment) {
-              to_delete.push_back (*v);
-            }
-          }
+            db::Vertex *vnew = insert_point (pnew, &new_triangles);
+            auto vertexes_in_diametral_circle = find_points_around (vnew, sr);
 
-          if (tl::verbosity () >= parameters.base_verbosity + 20) {
-            tl::info << "  -> found " << to_delete.size () << " vertexes to remove";
-          }
-          for (auto v = to_delete.begin (); v != to_delete.end (); ++v) {
-            remove (*v, &new_triangles);
+            std::vector<db::Vertex *> to_delete;
+            for (auto v = vertexes_in_diametral_circle.begin (); v != vertexes_in_diametral_circle.end (); ++v) {
+              bool has_segment = false;
+              for (auto e = (*v)->begin_edges (); e != (*v)->end_edges () && ! has_segment; ++e) {
+                has_segment = (*e)->is_segment ();
+              }
+              if (! has_segment) {
+                to_delete.push_back (*v);
+              }
+            }
+
+            if (tl::verbosity () >= parameters.base_verbosity + 20) {
+              tl::info << "  -> found " << to_delete.size () << " vertexes to remove";
+            }
+            for (auto v = to_delete.begin (); v != to_delete.end (); ++v) {
+              remove (*v, &new_triangles);
+            }
+
           }
 
         }
@@ -1586,6 +1604,35 @@ Triangles::triangulate (const db::Region &region, const TriangulateParameters &p
   if (tl::verbosity () >= parameters.base_verbosity + 20) {
     tl::info << "Finishing ..";
   }
+
+  if (parameters.mark_triangles) {
+
+    for (auto t = begin (); t != end (); ++t) {
+
+      size_t id = 0;
+
+      if (! t->is_outside ()) {
+
+        if (is_skinny (t.operator-> (), parameters)) {
+          id |= 1;
+        }
+        if (is_invalid (t.operator-> (), parameters)) {
+          id |= 2;
+        }
+        auto cp = t->circumcircle ();
+        auto vi = find_inside_circle (cp.first, cp.second);
+        if (! vi.empty ()) {
+          id |= 4;
+        }
+
+      }
+
+      (const_cast<db::Triangle *> (t.operator->()))->set_id (id);
+
+    }
+
+  }
+
   remove_outside_triangles ();
 }
 

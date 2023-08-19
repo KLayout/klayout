@@ -45,16 +45,27 @@ public:
   {
     TriangulateParameters ()
       : min_b (1.0),
+        min_length (0.0),
         max_area (0.0),
         max_area_border (0.0),
         max_iterations (std::numeric_limits<size_t>::max ()),
-        base_verbosity (30)
+        base_verbosity (30),
+        mark_triangles (false)
     { }
 
     /**
      *  @brief Min. readius-to-shortest edge ratio
      */
     double min_b;
+
+    /**
+     *  @brief Min. edge length
+     *
+     *  This parameter does not provide a guarantee about a minimume edge length, but
+     *  helps avoiding ever-reducing triangle splits in acute corners of the input polygon.
+     *  Splitting of edges stops when the edge is less than the min length.
+     */
+    double min_length;
 
     /**
      *  @brief Max area or zero for "no constraint"
@@ -75,6 +86,17 @@ public:
      *  @brief The verbosity level above which triangulation reports details
      */
     int base_verbosity;
+
+    /**
+     *  @brief If true, final triangles are marked using the "id" integer as a bit field
+     *
+     *  This provides information about the result quality.
+     *
+     *  Bit 0: skinny triangle
+     *  Bit 1: bad-quality (skinny or area too large)
+     *  Bit 2: non-Delaunay (in the strict sense)
+     */
+    bool mark_triangles;
   };
 
   typedef tl::list<db::Triangle> triangles_type;
@@ -139,14 +161,18 @@ public:
   /**
    *  @brief Dumps the triangle graph to a GDS file at the given path
    *  This method is for testing purposes mainly.
+   *
+   *  "decompose_id" will map triangles to layer 20, 21 and 22.
+   *  according to bit 0, 1 and 2 of the ID (useful with the 'mark_triangles'
+   *  flat in TriangulateParameters).
    */
-  void dump (const std::string &path) const;
+  void dump (const std::string &path, bool decompose_by_id = false) const;
 
   /**
    *  @brief Creates a new layout object representing the triangle graph
    *  This method is for testing purposes mainly.
    */
-  db::Layout *to_layout () const;
+  db::Layout *to_layout (bool decompose_by_id = false) const;
 
   /**
    *  @brief Finds the points within (not "on") a circle of radius "radius" around the given vertex.

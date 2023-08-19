@@ -352,7 +352,7 @@ Triangle::Triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3)
 {
   mp_e[0] = e1;
   mp_v[0] = e1->v1 ();
-  mp_v[1] = e1->other (mp_v[0]);
+  mp_v[1] = e1->v2 ();
 
   if (e2->has_vertex (mp_v[1])) {
     mp_e[1] = e2;

@@ -428,6 +428,7 @@ Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool insi
       return 0;
 
     }
+
   }
 
   db::DEdge line (*vstart, p);

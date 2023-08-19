@@ -145,7 +145,12 @@ public:
    *  @brief Creates a refined Delaunay triangulation for the given region
    *
    *  The database unit should be chosen in a way that target area values are "in the order of 1".
-   *  The algorithm becomes numerically unstable area constraints below 1e-4.
+   *  For inputs featuring acute angles (angles < ~25 degree), the parameters should defined a min
+   *  edge length ("min_length").
+   *  "min_length" should be at least 1e-4. If a min edge length is given, the max area constaints
+   *  may not be satisfied.
+   *
+   *  Edges in the input should not be shorter than 1e-4.
    */
   void triangulate (const db::Region &region, const TriangulateParameters &parameters, double dbu = 1.0);
 

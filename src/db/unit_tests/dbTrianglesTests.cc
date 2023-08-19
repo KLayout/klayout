@@ -779,7 +779,7 @@ TEST(triangulate2)
   EXPECT_EQ (tri.check (false), true);
 
   //  for debugging:
-  //  tri.dump ("debug.gds", true);
+  //  tri.dump ("debug.gds");
 
   size_t n_skinny = 0;
   for (auto t = tri.begin (); t != tri.end (); ++t) {
@@ -792,4 +792,58 @@ TEST(triangulate2)
   EXPECT_LT (n_skinny, size_t (20));
   EXPECT_GT (tri.num_triangles (), size_t (29000));
   EXPECT_LT (tri.num_triangles (), size_t (30000));
+}
+
+TEST(triangulate3)
+{
+  double dbu = 0.0001;
+
+  double star1 = 9.0, star2 = 5.0;
+  double r = 1.0;
+  int n = 100;
+
+  auto dbu_trans = db::CplxTrans (dbu).inverted ();
+
+  std::vector <db::Point> contour1, contour2;
+  for (int i = 0; i < n; ++i) {
+    double a = -M_PI * 2.0 * double (i) / double (n);  //  "-" for clockwise orientation
+    double rr, x, y;
+    rr = r * (1.0 + 0.4 * cos (star1 * a));
+    x = rr * cos (a);
+    y = rr * sin (a);
+    contour1.push_back (dbu_trans * db::DPoint (x, y));
+    rr = r * (0.1 + 0.03 * cos (star2 * a));
+    x = rr * cos (a);
+    y = rr * sin (a);
+    contour2.push_back (dbu_trans * db::DPoint (x, y));
+  }
+
+  db::Region rg;
+
+  db::SimplePolygon sp1;
+  sp1.assign_hull (contour1.begin (), contour1.end ());
+  db::SimplePolygon sp2;
+  sp2.assign_hull (contour2.begin (), contour2.end ());
+
+  rg = db::Region (sp1) - db::Region (sp2);
+
+  db::Triangles::TriangulateParameters param;
+  param.min_b = 1.0;
+  param.max_area = 0.01;
+
+  db::Triangles tri;
+  tri.triangulate (rg, param, dbu);
+
+  EXPECT_EQ (tri.check (false), true);
+
+  //  for debugging:
+  tri.dump ("debug.gds");
+
+  for (auto t = tri.begin (); t != tri.end (); ++t) {
+    EXPECT_LE (t->area (), param.max_area);
+    EXPECT_GE (t->b (), param.min_b);
+  }
+
+  EXPECT_GT (tri.num_triangles (), size_t (1250));
+  EXPECT_LT (tri.num_triangles (), size_t (1300));
 }

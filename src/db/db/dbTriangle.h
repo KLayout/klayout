@@ -451,12 +451,26 @@ public:
    *  @brief Gets the nth vertex (n wraps around and can be negative)
    *  The vertexes are oriented clockwise.
    */
-  Vertex *vertex (int n) const;
+  inline Vertex *vertex (int n) const
+  {
+    if (n >= 0 && n < 3) {
+      return mp_v[n];
+    } else {
+      return mp_v[(n + 3) % 3];
+    }
+  }
 
   /**
    *  @brief Gets the nth edge (n wraps around and can be negative)
    */
-  TriangleEdge *edge (int n) const;
+  inline TriangleEdge *edge (int n) const
+  {
+    if (n >= 0 && n < 3) {
+      return mp_e[n];
+    } else {
+      return mp_e[(n + 3) % 3];
+    }
+  }
 
   /**
    *  @brief Gets the area
@@ -501,17 +515,17 @@ public:
   /**
    *  @brief Gets a value indicating whether the triangle has the given vertex
    */
-  bool has_vertex (const db::Vertex *v) const
+  inline bool has_vertex (const db::Vertex *v) const
   {
-    return mp_v1 == v || mp_v2 == v || mp_v3 == v;
+    return mp_v[0] == v || mp_v[1] == v || mp_v[2] == v;
   }
 
   /**
    *  @brief Gets a value indicating whether the triangle has the given edge
    */
-  bool has_edge (const db::TriangleEdge *e) const
+  inline bool has_edge (const db::TriangleEdge *e) const
   {
-    return mp_e1 == e || mp_e2 == e || mp_e3 == e;
+    return mp_e[0] == e || mp_e[1] == e || mp_e[2] == e;
   }
 
   /**
@@ -536,8 +550,8 @@ public:
 
 private:
   bool m_is_outside;
-  TriangleEdge *mp_e1, *mp_e2, *mp_e3;
-  db::Vertex *mp_v1, *mp_v2, *mp_v3;
+  TriangleEdge *mp_e[3];
+  db::Vertex *mp_v[3];
   size_t m_id;
 
   //  no copying

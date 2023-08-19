@@ -339,30 +339,34 @@ TriangleEdge::has_triangle (const Triangle *t) const
 //  Triangle implementation
 
 Triangle::Triangle ()
-  : m_is_outside (false), mp_v1 (0), mp_v2 (0), mp_v3 (0), m_id (0)
+  : m_is_outside (false), m_id (0)
 {
-  //  .. nothing yet ..
+  for (int i = 0; i < 3; ++i) {
+    mp_v[i] = 0;
+    mp_e[i] = 0;
+  }
 }
 
 Triangle::Triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3)
-  : m_is_outside (false), mp_e1 (e1), m_id (0)
+  : m_is_outside (false), m_id (0)
 {
-  mp_v1 = mp_e1->v1 ();
-  mp_v2 = mp_e1->other (mp_v1);
+  mp_e[0] = e1;
+  mp_v[0] = e1->v1 ();
+  mp_v[1] = e1->other (mp_v[0]);
 
-  if (e2->has_vertex (mp_v2)) {
-    mp_e2 = e2;
-    mp_e3 = e3;
+  if (e2->has_vertex (mp_v[1])) {
+    mp_e[1] = e2;
+    mp_e[2] = e3;
   } else {
-    mp_e2 = e3;
-    mp_e3 = e2;
+    mp_e[1] = e3;
+    mp_e[2] = e2;
   }
-  mp_v3 = mp_e2->other (mp_v2);
+  mp_v[2] = mp_e[1]->other (mp_v[1]);
 
   //  establish link to edges
   for (int i = 0; i < 3; ++i) {
-    TriangleEdge *e = edge (i);
-    int side_of = e->side_of (*vertex (i - 1));
+    TriangleEdge *e = mp_e[i];
+    int side_of = e->side_of (*mp_v[i == 0 ? 2 : i - 1]);
     //  NOTE: in the degenerated case, the triangle is not attached to an edge!
     if (side_of < 0) {
       e->set_left (this);
@@ -372,8 +376,8 @@ Triangle::Triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3)
   }
 
   //  enforce clockwise orientation
-  if (db::vprod_sign (*mp_v3 - *mp_v1, *mp_v2 - *mp_v1) < 0) {
-    std::swap (mp_v3, mp_v2);
+  if (db::vprod_sign (*mp_v[2] - *mp_v[0], *mp_v[1] - *mp_v[0]) < 0) {
+    std::swap (mp_v[2], mp_v[1]);
   }
 }
 
@@ -386,7 +390,7 @@ void
 Triangle::unlink ()
 {
   for (int i = 0; i != 3; ++i) {
-    db::TriangleEdge *e = edge (i);
+    db::TriangleEdge *e = mp_e[i];
     if (e->left () == this) {
       e->set_left (0);
     }
@@ -414,36 +418,10 @@ Triangle::to_string (bool with_id) const
   return res;
 }
 
-Vertex *
-Triangle::vertex (int n) const
-{
-  n = (n + 3) % 3;
-  if (n == 0) {
-    return mp_v1;
-  } else if (n == 1) {
-    return mp_v2;
-  } else {
-    return mp_v3;
-  }
-}
-
-TriangleEdge *
-Triangle::edge (int n) const
-{
-  n = (n + 3) % 3;
-  if (n == 0) {
-    return mp_e1;
-  } else if (n == 1) {
-    return mp_e2;
-  } else {
-    return mp_e3;
-  }
-}
-
 double
 Triangle::area () const
 {
-  return fabs (db::vprod (mp_e1->d (), mp_e2->d ())) * 0.5;
+  return fabs (db::vprod (mp_e[0]->d (), mp_e[1]->d ())) * 0.5;
 }
 
 db::DBox
@@ -451,7 +429,7 @@ Triangle::bbox () const
 {
   db::DBox box;
   for (int i = 0; i < 3; ++i) {
-    box += *vertex (i);
+    box += *mp_v[i];
   }
   return box;
 }
@@ -460,8 +438,8 @@ Triangle::bbox () const
 std::pair<db::DPoint, double>
 Triangle::circumcircle () const
 {
-  db::DVector v1 = *vertex(0) - *vertex(1);
-  db::DVector v2 = *vertex(0) - *vertex(2);
+  db::DVector v1 = *mp_v[0] - *mp_v[1];
+  db::DVector v2 = *mp_v[0] - *mp_v[2];
   db::DVector n1 = db::DVector (v1.y (), -v1.x ());
   db::DVector n2 = db::DVector (v2.y (), -v2.x ());
 
@@ -472,7 +450,7 @@ Triangle::circumcircle () const
   tl_assert (fabs (s) > db::epsilon);
 
   db::DVector r = (n1 * p2s - n2 * p1s) * (0.5 / s);
-  db::DPoint center = *vertex (0) + r;
+  db::DPoint center = *mp_v[0] + r;
   double radius = r.length ();
 
   return std::make_pair (center, radius);
@@ -482,7 +460,7 @@ Vertex *
 Triangle::opposite (const TriangleEdge *edge) const
 {
   for (int i = 0; i < 3; ++i) {
-    Vertex *v = vertex (i);
+    Vertex *v = mp_v[i];
     if (! edge->has_vertex (v)) {
       return v;
     }
@@ -494,7 +472,7 @@ TriangleEdge *
 Triangle::opposite (const Vertex *vertex) const
 {
   for (int i = 0; i < 3; ++i) {
-    TriangleEdge *e = edge (i);
+    TriangleEdge *e = mp_e[i];
     if (! e->has_vertex (vertex)) {
       return e;
     }
@@ -506,7 +484,7 @@ TriangleEdge *
 Triangle::find_edge_with (const Vertex *v1, const Vertex *v2) const
 {
   for (int i = 0; i < 3; ++i) {
-    TriangleEdge *e = edge (i);
+    TriangleEdge *e = mp_e[i];
     if (e->has_vertex (v1) && e->has_vertex (v2)) {
       return e;
     }
@@ -518,7 +496,7 @@ TriangleEdge *
 Triangle::common_edge (const Triangle *other) const
 {
   for (int i = 0; i < 3; ++i) {
-    TriangleEdge *e = edge (i);
+    TriangleEdge *e = mp_e[i];;
     if (e->other (this) == other) {
       return e;
     }
@@ -530,9 +508,9 @@ int
 Triangle::contains (const db::DPoint &point) const
 {
   int res = 1;
-  const Vertex *vl = vertex (-1);
+  const Vertex *vl = mp_v[2];;
   for (int i = 0; i < 3; ++i) {
-    const Vertex *v = vertex (i);
+    const Vertex *v = mp_v[i];;
     int s = db::DEdge (*vl, *v).side_of (point);
     if (s == 0) {
       res = 0;
@@ -547,9 +525,9 @@ Triangle::contains (const db::DPoint &point) const
 double
 Triangle::min_edge_length () const
 {
-  double lmin = edge (0)->d ().length ();
+  double lmin = mp_e[0]->d ().length ();
   for (int i = 1; i < 3; ++i) {
-    lmin = std::min (lmin, edge (i)->d ().length ());
+    lmin = std::min (lmin, mp_e[i]->d ().length ());
   }
   return lmin;
 }
@@ -566,7 +544,7 @@ bool
 Triangle::has_segment () const
 {
   for (int i = 0; i < 3; ++i) {
-    if (edge (i)->is_segment ()) {
+    if (mp_e[i]->is_segment ()) {
       return true;
     }
   }
@@ -578,7 +556,7 @@ Triangle::num_segments () const
 {
   unsigned int n = 0;
   for (int i = 0; i < 3; ++i) {
-    if (edge (i)->is_segment ()) {
+    if (mp_e[i]->is_segment ()) {
       ++n;
     }
   }

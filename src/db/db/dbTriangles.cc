@@ -42,7 +42,7 @@ Triangles::Triangles ()
 Triangles::~Triangles ()
 {
   while (! mp_triangles.empty ()) {
-    remove (mp_triangles.begin ().operator-> ());
+    remove_triangle (mp_triangles.begin ().operator-> ());
   }
 }
 
@@ -89,7 +89,7 @@ Triangles::create_triangle (TriangleEdge *e1, TriangleEdge *e2, TriangleEdge *e3
 }
 
 void
-Triangles::remove (db::Triangle *tri)
+Triangles::remove_triangle (db::Triangle *tri)
 {
   db::TriangleEdge *edges [3];
   for (int i = 0; i < 3; ++i) {
@@ -627,7 +627,7 @@ Triangles::split_triangle (db::Triangle *t, db::Vertex *vertex, std::list<tl::we
     new_triangles.push_back (new_triangle);
   }
 
-  remove (t);
+  remove_triangle (t);
 
   fix_triangles (new_triangles, new_edges, new_triangles_out);
 }
@@ -670,7 +670,7 @@ Triangles::split_triangles_on_edge (const std::vector<db::Triangle *> &tris, db:
   }
 
   for (auto t = tris.begin (); t != tris.end (); ++t) {
-    remove (*t);
+    remove_triangle (*t);
   }
 
   std::vector<db::TriangleEdge *> fixed_edges;
@@ -738,7 +738,7 @@ Triangles::remove_outside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db:
   auto new_triangles = fill_concave_corners (outer_edges);
 
   for (auto t = to_remove.begin (); t != to_remove.end (); ++t) {
-    remove (*t);
+    remove_triangle (*t);
   }
 
   fix_triangles (new_triangles, std::vector<db::TriangleEdge *> (), new_triangles_out);
@@ -831,7 +831,7 @@ Triangles::remove_inside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::
 
   for (auto t = to_remove.begin (); t != to_remove.end (); ++t) {
     triangles_to_fix.erase (*t);
-    remove (*t);
+    remove_triangle (*t);
   }
 
   if (new_triangles_out) {
@@ -890,7 +890,7 @@ Triangles::fix_triangles (const std::vector<db::Triangle *> &tris, const std::ve
         }
 
         ++m_flips;
-        tl_assert (! is_illegal_edge (s12)); // @@@ remove later!
+        tl_assert (! is_illegal_edge (s12)); // TODO: remove later!
 
         for (int i = 0; i < 3; ++i) {
           db::TriangleEdge *s1 = t1->edge (i);
@@ -963,8 +963,8 @@ Triangles::flip (TriangleEdge *edge)
   db::Triangle *t2_new = create_triangle (s_new, t1_sext2, t2_sext2);
   t2_new->set_outside (outside);
 
-  remove (t1);
-  remove (t2);
+  remove_triangle (t1);
+  remove_triangle (t2);
 
   return std::make_pair (std::make_pair (t1_new, t2_new), s_new);
 }
@@ -1292,8 +1292,8 @@ Triangles::join_edges (std::vector<db::TriangleEdge *> &edges)
         t2->unlink ();
         db::Triangle *tri = create_triangle (tedge1, tedge2, new_edge);
         tri->set_outside (t1->is_outside ());
-        remove (t1);
-        remove (t2);
+        remove_triangle (t1);
+        remove_triangle (t2);
       }
 
       edges [i - 1] = new_edge;
@@ -1398,7 +1398,7 @@ Triangles::remove_outside_triangles ()
   }
 
   for (auto t = to_remove.begin (); t != to_remove.end (); ++t) {
-    remove (*t);
+    remove_triangle (*t);
   }
 }
 
@@ -1494,8 +1494,8 @@ Triangles::triangulate (const db::Region &region, const TriangulateParameters &p
     new_triangles.push_back (t.operator-> ());
   }
 
-  // @@@ TODO: break if iteration gets stuck
-  while (nloop < parameters.max_iterations) { // @@@
+  //  TODO: break if iteration gets stuck
+  while (nloop < parameters.max_iterations) {
 
     ++nloop;
     if (tl::verbosity () >= parameters.base_verbosity + 10) {

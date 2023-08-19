@@ -154,9 +154,23 @@ public:
    */
   void triangulate (const db::Region &region, const TriangulateParameters &parameters, double dbu = 1.0);
 
+  /**
+   *  @brief Statistics: number of flips (fixing)
+   */
+  size_t flips () const
+  {
+    return m_flips;
+  }
 
-  //  -- exposed for testing purposes --
+  /**
+   *  @brief Statistics: number of hops (searching)
+   */
+  size_t hops () const
+  {
+    return m_hops;
+  }
 
+protected:
   /**
    *  @brief Checks the triangle graph for consistency
    *  This method is for testing purposes mainly.
@@ -262,22 +276,6 @@ public:
    */
   static bool is_illegal_edge (db::TriangleEdge *edge);
 
-  /**
-   *  @brief Statistics: number of flips (fixing)
-   */
-  size_t flips () const
-  {
-    return m_flips;
-  }
-
-  /**
-   *  @brief Statistics: number of hops (searching)
-   */
-  size_t hops () const
-  {
-    return m_hops;
-  }
-
   //  NOTE: these functions are SLOW and intended to test purposes only
   std::vector<db::Vertex *> find_touching (const db::DBox &box) const;
   std::vector<db::Vertex *> find_inside_circle (const db::DPoint &center, double radius) const;
@@ -296,7 +294,7 @@ private:
   db::Vertex *create_vertex (const db::DPoint &pt);
   db::TriangleEdge *create_edge (db::Vertex *v1, db::Vertex *v2);
   db::Triangle *create_triangle (db::TriangleEdge *e1, db::TriangleEdge *e2, db::TriangleEdge *e3);
-  void remove (db::Triangle *tri);
+  void remove_triangle (db::Triangle *tri);
 
   void remove_outside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles = 0);
   void remove_inside_vertex (db::Vertex *vertex, std::list<tl::weak_ptr<db::Triangle> > *new_triangles_out = 0);

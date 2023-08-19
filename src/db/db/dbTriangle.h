@@ -76,7 +76,7 @@ public:
 
   /**
    *  @brief Returns 1 is the point is inside the circle, 0 if on the circle and -1 if outside
-   *  @@@ TODO: Move to db::DPoint
+   *  TODO: Move to db::DPoint
    */
   static int in_circle (const db::DPoint &point, const db::DPoint &center, double radius);
 
@@ -159,6 +159,7 @@ public:
   };
 
   TriangleEdge ();
+  TriangleEdge (Vertex *v1, Vertex *v2);
 
   Vertex *v1 () const { return mp_v1; }
   Vertex *v2 () const { return mp_v2; }
@@ -166,11 +167,7 @@ public:
   void reverse ()
   {
     std::swap (mp_v1, mp_v2);
-
-    Triangle *l = mp_left;
-    Triangle *r = mp_right;
-    mp_left = r;
-    mp_right = l;
+    std::swap (mp_left, mp_right);
   }
 
   Triangle *left  () const { return mp_left; }
@@ -209,7 +206,7 @@ public:
    *  @brief Returns the distance of the given point to the edge
    *
    *  The distance is the minimum distance of the point to one point from the edge.
-   *  @@@ TODO: Move to db::DEdge
+   *  TODO: Move to db::DEdge
    */
   static double distance (const db::DEdge &e, const db::DPoint &p);
 
@@ -228,7 +225,7 @@ public:
    *
    *  "crosses" is true, if both edges share at least one point which is not an endpoint
    *  of one of the edges.
-   *  @@@ TODO: Move to db::DEdge
+   *  TODO: Move to db::DEdge
    */
   static bool crosses (const db::DEdge &e, const db::DEdge &other);
 
@@ -257,7 +254,7 @@ public:
   /**
    *  @brief Returns a value indicating whether this edge crosses the other one
    *  "crosses" is true, if both edges share at least one point.
-   *  @@@ TODO: Move to db::DEdge
+   *  TODO: Move to db::DEdge
    */
   static bool crosses_including (const db::DEdge &e, const db::DEdge &other);
 
@@ -281,7 +278,7 @@ public:
 
   /**
    *  @brief Gets the intersection point
-   *  @@@ TODO: Move to db::DEdge
+   *  TODO: Move to db::DEdge
    */
   static db::DPoint intersection_point (const db::DEdge &e, const DEdge &other);
 
@@ -303,7 +300,7 @@ public:
 
   /**
    *  @brief Returns a value indicating whether the point is on the edge
-   *  @@@ TODO: Move to db::DEdge
+   *  TODO: Move to db::DEdge
    */
   static bool point_on (const db::DEdge &edge, const db::DPoint &point);
 
@@ -319,7 +316,7 @@ public:
    *  @brief Gets the side the point is on
    *
    *  -1 is for "left", 0 is "on" and +1 is "right"
-   *  @@@ TODO: correct to same definition as db::Edge (negative)
+   *  TODO: correct to same definition as db::Edge (negative)
    */
   static int side_of (const db::DEdge &e, const db::DPoint &point)
   {
@@ -330,7 +327,7 @@ public:
    *  @brief Gets the side the point is on
    *
    *  -1 is for "left", 0 is "on" and +1 is "right"
-   *  @@@ TODO: correct to same definition as db::Edge (negative)
+   *  TODO: correct to same definition as db::Edge (negative)
    */
   int side_of (const db::DPoint &p) const
   {
@@ -390,10 +387,7 @@ public:
    */
   bool has_triangle (const Triangle *t) const;
 
-  //  --- exposed for test purposes only ---
-
-  TriangleEdge (Vertex *v1, Vertex *v2);
-
+protected:
   void unlink ();
   void link ();
 

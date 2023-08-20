@@ -875,8 +875,8 @@ TEST(triangulate_problematic)
   db::DPoint contour[] = {
     db::DPoint (129145.00000, -30060.80000),
     db::DPoint (129145.00000, -28769.50000),
-    db::DPoint (129159.50000, -28754.90000),
-    db::DPoint (129159.60000, -28754.80000),
+    db::DPoint (129159.50000, -28754.90000), //  this is a very short edge  <-- from here.
+    db::DPoint (129159.60000, -28754.80000), //  <-- to here.
     db::DPoint (129159.50000, -28754.70000),
     db::DPoint (129366.32200, -28547.90000),
     db::DPoint (130958.54600, -26955.84600),
@@ -890,7 +890,7 @@ TEST(triangulate_problematic)
 
   db::Triangles::TriangulateParameters param;
   param.min_b = 1.0;
-  param.max_area = 10000.0;
+  param.max_area = 100000.0;
   param.min_length = 0.002;
 
   TestableTriangles tri;
@@ -906,7 +906,7 @@ TEST(triangulate_problematic)
     EXPECT_GE (t->b (), param.min_b);
   }
 
-  EXPECT_GT (tri.num_triangles (), size_t (1250));
-  EXPECT_LT (tri.num_triangles (), size_t (1300));
+  EXPECT_GT (tri.num_triangles (), size_t (470));
+  EXPECT_LT (tri.num_triangles (), size_t (490));
 }
 

@@ -470,7 +470,7 @@ Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool insi
 
       double ds = (*e)->distance (p);
 
-      if (d < 0.0 || ds < d) {
+      if (d < 0.0) {
 
         d = ds;
         edge = *e;
@@ -493,6 +493,12 @@ Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool insi
             vnext = edge->other (v);
           }
         }
+
+      } else if (ds < d) {
+
+        d = ds;
+        edge = *e;
+        vnext = edge->other (v);
 
       }
 

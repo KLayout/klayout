@@ -415,7 +415,7 @@ Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool insi
       size_t n = m_vertex_heap.size ();
       size_t m = n;
 
-      //  A sample heuristics that takes a sqrt(N) sample from the
+      //  A simple heuristics that takes a sqrt(N) sample from the
       //  vertexes to find a good starting point
 
       vstart = mp_triangles.begin ()->vertex (0);
@@ -1432,13 +1432,12 @@ Triangles::make_contours (const Poly &poly, const Trans &trans, std::vector<std:
 }
 
 void
-Triangles::create_constrained_delaunay (const db::Region &region, double dbu)
+Triangles::create_constrained_delaunay (const db::Region &region, const CplxTrans &trans)
 {
   clear ();
 
   std::vector<std::vector<db::Vertex *> > edge_contours;
 
-  db::CplxTrans trans (dbu);
   for (auto p = region.begin_merged (); ! p.at_end (); ++p) {
     make_contours (*p, trans, edge_contours);
   }
@@ -1447,12 +1446,12 @@ Triangles::create_constrained_delaunay (const db::Region &region, double dbu)
 }
 
 void
-Triangles::create_constrained_delaunay (const db::Polygon &p, double dbu)
+Triangles::create_constrained_delaunay (const db::Polygon &p, const CplxTrans &trans)
 {
   clear ();
 
   std::vector<std::vector<db::Vertex *> > edge_contours;
-  make_contours (p, db::CplxTrans (dbu), edge_contours);
+  make_contours (p, trans, edge_contours);
 
   constrain (edge_contours);
 }
@@ -1506,7 +1505,16 @@ Triangles::triangulate (const db::Region &region, const TriangulateParameters &p
 {
   tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
 
-  create_constrained_delaunay (region, dbu);
+  create_constrained_delaunay (region, db::CplxTrans (dbu));
+  refine (parameters);
+}
+
+void
+Triangles::triangulate (const db::Region &region, const TriangulateParameters &parameters, const db::CplxTrans &trans)
+{
+  tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
+
+  create_constrained_delaunay (region, trans);
   refine (parameters);
 }
 
@@ -1515,7 +1523,16 @@ Triangles::triangulate (const db::Polygon &poly, const TriangulateParameters &pa
 {
   tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
 
-  create_constrained_delaunay (poly, dbu);
+  create_constrained_delaunay (poly, db::CplxTrans (dbu));
+  refine (parameters);
+}
+
+void
+Triangles::triangulate (const db::Polygon &poly, const TriangulateParameters &parameters, const db::CplxTrans &trans)
+{
+  tl::SelfTimer timer (tl::verbosity () > parameters.base_verbosity, "Triangles::triangulate");
+
+  create_constrained_delaunay (poly, trans);
   refine (parameters);
 }
 
@@ -1582,13 +1599,10 @@ Triangles::refine (const TriangulateParameters &parameters)
 
       if ((*t)->contains (center) >= 0) {
 
-        //  heuristics #1: never insert a point into a triangle with more than one segments
-        if (t->get ()->num_segments () <= 1) {
-          if (tl::verbosity () >= parameters.base_verbosity + 20) {
-            tl::info << "Inserting in-triangle center " << center.to_string () << " of " << (*t)->to_string (true);
-          }
-          insert_point (center, &new_triangles);
+        if (tl::verbosity () >= parameters.base_verbosity + 20) {
+          tl::info << "Inserting in-triangle center " << center.to_string () << " of " << (*t)->to_string (true);
         }
+        insert_point (center, &new_triangles);
 
       } else {
 

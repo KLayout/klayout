@@ -665,7 +665,7 @@ TEST(create_constrained_delaunay)
              "((0, 1000), (200, 800), (200, 200))");
 }
 
-TEST(triangulate)
+TEST(triangulate_basic)
 {
   db::Region r;
   r.insert (db::Box (0, 0, 10000, 10000));
@@ -765,7 +765,7 @@ void read_polygons (const std::string &path, db::Region &region, double dbu)
   }
 }
 
-TEST(triangulate2)
+TEST(triangulate_geo)
 {
   double dbu = 0.001;
 
@@ -816,7 +816,7 @@ TEST(triangulate2)
   EXPECT_LT (tri.num_triangles (), size_t (30000));
 }
 
-TEST(triangulate3)
+TEST(triangulate_analytic)
 {
   double dbu = 0.0001;
 
@@ -869,3 +869,44 @@ TEST(triangulate3)
   EXPECT_GT (tri.num_triangles (), size_t (1250));
   EXPECT_LT (tri.num_triangles (), size_t (1300));
 }
+
+TEST(triangulate_problematic)
+{
+  db::DPoint contour[] = {
+    db::DPoint (129145.00000, -30060.80000),
+    db::DPoint (129145.00000, -28769.50000),
+    db::DPoint (129159.50000, -28754.90000),
+    db::DPoint (129159.60000, -28754.80000),
+    db::DPoint (129159.50000, -28754.70000),
+    db::DPoint (129366.32200, -28547.90000),
+    db::DPoint (130958.54600, -26955.84600),
+    db::DPoint (131046.25000, -27043.55000),
+    db::DPoint (130152.15000, -27937.65000),
+    db::DPoint (130152.15000, -30060.80000)
+  };
+
+  db::DPolygon poly;
+  poly.assign_hull (contour + 0, contour + sizeof (contour) / sizeof (contour[0]));
+
+  db::Triangles::TriangulateParameters param;
+  param.min_b = 1.0;
+  param.max_area = 10000.0;
+  param.min_length = 0.002;
+
+  TestableTriangles tri;
+  tri.triangulate (poly, param);
+
+  EXPECT_EQ (tri.check (false), true);
+
+  //  for debugging:
+  //  tri.dump ("debug.gds");
+
+  for (auto t = tri.begin (); t != tri.end (); ++t) {
+    EXPECT_LE (t->area (), param.max_area);
+    EXPECT_GE (t->b (), param.min_b);
+  }
+
+  EXPECT_GT (tri.num_triangles (), size_t (1250));
+  EXPECT_LT (tri.num_triangles (), size_t (1300));
+}
+

@@ -154,10 +154,10 @@ public:
    */
   void triangulate (const db::Region &region, const TriangulateParameters &parameters, double dbu = 1.0);
 
-  /**
-   *  @brief Triangulates a polygon
-   */
+  //  more versions
   void triangulate (const db::Polygon &poly, const TriangulateParameters &parameters, double dbu = 1.0);
+  void triangulate (const db::Region &region, const TriangulateParameters &parameters, const db::CplxTrans &trans = db::CplxTrans ());
+  void triangulate (const db::Polygon &poly, const TriangulateParameters &parameters, const db::CplxTrans &trans = db::CplxTrans ());
 
   /**
    *  @brief Triangulates a floating-point polygon
@@ -279,12 +279,12 @@ protected:
   /**
    *  @brief Creates a constrained Delaunay triangulation from the given Region
    */
-  void create_constrained_delaunay (const db::Region &region, double dbu = 1.0);
+  void create_constrained_delaunay (const db::Region &region, const db::CplxTrans &trans = db::CplxTrans ());
 
   /**
    *  @brief Creates a constrained Delaunay triangulation from the given Polygon
    */
-  void create_constrained_delaunay (const db::Polygon &poly, double dbu = 1.0);
+  void create_constrained_delaunay (const db::Polygon &poly, const db::CplxTrans &trans = db::CplxTrans ());
 
   /**
    *  @brief Creates a constrained Delaunay triangulation from the given DPolygon

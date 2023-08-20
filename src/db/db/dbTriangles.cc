@@ -1085,7 +1085,7 @@ Triangles::fill_concave_corners (const std::vector<db::TriangleEdge *> &edges)
 
     }
 
-    if (not any_connected) {
+    if (! any_connected) {
       break;
     }
 

@@ -25,6 +25,7 @@
 #include "tlUnitTest.h"
 
 #include <list>
+#include <memory>
 
 class TestableTriangleEdge
   : public db::TriangleEdge

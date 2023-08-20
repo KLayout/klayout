@@ -114,7 +114,12 @@ class DBTexts_TestClass < TestBase
     r1.insert(RBA::Text::new("uvm", RBA::Trans::new(RBA::Vector::new(111, 211))))
 
     assert_equal(csort((r1 + r2).to_s), csort("('abc',r0 100,-200);('uvm',r0 110,210);('abc',r0 101,-201);('uvm',r0 111,211)"))
-    r1 += r2
+    assert_equal(csort((r1.join(r2)).to_s), csort("('abc',r0 100,-200);('uvm',r0 110,210);('abc',r0 101,-201);('uvm',r0 111,211)"))
+    rr1 = r1.dup
+    rr1 += r2
+    assert_equal(csort(r1.to_s), csort("('abc',r0 100,-200);('uvm',r0 110,210);('abc',r0 101,-201);('uvm',r0 111,211)"))
+    rr1 = r1.dup
+    rr1.join_with(r2)
     assert_equal(csort(r1.to_s), csort("('abc',r0 100,-200);('uvm',r0 110,210);('abc',r0 101,-201);('uvm',r0 111,211)"))
 
   end

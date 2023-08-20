@@ -276,20 +276,27 @@ Class<db::Texts> decl_Texts (decl_dbShapeCollection, "db", "Texts",
   method_ext ("data_id", &id,
     "@brief Returns the data ID (a unique identifier for the underlying data storage)\n"
   ) +
-  method ("+", &db::Texts::operator+, gsi::arg ("other"),
+  method ("+|join", &db::Texts::operator+, gsi::arg ("other"),
     "@brief Returns the combined text collection of self and the other one\n"
     "\n"
     "@return The resulting text collection\n"
     "\n"
     "This operator adds the texts of the other collection to self and returns a new combined set.\n"
-  ) + 
-  method ("+=", &db::Texts::operator+=, gsi::arg ("other"),
+    "\n"
+    "The 'join' alias has been introduced in version 0.28.12."
+  ) +
+  method ("+=|join_with", &db::Texts::operator+=, gsi::arg ("other"),
     "@brief Adds the texts of the other text collection to self\n"
     "\n"
     "@return The text collection after modification (self)\n"
     "\n"
     "This operator adds the texts of the other collection to self.\n"
-  ) + 
+    "\n"
+    "Note that in Ruby, the '+=' operator actually does not exist, but is emulated by '+' followed by an assignment. "
+    "This is less efficient than the in-place operation, so it is recommended to use 'join_with' instead.\n"
+    "\n"
+    "The 'join_with' alias has been introduced in version 0.28.12."
+  ) +
   method_ext ("move", &move_p, gsi::arg ("p"),
     "@brief Moves the text collection\n"
     "\n"

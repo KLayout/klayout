@@ -1647,15 +1647,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This variant has been introduced in version 0.28.4."
   ) +
   method ("&=", &db::Region::operator&=, gsi::arg ("other"),
-    "@brief Performs the boolean AND between self and the other region\n"
+    "@brief Performs the boolean AND between self and the other region in-place (modifying self)\n"
     "\n"
     "@return The region after modification (self)\n"
     "\n"
     "This method will compute the boolean AND (intersection) between two regions. "
     "The result is often but not necessarily always merged.\n"
+    "\n"
+    "Note that in Ruby, the '&=' operator actually does not exist, but is emulated by '&' followed by an assignment. "
+    "This is less efficient than the in-place operation, so it is recommended to use 'and_with' instead."
   ) +
   method ("and_with", &db::Region::bool_and_with, gsi::arg ("other"), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"),
-    "@brief Performs the boolean AND between self and the other region\n"
+    "@brief Performs the boolean AND between self and the other region in-place (modifying self)\n"
     "\n"
     "@return The region after modification (self)\n"
     "\n"
@@ -1687,15 +1690,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "This variant has been introduced in version 0.28.4."
   ) +
   method ("-=", &db::Region::operator-=, gsi::arg ("other"),
-    "@brief Performs the boolean NOT between self and the other region\n"
+    "@brief Performs the boolean NOT between self and the other region in-place (modifying self)\n"
     "\n"
     "@return The region after modification (self)\n"
     "\n"
     "This method will compute the boolean NOT (intersection) between two regions. "
     "The result is often but not necessarily always merged.\n"
+    "\n"
+    "Note that in Ruby, the '-=' operator actually does not exist, but is emulated by '-' followed by an assignment. "
+    "This is less efficient than the in-place operation, so it is recommended to use 'not_with' instead."
   ) +
   method ("not_with", &db::Region::bool_not_with, gsi::arg ("other"), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"),
-    "@brief Performs the boolean NOT between self and the other region\n"
+    "@brief Performs the boolean NOT between self and the other region in-place (modifying self)\n"
     "\n"
     "@return The region after modification (self)\n"
     "\n"
@@ -1706,53 +1712,74 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This variant has been introduced in version 0.28.4."
   ) +
-  method ("^", &db::Region::operator^, gsi::arg ("other"),
+  method ("^|xor", &db::Region::operator^, gsi::arg ("other"),
     "@brief Returns the boolean XOR between self and the other region\n"
     "\n"
     "@return The result of the boolean XOR operation\n"
     "\n"
     "This method will compute the boolean XOR (intersection) between two regions. "
     "The result is often but not necessarily always merged.\n"
+    "\n"
+    "The 'xor' alias has been introduced in version 0.28.12."
   ) +
-  method ("^=", &db::Region::operator^=, gsi::arg ("other"),
-    "@brief Performs the boolean XOR between self and the other region\n"
+  method ("^=|xor_with", &db::Region::operator^=, gsi::arg ("other"),
+    "@brief Performs the boolean XOR between self and the other region in-place (modifying self)\n"
     "\n"
     "@return The region after modification (self)\n"
     "\n"
     "This method will compute the boolean XOR (intersection) between two regions. "
     "The result is often but not necessarily always merged.\n"
+    "\n"
+    "Note that in Ruby, the '^=' operator actually does not exist, but is emulated by '^' followed by an assignment. "
+    "This is less efficient than the in-place operation, so it is recommended to use 'xor_with' instead.\n"
+    "\n"
+    "The 'xor_with' alias has been introduced in version 0.28.12."
   ) +
-  method ("\\|", &db::Region::operator|, gsi::arg ("other"),
+  method ("\\||or", &db::Region::operator|, gsi::arg ("other"),
     "@brief Returns the boolean OR between self and the other region\n"
     "\n"
     "@return The resulting region\n"
     "\n"
     "The boolean OR is implemented by merging the polygons of both regions. To simply join the regions "
     "without merging, the + operator is more efficient."
+    "\n"
+    "The 'or' alias has been introduced in version 0.28.12."
   ) +
-  method ("\\|=", &db::Region::operator|=, gsi::arg ("other"),
-    "@brief Performs the boolean OR between self and the other region\n"
+  method ("\\|=|or_with", &db::Region::operator|=, gsi::arg ("other"),
+    "@brief Performs the boolean OR between self and the other region in-place (modifying self)\n"
     "\n"
     "@return The region after modification (self)\n"
     "\n"
     "The boolean OR is implemented by merging the polygons of both regions. To simply join the regions "
     "without merging, the + operator is more efficient."
+    "\n"
+    "Note that in Ruby, the '|=' operator actually does not exist, but is emulated by '|' followed by an assignment. "
+    "This is less efficient than the in-place operation, so it is recommended to use 'or_with' instead.\n"
+    "\n"
+    "The 'or_with' alias has been introduced in version 0.28.12."
   ) +
-  method ("+", &db::Region::operator+, gsi::arg ("other"),
+  method ("+|join", &db::Region::operator+, gsi::arg ("other"),
     "@brief Returns the combined region of self and the other region\n"
     "\n"
     "@return The resulting region\n"
     "\n"
     "This operator adds the polygons of the other region to self and returns a new combined region. "
     "This usually creates unmerged regions and polygons may overlap. Use \\merge if you want to ensure the result region is merged.\n"
+    "\n"
+    "The 'join' alias has been introduced in version 0.28.12."
   ) +
-  method ("+=", &db::Region::operator+=, gsi::arg ("other"),
+  method ("+=|join_with", &db::Region::operator+=, gsi::arg ("other"),
     "@brief Adds the polygons of the other region to self\n"
     "\n"
     "@return The region after modification (self)\n"
     "\n"
     "This operator adds the polygons of the other region to self. "
     "This usually creates unmerged regions and polygons may overlap. Use \\merge if you want to ensure the result region is merged.\n"
+    "\n"
+    "Note that in Ruby, the '+=' operator actually does not exist, but is emulated by '+' followed by an assignment. "
+    "This is less efficient than the in-place operation, so it is recommended to use 'join_with' instead.\n"
+    "\n"
+    "The 'join_with' alias has been introduced in version 0.28.12."
   ) +
   method ("covering", &db::Region::selected_enclosing, gsi::arg ("other"), gsi::arg ("min_count", size_t (1)), gsi::arg ("max_count", size_t (std::numeric_limits<size_t>::max ()), "unlimited"),
     "@brief Returns the polygons of this region which are completely covering polygons from the other region\n"

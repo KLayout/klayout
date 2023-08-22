@@ -45,7 +45,7 @@ template <class C> class point;
  */
 
 template <class C>
-class DB_PUBLIC_TEMPLATE vector
+class DB_PUBLIC vector
 {
 public:
   typedef C coord_type;
@@ -171,22 +171,42 @@ public:
   /**
    *  @brief Add to operation
    */
-  vector<C> &operator+= (const vector<C> &p);
+  vector<C> &operator+= (const vector<C> &p)
+  {
+    m_x += p.x ();
+    m_y += p.y ();
+    return *this;
+  }
 
   /**
    *  @brief method version of operator+ (mainly for automation purposes)
    */
-  vector<C> add (const vector<C> &p) const;
+  vector<C> add (const vector<C> &p) const
+  {
+    vector<C> r (*this);
+    r += p;
+    return r;
+  }
 
   /**
    *  @brief Subtract from operation
    */
-  vector<C> &operator-= (const vector<C> &p);
+  vector<C> &operator-= (const vector<C> &p)
+  {
+    m_x -= p.x ();
+    m_y -= p.y ();
+    return *this;
+  }
   
   /**
    *  @brief method version of operator- (mainly for automation purposes)
    */
-  vector<C> subtract (const vector<C> &p) const;
+  vector<C> subtract (const vector<C> &p) const
+  {
+    vector<C> r (*this);
+    r -= p;
+    return r;
+  }
 
   /**
    *  @brief "less" comparison operator
@@ -194,17 +214,26 @@ public:
    *  This operator is provided to establish a sorting
    *  order
    */
-  bool operator< (const vector<C> &p) const;
+  bool operator< (const vector<C> &p) const
+  {
+    return m_y < p.m_y || (m_y == p.m_y && m_x < p.m_x);
+  }
 
   /**
    *  @brief Equality test operator
    */
-  bool operator== (const vector<C> &p) const;
+  bool operator== (const vector<C> &p) const
+  {
+    return m_x == p.m_x && m_y == p.m_y;
+  }
 
   /**
    *  @brief Inequality test operator
    */
-  bool operator!= (const vector<C> &p) const;
+  bool operator!= (const vector<C> &p) const
+  {
+    return !operator== (p);
+  }
 
   /**
    *  @brief Const transform
@@ -217,7 +246,10 @@ public:
    *  @return The transformed vector
    */
   template <class Tr>
-  vector<typename Tr::target_coord_type> transformed (const Tr &t) const;
+  vector<typename Tr::target_coord_type> transformed (const Tr &t) const
+  {
+    return t (vector<typename Tr::target_coord_type> (*this));
+  }
 
   /**
    *  @brief In-place transformation
@@ -229,32 +261,51 @@ public:
    *  @return The transformed vector
    */
   template <class Tr>
-  vector &transform (const Tr &t);
+  vector &transform (const Tr &t)
+  {
+    *this = vector<C> (t (*this));
+    return *this;
+  }
 
   /**
    *  @brief Accessor to the x coordinate
    */
-  C x () const;
+  C x () const
+  {
+    return m_x;
+  }
 
   /**
    *  @brief Accessor to the y coordinate
    */
-  C y () const;
+  C y () const
+  {
+    return m_y;
+  }
 
   /**
    *  @brief Write accessor to the x coordinate
    */
-  void set_x (C _x);
+  void set_x (C _x)
+  {
+    m_x = _x;
+  }
 
   /**
    *  @brief Write accessor to the y coordinate
    */
-  void set_y (C _y);
+  void set_y (C _y)
+  {
+    m_y = _y;
+  }
 
   /**
    *  @brief Fuzzy comparison of vectors
    */
-  bool equal (const vector<C> &p) const;
+  bool equal (const vector<C> &p) const
+  {
+    return coord_traits::equal (x (), p.x ()) && coord_traits::equal (y (), p.y ());
+  }
 
   /**
    *  @brief Fuzzy comparison of vectors for inequality
@@ -267,31 +318,56 @@ public:
   /**
    *  @brief Fuzzy "less" comparison of vectors
    */
-  bool less (const vector<C> &p) const;
+  bool less (const vector<C> &p) const
+  {
+    if (! coord_traits::equal (y (), p.y ())) {
+      return y () < p.y ();
+    }
+    if (! coord_traits::equal (x (), p.x ())) {
+      return x () < p.x ();
+    }
+    return false;
+  }
 
   /**
    *  @brief Scaling by some factor
    *
    *  To avoid round effects, the result vector is of double coordinate type.
    */
-  vector<double> operator* (double s) const;
+  vector<double> operator* (double s) const
+  {
+    return vector<double> (m_x * s, m_y * s);
+  }
 
   /**
    *  @brief Scaling by some factor
    */
-  vector<C> operator* (long s) const;
+  vector<C> operator* (long s) const
+  {
+    return vector<C> (m_x * s, m_y * s);
+  }
 
   /**
    *  @brief Scaling self by some factor
    *
    *  Scaling by a double value in general involves rounding when the coordinate type is integer.
    */
-  vector<C> operator*= (double s);
+  vector<C> operator*= (double s)
+  {
+    m_x = coord_traits::rounded (m_x * s);
+    m_y = coord_traits::rounded (m_y * s);
+    return *this;
+  }
 
   /**
    *  @brief Scaling self by some integer factor
    */
-  vector<C> operator*= (long s);
+  vector<C> operator*= (long s)
+  {
+    m_x *= s;
+    m_y *= s;
+    return *this;
+  }
 
   /**
    *  @brief Division by some divisor.
@@ -300,32 +376,60 @@ public:
    *  with the coord_traits scheme.
    */
 
-  vector<C> &operator/= (double s);
+  vector<C> &operator/= (double s)
+  {
+    double mult = 1.0 / static_cast<double>(s);
+    *this *= mult;
+    return *this;
+  }
 
   /**
    *  @brief Dividing self by some integer divisor
    */
-  vector<C> &operator/= (long s);
+  vector<C> &operator/= (long s)
+  {
+    double mult = 1.0 / static_cast<double>(s);
+    *this *= mult;
+    return *this;
+  }
 
   /**
    *  @brief The euclidian length 
    */
-  distance_type length () const;
+  distance_type length () const
+  {
+    double ddx (x ());
+    double ddy (y ());
+    return coord_traits::rounded_distance (sqrt (ddx * ddx + ddy * ddy));
+  }
 
   /**
    *  @brief The euclidian length of the vector
    */
-  double double_length () const;
+  double double_length () const
+  {
+    double ddx (x ());
+    double ddy (y ());
+    return sqrt (ddx * ddx + ddy * ddy);
+  }
 
   /**
    *  @brief The square euclidian length of the vector
    */
-  area_type sq_length () const;
+  area_type sq_length () const
+  {
+    return coord_traits::sq_length (0, 0, x (), y ());
+  }
 
   /**
    *  @brief The square of the euclidian length of the vector
    */
-  double sq_double_length () const;
+  double sq_double_length () const
+  {
+    double ddx (x ());
+    double ddy (y ());
+    return ddx * ddx + ddy * ddy;
+  }
 
   /**
    *  @brief String conversion
@@ -349,216 +453,12 @@ private:
   C m_x, m_y;
 };
 
-template <class C>
-inline vector<C> &
-vector<C>::operator+= (const vector<C> &p)
-{
-  m_x += p.x ();
-  m_y += p.y ();
-  return *this;
-}
-
-template <class C>
-inline vector<C> 
-vector<C>::add (const vector<C> &p) const
-{
-  vector<C> r (*this);
-  r += p;
-  return r;
-}
-
-template <class C>
-inline vector<C> &
-vector<C>::operator-= (const vector<C> &p)
-{
-  m_x -= p.x ();
-  m_y -= p.y ();
-  return *this;
-}
-
-template <class C>
-inline vector<C> 
-vector<C>::subtract (const vector<C> &p) const
-{
-  vector<C> r (*this);
-  r -= p;
-  return r;
-}
-
-template <class C>
-inline bool
-vector<C>::operator< (const vector<C> &p) const
-{
-  return m_y < p.m_y || (m_y == p.m_y && m_x < p.m_x);
-}
-
-template <class C>
-inline bool
-vector<C>::less (const vector<C> &p) const
-{
-  if (! coord_traits::equal (y (), p.y ())) {
-    return y () < p.y ();
-  }
-  if (! coord_traits::equal (x (), p.x ())) {
-    return x () < p.x ();
-  }
-  return false;
-}
-
-template <class C>
-inline bool
-vector<C>::operator== (const vector<C> &p) const
-{
-  return m_x == p.m_x && m_y == p.m_y;
-}
-
-template <class C>
-inline bool
-vector<C>::equal (const vector<C> &p) const
-{
-  return coord_traits::equal (x (), p.x ()) && coord_traits::equal (y (), p.y ());
-}
-
-template <class C>
-inline bool
-vector<C>::operator!= (const vector<C> &p) const
-{
-  return !operator== (p);
-}
-
-template <class C> template <class Tr>
-inline vector<typename Tr::target_coord_type> 
-vector<C>::transformed (const Tr &t) const
-{
-  return t (vector<typename Tr::target_coord_type> (*this));
-}
-
-template <class C> template <class Tr>
-inline vector<C> &
-vector<C>::transform (const Tr &t)
-{
-  *this = vector<C> (t (*this));
-  return *this;
-}
-
-template <class C>
-inline C 
-vector<C>::x () const
-{
-  return m_x;
-}
-
-template <class C>
-inline C 
-vector<C>::y () const
-{
-  return m_y;
-}
-
-template <class C>
-inline void 
-vector<C>::set_x (C _x) 
-{
-  m_x = _x;
-}
-
-template <class C>
-inline void 
-vector<C>::set_y (C _y) 
-{
-  m_y = _y;
-}
-
-template <class C>
-inline vector<double>
-vector<C>::operator* (double s) const
-{
-  return vector<double> (m_x * s, m_y * s);
-}
-
-template <class C>
-inline vector<C>
-vector<C>::operator* (long s) const
-{
-  return vector<C> (m_x * s, m_y * s);
-}
-
 template <class C, typename Number>
 inline vector<C>
 operator/ (const db::vector<C> &p, Number s)
 {
   double mult = 1.0 / static_cast<double>(s);
   return vector<C> (p.x () * mult, p.y () * mult);
-}
-
-template <class C>
-inline vector<C> &
-vector<C>::operator/= (double s)
-{
-  double mult = 1.0 / static_cast<double>(s);
-  *this *= mult;
-  return *this;
-}
-
-template <class C>
-inline vector<C> &
-vector<C>::operator/= (long s)
-{
-  double mult = 1.0 / static_cast<double>(s);
-  *this *= mult;
-  return *this;
-}
-
-template <class C>
-inline vector<C> 
-vector<C>::operator*= (double s) 
-{
-  m_x = coord_traits::rounded (m_x * s);
-  m_y = coord_traits::rounded (m_y * s);
-  return *this;
-}
-
-template <class C>
-inline vector<C>
-vector<C>::operator*= (long s)
-{
-  m_x *= s;
-  m_y *= s;
-  return *this;
-}
-
-template <class C>
-inline typename vector<C>::distance_type 
-vector<C>::length () const
-{
-  double ddx (x ());
-  double ddy (y ());
-  return coord_traits::rounded_distance (sqrt (ddx * ddx + ddy * ddy));
-}
-
-template <class C>
-inline double 
-vector<C>::double_length () const
-{
-  double ddx (x ());
-  double ddy (y ());
-  return sqrt (ddx * ddx + ddy * ddy);
-}
-
-template <class C>
-inline typename vector<C>::area_type 
-vector<C>::sq_length () const
-{
-  return coord_traits::sq_length (0, 0, x (), y ());
-}
-
-template <class C>
-inline double 
-vector<C>::sq_double_length () const
-{
-  double ddx (x ());
-  double ddy (y ());
-  return ddx * ddx + ddy * ddy;
 }
 
 /**

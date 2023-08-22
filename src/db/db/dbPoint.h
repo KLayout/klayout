@@ -270,12 +270,22 @@ public:
    *  Scaling involves rounding which in our case is simply handled
    *  with the coord_traits scheme.
    */
-  point<C> &operator*= (double s);
+  point<C> &operator*= (double s)
+  {
+    m_x = coord_traits::rounded (m_x * s);
+    m_y = coord_traits::rounded (m_y * s);
+    return *this;
+  }
 
   /**
    *  @brief Scaling self by some integer factor
    */
-  point<C> &operator*= (long s);
+  point<C> &operator*= (long s)
+  {
+    m_x = coord_traits::rounded (m_x * s);
+    m_y = coord_traits::rounded (m_y * s);
+    return *this;
+  }
 
   /**
    *  @brief Division by some divisor.
@@ -284,62 +294,114 @@ public:
    *  with the coord_traits scheme.
    */
 
-  point<C> &operator/= (double s);
+  point<C> &operator/= (double s)
+  {
+    double mult = 1.0 / static_cast<double>(s);
+    *this *= mult;
+    return *this;
+  }
 
   /**
    *  @brief Dividing self by some integer divisor
    */
-  point<C> &operator/= (long s);
+  point<C> &operator/= (long s)
+  {
+    double mult = 1.0 / static_cast<double>(s);
+    *this *= mult;
+    return *this;
+  }
 
   /**
    *  @brief The euclidian distance to another point
    *
    *  @param d The other to compute the distance to.
    */
-  distance_type distance (const point<C> &p) const;
+  distance_type distance (const point<C> &p) const
+  {
+    double ddx (p.x ());
+    double ddy (p.y ());
+    ddx -= double (x ());
+    ddy -= double (y ());
+    return coord_traits::rounded_distance (sqrt (ddx * ddx + ddy * ddy));
+  }
 
   /**
    *  @brief The euclidian distance of the point to (0,0)
    */
-  distance_type distance () const;
+  distance_type distance () const
+  {
+    double ddx (x ());
+    double ddy (y ());
+    return coord_traits::rounded_distance (sqrt (ddx * ddx + ddy * ddy));
+  }
 
   /**
    *  @brief The euclidian distance to another point as double value
    *
    *  @param d The other to compute the distance to.
    */
-  double double_distance (const point<C> &p) const;
+  double double_distance (const point<C> &p) const
+  {
+    double ddx (p.x ());
+    double ddy (p.y ());
+    ddx -= double (x ());
+    ddy -= double (y ());
+    return sqrt (ddx * ddx + ddy * ddy);
+  }
 
   /**
    *  @brief The euclidian distance of the point to (0,0) as double value
    */
-  double double_distance () const;
+  double double_distance () const
+  {
+    double ddx (x ());
+    double ddy (y ());
+    return sqrt (ddx * ddx + ddy * ddy);
+  }
 
   /**
    *  @brief The square euclidian distance to another point
    *
    *  @param d The other to compute the distance to.
    */
-  area_type sq_distance (const point<C> &p) const;
+  area_type sq_distance (const point<C> &p) const
+  {
+    return coord_traits::sq_length (p.x (), p.y (), x (), y ());
+  }
 
   /**
    *  @brief The square euclidian distance to point (0,0)
    *
    *  @param d The other to compute the distance to.
    */
-  area_type sq_distance () const;
+  area_type sq_distance () const
+  {
+    return coord_traits::sq_length (0, 0, x (), y ());
+  }
 
   /**
    *  @brief The square of the euclidian distance to another point as double value
    *
    *  @param d The other to compute the distance to.
    */
-  double sq_double_distance (const point<C> &p) const;
+  double sq_double_distance (const point<C> &p) const
+  {
+    double ddx (p.x ());
+    double ddy (p.y ());
+    ddx -= double (x ());
+    ddy -= double (y ());
+    return ddx * ddx + ddy * ddy;
+  }
 
   /**
    *  @brief The square of the euclidian distance of the point to (0,0) as double value
    */
-  double sq_double_distance () const;
+  double sq_double_distance () const
+  {
+    double ddx (x ());
+    double ddy (y ());
+    return ddx * ddx + ddy * ddy;
+  }
 
   /**
    *  @brief String conversion
@@ -452,116 +514,6 @@ operator/ (const db::point<C> &p, Number s)
 {
   double mult = 1.0 / static_cast<double>(s);
   return point<C> (p.x () * mult, p.y () * mult);
-}
-
-template <class C>
-inline point<C> &
-point<C>::operator/= (double s)
-{
-  double mult = 1.0 / static_cast<double>(s);
-  *this *= mult;
-  return *this;
-}
-
-template <class C>
-inline point<C> &
-point<C>::operator/= (long s)
-{
-  double mult = 1.0 / static_cast<double>(s);
-  *this *= mult;
-  return *this;
-}
-
-template <class C>
-inline point<C> &
-point<C>::operator*= (double s) 
-{
-  m_x = coord_traits::rounded (m_x * s);
-  m_y = coord_traits::rounded (m_y * s);
-  return *this;
-}
-
-template <class C>
-inline point<C> &
-point<C>::operator*= (long s) 
-{
-  m_x = coord_traits::rounded (m_x * s);
-  m_y = coord_traits::rounded (m_y * s);
-  return *this;
-}
-
-template <class C>
-inline typename point<C>::distance_type 
-point<C>::distance (const point<C> &p) const
-{
-  double ddx (p.x ());
-  double ddy (p.y ());
-  ddx -= double (x ());
-  ddy -= double (y ());
-  return coord_traits::rounded_distance (sqrt (ddx * ddx + ddy * ddy));
-}
-
-template <class C>
-inline typename point<C>::distance_type 
-point<C>::distance () const
-{
-  double ddx (x ());
-  double ddy (y ());
-  return coord_traits::rounded_distance (sqrt (ddx * ddx + ddy * ddy));
-}
-
-template <class C>
-inline double 
-point<C>::double_distance (const point<C> &p) const
-{
-  double ddx (p.x ());
-  double ddy (p.y ());
-  ddx -= double (x ());
-  ddy -= double (y ());
-  return sqrt (ddx * ddx + ddy * ddy);
-}
-
-template <class C>
-inline double 
-point<C>::double_distance () const
-{
-  double ddx (x ());
-  double ddy (y ());
-  return sqrt (ddx * ddx + ddy * ddy);
-}
-
-template <class C>
-inline typename point<C>::area_type 
-point<C>::sq_distance (const point<C> &p) const
-{
-  return coord_traits::sq_length (p.x (), p.y (), x (), y ());
-}
-
-template <class C>
-inline typename point<C>::area_type 
-point<C>::sq_distance () const
-{
-  return coord_traits::sq_length (0, 0, x (), y ());
-}
-
-template <class C>
-inline double 
-point<C>::sq_double_distance (const point<C> &p) const
-{
-  double ddx (p.x ());
-  double ddy (p.y ());
-  ddx -= double (x ());
-  ddy -= double (y ());
-  return ddx * ddx + ddy * ddy;
-}
-
-template <class C>
-inline double 
-point <C>::sq_double_distance () const
-{
-  double ddx (x ());
-  double ddy (y ());
-  return ddx * ddx + ddy * ddy;
 }
 
 /**

@@ -22,6 +22,7 @@
 
 
 #include "dbVector.h"
+#include "dbPoint.h"
 
 // ----------------------------------------------------------------
 //  Implementation of the custom extractors

@@ -29,6 +29,9 @@
 #include "tlTimer.h"
 
 #include <set>
+#include <memory>
+#include <vector>
+#include <map>
 
 namespace db
 {

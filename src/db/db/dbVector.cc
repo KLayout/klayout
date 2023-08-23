@@ -55,6 +55,15 @@ namespace {
 
 }
 
+namespace db
+{
+
+//  instantiations
+template class vector<Coord>;
+template class vector<DCoord>;
+
+}
+
 namespace tl 
 {
   

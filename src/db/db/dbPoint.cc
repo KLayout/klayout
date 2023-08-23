@@ -55,6 +55,15 @@ namespace {
 
 }
 
+namespace db
+{
+
+//  instantiations
+template class point<Coord>;
+template class point<DCoord>;
+
+}
+
 namespace tl 
 {
   

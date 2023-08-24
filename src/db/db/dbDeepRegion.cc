@@ -252,8 +252,8 @@ static void transform_deep_layer (db::DeepLayer &deep_layer, const Trans &t)
 
     //  Plain move
 
-    //  build cell variants for different orientations
-    db::OrientationReducer same_orientation;
+    //  build cell variants for different orientations and magnifications
+    db::MagnificationAndOrientationReducer same_orientation;
 
     db::VariantsCollectorBase vars (&same_orientation);
     vars.collect (deep_layer.layout (), deep_layer.initial_cell ());

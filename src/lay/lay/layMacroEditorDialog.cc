@@ -2790,7 +2790,7 @@ BEGIN_PROTECTED
   std::string new_path = tl::to_string (QFileInfo (new_dir).absoluteFilePath ());
   paths.push_back (std::make_pair (new_path, cat));
 
-  lym::MacroCollection *c = mp_root->add_folder (tl::to_string (QObject::tr ("Project")) + " - " + new_path, new_path, cat, false);
+  lym::MacroCollection *c = mp_root->add_folder (tl::to_string (QObject::tr ("Project")) + " - " + new_path, new_path, cat, false /* writeable */, false /* do not auto-create folders */);
   if (!c) {
     throw tl::Exception (tl::to_string (QObject::tr ("The selected directory is already installed as custom location")));
   }

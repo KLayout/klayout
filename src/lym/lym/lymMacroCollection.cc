@@ -262,7 +262,7 @@ MacroCollection::make_readonly (bool f)
 }
 
 MacroCollection *
-MacroCollection::add_folder (const std::string &description, const std::string &p, const std::string &cat, bool readonly, bool force_create)
+MacroCollection::add_folder (const std::string &description, const std::string &p, const std::string &cat, bool readonly, bool auto_create)
 {
   if (! p.empty () && p[0] == ':') {
 
@@ -278,7 +278,7 @@ MacroCollection::add_folder (const std::string &description, const std::string &
     if (! tl::file_exists (fp)) {
 
       //  Try to create the folder since it does not exist yet or skip that one
-      if (! force_create) {
+      if (readonly || ! auto_create) {
 
         if (tl::verbosity () >= 20) {
           tl::log << tl::to_string (tr ("Folder does not exist - skipping: ")) << fp;
@@ -831,7 +831,7 @@ void MacroCollection::reload (bool safe)
 
   lym::MacroCollection new_collection;
   for (lym::MacroCollection::child_iterator c = begin_children (); c != end_children (); ++c) {
-    new_collection.add_folder (c->second->description (), c->second->path (), c->second->category (), c->second->is_readonly (), false /* don't force to create */);
+    new_collection.add_folder (c->second->description (), c->second->path (), c->second->category (), c->second->is_readonly (), false /* don't auto-create folder */);
   }
 
   //  and synchronize current with the actual one

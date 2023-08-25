@@ -91,9 +91,10 @@ module DRC
     end
     
     def finish
-      @tmp_layers.each do |li|
-        @layout.delete_layer(li)
+      @tmp_layers.each do |layout,li|
+        layout.delete_layer(li)
       end
+      @tmp_layers = []
     end
 
     def set_box(method, *args)
@@ -347,7 +348,7 @@ CODE
 
         if cell_filter
           tmp = @layout_var.insert_layer(RBA::LayerInfo::new)
-          @tmp_layers << tmp
+          @tmp_layers << [ @layout_var, tmp ]
           @layout_var.cells(cell_filter).each do |cell|
             cell.shapes(tmp).insert(cell.bbox)
           end
@@ -606,7 +607,7 @@ CODE
       
         li = @layout.insert_layer(RBA::LayerInfo::new)
         li && layers.push(li)
-        li && @tmp_layers.push(li)
+        li && @tmp_layers.push([ @layout, li ])
       
       elsif (args.size == 1 && args[0].is_a?(RBA::LayerInfo))
 

@@ -19,12 +19,14 @@ module D25
 
   class D25Executable &lt; RBA::Executable
 
-    def initialize(macro, generator)
+    def initialize(macro, interpreter, generator)
 
       @d25 = D25Engine::new
       @d25._generator = generator
 
       @macro = macro
+
+      @interpreter = interpreter
 
     end
 
@@ -37,9 +39,11 @@ module D25
 
       begin
 
+        encoded_file, expanded_text = @interpreter.include_expansion(@macro)
+
         # No verbosity set in d25 engine - we cannot use the engine's logger 
         RBA::Logger::verbosity &gt;= 10 &amp;&amp; RBA::Logger::info("Running #{@macro.path}")
-        @d25.instance_eval(@macro.text, @macro.path)
+        @d25.instance_eval(expanded_text, encoded_file)
 
       rescue =&gt; ex
 
@@ -67,13 +71,40 @@ module D25
 
   end
   
+  # A recipe implementation allowing the D25 run to be redone
+  class D25Recipe &lt; RBA::Recipe
+
+    def initialize(interpreter)
+
+      super("d25", "D25 recipe")
+
+      @interpreter = interpreter
+
+    end
+
+    def executable(params)
+
+      script = params["script"]
+      if ! script
+        return
+      end
+
+      macro = RBA::Macro::macro_by_path(script)
+      macro || raise("Can't find D25 script #{script} - unable to re-run")
+
+      D25Executable::new(macro, @interpreter, self.generator("script" => script))
+      
+    end
+
+  end
+  
   # A DSL implementation for a D25 language (XML format)
   class D25Interpreter &lt; RBA::MacroInterpreter
   
     # Constructor
-    def initialize(recipe)
+    def initialize
 
-      @recipe = recipe
+      @recipe = D25Recipe::new(self)
 
       # Make the DSL use ruby syntax highlighting
       self.syntax_scheme = "ruby"
@@ -98,7 +129,7 @@ module D25
     
     # Implements the execute method
     def executable(macro)
-      D25Executable::new(macro, @recipe.generator("script" => macro.path))
+      D25Executable::new(macro, self, @recipe.generator("script" => macro.path))
     end
     
   end
@@ -107,9 +138,9 @@ module D25
   class D25PlainTextInterpreter &lt; RBA::MacroInterpreter
   
     # Constructor
-    def initialize(recipe)
+    def initialize
 
-      @recipe = recipe
+      @recipe = D25Recipe::new(self)
 
       # Make the DSL use ruby syntax highlighting
       self.syntax_scheme = "ruby"
@@ -125,40 +156,14 @@ module D25
     
     # Implements the execute method
     def executable(macro)
-      D25Executable::new(macro, @recipe.generator("script" => macro.path))
+      D25Executable::new(macro, self, @recipe.generator("script" => macro.path))
     end
     
   end
   
-  # A recipe implementation allowing the D25 run to be redone
-  class D25Recipe &lt; RBA::Recipe
-
-    def initialize
-      super("d25", "D25 recipe")
-    end
-
-    def executable(params)
-
-      script = params["script"]
-      if ! script
-        return
-      end
-
-      macro = RBA::Macro::macro_by_path(script)
-      macro || raise("Can't find D25 script #{script} - unable to re-run")
-
-      D25Executable::new(macro, self.generator("script" => script))
-      
-    end
-
-  end
-  
-  # Register the recipe
-  d25_recipe = D25Recipe::new
- 
   # Register the new interpreters
-  D25Interpreter::new(d25_recipe)
-  D25PlainTextInterpreter::new(d25_recipe)
+  D25Interpreter::new
+  D25PlainTextInterpreter::new
 
   # Creates a new macro category
   if RBA::Application::instance 

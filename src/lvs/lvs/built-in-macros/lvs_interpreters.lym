@@ -19,13 +19,15 @@ module LVS
 
   class LVSExecutable &lt; RBA::Executable
 
-    def initialize(macro, generator, l2ndb_index = nil)
+    def initialize(macro, interpreter, generator, l2ndb_index = nil)
 
       @lvs = LVSEngine::new
       @lvs._l2ndb_index = l2ndb_index
       @lvs._generator = generator
 
       @macro = macro
+
+      @interpreter = interpreter
 
     end
 
@@ -38,9 +40,11 @@ module LVS
 
       begin
 
+        encoded_file, expanded_text = @interpreter.include_expansion(@macro)
+
         # No verbosity set in lvs engine - we cannot use the engine's logger 
         RBA::Logger::verbosity &gt;= 10 &amp;&amp; RBA::Logger::info("Running #{@macro.path}")
-        @lvs.instance_eval(@macro.text, @macro.path)
+        @lvs.instance_eval(expanded_text, encoded_file)
 
       rescue =&gt; ex
 
@@ -66,13 +70,40 @@ module LVS
 
   end
   
+  # A recipe implementation allowing the LVS run to be redone
+  class LVSRecipe &lt; RBA::Recipe
+
+    def initialize(interpreter)
+
+      super("lvs", "LVS recipe")
+
+      @interpreter = interpreter
+
+    end
+
+    def executable(params)
+
+      script = params["script"]
+      if ! script
+        return
+      end
+
+      macro = RBA::Macro::macro_by_path(script)
+      macro || raise("Can't find LVS script #{script} - unable to re-run")
+
+      LVSExecutable::new(macro, @interpreter, self.generator("script" => script), params["l2ndb_index"])
+      
+    end
+
+  end
+  
   # A DSL implementation for a LVS language (XML format)
   class LVSInterpreter &lt; RBA::MacroInterpreter
   
     # Constructor
-    def initialize(recipe)
+    def initialize
 
-      @recipe = recipe
+      @recipe = LVSRecipe::new(self)
 
       # Make the DSL use ruby syntax highlighting
       self.syntax_scheme = "ruby"
@@ -97,7 +128,7 @@ module LVS
     
     # Implements the execute method
     def executable(macro)
-      LVSExecutable::new(macro, @recipe.generator("script" => macro.path))
+      LVSExecutable::new(macro, self, @recipe.generator("script" => macro.path))
     end
     
   end
@@ -106,9 +137,9 @@ module LVS
   class LVSPlainTextInterpreter &lt; RBA::MacroInterpreter
   
     # Constructor
-    def initialize(recipe)
+    def initialize
 
-      @recipe = recipe
+      @recipe = LVSRecipe::new(self)
 
       # Make the DSL use ruby syntax highlighting
       self.syntax_scheme = "ruby"
@@ -124,40 +155,14 @@ module LVS
     
     # Implements the execute method
     def executable(macro)
-      LVSExecutable::new(macro, @recipe.generator("script" => macro.path))
+      LVSExecutable::new(macro, self, @recipe.generator("script" => macro.path))
     end
     
   end
 
-  # A recipe implementation allowing the LVS run to be redone
-  class LVSRecipe &lt; RBA::Recipe
-
-    def initialize
-      super("lvs", "LVS recipe")
-    end
-
-    def executable(params)
-
-      script = params["script"]
-      if ! script
-        return
-      end
-
-      macro = RBA::Macro::macro_by_path(script)
-      macro || raise("Can't find LVS script #{script} - unable to re-run")
-
-      LVSExecutable::new(macro, self.generator("script" => script), params["l2ndb_index"])
-      
-    end
-
-  end
-  
-  # Register the recipe
-  lvs_recipe = LVSRecipe::new
- 
   # Register the new interpreters
-  LVSInterpreter::new(lvs_recipe)
-  LVSPlainTextInterpreter::new(lvs_recipe)
+  LVSInterpreter::new
+  LVSPlainTextInterpreter::new
 
   # Creates a new macro category
   if RBA.constants.member?(:Application) &amp;&amp; RBA::Application::instance 

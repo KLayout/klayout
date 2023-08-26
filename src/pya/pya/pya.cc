@@ -109,13 +109,13 @@ public:
   {
     while (frame != NULL) {
 
-#if PY_VERSION_HEX >= 0x030B0000
+#if PY_VERSION_HEX >= 0x030A0000
       int line = PyFrame_GetLineNumber(frame);
 #else
       int line = frame->f_lineno;
 #endif
       std::string fn;
-#if PY_VERSION_HEX >= 0x030B0000
+#if PY_VERSION_HEX >= 0x030A0000
       if (test_type<std::string> (PyFrame_GetCode(frame)->co_filename, true)) {
         fn = normalize_path (python2c<std::string> (PyFrame_GetCode(frame)->co_filename));
 #else
@@ -125,7 +125,7 @@ public:
       }
       m_stack_trace.push_back (tl::BacktraceElement (fn, line));
 
-#if PY_VERSION_HEX >= 0x030B0000
+#if PY_VERSION_HEX >= 0x030A0000
       frame = PyFrame_GetBack(frame);
 #else
       frame = frame->f_back;

@@ -748,10 +748,11 @@ InstFinder::find_internal (LayoutViewBase *view, unsigned int cv_index, const db
         m_visible_layer_indexes.push_back (l->layer_index ());
       }
     }
-  }
-
-  if (!m_visible_layers || view->guiding_shapes_visible ()) {
-    m_visible_layer_indexes.push_back (cv->layout ().guiding_shape_layer ());
+    //  add guiding shape and error layers so we can select cells by error markers or guiding shapes
+    if (view->guiding_shapes_visible ()) {
+      m_visible_layer_indexes.push_back (cv->layout ().guiding_shape_layer ());
+    }
+    m_visible_layer_indexes.push_back (cv->layout ().error_layer ());
   }
 
   m_cv_index = cv_index;

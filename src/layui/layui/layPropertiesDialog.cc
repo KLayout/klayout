@@ -272,6 +272,7 @@ PropertiesDialog::disconnect ()
     delete *p;
   }
   mp_properties_pages.clear ();
+  m_index = -1;
 }
 
 void
@@ -604,7 +605,7 @@ PropertiesDialog::ok_pressed ()
 {
 BEGIN_PROTECTED
 
-  if (! mp_properties_pages [m_index]->readonly ()) {
+  if (m_index >= 0 && m_index < int (mp_properties_pages.size ()) && ! mp_properties_pages [m_index]->readonly ()) {
 
     db::Transaction t (mp_manager, tl::to_string (QObject::tr ("Apply changes")), m_transaction_id);
 

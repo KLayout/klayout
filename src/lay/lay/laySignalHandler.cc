@@ -27,6 +27,8 @@
 #include "tlException.h"
 #include "tlString.h"
 #include "tlLog.h"
+#include "tlFileUtils.h"
+#include "tlStream.h"
 
 #ifdef _WIN32
 #  include <windows.h>
@@ -297,16 +299,6 @@ void signal_handler (int signo, siginfo_t *si, void *)
             lay::Version::name () + " " +
             lay::Version::version () + " (" + lay::Version::subversion () + ")\n";
 
-  std::unique_ptr<CrashMessage> msg;
-
-  bool has_gui = s_sh_has_gui && lay::ApplicationBase::instance () && lay::ApplicationBase::instance ()->has_gui ();
-
-  if (has_gui) {
-    msg.reset (new CrashMessage (0, false, tl::to_qstring (text) + QObject::tr ("\nCollecting backtrace ..")));
-    msg->show ();
-    lay::ApplicationBase::instance ()->qapp_gui ()->setOverrideCursor (Qt::WaitCursor);
-  }
-
   text += std::string ("\nBacktrace:\n");
 
 #if 0
@@ -331,14 +323,6 @@ void signal_handler (int signo, siginfo_t *si, void *)
 
   bool has_addr2line = true;
   for (size_t i = 0; i < nptrs; ++i) {
-
-    if (has_gui) {
-      lay::ApplicationBase::instance ()->qapp_gui ()->processEvents ();
-      if (msg->is_cancel_pressed ()) {
-        text += "...\n";
-        break;
-      }
-    }
 
     Dl_info info;
     dladdr (array [i], &info);
@@ -407,9 +391,25 @@ void signal_handler (int signo, siginfo_t *si, void *)
 
 #endif
 
-  if (has_gui) {
+  try {
 
-    lay::ApplicationBase::instance ()->qapp_gui ()->setOverrideCursor (QCursor ());
+    //  write crash log
+
+    std::string crash_log = tl::combine_path (lay::ApplicationBase::instance () ? lay::ApplicationBase::instance ()->appdata_path () : ".", "klayout_crash.log");
+
+    tl::OutputStream os (crash_log, tl::OutputStream::OM_Plain, true);
+    os << text;
+
+    text += "\nCrash log written to " + crash_log;
+
+  } catch (...) {
+    //  .. ignore errors
+  }
+
+  tl::error << text << tl::noendl;
+
+  bool has_gui = s_sh_has_gui && lay::ApplicationBase::instance () && lay::ApplicationBase::instance ()->has_gui ();
+  if (has_gui) {
 
     //  YES! I! KNOW!
     //  In a signal handler you shall not do fancy stuff (in particular not
@@ -418,8 +418,10 @@ void signal_handler (int signo, siginfo_t *si, void *)
     //  from our stack frames) and everything is better than just core dumping.
     //  Isn't it?
 
-    msg->set_text (tl::to_qstring (text));
-    msg->set_can_resume (can_resume);
+    lay::ApplicationBase::instance ()->qapp_gui ()->setOverrideCursor (QCursor ());
+
+    std::unique_ptr<CrashMessage> msg;
+    msg.reset (new CrashMessage (0, can_resume, tl::to_qstring (text)));
 
     if (! msg->exec ()) {
 
@@ -438,7 +440,6 @@ void signal_handler (int signo, siginfo_t *si, void *)
 
   } else {
 
-    tl::error << text << tl::noendl;
     _exit (signo);
 
   }

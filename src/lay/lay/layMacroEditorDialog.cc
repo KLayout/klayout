@@ -429,6 +429,17 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
   connect (action, SIGNAL (triggered ()), this, SLOT (close_all_right ()));
   tabWidget->addAction (action);
 
+  action = new QAction ();
+  action->setSeparator (true);
+  tabWidget->addAction (action);
+
+  mp_tabs_menu = new QMenu ();
+
+  action = new QAction (tr ("Tabs"));
+  action->setMenu (mp_tabs_menu);
+  connect (mp_tabs_menu, SIGNAL (aboutToShow ()), this, SLOT (tabs_menu_about_to_show ()));
+  tabWidget->addAction (action);
+
   dbgOn->setEnabled (true);
   runButton->setEnabled (true);
   runThisButton->setEnabled (true);
@@ -670,6 +681,34 @@ MacroEditorDialog *
 MacroEditorDialog::instance () 
 {
   return s_macro_editor_instance;
+}
+
+void
+MacroEditorDialog::tab_menu_selected ()
+{
+  QAction *action = dynamic_cast<QAction *> (sender ());
+  if (action) {
+    tabWidget->setCurrentIndex (action->data ().toInt ());
+  }
+}
+
+void
+MacroEditorDialog::tabs_menu_about_to_show ()
+{
+  mp_tabs_menu->clear ();
+
+  for (int i = 0; i < tabWidget->count (); ++i) {
+    MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->widget (i));
+    if (page) {
+      QAction *action = new QAction (tl::to_qstring (page->path ()));
+      action->setData (i);
+      connect (action, SIGNAL (triggered ()), this, SLOT (tab_menu_selected ()));
+      if (page->macro () == mp_run_macro) {
+        action->setIcon (QIcon (":/run_16px.png"));
+      }
+      mp_tabs_menu->addAction (action);
+    }
+  }
 }
 
 void

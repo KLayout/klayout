@@ -38,6 +38,7 @@
 #include "tlProgress.h"
 #include "tlFileUtils.h"
 #include "tlResources.h"
+#include "tlEnv.h"
 
 #include "rba.h"
 #include "pya.h"
@@ -363,6 +364,22 @@ namespace {
 }
 #endif
 
+//  Some directories are ignored in addition to dotfiles
+static bool dir_is_ignored (const std::string &dn)
+{
+  static std::set <std::string> ignored;
+  static bool initialized = false;
+
+  if (! initialized) {
+    //  a colon-separated list of directory names
+    std::string ign = tl::get_env ("KLAYOUT_IGNORE_MACRO_DIRS", "__pycache__");
+    auto ignv = tl::split (ign, ":");
+    ignored.insert (ignv.begin (), ignv.end ());
+  }
+
+  return ignored.find (dn) != ignored.end ();
+}
+
 void MacroCollection::scan ()
 {
   std::string p = path ();
@@ -428,6 +445,10 @@ void MacroCollection::scan ()
 
       std::string fp = tl::combine_path (p, *f);
       if (! tl::is_dir (fp)) {
+        continue;
+      }
+
+      if (dir_is_ignored (*f)) {
         continue;
       }
 

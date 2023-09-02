@@ -429,13 +429,13 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
   connect (action, SIGNAL (triggered ()), this, SLOT (close_all_right ()));
   tabWidget->addAction (action);
 
-  action = new QAction ();
+  action = new QAction (this);
   action->setSeparator (true);
   tabWidget->addAction (action);
 
   mp_tabs_menu = new QMenu ();
 
-  action = new QAction (tr ("Tabs"));
+  action = new QAction (tr ("Tabs"), this);
   action->setMenu (mp_tabs_menu);
   connect (mp_tabs_menu, SIGNAL (aboutToShow ()), this, SLOT (tabs_menu_about_to_show ()));
   tabWidget->addAction (action);
@@ -700,7 +700,7 @@ MacroEditorDialog::tabs_menu_about_to_show ()
   for (int i = 0; i < tabWidget->count (); ++i) {
     MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->widget (i));
     if (page) {
-      QAction *action = new QAction (tl::to_qstring (page->path ()));
+      QAction *action = new QAction (tl::to_qstring (page->path ()), mp_tabs_menu);
       action->setData (i);
       connect (action, SIGNAL (triggered ()), this, SLOT (tab_menu_selected ()));
       if (page->macro () == mp_run_macro) {

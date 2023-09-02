@@ -1,37 +1,38 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>RenameCellDialog</class>
- <widget class="QDialog" name="RenameCellDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="RenameCellDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>286</width>
-    <height>124</height>
+    <width>540</width>
+    <height>133</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Rename Cell</string>
   </property>
-  <layout class="QGridLayout" >
-   <property name="margin" >
+  <layout class="QGridLayout">
+   <property name="margin" stdset="0">
     <number>9</number>
    </property>
-   <property name="spacing" >
+   <property name="spacing">
     <number>6</number>
    </property>
-   <item row="1" column="0" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
+   <item row="1" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
       <string>New cell name   </string>
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="2" >
+   <item row="0" column="0" colspan="2">
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>268</width>
        <height>16</height>
@@ -39,15 +40,15 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="1" >
-    <widget class="QLineEdit" name="name_le" />
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="name_le"/>
    </item>
-   <item row="2" column="0" colspan="2" >
+   <item row="2" column="0" colspan="2">
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>268</width>
        <height>31</height>
@@ -55,13 +56,13 @@
      </property>
     </spacer>
    </item>
-   <item row="3" column="0" colspan="2" >
-    <widget class="QDialogButtonBox" name="buttonBox" >
-     <property name="orientation" >
+   <item row="3" column="0" colspan="2">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="standardButtons" >
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
@@ -79,11 +80,11 @@
    <receiver>RenameCellDialog</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>248</x>
      <y>254</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>157</x>
      <y>274</y>
     </hint>
@@ -95,11 +96,11 @@
    <receiver>RenameCellDialog</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>316</x>
      <y>260</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
     </hint>

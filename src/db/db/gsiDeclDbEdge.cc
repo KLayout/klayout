@@ -494,7 +494,7 @@ struct edge_defs
       "\n"
       "@return True if the edges are coincident.\n"
     ) +
-    method ("intersects?|#intersects?", &C::intersect, gsi::arg ("e"),
+    method ("intersects?|#intersect?", &C::intersect, gsi::arg ("e"),
       "@brief Intersection test. \n"
       "\n"
       "Returns true if the edges intersect. Two edges intersect if they share at least one point. \n"

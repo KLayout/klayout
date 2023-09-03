@@ -267,6 +267,26 @@ public:
   virtual bool has_transient_selection ();
 
   /**
+   *  @brief Gets the selection bounding box
+   */
+  virtual db::DBox selection_bbox ();
+
+  /**
+   *  @brief Start a "move" operation
+   */
+  virtual bool begin_move (MoveMode sel, const db::DPoint &p, lay::angle_constraint_type ac);
+
+  /**
+   *  @brief Continue a "move" operation
+   */
+  virtual void move (const db::DPoint &p, lay::angle_constraint_type ac);
+
+  /**
+   *  @brief Terminate a "move" operation
+   */
+  virtual void end_move (const db::DPoint &p, lay::angle_constraint_type ac);
+
+  /**
    *  @brief Implement the "select" method at least to clear the selection
    */
   virtual bool select (const db::DBox &box, SelectionMode mode);

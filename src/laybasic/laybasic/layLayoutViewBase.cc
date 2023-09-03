@@ -5308,7 +5308,7 @@ LayoutViewBase::paste ()
 }
 
 void
-LayoutViewBase::paste_interactive ()
+LayoutViewBase::paste_interactive (bool transient_mode)
 {
   clear_selection ();
 
@@ -5320,7 +5320,7 @@ LayoutViewBase::paste_interactive ()
   //  operations.
   trans->close ();
 
-  if (mp_move_service->begin_move (trans.release (), false)) {
+  if (mp_move_service->begin_move (trans.release (), transient_mode)) {
     switch_mode (-1);  //  move mode
   }
 }

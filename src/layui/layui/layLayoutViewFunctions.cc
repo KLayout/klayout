@@ -1177,11 +1177,12 @@ LayoutViewFunctions::do_cm_duplicate (bool interactive)
   db::Clipboard::instance ().swap (saved_clipboard);
 
   try {
+    bool transient_mode = ! view ()->has_selection ();
     view ()->copy_view_objects ();
     view ()->clear_selection ();
     view ()->cancel ();
     if (interactive) {
-      view ()->paste_interactive ();
+      view ()->paste_interactive (transient_mode);
     } else {
       view ()->paste ();
     }

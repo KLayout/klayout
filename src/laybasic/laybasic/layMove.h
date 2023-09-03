@@ -42,7 +42,7 @@ public:
   ~MoveService ();
 
   virtual bool configure (const std::string &name, const std::string &value);
-  bool begin_move (db::Transaction *transaction = 0, bool selected_after_move = true);
+  bool begin_move (db::Transaction *transaction = 0, bool transient_selection = false);
 
 private:
   virtual bool mouse_press_event (const db::DPoint &p, unsigned int buttons, bool prio);

@@ -2345,6 +2345,8 @@ PartialService::has_transient_selection ()
 void
 PartialService::del ()
 {
+  std::set<db::Layout *> needs_cleanup;
+
   //  stop dragging
   ui ()->ungrab_mouse (this);
   
@@ -2426,6 +2428,9 @@ PartialService::del ()
     if (r->first.is_cell_inst ()) {
       const lay::CellView &cv = view ()->cellview (r->first.cv_index ());
       if (cv.is_valid ()) {
+        if (cv->layout ().cell (r->first.back ().inst_ptr.cell_index ()).is_proxy ()) {
+          needs_cleanup.insert (& cv->layout ());
+        }
         cv->layout ().cell (r->first.cell_index ()).erase (r->first.back ().inst_ptr);
       }
     }
@@ -2439,6 +2444,11 @@ PartialService::del ()
   m_selection.clear ();
   m_dragging = false;
   selection_to_view ();
+
+  //  clean up the layouts that need to do so.
+  for (std::set<db::Layout *>::const_iterator l = needs_cleanup.begin (); l != needs_cleanup.end (); ++l) {
+    (*l)->cleanup ();
+  }
 }
 
 lay::InstanceMarker *

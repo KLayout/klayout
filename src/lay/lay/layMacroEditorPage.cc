@@ -549,13 +549,16 @@ MacroEditorPage::MacroEditorPage (QWidget * /*parent*/, MacroEditorHighlighters 
   mp_layout = new QVBoxLayout (this);
   mp_layout->setContentsMargins (0, 0, 0, 0);
 
+  QVBoxLayout *vlayout = new QVBoxLayout (this);
+  vlayout->setContentsMargins (4, 4, 4, 4);
+  mp_layout->addLayout (vlayout);
+
   mp_readonly_label = new QLabel (this);
   mp_readonly_label->setText (QObject::tr ("Macro is read-only and cannot be edited"));
   mp_readonly_label->hide ();
-  mp_layout->addWidget (mp_readonly_label);
+  vlayout->addWidget (mp_readonly_label);
 
   QHBoxLayout *hlayout = new QHBoxLayout ();
-  hlayout->setContentsMargins (4, 4, 4, 4);
   mp_layout->addLayout (hlayout);
 
   mp_exec_model = new MacroEditorExecutionModel (this);

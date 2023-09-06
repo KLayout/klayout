@@ -254,7 +254,6 @@ MacroEditorDialog::MacroEditorDialog (lay::Dispatcher *pr, lym::MacroCollection 
     m_first_show (true), m_debugging_on (true),
     mp_run_macro (0),
     md_update_console_text (this, &MacroEditorDialog::update_console_text),
-    md_search_edited (this, &MacroEditorDialog::do_search_edited),
     m_in_event_handler (false),
     m_os (OS_none),
     m_new_line (true),
@@ -2099,14 +2098,6 @@ MacroEditorDialog::search_editing ()
   }
 }
 
-void 
-MacroEditorDialog::search_edited ()
-{
-  //  since we want to move the focus to the text field, we have to do this in the deferred method
-  //  (this method is called from an event handler and setFocus does not have an effect then)
-  md_search_edited ();
-}
-
 void
 MacroEditorDialog::search_finished ()
 {
@@ -2120,7 +2111,7 @@ MacroEditorDialog::search_finished ()
 }
 
 void
-MacroEditorDialog::do_search_edited ()
+MacroEditorDialog::search_edited ()
 {
   MacroEditorPage *page = dynamic_cast<MacroEditorPage *> (tabWidget->currentWidget ());
   if (! page) {
@@ -2132,7 +2123,6 @@ MacroEditorDialog::do_search_edited ()
   if (! page->has_multi_block_selection ()) {
     page->find_next ();
   }
-  set_editor_focus ();
 }
 
 void

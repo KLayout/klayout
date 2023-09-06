@@ -314,7 +314,6 @@ private:
   lym::Macro *mp_run_macro;
   std::vector<lym::Macro *> m_macro_templates;
   tl::DeferredMethod<MacroEditorDialog> md_update_console_text;
-  tl::DeferredMethod<MacroEditorDialog> md_search_edited;
   TextEditWidget *mp_console_text;
   std::map <lym::Macro *, MacroEditorPage *> m_tab_widgets;
   int m_history_index;

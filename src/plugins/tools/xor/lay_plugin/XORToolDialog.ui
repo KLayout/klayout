@@ -341,7 +341,7 @@
       <item row="4" column="1" colspan="2">
        <widget class="QCheckBox" name="summarize_cb">
         <property name="text">
-         <string>Summarize missing layers</string>
+         <string>Summarize missing layers (when output is marker DB)</string>
         </property>
         <property name="checked">
          <bool>true</bool>

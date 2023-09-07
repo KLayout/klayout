@@ -130,31 +130,15 @@ MacroInterpreter::execute_macro (const lym::Macro *macro)
 
     if (cls.current_name () == macro->dsl_interpreter ()) {
 
-      std::pair<std::string, std::string> et = cls->include_expansion (macro);
-      if (et.first.empty () || et.first == macro->path ()) {
-
-        std::unique_ptr<tl::Executable> eo (cls->executable (macro));
-        if (eo.get ()) {
-          eo->do_execute ();
-        }
-
-      } else {
-
-        //  provide a copy which takes the include-expanded version
-        lym::Macro tmp_macro;
-        tmp_macro.assign (*macro);
-        tmp_macro.set_text (et.second);
-        tmp_macro.set_file_path (et.first);
-        std::unique_ptr<tl::Executable> eo (cls->executable (&tmp_macro));
-        if (eo.get ()) {
-          eo->do_execute ();
-        }
-
+      std::unique_ptr<tl::Executable> eo (cls->executable (macro));
+      if (eo.get ()) {
+        eo->do_execute ();
       }
 
       return;
 
     }
+
   }
 
   throw tl::Exception (tl::to_string (tr ("No interpreter registered for DSL type '")) + macro->dsl_interpreter () + "'");

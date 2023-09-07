@@ -27,6 +27,7 @@
 
 #include "lymMacro.h"
 #include "layGenericSyntaxHighlighter.h"
+#include "tlVariant.h"
 
 #include <QDialog>
 #include <QPixmap>
@@ -47,9 +48,12 @@ class QSyntaxHighlighter;
 class QTimer;
 class QWindow;
 class QListWidget;
+class QVBoxLayout;
 
 namespace lay
 {
+
+class MacroEditorPage;
 
 /**
  *  @brief A collection of highlighters 
@@ -209,7 +213,92 @@ private:
   bool m_debugging_on;
 };
 
-class MacroEditorPage 
+/**
+ *  @brief Descriptor for a notification inside the macro editor
+ *
+ *  Notifications are popups added at the top of the view to indicate need for reloading for example.
+ *  Notifications have a name, a title, optional actions (id, title) and a parameter (e.g. file path to reload).
+ *  Actions are mapped to QPushButtons.
+ */
+class MacroEditorNotification
+{
+public:
+  MacroEditorNotification (const std::string &name, const std::string &title, const tl::Variant &parameter = tl::Variant ())
+    : m_name (name), m_title (title), m_parameter (parameter)
+  {
+    //  .. nothing yet ..
+  }
+
+  void add_action (const std::string &name, const std::string &title)
+  {
+    m_actions.push_back (std::make_pair (name, title));
+  }
+
+  const std::vector<std::pair<std::string, std::string> > &actions () const
+  {
+    return m_actions;
+  }
+
+  const std::string &name () const
+  {
+    return m_name;
+  }
+
+  const std::string &title () const
+  {
+    return m_title;
+  }
+
+  const tl::Variant &parameter () const
+  {
+    return m_parameter;
+  }
+
+  bool operator<(const MacroEditorNotification &other) const
+  {
+    if (m_name != other.name ()) {
+      return m_name < other.name ();
+    }
+    return m_parameter < other.parameter ();
+  }
+
+  bool operator==(const MacroEditorNotification &other) const
+  {
+    if (m_name != other.name ()) {
+      return false;
+    }
+    return m_parameter == other.parameter ();
+  }
+
+private:
+  std::string m_name;
+  std::string m_title;
+  tl::Variant m_parameter;
+  std::vector<std::pair<std::string, std::string> > m_actions;
+};
+
+/**
+ *  @brief A widget representing a notification
+ */
+class MacroEditorNotificationWidget
+  : public QFrame
+{
+Q_OBJECT
+
+public:
+  MacroEditorNotificationWidget (MacroEditorPage *parent, const MacroEditorNotification *notification);
+
+private slots:
+  void action_triggered ();
+  void close_triggered ();
+
+private:
+  MacroEditorPage *mp_parent;
+  const MacroEditorNotification *mp_notification;
+  std::map<QObject *, std::string> m_action_buttons;
+};
+
+class MacroEditorPage
   : public QWidget
 {
 Q_OBJECT
@@ -222,6 +311,11 @@ public:
   lym::Macro *macro () const
   {
     return mp_macro;
+  }
+
+  const std::string path () const
+  {
+    return m_path;
   }
 
   bool is_modified () const
@@ -269,10 +363,14 @@ public:
 
   void set_editor_focus ();
 
+  void add_notification (const MacroEditorNotification &notificaton);
+  void remove_notification (const MacroEditorNotification &notificaton);
+
 signals:
   void help_requested (const QString &s);
   void search_requested (const QString &s, bool backward);
   void edit_trace (bool);
+  void close_requested ();
 
 public slots:
   void commit ();
@@ -288,10 +386,22 @@ protected slots:
   void hide_completer ();
 
 private:
+  friend class MacroEditorNotificationWidget;
+
+  struct CompareNotificationPointers
+  {
+    bool operator() (const MacroEditorNotification *a, const MacroEditorNotification *b) const
+    {
+      return *a < *b;
+    }
+  };
+
   lym::Macro *mp_macro;
+  std::string m_path;
   MacroEditorExecutionModel *mp_exec_model;
   MacroEditorTextWidget *mp_text;
   MacroEditorSidePanel *mp_side_panel;
+  QVBoxLayout *mp_layout;
   QLabel *mp_readonly_label;
   bool m_is_modified;
   MacroEditorHighlighters *mp_highlighters;
@@ -305,6 +415,8 @@ private:
   QTimer *mp_completer_timer;
   QWidget *mp_completer_popup;
   QListWidget *mp_completer_list;
+  std::list<MacroEditorNotification> m_notifications;
+  std::map<const MacroEditorNotification *, QWidget *, CompareNotificationPointers> m_notification_widgets;
 
   void update_extra_selections ();
   bool return_pressed ();
@@ -316,6 +428,7 @@ private:
   QTextCursor get_completer_cursor (int &pos0, int &pos);
   bool select_match_here ();
   void replace_in_selection (const QString &replace, bool first);
+  void notification_action (const MacroEditorNotification &notification, const std::string &action);
 
   bool eventFilter (QObject *watched, QEvent *event);
 };

@@ -471,6 +471,7 @@ Service::selection_bbox ()
   //  build the transformation variants cache 
   //  TODO: this is done multiple times - once for each service!
   TransformationVariants tv (view ());
+  const db::DCplxTrans &vp = view ()->viewport ().trans ();
 
   lay::TextInfo text_info (view ());
 
@@ -491,7 +492,7 @@ Service::selection_bbox ()
           if (r->shape ().is_text ()) {
             db::Text text;
             r->shape ().text (text);
-            box += *t * text_info.bbox (ctx_trans * text, *t);
+            box += *t * text_info.bbox (ctx_trans * text, vp * *t);
           } else {
             box += *t * (ctx_trans * r->shape ().bbox ());
           }

@@ -1146,8 +1146,6 @@ PartialService::move_ac () const
 void  
 PartialService::deactivated ()
 {
-  //  clear selection when this mode is left
-  partial_select (db::DBox (), lay::Editable::Reset);
   clear_partial_transient_selection ();
 }
 
@@ -2170,6 +2168,110 @@ PartialService::mouse_release_event (const db::DPoint &p, unsigned int buttons, 
 }
 
 bool
+PartialService::begin_move (MoveMode mode, const db::DPoint &p, lay::angle_constraint_type ac)
+{
+  if (has_selection () && mode == lay::Editable::Selected) {
+
+    m_alt_ac = ac;
+
+    m_dragging = true;
+    m_keep_selection = true;
+
+    if (is_single_point_selection ()) {
+      //  for a single selected point we use the original point as the start location which
+      //  allows bringing it to grid
+      m_current = m_start = single_selected_point ();
+    } else if (is_single_edge_selection ()) {
+      //  for an edge selection use the point projected to edge as the start location which
+      //  allows bringing it to grid
+      m_current = m_start = projected_to_edge (single_selected_edge (), p);
+    } else {
+      m_current = m_start = p;
+    }
+
+    m_alt_ac = lay::AC_Global;
+
+    return true;
+
+  } else {
+    return false;
+  }
+}
+
+void
+PartialService::move (const db::DPoint &p, lay::angle_constraint_type ac)
+{
+  m_alt_ac = ac;
+
+  set_cursor (lay::Cursor::size_all);
+
+  //  drag the vertex or edge/segment
+  if (is_single_point_selection () || is_single_edge_selection ()) {
+
+    lay::PointSnapToObjectResult snap_details;
+
+    //  for a single selected point or edge, m_start is the original position and we snap the target -
+    //  thus, we can bring the point on grid or to an object's edge or vertex
+    snap_details = snap2 (p);
+    if (snap_details.object_snap == lay::PointSnapToObjectResult::NoObject) {
+      m_current = m_start + snap (p - m_start);
+    } else {
+      m_current = snap_details.snapped_point;
+      mouse_cursor_from_snap_details (snap_details);
+    }
+
+  } else {
+
+    //  snap movement to angle and grid without object
+    m_current = m_start + snap (p - m_start);
+    clear_mouse_cursors ();
+
+  }
+
+  selection_to_view ();
+
+  m_alt_ac = lay::AC_Global;
+}
+
+void
+PartialService::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type ac)
+{
+  m_alt_ac = ac;
+
+  if (m_current != m_start) {
+
+    //  stop dragging
+    ui ()->ungrab_mouse (this);
+
+    if (manager ()) {
+      manager ()->transaction (tl::to_string (tr ("Partial move")));
+    }
+
+    //  heuristically, if there is just one edge selected: do not confine to the movement
+    //  angle constraint - the edge usually is confined enough
+    db::DTrans move_trans = db::DTrans (m_current - m_start);
+
+    transform_selection (move_trans);
+
+    if (manager ()) {
+      manager ()->commit ();
+    }
+
+  }
+
+  if (! m_keep_selection) {
+    m_selection.clear ();
+  }
+
+  m_dragging = false;
+  selection_to_view ();
+
+  clear_mouse_cursors ();
+
+  m_alt_ac = lay::AC_Global;
+}
+
+bool
 PartialService::has_selection ()
 {
   return ! m_selection.empty ();
@@ -2179,6 +2281,58 @@ size_t
 PartialService::selection_size ()
 {
   return m_selection.size ();
+}
+
+db::DBox
+PartialService::selection_bbox ()
+{
+  //  build the transformation variants cache
+  //  TODO: this is done multiple times - once for each service!
+  TransformationVariants tv (view ());
+  const db::DCplxTrans &vp = view ()->viewport ().trans ();
+
+  lay::TextInfo text_info (view ());
+
+  db::DBox box;
+  for (partial_objects::const_iterator r = m_selection.begin (); r != m_selection.end (); ++r) {
+
+    const lay::CellView &cv = view ()->cellview (r->first.cv_index ());
+    const db::Layout &layout = cv->layout ();
+
+    db::CplxTrans ctx_trans = db::CplxTrans (layout.dbu ()) * cv.context_trans () * r->first.trans ();
+
+    db::box_convert<db::CellInst> bc (layout);
+    if (! r->first.is_cell_inst ()) {
+
+      const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (r->first.cv_index (), r->first.layer ());
+      if (tv_list != 0) {
+        for (std::vector<db::DCplxTrans>::const_iterator t = tv_list->begin (); t != tv_list->end (); ++t) {
+          if (r->first.shape ().is_text ()) {
+            db::Text text;
+            r->first.shape ().text (text);
+            box += *t * text_info.bbox (ctx_trans * text, vp * *t);
+          } else {
+            for (auto e = r->second.begin (); e != r->second.end (); ++e) {
+              box += *t * (ctx_trans * e->bbox ());
+            }
+          }
+        }
+      }
+
+    } else {
+
+      const std::vector<db::DCplxTrans> *tv_list = tv.per_cv (r->first.cv_index ());
+      if (tv_list != 0) {
+        for (std::vector<db::DCplxTrans>::const_iterator t = tv_list->begin (); t != tv_list->end (); ++t) {
+          box += *t * (ctx_trans * r->first.back ().bbox (bc));
+        }
+      }
+
+    }
+
+  }
+
+  return box;
 }
 
 bool
@@ -2191,6 +2345,8 @@ PartialService::has_transient_selection ()
 void
 PartialService::del ()
 {
+  std::set<db::Layout *> needs_cleanup;
+
   //  stop dragging
   ui ()->ungrab_mouse (this);
   
@@ -2272,6 +2428,9 @@ PartialService::del ()
     if (r->first.is_cell_inst ()) {
       const lay::CellView &cv = view ()->cellview (r->first.cv_index ());
       if (cv.is_valid ()) {
+        if (cv->layout ().cell (r->first.back ().inst_ptr.cell_index ()).is_proxy ()) {
+          needs_cleanup.insert (& cv->layout ());
+        }
         cv->layout ().cell (r->first.cell_index ()).erase (r->first.back ().inst_ptr);
       }
     }
@@ -2285,6 +2444,11 @@ PartialService::del ()
   m_selection.clear ();
   m_dragging = false;
   selection_to_view ();
+
+  //  clean up the layouts that need to do so.
+  for (std::set<db::Layout *>::const_iterator l = needs_cleanup.begin (); l != needs_cleanup.end (); ++l) {
+    (*l)->cleanup ();
+  }
 }
 
 lay::InstanceMarker *

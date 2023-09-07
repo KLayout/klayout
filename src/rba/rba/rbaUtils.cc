@@ -115,13 +115,15 @@ rba_get_backtrace_from_array (VALUE backtrace, std::vector<tl::BacktraceElement>
 void
 block_exceptions (bool f)
 {
-  RubyInterpreter::instance ()->block_exceptions (f);
+  if (RubyInterpreter::instance ()) {
+    RubyInterpreter::instance ()->block_exceptions (f);
+  }
 }
 
 bool
 exceptions_blocked ()
 {
-  return RubyInterpreter::instance ()->exceptions_blocked ();
+  return RubyInterpreter::instance () ? RubyInterpreter::instance ()->exceptions_blocked () : false;
 }
 
 void
@@ -161,8 +163,10 @@ rba_check_error ()
   std::vector <tl::BacktraceElement> bt;
   rba_get_backtrace_from_array (rb_funcall (lasterr, rb_intern ("backtrace"), 0), bt, 0);
 
-  const std::string &ds = RubyInterpreter::instance ()->debugger_scope ();
-  bt.erase (bt.begin (), bt.begin () + RubyStackTraceProvider::scope_index (bt, ds));
+  if (RubyInterpreter::instance ()) {
+    const std::string &ds = RubyInterpreter::instance ()->debugger_scope ();
+    bt.erase (bt.begin (), bt.begin () + RubyStackTraceProvider::scope_index (bt, ds));
+  }
 
   //  parse the backtrace to get the line number
   tl::BacktraceElement info;

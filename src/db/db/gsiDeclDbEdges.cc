@@ -769,7 +769,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "Crossing edges are not merged.\n"
     "In contrast to \\merge, this method does not modify the edge collection but returns a merged copy.\n"
   ) +
-  method ("&", (db::Edges (db::Edges::*)(const db::Edges &) const) &db::Edges::operator&, gsi::arg ("other"),
+  method ("&|and", (db::Edges (db::Edges::*)(const db::Edges &) const) &db::Edges::operator&, gsi::arg ("other"),
     "@brief Returns the boolean AND between self and the other edge collection\n"
     "\n"
     "@return The result of the boolean AND operation\n"
@@ -777,17 +777,24 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "The boolean AND operation will return all parts of the edges in this collection which "
     "are coincident with parts of the edges in the other collection."
     "The result will be a merged edge collection.\n"
-  ) + 
-  method ("&=", (db::Edges &(db::Edges::*)(const db::Edges &)) &db::Edges::operator&=, gsi::arg ("other"),
-    "@brief Performs the boolean AND between self and the other edge collection\n"
+    "\n"
+    "The 'and' alias has been introduced in version 0.28.12."
+  ) +
+  method ("&=|and_with", (db::Edges &(db::Edges::*)(const db::Edges &)) &db::Edges::operator&=, gsi::arg ("other"),
+    "@brief Performs the boolean AND between self and the other edge collection in-place (modifying self)\n"
     "\n"
     "@return The edge collection after modification (self)\n"
     "\n"
     "The boolean AND operation will return all parts of the edges in this collection which "
     "are coincident with parts of the edges in the other collection."
     "The result will be a merged edge collection.\n"
-  ) + 
-  method ("&", (db::Edges (db::Edges::*)(const db::Region &) const) &db::Edges::operator&, gsi::arg ("other"),
+    "\n"
+    "Note that in Ruby, the '&=' operator actually does not exist, but is emulated by '&' followed by an assignment. "
+    "This is less efficient than the in-place operation, so it is recommended to use 'and_with' instead.\n"
+    "\n"
+    "The 'and_with' alias has been introduced in version 0.28.12."
+  ) +
+  method ("&|and", (db::Edges (db::Edges::*)(const db::Region &) const) &db::Edges::operator&, gsi::arg ("other"),
     "@brief Returns the parts of the edges inside the given region\n"
     "\n"
     "@return The edges inside the given region\n"
@@ -798,9 +805,10 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "edges intersect.\n"
     "\n"
     "This method has been introduced in version 0.24."
-  ) + 
-  method ("&=", (db::Edges &(db::Edges::*)(const db::Region &)) &db::Edges::operator&=, gsi::arg ("other"),
-    "@brief Selects the parts of the edges inside the given region\n"
+    "The 'and' alias has been introduced in version 0.28.12."
+  ) +
+  method ("&=|and_with", (db::Edges &(db::Edges::*)(const db::Region &)) &db::Edges::operator&=, gsi::arg ("other"),
+    "@brief Selects the parts of the edges inside the given region in-place (modifying self)\n"
     "\n"
     "@return The edge collection after modification (self)\n"
     "\n"
@@ -810,8 +818,13 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "edges intersect.\n"
     "\n"
     "This method has been introduced in version 0.24."
-  ) + 
-  method ("-", (db::Edges (db::Edges::*)(const db::Edges &) const) &db::Edges::operator-, gsi::arg ("other"),
+    "\n"
+    "Note that in Ruby, the '&=' operator actually does not exist, but is emulated by '&' followed by an assignment. "
+    "This is less efficient than the in-place operation, so it is recommended to use 'and_with' instead.\n"
+    "\n"
+    "The 'and_with' alias has been introduced in version 0.28.12."
+  ) +
+  method ("-|not", (db::Edges (db::Edges::*)(const db::Edges &) const) &db::Edges::operator-, gsi::arg ("other"),
     "@brief Returns the boolean NOT between self and the other edge collection\n"
     "\n"
     "@return The result of the boolean NOT operation\n"
@@ -819,17 +832,24 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "The boolean NOT operation will return all parts of the edges in this collection which "
     "are not coincident with parts of the edges in the other collection."
     "The result will be a merged edge collection.\n"
-  ) + 
-  method ("-=", (db::Edges &(db::Edges::*)(const db::Edges &)) &db::Edges::operator-=, gsi::arg ("other"),
-    "@brief Performs the boolean NOT between self and the other edge collection\n"
+    "\n"
+    "The 'not' alias has been introduced in version 0.28.12."
+  ) +
+  method ("-=|not_with", (db::Edges &(db::Edges::*)(const db::Edges &)) &db::Edges::operator-=, gsi::arg ("other"),
+    "@brief Performs the boolean NOT between self and the other edge collection in-place (modifying self)\n"
     "\n"
     "@return The edge collection after modification (self)\n"
     "\n"
     "The boolean NOT operation will return all parts of the edges in this collection which "
     "are not coincident with parts of the edges in the other collection."
     "The result will be a merged edge collection.\n"
-  ) + 
-  method ("-", (db::Edges (db::Edges::*)(const db::Region &) const) &db::Edges::operator-, gsi::arg ("other"),
+    "\n"
+    "Note that in Ruby, the '-=' operator actually does not exist, but is emulated by '-' followed by an assignment. "
+    "This is less efficient than the in-place operation, so it is recommended to use 'not_with' instead.\n"
+    "\n"
+    "The 'not_with' alias has been introduced in version 0.28.12."
+  ) +
+  method ("-|not", (db::Edges (db::Edges::*)(const db::Region &) const) &db::Edges::operator-, gsi::arg ("other"),
     "@brief Returns the parts of the edges outside the given region\n"
     "\n"
     "@return The edges outside the given region\n"
@@ -840,9 +860,10 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "edges intersect.\n"
     "\n"
     "This method has been introduced in version 0.24."
-  ) + 
-  method ("-=", (db::Edges &(db::Edges::*)(const db::Region &)) &db::Edges::operator-=, gsi::arg ("other"),
-    "@brief Selects the parts of the edges outside the given region\n"
+    "The 'not' alias has been introduced in version 0.28.12."
+  ) +
+  method ("-=|not_with", (db::Edges &(db::Edges::*)(const db::Region &)) &db::Edges::operator-=, gsi::arg ("other"),
+    "@brief Selects the parts of the edges outside the given region in-place (modifying self)\n"
     "\n"
     "@return The edge collection after modification (self)\n"
     "\n"
@@ -851,8 +872,12 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "As a side effect, the edges are made non-intersecting by introducing cut points where\n"
     "edges intersect.\n"
     "\n"
+    "Note that in Ruby, the '-=' operator actually does not exist, but is emulated by '-' followed by an assignment. "
+    "This is less efficient than the in-place operation, so it is recommended to use 'not_with' instead.\n"
+    "\n"
     "This method has been introduced in version 0.24."
-  ) + 
+    "The 'not_with' alias has been introduced in version 0.28.12."
+  ) +
   method_ext ("andnot", &andnot_with_edges, gsi::arg ("other"),
     "@brief Returns the boolean AND and NOT between self and the other edge set\n"
     "\n"
@@ -873,7 +898,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "This method has been added in version 0.28.\n"
   ) +
-  method ("^", &db::Edges::operator^, gsi::arg ("other"),
+  method ("^|xor", &db::Edges::operator^, gsi::arg ("other"),
     "@brief Returns the boolean XOR between self and the other edge collection\n"
     "\n"
     "@return The result of the boolean XOR operation\n"
@@ -881,48 +906,69 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "The boolean XOR operation will return all parts of the edges in this and the other collection except "
     "the parts where both are coincident.\n"
     "The result will be a merged edge collection.\n"
-  ) + 
-  method ("^=", &db::Edges::operator^=, gsi::arg ("other"),
-    "@brief Performs the boolean XOR between self and the other edge collection\n"
+    "\n"
+    "The 'xor' alias has been introduced in version 0.28.12."
+  ) +
+  method ("^=|xor_with", &db::Edges::operator^=, gsi::arg ("other"),
+    "@brief Performs the boolean XOR between self and the other edge collection in-place (modifying self)\n"
     "\n"
     "@return The edge collection after modification (self)\n"
     "\n"
     "The boolean XOR operation will return all parts of the edges in this and the other collection except "
     "the parts where both are coincident.\n"
     "The result will be a merged edge collection.\n"
-  ) + 
-  method ("\\|", &db::Edges::operator|, gsi::arg ("other"),
+    "\n"
+    "Note that in Ruby, the '^=' operator actually does not exist, but is emulated by '^' followed by an assignment. "
+    "This is less efficient than the in-place operation, so it is recommended to use 'xor_with' instead.\n"
+    "\n"
+    "The 'xor_with' alias has been introduced in version 0.28.12."
+  ) +
+  method ("\\||or", &db::Edges::operator|, gsi::arg ("other"),
     "@brief Returns the boolean OR between self and the other edge set\n"
     "\n"
     "@return The resulting edge collection\n"
     "\n"
     "The boolean OR is implemented by merging the edges of both edge sets. To simply join the edge collections "
     "without merging, the + operator is more efficient."
-  ) + 
-  method ("\\|=", &db::Edges::operator|=, gsi::arg ("other"),
-    "@brief Performs the boolean OR between self and the other edge set\n"
+    "\n"
+    "The 'or' alias has been introduced in version 0.28.12."
+  ) +
+  method ("\\|=|or_with", &db::Edges::operator|=, gsi::arg ("other"),
+    "@brief Performs the boolean OR between self and the other edge set in-place (modifying self)\n"
     "\n"
     "@return The edge collection after modification (self)\n"
     "\n"
     "The boolean OR is implemented by merging the edges of both edge sets. To simply join the edge collections "
     "without merging, the + operator is more efficient."
-  ) + 
-  method ("+", &db::Edges::operator+, gsi::arg ("other"),
+    "\n"
+    "Note that in Ruby, the '|=' operator actually does not exist, but is emulated by '|' followed by an assignment. "
+    "This is less efficient than the in-place operation, so it is recommended to use 'or_with' instead.\n"
+    "\n"
+    "The 'or_with' alias has been introduced in version 0.28.12."
+  ) +
+  method ("+|join", &db::Edges::operator+, gsi::arg ("other"),
     "@brief Returns the combined edge set of self and the other one\n"
     "\n"
     "@return The resulting edge set\n"
     "\n"
     "This operator adds the edges of the other edge set to self and returns a new combined edge set. "
     "This usually creates unmerged edge sets and edges may overlap. Use \\merge if you want to ensure the result edge set is merged.\n"
-  ) + 
-  method ("+=", &db::Edges::operator+=, gsi::arg ("other"),
+    "\n"
+    "The 'join' alias has been introduced in version 0.28.12."
+  ) +
+  method ("+=|join_with", &db::Edges::operator+=, gsi::arg ("other"),
     "@brief Adds the edges of the other edge collection to self\n"
     "\n"
     "@return The edge set after modification (self)\n"
     "\n"
     "This operator adds the edges of the other edge set to self. "
     "This usually creates unmerged edge sets and edges may overlap. Use \\merge if you want to ensure the result edge set is merged.\n"
-  ) + 
+    "\n"
+    "Note that in Ruby, the '+=' operator actually does not exist, but is emulated by '+' followed by an assignment. "
+    "This is less efficient than the in-place operation, so it is recommended to use 'join_with' instead.\n"
+    "\n"
+    "The 'join_with' alias has been introduced in version 0.28.12."
+  ) +
   method ("interacting", (db::Edges (db::Edges::*) (const db::Edges &) const)  &db::Edges::selected_interacting, gsi::arg ("other"),
     "@brief Returns the edges of this edge collection which overlap or touch edges from the other edge collection\n"
     "\n"

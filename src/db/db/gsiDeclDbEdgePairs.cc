@@ -425,7 +425,7 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "\n"
     "This method has been added in version 0.26."
   ) +
-  method ("+", &db::EdgePairs::operator+, gsi::arg ("other"),
+  method ("+|join", &db::EdgePairs::operator+, gsi::arg ("other"),
     "@brief Returns the combined edge pair collection of self and the other one\n"
     "\n"
     "@return The resulting edge pair collection\n"
@@ -433,8 +433,9 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "This operator adds the edge pairs of the other collection to self and returns a new combined set.\n"
     "\n"
     "This method has been introduced in version 0.24.\n"
-  ) + 
-  method ("+=", &db::EdgePairs::operator+=, gsi::arg ("other"),
+    "The 'join' alias has been introduced in version 0.28.12."
+  ) +
+  method ("+=|join_with", &db::EdgePairs::operator+=, gsi::arg ("other"),
     "@brief Adds the edge pairs of the other edge pair collection to self\n"
     "\n"
     "@return The edge pair collection after modification (self)\n"
@@ -442,7 +443,12 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "This operator adds the edge pairs of the other collection to self.\n"
     "\n"
     "This method has been introduced in version 0.24.\n"
-  ) + 
+    "\n"
+    "Note that in Ruby, the '+=' operator actually does not exist, but is emulated by '+' followed by an assignment. "
+    "This is less efficient than the in-place operation, so it is recommended to use 'join_with' instead.\n"
+    "\n"
+    "The 'join_with' alias has been introduced in version 0.28.12."
+  ) +
   method_ext ("move", &move_p, gsi::arg ("p"),
     "@brief Moves the edge pair collection\n"
     "\n"

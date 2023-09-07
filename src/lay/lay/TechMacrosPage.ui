@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>TechMacrosPage</class>
- <widget class="QWidget" name="TechMacrosPage" >
-  <property name="geometry" >
+ <widget class="QWidget" name="TechMacrosPage">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,94 +10,86 @@
     <height>492</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
+  <layout class="QVBoxLayout">
+   <property name="spacing">
     <number>6</number>
    </property>
+   <property name="margin" stdset="0">
+    <number>9</number>
+   </property>
    <item>
-    <widget class="QLabel" name="title_label" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>0</vsizetype>
+    <widget class="QLabel" name="title_label">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>%CAT_DESC%</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="macro_frame" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>5</vsizetype>
+    <widget class="QFrame" name="macro_frame">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>1</verstretch>
       </sizepolicy>
      </property>
-     <property name="frameShape" >
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QVBoxLayout" >
-      <property name="margin" >
-       <number>0</number>
-      </property>
-      <property name="spacing" >
+     <layout class="QVBoxLayout">
+      <property name="spacing">
        <number>6</number>
       </property>
+      <property name="margin" stdset="0">
+       <number>0</number>
+      </property>
       <item>
-       <widget class="QSplitter" name="splitter" >
-        <property name="orientation" >
+       <widget class="QSplitter" name="splitter">
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <widget class="QTreeView" name="folder_tree" >
-         <property name="sizePolicy" >
-          <sizepolicy>
-           <hsizetype>5</hsizetype>
-           <vsizetype>7</vsizetype>
+        <widget class="QTreeView" name="folder_tree">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
         </widget>
-        <widget class="QFrame" name="frame" >
-         <property name="sizePolicy" >
-          <sizepolicy>
-           <hsizetype>5</hsizetype>
-           <vsizetype>5</vsizetype>
+        <widget class="QFrame" name="frame">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>3</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="frameShape" >
+         <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
-         <property name="frameShadow" >
+         <property name="frameShadow">
           <enum>QFrame::Raised</enum>
          </property>
-         <layout class="QVBoxLayout" >
-          <property name="margin" >
-           <number>0</number>
-          </property>
-          <property name="spacing" >
+         <layout class="QVBoxLayout">
+          <property name="spacing">
            <number>6</number>
           </property>
+          <property name="margin" stdset="0">
+           <number>0</number>
+          </property>
           <item>
-           <widget class="QTextBrowser" name="macro_text" >
-            <property name="lineWrapMode" >
+           <widget class="QTextBrowser" name="macro_text">
+            <property name="lineWrapMode">
              <enum>QTextEdit::NoWrap</enum>
             </property>
            </widget>
@@ -109,70 +102,68 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="note_label" >
-     <property name="text" >
-      <string>&lt;html>&lt;body>&lt;span style=" font-weight:600;">Note&lt;/span>: to edit, add or delete scripts, use the macro development facility in "Tools/Macro Development" or "Tools/Verification/DRC/Edit DRC Scripts". You will find a branch for this technology there.&lt;/p>&lt;/body>&lt;/html></string>
+    <widget class="QLabel" name="note_label">
+     <property name="text">
+      <string>&lt;html&gt;&lt;body&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;: to edit, add or delete scripts, use the macro development facility in &quot;Tools/Macro Development&quot;. You will find a branch for this technology there.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
-     <property name="wordWrap" >
+     <property name="wordWrap">
       <bool>true</bool>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="empty_label1" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>5</vsizetype>
+    <widget class="QLabel" name="empty_label1">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="text" >
-      <string>&lt;html>&lt;body>&lt;span style=" font-weight:600;">Note&lt;/span>: this page is empty because no valid base path is set.&lt;br/>Select a base path on the "General" page to establish one.&lt;/p>&lt;/body>&lt;/html></string>
+     <property name="text">
+      <string>&lt;html&gt;&lt;body&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;: this page is empty because no valid base path is set.&lt;br/&gt;Select a base path on the &quot;General&quot; page to establish one.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
-     <property name="alignment" >
+     <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
-     <property name="wordWrap" >
+     <property name="wordWrap">
       <bool>true</bool>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="empty_label2_frame" >
-     <property name="minimumSize" >
+    <widget class="QFrame" name="empty_label2_frame">
+     <property name="minimumSize">
       <size>
        <width>16</width>
        <height>200</height>
       </size>
      </property>
-     <property name="frameShape" >
+     <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="frameShadow" >
+     <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
+     <layout class="QGridLayout">
+      <property name="margin" stdset="0">
        <number>0</number>
       </property>
-      <property name="spacing" >
+      <property name="spacing">
        <number>6</number>
       </property>
-      <item row="2" column="1" >
-       <widget class="QPushButton" name="create_folder_button" >
-        <property name="text" >
+      <item row="2" column="1">
+       <widget class="QPushButton" name="create_folder_button">
+        <property name="text">
          <string>Create Folder Now</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="2" >
+      <item row="2" column="2">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>211</width>
           <height>20</height>
@@ -180,12 +171,12 @@
         </property>
        </spacer>
       </item>
-      <item row="2" column="0" >
+      <item row="2" column="0">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>231</width>
           <height>20</height>
@@ -193,12 +184,12 @@
         </property>
        </spacer>
       </item>
-      <item row="3" column="0" colspan="3" >
+      <item row="3" column="0" colspan="3">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>651</width>
           <height>40</height>
@@ -206,12 +197,12 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="0" colspan="3" >
+      <item row="0" column="0" colspan="3">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>671</width>
           <height>40</height>
@@ -219,23 +210,21 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="0" colspan="3" >
-       <widget class="QLabel" name="empty_label2" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>5</vsizetype>
+      <item row="1" column="0" colspan="3">
+       <widget class="QLabel" name="empty_label2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
-         <string>&lt;html>&lt;body>&lt;span style=" font-weight:600;">Note&lt;/span>: this page is empty, because the corresponding macro folder&lt;/p>&lt;p style=" margin-top:5px; margin-bottom:5px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;i>%BASE_PATH%/%CAT%&lt;/i>&lt;/p>&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">cannot be found or is not accessible.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="text">
+         <string>&lt;html&gt;&lt;body&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;: this page is empty, because the corresponding macro folder&lt;/p&gt;&lt;p style=&quot; margin-top:5px; margin-bottom:5px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;i&gt;%BASE_PATH%/%CAT%&lt;/i&gt;&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;cannot be found or is not accessible.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
-        <property name="wordWrap" >
+        <property name="wordWrap">
          <bool>true</bool>
         </property>
        </widget>
@@ -244,15 +233,15 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="empty_label3" >
-     <property name="text" >
-      <string>&lt;html>&lt;body>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">Note&lt;/span>: this page is empty, because the macro location is shared by a different macro site (specifically "&lt;i>%ALT_DESC%&lt;/i>"). Such a site cannot be made technology specific. Choose a base path that points to a different location.&lt;/p>&lt;/body>&lt;/html></string>
+    <widget class="QLabel" name="empty_label3">
+     <property name="text">
+      <string>&lt;html&gt;&lt;body&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;: this page is empty, because the macro location is shared by a different macro site (specifically &quot;&lt;i&gt;%ALT_DESC%&lt;/i&gt;&quot;). Such a site cannot be made technology specific. Choose a base path that points to a different location.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
-     <property name="alignment" >
+     <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
-     <property name="wordWrap" >
+     <property name="wordWrap">
       <bool>true</bool>
      </property>
     </widget>

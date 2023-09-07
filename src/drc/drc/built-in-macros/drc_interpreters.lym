@@ -19,13 +19,15 @@ module DRC
 
   class DRCExecutable &lt; RBA::Executable
 
-    def initialize(macro, generator, rdb_index = nil)
+    def initialize(macro, interpreter, generator, rdb_index = nil)
 
       @drc = DRCEngine::new
       @drc._rdb_index = rdb_index
       @drc._generator = generator
 
       @macro = macro
+
+      @interpreter = interpreter
 
     end
 
@@ -38,9 +40,11 @@ module DRC
 
       begin
 
+        encoded_file, expanded_text = @interpreter.include_expansion(@macro)
+
         # No verbosity set in drc engine - we cannot use the engine's logger 
         RBA::Logger::verbosity &gt;= 10 &amp;&amp; RBA::Logger::info("Running #{@macro.path}")
-        @drc.instance_eval(@macro.text, @macro.path)
+        @drc.instance_eval(expanded_text, encoded_file)
 
       rescue =&gt; ex
 
@@ -66,13 +70,40 @@ module DRC
 
   end
   
+  # A recipe implementation allowing the DRC run to be redone
+  class DRCRecipe &lt; RBA::Recipe
+
+    def initialize(interpreter)
+
+      super("drc", "DRC recipe")
+
+      @interpreter = interpreter
+
+    end
+
+    def executable(params)
+
+      script = params["script"]
+      if ! script
+        return
+      end
+
+      macro = RBA::Macro::macro_by_path(script)
+      macro || raise("Can't find DRC script #{script} - unable to re-run")
+
+      DRCExecutable::new(macro, @interpreter, self.generator("script" => script), params["rdb_index"])
+      
+    end
+
+  end
+  
   # A DSL implementation for a DRC language (XML format)
   class DRCInterpreter &lt; RBA::MacroInterpreter
   
     # Constructor
-    def initialize(recipe)
+    def initialize
 
-      @recipe = recipe
+      @recipe = DRCRecipe::new(self)
 
       # Make the DSL use ruby syntax highlighting
       self.syntax_scheme = "ruby"
@@ -97,7 +128,7 @@ module DRC
     
     # Implements the execute method
     def executable(macro)
-      DRCExecutable::new(macro, @recipe.generator("script" => macro.path))
+      DRCExecutable::new(macro, self, @recipe.generator("script" => macro.path))
     end
     
   end
@@ -106,9 +137,9 @@ module DRC
   class DRCPlainTextInterpreter &lt; RBA::MacroInterpreter
   
     # Constructor
-    def initialize(recipe)
+    def initialize
 
-      @recipe = recipe
+      @recipe = DRCRecipe::new(self)
 
       # Make the DSL use ruby syntax highlighting
       self.syntax_scheme = "ruby"
@@ -124,40 +155,14 @@ module DRC
     
     # Implements the execute method
     def executable(macro)
-      DRCExecutable::new(macro, @recipe.generator("script" => macro.path))
+      DRCExecutable::new(macro, self, @recipe.generator("script" => macro.path))
     end
     
   end
   
-  # A recipe implementation allowing the DRC run to be redone
-  class DRCRecipe &lt; RBA::Recipe
-
-    def initialize
-      super("drc", "DRC recipe")
-    end
-
-    def executable(params)
-
-      script = params["script"]
-      if ! script
-        return
-      end
-
-      macro = RBA::Macro::macro_by_path(script)
-      macro || raise("Can't find DRC script #{script} - unable to re-run")
-
-      DRCExecutable::new(macro, self.generator("script" => script), params["rdb_index"])
-      
-    end
-
-  end
-  
-  # Register the recipe
-  drc_recipe = DRCRecipe::new
- 
   # Register the new interpreters
-  DRCInterpreter::new(drc_recipe)
-  DRCPlainTextInterpreter::new(drc_recipe)
+  DRCInterpreter::new
+  DRCPlainTextInterpreter::new
 
   # Creates a new macro category
   if RBA.constants.member?(:Application) &amp;&amp; RBA::Application::instance 

@@ -464,7 +464,7 @@ struct edge_defs
       "@return The scaled edge\n"
     ) +
     method ("contains?", &C::contains, gsi::arg ("p"),
-      "@brief Test whether a point is on an edge.\n"
+      "@brief Tests whether a point is on an edge.\n"
       "\n"
       "A point is on a edge if it is on (or at least closer \n"
       "than a grid point to) the edge.\n"
@@ -474,7 +474,7 @@ struct edge_defs
       "@return True if the point is on the edge.\n"
     ) +
     method ("contains_excl?", &C::contains_excl, gsi::arg ("p"),
-      "@brief Test whether a point is on an edge excluding the endpoints.\n"
+      "@brief Tests whether a point is on an edge excluding the endpoints.\n"
       "\n"
       "A point is on a edge if it is on (or at least closer \n"
       "than a grid point to) the edge.\n"
@@ -494,15 +494,18 @@ struct edge_defs
       "\n"
       "@return True if the edges are coincident.\n"
     ) +
-    method ("intersect?", &C::intersect, gsi::arg ("e"),
+    method ("intersects?|#intersect?", &C::intersect, gsi::arg ("e"),
       "@brief Intersection test. \n"
       "\n"
       "Returns true if the edges intersect. Two edges intersect if they share at least one point. \n"
       "If the edges coincide, they also intersect.\n"
-      "For degenerated edges, the intersection is mapped to\n"
-      "point containment tests.\n"
+      "If one of the edges is degenerate (both points are identical), that point is "
+      "required to sit exaclty on the other edge. If both edges are degenerate, their "
+      "points are required to be identical.\n"
       "\n"
       "@param e The edge to test.\n"
+      "\n"
+      "The 'intersects' (with an 's') synonym has been introduced in version 0.28.12.\n"
     ) +
     method_ext ("intersection_point", &intersect_point, gsi::arg ("e"),
       "@brief Returns the intersection point of two edges. \n"
@@ -600,19 +603,21 @@ struct edge_defs
       "This method has been introduced in version 0.23.\n"
     ) +
     method ("crossed_by?", &C::crossed_by, gsi::arg ("e"),
-      "@brief Check, if an edge is cut by a line (given by an edge)\n"
+      "@brief Checks, if the line given by self is crossed by the edge e\n"
       "\n"
-      "This method returns true if p1 is in one semispace \n"
-      "while p2 is in the other or one of them is on the line\n"
-      "through the edge \"e\"\n"
+      "self if considered an infinite line. This predicate renders true "
+      "if the edge e is cut by this line. In other words: "
+      "this method returns true if e.p1 is in one semispace of self \n"
+      "while e.p2 is in the other or one of them is exactly on self.\n"
       "\n"
       "@param e The edge representing the line that the edge must be crossing.\n"
     ) +
     method_ext ("crossing_point", &crossing_point, gsi::arg ("e"),
       "@brief Returns the crossing point on two edges. \n"
       "\n"
-      "This method delivers the point where the given edge (self) crosses the line given "
-      "by the edge in argument \"e\". If self does not cross this line, the result is undefined. "
+      "This method delivers the point where the given line (self) crosses the edge given "
+      "by the argument \"e\". self is considered infinitely long and is required to cut "
+      "through the edge \"e\". If self does not cut this line, the result is undefined. "
       "See \\crossed_by? for a description of the crossing predicate.\n"
       "\n"
       "@param e The edge representing the line that self must be crossing.\n"

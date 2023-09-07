@@ -24,6 +24,7 @@
 
 #include "layBusy.h"
 #include "tlThreads.h"
+#include "tlFileSystemWatcher.h"
 
 namespace lay
 {
@@ -61,6 +62,9 @@ BusySection::BusySection ()
     m_previous_mode = mp_busy_mode->is_busy ();
     mp_busy_mode->enter_busy_mode (true);
   }
+
+  //  disable file system watchers during busy periods
+  tl::FileSystemWatcher::global_enable (false);
 }
 
 BusySection::~BusySection ()
@@ -70,6 +74,8 @@ BusySection::~BusySection ()
     mp_busy_mode->enter_busy_mode (m_previous_mode);
   }
   mp_busy_mode = 0;
+
+  tl::FileSystemWatcher::global_enable (true);
 }
 
 bool 

@@ -240,7 +240,7 @@ MoveService::mouse_press_event (const db::DPoint &p, unsigned int buttons, bool 
 }
 
 bool
-MoveService::begin_move (db::Transaction *transaction, bool selected_after_move)
+MoveService::begin_move (db::Transaction *transaction, bool transient_selection)
 {
   if (m_dragging) {
     return false;
@@ -248,16 +248,28 @@ MoveService::begin_move (db::Transaction *transaction, bool selected_after_move)
 
   std::unique_ptr<db::Transaction> trans_holder (transaction);
 
-  bool drag_transient = ! selected_after_move;
-  if (! mp_editables->has_selection ()) {
-    //  try to use the transient selection for the real one
-    mp_editables->transient_to_selection ();
-    drag_transient = true;
-  }
+  bool drag_transient = false;
 
-  if (! mp_editables->has_selection ()) {
-    //  still nothing selected
-    return false;
+  if (! transaction) {
+
+    //  unless in "continue with move" use case try to establish a selection
+
+    if (! mp_editables->has_selection ()) {
+      //  try to use the transient selection for the real one
+      mp_editables->transient_to_selection ();
+      drag_transient = true;
+    }
+
+    if (! mp_editables->has_selection ()) {
+      //  still nothing selected
+      return false;
+    }
+
+  } else {
+
+    //  inherit transient selection mode from previous operation
+    drag_transient = transient_selection;
+
   }
 
   db::DBox bbox = mp_editables->selection_bbox ();

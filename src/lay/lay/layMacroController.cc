@@ -385,9 +385,9 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
   } else {
 
     //  determine the paths currently in use
-    std::map<std::string, const ExternalPathDescriptor *> prev_folders_by_path;
+    std::map<std::string, ExternalPathDescriptor> prev_folders_by_path;
     for (std::vector<ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
-      prev_folders_by_path.insert (std::make_pair (p->path, p.operator-> ()));
+      prev_folders_by_path.insert (std::make_pair (p->path, *p));
     }
 
     //  gets the external paths (tech, packages) into m_external_paths
@@ -433,23 +433,39 @@ MacroController::sync_implicit_macros (bool ask_before_autorun)
 
     for (std::vector<ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
 
-      if (prev_folders_by_path.find (p->path) != prev_folders_by_path.end ()) {
-        continue;
-      }
+      auto pf = prev_folders_by_path.find (p->path);
+      if (pf != prev_folders_by_path.end ()) {
 
-      if (tl::verbosity () >= 20) {
-        tl::info << "Adding macro folder " << p->path << ", category '" << p->cat << "' for '" << p->description << "'";
-      }
+        if (pf->second.version != p->version) {
 
-      //  Add the folder. Note: it may happen that a macro folder for the tech specific macros already exists in
-      //  a non-tech context.
-      //  In that case, the add_folder method will return 0.
+          if (tl::verbosity () >= 20) {
+            tl::info << "New version (" << p->version << " vs. " << pf->second.version << ") of macro folder " << p->path << ", category '" << p->cat << "' for '" << p->description << "'";
+          }
 
-      //  TODO: is it wise to make this writeable?
-      lym::MacroCollection *mc = lym::MacroCollection::root ().add_folder (p->description, p->path, p->cat, p->readonly);
-      if (mc) {
-        mc->set_virtual_mode (p->type);
-        new_folders.push_back (mc);
+          lym::MacroCollection *mc = lym::MacroCollection::root ().folder_by_name (p->path);
+          if (mc) {
+            new_folders.push_back (mc);
+          }
+
+        }
+
+      } else {
+
+        if (tl::verbosity () >= 20) {
+          tl::info << "Adding macro folder " << p->path << ", category '" << p->cat << "' for '" << p->description << "'";
+        }
+
+        //  Add the folder. Note: it may happen that a macro folder for the tech specific macros already exists in
+        //  a non-tech context.
+        //  In that case, the add_folder method will return 0.
+
+        //  TODO: is it wise to make this writeable?
+        lym::MacroCollection *mc = lym::MacroCollection::root ().add_folder (p->description, p->path, p->cat, p->readonly);
+        if (mc) {
+          mc->set_virtual_mode (p->type);
+          new_folders.push_back (mc);
+        }
+
       }
 
     }
@@ -565,7 +581,7 @@ MacroController::sync_macro_sources ()
             if (*f != macro_categories () [c].name) {
               description += " - " + tl::to_string (tr ("%1 branch").arg (tl::to_qstring (*f)));
             }
-            external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.path ()), description, macro_categories () [c].name, lym::MacroCollection::SaltFolder, g->is_readonly ()));
+            external_paths.push_back (ExternalPathDescriptor (tl::to_string (macro_dir.path ()), description, macro_categories () [c].name, lym::MacroCollection::SaltFolder, g->is_readonly (), g->version ()));
 
           }
 

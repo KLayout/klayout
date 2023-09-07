@@ -38,6 +38,7 @@
 #include "tlProgress.h"
 #include "tlFileUtils.h"
 #include "tlResources.h"
+#include "tlEnv.h"
 
 #include "rba.h"
 #include "pya.h"
@@ -262,7 +263,7 @@ MacroCollection::make_readonly (bool f)
 }
 
 MacroCollection *
-MacroCollection::add_folder (const std::string &description, const std::string &p, const std::string &cat, bool readonly, bool force_create)
+MacroCollection::add_folder (const std::string &description, const std::string &p, const std::string &cat, bool readonly, bool auto_create)
 {
   if (! p.empty () && p[0] == ':') {
 
@@ -278,7 +279,7 @@ MacroCollection::add_folder (const std::string &description, const std::string &
     if (! tl::file_exists (fp)) {
 
       //  Try to create the folder since it does not exist yet or skip that one
-      if (! force_create) {
+      if (readonly || ! auto_create) {
 
         if (tl::verbosity () >= 20) {
           tl::log << tl::to_string (tr ("Folder does not exist - skipping: ")) << fp;
@@ -363,6 +364,22 @@ namespace {
 }
 #endif
 
+//  Some directories are ignored in addition to dotfiles
+static bool dir_is_ignored (const std::string &dn)
+{
+  static std::set <std::string> ignored;
+  static bool initialized = false;
+
+  if (! initialized) {
+    //  a colon-separated list of directory names
+    std::string ign = tl::get_env ("KLAYOUT_IGNORE_MACRO_DIRS", "__pycache__");
+    auto ignv = tl::split (ign, ":");
+    ignored.insert (ignv.begin (), ignv.end ());
+  }
+
+  return ignored.find (dn) != ignored.end ();
+}
+
 void MacroCollection::scan ()
 {
   std::string p = path ();
@@ -428,6 +445,10 @@ void MacroCollection::scan ()
 
       std::string fp = tl::combine_path (p, *f);
       if (! tl::is_dir (fp)) {
+        continue;
+      }
+
+      if (dir_is_ignored (*f)) {
         continue;
       }
 
@@ -831,7 +852,7 @@ void MacroCollection::reload (bool safe)
 
   lym::MacroCollection new_collection;
   for (lym::MacroCollection::child_iterator c = begin_children (); c != end_children (); ++c) {
-    new_collection.add_folder (c->second->description (), c->second->path (), c->second->category (), c->second->is_readonly (), false /* don't force to create */);
+    new_collection.add_folder (c->second->description (), c->second->path (), c->second->category (), c->second->is_readonly (), false /* don't auto-create folder */);
   }
 
   //  and synchronize current with the actual one

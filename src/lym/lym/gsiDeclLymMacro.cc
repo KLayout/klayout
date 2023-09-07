@@ -247,6 +247,18 @@ private:
   bool m_supports_include_expansion;
 };
 
+static std::vector<std::string>
+include_expansion (MacroInterpreterImpl *interp, lym::Macro *macro)
+{
+  std::vector<std::string> res;
+
+  auto sp = interp->include_expansion (macro);
+  res.push_back (sp.first);
+  res.push_back (sp.second);
+
+  return res;
+}
+
 gsi::EnumIn<lym::Macro, lym::Macro::Format> decl_FormatEnum ("lay", "Format",
   gsi::enum_const ("PlainTextFormat", lym::Macro::PlainTextFormat,
     "@brief The macro has plain text format"
@@ -297,6 +309,13 @@ Class<MacroInterpreterImpl> decl_MacroInterpreter ("lay", "MacroInterpreter",
   ) +
   gsi::method ("NoDebugger", &const_NoDebugger,
     "@brief Indicates no debugging for \\debugger_scheme\n"
+  ) +
+  gsi::method_ext ("include_expansion", &include_expansion, gsi::arg ("macro"),
+    "@brief Provides include expansion as defined by the interpreter\n"
+    "The return value will be a two-element array with the encoded file path "
+    "and the include-expanded text.\n"
+    "\n"
+    "This method has been introduced in version 0.28.12."
   ) +
   gsi::method ("register", &MacroInterpreterImpl::register_gsi, gsi::arg ("name"),
     "@brief Registers the macro interpreter\n"

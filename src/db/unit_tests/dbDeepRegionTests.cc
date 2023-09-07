@@ -2779,6 +2779,37 @@ TEST(issue_400_with_region)
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/deep_region_au400c.gds");
 }
 
+TEST(deep_region_transform_with_scaled)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/deep_region_transform_with_scaled.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  db::DeepShapeStore dss;
+
+  for (db::Layout::layer_iterator l = ly.begin_layers (); l != ly.end_layers (); ++l) {
+
+    unsigned int li = (*l).first;
+    db::Region r (db::RecursiveShapeIterator (ly, top_cell, li), dss);
+    r.transform (db::Trans (db::Vector (10000, 0)));
+
+    ly.clear_layer (li);
+    r.insert_into (&ly, top_cell_index, li);
+
+  }
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/deep_region_transform_with_scaled_au.gds");
+}
+
 TEST(issue_663_separation_from_inside)
 {
   db::Layout ly;

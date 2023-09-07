@@ -204,8 +204,8 @@ private:
    */
   struct ExternalPathDescriptor
   {
-    ExternalPathDescriptor (const std::string &_path, const std::string &_description, const std::string &_cat, lym::MacroCollection::FolderType _type, bool _readonly)
-      : path (_path), description (_description), cat (_cat), type (_type), readonly (_readonly)
+    ExternalPathDescriptor (const std::string &_path, const std::string &_description, const std::string &_cat, lym::MacroCollection::FolderType _type, bool _readonly, const std::string &_version = std::string ())
+      : path (_path), description (_description), cat (_cat), type (_type), version (_version), readonly (_readonly)
     {
       //  .. nothing yet ..
     }
@@ -214,6 +214,7 @@ private:
     std::string description;
     std::string cat;
     lym::MacroCollection::FolderType type;
+    std::string version;
     bool readonly;
   };
 

@@ -315,6 +315,8 @@ class DBEdges_TestClass < TestBase
 
     r = r1 + r2
     assert_equal(csort(r.to_s), csort("(0,0;100,0);(50,0;200,0)"))
+    r = r1.join(r2)
+    assert_equal(csort(r.to_s), csort("(0,0;100,0);(50,0;200,0)"))
     assert_equal(r.merged.to_s, "(0,0;200,0)")
     r.merge
     assert_equal(r.is_merged?, true)
@@ -322,8 +324,13 @@ class DBEdges_TestClass < TestBase
     r = r1.dup
     r += r2
     assert_equal(csort(r.to_s), csort("(0,0;100,0);(50,0;200,0)"))
+    r = r1.dup
+    r.join_with(r2)
+    assert_equal(csort(r.to_s), csort("(0,0;100,0);(50,0;200,0)"))
 
     r = r1 | r2
+    assert_equal(r.to_s, "(0,0;200,0)")
+    r = r1.or(r2)
     assert_equal(r.to_s, "(0,0;200,0)")
     assert_equal(r.merged.to_s, "(0,0;200,0)")
     r.merge
@@ -332,8 +339,13 @@ class DBEdges_TestClass < TestBase
     r = r1.dup
     r |= r2
     assert_equal(r.to_s, "(0,0;200,0)")
+    r = r1.dup
+    r.or_with(r2)
+    assert_equal(r.to_s, "(0,0;200,0)")
 
     r = r1 & r2
+    assert_equal(r.to_s, "(50,0;100,0)")
+    r = r1.and(r2)
     assert_equal(r.to_s, "(50,0;100,0)")
     assert_equal(r.is_merged?, true)
     r = r1.andnot(r2)[0]
@@ -342,8 +354,13 @@ class DBEdges_TestClass < TestBase
     r = r1.dup
     r &= r2
     assert_equal(r.to_s, "(50,0;100,0)")
+    r = r1.dup
+    r.and_with(r2)
+    assert_equal(r.to_s, "(50,0;100,0)")
 
     r = r1 - r2
+    assert_equal(r.to_s, "(0,0;50,0)")
+    r = r1.not(r2)
     assert_equal(r.to_s, "(0,0;50,0)")
     assert_equal(r.is_merged?, true)
     r = r1.andnot(r2)[1]
@@ -352,12 +369,20 @@ class DBEdges_TestClass < TestBase
     r = r1.dup
     r -= r2
     assert_equal(r.to_s, "(0,0;50,0)")
+    r = r1.dup
+    r.not_with(r2)
+    assert_equal(r.to_s, "(0,0;50,0)")
 
     r = r1 ^ r2
+    assert_equal(csort(r.to_s), csort("(0,0;50,0);(100,0;200,0)"))
+    r = r1.xor(r2)
     assert_equal(csort(r.to_s), csort("(0,0;50,0);(100,0;200,0)"))
     assert_equal(r.is_merged?, true)
     r = r1.dup
     r ^= r2
+    assert_equal(csort(r.to_s), csort("(0,0;50,0);(100,0;200,0)"))
+    r = r1.dup
+    r.xor_with(r2)
     assert_equal(csort(r.to_s), csort("(0,0;50,0);(100,0;200,0)"))
 
   end

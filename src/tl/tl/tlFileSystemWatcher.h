@@ -58,6 +58,11 @@ public:
   FileSystemWatcher (QObject *parent = 0);
 
   /**
+   *  @brief Global enable/disable
+   */
+  static void global_enable (bool en);
+
+  /**
    *  @brief Enables or disables the file watcher
    */
   void enable (bool en);

@@ -89,7 +89,7 @@ public:
    *  If force_create is true (the default), the folder will be created if it does not
    *  exist yet. On error, 0 is returned.
    */
-  MacroCollection *add_folder (const std::string &description, const std::string &path, const std::string &category, bool readonly, bool force_create = true);
+  MacroCollection *add_folder (const std::string &description, const std::string &path, const std::string &category, bool readonly, bool auto_create = true);
 
   /**
    *  @brief Gets the category tag of the collection

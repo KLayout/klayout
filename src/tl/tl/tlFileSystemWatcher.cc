@@ -31,6 +31,9 @@
 namespace tl
 {
 
+//  The global enable counter (<0: disable)
+static int s_global_enable = 0;
+
 //  The maximum allowed processing time in seconds
 const double processing_time = 0.02;
 
@@ -45,6 +48,16 @@ FileSystemWatcher::FileSystemWatcher (QObject *parent)
   m_index = 0;
   m_iter = m_files.end ();
   m_batch_size = 1000;
+}
+
+void
+FileSystemWatcher::global_enable (bool en)
+{
+  if (en) {
+    ++s_global_enable;
+  } else {
+    --s_global_enable;
+  }
 }
 
 void
@@ -120,6 +133,10 @@ FileSystemWatcher::remove_file (const std::string &path)
 void
 FileSystemWatcher::timeout ()
 {
+  if (s_global_enable < 0) {
+    return;
+  }
+
   tl::Clock start = tl::Clock::current ();
 
   if (m_iter == m_files.end ()) {

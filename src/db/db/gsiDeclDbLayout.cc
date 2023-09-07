@@ -1037,6 +1037,22 @@ static void dtransform_cplx (db::Layout *layout, const db::DCplxTrans &trans)
   layout->transform (dbu_trans.inverted () * trans * dbu_trans);
 }
 
+static db::LayerProperties get_properties (const db::Layout *layout, unsigned int index)
+{
+  if (layout->is_valid_layer (index)) {
+    return layout->get_properties (index);
+  } else {
+    return db::LayerProperties ();
+  }
+}
+
+static void set_properties (db::Layout *layout, unsigned int index, const db::LayerProperties &props)
+{
+  if (layout->is_valid_layer (index)) {
+    layout->set_properties (index, props);
+  }
+}
+
 Class<db::Layout> decl_Layout ("db", "Layout",
   gsi::constructor ("new", &layout_ctor_with_manager, gsi::arg ("manager"),
     "@brief Creates a layout object attached to a manager\n"
@@ -1667,11 +1683,12 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "See \\insert_special_layer for a description of special layers."
   ) +
-  gsi::method ("set_info", &db::Layout::set_properties, gsi::arg ("index"), gsi::arg ("props"),
+  gsi::method_ext ("set_info", &set_properties, gsi::arg ("index"), gsi::arg ("props"),
     "@brief Sets the info structure for a specified layer\n"
   ) +
-  gsi::method ("get_info", &db::Layout::get_properties, gsi::arg ("index"),
+  gsi::method_ext ("get_info", &get_properties, gsi::arg ("index"),
     "@brief Gets the info structure for a specified layer\n"
+    "If the layer index is not a valid layer index, an empty LayerProperties object will be returned."
   ) +
   gsi::method ("cells", &db::Layout::cells,
     "@brief Returns the number of cells\n"

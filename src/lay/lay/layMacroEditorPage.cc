@@ -46,6 +46,8 @@
 #include <QTimer>
 #include <QListWidget>
 #include <QApplication>
+#include <QToolButton>
+#include <QPushButton>
 
 namespace lay
 {
@@ -79,6 +81,59 @@ void MacroEditorTextWidget::paintEvent (QPaintEvent *event)
     emit contentsChanged ();
   }
   return TextEditWidget::paintEvent (event);
+}
+
+// ----------------------------------------------------------------------------------------------
+//  MacroEditorNotificationWidget implementation
+
+MacroEditorNotificationWidget::MacroEditorNotificationWidget (MacroEditorPage *parent, const MacroEditorNotification *notification)
+  : QFrame (parent), mp_parent (parent), mp_notification (notification)
+{
+  setBackgroundRole (QPalette::ToolTipBase);
+  setAutoFillBackground (true);
+
+  QHBoxLayout *layout = new QHBoxLayout (this);
+  layout->setContentsMargins (4, 4, 4, 4);
+
+  QLabel *title_label = new QLabel (this);
+  layout->addWidget (title_label, 1);
+  title_label->setText (tl::to_qstring (notification->title ()));
+  title_label->setForegroundRole (QPalette::ToolTipText);
+  title_label->setWordWrap (true);
+  activate_help_links (title_label);
+
+  for (auto a = notification->actions ().begin (); a != notification->actions ().end (); ++a) {
+
+    QPushButton *pb = new QPushButton (this);
+    layout->addWidget (pb);
+
+    pb->setText (tl::to_qstring (a->second));
+    m_action_buttons.insert (std::make_pair (pb, a->first));
+    connect (pb, SIGNAL (clicked ()), this, SLOT (action_triggered ()));
+
+  }
+
+  QToolButton *close_button = new QToolButton ();
+  close_button->setIcon (QIcon (":clear_edit_16px.png"));
+  close_button->setAutoRaise (true);
+  layout->addWidget (close_button);
+
+  connect (close_button, SIGNAL (clicked ()), this, SLOT (close_triggered ()));
+}
+
+void
+MacroEditorNotificationWidget::action_triggered ()
+{
+  auto a = m_action_buttons.find (sender ());
+  if (a != m_action_buttons.end ()) {
+    mp_parent->notification_action (*mp_notification, a->second);
+  }
+}
+
+void
+MacroEditorNotificationWidget::close_triggered ()
+{
+  mp_parent->remove_notification (*mp_notification);
 }
 
 // ----------------------------------------------------------------------------------------------
@@ -491,15 +546,20 @@ void MacroEditorSidePanel::paintEvent (QPaintEvent *)
 MacroEditorPage::MacroEditorPage (QWidget * /*parent*/, MacroEditorHighlighters *highlighters)
   : mp_macro (0), mp_highlighters (highlighters), mp_highlighter (0), m_error_line (-1), m_ntab (8), m_nindent (2), m_ignore_cursor_changed_event (false)
 {
-  QVBoxLayout *layout = new QVBoxLayout (this);
-  
+  mp_layout = new QVBoxLayout (this);
+  mp_layout->setContentsMargins (0, 0, 0, 0);
+
+  QVBoxLayout *vlayout = new QVBoxLayout (this);
+  vlayout->setContentsMargins (4, 4, 4, 4);
+  mp_layout->addLayout (vlayout);
+
   mp_readonly_label = new QLabel (this);
   mp_readonly_label->setText (QObject::tr ("Macro is read-only and cannot be edited"));
   mp_readonly_label->hide ();
-  layout->addWidget (mp_readonly_label);
+  vlayout->addWidget (mp_readonly_label);
 
   QHBoxLayout *hlayout = new QHBoxLayout ();
-  layout->addLayout (hlayout);
+  mp_layout->addLayout (hlayout);
 
   mp_exec_model = new MacroEditorExecutionModel (this);
   mp_text = new MacroEditorTextWidget (this);
@@ -1020,6 +1080,8 @@ void MacroEditorPage::connect_macro (lym::Macro *macro)
     mp_macro = macro;
 
     if (mp_macro) {
+
+      m_path = mp_macro->path ();
 
       connect (mp_macro, SIGNAL (changed ()), this, SLOT (update ()));
 
@@ -1922,6 +1984,55 @@ MacroEditorPage::eventFilter (QObject *watched, QEvent *event)
   }
 
   return false;
+}
+
+void
+MacroEditorPage::add_notification (const MacroEditorNotification &notification)
+{
+  if (m_notification_widgets.find (&notification) == m_notification_widgets.end ()) {
+    m_notifications.push_back (notification);
+    QWidget *w = new MacroEditorNotificationWidget (this, &m_notifications.back ());
+    m_notification_widgets.insert (std::make_pair (&m_notifications.back (), w));
+    mp_layout->insertWidget (0, w);
+  }
+}
+
+void
+MacroEditorPage::remove_notification (const MacroEditorNotification &notification)
+{
+  auto nw = m_notification_widgets.find (&notification);
+  if (nw != m_notification_widgets.end ()) {
+
+    nw->second->deleteLater ();
+    m_notification_widgets.erase (nw);
+
+    for (auto n = m_notifications.begin (); n != m_notifications.end (); ++n) {
+      if (*n == notification) {
+        m_notifications.erase (n);
+        break;
+      }
+    }
+
+  }
+}
+
+void
+MacroEditorPage::notification_action (const MacroEditorNotification &notification, const std::string &action)
+{
+  if (action == "close") {
+
+    remove_notification (notification);
+
+    emit close_requested ();
+
+  } else if (action == "reload") {
+
+    remove_notification (notification);
+
+    mp_macro->load ();
+    mp_macro->reset_modified ();
+
+  }
 }
 
 }

@@ -254,7 +254,7 @@ public:
   /**
    *  @brief Pastes from clipboard and initiates a move
    */
-  void paste_interactive ();
+  void paste_interactive (bool transient_mode = false);
 
   /**
    *  @brief Copies to clipboard

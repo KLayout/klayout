@@ -26,6 +26,7 @@
 #include "layConfig.h"
 #include "layMainWindow.h"
 #include "layQtTools.h"
+#include "layBusy.h"
 #include "tlLog.h"
 
 #include <QDir>
@@ -138,11 +139,12 @@ SaltController::show_editor ()
       lay::restore_dialog_state (mp_salt_dialog, s);
     }
 
-    //  while running the dialog, don't watch file events - that would interfere with
-    //  the changes applied by the dialog itself.
-    m_file_watcher->enable (false);
-    mp_salt_dialog->exec ();
-    m_file_watcher->enable (true);
+    {
+      //  while running the dialog, don't watch file events - that would interfere with
+      //  the changes applied by the dialog itself.
+      lay::BusySection busy_section;  //  disable file watcher
+      mp_salt_dialog->exec ();
+    }
 
     mp_plugin_root->config_set (cfg_salt_manager_window_state, lay::save_dialog_state (mp_salt_dialog));
 
@@ -154,13 +156,13 @@ SaltController::show_editor ()
 void
 SaltController::sync_file_watcher ()
 {
+  lay::BusySection busy_section;  //  disable file watcher
+
   if (m_file_watcher) {
     m_file_watcher->clear ();
-    m_file_watcher->enable (false);
     for (lay::Salt::flat_iterator g = m_salt.begin_flat (); g != m_salt.end_flat (); ++g) {
       m_file_watcher->add_file ((*g)->path ());
     }
-    m_file_watcher->enable (true);
   }
 }
 
@@ -216,7 +218,18 @@ SaltController::install_packages (const std::vector<std::string> &packages, bool
     manager.compute_packages (m_salt, salt_mine);
   }
 
-  return manager.execute (0, m_salt);
+  bool result = false;
+
+  {
+    //  while running the dialog, don't watch file events - that would interfere with
+    //  the changes applied by the dialog itself.
+    lay::BusySection busy_section;  //  disable file watcher
+    result = manager.execute (0, m_salt);
+  }
+
+  sync_file_watcher ();
+
+  return result;
 }
 
 void

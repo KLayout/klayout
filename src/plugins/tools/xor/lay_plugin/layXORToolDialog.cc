@@ -1420,7 +1420,7 @@ XORToolDialog::run_xor ()
 
     size_t todo_count = 0;
     XORJob::EmptyLayerHandling el_handling = XORJob::EL_optimize;
-    if (summarize) {
+    if (summarize && output_mode == OMMarkerDatabase) {
       el_handling = XORJob::EL_summarize;
     } else if (process_el) {
       el_handling = XORJob::EL_process;

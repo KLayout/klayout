@@ -333,7 +333,7 @@ TEST(def2)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_cell_outline_layer ("OUTLINE (10/0)");
-  run_test (_this, "def2", "lef:0.lef+lef:1.lef+def:in.def.gz", "au_2.oas.gz", options);
+  run_test (_this, "def2", "lef:0.lef+lef:1.lef+def:in.def.gz", "au_3.oas.gz", options);
 }
 
 TEST(def3)

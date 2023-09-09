@@ -1150,6 +1150,22 @@ DEFImporter::read_vias (db::Layout &layout, db::Cell & /*design*/, double scale)
   }
 }
 
+//  issue #1470
+static std::string fix_pin_name (const std::string &pin_name)
+{
+  auto pos = pin_name.find (".extra");
+  if (pos == std::string::npos) {
+    return pin_name;
+  } else {
+    //  TODO: do we need to be more specific?
+    //  Formally, the allowed specs are:
+    //    pinname.extraN
+    //    pinname.extraN[n]
+    //    pinname.extraN[n][m]...
+    return std::string (pin_name.begin (), pin_name.begin () + pos);
+  }
+}
+
 void
 DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
 {
@@ -1282,7 +1298,7 @@ DEFImporter::read_pins (db::Layout &layout, db::Cell &design, double scale)
       if (flush || ! peek ("+")) {
 
         //  TODO: put a label on every single object?
-        std::string label = pin_name;
+        std::string label = fix_pin_name (pin_name);
         /* don't add the direction currently, a name is sufficient
         if (! dir.empty ()) {
           label += ":";

@@ -429,7 +429,7 @@ TEST(def16)
   //  (complete example)
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_macro_resolution_mode (1);
-  run_test (_this, "def16", "lef:a.lef+lef:tech.lef+def:a.def", "au_2.oas.gz", opt);
+  run_test (_this, "def16", "lef:a.lef+lef:tech.lef+def:a.def", "au_3.oas.gz", opt);
 }
 
 TEST(100)
@@ -1003,5 +1003,11 @@ TEST(207_joined_paths)
 TEST(208_nets_and_rects)
 {
   run_test (_this, "issue-1432", "map:test.map+lef:test.lef+def:test.def", "au.oas", default_options (), false);
+}
+
+//  issue-1472
+TEST(209_invalid_split_paths)
+{
+  run_test (_this, "issue-1472", "map:tech.map+lef:tech.lef.gz+def:test.def.gz", "au.oas", default_options (), false);
 }
 

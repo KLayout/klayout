@@ -968,7 +968,7 @@ LEFImporter::read_macro (Layout &layout)
         foreign_name = cn;
 
         if (foreign_name != mn) {
-          warn (tl::to_string (tr ("FOREIGN name differs from MACRO name in macro: ")) + mn);
+          warn (tl::to_string (tl::sprintf (tl::to_string (tr ("FOREIGN name %s differs from MACRO %s")), foreign_name, mn)));
         }
 
       }

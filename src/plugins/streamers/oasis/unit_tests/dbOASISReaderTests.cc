@@ -584,3 +584,18 @@ TEST(Bug_121_2)
   std::string fn_au (tl::testdata () + "/oasis/bug_121_au2.gds");
   db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
 }
+
+TEST(Bug_1474)
+{
+  db::Manager m (false);
+  db::Layout layout (&m);
+
+  try {
+    tl::InputStream file (tl::testdata_private () + "/oasis/issue_1474.oas");
+    db::OASISReader reader (file);
+    reader.read (layout);
+    EXPECT_EQ (false, true);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg (), "Cell named ADDHX2 with ID 4 was already given name SEDFFTRX2 (position=763169, cell=)");
+  }
+}

@@ -163,6 +163,11 @@ def nh(h):
 
 class DBPCellTests(unittest.TestCase):
 
+  def test_0(self):
+
+    # PCellDeclarationHelper is inside "pya.__all__"
+    self.assertEqual("PCellDeclarationHelper" in pya.__all__, True)
+
   def test_1(self):
 
     # instantiate and register the library

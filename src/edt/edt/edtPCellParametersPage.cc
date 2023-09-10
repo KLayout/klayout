@@ -29,6 +29,7 @@
 #include "layQtTools.h"
 #include "layLayoutViewBase.h"
 #include "layDispatcher.h"
+#include "layBusy.h"
 #include "tlScriptError.h"
 
 #include <QFrame>
@@ -604,6 +605,10 @@ PCellParametersPage::parameter_changed ()
   if (! mp_view->cellview (m_cv_index).is_valid ()) {
     return;
   }
+  if (lay::BusySection::is_busy ()) {
+    //  ignore events for example during debugger execution
+    return;
+  }
 
   const std::vector<db::PCellParameterDeclaration> &pcp = mp_pcell_decl->parameter_declarations ();
   const db::PCellParameterDeclaration *pd = 0;
@@ -623,6 +628,7 @@ PCellParametersPage::parameter_changed ()
     //  This is just about providing the inputs for the callback.
     get_parameters_internal (states, edit_error);
 
+    //  Note: checking for is_busy prevents callbacks during debugger execution
     if (! edit_error) {
       mp_pcell_decl->callback (mp_view->cellview (m_cv_index)->layout (), pd ? pd->get_name () : std::string (), states);
       m_states = states;

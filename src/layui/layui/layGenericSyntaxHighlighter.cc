@@ -975,6 +975,12 @@ GenericSyntaxHighlighterAttributes::assign (const GenericSyntaxHighlighterAttrib
   m_ids = other.m_ids;
 }
 
+bool
+GenericSyntaxHighlighterAttributes::has_attribute (const QString &name) const
+{
+  return m_ids.find (name) != m_ids.end ();
+}
+
 int 
 GenericSyntaxHighlighterAttributes::id (const QString &name)
 {
@@ -1467,9 +1473,15 @@ parse_context (QDomElement e, const std::map<QString, QDomElement> &contexts_by_
 }
 
 static void 
-parse_item_data (QDomElement e, GenericSyntaxHighlighterAttributes &attributes)
+parse_item_data (QDomElement e, GenericSyntaxHighlighterAttributes &attributes, bool initialize)
 {
   QString name = e.attributeNode (QString::fromUtf8 ("name")).value ();
+
+  //  skip attribute if already present so we don't overwrite specific settings
+  if (! initialize && attributes.has_attribute (name)) {
+    return;
+  }
+
   int attribute_id = attributes.id (name);
 
   def_style ds = dsNormal;
@@ -1532,7 +1544,7 @@ parse_item_data (QDomElement e, GenericSyntaxHighlighterAttributes &attributes)
   attributes.set_styles (attribute_id, ds, format);
 }
 
-GenericSyntaxHighlighter::GenericSyntaxHighlighter (QObject *parent, QIODevice &input, GenericSyntaxHighlighterAttributes *attributes)
+GenericSyntaxHighlighter::GenericSyntaxHighlighter (QObject *parent, QIODevice &input, GenericSyntaxHighlighterAttributes *attributes, bool initialize_attributes)
   : QSyntaxHighlighter (parent), mp_attributes (attributes), m_generation_id (0)
 {
   QDomDocument d;
@@ -1593,7 +1605,7 @@ GenericSyntaxHighlighter::GenericSyntaxHighlighter (QObject *parent, QIODevice &
           if (nn.isElement()) {
             QDomElement ee = nn.toElement ();
             if (ee.tagName () == QString::fromUtf8 ("itemData")) {
-              parse_item_data (ee, *mp_attributes);
+              parse_item_data (ee, *mp_attributes, initialize_attributes);
             }
           }
         }

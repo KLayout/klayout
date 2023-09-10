@@ -1799,8 +1799,9 @@ Layout::do_update ()
       for (bottom_up_iterator c = begin_bottom_up (); c != end_bottom_up (); ++c) {
         ++*pr;
         cell_type &cp (cell (*c));
-        if (hier_dirty () || dirty_parents.find (*c) != dirty_parents.end ()) {
-          cp.sort_inst_tree ();
+        bool force_sort_inst_tree = dirty_parents.find (*c) != dirty_parents.end ();
+        if (hier_dirty () || force_sort_inst_tree) {
+          cp.sort_inst_tree (force_sort_inst_tree);
         }
         if (cp.layers () > layers) {
           layers = cp.layers ();

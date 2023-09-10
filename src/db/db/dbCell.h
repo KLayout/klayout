@@ -1076,9 +1076,7 @@ private:
   db::properties_id_type m_prop_id;
 
   // packed fields
-  unsigned int m_hier_levels : 28;
-  bool m_instances_need_sort : 1;
-  bool m_instances_need_sort_box_tree : 1;
+  unsigned int m_hier_levels : 30;
   bool m_bbox_needs_update : 1;
   bool m_ghost_cell : 1;
 

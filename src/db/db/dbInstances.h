@@ -1547,8 +1547,9 @@ public:
 
   /**
    *  @brief Establish the instance index list giving the instances by cell index
+   *  If force is true, the instance tree is always sorted.
    */
-  void sort_child_insts ();
+  void sort_child_insts (bool force);
 
   /**
    *  @brief Sort the cell instance list

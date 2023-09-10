@@ -1387,9 +1387,9 @@ struct cell_inst_compare_f
 };
 
 void 
-Instances::sort_child_insts () 
+Instances::sort_child_insts (bool force)
 {
-  if (! instance_by_cell_index_needs_made ()) {
+  if (! force && ! instance_by_cell_index_needs_made ()) {
     return;
   }
   set_instance_by_cell_index_needs_made (false);
@@ -1440,7 +1440,7 @@ Instances::sort_inst_tree (const Layout *g, bool force)
     } else {
       m_generic.unstable_tree->sort (cell_inst_array_box_converter (*g));
       //  since we use unstable instance trees in non-editable mode, we need to resort the child instances in this case
-      sort_child_insts ();
+      sort_child_insts (true);
     }
   }
   if (m_generic_wp.any) {
@@ -1449,7 +1449,7 @@ Instances::sort_inst_tree (const Layout *g, bool force)
     } else {
       m_generic_wp.unstable_tree->sort (cell_inst_wp_array_box_converter (*g));
       //  since we use unstable instance trees in non-editable mode, we need to resort the child instances in this case
-      sort_child_insts ();
+      sort_child_insts (true);
     }
   }
 

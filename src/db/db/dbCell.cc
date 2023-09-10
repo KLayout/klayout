@@ -701,7 +701,7 @@ Cell::clear_parent_insts (size_t sz)
 void 
 Cell::sort_child_insts ()
 {
-  m_instances.sort_child_insts ();
+  m_instances.sort_child_insts (false);
 }
 
 std::pair<bool, db::pcell_id_type> 

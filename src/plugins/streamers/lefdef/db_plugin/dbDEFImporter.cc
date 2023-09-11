@@ -1557,6 +1557,20 @@ DEFImporter::read_components (db::Layout &layout, std::list<std::pair<std::strin
         d = pt - m->second.bbox.transformed (ft).lower_left ();
         is_placed = true;
 
+      } else if (test ("UNPLACED")) {
+
+        //  invalid "UNPLACED", but yet it appears to be existing (#1307)
+        if (test ("(")) {
+
+          db::Point pt = get_point (scale);
+          test (")");
+
+          ft = get_orient (false /*mandatory*/);
+          d = pt - m->second.bbox.transformed (ft).lower_left ();
+          is_placed = true;
+
+        }
+
       } else if (test ("MASKSHIFT")) {
 
         maskshift = get ();

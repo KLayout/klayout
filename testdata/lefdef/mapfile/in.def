@@ -8,7 +8,7 @@ UNITS DISTANCE MICRONS 1000 ;
 DIEAREA ( 0 0 ) ( 1000 2000 ) ;
 
 COMPONENTS 3 ;
- - macro1 macro1 + PLACED ( 0 0 ) N ;
+ - macro1 macro1 + UNPLACED ( 0 0 ) N ;
 END COMPONENTS
 
 SPECIALNETS 1 ;

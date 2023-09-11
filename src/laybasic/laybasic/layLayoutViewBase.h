@@ -2917,6 +2917,8 @@ private:
   void init_layer_properties (LayerProperties &props, const LayerPropertiesList &lp_list) const;
   void merge_dither_pattern (lay::LayerPropertiesList &props);
 
+  void refresh ();
+
 protected:
   /**
    *  @brief Constructor for calling from a LayoutView

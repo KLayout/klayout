@@ -1005,3 +1005,9 @@ TEST(208_nets_and_rects)
   run_test (_this, "issue-1432", "map:test.map+lef:test.lef+def:test.def", "au.oas", default_options (), false);
 }
 
+//  issue-1472
+TEST(209_invalid_split_paths)
+{
+  run_test (_this, "issue-1472", "map:tech.map+lef:tech.lef.gz+def:test.def.gz", "au.oas", default_options (), false);
+}
+

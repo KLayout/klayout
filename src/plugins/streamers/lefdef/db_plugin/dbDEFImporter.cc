@@ -424,17 +424,53 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
           }
         }
 
-        if (options ().joined_paths ()) {
+        auto pt_from = pt0;
+        auto pt_to = pt + 1;
+
+        //  do not split away end segments if they are shorter than half the width
+        bool dont_join_first = false;
+        bool dont_join_last = false;
+        if (pt_to - pt_from >= 3 && (pt_from[1] - pt_from[0]).length() + be < wxy / 2) {
+          dont_join_first = true;
+        }
+        if (pt_to - pt_from >= 3 && (pt_to[-1] - pt_to[-2]).length() + ee < wxy / 2) {
+          dont_join_last = true;
+        }
+
+        if (options ().joined_paths () || (dont_join_first && dont_join_last && pt_to - pt_from <= 4)) {
+
           //  single path
-          db::Path p (pt0, pt + 1, wxy, be, ee, false);
+          db::Path p (pt_from, pt_to, wxy, be, ee, false);
           if (prop_id != 0) {
             design.shapes (layer).insert (db::object_with_properties<db::Path> (p, prop_id));
           } else {
             design.shapes (layer).insert (p);
           }
+
         } else {
+
+          if (dont_join_first) {
+            db::Path p (pt_from, pt_from + 3, wxy, be, pt_from + 2 != pt ? wxy / 2 : ee, false);
+            if (prop_id != 0) {
+              design.shapes (layer).insert (db::object_with_properties<db::Path> (p, prop_id));
+            } else {
+              design.shapes (layer).insert (p);
+            }
+            pt_from += 2;
+          }
+
+          if (dont_join_last) {
+            db::Path p (pt_to - 3, pt_to, wxy, pt_to - 3 != pt0 ? wxy / 2 : be, ee, false);
+            if (prop_id != 0) {
+              design.shapes (layer).insert (db::object_with_properties<db::Path> (p, prop_id));
+            } else {
+              design.shapes (layer).insert (p);
+            }
+            pt_to -= 2;
+          }
+
           //  multipart paths
-          for (std::vector<db::Point>::const_iterator i = pt0; i != pt; ++i) {
+          for (auto i = pt_from; i + 1 != pt_to; ++i) {
             db::Path p (i, i + 2, wxy, i == pt0 ? be : wxy / 2, i + 1 != pt ? wxy / 2 : ee, false);
             if (prop_id != 0) {
               design.shapes (layer).insert (db::object_with_properties<db::Path> (p, prop_id));
@@ -442,6 +478,7 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
               design.shapes (layer).insert (p);
             }
           }
+
         }
 
         was_path_before = true;

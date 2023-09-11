@@ -429,7 +429,7 @@ TEST(def16)
   //  (complete example)
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_macro_resolution_mode (1);
-  run_test (_this, "def16", "lef:a.lef+lef:tech.lef+def:a.def", "au_2.oas.gz", opt);
+  run_test (_this, "def16", "lef:a.lef+lef:tech.lef+def:a.def", "au_3.oas.gz", opt);
 }
 
 TEST(100)

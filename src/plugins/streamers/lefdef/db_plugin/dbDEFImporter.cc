@@ -135,7 +135,7 @@ DEFImporter::get_wire_width_for_rule (const std::string &rulename, const std::st
 }
 
 std::pair<db::Coord, db::Coord>
-DEFImporter::get_def_ext (const std::string &ln, const std::pair<db::Coord, db::Coord> &wxy, double dbu)
+DEFImporter::get_def_ext (const std::string & /*ln*/, const std::pair<db::Coord, db::Coord> &wxy, double /*dbu*/)
 {
   //  This implementation assumes the "preferred width" is controlling the default extension and it is
   //  identical to the minimum effective width. This is true if "LEF58_MINWIDTH" with "WRONGDIRECTION" is
@@ -432,7 +432,7 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
         auto pt_from_split = pt_from;
         auto pt_to_split = pt_to;
 
-        if (pt_to - pt_from > size_t (2)) {
+        if (pt_to - pt_from > 2) {
 
           if (be < wxy / 2) {
             while (pt_from_split + 1 != pt_to && db::Coord ((pt_from_split[1] - pt_from_split[0]).length ()) < wxy / 2) {

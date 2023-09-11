@@ -430,17 +430,22 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
         //  do not split away end segments if they are shorter than half the width
 
         auto pt_from_split = pt_from;
-        if (be < wxy / 2) {
-          while (pt_from_split + 1 != pt_to && db::Coord ((pt_from_split[1] - pt_from_split[0]).length ()) < wxy / 2) {
-            ++pt_from_split;
-          }
-        }
-
         auto pt_to_split = pt_to;
-        if (ee < wxy / 2) {
-          while (pt_to_split - 1 != pt_from && db::Coord ((pt_to_split[-1] - pt_to_split[-2]).length ()) < wxy / 2) {
-            --pt_to_split;
+
+        if (pt_to - pt_from > size_t (2)) {
+
+          if (be < wxy / 2) {
+            while (pt_from_split + 1 != pt_to && db::Coord ((pt_from_split[1] - pt_from_split[0]).length ()) < wxy / 2) {
+              ++pt_from_split;
+            }
           }
+
+          if (ee < wxy / 2) {
+            while (pt_to_split - 1 != pt_from && db::Coord ((pt_to_split[-1] - pt_to_split[-2]).length ()) < wxy / 2) {
+              --pt_to_split;
+            }
+          }
+
         }
 
         if (! options ().joined_paths () && (pt_to_split != pt_to || pt_from_split != pt_from)) {

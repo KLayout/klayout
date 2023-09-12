@@ -1076,7 +1076,7 @@ private:
   db::properties_id_type m_prop_id;
 
   // packed fields
-  unsigned int m_hier_levels : 29;
+  unsigned int m_hier_levels : 30;
   bool m_bbox_needs_update : 1;
   bool m_ghost_cell : 1;
 
@@ -1147,9 +1147,9 @@ private:
    *  This will sort the cell instance list. As a prerequesite
    *  the cell's bounding boxes must have been computed.
    *
-   *  @param layers The maximum number of layers in the child cells
+   *  @param force Force sorting, even if not strictly needed
    */
-  void sort_inst_tree ();
+  void sort_inst_tree (bool force);
 };
 
 /**

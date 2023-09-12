@@ -940,6 +940,9 @@ Instances::operator= (const Instances &d)
 
     m_parent_insts = d.m_parent_insts;
 
+    set_instance_by_cell_index_needs_made (true);
+    set_instance_tree_needs_sort (true);
+
   }
   return *this;
 }
@@ -947,13 +950,24 @@ Instances::operator= (const Instances &d)
 bool 
 Instances::is_editable () const
 {
-  return mp_cell && mp_cell->layout () ? mp_cell->layout ()->is_editable () : true;
+  return cell () && cell ()->layout () ? cell ()->layout ()->is_editable () : true;
 }
 
 db::Layout *
 Instances::layout () const
 {
-  return mp_cell ? mp_cell->layout () : 0;
+  return cell () ? cell ()->layout () : 0;
+}
+
+void
+Instances::invalidate_insts ()
+{
+  if (cell ()) {
+    cell ()->invalidate_insts ();
+  }
+
+  set_instance_by_cell_index_needs_made (true);
+  set_instance_tree_needs_sort (true);
 }
 
 template <class Tag, class ET, class I>
@@ -962,14 +976,15 @@ Instances::erase_positions (Tag tag, ET editable_tag, I first, I last)
 {
   typedef instances_editable_traits<ET> editable_traits;
 
-  if (mp_cell) { 
-    mp_cell->invalidate_insts ();  //  HINT: must come before the change is done!
-    if (mp_cell->manager () && mp_cell->manager ()->transacting ()) {
+  invalidate_insts ();  //  HINT: must come before the change is done!
+
+  if (cell ()) {
+    if (cell ()->manager () && cell ()->manager ()->transacting ()) {
       check_is_editable_for_undo_redo (this);
       if (! is_editable ()) {
         throw tl::Exception (tl::to_string (tr ("No undo/redo support for non-editable instance lists in 'erase_positions'")));
       }
-      mp_cell->manager ()->queue (mp_cell, new db::InstOp<typename Tag::object_type, ET> (false /*not insert*/, first, last, true /*dummy*/));
+      cell ()->manager ()->queue (cell (), new db::InstOp<typename Tag::object_type, ET> (false /*not insert*/, first, last, true /*dummy*/));
     }
   }
 
@@ -983,17 +998,18 @@ Instances::insert (const InstArray &inst)
 {
   bool editable = is_editable ();
 
-  if (mp_cell) {
-    if (mp_cell->manager () && mp_cell->manager ()->transacting ()) {
+  if (cell ()) {
+    if (cell ()->manager () && cell ()->manager ()->transacting ()) {
       check_is_editable_for_undo_redo (this);
       if (editable) {
-        mp_cell->manager ()->queue (mp_cell, new db::InstOp<InstArray, InstancesEditableTag> (true /*insert*/, inst));
+        cell ()->manager ()->queue (cell (), new db::InstOp<InstArray, InstancesEditableTag> (true /*insert*/, inst));
       } else {
-        mp_cell->manager ()->queue (mp_cell, new db::InstOp<InstArray, InstancesNonEditableTag> (true /*insert*/, inst));
+        cell ()->manager ()->queue (cell (), new db::InstOp<InstArray, InstancesNonEditableTag> (true /*insert*/, inst));
       }
     }
-    mp_cell->invalidate_insts ();
   }
+
+  invalidate_insts ();
 
   // TODO: simplify this, i.e. through instance_from_pointer
   if (editable) {
@@ -1010,14 +1026,14 @@ Instances::insert (I from, I to)
   typedef std::iterator_traits<I> it_traits;
   typedef typename it_traits::value_type value_type;
 
-  if (mp_cell) {
-    if (mp_cell->manager () && mp_cell->manager ()->transacting ()) {
+  if (cell ()) {
+    if (cell ()->manager () && cell ()->manager ()->transacting ()) {
       check_is_editable_for_undo_redo (this);
-      mp_cell->manager ()->queue (mp_cell, new db::InstOp<typename it_traits::value_type, ET> (true /*insert*/, from, to));
+      cell ()->manager ()->queue (cell (), new db::InstOp<typename it_traits::value_type, ET> (true /*insert*/, from, to));
     }
-    mp_cell->invalidate_insts ();
   }
 
+  invalidate_insts ();
   inst_tree (typename value_type::tag (), ET ()).insert (from, to);
 }
 
@@ -1061,19 +1077,20 @@ template <class InstArray>
 void 
 Instances::replace (const InstArray *replace, const InstArray &with)
 {
-  if (mp_cell) {
-    if (mp_cell->manager () && mp_cell->manager ()->transacting ()) {
+  if (cell ()) {
+    if (cell ()->manager () && cell ()->manager ()->transacting ()) {
       check_is_editable_for_undo_redo (this);
       if (is_editable ()) {
-        mp_cell->manager ()->queue (mp_cell, new db::InstOp<InstArray, InstancesEditableTag> (false /*not insert*/, *replace));
-        mp_cell->manager ()->queue (mp_cell, new db::InstOp<InstArray, InstancesEditableTag> (true /*insert*/, with));
+        cell ()->manager ()->queue (cell (), new db::InstOp<InstArray, InstancesEditableTag> (false /*not insert*/, *replace));
+        cell ()->manager ()->queue (cell (), new db::InstOp<InstArray, InstancesEditableTag> (true /*insert*/, with));
       } else {
-        mp_cell->manager ()->queue (mp_cell, new db::InstOp<InstArray, InstancesNonEditableTag> (false /*not insert*/, *replace));
-        mp_cell->manager ()->queue (mp_cell, new db::InstOp<InstArray, InstancesNonEditableTag> (true /*insert*/, with));
+        cell ()->manager ()->queue (cell (), new db::InstOp<InstArray, InstancesNonEditableTag> (false /*not insert*/, *replace));
+        cell ()->manager ()->queue (cell (), new db::InstOp<InstArray, InstancesNonEditableTag> (true /*insert*/, with));
       }
     }
-    mp_cell->invalidate_insts ();
   }
+
+  invalidate_insts ();
 
   //  HINT: this only works because we know our box trees well:
   *((InstArray *)replace) = with;
@@ -1150,11 +1167,12 @@ Instances::erase_inst_by_iter (Tag tag, ET editable_tag, I iter)
     throw tl::Exception (tl::to_string (tr ("Trying to erase an object from a list that it does not belong to")));
   }
 
-  if (mp_cell) {
-    mp_cell->invalidate_insts ();
-    if (mp_cell->manager () && mp_cell->manager ()->transacting ()) {
+  invalidate_insts ();
+
+  if (cell ()) {
+    if (cell ()->manager () && cell ()->manager ()->transacting ()) {
       check_is_editable_for_undo_redo (this);
-      mp_cell->manager ()->queue (mp_cell, new db::InstOp<typename Tag::object_type, ET> (false /*not insert*/, *iter));
+      cell ()->manager ()->queue (cell (), new db::InstOp<typename Tag::object_type, ET> (false /*not insert*/, *iter));
     }
   }
 
@@ -1165,11 +1183,12 @@ template <class Tag, class ET>
 void 
 Instances::erase_inst_by_tag (Tag tag, ET editable_tag, const typename Tag::object_type &obj)
 {
-  if (mp_cell) {
-    mp_cell->invalidate_insts ();
-    if (mp_cell->manager () && mp_cell->manager ()->transacting ()) {
+  invalidate_insts ();
+
+  if (cell ()) {
+    if (cell ()->manager () && cell ()->manager ()->transacting ()) {
       check_is_editable_for_undo_redo (this);
-      mp_cell->manager ()->queue (mp_cell, new db::InstOp<typename Tag::object_type, ET> (false /*not insert*/, obj));
+      cell ()->manager ()->queue (cell (), new db::InstOp<typename Tag::object_type, ET> (false /*not insert*/, obj));
     }
   }
 
@@ -1197,16 +1216,17 @@ template <class ET>
 void
 Instances::clear_insts (ET editable_tag)
 {
-  if (mp_cell) {
-    mp_cell->invalidate_insts ();
-    if (mp_cell->manager () && mp_cell->manager ()->transacting ()) {
+  invalidate_insts ();
+
+  if (cell ()) {
+    if (cell ()->manager () && cell ()->manager ()->transacting ()) {
       check_is_editable_for_undo_redo (this);
       const Instances *const_this = this;
       if (! const_this->inst_tree (cell_inst_array_type::tag (), editable_tag).empty ()) {
-        mp_cell->manager ()->queue (mp_cell, new db::InstOp<cell_inst_array_type, ET> (false /*not insert*/, const_this->inst_tree (cell_inst_array_type::tag (), editable_tag).begin (), const_this->inst_tree (cell_inst_array_type::tag (), editable_tag).end ()));
+        cell ()->manager ()->queue (cell (), new db::InstOp<cell_inst_array_type, ET> (false /*not insert*/, const_this->inst_tree (cell_inst_array_type::tag (), editable_tag).begin (), const_this->inst_tree (cell_inst_array_type::tag (), editable_tag).end ()));
       }
       if (! const_this->inst_tree (cell_inst_wp_array_type::tag (), editable_tag).empty ()) {
-        mp_cell->manager ()->queue (mp_cell, new db::InstOp<cell_inst_wp_array_type, ET> (false /*not insert*/, const_this->inst_tree (cell_inst_wp_array_type::tag (), editable_tag).begin (), const_this->inst_tree (cell_inst_wp_array_type::tag (), editable_tag).end ()));
+        cell ()->manager ()->queue (cell (), new db::InstOp<cell_inst_wp_array_type, ET> (false /*not insert*/, const_this->inst_tree (cell_inst_wp_array_type::tag (), editable_tag).begin (), const_this->inst_tree (cell_inst_wp_array_type::tag (), editable_tag).end ()));
       }
     }
   }
@@ -1227,9 +1247,7 @@ Instances::clear_insts ()
 void 
 Instances::clear (Instances::cell_inst_array_type::tag) 
 {
-  if (mp_cell) {
-    mp_cell->invalidate_insts ();
-  }
+  invalidate_insts ();
 
   if (m_generic.any) {
     if (is_editable ()) {
@@ -1244,9 +1262,7 @@ Instances::clear (Instances::cell_inst_array_type::tag)
 void 
 Instances::clear (Instances::cell_inst_wp_array_type::tag) 
 {
-  if (mp_cell) {
-    mp_cell->invalidate_insts ();
-  }
+  invalidate_insts ();
 
   if (m_generic_wp.any) {
     if (is_editable ()) {
@@ -1371,8 +1387,13 @@ struct cell_inst_compare_f
 };
 
 void 
-Instances::sort_child_insts () 
+Instances::sort_child_insts (bool force)
 {
+  if (! force && ! instance_by_cell_index_needs_made ()) {
+    return;
+  }
+  set_instance_by_cell_index_needs_made (false);
+
   m_insts_by_cell_index = sorted_inst_vector ();
   m_insts_by_cell_index.reserve (cell_instances ());
 
@@ -1406,15 +1427,20 @@ Instances::sort_child_insts ()
 }
 
 void 
-Instances::sort_inst_tree (const Layout *g)
+Instances::sort_inst_tree (const Layout *g, bool force)
 {
+  if (! force && ! instance_tree_needs_sort ()) {
+    return;
+  }
+  set_instance_tree_needs_sort (false);
+
   if (m_generic.any) {
     if (is_editable ()) {
       m_generic.stable_tree->sort (cell_inst_array_box_converter (*g));
     } else {
       m_generic.unstable_tree->sort (cell_inst_array_box_converter (*g));
       //  since we use unstable instance trees in non-editable mode, we need to resort the child instances in this case
-      sort_child_insts ();
+      sort_child_insts (true);
     }
   }
   if (m_generic_wp.any) {
@@ -1423,7 +1449,7 @@ Instances::sort_inst_tree (const Layout *g)
     } else {
       m_generic_wp.unstable_tree->sort (cell_inst_wp_array_box_converter (*g));
       //  since we use unstable instance trees in non-editable mode, we need to resort the child instances in this case
-      sort_child_insts ();
+      sort_child_insts (true);
     }
   }
 
@@ -1603,16 +1629,17 @@ void Instances::apply_op (const Op &op, ET editable_tag)
   bool has_insts = ! const_this->inst_tree (cell_inst_array_type::tag (), editable_tag).empty ();
   bool has_wp_insts = ! const_this->inst_tree (cell_inst_wp_array_type::tag (), editable_tag).empty ();
 
-  if (mp_cell) {
-    mp_cell->invalidate_insts ();
-    if (mp_cell->manager () && mp_cell->manager ()->transacting ()) {
+  invalidate_insts ();
+
+  if (cell ()) {
+    if (cell ()->manager () && cell ()->manager ()->transacting ()) {
       check_is_editable_for_undo_redo (this);
       transacting = true;
       if (has_insts) {
-        mp_cell->manager ()->queue (mp_cell, new db::InstOp<cell_inst_array_type, ET> (false /*not insert*/, const_this->inst_tree (cell_inst_array_type::tag (), editable_tag).begin (), const_this->inst_tree (cell_inst_array_type::tag (), editable_tag).end ()));
+        cell ()->manager ()->queue (cell (), new db::InstOp<cell_inst_array_type, ET> (false /*not insert*/, const_this->inst_tree (cell_inst_array_type::tag (), editable_tag).begin (), const_this->inst_tree (cell_inst_array_type::tag (), editable_tag).end ()));
       }
       if (has_wp_insts) {
-        mp_cell->manager ()->queue (mp_cell, new db::InstOp<cell_inst_wp_array_type, ET> (false /*not insert*/, const_this->inst_tree (cell_inst_wp_array_type::tag (), editable_tag).begin (), const_this->inst_tree (cell_inst_wp_array_type::tag (), editable_tag).end ()));
+        cell ()->manager ()->queue (cell (), new db::InstOp<cell_inst_wp_array_type, ET> (false /*not insert*/, const_this->inst_tree (cell_inst_wp_array_type::tag (), editable_tag).begin (), const_this->inst_tree (cell_inst_wp_array_type::tag (), editable_tag).end ()));
       }
     }
   }
@@ -1637,10 +1664,10 @@ void Instances::apply_op (const Op &op, ET editable_tag)
 
   if (transacting) {
     if (has_insts) {
-      mp_cell->manager ()->queue (mp_cell, new db::InstOp<cell_inst_array_type, ET> (true /*insert*/, const_this->inst_tree (cell_inst_array_type::tag (), editable_tag).begin (), const_this->inst_tree (cell_inst_array_type::tag (), editable_tag).end ()));
+      cell ()->manager ()->queue (cell (), new db::InstOp<cell_inst_array_type, ET> (true /*insert*/, const_this->inst_tree (cell_inst_array_type::tag (), editable_tag).begin (), const_this->inst_tree (cell_inst_array_type::tag (), editable_tag).end ()));
     }
     if (has_wp_insts) {
-      mp_cell->manager ()->queue (mp_cell, new db::InstOp<cell_inst_wp_array_type, ET> (true /*insert*/, const_this->inst_tree (cell_inst_wp_array_type::tag (), editable_tag).begin (), const_this->inst_tree (cell_inst_wp_array_type::tag (), editable_tag).end ()));
+      cell ()->manager ()->queue (cell (), new db::InstOp<cell_inst_wp_array_type, ET> (true /*insert*/, const_this->inst_tree (cell_inst_wp_array_type::tag (), editable_tag).begin (), const_this->inst_tree (cell_inst_wp_array_type::tag (), editable_tag).end ()));
     }
   }
 }

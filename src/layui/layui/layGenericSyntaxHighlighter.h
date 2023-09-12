@@ -608,6 +608,11 @@ public:
   }
 
   /**
+   *  @brief Gets a value indicating whether the given name is present already
+   */
+  bool has_attribute (const QString &name) const;
+
+  /**
    *  @brief Get the attribute ID for a given name
    *
    *  If no attribute with that ID exists, it is created.
@@ -716,7 +721,14 @@ class LAYUI_PUBLIC GenericSyntaxHighlighter
   : public QSyntaxHighlighter
 {
 public: 
-  GenericSyntaxHighlighter (QObject *parent, QIODevice &input, GenericSyntaxHighlighterAttributes *attributes);
+  /**
+   *  @brief Creates a GenericSyntaxHighlighter
+   *  @param parent The owner of the highlighter
+   *  @param input The stream from which to pull
+   *  @param attributes The attributes
+   *  @param initialize_attributes If true, the attributes are initialized from the itemData lines
+   */
+  GenericSyntaxHighlighter (QObject *parent, QIODevice &input, GenericSyntaxHighlighterAttributes *attributes, bool initialize_attributes);
   
   /**
    *  @brief Implementation of the highlighter

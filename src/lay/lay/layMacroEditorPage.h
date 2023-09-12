@@ -63,7 +63,7 @@ class MacroEditorHighlighters
 public:
   MacroEditorHighlighters (QObject *parent);
 
-  QSyntaxHighlighter *highlighter_for (QObject *parent, lym::Macro::Interpreter lang, const std::string &dsl_name);
+  QSyntaxHighlighter *highlighter_for (QObject *parent, lym::Macro::Interpreter lang, const std::string &dsl_name, bool initialize);
 
   GenericSyntaxHighlighterAttributes *attributes_for (lym::Macro::Interpreter lang, const std::string &dsl_name);
   GenericSyntaxHighlighterAttributes *basic_attributes ();
@@ -98,7 +98,7 @@ private:
   std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes> > m_attributes;
   GenericSyntaxHighlighterAttributes m_basic_attributes;
 
-  lay::GenericSyntaxHighlighter *highlighter_for_scheme (QObject *parent, const std::string &scheme, GenericSyntaxHighlighterAttributes *attributes);
+  lay::GenericSyntaxHighlighter *highlighter_for_scheme (QObject *parent, const std::string &scheme, GenericSyntaxHighlighterAttributes *attributes, bool initialize);
   std::string scheme_for (lym::Macro::Interpreter lang, const std::string &dsl_name);
 };
 

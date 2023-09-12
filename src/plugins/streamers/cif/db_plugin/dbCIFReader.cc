@@ -164,6 +164,7 @@ CIFReader::get_char ()
     error ("Unexpected end of file");
     return 0;
   } else {
+    m_progress.set (m_stream.line_number ());
     return m_stream.get_char ();
   }
 }
@@ -823,6 +824,8 @@ void
 CIFReader::do_read (db::Layout &layout)
 {
   try {
+
+    db::LayoutLocker locker (&layout);
   
     double sf = 0.01 / m_dbu;
     layout.dbu (m_dbu);

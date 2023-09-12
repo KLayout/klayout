@@ -1095,7 +1095,7 @@ UserPropertiesForm::UserPropertiesForm (QWidget *parent)
   input.open (QIODevice::ReadOnly);
   mp_hl_basic_attributes.reset (new GenericSyntaxHighlighterAttributes ());
   mp_hl_attributes.reset (new GenericSyntaxHighlighterAttributes (mp_hl_basic_attributes.get ()));
-  lay::GenericSyntaxHighlighter *hl = new GenericSyntaxHighlighter (mp_ui->text_edit, input, mp_hl_attributes.get ());
+  lay::GenericSyntaxHighlighter *hl = new GenericSyntaxHighlighter (mp_ui->text_edit, input, mp_hl_attributes.get (), true);
   input.close ();
 
   hl->setDocument (mp_ui->text_edit->document ());

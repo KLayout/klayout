@@ -148,18 +148,18 @@ MacroEditorHighlighters::MacroEditorHighlighters (QObject *parent)
 
   for (std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes> >::iterator a = m_attributes.begin (); a != m_attributes.end (); ++a) {
     //  Note: this loads and initializes the attributes
-    delete highlighter_for_scheme (parent, a->first, &a->second); 
+    delete highlighter_for_scheme (parent, a->first, &a->second, true);
   }
 }
 
 QSyntaxHighlighter *
-MacroEditorHighlighters::highlighter_for (QObject *parent, lym::Macro::Interpreter lang, const std::string &dsl_name)
+MacroEditorHighlighters::highlighter_for (QObject *parent, lym::Macro::Interpreter lang, const std::string &dsl_name, bool initialize)
 {
   std::string scheme = scheme_for (lang, dsl_name);
 
   for (std::vector<std::pair<std::string, GenericSyntaxHighlighterAttributes> >::iterator a = m_attributes.begin (); a != m_attributes.end (); ++a) {
     if (a->first == scheme) {
-      return highlighter_for_scheme (parent, a->first, &a->second);
+      return highlighter_for_scheme (parent, a->first, &a->second, initialize);
     }
   }
 
@@ -167,7 +167,7 @@ MacroEditorHighlighters::highlighter_for (QObject *parent, lym::Macro::Interpret
 }
 
 lay::GenericSyntaxHighlighter *
-MacroEditorHighlighters::highlighter_for_scheme (QObject *parent, const std::string &scheme, GenericSyntaxHighlighterAttributes *attributes)
+MacroEditorHighlighters::highlighter_for_scheme (QObject *parent, const std::string &scheme, GenericSyntaxHighlighterAttributes *attributes, bool initialize)
 {
   if (! scheme.empty ()) {
 
@@ -186,7 +186,7 @@ MacroEditorHighlighters::highlighter_for_scheme (QObject *parent, const std::str
 
     QBuffer input (&data);
     input.open (QIODevice::ReadOnly);
-    lay::GenericSyntaxHighlighter *hl = new GenericSyntaxHighlighter (parent, input, attributes);
+    lay::GenericSyntaxHighlighter *hl = new GenericSyntaxHighlighter (parent, input, attributes, initialize);
     input.close ();
 
     return hl;
@@ -1096,7 +1096,7 @@ void MacroEditorPage::connect_macro (lym::Macro *macro)
       mp_text->setPlainText (tl::to_qstring (mp_macro->text ()));
       mp_text->setReadOnly (macro->is_readonly ());
       mp_readonly_label->setVisible (macro->is_readonly ());
-      mp_highlighter = mp_highlighters->highlighter_for (mp_text, mp_macro->interpreter (), mp_macro->dsl_interpreter ());
+      mp_highlighter = mp_highlighters->highlighter_for (mp_text, mp_macro->interpreter (), mp_macro->dsl_interpreter (), false);
       if (mp_highlighter) {
         mp_highlighter->setDocument (mp_text->document ());
       }

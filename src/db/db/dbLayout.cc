@@ -1097,15 +1097,17 @@ Layout::do_prune_cell_or_subcell (cell_index_type id, int levels, bool subcells)
   //  collect the called cells
   std::set <cell_index_type> called;
   cref.collect_called_cells (called, levels);
-  called.insert (id);
+  if (! subcells) {
+    called.insert (id);
+  }
 
   //  From these cells erase all cells that have parents outside the subtree of our cell.
   //  Make sure this is done recursively by doing this top-down.
   for (top_down_iterator c = begin_top_down (); c != end_top_down (); ++c) {
-    if (called.find (*c) != called.end () && *c != id) {
+    if (*c != id && called.find (*c) != called.end ()) {
       db::Cell &ccref = cell (*c);
       for (db::Cell::parent_cell_iterator pc = ccref.begin_parent_cells (); pc != ccref.end_parent_cells (); ++pc) {
-        if (called.find (*pc) == called.end ()) {
+        if (*pc != id && called.find (*pc) == called.end ()) {
           //  we have a parent outside the subset considered currently (either the cell was never in or
           //  it was removed itself already): remove this cell from the set of valid subcells.
           called.erase (*c);
@@ -1115,17 +1117,8 @@ Layout::do_prune_cell_or_subcell (cell_index_type id, int levels, bool subcells)
     }
   }
 
-  //  order the called cells bottom-up 
-  std::vector <cell_index_type> cells_to_delete;
-  cells_to_delete.reserve (called.size ());
-  for (bottom_up_iterator c = begin_bottom_up (); c != end_bottom_up (); ++c) {
-    if (called.find (*c) != called.end () && (!subcells || *c != id)) {
-      cells_to_delete.push_back (*c);
-    }
-  }
-
-  //  and delete these cells
-  delete_cells (cells_to_delete.begin (), cells_to_delete.end ());
+  //  and delete the cells
+  delete_cells (called);
 
   //  erase all instances in the subcells case (because, by definition we don't have any more instances)
   if (subcells) {
@@ -1799,8 +1792,9 @@ Layout::do_update ()
       for (bottom_up_iterator c = begin_bottom_up (); c != end_bottom_up (); ++c) {
         ++*pr;
         cell_type &cp (cell (*c));
-        if (hier_dirty () || dirty_parents.find (*c) != dirty_parents.end ()) {
-          cp.sort_inst_tree ();
+        bool force_sort_inst_tree = dirty_parents.find (*c) != dirty_parents.end ();
+        if (hier_dirty () || force_sort_inst_tree) {
+          cp.sort_inst_tree (force_sort_inst_tree);
         }
         if (cp.layers () > layers) {
           layers = cp.layers ();

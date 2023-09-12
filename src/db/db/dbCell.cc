@@ -92,7 +92,8 @@ Cell::box_type Cell::ms_empty_box = Cell::box_type ();
 
 Cell::Cell (cell_index_type ci, db::Layout &l) 
   : db::Object (l.manager ()), 
-    m_cell_index (ci), mp_layout (&l), m_instances (this), m_prop_id (0), m_hier_levels (0), m_bbox_needs_update (false), m_ghost_cell (false), 
+    m_cell_index (ci), mp_layout (&l), m_instances (this), m_prop_id (0), m_hier_levels (0),
+    m_bbox_needs_update (false), m_ghost_cell (false),
     mp_last (0), mp_next (0)
 {
   //  .. nothing yet 
@@ -700,7 +701,7 @@ Cell::clear_parent_insts (size_t sz)
 void 
 Cell::sort_child_insts ()
 {
-  m_instances.sort_child_insts ();
+  m_instances.sort_child_insts (false);
 }
 
 std::pair<bool, db::pcell_id_type> 
@@ -744,9 +745,9 @@ Cell::change_pcell_parameters (const instance_type &ref, const std::vector<tl::V
 }
 
 void 
-Cell::sort_inst_tree ()
+Cell::sort_inst_tree (bool force)
 {
-  m_instances.sort_inst_tree (mp_layout);
+  m_instances.sort_inst_tree (mp_layout, force);
 
   //  update the number of hierarchy levels
   m_hier_levels = count_hier_levels ();

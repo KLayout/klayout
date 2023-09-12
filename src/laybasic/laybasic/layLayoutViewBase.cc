@@ -2777,8 +2777,7 @@ LayoutViewBase::get_screenshot ()
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save screenshot")));
 
-  //  Execute all deferred methods - ensure there are no pending tasks
-  tl::DeferredMethodScheduler::execute ();
+  refresh ();
   
   return mp_canvas->screenshot ().to_image_copy ();
 }
@@ -2789,8 +2788,7 @@ LayoutViewBase::get_screenshot_pb ()
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save screenshot")));
 
-  //  Execute all deferred methods - ensure there are no pending tasks
-  tl::DeferredMethodScheduler::execute ();
+  refresh ();
 
   return mp_canvas->screenshot ();
 }
@@ -2828,9 +2826,8 @@ LayoutViewBase::save_screenshot (const std::string &fn)
     writer.setText (tl::to_qstring (i->first), tl::to_qstring (i->second));
   }
 
-  //  Execute all deferred methods - ensure there are no pending tasks
-  tl::DeferredMethodScheduler::execute ();
-  
+  refresh ();
+
   if (! writer.write (mp_canvas->screenshot ().to_image ())) {
     throw tl::Exception (tl::to_string (tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
   }
@@ -2843,8 +2840,7 @@ LayoutViewBase::save_screenshot (const std::string &fn)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Save screenshot")));
 
-  //  Execute all deferred methods - ensure there are no pending tasks
-  tl::DeferredMethodScheduler::execute ();
+  refresh ();
 
   tl::OutputStream stream (fn);
   tl::PixelBuffer img = mp_canvas->screenshot ();
@@ -2867,9 +2863,8 @@ LayoutViewBase::get_image (unsigned int width, unsigned int height)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
 
-  //  Execute all deferred methods - ensure there are no pending tasks
-  tl::DeferredMethodScheduler::execute ();
-  
+  refresh ();
+
   return mp_canvas->image (width, height).to_image_copy ();
 }
 #endif
@@ -2879,8 +2874,7 @@ LayoutViewBase::get_pixels (unsigned int width, unsigned int height)
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
 
-  //  Execute all deferred methods - ensure there are no pending tasks
-  tl::DeferredMethodScheduler::execute ();
+  refresh ();
 
   return mp_canvas->image (width, height);
 }
@@ -2892,9 +2886,8 @@ LayoutViewBase::get_image_with_options (unsigned int width, unsigned int height,
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
 
-  //  Execute all deferred methods - ensure there are no pending tasks
-  tl::DeferredMethodScheduler::execute ();
-  
+  refresh ();
+
   if (monochrome) {
     return mp_canvas->image_with_options_mono (width, height, linewidth, background, foreground, active, target_box).to_image_copy ();
   } else {
@@ -2909,8 +2902,7 @@ LayoutViewBase::get_pixels_with_options (unsigned int width, unsigned int height
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
 
-  //  Execute all deferred methods - ensure there are no pending tasks
-  tl::DeferredMethodScheduler::execute ();
+  refresh ();
 
   return mp_canvas->image_with_options (width, height, linewidth, oversampling, resolution, background, foreground, active, target_box);
 }
@@ -2921,8 +2913,7 @@ LayoutViewBase::get_pixels_with_options_mono (unsigned int width, unsigned int h
 {
   tl::SelfTimer timer (tl::verbosity () >= 11, tl::to_string (tr ("Get image")));
 
-  //  Execute all deferred methods - ensure there are no pending tasks
-  tl::DeferredMethodScheduler::execute ();
+  refresh ();
 
   return mp_canvas->image_with_options_mono (width, height, linewidth, background, foreground, active, target_box);
 }
@@ -2941,9 +2932,8 @@ LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned 
     writer.setText (tl::to_qstring (i->first), tl::to_qstring (i->second));
   }
 
-  //  Execute all deferred methods - ensure there are no pending tasks
-  tl::DeferredMethodScheduler::execute ();
-  
+  refresh ();
+
   if (! writer.write (mp_canvas->image (width, height).to_image ())) {
     throw tl::Exception (tl::to_string (tr ("Unable to write screenshot to file: %s (%s)")), fn, tl::to_string (writer.errorString ()));
   }
@@ -2958,8 +2948,7 @@ LayoutViewBase::save_image (const std::string &fn, unsigned int width, unsigned 
 
   lay::Viewport vp (width, height, mp_canvas->viewport ().target_box ());
 
-  //  Execute all deferred methods - ensure there are no pending tasks
-  tl::DeferredMethodScheduler::execute ();
+  refresh ();
 
   tl::OutputStream stream (fn);
   tl::PixelBuffer img = mp_canvas->image (width, height);
@@ -2993,8 +2982,7 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
     writer.setText (tl::to_qstring (i->first), tl::to_qstring (i->second));
   }
 
-  //  Execute all deferred methods - ensure there are no pending tasks
-  tl::DeferredMethodScheduler::execute ();
+  refresh ();
 
   if (monochrome) {
     if (! writer.write (mp_canvas->image_with_options_mono (width, height, linewidth, background, foreground, active, target_box).to_image ())) {
@@ -3019,8 +3007,7 @@ LayoutViewBase::save_image_with_options (const std::string &fn,
   lay::Viewport vp (width, height, mp_canvas->viewport ().target_box ());
   std::vector<std::pair<std::string, std::string> > texts = png_texts (this, vp.box ());
 
-  //  Execute all deferred methods - ensure there are no pending tasks
-  tl::DeferredMethodScheduler::execute ();
+  refresh ();
 
   tl::OutputStream stream (fn);
   if (monochrome) {
@@ -3696,6 +3683,16 @@ LayoutViewBase::timer ()
       }
     }
   }
+}
+
+void
+LayoutViewBase::refresh ()
+{
+  //  Execute all deferred methods - ensure there are no pending tasks
+  tl::DeferredMethodScheduler::execute ();
+
+  //  Issue a "tick" to execute all other pending tasks
+  timer ();
 }
 
 void

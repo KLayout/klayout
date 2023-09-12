@@ -333,7 +333,7 @@ TEST(def2)
 {
   db::LEFDEFReaderOptions options = default_options ();
   options.set_cell_outline_layer ("OUTLINE (10/0)");
-  run_test (_this, "def2", "lef:0.lef+lef:1.lef+def:in.def.gz", "au_2.oas.gz", options);
+  run_test (_this, "def2", "lef:0.lef+lef:1.lef+def:in.def.gz", "au_3.oas.gz", options);
 }
 
 TEST(def3)
@@ -429,7 +429,7 @@ TEST(def16)
   //  (complete example)
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_macro_resolution_mode (1);
-  run_test (_this, "def16", "lef:a.lef+lef:tech.lef+def:a.def", "au_2.oas.gz", opt);
+  run_test (_this, "def16", "lef:a.lef+lef:tech.lef+def:a.def", "au_3.oas.gz", opt);
 }
 
 TEST(100)

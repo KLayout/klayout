@@ -38,7 +38,7 @@ module MyLib
       super
 
       # declare the parameters
-      param(:l, TypeLayer, "Layer", :default =&gt; LayerInfo::new(1, 0))
+      param(:l, TypeLayer, "Layer")
       param(:s, TypeShape, "", :default =&gt; DPoint::new(0, 0))
       param(:r, TypeDouble, "Radius", :default =&gt; 0.1)
       param(:n, TypeInt, "Number of points", :default =&gt; 64)     
@@ -100,18 +100,14 @@ module MyLib
     
       # This is the main part of the implementation: create the layout
 
-      # fetch the parameters
-      ru_dbu = ru / layout.dbu
-      
       # compute the circle
-      pts = []
       da = Math::PI * 2 / n
-      n.times do |i|
-        pts.push(Point.from_dpoint(DPoint.new(ru_dbu * Math::cos(i * da), ru_dbu * Math::sin(i * da))))
+      pts = n.times.collect do |i|
+        DPoint.new(ru * Math::cos(i * da), ru * Math::sin(i * da))
       end
       
       # create the shape
-      cell.shapes(l_layer).insert(Polygon.new(pts))
+      cell.shapes(l_layer).insert(DPolygon.new(pts))
       
     end
   

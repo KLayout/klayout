@@ -1547,16 +1547,18 @@ public:
 
   /**
    *  @brief Establish the instance index list giving the instances by cell index
+   *  If force is true, the instance tree is always sorted.
    */
-  void sort_child_insts ();
+  void sort_child_insts (bool force);
 
   /**
    *  @brief Sort the cell instance list
    *
-   *  This will sort the cell instance list. As a prerequesite
+   *  This will sort the cell instance list (quad tree sort). As a prerequesite
    *  the cell's bounding boxes must have been computed.
+   *  If force is true, the instance tree is always sorted.
    */
-  void sort_inst_tree (const layout_type *g);
+  void sort_inst_tree (const layout_type *g, bool force);
 
   /**
    *  @brief Update the child-parent relationships
@@ -1702,14 +1704,6 @@ public:
   }
 
   /**
-   *  @brief Gets the cell pointer the instance container is in
-   */
-  db::Cell *cell () const
-  {
-    return mp_cell;
-  }
-
-  /**
    *  @brief Gets the layout the instances collection lives in
    */
   db::Layout *layout () const;
@@ -1725,6 +1719,14 @@ public:
   bool is_editable () const;
 
   /**
+   *  @brief Gets the cell pointer
+   */
+  cell_type *cell () const
+  {
+    return reinterpret_cast<cell_type *> (size_t (mp_cell) & ~size_t (3));
+  }
+
+  /**
    *  @brief Delegate for the undo method
    */
   void undo (db::Op *op);
@@ -1735,6 +1737,7 @@ public:
   void redo (db::Op *op);
 
 private:
+  friend class Instance;
   friend struct NormalInstanceIteratorTraits;
   friend struct TouchingInstanceIteratorTraits;
   friend struct OverlappingInstanceIteratorTraits;
@@ -1760,6 +1763,43 @@ private:
   static cell_inst_tree_type ms_empty_tree;
   static stable_cell_inst_wp_tree_type ms_empty_stable_wp_tree;
   static stable_cell_inst_tree_type ms_empty_stable_tree;
+
+  /**
+   *  @brief Sets a flag indicating that the instance tree needs sorting
+   */
+  void set_instance_tree_needs_sort (bool f)
+  {
+    mp_cell = reinterpret_cast<cell_type *> ((size_t (mp_cell) & ~size_t (1)) | size_t (f ? 1 : 0));
+  }
+
+  /**
+   *  @brief Sets a flag indicating that the instance tree needs sorting
+   */
+  bool instance_tree_needs_sort () const
+  {
+    return (size_t (mp_cell) & 1) != 0;
+  }
+
+  /**
+   *  @brief Sets a flag indicating that the instance by cell index cache needs made
+   */
+  void set_instance_by_cell_index_needs_made (bool f)
+  {
+    mp_cell = reinterpret_cast<cell_type *> ((size_t (mp_cell) & ~size_t (2)) | size_t (f ? 2 : 0));
+  }
+
+  /**
+   *  @brief Sets a flag indicating that the instance tree needs sorting
+   */
+  bool instance_by_cell_index_needs_made () const
+  {
+    return (size_t (mp_cell) & 2) != 0;
+  }
+
+  /**
+   *  @brief Invalidates the instance information - called whenever something changes
+   */
+  void invalidate_insts ();
 
   /**
    *  @brief Get the non-editable instance tree by instance type

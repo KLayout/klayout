@@ -563,6 +563,7 @@ for k in dir(pya.PCellParameterDeclaration):
 
 # Inject the PCellDeclarationHelper into pya module for consistency:
 setattr(pya, "PCellDeclarationHelper", _PCellDeclarationHelper)
+pya.__all__.append("PCellDeclarationHelper")
 
 </text>
 </klayout-macro>

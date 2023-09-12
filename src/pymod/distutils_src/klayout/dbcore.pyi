@@ -8307,7 +8307,7 @@ class DEdge:
         """
     def contains(self, p: DPoint) -> bool:
         r"""
-        @brief Test whether a point is on an edge.
+        @brief Tests whether a point is on an edge.
 
         A point is on a edge if it is on (or at least closer 
         than a grid point to) the edge.
@@ -8318,7 +8318,7 @@ class DEdge:
         """
     def contains_excl(self, p: DPoint) -> bool:
         r"""
-        @brief Test whether a point is on an edge excluding the endpoints.
+        @brief Tests whether a point is on an edge excluding the endpoints.
 
         A point is on a edge if it is on (or at least closer 
         than a grid point to) the edge.
@@ -8334,11 +8334,10 @@ class DEdge:
         """
     def crossed_by(self, e: DEdge) -> bool:
         r"""
-        @brief Check, if an edge is cut by a line (given by an edge)
+        @brief Checks, if the line given by self is crossed by the edge e
 
-        This method returns true if p1 is in one semispace 
-        while p2 is in the other or one of them is on the line
-        through the edge "e"
+        self if considered an infinite line. This predicate renders true if the edge e is cut by this line. In other words: this method returns true if e.p1 is in one semispace of self 
+        while e.p2 is in the other or one of them is exactly on self.
 
         @param e The edge representing the line that the edge must be crossing.
         """
@@ -8346,7 +8345,7 @@ class DEdge:
         r"""
         @brief Returns the crossing point on two edges. 
 
-        This method delivers the point where the given edge (self) crosses the line given by the edge in argument "e". If self does not cross this line, the result is undefined. See \crossed_by? for a description of the crossing predicate.
+        This method delivers the point where the given line (self) crosses the edge given by the argument "e". self is considered infinitely long and is required to cut through the edge "e". If self does not cut this line, the result is undefined. See \crossed_by? for a description of the crossing predicate.
 
         @param e The edge representing the line that self must be crossing.
         @return The point where self crosses the line given by "e".
@@ -8500,10 +8499,11 @@ class DEdge:
 
         Returns true if the edges intersect. Two edges intersect if they share at least one point. 
         If the edges coincide, they also intersect.
-        For degenerated edges, the intersection is mapped to
-        point containment tests.
+        If one of the edges is degenerate (both points are identical), that point is required to sit exaclty on the other edge. If both edges are degenerate, their points are required to be identical.
 
         @param e The edge to test.
+
+        The 'intersects' (with an 's') synonym has been introduced in version 0.28.12.
         """
     def intersection_point(self, e: DEdge) -> Any:
         r"""
@@ -8516,6 +8516,18 @@ class DEdge:
 
         This method has been introduced in version 0.19.
         From version 0.26.2, this method will return nil in case of non-intersection.
+        """
+    def intersects(self, e: DEdge) -> bool:
+        r"""
+        @brief Intersection test. 
+
+        Returns true if the edges intersect. Two edges intersect if they share at least one point. 
+        If the edges coincide, they also intersect.
+        If one of the edges is degenerate (both points are identical), that point is required to sit exaclty on the other edge. If both edges are degenerate, their points are required to be identical.
+
+        @param e The edge to test.
+
+        The 'intersects' (with an 's') synonym has been introduced in version 0.28.12.
         """
     def is_const_object(self) -> bool:
         r"""
@@ -11271,8 +11283,7 @@ class DText:
     Setter:
     @brief Sets the horizontal alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     size: float
     r"""
@@ -11308,7 +11319,8 @@ class DText:
     Setter:
     @brief Sets the vertical alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     x: float
     r"""
@@ -16209,7 +16221,7 @@ class Edge:
         """
     def contains(self, p: Point) -> bool:
         r"""
-        @brief Test whether a point is on an edge.
+        @brief Tests whether a point is on an edge.
 
         A point is on a edge if it is on (or at least closer 
         than a grid point to) the edge.
@@ -16220,7 +16232,7 @@ class Edge:
         """
     def contains_excl(self, p: Point) -> bool:
         r"""
-        @brief Test whether a point is on an edge excluding the endpoints.
+        @brief Tests whether a point is on an edge excluding the endpoints.
 
         A point is on a edge if it is on (or at least closer 
         than a grid point to) the edge.
@@ -16236,11 +16248,10 @@ class Edge:
         """
     def crossed_by(self, e: Edge) -> bool:
         r"""
-        @brief Check, if an edge is cut by a line (given by an edge)
+        @brief Checks, if the line given by self is crossed by the edge e
 
-        This method returns true if p1 is in one semispace 
-        while p2 is in the other or one of them is on the line
-        through the edge "e"
+        self if considered an infinite line. This predicate renders true if the edge e is cut by this line. In other words: this method returns true if e.p1 is in one semispace of self 
+        while e.p2 is in the other or one of them is exactly on self.
 
         @param e The edge representing the line that the edge must be crossing.
         """
@@ -16248,7 +16259,7 @@ class Edge:
         r"""
         @brief Returns the crossing point on two edges. 
 
-        This method delivers the point where the given edge (self) crosses the line given by the edge in argument "e". If self does not cross this line, the result is undefined. See \crossed_by? for a description of the crossing predicate.
+        This method delivers the point where the given line (self) crosses the edge given by the argument "e". self is considered infinitely long and is required to cut through the edge "e". If self does not cut this line, the result is undefined. See \crossed_by? for a description of the crossing predicate.
 
         @param e The edge representing the line that self must be crossing.
         @return The point where self crosses the line given by "e".
@@ -16402,10 +16413,11 @@ class Edge:
 
         Returns true if the edges intersect. Two edges intersect if they share at least one point. 
         If the edges coincide, they also intersect.
-        For degenerated edges, the intersection is mapped to
-        point containment tests.
+        If one of the edges is degenerate (both points are identical), that point is required to sit exaclty on the other edge. If both edges are degenerate, their points are required to be identical.
 
         @param e The edge to test.
+
+        The 'intersects' (with an 's') synonym has been introduced in version 0.28.12.
         """
     def intersection_point(self, e: Edge) -> Any:
         r"""
@@ -16418,6 +16430,18 @@ class Edge:
 
         This method has been introduced in version 0.19.
         From version 0.26.2, this method will return nil in case of non-intersection.
+        """
+    def intersects(self, e: Edge) -> bool:
+        r"""
+        @brief Intersection test. 
+
+        Returns true if the edges intersect. Two edges intersect if they share at least one point. 
+        If the edges coincide, they also intersect.
+        If one of the edges is degenerate (both points are identical), that point is required to sit exaclty on the other edge. If both edges are degenerate, their points are required to be identical.
+
+        @param e The edge to test.
+
+        The 'intersects' (with an 's') synonym has been introduced in version 0.28.12.
         """
     def is_const_object(self) -> bool:
         r"""
@@ -17098,6 +17122,7 @@ class EdgePairs(ShapeCollection):
         This operator adds the edge pairs of the other collection to self and returns a new combined set.
 
         This method has been introduced in version 0.24.
+        The 'join' alias has been introduced in version 0.28.12.
         """
     def __copy__(self) -> EdgePairs:
         r"""
@@ -17124,6 +17149,10 @@ class EdgePairs(ShapeCollection):
         This operator adds the edge pairs of the other collection to self.
 
         This method has been introduced in version 0.24.
+
+        Note that in Ruby, the '+=' operator actually does not exist, but is emulated by '+' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'join_with' instead.
+
+        The 'join_with' alias has been introduced in version 0.28.12.
         """
     @overload
     def __init__(self) -> None:
@@ -17480,6 +17509,31 @@ class EdgePairs(ShapeCollection):
     def is_empty(self) -> bool:
         r"""
         @brief Returns true if the collection is empty
+        """
+    def join(self, other: EdgePairs) -> EdgePairs:
+        r"""
+        @brief Returns the combined edge pair collection of self and the other one
+
+        @return The resulting edge pair collection
+
+        This operator adds the edge pairs of the other collection to self and returns a new combined set.
+
+        This method has been introduced in version 0.24.
+        The 'join' alias has been introduced in version 0.28.12.
+        """
+    def join_with(self, other: EdgePairs) -> EdgePairs:
+        r"""
+        @brief Adds the edge pairs of the other edge pair collection to self
+
+        @return The edge pair collection after modification (self)
+
+        This operator adds the edge pairs of the other collection to self.
+
+        This method has been introduced in version 0.24.
+
+        Note that in Ruby, the '+=' operator actually does not exist, but is emulated by '+' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'join_with' instead.
+
+        The 'join_with' alias has been introduced in version 0.28.12.
         """
     def map_properties(self, key_map: Dict[Any, Any]) -> None:
         r"""
@@ -19239,6 +19293,8 @@ class Edges(ShapeCollection):
         @return The resulting edge set
 
         This operator adds the edges of the other edge set to self and returns a new combined edge set. This usually creates unmerged edge sets and edges may overlap. Use \merge if you want to ensure the result edge set is merged.
+
+        The 'join' alias has been introduced in version 0.28.12.
         """
     @overload
     def __and__(self, other: Edges) -> Edges:
@@ -19248,6 +19304,8 @@ class Edges(ShapeCollection):
         @return The result of the boolean AND operation
 
         The boolean AND operation will return all parts of the edges in this collection which are coincident with parts of the edges in the other collection.The result will be a merged edge collection.
+
+        The 'and' alias has been introduced in version 0.28.12.
         """
     @overload
     def __and__(self, other: Region) -> Edges:
@@ -19261,7 +19319,7 @@ class Edges(ShapeCollection):
         As a side effect, the edges are made non-intersecting by introducing cut points where
         edges intersect.
 
-        This method has been introduced in version 0.24.
+        This method has been introduced in version 0.24.The 'and' alias has been introduced in version 0.28.12.
         """
     def __copy__(self) -> Edges:
         r"""
@@ -19287,20 +19345,28 @@ class Edges(ShapeCollection):
         @return The edge set after modification (self)
 
         This operator adds the edges of the other edge set to self. This usually creates unmerged edge sets and edges may overlap. Use \merge if you want to ensure the result edge set is merged.
+
+        Note that in Ruby, the '+=' operator actually does not exist, but is emulated by '+' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'join_with' instead.
+
+        The 'join_with' alias has been introduced in version 0.28.12.
         """
     @overload
     def __iand__(self, other: Edges) -> Edges:
         r"""
-        @brief Performs the boolean AND between self and the other edge collection
+        @brief Performs the boolean AND between self and the other edge collection in-place (modifying self)
 
         @return The edge collection after modification (self)
 
         The boolean AND operation will return all parts of the edges in this collection which are coincident with parts of the edges in the other collection.The result will be a merged edge collection.
+
+        Note that in Ruby, the '&=' operator actually does not exist, but is emulated by '&' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'and_with' instead.
+
+        The 'and_with' alias has been introduced in version 0.28.12.
         """
     @overload
     def __iand__(self, other: Region) -> Edges:
         r"""
-        @brief Selects the parts of the edges inside the given region
+        @brief Selects the parts of the edges inside the given region in-place (modifying self)
 
         @return The edge collection after modification (self)
 
@@ -19310,6 +19376,9 @@ class Edges(ShapeCollection):
         edges intersect.
 
         This method has been introduced in version 0.24.
+        Note that in Ruby, the '&=' operator actually does not exist, but is emulated by '&' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'and_with' instead.
+
+        The 'and_with' alias has been introduced in version 0.28.12.
         """
     @overload
     def __init__(self) -> None:
@@ -19504,25 +19573,32 @@ class Edges(ShapeCollection):
         """
     def __ior__(self, other: Edges) -> Edges:
         r"""
-        @brief Performs the boolean OR between self and the other edge set
+        @brief Performs the boolean OR between self and the other edge set in-place (modifying self)
 
         @return The edge collection after modification (self)
 
         The boolean OR is implemented by merging the edges of both edge sets. To simply join the edge collections without merging, the + operator is more efficient.
+        Note that in Ruby, the '|=' operator actually does not exist, but is emulated by '|' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'or_with' instead.
+
+        The 'or_with' alias has been introduced in version 0.28.12.
         """
     @overload
     def __isub__(self, other: Edges) -> Edges:
         r"""
-        @brief Performs the boolean NOT between self and the other edge collection
+        @brief Performs the boolean NOT between self and the other edge collection in-place (modifying self)
 
         @return The edge collection after modification (self)
 
         The boolean NOT operation will return all parts of the edges in this collection which are not coincident with parts of the edges in the other collection.The result will be a merged edge collection.
+
+        Note that in Ruby, the '-=' operator actually does not exist, but is emulated by '-' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'not_with' instead.
+
+        The 'not_with' alias has been introduced in version 0.28.12.
         """
     @overload
     def __isub__(self, other: Region) -> Edges:
         r"""
-        @brief Selects the parts of the edges outside the given region
+        @brief Selects the parts of the edges outside the given region in-place (modifying self)
 
         @return The edge collection after modification (self)
 
@@ -19531,7 +19607,9 @@ class Edges(ShapeCollection):
         As a side effect, the edges are made non-intersecting by introducing cut points where
         edges intersect.
 
-        This method has been introduced in version 0.24.
+        Note that in Ruby, the '-=' operator actually does not exist, but is emulated by '-' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'not_with' instead.
+
+        This method has been introduced in version 0.24.The 'not_with' alias has been introduced in version 0.28.12.
         """
     def __iter__(self) -> Iterator[Edge]:
         r"""
@@ -19539,12 +19617,16 @@ class Edges(ShapeCollection):
         """
     def __ixor__(self, other: Edges) -> Edges:
         r"""
-        @brief Performs the boolean XOR between self and the other edge collection
+        @brief Performs the boolean XOR between self and the other edge collection in-place (modifying self)
 
         @return The edge collection after modification (self)
 
         The boolean XOR operation will return all parts of the edges in this and the other collection except the parts where both are coincident.
         The result will be a merged edge collection.
+
+        Note that in Ruby, the '^=' operator actually does not exist, but is emulated by '^' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'xor_with' instead.
+
+        The 'xor_with' alias has been introduced in version 0.28.12.
         """
     def __len__(self) -> int:
         r"""
@@ -19562,6 +19644,7 @@ class Edges(ShapeCollection):
         @return The resulting edge collection
 
         The boolean OR is implemented by merging the edges of both edge sets. To simply join the edge collections without merging, the + operator is more efficient.
+        The 'or' alias has been introduced in version 0.28.12.
         """
     def __repr__(self) -> str:
         r"""
@@ -19581,6 +19664,8 @@ class Edges(ShapeCollection):
         @return The result of the boolean NOT operation
 
         The boolean NOT operation will return all parts of the edges in this collection which are not coincident with parts of the edges in the other collection.The result will be a merged edge collection.
+
+        The 'not' alias has been introduced in version 0.28.12.
         """
     @overload
     def __sub__(self, other: Region) -> Edges:
@@ -19594,7 +19679,7 @@ class Edges(ShapeCollection):
         As a side effect, the edges are made non-intersecting by introducing cut points where
         edges intersect.
 
-        This method has been introduced in version 0.24.
+        This method has been introduced in version 0.24.The 'not' alias has been introduced in version 0.28.12.
         """
     def __xor__(self, other: Edges) -> Edges:
         r"""
@@ -19604,6 +19689,8 @@ class Edges(ShapeCollection):
 
         The boolean XOR operation will return all parts of the edges in this and the other collection except the parts where both are coincident.
         The result will be a merged edge collection.
+
+        The 'xor' alias has been introduced in version 0.28.12.
         """
     def _create(self) -> None:
         r"""
@@ -19641,6 +19728,61 @@ class Edges(ShapeCollection):
         Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
 
         Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    @overload
+    def and_(self, other: Edges) -> Edges:
+        r"""
+        @brief Returns the boolean AND between self and the other edge collection
+
+        @return The result of the boolean AND operation
+
+        The boolean AND operation will return all parts of the edges in this collection which are coincident with parts of the edges in the other collection.The result will be a merged edge collection.
+
+        The 'and' alias has been introduced in version 0.28.12.
+        """
+    @overload
+    def and_(self, other: Region) -> Edges:
+        r"""
+        @brief Returns the parts of the edges inside the given region
+
+        @return The edges inside the given region
+
+        This operation returns the parts of the edges which are inside the given region.
+        Edges on the borders of the polygons are included in the edge set.
+        As a side effect, the edges are made non-intersecting by introducing cut points where
+        edges intersect.
+
+        This method has been introduced in version 0.24.The 'and' alias has been introduced in version 0.28.12.
+        """
+    @overload
+    def and_with(self, other: Edges) -> Edges:
+        r"""
+        @brief Performs the boolean AND between self and the other edge collection in-place (modifying self)
+
+        @return The edge collection after modification (self)
+
+        The boolean AND operation will return all parts of the edges in this collection which are coincident with parts of the edges in the other collection.The result will be a merged edge collection.
+
+        Note that in Ruby, the '&=' operator actually does not exist, but is emulated by '&' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'and_with' instead.
+
+        The 'and_with' alias has been introduced in version 0.28.12.
+        """
+    @overload
+    def and_with(self, other: Region) -> Edges:
+        r"""
+        @brief Selects the parts of the edges inside the given region in-place (modifying self)
+
+        @return The edge collection after modification (self)
+
+        This operation selects the parts of the edges which are inside the given region.
+        Edges on the borders of the polygons are included in the edge set.
+        As a side effect, the edges are made non-intersecting by introducing cut points where
+        edges intersect.
+
+        This method has been introduced in version 0.24.
+        Note that in Ruby, the '&=' operator actually does not exist, but is emulated by '&' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'and_with' instead.
+
+        The 'and_with' alias has been introduced in version 0.28.12.
         """
     @overload
     def andnot(self, other: Edges) -> List[Edges]:
@@ -20135,6 +20277,28 @@ class Edges(ShapeCollection):
         @brief Returns true if the edge collection is merged
         If the region is merged, coincident edges have been merged into single edges. You can ensure merged state by calling \merge.
         """
+    def join(self, other: Edges) -> Edges:
+        r"""
+        @brief Returns the combined edge set of self and the other one
+
+        @return The resulting edge set
+
+        This operator adds the edges of the other edge set to self and returns a new combined edge set. This usually creates unmerged edge sets and edges may overlap. Use \merge if you want to ensure the result edge set is merged.
+
+        The 'join' alias has been introduced in version 0.28.12.
+        """
+    def join_with(self, other: Edges) -> Edges:
+        r"""
+        @brief Adds the edges of the other edge collection to self
+
+        @return The edge set after modification (self)
+
+        This operator adds the edges of the other edge set to self. This usually creates unmerged edge sets and edges may overlap. Use \merge if you want to ensure the result edge set is merged.
+
+        Note that in Ruby, the '+=' operator actually does not exist, but is emulated by '+' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'join_with' instead.
+
+        The 'join_with' alias has been introduced in version 0.28.12.
+        """
     @overload
     def length(self) -> int:
         r"""
@@ -20238,6 +20402,31 @@ class Edges(ShapeCollection):
 
         @return The moved edge collection.
         """
+    @overload
+    def not_(self, other: Edges) -> Edges:
+        r"""
+        @brief Returns the boolean NOT between self and the other edge collection
+
+        @return The result of the boolean NOT operation
+
+        The boolean NOT operation will return all parts of the edges in this collection which are not coincident with parts of the edges in the other collection.The result will be a merged edge collection.
+
+        The 'not' alias has been introduced in version 0.28.12.
+        """
+    @overload
+    def not_(self, other: Region) -> Edges:
+        r"""
+        @brief Returns the parts of the edges outside the given region
+
+        @return The edges outside the given region
+
+        This operation returns the parts of the edges which are outside the given region.
+        Edges on the borders of the polygons are not included in the edge set.
+        As a side effect, the edges are made non-intersecting by introducing cut points where
+        edges intersect.
+
+        This method has been introduced in version 0.24.The 'not' alias has been introduced in version 0.28.12.
+        """
     def not_in(self, other: Edges) -> Edges:
         r"""
         @brief Returns all edges which are not members of the other edge collection
@@ -20297,6 +20486,55 @@ class Edges(ShapeCollection):
         @return A new edge collection containing the edges not overlapping or touching polygons from the region
 
         This method has been introduced in version 0.28.
+        """
+    @overload
+    def not_with(self, other: Edges) -> Edges:
+        r"""
+        @brief Performs the boolean NOT between self and the other edge collection in-place (modifying self)
+
+        @return The edge collection after modification (self)
+
+        The boolean NOT operation will return all parts of the edges in this collection which are not coincident with parts of the edges in the other collection.The result will be a merged edge collection.
+
+        Note that in Ruby, the '-=' operator actually does not exist, but is emulated by '-' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'not_with' instead.
+
+        The 'not_with' alias has been introduced in version 0.28.12.
+        """
+    @overload
+    def not_with(self, other: Region) -> Edges:
+        r"""
+        @brief Selects the parts of the edges outside the given region in-place (modifying self)
+
+        @return The edge collection after modification (self)
+
+        This operation selects the parts of the edges which are outside the given region.
+        Edges on the borders of the polygons are not included in the edge set.
+        As a side effect, the edges are made non-intersecting by introducing cut points where
+        edges intersect.
+
+        Note that in Ruby, the '-=' operator actually does not exist, but is emulated by '-' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'not_with' instead.
+
+        This method has been introduced in version 0.24.The 'not_with' alias has been introduced in version 0.28.12.
+        """
+    def or_(self, other: Edges) -> Edges:
+        r"""
+        @brief Returns the boolean OR between self and the other edge set
+
+        @return The resulting edge collection
+
+        The boolean OR is implemented by merging the edges of both edge sets. To simply join the edge collections without merging, the + operator is more efficient.
+        The 'or' alias has been introduced in version 0.28.12.
+        """
+    def or_with(self, other: Edges) -> Edges:
+        r"""
+        @brief Performs the boolean OR between self and the other edge set in-place (modifying self)
+
+        @return The edge collection after modification (self)
+
+        The boolean OR is implemented by merging the edges of both edge sets. To simply join the edge collections without merging, the + operator is more efficient.
+        Note that in Ruby, the '|=' operator actually does not exist, but is emulated by '|' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'or_with' instead.
+
+        The 'or_with' alias has been introduced in version 0.28.12.
         """
     @overload
     def outside(self, other: Edges) -> Edges:
@@ -20835,6 +21073,30 @@ class Edges(ShapeCollection):
         Filters the edges in the edge collection by length. If "inverse" is false, only edges which have a length larger or equal to "min_length" and less than "max_length" are returned. If "inverse" is true, edges not having a length less than "min_length" or larger or equal than "max_length" are returned.
 
         If you don't want to specify a lower or upper limit, pass nil to that parameter.
+        """
+    def xor(self, other: Edges) -> Edges:
+        r"""
+        @brief Returns the boolean XOR between self and the other edge collection
+
+        @return The result of the boolean XOR operation
+
+        The boolean XOR operation will return all parts of the edges in this and the other collection except the parts where both are coincident.
+        The result will be a merged edge collection.
+
+        The 'xor' alias has been introduced in version 0.28.12.
+        """
+    def xor_with(self, other: Edges) -> Edges:
+        r"""
+        @brief Performs the boolean XOR between self and the other edge collection in-place (modifying self)
+
+        @return The edge collection after modification (self)
+
+        The boolean XOR operation will return all parts of the edges in this and the other collection except the parts where both are coincident.
+        The result will be a merged edge collection.
+
+        Note that in Ruby, the '^=' operator actually does not exist, but is emulated by '^' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'xor_with' instead.
+
+        The 'xor_with' alias has been introduced in version 0.28.12.
         """
 
 class EqualDeviceParameters:
@@ -21528,12 +21790,12 @@ class HAlign:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -26963,6 +27225,7 @@ class Layout:
     def get_info(self, index: int) -> LayerInfo:
         r"""
         @brief Gets the info structure for a specified layer
+        If the layer index is not a valid layer index, an empty LayerProperties object will be returned.
         """
     def guiding_shape_layer(self) -> int:
         r"""
@@ -28756,12 +29019,12 @@ class LayoutToNetlist:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -28786,12 +29049,12 @@ class LayoutToNetlist:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -32602,14 +32865,14 @@ class NetPinRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to.
+        @brief Gets the net this pin reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this pin reference is attached to.
         """
     def pin(self) -> Pin:
         r"""
@@ -33658,19 +33921,19 @@ class Netlist:
     @overload
     def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
         r"""
-        @brief Gets the circuit objects for a given name filter.
-        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
-
-        This method has been introduced in version 0.26.4.
-        """
-    @overload
-    def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
-        r"""
         @brief Gets the circuit objects for a given name filter (const version).
         The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
 
 
         This constness variant has been introduced in version 0.26.8.
+        """
+    @overload
+    def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
+        r"""
+        @brief Gets the circuit objects for a given name filter.
+        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
+
+        This method has been introduced in version 0.26.4.
         """
     def combine_devices(self) -> None:
         r"""
@@ -33728,16 +33991,16 @@ class Netlist:
     @overload
     def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits bottom-up (const version)
+        @brief Iterates over the circuits bottom-up
         Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
-
-        This constness variant has been introduced in version 0.26.8.
         """
     @overload
     def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits bottom-up
+        @brief Iterates over the circuits bottom-up (const version)
         Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
+
+        This constness variant has been introduced in version 0.26.8.
         """
     @overload
     def each_circuit_top_down(self) -> Iterator[Circuit]:
@@ -36343,12 +36606,12 @@ class PCellParameterState:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -39120,12 +39383,12 @@ class PropertyConstraint:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -39150,12 +39413,12 @@ class PropertyConstraint:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -40694,12 +40957,12 @@ class Region(ShapeCollection):
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -41091,6 +41354,8 @@ class Region(ShapeCollection):
         @return The resulting region
 
         This operator adds the polygons of the other region to self and returns a new combined region. This usually creates unmerged regions and polygons may overlap. Use \merge if you want to ensure the result region is merged.
+
+        The 'join' alias has been introduced in version 0.28.12.
         """
     def __and__(self, other: Region) -> Region:
         r"""
@@ -41124,14 +41389,20 @@ class Region(ShapeCollection):
         @return The region after modification (self)
 
         This operator adds the polygons of the other region to self. This usually creates unmerged regions and polygons may overlap. Use \merge if you want to ensure the result region is merged.
+
+        Note that in Ruby, the '+=' operator actually does not exist, but is emulated by '+' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'join_with' instead.
+
+        The 'join_with' alias has been introduced in version 0.28.12.
         """
     def __iand__(self, other: Region) -> Region:
         r"""
-        @brief Performs the boolean AND between self and the other region
+        @brief Performs the boolean AND between self and the other region in-place (modifying self)
 
         @return The region after modification (self)
 
         This method will compute the boolean AND (intersection) between two regions. The result is often but not necessarily always merged.
+
+        Note that in Ruby, the '&=' operator actually does not exist, but is emulated by '&' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'and_with' instead.
         """
     @overload
     def __init__(self) -> None:
@@ -41295,19 +41566,24 @@ class Region(ShapeCollection):
         """
     def __ior__(self, other: Region) -> Region:
         r"""
-        @brief Performs the boolean OR between self and the other region
+        @brief Performs the boolean OR between self and the other region in-place (modifying self)
 
         @return The region after modification (self)
 
         The boolean OR is implemented by merging the polygons of both regions. To simply join the regions without merging, the + operator is more efficient.
+        Note that in Ruby, the '|=' operator actually does not exist, but is emulated by '|' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'or_with' instead.
+
+        The 'or_with' alias has been introduced in version 0.28.12.
         """
     def __isub__(self, other: Region) -> Region:
         r"""
-        @brief Performs the boolean NOT between self and the other region
+        @brief Performs the boolean NOT between self and the other region in-place (modifying self)
 
         @return The region after modification (self)
 
         This method will compute the boolean NOT (intersection) between two regions. The result is often but not necessarily always merged.
+
+        Note that in Ruby, the '-=' operator actually does not exist, but is emulated by '-' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'not_with' instead.
         """
     def __iter__(self) -> Iterator[Polygon]:
         r"""
@@ -41317,11 +41593,15 @@ class Region(ShapeCollection):
         """
     def __ixor__(self, other: Region) -> Region:
         r"""
-        @brief Performs the boolean XOR between self and the other region
+        @brief Performs the boolean XOR between self and the other region in-place (modifying self)
 
         @return The region after modification (self)
 
         This method will compute the boolean XOR (intersection) between two regions. The result is often but not necessarily always merged.
+
+        Note that in Ruby, the '^=' operator actually does not exist, but is emulated by '^' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'xor_with' instead.
+
+        The 'xor_with' alias has been introduced in version 0.28.12.
         """
     def __len__(self) -> int:
         r"""
@@ -41339,6 +41619,7 @@ class Region(ShapeCollection):
         @return The resulting region
 
         The boolean OR is implemented by merging the polygons of both regions. To simply join the regions without merging, the + operator is more efficient.
+        The 'or' alias has been introduced in version 0.28.12.
         """
     def __repr__(self) -> str:
         r"""
@@ -41365,6 +41646,8 @@ class Region(ShapeCollection):
         @return The result of the boolean XOR operation
 
         This method will compute the boolean XOR (intersection) between two regions. The result is often but not necessarily always merged.
+
+        The 'xor' alias has been introduced in version 0.28.12.
         """
     def _create(self) -> None:
         r"""
@@ -41416,7 +41699,7 @@ class Region(ShapeCollection):
         """
     def and_with(self, other: Region, property_constraint: Optional[PropertyConstraint] = ...) -> Region:
         r"""
-        @brief Performs the boolean AND between self and the other region
+        @brief Performs the boolean AND between self and the other region in-place (modifying self)
 
         @return The region after modification (self)
 
@@ -42078,6 +42361,28 @@ class Region(ShapeCollection):
         The 'shielded', 'negative', 'not_opposite' and 'rect_sides' options have been introduced in version 0.27.
         'property_constraint' has been added in version 0.28.4.
         """
+    def join(self, other: Region) -> Region:
+        r"""
+        @brief Returns the combined region of self and the other region
+
+        @return The resulting region
+
+        This operator adds the polygons of the other region to self and returns a new combined region. This usually creates unmerged regions and polygons may overlap. Use \merge if you want to ensure the result region is merged.
+
+        The 'join' alias has been introduced in version 0.28.12.
+        """
+    def join_with(self, other: Region) -> Region:
+        r"""
+        @brief Adds the polygons of the other region to self
+
+        @return The region after modification (self)
+
+        This operator adds the polygons of the other region to self. This usually creates unmerged regions and polygons may overlap. Use \merge if you want to ensure the result region is merged.
+
+        Note that in Ruby, the '+=' operator actually does not exist, but is emulated by '+' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'join_with' instead.
+
+        The 'join_with' alias has been introduced in version 0.28.12.
+        """
     def map_properties(self, key_map: Dict[Any, Any]) -> None:
         r"""
         @brief Maps properties by name key.
@@ -42458,7 +42763,7 @@ class Region(ShapeCollection):
         """
     def not_with(self, other: Region, property_constraint: Optional[PropertyConstraint] = ...) -> Region:
         r"""
-        @brief Performs the boolean NOT between self and the other region
+        @brief Performs the boolean NOT between self and the other region in-place (modifying self)
 
         @return The region after modification (self)
 
@@ -42498,6 +42803,26 @@ class Region(ShapeCollection):
 
         The 'shielded' and 'negative' options have been introduced in version 0.27.
         'property_constraint' has been added in version 0.28.4.
+        """
+    def or_(self, other: Region) -> Region:
+        r"""
+        @brief Returns the boolean OR between self and the other region
+
+        @return The resulting region
+
+        The boolean OR is implemented by merging the polygons of both regions. To simply join the regions without merging, the + operator is more efficient.
+        The 'or' alias has been introduced in version 0.28.12.
+        """
+    def or_with(self, other: Region) -> Region:
+        r"""
+        @brief Performs the boolean OR between self and the other region in-place (modifying self)
+
+        @return The region after modification (self)
+
+        The boolean OR is implemented by merging the polygons of both regions. To simply join the regions without merging, the + operator is more efficient.
+        Note that in Ruby, the '|=' operator actually does not exist, but is emulated by '|' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'or_with' instead.
+
+        The 'or_with' alias has been introduced in version 0.28.12.
         """
     def outside(self, other: Region) -> Region:
         r"""
@@ -43560,6 +43885,28 @@ class Region(ShapeCollection):
 
         This method has been introduced in version 0.27.
         """
+    def xor(self, other: Region) -> Region:
+        r"""
+        @brief Returns the boolean XOR between self and the other region
+
+        @return The result of the boolean XOR operation
+
+        This method will compute the boolean XOR (intersection) between two regions. The result is often but not necessarily always merged.
+
+        The 'xor' alias has been introduced in version 0.28.12.
+        """
+    def xor_with(self, other: Region) -> Region:
+        r"""
+        @brief Performs the boolean XOR between self and the other region in-place (modifying self)
+
+        @return The region after modification (self)
+
+        This method will compute the boolean XOR (intersection) between two regions. The result is often but not necessarily always merged.
+
+        Note that in Ruby, the '^=' operator actually does not exist, but is emulated by '^' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'xor_with' instead.
+
+        The 'xor_with' alias has been introduced in version 0.28.12.
+        """
 
 class SaveLayoutOptions:
     r"""
@@ -44297,10 +44644,11 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a box.
     Setter:
-    @brief Replaces the shape by the given box (in micrometer units)
-    This method replaces the shape by the given box, like \box= with a \Box argument does. This version translates the box from micrometer units to database units internally.
+    @brief Replaces the shape by the given box
+    This method replaces the shape by the given box. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     box_center: Point
     r"""
@@ -44619,9 +44967,8 @@ class Shape:
 
     This method has been introduced in version 0.26.
     Setter:
-    @brief Replaces the shape by the given edge pair
-    This method replaces the shape by the given edge pair. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given edge pair (in micrometer units)
+    This method replaces the shape by the given edge pair, like \edge_pair= with a \EdgePair argument does. This version translates the edge pair from micrometer units to database units internally.
 
     This method has been introduced in version 0.26.
     """
@@ -44659,10 +45006,11 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a path.
     Setter:
-    @brief Replaces the shape by the given path (in micrometer units)
-    This method replaces the shape by the given path, like \path= with a \Path argument does. This version translates the path from micrometer units to database units internally.
+    @brief Replaces the shape by the given path object
+    This method replaces the shape by the given path object. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     path_bgnext: int
     r"""
@@ -44826,11 +45174,10 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a text.
     Setter:
-    @brief Replaces the shape by the given text object
-    This method replaces the shape by the given text object. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given text (in micrometer units)
+    This method replaces the shape by the given text, like \text= with a \Text argument does. This version translates the text from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     text_dpos: DVector
     r"""
@@ -44968,10 +45315,10 @@ class Shape:
     Applies to texts only. Will throw an exception if the object is not a text.
 
     Setter:
-    @brief Sets the text transformation
+    @brief Sets the text transformation in micrometer units
     Applies to texts only. Will throw an exception if the object is not a text.
 
-    This method has been introduced in version 0.23.
+    This method has been introduced in version 0.25.
     """
     text_valign: int
     r"""
@@ -48570,8 +48917,7 @@ class Text:
     Setter:
     @brief Sets the horizontal alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     size: int
     r"""
@@ -48607,7 +48953,8 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     x: int
     r"""
@@ -49352,6 +49699,8 @@ class Texts(ShapeCollection):
         @return The resulting text collection
 
         This operator adds the texts of the other collection to self and returns a new combined set.
+
+        The 'join' alias has been introduced in version 0.28.12.
         """
     def __and__(self, other: Region) -> Texts:
         r"""
@@ -49382,6 +49731,10 @@ class Texts(ShapeCollection):
         @return The text collection after modification (self)
 
         This operator adds the texts of the other collection to self.
+
+        Note that in Ruby, the '+=' operator actually does not exist, but is emulated by '+' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'join_with' instead.
+
+        The 'join_with' alias has been introduced in version 0.28.12.
         """
     @overload
     def __init__(self) -> None:
@@ -49677,6 +50030,28 @@ class Texts(ShapeCollection):
     def is_empty(self) -> bool:
         r"""
         @brief Returns true if the collection is empty
+        """
+    def join(self, other: Texts) -> Texts:
+        r"""
+        @brief Returns the combined text collection of self and the other one
+
+        @return The resulting text collection
+
+        This operator adds the texts of the other collection to self and returns a new combined set.
+
+        The 'join' alias has been introduced in version 0.28.12.
+        """
+    def join_with(self, other: Texts) -> Texts:
+        r"""
+        @brief Adds the texts of the other text collection to self
+
+        @return The text collection after modification (self)
+
+        This operator adds the texts of the other collection to self.
+
+        Note that in Ruby, the '+=' operator actually does not exist, but is emulated by '+' followed by an assignment. This is less efficient than the in-place operation, so it is recommended to use 'join_with' instead.
+
+        The 'join_with' alias has been introduced in version 0.28.12.
         """
     def map_properties(self, key_map: Dict[Any, Any]) -> None:
         r"""

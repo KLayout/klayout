@@ -7204,12 +7204,12 @@ class Macro:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -8098,6 +8098,13 @@ class MacroInterpreter:
     def dup(self) -> MacroInterpreter:
         r"""
         @brief Creates a copy of self
+        """
+    def include_expansion(self, macro: Macro) -> List[str]:
+        r"""
+        @brief Provides include expansion as defined by the interpreter
+        The return value will be a two-element array with the encoded file path and the include-expanded text.
+
+        This method has been introduced in version 0.28.12.
         """
     def is_const_object(self) -> bool:
         r"""

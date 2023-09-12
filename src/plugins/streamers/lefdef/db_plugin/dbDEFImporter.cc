@@ -135,7 +135,7 @@ DEFImporter::get_wire_width_for_rule (const std::string &rulename, const std::st
 }
 
 std::pair<db::Coord, db::Coord>
-DEFImporter::get_def_ext (const std::string &ln, const std::pair<db::Coord, db::Coord> &wxy, double dbu)
+DEFImporter::get_def_ext (const std::string & /*ln*/, const std::pair<db::Coord, db::Coord> &wxy, double /*dbu*/)
 {
   //  This implementation assumes the "preferred width" is controlling the default extension and it is
   //  identical to the minimum effective width. This is true if "LEF58_MINWIDTH" with "WRONGDIRECTION" is
@@ -424,17 +424,73 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
           }
         }
 
-        if (options ().joined_paths ()) {
+        auto pt_from = pt0;
+        auto pt_to = pt + 1;
+
+        //  do not split away end segments if they are shorter than half the width
+
+        auto pt_from_split = pt_from;
+        auto pt_to_split = pt_to;
+
+        if (pt_to - pt_from > 2) {
+
+          if (be < wxy / 2) {
+            while (pt_from_split + 1 != pt_to && db::Coord ((pt_from_split[1] - pt_from_split[0]).length ()) < wxy / 2) {
+              ++pt_from_split;
+            }
+          }
+
+          if (ee < wxy / 2) {
+            while (pt_to_split - 1 != pt_from && db::Coord ((pt_to_split[-1] - pt_to_split[-2]).length ()) < wxy / 2) {
+              --pt_to_split;
+            }
+          }
+
+        }
+
+        if (! options ().joined_paths () && (pt_to_split != pt_to || pt_from_split != pt_from)) {
+          std::string p0 = pt_from->to_string ();
+          std::string ln = "(unknown)";
+          if (design.layout ()) {
+            ln = design.layout ()->get_properties (layer).to_string ();
+          }
+          warn (tl::sprintf (tl::to_string (tr ("Joining path (or parts of it) because of short-edged begin or end segments (layer %s, first point %s)")), ln, p0));
+        }
+
+        if (options ().joined_paths () || pt_to_split - 1 <= pt_from_split + 1 || pt_to_split - 1 == pt_from || pt_from_split + 1 == pt_to) {
+
           //  single path
-          db::Path p (pt0, pt + 1, wxy, be, ee, false);
+          db::Path p (pt_from, pt_to, wxy, be, ee, false);
           if (prop_id != 0) {
             design.shapes (layer).insert (db::object_with_properties<db::Path> (p, prop_id));
           } else {
             design.shapes (layer).insert (p);
           }
+
         } else {
+
+          if (pt_from_split != pt_from) {
+            db::Path p (pt_from, pt_from_split + 2, wxy, be, wxy / 2, false);
+            if (prop_id != 0) {
+              design.shapes (layer).insert (db::object_with_properties<db::Path> (p, prop_id));
+            } else {
+              design.shapes (layer).insert (p);
+            }
+            pt_from = pt_from_split + 1;
+          }
+
+          if (pt_to_split != pt_to) {
+            db::Path p (pt_to_split - 2, pt_to, wxy, wxy / 2, ee, false);
+            if (prop_id != 0) {
+              design.shapes (layer).insert (db::object_with_properties<db::Path> (p, prop_id));
+            } else {
+              design.shapes (layer).insert (p);
+            }
+            pt_to = pt_to_split - 1;
+          }
+
           //  multipart paths
-          for (std::vector<db::Point>::const_iterator i = pt0; i != pt; ++i) {
+          for (auto i = pt_from; i + 1 != pt_to; ++i) {
             db::Path p (i, i + 2, wxy, i == pt0 ? be : wxy / 2, i + 1 != pt ? wxy / 2 : ee, false);
             if (prop_id != 0) {
               design.shapes (layer).insert (db::object_with_properties<db::Path> (p, prop_id));
@@ -442,6 +498,7 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
               design.shapes (layer).insert (p);
             }
           }
+
         }
 
         was_path_before = true;
@@ -449,7 +506,7 @@ DEFImporter::produce_routing_geometry (db::Cell &design, const Polygon *style, u
       } else {
 
         if (! is_isotropic) {
-          warn("Anisotropic wire widths not supported for diagonal wires");
+          warn (tl::to_string (tr ("Anisotropic wire widths not supported for diagonal wires")));
         }
 
         db::Coord s = (w.first + 1) / 2;
@@ -802,7 +859,7 @@ DEFImporter::read_nets (db::Layout &layout, db::Cell &design, double scale, bool
           stored_prop_id = prop_id;
           in_subnet = true;
         } else {
-          warn ("Nested subnets");
+          warn (tl::to_string (tr ("Nested subnets")));
         }
 
         net = stored_netname + "/" + subnetname;

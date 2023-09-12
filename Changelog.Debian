@@ -1,3 +1,17 @@
+klayout (0.28.12-1) unstable; urgency=low
+
+  * New features and bugfixes
+    - See changelog
+
+ -- Matthias Köfferlein <matthias@koefferlein.de>  Tue, 12 Sep 2023 00:29:28 +0200
+
+klayout (0.28.11-1) unstable; urgency=low
+
+  * New features and bugfixes
+    - See changelog
+
+ -- Matthias Köfferlein <matthias@koefferlein.de>  Wed, 09 Aug 2023 11:31:07 +0200
+
 klayout (0.28.10-1) unstable; urgency=low
 
   * New features and bugfixes

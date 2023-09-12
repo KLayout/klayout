@@ -1,3 +1,44 @@
+0.28.12          (2023-09-12):
+* Bugfix: %GITHUB%/issues/1477 Macro IDE: changing the colors does not have an effect
+* Bugfix: %GITHUB%/issues/1474 Throw a FATAL ERROR when multiple cellname have the same refnum
+* Bugfix: %GITHUB%/issues/1473 Ignore 'Summarize missing layers' when sending XOR result to other layout)
+* Bugfix: %GITHUB%/issues/1472 DEF path with first/last segment length < halfwidth are read wrong
+* Bugfix: %GITHUB%/issues/1471 Make warning about 'FOREIGN differs from MACRO name' more informative
+* Bugfix: %GITHUB%/issues/1470 DEF pinname VDD.extra1 should be written as VDD TEXT in gds/oasis
+* Bugfix: %GITHUB%/issues/1465 (maybe fixed) DRC crash at end of script
+* Bugfix: %GITHUB%/issues/1464 Layout#get_info and Layout#set_info not longer segfault on wrong layer index
+* Bugfix: %GITHUB%/issues/1460 CellRename dialog is larger now initially
+* Enhancement: %GITHUB%/issues/1307 (partial) Produce UNPLACED macros if location is provided
+* Enhancement: New aliases for inline operators (e.g. "+=") in RBA::Region and similar classes
+  Reasoning is that "+=" in Ruby is resolved into "+" and "=" which does not make
+  use of the inline optimization. Using "join_with" instead will avoid this. Other alias:
+  "join" for "+", "and" for "&", "and_with" for "&=", "not" for "-", "not_with" for "-=",
+  "or" for "|", "or_with" for "|=", "xor" for "^" and "xor_with" for "^=".
+* Bugfix: deep region 'transform' with plain shift was not working properly with scaled instances
+* Bugfix: re-run of include-expanded DRC/LVS wasn't working
+* Bugfix: Proper Python stack trace in debugger for Python 3.10
+* Enhancement: Allowing to select cells by error markers too (so that PCells with errors can be selected)
+* Bugfix: avoid a segfault in the properties dialog
+* Enhancement: crash log now is shown in a more reliable way - but less fancy. 
+  In addition, a crash log is written 'klayout_crash.log' in the home path 
+  and the crash message is printed to error.
+* Bugfix: Don't clear search when switching macro editor pages
+* Enhancement: Macro editor file change notification now also is no longer a modal window
+* Enhancement: Macro editor does not list __pycache__ directories
+* Enhancement: Pick a tab in Macro editor from the context menu of tab bar
+* Bugfix: moving a text with a non-centered vertical alignment now uses the right location
+* Enhancement: 'copy interactive' will maintain selection
+* Enhancement Better integration of partial mode - for example 'interactive move' now also acts on partial selection
+* Bugfix: cleanup after deleting cells in partial mode - no new top cells appear
+* Enhancement: package manager
+  * So not update macros while installing: avoids transient error messages
+  * Offer to autorun macros also after package update (so far only on package new installation
+* Bugfix: Fixed a issue with the search box on the macro editor
+  when switching to the replace text box, focus was passed to the text editor instead
+* Enhancement: CIF reader progress now functional
+* Enhancement: some speedup while sorting instances
+* Bugfix: LayoutView does not longer need processEvents when saving an image to PNG
+  
 0.28.11          (2023-08-09):
 * Bugfix: %GITHUB%/issues/1307 (partial) LEF/DEF PIN labels are taken from NET, not PIN name
 * Bugfix: %GITHUB%/issues/1415 GDS2 files with meta info are not read by old versions of KLayout 

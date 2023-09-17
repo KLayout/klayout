@@ -602,7 +602,17 @@ reference(
 
 # Cross reference
 xref(
+ log(
+  entry(error description('An error (global)'))
+  entry(warning description('A warning (global)'))
+  entry(info description('Some info (global)'))
+ )
  circuit(() INV2PAIRX mismatch
+  log(
+   entry(error description('An error'))
+   entry(warning description('A warning'))
+   entry(info description('Some info'))
+  )
   xref(
   )
  )

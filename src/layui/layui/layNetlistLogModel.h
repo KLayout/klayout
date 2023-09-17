@@ -27,6 +27,7 @@
 
 #include "layuiCommon.h"
 #include "dbNetlistCrossReference.h"
+#include "dbLayoutToNetlist.h"
 
 #include <QAbstractItemModel>
 
@@ -40,7 +41,7 @@ class LAYUI_PUBLIC NetlistLogModel
   : public QAbstractItemModel
 {
 public:
-  NetlistLogModel (QWidget *parent, const db::NetlistCrossReference *cross_ref);
+  NetlistLogModel (QWidget *parent, const db::NetlistCrossReference *cross_ref, const db::LayoutToNetlist *l2n);
 
   virtual bool hasChildren (const QModelIndex &parent) const;
   virtual QModelIndex index (int row, int column, const QModelIndex &parent) const;
@@ -53,6 +54,9 @@ public:
 private:
   typedef std::pair<std::pair<const db::Circuit *, const db::Circuit *>, const db::NetlistCrossReference::PerCircuitData::log_entries_type *> circuit_entry;
   std::vector<circuit_entry> m_circuits;
+  const db::NetlistCrossReference::PerCircuitData::log_entries_type *mp_lvsdb_messages;
+  const db::LayoutToNetlist::log_entries_type *mp_l2n_messages;
+  int m_global_entries;
 };
 
 }

@@ -25,6 +25,7 @@
 
 #include "dbCommon.h"
 #include "dbNetlist.h"
+#include "dbLog.h"
 
 #include <set>
 #include <map>
@@ -49,16 +50,6 @@ class DB_PUBLIC NetlistCompareLogger
 public:
   NetlistCompareLogger () { }
   virtual ~NetlistCompareLogger () { }
-
-  /**
-   *  @brief An enum describing the severity for the log_entry function
-   */
-  enum Severity {
-    NoSeverity = 0,   //  unspecific
-    Info = 1,         //  information only
-    Warning = 2,      //  a warning
-    Error = 3         //  an error
-  };
 
   /**
    *  @brief Begin logging for netlist a and b
@@ -101,7 +92,7 @@ public:
   /**
    *  @brief Receives log entries for the current circuit pair
    */
-  virtual void log_entry (Severity /*level*/, const std::string & /*msg*/) { }
+  virtual void log_entry (db::Severity /*level*/, const std::string & /*msg*/) { }
 
   /**
    *  @brief Nets a and b match exactly

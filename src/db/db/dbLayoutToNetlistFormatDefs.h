@@ -47,7 +47,7 @@ namespace db
  *  (circuits before subcircuits, nets before use ...)
  *
  *  Main body:
- *    [version|description|unit|top|layer|connect|global|circuit|class|device|any]*
+ *    [version|description|unit|top|layer|connect|global|circuit|class|device|message-entry|any]*
  *
  *  [version]:
  *    version(<number>)             - file format version [short key: V]
@@ -181,6 +181,17 @@ namespace db
  *    mirror                        - if specified, the instance is mirrored before rotation [short key: M]
  *    scale(<mag>)                  - magnification (default is 1) [short key: S]
  *
+ *  [message-entry]:
+ *    message([severity] [message|any]*) - message entry [short key: H]
+ *
+ *  [message]:
+ *    description(<name>)              - error description [short key: B]
+ *
+ *  [severity]:
+ *    info |                           - [short key: I]
+ *    warning |                        - [short key: W]
+ *    error                            - [short key: E]
+ *
  *  [any]:
  *    * |
  *    <token> |
@@ -220,8 +231,12 @@ namespace l2n_std_format
     static std::string mirror_key;
     static std::string scale_key;
     static std::string pin_key;
+    static std::string message_key;
     static std::string indent1;
     static std::string indent2;
+    static std::string info_severity_key;
+    static std::string warning_severity_key;
+    static std::string error_severity_key;
   };
 
   struct DB_PUBLIC LongKeys
@@ -253,8 +268,12 @@ namespace l2n_std_format
     static std::string mirror_key;
     static std::string scale_key;
     static std::string pin_key;
+    static std::string message_key;
     static std::string indent1;
     static std::string indent2;
+    static std::string info_severity_key;
+    static std::string warning_severity_key;
+    static std::string error_severity_key;
   };
 
   template <bool Short> struct DB_PUBLIC keys;

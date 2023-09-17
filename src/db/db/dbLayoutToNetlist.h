@@ -28,6 +28,7 @@
 #include "dbNetlistExtractor.h"
 #include "dbNetlistDeviceExtractor.h"
 #include "dbLayoutToNetlistEnums.h"
+#include "dbLog.h"
 #include "tlGlobPattern.h"
 
 namespace db
@@ -78,6 +79,7 @@ class DB_PUBLIC LayoutToNetlist
 {
 public:
   typedef std::map<unsigned int, std::string>::const_iterator layer_iterator;
+  typedef std::vector<db::LogEntryData> log_entries_type;
 
   /**
    *  @brief The constructor
@@ -188,6 +190,33 @@ public:
   void set_filename (const std::string &filename)
   {
     m_filename = filename;
+  }
+
+  /**
+   *  @brief Gets the log entries
+   *  @@@ TODO: provide GSI interface
+   */
+  const log_entries_type &log_entries () const
+  {
+    return m_log_entries;
+  }
+
+  /**
+   *  @brief Clears the log entries
+   *  @@@ TODO: provide GSI interface
+   */
+  void clear_log_entries ()
+  {
+    m_log_entries.clear ();
+  }
+
+  /**
+   *  @brief Adds a log entry
+   *  @@@ TODO: provide GSI interface
+   */
+  void log_entry (const db::LogEntryData &log_entry)
+  {
+    m_log_entries.push_back (log_entry);
   }
 
   /**
@@ -388,7 +417,7 @@ public:
    *  @brief Resets the extracted netlist
    *
    *  This method will invalidate the netlist and extraction. It is called automatically when
-   *  cone of the connect methods is called.
+   *  one of the connect methods is called.
    */
   void reset_extracted ();
 
@@ -930,6 +959,7 @@ private:
   std::string m_name;
   std::string m_original_file;
   std::string m_filename;
+  log_entries_type m_log_entries;
   db::RecursiveShapeIterator m_iter;
   std::unique_ptr<db::DeepShapeStore> mp_internal_dss;
   tl::weak_ptr<db::DeepShapeStore> mp_dss;

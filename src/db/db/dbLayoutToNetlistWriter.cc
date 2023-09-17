@@ -142,6 +142,30 @@ std_writer_impl<Keys>::std_writer_impl (tl::OutputStream &stream, double dbu, co
   m_progress.set_unit (1024 * 1024);
 }
 
+template <class Keys>
+std::string std_writer_impl<Keys>::message_to_s (const std::string &msg)
+{
+  if (msg.empty ()) {
+    return std::string ();
+  } else {
+    return Keys::description_key + "(" + tl::to_word_or_quoted_string (msg) + ")";
+  }
+}
+
+template <class Keys>
+std::string std_writer_impl<Keys>::severity_to_s (const db::Severity severity)
+{
+  if (severity == db::Info) {
+    return Keys::info_severity_key;
+  } else if (severity == db::Warning) {
+    return Keys::warning_severity_key;
+  } else if (severity == db::Error) {
+    return Keys::error_severity_key;
+  } else {
+    return std::string ();
+  }
+}
+
 static std::string name_for_layer (const db::LayoutToNetlist *l2n, unsigned int l)
 {
   std::string n = l2n->name (l);
@@ -316,6 +340,16 @@ void std_writer_impl<Keys>::write (bool nested, TokenizedOutput &stream, std::ma
         m_progress.set (mp_stream->pos ());
       }
 
+    }
+
+    if (! mp_l2n->log_entries ().empty ()) {
+      if (! Keys::is_short ()) {
+        stream << endl << "# Log entries" << endl;
+      }
+      for (auto l = mp_l2n->log_entries ().begin (); l != mp_l2n->log_entries ().end (); ++l) {
+        TokenizedOutput (stream, Keys::message_key) << severity_to_s (l->severity) << message_to_s (l->msg);
+        m_progress.set (mp_stream->pos ());
+      }
     }
 
   }

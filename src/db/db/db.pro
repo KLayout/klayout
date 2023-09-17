@@ -50,6 +50,7 @@ SOURCES = \
   dbLibraryManager.cc \
   dbLibraryProxy.cc \
   dbLoadLayoutOptions.cc \
+  dbLog.cc \
   dbManager.cc \
   dbMatrix.cc \
   dbMemStatistics.cc \
@@ -271,6 +272,7 @@ HEADERS = \
   dbLibraryManager.h \
   dbLibraryProxy.h \
   dbLoadLayoutOptions.h \
+  dbLog.h \
   dbManager.h \
   dbMatrix.h \
   dbMemStatistics.h \

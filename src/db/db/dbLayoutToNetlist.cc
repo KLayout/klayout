@@ -33,6 +33,7 @@
 #include "dbLayoutToNetlistFormatDefs.h"
 #include "dbLayoutVsSchematicFormatDefs.h"
 #include "dbShapeProcessor.h"
+#include "dbLog.h"
 #include "tlGlobPattern.h"
 
 namespace db
@@ -238,8 +239,16 @@ void LayoutToNetlist::extract_devices (db::NetlistDeviceExtractor &extractor, co
   if (m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
   }
+
   ensure_netlist ();
+
+  extractor.clear_errors ();
   extractor.extract (dss (), m_layout_index, layers, *mp_netlist, m_net_clusters, m_device_scaling);
+
+  //  transfer errors to log entries
+  for (auto e = extractor.begin_errors (); e != extractor.end_errors (); ++e) {
+    m_log_entries.push_back (db::LogEntryData (db::Error, e->to_string ()));
+  }
 }
 
 void LayoutToNetlist::reset_extracted ()
@@ -248,6 +257,8 @@ void LayoutToNetlist::reset_extracted ()
 
     m_net_clusters.clear ();
     mp_netlist.reset (0);
+
+    m_log_entries.clear ();
 
     m_netlist_extracted = false;
 
@@ -362,6 +373,7 @@ void LayoutToNetlist::extract_netlist ()
 
   db::NetlistExtractor netex;
 
+#if 0 // @@@ remove this plus corresponding code inside NetlistExtractor ...
   netex.set_joined_net_names (m_joined_net_names);
 
   std::map<std::string, std::list<tl::GlobPattern> > jp_per_cell;
@@ -397,9 +409,12 @@ void LayoutToNetlist::extract_netlist ()
   for (std::map<std::string, std::list<std::set<std::string> > >::const_iterator i = jn_per_cell.begin (); i != jn_per_cell.end (); ++i) {
     netex.set_joined_nets (i->first, i->second);
   }
+ #endif
 
   netex.set_include_floating_subcircuits (m_include_floating_subcircuits);
   netex.extract_nets (dss (), m_layout_index, m_conn, *mp_netlist, m_net_clusters);
+
+  // @@@ join_nets ();
 
   if (tl::verbosity () >= 41) {
     MemStatisticsCollector m (false);

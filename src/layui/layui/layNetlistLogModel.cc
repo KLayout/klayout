@@ -137,6 +137,7 @@ NetlistLogModel::rowCount (const QModelIndex &parent) const
   } else if (parent.parent ().isValid ()) {
     return 0;
   } else if (parent.row () >= 0 && parent.row () < int (m_circuits.size ())) {
+    //  @@@ that would crash for "other entries"!
     return int (m_circuits [parent.row ()].second->size ());
   } else {
     return 0;
@@ -152,7 +153,7 @@ NetlistLogModel::columnCount (const QModelIndex & /*parent*/) const
 QVariant
 NetlistLogModel::data (const QModelIndex &index, int role) const
 {
-  const db::NetlistCrossReference::LogEntryData *le = 0;
+  const db::LogEntryData *le = 0;
   if (index.parent ().isValid ()) {
     const circuit_entry *ce = (const circuit_entry *) index.internalPointer ();
     if (ce) {
@@ -164,11 +165,11 @@ NetlistLogModel::data (const QModelIndex &index, int role) const
 
     if (! le) {
       //  ignore
-    } else if (le->severity == db::NetlistCrossReference::Error) {
+    } else if (le->severity == db::Error) {
       return QIcon (QString::fromUtf8 (":/error_16px.png"));
-    } else if (le->severity == db::NetlistCrossReference::Warning) {
+    } else if (le->severity == db::Warning) {
       return QIcon (QString::fromUtf8 (":/warn_16px.png"));
-    } else if (le->severity == db::NetlistCrossReference::Info) {
+    } else if (le->severity == db::Info) {
       return QIcon (QString::fromUtf8 (":/info_16px.png"));
     }
 
@@ -192,7 +193,7 @@ NetlistLogModel::data (const QModelIndex &index, int role) const
   } else if (role == Qt::FontRole) {
 
     if (index.parent ().isValid ()) {
-      if (le && le->severity == db::NetlistCrossReference::Error) {
+      if (le && le->severity == db::Error) {
         QFont f;
         f.setBold (true);
         return QVariant (f);
@@ -208,9 +209,9 @@ NetlistLogModel::data (const QModelIndex &index, int role) const
     if (index.parent ().isValid ()) {
       if (!le) {
         //  ignore
-      } else if (le->severity == db::NetlistCrossReference::Error) {
+      } else if (le->severity == db::Error) {
         return QColor (255, 0, 0);
-      } else if (le->severity == db::NetlistCrossReference::Warning) {
+      } else if (le->severity == db::Warning) {
         return QColor (0, 0, 255);
       }
     }

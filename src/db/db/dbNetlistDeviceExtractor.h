@@ -266,6 +266,14 @@ public:
   void extract (DeepShapeStore &dss, unsigned int layout_index, const input_layers &layers, Netlist &netlist, hier_clusters_type &clusters, double device_scaling = 1.0);
 
   /**
+   *  @brief Clears the errors
+   */
+  void clear_errors ()
+  {
+    m_errors.clear ();
+  }
+
+  /**
    *  @brief Gets the error iterator, begin
    */
   error_iterator begin_errors ()

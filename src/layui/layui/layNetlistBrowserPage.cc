@@ -1132,9 +1132,9 @@ NetlistBrowserPage::setup_trees ()
   db::LayoutToNetlist *l2ndb = mp_database.get ();
   db::LayoutVsSchematic *lvsdb = dynamic_cast<db::LayoutVsSchematic *> (l2ndb);
 
-  if (lvsdb && lvsdb->cross_ref ()) {
+  if ((lvsdb && lvsdb->cross_ref ()) || (l2ndb && ! l2ndb->log_entries ().empty ())) {
 
-    NetlistLogModel *new_model = new NetlistLogModel (log_view, lvsdb->cross_ref ());
+    NetlistLogModel *new_model = new NetlistLogModel (log_view, lvsdb->cross_ref () /*@@@, l2ndb*/);
     delete log_view->model ();
     log_view->setModel (new_model);
 

@@ -28,6 +28,7 @@
 #include "dbTrans.h"
 #include "dbPolygon.h"
 #include "dbHierNetworkProcessor.h"
+#include "dbLog.h"
 #include "tlStream.h"
 #include "tlProgress.h"
 
@@ -91,6 +92,9 @@ protected:
   {
     return *mp_stream;
   }
+
+  std::string severity_to_s (const db::Severity severity);
+  std::string message_to_s (const std::string &msg);
 
 private:
   tl::OutputStream *mp_stream;

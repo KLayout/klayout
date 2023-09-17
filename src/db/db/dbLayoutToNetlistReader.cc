@@ -184,6 +184,52 @@ void LayoutToNetlistStandardReader::skip_element ()
   }
 }
 
+bool LayoutToNetlistStandardReader::read_message (std::string &msg)
+{
+  if (test (skeys::description_key) || test (lkeys::description_key)) {
+    Brace br (this);
+    read_word_or_quoted (msg);
+    br.done ();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool LayoutToNetlistStandardReader::read_severity (db::Severity &severity)
+{
+  if (test (skeys::info_severity_key) || test (lkeys::info_severity_key)) {
+    severity = db::Info;
+    return true;
+  } else if (test (skeys::warning_severity_key) || test (lkeys::warning_severity_key)) {
+    severity = db::Warning;
+    return true;
+  } else if (test (skeys::error_severity_key) || test (lkeys::error_severity_key)) {
+    severity = db::Error;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void LayoutToNetlistStandardReader::read_message_entry (db::LogEntryData &data)
+{
+  data.severity = db::NoSeverity;
+  data.msg.clear ();
+
+  Brace br (this);
+  while (br) {
+    if (read_severity (data.severity)) {
+      //  continue
+    } else if (read_message (data.msg)) {
+      //  continue
+    } else {
+      skip_element ();
+    }
+  }
+  br.done ();
+}
+
 void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
 {
   tl::SelfTimer timer (tl::verbosity () >= 21, tl::to_string (tr ("File read: ")) + m_path);
@@ -358,6 +404,13 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
         l2n->connect (layer_by_name (l2n, l1), layer_by_name (l2n, l2));
       }
       br.done ();
+
+    } else if (l2n && (test (skeys::message_key) || test (lkeys::message_key))) {
+
+      db::LogEntryData data;
+      read_message_entry (data);
+
+      l2n->log_entry (data);
 
     } else if (l2n && (test (skeys::global_key) || test (lkeys::global_key))) {
 

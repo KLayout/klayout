@@ -67,7 +67,7 @@ namespace db
  *                                       Content is the Netlist dump (reduced version of LayoutToNetlist)
  *
  *  [xrefs]:
- *    xref([xref|any]*)                - cross-reference part [short key: Z]
+ *    xref([xref|log|any]*)            - cross-reference part [short key: Z]
  *
  *  [xref]:
  *    circuit([non] [non] [status|message|log|circuit-xrefs|any]*)
@@ -81,11 +81,6 @@ namespace db
  *
  *  [log-entry]:
  *    entry([severity] [message|any]*) - log entry [short key: M]
- *
- *  [severity]:
- *    info |                           - [short key: I]
- *    warning |                        - [short key: W]
- *    error                            - [short key: E]
  *
  *  [circuit-xrefs]:
  *    xref([xref-pin|xref-device|xref-circuit|xref-net|any]*)
@@ -112,6 +107,11 @@ namespace db
  *
  *  [message]:
  *    description(<name>)              - error description [short key: B]
+ *
+ *  [severity]:
+ *    info |                           - [short key: I]
+ *    warning |                        - [short key: W]
+ *    error                            - [short key: E]
  *
  *  [status]:
  *    mismatch |                       - [short key: 0]
@@ -145,10 +145,6 @@ namespace lvs_std_format
     static std::string nomatch_key;
     static std::string warning_key;
     static std::string skipped_key;
-
-    static std::string info_severity_key;
-    static std::string warning_severity_key;
-    static std::string error_severity_key;
   };
 
   struct DB_PUBLIC LongKeys
@@ -166,10 +162,6 @@ namespace lvs_std_format
     static std::string nomatch_key;
     static std::string warning_key;
     static std::string skipped_key;
-
-    static std::string info_severity_key;
-    static std::string warning_severity_key;
-    static std::string error_severity_key;
   };
 
   template <bool Short> struct DB_PUBLIC keys;

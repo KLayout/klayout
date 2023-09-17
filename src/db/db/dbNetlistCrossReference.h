@@ -105,15 +105,6 @@ public:
     std::string msg;
   };
 
-  struct LogEntryData
-  {
-    LogEntryData (Severity s, const std::string &m) : severity (s), msg (m) { }
-    LogEntryData () : severity (NoSeverity) { }
-
-    Severity severity;
-    std::string msg;
-  };
-
   struct PerCircuitData
   {
     PerCircuitData () : status (None) { }

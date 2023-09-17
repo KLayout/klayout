@@ -497,3 +497,45 @@ TEST(5_ReaderFuture)
   compare_text_files (path, au_path);
 }
 
+TEST(6_ReaderLog)
+{
+  db::LayoutToNetlist l2n;
+
+  std::string in_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_reader_6.l2n");
+  tl::InputStream is_in (in_path);
+
+  db::LayoutToNetlistStandardReader reader (is_in);
+  reader.read (&l2n);
+
+  //  verify against the input
+
+  std::string path = tmp_file ("tmp.txt");
+  {
+    tl::OutputStream stream (path);
+    db::LayoutToNetlistStandardWriter writer (stream, false);
+    writer.write (&l2n);
+  }
+
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_reader_au_6.l2n");
+
+  compare_text_files (path, au_path);
+
+  std::string in_path_s = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_reader_6s.l2n");
+  tl::InputStream is_in_s (in_path_s);
+
+  l2n.clear_log_entries ();
+  db::LayoutToNetlistStandardReader reader_s (is_in_s);
+  reader_s.read (&l2n);
+
+  //  verify against the input
+
+  path = tmp_file ("tmp2.txt");
+  {
+    tl::OutputStream stream (path);
+    db::LayoutToNetlistStandardWriter writer (stream, false);
+    writer.write (&l2n);
+  }
+
+  compare_text_files (path, au_path);
+}
+

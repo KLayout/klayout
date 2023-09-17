@@ -449,3 +449,38 @@ TEST(2_WriterWithGlobalNets)
     db::compare_layouts (_this, ly2, au);
   }
 }
+
+TEST(3_Messages)
+{
+  db::Layout ly;
+  db::Cell &tc = ly.cell (ly.add_cell ("TOP"));
+  db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
+
+  l2n.extract_netlist ();
+
+  l2n.log_entry (db::LogEntryData (db::Info, "info"));
+  l2n.log_entry (db::LogEntryData (db::Warning, "warning"));
+  l2n.log_entry (db::LogEntryData (db::Error, "error"));
+
+  std::string path = tmp_file ("tmp_l2nwriter_3.txt");
+  {
+    tl::OutputStream stream (path);
+    db::LayoutToNetlistStandardWriter writer (stream, false);
+    writer.write (&l2n);
+  }
+
+  std::string au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_writer_au_3.txt");
+
+  compare_text_files (path, au_path);
+
+  path = tmp_file ("tmp_l2nwriter_3s.txt");
+  {
+    tl::OutputStream stream (path);
+    db::LayoutToNetlistStandardWriter writer (stream, true);
+    writer.write (&l2n);
+  }
+
+  au_path = tl::combine_path (tl::combine_path (tl::testdata (), "algo"), "l2n_writer_au_3s.txt");
+
+  compare_text_files (path, au_path);
+}

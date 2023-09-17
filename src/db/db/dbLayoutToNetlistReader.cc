@@ -132,6 +132,7 @@ LayoutToNetlistStandardReader::skip ()
 {
   while (m_ex.at_end () || *m_ex.skip () == '#') {
     if (m_stream.at_end ()) {
+      m_ex = tl::Extractor ();
       return;
     }
     m_progress.set (m_stream.line_number ());

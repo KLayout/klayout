@@ -1132,11 +1132,15 @@ NetlistBrowserPage::setup_trees ()
   db::LayoutToNetlist *l2ndb = mp_database.get ();
   db::LayoutVsSchematic *lvsdb = dynamic_cast<db::LayoutVsSchematic *> (l2ndb);
 
+  QIcon log_tab_icon;
+
   if ((lvsdb && lvsdb->cross_ref ()) || (l2ndb && ! l2ndb->log_entries ().empty ())) {
 
     NetlistLogModel *new_model = new NetlistLogModel (log_view, lvsdb->cross_ref (), l2ndb);
     delete log_view->model ();
     log_view->setModel (new_model);
+
+    log_tab_icon = NetlistLogModel::icon_for_severity (new_model->max_severity ());
 
   } else {
 
@@ -1144,6 +1148,8 @@ NetlistBrowserPage::setup_trees ()
     log_view->setModel (0);
 
   }
+
+  mode_tab->setTabIcon (3, log_tab_icon);
 
   {
     //  NOTE: with the tree as the parent, the tree will take over ownership of the model

@@ -414,7 +414,7 @@ void LayoutToNetlist::extract_netlist ()
   netex.set_include_floating_subcircuits (m_include_floating_subcircuits);
   netex.extract_nets (dss (), m_layout_index, m_conn, *mp_netlist, m_net_clusters);
 
-  // @@@ join_nets ();
+  do_join_nets ();
 
   if (tl::verbosity () >= 41) {
     MemStatisticsCollector m (false);
@@ -423,6 +423,102 @@ void LayoutToNetlist::extract_netlist ()
   }
 
   m_netlist_extracted = true;
+}
+
+static std::vector<db::Net *> nets_from_pattern (db::Circuit &c, const tl::GlobPattern &p)
+{
+  std::vector<db::Net *> result;
+  for (auto n = c.begin_nets (); n != c.end_nets (); ++n) {
+    if (p.match (n->name ())) {
+      result.push_back (n.operator-> ());
+    }
+  }
+  return result;
+}
+
+static std::vector<db::Net *> nets_from_pattern (db::Circuit &c, const std::set<std::string> &p)
+{
+  std::vector<db::Net *> result;
+  for (auto n = p.begin (); n != p.end (); ++n) {
+    db::Net *net = c.net_by_name (*n);
+    if (net) {
+      result.push_back (net);
+    }
+  }
+  return result;
+}
+
+void LayoutToNetlist::do_join_nets (db::Circuit &c, const std::vector<db::Net *> &nets)
+{
+  if (nets.size () <= 1) {
+    return;
+  }
+
+  std::set<std::string> names;
+  for (auto n = nets.begin (); n != nets.end (); ++n) {
+    if (! (*n)->name ().empty ()) {
+      names.insert ((*n)->name ());
+    }
+  }
+
+  nets [0]->set_name (tl::join (names.begin (), names.end (), ","));
+
+  for (auto n = nets.begin () + 1; n != nets.end (); ++n) {
+    c.join_nets (nets [0], *n);
+  }
+}
+
+void LayoutToNetlist::do_join_nets ()
+{
+  if (! mp_netlist) {
+    return;
+  }
+
+  //  prevents updates
+  NetlistLocker locked_netlist (mp_netlist.get ());
+
+  for (auto jn = m_joined_net_names.begin (); jn != m_joined_net_names.end (); ++jn) {
+    for (auto c = mp_netlist->begin_top_down (); c != mp_netlist->end_top_down (); ++c) {
+      do_join_nets (*c, nets_from_pattern (*c, *jn));
+    }
+  }
+
+  for (auto jn = m_joined_nets.begin (); jn != m_joined_nets.end (); ++jn) {
+    for (auto c = mp_netlist->begin_top_down (); c != mp_netlist->end_top_down (); ++c) {
+      do_join_nets (*c, nets_from_pattern (*c, *jn));
+    }
+  }
+
+  for (auto jn = m_joined_net_names_per_cell.begin (); jn != m_joined_net_names_per_cell.end (); ++jn) {
+    for (auto c = mp_netlist->begin_top_down (); c != mp_netlist->end_top_down (); ++c) {
+      if (jn->first.match (c->name ())) {
+        do_join_nets (*c, nets_from_pattern (*c, jn->second));
+      }
+    }
+  }
+
+  for (auto jn = m_joined_nets_per_cell.begin (); jn != m_joined_nets_per_cell.end (); ++jn) {
+    for (auto c = mp_netlist->begin_top_down (); c != mp_netlist->end_top_down (); ++c) {
+      if (jn->first.match (c->name ())) {
+        do_join_nets (*c, nets_from_pattern (*c, jn->second));
+      }
+    }
+  }
+}
+
+void LayoutToNetlist::error (const std::string &msg)
+{
+  m_log_entries.push_back (db::LogEntryData (db::Error, msg));
+}
+
+void LayoutToNetlist::warn (const std::string &msg)
+{
+  m_log_entries.push_back (db::LogEntryData (db::Warning, msg));
+}
+
+void LayoutToNetlist::info (const std::string &msg)
+{
+  m_log_entries.push_back (db::LogEntryData (db::Info, msg));
 }
 
 void LayoutToNetlist::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const

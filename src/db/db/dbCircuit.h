@@ -819,7 +819,7 @@ private:
   bool combine_parallel_devices (const db::DeviceClass &cls);
   bool combine_serial_devices (const db::DeviceClass &cls);
   void do_purge_nets (bool keep_pins);
-
+  void join_pins (size_t pin_id, size_t with);
   void devices_changed ();
   void subcircuits_changed ();
   void nets_changed ();

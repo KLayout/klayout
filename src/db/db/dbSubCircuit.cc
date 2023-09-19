@@ -90,6 +90,11 @@ void SubCircuit::set_trans (const db::DCplxTrans &t)
   m_trans = t;
 }
 
+void SubCircuit::erase_pin_ref (size_t pin_id)
+{
+  m_pin_refs.erase (m_pin_refs.begin () + pin_id);
+}
+
 void SubCircuit::set_pin_ref_for_pin (size_t pin_id, Net::subcircuit_pin_iterator iter)
 {
   if (m_pin_refs.size () < pin_id + 1) {

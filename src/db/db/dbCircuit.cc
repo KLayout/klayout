@@ -366,14 +366,11 @@ void Circuit::remove_net (Net *net)
 
 void Circuit::join_nets (Net *net, Net *with)
 {
-  if (! net) {
-    return;
-  }
-  if (net == with || ! with) {
+  if (net == with || ! with || ! net) {
     return;
   }
   if (net->circuit () != this || with->circuit () != this) {
-    throw tl::Exception (tl::to_string (tr ("Nets not withing given circuit")));
+    throw tl::Exception (tl::to_string (tr ("Nets not within given circuit")));
   }
 
   while (with->begin_terminals () != with->end_terminals ()) {
@@ -390,7 +387,6 @@ void Circuit::join_nets (Net *net, Net *with)
     connect_pin (with->begin_pins ()->pin_id (), net);
   }
 
-  //  TODO: join clusters too, join net properties(?)
   if (netlist ()->callbacks ()) {
     netlist ()->callbacks ()->link_nets (net, with);
   }
@@ -676,7 +672,42 @@ void Circuit::connect_pin (size_t pin_id, Net *net)
   }
 
   if (net) {
-    net->add_pin (NetPinRef (pin_id));
+    if (net->begin_pins () != net->end_pins ()) {
+      join_pins (net->begin_pins ()->pin_id (), pin_id);
+    } else {
+      net->add_pin (NetPinRef (pin_id));
+    }
+  }
+}
+
+void Circuit::join_pins (size_t pin, size_t with)
+{
+  if (with < m_pin_by_id.size () && ! tl::is_null_iterator (m_pin_by_id [with])) {
+
+    m_pins.erase (m_pin_by_id [with]);
+    m_pin_by_id.erase (m_pin_by_id.begin () + with);
+    m_pin_refs.erase (m_pin_refs.begin () + with);
+
+    //  join nets in calls
+    for (auto s = begin_refs (); s != end_refs (); ++s) {
+
+      db::SubCircuit &sc = *s;
+
+      db::Net *with_net = sc.net_for_pin (with);
+      //  remove the subcircuit pin reference from the "with" net
+      for (auto sc_pin = with_net->begin_subcircuit_pins (); sc_pin != with_net->end_subcircuit_pins (); ++sc_pin) {
+        if (sc_pin->subcircuit () == &sc && sc_pin->pin_id () == with) {
+          with_net->erase_subcircuit_pin (sc_pin);
+          break;
+        }
+      }
+
+      sc.circuit ()->join_nets (sc.net_for_pin (pin), with_net);
+
+      sc.erase_pin_ref (with);
+
+    }
+
   }
 }
 

@@ -993,6 +993,11 @@ private:
   void connect_impl (const db::ShapeCollection &a, const db::ShapeCollection &b);
   size_t connect_global_impl (const db::ShapeCollection &l, const std::string &gn);
   bool is_persisted_impl (const db::ShapeCollection &coll) const;
+  void do_join_nets (db::Circuit &c, const std::vector<Net *> &nets);
+  void do_join_nets ();
+  void error (const std::string &msg);
+  void warn (const std::string &msg);
+  void info (const std::string &msg);
 
   //  implementation of NetlistManipulationCallbacks
   virtual size_t link_net_to_parent_circuit (const Net *subcircuit_net, Circuit *parent_circuit, const DCplxTrans &trans);

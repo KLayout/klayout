@@ -423,6 +423,8 @@ void LayoutToNetlist::extract_netlist ()
   }
 
   m_netlist_extracted = true;
+
+  //  @@@ raise error on error
 }
 
 static std::vector<db::Net *> nets_from_pattern (db::Circuit &c, const tl::GlobPattern &p)
@@ -484,12 +486,15 @@ void LayoutToNetlist::check_must_connect (const db::Circuit &c, const db::Net &a
     return;
   }
 
-  if (a.begin_pins () == a.end_pins ()) {
-    error (tl::sprintf (tl::to_string (tr ("Must-connect net %s from circuit %s is not connected to outside")), a.expanded_name (), c.name ()));
+  if (c.begin_refs () != c.end_refs ()) {
+    if (a.begin_pins () == a.end_pins ()) {
+      error (tl::sprintf (tl::to_string (tr ("Must-connect net %s from circuit %s is not connected to outside")), a.expanded_name (), c.name ()));
+    }
+    if (b.begin_pins () == b.end_pins ()) {
+      error (tl::sprintf (tl::to_string (tr ("Must-connect net %s from circuit %s is not connected to outside")), a.expanded_name (), c.name ()));
+    }
   }
-  if (b.begin_pins () == b.end_pins ()) {
-    error (tl::sprintf (tl::to_string (tr ("Must-connect net %s from circuit %s is not connected to outside")), a.expanded_name (), c.name ()));
-  }
+
   if (a.begin_pins () != a.end_pins () && b.begin_pins () != b.end_pins ()) {
     for (auto ref = c.begin_refs (); ref != c.end_refs (); ++ref) {
       const db::SubCircuit &sc = *ref;

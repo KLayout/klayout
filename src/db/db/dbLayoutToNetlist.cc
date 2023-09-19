@@ -464,7 +464,47 @@ void LayoutToNetlist::do_join_nets (db::Circuit &c, const std::vector<db::Net *>
   nets [0]->set_name (tl::join (names.begin (), names.end (), ","));
 
   for (auto n = nets.begin () + 1; n != nets.end (); ++n) {
+    check_must_connect (c, *nets [0], **n);
     c.join_nets (nets [0], *n);
+  }
+}
+
+static std::string subcircuit_to_string (const db::SubCircuit &sc)
+{
+  if (! sc.name ().empty ()) {
+    return tl::to_string (tr ("on subcircuit ")) + sc.name () + tl::to_string (tr (" in ")) + sc.circuit ()->name ();
+  } else {
+    return tl::to_string (tr ("in ")) + sc.circuit ()->name ();
+  }
+}
+
+void LayoutToNetlist::check_must_connect (const db::Circuit &c, const db::Net &a, const db::Net &b)
+{
+  if (&a == &b) {
+    return;
+  }
+
+  if (a.begin_pins () == a.end_pins ()) {
+    error (tl::sprintf (tl::to_string (tr ("Must-connect net %s from circuit %s is not connected to outside")), a.expanded_name (), c.name ()));
+  }
+  if (b.begin_pins () == b.end_pins ()) {
+    error (tl::sprintf (tl::to_string (tr ("Must-connect net %s from circuit %s is not connected to outside")), a.expanded_name (), c.name ()));
+  }
+  if (a.begin_pins () != a.end_pins () && b.begin_pins () != b.end_pins ()) {
+    for (auto ref = c.begin_refs (); ref != c.end_refs (); ++ref) {
+      const db::SubCircuit &sc = *ref;
+      const db::Net *net_a = sc.net_for_pin (a.begin_pins ()->pin_id ());
+      const db::Net *net_b = sc.net_for_pin (b.begin_pins ()->pin_id ());
+      if (net_a == 0) {
+        error (tl::sprintf (tl::to_string (tr ("Must-connect net %s from circuit %s is not connected at all %s")), a.expanded_name (), c.name (), subcircuit_to_string (sc)));
+      }
+      if (net_b == 0) {
+        error (tl::sprintf (tl::to_string (tr ("Must-connect net %s from circuit %s is not connected at all %s")), b.expanded_name (), c.name (), subcircuit_to_string (sc)));
+      }
+      if (net_a && net_b && net_a != net_b) {
+        error (tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s from circuit %s are not connected %s")), a.expanded_name (), b.expanded_name (), c.name (), subcircuit_to_string (sc)));
+      }
+    }
   }
 }
 

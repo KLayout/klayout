@@ -427,27 +427,36 @@ void LayoutToNetlist::extract_netlist ()
   //  @@@ raise error on error
 }
 
-static std::vector<db::Net *> nets_from_pattern (db::Circuit &c, const tl::GlobPattern &p)
+void LayoutToNetlist::join_nets_from_pattern (db::Circuit &c, const tl::GlobPattern &p)
 {
-  std::vector<db::Net *> result;
+  std::map<std::string, std::vector<db::Net *> > nets_by_name;
   for (auto n = c.begin_nets (); n != c.end_nets (); ++n) {
-    if (p.match (n->name ())) {
-      result.push_back (n.operator-> ());
+    if (! n->name ().empty () && p.match (n->name ())) {
+      nets_by_name [n->name ()].push_back (n.operator-> ());
     }
   }
-  return result;
+
+  for (auto n2n = nets_by_name.begin (); n2n != nets_by_name.end (); ++n2n) {
+    if (n2n->second.size () > 1) {
+      do_join_nets (c, n2n->second);
+    }
+  }
 }
 
-static std::vector<db::Net *> nets_from_pattern (db::Circuit &c, const std::set<std::string> &p)
+void LayoutToNetlist::join_nets_from_pattern (db::Circuit &c, const std::set<std::string> &p)
 {
-  std::vector<db::Net *> result;
+  std::vector<db::Net *> nets;
   for (auto n = p.begin (); n != p.end (); ++n) {
-    db::Net *net = c.net_by_name (*n);
-    if (net) {
-      result.push_back (net);
+    if (! n->empty ()) {
+      db::Net *net = c.net_by_name (*n);
+      if (net) {
+        nets.push_back (net);
+      }
     }
   }
-  return result;
+  if (nets.size () > 1) {
+    do_join_nets (c, nets);
+  }
 }
 
 void LayoutToNetlist::do_join_nets (db::Circuit &c, const std::vector<db::Net *> &nets)
@@ -458,9 +467,7 @@ void LayoutToNetlist::do_join_nets (db::Circuit &c, const std::vector<db::Net *>
 
   std::set<std::string> names;
   for (auto n = nets.begin (); n != nets.end (); ++n) {
-    if (! (*n)->name ().empty ()) {
-      names.insert ((*n)->name ());
-    }
+    names.insert ((*n)->name ());
   }
 
   nets [0]->set_name (tl::join (names.begin (), names.end (), ","));
@@ -524,20 +531,20 @@ void LayoutToNetlist::do_join_nets ()
 
   for (auto jn = m_joined_net_names.begin (); jn != m_joined_net_names.end (); ++jn) {
     for (auto c = mp_netlist->begin_top_down (); c != mp_netlist->end_top_down (); ++c) {
-      do_join_nets (*c, nets_from_pattern (*c, *jn));
+      join_nets_from_pattern (*c, *jn);
     }
   }
 
   for (auto jn = m_joined_nets.begin (); jn != m_joined_nets.end (); ++jn) {
     for (auto c = mp_netlist->begin_top_down (); c != mp_netlist->end_top_down (); ++c) {
-      do_join_nets (*c, nets_from_pattern (*c, *jn));
+      join_nets_from_pattern (*c, *jn);
     }
   }
 
   for (auto jn = m_joined_net_names_per_cell.begin (); jn != m_joined_net_names_per_cell.end (); ++jn) {
     for (auto c = mp_netlist->begin_top_down (); c != mp_netlist->end_top_down (); ++c) {
       if (jn->first.match (c->name ())) {
-        do_join_nets (*c, nets_from_pattern (*c, jn->second));
+        join_nets_from_pattern (*c, jn->second);
       }
     }
   }
@@ -545,7 +552,7 @@ void LayoutToNetlist::do_join_nets ()
   for (auto jn = m_joined_nets_per_cell.begin (); jn != m_joined_nets_per_cell.end (); ++jn) {
     for (auto c = mp_netlist->begin_top_down (); c != mp_netlist->end_top_down (); ++c) {
       if (jn->first.match (c->name ())) {
-        do_join_nets (*c, nets_from_pattern (*c, jn->second));
+        join_nets_from_pattern (*c, jn->second);
       }
     }
   }

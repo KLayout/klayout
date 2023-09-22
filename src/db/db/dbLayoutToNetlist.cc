@@ -445,15 +445,14 @@ void LayoutToNetlist::join_nets_from_pattern (db::Circuit &c, const tl::GlobPatt
 
 void LayoutToNetlist::join_nets_from_pattern (db::Circuit &c, const std::set<std::string> &p)
 {
+  //  NOTE: this version implies implicit joining of different nets with the same name from the set p
   std::vector<db::Net *> nets;
-  for (auto n = p.begin (); n != p.end (); ++n) {
-    if (! n->empty ()) {
-      db::Net *net = c.net_by_name (*n);
-      if (net) {
-        nets.push_back (net);
-      }
+  for (auto n = c.begin_nets (); n != c.end_nets (); ++n) {
+    if (! n->name ().empty () && p.find (n->name ()) != p.end ()) {
+      nets.push_back (n.operator-> ());
     }
   }
+
   if (nets.size () > 1) {
     do_join_nets (c, nets);
   }
@@ -464,13 +463,6 @@ void LayoutToNetlist::do_join_nets (db::Circuit &c, const std::vector<db::Net *>
   if (nets.size () <= 1) {
     return;
   }
-
-  std::set<std::string> names;
-  for (auto n = nets.begin (); n != nets.end (); ++n) {
-    names.insert ((*n)->name ());
-  }
-
-  nets [0]->set_name (tl::join (names.begin (), names.end (), ","));
 
   for (auto n = nets.begin () + 1; n != nets.end (); ++n) {
     check_must_connect (c, *nets [0], **n);

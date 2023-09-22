@@ -30,6 +30,30 @@
 namespace db
 {
 
+/**
+ *  @brief Creates a joined name for nets and pins
+ */
+static std::string
+join_names (const std::string &n1, const std::string &n2)
+{
+  //  create a new name for the joined net
+  if (n2.empty ()) {
+    return n1;
+  } else if (n1.empty ()) {
+    return n2;
+  } else if (n1 == n2) {
+    return n1;
+  } else {
+    //  separate parts (if already joined) and mix
+    auto p1 = tl::split (n1, ",");
+    auto p2 = tl::split (n2, ",");
+    std::set<std::string> ps;
+    ps.insert (p1.begin (), p1.end ());
+    ps.insert (p2.begin (), p2.end ());
+    return tl::join (ps.begin (), ps.end (), ",");
+  }
+}
+
 // --------------------------------------------------------------------------------
 //  Circuit class implementation
 
@@ -391,6 +415,9 @@ void Circuit::join_nets (Net *net, Net *with)
     netlist ()->callbacks ()->link_nets (net, with);
   }
 
+  //  create a new name for the joined net
+  net->set_name (join_names (net->name (), with->name ()));
+
   remove_net (with);
 }
 
@@ -683,6 +710,9 @@ void Circuit::connect_pin (size_t pin_id, Net *net)
 void Circuit::join_pins (size_t pin, size_t with)
 {
   if (with != pin && with < m_pin_by_id.size () && ! tl::is_null_iterator (m_pin_by_id [with])) {
+
+    //  create a new joined name
+    m_pin_by_id [pin]->set_name (join_names (m_pin_by_id [pin]->name (), m_pin_by_id [with]->name ()));
 
     m_pins.erase (m_pin_by_id [with]);
     m_pin_by_id.erase (m_pin_by_id.begin () + with);

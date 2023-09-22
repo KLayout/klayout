@@ -3648,7 +3648,7 @@ TEST(14_JoinNets)
   jn.insert ("BULK");
   l2n->join_nets (tl::GlobPattern ("INV2"), jn);
 
-  //  This will trigger an implicit connection on top level (side effect of explicit connections)
+  //  Implicit connection of nets with same name "VDD"
   jn.clear ();
   jn.insert ("VDD");
   l2n->join_nets (jn);

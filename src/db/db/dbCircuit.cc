@@ -682,29 +682,35 @@ void Circuit::connect_pin (size_t pin_id, Net *net)
 
 void Circuit::join_pins (size_t pin, size_t with)
 {
-  if (with < m_pin_by_id.size () && ! tl::is_null_iterator (m_pin_by_id [with])) {
+  if (with != pin && with < m_pin_by_id.size () && ! tl::is_null_iterator (m_pin_by_id [with])) {
 
     m_pins.erase (m_pin_by_id [with]);
     m_pin_by_id.erase (m_pin_by_id.begin () + with);
     m_pin_refs.erase (m_pin_refs.begin () + with);
 
+    //  correct the pin IDs inside the circuit: all IDS > with will be reduced by 1
+    if (pin > with) {
+      --pin;
+    }
+    for (auto p = m_pins.begin (); p != m_pins.end (); ++p) {
+      if (p->id () > with) {
+        p->set_id (p->id () - 1);
+      }
+    }
+    for (auto p = m_pin_refs.begin () + with; p != m_pin_refs.end (); ++p) {
+      (*p)->set_pin_id ((*p)->pin_id () - 1);
+    }
+
     //  join nets in calls
     for (auto s = begin_refs (); s != end_refs (); ++s) {
 
       db::SubCircuit &sc = *s;
-
       db::Net *with_net = sc.net_for_pin (with);
-      //  remove the subcircuit pin reference from the "with" net
-      for (auto sc_pin = with_net->begin_subcircuit_pins (); sc_pin != with_net->end_subcircuit_pins (); ++sc_pin) {
-        if (sc_pin->subcircuit () == &sc && sc_pin->pin_id () == with) {
-          with_net->erase_subcircuit_pin (sc_pin);
-          break;
-        }
-      }
+
+      //  NOTE: this will also correct the Pin IDs on the attached nets
+      sc.erase_pin (with);
 
       sc.circuit ()->join_nets (sc.net_for_pin (pin), with_net);
-
-      sc.erase_pin_ref (with);
 
     }
 

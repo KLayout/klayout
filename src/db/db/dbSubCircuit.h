@@ -233,7 +233,7 @@ private:
   /**
    *  @brief Erases the given pin reference
    */
-  void erase_pin_ref (size_t pin_id);
+  void erase_pin (size_t pin_id);
 
   /**
    *  @brief Sets the circuit the subcircuit belongs to

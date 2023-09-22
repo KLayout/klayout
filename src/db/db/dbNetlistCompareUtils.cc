@@ -414,8 +414,8 @@ generic_categorizer<Obj>::cat_for (const Obj *cls)
 }
 
 //  explicit instantiations
-template class DB_PUBLIC generic_categorizer<db::DeviceClass>;
-template class DB_PUBLIC generic_categorizer<db::Circuit>;
+template class generic_categorizer<db::DeviceClass>;
+template class generic_categorizer<db::Circuit>;
 
 // --------------------------------------------------------------------------------------------------------------------
 //  DeviceCategorizer implementation

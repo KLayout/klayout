@@ -1647,11 +1647,11 @@ TEST(25_JoinNets)
   c->join_nets (c->net_by_name ("IN"), c->net_by_name ("OUT"));
 
   EXPECT_EQ (nl.to_string (),
-    "circuit INV2 (IN=IN,$2=$2,OUT=IN,$4=$4,$5=$5);\n"
-    "  subcircuit PTRANS SC1 ($1=$5,$2=$2,$3=IN);\n"
-    "  subcircuit NTRANS SC2 ($1=$4,$2=$2,$3=IN);\n"
-    "  subcircuit PTRANS SC3 ($1=$5,$2=IN,$3=$2);\n"
-    "  subcircuit NTRANS SC4 ($1=$4,$2=IN,$3=$2);\n"
+    "circuit INV2 ('IN,OUT'='IN,OUT',$2=$2,$3=$4,$4=$5);\n"
+    "  subcircuit PTRANS SC1 ($1=$5,$2=$2,$3='IN,OUT');\n"
+    "  subcircuit NTRANS SC2 ($1=$4,$2=$2,$3='IN,OUT');\n"
+    "  subcircuit PTRANS SC3 ($1=$5,$2='IN,OUT',$3=$2);\n"
+    "  subcircuit NTRANS SC4 ($1=$4,$2='IN,OUT',$3=$2);\n"
     "end;\n"
     "circuit PTRANS ($1=$1,$2=$2,$3=$3);\n"
     "  device PMOS $1 (S=$1,G=$3,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
@@ -1690,11 +1690,11 @@ TEST(26_JoinNets)
   c->join_nets (c->net_by_name ("IN"), c->net_by_name ("OUT"));
 
   EXPECT_EQ (nl.to_string (),
-    "circuit INV2 (IN=IN,$2=$2,OUT=IN,$4=$4,$5=$5);\n"
-    "  device PMOS $1 (S=$5,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device PMOS $2 (S=$5,G=$2,D=IN) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device NMOS $3 (S=$4,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device NMOS $4 (S=$4,G=$2,D=IN) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "circuit INV2 ('IN,OUT'='IN,OUT',$2=$2,$3=$4,$4=$5);\n"
+    "  device PMOS $1 (S=$5,G='IN,OUT',D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $2 (S=$5,G=$2,D='IN,OUT') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $3 (S=$4,G='IN,OUT',D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $4 (S=$4,G=$2,D='IN,OUT') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
     "end;\n"
   );
 }

@@ -2285,11 +2285,11 @@ TEST(50_SplitGatesSimple)
 
   EXPECT_EQ (nl2->to_string (),
     "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    "  device '' m11 (S=n1,G=g1,D=sd1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m11 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
     //  sd2 -> sd1
-    "  device '' m12 (S=n1,G=g1,D=sd1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
     "end;\n"
   );
 
@@ -2314,10 +2314,10 @@ TEST(50_SplitGatesSimple)
   EXPECT_EQ (nl2->to_string (),
     "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
     //  sd1 -> sd2
-    "  device '' m11 (S=sd2,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m11 (S='sd1,sd2',G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
     "end;\n"
   );
 
@@ -2389,10 +2389,10 @@ TEST(50_SplitGatesSimple)
   EXPECT_EQ (nl2->to_string (),
     "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
     //  sd1 -> sd2
-    "  device '' m11 (S=sd2,G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m11 (S='sd1,sd2',G=g1,D=n1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
     "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
     "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
     "end;\n"
@@ -2516,11 +2516,11 @@ TEST(51_SplitGatesStrict)
 
   EXPECT_EQ (nl2->to_string (),
     "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
-    "  device '' m11 (S=n1,G=g1,D=sd1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m11 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
     //  sd2 -> sd1
-    "  device '' m12 (S=n1,G=g1,D=sd1) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd1,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
     "end;\n"
   );
 
@@ -2623,10 +2623,10 @@ TEST(51_SplitGatesStrict)
   EXPECT_EQ (nl2->to_string (),
     "circuit '' (A=n1,B=n2,G1=g1,G2=g2);\n"
     //  sd1 -> sd2
-    "  device '' m11 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m11 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D='sd1,sd2') (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S='sd1,sd2',G=g2,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
     "  device '' mp1 (S=n1,G=g1,D=sd3) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
     "  device '' mp2 (S=sd3,G=g1,D=n2) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
     "end;\n"
@@ -2725,11 +2725,11 @@ TEST(52_SplitGatesMOS4)
 
   EXPECT_EQ (nl2->to_string (),
     "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
-    "  device '' m11 (S=n1,G=g1,D=sd1,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd1,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m11 (S=n1,G=g1,D='sd1,sd2',B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S='sd1,sd2',G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
     //  sd2 -> sd1
-    "  device '' m12 (S=n1,G=g1,D=sd1,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd1,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D='sd1,sd2',B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S='sd1,sd2',G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
     "end;\n"
   );
 
@@ -2754,10 +2754,10 @@ TEST(52_SplitGatesMOS4)
   EXPECT_EQ (nl2->to_string (),
     "circuit '' (A=n1,B=n2,G1=g1,G2=g2,VSS=vss);\n"
     //  sd1 -> sd2
-    "  device '' m11 (S=sd2,G=g1,D=n1,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m21 (S=sd2,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m12 (S=n1,G=g1,D=sd2,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device '' m22 (S=sd2,G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m11 (S='sd1,sd2',G=g1,D=n1,B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m21 (S='sd1,sd2',G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m12 (S=n1,G=g1,D='sd1,sd2',B=vss) (L=6,W=1,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device '' m22 (S='sd1,sd2',G=g2,D=n2,B=vss) (L=10,W=1,AS=0,AD=0,PS=0,PD=0);\n"
     "end;\n"
   );
 

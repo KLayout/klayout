@@ -27,6 +27,7 @@ J(
  C(l2 l6 l2)
  C(l5 l6 l5)
  G(l14 SUBSTRATE)
+ H(E B('Must-connect nets R from circuit INV2 are not connected in INVCHAIN'))
  K(PMOS MOS3)
  K(NMOS MOS3)
  D(D$PMOS PMOS

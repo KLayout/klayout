@@ -485,6 +485,7 @@ void LayoutToNetlist::check_must_connect (const db::Circuit &c, const db::Net &a
     return;
   }
 
+  //  @@@ raise a warning for top level cells?
   if (c.begin_refs () != c.end_refs ()) {
     if (a.begin_pins () == a.end_pins ()) {
       error (tl::sprintf (tl::to_string (tr ("Must-connect net %s from circuit %s is not connected to outside")), a.expanded_name (), c.name ()));
@@ -506,7 +507,11 @@ void LayoutToNetlist::check_must_connect (const db::Circuit &c, const db::Net &a
         error (tl::sprintf (tl::to_string (tr ("Must-connect net %s from circuit %s is not connected at all %s")), b.expanded_name (), c.name (), subcircuit_to_string (sc)));
       }
       if (net_a && net_b && net_a != net_b) {
-        error (tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s from circuit %s are not connected %s")), a.expanded_name (), b.expanded_name (), c.name (), subcircuit_to_string (sc)));
+        if (net_a->expanded_name () == net_b->expanded_name ()) {
+          error (tl::sprintf (tl::to_string (tr ("Must-connect nets %s from circuit %s are not connected %s")), a.expanded_name (), c.name (), subcircuit_to_string (sc)));
+        } else {
+          error (tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s from circuit %s are not connected %s")), a.expanded_name (), b.expanded_name (), c.name (), subcircuit_to_string (sc)));
+        }
       }
     }
   }

@@ -408,7 +408,7 @@ void Circuit::join_nets (Net *net, Net *with)
   }
 
   while (with->begin_pins () != with->end_pins ()) {
-    connect_pin (with->begin_pins ()->pin_id (), net);
+    join_pin_with_net (with->begin_pins ()->pin_id (), net);
   }
 
   if (netlist ()->callbacks ()) {
@@ -685,6 +685,25 @@ const Net *Circuit::net_for_pin (size_t pin_id) const
 }
 
 void Circuit::connect_pin (size_t pin_id, Net *net)
+{
+  if (net_for_pin (pin_id) == net) {
+    return;
+  }
+
+  if (pin_id < m_pin_refs.size ()) {
+    Net::pin_iterator p = m_pin_refs [pin_id];
+    if (! tl::is_null_iterator (p) && p->net ()) {
+      p->net ()->erase_pin (p);
+    }
+    m_pin_refs [pin_id] = Net::pin_iterator ();
+  }
+
+  if (net) {
+    net->add_pin (NetPinRef (pin_id));
+  }
+}
+
+void Circuit::join_pin_with_net (size_t pin_id, Net *net)
 {
   if (net_for_pin (pin_id) == net) {
     return;

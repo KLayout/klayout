@@ -136,11 +136,11 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
       rdiff2gate.set_base_verbosity (rdiff.base_verbosity ());
 
       if (rdiff2gate.empty ()) {
-        error (tl::to_string (tr ("Gate shape touches no diffusion - ignored")), *p);
+        warn (tl::to_string (tr ("Gate shape touches no diffusion - ignored")), *p);
       } else {
 
         if (rdiff2gate.count () != 2) {
-          error (tl::sprintf (tl::to_string (tr ("Expected two polygons on diff interacting with one gate shape (found %d) - gate shape ignored")), int (rdiff2gate.count ())), *p);
+          warn (tl::sprintf (tl::to_string (tr ("Expected two polygons on diff interacting with one gate shape (found %d) - gate shape ignored")), int (rdiff2gate.count ())), *p);
           continue;
         }
 
@@ -158,7 +158,7 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
           db::Edges edges (rgate.edges () & db::Edges (*d2g));
           db::Edges::length_type l = edges.length ();
           if (l == 0) {
-            error (tl::to_string (tr ("Vanishing edges for interaction gate/diff (corner interaction) - gate shape ignored")));
+            warn (tl::to_string (tr ("Vanishing edges for interaction gate/diff (corner interaction) - gate shape ignored")));
           } else {
             widths.push_back (l);
           }
@@ -237,18 +237,18 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
       ddiff2gate.set_base_verbosity (ddiff.base_verbosity ());
 
       if (sdiff2gate.empty () && ddiff2gate.empty ()) {
-        error (tl::to_string (tr ("Gate shape touches no diffusion - ignored")), *p);
+        warn (tl::to_string (tr ("Gate shape touches no diffusion - ignored")), *p);
       } else if (sdiff2gate.empty () || ddiff2gate.empty ()) {
-        error (tl::to_string (tr ("Gate shape touches a single diffusion only - ignored")), *p);
+        warn (tl::to_string (tr ("Gate shape touches a single diffusion only - ignored")), *p);
       } else {
 
         if (sdiff2gate.count () != 1) {
-          error (tl::sprintf (tl::to_string (tr ("Expected one polygons on source diff interacting with one gate shape (found %d) - gate shape ignored")), int (sdiff2gate.count ())), *p);
+          warn (tl::sprintf (tl::to_string (tr ("Expected one polygons on source diff interacting with one gate shape (found %d) - gate shape ignored")), int (sdiff2gate.count ())), *p);
           continue;
         }
 
         if (ddiff2gate.count () != 1) {
-          error (tl::sprintf (tl::to_string (tr ("Expected one polygons on drain diff interacting with one gate shape (found %d) - gate shape ignored")), int (ddiff2gate.count ())), *p);
+          warn (tl::sprintf (tl::to_string (tr ("Expected one polygons on drain diff interacting with one gate shape (found %d) - gate shape ignored")), int (ddiff2gate.count ())), *p);
           continue;
         }
 
@@ -258,7 +258,7 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
           db::Edges edges (rgate.edges () & sdiff2gate.edges ());
           sdwidth = edges.length ();
           if (sdwidth == 0) {
-            error (tl::to_string (tr ("Vanishing edges for interaction gate/source diff (corner interaction) - gate shape ignored")));
+            warn (tl::to_string (tr ("Vanishing edges for interaction gate/source diff (corner interaction) - gate shape ignored")));
             continue;
           }
         }
@@ -267,7 +267,7 @@ void NetlistDeviceExtractorMOS3Transistor::extract_devices (const std::vector<db
           db::Edges edges (rgate.edges () & ddiff2gate.edges ());
           ddwidth = edges.length ();
           if (ddwidth == 0) {
-            error (tl::to_string (tr ("Vanishing edges for interaction gate/drain diff (corner interaction) - gate shape ignored")));
+            warn (tl::to_string (tr ("Vanishing edges for interaction gate/drain diff (corner interaction) - gate shape ignored")));
             continue;
           }
         }
@@ -438,7 +438,7 @@ void NetlistDeviceExtractorResistor::extract_devices (const std::vector<db::Regi
     db::Region contacts_per_res = contact_wo_res.selected_interacting (rres);
 
     if (contacts_per_res.count () != 2) {
-      error (tl::sprintf (tl::to_string (tr ("Expected two polygons on contacts interacting with one resistor shape (found %d) - resistor shape ignored")), int (contacts_per_res.count ())), *p);
+      warn (tl::sprintf (tl::to_string (tr ("Expected two polygons on contacts interacting with one resistor shape (found %d) - resistor shape ignored")), int (contacts_per_res.count ())), *p);
       continue;
     }
 
@@ -458,7 +458,7 @@ void NetlistDeviceExtractorResistor::extract_devices (const std::vector<db::Regi
     db::Coord width2 = eperp.length ();
 
     if (width2 < 1) {
-      error (tl::to_string (tr ("Invalid contact geometry - resistor shape ignored")), *p);
+      warn (tl::to_string (tr ("Invalid contact geometry - resistor shape ignored")), *p);
       continue;
     }
 
@@ -681,7 +681,7 @@ void NetlistDeviceExtractorBJT3Transistor::extract_devices (const std::vector<db
     db::Region remitter2base = rbase & remitters;
 
     if (remitter2base.empty ()) {
-      error (tl::to_string (tr ("Base shape without emitters - ignored")), *p);
+      warn (tl::to_string (tr ("Base shape without emitters - ignored")), *p);
     } else {
 
       //  collectors inside base

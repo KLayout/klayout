@@ -27,6 +27,8 @@ J(
  C(l2 l6 l2)
  C(l5 l6 l5)
  G(l14 SUBSTRATE)
+ H(W B('Must-connect nets GND from circuit INVCHAIN must be connected further up in the hierarchy. This is an error at the chip top level.'))
+ H(W B('Must-connect nets R from circuit INVCHAIN must be connected further up in the hierarchy. This is an error at the chip top level.'))
  H(E B('Must-connect nets R from circuit INV2 are not connected in INVCHAIN'))
  K(PMOS MOS3)
  K(NMOS MOS3)

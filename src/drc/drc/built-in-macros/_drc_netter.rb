@@ -69,6 +69,7 @@ module DRC
       @l2n = nil
       @lnum = 0
       @device_scaling = 1.0
+      @ignore_extraction_errors = false
     end
     
     # %DRC%
@@ -233,6 +234,18 @@ module DRC
         @device_scaling = factor
         @l2n && @l2n.device_scaling = factor
       end
+    end
+
+    # %DRC%
+    # @name ignore_extraction_errors
+    # @brief Specifies whether to ignore extraction errors
+    # @synopsis ignore_extraction_errors(value)
+    # With this value set to false (the default), "extract_netlist" will raise
+    # an exception upon extraction errors. Otherwise, extraction errors will be logged
+    # but no error is raised.
+    
+    def ignore_extraction_errors(value)
+      @ignore_extraction_errors = value
     end
     
     # %DRC%
@@ -600,6 +613,11 @@ module DRC
           # configure the netter, post-extraction
           @post_extract_config.each do |cfg|
             cfg.call(@l2n)
+          end
+
+          # checks for errors if needed
+          if !@ignore_extraction_errors
+            @l2n.check_extraction_errors
           end
 
         end

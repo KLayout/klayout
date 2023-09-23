@@ -55,6 +55,22 @@ public:
   NetlistDeviceExtractorError (const std::string &cell_name, const std::string &msg);
 
   /**
+   *  @brief Sets a value indicating whether the error is only a warning
+   */
+  void set_warning (bool f)
+  {
+    m_warning = f;
+  }
+
+  /**
+   *  @brief Gets a value indicating whether the error is only a warning
+   */
+  bool is_warning () const
+  {
+    return m_warning;
+  }
+
+  /**
    *  @brief The category name of the error
    *  Specifying the category name is optional. If a category is given, it will be used for
    *  the report.
@@ -145,6 +161,7 @@ public:
   std::string to_string () const;
 
 private:
+  bool m_warning;
   std::string m_cell_name;
   std::string m_message;
   db::DPolygon m_geometry;
@@ -504,6 +521,42 @@ public:
   void error (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::Polygon &poly)
   {
     error (category_name, category_description, msg, poly.transformed (db::CplxTrans (dbu ())));
+  }
+
+  /**
+   *  @brief Issues a warning with the given message
+   */
+  void warn (const std::string &msg);
+
+  /**
+   *  @brief Issues a warning with the given message and warn shape
+   */
+  void warn (const std::string &msg, const db::DPolygon &poly);
+
+  /**
+   *  @brief Issues a warning with the given message and warn shape
+   */
+  void warn (const std::string &msg, const db::Polygon &poly)
+  {
+    warn (msg, poly.transformed (db::CplxTrans (dbu ())));
+  }
+
+  /**
+   *  @brief Issues a warning with the given category name, description and message
+   */
+  void warn (const std::string &category_name, const std::string &category_description, const std::string &msg);
+
+  /**
+   *  @brief Issues a warning with the given category name, description and message and warn shape
+   */
+  void warn (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::DPolygon &poly);
+
+  /**
+   *  @brief Issues a warning with the given category name, description and message and warn shape
+   */
+  void warn (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::Polygon &poly)
+  {
+    warn (category_name, category_description, msg, poly.transformed (db::CplxTrans (dbu ())));
   }
 
   /**

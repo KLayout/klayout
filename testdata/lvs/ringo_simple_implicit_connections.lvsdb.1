@@ -38,6 +38,9 @@ layout(
  global(l7 SUBSTRATE)
  global(l10 SUBSTRATE)
 
+ # Log entries
+ message(warning description('Must-connect nets VDD from circuit RINGO must be connected further up in the hierarchy. This is an error at the chip top level.'))
+
  # Device class section
  class(PMOS MOS4)
  class(NMOS MOS4)

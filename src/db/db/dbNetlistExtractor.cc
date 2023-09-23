@@ -178,6 +178,8 @@ NetlistExtractor::extract_nets (const db::DeepShapeStore &dss, unsigned int layo
   m_device_annot_name_id = mp_layout->properties_repository ().get_id_of_name (db::NetlistDeviceExtractor::device_id_property_name ());
 
   //  build an attribute equivalence map which lists the "attribute IDs" which are identical in terms of net names
+  //  TODO: this feature is not really used as must-connect nets now are handled in the LayoutToNetlist class on netlist level.
+  //  Remove this later.
 
   std::map<db::cell_index_type, tl::equivalence_clusters<size_t> > net_name_equivalence;
   if (m_text_annot_name_id.first) {

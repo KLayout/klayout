@@ -21,8 +21,8 @@ metal2_lbl  = input(8, 1)
 # Computed layers
 
 pactive     = active & nwell
-pgate       = active & poly
-psd         = active - pgate
+pgate       = pactive & poly
+psd         = pactive - pgate
 
 nactive     = active - nwell
 ngate       = nactive & poly

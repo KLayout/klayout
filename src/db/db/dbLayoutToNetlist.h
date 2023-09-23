@@ -194,7 +194,6 @@ public:
 
   /**
    *  @brief Gets the log entries
-   *  @@@ TODO: provide GSI interface
    */
   const log_entries_type &log_entries () const
   {
@@ -203,7 +202,6 @@ public:
 
   /**
    *  @brief Clears the log entries
-   *  @@@ TODO: provide GSI interface
    */
   void clear_log_entries ()
   {
@@ -212,7 +210,6 @@ public:
 
   /**
    *  @brief Adds a log entry
-   *  @@@ TODO: provide GSI interface
    */
   void log_entry (const db::LogEntryData &log_entry)
   {
@@ -586,6 +583,8 @@ public:
    *  See the class description for more details.
    */
   void extract_netlist ();
+
+  void check_extraction_errors ();
 
   /**
    *  @brief Marks the netlist as extracted

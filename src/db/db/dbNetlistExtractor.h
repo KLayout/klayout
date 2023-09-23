@@ -106,6 +106,8 @@ public:
    *  This is a glob expression rendering net names where partial nets with the
    *  same name are joined even without explicit connection.
    *  The cell-less version applies to top level cells only.
+   *  NOTE: this feature is not really used as must-connect nets are handled now in the LayoutToNetlist extractor.
+   *  Remove this function later.
    */
   void set_joined_net_names (const std::list<tl::GlobPattern> &jnn);
 
@@ -113,6 +115,8 @@ public:
    *  @brief Sets the joined net names attribute for a given cell name
    *  While the single-parameter set_joined_net_names only acts on the top cell, this
    *  version will act on the cell with the given name.
+   *  NOTE: this feature is not really used as must-connect nets are handled now in the LayoutToNetlist extractor.
+   *  Remove this function later.
    */
   void set_joined_net_names (const std::string &cell_name, const std::list<tl::GlobPattern> &jnn);
 
@@ -122,11 +126,15 @@ public:
    *  names that are to be connected. Multiple such groups can be specified. Each net name listed in a
    *  group implies implicit joining of the corresponding labels into one net.
    *  The cell-less version applies to top level cells only.
+   *  NOTE: this feature is not really used as must-connect nets are handled now in the LayoutToNetlist extractor.
+   *  Remove this function later.
    */
   void set_joined_nets (const std::list<std::set<std::string> > &jnn);
 
   /**
    *  @brief Sets the joined nets attribute per cell
+   *  NOTE: this feature is not really used as must-connect nets are handled now in the LayoutToNetlist extractor.
+   *  Remove this function later.
    */
   void set_joined_nets (const std::string &cell_name, const std::list<std::set<std::string> > &jnn);
 

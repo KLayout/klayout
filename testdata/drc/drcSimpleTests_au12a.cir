@@ -5,12 +5,12 @@
 * net 1 FB
 * net 2 OSC
 * net 3 NEXT
-* net 4 VSSZ,VSS
-* net 5 VDDZ,VDD
-* cell instance $1 r180 *1 -0.24,9.18
-X$1 16 1 2 4 5 INV2
-* cell instance $2 r0 *1 0,0
-X$2 1 14 15 4 5 INV2
+* net 4 VSSZ
+* net 5 VDDZ
+* cell instance $1 r0 *1 0,0
+X$1 1 14 15 4 5 INV2
+* cell instance $2 r180 *1 -0.24,9.18
+X$2 16 1 2 4 5 INV2
 * cell instance $3 r180 *1 10.32,9.18
 X$3 3 9 19 4 5 INV2
 * cell instance $4 r0 *1 10.56,0
@@ -46,18 +46,14 @@ X$2 2 5 1 TRANS
 X$3 5 3 2 TRANS
 * cell instance $4 m0 *1 0.4,0
 X$4 4 3 2 TRANS
-* device instance $1 -0.4,0 PMOS
-M$1 2 1 4 2 PMOS L=0.25U W=0.95U AS=0.49875P AD=0.26125P PS=2.95U PD=1.5U
-* device instance $2 0.4,0 PMOS
-M$2 4 2 3 4 PMOS L=0.25U W=0.95U AS=0.26125P AD=0.49875P PS=1.5U PD=2.95U
-* device instance $3 -0.4,2.8 PMOS
-M$3 2 1 5 2 PMOS L=0.25U W=0.95U AS=0.49875P AD=0.26125P PS=2.95U PD=1.5U
-* device instance $4 0.4,2.8 PMOS
-M$4 5 2 3 5 PMOS L=0.25U W=0.95U AS=0.26125P AD=0.49875P PS=1.5U PD=2.95U
-* device instance $5 -0.4,0 NMOS
-M$5 2 1 4 2 NMOS L=0.25U W=0.95U AS=0.49875P AD=0.26125P PS=2.95U PD=1.5U
-* device instance $6 0.4,0 NMOS
-M$6 4 2 3 4 NMOS L=0.25U W=0.95U AS=0.26125P AD=0.49875P PS=1.5U PD=2.95U
+* device instance $1 r0 *1 -0.4,2.8 PMOS
+M$1 5 1 2 2 PMOS L=0.25U W=0.95U AS=0.49875P AD=0.26125P PS=2.95U PD=1.5U
+* device instance $2 r0 *1 0.4,2.8 PMOS
+M$2 3 2 5 5 PMOS L=0.25U W=0.95U AS=0.26125P AD=0.49875P PS=1.5U PD=2.95U
+* device instance $3 r0 *1 -0.4,0 NMOS
+M$3 4 1 2 2 NMOS L=0.25U W=0.95U AS=0.49875P AD=0.26125P PS=2.95U PD=1.5U
+* device instance $4 r0 *1 0.4,0 NMOS
+M$4 3 2 4 4 NMOS L=0.25U W=0.95U AS=0.26125P AD=0.49875P PS=1.5U PD=2.95U
 .ENDS INV2
 
 * cell TRANS

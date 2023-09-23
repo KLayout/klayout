@@ -247,7 +247,7 @@ void LayoutToNetlist::extract_devices (db::NetlistDeviceExtractor &extractor, co
 
   //  transfer errors to log entries
   for (auto e = extractor.begin_errors (); e != extractor.end_errors (); ++e) {
-    m_log_entries.push_back (db::LogEntryData (db::Error, e->to_string ()));
+    m_log_entries.push_back (db::LogEntryData (e->is_warning () ? db::Warning : db::Error, e->to_string ()));
   }
 }
 
@@ -369,48 +369,7 @@ void LayoutToNetlist::extract_netlist ()
   }
   ensure_netlist ();
 
-  const db::Layout &layout = dss ().layout (m_layout_index);
-
   db::NetlistExtractor netex;
-
-#if 0 // @@@ remove this plus corresponding code inside NetlistExtractor ...
-  netex.set_joined_net_names (m_joined_net_names);
-
-  std::map<std::string, std::list<tl::GlobPattern> > jp_per_cell;
-  for (std::list<std::pair<tl::GlobPattern, tl::GlobPattern> >::const_iterator j = m_joined_net_names_per_cell.begin (); j != m_joined_net_names_per_cell.end (); ++j) {
-    if (j->first.is_const ()) {
-      jp_per_cell [j->first.pattern ()].push_back (j->second);
-    } else {
-      for (db::Layout::const_iterator c = layout.begin (); c != layout.end (); ++c) {
-        if (j->first.match (layout.cell_name (c->cell_index ()))) {
-          jp_per_cell [layout.cell_name (c->cell_index ())].push_back (j->second);
-        }
-      }
-    }
-  }
-  for (std::map<std::string, std::list<tl::GlobPattern> >::const_iterator i = jp_per_cell.begin (); i != jp_per_cell.end (); ++i) {
-    netex.set_joined_net_names (i->first, i->second);
-  }
-
-  netex.set_joined_nets (m_joined_nets);
-
-  std::map<std::string, std::list<std::set<std::string> > > jn_per_cell;
-  for (std::list<std::pair<tl::GlobPattern, std::set<std::string> > >::const_iterator j = m_joined_nets_per_cell.begin (); j != m_joined_nets_per_cell.end (); ++j) {
-    if (j->first.is_const ()) {
-      jn_per_cell [j->first.pattern ()].push_back (j->second);
-    } else {
-      for (db::Layout::const_iterator c = layout.begin (); c != layout.end (); ++c) {
-        if (j->first.match (layout.cell_name (c->cell_index ()))) {
-          jn_per_cell [layout.cell_name (c->cell_index ())].push_back (j->second);
-        }
-      }
-    }
-  }
-  for (std::map<std::string, std::list<std::set<std::string> > >::const_iterator i = jn_per_cell.begin (); i != jn_per_cell.end (); ++i) {
-    netex.set_joined_nets (i->first, i->second);
-  }
- #endif
-
   netex.set_include_floating_subcircuits (m_include_floating_subcircuits);
   netex.extract_nets (dss (), m_layout_index, m_conn, *mp_netlist, m_net_clusters);
 
@@ -423,8 +382,29 @@ void LayoutToNetlist::extract_netlist ()
   }
 
   m_netlist_extracted = true;
+}
 
-  //  @@@ raise error on error
+void LayoutToNetlist::check_extraction_errors ()
+{
+  int num_errors = 0;
+  int max_errors = 10;
+  std::string errors;
+  for (auto l = m_log_entries.begin (); l != m_log_entries.end (); ++l) {
+    if (l->severity >= db::Error) {
+      errors += "\n";
+      if (++num_errors >= max_errors) {
+        errors += "...\n";
+        errors += tl::sprintf (tl::to_string (tr ("(list shortened after %d errrors, see log for all errors)")), max_errors);
+        break;
+      } else {
+        errors += l->msg;
+      }
+    }
+  }
+
+  if (num_errors > 0) {
+    throw tl::Exception (tl::to_string (tr ("Errors encountered during netlist extraction:")) + errors);
+  }
 }
 
 void LayoutToNetlist::join_nets_from_pattern (db::Circuit &c, const tl::GlobPattern &p)
@@ -485,7 +465,6 @@ void LayoutToNetlist::check_must_connect (const db::Circuit &c, const db::Net &a
     return;
   }
 
-  //  @@@ raise a warning for top level cells?
   if (c.begin_refs () != c.end_refs ()) {
     if (a.begin_pins () == a.end_pins ()) {
       error (tl::sprintf (tl::to_string (tr ("Must-connect net %s from circuit %s is not connected to outside")), a.expanded_name (), c.name ()));
@@ -493,11 +472,18 @@ void LayoutToNetlist::check_must_connect (const db::Circuit &c, const db::Net &a
     if (b.begin_pins () == b.end_pins ()) {
       error (tl::sprintf (tl::to_string (tr ("Must-connect net %s from circuit %s is not connected to outside")), a.expanded_name (), c.name ()));
     }
+  } else {
+    if (a.expanded_name () == b.expanded_name ()) {
+      warn (tl::sprintf (tl::to_string (tr ("Must-connect nets %s from circuit %s must be connected further up in the hierarchy. This is an error at the chip top level.")), a.expanded_name (), c.name ()));
+    } else {
+      warn (tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s from circuit %s must be connected further up in the hierarchy. This is an error at the chip top level.")), a.expanded_name (), b.expanded_name (), c.name ()));
+    }
   }
 
   if (a.begin_pins () != a.end_pins () && b.begin_pins () != b.end_pins ()) {
     for (auto ref = c.begin_refs (); ref != c.end_refs (); ++ref) {
       const db::SubCircuit &sc = *ref;
+      //  TODO: consider the case of multiple pins on a net (rare)
       const db::Net *net_a = sc.net_for_pin (a.begin_pins ()->pin_id ());
       const db::Net *net_b = sc.net_for_pin (b.begin_pins ()->pin_id ());
       if (net_a == 0) {
@@ -557,17 +543,28 @@ void LayoutToNetlist::do_join_nets ()
 
 void LayoutToNetlist::error (const std::string &msg)
 {
-  m_log_entries.push_back (db::LogEntryData (db::Error, msg));
+  if (m_log_entries.empty () || m_log_entries.back ().severity != db::Error || m_log_entries.back ().msg != msg) {
+    tl::error << msg;
+    m_log_entries.push_back (db::LogEntryData (db::Error, msg));
+  }
 }
 
 void LayoutToNetlist::warn (const std::string &msg)
 {
-  m_log_entries.push_back (db::LogEntryData (db::Warning, msg));
+  if (m_log_entries.empty () || m_log_entries.back ().severity != db::Warning || m_log_entries.back ().msg != msg) {
+    tl::warn << msg;
+    m_log_entries.push_back (db::LogEntryData (db::Warning, msg));
+  }
 }
 
 void LayoutToNetlist::info (const std::string &msg)
 {
-  m_log_entries.push_back (db::LogEntryData (db::Info, msg));
+  if (m_log_entries.empty () || m_log_entries.back ().severity != db::Info || m_log_entries.back ().msg != msg) {
+    if (tl::verbosity () >= 10) {
+      tl::info << msg;
+    }
+    m_log_entries.push_back (db::LogEntryData (db::Info, msg));
+  }
 }
 
 void LayoutToNetlist::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const

@@ -530,6 +530,11 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "This method has been made parameter-less in version 0.27. Use \\include_floating_subcircuits= and \\join_net_names as substitutes for the arguments of previous versions."
   ) +
+  gsi::method ("check_extraction_errors", &db::LayoutToNetlist::check_extraction_errors,
+    "@brief Raises an exception if extraction errors are present\n"
+    "\n"
+    "This method has been introduced in version 0.28.13."
+  ) +
   gsi::method_ext ("internal_layout", &l2n_internal_layout,
     "@brief Gets the internal layout\n"
     "Usually it should not be required to obtain the internal layout. If you need to do so, make sure not to modify the layout as\n"

@@ -157,6 +157,14 @@ Class<DeviceClassFactoryImpl> decl_dbDeviceClassFactoryBase ("db", "DeviceClassF
 );
 
 Class<db::NetlistDeviceExtractorError> decl_dbNetlistDeviceExtractorError ("db", "NetlistDeviceExtractorError",
+  gsi::method ("is_warning?|is_warning", &db::NetlistDeviceExtractorError::is_warning,
+    "@brief Gets a value indicating whether the error is a warning.\n"
+    "This predicate has been introduced in version 0.28.13."
+  ) +
+  gsi::method ("warning=", &db::NetlistDeviceExtractorError::set_warning, gsi::arg ("flag"),
+    "@brief Sets a value indicating whether the error is a warning.\n"
+    "This predicate has been introduced in version 0.28.13."
+  ) +
   gsi::method ("message", &db::NetlistDeviceExtractorError::message,
     "@brief Gets the message text.\n"
   ) +
@@ -199,8 +207,12 @@ Class<db::NetlistDeviceExtractorError> decl_dbNetlistDeviceExtractorError ("db",
   gsi::method ("category_description=", &db::NetlistDeviceExtractorError::set_category_description, gsi::arg ("description"),
     "@brief Sets the category description.\n"
     "See \\category_name= for details about categories."
+  ) +
+  gsi::method ("to_s", &db::NetlistDeviceExtractorError::to_string,
+    "@brief Gets the string representation of this error or warning.\n"
+    "This method has been introduced in version 0.28.13."
   ),
-  "@brief An error that occurred during device extraction\n"
+  "@brief An error or a warning that occurred during device extraction\n"
   "The device extractor will keep errors that occurred during extraction of the devices. "
   "It does not by using this error class.\n"
   "\n"
@@ -211,7 +223,7 @@ Class<db::NetlistDeviceExtractorError> decl_dbNetlistDeviceExtractorError ("db",
   "For categorization of the errors, a category name and description may be specified. If given, the "
   "errors will be shown in the specified category. The category description is optional.\n"
   "\n"
-  "This class has been introduced in version 0.26."
+  "This class has been introduced in version 0.26. Warning mode has been added in version 0.28.13."
 );
 
 static const std::string &ld_name (const db::NetlistDeviceExtractorLayerDefinition *ld)
@@ -468,6 +480,36 @@ Class<GenericDeviceExtractor> decl_GenericDeviceExtractor (decl_dbNetlistDeviceE
   gsi::method ("error", (void (GenericDeviceExtractor::*) (const std::string &, const std::string &, const std::string &, const db::Polygon &)) &GenericDeviceExtractor::error,
     gsi::arg ("category_name"), gsi::arg ("category_description"), gsi::arg ("message"), gsi::arg ("geometry"),
    "@brief Issues an error with the given category name and description, message and database-unit polygon geometry\n"
+  ) +
+  gsi::method ("warn", (void (GenericDeviceExtractor::*) (const std::string &)) &GenericDeviceExtractor::warn,
+    gsi::arg ("message"),
+    "@brief Issues a warning with the given message\n"
+    "Warnings have been introduced in version 0.28.13."
+  ) +
+  gsi::method ("warn", (void (GenericDeviceExtractor::*) (const std::string &, const db::DPolygon &)) &GenericDeviceExtractor::warn,
+    gsi::arg ("message"), gsi::arg ("geometry"),
+    "@brief Issues a warning with the given message and micrometer-units polygon geometry\n"
+    "Warnings have been introduced in version 0.28.13."
+  ) +
+  gsi::method ("warn", (void (GenericDeviceExtractor::*) (const std::string &, const db::Polygon &)) &GenericDeviceExtractor::warn,
+    gsi::arg ("message"), gsi::arg ("geometry"),
+    "@brief Issues a warning with the given message and database-unit polygon geometry\n"
+    "Warnings have been introduced in version 0.28.13."
+  ) +
+  gsi::method ("warn", (void (GenericDeviceExtractor::*) (const std::string &, const std::string &, const std::string &)) &GenericDeviceExtractor::warn,
+    gsi::arg ("category_name"), gsi::arg ("category_description"), gsi::arg ("message"),
+    "@brief Issues a warning with the given category name and description, message\n"
+    "Warnings have been introduced in version 0.28.13."
+  ) +
+  gsi::method ("warn", (void (GenericDeviceExtractor::*) (const std::string &, const std::string &, const std::string &, const db::DPolygon &)) &GenericDeviceExtractor::warn,
+    gsi::arg ("category_name"), gsi::arg ("category_description"), gsi::arg ("message"), gsi::arg ("geometry"),
+    "@brief Issues a warning with the given category name and description, message and micrometer-units polygon geometry\n"
+    "Warnings have been introduced in version 0.28.13."
+  ) +
+  gsi::method ("warn", (void (GenericDeviceExtractor::*) (const std::string &, const std::string &, const std::string &, const db::Polygon &)) &GenericDeviceExtractor::warn,
+    gsi::arg ("category_name"), gsi::arg ("category_description"), gsi::arg ("message"), gsi::arg ("geometry"),
+    "@brief Issues a warning with the given category name and description, message and database-unit polygon geometry\n"
+    "Warnings have been introduced in version 0.28.13."
   ),
   "@brief The basic class for implementing custom device extractors.\n"
   "\n"

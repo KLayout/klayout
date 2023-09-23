@@ -36,12 +36,13 @@ namespace db
 //  NetlistDeviceExtractorError implementation
 
 NetlistDeviceExtractorError::NetlistDeviceExtractorError ()
+  : m_warning (false)
 {
   //  .. nothing yet ..
 }
 
 NetlistDeviceExtractorError::NetlistDeviceExtractorError (const std::string &cell_name, const std::string &msg)
-  : m_cell_name (cell_name), m_message (msg)
+  : m_warning (false), m_cell_name (cell_name), m_message (msg)
 {
   //  .. nothing yet ..
 }
@@ -623,6 +624,52 @@ void NetlistDeviceExtractor::error (const std::string &category_name, const std:
 
   if (tl::verbosity () >= 20) {
     tl::error << m_errors.back ().to_string ();
+  }
+}
+
+void NetlistDeviceExtractor::warn (const std::string &msg)
+{
+  m_errors.push_back (db::NetlistDeviceExtractorError (cell_name (), msg));
+  m_errors.back ().set_warning (true);
+
+  if (tl::verbosity () >= 20) {
+    tl::warn << m_errors.back ().to_string ();
+  }
+}
+
+void NetlistDeviceExtractor::warn (const std::string &msg, const db::DPolygon &poly)
+{
+  m_errors.push_back (db::NetlistDeviceExtractorError (cell_name (), msg));
+  m_errors.back ().set_geometry (poly);
+  m_errors.back ().set_warning (true);
+
+  if (tl::verbosity () >= 20) {
+    tl::warn << m_errors.back ().to_string ();
+  }
+}
+
+void NetlistDeviceExtractor::warn (const std::string &category_name, const std::string &category_description, const std::string &msg)
+{
+  m_errors.push_back (db::NetlistDeviceExtractorError (cell_name (), msg));
+  m_errors.back ().set_category_name (category_name);
+  m_errors.back ().set_category_description (category_description);
+  m_errors.back ().set_warning (true);
+
+  if (tl::verbosity () >= 20) {
+    tl::warn << m_errors.back ().to_string ();
+  }
+}
+
+void NetlistDeviceExtractor::warn (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::DPolygon &poly)
+{
+  m_errors.push_back (db::NetlistDeviceExtractorError (cell_name (), msg));
+  m_errors.back ().set_category_name (category_name);
+  m_errors.back ().set_category_description (category_description);
+  m_errors.back ().set_geometry (poly);
+  m_errors.back ().set_warning (true);
+
+  if (tl::verbosity () >= 20) {
+    tl::warn << m_errors.back ().to_string ();
   }
 }
 

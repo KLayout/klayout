@@ -201,6 +201,22 @@ public:
   }
 
   /**
+   *  @brief Iterator for the log entries (begin)
+   */
+  log_entries_type::const_iterator begin_log_entries () const
+  {
+    return m_log_entries.begin ();
+  }
+
+  /**
+   *  @brief Iterator for the log entries (end)
+   */
+  log_entries_type::const_iterator end_log_entries () const
+  {
+    return m_log_entries.end ();
+  }
+
+  /**
    *  @brief Clears the log entries
    */
   void clear_log_entries ()
@@ -213,7 +229,9 @@ public:
    */
   void log_entry (const db::LogEntryData &log_entry)
   {
-    m_log_entries.push_back (log_entry);
+    if (m_log_entries.empty () || m_log_entries.back () != log_entry) {
+      m_log_entries.push_back (log_entry);
+    }
   }
 
   /**
@@ -406,7 +424,8 @@ public:
    *  boolean operations for deriving layers. Other operations are applicable as long as they are
    *  capable of delivering hierarchical layers.
    *
-   *  If errors occur, the device extractor will contain theses errors.
+   *  If errors occur, the device extractor will contain theses errors. They are also transferred
+   *  to the LayoutToNetlist object.
    */
   void extract_devices (db::NetlistDeviceExtractor &extractor, const std::map<std::string, db::ShapeCollection *> &layers);
 
@@ -584,6 +603,9 @@ public:
    */
   void extract_netlist ();
 
+  /**
+   *  @brief Throws an exception if the extractor contains errors
+   */
   void check_extraction_errors ();
 
   /**
@@ -997,9 +1019,6 @@ private:
   void join_nets_from_pattern (db::Circuit &c, const tl::GlobPattern &p);
   void join_nets_from_pattern (db::Circuit &c, const std::set<std::string> &p);
   void check_must_connect (const db::Circuit &c, const db::Net &a, const db::Net &b);
-  void error (const std::string &msg);
-  void warn (const std::string &msg);
-  void info (const std::string &msg);
 
   //  implementation of NetlistManipulationCallbacks
   virtual size_t link_net_to_parent_circuit (const Net *subcircuit_net, Circuit *parent_circuit, const DCplxTrans &trans);

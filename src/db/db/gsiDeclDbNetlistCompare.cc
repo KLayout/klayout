@@ -657,21 +657,7 @@ Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
   "This class has been introduced in version 0.26."
 );
 
-gsi::EnumIn<GenericNetlistCompareLogger, db::Severity> decl_CompareLoggerSeverity ("db", "Severity",
-  gsi::enum_const ("NoSeverity", db::NoSeverity,
-    "@brief Unspecific severity\n"
-  ) +
-  gsi::enum_const ("Info", db::Info,
-    "@brief Information only\n"
-  ) +
-  gsi::enum_const ("Warning", db::Warning,
-    "@brief A warning\n"
-  ) +
-  gsi::enum_const ("Error", db::Error,
-    "@brief An error\n"
-  ),
-  "@brief This class represents the log severity level for \\GenericNetlistCompareLogger#log_entry.\n"
-  "This enum has been introduced in version 0.28."
-);
+extern gsi::Enum<db::Severity> decl_Severity;
+gsi::ClassExt<GenericNetlistCompareLogger> inject_SeverityEnum_into_GenericNetlistCompareLogger (decl_Severity.defs ());
 
 }

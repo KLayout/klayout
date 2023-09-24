@@ -203,7 +203,8 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::NetlistCro
     o << endl;
 
     for (auto l = xref->other_log_entries ().begin (); l != xref->other_log_entries ().end (); ++l) {
-      TokenizedOutput (o, Keys::log_entry_key, true) << this->severity_to_s (l->severity) << this->message_to_s (l->msg);
+      TokenizedOutput to (o, Keys::log_entry_key, true);
+      this->write_log_entry (to, *l);
       o << endl;
     }
 
@@ -224,7 +225,8 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::NetlistCro
       o << endl;
 
       for (auto l = pcd->log_entries.begin (); l != pcd->log_entries.end (); ++l) {
-        TokenizedOutput (o, Keys::log_entry_key, true) << this->severity_to_s (l->severity) << this->message_to_s (l->msg);
+        TokenizedOutput to (o, Keys::log_entry_key, true);
+        this->write_log_entry (to, *l);
         o << endl;
       }
 

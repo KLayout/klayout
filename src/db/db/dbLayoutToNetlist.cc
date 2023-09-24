@@ -242,13 +242,11 @@ void LayoutToNetlist::extract_devices (db::NetlistDeviceExtractor &extractor, co
 
   ensure_netlist ();
 
-  extractor.clear_errors ();
+  extractor.clear_log_entries ();
   extractor.extract (dss (), m_layout_index, layers, *mp_netlist, m_net_clusters, m_device_scaling);
 
   //  transfer errors to log entries
-  for (auto e = extractor.begin_errors (); e != extractor.end_errors (); ++e) {
-    m_log_entries.push_back (db::LogEntryData (e->is_warning () ? db::Warning : db::Error, e->to_string ()));
-  }
+  m_log_entries.insert (m_log_entries.end (), extractor.begin_log_entries (), extractor.end_log_entries ());
 }
 
 void LayoutToNetlist::reset_extracted ()
@@ -390,14 +388,14 @@ void LayoutToNetlist::check_extraction_errors ()
   int max_errors = 10;
   std::string errors;
   for (auto l = m_log_entries.begin (); l != m_log_entries.end (); ++l) {
-    if (l->severity >= db::Error) {
+    if (l->severity () >= db::Error) {
       errors += "\n";
       if (++num_errors >= max_errors) {
         errors += "...\n";
         errors += tl::sprintf (tl::to_string (tr ("(list shortened after %d errrors, see log for all errors)")), max_errors);
         break;
       } else {
-        errors += l->msg;
+        errors += l->to_string ();
       }
     }
   }
@@ -467,16 +465,24 @@ void LayoutToNetlist::check_must_connect (const db::Circuit &c, const db::Net &a
 
   if (c.begin_refs () != c.end_refs ()) {
     if (a.begin_pins () == a.end_pins ()) {
-      error (tl::sprintf (tl::to_string (tr ("Must-connect net %s from circuit %s is not connected to outside")), a.expanded_name (), c.name ()));
+      db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s is not connected to outside")), a.expanded_name ()));
+      error.set_cell_name (c.name ());
+      log_entry (error);
     }
     if (b.begin_pins () == b.end_pins ()) {
-      error (tl::sprintf (tl::to_string (tr ("Must-connect net %s from circuit %s is not connected to outside")), a.expanded_name (), c.name ()));
+      db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s is not connected to outside")), a.expanded_name ()));
+      error.set_cell_name (c.name ());
+      log_entry (error);
     }
   } else {
     if (a.expanded_name () == b.expanded_name ()) {
-      warn (tl::sprintf (tl::to_string (tr ("Must-connect nets %s from circuit %s must be connected further up in the hierarchy. This is an error at the chip top level.")), a.expanded_name (), c.name ()));
+      db::LogEntryData warn (db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s must be connected further up in the hierarchy. This is an error at the chip top level.")), a.expanded_name ()));
+      warn.set_cell_name (c.name ());
+      log_entry (warn);
     } else {
-      warn (tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s from circuit %s must be connected further up in the hierarchy. This is an error at the chip top level.")), a.expanded_name (), b.expanded_name (), c.name ()));
+      db::LogEntryData warn (db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s must be connected further up in the hierarchy. This is an error at the chip top level.")), a.expanded_name (), b.expanded_name ()));
+      warn.set_cell_name (c.name ());
+      log_entry (warn);
     }
   }
 
@@ -487,16 +493,24 @@ void LayoutToNetlist::check_must_connect (const db::Circuit &c, const db::Net &a
       const db::Net *net_a = sc.net_for_pin (a.begin_pins ()->pin_id ());
       const db::Net *net_b = sc.net_for_pin (b.begin_pins ()->pin_id ());
       if (net_a == 0) {
-        error (tl::sprintf (tl::to_string (tr ("Must-connect net %s from circuit %s is not connected at all %s")), a.expanded_name (), c.name (), subcircuit_to_string (sc)));
+        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s is not connected at all %s")), a.expanded_name (), subcircuit_to_string (sc)));
+        error.set_cell_name (c.name ());
+        log_entry (error);
       }
       if (net_b == 0) {
-        error (tl::sprintf (tl::to_string (tr ("Must-connect net %s from circuit %s is not connected at all %s")), b.expanded_name (), c.name (), subcircuit_to_string (sc)));
+        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s is not connected at all %s")), b.expanded_name (), subcircuit_to_string (sc)));
+        error.set_cell_name (c.name ());
+        log_entry (error);
       }
       if (net_a && net_b && net_a != net_b) {
         if (net_a->expanded_name () == net_b->expanded_name ()) {
-          error (tl::sprintf (tl::to_string (tr ("Must-connect nets %s from circuit %s are not connected %s")), a.expanded_name (), c.name (), subcircuit_to_string (sc)));
+          db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect nets %s are not connected %s")), a.expanded_name (), subcircuit_to_string (sc)));
+          error.set_cell_name (c.name ());
+          log_entry (error);
         } else {
-          error (tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s from circuit %s are not connected %s")), a.expanded_name (), b.expanded_name (), c.name (), subcircuit_to_string (sc)));
+          db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s are not connected %s")), a.expanded_name (), b.expanded_name (), subcircuit_to_string (sc)));
+          error.set_cell_name (c.name ());
+          log_entry (error);
         }
       }
     }
@@ -538,32 +552,6 @@ void LayoutToNetlist::do_join_nets ()
         join_nets_from_pattern (*c, jn->second);
       }
     }
-  }
-}
-
-void LayoutToNetlist::error (const std::string &msg)
-{
-  if (m_log_entries.empty () || m_log_entries.back ().severity != db::Error || m_log_entries.back ().msg != msg) {
-    tl::error << msg;
-    m_log_entries.push_back (db::LogEntryData (db::Error, msg));
-  }
-}
-
-void LayoutToNetlist::warn (const std::string &msg)
-{
-  if (m_log_entries.empty () || m_log_entries.back ().severity != db::Warning || m_log_entries.back ().msg != msg) {
-    tl::warn << msg;
-    m_log_entries.push_back (db::LogEntryData (db::Warning, msg));
-  }
-}
-
-void LayoutToNetlist::info (const std::string &msg)
-{
-  if (m_log_entries.empty () || m_log_entries.back ().severity != db::Info || m_log_entries.back ().msg != msg) {
-    if (tl::verbosity () >= 10) {
-      tl::info << msg;
-    }
-    m_log_entries.push_back (db::LogEntryData (db::Info, msg));
   }
 }
 

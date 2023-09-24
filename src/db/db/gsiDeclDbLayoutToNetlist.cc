@@ -712,7 +712,10 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "@brief Reads the extracted netlist from the file.\n"
     "This method employs the native format of KLayout.\n"
   ) +
-  // @@@ Add API for logs
+  gsi::iterator ("each_log_entry|#each_error", &db::LayoutToNetlist::begin_log_entries, &db::LayoutToNetlist::end_log_entries,
+    "@brief Iterates over all log entries collected during device and netlist extraction.\n"
+    "This method has been introduced in version 0.28.13."
+  ) +
   gsi::method_ext ("antenna_check", &antenna_check, gsi::arg ("gate"), gsi::arg ("metal"), gsi::arg ("ratio"), gsi::arg ("diodes", std::vector<tl::Variant> (), "[]"), gsi::arg ("texts", (db::Texts *) 0, "nil"),
    "@brief Runs an antenna check on the extracted clusters\n"
    "\n"

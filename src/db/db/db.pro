@@ -123,6 +123,7 @@ SOURCES = \
   gsiDeclDbLayoutUtils.cc \
   gsiDeclDbLayoutQuery.cc \
   gsiDeclDbLibrary.cc \
+  gsiDeclDbLog.cc \
   gsiDeclDbManager.cc \
   gsiDeclDbMatrix.cc \
   gsiDeclDbMetaInfo.cc \

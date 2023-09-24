@@ -155,6 +155,8 @@ void LayoutVsSchematicStandardReader::read_log_entry (db::NetlistCrossReference 
   }
   br.done ();
 
+  //  NOTE: this API does not use the full feature set of db::LogEntryData, so
+  //  we do not use this object here.
   xref->log_entry (severity, msg);
 }
 

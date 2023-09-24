@@ -87,14 +87,14 @@ NetlistLogModel::NetlistLogModel (QWidget *parent, const db::NetlistCrossReferen
   mp_lvsdb_messages = cross_ref ? &cross_ref->other_log_entries () : 0;
   if (mp_lvsdb_messages) {
     for (auto l = mp_lvsdb_messages->begin (); l != mp_lvsdb_messages->end (); ++l) {
-      m_max_severity = std::max (m_max_severity, l->severity);
+      m_max_severity = std::max (m_max_severity, l->severity ());
     }
   }
 
   mp_l2n_messages = l2n ? &l2n->log_entries () : 0;
   if (mp_l2n_messages) {
     for (auto l = mp_l2n_messages->begin (); l != mp_l2n_messages->end (); ++l) {
-      m_max_severity = std::max (m_max_severity, l->severity);
+      m_max_severity = std::max (m_max_severity, l->severity ());
     }
   }
 
@@ -104,7 +104,7 @@ NetlistLogModel::NetlistLogModel (QWidget *parent, const db::NetlistCrossReferen
     const db::NetlistCrossReference::PerCircuitData *pcd = cross_ref->per_circuit_data_for (*i);
     if (pcd && (i->first || i->second) && ! pcd->log_entries.empty ()) {
       for (auto l = pcd->log_entries.begin (); l != pcd->log_entries.end (); ++l) {
-        m_max_severity = std::max (m_max_severity, l->severity);
+        m_max_severity = std::max (m_max_severity, l->severity ());
       }
       m_circuits.push_back (std::make_pair (*i, &pcd->log_entries));
     }
@@ -201,13 +201,13 @@ NetlistLogModel::data (const QModelIndex &index, int role) const
   if (role == Qt::DecorationRole) {
 
     if (le) {
-      return icon_for_severity (le->severity);
+      return icon_for_severity (le->severity ());
     }
 
   } else if (role == Qt::DisplayRole) {
 
     if (le) {
-      return QVariant (tl::to_qstring (le->msg));
+      return QVariant (tl::to_qstring (le->to_string ()));
     } else if (! index.parent ().isValid () && index.row () >= m_global_entries && index.row () < int (m_circuits.size ()) + m_global_entries) {
       const std::pair<const db::Circuit *, const db::Circuit *> &cp = m_circuits [index.row () - m_global_entries].first;
       if (! cp.first) {
@@ -225,7 +225,7 @@ NetlistLogModel::data (const QModelIndex &index, int role) const
 
     if (le) {
       QFont f;
-      f.setBold (le->severity == db::Error);
+      f.setBold (le->severity () == db::Error);
       return QVariant (f);
     } else if (! index.parent ().isValid () && index.row () >= m_global_entries && index.row () < int (m_circuits.size ()) + m_global_entries) {
       QFont f;
@@ -237,9 +237,9 @@ NetlistLogModel::data (const QModelIndex &index, int role) const
 
     if (! le) {
       //  ignore
-    } else if (le->severity == db::Error) {
+    } else if (le->severity () == db::Error) {
       return QColor (255, 0, 0);
-    } else if (le->severity == db::Warning) {
+    } else if (le->severity () == db::Warning) {
       return QColor (0, 0, 255);
     }
 

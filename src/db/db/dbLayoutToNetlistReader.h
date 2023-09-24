@@ -163,6 +163,9 @@ private:
   void read_geometries (db::NetlistObject *obj, Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<NetShape> &lc, db::Cell &cell);
   db::Point read_point ();
   void read_message_entry (db::LogEntryData &data);
+  bool read_message_cell (std::string &cell_name);
+  bool read_message_geometry (db::DPolygon &polygon);
+  bool read_message_cat (std::string &category_name, std::string &category_description);
 };
 
 }

@@ -24,6 +24,7 @@
 #define _HDR_dbLog
 
 #include "dbCommon.h"
+#include "dbPolygon.h"
 
 #include <string>
 
@@ -41,16 +42,136 @@ enum Severity {
 };
 
 /**
- *  @brief A class representing one log entry
+ *  @brief A generic log entry
+ *
+ *  This object can be used for collecting errors or warnings.
+ *  It features a message and a severity level and optionally
+ *  a polygon (for geometry marker), a category name and a category description.
  */
-struct LogEntryData
+class DB_PUBLIC LogEntryData
 {
-  LogEntryData (Severity s, const std::string &m) : severity (s), msg (m) { }
-  LogEntryData () : severity (NoSeverity) { }
+public:
+  typedef size_t string_id_type;
 
-  Severity severity;
-  std::string msg;
+  /**
+   *  @brief Creates a log entry
+   */
+  LogEntryData ();
+
+  /**
+   *  @brief Creates a log entry with the severity and a message
+   */
+  LogEntryData (Severity s, const std::string &msg);
+
+  /**
+   *  @brief Creates an error with the severity, a cell name and a message
+   */
+  LogEntryData (Severity s, const std::string &cell_name, const std::string &msg);
+
+  /**
+   *  @brief Equality
+   */
+  bool operator== (const LogEntryData &other) const;
+
+  /**
+   *  @brief Inequality
+   */
+  bool operator!= (const LogEntryData &other) const
+  {
+    return ! operator== (other);
+  }
+
+  /**
+   *  @brief Sets the severity
+   */
+  void set_severity (Severity severity)
+  {
+    m_severity = severity;
+  }
+
+  /**
+   *  @brief Gets the severity
+   */
+  Severity severity () const
+  {
+    return m_severity;
+  }
+
+  /**
+   *  @brief The category name of the error
+   *  Specifying the category name is optional. If a category is given, it will be used for
+   *  the report.
+   */
+  const std::string &category_name () const;
+
+  /**
+   *  @brief Sets the category name
+   */
+  void set_category_name (const std::string &s);
+
+  /**
+   *  @brief The category description of the error
+   *  Specifying the category description is optional. If a category is given, this attribute will
+   *  be used for the category description.
+   */
+  const std::string &category_description () const;
+
+  /**
+   *  @brief Sets the category description
+   */
+  void set_category_description (const std::string &s);
+
+  /**
+   *  @brief Gets the geometry for this error
+   *  Not all errors may specify a geometry. In this case, the polygon is empty.
+   */
+  const db::DPolygon &geometry () const
+  {
+    return m_geometry;
+  }
+
+  /**
+   *  @brief Sets the geometry
+   */
+  void set_geometry (const db::DPolygon &g)
+  {
+    m_geometry = g;
+  }
+
+  /**
+   *  @brief Gets the message for this error
+   */
+  const std::string &message () const;
+
+  /**
+   *  @brief Sets the message
+   */
+  void set_message (const std::string &n);
+
+  /**
+   *  @brief Gets the cell name the error occurred in
+   */
+  const std::string &cell_name () const;
+
+  /**
+   *  @brief Sets the cell name
+   */
+  void set_cell_name (const std::string &n);
+
+  /**
+   *  @brief Formats this message for printing
+   */
+  std::string to_string () const;
+
+private:
+  Severity m_severity;
+  string_id_type m_cell_name;
+  string_id_type m_message;
+  db::DPolygon m_geometry;
+  string_id_type m_category_name, m_category_description;
 };
+
+
 
 }
 

@@ -213,22 +213,78 @@ bool LayoutToNetlistStandardReader::read_severity (db::Severity &severity)
   }
 }
 
+bool LayoutToNetlistStandardReader::read_message_cell (std::string &cell_name)
+{
+  if (test (skeys::cell_key) || test (lkeys::cell_key)) {
+    Brace br (this);
+    read_word_or_quoted (cell_name);
+    br.done ();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool LayoutToNetlistStandardReader::read_message_geometry (db::DPolygon &polygon)
+{
+  if (test (skeys::polygon_key) || test (lkeys::polygon_key)) {
+    Brace br (this);
+    std::string s;
+    read_word_or_quoted (s);
+    tl::Extractor ex (s.c_str ());
+    ex.read (polygon);
+    br.done ();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool LayoutToNetlistStandardReader::read_message_cat (std::string &category_name, std::string &category_description)
+{
+  if (test (skeys::cat_key) || test (lkeys::cat_key)) {
+    Brace br (this);
+    read_word_or_quoted (category_name);
+    if (br) {
+      read_word_or_quoted (category_description);
+    }
+    br.done ();
+    return true;
+  } else {
+    return false;
+  }
+}
+
 void LayoutToNetlistStandardReader::read_message_entry (db::LogEntryData &data)
 {
-  data.severity = db::NoSeverity;
-  data.msg.clear ();
+  Severity severity (db::NoSeverity);
+  std::string msg, cell_name, category_name, category_description;
+  db::DPolygon geometry;
 
   Brace br (this);
   while (br) {
-    if (read_severity (data.severity)) {
+    if (read_severity (severity)) {
       //  continue
-    } else if (read_message (data.msg)) {
+    } else if (read_message (msg)) {
+      //  continue
+    } else if (read_message_cell (cell_name)) {
+      //  continue
+    } else if (read_message_cat (category_name, category_description)) {
+      //  continue
+    } else if (read_message_geometry (geometry)) {
       //  continue
     } else {
       skip_element ();
     }
   }
   br.done ();
+
+  data.set_severity (severity);
+  data.set_message (msg);
+  data.set_cell_name (cell_name);
+  data.set_category_description (category_description);
+  data.set_category_name (category_name);
+  data.set_geometry (geometry);
 }
 
 void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)

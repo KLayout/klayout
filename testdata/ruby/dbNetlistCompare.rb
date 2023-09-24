@@ -181,6 +181,12 @@ class NetlistCompare_TestClass < TestBase
 
   def test_1
 
+    # severity enums
+    assert_equal(NetlistCompareTestLogger::Info.to_s, "Info")
+    assert_equal(NetlistCompareTestLogger::Error.to_s, "Error")
+    assert_equal(NetlistCompareTestLogger::Warning.to_s, "Warning")
+    assert_equal(NetlistCompareTestLogger::NoSeverity.to_s, "NoSeverity")
+
     nl1 = RBA::Netlist::new
     nl2 = RBA::Netlist::new
     dc = RBA::DeviceClass::new

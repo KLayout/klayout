@@ -163,7 +163,7 @@ LogEntryData::to_string () const
   std::string res;
 
   if (m_category_name != 0) {
-    if (m_category_description != 0) {
+    if (m_category_description == 0) {
       res += "[" + category_name () + "] ";
     } else {
       res += "[" + category_description () + "] ";

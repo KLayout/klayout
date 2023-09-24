@@ -81,8 +81,8 @@ const std::string var_sep (" \u21D4 ");
 NetlistLogModel::NetlistLogModel (QWidget *parent, const db::NetlistCrossReference *cross_ref, const db::LayoutToNetlist *l2n)
   : QAbstractItemModel (parent), m_max_severity (db::NoSeverity)
 {
-  tl_assert (cross_ref->netlist_a () != 0);
-  tl_assert (cross_ref->netlist_b () != 0);
+  tl_assert (! cross_ref || cross_ref->netlist_a () != 0);
+  tl_assert (! cross_ref || cross_ref->netlist_b () != 0);
 
   mp_lvsdb_messages = cross_ref ? &cross_ref->other_log_entries () : 0;
   if (mp_lvsdb_messages) {
@@ -100,13 +100,15 @@ NetlistLogModel::NetlistLogModel (QWidget *parent, const db::NetlistCrossReferen
 
   m_global_entries = int ((mp_lvsdb_messages ? mp_lvsdb_messages->size () : 0) + (mp_l2n_messages ? mp_l2n_messages->size () : 0));
 
-  for (auto i = cross_ref->begin_circuits (); i != cross_ref->end_circuits (); ++i) {
-    const db::NetlistCrossReference::PerCircuitData *pcd = cross_ref->per_circuit_data_for (*i);
-    if (pcd && (i->first || i->second) && ! pcd->log_entries.empty ()) {
-      for (auto l = pcd->log_entries.begin (); l != pcd->log_entries.end (); ++l) {
-        m_max_severity = std::max (m_max_severity, l->severity ());
+  if (cross_ref) {
+    for (auto i = cross_ref->begin_circuits (); i != cross_ref->end_circuits (); ++i) {
+      const db::NetlistCrossReference::PerCircuitData *pcd = cross_ref->per_circuit_data_for (*i);
+      if (pcd && (i->first || i->second) && ! pcd->log_entries.empty ()) {
+        for (auto l = pcd->log_entries.begin (); l != pcd->log_entries.end (); ++l) {
+          m_max_severity = std::max (m_max_severity, l->severity ());
+        }
+        m_circuits.push_back (std::make_pair (*i, &pcd->log_entries));
       }
-      m_circuits.push_back (std::make_pair (*i, &pcd->log_entries));
     }
   }
 

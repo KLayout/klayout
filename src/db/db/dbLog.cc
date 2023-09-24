@@ -170,11 +170,13 @@ LogEntryData::to_string () const
     }
   }
 
-  res += message ();
-
   if (m_cell_name != 0) {
-    res += tl::to_string (tr (", in cell: ")) + cell_name ();
+    res += tl::to_string (tr ("In cell "));
+    res += cell_name ();
+    res += ": ";
   }
+
+  res += message ();
 
   if (! m_geometry.box ().empty ()) {
     res += tl::to_string (tr (", shape: ")) + m_geometry.to_string ();

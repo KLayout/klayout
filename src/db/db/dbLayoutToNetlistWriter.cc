@@ -205,7 +205,7 @@ template <class Keys>
 void std_writer_impl<Keys>::write_log_entry (TokenizedOutput &stream, const LogEntryData &le)
 {
   stream << severity_to_s (le.severity ());
-  stream << message_to_s (le.to_string ());
+  stream << message_to_s (le.message ());
 
   if (! le.cell_name ().empty ()) {
     TokenizedOutput (stream, Keys::cell_key, true) << tl::to_word_or_quoted_string (le.cell_name ());
@@ -220,7 +220,7 @@ void std_writer_impl<Keys>::write_log_entry (TokenizedOutput &stream, const LogE
   }
 
   if (le.geometry () != db::DPolygon ()) {
-    TokenizedOutput o (stream, Keys::polygon_key);
+    TokenizedOutput o (stream, Keys::polygon_key, true);
     o << tl::to_word_or_quoted_string (le.geometry ().to_string ());
   }
 }

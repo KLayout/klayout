@@ -476,11 +476,11 @@ void LayoutToNetlist::check_must_connect (const db::Circuit &c, const db::Net &a
     }
   } else {
     if (a.expanded_name () == b.expanded_name ()) {
-      db::LogEntryData warn (db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s must be connected further up in the hierarchy. This is an error at the chip top level.")), a.expanded_name ()));
+      db::LogEntryData warn (db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s must be connected further up in the hierarchy - this is an error at the chip top level")), a.expanded_name ()));
       warn.set_cell_name (c.name ());
       log_entry (warn);
     } else {
-      db::LogEntryData warn (db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s must be connected further up in the hierarchy. This is an error at the chip top level.")), a.expanded_name (), b.expanded_name ()));
+      db::LogEntryData warn (db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s must be connected further up in the hierarchy - this is an error at the chip top level")), a.expanded_name (), b.expanded_name ()));
       warn.set_cell_name (c.name ());
       log_entry (warn);
     }

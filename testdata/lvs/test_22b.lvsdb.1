@@ -71,7 +71,7 @@ layout(
  global(l6 vss)
 
  # Log entries
- message(warning description('Must-connect nets vdd from circuit SP6TArray_2X4 must be connected further up in the hierarchy. This is an error at the chip top level.'))
+ message(warning description('Must-connect nets vdd must be connected further up in the hierarchy - this is an error at the chip top level') cell(SP6TArray_2X4))
 
  # Device class section
  class(active_res RES)

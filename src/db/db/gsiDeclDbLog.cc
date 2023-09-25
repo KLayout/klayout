@@ -46,10 +46,10 @@ Class<db::LogEntryData> decl_dbNetlistDeviceExtractorError ("db", "LogEntryData"
   ) +
   gsi::method ("cell_name=", &db::LogEntryData::set_cell_name, gsi::arg ("cell_name"),
     "@brief Sets the cell name.\n"
-    "The cell name is the name of the layout cell which was treated. This is "
-    "also the name of the circuit the device should have appeared in (it may be dropped because of this error). "
-    "If netlist hierarchy manipulation happens however, the circuit may not exist "
-    "any longer or may be renamed."
+    "The cell (or circuit) name specifies the cell or circuit the "
+    "log entry is related to. If the log entry is an error or "
+    "warning generated during device extraction, the cell name is "
+    "the circuit the device should have appeared in."
   ) +
   gsi::method ("geometry", &db::LogEntryData::geometry,
     "@brief Gets the geometry.\n"
@@ -57,7 +57,7 @@ Class<db::LogEntryData> decl_dbNetlistDeviceExtractorError ("db", "LogEntryData"
   ) +
   gsi::method ("geometry=", &db::LogEntryData::set_geometry, gsi::arg ("polygon"),
     "@brief Sets the geometry.\n"
-    "The geometry is optional. If given, a marker will be shown when selecting this error."
+    "The geometry is optional. If given, a marker may be shown when selecting this error."
   ) +
   gsi::method ("category_name", &db::LogEntryData::category_name,
     "@brief Gets the category name.\n"
@@ -67,7 +67,7 @@ Class<db::LogEntryData> decl_dbNetlistDeviceExtractorError ("db", "LogEntryData"
     "@brief Sets the category name.\n"
     "The category name is optional. If given, it specifies a formal category name. Errors with the same "
     "category name are shown in that category. If in addition a category description is specified "
-    "(see \\category_description), this description will be displayed as the title of."
+    "(see \\category_description), this description will be displayed as the title."
   ) +
   gsi::method ("category_description", &db::LogEntryData::category_description,
     "@brief Gets the category description.\n"
@@ -91,7 +91,7 @@ Class<db::LogEntryData> decl_dbNetlistDeviceExtractorError ("db", "LogEntryData"
   "for indicating some location or error marker."
   "\n"
   "The original class used to be \"NetlistDeviceExtractorError\" which had been introduced in version 0.26. "
-  "It was generalized and renamed in version 0.28.13 as it was basically not useful as a seperate class."
+  "It was generalized and renamed in version 0.28.13 as it was basically not useful as a separate class."
 );
 
 gsi::Enum<db::Severity> decl_Severity ("db", "Severity",

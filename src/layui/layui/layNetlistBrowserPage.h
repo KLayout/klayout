@@ -211,6 +211,7 @@ private slots:
   void nl_selection_changed ();
   void sch_selection_changed ();
   void xref_selection_changed ();
+  void log_selection_changed ();
   void browse_color_for_net ();
   void select_color_for_net ();
 

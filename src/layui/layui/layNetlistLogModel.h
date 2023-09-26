@@ -52,6 +52,8 @@ public:
   virtual QVariant data (const QModelIndex &index, int role) const;
   virtual QVariant headerData (int section, Qt::Orientation orientation, int role) const;
 
+  const db::LogEntryData *log_entry (const QModelIndex &index) const;
+
   static QIcon icon_for_severity (db::Severity severity);
 
   db::Severity max_severity () const

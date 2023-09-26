@@ -182,10 +182,11 @@ NetlistLogModel::icon_for_severity (db::Severity severity)
   }
 }
 
-QVariant
-NetlistLogModel::data (const QModelIndex &index, int role) const
+const db::LogEntryData *
+NetlistLogModel::log_entry (const QModelIndex &index) const
 {
   const db::LogEntryData *le = 0;
+
   if (index.parent ().isValid ()) {
     const circuit_entry *ce = (const circuit_entry *) index.internalPointer ();
     if (ce) {
@@ -199,6 +200,14 @@ NetlistLogModel::data (const QModelIndex &index, int role) const
       le = (mp_lvsdb_messages->begin () + (index.row () - n_l2n)).operator-> ();
     }
   }
+
+  return le;
+}
+
+QVariant
+NetlistLogModel::data (const QModelIndex &index, int role) const
+{
+  const db::LogEntryData *le = log_entry (index);
 
   if (role == Qt::DecorationRole) {
 

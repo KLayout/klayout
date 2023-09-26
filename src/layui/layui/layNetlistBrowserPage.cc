@@ -40,6 +40,7 @@
 #include "dbCellMapping.h"
 #include "dbLayerMapping.h"
 #include "dbCell.h"
+#include "dbLog.h"
 
 #include <QUrl>
 #include <QPainter>
@@ -793,6 +794,29 @@ NetlistBrowserPage::navigate_to (const QModelIndex &index, bool fwd)
 }
 
 void
+NetlistBrowserPage::log_selection_changed ()
+{
+  clear_highlights ();
+
+  NetlistLogModel *model = dynamic_cast<NetlistLogModel *> (log_view->model ());
+  tl_assert (model != 0);
+
+  QModelIndexList selection = log_view->selectionModel ()->selectedIndexes ();
+  for (QModelIndexList::const_iterator i = selection.begin (); i != selection.end (); ++i) {
+    if (i->column () == 0) {
+      const db::LogEntryData *le = model->log_entry (*i);
+      if (le && le->geometry () != db::DPolygon ()) {
+
+        // @@@ TODO: add highlight for error here.
+
+      }
+    }
+  }
+
+  update_highlights ();
+}
+
+void
 NetlistBrowserPage::add_to_history (const QModelIndex &index, bool fwd)
 {
   if (! fwd) {
@@ -1139,6 +1163,8 @@ NetlistBrowserPage::setup_trees ()
     NetlistLogModel *new_model = new NetlistLogModel (log_view, lvsdb->cross_ref (), l2ndb);
     delete log_view->model ();
     log_view->setModel (new_model);
+
+    connect (log_view->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (log_selection_changed ()));
 
     log_tab_icon = NetlistLogModel::icon_for_severity (new_model->max_severity ());
 

@@ -39,7 +39,7 @@ layout(
  global(l10 SUBSTRATE)
 
  # Log entries
- message(warning description('Must-connect nets VDD must be connected further up in the hierarchy - this is an error at the chip top level') cell(RINGO))
+ message(warning description('Must-connect nets VDD must be connected further up in the hierarchy - this is an error at chip top level') cell(RINGO) cat('must-connect'))
 
  # Device class section
  class(PMOS MOS4)

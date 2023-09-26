@@ -89,8 +89,8 @@ TEST(2_NetlistDeviceExtractorErrors)
 
   std::vector<db::LogEntryData> errors (dummy_ex.begin_log_entries (), dummy_ex.end_log_entries ());
   EXPECT_EQ (int (errors.size ()), 4);
-  EXPECT_EQ (error2string (errors [0]), ":::():msg1");
-  EXPECT_EQ (error2string (errors [1]), ":::(0,1;0,3;2,3;2,1):msg2");
+  EXPECT_EQ (error2string (errors [0]), ":device-extract::():msg1");
+  EXPECT_EQ (error2string (errors [1]), ":device-extract::(0,1;0,3;2,3;2,1):msg2");
   EXPECT_EQ (error2string (errors [2]), ":cat1:desc1:():msg1");
   EXPECT_EQ (error2string (errors [3]), ":cat1:desc1:(10,11;10,13;12,13;12,11):msg3");
 }

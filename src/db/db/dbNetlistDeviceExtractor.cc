@@ -571,7 +571,6 @@ void NetlistDeviceExtractor::error (const std::string &category_name, const std:
   m_log_entries.push_back (db::LogEntryData (db::Error, cell_name (), msg));
   m_log_entries.back ().set_category_name (category_name);
   m_log_entries.back ().set_category_description (category_description);
-  m_log_entries.back ().set_category_name ("device-extract");
 
   if (tl::verbosity () >= 20) {
     tl::error << m_log_entries.back ().to_string ();
@@ -584,7 +583,6 @@ void NetlistDeviceExtractor::error (const std::string &category_name, const std:
   m_log_entries.back ().set_category_name (category_name);
   m_log_entries.back ().set_category_description (category_description);
   m_log_entries.back ().set_geometry (poly);
-  m_log_entries.back ().set_category_name ("device-extract");
 
   if (tl::verbosity () >= 20) {
     tl::error << m_log_entries.back ().to_string ();
@@ -617,7 +615,6 @@ void NetlistDeviceExtractor::warn (const std::string &category_name, const std::
   m_log_entries.push_back (db::LogEntryData (db::Warning, cell_name (), msg));
   m_log_entries.back ().set_category_name (category_name);
   m_log_entries.back ().set_category_description (category_description);
-  m_log_entries.back ().set_category_name ("device-extract");
 
   if (tl::verbosity () >= 20) {
     tl::warn << m_log_entries.back ().to_string ();
@@ -630,7 +627,6 @@ void NetlistDeviceExtractor::warn (const std::string &category_name, const std::
   m_log_entries.back ().set_category_name (category_name);
   m_log_entries.back ().set_category_description (category_description);
   m_log_entries.back ().set_geometry (poly);
-  m_log_entries.back ().set_category_name ("device-extract");
 
   if (tl::verbosity () >= 20) {
     tl::warn << m_log_entries.back ().to_string ();

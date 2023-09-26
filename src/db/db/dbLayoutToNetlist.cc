@@ -451,10 +451,20 @@ void LayoutToNetlist::do_join_nets (db::Circuit &c, const std::vector<db::Net *>
 static std::string subcircuit_to_string (const db::SubCircuit &sc)
 {
   if (! sc.name ().empty ()) {
-    return tl::to_string (tr ("on subcircuit ")) + sc.name () + tl::to_string (tr (" in ")) + sc.circuit ()->name ();
+    return tl::to_string (tr (" on subcircuit ")) + sc.name ();
   } else {
-    return tl::to_string (tr ("in ")) + sc.circuit ()->name ();
+    return std::string ();
   }
+}
+
+static db::DPolygon subcircuit_geometry (const db::SubCircuit &sc, const db::Layout *layout)
+{
+  if (! layout || ! sc.circuit_ref () || ! layout->is_valid_cell_index (sc.circuit_ref ()->cell_index ())) {
+    return db::DPolygon ();
+  }
+
+  db::DBox dbox = db::CplxTrans (layout->dbu ()) * layout->cell (sc.circuit_ref ()->cell_index ()).bbox ();
+  return db::DPolygon (sc.trans () * dbox);
 }
 
 void LayoutToNetlist::check_must_connect (const db::Circuit &c, const db::Net &a, const db::Net &b)
@@ -467,21 +477,25 @@ void LayoutToNetlist::check_must_connect (const db::Circuit &c, const db::Net &a
     if (a.begin_pins () == a.end_pins ()) {
       db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s is not connected to outside")), a.expanded_name ()));
       error.set_cell_name (c.name ());
+      error.set_category_name ("must-connect");
       log_entry (error);
     }
     if (b.begin_pins () == b.end_pins ()) {
       db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s is not connected to outside")), a.expanded_name ()));
       error.set_cell_name (c.name ());
+      error.set_category_name ("must-connect");
       log_entry (error);
     }
   } else {
     if (a.expanded_name () == b.expanded_name ()) {
-      db::LogEntryData warn (db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s must be connected further up in the hierarchy - this is an error at the chip top level")), a.expanded_name ()));
+      db::LogEntryData warn (db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s must be connected further up in the hierarchy - this is an error at chip top level")), a.expanded_name ()));
       warn.set_cell_name (c.name ());
+      warn.set_category_name ("must-connect");
       log_entry (warn);
     } else {
-      db::LogEntryData warn (db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s must be connected further up in the hierarchy - this is an error at the chip top level")), a.expanded_name (), b.expanded_name ()));
+      db::LogEntryData warn (db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s must be connected further up in the hierarchy - this is an error at chip top level")), a.expanded_name (), b.expanded_name ()));
       warn.set_cell_name (c.name ());
+      warn.set_category_name ("must-connect");
       log_entry (warn);
     }
   }
@@ -493,23 +507,31 @@ void LayoutToNetlist::check_must_connect (const db::Circuit &c, const db::Net &a
       const db::Net *net_a = sc.net_for_pin (a.begin_pins ()->pin_id ());
       const db::Net *net_b = sc.net_for_pin (b.begin_pins ()->pin_id ());
       if (net_a == 0) {
-        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s is not connected at all %s")), a.expanded_name (), subcircuit_to_string (sc)));
-        error.set_cell_name (c.name ());
+        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s of circuit %s is not connected at all%s")), a.expanded_name (), c.name (), subcircuit_to_string (sc)));
+        error.set_cell_name (sc.circuit ()->name ());
+        error.set_geometry (subcircuit_geometry (sc, internal_layout ()));
+        error.set_category_name ("must-connect");
         log_entry (error);
       }
       if (net_b == 0) {
-        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s is not connected at all %s")), b.expanded_name (), subcircuit_to_string (sc)));
-        error.set_cell_name (c.name ());
+        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s of circuit %s is not connected at all%s")), b.expanded_name (), c.name (), subcircuit_to_string (sc)));
+        error.set_cell_name (sc.circuit ()->name ());
+        error.set_geometry (subcircuit_geometry (sc, internal_layout ()));
+        error.set_category_name ("must-connect");
         log_entry (error);
       }
       if (net_a && net_b && net_a != net_b) {
-        if (net_a->expanded_name () == net_b->expanded_name ()) {
-          db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect nets %s are not connected %s")), a.expanded_name (), subcircuit_to_string (sc)));
-          error.set_cell_name (c.name ());
+        if (a.expanded_name () == b.expanded_name ()) {
+          db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect nets %s of circuit %s are not connected%s")), a.expanded_name (), c.name (), subcircuit_to_string (sc)));
+          error.set_cell_name (sc.circuit ()->name ());
+          error.set_geometry (subcircuit_geometry (sc, internal_layout ()));
+          error.set_category_name ("must-connect");
           log_entry (error);
         } else {
-          db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s are not connected %s")), a.expanded_name (), b.expanded_name (), subcircuit_to_string (sc)));
-          error.set_cell_name (c.name ());
+          db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s of circuit %s are not connected%s")), a.expanded_name (), b.expanded_name (), c.name (), subcircuit_to_string (sc)));
+          error.set_cell_name (sc.circuit ()->name ());
+          error.set_geometry (subcircuit_geometry (sc, internal_layout ()));
+          error.set_category_name ("must-connect");
           log_entry (error);
         }
       }
@@ -526,32 +548,28 @@ void LayoutToNetlist::do_join_nets ()
   //  prevents updates
   NetlistLocker locked_netlist (mp_netlist.get ());
 
-  for (auto jn = m_joined_net_names.begin (); jn != m_joined_net_names.end (); ++jn) {
-    for (auto c = mp_netlist->begin_top_down (); c != mp_netlist->end_top_down (); ++c) {
+  for (auto c = mp_netlist->begin_top_down (); c != mp_netlist->end_top_down (); ++c) {
+
+    for (auto jn = m_joined_net_names.begin (); jn != m_joined_net_names.end (); ++jn) {
       join_nets_from_pattern (*c, *jn);
     }
-  }
 
-  for (auto jn = m_joined_nets.begin (); jn != m_joined_nets.end (); ++jn) {
-    for (auto c = mp_netlist->begin_top_down (); c != mp_netlist->end_top_down (); ++c) {
+    for (auto jn = m_joined_nets.begin (); jn != m_joined_nets.end (); ++jn) {
       join_nets_from_pattern (*c, *jn);
     }
-  }
 
-  for (auto jn = m_joined_net_names_per_cell.begin (); jn != m_joined_net_names_per_cell.end (); ++jn) {
-    for (auto c = mp_netlist->begin_top_down (); c != mp_netlist->end_top_down (); ++c) {
+    for (auto jn = m_joined_net_names_per_cell.begin (); jn != m_joined_net_names_per_cell.end (); ++jn) {
       if (jn->first.match (c->name ())) {
         join_nets_from_pattern (*c, jn->second);
       }
     }
-  }
 
-  for (auto jn = m_joined_nets_per_cell.begin (); jn != m_joined_nets_per_cell.end (); ++jn) {
-    for (auto c = mp_netlist->begin_top_down (); c != mp_netlist->end_top_down (); ++c) {
+    for (auto jn = m_joined_nets_per_cell.begin (); jn != m_joined_nets_per_cell.end (); ++jn) {
       if (jn->first.match (c->name ())) {
         join_nets_from_pattern (*c, jn->second);
       }
     }
+
   }
 }
 

@@ -942,9 +942,9 @@ def Build_pymod(parameters):
         try:
             ldpath = os.environ['LDFLAGS']
         except KeyError:
-            os.environ['LDFLAGS'] = '-L%s' % addLibPath
+            os.environ['LDFLAGS'] = '-L%s -headerpad_max_install_names' % addLibPath
         else:
-            os.environ['LDFLAGS'] = '-L%s %s' % (addLibPath, ldpath)
+            os.environ['LDFLAGS'] = '-L%s %s -headerpad_max_install_names' % (addLibPath, ldpath)
 
     #--------------------------------------------------------------------
     # [3] Set different command line parameters for building <pymod>

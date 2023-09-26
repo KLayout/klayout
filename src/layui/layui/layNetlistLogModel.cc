@@ -218,7 +218,7 @@ NetlistLogModel::data (const QModelIndex &index, int role) const
   } else if (role == Qt::DisplayRole) {
 
     if (le) {
-      return QVariant (tl::to_qstring (le->to_string ()));
+      return QVariant (tl::to_qstring (le->to_string (false)));
     } else if (! index.parent ().isValid () && index.row () >= m_global_entries && index.row () < int (m_circuits.size ()) + m_global_entries) {
       const std::pair<const db::Circuit *, const db::Circuit *> &cp = m_circuits [index.row () - m_global_entries].first;
       if (! cp.first) {

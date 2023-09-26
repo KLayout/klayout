@@ -161,7 +161,7 @@ public:
   /**
    *  @brief Formats this message for printing
    */
-  std::string to_string () const;
+  std::string to_string (bool with_geometry = true) const;
 
 private:
   Severity m_severity;

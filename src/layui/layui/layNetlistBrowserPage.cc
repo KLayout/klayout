@@ -798,6 +798,10 @@ NetlistBrowserPage::log_selection_changed ()
 {
   clear_highlights ();
 
+  if (! mp_database.get () || ! mp_database->netlist ()) {
+    return;
+  }
+
   NetlistLogModel *model = dynamic_cast<NetlistLogModel *> (log_view->model ());
   tl_assert (model != 0);
 
@@ -805,15 +809,17 @@ NetlistBrowserPage::log_selection_changed ()
   for (QModelIndexList::const_iterator i = selection.begin (); i != selection.end (); ++i) {
     if (i->column () == 0) {
       const db::LogEntryData *le = model->log_entry (*i);
-      if (le && le->geometry () != db::DPolygon ()) {
-
-        // @@@ TODO: add highlight for error here.
-
+      if (le && le->geometry () != db::DPolygon () && ! le->cell_name ().empty ()) {
+        const db::Circuit *c = mp_database->netlist ()->circuit_by_name (le->cell_name ());
+        if (c) {
+          m_markers.push_back (std::make_pair (c, le->geometry ()));
+        }
       }
     }
   }
 
   update_highlights ();
+  adjust_view ();
 }
 
 void
@@ -1276,6 +1282,7 @@ NetlistBrowserPage::clear_highlights ()
 {
   m_current_path = lay::NetlistObjectsPath ();
   m_selected_paths.clear ();
+  m_markers.clear ();
 
   update_highlights ();
 }
@@ -1432,6 +1439,17 @@ NetlistBrowserPage::adjust_view ()
     }
 
     bbox += trans * db::CplxTrans (layout->dbu ()) * ebox;
+
+  }
+
+  //  add markers boxes
+
+  for (auto marker = m_markers.begin (); marker != m_markers.end (); ++marker) {
+
+    std::pair<bool, db::DCplxTrans> tr = trans_for (marker->first, *layout, *cell, m_cell_context_cache, cv.context_dtrans ());
+    if (tr.first) {
+      bbox += (tr.second * marker->second).box ();
+    }
 
   }
 
@@ -1676,10 +1694,12 @@ NetlistBrowserPage::update_highlights ()
     }
   }
 
+  std::vector<db::DCplxTrans> tv = mp_view->cv_transform_variants (m_cv_index);
+
   size_t n_markers = 0;
   bool not_all_shapes_are_shown = false;
 
-  for (std::vector<lay::NetlistObjectsPath>::const_iterator path = m_selected_paths.begin (); path != m_selected_paths.end (); ++path) {
+  for (auto path = m_selected_paths.begin (); path != m_selected_paths.end (); ++path) {
 
     const db::Circuit *circuit = path->root.first;
     if (! circuit) {
@@ -1711,7 +1731,6 @@ NetlistBrowserPage::update_highlights ()
     //  a map of display properties vs. layer properties
 
     //  correct DBU differences between the storage layout and the original layout
-    std::vector<db::DCplxTrans> tv = mp_view->cv_transform_variants (m_cv_index);
     for (std::vector<db::DCplxTrans>::iterator t = tv.begin (); t != tv.end (); ++t) {
       *t = *t * trans * db::DCplxTrans (layout->dbu () / original_layout.dbu ());
     }
@@ -1729,6 +1748,28 @@ NetlistBrowserPage::update_highlights ()
         not_all_shapes_are_shown = true;
       }
     }
+
+  }
+
+  for (auto marker = m_markers.begin (); marker != m_markers.end (); ++marker) {
+
+    //  computes the transformation supplied by the path
+
+    std::pair<bool, db::DCplxTrans> tr = trans_for (marker->first, *layout, *cell, m_cell_context_cache, cv.context_dtrans ());
+    if (! tr.first) {
+      continue;
+    }
+
+    //  creates a highlight from the marker
+
+    tl::Color color = make_valid_color (m_colorizer.marker_color ());
+
+    mp_markers.push_back (new lay::Marker (mp_view, m_cv_index));
+    mp_markers.back ()->set (marker->second, db::DCplxTrans (1.0 / original_layout.dbu ()) * tr.second, tv);
+    mp_markers.back ()->set_color (color);
+    mp_markers.back ()->set_frame_color (color);
+
+    configure_marker (mp_markers.back (), true);
 
   }
 

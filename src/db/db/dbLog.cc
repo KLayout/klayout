@@ -158,7 +158,7 @@ LogEntryData::set_cell_name (const std::string &n)
 }
 
 std::string
-LogEntryData::to_string () const
+LogEntryData::to_string (bool with_geometry) const
 {
   std::string res;
 
@@ -178,7 +178,7 @@ LogEntryData::to_string () const
 
   res += message ();
 
-  if (! m_geometry.box ().empty ()) {
+  if (with_geometry && ! m_geometry.box ().empty ()) {
     res += tl::to_string (tr (", shape: ")) + m_geometry.to_string ();
   }
 

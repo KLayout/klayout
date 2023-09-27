@@ -77,7 +77,7 @@ Class<db::LogEntryData> decl_dbNetlistDeviceExtractorError ("db", "LogEntryData"
     "@brief Sets the category description.\n"
     "See \\category_name= for details about categories."
   ) +
-  gsi::method ("to_s", &db::LogEntryData::to_string,
+  gsi::method ("to_s", &db::LogEntryData::to_string, gsi::arg ("with_geometry", true),
     "@brief Gets the string representation of this error or warning.\n"
     "This method has been introduced in version 0.28.13."
   ),

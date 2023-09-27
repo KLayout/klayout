@@ -45,7 +45,7 @@ namespace db
 //  Note: the iterator provides the hierarchical selection (enabling/disabling cells etc.)
 
 LayoutToNetlist::LayoutToNetlist (const db::RecursiveShapeIterator &iter)
-  : m_iter (iter), m_layout_index (0), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false)
+  : m_iter (iter), m_layout_index (0), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false)
 {
   //  check the iterator
   if (iter.has_complex_region () || iter.region () != db::Box::world ()) {
@@ -65,7 +65,7 @@ LayoutToNetlist::LayoutToNetlist (const db::RecursiveShapeIterator &iter)
 }
 
 LayoutToNetlist::LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_index)
-  : mp_dss (dss), m_layout_index (layout_index), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false)
+  : mp_dss (dss), m_layout_index (layout_index), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false)
 {
   if (dss->is_valid_layout_index (m_layout_index)) {
     m_iter = db::RecursiveShapeIterator (dss->layout (m_layout_index), dss->initial_cell (m_layout_index), std::set<unsigned int> ());
@@ -73,7 +73,7 @@ LayoutToNetlist::LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_i
 }
 
 LayoutToNetlist::LayoutToNetlist (const std::string &topcell_name, double dbu)
-  : m_iter (), m_netlist_extracted (false), m_is_flat (true), m_device_scaling (1.0), m_include_floating_subcircuits (false)
+  : m_iter (), m_netlist_extracted (false), m_is_flat (true), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false)
 {
   mp_internal_dss.reset (new db::DeepShapeStore (topcell_name, dbu));
   mp_dss.reset (mp_internal_dss.get ());
@@ -84,7 +84,7 @@ LayoutToNetlist::LayoutToNetlist (const std::string &topcell_name, double dbu)
 
 LayoutToNetlist::LayoutToNetlist ()
   : m_iter (), mp_internal_dss (new db::DeepShapeStore ()), mp_dss (mp_internal_dss.get ()), m_layout_index (0),
-    m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false)
+    m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false)
 {
   init ();
 }
@@ -488,12 +488,12 @@ void LayoutToNetlist::check_must_connect (const db::Circuit &c, const db::Net &a
     }
   } else {
     if (a.expanded_name () == b.expanded_name ()) {
-      db::LogEntryData warn (db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s must be connected further up in the hierarchy - this is an error at chip top level")), a.expanded_name ()));
+      db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s must be connected further up in the hierarchy - this is an error at chip top level")), a.expanded_name ()));
       warn.set_cell_name (c.name ());
       warn.set_category_name ("must-connect");
       log_entry (warn);
     } else {
-      db::LogEntryData warn (db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s must be connected further up in the hierarchy - this is an error at chip top level")), a.expanded_name (), b.expanded_name ()));
+      db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s must be connected further up in the hierarchy - this is an error at chip top level")), a.expanded_name (), b.expanded_name ()));
       warn.set_cell_name (c.name ());
       warn.set_category_name ("must-connect");
       log_entry (warn);

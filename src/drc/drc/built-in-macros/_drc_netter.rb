@@ -70,6 +70,7 @@ module DRC
       @lnum = 0
       @device_scaling = 1.0
       @ignore_extraction_errors = false
+      @top_level = false
     end
     
     # %DRC%
@@ -236,6 +237,24 @@ module DRC
       end
     end
 
+    # %DRC%
+    # @name top_level
+    # @brief Specifies top level mode
+    # @synopsis top_level(value)
+    # With this value set to false (the default), it is assumed that the 
+    # circuit is not used as a top level chip circuit. In that case, for
+    # example must-connect nets which are not connected are reported as
+    # as warnings. If top level mode is set to true, such disconnected
+    # nets are reported as errors as this indicates a missing physical
+    # connection.
+    
+    def top_level(value)
+      @engine._context("top_level") do
+        @top_level = value
+        @l2n && @l2n.top_level_mode = value
+      end
+    end
+    
     # %DRC%
     # @name ignore_extraction_errors
     # @brief Specifies whether to ignore extraction errors
@@ -672,6 +691,7 @@ module DRC
         @layers = {}
         _make_data
         @l2n.device_scaling = @device_scaling
+        @l2n.top_level_mode = @top_level
       end
     end
 

@@ -193,6 +193,27 @@ public:
   }
 
   /**
+   *  @brief Gets the top level mode flag
+   */
+  bool top_level_mode () const
+  {
+    return m_top_level_mode;
+  }
+
+  /**
+   *  @brief Sets top level mode
+   *
+   *  In top level mode, must-connect warnings are turned into
+   *  errors for example.
+   *
+   *  By default, top-level mode is off.
+   */
+  void set_top_level_mode (bool f)
+  {
+    m_top_level_mode = f;
+  }
+
+  /**
    *  @brief Gets the log entries
    */
   const log_entries_type &log_entries () const
@@ -999,6 +1020,7 @@ private:
   db::DeepLayer m_dummy_layer;
   std::string m_generator;
   bool m_include_floating_subcircuits;
+  bool m_top_level_mode;
   std::list<tl::GlobPattern> m_joined_net_names;
   std::list<std::pair<tl::GlobPattern, tl::GlobPattern> > m_joined_net_names_per_cell;
   std::list<std::set<std::string> > m_joined_nets;

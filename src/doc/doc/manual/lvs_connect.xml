@@ -137,7 +137,14 @@ connect(metal2, metal2_labels)</pre>
   </p>
 
   <p>
-  This feature is also called "must connect" nets in other systems.
+  You can declare the layout as being a top level one. This turns the 
+  warning about missing physical connections into an error:
+  </p>
+
+  <pre>top_level(true)</pre>
+
+  <p>
+  The "connect_implicit" feature is also called "must connect" nets in other systems.
   </p>
 
   <p>
@@ -222,11 +229,11 @@ connect(metal2, metal2_labels)</pre>
   To align layout and schematic, bulk and VSS pins can be connected
   explicitly. Same for n-well and VDD.
   This scheme is similar to the "connect_implicit" scheme explained
-  above, but acts on differently named nets.
+  above, but can connect differently named nets.
   </p>
 
   <p>
-  To establish an explicit connection, make sure that n-well and 
+  To establish an explicit connection in the above example, make sure that n-well and 
   bulk have proper names. For the n-well this can be done by creating
   labels on the n-well islands giving them a proper name - e.g. "NWELL".
   The bulk isn't a real layout layer with polygons on it. Using "connect_global"
@@ -257,8 +264,7 @@ connect_explicit("INV", [ "BULK", "VSS" ])
   <p>
   Like implicit connections, explicit connections are checked for being made
   on the next level of hierarchy, either physically or by another explicit or
-  implicit connection. 
-  This feature is also called "must connect" nets in other systems.
+  implicit connection.
   </p>
 
   <p>

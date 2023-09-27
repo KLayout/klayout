@@ -464,6 +464,20 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "This attribute has been introduced in version 0.27.\n"
   ) +
+  gsi::method ("top_level_mode=", &db::LayoutToNetlist::set_top_level_mode, gsi::arg ("flag"),
+    "@brief Sets a flag indicating whether top level mode is enabled.\n"
+    "\n"
+    "In top level mode, must-connect warnings are turned into errors for example.\n"
+    "To enable top level mode, set this attribute to true. By default, top-level mode is turned off.\n"
+    "\n"
+    "This attribute has been introduced in version 0.28.13."
+  ) +
+  gsi::method ("top_level_mode", &db::LayoutToNetlist::top_level_mode,
+    "@brief Gets a flag indicating whether top level mode is enabled.\n"
+    "See \\top_level_mode= for details.\n"
+    "\n"
+    "This attribute has been introduced in version 0.28.13.\n"
+  ) +
   gsi::method ("clear_join_net_names", &db::LayoutToNetlist::clear_join_net_names,
     "@brief Clears all implicit net joining expressions.\n"
     "See \\extract_netlist for more details about this feature.\n"

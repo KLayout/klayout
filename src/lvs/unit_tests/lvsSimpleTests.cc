@@ -279,9 +279,11 @@ TEST(29_DeviceCombineAndTolerances)
 TEST(30_MustConnect1)
 {
   run_test (_this, "must_connect1", "must_connect1.gds");
+  run_test (_this, "must_connect1_tl", "must_connect1.gds");
 }
 
 TEST(31_MustConnect2)
 {
   run_test (_this, "must_connect2", "must_connect2.gds");
 }
+

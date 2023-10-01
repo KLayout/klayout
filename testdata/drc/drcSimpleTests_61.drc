@@ -1,0 +1,23 @@
+
+# Moved implementation
+
+source($drc_test_source)
+target($drc_test_target)
+
+if $drc_test_deep
+  deep
+end
+
+input(1, 0).output(1, 0)
+input(2, 0).output(2, 0)
+
+cell("TOP")
+
+l1 = input(1, 0)
+l2 = input(2, 0)
+
+l1.output(10, 0)
+l2.output(11, 0)
+l1.sized(100.nm).output(20, 0)
+(l2 - l1).output(21, 0)
+

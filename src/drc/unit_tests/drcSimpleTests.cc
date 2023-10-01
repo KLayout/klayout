@@ -1547,6 +1547,16 @@ TEST(60d_issue1216)
   run_test (_this, "60", true);
 }
 
+TEST(61_issue1485)
+{
+  run_test (_this, "61", false);
+}
+
+TEST(61d_issue1485)
+{
+  run_test (_this, "61", true);
+}
+
 TEST(70_props)
 {
   run_test (_this, "70", false);

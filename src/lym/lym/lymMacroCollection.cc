@@ -868,7 +868,7 @@ static bool has_autorun_for (const lym::MacroCollection &collection, bool early)
   }
 
   for (lym::MacroCollection::const_iterator c = collection.begin (); c != collection.end (); ++c) {
-    if ((early && c->second->is_autorun_early ()) || (!early && c->second->is_autorun () && !c->second->is_autorun_early ())) {
+    if (((early && c->second->is_autorun_early ()) || (!early && c->second->is_autorun () && !c->second->is_autorun_early ())) && ! c->second->was_autorun ()) {
       return true;
     }
   }
@@ -909,35 +909,28 @@ static int collect_priority (lym::MacroCollection &collection, bool early, int f
   return p;
 }
 
-static void autorun_for_prio (lym::MacroCollection &collection, bool early, std::set<std::string> *executed_already, int prio)
+static void autorun_for_prio (lym::MacroCollection &collection, bool early, int prio)
 {
   for (lym::MacroCollection::child_iterator c = collection.begin_children (); c != collection.end_children (); ++c) {
-    autorun_for_prio (*c->second, early, executed_already, prio);
+    autorun_for_prio (*c->second, early, prio);
   }
 
   for (lym::MacroCollection::iterator c = collection.begin (); c != collection.end (); ++c) {
 
-    if (c->second->priority () == prio && c->second->can_run () && ((early && c->second->is_autorun_early ()) || (!early && c->second->is_autorun () && !c->second->is_autorun_early ()))) {
+    if (! c->second->was_autorun () && c->second->priority () == prio && c->second->can_run () && ((early && c->second->is_autorun_early ()) || (!early && c->second->is_autorun () && !c->second->is_autorun_early ()))) {
 
-      if (!executed_already || executed_already->find (c->second->path ()) == executed_already->end ()) {
-
-        BEGIN_PROTECTED_SILENT
-          c->second->run ();
-          c->second->install_doc ();
-        END_PROTECTED_SILENT
-
-        if (executed_already) {
-          executed_already->insert (c->second->path ());
-        }
-
-      }
+      BEGIN_PROTECTED_SILENT
+        c->second->run ();
+        c->second->set_was_autorun (true);
+        c->second->install_doc ();
+      END_PROTECTED_SILENT
 
     }
 
   }
 }
 
-static void autorun_for (lym::MacroCollection &collection, bool early, std::set<std::string> *executed_already)
+static void autorun_for (lym::MacroCollection &collection, bool early)
 {
   int prio = 0;
   while (true) {
@@ -945,19 +938,19 @@ static void autorun_for (lym::MacroCollection &collection, bool early, std::set<
     if (p < prio) {
       break;
     }
-    autorun_for_prio (collection, early, executed_already, p);
+    autorun_for_prio (collection, early, p);
     prio = p + 1;
   }
 }
 
-void MacroCollection::autorun (std::set<std::string> *already_executed)
+void MacroCollection::autorun ()
 {
-  autorun_for (*this, false, already_executed);
+  autorun_for (*this, false);
 }
 
-void MacroCollection::autorun_early (std::set<std::string> *already_executed)
+void MacroCollection::autorun_early ()
 {
-  autorun_for (*this, true, already_executed);
+  autorun_for (*this, true);
 }
 
 void MacroCollection::dump (int l)

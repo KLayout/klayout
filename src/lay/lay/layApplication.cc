@@ -817,10 +817,8 @@ ApplicationBase::init_app ()
     }
   }
 
-  std::set<std::string> already_executed;
-
   //  run all early autorun macros
-  lym::MacroCollection::root ().autorun_early (&already_executed);
+  lym::MacroCollection::root ().autorun_early ();
 
   //  redo gsi::initialize as the macros may have registered new external classes
   //  through the "doc to external class" mechanism.
@@ -833,7 +831,7 @@ ApplicationBase::init_app ()
 
     //  as this regenerates the macro collection, autorun_early is required again
     //  note: this does no re-execute macros that have been executed already
-    lym::MacroCollection::root ().autorun_early (&already_executed);
+    lym::MacroCollection::root ().autorun_early ();
 
   }
 
@@ -842,7 +840,7 @@ ApplicationBase::init_app ()
   lym::MacroCollection::root ().rescan ();
 
   //  and yet another autorun_early pass ..
-  lym::MacroCollection::root ().autorun_early (&already_executed);
+  lym::MacroCollection::root ().autorun_early ();
 
   //  creates the main window or plugin root as required
   setup ();

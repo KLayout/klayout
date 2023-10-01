@@ -419,7 +419,7 @@ public:
   /**
    *  @brief Runs all macros marked with auto-run
    */
-  void autorun (std::set<std::string> *already_executed = 0);
+  void autorun ();
 
   /**
    *  @brief Returns true, if the collection has an early autorun macro
@@ -429,7 +429,7 @@ public:
   /**
    *  @brief Runs all macros marked with early auto-run
    */
-  void autorun_early (std::set<std::string> *already_executed = 0);
+  void autorun_early ();
 
   /**
    *  @brief Redo the scan (will add new files or folders)

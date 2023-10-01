@@ -55,7 +55,10 @@ namespace lym
 // ----------------------------------------------------------------------
 
 Macro::Macro ()
-  : m_modified (true), m_readonly (false), m_autorun (false), m_autorun_default (false), m_autorun_early (false), m_priority (0), m_show_in_menu (false), m_is_file (false), m_interpreter (None), m_format (Macro::NoFormat)
+  : m_modified (true), m_readonly (false),
+    m_autorun (false), m_autorun_default (false), m_autorun_early (false), m_was_autorun (false),
+    m_priority (0), m_show_in_menu (false), m_is_file (false),
+    m_interpreter (None), m_format (Macro::NoFormat)
 {
   mp_parent = 0;
 }
@@ -70,6 +73,8 @@ void Macro::on_menu_needs_update ()
 
 void Macro::on_changed ()
 {
+  m_was_autorun = false;
+
 #if defined(HAVE_QT)
   emit changed ();
   if (mp_parent) {
@@ -794,6 +799,11 @@ void Macro::set_autorun (bool f)
     m_autorun = f;
     on_changed ();
   }
+}
+
+void Macro::set_was_autorun (bool f)
+{
+  m_was_autorun = f;
 }
 
 void Macro::set_priority (int p)

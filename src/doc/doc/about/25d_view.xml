@@ -171,19 +171,19 @@ end
   </p>
 
   <pre>
-poly = input(2, 0)
-active = input(1, 0)
+gate = input(1, 0)
+active = input(2, 0)
 
-z(poly, zstart: 0, height: 20.nm, name: "POLY")
+z(active, zstart: 0, height: 20.nm, name: "ACTIVE")
 
-zz(name: "ACTIVE", like: "1/0") do
+zz(name: "GATE", like: "1/0") do
   
-  poly_sized = poly.sized(10.nm)
-  active_over_poly_sized = poly_sized &amp; active
+  active_sized = active.sized(10.nm)
+  gate_over_active_sized = active_sized &amp; gate
   
-  z(active - poly, zstart: 0, height: 10.nm)       # bottom sheet
-  z(active_over_poly_sized - poly, height: 10.nm)  # center sheet
-  z(active_over_poly_sized, height: 10.nm)         # top sheet
+  z(gate - active, zstart: 0, height: 10.nm)
+  z(gate_over_active_sized - active, height: 10.nm)
+  z(gate_over_active_sized, height: 10.nm)
 
 end
 </pre>

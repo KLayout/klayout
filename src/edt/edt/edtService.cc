@@ -148,6 +148,92 @@ Service::snap (db::DPoint p) const
   return p;
 }
 
+void
+Service::update_vector_snapped_point (const db::DPoint &pt, db::DVector &vr, bool &result_set) const
+{
+  db::DVector v = snap (pt) - pt;
+  v = lay::snap_angle (v, move_ac ());
+
+  if (! result_set || v.length () < vr.length ()) {
+    result_set = true;
+    vr = v;
+  }
+}
+
+void
+Service::update_vector_snapped_marker (const lay::ShapeMarker *sm, const db::DTrans &trans, db::DVector &vr, bool &result_set, size_t &count) const
+{
+  const db::Shape &shape = sm->shape ();
+  db::CplxTrans tr = db::DCplxTrans (trans) * db::DCplxTrans (-sm->trans ().disp ()) * sm->trans ();
+
+  if (shape.is_text ()) {
+
+    update_vector_snapped_point (tr * shape.bbox ().center (), vr, result_set);
+    --count;
+
+  } else if (shape.is_path ()) {
+
+    for (auto pt = shape.begin_point (); pt != shape.end_point () && count > 0; ++pt) {
+      update_vector_snapped_point (tr * *pt, vr, result_set);
+      --count;
+    }
+
+  } else if (shape.is_box ()) {
+
+    db::Box box = shape.bbox ();
+    for (unsigned int c = 0; c < 4 && count > 0; ++c) {
+      db::Point pt = db::Point ((c & 1) != 0 ? box.left () : box.right (), (c & 2) != 0 ? box.bottom () : box.top ());
+      update_vector_snapped_point (tr * pt, vr, result_set);
+      --count;
+    }
+
+  } else if (shape.is_polygon ()) {
+
+    for (auto pt = shape.begin_hull (); pt != shape.end_hull () && count > 0; ++pt) {
+      update_vector_snapped_point (tr * *pt, vr, result_set);
+      --count;
+    }
+
+    for (unsigned int h = 0; h < shape.holes () && count > 0; ++h) {
+      for (auto pt = shape.begin_hole (h); pt != shape.end_hole (h) && count > 0; ++pt) {
+        update_vector_snapped_point (tr * *pt, vr, result_set);
+        --count;
+      }
+    }
+
+  }
+}
+
+db::DVector
+Service::snap_marker_to_grid (const db::DVector &v) const
+{
+  db::DVector vr;
+  bool result_set = false;
+
+  //  max. 10000 checks
+  size_t count = 10000;
+
+  db::DTrans tt = db::DTrans (v);
+
+  for (auto m = m_markers.begin (); m != m_markers.end () && count > 0; ++m) {
+
+    const lay::ShapeMarker *sm = dynamic_cast<const lay::ShapeMarker *> (*m);
+    if (sm) {
+      update_vector_snapped_marker (sm, tt, vr, result_set, count);
+    } else {
+      // @@@ instance markers
+    }
+
+  }
+
+  if (result_set) {
+    tl::info << "@@@ " << v;
+    return vr + v;
+  } else {
+    return v;
+  }
+}
+
 db::DVector
 Service::snap (db::DVector v) const
 {
@@ -433,10 +519,15 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
 void  
 Service::move (const db::DPoint &pu, lay::angle_constraint_type ac)
 {
+  //  @@@ does not work yet after rotation (right mouse click!!!!)
   m_alt_ac = ac;
-  db::DPoint p = snap (m_move_start) + snap (pu - m_move_start, false /*move*/);
   if (view ()->is_editable () && m_moving) {
-    move_markers (db::DTrans (p - db::DPoint ()) * db::DTrans (m_move_trans.fp_trans ()) * db::DTrans (db::DPoint () - snap (m_move_start)));
+    db::DPoint ref = snap (m_move_start);
+    db::DPoint p = ref + snap_marker_to_grid (pu - ref);
+    if (p.equal (pu)) {
+      p = ref + snap (pu - m_move_start, false /*move*/);
+    }
+    move_markers (db::DTrans (p - db::DPoint ()) * db::DTrans (m_move_trans.fp_trans ()) * db::DTrans (db::DPoint () - ref));
   }
   m_alt_ac = lay::AC_Global;
 }
@@ -444,10 +535,17 @@ Service::move (const db::DPoint &pu, lay::angle_constraint_type ac)
 void  
 Service::move_transform (const db::DPoint &pu, db::DFTrans tr, lay::angle_constraint_type ac)
 {
+  //  @@@ TODO: adjust and test!!!
   m_alt_ac = ac;
-  db::DPoint p = snap (m_move_start) + snap (pu - m_move_start, false);
   if (view ()->is_editable () && m_moving) {
-    move_markers (db::DTrans (p - db::DPoint ()) * db::DTrans (m_move_trans.fp_trans () * tr) * db::DTrans (db::DPoint () - snap (m_move_start)));
+    db::DPoint p = m_move_start + snap_marker_to_grid (pu - m_move_start);
+    if (p.equal (pu)) {
+      db::DPoint ref = snap (m_move_start);
+      p = ref + snap (pu - m_move_start, false /*move*/);
+      move_markers (db::DTrans (p - db::DPoint ()) * db::DTrans (tr * m_move_trans.fp_trans ()) * db::DTrans (db::DPoint () - ref));
+    } else {
+      move_markers (db::DTrans (p - m_move_start) * db::DTrans (tr) * m_move_trans);
+    }
   }
   m_alt_ac = lay::AC_Global;
 }

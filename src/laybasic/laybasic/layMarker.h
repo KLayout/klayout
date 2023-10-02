@@ -396,6 +396,14 @@ public:
    */
   void set (const db::Shape &shape, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans);
 
+  /**
+   *  @brief Gets the shape
+   */
+  const db::Shape &shape () const
+  {
+    return m_shape;
+  }
+
 private:
   virtual void render (const Viewport &vp, ViewObjectCanvas &canvas);
 

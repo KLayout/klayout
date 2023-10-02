@@ -519,6 +519,14 @@ protected:
   db::DVector snap (const db::DVector &v, bool connect) const;
 
   /**
+   *  @brief Proposes a grid-snapped displacement vector
+   *
+   *  @param v The input displacement
+   *  @return A displacement that pushes the (current) markers on-grid, definition depending on marker
+   */
+  db::DVector snap_marker_to_grid (const db::DVector &v) const;
+
+  /**
    *  @brief Snap a point to the edit grid with advanced snapping (including object snapping)
    *
    *  @param p The point to snap
@@ -658,6 +666,8 @@ private:
 
 private:
   void copy_selected (unsigned int inst_mode);
+  void update_vector_snapped_point (const db::DPoint &pt, db::DVector &vr, bool &result_set) const;
+  void update_vector_snapped_marker (const lay::ShapeMarker *sm, const db::DTrans &trans, db::DVector &vr, bool &result_set, size_t &count) const;
 };
 
 }

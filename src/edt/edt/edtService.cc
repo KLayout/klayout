@@ -227,7 +227,6 @@ Service::snap_marker_to_grid (const db::DVector &v) const
   }
 
   if (result_set) {
-    tl::info << "@@@ " << v;
     return vr + v;
   } else {
     return v;
@@ -519,7 +518,6 @@ Service::begin_move (lay::Editable::MoveMode mode, const db::DPoint &p, lay::ang
 void  
 Service::move (const db::DPoint &pu, lay::angle_constraint_type ac)
 {
-  //  @@@ does not work yet after rotation (right mouse click!!!!)
   m_alt_ac = ac;
   if (view ()->is_editable () && m_moving) {
     db::DPoint ref = snap (m_move_start);
@@ -535,17 +533,14 @@ Service::move (const db::DPoint &pu, lay::angle_constraint_type ac)
 void  
 Service::move_transform (const db::DPoint &pu, db::DFTrans tr, lay::angle_constraint_type ac)
 {
-  //  @@@ TODO: adjust and test!!!
   m_alt_ac = ac;
   if (view ()->is_editable () && m_moving) {
-    db::DPoint p = m_move_start + snap_marker_to_grid (pu - m_move_start);
+    db::DPoint ref = snap (m_move_start);
+    db::DPoint p = ref + snap_marker_to_grid (pu - ref);
     if (p.equal (pu)) {
-      db::DPoint ref = snap (m_move_start);
       p = ref + snap (pu - m_move_start, false /*move*/);
-      move_markers (db::DTrans (p - db::DPoint ()) * db::DTrans (tr * m_move_trans.fp_trans ()) * db::DTrans (db::DPoint () - ref));
-    } else {
-      move_markers (db::DTrans (p - m_move_start) * db::DTrans (tr) * m_move_trans);
     }
+    move_markers (db::DTrans (p - db::DPoint ()) * db::DTrans (tr * m_move_trans.fp_trans ()) * db::DTrans (db::DPoint () - ref));
   }
   m_alt_ac = lay::AC_Global;
 }

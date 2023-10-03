@@ -2201,6 +2201,10 @@ PartialService::begin_move (MoveMode mode, const db::DPoint &p, lay::angle_const
 void
 PartialService::move (const db::DPoint &p, lay::angle_constraint_type ac)
 {
+  if (! m_dragging) {
+    return;
+  }
+
   m_alt_ac = ac;
 
   set_cursor (lay::Cursor::size_all);
@@ -2236,6 +2240,10 @@ PartialService::move (const db::DPoint &p, lay::angle_constraint_type ac)
 void
 PartialService::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type ac)
 {
+  if (! m_dragging) {
+    return;
+  }
+
   m_alt_ac = ac;
 
   if (m_current != m_start) {

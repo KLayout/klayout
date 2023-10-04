@@ -184,28 +184,40 @@ def SetChangeLibIdentificationName( executable, relativedir ):
 
 #----------------------------------------------------------------------------------------
 ## To make a library dependency dictionary by recursively walk down the lib hierarchy
-#     DefaultHomebrewRoot = '/opt/homebrew' "arm64"  Apple Silicon
-#     DefaultHomebrewRoot = '/usr/local'    "x86_64" Intel Mac
+#     Refer to "macbuild/build4mac_env.py" for HomebrewSearchPathFilter[1|2]
 #
 # @param[in] dylibPath:     dylib path
 # @param[in] depth:         hierarchy depth (< 5)
 # @param[in] filter_regex:  filter regular expression
+# @param[in] debug_level:   debug level
 #
 # @return a dictionary
 #----------------------------------------------------------------------------------------
-def WalkLibDependencyTree( dylibPath, depth=0, filter_regex=r'\t+%s/opt' % DefaultHomebrewRoot ):
+def WalkLibDependencyTree( dylibPath,
+                           depth=0,
+                           filter_regex=r'%s' % HomebrewSearchPathFilter1,
+                           debug_level=0 ):
+
     otoolCm   = 'otool -L %s | grep -E "%s"' % (dylibPath, filter_regex)
     otoolOut  = os.popen( otoolCm ).read()
     exedepdic = DecomposeLibraryDependency( dylibPath + ":\n" + otoolOut )
     keys      = exedepdic.keys()
     deplibs   = exedepdic[ list(keys)[0] ]
 
+    if debug_level > 0:
+        print( "In WalkLibDependencyTree()" )
+        print( "  1) depth     = %d" % depth )
+        print( "  2) dylibPath = %s" % dylibPath )
+        print( "  3) exedepdic = %s" % exedepdic )
+        print( "  4) key       = %s" % list(keys)[0] )
+        print( "  5) deplibs   = %s" % deplibs )
+
     if depth < 5:
         if len(deplibs) > 0:
             for idx, lib in enumerate(deplibs):
                 lib = str(lib)
                 if lib != list(keys)[0]:
-                    deplibs[idx] = WalkLibDependencyTree( lib, depth+1, filter_regex )
+                    deplibs[idx] = WalkLibDependencyTree( lib, depth+1, filter_regex, debug_level )
         if depth == 0:
             return deplibs
         return exedepdic
@@ -214,17 +226,20 @@ def WalkLibDependencyTree( dylibPath, depth=0, filter_regex=r'\t+%s/opt' % Defau
 
 #----------------------------------------------------------------------------------------
 ## To make a library dependency dictionary by recursively walk down the Framework
-#     DefaultHomebrewRoot = '/opt/homebrew' "arm64"  Apple Silicon
-#     DefaultHomebrewRoot = '/usr/local'    "x86_64" Intel Mac
+#     Refer to "macbuild/build4mac_env.py" for HomebrewSearchPathFilter[1|2]
 #
 # @param[in] frameworkPaths:      Framework path
 # @param[in] filter_regex:        filter regular expression
 # @param[in] search_path_filter:  search path filter regular expression
+# @param[in] debug_level:         debug level
 #
 # @return a dictionary
 #----------------------------------------------------------------------------------------
-def WalkFrameworkPaths( frameworkPaths, filter_regex=r'\.(so|dylib)$',
-                                        search_path_filter=r'\t+%s/opt' % DefaultHomebrewRoot ):
+def WalkFrameworkPaths( frameworkPaths,
+                        filter_regex=r'\.(so|dylib)$',
+                        search_path_filter=r'%s' % HomebrewSearchPathFilter1,
+                        debug_level=0 ):
+
     if isinstance( frameworkPaths, str ):
         frameworkPathsIter = [frameworkPaths]
     else:
@@ -239,12 +254,45 @@ def WalkFrameworkPaths( frameworkPaths, filter_regex=r'\.(so|dylib)$',
 
         dependency_dict[frameworkPath] = list()
         for idx, file in enumerate(framework_files):
-            dict_file = { file: WalkLibDependencyTree( file, filter_regex=search_path_filter ) }
+            dict_dep = WalkLibDependencyTree( file, filter_regex=search_path_filter, debug_level=debug_level )
+            if debug_level > 0:
+                print( "" )
+                print( "Return of WalkLibDependencyTree() for <%s>" % file )
+                print( "  *) %s" % dict_dep )
+                print( "" )
+            dict_file = { file: dict_dep }
             dependency_dict[frameworkPath].append(dict_file)
     return dependency_dict
 
 #----------------------------------------------------------------------------------------
-## To make a list of changed libraries
+## To dump the contents of a dependency dictionary
+#
+# @param[in] title:         title
+# @param[in] depdic:        dependency dictionary to dump
+# @param[in] debug_level:   debug level
+#
+# @return void
+#----------------------------------------------------------------------------------------
+def DumpDependencyDic( title, depdic, debug_level=0 ):
+    if not debug_level > 0:
+        return
+
+    print( "### Dependency Dictionary <%s> ###" % title )
+    count1 = 0
+    for key1 in sorted(depdic.keys()):
+        count1 += 1
+        diclist = depdic[key1]
+        print( "    %3d:%s" % (count1, key1) )
+
+        count2 = 0
+        for dict_file in diclist:
+            for key2 in sorted(dict_file.keys()):
+                count2 += 1
+                val2    = dict_file[key2]
+                print( "      %3d:%s:%s" % (count2, key2, val2) )
+
+#----------------------------------------------------------------------------------------
+## To make a list of libraries to change
 #
 # @param[in] dependencyDict:  library dependency dictionary
 # @param[in] visited_files:   list of visited files
@@ -307,7 +355,7 @@ def ResolveExecutablePath( path, executable_path ):
     return p
 
 #----------------------------------------------------------------------------------------
-## To detect the changed library names
+## To detect the library names to change
 #
 # @param[in] frameworkDependencyDict: framework dependency dictionary
 #
@@ -330,12 +378,27 @@ def DetectChanges(frameworkDependencyDict):
 # @param[in] frameworkDependencyDict: framework dependency dictionary
 # @param[in] replaceFromToPairs:      (from, to)-pair for replacement
 # @param[in] executable_path:         executable path
+# @param[in] debug_level:             debug level
 #
 # @return 0 on success; > 0 on failure
 #----------------------------------------------------------------------------------------
-def PerformChanges( frameworkDependencyDict, replaceFromToPairs=None, executable_path="/tmp/klayout" ):
+def PerformChanges( frameworkDependencyDict,
+                    replaceFromToPairs=None,
+                    executable_path="/tmp/klayout",
+                    debug_level=0 ):
+
     libNameChanges = DetectChanges(frameworkDependencyDict)
-    #print(libNameChanges)
+    # eg libNameChanges = [ ('lib.dylib',), ('lib.dylib',), ('lib.dylib', ['dep1.dylib', ...]), ... ]
+    if debug_level > 0:
+        print( "" )
+        print( "PerformChanges() ---> DetectChanges()" )
+        for tuple_item in libNameChanges:
+            if len(tuple_item) == 1:
+                print( "  %s" % tuple_item[0] )
+            elif len(tuple_item) == 2:
+                print( "  %s, %s" % (tuple_item[0], tuple_item[1]) )
+        print( "" )
+
     cmdNameId  = XcodeToolChain['nameID']
     cmdNameChg = XcodeToolChain['nameCH']
 
@@ -344,13 +407,18 @@ def PerformChanges( frameworkDependencyDict, replaceFromToPairs=None, executable
     else:
         for libNameChange in libNameChanges:
             libNameChangeIterator = iter(libNameChange)
-            lib = next(libNameChangeIterator)
+            lib = next(libNameChangeIterator) # 'lib.dylib'
+            if debug_level > 0:
+                print( "PerformChanges():lib = %s" % lib )
             try:
-                dependencies = next(libNameChangeIterator)
+                dependencies = next(libNameChangeIterator) # dependencies = ['dep1.dylib', ...] if any
             except StopIteration:
+                # if libNameChange == ('lib.dylib',)
                 dependencies = list()
             for replaceFrom, replaceTo, libdir in replaceFromToPairs:
                 fileName = ResolveExecutablePath(lib.replace(replaceFrom, replaceTo), executable_path)
+                if debug_level > 0:
+                    print( "PerformChanges():fileName = %s" % fileName )
                 if fileName.startswith('/usr'):
                     # print(f'skipping fileName: {fileName}')
                     continue
@@ -368,7 +436,7 @@ def PerformChanges( frameworkDependencyDict, replaceFromToPairs=None, executable
                         print( "       COPYING:", frameworkPath, " -> ", destFrameworkPath )
                         shutil.copytree(frameworkPath, destFrameworkPath)
 
-                    nameId = lib.replace(replaceFrom, replaceTo)
+                    nameId  = lib.replace(replaceFrom, replaceTo)
                     command = "%s %s %s" % ( cmdNameId, nameId, fileName )
                     if not os.access(fileName, os.W_OK):
                         command = "chmod u+w %s; %s; chmod u-w %s" % (fileName, command, fileName)
@@ -511,10 +579,13 @@ def GenerateInfoPlist( keydic, templfile ):
 #
 # @param[in]  pythonFrameworkPath:  Python Framework path
 # @param[in]  filter_regex:         filter regular expression
+# @param[in]  debug_level:          debug level
 #
 # @return 0 on succcess; non-zero on failure
 #----------------------------------------------------------------------------------------
-def Patch_Python_In_PythonFramework( pythonFrameworkPath, filter_regex=r'\t+%s/opt' % DefaultHomebrewRoot ):
+def Patch_Python_In_PythonFramework( pythonFrameworkPath,
+                                     filter_regex=r'\t+%s/opt' % DefaultHomebrewRoot,
+                                     debug_level=0 ):
     #----------------------------------------------------------------------
     # [1] Get Python's dependency
     #----------------------------------------------------------------------
@@ -547,6 +618,131 @@ def Patch_Python_In_PythonFramework( pythonFrameworkPath, filter_regex=r'\t+%s/o
                 print( msg % (nameNew, lib), file=sys.stderr )
                 return 1
     # for-lib
+    return 0
+
+#----------------------------------------------------------------------------------------
+## To change the Python's relative library paths to the absolute paths
+#
+# 1: absolute path as in ~python@3.9.17
+#      BigSur{kazzz-s} lib-dynload (1)% otool -L _sqlite3.cpython-39-darwin.so
+#      _sqlite3.cpython-39-darwin.so:
+#   ===> /usr/local/opt/sqlite/lib/libsqlite3.0.dylib (compatibility version 9.0.0, current version 9.6.0)
+#        /usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1292.100.5)
+#
+# 2: relative path as in  python@3.9.18~
+#      Monterey{kazzz-s} lib-dynload (1)% otool -L _sqlite3.cpython-39-darwin.so
+#      _sqlite3.cpython-39-darwin.so:
+#   ===> @loader_path/../../../../../../../../../../opt/sqlite/lib/libsqlite3.0.dylib (compatibility version 9.0.0, current version 9.6.0)
+#        /usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1311.100.3)
+#
+# @param[in] frameworkPath: Python Framework path
+# @param[in] debug_level:   debug level
+#
+# @return 0 on success; non-zero on failure
+#----------------------------------------------------------------------------------------
+def Change_Python_LibPath_RelativeToAbsolute( frameworkPath, debug_level=0 ):
+    #----------------------------------------------------------------------
+    # [1] Populate a dependency dictionary
+    #----------------------------------------------------------------------
+    dependency_dict = dict()
+    filter_regex    = r'\.(so|dylib)$'
+    patRel2         = r'(%s)(.+)' % HomebrewSearchPathFilter2   # = '\t+@loader_path/../../../../../../../../../../opt'
+    patRel3         = r'(%s)(.+)' % HomebrewSearchPathFilter3   # =    '@loader_path/../../../../../../../../../../opt'
+    regRel3         = re.compile(patRel3)
+
+    #----------------------------------------------------------------------
+    # (A) Collect *.[so|dylib] that the Python Frameworks depends on
+    #----------------------------------------------------------------------
+    # Ref. https://formulae.brew.sh/formula/python@3.9#default
+    #   as of 2023-09-22, python@3.9 depends on:
+    #     gdbm        1.23    GNU database manager
+    #     mpdecimal   2.5.1   Library for decimal floating point arithmetic
+    #     openssl@3   3.1.2   Cryptography and SSL/TLS Toolkit
+    #     readline    8.2.1   Library for command-line editing
+    #     sqlite      3.43.1  Command-line interface for SQLite
+    #     xz          5.4.4   General-purpose data compression with high compression ratio
+    find_grep_results = os.popen( 'find %s -type f | grep -E "%s"' % (frameworkPath, filter_regex) ).read().split('\n')
+    framework_files   = filter( lambda x: x != '', map(lambda x: x.strip(), find_grep_results) )
+
+    for idx, dylibPath in enumerate(framework_files):
+        otoolCm   = 'otool -L %s | grep -E "%s"' % (dylibPath, patRel2)
+        otoolOut  = os.popen( otoolCm ).read()
+        libdepdic = DecomposeLibraryDependency( dylibPath + ":\n" + otoolOut )
+        keys      = libdepdic.keys()
+        deplibs   = libdepdic[ list(keys)[0] ]
+
+        if len(deplibs) == 0:
+            continue
+
+        if debug_level > 0:
+            print( "In Change_Python_LibPath_RelativeToAbsolute()" )
+            print( "  1) dylibPath = %s" % dylibPath )
+            print( "  2) libdepdic = %s" % libdepdic )
+            print( "  3) key       = %s" % list(keys)[0] )
+            print( "  4) deplibs   = %s" % deplibs )
+
+            # @LOADER_PATH = @loader_path/../../../../../../../../../..
+            # dylibPath = /Abs/python3.9/lib-dynload/_hashlib.cpython-39-darwin.so
+            # libdepdic = {'/Abs/python3.9/lib-dynload/_hashlib.cpython-39-darwin.so':
+            #               ['@LOADER_PATH/opt/openssl@3/lib/libssl.3.dylib',
+            #                '@LOADER_PATH/opt/openssl@3/lib/libcrypto.3.dylib']}
+            # key       = /Abs/python3.9/lib-dynload/_hashlib.cpython-39-darwin.so
+            # deplibs   = ['@LOADER_PATH/opt/openssl@3/lib/libssl.3.dylib',
+            #              '@LOADER_PATH/opt/openssl@3/lib/libcrypto.3.dylib']
+
+        for key in keys:
+            for file in libdepdic[key]:
+                if regRel3.match(file):
+                    g1, g2 = regRel3.match(file).groups()
+                    try:
+                        container = dependency_dict[key]
+                    except KeyError:
+                        dependency_dict[key] = list() # new empty container
+                    else:
+                        pass
+                    pathRel = "%s" % file
+                    pathAbs = ("%s/opt" % DefaultHomebrewRoot) + g2
+                    dependency_dict[key].append( {pathRel:pathAbs} )
+
+    if len(dependency_dict) == 0:
+        print( "           ---> Change_Python_LibPath_RelativeToAbsolute(): No need to change the library paths." )
+        return 0
+
+    if debug_level > 0:
+        print( "In [1] of Change_Python_LibPath_RelativeToAbsolute()" )
+        for key in sorted(dependency_dict.keys()):
+            val = dependency_dict[key]
+            print( "  key=%s" % key )
+            print( "  val=%s" % val )
+
+    #----------------------------------------------------------------------
+    # [2] Perform the changes: relative paths ---> absolute paths
+    #----------------------------------------------------------------------
+    cmdNameId  = XcodeToolChain['nameID']
+    cmdNameChg = XcodeToolChain['nameCH']
+
+    if debug_level > 0:
+        print( "In [2] of Change_Python_LibPath_RelativeToAbsolute()" )
+
+    for targetfile in sorted(dependency_dict.keys()):
+        for depdic in dependency_dict[targetfile]:
+            nameOld = list(depdic.keys())[0] # relative path
+            nameNew = depdic[nameOld]        # absolute path
+
+            #-----------------------------------------------------------
+            # (A) Make the library aware of the new identification
+            #     $ install_name_tool [-change old new] input
+            #-----------------------------------------------------------
+            command = "%s %s %s %s" % ( cmdNameChg, nameOld, nameNew, targetfile )
+            if debug_level > 0:
+                print( "  executing: %s" % command )
+            if subprocess.call( command, shell=True ) != 0:
+                msg = "!!! Failed to make the library <%s> aware of the new identification name <%s> !!!"
+                print( msg % (targetfile, nameNew), file=sys.stderr )
+                return 1
+    # for-targetfile
+
+    print( "           ---> Change_Python_LibPath_RelativeToAbsolute(): Changed the library paths." )
     return 0
 
 #----------------

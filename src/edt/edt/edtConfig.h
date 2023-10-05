@@ -40,6 +40,7 @@ namespace edt
  */
 extern EDT_PUBLIC std::string cfg_edit_grid;
 extern EDT_PUBLIC std::string cfg_edit_snap_to_objects;
+extern EDT_PUBLIC std::string cfg_edit_snap_objects_to_grid;
 extern EDT_PUBLIC std::string cfg_edit_move_angle_mode;
 extern EDT_PUBLIC std::string cfg_edit_connect_angle_mode;
 extern EDT_PUBLIC std::string cfg_edit_text_string;

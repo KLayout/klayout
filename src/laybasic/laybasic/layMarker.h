@@ -440,6 +440,14 @@ public:
   ~InstanceMarker ();
 
   /**
+   *  @brief Gets the instance
+   */
+  const db::Instance &instance () const
+  {
+    return m_inst;
+  }
+
+  /**
    *  @brief Set the instance the marker is to display
    *
    *  The marker just stores the instance which is a proxy. The actual object

@@ -85,6 +85,7 @@ EditorOptionsGeneric::EditorOptionsGeneric (lay::LayoutViewBase *view, lay::Disp
   connect (mp_ui->hier_sel_cbx, SIGNAL (clicked ()), this, SLOT (edited ()));
   connect (mp_ui->hier_copy_mode_cbx, SIGNAL (activated (int)), this, SLOT (edited ()));
   connect (mp_ui->snap_objects_cbx, SIGNAL (clicked ()), this, SLOT (edited ()));
+  connect (mp_ui->snap_objects_to_grid_cbx, SIGNAL (clicked ()), this, SLOT (edited ()));
   connect (mp_ui->max_shapes_le, SIGNAL (editingFinished ()), this, SLOT (edited ()));
   connect (mp_ui->show_shapes_cbx, SIGNAL (clicked ()), this, SLOT (edited ()));
 }
@@ -132,6 +133,7 @@ EditorOptionsGeneric::apply (lay::Dispatcher *root)
   int cpm = mp_ui->hier_copy_mode_cbx->currentIndex ();
   root->config_set (cfg_edit_hier_copy_mode, tl::to_string ((cpm < 0 || cpm > 1) ? -1 : cpm));
   root->config_set (cfg_edit_snap_to_objects, tl::to_string (mp_ui->snap_objects_cbx->isChecked ()));
+  root->config_set (cfg_edit_snap_objects_to_grid, tl::to_string (mp_ui->snap_objects_to_grid_cbx->isChecked ()));
 
   configure_from_line_edit<unsigned int> (root, mp_ui->max_shapes_le, cfg_edit_max_shapes_of_instances);
   root->config_set (cfg_edit_show_shapes_of_instances, tl::to_string (mp_ui->show_shapes_cbx->isChecked ()));
@@ -193,6 +195,10 @@ EditorOptionsGeneric::setup (lay::Dispatcher *root)
   bool snap_to_objects = false;
   root->config_get (cfg_edit_snap_to_objects, snap_to_objects);
   mp_ui->snap_objects_cbx->setChecked (snap_to_objects);
+
+  bool snap_objects_to_grid = false;
+  root->config_get (cfg_edit_snap_objects_to_grid, snap_objects_to_grid);
+  mp_ui->snap_objects_to_grid_cbx->setChecked (snap_objects_to_grid);
 
   unsigned int max_shapes = 1000;
   root->config_get (cfg_edit_max_shapes_of_instances, max_shapes);

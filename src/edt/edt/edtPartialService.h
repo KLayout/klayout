@@ -341,6 +341,7 @@ private:
   lay::angle_constraint_type m_connect_ac, m_move_ac, m_alt_ac;
   db::DVector m_edit_grid;
   bool m_snap_to_objects;
+  bool m_snap_objects_to_grid;
   db::DVector m_global_grid;
   bool m_top_level_sel;
 

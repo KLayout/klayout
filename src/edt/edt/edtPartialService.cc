@@ -1102,6 +1102,7 @@ PartialService::PartialService (db::Manager *manager, lay::LayoutViewBase *view,
     m_buttons (0),
     m_connect_ac (lay::AC_Any), m_move_ac (lay::AC_Any), m_alt_ac (lay::AC_Global),
     m_snap_to_objects (true),
+    m_snap_objects_to_grid (true),
     m_top_level_sel (false),
     m_hover (false),
     m_hover_wait (false),
@@ -1340,6 +1341,9 @@ PartialService::configure (const std::string &name, const std::string &value)
     return true;  //  taken
   } else if (name == cfg_edit_snap_to_objects) {
     tl::from_string (value, m_snap_to_objects);
+    return true;  //  taken
+  } else if (name == cfg_edit_snap_objects_to_grid) {
+    tl::from_string (value, m_snap_objects_to_grid);
     return true;  //  taken
   } else if (name == cfg_edit_move_angle_mode) {
     acc.from_string (value, m_move_ac);

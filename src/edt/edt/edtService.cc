@@ -72,7 +72,8 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view, db::ShapeIter
     m_flags (flags),
     m_move_sel (false), m_moving (false),
     m_connect_ac (lay::AC_Any), m_move_ac (lay::AC_Any), m_alt_ac (lay::AC_Global),
-    m_snap_to_objects (false),
+    m_snap_to_objects (true),
+    m_snap_objects_to_grid (true),
     m_top_level_sel (false), m_show_shapes_of_instances (true), m_max_shapes_of_instances (1000),
     m_hier_copy_mode (-1),
     m_indicate_secondary_selection (false),
@@ -94,6 +95,7 @@ Service::Service (db::Manager *manager, lay::LayoutViewBase *view)
     m_move_sel (false), m_moving (false),
     m_connect_ac (lay::AC_Any), m_move_ac (lay::AC_Any), m_alt_ac (lay::AC_Global),
     m_snap_to_objects (true),
+    m_snap_objects_to_grid (true),
     m_top_level_sel (false), m_show_shapes_of_instances (true), m_max_shapes_of_instances (1000),
     m_hier_copy_mode (-1),
     m_indicate_secondary_selection (false),
@@ -152,7 +154,6 @@ void
 Service::update_vector_snapped_point (const db::DPoint &pt, db::DVector &vr, bool &result_set) const
 {
   db::DVector v = snap (pt) - pt;
-  v = lay::snap_angle (v, move_ac ());
 
   if (! result_set || v.length () < vr.length ()) {
     result_set = true;
@@ -204,32 +205,51 @@ Service::update_vector_snapped_marker (const lay::ShapeMarker *sm, const db::DTr
   }
 }
 
-db::DVector
-Service::snap_marker_to_grid (const db::DVector &v) const
+void
+Service::update_vector_snapped_marker (const lay::InstanceMarker *im, const db::DTrans &trans, db::DVector &vr, bool &result_set, size_t &count) const
 {
+  const db::Instance &instance = im->instance ();
+  db::CplxTrans tr = db::DCplxTrans (trans) * db::DCplxTrans (-im->trans ().disp ()) * im->trans ();
+
+  update_vector_snapped_point (tr * (instance.complex_trans () * db::Point ()), vr, result_set);
+  --count;
+}
+
+db::DVector
+Service::snap_marker_to_grid (const db::DVector &v, bool &snapped) const
+{
+  if (! m_snap_objects_to_grid) {
+    return v;
+  }
+
+  snapped = false;
   db::DVector vr;
-  bool result_set = false;
 
   //  max. 10000 checks
   size_t count = 10000;
 
-  db::DTrans tt = db::DTrans (v);
+  db::DVector snapped_to (1.0, 1.0);
+  db::DVector vv = lay::snap_angle (v, move_ac (), &snapped_to);
+
+  db::DTrans tt = db::DTrans (vv);
 
   for (auto m = m_markers.begin (); m != m_markers.end () && count > 0; ++m) {
 
     const lay::ShapeMarker *sm = dynamic_cast<const lay::ShapeMarker *> (*m);
+    const lay::InstanceMarker *im = dynamic_cast<const lay::InstanceMarker *> (*m);
     if (sm) {
-      update_vector_snapped_marker (sm, tt, vr, result_set, count);
-    } else {
-      // @@@ instance markers
+      update_vector_snapped_marker (sm, tt, vr, snapped, count);
+    } else if (im) {
+      update_vector_snapped_marker (im, tt, vr, snapped, count);
     }
 
   }
 
-  if (result_set) {
-    return vr + v;
+  if (snapped) {
+    vr += vv;
+    return db::DVector (vr.x () * snapped_to.x (), vr.y () * snapped_to.y ());
   } else {
-    return v;
+    return db::DVector ();
   }
 }
 
@@ -320,6 +340,13 @@ Service::configure (const std::string &name, const std::string &value)
   } else if (name == cfg_edit_snap_to_objects) {
 
     tl::from_string (value, m_snap_to_objects);
+    service_configuration_changed ();
+
+    return true;  //  taken
+
+  } else if (name == cfg_edit_snap_objects_to_grid) {
+
+    tl::from_string (value, m_snap_objects_to_grid);
     service_configuration_changed ();
 
     return true;  //  taken
@@ -521,8 +548,9 @@ Service::move (const db::DPoint &pu, lay::angle_constraint_type ac)
   m_alt_ac = ac;
   if (view ()->is_editable () && m_moving) {
     db::DPoint ref = snap (m_move_start);
-    db::DPoint p = ref + snap_marker_to_grid (pu - ref);
-    if (p.equal (pu)) {
+    bool snapped = false;
+    db::DPoint p = ref + snap_marker_to_grid (pu - m_move_start, snapped);
+    if (! snapped) {
       p = ref + snap (pu - m_move_start, false /*move*/);
     }
     move_markers (db::DTrans (p - db::DPoint ()) * db::DTrans (m_move_trans.fp_trans ()) * db::DTrans (db::DPoint () - ref));
@@ -536,8 +564,9 @@ Service::move_transform (const db::DPoint &pu, db::DFTrans tr, lay::angle_constr
   m_alt_ac = ac;
   if (view ()->is_editable () && m_moving) {
     db::DPoint ref = snap (m_move_start);
-    db::DPoint p = ref + snap_marker_to_grid (pu - ref);
-    if (p.equal (pu)) {
+    bool snapped = false;
+    db::DPoint p = ref + snap_marker_to_grid (pu - m_move_start, snapped);
+    if (! snapped) {
       p = ref + snap (pu - m_move_start, false /*move*/);
     }
     move_markers (db::DTrans (p - db::DPoint ()) * db::DTrans (tr * m_move_trans.fp_trans ()) * db::DTrans (db::DPoint () - ref));

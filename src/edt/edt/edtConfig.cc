@@ -32,6 +32,7 @@ namespace edt
 
 std::string cfg_edit_grid ("edit-grid");
 std::string cfg_edit_snap_to_objects ("edit-snap-to-objects");
+std::string cfg_edit_snap_objects_to_grid ("edit-snap-objects-to-grid");
 std::string cfg_edit_move_angle_mode ("edit-move-angle-mode");
 std::string cfg_edit_connect_angle_mode ("edit-connect-angle-mode");
 std::string cfg_edit_text_string ("edit-text-string");

@@ -524,7 +524,7 @@ protected:
    *  @param v The input displacement
    *  @return A displacement that pushes the (current) markers on-grid, definition depending on marker
    */
-  db::DVector snap_marker_to_grid (const db::DVector &v) const;
+  db::DVector snap_marker_to_grid (const db::DVector &v, bool &snapped) const;
 
   /**
    *  @brief Snap a point to the edit grid with advanced snapping (including object snapping)
@@ -613,6 +613,7 @@ private:
   lay::angle_constraint_type m_connect_ac, m_move_ac, m_alt_ac;
   db::DVector m_edit_grid;
   bool m_snap_to_objects;
+  bool m_snap_objects_to_grid;
   db::DVector m_global_grid;
   bool m_top_level_sel;
   bool m_show_shapes_of_instances;
@@ -668,6 +669,7 @@ private:
   void copy_selected (unsigned int inst_mode);
   void update_vector_snapped_point (const db::DPoint &pt, db::DVector &vr, bool &result_set) const;
   void update_vector_snapped_marker (const lay::ShapeMarker *sm, const db::DTrans &trans, db::DVector &vr, bool &result_set, size_t &count) const;
+  void update_vector_snapped_marker (const lay::InstanceMarker *sm, const db::DTrans &trans, db::DVector &vr, bool &result_set, size_t &count) const;
 };
 
 }

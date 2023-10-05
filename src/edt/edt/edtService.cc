@@ -172,6 +172,20 @@ Service::update_vector_snapped_marker (const lay::ShapeMarker *sm, const db::DTr
     update_vector_snapped_point (tr * shape.bbox ().center (), vr, result_set);
     --count;
 
+  } else if (shape.is_point ()) {
+
+    update_vector_snapped_point (tr * shape.point (), vr, result_set);
+    --count;
+
+  } else if (shape.is_edge ()) {
+
+    update_vector_snapped_point (tr * shape.edge ().p1 (), vr, result_set);
+    --count;
+    if (count > 0) {
+      update_vector_snapped_point (tr * shape.edge ().p2 (), vr, result_set);
+      --count;
+    }
+
   } else if (shape.is_path ()) {
 
     for (auto pt = shape.begin_point (); pt != shape.end_point () && count > 0; ++pt) {

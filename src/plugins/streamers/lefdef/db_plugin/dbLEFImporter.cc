@@ -721,6 +721,8 @@ LEFImporter::read_layer (Layout & /*layout*/)
         m_routing_layers.insert (ln);
       } else if (type == "CUT") {
         m_cut_layers.insert (ln);
+      } else if (type == "OVERLAP") {
+        m_overlap_layers.insert (ln);
       }
       expect (";");
 
@@ -1029,6 +1031,7 @@ LEFImporter::read_macro (Layout &layout)
   }
 
   mg->add_box (std::string (), Outline, db::Box (-origin, -origin + size), 0, 0);
+  mg->subtract_overlap_from_outline (m_overlap_layers);
 
   MacroDesc macro_desc;
   macro_desc.foreign_name = foreign_name;

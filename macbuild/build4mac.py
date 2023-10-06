@@ -61,7 +61,7 @@ def GenerateUsage(platform):
     usage += "                        :       Qt6Brew: use Qt6 from Homebrew (*)                       | \n"
     usage += "                        :                        (*) migration to Qt6 is ongoing         | \n"
     usage += "   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP31', 'HB31', 'Ana3',   | %s \n" % myRuby
-    usage += "                        :                        'MP32', HB32']                          | \n"
+    usage += "                        :                        'MP32', 'HB32']                         | \n"
     usage += "                        :    nil: don't bind Ruby                                        | \n"
     usage += "                        :    Sys: use OS-bundled Ruby [2.0 - 2.6] depending on OS        | \n"
     usage += "                        :   MP31: use Ruby 3.1 from MacPorts                             | \n"
@@ -70,7 +70,7 @@ def GenerateUsage(platform):
     usage += "                        :   MP32: use Ruby 3.2 from MacPorts                             | \n"
     usage += "                        :   HB32: use Ruby 3.2 from Homebrew                             | \n"
     usage += "   [-p|--python <type>] : case-insensitive type=['nil',  'Sys', 'MP38', 'HB38', 'Ana3',  | %s \n" % myPython
-    usage += "                        :                        'MP39', HB39', 'HBAuto']                | \n"
+    usage += "                        :                        'MP39', 'HB39', 'HBAuto']               | \n"
     usage += "                        :    nil: don't bind Python                                      | \n"
     usage += "                        :    Sys: use OS-bundled Python 2.7 up to Catalina               | \n"
     usage += "                        :   MP38: use Python 3.8 from MacPorts                           | \n"
@@ -154,6 +154,9 @@ def Get_Default_Config():
     # Set the OS-wise usage and module set
     Usage, ModuleSet = GenerateUsage(Platform)
 
+    # developer's debug level list for this tool
+    ToolDebug = list()
+
     # Set the default modules
     if   Platform == "Ventura":
         ModuleQt     = "Qt5Brew"
@@ -226,6 +229,7 @@ def Get_Default_Config():
     config['DeployVerbose'] = DeployVerbose     # -verbose=<0-3> level passed to 'macdeployqt' tool
     config['Version']       = Version           # KLayout's version
     config['ModuleSet']     = ModuleSet         # (Qt, Ruby, Python)-tuple
+    config['ToolDebug']     = ToolDebug         # debug level list for this tool
     # auxiliary variables on platform
     config['System']        = System            # 6-tuple from platform.uname()
     config['Node']          = Node              # - do -
@@ -382,6 +386,7 @@ def Parse_CLI_Args(config):
     PackagePrefix = config['PackagePrefix']
     DeployVerbose = config['DeployVerbose']
     ModuleSet     = config['ModuleSet']
+    ToolDebug     = config['ToolDebug']
 
     #-----------------------------------------------------
     # [2] Parse the CLI arguments
@@ -449,6 +454,11 @@ def Parse_CLI_Args(config):
                     dest='deploy_verbose',
                     help="verbose level of `macdeployqt` tool" )
 
+    p.add_option( '-t', '--tooldebug',
+                    action='append',
+                    dest='tool_debug',
+                    help="developer's debug level list for this tool" ) # not shown in the usage
+
     p.add_option( '-?', '--??',
                     action='store_true',
                     dest='checkusage',
@@ -468,6 +478,7 @@ def Parse_CLI_Args(config):
                         deploy_full    = False,
                         deploy_partial = False,
                         deploy_verbose = "1",
+                        tool_debug     = [],
                         checkusage     = False )
     else: # with Xcode [ .. 12.4]
         p.set_defaults( type_qt        = "qt5macports",
@@ -482,6 +493,7 @@ def Parse_CLI_Args(config):
                         deploy_full    = False,
                         deploy_partial = False,
                         deploy_verbose = "1",
+                        tool_debug     = [],
                         checkusage     = False )
 
     opt, args = p.parse_args()
@@ -647,6 +659,7 @@ def Parse_CLI_Args(config):
     CheckComOnly = opt.check_command
     DeploymentF  = opt.deploy_full
     DeploymentP  = opt.deploy_partial
+    ToolDebug    = sorted( set([ int(val) for val in opt.tool_debug ]) )
 
     if DeploymentF and DeploymentP:
         print("")
@@ -715,6 +728,7 @@ def Parse_CLI_Args(config):
     config['PackagePrefix'] = PackagePrefix
     config['DeployVerbose'] = DeployVerbose
     config['ModuleSet']     = ModuleSet
+    config['ToolDebug']     = ToolDebug
 
     if CheckComOnly:
         pp = pprint.PrettyPrinter( indent=4, width=140 )
@@ -942,9 +956,9 @@ def Build_pymod(parameters):
         try:
             ldpath = os.environ['LDFLAGS']
         except KeyError:
-            os.environ['LDFLAGS'] = '-L%s' % addLibPath
+            os.environ['LDFLAGS'] = '-L%s -headerpad_max_install_names' % addLibPath
         else:
-            os.environ['LDFLAGS'] = '-L%s %s' % (addLibPath, ldpath)
+            os.environ['LDFLAGS'] = '-L%s %s -headerpad_max_install_names' % (addLibPath, ldpath)
 
     #--------------------------------------------------------------------
     # [3] Set different command line parameters for building <pymod>
@@ -1235,6 +1249,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     DeployVerbose  = config['DeployVerbose']
     ModuleRuby     = config['ModuleRuby']
     ModulePython   = config['ModulePython']
+    ToolDebug      = config['ToolDebug']
 
     BuildPymod     = parameters['BuildPymod']
     ProjectDir     = parameters['project_dir']
@@ -1521,10 +1536,9 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             shutil.copy2( item,  targetDirP )
 
     print( " [7] Setting and changing the identification names of KLayout's libraries in each executable ..." )
-    #-------------------------------------------------------------
-    # [7] Set and change the library identification name(s) of
-    #     different executables
-    #-------------------------------------------------------------
+    #------------------------------------------------------------------------------------
+    # [7] Set and change the library identification name(s) of different executable(s)
+    #------------------------------------------------------------------------------------
     os.chdir(ProjectDir)
     os.chdir(MacPkgDir)
     klayoutexec = "klayout.app/Contents/MacOS/klayout"
@@ -1551,14 +1565,14 @@ def Deploy_Binaries_For_Bundle(config, parameters):
         #-------------------------------------------------------------
         # [8] Deploy Qt Frameworks
         #-------------------------------------------------------------
-        verbose = " -verbose=%d" % DeployVerbose
+        verbose    = " -verbose=%d" % DeployVerbose
         app_bundle = "klayout.app"
-        options = macdepQtOpt + verbose
+        options    = macdepQtOpt + verbose
         deploytool = parameters['deploy_tool']
 
         # Without the following, the plugin cocoa would not be found properly.
         shutil.copy2( sourceDir2 + "/qt.conf", targetDirM )
-        os.chmod( targetDirM + "/qt.conf",      0o0644 )
+        os.chmod( targetDirM + "/qt.conf", 0o0644 )
 
         os.chdir(ProjectDir)
         os.chdir(MacPkgDir)
@@ -1611,7 +1625,8 @@ def Deploy_Binaries_For_Bundle(config, parameters):
         deploymentPython39HB   = (ModulePython == 'Python39Brew')
         deploymentPythonAutoHB = (ModulePython == 'PythonAutoBrew')
         if (deploymentPython38HB or deploymentPython39HB or deploymentPythonAutoHB) and NonOSStdLang:
-            from build4mac_util import WalkFrameworkPaths, PerformChanges
+            # from build4mac_util import WalkFrameworkPaths, PerformChanges
+            # from build4mac_util import Change_Python_LibPath_RelativeToAbsolute, DumpDependencyDic
 
             if deploymentPython38HB:
                 HBPythonFrameworkPath = HBPython38FrameworkPath
@@ -1619,6 +1634,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             elif deploymentPython39HB:
                 HBPythonFrameworkPath = HBPython39FrameworkPath
                 pythonHBVer           = "3.9" # 'pinned' to this version as of KLayout version 0.28.2 (2023-01-02)
+                                              # More specifically, "3.9.17" as of KLayout version 0.28.12 (2023-09-dd)
             elif deploymentPythonAutoHB:
                 HBPythonFrameworkPath = HBPythonAutoFrameworkPath
                 pythonHBVer           = HBPythonAutoVersion
@@ -1636,6 +1652,10 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             print( "" )
             print( " [9] Optional deployment of Python from %s ..." % HBPythonFrameworkPath )
             print( "  [9.1] Copying Python Framework" )
+            if 910 in ToolDebug:
+                dbglevel = 910
+            else:
+                dbglevel = 0
 
             cmd01 = "rm -rf %s" % pythonFrameworkPath
             cmd02 = "rsync -a --safe-links %s/ %s" % (HBPythonFrameworkPath, pythonFrameworkPath)
@@ -1660,7 +1680,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
 
             for command in shell_commands:
                 if subprocess.call( command, shell=True ) != 0:
-                    msg = "command failed: %s"
+                    msg = "In [9.1], failed to execute command: %s"
                     print( msg % command, file=sys.stderr )
                     sys.exit(1)
 
@@ -1669,23 +1689,39 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             os.chmod( targetDirM + "/start-console.py", 0o0755 )
             os.chmod( targetDirM + "/klayout_console",  0o0755 )
 
-            print( "  [9.2] Relinking dylib dependencies inside Python.framework" )
+            print( "  [9.2] Re-linking dylib dependencies inside Python.framework" )
             print( "   [9.2.1] Patching Python Framework" )
-            depdict = WalkFrameworkPaths( pythonFrameworkPath )
+            if 921 in ToolDebug:
+                dbglevel = 921
+            else:
+                dbglevel = 0
+            Change_Python_LibPath_RelativeToAbsolute( pythonFrameworkPath, debug_level=dbglevel )
+            depdict = WalkFrameworkPaths( pythonFrameworkPath, debug_level=dbglevel )
+            DumpDependencyDic( "[9.2.1]", depdict, debug_level=dbglevel )
             appPythonFrameworkPath = '@executable_path/../Frameworks/Python.framework/'
-            PerformChanges( depdict, [(HBPythonFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs )
+            replacePairs = [ (HBPythonFrameworkPath, appPythonFrameworkPath, False) ]
+            PerformChanges( depdict, replacePairs, bundleExecPathAbs, debug_level=dbglevel )
 
             print( "   [9.2.2] Patching 'Python' itself in Python Framework" )
+            if 922 in ToolDebug:
+                dbglevel = 922
+            else:
+                dbglevel = 0
             filterreg = r'\t+%s/(opt|Cellar)' % DefaultHomebrewRoot
-            Patch_Python_In_PythonFramework( pythonFrameworkPath, filter_regex=filterreg  )
+            Patch_Python_In_PythonFramework( pythonFrameworkPath, filter_regex=filterreg, debug_level=dbglevel )
 
             print( "   [9.2.3] Patching %s/opt/ libs" % DefaultHomebrewRoot ) # eg. DefaultHomebrewRoot == "/usr/local"
+            if 923 in ToolDebug:
+                dbglevel = 923
+            else:
+                dbglevel = 0
+            filterreg = r'\t+%s/(opt|Cellar)' % DefaultHomebrewRoot
+            depdict   = WalkFrameworkPaths( pythonFrameworkPath, search_path_filter=filterreg, debug_level=dbglevel )
+            DumpDependencyDic( "[9.2.3]", depdict, debug_level=dbglevel )
             usrLocalPath    = '%s/opt/' % DefaultHomebrewRoot
             appUsrLocalPath = '@executable_path/../Frameworks/'
             replacePairs    = [ (usrLocalPath, appUsrLocalPath, True) ]
-            filterreg       = r'\t+%s/(opt|Cellar)' % DefaultHomebrewRoot
-            depdict         = WalkFrameworkPaths( pythonFrameworkPath, search_path_filter=filterreg )
-            PerformChanges( depdict, replacePairs, bundleExecPathAbs )
+            PerformChanges( depdict, replacePairs, bundleExecPathAbs, debug_level=dbglevel )
 
             #---------------------------------------------------------------------------------------------------
             # As of 2023-07-09 (KLayout 0.28.10),
@@ -1709,8 +1745,21 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             #     sqlite
             #     xz
             #---------------------------------------------------------------------------------------------------
+            # https://formulae.brew.sh/formula/python@3.9#default
+            #   as of 2023-09-22, python@3.9 depends on:
+            #     gdbm        1.23    GNU database manager
+            #     mpdecimal   2.5.1   Library for decimal floating point arithmetic
+            #     openssl@3   3.1.2   Cryptography and SSL/TLS Toolkit
+            #     readline    8.2.1   Library for command-line editing
+            #     sqlite      3.43.1  Command-line interface for SQLite
+            #     xz          5.4.4   General-purpose data compression with high compression ratio
+            #---------------------------------------------------------------------------------------------------
             if Platform in ['Catalina']:
-                print( "   [9.2.4] Patching openssl@1.1, gdbm, mpdecimal, readline, sqlite, xz" )
+                print( "   [9.2.4] Patching [openssl@1.1, gdbm, mpdecimal, readline, sqlite, xz]" )
+                if 924 in ToolDebug:
+                    dbglevel = 924
+                else:
+                    dbglevel = 0
                 usrLocalPath    = '%s/opt/' % DefaultHomebrewRoot
                 appUsrLocalPath = '@executable_path/../Frameworks/'
                 replacePairs    = [ (usrLocalPath, appUsrLocalPath, True) ]
@@ -1722,9 +1771,15 @@ def Deploy_Binaries_For_Bundle(config, parameters):
                                                  pythonFrameworkPath + '/../mpdecimal',
                                                  pythonFrameworkPath + '/../readline',
                                                  pythonFrameworkPath + '/../sqlite',
-                                                 pythonFrameworkPath + '/../xz'], search_path_filter=filterreg )
+                                                 pythonFrameworkPath + '/../xz'],
+                                                 search_path_filter=filterreg,
+                                                 debug_level=dbglevel )
             else: # [ 'Ventura', 'Monterey', 'BigSur' ]
-                print( "   [9.2.4] Patching openssl@3, gdbm, mpdecimal, readline, sqlite, xz" )
+                print( "   [9.2.4] Patching [openssl@3, gdbm, mpdecimal, readline, sqlite, xz]" )
+                if 924 in ToolDebug:
+                    dbglevel = 924
+                else:
+                    dbglevel = 0
                 usrLocalPath    = '%s/opt/' % DefaultHomebrewRoot
                 appUsrLocalPath = '@executable_path/../Frameworks/'
                 replacePairs    = [ (usrLocalPath, appUsrLocalPath, True) ]
@@ -1736,19 +1791,39 @@ def Deploy_Binaries_For_Bundle(config, parameters):
                                                  pythonFrameworkPath + '/../mpdecimal',
                                                  pythonFrameworkPath + '/../readline',
                                                  pythonFrameworkPath + '/../sqlite',
-                                                 pythonFrameworkPath + '/../xz'], search_path_filter=filterreg )
-            PerformChanges( depdict, replacePairs, bundleExecPathAbs )
+                                                 pythonFrameworkPath + '/../xz'],
+                                                 search_path_filter=filterreg,
+                                                 debug_level=dbglevel )
 
-            print( "  [9.3] Relinking dylib dependencies for klayout" )
+            DumpDependencyDic( "[9.2.4]", depdict, debug_level=dbglevel )
+            PerformChanges( depdict, replacePairs, bundleExecPathAbs, debug_level=dbglevel )
+
+            print( "  [9.3] Re-linking dylib dependencies for klayout" )
+            if 931 in ToolDebug:
+                dbglevel = 931
+            else:
+                dbglevel = 0
             klayoutPath = bundleExecPathAbs
-            depdict     = WalkFrameworkPaths( klayoutPath, filter_regex=r'klayout$' )
-            PerformChanges( depdict, [(HBPythonFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs )
+            depdict     = WalkFrameworkPaths( klayoutPath, filter_regex=r'klayout$', debug_level=dbglevel )
+            DumpDependencyDic( "[9.3.1]", depdict, debug_level=dbglevel )
+            replacePairs = [ (HBPythonFrameworkPath, appPythonFrameworkPath, False) ]
+            PerformChanges( depdict, replacePairs, bundleExecPathAbs, debug_level=dbglevel )
 
+            if 932 in ToolDebug:
+                dbglevel = 932
+            else:
+                dbglevel = 0
             libKlayoutPath = bundleExecPathAbs + '../Frameworks'
-            depdict        = WalkFrameworkPaths( libKlayoutPath, filter_regex=r'libklayout' )
-            PerformChanges( depdict, [(HBPythonFrameworkPath, appPythonFrameworkPath, False)], bundleExecPathAbs )
+            depdict        = WalkFrameworkPaths( libKlayoutPath, filter_regex=r'libklayout', debug_level=dbglevel )
+            DumpDependencyDic( "[9.3.2]", depdict, debug_level=dbglevel )
+            replacePairs = [ (HBPythonFrameworkPath, appPythonFrameworkPath, False) ]
+            PerformChanges( depdict, replacePairs, bundleExecPathAbs, debug_level=dbglevel )
 
             print( "  [9.4] Patching site.py, pip/, and distutils/" )
+            if 940 in ToolDebug:
+                dbglevel = 940
+            else:
+                dbglevel = 0
             site_module = "%s/Versions/%s/lib/python%s/site.py" % (pythonFrameworkPath, pythonHBVer, pythonHBVer)
             with open(site_module, 'r') as site:
                 buf = site.readlines()
@@ -1778,10 +1853,10 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             # Type "help", "copyright", "credits" or "license" for more information.
             # (KLayout Python Console)
             # >>> import pip
-            # >>> pip.main( ['install', 'numpy'] )
-            # >>> pip.main( ['install', 'scipy'] )
-            # >>> pip.main( ['install', 'pandas'] )
-            # >>> pip.main( ['install', 'matplotlib'] )
+            # >>> pip.main( ['install', 'pandas', 'scipy', 'matplotlib'] )
+            # >>> quit()
+            #
+            # 'pandas' depends on many modules including 'numpy'. They are also installed.
             #----------------------------------------------------------------------------------
             pip_module = "%s/Versions/%s/lib/python%s/site-packages/pip/__init__.py" % \
                                      (pythonFrameworkPath, pythonHBVer, pythonHBVer)
@@ -1807,15 +1882,15 @@ def Deploy_Binaries_For_Bundle(config, parameters):
                     file.write(line)
 
         #-------------------------------------------------------------
-        # [10] Special deployment of Ruby3.1 from Homebrew?
+        # [10] Special deployment of Ruby3.2 from Homebrew?
         #-------------------------------------------------------------
-        deploymentRuby31HB = (ModuleRuby == 'Ruby31Brew')
-        if deploymentRuby31HB and NonOSStdLang:
+        deploymentRuby32HB = (ModuleRuby == 'Ruby32Brew')
+        if deploymentRuby32HB and NonOSStdLang:
 
             print( "" )
-            print( " [10] You have reached optional deployment of Ruby from %s ..." % HBRuby31Path )
+            print( " [10] You have reached optional deployment of Ruby from %s ..." % HBRuby32Path )
             print( "   [!!!] Sorry, the deployed package will not work properly since deployment of" )
-            print( "         Ruby2.7 from Homebrew is not yet supported." )
+            print( "         Ruby3.2 from Homebrew is not yet supported." )
             print( "         Since you have Homebrew development environment, there two options:" )
             print( "           (1) Retry to make a package with '-Y|--DEPLOY' option." )
             print( "               This will not deploy any of Qt[5|6], Python, and Ruby from Homebrew." )

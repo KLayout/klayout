@@ -27,8 +27,29 @@ XcodeToolChain = { 'nameID': '/usr/bin/install_name_tool -id ',
 (System, Node, Release, MacVersion, Machine, Processor) = platform.uname()
 if Machine == "arm64": # Apple Silicon!
   DefaultHomebrewRoot = '/opt/homebrew'
+  HomebrewSearchPathFilter1 = '\t+%s/opt' % DefaultHomebrewRoot
+  HomebrewSearchPathFilter2 = '\t+@loader_path/../../../../../../../../../../opt'
+  HomebrewSearchPathFilter3 =    '@loader_path/../../../../../../../../../../opt' # no leading white space
+  # 1: absolute path as in ~python@3.9.17
+  # 2: relative path as in  python@3.9.18~
 else:
   DefaultHomebrewRoot = '/usr/local'
+  HomebrewSearchPathFilter1 = '\t+%s/opt' % DefaultHomebrewRoot
+  HomebrewSearchPathFilter2 = '\t+@loader_path/../../../../../../../../../../opt'
+  HomebrewSearchPathFilter3 =    '@loader_path/../../../../../../../../../../opt' # no leading white space
+  # 1: absolute path as in ~python@3.9.17
+  #      BigSur{kazzz-s} lib-dynload (1)% otool -L _sqlite3.cpython-39-darwin.so
+  #      _sqlite3.cpython-39-darwin.so:
+  #   ===> /usr/local/opt/sqlite/lib/libsqlite3.0.dylib (compatibility version 9.0.0, current version 9.6.0)
+  #        /usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1292.100.5)
+  #
+  # 2: relative path as in  python@3.9.18~
+  #      Monterey{kazzz-s} lib-dynload (1)% otool -L _sqlite3.cpython-39-darwin.so
+  #      _sqlite3.cpython-39-darwin.so:
+  #   ===> @loader_path/../../../../../../../../../../opt/sqlite/lib/libsqlite3.0.dylib (compatibility version 9.0.0, current version 9.6.0)
+  #        /usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1311.100.3)
+  #
+  # Ref. https://github.com/Homebrew/homebrew-core/issues/140930#issuecomment-1701524467
 del System, Node, Release, MacVersion, Machine, Processor
 
 #-----------------------------------------------------

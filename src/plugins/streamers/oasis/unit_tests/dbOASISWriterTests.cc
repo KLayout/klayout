@@ -1532,6 +1532,65 @@ TEST(116)
     EXPECT_EQ (std::string (os.string ()), std::string (expected))
   }
 
+  {
+    std::string tmp_file = tl::TestBase::tmp_file ("tmp_dbOASISWriter116d2.gds");
+
+    {
+      tl::OutputStream out (tmp_file);
+      db::SaveLayoutOptions write_options;
+      write_options.set_format ("OASIS");
+      db::OASISWriterOptions oas_write_options;
+      oas_write_options.write_std_properties = 1;
+      oas_write_options.strict_mode = true;
+      oas_write_options.write_cblocks = false;
+      write_options.set_options (oas_write_options);
+      db::Writer writer (write_options);
+      writer.write (g, out);
+    }
+
+    tl::InputStream in (tmp_file);
+    db::OASISReaderOptions oas_options;
+    oas_options.read_all_properties = true;
+    oas_options.expect_strict_mode = 1;
+    db::LoadLayoutOptions options;
+    options.set_options (oas_options);
+    db::Reader reader (in);
+    db::Layout gg;
+    reader.set_warnings_as_errors (true);
+    reader.read (gg, options);
+
+    const char *expected =
+      "set props {\n"
+      "  {{S_MAX_SIGNED_INTEGER_WIDTH} {4}}\n"
+      "  {{S_MAX_UNSIGNED_INTEGER_WIDTH} {4}}\n"
+      "  {{S_TOP_CELL} {$2}}\n"
+      "  {{S_TOP_CELL} {$1}}\n"
+      "  {{name} {117}}\n"
+      "  {17 {17value}}\n"
+      "}\n"
+      "begin_libp $props 0.001\n"
+      "set props {\n"
+      "  {42 {42}}\n"
+      "  {{S_CELL_OFFSET} {182}}\n"
+      "}\n"
+      "begin_cellp $props {$1}\n"
+      "path 1 0 0 0 0 {0 100} {1000 1200}\n"
+      "end_cell\n"
+      "set props {\n"
+      "  {{S_CELL_OFFSET} {180}}\n"
+      "}\n"
+      "begin_cellp $props {$2}\n"
+      "end_cell\n"
+      "end_lib\n"
+    ;
+
+    tl::OutputStringStream os;
+    tl::OutputStream stream (os);
+    db::TextWriter textwriter (stream);
+    textwriter.write (gg);
+    EXPECT_EQ (std::string (os.string ()), std::string (expected))
+  }
+
   c1.insert (db::CellInstArray (c2.cell_index (), db::Trans ()));
 
   {

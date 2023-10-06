@@ -1338,30 +1338,34 @@ OASISWriter::write_cellname_table (size_t &cellnames_table_pos, const std::vecto
       write ((unsigned long) *cell);
     }
 
-    if (m_options.write_std_properties > 1) {
+    if (m_options.write_std_properties >= 1) {
 
       reset_modal_variables ();
 
-      //  write S_BOUNDING_BOX entries
+      if (m_options.write_std_properties > 1) {
 
-      std::vector<tl::Variant> values;
+        //  write S_BOUNDING_BOX entries
 
-      //  TODO: how to set the "depends on external cells" flag?
-      db::Box bbox = layout.cell (*cell).bbox ();
-      if (bbox.empty ()) {
-        //  empty box
-        values.push_back (tl::Variant ((unsigned int) 0x2));
-        bbox = db::Box (0, 0, 0, 0);
-      } else {
-        values.push_back (tl::Variant ((unsigned int) 0x0));
+        std::vector<tl::Variant> values;
+
+        //  TODO: how to set the "depends on external cells" flag?
+        db::Box bbox = layout.cell (*cell).bbox ();
+        if (bbox.empty ()) {
+          //  empty box
+          values.push_back (tl::Variant ((unsigned int) 0x2));
+          bbox = db::Box (0, 0, 0, 0);
+        } else {
+          values.push_back (tl::Variant ((unsigned int) 0x0));
+        }
+
+        values.push_back (tl::Variant (bbox.left ()));
+        values.push_back (tl::Variant (bbox.bottom ()));
+        values.push_back (tl::Variant (bbox.width ()));
+        values.push_back (tl::Variant (bbox.height ()));
+
+        write_property_def (s_bounding_box_name, values, true);
+
       }
-
-      values.push_back (tl::Variant (bbox.left ()));
-      values.push_back (tl::Variant (bbox.bottom ()));
-      values.push_back (tl::Variant (bbox.width ()));
-      values.push_back (tl::Variant (bbox.height ()));
-
-      write_property_def (s_bounding_box_name, values, true);
 
       //  PROPERTY record with S_CELL_OFFSET
       if (cell_positions) {

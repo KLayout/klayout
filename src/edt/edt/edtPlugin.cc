@@ -331,6 +331,7 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_edit_hier_copy_mode, "-1"));
     options.push_back (std::pair<std::string, std::string> (cfg_edit_grid, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_edit_snap_to_objects, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_edit_snap_objects_to_grid, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_edit_move_angle_mode, "any"));
     options.push_back (std::pair<std::string, std::string> (cfg_edit_connect_angle_mode, "any"));
     options.push_back (std::pair<std::string, std::string> (cfg_edit_combine_mode, "add"));

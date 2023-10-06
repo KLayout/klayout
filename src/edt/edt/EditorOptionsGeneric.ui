@@ -95,10 +95,30 @@
           <property name="verticalSpacing">
            <number>2</number>
           </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_5">
+          <item row="0" column="2">
+           <widget class="QLineEdit" name="edit_grid_le">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Enter the grid in micron. Can be anisotropic (&quot;gx,gy&quot;)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_6">
             <property name="text">
-             <string>Grid</string>
+             <string>Objects   </string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" colspan="3">
+           <widget class="QCheckBox" name="snap_objects_cbx">
+            <property name="text">
+             <string>Snap to other objects</string>
             </property>
            </widget>
           </item>
@@ -130,17 +150,10 @@
             </item>
            </widget>
           </item>
-          <item row="1" column="1" colspan="3">
-           <widget class="QCheckBox" name="snap_objects_cbx">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_5">
             <property name="text">
-             <string>Snap to other objects</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_6">
-            <property name="text">
-             <string>Objects   </string>
+             <string>Grid</string>
             </property>
            </widget>
           </item>
@@ -157,16 +170,10 @@
             </property>
            </spacer>
           </item>
-          <item row="0" column="2">
-           <widget class="QLineEdit" name="edit_grid_le">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="toolTip">
-             <string>Enter the grid in micron. Can be anisotropic (&quot;gx,gy&quot;)</string>
+          <item row="2" column="1" colspan="3">
+           <widget class="QCheckBox" name="snap_objects_to_grid_cbx">
+            <property name="text">
+             <string>Snap to grid while moving</string>
             </property>
            </widget>
           </item>

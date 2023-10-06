@@ -183,7 +183,7 @@ draw_round_dbl (const db::DPoint &p1, const db::DPoint &p2, int /*h*/)
 }
 
 db::DVector 
-snap_angle (const db::DVector &in, lay::angle_constraint_type ac)
+snap_angle (const db::DVector &in, lay::angle_constraint_type ac, db::DVector *snapped_to)
 {
   std::vector <db::DVector> ref_dir;
   if (ac != lay::AC_Any) {
@@ -206,11 +206,17 @@ snap_angle (const db::DVector &in, lay::angle_constraint_type ac)
       proj = db::sprod (*re, in) / (elen * re->length ());
       if (proj > max_proj) {
         max_proj = proj;
+        if (snapped_to) {
+          *snapped_to = *re;
+        }
         out = *re * (elen * proj / re->length ());
       }
       proj = db::sprod (-*re, in) / (elen * re->length ());
       if (proj > max_proj) {
         max_proj = proj;
+        if (snapped_to) {
+          *snapped_to = *re;
+        }
         out = -*re * (elen * proj / re->length ());
       }
     }
@@ -218,6 +224,7 @@ snap_angle (const db::DVector &in, lay::angle_constraint_type ac)
 
   return out;
 }
+
 // ---------------------------------------------------------------------------------------
 //  obj_snap implementations
 

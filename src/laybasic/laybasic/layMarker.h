@@ -396,6 +396,14 @@ public:
    */
   void set (const db::Shape &shape, const db::ICplxTrans &t1, const std::vector<db::DCplxTrans> &trans);
 
+  /**
+   *  @brief Gets the shape
+   */
+  const db::Shape &shape () const
+  {
+    return m_shape;
+  }
+
 private:
   virtual void render (const Viewport &vp, ViewObjectCanvas &canvas);
 
@@ -430,6 +438,14 @@ public:
    *  @brief The destructor
    */
   ~InstanceMarker ();
+
+  /**
+   *  @brief Gets the instance
+   */
+  const db::Instance &instance () const
+  {
+    return m_inst;
+  }
 
   /**
    *  @brief Set the instance the marker is to display

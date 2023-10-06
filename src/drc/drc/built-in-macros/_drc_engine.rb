@@ -1595,7 +1595,7 @@ module DRC
         if ! @def_output
           if @def_layout
             # establish a new default output from the default layout on this occasion
-            @def_output = LayoutOutputChannel::new(self, @def_layout, cellname.to_s, nil)
+            @def_output = LayoutOutputChannel::new(self, @def_layout, @def_layout.cell(cellname.to_s), nil)
           end
         else
           @def_output.cellname = cellname.to_s

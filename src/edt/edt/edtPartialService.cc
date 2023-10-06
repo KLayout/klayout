@@ -1102,6 +1102,7 @@ PartialService::PartialService (db::Manager *manager, lay::LayoutViewBase *view,
     m_buttons (0),
     m_connect_ac (lay::AC_Any), m_move_ac (lay::AC_Any), m_alt_ac (lay::AC_Global),
     m_snap_to_objects (true),
+    m_snap_objects_to_grid (true),
     m_top_level_sel (false),
     m_hover (false),
     m_hover_wait (false),
@@ -1340,6 +1341,9 @@ PartialService::configure (const std::string &name, const std::string &value)
     return true;  //  taken
   } else if (name == cfg_edit_snap_to_objects) {
     tl::from_string (value, m_snap_to_objects);
+    return true;  //  taken
+  } else if (name == cfg_edit_snap_objects_to_grid) {
+    tl::from_string (value, m_snap_objects_to_grid);
     return true;  //  taken
   } else if (name == cfg_edit_move_angle_mode) {
     acc.from_string (value, m_move_ac);
@@ -1651,7 +1655,7 @@ PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, boo
       //  thus, we can bring the point on grid or to an object's edge or vertex
       snap_details = snap2 (p);
       if (snap_details.object_snap == lay::PointSnapToObjectResult::NoObject) {
-        m_current = m_start + snap (p - m_start);
+        m_current = m_start + snap_move (p - m_start);
       } else {
         m_current = snap_details.snapped_point;
         mouse_cursor_from_snap_details (snap_details);
@@ -1660,7 +1664,7 @@ PartialService::mouse_move_event (const db::DPoint &p, unsigned int buttons, boo
     } else {
 
       //  snap movement to angle and grid without object
-      m_current = m_start + snap (p - m_start);
+      m_current = m_start + snap_move (p - m_start);
       clear_mouse_cursors ();
 
     }
@@ -2199,8 +2203,85 @@ PartialService::begin_move (MoveMode mode, const db::DPoint &p, lay::angle_const
 }
 
 void
+PartialService::update_vector_snapped_point (const db::DPoint &pt, db::DVector &vr, bool &result_set) const
+{
+  db::DVector v = snap (pt) - pt;
+
+  if (! result_set || v.length () < vr.length ()) {
+    result_set = true;
+    vr = v;
+  }
+}
+
+db::DVector
+PartialService::snap_marker_to_grid (const db::DVector &v, bool &snapped) const
+{
+  if (! m_snap_objects_to_grid) {
+    return v;
+  }
+
+  snapped = false;
+  db::DVector vr;
+
+  //  max. 10000 checks
+  size_t count = 10000;
+
+  db::DVector snapped_to (1.0, 1.0);
+  db::DVector vv = lay::snap_angle (v, move_ac (), &snapped_to);
+
+  TransformationVariants tv (view ());
+
+  for (auto r = m_selection.begin (); r != m_selection.end (); ++r) {
+
+    if (! r->first.is_valid (view ()) || r->first.is_cell_inst ()) {
+      continue;
+    }
+
+    const lay::CellView &cv = view ()->cellview (r->first.cv_index ());
+    const std::vector<db::DCplxTrans> *tv_list = tv.per_cv_and_layer (r->first.cv_index (), r->first.layer ());
+    if (!tv_list || tv_list->empty ()) {
+      continue;
+    }
+
+    db::CplxTrans tr = db::DCplxTrans (vv) * tv_list->front () * db::CplxTrans (cv->layout ().dbu ()) * cv.context_trans () * r->first.trans ();
+
+    for (auto e = r->second.begin (); e != r->second.end () && count > 0; ++e) {
+      update_vector_snapped_point (tr * e->p1 (), vr, snapped);
+      --count;
+      if (count > 0) {
+        update_vector_snapped_point (tr * e->p2 (), vr, snapped);
+        --count;
+      }
+    }
+
+  }
+
+  if (snapped) {
+    vr += vv;
+    return db::DVector (vr.x () * snapped_to.x (), vr.y () * snapped_to.y ());
+  } else {
+    return db::DVector ();
+  }
+}
+
+db::DVector
+PartialService::snap_move (const db::DVector &v) const
+{
+  bool snapped = false;
+  db::DVector vs = snap_marker_to_grid (v, snapped);
+  if (! snapped) {
+    vs = snap (v);
+  }
+  return vs;
+}
+
+void
 PartialService::move (const db::DPoint &p, lay::angle_constraint_type ac)
 {
+  if (! m_dragging) {
+    return;
+  }
+
   m_alt_ac = ac;
 
   set_cursor (lay::Cursor::size_all);
@@ -2214,7 +2295,7 @@ PartialService::move (const db::DPoint &p, lay::angle_constraint_type ac)
     //  thus, we can bring the point on grid or to an object's edge or vertex
     snap_details = snap2 (p);
     if (snap_details.object_snap == lay::PointSnapToObjectResult::NoObject) {
-      m_current = m_start + snap (p - m_start);
+      m_current = m_start + snap_move (p - m_start);
     } else {
       m_current = snap_details.snapped_point;
       mouse_cursor_from_snap_details (snap_details);
@@ -2223,7 +2304,7 @@ PartialService::move (const db::DPoint &p, lay::angle_constraint_type ac)
   } else {
 
     //  snap movement to angle and grid without object
-    m_current = m_start + snap (p - m_start);
+    m_current = m_start + snap_move (p - m_start);
     clear_mouse_cursors ();
 
   }
@@ -2236,6 +2317,10 @@ PartialService::move (const db::DPoint &p, lay::angle_constraint_type ac)
 void
 PartialService::end_move (const db::DPoint & /*p*/, lay::angle_constraint_type ac)
 {
+  if (! m_dragging) {
+    return;
+  }
+
   m_alt_ac = ac;
 
   if (m_current != m_start) {

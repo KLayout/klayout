@@ -238,8 +238,12 @@ namespace lay
 
   /**
    *  @brief Reduce a given vector according to the angle constraint
+   *
+   *  If the "snapped_to" pointer is non-null, it will receive the snap target
+   *  vector (e.g. (1, 0) for snapping to horizontal axis. If no snapping happens,
+   *  the value of this vector is not changed.
    */
-  LAYBASIC_PUBLIC db::DVector snap_angle (const db::DVector &in, lay::angle_constraint_type ac);
+  LAYBASIC_PUBLIC db::DVector snap_angle (const db::DVector &in, lay::angle_constraint_type ac, db::DVector *snapped_to = 0);
 
   /**
    *  @brief rounding of a double value for drawing purposes

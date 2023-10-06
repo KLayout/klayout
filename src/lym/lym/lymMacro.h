@@ -427,6 +427,19 @@ public:
   }
 
   /**
+   *  @brief Sets a value indicating whether the macro was alread auto-runned
+   */
+  void set_was_autorun (bool f);
+
+  /**
+   *  @brief Gets a value indicating whether the macro was alread auto-runned
+   */
+  bool was_autorun () const
+  {
+    return m_was_autorun;
+  }
+
+  /**
    *  @brief Sets a value indicating whether the macro shall be executed on startup
    */
   void set_autorun (bool f);
@@ -618,6 +631,7 @@ private:
   bool m_autorun;
   bool m_autorun_default;
   bool m_autorun_early;
+  bool m_was_autorun;
   int m_priority;
   bool m_show_in_menu;
   std::string m_group_name;

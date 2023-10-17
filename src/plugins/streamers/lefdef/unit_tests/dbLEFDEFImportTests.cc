@@ -1011,3 +1011,10 @@ TEST(209_invalid_split_paths)
   run_test (_this, "issue-1472", "map:tech.map+lef:tech.lef.gz+def:test.def.gz", "au.oas", default_options (), false);
 }
 
+//  issue-1499
+TEST(210_overlaps)
+{
+  run_test (_this, "issue-1499", "map:tech.map+lef:tech.lef+lef:blocks.lef+def:top.def", "au.oas", default_options (), false);
+}
+
+

@@ -522,7 +522,7 @@ GeometryBasedLayoutGenerator::subtract_overlap_from_outline (const std::set<std:
       pn += 2;
     }
 
-    db::BooleanOp op (db::BooleanOp::ANotB);
+    db::BooleanOp op (db::BooleanOp::And);
     db::ShapeGenerator sg (s->second, true /*clear shapes*/);
     db::PolygonGenerator out (sg, true, true);
     proc.process (out, op);

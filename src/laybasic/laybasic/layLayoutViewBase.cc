@@ -3693,6 +3693,9 @@ LayoutViewBase::refresh ()
 
   //  Issue a "tick" to execute all other pending tasks
   timer ();
+
+  //  Update the view ops as this is not always guaranteed (issue #1512)
+  set_view_ops ();
 }
 
 void

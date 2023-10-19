@@ -227,12 +227,12 @@ RuleBasedViaGenerator::create_cell (LEFDEFReaderState &reader, Layout &layout, d
 
   std::set <unsigned int> dl;
 
-  dl = reader.open_layer (layout, m_bottom_layer, ViaGeometry, mask_bottom, via_box.enlarged (m_be));
+  dl = reader.open_layer (layout, m_bottom_layer, ViaGeometry, mask_bottom);
   for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
     cell.shapes (*l).insert (db::Polygon (via_box.enlarged (m_be).moved (m_bo)));
   }
 
-  dl = reader.open_layer (layout, m_top_layer, ViaGeometry, mask_top, via_box.enlarged (m_te));
+  dl = reader.open_layer (layout, m_top_layer, ViaGeometry, mask_top);
   for (std::set<unsigned int>::const_iterator l = dl.begin (); l != dl.end (); ++l) {
     cell.shapes (*l).insert (db::Polygon (via_box.enlarged (m_te).moved (m_to)));
   }

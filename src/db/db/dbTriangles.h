@@ -33,6 +33,11 @@
 #include "tlObjectCollection.h"
 #include "tlStableVector.h"
 
+#include <limits>
+#include <list>
+#include <vector>
+#include <algorithm>
+
 namespace db
 {
 

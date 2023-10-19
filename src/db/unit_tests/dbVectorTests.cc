@@ -142,9 +142,9 @@ TEST(6)
   EXPECT_EQ (db::vprod_with_sign (db::Vector (1000000000, 0), db::Vector (1000000000, -1)).second, -1);
 
   EXPECT_EQ (db::sprod_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, 0)), 0);
-  EXPECT_EQ (db::sprod_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, 1e-7)), 0);
+  EXPECT_EQ (db::sprod_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, 1e-11)), 0);
   EXPECT_EQ (db::sprod_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, 0.0001)), 1);
-  EXPECT_EQ (db::sprod_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, -1e-7)), 0);
+  EXPECT_EQ (db::sprod_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, -1e-11)), 0);
   EXPECT_EQ (db::sprod_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, -0.0001)), -1);
   EXPECT_EQ (db::sprod_sign (db::DVector (100000.0000, 0), db::DVector (0, 100000.0000)), 0);
   EXPECT_EQ (db::sprod_sign (db::DVector (100000.0000, 0), db::DVector (0.0001, 100000.0000)), 1);
@@ -157,9 +157,9 @@ TEST(6)
   EXPECT_EQ (db::vprod_sign (db::DVector (100000.0000, 0), db::DVector (100000.0000, -0.0001)), -1);
 
   EXPECT_EQ (db::sprod_with_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, 0)).second, 0);
-  EXPECT_EQ (db::sprod_with_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, 1e-7)).second, 0);
+  EXPECT_EQ (db::sprod_with_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, 1e-11)).second, 0);
   EXPECT_EQ (db::sprod_with_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, 0.0001)).second, 1);
-  EXPECT_EQ (db::sprod_with_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, -1e-7)).second, 0);
+  EXPECT_EQ (db::sprod_with_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, -1e-11)).second, 0);
   EXPECT_EQ (db::sprod_with_sign (db::DVector (0, 100000.0000), db::DVector (100000.0000, -0.0001)).second, -1);
   EXPECT_EQ (db::sprod_with_sign (db::DVector (100000.0000, 0), db::DVector (0, 100000.0000)).second, 0);
   EXPECT_EQ (db::sprod_with_sign (db::DVector (100000.0000, 0), db::DVector (0.0001, 100000.0000)).second, 1);

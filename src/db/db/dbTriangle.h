@@ -32,6 +32,11 @@
 #include "tlObjectCollection.h"
 #include "tlList.h"
 
+#include <vector>
+#include <string>
+#include <list>
+#include <algorithm>
+
 namespace db
 {
 

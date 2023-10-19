@@ -29,6 +29,9 @@
 #include "tlTimer.h"
 
 #include <set>
+#include <memory>
+#include <vector>
+#include <map>
 
 namespace db
 {
@@ -1085,7 +1088,7 @@ Triangles::fill_concave_corners (const std::vector<db::TriangleEdge *> &edges)
 
     }
 
-    if (not any_connected) {
+    if (! any_connected) {
       break;
     }
 
@@ -1315,7 +1318,7 @@ Triangles::join_edges (std::vector<db::TriangleEdge *> &edges)
 void
 Triangles::constrain (const std::vector<std::vector<db::Vertex *> > &contours)
 {
-  assert (! m_is_constrained);
+  tl_assert (! m_is_constrained);
 
   std::vector<std::pair<db::DEdge, std::vector<db::TriangleEdge *> > > resolved_edges;
 

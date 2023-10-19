@@ -183,6 +183,8 @@ static gsi::Methods methods_QMediaContainerControl () {
   methods += new qt_gsi::GenericMethod (":containerFormat", "@brief Method QString QMediaContainerControl::containerFormat()\n", true, &_init_f_containerFormat_c0, &_call_f_containerFormat_c0);
   methods += new qt_gsi::GenericMethod ("setContainerFormat|containerFormat=", "@brief Method void QMediaContainerControl::setContainerFormat(const QString &format)\n", false, &_init_f_setContainerFormat_2025, &_call_f_setContainerFormat_2025);
   methods += new qt_gsi::GenericMethod ("supportedContainers", "@brief Method QStringList QMediaContainerControl::supportedContainers()\n", true, &_init_f_supportedContainers_c0, &_call_f_supportedContainers_c0);
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QMediaContainerControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QMediaContainerControl::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QMediaContainerControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QMediaContainerControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -262,34 +264,47 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QMediaContainerControl::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [emitter impl] void QMediaContainerControl::destroyed(QObject *)
+  void emitter_QMediaContainerControl_destroyed_1302(QObject *arg1)
   {
-    return QMediaContainerControl::event(arg1);
+    emit QMediaContainerControl::destroyed(arg1);
   }
 
-  virtual bool event(QEvent *arg1)
+  //  [adaptor impl] bool QMediaContainerControl::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
+  {
+    return QMediaContainerControl::event(_event);
+  }
+
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QMediaContainerControl_Adaptor, bool, QEvent *>(&QMediaContainerControl_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QMediaContainerControl_Adaptor, bool, QEvent *>(&QMediaContainerControl_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QMediaContainerControl::event(arg1);
+      return QMediaContainerControl::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QMediaContainerControl::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QMediaContainerControl::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QMediaContainerControl::eventFilter(arg1, arg2);
+    return QMediaContainerControl::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QMediaContainerControl_Adaptor, bool, QObject *, QEvent *>(&QMediaContainerControl_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QMediaContainerControl_Adaptor, bool, QObject *, QEvent *>(&QMediaContainerControl_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QMediaContainerControl::eventFilter(arg1, arg2);
+      return QMediaContainerControl::eventFilter(watched, event);
     }
+  }
+
+  //  [emitter impl] void QMediaContainerControl::objectNameChanged(const QString &objectName)
+  void emitter_QMediaContainerControl_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QMediaContainerControl::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QMediaContainerControl::setContainerFormat(const QString &format)
@@ -323,33 +338,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMediaContainerControl::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QMediaContainerControl::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QMediaContainerControl::childEvent(arg1);
+    QMediaContainerControl::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QMediaContainerControl_Adaptor, QChildEvent *>(&QMediaContainerControl_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QMediaContainerControl_Adaptor, QChildEvent *>(&QMediaContainerControl_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QMediaContainerControl::childEvent(arg1);
+      QMediaContainerControl::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QMediaContainerControl::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QMediaContainerControl::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QMediaContainerControl::customEvent(arg1);
+    QMediaContainerControl::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QMediaContainerControl_Adaptor, QEvent *>(&QMediaContainerControl_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QMediaContainerControl_Adaptor, QEvent *>(&QMediaContainerControl_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QMediaContainerControl::customEvent(arg1);
+      QMediaContainerControl::customEvent(event);
     }
   }
 
@@ -368,18 +383,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMediaContainerControl::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QMediaContainerControl::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QMediaContainerControl::timerEvent(arg1);
+    QMediaContainerControl::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QMediaContainerControl_Adaptor, QTimerEvent *>(&QMediaContainerControl_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QMediaContainerControl_Adaptor, QTimerEvent *>(&QMediaContainerControl_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QMediaContainerControl::timerEvent(arg1);
+      QMediaContainerControl::timerEvent(event);
     }
   }
 
@@ -411,11 +426,11 @@ static void _call_ctor_QMediaContainerControl_Adaptor_0 (const qt_gsi::GenericSt
 }
 
 
-// void QMediaContainerControl::childEvent(QChildEvent *)
+// void QMediaContainerControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -477,11 +492,11 @@ static void _set_callback_cbs_containerFormat_c0_0 (void *cls, const gsi::Callba
 }
 
 
-// void QMediaContainerControl::customEvent(QEvent *)
+// void QMediaContainerControl::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -498,6 +513,24 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QMediaContainerControl_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
+}
+
+
+// emitter void QMediaContainerControl::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QMediaContainerControl_Adaptor *)cls)->emitter_QMediaContainerControl_destroyed_1302 (arg1);
 }
 
 
@@ -525,11 +558,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QMediaContainerControl::event(QEvent *)
+// bool QMediaContainerControl::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -548,13 +581,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QMediaContainerControl::eventFilter(QObject *, QEvent *)
+// bool QMediaContainerControl::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -589,6 +622,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
   tl::Heap heap;
   const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QMediaContainerControl_Adaptor *)cls)->fp_QMediaContainerControl_isSignalConnected_c2394 (arg1));
+}
+
+
+// emitter void QMediaContainerControl::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QMediaContainerControl_Adaptor *)cls)->emitter_QMediaContainerControl_objectNameChanged_4567 (arg1);
 }
 
 
@@ -681,11 +732,11 @@ static void _set_callback_cbs_supportedContainers_c0_0 (void *cls, const gsi::Ca
 }
 
 
-// void QMediaContainerControl::timerEvent(QTimerEvent *)
+// void QMediaContainerControl::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -713,21 +764,23 @@ gsi::Class<QMediaContainerControl> &qtdecl_QMediaContainerControl ();
 static gsi::Methods methods_QMediaContainerControl_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMediaContainerControl::QMediaContainerControl()\nThis method creates an object of class QMediaContainerControl.", &_init_ctor_QMediaContainerControl_Adaptor_0, &_call_ctor_QMediaContainerControl_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QMediaContainerControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QMediaContainerControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("containerDescription", "@brief Virtual method QString QMediaContainerControl::containerDescription(const QString &formatMimeType)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_containerDescription_c2025_0, &_call_cbs_containerDescription_c2025_0);
   methods += new qt_gsi::GenericMethod ("containerDescription", "@hide", true, &_init_cbs_containerDescription_c2025_0, &_call_cbs_containerDescription_c2025_0, &_set_callback_cbs_containerDescription_c2025_0);
   methods += new qt_gsi::GenericMethod ("containerFormat", "@brief Virtual method QString QMediaContainerControl::containerFormat()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_containerFormat_c0_0, &_call_cbs_containerFormat_c0_0);
   methods += new qt_gsi::GenericMethod ("containerFormat", "@hide", true, &_init_cbs_containerFormat_c0_0, &_call_cbs_containerFormat_c0_0, &_set_callback_cbs_containerFormat_c0_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMediaContainerControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMediaContainerControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QMediaContainerControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QMediaContainerControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMediaContainerControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMediaContainerControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QMediaContainerControl::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QMediaContainerControl::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QMediaContainerControl::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QMediaContainerControl::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QMediaContainerControl::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QMediaContainerControl::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QMediaContainerControl::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
@@ -735,7 +788,7 @@ static gsi::Methods methods_QMediaContainerControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("setContainerFormat", "@hide", false, &_init_cbs_setContainerFormat_2025_0, &_call_cbs_setContainerFormat_2025_0, &_set_callback_cbs_setContainerFormat_2025_0);
   methods += new qt_gsi::GenericMethod ("supportedContainers", "@brief Virtual method QStringList QMediaContainerControl::supportedContainers()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_supportedContainers_c0_0, &_call_cbs_supportedContainers_c0_0);
   methods += new qt_gsi::GenericMethod ("supportedContainers", "@hide", true, &_init_cbs_supportedContainers_c0_0, &_call_cbs_supportedContainers_c0_0, &_set_callback_cbs_supportedContainers_c0_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QMediaContainerControl::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QMediaContainerControl::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

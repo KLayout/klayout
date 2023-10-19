@@ -141,6 +141,10 @@ class QDateTime;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QDateTime> &qtdecl_QDateTime (); }
 
+class QDeadlineTimer;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QDeadlineTimer> &qtdecl_QDeadlineTimer (); }
+
 class QDebug;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QDebug> &qtdecl_QDebug (); }
@@ -381,6 +385,10 @@ class QObject;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QObject> &qtdecl_QObject (); }
 
+class QOperatingSystemVersion;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QOperatingSystemVersion> &qtdecl_QOperatingSystemVersion (); }
+
 class QParallelAnimationGroup;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QParallelAnimationGroup> &qtdecl_QParallelAnimationGroup (); }
@@ -416,6 +424,14 @@ namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QProcessEnvironment> &qtdecl_QProce
 class QPropertyAnimation;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QPropertyAnimation> &qtdecl_QPropertyAnimation (); }
+
+class QRandomGenerator;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QRandomGenerator> &qtdecl_QRandomGenerator (); }
+
+class QRandomGenerator64;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QRandomGenerator64> &qtdecl_QRandomGenerator64 (); }
 
 class QReadLocker;
 
@@ -464,6 +480,10 @@ namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QSaveFile> &qtdecl_QSaveFile (); }
 class QSemaphore;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QSemaphore> &qtdecl_QSemaphore (); }
+
+class QSemaphoreReleaser;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QSemaphoreReleaser> &qtdecl_QSemaphoreReleaser (); }
 
 class QSequentialAnimationGroup;
 
@@ -620,6 +640,10 @@ namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QUrlQuery> &qtdecl_QUrlQuery (); }
 class QVariantAnimation;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QVariantAnimation> &qtdecl_QVariantAnimation (); }
+
+class QVersionNumber;
+
+namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QVersionNumber> &qtdecl_QVersionNumber (); }
 
 class QWaitCondition;
 

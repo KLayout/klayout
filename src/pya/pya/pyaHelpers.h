@@ -44,7 +44,7 @@ class SignalHandler;
 struct PYAChannelObject
   : public PyObject
 {
-  static void make_class (PyObject *module);
+  static void make_class ();
   static PYAChannelObject *create (gsi::Console::output_stream chn);
 
   gsi::Console::output_stream channel;

@@ -38,6 +38,76 @@
 class Qt_Namespace { };
 
 
+//  Implementation of the enum wrapper class for Qt::ItemDataRole
+namespace qt_gsi
+{
+
+static gsi::Enum<Qt::ItemDataRole> decl_Qt_ItemDataRole_Enum ("QtCore", "Qt_ItemDataRole",
+    gsi::enum_const ("DisplayRole", Qt::DisplayRole, "@brief Enum constant Qt::DisplayRole") +
+    gsi::enum_const ("DecorationRole", Qt::DecorationRole, "@brief Enum constant Qt::DecorationRole") +
+    gsi::enum_const ("EditRole", Qt::EditRole, "@brief Enum constant Qt::EditRole") +
+    gsi::enum_const ("ToolTipRole", Qt::ToolTipRole, "@brief Enum constant Qt::ToolTipRole") +
+    gsi::enum_const ("StatusTipRole", Qt::StatusTipRole, "@brief Enum constant Qt::StatusTipRole") +
+    gsi::enum_const ("WhatsThisRole", Qt::WhatsThisRole, "@brief Enum constant Qt::WhatsThisRole") +
+    gsi::enum_const ("FontRole", Qt::FontRole, "@brief Enum constant Qt::FontRole") +
+    gsi::enum_const ("TextAlignmentRole", Qt::TextAlignmentRole, "@brief Enum constant Qt::TextAlignmentRole") +
+    gsi::enum_const ("BackgroundColorRole", Qt::BackgroundColorRole, "@brief Enum constant Qt::BackgroundColorRole") +
+    gsi::enum_const ("BackgroundRole", Qt::BackgroundRole, "@brief Enum constant Qt::BackgroundRole") +
+    gsi::enum_const ("TextColorRole", Qt::TextColorRole, "@brief Enum constant Qt::TextColorRole") +
+    gsi::enum_const ("ForegroundRole", Qt::ForegroundRole, "@brief Enum constant Qt::ForegroundRole") +
+    gsi::enum_const ("CheckStateRole", Qt::CheckStateRole, "@brief Enum constant Qt::CheckStateRole") +
+    gsi::enum_const ("AccessibleTextRole", Qt::AccessibleTextRole, "@brief Enum constant Qt::AccessibleTextRole") +
+    gsi::enum_const ("AccessibleDescriptionRole", Qt::AccessibleDescriptionRole, "@brief Enum constant Qt::AccessibleDescriptionRole") +
+    gsi::enum_const ("SizeHintRole", Qt::SizeHintRole, "@brief Enum constant Qt::SizeHintRole") +
+    gsi::enum_const ("InitialSortOrderRole", Qt::InitialSortOrderRole, "@brief Enum constant Qt::InitialSortOrderRole") +
+    gsi::enum_const ("DisplayPropertyRole", Qt::DisplayPropertyRole, "@brief Enum constant Qt::DisplayPropertyRole") +
+    gsi::enum_const ("DecorationPropertyRole", Qt::DecorationPropertyRole, "@brief Enum constant Qt::DecorationPropertyRole") +
+    gsi::enum_const ("ToolTipPropertyRole", Qt::ToolTipPropertyRole, "@brief Enum constant Qt::ToolTipPropertyRole") +
+    gsi::enum_const ("StatusTipPropertyRole", Qt::StatusTipPropertyRole, "@brief Enum constant Qt::StatusTipPropertyRole") +
+    gsi::enum_const ("WhatsThisPropertyRole", Qt::WhatsThisPropertyRole, "@brief Enum constant Qt::WhatsThisPropertyRole") +
+    gsi::enum_const ("UserRole", Qt::UserRole, "@brief Enum constant Qt::UserRole"),
+  "@qt\n@brief This class represents the Qt::ItemDataRole enum");
+
+static gsi::QFlagsClass<Qt::ItemDataRole > decl_Qt_ItemDataRole_Enums ("QtCore", "Qt_QFlags_ItemDataRole",
+  "@qt\n@brief This class represents the QFlags<Qt::ItemDataRole> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<Qt_Namespace> inject_Qt_ItemDataRole_Enum_in_parent (decl_Qt_ItemDataRole_Enum.defs ());
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ItemDataRole_Enum_as_child (decl_Qt_ItemDataRole_Enum, "ItemDataRole");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ItemDataRole_Enums_as_child (decl_Qt_ItemDataRole_Enums, "QFlags_ItemDataRole");
+
+}
+
+
+//  Implementation of the enum wrapper class for Qt::ItemFlag
+namespace qt_gsi
+{
+
+static gsi::Enum<Qt::ItemFlag> decl_Qt_ItemFlag_Enum ("QtCore", "Qt_ItemFlag",
+    gsi::enum_const ("NoItemFlags", Qt::NoItemFlags, "@brief Enum constant Qt::NoItemFlags") +
+    gsi::enum_const ("ItemIsSelectable", Qt::ItemIsSelectable, "@brief Enum constant Qt::ItemIsSelectable") +
+    gsi::enum_const ("ItemIsEditable", Qt::ItemIsEditable, "@brief Enum constant Qt::ItemIsEditable") +
+    gsi::enum_const ("ItemIsDragEnabled", Qt::ItemIsDragEnabled, "@brief Enum constant Qt::ItemIsDragEnabled") +
+    gsi::enum_const ("ItemIsDropEnabled", Qt::ItemIsDropEnabled, "@brief Enum constant Qt::ItemIsDropEnabled") +
+    gsi::enum_const ("ItemIsUserCheckable", Qt::ItemIsUserCheckable, "@brief Enum constant Qt::ItemIsUserCheckable") +
+    gsi::enum_const ("ItemIsEnabled", Qt::ItemIsEnabled, "@brief Enum constant Qt::ItemIsEnabled") +
+    gsi::enum_const ("ItemIsAutoTristate", Qt::ItemIsAutoTristate, "@brief Enum constant Qt::ItemIsAutoTristate") +
+    gsi::enum_const ("ItemIsTristate", Qt::ItemIsTristate, "@brief Enum constant Qt::ItemIsTristate") +
+    gsi::enum_const ("ItemNeverHasChildren", Qt::ItemNeverHasChildren, "@brief Enum constant Qt::ItemNeverHasChildren") +
+    gsi::enum_const ("ItemIsUserTristate", Qt::ItemIsUserTristate, "@brief Enum constant Qt::ItemIsUserTristate"),
+  "@qt\n@brief This class represents the Qt::ItemFlag enum");
+
+static gsi::QFlagsClass<Qt::ItemFlag > decl_Qt_ItemFlag_Enums ("QtCore", "Qt_QFlags_ItemFlag",
+  "@qt\n@brief This class represents the QFlags<Qt::ItemFlag> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<Qt_Namespace> inject_Qt_ItemFlag_Enum_in_parent (decl_Qt_ItemFlag_Enum.defs ());
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ItemFlag_Enum_as_child (decl_Qt_ItemFlag_Enum, "ItemFlag");
+static gsi::ClassExt<Qt_Namespace> decl_Qt_ItemFlag_Enums_as_child (decl_Qt_ItemFlag_Enums, "QFlags_ItemFlag");
+
+}
+
+
 //  Implementation of the enum wrapper class for Qt::ItemSelectionMode
 namespace qt_gsi
 {
@@ -344,6 +414,36 @@ static gsi::Enum<Qt::Key> decl_Qt_Key_Enum ("QtCore", "Qt_Key",
     gsi::enum_const ("Key_Dead_Belowdot", Qt::Key_Dead_Belowdot, "@brief Enum constant Qt::Key_Dead_Belowdot") +
     gsi::enum_const ("Key_Dead_Hook", Qt::Key_Dead_Hook, "@brief Enum constant Qt::Key_Dead_Hook") +
     gsi::enum_const ("Key_Dead_Horn", Qt::Key_Dead_Horn, "@brief Enum constant Qt::Key_Dead_Horn") +
+    gsi::enum_const ("Key_Dead_Stroke", Qt::Key_Dead_Stroke, "@brief Enum constant Qt::Key_Dead_Stroke") +
+    gsi::enum_const ("Key_Dead_Abovecomma", Qt::Key_Dead_Abovecomma, "@brief Enum constant Qt::Key_Dead_Abovecomma") +
+    gsi::enum_const ("Key_Dead_Abovereversedcomma", Qt::Key_Dead_Abovereversedcomma, "@brief Enum constant Qt::Key_Dead_Abovereversedcomma") +
+    gsi::enum_const ("Key_Dead_Doublegrave", Qt::Key_Dead_Doublegrave, "@brief Enum constant Qt::Key_Dead_Doublegrave") +
+    gsi::enum_const ("Key_Dead_Belowring", Qt::Key_Dead_Belowring, "@brief Enum constant Qt::Key_Dead_Belowring") +
+    gsi::enum_const ("Key_Dead_Belowmacron", Qt::Key_Dead_Belowmacron, "@brief Enum constant Qt::Key_Dead_Belowmacron") +
+    gsi::enum_const ("Key_Dead_Belowcircumflex", Qt::Key_Dead_Belowcircumflex, "@brief Enum constant Qt::Key_Dead_Belowcircumflex") +
+    gsi::enum_const ("Key_Dead_Belowtilde", Qt::Key_Dead_Belowtilde, "@brief Enum constant Qt::Key_Dead_Belowtilde") +
+    gsi::enum_const ("Key_Dead_Belowbreve", Qt::Key_Dead_Belowbreve, "@brief Enum constant Qt::Key_Dead_Belowbreve") +
+    gsi::enum_const ("Key_Dead_Belowdiaeresis", Qt::Key_Dead_Belowdiaeresis, "@brief Enum constant Qt::Key_Dead_Belowdiaeresis") +
+    gsi::enum_const ("Key_Dead_Invertedbreve", Qt::Key_Dead_Invertedbreve, "@brief Enum constant Qt::Key_Dead_Invertedbreve") +
+    gsi::enum_const ("Key_Dead_Belowcomma", Qt::Key_Dead_Belowcomma, "@brief Enum constant Qt::Key_Dead_Belowcomma") +
+    gsi::enum_const ("Key_Dead_Currency", Qt::Key_Dead_Currency, "@brief Enum constant Qt::Key_Dead_Currency") +
+    gsi::enum_const ("Key_Dead_a", Qt::Key_Dead_a, "@brief Enum constant Qt::Key_Dead_a") +
+    gsi::enum_const ("Key_Dead_A", Qt::Key_Dead_A, "@brief Enum constant Qt::Key_Dead_A") +
+    gsi::enum_const ("Key_Dead_e", Qt::Key_Dead_e, "@brief Enum constant Qt::Key_Dead_e") +
+    gsi::enum_const ("Key_Dead_E", Qt::Key_Dead_E, "@brief Enum constant Qt::Key_Dead_E") +
+    gsi::enum_const ("Key_Dead_i", Qt::Key_Dead_i, "@brief Enum constant Qt::Key_Dead_i") +
+    gsi::enum_const ("Key_Dead_I", Qt::Key_Dead_I, "@brief Enum constant Qt::Key_Dead_I") +
+    gsi::enum_const ("Key_Dead_o", Qt::Key_Dead_o, "@brief Enum constant Qt::Key_Dead_o") +
+    gsi::enum_const ("Key_Dead_O", Qt::Key_Dead_O, "@brief Enum constant Qt::Key_Dead_O") +
+    gsi::enum_const ("Key_Dead_u", Qt::Key_Dead_u, "@brief Enum constant Qt::Key_Dead_u") +
+    gsi::enum_const ("Key_Dead_U", Qt::Key_Dead_U, "@brief Enum constant Qt::Key_Dead_U") +
+    gsi::enum_const ("Key_Dead_Small_Schwa", Qt::Key_Dead_Small_Schwa, "@brief Enum constant Qt::Key_Dead_Small_Schwa") +
+    gsi::enum_const ("Key_Dead_Capital_Schwa", Qt::Key_Dead_Capital_Schwa, "@brief Enum constant Qt::Key_Dead_Capital_Schwa") +
+    gsi::enum_const ("Key_Dead_Greek", Qt::Key_Dead_Greek, "@brief Enum constant Qt::Key_Dead_Greek") +
+    gsi::enum_const ("Key_Dead_Lowline", Qt::Key_Dead_Lowline, "@brief Enum constant Qt::Key_Dead_Lowline") +
+    gsi::enum_const ("Key_Dead_Aboveverticalline", Qt::Key_Dead_Aboveverticalline, "@brief Enum constant Qt::Key_Dead_Aboveverticalline") +
+    gsi::enum_const ("Key_Dead_Belowverticalline", Qt::Key_Dead_Belowverticalline, "@brief Enum constant Qt::Key_Dead_Belowverticalline") +
+    gsi::enum_const ("Key_Dead_Longsolidusoverlay", Qt::Key_Dead_Longsolidusoverlay, "@brief Enum constant Qt::Key_Dead_Longsolidusoverlay") +
     gsi::enum_const ("Key_Back", Qt::Key_Back, "@brief Enum constant Qt::Key_Back") +
     gsi::enum_const ("Key_Forward", Qt::Key_Forward, "@brief Enum constant Qt::Key_Forward") +
     gsi::enum_const ("Key_Stop", Qt::Key_Stop, "@brief Enum constant Qt::Key_Stop") +
@@ -738,7 +838,8 @@ namespace qt_gsi
 static gsi::Enum<Qt::MouseEventSource> decl_Qt_MouseEventSource_Enum ("QtCore", "Qt_MouseEventSource",
     gsi::enum_const ("MouseEventNotSynthesized", Qt::MouseEventNotSynthesized, "@brief Enum constant Qt::MouseEventNotSynthesized") +
     gsi::enum_const ("MouseEventSynthesizedBySystem", Qt::MouseEventSynthesizedBySystem, "@brief Enum constant Qt::MouseEventSynthesizedBySystem") +
-    gsi::enum_const ("MouseEventSynthesizedByQt", Qt::MouseEventSynthesizedByQt, "@brief Enum constant Qt::MouseEventSynthesizedByQt"),
+    gsi::enum_const ("MouseEventSynthesizedByQt", Qt::MouseEventSynthesizedByQt, "@brief Enum constant Qt::MouseEventSynthesizedByQt") +
+    gsi::enum_const ("MouseEventSynthesizedByApplication", Qt::MouseEventSynthesizedByApplication, "@brief Enum constant Qt::MouseEventSynthesizedByApplication"),
   "@qt\n@brief This class represents the Qt::MouseEventSource enum");
 
 static gsi::QFlagsClass<Qt::MouseEventSource > decl_Qt_MouseEventSource_Enums ("QtCore", "Qt_QFlags_MouseEventSource",
@@ -910,48 +1011,6 @@ static gsi::QFlagsClass<Qt::ScreenOrientation > decl_Qt_ScreenOrientation_Enums 
 static gsi::ClassExt<Qt_Namespace> inject_Qt_ScreenOrientation_Enum_in_parent (decl_Qt_ScreenOrientation_Enum.defs ());
 static gsi::ClassExt<Qt_Namespace> decl_Qt_ScreenOrientation_Enum_as_child (decl_Qt_ScreenOrientation_Enum, "ScreenOrientation");
 static gsi::ClassExt<Qt_Namespace> decl_Qt_ScreenOrientation_Enums_as_child (decl_Qt_ScreenOrientation_Enums, "QFlags_ScreenOrientation");
-
-}
-
-
-//  Implementation of the enum wrapper class for Qt::ScrollBarPolicy
-namespace qt_gsi
-{
-
-static gsi::Enum<Qt::ScrollBarPolicy> decl_Qt_ScrollBarPolicy_Enum ("QtCore", "Qt_ScrollBarPolicy",
-    gsi::enum_const ("ScrollBarAsNeeded", Qt::ScrollBarAsNeeded, "@brief Enum constant Qt::ScrollBarAsNeeded") +
-    gsi::enum_const ("ScrollBarAlwaysOff", Qt::ScrollBarAlwaysOff, "@brief Enum constant Qt::ScrollBarAlwaysOff") +
-    gsi::enum_const ("ScrollBarAlwaysOn", Qt::ScrollBarAlwaysOn, "@brief Enum constant Qt::ScrollBarAlwaysOn"),
-  "@qt\n@brief This class represents the Qt::ScrollBarPolicy enum");
-
-static gsi::QFlagsClass<Qt::ScrollBarPolicy > decl_Qt_ScrollBarPolicy_Enums ("QtCore", "Qt_QFlags_ScrollBarPolicy",
-  "@qt\n@brief This class represents the QFlags<Qt::ScrollBarPolicy> flag set");
-
-//  Inject the declarations into the parent
-static gsi::ClassExt<Qt_Namespace> inject_Qt_ScrollBarPolicy_Enum_in_parent (decl_Qt_ScrollBarPolicy_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ScrollBarPolicy_Enum_as_child (decl_Qt_ScrollBarPolicy_Enum, "ScrollBarPolicy");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ScrollBarPolicy_Enums_as_child (decl_Qt_ScrollBarPolicy_Enums, "QFlags_ScrollBarPolicy");
-
-}
-
-
-//  Implementation of the enum wrapper class for Qt::ScrollPhase
-namespace qt_gsi
-{
-
-static gsi::Enum<Qt::ScrollPhase> decl_Qt_ScrollPhase_Enum ("QtCore", "Qt_ScrollPhase",
-    gsi::enum_const ("ScrollBegin", Qt::ScrollBegin, "@brief Enum constant Qt::ScrollBegin") +
-    gsi::enum_const ("ScrollUpdate", Qt::ScrollUpdate, "@brief Enum constant Qt::ScrollUpdate") +
-    gsi::enum_const ("ScrollEnd", Qt::ScrollEnd, "@brief Enum constant Qt::ScrollEnd"),
-  "@qt\n@brief This class represents the Qt::ScrollPhase enum");
-
-static gsi::QFlagsClass<Qt::ScrollPhase > decl_Qt_ScrollPhase_Enums ("QtCore", "Qt_QFlags_ScrollPhase",
-  "@qt\n@brief This class represents the QFlags<Qt::ScrollPhase> flag set");
-
-//  Inject the declarations into the parent
-static gsi::ClassExt<Qt_Namespace> inject_Qt_ScrollPhase_Enum_in_parent (decl_Qt_ScrollPhase_Enum.defs ());
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ScrollPhase_Enum_as_child (decl_Qt_ScrollPhase_Enum, "ScrollPhase");
-static gsi::ClassExt<Qt_Namespace> decl_Qt_ScrollPhase_Enums_as_child (decl_Qt_ScrollPhase_Enums, "QFlags_ScrollPhase");
 
 }
 

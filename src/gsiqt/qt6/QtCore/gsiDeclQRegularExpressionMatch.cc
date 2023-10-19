@@ -108,25 +108,6 @@ static void _call_f_captured_c2025 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// QString QRegularExpressionMatch::captured(QStringView name)
-
-
-static void _init_f_captured_c1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("name");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<QString > ();
-}
-
-static void _call_f_captured_c1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QString > ((QString)((QRegularExpressionMatch *)cls)->captured (arg1));
-}
-
-
 // qsizetype QRegularExpressionMatch::capturedEnd(int nth)
 
 
@@ -161,25 +142,6 @@ static void _call_f_capturedEnd_c2025 (const qt_gsi::GenericMethod * /*decl*/, v
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  ret.write<qsizetype > ((qsizetype)((QRegularExpressionMatch *)cls)->capturedEnd (arg1));
-}
-
-
-// qsizetype QRegularExpressionMatch::capturedEnd(QStringView name)
-
-
-static void _init_f_capturedEnd_c1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("name");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<qsizetype > ();
-}
-
-static void _call_f_capturedEnd_c1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
   ret.write<qsizetype > ((qsizetype)((QRegularExpressionMatch *)cls)->capturedEnd (arg1));
 }
 
@@ -222,25 +184,6 @@ static void _call_f_capturedLength_c2025 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// qsizetype QRegularExpressionMatch::capturedLength(QStringView name)
-
-
-static void _init_f_capturedLength_c1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("name");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<qsizetype > ();
-}
-
-static void _call_f_capturedLength_c1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<qsizetype > ((qsizetype)((QRegularExpressionMatch *)cls)->capturedLength (arg1));
-}
-
-
 // qsizetype QRegularExpressionMatch::capturedStart(int nth)
 
 
@@ -279,25 +222,6 @@ static void _call_f_capturedStart_c2025 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// qsizetype QRegularExpressionMatch::capturedStart(QStringView name)
-
-
-static void _init_f_capturedStart_c1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("name");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<qsizetype > ();
-}
-
-static void _call_f_capturedStart_c1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<qsizetype > ((qsizetype)((QRegularExpressionMatch *)cls)->capturedStart (arg1));
-}
-
-
 // QStringList QRegularExpressionMatch::capturedTexts()
 
 
@@ -310,44 +234,6 @@ static void _call_f_capturedTexts_c0 (const qt_gsi::GenericMethod * /*decl*/, vo
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QStringList > ((QStringList)((QRegularExpressionMatch *)cls)->capturedTexts ());
-}
-
-
-// QStringView QRegularExpressionMatch::capturedView(int nth)
-
-
-static void _init_f_capturedView_c767 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("nth", true, "0");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_capturedView_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
-  ret.write<QStringView > ((QStringView)((QRegularExpressionMatch *)cls)->capturedView (arg1));
-}
-
-
-// QStringView QRegularExpressionMatch::capturedView(QStringView name)
-
-
-static void _init_f_capturedView_c1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("name");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_capturedView_c1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QStringView > ((QStringView)((QRegularExpressionMatch *)cls)->capturedView (arg1));
 }
 
 
@@ -505,19 +391,13 @@ static gsi::Methods methods_QRegularExpressionMatch () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QRegularExpressionMatch::QRegularExpressionMatch(const QRegularExpressionMatch &match)\nThis method creates an object of class QRegularExpressionMatch.", &_init_ctor_QRegularExpressionMatch_3681, &_call_ctor_QRegularExpressionMatch_3681);
   methods += new qt_gsi::GenericMethod ("captured", "@brief Method QString QRegularExpressionMatch::captured(int nth)\n", true, &_init_f_captured_c767, &_call_f_captured_c767);
   methods += new qt_gsi::GenericMethod ("captured", "@brief Method QString QRegularExpressionMatch::captured(const QString &name)\n", true, &_init_f_captured_c2025, &_call_f_captured_c2025);
-  methods += new qt_gsi::GenericMethod ("captured", "@brief Method QString QRegularExpressionMatch::captured(QStringView name)\n", true, &_init_f_captured_c1559, &_call_f_captured_c1559);
   methods += new qt_gsi::GenericMethod ("capturedEnd", "@brief Method qsizetype QRegularExpressionMatch::capturedEnd(int nth)\n", true, &_init_f_capturedEnd_c767, &_call_f_capturedEnd_c767);
   methods += new qt_gsi::GenericMethod ("capturedEnd", "@brief Method qsizetype QRegularExpressionMatch::capturedEnd(const QString &name)\n", true, &_init_f_capturedEnd_c2025, &_call_f_capturedEnd_c2025);
-  methods += new qt_gsi::GenericMethod ("capturedEnd", "@brief Method qsizetype QRegularExpressionMatch::capturedEnd(QStringView name)\n", true, &_init_f_capturedEnd_c1559, &_call_f_capturedEnd_c1559);
   methods += new qt_gsi::GenericMethod ("capturedLength", "@brief Method qsizetype QRegularExpressionMatch::capturedLength(int nth)\n", true, &_init_f_capturedLength_c767, &_call_f_capturedLength_c767);
   methods += new qt_gsi::GenericMethod ("capturedLength", "@brief Method qsizetype QRegularExpressionMatch::capturedLength(const QString &name)\n", true, &_init_f_capturedLength_c2025, &_call_f_capturedLength_c2025);
-  methods += new qt_gsi::GenericMethod ("capturedLength", "@brief Method qsizetype QRegularExpressionMatch::capturedLength(QStringView name)\n", true, &_init_f_capturedLength_c1559, &_call_f_capturedLength_c1559);
   methods += new qt_gsi::GenericMethod ("capturedStart", "@brief Method qsizetype QRegularExpressionMatch::capturedStart(int nth)\n", true, &_init_f_capturedStart_c767, &_call_f_capturedStart_c767);
   methods += new qt_gsi::GenericMethod ("capturedStart", "@brief Method qsizetype QRegularExpressionMatch::capturedStart(const QString &name)\n", true, &_init_f_capturedStart_c2025, &_call_f_capturedStart_c2025);
-  methods += new qt_gsi::GenericMethod ("capturedStart", "@brief Method qsizetype QRegularExpressionMatch::capturedStart(QStringView name)\n", true, &_init_f_capturedStart_c1559, &_call_f_capturedStart_c1559);
   methods += new qt_gsi::GenericMethod ("capturedTexts", "@brief Method QStringList QRegularExpressionMatch::capturedTexts()\n", true, &_init_f_capturedTexts_c0, &_call_f_capturedTexts_c0);
-  methods += new qt_gsi::GenericMethod ("capturedView", "@brief Method QStringView QRegularExpressionMatch::capturedView(int nth)\n", true, &_init_f_capturedView_c767, &_call_f_capturedView_c767);
-  methods += new qt_gsi::GenericMethod ("capturedView", "@brief Method QStringView QRegularExpressionMatch::capturedView(QStringView name)\n", true, &_init_f_capturedView_c1559, &_call_f_capturedView_c1559);
   methods += new qt_gsi::GenericMethod ("hasMatch", "@brief Method bool QRegularExpressionMatch::hasMatch()\n", true, &_init_f_hasMatch_c0, &_call_f_hasMatch_c0);
   methods += new qt_gsi::GenericMethod ("hasPartialMatch", "@brief Method bool QRegularExpressionMatch::hasPartialMatch()\n", true, &_init_f_hasPartialMatch_c0, &_call_f_hasPartialMatch_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QRegularExpressionMatch::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);

@@ -446,6 +446,8 @@ static gsi::Enum<QEvent::Type> decl_QEvent_Type_Enum ("QtCore", "QEvent_Type",
     gsi::enum_const ("WindowChangeInternal", QEvent::WindowChangeInternal, "@brief Enum constant QEvent::WindowChangeInternal") +
     gsi::enum_const ("ScreenChangeInternal", QEvent::ScreenChangeInternal, "@brief Enum constant QEvent::ScreenChangeInternal") +
     gsi::enum_const ("PlatformSurface", QEvent::PlatformSurface, "@brief Enum constant QEvent::PlatformSurface") +
+    gsi::enum_const ("Pointer", QEvent::Pointer, "@brief Enum constant QEvent::Pointer") +
+    gsi::enum_const ("TabletTrackingChange", QEvent::TabletTrackingChange, "@brief Enum constant QEvent::TabletTrackingChange") +
     gsi::enum_const ("User", QEvent::User, "@brief Enum constant QEvent::User") +
     gsi::enum_const ("MaxUser", QEvent::MaxUser, "@brief Enum constant QEvent::MaxUser"),
   "@qt\n@brief This class represents the QEvent::Type enum");

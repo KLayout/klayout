@@ -1629,7 +1629,7 @@ static gsi::Methods methods_QTextDocument () {
   methods += new qt_gsi::GenericMethod ("availableRedoSteps", "@brief Method int QTextDocument::availableRedoSteps()\n", true, &_init_f_availableRedoSteps_c0, &_call_f_availableRedoSteps_c0);
   methods += new qt_gsi::GenericMethod ("availableUndoSteps", "@brief Method int QTextDocument::availableUndoSteps()\n", true, &_init_f_availableUndoSteps_c0, &_call_f_availableUndoSteps_c0);
   methods += new qt_gsi::GenericMethod (":baseUrl", "@brief Method QUrl QTextDocument::baseUrl()\n", true, &_init_f_baseUrl_c0, &_call_f_baseUrl_c0);
-  methods += new qt_gsi::GenericMethod ("baselineOffset", "@brief Method double QTextDocument::baselineOffset()\n", true, &_init_f_baselineOffset_c0, &_call_f_baselineOffset_c0);
+  methods += new qt_gsi::GenericMethod (":baselineOffset", "@brief Method double QTextDocument::baselineOffset()\n", true, &_init_f_baselineOffset_c0, &_call_f_baselineOffset_c0);
   methods += new qt_gsi::GenericMethod ("begin", "@brief Method QTextBlock QTextDocument::begin()\n", true, &_init_f_begin_c0, &_call_f_begin_c0);
   methods += new qt_gsi::GenericMethod (":blockCount", "@brief Method int QTextDocument::blockCount()\n", true, &_init_f_blockCount_c0, &_call_f_blockCount_c0);
   methods += new qt_gsi::GenericMethod ("characterAt", "@brief Method QChar QTextDocument::characterAt(int pos)\n", true, &_init_f_characterAt_c767, &_call_f_characterAt_c767);
@@ -1677,7 +1677,7 @@ static gsi::Methods methods_QTextDocument () {
   methods += new qt_gsi::GenericMethod ("revision", "@brief Method int QTextDocument::revision()\n", true, &_init_f_revision_c0, &_call_f_revision_c0);
   methods += new qt_gsi::GenericMethod ("rootFrame", "@brief Method QTextFrame *QTextDocument::rootFrame()\n", true, &_init_f_rootFrame_c0, &_call_f_rootFrame_c0);
   methods += new qt_gsi::GenericMethod ("setBaseUrl|baseUrl=", "@brief Method void QTextDocument::setBaseUrl(const QUrl &url)\n", false, &_init_f_setBaseUrl_1701, &_call_f_setBaseUrl_1701);
-  methods += new qt_gsi::GenericMethod ("setBaselineOffset", "@brief Method void QTextDocument::setBaselineOffset(double baseline)\n", false, &_init_f_setBaselineOffset_1071, &_call_f_setBaselineOffset_1071);
+  methods += new qt_gsi::GenericMethod ("setBaselineOffset|baselineOffset=", "@brief Method void QTextDocument::setBaselineOffset(double baseline)\n", false, &_init_f_setBaselineOffset_1071, &_call_f_setBaselineOffset_1071);
   methods += new qt_gsi::GenericMethod ("setDefaultCursorMoveStyle|defaultCursorMoveStyle=", "@brief Method void QTextDocument::setDefaultCursorMoveStyle(Qt::CursorMoveStyle style)\n", false, &_init_f_setDefaultCursorMoveStyle_2323, &_call_f_setDefaultCursorMoveStyle_2323);
   methods += new qt_gsi::GenericMethod ("setDefaultFont|defaultFont=", "@brief Method void QTextDocument::setDefaultFont(const QFont &font)\n", false, &_init_f_setDefaultFont_1801, &_call_f_setDefaultFont_1801);
   methods += new qt_gsi::GenericMethod ("setDefaultStyleSheet|defaultStyleSheet=", "@brief Method void QTextDocument::setDefaultStyleSheet(const QString &sheet)\n", false, &_init_f_setDefaultStyleSheet_2025, &_call_f_setDefaultStyleSheet_2025);
@@ -1692,14 +1692,14 @@ static gsi::Methods methods_QTextDocument () {
   methods += new qt_gsi::GenericMethod ("setModified|modified=", "@brief Method void QTextDocument::setModified(bool m)\n", false, &_init_f_setModified_864, &_call_f_setModified_864);
   methods += new qt_gsi::GenericMethod ("setPageSize|pageSize=", "@brief Method void QTextDocument::setPageSize(const QSizeF &size)\n", false, &_init_f_setPageSize_1875, &_call_f_setPageSize_1875);
   methods += new qt_gsi::GenericMethod ("setPlainText", "@brief Method void QTextDocument::setPlainText(const QString &text)\n", false, &_init_f_setPlainText_2025, &_call_f_setPlainText_2025);
-  methods += new qt_gsi::GenericMethod ("setSubScriptBaseline", "@brief Method void QTextDocument::setSubScriptBaseline(double baseline)\n", false, &_init_f_setSubScriptBaseline_1071, &_call_f_setSubScriptBaseline_1071);
-  methods += new qt_gsi::GenericMethod ("setSuperScriptBaseline", "@brief Method void QTextDocument::setSuperScriptBaseline(double baseline)\n", false, &_init_f_setSuperScriptBaseline_1071, &_call_f_setSuperScriptBaseline_1071);
+  methods += new qt_gsi::GenericMethod ("setSubScriptBaseline|subScriptBaseline=", "@brief Method void QTextDocument::setSubScriptBaseline(double baseline)\n", false, &_init_f_setSubScriptBaseline_1071, &_call_f_setSubScriptBaseline_1071);
+  methods += new qt_gsi::GenericMethod ("setSuperScriptBaseline|superScriptBaseline=", "@brief Method void QTextDocument::setSuperScriptBaseline(double baseline)\n", false, &_init_f_setSuperScriptBaseline_1071, &_call_f_setSuperScriptBaseline_1071);
   methods += new qt_gsi::GenericMethod ("setTextWidth|textWidth=", "@brief Method void QTextDocument::setTextWidth(double width)\n", false, &_init_f_setTextWidth_1071, &_call_f_setTextWidth_1071);
   methods += new qt_gsi::GenericMethod ("setUndoRedoEnabled|undoRedoEnabled=", "@brief Method void QTextDocument::setUndoRedoEnabled(bool enable)\n", false, &_init_f_setUndoRedoEnabled_864, &_call_f_setUndoRedoEnabled_864);
   methods += new qt_gsi::GenericMethod ("setUseDesignMetrics|useDesignMetrics=", "@brief Method void QTextDocument::setUseDesignMetrics(bool b)\n", false, &_init_f_setUseDesignMetrics_864, &_call_f_setUseDesignMetrics_864);
   methods += new qt_gsi::GenericMethod (":size", "@brief Method QSizeF QTextDocument::size()\n", true, &_init_f_size_c0, &_call_f_size_c0);
-  methods += new qt_gsi::GenericMethod ("subScriptBaseline", "@brief Method double QTextDocument::subScriptBaseline()\n", true, &_init_f_subScriptBaseline_c0, &_call_f_subScriptBaseline_c0);
-  methods += new qt_gsi::GenericMethod ("superScriptBaseline", "@brief Method double QTextDocument::superScriptBaseline()\n", true, &_init_f_superScriptBaseline_c0, &_call_f_superScriptBaseline_c0);
+  methods += new qt_gsi::GenericMethod (":subScriptBaseline", "@brief Method double QTextDocument::subScriptBaseline()\n", true, &_init_f_subScriptBaseline_c0, &_call_f_subScriptBaseline_c0);
+  methods += new qt_gsi::GenericMethod (":superScriptBaseline", "@brief Method double QTextDocument::superScriptBaseline()\n", true, &_init_f_superScriptBaseline_c0, &_call_f_superScriptBaseline_c0);
   methods += new qt_gsi::GenericMethod (":textWidth", "@brief Method double QTextDocument::textWidth()\n", true, &_init_f_textWidth_c0, &_call_f_textWidth_c0);
   methods += new qt_gsi::GenericMethod ("toHtml", "@brief Method QString QTextDocument::toHtml()\n", true, &_init_f_toHtml_c0, &_call_f_toHtml_c0);
   methods += new qt_gsi::GenericMethod ("toMarkdown", "@brief Method QString QTextDocument::toMarkdown(QFlags<QTextDocument::MarkdownFeature> features)\n", true, &_init_f_toMarkdown_c4132, &_call_f_toMarkdown_c4132);

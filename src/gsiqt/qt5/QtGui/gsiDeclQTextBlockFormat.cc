@@ -91,6 +91,21 @@ static void _call_f_bottomMargin_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
+// int QTextBlockFormat::headingLevel()
+
+
+static void _init_f_headingLevel_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<int > ();
+}
+
+static void _call_f_headingLevel_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<int > ((int)((QTextBlockFormat *)cls)->headingLevel ());
+}
+
+
 // int QTextBlockFormat::indent()
 
 
@@ -270,6 +285,26 @@ static void _call_f_setBottomMargin_1071 (const qt_gsi::GenericMethod * /*decl*/
   double arg1 = gsi::arg_reader<double >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextBlockFormat *)cls)->setBottomMargin (arg1);
+}
+
+
+// void QTextBlockFormat::setHeadingLevel(int alevel)
+
+
+static void _init_f_setHeadingLevel_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("alevel");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setHeadingLevel_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QTextBlockFormat *)cls)->setHeadingLevel (arg1);
 }
 
 
@@ -510,6 +545,7 @@ static gsi::Methods methods_QTextBlockFormat () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTextBlockFormat::QTextBlockFormat()\nThis method creates an object of class QTextBlockFormat.", &_init_ctor_QTextBlockFormat_0, &_call_ctor_QTextBlockFormat_0);
   methods += new qt_gsi::GenericMethod (":alignment", "@brief Method QFlags<Qt::AlignmentFlag> QTextBlockFormat::alignment()\n", true, &_init_f_alignment_c0, &_call_f_alignment_c0);
   methods += new qt_gsi::GenericMethod (":bottomMargin", "@brief Method double QTextBlockFormat::bottomMargin()\n", true, &_init_f_bottomMargin_c0, &_call_f_bottomMargin_c0);
+  methods += new qt_gsi::GenericMethod (":headingLevel", "@brief Method int QTextBlockFormat::headingLevel()\n", true, &_init_f_headingLevel_c0, &_call_f_headingLevel_c0);
   methods += new qt_gsi::GenericMethod (":indent", "@brief Method int QTextBlockFormat::indent()\n", true, &_init_f_indent_c0, &_call_f_indent_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QTextBlockFormat::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod (":leftMargin", "@brief Method double QTextBlockFormat::leftMargin()\n", true, &_init_f_leftMargin_c0, &_call_f_leftMargin_c0);
@@ -521,6 +557,7 @@ static gsi::Methods methods_QTextBlockFormat () {
   methods += new qt_gsi::GenericMethod (":rightMargin", "@brief Method double QTextBlockFormat::rightMargin()\n", true, &_init_f_rightMargin_c0, &_call_f_rightMargin_c0);
   methods += new qt_gsi::GenericMethod ("setAlignment|alignment=", "@brief Method void QTextBlockFormat::setAlignment(QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_setAlignment_2750, &_call_f_setAlignment_2750);
   methods += new qt_gsi::GenericMethod ("setBottomMargin|bottomMargin=", "@brief Method void QTextBlockFormat::setBottomMargin(double margin)\n", false, &_init_f_setBottomMargin_1071, &_call_f_setBottomMargin_1071);
+  methods += new qt_gsi::GenericMethod ("setHeadingLevel|headingLevel=", "@brief Method void QTextBlockFormat::setHeadingLevel(int alevel)\n", false, &_init_f_setHeadingLevel_767, &_call_f_setHeadingLevel_767);
   methods += new qt_gsi::GenericMethod ("setIndent|indent=", "@brief Method void QTextBlockFormat::setIndent(int indent)\n", false, &_init_f_setIndent_767, &_call_f_setIndent_767);
   methods += new qt_gsi::GenericMethod ("setLeftMargin|leftMargin=", "@brief Method void QTextBlockFormat::setLeftMargin(double margin)\n", false, &_init_f_setLeftMargin_1071, &_call_f_setLeftMargin_1071);
   methods += new qt_gsi::GenericMethod ("setLineHeight", "@brief Method void QTextBlockFormat::setLineHeight(double height, int heightType)\n", false, &_init_f_setLineHeight_1730, &_call_f_setLineHeight_1730);

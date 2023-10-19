@@ -35,12 +35,12 @@
 // -----------------------------------------------------------------------
 // class QInputMethodEvent::Attribute
 
-//  Constructor QInputMethodEvent::Attribute::Attribute(QInputMethodEvent::AttributeType t, int s, int l, QVariant val)
+//  Constructor QInputMethodEvent::Attribute::Attribute(QInputMethodEvent::AttributeType typ, int s, int l, QVariant val)
 
 
 static void _init_ctor_QInputMethodEvent_Attribute_6102 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("t");
+  static gsi::ArgSpecBase argspec_0 ("typ");
   decl->add_arg<const qt_gsi::Converter<QInputMethodEvent::AttributeType>::target_type & > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("s");
   decl->add_arg<int > (argspec_1);
@@ -63,13 +63,39 @@ static void _call_ctor_QInputMethodEvent_Attribute_6102 (const qt_gsi::GenericSt
 }
 
 
+//  Constructor QInputMethodEvent::Attribute::Attribute(QInputMethodEvent::AttributeType typ, int s, int l)
+
+
+static void _init_ctor_QInputMethodEvent_Attribute_4968 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("typ");
+  decl->add_arg<const qt_gsi::Converter<QInputMethodEvent::AttributeType>::target_type & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("s");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("l");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return_new<QInputMethodEvent::Attribute> ();
+}
+
+static void _call_ctor_QInputMethodEvent_Attribute_4968 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QInputMethodEvent::AttributeType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QInputMethodEvent::AttributeType>::target_type & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ret.write<QInputMethodEvent::Attribute *> (new QInputMethodEvent::Attribute (qt_gsi::QtToCppAdaptor<QInputMethodEvent::AttributeType>(arg1).cref(), arg2, arg3));
+}
+
+
 
 namespace gsi
 {
 
 static gsi::Methods methods_QInputMethodEvent_Attribute () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QInputMethodEvent::Attribute::Attribute(QInputMethodEvent::AttributeType t, int s, int l, QVariant val)\nThis method creates an object of class QInputMethodEvent::Attribute.", &_init_ctor_QInputMethodEvent_Attribute_6102, &_call_ctor_QInputMethodEvent_Attribute_6102);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QInputMethodEvent::Attribute::Attribute(QInputMethodEvent::AttributeType typ, int s, int l, QVariant val)\nThis method creates an object of class QInputMethodEvent::Attribute.", &_init_ctor_QInputMethodEvent_Attribute_6102, &_call_ctor_QInputMethodEvent_Attribute_6102);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QInputMethodEvent::Attribute::Attribute(QInputMethodEvent::AttributeType typ, int s, int l)\nThis method creates an object of class QInputMethodEvent::Attribute.", &_init_ctor_QInputMethodEvent_Attribute_4968, &_call_ctor_QInputMethodEvent_Attribute_4968);
   return methods;
 }
 

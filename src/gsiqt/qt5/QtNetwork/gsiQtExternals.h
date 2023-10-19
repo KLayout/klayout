@@ -69,6 +69,14 @@ class QDnsTextRecord;
 
 namespace gsi { GSI_QTNETWORK_PUBLIC gsi::Class<QDnsTextRecord> &qtdecl_QDnsTextRecord (); }
 
+class QDtls;
+
+namespace gsi { GSI_QTNETWORK_PUBLIC gsi::Class<QDtls> &qtdecl_QDtls (); }
+
+class QDtlsClientVerifier;
+
+namespace gsi { GSI_QTNETWORK_PUBLIC gsi::Class<QDtlsClientVerifier> &qtdecl_QDtlsClientVerifier (); }
+
 class QHostAddress;
 
 namespace gsi { GSI_QTNETWORK_PUBLIC gsi::Class<QHostAddress> &qtdecl_QHostAddress (); }
@@ -76,6 +84,10 @@ namespace gsi { GSI_QTNETWORK_PUBLIC gsi::Class<QHostAddress> &qtdecl_QHostAddre
 class QHostInfo;
 
 namespace gsi { GSI_QTNETWORK_PUBLIC gsi::Class<QHostInfo> &qtdecl_QHostInfo (); }
+
+class QHstsPolicy;
+
+namespace gsi { GSI_QTNETWORK_PUBLIC gsi::Class<QHstsPolicy> &qtdecl_QHstsPolicy (); }
 
 class QHttpMultiPart;
 
@@ -125,6 +137,10 @@ class QNetworkCookieJar;
 
 namespace gsi { GSI_QTNETWORK_PUBLIC gsi::Class<QNetworkCookieJar> &qtdecl_QNetworkCookieJar (); }
 
+class QNetworkDatagram;
+
+namespace gsi { GSI_QTNETWORK_PUBLIC gsi::Class<QNetworkDatagram> &qtdecl_QNetworkDatagram (); }
+
 class QNetworkDiskCache;
 
 namespace gsi { GSI_QTNETWORK_PUBLIC gsi::Class<QNetworkDiskCache> &qtdecl_QNetworkDiskCache (); }
@@ -172,6 +188,10 @@ namespace gsi { GSI_QTNETWORK_PUBLIC gsi::Class<QSslCipher> &qtdecl_QSslCipher (
 class QSslConfiguration;
 
 namespace gsi { GSI_QTNETWORK_PUBLIC gsi::Class<QSslConfiguration> &qtdecl_QSslConfiguration (); }
+
+class QSslDiffieHellmanParameters;
+
+namespace gsi { GSI_QTNETWORK_PUBLIC gsi::Class<QSslDiffieHellmanParameters> &qtdecl_QSslDiffieHellmanParameters (); }
 
 class QSslEllipticCurve;
 

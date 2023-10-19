@@ -303,33 +303,33 @@ public:
     emit QSyntaxHighlighter::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QSyntaxHighlighter::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QSyntaxHighlighter::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QSyntaxHighlighter::event(arg1);
+    return QSyntaxHighlighter::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QSyntaxHighlighter_Adaptor, bool, QEvent *>(&QSyntaxHighlighter_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QSyntaxHighlighter_Adaptor, bool, QEvent *>(&QSyntaxHighlighter_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QSyntaxHighlighter::event(arg1);
+      return QSyntaxHighlighter::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QSyntaxHighlighter::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QSyntaxHighlighter::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QSyntaxHighlighter::eventFilter(arg1, arg2);
+    return QSyntaxHighlighter::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QSyntaxHighlighter_Adaptor, bool, QObject *, QEvent *>(&QSyntaxHighlighter_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QSyntaxHighlighter_Adaptor, bool, QObject *, QEvent *>(&QSyntaxHighlighter_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QSyntaxHighlighter::eventFilter(arg1, arg2);
+      return QSyntaxHighlighter::eventFilter(watched, event);
     }
   }
 
@@ -340,33 +340,33 @@ public:
     throw tl::Exception ("Can't emit private signal 'void QSyntaxHighlighter::objectNameChanged(const QString &objectName)'");
   }
 
-  //  [adaptor impl] void QSyntaxHighlighter::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QSyntaxHighlighter::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QSyntaxHighlighter::childEvent(arg1);
+    QSyntaxHighlighter::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QSyntaxHighlighter_Adaptor, QChildEvent *>(&QSyntaxHighlighter_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QSyntaxHighlighter_Adaptor, QChildEvent *>(&QSyntaxHighlighter_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QSyntaxHighlighter::childEvent(arg1);
+      QSyntaxHighlighter::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QSyntaxHighlighter::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QSyntaxHighlighter::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QSyntaxHighlighter::customEvent(arg1);
+    QSyntaxHighlighter::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QSyntaxHighlighter_Adaptor, QEvent *>(&QSyntaxHighlighter_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QSyntaxHighlighter_Adaptor, QEvent *>(&QSyntaxHighlighter_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QSyntaxHighlighter::customEvent(arg1);
+      QSyntaxHighlighter::customEvent(event);
     }
   }
 
@@ -401,18 +401,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QSyntaxHighlighter::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QSyntaxHighlighter::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QSyntaxHighlighter::timerEvent(arg1);
+    QSyntaxHighlighter::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QSyntaxHighlighter_Adaptor, QTimerEvent *>(&QSyntaxHighlighter_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QSyntaxHighlighter_Adaptor, QTimerEvent *>(&QSyntaxHighlighter_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QSyntaxHighlighter::timerEvent(arg1);
+      QSyntaxHighlighter::timerEvent(event);
     }
   }
 
@@ -463,11 +463,11 @@ static void _call_ctor_QSyntaxHighlighter_Adaptor_1955 (const qt_gsi::GenericSta
 }
 
 
-// void QSyntaxHighlighter::childEvent(QChildEvent *)
+// void QSyntaxHighlighter::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -529,11 +529,11 @@ static void _call_fp_currentBlockUserData_c0 (const qt_gsi::GenericMethod * /*de
 }
 
 
-// void QSyntaxHighlighter::customEvent(QEvent *)
+// void QSyntaxHighlighter::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -557,7 +557,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -566,7 +566,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QSyntaxHighlighter_Adaptor *)cls)->emitter_QSyntaxHighlighter_destroyed_1302 (arg1);
 }
 
@@ -595,11 +595,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QSyntaxHighlighter::event(QEvent *)
+// bool QSyntaxHighlighter::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -618,13 +618,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QSyntaxHighlighter::eventFilter(QObject *, QEvent *)
+// bool QSyntaxHighlighter::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -895,11 +895,11 @@ static void _call_fp_setFormat_3119 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// void QSyntaxHighlighter::timerEvent(QTimerEvent *)
+// void QSyntaxHighlighter::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -928,19 +928,19 @@ static gsi::Methods methods_QSyntaxHighlighter_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSyntaxHighlighter::QSyntaxHighlighter(QObject *parent)\nThis method creates an object of class QSyntaxHighlighter.", &_init_ctor_QSyntaxHighlighter_Adaptor_1302, &_call_ctor_QSyntaxHighlighter_Adaptor_1302);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSyntaxHighlighter::QSyntaxHighlighter(QTextDocument *parent)\nThis method creates an object of class QSyntaxHighlighter.", &_init_ctor_QSyntaxHighlighter_Adaptor_1955, &_call_ctor_QSyntaxHighlighter_Adaptor_1955);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QSyntaxHighlighter::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QSyntaxHighlighter::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*currentBlock", "@brief Method QTextBlock QSyntaxHighlighter::currentBlock()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_currentBlock_c0, &_call_fp_currentBlock_c0);
   methods += new qt_gsi::GenericMethod ("*currentBlockState", "@brief Method int QSyntaxHighlighter::currentBlockState()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_currentBlockState_c0, &_call_fp_currentBlockState_c0);
   methods += new qt_gsi::GenericMethod ("*currentBlockUserData", "@brief Method QTextBlockUserData *QSyntaxHighlighter::currentBlockUserData()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_currentBlockUserData_c0, &_call_fp_currentBlockUserData_c0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QSyntaxHighlighter::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QSyntaxHighlighter::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QSyntaxHighlighter::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QSyntaxHighlighter::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QSyntaxHighlighter::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QSyntaxHighlighter::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QSyntaxHighlighter::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QSyntaxHighlighter::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*format", "@brief Method QTextCharFormat QSyntaxHighlighter::format(int pos)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_format_c767, &_call_fp_format_c767);
   methods += new qt_gsi::GenericMethod ("*highlightBlock", "@brief Virtual method void QSyntaxHighlighter::highlightBlock(const QString &text)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_highlightBlock_2025_0, &_call_cbs_highlightBlock_2025_0);
@@ -956,7 +956,7 @@ static gsi::Methods methods_QSyntaxHighlighter_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*setFormat", "@brief Method void QSyntaxHighlighter::setFormat(int start, int count, const QTextCharFormat &format)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_setFormat_4132, &_call_fp_setFormat_4132);
   methods += new qt_gsi::GenericMethod ("*setFormat", "@brief Method void QSyntaxHighlighter::setFormat(int start, int count, const QColor &color)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_setFormat_3223, &_call_fp_setFormat_3223);
   methods += new qt_gsi::GenericMethod ("*setFormat", "@brief Method void QSyntaxHighlighter::setFormat(int start, int count, const QFont &font)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_setFormat_3119, &_call_fp_setFormat_3119);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QSyntaxHighlighter::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QSyntaxHighlighter::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

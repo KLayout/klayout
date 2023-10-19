@@ -271,7 +271,7 @@ static void _init_ctor_QPageSetupDialog_Adaptor_2650 (qt_gsi::GenericStaticMetho
 {
   static gsi::ArgSpecBase argspec_0 ("printer");
   decl->add_arg<QPrinter * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_1);
   decl->set_return_new<QPageSetupDialog_Adaptor> ();
 }
@@ -281,7 +281,7 @@ static void _call_ctor_QPageSetupDialog_Adaptor_2650 (const qt_gsi::GenericStati
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QPrinter *arg1 = gsi::arg_reader<QPrinter * >() (args, heap);
-  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
   ret.write<QPageSetupDialog_Adaptor *> (new QPageSetupDialog_Adaptor (arg1, arg2));
 }
 
@@ -290,7 +290,7 @@ static void _call_ctor_QPageSetupDialog_Adaptor_2650 (const qt_gsi::GenericStati
 
 static void _init_ctor_QPageSetupDialog_Adaptor_1315 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_0);
   decl->set_return_new<QPageSetupDialog_Adaptor> ();
 }
@@ -299,7 +299,7 @@ static void _call_ctor_QPageSetupDialog_Adaptor_1315 (const qt_gsi::GenericStati
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
   ret.write<QPageSetupDialog_Adaptor *> (new QPageSetupDialog_Adaptor (arg1));
 }
 

@@ -205,6 +205,11 @@ std::string TL_PUBLIC get_home_path ();
 std::string TL_PUBLIC get_inst_path ();
 
 /**
+ *  @brief Gets the path of the binary executing
+ */
+std::string TL_PUBLIC get_exe_file ();
+
+/**
  *  @brief Gets the absolute path of the module (DLL/.so) which contains the given address
  *  "address" is supposed to be the address of a function inside the module.
  */

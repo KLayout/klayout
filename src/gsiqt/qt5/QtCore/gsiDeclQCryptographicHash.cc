@@ -170,6 +170,25 @@ static void _call_f_hash_5532 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi
 }
 
 
+// static int QCryptographicHash::hashLength(QCryptographicHash::Algorithm method)
+
+
+static void _init_f_hashLength_3331 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("method");
+  decl->add_arg<const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & > (argspec_0);
+  decl->set_return<int > ();
+}
+
+static void _call_f_hashLength_3331 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCryptographicHash::Algorithm>::target_type & >() (args, heap);
+  ret.write<int > ((int)QCryptographicHash::hashLength (qt_gsi::QtToCppAdaptor<QCryptographicHash::Algorithm>(arg1).cref()));
+}
+
+
 
 namespace gsi
 {
@@ -183,6 +202,7 @@ static gsi::Methods methods_QCryptographicHash () {
   methods += new qt_gsi::GenericMethod ("reset", "@brief Method void QCryptographicHash::reset()\n", false, &_init_f_reset_0, &_call_f_reset_0);
   methods += new qt_gsi::GenericMethod ("result", "@brief Method QByteArray QCryptographicHash::result()\n", true, &_init_f_result_c0, &_call_f_result_c0);
   methods += new qt_gsi::GenericStaticMethod ("hash", "@brief Static method QByteArray QCryptographicHash::hash(const QByteArray &data, QCryptographicHash::Algorithm method)\nThis method is static and can be called without an instance.", &_init_f_hash_5532, &_call_f_hash_5532);
+  methods += new qt_gsi::GenericStaticMethod ("hashLength", "@brief Static method int QCryptographicHash::hashLength(QCryptographicHash::Algorithm method)\nThis method is static and can be called without an instance.", &_init_f_hashLength_3331, &_call_f_hashLength_3331);
   return methods;
 }
 
@@ -208,6 +228,14 @@ static gsi::Enum<QCryptographicHash::Algorithm> decl_QCryptographicHash_Algorith
     gsi::enum_const ("Sha256", QCryptographicHash::Sha256, "@brief Enum constant QCryptographicHash::Sha256") +
     gsi::enum_const ("Sha384", QCryptographicHash::Sha384, "@brief Enum constant QCryptographicHash::Sha384") +
     gsi::enum_const ("Sha512", QCryptographicHash::Sha512, "@brief Enum constant QCryptographicHash::Sha512") +
+    gsi::enum_const ("Keccak_224", QCryptographicHash::Keccak_224, "@brief Enum constant QCryptographicHash::Keccak_224") +
+    gsi::enum_const ("Keccak_256", QCryptographicHash::Keccak_256, "@brief Enum constant QCryptographicHash::Keccak_256") +
+    gsi::enum_const ("Keccak_384", QCryptographicHash::Keccak_384, "@brief Enum constant QCryptographicHash::Keccak_384") +
+    gsi::enum_const ("Keccak_512", QCryptographicHash::Keccak_512, "@brief Enum constant QCryptographicHash::Keccak_512") +
+    gsi::enum_const ("RealSha3_224", QCryptographicHash::RealSha3_224, "@brief Enum constant QCryptographicHash::RealSha3_224") +
+    gsi::enum_const ("RealSha3_256", QCryptographicHash::RealSha3_256, "@brief Enum constant QCryptographicHash::RealSha3_256") +
+    gsi::enum_const ("RealSha3_384", QCryptographicHash::RealSha3_384, "@brief Enum constant QCryptographicHash::RealSha3_384") +
+    gsi::enum_const ("RealSha3_512", QCryptographicHash::RealSha3_512, "@brief Enum constant QCryptographicHash::RealSha3_512") +
     gsi::enum_const ("Sha3_224", QCryptographicHash::Sha3_224, "@brief Enum constant QCryptographicHash::Sha3_224") +
     gsi::enum_const ("Sha3_256", QCryptographicHash::Sha3_256, "@brief Enum constant QCryptographicHash::Sha3_256") +
     gsi::enum_const ("Sha3_384", QCryptographicHash::Sha3_384, "@brief Enum constant QCryptographicHash::Sha3_384") +

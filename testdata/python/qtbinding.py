@@ -649,6 +649,81 @@ class QtBindingTest(unittest.TestCase):
     self.assertEqual(item.background(0).color.green, 255)
     self.assertEqual(item.background(0).color.blue, 0)
 
+  def test_55(self):
+
+    # addWidget to QHBoxLayout keeps object managed
+    window = pya.QDialog()
+    layout = pya.QHBoxLayout(window)
+
+    w = pya.QPushButton()
+    oid = str(w)
+    layout.addWidget(w)
+    self.assertEqual(str(layout.itemAt(0).widget()), oid)
+
+    # try to kill the object
+    w = None
+
+    # still there
+    w = layout.itemAt(0).widget()
+    self.assertEqual(w._destroyed(), False)
+    self.assertEqual(str(w), oid)
+
+    # killing the window kills the layout kills the widget
+    window._destroy()
+    self.assertEqual(window._destroyed(), True)
+    self.assertEqual(layout._destroyed(), True)
+    self.assertEqual(w._destroyed(), True)
+
+  def test_56(self):
+
+    # Creating QImage from binary data
+
+    bstr = b'\x01\x02\x03\x04\x11\x12\x13\x14\x21\x22\x33\x34' + b'\x31\x32\x33\x34\x41\x42\x43\x44\x51\x52\x53\x54' + b'\x61\x62\x63\x64\x71\x72\x73\x74\x81\x82\x83\x84' + b'\x91\x92\x93\x94\xa1\xa2\xa3\xa4\xb1\xb2\xb3\xb4'
+
+    image = pya.QImage(bstr, 3, 4, pya.QImage.Format_ARGB32)
+    self.assertEqual("%08x" % image.pixel(0, 0), "04030201")
+    self.assertEqual("%08x" % image.pixel(1, 0), "14131211")
+    self.assertEqual("%08x" % image.pixel(0, 2), "64636261")
+
+  def test_57(self):
+
+    # QColor with string parameter (suppressing QLatin1String)
+
+    color = pya.QColor("blue")
+    self.assertEqual(color.name(), "#0000ff")
+
+  def test_58(self):
+
+    # The various ways to refer to enums
+
+    self.assertEqual(pya.Qt.MouseButton(4).to_i(), 4)
+    self.assertEqual(pya.Qt_MouseButton(4).to_i(), 4)
+    self.assertEqual(pya.Qt_MouseButton(4).__int__(), 4)
+    self.assertEqual(pya.Qt_MouseButton(4).__hash__(), 4)
+    self.assertEqual(int(pya.Qt_MouseButton(4)), 4)
+    self.assertEqual(str(pya.Qt_MouseButton(1)), "LeftButton")
+    self.assertEqual(pya.Qt.MouseButton.LeftButton.to_i(), 1)
+    self.assertEqual(pya.Qt_MouseButton.LeftButton.to_i(), 1)
+    self.assertEqual(pya.Qt.LeftButton.to_i(), 1)
+    self.assertEqual((pya.Qt_MouseButton.LeftButton | pya.Qt_MouseButton.RightButton).to_i(), 3)
+    self.assertEqual(type(pya.Qt_MouseButton.LeftButton | pya.Qt_MouseButton.RightButton).__name__, "Qt_QFlags_MouseButton")
+    self.assertEqual((pya.Qt.MouseButton.LeftButton | pya.Qt.MouseButton.RightButton).to_i(), 3)
+    self.assertEqual(type(pya.Qt.MouseButton.LeftButton | pya.Qt.MouseButton.RightButton).__name__, "Qt_QFlags_MouseButton")
+    self.assertEqual((pya.Qt.LeftButton | pya.Qt.RightButton).to_i(), 3)
+    self.assertEqual(type(pya.Qt.LeftButton | pya.Qt.RightButton).__name__, "Qt_QFlags_MouseButton")
+
+  def test_59(self):
+
+    # Enums can act as hash keys
+
+    h = {}
+    h[pya.Qt.MouseButton.LeftButton] = "left"
+    h[pya.Qt.MouseButton.RightButton] = "right"
+    self.assertEqual(pya.Qt.MouseButton.LeftButton in h, True)
+    self.assertEqual(h[pya.Qt.MouseButton.LeftButton], "left")
+    self.assertEqual(h[pya.Qt.MouseButton.RightButton], "right")
+    self.assertEqual(pya.Qt.MouseButton.NoButton in h, False)
+
 # run unit tests
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(QtBindingTest)

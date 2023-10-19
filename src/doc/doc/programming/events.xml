@@ -59,10 +59,12 @@
   </p>
 
   <p>
-  Here is the code:
+  Here is the code.
+  This example demonstrates how the "get" method is reimplemented to deliver the actual text.
   </p>
 
-  <pre>module MyMacro
+  <pre>
+module MyMacro
   
   include RBA
   
@@ -78,15 +80,32 @@
   dialog.home = "int:0"
   dialog.exec
 
-end</pre>
+end
+</pre>
+
+  The Python version is this:
+
+  <pre>
+from pya import BrowserSource, BrowserDialog
+
+class MyBrowserSource(BrowserSource):
+  def get(self, url):
+    next_url = "int:" + str(int(url.split(":")[1]) + 1)
+    return f"This is {url}. &lt;a href='{next_url}'&gt;Goto next ({next_url})&lt;/a&gt;>"
+
+dialog = BrowserDialog()
+dialog.home = "int:0"
+dialog.source = MyBrowserSource()
+dialog.exec_()
+</pre>
 
   <p>
-  This example demonstrates how the "get" method is reimplemented to deliver the actual text.
   Ruby even allows reimplementation of a method without deriving a new class, because it allows
-  to define methods per instance:
+  defining methods per instance:
   </p>
 
-  <pre>module MyMacro
+  <pre>
+module MyMacro
   
   include RBA
   
@@ -101,7 +120,8 @@ end</pre>
   dialog.home = "int:0"
   dialog.exec
 
-end</pre>
+end
+</pre>
 
   <h2>Events</h2>
 
@@ -117,7 +137,8 @@ end</pre>
   clicked, it displays a message box:
   </p>
 
-  <pre>module MyMacro
+  <pre>
+module MyMacro
   
   include RBA
   
@@ -129,14 +150,33 @@ end</pre>
   
   Application::instance.main_window.menu.insert_item("@toolbar.end", "my_action", action)
   
-end</pre>
+end
+</pre>
+
+  <p>
+  The Python version is:
+  </p>
+
+  <pre>
+from pya import Action, MessageBox, Application
+
+def on_triggered():
+  MessageBox.info("A message", "The action was triggered", MessageBox.Ok)
+
+action = Action()
+action.on_triggered = on_triggered
+action.title = "My Action"
+
+Application.instance().main_window().menu().insert_item("@toolbar.end", "my_action", action)
+</pre>
 
   <p>
   Specifying a block to an event will make the event only execute that block. A more flexible way of 
   controlling the code attached to events is available through the += and -= operators:
   </p>
 
-  <pre>module MyMacro
+  <pre>
+module MyMacro
 
   include RBA
 
@@ -157,7 +197,12 @@ end</pre>
 
   # to clear all event handlers use:
   action.on_triggered.clear
-  </pre>
+</pre>
+
+  <p>
+  Synonyms for the <tt>+=</tt> operator are <tt>add</tt> and <tt>connect</tt>. The latter makes code more familiar for PyQt users.
+  In the same way, synonyms for the <tt>-=</tt> operator are <tt>remove</tt> and <tt>disconnect</tt>.
+  </p>
 
   <p>
   If the Qt binding is available (see <link href="/programming/qt_binding.xml"/>), Qt signals
@@ -166,7 +211,8 @@ end</pre>
   input field to the label below:
   </p>
   
-  <pre>module MyMacro
+  <pre>
+module MyMacro
   
   include RBA
   
@@ -182,13 +228,38 @@ end</pre>
 
   dialog.exec
 
-end</pre>
+end
+</pre>
+
+  <p>
+  The Python version is:
+  </p>
+
+  <pre>
+from pya import QDialog, QVBoxLayout, QLineEdit, QLabel, Application
+
+dialog = QDialog(Application.instance().main_window())
+layout = QVBoxLayout(dialog)
+input = QLineEdit(dialog)
+label = QLabel(dialog)
+layout.addWidget(input)
+layout.addWidget(label)
+
+def text_changed(text):
+  label.text = text
+
+# implement the textChanged signal as event:
+input.textChanged = text_changed
+
+dialog.exec_()
+</pre>
 
   <p>
   Using the += operator on the event, multiple handlers can be added to a signal:
   </p>
 
-  <pre>module MyMacro
+  <pre>
+module MyMacro
   
   include RBA
   
@@ -207,7 +278,37 @@ end</pre>
   
   dialog.exec
 
-end</pre>
+end
+</pre>
+
+  <p>
+  with the Python version:
+  </p>
+
+  <pre>
+from pya import QDialog, QVBoxLayout, QLineEdit, QLabel, Application
+
+dialog = QDialog(Application.instance().main_window())
+layout = QVBoxLayout(dialog)
+input = QLineEdit(dialog)
+label1 = QLabel(dialog)
+label2 = QLabel(dialog)
+layout.addWidget(input)
+layout.addWidget(label1)
+layout.addWidget(label2)
+
+def text_changed1(text):
+  label1.text = text
+
+def text_changed2(text):
+  label2.text = text[::-1]
+
+# two signal consumers:
+input.textChanged += text_changed1
+input.textChanged += text_changed2
+
+dialog.exec_()
+</pre>
 
 </doc>
 

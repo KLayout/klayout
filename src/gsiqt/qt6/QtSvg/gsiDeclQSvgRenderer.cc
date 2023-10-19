@@ -329,22 +329,6 @@ static void _call_f_render_5097 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// void QSvgRenderer::repaintNeeded()
-
-
-static void _init_f_repaintNeeded_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_repaintNeeded_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSvgRenderer *)cls)->repaintNeeded ();
-}
-
-
 // void QSvgRenderer::setAspectRatioMode(Qt::AspectRatioMode mode)
 
 
@@ -527,7 +511,7 @@ static gsi::Methods methods_QSvgRenderer () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("animated", "@brief Method bool QSvgRenderer::animated()\n", true, &_init_f_animated_c0, &_call_f_animated_c0);
   methods += new qt_gsi::GenericMethod ("animationDuration", "@brief Method int QSvgRenderer::animationDuration()\n", true, &_init_f_animationDuration_c0, &_call_f_animationDuration_c0);
-  methods += new qt_gsi::GenericMethod ("aspectRatioMode", "@brief Method Qt::AspectRatioMode QSvgRenderer::aspectRatioMode()\n", true, &_init_f_aspectRatioMode_c0, &_call_f_aspectRatioMode_c0);
+  methods += new qt_gsi::GenericMethod (":aspectRatioMode", "@brief Method Qt::AspectRatioMode QSvgRenderer::aspectRatioMode()\n", true, &_init_f_aspectRatioMode_c0, &_call_f_aspectRatioMode_c0);
   methods += new qt_gsi::GenericMethod ("boundsOnElement", "@brief Method QRectF QSvgRenderer::boundsOnElement(const QString &id)\n", true, &_init_f_boundsOnElement_c2025, &_call_f_boundsOnElement_c2025);
   methods += new qt_gsi::GenericMethod (":currentFrame", "@brief Method int QSvgRenderer::currentFrame()\n", true, &_init_f_currentFrame_c0, &_call_f_currentFrame_c0);
   methods += new qt_gsi::GenericMethod ("defaultSize", "@brief Method QSize QSvgRenderer::defaultSize()\n", true, &_init_f_defaultSize_c0, &_call_f_defaultSize_c0);
@@ -540,8 +524,7 @@ static gsi::Methods methods_QSvgRenderer () {
   methods += new qt_gsi::GenericMethod ("render", "@brief Method void QSvgRenderer::render(QPainter *p)\n", false, &_init_f_render_1426, &_call_f_render_1426);
   methods += new qt_gsi::GenericMethod ("render", "@brief Method void QSvgRenderer::render(QPainter *p, const QRectF &bounds)\n", false, &_init_f_render_3180, &_call_f_render_3180);
   methods += new qt_gsi::GenericMethod ("render", "@brief Method void QSvgRenderer::render(QPainter *p, const QString &elementId, const QRectF &bounds)\n", false, &_init_f_render_5097, &_call_f_render_5097);
-  methods += new qt_gsi::GenericMethod ("repaintNeeded", "@brief Method void QSvgRenderer::repaintNeeded()\n", false, &_init_f_repaintNeeded_0, &_call_f_repaintNeeded_0);
-  methods += new qt_gsi::GenericMethod ("setAspectRatioMode", "@brief Method void QSvgRenderer::setAspectRatioMode(Qt::AspectRatioMode mode)\n", false, &_init_f_setAspectRatioMode_2257, &_call_f_setAspectRatioMode_2257);
+  methods += new qt_gsi::GenericMethod ("setAspectRatioMode|aspectRatioMode=", "@brief Method void QSvgRenderer::setAspectRatioMode(Qt::AspectRatioMode mode)\n", false, &_init_f_setAspectRatioMode_2257, &_call_f_setAspectRatioMode_2257);
   methods += new qt_gsi::GenericMethod ("setCurrentFrame|currentFrame=", "@brief Method void QSvgRenderer::setCurrentFrame(int)\n", false, &_init_f_setCurrentFrame_767, &_call_f_setCurrentFrame_767);
   methods += new qt_gsi::GenericMethod ("setFramesPerSecond|framesPerSecond=", "@brief Method void QSvgRenderer::setFramesPerSecond(int num)\n", false, &_init_f_setFramesPerSecond_767, &_call_f_setFramesPerSecond_767);
   methods += new qt_gsi::GenericMethod ("setViewBox|viewBox=", "@brief Method void QSvgRenderer::setViewBox(const QRect &viewbox)\n", false, &_init_f_setViewBox_1792, &_call_f_setViewBox_1792);
@@ -549,6 +532,9 @@ static gsi::Methods methods_QSvgRenderer () {
   methods += new qt_gsi::GenericMethod ("transformForElement", "@brief Method QTransform QSvgRenderer::transformForElement(const QString &id)\n", true, &_init_f_transformForElement_c2025, &_call_f_transformForElement_c2025);
   methods += new qt_gsi::GenericMethod (":viewBox", "@brief Method QRect QSvgRenderer::viewBox()\n", true, &_init_f_viewBox_c0, &_call_f_viewBox_c0);
   methods += new qt_gsi::GenericMethod ("viewBoxF", "@brief Method QRectF QSvgRenderer::viewBoxF()\n", true, &_init_f_viewBoxF_c0, &_call_f_viewBoxF_c0);
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QSvgRenderer::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QSvgRenderer::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("repaintNeeded()", "repaintNeeded", "@brief Signal declaration for QSvgRenderer::repaintNeeded()\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QSvgRenderer::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;
 }
@@ -638,6 +624,12 @@ public:
     return QSvgRenderer::senderSignalIndex();
   }
 
+  //  [emitter impl] void QSvgRenderer::destroyed(QObject *)
+  void emitter_QSvgRenderer_destroyed_1302(QObject *arg1)
+  {
+    emit QSvgRenderer::destroyed(arg1);
+  }
+
   //  [adaptor impl] bool QSvgRenderer::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -666,6 +658,19 @@ public:
     } else {
       return QSvgRenderer::eventFilter(watched, event);
     }
+  }
+
+  //  [emitter impl] void QSvgRenderer::objectNameChanged(const QString &objectName)
+  void emitter_QSvgRenderer_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QSvgRenderer::objectNameChanged(const QString &objectName)'");
+  }
+
+  //  [emitter impl] void QSvgRenderer::repaintNeeded()
+  void emitter_QSvgRenderer_repaintNeeded_0()
+  {
+    emit QSvgRenderer::repaintNeeded();
   }
 
   //  [adaptor impl] void QSvgRenderer::childEvent(QChildEvent *event)
@@ -867,6 +872,24 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QSvgRenderer::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QSvgRenderer_Adaptor *)cls)->emitter_QSvgRenderer_destroyed_1302 (arg1);
+}
+
+
 // void QSvgRenderer::disconnectNotify(const QMetaMethod &signal)
 
 static void _init_cbs_disconnectNotify_2394_0 (qt_gsi::GenericMethod *decl)
@@ -958,6 +981,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QSvgRenderer::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QSvgRenderer_Adaptor *)cls)->emitter_QSvgRenderer_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QSvgRenderer::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -973,6 +1014,20 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
   tl::Heap heap;
   const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QSvgRenderer_Adaptor *)cls)->fp_QSvgRenderer_receivers_c1731 (arg1));
+}
+
+
+// emitter void QSvgRenderer::repaintNeeded()
+
+static void _init_emitter_repaintNeeded_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_repaintNeeded_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QSvgRenderer_Adaptor *)cls)->emitter_QSvgRenderer_repaintNeeded_0 ();
 }
 
 
@@ -1043,6 +1098,7 @@ static gsi::Methods methods_QSvgRenderer_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QSvgRenderer::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QSvgRenderer::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QSvgRenderer::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QSvgRenderer::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
@@ -1050,7 +1106,9 @@ static gsi::Methods methods_QSvgRenderer_Adaptor () {
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QSvgRenderer::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QSvgRenderer::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QSvgRenderer::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QSvgRenderer::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
+  methods += new qt_gsi::GenericMethod ("emit_repaintNeeded", "@brief Emitter for signal void QSvgRenderer::repaintNeeded()\nCall this method to emit this signal.", false, &_init_emitter_repaintNeeded_0, &_call_emitter_repaintNeeded_0);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QSvgRenderer::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QSvgRenderer::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QSvgRenderer::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);

@@ -282,44 +282,6 @@ static void _call_f_operator_eq__eq__c2313 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// const QJsonValue QJsonValueRef::operator[](QStringView key)
-
-
-static void _init_f_operator_index__c1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<const QJsonValue > ();
-}
-
-static void _call_f_operator_index__c1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<const QJsonValue > ((const QJsonValue)((QJsonValueRef *)cls)->operator[] (arg1));
-}
-
-
-// const QJsonValue QJsonValueRef::operator[](QLatin1String key)
-
-
-static void _init_f_operator_index__c1701 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QLatin1String > (argspec_0);
-  decl->set_return<const QJsonValue > ();
-}
-
-static void _call_f_operator_index__c1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
-  ret.write<const QJsonValue > ((const QJsonValue)((QJsonValueRef *)cls)->operator[] (arg1));
-}
-
-
 // const QJsonValue QJsonValueRef::operator[](qsizetype i)
 
 
@@ -514,8 +476,6 @@ static gsi::Methods methods_QJsonValueRef () {
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QJsonValueRef &QJsonValueRef::operator =(const QJsonValueRef &val)\n", false, &_init_f_operator_eq__2598, &_call_f_operator_eq__2598);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QJsonValueRef::operator!=(const QJsonValue &other)\n", true, &_init_f_operator_excl__eq__c2313, &_call_f_operator_excl__eq__c2313);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QJsonValueRef::operator==(const QJsonValue &other)\n", true, &_init_f_operator_eq__eq__c2313, &_call_f_operator_eq__eq__c2313);
-  methods += new qt_gsi::GenericMethod ("[]", "@brief Method const QJsonValue QJsonValueRef::operator[](QStringView key)\n", true, &_init_f_operator_index__c1559, &_call_f_operator_index__c1559);
-  methods += new qt_gsi::GenericMethod ("[]", "@brief Method const QJsonValue QJsonValueRef::operator[](QLatin1String key)\n", true, &_init_f_operator_index__c1701, &_call_f_operator_index__c1701);
   methods += new qt_gsi::GenericMethod ("[]", "@brief Method const QJsonValue QJsonValueRef::operator[](qsizetype i)\n", true, &_init_f_operator_index__c1442, &_call_f_operator_index__c1442);
   methods += new qt_gsi::GenericMethod ("toArray", "@brief Method QJsonArray QJsonValueRef::toArray()\n", true, &_init_f_toArray_c0, &_call_f_toArray_c0);
   methods += new qt_gsi::GenericMethod ("toBool", "@brief Method bool QJsonValueRef::toBool(bool defaultValue)\n", true, &_init_f_toBool_c864, &_call_f_toBool_c864);

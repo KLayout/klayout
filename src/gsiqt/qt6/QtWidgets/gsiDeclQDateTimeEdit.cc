@@ -1023,7 +1023,7 @@ namespace gsi
 static gsi::Methods methods_QDateTimeEdit () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("calendar", "@brief Method QCalendar QDateTimeEdit::calendar()\n", true, &_init_f_calendar_c0, &_call_f_calendar_c0);
+  methods += new qt_gsi::GenericMethod (":calendar", "@brief Method QCalendar QDateTimeEdit::calendar()\n", true, &_init_f_calendar_c0, &_call_f_calendar_c0);
   methods += new qt_gsi::GenericMethod (":calendarPopup", "@brief Method bool QDateTimeEdit::calendarPopup()\n", true, &_init_f_calendarPopup_c0, &_call_f_calendarPopup_c0);
   methods += new qt_gsi::GenericMethod (":calendarWidget", "@brief Method QCalendarWidget *QDateTimeEdit::calendarWidget()\n", true, &_init_f_calendarWidget_c0, &_call_f_calendarWidget_c0);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QDateTimeEdit::clear()\nThis is a reimplementation of QAbstractSpinBox::clear", false, &_init_f_clear_0, &_call_f_clear_0);
@@ -1049,7 +1049,7 @@ static gsi::Methods methods_QDateTimeEdit () {
   methods += new qt_gsi::GenericMethod ("sectionAt", "@brief Method QDateTimeEdit::Section QDateTimeEdit::sectionAt(int index)\n", true, &_init_f_sectionAt_c767, &_call_f_sectionAt_c767);
   methods += new qt_gsi::GenericMethod (":sectionCount", "@brief Method int QDateTimeEdit::sectionCount()\n", true, &_init_f_sectionCount_c0, &_call_f_sectionCount_c0);
   methods += new qt_gsi::GenericMethod ("sectionText", "@brief Method QString QDateTimeEdit::sectionText(QDateTimeEdit::Section section)\n", true, &_init_f_sectionText_c2529, &_call_f_sectionText_c2529);
-  methods += new qt_gsi::GenericMethod ("setCalendar", "@brief Method void QDateTimeEdit::setCalendar(QCalendar calendar)\n", false, &_init_f_setCalendar_1311, &_call_f_setCalendar_1311);
+  methods += new qt_gsi::GenericMethod ("setCalendar|calendar=", "@brief Method void QDateTimeEdit::setCalendar(QCalendar calendar)\n", false, &_init_f_setCalendar_1311, &_call_f_setCalendar_1311);
   methods += new qt_gsi::GenericMethod ("setCalendarPopup|calendarPopup=", "@brief Method void QDateTimeEdit::setCalendarPopup(bool enable)\n", false, &_init_f_setCalendarPopup_864, &_call_f_setCalendarPopup_864);
   methods += new qt_gsi::GenericMethod ("setCalendarWidget|calendarWidget=", "@brief Method void QDateTimeEdit::setCalendarWidget(QCalendarWidget *calendarWidget)\n", false, &_init_f_setCalendarWidget_2109, &_call_f_setCalendarWidget_2109);
   methods += new qt_gsi::GenericMethod ("setCurrentSection|currentSection=", "@brief Method void QDateTimeEdit::setCurrentSection(QDateTimeEdit::Section section)\n", false, &_init_f_setCurrentSection_2529, &_call_f_setCurrentSection_2529);
@@ -3830,7 +3830,7 @@ static gsi::Methods methods_QDateTimeEdit_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*closeEvent", "@hide", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0, &_set_callback_cbs_closeEvent_1719_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QDateTimeEdit::contextMenuEvent(QContextMenuEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0, &_set_callback_cbs_contextMenuEvent_2363_0);
-  methods += new qt_gsi::GenericMethod ("*qt_create", "@brief Method void QDateTimeEdit::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
+  methods += new qt_gsi::GenericMethod ("*create|qt_create", "@brief Method void QDateTimeEdit::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
   methods += new qt_gsi::GenericMethod ("emit_customContextMenuRequested", "@brief Emitter for signal void QDateTimeEdit::customContextMenuRequested(const QPoint &pos)\nCall this method to emit this signal.", false, &_init_emitter_customContextMenuRequested_1916, &_call_emitter_customContextMenuRequested_1916);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QDateTimeEdit::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
@@ -3838,7 +3838,7 @@ static gsi::Methods methods_QDateTimeEdit_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_dateTimeChanged", "@brief Emitter for signal void QDateTimeEdit::dateTimeChanged(const QDateTime &dateTime)\nCall this method to emit this signal.", false, &_init_emitter_dateTimeChanged_2175, &_call_emitter_dateTimeChanged_2175);
   methods += new qt_gsi::GenericMethod ("*dateTimeFromText", "@brief Virtual method QDateTime QDateTimeEdit::dateTimeFromText(const QString &text)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_dateTimeFromText_c2025_0, &_call_cbs_dateTimeFromText_c2025_0);
   methods += new qt_gsi::GenericMethod ("*dateTimeFromText", "@hide", true, &_init_cbs_dateTimeFromText_c2025_0, &_call_cbs_dateTimeFromText_c2025_0, &_set_callback_cbs_dateTimeFromText_c2025_0);
-  methods += new qt_gsi::GenericMethod ("*qt_destroy", "@brief Method void QDateTimeEdit::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
+  methods += new qt_gsi::GenericMethod ("*destroy|qt_destroy", "@brief Method void QDateTimeEdit::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QDateTimeEdit::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QDateTimeEdit::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);

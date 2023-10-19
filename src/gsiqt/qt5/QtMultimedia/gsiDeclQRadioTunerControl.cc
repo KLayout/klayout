@@ -54,26 +54,6 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// void QRadioTunerControl::antennaConnectedChanged(bool connectionStatus)
-
-
-static void _init_f_antennaConnectedChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("connectionStatus");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_antennaConnectedChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QRadioTunerControl *)cls)->antennaConnectedChanged (arg1);
-}
-
-
 // QRadioTuner::Band QRadioTunerControl::band()
 
 
@@ -86,26 +66,6 @@ static void _call_f_band_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qt_gsi::Converter<QRadioTuner::Band>::target_type > ((qt_gsi::Converter<QRadioTuner::Band>::target_type)qt_gsi::CppToQtAdaptor<QRadioTuner::Band>(((QRadioTunerControl *)cls)->band ()));
-}
-
-
-// void QRadioTunerControl::bandChanged(QRadioTuner::Band band)
-
-
-static void _init_f_bandChanged_2027 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("band");
-  decl->add_arg<const qt_gsi::Converter<QRadioTuner::Band>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_bandChanged_2027 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QRadioTuner::Band>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QRadioTuner::Band>::target_type & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QRadioTunerControl *)cls)->bandChanged (qt_gsi::QtToCppAdaptor<QRadioTuner::Band>(arg1).cref());
 }
 
 
@@ -140,26 +100,6 @@ static void _call_f_error_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// void QRadioTunerControl::error(QRadioTuner::Error err)
-
-
-static void _init_f_error_2176 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("err");
-  decl->add_arg<const qt_gsi::Converter<QRadioTuner::Error>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_error_2176 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QRadioTuner::Error>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QRadioTuner::Error>::target_type & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QRadioTunerControl *)cls)->error (qt_gsi::QtToCppAdaptor<QRadioTuner::Error>(arg1).cref());
-}
-
-
 // QString QRadioTunerControl::errorString()
 
 
@@ -187,26 +127,6 @@ static void _call_f_frequency_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<int > ((int)((QRadioTunerControl *)cls)->frequency ());
-}
-
-
-// void QRadioTunerControl::frequencyChanged(int frequency)
-
-
-static void _init_f_frequencyChanged_767 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("frequency");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_frequencyChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QRadioTunerControl *)cls)->frequencyChanged (arg1);
 }
 
 
@@ -327,26 +247,6 @@ static void _call_f_isStereo_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// void QRadioTunerControl::mutedChanged(bool muted)
-
-
-static void _init_f_mutedChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("muted");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_mutedChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QRadioTunerControl *)cls)->mutedChanged (arg1);
-}
-
-
 // void QRadioTunerControl::searchAllStations(QRadioTuner::SearchMode searchMode)
 
 
@@ -396,26 +296,6 @@ static void _call_f_searchForward_0 (const qt_gsi::GenericMethod * /*decl*/, voi
   __SUPPRESS_UNUSED_WARNING(args);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QRadioTunerControl *)cls)->searchForward ();
-}
-
-
-// void QRadioTunerControl::searchingChanged(bool searching)
-
-
-static void _init_f_searchingChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("searching");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_searchingChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QRadioTunerControl *)cls)->searchingChanged (arg1);
 }
 
 
@@ -534,26 +414,6 @@ static void _call_f_signalStrength_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// void QRadioTunerControl::signalStrengthChanged(int signalStrength)
-
-
-static void _init_f_signalStrengthChanged_767 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("signalStrength");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_signalStrengthChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QRadioTunerControl *)cls)->signalStrengthChanged (arg1);
-}
-
-
 // void QRadioTunerControl::start()
 
 
@@ -585,49 +445,6 @@ static void _call_f_state_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// void QRadioTunerControl::stateChanged(QRadioTuner::State state)
-
-
-static void _init_f_stateChanged_2167 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("state");
-  decl->add_arg<const qt_gsi::Converter<QRadioTuner::State>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_stateChanged_2167 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QRadioTuner::State>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QRadioTuner::State>::target_type & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QRadioTunerControl *)cls)->stateChanged (qt_gsi::QtToCppAdaptor<QRadioTuner::State>(arg1).cref());
-}
-
-
-// void QRadioTunerControl::stationFound(int frequency, QString stationId)
-
-
-static void _init_f_stationFound_1807 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("frequency");
-  decl->add_arg<int > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("stationId");
-  decl->add_arg<QString > (argspec_1);
-  decl->set_return<void > ();
-}
-
-static void _call_f_stationFound_1807 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  QString arg2 = gsi::arg_reader<QString >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QRadioTunerControl *)cls)->stationFound (arg1, arg2);
-}
-
-
 // QRadioTuner::StereoMode QRadioTunerControl::stereoMode()
 
 
@@ -640,26 +457,6 @@ static void _call_f_stereoMode_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qt_gsi::Converter<QRadioTuner::StereoMode>::target_type > ((qt_gsi::Converter<QRadioTuner::StereoMode>::target_type)qt_gsi::CppToQtAdaptor<QRadioTuner::StereoMode>(((QRadioTunerControl *)cls)->stereoMode ()));
-}
-
-
-// void QRadioTunerControl::stereoStatusChanged(bool stereo)
-
-
-static void _init_f_stereoStatusChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("stereo");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_stereoStatusChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QRadioTunerControl *)cls)->stereoStatusChanged (arg1);
 }
 
 
@@ -691,26 +488,6 @@ static void _call_f_volume_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<int > ((int)((QRadioTunerControl *)cls)->volume ());
-}
-
-
-// void QRadioTunerControl::volumeChanged(int volume)
-
-
-static void _init_f_volumeChanged_767 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("volume");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_volumeChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QRadioTunerControl *)cls)->volumeChanged (arg1);
 }
 
 
@@ -770,15 +547,11 @@ namespace gsi
 static gsi::Methods methods_QRadioTunerControl () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("antennaConnectedChanged", "@brief Method void QRadioTunerControl::antennaConnectedChanged(bool connectionStatus)\n", false, &_init_f_antennaConnectedChanged_864, &_call_f_antennaConnectedChanged_864);
   methods += new qt_gsi::GenericMethod (":band", "@brief Method QRadioTuner::Band QRadioTunerControl::band()\n", true, &_init_f_band_c0, &_call_f_band_c0);
-  methods += new qt_gsi::GenericMethod ("bandChanged", "@brief Method void QRadioTunerControl::bandChanged(QRadioTuner::Band band)\n", false, &_init_f_bandChanged_2027, &_call_f_bandChanged_2027);
   methods += new qt_gsi::GenericMethod ("cancelSearch", "@brief Method void QRadioTunerControl::cancelSearch()\n", false, &_init_f_cancelSearch_0, &_call_f_cancelSearch_0);
   methods += new qt_gsi::GenericMethod ("error", "@brief Method QRadioTuner::Error QRadioTunerControl::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
-  methods += new qt_gsi::GenericMethod ("error_sig", "@brief Method void QRadioTunerControl::error(QRadioTuner::Error err)\n", false, &_init_f_error_2176, &_call_f_error_2176);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QRadioTunerControl::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
   methods += new qt_gsi::GenericMethod (":frequency", "@brief Method int QRadioTunerControl::frequency()\n", true, &_init_f_frequency_c0, &_call_f_frequency_c0);
-  methods += new qt_gsi::GenericMethod ("frequencyChanged", "@brief Method void QRadioTunerControl::frequencyChanged(int frequency)\n", false, &_init_f_frequencyChanged_767, &_call_f_frequencyChanged_767);
   methods += new qt_gsi::GenericMethod ("frequencyRange", "@brief Method QPair<int, int> QRadioTunerControl::frequencyRange(QRadioTuner::Band b)\n", true, &_init_f_frequencyRange_c2027, &_call_f_frequencyRange_c2027);
   methods += new qt_gsi::GenericMethod ("frequencyStep", "@brief Method int QRadioTunerControl::frequencyStep(QRadioTuner::Band b)\n", true, &_init_f_frequencyStep_c2027, &_call_f_frequencyStep_c2027);
   methods += new qt_gsi::GenericMethod ("isAntennaConnected?", "@brief Method bool QRadioTunerControl::isAntennaConnected()\n", true, &_init_f_isAntennaConnected_c0, &_call_f_isAntennaConnected_c0);
@@ -786,27 +559,33 @@ static gsi::Methods methods_QRadioTunerControl () {
   methods += new qt_gsi::GenericMethod ("isMuted?|:muted", "@brief Method bool QRadioTunerControl::isMuted()\n", true, &_init_f_isMuted_c0, &_call_f_isMuted_c0);
   methods += new qt_gsi::GenericMethod ("isSearching?", "@brief Method bool QRadioTunerControl::isSearching()\n", true, &_init_f_isSearching_c0, &_call_f_isSearching_c0);
   methods += new qt_gsi::GenericMethod ("isStereo?", "@brief Method bool QRadioTunerControl::isStereo()\n", true, &_init_f_isStereo_c0, &_call_f_isStereo_c0);
-  methods += new qt_gsi::GenericMethod ("mutedChanged", "@brief Method void QRadioTunerControl::mutedChanged(bool muted)\n", false, &_init_f_mutedChanged_864, &_call_f_mutedChanged_864);
   methods += new qt_gsi::GenericMethod ("searchAllStations", "@brief Method void QRadioTunerControl::searchAllStations(QRadioTuner::SearchMode searchMode)\n", false, &_init_f_searchAllStations_2641, &_call_f_searchAllStations_2641);
   methods += new qt_gsi::GenericMethod ("searchBackward", "@brief Method void QRadioTunerControl::searchBackward()\n", false, &_init_f_searchBackward_0, &_call_f_searchBackward_0);
   methods += new qt_gsi::GenericMethod ("searchForward", "@brief Method void QRadioTunerControl::searchForward()\n", false, &_init_f_searchForward_0, &_call_f_searchForward_0);
-  methods += new qt_gsi::GenericMethod ("searchingChanged", "@brief Method void QRadioTunerControl::searchingChanged(bool searching)\n", false, &_init_f_searchingChanged_864, &_call_f_searchingChanged_864);
   methods += new qt_gsi::GenericMethod ("setBand|band=", "@brief Method void QRadioTunerControl::setBand(QRadioTuner::Band b)\n", false, &_init_f_setBand_2027, &_call_f_setBand_2027);
   methods += new qt_gsi::GenericMethod ("setFrequency|frequency=", "@brief Method void QRadioTunerControl::setFrequency(int frequency)\n", false, &_init_f_setFrequency_767, &_call_f_setFrequency_767);
   methods += new qt_gsi::GenericMethod ("setMuted|muted=", "@brief Method void QRadioTunerControl::setMuted(bool muted)\n", false, &_init_f_setMuted_864, &_call_f_setMuted_864);
   methods += new qt_gsi::GenericMethod ("setStereoMode|stereoMode=", "@brief Method void QRadioTunerControl::setStereoMode(QRadioTuner::StereoMode mode)\n", false, &_init_f_setStereoMode_2669, &_call_f_setStereoMode_2669);
   methods += new qt_gsi::GenericMethod ("setVolume|volume=", "@brief Method void QRadioTunerControl::setVolume(int volume)\n", false, &_init_f_setVolume_767, &_call_f_setVolume_767);
   methods += new qt_gsi::GenericMethod ("signalStrength", "@brief Method int QRadioTunerControl::signalStrength()\n", true, &_init_f_signalStrength_c0, &_call_f_signalStrength_c0);
-  methods += new qt_gsi::GenericMethod ("signalStrengthChanged", "@brief Method void QRadioTunerControl::signalStrengthChanged(int signalStrength)\n", false, &_init_f_signalStrengthChanged_767, &_call_f_signalStrengthChanged_767);
   methods += new qt_gsi::GenericMethod ("start", "@brief Method void QRadioTunerControl::start()\n", false, &_init_f_start_0, &_call_f_start_0);
   methods += new qt_gsi::GenericMethod ("state", "@brief Method QRadioTuner::State QRadioTunerControl::state()\n", true, &_init_f_state_c0, &_call_f_state_c0);
-  methods += new qt_gsi::GenericMethod ("stateChanged", "@brief Method void QRadioTunerControl::stateChanged(QRadioTuner::State state)\n", false, &_init_f_stateChanged_2167, &_call_f_stateChanged_2167);
-  methods += new qt_gsi::GenericMethod ("stationFound", "@brief Method void QRadioTunerControl::stationFound(int frequency, QString stationId)\n", false, &_init_f_stationFound_1807, &_call_f_stationFound_1807);
   methods += new qt_gsi::GenericMethod (":stereoMode", "@brief Method QRadioTuner::StereoMode QRadioTunerControl::stereoMode()\n", true, &_init_f_stereoMode_c0, &_call_f_stereoMode_c0);
-  methods += new qt_gsi::GenericMethod ("stereoStatusChanged", "@brief Method void QRadioTunerControl::stereoStatusChanged(bool stereo)\n", false, &_init_f_stereoStatusChanged_864, &_call_f_stereoStatusChanged_864);
   methods += new qt_gsi::GenericMethod ("stop", "@brief Method void QRadioTunerControl::stop()\n", false, &_init_f_stop_0, &_call_f_stop_0);
   methods += new qt_gsi::GenericMethod (":volume", "@brief Method int QRadioTunerControl::volume()\n", true, &_init_f_volume_c0, &_call_f_volume_c0);
-  methods += new qt_gsi::GenericMethod ("volumeChanged", "@brief Method void QRadioTunerControl::volumeChanged(int volume)\n", false, &_init_f_volumeChanged_767, &_call_f_volumeChanged_767);
+  methods += gsi::qt_signal<bool > ("antennaConnectedChanged(bool)", "antennaConnectedChanged", gsi::arg("connectionStatus"), "@brief Signal declaration for QRadioTunerControl::antennaConnectedChanged(bool connectionStatus)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QRadioTuner::Band>::target_type & > ("bandChanged(QRadioTuner::Band)", "bandChanged", gsi::arg("band"), "@brief Signal declaration for QRadioTunerControl::bandChanged(QRadioTuner::Band band)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QRadioTunerControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QRadioTuner::Error>::target_type & > ("error(QRadioTuner::Error)", "error_sig", gsi::arg("err"), "@brief Signal declaration for QRadioTunerControl::error(QRadioTuner::Error err)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("frequencyChanged(int)", "frequencyChanged", gsi::arg("frequency"), "@brief Signal declaration for QRadioTunerControl::frequencyChanged(int frequency)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("mutedChanged(bool)", "mutedChanged", gsi::arg("muted"), "@brief Signal declaration for QRadioTunerControl::mutedChanged(bool muted)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QRadioTunerControl::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("searchingChanged(bool)", "searchingChanged", gsi::arg("searching"), "@brief Signal declaration for QRadioTunerControl::searchingChanged(bool searching)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("signalStrengthChanged(int)", "signalStrengthChanged", gsi::arg("signalStrength"), "@brief Signal declaration for QRadioTunerControl::signalStrengthChanged(int signalStrength)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QRadioTuner::State>::target_type & > ("stateChanged(QRadioTuner::State)", "stateChanged", gsi::arg("state"), "@brief Signal declaration for QRadioTunerControl::stateChanged(QRadioTuner::State state)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int, QString > ("stationFound(int, QString)", "stationFound", gsi::arg("frequency"), gsi::arg("stationId"), "@brief Signal declaration for QRadioTunerControl::stationFound(int frequency, QString stationId)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("stereoStatusChanged(bool)", "stereoStatusChanged", gsi::arg("stereo"), "@brief Signal declaration for QRadioTunerControl::stereoStatusChanged(bool stereo)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("volumeChanged(int)", "volumeChanged", gsi::arg("volume"), "@brief Signal declaration for QRadioTunerControl::volumeChanged(int volume)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QRadioTunerControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QRadioTunerControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -849,6 +628,12 @@ public:
     return QRadioTunerControl::senderSignalIndex();
   }
 
+  //  [emitter impl] void QRadioTunerControl::antennaConnectedChanged(bool connectionStatus)
+  void emitter_QRadioTunerControl_antennaConnectedChanged_864(bool connectionStatus)
+  {
+    emit QRadioTunerControl::antennaConnectedChanged(connectionStatus);
+  }
+
   //  [adaptor impl] QRadioTuner::Band QRadioTunerControl::band()
   qt_gsi::Converter<QRadioTuner::Band>::target_type cbs_band_c0_0() const
   {
@@ -862,6 +647,12 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("band");
     }
+  }
+
+  //  [emitter impl] void QRadioTunerControl::bandChanged(QRadioTuner::Band band)
+  void emitter_QRadioTunerControl_bandChanged_2027(QRadioTuner::Band band)
+  {
+    emit QRadioTunerControl::bandChanged(band);
   }
 
   //  [adaptor impl] void QRadioTunerControl::cancelSearch()
@@ -879,6 +670,12 @@ public:
     }
   }
 
+  //  [emitter impl] void QRadioTunerControl::destroyed(QObject *)
+  void emitter_QRadioTunerControl_destroyed_1302(QObject *arg1)
+  {
+    emit QRadioTunerControl::destroyed(arg1);
+  }
+
   //  [adaptor impl] QRadioTuner::Error QRadioTunerControl::error()
   qt_gsi::Converter<QRadioTuner::Error>::target_type cbs_error_c0_0() const
   {
@@ -892,6 +689,12 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("error");
     }
+  }
+
+  //  [emitter impl] void QRadioTunerControl::error(QRadioTuner::Error err)
+  void emitter_QRadioTunerControl_error_2176(QRadioTuner::Error err)
+  {
+    emit QRadioTunerControl::error(err);
   }
 
   //  [adaptor impl] QString QRadioTunerControl::errorString()
@@ -909,33 +712,33 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QRadioTunerControl::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QRadioTunerControl::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QRadioTunerControl::event(arg1);
+    return QRadioTunerControl::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QRadioTunerControl_Adaptor, bool, QEvent *>(&QRadioTunerControl_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QRadioTunerControl_Adaptor, bool, QEvent *>(&QRadioTunerControl_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QRadioTunerControl::event(arg1);
+      return QRadioTunerControl::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QRadioTunerControl::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QRadioTunerControl::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QRadioTunerControl::eventFilter(arg1, arg2);
+    return QRadioTunerControl::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QRadioTunerControl_Adaptor, bool, QObject *, QEvent *>(&QRadioTunerControl_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QRadioTunerControl_Adaptor, bool, QObject *, QEvent *>(&QRadioTunerControl_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QRadioTunerControl::eventFilter(arg1, arg2);
+      return QRadioTunerControl::eventFilter(watched, event);
     }
   }
 
@@ -952,6 +755,12 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("frequency");
     }
+  }
+
+  //  [emitter impl] void QRadioTunerControl::frequencyChanged(int frequency)
+  void emitter_QRadioTunerControl_frequencyChanged_767(int frequency)
+  {
+    emit QRadioTunerControl::frequencyChanged(frequency);
   }
 
   //  [adaptor impl] QPair<int, int> QRadioTunerControl::frequencyRange(QRadioTuner::Band b)
@@ -1062,6 +871,19 @@ public:
     }
   }
 
+  //  [emitter impl] void QRadioTunerControl::mutedChanged(bool muted)
+  void emitter_QRadioTunerControl_mutedChanged_864(bool muted)
+  {
+    emit QRadioTunerControl::mutedChanged(muted);
+  }
+
+  //  [emitter impl] void QRadioTunerControl::objectNameChanged(const QString &objectName)
+  void emitter_QRadioTunerControl_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QRadioTunerControl::objectNameChanged(const QString &objectName)'");
+  }
+
   //  [adaptor impl] void QRadioTunerControl::searchAllStations(QRadioTuner::SearchMode searchMode)
   void cbs_searchAllStations_2641_1(const qt_gsi::Converter<QRadioTuner::SearchMode>::target_type & searchMode)
   {
@@ -1106,6 +928,12 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("searchForward");
     }
+  }
+
+  //  [emitter impl] void QRadioTunerControl::searchingChanged(bool searching)
+  void emitter_QRadioTunerControl_searchingChanged_864(bool searching)
+  {
+    emit QRadioTunerControl::searchingChanged(searching);
   }
 
   //  [adaptor impl] void QRadioTunerControl::setBand(QRadioTuner::Band b)
@@ -1203,6 +1031,12 @@ public:
     }
   }
 
+  //  [emitter impl] void QRadioTunerControl::signalStrengthChanged(int signalStrength)
+  void emitter_QRadioTunerControl_signalStrengthChanged_767(int signalStrength)
+  {
+    emit QRadioTunerControl::signalStrengthChanged(signalStrength);
+  }
+
   //  [adaptor impl] void QRadioTunerControl::start()
   void cbs_start_0_0()
   {
@@ -1233,6 +1067,18 @@ public:
     }
   }
 
+  //  [emitter impl] void QRadioTunerControl::stateChanged(QRadioTuner::State state)
+  void emitter_QRadioTunerControl_stateChanged_2167(QRadioTuner::State state)
+  {
+    emit QRadioTunerControl::stateChanged(state);
+  }
+
+  //  [emitter impl] void QRadioTunerControl::stationFound(int frequency, QString stationId)
+  void emitter_QRadioTunerControl_stationFound_1807(int frequency, QString stationId)
+  {
+    emit QRadioTunerControl::stationFound(frequency, stationId);
+  }
+
   //  [adaptor impl] QRadioTuner::StereoMode QRadioTunerControl::stereoMode()
   qt_gsi::Converter<QRadioTuner::StereoMode>::target_type cbs_stereoMode_c0_0() const
   {
@@ -1246,6 +1092,12 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("stereoMode");
     }
+  }
+
+  //  [emitter impl] void QRadioTunerControl::stereoStatusChanged(bool stereo)
+  void emitter_QRadioTunerControl_stereoStatusChanged_864(bool stereo)
+  {
+    emit QRadioTunerControl::stereoStatusChanged(stereo);
   }
 
   //  [adaptor impl] void QRadioTunerControl::stop()
@@ -1278,33 +1130,39 @@ public:
     }
   }
 
-  //  [adaptor impl] void QRadioTunerControl::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [emitter impl] void QRadioTunerControl::volumeChanged(int volume)
+  void emitter_QRadioTunerControl_volumeChanged_767(int volume)
   {
-    QRadioTunerControl::childEvent(arg1);
+    emit QRadioTunerControl::volumeChanged(volume);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  //  [adaptor impl] void QRadioTunerControl::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
+  {
+    QRadioTunerControl::childEvent(event);
+  }
+
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QRadioTunerControl_Adaptor, QChildEvent *>(&QRadioTunerControl_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QRadioTunerControl_Adaptor, QChildEvent *>(&QRadioTunerControl_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QRadioTunerControl::childEvent(arg1);
+      QRadioTunerControl::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QRadioTunerControl::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QRadioTunerControl::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QRadioTunerControl::customEvent(arg1);
+    QRadioTunerControl::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QRadioTunerControl_Adaptor, QEvent *>(&QRadioTunerControl_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QRadioTunerControl_Adaptor, QEvent *>(&QRadioTunerControl_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QRadioTunerControl::customEvent(arg1);
+      QRadioTunerControl::customEvent(event);
     }
   }
 
@@ -1323,18 +1181,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QRadioTunerControl::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QRadioTunerControl::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QRadioTunerControl::timerEvent(arg1);
+    QRadioTunerControl::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QRadioTunerControl_Adaptor, QTimerEvent *>(&QRadioTunerControl_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QRadioTunerControl_Adaptor, QTimerEvent *>(&QRadioTunerControl_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QRadioTunerControl::timerEvent(arg1);
+      QRadioTunerControl::timerEvent(event);
     }
   }
 
@@ -1374,6 +1232,24 @@ public:
 
 QRadioTunerControl_Adaptor::~QRadioTunerControl_Adaptor() { }
 
+// emitter void QRadioTunerControl::antennaConnectedChanged(bool connectionStatus)
+
+static void _init_emitter_antennaConnectedChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("connectionStatus");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_antennaConnectedChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_antennaConnectedChanged_864 (arg1);
+}
+
+
 // QRadioTuner::Band QRadioTunerControl::band()
 
 static void _init_cbs_band_c0_0 (qt_gsi::GenericMethod *decl)
@@ -1390,6 +1266,24 @@ static void _call_cbs_band_c0_0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 static void _set_callback_cbs_band_c0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QRadioTunerControl_Adaptor *)cls)->cb_band_c0_0 = cb;
+}
+
+
+// emitter void QRadioTunerControl::bandChanged(QRadioTuner::Band band)
+
+static void _init_emitter_bandChanged_2027 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("band");
+  decl->add_arg<const qt_gsi::Converter<QRadioTuner::Band>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_bandChanged_2027 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QRadioTuner::Band>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QRadioTuner::Band>::target_type & >() (args, heap);
+  ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_bandChanged_2027 (arg1);
 }
 
 
@@ -1413,11 +1307,11 @@ static void _set_callback_cbs_cancelSearch_0_0 (void *cls, const gsi::Callback &
 }
 
 
-// void QRadioTunerControl::childEvent(QChildEvent *)
+// void QRadioTunerControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1437,11 +1331,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QRadioTunerControl::customEvent(QEvent *)
+// void QRadioTunerControl::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1458,6 +1352,24 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QRadioTunerControl_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
+}
+
+
+// emitter void QRadioTunerControl::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_destroyed_1302 (arg1);
 }
 
 
@@ -1504,6 +1416,24 @@ static void _set_callback_cbs_error_c0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
+// emitter void QRadioTunerControl::error(QRadioTuner::Error err)
+
+static void _init_emitter_error_2176 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("err");
+  decl->add_arg<const qt_gsi::Converter<QRadioTuner::Error>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_error_2176 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QRadioTuner::Error>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QRadioTuner::Error>::target_type & >() (args, heap);
+  ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_error_2176 (arg1);
+}
+
+
 // QString QRadioTunerControl::errorString()
 
 static void _init_cbs_errorString_c0_0 (qt_gsi::GenericMethod *decl)
@@ -1523,11 +1453,11 @@ static void _set_callback_cbs_errorString_c0_0 (void *cls, const gsi::Callback &
 }
 
 
-// bool QRadioTunerControl::event(QEvent *)
+// bool QRadioTunerControl::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -1546,13 +1476,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QRadioTunerControl::eventFilter(QObject *, QEvent *)
+// bool QRadioTunerControl::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -1588,6 +1518,24 @@ static void _call_cbs_frequency_c0_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 static void _set_callback_cbs_frequency_c0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QRadioTunerControl_Adaptor *)cls)->cb_frequency_c0_0 = cb;
+}
+
+
+// emitter void QRadioTunerControl::frequencyChanged(int frequency)
+
+static void _init_emitter_frequencyChanged_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("frequency");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_frequencyChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_frequencyChanged_767 (arg1);
 }
 
 
@@ -1754,6 +1702,42 @@ static void _set_callback_cbs_isStereo_c0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
+// emitter void QRadioTunerControl::mutedChanged(bool muted)
+
+static void _init_emitter_mutedChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("muted");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_mutedChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_mutedChanged_864 (arg1);
+}
+
+
+// emitter void QRadioTunerControl::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QRadioTunerControl::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -1833,6 +1817,24 @@ static void _call_cbs_searchForward_0_0 (const qt_gsi::GenericMethod * /*decl*/,
 static void _set_callback_cbs_searchForward_0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QRadioTunerControl_Adaptor *)cls)->cb_searchForward_0_0 = cb;
+}
+
+
+// emitter void QRadioTunerControl::searchingChanged(bool searching)
+
+static void _init_emitter_searchingChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("searching");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_searchingChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_searchingChanged_864 (arg1);
 }
 
 
@@ -2003,6 +2005,24 @@ static void _set_callback_cbs_signalStrength_c0_0 (void *cls, const gsi::Callbac
 }
 
 
+// emitter void QRadioTunerControl::signalStrengthChanged(int signalStrength)
+
+static void _init_emitter_signalStrengthChanged_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("signalStrength");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_signalStrengthChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_signalStrengthChanged_767 (arg1);
+}
+
+
 // void QRadioTunerControl::start()
 
 static void _init_cbs_start_0_0 (qt_gsi::GenericMethod *decl)
@@ -2042,6 +2062,45 @@ static void _set_callback_cbs_state_c0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
+// emitter void QRadioTunerControl::stateChanged(QRadioTuner::State state)
+
+static void _init_emitter_stateChanged_2167 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("state");
+  decl->add_arg<const qt_gsi::Converter<QRadioTuner::State>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_stateChanged_2167 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QRadioTuner::State>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QRadioTuner::State>::target_type & >() (args, heap);
+  ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_stateChanged_2167 (arg1);
+}
+
+
+// emitter void QRadioTunerControl::stationFound(int frequency, QString stationId)
+
+static void _init_emitter_stationFound_1807 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("frequency");
+  decl->add_arg<int > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("stationId");
+  decl->add_arg<QString > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_stationFound_1807 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  QString arg2 = gsi::arg_reader<QString >() (args, heap);
+  ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_stationFound_1807 (arg1, arg2);
+}
+
+
 // QRadioTuner::StereoMode QRadioTunerControl::stereoMode()
 
 static void _init_cbs_stereoMode_c0_0 (qt_gsi::GenericMethod *decl)
@@ -2058,6 +2117,24 @@ static void _call_cbs_stereoMode_c0_0 (const qt_gsi::GenericMethod * /*decl*/, v
 static void _set_callback_cbs_stereoMode_c0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QRadioTunerControl_Adaptor *)cls)->cb_stereoMode_c0_0 = cb;
+}
+
+
+// emitter void QRadioTunerControl::stereoStatusChanged(bool stereo)
+
+static void _init_emitter_stereoStatusChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("stereo");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_stereoStatusChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_stereoStatusChanged_864 (arg1);
 }
 
 
@@ -2081,11 +2158,11 @@ static void _set_callback_cbs_stop_0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QRadioTunerControl::timerEvent(QTimerEvent *)
+// void QRadioTunerControl::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2124,6 +2201,24 @@ static void _set_callback_cbs_volume_c0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
+// emitter void QRadioTunerControl::volumeChanged(int volume)
+
+static void _init_emitter_volumeChanged_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("volume");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_volumeChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QRadioTunerControl_Adaptor *)cls)->emitter_QRadioTunerControl_volumeChanged_767 (arg1);
+}
+
+
 namespace gsi
 {
 
@@ -2131,26 +2226,31 @@ gsi::Class<QRadioTunerControl> &qtdecl_QRadioTunerControl ();
 
 static gsi::Methods methods_QRadioTunerControl_Adaptor () {
   gsi::Methods methods;
+  methods += new qt_gsi::GenericMethod ("emit_antennaConnectedChanged", "@brief Emitter for signal void QRadioTunerControl::antennaConnectedChanged(bool connectionStatus)\nCall this method to emit this signal.", false, &_init_emitter_antennaConnectedChanged_864, &_call_emitter_antennaConnectedChanged_864);
   methods += new qt_gsi::GenericMethod ("band", "@brief Virtual method QRadioTuner::Band QRadioTunerControl::band()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_band_c0_0, &_call_cbs_band_c0_0);
   methods += new qt_gsi::GenericMethod ("band", "@hide", true, &_init_cbs_band_c0_0, &_call_cbs_band_c0_0, &_set_callback_cbs_band_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_bandChanged", "@brief Emitter for signal void QRadioTunerControl::bandChanged(QRadioTuner::Band band)\nCall this method to emit this signal.", false, &_init_emitter_bandChanged_2027, &_call_emitter_bandChanged_2027);
   methods += new qt_gsi::GenericMethod ("cancelSearch", "@brief Virtual method void QRadioTunerControl::cancelSearch()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_cancelSearch_0_0, &_call_cbs_cancelSearch_0_0);
   methods += new qt_gsi::GenericMethod ("cancelSearch", "@hide", false, &_init_cbs_cancelSearch_0_0, &_call_cbs_cancelSearch_0_0, &_set_callback_cbs_cancelSearch_0_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QRadioTunerControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QRadioTunerControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QRadioTunerControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QRadioTunerControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QRadioTunerControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QRadioTunerControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("error", "@brief Virtual method QRadioTuner::Error QRadioTunerControl::error()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_error_c0_0, &_call_cbs_error_c0_0);
   methods += new qt_gsi::GenericMethod ("error", "@hide", true, &_init_cbs_error_c0_0, &_call_cbs_error_c0_0, &_set_callback_cbs_error_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_error_sig", "@brief Emitter for signal void QRadioTunerControl::error(QRadioTuner::Error err)\nCall this method to emit this signal.", false, &_init_emitter_error_2176, &_call_emitter_error_2176);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Virtual method QString QRadioTunerControl::errorString()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0);
   methods += new qt_gsi::GenericMethod ("errorString", "@hide", true, &_init_cbs_errorString_c0_0, &_call_cbs_errorString_c0_0, &_set_callback_cbs_errorString_c0_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QRadioTunerControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QRadioTunerControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QRadioTunerControl::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QRadioTunerControl::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("frequency", "@brief Virtual method int QRadioTunerControl::frequency()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_frequency_c0_0, &_call_cbs_frequency_c0_0);
   methods += new qt_gsi::GenericMethod ("frequency", "@hide", true, &_init_cbs_frequency_c0_0, &_call_cbs_frequency_c0_0, &_set_callback_cbs_frequency_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_frequencyChanged", "@brief Emitter for signal void QRadioTunerControl::frequencyChanged(int frequency)\nCall this method to emit this signal.", false, &_init_emitter_frequencyChanged_767, &_call_emitter_frequencyChanged_767);
   methods += new qt_gsi::GenericMethod ("frequencyRange", "@brief Virtual method QPair<int, int> QRadioTunerControl::frequencyRange(QRadioTuner::Band b)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_frequencyRange_c2027_0, &_call_cbs_frequencyRange_c2027_0);
   methods += new qt_gsi::GenericMethod ("frequencyRange", "@hide", true, &_init_cbs_frequencyRange_c2027_0, &_call_cbs_frequencyRange_c2027_0, &_set_callback_cbs_frequencyRange_c2027_0);
   methods += new qt_gsi::GenericMethod ("frequencyStep", "@brief Virtual method int QRadioTunerControl::frequencyStep(QRadioTuner::Band b)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_frequencyStep_c2027_0, &_call_cbs_frequencyStep_c2027_0);
@@ -2166,6 +2266,8 @@ static gsi::Methods methods_QRadioTunerControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QRadioTunerControl::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("isStereo", "@brief Virtual method bool QRadioTunerControl::isStereo()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isStereo_c0_0, &_call_cbs_isStereo_c0_0);
   methods += new qt_gsi::GenericMethod ("isStereo", "@hide", true, &_init_cbs_isStereo_c0_0, &_call_cbs_isStereo_c0_0, &_set_callback_cbs_isStereo_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_mutedChanged", "@brief Emitter for signal void QRadioTunerControl::mutedChanged(bool muted)\nCall this method to emit this signal.", false, &_init_emitter_mutedChanged_864, &_call_emitter_mutedChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QRadioTunerControl::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QRadioTunerControl::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("searchAllStations", "@brief Virtual method void QRadioTunerControl::searchAllStations(QRadioTuner::SearchMode searchMode)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_searchAllStations_2641_1, &_call_cbs_searchAllStations_2641_1);
   methods += new qt_gsi::GenericMethod ("searchAllStations", "@hide", false, &_init_cbs_searchAllStations_2641_1, &_call_cbs_searchAllStations_2641_1, &_set_callback_cbs_searchAllStations_2641_1);
@@ -2173,6 +2275,7 @@ static gsi::Methods methods_QRadioTunerControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("searchBackward", "@hide", false, &_init_cbs_searchBackward_0_0, &_call_cbs_searchBackward_0_0, &_set_callback_cbs_searchBackward_0_0);
   methods += new qt_gsi::GenericMethod ("searchForward", "@brief Virtual method void QRadioTunerControl::searchForward()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_searchForward_0_0, &_call_cbs_searchForward_0_0);
   methods += new qt_gsi::GenericMethod ("searchForward", "@hide", false, &_init_cbs_searchForward_0_0, &_call_cbs_searchForward_0_0, &_set_callback_cbs_searchForward_0_0);
+  methods += new qt_gsi::GenericMethod ("emit_searchingChanged", "@brief Emitter for signal void QRadioTunerControl::searchingChanged(bool searching)\nCall this method to emit this signal.", false, &_init_emitter_searchingChanged_864, &_call_emitter_searchingChanged_864);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QRadioTunerControl::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QRadioTunerControl::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("setBand", "@brief Virtual method void QRadioTunerControl::setBand(QRadioTuner::Band b)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setBand_2027_0, &_call_cbs_setBand_2027_0);
@@ -2187,18 +2290,23 @@ static gsi::Methods methods_QRadioTunerControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("setVolume", "@hide", false, &_init_cbs_setVolume_767_0, &_call_cbs_setVolume_767_0, &_set_callback_cbs_setVolume_767_0);
   methods += new qt_gsi::GenericMethod ("signalStrength", "@brief Virtual method int QRadioTunerControl::signalStrength()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_signalStrength_c0_0, &_call_cbs_signalStrength_c0_0);
   methods += new qt_gsi::GenericMethod ("signalStrength", "@hide", true, &_init_cbs_signalStrength_c0_0, &_call_cbs_signalStrength_c0_0, &_set_callback_cbs_signalStrength_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_signalStrengthChanged", "@brief Emitter for signal void QRadioTunerControl::signalStrengthChanged(int signalStrength)\nCall this method to emit this signal.", false, &_init_emitter_signalStrengthChanged_767, &_call_emitter_signalStrengthChanged_767);
   methods += new qt_gsi::GenericMethod ("start", "@brief Virtual method void QRadioTunerControl::start()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_start_0_0, &_call_cbs_start_0_0);
   methods += new qt_gsi::GenericMethod ("start", "@hide", false, &_init_cbs_start_0_0, &_call_cbs_start_0_0, &_set_callback_cbs_start_0_0);
   methods += new qt_gsi::GenericMethod ("state", "@brief Virtual method QRadioTuner::State QRadioTunerControl::state()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_state_c0_0, &_call_cbs_state_c0_0);
   methods += new qt_gsi::GenericMethod ("state", "@hide", true, &_init_cbs_state_c0_0, &_call_cbs_state_c0_0, &_set_callback_cbs_state_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_stateChanged", "@brief Emitter for signal void QRadioTunerControl::stateChanged(QRadioTuner::State state)\nCall this method to emit this signal.", false, &_init_emitter_stateChanged_2167, &_call_emitter_stateChanged_2167);
+  methods += new qt_gsi::GenericMethod ("emit_stationFound", "@brief Emitter for signal void QRadioTunerControl::stationFound(int frequency, QString stationId)\nCall this method to emit this signal.", false, &_init_emitter_stationFound_1807, &_call_emitter_stationFound_1807);
   methods += new qt_gsi::GenericMethod ("stereoMode", "@brief Virtual method QRadioTuner::StereoMode QRadioTunerControl::stereoMode()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_stereoMode_c0_0, &_call_cbs_stereoMode_c0_0);
   methods += new qt_gsi::GenericMethod ("stereoMode", "@hide", true, &_init_cbs_stereoMode_c0_0, &_call_cbs_stereoMode_c0_0, &_set_callback_cbs_stereoMode_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_stereoStatusChanged", "@brief Emitter for signal void QRadioTunerControl::stereoStatusChanged(bool stereo)\nCall this method to emit this signal.", false, &_init_emitter_stereoStatusChanged_864, &_call_emitter_stereoStatusChanged_864);
   methods += new qt_gsi::GenericMethod ("stop", "@brief Virtual method void QRadioTunerControl::stop()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_stop_0_0, &_call_cbs_stop_0_0);
   methods += new qt_gsi::GenericMethod ("stop", "@hide", false, &_init_cbs_stop_0_0, &_call_cbs_stop_0_0, &_set_callback_cbs_stop_0_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QRadioTunerControl::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QRadioTunerControl::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("volume", "@brief Virtual method int QRadioTunerControl::volume()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_volume_c0_0, &_call_cbs_volume_c0_0);
   methods += new qt_gsi::GenericMethod ("volume", "@hide", true, &_init_cbs_volume_c0_0, &_call_cbs_volume_c0_0, &_set_callback_cbs_volume_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_volumeChanged", "@brief Emitter for signal void QRadioTunerControl::volumeChanged(int volume)\nCall this method to emit this signal.", false, &_init_emitter_volumeChanged_767, &_call_emitter_volumeChanged_767);
   return methods;
 }
 

@@ -109,6 +109,10 @@ class QAudioRecorder;
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAudioRecorder> &qtdecl_QAudioRecorder (); }
 
+class QAudioRoleControl;
+
+namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAudioRoleControl> &qtdecl_QAudioRoleControl (); }
+
 struct QAudioSystemFactoryInterface;
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QAudioSystemFactoryInterface> &qtdecl_QAudioSystemFactoryInterface (); }
@@ -204,6 +208,10 @@ namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraViewfinderSettingsCont
 class QCameraZoomControl;
 
 namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCameraZoomControl> &qtdecl_QCameraZoomControl (); }
+
+class QCustomAudioRoleControl;
+
+namespace gsi { GSI_QTMULTIMEDIA_PUBLIC gsi::Class<QCustomAudioRoleControl> &qtdecl_QCustomAudioRoleControl (); }
 
 class QGraphicsVideoItem;
 

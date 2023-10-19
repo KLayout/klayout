@@ -713,7 +713,7 @@ QGraphicsLinearLayout_Adaptor::~QGraphicsLinearLayout_Adaptor() { }
 
 static void _init_ctor_QGraphicsLinearLayout_Adaptor_2557 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QGraphicsLayoutItem * > (argspec_0);
   decl->set_return_new<QGraphicsLinearLayout_Adaptor> ();
 }
@@ -722,7 +722,7 @@ static void _call_ctor_QGraphicsLinearLayout_Adaptor_2557 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args ? gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap) : gsi::arg_maker<QGraphicsLayoutItem * >() (0, heap);
+  QGraphicsLayoutItem *arg1 = args ? gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap) : gsi::arg_maker<QGraphicsLayoutItem * >() (nullptr, heap);
   ret.write<QGraphicsLinearLayout_Adaptor *> (new QGraphicsLinearLayout_Adaptor (arg1));
 }
 
@@ -733,7 +733,7 @@ static void _init_ctor_QGraphicsLinearLayout_Adaptor_4362 (qt_gsi::GenericStatic
 {
   static gsi::ArgSpecBase argspec_0 ("orientation");
   decl->add_arg<const qt_gsi::Converter<Qt::Orientation>::target_type & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
   decl->add_arg<QGraphicsLayoutItem * > (argspec_1);
   decl->set_return_new<QGraphicsLinearLayout_Adaptor> ();
 }
@@ -743,7 +743,7 @@ static void _call_ctor_QGraphicsLinearLayout_Adaptor_4362 (const qt_gsi::Generic
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap);
-  QGraphicsLayoutItem *arg2 = args ? gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap) : gsi::arg_maker<QGraphicsLayoutItem * >() (0, heap);
+  QGraphicsLayoutItem *arg2 = args ? gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap) : gsi::arg_maker<QGraphicsLayoutItem * >() (nullptr, heap);
   ret.write<QGraphicsLinearLayout_Adaptor *> (new QGraphicsLinearLayout_Adaptor (qt_gsi::QtToCppAdaptor<Qt::Orientation>(arg1).cref(), arg2));
 }
 

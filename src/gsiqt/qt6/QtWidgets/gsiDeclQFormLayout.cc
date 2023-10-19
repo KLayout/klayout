@@ -98,7 +98,9 @@ static void _call_f_addRow_2522 (const qt_gsi::GenericMethod * /*decl*/, void *c
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg2);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->addRow (arg1, arg2);
 }
@@ -121,7 +123,9 @@ static void _call_f_addRow_2548 (const qt_gsi::GenericMethod * /*decl*/, void *c
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   QLayout *arg2 = gsi::arg_reader<QLayout * >() (args, heap);
+  qt_gsi::qt_keep (arg2);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->addRow (arg1, arg2);
 }
@@ -145,6 +149,7 @@ static void _call_f_addRow_3232 (const qt_gsi::GenericMethod * /*decl*/, void *c
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg2);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->addRow (arg1, arg2);
 }
@@ -168,6 +173,7 @@ static void _call_f_addRow_3258 (const qt_gsi::GenericMethod * /*decl*/, void *c
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   QLayout *arg2 = gsi::arg_reader<QLayout * >() (args, heap);
+  qt_gsi::qt_keep (arg2);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->addRow (arg1, arg2);
 }
@@ -188,6 +194,7 @@ static void _call_f_addRow_1315 (const qt_gsi::GenericMethod * /*decl*/, void *c
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->addRow (arg1);
 }
@@ -421,6 +428,7 @@ static void _call_f_insertRow_3181 (const qt_gsi::GenericMethod * /*decl*/, void
   int arg1 = gsi::arg_reader<int >() (args, heap);
   QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
   QWidget *arg3 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg3);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->insertRow (arg1, arg2, arg3);
 }
@@ -447,6 +455,7 @@ static void _call_f_insertRow_3207 (const qt_gsi::GenericMethod * /*decl*/, void
   int arg1 = gsi::arg_reader<int >() (args, heap);
   QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
   QLayout *arg3 = gsi::arg_reader<QLayout * >() (args, heap);
+  qt_gsi::qt_keep (arg3);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->insertRow (arg1, arg2, arg3);
 }
@@ -473,6 +482,7 @@ static void _call_f_insertRow_3891 (const qt_gsi::GenericMethod * /*decl*/, void
   int arg1 = gsi::arg_reader<int >() (args, heap);
   const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   QWidget *arg3 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg3);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->insertRow (arg1, arg2, arg3);
 }
@@ -499,6 +509,7 @@ static void _call_f_insertRow_3917 (const qt_gsi::GenericMethod * /*decl*/, void
   int arg1 = gsi::arg_reader<int >() (args, heap);
   const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   QLayout *arg3 = gsi::arg_reader<QLayout * >() (args, heap);
+  qt_gsi::qt_keep (arg3);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->insertRow (arg1, arg2, arg3);
 }
@@ -998,6 +1009,7 @@ static void _call_f_setWidget_4342 (const qt_gsi::GenericMethod * /*decl*/, void
   int arg1 = gsi::arg_reader<int >() (args, heap);
   const qt_gsi::Converter<QFormLayout::ItemRole>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QFormLayout::ItemRole>::target_type & >() (args, heap);
   QWidget *arg3 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg3);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QFormLayout *)cls)->setWidget (arg1, qt_gsi::QtToCppAdaptor<QFormLayout::ItemRole>(arg2).cref(), arg3);
 }

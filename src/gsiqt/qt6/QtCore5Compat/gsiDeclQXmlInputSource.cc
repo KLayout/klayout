@@ -123,11 +123,11 @@ namespace gsi
 
 static gsi::Methods methods_QXmlInputSource () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod (":data", "@brief Method QString QXmlInputSource::data()\n", true, &_init_f_data_c0, &_call_f_data_c0);
+  methods += new qt_gsi::GenericMethod ("data", "@brief Method QString QXmlInputSource::data()\n", true, &_init_f_data_c0, &_call_f_data_c0);
   methods += new qt_gsi::GenericMethod ("fetchData", "@brief Method void QXmlInputSource::fetchData()\n", false, &_init_f_fetchData_0, &_call_f_fetchData_0);
   methods += new qt_gsi::GenericMethod ("next", "@brief Method QChar QXmlInputSource::next()\n", false, &_init_f_next_0, &_call_f_next_0);
   methods += new qt_gsi::GenericMethod ("reset", "@brief Method void QXmlInputSource::reset()\n", false, &_init_f_reset_0, &_call_f_reset_0);
-  methods += new qt_gsi::GenericMethod ("setData|data=", "@brief Method void QXmlInputSource::setData(const QString &dat)\n", false, &_init_f_setData_2025, &_call_f_setData_2025);
+  methods += new qt_gsi::GenericMethod ("setData", "@brief Method void QXmlInputSource::setData(const QString &dat)\n", false, &_init_f_setData_2025, &_call_f_setData_2025);
   return methods;
 }
 

@@ -25,6 +25,7 @@
 #include "tlString.h"
 
 #include <string>
+#include <string.h>
 
 #ifdef _WIN32
 #  include <windows.h>
@@ -55,6 +56,28 @@ std::string get_env (const std::string &name, const std::string &def_value)
   } else {
     return def_value;
   }
+#endif
+}
+
+void set_env (const std::string &name, const std::string &value)
+{
+#ifdef _WIN32
+  std::wstring wstr = tl::to_wstring (name + "=" + value);
+  _wputenv (wstr.c_str ());
+#else
+  char *str = strdup ((name + "=" + value).c_str ());
+  putenv (str);
+#endif
+}
+
+void unset_env (const std::string &name)
+{
+#ifdef _WIN32
+  std::wstring wstr = tl::to_wstring (name + "=");
+  _wputenv (wstr.c_str ());
+#else
+  char *str = strdup (name.c_str ());  //  TODO: needed?
+  putenv (str);
 #endif
 }
 

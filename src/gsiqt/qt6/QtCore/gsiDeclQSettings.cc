@@ -626,13 +626,13 @@ static gsi::Methods methods_QSettings () {
   methods += new qt_gsi::GenericMethod ("fileName", "@brief Method QString QSettings::fileName()\n", true, &_init_f_fileName_c0, &_call_f_fileName_c0);
   methods += new qt_gsi::GenericMethod ("format", "@brief Method QSettings::Format QSettings::format()\n", true, &_init_f_format_c0, &_call_f_format_c0);
   methods += new qt_gsi::GenericMethod ("group", "@brief Method QString QSettings::group()\n", true, &_init_f_group_c0, &_call_f_group_c0);
-  methods += new qt_gsi::GenericMethod ("isAtomicSyncRequired?", "@brief Method bool QSettings::isAtomicSyncRequired()\n", true, &_init_f_isAtomicSyncRequired_c0, &_call_f_isAtomicSyncRequired_c0);
+  methods += new qt_gsi::GenericMethod ("isAtomicSyncRequired?|:atomicSyncRequired", "@brief Method bool QSettings::isAtomicSyncRequired()\n", true, &_init_f_isAtomicSyncRequired_c0, &_call_f_isAtomicSyncRequired_c0);
   methods += new qt_gsi::GenericMethod ("isWritable?", "@brief Method bool QSettings::isWritable()\n", true, &_init_f_isWritable_c0, &_call_f_isWritable_c0);
   methods += new qt_gsi::GenericMethod ("organizationName", "@brief Method QString QSettings::organizationName()\n", true, &_init_f_organizationName_c0, &_call_f_organizationName_c0);
   methods += new qt_gsi::GenericMethod ("remove", "@brief Method void QSettings::remove(const QString &key)\n", false, &_init_f_remove_2025, &_call_f_remove_2025);
   methods += new qt_gsi::GenericMethod ("scope", "@brief Method QSettings::Scope QSettings::scope()\n", true, &_init_f_scope_c0, &_call_f_scope_c0);
   methods += new qt_gsi::GenericMethod ("setArrayIndex", "@brief Method void QSettings::setArrayIndex(int i)\n", false, &_init_f_setArrayIndex_767, &_call_f_setArrayIndex_767);
-  methods += new qt_gsi::GenericMethod ("setAtomicSyncRequired", "@brief Method void QSettings::setAtomicSyncRequired(bool enable)\n", false, &_init_f_setAtomicSyncRequired_864, &_call_f_setAtomicSyncRequired_864);
+  methods += new qt_gsi::GenericMethod ("setAtomicSyncRequired|atomicSyncRequired=", "@brief Method void QSettings::setAtomicSyncRequired(bool enable)\n", false, &_init_f_setAtomicSyncRequired_864, &_call_f_setAtomicSyncRequired_864);
   methods += new qt_gsi::GenericMethod ("setFallbacksEnabled|fallbacksEnabled=", "@brief Method void QSettings::setFallbacksEnabled(bool b)\n", false, &_init_f_setFallbacksEnabled_864, &_call_f_setFallbacksEnabled_864);
   methods += new qt_gsi::GenericMethod ("setValue", "@brief Method void QSettings::setValue(const QString &key, const QVariant &value)\n", false, &_init_f_setValue_4036, &_call_f_setValue_4036);
   methods += new qt_gsi::GenericMethod ("status", "@brief Method QSettings::Status QSettings::status()\n", true, &_init_f_status_c0, &_call_f_status_c0);

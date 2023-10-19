@@ -205,7 +205,7 @@ static void _init_f_toUnicode_c5465 (qt_gsi::GenericMethod *decl)
   decl->add_arg<const char * > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("length");
   decl->add_arg<int > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("state", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("state", true, "nullptr");
   decl->add_arg<QTextCodec::ConverterState * > (argspec_2);
   decl->set_return<QString > ();
 }
@@ -216,7 +216,7 @@ static void _call_f_toUnicode_c5465 (const qt_gsi::GenericMethod * /*decl*/, voi
   tl::Heap heap;
   const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   int arg2 = gsi::arg_reader<int >() (args, heap);
-  QTextCodec::ConverterState *arg3 = args ? gsi::arg_reader<QTextCodec::ConverterState * >() (args, heap) : gsi::arg_maker<QTextCodec::ConverterState * >() (0, heap);
+  QTextCodec::ConverterState *arg3 = args ? gsi::arg_reader<QTextCodec::ConverterState * >() (args, heap) : gsi::arg_maker<QTextCodec::ConverterState * >() (nullptr, heap);
   ret.write<QString > ((QString)((QTextCodec *)cls)->toUnicode (arg1, arg2, arg3));
 }
 

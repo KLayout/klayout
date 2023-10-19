@@ -116,26 +116,6 @@ static void _call_f_autoRepeat_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// void QAction::checkableChanged(bool checkable)
-
-
-static void _init_f_checkableChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("checkable");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_checkableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAction *)cls)->checkableChanged (arg1);
-}
-
-
 // QVariant QAction::data()
 
 
@@ -148,26 +128,6 @@ static void _call_f_data_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QVariant > ((QVariant)((QAction *)cls)->data ());
-}
-
-
-// void QAction::enabledChanged(bool enabled)
-
-
-static void _init_f_enabledChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("enabled");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_enabledChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAction *)cls)->enabledChanged (arg1);
 }
 
 
@@ -1004,22 +964,6 @@ static void _call_f_trigger_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// void QAction::visibleChanged()
-
-
-static void _init_f_visibleChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_visibleChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAction *)cls)->visibleChanged ();
-}
-
-
 // QString QAction::whatsThis()
 
 
@@ -1070,9 +1014,7 @@ static gsi::Methods methods_QAction () {
   methods += new qt_gsi::GenericMethod ("activate", "@brief Method void QAction::activate(QAction::ActionEvent event)\n", false, &_init_f_activate_2359, &_call_f_activate_2359);
   methods += new qt_gsi::GenericMethod ("associatedObjects", "@brief Method QList<QObject *> QAction::associatedObjects()\n", true, &_init_f_associatedObjects_c0, &_call_f_associatedObjects_c0);
   methods += new qt_gsi::GenericMethod (":autoRepeat", "@brief Method bool QAction::autoRepeat()\n", true, &_init_f_autoRepeat_c0, &_call_f_autoRepeat_c0);
-  methods += new qt_gsi::GenericMethod ("checkableChanged", "@brief Method void QAction::checkableChanged(bool checkable)\n", false, &_init_f_checkableChanged_864, &_call_f_checkableChanged_864);
   methods += new qt_gsi::GenericMethod (":data", "@brief Method QVariant QAction::data()\n", true, &_init_f_data_c0, &_call_f_data_c0);
-  methods += new qt_gsi::GenericMethod ("enabledChanged", "@brief Method void QAction::enabledChanged(bool enabled)\n", false, &_init_f_enabledChanged_864, &_call_f_enabledChanged_864);
   methods += new qt_gsi::GenericMethod (":font", "@brief Method QFont QAction::font()\n", true, &_init_f_font_c0, &_call_f_font_c0);
   methods += new qt_gsi::GenericMethod ("hover", "@brief Method void QAction::hover()\n", false, &_init_f_hover_0, &_call_f_hover_0);
   methods += new qt_gsi::GenericMethod (":icon", "@brief Method QIcon QAction::icon()\n", true, &_init_f_icon_c0, &_call_f_icon_c0);
@@ -1082,7 +1024,7 @@ static gsi::Methods methods_QAction () {
   methods += new qt_gsi::GenericMethod ("isEnabled?|:enabled", "@brief Method bool QAction::isEnabled()\n", true, &_init_f_isEnabled_c0, &_call_f_isEnabled_c0);
   methods += new qt_gsi::GenericMethod ("isIconVisibleInMenu?|:iconVisibleInMenu", "@brief Method bool QAction::isIconVisibleInMenu()\n", true, &_init_f_isIconVisibleInMenu_c0, &_call_f_isIconVisibleInMenu_c0);
   methods += new qt_gsi::GenericMethod ("isSeparator?|:separator", "@brief Method bool QAction::isSeparator()\n", true, &_init_f_isSeparator_c0, &_call_f_isSeparator_c0);
-  methods += new qt_gsi::GenericMethod ("isShortcutVisibleInContextMenu?", "@brief Method bool QAction::isShortcutVisibleInContextMenu()\n", true, &_init_f_isShortcutVisibleInContextMenu_c0, &_call_f_isShortcutVisibleInContextMenu_c0);
+  methods += new qt_gsi::GenericMethod ("isShortcutVisibleInContextMenu?|:shortcutVisibleInContextMenu", "@brief Method bool QAction::isShortcutVisibleInContextMenu()\n", true, &_init_f_isShortcutVisibleInContextMenu_c0, &_call_f_isShortcutVisibleInContextMenu_c0);
   methods += new qt_gsi::GenericMethod ("isVisible?|:visible", "@brief Method bool QAction::isVisible()\n", true, &_init_f_isVisible_c0, &_call_f_isVisible_c0);
   methods += new qt_gsi::GenericMethod (":menuRole", "@brief Method QAction::MenuRole QAction::menuRole()\n", true, &_init_f_menuRole_c0, &_call_f_menuRole_c0);
   methods += new qt_gsi::GenericMethod (":priority", "@brief Method QAction::Priority QAction::priority()\n", true, &_init_f_priority_c0, &_call_f_priority_c0);
@@ -1103,7 +1045,7 @@ static gsi::Methods methods_QAction () {
   methods += new qt_gsi::GenericMethod ("setSeparator|separator=", "@brief Method void QAction::setSeparator(bool b)\n", false, &_init_f_setSeparator_864, &_call_f_setSeparator_864);
   methods += new qt_gsi::GenericMethod ("setShortcut|shortcut=", "@brief Method void QAction::setShortcut(const QKeySequence &shortcut)\n", false, &_init_f_setShortcut_2516, &_call_f_setShortcut_2516);
   methods += new qt_gsi::GenericMethod ("setShortcutContext|shortcutContext=", "@brief Method void QAction::setShortcutContext(Qt::ShortcutContext context)\n", false, &_init_f_setShortcutContext_2350, &_call_f_setShortcutContext_2350);
-  methods += new qt_gsi::GenericMethod ("setShortcutVisibleInContextMenu", "@brief Method void QAction::setShortcutVisibleInContextMenu(bool show)\n", false, &_init_f_setShortcutVisibleInContextMenu_864, &_call_f_setShortcutVisibleInContextMenu_864);
+  methods += new qt_gsi::GenericMethod ("setShortcutVisibleInContextMenu|shortcutVisibleInContextMenu=", "@brief Method void QAction::setShortcutVisibleInContextMenu(bool show)\n", false, &_init_f_setShortcutVisibleInContextMenu_864, &_call_f_setShortcutVisibleInContextMenu_864);
   methods += new qt_gsi::GenericMethod ("setShortcuts|shortcuts=", "@brief Method void QAction::setShortcuts(const QList<QKeySequence> &shortcuts)\n", false, &_init_f_setShortcuts_3131, &_call_f_setShortcuts_3131);
   methods += new qt_gsi::GenericMethod ("setShortcuts|shortcuts=", "@brief Method void QAction::setShortcuts(QKeySequence::StandardKey)\n", false, &_init_f_setShortcuts_2869, &_call_f_setShortcuts_2869);
   methods += new qt_gsi::GenericMethod ("setStatusTip|statusTip=", "@brief Method void QAction::setStatusTip(const QString &statusTip)\n", false, &_init_f_setStatusTip_2025, &_call_f_setStatusTip_2025);
@@ -1120,14 +1062,16 @@ static gsi::Methods methods_QAction () {
   methods += new qt_gsi::GenericMethod ("toggle", "@brief Method void QAction::toggle()\n", false, &_init_f_toggle_0, &_call_f_toggle_0);
   methods += new qt_gsi::GenericMethod (":toolTip", "@brief Method QString QAction::toolTip()\n", true, &_init_f_toolTip_c0, &_call_f_toolTip_c0);
   methods += new qt_gsi::GenericMethod ("trigger", "@brief Method void QAction::trigger()\n", false, &_init_f_trigger_0, &_call_f_trigger_0);
-  methods += new qt_gsi::GenericMethod ("visibleChanged", "@brief Method void QAction::visibleChanged()\n", false, &_init_f_visibleChanged_0, &_call_f_visibleChanged_0);
   methods += new qt_gsi::GenericMethod (":whatsThis", "@brief Method QString QAction::whatsThis()\n", true, &_init_f_whatsThis_c0, &_call_f_whatsThis_c0);
   methods += gsi::qt_signal ("changed()", "changed", "@brief Signal declaration for QAction::changed()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("checkableChanged(bool)", "checkableChanged", gsi::arg("checkable"), "@brief Signal declaration for QAction::checkableChanged(bool checkable)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAction::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("enabledChanged(bool)", "enabledChanged", gsi::arg("enabled"), "@brief Signal declaration for QAction::enabledChanged(bool enabled)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("hovered()", "hovered", "@brief Signal declaration for QAction::hovered()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QAction::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("toggled(bool)", "toggled", gsi::arg("arg1"), "@brief Signal declaration for QAction::toggled(bool)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("triggered(bool)", "triggered", gsi::arg("checked"), "@brief Signal declaration for QAction::triggered(bool checked)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("visibleChanged()", "visibleChanged", "@brief Signal declaration for QAction::visibleChanged()\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QAction::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;
 }
@@ -1211,10 +1155,22 @@ public:
     emit QAction::changed();
   }
 
+  //  [emitter impl] void QAction::checkableChanged(bool checkable)
+  void emitter_QAction_checkableChanged_864(bool checkable)
+  {
+    emit QAction::checkableChanged(checkable);
+  }
+
   //  [emitter impl] void QAction::destroyed(QObject *)
   void emitter_QAction_destroyed_1302(QObject *arg1)
   {
     emit QAction::destroyed(arg1);
+  }
+
+  //  [emitter impl] void QAction::enabledChanged(bool enabled)
+  void emitter_QAction_enabledChanged_864(bool enabled)
+  {
+    emit QAction::enabledChanged(enabled);
   }
 
   //  [adaptor impl] bool QAction::eventFilter(QObject *watched, QEvent *event)
@@ -1255,6 +1211,12 @@ public:
   void emitter_QAction_triggered_864(bool checked)
   {
     emit QAction::triggered(checked);
+  }
+
+  //  [emitter impl] void QAction::visibleChanged()
+  void emitter_QAction_visibleChanged_0()
+  {
+    emit QAction::visibleChanged();
   }
 
   //  [adaptor impl] void QAction::childEvent(QChildEvent *event)
@@ -1419,6 +1381,24 @@ static void _call_emitter_changed_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
+// emitter void QAction::checkableChanged(bool checkable)
+
+static void _init_emitter_checkableChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("checkable");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_checkableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QAction_Adaptor *)cls)->emitter_QAction_checkableChanged_864 (arg1);
+}
+
+
 // void QAction::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
@@ -1506,6 +1486,24 @@ static void _call_cbs_disconnectNotify_2394_0 (const qt_gsi::GenericMethod * /*d
 static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Callback &cb)
 {
   ((QAction_Adaptor *)cls)->cb_disconnectNotify_2394_0 = cb;
+}
+
+
+// emitter void QAction::enabledChanged(bool enabled)
+
+static void _init_emitter_enabledChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("enabled");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_enabledChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QAction_Adaptor *)cls)->emitter_QAction_enabledChanged_864 (arg1);
 }
 
 
@@ -1714,6 +1712,20 @@ static void _call_emitter_triggered_864 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
+// emitter void QAction::visibleChanged()
+
+static void _init_emitter_visibleChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_visibleChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QAction_Adaptor *)cls)->emitter_QAction_visibleChanged_0 ();
+}
+
+
 namespace gsi
 {
 
@@ -1725,6 +1737,7 @@ static gsi::Methods methods_QAction_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAction::QAction(const QString &text, QObject *parent)\nThis method creates an object of class QAction.", &_init_ctor_QAction_Adaptor_3219, &_call_ctor_QAction_Adaptor_3219);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAction::QAction(const QIcon &icon, const QString &text, QObject *parent)\nThis method creates an object of class QAction.", &_init_ctor_QAction_Adaptor_4898, &_call_ctor_QAction_Adaptor_4898);
   methods += new qt_gsi::GenericMethod ("emit_changed", "@brief Emitter for signal void QAction::changed()\nCall this method to emit this signal.", false, &_init_emitter_changed_0, &_call_emitter_changed_0);
+  methods += new qt_gsi::GenericMethod ("emit_checkableChanged", "@brief Emitter for signal void QAction::checkableChanged(bool checkable)\nCall this method to emit this signal.", false, &_init_emitter_checkableChanged_864, &_call_emitter_checkableChanged_864);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QAction::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAction::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
@@ -1732,6 +1745,7 @@ static gsi::Methods methods_QAction_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QAction::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QAction::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("emit_enabledChanged", "@brief Emitter for signal void QAction::enabledChanged(bool enabled)\nCall this method to emit this signal.", false, &_init_emitter_enabledChanged_864, &_call_emitter_enabledChanged_864);
   methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QAction::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QAction::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
@@ -1746,6 +1760,7 @@ static gsi::Methods methods_QAction_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("emit_toggled", "@brief Emitter for signal void QAction::toggled(bool)\nCall this method to emit this signal.", false, &_init_emitter_toggled_864, &_call_emitter_toggled_864);
   methods += new qt_gsi::GenericMethod ("emit_triggered", "@brief Emitter for signal void QAction::triggered(bool checked)\nCall this method to emit this signal.", false, &_init_emitter_triggered_864, &_call_emitter_triggered_864);
+  methods += new qt_gsi::GenericMethod ("emit_visibleChanged", "@brief Emitter for signal void QAction::visibleChanged()\nCall this method to emit this signal.", false, &_init_emitter_visibleChanged_0, &_call_emitter_visibleChanged_0);
   return methods;
 }
 

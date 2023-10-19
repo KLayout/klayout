@@ -308,6 +308,21 @@ static void _call_f_isDetached_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
+// bool QIcon::isMask()
+
+
+static void _init_f_isMask_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isMask_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QIcon *)cls)->isMask ());
+}
+
+
 // bool QIcon::isNull()
 
 
@@ -536,6 +551,26 @@ static void _call_f_pixmap_c5770 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
+// void QIcon::setIsMask(bool isMask)
+
+
+static void _init_f_setIsMask_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("isMask");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setIsMask_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QIcon *)cls)->setIsMask (arg1);
+}
+
+
 // void QIcon::swap(QIcon &other)
 
 
@@ -556,6 +591,55 @@ static void _call_f_swap_1092 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+// static QStringList QIcon::fallbackSearchPaths()
+
+
+static void _init_f_fallbackSearchPaths_0 (qt_gsi::GenericStaticMethod *decl)
+{
+  decl->set_return<QStringList > ();
+}
+
+static void _call_f_fallbackSearchPaths_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QStringList > ((QStringList)QIcon::fallbackSearchPaths ());
+}
+
+
+// static QString QIcon::fallbackThemeName()
+
+
+static void _init_f_fallbackThemeName_0 (qt_gsi::GenericStaticMethod *decl)
+{
+  decl->set_return<QString > ();
+}
+
+static void _call_f_fallbackThemeName_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QString > ((QString)QIcon::fallbackThemeName ());
+}
+
+
+// static QIcon QIcon::fromTheme(const QString &name)
+
+
+static void _init_f_fromTheme_2025 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("name");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<QIcon > ();
+}
+
+static void _call_f_fromTheme_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ret.write<QIcon > ((QIcon)QIcon::fromTheme (arg1));
+}
+
+
 // static QIcon QIcon::fromTheme(const QString &name, const QIcon &fallback)
 
 
@@ -563,7 +647,7 @@ static void _init_f_fromTheme_3704 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("name");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("fallback", true, "QIcon()");
+  static gsi::ArgSpecBase argspec_1 ("fallback");
   decl->add_arg<const QIcon & > (argspec_1);
   decl->set_return<QIcon > ();
 }
@@ -573,7 +657,7 @@ static void _call_f_fromTheme_3704 (const qt_gsi::GenericStaticMethod * /*decl*/
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const QIcon &arg2 = args ? gsi::arg_reader<const QIcon & >() (args, heap) : gsi::arg_maker<const QIcon & >() (QIcon(), heap);
+  const QIcon &arg2 = gsi::arg_reader<const QIcon & >() (args, heap);
   ret.write<QIcon > ((QIcon)QIcon::fromTheme (arg1, arg2));
 }
 
@@ -594,6 +678,46 @@ static void _call_f_hasThemeIcon_2025 (const qt_gsi::GenericStaticMethod * /*dec
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<bool > ((bool)QIcon::hasThemeIcon (arg1));
+}
+
+
+// static void QIcon::setFallbackSearchPaths(const QStringList &paths)
+
+
+static void _init_f_setFallbackSearchPaths_2437 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("paths");
+  decl->add_arg<const QStringList & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setFallbackSearchPaths_2437 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QStringList &arg1 = gsi::arg_reader<const QStringList & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  QIcon::setFallbackSearchPaths (arg1);
+}
+
+
+// static void QIcon::setFallbackThemeName(const QString &name)
+
+
+static void _init_f_setFallbackThemeName_2025 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("name");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setFallbackThemeName_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  QIcon::setFallbackThemeName (arg1);
 }
 
 
@@ -686,6 +810,7 @@ static gsi::Methods methods_QIcon () {
   methods += new qt_gsi::GenericMethod ("cacheKey", "@brief Method qint64 QIcon::cacheKey()\n", true, &_init_f_cacheKey_c0, &_call_f_cacheKey_c0);
   methods += new qt_gsi::GenericMethod ("detach", "@brief Method void QIcon::detach()\n", false, &_init_f_detach_0, &_call_f_detach_0);
   methods += new qt_gsi::GenericMethod ("isDetached?", "@brief Method bool QIcon::isDetached()\n", true, &_init_f_isDetached_c0, &_call_f_isDetached_c0);
+  methods += new qt_gsi::GenericMethod ("isMask?", "@brief Method bool QIcon::isMask()\n", true, &_init_f_isMask_c0, &_call_f_isMask_c0);
   methods += new qt_gsi::GenericMethod ("isNull?", "@brief Method bool QIcon::isNull()\n", true, &_init_f_isNull_c0, &_call_f_isNull_c0);
   methods += new qt_gsi::GenericMethod ("name", "@brief Method QString QIcon::name()\n", true, &_init_f_name_c0, &_call_f_name_c0);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QIcon &QIcon::operator=(const QIcon &other)\n", false, &_init_f_operator_eq__1787, &_call_f_operator_eq__1787);
@@ -695,9 +820,15 @@ static gsi::Methods methods_QIcon () {
   methods += new qt_gsi::GenericMethod ("pixmap", "@brief Method QPixmap QIcon::pixmap(int w, int h, QIcon::Mode mode, QIcon::State state)\n", true, &_init_f_pixmap_c4164, &_call_f_pixmap_c4164);
   methods += new qt_gsi::GenericMethod ("pixmap_ext", "@brief Method QPixmap QIcon::pixmap(int extent, QIcon::Mode mode, QIcon::State state)\n", true, &_init_f_pixmap_c3505, &_call_f_pixmap_c3505);
   methods += new qt_gsi::GenericMethod ("pixmap", "@brief Method QPixmap QIcon::pixmap(QWindow *window, const QSize &size, QIcon::Mode mode, QIcon::State state)\n", true, &_init_f_pixmap_c5770, &_call_f_pixmap_c5770);
+  methods += new qt_gsi::GenericMethod ("setIsMask", "@brief Method void QIcon::setIsMask(bool isMask)\n", false, &_init_f_setIsMask_864, &_call_f_setIsMask_864);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QIcon::swap(QIcon &other)\n", false, &_init_f_swap_1092, &_call_f_swap_1092);
+  methods += new qt_gsi::GenericStaticMethod (":fallbackSearchPaths", "@brief Static method QStringList QIcon::fallbackSearchPaths()\nThis method is static and can be called without an instance.", &_init_f_fallbackSearchPaths_0, &_call_f_fallbackSearchPaths_0);
+  methods += new qt_gsi::GenericStaticMethod (":fallbackThemeName", "@brief Static method QString QIcon::fallbackThemeName()\nThis method is static and can be called without an instance.", &_init_f_fallbackThemeName_0, &_call_f_fallbackThemeName_0);
+  methods += new qt_gsi::GenericStaticMethod ("fromTheme", "@brief Static method QIcon QIcon::fromTheme(const QString &name)\nThis method is static and can be called without an instance.", &_init_f_fromTheme_2025, &_call_f_fromTheme_2025);
   methods += new qt_gsi::GenericStaticMethod ("fromTheme", "@brief Static method QIcon QIcon::fromTheme(const QString &name, const QIcon &fallback)\nThis method is static and can be called without an instance.", &_init_f_fromTheme_3704, &_call_f_fromTheme_3704);
   methods += new qt_gsi::GenericStaticMethod ("hasThemeIcon", "@brief Static method bool QIcon::hasThemeIcon(const QString &name)\nThis method is static and can be called without an instance.", &_init_f_hasThemeIcon_2025, &_call_f_hasThemeIcon_2025);
+  methods += new qt_gsi::GenericStaticMethod ("setFallbackSearchPaths|fallbackSearchPaths=", "@brief Static method void QIcon::setFallbackSearchPaths(const QStringList &paths)\nThis method is static and can be called without an instance.", &_init_f_setFallbackSearchPaths_2437, &_call_f_setFallbackSearchPaths_2437);
+  methods += new qt_gsi::GenericStaticMethod ("setFallbackThemeName|fallbackThemeName=", "@brief Static method void QIcon::setFallbackThemeName(const QString &name)\nThis method is static and can be called without an instance.", &_init_f_setFallbackThemeName_2025, &_call_f_setFallbackThemeName_2025);
   methods += new qt_gsi::GenericStaticMethod ("setThemeName|themeName=", "@brief Static method void QIcon::setThemeName(const QString &path)\nThis method is static and can be called without an instance.", &_init_f_setThemeName_2025, &_call_f_setThemeName_2025);
   methods += new qt_gsi::GenericStaticMethod ("setThemeSearchPaths|themeSearchPaths=", "@brief Static method void QIcon::setThemeSearchPaths(const QStringList &searchpath)\nThis method is static and can be called without an instance.", &_init_f_setThemeSearchPaths_2437, &_call_f_setThemeSearchPaths_2437);
   methods += new qt_gsi::GenericStaticMethod (":themeName", "@brief Static method QString QIcon::themeName()\nThis method is static and can be called without an instance.", &_init_f_themeName_0, &_call_f_themeName_0);

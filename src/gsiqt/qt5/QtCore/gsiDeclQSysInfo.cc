@@ -50,6 +50,21 @@ static void _call_ctor_QSysInfo_0 (const qt_gsi::GenericStaticMethod * /*decl*/,
 }
 
 
+// static QByteArray QSysInfo::bootUniqueId()
+
+
+static void _init_f_bootUniqueId_0 (qt_gsi::GenericStaticMethod *decl)
+{
+  decl->set_return<QByteArray > ();
+}
+
+static void _call_f_bootUniqueId_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QByteArray > ((QByteArray)QSysInfo::bootUniqueId ());
+}
+
+
 // static QString QSysInfo::buildAbi()
 
 
@@ -140,6 +155,36 @@ static void _call_f_macVersion_0 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 }
 
 
+// static QString QSysInfo::machineHostName()
+
+
+static void _init_f_machineHostName_0 (qt_gsi::GenericStaticMethod *decl)
+{
+  decl->set_return<QString > ();
+}
+
+static void _call_f_machineHostName_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QString > ((QString)QSysInfo::machineHostName ());
+}
+
+
+// static QByteArray QSysInfo::machineUniqueId()
+
+
+static void _init_f_machineUniqueId_0 (qt_gsi::GenericStaticMethod *decl)
+{
+  decl->set_return<QByteArray > ();
+}
+
+static void _call_f_machineUniqueId_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QByteArray > ((QByteArray)QSysInfo::machineUniqueId ());
+}
+
+
 // static QString QSysInfo::prettyProductName()
 
 
@@ -207,12 +252,15 @@ namespace gsi
 static gsi::Methods methods_QSysInfo () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSysInfo::QSysInfo()\nThis method creates an object of class QSysInfo.", &_init_ctor_QSysInfo_0, &_call_ctor_QSysInfo_0);
+  methods += new qt_gsi::GenericStaticMethod ("bootUniqueId", "@brief Static method QByteArray QSysInfo::bootUniqueId()\nThis method is static and can be called without an instance.", &_init_f_bootUniqueId_0, &_call_f_bootUniqueId_0);
   methods += new qt_gsi::GenericStaticMethod ("buildAbi", "@brief Static method QString QSysInfo::buildAbi()\nThis method is static and can be called without an instance.", &_init_f_buildAbi_0, &_call_f_buildAbi_0);
   methods += new qt_gsi::GenericStaticMethod ("buildCpuArchitecture", "@brief Static method QString QSysInfo::buildCpuArchitecture()\nThis method is static and can be called without an instance.", &_init_f_buildCpuArchitecture_0, &_call_f_buildCpuArchitecture_0);
   methods += new qt_gsi::GenericStaticMethod ("currentCpuArchitecture", "@brief Static method QString QSysInfo::currentCpuArchitecture()\nThis method is static and can be called without an instance.", &_init_f_currentCpuArchitecture_0, &_call_f_currentCpuArchitecture_0);
   methods += new qt_gsi::GenericStaticMethod ("kernelType", "@brief Static method QString QSysInfo::kernelType()\nThis method is static and can be called without an instance.", &_init_f_kernelType_0, &_call_f_kernelType_0);
   methods += new qt_gsi::GenericStaticMethod ("kernelVersion", "@brief Static method QString QSysInfo::kernelVersion()\nThis method is static and can be called without an instance.", &_init_f_kernelVersion_0, &_call_f_kernelVersion_0);
   methods += new qt_gsi::GenericStaticMethod ("macVersion", "@brief Static method QSysInfo::MacVersion QSysInfo::macVersion()\nThis method is static and can be called without an instance.", &_init_f_macVersion_0, &_call_f_macVersion_0);
+  methods += new qt_gsi::GenericStaticMethod ("machineHostName", "@brief Static method QString QSysInfo::machineHostName()\nThis method is static and can be called without an instance.", &_init_f_machineHostName_0, &_call_f_machineHostName_0);
+  methods += new qt_gsi::GenericStaticMethod ("machineUniqueId", "@brief Static method QByteArray QSysInfo::machineUniqueId()\nThis method is static and can be called without an instance.", &_init_f_machineUniqueId_0, &_call_f_machineUniqueId_0);
   methods += new qt_gsi::GenericStaticMethod ("prettyProductName", "@brief Static method QString QSysInfo::prettyProductName()\nThis method is static and can be called without an instance.", &_init_f_prettyProductName_0, &_call_f_prettyProductName_0);
   methods += new qt_gsi::GenericStaticMethod ("productType", "@brief Static method QString QSysInfo::productType()\nThis method is static and can be called without an instance.", &_init_f_productType_0, &_call_f_productType_0);
   methods += new qt_gsi::GenericStaticMethod ("productVersion", "@brief Static method QString QSysInfo::productVersion()\nThis method is static and can be called without an instance.", &_init_f_productVersion_0, &_call_f_productVersion_0);
@@ -250,6 +298,7 @@ static gsi::Enum<QSysInfo::MacVersion> decl_QSysInfo_MacVersion_Enum ("QtCore", 
     gsi::enum_const ("MV_10_9", QSysInfo::MV_10_9, "@brief Enum constant QSysInfo::MV_10_9") +
     gsi::enum_const ("MV_10_10", QSysInfo::MV_10_10, "@brief Enum constant QSysInfo::MV_10_10") +
     gsi::enum_const ("MV_10_11", QSysInfo::MV_10_11, "@brief Enum constant QSysInfo::MV_10_11") +
+    gsi::enum_const ("MV_10_12", QSysInfo::MV_10_12, "@brief Enum constant QSysInfo::MV_10_12") +
     gsi::enum_const ("MV_CHEETAH", QSysInfo::MV_CHEETAH, "@brief Enum constant QSysInfo::MV_CHEETAH") +
     gsi::enum_const ("MV_PUMA", QSysInfo::MV_PUMA, "@brief Enum constant QSysInfo::MV_PUMA") +
     gsi::enum_const ("MV_JAGUAR", QSysInfo::MV_JAGUAR, "@brief Enum constant QSysInfo::MV_JAGUAR") +
@@ -262,6 +311,7 @@ static gsi::Enum<QSysInfo::MacVersion> decl_QSysInfo_MacVersion_Enum ("QtCore", 
     gsi::enum_const ("MV_MAVERICKS", QSysInfo::MV_MAVERICKS, "@brief Enum constant QSysInfo::MV_MAVERICKS") +
     gsi::enum_const ("MV_YOSEMITE", QSysInfo::MV_YOSEMITE, "@brief Enum constant QSysInfo::MV_YOSEMITE") +
     gsi::enum_const ("MV_ELCAPITAN", QSysInfo::MV_ELCAPITAN, "@brief Enum constant QSysInfo::MV_ELCAPITAN") +
+    gsi::enum_const ("MV_SIERRA", QSysInfo::MV_SIERRA, "@brief Enum constant QSysInfo::MV_SIERRA") +
     gsi::enum_const ("MV_IOS", QSysInfo::MV_IOS, "@brief Enum constant QSysInfo::MV_IOS") +
     gsi::enum_const ("MV_IOS_4_3", QSysInfo::MV_IOS_4_3, "@brief Enum constant QSysInfo::MV_IOS_4_3") +
     gsi::enum_const ("MV_IOS_5_0", QSysInfo::MV_IOS_5_0, "@brief Enum constant QSysInfo::MV_IOS_5_0") +
@@ -275,7 +325,21 @@ static gsi::Enum<QSysInfo::MacVersion> decl_QSysInfo_MacVersion_Enum ("QtCore", 
     gsi::enum_const ("MV_IOS_8_2", QSysInfo::MV_IOS_8_2, "@brief Enum constant QSysInfo::MV_IOS_8_2") +
     gsi::enum_const ("MV_IOS_8_3", QSysInfo::MV_IOS_8_3, "@brief Enum constant QSysInfo::MV_IOS_8_3") +
     gsi::enum_const ("MV_IOS_8_4", QSysInfo::MV_IOS_8_4, "@brief Enum constant QSysInfo::MV_IOS_8_4") +
-    gsi::enum_const ("MV_IOS_9_0", QSysInfo::MV_IOS_9_0, "@brief Enum constant QSysInfo::MV_IOS_9_0"),
+    gsi::enum_const ("MV_IOS_9_0", QSysInfo::MV_IOS_9_0, "@brief Enum constant QSysInfo::MV_IOS_9_0") +
+    gsi::enum_const ("MV_IOS_9_1", QSysInfo::MV_IOS_9_1, "@brief Enum constant QSysInfo::MV_IOS_9_1") +
+    gsi::enum_const ("MV_IOS_9_2", QSysInfo::MV_IOS_9_2, "@brief Enum constant QSysInfo::MV_IOS_9_2") +
+    gsi::enum_const ("MV_IOS_9_3", QSysInfo::MV_IOS_9_3, "@brief Enum constant QSysInfo::MV_IOS_9_3") +
+    gsi::enum_const ("MV_IOS_10_0", QSysInfo::MV_IOS_10_0, "@brief Enum constant QSysInfo::MV_IOS_10_0") +
+    gsi::enum_const ("MV_TVOS", QSysInfo::MV_TVOS, "@brief Enum constant QSysInfo::MV_TVOS") +
+    gsi::enum_const ("MV_TVOS_9_0", QSysInfo::MV_TVOS_9_0, "@brief Enum constant QSysInfo::MV_TVOS_9_0") +
+    gsi::enum_const ("MV_TVOS_9_1", QSysInfo::MV_TVOS_9_1, "@brief Enum constant QSysInfo::MV_TVOS_9_1") +
+    gsi::enum_const ("MV_TVOS_9_2", QSysInfo::MV_TVOS_9_2, "@brief Enum constant QSysInfo::MV_TVOS_9_2") +
+    gsi::enum_const ("MV_TVOS_10_0", QSysInfo::MV_TVOS_10_0, "@brief Enum constant QSysInfo::MV_TVOS_10_0") +
+    gsi::enum_const ("MV_WATCHOS", QSysInfo::MV_WATCHOS, "@brief Enum constant QSysInfo::MV_WATCHOS") +
+    gsi::enum_const ("MV_WATCHOS_2_0", QSysInfo::MV_WATCHOS_2_0, "@brief Enum constant QSysInfo::MV_WATCHOS_2_0") +
+    gsi::enum_const ("MV_WATCHOS_2_1", QSysInfo::MV_WATCHOS_2_1, "@brief Enum constant QSysInfo::MV_WATCHOS_2_1") +
+    gsi::enum_const ("MV_WATCHOS_2_2", QSysInfo::MV_WATCHOS_2_2, "@brief Enum constant QSysInfo::MV_WATCHOS_2_2") +
+    gsi::enum_const ("MV_WATCHOS_3_0", QSysInfo::MV_WATCHOS_3_0, "@brief Enum constant QSysInfo::MV_WATCHOS_3_0"),
   "@qt\n@brief This class represents the QSysInfo::MacVersion enum");
 
 static gsi::QFlagsClass<QSysInfo::MacVersion > decl_QSysInfo_MacVersion_Enums ("QtCore", "QSysInfo_QFlags_MacVersion",

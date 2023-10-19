@@ -86,7 +86,7 @@
 
   <ul>
     <li>
-      <p><b><i>[virtual]</i> bool event(QEvent ptr arg1)</b>:</p>
+      <p><b><i>[virtual]</i> bool event(QEvent ptr ev)</b>:</p>
       <p>A virtual method called "event" returning a boolean value 
       (Ruby "true" or "false") and expecting one argument (a pointer to a QEvent object).
       "ptr" indicates that the argument is a pointer, "arg1" is the argument name.
@@ -108,9 +108,12 @@
       <p>An iterator called "each_reference" delivering RdbReference objects.</p>
     </li>
     <li>
-      <p><b><i>[event]</i> void layoutAboutToBeChanged</b>:</p>
-      <p>A parameterless event called "layoutAboutToBeChanged". 
-      </p>
+      <p><b><i>[signal]</i> void layoutAboutToBeChanged</b>:</p>
+      <p>A parameterless signal (event) called "layoutAboutToBeChanged" (see <link href="/programming/events.xml"/> for details about events or signals).</p>
+    </li>
+    <li>
+      <p><b><i>[signal]</i> void objectNameChanged(string objectName)</b>:</p>
+      <p>A signal (event) called "objectNameChanged" with one string argument.</p>
     </li>
   </ul>
 

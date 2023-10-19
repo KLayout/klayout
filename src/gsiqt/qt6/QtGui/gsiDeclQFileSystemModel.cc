@@ -1118,7 +1118,7 @@ static gsi::Methods methods_QFileSystemModel () {
   methods += new qt_gsi::GenericMethod ("myComputer", "@brief Method QVariant QFileSystemModel::myComputer(int role)\n", true, &_init_f_myComputer_c767, &_call_f_myComputer_c767);
   methods += new qt_gsi::GenericMethod (":nameFilterDisables", "@brief Method bool QFileSystemModel::nameFilterDisables()\n", true, &_init_f_nameFilterDisables_c0, &_call_f_nameFilterDisables_c0);
   methods += new qt_gsi::GenericMethod (":nameFilters", "@brief Method QStringList QFileSystemModel::nameFilters()\n", true, &_init_f_nameFilters_c0, &_call_f_nameFilters_c0);
-  methods += new qt_gsi::GenericMethod ("options", "@brief Method QFlags<QFileSystemModel::Option> QFileSystemModel::options()\n", true, &_init_f_options_c0, &_call_f_options_c0);
+  methods += new qt_gsi::GenericMethod (":options", "@brief Method QFlags<QFileSystemModel::Option> QFileSystemModel::options()\n", true, &_init_f_options_c0, &_call_f_options_c0);
   methods += new qt_gsi::GenericMethod ("parent", "@brief Method QModelIndex QFileSystemModel::parent(const QModelIndex &child)\nThis is a reimplementation of QAbstractItemModel::parent", true, &_init_f_parent_c2395, &_call_f_parent_c2395);
   methods += new qt_gsi::GenericMethod (":parent", "@brief Method QObject *QFileSystemModel::parent()\n", true, &_init_f_parent_c0, &_call_f_parent_c0);
   methods += new qt_gsi::GenericMethod ("permissions", "@brief Method QFlags<QFileDevice::Permission> QFileSystemModel::permissions(const QModelIndex &index)\n", true, &_init_f_permissions_c2395, &_call_f_permissions_c2395);
@@ -1135,7 +1135,7 @@ static gsi::Methods methods_QFileSystemModel () {
   methods += new qt_gsi::GenericMethod ("setNameFilterDisables|nameFilterDisables=", "@brief Method void QFileSystemModel::setNameFilterDisables(bool enable)\n", false, &_init_f_setNameFilterDisables_864, &_call_f_setNameFilterDisables_864);
   methods += new qt_gsi::GenericMethod ("setNameFilters|nameFilters=", "@brief Method void QFileSystemModel::setNameFilters(const QStringList &filters)\n", false, &_init_f_setNameFilters_2437, &_call_f_setNameFilters_2437);
   methods += new qt_gsi::GenericMethod ("setOption", "@brief Method void QFileSystemModel::setOption(QFileSystemModel::Option option, bool on)\n", false, &_init_f_setOption_3548, &_call_f_setOption_3548);
-  methods += new qt_gsi::GenericMethod ("setOptions", "@brief Method void QFileSystemModel::setOptions(QFlags<QFileSystemModel::Option> options)\n", false, &_init_f_setOptions_3488, &_call_f_setOptions_3488);
+  methods += new qt_gsi::GenericMethod ("setOptions|options=", "@brief Method void QFileSystemModel::setOptions(QFlags<QFileSystemModel::Option> options)\n", false, &_init_f_setOptions_3488, &_call_f_setOptions_3488);
   methods += new qt_gsi::GenericMethod ("setReadOnly|readOnly=", "@brief Method void QFileSystemModel::setReadOnly(bool enable)\n", false, &_init_f_setReadOnly_864, &_call_f_setReadOnly_864);
   methods += new qt_gsi::GenericMethod ("setResolveSymlinks|resolveSymlinks=", "@brief Method void QFileSystemModel::setResolveSymlinks(bool enable)\n", false, &_init_f_setResolveSymlinks_864, &_call_f_setResolveSymlinks_864);
   methods += new qt_gsi::GenericMethod ("setRootPath", "@brief Method QModelIndex QFileSystemModel::setRootPath(const QString &path)\n", false, &_init_f_setRootPath_2025, &_call_f_setRootPath_2025);

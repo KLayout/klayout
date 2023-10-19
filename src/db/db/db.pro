@@ -95,6 +95,8 @@ SOURCES = \
   dbTextWriter.cc \
   dbTilingProcessor.cc \
   dbTrans.cc \
+  dbTriangle.cc \
+  dbTriangles.cc \
   dbUserObject.cc \
   dbUtils.cc \
   dbVector.cc \
@@ -319,6 +321,8 @@ HEADERS = \
   dbTextWriter.h \
   dbTilingProcessor.h \
   dbTrans.h \
+  dbTriangle.h \
+  dbTriangles.h \
   dbTypes.h \
   dbUserObject.h \
   dbUtils.h \

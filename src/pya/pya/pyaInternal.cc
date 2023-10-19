@@ -521,6 +521,22 @@ MethodTable::add_method (const std::string &name, const gsi::MethodBase *mb)
       mp_module->add_python_doc (mb, tl::to_string (tr ("This method is also available as 'str(object)'")));
     }
 
+  } else if (name == "to_i" && mb->compatible_with_num_args (0)) {
+
+    //  The hash method is also routed via the tp_int implementation
+    add_method_basic ("__int__", mb);
+
+    add_method_basic (name, mb);
+    mp_module->add_python_doc (mb, tl::to_string (tr ("This method is also available as 'int(object)'")));
+
+  } else if (name == "to_f" && mb->compatible_with_num_args (0)) {
+
+    //  The hash method is also routed via the tp_int implementation
+    add_method_basic ("__float__", mb);
+
+    add_method_basic (name, mb);
+    mp_module->add_python_doc (mb, tl::to_string (tr ("This method is also available as 'float(object)'")));
+
   } else if (name == "hash" && mb->compatible_with_num_args (0)) {
 
     //  The hash method is also routed via the tp_hash implementation
@@ -853,10 +869,17 @@ MethodTable::method_table_by_class (const gsi::ClassBase *cls_decl)
 // -------------------------------------------------------------------
 //  PythonClassClientData implementation
 
+static std::map<PyTypeObject *, const gsi::ClassBase *> s_type2cls;
+
 PythonClassClientData::PythonClassClientData (const gsi::ClassBase *_cls, PyTypeObject *_py_type, PyTypeObject *_py_type_static, PythonModule *module)
   : py_type_object ((PyObject *) _py_type), py_type_object_static ((PyObject *) _py_type_static), method_table (_cls, module)
 {
-  //  .. nothing yet ..
+  if (_py_type != NULL) {
+    s_type2cls.insert (std::make_pair (_py_type, _cls));
+  }
+  if (_py_type_static != NULL) {
+    s_type2cls.insert (std::make_pair (_py_type_static, _cls));
+  }
 }
 
 PythonClassClientData::~PythonClassClientData ()
@@ -874,11 +897,26 @@ PythonClassClientData::py_type (const gsi::ClassBase &cls_decl, bool as_static)
   return (PyTypeObject *) (cd ? (as_static ? cd->py_type_object_static.get () : cd->py_type_object.get ()) : 0);
 }
 
+const gsi::ClassBase *
+PythonClassClientData::cls_for_type (PyTypeObject *type)
+{
+  while (type && type != &PyBaseObject_Type) {
+    auto t2c = s_type2cls.find (type);
+    if (t2c != s_type2cls.end ()) {
+      return t2c->second;
+    }
+    type = type->tp_base;
+  }
+
+  return 0;
+}
+
 void
 PythonClassClientData::initialize (const gsi::ClassBase &cls_decl, PyTypeObject *py_type, bool as_static, PythonModule *module)
 {
   PythonClassClientData *cd = dynamic_cast<PythonClassClientData *>(cls_decl.data (gsi::ClientIndex::Python));
   if (cd) {
+    s_type2cls.insert (std::make_pair (py_type, &cls_decl));
     if (as_static) {
       cd->py_type_object_static = (PyObject *) py_type;
     } else {

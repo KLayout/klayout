@@ -70,22 +70,6 @@ static void _call_f_category_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// void QSoundEffect::categoryChanged()
-
-
-static void _init_f_categoryChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_categoryChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSoundEffect *)cls)->categoryChanged ();
-}
-
-
 // bool QSoundEffect::isLoaded()
 
 
@@ -131,22 +115,6 @@ static void _call_f_isPlaying_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// void QSoundEffect::loadedChanged()
-
-
-static void _init_f_loadedChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_loadedChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSoundEffect *)cls)->loadedChanged ();
-}
-
-
 // int QSoundEffect::loopCount()
 
 
@@ -159,22 +127,6 @@ static void _call_f_loopCount_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<int > ((int)((QSoundEffect *)cls)->loopCount ());
-}
-
-
-// void QSoundEffect::loopCountChanged()
-
-
-static void _init_f_loopCountChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_loopCountChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSoundEffect *)cls)->loopCountChanged ();
 }
 
 
@@ -193,38 +145,6 @@ static void _call_f_loopsRemaining_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// void QSoundEffect::loopsRemainingChanged()
-
-
-static void _init_f_loopsRemainingChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_loopsRemainingChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSoundEffect *)cls)->loopsRemainingChanged ();
-}
-
-
-// void QSoundEffect::mutedChanged()
-
-
-static void _init_f_mutedChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_mutedChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSoundEffect *)cls)->mutedChanged ();
-}
-
-
 // void QSoundEffect::play()
 
 
@@ -238,22 +158,6 @@ static void _call_f_play_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
   __SUPPRESS_UNUSED_WARNING(args);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSoundEffect *)cls)->play ();
-}
-
-
-// void QSoundEffect::playingChanged()
-
-
-static void _init_f_playingChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_playingChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSoundEffect *)cls)->playingChanged ();
 }
 
 
@@ -372,22 +276,6 @@ static void _call_f_source_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// void QSoundEffect::sourceChanged()
-
-
-static void _init_f_sourceChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_sourceChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSoundEffect *)cls)->sourceChanged ();
-}
-
-
 // QSoundEffect::Status QSoundEffect::status()
 
 
@@ -400,22 +288,6 @@ static void _call_f_status_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qt_gsi::Converter<QSoundEffect::Status>::target_type > ((qt_gsi::Converter<QSoundEffect::Status>::target_type)qt_gsi::CppToQtAdaptor<QSoundEffect::Status>(((QSoundEffect *)cls)->status ()));
-}
-
-
-// void QSoundEffect::statusChanged()
-
-
-static void _init_f_statusChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_statusChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSoundEffect *)cls)->statusChanged ();
 }
 
 
@@ -447,22 +319,6 @@ static void _call_f_volume_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<double > ((double)((QSoundEffect *)cls)->volume ());
-}
-
-
-// void QSoundEffect::volumeChanged()
-
-
-static void _init_f_volumeChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_volumeChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSoundEffect *)cls)->volumeChanged ();
 }
 
 
@@ -538,30 +394,32 @@ static gsi::Methods methods_QSoundEffect () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":category", "@brief Method QString QSoundEffect::category()\n", true, &_init_f_category_c0, &_call_f_category_c0);
-  methods += new qt_gsi::GenericMethod ("categoryChanged", "@brief Method void QSoundEffect::categoryChanged()\n", false, &_init_f_categoryChanged_0, &_call_f_categoryChanged_0);
   methods += new qt_gsi::GenericMethod ("isLoaded?", "@brief Method bool QSoundEffect::isLoaded()\n", true, &_init_f_isLoaded_c0, &_call_f_isLoaded_c0);
   methods += new qt_gsi::GenericMethod ("isMuted?|:muted", "@brief Method bool QSoundEffect::isMuted()\n", true, &_init_f_isMuted_c0, &_call_f_isMuted_c0);
   methods += new qt_gsi::GenericMethod ("isPlaying?|:playing", "@brief Method bool QSoundEffect::isPlaying()\n", true, &_init_f_isPlaying_c0, &_call_f_isPlaying_c0);
-  methods += new qt_gsi::GenericMethod ("loadedChanged", "@brief Method void QSoundEffect::loadedChanged()\n", false, &_init_f_loadedChanged_0, &_call_f_loadedChanged_0);
   methods += new qt_gsi::GenericMethod (":loopCount", "@brief Method int QSoundEffect::loopCount()\n", true, &_init_f_loopCount_c0, &_call_f_loopCount_c0);
-  methods += new qt_gsi::GenericMethod ("loopCountChanged", "@brief Method void QSoundEffect::loopCountChanged()\n", false, &_init_f_loopCountChanged_0, &_call_f_loopCountChanged_0);
   methods += new qt_gsi::GenericMethod (":loopsRemaining", "@brief Method int QSoundEffect::loopsRemaining()\n", true, &_init_f_loopsRemaining_c0, &_call_f_loopsRemaining_c0);
-  methods += new qt_gsi::GenericMethod ("loopsRemainingChanged", "@brief Method void QSoundEffect::loopsRemainingChanged()\n", false, &_init_f_loopsRemainingChanged_0, &_call_f_loopsRemainingChanged_0);
-  methods += new qt_gsi::GenericMethod ("mutedChanged", "@brief Method void QSoundEffect::mutedChanged()\n", false, &_init_f_mutedChanged_0, &_call_f_mutedChanged_0);
   methods += new qt_gsi::GenericMethod ("play", "@brief Method void QSoundEffect::play()\n", false, &_init_f_play_0, &_call_f_play_0);
-  methods += new qt_gsi::GenericMethod ("playingChanged", "@brief Method void QSoundEffect::playingChanged()\n", false, &_init_f_playingChanged_0, &_call_f_playingChanged_0);
   methods += new qt_gsi::GenericMethod ("setCategory|category=", "@brief Method void QSoundEffect::setCategory(const QString &category)\n", false, &_init_f_setCategory_2025, &_call_f_setCategory_2025);
   methods += new qt_gsi::GenericMethod ("setLoopCount|loopCount=", "@brief Method void QSoundEffect::setLoopCount(int loopCount)\n", false, &_init_f_setLoopCount_767, &_call_f_setLoopCount_767);
   methods += new qt_gsi::GenericMethod ("setMuted|muted=", "@brief Method void QSoundEffect::setMuted(bool muted)\n", false, &_init_f_setMuted_864, &_call_f_setMuted_864);
   methods += new qt_gsi::GenericMethod ("setSource|source=", "@brief Method void QSoundEffect::setSource(const QUrl &url)\n", false, &_init_f_setSource_1701, &_call_f_setSource_1701);
   methods += new qt_gsi::GenericMethod ("setVolume|volume=", "@brief Method void QSoundEffect::setVolume(double volume)\n", false, &_init_f_setVolume_1071, &_call_f_setVolume_1071);
   methods += new qt_gsi::GenericMethod (":source", "@brief Method QUrl QSoundEffect::source()\n", true, &_init_f_source_c0, &_call_f_source_c0);
-  methods += new qt_gsi::GenericMethod ("sourceChanged", "@brief Method void QSoundEffect::sourceChanged()\n", false, &_init_f_sourceChanged_0, &_call_f_sourceChanged_0);
   methods += new qt_gsi::GenericMethod (":status", "@brief Method QSoundEffect::Status QSoundEffect::status()\n", true, &_init_f_status_c0, &_call_f_status_c0);
-  methods += new qt_gsi::GenericMethod ("statusChanged", "@brief Method void QSoundEffect::statusChanged()\n", false, &_init_f_statusChanged_0, &_call_f_statusChanged_0);
   methods += new qt_gsi::GenericMethod ("stop", "@brief Method void QSoundEffect::stop()\n", false, &_init_f_stop_0, &_call_f_stop_0);
   methods += new qt_gsi::GenericMethod (":volume", "@brief Method double QSoundEffect::volume()\n", true, &_init_f_volume_c0, &_call_f_volume_c0);
-  methods += new qt_gsi::GenericMethod ("volumeChanged", "@brief Method void QSoundEffect::volumeChanged()\n", false, &_init_f_volumeChanged_0, &_call_f_volumeChanged_0);
+  methods += gsi::qt_signal ("categoryChanged()", "categoryChanged", "@brief Signal declaration for QSoundEffect::categoryChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QSoundEffect::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("loadedChanged()", "loadedChanged", "@brief Signal declaration for QSoundEffect::loadedChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("loopCountChanged()", "loopCountChanged", "@brief Signal declaration for QSoundEffect::loopCountChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("loopsRemainingChanged()", "loopsRemainingChanged", "@brief Signal declaration for QSoundEffect::loopsRemainingChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("mutedChanged()", "mutedChanged", "@brief Signal declaration for QSoundEffect::mutedChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QSoundEffect::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("playingChanged()", "playingChanged", "@brief Signal declaration for QSoundEffect::playingChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("sourceChanged()", "sourceChanged", "@brief Signal declaration for QSoundEffect::sourceChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("statusChanged()", "statusChanged", "@brief Signal declaration for QSoundEffect::statusChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("volumeChanged()", "volumeChanged", "@brief Signal declaration for QSoundEffect::volumeChanged()\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("supportedMimeTypes", "@brief Static method QStringList QSoundEffect::supportedMimeTypes()\nThis method is static and can be called without an instance.", &_init_f_supportedMimeTypes_0, &_call_f_supportedMimeTypes_0);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QSoundEffect::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QSoundEffect::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
@@ -617,63 +475,130 @@ public:
     return QSoundEffect::senderSignalIndex();
   }
 
-  //  [adaptor impl] bool QSoundEffect::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [emitter impl] void QSoundEffect::categoryChanged()
+  void emitter_QSoundEffect_categoryChanged_0()
   {
-    return QSoundEffect::event(arg1);
+    emit QSoundEffect::categoryChanged();
   }
 
-  virtual bool event(QEvent *arg1)
+  //  [emitter impl] void QSoundEffect::destroyed(QObject *)
+  void emitter_QSoundEffect_destroyed_1302(QObject *arg1)
+  {
+    emit QSoundEffect::destroyed(arg1);
+  }
+
+  //  [adaptor impl] bool QSoundEffect::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
+  {
+    return QSoundEffect::event(_event);
+  }
+
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QSoundEffect_Adaptor, bool, QEvent *>(&QSoundEffect_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QSoundEffect_Adaptor, bool, QEvent *>(&QSoundEffect_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QSoundEffect::event(arg1);
+      return QSoundEffect::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QSoundEffect::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QSoundEffect::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QSoundEffect::eventFilter(arg1, arg2);
+    return QSoundEffect::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QSoundEffect_Adaptor, bool, QObject *, QEvent *>(&QSoundEffect_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QSoundEffect_Adaptor, bool, QObject *, QEvent *>(&QSoundEffect_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QSoundEffect::eventFilter(arg1, arg2);
+      return QSoundEffect::eventFilter(watched, event);
     }
   }
 
-  //  [adaptor impl] void QSoundEffect::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [emitter impl] void QSoundEffect::loadedChanged()
+  void emitter_QSoundEffect_loadedChanged_0()
   {
-    QSoundEffect::childEvent(arg1);
+    emit QSoundEffect::loadedChanged();
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  //  [emitter impl] void QSoundEffect::loopCountChanged()
+  void emitter_QSoundEffect_loopCountChanged_0()
+  {
+    emit QSoundEffect::loopCountChanged();
+  }
+
+  //  [emitter impl] void QSoundEffect::loopsRemainingChanged()
+  void emitter_QSoundEffect_loopsRemainingChanged_0()
+  {
+    emit QSoundEffect::loopsRemainingChanged();
+  }
+
+  //  [emitter impl] void QSoundEffect::mutedChanged()
+  void emitter_QSoundEffect_mutedChanged_0()
+  {
+    emit QSoundEffect::mutedChanged();
+  }
+
+  //  [emitter impl] void QSoundEffect::objectNameChanged(const QString &objectName)
+  void emitter_QSoundEffect_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QSoundEffect::objectNameChanged(const QString &objectName)'");
+  }
+
+  //  [emitter impl] void QSoundEffect::playingChanged()
+  void emitter_QSoundEffect_playingChanged_0()
+  {
+    emit QSoundEffect::playingChanged();
+  }
+
+  //  [emitter impl] void QSoundEffect::sourceChanged()
+  void emitter_QSoundEffect_sourceChanged_0()
+  {
+    emit QSoundEffect::sourceChanged();
+  }
+
+  //  [emitter impl] void QSoundEffect::statusChanged()
+  void emitter_QSoundEffect_statusChanged_0()
+  {
+    emit QSoundEffect::statusChanged();
+  }
+
+  //  [emitter impl] void QSoundEffect::volumeChanged()
+  void emitter_QSoundEffect_volumeChanged_0()
+  {
+    emit QSoundEffect::volumeChanged();
+  }
+
+  //  [adaptor impl] void QSoundEffect::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
+  {
+    QSoundEffect::childEvent(event);
+  }
+
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QSoundEffect_Adaptor, QChildEvent *>(&QSoundEffect_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QSoundEffect_Adaptor, QChildEvent *>(&QSoundEffect_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QSoundEffect::childEvent(arg1);
+      QSoundEffect::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QSoundEffect::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QSoundEffect::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QSoundEffect::customEvent(arg1);
+    QSoundEffect::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QSoundEffect_Adaptor, QEvent *>(&QSoundEffect_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QSoundEffect_Adaptor, QEvent *>(&QSoundEffect_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QSoundEffect::customEvent(arg1);
+      QSoundEffect::customEvent(event);
     }
   }
 
@@ -692,18 +617,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QSoundEffect::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QSoundEffect::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QSoundEffect::timerEvent(arg1);
+    QSoundEffect::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QSoundEffect_Adaptor, QTimerEvent *>(&QSoundEffect_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QSoundEffect_Adaptor, QTimerEvent *>(&QSoundEffect_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QSoundEffect::timerEvent(arg1);
+      QSoundEffect::timerEvent(event);
     }
   }
 
@@ -721,7 +646,7 @@ QSoundEffect_Adaptor::~QSoundEffect_Adaptor() { }
 
 static void _init_ctor_QSoundEffect_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QSoundEffect_Adaptor> ();
 }
@@ -730,16 +655,30 @@ static void _call_ctor_QSoundEffect_Adaptor_1302 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QSoundEffect_Adaptor *> (new QSoundEffect_Adaptor (arg1));
 }
 
 
-// void QSoundEffect::childEvent(QChildEvent *)
+// emitter void QSoundEffect::categoryChanged()
+
+static void _init_emitter_categoryChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_categoryChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QSoundEffect_Adaptor *)cls)->emitter_QSoundEffect_categoryChanged_0 ();
+}
+
+
+// void QSoundEffect::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -759,11 +698,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QSoundEffect::customEvent(QEvent *)
+// void QSoundEffect::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -780,6 +719,24 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QSoundEffect_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
+}
+
+
+// emitter void QSoundEffect::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QSoundEffect_Adaptor *)cls)->emitter_QSoundEffect_destroyed_1302 (arg1);
 }
 
 
@@ -807,11 +764,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QSoundEffect::event(QEvent *)
+// bool QSoundEffect::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -830,13 +787,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QSoundEffect::eventFilter(QObject *, QEvent *)
+// bool QSoundEffect::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -871,6 +828,94 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
   tl::Heap heap;
   const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QSoundEffect_Adaptor *)cls)->fp_QSoundEffect_isSignalConnected_c2394 (arg1));
+}
+
+
+// emitter void QSoundEffect::loadedChanged()
+
+static void _init_emitter_loadedChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_loadedChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QSoundEffect_Adaptor *)cls)->emitter_QSoundEffect_loadedChanged_0 ();
+}
+
+
+// emitter void QSoundEffect::loopCountChanged()
+
+static void _init_emitter_loopCountChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_loopCountChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QSoundEffect_Adaptor *)cls)->emitter_QSoundEffect_loopCountChanged_0 ();
+}
+
+
+// emitter void QSoundEffect::loopsRemainingChanged()
+
+static void _init_emitter_loopsRemainingChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_loopsRemainingChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QSoundEffect_Adaptor *)cls)->emitter_QSoundEffect_loopsRemainingChanged_0 ();
+}
+
+
+// emitter void QSoundEffect::mutedChanged()
+
+static void _init_emitter_mutedChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_mutedChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QSoundEffect_Adaptor *)cls)->emitter_QSoundEffect_mutedChanged_0 ();
+}
+
+
+// emitter void QSoundEffect::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QSoundEffect_Adaptor *)cls)->emitter_QSoundEffect_objectNameChanged_4567 (arg1);
+}
+
+
+// emitter void QSoundEffect::playingChanged()
+
+static void _init_emitter_playingChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_playingChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QSoundEffect_Adaptor *)cls)->emitter_QSoundEffect_playingChanged_0 ();
 }
 
 
@@ -920,11 +965,39 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QSoundEffect::timerEvent(QTimerEvent *)
+// emitter void QSoundEffect::sourceChanged()
+
+static void _init_emitter_sourceChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_sourceChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QSoundEffect_Adaptor *)cls)->emitter_QSoundEffect_sourceChanged_0 ();
+}
+
+
+// emitter void QSoundEffect::statusChanged()
+
+static void _init_emitter_statusChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_statusChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QSoundEffect_Adaptor *)cls)->emitter_QSoundEffect_statusChanged_0 ();
+}
+
+
+// void QSoundEffect::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -944,6 +1017,20 @@ static void _set_callback_cbs_timerEvent_1730_0 (void *cls, const gsi::Callback 
 }
 
 
+// emitter void QSoundEffect::volumeChanged()
+
+static void _init_emitter_volumeChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_volumeChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QSoundEffect_Adaptor *)cls)->emitter_QSoundEffect_volumeChanged_0 ();
+}
+
+
 namespace gsi
 {
 
@@ -952,22 +1039,33 @@ gsi::Class<QSoundEffect> &qtdecl_QSoundEffect ();
 static gsi::Methods methods_QSoundEffect_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSoundEffect::QSoundEffect(QObject *parent)\nThis method creates an object of class QSoundEffect.", &_init_ctor_QSoundEffect_Adaptor_1302, &_call_ctor_QSoundEffect_Adaptor_1302);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QSoundEffect::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("emit_categoryChanged", "@brief Emitter for signal void QSoundEffect::categoryChanged()\nCall this method to emit this signal.", false, &_init_emitter_categoryChanged_0, &_call_emitter_categoryChanged_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QSoundEffect::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QSoundEffect::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QSoundEffect::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QSoundEffect::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QSoundEffect::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QSoundEffect::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QSoundEffect::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QSoundEffect::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QSoundEffect::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QSoundEffect::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_loadedChanged", "@brief Emitter for signal void QSoundEffect::loadedChanged()\nCall this method to emit this signal.", false, &_init_emitter_loadedChanged_0, &_call_emitter_loadedChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_loopCountChanged", "@brief Emitter for signal void QSoundEffect::loopCountChanged()\nCall this method to emit this signal.", false, &_init_emitter_loopCountChanged_0, &_call_emitter_loopCountChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_loopsRemainingChanged", "@brief Emitter for signal void QSoundEffect::loopsRemainingChanged()\nCall this method to emit this signal.", false, &_init_emitter_loopsRemainingChanged_0, &_call_emitter_loopsRemainingChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_mutedChanged", "@brief Emitter for signal void QSoundEffect::mutedChanged()\nCall this method to emit this signal.", false, &_init_emitter_mutedChanged_0, &_call_emitter_mutedChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QSoundEffect::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
+  methods += new qt_gsi::GenericMethod ("emit_playingChanged", "@brief Emitter for signal void QSoundEffect::playingChanged()\nCall this method to emit this signal.", false, &_init_emitter_playingChanged_0, &_call_emitter_playingChanged_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QSoundEffect::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QSoundEffect::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QSoundEffect::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QSoundEffect::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("emit_sourceChanged", "@brief Emitter for signal void QSoundEffect::sourceChanged()\nCall this method to emit this signal.", false, &_init_emitter_sourceChanged_0, &_call_emitter_sourceChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_statusChanged", "@brief Emitter for signal void QSoundEffect::statusChanged()\nCall this method to emit this signal.", false, &_init_emitter_statusChanged_0, &_call_emitter_statusChanged_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QSoundEffect::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("emit_volumeChanged", "@brief Emitter for signal void QSoundEffect::volumeChanged()\nCall this method to emit this signal.", false, &_init_emitter_volumeChanged_0, &_call_emitter_volumeChanged_0);
   return methods;
 }
 

@@ -36,62 +36,6 @@
 // -----------------------------------------------------------------------
 // class QInputMethodEvent
 
-//  Constructor QInputMethodEvent::QInputMethodEvent()
-
-
-static void _init_ctor_QInputMethodEvent_0 (qt_gsi::GenericStaticMethod *decl)
-{
-  decl->set_return_new<QInputMethodEvent> ();
-}
-
-static void _call_ctor_QInputMethodEvent_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QInputMethodEvent *> (new QInputMethodEvent ());
-}
-
-
-//  Constructor QInputMethodEvent::QInputMethodEvent(const QString &preeditText, const QList<QInputMethodEvent::Attribute> &attributes)
-
-
-static void _init_ctor_QInputMethodEvent_6641 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("preeditText");
-  decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("attributes");
-  decl->add_arg<const QList<QInputMethodEvent::Attribute> & > (argspec_1);
-  decl->set_return_new<QInputMethodEvent> ();
-}
-
-static void _call_ctor_QInputMethodEvent_6641 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const QList<QInputMethodEvent::Attribute> &arg2 = gsi::arg_reader<const QList<QInputMethodEvent::Attribute> & >() (args, heap);
-  ret.write<QInputMethodEvent *> (new QInputMethodEvent (arg1, arg2));
-}
-
-
-//  Constructor QInputMethodEvent::QInputMethodEvent(const QInputMethodEvent &other)
-
-
-static void _init_ctor_QInputMethodEvent_3045 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("other");
-  decl->add_arg<const QInputMethodEvent & > (argspec_0);
-  decl->set_return_new<QInputMethodEvent> ();
-}
-
-static void _call_ctor_QInputMethodEvent_3045 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QInputMethodEvent &arg1 = gsi::arg_reader<const QInputMethodEvent & >() (args, heap);
-  ret.write<QInputMethodEvent *> (new QInputMethodEvent (arg1));
-}
-
-
 // const QList<QInputMethodEvent::Attribute> &QInputMethodEvent::attributes()
 
 
@@ -193,15 +137,11 @@ static void _call_f_setCommitString_3343 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-
 namespace gsi
 {
 
 static gsi::Methods methods_QInputMethodEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QInputMethodEvent::QInputMethodEvent()\nThis method creates an object of class QInputMethodEvent.", &_init_ctor_QInputMethodEvent_0, &_call_ctor_QInputMethodEvent_0);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QInputMethodEvent::QInputMethodEvent(const QString &preeditText, const QList<QInputMethodEvent::Attribute> &attributes)\nThis method creates an object of class QInputMethodEvent.", &_init_ctor_QInputMethodEvent_6641, &_call_ctor_QInputMethodEvent_6641);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QInputMethodEvent::QInputMethodEvent(const QInputMethodEvent &other)\nThis method creates an object of class QInputMethodEvent.", &_init_ctor_QInputMethodEvent_3045, &_call_ctor_QInputMethodEvent_3045);
   methods += new qt_gsi::GenericMethod ("attributes", "@brief Method const QList<QInputMethodEvent::Attribute> &QInputMethodEvent::attributes()\n", true, &_init_f_attributes_c0, &_call_f_attributes_c0);
   methods += new qt_gsi::GenericMethod (":commitString", "@brief Method const QString &QInputMethodEvent::commitString()\n", true, &_init_f_commitString_c0, &_call_f_commitString_c0);
   methods += new qt_gsi::GenericMethod ("preeditString", "@brief Method const QString &QInputMethodEvent::preeditString()\n", true, &_init_f_preeditString_c0, &_call_f_preeditString_c0);
@@ -213,12 +153,113 @@ static gsi::Methods methods_QInputMethodEvent () {
 
 gsi::Class<QEvent> &qtdecl_QEvent ();
 
-gsi::Class<QInputMethodEvent> decl_QInputMethodEvent (qtdecl_QEvent (), "QtGui", "QInputMethodEvent",
+gsi::Class<QInputMethodEvent> decl_QInputMethodEvent (qtdecl_QEvent (), "QtGui", "QInputMethodEvent_Native",
   methods_QInputMethodEvent (),
-  "@qt\n@brief Binding of QInputMethodEvent");
-
+  "@hide\n@alias QInputMethodEvent");
 
 GSI_QTGUI_PUBLIC gsi::Class<QInputMethodEvent> &qtdecl_QInputMethodEvent () { return decl_QInputMethodEvent; }
+
+}
+
+
+class QInputMethodEvent_Adaptor : public QInputMethodEvent, public qt_gsi::QtObjectBase
+{
+public:
+
+  virtual ~QInputMethodEvent_Adaptor();
+
+  //  [adaptor ctor] QInputMethodEvent::QInputMethodEvent()
+  QInputMethodEvent_Adaptor() : QInputMethodEvent()
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
+  //  [adaptor ctor] QInputMethodEvent::QInputMethodEvent(const QString &preeditText, const QList<QInputMethodEvent::Attribute> &attributes)
+  QInputMethodEvent_Adaptor(const QString &preeditText, const QList<QInputMethodEvent::Attribute> &attributes) : QInputMethodEvent(preeditText, attributes)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
+  //  [adaptor ctor] QInputMethodEvent::QInputMethodEvent(const QInputMethodEvent &other)
+  QInputMethodEvent_Adaptor(const QInputMethodEvent &other) : QInputMethodEvent(other)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
+  
+};
+
+QInputMethodEvent_Adaptor::~QInputMethodEvent_Adaptor() { }
+
+//  Constructor QInputMethodEvent::QInputMethodEvent() (adaptor class)
+
+static void _init_ctor_QInputMethodEvent_Adaptor_0 (qt_gsi::GenericStaticMethod *decl)
+{
+  decl->set_return_new<QInputMethodEvent_Adaptor> ();
+}
+
+static void _call_ctor_QInputMethodEvent_Adaptor_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QInputMethodEvent_Adaptor *> (new QInputMethodEvent_Adaptor ());
+}
+
+
+//  Constructor QInputMethodEvent::QInputMethodEvent(const QString &preeditText, const QList<QInputMethodEvent::Attribute> &attributes) (adaptor class)
+
+static void _init_ctor_QInputMethodEvent_Adaptor_6641 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("preeditText");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("attributes");
+  decl->add_arg<const QList<QInputMethodEvent::Attribute> & > (argspec_1);
+  decl->set_return_new<QInputMethodEvent_Adaptor> ();
+}
+
+static void _call_ctor_QInputMethodEvent_Adaptor_6641 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QList<QInputMethodEvent::Attribute> &arg2 = gsi::arg_reader<const QList<QInputMethodEvent::Attribute> & >() (args, heap);
+  ret.write<QInputMethodEvent_Adaptor *> (new QInputMethodEvent_Adaptor (arg1, arg2));
+}
+
+
+//  Constructor QInputMethodEvent::QInputMethodEvent(const QInputMethodEvent &other) (adaptor class)
+
+static void _init_ctor_QInputMethodEvent_Adaptor_3045 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<const QInputMethodEvent & > (argspec_0);
+  decl->set_return_new<QInputMethodEvent_Adaptor> ();
+}
+
+static void _call_ctor_QInputMethodEvent_Adaptor_3045 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QInputMethodEvent &arg1 = gsi::arg_reader<const QInputMethodEvent & >() (args, heap);
+  ret.write<QInputMethodEvent_Adaptor *> (new QInputMethodEvent_Adaptor (arg1));
+}
+
+
+namespace gsi
+{
+
+gsi::Class<QInputMethodEvent> &qtdecl_QInputMethodEvent ();
+
+static gsi::Methods methods_QInputMethodEvent_Adaptor () {
+  gsi::Methods methods;
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QInputMethodEvent::QInputMethodEvent()\nThis method creates an object of class QInputMethodEvent.", &_init_ctor_QInputMethodEvent_Adaptor_0, &_call_ctor_QInputMethodEvent_Adaptor_0);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QInputMethodEvent::QInputMethodEvent(const QString &preeditText, const QList<QInputMethodEvent::Attribute> &attributes)\nThis method creates an object of class QInputMethodEvent.", &_init_ctor_QInputMethodEvent_Adaptor_6641, &_call_ctor_QInputMethodEvent_Adaptor_6641);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QInputMethodEvent::QInputMethodEvent(const QInputMethodEvent &other)\nThis method creates an object of class QInputMethodEvent.", &_init_ctor_QInputMethodEvent_Adaptor_3045, &_call_ctor_QInputMethodEvent_Adaptor_3045);
+  return methods;
+}
+
+gsi::Class<QInputMethodEvent_Adaptor> decl_QInputMethodEvent_Adaptor (qtdecl_QInputMethodEvent (), "QtGui", "QInputMethodEvent",
+  methods_QInputMethodEvent_Adaptor (),
+  "@qt\n@brief Binding of QInputMethodEvent");
 
 }
 

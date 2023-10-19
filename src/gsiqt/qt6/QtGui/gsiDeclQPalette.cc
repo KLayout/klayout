@@ -1022,14 +1022,14 @@ static gsi::Methods methods_QPalette () {
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QPalette::operator==(const QPalette &p)\n", true, &_init_f_operator_eq__eq__c2113, &_call_f_operator_eq__eq__c2113);
   methods += new qt_gsi::GenericMethod ("placeholderText", "@brief Method const QBrush &QPalette::placeholderText()\n", true, &_init_f_placeholderText_c0, &_call_f_placeholderText_c0);
   methods += new qt_gsi::GenericMethod ("resolve", "@brief Method QPalette QPalette::resolve(const QPalette &other)\n", true, &_init_f_resolve_c2113, &_call_f_resolve_c2113);
-  methods += new qt_gsi::GenericMethod ("resolveMask", "@brief Method QPalette::ResolveMask QPalette::resolveMask()\n", true, &_init_f_resolveMask_c0, &_call_f_resolveMask_c0);
+  methods += new qt_gsi::GenericMethod (":resolveMask", "@brief Method QPalette::ResolveMask QPalette::resolveMask()\n", true, &_init_f_resolveMask_c0, &_call_f_resolveMask_c0);
   methods += new qt_gsi::GenericMethod ("setBrush", "@brief Method void QPalette::setBrush(QPalette::ColorRole cr, const QBrush &brush)\n", false, &_init_f_setBrush_4067, &_call_f_setBrush_4067);
   methods += new qt_gsi::GenericMethod ("setBrush", "@brief Method void QPalette::setBrush(QPalette::ColorGroup cg, QPalette::ColorRole cr, const QBrush &brush)\n", false, &_init_f_setBrush_6347, &_call_f_setBrush_6347);
   methods += new qt_gsi::GenericMethod ("setColor", "@brief Method void QPalette::setColor(QPalette::ColorGroup cg, QPalette::ColorRole cr, const QColor &color)\n", false, &_init_f_setColor_6342, &_call_f_setColor_6342);
   methods += new qt_gsi::GenericMethod ("setColor", "@brief Method void QPalette::setColor(QPalette::ColorRole cr, const QColor &color)\n", false, &_init_f_setColor_4062, &_call_f_setColor_4062);
   methods += new qt_gsi::GenericMethod ("setColorGroup", "@brief Method void QPalette::setColorGroup(QPalette::ColorGroup cr, const QBrush &windowText, const QBrush &button, const QBrush &light, const QBrush &dark, const QBrush &mid, const QBrush &text, const QBrush &bright_text, const QBrush &base, const QBrush &window)\n", false, &_init_f_setColorGroup_18606, &_call_f_setColorGroup_18606);
   methods += new qt_gsi::GenericMethod ("setCurrentColorGroup|currentColorGroup=", "@brief Method void QPalette::setCurrentColorGroup(QPalette::ColorGroup cg)\n", false, &_init_f_setCurrentColorGroup_2388, &_call_f_setCurrentColorGroup_2388);
-  methods += new qt_gsi::GenericMethod ("setResolveMask", "@brief Method void QPalette::setResolveMask(QPalette::ResolveMask mask)\n", false, &_init_f_setResolveMask_2484, &_call_f_setResolveMask_2484);
+  methods += new qt_gsi::GenericMethod ("setResolveMask|resolveMask=", "@brief Method void QPalette::setResolveMask(QPalette::ResolveMask mask)\n", false, &_init_f_setResolveMask_2484, &_call_f_setResolveMask_2484);
   methods += new qt_gsi::GenericMethod ("shadow", "@brief Method const QBrush &QPalette::shadow()\n", true, &_init_f_shadow_c0, &_call_f_shadow_c0);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QPalette::swap(QPalette &other)\n", false, &_init_f_swap_1418, &_call_f_swap_1418);
   methods += new qt_gsi::GenericMethod ("text", "@brief Method const QBrush &QPalette::text()\n", true, &_init_f_text_c0, &_call_f_text_c0);

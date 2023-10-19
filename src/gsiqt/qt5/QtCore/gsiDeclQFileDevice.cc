@@ -29,6 +29,7 @@
 
 #include <QFileDevice>
 #include <QChildEvent>
+#include <QDateTime>
 #include <QEvent>
 #include <QMetaMethod>
 #include <QObject>
@@ -112,6 +113,25 @@ static void _call_f_fileName_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QString > ((QString)((QFileDevice *)cls)->fileName ());
+}
+
+
+// QDateTime QFileDevice::fileTime(QFileDevice::FileTime time)
+
+
+static void _init_f_fileTime_c2392 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("time");
+  decl->add_arg<const qt_gsi::Converter<QFileDevice::FileTime>::target_type & > (argspec_0);
+  decl->set_return<QDateTime > ();
+}
+
+static void _call_f_fileTime_c2392 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QFileDevice::FileTime>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QFileDevice::FileTime>::target_type & >() (args, heap);
+  ret.write<QDateTime > ((QDateTime)((QFileDevice *)cls)->fileTime (qt_gsi::QtToCppAdaptor<QFileDevice::FileTime>(arg1).cref()));
 }
 
 
@@ -228,6 +248,28 @@ static void _call_f_seek_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
+// bool QFileDevice::setFileTime(const QDateTime &newDate, QFileDevice::FileTime fileTime)
+
+
+static void _init_f_setFileTime_4459 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("newDate");
+  decl->add_arg<const QDateTime & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("fileTime");
+  decl->add_arg<const qt_gsi::Converter<QFileDevice::FileTime>::target_type & > (argspec_1);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_setFileTime_4459 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
+  const qt_gsi::Converter<QFileDevice::FileTime>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QFileDevice::FileTime>::target_type & >() (args, heap);
+  ret.write<bool > ((bool)((QFileDevice *)cls)->setFileTime (arg1, qt_gsi::QtToCppAdaptor<QFileDevice::FileTime>(arg2).cref()));
+}
+
+
 // bool QFileDevice::setPermissions(QFlags<QFileDevice::Permission> permissionSpec)
 
 
@@ -338,6 +380,7 @@ static gsi::Methods methods_QFileDevice () {
   methods += new qt_gsi::GenericMethod ("close", "@brief Method void QFileDevice::close()\nThis is a reimplementation of QIODevice::close", false, &_init_f_close_0, &_call_f_close_0);
   methods += new qt_gsi::GenericMethod ("error", "@brief Method QFileDevice::FileError QFileDevice::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
   methods += new qt_gsi::GenericMethod ("fileName", "@brief Method QString QFileDevice::fileName()\n", true, &_init_f_fileName_c0, &_call_f_fileName_c0);
+  methods += new qt_gsi::GenericMethod ("fileTime", "@brief Method QDateTime QFileDevice::fileTime(QFileDevice::FileTime time)\n", true, &_init_f_fileTime_c2392, &_call_f_fileTime_c2392);
   methods += new qt_gsi::GenericMethod ("flush", "@brief Method bool QFileDevice::flush()\n", false, &_init_f_flush_0, &_call_f_flush_0);
   methods += new qt_gsi::GenericMethod ("handle", "@brief Method int QFileDevice::handle()\n", true, &_init_f_handle_c0, &_call_f_handle_c0);
   methods += new qt_gsi::GenericMethod ("isSequential?", "@brief Method bool QFileDevice::isSequential()\nThis is a reimplementation of QIODevice::isSequential", true, &_init_f_isSequential_c0, &_call_f_isSequential_c0);
@@ -345,11 +388,14 @@ static gsi::Methods methods_QFileDevice () {
   methods += new qt_gsi::GenericMethod ("pos", "@brief Method qint64 QFileDevice::pos()\nThis is a reimplementation of QIODevice::pos", true, &_init_f_pos_c0, &_call_f_pos_c0);
   methods += new qt_gsi::GenericMethod ("resize", "@brief Method bool QFileDevice::resize(qint64 sz)\n", false, &_init_f_resize_986, &_call_f_resize_986);
   methods += new qt_gsi::GenericMethod ("seek", "@brief Method bool QFileDevice::seek(qint64 offset)\nThis is a reimplementation of QIODevice::seek", false, &_init_f_seek_986, &_call_f_seek_986);
+  methods += new qt_gsi::GenericMethod ("setFileTime", "@brief Method bool QFileDevice::setFileTime(const QDateTime &newDate, QFileDevice::FileTime fileTime)\n", false, &_init_f_setFileTime_4459, &_call_f_setFileTime_4459);
   methods += new qt_gsi::GenericMethod ("setPermissions", "@brief Method bool QFileDevice::setPermissions(QFlags<QFileDevice::Permission> permissionSpec)\n", false, &_init_f_setPermissions_3370, &_call_f_setPermissions_3370);
   methods += new qt_gsi::GenericMethod ("size", "@brief Method qint64 QFileDevice::size()\nThis is a reimplementation of QIODevice::size", true, &_init_f_size_c0, &_call_f_size_c0);
   methods += new qt_gsi::GenericMethod ("unsetError", "@brief Method void QFileDevice::unsetError()\n", false, &_init_f_unsetError_0, &_call_f_unsetError_0);
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QFileDevice::aboutToClose()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64 > ("bytesWritten(qint64)", "bytesWritten", gsi::arg("bytes"), "@brief Signal declaration for QFileDevice::bytesWritten(qint64 bytes)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int, qint64 > ("channelBytesWritten(int, qint64)", "channelBytesWritten", gsi::arg("channel"), gsi::arg("bytes"), "@brief Signal declaration for QFileDevice::channelBytesWritten(int channel, qint64 bytes)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("channelReadyRead(int)", "channelReadyRead", gsi::arg("channel"), "@brief Signal declaration for QFileDevice::channelReadyRead(int channel)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QFileDevice::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QFileDevice::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("readChannelFinished()", "readChannelFinished", "@brief Signal declaration for QFileDevice::readChannelFinished()\nYou can bind a procedure to this signal.");
@@ -478,6 +524,18 @@ public:
     }
   }
 
+  //  [emitter impl] void QFileDevice::channelBytesWritten(int channel, qint64 bytes)
+  void emitter_QFileDevice_channelBytesWritten_1645(int channel, qint64 bytes)
+  {
+    emit QFileDevice::channelBytesWritten(channel, bytes);
+  }
+
+  //  [emitter impl] void QFileDevice::channelReadyRead(int channel)
+  void emitter_QFileDevice_channelReadyRead_767(int channel)
+  {
+    emit QFileDevice::channelReadyRead(channel);
+  }
+
   //  [adaptor impl] void QFileDevice::close()
   void cbs_close_0_0()
   {
@@ -499,33 +557,33 @@ public:
     emit QFileDevice::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QFileDevice::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QFileDevice::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QFileDevice::event(arg1);
+    return QFileDevice::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QFileDevice_Adaptor, bool, QEvent *>(&QFileDevice_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QFileDevice_Adaptor, bool, QEvent *>(&QFileDevice_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QFileDevice::event(arg1);
+      return QFileDevice::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QFileDevice::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QFileDevice::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QFileDevice::eventFilter(arg1, arg2);
+    return QFileDevice::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QFileDevice_Adaptor, bool, QObject *, QEvent *>(&QFileDevice_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QFileDevice_Adaptor, bool, QObject *, QEvent *>(&QFileDevice_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QFileDevice::eventFilter(arg1, arg2);
+      return QFileDevice::eventFilter(watched, event);
     }
   }
 
@@ -728,33 +786,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QFileDevice::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QFileDevice::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QFileDevice::childEvent(arg1);
+    QFileDevice::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QFileDevice_Adaptor, QChildEvent *>(&QFileDevice_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QFileDevice_Adaptor, QChildEvent *>(&QFileDevice_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QFileDevice::childEvent(arg1);
+      QFileDevice::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QFileDevice::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QFileDevice::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QFileDevice::customEvent(arg1);
+    QFileDevice::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QFileDevice_Adaptor, QEvent *>(&QFileDevice_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QFileDevice_Adaptor, QEvent *>(&QFileDevice_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QFileDevice::customEvent(arg1);
+      QFileDevice::customEvent(event);
     }
   }
 
@@ -773,18 +831,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QFileDevice::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QFileDevice::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QFileDevice::timerEvent(arg1);
+    QFileDevice::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QFileDevice_Adaptor, QTimerEvent *>(&QFileDevice_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QFileDevice_Adaptor, QTimerEvent *>(&QFileDevice_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QFileDevice::timerEvent(arg1);
+      QFileDevice::timerEvent(event);
     }
   }
 
@@ -939,11 +997,50 @@ static void _set_callback_cbs_canReadLine_c0_0 (void *cls, const gsi::Callback &
 }
 
 
-// void QFileDevice::childEvent(QChildEvent *)
+// emitter void QFileDevice::channelBytesWritten(int channel, qint64 bytes)
+
+static void _init_emitter_channelBytesWritten_1645 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("channel");
+  decl->add_arg<int > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("bytes");
+  decl->add_arg<qint64 > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_channelBytesWritten_1645 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  qint64 arg2 = gsi::arg_reader<qint64 >() (args, heap);
+  ((QFileDevice_Adaptor *)cls)->emitter_QFileDevice_channelBytesWritten_1645 (arg1, arg2);
+}
+
+
+// emitter void QFileDevice::channelReadyRead(int channel)
+
+static void _init_emitter_channelReadyRead_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("channel");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_channelReadyRead_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QFileDevice_Adaptor *)cls)->emitter_QFileDevice_channelReadyRead_767 (arg1);
+}
+
+
+// void QFileDevice::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -983,11 +1080,11 @@ static void _set_callback_cbs_close_0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QFileDevice::customEvent(QEvent *)
+// void QFileDevice::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1011,7 +1108,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1020,7 +1117,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QFileDevice_Adaptor *)cls)->emitter_QFileDevice_destroyed_1302 (arg1);
 }
 
@@ -1049,11 +1146,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QFileDevice::event(QEvent *)
+// bool QFileDevice::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -1072,13 +1169,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QFileDevice::eventFilter(QObject *, QEvent *)
+// bool QFileDevice::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -1452,11 +1549,11 @@ static void _set_callback_cbs_size_c0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QFileDevice::timerEvent(QTimerEvent *)
+// void QFileDevice::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1565,18 +1662,20 @@ static gsi::Methods methods_QFileDevice_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_bytesWritten", "@brief Emitter for signal void QFileDevice::bytesWritten(qint64 bytes)\nCall this method to emit this signal.", false, &_init_emitter_bytesWritten_986, &_call_emitter_bytesWritten_986);
   methods += new qt_gsi::GenericMethod ("canReadLine", "@brief Virtual method bool QFileDevice::canReadLine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_canReadLine_c0_0, &_call_cbs_canReadLine_c0_0);
   methods += new qt_gsi::GenericMethod ("canReadLine", "@hide", true, &_init_cbs_canReadLine_c0_0, &_call_cbs_canReadLine_c0_0, &_set_callback_cbs_canReadLine_c0_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QFileDevice::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("emit_channelBytesWritten", "@brief Emitter for signal void QFileDevice::channelBytesWritten(int channel, qint64 bytes)\nCall this method to emit this signal.", false, &_init_emitter_channelBytesWritten_1645, &_call_emitter_channelBytesWritten_1645);
+  methods += new qt_gsi::GenericMethod ("emit_channelReadyRead", "@brief Emitter for signal void QFileDevice::channelReadyRead(int channel)\nCall this method to emit this signal.", false, &_init_emitter_channelReadyRead_767, &_call_emitter_channelReadyRead_767);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QFileDevice::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("close", "@brief Virtual method void QFileDevice::close()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_close_0_0, &_call_cbs_close_0_0);
   methods += new qt_gsi::GenericMethod ("close", "@hide", false, &_init_cbs_close_0_0, &_call_cbs_close_0_0, &_set_callback_cbs_close_0_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QFileDevice::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QFileDevice::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QFileDevice::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QFileDevice::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QFileDevice::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QFileDevice::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QFileDevice::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QFileDevice::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("fileName", "@brief Virtual method QString QFileDevice::fileName()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_fileName_c0_0, &_call_cbs_fileName_c0_0);
   methods += new qt_gsi::GenericMethod ("fileName", "@hide", true, &_init_cbs_fileName_c0_0, &_call_cbs_fileName_c0_0, &_set_callback_cbs_fileName_c0_0);
@@ -1607,7 +1706,7 @@ static gsi::Methods methods_QFileDevice_Adaptor () {
   methods += new qt_gsi::GenericMethod ("setPermissions", "@hide", false, &_init_cbs_setPermissions_3370_0, &_call_cbs_setPermissions_3370_0, &_set_callback_cbs_setPermissions_3370_0);
   methods += new qt_gsi::GenericMethod ("size", "@brief Virtual method qint64 QFileDevice::size()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_size_c0_0, &_call_cbs_size_c0_0);
   methods += new qt_gsi::GenericMethod ("size", "@hide", true, &_init_cbs_size_c0_0, &_call_cbs_size_c0_0, &_set_callback_cbs_size_c0_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QFileDevice::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QFileDevice::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("waitForBytesWritten", "@brief Virtual method bool QFileDevice::waitForBytesWritten(int msecs)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_waitForBytesWritten_767_0, &_call_cbs_waitForBytesWritten_767_0);
   methods += new qt_gsi::GenericMethod ("waitForBytesWritten", "@hide", false, &_init_cbs_waitForBytesWritten_767_0, &_call_cbs_waitForBytesWritten_767_0, &_set_callback_cbs_waitForBytesWritten_767_0);
@@ -1654,6 +1753,28 @@ static gsi::QFlagsClass<QFileDevice::FileError > decl_QFileDevice_FileError_Enum
 static gsi::ClassExt<QFileDevice> inject_QFileDevice_FileError_Enum_in_parent (decl_QFileDevice_FileError_Enum.defs ());
 static gsi::ClassExt<QFileDevice> decl_QFileDevice_FileError_Enum_as_child (decl_QFileDevice_FileError_Enum, "FileError");
 static gsi::ClassExt<QFileDevice> decl_QFileDevice_FileError_Enums_as_child (decl_QFileDevice_FileError_Enums, "QFlags_FileError");
+
+}
+
+
+//  Implementation of the enum wrapper class for QFileDevice::FileTime
+namespace qt_gsi
+{
+
+static gsi::Enum<QFileDevice::FileTime> decl_QFileDevice_FileTime_Enum ("QtCore", "QFileDevice_FileTime",
+    gsi::enum_const ("FileAccessTime", QFileDevice::FileAccessTime, "@brief Enum constant QFileDevice::FileAccessTime") +
+    gsi::enum_const ("FileBirthTime", QFileDevice::FileBirthTime, "@brief Enum constant QFileDevice::FileBirthTime") +
+    gsi::enum_const ("FileMetadataChangeTime", QFileDevice::FileMetadataChangeTime, "@brief Enum constant QFileDevice::FileMetadataChangeTime") +
+    gsi::enum_const ("FileModificationTime", QFileDevice::FileModificationTime, "@brief Enum constant QFileDevice::FileModificationTime"),
+  "@qt\n@brief This class represents the QFileDevice::FileTime enum");
+
+static gsi::QFlagsClass<QFileDevice::FileTime > decl_QFileDevice_FileTime_Enums ("QtCore", "QFileDevice_QFlags_FileTime",
+  "@qt\n@brief This class represents the QFlags<QFileDevice::FileTime> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<QFileDevice> inject_QFileDevice_FileTime_Enum_in_parent (decl_QFileDevice_FileTime_Enum.defs ());
+static gsi::ClassExt<QFileDevice> decl_QFileDevice_FileTime_Enum_as_child (decl_QFileDevice_FileTime_Enum, "FileTime");
+static gsi::ClassExt<QFileDevice> decl_QFileDevice_FileTime_Enums_as_child (decl_QFileDevice_FileTime_Enums, "QFlags_FileTime");
 
 }
 

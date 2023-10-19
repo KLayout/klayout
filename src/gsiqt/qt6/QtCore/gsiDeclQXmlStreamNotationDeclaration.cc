@@ -50,21 +50,6 @@ static void _call_ctor_QXmlStreamNotationDeclaration_0 (const qt_gsi::GenericSta
 }
 
 
-// QStringView QXmlStreamNotationDeclaration::name()
-
-
-static void _init_f_name_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_name_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamNotationDeclaration *)cls)->name ());
-}
-
-
 // bool QXmlStreamNotationDeclaration::operator!=(const QXmlStreamNotationDeclaration &other)
 
 
@@ -103,36 +88,6 @@ static void _call_f_operator_eq__eq__c4289 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// QStringView QXmlStreamNotationDeclaration::publicId()
-
-
-static void _init_f_publicId_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_publicId_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamNotationDeclaration *)cls)->publicId ());
-}
-
-
-// QStringView QXmlStreamNotationDeclaration::systemId()
-
-
-static void _init_f_systemId_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_systemId_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamNotationDeclaration *)cls)->systemId ());
-}
-
-
 
 namespace gsi
 {
@@ -140,11 +95,8 @@ namespace gsi
 static gsi::Methods methods_QXmlStreamNotationDeclaration () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamNotationDeclaration::QXmlStreamNotationDeclaration()\nThis method creates an object of class QXmlStreamNotationDeclaration.", &_init_ctor_QXmlStreamNotationDeclaration_0, &_call_ctor_QXmlStreamNotationDeclaration_0);
-  methods += new qt_gsi::GenericMethod ("name", "@brief Method QStringView QXmlStreamNotationDeclaration::name()\n", true, &_init_f_name_c0, &_call_f_name_c0);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QXmlStreamNotationDeclaration::operator!=(const QXmlStreamNotationDeclaration &other)\n", true, &_init_f_operator_excl__eq__c4289, &_call_f_operator_excl__eq__c4289);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QXmlStreamNotationDeclaration::operator==(const QXmlStreamNotationDeclaration &other)\n", true, &_init_f_operator_eq__eq__c4289, &_call_f_operator_eq__eq__c4289);
-  methods += new qt_gsi::GenericMethod ("publicId", "@brief Method QStringView QXmlStreamNotationDeclaration::publicId()\n", true, &_init_f_publicId_c0, &_call_f_publicId_c0);
-  methods += new qt_gsi::GenericMethod ("systemId", "@brief Method QStringView QXmlStreamNotationDeclaration::systemId()\n", true, &_init_f_systemId_c0, &_call_f_systemId_c0);
   return methods;
 }
 

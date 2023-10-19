@@ -56,12 +56,12 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// QString QImageEncoderControl::imageCodecDescription(const QString &codecName)
+// QString QImageEncoderControl::imageCodecDescription(const QString &codec)
 
 
 static void _init_f_imageCodecDescription_c2025 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("codecName");
+  static gsi::ArgSpecBase argspec_0 ("codec");
   decl->add_arg<const QString & > (argspec_0);
   decl->set_return<QString > ();
 }
@@ -132,7 +132,7 @@ static void _init_f_supportedResolutions_c4372 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("settings");
   decl->add_arg<const QImageEncoderSettings & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("continuous", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("continuous", true, "nullptr");
   decl->add_arg<bool * > (argspec_1);
   decl->set_return<QList<QSize> > ();
 }
@@ -142,7 +142,7 @@ static void _call_f_supportedResolutions_c4372 (const qt_gsi::GenericMethod * /*
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QImageEncoderSettings &arg1 = gsi::arg_reader<const QImageEncoderSettings & >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<QList<QSize> > ((QList<QSize>)((QImageEncoderControl *)cls)->supportedResolutions (arg1, arg2));
 }
 
@@ -203,11 +203,13 @@ namespace gsi
 static gsi::Methods methods_QImageEncoderControl () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("imageCodecDescription", "@brief Method QString QImageEncoderControl::imageCodecDescription(const QString &codecName)\n", true, &_init_f_imageCodecDescription_c2025, &_call_f_imageCodecDescription_c2025);
+  methods += new qt_gsi::GenericMethod ("imageCodecDescription", "@brief Method QString QImageEncoderControl::imageCodecDescription(const QString &codec)\n", true, &_init_f_imageCodecDescription_c2025, &_call_f_imageCodecDescription_c2025);
   methods += new qt_gsi::GenericMethod (":imageSettings", "@brief Method QImageEncoderSettings QImageEncoderControl::imageSettings()\n", true, &_init_f_imageSettings_c0, &_call_f_imageSettings_c0);
   methods += new qt_gsi::GenericMethod ("setImageSettings|imageSettings=", "@brief Method void QImageEncoderControl::setImageSettings(const QImageEncoderSettings &settings)\n", false, &_init_f_setImageSettings_3430, &_call_f_setImageSettings_3430);
   methods += new qt_gsi::GenericMethod ("supportedImageCodecs", "@brief Method QStringList QImageEncoderControl::supportedImageCodecs()\n", true, &_init_f_supportedImageCodecs_c0, &_call_f_supportedImageCodecs_c0);
   methods += new qt_gsi::GenericMethod ("supportedResolutions", "@brief Method QList<QSize> QImageEncoderControl::supportedResolutions(const QImageEncoderSettings &settings, bool *continuous)\n", true, &_init_f_supportedResolutions_c4372, &_call_f_supportedResolutions_c4372);
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QImageEncoderControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QImageEncoderControl::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QImageEncoderControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QImageEncoderControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -256,47 +258,53 @@ public:
     return QImageEncoderControl::senderSignalIndex();
   }
 
-  //  [adaptor impl] bool QImageEncoderControl::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [emitter impl] void QImageEncoderControl::destroyed(QObject *)
+  void emitter_QImageEncoderControl_destroyed_1302(QObject *arg1)
   {
-    return QImageEncoderControl::event(arg1);
+    emit QImageEncoderControl::destroyed(arg1);
   }
 
-  virtual bool event(QEvent *arg1)
+  //  [adaptor impl] bool QImageEncoderControl::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
+  {
+    return QImageEncoderControl::event(_event);
+  }
+
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QImageEncoderControl_Adaptor, bool, QEvent *>(&QImageEncoderControl_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QImageEncoderControl_Adaptor, bool, QEvent *>(&QImageEncoderControl_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QImageEncoderControl::event(arg1);
+      return QImageEncoderControl::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QImageEncoderControl::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QImageEncoderControl::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QImageEncoderControl::eventFilter(arg1, arg2);
+    return QImageEncoderControl::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QImageEncoderControl_Adaptor, bool, QObject *, QEvent *>(&QImageEncoderControl_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QImageEncoderControl_Adaptor, bool, QObject *, QEvent *>(&QImageEncoderControl_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QImageEncoderControl::eventFilter(arg1, arg2);
+      return QImageEncoderControl::eventFilter(watched, event);
     }
   }
 
-  //  [adaptor impl] QString QImageEncoderControl::imageCodecDescription(const QString &codecName)
-  QString cbs_imageCodecDescription_c2025_0(const QString &codecName) const
+  //  [adaptor impl] QString QImageEncoderControl::imageCodecDescription(const QString &codec)
+  QString cbs_imageCodecDescription_c2025_0(const QString &codec) const
   {
-    __SUPPRESS_UNUSED_WARNING (codecName);
+    __SUPPRESS_UNUSED_WARNING (codec);
     throw qt_gsi::AbstractMethodCalledException("imageCodecDescription");
   }
 
-  virtual QString imageCodecDescription(const QString &codecName) const
+  virtual QString imageCodecDescription(const QString &codec) const
   {
     if (cb_imageCodecDescription_c2025_0.can_issue()) {
-      return cb_imageCodecDescription_c2025_0.issue<QImageEncoderControl_Adaptor, QString, const QString &>(&QImageEncoderControl_Adaptor::cbs_imageCodecDescription_c2025_0, codecName);
+      return cb_imageCodecDescription_c2025_0.issue<QImageEncoderControl_Adaptor, QString, const QString &>(&QImageEncoderControl_Adaptor::cbs_imageCodecDescription_c2025_0, codec);
     } else {
       throw qt_gsi::AbstractMethodCalledException("imageCodecDescription");
     }
@@ -315,6 +323,13 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("imageSettings");
     }
+  }
+
+  //  [emitter impl] void QImageEncoderControl::objectNameChanged(const QString &objectName)
+  void emitter_QImageEncoderControl_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QImageEncoderControl::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QImageEncoderControl::setImageSettings(const QImageEncoderSettings &settings)
@@ -365,33 +380,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QImageEncoderControl::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QImageEncoderControl::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QImageEncoderControl::childEvent(arg1);
+    QImageEncoderControl::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QImageEncoderControl_Adaptor, QChildEvent *>(&QImageEncoderControl_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QImageEncoderControl_Adaptor, QChildEvent *>(&QImageEncoderControl_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QImageEncoderControl::childEvent(arg1);
+      QImageEncoderControl::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QImageEncoderControl::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QImageEncoderControl::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QImageEncoderControl::customEvent(arg1);
+    QImageEncoderControl::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QImageEncoderControl_Adaptor, QEvent *>(&QImageEncoderControl_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QImageEncoderControl_Adaptor, QEvent *>(&QImageEncoderControl_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QImageEncoderControl::customEvent(arg1);
+      QImageEncoderControl::customEvent(event);
     }
   }
 
@@ -410,18 +425,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QImageEncoderControl::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QImageEncoderControl::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QImageEncoderControl::timerEvent(arg1);
+    QImageEncoderControl::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QImageEncoderControl_Adaptor, QTimerEvent *>(&QImageEncoderControl_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QImageEncoderControl_Adaptor, QTimerEvent *>(&QImageEncoderControl_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QImageEncoderControl::timerEvent(arg1);
+      QImageEncoderControl::timerEvent(event);
     }
   }
 
@@ -454,11 +469,11 @@ static void _call_ctor_QImageEncoderControl_Adaptor_0 (const qt_gsi::GenericStat
 }
 
 
-// void QImageEncoderControl::childEvent(QChildEvent *)
+// void QImageEncoderControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -478,11 +493,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QImageEncoderControl::customEvent(QEvent *)
+// void QImageEncoderControl::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -499,6 +514,24 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QImageEncoderControl_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
+}
+
+
+// emitter void QImageEncoderControl::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QImageEncoderControl_Adaptor *)cls)->emitter_QImageEncoderControl_destroyed_1302 (arg1);
 }
 
 
@@ -526,11 +559,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QImageEncoderControl::event(QEvent *)
+// bool QImageEncoderControl::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -549,13 +582,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QImageEncoderControl::eventFilter(QObject *, QEvent *)
+// bool QImageEncoderControl::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -575,11 +608,11 @@ static void _set_callback_cbs_eventFilter_2411_0 (void *cls, const gsi::Callback
 }
 
 
-// QString QImageEncoderControl::imageCodecDescription(const QString &codecName)
+// QString QImageEncoderControl::imageCodecDescription(const QString &codec)
 
 static void _init_cbs_imageCodecDescription_c2025_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("codecName");
+  static gsi::ArgSpecBase argspec_0 ("codec");
   decl->add_arg<const QString & > (argspec_0);
   decl->set_return<QString > ();
 }
@@ -632,6 +665,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
   tl::Heap heap;
   const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QImageEncoderControl_Adaptor *)cls)->fp_QImageEncoderControl_isSignalConnected_c2394 (arg1));
+}
+
+
+// emitter void QImageEncoderControl::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QImageEncoderControl_Adaptor *)cls)->emitter_QImageEncoderControl_objectNameChanged_4567 (arg1);
 }
 
 
@@ -750,11 +801,11 @@ static void _set_callback_cbs_supportedResolutions_c4372_1 (void *cls, const gsi
 }
 
 
-// void QImageEncoderControl::timerEvent(QTimerEvent *)
+// void QImageEncoderControl::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -782,21 +833,23 @@ gsi::Class<QImageEncoderControl> &qtdecl_QImageEncoderControl ();
 static gsi::Methods methods_QImageEncoderControl_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QImageEncoderControl::QImageEncoderControl()\nThis method creates an object of class QImageEncoderControl.", &_init_ctor_QImageEncoderControl_Adaptor_0, &_call_ctor_QImageEncoderControl_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QImageEncoderControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QImageEncoderControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QImageEncoderControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QImageEncoderControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QImageEncoderControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QImageEncoderControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QImageEncoderControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QImageEncoderControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QImageEncoderControl::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QImageEncoderControl::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("imageCodecDescription", "@brief Virtual method QString QImageEncoderControl::imageCodecDescription(const QString &codecName)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_imageCodecDescription_c2025_0, &_call_cbs_imageCodecDescription_c2025_0);
+  methods += new qt_gsi::GenericMethod ("imageCodecDescription", "@brief Virtual method QString QImageEncoderControl::imageCodecDescription(const QString &codec)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_imageCodecDescription_c2025_0, &_call_cbs_imageCodecDescription_c2025_0);
   methods += new qt_gsi::GenericMethod ("imageCodecDescription", "@hide", true, &_init_cbs_imageCodecDescription_c2025_0, &_call_cbs_imageCodecDescription_c2025_0, &_set_callback_cbs_imageCodecDescription_c2025_0);
   methods += new qt_gsi::GenericMethod ("imageSettings", "@brief Virtual method QImageEncoderSettings QImageEncoderControl::imageSettings()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_imageSettings_c0_0, &_call_cbs_imageSettings_c0_0);
   methods += new qt_gsi::GenericMethod ("imageSettings", "@hide", true, &_init_cbs_imageSettings_c0_0, &_call_cbs_imageSettings_c0_0, &_set_callback_cbs_imageSettings_c0_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QImageEncoderControl::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QImageEncoderControl::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QImageEncoderControl::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QImageEncoderControl::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QImageEncoderControl::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
@@ -806,7 +859,7 @@ static gsi::Methods methods_QImageEncoderControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("supportedImageCodecs", "@hide", true, &_init_cbs_supportedImageCodecs_c0_0, &_call_cbs_supportedImageCodecs_c0_0, &_set_callback_cbs_supportedImageCodecs_c0_0);
   methods += new qt_gsi::GenericMethod ("supportedResolutions", "@brief Virtual method QList<QSize> QImageEncoderControl::supportedResolutions(const QImageEncoderSettings &settings, bool *continuous)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_supportedResolutions_c4372_1, &_call_cbs_supportedResolutions_c4372_1);
   methods += new qt_gsi::GenericMethod ("supportedResolutions", "@hide", true, &_init_cbs_supportedResolutions_c4372_1, &_call_cbs_supportedResolutions_c4372_1, &_set_callback_cbs_supportedResolutions_c4372_1);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QImageEncoderControl::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QImageEncoderControl::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

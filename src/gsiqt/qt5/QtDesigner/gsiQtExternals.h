@@ -33,14 +33,6 @@
 #include "gsiClass.h"
 #include "gsiQtDesignerCommon.h"
 
-class QAbstractExtensionFactory;
-
-namespace gsi { GSI_QTDESIGNER_PUBLIC gsi::Class<QAbstractExtensionFactory> &qtdecl_QAbstractExtensionFactory (); }
-
-class QAbstractExtensionManager;
-
-namespace gsi { GSI_QTDESIGNER_PUBLIC gsi::Class<QAbstractExtensionManager> &qtdecl_QAbstractExtensionManager (); }
-
 class QAbstractFormBuilder;
 
 namespace gsi { GSI_QTDESIGNER_PUBLIC gsi::Class<QAbstractFormBuilder> &qtdecl_QAbstractFormBuilder (); }

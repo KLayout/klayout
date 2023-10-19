@@ -124,7 +124,7 @@ static void _init_f_load_3070 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("dev");
   decl->add_arg<QIODevice * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("format", true, "nullptr");
   decl->add_arg<const char * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -134,7 +134,7 @@ static void _call_f_load_3070 (const qt_gsi::GenericMethod * /*decl*/, void *cls
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
-  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
   ret.write<bool > ((bool)((QPicture *)cls)->load (arg1, arg2));
 }
 
@@ -146,7 +146,7 @@ static void _init_f_load_3648 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("fileName");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("format", true, "nullptr");
   decl->add_arg<const char * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -156,7 +156,7 @@ static void _call_f_load_3648 (const qt_gsi::GenericMethod * /*decl*/, void *cls
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
   ret.write<bool > ((bool)((QPicture *)cls)->load (arg1, arg2));
 }
 
@@ -221,7 +221,7 @@ static void _init_f_save_3070 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("dev");
   decl->add_arg<QIODevice * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("format", true, "nullptr");
   decl->add_arg<const char * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -231,7 +231,7 @@ static void _call_f_save_3070 (const qt_gsi::GenericMethod * /*decl*/, void *cls
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
-  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
   ret.write<bool > ((bool)((QPicture *)cls)->save (arg1, arg2));
 }
 
@@ -243,7 +243,7 @@ static void _init_f_save_3648 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("fileName");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("format", true, "nullptr");
   decl->add_arg<const char * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -253,7 +253,7 @@ static void _call_f_save_3648 (const qt_gsi::GenericMethod * /*decl*/, void *cls
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
   ret.write<bool > ((bool)((QPicture *)cls)->save (arg1, arg2));
 }
 

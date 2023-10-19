@@ -480,7 +480,7 @@ static void _init_f_find_5261 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("exp");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("options", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("options", true, "QTextDocument::FindFlags()");
   decl->add_arg<QFlags<QTextDocument::FindFlag> > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -490,7 +490,7 @@ static void _call_f_find_5261 (const qt_gsi::GenericMethod * /*decl*/, void *cls
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  QFlags<QTextDocument::FindFlag> arg2 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (0, heap);
+  QFlags<QTextDocument::FindFlag> arg2 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (QTextDocument::FindFlags(), heap);
   ret.write<bool > ((bool)((QPlainTextEdit *)cls)->find (arg1, arg2));
 }
 
@@ -502,7 +502,7 @@ static void _init_f_find_5217 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("exp");
   decl->add_arg<const QRegExp & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("options", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("options", true, "QTextDocument::FindFlags()");
   decl->add_arg<QFlags<QTextDocument::FindFlag> > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -512,7 +512,7 @@ static void _call_f_find_5217 (const qt_gsi::GenericMethod * /*decl*/, void *cls
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QRegExp &arg1 = gsi::arg_reader<const QRegExp & >() (args, heap);
-  QFlags<QTextDocument::FindFlag> arg2 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (0, heap);
+  QFlags<QTextDocument::FindFlag> arg2 = args ? gsi::arg_reader<QFlags<QTextDocument::FindFlag> >() (args, heap) : gsi::arg_maker<QFlags<QTextDocument::FindFlag> >() (QTextDocument::FindFlags(), heap);
   ret.write<bool > ((bool)((QPlainTextEdit *)cls)->find (arg1, arg2));
 }
 
@@ -1081,6 +1081,26 @@ static void _call_f_setTabChangesFocus_864 (const qt_gsi::GenericMethod * /*decl
 }
 
 
+// void QPlainTextEdit::setTabStopDistance(double distance)
+
+
+static void _init_f_setTabStopDistance_1071 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("distance");
+  decl->add_arg<double > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setTabStopDistance_1071 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QPlainTextEdit *)cls)->setTabStopDistance (arg1);
+}
+
+
 // void QPlainTextEdit::setTabStopWidth(int width)
 
 
@@ -1193,6 +1213,21 @@ static void _call_f_tabChangesFocus_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<bool > ((bool)((QPlainTextEdit *)cls)->tabChangesFocus ());
+}
+
+
+// double QPlainTextEdit::tabStopDistance()
+
+
+static void _init_f_tabStopDistance_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<double > ();
+}
+
+static void _call_f_tabStopDistance_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<double > ((double)((QPlainTextEdit *)cls)->tabStopDistance ());
 }
 
 
@@ -1437,12 +1472,14 @@ static gsi::Methods methods_QPlainTextEdit () {
   methods += new qt_gsi::GenericMethod ("setPlainText|plainText=", "@brief Method void QPlainTextEdit::setPlainText(const QString &text)\n", false, &_init_f_setPlainText_2025, &_call_f_setPlainText_2025);
   methods += new qt_gsi::GenericMethod ("setReadOnly|readOnly=", "@brief Method void QPlainTextEdit::setReadOnly(bool ro)\n", false, &_init_f_setReadOnly_864, &_call_f_setReadOnly_864);
   methods += new qt_gsi::GenericMethod ("setTabChangesFocus|tabChangesFocus=", "@brief Method void QPlainTextEdit::setTabChangesFocus(bool b)\n", false, &_init_f_setTabChangesFocus_864, &_call_f_setTabChangesFocus_864);
+  methods += new qt_gsi::GenericMethod ("setTabStopDistance|tabStopDistance=", "@brief Method void QPlainTextEdit::setTabStopDistance(double distance)\n", false, &_init_f_setTabStopDistance_1071, &_call_f_setTabStopDistance_1071);
   methods += new qt_gsi::GenericMethod ("setTabStopWidth|tabStopWidth=", "@brief Method void QPlainTextEdit::setTabStopWidth(int width)\n", false, &_init_f_setTabStopWidth_767, &_call_f_setTabStopWidth_767);
   methods += new qt_gsi::GenericMethod ("setTextCursor|textCursor=", "@brief Method void QPlainTextEdit::setTextCursor(const QTextCursor &cursor)\n", false, &_init_f_setTextCursor_2453, &_call_f_setTextCursor_2453);
   methods += new qt_gsi::GenericMethod ("setTextInteractionFlags|textInteractionFlags=", "@brief Method void QPlainTextEdit::setTextInteractionFlags(QFlags<Qt::TextInteractionFlag> flags)\n", false, &_init_f_setTextInteractionFlags_3396, &_call_f_setTextInteractionFlags_3396);
   methods += new qt_gsi::GenericMethod ("setUndoRedoEnabled|undoRedoEnabled=", "@brief Method void QPlainTextEdit::setUndoRedoEnabled(bool enable)\n", false, &_init_f_setUndoRedoEnabled_864, &_call_f_setUndoRedoEnabled_864);
   methods += new qt_gsi::GenericMethod ("setWordWrapMode|wordWrapMode=", "@brief Method void QPlainTextEdit::setWordWrapMode(QTextOption::WrapMode policy)\n", false, &_init_f_setWordWrapMode_2486, &_call_f_setWordWrapMode_2486);
   methods += new qt_gsi::GenericMethod (":tabChangesFocus", "@brief Method bool QPlainTextEdit::tabChangesFocus()\n", true, &_init_f_tabChangesFocus_c0, &_call_f_tabChangesFocus_c0);
+  methods += new qt_gsi::GenericMethod (":tabStopDistance", "@brief Method double QPlainTextEdit::tabStopDistance()\n", true, &_init_f_tabStopDistance_c0, &_call_f_tabStopDistance_c0);
   methods += new qt_gsi::GenericMethod (":tabStopWidth", "@brief Method int QPlainTextEdit::tabStopWidth()\n", true, &_init_f_tabStopWidth_c0, &_call_f_tabStopWidth_c0);
   methods += new qt_gsi::GenericMethod (":textCursor", "@brief Method QTextCursor QPlainTextEdit::textCursor()\n", true, &_init_f_textCursor_c0, &_call_f_textCursor_c0);
   methods += new qt_gsi::GenericMethod (":textInteractionFlags", "@brief Method QFlags<Qt::TextInteractionFlag> QPlainTextEdit::textInteractionFlags()\n", true, &_init_f_textInteractionFlags_c0, &_call_f_textInteractionFlags_c0);
@@ -1838,18 +1875,18 @@ public:
     emit QPlainTextEdit::windowTitleChanged(title);
   }
 
-  //  [adaptor impl] void QPlainTextEdit::actionEvent(QActionEvent *)
-  void cbs_actionEvent_1823_0(QActionEvent *arg1)
+  //  [adaptor impl] void QPlainTextEdit::actionEvent(QActionEvent *event)
+  void cbs_actionEvent_1823_0(QActionEvent *event)
   {
-    QPlainTextEdit::actionEvent(arg1);
+    QPlainTextEdit::actionEvent(event);
   }
 
-  virtual void actionEvent(QActionEvent *arg1)
+  virtual void actionEvent(QActionEvent *event)
   {
     if (cb_actionEvent_1823_0.can_issue()) {
-      cb_actionEvent_1823_0.issue<QPlainTextEdit_Adaptor, QActionEvent *>(&QPlainTextEdit_Adaptor::cbs_actionEvent_1823_0, arg1);
+      cb_actionEvent_1823_0.issue<QPlainTextEdit_Adaptor, QActionEvent *>(&QPlainTextEdit_Adaptor::cbs_actionEvent_1823_0, event);
     } else {
-      QPlainTextEdit::actionEvent(arg1);
+      QPlainTextEdit::actionEvent(event);
     }
   }
 
@@ -1883,33 +1920,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QPlainTextEdit::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QPlainTextEdit::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QPlainTextEdit::childEvent(arg1);
+    QPlainTextEdit::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QPlainTextEdit_Adaptor, QChildEvent *>(&QPlainTextEdit_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QPlainTextEdit_Adaptor, QChildEvent *>(&QPlainTextEdit_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QPlainTextEdit::childEvent(arg1);
+      QPlainTextEdit::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QPlainTextEdit::closeEvent(QCloseEvent *)
-  void cbs_closeEvent_1719_0(QCloseEvent *arg1)
+  //  [adaptor impl] void QPlainTextEdit::closeEvent(QCloseEvent *event)
+  void cbs_closeEvent_1719_0(QCloseEvent *event)
   {
-    QPlainTextEdit::closeEvent(arg1);
+    QPlainTextEdit::closeEvent(event);
   }
 
-  virtual void closeEvent(QCloseEvent *arg1)
+  virtual void closeEvent(QCloseEvent *event)
   {
     if (cb_closeEvent_1719_0.can_issue()) {
-      cb_closeEvent_1719_0.issue<QPlainTextEdit_Adaptor, QCloseEvent *>(&QPlainTextEdit_Adaptor::cbs_closeEvent_1719_0, arg1);
+      cb_closeEvent_1719_0.issue<QPlainTextEdit_Adaptor, QCloseEvent *>(&QPlainTextEdit_Adaptor::cbs_closeEvent_1719_0, event);
     } else {
-      QPlainTextEdit::closeEvent(arg1);
+      QPlainTextEdit::closeEvent(event);
     }
   }
 
@@ -1943,18 +1980,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QPlainTextEdit::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QPlainTextEdit::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QPlainTextEdit::customEvent(arg1);
+    QPlainTextEdit::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QPlainTextEdit_Adaptor, QEvent *>(&QPlainTextEdit_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QPlainTextEdit_Adaptor, QEvent *>(&QPlainTextEdit_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QPlainTextEdit::customEvent(arg1);
+      QPlainTextEdit::customEvent(event);
     }
   }
 
@@ -2048,18 +2085,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QPlainTextEdit::enterEvent(QEvent *)
-  void cbs_enterEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QPlainTextEdit::enterEvent(QEvent *event)
+  void cbs_enterEvent_1217_0(QEvent *event)
   {
-    QPlainTextEdit::enterEvent(arg1);
+    QPlainTextEdit::enterEvent(event);
   }
 
-  virtual void enterEvent(QEvent *arg1)
+  virtual void enterEvent(QEvent *event)
   {
     if (cb_enterEvent_1217_0.can_issue()) {
-      cb_enterEvent_1217_0.issue<QPlainTextEdit_Adaptor, QEvent *>(&QPlainTextEdit_Adaptor::cbs_enterEvent_1217_0, arg1);
+      cb_enterEvent_1217_0.issue<QPlainTextEdit_Adaptor, QEvent *>(&QPlainTextEdit_Adaptor::cbs_enterEvent_1217_0, event);
     } else {
-      QPlainTextEdit::enterEvent(arg1);
+      QPlainTextEdit::enterEvent(event);
     }
   }
 
@@ -2138,18 +2175,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QPlainTextEdit::hideEvent(QHideEvent *)
-  void cbs_hideEvent_1595_0(QHideEvent *arg1)
+  //  [adaptor impl] void QPlainTextEdit::hideEvent(QHideEvent *event)
+  void cbs_hideEvent_1595_0(QHideEvent *event)
   {
-    QPlainTextEdit::hideEvent(arg1);
+    QPlainTextEdit::hideEvent(event);
   }
 
-  virtual void hideEvent(QHideEvent *arg1)
+  virtual void hideEvent(QHideEvent *event)
   {
     if (cb_hideEvent_1595_0.can_issue()) {
-      cb_hideEvent_1595_0.issue<QPlainTextEdit_Adaptor, QHideEvent *>(&QPlainTextEdit_Adaptor::cbs_hideEvent_1595_0, arg1);
+      cb_hideEvent_1595_0.issue<QPlainTextEdit_Adaptor, QHideEvent *>(&QPlainTextEdit_Adaptor::cbs_hideEvent_1595_0, event);
     } else {
-      QPlainTextEdit::hideEvent(arg1);
+      QPlainTextEdit::hideEvent(event);
     }
   }
 
@@ -2228,18 +2265,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QPlainTextEdit::leaveEvent(QEvent *)
-  void cbs_leaveEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QPlainTextEdit::leaveEvent(QEvent *event)
+  void cbs_leaveEvent_1217_0(QEvent *event)
   {
-    QPlainTextEdit::leaveEvent(arg1);
+    QPlainTextEdit::leaveEvent(event);
   }
 
-  virtual void leaveEvent(QEvent *arg1)
+  virtual void leaveEvent(QEvent *event)
   {
     if (cb_leaveEvent_1217_0.can_issue()) {
-      cb_leaveEvent_1217_0.issue<QPlainTextEdit_Adaptor, QEvent *>(&QPlainTextEdit_Adaptor::cbs_leaveEvent_1217_0, arg1);
+      cb_leaveEvent_1217_0.issue<QPlainTextEdit_Adaptor, QEvent *>(&QPlainTextEdit_Adaptor::cbs_leaveEvent_1217_0, event);
     } else {
-      QPlainTextEdit::leaveEvent(arg1);
+      QPlainTextEdit::leaveEvent(event);
     }
   }
 
@@ -2318,18 +2355,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QPlainTextEdit::moveEvent(QMoveEvent *)
-  void cbs_moveEvent_1624_0(QMoveEvent *arg1)
+  //  [adaptor impl] void QPlainTextEdit::moveEvent(QMoveEvent *event)
+  void cbs_moveEvent_1624_0(QMoveEvent *event)
   {
-    QPlainTextEdit::moveEvent(arg1);
+    QPlainTextEdit::moveEvent(event);
   }
 
-  virtual void moveEvent(QMoveEvent *arg1)
+  virtual void moveEvent(QMoveEvent *event)
   {
     if (cb_moveEvent_1624_0.can_issue()) {
-      cb_moveEvent_1624_0.issue<QPlainTextEdit_Adaptor, QMoveEvent *>(&QPlainTextEdit_Adaptor::cbs_moveEvent_1624_0, arg1);
+      cb_moveEvent_1624_0.issue<QPlainTextEdit_Adaptor, QMoveEvent *>(&QPlainTextEdit_Adaptor::cbs_moveEvent_1624_0, event);
     } else {
-      QPlainTextEdit::moveEvent(arg1);
+      QPlainTextEdit::moveEvent(event);
     }
   }
 
@@ -2438,18 +2475,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QPlainTextEdit::tabletEvent(QTabletEvent *)
-  void cbs_tabletEvent_1821_0(QTabletEvent *arg1)
+  //  [adaptor impl] void QPlainTextEdit::tabletEvent(QTabletEvent *event)
+  void cbs_tabletEvent_1821_0(QTabletEvent *event)
   {
-    QPlainTextEdit::tabletEvent(arg1);
+    QPlainTextEdit::tabletEvent(event);
   }
 
-  virtual void tabletEvent(QTabletEvent *arg1)
+  virtual void tabletEvent(QTabletEvent *event)
   {
     if (cb_tabletEvent_1821_0.can_issue()) {
-      cb_tabletEvent_1821_0.issue<QPlainTextEdit_Adaptor, QTabletEvent *>(&QPlainTextEdit_Adaptor::cbs_tabletEvent_1821_0, arg1);
+      cb_tabletEvent_1821_0.issue<QPlainTextEdit_Adaptor, QTabletEvent *>(&QPlainTextEdit_Adaptor::cbs_tabletEvent_1821_0, event);
     } else {
-      QPlainTextEdit::tabletEvent(arg1);
+      QPlainTextEdit::tabletEvent(event);
     }
   }
 
@@ -2575,7 +2612,7 @@ QPlainTextEdit_Adaptor::~QPlainTextEdit_Adaptor() { }
 
 static void _init_ctor_QPlainTextEdit_Adaptor_1315 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_0);
   decl->set_return_new<QPlainTextEdit_Adaptor> ();
 }
@@ -2584,7 +2621,7 @@ static void _call_ctor_QPlainTextEdit_Adaptor_1315 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
   ret.write<QPlainTextEdit_Adaptor *> (new QPlainTextEdit_Adaptor (arg1));
 }
 
@@ -2595,7 +2632,7 @@ static void _init_ctor_QPlainTextEdit_Adaptor_3232 (qt_gsi::GenericStaticMethod 
 {
   static gsi::ArgSpecBase argspec_0 ("text");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_1);
   decl->set_return_new<QPlainTextEdit_Adaptor> ();
 }
@@ -2605,16 +2642,16 @@ static void _call_ctor_QPlainTextEdit_Adaptor_3232 (const qt_gsi::GenericStaticM
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
   ret.write<QPlainTextEdit_Adaptor *> (new QPlainTextEdit_Adaptor (arg1, arg2));
 }
 
 
-// void QPlainTextEdit::actionEvent(QActionEvent *)
+// void QPlainTextEdit::actionEvent(QActionEvent *event)
 
 static void _init_cbs_actionEvent_1823_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QActionEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2735,11 +2772,11 @@ static void _set_callback_cbs_changeEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
-// void QPlainTextEdit::childEvent(QChildEvent *)
+// void QPlainTextEdit::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2759,11 +2796,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QPlainTextEdit::closeEvent(QCloseEvent *)
+// void QPlainTextEdit::closeEvent(QCloseEvent *event)
 
 static void _init_cbs_closeEvent_1719_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QCloseEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2915,11 +2952,11 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 }
 
 
-// void QPlainTextEdit::customEvent(QEvent *)
+// void QPlainTextEdit::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2965,7 +3002,7 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2974,7 +3011,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QPlainTextEdit_Adaptor *)cls)->emitter_QPlainTextEdit_destroyed_1302 (arg1);
 }
 
@@ -3142,11 +3179,11 @@ static void _set_callback_cbs_dropEvent_1622_0 (void *cls, const gsi::Callback &
 }
 
 
-// void QPlainTextEdit::enterEvent(QEvent *)
+// void QPlainTextEdit::enterEvent(QEvent *event)
 
 static void _init_cbs_enterEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3384,11 +3421,11 @@ static void _set_callback_cbs_heightForWidth_c767_0 (void *cls, const gsi::Callb
 }
 
 
-// void QPlainTextEdit::hideEvent(QHideEvent *)
+// void QPlainTextEdit::hideEvent(QHideEvent *event)
 
 static void _init_cbs_hideEvent_1595_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QHideEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3588,11 +3625,11 @@ static void _set_callback_cbs_keyReleaseEvent_1514_0 (void *cls, const gsi::Call
 }
 
 
-// void QPlainTextEdit::leaveEvent(QEvent *)
+// void QPlainTextEdit::leaveEvent(QEvent *event)
 
 static void _init_cbs_leaveEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3794,11 +3831,11 @@ static void _set_callback_cbs_mouseReleaseEvent_1738_0 (void *cls, const gsi::Ca
 }
 
 
-// void QPlainTextEdit::moveEvent(QMoveEvent *)
+// void QPlainTextEdit::moveEvent(QMoveEvent *event)
 
 static void _init_cbs_moveEvent_1624_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMoveEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -4217,11 +4254,11 @@ static void _set_callback_cbs_sizeHint_c0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QPlainTextEdit::tabletEvent(QTabletEvent *)
+// void QPlainTextEdit::tabletEvent(QTabletEvent *event)
 
 static void _init_cbs_tabletEvent_1821_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTabletEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -4495,7 +4532,7 @@ static gsi::Methods methods_QPlainTextEdit_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPlainTextEdit::QPlainTextEdit(QWidget *parent)\nThis method creates an object of class QPlainTextEdit.", &_init_ctor_QPlainTextEdit_Adaptor_1315, &_call_ctor_QPlainTextEdit_Adaptor_1315);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPlainTextEdit::QPlainTextEdit(const QString &text, QWidget *parent)\nThis method creates an object of class QPlainTextEdit.", &_init_ctor_QPlainTextEdit_Adaptor_3232, &_call_ctor_QPlainTextEdit_Adaptor_3232);
-  methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QPlainTextEdit::actionEvent(QActionEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
+  methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QPlainTextEdit::actionEvent(QActionEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("*actionEvent", "@hide", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0, &_set_callback_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("*blockBoundingGeometry", "@brief Method QRectF QPlainTextEdit::blockBoundingGeometry(const QTextBlock &block)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_blockBoundingGeometry_c2306, &_call_fp_blockBoundingGeometry_c2306);
   methods += new qt_gsi::GenericMethod ("*blockBoundingRect", "@brief Method QRectF QPlainTextEdit::blockBoundingRect(const QTextBlock &block)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_blockBoundingRect_c2306, &_call_fp_blockBoundingRect_c2306);
@@ -4504,22 +4541,22 @@ static gsi::Methods methods_QPlainTextEdit_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*canInsertFromMimeData", "@hide", true, &_init_cbs_canInsertFromMimeData_c2168_0, &_call_cbs_canInsertFromMimeData_c2168_0, &_set_callback_cbs_canInsertFromMimeData_c2168_0);
   methods += new qt_gsi::GenericMethod ("*changeEvent", "@brief Virtual method void QPlainTextEdit::changeEvent(QEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*changeEvent", "@hide", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0, &_set_callback_cbs_changeEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QPlainTextEdit::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QPlainTextEdit::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*closeEvent", "@brief Virtual method void QPlainTextEdit::closeEvent(QCloseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0);
+  methods += new qt_gsi::GenericMethod ("*closeEvent", "@brief Virtual method void QPlainTextEdit::closeEvent(QCloseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0);
   methods += new qt_gsi::GenericMethod ("*closeEvent", "@hide", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0, &_set_callback_cbs_closeEvent_1719_0);
   methods += new qt_gsi::GenericMethod ("*contentOffset", "@brief Method QPointF QPlainTextEdit::contentOffset()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_contentOffset_c0, &_call_fp_contentOffset_c0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QPlainTextEdit::contextMenuEvent(QContextMenuEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0, &_set_callback_cbs_contextMenuEvent_2363_0);
   methods += new qt_gsi::GenericMethod ("emit_copyAvailable", "@brief Emitter for signal void QPlainTextEdit::copyAvailable(bool b)\nCall this method to emit this signal.", false, &_init_emitter_copyAvailable_864, &_call_emitter_copyAvailable_864);
-  methods += new qt_gsi::GenericMethod ("*qt_create", "@brief Method void QPlainTextEdit::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
+  methods += new qt_gsi::GenericMethod ("*create|qt_create", "@brief Method void QPlainTextEdit::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
   methods += new qt_gsi::GenericMethod ("*createMimeDataFromSelection", "@brief Virtual method QMimeData *QPlainTextEdit::createMimeDataFromSelection()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_createMimeDataFromSelection_c0_0, &_call_cbs_createMimeDataFromSelection_c0_0);
   methods += new qt_gsi::GenericMethod ("*createMimeDataFromSelection", "@hide", true, &_init_cbs_createMimeDataFromSelection_c0_0, &_call_cbs_createMimeDataFromSelection_c0_0, &_set_callback_cbs_createMimeDataFromSelection_c0_0);
   methods += new qt_gsi::GenericMethod ("emit_cursorPositionChanged", "@brief Emitter for signal void QPlainTextEdit::cursorPositionChanged()\nCall this method to emit this signal.", false, &_init_emitter_cursorPositionChanged_0, &_call_emitter_cursorPositionChanged_0);
   methods += new qt_gsi::GenericMethod ("emit_customContextMenuRequested", "@brief Emitter for signal void QPlainTextEdit::customContextMenuRequested(const QPoint &pos)\nCall this method to emit this signal.", false, &_init_emitter_customContextMenuRequested_1916, &_call_emitter_customContextMenuRequested_1916);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QPlainTextEdit::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QPlainTextEdit::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*qt_destroy", "@brief Method void QPlainTextEdit::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
+  methods += new qt_gsi::GenericMethod ("*destroy|qt_destroy", "@brief Method void QPlainTextEdit::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QPlainTextEdit::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QPlainTextEdit::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
@@ -4534,7 +4571,7 @@ static gsi::Methods methods_QPlainTextEdit_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*drawFrame", "@brief Method void QPlainTextEdit::drawFrame(QPainter *)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_drawFrame_1426, &_call_fp_drawFrame_1426);
   methods += new qt_gsi::GenericMethod ("*dropEvent", "@brief Virtual method void QPlainTextEdit::dropEvent(QDropEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0);
   methods += new qt_gsi::GenericMethod ("*dropEvent", "@hide", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0, &_set_callback_cbs_dropEvent_1622_0);
-  methods += new qt_gsi::GenericMethod ("*enterEvent", "@brief Virtual method void QPlainTextEdit::enterEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*enterEvent", "@brief Virtual method void QPlainTextEdit::enterEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*enterEvent", "@hide", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0, &_set_callback_cbs_enterEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QPlainTextEdit::event(QEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
@@ -4554,7 +4591,7 @@ static gsi::Methods methods_QPlainTextEdit_Adaptor () {
   methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@hide", true, &_init_cbs_hasHeightForWidth_c0_0, &_call_cbs_hasHeightForWidth_c0_0, &_set_callback_cbs_hasHeightForWidth_c0_0);
   methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Virtual method int QPlainTextEdit::heightForWidth(int)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_heightForWidth_c767_0, &_call_cbs_heightForWidth_c767_0);
   methods += new qt_gsi::GenericMethod ("heightForWidth", "@hide", true, &_init_cbs_heightForWidth_c767_0, &_call_cbs_heightForWidth_c767_0, &_set_callback_cbs_heightForWidth_c767_0);
-  methods += new qt_gsi::GenericMethod ("*hideEvent", "@brief Virtual method void QPlainTextEdit::hideEvent(QHideEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_hideEvent_1595_0, &_call_cbs_hideEvent_1595_0);
+  methods += new qt_gsi::GenericMethod ("*hideEvent", "@brief Virtual method void QPlainTextEdit::hideEvent(QHideEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_hideEvent_1595_0, &_call_cbs_hideEvent_1595_0);
   methods += new qt_gsi::GenericMethod ("*hideEvent", "@hide", false, &_init_cbs_hideEvent_1595_0, &_call_cbs_hideEvent_1595_0, &_set_callback_cbs_hideEvent_1595_0);
   methods += new qt_gsi::GenericMethod ("*initPainter", "@brief Virtual method void QPlainTextEdit::initPainter(QPainter *painter)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0);
   methods += new qt_gsi::GenericMethod ("*initPainter", "@hide", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0, &_set_callback_cbs_initPainter_c1426_0);
@@ -4570,7 +4607,7 @@ static gsi::Methods methods_QPlainTextEdit_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*keyPressEvent", "@hide", false, &_init_cbs_keyPressEvent_1514_0, &_call_cbs_keyPressEvent_1514_0, &_set_callback_cbs_keyPressEvent_1514_0);
   methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@brief Virtual method void QPlainTextEdit::keyReleaseEvent(QKeyEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0);
   methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@hide", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0, &_set_callback_cbs_keyReleaseEvent_1514_0);
-  methods += new qt_gsi::GenericMethod ("*leaveEvent", "@brief Virtual method void QPlainTextEdit::leaveEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*leaveEvent", "@brief Virtual method void QPlainTextEdit::leaveEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*leaveEvent", "@hide", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0, &_set_callback_cbs_leaveEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("loadResource", "@brief Virtual method QVariant QPlainTextEdit::loadResource(int type, const QUrl &name)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_loadResource_2360_0, &_call_cbs_loadResource_2360_0);
   methods += new qt_gsi::GenericMethod ("loadResource", "@hide", false, &_init_cbs_loadResource_2360_0, &_call_cbs_loadResource_2360_0, &_set_callback_cbs_loadResource_2360_0);
@@ -4587,7 +4624,7 @@ static gsi::Methods methods_QPlainTextEdit_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*mousePressEvent", "@hide", false, &_init_cbs_mousePressEvent_1738_0, &_call_cbs_mousePressEvent_1738_0, &_set_callback_cbs_mousePressEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@brief Virtual method void QPlainTextEdit::mouseReleaseEvent(QMouseEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@hide", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0, &_set_callback_cbs_mouseReleaseEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*moveEvent", "@brief Virtual method void QPlainTextEdit::moveEvent(QMoveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0);
+  methods += new qt_gsi::GenericMethod ("*moveEvent", "@brief Virtual method void QPlainTextEdit::moveEvent(QMoveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*moveEvent", "@hide", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0, &_set_callback_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@brief Virtual method bool QPlainTextEdit::nativeEvent(const QByteArray &eventType, void *message, long int *result)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@hide", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0, &_set_callback_cbs_nativeEvent_4678_0);
@@ -4619,7 +4656,7 @@ static gsi::Methods methods_QPlainTextEdit_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*showEvent", "@hide", false, &_init_cbs_showEvent_1634_0, &_call_cbs_showEvent_1634_0, &_set_callback_cbs_showEvent_1634_0);
   methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Virtual method QSize QPlainTextEdit::sizeHint()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0);
   methods += new qt_gsi::GenericMethod ("sizeHint", "@hide", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0, &_set_callback_cbs_sizeHint_c0_0);
-  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QPlainTextEdit::tabletEvent(QTabletEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
+  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QPlainTextEdit::tabletEvent(QTabletEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
   methods += new qt_gsi::GenericMethod ("*tabletEvent", "@hide", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0, &_set_callback_cbs_tabletEvent_1821_0);
   methods += new qt_gsi::GenericMethod ("emit_textChanged", "@brief Emitter for signal void QPlainTextEdit::textChanged()\nCall this method to emit this signal.", false, &_init_emitter_textChanged_0, &_call_emitter_textChanged_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QPlainTextEdit::timerEvent(QTimerEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);

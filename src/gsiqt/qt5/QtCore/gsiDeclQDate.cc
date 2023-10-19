@@ -252,6 +252,32 @@ static void _call_f_getDate_2643 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
+// void QDate::getDate(int *year, int *month, int *day)
+
+
+static void _init_f_getDate_c2643 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("year");
+  decl->add_arg<int * > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("month");
+  decl->add_arg<int * > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("day");
+  decl->add_arg<int * > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_f_getDate_c2643 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int *arg1 = gsi::arg_reader<int * >() (args, heap);
+  int *arg2 = gsi::arg_reader<int * >() (args, heap);
+  int *arg3 = gsi::arg_reader<int * >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QDate *)cls)->getDate (arg1, arg2, arg3);
+}
+
+
 // bool QDate::isNull()
 
 
@@ -494,7 +520,7 @@ static void _call_f_toString_c2025 (const qt_gsi::GenericMethod * /*decl*/, void
 
 static void _init_f_weekNumber_c953 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("yearNum", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("yearNum", true, "nullptr");
   decl->add_arg<int * > (argspec_0);
   decl->set_return<int > ();
 }
@@ -503,7 +529,7 @@ static void _call_f_weekNumber_c953 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  int *arg1 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
+  int *arg1 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
   ret.write<int > ((int)((QDate *)cls)->weekNumber (arg1));
 }
 
@@ -538,12 +564,12 @@ static void _call_f_currentDate_0 (const qt_gsi::GenericStaticMethod * /*decl*/,
 }
 
 
-// static QDate QDate::fromJulianDay(qint64 jd)
+// static QDate QDate::fromJulianDay(qint64 jd_)
 
 
 static void _init_f_fromJulianDay_986 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("jd");
+  static gsi::ArgSpecBase argspec_0 ("jd_");
   decl->add_arg<qint64 > (argspec_0);
   decl->set_return<QDate > ();
 }
@@ -751,6 +777,7 @@ static gsi::Methods methods_QDate () {
   methods += new qt_gsi::GenericMethod ("daysInYear", "@brief Method int QDate::daysInYear()\n", true, &_init_f_daysInYear_c0, &_call_f_daysInYear_c0);
   methods += new qt_gsi::GenericMethod ("daysTo", "@brief Method qint64 QDate::daysTo(const QDate &)\n", true, &_init_f_daysTo_c1776, &_call_f_daysTo_c1776);
   methods += new qt_gsi::GenericMethod ("getDate", "@brief Method void QDate::getDate(int *year, int *month, int *day)\n", false, &_init_f_getDate_2643, &_call_f_getDate_2643);
+  methods += new qt_gsi::GenericMethod ("getDate", "@brief Method void QDate::getDate(int *year, int *month, int *day)\n", true, &_init_f_getDate_c2643, &_call_f_getDate_c2643);
   methods += new qt_gsi::GenericMethod ("isNull?", "@brief Method bool QDate::isNull()\n", true, &_init_f_isNull_c0, &_call_f_isNull_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QDate::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("month", "@brief Method int QDate::month()\n", true, &_init_f_month_c0, &_call_f_month_c0);
@@ -767,7 +794,7 @@ static gsi::Methods methods_QDate () {
   methods += new qt_gsi::GenericMethod ("weekNumber", "@brief Method int QDate::weekNumber(int *yearNum)\n", true, &_init_f_weekNumber_c953, &_call_f_weekNumber_c953);
   methods += new qt_gsi::GenericMethod ("year", "@brief Method int QDate::year()\n", true, &_init_f_year_c0, &_call_f_year_c0);
   methods += new qt_gsi::GenericStaticMethod ("currentDate", "@brief Static method QDate QDate::currentDate()\nThis method is static and can be called without an instance.", &_init_f_currentDate_0, &_call_f_currentDate_0);
-  methods += new qt_gsi::GenericStaticMethod ("fromJulianDay", "@brief Static method QDate QDate::fromJulianDay(qint64 jd)\nThis method is static and can be called without an instance.", &_init_f_fromJulianDay_986, &_call_f_fromJulianDay_986);
+  methods += new qt_gsi::GenericStaticMethod ("fromJulianDay", "@brief Static method QDate QDate::fromJulianDay(qint64 jd_)\nThis method is static and can be called without an instance.", &_init_f_fromJulianDay_986, &_call_f_fromJulianDay_986);
   methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QDate QDate::fromString(const QString &s, Qt::DateFormat f)\nThis method is static and can be called without an instance.", &_init_f_fromString_3665, &_call_f_fromString_3665);
   methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QDate QDate::fromString(const QString &s, const QString &format)\nThis method is static and can be called without an instance.", &_init_f_fromString_3942, &_call_f_fromString_3942);
   methods += new qt_gsi::GenericStaticMethod ("isLeapYear?", "@brief Static method bool QDate::isLeapYear(int year)\nThis method is static and can be called without an instance.", &_init_f_isLeapYear_767, &_call_f_isLeapYear_767);

@@ -907,7 +907,7 @@ QGraphicsSimpleTextItem_Adaptor::~QGraphicsSimpleTextItem_Adaptor() { }
 
 static void _init_ctor_QGraphicsSimpleTextItem_Adaptor_1919 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QGraphicsItem * > (argspec_0);
   decl->set_return_new<QGraphicsSimpleTextItem_Adaptor> ();
 }
@@ -916,7 +916,7 @@ static void _call_ctor_QGraphicsSimpleTextItem_Adaptor_1919 (const qt_gsi::Gener
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
+  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (nullptr, heap);
   ret.write<QGraphicsSimpleTextItem_Adaptor *> (new QGraphicsSimpleTextItem_Adaptor (arg1));
 }
 
@@ -927,7 +927,7 @@ static void _init_ctor_QGraphicsSimpleTextItem_Adaptor_3836 (qt_gsi::GenericStat
 {
   static gsi::ArgSpecBase argspec_0 ("text");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
   decl->add_arg<QGraphicsItem * > (argspec_1);
   decl->set_return_new<QGraphicsSimpleTextItem_Adaptor> ();
 }
@@ -937,7 +937,7 @@ static void _call_ctor_QGraphicsSimpleTextItem_Adaptor_3836 (const qt_gsi::Gener
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  QGraphicsItem *arg2 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
+  QGraphicsItem *arg2 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (nullptr, heap);
   ret.write<QGraphicsSimpleTextItem_Adaptor *> (new QGraphicsSimpleTextItem_Adaptor (arg1, arg2));
 }
 

@@ -1322,9 +1322,12 @@ LEFDEFReaderState::open_layer (db::Layout &layout, const std::string &n, LayerPu
       if (mask > 0) {
         tl::warn << tl::to_string (tr (" Mask ")) << mask << tl::noendl;
       }
+//  not printing via size - too confusing?
+#if 0
       if (via_size != db::DVector ()) {
         tl::warn << tl::to_string (tr (" Via size ")) << via_size.to_string () << tl::noendl;
       }
+#endif
       tl::warn << tl::to_string (tr (" - layer is ignored"));
     }
 

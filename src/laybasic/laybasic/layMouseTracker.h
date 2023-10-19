@@ -25,6 +25,8 @@
 #define HDR_layMouseTracker
 
 #include "layViewObject.h"
+#include "layMarker.h"
+#include "tlObject.h"
 
 class QMouseEvent;
 
@@ -38,10 +40,17 @@ class MouseTracker
 {
 public: 
   MouseTracker (lay::LayoutViewBase *view);
+
   virtual bool mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio);
+  bool leave_event (bool prio);
+  bool configure (const std::string &name, const std::string &value);
 
 private:
   lay::LayoutViewBase *mp_view;
+  tl::shared_collection<lay::DMarker> mp_markers;
+  tl::Color m_cursor_color;
+  int m_cursor_line_style;
+  bool m_cursor_enabled;
 };
 
 }

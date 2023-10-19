@@ -87,6 +87,8 @@ FORCE_LINK_GSI_QTUITOOLS
 #include <QTextCodec>
 
 #include <iostream>
+#include <fstream>
+#include <memory>
 #include <cstdlib>
 
 int klayout_main (int &argc, char **argv);
@@ -202,6 +204,74 @@ void custom_message_handler(QtMsgType type, const char *msg)
 
 static int klayout_main_cont (int &argc, char **argv);
 
+namespace {
+
+class LogFileWriter
+  : public tl::Channel
+{
+public:
+  static std::unique_ptr<std::ofstream> m_os;
+
+  LogFileWriter (int min_verbosity, const std::string &prefix)
+    : m_min_verbosity (min_verbosity), m_prefix (prefix), m_new_line (true)
+  { }
+
+  static bool open (const std::string &path)
+  {
+    m_os.reset (new std::ofstream (path));
+    return m_os->good ();
+  }
+
+  void puts (const char *s)
+  {
+    if (m_os && tl::verbosity () >= m_min_verbosity) {
+      m_os->write (s, strlen (s));
+    }
+  }
+
+  void endl ()
+  {
+    puts ("\n");
+    m_new_line = true;
+  }
+
+  void end ()
+  {
+    if (m_os && tl::verbosity () >= m_min_verbosity) {
+      m_os->flush ();
+    }
+  }
+
+  void begin ()
+  {
+    if (m_new_line) {
+      puts (m_prefix.c_str ());
+      m_new_line = false;
+    }
+  }
+
+  void yield () { }
+
+private:
+  int m_min_verbosity;
+  std::string m_prefix;
+  bool m_new_line;
+};
+
+std::unique_ptr<std::ofstream> LogFileWriter::m_os;
+
+}
+
+static void set_log_file (const std::string &log_file)
+{
+  if (LogFileWriter::open (log_file)) {
+    tl::info.add (new LogFileWriter (0, std::string ()), true);
+    tl::log.add (new LogFileWriter (10, std::string ()), true);
+    tl::warn.add (new LogFileWriter (0, std::string ("Warning: ")), true);
+    tl::error.add (new LogFileWriter (0, std::string ("ERROR: ")), true);
+  }
+}
+
 /**
  *  @brief The basic entry point
  *  Note that by definition, klayout_main receives arguments in UTF-8
@@ -229,7 +299,7 @@ klayout_main (int &argc, char **argv)
   about_text += prg_about_text;
   lay::Version::set_about_text (about_text.c_str ());
 
-  //  Capture the shortcut command line arguments and the verbosity settings
+  //  Capture the shortcut command line arguments, log file and the verbosity settings
   //  for early errors and warnings
 
   for (int i = 1; i < argc; ++i) {
@@ -243,6 +313,10 @@ klayout_main (int &argc, char **argv)
 
       tl::info << lay::ApplicationBase::usage () << tl::noendl;
       return 0;
+
+    } else if (argv [i] == std::string ("-k") && (i + 1) < argc) {
+
+      set_log_file (argv [++i]);
 
     } else if (argv [i] == std::string ("-d") && (i + 1) < argc) {
 

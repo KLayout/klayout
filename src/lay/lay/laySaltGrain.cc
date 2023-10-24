@@ -25,8 +25,11 @@
 #include "tlString.h"
 #include "tlXMLParser.h"
 #include "tlHttpStream.h"
-#include "tlWebDAV.h"
 #include "tlFileUtils.h"
+#include "tlWebDAV.h"
+#if defined(HAVE_GIT2)
+#  include "tlGit.h"
+#endif
 
 #include <memory>
 #include <QDir>
@@ -41,7 +44,7 @@ namespace lay
 static const std::string grain_filename = "grain.xml";
 
 SaltGrain::SaltGrain ()
-  : m_hidden (false)
+  : m_protocol (DefaultProtocol), m_hidden (false)
 {
   //  .. nothing yet ..
 }
@@ -65,7 +68,10 @@ SaltGrain::operator== (const SaltGrain &other) const
          m_license == other.m_license &&
          m_hidden == other.m_hidden &&
          m_authored_time == other.m_authored_time &&
-         m_installed_time == other.m_installed_time;
+         m_installed_time == other.m_installed_time &&
+         m_protocol == other.m_protocol &&
+         m_branch == other.m_branch
+      ;
 }
 
 void
@@ -108,6 +114,18 @@ void
 SaltGrain::set_url (const std::string &u)
 {
   m_url = u;
+}
+
+void
+SaltGrain::set_branch (const std::string &b)
+{
+  m_branch = b;
+}
+
+void
+SaltGrain::set_protocol (const Protocol &p)
+{
+  m_protocol = p;
 }
 
 void
@@ -253,18 +271,10 @@ SaltGrain::compare_versions (const std::string &v1, const std::string &v2)
   }
 }
 
-std::string
-SaltGrain::spec_url (const std::string &url)
+const std::string &
+SaltGrain::spec_file ()
 {
-  std::string res = url;
-  if (! res.empty()) {
-    //  TODO: use system path separator unless this is a URL
-    if (res [res.size () - 1] != '/') {
-      res += "/";
-    }
-    res += grain_filename;
-  }
-  return res;
+  return grain_filename;
 }
 
 bool
@@ -400,6 +410,30 @@ struct ImageConverter
   }
 };
 
+struct ProtocolConverter
+{
+  std::string to_string (const Protocol &protocol) const
+  {
+    if (protocol == lay::WebDAV) {
+      return std::string ("svn");
+    } else if (protocol == lay::Git) {
+      return std::string ("git");
+    } else {
+      return std::string ();
+    }
+  }
+
+  void from_string (const std::string &s, Protocol &res) const
+  {
+    res = lay::DefaultProtocol;
+    if (s == "svn" || s == "SVN" || s == "WebDAV") {
+      res = lay::WebDAV;
+    } else if (s == "git" || s == "Git" || s == "GIT") {
+      res = lay::Git;
+    }
+  }
+};
+
 static tl::XMLElementList *sp_xml_elements = 0;
 
 tl::XMLElementList &
@@ -416,6 +450,8 @@ SaltGrain::xml_elements ()
       tl::make_member (&SaltGrain::doc, &SaltGrain::set_doc, "doc") +
       tl::make_member (&SaltGrain::doc_url, &SaltGrain::set_doc_url, "doc-url") +
       tl::make_member (&SaltGrain::url, &SaltGrain::set_url, "url") +
+      tl::make_member (&SaltGrain::branch, &SaltGrain::set_branch, "branch") +
+      tl::make_member (&SaltGrain::protocol, &SaltGrain::set_protocol, "protocol", ProtocolConverter ()) +
       tl::make_member (&SaltGrain::license, &SaltGrain::set_license, "license") +
       tl::make_member (&SaltGrain::author, &SaltGrain::set_author, "author") +
       tl::make_member (&SaltGrain::author_contact, &SaltGrain::set_author_contact, "author-contact") +
@@ -426,6 +462,8 @@ SaltGrain::xml_elements ()
       tl::make_element (&SaltGrain::begin_dependencies, &SaltGrain::end_dependencies, &SaltGrain::add_dependency, "depends",
         tl::make_member (&SaltGrainDependency::name, "name") +
         tl::make_member (&SaltGrainDependency::url, "url") +
+        tl::make_member (&SaltGrainDependency::protocol, "protocol", ProtocolConverter ()) +
+        tl::make_member (&SaltGrainDependency::branch, "branch") +
         tl::make_member (&SaltGrainDependency::version, "version")
       )
     );
@@ -512,7 +550,7 @@ SaltGrain::from_path (const std::string &path)
 }
 
 tl::InputStream *
-SaltGrain::stream_from_url (std::string &url, double timeout, tl::InputHttpStreamCallback *callback)
+SaltGrain::stream_from_url (std::string &url, Protocol protocol, const std::string &branch, double timeout, tl::InputHttpStreamCallback *callback)
 {
   if (url.empty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("No download link available")));
@@ -533,19 +571,30 @@ SaltGrain::stream_from_url (std::string &url, double timeout, tl::InputHttpStrea
 
   }
 
-  std::string spec_url = SaltGrain::spec_url (url);
-  if (spec_url.find ("http:") == 0 || spec_url.find ("https:") == 0) {
-    return tl::WebDAVObject::download_item (spec_url, timeout, callback);
+  if (url.find ("http:") == 0 || url.find ("https:") == 0) {
+
+    if (protocol == lay::Git) {
+#if defined(HAVE_GIT2)
+      return tl::GitObject::download_item (url, SaltGrain::spec_file (), branch, timeout, callback);
+#else
+      throw tl::Exception (tl::to_string (QObject::tr ("Cannot download from Git - Git support not compiled in")));
+#endif
+    } else {
+      return tl::WebDAVObject::download_item (url + "/" + SaltGrain::spec_file (), timeout, callback);
+    }
+
   } else {
-    return new tl::InputStream (spec_url);
+
+    return new tl::InputStream (url);
+
   }
 }
 
 SaltGrain
-SaltGrain::from_url (const std::string &url_in, double timeout, tl::InputHttpStreamCallback *callback)
+SaltGrain::from_url (const std::string &url_in, Protocol protocol, const std::string &branch, double timeout, tl::InputHttpStreamCallback *callback)
 {
   std::string url = url_in;
-  std::unique_ptr<tl::InputStream> stream (stream_from_url (url, timeout, callback));
+  std::unique_ptr<tl::InputStream> stream (stream_from_url (url, protocol, branch, timeout, callback));
 
   SaltGrain g;
   g.load (*stream);

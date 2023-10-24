@@ -58,7 +58,7 @@ ConfirmationDialog::ConfirmationDialog (QWidget *parent)
 }
 
 void
-ConfirmationDialog::add_info (const std::string &name, bool update, const std::string &version, const std::string &url)
+ConfirmationDialog::add_info (const std::string &name, bool update, const std::string &version, const std::string &url, Protocol protocol, const std::string &branch)
 {
   QTreeWidgetItem *item = new QTreeWidgetItem (list);
   m_items_by_name.insert (std::make_pair (name, item));
@@ -68,7 +68,18 @@ ConfirmationDialog::add_info (const std::string &name, bool update, const std::s
   item->setText (0, tl::to_qstring (name));
   item->setText (1, update ? tr ("UPDATE") : tr ("INSTALL"));
   item->setText (2, tl::to_qstring (version));
-  item->setText (3, tl::to_qstring (url));
+
+  if (protocol == WebDAV) {
+    item->setText (3, tl::to_qstring ("svn@" + url));
+  } else if (protocol == Git) {
+    if (branch.empty ()) {
+      item->setText (3, tl::to_qstring ("git@" + url));
+    } else {
+      item->setText (3, tl::to_qstring ("git@" + url + "[" + branch + "]"));
+    }
+  } else {
+    item->setText (3, tl::to_qstring (url));
+  }
 
   for (int column = 0; column < list->colorCount (); ++column) {
     item->setData (column, Qt::ForegroundRole, QVariant (QBrush (update ? QColor (Qt::blue) : QColor (Qt::black))));
@@ -169,9 +180,9 @@ SaltDownloadManager::SaltDownloadManager ()
 }
 
 void
-SaltDownloadManager::register_download (const std::string &name, const std::string &token, const std::string &url, const std::string &version)
+SaltDownloadManager::register_download (const std::string &name, const std::string &token, const std::string &url, Protocol protocol, const std::string &branch, const std::string &version)
 {
-  m_registry.push_back (Descriptor (name, token, url, version));
+  m_registry.push_back (Descriptor (name, token, url, protocol, branch, version));
 }
 
 void
@@ -244,7 +255,7 @@ SaltDownloadManager::compute_list (const lay::Salt &salt, const lay::Salt &salt_
               if (tl::verbosity() >= 20) {
                 tl::log << "Considering for update as dependency: " << d->name << " (" << d->version << ") with URL " << d->url;
               }
-              m_registry.push_back (Descriptor (d->name, std::string (), d->url, d->version));
+              m_registry.push_back (Descriptor (d->name, std::string (), d->url, d->protocol, d->branch, d->version));
 
             } else {
               if (tl::verbosity() >= 20) {
@@ -257,7 +268,7 @@ SaltDownloadManager::compute_list (const lay::Salt &salt, const lay::Salt &salt_
             if (tl::verbosity() >= 20) {
               tl::log << "Considering for download as dependency: " << d->name << " (" << d->version << ") with URL " << d->url;
             }
-            m_registry.push_back (Descriptor (d->name, std::string (), d->url, d->version));
+            m_registry.push_back (Descriptor (d->name, std::string (), d->url, d->protocol, d->branch, d->version));
 
           }
 
@@ -330,7 +341,7 @@ SaltDownloadManager::fetch_missing (const lay::Salt &salt, const lay::Salt &salt
       }
 
       try {
-        p->grain = SaltGrain::from_url (p->url);
+        p->grain = SaltGrain::from_url (p->url, p->protocol, p->branch);
       } catch (tl::Exception &ex) {
         throw tl::Exception (tl::to_string (QObject::tr ("Error fetching spec file for package '%1': %2").arg (tl::to_qstring (p->name)).arg (tl::to_qstring (ex.msg ()))));
       }
@@ -387,7 +398,7 @@ SaltDownloadManager::make_confirmation_dialog (QWidget *parent, const lay::Salt 
     const lay::SaltGrain *g = salt.grain_by_name (p->name);
     if (g) {
       //  \342\206\222 is UTF-8 "right arrow"
-      dialog->add_info (p->name, true, g->version () + " \342\206\222 " + p->version, p->url);
+      dialog->add_info (p->name, true, g->version () + " \342\206\222 " + p->version, p->url, p->protocol, p->branch);
     }
   }
 
@@ -395,7 +406,7 @@ SaltDownloadManager::make_confirmation_dialog (QWidget *parent, const lay::Salt 
   for (std::vector<Descriptor>::const_iterator p = m_registry.begin (); p != m_registry.end (); ++p) {
     const lay::SaltGrain *g = salt.grain_by_name (p->name);
     if (!g) {
-      dialog->add_info (p->name, false, p->version, p->url);
+      dialog->add_info (p->name, false, p->version, p->url, p->protocol, p->branch);
     }
   }
 

@@ -203,11 +203,40 @@ SaltController::install_packages (const std::vector<std::string> &packages, bool
     }
 
     if (n.find ("http:") == 0 || n.find ("https:") == 0 || n.find ("file:") == 0 || n[0] == '/' || n[0] == '\\') {
+
       //  its a URL
-      manager.register_download (std::string (), std::string (), n, v);
+      manager.register_download (std::string (), std::string (), n, DefaultProtocol, std::string (), v);
+
+    } else if (n.find ("git@") == 0) {
+
+      //  git protocol:
+      //    "git@<url>"
+      //    "git@<url>[<branch>]"
+
+      std::string url (n, 4);
+      size_t br = url.find ("[");
+      std::string branch;
+      if (br != std::string::npos && url.back () == ']') {
+        branch = std::string (url, br + 1, url.size () - br - 2);
+        url = std::string (url, 0, br);
+      }
+
+      manager.register_download (std::string (), std::string (), url, Git, branch, v);
+
+    } else if (n.find ("svn@") == 0) {
+
+      //  svn protocol:
+      //    "svn@<url>"
+
+      std::string url (n, 4);
+      //  its a URL
+      manager.register_download (std::string (), std::string (), url, WebDAV, std::string (), v);
+
     } else {
+
       //  its a plain name
-      manager.register_download (n, std::string (), std::string (), v);
+      manager.register_download (n, std::string (), std::string (), DefaultProtocol, std::string (), v);
+
     }
 
   }

@@ -39,6 +39,7 @@ HAVE_QT=1
 HAVE_PNG=0
 HAVE_CURL=0
 HAVE_EXPAT=0
+HAVE_GIT2=1
 
 RUBYINCLUDE=""
 RUBYINCLUDE2=""
@@ -208,6 +209,9 @@ while [ "$*" != "" ]; do
     ;;
   -libexpat)
     HAVE_EXPAT=1
+    ;;
+  -nolibgit2)
+    HAVE_GIT2=0
     ;;
   -qt5)
     echo "*** WARNING: -qt5 option is ignored - Qt version is auto-detected now."
@@ -495,6 +499,9 @@ fi
 if [ $HAVE_PNG != 0 ]; then
   echo "    Uses libpng for PNG generation"
 fi
+if [ $HAVE_GIT2 != 0 ]; then
+  echo "    Uses libgit2 for Git access"
+fi
 if [ "$RPATH" = "" ]; then
   RPATH="$BIN"
 fi
@@ -578,6 +585,7 @@ echo "      HAVE_64BIT_COORD=$HAVE_64BIT_COORD"
 echo "      HAVE_CURL=$HAVE_CURL"
 echo "      HAVE_PNG=$HAVE_PNG"
 echo "      HAVE_EXPAT=$HAVE_EXPAT"
+echo "      HAVE_GIT2=$HAVE_GIT2"
 echo "      RPATH=$RPATH"
 
 mkdir -p $BUILD
@@ -650,6 +658,7 @@ qmake_options=(
   HAVE_CURL="$HAVE_CURL"
   HAVE_EXPAT="$HAVE_EXPAT"
   HAVE_PNG="$HAVE_PNG"
+  HAVE_GIT2="$HAVE_GIT2"
   PREFIX="$BIN"
   RPATH="$RPATH"
   KLAYOUT_VERSION="$KLAYOUT_VERSION"

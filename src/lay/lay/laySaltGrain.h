@@ -40,6 +40,15 @@ namespace lay
 {
 
 /**
+ *  @brief An enum describing the protocol to use for download
+ */
+enum Protocol {
+  DefaultProtocol = 0,
+  WebDAV = 1,
+  Git = 2
+};
+
+/**
  *  @brief A descriptor for one dependency
  *  A dependency can be specified either through a name (see name property)
  *  or a download URL. If download URL are specified, they have precedence
@@ -49,8 +58,14 @@ namespace lay
  */
 struct SaltGrainDependency
 {
+  SaltGrainDependency ()
+    : protocol (DefaultProtocol)
+  { }
+
   std::string name;
   std::string url;
+  Protocol protocol;
+  std::string branch;
   std::string version;
 
   bool operator== (const SaltGrainDependency &other) const
@@ -342,6 +357,32 @@ public:
   void set_url (const std::string &u);
 
   /**
+   *  @brief Gets the download protocol
+   */
+  const Protocol &protocol () const
+  {
+    return m_protocol;
+  }
+
+  /**
+   *  @brief Sets the download protocol
+   */
+  void set_protocol (const Protocol &p);
+
+  /**
+   *  @brief Gets the Git branch
+   */
+  const std::string &branch () const
+  {
+    return m_branch;
+  }
+
+  /**
+   *  @brief Sets the Git branch
+   */
+  void set_branch (const std::string &b);
+
+  /**
    *  @brief Gets a value indicating whether the grain is hidden
    *  A grain can be hidden (in Salt.Mine) if it's a pure dependency package
    *  which is only there because others need it. Such packages are listed
@@ -466,21 +507,23 @@ public:
    *  This method will return a grain constructed from the downloaded data.
    *  The data is read from "URL/grain.xml". This method will throw an
    *  exception if an error occurs during reading.
+   *  protocol is the protocol to use and branch the Git branch.
    */
-  static SaltGrain from_url (const std::string &url, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);
+  static SaltGrain from_url (const std::string &url, Protocol protocol, const std::string &branch, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);
 
   /**
    *  @brief Returns a stream prepared for downloading the grain
    *  The stream is a new'd object and needs to be deleted by the caller.
    *  "url" is the download URL on input and gets modified to match the
    *  actual URL if it is a relative one.
+   *  protocol is the protocol to use and branch the Git branch.
    */
-  static tl::InputStream *stream_from_url (std::string &url, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);
+  static tl::InputStream *stream_from_url (std::string &url, Protocol protocol, const std::string &branch, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);
 
   /**
-   *  @brief Forms the spec file download URL from a given download URL
+   *  @brief Gets the name of the spec file ("grain.xml")
    */
-  static std::string spec_url (const std::string &url);
+  static const std::string &spec_file ();
 
   /**
    *  @brief Returns a value indicating whether the given path represents is a grain
@@ -499,6 +542,8 @@ private:
   std::string m_author;
   std::string m_author_contact;
   std::string m_license;
+  Protocol m_protocol;
+  std::string m_branch;
   bool m_hidden;
   QDateTime m_authored_time, m_installed_time;
   QImage m_icon, m_screenshot;

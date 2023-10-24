@@ -586,7 +586,7 @@ SaltGrainPropertiesDialog::accept ()
     if (!d->url.empty ()) {
       SaltGrain gdep;
       try {
-        gdep = SaltGrain::from_url (d->url);
+        gdep = SaltGrain::from_url (d->url, d->protocol, d->branch);
         if (gdep.name () != d->name) {
           dependencies_alert->error () << tr ("Package name obtained from download URL is not the expected name.") << tl::endl
                                        << tr ("Downloaded name: ") << gdep.name () << tl::endl

@@ -35,6 +35,7 @@
 #include "pya.h"
 
 #include <QTextDocument>
+#include <QApplication>
 #include <QPainter>
 #include <QDir>
 #include <QTextStream>
@@ -682,7 +683,7 @@ BEGIN_PROTECTED
       SaltGrain *g = model->grain_from_index (index);
       //  NOTE: checking for valid_name prevents bad entries inside the download list
       if (g && model->is_marked (g->name ()) && SaltGrain::valid_name (g->name ())) {
-        manager.register_download (g->name (), g->token (), g->url (), g->version ());
+        manager.register_download (g->name (), g->token (), g->url (), g->protocol (), g->branch (), g->version ());
         any = true;
       }
     }
@@ -1133,6 +1134,24 @@ BEGIN_PROTECTED
 END_PROTECTED
 }
 
+namespace
+{
+
+/**
+ * @brief A callback to keep the UI alive (mainly used for Git grain retrieval)
+ */
+class ProcessEventCallback
+  : public tl::InputHttpStreamCallback
+{
+public:
+  virtual void wait_for_input ()
+  {
+    QApplication::processEvents (QEventLoop::ExcludeUserInputEvents);
+  }
+};
+
+}
+
 void
 SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTextWidget *details)
 {
@@ -1166,16 +1185,22 @@ SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTex
         "</body>"
       "</html>"
     )
-    .arg (tl::to_qstring (SaltGrain::spec_url (g->url ())));
+    .arg (tl::to_qstring (g->url ()));
 
     details->setHtml (html);
 
     std::string url = g->url ();
+    Protocol protocol = g->protocol ();
+    std::string branch = g->branch ();
+
     m_downloaded_grain.reset (new SaltGrain ());
     m_downloaded_grain->set_url (url);
+    m_downloaded_grain->set_protocol (protocol);
+    m_downloaded_grain->set_branch (branch);
 
     //  NOTE: stream_from_url may modify the URL, hence we set it again
-    m_downloaded_grain_reader.reset (SaltGrain::stream_from_url (url));
+    ProcessEventCallback callback;
+    m_downloaded_grain_reader.reset (SaltGrain::stream_from_url (url, protocol, branch, 60.0, &callback));
     m_downloaded_grain->set_url (url);
 
     tl::InputHttpStream *http = dynamic_cast<tl::InputHttpStream *> (m_downloaded_grain_reader->base ());

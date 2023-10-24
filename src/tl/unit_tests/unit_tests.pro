@@ -20,6 +20,7 @@ SOURCES = \
   tlExpressionTests.cc \
   tlFileSystemWatcherTests.cc \
   tlFileUtilsTests.cc \
+  tlGitTests.cc \
   tlHttpStreamTests.cc \
   tlIncludeTests.cc \
   tlInt128SupportTests.cc \

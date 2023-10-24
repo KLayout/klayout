@@ -53,7 +53,7 @@ Q_OBJECT
 public:
   ConfirmationDialog (QWidget *parent);
 
-  void add_info (const std::string &name, bool update, const std::string &version, const std::string &url);
+  void add_info (const std::string &name, bool update, const std::string &version, const std::string &url, Protocol protocol, const std::string &branch);
 
   bool is_confirmed () const  { return m_confirmed; }
   bool is_cancelled () const  { return m_cancelled; }
@@ -108,7 +108,7 @@ public:
    *
    *  The target directory can be empty. In this case, the downloader will pick an appropriate one.
    */
-  void register_download (const std::string &name, const std::string &token, const std::string &url, const std::string &version);
+  void register_download (const std::string &name, const std::string &token, const std::string &url, Protocol protocol, const std::string &branch, const std::string &version);
 
   /**
    *  @brief Computes the dependencies after all required packages have been registered
@@ -145,8 +145,8 @@ public:
 private:
   struct Descriptor
   {
-    Descriptor (const std::string &_name, const std::string &_token, const std::string &_url, const std::string &_version)
-      : name (_name), token (_token), url (_url), version (_version), downloaded (false)
+    Descriptor (const std::string &_name, const std::string &_token, const std::string &_url, Protocol _protocol, const std::string &_branch, const std::string &_version)
+      : name (_name), token (_token), url (_url), protocol (_protocol), branch (_branch), version (_version), downloaded (false)
     { }
 
     bool operator< (const Descriptor &other) const
@@ -170,6 +170,8 @@ private:
     std::string name;
     std::string token;
     std::string url;
+    Protocol protocol;
+    std::string branch;
     std::string version;
     bool downloaded;
     lay::SaltGrain grain;

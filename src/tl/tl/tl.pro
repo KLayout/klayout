@@ -121,7 +121,17 @@ HEADERS = \
     tlUniqueName.h \
     tlRecipe.h \
     tlSelect.h \
-    tlEnv.h
+    tlEnv.h 
+
+equals(HAVE_GIT2, "1") {
+
+  HEADERS += \
+    tlGit.h
+
+  SOURCES += \
+    tlGit.cc
+
+}
 
 equals(HAVE_CURL, "1") {
 

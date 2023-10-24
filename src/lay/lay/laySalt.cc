@@ -21,11 +21,16 @@
 */
 
 #include "laySalt.h"
+
 #include "tlString.h"
 #include "tlFileUtils.h"
 #include "tlLog.h"
 #include "tlInternational.h"
 #include "tlWebDAV.h"
+#if defined(HAVE_GIT2)
+#  include "tlGit.h"
+#endif
+
 #include "lymMacro.h"
 
 #include <QFileInfo>
@@ -485,9 +490,23 @@ Salt::create_grain (const SaltGrain &templ, SaltGrain &target, double timeout, t
 
     if (templ.url ().find ("http:") == 0 || templ.url ().find ("https:") == 0) {
 
-      //  otherwise download from the URL
-      tl::info << QObject::tr ("Downloading package from '%1' to '%2' ..").arg (tl::to_qstring (templ.url ())).arg (tl::to_qstring (target.path ()));
-      res = tl::WebDAVObject::download (templ.url (), target.path (), timeout, callback);
+      //  otherwise download from the URL using Git or SVN
+
+      if (templ.protocol () == Git) {
+
+#if defined(HAVE_GIT2)
+        tl::info << QObject::tr ("Downloading package from '%1' to '%2' using Git protocol ..").arg (tl::to_qstring (templ.url ())).arg (tl::to_qstring (target.path ()));
+        res = tl::GitObject::download (templ.url (), target.path (), templ.branch (), timeout, callback);
+#else
+        throw tl::Exception (tl::to_string (QObject::tr ("Unable to install package '%1' - git protocol not compiled in").arg (tl::to_qstring (target.name ()))));
+#endif
+
+      } else if (templ.protocol () == WebDAV || templ.protocol () == DefaultProtocol) {
+
+        tl::info << QObject::tr ("Downloading package from '%1' to '%2' using SVN/WebDAV protocol ..").arg (tl::to_qstring (templ.url ())).arg (tl::to_qstring (target.path ()));
+        res = tl::WebDAVObject::download (templ.url (), target.path (), timeout, callback);
+
+      }
 
     } else {
 

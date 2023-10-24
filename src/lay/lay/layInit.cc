@@ -152,7 +152,7 @@ void init (const std::vector<std::string> &_paths)
         try {
           s_plugins.push_back (do_load_plugin (imp));
           modules.insert (*im);
-        } catch (tl::Exception (&ex)) {
+        } catch (tl::Exception &ex) {
           tl::error << ex.msg ();
         }
       }

@@ -99,7 +99,11 @@ GitObject::~GitObject ()
 }
 
 static int
+#if LIBGIT2_VER_MAJOR >= 1
 fetch_progress (const git_indexer_progress *stats, void *payload)
+#else
+fetch_progress (const git_transfer_progress *stats, void *payload)
+#endif
 {
   tl::RelativeProgress *progress = reinterpret_cast<tl::RelativeProgress *> (payload);
 

@@ -19,16 +19,16 @@ fi
 # TODO: derive this list automatically?
 case $target in
 ubuntu16)
-  depends="libqt4-designer (>= 4.8.6), libqt4-xml (>= 4.8.6), libqt4-sql (>= 4.8.6), libqt4-network (>= 4.8.6), libqtcore4 (>= 4.8.6), libqtgui4 (>= 4.8.6), zlib1g (>= 1.2.8), libruby2.3 (>= 2.3.1), python3 (>= 3.5.1), libpython3.5 (>= 3.5.1), libstdc++6 (>= 4.6.3), libc6 (>= 2.15)"
+  depends="libqt4-designer (>= 4.8.6), libqt4-xml (>= 4.8.6), libqt4-sql (>= 4.8.6), libqt4-network (>= 4.8.6), libqtcore4 (>= 4.8.6), libqtgui4 (>= 4.8.6), zlib1g (>= 1.2.8), libgit2-24 (>= 0.24.0), libruby2.3 (>= 2.3.1), python3 (>= 3.5.1), libpython3.5 (>= 3.5.1), libstdc++6 (>= 4.6.3), libc6 (>= 2.15)"
   ;;
 ubuntu18)
-  depends="libqt4-designer (>= 4.8.7), libqt4-xml (>= 4.8.7), libqt4-sql (>= 4.8.7), libqt4-network (>= 4.8.7), libqtcore4 (>= 4.8.7), libqtgui4 (>= 4.8.7), zlib1g (>= 1.2.11), libruby2.5 (>= 2.5.1), python3 (>= 3.6.5), libpython3.6 (>= 3.6.5), libstdc++6 (>= 8), libc6 (>= 2.27)"
+  depends="libqt4-designer (>= 4.8.7), libqt4-xml (>= 4.8.7), libqt4-sql (>= 4.8.7), libqt4-network (>= 4.8.7), libqtcore4 (>= 4.8.7), libqtgui4 (>= 4.8.7), zlib1g (>= 1.2.11), libgit2-26 (>= 0.26.0), libruby2.5 (>= 2.5.1), python3 (>= 3.6.5), libpython3.6 (>= 3.6.5), libstdc++6 (>= 8), libc6 (>= 2.27)"
   ;;
 ubuntu20)
-  depends="libqt5core5a (>= 5.12.8), libqt5designer5 (>= 5.12.8), libqt5gui5 (>= 5.12.8), libqt5multimedia5 (>= 5.12.8), libqt5multimediawidgets5 (>= 5.12.8), libqt5network5 (>= 5.12.8), libqt5opengl5 (>= 5.12.8), libqt5printsupport5 (>= 5.12.8), libqt5sql5 (>= 5.12.8), libqt5svg5 (>= 5.12.8), libqt5widgets5 (>= 5.12.8), libqt5xml5 (>= 5.12.8), libqt5xmlpatterns5 (>= 5.12.8), zlib1g (>= 1.2.11), libruby2.7 (>= 2.7.0), python3 (>= 3.8.2), libpython3.8 (>= 3.8.2), libstdc++6 (>=10), libc6 (>= 2.31)" 
+  depends="libqt5core5a (>= 5.12.8), libqt5designer5 (>= 5.12.8), libqt5gui5 (>= 5.12.8), libqt5multimedia5 (>= 5.12.8), libqt5multimediawidgets5 (>= 5.12.8), libqt5network5 (>= 5.12.8), libqt5opengl5 (>= 5.12.8), libqt5printsupport5 (>= 5.12.8), libqt5sql5 (>= 5.12.8), libqt5svg5 (>= 5.12.8), libqt5widgets5 (>= 5.12.8), libqt5xml5 (>= 5.12.8), libqt5xmlpatterns5 (>= 5.12.8), zlib1g (>= 1.2.11), libgit2-28 (>= 0.28.4), libruby2.7 (>= 2.7.0), python3 (>= 3.8.2), libpython3.8 (>= 3.8.2), libstdc++6 (>=10), libc6 (>= 2.31)" 
   ;;
 ubuntu22)
-  depends="libqt5core5a (>= 5.15.3), libqt5designer5 (>= 5.15.3), libqt5gui5 (>= 5.15.3), libqt5multimedia5 (>= 5.15.3), libqt5multimediawidgets5 (>= 5.15.3), libqt5network5 (>= 5.15.3), libqt5opengl5 (>= 5.15.3), libqt5printsupport5 (>= 5.15.3), libqt5sql5 (>= 5.15.3), libqt5svg5 (>= 5.15.3), libqt5widgets5 (>= 5.15.3), libqt5xml5 (>= 5.15.3), libqt5xmlpatterns5 (>= 5.15.3), zlib1g (>= 1.2.11), libruby3.0 (>= 3.0.2), python3 (>= 3.10.4), libpython3.10 (>= 3.10.4), libstdc++6 (>=12), libc6 (>= 2.35)" 
+  depends="libqt5core5a (>= 5.15.3), libqt5designer5 (>= 5.15.3), libqt5gui5 (>= 5.15.3), libqt5multimedia5 (>= 5.15.3), libqt5multimediawidgets5 (>= 5.15.3), libqt5network5 (>= 5.15.3), libqt5opengl5 (>= 5.15.3), libqt5printsupport5 (>= 5.15.3), libqt5sql5 (>= 5.15.3), libqt5svg5 (>= 5.15.3), libqt5widgets5 (>= 5.15.3), libqt5xml5 (>= 5.15.3), libqt5xmlpatterns5 (>= 5.15.3), zlib1g (>= 1.2.11), libgit2-1.1 (>= 1.1.0), libruby3.0 (>= 3.0.2), python3 (>= 3.10.4), libpython3.10 (>= 3.10.4), libstdc++6 (>=12), libc6 (>= 2.35)" 
   ;;
 *)
   echo "Unknown target '$target' (given as first argument)"

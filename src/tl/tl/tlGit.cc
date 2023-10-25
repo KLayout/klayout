@@ -122,8 +122,28 @@ checkout_progress(const char * /*path*/, size_t cur, size_t tot, void *payload)
 
 
 void
-GitObject::read (const std::string &url, const std::string &filter, const std::string &branch, double timeout, tl::InputHttpStreamCallback *callback)
+GitObject::read (const std::string &org_url, const std::string &org_filter, const std::string &branch, double timeout, tl::InputHttpStreamCallback *callback)
 {
+  std::string url = org_url;
+  std::string filter = org_filter;
+
+  std::string subdir;
+
+  std::string url_terminator (".git/");
+  size_t url_end = url.find (url_terminator);
+  if (url_end != std::string::npos) {
+
+    subdir = std::string (url, url_end + url_terminator.size ());
+
+    url = std::string (url, 0, url_end + url_terminator.size () - 1);
+    if (filter.empty ()) {
+      filter = subdir + "/**";
+    } else {
+      filter = subdir + "/" + filter;
+    }
+
+  }
+
   //  @@@ use callback, timeout?
   tl::RelativeProgress progress (tl::to_string (tr ("Download progress")), 10000, 1 /*yield always*/);
 
@@ -136,8 +156,10 @@ GitObject::read (const std::string &url, const std::string &filter, const std::s
     checkout_opts.paths.strings = (char **) &paths_cstr;
   }
 
+  /*
   checkout_opts.checkout_strategy = GIT_CHECKOUT_FORCE |
                                     GIT_CHECKOUT_DISABLE_PATHSPEC_MATCH;
+  @@@*/
   checkout_opts.progress_cb = &checkout_progress;
   checkout_opts.progress_payload = (void *) &progress;
 
@@ -161,13 +183,44 @@ GitObject::read (const std::string &url, const std::string &filter, const std::s
   int error = git_clone (&cloned_repo, url.c_str (), m_local_path.c_str (), &clone_opts);
   if (error != 0) {
     const git_error *err = git_error_last ();
-    throw tl::Exception (tl::to_string (tr ("Error cloning Git repo (%d): %s")), err->klass, (const char *) err->message);
+    throw tl::Exception (tl::to_string (tr ("Error cloning Git repo: %s")), (const char *) err->message);
   }
 
-  if (cloned_repo) {
-    git_repository_free (cloned_repo);
-    //  remove the worktree we don't need
-    tl::rm_dir_recursive (tl::combine_path (m_local_path, ".git"));
+  if (! cloned_repo) {
+    throw tl::Exception (tl::to_string (tr ("Error cloning Git repo - no data available")));
+  }
+
+  git_repository_free (cloned_repo);
+
+  //  remove the worktree as we don't need it
+  tl::rm_dir_recursive (tl::combine_path (m_local_path, ".git"));
+
+  //  pull subfolder files to target path level
+  if (! subdir.empty ()) {
+
+    std::string pp = tl::combine_path (m_local_path, subdir);
+    if (! tl::is_dir (pp)) {
+      throw tl::Exception (tl::to_string (tr ("Error cloning Git repo - failed to fetch subdirectory: ")) + pp);
+    }
+
+    //  rename the source to a temporary folder so we don't overwrite the source folder with something from within
+    std::string tmp_dir = "__temp__";
+    for (unsigned int i = 0; ; ++i) {
+      if (! tl::file_exists (tl::combine_path (m_local_path, tmp_dir + tl::to_string (i)))) {
+        tmp_dir += tl::to_string (i);
+        break;
+      }
+    }
+    auto pc = tl::split (subdir, "/");
+    if (! tl::rename_file (tl::combine_path (m_local_path, pc.front ()), tmp_dir)) {
+      throw tl::Exception (tl::to_string (tr ("Error cloning Git repo - failed to rename temp folder")));
+    }
+    pc.front () = tmp_dir;
+
+    if (! tl::mv_dir_recursive (tl::combine_path (m_local_path, tl::join (pc, "/")), m_local_path)) {
+      throw tl::Exception (tl::to_string (tr ("Error cloning Git repo - failed to move subdir components")));
+    }
+
   }
 }
 

@@ -24,35 +24,113 @@
 
 #include "tlGit.h"
 #include "tlUnitTest.h"
+#include "tlFileUtils.h"
 
-// @@@
-static std::string test_url ("https://github.com/klayoutmatthias/xsection.git");
+static std::string test_url ("https://github.com/klayout/klayout_git_test.git");
 
-TEST(1)
+TEST(1_plain)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
   repo.read (test_url, std::string (), std::string ());
 
-  printf("@@@ done: %s\n", path.c_str ());
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "LICENSE")), true);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".gitignore")), true);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".git")), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "src/grain.xml")), true);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "src/macros/xsection.lym")), true);
 }
 
-TEST(2)
+TEST(2_pathspecs)
+{
+  std::string path = tl::TestBase::tmp_file ("repo");
+  tl::GitObject repo (path);
+  repo.read (test_url, std::string ("src/**"), std::string ());
+
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "LICENSE")), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".gitignore")), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".git")), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "src/grain.xml")), true);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "src/macros/xsection.lym")), true);
+}
+
+TEST(3_subdir)
+{
+  std::string path = tl::TestBase::tmp_file ("repo");
+  tl::GitObject repo (path);
+  repo.read (test_url + "/src", std::string (), std::string ());
+
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".git")), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "grain.xml")), true);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "macros/xsection.lym")), true);
+}
+
+TEST(4_single_file)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
   repo.read (test_url, std::string ("LICENSE"), std::string ());
 
-  printf("@@@ done: %s\n", path.c_str ());
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "LICENSE")), true);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".gitignore")), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".git")), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "src")), false);
 }
 
-TEST(3)
+TEST(5_single_file_from_subdir)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
-  repo.read (test_url, std::string (), std::string ("brxxx"));
+  repo.read (test_url + "/src", std::string ("grain.xml"), std::string ());
 
-  printf("@@@ done: %s\n", path.c_str ());
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".git")), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "grain.xml")), true);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "macros")), false);
+
+  tl::InputStream file (tl::combine_path (path, "grain.xml"));
+  tl::TextInputStream grain (file);
+  bool found = false;
+  while (! grain.at_end () && ! found) {
+    std::string line = grain.get_line ();
+    if (line.find ("<version>1.7</version>") != std::string::npos) {
+      found = true;
+    }
+  }
+  EXPECT_EQ (found, true);
+}
+
+TEST(6_branch)
+{
+  std::string path = tl::TestBase::tmp_file ("repo");
+  tl::GitObject repo (path);
+  repo.read (test_url + "/src", std::string ("grain.xml"), std::string ("wip"));
+
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".git")), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "grain.xml")), true);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "macros")), false);
+
+  tl::InputStream file (tl::combine_path (path, "grain.xml"));
+  tl::TextInputStream grain (file);
+  bool found = false;
+  while (! grain.at_end () && ! found) {
+    std::string line = grain.get_line ();
+    if (line.find ("<version>1.4</version>") != std::string::npos) {
+      found = true;
+    }
+  }
+  EXPECT_EQ (found, true);
+}
+
+TEST(7_invalid_branch)
+{
+  std::string path = tl::TestBase::tmp_file ("repo");
+  tl::GitObject repo (path);
+  try {
+    repo.read (test_url, std::string (), std::string ("brxxx"));
+    EXPECT_EQ (true, false);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg (), "Error cloning Git repo: reference 'refs/remotes/origin/brxxx' not found");
+  }
 }
 
 #endif

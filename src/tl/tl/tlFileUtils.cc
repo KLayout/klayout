@@ -584,6 +584,48 @@ cp_dir_recursive (const std::string &source, const std::string &target)
   return true;
 }
 
+bool
+mv_dir_recursive (const std::string &source, const std::string &target)
+{
+  std::vector<std::string> entries;
+  std::string path = tl::absolute_file_path (source);
+  std::string path_to = tl::absolute_file_path (target);
+
+  bool error = false;
+
+  entries = dir_entries (path, false /*without_files*/, true /*with_dirs*/);
+  for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
+    std::string tc = tl::combine_path (path_to, *e);
+    if (! mkpath (tc)) {
+#if defined(FILE_UTILS_VERBOSE)
+      tl::error << tr ("Unable to create target directory: ") << tc;
+#endif
+      error = true;
+    } else if (! mv_dir_recursive (tl::combine_path (path, *e), tc)) {
+      error = true;
+    }
+  }
+
+  entries = dir_entries (path, true /*with_files*/, false /*without_dirs*/);
+  for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
+    if (! tl::rename_file (tl::combine_path (path, *e), tl::combine_path (path_to, *e))) {
+#if defined(FILE_UTILS_VERBOSE)
+      tl::error << tr ("Unable to move file from ") << tl::combine_path (path, *e) << tr (" to ") << tl::combine_path (path_to, *e);
+#endif
+      error = true;
+    }
+  }
+
+  if (! tl::rm_dir (path)) {
+#if defined(FILE_UTILS_VERBOSE)
+      tl::error << tr ("Unable to remove folder ") << path;
+#endif
+    error = true;
+  }
+
+  return ! error;
+}
+
 std::string absolute_path (const std::string &s)
 {
   std::vector<std::string> parts = split_path (absolute_file_path (s));

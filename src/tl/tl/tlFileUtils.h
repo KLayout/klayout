@@ -52,10 +52,17 @@ bool TL_PUBLIC rm_dir_recursive (const std::string &path);
 bool TL_PUBLIC mkpath (const std::string &path);
 
 /**
- *  @brief Recursively remove the given directory, the files from that directory and all sub-directories (version with std::string)
+ *  @brief Recursively copy the given directory
  *  @return True, if successful. false otherwise.
  */
 bool TL_PUBLIC cp_dir_recursive (const std::string &source, const std::string &target);
+
+/**
+ *  @brief Recursively move the contents of the given directory
+ *  @return True, if successful. false otherwise.
+ *  After this operation, the source directory is deleted.
+ */
+bool TL_PUBLIC mv_dir_recursive (const std::string &source, const std::string &target);
 
 /**
  *  @brief Gets the absolute path for a given file path

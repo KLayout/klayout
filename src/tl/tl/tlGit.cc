@@ -182,7 +182,11 @@ GitObject::read (const std::string &org_url, const std::string &org_filter, cons
   git_repository *cloned_repo = NULL;
   int error = git_clone (&cloned_repo, url.c_str (), m_local_path.c_str (), &clone_opts);
   if (error != 0) {
+#if LIBGIT2_VER_MAJOR > 0 || (LIBGIT2_VER_MAJOR == 0 && LIBGIT2_VER_MINOR >= 28)
     const git_error *err = git_error_last ();
+#else
+    const git_error *err = giterr_last ();
+#endif
     throw tl::Exception (tl::to_string (tr ("Error cloning Git repo: %s")), (const char *) err->message);
   }
 

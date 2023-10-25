@@ -269,6 +269,7 @@ while [ "$*" != "" ]; do
     echo "  -libcurl              Use libcurl instead of QtNetwork (for Qt<4.7)"
     echo "  -libexpat             Use libexpat instead of QtXml"
     echo "  -libpng               Use libpng instead of Qt for PNG generation"
+    echo "  -nolibgit2            Do not include libgit2 for Git package support"
     echo ""
     echo "Environment Variables:"
     echo ""

@@ -153,72 +153,93 @@ ref_matches (const char *name, const std::string &ref)
   }
 }
 
+namespace
+{
+
+class GitBuffer
+{
+public:
+  GitBuffer ()
+  {
+    m_buf = GIT_BUF_INIT_CONST (NULL, 0);
+  }
+
+  ~GitBuffer ()
+  {
+#if LIBGIT2_VER_MAJOR > 0 || (LIBGIT2_VER_MAJOR == 0 && LIBGIT2_VER_MINOR >= 28)
+    git_buf_dispose (&m_buf);
+#else
+    git_buf_free (&m_buf);
+#endif
+  }
+
+  const char *c_str () const { return m_buf.ptr; }
+
+  git_buf *get () { return &m_buf; }
+  const git_buf *get () const { return &m_buf; }
+
+private:
+  git_buf m_buf;
+};
+
+}
+
 static void
 checkout_branch (git_repository *repo, git_remote *remote, const git_checkout_options *co_opts, const char *branch)
 {
-  git_buf remote_branch = GIT_BUF_INIT_CONST (NULL, 0);
+  GitBuffer remote_branch;
+  git_oid oid;
 
-  try {
-
-    git_oid oid;
-
-    //  if no branch is given, use the default branch
-    if (! branch) {
-      check (git_remote_default_branch (&remote_branch, remote));
-      branch = remote_branch.ptr;
-      if (tl::verbosity () >= 10) {
-        tl::info << tr ("Git checkout: Using default branch for repository ") << git_remote_url (remote) << ": " << branch;
-      }
-    } else {
-      if (tl::verbosity () >= 10) {
-        tl::info << tr ("Git checkout: Checking out branch for repository ") << git_remote_url (remote) << ": " << branch;
-      }
-    }
-
-    //  resolve the branch by using ls-remote:
-
-    size_t n = 0;
-    const git_remote_head **ls = NULL;
-    check (git_remote_ls (&ls, &n, remote));
-
-    if (tl::verbosity () >= 20) {
-      tl::info << "Git checkout: ls-remote on " << git_remote_url (remote) << ":";
-    }
-
-    bool found = false;
-
-    for (size_t i = 0; i < n; ++i) {
-      const git_remote_head *rh = ls[i];
-      if (tl::verbosity () >= 20) {
-        char oid_fmt [80];
-        git_oid_tostr (oid_fmt, sizeof (oid_fmt), &rh->oid);
-        tl::info << "  " << rh->name << ": " << (const char *) oid_fmt;
-      }
-      if (ref_matches (rh->name, branch)) {
-        oid = rh->oid;
-        found = true;
-      }
-    }
-
-    if (! found) {
-      throw tl::Exception (tl::to_string (tr ("Git checkout - Unable to resolve reference name: ")) + branch);
-    }
-
+  //  if no branch is given, use the default branch
+  if (! branch) {
+    check (git_remote_default_branch (remote_branch.get (), remote));
+    branch = remote_branch.c_str ();
     if (tl::verbosity () >= 10) {
-      char oid_fmt [80];
-      git_oid_tostr (oid_fmt, sizeof (oid_fmt), &oid);
-      tl::info << tr ("Git checkout: resolving ") << branch << tr (" to ") << (const char *) oid_fmt;
+      tl::info << tr ("Git checkout: Using default branch for repository ") << git_remote_url (remote) << ": " << branch;
     }
-
-    check (git_repository_set_head_detached (repo, &oid));
-    check (git_checkout_head (repo, co_opts));
-
-  } catch (...) {
-    git_buf_dispose (&remote_branch);
-    throw;
+  } else {
+    if (tl::verbosity () >= 10) {
+      tl::info << tr ("Git checkout: Checking out branch for repository ") << git_remote_url (remote) << ": " << branch;
+    }
   }
 
-  git_buf_dispose (&remote_branch);
+  //  resolve the branch by using ls-remote:
+
+  size_t n = 0;
+  const git_remote_head **ls = NULL;
+  check (git_remote_ls (&ls, &n, remote));
+
+  if (tl::verbosity () >= 20) {
+    tl::info << "Git checkout: ls-remote on " << git_remote_url (remote) << ":";
+  }
+
+  bool found = false;
+
+  for (size_t i = 0; i < n; ++i) {
+    const git_remote_head *rh = ls[i];
+    if (tl::verbosity () >= 20) {
+      char oid_fmt [80];
+      git_oid_tostr (oid_fmt, sizeof (oid_fmt), &rh->oid);
+      tl::info << "  " << rh->name << ": " << (const char *) oid_fmt;
+    }
+    if (ref_matches (rh->name, branch)) {
+      oid = rh->oid;
+      found = true;
+    }
+  }
+
+  if (! found) {
+    throw tl::Exception (tl::to_string (tr ("Git checkout - Unable to resolve reference name: ")) + branch);
+  }
+
+  if (tl::verbosity () >= 10) {
+    char oid_fmt [80];
+    git_oid_tostr (oid_fmt, sizeof (oid_fmt), &oid);
+    tl::info << tr ("Git checkout: resolving ") << branch << tr (" to ") << (const char *) oid_fmt;
+  }
+
+  check (git_repository_set_head_detached (repo, &oid));
+  check (git_checkout_head (repo, co_opts));
 }
 
 void

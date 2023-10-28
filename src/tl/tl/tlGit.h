@@ -81,6 +81,9 @@ public:
    *
    *  This method throws an exception if the directory structure could
    *  not be obtained or downloading of one file failed.
+   *
+   *  "branch" is the remote ref to use. This can be a branch name, a tag name,
+   *  a remote ref such as "refs/heads/master" or a symbolic name such as "HEAD".
    */
   static bool download (const std::string &url, const std::string &target, const std::string &branch, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);
 

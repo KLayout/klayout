@@ -433,6 +433,8 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
 static int
 main_cont (int &argc, char **argv)
 {
+  ut::TestConsole console (stdout);
+
   std::unique_ptr<rba::RubyInterpreter> ruby_interpreter;
   std::unique_ptr<pya::PythonInterpreter> python_interpreter;
 
@@ -451,8 +453,6 @@ main_cont (int &argc, char **argv)
 #endif
 
   int result = 0;
-
-  ut::TestConsole console (stdout);
 
   try {
 

@@ -14,7 +14,7 @@ DEPENDPATH += $$RBA_INC $$TL_INC $$DB_INC $$GSI_INC
 
 LIBS += -L$$DESTDIR_UT -lklayout_rba -lklayout_tl -lklayout_db -lklayout_gsi
 
-!equals(HAVE_QT, "0") || !equals(HAVE_PYTHON, "0") {
+!equals(HAVE_QT, "0") {
   RESOURCES = \
     rba_unit_tests.qrc
 }

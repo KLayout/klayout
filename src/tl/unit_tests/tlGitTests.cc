@@ -121,7 +121,73 @@ TEST(6_branch)
   EXPECT_EQ (found, true);
 }
 
-TEST(7_invalid_branch)
+TEST(7_tag)
+{
+  std::string path = tl::TestBase::tmp_file ("repo");
+  tl::GitObject repo (path);
+  repo.read (test_url + "/src", std::string ("grain.xml"), std::string ("1.2"));
+
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".git")), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "grain.xml")), true);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "macros")), false);
+
+  tl::InputStream file (tl::combine_path (path, "grain.xml"));
+  tl::TextInputStream grain (file);
+  bool found = false;
+  while (! grain.at_end () && ! found) {
+    std::string line = grain.get_line ();
+    if (line.find ("<version>1.2</version>") != std::string::npos) {
+      found = true;
+    }
+  }
+  EXPECT_EQ (found, true);
+}
+
+TEST(8_refspec)
+{
+  std::string path = tl::TestBase::tmp_file ("repo");
+  tl::GitObject repo (path);
+  repo.read (test_url + "/src", std::string ("grain.xml"), std::string ("refs/tags/1.5"));
+
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".git")), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "grain.xml")), true);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "macros")), false);
+
+  tl::InputStream file (tl::combine_path (path, "grain.xml"));
+  tl::TextInputStream grain (file);
+  bool found = false;
+  while (! grain.at_end () && ! found) {
+    std::string line = grain.get_line ();
+    if (line.find ("<version>1.5</version>") != std::string::npos) {
+      found = true;
+    }
+  }
+  EXPECT_EQ (found, true);
+}
+
+TEST(9_HEAD)
+{
+  std::string path = tl::TestBase::tmp_file ("repo");
+  tl::GitObject repo (path);
+  repo.read (test_url + "/src", std::string ("grain.xml"), std::string ("HEAD"));
+
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".git")), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "grain.xml")), true);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "macros")), false);
+
+  tl::InputStream file (tl::combine_path (path, "grain.xml"));
+  tl::TextInputStream grain (file);
+  bool found = false;
+  while (! grain.at_end () && ! found) {
+    std::string line = grain.get_line ();
+    if (line.find ("<version>1.7</version>") != std::string::npos) {
+      found = true;
+    }
+  }
+  EXPECT_EQ (found, true);
+}
+
+TEST(10_invalid_branch)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
@@ -129,7 +195,7 @@ TEST(7_invalid_branch)
     repo.read (test_url, std::string (), std::string ("brxxx"));
     EXPECT_EQ (true, false);
   } catch (tl::Exception &ex) {
-    EXPECT_EQ (ex.msg (), "Error cloning Git repo: reference 'refs/remotes/origin/brxxx' not found");
+    EXPECT_EQ (ex.msg (), "Git checkout - Unable to resolve reference name: brxxx");
   }
 }
 

@@ -25,6 +25,7 @@
 #include "tlFileUtils.h"
 #include "tlProgress.h"
 #include "tlStaticObjects.h"
+#include "tlLog.h"
 
 #include <git2.h>
 #include <cstdio>
@@ -124,6 +125,101 @@ checkout_progress(const char * /*path*/, size_t cur, size_t tot, void *payload)
   progress->set (count + 5000u);
 }
 
+static void check (int error)
+{
+  if (error != 0) {
+#if LIBGIT2_VER_MAJOR > 0 || (LIBGIT2_VER_MAJOR == 0 && LIBGIT2_VER_MINOR >= 28)
+    const git_error *err = git_error_last ();
+#else
+    const git_error *err = giterr_last ();
+#endif
+    throw tl::Exception (tl::to_string (tr ("Error cloning Git repo: %s")), (const char *) err->message);
+  }
+}
+
+static bool
+ref_matches (const char *name, const std::string &ref)
+{
+  if (!name) {
+    return false;
+  } else if (name == ref) {
+    return true;
+  } else if (name == "refs/heads/" + ref) {
+    return true;
+  } else if (name == "refs/tags/" + ref) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+static void
+checkout_branch (git_repository *repo, git_remote *remote, const git_checkout_options *co_opts, const char *branch)
+{
+  git_buf remote_branch = GIT_BUF_INIT_CONST (NULL, 0);
+
+  try {
+
+    git_oid oid;
+
+    //  if no branch is given, use the default branch
+    if (! branch) {
+      check (git_remote_default_branch (&remote_branch, remote));
+      branch = remote_branch.ptr;
+      if (tl::verbosity () >= 10) {
+        tl::info << tr ("Git checkout: Using default branch for repository ") << git_remote_url (remote) << ": " << branch;
+      }
+    } else {
+      if (tl::verbosity () >= 10) {
+        tl::info << tr ("Git checkout: Checking out branch for repository ") << git_remote_url (remote) << ": " << branch;
+      }
+    }
+
+    //  resolve the branch by using ls-remote:
+
+    size_t n = 0;
+    const git_remote_head **ls = NULL;
+    check (git_remote_ls (&ls, &n, remote));
+
+    if (tl::verbosity () >= 20) {
+      tl::info << "Git checkout: ls-remote on " << git_remote_url (remote) << ":";
+    }
+
+    bool found = false;
+
+    for (size_t i = 0; i < n; ++i) {
+      const git_remote_head *rh = ls[i];
+      if (tl::verbosity () >= 20) {
+        char oid_fmt [80];
+        git_oid_tostr (oid_fmt, sizeof (oid_fmt), &rh->oid);
+        tl::info << "  " << rh->name << ": " << (const char *) oid_fmt;
+      }
+      if (ref_matches (rh->name, branch)) {
+        oid = rh->oid;
+        found = true;
+      }
+    }
+
+    if (! found) {
+      throw tl::Exception (tl::to_string (tr ("Git checkout - Unable to resolve reference name: ")) + branch);
+    }
+
+    if (tl::verbosity () >= 10) {
+      char oid_fmt [80];
+      git_oid_tostr (oid_fmt, sizeof (oid_fmt), &oid);
+      tl::info << tr ("Git checkout: resolving ") << branch << tr (" to ") << (const char *) oid_fmt;
+    }
+
+    check (git_repository_set_head_detached (repo, &oid));
+    check (git_checkout_head (repo, co_opts));
+
+  } catch (...) {
+    git_buf_dispose (&remote_branch);
+    throw;
+  }
+
+  git_buf_dispose (&remote_branch);
+}
 
 void
 GitObject::read (const std::string &org_url, const std::string &org_filter, const std::string &branch, double timeout, tl::InputHttpStreamCallback *callback)
@@ -151,6 +247,8 @@ GitObject::read (const std::string &org_url, const std::string &org_filter, cons
   //  @@@ use callback, timeout?
   tl::RelativeProgress progress (tl::to_string (tr ("Download progress")), 10000, 1 /*yield always*/);
 
+  //  build checkout options
+
   git_checkout_options checkout_opts = GIT_CHECKOUT_OPTIONS_INIT;
 
   const char *paths_cstr[1];
@@ -160,48 +258,67 @@ GitObject::read (const std::string &org_url, const std::string &org_filter, cons
     checkout_opts.paths.strings = (char **) &paths_cstr;
   }
 
-  /*
-  checkout_opts.checkout_strategy = GIT_CHECKOUT_FORCE |
-                                    GIT_CHECKOUT_DISABLE_PATHSPEC_MATCH;
-  @@@*/
   checkout_opts.progress_cb = &checkout_progress;
   checkout_opts.progress_payload = (void *) &progress;
 
-  git_clone_options clone_opts = GIT_CLONE_OPTIONS_INIT;
+  //  build fetch options
 
-  clone_opts.checkout_opts = checkout_opts;
+  git_fetch_options fetch_opts = GIT_FETCH_OPTIONS_INIT;
 
-  //  NOTE: really has to be a branch! Tags won't work.
-  if (! branch.empty ()) {
-    clone_opts.checkout_branch = branch.c_str ();
-  }
+  fetch_opts.download_tags = GIT_REMOTE_DOWNLOAD_TAGS_AUTO;
 
 #if LIBGIT2_VER_MAJOR > 1 || (LIBGIT2_VER_MAJOR == 1 && LIBGIT2_VER_MINOR >= 7)
-  clone_opts.fetch_opts.depth = 1;  // shallow (single commit)
+  fetch_opts.depth = 1;  // shallow (single commit)
 #endif
-  clone_opts.fetch_opts.callbacks.transfer_progress = &fetch_progress;
-  clone_opts.fetch_opts.callbacks.payload = (void *) &progress;
+  fetch_opts.callbacks.transfer_progress = &fetch_progress;
+  fetch_opts.callbacks.payload = (void *) &progress;
 
-  //  Do the clone
+  //  build refspecs in case they are needed
+
+  char *refs[] = { (char *) branch.c_str () };
+  git_strarray refspecs;
+  refspecs.count = 1;
+  refspecs.strings = refs;
+  git_strarray *refspecs_p = branch.empty () ? NULL : &refspecs;
+
+  //  Make repository
+
   git_repository *cloned_repo = NULL;
-  int error = git_clone (&cloned_repo, url.c_str (), m_local_path.c_str (), &clone_opts);
-  if (error != 0) {
-#if LIBGIT2_VER_MAJOR > 0 || (LIBGIT2_VER_MAJOR == 0 && LIBGIT2_VER_MINOR >= 28)
-    const git_error *err = git_error_last ();
-#else
-    const git_error *err = giterr_last ();
-#endif
-    throw tl::Exception (tl::to_string (tr ("Error cloning Git repo: %s")), (const char *) err->message);
+  git_remote *remote = NULL;
+
+  try {
+
+    check (git_repository_init (&cloned_repo, m_local_path.c_str (), 0));
+
+    check (git_remote_create (&remote, cloned_repo, "download", url.c_str ()));
+
+    //  actually fetch
+    if (tl::verbosity () >= 10) {
+      tl::info << tr ("Fetching Git repo from ") << git_remote_url (remote) << " ...";
+    }
+    check (git_remote_fetch (remote, refspecs_p, &fetch_opts, NULL));
+
+    //  checkout
+    checkout_branch (cloned_repo, remote, &checkout_opts, branch.empty () ? 0 : branch.c_str ());
+
+    //  free the repo and remote
+    git_repository_free (cloned_repo);
+    git_remote_free (remote);
+
+    //  get rid of ".git" - we do not need it anymore
+
+    tl::rm_dir_recursive (tl::combine_path (m_local_path, ".git"));
+
+  } catch (...) {
+    //  free the repo in the error case
+    if (cloned_repo != NULL) {
+      git_repository_free (cloned_repo);
+    }
+    if (remote != NULL) {
+      git_remote_free (remote);
+    }
+    throw;
   }
-
-  if (! cloned_repo) {
-    throw tl::Exception (tl::to_string (tr ("Error cloning Git repo - no data available")));
-  }
-
-  git_repository_free (cloned_repo);
-
-  //  remove the worktree as we don't need it
-  tl::rm_dir_recursive (tl::combine_path (m_local_path, ".git"));
 
   //  pull subfolder files to target path level
   if (! subdir.empty ()) {

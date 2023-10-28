@@ -271,6 +271,7 @@ GitObject::read (const std::string &org_url, const std::string &org_filter, cons
   //  build checkout options
 
   git_checkout_options checkout_opts = GIT_CHECKOUT_OPTIONS_INIT;
+  checkout_opts.checkout_strategy = GIT_CHECKOUT_FORCE;
 
   const char *paths_cstr[1];
   paths_cstr[0] = filter.c_str ();

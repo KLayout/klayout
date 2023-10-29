@@ -9,6 +9,7 @@ include($$PWD/../../lib_ut.pri)
 SOURCES = \
   laySalt.cc \
   layHelpIndexTest.cc \
+  laySaltParsedURLTests.cc \
   laySessionTests.cc
 
 INCLUDEPATH += $$LAY_INC $$TL_INC $$LAYBASIC_INC $$LAYUI_INC $$LAYVIEW_INC $$DB_INC $$GSI_INC $$ANT_INC $$IMG_INC $$RDB_INC

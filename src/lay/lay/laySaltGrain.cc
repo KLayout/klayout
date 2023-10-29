@@ -515,6 +515,10 @@ SaltGrain::stream_from_url (std::string &generic_url, double timeout, tl::InputH
     throw tl::Exception (tl::to_string (QObject::tr ("No download link available")));
   }
 
+  if (tl::verbosity () >= 20) {
+    tl::info << tr ("Downloading package info from ") << generic_url;
+  }
+
   lay::SaltParsedURL purl (generic_url);
   const std::string &url = purl.url ();
 

@@ -130,3 +130,12 @@ TEST (19_GitSVNEmulationTagWithSubFolder)
   EXPECT_EQ (purl.branch (), "refs/tags/1.9");
   EXPECT_EQ (purl.subfolder (), "sub/folder");
 }
+
+TEST (20_Example1)
+{
+  lay::SaltParsedURL purl ("git+https://github.com/my-user/test-core[refs/tags/v1.1.0]");
+  EXPECT_EQ (purl.protocol () == lay::Git, true);
+  EXPECT_EQ (purl.url (), "https://github.com/my-user/test-core");
+  EXPECT_EQ (purl.branch (), "refs/tags/v1.1.0");
+  EXPECT_EQ (purl.subfolder (), "");
+}

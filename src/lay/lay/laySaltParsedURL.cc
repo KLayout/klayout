@@ -39,7 +39,7 @@ parse_git_url (tl::Extractor &ex, std::string &url, std::string &branch, std::st
     ;
   }
   // server ("www.klayout.de")
-  while (! ex.at_end () && (*ex != '/' && *ex != '+')) {
+  while (! ex.at_end () && (*ex != '/' && *ex != '+' && *ex != '[')) {
     ++ex;
   }
 
@@ -47,6 +47,7 @@ parse_git_url (tl::Extractor &ex, std::string &url, std::string &branch, std::st
 
     ++ex;
 
+    //  next component
     const char *c1 = ex.get ();
     while (! ex.at_end () && (*ex != '/' && *ex != '+' && *ex != '[')) {
       ++ex;
@@ -55,7 +56,7 @@ parse_git_url (tl::Extractor &ex, std::string &url, std::string &branch, std::st
 
     std::string comp (c1, c2 - c1);
 
-    if ((! ex.at_end () && *ex == '+') || comp.find (".git") == comp.size () - 4) {
+    if ((! ex.at_end () && (*ex == '+' || *ex == '[')) || comp.find (".git") == comp.size () - 4) {
       //  subfolder starts here
       break;
     }
@@ -68,6 +69,7 @@ parse_git_url (tl::Extractor &ex, std::string &url, std::string &branch, std::st
     return;
   }
 
+  //  skip URL/subfolder separator
   if (*ex == '/') {
     while (! ex.at_end () && *ex == '/') {
       ++ex;
@@ -76,6 +78,7 @@ parse_git_url (tl::Extractor &ex, std::string &url, std::string &branch, std::st
     ++ex;
   }
 
+  //  subfolders
   {
     const char *c1 = ex.get ();
     while (! ex.at_end () && *ex != '[') {

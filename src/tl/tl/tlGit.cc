@@ -79,17 +79,23 @@ GitObject::GitObject (const std::string &local_path)
 
   if (local_path.empty ()) {
     //  @@@ generic tempnam on Windows/Posix ...
-    char tmp[] = "git2klayoutXXXXXX";
-    mkstemp (tmp);
+    char tmp[] = "/tmp/git2klayoutXXXXXX";
+    if (mkdtemp (tmp) == NULL) {
+      throw tl::Exception (tl::to_string (tr ("Unable to create temporary folder: %s")), (const char *) tmp);
+    }
     m_local_path = tmp;
     m_is_temp = true;
   }
 
-  tl::mkpath (m_local_path);
-
   //  ensures the directory is clean
-  tl::rm_dir_recursive (m_local_path); // @@@ TODO: error handling?
-  tl::mkpath (m_local_path);
+  if (! m_is_temp) {
+    if (! tl::rm_dir_recursive (m_local_path)) {
+      throw tl::Exception (tl::to_string (tr ("Unable to clean local Git repo path: %s")), m_local_path);
+    }
+    if (! tl::mkpath (m_local_path)) {
+      throw tl::Exception (tl::to_string (tr ("Unable to regenerate local Git repo path: %s")), m_local_path);
+    }
+  }
 }
 
 GitObject::~GitObject ()

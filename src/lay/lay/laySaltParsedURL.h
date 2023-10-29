@@ -55,10 +55,10 @@ enum Protocol {
  *    git+https://server.com/repo.git[v1.0]                       -> protocol=Git, url="https://server.com/repo.git", branch="v1.0", subfolder=""
  *    git+https://server.com/repo.git/sub/folder[refs/tags/1.0]   -> protocol=Git, url="https://server.com/repo.git", branch="refs/tags/1.0", subfolder="sub/folder"
  *    git+https://server.com/repo.git/trunk                       -> protocol=Git, url="https://server.com/repo.git", branch="HEAD", subfolder=""
- *    git+https://server.com/repo.git/sub/folder/trunk            -> protocol=Git, url="https://server.com/repo.git", branch="HEAD", subfolder="sub/folder"
+ *    git+https://server.com/repo.git/trunk/sub/folder            -> protocol=Git, url="https://server.com/repo.git", branch="HEAD", subfolder="sub/folder"
  *    git+https://server.com/repo.git/branches/release            -> protocol=Git, url="https://server.com/repo.git", branch="refs/heads/release", subfolder=""
  *    git+https://server.com/repo.git/tags/1.9                    -> protocol=Git, url="https://server.com/repo.git", branch="refs/tags/1.9", subfolder=""
- *    git+https://server.com/repo.git/sub/folder/tags/1.9         -> protocol=Git, url="https://server.com/repo.git", branch="refs/tags/1.9", subfolder="sub/folder"
+ *    git+https://server.com/repo.git/tags/1.9/sub/folder         -> protocol=Git, url="https://server.com/repo.git", branch="refs/tags/1.9", subfolder="sub/folder"
  */
 
 class LAY_PUBLIC SaltParsedURL

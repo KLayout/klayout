@@ -97,7 +97,7 @@ TEST (15_GitSVNEmulationTrunk)
 
 TEST (16_GitSVNEmulationTrunkWithSubFolder)
 {
-  lay::SaltParsedURL purl ("git+https://server.com/repo.git/sub/folder/trunk");
+  lay::SaltParsedURL purl ("git+https://server.com/repo.git/trunk/sub/folder");
   EXPECT_EQ (purl.protocol () == lay::Git, true);
   EXPECT_EQ (purl.url (), "https://server.com/repo.git");
   EXPECT_EQ (purl.branch (), "HEAD");
@@ -124,7 +124,7 @@ TEST (18_GitSVNEmulationTag)
 
 TEST (19_GitSVNEmulationTagWithSubFolder)
 {
-  lay::SaltParsedURL purl ("git+https://server.com/repo.git/sub/folder/tags/1.9");
+  lay::SaltParsedURL purl ("git+https://server.com/repo.git/tags/1.9/sub/folder");
   EXPECT_EQ (purl.protocol () == lay::Git, true);
   EXPECT_EQ (purl.url (), "https://server.com/repo.git");
   EXPECT_EQ (purl.branch (), "refs/tags/1.9");

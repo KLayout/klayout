@@ -101,24 +101,22 @@ parse_git_url (tl::Extractor &ex, std::string &url, std::string &branch, std::st
     //  SVN emulation
 
     auto parts = tl::split (subfolder, "/");
-    if (parts.size () >= 1 && parts.back () == "trunk") {
+    if (parts.size () >= 1 && parts.front () == "trunk") {
 
       branch = "HEAD";
-      parts.pop_back ();
+      parts.erase (parts.begin ());
       subfolder = tl::join (parts, "/");
 
-    } else if (parts.size () >= 2 && parts[parts.size () - 2] == "tags") {
+    } else if (parts.size () >= 2 && parts.front () == "tags") {
 
-      branch = "refs/tags/" + parts.back ();
-      parts.pop_back ();
-      parts.pop_back ();
+      branch = "refs/tags/" + parts[1];
+      parts.erase (parts.begin (), parts.begin () + 2);
       subfolder = tl::join (parts, "/");
 
-    } else if (parts.size () >= 2 && parts[parts.size () - 2] == "branches") {
+    } else if (parts.size () >= 2 && parts.front () == "branches") {
 
-      branch = "refs/heads/" + parts.back ();
-      parts.pop_back ();
-      parts.pop_back ();
+      branch = "refs/heads/" + parts[1];
+      parts.erase (parts.begin (), parts.begin () + 2);
       subfolder = tl::join (parts, "/");
 
     }

@@ -30,6 +30,7 @@
 #include "ui_SaltGrainTemplateSelectionDialog.h"
 #include "tlString.h"
 #include "tlExceptions.h"
+#include "tlEnv.h"
 
 #include "rba.h"
 #include "pya.h"
@@ -48,6 +49,14 @@
 
 namespace lay
 {
+
+// --------------------------------------------------------------------------------------
+
+static bool download_package_information ()
+{
+  //  $KLAYOUT_ALWAYS_DOWNLOAD_PACKAGE_INFO
+  return tl::app_flag ("always-download-package-info");
+}
 
 // --------------------------------------------------------------------------------------
 
@@ -1168,48 +1177,58 @@ SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTex
   mp_downloaded_target = details;
   m_salt_mine_grain.reset (new lay::SaltGrain (*g));
 
-  //  Download actual grain definition file
-  try {
+  if (download_package_information ()) {
 
-    if (g->url ().empty ()) {
-      throw tl::Exception (tl::to_string (tr ("No download link available")));
+    //  Download actual grain definition file
+    try {
+
+      if (g->url ().empty ()) {
+        throw tl::Exception (tl::to_string (tr ("No download link available")));
+      }
+
+      QString html = tr (
+        "<html>"
+          "<body>"
+            "<font color=\"#c0c0c0\">"
+              "<h2>Fetching Package Definition ...</h2>"
+              "<p><b>URL</b>: %1</p>"
+            "</font>"
+          "</body>"
+        "</html>"
+      )
+      .arg (tl::to_qstring (g->url ()));
+
+      details->setHtml (html);
+
+      std::string url = g->url ();
+
+      m_downloaded_grain.reset (new SaltGrain ());
+      m_downloaded_grain->set_url (url);
+
+      //  NOTE: stream_from_url may modify the URL, hence we set it again
+      ProcessEventCallback callback;
+      m_downloaded_grain_reader.reset (SaltGrain::stream_from_url (url, 60.0, &callback));
+      m_downloaded_grain->set_url (url);
+
+      tl::InputHttpStream *http = dynamic_cast<tl::InputHttpStream *> (m_downloaded_grain_reader->base ());
+      if (http) {
+        //  async reading on HTTP
+        http->ready ().add (this, &SaltManagerDialog::data_ready);
+        http->send ();
+      } else {
+        data_ready ();
+      }
+
+    } catch (tl::Exception &ex) {
+      show_error (ex);
     }
 
-    QString html = tr (
-      "<html>"
-        "<body>"
-          "<font color=\"#c0c0c0\">"
-            "<h2>Fetching Package Definition ...</h2>"
-            "<p><b>URL</b>: %1</p>"
-          "</font>"
-        "</body>"
-      "</html>"
-    )
-    .arg (tl::to_qstring (g->url ()));
+  } else {
 
-    details->setHtml (html);
+    //  Download denied - take information from index
+    m_downloaded_grain.reset (new SaltGrain (*g));
+    data_ready ();
 
-    std::string url = g->url ();
-
-    m_downloaded_grain.reset (new SaltGrain ());
-    m_downloaded_grain->set_url (url);
-
-    //  NOTE: stream_from_url may modify the URL, hence we set it again
-    ProcessEventCallback callback;
-    m_downloaded_grain_reader.reset (SaltGrain::stream_from_url (url, 60.0, &callback));
-    m_downloaded_grain->set_url (url);
-
-    tl::InputHttpStream *http = dynamic_cast<tl::InputHttpStream *> (m_downloaded_grain_reader->base ());
-    if (http) {
-      //  async reading on HTTP
-      http->ready ().add (this, &SaltManagerDialog::data_ready);
-      http->send ();
-    } else {
-      data_ready ();
-    }
-
-  } catch (tl::Exception &ex) {
-    show_error (ex);
   }
 }
 

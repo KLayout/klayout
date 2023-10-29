@@ -143,7 +143,7 @@ SaltController::show_editor ()
     {
       //  while running the dialog, don't watch file events - that would interfere with
       //  the changes applied by the dialog itself.
-      lay::BusySection busy_section;  //  disable file watcher
+      tl::FileSystemWatcherDisabled disable_file_watcher;  //  disable file watcher
       mp_salt_dialog->exec ();
     }
 
@@ -157,7 +157,7 @@ SaltController::show_editor ()
 void
 SaltController::sync_file_watcher ()
 {
-  lay::BusySection busy_section;  //  disable file watcher
+  tl::FileSystemWatcherDisabled disable_file_watcher;  //  disable file watcher
 
   if (m_file_watcher) {
     m_file_watcher->clear ();
@@ -231,7 +231,7 @@ SaltController::install_packages (const std::vector<std::string> &packages, bool
   {
     //  while running the dialog, don't watch file events - that would interfere with
     //  the changes applied by the dialog itself.
-    lay::BusySection busy_section;  //  disable file watcher
+    tl::FileSystemWatcherDisabled disable_file_watcher;  //  disable file watcher
     result = manager.execute (0, m_salt);
   }
 

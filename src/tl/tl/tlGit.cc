@@ -116,7 +116,11 @@ fetch_progress (const git_transfer_progress *stats, void *payload)
 
   //  first half of progress
   size_t count = size_t (5000.0 * double (stats->received_objects) / double (std::max (1u, stats->total_objects)) + 1e-10);
-  progress->set (count);
+  try {
+    progress->set (count);
+  } catch (...) {
+    //  TODO: stop
+  }
 
   return 0;
 }
@@ -128,7 +132,11 @@ checkout_progress(const char * /*path*/, size_t cur, size_t tot, void *payload)
 
   //  first half of progress
   size_t count = size_t (5000.0 * double (cur) / double (std::max (size_t (1), tot)) + 1e-10);
-  progress->set (count + 5000u);
+  try {
+    progress->set (count + 5000u);
+  } catch (...) {
+    //  ignore cancel requests (TODO: how to stop?)
+  }
 }
 
 static void check (int error)

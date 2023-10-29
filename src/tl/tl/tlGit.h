@@ -65,7 +65,7 @@ public:
    *  "filter" can be a top-level file to download. If filter is non-empty,
    *  sparse mode is chosen.
    */
-  void read (const std::string &url, const std::string &filter, const std::string &branch, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);
+  void read (const std::string &url, const std::string &filter, const std::string &subfolder, const std::string &branch, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);
 
   /**
    *  @brief Downloads the collection or file with the given URL
@@ -85,7 +85,7 @@ public:
    *  "branch" is the remote ref to use. This can be a branch name, a tag name,
    *  a remote ref such as "refs/heads/master" or a symbolic name such as "HEAD".
    */
-  static bool download (const std::string &url, const std::string &target, const std::string &branch, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);
+  static bool download (const std::string &url, const std::string &target, const std::string &subfolder, const std::string &branch, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);
 
   /**
    *  @brief Gets a stream object for downloading the single item of the given URL
@@ -93,7 +93,7 @@ public:
    *  The file needs to be a top-level object.
    *  The stream object returned needs to be deleted by the caller.
    */
-  static tl::InputStream *download_item (const std::string &url, const std::string &file, const std::string &branch, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);
+  static tl::InputStream *download_item (const std::string &url, const std::string &file, const std::string &subfolder, const std::string &branch, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);
 
 private:
   std::string m_local_path;

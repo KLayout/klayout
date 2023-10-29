@@ -32,7 +32,7 @@ TEST(1_plain)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
-  repo.read (test_url, std::string (), std::string ());
+  repo.read (test_url, std::string (), std::string (), std::string ());
 
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, "LICENSE")), true);
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".gitignore")), true);
@@ -41,11 +41,24 @@ TEST(1_plain)
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, "src/macros/xsection.lym")), true);
 }
 
-TEST(2_pathspecs)
+TEST(2_subdir)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
-  repo.read (test_url, std::string ("src/**"), std::string ());
+  repo.read (test_url, std::string (), std::string ("src"), std::string ());
+
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "LICENSE")), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".gitignore")), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".git")), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "grain.xml")), true);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "macros/xsection.lym")), true);
+}
+
+TEST(3_subdir_as_filter)
+{
+  std::string path = tl::TestBase::tmp_file ("repo");
+  tl::GitObject repo (path);
+  repo.read (test_url, std::string ("src/**"), std::string (), std::string ());
 
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, "LICENSE")), false);
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".gitignore")), false);
@@ -54,22 +67,11 @@ TEST(2_pathspecs)
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, "src/macros/xsection.lym")), true);
 }
 
-TEST(3_subdir)
-{
-  std::string path = tl::TestBase::tmp_file ("repo");
-  tl::GitObject repo (path);
-  repo.read (test_url + "/src", std::string (), std::string ());
-
-  EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".git")), false);
-  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "grain.xml")), true);
-  EXPECT_EQ (tl::file_exists (tl::combine_path (path, "macros/xsection.lym")), true);
-}
-
 TEST(4_single_file)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
-  repo.read (test_url, std::string ("LICENSE"), std::string ());
+  repo.read (test_url, std::string ("LICENSE"), std::string (), std::string ());
 
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, "LICENSE")), true);
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".gitignore")), false);
@@ -81,7 +83,7 @@ TEST(5_single_file_from_subdir)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
-  repo.read (test_url + "/src", std::string ("grain.xml"), std::string ());
+  repo.read (test_url, std::string ("grain.xml"), std::string ("src"), std::string ());
 
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".git")), false);
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, "grain.xml")), true);
@@ -103,7 +105,7 @@ TEST(6_branch)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
-  repo.read (test_url + "/src", std::string ("grain.xml"), std::string ("wip"));
+  repo.read (test_url, std::string ("grain.xml"), std::string ("src"), std::string ("wip"));
 
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".git")), false);
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, "grain.xml")), true);
@@ -125,7 +127,7 @@ TEST(7_tag)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
-  repo.read (test_url + "/src", std::string ("grain.xml"), std::string ("1.2"));
+  repo.read (test_url, std::string ("grain.xml"), std::string ("src"), std::string ("1.2"));
 
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".git")), false);
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, "grain.xml")), true);
@@ -147,7 +149,7 @@ TEST(8_refspec)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
-  repo.read (test_url + "/src", std::string ("grain.xml"), std::string ("refs/tags/1.5"));
+  repo.read (test_url, std::string ("grain.xml"), std::string ("src"), std::string ("refs/tags/1.5"));
 
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".git")), false);
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, "grain.xml")), true);
@@ -169,7 +171,7 @@ TEST(9_HEAD)
 {
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
-  repo.read (test_url + "/src", std::string ("grain.xml"), std::string ("HEAD"));
+  repo.read (test_url, std::string ("grain.xml"), std::string ("src"), std::string ("HEAD"));
 
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, ".git")), false);
   EXPECT_EQ (tl::file_exists (tl::combine_path (path, "grain.xml")), true);
@@ -192,7 +194,7 @@ TEST(10_invalid_branch)
   std::string path = tl::TestBase::tmp_file ("repo");
   tl::GitObject repo (path);
   try {
-    repo.read (test_url, std::string (), std::string ("brxxx"));
+    repo.read (test_url, std::string (), std::string (), std::string ("brxxx"));
     EXPECT_EQ (true, false);
   } catch (tl::Exception &ex) {
     EXPECT_EQ (ex.msg (), "Git checkout - Unable to resolve reference name: brxxx");

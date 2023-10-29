@@ -23,6 +23,7 @@
 #include "laySaltController.h"
 #include "laySaltManagerDialog.h"
 #include "laySaltDownloadManager.h"
+#include "laySaltParsedURL.h"
 #include "layConfig.h"
 #include "layMainWindow.h"
 #include "layQtTools.h"
@@ -202,40 +203,18 @@ SaltController::install_packages (const std::vector<std::string> &packages, bool
       }
     }
 
-    if (n.find ("http:") == 0 || n.find ("https:") == 0 || n.find ("file:") == 0 || n[0] == '/' || n[0] == '\\') {
+    lay::SaltParsedURL purl (n);
+    const std::string &url = purl.url ();
+
+    if (url.find ("http:") == 0 || url.find ("https:") == 0 || url.find ("file:") == 0 || url[0] == '/' || url[0] == '\\') {
 
       //  its a URL
-      manager.register_download (std::string (), std::string (), n, DefaultProtocol, std::string (), v);
-
-    } else if (n.find ("git@") == 0) {
-
-      //  git protocol:
-      //    "git@<url>"
-      //    "git@<url>[<branch>]"
-
-      std::string url (n, 4);
-      size_t br = url.find ("[");
-      std::string branch;
-      if (br != std::string::npos && url.back () == ']') {
-        branch = std::string (url, br + 1, url.size () - br - 2);
-        url = std::string (url, 0, br);
-      }
-
-      manager.register_download (std::string (), std::string (), url, Git, branch, v);
-
-    } else if (n.find ("svn@") == 0) {
-
-      //  svn protocol:
-      //    "svn@<url>"
-
-      std::string url (n, 4);
-      //  its a URL
-      manager.register_download (std::string (), std::string (), url, WebDAV, std::string (), v);
+      manager.register_download (std::string (), std::string (), n, v);
 
     } else {
 
       //  its a plain name
-      manager.register_download (n, std::string (), std::string (), DefaultProtocol, std::string (), v);
+      manager.register_download (n, std::string (), std::string (), v);
 
     }
 

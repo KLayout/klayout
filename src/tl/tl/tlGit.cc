@@ -243,26 +243,17 @@ checkout_branch (git_repository *repo, git_remote *remote, const git_checkout_op
 }
 
 void
-GitObject::read (const std::string &org_url, const std::string &org_filter, const std::string &branch, double timeout, tl::InputHttpStreamCallback *callback)
+GitObject::read (const std::string &org_url, const std::string &org_filter, const std::string &subfolder, const std::string &branch, double timeout, tl::InputHttpStreamCallback *callback)
 {
   std::string url = org_url;
+
   std::string filter = org_filter;
-
-  std::string subdir;
-
-  std::string url_terminator (".git/");
-  size_t url_end = url.find (url_terminator);
-  if (url_end != std::string::npos) {
-
-    subdir = std::string (url, url_end + url_terminator.size ());
-
-    url = std::string (url, 0, url_end + url_terminator.size () - 1);
+  if (! subfolder.empty ()) {
     if (filter.empty ()) {
-      filter = subdir + "/**";
+      filter = subfolder + "/**";
     } else {
-      filter = subdir + "/" + filter;
+      filter = subfolder + "/" + filter;
     }
-
   }
 
   //  @@@ use callback, timeout?
@@ -343,9 +334,9 @@ GitObject::read (const std::string &org_url, const std::string &org_filter, cons
   }
 
   //  pull subfolder files to target path level
-  if (! subdir.empty ()) {
+  if (! subfolder.empty ()) {
 
-    std::string pp = tl::combine_path (m_local_path, subdir);
+    std::string pp = tl::combine_path (m_local_path, subfolder);
     if (! tl::is_dir (pp)) {
       throw tl::Exception (tl::to_string (tr ("Error cloning Git repo - failed to fetch subdirectory: ")) + pp);
     }
@@ -358,7 +349,7 @@ GitObject::read (const std::string &org_url, const std::string &org_filter, cons
         break;
       }
     }
-    auto pc = tl::split (subdir, "/");
+    auto pc = tl::split (subfolder, "/");
     if (! tl::rename_file (tl::combine_path (m_local_path, pc.front ()), tmp_dir)) {
       throw tl::Exception (tl::to_string (tr ("Error cloning Git repo - failed to rename temp folder")));
     }
@@ -372,18 +363,18 @@ GitObject::read (const std::string &org_url, const std::string &org_filter, cons
 }
 
 bool
-GitObject::download (const std::string &url, const std::string &target, const std::string &branch, double timeout, tl::InputHttpStreamCallback *callback)
+GitObject::download (const std::string &url, const std::string &target, const std::string &subfolder, const std::string &branch, double timeout, tl::InputHttpStreamCallback *callback)
 {
   GitObject obj (target);
-  obj.read (url, std::string (), branch, timeout, callback);
+  obj.read (url, std::string (), subfolder, branch, timeout, callback);
   return false;
 }
 
 tl::InputStream *
-GitObject::download_item (const std::string &url, const std::string &file, const std::string &branch, double timeout, tl::InputHttpStreamCallback *callback)
+GitObject::download_item (const std::string &url, const std::string &file, const std::string &subfolder, const std::string &branch, double timeout, tl::InputHttpStreamCallback *callback)
 {
   GitObject obj;
-  obj.read (url, file, branch, timeout, callback);
+  obj.read (url, file, subfolder, branch, timeout, callback);
 
   //  extract the file and return a memory blob, so we can delete the temp folder
 

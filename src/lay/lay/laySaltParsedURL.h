@@ -30,6 +30,15 @@ namespace lay
 {
 
 /**
+ *  @brief An enum describing the protocol to use for download
+ */
+enum Protocol {
+  DefaultProtocol = 0,
+  WebDAV = 1,
+  Git = 2
+};
+
+/**
  *  @brief A class representing a SaltGrain URL
  *
  *  The URL is parsed into protocol, branch, URL and subfolder if applicable.

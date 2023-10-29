@@ -178,6 +178,7 @@ SaltGrainPropertiesDialog::update_controls ()
     dependency_changed (item, 0);
     item->setData (1, Qt::UserRole, tl::to_qstring (d->version));
     dependency_changed (item, 1);
+    //  @@@ TODO: protocol and branch?
     item->setData (2, Qt::UserRole, tl::to_qstring (d->url));
     dependency_changed (item, 2);
 
@@ -244,6 +245,7 @@ SaltGrainPropertiesDialog::update_data ()
       dep.name = tl::to_string (name);
       dep.version = tl::to_string (version);
       dep.url = tl::to_string (url);
+      //  @@@ TODO: set protocol and branch
       m_grain.dependencies ().push_back (dep);
     }
 
@@ -584,9 +586,10 @@ SaltGrainPropertiesDialog::accept ()
     }
 
     if (!d->url.empty ()) {
+      //  @@@ TODO: only do for SVN repo
       SaltGrain gdep;
       try {
-        gdep = SaltGrain::from_url (d->url, d->protocol, d->branch);
+        gdep = SaltGrain::from_url (d->url);
         if (gdep.name () != d->name) {
           dependencies_alert->error () << tr ("Package name obtained from download URL is not the expected name.") << tl::endl
                                        << tr ("Downloaded name: ") << gdep.name () << tl::endl

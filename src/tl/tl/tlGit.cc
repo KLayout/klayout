@@ -270,7 +270,7 @@ GitObject::read (const std::string &org_url, const std::string &org_filter, cons
     }
   }
 
-  //  @@@ use callback, timeout?
+  //  TODO: use callback, timeout?
   tl::RelativeProgress progress (tl::to_string (tr ("Download progress")), 10000, 1 /*yield always*/);
 
   //  build checkout options

@@ -28,6 +28,7 @@
 #include "tlLog.h"
 #include "tlInternational.h"
 #include "tlWebDAV.h"
+#include "tlEnv.h"
 #if defined(HAVE_GIT2)
 #  include "tlGit.h"
 #endif
@@ -67,6 +68,13 @@ SaltGrains &
 Salt::root ()
 {
   return m_root;
+}
+
+bool
+Salt::download_package_information () const
+{
+  //  $KLAYOUT_ALWAYS_DOWNLOAD_PACKAGE_INFO
+  return tl::app_flag ("always-download-package-info") || m_root.sparse ();
 }
 
 Salt::flat_iterator

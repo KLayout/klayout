@@ -52,14 +52,6 @@ namespace lay
 
 // --------------------------------------------------------------------------------------
 
-static bool download_package_information ()
-{
-  //  $KLAYOUT_ALWAYS_DOWNLOAD_PACKAGE_INFO
-  return tl::app_flag ("always-download-package-info");
-}
-
-// --------------------------------------------------------------------------------------
-
 /**
  *  @brief A tiny dialog to select a template and a name for the grain
  */
@@ -1238,7 +1230,7 @@ SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTex
   mp_downloaded_target = details;
   m_salt_mine_grain.reset (new lay::SaltGrain (*g));
 
-  if (download_package_information ()) {
+  if (m_salt_mine.download_package_information () && m_salt_mine.grain_by_name (g->name ())) {
 
     //  Download actual grain definition file
     try {

@@ -199,6 +199,11 @@ public:
    */
   SaltGrains &root ();
 
+  /**
+   *  @brief Gets a value indicating whether the collection wants package information to be downloaded always
+   */
+  bool download_package_information () const;
+
 signals:
   /**
    *  @brief A signal triggered before one of the collections changed

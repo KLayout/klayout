@@ -39,14 +39,6 @@ namespace lay
 
 // ----------------------------------------------------------------------------------
 
-static bool download_package_information ()
-{
-  //  $KLAYOUT_ALWAYS_DOWNLOAD_PACKAGE_INFO
-  return tl::app_flag ("always-download-package-info");
-}
-
-// ----------------------------------------------------------------------------------
-
 ConfirmationDialog::ConfirmationDialog (QWidget *parent)
   : QDialog (parent), m_confirmed (false), m_cancelled (false), m_aborted (false), m_file (50000, true)
 {
@@ -327,6 +319,9 @@ SaltDownloadManager::fetch_missing (const lay::Salt &salt, const lay::Salt &salt
       //  Downloading is required if:
       //  - A package download is requested without a name (package can't be looked up in the package index)
       //  - Or a name is given, but not found in the package index
+      //
+      //  Downloading can be bypassed if the package index (salt mine) specifies "sparse=false".
+      //  In that case, the package index will have all information about the package.
 
       if (! p->name.empty ()) {
 
@@ -349,7 +344,7 @@ SaltDownloadManager::fetch_missing (const lay::Salt &salt, const lay::Salt &salt
 
       }
 
-      if (! p->downloaded && download_package_information ()) {
+      if (! p->downloaded && salt_mine.download_package_information ()) {
 
         //  If requested, download package information to complete information from index or dependencies
         if (tl::verbosity() >= 10) {

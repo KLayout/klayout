@@ -886,8 +886,10 @@ TEST (21)
   os << "A test";
   os.close ();
 
-  tl::InputStream is (p);
-  EXPECT_EQ (is.read_all (), "A test");
+  {
+    tl::InputStream is (p);
+    EXPECT_EQ (is.read_all (), "A test");
+  }
 
   EXPECT_EQ (tl::rm_file (p), true);
   EXPECT_EQ (tl::file_exists (p), false);
@@ -925,8 +927,10 @@ TEST (23)
   os << "A test";
   os.close ();
 
-  tl::InputStream is (tl::combine_path (p, "test"));
-  EXPECT_EQ (is.read_all (), "A test");
+  {
+    tl::InputStream is (tl::combine_path (p, "test"));
+    EXPECT_EQ (is.read_all (), "A test");
+  }
 
   EXPECT_EQ (tl::rm_dir_recursive (p), true);
   EXPECT_EQ (tl::file_exists (p), false);

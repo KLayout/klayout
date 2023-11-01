@@ -1038,7 +1038,7 @@ tmpfile (const std::string &domain)
   char *tmpstr = strdup (templ.c_str ());
 
 #if defined(_WIN32)
-  if (_mktemp_s (tmpstr, templ) != 0) {
+  if (_mktemp_s (tmpstr, templ.size ()) != 0) {
     free (tmpstr);
     throw tl::Exception (tl::to_string (tr ("Unable to create temporary folder name in %s")), tmp);
   }
@@ -1092,7 +1092,7 @@ tmpdir (const std::string &domain)
   char *tmpstr = strdup (templ.c_str ());
 
 #if defined(_WIN32)
-  if (_mktemp_s (tmpstr, templ) != 0) {
+  if (_mktemp_s (tmpstr, templ.size ()) != 0) {
     free (tmpstr);
     throw tl::Exception (tl::to_string (tr ("Unable to create temporary folder name in %s")), tmp);
   }

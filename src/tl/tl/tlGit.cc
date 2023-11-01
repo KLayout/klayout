@@ -20,6 +20,7 @@
 
 */
 
+#if defined(HAVE_GIT2)
 
 #include "tlGit.h"
 #include "tlFileUtils.h"
@@ -396,3 +397,5 @@ GitObject::download_item (const std::string &url, const std::string &file, const
 }
 
 }
+
+#endif

@@ -78,12 +78,7 @@ GitObject::GitObject (const std::string &local_path)
   InitHelper::ensure_initialized ();
 
   if (local_path.empty ()) {
-    //  @@@ generic tempnam on Windows/Posix ...
-    char tmp[] = "/tmp/git2klayoutXXXXXX";
-    if (mkdtemp (tmp) == NULL) {
-      throw tl::Exception (tl::to_string (tr ("Unable to create temporary folder: %s")), (const char *) tmp);
-    }
-    m_local_path = tmp;
+    m_local_path = tl::tmpdir ("git2klayout");
     m_is_temp = true;
   }
 

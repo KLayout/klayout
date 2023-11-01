@@ -189,6 +189,68 @@ std::string TL_PUBLIC current_dir ();
 bool TL_PUBLIC chdir (const std::string &path);
 
 /**
+ *  @brief Gets a temporary file path
+ *
+ *  This function will make a temporary file with a unique name.
+ *  The "domain" string is used as part of the file name as an disambiguator.
+ *
+ *  The function reads $TMPDIR or $TMP to define the location of the temporary
+ *  directory. On Linux, the default is /tmp.
+ *
+ *  The file is created and it is the responsibility of the caller to remove
+ *  the file.
+ */
+std::string TL_PUBLIC tmpfile (const std::string &domain = std::string ());
+
+/**
+ *  @brief A class wrapping a temporary file
+ *
+ *  In the destructor of this class, the temporary file will be deleted again.
+ */
+class TL_PUBLIC TemporaryFile
+{
+public:
+  TemporaryFile (const std::string &domain = std::string ());
+  ~TemporaryFile ();
+
+  const std::string &path () const
+  {
+    return m_path;
+  }
+
+private:
+  std::string m_path;
+};
+
+/**
+ *  @brief Gets a temporary folder path
+ *
+ *  Similar to "tmpfile", but will create a new, empty folder. Again it is the
+ *  reposibility of the caller to clean up.
+ */
+std::string TL_PUBLIC tmpdir (const std::string &domain = std::string ());
+
+/**
+ *  @brief A class wrapping a temporary directory
+ *
+ *  In the destructor of this class, the temporary directory will be deleted again.
+ */
+class TL_PUBLIC TemporaryDirectory
+{
+public:
+  TemporaryDirectory (const std::string &domain = std::string ());
+  ~TemporaryDirectory ();
+
+  const std::string &path () const
+  {
+    return m_path;
+  }
+
+private:
+  std::string m_path;
+};
+
+/**
  *  @brief This function splits the path into it's components
  *  On Windows, the first component may be the drive prefix ("C:") or
  *  UNC server name ("\\server").

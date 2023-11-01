@@ -305,7 +305,6 @@ SaltGrainDetailsTextWidget::details_text ()
         if (! d->url.empty ()) {
           stream << " - ";
           stream << "[" << tl::to_qstring (tl::escaped_to_html (d->url)) << "]<br/>";
-          //  @@@ TODO: protocol and branch
         }
       }
       stream << "</p>";

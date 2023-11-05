@@ -252,6 +252,14 @@ checkout_branch (git_repository *repo, git_remote *remote, const git_checkout_op
   check (git_checkout_head (repo, co_opts));
 }
 
+int
+credentials_cb (git_credential ** /*out*/, const char * /*url*/, const char * /*username*/, unsigned int /*allowed_types*/, void *)
+{
+  //  no credentials aquired
+  git_error_set_str (GIT_ERROR_NONE, "anonymous access is supported only, but server requests credentials");
+  return GIT_EUSER;
+}
+
 void
 GitObject::read (const std::string &org_url, const std::string &org_filter, const std::string &subfolder, const std::string &branch, double timeout, tl::InputHttpStreamCallback *callback)
 {
@@ -294,6 +302,7 @@ GitObject::read (const std::string &org_url, const std::string &org_filter, cons
   fetch_opts.depth = 1;  // shallow (single commit)
 #endif
   fetch_opts.callbacks.transfer_progress = &fetch_progress;
+  fetch_opts.callbacks.credentials = &credentials_cb;
   fetch_opts.callbacks.payload = (void *) &progress;
 
   //  build refspecs in case they are needed

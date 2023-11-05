@@ -27,6 +27,7 @@
 #include "tlFileUtils.h"
 
 static std::string test_url ("https://github.com/klayout/klayout_git_test.git");
+static std::string test_url_invalid ("https://github.com/klayout/doesnotexist.git");
 
 TEST(1_plain)
 {
@@ -198,6 +199,18 @@ TEST(10_invalid_branch)
     EXPECT_EQ (true, false);
   } catch (tl::Exception &ex) {
     EXPECT_EQ (ex.msg (), "Git checkout - Unable to resolve reference name: brxxx");
+  }
+}
+
+TEST(11_invalid_url)
+{
+  std::string path = tl::TestBase::tmp_file ("repo");
+  tl::GitObject repo (path);
+  try {
+    repo.read (test_url_invalid, std::string (), std::string (), std::string ("brxxx"));
+    EXPECT_EQ (true, false);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg (), "Error cloning Git repo: anonymous access is supported only, but server requests credentials");
   }
 }
 

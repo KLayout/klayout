@@ -497,25 +497,25 @@ Salt::create_grain (const SaltGrain &templ, SaltGrain &target, double timeout, t
 
   } else if (! templ.url ().empty ()) {
 
-    if (templ.url ().find ("http:") == 0 || templ.url ().find ("https:") == 0) {
+    lay::SaltParsedURL purl (templ.url ());
+
+    if (purl.url ().find ("http:") == 0 || purl.url ().find ("https:") == 0) {
 
       //  otherwise download from the URL using Git or SVN
-
-      lay::SaltParsedURL purl (templ.url ());
 
       if (purl.protocol () == Git) {
 
 #if defined(HAVE_GIT2)
-        tl::info << QObject::tr ("Downloading package from '%1' to '%2' using Git protocol ..").arg (tl::to_qstring (templ.url ())).arg (tl::to_qstring (target.path ()));
-        res = tl::GitObject::download (templ.url (), target.path (), purl.subfolder (), purl.branch (), timeout, callback);
+        tl::info << QObject::tr ("Downloading package from '%1' to '%2' using Git protocol (ref='%3', subdir='%4') ..").arg (tl::to_qstring (purl.url ())).arg (tl::to_qstring (target.path ())).arg (tl::to_qstring (purl.branch ())).arg (tl::to_qstring (purl.subfolder ()));
+        res = tl::GitObject::download (purl.url (), target.path (), purl.subfolder (), purl.branch (), timeout, callback);
 #else
         throw tl::Exception (tl::to_string (QObject::tr ("Unable to install package '%1' - git protocol not compiled in").arg (tl::to_qstring (target.name ()))));
 #endif
 
       } else if (purl.protocol () == WebDAV || purl.protocol () == DefaultProtocol) {
 
-        tl::info << QObject::tr ("Downloading package from '%1' to '%2' using SVN/WebDAV protocol ..").arg (tl::to_qstring (templ.url ())).arg (tl::to_qstring (target.path ()));
-        res = tl::WebDAVObject::download (templ.url (), target.path (), timeout, callback);
+        tl::info << QObject::tr ("Downloading package from '%1' to '%2' using SVN/WebDAV protocol ..").arg (tl::to_qstring (purl.url ())).arg (tl::to_qstring (target.path ()));
+        res = tl::WebDAVObject::download (purl.url (), target.path (), timeout, callback);
 
       }
 

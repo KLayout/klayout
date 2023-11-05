@@ -79,7 +79,7 @@ public:
    *
    *  Sub-directories are created if required.
    *
-   *  This method throws an exception if the directory structure could
+   *  This method returns false if the directory structure could
    *  not be obtained or downloading of one file failed.
    *
    *  "branch" is the remote ref to use. This can be a branch name, a tag name,

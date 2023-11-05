@@ -384,9 +384,20 @@ GitObject::read (const std::string &org_url, const std::string &org_filter, cons
 bool
 GitObject::download (const std::string &url, const std::string &target, const std::string &subfolder, const std::string &branch, double timeout, tl::InputHttpStreamCallback *callback)
 {
-  GitObject obj (target);
-  obj.read (url, std::string (), subfolder, branch, timeout, callback);
-  return false;
+  try {
+
+    GitObject obj (target);
+    obj.read (url, std::string (), subfolder, branch, timeout, callback);
+
+    return true;
+
+  } catch (tl::Exception &ex) {
+
+    tl::error << tl::sprintf (tl::to_string (tr ("Error downloading Git repo from %s (subdir '%s', ref '%s')")), url, subfolder, branch);
+
+    return false;
+
+  }
 }
 
 tl::InputStream *

@@ -31,6 +31,7 @@
 #include <list>
 #include <memory>
 #include <cstring>
+#include <optional>
 
 namespace gsi
 {

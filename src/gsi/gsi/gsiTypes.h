@@ -33,6 +33,8 @@
 #include <vector>
 #include <list>
 #include <set>
+#include <optional>
+#include <cstdint>
 #include <stdexcept>
 
 #if defined(HAVE_QT)

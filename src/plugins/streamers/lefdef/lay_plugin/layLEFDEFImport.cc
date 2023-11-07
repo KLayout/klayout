@@ -140,6 +140,13 @@ public:
         }
 
         db::LEFDEFReader reader (stream);
+
+        //  Add the LEF files specified explicitly
+        db::LEFDEFReaderOptions *lefdef_options = dynamic_cast<db::LEFDEFReaderOptions *> (options.get_options (reader.format ()));
+        auto lef_files = lefdef_options->lef_files ();
+        lef_files.insert (lef_files.end (), data.lef_files.begin (), data.lef_files.end ());
+        lefdef_options->set_lef_files (lef_files);
+
         reader.read_lefdef (*layout, options, import_lef);
 
         lay::LayoutView *view = lay::LayoutView::current ();

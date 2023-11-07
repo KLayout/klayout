@@ -53,6 +53,7 @@ Requires: qt5-qttools-devel >= 5.11.1
 Requires:	ruby >= 2.0.0
 Requires:	python3 >= 3.6.0
 Requires: qt-x11 >= 4.8.5
+Requires: libgit2 >= 0.26.8
 %define buildopt -j2
 %endif
 
@@ -62,7 +63,7 @@ Requires: libcurl >= 7.19.7
 Requires: ruby >= 1.8.7
 Requires: python >= 2.6.6
 Requires: qt-x11 >= 4.6.2
-%define buildopt -libcurl -j2
+%define buildopt -libcurl -j2 -nolibgit2
 %endif
 
 %if "%{target_system}" == "opensuse42_2"
@@ -70,7 +71,7 @@ Requires: qt-x11 >= 4.6.2
 Requires:	ruby2.3 >= 2.3.1
 Requires:	python3 >= 3.4.6
 Requires: libqt4-x11 >= 4.8.6
-%define buildopt -j2
+%define buildopt -j2 -nolibgit2
 %endif
 
 %if "%{target_system}" == "opensuse42_3"
@@ -78,13 +79,14 @@ Requires: libqt4-x11 >= 4.8.6
 Requires:	ruby2.3 >= 2.3.1
 Requires:	python3 >= 3.4.6
 Requires: libqt4-x11 >= 4.8.6
-%define buildopt -j2
+%define buildopt -j2 -nolibgit2
 %endif
 
 %if "%{target_system}" == "opensuse15"
 # OpenSuSE Leap 15 requirements
 Requires:	ruby >= 2.5
 Requires:	python3 >= 3.6
+Requires:	libgit2 >= 1.3.0
 Requires: libqt5-qtbase >= 5.15.2
 Requires: libQt5PrintSupport5 >= 5.15.2
 Requires: libQt5Designer5 >= 5.15.2

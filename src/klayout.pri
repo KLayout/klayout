@@ -103,6 +103,15 @@ equals(HAVE_PTHREADS, "1") {
   DEFINES += HAVE_PTHREADS
 }
 
+equals(HAVE_GIT2, "1") {
+  !isEmpty(BITS_PATH) {
+    include($$BITS_PATH/git2/git2.pri)
+  } else {
+    LIBS += -lgit2
+  }
+  DEFINES += HAVE_GIT2
+}
+
 equals(HAVE_RUBY, "1") {
   !isEmpty(BITS_PATH) {
     include($$BITS_PATH/ruby/ruby.pri)

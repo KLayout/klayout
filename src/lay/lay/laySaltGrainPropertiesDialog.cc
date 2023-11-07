@@ -25,6 +25,7 @@
 #include "tlString.h"
 #include "tlExceptions.h"
 #include "tlHttpStream.h"
+#include "tlEnv.h"
 
 #include <QFileDialog>
 #include <QFileInfo>
@@ -40,6 +41,14 @@
 
 namespace lay
 {
+
+// ----------------------------------------------------------------------------------------------------
+
+static bool download_package_information ()
+{
+  //  $KLAYOUT_ALWAYS_DOWNLOAD_PACKAGE_INFO
+  return tl::app_flag ("always-download-package-info");
+}
 
 // ----------------------------------------------------------------------------------------------------
 
@@ -583,7 +592,7 @@ SaltGrainPropertiesDialog::accept ()
                                   << tr ("If the dependency package has a version itself, the version is automatically set to its current version.");
     }
 
-    if (!d->url.empty ()) {
+    if (!d->url.empty () && download_package_information ()) {
       SaltGrain gdep;
       try {
         gdep = SaltGrain::from_url (d->url);

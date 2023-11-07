@@ -49,6 +49,9 @@ namespace lay
  */
 struct SaltGrainDependency
 {
+  SaltGrainDependency ()
+  { }
+
   std::string name;
   std::string url;
   std::string version;
@@ -466,6 +469,8 @@ public:
    *  This method will return a grain constructed from the downloaded data.
    *  The data is read from "URL/grain.xml". This method will throw an
    *  exception if an error occurs during reading.
+   *
+   *  CAUTION: with GIT protocol and large repositories, this function may be very expensive.
    */
   static SaltGrain from_url (const std::string &url, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);
 
@@ -474,13 +479,15 @@ public:
    *  The stream is a new'd object and needs to be deleted by the caller.
    *  "url" is the download URL on input and gets modified to match the
    *  actual URL if it is a relative one.
+   *
+   *  CAUTION: with GIT protocol and large repositories, this function may be very expensive.
    */
   static tl::InputStream *stream_from_url (std::string &url, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);
 
   /**
-   *  @brief Forms the spec file download URL from a given download URL
+   *  @brief Gets the name of the spec file ("grain.xml")
    */
-  static std::string spec_url (const std::string &url);
+  static const std::string &spec_file ();
 
   /**
    *  @brief Returns a value indicating whether the given path represents is a grain

@@ -188,6 +188,9 @@ private:
   std::unique_ptr<lay::SaltGrain> m_downloaded_grain, m_salt_mine_grain;
   SaltGrainDetailsTextWidget *mp_downloaded_target;
   std::unique_ptr<tl::InputStream> m_salt_mine_reader;
+  tl::DeferredMethod<SaltManagerDialog> dm_mine_update_selected_changed;
+  tl::DeferredMethod<SaltManagerDialog> dm_mine_new_selected_changed;
+  std::map<std::string, lay::SaltGrain> m_salt_grain_cache;
 
   SaltGrain *current_grain ();
   std::vector<lay::SaltGrain *> current_grains ();
@@ -199,6 +202,8 @@ private:
   void show_error (tl::Exception &ex);
   void salt_mine_download_started ();
   void salt_mine_download_finished ();
+  void do_mine_update_selected_changed ();
+  void do_mine_new_selected_changed ();
 };
 
 }

@@ -13,7 +13,7 @@ HEADERS = \
   lvsCommon.h \
   lvsForceLink.h \
 
-!equals(HAVE_QT, "0") || !equals(HAVE_PYTHON, "0") {
+!equals(HAVE_QT, "0") {
   RESOURCES = \
     lvsResources.qrc
 }

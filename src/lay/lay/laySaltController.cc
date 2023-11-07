@@ -23,6 +23,7 @@
 #include "laySaltController.h"
 #include "laySaltManagerDialog.h"
 #include "laySaltDownloadManager.h"
+#include "laySaltParsedURL.h"
 #include "layConfig.h"
 #include "layMainWindow.h"
 #include "layQtTools.h"
@@ -142,7 +143,7 @@ SaltController::show_editor ()
     {
       //  while running the dialog, don't watch file events - that would interfere with
       //  the changes applied by the dialog itself.
-      lay::BusySection busy_section;  //  disable file watcher
+      tl::FileSystemWatcherDisabled disable_file_watcher;  //  disable file watcher
       mp_salt_dialog->exec ();
     }
 
@@ -156,7 +157,7 @@ SaltController::show_editor ()
 void
 SaltController::sync_file_watcher ()
 {
-  lay::BusySection busy_section;  //  disable file watcher
+  tl::FileSystemWatcherDisabled disable_file_watcher;  //  disable file watcher
 
   if (m_file_watcher) {
     m_file_watcher->clear ();
@@ -202,12 +203,19 @@ SaltController::install_packages (const std::vector<std::string> &packages, bool
       }
     }
 
-    if (n.find ("http:") == 0 || n.find ("https:") == 0 || n.find ("file:") == 0 || n[0] == '/' || n[0] == '\\') {
+    lay::SaltParsedURL purl (n);
+    const std::string &url = purl.url ();
+
+    if (url.find ("http:") == 0 || url.find ("https:") == 0 || url.find ("file:") == 0 || url[0] == '/' || url[0] == '\\') {
+
       //  its a URL
       manager.register_download (std::string (), std::string (), n, v);
+
     } else {
+
       //  its a plain name
       manager.register_download (n, std::string (), std::string (), v);
+
     }
 
   }
@@ -223,7 +231,7 @@ SaltController::install_packages (const std::vector<std::string> &packages, bool
   {
     //  while running the dialog, don't watch file events - that would interfere with
     //  the changes applied by the dialog itself.
-    lay::BusySection busy_section;  //  disable file watcher
+    tl::FileSystemWatcherDisabled disable_file_watcher;  //  disable file watcher
     result = manager.execute (0, m_salt);
   }
 

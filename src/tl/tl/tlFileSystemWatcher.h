@@ -140,6 +140,23 @@ private:
   std::map<std::string, FileEntry>::iterator m_iter;
 };
 
+/**
+ *  @brief A class employing RIIA for locking the file system watcher
+ */
+class TL_PUBLIC FileSystemWatcherDisabled
+{
+public:
+  FileSystemWatcherDisabled ()
+  {
+    tl::FileSystemWatcher::global_enable (false);
+  }
+
+  ~FileSystemWatcherDisabled ()
+  {
+    tl::FileSystemWatcher::global_enable (true);
+  }
+};
+
 }
 
 #endif

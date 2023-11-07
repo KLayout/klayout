@@ -27,6 +27,7 @@
 #include "tlEnv.h"
 
 #include <cctype>
+#include <fstream>
 
 // Use this define to print debug output
 // #define FILE_UTILS_VERBOSE
@@ -584,6 +585,48 @@ cp_dir_recursive (const std::string &source, const std::string &target)
   return true;
 }
 
+bool
+mv_dir_recursive (const std::string &source, const std::string &target)
+{
+  std::vector<std::string> entries;
+  std::string path = tl::absolute_file_path (source);
+  std::string path_to = tl::absolute_file_path (target);
+
+  bool error = false;
+
+  entries = dir_entries (path, false /*without_files*/, true /*with_dirs*/);
+  for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
+    std::string tc = tl::combine_path (path_to, *e);
+    if (! mkpath (tc)) {
+#if defined(FILE_UTILS_VERBOSE)
+      tl::error << tr ("Unable to create target directory: ") << tc;
+#endif
+      error = true;
+    } else if (! mv_dir_recursive (tl::combine_path (path, *e), tc)) {
+      error = true;
+    }
+  }
+
+  entries = dir_entries (path, true /*with_files*/, false /*without_dirs*/);
+  for (std::vector<std::string>::const_iterator e = entries.begin (); e != entries.end (); ++e) {
+    if (! tl::rename_file (tl::combine_path (path, *e), tl::combine_path (path_to, *e))) {
+#if defined(FILE_UTILS_VERBOSE)
+      tl::error << tr ("Unable to move file from ") << tl::combine_path (path, *e) << tr (" to ") << tl::combine_path (path_to, *e);
+#endif
+      error = true;
+    }
+  }
+
+  if (! tl::rm_dir (path)) {
+#if defined(FILE_UTILS_VERBOSE)
+      tl::error << tr ("Unable to remove folder ") << path;
+#endif
+    error = true;
+  }
+
+  return ! error;
+}
+
 std::string absolute_path (const std::string &s)
 {
   std::vector<std::string> parts = split_path (absolute_file_path (s));
@@ -975,5 +1018,109 @@ get_module_path (void *addr)
 
 #endif
 }
+
+std::string
+tmpfile (const std::string &domain)
+{
+  std::string tmp = tl::get_env ("TMPDIR");
+  if (tmp.empty ()) {
+    tmp = tl::get_env ("TMP");
+  }
+  if (tmp.empty ()) {
+#if defined(_WIN32)
+    throw tl::Exception (tl::to_string (tr ("TMP and TMPDIR not set - cannot create temporary file")));
+#else
+    tmp = "/tmp";
+#endif
+  }
+
+  std::string templ = tl::combine_path (tmp, domain + "XXXXXX");
+  char *tmpstr = strdup (templ.c_str ());
+
+#if defined(_WIN32)
+  if (_mktemp_s (tmpstr, templ.size () + 1) != 0) {
+    free (tmpstr);
+    throw tl::Exception (tl::to_string (tr ("Unable to create temporary folder name in %s")), tmp);
+  }
+
+  //  for compatibility with Linux, create the file as an empty one
+  std::ofstream os (tmpstr);
+  if (os.bad ()) {
+    throw tl::Exception (tl::to_string (tr ("Unable to create temporary folder in %s")), tmp);
+  }
+  os.close ();
+#else
+  int fd = mkstemp (tmpstr);
+  if (fd < 0) {
+    free (tmpstr);
+    throw tl::Exception (tl::to_string (tr ("Unable to create temporary folder in %s")), tmp);
+  }
+  close (fd);
+#endif
+
+  std::string res = tmpstr;
+  free (tmpstr);
+  return res;
+}
+
+TemporaryFile::TemporaryFile (const std::string &domain)
+{
+  m_path = tmpfile (domain);
+}
+
+TemporaryFile::~TemporaryFile ()
+{
+  tl::rm_file (m_path);
+}
+
+std::string
+tmpdir (const std::string &domain)
+{
+  std::string tmp = tl::get_env ("TMPDIR");
+  if (tmp.empty ()) {
+    tmp = tl::get_env ("TMP");
+  }
+  if (tmp.empty ()) {
+#if defined(_WIN32)
+    throw tl::Exception (tl::to_string (tr ("TMP and TMPDIR not set - cannot create temporary file")));
+#else
+    tmp = "/tmp";
+#endif
+  }
+
+  std::string templ = tl::combine_path (tmp, domain + "XXXXXX");
+  char *tmpstr = strdup (templ.c_str ());
+
+#if defined(_WIN32)
+  if (_mktemp_s (tmpstr, templ.size () + 1) != 0) {
+    free (tmpstr);
+    throw tl::Exception (tl::to_string (tr ("Unable to create temporary folder name in %s")), tmp);
+  }
+  if (! tl::mkdir (tmpstr)) {
+    free (tmpstr);
+    throw tl::Exception (tl::to_string (tr ("Unable to create temporary folder in %s")), tmp);
+  }
+#else
+  if (mkdtemp (tmpstr) == NULL) {
+    free (tmpstr);
+    throw tl::Exception (tl::to_string (tr ("Unable to create temporary folder in %s")), tmp);
+  }
+#endif
+
+  std::string res = tmpstr;
+  free (tmpstr);
+  return res;
+}
+
+TemporaryDirectory::TemporaryDirectory (const std::string &domain)
+{
+  m_path = tmpdir (domain);
+}
+
+TemporaryDirectory::~TemporaryDirectory ()
+{
+  tl::rm_dir_recursive (m_path);
+}
+
 
 }

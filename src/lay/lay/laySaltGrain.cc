@@ -22,11 +22,15 @@
 
 #include "laySaltGrain.h"
 #include "laySaltController.h"
+#include "laySaltParsedURL.h"
 #include "tlString.h"
 #include "tlXMLParser.h"
 #include "tlHttpStream.h"
-#include "tlWebDAV.h"
 #include "tlFileUtils.h"
+#include "tlWebDAV.h"
+#if defined(HAVE_GIT2)
+#  include "tlGit.h"
+#endif
 
 #include <memory>
 #include <QDir>
@@ -65,7 +69,8 @@ SaltGrain::operator== (const SaltGrain &other) const
          m_license == other.m_license &&
          m_hidden == other.m_hidden &&
          m_authored_time == other.m_authored_time &&
-         m_installed_time == other.m_installed_time;
+         m_installed_time == other.m_installed_time
+      ;
 }
 
 void
@@ -253,18 +258,10 @@ SaltGrain::compare_versions (const std::string &v1, const std::string &v2)
   }
 }
 
-std::string
-SaltGrain::spec_url (const std::string &url)
+const std::string &
+SaltGrain::spec_file ()
 {
-  std::string res = url;
-  if (! res.empty()) {
-    //  TODO: use system path separator unless this is a URL
-    if (res [res.size () - 1] != '/') {
-      res += "/";
-    }
-    res += grain_filename;
-  }
-  return res;
+  return grain_filename;
 }
 
 bool
@@ -512,14 +509,21 @@ SaltGrain::from_path (const std::string &path)
 }
 
 tl::InputStream *
-SaltGrain::stream_from_url (std::string &url, double timeout, tl::InputHttpStreamCallback *callback)
+SaltGrain::stream_from_url (std::string &generic_url, double timeout, tl::InputHttpStreamCallback *callback)
 {
-  if (url.empty ()) {
+  if (generic_url.empty ()) {
     throw tl::Exception (tl::to_string (QObject::tr ("No download link available")));
   }
 
+  if (tl::verbosity () >= 20) {
+    tl::info << tr ("Downloading package info from ") << generic_url;
+  }
+
+  lay::SaltParsedURL purl (generic_url);
+  const std::string &url = purl.url ();
+
   //  base relative URL's on the salt mine URL
-  if (url.find ("http:") != 0 && url.find ("https:") != 0 && url.find ("file:") != 0 && !url.empty() && url[0] != '/' && url[0] != '\\' && lay::SaltController::instance ()) {
+  if (purl.protocol () == lay::DefaultProtocol && url.find ("http:") != 0 && url.find ("https:") != 0 && url.find ("file:") != 0 && !url.empty() && url[0] != '/' && url[0] != '\\' && lay::SaltController::instance ()) {
 
     //  replace the last component ("repository.xml") by the given path
     QUrl sami_url (tl::to_qstring (lay::SaltController::instance ()->salt_mine_url ()));
@@ -529,15 +533,27 @@ SaltGrain::stream_from_url (std::string &url, double timeout, tl::InputHttpStrea
     }
     sami_url.setPath (path_comp.join (QString::fromUtf8 ("/")));
 
-    url = tl::to_string (sami_url.toString ());
+    //  return the full path as a file path, not an URL
+    generic_url = tl::to_string (sami_url.toString ());
 
   }
 
-  std::string spec_url = SaltGrain::spec_url (url);
-  if (spec_url.find ("http:") == 0 || spec_url.find ("https:") == 0) {
-    return tl::WebDAVObject::download_item (spec_url, timeout, callback);
+  if (url.find ("http:") == 0 || url.find ("https:") == 0) {
+
+    if (purl.protocol () == lay::Git) {
+#if defined(HAVE_GIT2)
+      return tl::GitObject::download_item (url, SaltGrain::spec_file (), purl.subfolder (), purl.branch (), timeout, callback);
+#else
+      throw tl::Exception (tl::to_string (QObject::tr ("Cannot download from Git - Git support not compiled in")));
+#endif
+    } else {
+      return tl::WebDAVObject::download_item (url + "/" + SaltGrain::spec_file (), timeout, callback);
+    }
+
   } else {
-    return new tl::InputStream (spec_url);
+
+    return new tl::InputStream (url);
+
   }
 }
 

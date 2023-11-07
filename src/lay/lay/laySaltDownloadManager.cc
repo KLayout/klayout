@@ -27,6 +27,7 @@
 #include "tlFileUtils.h"
 #include "tlWebDAV.h"
 #include "tlLog.h"
+#include "tlEnv.h"
 
 #include <memory>
 #include <QTreeWidgetItem>
@@ -310,41 +311,80 @@ SaltDownloadManager::fetch_missing (const lay::Salt &salt, const lay::Salt &salt
       ++progress;
 
       //  Add URL and token from the package index
+      //
+      //  In order to do so, we try to use the information from that package index as far as possible.
+      //  Downloading a package definition from the original package URL may be expensive in case of
+      //  large GIT repositories.
+      //
+      //  Downloading is required if:
+      //  - A package download is requested without a name (package can't be looked up in the package index)
+      //  - Or a name is given, but not found in the package index
+      //
+      //  Downloading can be bypassed if the package index (salt mine) specifies "sparse=false".
+      //  In that case, the package index will have all information about the package.
+
       if (! p->name.empty ()) {
 
         const lay::SaltGrain *g = salt_mine.grain_by_name (p->name);
         if (! g) {
           if (p->url.empty ()) {
-            throw tl::Exception (tl::to_string (QObject::tr ("Package '%1' not found in index - cannot resolve download URL").arg (tl::to_qstring (p->name))));
+            throw tl::Exception (tl::to_string (tr ("Package '%s' not found in index - cannot resolve download URL")), p->name);
           }
         } else {
           if (p->url.empty ()) {
             if (tl::verbosity() >= 20) {
-              tl::log << "Resolved package URL for package " << p->name << ": " << g->url ();
+              tl::log << tr ("Resolved package URL for package") << " '" << p->name << "': " << g->url ();
             }
             p->url = g->url ();
           }
           p->token = g->token ();
+          p->grain = *g;
+          p->downloaded = true;
         }
 
       }
 
-      try {
-        p->grain = SaltGrain::from_url (p->url);
-      } catch (tl::Exception &ex) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Error fetching spec file for package '%1': %2").arg (tl::to_qstring (p->name)).arg (tl::to_qstring (ex.msg ()))));
+      if (! p->downloaded && salt_mine.download_package_information ()) {
+
+        //  If requested, download package information to complete information from index or dependencies
+        if (tl::verbosity() >= 10) {
+          tl::log << tl::sprintf (tl::to_string (tr ("Reading package description for package '%s' from: '%s")), p->name, p->url);
+        }
+        try {
+          p->grain = SaltGrain::from_url (p->url);
+          p->downloaded = true;
+        } catch (tl::Exception &ex) {
+          throw tl::Exception (tl::to_string (tr ("Error fetching spec file for package from '%s': %s")), p->url, ex.msg ());
+        }
+
       }
 
-      if (p->version.empty ()) {
-        p->version = p->grain.version ();
+      if (! p->downloaded) {
+
+        if (p->name.empty ()) {
+          throw tl::Exception (tl::to_string (tr ("No name given package from '%s' (from dependencies or command line installation request)")), p->url);
+        }
+
+        if (tl::verbosity() >= 10) {
+          tl::warn << tl::sprintf (tl::to_string (tr ("Package '%s' not downloaded from: %s. Dependencies may not be resolved.")), p->name, p->url);
+        }
+
+      } else {
+
+        if (p->version.empty ()) {
+          p->version = p->grain.version ();
+        }
+        if (p->name.empty ()) {
+          p->name = p->grain.name ();
+        }
+
+        if (SaltGrain::compare_versions (p->grain.version (), p->version) < 0) {
+          throw tl::Exception (tl::to_string (tr ("Package '%s': package in repository is too old (%s) to satisfy requirements (%s)")), p->name, p->grain.version (), p->version);
+        }
+
       }
 
-      p->name = p->grain.name ();
       p->downloaded = true;
-
-      if (SaltGrain::compare_versions (p->grain.version (), p->version) < 0) {
-        throw tl::Exception (tl::to_string (QObject::tr ("Package '%1': package in repository is too old (%2) to satisfy requirements (%3)").arg (tl::to_qstring (p->name)).arg (tl::to_qstring (p->grain.version ())).arg (tl::to_qstring (p->version))));
-      }
 
     }
 

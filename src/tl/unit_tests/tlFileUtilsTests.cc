@@ -285,6 +285,58 @@ TEST (3_NOQT)
   }
 }
 
+TEST (4_mv_dir)
+{
+  std::string tmp_dir = tl::absolute_file_path (tmp_file ());
+  std::string adir = tl::combine_path (tmp_dir, "a");
+
+  std::string b1dir = tl::combine_path (adir, "b1");
+  tl::mkpath (b1dir);
+  EXPECT_EQ (tl::file_exists (b1dir), true);
+
+  std::string b2dir = tl::combine_path (adir, "b2");
+  tl::mkpath (b2dir);
+  EXPECT_EQ (tl::file_exists (b1dir), true);
+
+  {
+    tl::OutputStream os (tl::absolute_file_path (tl::combine_path (b2dir, "x")));
+    os << "hello, world!\n";
+  }
+
+  {
+    tl::OutputStream os (tl::absolute_file_path (tl::combine_path (b2dir, "y")));
+    os << "hello, world II!\n";
+  }
+
+  std::string acopydir = tl::combine_path (tmp_dir, "acopy");
+  tl::rm_dir_recursive (acopydir);
+  tl::mkpath (acopydir);
+
+  tl::mv_dir_recursive (adir, acopydir);
+
+  EXPECT_EQ (tl::file_exists (acopydir), true);
+  EXPECT_EQ (tl::file_exists (adir), false);
+
+  std::string b1copydir = tl::combine_path (acopydir, "b1");
+  EXPECT_EQ (tl::file_exists (b1copydir), true);
+  std::string b2copydir = tl::combine_path (acopydir, "b2");
+  EXPECT_EQ (tl::file_exists (b2copydir), true);
+
+  {
+    std::string xfile = tl::combine_path (b2copydir, "x");
+    EXPECT_EQ (tl::file_exists (xfile), true);
+    tl::InputStream is (xfile);
+    EXPECT_EQ (is.read_all (), "hello, world!\n");
+  }
+
+  {
+    std::string yfile = tl::combine_path (b2copydir, "y");
+    EXPECT_EQ (tl::file_exists (yfile), true);
+    tl::InputStream is (yfile);
+    EXPECT_EQ (is.read_all (), "hello, world II!\n");
+  }
+}
+
 //  Secret mode switchers for testing
 namespace tl
 {
@@ -797,6 +849,13 @@ TEST (18)
     tl::InputStream is (zfile);
     EXPECT_EQ (is.read_all (), "hello, world!\n");
   }
+
+  //  rename directory
+  tl::rename_file (tl::combine_path (tp, "dir"), "dirx");
+
+  EXPECT_EQ (tl::file_exists (tl::combine_path (tp, "dir")), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (tp, "dirx")), true);
+  EXPECT_EQ (tl::is_dir (tl::combine_path (tp, "dirx")), true);
 }
 
 //  get_home_path
@@ -816,3 +875,87 @@ TEST (20)
   EXPECT_EQ (tl::absolute_file_path ("~"), tl::get_home_path ());
   EXPECT_EQ (tl::absolute_file_path (tl::combine_path ("~", "test")), tl::combine_path (tl::get_home_path (), "test"));
 }
+
+//  tmpfile
+TEST (21)
+{
+  std::string p = tl::tmpfile ("tl_tests");
+  EXPECT_EQ (tl::file_exists (p), true);
+
+  std::ofstream os (p);
+  os << "A test";
+  os.close ();
+
+  {
+    tl::InputStream is (p);
+    EXPECT_EQ (is.read_all (), "A test");
+  }
+
+  EXPECT_EQ (tl::rm_file (p), true);
+  EXPECT_EQ (tl::file_exists (p), false);
+}
+
+//  TemporaryFile
+TEST (22)
+{
+  std::string p;
+
+  {
+    tl::TemporaryFile tf ("tl_tests");
+    p = tf.path ();
+    EXPECT_EQ (tl::file_exists (tf.path ()), true);
+
+    std::ofstream os (tf.path ());
+    os << "A test";
+    os.close ();
+
+    tl::InputStream is (tf.path ());
+    EXPECT_EQ (is.read_all (), "A test");
+  }
+
+  EXPECT_EQ (tl::file_exists (p), false);
+}
+
+//  tmpdir
+TEST (23)
+{
+  std::string p = tl::tmpdir ("tl_tests");
+  EXPECT_EQ (tl::file_exists (p), true);
+  EXPECT_EQ (tl::is_dir (p), true);
+
+  std::ofstream os (tl::combine_path (p, "test"));
+  os << "A test";
+  os.close ();
+
+  {
+    tl::InputStream is (tl::combine_path (p, "test"));
+    EXPECT_EQ (is.read_all (), "A test");
+  }
+
+  EXPECT_EQ (tl::rm_dir_recursive (p), true);
+  EXPECT_EQ (tl::file_exists (p), false);
+}
+
+//  TemporaryDirectory object
+TEST (24)
+{
+  std::string p;
+
+  {
+    tl::TemporaryDirectory tmpdir ("tl_tests");
+    p = tmpdir.path ();
+
+    EXPECT_EQ (tl::file_exists (p), true);
+    EXPECT_EQ (tl::is_dir (p), true);
+
+    std::ofstream os (tl::combine_path (p, "test"));
+    os << "A test";
+    os.close ();
+
+    tl::InputStream is (tl::combine_path (p, "test"));
+    EXPECT_EQ (is.read_all (), "A test");
+  }
+
+  EXPECT_EQ (tl::file_exists (p), false);
+}
+

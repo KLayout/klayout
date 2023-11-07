@@ -407,7 +407,7 @@ HEADERS = \
   dbShapeCollection.h \
   dbShapeCollectionUtils.h
 
-!equals(HAVE_QT, "0") || !equals(HAVE_PYTHON, "0") {
+!equals(HAVE_QT, "0") {
 
   RESOURCES = \
     dbResources.qrc \

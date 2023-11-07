@@ -422,15 +422,12 @@ class Config(object):
         macros = [
             ("HAVE_CURL", 1),
             ("HAVE_EXPAT", 1),
+            ("HAVE_PNG", 1),
             ("KLAYOUT_MAJOR_VERSION", self.major_version()),
             ("KLAYOUT_MINOR_VERSION", self.minor_version()),
             ("GSI_ALIAS_INSPECT", 1),
         ]
 
-        if platform.system() == "Darwin" and check_libpng():
-                macros += [("HAVE_PNG", 1)]
-        else:
-            macros += [("HAVE_PNG", 1)]
         return macros
 
     def minor_version(self):

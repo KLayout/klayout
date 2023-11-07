@@ -145,7 +145,7 @@ public:
    *
    *  Sub-directories are created if required.
    *
-   *  This method throws an exception if the directory structure could
+   *  This method returns false if the directory structure could
    *  not be obtained or downloading of one file failed.
    */
   static bool download (const std::string &url, const std::string &target, double timeout = 60.0, tl::InputHttpStreamCallback *callback = 0);

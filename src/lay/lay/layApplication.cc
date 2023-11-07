@@ -770,7 +770,7 @@ ApplicationBase::init_app ()
     size_t local_folders = (lay::get_appdata_path ().empty () ? 0 : 1);
 
     for (std::vector <std::string>::const_iterator p = m_klayout_path.begin (); p != m_klayout_path.end (); ++p) {
-      if (p - m_klayout_path.begin () < local_folders) {
+      if (size_t (p - m_klayout_path.begin ()) < local_folders) {
         mc->add_path (*p, tl::to_string (QObject::tr ("Local")), std::string (), false);
       } else if (m_klayout_path.size () == 1 + local_folders) {
         mc->add_path (*p, tl::to_string (QObject::tr ("Global")), std::string (), true);

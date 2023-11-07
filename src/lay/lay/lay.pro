@@ -33,6 +33,7 @@ HEADERS = \
     layResourceHelpProvider.h \
     layRuntimeErrorForm.h \
     layReaderErrorForm.h \
+    laySaltParsedURL.h \
     laySearchReplaceConfigPage.h \
     laySearchReplaceDialog.h \
     laySearchReplacePropertiesWidgets.h \
@@ -144,6 +145,7 @@ SOURCES = \
     layResourceHelpProvider.cc \
     layRuntimeErrorForm.cc \
     layReaderErrorForm.cc \
+    laySaltParsedURL.cc \
     laySearchReplaceConfigPage.cc \
     laySearchReplaceDialog.cc \
     laySearchReplacePlugin.cc \

@@ -1,0 +1,19 @@
+#%l2n-klayout
+top(TOP)
+unit(0.001)
+
+# Layer section
+# This section lists the mask layers (drawing or derived) and their connections.
+
+# Mask layers
+
+# Mask layer connectivity
+
+# Log entries
+message(info description(info))
+message(info description(info) cell(cell_name) cat("cat name" "cat description") polygon("(1,1;2,2;3,1)"))
+message(warning description(warning))
+message(error description(error))
+
+# Circuit section
+# Circuits are the hierarchical building blocks of the netlist.

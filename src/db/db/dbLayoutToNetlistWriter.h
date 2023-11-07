@@ -28,6 +28,7 @@
 #include "dbTrans.h"
 #include "dbPolygon.h"
 #include "dbHierNetworkProcessor.h"
+#include "dbLog.h"
 #include "tlStream.h"
 #include "tlProgress.h"
 
@@ -43,6 +44,7 @@ class Net;
 class Netlist;
 class LayoutToNetlist;
 class NetShape;
+class LogEntryData;
 
 /**
  *  @brief A helper class to produce token/list lines
@@ -91,6 +93,10 @@ protected:
   {
     return *mp_stream;
   }
+
+  std::string severity_to_s (const db::Severity severity);
+  std::string message_to_s (const std::string &msg);
+  void write_log_entry (TokenizedOutput &stream, const LogEntryData &log_entry);
 
 private:
   tl::OutputStream *mp_stream;

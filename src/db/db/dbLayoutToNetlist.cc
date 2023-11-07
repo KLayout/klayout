@@ -33,6 +33,7 @@
 #include "dbLayoutToNetlistFormatDefs.h"
 #include "dbLayoutVsSchematicFormatDefs.h"
 #include "dbShapeProcessor.h"
+#include "dbLog.h"
 #include "tlGlobPattern.h"
 
 namespace db
@@ -44,7 +45,7 @@ namespace db
 //  Note: the iterator provides the hierarchical selection (enabling/disabling cells etc.)
 
 LayoutToNetlist::LayoutToNetlist (const db::RecursiveShapeIterator &iter)
-  : m_iter (iter), m_layout_index (0), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false)
+  : m_iter (iter), m_layout_index (0), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false)
 {
   //  check the iterator
   if (iter.has_complex_region () || iter.region () != db::Box::world ()) {
@@ -64,7 +65,7 @@ LayoutToNetlist::LayoutToNetlist (const db::RecursiveShapeIterator &iter)
 }
 
 LayoutToNetlist::LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_index)
-  : mp_dss (dss), m_layout_index (layout_index), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false)
+  : mp_dss (dss), m_layout_index (layout_index), m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false)
 {
   if (dss->is_valid_layout_index (m_layout_index)) {
     m_iter = db::RecursiveShapeIterator (dss->layout (m_layout_index), dss->initial_cell (m_layout_index), std::set<unsigned int> ());
@@ -72,7 +73,7 @@ LayoutToNetlist::LayoutToNetlist (db::DeepShapeStore *dss, unsigned int layout_i
 }
 
 LayoutToNetlist::LayoutToNetlist (const std::string &topcell_name, double dbu)
-  : m_iter (), m_netlist_extracted (false), m_is_flat (true), m_device_scaling (1.0), m_include_floating_subcircuits (false)
+  : m_iter (), m_netlist_extracted (false), m_is_flat (true), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false)
 {
   mp_internal_dss.reset (new db::DeepShapeStore (topcell_name, dbu));
   mp_dss.reset (mp_internal_dss.get ());
@@ -83,7 +84,7 @@ LayoutToNetlist::LayoutToNetlist (const std::string &topcell_name, double dbu)
 
 LayoutToNetlist::LayoutToNetlist ()
   : m_iter (), mp_internal_dss (new db::DeepShapeStore ()), mp_dss (mp_internal_dss.get ()), m_layout_index (0),
-    m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false)
+    m_netlist_extracted (false), m_is_flat (false), m_device_scaling (1.0), m_include_floating_subcircuits (false), m_top_level_mode (false)
 {
   init ();
 }
@@ -238,8 +239,14 @@ void LayoutToNetlist::extract_devices (db::NetlistDeviceExtractor &extractor, co
   if (m_netlist_extracted) {
     throw tl::Exception (tl::to_string (tr ("The netlist has already been extracted")));
   }
+
   ensure_netlist ();
+
+  extractor.clear_log_entries ();
   extractor.extract (dss (), m_layout_index, layers, *mp_netlist, m_net_clusters, m_device_scaling);
+
+  //  transfer errors to log entries
+  m_log_entries.insert (m_log_entries.end (), extractor.begin_log_entries (), extractor.end_log_entries ());
 }
 
 void LayoutToNetlist::reset_extracted ()
@@ -248,6 +255,8 @@ void LayoutToNetlist::reset_extracted ()
 
     m_net_clusters.clear ();
     mp_netlist.reset (0);
+
+    m_log_entries.clear ();
 
     m_netlist_extracted = false;
 
@@ -358,48 +367,11 @@ void LayoutToNetlist::extract_netlist ()
   }
   ensure_netlist ();
 
-  const db::Layout &layout = dss ().layout (m_layout_index);
-
   db::NetlistExtractor netex;
-
-  netex.set_joined_net_names (m_joined_net_names);
-
-  std::map<std::string, std::list<tl::GlobPattern> > jp_per_cell;
-  for (std::list<std::pair<tl::GlobPattern, tl::GlobPattern> >::const_iterator j = m_joined_net_names_per_cell.begin (); j != m_joined_net_names_per_cell.end (); ++j) {
-    if (j->first.is_const ()) {
-      jp_per_cell [j->first.pattern ()].push_back (j->second);
-    } else {
-      for (db::Layout::const_iterator c = layout.begin (); c != layout.end (); ++c) {
-        if (j->first.match (layout.cell_name (c->cell_index ()))) {
-          jp_per_cell [layout.cell_name (c->cell_index ())].push_back (j->second);
-        }
-      }
-    }
-  }
-  for (std::map<std::string, std::list<tl::GlobPattern> >::const_iterator i = jp_per_cell.begin (); i != jp_per_cell.end (); ++i) {
-    netex.set_joined_net_names (i->first, i->second);
-  }
-
-  netex.set_joined_nets (m_joined_nets);
-
-  std::map<std::string, std::list<std::set<std::string> > > jn_per_cell;
-  for (std::list<std::pair<tl::GlobPattern, std::set<std::string> > >::const_iterator j = m_joined_nets_per_cell.begin (); j != m_joined_nets_per_cell.end (); ++j) {
-    if (j->first.is_const ()) {
-      jn_per_cell [j->first.pattern ()].push_back (j->second);
-    } else {
-      for (db::Layout::const_iterator c = layout.begin (); c != layout.end (); ++c) {
-        if (j->first.match (layout.cell_name (c->cell_index ()))) {
-          jn_per_cell [layout.cell_name (c->cell_index ())].push_back (j->second);
-        }
-      }
-    }
-  }
-  for (std::map<std::string, std::list<std::set<std::string> > >::const_iterator i = jn_per_cell.begin (); i != jn_per_cell.end (); ++i) {
-    netex.set_joined_nets (i->first, i->second);
-  }
-
   netex.set_include_floating_subcircuits (m_include_floating_subcircuits);
   netex.extract_nets (dss (), m_layout_index, m_conn, *mp_netlist, m_net_clusters);
+
+  do_join_nets ();
 
   if (tl::verbosity () >= 41) {
     MemStatisticsCollector m (false);
@@ -408,6 +380,197 @@ void LayoutToNetlist::extract_netlist ()
   }
 
   m_netlist_extracted = true;
+}
+
+void LayoutToNetlist::check_extraction_errors ()
+{
+  int num_errors = 0;
+  int max_errors = 10;
+  std::string errors;
+  for (auto l = m_log_entries.begin (); l != m_log_entries.end (); ++l) {
+    if (l->severity () >= db::Error) {
+      errors += "\n";
+      if (++num_errors >= max_errors) {
+        errors += "...\n";
+        errors += tl::sprintf (tl::to_string (tr ("(list shortened after %d errrors, see log for all errors)")), max_errors);
+        break;
+      } else {
+        errors += l->to_string ();
+      }
+    }
+  }
+
+  if (num_errors > 0) {
+    throw tl::Exception (tl::to_string (tr ("Errors encountered during netlist extraction:")) + errors);
+  }
+}
+
+void LayoutToNetlist::join_nets_from_pattern (db::Circuit &c, const tl::GlobPattern &p)
+{
+  std::map<std::string, std::vector<db::Net *> > nets_by_name;
+  for (auto n = c.begin_nets (); n != c.end_nets (); ++n) {
+    if (! n->name ().empty () && p.match (n->name ())) {
+      nets_by_name [n->name ()].push_back (n.operator-> ());
+    }
+  }
+
+  for (auto n2n = nets_by_name.begin (); n2n != nets_by_name.end (); ++n2n) {
+    if (n2n->second.size () > 1) {
+      do_join_nets (c, n2n->second);
+    }
+  }
+}
+
+void LayoutToNetlist::join_nets_from_pattern (db::Circuit &c, const std::set<std::string> &p)
+{
+  //  NOTE: this version implies implicit joining of different nets with the same name from the set p
+  std::vector<db::Net *> nets;
+  for (auto n = c.begin_nets (); n != c.end_nets (); ++n) {
+    if (! n->name ().empty () && p.find (n->name ()) != p.end ()) {
+      nets.push_back (n.operator-> ());
+    }
+  }
+
+  if (nets.size () > 1) {
+    do_join_nets (c, nets);
+  }
+}
+
+void LayoutToNetlist::do_join_nets (db::Circuit &c, const std::vector<db::Net *> &nets)
+{
+  if (nets.size () <= 1) {
+    return;
+  }
+
+  for (auto n = nets.begin () + 1; n != nets.end (); ++n) {
+    check_must_connect (c, *nets [0], **n);
+    c.join_nets (nets [0], *n);
+  }
+}
+
+static std::string subcircuit_to_string (const db::SubCircuit &sc)
+{
+  if (! sc.name ().empty ()) {
+    return tl::to_string (tr (" on subcircuit ")) + sc.name ();
+  } else {
+    return std::string ();
+  }
+}
+
+static db::DPolygon subcircuit_geometry (const db::SubCircuit &sc, const db::Layout *layout)
+{
+  if (! layout || ! sc.circuit_ref () || ! layout->is_valid_cell_index (sc.circuit_ref ()->cell_index ())) {
+    return db::DPolygon ();
+  }
+
+  db::DBox dbox = db::CplxTrans (layout->dbu ()) * layout->cell (sc.circuit_ref ()->cell_index ()).bbox ();
+  return db::DPolygon (sc.trans () * dbox);
+}
+
+void LayoutToNetlist::check_must_connect (const db::Circuit &c, const db::Net &a, const db::Net &b)
+{
+  if (&a == &b) {
+    return;
+  }
+
+  if (c.begin_refs () != c.end_refs ()) {
+    if (a.begin_pins () == a.end_pins ()) {
+      db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s is not connected to outside")), a.expanded_name ()));
+      error.set_cell_name (c.name ());
+      error.set_category_name ("must-connect");
+      log_entry (error);
+    }
+    if (b.begin_pins () == b.end_pins ()) {
+      db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s is not connected to outside")), a.expanded_name ()));
+      error.set_cell_name (c.name ());
+      error.set_category_name ("must-connect");
+      log_entry (error);
+    }
+  } else {
+    if (a.expanded_name () == b.expanded_name ()) {
+      db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s must be connected further up in the hierarchy - this is an error at chip top level")), a.expanded_name ()));
+      warn.set_cell_name (c.name ());
+      warn.set_category_name ("must-connect");
+      log_entry (warn);
+    } else {
+      db::LogEntryData warn (m_top_level_mode ? db::Error : db::Warning, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s must be connected further up in the hierarchy - this is an error at chip top level")), a.expanded_name (), b.expanded_name ()));
+      warn.set_cell_name (c.name ());
+      warn.set_category_name ("must-connect");
+      log_entry (warn);
+    }
+  }
+
+  if (a.begin_pins () != a.end_pins () && b.begin_pins () != b.end_pins ()) {
+    for (auto ref = c.begin_refs (); ref != c.end_refs (); ++ref) {
+      const db::SubCircuit &sc = *ref;
+      //  TODO: consider the case of multiple pins on a net (rare)
+      const db::Net *net_a = sc.net_for_pin (a.begin_pins ()->pin_id ());
+      const db::Net *net_b = sc.net_for_pin (b.begin_pins ()->pin_id ());
+      if (net_a == 0) {
+        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s of circuit %s is not connected at all%s")), a.expanded_name (), c.name (), subcircuit_to_string (sc)));
+        error.set_cell_name (sc.circuit ()->name ());
+        error.set_geometry (subcircuit_geometry (sc, internal_layout ()));
+        error.set_category_name ("must-connect");
+        log_entry (error);
+      }
+      if (net_b == 0) {
+        db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect net %s of circuit %s is not connected at all%s")), b.expanded_name (), c.name (), subcircuit_to_string (sc)));
+        error.set_cell_name (sc.circuit ()->name ());
+        error.set_geometry (subcircuit_geometry (sc, internal_layout ()));
+        error.set_category_name ("must-connect");
+        log_entry (error);
+      }
+      if (net_a && net_b && net_a != net_b) {
+        if (a.expanded_name () == b.expanded_name ()) {
+          db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect nets %s of circuit %s are not connected%s")), a.expanded_name (), c.name (), subcircuit_to_string (sc)));
+          error.set_cell_name (sc.circuit ()->name ());
+          error.set_geometry (subcircuit_geometry (sc, internal_layout ()));
+          error.set_category_name ("must-connect");
+          log_entry (error);
+        } else {
+          db::LogEntryData error (db::Error, tl::sprintf (tl::to_string (tr ("Must-connect nets %s and %s of circuit %s are not connected%s")), a.expanded_name (), b.expanded_name (), c.name (), subcircuit_to_string (sc)));
+          error.set_cell_name (sc.circuit ()->name ());
+          error.set_geometry (subcircuit_geometry (sc, internal_layout ()));
+          error.set_category_name ("must-connect");
+          log_entry (error);
+        }
+      }
+    }
+  }
+}
+
+void LayoutToNetlist::do_join_nets ()
+{
+  if (! mp_netlist) {
+    return;
+  }
+
+  //  prevents updates
+  NetlistLocker locked_netlist (mp_netlist.get ());
+
+  for (auto c = mp_netlist->begin_top_down (); c != mp_netlist->end_top_down (); ++c) {
+
+    for (auto jn = m_joined_net_names.begin (); jn != m_joined_net_names.end (); ++jn) {
+      join_nets_from_pattern (*c, *jn);
+    }
+
+    for (auto jn = m_joined_nets.begin (); jn != m_joined_nets.end (); ++jn) {
+      join_nets_from_pattern (*c, *jn);
+    }
+
+    for (auto jn = m_joined_net_names_per_cell.begin (); jn != m_joined_net_names_per_cell.end (); ++jn) {
+      if (jn->first.match (c->name ())) {
+        join_nets_from_pattern (*c, jn->second);
+      }
+    }
+
+    for (auto jn = m_joined_nets_per_cell.begin (); jn != m_joined_nets_per_cell.end (); ++jn) {
+      if (jn->first.match (c->name ())) {
+        join_nets_from_pattern (*c, jn->second);
+      }
+    }
+
+  }
 }
 
 void LayoutToNetlist::mem_stat (MemStatistics *stat, MemStatistics::purpose_t purpose, int cat, bool no_self, void *parent) const

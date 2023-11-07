@@ -116,18 +116,6 @@ void LayoutVsSchematicStandardReader::read_netlist (db::LayoutVsSchematic *lvs)
   }
 }
 
-bool LayoutVsSchematicStandardReader::read_message (std::string &msg)
-{
-  if (test (skeys::description_key) || test (lkeys::description_key)) {
-    Brace br (this);
-    read_word_or_quoted (msg);
-    br.done ();
-    return true;
-  } else {
-    return false;
-  }
-}
-
 bool LayoutVsSchematicStandardReader::read_status (db::NetlistCrossReference::Status &status)
 {
   if (test (skeys::match_key) || test (lkeys::match_key)) {
@@ -150,25 +138,9 @@ bool LayoutVsSchematicStandardReader::read_status (db::NetlistCrossReference::St
   }
 }
 
-bool LayoutVsSchematicStandardReader::read_severity (db::NetlistCrossReference::Severity &severity)
-{
-  if (test (skeys::info_severity_key) || test (lkeys::info_severity_key)) {
-    severity = db::NetlistCrossReference::Info;
-    return true;
-  } else if (test (skeys::warning_severity_key) || test (lkeys::warning_severity_key)) {
-    severity = db::NetlistCrossReference::Warning;
-    return true;
-  } else if (test (skeys::error_severity_key) || test (lkeys::error_severity_key)) {
-    severity = db::NetlistCrossReference::Error;
-    return true;
-  } else {
-    return false;
-  }
-}
-
 void LayoutVsSchematicStandardReader::read_log_entry (db::NetlistCrossReference *xref)
 {
-  db::NetlistCrossReference::Severity severity = db::NetlistCrossReference::NoSeverity;
+  db::Severity severity = db::NoSeverity;
   std::string msg;
 
   Brace br (this);
@@ -183,10 +155,12 @@ void LayoutVsSchematicStandardReader::read_log_entry (db::NetlistCrossReference 
   }
   br.done ();
 
+  //  NOTE: this API does not use the full feature set of db::LogEntryData, so
+  //  we do not use this object here.
   xref->log_entry (severity, msg);
 }
 
-void LayoutVsSchematicStandardReader::read_logs_for_circuits (db::NetlistCrossReference *xref)
+void LayoutVsSchematicStandardReader::read_logs (db::NetlistCrossReference *xref)
 {
   Brace br (this);
   while (br) {
@@ -194,7 +168,7 @@ void LayoutVsSchematicStandardReader::read_logs_for_circuits (db::NetlistCrossRe
     if (test (skeys::log_entry_key) || test (lkeys::log_entry_key)) {
       read_log_entry (xref);
     } else if (at_end ()) {
-      throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside circuit definition (net, pin, device or circuit expected)")));
+      throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside log section (entry expected)")));
     } else {
       skip_element ();
     }
@@ -269,7 +243,7 @@ void LayoutVsSchematicStandardReader::read_xref (db::NetlistCrossReference *xref
         } else if (test (skeys::xref_key) || test (lkeys::xref_key)) {
           read_xrefs_for_circuits (xref, circuit_a, circuit_b);
         } else if (test (skeys::log_key) || test (lkeys::log_key)) {
-          read_logs_for_circuits (xref);
+          read_logs (xref);
         } else if (at_end ()) {
           throw tl::Exception (tl::to_string (tr ("Unexpected end of file inside circuit definition (status keyword of xrefs expected)")));
         } else {
@@ -282,6 +256,8 @@ void LayoutVsSchematicStandardReader::read_xref (db::NetlistCrossReference *xref
 
       br.done ();
 
+    } else if (test (skeys::log_key) || test (lkeys::log_key)) {
+      read_logs (xref);
     } else {
       skip_element ();
     }

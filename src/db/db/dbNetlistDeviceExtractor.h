@@ -30,126 +30,12 @@
 #include "dbDeepShapeStore.h"
 #include "dbRegion.h"
 #include "dbNetShape.h"
+#include "dbLog.h"
 
 #include "gsiObject.h"
 
 namespace db
 {
-
-/**
- *  @brief An error object for the netlist device extractor
- *
- *  The device extractor will keep errors using objects of this kind.
- */
-class DB_PUBLIC NetlistDeviceExtractorError
-{
-public:
-  /**
-   *  @brief Creates an error
-   */
-  NetlistDeviceExtractorError ();
-
-  /**
-   *  @brief Creates an error with a cell name and a message (the minimum information)
-   */
-  NetlistDeviceExtractorError (const std::string &cell_name, const std::string &msg);
-
-  /**
-   *  @brief The category name of the error
-   *  Specifying the category name is optional. If a category is given, it will be used for
-   *  the report.
-   */
-  const std::string &category_name () const
-  {
-    return m_category_name;
-  }
-
-  /**
-   *  @brief Sets the category name
-   */
-  void set_category_name (const std::string &s)
-  {
-    m_category_name = s;
-  }
-
-  /**
-   *  @brief The category description of the error
-   *  Specifying the category description is optional. If a category is given, this attribute will
-   *  be used for the category description.
-   */
-  const std::string &category_description () const
-  {
-    return m_category_description;
-  }
-
-  /**
-   *  @brief Sets the category description
-   */
-  void set_category_description (const std::string &s)
-  {
-    m_category_description = s;
-  }
-
-  /**
-   *  @brief Gets the geometry for this error
-   *  Not all errors may specify a geometry. In this case, the polygon is empty.
-   */
-  const db::DPolygon &geometry () const
-  {
-    return m_geometry;
-  }
-
-  /**
-   *  @brief Sets the geometry
-   */
-  void set_geometry (const db::DPolygon &g)
-  {
-    m_geometry = g;
-  }
-
-  /**
-   *  @brief Gets the message for this error
-   */
-  const std::string &message () const
-  {
-    return m_message;
-  }
-
-  /**
-   *  @brief Sets the message
-   */
-  void set_message (const std::string &n)
-  {
-    m_message = n;
-  }
-
-  /**
-   *  @brief Gets the cell name the error occurred in
-   */
-  const std::string &cell_name () const
-  {
-    return m_cell_name;
-  }
-
-  /**
-   *  @brief Sets the cell name
-   */
-  void set_cell_name (const std::string &n)
-  {
-    m_cell_name = n;
-  }
-
-  /**
-   *  @brief Formats this message for printing
-   */
-  std::string to_string () const;
-
-private:
-  std::string m_cell_name;
-  std::string m_message;
-  db::DPolygon m_geometry;
-  std::string m_category_name, m_category_description;
-};
 
 /**
  *  @brief Specifies a single layer from the device extractor
@@ -201,8 +87,8 @@ class DB_PUBLIC NetlistDeviceExtractor
   : public gsi::ObjectBase, public tl::Object
 {
 public:
-  typedef std::list<db::NetlistDeviceExtractorError> error_list;
-  typedef error_list::const_iterator error_iterator;
+  typedef std::list<db::LogEntryData> log_entry_list;
+  typedef log_entry_list::const_iterator log_entry_iterator;
   typedef std::vector<db::NetlistDeviceExtractorLayerDefinition> layer_definitions;
   typedef layer_definitions::const_iterator layer_definitions_iterator;
   typedef std::map<std::string, db::ShapeCollection *> input_layers;
@@ -266,27 +152,27 @@ public:
   void extract (DeepShapeStore &dss, unsigned int layout_index, const input_layers &layers, Netlist &netlist, hier_clusters_type &clusters, double device_scaling = 1.0);
 
   /**
-   *  @brief Gets the error iterator, begin
+   *  @brief Clears the log entries
    */
-  error_iterator begin_errors ()
+  void clear_log_entries ()
   {
-    return m_errors.begin ();
+    m_log_entries.clear ();
   }
 
   /**
-   *  @brief Gets the error iterator, end
+   *  @brief Gets the log entry iterator, begin
    */
-  error_iterator end_errors ()
+  log_entry_iterator begin_log_entries ()
   {
-    return m_errors.end ();
+    return m_log_entries.begin ();
   }
 
   /**
-   *  @brief Returns true, if there are errors
+   *  @brief Gets the log entry iterator, end
    */
-  bool has_errors () const
+  log_entry_iterator end_log_entries ()
   {
-    return ! m_errors.empty ();
+    return m_log_entries.end ();
   }
 
   /**
@@ -499,6 +385,42 @@ public:
   }
 
   /**
+   *  @brief Issues a warning with the given message
+   */
+  void warn (const std::string &msg);
+
+  /**
+   *  @brief Issues a warning with the given message and warn shape
+   */
+  void warn (const std::string &msg, const db::DPolygon &poly);
+
+  /**
+   *  @brief Issues a warning with the given message and warn shape
+   */
+  void warn (const std::string &msg, const db::Polygon &poly)
+  {
+    warn (msg, poly.transformed (db::CplxTrans (dbu ())));
+  }
+
+  /**
+   *  @brief Issues a warning with the given category name, description and message
+   */
+  void warn (const std::string &category_name, const std::string &category_description, const std::string &msg);
+
+  /**
+   *  @brief Issues a warning with the given category name, description and message and warn shape
+   */
+  void warn (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::DPolygon &poly);
+
+  /**
+   *  @brief Issues a warning with the given category name, description and message and warn shape
+   */
+  void warn (const std::string &category_name, const std::string &category_description, const std::string &msg, const db::Polygon &poly)
+  {
+    warn (category_name, category_description, msg, poly.transformed (db::CplxTrans (dbu ())));
+  }
+
+  /**
    *  @brief Gets the name of the current cell
    */
   std::string cell_name () const;
@@ -556,7 +478,7 @@ private:
   std::string m_name;
   layer_definitions m_layer_definitions;
   std::vector<unsigned int> m_layers;
-  error_list m_errors;
+  log_entry_list m_log_entries;
   std::map<size_t, std::pair<db::Device *, geometry_per_terminal_type> > m_new_devices;
   std::map<DeviceCellKey, std::pair<db::cell_index_type, db::DeviceAbstract *> > m_device_cells;
 

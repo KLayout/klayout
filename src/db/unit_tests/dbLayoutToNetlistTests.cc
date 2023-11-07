@@ -608,12 +608,12 @@ TEST(1_BasicExtraction)
   //  do some probing after purging
 
   //  top level
-  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal2, db::DPoint (0.0, 1.8))), "RINGO:FB");
-  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal2, db::Point (0, 1800))), "RINGO:FB");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal2, db::DPoint (0.0, 1.8))), "RINGO:FB,OSC");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal2, db::Point (0, 1800))), "RINGO:FB,OSC");
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal2, db::DPoint (-2.0, 1.8))), "(null)");
-  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (-1.5, 1.8))), "RINGO:FB");
-  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (24.5, 1.8))), "RINGO:FB");
-  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (5.3, 0.0))), "RINGO:VSS");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (-1.5, 1.8))), "RINGO:FB,OSC");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (24.5, 1.8))), "RINGO:FB,OSC");
+  EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (5.3, 0.0))), "RINGO:VDD,VSS");
 
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (2.6, 1.0))), "RINGO:$I39");
   EXPECT_EQ (qnet_name (l2n.probe_net (*rmetal1, db::DPoint (6.4, 1.0))), "RINGO:$I2");
@@ -2879,28 +2879,271 @@ TEST(11_DuplicateInstances)
   );
 }
 
+namespace
+{
+
+class TestRig
+{
+public:
+  TestRig (db::Layout &ly)
+    : m_ly (ly)
+  {
+    nwell      = define_layer (m_ly, m_lmap, 1);
+    nwell_lbl  = define_layer (m_ly, m_lmap, 1, 1);
+    active     = define_layer (m_ly, m_lmap, 2);
+    pplus      = define_layer (m_ly, m_lmap, 10);
+    nplus      = define_layer (m_ly, m_lmap, 11);
+    poly       = define_layer (m_ly, m_lmap, 3);
+    poly_lbl   = define_layer (m_ly, m_lmap, 3, 1);
+    diff_cont  = define_layer (m_ly, m_lmap, 4);
+    poly_cont  = define_layer (m_ly, m_lmap, 5);
+    metal1     = define_layer (m_ly, m_lmap, 6);
+    metal1_lbl = define_layer (m_ly, m_lmap, 6, 1);
+    via1       = define_layer (m_ly, m_lmap, 7);
+    metal2     = define_layer (m_ly, m_lmap, 8);
+    metal2_lbl = define_layer (m_ly, m_lmap, 8, 1);
+  }
+
+  db::LayoutToNetlist *
+  make_l2n ()
+  {
+    db::Cell &tc = m_ly.cell (*m_ly.begin_top_down ());
+
+    std::unique_ptr<db::LayoutToNetlist> l2n_p (new db::LayoutToNetlist (db::RecursiveShapeIterator (m_ly, tc, std::set<unsigned int> ())));
+    db::LayoutToNetlist &l2n = *l2n_p;
+
+    rbulk.reset (l2n.make_layer ("bulk"));
+    rnwell.reset (l2n.make_layer (nwell, "nwell"));
+    rnwell_lbl.reset (l2n.make_layer (nwell_lbl, "nwell_lbl"));
+    ractive.reset (l2n.make_layer (active, "active"));
+    rpplus.reset (l2n.make_layer (pplus, "pplus"));
+    rnplus.reset (l2n.make_layer (nplus, "nplus"));
+    rpoly.reset (l2n.make_polygon_layer (poly, "poly"));
+    rpoly_lbl.reset (l2n.make_text_layer (poly_lbl, "poly_lbl"));
+    rdiff_cont.reset (l2n.make_polygon_layer (diff_cont, "diff_cont"));
+    rpoly_cont.reset (l2n.make_polygon_layer (poly_cont, "poly_cont"));
+    rmetal1.reset (l2n.make_polygon_layer (metal1, "metal1"));
+    rmetal1_lbl.reset (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
+    rvia1.reset (l2n.make_polygon_layer (via1, "via1"));
+    rmetal2.reset (l2n.make_polygon_layer (metal2, "metal2"));
+    rmetal2_lbl.reset (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
+
+    //  derived regions
+
+    ractive_in_nwell = *ractive & *rnwell;
+    rpactive = ractive_in_nwell & *rpplus;
+    rntie    = ractive_in_nwell & *rnplus;
+    rpgate   = rpactive & *rpoly;
+    rpsd     = rpactive - rpgate;
+
+    ractive_outside_nwell = *ractive - *rnwell;
+    rnactive = ractive_outside_nwell & *rnplus;
+    rptie    = ractive_outside_nwell & *rpplus;
+    rngate   = rnactive & *rpoly;
+    rnsd     = rnactive - rngate;
+
+    //  return the computed layers into the original layout and write it for debugging purposes
+
+    unsigned int lgate  = m_ly.insert_layer (db::LayerProperties (20, 0));      // 20/0 -> Gate
+    unsigned int lsd    = m_ly.insert_layer (db::LayerProperties (21, 0));      // 21/0 -> Source/Drain
+    unsigned int lpdiff = m_ly.insert_layer (db::LayerProperties (22, 0));      // 22/0 -> P Diffusion
+    unsigned int lndiff = m_ly.insert_layer (db::LayerProperties (23, 0));      // 23/0 -> N Diffusion
+    unsigned int lptie  = m_ly.insert_layer (db::LayerProperties (24, 0));      // 24/0 -> P Tie
+    unsigned int lntie  = m_ly.insert_layer (db::LayerProperties (25, 0));      // 25/0 -> N Tie
+
+    rpgate.insert_into (&m_ly, tc.cell_index (), lgate);
+    rngate.insert_into (&m_ly, tc.cell_index (), lgate);
+    rpsd.insert_into (&m_ly, tc.cell_index (), lsd);
+    rnsd.insert_into (&m_ly, tc.cell_index (), lsd);
+    rpsd.insert_into (&m_ly, tc.cell_index (), lpdiff);
+    rnsd.insert_into (&m_ly, tc.cell_index (), lndiff);
+    rpsd.insert_into (&m_ly, tc.cell_index (), lptie);
+    rnsd.insert_into (&m_ly, tc.cell_index (), lntie);
+
+    db::NetlistDeviceExtractorMOS4Transistor pmos_ex ("PMOS");
+    db::NetlistDeviceExtractorMOS4Transistor nmos_ex ("NMOS");
+
+    //  device extraction
+
+    db::NetlistDeviceExtractor::input_layers dl;
+
+    dl["SD"] = &rpsd;
+    dl["G"] = &rpgate;
+    dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+    dl["W"] = rnwell.get ();
+    l2n.extract_devices (pmos_ex, dl);
+
+    dl["SD"] = &rnsd;
+    dl["G"] = &rngate;
+    dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
+    dl["W"] = rbulk.get ();
+    l2n.extract_devices (nmos_ex, dl);
+
+    //  net extraction
+
+    l2n.register_layer (rpsd, "psd");
+    l2n.register_layer (rnsd, "nsd");
+    l2n.register_layer (rptie, "ptie");
+    l2n.register_layer (rntie, "ntie");
+
+    //  Intra-layer
+    l2n.connect (rpsd);
+    l2n.connect (rnsd);
+    l2n.connect (*rnwell);
+    l2n.connect (*rpoly);
+    l2n.connect (*rdiff_cont);
+    l2n.connect (*rpoly_cont);
+    l2n.connect (*rmetal1);
+    l2n.connect (*rvia1);
+    l2n.connect (*rmetal2);
+    l2n.connect (rptie);
+    l2n.connect (rntie);
+    //  Inter-layer
+    l2n.connect (rpsd,        *rdiff_cont);
+    l2n.connect (rnsd,        *rdiff_cont);
+    l2n.connect (rntie,       *rnwell);
+    l2n.connect (*rpoly,      *rpoly_cont);
+    l2n.connect (*rpoly_cont, *rmetal1);
+    l2n.connect (*rdiff_cont, *rmetal1);
+    l2n.connect (*rdiff_cont, rptie);
+    l2n.connect (*rdiff_cont, rntie);
+    l2n.connect (*rnwell,     rntie);
+    l2n.connect (*rmetal1,    *rvia1);
+    l2n.connect (*rvia1,      *rmetal2);
+    l2n.connect (*rnwell,     *rnwell_lbl);    //  attaches labels
+    l2n.connect (*rpoly,      *rpoly_lbl);     //  attaches labels
+    l2n.connect (*rmetal1,    *rmetal1_lbl);   //  attaches labels
+    l2n.connect (*rmetal2,    *rmetal2_lbl);   //  attaches labels
+
+    return l2n_p.release ();
+  }
+
+  void dump_nets (db::LayoutToNetlist &l2n)
+  {
+    //  debug layers produced for nets
+    //    201/0 -> Well
+    //    203/0 -> Poly
+    //    204/0 -> Diffusion contacts
+    //    205/0 -> Poly contacts
+    //    206/0 -> Metal1
+    //    207/0 -> Via1
+    //    208/0 -> Metal2
+    //    210/0 -> N source/drain
+    //    211/0 -> P source/drain
+    //    212/0 -> N tie
+    //    213/0 -> P tie
+    std::map<const db::Region *, unsigned int> dump_map;
+    dump_map [&rpsd            ] = m_ly.insert_layer (db::LayerProperties (210, 0));
+    dump_map [&rnsd            ] = m_ly.insert_layer (db::LayerProperties (211, 0));
+    dump_map [&rptie           ] = m_ly.insert_layer (db::LayerProperties (212, 0));
+    dump_map [&rntie           ] = m_ly.insert_layer (db::LayerProperties (213, 0));
+    dump_map [rbulk.get ()     ] = m_ly.insert_layer (db::LayerProperties (214, 0));
+    dump_map [rnwell.get ()    ] = m_ly.insert_layer (db::LayerProperties (201, 0));
+    dump_map [rpoly.get ()     ] = m_ly.insert_layer (db::LayerProperties (203, 0));
+    dump_map [rdiff_cont.get ()] = m_ly.insert_layer (db::LayerProperties (204, 0));
+    dump_map [rpoly_cont.get ()] = m_ly.insert_layer (db::LayerProperties (205, 0));
+    dump_map [rmetal1.get ()   ] = m_ly.insert_layer (db::LayerProperties (206, 0));
+    dump_map [rvia1.get ()     ] = m_ly.insert_layer (db::LayerProperties (207, 0));
+    dump_map [rmetal2.get ()   ] = m_ly.insert_layer (db::LayerProperties (208, 0));
+
+    //  write nets to layout
+    db::Cell &tc = m_ly.cell (*m_ly.begin_top_down ());
+    db::CellMapping cm = l2n.cell_mapping_into (m_ly, tc);
+    dump_nets_to_layout (l2n, m_ly, dump_map, cm);
+  }
+
+  void dump_nets_recursive (db::LayoutToNetlist &l2n)
+  {
+    //  debug layers produced for nets
+    //    301/0 -> Well
+    //    303/0 -> Poly
+    //    304/0 -> Diffusion contacts
+    //    305/0 -> Poly contacts
+    //    306/0 -> Metal1
+    //    307/0 -> Via1
+    //    308/0 -> Metal2
+    //    310/0 -> N source/drain
+    //    311/0 -> P source/drain
+    //    312/0 -> N tie
+    //    313/0 -> P tie
+    std::map<const db::Region *, unsigned int> dump_map;
+    dump_map [&rpsd            ] = m_ly.insert_layer (db::LayerProperties (310, 0));
+    dump_map [&rnsd            ] = m_ly.insert_layer (db::LayerProperties (311, 0));
+    dump_map [&rptie           ] = m_ly.insert_layer (db::LayerProperties (312, 0));
+    dump_map [&rntie           ] = m_ly.insert_layer (db::LayerProperties (313, 0));
+    dump_map [rbulk.get ()     ] = m_ly.insert_layer (db::LayerProperties (314, 0));
+    dump_map [rnwell.get ()    ] = m_ly.insert_layer (db::LayerProperties (301, 0));
+    dump_map [rpoly.get ()     ] = m_ly.insert_layer (db::LayerProperties (303, 0));
+    dump_map [rdiff_cont.get ()] = m_ly.insert_layer (db::LayerProperties (304, 0));
+    dump_map [rpoly_cont.get ()] = m_ly.insert_layer (db::LayerProperties (305, 0));
+    dump_map [rmetal1.get ()   ] = m_ly.insert_layer (db::LayerProperties (306, 0));
+    dump_map [rvia1.get ()     ] = m_ly.insert_layer (db::LayerProperties (307, 0));
+    dump_map [rmetal2.get ()   ] = m_ly.insert_layer (db::LayerProperties (308, 0));
+
+    //  write nets to layout
+    db::Cell &tc = m_ly.cell (*m_ly.begin_top_down ());
+    db::CellMapping cm = l2n.cell_mapping_into (m_ly, tc);
+    dump_recursive_nets_to_layout (l2n, m_ly, dump_map, cm);
+  }
+
+  const db::LayerMap &lmap () const { return m_lmap; }
+
+private:
+  db::Layout &m_ly;
+  db::LayerMap m_lmap;
+
+public:
+  unsigned int nwell;
+  unsigned int nwell_lbl;
+  unsigned int active;
+  unsigned int pplus;
+  unsigned int nplus;
+  unsigned int poly;
+  unsigned int poly_lbl;
+  unsigned int diff_cont;
+  unsigned int poly_cont;
+  unsigned int metal1;
+  unsigned int metal1_lbl;
+  unsigned int via1;
+  unsigned int metal2;
+  unsigned int metal2_lbl;
+  std::unique_ptr<db::Region> rbulk;
+  std::unique_ptr<db::Region> rnwell;
+  std::unique_ptr<db::Region> rnwell_lbl;
+  std::unique_ptr<db::Region> ractive;
+  std::unique_ptr<db::Region> rpplus;
+  std::unique_ptr<db::Region> rnplus;
+  std::unique_ptr<db::Region> rpoly;
+  std::unique_ptr<db::Texts> rpoly_lbl;
+  std::unique_ptr<db::Region> rdiff_cont;
+  std::unique_ptr<db::Region> rpoly_cont;
+  std::unique_ptr<db::Region> rmetal1;
+  std::unique_ptr<db::Texts> rmetal1_lbl;
+  std::unique_ptr<db::Region> rvia1;
+  std::unique_ptr<db::Region> rmetal2;
+  std::unique_ptr<db::Texts> rmetal2_lbl;
+  db::Region ractive_in_nwell;
+  db::Region rpactive;
+  db::Region rntie;
+  db::Region rpgate;
+  db::Region rpsd;
+  db::Region ractive_outside_nwell;
+  db::Region rnactive;
+  db::Region rptie;
+  db::Region rngate;
+  db::Region rnsd;
+};
+
+}
+
 TEST(12_FlattenCircuitDoesFlattenLayout)
 {
   db::Layout ly;
-  db::LayerMap lmap;
-
-  unsigned int nwell      = define_layer (ly, lmap, 1);
-  unsigned int active     = define_layer (ly, lmap, 2);
-  unsigned int pplus      = define_layer (ly, lmap, 10);
-  unsigned int nplus      = define_layer (ly, lmap, 11);
-  unsigned int poly       = define_layer (ly, lmap, 3);
-  unsigned int poly_lbl   = define_layer (ly, lmap, 3, 1);
-  unsigned int diff_cont  = define_layer (ly, lmap, 4);
-  unsigned int poly_cont  = define_layer (ly, lmap, 5);
-  unsigned int metal1     = define_layer (ly, lmap, 6);
-  unsigned int metal1_lbl = define_layer (ly, lmap, 6, 1);
-  unsigned int via1       = define_layer (ly, lmap, 7);
-  unsigned int metal2     = define_layer (ly, lmap, 8);
-  unsigned int metal2_lbl = define_layer (ly, lmap, 8, 1);
+  TestRig test_rig (ly);
 
   {
     db::LoadLayoutOptions options;
-    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().layer_map = test_rig.lmap ();
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
     std::string fn (tl::testdata ());
@@ -2912,172 +3155,32 @@ TEST(12_FlattenCircuitDoesFlattenLayout)
     reader.read (ly, options);
   }
 
-  db::Cell &tc = ly.cell (*ly.begin_top_down ());
-  db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
+  std::unique_ptr<db::LayoutToNetlist> l2n (test_rig.make_l2n ());
 
-  std::unique_ptr<db::Region> rbulk (l2n.make_layer ("bulk"));
-  std::unique_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
-  std::unique_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
-  std::unique_ptr<db::Region> rpplus (l2n.make_layer (pplus, "pplus"));
-  std::unique_ptr<db::Region> rnplus (l2n.make_layer (nplus, "nplus"));
-  std::unique_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
-  std::unique_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
-  std::unique_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
-  std::unique_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
-  std::unique_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
-  std::unique_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
-  std::unique_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
-  std::unique_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
-  std::unique_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
-
-  //  derived regions
-
-  db::Region ractive_in_nwell = *ractive & *rnwell;
-  db::Region rpactive = ractive_in_nwell & *rpplus;
-  db::Region rntie    = ractive_in_nwell & *rnplus;
-  db::Region rpgate   = rpactive & *rpoly;
-  db::Region rpsd     = rpactive - rpgate;
-
-  db::Region ractive_outside_nwell = *ractive - *rnwell;
-  db::Region rnactive = ractive_outside_nwell & *rnplus;
-  db::Region rptie    = ractive_outside_nwell & *rpplus;
-  db::Region rngate   = rnactive & *rpoly;
-  db::Region rnsd     = rnactive - rngate;
-
-  //  return the computed layers into the original layout and write it for debugging purposes
-
-  unsigned int lgate  = ly.insert_layer (db::LayerProperties (20, 0));      // 20/0 -> Gate
-  unsigned int lsd    = ly.insert_layer (db::LayerProperties (21, 0));      // 21/0 -> Source/Drain
-  unsigned int lpdiff = ly.insert_layer (db::LayerProperties (22, 0));      // 22/0 -> P Diffusion
-  unsigned int lndiff = ly.insert_layer (db::LayerProperties (23, 0));      // 23/0 -> N Diffusion
-  unsigned int lptie  = ly.insert_layer (db::LayerProperties (24, 0));      // 24/0 -> P Tie
-  unsigned int lntie  = ly.insert_layer (db::LayerProperties (25, 0));      // 25/0 -> N Tie
-
-  rpgate.insert_into (&ly, tc.cell_index (), lgate);
-  rngate.insert_into (&ly, tc.cell_index (), lgate);
-  rpsd.insert_into (&ly, tc.cell_index (), lsd);
-  rnsd.insert_into (&ly, tc.cell_index (), lsd);
-  rpsd.insert_into (&ly, tc.cell_index (), lpdiff);
-  rnsd.insert_into (&ly, tc.cell_index (), lndiff);
-  rpsd.insert_into (&ly, tc.cell_index (), lptie);
-  rnsd.insert_into (&ly, tc.cell_index (), lntie);
-
-  db::NetlistDeviceExtractorMOS4Transistor pmos_ex ("PMOS");
-  db::NetlistDeviceExtractorMOS4Transistor nmos_ex ("NMOS");
-
-  //  device extraction
-
-  db::NetlistDeviceExtractor::input_layers dl;
-
-  dl["SD"] = &rpsd;
-  dl["G"] = &rpgate;
-  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
-  dl["W"] = rnwell.get ();
-  l2n.extract_devices (pmos_ex, dl);
-
-  dl["SD"] = &rnsd;
-  dl["G"] = &rngate;
-  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
-  dl["W"] = rbulk.get ();
-  l2n.extract_devices (nmos_ex, dl);
-
-  //  net extraction
-
-  l2n.register_layer (rpsd, "psd");
-  l2n.register_layer (rnsd, "nsd");
-  l2n.register_layer (rptie, "ptie");
-  l2n.register_layer (rntie, "ntie");
-
-  //  Intra-layer
-  l2n.connect (rpsd);
-  l2n.connect (rnsd);
-  l2n.connect (*rnwell);
-  l2n.connect (*rpoly);
-  l2n.connect (*rdiff_cont);
-  l2n.connect (*rpoly_cont);
-  l2n.connect (*rmetal1);
-  l2n.connect (*rvia1);
-  l2n.connect (*rmetal2);
-  l2n.connect (rptie);
-  l2n.connect (rntie);
-  //  Inter-layer
-  l2n.connect (rpsd,        *rdiff_cont);
-  l2n.connect (rnsd,        *rdiff_cont);
-  l2n.connect (*rpoly,      *rpoly_cont);
-  l2n.connect (*rpoly_cont, *rmetal1);
-  l2n.connect (*rdiff_cont, *rmetal1);
-  l2n.connect (*rdiff_cont, rptie);
-  l2n.connect (*rdiff_cont, rntie);
-  l2n.connect (*rnwell,     rntie);
-  l2n.connect (*rmetal1,    *rvia1);
-  l2n.connect (*rvia1,      *rmetal2);
-  l2n.connect (*rpoly,      *rpoly_lbl);     //  attaches labels
-  l2n.connect (*rmetal1,    *rmetal1_lbl);   //  attaches labels
-  l2n.connect (*rmetal2,    *rmetal2_lbl);   //  attaches labels
   //  Global
-  l2n.connect_global (rptie, "BULK");
-  l2n.connect_global (*rbulk, "BULK");
+  l2n->connect_global (test_rig.rptie, "BULK");
+  l2n->connect_global (*test_rig.rbulk, "BULK");
+
+  //  Extract with joining VSS and VDD
+  l2n->join_net_names (tl::GlobPattern ("{VSS,VDD}"));
 
   //  create some mess - we have to keep references to the layers to make them not disappear
-  rmetal1_lbl.reset (0);
-  rmetal2_lbl.reset (0);
-  rpoly_lbl.reset (0);
+  test_rig.rmetal1_lbl.reset (0);
+  test_rig.rmetal2_lbl.reset (0);
+  test_rig.rpoly_lbl.reset (0);
 
-  l2n.extract_netlist ();
+  l2n->extract_netlist ();
 
-  l2n.netlist ()->flatten_circuit (l2n.netlist ()->circuit_by_name ("INV2"));
-  l2n.netlist ()->flatten_circuit (l2n.netlist ()->circuit_by_name ("INV2PAIR"));
-  l2n.netlist ()->flatten_circuit (l2n.netlist ()->circuit_by_name ("TRANS"));
+  l2n->netlist ()->flatten_circuit (l2n->netlist ()->circuit_by_name ("INV2"));
+  l2n->netlist ()->flatten_circuit (l2n->netlist ()->circuit_by_name ("INV2PAIR"));
+  l2n->netlist ()->flatten_circuit (l2n->netlist ()->circuit_by_name ("TRANS"));
 
-  //  debug layers produced for nets
-  //    201/0 -> Well
-  //    203/0 -> Poly
-  //    204/0 -> Diffusion contacts
-  //    205/0 -> Poly contacts
-  //    206/0 -> Metal1
-  //    207/0 -> Via1
-  //    208/0 -> Metal2
-  //    210/0 -> N source/drain
-  //    211/0 -> P source/drain
-  //    212/0 -> N tie
-  //    213/0 -> P tie
-  std::map<const db::Region *, unsigned int> dump_map;
-  dump_map [&rpsd            ] = ly.insert_layer (db::LayerProperties (210, 0));
-  dump_map [&rnsd            ] = ly.insert_layer (db::LayerProperties (211, 0));
-  dump_map [&rptie           ] = ly.insert_layer (db::LayerProperties (212, 0));
-  dump_map [&rntie           ] = ly.insert_layer (db::LayerProperties (213, 0));
-  dump_map [rbulk.get ()     ] = ly.insert_layer (db::LayerProperties (214, 0));
-  dump_map [rnwell.get ()    ] = ly.insert_layer (db::LayerProperties (201, 0));
-  dump_map [rpoly.get ()     ] = ly.insert_layer (db::LayerProperties (203, 0));
-  dump_map [rdiff_cont.get ()] = ly.insert_layer (db::LayerProperties (204, 0));
-  dump_map [rpoly_cont.get ()] = ly.insert_layer (db::LayerProperties (205, 0));
-  dump_map [rmetal1.get ()   ] = ly.insert_layer (db::LayerProperties (206, 0));
-  dump_map [rvia1.get ()     ] = ly.insert_layer (db::LayerProperties (207, 0));
-  dump_map [rmetal2.get ()   ] = ly.insert_layer (db::LayerProperties (208, 0));
-
-  //  write nets to layout
-  db::CellMapping cm = l2n.cell_mapping_into (ly, tc);
-  dump_nets_to_layout (l2n, ly, dump_map, cm);
-
-  dump_map.clear ();
-  dump_map [&rpsd            ] = ly.insert_layer (db::LayerProperties (310, 0));
-  dump_map [&rnsd            ] = ly.insert_layer (db::LayerProperties (311, 0));
-  dump_map [&rptie           ] = ly.insert_layer (db::LayerProperties (312, 0));
-  dump_map [&rntie           ] = ly.insert_layer (db::LayerProperties (313, 0));
-  dump_map [rbulk.get ()     ] = ly.insert_layer (db::LayerProperties (314, 0));
-  dump_map [rnwell.get ()    ] = ly.insert_layer (db::LayerProperties (301, 0));
-  dump_map [rpoly.get ()     ] = ly.insert_layer (db::LayerProperties (303, 0));
-  dump_map [rdiff_cont.get ()] = ly.insert_layer (db::LayerProperties (304, 0));
-  dump_map [rpoly_cont.get ()] = ly.insert_layer (db::LayerProperties (305, 0));
-  dump_map [rmetal1.get ()   ] = ly.insert_layer (db::LayerProperties (306, 0));
-  dump_map [rvia1.get ()     ] = ly.insert_layer (db::LayerProperties (307, 0));
-  dump_map [rmetal2.get ()   ] = ly.insert_layer (db::LayerProperties (308, 0));
-
-  dump_recursive_nets_to_layout (l2n, ly, dump_map, cm);
+  test_rig.dump_nets (*l2n);
+  test_rig.dump_nets_recursive (*l2n);
 
   //  compare netlist as string
   CHECKPOINT ();
-  db::compare_netlist (_this, *l2n.netlist (),
+  db::compare_netlist (_this, *l2n->netlist (),
     "circuit RINGO ();\n"
     "  device PMOS $1 (S=FB,G=$I7,D=VDD,B=VDD) (L=0.25,W=1.75,AS=0.91875,AD=0.48125,PS=4.55,PD=2.3);\n"
     "  device PMOS $2 (S=VDD,G=$I7,D=FB,B=VDD) (L=0.25,W=1.75,AS=0.48125,AD=0.91875,PS=2.3,PD=4.55);\n"
@@ -3134,25 +3237,11 @@ TEST(12_FlattenCircuitDoesFlattenLayout)
 TEST(13_JoinNetNames)
 {
   db::Layout ly;
-  db::LayerMap lmap;
-
-  unsigned int nwell      = define_layer (ly, lmap, 1);
-  unsigned int active     = define_layer (ly, lmap, 2);
-  unsigned int pplus      = define_layer (ly, lmap, 10);
-  unsigned int nplus      = define_layer (ly, lmap, 11);
-  unsigned int poly       = define_layer (ly, lmap, 3);
-  unsigned int poly_lbl   = define_layer (ly, lmap, 3, 1);
-  unsigned int diff_cont  = define_layer (ly, lmap, 4);
-  unsigned int poly_cont  = define_layer (ly, lmap, 5);
-  unsigned int metal1     = define_layer (ly, lmap, 6);
-  unsigned int metal1_lbl = define_layer (ly, lmap, 6, 1);
-  unsigned int via1       = define_layer (ly, lmap, 7);
-  unsigned int metal2     = define_layer (ly, lmap, 8);
-  unsigned int metal2_lbl = define_layer (ly, lmap, 8, 1);
+  TestRig test_rig (ly);
 
   {
     db::LoadLayoutOptions options;
-    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().layer_map = test_rig.lmap ();
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
     std::string fn (tl::testdata ());
@@ -3164,167 +3253,25 @@ TEST(13_JoinNetNames)
     reader.read (ly, options);
   }
 
-  db::Cell &tc = ly.cell (*ly.begin_top_down ());
-  db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
+  std::unique_ptr<db::LayoutToNetlist> l2n (test_rig.make_l2n ());
 
-  std::unique_ptr<db::Region> rbulk (l2n.make_layer ("bulk"));
-  std::unique_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
-  std::unique_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
-  std::unique_ptr<db::Region> rpplus (l2n.make_layer (pplus, "pplus"));
-  std::unique_ptr<db::Region> rnplus (l2n.make_layer (nplus, "nplus"));
-  std::unique_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
-  std::unique_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
-  std::unique_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
-  std::unique_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
-  std::unique_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
-  std::unique_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
-  std::unique_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
-  std::unique_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
-  std::unique_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
-
-  //  derived regions
-
-  db::Region ractive_in_nwell = *ractive & *rnwell;
-  db::Region rpactive = ractive_in_nwell & *rpplus;
-  db::Region rntie    = ractive_in_nwell & *rnplus;
-  db::Region rpgate   = rpactive & *rpoly;
-  db::Region rpsd     = rpactive - rpgate;
-
-  db::Region ractive_outside_nwell = *ractive - *rnwell;
-  db::Region rnactive = ractive_outside_nwell & *rnplus;
-  db::Region rptie    = ractive_outside_nwell & *rpplus;
-  db::Region rngate   = rnactive & *rpoly;
-  db::Region rnsd     = rnactive - rngate;
-
-  //  return the computed layers into the original layout and write it for debugging purposes
-
-  unsigned int lgate  = ly.insert_layer (db::LayerProperties (20, 0));      // 20/0 -> Gate
-  unsigned int lsd    = ly.insert_layer (db::LayerProperties (21, 0));      // 21/0 -> Source/Drain
-  unsigned int lpdiff = ly.insert_layer (db::LayerProperties (22, 0));      // 22/0 -> P Diffusion
-  unsigned int lndiff = ly.insert_layer (db::LayerProperties (23, 0));      // 23/0 -> N Diffusion
-  unsigned int lptie  = ly.insert_layer (db::LayerProperties (24, 0));      // 24/0 -> P Tie
-  unsigned int lntie  = ly.insert_layer (db::LayerProperties (25, 0));      // 25/0 -> N Tie
-
-  rpgate.insert_into (&ly, tc.cell_index (), lgate);
-  rngate.insert_into (&ly, tc.cell_index (), lgate);
-  rpsd.insert_into (&ly, tc.cell_index (), lsd);
-  rnsd.insert_into (&ly, tc.cell_index (), lsd);
-  rpsd.insert_into (&ly, tc.cell_index (), lpdiff);
-  rnsd.insert_into (&ly, tc.cell_index (), lndiff);
-  rpsd.insert_into (&ly, tc.cell_index (), lptie);
-  rnsd.insert_into (&ly, tc.cell_index (), lntie);
-
-  db::NetlistDeviceExtractorMOS4Transistor pmos_ex ("PMOS");
-  db::NetlistDeviceExtractorMOS4Transistor nmos_ex ("NMOS");
-
-  //  device extraction
-
-  db::NetlistDeviceExtractor::input_layers dl;
-
-  dl["SD"] = &rpsd;
-  dl["G"] = &rpgate;
-  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
-  dl["W"] = rnwell.get ();
-  l2n.extract_devices (pmos_ex, dl);
-
-  dl["SD"] = &rnsd;
-  dl["G"] = &rngate;
-  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
-  dl["W"] = rbulk.get ();
-  l2n.extract_devices (nmos_ex, dl);
-
-  //  net extraction
-
-  l2n.register_layer (rpsd, "psd");
-  l2n.register_layer (rnsd, "nsd");
-  l2n.register_layer (rptie, "ptie");
-  l2n.register_layer (rntie, "ntie");
-
-  //  Intra-layer
-  l2n.connect (rpsd);
-  l2n.connect (rnsd);
-  l2n.connect (*rnwell);
-  l2n.connect (*rpoly);
-  l2n.connect (*rdiff_cont);
-  l2n.connect (*rpoly_cont);
-  l2n.connect (*rmetal1);
-  l2n.connect (*rvia1);
-  l2n.connect (*rmetal2);
-  l2n.connect (rptie);
-  l2n.connect (rntie);
-  //  Inter-layer
-  l2n.connect (rpsd,        *rdiff_cont);
-  l2n.connect (rnsd,        *rdiff_cont);
-  l2n.connect (*rpoly,      *rpoly_cont);
-  l2n.connect (*rpoly_cont, *rmetal1);
-  l2n.connect (*rdiff_cont, *rmetal1);
-  l2n.connect (*rdiff_cont, rptie);
-  l2n.connect (*rdiff_cont, rntie);
-  l2n.connect (*rnwell,     rntie);
-  l2n.connect (*rmetal1,    *rvia1);
-  l2n.connect (*rvia1,      *rmetal2);
-  l2n.connect (*rpoly,      *rpoly_lbl);     //  attaches labels
-  l2n.connect (*rmetal1,    *rmetal1_lbl);   //  attaches labels
-  l2n.connect (*rmetal2,    *rmetal2_lbl);   //  attaches labels
   //  Global
-  l2n.connect_global (rntie, "VDD");
-  l2n.connect_global (*rnwell, "VDD");
-  l2n.connect_global (rptie, "VSS");
-  l2n.connect_global (*rbulk, "VSS");
+  l2n->connect_global (test_rig.rntie, "VDD");
+  l2n->connect_global (*test_rig.rnwell, "VDD");
+  l2n->connect_global (test_rig.rptie, "VSS");
+  l2n->connect_global (*test_rig.rbulk, "VSS");
 
   //  Extract with joining VSS and VDD
-  l2n.join_net_names (tl::GlobPattern ("{VSS,VDD}"));
-  l2n.extract_netlist ();
+  l2n->join_net_names (tl::GlobPattern ("{VSS,VDD}"));
 
-  //  debug layers produced for nets
-  //    201/0 -> Well
-  //    203/0 -> Poly
-  //    204/0 -> Diffusion contacts
-  //    205/0 -> Poly contacts
-  //    206/0 -> Metal1
-  //    207/0 -> Via1
-  //    208/0 -> Metal2
-  //    210/0 -> N source/drain
-  //    211/0 -> P source/drain
-  //    212/0 -> N tie
-  //    213/0 -> P tie
-  std::map<const db::Region *, unsigned int> dump_map;
-  dump_map [&rpsd            ] = ly.insert_layer (db::LayerProperties (210, 0));
-  dump_map [&rnsd            ] = ly.insert_layer (db::LayerProperties (211, 0));
-  dump_map [&rptie           ] = ly.insert_layer (db::LayerProperties (212, 0));
-  dump_map [&rntie           ] = ly.insert_layer (db::LayerProperties (213, 0));
-  dump_map [rbulk.get ()     ] = ly.insert_layer (db::LayerProperties (214, 0));
-  dump_map [rnwell.get ()    ] = ly.insert_layer (db::LayerProperties (201, 0));
-  dump_map [rpoly.get ()     ] = ly.insert_layer (db::LayerProperties (203, 0));
-  dump_map [rdiff_cont.get ()] = ly.insert_layer (db::LayerProperties (204, 0));
-  dump_map [rpoly_cont.get ()] = ly.insert_layer (db::LayerProperties (205, 0));
-  dump_map [rmetal1.get ()   ] = ly.insert_layer (db::LayerProperties (206, 0));
-  dump_map [rvia1.get ()     ] = ly.insert_layer (db::LayerProperties (207, 0));
-  dump_map [rmetal2.get ()   ] = ly.insert_layer (db::LayerProperties (208, 0));
+  l2n->extract_netlist ();
 
-  //  write nets to layout
-  db::CellMapping cm = l2n.cell_mapping_into (ly, tc);
-  dump_nets_to_layout (l2n, ly, dump_map, cm);
-
-  dump_map.clear ();
-  dump_map [&rpsd            ] = ly.insert_layer (db::LayerProperties (310, 0));
-  dump_map [&rnsd            ] = ly.insert_layer (db::LayerProperties (311, 0));
-  dump_map [&rptie           ] = ly.insert_layer (db::LayerProperties (312, 0));
-  dump_map [&rntie           ] = ly.insert_layer (db::LayerProperties (313, 0));
-  dump_map [rbulk.get ()     ] = ly.insert_layer (db::LayerProperties (314, 0));
-  dump_map [rnwell.get ()    ] = ly.insert_layer (db::LayerProperties (301, 0));
-  dump_map [rpoly.get ()     ] = ly.insert_layer (db::LayerProperties (303, 0));
-  dump_map [rdiff_cont.get ()] = ly.insert_layer (db::LayerProperties (304, 0));
-  dump_map [rpoly_cont.get ()] = ly.insert_layer (db::LayerProperties (305, 0));
-  dump_map [rmetal1.get ()   ] = ly.insert_layer (db::LayerProperties (306, 0));
-  dump_map [rvia1.get ()     ] = ly.insert_layer (db::LayerProperties (307, 0));
-  dump_map [rmetal2.get ()   ] = ly.insert_layer (db::LayerProperties (308, 0));
-
-  dump_recursive_nets_to_layout (l2n, ly, dump_map, cm);
+  test_rig.dump_nets (*l2n);
+  test_rig.dump_nets_recursive (*l2n);
 
   //  compare netlist as string
   CHECKPOINT ();
-  db::compare_netlist (_this, *l2n.netlist (),
+  db::compare_netlist (_this, *l2n->netlist (),
     "circuit RINGO ();\n"
     "  subcircuit INV2 $1 (IN=$I7,$2=FB,OUT=OSC,$4=VSS,$5=VDD,VDD=VDD,VSS=VSS);\n"
     "  subcircuit INV2 $2 (IN=FB,$2=$I34,OUT=$I17,$4=VSS,$5=VDD,VDD=VDD,VSS=VSS);\n"
@@ -3359,30 +3306,14 @@ TEST(13_JoinNetNames)
   db::compare_layouts (_this, ly, au);
 }
 
-
 TEST(14_JoinNets)
 {
   db::Layout ly;
-  db::LayerMap lmap;
-
-  unsigned int nwell      = define_layer (ly, lmap, 1);
-  unsigned int nwell_lbl  = define_layer (ly, lmap, 1, 1);
-  unsigned int active     = define_layer (ly, lmap, 2);
-  unsigned int pplus      = define_layer (ly, lmap, 10);
-  unsigned int nplus      = define_layer (ly, lmap, 11);
-  unsigned int poly       = define_layer (ly, lmap, 3);
-  unsigned int poly_lbl   = define_layer (ly, lmap, 3, 1);
-  unsigned int diff_cont  = define_layer (ly, lmap, 4);
-  unsigned int poly_cont  = define_layer (ly, lmap, 5);
-  unsigned int metal1     = define_layer (ly, lmap, 6);
-  unsigned int metal1_lbl = define_layer (ly, lmap, 6, 1);
-  unsigned int via1       = define_layer (ly, lmap, 7);
-  unsigned int metal2     = define_layer (ly, lmap, 8);
-  unsigned int metal2_lbl = define_layer (ly, lmap, 8, 1);
+  TestRig test_rig (ly);
 
   {
     db::LoadLayoutOptions options;
-    options.get_options<db::CommonReaderOptions> ().layer_map = lmap;
+    options.get_options<db::CommonReaderOptions> ().layer_map = test_rig.lmap ();
     options.get_options<db::CommonReaderOptions> ().create_other_layers = false;
 
     std::string fn (tl::testdata ());
@@ -3394,181 +3325,35 @@ TEST(14_JoinNets)
     reader.read (ly, options);
   }
 
-  db::Cell &tc = ly.cell (*ly.begin_top_down ());
-  db::LayoutToNetlist l2n (db::RecursiveShapeIterator (ly, tc, std::set<unsigned int> ()));
+  std::unique_ptr<db::LayoutToNetlist> l2n (test_rig.make_l2n ());
 
-  std::unique_ptr<db::Region> rbulk (l2n.make_layer ("bulk"));
-  std::unique_ptr<db::Region> rnwell (l2n.make_layer (nwell, "nwell"));
-  std::unique_ptr<db::Region> rnwell_lbl (l2n.make_layer (nwell_lbl, "nwell_lbl"));
-  std::unique_ptr<db::Region> ractive (l2n.make_layer (active, "active"));
-  std::unique_ptr<db::Region> rpplus (l2n.make_layer (pplus, "pplus"));
-  std::unique_ptr<db::Region> rnplus (l2n.make_layer (nplus, "nplus"));
-  std::unique_ptr<db::Region> rpoly (l2n.make_polygon_layer (poly, "poly"));
-  std::unique_ptr<db::Texts> rpoly_lbl (l2n.make_text_layer (poly_lbl, "poly_lbl"));
-  std::unique_ptr<db::Region> rdiff_cont (l2n.make_polygon_layer (diff_cont, "diff_cont"));
-  std::unique_ptr<db::Region> rpoly_cont (l2n.make_polygon_layer (poly_cont, "poly_cont"));
-  std::unique_ptr<db::Region> rmetal1 (l2n.make_polygon_layer (metal1, "metal1"));
-  std::unique_ptr<db::Texts> rmetal1_lbl (l2n.make_text_layer (metal1_lbl, "metal1_lbl"));
-  std::unique_ptr<db::Region> rvia1 (l2n.make_polygon_layer (via1, "via1"));
-  std::unique_ptr<db::Region> rmetal2 (l2n.make_polygon_layer (metal2, "metal2"));
-  std::unique_ptr<db::Texts> rmetal2_lbl (l2n.make_text_layer (metal2_lbl, "metal2_lbl"));
-
-  //  derived regions
-
-  db::Region ractive_in_nwell = *ractive & *rnwell;
-  db::Region rpactive = ractive_in_nwell & *rpplus;
-  db::Region rntie    = ractive_in_nwell & *rnplus;
-  db::Region rpgate   = rpactive & *rpoly;
-  db::Region rpsd     = rpactive - rpgate;
-
-  db::Region ractive_outside_nwell = *ractive - *rnwell;
-  db::Region rnactive = ractive_outside_nwell & *rnplus;
-  db::Region rptie    = ractive_outside_nwell & *rpplus;
-  db::Region rngate   = rnactive & *rpoly;
-  db::Region rnsd     = rnactive - rngate;
-
-  //  return the computed layers into the original layout and write it for debugging purposes
-
-  unsigned int lgate  = ly.insert_layer (db::LayerProperties (20, 0));      // 20/0 -> Gate
-  unsigned int lsd    = ly.insert_layer (db::LayerProperties (21, 0));      // 21/0 -> Source/Drain
-  unsigned int lpdiff = ly.insert_layer (db::LayerProperties (22, 0));      // 22/0 -> P Diffusion
-  unsigned int lndiff = ly.insert_layer (db::LayerProperties (23, 0));      // 23/0 -> N Diffusion
-  unsigned int lptie  = ly.insert_layer (db::LayerProperties (24, 0));      // 24/0 -> P Tie
-  unsigned int lntie  = ly.insert_layer (db::LayerProperties (25, 0));      // 25/0 -> N Tie
-
-  rpgate.insert_into (&ly, tc.cell_index (), lgate);
-  rngate.insert_into (&ly, tc.cell_index (), lgate);
-  rpsd.insert_into (&ly, tc.cell_index (), lsd);
-  rnsd.insert_into (&ly, tc.cell_index (), lsd);
-  rpsd.insert_into (&ly, tc.cell_index (), lpdiff);
-  rnsd.insert_into (&ly, tc.cell_index (), lndiff);
-  rpsd.insert_into (&ly, tc.cell_index (), lptie);
-  rnsd.insert_into (&ly, tc.cell_index (), lntie);
-
-  db::NetlistDeviceExtractorMOS4Transistor pmos_ex ("PMOS");
-  db::NetlistDeviceExtractorMOS4Transistor nmos_ex ("NMOS");
-
-  //  device extraction
-
-  db::NetlistDeviceExtractor::input_layers dl;
-
-  dl["SD"] = &rpsd;
-  dl["G"] = &rpgate;
-  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
-  dl["W"] = rnwell.get ();
-  l2n.extract_devices (pmos_ex, dl);
-
-  dl["SD"] = &rnsd;
-  dl["G"] = &rngate;
-  dl["P"] = rpoly.get ();  //  not needed for extraction but to return terminal shapes
-  dl["W"] = rbulk.get ();
-  l2n.extract_devices (nmos_ex, dl);
-
-  //  net extraction
-
-  l2n.register_layer (rpsd, "psd");
-  l2n.register_layer (rnsd, "nsd");
-  l2n.register_layer (rptie, "ptie");
-  l2n.register_layer (rntie, "ntie");
-
-  //  Intra-layer
-  l2n.connect (rpsd);
-  l2n.connect (rnsd);
-  l2n.connect (*rnwell);
-  l2n.connect (*rpoly);
-  l2n.connect (*rdiff_cont);
-  l2n.connect (*rpoly_cont);
-  l2n.connect (*rmetal1);
-  l2n.connect (*rvia1);
-  l2n.connect (*rmetal2);
-  l2n.connect (rptie);
-  l2n.connect (rntie);
-  //  Inter-layer
-  l2n.connect (rpsd,        *rdiff_cont);
-  l2n.connect (rnsd,        *rdiff_cont);
-  l2n.connect (rntie,       *rnwell);
-  l2n.connect (*rpoly,      *rpoly_cont);
-  l2n.connect (*rpoly_cont, *rmetal1);
-  l2n.connect (*rdiff_cont, *rmetal1);
-  l2n.connect (*rdiff_cont, rptie);
-  l2n.connect (*rdiff_cont, rntie);
-  l2n.connect (*rnwell,     rntie);
-  l2n.connect (*rmetal1,    *rvia1);
-  l2n.connect (*rvia1,      *rmetal2);
-  l2n.connect (*rnwell,     *rnwell_lbl);    //  attaches labels
-  l2n.connect (*rpoly,      *rpoly_lbl);     //  attaches labels
-  l2n.connect (*rmetal1,    *rmetal1_lbl);   //  attaches labels
-  l2n.connect (*rmetal2,    *rmetal2_lbl);   //  attaches labels
   //  Global
-  l2n.connect_global (*rbulk, "BULK");
-  l2n.connect_global (rptie, "BULK");
+  l2n->connect_global (*test_rig.rbulk, "BULK");
+  l2n->connect_global (test_rig.rptie, "BULK");
 
   //  Extract while joining VSS with BULK and VDD with NWELL
   std::set<std::string> jn;
   jn.insert ("VDD");
   jn.insert ("NWELL");
-  l2n.join_nets (tl::GlobPattern ("INV2"), jn);
+  l2n->join_nets (tl::GlobPattern ("INV2"), jn);
   jn.clear ();
   jn.insert ("VSS");
   jn.insert ("BULK");
-  l2n.join_nets (tl::GlobPattern ("INV2"), jn);
+  l2n->join_nets (tl::GlobPattern ("INV2"), jn);
 
-  //  This will trigger an implicit connection on top level (side effect of explicit connections)
+  //  Implicit connection of nets with same name "VDD"
   jn.clear ();
   jn.insert ("VDD");
-  l2n.join_nets (jn);
+  l2n->join_nets (jn);
 
-  l2n.extract_netlist ();
+  l2n->extract_netlist ();
 
-  //  debug layers produced for nets
-  //    201/0 -> Well
-  //    203/0 -> Poly
-  //    204/0 -> Diffusion contacts
-  //    205/0 -> Poly contacts
-  //    206/0 -> Metal1
-  //    207/0 -> Via1
-  //    208/0 -> Metal2
-  //    210/0 -> N source/drain
-  //    211/0 -> P source/drain
-  //    212/0 -> N tie
-  //    213/0 -> P tie
-  std::map<const db::Region *, unsigned int> dump_map;
-  dump_map [&rpsd            ] = ly.insert_layer (db::LayerProperties (210, 0));
-  dump_map [&rnsd            ] = ly.insert_layer (db::LayerProperties (211, 0));
-  dump_map [&rptie           ] = ly.insert_layer (db::LayerProperties (212, 0));
-  dump_map [&rntie           ] = ly.insert_layer (db::LayerProperties (213, 0));
-  dump_map [rbulk.get ()     ] = ly.insert_layer (db::LayerProperties (214, 0));
-  dump_map [rnwell.get ()    ] = ly.insert_layer (db::LayerProperties (201, 0));
-  dump_map [rpoly.get ()     ] = ly.insert_layer (db::LayerProperties (203, 0));
-  dump_map [rdiff_cont.get ()] = ly.insert_layer (db::LayerProperties (204, 0));
-  dump_map [rpoly_cont.get ()] = ly.insert_layer (db::LayerProperties (205, 0));
-  dump_map [rmetal1.get ()   ] = ly.insert_layer (db::LayerProperties (206, 0));
-  dump_map [rvia1.get ()     ] = ly.insert_layer (db::LayerProperties (207, 0));
-  dump_map [rmetal2.get ()   ] = ly.insert_layer (db::LayerProperties (208, 0));
-
-  //  write nets to layout
-  db::CellMapping cm = l2n.cell_mapping_into (ly, tc);
-  dump_nets_to_layout (l2n, ly, dump_map, cm);
-
-  dump_map.clear ();
-  dump_map [&rpsd            ] = ly.insert_layer (db::LayerProperties (310, 0));
-  dump_map [&rnsd            ] = ly.insert_layer (db::LayerProperties (311, 0));
-  dump_map [&rptie           ] = ly.insert_layer (db::LayerProperties (312, 0));
-  dump_map [&rntie           ] = ly.insert_layer (db::LayerProperties (313, 0));
-  dump_map [rbulk.get ()     ] = ly.insert_layer (db::LayerProperties (314, 0));
-  dump_map [rnwell.get ()    ] = ly.insert_layer (db::LayerProperties (301, 0));
-  dump_map [rpoly.get ()     ] = ly.insert_layer (db::LayerProperties (303, 0));
-  dump_map [rdiff_cont.get ()] = ly.insert_layer (db::LayerProperties (304, 0));
-  dump_map [rpoly_cont.get ()] = ly.insert_layer (db::LayerProperties (305, 0));
-  dump_map [rmetal1.get ()   ] = ly.insert_layer (db::LayerProperties (306, 0));
-  dump_map [rvia1.get ()     ] = ly.insert_layer (db::LayerProperties (307, 0));
-  dump_map [rmetal2.get ()   ] = ly.insert_layer (db::LayerProperties (308, 0));
-
-  dump_recursive_nets_to_layout (l2n, ly, dump_map, cm);
+  test_rig.dump_nets (*l2n);
+  test_rig.dump_nets_recursive (*l2n);
 
   //  compare netlist as string
   CHECKPOINT ();
-  db::compare_netlist (_this, *l2n.netlist (),
+  db::compare_netlist (_this, *l2n->netlist (),
     "circuit RINGO ();\n"
     "  subcircuit INV2 $1 ('NWELL,VDD'=VDD,IN=$I15,$3=FB,OUT=OSC,VSS=VSS);\n"
     "  subcircuit INV2 $2 ('NWELL,VDD'=VDD,IN=FB,$3=$I26,OUT=$I25,VSS=VSS);\n"

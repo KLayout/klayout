@@ -132,6 +132,7 @@ LayoutToNetlistStandardReader::skip ()
 {
   while (m_ex.at_end () || *m_ex.skip () == '#') {
     if (m_stream.at_end ()) {
+      m_ex = tl::Extractor ();
       return;
     }
     m_progress.set (m_stream.line_number ());
@@ -182,6 +183,108 @@ void LayoutToNetlistStandardReader::skip_element ()
     }
 
   }
+}
+
+bool LayoutToNetlistStandardReader::read_message (std::string &msg)
+{
+  if (test (skeys::description_key) || test (lkeys::description_key)) {
+    Brace br (this);
+    read_word_or_quoted (msg);
+    br.done ();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool LayoutToNetlistStandardReader::read_severity (db::Severity &severity)
+{
+  if (test (skeys::info_severity_key) || test (lkeys::info_severity_key)) {
+    severity = db::Info;
+    return true;
+  } else if (test (skeys::warning_severity_key) || test (lkeys::warning_severity_key)) {
+    severity = db::Warning;
+    return true;
+  } else if (test (skeys::error_severity_key) || test (lkeys::error_severity_key)) {
+    severity = db::Error;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool LayoutToNetlistStandardReader::read_message_cell (std::string &cell_name)
+{
+  if (test (skeys::cell_key) || test (lkeys::cell_key)) {
+    Brace br (this);
+    read_word_or_quoted (cell_name);
+    br.done ();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool LayoutToNetlistStandardReader::read_message_geometry (db::DPolygon &polygon)
+{
+  if (test (skeys::polygon_key) || test (lkeys::polygon_key)) {
+    Brace br (this);
+    std::string s;
+    read_word_or_quoted (s);
+    tl::Extractor ex (s.c_str ());
+    ex.read (polygon);
+    br.done ();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool LayoutToNetlistStandardReader::read_message_cat (std::string &category_name, std::string &category_description)
+{
+  if (test (skeys::cat_key) || test (lkeys::cat_key)) {
+    Brace br (this);
+    read_word_or_quoted (category_name);
+    if (br) {
+      read_word_or_quoted (category_description);
+    }
+    br.done ();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void LayoutToNetlistStandardReader::read_message_entry (db::LogEntryData &data)
+{
+  Severity severity (db::NoSeverity);
+  std::string msg, cell_name, category_name, category_description;
+  db::DPolygon geometry;
+
+  Brace br (this);
+  while (br) {
+    if (read_severity (severity)) {
+      //  continue
+    } else if (read_message (msg)) {
+      //  continue
+    } else if (read_message_cell (cell_name)) {
+      //  continue
+    } else if (read_message_cat (category_name, category_description)) {
+      //  continue
+    } else if (read_message_geometry (geometry)) {
+      //  continue
+    } else {
+      skip_element ();
+    }
+  }
+  br.done ();
+
+  data.set_severity (severity);
+  data.set_message (msg);
+  data.set_cell_name (cell_name);
+  data.set_category_description (category_description);
+  data.set_category_name (category_name);
+  data.set_geometry (geometry);
 }
 
 void LayoutToNetlistStandardReader::do_read (db::LayoutToNetlist *l2n)
@@ -358,6 +461,13 @@ void LayoutToNetlistStandardReader::read_netlist (db::Netlist *netlist, db::Layo
         l2n->connect (layer_by_name (l2n, l1), layer_by_name (l2n, l2));
       }
       br.done ();
+
+    } else if (l2n && (test (skeys::message_key) || test (lkeys::message_key))) {
+
+      db::LogEntryData data;
+      read_message_entry (data);
+
+      l2n->log_entry (data);
 
     } else if (l2n && (test (skeys::global_key) || test (lkeys::global_key))) {
 

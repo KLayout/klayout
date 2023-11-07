@@ -27,6 +27,7 @@ namespace db
 {
 
 NetlistCrossReference::NetlistCrossReference ()
+  : mp_per_circuit_data (0)
 {
   //  .. nothing yet ..
 }

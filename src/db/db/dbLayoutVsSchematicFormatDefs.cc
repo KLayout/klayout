@@ -43,11 +43,7 @@ namespace lvs_std_format
   DB_PUBLIC std::string LongKeys::warning_key ("warning");
   DB_PUBLIC std::string LongKeys::skipped_key ("skipped");
 
-  DB_PUBLIC std::string LongKeys::info_severity_key ("info");
-  DB_PUBLIC std::string LongKeys::warning_severity_key ("warning");
-  DB_PUBLIC std::string LongKeys::error_severity_key ("error");
-
-  //  E, H, I, J, L, M, S, W, X, Z, 0, 1
+  //  H, J, L, M, S, X, Z, 0, 1
 
   DB_PUBLIC std::string ShortKeys::reference_key ("H");
   DB_PUBLIC std::string ShortKeys::layout_key ("J");
@@ -60,10 +56,6 @@ namespace lvs_std_format
   DB_PUBLIC std::string ShortKeys::nomatch_key ("X");
   DB_PUBLIC std::string ShortKeys::warning_key ("W");
   DB_PUBLIC std::string ShortKeys::skipped_key ("S");
-
-  DB_PUBLIC std::string ShortKeys::info_severity_key ("I");
-  DB_PUBLIC std::string ShortKeys::warning_severity_key ("W");
-  DB_PUBLIC std::string ShortKeys::error_severity_key ("E");
 }
 
 }

@@ -1011,6 +1011,20 @@ END
 
   end
 
+  def test_21_LogAPI
+
+    l2n = RBA::LayoutToNetlist::new
+    l2n.read(File.join($ut_testsrc, "testdata", "algo", "l2n_reader_au_6.l2n"))
+
+    le = l2n.each_log_entry.collect { |s| s.to_s }
+    assert_equal(le.size, 4)
+    assert_equal(le[0].to_s, "info")
+    assert_equal(le[1].to_s, "[cat description] In cell cell_name: info, shape: (1,1;2,2;3,1)")
+    assert_equal(le[2].to_s, "warning")
+    assert_equal(le[3].to_s, "error")
+
+  end
+
 end
 
 load("test_epilogue.rb")

@@ -1839,7 +1839,7 @@ gsi::EnumIn<db::Edges, db::SpecialEdgeOrientationFilter::FilterType> decl_EdgesE
   gsi::enum_const ("OrthoDiagonalEdges", db::SpecialEdgeOrientationFilter::OrthoDiagonal,
     "@brief Diagonal or orthogonal edges are selected (0, 90, -45 and 45 degree)\n"
   ),
-  "@brief This enum specifies the the edge type for edge angle filters.\n"
+  "@brief This enum specifies the edge type for edge angle filters.\n"
   "\n"
   "This enum was introduced in version 0.28.\n"
 );

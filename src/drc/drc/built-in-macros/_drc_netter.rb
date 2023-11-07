@@ -69,6 +69,8 @@ module DRC
       @l2n = nil
       @lnum = 0
       @device_scaling = 1.0
+      @ignore_extraction_errors = false
+      @top_level = false
     end
     
     # %DRC%
@@ -234,6 +236,36 @@ module DRC
         @l2n && @l2n.device_scaling = factor
       end
     end
+
+    # %DRC%
+    # @name top_level
+    # @brief Specifies top level mode
+    # @synopsis top_level(value)
+    # With this value set to false (the default), it is assumed that the 
+    # circuit is not used as a top level chip circuit. In that case, for
+    # example must-connect nets which are not connected are reported as
+    # as warnings. If top level mode is set to true, such disconnected
+    # nets are reported as errors as this indicates a missing physical
+    # connection.
+    
+    def top_level(value)
+      @engine._context("top_level") do
+        @top_level = value
+        @l2n && @l2n.top_level_mode = value
+      end
+    end
+    
+    # %DRC%
+    # @name ignore_extraction_errors
+    # @brief Specifies whether to ignore extraction errors
+    # @synopsis ignore_extraction_errors(value)
+    # With this value set to false (the default), "extract_netlist" will raise
+    # an exception upon extraction errors. Otherwise, extraction errors will be logged
+    # but no error is raised.
+    
+    def ignore_extraction_errors(value)
+      @ignore_extraction_errors = value
+    end
     
     # %DRC%
     # @name clear_connections
@@ -249,26 +281,31 @@ module DRC
     
     # %DRC%
     # @name connect_implicit
-    # @brief Specifies a search pattern for labels which create implicit net connections
+    # @brief Specifies a search pattern for implicit net connections ("must connect" nets)
     # @synopsis connect_implicit(label_pattern)
     # @synopsis connect_implicit(cell_pattern, label_pattern)
-    # Use this method to supply label strings which create implicit net connections
-    # on the top level circuit in the first version. This feature is useful to connect identically labelled nets
-    # while a component isn't integrated yet. If the component is integrated, nets may be connected
-    # on a higher hierarchy level - e.g. by a power mesh. Inside the component this net consists
-    # of individual islands. To properly perform netlist extraction and comparison, these islands
-    # need to be connected even though there isn't a physical connection. "connect_implicit" can
-    # achive this if these islands are labelled with the same text on the top level of the
-    # component.
+    # This method specifies a net name search pattern, either for all cells or for
+    # certain cells, given by a name search pattern. Search pattern follow the usual glob
+    # form (e.g. "A*" for all cells or nets with names starting with "A").
+    # 
+    # Then, for nets matching the net name pattern and for which there is more than
+    # one subnet, the subnets are connected. "Subnets" are physically disconnected parts
+    # of a net which carry the same name.
     #
-    # In the second version, the pattern can be specified for a cell range (given by a cell name pattern or a 
-    # single cell name). These pattern are applied to non-top cells. The unspecific pattern
-    # has priority over the cell-specific ones. As the cell selector is a pattern itself, a
-    # single cell may fall into more than one category. In this case, the label filters are
-    # combined.
+    # This feature is useful for example for power nets which are complete in a cell,
+    # but are supposed to be connected upwards in the hierarchy ("must connect" nets).
+    # Physically there are multiple nets, logically - and specifically in the schematic for
+    # the purpose of LVS - there is only one net. 
+    # "connect_implicit" now creates a virtual, combined physical net that matches the logical net.
+    # 
+    # This is general bears the risk of missing a physical connection. The "connect_implicit"
+    # feature therefore checks whether the connection is made physically on the next hierarchy
+    # level, except for top-level cells for which it is assumed that this connection is made
+    # later. A warning is raised instead for top level cells.
     #
     # The implicit connections are applied on the next net extraction and cleared
-    # on "clear_connections".
+    # on "clear_connections". Another feature is \connect_explicit which allows connecting
+    # differently named subnets in a similar fashion.
 
     def connect_implicit(arg1, arg2 = nil)
 
@@ -290,27 +327,24 @@ module DRC
 
     # %DRC%
     # @name connect_explicit
-    # @brief Specifies a list of net names for nets to connect explicitly
+    # @brief Specifies a list of net names for nets to connect ("must connect" nets)
     # @synopsis connect_explicit(net_names)
     # @synopsis connect_explicit(cell_pattern, net_names)
     # Use this method to explicitly connect nets even if there is no physical connection.
-    # As this breaks with the concept of physical verification, this feature should be used 
-    # with care. 
+    # The concept is similar to implicit connection (see \connect_implicit). The method gets
+    # a list of nets which are connected virtually, even if there is no physical connection.
+    # The first version applies this scheme to all cells, the second version to cells matching
+    # the cell name pattern. The cell name pattern follows the usual glob style form (e.g. "A*"
+    # applies the connection in all cells whose name starts with "A").
     #
-    # The first version of this function will connect all nets listed in the "net_names" array 
-    # in the top level cell. The second version takes a cell name pattern and connects all nets listed
-    # in "net_names" for cells matching this pattern.
-    #
-    # A use case for this method is the following: consider a set of standard cells. These do not have a bulk
-    # or n-well pin in the schematics. They also do not have build in tie-down diodes for the 
-    # substrate connections. In this case there is a build-in discrepancy between the 
-    # schematics and the layout: bulk and VSS are separate nets within the layout, but the 
-    # schematic does not list them as separate. The solution is to make an explicit connection
-    # between VDD and n-well and VSS and bulk, provided VDD and VSS are properly labelled as "VDD" and "VSS"
-    # and n-well and bulk are accessible as named nets (for bulk you can use "connect_global").
-    #
-    # The following code will establish an explicit connection for all cells called "INV.." between 
-    # BULK and VSS nets:
+    # This method is useful to establish a logical connection which is made later up on the 
+    # next level of hierarchy. For example, a standard cell my not contain substrate or well
+    # taps as these may be made by tap or spare cells. Logically however, the cell only has
+    # one power or ground pin for the devices and substrate or well. In order to match both
+    # representations - for example for the purpose of LVS - the dual power or ground pins have
+    # to be connected. Assuming that there is a global net "BULK" for the substrate and a
+    # net "VSS" for the sources of the NMOS devices, the following statement will create this
+    # connection for all cell names beginning with "INV":
     #
     # @code
     # connect_global(bulk, "BULK")
@@ -318,13 +352,18 @@ module DRC
     # connect_explicit("INV*", [ "BULK", "VSS" ])
     # @/code
     #
+    # The resulting net and pin will carry a name made from the combination of the connected
+    # nets. In this case it will be "BULK,VSS".
+    #
+    # The virtual connection in general bears the risk of missing a physical connection. 
+    # The "connect_explicit" feature therefore checks whether the connection is made physically 
+    # on the next hierarchy level ("must connect" nets), except for top-level cells for which 
+    # it is assumed that this connection is made later. 
+    # A warning is raised instead for top level cells.
+    # 
     # Explicit connections also imply implicit connections between different parts of 
     # one of the nets. In the example before, "VSS" pieces without a physical connection
     # will also be connected.
-    #
-    # When you use explicit connections you should make sure by other ways that the connection
-    # is made physically. For example, for the bulk/n-well pin example above, by enforcing at least one
-    # tie-down diode per n-well island and in the substrate by means of a DRC rule.
     #
     # The explicit connections are applied on the next net extraction and cleared
     # on "clear_connections".
@@ -595,6 +634,11 @@ module DRC
             cfg.call(@l2n)
           end
 
+          # checks for errors if needed
+          if !@ignore_extraction_errors
+            @l2n.check_extraction_errors
+          end
+
         end
 
         @l2n
@@ -647,6 +691,7 @@ module DRC
         @layers = {}
         _make_data
         @l2n.device_scaling = @device_scaling
+        @l2n.top_level_mode = @top_level
       end
     end
 

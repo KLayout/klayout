@@ -102,19 +102,21 @@ connect(metal2, metal2_labels)</pre>
   <p>
   Implicit connections can be useful to supply preliminary connections
   which are supposed to be created higher up in the hierarchy:
-  Imagine a circuit which a big power net for example. When the layout
-  is made, the power net may not be completely connected yet because the 
+  Imagine a circuit with a big power net for example. When the layout
+  is made, the power net may not be completely connected yet, because the 
   plan is to connect all parts of this power net later when the
   cell is integrated. In this situation, the 
-  subcircuit cell itself won't be LVS clean because the power net is a single
+  subcircuit cell itself won't be LVS clean, because the power net is a single
   net schematic-wise, but exist as multiple nets layout-wise. This prevents
   bottom-up verification - a very useful technique to achieve LVS clean 
-  layouts.
+  layouts. It also prevents matching in general, as the layout cell will
+  have two pins while the schematic subcircuit has only one. In this case, 
+  the cell and subcircuit will never match.
   </p>
 
   <p>
   To allow verification of such a cell, "implicit connections" can be
-  made by giving the net parts the same name through labels and assume
+  made by giving the net parts the same name through labels and assuming
   these parts are connected: 
   for example to specify implicit connections between all parts of a "VDD" net,
   place a label "VDD" on each part and include the following statement
@@ -126,9 +128,23 @@ connect(metal2, metal2_labels)</pre>
   <p>
   "connect_implicit" (see <a href="/about/drc_ref_global.xml#connect_implicit">connect_implicit</a>)
   can be present multiple times to make many of such connections.
-  Implicit connections will only be made on the topmost circuit to prevent false verification results. 
-  Be careful not to use this option in a final verification of a full design as power net 
-  opens may pass unnoticed.
+  Implicit connections are accepted on top level, but a warning is issued, indicating
+  that the connection needs to be made further up in the hierarchy. 
+  In a subcircuit, implicit connections are required to be connected on the
+  next level of hierarchy - either physically or by another implicit connection.
+  This way, a missing physical connection does not escape and at least a warning
+  is issued if the connection is still not made on top level.
+  </p>
+
+  <p>
+  You can declare the layout as being a top level one. This turns the 
+  warning about missing physical connections into an error:
+  </p>
+
+  <pre>top_level(true)</pre>
+
+  <p>
+  The "connect_implicit" feature is also called "must connect" nets in other systems.
   </p>
 
   <p>
@@ -142,7 +158,8 @@ connect(metal2, metal2_labels)</pre>
   This will connect all nets labelled with "VDD1" for example or those labelled
   with "VDD_5V". However, this statement will only connect "VDD1" with "VDD1",
   <b>not</b> nets with different labels. I.e. it will not connect "VDD1" with "VDD2"
-  labels.
+  labels. To make connections between differently named nets, use "explicit connections"
+  (see below).
   </p>
 
   <p>
@@ -151,30 +168,22 @@ connect(metal2, metal2_labels)</pre>
   </p>
 
   <p>
-  The standard method "connect_implicit" will only act on top-level cells.
-  However, sometimes the construction of certain library cells requires 
-  connecting nets inside subcells. For example, memory cells are often made
-  in a way that their common rails are exposed on different sides but 
-  not connected internally. Formally, those cells need to be described by
-  circuits with multiple pins in the schematic. As the cells are only used
-  in certain contexts where these rails are connected, it's sufficient to 
-  specify a single pin and connect the rails inside the subcells if labelled
-  properly. The following statement will connect all nets labelled with "VDD"
+  The above examples of "connect_implicit" apply to all cells. The statement
+  can be made cell specific, by giving a cell name glob pattern for the 
+  first argument, followed by the net name pattern.
+  </p>
+  
+  <p>
+  The following statement will connect all nets labelled with "VDD"
   from the "MEMCELL" subcell:
   </p>
 
   <pre>connect_implicit("MEMCELL", "VDD")</pre>
 
   <p>
-  If MEMCELL is the top cell, the single-argument, unspecific "connect_implicit"
-  rule is applied, unless no such rule is given. In other words: the unspecific
-  rule has priority for the top cell.
-  </p>
-
-  <p>
-  The cell argument can be a glob-style pattern. In this case, the rule is
-  applied to all matching cells. Again, the "connect_implicit" rule may be 
-  given multiple times. In this case, all matching occurances act together.
+  The rule is applied to all cells matching the glob pattern in the first argument.
+  Again, the "connect_implicit" rule may be given multiple times. 
+  In this case, all matching occurrences act together.
   </p>
 
   <p>
@@ -217,20 +226,18 @@ connect(metal2, metal2_labels)</pre>
   </p>
 
   <p>
-  To align layout and schematics, bulk and VSS pins can be connected
+  To align layout and schematic, bulk and VSS pins can be connected
   explicitly. Same for n-well and VDD.
-  There is a certain risk to forget making these connections later. 
-  But this risk can be mitigated by implementing DRC rules which
-  demand at least one tie-down diode for each isolated n-well island
-  or the bulk.
+  This scheme is similar to the "connect_implicit" scheme explained
+  above, but can connect differently named nets.
   </p>
 
   <p>
-  To establish an explicit connection, make sure that n-well and 
+  To establish an explicit connection in the above example, make sure that n-well and 
   bulk have proper names. For the n-well this can be done by creating
   labels on the n-well islands giving them a proper name - e.g. "NWELL".
   The bulk isn't a real layout layer with polygons on it. Using "connect_global"
-  will both connect everthing on this layer and give it a name.
+  will both connect everything on this layer and give it a name.
   </p>
 
   <p>
@@ -243,16 +250,34 @@ connect_explicit("INV", [ "BULK", "VSS" ])
 </pre>
 
   <p>
+  Note that this rule will form a new net called "BULK,VSS" combining both
+  subnets.
+  </p>
+
+  <p>
   The cell name can be a pattern. For example "INV*" will apply this rule on all 
   cells starting with "INV".
-  The cell is not mandatory: if it is omitted, the rule is applied to top level only
-  to avoid introducing rules in subcells where they would mask layout errors.
+  The cell pattern is not mandatory: if it is omitted, the rule is applied to all 
+  cells.
+  </p>
+
+  <p>
+  Like implicit connections, explicit connections are checked for being made
+  on the next level of hierarchy, either physically or by another explicit or
+  implicit connection.
   </p>
 
   <p>
   An explicit connection will also imply implicit connections on the nets 
   listed in the net names. So in the example above, different pieces of "VSS"
-  are connected even if they are not physically connected.
+  are connected even if they are not physically connected. Again, it is checked
+  that these connections are made later up in the hierarchy.
+  </p>
+
+  <p>
+  Again, the "connect_explicit" statements must be given before the netlist is 
+  extracted. Typically this happens before or shortly after "connect"
+  statements.
   </p>
 
 </doc>

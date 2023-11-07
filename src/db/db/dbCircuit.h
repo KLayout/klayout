@@ -703,6 +703,15 @@ public:
   void connect_pin (size_t pin_id, Net *net);
 
   /**
+   *  @brief Adds a pin to the given net
+   *  The pin will be added to the net. If there is already a pin
+   *  on the net, the existing and new pin will be joined.
+   *  This usually implies that nets further up in the hierarchy
+   *  are joined too.
+   */
+  void join_pin_with_net (size_t pin_id, Net *net);
+
+  /**
    *  @brief Renames the pin with the given ID
    */
   void rename_pin (size_t pin_id, const std::string &name);
@@ -819,7 +828,7 @@ private:
   bool combine_parallel_devices (const db::DeviceClass &cls);
   bool combine_serial_devices (const db::DeviceClass &cls);
   void do_purge_nets (bool keep_pins);
-
+  void join_pins (size_t pin_id, size_t with);
   void devices_changed ();
   void subcircuits_changed ();
   void nets_changed ();

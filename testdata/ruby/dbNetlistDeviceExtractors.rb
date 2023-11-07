@@ -27,7 +27,7 @@ class DBNetlistExtractorTests_TestClass < TestBase
 
   def test_1_Error
   
-    err = RBA::NetlistDeviceExtractorError::new
+    err = RBA::LogEntryData::new
 
     err.message = "MSG"
     err.cell_name = "Cell"

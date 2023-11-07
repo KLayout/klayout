@@ -211,6 +211,7 @@ private slots:
   void nl_selection_changed ();
   void sch_selection_changed ();
   void xref_selection_changed ();
+  void log_selection_changed ();
   void browse_color_for_net ();
   void select_color_for_net ();
 
@@ -243,6 +244,7 @@ private:
   bool m_update_needed;
   lay::NetlistObjectsPath m_current_path;
   std::vector<lay::NetlistObjectsPath> m_selected_paths;
+  std::vector<std::pair<const db::Circuit *, db::DPolygon> > m_markers;
   lay::NetInfoDialog *mp_info_dialog;
   tl::DeferredMethod<NetlistBrowserPage> dm_update_highlights;
   tl::DeferredMethod<NetlistBrowserPage> dm_rerun_macro;

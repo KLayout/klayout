@@ -109,6 +109,8 @@ protected:
   void read_netlist (Netlist *netlist, db::LayoutToNetlist *l2n, Brace *nested = 0, std::map<const db::Circuit *, ObjectMap> *map_per_circuit = 0);
   static size_t terminal_id (const db::DeviceClass *device_class, const std::string &tname);
   static std::pair<db::DeviceAbstract *, const db::DeviceClass *> device_model_by_name (db::Netlist *netlist, const std::string &dmname);
+  bool read_message (std::string &msg);
+  bool read_severity (Severity &severity);
 
   const std::string &path () const
   {
@@ -140,6 +142,15 @@ protected:
   void skip ();
   void skip_element ();
 
+private:
+  tl::TextInputStream m_stream;
+  std::string m_path;
+  std::string m_line;
+  double m_dbu;
+  tl::Extractor m_ex;
+  db::Point m_ref;
+  tl::AbsoluteProgress m_progress;
+
   void read_net (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map);
   void read_pin (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map);
   void read_device (Netlist *netlist, db::LayoutToNetlist *l2n, db::Circuit *circuit, ObjectMap &map, std::map<db::CellInstArray, std::list<Connections> > &connections);
@@ -151,15 +162,10 @@ protected:
   db::Box read_rect ();
   void read_geometries (db::NetlistObject *obj, Brace &br, db::LayoutToNetlist *l2n, db::local_cluster<NetShape> &lc, db::Cell &cell);
   db::Point read_point ();
-
-private:
-  tl::TextInputStream m_stream;
-  std::string m_path;
-  std::string m_line;
-  double m_dbu;
-  tl::Extractor m_ex;
-  db::Point m_ref;
-  tl::AbsoluteProgress m_progress;
+  void read_message_entry (db::LogEntryData &data);
+  bool read_message_cell (std::string &cell_name);
+  bool read_message_geometry (db::DPolygon &polygon);
+  bool read_message_cat (std::string &category_name, std::string &category_description);
 };
 
 }

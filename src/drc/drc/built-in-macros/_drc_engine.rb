@@ -2278,6 +2278,18 @@ CODE
     # See \Netter#device_scaling for a description of that function.
  
     # %DRC%
+    # @name top_level
+    # @brief Specifies that the circuit is a chip top level circuit
+    # @synopsis top_level(flag)
+    # See \Netter#top_level for a description of that function.
+ 
+    # %DRC%
+    # @name ignore_extraction_errors
+    # @brief Specifies whether to ignore extraction errors
+    # @synopsis ignore_extraction_errors(value)
+    # See \Netter#ignore_extraction_errors for a description of that function.
+ 
+    # %DRC%
     # @name extract_devices
     # @brief Extracts devices for a given device extractor and device layer selection
     # @synopsis extract_devices(extractor, layer_hash)
@@ -2299,6 +2311,8 @@ CODE
       connect_implicit
       connect_explicit
       device_scaling
+      top_level
+      ignore_extraction_errors
       extract_devices
       l2n_data
       netlist

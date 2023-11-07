@@ -28,6 +28,7 @@
 #include "dbNetlistExtractor.h"
 #include "dbNetlistDeviceExtractor.h"
 #include "dbLayoutToNetlistEnums.h"
+#include "dbLog.h"
 #include "tlGlobPattern.h"
 
 namespace db
@@ -78,6 +79,7 @@ class DB_PUBLIC LayoutToNetlist
 {
 public:
   typedef std::map<unsigned int, std::string>::const_iterator layer_iterator;
+  typedef std::vector<db::LogEntryData> log_entries_type;
 
   /**
    *  @brief The constructor
@@ -188,6 +190,69 @@ public:
   void set_filename (const std::string &filename)
   {
     m_filename = filename;
+  }
+
+  /**
+   *  @brief Gets the top level mode flag
+   */
+  bool top_level_mode () const
+  {
+    return m_top_level_mode;
+  }
+
+  /**
+   *  @brief Sets top level mode
+   *
+   *  In top level mode, must-connect warnings are turned into
+   *  errors for example.
+   *
+   *  By default, top-level mode is off.
+   */
+  void set_top_level_mode (bool f)
+  {
+    m_top_level_mode = f;
+  }
+
+  /**
+   *  @brief Gets the log entries
+   */
+  const log_entries_type &log_entries () const
+  {
+    return m_log_entries;
+  }
+
+  /**
+   *  @brief Iterator for the log entries (begin)
+   */
+  log_entries_type::const_iterator begin_log_entries () const
+  {
+    return m_log_entries.begin ();
+  }
+
+  /**
+   *  @brief Iterator for the log entries (end)
+   */
+  log_entries_type::const_iterator end_log_entries () const
+  {
+    return m_log_entries.end ();
+  }
+
+  /**
+   *  @brief Clears the log entries
+   */
+  void clear_log_entries ()
+  {
+    m_log_entries.clear ();
+  }
+
+  /**
+   *  @brief Adds a log entry
+   */
+  void log_entry (const db::LogEntryData &log_entry)
+  {
+    if (m_log_entries.empty () || m_log_entries.back () != log_entry) {
+      m_log_entries.push_back (log_entry);
+    }
   }
 
   /**
@@ -380,7 +445,8 @@ public:
    *  boolean operations for deriving layers. Other operations are applicable as long as they are
    *  capable of delivering hierarchical layers.
    *
-   *  If errors occur, the device extractor will contain theses errors.
+   *  If errors occur, the device extractor will contain theses errors. They are also transferred
+   *  to the LayoutToNetlist object.
    */
   void extract_devices (db::NetlistDeviceExtractor &extractor, const std::map<std::string, db::ShapeCollection *> &layers);
 
@@ -388,7 +454,7 @@ public:
    *  @brief Resets the extracted netlist
    *
    *  This method will invalidate the netlist and extraction. It is called automatically when
-   *  cone of the connect methods is called.
+   *  one of the connect methods is called.
    */
   void reset_extracted ();
 
@@ -557,6 +623,11 @@ public:
    *  See the class description for more details.
    */
   void extract_netlist ();
+
+  /**
+   *  @brief Throws an exception if the extractor contains errors
+   */
+  void check_extraction_errors ();
 
   /**
    *  @brief Marks the netlist as extracted
@@ -930,6 +1001,7 @@ private:
   std::string m_name;
   std::string m_original_file;
   std::string m_filename;
+  log_entries_type m_log_entries;
   db::RecursiveShapeIterator m_iter;
   std::unique_ptr<db::DeepShapeStore> mp_internal_dss;
   tl::weak_ptr<db::DeepShapeStore> mp_dss;
@@ -948,6 +1020,7 @@ private:
   db::DeepLayer m_dummy_layer;
   std::string m_generator;
   bool m_include_floating_subcircuits;
+  bool m_top_level_mode;
   std::list<tl::GlobPattern> m_joined_net_names;
   std::list<std::pair<tl::GlobPattern, tl::GlobPattern> > m_joined_net_names_per_cell;
   std::list<std::set<std::string> > m_joined_nets;
@@ -963,6 +1036,11 @@ private:
   void connect_impl (const db::ShapeCollection &a, const db::ShapeCollection &b);
   size_t connect_global_impl (const db::ShapeCollection &l, const std::string &gn);
   bool is_persisted_impl (const db::ShapeCollection &coll) const;
+  void do_join_nets (db::Circuit &c, const std::vector<Net *> &nets);
+  void do_join_nets ();
+  void join_nets_from_pattern (db::Circuit &c, const tl::GlobPattern &p);
+  void join_nets_from_pattern (db::Circuit &c, const std::set<std::string> &p);
+  void check_must_connect (const db::Circuit &c, const db::Net &a, const db::Net &b);
 
   //  implementation of NetlistManipulationCallbacks
   virtual size_t link_net_to_parent_circuit (const Net *subcircuit_net, Circuit *parent_circuit, const DCplxTrans &trans);

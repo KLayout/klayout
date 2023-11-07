@@ -33,7 +33,7 @@
 
 TEST(1_NetlistDeviceExtractorErrorBasic)
 {
-  db::NetlistDeviceExtractorError error;
+  db::LogEntryData error;
 
   EXPECT_EQ (error.message (), "");
   error.set_message ("x");
@@ -47,12 +47,16 @@ TEST(1_NetlistDeviceExtractorErrorBasic)
   error.set_geometry (db::DPolygon (db::DBox (0, 1, 2, 3)));
   EXPECT_EQ (error.geometry ().to_string (), "(0,1;0,3;2,3;2,1)");
 
-  error = db::NetlistDeviceExtractorError ("cell2", "msg2");
+  error = db::LogEntryData (db::Error, "cell2", "msg2");
+  EXPECT_EQ (error.severity () == db::Error, true);
   EXPECT_EQ (error.cell_name (), "cell2");
   EXPECT_EQ (error.message (), "msg2");
   EXPECT_EQ (error.category_name (), "");
   EXPECT_EQ (error.category_description (), "");
   EXPECT_EQ (error.geometry ().to_string (), "()");
+
+  error.set_severity (db::Warning);
+  EXPECT_EQ (error.severity () == db::Warning, true);
 }
 
 namespace {
@@ -71,7 +75,7 @@ namespace {
   };
 }
 
-static std::string error2string (const db::NetlistDeviceExtractorError &e)
+static std::string error2string (const db::LogEntryData &e)
 {
   return e.cell_name() + ":" + e.category_name () + ":" + e.category_description () + ":" +
          e.geometry ().to_string () + ":" + e.message ();
@@ -81,12 +85,12 @@ TEST(2_NetlistDeviceExtractorErrors)
 {
   DummyDeviceExtractor dummy_ex;
 
-  EXPECT_EQ (dummy_ex.has_errors (), true);
+  EXPECT_EQ (dummy_ex.begin_log_entries () != dummy_ex.end_log_entries (), true);
 
-  std::vector<db::NetlistDeviceExtractorError> errors (dummy_ex.begin_errors (), dummy_ex.end_errors ());
+  std::vector<db::LogEntryData> errors (dummy_ex.begin_log_entries (), dummy_ex.end_log_entries ());
   EXPECT_EQ (int (errors.size ()), 4);
-  EXPECT_EQ (error2string (errors [0]), ":::():msg1");
-  EXPECT_EQ (error2string (errors [1]), ":::(0,1;0,3;2,3;2,1):msg2");
+  EXPECT_EQ (error2string (errors [0]), ":device-extract::():msg1");
+  EXPECT_EQ (error2string (errors [1]), ":device-extract::(0,1;0,3;2,3;2,1):msg2");
   EXPECT_EQ (error2string (errors [2]), ":cat1:desc1:():msg1");
   EXPECT_EQ (error2string (errors [3]), ":cat1:desc1:(10,11;10,13;12,13;12,11):msg3");
 }

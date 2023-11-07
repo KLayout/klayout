@@ -231,6 +231,11 @@ private:
   void set_circuit_ref (Circuit *c);
 
   /**
+   *  @brief Erases the given pin reference
+   */
+  void erase_pin (size_t pin_id);
+
+  /**
    *  @brief Sets the circuit the subcircuit belongs to
    */
   void set_circuit (Circuit *c)

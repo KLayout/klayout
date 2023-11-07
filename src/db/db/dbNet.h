@@ -235,6 +235,7 @@ public:
 
 private:
   friend class Net;
+  friend class Circuit;
 
   size_t m_pin_id;
   Net *mp_net;
@@ -245,6 +246,14 @@ private:
   void set_net (Net *net)
   {
     mp_net = net;
+  }
+
+  /**
+   *  @brief Sets the pin ID
+   */
+  void set_pin_id (size_t id)
+  {
+    m_pin_id = id;
   }
 };
 
@@ -343,6 +352,7 @@ public:
 
 private:
   friend class Net;
+  friend class SubCircuit;
 
   size_t m_pin_id;
   SubCircuit *mp_subcircuit;
@@ -354,6 +364,14 @@ private:
   void set_net (Net *net)
   {
     mp_net = net;
+  }
+
+  /**
+   *  @brief Sets the pin ID
+   */
+  void set_pin_id (size_t pin)
+  {
+    m_pin_id = pin;
   }
 };
 

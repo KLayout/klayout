@@ -130,6 +130,41 @@ TokenizedOutput &TokenizedOutput::operator<< (const std::string &s)
 
 // -------------------------------------------------------------------------------------------
 
+static void write_point (TokenizedOutput &out, const db::Point &pt, db::Point &ref, bool relative)
+{
+  if (relative) {
+
+    TokenizedOutput (out, std::string (), true) << tl::to_string (pt.x () - ref.x ()) << tl::to_string (pt.y () - ref.y ());
+
+  } else {
+
+    if (pt.x () == 0 || pt.x () != ref.x ()) {
+      out << tl::to_string (pt.x ());
+    } else {
+      out << "*";
+    }
+
+    if (pt.y () == 0 || pt.y () != ref.y ()) {
+      out << tl::to_string (pt.y ());
+    } else {
+      out << "*";
+    }
+
+  }
+
+  ref = pt;
+}
+
+template <class T, class Tr>
+static void write_points (TokenizedOutput &out, const T &poly, const Tr &tr, db::Point &ref, bool relative)
+{
+  for (typename T::polygon_contour_iterator c = poly.begin_hull (); c != poly.end_hull (); ++c) {
+    write_point (out, tr * *c, ref, relative);
+  }
+}
+
+// -------------------------------------------------------------------------------------------
+
 namespace l2n_std_format
 {
 
@@ -140,6 +175,54 @@ std_writer_impl<Keys>::std_writer_impl (tl::OutputStream &stream, double dbu, co
 {
   m_progress.set_format (tl::to_string (tr ("%.0f MB")));
   m_progress.set_unit (1024 * 1024);
+}
+
+template <class Keys>
+std::string std_writer_impl<Keys>::message_to_s (const std::string &msg)
+{
+  if (msg.empty ()) {
+    return std::string ();
+  } else {
+    return Keys::description_key + "(" + tl::to_word_or_quoted_string (msg) + ")";
+  }
+}
+
+template <class Keys>
+std::string std_writer_impl<Keys>::severity_to_s (const db::Severity severity)
+{
+  if (severity == db::Info) {
+    return Keys::info_severity_key;
+  } else if (severity == db::Warning) {
+    return Keys::warning_severity_key;
+  } else if (severity == db::Error) {
+    return Keys::error_severity_key;
+  } else {
+    return std::string ();
+  }
+}
+
+template <class Keys>
+void std_writer_impl<Keys>::write_log_entry (TokenizedOutput &stream, const LogEntryData &le)
+{
+  stream << severity_to_s (le.severity ());
+  stream << message_to_s (le.message ());
+
+  if (! le.cell_name ().empty ()) {
+    TokenizedOutput (stream, Keys::cell_key, true) << tl::to_word_or_quoted_string (le.cell_name ());
+  }
+
+  if (! le.category_name ().empty ()) {
+    TokenizedOutput o (stream, Keys::cat_key, true);
+    o << tl::to_word_or_quoted_string (le.category_name ());
+    if (! le.category_description ().empty ()) {
+      o << tl::to_word_or_quoted_string (le.category_description ());
+    }
+  }
+
+  if (le.geometry () != db::DPolygon ()) {
+    TokenizedOutput o (stream, Keys::polygon_key, true);
+    o << tl::to_word_or_quoted_string (le.geometry ().to_string ());
+  }
 }
 
 static std::string name_for_layer (const db::LayoutToNetlist *l2n, unsigned int l)
@@ -318,6 +401,17 @@ void std_writer_impl<Keys>::write (bool nested, TokenizedOutput &stream, std::ma
 
     }
 
+    if (! mp_l2n->log_entries ().empty ()) {
+      if (! Keys::is_short ()) {
+        stream << endl << "# Log entries" << endl;
+      }
+      for (auto l = mp_l2n->begin_log_entries (); l != mp_l2n->end_log_entries (); ++l) {
+        TokenizedOutput out (stream, Keys::message_key);
+        this->write_log_entry (out, *l);
+        m_progress.set (mp_stream->pos ());
+      }
+    }
+
   }
 
   if (mp_netlist->begin_device_classes () != mp_netlist->end_device_classes () && ! Keys::is_short ()) {
@@ -358,39 +452,6 @@ void std_writer_impl<Keys>::write (bool nested, TokenizedOutput &stream, std::ma
     out << tl::to_word_or_quoted_string (x->name ()) << endl;
     write (out, *x, net2id_per_circuit);
     m_progress.set (mp_stream->pos ());
-  }
-}
-
-static void write_point (TokenizedOutput &out, const db::Point &pt, db::Point &ref, bool relative)
-{
-  if (relative) {
-
-    TokenizedOutput (out, std::string (), true) << tl::to_string (pt.x () - ref.x ()) << tl::to_string (pt.y () - ref.y ());
-
-  } else {
-
-    if (pt.x () == 0 || pt.x () != ref.x ()) {
-      out << tl::to_string (pt.x ());
-    } else {
-      out << "*";
-    }
-
-    if (pt.y () == 0 || pt.y () != ref.y ()) {
-      out << tl::to_string (pt.y ());
-    } else {
-      out << "*";
-    }
-
-  }
-
-  ref = pt;
-}
-
-template <class T, class Tr>
-static void write_points (TokenizedOutput &out, const T &poly, const Tr &tr, db::Point &ref, bool relative)
-{
-  for (typename T::polygon_contour_iterator c = poly.begin_hull (); c != poly.end_hull (); ++c) {
-    write_point (out, tr * *c, ref, relative);
   }
 }
 

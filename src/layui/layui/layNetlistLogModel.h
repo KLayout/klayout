@@ -27,8 +27,10 @@
 
 #include "layuiCommon.h"
 #include "dbNetlistCrossReference.h"
+#include "dbLayoutToNetlist.h"
 
 #include <QAbstractItemModel>
+#include <QIcon>
 
 namespace lay
 {
@@ -40,7 +42,7 @@ class LAYUI_PUBLIC NetlistLogModel
   : public QAbstractItemModel
 {
 public:
-  NetlistLogModel (QWidget *parent, const db::NetlistCrossReference *cross_ref);
+  NetlistLogModel (QWidget *parent, const db::NetlistCrossReference *cross_ref, const db::LayoutToNetlist *l2n);
 
   virtual bool hasChildren (const QModelIndex &parent) const;
   virtual QModelIndex index (int row, int column, const QModelIndex &parent) const;
@@ -50,9 +52,22 @@ public:
   virtual QVariant data (const QModelIndex &index, int role) const;
   virtual QVariant headerData (int section, Qt::Orientation orientation, int role) const;
 
+  const db::LogEntryData *log_entry (const QModelIndex &index) const;
+
+  static QIcon icon_for_severity (db::Severity severity);
+
+  db::Severity max_severity () const
+  {
+    return m_max_severity;
+  }
+
 private:
   typedef std::pair<std::pair<const db::Circuit *, const db::Circuit *>, const db::NetlistCrossReference::PerCircuitData::log_entries_type *> circuit_entry;
   std::vector<circuit_entry> m_circuits;
+  const db::NetlistCrossReference::PerCircuitData::log_entries_type *mp_lvsdb_messages;
+  const db::LayoutToNetlist::log_entries_type *mp_l2n_messages;
+  int m_global_entries;
+  db::Severity m_max_severity;
 };
 
 }

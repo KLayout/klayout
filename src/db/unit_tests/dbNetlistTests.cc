@@ -1380,15 +1380,15 @@ TEST(22_FlattenSubCircuitPinsJoinNets)
   nl2.flatten_circuit (nl2.circuit_by_name ("PTRANS"));
 
   EXPECT_EQ (nl2.to_string (),
-    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);\n"
-    "  subcircuit INV2 INV2_SC1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
-    "  subcircuit INV2 INV2_SC2 (IN=FB,$2=(null),OUT=$I8,$4=VSS,$5=VDD);\n"
+    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD='FB,VDD');\n"
+    "  subcircuit INV2 INV2_SC1 (OUT=OSC,$2=VSS,IN='FB,VDD');\n"
+    "  subcircuit INV2 INV2_SC2 (OUT='FB,VDD',$2=VSS,IN='FB,VDD');\n"
     "end;\n"
-    "circuit INV2 (IN=$5,$2=$5,OUT=OUT,$4=$4,$5=$5);\n"
-    "  device PMOS $1 (S=$5,G=$5,D=$5) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device PMOS $2 (S=$5,G=$5,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
-    "  subcircuit NTRANS SC2 ($1=$4,$2=$5,$3=$5);\n"
-    "  subcircuit NTRANS SC4 ($1=$4,$2=OUT,$3=$5);\n"
+    "circuit INV2 (OUT=OUT,$2=$4,IN=IN);\n"
+    "  device PMOS $1 (S=IN,G=IN,D=IN) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $2 (S=IN,G=IN,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  subcircuit NTRANS SC2 ($1=$4,$2=IN,$3=IN);\n"
+    "  subcircuit NTRANS SC4 ($1=$4,$2=OUT,$3=IN);\n"
     "end;\n"
     "circuit NTRANS ($1=$1,$2=$2,$3=$2);\n"
     "  device NMOS $1 (S=$1,G=$2,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
@@ -1398,33 +1398,32 @@ TEST(22_FlattenSubCircuitPinsJoinNets)
   nl2.flatten_circuit (nl2.circuit_by_name ("NTRANS"));
 
   EXPECT_EQ (nl2.to_string (),
-    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=VDD);\n"
-    "  subcircuit INV2 INV2_SC1 (IN=$I8,$2=FB,OUT=OSC,$4=VSS,$5=VDD);\n"
-    "  subcircuit INV2 INV2_SC2 (IN=FB,$2=(null),OUT=$I8,$4=VSS,$5=VDD);\n"
+    "circuit RINGO (IN=IN,'OSC,VDD'='FB,OSC,VDD',VSS=VSS);\n"
+    "  subcircuit INV2 INV2_SC1 ('IN,OUT'='FB,OSC,VDD',$2=VSS);\n"
+    "  subcircuit INV2 INV2_SC2 ('IN,OUT'='FB,OSC,VDD',$2=VSS);\n"
     "end;\n"
-    "circuit INV2 (IN=OUT,$2=OUT,OUT=OUT,$4=$4,$5=OUT);\n"
-    "  device PMOS $1 (S=OUT,G=OUT,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device PMOS $2 (S=OUT,G=OUT,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device NMOS $3 (S=$4,G=OUT,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device NMOS $4 (S=$4,G=OUT,D=OUT) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "circuit INV2 ('IN,OUT'='IN,OUT',$2=$4);\n"
+    "  device PMOS $1 (S='IN,OUT',G='IN,OUT',D='IN,OUT') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $2 (S='IN,OUT',G='IN,OUT',D='IN,OUT') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $3 (S=$4,G='IN,OUT',D='IN,OUT') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $4 (S=$4,G='IN,OUT',D='IN,OUT') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
     "end;\n"
   );
 
   nl2.flatten_circuit (nl2.circuit_by_name ("INV2"));
 
   EXPECT_EQ (nl2.to_string (),
-    "circuit RINGO (IN=IN,OSC=OSC,VSS=VSS,VDD=OSC);\n"
-    "  device PMOS $1 (S=OSC,G=OSC,D=OSC) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device PMOS $2 (S=OSC,G=OSC,D=OSC) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device NMOS $3 (S=VSS,G=OSC,D=OSC) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device NMOS $4 (S=VSS,G=OSC,D=OSC) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device PMOS $5 (S=OSC,G=OSC,D=OSC) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device PMOS $6 (S=OSC,G=OSC,D=OSC) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device NMOS $7 (S=VSS,G=OSC,D=OSC) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device NMOS $8 (S=VSS,G=OSC,D=OSC) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "circuit RINGO (IN=IN,'OSC,VDD'='FB,OSC,VDD',VSS=VSS);\n"
+    "  device PMOS $1 (S='FB,OSC,VDD',G='FB,OSC,VDD',D='FB,OSC,VDD') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $2 (S='FB,OSC,VDD',G='FB,OSC,VDD',D='FB,OSC,VDD') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $3 (S=VSS,G='FB,OSC,VDD',D='FB,OSC,VDD') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $4 (S=VSS,G='FB,OSC,VDD',D='FB,OSC,VDD') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $5 (S='FB,OSC,VDD',G='FB,OSC,VDD',D='FB,OSC,VDD') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $6 (S='FB,OSC,VDD',G='FB,OSC,VDD',D='FB,OSC,VDD') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $7 (S=VSS,G='FB,OSC,VDD',D='FB,OSC,VDD') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $8 (S=VSS,G='FB,OSC,VDD',D='FB,OSC,VDD') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
     "end;\n"
   );
-
 }
 
 TEST(23_BlankCircuit)
@@ -1648,11 +1647,11 @@ TEST(25_JoinNets)
   c->join_nets (c->net_by_name ("IN"), c->net_by_name ("OUT"));
 
   EXPECT_EQ (nl.to_string (),
-    "circuit INV2 (IN=IN,$2=$2,OUT=IN,$4=$4,$5=$5);\n"
-    "  subcircuit PTRANS SC1 ($1=$5,$2=$2,$3=IN);\n"
-    "  subcircuit NTRANS SC2 ($1=$4,$2=$2,$3=IN);\n"
-    "  subcircuit PTRANS SC3 ($1=$5,$2=IN,$3=$2);\n"
-    "  subcircuit NTRANS SC4 ($1=$4,$2=IN,$3=$2);\n"
+    "circuit INV2 ('IN,OUT'='IN,OUT',$2=$2,$3=$4,$4=$5);\n"
+    "  subcircuit PTRANS SC1 ($1=$5,$2=$2,$3='IN,OUT');\n"
+    "  subcircuit NTRANS SC2 ($1=$4,$2=$2,$3='IN,OUT');\n"
+    "  subcircuit PTRANS SC3 ($1=$5,$2='IN,OUT',$3=$2);\n"
+    "  subcircuit NTRANS SC4 ($1=$4,$2='IN,OUT',$3=$2);\n"
     "end;\n"
     "circuit PTRANS ($1=$1,$2=$2,$3=$3);\n"
     "  device PMOS $1 (S=$1,G=$3,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
@@ -1691,11 +1690,11 @@ TEST(26_JoinNets)
   c->join_nets (c->net_by_name ("IN"), c->net_by_name ("OUT"));
 
   EXPECT_EQ (nl.to_string (),
-    "circuit INV2 (IN=IN,$2=$2,OUT=IN,$4=$4,$5=$5);\n"
-    "  device PMOS $1 (S=$5,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device PMOS $2 (S=$5,G=$2,D=IN) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device NMOS $3 (S=$4,G=IN,D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
-    "  device NMOS $4 (S=$4,G=$2,D=IN) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "circuit INV2 ('IN,OUT'='IN,OUT',$2=$2,$3=$4,$4=$5);\n"
+    "  device PMOS $1 (S=$5,G='IN,OUT',D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device PMOS $2 (S=$5,G=$2,D='IN,OUT') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $3 (S=$4,G='IN,OUT',D=$2) (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
+    "  device NMOS $4 (S=$4,G=$2,D='IN,OUT') (L=0.25,W=0.95,AS=0,AD=0,PS=0,PD=0);\n"
     "end;\n"
   );
 }

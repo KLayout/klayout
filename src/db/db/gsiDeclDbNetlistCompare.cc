@@ -137,16 +137,16 @@ public:
     db::NetlistCompareLogger::circuit_mismatch (a, b, msg);
   }
 
-  virtual void log_entry (db::NetlistCompareLogger::Severity severity, const std::string &msg)
+  virtual void log_entry (db::Severity severity, const std::string &msg)
   {
     if (cb_log_entry.can_issue ()) {
-      cb_log_entry.issue<GenericNetlistCompareLogger, db::NetlistCompareLogger::Severity, const std::string &> (&GenericNetlistCompareLogger::log_entry, severity, msg);
+      cb_log_entry.issue<GenericNetlistCompareLogger, db::Severity, const std::string &> (&GenericNetlistCompareLogger::log_entry, severity, msg);
     } else {
       db::NetlistCompareLogger::log_entry (severity, msg);
     }
   }
 
-  void log_entry_fb (db::NetlistCompareLogger::Severity severity, const std::string &msg)
+  void log_entry_fb (db::Severity severity, const std::string &msg)
   {
     db::NetlistCompareLogger::log_entry (severity, msg);
   }
@@ -657,21 +657,7 @@ Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
   "This class has been introduced in version 0.26."
 );
 
-gsi::EnumIn<GenericNetlistCompareLogger, db::NetlistCompareLogger::Severity> decl_CompareLoggerSeverity ("db", "Severity",
-  gsi::enum_const ("NoSeverity", db::NetlistCompareLogger::NoSeverity,
-    "@brief Unspecific severity\n"
-  ) +
-  gsi::enum_const ("Info", db::NetlistCompareLogger::Info,
-    "@brief Information only\n"
-  ) +
-  gsi::enum_const ("Warning", db::NetlistCompareLogger::Warning,
-    "@brief A warning\n"
-  ) +
-  gsi::enum_const ("Error", db::NetlistCompareLogger::Error,
-    "@brief An error\n"
-  ),
-  "@brief This class represents the log severity level for \\GenericNetlistCompareLogger#log_entry.\n"
-  "This enum has been introduced in version 0.28."
-);
+extern gsi::Enum<db::Severity> decl_Severity;
+gsi::ClassExt<GenericNetlistCompareLogger> inject_SeverityEnum_into_GenericNetlistCompareLogger (decl_Severity.defs ());
 
 }

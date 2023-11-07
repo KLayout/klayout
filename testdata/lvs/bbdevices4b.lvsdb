@@ -275,6 +275,9 @@ reference(
 
 # Cross reference
 xref(
+ log(
+  entry(error description('Circuits testall and TESTALL could not be compared because the following subcircuits failed to compare:\n  B: BWBTEST'))
+ )
  circuit(BBGATEST BBGATEST match
   xref(
    pin(() 1 match)

@@ -72,8 +72,6 @@ private:
   }
 
   std::string status_to_s (const db::NetlistCrossReference::Status status);
-  std::string severity_to_s (const db::NetlistCrossReference::Severity severity);
-  std::string message_to_s (const std::string &msg);
   void write (TokenizedOutput &stream, const db::NetlistCrossReference *xref);
 
   std::map<const db::Circuit *, std::map<const db::Net *, unsigned int> > m_net2id_per_circuit_a, m_net2id_per_circuit_b;
@@ -179,16 +177,6 @@ static std::string pin_id_to_s (const db::Pin *pin, const std::map<const db::Pin
 }
 
 template <class Keys>
-std::string std_writer_impl<Keys>::message_to_s (const std::string &msg)
-{
-  if (msg.empty ()) {
-    return std::string ();
-  } else {
-    return Keys::description_key + "(" + tl::to_word_or_quoted_string (msg) + ")";
-  }
-}
-
-template <class Keys>
 std::string std_writer_impl<Keys>::status_to_s (const db::NetlistCrossReference::Status status)
 {
   if (status == db::NetlistCrossReference::Match) {
@@ -207,29 +195,30 @@ std::string std_writer_impl<Keys>::status_to_s (const db::NetlistCrossReference:
 }
 
 template <class Keys>
-std::string std_writer_impl<Keys>::severity_to_s (const db::NetlistCrossReference::Severity severity)
-{
-  if (severity == db::NetlistCrossReference::Info) {
-    return Keys::info_severity_key;
-  } else if (severity == db::NetlistCrossReference::Warning) {
-    return Keys::warning_severity_key;
-  } else if (severity == db::NetlistCrossReference::Error) {
-    return Keys::error_severity_key;
-  } else {
-    return std::string ();
-  }
-}
-
-template <class Keys>
 void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::NetlistCrossReference *xref)
 {
-  for (db::NetlistCrossReference::circuits_iterator c = xref->begin_circuits (); c != xref->end_circuits (); ++c) {
+  if (! xref->other_log_entries ().empty ()) {
+
+    TokenizedOutput o (stream, Keys::log_key);
+    o << endl;
+
+    for (auto l = xref->other_log_entries ().begin (); l != xref->other_log_entries ().end (); ++l) {
+      {
+        TokenizedOutput to (o, Keys::log_entry_key, true);
+        this->write_log_entry (to, *l);
+      }
+      o << endl;
+    }
+
+  }
+
+  for (auto c = xref->begin_circuits (); c != xref->end_circuits (); ++c) {
 
     const db::NetlistCrossReference::PerCircuitData *pcd = xref->per_circuit_data_for (*c);
     tl_assert (pcd != 0);
 
     TokenizedOutput out (stream, Keys::circuit_key);
-    out << name_to_s (c->first) << name_to_s (c->second) << status_to_s (pcd->status) << message_to_s (pcd->msg);
+    out << name_to_s (c->first) << name_to_s (c->second) << status_to_s (pcd->status) << this->message_to_s (pcd->msg);
     out << endl;
 
     if (! pcd->log_entries.empty ()) {
@@ -237,8 +226,11 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::NetlistCro
       TokenizedOutput o (out, Keys::log_key);
       o << endl;
 
-      for (db::NetlistCrossReference::PerCircuitData::log_entries_const_iterator l = pcd->log_entries.begin (); l != pcd->log_entries.end (); ++l) {
-        TokenizedOutput (o, Keys::log_entry_key, true) << severity_to_s (l->severity) << message_to_s (l->msg);
+      for (auto l = pcd->log_entries.begin (); l != pcd->log_entries.end (); ++l) {
+        {
+          TokenizedOutput to (o, Keys::log_entry_key, true);
+          this->write_log_entry (to, *l);
+        }
         o << endl;
       }
 
@@ -249,7 +241,7 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::NetlistCro
       o << endl;
 
       for (db::NetlistCrossReference::PerCircuitData::net_pairs_const_iterator n = pcd->nets.begin (); n != pcd->nets.end (); ++n) {
-        TokenizedOutput (o, Keys::net_key) << net_id_to_s (n->pair.first, m_net2id_per_circuit_a [c->first]) << net_id_to_s (n->pair.second, m_net2id_per_circuit_b [c->second]) << status_to_s (n->status) << message_to_s (n->msg);
+        TokenizedOutput (o, Keys::net_key) << net_id_to_s (n->pair.first, m_net2id_per_circuit_a [c->first]) << net_id_to_s (n->pair.second, m_net2id_per_circuit_b [c->second]) << status_to_s (n->status) << this->message_to_s (n->msg);
       }
 
       std::map<const db::Pin *, unsigned int> pin2index_a, pin2index_b;
@@ -257,15 +249,15 @@ void std_writer_impl<Keys>::write (TokenizedOutput &stream, const db::NetlistCro
       build_pin_index_map (c->second, pin2index_b);
 
       for (db::NetlistCrossReference::PerCircuitData::pin_pairs_const_iterator n = pcd->pins.begin (); n != pcd->pins.end (); ++n) {
-        TokenizedOutput (o, Keys::pin_key) << pin_id_to_s (n->pair.first, pin2index_a) << pin_id_to_s (n->pair.second, pin2index_b) << status_to_s (n->status) << message_to_s (n->msg);
+        TokenizedOutput (o, Keys::pin_key) << pin_id_to_s (n->pair.first, pin2index_a) << pin_id_to_s (n->pair.second, pin2index_b) << status_to_s (n->status) << this->message_to_s (n->msg);
       }
 
       for (db::NetlistCrossReference::PerCircuitData::device_pairs_const_iterator n = pcd->devices.begin (); n != pcd->devices.end (); ++n) {
-        TokenizedOutput (o, Keys::device_key) << ion_to_s (n->pair.first) << ion_to_s (n->pair.second) << status_to_s (n->status) << message_to_s (n->msg);
+        TokenizedOutput (o, Keys::device_key) << ion_to_s (n->pair.first) << ion_to_s (n->pair.second) << status_to_s (n->status) << this->message_to_s (n->msg);
       }
 
       for (db::NetlistCrossReference::PerCircuitData::subcircuit_pairs_const_iterator n = pcd->subcircuits.begin (); n != pcd->subcircuits.end (); ++n) {
-        TokenizedOutput (o, Keys::circuit_key) << ion_to_s (n->pair.first) << ion_to_s (n->pair.second) << status_to_s (n->status) << message_to_s (n->msg);
+        TokenizedOutput (o, Keys::circuit_key) << ion_to_s (n->pair.first) << ion_to_s (n->pair.second) << status_to_s (n->status) << this->message_to_s (n->msg);
       }
     }
 

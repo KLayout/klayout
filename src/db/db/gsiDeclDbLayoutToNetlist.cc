@@ -464,6 +464,20 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "\n"
     "This attribute has been introduced in version 0.27.\n"
   ) +
+  gsi::method ("top_level_mode=", &db::LayoutToNetlist::set_top_level_mode, gsi::arg ("flag"),
+    "@brief Sets a flag indicating whether top level mode is enabled.\n"
+    "\n"
+    "In top level mode, must-connect warnings are turned into errors for example.\n"
+    "To enable top level mode, set this attribute to true. By default, top-level mode is turned off.\n"
+    "\n"
+    "This attribute has been introduced in version 0.28.13."
+  ) +
+  gsi::method ("top_level_mode", &db::LayoutToNetlist::top_level_mode,
+    "@brief Gets a flag indicating whether top level mode is enabled.\n"
+    "See \\top_level_mode= for details.\n"
+    "\n"
+    "This attribute has been introduced in version 0.28.13.\n"
+  ) +
   gsi::method ("clear_join_net_names", &db::LayoutToNetlist::clear_join_net_names,
     "@brief Clears all implicit net joining expressions.\n"
     "See \\extract_netlist for more details about this feature.\n"
@@ -529,6 +543,11 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "See the class description for more details.\n"
     "\n"
     "This method has been made parameter-less in version 0.27. Use \\include_floating_subcircuits= and \\join_net_names as substitutes for the arguments of previous versions."
+  ) +
+  gsi::method ("check_extraction_errors", &db::LayoutToNetlist::check_extraction_errors,
+    "@brief Raises an exception if extraction errors are present\n"
+    "\n"
+    "This method has been introduced in version 0.28.13."
   ) +
   gsi::method_ext ("internal_layout", &l2n_internal_layout,
     "@brief Gets the internal layout\n"
@@ -706,6 +725,10 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("read|read_l2n", &db::LayoutToNetlist::load, gsi::arg ("path"),
     "@brief Reads the extracted netlist from the file.\n"
     "This method employs the native format of KLayout.\n"
+  ) +
+  gsi::iterator ("each_log_entry|#each_error", &db::LayoutToNetlist::begin_log_entries, &db::LayoutToNetlist::end_log_entries,
+    "@brief Iterates over all log entries collected during device and netlist extraction.\n"
+    "This method has been introduced in version 0.28.13."
   ) +
   gsi::method_ext ("antenna_check", &antenna_check, gsi::arg ("gate"), gsi::arg ("metal"), gsi::arg ("ratio"), gsi::arg ("diodes", std::vector<tl::Variant> (), "[]"), gsi::arg ("texts", (db::Texts *) 0, "nil"),
    "@brief Runs an antenna check on the extracted clusters\n"

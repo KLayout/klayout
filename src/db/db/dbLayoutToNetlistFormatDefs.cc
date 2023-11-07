@@ -56,8 +56,15 @@ namespace l2n_std_format
   DB_PUBLIC std::string LongKeys::mirror_key ("mirror");
   DB_PUBLIC std::string LongKeys::scale_key ("scale");
   DB_PUBLIC std::string LongKeys::pin_key ("pin");
+  DB_PUBLIC std::string LongKeys::message_key ("message");
 
-  //  A, B, C, D, E, F, G, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y
+  DB_PUBLIC std::string LongKeys::info_severity_key ("info");
+  DB_PUBLIC std::string LongKeys::warning_severity_key ("warning");
+  DB_PUBLIC std::string LongKeys::error_severity_key ("error");
+  DB_PUBLIC std::string LongKeys::cell_key ("cell");
+  DB_PUBLIC std::string LongKeys::cat_key ("cat");
+
+  //  A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y
   DB_PUBLIC std::string ShortKeys::version_key ("V");
   DB_PUBLIC std::string ShortKeys::description_key ("B");
   DB_PUBLIC std::string ShortKeys::top_key ("W");
@@ -82,6 +89,15 @@ namespace l2n_std_format
   DB_PUBLIC std::string ShortKeys::mirror_key ("M");
   DB_PUBLIC std::string ShortKeys::scale_key ("S");
   DB_PUBLIC std::string ShortKeys::pin_key ("P");
+  DB_PUBLIC std::string ShortKeys::message_key ("H");
+
+  //  I, W, E, C, X
+
+  DB_PUBLIC std::string ShortKeys::info_severity_key ("I");
+  DB_PUBLIC std::string ShortKeys::warning_severity_key ("W");
+  DB_PUBLIC std::string ShortKeys::error_severity_key ("E");
+  DB_PUBLIC std::string ShortKeys::cell_key ("C");
+  DB_PUBLIC std::string ShortKeys::cat_key ("X");
 }
 
 }

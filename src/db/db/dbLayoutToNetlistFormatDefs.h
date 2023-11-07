@@ -47,7 +47,7 @@ namespace db
  *  (circuits before subcircuits, nets before use ...)
  *
  *  Main body:
- *    [version|description|unit|top|layer|connect|global|circuit|class|device|any]*
+ *    [version|description|unit|top|layer|connect|global|circuit|class|device|message-entry|any]*
  *
  *  [version]:
  *    version(<number>)             - file format version [short key: V]
@@ -144,7 +144,7 @@ namespace db
  *                                    coordinates are bottom/left and top/right
  *
  *  [text]:
- *    text(<layer> [text] [coord])  - defines a rectangle [short key: J]
+ *    text(<layer> <string> [coord]) - defines a label [short key: J]
  *
  *  [coord]:
  *    <x> <y>                       - absolute coordinates
@@ -180,6 +180,26 @@ namespace db
  *    rotation(<angle>)             - rotation angle (in degree, default is 0) [short key: O]
  *    mirror                        - if specified, the instance is mirrored before rotation [short key: M]
  *    scale(<mag>)                  - magnification (default is 1) [short key: S]
+ *
+ *  [message-entry]:
+ *    message([severity] [message|message-geometry|message-cell|message-category|any]*) - message entry [short key: H]
+ *
+ *  [message]:
+ *    description(<name>)           - message text [short key: B]
+ *
+ *  [message-geometry]:
+ *    polygon(<string>)             - message geometry polygon in string-serialized form [short key: Q]
+ *
+ *  [message-cell]:
+ *    cell(<name>)                  - message cell [short key: C]
+ *
+ *  [message-category]:
+ *    cat(<name> <name>?)           - message category with optional description [short key: X]
+ *
+ *  [severity]:
+ *    info |                        - [short key: I]
+ *    warning |                     - [short key: W]
+ *    error                         - [short key: E]
  *
  *  [any]:
  *    * |
@@ -220,8 +240,14 @@ namespace l2n_std_format
     static std::string mirror_key;
     static std::string scale_key;
     static std::string pin_key;
+    static std::string message_key;
     static std::string indent1;
     static std::string indent2;
+    static std::string info_severity_key;
+    static std::string warning_severity_key;
+    static std::string error_severity_key;
+    static std::string cell_key;
+    static std::string cat_key;
   };
 
   struct DB_PUBLIC LongKeys
@@ -253,8 +279,14 @@ namespace l2n_std_format
     static std::string mirror_key;
     static std::string scale_key;
     static std::string pin_key;
+    static std::string message_key;
     static std::string indent1;
     static std::string indent2;
+    static std::string info_severity_key;
+    static std::string warning_severity_key;
+    static std::string error_severity_key;
+    static std::string cell_key;
+    static std::string cat_key;
   };
 
   template <bool Short> struct DB_PUBLIC keys;

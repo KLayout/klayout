@@ -3074,7 +3074,7 @@ PartialService::partial_select (const db::DBox &box, lay::Editable::SelectionMod
       shape_flags |= db::ShapeIterator::Polygons;
     }
     if (edt::paths_enabled ()) {
-      //  Note: points, edges and edge pairs don't have seperate entires, so
+      //  Note: points, edges and edge pairs don't have separate entires, so
       //  we count them as paths here
       shape_flags |= db::ShapeIterator::Paths;
       shape_flags |= db::ShapeIterator::Edges;

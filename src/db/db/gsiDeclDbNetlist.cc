@@ -1659,7 +1659,8 @@ Class<db::Circuit> decl_dbCircuit (decl_dbNetlistObject, "db", "Circuit",
     "@brief Joins (connects) two nets into one\n"
     "This method will connect the 'with' net with 'net' and remove 'with'.\n"
     "\n"
-    "This method has been introduced in version 0.26.4."
+    "This method has been introduced in version 0.26.4. Starting with version 0.28.13, "
+    "net names will be formed from both input names, combining them with as a comma-separated list."
   ) +
   gsi::iterator ("each_net", (db::Circuit::net_iterator (db::Circuit::*) ()) &db::Circuit::begin_nets, (db::Circuit::net_iterator (db::Circuit::*) ()) &db::Circuit::end_nets,
     "@brief Iterates over the nets of the circuit"

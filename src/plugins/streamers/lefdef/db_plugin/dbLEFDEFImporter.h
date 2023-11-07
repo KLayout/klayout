@@ -1213,6 +1213,8 @@ public:
     m_fixedmask = f;
   }
 
+  void subtract_overlap_from_outline (const std::set<std::string> &overlap_layers);
+
 private:
   struct Via {
     Via () : bottom_mask (0), cut_mask (0), top_mask (0) { }

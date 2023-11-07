@@ -95,6 +95,14 @@ public:
   }
 
   /**
+   *  @brief Returns true if the given layer is an overlap layer
+   */
+  bool is_overlap_layer (const std::string &layer) const
+  {
+    return m_overlap_layers.find (layer) != m_overlap_layers.end ();
+  }
+
+  /**
    *  @brief Returns the number of masks for the given layer
    */
   virtual unsigned int number_of_masks (const std::string &layer) const
@@ -141,7 +149,7 @@ private:
   std::map<std::string, std::pair<double, double> > m_min_widths;
   std::map<std::string, MacroDesc> m_macros;
   std::map<std::string, ViaDesc> m_vias;
-  std::set<std::string> m_routing_layers, m_cut_layers;
+  std::set<std::string> m_routing_layers, m_cut_layers, m_overlap_layers;
   std::map<std::string, unsigned int> m_num_masks;
 
   std::vector <db::Trans> get_iteration (double dbu);

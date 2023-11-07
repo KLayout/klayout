@@ -24,6 +24,7 @@
 #include "dbLEFDEFImporter.h"
 #include "dbLayoutUtils.h"
 #include "dbTechnology.h"
+#include "dbShapeProcessor.h"
 
 #include "tlStream.h"
 #include "tlProgress.h"
@@ -478,6 +479,55 @@ GeometryBasedLayoutGenerator::add_via (const std::string &vn, const db::Trans &t
   m_vias.back ().bottom_mask = bottom_mask;
   m_vias.back ().cut_mask = cut_mask;
   m_vias.back ().top_mask = top_mask;
+}
+
+void
+GeometryBasedLayoutGenerator::subtract_overlap_from_outline (const std::set<std::string> &overlap_layers)
+{
+  db::Shapes all_overlaps;
+
+  std::vector<std::map <std::pair<std::string, LayerDetailsKey>, db::Shapes>::iterator> to_remove;
+  for (auto s = m_shapes.begin (); s != m_shapes.end (); ++s) {
+    if (overlap_layers.find (s->first.first) != overlap_layers.end ()) {
+      all_overlaps.insert (s->second);
+      to_remove.push_back (s);
+    }
+  }
+
+  for (auto i = to_remove.begin (); i != to_remove.end (); ++i) {
+    m_shapes.erase (*i);
+  }
+
+  if (all_overlaps.empty ()) {
+    return;
+  }
+
+  for (auto s = m_shapes.begin (); s != m_shapes.end (); ++s) {
+
+    if (s->first.second.purpose != Outline) {
+      continue;
+    }
+
+    db::ShapeProcessor proc;
+
+    size_t pn = 0;
+    for (auto sh = s->second.begin (db::ShapeIterator::All); ! sh.at_end (); ++sh) {
+      proc.insert (*sh, pn);
+      pn += 2;
+    }
+
+    pn = 1;
+    for (auto sh = all_overlaps.begin (db::ShapeIterator::All); ! sh.at_end (); ++sh) {
+      proc.insert (*sh, pn);
+      pn += 2;
+    }
+
+    db::BooleanOp op (db::BooleanOp::And);
+    db::ShapeGenerator sg (s->second, true /*clear shapes*/);
+    db::PolygonGenerator out (sg, true, true);
+    proc.process (out, op);
+
+  }
 }
 
 // -----------------------------------------------------------------------------------

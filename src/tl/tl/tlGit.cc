@@ -253,7 +253,11 @@ checkout_branch (git_repository *repo, git_remote *remote, const git_checkout_op
 }
 
 int
+#if LIBGIT2_VER_MAJOR >= 1
 credentials_cb (git_credential ** /*out*/, const char * /*url*/, const char * /*username*/, unsigned int /*allowed_types*/, void *)
+#else
+credentials_cb (git_cred ** /*out*/, const char * /*url*/, const char * /*username*/, unsigned int /*allowed_types*/, void *)
+#endif
 {
   //  no credentials aquired
   git_error_set_str (GIT_ERROR_NONE, "anonymous access is supported only, but server requests credentials");

@@ -381,7 +381,7 @@ std::vector<std::string> dir_entries (const std::string &s, bool with_files, boo
 
   struct _wfinddata_t fileinfo;
 
-  intptr_t h = _wfindfirst (tl::to_wstring (s + "\\*.*").c_str (), &fileinfo);
+  intptr_t h = _wfindfirst (tl::to_wstring (s + "\\*").c_str (), &fileinfo);
   if (h != -1) {
 
     do {

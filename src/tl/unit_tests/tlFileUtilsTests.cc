@@ -121,6 +121,8 @@ TEST (2)
   EXPECT_EQ (b1dir.exists (), false);
   EXPECT_EQ (b2dir.exists (), false);
   EXPECT_EQ (QFileInfo (b2dir.absoluteFilePath (QString::fromUtf8 ("x"))).exists (), false);
+
+
 }
 #endif
 
@@ -164,6 +166,40 @@ TEST (2_NOQT)
   EXPECT_EQ (tl::file_exists (b1dir), false);
   EXPECT_EQ (tl::file_exists (tl::combine_path (b2dir, "x")), false);
   EXPECT_EQ (tl::file_exists (tl::combine_path (b2dir, "y")), false);
+
+  //  with dotfiles and dotdirs
+
+  adir = tl::combine_path (tmp_dir, ".a");
+  tl::mkpath (adir);
+  EXPECT_EQ (tl::file_exists (adir), true);
+
+  EXPECT_EQ (tl::rm_dir_recursive (adir), true);
+  EXPECT_EQ (tl::file_exists (adir), false);
+
+  b1dir = tl::combine_path (adir, ".b1");
+  tl::mkpath (b1dir);
+  EXPECT_EQ (tl::file_exists (b1dir), true);
+
+  b2dir = tl::combine_path (adir, ".b2");
+  tl::mkpath (b2dir);
+  EXPECT_EQ (tl::file_exists (b1dir), true);
+
+  {
+    tl::OutputStream os (tl::absolute_file_path (tl::combine_path (b2dir, ".x")));
+    os << "hello, world!\n";
+  }
+
+  {
+    tl::OutputStream os (tl::absolute_file_path (tl::combine_path (b2dir, ".y")));
+    os << "hello, world!\n";
+  }
+
+  EXPECT_EQ (tl::file_exists (adir), true);
+  EXPECT_EQ (tl::rm_dir_recursive (adir), true);
+  EXPECT_EQ (tl::file_exists (adir), false);
+  EXPECT_EQ (tl::file_exists (b1dir), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (b2dir, ".x")), false);
+  EXPECT_EQ (tl::file_exists (tl::combine_path (b2dir, ".y")), false);
 }
 
 #if defined(HAVE_QT)

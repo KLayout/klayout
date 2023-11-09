@@ -25,7 +25,7 @@ win32 {
   msvc {
     QMAKE_POST_LINK += (if not exist $$shell_path($$DESTDIR_PYMOD) mkdir $$shell_path($$DESTDIR_PYMOD)) && $(COPY) $(DESTDIR_TARGET) $$shell_path($$DESTDIR_PYMOD/$${TARGET}$${PYTHONEXTSUFFIX})
   } else {
-    QMAKE_POST_LINK += $(MKDIR) $$shell_path($$DESTDIR_PYMOD) && $(COPY) $(DESTDIR_TARGET) $$shell_path($$DESTDIR_PYMOD/$${TARGET}$${PYTHONEXTSUFFIX})
+    QMAKE_POST_LINK += $(MKDIR) $$DESTDIR_PYMOD && $(COPY) $(DESTDIR_TARGET) $$DESTDIR_PYMOD/$${TARGET}$${PYTHONEXTSUFFIX}
   }
 
   # to avoid the major version being appended to the dll name - in this case -lxyz won't link it again

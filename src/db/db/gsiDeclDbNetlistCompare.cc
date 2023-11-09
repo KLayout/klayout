@@ -657,7 +657,7 @@ Class<db::NetlistComparer> decl_dbNetlistComparer ("db", "NetlistComparer",
   "This class has been introduced in version 0.26."
 );
 
-extern gsi::Enum<db::Severity> decl_Severity;
-gsi::ClassExt<GenericNetlistCompareLogger> inject_SeverityEnum_into_GenericNetlistCompareLogger (decl_Severity.defs ());
+const gsi::Enum<db::Severity> &get_decl_Severity ();
+gsi::ClassExt<GenericNetlistCompareLogger> inject_SeverityEnum_into_GenericNetlistCompareLogger (get_decl_Severity ().defs ());
 
 }

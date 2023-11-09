@@ -112,6 +112,11 @@ gsi::Enum<db::Severity> decl_Severity ("db", "Severity",
   "This enum was introduced in version 0.28.13.\n"
 );
 
+const gsi::Enum<db::Severity> &get_decl_Severity ()
+{
+  return decl_Severity;
+}
+
 gsi::ClassExt<db::LogEntryData> inject_SeverityEnum_into_LogEntryData (decl_Severity.defs ());
 
 }

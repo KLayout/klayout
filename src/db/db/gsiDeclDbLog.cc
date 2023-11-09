@@ -94,29 +94,29 @@ Class<db::LogEntryData> decl_dbNetlistDeviceExtractorError ("db", "LogEntryData"
   "It was generalized and renamed in version 0.28.13 as it was basically not useful as a separate class."
 );
 
-gsi::Enum<db::Severity> decl_Severity ("db", "Severity",
-  gsi::enum_const ("NoSeverity", db::NoSeverity,
-    "@brief Specifies no particular severity (default)\n"
-  ) +
-  gsi::enum_const ("Warning", db::Warning,
-    "@brief Specifies warning severity (log with high priority, but do not stop)\n"
-  ) +
-  gsi::enum_const ("Error", db::Error,
-    "@brief Specifies error severity (preferred action is stop)\n"
-  ) +
-  gsi::enum_const ("Info", db::Info,
-    "@brief Specifies info severity (print if requested, otherwise silent)\n"
-  ),
-  "@brief This enum specifies the severity level for log entries.\n"
-  "\n"
-  "This enum was introduced in version 0.28.13.\n"
-);
-
 const gsi::Enum<db::Severity> &get_decl_Severity ()
 {
+  static gsi::Enum<db::Severity> decl_Severity ("db", "Severity",
+    gsi::enum_const ("NoSeverity", db::NoSeverity,
+      "@brief Specifies no particular severity (default)\n"
+    ) +
+    gsi::enum_const ("Warning", db::Warning,
+      "@brief Specifies warning severity (log with high priority, but do not stop)\n"
+    ) +
+    gsi::enum_const ("Error", db::Error,
+      "@brief Specifies error severity (preferred action is stop)\n"
+    ) +
+    gsi::enum_const ("Info", db::Info,
+      "@brief Specifies info severity (print if requested, otherwise silent)\n"
+    ),
+    "@brief This enum specifies the severity level for log entries.\n"
+    "\n"
+    "This enum was introduced in version 0.28.13.\n"
+  );
+
   return decl_Severity;
 }
 
-gsi::ClassExt<db::LogEntryData> inject_SeverityEnum_into_LogEntryData (decl_Severity.defs ());
+gsi::ClassExt<db::LogEntryData> inject_SeverityEnum_into_LogEntryData (get_decl_Severity ().defs ());
 
 }

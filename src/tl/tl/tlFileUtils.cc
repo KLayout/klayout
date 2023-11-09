@@ -484,7 +484,9 @@ bool rename_file (const std::string &path, const std::string &new_name)
 bool rm_file (const std::string &path)
 {
 #if defined(_WIN32)
-  return _wunlink (tl::to_wstring (path).c_str ()) == 0;
+  std::wstring wpath = tl::to_wstring (path);
+  _wchmod (wpath.c_str (), _S_IREAD | _S_IWRITE);
+  return _wunlink (wpath.c_str ()) == 0;
 #else
   return unlink (tl::to_local (path).c_str ()) == 0;
 #endif

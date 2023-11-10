@@ -34,6 +34,7 @@
 #include <list>
 #include <set>
 #include <stdexcept>
+#include <cstdint>
 
 #if defined(HAVE_QT)
 #include <QString>

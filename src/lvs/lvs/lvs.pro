@@ -13,10 +13,8 @@ HEADERS = \
   lvsCommon.h \
   lvsForceLink.h \
 
-!equals(HAVE_QT, "0") {
-  RESOURCES = \
-    lvsResources.qrc
-}
+RESOURCES = \
+  lvsResources.qrc
 
 INCLUDEPATH += $$TL_INC $$DB_INC $$GSI_INC $$LYM_INC $$RDB_INC
 DEPENDPATH += $$TL_INC $$DB_INC $$GSI_INC $$LYM_INC $$RDB_INC

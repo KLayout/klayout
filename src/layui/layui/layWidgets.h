@@ -116,6 +116,68 @@ private:
 };
 
 /**
+ *  @brief A selection button for dither pattern
+ */
+class LAYUI_PUBLIC LineStyleSelectionButton
+  : public QPushButton
+{
+Q_OBJECT
+
+public:
+  /**
+   *  @brief Constructor
+   */
+  LineStyleSelectionButton (QWidget *parent);
+
+  /**
+   *  @brief Destructor
+   */
+  ~LineStyleSelectionButton ();
+
+  /**
+   *  @brief Associate with a view
+   *
+   *  This method is required to select the proper dither pattern
+   */
+  void set_view (lay::LayoutViewBase *view);
+
+  /**
+   *  @brief Set the line style index
+   */
+  void set_line_style (int ls);
+
+  /**
+   *  @brief Get the line style index
+   */
+  int line_style () const;
+
+  /**
+   *  @brief Override setText
+   */
+  void setText (const QString &) { }
+
+  /**
+   *  @brief Override setPixmap
+   */
+  void setPixmap (const QPixmap &) { }
+
+signals:
+  void line_style_changed (int);
+
+private slots:
+  void browse_selected ();
+  void menu_selected ();
+  void menu_about_to_show ();
+
+private:
+  lay::LayoutViewBase *mp_view;
+  int m_line_style;
+
+  void update_pattern ();
+  void update_menu ();
+};
+
+/**
  *  @brief A library selection combo box
  *
  *  This combo box allows selecting a library

@@ -150,8 +150,9 @@ public:
    *
    *  @param width The desired width (-1 for default)
    *  @param height The desired height (-1 for default)
+   *  @param The intended frame width in pixels
    */
-  QBitmap get_bitmap (int width = -1, int height = -1) const;
+  QBitmap get_bitmap (int width = -1, int height = -1, int frame_width = 1) const;
 #endif
 
   /**

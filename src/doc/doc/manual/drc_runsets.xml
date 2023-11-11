@@ -444,8 +444,7 @@ output(w, "width violations")</pre>
       <a href="/about/drc_ref_layer.xml#|">| (or)</a>,
       <a href="/about/drc_ref_layer.xml#-">- (not)</a>,
       <a href="/about/drc_ref_layer.xml#^">^ (xor)</a>,
-      <a href="/about/drc_ref_layer.xml#+">+ (xor)</a>,
-      <a href="/about/drc_ref_layer.xml#join">join</a>
+      <a href="/about/drc_ref_layer.xml#+">+ (join)</a>,
     </li>
     <li>Sizing:<br/>
       <a href="/about/drc_ref_layer.xml#size">size</a>,

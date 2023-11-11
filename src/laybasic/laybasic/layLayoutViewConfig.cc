@@ -72,11 +72,15 @@ public:
     options.push_back (std::pair<std::string, std::string> (cfg_sel_line_width, "1"));
     options.push_back (std::pair<std::string, std::string> (cfg_sel_vertex_size, "3"));
     options.push_back (std::pair<std::string, std::string> (cfg_sel_dither_pattern, "1"));
+    options.push_back (std::pair<std::string, std::string> (cfg_sel_line_style, "0"));
     options.push_back (std::pair<std::string, std::string> (cfg_sel_halo, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_sel_transient_mode, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_sel_inside_pcells_mode, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_tracking_cursor_enabled, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_tracking_cursor_color, cc.to_string (tl::Color ())));
+    options.push_back (std::pair<std::string, std::string> (cfg_crosshair_cursor_color, cc.to_string (tl::Color ())));
+    options.push_back (std::pair<std::string, std::string> (cfg_crosshair_cursor_line_style, "0"));
+    options.push_back (std::pair<std::string, std::string> (cfg_crosshair_cursor_enabled, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_background_color, cc.to_string (tl::Color ())));
     options.push_back (std::pair<std::string, std::string> (cfg_ctx_color, cc.to_string (tl::Color ())));
     options.push_back (std::pair<std::string, std::string> (cfg_ctx_dimming, "50"));

@@ -1670,6 +1670,12 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been added in version 0.22.\n"
   ) +
+  gsi::method ("error_layer", &db::Layout::error_layer,
+    "@brief Returns the index of the error layer\n"
+    "The error layer is used to place error texts on it, for example when a PCell evaluation fails.\n"
+    "\n"
+    "This method has been added in version 0.23.13.\n"
+  ) +
   gsi::method ("insert_special_layer", (unsigned int (db::Layout::*) (const db::LayerProperties &)) &db::Layout::insert_special_layer, gsi::arg ("props"),
     "@brief Inserts a new special layer with the given properties\n"
     "\n"

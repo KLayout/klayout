@@ -176,10 +176,10 @@ unsigned int
 LayoutLayers::error_layer () const
 {
   if (m_error_layer < 0) {
-    //  create the waste layer (since that layer is cached we can do
+    //  create the error layer (since that layer is cached we can do
     //  this in a "const" fashion.
     db::LayoutLayers *self = const_cast<db::LayoutLayers *> (this);
-    self->m_error_layer = (int) self->insert_special_layer (db::LayerProperties ("WASTE"));
+    self->m_error_layer = (int) self->insert_special_layer (db::LayerProperties ("ERROR"));
   }
 
   return (unsigned int) m_error_layer;

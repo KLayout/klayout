@@ -795,3 +795,16 @@ TEST(8_MetaInfo)
   EXPECT_EQ (ly.has_context_info (ci), false);
   EXPECT_EQ (ly.meta_info (ci, "a").value.to_string (), "nil");
 }
+
+TEST(9_ErrorLayer)
+{
+  db::Manager m;
+  db::Layout l (&m);
+
+  EXPECT_EQ (l.is_valid_layer (0), false);
+  EXPECT_EQ (l.guiding_shape_layer (), (unsigned int) 0);
+  EXPECT_EQ (l.is_valid_layer (1), false);
+  EXPECT_EQ (l.error_layer (), (unsigned int) 1);
+  EXPECT_EQ (l.is_special_layer (1), true);
+  EXPECT_EQ (int (l.layers ()), 2);
+}

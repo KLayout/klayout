@@ -236,10 +236,7 @@ PythonInterpreter::PythonInterpreter (bool embedded)
 
   tl::SelfTimer timer (tl::verbosity () >= 21, "Initializing Python");
 
-  std::string app_path;
-#if defined(HAVE_QT)
-  app_path = tl::to_string (QCoreApplication::applicationFilePath ());
-#endif
+  std::string app_path = tl::get_app_path ();
 
 #if PY_MAJOR_VERSION >= 3
 

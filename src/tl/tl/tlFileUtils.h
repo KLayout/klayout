@@ -269,9 +269,14 @@ std::vector<std::string> TL_PUBLIC split_path (const std::string &p, bool keep_l
 std::string TL_PUBLIC get_home_path ();
 
 /**
- *  @brief Gets the path of the currently running process
+ *  @brief Gets the path (directory) of the currently running process
  */
 std::string TL_PUBLIC get_inst_path ();
+
+/**
+ *  @brief Gets the path (full exe file name) of the currently running process
+ */
+std::string TL_PUBLIC get_app_path ();
 
 /**
  *  @brief Gets the absolute path of the module (DLL/.so) which contains the given address

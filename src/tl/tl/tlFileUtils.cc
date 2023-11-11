@@ -939,14 +939,14 @@ get_home_path ()
 }
 
 static std::string
-get_inst_path_internal ()
+get_app_path_internal ()
 {
 #if defined(_WIN32)
 
   wchar_t buffer[MAX_PATH];
   int len;
   if ((len = GetModuleFileNameW (NULL, buffer, MAX_PATH)) > 0) {
-    return tl::absolute_path (tl::to_string (std::wstring (buffer)));
+    return tl::to_string (std::wstring (buffer));
   }
 
 #elif __APPLE__
@@ -955,7 +955,7 @@ get_inst_path_internal ()
   int ret = proc_pidpath (getpid (), buffer, sizeof (buffer));
   if (ret > 0) {
     //  TODO: does this correctly translate paths? (MacOS uses UTF-8 encoding with D-like normalization)
-    return tl::absolute_path (buffer);
+    return buffer;
   }
 
 #elif defined (__FreeBSD__)
@@ -964,7 +964,7 @@ get_inst_path_internal ()
   size_t len = PATH_MAX;
   const int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1};
   if (sysctl(&mib[0], 4, &path, &len, NULL, 0) == 0) {
-    return tl::absolute_path(path);
+    return path;
   }
   return "";
 
@@ -972,7 +972,7 @@ get_inst_path_internal ()
 
   std::string pf = tl::sprintf ("/proc/%d/exe", getpid ());
   if (tl::file_exists (pf)) {
-    return tl::absolute_path (pf);
+    return pf;
   }
 
 #endif
@@ -984,9 +984,19 @@ get_inst_path ()
 {
   static std::string s_inst_path;
   if (s_inst_path.empty ()) {
-    s_inst_path = get_inst_path_internal ();
+    s_inst_path = tl::absolute_path (get_app_path_internal ());
   }
   return s_inst_path;
+}
+
+std::string
+get_app_path ()
+{
+  static std::string s_app_path;
+  if (s_app_path.empty ()) {
+    s_app_path = get_app_path_internal ();
+  }
+  return s_app_path;
 }
 
 std::string

@@ -122,11 +122,6 @@ public:
     return QSqlResult::boundValueName(pos);
   }
 
-  //  [expose] QList<QVariant> &QSqlResult::boundValues()
-  QList<QVariant> & fp_QSqlResult_boundValues_c0 () const {
-    return QSqlResult::boundValues();
-  }
-
   //  [expose] void QSqlResult::clear()
   void fp_QSqlResult_clear_0 () {
     QSqlResult::clear();
@@ -870,20 +865,6 @@ static void _call_fp_boundValueName_c767 (const qt_gsi::GenericMethod * /*decl*/
   tl::Heap heap;
   int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)((QSqlResult_Adaptor *)cls)->fp_QSqlResult_boundValueName_c767 (arg1));
-}
-
-
-// exposed QList<QVariant> &QSqlResult::boundValues()
-
-static void _init_fp_boundValues_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QList<QVariant> & > ();
-}
-
-static void _call_fp_boundValues_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QList<QVariant> & > ((QList<QVariant> &)((QSqlResult_Adaptor *)cls)->fp_QSqlResult_boundValues_c0 ());
 }
 
 
@@ -1662,7 +1643,6 @@ static gsi::Methods methods_QSqlResult_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*boundValue", "@brief Method QVariant QSqlResult::boundValue(int pos)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_boundValue_c767, &_call_fp_boundValue_c767);
   methods += new qt_gsi::GenericMethod ("*boundValueCount", "@brief Method int QSqlResult::boundValueCount()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_boundValueCount_c0, &_call_fp_boundValueCount_c0);
   methods += new qt_gsi::GenericMethod ("*boundValueName", "@brief Method QString QSqlResult::boundValueName(int pos)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_boundValueName_c767, &_call_fp_boundValueName_c767);
-  methods += new qt_gsi::GenericMethod ("*boundValues", "@brief Method QList<QVariant> &QSqlResult::boundValues()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_boundValues_c0, &_call_fp_boundValues_c0);
   methods += new qt_gsi::GenericMethod ("*clear", "@brief Method void QSqlResult::clear()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_clear_0, &_call_fp_clear_0);
   methods += new qt_gsi::GenericMethod ("*data", "@brief Virtual method QVariant QSqlResult::data(int i)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_data_767_0, &_call_cbs_data_767_0);
   methods += new qt_gsi::GenericMethod ("*data", "@hide", false, &_init_cbs_data_767_0, &_call_cbs_data_767_0, &_set_callback_cbs_data_767_0);

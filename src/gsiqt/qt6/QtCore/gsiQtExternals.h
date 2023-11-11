@@ -61,10 +61,6 @@ class QAbstractTableModel;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QAbstractTableModel> &qtdecl_QAbstractTableModel (); }
 
-struct QAdoptSharedDataTag;
-
-namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QAdoptSharedDataTag> &qtdecl_QAdoptSharedDataTag (); }
-
 class QAnimationDriver;
 
 namespace gsi { GSI_QTCORE_PUBLIC gsi::Class<QAnimationDriver> &qtdecl_QAnimationDriver (); }

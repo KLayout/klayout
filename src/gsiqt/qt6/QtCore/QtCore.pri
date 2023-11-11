@@ -15,7 +15,6 @@ SOURCES += \
   $$PWD/gsiDeclQAbstractNativeEventFilter.cc \
   $$PWD/gsiDeclQAbstractProxyModel.cc \
   $$PWD/gsiDeclQAbstractTableModel.cc \
-  $$PWD/gsiDeclQAdoptSharedDataTag.cc \
   $$PWD/gsiDeclQAnimationDriver.cc \
   $$PWD/gsiDeclQAnimationGroup.cc \
   $$PWD/gsiDeclQAnyStringView.cc \

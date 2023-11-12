@@ -407,12 +407,8 @@ HEADERS = \
   dbShapeCollection.h \
   dbShapeCollectionUtils.h
 
-!equals(HAVE_QT, "0") {
-
-  RESOURCES = \
-    dbResources.qrc \
-
-}
+RESOURCES = \
+  dbResources.qrc \
 
 INCLUDEPATH += $$TL_INC $$GSI_INC
 DEPENDPATH += $$TL_INC $$GSI_INC

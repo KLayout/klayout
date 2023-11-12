@@ -263,7 +263,7 @@ credentials_cb (git_cred ** /*out*/, const char * /*url*/, const char * /*userna
 #if LIBGIT2_VER_MAJOR > 0 || (LIBGIT2_VER_MAJOR == 0 && LIBGIT2_VER_MINOR >= 28)
   git_error_set_str (GIT_ERROR_NONE, "anonymous access is supported only, but server requests credentials");
 #else
-  git_error_set_str (GITERR_NONE, "anonymous access is supported only, but server requests credentials");
+  giterr_set_str (GITERR_NONE, "anonymous access is supported only, but server requests credentials");
 #endif
   return GIT_EUSER;
 

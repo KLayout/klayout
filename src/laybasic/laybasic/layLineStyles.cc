@@ -175,31 +175,38 @@ LineStyleInfo::is_bit_set (unsigned int n) const
 
 #if defined(HAVE_QT)
 QBitmap
-LineStyleInfo::get_bitmap (int width, int height) const
+LineStyleInfo::get_bitmap (int w, int h, int fw) const
 {
-  if (height < 0) {
-    height = 5;
-  }
-  if (width < 0) {
-    width = 34;
-  }
-
+  unsigned int height = h < 0 ? 5 : (unsigned int) h;
+  unsigned int width = w < 0 ? 34 : (unsigned int) w;
+  unsigned int frame_width = fw <= 0 ? 1 : (unsigned int) fw;
   unsigned int stride = (width + 7) / 8;
 
   unsigned char *data = new unsigned char[stride * height];
   memset (data, 0x00, size_t (stride * height));
 
-  for (unsigned int i = 0; i < (unsigned int)(height - 2); ++i) {
-    if (is_bit_set (i)) {
-      data [(height - 2 - i) * stride] |= 0x01;
-      data [(height - 2 - i) * stride + (width - 1) / 8] |= (1 << ((width - 1) % 8));
+  unsigned int hv = height - 2 * frame_width;
+
+  for (unsigned int i = 0; i < hv; ++i) {
+    if (is_bit_set (i / frame_width + 1)) {
+      unsigned int y = height - 1 - frame_width - i;
+      for (unsigned int x = 0; x < frame_width; ++x) {
+        data [y * stride + x / 8] |= (1 << (x % 8));
+      }
+      for (unsigned int x = width - frame_width; x < width; ++x) {
+        data [y * stride + x / 8] |= (1 << (x % 8));
+      }
     }
   }
 
-  for (unsigned int i = 1; i < (unsigned int)(width - 1); ++i) {
-    if (is_bit_set (i)) {
-      data [stride + i / 8] |= (1 << (i % 8));
-      data [(height - 2) * stride + i / 8] |= (1 << (i % 8));
+  for (unsigned int i = 0; i < width; ++i) {
+    if (is_bit_set (i / frame_width)) {
+      for (unsigned int y = 0; y < frame_width; ++y) {
+        data [y * stride + i / 8] |= (1 << (i % 8));
+      }
+      for (unsigned int y = height - frame_width; y < height; ++y) {
+        data [y * stride + i / 8] |= (1 << (i % 8));
+      }
     }
   }
 

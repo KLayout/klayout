@@ -46,6 +46,7 @@
 #include "tlInternational.h"
 
 #include "laySelectStippleForm.h"
+#include "laySelectLineStyleForm.h"
 
 #include <vector>
 
@@ -239,6 +240,199 @@ DitherPatternSelectionButton::update_menu ()
         }
 
         menu ()->addAction (QIcon (info.get_bitmap (-1, -1, dpr)), tl::to_qstring (name), this, SLOT (menu_selected ()))->setData (n);
+
+      }
+    }
+
+  } catch (...) { }
+}
+
+// -------------------------------------------------------------
+//  LineStyleSelectionButton implementation
+
+LineStyleSelectionButton::LineStyleSelectionButton (QWidget *parent)
+  : QPushButton (parent), mp_view (0), m_line_style (-1)
+{
+  setMenu (new QMenu (this));
+  update_pattern ();
+  connect (menu (), SIGNAL (aboutToShow ()), this, SLOT (menu_about_to_show ()));
+}
+
+LineStyleSelectionButton::~LineStyleSelectionButton ()
+{
+  // .. nothing yet ..
+}
+
+void
+LineStyleSelectionButton::set_view (lay::LayoutViewBase *view)
+{
+  if (view != mp_view) {
+    mp_view = view;
+    update_menu ();
+  }
+}
+
+void
+LineStyleSelectionButton::set_line_style (int ls)
+{
+  if (ls != m_line_style) {
+    m_line_style = ls;
+    update_pattern ();
+  }
+}
+
+int
+LineStyleSelectionButton::line_style () const
+{
+  return m_line_style;
+}
+
+void
+LineStyleSelectionButton::menu_selected ()
+{
+  QAction *action = dynamic_cast <QAction *> (sender ());
+  if (action) {
+
+    m_line_style = action->data ().toInt ();
+    update_pattern ();
+    emit (line_style_changed (m_line_style));
+
+  }
+}
+
+void
+LineStyleSelectionButton::browse_selected ()
+{
+  if (mp_view) {
+
+    SelectLineStyleForm styles_form (0, mp_view->line_styles (), true);
+    styles_form.set_selected (m_line_style);
+
+    if (styles_form.exec ()) {
+
+      m_line_style = styles_form.selected ();
+      update_pattern ();
+      emit (line_style_changed (m_line_style));
+
+    }
+
+  } else {
+
+    //  Use the default (non-custom) pattern if no view is set.
+    lay::LineStyles default_pattern;
+
+    SelectLineStyleForm styles_form (0, default_pattern, true);
+    styles_form.set_selected (m_line_style);
+
+    if (styles_form.exec ()) {
+
+      m_line_style = styles_form.selected ();
+      update_pattern ();
+      emit (line_style_changed (m_line_style));
+
+    }
+
+  }
+}
+
+void
+LineStyleSelectionButton::update_pattern ()
+{
+  QPushButton::setText (QString::fromUtf8 (" "));
+
+  QString text = QString::fromUtf8 ("XXXXXXX");
+  QFontMetrics fm (font (), this);
+  QRect rt (fm.boundingRect (text)); // dummy text to be compliant with the other color button
+
+  QPushButton::setIconSize (QSize (rt.width (), rt.height ()));
+
+#if QT_VERSION >= 0x050000
+  double dpr = devicePixelRatio ();
+#else
+  double dpr = 1.0;
+#endif
+
+  if (m_line_style < 0) {
+
+    QPixmap pixmap (rt.width () * dpr, rt.height () * dpr);
+#if QT_VERSION >= 0x050000
+    pixmap.setDevicePixelRatio (dpr);
+#endif
+    pixmap.fill (QColor (0, 0, 0, 0));
+
+    QPainter pxpainter (&pixmap);
+    pxpainter.setFont (font ());
+    QColor text_color = palette ().color (QPalette::Active, QPalette::Text);
+    pxpainter.setPen (QPen (text_color));
+
+    QRectF r (0, 0, rt.width () - pxpainter.pen ().widthF (), rt.height () - pxpainter.pen ().widthF ());
+    pxpainter.drawText (r, Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine, QObject::tr ("None"));
+
+    QPushButton::setIcon (QIcon (pixmap));
+
+  } else {
+
+    const lay::LineStyleInfo *dp_info;
+    if (mp_view) {
+      dp_info = & mp_view->line_styles ().style ((unsigned int) m_line_style);
+    } else {
+      static lay::LineStyles default_pattern;
+      dp_info = & default_pattern.style ((unsigned int) m_line_style);
+    }
+
+    QPushButton::setIcon (dp_info->get_bitmap (rt.width () * dpr, rt.height () * dpr, dpr));
+
+  }
+}
+
+void
+LineStyleSelectionButton::menu_about_to_show ()
+{
+  update_menu ();
+}
+
+void
+LineStyleSelectionButton::update_menu ()
+{
+  menu ()->clear ();
+  menu ()->addAction (QObject::tr ("None"), this, SLOT (menu_selected ()))->setData (-1);
+  menu ()->addAction (QObject::tr ("Choose ..."), this, SLOT (browse_selected ()));
+  menu ()->addSeparator ();
+
+  //  from_string might throw an exception ...
+  try {
+
+    lay::LineStyles patterns;
+
+    std::string s;
+    if (lay::Dispatcher::instance ()) {
+      lay::Dispatcher::instance ()->config_get (cfg_line_style_palette, s);
+    }
+    lay::LineStylePalette palette = lay::LineStylePalette::default_palette ();
+    if (! s.empty ()) {
+      palette.from_string (s);
+    }
+
+    //  fill the list of stipple palette items
+    for (unsigned int i = 0; i < palette.styles (); ++i) {
+
+      unsigned int n = palette.style_by_index (i);
+      if (int (n) < std::distance (patterns.begin (), patterns.end ())) {
+
+#if QT_VERSION > 0x050000
+        double dpr = devicePixelRatio ();
+#else
+        double dpr = 1.0;
+#endif
+
+        lay::LineStyleInfo info = patterns.begin () [n];
+
+        std::string name (info.name ());
+        if (name.empty ()) {
+          name = tl::sprintf ("#%d", n);
+        }
+
+        menu ()->addAction (QIcon (info.get_bitmap (16, 8)), tl::to_qstring (name), this, SLOT (menu_selected ()))->setData (n);
 
       }
     }

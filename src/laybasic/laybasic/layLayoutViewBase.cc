@@ -741,6 +741,10 @@ LayoutViewBase::configure (const std::string &name, const std::string &value)
     return true;
   }
 
+  if (mp_tracker && mp_tracker->configure (name, value)) {
+    return true;
+  }
+
   if (name == cfg_default_lyp_file) {
 
     m_def_lyp_file = value;
@@ -3693,6 +3697,9 @@ LayoutViewBase::refresh ()
 
   //  Issue a "tick" to execute all other pending tasks
   timer ();
+
+  //  Update the view ops as this is not always guaranteed (issue #1512)
+  set_view_ops ();
 }
 
 void

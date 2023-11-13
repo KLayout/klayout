@@ -647,7 +647,7 @@ GenericReaderOptions::add_options (tl::CommandLineOptions &cmd)
                     "* 1: produce LEF geometry always and ignore FOREIGN\n"
                     "* 2: Never produce LEF geometry and assume FOREIGN always\n"
                     "\n"
-                    "In case of FOREIGN macros in mode 1 or always in mode 2, the '--" + m_long_prefix + "lefdef-lef-layouts' option is available to specify "
+                    "In case of FOREIGN macros in mode 0 or always in mode 2, the '--" + m_long_prefix + "lefdef-lef-layouts' option is available to specify "
                     "external layout files for providing the LEF macro layouts.\n"
                    )
         << tl::arg (group +

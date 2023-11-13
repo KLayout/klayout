@@ -4333,7 +4333,8 @@ public:
     menu_entries.push_back (lay::menu_item ("cm_reset_window_state", "reset_window_state", at, tl::to_string (QObject::tr ("Restore Window")))),
     menu_entries.push_back (lay::separator ("selection_group", at));
     menu_entries.push_back (lay::config_menu_item ("transient_selection", at, tl::to_string (QObject::tr ("Highlight Object Under Mouse")), cfg_sel_transient_mode, "?"));
-    menu_entries.push_back (lay::config_menu_item ("mouse_tracking", at, tl::to_string (QObject::tr ("Mouse tracking")), cfg_tracking_cursor_enabled, "?"));
+    menu_entries.push_back (lay::config_menu_item ("mouse_tracking", at, tl::to_string (QObject::tr ("Mouse Tracking")), cfg_tracking_cursor_enabled, "?"));
+    menu_entries.push_back (lay::config_menu_item ("crosshair_cursor", at, tl::to_string (QObject::tr ("Crosshair Cursor")), cfg_crosshair_cursor_enabled, "?"));
 
     at = "help_menu.end";
     menu_entries.push_back (lay::menu_item ("cm_show_all_tips", "show_all_tips", at, tl::to_string (QObject::tr ("Show All Tips"))));

@@ -258,6 +258,7 @@ private:
 
 public:
   ChunkedBuffer ()
+    : m_current_chunk (m_chunks.end ())
   {
     //  .. nothing yet ..
   }
@@ -265,6 +266,7 @@ public:
   void clear ()
   {
     m_chunks.clear ();
+    m_current_chunk = m_chunks.end ();
   }
 
   void push (const char *data, size_t bytes)
@@ -272,6 +274,9 @@ public:
     if (bytes > 0) {
       m_chunks.push_back (ChunkInfo ());
       m_chunks.back ().set (data, bytes);
+      if (m_current_chunk == m_chunks.end ()) {
+        --m_current_chunk;
+      }
     }
   }
 
@@ -279,13 +284,13 @@ public:
   {
     char *start = data;
 
-    while (bytes > 0 && ! m_chunks.empty ()) {
+    while (bytes > 0 && m_current_chunk != m_chunks.end ()) {
 
-      size_t n = m_chunks.front ().fetch (data, bytes);
+      size_t n = m_current_chunk->fetch (data, bytes);
       data += n;
       bytes -= n;
-      if (m_chunks.front ().empty ()) {
-        m_chunks.pop_front ();
+      if (m_current_chunk->empty ()) {
+        ++m_current_chunk;
       }
 
     }
@@ -322,7 +327,38 @@ public:
     return true;
   }
 
+  size_t pos () const
+  {
+    size_t p = 0;
+    for (std::list<ChunkInfo>::const_iterator c = m_chunks.begin (); c != m_current_chunk; ++c) {
+      p += c->size;
+    }
+    if (m_current_chunk != m_chunks.end ()) {
+      p += (m_current_chunk->pos - m_current_chunk->start);
+    }
+    return p;
+  }
+
+  void seek (size_t pos)
+  {
+    for (std::list<ChunkInfo>::iterator c = m_chunks.begin (); c != m_chunks.end (); ++c) {
+      c->pos = c->start;
+    }
+
+    m_current_chunk = m_chunks.end ();
+    for (std::list<ChunkInfo>::iterator c = m_chunks.begin (); c != m_chunks.end (); ++c) {
+      if (pos < c->size) {
+        m_current_chunk = c;
+        c->pos = c->start + pos;
+        break;
+      } else {
+        pos -= c->size;
+      }
+    }
+  }
+
   std::list<ChunkInfo> m_chunks;
+  std::list<ChunkInfo>::iterator m_current_chunk;
 };
 
 // ---------------------------------------------------------------
@@ -452,12 +488,14 @@ private:
 
   friend class CurlNetworkManager;
   friend size_t read_func (char *buffer, size_t size, size_t nitems, void *userdata);
+  friend size_t seek_func (void *userdata, curl_off_t offset, int origin);
   friend size_t write_func (char *ptr, size_t size, size_t nmemb, void *userdata);
   friend size_t write_header_func (char *ptr, size_t size, size_t nmemb, void *userdata);
 
   void add_read_data (const char *data, size_t n);
   void add_header_data (const char *data, size_t n);
   size_t fetch_data (char *buffer, size_t nbytes);
+  int seek (curl_off_t offset, int origin);
 
   void finished (int status);
   void init ();
@@ -687,6 +725,7 @@ InputHttpStream::timeout () const
 //  CurlConnection implementation
 
 size_t read_func (char *buffer, size_t size, size_t nitems, void *userdata);
+size_t seek_func (void *userdata, curl_off_t offset, int origin);
 size_t write_func (char *ptr, size_t size, size_t nmemb, void *userdata);
 size_t write_header_func (char *ptr, size_t size, size_t nmemb, void *userdata);
 
@@ -801,6 +840,18 @@ size_t CurlConnection::fetch_data (char *buffer, size_t nbytes)
   return m_data.fetch (buffer, nbytes);
 }
 
+int CurlConnection::seek (curl_off_t offset, int origin)
+{
+  if (origin == SEEK_CUR) {
+    m_data.seek (size_t (curl_off_t (m_data.pos ()) + offset));
+  } else if (origin == SEEK_END) {
+    m_data.seek (size_t (curl_off_t (m_data.size ()) + offset));
+  } else {
+    m_data.seek (size_t (offset));
+  }
+  return CURL_SEEKFUNC_OK;
+}
+
 void CurlConnection::send ()
 {
   tl_assert (mp_handle != 0);
@@ -837,6 +888,8 @@ void CurlConnection::send ()
 
   curl_easy_setopt (mp_handle, CURLOPT_READFUNCTION, &read_func);
   curl_easy_setopt (mp_handle, CURLOPT_READDATA, (void *) this);
+  curl_easy_setopt (mp_handle, CURLOPT_SEEKFUNCTION, &seek_func);
+  curl_easy_setopt (mp_handle, CURLOPT_SEEKDATA, (void *) this);
   curl_easy_setopt (mp_handle, CURLOPT_WRITEFUNCTION, &write_func);
   curl_easy_setopt (mp_handle, CURLOPT_WRITEDATA, (void *) this);
   curl_easy_setopt (mp_handle, CURLOPT_HEADERFUNCTION, &write_header_func);
@@ -998,20 +1051,26 @@ void CurlConnection::finished (int status)
   finished_event ();
 }
 
-size_t read_func(char *buffer, size_t size, size_t nitems, void *userdata)
+size_t read_func (char *buffer, size_t size, size_t nitems, void *userdata)
 {
   CurlConnection *connection = (CurlConnection *) userdata;
   return connection->fetch_data (buffer, size * nitems);
 }
 
-size_t write_func(char *buffer, size_t size, size_t nitems, void *userdata)
+size_t seek_func (void *userdata, curl_off_t offset, int origin)
+{
+  CurlConnection *connection = (CurlConnection *) userdata;
+  return connection->seek (offset, origin);
+}
+
+size_t write_func (char *buffer, size_t size, size_t nitems, void *userdata)
 {
   CurlConnection *connection = (CurlConnection *) userdata;
   connection->add_read_data (buffer, size * nitems);
   return size * nitems;
 }
 
-size_t write_header_func(char *buffer, size_t size, size_t nitems, void *userdata)
+size_t write_header_func (char *buffer, size_t size, size_t nitems, void *userdata)
 {
   CurlConnection *connection = (CurlConnection *) userdata;
   connection->add_header_data (buffer, size * nitems);

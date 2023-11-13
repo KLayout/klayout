@@ -317,6 +317,11 @@ ApplicationBase::parse_cmd (int &argc, char **argv)
       }
       tl::verbosity (v);
 
+    } else if (a == "-k" && (i + 1) < argc) {
+
+      //  ignored (handled earlier)
+      ++i;
+
     } else if (a == "-l" && (i + 1) < argc) {
 
       m_layer_props_file = args [++i];
@@ -1055,6 +1060,7 @@ ApplicationBase::usage ()
   r += tl::to_string (QObject::tr ("  -i                  Disable undo buffering (less memory requirements)")) + "\n";
   r += tl::to_string (QObject::tr ("  -ni                 Enable undo buffering (default, overrides previous -i option)")) + "\n";
   r += tl::to_string (QObject::tr ("  -j <path>           Add the given path to the macro project paths")) + "\n"; 
+  r += tl::to_string (QObject::tr ("  -k <log file>       Write log to the given file plus stdout/stderr")) + "\n";
   r += tl::to_string (QObject::tr ("  -l <lyp file>       Use layer properties file")) + "\n";
   r += tl::to_string (QObject::tr ("  -lx                 With -l: add other layers as well")) + "\n";
   r += tl::to_string (QObject::tr ("  -lf                 With -l: use the lyp file as it is (no expansion to multiple layouts)")) + "\n";

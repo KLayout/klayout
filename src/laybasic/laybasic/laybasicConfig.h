@@ -77,6 +77,9 @@ static const std::string cfg_sel_inside_pcells_mode ("sel-inside-pcells-mode");
 
 static const std::string cfg_tracking_cursor_color ("tracking-cursor-color");
 static const std::string cfg_tracking_cursor_enabled ("tracking-cursor-enabled");
+static const std::string cfg_crosshair_cursor_color ("crosshair-cursor-color");
+static const std::string cfg_crosshair_cursor_line_style ("crosshair-cursor-line-style");
+static const std::string cfg_crosshair_cursor_enabled ("crosshair-cursor-enabled");
 
 static const std::string cfg_markers_visible ("markers-visible");
 

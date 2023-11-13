@@ -41,7 +41,7 @@ public:
   MoveService (lay::LayoutViewBase *view);
   ~MoveService ();
 
-  virtual bool configure (const std::string &name, const std::string &value);
+  bool configure (const std::string &name, const std::string &value);
   bool begin_move (db::Transaction *transaction = 0, bool transient_selection = false);
 
 private:

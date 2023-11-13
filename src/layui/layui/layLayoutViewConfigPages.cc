@@ -424,9 +424,21 @@ LayoutViewConfigPage2d::setup (lay::Dispatcher *root)
   root->config_get (cfg_tracking_cursor_color, color, lay::ColorConverter ());
   mp_ui->color_pb->set_color (color);
 
-  bool enabled = 0;
+  bool enabled = false;
   root->config_get (cfg_tracking_cursor_enabled, enabled);
   mp_ui->tracking_cb->setChecked (enabled);
+
+  color = QColor ();
+  root->config_get (cfg_crosshair_cursor_color, color, lay::ColorConverter ());
+  mp_ui->color_chc->set_color (color);
+
+  int line_style = 0;
+  root->config_get (cfg_crosshair_cursor_line_style, line_style);
+  mp_ui->line_style_chc->set_line_style (line_style);
+
+  enabled = false;
+  root->config_get (cfg_crosshair_cursor_enabled, enabled);
+  mp_ui->crosshair_cursor_cb->setChecked (enabled);
 }
 
 void
@@ -435,6 +447,9 @@ LayoutViewConfigPage2d::commit (lay::Dispatcher *root)
   lay::ColorConverter cc;
   root->config_set (cfg_tracking_cursor_color, mp_ui->color_pb->get_color (), cc);
   root->config_set (cfg_tracking_cursor_enabled, mp_ui->tracking_cb->isChecked ());
+  root->config_set (cfg_crosshair_cursor_color, mp_ui->color_chc->get_color (), cc);
+  root->config_set (cfg_crosshair_cursor_line_style, mp_ui->line_style_chc->line_style ());
+  root->config_set (cfg_crosshair_cursor_enabled, mp_ui->crosshair_cursor_cb->isChecked ());
 }
 
 // ------------------------------------------------------------

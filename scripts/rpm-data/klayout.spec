@@ -35,6 +35,7 @@ AutoReqProv: 	no
 %if "%{target_system}" == "centos8"
 Requires:	ruby >= 2.5.5
 Requires:	python3 >= 3.6.0
+Requires: libgit2 >= 0.26.8
 Requires: qt5-qtbase >= 5.11.1
 Requires: qt5-qtmultimedia >= 5.11.1
 Requires: qt5-qtxmlpatterns >= 5.11.1

@@ -199,12 +199,16 @@ check_local_operation_base<TS, TI>::check_local_operation_base (const EdgeRelati
 
 template <class TS, class TI>
 void
-check_local_operation_base<TS, TI>::compute_results (db::Layout *layout, const std::vector<const TS *> &subjects, const std::set<const TI *> &intruders, std::unordered_set<db::EdgePair> &result, std::unordered_set<db::EdgePair> &intra_polygon_result) const
+check_local_operation_base<TS, TI>::compute_results (db::Layout *layout, db::Cell *subject_cell, const std::vector<const TS *> &subjects, const std::set<const TI *> &intruders, std::unordered_set<db::EdgePair> &result, std::unordered_set<db::EdgePair> &intra_polygon_result, const db::LocalProcessorBase *proc) const
 {
   //  NOTE: the rectangle and opposite filters are unsymmetric
   bool symmetric_edge_pairs = ! m_has_other && m_options.opposite_filter == db::NoOppositeFilter && m_options.rect_filter == RectFilter::NoRectFilter;
 
-  edge2edge_check_negative_or_positive<std::unordered_set<db::EdgePair> > edge_check (m_check, result, intra_polygon_result, m_options.negative, m_different_polygons, m_has_other, m_options.shielded, symmetric_edge_pairs);
+  //  modify the check to take into account scaled cells
+  EdgeRelationFilter check = m_check;
+  check.set_distance (proc->dist_for_cell (subject_cell, check.distance ()));
+
+  edge2edge_check_negative_or_positive<std::unordered_set<db::EdgePair> > edge_check (check, result, intra_polygon_result, m_options.negative, m_different_polygons, m_has_other, m_options.shielded, symmetric_edge_pairs);
   poly2poly_check<TS> poly_check (edge_check);
 
   std::unordered_set<TI> polygons;
@@ -677,7 +681,7 @@ check_local_operation<TS, TI>::check_local_operation (const EdgeRelationFilter &
 
 template <class TS, class TI>
 void
-check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, const db::LocalProcessorBase *proc) const
 {
   std::vector<const TS *> subjects;
   subjects.reserve (interactions.size ());
@@ -696,7 +700,7 @@ check_local_operation<TS, TI>::do_compute_local (db::Layout *layout, const shape
   std::unordered_set<db::EdgePair> result, intra_polygon_result;
 
   //  perform the basic check
-  check_local_operation_base<TS, TI>::compute_results (layout, subjects, intruders, result, intra_polygon_result);
+  check_local_operation_base<TS, TI>::compute_results (layout, subject_cell, subjects, intruders, result, intra_polygon_result, proc);
 
   //  detect and remove parts of the result which have or do not have results "opposite"
   //  ("opposite" is defined by the projection of edges "through" the subject shape)
@@ -752,7 +756,7 @@ check_local_operation_with_properties<TS, TI>::check_local_operation_with_proper
 
 template <class TS, class TI>
 void
-check_local_operation_with_properties<TS, TI>::do_compute_local (db::Layout *layout, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+check_local_operation_with_properties<TS, TI>::do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties> > &results, const db::LocalProcessorBase *proc) const
 {
   tl_assert (results.size () == 1);
 
@@ -766,7 +770,7 @@ check_local_operation_with_properties<TS, TI>::do_compute_local (db::Layout *lay
     const std::set<const TI *> &intruders = s2p->second.second;
 
     //  perform the basic check
-    check_local_operation_base<TS, TI>::compute_results (layout, subjects, intruders, result, intra_polygon_result);
+    check_local_operation_base<TS, TI>::compute_results (layout, subject_cell, subjects, intruders, result, intra_polygon_result, proc);
 
     //  detect and remove parts of the result which have or do not have results "opposite"
     //  ("opposite" is defined by the projection of edges "through" the subject shape)
@@ -852,7 +856,7 @@ db::Coord interacting_local_operation<TS, TI, TR>::dist () const
 }
 
 template <class TS, class TI, class TR>
-void interacting_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+void interacting_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const
 {
   if (m_output_mode == None) {
     return;
@@ -1031,7 +1035,7 @@ db::Coord contained_local_operation<TS, TI, TR>::dist () const
 }
 
 template <class TS, class TI, class TR>
-void contained_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+void contained_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const
 {
   if (m_output_mode == None) {
     return;
@@ -1106,7 +1110,7 @@ db::Coord pull_local_operation<TS, TI, TR>::dist () const
 }
 
 template <class TS, class TI, class TR>
-void pull_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*layout*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+void pull_local_operation<TS, TI, TR>::do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const
 {
   tl_assert (results.size () == 1);
   std::unordered_set<TR> &result = results.front ();
@@ -1186,7 +1190,7 @@ db::Coord interacting_with_edge_local_operation<TS, TI, TR>::dist () const
 }
 
 template <class TS, class TI, class TR>
-void interacting_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+void interacting_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const
 {
   if (m_output_mode == None) {
     return;
@@ -1313,7 +1317,7 @@ db::Coord pull_with_edge_local_operation<TS, TI, TR>::dist () const
 }
 
 template <class TS, class TI, class TR>
-void pull_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+void pull_with_edge_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const
 {
   tl_assert (results.size () == 1);
   std::unordered_set<TR> &result = results.front ();
@@ -1374,7 +1378,7 @@ db::Coord pull_with_text_local_operation<TS, TI, TR>::dist () const
 }
 
 template <class TS, class TI, class TR>
-void pull_with_text_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+void pull_with_text_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const
 {
   tl_assert (results.size () == 1);
   std::unordered_set<TR> &result = results.front ();
@@ -1443,7 +1447,7 @@ db::Coord interacting_with_text_local_operation<TS, TI, TR>::dist () const
 
 
 template <class TS, class TI, class TR>
-void interacting_with_text_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+void interacting_with_text_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase * /*proc*/) const
 {
   if (m_output_mode == None) {
     return;
@@ -1555,7 +1559,7 @@ bool_and_or_not_local_operation<TS, TI, TR>::description () const
 
 template <class TS, class TI, class TR>
 void
-bool_and_or_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio) const
+bool_and_or_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase *proc) const
 {
   tl_assert (results.size () == 1);
   std::unordered_set<TR> &result = results.front ();
@@ -1603,7 +1607,7 @@ bool_and_or_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layou
 
     db::BooleanOp op (m_is_and ? db::BooleanOp::And : db::BooleanOp::ANotB);
     db::polygon_ref_generator<TR> pr (layout, result);
-    db::PolygonSplitter splitter (pr, area_ratio, max_vertex_count);
+    db::PolygonSplitter splitter (pr, proc->area_ratio (), proc->max_vertex_count ());
     db::PolygonGenerator pg (splitter, true, true);
     ep.set_base_verbosity (50);
     ep.process (pg, op);
@@ -1640,7 +1644,7 @@ bool_and_or_not_local_operation_with_properties<TS, TI, TR>::description () cons
 
 template <class TS, class TI, class TR>
 void
-bool_and_or_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &results, size_t max_vertex_count, double area_ratio) const
+bool_and_or_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &results, const db::LocalProcessorBase *proc) const
 {
   tl_assert (results.size () == 1);
   std::unordered_set<db::object_with_properties<TR> > &result = results.front ();
@@ -1717,7 +1721,7 @@ bool_and_or_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (d
 
       db::BooleanOp op (m_is_and ? db::BooleanOp::And : db::BooleanOp::ANotB);
       db::polygon_ref_generator_with_properties<db::object_with_properties<TR> > pr (layout, result, prop_id);
-      db::PolygonSplitter splitter (pr, area_ratio, max_vertex_count);
+      db::PolygonSplitter splitter (pr, proc->area_ratio (), proc->max_vertex_count ());
       db::PolygonGenerator pg (splitter, true, true);
       ep.set_base_verbosity (50);
       ep.process (pg, op);
@@ -1742,7 +1746,7 @@ two_bool_and_not_local_operation<TS, TI, TR>::two_bool_and_not_local_operation (
 
 template <class TS, class TI, class TR>
 void
-two_bool_and_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio) const
+two_bool_and_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase *proc) const
 {
   tl_assert (results.size () == 2);
 
@@ -1788,12 +1792,12 @@ two_bool_and_not_local_operation<TS, TI, TR>::do_compute_local (db::Layout *layo
 
     db::BooleanOp op0 (db::BooleanOp::And);
     db::polygon_ref_generator<TR> pr0 (layout, result0);
-    db::PolygonSplitter splitter0 (pr0, area_ratio, max_vertex_count);
+    db::PolygonSplitter splitter0 (pr0, proc->area_ratio (), proc->max_vertex_count ());
     db::PolygonGenerator pg0 (splitter0, true, true);
 
     db::BooleanOp op1 (db::BooleanOp::ANotB);
     db::polygon_ref_generator<TR> pr1 (layout, result1);
-    db::PolygonSplitter splitter1 (pr1, area_ratio, max_vertex_count);
+    db::PolygonSplitter splitter1 (pr1, proc->area_ratio (), proc->max_vertex_count ());
     db::PolygonGenerator pg1 (splitter1, true, true);
 
     ep.set_base_verbosity (50);
@@ -1829,7 +1833,7 @@ two_bool_and_not_local_operation_with_properties<TS, TI, TR>::two_bool_and_not_l
 
 template <class TS, class TI, class TR>
 void
-two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (db::Layout *layout, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &results, size_t max_vertex_count, double area_ratio) const
+two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &results, const db::LocalProcessorBase *proc) const
 {
   tl_assert (results.size () == 2);
   std::unordered_set<db::object_with_properties<TR> > &result0 = results [0];
@@ -1904,12 +1908,12 @@ two_bool_and_not_local_operation_with_properties<TS, TI, TR>::do_compute_local (
 
       db::BooleanOp op0 (db::BooleanOp::And);
       db::polygon_ref_generator<TR> pr0 (layout, result0_wo_props);
-      db::PolygonSplitter splitter0 (pr0, area_ratio, max_vertex_count);
+      db::PolygonSplitter splitter0 (pr0, proc->area_ratio (), proc->max_vertex_count ());
       db::PolygonGenerator pg0 (splitter0, true, true);
 
       db::BooleanOp op1 (db::BooleanOp::ANotB);
       db::polygon_ref_generator<TR> pr1 (layout, result1_wo_props);
-      db::PolygonSplitter splitter1 (pr1, area_ratio, max_vertex_count);
+      db::PolygonSplitter splitter1 (pr1, proc->area_ratio (), proc->max_vertex_count ());
       db::PolygonGenerator pg1 (splitter1, true, true);
 
       ep.set_base_verbosity (50);
@@ -1949,7 +1953,7 @@ SelfOverlapMergeLocalOperation::SelfOverlapMergeLocalOperation (unsigned int wra
 }
 
 void
-SelfOverlapMergeLocalOperation::do_compute_local (db::Layout *layout, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+SelfOverlapMergeLocalOperation::do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, const db::LocalProcessorBase * /*proc*/) const
 {
   tl_assert (results.size () == 1);
   std::unordered_set<db::PolygonRef> &result = results.front ();
@@ -2021,7 +2025,7 @@ PolygonToEdgeLocalOperation::description () const
 }
 
 void
-PolygonToEdgeLocalOperation::do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::EdgeWithProperties> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+PolygonToEdgeLocalOperation::do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::PolygonRefWithProperties, db::PolygonRefWithProperties> &interactions, std::vector<std::unordered_set<db::EdgeWithProperties> > &results, const db::LocalProcessorBase * /*proc*/) const
 {
   db::EdgeProcessor ep;
   ep.set_base_verbosity (50);

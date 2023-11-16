@@ -229,11 +229,27 @@ struct DB_PUBLIC EdgeRelationFilter
   }
 
   /**
+   *  @brief sets the check distance
+   */
+  void set_distance (distance_type d)
+  {
+    m_d = d;
+  }
+
+  /**
    *  @brief Gets the check distance
    */
   distance_type distance () const
   {
     return m_d;
+  }
+
+  /**
+   *  @brief Sets the relation
+   */
+  void set_relation (edge_relation_type r)
+  {
+    m_r = r;
   }
 
   /**

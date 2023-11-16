@@ -1953,6 +1953,30 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 
   const db::DeepLayer &polygons = needs_merged_primary ? merged_deep_layer () : deep_layer ();
 
+  {
+    //  create cell variants for magnification if needed
+
+    db::cell_variants_collector<db::MagnificationReducer> vars;
+    vars.collect (polygons.layout (), polygons.initial_cell ());
+
+    //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
+    const_cast<db::DeepLayer &> (polygons).separate_variants (vars);
+  }
+
+  if (other_deep && &other_deep->deep_layer ().layout () != &polygons.layout ()) {
+
+    //  create cell variants for magnification for the other input if needed
+
+    const db::DeepLayer &other_layer = other_deep->deep_layer ();
+
+    db::cell_variants_collector<db::MagnificationReducer> vars;
+    vars.collect (other_layer.layout (), other_layer.initial_cell ());
+
+    //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
+    const_cast<db::DeepLayer &> (other_layer).separate_variants (vars);
+
+  }
+
   EdgeRelationFilter check (rel, d, options.metrics);
   check.set_include_zero (false);
   check.set_whole_edges (options.whole_edges);
@@ -2009,17 +2033,28 @@ DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, c
 
   const db::DeepLayer &polygons = merged_deep_layer ();
 
-  EdgeRelationFilter check (rel, d, options.metrics);
-  check.set_include_zero (false);
-  check.set_whole_edges (options.whole_edges);
-  check.set_ignore_angle (options.ignore_angle);
-  check.set_min_projection (options.min_projection);
-  check.set_max_projection (options.max_projection);
+  db::cell_variants_collector<db::MagnificationReducer> vars;
+  vars.collect (polygons.layout (), polygons.initial_cell ());
+
+  //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
+  const_cast<db::DeepLayer &> (polygons).separate_variants (vars);
 
   db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
   std::unique_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
+    tl_assert (v.size () == size_t (1));
+    double mag = v.begin ()->first.mag ();
+    db::Coord d_with_mag = db::coord_traits<db::Coord>::rounded (d / mag);
+
+    EdgeRelationFilter check (rel, d_with_mag, options.metrics);
+    check.set_include_zero (false);
+    check.set_whole_edges (options.whole_edges);
+    check.set_ignore_angle (options.ignore_angle);
+    check.set_min_projection (options.min_projection);
+    check.set_max_projection (options.max_projection);
 
     const db::Shapes &shapes = c->shapes (polygons.layer ());
     db::Shapes &result = c->shapes (res->deep_layer ().layer ());

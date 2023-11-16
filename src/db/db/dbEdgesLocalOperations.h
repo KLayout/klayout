@@ -44,7 +44,7 @@ class DB_PUBLIC EdgeBoolAndOrNotLocalOperation
 public:
   EdgeBoolAndOrNotLocalOperation (db::EdgeBoolOp op);
 
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &result, size_t max_vertex_count, double area_ratio) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *cell, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &result, const db::LocalProcessorBase *proc) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 
@@ -67,7 +67,7 @@ class DB_PUBLIC EdgeToPolygonLocalOperation
 public:
   EdgeToPolygonLocalOperation (EdgePolygonOp::mode_t op, bool include_borders);
 
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &result, size_t max_vertex_count, double area_ratio) const;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *cell, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &result, const db::LocalProcessorBase *proc) const;
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual std::string description () const;
 

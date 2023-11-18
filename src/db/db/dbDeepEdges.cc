@@ -1941,12 +1941,16 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, const db::LocalProcessorBase * /*proc*/) const
+  virtual void do_compute_local (db::Layout * /*layout*/, db::Cell *cell, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, const db::LocalProcessorBase *proc) const
   {
     tl_assert (results.size () == 1);
     std::unordered_set<db::EdgePair> &result = results.front ();
 
-    edge2edge_check_for_edges<std::unordered_set<db::EdgePair> > edge_check (m_check, result, m_has_other);
+    //  implement check in local coordinates in the presence of magnification variants
+    EdgeRelationFilter check = m_check;
+    check.set_distance (proc->dist_for_cell (cell, check.distance ()));
+
+    edge2edge_check_for_edges<std::unordered_set<db::EdgePair> > edge_check (check, result, m_has_other);
 
     db::box_scanner<db::Edge, size_t> scanner;
     std::set<db::Edge> others;
@@ -1989,7 +1993,7 @@ public:
 
     }
 
-    scanner.process (edge_check, m_check.distance (), db::box_convert<db::Edge> ());
+    scanner.process (edge_check, check.distance (), db::box_convert<db::Edge> ());
   }
 
   virtual db::Coord dist () const
@@ -2028,6 +2032,28 @@ DeepEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Coord 
 
   const db::DeepLayer &edges = merged_deep_layer ();
 
+  //  create cell variants for magnification if needed
+
+  db::cell_variants_collector<db::MagnificationReducer> vars;
+  vars.collect (edges.layout (), edges.initial_cell ());
+
+  //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
+  const_cast<db::DeepLayer &> (edges).separate_variants (vars);
+
+  if (other_deep && &other_deep->deep_layer ().layout () != &edges.layout ()) {
+
+    //  create cell variants for magnification for the other input if needed
+
+    const db::DeepLayer &other_layer = other_deep->deep_layer ();
+
+    db::cell_variants_collector<db::MagnificationReducer> vars;
+    vars.collect (other_layer.layout (), other_layer.initial_cell ());
+
+    //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
+    const_cast<db::DeepLayer &> (other_layer).separate_variants (vars);
+
+  }
+
   EdgeRelationFilter check (rel, d, options.metrics);
   check.set_include_zero (false);
   check.set_whole_edges (options.whole_edges);
@@ -2045,6 +2071,7 @@ DeepEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Coord 
                                                               other_deep ? &other_deep->deep_layer ().initial_cell () : const_cast<db::Cell *> (&edges.initial_cell ()));
 
   proc.set_base_verbosity (base_verbosity ());
+  proc.set_vars (&vars);
   proc.set_threads (edges.store ()->threads ());
 
   proc.run (&op, edges.layer (), other_deep ? other_deep->deep_layer ().layer () : edges.layer (), res->deep_layer ().layer ());

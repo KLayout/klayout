@@ -1138,6 +1138,7 @@ private:
 
   void processed (db::Layout *, const db::Polygon &p, std::vector<db::Polygon> &res) const;
   void processed (db::Layout *, const db::PolygonRef &p, std::vector<db::PolygonRef> &res) const;
+  void processed (db::Layout *, const db::polygon_ref<db::Polygon, db::ICplxTrans> &p, std::vector<db::PolygonRef> &res) const;
 
   template <class T>
   void implement_compute_local (db::CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<T> > &results, const db::LocalProcessorBase *proc) const
@@ -1149,9 +1150,33 @@ private:
 
     std::vector<T> res;
     for (typename std::unordered_set<T>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
+
       res.clear ();
-      processed (layout, *p, res);
-      results.front ().insert (res.begin (), res.end ());
+
+      if (proc->vars ()) {
+
+        //  in the presence of variants, handle the object in top level space
+
+        const std::map<db::ICplxTrans, size_t> &vv = proc->vars ()->variants (cell->cell_index ());
+        tl_assert (vv.size () == 1);
+        const db::ICplxTrans &tr = vv.begin ()->first;
+        processed (layout, tr * *p, res);
+
+        if (! res.empty ()) {
+          db::ICplxTrans tri = tr.inverted ();
+          for (auto r = res.begin (); r != res.end (); ++r) {
+            results.front ().insert (tri * *r);
+          }
+        }
+
+      } else {
+
+        processed (layout, *p, res);
+
+        results.front ().insert (res.begin (), res.end ());
+
+      }
+
     }
   }
 };
@@ -1175,7 +1200,6 @@ public:
 
 private:
   db::PolygonSizer m_proc;
-  CompoundTransformationReducer m_vars;
 };
 
 class DB_PUBLIC CompoundRegionMergeOperationNode
@@ -1286,9 +1310,33 @@ private:
 
     std::vector<T> res;
     for (typename std::unordered_set<db::Edge>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
+
       res.clear ();
-      processed (layout, *p, res);
-      results.front ().insert (res.begin (), res.end ());
+
+      if (proc->vars ()) {
+
+        //  in the presence of variants, handle the object in top level space
+
+        const std::map<db::ICplxTrans, size_t> &vv = proc->vars ()->variants (cell->cell_index ());
+        tl_assert (vv.size () == 1);
+        const db::ICplxTrans &tr = vv.begin ()->first;
+        processed (layout, tr * *p, res);
+
+        if (! res.empty ()) {
+          db::ICplxTrans tri = tr.inverted ();
+          for (auto r = res.begin (); r != res.end (); ++r) {
+            results.front ().insert (tri * *r);
+          }
+        }
+
+      } else {
+
+        processed (layout, *p, res);
+
+        results.front ().insert (res.begin (), res.end ());
+
+      }
+
     }
   }
 };
@@ -1331,9 +1379,33 @@ private:
 
     std::vector<db::Edge> res;
     for (typename std::unordered_set<db::Edge>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
+
       res.clear ();
-      processed (layout, *p, res);
-      results.front ().insert (res.begin (), res.end ());
+
+      if (proc->vars ()) {
+
+        //  in the presence of variants, handle the object in top level space
+
+        const std::map<db::ICplxTrans, size_t> &vv = proc->vars ()->variants (cell->cell_index ());
+        tl_assert (vv.size () == 1);
+        const db::ICplxTrans &tr = vv.begin ()->first;
+        processed (layout, tr * *p, res);
+
+        if (! res.empty ()) {
+          db::ICplxTrans tri = tr.inverted ();
+          for (auto r = res.begin (); r != res.end (); ++r) {
+            results.front ().insert (tri * *r);
+          }
+        }
+
+      } else {
+
+        processed (layout, *p, res);
+
+        results.front ().insert (res.begin (), res.end ());
+
+      }
+
     }
   }
 };
@@ -1377,9 +1449,33 @@ private:
 
     std::vector<T> res;
     for (typename std::unordered_set<db::EdgePair>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
+
       res.clear ();
-      processed (layout, *p, res);
-      results.front ().insert (res.begin (), res.end ());
+
+      if (proc->vars ()) {
+
+        //  in the presence of variants, handle the object in top level space
+
+        const std::map<db::ICplxTrans, size_t> &vv = proc->vars ()->variants (cell->cell_index ());
+        tl_assert (vv.size () == 1);
+        const db::ICplxTrans &tr = vv.begin ()->first;
+        processed (layout, tr * *p, res);
+
+        if (! res.empty ()) {
+          db::ICplxTrans tri = tr.inverted ();
+          for (auto r = res.begin (); r != res.end (); ++r) {
+            results.front ().insert (tri * *r);
+          }
+        }
+
+      } else {
+
+        processed (layout, *p, res);
+
+        results.front ().insert (res.begin (), res.end ());
+
+      }
+
     }
   }
 };
@@ -1420,9 +1516,33 @@ private:
 
     std::vector<db::Edge> res;
     for (typename std::unordered_set<db::EdgePair>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
+
       res.clear ();
-      mp_proc->process (*p, res);
-      results.front ().insert (res.begin (), res.end ());
+
+      if (proc->vars ()) {
+
+        //  in the presence of variants, handle the object in top level space
+
+        const std::map<db::ICplxTrans, size_t> &vv = proc->vars ()->variants (cell->cell_index ());
+        tl_assert (vv.size () == 1);
+        const db::ICplxTrans &tr = vv.begin ()->first;
+        mp_proc->process (tr * *p, res);
+
+        if (! res.empty ()) {
+          db::ICplxTrans tri = tr.inverted ();
+          for (auto r = res.begin (); r != res.end (); ++r) {
+            results.front ().insert (tri * *r);
+          }
+        }
+
+      } else {
+
+        mp_proc->process (*p, res);
+
+        results.front ().insert (res.begin (), res.end ());
+
+      }
+
     }
   }
 };
@@ -1455,6 +1575,7 @@ private:
 
   void processed (db::Layout *, const db::Polygon &p, std::vector<db::Edge> &res) const;
   void processed (db::Layout *layout, const db::PolygonRef &p, std::vector<db::Edge> &res) const;
+  void processed (db::Layout *, const db::polygon_ref<db::Polygon, db::ICplxTrans> &p, std::vector<db::Edge> &res) const;
 
   template <class T>
   void implement_compute_local (db::CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<db::Edge> > &results, const db::LocalProcessorBase *proc) const
@@ -1466,9 +1587,33 @@ private:
 
     std::vector<db::Edge> res;
     for (typename std::unordered_set<T>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
+
       res.clear ();
-      processed (layout, *p, res);
-      results.front ().insert (res.begin (), res.end ());
+
+      if (proc->vars ()) {
+
+        //  in the presence of variants, handle the object in top level space
+
+        const std::map<db::ICplxTrans, size_t> &vv = proc->vars ()->variants (cell->cell_index ());
+        tl_assert (vv.size () == 1);
+        const db::ICplxTrans &tr = vv.begin ()->first;
+        processed (layout, tr * *p, res);
+
+        if (! res.empty ()) {
+          db::ICplxTrans tri = tr.inverted ();
+          for (auto r = res.begin (); r != res.end (); ++r) {
+            results.front ().insert (tri * *r);
+          }
+        }
+
+      } else {
+
+        processed (layout, *p, res);
+
+        results.front ().insert (res.begin (), res.end ());
+
+      }
+
     }
   }
 };
@@ -1506,11 +1651,12 @@ public:
   virtual void do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::PolygonRef, db::PolygonRef> & /*interactions*/, std::vector<std::unordered_set<db::Edge> > & /*results*/,        const db::LocalProcessorBase * /*proc*/) const { }
 
 private:
- PolygonToEdgePairProcessorBase *mp_proc;
+  PolygonToEdgePairProcessorBase *mp_proc;
   bool m_owns_proc;
 
   void processed (db::Layout *, const db::Polygon &p, std::vector<db::EdgePair> &res) const;
   void processed (db::Layout *layout, const db::PolygonRef &p, std::vector<db::EdgePair> &res) const;
+  void processed (db::Layout *, const db::polygon_ref<db::Polygon, db::ICplxTrans> &p, std::vector<db::EdgePair> &res) const;
 
   template <class T>
   void implement_compute_local (db::CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, const db::LocalProcessorBase *proc) const
@@ -1522,9 +1668,33 @@ private:
 
     std::vector<db::EdgePair> res;
     for (typename std::unordered_set<T>::const_iterator p = one.front ().begin (); p != one.front ().end (); ++p) {
+
       res.clear ();
-      processed (layout, *p, res);
-      results.front ().insert (res.begin (), res.end ());
+
+      if (proc->vars ()) {
+
+        //  in the presence of variants, handle the object in top level space
+
+        const std::map<db::ICplxTrans, size_t> &vv = proc->vars ()->variants (cell->cell_index ());
+        tl_assert (vv.size () == 1);
+        const db::ICplxTrans &tr = vv.begin ()->first;
+        processed (layout, tr * *p, res);
+
+        if (! res.empty ()) {
+          db::ICplxTrans tri = tr.inverted ();
+          for (auto r = res.begin (); r != res.end (); ++r) {
+            results.front ().insert (tri * *r);
+          }
+        }
+
+      } else {
+
+        processed (layout, *p, res);
+
+        results.front ().insert (res.begin (), res.end ());
+
+      }
+
     }
   }
 };
@@ -1560,6 +1730,9 @@ public:
   virtual OnEmptyIntruderHint on_empty_intruder_hint () const;
   virtual db::Coord computed_dist () const;
 
+  virtual const TransformationReducer *vars () const { return &m_vars; }
+  virtual bool wants_variants () const { return true; }
+
   virtual void do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, const LocalProcessorBase *proc) const;
   virtual void do_compute_local (CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, const LocalProcessorBase *proc) const;
 
@@ -1575,6 +1748,7 @@ private:
   db::RegionCheckOptions m_options;
   bool m_has_other;
   bool m_is_other_merged;
+  db::MagnificationReducer m_vars;
 };
 
 
@@ -1599,6 +1773,9 @@ public:
     : mp_node (node)
   { }
 
+  const TransformationReducer *vars () const { return mp_node->vars (); }
+  bool wants_variants () const { return mp_node->wants_variants (); }
+
 protected:
   virtual void do_compute_local (db::Layout *layout, db::Cell *cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase *proc) const
   {
@@ -1611,8 +1788,6 @@ protected:
   virtual bool requests_single_subjects () const { return true; }
   virtual std::string description () const { return mp_node->description (); }
 
-  const TransformationReducer *vars () const { return mp_node->vars (); }
-  bool wants_variants () const { return mp_node->wants_variants (); }
   std::vector<db::Region *> inputs () const { return mp_node->inputs (); }
 
 private:
@@ -1645,6 +1820,9 @@ public:
     }
   }
 
+  const TransformationReducer *vars () const { return mp_node->vars (); }
+  bool wants_variants () const { return mp_node->wants_variants (); }
+
 protected:
   virtual void do_compute_local (db::Layout *layout, db::Cell *cell, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &results, const db::LocalProcessorBase *proc) const
   {
@@ -1671,8 +1849,6 @@ protected:
   virtual bool requests_single_subjects () const { return true; }
   virtual std::string description () const { return mp_node->description (); }
 
-  const TransformationReducer *vars () const { return mp_node->vars (); }
-  bool wants_variants () const { return mp_node->wants_variants (); }
   std::vector<db::Region *> inputs () const { return mp_node->inputs (); }
 
 private:

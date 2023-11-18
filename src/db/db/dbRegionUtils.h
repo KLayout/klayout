@@ -593,11 +593,14 @@ public:
   SinglePolygonCheck (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options);
 
   virtual void process (const db::Polygon &polygon, std::vector<db::EdgePair> &res) const;
+  virtual const TransformationReducer *vars () const { return &m_vars; }
+  virtual bool wants_variants () const { return true; }
 
 private:
   db::edge_relation_type m_relation;
   db::Coord m_d;
   db::RegionCheckOptions m_options;
+  db::MagnificationReducer m_vars;
 };
 
 } // namespace db

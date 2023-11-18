@@ -490,6 +490,11 @@ public:
     mp_vars = vars;
   }
 
+  const db::VariantsCollectorBase *vars () const
+  {
+    return mp_vars;
+  }
+
   db::Coord dist_for_cell (db::cell_index_type cell_index, db::Coord dist) const;
   db::Coord dist_for_cell (const db::Cell *cell, db::Coord dist) const;
 

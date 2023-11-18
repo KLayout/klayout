@@ -1799,6 +1799,16 @@ Output *region_cop_impl (DeepRegion *region, db::CompoundRegionOperationNode &no
   }
 
   compound_local_operation<db::PolygonRef, db::PolygonRef, TR> op (&node);
+
+  //  Prepare cell variants if needed
+  db::VariantsCollectorBase vc (op.vars ());
+  if (op.wants_variants ()) {
+    vc.collect (polygons.layout (), polygons.initial_cell ());
+    //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
+    const_cast<db::DeepLayer &> (polygons).separate_variants (vc);
+    proc.set_vars (&vc);
+  }
+
   proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer ());
 
   return res.release ();
@@ -1852,6 +1862,16 @@ Output *region_cop_with_properties_impl (DeepRegion *region, db::CompoundRegionO
   }
 
   compound_local_operation_with_properties<db::PolygonRef, db::PolygonRef, TR> op (&node, prop_constraint, res->properties_repository (), subject_pr, intruder_prs);
+
+  //  Prepare cell variants if needed
+  db::VariantsCollectorBase vc (op.vars ());
+  if (op.wants_variants ()) {
+    vc.collect (polygons.layout (), polygons.initial_cell ());
+    //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
+    const_cast<db::DeepLayer &> (polygons).separate_variants (vc);
+    proc.set_vars (&vc);
+  }
+
   proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer ());
 
   return res.release ();

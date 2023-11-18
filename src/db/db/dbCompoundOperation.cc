@@ -1298,6 +1298,16 @@ CompoundRegionProcessingOperationNode::processed (db::Layout *layout, const db::
   }
 }
 
+void
+CompoundRegionProcessingOperationNode::processed (db::Layout *layout, const db::polygon_ref<db::Polygon, db::ICplxTrans> &p, std::vector<db::PolygonRef> &res) const
+{
+  std::vector<db::Polygon> poly;
+  mp_proc->process (p.obj ().transformed (p.trans ()), poly);
+  for (std::vector<db::Polygon>::const_iterator p = poly.begin (); p != poly.end (); ++p) {
+    res.push_back (db::PolygonRef (*p, layout->shape_repository ()));
+  }
+}
+
 // ---------------------------------------------------------------------------------------------
 
 CompoundRegionToEdgeProcessingOperationNode::CompoundRegionToEdgeProcessingOperationNode (PolygonToEdgeProcessorBase *proc, CompoundRegionOperationNode *input, bool owns_proc)
@@ -1334,6 +1344,12 @@ CompoundRegionToEdgeProcessingOperationNode::processed (db::Layout *, const db::
 
 void
 CompoundRegionToEdgeProcessingOperationNode::processed (db::Layout *, const db::PolygonRef &p, std::vector<db::Edge> &res) const
+{
+  mp_proc->process (p.obj ().transformed (p.trans ()), res);
+}
+
+void
+CompoundRegionToEdgeProcessingOperationNode::processed (db::Layout *, const db::polygon_ref<db::Polygon, db::ICplxTrans> &p, std::vector<db::Edge> &res) const
 {
   mp_proc->process (p.obj ().transformed (p.trans ()), res);
 }
@@ -1452,6 +1468,12 @@ CompoundRegionToEdgePairProcessingOperationNode::processed (db::Layout *, const 
 
 void
 CompoundRegionToEdgePairProcessingOperationNode::processed (db::Layout *, const db::PolygonRef &p, std::vector<db::EdgePair> &res) const
+{
+  mp_proc->process (p.obj ().transformed (p.trans ()), res);
+}
+
+void
+CompoundRegionToEdgePairProcessingOperationNode::processed (db::Layout *, const db::polygon_ref<db::Polygon, db::ICplxTrans> &p, std::vector<db::EdgePair> &res) const
 {
   mp_proc->process (p.obj ().transformed (p.trans ()), res);
 }
@@ -1593,9 +1615,13 @@ CompoundRegionCheckOperationNode::computed_dist () const
 void
 CompoundRegionCheckOperationNode::do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout *layout, db::Cell *cell, const shape_interactions<db::Polygon, db::Polygon> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, const db::LocalProcessorBase *proc) const
 {
+  //  consider magnification variants
+  db::EdgeRelationFilter check = m_check;
+  check.set_distance (proc->dist_for_cell (cell, check.distance ()));
+
   // TODO: needs a concept to deal with merged/non-merged inputs
   bool is_merged = true;
-  db::check_local_operation<db::Polygon, db::Polygon> op (m_check, m_different_polygons, is_merged, m_has_other, m_is_other_merged, m_options);
+  db::check_local_operation<db::Polygon, db::Polygon> op (check, m_different_polygons, is_merged, m_has_other, m_is_other_merged, m_options);
 
   tl_assert (results.size () == 1);
   if (results.front ().empty ()) {
@@ -1611,9 +1637,13 @@ CompoundRegionCheckOperationNode::do_compute_local (CompoundRegionOperationCache
 void
 CompoundRegionCheckOperationNode::do_compute_local (CompoundRegionOperationCache * /*cache*/, db::Layout *layout, db::Cell *cell, const shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, const db::LocalProcessorBase *proc) const
 {
+  //  consider magnification variants
+  db::EdgeRelationFilter check = m_check;
+  check.set_distance (proc->dist_for_cell (cell, check.distance ()));
+
   // TODO: needs a concept to deal with merged/non-merged inputs
   bool is_merged = true;
-  db::check_local_operation<db::PolygonRef, db::PolygonRef> op (m_check, m_different_polygons, is_merged, m_has_other, m_is_other_merged, m_options);
+  db::check_local_operation<db::PolygonRef, db::PolygonRef> op (check, m_different_polygons, is_merged, m_has_other, m_is_other_merged, m_options);
 
   tl_assert (results.size () == 1);
   if (results.front ().empty ()) {

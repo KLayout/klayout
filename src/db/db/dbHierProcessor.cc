@@ -1143,7 +1143,7 @@ public:
     db::Box ref_box = db::box_convert<TS> () (*ref);
     for (db::CellInstArray::iterator n = inst->begin_touching (safe_box_enlarged (ref_box, m_dist - 1, m_dist - 1), inst_bc); !n.at_end (); ++n) {
       db::ICplxTrans tn = inst->complex_trans (*n);
-      db::Box region = ref_box.transformed (tn.inverted ()).enlarged (db::Vector (m_dist, m_dist)) & intruder_cell.bbox (m_intruder_layer).enlarged (db::Vector (m_dist, m_dist));
+      db::Box region = ref_box.enlarged (db::Vector (m_dist, m_dist)).transformed (tn.inverted ()) & intruder_cell.bbox (m_intruder_layer) /*.enlarged (db::Vector (m_dist, m_dist))@@@*/;
       if (! region.empty ()) {
         add_shapes_from_intruder_inst (id1, intruder_cell, tn, inst_id, region);
       }

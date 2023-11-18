@@ -325,6 +325,7 @@ VariantsCollectorBase::separate_variants (db::Layout &layout, db::Cell &top_cell
           var_name += "$VAR" + tl::to_string (index);
 
           ci_var = layout.add_cell (var_name.c_str ());
+          m_called.insert (ci_var);
           layout.add_meta_info (ci_var, layout.begin_meta (*c), layout.end_meta (*c));
           copy_shapes (layout, ci_var, *c);
 

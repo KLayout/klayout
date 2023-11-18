@@ -1591,12 +1591,13 @@ void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned
       db::VariantsCollectorBase *coll = new db::VariantsCollectorBase (op_vars);
       set_vars_owned (coll);
 
-      coll->collect (*mp_subject_layout, *mp_subject_top);
-      mp_subject_layout->separate_variants (*coll, mp_subject_top->cell_index ());
+      coll->collect (mp_subject_layout, mp_subject_top->cell_index ());
+      coll->separate_variants ();
 
       if (mp_intruder_layout != mp_subject_layout) {
         db::VariantsCollectorBase vci (op_vars);
-        vci.collect (*mp_intruder_layout, *mp_intruder_top);
+        //  NOTE: we don't plan to use separate_variants, so the const cast is in order
+        vci.collect (const_cast<db::Layout *> (mp_intruder_layout), mp_intruder_top->cell_index ());
         if (vci.has_variants ()) {
           //  intruder layout needs to be the same one in that case - we do not want the secondary layout to be modified
           throw tl::Exception (tl::to_string (tr ("Can't modify second layout for cell variant formation - this case is not supported as of now")));

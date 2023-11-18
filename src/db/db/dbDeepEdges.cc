@@ -244,15 +244,16 @@ static void transform_deep_layer (db::DeepLayer &deep_layer, const Trans &t)
 
     //  Plain move
 
+    db::Layout &layout = deep_layer.layout ();
+
     //  build cell variants for different orientations
     db::OrientationReducer same_orientation;
 
     db::VariantsCollectorBase vars (&same_orientation);
-    vars.collect (deep_layer.layout (), deep_layer.initial_cell ());
-    deep_layer.separate_variants (vars);
+    vars.collect (&layout, deep_layer.initial_cell ().cell_index ());
+    vars.separate_variants ();
 
     //  process the variants
-    db::Layout &layout = deep_layer.layout ();
 
     for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
@@ -738,7 +739,7 @@ DeepEdges::length_type DeepEdges::length (const db::Box &box) const
 
     db::MagnificationReducer red;
     db::cell_variants_statistics<db::MagnificationReducer> vars (red);
-    vars.collect (edges.layout (), edges.initial_cell ());
+    vars.collect (&edges.layout (), edges.initial_cell ().cell_index ());
 
     DeepEdges::length_type l = 0;
 
@@ -810,21 +811,21 @@ DeepEdges *
 DeepEdges::apply_filter (const EdgeFilterBase &filter) const
 {
   const db::DeepLayer &edges = filter.requires_raw_input () ? deep_layer () : merged_deep_layer ();
+  db::Layout &layout = const_cast<db::Layout &> (edges.layout ());
 
   std::unique_ptr<VariantsCollectorBase> vars;
   if (filter.vars ()) {
 
     vars.reset (new db::VariantsCollectorBase (filter.vars ()));
 
-    vars->collect (edges.layout (), edges.initial_cell ());
+    vars->collect (&layout, edges.initial_cell ().cell_index ());
 
     if (filter.wants_variants ()) {
-      const_cast<db::DeepLayer &> (edges).separate_variants (*vars);
+      vars->separate_variants ();
     }
 
   }
 
-  db::Layout &layout = const_cast<db::Layout &> (edges.layout ());
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
 
   std::unique_ptr<db::DeepEdges> res (new db::DeepEdges (edges.derived ()));
@@ -867,7 +868,7 @@ DeepEdges::apply_filter (const EdgeFilterBase &filter) const
   }
 
   if (! to_commit.empty () && vars.get ()) {
-    res->deep_layer ().commit_shapes (*vars, to_commit);
+    vars->commit_shapes (res->deep_layer ().layer (), to_commit);
   }
 
   if (! filter.requires_raw_input ()) {
@@ -1258,7 +1259,7 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
   //  dots formally don't have an orientation, hence the interpretation is x and y.
   db::MagnificationReducer red;
   db::cell_variants_collector<db::MagnificationReducer> vars (red);
-  vars.collect (edges.layout (), edges.initial_cell ());
+  vars.collect (&layout, edges.initial_cell ().cell_index ());
 
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
 
@@ -1337,7 +1338,7 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
   }
 
   //  propagate results from variants
-  vars.commit_shapes (layout, top_cell, res->deep_layer ().layer (), to_commit);
+  vars.commit_shapes (res->deep_layer ().layer (), to_commit);
 
   return res.release ();
 }

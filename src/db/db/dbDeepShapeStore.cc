@@ -1284,13 +1284,6 @@ namespace
 }
 
 void
-DeepShapeStore::separate_variants (unsigned int layout_index, db::VariantsCollectorBase &coll)
-{
-  tl_assert (is_valid_layout_index (layout_index));
-  layout (layout_index).separate_variants (coll, initial_cell (layout_index).cell_index ());
-}
-
-void
 DeepShapeStore::insert (const DeepLayer &deep_layer, db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer)
 {
   db::LayoutLocker locker (into_layout);

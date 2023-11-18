@@ -1659,15 +1659,6 @@ public:
   void update () const;
 
   /**
-   *  @brief Separates cell variants as given by the cell variant collector
-   *
-   *  The cell variant collector must have been setup with the desired variants
-   *  using "collect". The new cell variants will be created and a "variants_created"
-   *  event is issued.
-   */
-  void separate_variants (db::VariantsCollectorBase &coll, cell_index_type initial_cell);
-
-  /**
    *  @brief Forces an update even if the layout is under construction
    *
    *  This method behaves like "update" but forces and update even if the 

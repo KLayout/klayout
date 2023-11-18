@@ -256,8 +256,8 @@ static void transform_deep_layer (db::DeepLayer &deep_layer, const Trans &t)
     db::MagnificationAndOrientationReducer same_orientation;
 
     db::VariantsCollectorBase vars (&same_orientation);
-    vars.collect (deep_layer.layout (), deep_layer.initial_cell ());
-    deep_layer.separate_variants (vars);
+    vars.collect (&deep_layer.layout (), deep_layer.initial_cell ().cell_index ());
+    vars.separate_variants ();
 
     //  process the variants
     db::Layout &layout = deep_layer.layout ();
@@ -1110,7 +1110,7 @@ DeepRegion::area (const db::Box &box) const
     const db::DeepLayer &polygons = merged_deep_layer ();
 
     db::cell_variants_statistics<db::MagnificationReducer> vars;
-    vars.collect (polygons.layout (), polygons.initial_cell ());
+    vars.collect (&polygons.layout (), polygons.initial_cell ().cell_index ());
 
     DeepRegion::area_type a = 0;
 
@@ -1147,7 +1147,7 @@ DeepRegion::perimeter (const db::Box &box) const
     const db::DeepLayer &polygons = merged_deep_layer ();
 
     db::cell_variants_statistics<db::MagnificationReducer> vars;
-    vars.collect (polygons.layout (), polygons.initial_cell ());
+    vars.collect (&polygons.layout (), polygons.initial_cell ().cell_index ());
 
     DeepRegion::perimeter_type p = 0;
 
@@ -1208,7 +1208,7 @@ DeepRegion::grid_check (db::Coord gx, db::Coord gy) const
   db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
   db::cell_variants_collector<db::GridReducer> vars (gx);
-  vars.collect (layout, polygons.initial_cell ());
+  vars.collect (&layout, polygons.initial_cell ().cell_index ());
 
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
   std::unique_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
@@ -1241,7 +1241,7 @@ DeepRegion::grid_check (db::Coord gx, db::Coord gy) const
   }
 
   //  propagate the markers with a similar algorithm used for producing the variants
-  res->deep_layer ().commit_shapes (vars, to_commit);
+  vars.commit_shapes (res->deep_layer ().layer (), to_commit);
 
   return res.release ();
 }
@@ -1295,15 +1295,13 @@ DeepRegion::snapped (db::Coord gx, db::Coord gy)
   }
 
   const db::DeepLayer &polygons = merged_deep_layer ();
+  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
   db::cell_variants_collector<db::GridReducer> vars (gx);
 
-  vars.collect (polygons.layout (), polygons.initial_cell ());
+  vars.collect (&layout, polygons.initial_cell ().cell_index ());
+  vars.separate_variants ();
 
-  //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-  const_cast<db::DeepLayer &> (polygons).separate_variants (vars);
-
-  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
   std::vector<db::Point> heap;
 
   std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
@@ -1363,19 +1361,16 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
     db::PropertyMapper pm (res->properties_repository (), &polygons.layout ().properties_repository ());
 
     std::unique_ptr<VariantsCollectorBase> vars;
+    db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
     if (filter && filter->vars ()) {
 
       vars.reset (new db::VariantsCollectorBase (filter->vars ()));
 
-      vars->collect (polygons.layout (), polygons.initial_cell ());
-
-      //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-      const_cast<db::DeepLayer &> (polygons).separate_variants (*vars);
+      vars->collect (&layout, polygons.initial_cell ().cell_index ());
+      vars->separate_variants ();
 
     }
-
-    db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
     for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
@@ -1476,21 +1471,21 @@ DeepRegion *
 DeepRegion::apply_filter (const PolygonFilterBase &filter) const
 {
   const db::DeepLayer &polygons = filter.requires_raw_input () ? deep_layer () : merged_deep_layer ();
+  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
   std::unique_ptr<VariantsCollectorBase> vars;
   if (filter.vars ()) {
 
     vars.reset (new db::VariantsCollectorBase (filter.vars ()));
 
-    vars->collect (polygons.layout (), polygons.initial_cell ());
+    vars->collect (&layout, polygons.initial_cell ().cell_index ());
 
     if (filter.wants_variants ()) {
-      const_cast<db::DeepLayer &> (polygons).separate_variants (*vars);
+      vars->separate_variants ();
     }
 
   }
 
-  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
 
   std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
@@ -1537,7 +1532,7 @@ DeepRegion::apply_filter (const PolygonFilterBase &filter) const
   }
 
   if (! to_commit.empty () && vars.get ()) {
-    res->deep_layer ().commit_shapes (*vars, to_commit);
+    vars->commit_shapes (res->deep_layer ().layer (), to_commit);
   }
 
   if (! filter.requires_raw_input ()) {
@@ -1647,10 +1642,8 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
   db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
   db::cell_variants_collector<db::MagnificationReducer> vars;
-  vars.collect (polygons.layout (), polygons.initial_cell ());
-
-  //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-  const_cast<db::DeepLayer &> (polygons).separate_variants (vars);
+  vars.collect (&layout, polygons.initial_cell ().cell_index ());
+  vars.separate_variants ();
 
   std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
@@ -1702,10 +1695,8 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
   db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
   db::cell_variants_collector<db::XYAnisotropyAndMagnificationReducer> vars;
-  vars.collect (polygons.layout (), polygons.initial_cell ());
-
-  //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-  const_cast<db::DeepLayer &> (polygons).separate_variants (vars);
+  vars.collect (&layout, polygons.initial_cell ().cell_index ());
+  vars.separate_variants ();
 
   std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
@@ -1998,14 +1989,11 @@ DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, c
   }
 
   const db::DeepLayer &polygons = merged_deep_layer ();
+  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
   db::cell_variants_collector<db::MagnificationReducer> vars;
-  vars.collect (polygons.layout (), polygons.initial_cell ());
-
-  //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-  const_cast<db::DeepLayer &> (polygons).separate_variants (vars);
-
-  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
+  vars.collect (&layout, polygons.initial_cell ().cell_index ());
+  vars.separate_variants ();
 
   std::unique_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {

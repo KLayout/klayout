@@ -105,14 +105,14 @@ TEST(1_Trivial)
 
   db::OrientationReducer red;
   db::cell_variants_collector<db::OrientationReducer> vb (red);
-  vb.collect (ly, a);
+  vb.collect (&ly, a.cell_index ());
   EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0");
   EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 0,0");
   EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "");
   EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
 
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > vm;
-  vb.separate_variants (ly, a, &vm);
+  vb.separate_variants (&vm);
   EXPECT_EQ (vm.empty (), true);
   EXPECT_EQ (vm2str (ly, vm), "");
 }
@@ -130,7 +130,7 @@ TEST(2_TwoVariants)
 
   db::OrientationReducer red;
   db::cell_variants_collector<db::OrientationReducer> vb (red);
-  vb.collect (ly, a);
+  vb.collect (&ly, a.cell_index ());
   EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0");
   EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "m0 *1 0,0;r0 *1 0,0");
   EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "");
@@ -139,7 +139,7 @@ TEST(2_TwoVariants)
   EXPECT_EQ (inst2str (ly, a), "B:r0 *1 1,10;B:m0 *1 1,100");
 
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > vm;
-  vb.separate_variants (ly, a, &vm);
+  vb.separate_variants (&vm);
   EXPECT_EQ (vm2str (ly, vm), "B:B[m0 *1 0,0],B$VAR1[r0 *1 0,0]");
   EXPECT_EQ (inst2str (ly, a), "B$VAR1:r0 *1 1,10;B:m0 *1 1,100");
 }
@@ -159,7 +159,7 @@ TEST(3_TwoLevels)
 
   db::OrientationReducer red;
   db::cell_variants_collector<db::OrientationReducer> vb (red);
-  vb.collect (ly, a);
+  vb.collect (&ly, a.cell_index ());
   EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0");
   EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 0,0;r90 *1 0,0");
   EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "m0 *1 0,0;r0 *1 0,0;m45 *1 0,0;r90 *1 0,0");
@@ -169,7 +169,7 @@ TEST(3_TwoLevels)
   EXPECT_EQ (inst2str (ly, b), "C:r0 *1 2,10;C:m0 *1 2,100");
 
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > vm;
-  vb.separate_variants (ly, a, &vm);
+  vb.separate_variants (&vm);
   EXPECT_EQ (vm2str (ly, vm), "B:B[r0 *1 0,0],B$VAR1[r90 *1 0,0];C:C[m0 *1 0,0],C$VAR1[r0 *1 0,0],C$VAR2[m45 *1 0,0],C$VAR3[r90 *1 0,0]");
 
   EXPECT_EQ (inst2str (ly, a), "B:r0 *1 1,10;B$VAR1:r90 *1 1,100");
@@ -193,7 +193,7 @@ TEST(4_ThreeLevels)
 
   db::OrientationReducer red;
   db::cell_variants_collector<db::OrientationReducer> vb (red);
-  vb.collect (ly, a);
+  vb.collect (&ly, a.cell_index ());
   EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0");
   EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 0,0;r90 *1 0,0");
   EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "m0 *1 0,0;r0 *1 0,0;m45 *1 0,0;r90 *1 0,0");
@@ -204,7 +204,7 @@ TEST(4_ThreeLevels)
   EXPECT_EQ (inst2str (ly, c), "D:m45 *1 0,0");
 
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > vm;
-  vb.separate_variants (ly, a, &vm);
+  vb.separate_variants (&vm);
   EXPECT_EQ (vm2str (ly, vm), "B:B[r0 *1 0,0],B$VAR1[r90 *1 0,0];C:C[m0 *1 0,0],C$VAR1[r0 *1 0,0],C$VAR2[m45 *1 0,0],C$VAR3[r90 *1 0,0];D:D[r270 *1 0,0],D$VAR1[m90 *1 0,0],D$VAR2[r0 *1 0,0],D$VAR3[m45 *1 0,0]");
 
   EXPECT_EQ (inst2str (ly, a), "B:r0 *1 1,10;B$VAR1:r90 *1 1,100");
@@ -231,7 +231,7 @@ TEST(5_ComplexTrans)
 
   db::OrientationReducer red;
   db::cell_variants_collector<db::OrientationReducer> vb (red);
-  vb.collect (ly, a);
+  vb.collect (&ly, a.cell_index ());
   EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0");
   EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 0,0;r90 *1 0,0");
   EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "m0 *1 0,0;r0 *1 0,0;m45 *1 0,0;r90 *1 0,0");
@@ -240,7 +240,6 @@ TEST(5_ComplexTrans)
 
 TEST(6_Arrays)
 {
-
   db::Layout ly;
   db::Cell &a = ly.cell (ly.add_cell ("A"));
   db::Cell &b = ly.cell (ly.add_cell ("B"));
@@ -254,7 +253,7 @@ TEST(6_Arrays)
 
   db::OrientationReducer red;
   db::cell_variants_collector<db::OrientationReducer> vb (red);
-  vb.collect (ly, a);
+  vb.collect (&ly, a.cell_index ());
   EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0");
   EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 0,0;r90 *1 0,0");
   EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "m0 *1 0,0;r0 *1 0,0;m45 *1 0,0;r90 *1 0,0");
@@ -276,7 +275,7 @@ TEST(7_ScalingVariants)
 
   db::MagnificationReducer red;
   db::cell_variants_collector<db::MagnificationReducer> vb (red);
-  vb.collect (ly, a);
+  vb.collect (&ly, a.cell_index ());
   EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0");
   EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 0,0;r0 *1.5 0,0");
   EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "r0 *1 0,0;r0 *1.5 0,0;r0 *2 0,0;r0 *3 0,0");
@@ -296,7 +295,7 @@ TEST(8_GridVariants)
 
   db::GridReducer red (10);
   db::cell_variants_collector<db::GridReducer> vb (red);
-  vb.collect (ly, a);
+  vb.collect (&ly, a.cell_index ());
   EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0");
   EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 1,0;r0 *1 3,0;r0 *1 1,1;r0 *1 3,1");
 
@@ -317,7 +316,7 @@ TEST(8_GridVariants)
   EXPECT_EQ (inst2str (ly, c), "");
 
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > vm;
-  vb.separate_variants (ly, a, &vm);
+  vb.separate_variants (&vm);
   EXPECT_EQ (vm2str (ly, vm), "B:B[r0 *1 1,0],B$VAR1[r0 *1 3,0],B$VAR2[r0 *1 1,1],B$VAR3[r0 *1 3,1];C:C[r0 *1 -5,3],C$VAR1[r0 *1 3,3],C$VAR2[r0 *1 -5,4],C$VAR3[r0 *1 3,4]");
 
   EXPECT_EQ (inst2str (ly, a), "B:r0 *1 1,10;B$VAR2:r0 *1 1,111;B$VAR1:r0 *1 103,10;B$VAR3:r0 *1 103,111");
@@ -343,7 +342,7 @@ TEST(9_ComplexGridVariants)
 
   db::GridReducer red (10);
   db::cell_variants_collector<db::GridReducer> vb (red);
-  vb.collect (ly, a);
+  vb.collect (&ly, a.cell_index ());
   EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0");
   EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *2 1,0;r90 *1 1,0;r0 *2 3,0;r0 *2 1,1;r0 *2 3,1");
 
@@ -398,8 +397,8 @@ TEST(100_OrientationVariantsWithLayout)
 
   db::OrientationReducer red;
   db::cell_variants_collector<db::OrientationReducer> vb (red);
-  vb.collect (ly, top_cell);
-  vb.separate_variants (ly, top_cell);
+  vb.collect (&ly, top_cell.cell_index ());
+  vb.separate_variants ();
 
   CHECKPOINT();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/cell_variants_au1.gds");
@@ -417,7 +416,7 @@ TEST(10_TrivialStatistics)
 
   db::OrientationReducer red;
   db::cell_variants_statistics<db::OrientationReducer> vb (red);
-  vb.collect (ly, a);
+  vb.collect (&ly, a.cell_index ());
   EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0[1]");
   EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 0,0[1]");
   EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "");
@@ -437,7 +436,7 @@ TEST(11_TwoVariantsStatistics)
 
   db::OrientationReducer red;
   db::cell_variants_statistics<db::OrientationReducer> vb (red);
-  vb.collect (ly, a);
+  vb.collect (&ly, a.cell_index ());
   EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0[1]");
   EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "m0 *1 0,0[1];r0 *1 0,0[1]");
   EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "");
@@ -461,7 +460,7 @@ TEST(12_TwoLevelsStatistics)
 
   db::OrientationReducer red;
   db::cell_variants_statistics<db::OrientationReducer> vb (red);
-  vb.collect (ly, a);
+  vb.collect (&ly, a.cell_index ());
   EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0[1]");
   EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 0,0[1];r90 *1 0,0[1]");
   EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "m0 *1 0,0[1];r0 *1 0,0[1];m45 *1 0,0[1];r90 *1 0,0[1]");
@@ -487,7 +486,7 @@ TEST(13_ThreeLevelsStatistics)
 
   db::OrientationReducer red;
   db::cell_variants_statistics<db::OrientationReducer> vb (red);
-  vb.collect (ly, a);
+  vb.collect (&ly, a.cell_index ());
   EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0[1]");
   EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 0,0[1];r90 *1 0,0[1]");
   EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "m0 *1 0,0[1];r0 *1 0,0[1];m45 *1 0,0[1];r90 *1 0,0[1]");
@@ -513,7 +512,7 @@ TEST(14_ComplexTransStatistics)
 
   db::OrientationReducer red;
   db::cell_variants_statistics<db::OrientationReducer> vb (red);
-  vb.collect (ly, a);
+  vb.collect (&ly, a.cell_index ());
   EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0[1]");
   EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 0,0[1];r90 *1 0,0[1]");
   EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "m0 *1 0,0[1];r0 *1 0,0[1];m45 *1 0,0[1];r90 *1 0,0[1]");
@@ -536,7 +535,7 @@ TEST(15_ArraysStatistics)
 
   db::OrientationReducer red;
   db::cell_variants_statistics<db::OrientationReducer> vb (red);
-  vb.collect (ly, a);
+  vb.collect (&ly, a.cell_index ());
   EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0[1]");
   EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 0,0[100];r90 *1 0,0[1]");
   EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "m0 *1 0,0[100];r0 *1 0,0[10000];m45 *1 0,0[1];r90 *1 0,0[100]");
@@ -558,7 +557,7 @@ TEST(16_ScalingVariantsStatistics)
 
   db::MagnificationReducer red;
   db::cell_variants_statistics<db::MagnificationReducer> vb (red);
-  vb.collect (ly, a);
+  vb.collect (&ly, a.cell_index ());
   EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0[1]");
   EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 0,0[1];r0 *1.5 0,0[100]");
   EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "r0 *1 0,0[1];r0 *1.5 0,0[100];r0 *2 0,0[100];r0 *3 0,0[10000]");
@@ -578,7 +577,7 @@ TEST(17_GridVariantsStatistics)
 
   db::GridReducer red (10);
   db::cell_variants_statistics<db::GridReducer> vb (red);
-  vb.collect (ly, a);
+  vb.collect (&ly, a.cell_index ());
   EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0[1]");
   EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 1,0[1];r0 *1 3,0[1];r0 *1 1,1[1];r0 *1 3,1[1]");
 
@@ -614,7 +613,7 @@ TEST(18_ComplexGridVariantsStatistics)
 
   db::GridReducer red (10);
   db::cell_variants_statistics<db::GridReducer> vb (red);
-  vb.collect (ly, a);
+  vb.collect (&ly, a.cell_index ());
   EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0[1]");
   EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *2 1,0[1];r90 *1 1,0[1];r0 *2 3,0[1];r0 *2 1,1[1];r0 *2 3,1[1]");
 
@@ -673,7 +672,7 @@ TEST(101_Propagation)
   unsigned int l2 = ly.insert_layer (db::LayerProperties (2, 0));
 
   db::cell_variants_collector<db::MagnificationAndOrientationReducer> vb;
-  vb.collect (ly, top_cell);
+  vb.collect (&ly, top_cell.cell_index ());
 
   for (db::Layout::const_iterator c = ly.begin (); c != ly.end (); ++c) {
 
@@ -691,7 +690,7 @@ TEST(101_Propagation)
 
   }
 
-  vb.commit_shapes (ly, top_cell, l2, to_commit);
+  vb.commit_shapes (l2, to_commit);
 
   CHECKPOINT();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/cell_variants_au2.gds");

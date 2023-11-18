@@ -386,21 +386,21 @@ DeepEdgePairs *
 DeepEdgePairs::apply_filter (const EdgePairFilterBase &filter) const
 {
   const db::DeepLayer &edge_pairs = deep_layer ();
+  db::Layout &layout = const_cast<db::Layout &> (edge_pairs.layout ());
 
   std::unique_ptr<VariantsCollectorBase> vars;
   if (filter.vars ()) {
 
     vars.reset (new db::VariantsCollectorBase (filter.vars ()));
 
-    vars->collect (edge_pairs.layout (), edge_pairs.initial_cell ());
+    vars->collect (&layout, edge_pairs.initial_cell ().cell_index ());
 
     if (filter.wants_variants ()) {
-      const_cast<db::DeepLayer &> (edge_pairs).separate_variants (*vars);
+      vars->separate_variants ();
     }
 
   }
 
-  db::Layout &layout = const_cast<db::Layout &> (edge_pairs.layout ());
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
 
   std::unique_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (edge_pairs.derived ()));
@@ -445,7 +445,7 @@ DeepEdgePairs::apply_filter (const EdgePairFilterBase &filter) const
   }
 
   if (! to_commit.empty () && vars.get ()) {
-    res->deep_layer ().commit_shapes (*vars, to_commit);
+    vars->commit_shapes (res->deep_layer ().layer (), to_commit);
   }
 
   return res.release ();

@@ -188,7 +188,7 @@ public:
   /**
    *  @brief Collects cell variants for the given layout starting from the top cell
    */
-  void collect (const db::Layout &layout, const db::Cell &top_cell);
+  void collect (Layout *layout, cell_index_type initial_cell);
 
   /**
    *  @brief Creates cell variants for singularization of the different variants
@@ -199,7 +199,7 @@ public:
    *  If given, *var_table will be filled with a map giving the new cell and variant against
    *  the old cell for all cells with more than one variant.
    */
-  void separate_variants (db::Layout &layout, db::Cell &top_cell, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > *var_table = 0);
+  void separate_variants (std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > *var_table = 0);
 
   /**
    *  @brief Commits the shapes for different variants to the current cell hierarchy
@@ -208,7 +208,7 @@ public:
    *  "to_commit" initially is a set of shapes to commit for the given cell and variant.
    *  This map is modified during the algorithm and should be discarded later.
    */
-  void commit_shapes (db::Layout &layout, db::Cell &top_cell, unsigned int layer, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > &to_commit);
+  void commit_shapes (unsigned int layer, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > &to_commit);
 
   /**
    *  @brief Gets the variants for a given cell
@@ -240,6 +240,7 @@ private:
   std::map<db::cell_index_type, std::set<db::ICplxTrans> > m_variants;
   std::set<db::cell_index_type> m_called;
   const TransformationReducer *mp_red;
+  db::Layout *mp_layout;
 
   void add_variant (std::set<ICplxTrans> &variants, const db::CellInstArray &inst, bool tl_invariant) const;
   void add_variant_non_tl_invariant (std::set<db::ICplxTrans> &variants, const db::CellInstArray &inst) const;
@@ -304,7 +305,8 @@ public:
   /**
    *  @brief Collects cell variants for the given layout starting from the top cell
    */
-  void collect (const db::Layout &layout, const db::Cell &top_cell);
+  void collect (const db::Layout *layout, db::cell_index_type initial_cell);
+
   /**
    *  @brief Gets the variants for a given cell
    *

@@ -521,8 +521,8 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
 
   {
     tl::SelfTimer timer1 (tl::verbosity () >= 41, tl::to_string (tr ("scale_and_snap: variant formation")));
-    vars.collect (layout, cell);
-    vars.separate_variants (layout, cell);
+    vars.collect (&layout, cell.cell_index ());
+    vars.separate_variants ();
   }
 
   std::set<db::cell_index_type> called_cells;

@@ -220,22 +220,23 @@ VariantsCollectorBase::VariantsCollectorBase ()
 }
 
 VariantsCollectorBase::VariantsCollectorBase (const TransformationReducer *red)
-  : mp_red (red)
+  : mp_red (red), mp_layout (0)
 {
   //  .. nothing yet ..
 }
 
 void
-VariantsCollectorBase::collect (const db::Layout &layout, const db::Cell &top_cell)
+VariantsCollectorBase::collect (Layout *layout, db::cell_index_type initial_cell)
 {
   tl_assert (mp_red != 0);
+  mp_layout = layout;
 
   m_called.clear ();
-  m_called.insert (top_cell.cell_index ());
+  m_called.insert (initial_cell);
 
-  top_cell.collect_called_cells (m_called);
+  layout->cell (initial_cell).collect_called_cells (m_called);
 
-  for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
+  for (db::Layout::top_down_const_iterator c = layout->begin_top_down (); c != layout->end_top_down (); ++c) {
 
     if (m_called.find (*c) == m_called.end ()) {
       continue;
@@ -244,7 +245,7 @@ VariantsCollectorBase::collect (const db::Layout &layout, const db::Cell &top_ce
     //  collect the parent variants per parent cell
 
     std::map<db::cell_index_type, std::set<db::ICplxTrans> > variants_per_parent_cell;
-    for (db::Cell::parent_inst_iterator pi = layout.cell (*c).begin_parent_insts (); ! pi.at_end (); ++pi) {
+    for (db::Cell::parent_inst_iterator pi = layout->cell (*c).begin_parent_insts (); ! pi.at_end (); ++pi) {
       std::set<db::ICplxTrans> &variants = variants_per_parent_cell [pi->inst ().object ().cell_index ()];
       add_variant (variants, pi->child_inst ().cell_inst (), mp_red->is_translation_invariant ());
     }
@@ -275,15 +276,11 @@ VariantsCollectorBase::collect (const db::Layout &layout, const db::Cell &top_ce
 }
 
 void
-VariantsCollectorBase::separate_variants (db::Layout &layout, db::Cell &top_cell, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > *var_table)
+VariantsCollectorBase::separate_variants (std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > *var_table)
 {
   tl_assert (mp_red != 0);
 
-  db::LayoutLocker locker (&layout);
-
-  std::set<db::cell_index_type> called;
-  top_cell.collect_called_cells (called);
-  called.insert (top_cell.cell_index ());
+  db::LayoutLocker locker (mp_layout);
 
   //  create new cells for the variants
 
@@ -292,13 +289,13 @@ VariantsCollectorBase::separate_variants (db::Layout &layout, db::Cell &top_cell
     var_table = &var_table_intern;
   }
 
-  for (db::Layout::bottom_up_const_iterator c = layout.begin_bottom_up (); c != layout.end_bottom_up (); ++c) {
+  for (db::Layout::bottom_up_const_iterator c = mp_layout->begin_bottom_up (); c != mp_layout->end_bottom_up (); ++c) {
 
-    if (called.find (*c) == called.end ()) {
+    if (m_called.find (*c) == m_called.end ()) {
       continue;
     }
 
-    db::Cell &cell = layout.cell (*c);
+    db::Cell &cell = mp_layout->cell (*c);
 
     auto vc = m_variants.find (*c);
     if (vc != m_variants.end () && vc->second.size () > 1) {
@@ -321,13 +318,13 @@ VariantsCollectorBase::separate_variants (db::Layout &layout, db::Cell &top_cell
 
         if (v != vc->second.begin ()) {
 
-          std::string var_name = layout.cell_name (*c);
+          std::string var_name = mp_layout->cell_name (*c);
           var_name += "$VAR" + tl::to_string (index);
 
-          ci_var = layout.add_cell (var_name.c_str ());
+          ci_var = mp_layout->add_cell (var_name.c_str ());
           m_called.insert (ci_var);
-          layout.add_meta_info (ci_var, layout.begin_meta (*c), layout.end_meta (*c));
-          copy_shapes (layout, ci_var, *c);
+          mp_layout->add_meta_info (ci_var, mp_layout->begin_meta (*c), mp_layout->end_meta (*c));
+          copy_shapes (*mp_layout, ci_var, *c);
 
           //  a new entry for the variant
           if (! v->is_unity ()) {
@@ -339,7 +336,7 @@ VariantsCollectorBase::separate_variants (db::Layout &layout, db::Cell &top_cell
         }
 
         vt.insert (std::make_pair (*v, ci_var));
-        create_var_instances (layout.cell (ci_var), inst, *v, *var_table, mp_red->is_translation_invariant ());
+        create_var_instances (mp_layout->cell (ci_var), inst, *v, *var_table, mp_red->is_translation_invariant ());
 
       }
 
@@ -384,10 +381,12 @@ VariantsCollectorBase::separate_variants (db::Layout &layout, db::Cell &top_cell
     }
 
   }
+
+  mp_layout->variants_created_event (var_table);
 }
 
 void
-VariantsCollectorBase::commit_shapes (db::Layout &layout, db::Cell &top_cell, unsigned int layer, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > &to_commit)
+VariantsCollectorBase::commit_shapes (unsigned int layer, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > &to_commit)
 {
   tl_assert (mp_red != 0);
 
@@ -398,19 +397,15 @@ VariantsCollectorBase::commit_shapes (db::Layout &layout, db::Cell &top_cell, un
   //  NOTE: this implementation suffers from accumulation of propagated shapes: we add more levels of propagated
   //  shapes if required. We don't clean up, because we do not know when a shape collection stops being required.
 
-  db::LayoutLocker locker (&layout);
+  db::LayoutLocker locker (mp_layout);
 
-  std::set<db::cell_index_type> called;
-  top_cell.collect_called_cells (called);
-  called.insert (top_cell.cell_index ());
+  for (db::Layout::bottom_up_const_iterator c = mp_layout->begin_bottom_up (); c != mp_layout->end_bottom_up (); ++c) {
 
-  for (db::Layout::bottom_up_const_iterator c = layout.begin_bottom_up (); c != layout.end_bottom_up (); ++c) {
-
-    if (called.find (*c) == called.end ()) {
+    if (m_called.find (*c) == m_called.end ()) {
       continue;
     }
 
-    db::Cell &cell = layout.cell (*c);
+    db::Cell &cell = mp_layout->cell (*c);
 
     auto vvc = m_variants.find (*c);
     if (vvc != m_variants.end () && vvc->second.size () > 1) {
@@ -722,17 +717,17 @@ VariantStatistics::VariantStatistics (const TransformationReducer *red)
 }
 
 void
-VariantStatistics::collect (const db::Layout &layout, const db::Cell &top_cell)
+VariantStatistics::collect (const db::Layout *layout, db::cell_index_type initial_cell)
 {
   tl_assert (mp_red != 0);
 
   //  The top cell gets a "variant" with unit transformation
-  m_variants [top_cell.cell_index ()].insert (std::make_pair (db::ICplxTrans (), 1));
+  m_variants [initial_cell].insert (std::make_pair (db::ICplxTrans (), 1));
 
   std::set<db::cell_index_type> called;
-  top_cell.collect_called_cells (called);
+  layout->cell (initial_cell).collect_called_cells (called);
 
-  for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
+  for (db::Layout::top_down_const_iterator c = layout->begin_top_down (); c != layout->end_top_down (); ++c) {
 
     if (called.find (*c) == called.end ()) {
       continue;
@@ -741,7 +736,7 @@ VariantStatistics::collect (const db::Layout &layout, const db::Cell &top_cell)
     //  collect the parent variants per parent cell
 
     std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> > variants_per_parent_cell;
-    for (db::Cell::parent_inst_iterator pi = layout.cell (*c).begin_parent_insts (); ! pi.at_end (); ++pi) {
+    for (db::Cell::parent_inst_iterator pi = layout->cell (*c).begin_parent_insts (); ! pi.at_end (); ++pi) {
       std::map<db::ICplxTrans, size_t> &variants = variants_per_parent_cell [pi->inst ().object ().cell_index ()];
       add_variant (variants, pi->child_inst ().cell_inst (), mp_red->is_translation_invariant ());
     }

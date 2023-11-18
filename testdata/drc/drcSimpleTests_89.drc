@@ -1,0 +1,15 @@
+
+source $drc_test_source
+target $drc_test_target
+
+deep
+
+l1 = input(1, 0)
+
+l1.output(1, 0)
+
+l1.drc(sized(0.2, 0.0)).output(100, 0)
+l1.drc(sized(0.0, 0.2)).output(101, 0)
+l1.drc(sized(-0.2, 0.0)).output(102, 0)
+l1.drc(sized(0.0, -0.2)).output(103, 0)
+

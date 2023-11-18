@@ -1299,12 +1299,30 @@ CompoundRegionProcessingOperationNode::processed (db::Layout *layout, const db::
 }
 
 void
-CompoundRegionProcessingOperationNode::processed (db::Layout *layout, const db::polygon_ref<db::Polygon, db::ICplxTrans> &p, std::vector<db::PolygonRef> &res) const
+CompoundRegionProcessingOperationNode::processed (db::Layout *, const db::Polygon &p, const db::ICplxTrans &tr, std::vector<db::Polygon> &res) const
+{
+  size_t n = res.size ();
+  mp_proc->process (tr * p, res);
+
+  if (res.size () > n) {
+    db::ICplxTrans tri = tr.inverted ();
+    for (auto p = res.begin () + n; p != res.end (); ++p) {
+      p->transform (tri);
+    }
+  }
+}
+
+void
+CompoundRegionProcessingOperationNode::processed (db::Layout *layout, const db::PolygonRef &p, const db::ICplxTrans &tr, std::vector<db::PolygonRef> &res) const
 {
   std::vector<db::Polygon> poly;
-  mp_proc->process (p.obj ().transformed (p.trans ()), poly);
-  for (std::vector<db::Polygon>::const_iterator p = poly.begin (); p != poly.end (); ++p) {
-    res.push_back (db::PolygonRef (*p, layout->shape_repository ()));
+  mp_proc->process (p.obj ().transformed (p.trans ()).transformed (tr), poly);
+
+  if (! poly.empty ()) {
+    db::ICplxTrans tri = tr.inverted ();
+    for (std::vector<db::Polygon>::const_iterator p = poly.begin (); p != poly.end (); ++p) {
+      res.push_back (db::PolygonRef (tri * *p, layout->shape_repository ()));
+    }
   }
 }
 
@@ -1349,9 +1367,31 @@ CompoundRegionToEdgeProcessingOperationNode::processed (db::Layout *, const db::
 }
 
 void
-CompoundRegionToEdgeProcessingOperationNode::processed (db::Layout *, const db::polygon_ref<db::Polygon, db::ICplxTrans> &p, std::vector<db::Edge> &res) const
+CompoundRegionToEdgeProcessingOperationNode::processed (db::Layout *, const db::Polygon &p, const db::ICplxTrans &tr, std::vector<db::Edge> &res) const
 {
-  mp_proc->process (p.obj ().transformed (p.trans ()), res);
+  size_t n = res.size ();
+  mp_proc->process (tr * p, res);
+
+  if (res.size () > n) {
+    db::ICplxTrans tri = tr.inverted ();
+    for (auto p = res.begin () + n; p != res.end (); ++p) {
+      p->transform (tri);
+    }
+  }
+}
+
+void
+CompoundRegionToEdgeProcessingOperationNode::processed (db::Layout *, const db::PolygonRef &p, const db::ICplxTrans &tr, std::vector<db::Edge> &res) const
+{
+  size_t n = res.size ();
+  mp_proc->process (p.obj ().transformed (p.trans ()).transformed (tr), res);
+
+  if (res.size () > n) {
+    db::ICplxTrans tri = tr.inverted ();
+    for (auto p = res.begin () + n; p != res.end (); ++p) {
+      p->transform (tri);
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1473,9 +1513,31 @@ CompoundRegionToEdgePairProcessingOperationNode::processed (db::Layout *, const 
 }
 
 void
-CompoundRegionToEdgePairProcessingOperationNode::processed (db::Layout *, const db::polygon_ref<db::Polygon, db::ICplxTrans> &p, std::vector<db::EdgePair> &res) const
+CompoundRegionToEdgePairProcessingOperationNode::processed (db::Layout *, const db::Polygon &p, const db::ICplxTrans &tr, std::vector<db::EdgePair> &res) const
 {
-  mp_proc->process (p.obj ().transformed (p.trans ()), res);
+  size_t n = res.size ();
+  mp_proc->process (tr * p, res);
+
+  if (res.size () > n) {
+    db::ICplxTrans tri = tr.inverted ();
+    for (auto p = res.begin () + n; p != res.end (); ++p) {
+      p->transform (tri);
+    }
+  }
+}
+
+void
+CompoundRegionToEdgePairProcessingOperationNode::processed (db::Layout *, const db::PolygonRef &p, const db::ICplxTrans &tr, std::vector<db::EdgePair> &res) const
+{
+  size_t n = res.size ();
+  mp_proc->process (p.obj ().transformed (p.trans ()).transformed (tr), res);
+
+  if (res.size () > n) {
+    db::ICplxTrans tri = tr.inverted ();
+    for (auto p = res.begin () + n; p != res.end (); ++p) {
+      p->transform (tri);
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------------------------

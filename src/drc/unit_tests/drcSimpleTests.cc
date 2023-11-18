@@ -1566,3 +1566,54 @@ TEST(70d_props)
 {
   run_test (_this, "70", true);
 }
+
+TEST(80_deep_with_mag_width)
+{
+  run_test (_this, "80", true);
+}
+
+TEST(81_deep_with_mag_space)
+{
+  run_test (_this, "81", true);
+}
+
+TEST(82_deep_with_mag_cop_width)
+{
+  run_test (_this, "82", true);
+}
+
+TEST(83_deep_with_mag_cop_space)
+{
+  run_test (_this, "83", true);
+}
+
+TEST(84_deep_with_mag_edge_width)
+{
+  run_test (_this, "84", true);
+}
+
+TEST(85_deep_with_mag_edge_space)
+{
+  run_test (_this, "85", true);
+}
+
+TEST(86_deep_with_mag_size)
+{
+  run_test (_this, "86", true);
+}
+
+TEST(87_deep_with_mag_size_aniso)
+{
+  run_test (_this, "87", true);
+}
+
+TEST(88_deep_with_mag_cop_size)
+{
+  run_test (_this, "88", true);
+}
+
+TEST(89_deep_with_mag_cop_size_aniso)
+{
+  run_test (_this, "89", true);
+}
+

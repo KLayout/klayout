@@ -1138,7 +1138,8 @@ private:
 
   void processed (db::Layout *, const db::Polygon &p, std::vector<db::Polygon> &res) const;
   void processed (db::Layout *, const db::PolygonRef &p, std::vector<db::PolygonRef> &res) const;
-  void processed (db::Layout *, const db::polygon_ref<db::Polygon, db::ICplxTrans> &p, std::vector<db::PolygonRef> &res) const;
+  void processed (db::Layout *, const db::Polygon &p, const db::ICplxTrans &tr, std::vector<db::Polygon> &res) const;
+  void processed (db::Layout *, const db::PolygonRef &p, const db::ICplxTrans &tr, std::vector<db::PolygonRef> &res) const;
 
   template <class T>
   void implement_compute_local (db::CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<T> > &results, const db::LocalProcessorBase *proc) const
@@ -1160,22 +1161,15 @@ private:
         const std::map<db::ICplxTrans, size_t> &vv = proc->vars ()->variants (cell->cell_index ());
         tl_assert (vv.size () == 1);
         const db::ICplxTrans &tr = vv.begin ()->first;
-        processed (layout, tr * *p, res);
-
-        if (! res.empty ()) {
-          db::ICplxTrans tri = tr.inverted ();
-          for (auto r = res.begin (); r != res.end (); ++r) {
-            results.front ().insert (tri * *r);
-          }
-        }
+        processed (layout, *p, tr, res);
 
       } else {
 
         processed (layout, *p, res);
 
-        results.front ().insert (res.begin (), res.end ());
-
       }
+
+      results.front ().insert (res.begin (), res.end ());
 
     }
   }
@@ -1575,7 +1569,8 @@ private:
 
   void processed (db::Layout *, const db::Polygon &p, std::vector<db::Edge> &res) const;
   void processed (db::Layout *layout, const db::PolygonRef &p, std::vector<db::Edge> &res) const;
-  void processed (db::Layout *, const db::polygon_ref<db::Polygon, db::ICplxTrans> &p, std::vector<db::Edge> &res) const;
+  void processed (db::Layout *, const db::Polygon &p, const db::ICplxTrans &tr, std::vector<db::Edge> &res) const;
+  void processed (db::Layout *, const db::PolygonRef &p, const db::ICplxTrans &tr, std::vector<db::Edge> &res) const;
 
   template <class T>
   void implement_compute_local (db::CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<db::Edge> > &results, const db::LocalProcessorBase *proc) const
@@ -1597,22 +1592,15 @@ private:
         const std::map<db::ICplxTrans, size_t> &vv = proc->vars ()->variants (cell->cell_index ());
         tl_assert (vv.size () == 1);
         const db::ICplxTrans &tr = vv.begin ()->first;
-        processed (layout, tr * *p, res);
-
-        if (! res.empty ()) {
-          db::ICplxTrans tri = tr.inverted ();
-          for (auto r = res.begin (); r != res.end (); ++r) {
-            results.front ().insert (tri * *r);
-          }
-        }
+        processed (layout, *p, tr, res);
 
       } else {
 
         processed (layout, *p, res);
 
-        results.front ().insert (res.begin (), res.end ());
-
       }
+
+      results.front ().insert (res.begin (), res.end ());
 
     }
   }
@@ -1656,7 +1644,8 @@ private:
 
   void processed (db::Layout *, const db::Polygon &p, std::vector<db::EdgePair> &res) const;
   void processed (db::Layout *layout, const db::PolygonRef &p, std::vector<db::EdgePair> &res) const;
-  void processed (db::Layout *, const db::polygon_ref<db::Polygon, db::ICplxTrans> &p, std::vector<db::EdgePair> &res) const;
+  void processed (db::Layout *, const db::Polygon &p, const db::ICplxTrans &tr, std::vector<db::EdgePair> &res) const;
+  void processed (db::Layout *layout, const db::PolygonRef &p, const db::ICplxTrans &tr, std::vector<db::EdgePair> &res) const;
 
   template <class T>
   void implement_compute_local (db::CompoundRegionOperationCache *cache, db::Layout *layout, db::Cell *cell, const shape_interactions<T, T> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, const db::LocalProcessorBase *proc) const
@@ -1678,22 +1667,15 @@ private:
         const std::map<db::ICplxTrans, size_t> &vv = proc->vars ()->variants (cell->cell_index ());
         tl_assert (vv.size () == 1);
         const db::ICplxTrans &tr = vv.begin ()->first;
-        processed (layout, tr * *p, res);
-
-        if (! res.empty ()) {
-          db::ICplxTrans tri = tr.inverted ();
-          for (auto r = res.begin (); r != res.end (); ++r) {
-            results.front ().insert (tri * *r);
-          }
-        }
+        processed (layout, *p, tr, res);
 
       } else {
 
         processed (layout, *p, res);
 
-        results.front ().insert (res.begin (), res.end ());
-
       }
+
+      results.front ().insert (res.begin (), res.end ());
 
     }
   }

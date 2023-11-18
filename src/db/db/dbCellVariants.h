@@ -282,6 +282,85 @@ private:
   RED m_red;
 };
 
+/**
+ *  @brief A class computing variants for cells with statistics
+ *
+ *  This version provides detailed information about the multiplicity of a certain variant.
+ *  It does not offer a way to seperate variants.
+ */
+class DB_PUBLIC VariantStatistics
+{
+public:
+  /**
+   *  @brief Creates a variant collector without a transformation reducer
+   */
+  VariantStatistics ();
+
+  /**
+   *  @brief Creates a variant collector with the given reducer
+   */
+  VariantStatistics (const TransformationReducer *red);
+
+  /**
+   *  @brief Collects cell variants for the given layout starting from the top cell
+   */
+  void collect (const db::Layout &layout, const db::Cell &top_cell);
+  /**
+   *  @brief Gets the variants for a given cell
+   *
+   *  The keys of the map are the variants, the values is the instance count of the variant
+   *  (as seen from the top cell).
+   */
+  const std::map<db::ICplxTrans, size_t> &variants (db::cell_index_type ci) const;
+
+  /**
+   *  @brief Returns true, if variants have been built
+   */
+  bool has_variants () const;
+
+private:
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> > m_variants;
+  const TransformationReducer *mp_red;
+
+  void add_variant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst, bool tl_invariant) const;
+  void add_variant_non_tl_invariant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst) const;
+  void add_variant_tl_invariant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst) const;
+  void product (const std::map<db::ICplxTrans, size_t> &v1, const std::map<db::ICplxTrans, size_t> &v2, std::map<db::ICplxTrans, size_t> &prod) const;
+};
+
+/**
+ *  @brief A template using a specific transformation reducer
+ */
+template <class RED>
+class DB_PUBLIC_TEMPLATE cell_variants_statistics
+  : public VariantStatistics
+{
+public:
+  /**
+   *  @brief Creates a variant statistics without a transformation reducer
+   */
+  cell_variants_statistics ()
+    : VariantStatistics (&m_red)
+  {
+    //  .. nothing yet ..
+  }
+
+  /**
+   *  @brief Creates a variant statistics with the given reducer
+   *
+   *  The statistics object will take ownership over the reducer
+   */
+  cell_variants_statistics (const RED &red)
+    : VariantStatistics (&m_red), m_red (red)
+  {
+    //  .. nothing yet ..
+  }
+
+private:
+  RED m_red;
+};
+
+
 }  // namespace db
 
 #endif

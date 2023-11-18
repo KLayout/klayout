@@ -706,5 +706,122 @@ VariantsCollectorBase::create_var_instances_tl_invariant (db::Cell &in_cell, std
   }
 }
 
+// ------------------------------------------------------------------------------------------
+
+VariantStatistics::VariantStatistics ()
+  : mp_red ()
+{
+  //  .. nothing yet ..
+}
+
+VariantStatistics::VariantStatistics (const TransformationReducer *red)
+  : mp_red (red)
+{
+  //  .. nothing yet ..
+}
+
+void
+VariantStatistics::collect (const db::Layout &layout, const db::Cell &top_cell)
+{
+  tl_assert (mp_red != 0);
+
+  //  The top cell gets a "variant" with unit transformation
+  m_variants [top_cell.cell_index ()].insert (std::make_pair (db::ICplxTrans (), 1));
+
+  std::set<db::cell_index_type> called;
+  top_cell.collect_called_cells (called);
+
+  for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
+
+    if (called.find (*c) == called.end ()) {
+      continue;
+    }
+
+    //  collect the parent variants per parent cell
+
+    std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> > variants_per_parent_cell;
+    for (db::Cell::parent_inst_iterator pi = layout.cell (*c).begin_parent_insts (); ! pi.at_end (); ++pi) {
+      std::map<db::ICplxTrans, size_t> &variants = variants_per_parent_cell [pi->inst ().object ().cell_index ()];
+      add_variant (variants, pi->child_inst ().cell_inst (), mp_red->is_translation_invariant ());
+    }
+
+    //  compute the resulting variants
+
+    std::map<db::ICplxTrans, size_t> &new_variants = m_variants [*c];
+
+    for (std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> >::const_iterator pv = variants_per_parent_cell.begin (); pv != variants_per_parent_cell.end (); ++pv) {
+      product (variants (pv->first), pv->second, new_variants);
+    }
+
+  }
+}
+
+const std::map<db::ICplxTrans, size_t> &
+VariantStatistics::variants (db::cell_index_type ci) const
+{
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> >::const_iterator v = m_variants.find (ci);
+  static std::map<db::ICplxTrans, size_t> empty_set;
+  if (v == m_variants.end ()) {
+    return empty_set;
+  } else {
+    return v->second;
+  }
+}
+
+bool
+VariantStatistics::has_variants () const
+{
+  for (std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> >::const_iterator i = m_variants.begin (); i != m_variants.end (); ++i) {
+    if (i->second.size () > 1) {
+      return true;
+    }
+  }
+  return false;
+}
+
+void
+VariantStatistics::add_variant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst, bool tl_invariant) const
+{
+  if (tl_invariant) {
+    add_variant_tl_invariant (variants, inst);
+  } else {
+    add_variant_non_tl_invariant (variants, inst);
+  }
+}
+
+void
+VariantStatistics::add_variant_non_tl_invariant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst) const
+{
+  if (inst.is_complex ()) {
+    for (db::CellInstArray::iterator i = inst.begin (); ! i.at_end (); ++i) {
+      variants [mp_red->reduce_trans (inst.complex_trans (*i))] += 1;
+    }
+  } else {
+    for (db::CellInstArray::iterator i = inst.begin (); ! i.at_end (); ++i) {
+      variants [db::ICplxTrans (mp_red->reduce_trans (*i))] += 1;
+    }
+  }
+}
+
+void
+VariantStatistics::add_variant_tl_invariant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst) const
+{
+  if (inst.is_complex ()) {
+    variants [mp_red->reduce_trans (inst.complex_trans ())] += inst.size ();
+  } else {
+    variants [db::ICplxTrans (mp_red->reduce_trans (inst.front ()))] += inst.size ();
+  }
+}
+
+void
+VariantStatistics::product (const std::map<db::ICplxTrans, size_t> &v1, const std::map<db::ICplxTrans, size_t> &v2, std::map<db::ICplxTrans, size_t> &prod) const
+{
+  for (std::map<db::ICplxTrans, size_t>::const_iterator i = v1.begin (); i != v1.end (); ++i) {
+    for (std::map<db::ICplxTrans, size_t>::const_iterator j = v2.begin (); j != v2.end (); ++j) {
+      prod [mp_red->reduce (i->first * j->first)] += i->second * j->second;
+    }
+  }
+}
+
 }
 

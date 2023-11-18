@@ -1109,7 +1109,7 @@ DeepRegion::area (const db::Box &box) const
 
     const db::DeepLayer &polygons = merged_deep_layer ();
 
-    db::cell_variants_collector<db::MagnificationReducer> vars;
+    db::cell_variants_statistics<db::MagnificationReducer> vars;
     vars.collect (polygons.layout (), polygons.initial_cell ());
 
     DeepRegion::area_type a = 0;
@@ -1120,10 +1120,10 @@ DeepRegion::area (const db::Box &box) const
       for (db::ShapeIterator s = layout.cell (*c).shapes (polygons.layer ()).begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
         ac += s->area ();
       }
-      const std::set<db::ICplxTrans> &vv = vars.variants (*c);
+      const std::map<db::ICplxTrans, size_t> &vv = vars.variants (*c);
       for (auto v = vv.begin (); v != vv.end (); ++v) {
-        double mag = v->mag ();
-        // @@@ a += v->second * ac * mag * mag;
+        double mag = v->first.mag ();
+        a += v->second * ac * mag * mag;
       }
     }
 
@@ -1146,7 +1146,7 @@ DeepRegion::perimeter (const db::Box &box) const
 
     const db::DeepLayer &polygons = merged_deep_layer ();
 
-    db::cell_variants_collector<db::MagnificationReducer> vars;
+    db::cell_variants_statistics<db::MagnificationReducer> vars;
     vars.collect (polygons.layout (), polygons.initial_cell ());
 
     DeepRegion::perimeter_type p = 0;
@@ -1157,10 +1157,10 @@ DeepRegion::perimeter (const db::Box &box) const
       for (db::ShapeIterator s = layout.cell (*c).shapes (polygons.layer ()).begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
         pc += s->perimeter ();
       }
-      const std::set<db::ICplxTrans> &vv = vars.variants (*c);
+      const std::map<db::ICplxTrans, size_t> &vv = vars.variants (*c);
       for (auto v = vv.begin (); v != vv.end (); ++v) {
-        double mag = v->mag ();
-        // @@@ p += v->second * pc * mag;
+        double mag = v->first.mag ();
+        p += v->second * pc * mag;
       }
     }
 

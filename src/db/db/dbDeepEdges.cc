@@ -737,7 +737,7 @@ DeepEdges::length_type DeepEdges::length (const db::Box &box) const
     const db::DeepLayer &edges = merged_deep_layer ();
 
     db::MagnificationReducer red;
-    db::cell_variants_collector<db::MagnificationReducer> vars (red);
+    db::cell_variants_statistics<db::MagnificationReducer> vars (red);
     vars.collect (edges.layout (), edges.initial_cell ());
 
     DeepEdges::length_type l = 0;
@@ -748,10 +748,10 @@ DeepEdges::length_type DeepEdges::length (const db::Box &box) const
       for (db::ShapeIterator s = layout.cell (*c).shapes (edges.layer ()).begin (db::ShapeIterator::Edges); ! s.at_end (); ++s) {
         lc += s->edge ().length ();
       }
-      const std::set<db::ICplxTrans> &vv = vars.variants (*c);
+      const std::map<db::ICplxTrans, size_t> &vv = vars.variants (*c);
       for (auto v = vv.begin (); v != vv.end (); ++v) {
-        double mag = v->mag ();
-        // @@@ l += v->second * lc * mag;
+        double mag = v->first.mag ();
+        l += v->second * lc * mag;
       }
     }
 

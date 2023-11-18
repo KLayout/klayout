@@ -39,6 +39,21 @@ std::string var2str (const std::set<db::ICplxTrans> &vars)
   return res;
 }
 
+std::string var2str (const std::map<db::ICplxTrans, size_t> &vars)
+{
+  std::string res;
+  for (std::map<db::ICplxTrans, size_t>::const_iterator i = vars.begin (); i != vars.end (); ++i) {
+    if (! res.empty ()) {
+      res += ";";
+    }
+    res += i->first.to_string ();
+    res += "[";
+    res += tl::to_string (i->second);
+    res += "]";
+  }
+  return res;
+}
+
 std::string vm2str (const db::Layout &ly, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &vm)
 {
   std::string res;
@@ -388,6 +403,254 @@ TEST(100_OrientationVariantsWithLayout)
 
   CHECKPOINT();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/cell_variants_au1.gds");
+}
+
+TEST(10_TrivialStatistics)
+{
+  db::Layout ly;
+  db::Cell &a = ly.cell (ly.add_cell ("A"));
+  db::Cell &b = ly.cell (ly.add_cell ("B"));
+  db::Cell &c = ly.cell (ly.add_cell ("C"));
+  db::Cell &d = ly.cell (ly.add_cell ("D"));
+
+  a.insert (db::CellInstArray (db::CellInst (b.cell_index ()), db::Trans (0, false, db::Vector (1, 10))));
+
+  db::OrientationReducer red;
+  db::cell_variants_statistics<db::OrientationReducer> vb (red);
+  vb.collect (ly, a);
+  EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0[1]");
+  EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 0,0[1]");
+  EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "");
+  EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
+}
+
+TEST(11_TwoVariantsStatistics)
+{
+  db::Layout ly;
+  db::Cell &a = ly.cell (ly.add_cell ("A"));
+  db::Cell &b = ly.cell (ly.add_cell ("B"));
+  db::Cell &c = ly.cell (ly.add_cell ("C"));
+  db::Cell &d = ly.cell (ly.add_cell ("D"));
+
+  a.insert (db::CellInstArray (db::CellInst (b.cell_index ()), db::Trans (0, false, db::Vector (1, 10))));
+  a.insert (db::CellInstArray (db::CellInst (b.cell_index ()), db::Trans (0, true, db::Vector (1, 100))));
+
+  db::OrientationReducer red;
+  db::cell_variants_statistics<db::OrientationReducer> vb (red);
+  vb.collect (ly, a);
+  EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0[1]");
+  EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "m0 *1 0,0[1];r0 *1 0,0[1]");
+  EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "");
+  EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
+
+  EXPECT_EQ (inst2str (ly, a), "B:r0 *1 1,10;B:m0 *1 1,100");
+}
+
+TEST(12_TwoLevelsStatistics)
+{
+  db::Layout ly;
+  db::Cell &a = ly.cell (ly.add_cell ("A"));
+  db::Cell &b = ly.cell (ly.add_cell ("B"));
+  db::Cell &c = ly.cell (ly.add_cell ("C"));
+  db::Cell &d = ly.cell (ly.add_cell ("D"));
+
+  a.insert (db::CellInstArray (db::CellInst (b.cell_index ()), db::Trans (0, false, db::Vector (1, 10))));
+  a.insert (db::CellInstArray (db::CellInst (b.cell_index ()), db::Trans (1, false, db::Vector (1, 100))));
+  b.insert (db::CellInstArray (db::CellInst (c.cell_index ()), db::Trans (0, false, db::Vector (2, 10))));
+  b.insert (db::CellInstArray (db::CellInst (c.cell_index ()), db::Trans (0, true, db::Vector (2, 100))));
+
+  db::OrientationReducer red;
+  db::cell_variants_statistics<db::OrientationReducer> vb (red);
+  vb.collect (ly, a);
+  EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0[1]");
+  EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 0,0[1];r90 *1 0,0[1]");
+  EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "m0 *1 0,0[1];r0 *1 0,0[1];m45 *1 0,0[1];r90 *1 0,0[1]");
+  EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
+
+  EXPECT_EQ (inst2str (ly, a), "B:r0 *1 1,10;B:r90 *1 1,100");
+  EXPECT_EQ (inst2str (ly, b), "C:r0 *1 2,10;C:m0 *1 2,100");
+}
+
+TEST(13_ThreeLevelsStatistics)
+{
+  db::Layout ly;
+  db::Cell &a = ly.cell (ly.add_cell ("A"));
+  db::Cell &b = ly.cell (ly.add_cell ("B"));
+  db::Cell &c = ly.cell (ly.add_cell ("C"));
+  db::Cell &d = ly.cell (ly.add_cell ("D"));
+
+  a.insert (db::CellInstArray (db::CellInst (b.cell_index ()), db::Trans (0, false, db::Vector (1, 10))));
+  a.insert (db::CellInstArray (db::CellInst (b.cell_index ()), db::Trans (1, false, db::Vector (1, 100))));
+  b.insert (db::CellInstArray (db::CellInst (c.cell_index ()), db::Trans (0, false, db::Vector (2, 10))));
+  b.insert (db::CellInstArray (db::CellInst (c.cell_index ()), db::Trans (0, true, db::Vector (2, 100))));
+  c.insert (db::CellInstArray (db::CellInst (d.cell_index ()), db::Trans (1, true, db::Vector (0, 0))));
+
+  db::OrientationReducer red;
+  db::cell_variants_statistics<db::OrientationReducer> vb (red);
+  vb.collect (ly, a);
+  EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0[1]");
+  EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 0,0[1];r90 *1 0,0[1]");
+  EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "m0 *1 0,0[1];r0 *1 0,0[1];m45 *1 0,0[1];r90 *1 0,0[1]");
+  EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "r270 *1 0,0[1];m90 *1 0,0[1];r0 *1 0,0[1];m45 *1 0,0[1]");
+
+  EXPECT_EQ (inst2str (ly, a), "B:r0 *1 1,10;B:r90 *1 1,100");
+  EXPECT_EQ (inst2str (ly, b), "C:r0 *1 2,10;C:m0 *1 2,100");
+  EXPECT_EQ (inst2str (ly, c), "D:m45 *1 0,0");
+}
+
+TEST(14_ComplexTransStatistics)
+{
+  db::Layout ly;
+  db::Cell &a = ly.cell (ly.add_cell ("A"));
+  db::Cell &b = ly.cell (ly.add_cell ("B"));
+  db::Cell &c = ly.cell (ly.add_cell ("C"));
+  db::Cell &d = ly.cell (ly.add_cell ("D"));
+
+  a.insert (db::CellInstArray (db::CellInst (b.cell_index ()), db::ICplxTrans (db::Trans (0, false, db::Vector (1, 10)))));
+  a.insert (db::CellInstArray (db::CellInst (b.cell_index ()), db::ICplxTrans (db::Trans (1, false, db::Vector (1, 100)))));
+  b.insert (db::CellInstArray (db::CellInst (c.cell_index ()), db::ICplxTrans (db::Trans (0, false, db::Vector (2, 10)))));
+  b.insert (db::CellInstArray (db::CellInst (c.cell_index ()), db::ICplxTrans (db::Trans (0, true, db::Vector (2, 100)))));
+
+  db::OrientationReducer red;
+  db::cell_variants_statistics<db::OrientationReducer> vb (red);
+  vb.collect (ly, a);
+  EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0[1]");
+  EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 0,0[1];r90 *1 0,0[1]");
+  EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "m0 *1 0,0[1];r0 *1 0,0[1];m45 *1 0,0[1];r90 *1 0,0[1]");
+  EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
+}
+
+TEST(15_ArraysStatistics)
+{
+
+  db::Layout ly;
+  db::Cell &a = ly.cell (ly.add_cell ("A"));
+  db::Cell &b = ly.cell (ly.add_cell ("B"));
+  db::Cell &c = ly.cell (ly.add_cell ("C"));
+  db::Cell &d = ly.cell (ly.add_cell ("D"));
+
+  a.insert (db::CellInstArray (db::CellInst (b.cell_index ()), db::Trans (0, false, db::Vector (1, 10)), db::Vector (0, 100), db::Vector (100, 0), 10, 10));
+  a.insert (db::CellInstArray (db::CellInst (b.cell_index ()), db::Trans (1, false, db::Vector (1, 100))));
+  b.insert (db::CellInstArray (db::CellInst (c.cell_index ()), db::Trans (0, false, db::Vector (2, 10)), db::Vector (0, 101), db::Vector (101, 0), 10, 10));
+  b.insert (db::CellInstArray (db::CellInst (c.cell_index ()), db::Trans (0, true, db::Vector (2, 100))));
+
+  db::OrientationReducer red;
+  db::cell_variants_statistics<db::OrientationReducer> vb (red);
+  vb.collect (ly, a);
+  EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0[1]");
+  EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 0,0[100];r90 *1 0,0[1]");
+  EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "m0 *1 0,0[100];r0 *1 0,0[10000];m45 *1 0,0[1];r90 *1 0,0[100]");
+  EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
+}
+
+TEST(16_ScalingVariantsStatistics)
+{
+  db::Layout ly;
+  db::Cell &a = ly.cell (ly.add_cell ("A"));
+  db::Cell &b = ly.cell (ly.add_cell ("B"));
+  db::Cell &c = ly.cell (ly.add_cell ("C"));
+  db::Cell &d = ly.cell (ly.add_cell ("D"));
+
+  a.insert (db::CellInstArray (db::CellInst (b.cell_index ()), db::ICplxTrans (1.5, 0, false, db::Vector (1, 10)), db::Vector (0, 100), db::Vector (100, 0), 10, 10));
+  a.insert (db::CellInstArray (db::CellInst (b.cell_index ()), db::ICplxTrans (1.0, 90.0, false, db::Vector (1, 100))));
+  b.insert (db::CellInstArray (db::CellInst (c.cell_index ()), db::ICplxTrans (2.0, 0, false, db::Vector (2, 10)), db::Vector (0, 101), db::Vector (101, 0), 10, 10));
+  b.insert (db::CellInstArray (db::CellInst (c.cell_index ()), db::ICplxTrans (1.0, 0, true, db::Vector (2, 100))));
+
+  db::MagnificationReducer red;
+  db::cell_variants_statistics<db::MagnificationReducer> vb (red);
+  vb.collect (ly, a);
+  EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0[1]");
+  EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 0,0[1];r0 *1.5 0,0[100]");
+  EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "r0 *1 0,0[1];r0 *1.5 0,0[100];r0 *2 0,0[100];r0 *3 0,0[10000]");
+  EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
+}
+
+TEST(17_GridVariantsStatistics)
+{
+  db::Layout ly;
+  db::Cell &a = ly.cell (ly.add_cell ("A"));
+  db::Cell &b = ly.cell (ly.add_cell ("B"));
+  db::Cell &c = ly.cell (ly.add_cell ("C"));
+  db::Cell &d = ly.cell (ly.add_cell ("D"));
+
+  a.insert (db::CellInstArray (db::CellInst (b.cell_index ()), db::ICplxTrans (1.0, 0, false, db::Vector (1, 10)), db::Vector (0, 101), db::Vector (102, 0), 2, 2));
+  b.insert (db::CellInstArray (db::CellInst (c.cell_index ()), db::ICplxTrans (1.0, 0, false, db::Vector (2, 3))));
+
+  db::GridReducer red (10);
+  db::cell_variants_statistics<db::GridReducer> vb (red);
+  vb.collect (ly, a);
+  EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0[1]");
+  EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *1 1,0[1];r0 *1 3,0[1];r0 *1 1,1[1];r0 *1 3,1[1]");
+
+  //  placements are:
+  //    b in a: r0 *1 x=1,1+102 y=10,10+101
+  //    c in b: r0 *1 x=2,y=3
+  //  expanded placements:
+  //    c in a: r0 *2 x=1,1+102 y=10,10+101  x  r0 *1 x=2,y=3
+  //              = (3,13),(105,13),(3,114),(105,114)
+  //  expanded placements mod 10:
+  //    c in a: r0 *2 x=1,1+102 y=10,10+101  x  r0 *1 x=2,y=3
+  //              = (3,3),(5,3),(3,4),(5,4)
+  EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "r0 *1 -5,3[1];r0 *1 3,3[1];r0 *1 -5,4[1];r0 *1 3,4[1]");
+  EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
+
+  EXPECT_EQ (inst2str (ly, a), "B:r0 *1 1,10;B:r0 *1 1,111;B:r0 *1 103,10;B:r0 *1 103,111");
+  EXPECT_EQ (inst2str (ly, b), "C:r0 *1 2,3");
+  EXPECT_EQ (inst2str (ly, c), "");
+}
+
+TEST(18_ComplexGridVariantsStatistics)
+{
+  db::Layout ly;
+  db::Cell &a = ly.cell (ly.add_cell ("A"));
+  db::Cell &b = ly.cell (ly.add_cell ("B"));
+  db::Cell &c = ly.cell (ly.add_cell ("C"));
+  db::Cell &d = ly.cell (ly.add_cell ("D"));
+
+  a.insert (db::CellInstArray (db::CellInst (b.cell_index ()), db::ICplxTrans (2.0, 0, false, db::Vector (1, 10)), db::Vector (0, 101), db::Vector (102, 0), 2, 2));
+  a.insert (db::CellInstArray (db::CellInst (b.cell_index ()), db::ICplxTrans (1.0, 90.0, false, db::Vector (1, 100))));
+  b.insert (db::CellInstArray (db::CellInst (c.cell_index ()), db::ICplxTrans (2.0, 0, false, db::Vector (2, 10)), db::Vector (0, 103), db::Vector (105, 0), 2, 2));
+  b.insert (db::CellInstArray (db::CellInst (c.cell_index ()), db::ICplxTrans (1.0, 0, true, db::Vector (2, 100))));
+
+  db::GridReducer red (10);
+  db::cell_variants_statistics<db::GridReducer> vb (red);
+  vb.collect (ly, a);
+  EXPECT_EQ (var2str (vb.variants (a.cell_index ())), "r0 *1 0,0[1]");
+  EXPECT_EQ (var2str (vb.variants (b.cell_index ())), "r0 *2 1,0[1];r90 *1 1,0[1];r0 *2 3,0[1];r0 *2 1,1[1];r0 *2 3,1[1]");
+
+  //  placements are:
+  //    b in a: r0 *2 x=1,1+102 y=10,10+101
+  //            r90 *1 x=1,y=100
+  //    c in b: r0 *2 x=2,2+105 y=10,10+103
+  //            m0 *1 x=2,y=100
+  //  expanded placements:
+  //    c in a: r0 *2 x=1,1+102 y=10,10+101  x  r0 *2 x=2,2+105 y=10,10+103
+  //              = (5,30),(215,30),(5,236),(215,236)
+  //                (107,30),(317,30),(107,236),(317,236)
+  //                (5,131),(215,131),(5,337),(215,337)
+  //                (107,131),(317,131),(107,337),(317,337)
+  //            r0 *2 x=1,1+102 y=10,10+101  x  m0 *1 x=2,y=100
+  //                (5,210),(5,311),(107,210),(107,311)
+  //            r90 *1 x=1,y=100  x  r0 *2 x=2,2+105 y=10,10+103
+  //                (-9,102),(-9,207),(-112,102),(-112,207)
+  //            r90 *1 x=1,y=100  x  m0 *1 x=2,y=100
+  //                (-99,102)
+  //  expanded ((placements + 5) mod 10) - placements
+  //    c in a: r0 *2 x=1,1+102 y=10,10+101  x  r0 *2 x=2,2+105 y=10,10+103
+  //              = (5,0),(5,0),(-5,-4),(-5,-4)
+  //                (7,0),(7,0),(-3,-4),(-3,-4)
+  //                (-5,1),(-5,1),(-5,-3),(-5,-3)
+  //                (-3,1),(-3,1),(-3,-3),(-3,-3)
+  //            r0 *2 x=1,1+102 y=10,10+101  x  m0 *1 x=2,y=100
+  //                (-5,0),(-5,1),(-3,0),(-3,1)
+  //            r90 *1 x=1,y=100  x  r0 *2 x=2,2+105 y=10,10+103
+  //                (1,2),(1,-3),(-2,2),(-2,-3)
+  //            r90 *1 x=1,y=100  x  m0 *1 x=2,y=100
+  //                (1,2)
+  EXPECT_EQ (var2str (vb.variants (c.cell_index ())), "r0 *4 -5,-4[2];r0 *4 -3,-4[2];r0 *4 -5,-3[2];r0 *4 -3,-3[2];r90 *2 -2,-3[1];"
+                                                      "r90 *2 1,-3[1];m0 *2 -5,0[1];r0 *4 -5,0[2];m0 *2 -3,0[1];r0 *4 -3,0[2];"
+                                                      "m0 *2 -5,1[1];r0 *4 -5,1[2];m0 *2 -3,1[1];r0 *4 -3,1[2];r90 *2 -2,2[1];m45 *1 1,2[1];r90 *2 1,2[1]");
+  EXPECT_EQ (var2str (vb.variants (d.cell_index ())), "");
 }
 
 TEST(101_Propagation)

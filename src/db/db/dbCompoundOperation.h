@@ -432,7 +432,7 @@ public:
   virtual bool is_translation_invariant () const;
 
   //  NOTE: equality does not really matter here as we use it only on leaf reducers
-  virtual bool equals (const TransformationReducer *other) const { return false; }
+  virtual bool equals (const TransformationReducer * /*other*/) const { return false; }
 
 private:
   std::vector<const db::TransformationReducer *> m_vars;
@@ -1161,9 +1161,7 @@ private:
 
         //  in the presence of variants, handle the object in top level space
 
-        const std::map<db::ICplxTrans, size_t> &vv = proc->vars ()->variants (cell->cell_index ());
-        tl_assert (vv.size () == 1);
-        const db::ICplxTrans &tr = vv.begin ()->first;
+        const db::ICplxTrans &tr = proc->vars ()->single_variant_transformation (cell->cell_index ());
         processed (layout, *p, tr, res);
 
       } else {
@@ -1314,9 +1312,7 @@ private:
 
         //  in the presence of variants, handle the object in top level space
 
-        const std::map<db::ICplxTrans, size_t> &vv = proc->vars ()->variants (cell->cell_index ());
-        tl_assert (vv.size () == 1);
-        const db::ICplxTrans &tr = vv.begin ()->first;
+        const db::ICplxTrans &tr = proc->vars ()->single_variant_transformation (cell->cell_index ());
         processed (layout, tr * *p, res);
 
         if (! res.empty ()) {
@@ -1383,9 +1379,7 @@ private:
 
         //  in the presence of variants, handle the object in top level space
 
-        const std::map<db::ICplxTrans, size_t> &vv = proc->vars ()->variants (cell->cell_index ());
-        tl_assert (vv.size () == 1);
-        const db::ICplxTrans &tr = vv.begin ()->first;
+        const db::ICplxTrans &tr = proc->vars ()->single_variant_transformation (cell->cell_index ());
         processed (layout, tr * *p, res);
 
         if (! res.empty ()) {
@@ -1453,9 +1447,7 @@ private:
 
         //  in the presence of variants, handle the object in top level space
 
-        const std::map<db::ICplxTrans, size_t> &vv = proc->vars ()->variants (cell->cell_index ());
-        tl_assert (vv.size () == 1);
-        const db::ICplxTrans &tr = vv.begin ()->first;
+        const db::ICplxTrans &tr = proc->vars ()->single_variant_transformation (cell->cell_index ());
         processed (layout, tr * *p, res);
 
         if (! res.empty ()) {
@@ -1520,9 +1512,7 @@ private:
 
         //  in the presence of variants, handle the object in top level space
 
-        const std::map<db::ICplxTrans, size_t> &vv = proc->vars ()->variants (cell->cell_index ());
-        tl_assert (vv.size () == 1);
-        const db::ICplxTrans &tr = vv.begin ()->first;
+        const db::ICplxTrans &tr = proc->vars ()->single_variant_transformation (cell->cell_index ());
         mp_proc->process (tr * *p, res);
 
         if (! res.empty ()) {
@@ -1592,9 +1582,7 @@ private:
 
         //  in the presence of variants, handle the object in top level space
 
-        const std::map<db::ICplxTrans, size_t> &vv = proc->vars ()->variants (cell->cell_index ());
-        tl_assert (vv.size () == 1);
-        const db::ICplxTrans &tr = vv.begin ()->first;
+        const db::ICplxTrans &tr = proc->vars ()->single_variant_transformation (cell->cell_index ());
         processed (layout, *p, tr, res);
 
       } else {
@@ -1667,9 +1655,7 @@ private:
 
         //  in the presence of variants, handle the object in top level space
 
-        const std::map<db::ICplxTrans, size_t> &vv = proc->vars ()->variants (cell->cell_index ());
-        tl_assert (vv.size () == 1);
-        const db::ICplxTrans &tr = vv.begin ()->first;
+        const db::ICplxTrans &tr = proc->vars ()->single_variant_transformation (cell->cell_index ());
         processed (layout, *p, tr, res);
 
       } else {

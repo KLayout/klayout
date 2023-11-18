@@ -216,7 +216,15 @@ public:
    *  The keys of the map are the variants, the values is the instance count of the variant
    *  (as seen from the top cell).
    */
-  const std::map<db::ICplxTrans, size_t> &variants (db::cell_index_type ci) const;
+  const std::set<db::ICplxTrans> &variants (db::cell_index_type ci) const;
+
+  /**
+   *  @brief Gets the transformation for a single variant
+   *
+   *  This requires the cell not to be a variant (i.e. already separated).
+   *  It returns the corresponding transformation.
+   */
+  const db::ICplxTrans &single_variant_transformation (db::cell_index_type ci) const;
 
   /**
    *  @brief Returns true, if variants have been built
@@ -229,13 +237,14 @@ public:
   static void copy_shapes (db::Layout &layout, db::cell_index_type ci_to, db::cell_index_type ci_from);
 
 private:
-  std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> > m_variants;
+  std::map<db::cell_index_type, std::set<db::ICplxTrans> > m_variants;
+  std::set<db::cell_index_type> m_called;
   const TransformationReducer *mp_red;
 
-  void add_variant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst, bool tl_invariant) const;
-  void add_variant_non_tl_invariant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst) const;
-  void add_variant_tl_invariant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst) const;
-  void product (const std::map<db::ICplxTrans, size_t> &v1, const std::map<db::ICplxTrans, size_t> &v2, std::map<db::ICplxTrans, size_t> &prod) const;
+  void add_variant (std::set<ICplxTrans> &variants, const db::CellInstArray &inst, bool tl_invariant) const;
+  void add_variant_non_tl_invariant (std::set<db::ICplxTrans> &variants, const db::CellInstArray &inst) const;
+  void add_variant_tl_invariant (std::set<ICplxTrans> &variants, const db::CellInstArray &inst) const;
+  void product (const std::set<db::ICplxTrans> &v1, const std::set<db::ICplxTrans> &v2, std::set<db::ICplxTrans> &prod) const;
   void create_var_instances (db::Cell &in_cell, std::vector<db::CellInstArrayWithProperties> &inst, const db::ICplxTrans &for_var, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_table, bool tl_invariant) const;
   void create_var_instances_non_tl_invariant (db::Cell &in_cell, std::vector<db::CellInstArrayWithProperties> &inst, const db::ICplxTrans &for_var, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_table) const;
   void create_var_instances_tl_invariant (db::Cell &in_cell, std::vector<db::CellInstArrayWithProperties> &inst, const db::ICplxTrans &for_var, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_table) const;

@@ -543,9 +543,7 @@ scale_and_snap (db::Layout &layout, db::Cell &cell, db::Coord g, db::Coord m, db
       continue;
     }
 
-    const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
-    tl_assert (v.size () == size_t (1));
-    db::ICplxTrans tr = v.begin ()->first;
+    db::ICplxTrans tr = vars.single_variant_transformation (c->cell_index ());
 
     //  NOTE: tr_disp is already multiplied with mag, so it can be an integer
     db::Vector tr_disp = tr.disp ();

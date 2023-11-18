@@ -431,22 +431,20 @@ DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
 
     if (vars.get ()) {
 
-      const std::map<db::ICplxTrans, size_t> &vv = vars->variants (c->cell_index ());
-      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+      const std::set<db::ICplxTrans> &vv = vars->variants (c->cell_index ());
+      for (auto v = vv.begin (); v != vv.end (); ++v) {
 
         db::Shapes *st;
         if (vv.size () == 1) {
           st = & c->shapes (res->deep_layer ().layer ());
         } else {
-          st = & to_commit [c->cell_index ()] [v->first];
+          st = & to_commit [c->cell_index ()] [*v];
         }
-
-        const db::ICplxTrans &tr = v->first;
 
         for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Texts); ! si.at_end (); ++si) {
           db::Text text;
           si->text (text);
-          if (filter.selected (text.transformed (tr))) {
+          if (filter.selected (text.transformed (*v))) {
             st->insert (*si);
           }
         }

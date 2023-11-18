@@ -1491,10 +1491,8 @@ LocalProcessorBase::dist_for_cell (db::cell_index_type cell_index, db::Coord dis
 {
   if (mp_vars) {
 
-    const std::map<db::ICplxTrans, size_t> &v = mp_vars->variants (cell_index);
-    tl_assert (v.size () == size_t (1));
-
-    double mag = v.begin ()->first.mag ();
+    const db::ICplxTrans &tr = mp_vars->single_variant_transformation (cell_index);
+    double mag = tr.mag ();
     return db::coord_traits<db::Coord>::rounded (dist / mag);
 
   } else {

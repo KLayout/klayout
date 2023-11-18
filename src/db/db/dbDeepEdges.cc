@@ -256,10 +256,8 @@ static void transform_deep_layer (db::DeepLayer &deep_layer, const Trans &t)
 
     for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-      const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
-      tl_assert (v.size () == size_t (1));
-
-      db::Trans tr (v.begin ()->first.inverted () * t.disp ());
+      const db::ICplxTrans &tv = vars.single_variant_transformation (c->cell_index ());
+      db::ICplxTrans tr (tv.inverted () * t.disp ());
 
       db::Shapes &shapes = c->shapes (deep_layer.layer ());
       db::Shapes new_shapes (layout.manager (), c.operator-> (), layout.is_editable ());
@@ -750,10 +748,10 @@ DeepEdges::length_type DeepEdges::length (const db::Box &box) const
       for (db::ShapeIterator s = layout.cell (*c).shapes (edges.layer ()).begin (db::ShapeIterator::Edges); ! s.at_end (); ++s) {
         lc += s->edge ().length ();
       }
-      const std::map<db::ICplxTrans, size_t> &vv = vars.variants (*c);
-      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
-        double mag = v->first.mag ();
-        l += v->second * lc * mag;
+      const std::set<db::ICplxTrans> &vv = vars.variants (*c);
+      for (auto v = vv.begin (); v != vv.end (); ++v) {
+        double mag = v->mag ();
+        // @@@ l += v->second * lc * mag;
       }
     }
 
@@ -836,20 +834,18 @@ DeepEdges::apply_filter (const EdgeFilterBase &filter) const
 
     if (vars.get ()) {
 
-      const std::map<db::ICplxTrans, size_t> &vv = vars->variants (c->cell_index ());
-      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+      const std::set<db::ICplxTrans> &vv = vars->variants (c->cell_index ());
+      for (auto v = vv.begin (); v != vv.end (); ++v) {
 
         db::Shapes *st;
         if (vv.size () == 1) {
           st = & c->shapes (res->deep_layer ().layer ());
         } else {
-          st = & to_commit [c->cell_index ()] [v->first];
+          st = & to_commit [c->cell_index ()] [*v];
         }
 
-        const db::ICplxTrans &tr = v->first;
-
         for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
-          if (filter.selected (si->edge ().transformed (tr))) {
+          if (filter.selected (si->edge ().transformed (*v))) {
             st->insert (*si);
           }
         }
@@ -1279,14 +1275,14 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
     //  TODO: iterate only over the called cells?
     for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-      const std::map<db::ICplxTrans, size_t> &vv = vars.variants (c->cell_index ());
-      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+      const std::set<db::ICplxTrans> &vv = vars.variants (c->cell_index ());
+      for (auto v = vv.begin (); v != vv.end (); ++v) {
 
         db::Shapes *out;
         if (vv.size () == 1) {
           out = & c->shapes (res->deep_layer ().layer ());
         } else {
-          out = & to_commit [c->cell_index ()][v->first];
+          out = & to_commit [c->cell_index ()][*v];
         }
 
         const db::connected_clusters<db::Edge> &cc = hc.clusters_per_cell (c->cell_index ());
@@ -1295,12 +1291,12 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
           if (cc.is_root (*cl)) {
 
             PolygonRefToShapesGenerator prgen (&layout, out);
-            polygon_transformation_filter<db::ICplxTrans> ptrans (&prgen, v->first.inverted ());
+            polygon_transformation_filter<db::ICplxTrans> ptrans (&prgen, v->inverted ());
             JoinEdgesCluster jec (&ptrans, ext_b, ext_e, ext_o, ext_i);
 
             std::list<db::Edge> heap;
             for (db::recursive_cluster_shape_iterator<db::Edge> rcsi (hc, edges.layer (), c->cell_index (), *cl); ! rcsi.at_end (); ++rcsi) {
-              heap.push_back (rcsi->transformed (v->first * rcsi.trans ()));
+              heap.push_back (rcsi->transformed (*v * rcsi.trans ()));
               jec.add (&heap.back (), 0);
             }
 
@@ -1318,20 +1314,20 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
 
     for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-      const std::map<db::ICplxTrans, size_t> &vv = vars.variants (c->cell_index ());
-      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+      const std::set<db::ICplxTrans> &vv = vars.variants (c->cell_index ());
+      for (auto v = vv.begin (); v != vv.end (); ++v) {
 
         db::Shapes *out;
         if (vv.size () == 1) {
           out = & c->shapes (res->deep_layer ().layer ());
         } else {
-          out = & to_commit [c->cell_index ()][v->first];
+          out = & to_commit [c->cell_index ()][*v];
         }
 
         PolygonRefToShapesGenerator prgen (&layout, out);
         for (db::Shapes::shape_iterator si = c->shapes (edges.layer ()).begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
           prgen.set_prop_id (si->prop_id ());
-          prgen.put (extended_edge (si->edge ().transformed (v->first), ext_b, ext_e, ext_o, ext_i).transformed (v->first.inverted ()));
+          prgen.put (extended_edge (si->edge ().transformed (*v), ext_b, ext_e, ext_o, ext_i).transformed (v->inverted ()));
         }
 
       }

@@ -264,10 +264,8 @@ static void transform_deep_layer (db::DeepLayer &deep_layer, const Trans &t)
 
     for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-      const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
-      tl_assert (v.size () == size_t (1));
-
-      db::Trans tr (v.begin ()->first.inverted () * t.disp ());
+      const db::ICplxTrans &tv = vars.single_variant_transformation (c->cell_index ());
+      db::ICplxTrans tr (tv.inverted () * t.disp ());
 
       db::Shapes &shapes = c->shapes (deep_layer.layer ());
       db::Shapes new_shapes (layout.manager (), c.operator-> (), layout.is_editable ());
@@ -1122,10 +1120,10 @@ DeepRegion::area (const db::Box &box) const
       for (db::ShapeIterator s = layout.cell (*c).shapes (polygons.layer ()).begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
         ac += s->area ();
       }
-      const std::map<db::ICplxTrans, size_t> &vv = vars.variants (*c);
-      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
-        double mag = v->first.mag ();
-        a += v->second * ac * mag * mag;
+      const std::set<db::ICplxTrans> &vv = vars.variants (*c);
+      for (auto v = vv.begin (); v != vv.end (); ++v) {
+        double mag = v->mag ();
+        // @@@ a += v->second * ac * mag * mag;
       }
     }
 
@@ -1159,10 +1157,10 @@ DeepRegion::perimeter (const db::Box &box) const
       for (db::ShapeIterator s = layout.cell (*c).shapes (polygons.layer ()).begin (db::ShapeIterator::All); ! s.at_end (); ++s) {
         pc += s->perimeter ();
       }
-      const std::map<db::ICplxTrans, size_t> &vv = vars.variants (*c);
-      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
-        double mag = v->first.mag ();
-        p += v->second * pc * mag;
+      const std::set<db::ICplxTrans> &vv = vars.variants (*c);
+      for (auto v = vv.begin (); v != vv.end (); ++v) {
+        double mag = v->mag ();
+        // @@@ p += v->second * pc * mag;
       }
     }
 
@@ -1219,14 +1217,14 @@ DeepRegion::grid_check (db::Coord gx, db::Coord gy) const
 
     const db::Shapes &shapes = c->shapes (polygons.layer ());
 
-    const std::map<db::ICplxTrans, size_t> &vv = vars.variants (c->cell_index ());
-    for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+    const std::set<db::ICplxTrans> &vv = vars.variants (c->cell_index ());
+    for (auto v = vv.begin (); v != vv.end (); ++v) {
 
       db::Shapes *markers;
       if (vv.size () == 1) {
         markers = & c->shapes (res->deep_layer ().layer ());
       } else {
-        markers = & to_commit [c->cell_index ()] [v->first];
+        markers = & to_commit [c->cell_index ()] [*v];
       }
 
       for (db::Shapes::shape_iterator si = shapes.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
@@ -1234,7 +1232,7 @@ DeepRegion::grid_check (db::Coord gx, db::Coord gy) const
         db::Polygon poly;
         si->polygon (poly);
 
-        AsIfFlatRegion::produce_markers_for_grid_check (poly, v->first, gx, gy, *markers);
+        AsIfFlatRegion::produce_markers_for_grid_check (poly, *v, gx, gy, *markers);
 
       }
 
@@ -1311,9 +1309,7 @@ DeepRegion::snapped (db::Coord gx, db::Coord gy)
   std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-    const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
-    tl_assert (v.size () == size_t (1));
-    const db::ICplxTrans &tr = v.begin ()->first;
+    const db::ICplxTrans &tr = vars.single_variant_transformation (c->cell_index ());
     db::ICplxTrans trinv = tr.inverted ();
 
     const db::Shapes &s = c->shapes (polygons.layer ());
@@ -1385,9 +1381,7 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
 
       db::ICplxTrans tr;
       if (vars.get ()) {
-        const std::map<db::ICplxTrans, size_t> &v = vars->variants (c->cell_index ());
-        tl_assert (v.size () == size_t (1));
-        tr = v.begin ()->first;
+        tr = vars->single_variant_transformation (c->cell_index ());
       }
 
       const db::Shapes &s = c->shapes (polygons.layer ());
@@ -1506,22 +1500,20 @@ DeepRegion::apply_filter (const PolygonFilterBase &filter) const
 
     if (vars.get ()) {
 
-      const std::map<db::ICplxTrans, size_t> &vv = vars->variants (c->cell_index ());
-      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+      const std::set<db::ICplxTrans> &vv = vars->variants (c->cell_index ());
+      for (auto v = vv.begin (); v != vv.end (); ++v) {
 
         db::Shapes *st;
         if (vv.size () == 1) {
           st = & c->shapes (res->deep_layer ().layer ());
         } else {
-          st = & to_commit [c->cell_index ()] [v->first];
+          st = & to_commit [c->cell_index ()] [*v];
         }
-
-        const db::ICplxTrans &tr = v->first;
 
         for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
           db::Polygon poly;
           si->polygon (poly);
-          if (filter.selected (poly.transformed (tr))) {
+          if (filter.selected (poly.transformed (*v))) {
             st->insert (*si);
           }
         }
@@ -1663,9 +1655,8 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
   std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-    const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
-    tl_assert (v.size () == size_t (1));
-    double mag = v.begin ()->first.mag ();
+    const db::ICplxTrans &tr = vars.single_variant_transformation (c->cell_index ());
+    double mag = tr.mag ();
     db::Coord d_with_mag = db::coord_traits<db::Coord>::rounded (d / mag);
 
     const db::Shapes &s = c->shapes (polygons.layer ());
@@ -1719,10 +1710,9 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
   std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-    const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
-    tl_assert (v.size () == size_t (1));
-    double mag = v.begin ()->first.mag ();
-    double angle = v.begin ()->first.angle ();
+    const db::ICplxTrans &tr = vars.single_variant_transformation (c->cell_index ());
+    double mag = tr.mag ();
+    double angle = tr.angle ();
 
     db::Coord dx_with_mag = db::coord_traits<db::Coord>::rounded (dx / mag);
     db::Coord dy_with_mag = db::coord_traits<db::Coord>::rounded (dy / mag);
@@ -2020,9 +2010,8 @@ DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, c
   std::unique_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-    const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
-    tl_assert (v.size () == size_t (1));
-    double mag = v.begin ()->first.mag ();
+    const db::ICplxTrans &tr = vars.single_variant_transformation (c->cell_index ());
+    double mag = tr.mag ();
     db::Coord d_with_mag = db::coord_traits<db::Coord>::rounded (d / mag);
 
     EdgeRelationFilter check (rel, d_with_mag, options.metrics);

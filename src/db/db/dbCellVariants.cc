@@ -230,32 +230,45 @@ VariantsCollectorBase::collect (const db::Layout &layout, const db::Cell &top_ce
 {
   tl_assert (mp_red != 0);
 
-  //  The top cell gets a "variant" with unit transformation
-  m_variants [top_cell.cell_index ()].insert (std::make_pair (db::ICplxTrans (), 1));
+  m_called.clear ();
+  m_called.insert (top_cell.cell_index ());
 
-  std::set<db::cell_index_type> called;
-  top_cell.collect_called_cells (called);
+  top_cell.collect_called_cells (m_called);
 
   for (db::Layout::top_down_const_iterator c = layout.begin_top_down (); c != layout.end_top_down (); ++c) {
 
-    if (called.find (*c) == called.end ()) {
+    if (m_called.find (*c) == m_called.end ()) {
       continue;
     }
 
     //  collect the parent variants per parent cell
 
-    std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> > variants_per_parent_cell;
+    std::map<db::cell_index_type, std::set<db::ICplxTrans> > variants_per_parent_cell;
     for (db::Cell::parent_inst_iterator pi = layout.cell (*c).begin_parent_insts (); ! pi.at_end (); ++pi) {
-      std::map<db::ICplxTrans, size_t> &variants = variants_per_parent_cell [pi->inst ().object ().cell_index ()];
+      std::set<db::ICplxTrans> &variants = variants_per_parent_cell [pi->inst ().object ().cell_index ()];
       add_variant (variants, pi->child_inst ().cell_inst (), mp_red->is_translation_invariant ());
     }
 
     //  compute the resulting variants
 
-    std::map<db::ICplxTrans, size_t> &new_variants = m_variants [*c];
+    std::set<db::ICplxTrans> new_variants;
 
-    for (std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> >::const_iterator pv = variants_per_parent_cell.begin (); pv != variants_per_parent_cell.end (); ++pv) {
-      product (variants (pv->first), pv->second, new_variants);
+    auto vc = m_variants.find (*c);
+    if (vc != m_variants.end ()) {
+      new_variants = vc->second;
+    }
+
+    for (auto pv = variants_per_parent_cell.begin (); pv != variants_per_parent_cell.end (); ++pv) {
+      auto v = m_variants.find (pv->first);
+      if (v != m_variants.end ()) {
+        product (v->second, pv->second, new_variants);
+      } else {
+        new_variants.insert (pv->second.begin (), pv->second.end ());
+      }
+    }
+
+    if (new_variants.size () > 1 || (new_variants.size () == 1 && ! new_variants.begin ()->is_unity ())) {
+      m_variants [*c] = std::move (new_variants);
     }
 
   }
@@ -287,8 +300,8 @@ VariantsCollectorBase::separate_variants (db::Layout &layout, db::Cell &top_cell
 
     db::Cell &cell = layout.cell (*c);
 
-    std::map<db::ICplxTrans, size_t> &vv = m_variants [*c];
-    if (vv.size () > 1) {
+    auto vc = m_variants.find (*c);
+    if (vc != m_variants.end () && vc->second.size () > 1) {
 
       std::map<db::ICplxTrans, db::cell_index_type> &vt = (*var_table) [*c];
 
@@ -302,11 +315,11 @@ VariantsCollectorBase::separate_variants (db::Layout &layout, db::Cell &top_cell
       cell.clear_insts ();
 
       int index = 0;
-      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v, ++index) {
+      for (auto v = vc->second.begin (); v != vc->second.end (); ++v, ++index) {
 
         db::cell_index_type ci_var;
 
-        if (v != vv.begin ()) {
+        if (v != vc->second.begin ()) {
 
           std::string var_name = layout.cell_name (*c);
           var_name += "$VAR" + tl::to_string (index);
@@ -316,21 +329,27 @@ VariantsCollectorBase::separate_variants (db::Layout &layout, db::Cell &top_cell
           copy_shapes (layout, ci_var, *c);
 
           //  a new entry for the variant
-          m_variants [ci_var].insert (*v);
+          if (! v->is_unity ()) {
+            m_variants [ci_var].insert (*v);
+          }
 
         } else {
           ci_var = *c;
         }
 
-        vt.insert (std::make_pair (v->first, ci_var));
-        create_var_instances (layout.cell (ci_var), inst, v->first, *var_table, mp_red->is_translation_invariant ());
+        vt.insert (std::make_pair (*v, ci_var));
+        create_var_instances (layout.cell (ci_var), inst, *v, *var_table, mp_red->is_translation_invariant ());
 
       }
 
       //  correct the first (remaining) entry
-      std::pair<db::ICplxTrans, size_t> v1 = *vt.begin ();
-      vv.clear ();
-      vv.insert (v1);
+      if (! vt.begin ()->first.is_unity ()) {
+        std::set<db::ICplxTrans> &tv = m_variants [*c];
+        tv.clear ();
+        tv.insert (vt.begin ()->first);
+      } else {
+        m_variants.erase (*c);
+      }
 
     } else {
 
@@ -352,7 +371,12 @@ VariantsCollectorBase::separate_variants (db::Layout &layout, db::Cell &top_cell
         }
 
         cell.clear_insts ();
-        create_var_instances (cell, inst, vv.begin ()->first, *var_table, mp_red->is_translation_invariant ());
+
+        if (vc != m_variants.end ()) {
+          create_var_instances (cell, inst, *vc->second.begin (), *var_table, mp_red->is_translation_invariant ());
+        } else {
+          create_var_instances (cell, inst, db::ICplxTrans (), *var_table, mp_red->is_translation_invariant ());
+        }
 
       }
 
@@ -387,14 +411,14 @@ VariantsCollectorBase::commit_shapes (db::Layout &layout, db::Cell &top_cell, un
 
     db::Cell &cell = layout.cell (*c);
 
-    std::map<db::ICplxTrans, size_t> &vvc = m_variants [*c];
-    if (vvc.size () > 1) {
+    auto vvc = m_variants.find (*c);
+    if (vvc != m_variants.end () && vvc->second.size () > 1) {
 
-      for (std::map<db::ICplxTrans, size_t>::const_iterator vc = vvc.begin (); vc != vvc.end (); ++vc) {
+      for (auto vc = vvc->second.begin (); vc != vvc->second.end (); ++vc) {
 
         for (db::Cell::const_iterator i = cell.begin (); ! i.at_end (); ++i) {
 
-          std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> >::const_iterator tc = to_commit.find (i->cell_index ());
+          auto tc = to_commit.find (i->cell_index ());
           if (tc != to_commit.end ()) {
 
             const std::map<db::ICplxTrans, db::Shapes> &vt = tc->second;
@@ -406,11 +430,11 @@ VariantsCollectorBase::commit_shapes (db::Layout &layout, db::Cell &top_cell, un
             for (db::CellInstArray::iterator ia = i->begin (); ! ia.at_end (); ++ia) {
 
               db::ICplxTrans t = i->complex_trans (*ia);
-              db::ICplxTrans rt = mp_red->reduce (vc->first * mp_red->reduce_trans (t));
+              db::ICplxTrans rt = mp_red->reduce (*vc * mp_red->reduce_trans (t));
               std::map<db::ICplxTrans, db::Shapes>::const_iterator v = vt.find (rt);
               if (v != vt.end ()) {
 
-                db::Shapes &ps = propagated [vc->first];
+                db::Shapes &ps = propagated [*vc];
                 tl::ident_map<db::Layout::properties_id_type> pm;
 
                 for (db::Shapes::shape_iterator si = v->second.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
@@ -431,7 +455,7 @@ VariantsCollectorBase::commit_shapes (db::Layout &layout, db::Cell &top_cell, un
 
       //  single variant -> we can commit any shapes we have kept for this cell directly to the cell
 
-      std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> >::iterator l = to_commit.find (*c);
+      auto l = to_commit.find (*c);
       if (l != to_commit.end ()) {
         tl_assert (l->second.size () == 1);
         cell.shapes (layer).insert (l->second.begin ()->second);
@@ -442,7 +466,7 @@ VariantsCollectorBase::commit_shapes (db::Layout &layout, db::Cell &top_cell, un
 
       for (db::Cell::const_iterator i = cell.begin (); ! i.at_end (); ++i) {
 
-        std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> >::const_iterator tc = to_commit.find (i->cell_index ());
+        auto tc = to_commit.find (i->cell_index ());
         if (tc != to_commit.end ()) {
 
           const std::map<db::ICplxTrans, db::Shapes> &vt = tc->second;
@@ -450,7 +474,10 @@ VariantsCollectorBase::commit_shapes (db::Layout &layout, db::Cell &top_cell, un
           for (db::CellInstArray::iterator ia = i->begin (); ! ia.at_end (); ++ia) {
 
             db::ICplxTrans t = i->complex_trans (*ia);
-            db::ICplxTrans rt = mp_red->reduce (vvc.begin ()->first * mp_red->reduce_trans (t));
+            db::ICplxTrans rt = mp_red->reduce_trans (t);
+            if (vvc != m_variants.end ()) {
+              rt = mp_red->reduce (*vvc->second.begin () * rt);
+            }
             std::map<db::ICplxTrans, db::Shapes>::const_iterator v = vt.find (rt);
 
             if (v != vt.end ()) {
@@ -474,22 +501,49 @@ VariantsCollectorBase::commit_shapes (db::Layout &layout, db::Cell &top_cell, un
   }
 }
 
-const std::map<db::ICplxTrans, size_t> &
+static std::set<db::ICplxTrans> make_once ()
+{
+  std::set<db::ICplxTrans> res;
+  res.insert (db::ICplxTrans ());
+  return res;
+}
+
+static std::set<db::ICplxTrans> s_once (make_once ());
+
+const std::set<db::ICplxTrans> &
 VariantsCollectorBase::variants (db::cell_index_type ci) const
 {
-  std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> >::const_iterator v = m_variants.find (ci);
-  static std::map<db::ICplxTrans, size_t> empty_set;
+  if (m_called.find (ci) == m_called.end ()) {
+    static std::set<db::ICplxTrans> empty;
+    return empty;
+  }
+
+  auto v = m_variants.find (ci);
   if (v == m_variants.end ()) {
-    return empty_set;
+    return s_once;
   } else {
     return v->second;
+  }
+}
+
+const db::ICplxTrans &
+VariantsCollectorBase::single_variant_transformation (db::cell_index_type ci) const
+{
+  auto v = m_variants.find (ci);
+
+  if (v == m_variants.end ()) {
+    static db::ICplxTrans tr1;
+    return tr1;
+  } else {
+    tl_assert (v->second.size () == 1);
+    return *v->second.begin ();
   }
 }
 
 bool
 VariantsCollectorBase::has_variants () const
 {
-  for (std::map<db::cell_index_type, std::map<db::ICplxTrans, size_t> >::const_iterator i = m_variants.begin (); i != m_variants.end (); ++i) {
+  for (auto i = m_variants.begin (); i != m_variants.end (); ++i) {
     if (i->second.size () > 1) {
       return true;
     }
@@ -498,7 +552,7 @@ VariantsCollectorBase::has_variants () const
 }
 
 void
-VariantsCollectorBase::add_variant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst, bool tl_invariant) const
+VariantsCollectorBase::add_variant (std::set<db::ICplxTrans> &variants, const db::CellInstArray &inst, bool tl_invariant) const
 {
   if (tl_invariant) {
     add_variant_tl_invariant (variants, inst);
@@ -508,35 +562,35 @@ VariantsCollectorBase::add_variant (std::map<db::ICplxTrans, size_t> &variants, 
 }
 
 void
-VariantsCollectorBase::add_variant_non_tl_invariant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst) const
+VariantsCollectorBase::add_variant_non_tl_invariant (std::set<db::ICplxTrans> &variants, const db::CellInstArray &inst) const
 {
   if (inst.is_complex ()) {
     for (db::CellInstArray::iterator i = inst.begin (); ! i.at_end (); ++i) {
-      variants [mp_red->reduce_trans (inst.complex_trans (*i))] += 1;
+      variants.insert (mp_red->reduce_trans (inst.complex_trans (*i)));
     }
   } else {
     for (db::CellInstArray::iterator i = inst.begin (); ! i.at_end (); ++i) {
-      variants [db::ICplxTrans (mp_red->reduce_trans (*i))] += 1;
+      variants.insert (db::ICplxTrans (mp_red->reduce_trans (*i)));
     }
   }
 }
 
 void
-VariantsCollectorBase::add_variant_tl_invariant (std::map<db::ICplxTrans, size_t> &variants, const db::CellInstArray &inst) const
+VariantsCollectorBase::add_variant_tl_invariant (std::set<db::ICplxTrans> &variants, const db::CellInstArray &inst) const
 {
   if (inst.is_complex ()) {
-    variants [mp_red->reduce_trans (inst.complex_trans ())] += inst.size ();
+    variants.insert (mp_red->reduce_trans (inst.complex_trans ()));
   } else {
-    variants [db::ICplxTrans (mp_red->reduce_trans (inst.front ()))] += inst.size ();
+    variants.insert (db::ICplxTrans (mp_red->reduce_trans (inst.front ())));
   }
 }
 
 void
-VariantsCollectorBase::product (const std::map<db::ICplxTrans, size_t> &v1, const std::map<db::ICplxTrans, size_t> &v2, std::map<db::ICplxTrans, size_t> &prod) const
+VariantsCollectorBase::product (const std::set<db::ICplxTrans> &v1, const std::set<db::ICplxTrans> &v2, std::set<db::ICplxTrans> &prod) const
 {
-  for (std::map<db::ICplxTrans, size_t>::const_iterator i = v1.begin (); i != v1.end (); ++i) {
-    for (std::map<db::ICplxTrans, size_t>::const_iterator j = v2.begin (); j != v2.end (); ++j) {
-      prod [mp_red->reduce (i->first * j->first)] += i->second * j->second;
+  for (auto i = v1.begin (); i != v1.end (); ++i) {
+    for (auto j = v2.begin (); j != v2.end (); ++j) {
+      prod.insert (mp_red->reduce (*i * *j));
     }
   }
 }
@@ -564,9 +618,9 @@ VariantsCollectorBase::create_var_instances (db::Cell &in_cell, std::vector<db::
 void
 VariantsCollectorBase::create_var_instances_non_tl_invariant (db::Cell &in_cell, std::vector<db::CellInstArrayWithProperties> &inst, const db::ICplxTrans &for_var, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_table) const
 {
-  for (std::vector<db::CellInstArrayWithProperties>::const_iterator i = inst.begin (); i != inst.end (); ++i) {
+  for (auto i = inst.begin (); i != inst.end (); ++i) {
 
-    std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> >::const_iterator f = var_table.find (i->object ().cell_index ());
+    auto f = var_table.find (i->object ().cell_index ());
     if (f == var_table.end ()) {
 
       in_cell.insert (*i);
@@ -626,9 +680,9 @@ VariantsCollectorBase::create_var_instances_non_tl_invariant (db::Cell &in_cell,
 void
 VariantsCollectorBase::create_var_instances_tl_invariant (db::Cell &in_cell, std::vector<db::CellInstArrayWithProperties> &inst, const db::ICplxTrans &for_var, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_table) const
 {
-  for (std::vector<db::CellInstArrayWithProperties>::const_iterator i = inst.begin (); i != inst.end (); ++i) {
+  for (auto i = inst.begin (); i != inst.end (); ++i) {
 
-    std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> >::const_iterator f = var_table.find (i->object ().cell_index ());
+    auto f = var_table.find (i->object ().cell_index ());
     if (f == var_table.end ()) {
 
        in_cell.insert (*i);

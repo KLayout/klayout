@@ -245,7 +245,7 @@ CompoundTransformationReducer::reduce_trans (const db::Trans &trans) const
 {
   db::Trans t = trans;
   for (std::vector<const db::TransformationReducer *>::const_iterator v = m_vars.begin (); v != m_vars.end (); ++v) {
-    (*v)->reduce_trans (t);
+    t = (*v)->reduce_trans (t);
   }
   return t;
 }
@@ -255,7 +255,7 @@ CompoundTransformationReducer::reduce_trans (const db::ICplxTrans &trans) const
 {
   db::ICplxTrans t = trans;
   for (std::vector<const db::TransformationReducer *>::const_iterator v = m_vars.begin (); v != m_vars.end (); ++v) {
-    (*v)->reduce_trans (t);
+    t = (*v)->reduce_trans (t);
   }
   return t;
 }
@@ -265,7 +265,7 @@ CompoundTransformationReducer::reduce (const db::Trans &trans) const
 {
   db::Trans t = trans;
   for (std::vector<const db::TransformationReducer *>::const_iterator v = m_vars.begin (); v != m_vars.end (); ++v) {
-    (*v)->reduce (t);
+    t = (*v)->reduce (t);
   }
   return t;
 }
@@ -275,7 +275,7 @@ CompoundTransformationReducer::reduce (const db::ICplxTrans &trans) const
 {
   db::ICplxTrans t = trans;
   for (std::vector<const db::TransformationReducer *>::const_iterator v = m_vars.begin (); v != m_vars.end (); ++v) {
-    (*v)->reduce (t);
+    t = (*v)->reduce (t);
   }
   return t;
 }
@@ -403,7 +403,7 @@ CompoundRegionMultiInputOperationNode::child (unsigned int index) const
 const TransformationReducer *
 CompoundRegionMultiInputOperationNode::vars () const
 {
-  return (m_vars.is_empty () ? &m_vars : 0);
+  return (m_vars.is_empty () ? 0 : &m_vars);
 }
 
 bool

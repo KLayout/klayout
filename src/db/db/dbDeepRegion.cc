@@ -1801,8 +1801,9 @@ Output *region_cop_impl (DeepRegion *region, db::CompoundRegionOperationNode &no
   compound_local_operation<db::PolygonRef, db::PolygonRef, TR> op (&node);
 
   //  Prepare cell variants if needed
-  db::VariantsCollectorBase vc (op.vars ());
-  if (op.wants_variants ()) {
+  auto op_vars = op.vars ();
+  db::VariantsCollectorBase vc (op_vars);
+  if (op.wants_variants () && op_vars) {
     vc.collect (polygons.layout (), polygons.initial_cell ());
     //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
     const_cast<db::DeepLayer &> (polygons).separate_variants (vc);

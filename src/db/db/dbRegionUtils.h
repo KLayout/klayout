@@ -402,7 +402,7 @@ private:
   bool m_inverse;
   parameter_type m_parameter;
   db::MagnificationReducer m_isotropic_vars;
-  db::MagnificationAndOrientationReducer m_anisotropic_vars;
+  db::XYAnisotropyAndMagnificationReducer m_anisotropic_vars;
 
   bool check (const db::Box &box) const;
 };
@@ -472,7 +472,7 @@ private:
   bool m_inverse;
   parameter_type m_parameter;
   db::MagnificationReducer m_isotropic_vars;
-  db::MagnificationAndOrientationReducer m_anisotropic_vars;
+  db::XYAnisotropyAndMagnificationReducer m_anisotropic_vars;
 };
 
 /**

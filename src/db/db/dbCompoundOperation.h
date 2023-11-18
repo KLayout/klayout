@@ -1755,8 +1755,10 @@ public:
     : mp_node (node)
   { }
 
-  const TransformationReducer *vars () const { return mp_node->vars (); }
-  bool wants_variants () const { return mp_node->wants_variants (); }
+  virtual const TransformationReducer *vars () const
+  {
+    return mp_node->vars ();
+  }
 
 protected:
   virtual void do_compute_local (db::Layout *layout, db::Cell *cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase *proc) const
@@ -1802,8 +1804,10 @@ public:
     }
   }
 
-  const TransformationReducer *vars () const { return mp_node->vars (); }
-  bool wants_variants () const { return mp_node->wants_variants (); }
+  virtual const TransformationReducer *vars () const
+  {
+    return mp_node->vars ();
+  }
 
 protected:
   virtual void do_compute_local (db::Layout *layout, db::Cell *cell, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::object_with_properties<TR> > > &results, const db::LocalProcessorBase *proc) const

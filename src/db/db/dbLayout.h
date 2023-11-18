@@ -71,6 +71,7 @@ class Texts;
 class Technology;
 class CellMapping;
 class LayerMapping;
+class VariantsCollectorBase;
 
 template <class Coord> class generic_repository;
 typedef generic_repository<db::Coord> GenericRepository;
@@ -1658,6 +1659,15 @@ public:
   void update () const;
 
   /**
+   *  @brief Separates cell variants as given by the cell variant collector
+   *
+   *  The cell variant collector must have been setup with the desired variants
+   *  using "collect". The new cell variants will be created and a "variants_created"
+   *  event is issued.
+   */
+  void separate_variants (db::VariantsCollectorBase &coll, cell_index_type initial_cell);
+
+  /**
    *  @brief Forces an update even if the layout is under construction
    *
    *  This method behaves like "update" but forces and update even if the 
@@ -2067,6 +2077,12 @@ public:
    *  @brief This event is triggered when the technology changes
    */
   tl::Event technology_changed_event;
+
+  /**
+   *  @brief This event is raised when cell variants are built
+   *  It will specify a list of cells with their new variants.
+   */
+  tl::event<const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > *> variants_created_event;
 
 protected:
   /**

@@ -2012,9 +2012,15 @@ public:
     return tl::to_string (tr ("Generic DRC check"));
   }
 
+  virtual const db::TransformationReducer *vars () const
+  {
+    return &m_vars;
+  }
+
 private:
   EdgeRelationFilter m_check;
   bool m_has_other;
+  db::MagnificationReducer m_vars;
 };
 
 }
@@ -2031,28 +2037,6 @@ DeepEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Coord 
   }
 
   const db::DeepLayer &edges = merged_deep_layer ();
-
-  //  create cell variants for magnification if needed
-
-  db::cell_variants_collector<db::MagnificationReducer> vars;
-  vars.collect (edges.layout (), edges.initial_cell ());
-
-  //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-  const_cast<db::DeepLayer &> (edges).separate_variants (vars);
-
-  if (other_deep && &other_deep->deep_layer ().layout () != &edges.layout ()) {
-
-    //  create cell variants for magnification for the other input if needed
-
-    const db::DeepLayer &other_layer = other_deep->deep_layer ();
-
-    db::cell_variants_collector<db::MagnificationReducer> vars;
-    vars.collect (other_layer.layout (), other_layer.initial_cell ());
-
-    //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-    const_cast<db::DeepLayer &> (other_layer).separate_variants (vars);
-
-  }
 
   EdgeRelationFilter check (rel, d, options.metrics);
   check.set_include_zero (false);
@@ -2071,7 +2055,6 @@ DeepEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Coord 
                                                               other_deep ? &other_deep->deep_layer ().initial_cell () : const_cast<db::Cell *> (&edges.initial_cell ()));
 
   proc.set_base_verbosity (base_verbosity ());
-  proc.set_vars (&vars);
   proc.set_threads (edges.store ()->threads ());
 
   proc.run (&op, edges.layer (), other_deep ? other_deep->deep_layer ().layer () : edges.layer (), res->deep_layer ().layer ());

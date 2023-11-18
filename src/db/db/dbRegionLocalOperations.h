@@ -254,6 +254,11 @@ public:
   virtual std::string description () const;
 
   virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, const db::LocalProcessorBase * /*proc*/) const;
+
+  virtual const db::TransformationReducer *vars () const { return &m_vars; }
+
+private:
+  db::MagnificationReducer m_vars;
 };
 
 template <class TS, class TI>
@@ -270,8 +275,11 @@ public:
 
   virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<db::object_with_properties<TS>, db::object_with_properties<TI> > &interactions, std::vector<std::unordered_set<db::EdgePairWithProperties> > &results, const db::LocalProcessorBase * /*proc*/) const;
 
+  virtual const db::TransformationReducer *vars () const { return &m_vars; }
+
 private:
   mutable db::PropertyMapper m_pms, m_pmi;
+  db::MagnificationReducer m_vars;
 };
 
 typedef check_local_operation<db::PolygonRef, db::PolygonRef> CheckLocalOperation;

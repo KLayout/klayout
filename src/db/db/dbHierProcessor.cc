@@ -1143,7 +1143,7 @@ public:
     db::Box ref_box = db::box_convert<TS> () (*ref);
     for (db::CellInstArray::iterator n = inst->begin_touching (safe_box_enlarged (ref_box, m_dist - 1, m_dist - 1), inst_bc); !n.at_end (); ++n) {
       db::ICplxTrans tn = inst->complex_trans (*n);
-      db::Box region = ref_box.enlarged (db::Vector (m_dist, m_dist)).transformed (tn.inverted ()) & intruder_cell.bbox (m_intruder_layer) /*.enlarged (db::Vector (m_dist, m_dist))@@@*/;
+      db::Box region = ref_box.enlarged (db::Vector (m_dist, m_dist)).transformed (tn.inverted ()) & intruder_cell.bbox (m_intruder_layer);
       if (! region.empty ()) {
         add_shapes_from_intruder_inst (id1, intruder_cell, tn, inst_id, region);
       }
@@ -1551,34 +1551,63 @@ size_t local_processor<TS, TI, TR>::get_progress () const
 }
 
 template <class TS, class TI, class TR>
-void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer)
+void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer, bool make_variants)
 {
   std::vector<unsigned int> ol, il;
   ol.push_back (output_layer);
   il.push_back (intruder_layer);
-  run (op, subject_layer, il, ol);
+  run (op, subject_layer, il, ol, make_variants);
 }
 
 template <class TS, class TI, class TR>
-void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, const std::vector<unsigned int> &output_layers)
+void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, const std::vector<unsigned int> &output_layers, bool make_variants)
 {
   std::vector<unsigned int> ol, il;
   il.push_back (intruder_layer);
-  run (op, subject_layer, il, output_layers);
+  run (op, subject_layer, il, output_layers, make_variants);
 }
 
 template <class TS, class TI, class TR>
-void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers, unsigned int output_layer)
+void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers, unsigned int output_layer, bool make_variants)
 {
   std::vector<unsigned int> ol;
   ol.push_back (output_layer);
-  run (op, subject_layer, intruder_layers, ol);
+  run (op, subject_layer, intruder_layers, ol, make_variants);
 }
 
 template <class TS, class TI, class TR>
-void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers, const std::vector<unsigned int> &output_layers)
+void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers, const std::vector<unsigned int> &output_layers, bool make_variants)
 {
   tl::SelfTimer timer (tl::verbosity () > base_verbosity (), tl::to_string (tr ("Executing ")) + description (op));
+
+  set_vars_owned (0);
+
+  //  Prepare cell variants if needed
+  if (make_variants) {
+
+    tl::SelfTimer timer (tl::verbosity () > base_verbosity () + 10, tl::to_string (tr ("Cell variant formation")));
+
+    auto op_vars = op->vars ();
+    if (op_vars) {
+
+      db::VariantsCollectorBase *coll = new db::VariantsCollectorBase (op_vars);
+      set_vars_owned (coll);
+
+      coll->collect (*mp_subject_layout, *mp_subject_top);
+      mp_subject_layout->separate_variants (*coll, mp_subject_top->cell_index ());
+
+      if (mp_intruder_layout != mp_subject_layout) {
+        db::VariantsCollectorBase vci (op_vars);
+        vci.collect (*mp_intruder_layout, *mp_intruder_top);
+        if (vci.has_variants ()) {
+          //  intruder layout needs to be the same one in that case - we do not want the secondary layout to be modified
+          throw tl::Exception (tl::to_string (tr ("Can't modify second layout for cell variant formation - this case is not supported as of now")));
+        }
+      }
+
+    }
+
+  }
 
   local_processor_contexts<TS, TI, TR> contexts;
   compute_contexts (contexts, op, subject_layer, intruder_layers);

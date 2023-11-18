@@ -49,6 +49,7 @@ class Texts;
 class ShapeCollection;
 class NetBuilder;
 class LayoutToNetlist;
+class VariantsCollectorBase;
 
 /**
  *  @brief Represents a shape collection from the deep shape store
@@ -561,20 +562,7 @@ public:
    *  To use this method, first create a variant collector (db::cell_variant_collector) with the required
    *  reducer and collect the variants. Then call this method on the desired layout index to create the variants.
    */
-  template <class VarCollector>
-  void separate_variants (unsigned int layout_index, VarCollector &coll)
-  {
-    tl_assert (is_valid_layout_index (layout_index));
-
-    std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > var_map;
-    coll.separate_variants (layout (layout_index), initial_cell (layout_index), &var_map);
-    if (var_map.empty ()) {
-      //  nothing to do.
-      return;
-    }
-
-    issue_variants (layout_index, var_map);
-  }
+  void separate_variants (unsigned int layout_index, db::VariantsCollectorBase &coll);
 
   /**
    *  @brief Commits shapes for variants to the existing cell hierarchy

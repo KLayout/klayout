@@ -30,6 +30,7 @@
 #include "dbLayout.h"
 #include "dbLocalOperation.h"
 #include "dbGenericShapeIterator.h"
+#include "dbCellVariants.h"
 #include "tlThreadedWorkers.h"
 #include "tlProgress.h"
 
@@ -43,8 +44,6 @@
 
 namespace db
 {
-
-class VariantsCollectorBase;
 
 template <class TS, class TI, class TR> class local_processor;
 template <class TS, class TI, class TR> class local_processor_cell_context;
@@ -485,8 +484,9 @@ public:
     return m_boolean_core;
   }
 
-  void set_vars (const db::VariantsCollectorBase *vars)
+  void set_vars_owned (db::VariantsCollectorBase *vars)
   {
+    mp_vars_owned.reset (vars);
     mp_vars = vars;
   }
 
@@ -517,6 +517,7 @@ private:
   bool m_boolean_core;
   int m_base_verbosity;
   const db::VariantsCollectorBase *mp_vars;
+  std::unique_ptr<db::VariantsCollectorBase> mp_vars_owned;
   mutable const db::Cell *mp_current_cell;
 };
 
@@ -528,10 +529,10 @@ public:
   local_processor (db::Layout *layout = 0, db::Cell *top = 0, const std::set<db::cell_index_type> *breakout_cells = 0);
   local_processor (db::Layout *subject_layout, db::Cell *subject_top, const db::Layout *intruder_layout, const db::Cell *intruder_cell, const std::set<db::cell_index_type> *subject_breakout_cells = 0, const std::set<db::cell_index_type> *intruder_breakout_cells = 0);
 
-  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layers);
-  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, const std::vector<unsigned int> &output_layers);
-  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers, const std::vector<unsigned int> &output_layers);
-  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers, unsigned int output_layer);
+  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layers, bool make_variants = true);
+  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, const std::vector<unsigned int> &output_layers, bool make_variants = true);
+  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers, const std::vector<unsigned int> &output_layers, bool make_variants = true);
+  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers, unsigned int output_layer, bool make_variants = true);
   void compute_contexts (local_processor_contexts<TS, TI, TR> &contexts, const local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers) const;
   void compute_results (local_processor_contexts<TS, TI, TR> &contexts, const local_operation<TS, TI, TR> *op, const std::vector<unsigned int> &output_layers) const;
 

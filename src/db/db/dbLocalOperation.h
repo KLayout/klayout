@@ -38,6 +38,7 @@ namespace db
 
 template <class TS, class TI> class shape_interactions;
 class LocalProcessorBase;
+class TransformationReducer;
 
 /**
  *  @brief Indicates the desired behaviour for subject shapes for which there is no intruder
@@ -116,6 +117,11 @@ public:
    *  A distance of means the shapes must overlap in order to interact.
    */
   virtual db::Coord dist () const { return 0; }
+
+  /**
+   *  @brief Gets the cell variant reducer that indicates whether to build cell variants and which
+   */
+  virtual const db::TransformationReducer *vars () const { return 0; }
 
 protected:
   /**

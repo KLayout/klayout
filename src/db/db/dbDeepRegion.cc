@@ -1799,18 +1799,7 @@ Output *region_cop_impl (DeepRegion *region, db::CompoundRegionOperationNode &no
   }
 
   compound_local_operation<db::PolygonRef, db::PolygonRef, TR> op (&node);
-
-  //  Prepare cell variants if needed
-  auto op_vars = op.vars ();
-  db::VariantsCollectorBase vc (op_vars);
-  if (op.wants_variants () && op_vars) {
-    vc.collect (polygons.layout (), polygons.initial_cell ());
-    //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-    const_cast<db::DeepLayer &> (polygons).separate_variants (vc);
-    proc.set_vars (&vc);
-  }
-
-  proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer ());
+  proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer (), true /*make_variants*/);
 
   return res.release ();
 }
@@ -1863,17 +1852,7 @@ Output *region_cop_with_properties_impl (DeepRegion *region, db::CompoundRegionO
   }
 
   compound_local_operation_with_properties<db::PolygonRef, db::PolygonRef, TR> op (&node, prop_constraint, res->properties_repository (), subject_pr, intruder_prs);
-
-  //  Prepare cell variants if needed
-  db::VariantsCollectorBase vc (op.vars ());
-  if (op.wants_variants ()) {
-    vc.collect (polygons.layout (), polygons.initial_cell ());
-    //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-    const_cast<db::DeepLayer &> (polygons).separate_variants (vc);
-    proc.set_vars (&vc);
-  }
-
-  proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer ());
+  proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer (), true /*make_variants*/);
 
   return res.release ();
 }
@@ -1974,28 +1953,6 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 
   const db::DeepLayer &polygons = needs_merged_primary ? merged_deep_layer () : deep_layer ();
 
-  //  create cell variants for magnification if needed
-
-  db::cell_variants_collector<db::MagnificationReducer> vars;
-  vars.collect (polygons.layout (), polygons.initial_cell ());
-
-  //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-  const_cast<db::DeepLayer &> (polygons).separate_variants (vars);
-
-  if (other_deep && &other_deep->deep_layer ().layout () != &polygons.layout ()) {
-
-    //  create cell variants for magnification for the other input if needed
-
-    const db::DeepLayer &other_layer = other_deep->deep_layer ();
-
-    db::cell_variants_collector<db::MagnificationReducer> vars;
-    vars.collect (other_layer.layout (), other_layer.initial_cell ());
-
-    //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-    const_cast<db::DeepLayer &> (other_layer).separate_variants (vars);
-
-  }
-
   EdgeRelationFilter check (rel, d, options.metrics);
   check.set_include_zero (false);
   check.set_whole_edges (options.whole_edges);
@@ -2021,7 +1978,6 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
                                                                             subject_breakout_cells, intruder_breakout_cells);
 
     configure_proc (proc);
-    proc.set_vars (&vars);
     proc.set_threads (polygons.store ()->threads ());
 
     proc.run (&op, polygons.layer (), other_layer, res->deep_layer ().layer ());
@@ -2035,7 +1991,6 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
                                                                                                                 subject_breakout_cells, intruder_breakout_cells);
 
     configure_proc (proc);
-    proc.set_vars (&vars);
     proc.set_threads (polygons.store ()->threads ());
 
     proc.run (&op, polygons.layer (), other_layer, res->deep_layer ().layer ());

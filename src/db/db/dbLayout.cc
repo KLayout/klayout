@@ -33,6 +33,7 @@
 #include "dbColdProxy.h"
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
+#include "dbCellVariants.h"
 #include "dbRegion.h"
 #include "dbEdgePairs.h"
 #include "dbEdges.h"
@@ -40,6 +41,7 @@
 #include "dbCellMapping.h"
 #include "dbLayerMapping.h"
 #include "dbLayoutUtils.h"
+#include "dbCellVariants.h"
 #include "tlTimer.h"
 #include "tlLog.h"
 #include "tlInternational.h"
@@ -1808,6 +1810,15 @@ Layout::do_update ()
   }
 
   delete pr;
+}
+
+void
+Layout::separate_variants (db::VariantsCollectorBase &coll, cell_index_type initial_cell)
+{
+  std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > var_table;
+  coll.separate_variants (*this, cell (initial_cell), &var_table);
+
+  variants_created_event (&var_table);
 }
 
 static Layout::meta_info_map s_empty_meta;

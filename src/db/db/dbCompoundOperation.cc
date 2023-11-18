@@ -236,7 +236,16 @@ void
 CompoundTransformationReducer::add (const db::TransformationReducer *reducer)
 {
   if (reducer) {
+
+    //  do not add the same reducer twice
+    for (auto v = m_vars.begin (); v != m_vars.end (); ++v) {
+      if (reducer->equals (*v)) {
+        return;
+      }
+    }
+
     m_vars.push_back (reducer);
+
   }
 }
 

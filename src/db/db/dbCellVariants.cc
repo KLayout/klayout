@@ -43,6 +43,11 @@ db::Trans OrientationReducer::reduce (const db::Trans &trans) const
   return db::Trans (trans.fp_trans ());
 }
 
+bool OrientationReducer::equals (const TransformationReducer *other) const
+{
+  return dynamic_cast<const OrientationReducer *> (other) != 0;
+}
+
 // ------------------------------------------------------------------------------------------
 
 db::ICplxTrans OrthogonalTransformationReducer::reduce (const db::ICplxTrans &trans) const
@@ -63,6 +68,11 @@ db::Trans OrthogonalTransformationReducer::reduce (const db::Trans &) const
   return db::Trans ();
 }
 
+bool OrthogonalTransformationReducer::equals (const TransformationReducer *other) const
+{
+  return dynamic_cast<const OrthogonalTransformationReducer *> (other) != 0;
+}
+
 // ------------------------------------------------------------------------------------------
 
 db::ICplxTrans MagnificationReducer::reduce (const db::ICplxTrans &trans) const
@@ -73,6 +83,11 @@ db::ICplxTrans MagnificationReducer::reduce (const db::ICplxTrans &trans) const
 db::Trans MagnificationReducer::reduce (const db::Trans &) const
 {
   return db::Trans ();
+}
+
+bool MagnificationReducer::equals (const TransformationReducer *other) const
+{
+  return dynamic_cast<const MagnificationReducer *> (other) != 0;
 }
 
 // ------------------------------------------------------------------------------------------
@@ -91,6 +106,11 @@ db::Trans XYAnisotropyAndMagnificationReducer::reduce (const db::Trans &trans) c
   return db::Trans (trans.angle () % 2, false, db::Vector ());
 }
 
+bool XYAnisotropyAndMagnificationReducer::equals (const TransformationReducer *other) const
+{
+  return dynamic_cast<const XYAnisotropyAndMagnificationReducer *> (other) != 0;
+}
+
 // ------------------------------------------------------------------------------------------
 
 db::ICplxTrans MagnificationAndOrientationReducer::reduce (const db::ICplxTrans &trans) const
@@ -103,6 +123,11 @@ db::ICplxTrans MagnificationAndOrientationReducer::reduce (const db::ICplxTrans 
 db::Trans MagnificationAndOrientationReducer::reduce (const db::Trans &trans) const
 {
   return db::Trans (trans.fp_trans ());
+}
+
+bool MagnificationAndOrientationReducer::equals (const TransformationReducer *other) const
+{
+  return dynamic_cast<const MagnificationAndOrientationReducer *> (other) != 0;
 }
 
 // ------------------------------------------------------------------------------------------
@@ -128,6 +153,12 @@ db::Trans GridReducer::reduce (const db::Trans &trans) const
   db::Trans res (trans);
   res.disp (db::Vector (trans.disp ().x () - snap_to_grid (trans.disp ().x (), m_grid), trans.disp ().y () - snap_to_grid (trans.disp ().y (), m_grid)));
   return res;
+}
+
+bool GridReducer::equals (const TransformationReducer *other) const
+{
+  const GridReducer *red = dynamic_cast<const GridReducer *> (other);
+  return red != 0 && red->m_grid == m_grid;
 }
 
 // ------------------------------------------------------------------------------------------
@@ -172,6 +203,12 @@ db::Trans ScaleAndGridReducer::reduce (const db::Trans &trans) const
   int64_t dy = int64_t (trans.disp ().y ());
   res.disp (db::Vector (db::Coord (dx - snap_to_grid (dx, m_grid)), db::Coord (dy - snap_to_grid (dy, m_grid))));
   return res;
+}
+
+bool ScaleAndGridReducer::equals (const TransformationReducer *other) const
+{
+  const ScaleAndGridReducer *red = dynamic_cast<const ScaleAndGridReducer *> (other);
+  return red != 0 && red->m_grid == m_grid && red->m_mult == m_mult;
 }
 
 // ------------------------------------------------------------------------------------------

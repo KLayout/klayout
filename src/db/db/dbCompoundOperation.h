@@ -431,6 +431,9 @@ public:
   virtual db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
   virtual bool is_translation_invariant () const;
 
+  //  NOTE: equality does not really matter here as we use it only on leaf reducers
+  virtual bool equals (const TransformationReducer *other) const { return false; }
+
 private:
   std::vector<const db::TransformationReducer *> m_vars;
 };

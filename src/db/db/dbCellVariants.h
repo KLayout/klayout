@@ -54,6 +54,7 @@ public:
   virtual db::ICplxTrans reduce_trans (const db::ICplxTrans &trans) const { return reduce (trans); }
   virtual db::Trans reduce (const db::Trans &trans) const = 0;
   virtual db::ICplxTrans reduce (const db::ICplxTrans &trans) const = 0;
+  virtual bool equals (const TransformationReducer *other) const = 0;
   virtual bool is_translation_invariant () const { return true; }
 };
 
@@ -67,6 +68,7 @@ struct DB_PUBLIC OrientationReducer
 {
   db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
   db::Trans reduce (const db::Trans &trans) const;
+  virtual bool equals (const TransformationReducer *other) const;
 };
 
 /**
@@ -77,6 +79,7 @@ struct DB_PUBLIC OrthogonalTransformationReducer
 {
   db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
   db::Trans reduce (const db::Trans &trans) const;
+  virtual bool equals (const TransformationReducer *other) const;
 };
 
 /**
@@ -89,6 +92,7 @@ struct DB_PUBLIC MagnificationReducer
 {
   db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
   db::Trans reduce (const db::Trans &) const;
+  virtual bool equals (const TransformationReducer *other) const;
 };
 
 /**
@@ -101,6 +105,7 @@ struct DB_PUBLIC XYAnisotropyAndMagnificationReducer
 {
   db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
   db::Trans reduce (const db::Trans &trans) const;
+  virtual bool equals (const TransformationReducer *other) const;
 };
 
 /**
@@ -113,6 +118,7 @@ struct DB_PUBLIC MagnificationAndOrientationReducer
 {
   db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
   db::Trans reduce (const db::Trans &trans) const;
+  virtual bool equals (const TransformationReducer *other) const;
 };
 
 /**
@@ -127,6 +133,7 @@ struct DB_PUBLIC GridReducer
 
   db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
   db::Trans reduce (const db::Trans &trans) const;
+  virtual bool equals (const TransformationReducer *other) const;
 
   bool is_translation_invariant () const { return false; }
 
@@ -150,6 +157,7 @@ struct DB_PUBLIC ScaleAndGridReducer
   virtual db::Trans reduce_trans (const db::Trans &trans) const;
   virtual db::ICplxTrans reduce (const db::ICplxTrans &trans) const;
   virtual db::Trans reduce (const db::Trans &trans) const;
+  virtual bool equals (const TransformationReducer *other) const;
 
   bool is_translation_invariant () const { return false; }
 

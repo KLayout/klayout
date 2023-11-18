@@ -31,10 +31,8 @@ SOURCES = \
   libBasicStrokedPolygon.cc \
   libBasicText.cc
 
-!equals(HAVE_QT, "0") {
-  RESOURCES = \
-    libResources.qrc
-}
+RESOURCES = \
+  libResources.qrc
 
 INCLUDEPATH += $$TL_INC $$GSI_INC $$DB_INC
 DEPENDPATH += $$TL_INC $$GSI_INC $$DB_INC

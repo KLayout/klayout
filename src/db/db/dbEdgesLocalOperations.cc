@@ -57,7 +57,7 @@ EdgeBoolAndOrNotLocalOperation::description () const
 }
 
 void
-EdgeBoolAndOrNotLocalOperation::do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+EdgeBoolAndOrNotLocalOperation::do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, const db::LocalProcessorBase * /*proc*/) const
 {
   tl_assert (results.size () == size_t (m_op == EdgeAndNot ? 2 : 1));
 
@@ -140,7 +140,7 @@ EdgeToPolygonLocalOperation::description () const
 }
 
 void
-EdgeToPolygonLocalOperation::do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+EdgeToPolygonLocalOperation::do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, const db::LocalProcessorBase * /*proc*/) const
 {
   tl_assert (results.size () == size_t (m_op == EdgePolygonOp::Both ? 2 : 1));
 

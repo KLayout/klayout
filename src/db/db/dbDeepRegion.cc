@@ -256,18 +256,16 @@ static void transform_deep_layer (db::DeepLayer &deep_layer, const Trans &t)
     db::MagnificationAndOrientationReducer same_orientation;
 
     db::VariantsCollectorBase vars (&same_orientation);
-    vars.collect (deep_layer.layout (), deep_layer.initial_cell ());
-    deep_layer.separate_variants (vars);
+    vars.collect (&deep_layer.layout (), deep_layer.initial_cell ().cell_index ());
+    vars.separate_variants ();
 
     //  process the variants
     db::Layout &layout = deep_layer.layout ();
 
     for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-      const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
-      tl_assert (v.size () == size_t (1));
-
-      db::Trans tr (v.begin ()->first.inverted () * t.disp ());
+      const db::ICplxTrans &tv = vars.single_variant_transformation (c->cell_index ());
+      db::ICplxTrans tr (tv.inverted () * t.disp ());
 
       db::Shapes &shapes = c->shapes (deep_layer.layer ());
       db::Shapes new_shapes (layout.manager (), c.operator-> (), layout.is_editable ());
@@ -1111,8 +1109,8 @@ DeepRegion::area (const db::Box &box) const
 
     const db::DeepLayer &polygons = merged_deep_layer ();
 
-    db::cell_variants_collector<db::MagnificationReducer> vars;
-    vars.collect (polygons.layout (), polygons.initial_cell ());
+    db::cell_variants_statistics<db::MagnificationReducer> vars;
+    vars.collect (&polygons.layout (), polygons.initial_cell ().cell_index ());
 
     DeepRegion::area_type a = 0;
 
@@ -1123,7 +1121,7 @@ DeepRegion::area (const db::Box &box) const
         ac += s->area ();
       }
       const std::map<db::ICplxTrans, size_t> &vv = vars.variants (*c);
-      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+      for (auto v = vv.begin (); v != vv.end (); ++v) {
         double mag = v->first.mag ();
         a += v->second * ac * mag * mag;
       }
@@ -1148,8 +1146,8 @@ DeepRegion::perimeter (const db::Box &box) const
 
     const db::DeepLayer &polygons = merged_deep_layer ();
 
-    db::cell_variants_collector<db::MagnificationReducer> vars;
-    vars.collect (polygons.layout (), polygons.initial_cell ());
+    db::cell_variants_statistics<db::MagnificationReducer> vars;
+    vars.collect (&polygons.layout (), polygons.initial_cell ().cell_index ());
 
     DeepRegion::perimeter_type p = 0;
 
@@ -1160,7 +1158,7 @@ DeepRegion::perimeter (const db::Box &box) const
         pc += s->perimeter ();
       }
       const std::map<db::ICplxTrans, size_t> &vv = vars.variants (*c);
-      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+      for (auto v = vv.begin (); v != vv.end (); ++v) {
         double mag = v->first.mag ();
         p += v->second * pc * mag;
       }
@@ -1210,7 +1208,7 @@ DeepRegion::grid_check (db::Coord gx, db::Coord gy) const
   db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
   db::cell_variants_collector<db::GridReducer> vars (gx);
-  vars.collect (layout, polygons.initial_cell ());
+  vars.collect (&layout, polygons.initial_cell ().cell_index ());
 
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
   std::unique_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
@@ -1219,14 +1217,14 @@ DeepRegion::grid_check (db::Coord gx, db::Coord gy) const
 
     const db::Shapes &shapes = c->shapes (polygons.layer ());
 
-    const std::map<db::ICplxTrans, size_t> &vv = vars.variants (c->cell_index ());
-    for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+    const std::set<db::ICplxTrans> &vv = vars.variants (c->cell_index ());
+    for (auto v = vv.begin (); v != vv.end (); ++v) {
 
       db::Shapes *markers;
       if (vv.size () == 1) {
         markers = & c->shapes (res->deep_layer ().layer ());
       } else {
-        markers = & to_commit [c->cell_index ()] [v->first];
+        markers = & to_commit [c->cell_index ()] [*v];
       }
 
       for (db::Shapes::shape_iterator si = shapes.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
@@ -1234,7 +1232,7 @@ DeepRegion::grid_check (db::Coord gx, db::Coord gy) const
         db::Polygon poly;
         si->polygon (poly);
 
-        AsIfFlatRegion::produce_markers_for_grid_check (poly, v->first, gx, gy, *markers);
+        AsIfFlatRegion::produce_markers_for_grid_check (poly, *v, gx, gy, *markers);
 
       }
 
@@ -1243,7 +1241,7 @@ DeepRegion::grid_check (db::Coord gx, db::Coord gy) const
   }
 
   //  propagate the markers with a similar algorithm used for producing the variants
-  res->deep_layer ().commit_shapes (vars, to_commit);
+  vars.commit_shapes (res->deep_layer ().layer (), to_commit);
 
   return res.release ();
 }
@@ -1297,23 +1295,19 @@ DeepRegion::snapped (db::Coord gx, db::Coord gy)
   }
 
   const db::DeepLayer &polygons = merged_deep_layer ();
+  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
   db::cell_variants_collector<db::GridReducer> vars (gx);
 
-  vars.collect (polygons.layout (), polygons.initial_cell ());
+  vars.collect (&layout, polygons.initial_cell ().cell_index ());
+  vars.separate_variants ();
 
-  //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-  const_cast<db::DeepLayer &> (polygons).separate_variants (vars);
-
-  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
   std::vector<db::Point> heap;
 
   std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-    const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
-    tl_assert (v.size () == size_t (1));
-    const db::ICplxTrans &tr = v.begin ()->first;
+    const db::ICplxTrans &tr = vars.single_variant_transformation (c->cell_index ());
     db::ICplxTrans trinv = tr.inverted ();
 
     const db::Shapes &s = c->shapes (polygons.layer ());
@@ -1367,27 +1361,22 @@ DeepRegion::edges (const EdgeFilterBase *filter) const
     db::PropertyMapper pm (res->properties_repository (), &polygons.layout ().properties_repository ());
 
     std::unique_ptr<VariantsCollectorBase> vars;
+    db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
     if (filter && filter->vars ()) {
 
       vars.reset (new db::VariantsCollectorBase (filter->vars ()));
 
-      vars->collect (polygons.layout (), polygons.initial_cell ());
-
-      //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-      const_cast<db::DeepLayer &> (polygons).separate_variants (*vars);
+      vars->collect (&layout, polygons.initial_cell ().cell_index ());
+      vars->separate_variants ();
 
     }
-
-    db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
     for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
       db::ICplxTrans tr;
       if (vars.get ()) {
-        const std::map<db::ICplxTrans, size_t> &v = vars->variants (c->cell_index ());
-        tl_assert (v.size () == size_t (1));
-        tr = v.begin ()->first;
+        tr = vars->single_variant_transformation (c->cell_index ());
       }
 
       const db::Shapes &s = c->shapes (polygons.layer ());
@@ -1482,21 +1471,21 @@ DeepRegion *
 DeepRegion::apply_filter (const PolygonFilterBase &filter) const
 {
   const db::DeepLayer &polygons = filter.requires_raw_input () ? deep_layer () : merged_deep_layer ();
+  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
   std::unique_ptr<VariantsCollectorBase> vars;
   if (filter.vars ()) {
 
     vars.reset (new db::VariantsCollectorBase (filter.vars ()));
 
-    vars->collect (polygons.layout (), polygons.initial_cell ());
+    vars->collect (&layout, polygons.initial_cell ().cell_index ());
 
     if (filter.wants_variants ()) {
-      const_cast<db::DeepLayer &> (polygons).separate_variants (*vars);
+      vars->separate_variants ();
     }
 
   }
 
-  db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
 
   std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
@@ -1506,22 +1495,20 @@ DeepRegion::apply_filter (const PolygonFilterBase &filter) const
 
     if (vars.get ()) {
 
-      const std::map<db::ICplxTrans, size_t> &vv = vars->variants (c->cell_index ());
-      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+      const std::set<db::ICplxTrans> &vv = vars->variants (c->cell_index ());
+      for (auto v = vv.begin (); v != vv.end (); ++v) {
 
         db::Shapes *st;
         if (vv.size () == 1) {
           st = & c->shapes (res->deep_layer ().layer ());
         } else {
-          st = & to_commit [c->cell_index ()] [v->first];
+          st = & to_commit [c->cell_index ()] [*v];
         }
-
-        const db::ICplxTrans &tr = v->first;
 
         for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
           db::Polygon poly;
           si->polygon (poly);
-          if (filter.selected (poly.transformed (tr))) {
+          if (filter.selected (poly.transformed (*v))) {
             st->insert (*si);
           }
         }
@@ -1545,7 +1532,7 @@ DeepRegion::apply_filter (const PolygonFilterBase &filter) const
   }
 
   if (! to_commit.empty () && vars.get ()) {
-    res->deep_layer ().commit_shapes (*vars, to_commit);
+    vars->commit_shapes (res->deep_layer ().layer (), to_commit);
   }
 
   if (! filter.requires_raw_input ()) {
@@ -1655,17 +1642,14 @@ DeepRegion::sized (coord_type d, unsigned int mode) const
   db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
   db::cell_variants_collector<db::MagnificationReducer> vars;
-  vars.collect (polygons.layout (), polygons.initial_cell ());
-
-  //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-  const_cast<db::DeepLayer &> (polygons).separate_variants (vars);
+  vars.collect (&layout, polygons.initial_cell ().cell_index ());
+  vars.separate_variants ();
 
   std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-    const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
-    tl_assert (v.size () == size_t (1));
-    double mag = v.begin ()->first.mag ();
+    const db::ICplxTrans &tr = vars.single_variant_transformation (c->cell_index ());
+    double mag = tr.mag ();
     db::Coord d_with_mag = db::coord_traits<db::Coord>::rounded (d / mag);
 
     const db::Shapes &s = c->shapes (polygons.layer ());
@@ -1711,18 +1695,15 @@ DeepRegion::sized (coord_type dx, coord_type dy, unsigned int mode) const
   db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
 
   db::cell_variants_collector<db::XYAnisotropyAndMagnificationReducer> vars;
-  vars.collect (polygons.layout (), polygons.initial_cell ());
-
-  //  NOTE: m_merged_polygons is mutable, so why is the const_cast needed?
-  const_cast<db::DeepLayer &> (polygons).separate_variants (vars);
+  vars.collect (&layout, polygons.initial_cell ().cell_index ());
+  vars.separate_variants ();
 
   std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-    const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
-    tl_assert (v.size () == size_t (1));
-    double mag = v.begin ()->first.mag ();
-    double angle = v.begin ()->first.angle ();
+    const db::ICplxTrans &tr = vars.single_variant_transformation (c->cell_index ());
+    double mag = tr.mag ();
+    double angle = tr.angle ();
 
     db::Coord dx_with_mag = db::coord_traits<db::Coord>::rounded (dx / mag);
     db::Coord dy_with_mag = db::coord_traits<db::Coord>::rounded (dy / mag);
@@ -1799,7 +1780,7 @@ Output *region_cop_impl (DeepRegion *region, db::CompoundRegionOperationNode &no
   }
 
   compound_local_operation<db::PolygonRef, db::PolygonRef, TR> op (&node);
-  proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer ());
+  proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer (), true /*make_variants*/);
 
   return res.release ();
 }
@@ -1852,7 +1833,7 @@ Output *region_cop_with_properties_impl (DeepRegion *region, db::CompoundRegionO
   }
 
   compound_local_operation_with_properties<db::PolygonRef, db::PolygonRef, TR> op (&node, prop_constraint, res->properties_repository (), subject_pr, intruder_prs);
-  proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer ());
+  proc.run (&op, polygons.layer (), other_layers, res->deep_layer ().layer (), true /*make_variants*/);
 
   return res.release ();
 }
@@ -2008,18 +1989,25 @@ DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, c
   }
 
   const db::DeepLayer &polygons = merged_deep_layer ();
-
-  EdgeRelationFilter check (rel, d, options.metrics);
-  check.set_include_zero (false);
-  check.set_whole_edges (options.whole_edges);
-  check.set_ignore_angle (options.ignore_angle);
-  check.set_min_projection (options.min_projection);
-  check.set_max_projection (options.max_projection);
-
   db::Layout &layout = const_cast<db::Layout &> (polygons.layout ());
+
+  db::cell_variants_collector<db::MagnificationReducer> vars;
+  vars.collect (&layout, polygons.initial_cell ().cell_index ());
+  vars.separate_variants ();
 
   std::unique_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
   for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
+
+    const db::ICplxTrans &tr = vars.single_variant_transformation (c->cell_index ());
+    double mag = tr.mag ();
+    db::Coord d_with_mag = db::coord_traits<db::Coord>::rounded (d / mag);
+
+    EdgeRelationFilter check (rel, d_with_mag, options.metrics);
+    check.set_include_zero (false);
+    check.set_whole_edges (options.whole_edges);
+    check.set_ignore_angle (options.ignore_angle);
+    check.set_min_projection (options.min_projection);
+    check.set_max_projection (options.max_projection);
 
     const db::Shapes &shapes = c->shapes (polygons.layer ());
     db::Shapes &result = c->shapes (res->deep_layer ().layer ());

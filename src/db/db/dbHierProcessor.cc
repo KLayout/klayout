@@ -30,6 +30,7 @@
 #include "dbPolygonGenerators.h"
 #include "dbLocalOperationUtils.h"
 #include "dbShapeFlags.h"
+#include "dbCellVariants.h"
 #include "tlLog.h"
 #include "tlTimer.h"
 #include "tlInternational.h"
@@ -1142,7 +1143,7 @@ public:
     db::Box ref_box = db::box_convert<TS> () (*ref);
     for (db::CellInstArray::iterator n = inst->begin_touching (safe_box_enlarged (ref_box, m_dist - 1, m_dist - 1), inst_bc); !n.at_end (); ++n) {
       db::ICplxTrans tn = inst->complex_trans (*n);
-      db::Box region = ref_box.transformed (tn.inverted ()).enlarged (db::Vector (m_dist, m_dist)) & intruder_cell.bbox (m_intruder_layer).enlarged (db::Vector (m_dist, m_dist));
+      db::Box region = ref_box.enlarged (db::Vector (m_dist, m_dist)).transformed (tn.inverted ()) & intruder_cell.bbox (m_intruder_layer);
       if (! region.empty ()) {
         add_shapes_from_intruder_inst (id1, intruder_cell, tn, inst_id, region);
       }
@@ -1258,7 +1259,7 @@ private:
 
       db::ICplxTrans tn1 = inst1->complex_trans (*n);
       db::ICplxTrans tni1 = tn1.inverted ();
-      db::Box ibox1 = tn1 * cell1.bbox (m_subject_layer).enlarged (db::Vector (m_dist, m_dist));
+      db::Box ibox1 = (tn1 * cell1.bbox (m_subject_layer)).enlarged (db::Vector (m_dist, m_dist));
 
       std::set<db::CellInstArray> *insts = 0;
 
@@ -1276,7 +1277,7 @@ private:
           db::ICplxTrans tn2 = inst2->complex_trans (*k);
 
           //  NOTE: we need to enlarge both subject *and* intruder boxes - either object comes close to intruder or the other way around
-          db::Box ibox2 = tn2 * cell2.bbox (m_intruder_layer).enlarged (db::Vector (m_dist, m_dist));
+          db::Box ibox2 = (tn2 * cell2.bbox (m_intruder_layer)).enlarged (db::Vector (m_dist, m_dist));
 
           db::Box cbox = ibox1 & ibox2;
           if (! cbox.empty () && (cbox == ibox1 || cell1.has_shapes_touching (m_subject_layer, safe_box_enlarged (tni1 * cbox, -1, -1)))) {
@@ -1332,7 +1333,7 @@ private:
 
         db::ICplxTrans it = i->complex_trans (*ia);
 
-        db::Box ibox2 = tni2.inverted () * it * ic.bbox (m_intruder_layer).enlarged (db::Vector (m_dist, m_dist));
+        db::Box ibox2 = (tni2.inverted () * it * ic.bbox (m_intruder_layer)).enlarged (db::Vector (m_dist, m_dist));
         db::Box ccbox = cbox & ibox2;
 
         if (! ccbox.empty ()) {
@@ -1470,6 +1471,36 @@ local_processor_result_computation_task<TS, TI, TR>::perform ()
 }
 
 // ---------------------------------------------------------------------------------------------
+//  LocalProcessorBase implementation
+
+LocalProcessorBase::LocalProcessorBase ()
+  : m_report_progress (true), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_boolean_core (false),
+    m_base_verbosity (30), mp_vars (0), mp_current_cell (0)
+{
+  //  .. nothing yet ..
+}
+
+db::Coord
+LocalProcessorBase::dist_for_cell (const db::Cell *cell, db::Coord dist) const
+{
+  return cell ? dist_for_cell (cell->cell_index (), dist) : dist;
+}
+
+db::Coord
+LocalProcessorBase::dist_for_cell (db::cell_index_type cell_index, db::Coord dist) const
+{
+  if (mp_vars) {
+
+    const db::ICplxTrans &tr = mp_vars->single_variant_transformation (cell_index);
+    double mag = tr.mag ();
+    return db::coord_traits<db::Coord>::rounded (dist / mag);
+
+  } else {
+    return dist;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
 //  LocalProcessor implementation
 
 template <class TS, class TI, class TR>
@@ -1477,9 +1508,9 @@ local_processor<TS, TI, TR>::local_processor (db::Layout *layout, db::Cell *top,
   : mp_subject_layout (layout), mp_intruder_layout (layout),
     mp_subject_top (top), mp_intruder_top (top),
     mp_subject_breakout_cells (breakout_cells), mp_intruder_breakout_cells (breakout_cells),
-    m_report_progress (true), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_boolean_core (default_boolean_core<TR> () ()), m_base_verbosity (30), m_progress (0), mp_progress (0)
+    m_progress (0), mp_progress (0)
 {
-  //  .. nothing yet ..
+  set_boolean_core (default_boolean_core<TR> () ());
 }
 
 template <class TS, class TI, class TR>
@@ -1487,19 +1518,9 @@ local_processor<TS, TI, TR>::local_processor (db::Layout *subject_layout, db::Ce
   : mp_subject_layout (subject_layout), mp_intruder_layout (intruder_layout),
     mp_subject_top (subject_top), mp_intruder_top (intruder_top),
     mp_subject_breakout_cells (subject_breakout_cells), mp_intruder_breakout_cells (intruder_breakout_cells),
-    m_report_progress (true), m_nthreads (0), m_max_vertex_count (0), m_area_ratio (0.0), m_boolean_core (default_boolean_core<TR> () ()), m_base_verbosity (30), m_progress (0), mp_progress (0)
+    m_progress (0), mp_progress (0)
 {
-  //  .. nothing yet ..
-}
-
-template <class TS, class TI, class TR>
-std::string local_processor<TS, TI, TR>::description (const local_operation<TS, TI, TR> *op) const
-{
-  if (op && m_description.empty ()) {
-    return op->description ();
-  } else {
-    return m_description;
-  }
+  set_boolean_core (default_boolean_core<TR> () ());
 }
 
 template <class TS, class TI, class TR>
@@ -1528,34 +1549,64 @@ size_t local_processor<TS, TI, TR>::get_progress () const
 }
 
 template <class TS, class TI, class TR>
-void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer)
+void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layer, bool make_variants)
 {
   std::vector<unsigned int> ol, il;
   ol.push_back (output_layer);
   il.push_back (intruder_layer);
-  run (op, subject_layer, il, ol);
+  run (op, subject_layer, il, ol, make_variants);
 }
 
 template <class TS, class TI, class TR>
-void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, const std::vector<unsigned int> &output_layers)
+void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, const std::vector<unsigned int> &output_layers, bool make_variants)
 {
   std::vector<unsigned int> ol, il;
   il.push_back (intruder_layer);
-  run (op, subject_layer, il, output_layers);
+  run (op, subject_layer, il, output_layers, make_variants);
 }
 
 template <class TS, class TI, class TR>
-void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers, unsigned int output_layer)
+void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers, unsigned int output_layer, bool make_variants)
 {
   std::vector<unsigned int> ol;
   ol.push_back (output_layer);
-  run (op, subject_layer, intruder_layers, ol);
+  run (op, subject_layer, intruder_layers, ol, make_variants);
 }
 
 template <class TS, class TI, class TR>
-void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers, const std::vector<unsigned int> &output_layers)
+void local_processor<TS, TI, TR>::run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers, const std::vector<unsigned int> &output_layers, bool make_variants)
 {
-  tl::SelfTimer timer (tl::verbosity () > m_base_verbosity, tl::to_string (tr ("Executing ")) + description (op));
+  tl::SelfTimer timer (tl::verbosity () > base_verbosity (), tl::to_string (tr ("Executing ")) + description (op));
+
+  set_vars_owned (0);
+
+  //  Prepare cell variants if needed
+  if (make_variants) {
+
+    tl::SelfTimer timer (tl::verbosity () > base_verbosity () + 10, tl::to_string (tr ("Cell variant formation")));
+
+    auto op_vars = op->vars ();
+    if (op_vars) {
+
+      db::VariantsCollectorBase *coll = new db::VariantsCollectorBase (op_vars);
+      set_vars_owned (coll);
+
+      coll->collect (mp_subject_layout, mp_subject_top->cell_index ());
+      coll->separate_variants ();
+
+      if (mp_intruder_layout != mp_subject_layout) {
+        db::VariantsCollectorBase vci (op_vars);
+        //  NOTE: we don't plan to use separate_variants, so the const cast is in order
+        vci.collect (const_cast<db::Layout *> (mp_intruder_layout), mp_intruder_top->cell_index ());
+        if (vci.has_variants ()) {
+          //  intruder layout needs to be the same one in that case - we do not want the secondary layout to be modified
+          throw tl::Exception (tl::to_string (tr ("Can't modify second layout for cell variant formation - this case is not supported as of now")));
+        }
+      }
+
+    }
+
+  }
 
   local_processor_contexts<TS, TI, TR> contexts;
   compute_contexts (contexts, op, subject_layer, intruder_layers);
@@ -1576,10 +1627,10 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
 {
   try {
 
-    tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 10, tl::to_string (tr ("Computing contexts for ")) + description (op));
+    tl::SelfTimer timer (tl::verbosity () > base_verbosity () + 10, tl::to_string (tr ("Computing contexts for ")) + description (op));
 
-    if (m_nthreads > 0) {
-      mp_cc_job.reset (new tl::Job<local_processor_context_computation_worker<TS, TI, TR> > (m_nthreads));
+    if (threads () > 0) {
+      mp_cc_job.reset (new tl::Job<local_processor_context_computation_worker<TS, TI, TR> > (threads ()));
     } else {
       mp_cc_job.reset (0);
     }
@@ -1629,17 +1680,19 @@ void local_processor<TS, TI, TR>::compute_contexts (local_processor_contexts<TS,
                                                     const db::ICplxTrans &subject_cell_inst,
                                                     const db::Cell *intruder_cell,
                                                     const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders,
-                                                    db::Coord dist) const
+                                                    db::Coord dist_top) const
 {
   CRONOLOGY_COLLECTION_BRACKET(event_compute_contexts)
 
-  if (tl::verbosity () >= m_base_verbosity + 20) {
+  if (tl::verbosity () >= base_verbosity () + 20) {
     if (! subject_parent) {
       tl::log << tr ("Computing context for top cell ") << mp_subject_layout->cell_name (subject_cell->cell_index ());
     } else {
       tl::log << tr ("Computing context for ") << mp_subject_layout->cell_name (subject_parent->cell_index ()) << " -> " << mp_subject_layout->cell_name (subject_cell->cell_index ()) << " @" << subject_cell_inst.to_string ();
     }
   }
+
+  db::Coord dist = dist_for_cell (subject_cell->cell_index (), dist_top);
 
   db::local_processor_cell_context<TS, TI, TR> *cell_context = 0;
 
@@ -1821,7 +1874,7 @@ local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, T
   dump_cell_contexts (contexts, mp_subject_layout, mp_intruder_layout ? mp_intruder_layout : mp_subject_layout);
 #endif
 
-  tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 10, tl::to_string (tr ("Computing results for ")) + description (op));
+  tl::SelfTimer timer (tl::verbosity () > base_verbosity () + 10, tl::to_string (tr ("Computing results for ")) + description (op));
 
   //  avoids updates while we work on the layout
   mp_subject_layout->update ();
@@ -1829,7 +1882,7 @@ local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, T
 
   //  prepare a progress for the computation tasks
   size_t comp_effort = 0;
-  if (m_report_progress) {
+  if (report_progress ()) {
     for (typename local_processor_contexts<TS, TI, TR>::iterator c = contexts.begin (); c != contexts.end (); ++c) {
       comp_effort += c->second.size ();
     }
@@ -1839,9 +1892,9 @@ local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, T
   m_progress = 0;
   mp_progress = 0;
 
-  if (m_nthreads > 0) {
+  if (threads () > 0) {
 
-    std::unique_ptr<tl::Job<local_processor_result_computation_worker<TS, TI, TR> > > rc_job (new tl::Job<local_processor_result_computation_worker<TS, TI, TR> > (m_nthreads));
+    std::unique_ptr<tl::Job<local_processor_result_computation_worker<TS, TI, TR> > > rc_job (new tl::Job<local_processor_result_computation_worker<TS, TI, TR> > (threads ()));
 
     //  schedule computation jobs in "waves": we need to make sure they are executed
     //  bottom-up. So we identify a new bunch of cells each time we pass through the cell set
@@ -1857,7 +1910,7 @@ local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, T
     while (true) {
 
       ++iter;
-      tl::SelfTimer timer (tl::verbosity () > m_base_verbosity + 10, tl::sprintf (tl::to_string (tr ("Computing results iteration #%d")), iter));
+      tl::SelfTimer timer (tl::verbosity () > base_verbosity () + 10, tl::sprintf (tl::to_string (tr ("Computing results iteration #%d")), iter));
 
       bool any = false;
       std::unordered_set<db::cell_index_type> later;
@@ -1917,7 +1970,7 @@ local_processor<TS, TI, TR>::compute_results (local_processor_contexts<TS, TI, T
 
     try {
 
-      mp_progress = m_report_progress ? &progress : 0;
+      mp_progress = report_progress () ? &progress : 0;
 
       for (db::Layout::bottom_up_const_iterator bu = mp_subject_layout->begin_bottom_up (); bu != mp_subject_layout->end_bottom_up (); ++bu) {
 
@@ -2045,6 +2098,8 @@ template <class TS, class TI, class TR>
 void
 local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_contexts<TS, TI, TR> &contexts, db::Cell *subject_cell, const db::Cell *intruder_cell, const local_operation<TS, TI, TR> *op, const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, std::vector<std::unordered_set<TR> > &result) const
 {
+  db::Coord dist = dist_for_cell (subject_cell->cell_index (), op->dist ());
+
   const db::Shapes *subject_shapes = &subject_cell->shapes (contexts.subject_layer ());
   db::shape_to_object<TS> s2o;
 
@@ -2091,12 +2146,12 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
       if (subject_cell == intruder_cell && contexts.subject_layer () == ail && !foreign) {
 
-        scan_shape2shape_same_layer<TS, TI> () (subject_shapes, subject_id0, ipl == intruders.second.end () ? empty_intruders : ipl->second, il_index, interactions, op->dist ());
+        scan_shape2shape_same_layer<TS, TI> () (subject_shapes, subject_id0, ipl == intruders.second.end () ? empty_intruders : ipl->second, il_index, interactions, dist);
 
       } else {
 
         db::Layout *target_layout = (mp_subject_layout == mp_intruder_layout ? 0 : mp_subject_layout);
-        scan_shape2shape_different_layers<TS, TI> () (target_layout, subject_shapes, intruder_shapes, subject_id0, &(ipl == intruders.second.end () ? empty_intruders : ipl->second), il_index, interactions, op->dist ());
+        scan_shape2shape_different_layers<TS, TI> () (target_layout, subject_shapes, intruder_shapes, subject_id0, &(ipl == intruders.second.end () ? empty_intruders : ipl->second), il_index, interactions, dist);
 
       }
 
@@ -2106,7 +2161,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
       db::box_scanner2<TS, int, db::CellInstArray, int> scanner;
       db::addressable_object_from_shape<TS> heap;
-      interaction_registration_shape2inst<TS, TI> rec (mp_subject_layout, mp_intruder_layout, ail, il_index, op->dist (), &interactions);
+      interaction_registration_shape2inst<TS, TI> rec (mp_subject_layout, mp_intruder_layout, ail, il_index, dist, &interactions);
 
       unsigned int id = subject_id0;
       for (db::Shapes::shape_iterator i = subject_shapes->begin (shape_flags<TS> ()); !i.at_end (); ++i) {
@@ -2137,7 +2192,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
         }
       }
 
-      scanner.process (rec, op->dist (), db::box_convert<TS> (), inst_bci);
+      scanner.process (rec, dist, db::box_convert<TS> (), inst_bci);
 
     }
 
@@ -2154,7 +2209,7 @@ local_processor<TS, TI, TR>::compute_local_cell (const db::local_processor_conte
 
     }
 
-    op->compute_local (mp_subject_layout, interactions, result, m_max_vertex_count, m_area_ratio);
+    op->compute_local (mp_subject_layout, subject_cell, interactions, result, this);
 
   }
 }
@@ -2264,7 +2319,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
   std::string process_description, scan_description;
 
-  if (m_report_progress) {
+  if (report_progress ()) {
 
     process_description = description (op);
     if (process_description.empty ()) {
@@ -2327,7 +2382,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
         if (*il == subjects && ! ff) {
 
-          interaction_registration_shape1_scanner_combo<TS, TI> scanner (&interactions, il_index, m_report_progress, scan_description);
+          interaction_registration_shape1_scanner_combo<TS, TI> scanner (&interactions, il_index, report_progress (), scan_description);
 
           for (typename shape_interactions<TS, TI>::subject_iterator s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
             scanner.insert (&s->second, s->first);
@@ -2337,7 +2392,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
         } else {
 
-          db::box_scanner2<TS, unsigned int, TI, unsigned int> scanner (m_report_progress, scan_description);
+          db::box_scanner2<TS, unsigned int, TI, unsigned int> scanner (report_progress (), scan_description);
           interaction_registration_shape2shape<TS, TI> rec (0 /*layout*/, &interactions, il_index);
 
           for (typename shape_interactions<TS, TI>::subject_iterator s = interactions.begin_subjects (); s != interactions.end_subjects (); ++s) {
@@ -2393,7 +2448,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
         if (*il == subjects && ! ff) {
 
-          interaction_registration_shape1_scanner_combo<TS, TI> scanner (&interactions, il_index, m_report_progress, scan_description);
+          interaction_registration_shape1_scanner_combo<TS, TI> scanner (&interactions, il_index, report_progress (), scan_description);
 
           addressable_shape_delivery<TS> is (subjects.confined (common_box, false));
           unsigned int id = id_first;
@@ -2406,7 +2461,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
         } else {
 
-          db::box_scanner2<TS, unsigned int, TI, unsigned int> scanner (m_report_progress, scan_description);
+          db::box_scanner2<TS, unsigned int, TI, unsigned int> scanner (report_progress (), scan_description);
           interaction_registration_shape2shape<TS, TI> rec (0 /*layout*/, &interactions, il_index);
 
           if (*il == subjects) {
@@ -2463,7 +2518,7 @@ local_processor<TS, TI, TR>::run_flat (const generic_shape_iterator<TS> &subject
 
     std::vector<std::unordered_set<TR> > result;
     result.resize (result_shapes.size ());
-    op->compute_local (mp_subject_layout, interactions, result, m_max_vertex_count, m_area_ratio, m_report_progress, process_description);
+    op->compute_local (mp_subject_layout, 0, interactions, result, this);
 
     for (std::vector<db::Shapes *>::const_iterator r = result_shapes.begin (); r != result_shapes.end (); ++r) {
       if (*r) {

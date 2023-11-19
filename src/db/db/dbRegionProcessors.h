@@ -282,6 +282,7 @@ public:
 private:
   double m_fx1, m_fy1, m_fx2, m_fy2;
   db::MagnificationAndOrientationReducer m_anisotropic_reducer;
+  db::MagnificationReducer m_isotropic_reducer;
 };
 
 /**

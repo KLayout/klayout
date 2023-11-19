@@ -30,6 +30,7 @@
 #include "dbLayout.h"
 #include "dbLocalOperation.h"
 #include "dbGenericShapeIterator.h"
+#include "dbCellVariants.h"
 #include "tlThreadedWorkers.h"
 #include "tlProgress.h"
 
@@ -413,22 +414,10 @@ public:
   }
 };
 
-template <class TS, class TI, class TR>
-class DB_PUBLIC local_processor
+class DB_PUBLIC LocalProcessorBase
 {
 public:
-  local_processor (db::Layout *layout = 0, db::Cell *top = 0, const std::set<db::cell_index_type> *breakout_cells = 0);
-  local_processor (db::Layout *subject_layout, db::Cell *subject_top, const db::Layout *intruder_layout, const db::Cell *intruder_cell, const std::set<db::cell_index_type> *subject_breakout_cells = 0, const std::set<db::cell_index_type> *intruder_breakout_cells = 0);
-  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layers);
-  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, const std::vector<unsigned int> &output_layers);
-  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers, const std::vector<unsigned int> &output_layers);
-  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers, unsigned int output_layer);
-  void compute_contexts (local_processor_contexts<TS, TI, TR> &contexts, const local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers) const;
-  void compute_results (local_processor_contexts<TS, TI, TR> &contexts, const local_operation<TS, TI, TR> *op, const std::vector<unsigned int> &output_layers) const;
-
-  void run_flat (const db::Shapes *subject_shapes, const db::Shapes *intruders, const local_operation<TS, TI, TR> *op, db::Shapes *result_shapes) const;
-  void run_flat (const db::Shapes *subjects, const std::vector<const db::Shapes *> &intruders, const local_operation<TS, TI, TR> *op, const std::vector<db::Shapes *> &result_shapes) const;
-  void run_flat (const generic_shape_iterator<TS> &subjects, const std::vector<generic_shape_iterator<TI> > &intruders, const std::vector<bool> &foreign, const local_operation<TS, TI, TR> *op, const std::vector<db::Shapes *> &result_shapes) const;
+  LocalProcessorBase ();
 
   void set_description (const std::string &d)
   {
@@ -438,6 +427,11 @@ public:
   void set_report_progress (bool rp)
   {
     m_report_progress = rp;
+  }
+
+  bool report_progress () const
+  {
+    return m_report_progress;
   }
 
   void set_base_verbosity (int vb)
@@ -490,6 +484,62 @@ public:
     return m_boolean_core;
   }
 
+  void set_vars_owned (db::VariantsCollectorBase *vars)
+  {
+    mp_vars_owned.reset (vars);
+    mp_vars = vars;
+  }
+
+  const db::VariantsCollectorBase *vars () const
+  {
+    return mp_vars;
+  }
+
+  db::Coord dist_for_cell (db::cell_index_type cell_index, db::Coord dist) const;
+  db::Coord dist_for_cell (const db::Cell *cell, db::Coord dist) const;
+
+  template <class TS, class TI, class TR>
+  std::string description (const local_operation<TS, TI, TR> *op) const
+  {
+    if (op && m_description.empty ()) {
+      return op->description ();
+    } else {
+      return m_description;
+    }
+  }
+
+private:
+  std::string m_description;
+  bool m_report_progress;
+  unsigned int m_nthreads;
+  size_t m_max_vertex_count;
+  double m_area_ratio;
+  bool m_boolean_core;
+  int m_base_verbosity;
+  const db::VariantsCollectorBase *mp_vars;
+  std::unique_ptr<db::VariantsCollectorBase> mp_vars_owned;
+  mutable const db::Cell *mp_current_cell;
+};
+
+template <class TS, class TI, class TR>
+class DB_PUBLIC local_processor
+  : public LocalProcessorBase
+{
+public:
+  local_processor (db::Layout *layout = 0, db::Cell *top = 0, const std::set<db::cell_index_type> *breakout_cells = 0);
+  local_processor (db::Layout *subject_layout, db::Cell *subject_top, const db::Layout *intruder_layout, const db::Cell *intruder_cell, const std::set<db::cell_index_type> *subject_breakout_cells = 0, const std::set<db::cell_index_type> *intruder_breakout_cells = 0);
+
+  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, unsigned int output_layers, bool make_variants = true);
+  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, unsigned int intruder_layer, const std::vector<unsigned int> &output_layers, bool make_variants = true);
+  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers, const std::vector<unsigned int> &output_layers, bool make_variants = true);
+  void run (local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers, unsigned int output_layer, bool make_variants = true);
+  void compute_contexts (local_processor_contexts<TS, TI, TR> &contexts, const local_operation<TS, TI, TR> *op, unsigned int subject_layer, const std::vector<unsigned int> &intruder_layers) const;
+  void compute_results (local_processor_contexts<TS, TI, TR> &contexts, const local_operation<TS, TI, TR> *op, const std::vector<unsigned int> &output_layers) const;
+
+  void run_flat (const db::Shapes *subject_shapes, const db::Shapes *intruders, const local_operation<TS, TI, TR> *op, db::Shapes *result_shapes) const;
+  void run_flat (const db::Shapes *subjects, const std::vector<const db::Shapes *> &intruders, const local_operation<TS, TI, TR> *op, const std::vector<db::Shapes *> &result_shapes) const;
+  void run_flat (const generic_shape_iterator<TS> &subjects, const std::vector<generic_shape_iterator<TI> > &intruders, const std::vector<bool> &foreign, const local_operation<TS, TI, TR> *op, const std::vector<db::Shapes *> &result_shapes) const;
+
 private:
   template<typename, typename, typename> friend class local_processor_cell_contexts;
   template<typename, typename, typename> friend class local_processor_context_computation_task;
@@ -500,18 +550,10 @@ private:
   const db::Cell *mp_intruder_top;
   const std::set<db::cell_index_type> *mp_subject_breakout_cells;
   const std::set<db::cell_index_type> *mp_intruder_breakout_cells;
-  std::string m_description;
-  bool m_report_progress;
-  unsigned int m_nthreads;
-  size_t m_max_vertex_count;
-  double m_area_ratio;
-  bool m_boolean_core;
-  int m_base_verbosity;
   mutable std::unique_ptr<tl::Job<local_processor_context_computation_worker<TS, TI, TR> > > mp_cc_job;
   mutable size_t m_progress;
   mutable tl::Progress *mp_progress;
 
-  std::string description (const local_operation<TS, TI, TR> *op) const;
   void next () const;
   size_t get_progress () const;
   void compute_contexts (db::local_processor_contexts<TS, TI, TR> &contexts, db::local_processor_cell_context<TS, TI, TR> *parent_context, db::Cell *subject_parent, db::Cell *subject_cell, const db::ICplxTrans &subject_cell_inst, const db::Cell *intruder_cell, const typename local_processor_cell_contexts<TS, TI, TR>::context_key_type &intruders, db::Coord dist) const;

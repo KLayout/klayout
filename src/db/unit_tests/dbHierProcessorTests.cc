@@ -61,7 +61,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void do_compute_local (db::Layout *layout, const db::shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
+  virtual void do_compute_local (db::Layout *layout, db::Cell *cell, const db::shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, const db::LocalProcessorBase *proc) const
   {
     db::shape_interactions<db::PolygonRef, db::PolygonRef> sized_interactions = interactions;
     for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = sized_interactions.begin (); i != sized_interactions.end (); ++i) {
@@ -73,7 +73,7 @@ public:
       }
     }
 
-    db::BoolAndOrNotLocalOperation::do_compute_local (layout, sized_interactions, results, max_vertex_count, area_ratio);
+    db::BoolAndOrNotLocalOperation::do_compute_local (layout, cell, sized_interactions, results, proc);
   }
 
   db::Coord dist () const
@@ -98,7 +98,7 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void do_compute_local (db::Layout *layout, const db::shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t max_vertex_count, double area_ratio) const
+  virtual void do_compute_local (db::Layout *layout, db::Cell *cell, const db::shape_interactions<db::PolygonRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, const db::LocalProcessorBase *proc) const
   {
     db::shape_interactions<db::PolygonRef, db::PolygonRef> sized_interactions = interactions;
     for (db::shape_interactions<db::PolygonRef, db::PolygonRef>::iterator i = sized_interactions.begin (); i != sized_interactions.end (); ++i) {
@@ -119,7 +119,7 @@ public:
 
     }
 
-    SelfOverlapMergeLocalOperation::do_compute_local (layout, sized_interactions, results, max_vertex_count, area_ratio);
+    SelfOverlapMergeLocalOperation::do_compute_local (layout, cell, sized_interactions, results, proc);
   }
 
   db::Coord dist () const

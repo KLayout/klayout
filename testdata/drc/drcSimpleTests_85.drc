@@ -1,0 +1,14 @@
+
+source $drc_test_source
+target $drc_test_target
+
+deep
+
+l1 = input(1, 0)
+
+l1.output(1, 0)
+
+l1.edges.space(0.4, projection).output(100, 0)
+l1.edges.space(0.9, projection).output(101, 0)
+l1.edges.space(1.1, projection).output(102, 0)
+

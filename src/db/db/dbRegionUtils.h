@@ -402,7 +402,7 @@ private:
   bool m_inverse;
   parameter_type m_parameter;
   db::MagnificationReducer m_isotropic_vars;
-  db::MagnificationAndOrientationReducer m_anisotropic_vars;
+  db::XYAnisotropyAndMagnificationReducer m_anisotropic_vars;
 
   bool check (const db::Box &box) const;
 };
@@ -472,7 +472,7 @@ private:
   bool m_inverse;
   parameter_type m_parameter;
   db::MagnificationReducer m_isotropic_vars;
-  db::MagnificationAndOrientationReducer m_anisotropic_vars;
+  db::XYAnisotropyAndMagnificationReducer m_anisotropic_vars;
 };
 
 /**
@@ -593,11 +593,14 @@ public:
   SinglePolygonCheck (db::edge_relation_type rel, db::Coord d, const RegionCheckOptions &options);
 
   virtual void process (const db::Polygon &polygon, std::vector<db::EdgePair> &res) const;
+  virtual const TransformationReducer *vars () const { return &m_vars; }
+  virtual bool wants_variants () const { return true; }
 
 private:
   db::edge_relation_type m_relation;
   db::Coord m_d;
   db::RegionCheckOptions m_options;
+  db::MagnificationReducer m_vars;
 };
 
 } // namespace db

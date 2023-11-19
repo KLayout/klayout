@@ -407,21 +407,21 @@ TextsDelegate *DeepTexts::filtered (const TextFilterBase &filter) const
 DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
 {
   const db::DeepLayer &texts = deep_layer ();
+  db::Layout &layout = const_cast<db::Layout &> (texts.layout ());
 
   std::unique_ptr<VariantsCollectorBase> vars;
   if (filter.vars ()) {
 
     vars.reset (new db::VariantsCollectorBase (filter.vars ()));
 
-    vars->collect (texts.layout (), texts.initial_cell ());
+    vars->collect (&layout, texts.initial_cell ().cell_index ());
 
     if (filter.wants_variants ()) {
-      const_cast<db::DeepLayer &> (texts).separate_variants (*vars);
+      vars->separate_variants ();
     }
 
   }
 
-  db::Layout &layout = const_cast<db::Layout &> (texts.layout ());
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
 
   std::unique_ptr<db::DeepTexts> res (new db::DeepTexts (texts.derived ()));
@@ -431,22 +431,20 @@ DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
 
     if (vars.get ()) {
 
-      const std::map<db::ICplxTrans, size_t> &vv = vars->variants (c->cell_index ());
-      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+      const std::set<db::ICplxTrans> &vv = vars->variants (c->cell_index ());
+      for (auto v = vv.begin (); v != vv.end (); ++v) {
 
         db::Shapes *st;
         if (vv.size () == 1) {
           st = & c->shapes (res->deep_layer ().layer ());
         } else {
-          st = & to_commit [c->cell_index ()] [v->first];
+          st = & to_commit [c->cell_index ()] [*v];
         }
-
-        const db::ICplxTrans &tr = v->first;
 
         for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Texts); ! si.at_end (); ++si) {
           db::Text text;
           si->text (text);
-          if (filter.selected (text.transformed (tr))) {
+          if (filter.selected (text.transformed (*v))) {
             st->insert (*si);
           }
         }
@@ -470,7 +468,7 @@ DeepTexts *DeepTexts::apply_filter (const TextFilterBase &filter) const
   }
 
   if (! to_commit.empty () && vars.get ()) {
-    res->deep_layer ().commit_shapes (*vars, to_commit);
+    vars->commit_shapes (res->deep_layer ().layer (), to_commit);
   }
 
   return res.release ();
@@ -571,7 +569,7 @@ public:
     return 1;
   }
 
-  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::TextRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::TextRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::TextRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::TextRef> > &results, const db::LocalProcessorBase * /*proc*/) const
   {
     tl_assert (results.size () == 1);
     std::unordered_set<db::TextRef> &result = results.front ();
@@ -670,7 +668,7 @@ public:
     return 1;
   }
 
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::TextRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<db::TextRef, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, const db::LocalProcessorBase * /*proc*/) const
   {
     tl_assert (results.size () == 1);
     std::unordered_set<db::PolygonRef> &result = results.front ();

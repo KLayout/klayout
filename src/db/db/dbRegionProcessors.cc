@@ -118,7 +118,13 @@ void RelativeExtentsAsEdges::process (const db::Polygon &poly, std::vector<db::E
 
 const TransformationReducer *RelativeExtentsAsEdges::vars () const
 {
-  return & m_anisotropic_reducer;
+  if (fabs (m_fx1) < db::epsilon && fabs (m_fy1) < db::epsilon && fabs (1.0 - m_fx2) < db::epsilon && fabs (1.0 - m_fy2) < db::epsilon) {
+    return 0;
+  } else if (fabs (m_fx1 - m_fy1) < db::epsilon && fabs (1.0 - (m_fx1 + m_fx2)) < db::epsilon  && fabs (m_fx2 - m_fy2) < db::epsilon && fabs (1.0 - (m_fy1 + m_fy2)) < db::epsilon) {
+    return & m_isotropic_reducer;
+  } else {
+    return & m_anisotropic_reducer;
+  }
 }
 
 bool RelativeExtentsAsEdges::result_must_not_be_merged () const

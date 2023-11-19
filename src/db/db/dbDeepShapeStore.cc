@@ -287,8 +287,31 @@ struct DeepShapeStore::LayoutHolder
     db::LayoutToNetlist *mp_l2n;
   };
 
+  class VariantsCreatedListener
+    : public tl::Object
+  {
+  public:
+    VariantsCreatedListener (DeepShapeStore::LayoutHolder *lh, db::Layout *ly)
+      : mp_lh (lh)
+    {
+      ly->variants_created_event.add (this, &VariantsCreatedListener::variants_created);
+    }
+
+  private:
+    void variants_created (const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > *var_map)
+    {
+      for (std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> >::const_iterator i = var_map->begin (); i != var_map->end (); ++i) {
+        for (std::map<db::ICplxTrans, db::cell_index_type>::const_iterator j = i->second.begin (); j != i->second.end (); ++j) {
+          mp_lh->builder.register_variant (i->first, j->second);
+        }
+      }
+    }
+
+    DeepShapeStore::LayoutHolder *mp_lh;
+  };
+
   LayoutHolder (const db::ICplxTrans &trans)
-    : refs (0), layout (false), builder (&layout, trans)
+    : refs (0), layout (false), builder (&layout, trans), variants_created (this, &layout)
   {
     //  .. nothing yet ..
   }
@@ -337,6 +360,9 @@ struct DeepShapeStore::LayoutHolder
   int refs;
   db::Layout layout;
   db::HierarchyBuilder builder;
+
+private:
+  VariantsCreatedListener variants_created;
   std::map<db::LayoutToNetlist *, std::pair<L2NStatusChangedListener, db::NetBuilder> > net_builders;
   std::map<unsigned int, int> layer_refs;
 };
@@ -1046,17 +1072,6 @@ DeepLayer DeepShapeStore::create_text_layer (const db::RecursiveShapeIterator &s
 
   db::TextBuildingHierarchyBuilderShapeReceiver refs (&layout, si.layout ());
   return create_custom_layer (si, &refs, trans);
-}
-
-void
-DeepShapeStore::issue_variants (unsigned int layout_index, const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > &var_map)
-{
-  db::HierarchyBuilder &builder = m_layouts [layout_index]->builder;
-  for (std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> >::const_iterator i = var_map.begin (); i != var_map.end (); ++i) {
-    for (std::map<db::ICplxTrans, db::cell_index_type>::const_iterator j = i->second.begin (); j != i->second.end (); ++j) {
-      builder.register_variant (i->first, j->second);
-    }
-  }
 }
 
 const db::CellMapping &

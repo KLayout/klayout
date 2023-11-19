@@ -37,6 +37,8 @@ namespace db
 {
 
 template <class TS, class TI> class shape_interactions;
+class LocalProcessorBase;
+class TransformationReducer;
 
 /**
  *  @brief Indicates the desired behaviour for subject shapes for which there is no intruder
@@ -93,7 +95,7 @@ public:
    *
    *  If the operation requests single subject mode, the interactions will be split into single subject/intruder clusters
    */
-  void compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio, bool report_progress = false, const std::string &progress_desc = std::string ()) const;
+  void compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase *proc) const;
 
   /**
    *  @brief Indicates the desired behaviour when a shape does not have an intruder
@@ -116,6 +118,11 @@ public:
    */
   virtual db::Coord dist () const { return 0; }
 
+  /**
+   *  @brief Gets the cell variant reducer that indicates whether to build cell variants and which
+   */
+  virtual const db::TransformationReducer *vars () const { return 0; }
+
 protected:
   /**
    *  @brief Computes the results from a given set of interacting shapes
@@ -123,7 +130,7 @@ protected:
    *  @param interactions The interaction set
    *  @param result The container to which the results are written
    */
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &result, size_t max_vertex_count, double area_ratio) const = 0;
+  virtual void do_compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &result, const db::LocalProcessorBase *proc) const = 0;
 };
 
 }

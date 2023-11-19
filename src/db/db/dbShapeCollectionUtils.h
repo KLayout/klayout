@@ -169,20 +169,20 @@ DB_PUBLIC_TEMPLATE
 OutputContainer *
 shape_collection_processed_impl (const db::DeepLayer &input, const shape_collection_processor<Shape, Result> &filter)
 {
+  db::Layout &layout = const_cast<db::Layout &> (input.layout ());
+
   std::unique_ptr<VariantsCollectorBase> vars;
   if (filter.vars ()) {
 
     vars.reset (new db::VariantsCollectorBase (filter.vars ()));
 
-    vars->collect (input.layout (), input.initial_cell ());
+    vars->collect (&layout, input.initial_cell ().cell_index ());
 
     if (filter.wants_variants ()) {
-      const_cast<db::DeepLayer &> (input).separate_variants (*vars);
+      vars->separate_variants ();
     }
 
   }
-
-  db::Layout &layout = const_cast<db::Layout &> (input.layout ());
 
   std::vector<Result> heap;
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
@@ -198,20 +198,20 @@ shape_collection_processed_impl (const db::DeepLayer &input, const shape_collect
 
     if (vars.get ()) {
 
-      const std::map<db::ICplxTrans, size_t> &vv = vars->variants (c->cell_index ());
-      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+      const std::set<db::ICplxTrans> &vv = vars->variants (c->cell_index ());
+      for (auto v = vv.begin (); v != vv.end (); ++v) {
 
         db::Shapes *st;
         if (vv.size () == 1) {
           st = & c->shapes (res->deep_layer ().layer ());
         } else {
-          st = & to_commit [c->cell_index ()] [v->first];
+          st = & to_commit [c->cell_index ()] [*v];
         }
 
         shape_collection_processor_delivery<Result> delivery (&layout, st);
         shape_collection_processor_delivery<db::object_with_properties<Result> > delivery_wp (&layout, st);
 
-        const db::ICplxTrans &tr = v->first;
+        const db::ICplxTrans &tr = *v;
         db::ICplxTrans trinv = tr.inverted ();
 
         for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::All); ! si.at_end (); ++si) {
@@ -256,7 +256,7 @@ shape_collection_processed_impl (const db::DeepLayer &input, const shape_collect
   }
 
   if (! to_commit.empty () && vars.get ()) {
-    res->deep_layer ().commit_shapes (*vars, to_commit);
+    vars->commit_shapes (res->deep_layer ().layer (), to_commit);
   }
 
   if (filter.result_is_merged ()) {

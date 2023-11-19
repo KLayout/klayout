@@ -244,22 +244,21 @@ static void transform_deep_layer (db::DeepLayer &deep_layer, const Trans &t)
 
     //  Plain move
 
+    db::Layout &layout = deep_layer.layout ();
+
     //  build cell variants for different orientations
     db::OrientationReducer same_orientation;
 
     db::VariantsCollectorBase vars (&same_orientation);
-    vars.collect (deep_layer.layout (), deep_layer.initial_cell ());
-    deep_layer.separate_variants (vars);
+    vars.collect (&layout, deep_layer.initial_cell ().cell_index ());
+    vars.separate_variants ();
 
     //  process the variants
-    db::Layout &layout = deep_layer.layout ();
 
     for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-      const std::map<db::ICplxTrans, size_t> &v = vars.variants (c->cell_index ());
-      tl_assert (v.size () == size_t (1));
-
-      db::Trans tr (v.begin ()->first.inverted () * t.disp ());
+      const db::ICplxTrans &tv = vars.single_variant_transformation (c->cell_index ());
+      db::ICplxTrans tr (tv.inverted () * t.disp ());
 
       db::Shapes &shapes = c->shapes (deep_layer.layer ());
       db::Shapes new_shapes (layout.manager (), c.operator-> (), layout.is_editable ());
@@ -739,8 +738,8 @@ DeepEdges::length_type DeepEdges::length (const db::Box &box) const
     const db::DeepLayer &edges = merged_deep_layer ();
 
     db::MagnificationReducer red;
-    db::cell_variants_collector<db::MagnificationReducer> vars (red);
-    vars.collect (edges.layout (), edges.initial_cell ());
+    db::cell_variants_statistics<db::MagnificationReducer> vars (red);
+    vars.collect (&edges.layout (), edges.initial_cell ().cell_index ());
 
     DeepEdges::length_type l = 0;
 
@@ -751,7 +750,7 @@ DeepEdges::length_type DeepEdges::length (const db::Box &box) const
         lc += s->edge ().length ();
       }
       const std::map<db::ICplxTrans, size_t> &vv = vars.variants (*c);
-      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+      for (auto v = vv.begin (); v != vv.end (); ++v) {
         double mag = v->first.mag ();
         l += v->second * lc * mag;
       }
@@ -812,21 +811,21 @@ DeepEdges *
 DeepEdges::apply_filter (const EdgeFilterBase &filter) const
 {
   const db::DeepLayer &edges = filter.requires_raw_input () ? deep_layer () : merged_deep_layer ();
+  db::Layout &layout = const_cast<db::Layout &> (edges.layout ());
 
   std::unique_ptr<VariantsCollectorBase> vars;
   if (filter.vars ()) {
 
     vars.reset (new db::VariantsCollectorBase (filter.vars ()));
 
-    vars->collect (edges.layout (), edges.initial_cell ());
+    vars->collect (&layout, edges.initial_cell ().cell_index ());
 
     if (filter.wants_variants ()) {
-      const_cast<db::DeepLayer &> (edges).separate_variants (*vars);
+      vars->separate_variants ();
     }
 
   }
 
-  db::Layout &layout = const_cast<db::Layout &> (edges.layout ());
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
 
   std::unique_ptr<db::DeepEdges> res (new db::DeepEdges (edges.derived ()));
@@ -836,20 +835,18 @@ DeepEdges::apply_filter (const EdgeFilterBase &filter) const
 
     if (vars.get ()) {
 
-      const std::map<db::ICplxTrans, size_t> &vv = vars->variants (c->cell_index ());
-      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+      const std::set<db::ICplxTrans> &vv = vars->variants (c->cell_index ());
+      for (auto v = vv.begin (); v != vv.end (); ++v) {
 
         db::Shapes *st;
         if (vv.size () == 1) {
           st = & c->shapes (res->deep_layer ().layer ());
         } else {
-          st = & to_commit [c->cell_index ()] [v->first];
+          st = & to_commit [c->cell_index ()] [*v];
         }
 
-        const db::ICplxTrans &tr = v->first;
-
         for (db::Shapes::shape_iterator si = s.begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
-          if (filter.selected (si->edge ().transformed (tr))) {
+          if (filter.selected (si->edge ().transformed (*v))) {
             st->insert (*si);
           }
         }
@@ -871,7 +868,7 @@ DeepEdges::apply_filter (const EdgeFilterBase &filter) const
   }
 
   if (! to_commit.empty () && vars.get ()) {
-    res->deep_layer ().commit_shapes (*vars, to_commit);
+    vars->commit_shapes (res->deep_layer ().layer (), to_commit);
   }
 
   if (! filter.requires_raw_input ()) {
@@ -1262,7 +1259,7 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
   //  dots formally don't have an orientation, hence the interpretation is x and y.
   db::MagnificationReducer red;
   db::cell_variants_collector<db::MagnificationReducer> vars (red);
-  vars.collect (edges.layout (), edges.initial_cell ());
+  vars.collect (&layout, edges.initial_cell ().cell_index ());
 
   std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > to_commit;
 
@@ -1279,14 +1276,14 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
     //  TODO: iterate only over the called cells?
     for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-      const std::map<db::ICplxTrans, size_t> &vv = vars.variants (c->cell_index ());
-      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+      const std::set<db::ICplxTrans> &vv = vars.variants (c->cell_index ());
+      for (auto v = vv.begin (); v != vv.end (); ++v) {
 
         db::Shapes *out;
         if (vv.size () == 1) {
           out = & c->shapes (res->deep_layer ().layer ());
         } else {
-          out = & to_commit [c->cell_index ()][v->first];
+          out = & to_commit [c->cell_index ()][*v];
         }
 
         const db::connected_clusters<db::Edge> &cc = hc.clusters_per_cell (c->cell_index ());
@@ -1295,12 +1292,12 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
           if (cc.is_root (*cl)) {
 
             PolygonRefToShapesGenerator prgen (&layout, out);
-            polygon_transformation_filter<db::ICplxTrans> ptrans (&prgen, v->first.inverted ());
+            polygon_transformation_filter<db::ICplxTrans> ptrans (&prgen, v->inverted ());
             JoinEdgesCluster jec (&ptrans, ext_b, ext_e, ext_o, ext_i);
 
             std::list<db::Edge> heap;
             for (db::recursive_cluster_shape_iterator<db::Edge> rcsi (hc, edges.layer (), c->cell_index (), *cl); ! rcsi.at_end (); ++rcsi) {
-              heap.push_back (rcsi->transformed (v->first * rcsi.trans ()));
+              heap.push_back (rcsi->transformed (*v * rcsi.trans ()));
               jec.add (&heap.back (), 0);
             }
 
@@ -1318,20 +1315,20 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
 
     for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
 
-      const std::map<db::ICplxTrans, size_t> &vv = vars.variants (c->cell_index ());
-      for (std::map<db::ICplxTrans, size_t>::const_iterator v = vv.begin (); v != vv.end (); ++v) {
+      const std::set<db::ICplxTrans> &vv = vars.variants (c->cell_index ());
+      for (auto v = vv.begin (); v != vv.end (); ++v) {
 
         db::Shapes *out;
         if (vv.size () == 1) {
           out = & c->shapes (res->deep_layer ().layer ());
         } else {
-          out = & to_commit [c->cell_index ()][v->first];
+          out = & to_commit [c->cell_index ()][*v];
         }
 
         PolygonRefToShapesGenerator prgen (&layout, out);
         for (db::Shapes::shape_iterator si = c->shapes (edges.layer ()).begin (db::ShapeIterator::Edges); ! si.at_end (); ++si) {
           prgen.set_prop_id (si->prop_id ());
-          prgen.put (extended_edge (si->edge ().transformed (v->first), ext_b, ext_e, ext_o, ext_i).transformed (v->first.inverted ()));
+          prgen.put (extended_edge (si->edge ().transformed (*v), ext_b, ext_e, ext_o, ext_i).transformed (v->inverted ()));
         }
 
       }
@@ -1341,7 +1338,7 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
   }
 
   //  propagate results from variants
-  vars.commit_shapes (layout, top_cell, res->deep_layer ().layer (), to_commit);
+  vars.commit_shapes (res->deep_layer ().layer (), to_commit);
 
   return res.release ();
 }
@@ -1367,7 +1364,7 @@ public:
     return 1;
   }
 
-  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, const db::LocalProcessorBase * /*proc*/) const
   {
     tl_assert (results.size () == (m_output_mode == Both ? 2 : 1));
 
@@ -1460,7 +1457,7 @@ public:
     return 1;
   }
 
-  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::Edge> > &results, const db::LocalProcessorBase * /*proc*/) const
   {
     tl_assert (results.size () == 1);
     std::unordered_set<db::Edge> &result = results.front ();
@@ -1517,7 +1514,7 @@ public:
     return 1;
   }
 
-  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout * /*layout*/, db::Cell * /*cell*/, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::Edge> > &results, const db::LocalProcessorBase * /*proc*/) const
   {
     tl_assert (results.size () == size_t (m_output_mode == Both ? 2 : 1));
 
@@ -1657,7 +1654,7 @@ public:
     return 1;
   }
 
-  virtual void do_compute_local (db::Layout *layout, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout *layout, db::Cell * /*cell*/, const shape_interactions<db::Edge, db::PolygonRef> &interactions, std::vector<std::unordered_set<db::PolygonRef> > &results, const db::LocalProcessorBase * /*proc*/) const
   {
     tl_assert (results.size () == 1);
     std::unordered_set<db::PolygonRef> &result = results.front ();
@@ -1941,12 +1938,16 @@ public:
     //  .. nothing yet ..
   }
 
-  virtual void do_compute_local (db::Layout * /*layout*/, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, size_t /*max_vertex_count*/, double /*area_ratio*/) const
+  virtual void do_compute_local (db::Layout * /*layout*/, db::Cell *cell, const shape_interactions<db::Edge, db::Edge> &interactions, std::vector<std::unordered_set<db::EdgePair> > &results, const db::LocalProcessorBase *proc) const
   {
     tl_assert (results.size () == 1);
     std::unordered_set<db::EdgePair> &result = results.front ();
 
-    edge2edge_check_for_edges<std::unordered_set<db::EdgePair> > edge_check (m_check, result, m_has_other);
+    //  implement check in local coordinates in the presence of magnification variants
+    EdgeRelationFilter check = m_check;
+    check.set_distance (proc->dist_for_cell (cell, check.distance ()));
+
+    edge2edge_check_for_edges<std::unordered_set<db::EdgePair> > edge_check (check, result, m_has_other);
 
     db::box_scanner<db::Edge, size_t> scanner;
     std::set<db::Edge> others;
@@ -1989,7 +1990,7 @@ public:
 
     }
 
-    scanner.process (edge_check, m_check.distance (), db::box_convert<db::Edge> ());
+    scanner.process (edge_check, check.distance (), db::box_convert<db::Edge> ());
   }
 
   virtual db::Coord dist () const
@@ -2008,9 +2009,15 @@ public:
     return tl::to_string (tr ("Generic DRC check"));
   }
 
+  virtual const db::TransformationReducer *vars () const
+  {
+    return &m_vars;
+  }
+
 private:
   EdgeRelationFilter m_check;
   bool m_has_other;
+  db::MagnificationReducer m_vars;
 };
 
 }

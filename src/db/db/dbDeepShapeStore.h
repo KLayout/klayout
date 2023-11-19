@@ -49,6 +49,7 @@ class Texts;
 class ShapeCollection;
 class NetBuilder;
 class LayoutToNetlist;
+class VariantsCollectorBase;
 
 /**
  *  @brief Represents a shape collection from the deep shape store
@@ -191,25 +192,6 @@ public:
    *  @brief Adds shapes from another deep layer to this one
    */
   void add_from (const DeepLayer &dl);
-
-  /**
-   *  @brief Separates cell variants (see DeepShapeStore::separate_variants)
-   */
-  template <class VarCollector>
-  void separate_variants (VarCollector &collector);
-
-  /**
-   *  @brief Commits shapes for variants to the existing cell hierarchy
-   *
-   *  The "to_propagate" collection is a set of shapes per cell and variant. The
-   *  algorithm will put these shapes into the existing hierarchy putting the
-   *  shapes into the proper parent cells to resolve variants.
-   *
-   *  This map will be modified by the algorithm and should be discarded
-   *  later.
-   */
-  template <class VarCollector>
-  void commit_shapes (VarCollector &collector, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > &to_propagate);
 
   /**
    *  @brief Gets the shape store object
@@ -556,42 +538,6 @@ public:
   const db::CellMapping &internal_cell_mapping (unsigned int from_layout_index, unsigned int into_layout_index);
 
   /**
-   *  @brief Create cell variants from the given variant collector
-   *
-   *  To use this method, first create a variant collector (db::cell_variant_collector) with the required
-   *  reducer and collect the variants. Then call this method on the desired layout index to create the variants.
-   */
-  template <class VarCollector>
-  void separate_variants (unsigned int layout_index, VarCollector &coll)
-  {
-    tl_assert (is_valid_layout_index (layout_index));
-
-    std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > var_map;
-    coll.separate_variants (layout (layout_index), initial_cell (layout_index), &var_map);
-    if (var_map.empty ()) {
-      //  nothing to do.
-      return;
-    }
-
-    issue_variants (layout_index, var_map);
-  }
-
-  /**
-   *  @brief Commits shapes for variants to the existing cell hierarchy
-   *
-   *  To use this method, first create a variant collector (db::cell_variant_collector) with the required
-   *  reducer and collect the variants. Then call this method on the desired layout index to commit the shapes for the
-   *  respective variants.
-   */
-  template <class VarCollector>
-  void commit_shapes (unsigned int layout_index, VarCollector &coll, unsigned int layer, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > &to_commit)
-  {
-    tl_assert (is_valid_layout_index (layout_index));
-
-    coll.commit_shapes (layout (layout_index), initial_cell (layout_index), layer, to_commit);
-  }
-
-  /**
    *  @brief For testing
    */
   static size_t instance_count ();
@@ -927,20 +873,6 @@ private:
   std::map<DeliveryMappingCacheKey, CellMappingWithGenerationIds> m_delivery_mapping_cache;
   std::map<std::pair<unsigned int, unsigned int>, CellMappingWithGenerationIds> m_internal_mapping_cache;
 };
-
-template <class VarCollector>
-void DeepLayer::separate_variants (VarCollector &collector)
-{
-  check_dss ();
-  mp_store->separate_variants (m_layout, collector);
-}
-
-template <class VarCollector>
-void DeepLayer::commit_shapes (VarCollector &collector, std::map<db::cell_index_type, std::map<db::ICplxTrans, db::Shapes> > &to_commit)
-{
-  check_dss ();
-  mp_store->commit_shapes (m_layout, collector, layer (), to_commit);
-}
 
 }
 

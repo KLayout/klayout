@@ -30,17 +30,17 @@ namespace db
 //  local_operations implementation
 
 template <class TS, class TI, class TR>
-void local_operation<TS, TI, TR>::compute_local (db::Layout *layout, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, size_t max_vertex_count, double area_ratio, bool report_progress, const std::string &progress_desc) const
+void local_operation<TS, TI, TR>::compute_local (db::Layout *layout, db::Cell *subject_cell, const shape_interactions<TS, TI> &interactions, std::vector<std::unordered_set<TR> > &results, const db::LocalProcessorBase *proc) const
 {
   if (interactions.num_subjects () <= 1 || ! requests_single_subjects ()) {
 
-    do_compute_local (layout, interactions, results, max_vertex_count, area_ratio);
+    do_compute_local (layout, subject_cell, interactions, results, proc);
 
   } else {
 
     std::unique_ptr<tl::RelativeProgress> progress;
-    if (report_progress) {
-      progress.reset (new tl::RelativeProgress (progress_desc, interactions.size ()));
+    if (proc->report_progress ()) {
+      progress.reset (new tl::RelativeProgress (proc->description (this), interactions.size ()));
     }
 
     for (typename shape_interactions<TS, TI>::iterator i = interactions.begin (); i != interactions.end (); ++i) {
@@ -62,7 +62,7 @@ void local_operation<TS, TI, TR>::compute_local (db::Layout *layout, const shape
         single_interactions.add_interaction (i->first, *ii);
       }
 
-      do_compute_local (layout, single_interactions, results, max_vertex_count, area_ratio);
+      do_compute_local (layout, subject_cell, single_interactions, results, proc);
 
       if (progress.get ()) {
         ++*progress;

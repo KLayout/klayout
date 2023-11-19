@@ -71,6 +71,7 @@ class Texts;
 class Technology;
 class CellMapping;
 class LayerMapping;
+class VariantsCollectorBase;
 
 template <class Coord> class generic_repository;
 typedef generic_repository<db::Coord> GenericRepository;
@@ -2067,6 +2068,12 @@ public:
    *  @brief This event is triggered when the technology changes
    */
   tl::Event technology_changed_event;
+
+  /**
+   *  @brief This event is raised when cell variants are built
+   *  It will specify a list of cells with their new variants.
+   */
+  tl::event<const std::map<db::cell_index_type, std::map<db::ICplxTrans, db::cell_index_type> > *> variants_created_event;
 
 protected:
   /**

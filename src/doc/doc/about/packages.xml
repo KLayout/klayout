@@ -138,8 +138,8 @@
   this can be a web server or a folder on 
   a file server. KLayout talks WebDAV, so the web server needs to offer WebDAV 
   access. A subversion (SVN) server provides WebDAV by default, so this is a good
-  choice. Git can be used too, but you'll need to mirror the Git repository to 
-  a file system or WebDAV share.
+  choice. For the packages themselves Git or WebDAV/Subversion can be used. You
+  need to specify the protocol in the package URL (see below).
   </p>
 
   <p>
@@ -207,6 +207,62 @@
   This protocol is spoken by Subversion and GitHub with the subversion bridge. The 
   latter requires a simple translation of the original Git URL's to obtain the 
   subversion equivalent.
+  </p>
+
+  <h2>Generic package URLs</h2>
+
+  <p>
+  Package URLs are the locations from where KLayout will download the package
+  files. The package data is a hierarchy of files. The package description file
+  ("grain.xml") needs to be located at the root of this hierarchy.
+  </p>
+
+  <p>
+  A plain package URL will instruct KLayout to download the package file from
+  the given hierarchy using the WebDAV protocol. You can add "svn+" at the front
+  of the URL to make this specification a little more explicit. These are
+  WebDAV/Subversion URLs:
+  </p>
+
+  <pre>https://www.klayout.org/example-package
+svn+https://www.klayout.org/example-package</pre>
+
+  <p>
+  Git is another option to host packages. In order to use the Git protocol,
+  add "git+" at the front of the URL:
+  </p>
+
+  <pre>git+https://github.com/klayout/example-package.git</pre>
+
+  <p>
+  This will make KLayout clone the "example-package" repository and use the default
+  branch for checking out the files. It will expect a file named "grain.xml" at the
+  root of the package file hierarchy.
+  </p>
+
+  <p>
+  To use a different branch or tag, specify the tag or branch name in square
+  brackes. For example:
+  </p>
+
+  <pre>git+https://github.com/klayout/example-package.git[v1.0]</pre>
+
+  <p>
+  This will use the "v1.0" tag or branch for checking out the files.
+  </p>
+
+  <p>
+  It is also possible to have packages in the a subfolder of the repository.
+  To specify the subfolder, separate the subfolder path from the repository
+  URL using "+", like this:
+  </p>
+
+  <pre>git+https://github.com/klayout/repository.git+klayout/package-data[v1.0]</pre>
+
+  <p>
+  This will clone the "repository" project and in this project, KLayout will checkout
+  files from "klayout/package-data" and below. This is also the place, where KLayout expects
+  the "grain.xml" file.
   </p>
 
   <h2>Installation Hooks</h2>

@@ -1,3 +1,22 @@
+0.28.13          (2023-xx-xx):
+* Bugfix: %GITHUB%/issues/1532 DRC checks give incorrect results in deep mode with magnified instances
+* Enhancement: %GITHUB%/issues/1514 Package manager: Support for Git-hosted packages
+* Bugfix: %GITHUB%/issues/1512 "get_image" of LayoutView should also work on inactive views
+* Bugfix: %GITHUB%/issues/1511 Typo
+* Enhancement: %GITHUB%/issues/1510 Cross hair cursor
+* Bugfix: %GITHUB%/issues/1503 Import LEF/DEF - LEF files given in list are ignored for DEF import
+* Bugfix: %GITHUB%/issues/1499 strm2oas: support LAYER <layername> TYPE OVERLAP ; for L-shaped abstracts
+* Bugfix: %GITHUB%/issues/1486 Invalid error "Some macros are configured to run automatically" when changing reader options
+* Bugfix: %GITHUB%/issues/1485 Incorrectly set output cell name if using DRC::cell
+* Bugfix: %GITHUB%/issues/1482 Strict mode oasis should write the S_CELL_OFFSET into the CELLNAME table
+* Bugfix: %GITHUB%/issues/885 Must-connect checks in LVS
+* Bugfix: -without-qt builds did not include DRC or LVS
+* Enhancement: Added Layout#error_layer
+* Enhancement: Option -k for copying log to a file
+* Enhancement: Editor option to control snapping to grid while moving
+  This controls whether objects are snapped to grid (on) or moved in grid
+  increments (off)
+
 0.28.12          (2023-09-12):
 * Bugfix: %GITHUB%/issues/1477 Macro IDE: changing the colors does not have an effect
 * Bugfix: %GITHUB%/issues/1474 Throw a FATAL ERROR when multiple cellname have the same refnum

@@ -45,24 +45,6 @@ namespace ant
 
 static PluginDeclaration *sp_instance = 0;
 
-PluginDeclaration::PluginDeclaration ()
-  : m_current_template (0), 
-    m_current_template_updated (true), m_templates_updated (true)
-{
-  sp_instance = this;
-}
-
-PluginDeclaration::~PluginDeclaration ()
-{
-  sp_instance = 0;
-}
-
-PluginDeclaration *
-PluginDeclaration::instance ()
-{
-  return sp_instance;
-}
-
 static std::vector<ant::Template> make_standard_templates ()
 {
   std::vector<ant::Template> templates;
@@ -90,6 +72,24 @@ static std::vector<ant::Template> make_standard_templates ()
   templates.push_back (ant::Template (tl::to_string (tr ("Box")), "W=$(abs(X))", "H=$(abs(Y))", "", ant::Object::STY_line, ant::Object::OL_box, true, lay::AC_Global, std::string ()));
 
   return templates;
+}
+
+PluginDeclaration::PluginDeclaration ()
+  : m_current_template (0), 
+    m_current_template_updated (true), m_templates_updated (true)
+{
+  sp_instance = this;
+}
+
+PluginDeclaration::~PluginDeclaration ()
+{
+  sp_instance = 0;
+}
+
+PluginDeclaration *
+PluginDeclaration::instance ()
+{
+  return sp_instance;
 }
 
 void 
@@ -281,25 +281,24 @@ PluginDeclaration::update_current_template ()
     return;
   }
 
-  if (m_current_template >= 0 && m_current_template < int (m_templates.size ())) {
-
-    std::vector<std::string> menu_entries = mp->menu ()->group ("ruler_mode_group");
-    for (std::vector<std::string>::const_iterator m = menu_entries.begin (); m != menu_entries.end (); ++m) {
-      lay::Action *action = mp->menu ()->action (*m);
+  std::vector<std::string> menu_entries = mp->menu ()->group ("ruler_mode_group");
+  for (std::vector<std::string>::const_iterator m = menu_entries.begin (); m != menu_entries.end (); ++m) {
+    lay::Action *action = mp->menu ()->action (*m);
+    if (m_current_template >= 0 && m_current_template < int (m_templates.size ())) {
       action->set_title (m_templates [m_current_template].title ());
+    } else {
+      action->set_title (std::string ());
     }
-    
-    if (m_templates.size () > 1) {
+  }
 
-      tl::weak_collection<lay::ConfigureAction>::iterator it = m_actions.begin ();
-      int index = 0;
-      for (std::vector<Template>::const_iterator tt = m_templates.begin (); tt != m_templates.end () && it != m_actions.end (); ++tt, ++it, ++index) {
-        if (it.operator -> ()) {
-          it->set_checked (index == m_current_template);
-        }
+  if (m_templates.size () > 1) {
+    tl::weak_collection<lay::ConfigureAction>::iterator it = m_actions.begin ();
+    int index = 0;
+    for (std::vector<Template>::const_iterator tt = m_templates.begin (); tt != m_templates.end () && it != m_actions.end (); ++tt, ++it, ++index) {
+      if (it.operator -> ()) {
+        it->set_checked (index == m_current_template);
       }
     }
-
   }
 
   m_current_template_updated = false;
@@ -313,15 +312,13 @@ PluginDeclaration::update_menu ()
     return;
   }
 
-  if (m_current_template < 0 || m_current_template >= int (m_templates.size ())) {
-    m_current_template = 0;
-  }
-    
-  if (m_current_template >= 0 && m_current_template < int (m_templates.size ())) {
-    std::vector<std::string> menu_entries = mp->menu ()->group ("ruler_mode_group");
-    for (std::vector<std::string>::const_iterator m = menu_entries.begin (); m != menu_entries.end (); ++m) {
-      lay::Action *action = mp->menu ()->action (*m);
+  std::vector<std::string> menu_entries = mp->menu ()->group ("ruler_mode_group");
+  for (std::vector<std::string>::const_iterator m = menu_entries.begin (); m != menu_entries.end (); ++m) {
+    lay::Action *action = mp->menu ()->action (*m);
+    if (m_current_template >= 0 && m_current_template < int (m_templates.size ())) {
       action->set_title (m_templates [m_current_template].title ());
+    } else {
+      action->set_title (std::string ());
     }
   }
   

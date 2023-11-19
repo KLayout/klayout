@@ -277,7 +277,10 @@ static unsigned int show_layout1 (lay::LayoutViewBase *view, db::Layout *layout,
 {
   //  the layout gets held by the LayoutHandle object
   layout->keep ();
-  lay::LayoutHandle *handle = new lay::LayoutHandle (layout, std::string ());
+  lay::LayoutHandle *handle = lay::LayoutHandle::find_layout (layout);
+  if (! handle) {
+    handle = new lay::LayoutHandle (layout, std::string ());
+  }
   return view->add_layout (handle, add_cellview);
 }
 
@@ -285,7 +288,10 @@ static unsigned int show_layout2 (lay::LayoutViewBase *view, db::Layout *layout,
 {
   //  the layout gets held by the LayoutHandle object
   layout->keep ();
-  lay::LayoutHandle *handle = new lay::LayoutHandle (layout, std::string ());
+  lay::LayoutHandle *handle = lay::LayoutHandle::find_layout (layout);
+  if (! handle) {
+    handle = new lay::LayoutHandle (layout, std::string ());
+  }
   handle->set_tech_name (tech);
   return view->add_layout (handle, add_cellview);
 }
@@ -294,7 +300,10 @@ static unsigned int show_layout3 (lay::LayoutViewBase *view, db::Layout *layout,
 {
   //  the layout gets held by the LayoutHandle object
   layout->keep ();
-  lay::LayoutHandle *handle = new lay::LayoutHandle (layout, std::string ());
+  lay::LayoutHandle *handle = lay::LayoutHandle::find_layout (layout);
+  if (! handle) {
+    handle = new lay::LayoutHandle (layout, std::string ());
+  }
   handle->set_tech_name (tech);
   return view->add_layout (handle, add_cellview, initialize_layers);
 }

@@ -550,6 +550,26 @@ class LAYLayoutView_TestClass < TestBase
 
   end
 
+  # issue-1533
+  def test_8
+
+    if !RBA.constants.member?(:Application)
+      return
+    end
+
+    app = RBA::Application.instance
+    mw = app.main_window
+    mw.close_all
+    mw.create_view
+
+    ly = RBA::Layout::new
+    mw.current_view.show_layout(ly, false)
+
+    # was crashing
+    mw.current_view.show_layout(ly, false)
+
+  end
+
 end
 
 load("test_epilogue.rb")

@@ -62,13 +62,15 @@ MacroController::add_macro_category (const std::string &name, const std::string 
 void
 MacroController::finish ()
 {
-  lym::MacroCollection::root ().clear ();
+  lym::MacroCollection &root = lym::MacroCollection::root ();
+
+  root.clear ();
 
   //  Scan built-in macros
   //  These macros are always taken, even if there are no macros requested (they are required to
   //  fully form the API).
-  lym::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-macros", "macros", true);
-  lym::MacroCollection::root ().add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-pymacros", "pymacros", true);
+  root.add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-macros", "macros", true);
+  root.add_folder (tl::to_string (QObject::tr ("Built-In")), ":/built-in-pymacros", "pymacros", true);
 
   //  scans the macros from techs and packages (this will allow autorun-early on them)
   //  and updates m_external_paths
@@ -92,13 +94,13 @@ MacroController::finish ()
               description += " - " + tl::to_string (tr ("%1 branch").arg (tl::to_qstring (*f)));
             }
 
-            lym::MacroCollection::root ().add_folder (description, mp, m_macro_categories[c].name, p->readonly);
+            root.add_folder (description, mp, m_macro_categories[c].name, p->readonly);
 
           }
 
         } else if (p->cat == m_macro_categories[c].name) {
 
-          lym::MacroCollection::root ().add_folder (p->description, p->path, m_macro_categories[c].name, p->readonly);
+          root.add_folder (p->description, p->path, m_macro_categories[c].name, p->readonly);
 
         }
 
@@ -121,7 +123,7 @@ MacroController::finish ()
 
   if (! m_no_implicit_macros) {
     for (std::vector <ExternalPathDescriptor>::const_iterator p = m_external_paths.begin (); p != m_external_paths.end (); ++p) {
-      lym::MacroCollection *mc = lym::MacroCollection::root ().add_folder (p->description, p->path, p->cat, p->readonly);
+      lym::MacroCollection *mc = root.add_folder (p->description, p->path, p->cat, p->readonly);
       if (mc) {
         mc->set_virtual_mode (p->type);
       }

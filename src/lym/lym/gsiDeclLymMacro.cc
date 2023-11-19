@@ -123,6 +123,14 @@ public:
 
   void register_gsi (const char *name)
   {
+    //  do not register an interpreter again (this is important as registration code
+    //  may be executed again and we do not want to have two interpreters for the same thing)
+    for (tl::Registrar<lym::MacroInterpreter>::iterator cls = tl::Registrar<lym::MacroInterpreter>::begin (); cls != tl::Registrar<lym::MacroInterpreter>::end (); ++cls) {
+      if (cls.current_name () == name) {
+        return;
+      }
+    }
+
     //  makes the object owned by the C++ side
     keep ();
 
@@ -220,6 +228,16 @@ public:
     m->set_interpreter (lym::Macro::DSLInterpreter);
     m->set_format (storage_scheme ());
 
+    //  avoid registering the same template twice
+    for (auto t = m_templates.begin (); t != m_templates.end (); ++t) {
+      if ((*t)->path () == m->path ()) {
+        delete *t;
+        *t = m;
+        return m;
+      }
+    }
+
+    //  not present yet - install at end
     m_templates.push_back (m);
     return m;
   }

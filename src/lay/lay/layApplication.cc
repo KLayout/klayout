@@ -835,7 +835,7 @@ ApplicationBase::init_app ()
     mc->finish ();
 
     //  as this regenerates the macro collection, autorun_early is required again
-    //  note: this does no re-execute macros that have been executed already
+    //  note: this does not re-execute macros that have been executed already
     lym::MacroCollection::root ().autorun_early ();
 
   }

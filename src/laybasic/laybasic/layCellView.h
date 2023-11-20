@@ -145,6 +145,14 @@ public:
   static LayoutHandle *find (const std::string &name);
 
   /**
+   *  @brief Finds a handle by layout object
+   *
+   *  @param layout The Layout object bound to the handle
+   *  @return 0, if there is no layout object with this name. Otherwise a pointer to its handle
+   */
+  static LayoutHandle *find_layout (const db::Layout *layout);
+
+  /**
    *  @brief Gets the names of all registered layout objects
    */
   static void get_names (std::vector <std::string> &names);

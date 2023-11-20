@@ -1506,6 +1506,18 @@ MarkerBrowserPage::MarkerBrowserPage (QWidget * /*parent*/)
   markers_list->header ()->setSortIndicatorShown (true);
   markers_list->header ()->setMinimumSectionSize (24);
 
+  QAction *select_all_info_action = new QAction (this);
+  select_all_info_action->setText (tr ("Select All"));
+  connect (select_all_info_action, SIGNAL (triggered ()), info_text, SLOT (selectAll ()));
+
+  QAction *copy_info_action = new QAction (this);
+  copy_info_action->setText (tr ("Copy"));
+  connect (copy_info_action, SIGNAL (triggered ()), info_text, SLOT (copy ()));
+
+  info_text->addAction (select_all_info_action);
+  info_text->addAction (copy_info_action);
+  info_text->setContextMenuPolicy (Qt::ActionsContextMenu);
+
   list_shapes_cb->setChecked (m_list_shapes);
 
   connect (markers_list, SIGNAL (doubleClicked (const QModelIndex &)), this, SLOT (marker_double_clicked (const QModelIndex &)));

@@ -138,7 +138,7 @@
   this can be a web server or a folder on 
   a file server. KLayout talks WebDAV, so the web server needs to offer WebDAV 
   access. A subversion (SVN) server provides WebDAV by default, so this is a good
-  choice. For the packages themselves Git or WebDAV/Subversion can be used. You
+  choice. For the packages themselves, Git or WebDAV/Subversion can be used. You
   need to specify the protocol in the package URL (see below).
   </p>
 

@@ -531,6 +531,8 @@ Layout::operator= (const Layout &d)
 
     m_tech_name = d.m_tech_name;
 
+    m_prop_id = d.m_prop_id;
+
   }
   return *this;
 }

@@ -2082,6 +2082,24 @@ class DBLayoutTests1_TestClass < TestBase
 
   end
 
+  def test_24
+
+    ly = RBA::Layout::new
+    ly.set_property("k1", 17)
+    ly.set_property(17, "42")
+
+    assert_equal(17, ly.property("k1"))
+    assert_equal("42", ly.property(17))
+    assert_equal(nil, ly.property(42))
+
+    ly_dup = ly.dup
+
+    assert_equal(17, ly_dup.property("k1"))
+    assert_equal("42", ly_dup.property(17))
+    assert_equal(nil, ly_dup.property(42))
+
+  end
+
   # Iterating while flatten
   def test_issue200
 

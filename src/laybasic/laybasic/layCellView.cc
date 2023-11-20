@@ -272,6 +272,17 @@ LayoutHandle::find (const std::string &name)
   }
 }
 
+LayoutHandle *
+LayoutHandle::find_layout (const db::Layout *layout)
+{
+  for (auto h = ms_dict.begin (); h != ms_dict.end (); ++h) {
+    if (h->second->mp_layout == layout) {
+      return h->second;
+    }
+  }
+  return 0;
+}
+
 void 
 LayoutHandle::get_names (std::vector <std::string> &names)
 {
@@ -484,6 +495,10 @@ LayoutHandleRef::operator= (const LayoutHandleRef &r)
 void
 LayoutHandleRef::set (LayoutHandle *h)
 {
+  if (mp_handle == h) {
+    return;
+  }
+
   if (mp_handle) {
     mp_handle->remove_ref ();
     mp_handle = 0;

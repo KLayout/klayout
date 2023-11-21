@@ -242,7 +242,7 @@ joins.
 Connections are accumulated. The connections defined so far
 can be cleared with <a href="#clear_connections">clear_connections</a>.
 </p>
-<a name="connect_explicit"/><h2>"connect_explicit" - Specifies a list of net names for nets to connect explicitly</h2>
+<a name="connect_explicit"/><h2>"connect_explicit" - Specifies a list of net names for nets to connect ("must connect" nets)</h2>
 <keyword name="connect_explicit"/>
 <p>Usage:</p>
 <ul>
@@ -251,23 +251,20 @@ can be cleared with <a href="#clear_connections">clear_connections</a>.
 </ul>
 <p>
 Use this method to explicitly connect nets even if there is no physical connection.
-As this breaks with the concept of physical verification, this feature should be used 
-with care. 
+The concept is similar to implicit connection (see <a href="#connect_implicit">connect_implicit</a>). The method gets
+a list of nets which are connected virtually, even if there is no physical connection.
+The first version applies this scheme to all cells, the second version to cells matching
+the cell name pattern. The cell name pattern follows the usual glob style form (e.g. "A*"
+applies the connection in all cells whose name starts with "A").
 </p><p>
-The first version of this function will connect all nets listed in the "net_names" array 
-in the top level cell. The second version takes a cell name pattern and connects all nets listed
-in "net_names" for cells matching this pattern.
-</p><p>
-A use case for this method is the following: consider a set of standard cells. These do not have a bulk
-or n-well pin in the schematics. They also do not have build in tie-down diodes for the 
-substrate connections. In this case there is a build-in discrepancy between the 
-schematics and the layout: bulk and VSS are separate nets within the layout, but the 
-schematic does not list them as separate. The solution is to make an explicit connection
-between VDD and n-well and VSS and bulk, provided VDD and VSS are properly labelled as "VDD" and "VSS"
-and n-well and bulk are accessible as named nets (for bulk you can use "connect_global").
-</p><p>
-The following code will establish an explicit connection for all cells called "INV.." between 
-BULK and VSS nets:
+This method is useful to establish a logical connection which is made later up on the 
+next level of hierarchy. For example, a standard cell my not contain substrate or well
+taps as these may be made by tap or spare cells. Logically however, the cell only has
+one power or ground pin for the devices and substrate or well. In order to match both
+representations - for example for the purpose of LVS - the dual power or ground pins have
+to be connected. Assuming that there is a global net "BULK" for the substrate and a
+net "VSS" for the sources of the NMOS devices, the following statement will create this
+connection for all cell names beginning with "INV":
 </p><p>
 <pre>
 connect_global(bulk, "BULK")
@@ -275,13 +272,18 @@ connect_global(bulk, "BULK")
 connect_explicit("INV*", [ "BULK", "VSS" ])
 </pre>
 </p><p>
+The resulting net and pin will carry a name made from the combination of the connected
+nets. In this case it will be "BULK,VSS".
+</p><p>
+The virtual connection in general bears the risk of missing a physical connection. 
+The "connect_explicit" feature therefore checks whether the connection is made physically 
+on the next hierarchy level ("must connect" nets), except for top-level cells for which 
+it is assumed that this connection is made later. 
+A warning is raised instead for top level cells.
+</p><p>
 Explicit connections also imply implicit connections between different parts of 
 one of the nets. In the example before, "VSS" pieces without a physical connection
 will also be connected.
-</p><p>
-When you use explicit connections you should make sure by other ways that the connection
-is made physically. For example, for the bulk/n-well pin example above, by enforcing at least one
-tie-down diode per n-well island and in the substrate by means of a DRC rule.
 </p><p>
 The explicit connections are applied on the next net extraction and cleared
 on "clear_connections".
@@ -298,7 +300,7 @@ Global nets are common to all cells. Global nets automatically connect to parent
 cells throughs implied pins. An example is the substrate (bulk) net which connects
 to shapes belonging to tie-down diodes. "l" can be a polygon or text layer.
 </p>
-<a name="connect_implicit"/><h2>"connect_implicit" - Specifies a search pattern for labels which create implicit net connections</h2>
+<a name="connect_implicit"/><h2>"connect_implicit" - Specifies a search pattern for implicit net connections ("must connect" nets)</h2>
 <keyword name="connect_implicit"/>
 <p>Usage:</p>
 <ul>
@@ -306,23 +308,28 @@ to shapes belonging to tie-down diodes. "l" can be a polygon or text layer.
 <li><tt>connect_implicit(cell_pattern, label_pattern)</tt></li>
 </ul>
 <p>
-Use this method to supply label strings which create implicit net connections
-on the top level circuit in the first version. This feature is useful to connect identically labelled nets
-while a component isn't integrated yet. If the component is integrated, nets may be connected
-on a higher hierarchy level - e.g. by a power mesh. Inside the component this net consists
-of individual islands. To properly perform netlist extraction and comparison, these islands
-need to be connected even though there isn't a physical connection. "connect_implicit" can
-achive this if these islands are labelled with the same text on the top level of the
-component.
+This method specifies a net name search pattern, either for all cells or for
+certain cells, given by a name search pattern. Search pattern follow the usual glob
+form (e.g. "A*" for all cells or nets with names starting with "A").
 </p><p>
-In the second version, the pattern can be specified for a cell range (given by a cell name pattern or a 
-single cell name). These pattern are applied to non-top cells. The unspecific pattern
-has priority over the cell-specific ones. As the cell selector is a pattern itself, a
-single cell may fall into more than one category. In this case, the label filters are
-combined.
+Then, for nets matching the net name pattern and for which there is more than
+one subnet, the subnets are connected. "Subnets" are physically disconnected parts
+of a net which carry the same name.
+</p><p>
+This feature is useful for example for power nets which are complete in a cell,
+but are supposed to be connected upwards in the hierarchy ("must connect" nets).
+Physically there are multiple nets, logically - and specifically in the schematic for
+the purpose of LVS - there is only one net. 
+"connect_implicit" now creates a virtual, combined physical net that matches the logical net.
+</p><p>
+This is general bears the risk of missing a physical connection. The "connect_implicit"
+feature therefore checks whether the connection is made physically on the next hierarchy
+level, except for top-level cells for which it is assumed that this connection is made
+later. A warning is raised instead for top level cells.
 </p><p>
 The implicit connections are applied on the next net extraction and cleared
-on "clear_connections".
+on "clear_connections". Another feature is <a href="#connect_explicit">connect_explicit</a> which allows connecting
+differently named subnets in a similar fashion.
 </p>
 <a name="device_scaling"/><h2>"device_scaling" - Specifies a dimension scale factor for the geometrical device properties</h2>
 <keyword name="device_scaling"/>
@@ -394,6 +401,17 @@ extract_devices(mos4("NMOS4"), { :SD =&gt; nsd, :G =&gt; gate, :P =&gt; poly, :W
 The return value of this method will be the device class of the devices
 generated in the extraction step (see <class_doc href="DeviceClass">DeviceClass</class_doc>).
 </p>
+<a name="ignore_extraction_errors"/><h2>"ignore_extraction_errors" - Specifies whether to ignore extraction errors</h2>
+<keyword name="ignore_extraction_errors"/>
+<p>Usage:</p>
+<ul>
+<li><tt>ignore_extraction_errors(value)</tt></li>
+</ul>
+<p>
+With this value set to false (the default), "extract_netlist" will raise
+an exception upon extraction errors. Otherwise, extraction errors will be logged
+but no error is raised.
+</p>
 <a name="l2n_data"/><h2>"l2n_data" - Gets the internal <class_doc href="LayoutToNetlist">LayoutToNetlist</class_doc> object</h2>
 <keyword name="l2n_data"/>
 <p>Usage:</p>
@@ -415,5 +433,19 @@ If no extraction has been performed yet, this method will start the
 layout analysis. Hence, all <a href="#connect">connect</a>, <a href="#connect_global">connect_global</a> and <a href="#connect_implicit">connect_implicit</a>
 calls must have been made before this method is used. Further <a href="#connect">connect</a>
 statements will clear the netlist and re-extract it again.
+</p>
+<a name="top_level"/><h2>"top_level" - Specifies top level mode</h2>
+<keyword name="top_level"/>
+<p>Usage:</p>
+<ul>
+<li><tt>top_level(value)</tt></li>
+</ul>
+<p>
+With this value set to false (the default), it is assumed that the 
+circuit is not used as a top level chip circuit. In that case, for
+example must-connect nets which are not connected are reported as
+as warnings. If top level mode is set to true, such disconnected
+nets are reported as errors as this indicates a missing physical
+connection.
 </p>
 </doc>

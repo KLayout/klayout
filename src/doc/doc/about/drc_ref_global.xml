@@ -855,6 +855,15 @@ This function will evaluate the conditions c1 to cn and return the
 current primary shape if all conditions renders an empty result.
 See <a href="#if_all">if_all</a> for an example how to use the if_... functions.
 </p>
+<a name="ignore_extraction_errors"/><h2>"ignore_extraction_errors" - Specifies whether to ignore extraction errors</h2>
+<keyword name="ignore_extraction_errors"/>
+<p>Usage:</p>
+<ul>
+<li><tt>ignore_extraction_errors(value)</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_netter.xml#ignore_extraction_errors">Netter#ignore_extraction_errors</a> for a description of that function.
+</p>
 <a name="info"/><h2>"info" - Outputs as message to the logger or progress window</h2>
 <keyword name="info"/>
 <p>Usage:</p>
@@ -2057,6 +2066,15 @@ choice of the tile size) and multi-CPU support is enabled (see <a href="#threads
 To disable tiling mode use <a href="#flat">flat</a> or <a href="#deep">deep</a>. 
 </p><p>
 Tiling mode will disable deep mode (see <a href="#deep">deep</a>).
+</p>
+<a name="top_level"/><h2>"top_level" - Specifies that the circuit is a chip top level circuit</h2>
+<keyword name="top_level"/>
+<p>Usage:</p>
+<ul>
+<li><tt>top_level(flag)</tt></li>
+</ul>
+<p>
+See <a href="/about/drc_ref_netter.xml#top_level">Netter#top_level</a> for a description of that function.
 </p>
 <a name="verbose"/><h2>"verbose" - Sets or resets verbose mode</h2>
 <keyword name="verbose"/>

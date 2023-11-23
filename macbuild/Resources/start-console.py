@@ -6,6 +6,25 @@ import os
 pwd = os.getcwd()
 sys.path.append(pwd)
 
+piphelpstr = """
+--------------------------------------------------------------------------------
+(1) Install ['pandas', 'scipy', 'matplotlib']
+>>> import pip
+>>> pip.main( ['install', 'pandas', 'scipy', 'matplotlib'] )
+
+(2) List modules
+>>> import pip
+>>> pip.main( ['list'] )
+
+(3) Uninstall ['scipy']
+>>> import pip
+>>> pip.main( ['uninstall', 'scipy'] )
+--------------------------------------------------------------------------------
+"""
+def howtopip():
+    print(piphelpstr)
+
+
 variables = globals().copy()
 variables.update(locals())
 shell = code.InteractiveConsole(variables)

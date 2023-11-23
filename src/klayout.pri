@@ -104,9 +104,15 @@ equals(HAVE_PTHREADS, "1") {
 }
 
 equals(HAVE_GIT2, "1") {
-  !isEmpty(BITS_PATH) {
-    include($$BITS_PATH/git2/git2.pri)
+  !mac {
+    !isEmpty(BITS_PATH) {
+      include($$BITS_PATH/git2/git2.pri)
+    } else {
+      LIBS += -lgit2
+    }
   } else {
+    QMAKE_INCDIR += $$(MAC_LIBGIT2_INC)
+    QMAKE_LFLAGS += -L$$(MAC_LIBGIT2_LIB)
     LIBS += -lgit2
   }
   DEFINES += HAVE_GIT2

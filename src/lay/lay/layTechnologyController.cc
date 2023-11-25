@@ -536,7 +536,7 @@ TechnologyController::rescan (db::Technologies &technologies)
   technologies.clear ();
   for (db::Technologies::const_iterator t = current.begin (); t != current.end (); ++t) {
     if (t->is_persisted ()) {
-      technologies.add (new db::Technology (*t));
+      technologies.add (*t);
     }
   }
 
@@ -596,7 +596,7 @@ TechnologyController::rescan (db::Technologies &technologies)
         t.set_persisted (false);   // don't save that one in the configuration
         t.set_readonly (readonly || ! QFileInfo (dir.filePath (*lf)).isWritable ());
         t.set_grain_name (grain_name);
-        technologies.add (new db::Technology (t));
+        technologies.add (t);
 
       } catch (tl::Exception &ex) {
         tl::warn << tl::to_string (QObject::tr ("Unable to auto-import technology file ")) << tl::to_string (*lf) << ": " << ex.msg ();
@@ -608,14 +608,14 @@ TechnologyController::rescan (db::Technologies &technologies)
 
   for (std::vector<db::Technology>::const_iterator t = m_temp_tech.begin (); t != m_temp_tech.end (); ++t) {
 
-    db::Technology *tech = new db::Technology (*t);
     if (tl::verbosity () >= 20) {
-      tl::info << "Registering special technology from " << tech->tech_file_path () << " as " << tech->name ();
+      tl::info << "Registering special technology from " << t->tech_file_path () << " as " << t->name ();
     }
+
+    db::Technology *tech = technologies.add (*t);
     tech->set_persisted (false);                //  don't save that one in the configuration
     tech->set_tech_file_path (std::string ());  //  don't save to a file either
     tech->set_readonly (true);                  //  don't edit
-    technologies.add (tech);
 
   }
 }

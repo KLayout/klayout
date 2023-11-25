@@ -80,7 +80,7 @@ Technologies::instance ()
 
 static tl::XMLElementList xml_elements () 
 {
-  return make_element ((Technologies::const_iterator (Technologies::*) () const) &Technologies::begin, (Technologies::const_iterator (Technologies::*) () const) &Technologies::end, &Technologies::add, "technology",
+  return make_element ((Technologies::const_iterator (Technologies::*) () const) &Technologies::begin, (Technologies::const_iterator (Technologies::*) () const) &Technologies::end, &Technologies::add_void, "technology",
     Technology::xml_elements ()
   );
 }
@@ -92,7 +92,7 @@ Technologies::to_xml () const
   db::Technologies copy;
   for (const_iterator t = begin (); t != end (); ++t) {
     if (t->is_persisted ()) {
-      copy.add (new Technology (*t));
+      copy.add (*t);
     }
   }
 
@@ -110,7 +110,7 @@ Technologies::load_from_xml (const std::string &s)
   db::Technologies copy;
   for (const_iterator t = begin (); t != end (); ++t) {
     if (! t->is_persisted ()) {
-      copy.add (new Technology (*t));
+      copy.add (*t);
     }
   }
 
@@ -121,34 +121,31 @@ Technologies::load_from_xml (const std::string &s)
   *this = copy;
 }
 
-void 
-Technologies::add_tech (Technology *tech, bool replace_same)
+db::Technology *
+Technologies::add_tech (const Technology &tech, bool replace_same)
 {
-  if (! tech) {
-    return;
-  }
-
-  std::unique_ptr<Technology> tech_ptr (tech);
-
   Technology *t = 0;
   for (tl::stable_vector<Technology>::iterator i = m_technologies.begin (); !t && i != m_technologies.end (); ++i) {
-    if (i->name () == tech->name ()) {
+    if (i->name () == tech.name ()) {
       t = i.operator-> ();
     }
   }
 
   if (t) {
     if (replace_same) {
-      *t = *tech;
+      *t = tech;
     } else {
-      throw tl::Exception (tl::to_string (tr ("A technology with this name already exists: ")) + tech->name ());
+      throw tl::Exception (tl::to_string (tr ("A technology with this name already exists: ")) + tech.name ());
     }
   } else {
-    m_technologies.push_back (tech_ptr.release ());
-    tech->technology_changed_with_sender_event.add (this, &Technologies::technology_changed);
+    t = new Technology (tech);
+    m_technologies.push_back (t);
+    t->technology_changed_with_sender_event.add (this, &Technologies::technology_changed);
   }
 
   technologies_changed ();
+
+  return t;
 }
 
 void 

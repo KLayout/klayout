@@ -775,13 +775,13 @@ BEGIN_PROTECTED
       }
     }
 
-    db::Technology *nt = new db::Technology (*t);
+    db::Technology nt (*t);
 
-    nt->set_tech_file_path (tl::to_string (tech_dir.absoluteFilePath (tn + QString::fromUtf8 (".lyt"))));
-    nt->set_default_base_path (tl::to_string (tech_dir.absolutePath ()));
-    nt->set_persisted (false);
-    nt->set_name (tl::to_string (tn));
-    nt->set_description (std::string ());
+    nt.set_tech_file_path (tl::to_string (tech_dir.absoluteFilePath (tn + QString::fromUtf8 (".lyt"))));
+    nt.set_default_base_path (tl::to_string (tech_dir.absolutePath ()));
+    nt.set_persisted (false);
+    nt.set_name (tl::to_string (tn));
+    nt.set_description (std::string ());
     m_technologies.add (nt);
 
     update_tech_tree ();
@@ -900,12 +900,7 @@ BEGIN_PROTECTED
 
     db::Technology t;
     t.load (fn);
-
-    if (m_technologies.has_technology (t.name ())) {
-      *m_technologies.technology_by_name (t.name ()) = t;
-    } else {
-      m_technologies.add (new db::Technology (t));
-    }
+    m_technologies.add (t);
 
     update_tech_tree ();
     select_tech (*m_technologies.technology_by_name (t.name ()));

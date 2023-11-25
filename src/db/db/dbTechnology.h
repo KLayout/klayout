@@ -121,24 +121,34 @@ public:
   /**
    *  @brief Adds a technology to the setup
    *
-   *  The container becomes owner of the technology object.
-   *  Replaces a technology with the name of the given technology.
+   *  @return A reference to the new Technology object
+   *
+   *  If a technology with the given name already exists, it is replaced.
    */
-  void add (Technology *technology)
+  db::Technology *add (const Technology &technology)
   {
-    add_tech (technology, true /*replace*/);
+    return add_tech (technology, true /*replace*/);
   }
 
   /**
    *  @brief Adds a technology with a new name
    *
+   *  @return A reference to the new Technology object
+   *
    *  Like \add, but throws an exception if a technology with this name
-   *  already exists. Takes over ownership over the technology object.
-   *  The technology object is discarded if an exception is thrown.
+   *  already exists.
    */
-  void add_new (Technology *technology)
+  db::Technology *add_new (const Technology &technology)
   {
-    add_tech (technology, false /*throws exception on same name*/);
+    return add_tech (technology, false /*throws exception on same name*/);
+  }
+
+  /**
+   *  @brief Same as add, but no return value (for XML binding)
+   */
+  void add_void (const Technology &technology)
+  {
+    add (technology);
   }
 
   /**
@@ -244,7 +254,7 @@ private:
   bool m_changed;
   bool m_in_update;
 
-  void add_tech (Technology *technology, bool replace_same);
+  Technology *add_tech(const Technology &technology, bool replace_same);
 };
 
 /**

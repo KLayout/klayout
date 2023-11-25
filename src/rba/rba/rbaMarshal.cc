@@ -46,7 +46,7 @@ class RubyBasedStringAdaptor
 public:
   RubyBasedStringAdaptor (VALUE value)
   {
-    m_string = rba_safe_string_value (value);
+    m_string = rba_safe_obj_as_string (value);
     gc_lock_object (m_string);
   }
 

@@ -4,6 +4,19 @@
 # safe in multiple inclusions
 require File.expand_path('../basic_testcore_defs', __FILE__)
 
+
+class ObjectWithStr
+
+  def initialize(s)
+    @s = s
+  end
+
+  def to_s
+    @s
+  end
+
+end
+
 class Basic_TestClass < TestBase
 
   def test_FIRST
@@ -85,6 +98,7 @@ class Basic_TestClass < TestBase
     assert_equal( a.a1, -0x80000000 )
 
     assert_equal( a.a3("a"), 1 )
+    assert_equal( a.a3(ObjectWithStr::new("abcde")), 5 )   # implicitly using to_s for string conversion
     assert_equal( a.a3("ab"), 2 )
     assert_equal( a.a3("µ"), 2 )  # two UTF8 bytes
     if a.respond_to?(:a3_qstr) 
@@ -2198,19 +2212,9 @@ class Basic_TestClass < TestBase
     assert_equal(b.map1_cptr_null == nil, true);
     assert_equal(b.map1_ptr_null == nil, true);
 
-    begin
-      b.map1 = { 42 => 1, -17 => true }
-      error = nil
-    rescue => ex
-      error = ex.message.split("\n")[0]
-    end
-    if error == "can't convert Fixnum into String"
-      # Ok
-    elsif error == "no implicit conversion of Fixnum into String" || error == "no implicit conversion of Integer into String"
-      # Ok 
-    else
-      assert_equal(error, "")
-    end
+    b.map1 = { 42 => 1, -17 => true }
+    assert_equal(b.map1.inspect, "{-17=>\"true\", 42=>\"1\"}")
+
     b.map1 = { 42 => "1", -17 => "true" }
     assert_equal(b.map1.inspect, "{-17=>\"true\", 42=>\"1\"}")
 

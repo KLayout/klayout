@@ -26,6 +26,12 @@ import copy
 # Set this to True to disable some tests involving exceptions
 leak_check = "TEST_LEAK_CHECK" in os.environ
 
+class ObjectWithStr:
+  def __init__(self, s):
+    self.s = s
+  def __str__(self):
+    return self.s
+
 # see test_21
 class AEXT(pya.A):
   def __init__(self):
@@ -191,6 +197,7 @@ class BasicTest(unittest.TestCase):
     self.assertEqual( a.a1(), -0x80000000 )
 
     self.assertEqual( a.a3("a"), 1 )
+    self.assertEqual( a.a3(ObjectWithStr("abcde")), 5 )   # implicitly using to_s for string conversion
     self.assertEqual( a.a3("ab"), 2 )
     self.assertEqual( a.a3("µ"), 2 )  # two UTF8 bytes
     if "a3_qstr" in a.__dict__:
@@ -2279,13 +2286,8 @@ class BasicTest(unittest.TestCase):
     self.assertEqual(b.map1_cptr_null() == None, True);
     self.assertEqual(b.map1_ptr_null() == None, True);
 
-    try: 
-      # error converting 1 or True to string
-      b.map1 = { 42: 1, -17: True }
-      error_caught = False
-    except:
-      error_caught = True
-    self.assertEqual(error_caught, True)
+    b.map1 = { 42: 1, -17: True }
+    self.assertEqual(map2str(b.map1), "{-17: True, 42: 1}")
 
     b.map1 = { 42: "1", -17: "True" }
     self.assertEqual(map2str(b.map1), "{-17: True, 42: 1}")

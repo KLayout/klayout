@@ -928,8 +928,10 @@ void PythonBasedVectorAdaptor::push (gsi::SerialArgs &r, tl::Heap &heap)
 
 void PythonBasedVectorAdaptor::clear ()
 {
-  if (PySequence_Check (m_array.get ())) {
-    PySequence_DelSlice (m_array.get (), 0, PySequence_Length (m_array.get ()));
+  if (PyList_Check (m_array.get ())) {
+    PyList_SetSlice (m_array.get (), 0, PyList_Size (m_array.get ()), NULL);
+  } else if (PyTuple_Check (m_array.get ())) {
+    throw tl::Exception (tl::to_string (tr ("Tuples cannot be modified and cannot be used as out parameters")));
   }
 }
 

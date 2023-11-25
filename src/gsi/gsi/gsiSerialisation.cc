@@ -23,6 +23,7 @@
 
 #include "gsi.h"
 #include "gsiSerialisation.h"
+#include "tlLog.h"
 
 namespace gsi
 {
@@ -38,7 +39,14 @@ public:
 
   ~AdaptorSynchronizer ()
   {
-    mp_src->copy_to (mp_target, *mp_heap);
+    try {
+      //  NOTE: exceptions must not escape destructors as a basic C++ design requirement
+      mp_src->copy_to (mp_target, *mp_heap);
+    } catch (tl::Exception &ex) {
+      tl::error << ex.msg ();
+    } catch (...) {
+    }
+
     delete mp_src;
     delete mp_target;
     mp_src = 0;

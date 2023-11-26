@@ -43,9 +43,26 @@ class PythonBasedStringAdaptor
 {
 public:
   PythonBasedStringAdaptor (const PythonPtr &string)
-    : m_stdstr (python2c<std::string> (string.get ())), m_string (string)
+    : m_string (string)
   {
-    //  .. nothing yet ..
+#if PY_MAJOR_VERSION < 3
+    if (PyString_Check (string.get ())) {
+      m_stdstr = python2c<std::string> (string.get ());
+    } else
+#else
+    if (PyBytes_Check (string.get ())) {
+      m_stdstr = python2c<std::string> (string.get ());
+    } else
+#endif
+    if (PyUnicode_Check (string.get ()) || PyByteArray_Check (string.get ())) {
+      m_stdstr = python2c<std::string> (string.get ());
+    } else {
+      //  use object protocol to get the string through str(...)
+      PythonRef as_str (PyObject_Str (string.get ()));
+      if (as_str) {
+        m_stdstr = python2c<std::string> (as_str.get ());
+      }
+    }
   }
 
   virtual const char *c_str () const

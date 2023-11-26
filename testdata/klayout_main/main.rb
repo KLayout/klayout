@@ -191,6 +191,18 @@ class KLayoutMain_TestClass < TestBase
 
   end
 
+  def test_12
+
+    # Application.exit(0) - Python
+    out = `#{self.klayout_bin} -z -r #{File.join(File.dirname(__FILE__), "test12.py")} 2>&1`
+    assert_equal(out, "Before exit()\n")
+
+    # Application.exit(0) - Ruby
+    out = `#{self.klayout_bin} -z -r #{File.join(File.dirname(__FILE__), "test12.rb")} 2>&1`
+    assert_equal(out, "Before exit()\n")
+
+  end
+
 end
 
 load("test_epilogue.rb")

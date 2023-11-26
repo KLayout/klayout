@@ -265,7 +265,17 @@ bool TestBase::do_test (bool editable, bool slow)
 
   reset_checkpoint ();
 
-  execute (this);
+  try {
+    execute (this);
+  } catch (tl::CancelException &) {
+    throw;
+  } catch (tl::Exception &ex) {
+    raise (std::string ("Exception caught: ") + ex.msg ());
+  } catch (std::runtime_error &ex) {
+    raise (std::string ("std::runtime_error caught: ") + ex.what ());
+  } catch (...) {
+    raise (std::string ("unspecific exception caught: "));
+  }
 
   m_testtmp.clear ();
 

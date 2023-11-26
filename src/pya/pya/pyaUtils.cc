@@ -117,8 +117,9 @@ void check_error ()
     } else if (PyErr_GivenExceptionMatches (exc_type.get (), PyExc_SystemExit)) {
 
       int status = 0;
-      if (exc_value && test_type<int> (exc_value.get (), true)) {
-        status = python2c<int> (exc_value.get ());
+      if (exc_value) {
+        tl::Variant st = python2c<tl::Variant> (exc_value.get ());
+        status = st.to_int ();
       }
 
       throw tl::ExitException (status);

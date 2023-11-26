@@ -200,7 +200,8 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
 
   tl_assert (cls_decl != 0);
 
-  int argc = args == NULL ? 0 : int (PyTuple_Size (args));
+  bool is_tuple = PyTuple_Check (args);
+  int argc = args == NULL ? 0 : (is_tuple ? int (PyTuple_Size (args)) : int (PyList_Size (args)));
 
   //  get number of candidates by argument count
   const gsi::MethodBase *meth = 0;
@@ -277,9 +278,10 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
         int sc = 0;
         int i = 0;
         for (gsi::MethodBase::argument_iterator a = (*m)->begin_arguments (); is_valid && i < argc && a != (*m)->end_arguments (); ++a, ++i) {
-          if (test_arg (*a, PyTuple_GetItem (args, i), false /*strict*/)) {
+          PyObject *arg = is_tuple ? PyTuple_GetItem (args, i) : PyList_GetItem (args, i);
+          if (test_arg (*a, arg, false /*strict*/)) {
             ++sc;
-          } else if (test_arg (*a, PyTuple_GetItem (args, i), true /*loose*/)) {
+          } else if (test_arg (*a, arg, true /*loose*/)) {
             //  non-scoring match
           } else {
             is_valid = false;
@@ -326,7 +328,8 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
     //  one candidate, but needs checking whether compatibility is given - this avoid having to route NotImplemented over TypeError exceptions later
     int i = 0;
     for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); i < argc && a != meth->end_arguments (); ++a, ++i) {
-      if (! test_arg (*a, PyTuple_GetItem (args, i), true /*loose*/)) {
+      PyObject *arg = is_tuple ? PyTuple_GetItem (args, i) : PyList_GetItem (args, i);
+      if (! test_arg (*a, arg, true /*loose*/)) {
         return 0;
       }
     }
@@ -607,16 +610,17 @@ special_method_impl (gsi::MethodBase::special_method_type smt, PyObject *self, P
   }
 }
 
-static void
+void
 push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, PyObject *args, tl::Heap &heap)
 {
+  bool is_tuple = PyTuple_Check (args);
   int i = 0;
-  int argc = args == NULL ? 0 : int (PyTuple_Size (args));
+  int argc = args == NULL ? 0 : (is_tuple ? int (PyTuple_Size (args)) : int (PyList_Size (args)));
 
   try {
 
     for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); i < argc && a != meth->end_arguments (); ++a, ++i) {
-      push_arg (*a, arglist, PyTuple_GetItem (args, i), heap);
+      push_arg (*a, arglist, is_tuple ? PyTuple_GetItem (args, i) : PyList_GetItem (args, i), heap);
     }
 
   } catch (tl::Exception &ex) {
@@ -726,7 +730,7 @@ property_getter_adaptor (int mid, PyObject *self, PyObject *args)
 
   PYA_TRY
 
-    int argc = args == NULL ? 0 : int (PyTuple_Size (args));
+    int argc = args == NULL ? 0 : (PyTuple_Check (args) ? int (PyTuple_Size (args)) : int (PyList_Size (args)));
     if (argc != 0) {
       throw tl::Exception (tl::to_string (tr ("Property getters must not have an argument")));
     }
@@ -747,12 +751,12 @@ property_setter_adaptor (int mid, PyObject *self, PyObject *args)
 
   PYA_TRY
 
-    int argc = args == NULL ? 0 : int (PyTuple_Size (args));
+    int argc = args == NULL ? 0 : (PyTuple_Check (args) ? int (PyTuple_Size (args)) : int (PyList_Size (args)));
     if (argc != 1) {
       throw tl::Exception (tl::to_string (tr ("Property setter needs exactly one argument")));
     }
 
-    PyObject *value = PyTuple_GetItem (args, 0);
+    PyObject *value = PyTuple_Check (args) ? PyTuple_GetItem (args, 0) : PyList_GetItem (args, 0);
     if (value) {
       ret = property_setter_impl (mid, self, value);
     }
@@ -777,7 +781,8 @@ method_init_adaptor (int mid, PyObject *self, PyObject *args)
       p->destroy ();
     }
 
-    const gsi::MethodBase *meth = match_method (mid, self, args, PyTuple_Size (args) > 0 || ! p->cls_decl ()->can_default_create ());
+    int argc = PyTuple_Check (args) ? int (PyTuple_Size (args)) : int (PyList_Size (args));
+    const gsi::MethodBase *meth = match_method (mid, self, args, argc > 0 || ! p->cls_decl ()->can_default_create ());
 
     if (meth && meth->smt () == gsi::MethodBase::None) {
 

@@ -65,6 +65,20 @@ A::A (int nn) {
   f = false;
 }
 
+A::A (int n1, int n2) {
+  ++a_count;
+  e = Enum (0);
+  n = n1 + n2;
+  f = false;
+}
+
+A::A (int n1, int n2, double n3) {
+  ++a_count;
+  e = Enum (0);
+  n = (n1 + n2) * n3;
+  f = false;
+}
+
 A::A (const A &a)
   : gsi::ObjectBase (a)
 {
@@ -339,7 +353,17 @@ static A *a_ctor (int i)
   return new A (i);
 }
 
-void A::a20 (A *ptr) 
+static A *a_ctor2 (int i, int j)
+{
+  return new A (i, j);
+}
+
+static A *a_ctor3 (int i, int j, double f)
+{
+  return new A (i, j, f);
+}
+
+void A::a20 (A *ptr)
 { 
   if (a_inst.get () != ptr) {
     a_inst.reset (ptr);
@@ -360,26 +384,26 @@ static int b_count = 0;
 B::B () 
 { 
   ++b_count;
-  av.push_back (A (100));
-  av.push_back (A (121));
-  av.push_back (A (144));
-  avc_nc.push_back (new A_NC (-3100));
-  avc_nc.push_back (new A_NC (-3121));
-  av_nc.push_back (new A_NC (7100));
-  av_nc.push_back (new A_NC (7121));
-  av_nc.push_back (new A_NC (7144));
-  av_nc.push_back (new A_NC (7169));
+  m_av.push_back (A (100));
+  m_av.push_back (A (121));
+  m_av.push_back (A (144));
+  m_avc_nc.push_back (new A_NC (-3100));
+  m_avc_nc.push_back (new A_NC (-3121));
+  m_av_nc.push_back (new A_NC (7100));
+  m_av_nc.push_back (new A_NC (7121));
+  m_av_nc.push_back (new A_NC (7144));
+  m_av_nc.push_back (new A_NC (7169));
 }
 
 B::~B ()
 {
-  while (! av_nc.empty ()) {
-    delete av_nc.back ();
-    av_nc.pop_back ();
+  while (! m_av_nc.empty ()) {
+    delete m_av_nc.back ();
+    m_av_nc.pop_back ();
   }
-  while (! avc_nc.empty ()) {
-    delete const_cast<A_NC *> (avc_nc.back ());
-    avc_nc.pop_back ();
+  while (! m_avc_nc.empty ()) {
+    delete const_cast<A_NC *> (m_avc_nc.back ());
+    m_avc_nc.pop_back ();
   }
   if (b_inst == this) {
     b_inst = 0;
@@ -405,22 +429,22 @@ B &B::operator=(const B &d)
   }
 
   m = d.m;
-  a = d.a;
-  bv = d.bv;
-  av = d.av;
-  while (! av_nc.empty ()) {
-    delete av_nc.back ();
-    av_nc.pop_back ();
+  m_a = d.m_a;
+  m_bv = d.m_bv;
+  m_av = d.m_av;
+  while (! m_av_nc.empty ()) {
+    delete m_av_nc.back ();
+    m_av_nc.pop_back ();
   }
-  for (std::vector <A_NC *>::const_iterator i = d.av_nc.begin (); i != d.av_nc.end (); ++i) {
-    av_nc.push_back (new A_NC (**i));
+  for (std::vector <A_NC *>::const_iterator i = d.m_av_nc.begin (); i != d.m_av_nc.end (); ++i) {
+    m_av_nc.push_back (new A_NC (**i));
   }
-  while (! avc_nc.empty ()) {
-    delete const_cast<A_NC *> (avc_nc.back ());
-    avc_nc.pop_back ();
+  while (! m_avc_nc.empty ()) {
+    delete const_cast<A_NC *> (m_avc_nc.back ());
+    m_avc_nc.pop_back ();
   }
-  for (std::vector <const A_NC *>::const_iterator i = d.avc_nc.begin (); i != d.avc_nc.end (); ++i) {
-    avc_nc.push_back (new A_NC (**i));
+  for (std::vector <const A_NC *>::const_iterator i = d.m_avc_nc.begin (); i != d.m_avc_nc.end (); ++i) {
+    m_avc_nc.push_back (new A_NC (**i));
   }
   m_var = d.m_var;
   m_vars = d.m_vars;
@@ -461,7 +485,7 @@ std::string B::addr () const
   return c;
 }
 
-static int b3_ext (const B *b, A *aptr) 
+static int aptr_to_n_ext (const B *b, A *aptr)
 { 
   return b->b3 (aptr);
 }
@@ -1030,6 +1054,8 @@ static gsi::QFlagsClass<Enum> decl_qflags_enum ("", "Enums");
 
 static gsi::Class<A> decl_a ("", "A",
   gsi::constructor ("new_a|new", &a_ctor) +
+  gsi::constructor ("new", &a_ctor2) +
+  gsi::constructor ("new", &a_ctor3) +
   gsi::method ("instance_count", &A::instance_count) +
   gsi::method ("new_a_by_variant", &A::new_a_by_variant) +
 
@@ -1146,8 +1172,8 @@ static gsi::Class<A> decl_a ("", "A",
   gsi::method ("af?|af", &A::af1) +
   gsi::method ("aa", &A::a) +
   gsi::method ("aa", &A::a_static) +
-  gsi::method ("a1", &A::a1) +
-  gsi::method ("a1c", &A::a1c) +
+  gsi::method ("a1|get_n", &A::a1) +
+  gsi::method ("a1c|get_n_const", &A::a1c) +
   gsi::method ("a2", &A::a2) +
   gsi::method ("a3", &A::a3) +
 #if defined(HAVE_QT)
@@ -1262,8 +1288,8 @@ static gsi::Class<B> decl_b ("", "B",
   gsi::method ("set_str", &B::set_str) +
   gsi::method ("str_ccptr", &B::str_ccptr) +
   gsi::method ("set_str_combine", &B::set_str_combine) +
-  gsi::method_ext ("b3|aptr_to_n", &b3_ext) +
-  gsi::method ("b4|aref_to_s", &B::b4) +
+  gsi::method_ext ("b3|aptr_to_n", &aptr_to_n_ext) +
+  gsi::method ("b4|aref_to_s", &B::aref_to_s) +
   gsi::method ("make_a", &B::make_a) +
   gsi::method ("set_an", &B::set_an) +
   gsi::method ("an", &B::an) +
@@ -1280,18 +1306,23 @@ static gsi::Class<B> decl_b ("", "B",
   gsi::method ("xxx|amember_cptr", &B::amember_cptr) +
   gsi::method ("yyy|amember_cref", &B::amember_cref) +
   gsi::method ("zzz|amember_ref", &B::amember_ref) +
-  gsi::method ("b15|arg_is_not_nil", &B::b15) +
-  gsi::method ("b16a|av", &B::b16a) +
-  gsi::method ("b16b|av_cref", &B::b16b) +
-  gsi::method ("b16c|av_ref", &B::b16c) +
-  gsi::method ("b17a|av_cref=", &B::b17a) +
-  gsi::method ("b17b|av_ref=", &B::b17b) +
-  gsi::method ("b17c|av=", &B::b17c) +
-  gsi::method ("b17d|av_cptr=", &B::b17d) +
-  gsi::method ("b17e|av_ptr=", &B::b17e) +
-  gsi::iterator ("b18", &B::b18) +
-  gsi::iterator ("b18b", &B::b18b) +
-  gsi::iterator ("b18c", &B::b18b) +
+  gsi::method ("b15|arg_is_not_nil", &B::arg_is_not_nil) +
+  gsi::method ("b16a|av", &B::av) +
+  gsi::method ("b16b|av_cref", &B::av_cref) +
+  gsi::method ("b16c|av_ref", &B::av_ref) +
+  gsi::method ("push_a", &B::push_a) +
+  gsi::method ("push_a_cref", &B::push_a_cref) +
+  gsi::method ("push_a_cptr", &B::push_a_cptr) +
+  gsi::method ("push_a_ref", &B::push_a_ref) +
+  gsi::method ("push_a_ptr", &B::push_a_ptr) +
+  gsi::method ("b17a|av_cref=", &B::set_av_cref) +
+  gsi::method ("b17b|av_ref=", &B::set_av_ref) +
+  gsi::method ("b17c|av=", &B::set_av) +
+  gsi::method ("b17d|av_cptr=", &B::set_av_cptr) +
+  gsi::method ("b17e|av_ptr=", &B::set_av_ptr) +
+  gsi::iterator ("b18|each_a", &B::b18) +
+  gsi::iterator ("b18b|each_a_ref", &B::b18b) +
+  gsi::iterator ("b18c|each_a_ptr", &B::b18c) +
   gsi::method ("b20a|var_is_nil", &B::b20a) +
   gsi::method ("b20b|var_is_double", &B::b20b) +
   gsi::method ("b20c|var_is_long", &B::b20c) +

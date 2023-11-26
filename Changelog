@@ -1,5 +1,9 @@
-0.28.13          (2023-xx-xx):
+0.28.13          (2023-11-20):
+* Bugfix: %GITHUB%/issues/1534 Layout::dup does not copy properties
+* Bugfix: %GITHUB%/issues/1533 KLayout crashing with two consecutive calls of the same LayoutView::show_layout command 
 * Bugfix: %GITHUB%/issues/1532 DRC checks give incorrect results in deep mode with magnified instances
+* Enhancement: %GITHUB%/issues/1527 Marker Database Browser: add context menu to Info widget
+* Bugfix: %GITHUB%/issues/1522 Changing ruler/annotation from script weirdly interferes with pya.Application.commit_config
 * Enhancement: %GITHUB%/issues/1514 Package manager: Support for Git-hosted packages
 * Bugfix: %GITHUB%/issues/1512 "get_image" of LayoutView should also work on inactive views
 * Bugfix: %GITHUB%/issues/1511 Typo

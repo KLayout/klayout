@@ -3696,7 +3696,7 @@ class Circuit(NetlistObject):
         @brief Joins (connects) two nets into one
         This method will connect the 'with' net with 'net' and remove 'with'.
 
-        This method has been introduced in version 0.26.4.
+        This method has been introduced in version 0.26.4. Starting with version 0.28.13, net names will be formed from both input names, combining them with as a comma-separated list.
         """
     def net_by_cluster_id(self, cluster_id: int) -> Net:
         r"""
@@ -4110,12 +4110,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -4140,12 +4140,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -4230,12 +4230,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -4320,12 +4320,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -11283,7 +11283,8 @@ class DText:
     Setter:
     @brief Sets the horizontal alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     size: float
     r"""
@@ -14917,13 +14918,17 @@ class DeviceExtractorBase:
 
         This method has been added in version 0.27.3.
         """
-    def each_error(self) -> Iterator[NetlistDeviceExtractorError]:
+    def each_error(self) -> Iterator[LogEntryData]:
         r"""
-        @brief Iterates over all errors collected in the device extractor.
+        @brief Iterates over all log entries collected in the device extractor.Starting with version 0.28.13, the preferred name of the method is 'each_log_entry' as log entries have been generalized to become warnings too.
         """
     def each_layer_definition(self) -> Iterator[NetlistDeviceExtractorLayerDefinition]:
         r"""
         @brief Iterates over all layer definitions.
+        """
+    def each_log_entry(self) -> Iterator[LogEntryData]:
+        r"""
+        @brief Iterates over all log entries collected in the device extractor.Starting with version 0.28.13, the preferred name of the method is 'each_log_entry' as log entries have been generalized to become warnings too.
         """
     def is_const_object(self) -> bool:
         r"""
@@ -18912,7 +18917,7 @@ class Edges(ShapeCollection):
     """
     class EdgeType:
         r"""
-        @brief This enum specifies the the edge type for edge angle filters.
+        @brief This enum specifies the edge type for edge angle filters.
 
         This enum was introduced in version 0.28.
         """
@@ -21522,6 +21527,42 @@ class GenericDeviceExtractor(DeviceExtractorBase):
         Use this unit to compute device properties. It is the database unit multiplied with the
         device scaling factor.
         """
+    @overload
+    def warn(self, category_name: str, category_description: str, message: str) -> None:
+        r"""
+        @brief Issues a warning with the given category name and description, message
+        Warnings have been introduced in version 0.28.13.
+        """
+    @overload
+    def warn(self, category_name: str, category_description: str, message: str, geometry: DPolygon) -> None:
+        r"""
+        @brief Issues a warning with the given category name and description, message and micrometer-units polygon geometry
+        Warnings have been introduced in version 0.28.13.
+        """
+    @overload
+    def warn(self, category_name: str, category_description: str, message: str, geometry: Polygon) -> None:
+        r"""
+        @brief Issues a warning with the given category name and description, message and database-unit polygon geometry
+        Warnings have been introduced in version 0.28.13.
+        """
+    @overload
+    def warn(self, message: str) -> None:
+        r"""
+        @brief Issues a warning with the given message
+        Warnings have been introduced in version 0.28.13.
+        """
+    @overload
+    def warn(self, message: str, geometry: DPolygon) -> None:
+        r"""
+        @brief Issues a warning with the given message and micrometer-units polygon geometry
+        Warnings have been introduced in version 0.28.13.
+        """
+    @overload
+    def warn(self, message: str, geometry: Polygon) -> None:
+        r"""
+        @brief Issues a warning with the given message and database-unit polygon geometry
+        Warnings have been introduced in version 0.28.13.
+        """
 
 class GenericDeviceParameterCompare(EqualDeviceParameters):
     r"""
@@ -21585,99 +21626,22 @@ class GenericNetlistCompareLogger(NetlistCompareLogger):
     The \NetlistComparer class will send compare events to a logger derived from this class. Use this class to implement your own logger class. You can override on of its methods to receive certain kind of events.
     This class has been introduced in version 0.26.
     """
-    class Severity:
-        r"""
-        @brief This class represents the log severity level for \GenericNetlistCompareLogger#log_entry.
-        This enum has been introduced in version 0.28.
-        """
-        Error: ClassVar[GenericNetlistCompareLogger.Severity]
-        r"""
-        @brief An error
-        """
-        Info: ClassVar[GenericNetlistCompareLogger.Severity]
-        r"""
-        @brief Information only
-        """
-        NoSeverity: ClassVar[GenericNetlistCompareLogger.Severity]
-        r"""
-        @brief Unspecific severity
-        """
-        Warning: ClassVar[GenericNetlistCompareLogger.Severity]
-        r"""
-        @brief A warning
-        """
-        @overload
-        @classmethod
-        def new(cls, i: int) -> GenericNetlistCompareLogger.Severity:
-            r"""
-            @brief Creates an enum from an integer value
-            """
-        @overload
-        @classmethod
-        def new(cls, s: str) -> GenericNetlistCompareLogger.Severity:
-            r"""
-            @brief Creates an enum from a string value
-            """
-        @overload
-        def __eq__(self, other: object) -> bool:
-            r"""
-            @brief Compares an enum with an integer value
-            """
-        @overload
-        def __eq__(self, other: object) -> bool:
-            r"""
-            @brief Compares two enums
-            """
-        @overload
-        def __init__(self, i: int) -> None:
-            r"""
-            @brief Creates an enum from an integer value
-            """
-        @overload
-        def __init__(self, s: str) -> None:
-            r"""
-            @brief Creates an enum from a string value
-            """
-        @overload
-        def __lt__(self, other: GenericNetlistCompareLogger.Severity) -> bool:
-            r"""
-            @brief Returns true if the first enum is less (in the enum symbol order) than the second
-            """
-        @overload
-        def __lt__(self, other: int) -> bool:
-            r"""
-            @brief Returns true if the enum is less (in the enum symbol order) than the integer value
-            """
-        @overload
-        def __ne__(self, other: object) -> bool:
-            r"""
-            @brief Compares an enum with an integer for inequality
-            """
-        @overload
-        def __ne__(self, other: object) -> bool:
-            r"""
-            @brief Compares two enums for inequality
-            """
-        def __repr__(self) -> str:
-            r"""
-            @brief Converts an enum to a visual string
-            """
-        def __str__(self) -> str:
-            r"""
-            @brief Gets the symbolic string from an enum
-            """
-        def inspect(self) -> str:
-            r"""
-            @brief Converts an enum to a visual string
-            """
-        def to_i(self) -> int:
-            r"""
-            @brief Gets the integer value from the enum
-            """
-        def to_s(self) -> str:
-            r"""
-            @brief Gets the symbolic string from an enum
-            """
+    Error: ClassVar[Severity]
+    r"""
+    @brief Specifies error severity (preferred action is stop)
+    """
+    Info: ClassVar[Severity]
+    r"""
+    @brief Specifies info severity (print if requested, otherwise silent)
+    """
+    NoSeverity: ClassVar[Severity]
+    r"""
+    @brief Specifies no particular severity (default)
+    """
+    Warning: ClassVar[Severity]
+    r"""
+    @brief Specifies warning severity (log with high priority, but do not stop)
+    """
     def _create(self) -> None:
         r"""
         @brief Ensures the C++ object is created
@@ -21790,12 +21754,12 @@ class HAlign:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -27137,6 +27101,13 @@ class Layout:
         r"""
         @brief Cancels the "in changes" state (see "start_changes")
         """
+    def error_layer(self) -> int:
+        r"""
+        @brief Returns the index of the error layer
+        The error layer is used to place error texts on it, for example when a PCell evaluation fails.
+
+        This method has been added in version 0.23.13.
+        """
     @overload
     def find_layer(self, info: LayerInfo) -> Any:
         r"""
@@ -29019,12 +28990,12 @@ class LayoutToNetlist:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -29049,12 +29020,12 @@ class LayoutToNetlist:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -29172,6 +29143,22 @@ class LayoutToNetlist:
 
     Setter:
     @brief Sets the number of threads to use for operations which support multiple threads
+    """
+    top_level_mode: bool
+    r"""
+    Getter:
+    @brief Gets a flag indicating whether top level mode is enabled.
+    See \top_level_mode= for details.
+
+    This attribute has been introduced in version 0.28.13.
+
+    Setter:
+    @brief Sets a flag indicating whether top level mode is enabled.
+
+    In top level mode, must-connect warnings are turned into errors for example.
+    To enable top level mode, set this attribute to true. By default, top-level mode is turned off.
+
+    This attribute has been introduced in version 0.28.13.
     """
     @overload
     @classmethod
@@ -29463,6 +29450,12 @@ class LayoutToNetlist:
 
         CAUTION: this function may create new cells in 'layout'. Use \const_cell_mapping_into if you want to use the target layout's hierarchy and not modify it.
         """
+    def check_extraction_errors(self) -> None:
+        r"""
+        @brief Raises an exception if extraction errors are present
+
+        This method has been introduced in version 0.28.13.
+        """
     def clear_join_net_names(self) -> None:
         r"""
         @brief Clears all implicit net joining expressions.
@@ -29565,6 +29558,16 @@ class LayoutToNetlist:
     def dump_joined_nets_per_cell(self) -> str:
         r"""
         @hide
+        """
+    def each_error(self) -> Iterator[LogEntryData]:
+        r"""
+        @brief Iterates over all log entries collected during device and netlist extraction.
+        This method has been introduced in version 0.28.13.
+        """
+    def each_log_entry(self) -> Iterator[LogEntryData]:
+        r"""
+        @brief Iterates over all log entries collected during device and netlist extraction.
+        This method has been introduced in version 0.28.13.
         """
     def extract_devices(self, extractor: DeviceExtractorBase, layers: Dict[str, ShapeCollection]) -> None:
         r"""
@@ -31285,6 +31288,183 @@ class LoadLayoutOptions:
         Starting with version 0.25 this option only applies to GDS2 and OASIS format. Other formats provide their own configuration.
         """
 
+class LogEntryData:
+    r"""
+    @brief A generic log entry
+    This class is used for example by the device extractor (see \NetlistDeviceExtractor) to keep errors or warnings that occurred during extraction of the devices.
+
+    Other classes also make use of this object to store errors, warnings or information. The log entry object features a severity (warning, error, info), a message, an optional category name and description (good for filtering if needed) and an optional \DPolygon object for indicating some location or error marker.
+    The original class used to be "NetlistDeviceExtractorError" which had been introduced in version 0.26. It was generalized and renamed in version 0.28.13 as it was basically not useful as a separate class.
+    """
+    Error: ClassVar[Severity]
+    r"""
+    @brief Specifies error severity (preferred action is stop)
+    """
+    Info: ClassVar[Severity]
+    r"""
+    @brief Specifies info severity (print if requested, otherwise silent)
+    """
+    NoSeverity: ClassVar[Severity]
+    r"""
+    @brief Specifies no particular severity (default)
+    """
+    Warning: ClassVar[Severity]
+    r"""
+    @brief Specifies warning severity (log with high priority, but do not stop)
+    """
+    category_description: str
+    r"""
+    Getter:
+    @brief Gets the category description.
+    See \category_name= for details about categories.
+    Setter:
+    @brief Sets the category description.
+    See \category_name= for details about categories.
+    """
+    category_name: str
+    r"""
+    Getter:
+    @brief Gets the category name.
+    See \category_name= for more details.
+    Setter:
+    @brief Sets the category name.
+    The category name is optional. If given, it specifies a formal category name. Errors with the same category name are shown in that category. If in addition a category description is specified (see \category_description), this description will be displayed as the title.
+    """
+    cell_name: str
+    r"""
+    Getter:
+    @brief Gets the cell name.
+    See \cell_name= for details about this attribute.
+    Setter:
+    @brief Sets the cell name.
+    The cell (or circuit) name specifies the cell or circuit the log entry is related to. If the log entry is an error or warning generated during device extraction, the cell name is the circuit the device should have appeared in.
+    """
+    geometry: DPolygon
+    r"""
+    Getter:
+    @brief Gets the geometry.
+    See \geometry= for more details.
+    Setter:
+    @brief Sets the geometry.
+    The geometry is optional. If given, a marker may be shown when selecting this error.
+    """
+    message: str
+    r"""
+    Getter:
+    @brief Gets the message text.
+
+    Setter:
+    @brief Sets the message text.
+    """
+    severity: Severity
+    r"""
+    Getter:
+    @brief Gets the severity attribute.
+
+    Setter:
+    @brief Sets the severity attribute.
+    """
+    @classmethod
+    def new(cls) -> LogEntryData:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __copy__(self) -> LogEntryData:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> LogEntryData:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __init__(self) -> None:
+        r"""
+        @brief Creates a new object of this class
+        """
+    def __repr__(self, with_geometry: Optional[bool] = ...) -> str:
+        r"""
+        @brief Gets the string representation of this error or warning.
+        This method has been introduced in version 0.28.13.
+        """
+    def __str__(self, with_geometry: Optional[bool] = ...) -> str:
+        r"""
+        @brief Gets the string representation of this error or warning.
+        This method has been introduced in version 0.28.13.
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def assign(self, other: LogEntryData) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def dup(self) -> LogEntryData:
+        r"""
+        @brief Creates a copy of self
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def to_s(self, with_geometry: Optional[bool] = ...) -> str:
+        r"""
+        @brief Gets the string representation of this error or warning.
+        This method has been introduced in version 0.28.13.
+        """
+
 class Manager:
     r"""
     @brief A transaction manager class
@@ -32865,14 +33045,14 @@ class NetPinRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this pin reference is attached to.
         """
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this pin reference is attached to.
+        @brief Gets the net this pin reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
     def pin(self) -> Pin:
         r"""
@@ -33123,14 +33303,14 @@ class NetTerminalRef:
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to (non-const version).
-
-        This constness variant has been introduced in version 0.26.8
+        @brief Gets the net this terminal reference is attached to.
         """
     @overload
     def net(self) -> Net:
         r"""
-        @brief Gets the net this terminal reference is attached to.
+        @brief Gets the net this terminal reference is attached to (non-const version).
+
+        This constness variant has been introduced in version 0.26.8
         """
     def terminal_def(self) -> DeviceTerminalDefinition:
         r"""
@@ -33893,16 +34073,16 @@ class Netlist:
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index (const version).
+        @brief Gets the circuit object for a given cell index.
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
-
-        This constness variant has been introduced in version 0.26.8.
         """
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index.
+        @brief Gets the circuit object for a given cell index (const version).
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
+
+        This constness variant has been introduced in version 0.26.8.
         """
     @overload
     def circuit_by_name(self, name: str) -> Circuit:
@@ -33921,19 +34101,19 @@ class Netlist:
     @overload
     def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
         r"""
+        @brief Gets the circuit objects for a given name filter.
+        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
+
+        This method has been introduced in version 0.26.4.
+        """
+    @overload
+    def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
+        r"""
         @brief Gets the circuit objects for a given name filter (const version).
         The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
 
 
         This constness variant has been introduced in version 0.26.8.
-        """
-    @overload
-    def circuits_by_name(self, name_pattern: str) -> List[Circuit]:
-        r"""
-        @brief Gets the circuit objects for a given name filter.
-        The name filter is a glob pattern. This method will return all \Circuit objects matching the glob pattern.
-
-        This method has been introduced in version 0.26.4.
         """
     def combine_devices(self) -> None:
         r"""
@@ -33991,16 +34171,22 @@ class Netlist:
     @overload
     def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits bottom-up
-        Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
-        """
-    @overload
-    def each_circuit_bottom_up(self) -> Iterator[Circuit]:
-        r"""
         @brief Iterates over the circuits bottom-up (const version)
         Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
 
         This constness variant has been introduced in version 0.26.8.
+        """
+    @overload
+    def each_circuit_bottom_up(self) -> Iterator[Circuit]:
+        r"""
+        @brief Iterates over the circuits bottom-up
+        Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
+        """
+    @overload
+    def each_circuit_top_down(self) -> Iterator[Circuit]:
+        r"""
+        @brief Iterates over the circuits top-down
+        Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
         """
     @overload
     def each_circuit_top_down(self) -> Iterator[Circuit]:
@@ -34009,12 +34195,6 @@ class Netlist:
         Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
 
         This constness variant has been introduced in version 0.26.8.
-        """
-    @overload
-    def each_circuit_top_down(self) -> Iterator[Circuit]:
-        r"""
-        @brief Iterates over the circuits top-down
-        Iterating top-down means the parent circuits come before the child circuits. The first \top_circuit_count circuits are top circuits - i.e. those which are not referenced by other circuits.
         """
     @overload
     def each_device_class(self) -> Iterator[DeviceClass]:
@@ -34920,147 +35100,6 @@ class NetlistCrossReference(NetlistCompareLogger):
         The return value will be nil if no match is found. Otherwise it is the 'b' subcircuit for subcircuits from the 'a' netlist and vice versa.
 
         This method has been introduced in version 0.27.
-        """
-
-class NetlistDeviceExtractorError:
-    r"""
-    @brief An error that occurred during device extraction
-    The device extractor will keep errors that occurred during extraction of the devices. It does not by using this error class.
-
-    An error is basically described by the cell/circuit it occurs in and the message. In addition, a geometry may be attached forming a marker that can be shown when the error is selected. The geometry is given as a \DPolygon object. If no geometry is specified, this polygon is empty.
-
-    For categorization of the errors, a category name and description may be specified. If given, the errors will be shown in the specified category. The category description is optional.
-
-    This class has been introduced in version 0.26.
-    """
-    category_description: str
-    r"""
-    Getter:
-    @brief Gets the category description.
-    See \category_name= for details about categories.
-    Setter:
-    @brief Sets the category description.
-    See \category_name= for details about categories.
-    """
-    category_name: str
-    r"""
-    Getter:
-    @brief Gets the category name.
-    See \category_name= for more details.
-    Setter:
-    @brief Sets the category name.
-    The category name is optional. If given, it specifies a formal category name. Errors with the same category name are shown in that category. If in addition a category description is specified (see \category_description), this description will be displayed as the title of.
-    """
-    cell_name: str
-    r"""
-    Getter:
-    @brief Gets the cell name.
-    See \cell_name= for details about this attribute.
-    Setter:
-    @brief Sets the cell name.
-    The cell name is the name of the layout cell which was treated. This is also the name of the circuit the device should have appeared in (it may be dropped because of this error). If netlist hierarchy manipulation happens however, the circuit may not exist any longer or may be renamed.
-    """
-    geometry: DPolygon
-    r"""
-    Getter:
-    @brief Gets the geometry.
-    See \geometry= for more details.
-    Setter:
-    @brief Sets the geometry.
-    The geometry is optional. If given, a marker will be shown when selecting this error.
-    """
-    message: str
-    r"""
-    Getter:
-    @brief Gets the message text.
-
-    Setter:
-    @brief Sets the message text.
-    """
-    @classmethod
-    def new(cls) -> NetlistDeviceExtractorError:
-        r"""
-        @brief Creates a new object of this class
-        """
-    def __copy__(self) -> NetlistDeviceExtractorError:
-        r"""
-        @brief Creates a copy of self
-        """
-    def __deepcopy__(self) -> NetlistDeviceExtractorError:
-        r"""
-        @brief Creates a copy of self
-        """
-    def __init__(self) -> None:
-        r"""
-        @brief Creates a new object of this class
-        """
-    def _create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
-    def _destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-    def _destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
-        """
-    def _is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
-        """
-    def _manage(self) -> None:
-        r"""
-        @brief Marks the object as managed by the script side.
-        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
-
-        Usually it's not required to call this method. It has been introduced in version 0.24.
-        """
-    def _unmanage(self) -> None:
-        r"""
-        @brief Marks the object as no longer owned by the script side.
-        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
-
-        Usually it's not required to call this method. It has been introduced in version 0.24.
-        """
-    def assign(self, other: NetlistDeviceExtractorError) -> None:
-        r"""
-        @brief Assigns another object to self
-        """
-    def create(self) -> None:
-        r"""
-        @brief Ensures the C++ object is created
-        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
-        """
-    def destroy(self) -> None:
-        r"""
-        @brief Explicitly destroys the object
-        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
-        If the object is not owned by the script, this method will do nothing.
-        """
-    def destroyed(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the object was already destroyed
-        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
-        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
-        """
-    def dup(self) -> NetlistDeviceExtractorError:
-        r"""
-        @brief Creates a copy of self
-        """
-    def is_const_object(self) -> bool:
-        r"""
-        @brief Returns a value indicating whether the reference is a const reference
-        This method returns true, if self is a const reference.
-        In that case, only const methods may be called on self.
         """
 
 class NetlistDeviceExtractorLayerDefinition:
@@ -36576,12 +36615,12 @@ class PCellParameterState:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -39198,12 +39237,12 @@ class PreferredOrientation:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -39228,12 +39267,12 @@ class PreferredOrientation:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -39383,12 +39422,12 @@ class PropertyConstraint:
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums
+        @brief Compares an enum with an integer value
         """
     @overload
     def __eq__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer value
+        @brief Compares two enums
         """
     @overload
     def __init__(self, i: int) -> None:
@@ -39413,12 +39452,12 @@ class PropertyConstraint:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -40851,12 +40890,12 @@ class Region(ShapeCollection):
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -44541,6 +44580,177 @@ class SaveLayoutOptions:
         This method has been introduced in version 0.22. Beginning with version 0.23, this method always returns true, since the only consumer for the return value, Layout#write, now ignores that parameter and automatically determines the compression mode from the file name.
         """
 
+class Severity:
+    r"""
+    @brief This enum specifies the severity level for log entries.
+
+    This enum was introduced in version 0.28.13.
+    """
+    Error: ClassVar[Severity]
+    r"""
+    @brief Specifies error severity (preferred action is stop)
+    """
+    Info: ClassVar[Severity]
+    r"""
+    @brief Specifies info severity (print if requested, otherwise silent)
+    """
+    NoSeverity: ClassVar[Severity]
+    r"""
+    @brief Specifies no particular severity (default)
+    """
+    Warning: ClassVar[Severity]
+    r"""
+    @brief Specifies warning severity (log with high priority, but do not stop)
+    """
+    @overload
+    @classmethod
+    def new(cls, i: int) -> Severity:
+        r"""
+        @brief Creates an enum from an integer value
+        """
+    @overload
+    @classmethod
+    def new(cls, s: str) -> Severity:
+        r"""
+        @brief Creates an enum from a string value
+        """
+    def __copy__(self) -> Severity:
+        r"""
+        @brief Creates a copy of self
+        """
+    def __deepcopy__(self) -> Severity:
+        r"""
+        @brief Creates a copy of self
+        """
+    @overload
+    def __eq__(self, other: object) -> bool:
+        r"""
+        @brief Compares an enum with an integer value
+        """
+    @overload
+    def __eq__(self, other: object) -> bool:
+        r"""
+        @brief Compares two enums
+        """
+    @overload
+    def __init__(self, i: int) -> None:
+        r"""
+        @brief Creates an enum from an integer value
+        """
+    @overload
+    def __init__(self, s: str) -> None:
+        r"""
+        @brief Creates an enum from a string value
+        """
+    @overload
+    def __lt__(self, other: Severity) -> bool:
+        r"""
+        @brief Returns true if the first enum is less (in the enum symbol order) than the second
+        """
+    @overload
+    def __lt__(self, other: int) -> bool:
+        r"""
+        @brief Returns true if the enum is less (in the enum symbol order) than the integer value
+        """
+    @overload
+    def __ne__(self, other: object) -> bool:
+        r"""
+        @brief Compares an enum with an integer for inequality
+        """
+    @overload
+    def __ne__(self, other: object) -> bool:
+        r"""
+        @brief Compares two enums for inequality
+        """
+    def __repr__(self) -> str:
+        r"""
+        @brief Converts an enum to a visual string
+        """
+    def __str__(self) -> str:
+        r"""
+        @brief Gets the symbolic string from an enum
+        """
+    def _create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def _destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def _destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def _is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def _manage(self) -> None:
+        r"""
+        @brief Marks the object as managed by the script side.
+        After calling this method on an object, the script side will be responsible for the management of the object. This method may be called if an object is returned from a C++ function and the object is known not to be owned by any C++ instance. If necessary, the script side may delete the object if the script's reference is no longer required.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def _unmanage(self) -> None:
+        r"""
+        @brief Marks the object as no longer owned by the script side.
+        Calling this method will make this object no longer owned by the script's memory management. Instead, the object must be managed in some other way. Usually this method may be called if it is known that some C++ object holds and manages this object. Technically speaking, this method will turn the script's reference into a weak reference. After the script engine decides to delete the reference, the object itself will still exist. If the object is not managed otherwise, memory leaks will occur.
+
+        Usually it's not required to call this method. It has been introduced in version 0.24.
+        """
+    def assign(self, other: Severity) -> None:
+        r"""
+        @brief Assigns another object to self
+        """
+    def create(self) -> None:
+        r"""
+        @brief Ensures the C++ object is created
+        Use this method to ensure the C++ object is created, for example to ensure that resources are allocated. Usually C++ objects are created on demand and not necessarily when the script object is created.
+        """
+    def destroy(self) -> None:
+        r"""
+        @brief Explicitly destroys the object
+        Explicitly destroys the object on C++ side if it was owned by the script interpreter. Subsequent access to this object will throw an exception.
+        If the object is not owned by the script, this method will do nothing.
+        """
+    def destroyed(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the object was already destroyed
+        This method returns true, if the object was destroyed, either explicitly or by the C++ side.
+        The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def dup(self) -> Severity:
+        r"""
+        @brief Creates a copy of self
+        """
+    def inspect(self) -> str:
+        r"""
+        @brief Converts an enum to a visual string
+        """
+    def is_const_object(self) -> bool:
+        r"""
+        @brief Returns a value indicating whether the reference is a const reference
+        This method returns true, if self is a const reference.
+        In that case, only const methods may be called on self.
+        """
+    def to_i(self) -> int:
+        r"""
+        @brief Gets the integer value from the enum
+        """
+    def to_s(self) -> str:
+        r"""
+        @brief Gets the symbolic string from an enum
+        """
+
 class Shape:
     r"""
     @brief An object representing a shape in the layout database
@@ -44967,8 +45177,9 @@ class Shape:
 
     This method has been introduced in version 0.26.
     Setter:
-    @brief Replaces the shape by the given edge pair (in micrometer units)
-    This method replaces the shape by the given edge pair, like \edge_pair= with a \EdgePair argument does. This version translates the edge pair from micrometer units to database units internally.
+    @brief Replaces the shape by the given edge pair
+    This method replaces the shape by the given edge pair. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
     This method has been introduced in version 0.26.
     """
@@ -45174,10 +45385,11 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a text.
     Setter:
-    @brief Replaces the shape by the given text (in micrometer units)
-    This method replaces the shape by the given text, like \text= with a \Text argument does. This version translates the text from micrometer units to database units internally.
+    @brief Replaces the shape by the given text object
+    This method replaces the shape by the given text object. This method can only be called for editable layouts. It does not change the user properties of the shape.
+    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.22.
     """
     text_dpos: DVector
     r"""
@@ -45315,10 +45527,10 @@ class Shape:
     Applies to texts only. Will throw an exception if the object is not a text.
 
     Setter:
-    @brief Sets the text transformation in micrometer units
+    @brief Sets the text transformation
     Applies to texts only. Will throw an exception if the object is not a text.
 
-    This method has been introduced in version 0.25.
+    This method has been introduced in version 0.23.
     """
     text_valign: int
     r"""
@@ -48370,16 +48582,21 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit(self) -> Circuit:
         r"""
+        @brief Gets the circuit the subcircuit lives in.
+        This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
+        """
+    @overload
+    def circuit(self) -> Circuit:
+        r"""
         @brief Gets the circuit the subcircuit lives in (non-const version).
         This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
 
         This constness variant has been introduced in version 0.26.8
         """
     @overload
-    def circuit(self) -> Circuit:
+    def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit the subcircuit lives in.
-        This is NOT the circuit which is referenced. For getting the circuit that the subcircuit references, use \circuit_ref.
+        @brief Gets the circuit referenced by the subcircuit.
         """
     @overload
     def circuit_ref(self) -> Circuit:
@@ -48388,11 +48605,6 @@ class SubCircuit(NetlistObject):
 
 
         This constness variant has been introduced in version 0.26.8
-        """
-    @overload
-    def circuit_ref(self) -> Circuit:
-        r"""
-        @brief Gets the circuit referenced by the subcircuit.
         """
     @overload
     def connect_pin(self, pin: Pin, net: Net) -> None:
@@ -48917,7 +49129,8 @@ class Text:
     Setter:
     @brief Sets the horizontal alignment
 
-    This is the version accepting integer values. It's provided for backward compatibility.
+    This property specifies how the text is aligned relative to the anchor point. 
+    This property has been introduced in version 0.22 and extended to enums in 0.28.
     """
     size: int
     r"""
@@ -48953,8 +49166,7 @@ class Text:
     Setter:
     @brief Sets the vertical alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     x: int
     r"""

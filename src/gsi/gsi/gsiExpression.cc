@@ -684,7 +684,7 @@ struct writer<gsi::ObjectType>
         try {
           //  Note: this const_cast is ugly, but it will basically enable "out" parameters
           //  TODO: clean this up.
-          gsi::do_on_type<writer> () (a->type (), &arglist, (arg->get_list ().begin () + narg).operator-> (), *a, heap);
+          gsi::do_on_type<writer> () (a->type (), &arglist, const_cast<tl::Variant *> ((arg->get_list ().begin () + narg).operator-> ()), *a, heap);
         } catch (tl::Exception &ex) {
           std::string msg = ex.msg () + tl::sprintf (tl::to_string (tr (" (argument '%s')")), a->spec ()->name ());
           throw tl::Exception (msg);

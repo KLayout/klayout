@@ -267,6 +267,8 @@ bool TestBase::do_test (bool editable, bool slow)
 
   try {
     execute (this);
+  } catch (tl::CancelException &) {
+    throw;
   } catch (tl::Exception &ex) {
     raise (std::string ("Exception caught: ") + ex.msg ());
   } catch (std::runtime_error &ex) {

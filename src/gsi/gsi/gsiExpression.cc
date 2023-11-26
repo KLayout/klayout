@@ -291,7 +291,7 @@ struct test_arg_func<gsi::ObjectType>
       //  we may implicitly convert an array into a constructor call of a target object -
       //  for now we only check whether the number of arguments is compatible with the array given.
 
-      int n = arg.size ();
+      int n = int (arg.size ());
 
       *ret = false;
       for (gsi::ClassBase::method_iterator c = atype.cls ()->begin_constructors (); c != atype.cls ()->end_constructors (); ++c) {
@@ -639,6 +639,8 @@ struct writer<gsi::VoidType>
   }
 };
 
+void push_args (gsi::SerialArgs &arglist, const tl::Variant &args, const gsi::MethodBase *meth, tl::Heap *heap);
+
 /**
  *  @brief Specialization for void
  */
@@ -662,7 +664,7 @@ struct writer<gsi::ObjectType>
       //  we may implicitly convert an array into a constructor call of a target object -
       //  for now we only check whether the number of arguments is compatible with the array given.
 
-      int n = arg->size ();
+      int n = int (arg->size ());
       const gsi::MethodBase *meth = 0;
       for (gsi::ClassBase::method_iterator c = atype.cls ()->begin_constructors (); c != atype.cls ()->end_constructors (); ++c) {
         if ((*c)->compatible_with_num_args (n)) {
@@ -679,17 +681,7 @@ struct writer<gsi::ObjectType>
       gsi::SerialArgs retlist (meth->retsize ());
       gsi::SerialArgs arglist (meth->argsize ());
 
-      int narg = 0;
-      for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && narg < n; ++a, ++narg) {
-        try {
-          //  Note: this const_cast is ugly, but it will basically enable "out" parameters
-          //  TODO: clean this up.
-          gsi::do_on_type<writer> () (a->type (), &arglist, const_cast<tl::Variant *> ((arg->get_list ().begin () + narg).operator-> ()), *a, heap);
-        } catch (tl::Exception &ex) {
-          std::string msg = ex.msg () + tl::sprintf (tl::to_string (tr (" (argument '%s')")), a->spec ()->name ());
-          throw tl::Exception (msg);
-        }
-      }
+      push_args (arglist, *arg, meth, heap);
 
       meth->call (0, arglist, retlist);
 
@@ -764,6 +756,23 @@ struct writer<gsi::ObjectType>
 
   }
 };
+
+void push_args (gsi::SerialArgs &arglist, const tl::Variant &args, const gsi::MethodBase *meth, tl::Heap *heap)
+{
+  int n = int (args.size ());
+  int narg = 0;
+
+  for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && narg < n; ++a, ++narg) {
+    try {
+      //  Note: this const_cast is ugly, but it will basically enable "out" parameters
+      //  TODO: clean this up.
+      gsi::do_on_type<writer> () (a->type (), &arglist, const_cast<tl::Variant *> ((args.get_list ().begin () + narg).operator-> ()), *a, heap);
+    } catch (tl::Exception &ex) {
+      std::string msg = ex.msg () + tl::sprintf (tl::to_string (tr (" (argument '%s')")), a->spec ()->name ());
+      throw tl::Exception (msg);
+    }
+  }
+}
 
 // ---------------------------------------------------------------------
 //  Reader function for serialization

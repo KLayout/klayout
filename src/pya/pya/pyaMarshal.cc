@@ -32,6 +32,8 @@
 namespace pya
 {
 
+void push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, PyObject *args, tl::Heap &heap);
+
 // -------------------------------------------------------------------
 //  Serialization adaptors for strings, variants, vectors and maps
 
@@ -43,9 +45,26 @@ class PythonBasedStringAdaptor
 {
 public:
   PythonBasedStringAdaptor (const PythonPtr &string)
-    : m_stdstr (python2c<std::string> (string.get ())), m_string (string)
+    : m_string (string)
   {
-    //  .. nothing yet ..
+#if PY_MAJOR_VERSION < 3
+    if (PyString_Check (string.get ())) {
+      m_stdstr = python2c<std::string> (string.get ());
+    } else
+#else
+    if (PyBytes_Check (string.get ())) {
+      m_stdstr = python2c<std::string> (string.get ());
+    } else
+#endif
+    if (PyUnicode_Check (string.get ()) || PyByteArray_Check (string.get ())) {
+      m_stdstr = python2c<std::string> (string.get ());
+    } else {
+      //  use object protocol to get the string through str(...)
+      PythonRef as_str (PyObject_Str (string.get ()));
+      if (as_str) {
+        m_stdstr = python2c<std::string> (as_str.get ());
+      }
+    }
   }
 
   virtual const char *c_str () const
@@ -454,6 +473,8 @@ struct writer<gsi::ObjectType>
 {
   void operator() (gsi::SerialArgs *aa, PyObject *arg, const gsi::ArgType &atype, tl::Heap *heap)
   {
+    const gsi::ClassBase *acls = atype.cls ();
+
     if (arg == Py_None || arg == NULL) {
 
       if (! (atype.is_ptr () || atype.is_cptr ())) {
@@ -465,14 +486,50 @@ struct writer<gsi::ObjectType>
 
     }
 
-    if (atype.is_ptr () || atype.is_cptr () || atype.is_ref () || atype.is_cref ()) {
+    if (PyTuple_Check (arg) || PyList_Check (arg)) {
+
+      //  we may implicitly convert a tuple into a constructor call of a target object -
+      //  for now we only check whether the number of arguments is compatible with the list given.
+
+      int n = PyTuple_Check (arg) ? int (PyTuple_Size (arg)) : int (PyList_Size (arg));
+      const gsi::MethodBase *meth = 0;
+      for (gsi::ClassBase::method_iterator c = acls->begin_constructors (); c != acls->end_constructors (); ++c) {
+        if ((*c)->compatible_with_num_args (n)) {
+          meth = *c;
+          break;
+        }
+      }
+
+      if (!meth) {
+        throw tl::Exception (tl::to_string (tr ("No constructor of %s available that takes %d arguments (implicit call from tuple)")), acls->name (), n);
+      }
+
+      //  implicit call of constructor
+      gsi::SerialArgs retlist (meth->retsize ());
+      gsi::SerialArgs arglist (meth->argsize ());
+
+      push_args (arglist, meth, arg, *heap);
+
+      meth->call (0, arglist, retlist);
+
+      void *new_obj = retlist.read<void *> (*heap);
+      if (new_obj && (atype.is_ptr () || atype.is_cptr () || atype.is_ref () || atype.is_cref ())) {
+        //  For pointers or refs, ownership over these objects is not transferred.
+        //  Hence we have to keep them on the heap.
+        //  TODO: what if the called method takes ownership using keep()?
+        heap->push (new gsi::ObjectHolder (acls, new_obj));
+      }
+
+      aa->write<void *> (new_obj);
+
+    } else if (atype.is_ptr () || atype.is_cptr () || atype.is_ref () || atype.is_cref ()) {
 
       const gsi::ClassBase *cls_decl = PythonModule::cls_for_type (Py_TYPE (arg));
       if (! cls_decl) {
         throw tl::TypeError (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), Py_TYPE (arg)->tp_name));
       }
 
-      if (cls_decl->is_derived_from (atype.cls ())) {
+      if (cls_decl->is_derived_from (acls)) {
 
         PYAObjectBase *p = PYAObjectBase::from_pyobject (arg);
 
@@ -483,14 +540,15 @@ struct writer<gsi::ObjectType>
           aa->write<void *> (p->obj ());
         }
 
-      } else if (cls_decl->can_convert_to (atype.cls ())) {
+      } else if (cls_decl->can_convert_to (acls)) {
 
         PYAObjectBase *p = PYAObjectBase::from_pyobject (arg);
 
         //  We can convert objects for cref and cptr, but ownership over these objects is not transferred.
         //  Hence we have to keep them on the heap.
-        void *new_obj = atype.cls ()->create_obj_from (p->cls_decl (), p->obj ());
-        heap->push (new gsi::ObjectHolder (atype.cls (), new_obj));
+        //  TODO: what if the called method takes ownership using keep()?
+        void *new_obj = acls->create_obj_from (p->cls_decl (), p->obj ());
+        heap->push (new gsi::ObjectHolder (acls, new_obj));
         aa->write<void *> (new_obj);
 
       } else {
@@ -504,7 +562,7 @@ struct writer<gsi::ObjectType>
         throw tl::TypeError (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s, got %s)")), atype.cls ()->name (), Py_TYPE (arg)->tp_name));
       }
 
-      if (cls_decl->is_derived_from (atype.cls ())) {
+      if (cls_decl->is_derived_from (acls)) {
 
         PYAObjectBase *p = PYAObjectBase::from_pyobject (arg);
 
@@ -515,7 +573,7 @@ struct writer<gsi::ObjectType>
           aa->write<void *> (atype.cls ()->clone (p->obj ()));
         }
 
-      } else if (cls_decl->can_convert_to (atype.cls ())) {
+      } else if (cls_decl->can_convert_to (acls)) {
 
         PYAObjectBase *p = PYAObjectBase::from_pyobject (arg);
         aa->write<void *> (atype.cls ()->create_obj_from (cls_decl, p->obj ()));
@@ -887,8 +945,10 @@ void PythonBasedVectorAdaptor::push (gsi::SerialArgs &r, tl::Heap &heap)
 
 void PythonBasedVectorAdaptor::clear ()
 {
-  if (PySequence_Check (m_array.get ())) {
-    PySequence_DelSlice (m_array.get (), 0, PySequence_Length (m_array.get ()));
+  if (PyList_Check (m_array.get ())) {
+    PyList_SetSlice (m_array.get (), 0, PyList_Size (m_array.get ()), NULL);
+  } else if (PyTuple_Check (m_array.get ())) {
+    throw tl::Exception (tl::to_string (tr ("Tuples cannot be modified and cannot be used as out parameters")));
   }
 }
 
@@ -1141,10 +1201,29 @@ struct test_arg_func<gsi::ObjectType>
 {
   void operator() (bool *ret, PyObject *arg, const gsi::ArgType &atype, bool loose)
   {
+    const gsi::ClassBase *acls = atype.cls ();
+
     //  for const X * or X *, null is an allowed value
     if ((atype.is_cptr () || atype.is_ptr ()) && arg == Py_None) {
       *ret = true;
       return;
+    }
+
+    if (loose && (PyTuple_Check (arg) || PyList_Check (arg))) {
+
+      //  we may implicitly convert a tuple into a constructor call of a target object -
+      //  for now we only check whether the number of arguments is compatible with the list given.
+
+      int n = PyTuple_Check (arg) ? int (PyTuple_Size (arg)) : int (PyList_Size (arg));
+      *ret = false;
+      for (gsi::ClassBase::method_iterator c = acls->begin_constructors (); c != acls->end_constructors (); ++c) {
+        if ((*c)->compatible_with_num_args (n)) {
+          *ret = true;
+          break;
+        }
+      }
+      return;
+
     }
 
     const gsi::ClassBase *cls_decl = PythonModule::cls_for_type (Py_TYPE (arg));
@@ -1153,7 +1232,7 @@ struct test_arg_func<gsi::ObjectType>
       return;
     }
 
-    if (! (cls_decl == atype.cls () || (loose && (cls_decl->is_derived_from (atype.cls ()) || cls_decl->can_convert_to(atype.cls ()))))) {
+    if (! (cls_decl == acls || (loose && (cls_decl->is_derived_from (atype.cls ()) || cls_decl->can_convert_to (atype.cls ()))))) {
       *ret = false;
       return;
     }

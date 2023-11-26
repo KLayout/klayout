@@ -5,7 +5,7 @@
 #
 #  The top Bash script to run "ut_runner" after building KLayout
 #  (http://www.klayout.de/index.php) version 0.26.1 or later on different Apple
-#  ßMac OSX platforms.
+#  Mac OSX platforms.
 #
 #  This script must be copied to a "*.macQAT/" directory to run.
 #===============================================================================
@@ -68,8 +68,8 @@ if [ $# -eq 1 ]; then
         echo " Time stamp = ${timestamp}"
         echo " Log file   = ${logfile}"
         echo " Usage:"
-        echo "  ./QATest.sh -h: to get the help of 'ut_runner'"
-        echo "  ./QATest.sh -r: to run the tests with '-c' option: continues after an error"
+        echo "  ./macQAT.sh -h: to get the help of 'ut_runner'"
+        echo "  ./macQAT.sh -r: to run the tests with '-c' option: continues after an error"
         echo ""
         exit 0
     fi
@@ -79,8 +79,8 @@ else
     echo " Time stamp = ${timestamp}"
     echo " Log file   = ${logfile}"
     echo " Usage:"
-    echo "  ./QATest.sh -h: to get the help of 'ut_runner'"
-    echo "  ./QATest.sh -r: to run the tests with '-c' option: continues after an error"
+    echo "  ./macQAT.sh -h: to get the help of 'ut_runner'"
+    echo "  ./macQAT.sh -r: to run the tests with '-c' option: continues after an error"
     echo ""
     exit 0
 fi

@@ -34,6 +34,7 @@ def SetGlobals():
     global WorkDir            # work directory name
     global LogFile            # log file name
     global Usage              # string on usage
+    global DryRun             # dry-run mode; print the command line and exit
     # auxiliary variables on platform
     global System             # 6-tuple from platform.uname()
     global Node               # - do -
@@ -48,16 +49,19 @@ def SetGlobals():
     Usage += "<< Usage of 'macQAT.py' >>\n"
     Usage += "       for running 'ut_runner' after building KLayout.\n"
     Usage += "\n"
-    Usage += "$ [python] ./macQAT.py \n"
+    Usage += "$ [python] ./macQAT.py\n"
     Usage += "   option & argument      : descriptions                            | default value\n"
     Usage += "   -----------------------------------------------------------------+---------------\n"
-    Usage += "   [-u|--usage]           : print usage of 'ut_runner'and exit      | disabled \n"
-    Usage += "                                                                    | \n"
-    Usage += "   <-r|--run>             : run this script                         | disabled \n"
-    Usage += "   [-s|--stop]            : stop on error                           | disabled \n"
-    Usage += "   [-x|--exclude <tests>] : exclude test(s) such as 'pymod,pya'     | '' \n"
-    Usage += "   [-a|--args <string>]   : arguments other than '-x' and '-c'      | '' \n"
-    Usage += "   [-?|--?]               : print this usage and exit               | disabled \n"
+    Usage += "   [-u|--usage]           : print usage of 'ut_runner'and exit      | disabled\n"
+    Usage += "                                                                    |\n"
+    Usage += "   <-r|--run>             : run this script                         | disabled\n"
+    Usage += "   [-s|--stop]            : stop on error                           | disabled\n"
+    Usage += "   [-x|--exclude <tests>] : exclude test(s) such as 'pymod,pya'     | ''\n"
+    Usage += "                          : you can use this option multiple times  |\n"
+    Usage += "   [-a|--args <string>]   : arguments other than '-x' and '-c'      | ''\n"
+    Usage += "                          : you can use this option multiple times  |\n"
+    Usage += "   [--dryrun]             : print the command line and exit         | disabled\n"
+    Usage += "   [-?|--?]               : print this usage and exit               | disabled\n"
     Usage += "--------------------------------------------------------------------+-------------------\n"
 
     ProjectDir      = os.getcwd()
@@ -65,11 +69,12 @@ def SetGlobals():
     Run             = False
     ContinueOnError = True
     TestsExcluded   = list()
-    Arguments       = ""
+    Arguments       = list()
     GitSHA1         = GetGitShortSHA1()
     TimeStamp       = GetTimeStamp()
     WorkDir         = "QATest_%s_%s__%s" % (GitSHA1, TimeStamp, os.path.basename(ProjectDir) )
     LogFile         = WorkDir + ".log"
+    DryRun          = False
 
     (System, Node, Release, Version, Machine, Processor) = platform.uname()
 
@@ -103,6 +108,7 @@ def ParseCommandLineArguments():
     global ContinueOnError
     global TestsExcluded
     global Arguments
+    global DryRun
 
     p = optparse.OptionParser( usage=Usage )
     p.add_option( '-u', '--usage',
@@ -124,12 +130,20 @@ def ParseCommandLineArguments():
                     help='stop on error (false)' )
 
     p.add_option( '-x', '--exclude',
+                    action='append',
                     dest='exclude_tests',
                     help="exclude test(s) such as 'pymod,pya' ('')" )
 
     p.add_option( '-a', '--args',
+                    action='append',
                     dest='arguments',
                     help="arguments other than '-x' and '-c' ('')" )
+
+    p.add_option( '--dryrun',
+                    action='store_true',
+                    dest='dryrun',
+                    default=False,
+                    help='print the command line and exit (false)' )
 
     p.add_option( '-?', '--??',
                     action='store_true',
@@ -140,8 +154,9 @@ def ParseCommandLineArguments():
     p.set_defaults( runner_usage  = False,
                     runme         = False,
                     stop_on_error = False,
-                    exclude_tests = "",
-                    arguments     = "",
+                    exclude_tests = list(),
+                    arguments     = list(),
+                    dryrun        = False,
                     checkusage    = False )
 
     opt, args = p.parse_args()
@@ -152,11 +167,15 @@ def ParseCommandLineArguments():
     RunnerUsage     = opt.runner_usage
     Run             = opt.runme
     ContinueOnError = not opt.stop_on_error
-    if not opt.exclude_tests == "":
-        TestsExcluded = [ item.strip() for item in opt.exclude_tests.split(',') ]
+    if not len(opt.exclude_tests) == 0:
+        excluded_tests = list()
+        for item in opt.exclude_tests:
+            excluded_tests += [ subitem.strip() for subitem in item.split(',') ]
+        TestsExcluded = sorted(list(set(excluded_tests)))
     else:
         TestsExcluded = []
     Arguments = opt.arguments
+    DryRun    = opt.dryrun
 
 #-------------------------------------------------------------------------------
 ## Hide/Show the private directory
@@ -248,16 +267,20 @@ def Main():
         command += " -c"
     for item in TestsExcluded:
         command += ' -x %s' % item
-    if not Arguments == "":
-        command += " %s" % Arguments
+    if not len(Arguments) == 0:
+        for arg in Arguments:
+            command += " %s" % arg
 
     print( "" )
     print( "### Dumping the log to <%s>" % LogFile )
-    print( "------------------------------------------------------------" )
-    print( "  Git SHA1   = %s" % GitSHA1 )
-    print( "  Time stamp = %s" % TimeStamp )
-    print( "------------------------------------------------------------" )
-    sleep( 1.0 )
+    print( "------------------------------------------------------------------------" )
+    print( "  Git SHA1     = %s" % GitSHA1 )
+    print( "  Time stamp   = %s" % TimeStamp )
+    print( "  Command line = %s" % command )
+    print( "------------------------------------------------------------------------" )
+    if DryRun:
+        quit()
+    sleep(1.0)
     HidePrivateDir()
     RunTester( command, logfile=LogFile )
     ShowPrivateDir()

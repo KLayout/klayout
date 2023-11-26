@@ -34,6 +34,8 @@
 namespace rba
 {
 
+void push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, int argc, tl::Heap &heap);
+
 // -------------------------------------------------------------------
 //  Serialization adaptors for strings, variants, vectors and maps
 
@@ -46,7 +48,7 @@ class RubyBasedStringAdaptor
 public:
   RubyBasedStringAdaptor (VALUE value)
   {
-    m_string = rba_safe_string_value (value);
+    m_string = rba_safe_obj_as_string (value);
     gc_lock_object (m_string);
   }
 
@@ -496,6 +498,42 @@ struct writer <gsi::ObjectType>
       } else {
         aa->write<void *> ((void *) 0);
       }
+
+    } else if (TYPE (arg) == T_ARRAY) {
+
+      //  we may implicitly convert an array into a constructor call of a target object -
+      //  for now we only check whether the number of arguments is compatible with the array given.
+
+      int n = RARRAY_LEN (arg);
+      const gsi::MethodBase *meth = 0;
+      for (gsi::ClassBase::method_iterator c = atype.cls ()->begin_constructors (); c != atype.cls ()->end_constructors (); ++c) {
+        if ((*c)->compatible_with_num_args (n)) {
+          meth = *c;
+          break;
+        }
+      }
+
+      if (!meth) {
+        throw tl::Exception (tl::to_string (tr ("No constructor of %s available that takes %d arguments (implicit call from tuple)")), atype.cls ()->name (), n);
+      }
+
+      //  implicit call of constructor
+      gsi::SerialArgs retlist (meth->retsize ());
+      gsi::SerialArgs arglist (meth->argsize ());
+
+      push_args (arglist, meth, RARRAY_PTR (arg), n, *heap);
+
+      meth->call (0, arglist, retlist);
+
+      void *new_obj = retlist.read<void *> (*heap);
+      if (new_obj && (atype.is_ptr () || atype.is_cptr () || atype.is_ref () || atype.is_cref ())) {
+        //  For pointers or refs, ownership over these objects is not transferred.
+        //  Hence we have to keep them on the heap.
+        //  TODO: what if the called method takes ownership using keep()?
+        heap->push (new gsi::ObjectHolder (atype.cls (), new_obj));
+      }
+
+      aa->write<void *> (new_obj);
 
     } else {
 
@@ -1151,6 +1189,21 @@ struct test_arg_func<gsi::ObjectType>
 
       //  for const X * or X *, nil is an allowed value
       *ret = true;
+
+    } else if (loose && TYPE (arg) == T_ARRAY) {
+
+      //  we may implicitly convert an array into a constructor call of a target object -
+      //  for now we only check whether the number of arguments is compatible with the array given.
+
+      int n = RARRAY_LEN (arg);
+
+      *ret = false;
+      for (gsi::ClassBase::method_iterator c = atype.cls ()->begin_constructors (); c != atype.cls ()->end_constructors (); ++c) {
+        if ((*c)->compatible_with_num_args (n)) {
+          *ret = true;
+          break;
+        }
+      }
 
     } else {
 

@@ -390,6 +390,8 @@ PythonInterpreter::~PythonInterpreter ()
   m_stdout = PythonPtr ();
   m_stderr = PythonPtr ();
 
+  sp_interpreter = 0;
+
   if (m_embedded) {
 
     Py_Finalize ();
@@ -400,8 +402,6 @@ PythonInterpreter::~PythonInterpreter ()
     }
 
   }
-
-  sp_interpreter = 0;
 }
 
 char *

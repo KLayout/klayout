@@ -286,6 +286,25 @@ struct test_arg_func<gsi::ObjectType>
       return;
     }
 
+    if (arg.is_list ()) {
+
+      //  we may implicitly convert an array into a constructor call of a target object -
+      //  for now we only check whether the number of arguments is compatible with the array given.
+
+      int n = int (arg.size ());
+
+      *ret = false;
+      for (gsi::ClassBase::method_iterator c = atype.cls ()->begin_constructors (); c != atype.cls ()->end_constructors (); ++c) {
+        if ((*c)->compatible_with_num_args (n)) {
+          *ret = true;
+          break;
+        }
+      }
+
+      return;
+
+    }
+
     if (! arg.is_user ()) {
       *ret = false;
       return;
@@ -620,6 +639,8 @@ struct writer<gsi::VoidType>
   }
 };
 
+void push_args (gsi::SerialArgs &arglist, const tl::Variant &args, const gsi::MethodBase *meth, tl::Heap *heap);
+
 /**
  *  @brief Specialization for void
  */
@@ -628,29 +649,67 @@ struct writer<gsi::ObjectType>
 {
   void operator() (gsi::SerialArgs *aa, tl::Variant *arg, const gsi::ArgType &atype, tl::Heap *heap)
   {
-    if (atype.is_ref () || atype.is_cref () || atype.is_ptr () || atype.is_cptr ()) {
+    if (arg->is_nil ()) {
 
-      if (arg->is_nil ()) {
+      if (atype.is_ref () || atype.is_cref ()) {
+        throw tl::Exception (tl::to_string (tr ("Cannot pass nil to reference parameters")));
+      } else if (! atype.is_cptr () && ! atype.is_ptr ()) {
+        throw tl::Exception (tl::to_string (tr ("Cannot pass nil to direct parameters")));
+      }
 
-        if (atype.is_ref () || atype.is_cref ()) {
-          throw tl::Exception (tl::to_string (tr ("Cannot pass nil to reference parameters")));
+      aa->write<void *> ((void *) 0);
+
+    } else if (arg->is_list ()) {
+
+      //  we may implicitly convert an array into a constructor call of a target object -
+      //  for now we only check whether the number of arguments is compatible with the array given.
+
+      int n = int (arg->size ());
+      const gsi::MethodBase *meth = 0;
+      for (gsi::ClassBase::method_iterator c = atype.cls ()->begin_constructors (); c != atype.cls ()->end_constructors (); ++c) {
+        if ((*c)->compatible_with_num_args (n)) {
+          meth = *c;
+          break;
         }
+      }
 
-        aa->write<void *> ((void *) 0);
+      if (!meth) {
+        throw tl::Exception (tl::to_string (tr ("No constructor of %s available that takes %d arguments (implicit call from tuple)")), atype.cls ()->name (), n);
+      }
 
-      } else {
+      //  implicit call of constructor
+      gsi::SerialArgs retlist (meth->retsize ());
+      gsi::SerialArgs arglist (meth->argsize ());
 
-        if (! arg->is_user ()) {
-          throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
-        }
+      push_args (arglist, *arg, meth, heap);
 
-        const tl::VariantUserClassBase *cls = arg->user_cls ();
-        if (!cls) {
-          throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
-        }
-        if (cls->is_const () && (atype.is_ref () || atype.is_ptr ())) {
-          throw tl::Exception (tl::sprintf (tl::to_string (tr ("Cannot pass a const reference of class %s to a non-const reference or pointer parameter")), atype.cls ()->name ()));
-        }
+      meth->call (0, arglist, retlist);
+
+      void *new_obj = retlist.read<void *> (*heap);
+      if (new_obj && (atype.is_ptr () || atype.is_cptr () || atype.is_ref () || atype.is_cref ())) {
+        //  For pointers or refs, ownership over these objects is not transferred.
+        //  Hence we have to keep them on the heap.
+        //  TODO: what if the called method takes ownership using keep()?
+        heap->push (new gsi::ObjectHolder (atype.cls (), new_obj));
+      }
+
+      aa->write<void *> (new_obj);
+
+    } else {
+
+      if (! arg->is_user ()) {
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
+      }
+
+      const tl::VariantUserClassBase *cls = arg->user_cls ();
+      if (!cls) {
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
+      }
+      if (cls->is_const () && (atype.is_ref () || atype.is_ptr ())) {
+        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Cannot pass a const reference of class %s to a non-const reference or pointer parameter")), atype.cls ()->name ()));
+      }
+
+      if (atype.is_ref () || atype.is_cref () || atype.is_ptr () || atype.is_cptr ()) {
 
         if (cls->gsi_cls ()->is_derived_from (atype.cls ())) {
 
@@ -673,42 +732,47 @@ struct writer<gsi::ObjectType>
           throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
         }
 
-      }
+      } else {
 
-    } else {
+        if (cls->gsi_cls ()->is_derived_from (atype.cls ())) {
 
-      if (! arg->is_user ()) {
-        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
-      }
+          if (cls->gsi_cls ()->adapted_type_info ()) {
+            aa->write<void *> (cls->gsi_cls ()->create_adapted_from_obj (get_object (*arg)));
+          } else {
+            aa->write<void *> ((void *) cls->gsi_cls ()->clone (get_object (*arg)));
+          }
 
-      const tl::VariantUserClassBase *cls = arg->user_cls ();
-      if (!cls) {
-        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
-      }
-      if (cls->is_const () && (atype.is_ref () || atype.is_ptr ())) {
-        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Cannot pass a const reference of class %s to a non-const reference or pointer parameter")), atype.cls ()->name ()));
-      }
+        } else if (cls->gsi_cls ()->can_convert_to (atype.cls ())) {
 
-      if (cls->gsi_cls ()->is_derived_from (atype.cls ())) {
+          aa->write<void *> (atype.cls ()->create_obj_from (cls->gsi_cls (), get_object (*arg)));
 
-        if (cls->gsi_cls ()->adapted_type_info ()) {
-          aa->write<void *> (cls->gsi_cls ()->create_adapted_from_obj (get_object (*arg)));
         } else {
-          aa->write<void *> ((void *) cls->gsi_cls ()->clone (get_object (*arg)));
+          throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
         }
 
-      } else if (cls->gsi_cls ()->can_convert_to (atype.cls ())) {
-
-        aa->write<void *> (atype.cls ()->create_obj_from (cls->gsi_cls (), get_object (*arg)));
-
-      } else {
-        throw tl::Exception (tl::sprintf (tl::to_string (tr ("Unexpected object type (expected argument of class %s)")), atype.cls ()->name ()));
       }
 
     }
 
   }
 };
+
+void push_args (gsi::SerialArgs &arglist, const tl::Variant &args, const gsi::MethodBase *meth, tl::Heap *heap)
+{
+  int n = int (args.size ());
+  int narg = 0;
+
+  for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && narg < n; ++a, ++narg) {
+    try {
+      //  Note: this const_cast is ugly, but it will basically enable "out" parameters
+      //  TODO: clean this up.
+      gsi::do_on_type<writer> () (a->type (), &arglist, const_cast<tl::Variant *> ((args.get_list ().begin () + narg).operator-> ()), *a, heap);
+    } catch (tl::Exception &ex) {
+      std::string msg = ex.msg () + tl::sprintf (tl::to_string (tr (" (argument '%s')")), a->spec ()->name ());
+      throw tl::Exception (msg);
+    }
+  }
+}
 
 // ---------------------------------------------------------------------
 //  Reader function for serialization

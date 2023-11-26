@@ -73,7 +73,17 @@ struct A
    */
   A (int nn);
 
-  /** 
+  /**
+   *  @brief Parametrized constructor 2
+   */
+  A (int n1, int n2);
+
+  /**
+   *  @brief Parametrized constructor 3
+   */
+  A (int n1, int n2, double n3);
+
+  /**
    *  @brief Copy constructor
    */
   A (const A &a);
@@ -640,7 +650,7 @@ struct B
     return aptr->n; 
   }
 
-  std::string b4 (const A &aref) { 
+  std::string aref_to_s (const A &aref) {
     return tl::sprintf ("b4_result: %d", aref.n); 
   }
 
@@ -650,7 +660,7 @@ struct B
 
   void set_an (int n)
   { 
-    a.n = n;
+    m_a.n = n;
   }
 
   int an (A a)
@@ -660,7 +670,7 @@ struct B
 
   void set_an_cref (const int &n)
   { 
-    a.n = n;
+    m_a.n = n;
   }
 
   const int &an_cref (const A &a)
@@ -670,122 +680,155 @@ struct B
 
   std::vector <A>::const_iterator b10b () const
   {
-    return av.begin ();
+    return m_av.begin ();
   }
 
   std::vector <A>::const_iterator b10e () const
   {
-    return av.end ();
+    return m_av.end ();
   }
 
   std::vector <A>::iterator b10b_nc ()
   {
-    return av.begin ();
+    return m_av.begin ();
   }
 
   std::vector <A>::iterator b10e_nc ()
   {
-    return av.end ();
+    return m_av.end ();
   }
 
   ValueIter<std::vector <A>::const_iterator> b11b () const
   {
-    return ValueIter<std::vector <A>::const_iterator> (av.begin ());
+    return ValueIter<std::vector <A>::const_iterator> (m_av.begin ());
   }
 
   ValueIter<std::vector <A>::const_iterator> b11e () const
   {
-    return ValueIter<std::vector <A>::const_iterator> (av.end ());
+    return ValueIter<std::vector <A>::const_iterator> (m_av.end ());
   }
 
   std::vector <A_NC *>::const_iterator b12b () const
   {
-    return av_nc.begin ();
+    return m_av_nc.begin ();
   }
 
   std::vector <A_NC *>::const_iterator b12e () const
   {
-    return av_nc.end ();
+    return m_av_nc.end ();
   }
 
   std::vector <const A_NC *>::const_iterator b13b () const
   {
-    return avc_nc.begin ();
+    return m_avc_nc.begin ();
   }
 
   std::vector <const A_NC *>::const_iterator b13e () const
   {
-    return avc_nc.end ();
+    return m_avc_nc.end ();
   }
 
-  A *amember_or_nil (bool nn) { return nn ? &a : 0; }
-  A *amember_ptr () { return &a; } 
-  A &amember_ref () { return a; }
-  const A *amember_cptr () const { return &a; }
-  const A &amember_cref () const { return a; }
+  A *amember_or_nil (bool nn) { return nn ? &m_a : 0; }
+  A *amember_ptr () { return &m_a; }
+  A &amember_ref () { return m_a; }
+  const A *amember_cptr () const { return &m_a; }
+  const A &amember_cref () const { return m_a; }
 
-  bool b15 (A *a)
+  bool arg_is_not_nil (A *a)
   {
     return a != 0;
   }
 
-  std::vector <A> b16a () const
+  std::vector <A> av () const
   {
-    return av;
+    return m_av;
   }
 
-  const std::vector <A> &b16b () const
+  const std::vector <A> &av_cref () const
   {
-    return av;
+    return m_av;
   }
 
-  std::vector <A> &b16c ()
+  std::vector <A> &av_ref ()
   {
-    return av;
+    return m_av;
   }
 
-  void b17a (const std::vector <A> &v)
+  void set_av_cref (const std::vector <A> &v)
   {
-    av = v;
+    m_av = v;
   }
 
-  void b17b (std::vector <A> &v)
+  void set_av_ref (std::vector <A> &v)
   {
-    av = v;
+    m_av = v;
   }
 
-  void b17c (std::vector <A> v)
+  void set_av (std::vector <A> v)
   {
-    av = v;
+    m_av = v;
   }
 
-  void b17d (const std::vector <A> *v)
+  void set_av_cptr (const std::vector <A> *v)
   {
     if (v) {
-      av = *v;
+      m_av = *v;
+    } else {
+      m_av.clear ();
     }
   }
 
-  void b17e (std::vector <A> *v)
+  void set_av_ptr (std::vector <A> *v)
   {
     if (v) {
-      av = *v;
+      m_av = *v;
+    } else {
+      m_av.clear ();
+    }
+  }
+
+  void push_a (A a)
+  {
+    m_av.push_back (a);
+  }
+
+  void push_a_cref (const A &a)
+  {
+    m_av.push_back (a);
+  }
+
+  void push_a_ref (A &a)
+  {
+    m_av.push_back (a);
+  }
+
+  void push_a_cptr (const A *a)
+  {
+    if (a) {
+      m_av.push_back (*a);
+    }
+  }
+
+  void push_a_ptr (A *a)
+  {
+    if (a) {
+      m_av.push_back (*a);
     }
   }
 
   FreeIter<std::vector <A>::const_iterator> b18 () const
   {
-    return FreeIter<std::vector <A>::const_iterator> (av.begin (), av.end ());
+    return FreeIter<std::vector <A>::const_iterator> (m_av.begin (), m_av.end ());
   }
 
   FreeIterUseRef<std::vector <A>::const_iterator> b18b () const
   {
-    return FreeIterUseRef<std::vector <A>::const_iterator> (av.begin (), av.end ());
+    return FreeIterUseRef<std::vector <A>::const_iterator> (m_av.begin (), m_av.end ());
   }
 
   FreeIterUsePtr<std::vector <A>::const_iterator> b18c () const
   {
-    return FreeIterUsePtr<std::vector <A>::const_iterator> (av.begin (), av.end ());
+    return FreeIterUsePtr<std::vector <A>::const_iterator> (m_av.begin (), m_av.end ());
   }
 
   bool b20a (const tl::Variant &var) const { return var.is_nil (); }
@@ -862,30 +905,30 @@ struct B
 
   FreeIter<std::vector <B>::const_iterator> each_b_copy () const
   {
-    return FreeIter<std::vector <B>::const_iterator> (bv.begin (), bv.end ());
+    return FreeIter<std::vector <B>::const_iterator> (m_bv.begin (), m_bv.end ());
   }
 
   FreeIterUseRef<std::vector <B>::const_iterator> each_b_cref () const
   {
-    return FreeIterUseRef<std::vector <B>::const_iterator> (bv.begin (), bv.end ());
+    return FreeIterUseRef<std::vector <B>::const_iterator> (m_bv.begin (), m_bv.end ());
   }
 
   FreeIterUsePtr<std::vector <B>::const_iterator> each_b_cptr () const
   {
-    return FreeIterUsePtr<std::vector <B>::const_iterator> (bv.begin (), bv.end ());
+    return FreeIterUsePtr<std::vector <B>::const_iterator> (m_bv.begin (), m_bv.end ());
   }
 
   FreeIterUseRef<std::vector <B>::iterator> each_b_ref () 
   {
-    return FreeIterUseRef<std::vector <B>::iterator> (bv.begin (), bv.end ());
+    return FreeIterUseRef<std::vector <B>::iterator> (m_bv.begin (), m_bv.end ());
   }
 
   FreeIterUsePtr<std::vector <B>::iterator> each_b_ptr ()
   {
-    return FreeIterUsePtr<std::vector <B>::iterator> (bv.begin (), bv.end ());
+    return FreeIterUsePtr<std::vector <B>::iterator> (m_bv.begin (), m_bv.end ());
   }
 
-  void push_b (const B &b) { bv.push_back (b); }
+  void push_b (const B &b) { m_bv.push_back (b); }
 
   std::map<int, A *> map_iaptr () { return m_map_iaptr; }
   const std::map<int, A *> &map_iaptr_cref () { return m_map_iaptr; }
@@ -996,11 +1039,11 @@ struct B
 #endif
 
   std::string m;
-  A a;
-  std::vector <B> bv;
-  std::vector <A> av;
-  std::vector <A_NC *> av_nc;
-  std::vector <const A_NC *> avc_nc;
+  A m_a;
+  std::vector <B> m_bv;
+  std::vector <A> m_av;
+  std::vector <A_NC *> m_av_nc;
+  std::vector <const A_NC *> m_avc_nc;
   tl::Variant m_var;
   std::vector<tl::Variant> m_vars;
   std::map<int, std::string> m_map1;

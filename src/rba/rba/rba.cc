@@ -943,7 +943,7 @@ static gsi::ArgType create_void_type ()
 
 static gsi::ArgType s_void_type = create_void_type ();
 
-static void
+void
 push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, int argc, tl::Heap &heap)
 {
   int i = 0;

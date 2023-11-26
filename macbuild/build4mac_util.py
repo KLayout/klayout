@@ -623,16 +623,22 @@ def Patch_Python_In_PythonFramework( pythonFrameworkPath,
 #----------------------------------------------------------------------------------------
 ## To change the Python's relative library paths to the absolute paths
 #
-# 1: absolute path as in ~python@3.9.17
+# 1: absolute path as seen in ~python@3.9.17
 #      BigSur{kazzz-s} lib-dynload (1)% otool -L _sqlite3.cpython-39-darwin.so
 #      _sqlite3.cpython-39-darwin.so:
 #   ===> /usr/local/opt/sqlite/lib/libsqlite3.0.dylib (compatibility version 9.0.0, current version 9.6.0)
 #        /usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1292.100.5)
 #
-# 2: relative path as in  python@3.9.18~
+# 2: relative path as seen in python@3.9.18
 #      Monterey{kazzz-s} lib-dynload (1)% otool -L _sqlite3.cpython-39-darwin.so
 #      _sqlite3.cpython-39-darwin.so:
 #   ===> @loader_path/../../../../../../../../../../opt/sqlite/lib/libsqlite3.0.dylib (compatibility version 9.0.0, current version 9.6.0)
+#        /usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1311.100.3)
+#
+# 3. absolute path again as seen in python@3.11
+#      Monterey{kazzz-s} lib-dynload (1)% otool -L _sqlite3.cpython-311-darwin.so
+#      _sqlite3.cpython-311-darwin.so:
+#   ===> /usr/local/opt/sqlite/lib/libsqlite3.0.dylib (compatibility version 9.0.0, current version 9.6.0)
 #        /usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1311.100.3)
 #
 # @param[in] frameworkPath: Python Framework path
@@ -650,10 +656,10 @@ def Change_Python_LibPath_RelativeToAbsolute( frameworkPath, debug_level=0 ):
     patRel3         = r'(%s)(.+)' % HomebrewSearchPathFilter3   # =    '@loader_path/../../../../../../../../../../opt'
     regRel3         = re.compile(patRel3)
 
-    #----------------------------------------------------------------------
+    #---------------------------------------------------------------------------------------------------
     # (A) Collect *.[so|dylib] that the Python Frameworks depends on
-    #----------------------------------------------------------------------
-    # Ref. https://formulae.brew.sh/formula/python@3.9#default
+    #---------------------------------------------------------------------------------------------------
+    # Ref. https://formulae.brew.sh/formula/python@3.9
     #   as of 2023-09-22, python@3.9 depends on:
     #     gdbm        1.23    GNU database manager
     #     mpdecimal   2.5.1   Library for decimal floating point arithmetic
@@ -661,6 +667,14 @@ def Change_Python_LibPath_RelativeToAbsolute( frameworkPath, debug_level=0 ):
     #     readline    8.2.1   Library for command-line editing
     #     sqlite      3.43.1  Command-line interface for SQLite
     #     xz          5.4.4   General-purpose data compression with high compression ratio
+    #---------------------------------------------------------------------------------------------------
+    # https://formulae.brew.sh/formula/python@3.11
+    #   as of 2023-10-24, python@3.11 depends on:
+    #     mpdecimal   2.5.1   Library for decimal floating point arithmetic
+    #     openssl@3   3.1.3   Cryptography and SSL/TLS Toolkit
+    #     sqlite      3.43.2  Command-line interface for SQLite
+    #     xz          5.4.4   General-purpose data compression with high compression ratio
+    #---------------------------------------------------------------------------------------------------
     find_grep_results = os.popen( 'find %s -type f | grep -E "%s"' % (frameworkPath, filter_regex) ).read().split('\n')
     framework_files   = filter( lambda x: x != '', map(lambda x: x.strip(), find_grep_results) )
 
@@ -744,6 +758,37 @@ def Change_Python_LibPath_RelativeToAbsolute( frameworkPath, debug_level=0 ):
 
     print( "           ---> Change_Python_LibPath_RelativeToAbsolute(): Changed the library paths." )
     return 0
+
+#----------------------------------------------------------------------------------------
+## To generate the 'start-console.py' file from the template file
+#
+# @param[in] template:  input template file (template-start-console.py)
+# @param[in] pythonver: Python version string such as "3.11"
+# @param[in] target:    output target file  (start-console.py)
+#
+# @return True on success, False on failure
+#----------------------------------------------------------------------------------------
+def Generate_Start_Console_Py( template, pythonver, target ):
+    try:
+        fd   = open( template, "r" )
+        tmpl = fd.read()
+        fd.close()
+    except Exception as e:
+        print( "! Failed to read <%s>" % template, file=sys.stderr )
+        return False
+    else:
+        t = string.Template(tmpl)
+        startpy = t.safe_substitute( PYTHON_VER=pythonver )
+
+    try:
+        fd = open( target, "w" )
+        fd.write(startpy)
+        fd.close()
+    except Exception as e:
+        print( "! Failed to write <%s>" % target, file=sys.stderr )
+        return False
+    else:
+        return True
 
 #----------------
 # End of File

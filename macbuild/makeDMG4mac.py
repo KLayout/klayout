@@ -47,7 +47,7 @@ def SetGlobals():
     global DefaultBundleName  # the default bundle name 'klayout.app'
     global BundleName         # application bundle name in the DMG
     global DMGSerialNum       # the DMG serial number
-    global PackagePrefix      # the package prefix: 'ST-', 'LW-', 'HW-', or 'EX-'
+    global PackagePrefix      # the package prefix: LW-', 'HW-', or 'EX-'
     global QtIdentification   # Qt identification
     global RubyPythonID       # Ruby- and Python-identification
     global KLVersion          # KLayout's version
@@ -77,13 +77,13 @@ def SetGlobals():
     Usage  = "\n"
     Usage += "---------------------------------------------------------------------------------------------------------\n"
     Usage += "<< Usage of 'makeDMG4mac.py' >>\n"
-    Usage += "       for making a DMG file of KLayout 0.28.4 or later on different Apple macOS / Mac OSX platforms.\n"
+    Usage += "       for making a DMG file of KLayout 0.28.13 or later on different Apple macOS platforms.\n"
     Usage += "\n"
     Usage += "$ [python] ./makeDMG4mac.py\n"
     Usage += "   option & argument    : descriptions                                               | default value\n"
     Usage += "   ----------------------------------------------------------------------------------+-----------------\n"
     Usage += "   <-p|--pkg <dir>>     : package directory created by `build4mac.py` with [-y|-Y]   | ``\n"
-    Usage += "                        : like 'LW-qt5MP.pkg.macos-Catalina-release-Rmp32Pmp39'      | \n"
+    Usage += "                        : like 'LW-qt5MP.pkg.macos-Monterey-release-Rmp32Pmp311'     | \n"
     Usage += "   <-c|--clean>         : clean the work directory                                   | disabled\n"
     Usage += "   <-m|--make>          : make a compressed DMG file                                 | disabled\n"
     Usage += "                        :   <-c|--clean> and <-m|--make> are mutually exclusive      | \n"
@@ -103,9 +103,13 @@ def SetGlobals():
         print(Usage)
         quit()
 
-    release = int( Release.split(".")[0] ) # take the first of ['19', '0', '0']
+    release = int( Release.split(".")[0] ) # take the first of ['21', '0', '0']
     LatestOS = ""
-    if release == 22:
+    if release == 23:
+        GenOSName = "macOS"
+        Platform  = "Sonoma"
+        LatestOS  = Platform
+    elif release == 22:
         GenOSName = "macOS"
         Platform  = "Ventura"
         LatestOS  = Platform
@@ -113,26 +117,6 @@ def SetGlobals():
         GenOSName = "macOS"
         Platform  = "Monterey"
         LatestOS  = Platform
-    elif release == 20:
-        GenOSName = "macOS"
-        Platform  = "BigSur"
-        LatestOS  = Platform
-    elif release == 19:
-        GenOSName = "macOS"
-        Platform  = "Catalina"
-        LatestOS  = Platform
-    elif release == 18:
-        GenOSName = "macOS"
-        Platform  = "Mojave"
-    elif release == 17:
-        GenOSName = "macOS"
-        Platform  = "HighSierra"
-    elif release == 16:
-        Platform  = "Sierra"
-        GenOSName = "macOS"
-    elif release == 15:
-        GenOSName = "MacOSX"
-        Platform  = "ElCapitan"
     else:
         Platform = ""
         print("")
@@ -141,7 +125,7 @@ def SetGlobals():
         sys.exit(1)
 
     if not Machine == "x86_64":
-        if Machine == "arm64" and Platform in ["Ventura", "Monterey", "BigSur"]: # with an Apple Silicon Chip
+        if Machine == "arm64" and Platform in ["Sonoma", "Ventura", "Monterey"]: # with an Apple Silicon Chip
             print("")
             print( "### Your Mac equips an Apple Silicon Chip ###" )
             print("")
@@ -207,18 +191,18 @@ def SetGlobals():
 ## To check the contents of the package directory
 #
 # The package directory name should look like:
-#     * LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
-#     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb32Phb39  --- (1)
-#     * LW-qt5MP.pkg.macos-Catalina-release-Rmp32Pmp39
-#     * HW-qt5Brew.pkg.macos-Catalina-release-RsysPhb39
+#     * LW-qt5Ana3.pkg.macos-Monterey-release-Rana3Pana3
+#     * LW-qt5Brew.pkg.macos-Monterey-release-Rhb32Phb311  --- (1)
+#     * LW-qt5MP.pkg.macos-Monterey-release-Rmp32Pmp311
+#     * HW-qt5Brew.pkg.macos-Monterey-release-RsysPhb311
 #
-#     * LW-qt6Ana3.pkg.macos-Catalina-release-Rana3Pana3
-#     * LW-qt6Brew.pkg.macos-Catalina-release-Rhb32Phb39
-#     * LW-qt6MP.pkg.macos-Catalina-release-Rmp32Pmp39
-#     * HW-qt6Brew.pkg.macos-Catalina-release-RsysPhb39
+#     * LW-qt6Ana3.pkg.macos-Monterey-release-Rana3Pana3
+#     * LW-qt6Brew.pkg.macos-Monterey-release-Rhb32Phb311
+#     * LW-qt6MP.pkg.macos-Monterey-release-Rmp32Pmp311
+#     * HW-qt6Brew.pkg.macos-Monterey-release-RsysPhb311
 #
 # Generated DMG will be, for example,
-#     (1) ---> LW-klayout-0.28.4-macOS-Catalina-1-qt5Brew-Rhb32Phb39.dmg
+#     (1) ---> LW-klayout-0.28.13-macOS-Monterey-1-qt5Brew-Rhb32Phb311.dmg
 #
 # @return on success, positive integer in [MB] that tells approx. occupied disc space;
 #         on failure, -1
@@ -257,19 +241,18 @@ def CheckPkgDirectory():
 
     #-----------------------------------------------------------------------------------------------
     # [2] Identify (Qt, Ruby, Python) from PkgDir
-    #     * ST-qt5MP.pkg.macos-Catalina-release-RsysPsys     # 'ST' has been restored in 0.28.3
-    #     * LW-qt5Ana3.pkg.macos-Catalina-release-Rana3Pana3
-    #     * LW-qt5Brew.pkg.macos-Catalina-release-Rhb32Phb39
-    #     * LW-qt5MP.pkg.macos-Catalina-release-Rmp32Pmp39
-    #     * HW-qt5Brew.pkg.macos-Catalina-release-RsysPhb39
-    #     * EX-qt5MP.pkg.macos-Catalina-release-Rhb32Pmp39
+    #     * LW-qt5Ana3.pkg.macos-Monterey-release-Rana3Pana3
+    #     * LW-qt5Brew.pkg.macos-Monterey-release-Rhb32Phb311
+    #     * LW-qt5MP.pkg.macos-Monterey-release-Rmp32Pmp311
+    #     * HW-qt5Brew.pkg.macos-Monterey-release-RsysPhb311
+    #     * EX-qt5MP.pkg.macos-Monterey-release-Rhb32Pmp311
     #
-    #     * LW-qt6Ana3.pkg.macos-Catalina-release-Rana3Pana3
-    #     * LW-qt6Brew.pkg.macos-Catalina-release-Rhb32Phb39
-    #     * LW-qt6MP.pkg.macos-Catalina-release-Rmp32Pmp39
-    #     * HW-qt6Brew.pkg.macos-Catalina-release-RsysPhb39
+    #     * LW-qt6Ana3.pkg.macos-Monterey-release-Rana3Pana3
+    #     * LW-qt6Brew.pkg.macos-Monterey-release-Rhb32Phb311
+    #     * LW-qt6MP.pkg.macos-Monterey-release-Rmp32Pmp311
+    #     * HW-qt6Brew.pkg.macos-Monterey-release-RsysPhb311
     #-----------------------------------------------------------------------------------------------
-    patQRP = u'(ST|LW|HW|EX)([-])([qt5|qt6][0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-]release[-])([0-9A-Za-z]+)'
+    patQRP = u'(LW|HW|EX)([-])([qt5|qt6][0-9A-Za-z]+)([.]pkg[.])([A-Za-z]+[-][A-Za-z]+[-]release[-])([0-9A-Za-z]+)'
     regQRP = re.compile(patQRP)
     if not regQRP.match(PkgDir):
         print( "! Cannot identify (Qt, Ruby, Python) from the package directory name" )
@@ -297,14 +280,12 @@ def CheckPkgDirectory():
         LatestOSMacPorts   = Platform == LatestOS
         LatestOSMacPorts  &= PackagePrefix == "LW"
         LatestOSMacPorts  &= QtIdentification in [ "qt5MP", "qt6MP" ]
-        LatestOSMacPorts  &= RubyPythonID in [ "Rmp31Pmp38", "Rmp31Pmp39", \
-                                               "Rmp32Pmp38", "Rmp32Pmp39" ]
+        LatestOSMacPorts  &= RubyPythonID in [ "Rmp32Pmp311", "Rmp32Pmp39" ]
 
         LatestOSHomebrew   = Platform == LatestOS
         LatestOSHomebrew  &= PackagePrefix == "LW"
         LatestOSHomebrew  &= QtIdentification in [ "qt5Brew", "qt6Brew" ]
-        LatestOSHomebrew  &= RubyPythonID in [ "Rhb31Phb38", "Rhb31Phb39", "Rhb31Phbauto", \
-                                               "Rhb32Phb38", "Rhb32Phb39", "Rhb32Phbauto" ]
+        LatestOSHomebrew  &= RubyPythonID in [ "Rhb32Phb311", "Rhb32Phb39", "Rhb32Phbauto" ]
 
         LatestOSAnaconda3  = Platform == LatestOS
         LatestOSAnaconda3 &= PackagePrefix == "LW"
@@ -314,7 +295,7 @@ def CheckPkgDirectory():
         LatestOSHomebrewH  = Platform == LatestOS
         LatestOSHomebrewH &= PackagePrefix == "HW"
         LatestOSHomebrewH &= QtIdentification in [ "qt5Brew", "qt6Brew" ]
-        LatestOSHomebrewH &= RubyPythonID in [ "RsysPhb39", "RsysPhb39", "RsysPhbauto" ] # Sys-Homebre hybrid
+        LatestOSHomebrewH &= RubyPythonID in [ "RsysPhb311", "RsysPhb39", "RsysPhbauto" ] # Sys-Homebre hybrid
 
         if LatestOSMacPorts:
             mydic  = DicLightHeavyW["ports"]

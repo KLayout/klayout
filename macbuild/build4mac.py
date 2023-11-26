@@ -5,10 +5,11 @@
 # File: "macbuild/build4mac.py"
 #
 #  The top Python script for building KLayout (http://www.klayout.de/index.php)
-#  version 0.26.1 or later on different Apple Mac OSX platforms.
+#  version 0.28.13 or later on different Apple Mac OSX platforms.
 #===============================================================================
 import sys
 import os
+import re
 import codecs
 import shutil
 import glob
@@ -33,69 +34,64 @@ from build4mac_util import *
 # @return (usage, moduleset)-tuple
 #-------------------------------------------------------------------------------
 def GenerateUsage(platform):
-    if platform.upper() in [ "VENTURA", "MONTEREY", "BIGSUR" ]: # with Xcode [13.1 .. ]
+    if platform.upper() in [ "SONOMA", "VENTURA", "MONTEREY" ]: # with Xcode [13.1 .. ]
         myQt56    = "qt5brew"
         myRuby    = "hb32"
-        myPython  = "hb39"
-        moduleset = ('qt5Brew', 'HB32', 'HB39')
-    else: # with Xcode [ .. 12.4]; 'sys' for Python has been restored in 0.28.3
-        myQt56    = "qt5macports"
-        myRuby    = "sys"
-        myPython  = "sys"
-        moduleset = ('qt5MP', 'Sys', 'Sys')
+        myPython  = "hb311"
+        moduleset = ('qt5Brew', 'HB32', 'HB311')
+    else: # too obsolete
+        raise Exception( "! Too obsolete platform <%s>" % platform )
 
     usage  = "\n"
     usage += "---------------------------------------------------------------------------------------------------------\n"
     usage += "<< Usage of 'build4mac.py' >>\n"
-    usage += "       for building KLayout 0.28.6 or later on different Apple macOS / Mac OSX platforms.\n"
+    usage += "       for building KLayout 0.28.13 or later on different Apple macOS platforms.\n"
     usage += "\n"
     usage += "$ [python] ./build4mac.py\n"
     usage += "   option & argument    : descriptions (refer to 'macbuild/build4mac_env.py' for details)| default value\n"
     usage += "   --------------------------------------------------------------------------------------+---------------\n"
-    usage += "   [-q|--qt <type>]     : case-insensitive type=['Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3',    | %s \n" % myQt56
-    usage += "                        :                        'Qt6MacPorts', 'Qt6Brew']               | \n"
-    usage += "                        :   Qt5MacPorts: use Qt5 from MacPorts                           | \n"
-    usage += "                        :       Qt5Brew: use Qt5 from Homebrew                           | \n"
-    usage += "                        :       Qt5Ana3: use Qt5 from Anaconda3                          | \n"
-    usage += "                        :   Qt6MacPorts: use Qt6 from MacPorts (*)                       | \n"
-    usage += "                        :       Qt6Brew: use Qt6 from Homebrew (*)                       | \n"
-    usage += "                        :                        (*) migration to Qt6 is ongoing         | \n"
-    usage += "   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP31', 'HB31', 'Ana3',   | %s \n" % myRuby
-    usage += "                        :                        'MP32', 'HB32']                         | \n"
-    usage += "                        :    nil: don't bind Ruby                                        | \n"
-    usage += "                        :    Sys: use OS-bundled Ruby [2.0 - 2.6] depending on OS        | \n"
-    usage += "                        :   MP31: use Ruby 3.1 from MacPorts                             | \n"
-    usage += "                        :   HB31: use Ruby 3.1 from Homebrew                             | \n"
-    usage += "                        :   Ana3: use Ruby 3.1 from Anaconda3                            | \n"
-    usage += "                        :   MP32: use Ruby 3.2 from MacPorts                             | \n"
-    usage += "                        :   HB32: use Ruby 3.2 from Homebrew                             | \n"
-    usage += "   [-p|--python <type>] : case-insensitive type=['nil',  'Sys', 'MP38', 'HB38', 'Ana3',  | %s \n" % myPython
-    usage += "                        :                        'MP39', 'HB39', 'HBAuto']               | \n"
-    usage += "                        :    nil: don't bind Python                                      | \n"
-    usage += "                        :    Sys: use OS-bundled Python 2.7 up to Catalina               | \n"
-    usage += "                        :   MP38: use Python 3.8 from MacPorts                           | \n"
-    usage += "                        :   HB38: use Python 3.8 from Homebrew                           | \n"
-    usage += "                        :   Ana3: use Python 3.9 from Anaconda3                          | \n"
-    usage += "                        :   MP39: use Python 3.9 from MacPorts                           | \n"
-    usage += "                        :   HB39: use Python 3.9 from Homebrew                           | \n"
-    usage += "                        : HBAuto: use the latest Python 3.x auto-detected from Homebrew  | \n"
-    usage += "   [-P|--buildPymod]    : build and deploy Pymod (*.whl and *.egg) for LW-*.dmg          | disabled\n"
+    usage += "   [-q|--qt <type>]     : case-insensitive type=['Qt5MacPorts', 'Qt5Brew', 'Qt5Ana3',    | %s\n" % myQt56
+    usage += "                        :                        'Qt6MacPorts', 'Qt6Brew']               |\n"
+    usage += "                        :   Qt5MacPorts: use Qt5 from MacPorts                           |\n"
+    usage += "                        :       Qt5Brew: use Qt5 from Homebrew                           |\n"
+    usage += "                        :       Qt5Ana3: use Qt5 from Anaconda3                          |\n"
+    usage += "                        :   Qt6MacPorts: use Qt6 from MacPorts (*)                       |\n"
+    usage += "                        :       Qt6Brew: use Qt6 from Homebrew (*)                       |\n"
+    usage += "                        :                        (*) migration to Qt6 is ongoing         |\n"
+    usage += "   [-r|--ruby <type>]   : case-insensitive type=['nil', 'Sys', 'MP32', 'HB32', 'Ana3']   | %s\n" % myRuby
+    usage += "                        :    nil: don't bind Ruby                                        |\n"
+    usage += "                        :    Sys: use [Sonoma|Ventura|Monterey]-bundled Ruby 2.6         |\n"
+    usage += "                        :   MP32: use Ruby 3.2 from MacPorts                             |\n"
+    usage += "                        :   HB32: use Ruby 3.2 from Homebrew                             |\n"
+    usage += "                        :   Ana3: use Ruby 3.1 from Anaconda3                            |\n"
+    usage += "   [-p|--python <type>] : case-insensitive type=['nil', 'MP311', 'HB311', 'Ana3',        | %s\n" % myPython
+    usage += "                        :                        'MP39', 'HB39', 'HBAuto']               |\n"
+    usage += "                        :    nil: don't bind Python                                      |\n"
+    usage += "                        :  MP311: use Python 3.11 from MacPorts                          |\n"
+    usage += "                        :  HB311: use Python 3.11 from Homebrew                          |\n"
+    usage += "                        :   Ana3: use Python 3.11 from Anaconda3                         |\n"
+    usage += "                        :   MP39: use Python 3.9 from MacPorts (+)                       |\n"
+    usage += "                        :   HB39: use Python 3.9 from Homebrew (+)                       |\n"
+    usage += "                        :                    (+) for the backward compatibility tests    |\n"
+    usage += "                        : HBAuto: use the latest Python 3.x auto-detected from Homebrew  |\n"
+    usage += "   [-P|--buildPymod]    : build and deploy Pymod (*.whl) for LW-*.dmg                    | disabled\n"
     usage += "   [-n|--noqtbinding]   : don't create Qt bindings for ruby scripts                      | disabled\n"
     usage += "   [-u|--noqtuitools]   : don't include uitools in Qt binding                            | disabled\n"
+    usage += "   [-g|--nolibgit2]     : don't include libgit2 for Git package support                  | disabled\n"
     usage += "   [-m|--make <option>] : option passed to 'make'                                        | '--jobs=4'\n"
     usage += "   [-d|--debug]         : enable debug mode build                                        | disabled\n"
     usage += "   [-c|--checkcom]      : check command-line and exit without building                   | disabled\n"
     usage += "   [-y|--deploy]        : deploy executables and dylibs, including Qt's Frameworks       | disabled\n"
     usage += "   [-Y|--DEPLOY]        : deploy executables and dylibs for those who built KLayout      | disabled\n"
-    usage += "                        : from the source code and use the tools in the same machine     | \n"
-    usage += "                        : ! After confirmation of the successful build of 'klayout.app', | \n"
-    usage += "                        :   rerun this script with BOTH:                                 | \n"
-    usage += "                        :     1) the same options used for building AND                  | \n"
-    usage += "                        :     2) <-y|--deploy> OR <-Y|--DEPLOY>                          | \n"
-    usage += "                        :   optionally with [-v|--verbose <0-3>]                         | \n"
+    usage += "                        : from the source code and use the tools in the same machine     |\n"
+    usage += "                        : ! After confirmation of the successful build of 'klayout.app', |\n"
+    usage += "                        :   rerun this script with BOTH:                                 |\n"
+    usage += "                        :     1) the same options used for building AND                  |\n"
+    usage += "                        :     2) <-y|--deploy> OR <-Y|--DEPLOY>                          |\n"
+    usage += "                        :   optionally with [-v|--verbose <0-3>]                         |\n"
     usage += "   [-v|--verbose <0-3>] : verbose level of `macdeployqt' (effective with -y only)        | 1\n"
-    usage += "                        : 0 = no output, 1 = error/warning (default),                    | \n"
-    usage += "                        : 2 = normal,    3 = debug                                       | \n"
+    usage += "                        : 0 = no output, 1 = error/warning (default),                    |\n"
+    usage += "                        : 2 = normal,    3 = debug                                       |\n"
     usage += "   [-?|--?]             : print this usage and exit; in zsh, quote like '-?' or '--?'    | disabled\n"
     usage += "-----------------------------------------------------------------------------------------+---------------\n"
     return (usage, moduleset)
@@ -113,26 +109,19 @@ def Get_Default_Config():
     if not System == "Darwin":
         print("")
         print( "!!! Sorry. Your system <%s> looks like non-Mac" % System, file=sys.stderr )
-        print( GenerateUsage("")[0] )
         sys.exit(1)
 
-    release = int( Release.split(".")[0] ) # take the first of ['19', '0', '0']
-    if   release == 22:
+    release = int( Release.split(".")[0] ) # take the first of ['21', '0', '0']
+    #----------------------------------------------------------------------------
+    # Dropped [ElCapitan - BigSur] (2023-10-24).
+    # See 415b5aa2efca04928f1148a69e77efd5d76f8c1d for the previous states.
+    #----------------------------------------------------------------------------
+    if   release == 23:
+        Platform = "Sonoma"
+    elif release == 22:
         Platform = "Ventura"
     elif release == 21:
         Platform = "Monterey"
-    elif release == 20:
-        Platform = "BigSur"
-    elif release == 19:
-        Platform = "Catalina"
-    elif release == 18:
-        Platform = "Mojave"
-    elif release == 17:
-        Platform = "HighSierra"
-    elif release == 16:
-        Platform = "Sierra"
-    elif release == 15:
-        Platform = "ElCapitan"
     else:
         Platform = ""
         print("")
@@ -141,10 +130,11 @@ def Get_Default_Config():
         sys.exit(1)
 
     if not Machine == "x86_64":
-        if Machine == "arm64" and Platform in ["Ventura", "Monterey", "BigSur"]: # with an Apple Silicon Chip
+        if Machine == "arm64" and Platform in ["Sonoma", "Ventura", "Monterey"]: # with an Apple Silicon Chip
             print("")
             print( "### Your Mac equips an Apple Silicon Chip ###" )
-            print("")
+            print( "    Setting QMAKE_APPLE_DEVICE_ARCHS=arm64\n")
+            os.environ['QMAKE_APPLE_DEVICE_ARCHS'] = 'arm64'
         else:
             print("")
             print( "!!! Sorry. Only x86_64/arm64 architecture machine is supported but found <%s>" % Machine, file=sys.stderr )
@@ -158,40 +148,20 @@ def Get_Default_Config():
     ToolDebug = list()
 
     # Set the default modules
-    if   Platform == "Ventura":
+    if   Platform == "Sonoma":
         ModuleQt     = "Qt5Brew"
         ModuleRuby   = "Ruby32Brew"
-        ModulePython = "Python39Brew"
+        ModulePython = "Python311Brew"
+    elif Platform == "Ventura":
+        ModuleQt     = "Qt5Brew"
+        ModuleRuby   = "Ruby32Brew"
+        ModulePython = "Python311Brew"
     elif Platform == "Monterey":
         ModuleQt     = "Qt5Brew"
         ModuleRuby   = "Ruby32Brew"
-        ModulePython = "Python39Brew"
-    elif Platform == "BigSur":
-        ModuleQt     = "Qt5Brew"
-        ModuleRuby   = "Ruby32Brew"
-        ModulePython = "Python39Brew"
-    elif Platform == "Catalina":
-        ModuleQt     = "Qt5MacPorts"
-        ModuleRuby   = "RubyCatalina"
-        ModulePython = "PythonCatalina"
-    elif Platform == "Mojave":
-        ModuleQt     = "Qt5MacPorts"
-        ModuleRuby   = "RubyMojave"
-        ModulePython = "PythonMojave"
-    elif Platform == "HighSierra":
-        ModuleQt     = "Qt5MacPorts"
-        ModuleRuby   = "RubyHighSierra"
-        ModulePython = "PythonHighSierra"
-    elif Platform == "Sierra":
-        ModuleQt     = "Qt5MacPorts"
-        ModuleRuby   = "RubySierra"
-        ModulePython = "PythonSierra"
-    elif Platform == "ElCapitan":
-        ModuleQt     = "Qt5MacPorts"
-        ModuleRuby   = "RubyElCapitan"
-        ModulePython = "PythonElCapitan"
+        ModulePython = "Python311Brew"
     else:
-        ModuleQt     = "Qt5MacPorts"
+        ModuleQt     = "Qt5Brew"
         ModuleRuby   = "nil"
         ModulePython = "nil"
 
@@ -199,6 +169,7 @@ def Get_Default_Config():
     NonOSStdLang  = False
     NoQtBindings  = False
     NoQtUiTools   = False
+    NoLibGit2     = False
     MakeOptions   = "--jobs=4"
     DebugMode     = False
     CheckComOnly  = False
@@ -207,6 +178,7 @@ def Get_Default_Config():
     PackagePrefix = ""
     DeployVerbose = 1
     Version       = GetKLayoutVersionFrom( "./version.sh" )
+    HBPythonIs39  = False # because ModulePython == "Python311Brew" by default
 
     config = dict()
     config['ProjectDir']    = ProjectDir        # project directory where "build.sh" exists
@@ -220,6 +192,7 @@ def Get_Default_Config():
     config['NonOSStdLang']  = NonOSStdLang      # True if non-OS-standard language is chosen
     config['NoQtBindings']  = NoQtBindings      # True if not creating Qt bindings for Ruby scripts
     config['NoQtUiTools']   = NoQtUiTools       # True if not to include QtUiTools in Qt binding
+    config['NoLibGit2']     = NoLibGit2         # True if not to include libgit2 for Git package support
     config['MakeOptions']   = MakeOptions       # options passed to `make`
     config['DebugMode']     = DebugMode         # True if debug mode build
     config['CheckComOnly']  = CheckComOnly      # True if only for checking the command line parameters to "build.sh"
@@ -230,6 +203,7 @@ def Get_Default_Config():
     config['Version']       = Version           # KLayout's version
     config['ModuleSet']     = ModuleSet         # (Qt, Ruby, Python)-tuple
     config['ToolDebug']     = ToolDebug         # debug level list for this tool
+    config['HBPythonIs39']  = HBPythonIs39      # True if the Homebrew Python version <= 3.9
     # auxiliary variables on platform
     config['System']        = System            # 6-tuple from platform.uname()
     config['Node']          = Node              # - do -
@@ -238,123 +212,6 @@ def Get_Default_Config():
     config['Machine']       = Machine           # - do -
     config['Processor']     = Processor         # - do -
     return config
-
-#------------------------------------------------------------------------------
-## To apply a workaround patch to "./src/klayout.pri" to work with Ruby 3.x.
-#
-# @param[in] config     dictionary containing the default configuration
-#
-# @return void
-#------------------------------------------------------------------------------
-def ApplyPatch2KLayoutQtPri4Ruby3(config):
-    #----------------------------------------------------------------
-    # [1] Check if the previous patch exists
-    #----------------------------------------------------------------
-    priMaster   = "./src/klayout.pri"
-    priOriginal = "./src/klayout.pri.org"
-    if os.path.exists(priOriginal):
-        shutil.copy2( priOriginal, priMaster )
-        os.remove( priOriginal )
-
-    #----------------------------------------------------------------
-    # [2] Not using Ruby?
-    #----------------------------------------------------------------
-    ModuleRuby = config['ModuleRuby']
-    if ModuleRuby == 'nil':
-        return;
-
-    #----------------------------------------------------------------
-    # [3] Get the Ruby version code as done in "build.sh"
-    #----------------------------------------------------------------
-    rubyExe  = RubyDictionary[ModuleRuby]['exe']
-    oneline  = "puts (RbConfig::CONFIG['MAJOR'] || 0).to_i*10000+(RbConfig::CONFIG['MINOR'] || 0).to_i*100+(RbConfig::CONFIG['TEENY'] || 0).to_i"
-    command  = [ '%s' % rubyExe, '-rrbconfig', '-e', '%s' % oneline ]
-    verCode  = subprocess.check_output( command, encoding='utf-8' ).strip() # like 3.1.2 => "30102"
-    verInt   = int(verCode)
-    verMajor = verInt // 10000
-    verMinor = (verInt - verMajor * 10000) // 100
-    verTeeny = (verInt - verMajor * 10000) - (verMinor * 100)
-    # print( verMajor, verMinor, verTeeny )
-    # quit()
-    if verMajor < 3:
-        return;
-
-    #-----------------------------------------------------------------------------------------------
-    # [4] The two buggy Apple compilers below flag errors like:
-    #
-    #     /Applications/anaconda3/include/ruby-3.1.0/ruby/internal/intern/vm.h:383:1: error: \
-    #     '__declspec' attributes are not enabled; use '-fdeclspec' or '-fms-extensions' to \
-    #     enable support for __declspec attributes RBIMPL_ATTR_NORETURN()
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    #   Problematic in <Catalina> with
-    #     Apple clang version 12.0.0 (clang-1200.0.32.29)
-    #     Target: x86_64-apple-darwin19.6.0
-    #     Thread model: posix
-    #
-    #   Problematic in <Big Sur> with
-    #     Apple clang version 13.0.0 (clang-1300.0.29.30)
-    #     Target: x86_64-apple-darwin20.6.0
-    #     Thread model: posix
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    #   Non-problematic in <Monterey> with
-    #     Apple clang version 13.1.6 (clang-1316.0.21.2.5)
-    #     Target: x86_64-apple-darwin21.6.0
-    #     Thread model: posix
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    #   Refer to https://github.com/nginx/unit/issues/653
-    #            https://github.com/nginx/unit/issues/653#issuecomment-1062129080
-    #
-    #   Pass "-fdeclspec" option to the QMAKE_CXXFLAGS macro via the "./src/klayout.pri" file like:
-    """
-    # <build4mac.py> applied this patch for Mac to work with Ruby 3.x
-    mac {
-        QMAKE_CXXFLAGS += -fdeclspec
-    }
-    # <build4mac.py> applied this patch for Mac to work with Ruby 3.x
-    """
-    #-----------------------------------------------------------------------------------------------
-    #----------------------------------------------------------------
-    # (A) Check Platform
-    #----------------------------------------------------------------
-    Platform = config['Platform']
-    if Platform in [ "Ventura", "Monterey" ]:
-        return
-    elif Platform in [ "BigSur", "Catalina" ]: # take care
-        pass
-    else:
-        return # the results are not tested and unknown
-
-    #----------------------------------------------------------------
-    # (B) Check ./src/klayout.pri and apply the patch if necessary
-    #----------------------------------------------------------------
-    keystring = "<build4mac.py> applied this patch for Mac to work with Ruby 3.x"
-    patPatch  = r"(^#)([ ]*)(%s)([ ]*$)" % keystring
-    regPatch  = re.compile(patPatch)
-    foundKey1 = False
-    foundKey2 = False
-
-    with codecs.open( priMaster, "r", "utf-8" ) as file:
-        allLines = file.readlines()
-        file.close()
-        for line in allLines:
-            if regPatch.match( line.strip() ):
-                if not foundKey1:
-                    foundKey1 = True
-                    continue
-                elif not foundKey2:
-                    foundKey2 = True
-                    break
-    if foundKey1 and foundKey2:
-        return
-
-    shutil.copy2( priMaster, priOriginal )
-    with codecs.open( priMaster, "a", "utf-8" ) as file:
-        file.write( "# %s\n" % keystring )
-        file.write( "mac {\n" )
-        file.write( "    QMAKE_CXXFLAGS += -fdeclspec\n" )
-        file.write( "}\n" )
-        file.write( "# %s\n" % keystring )
-    return
 
 #------------------------------------------------------------------------------
 ## To parse the command line parameters
@@ -378,6 +235,7 @@ def Parse_CLI_Args(config):
     NonOSStdLang  = config['NonOSStdLang']
     NoQtBindings  = config['NoQtBindings']
     NoQtUiTools   = config['NoQtUiTools']
+    NoLibGit2     = config['NoLibGit2']
     MakeOptions   = config['MakeOptions']
     DebugMode     = config['DebugMode']
     CheckComOnly  = config['CheckComOnly']
@@ -387,6 +245,7 @@ def Parse_CLI_Args(config):
     DeployVerbose = config['DeployVerbose']
     ModuleSet     = config['ModuleSet']
     ToolDebug     = config['ToolDebug']
+    HBPythonIs39  = config['HBPythonIs39']
 
     #-----------------------------------------------------
     # [2] Parse the CLI arguments
@@ -398,11 +257,11 @@ def Parse_CLI_Args(config):
 
     p.add_option( '-r', '--ruby',
                     dest='type_ruby',
-                    help="Ruby type=['nil', 'Sys', 'MP31', 'HB31', 'Ana3', 'MP32', 'HB32']" )
+                    help="Ruby type=['nil', 'Sys', 'MP32', 'HB32', 'Ana3']" )
 
     p.add_option( '-p', '--python',
                     dest='type_python',
-                    help="Python type=['nil', 'Sys', 'MP38', 'HB38', 'Ana3', 'MP39', 'HB39', 'HBAuto']" )
+                    help="Python type=['nil', 'Sys', 'MP311', 'HB311', 'Ana3', 'MP39', 'HB39', 'HBAuto']" )
 
     p.add_option( '-P', '--buildPymod',
                     action='store_true',
@@ -421,6 +280,12 @@ def Parse_CLI_Args(config):
                     dest='no_qt_uitools',
                     default=False,
                     help="don't include uitools in Qt binding" )
+
+    p.add_option( '-g', '--nolibgit2',
+                    action='store_true',
+                    dest='no_libgit2',
+                    default=False,
+                    help="don't include libgit2 for Git package support" )
 
     p.add_option( '-m', '--make',
                     dest='make_option',
@@ -465,13 +330,14 @@ def Parse_CLI_Args(config):
                     default=False,
                     help='check usage' )
 
-    if Platform.upper() in [ "VENTURA", "MONTEREY", "BIGSUR" ]: # with Xcode [13.1 .. ]
+    if Platform.upper() in [ "SONOMA", "VENTURA", "MONTEREY" ]: # with Xcode [13.1 .. ]
         p.set_defaults( type_qt        = "qt5brew",
                         type_ruby      = "hb32",
-                        type_python    = "hb39",
+                        type_python    = "hb311",
                         build_pymod    = False,
                         no_qt_binding  = False,
                         no_qt_uitools  = False,
+                        no_libgit2     = False,
                         make_option    = "--jobs=4",
                         debug_build    = False,
                         check_command  = False,
@@ -480,21 +346,8 @@ def Parse_CLI_Args(config):
                         deploy_verbose = "1",
                         tool_debug     = [],
                         checkusage     = False )
-    else: # with Xcode [ .. 12.4]
-        p.set_defaults( type_qt        = "qt5macports",
-                        type_ruby      = "sys",
-                        type_python    = "sys",
-                        build_pymod    = False,
-                        no_qt_binding  = False,
-                        no_qt_uitools  = False,
-                        make_option    = "--jobs=4",
-                        debug_build    = False,
-                        check_command  = False,
-                        deploy_full    = False,
-                        deploy_partial = False,
-                        deploy_verbose = "1",
-                        tool_debug     = [],
-                        checkusage     = False )
+    else:
+        raise Exception( "! Too obsolete platform <%s>" % Platform )
 
     opt, args = p.parse_args()
     if (opt.checkusage):
@@ -530,18 +383,16 @@ def Parse_CLI_Args(config):
     elif ModuleQt == "Qt6Brew":
         choiceQt56 = 'qt6Brew'
 
-    # By default, OS-standard (-bundled) script languages (Ruby and Python) are used
+    # Check if non-OS-standard (-bundled) script languages (Ruby and Python) are used
     NonOSStdLang = False
 
     # (B) Determine the Ruby type
     candidates         = dict()
     candidates['NIL']  = 'nil'
     candidates['SYS']  = 'Sys'
-    candidates['MP31'] = 'MP31'
-    candidates['HB31'] = 'HB31'
-    candidates['ANA3'] = 'Ana3'
     candidates['MP32'] = 'MP32'
     candidates['HB32'] = 'HB32'
+    candidates['ANA3'] = 'Ana3'
     try:
         choiceRuby = candidates[ opt.type_ruby.upper() ]
     except KeyError:
@@ -553,36 +404,20 @@ def Parse_CLI_Args(config):
             ModuleRuby = 'nil'
         elif choiceRuby == "Sys":
             choiceRuby = "Sys"
-            if Platform == "Ventura":
+            if Platform == "Sonoma":
+                ModuleRuby = 'RubySonoma'
+            elif Platform == "Ventura":
                 ModuleRuby = 'RubyVentura'
             elif Platform == "Monterey":
                 ModuleRuby = 'RubyMonterey'
-            elif Platform == "BigSur":
-                ModuleRuby = 'RubyBigSur'
-            elif Platform == "Catalina":
-                ModuleRuby = 'RubyCatalina'
-            elif Platform == "Mojave":
-                ModuleRuby = 'RubyMojave'
-            elif Platform == "HighSierra":
-                ModuleRuby = 'RubyHighSierra'
-            elif Platform == "Sierra":
-                ModuleRuby = 'RubySierra'
-            elif Platform == "ElCapitan":
-                ModuleRuby = 'RubyElCapitan'
-        elif choiceRuby == "MP31":
-            ModuleRuby   = 'Ruby31MacPorts'
-            NonOSStdLang = True
-        elif choiceRuby == "HB31":
-            ModuleRuby   = 'Ruby31Brew'
-            NonOSStdLang = True
-        elif choiceRuby == "Ana3":
-            ModuleRuby   = 'RubyAnaconda3'
-            NonOSStdLang = True
         elif choiceRuby == "MP32":
             ModuleRuby   = 'Ruby32MacPorts'
             NonOSStdLang = True
         elif choiceRuby == "HB32":
             ModuleRuby   = 'Ruby32Brew'
+            NonOSStdLang = True
+        elif choiceRuby == "Ana3":
+            ModuleRuby   = 'RubyAnaconda3'
             NonOSStdLang = True
     if ModuleRuby == '':
         print("")
@@ -594,9 +429,8 @@ def Parse_CLI_Args(config):
     # (C) Determine the Python type
     candidates           = dict()
     candidates['NIL']    = 'nil'
-    candidates['SYS']    = 'Sys'   # has been restored in 0.28.3
-    candidates['MP38']   = 'MP38'
-    candidates['HB38']   = 'HB38'
+    candidates['MP311']  = 'MP311'
+    candidates['HB311']  = 'HB311'
     candidates['ANA3']   = 'Ana3'
     candidates['MP39']   = 'MP39'
     candidates['HB39']   = 'HB39'
@@ -610,35 +444,30 @@ def Parse_CLI_Args(config):
         ModulePython = ''
         if choicePython ==  "nil":
             ModulePython = 'nil'
-        elif choicePython == "Sys":
-            if Platform in [ "Ventura", "Monterey", "BigSur" ]:
-                raise Exception( "! Cannot choose the 'sys' Python on <%s>" % Platform )
-            elif Platform == "Catalina":
-                ModulePython = 'PythonCatalina'
-            elif Platform == "Mojave":
-                ModulePython = 'PythonMojave'
-            elif Platform == "HighSierra":
-                ModulePython = 'PythonHighSierra'
-            elif Platform == "Sierra":
-                ModulePython = 'PythonSierra'
-            elif Platform == "ElCapitan":
-                ModulePython = 'PythonElCapitan'
-        elif choicePython == "MP38":
-            ModulePython = 'Python38MacPorts'
+            HBPythonIs39 = None
+        elif choicePython == "MP311":
+            ModulePython = 'Python311MacPorts'
+            HBPythonIs39 = None
             NonOSStdLang = True
-        elif choicePython == "HB38":
-            ModulePython = 'Python38Brew'
+        elif choicePython == "HB311":
+            ModulePython = 'Python311Brew'
+            HBPythonIs39 = False
             NonOSStdLang = True
         elif choicePython == "Ana3":
             ModulePython = 'PythonAnaconda3'
+            HBPythonIs39 = None
             NonOSStdLang = True
         elif choicePython == "MP39":
             ModulePython = 'Python39MacPorts'
+            HBPythonIs39 = None
+            NonOSStdLang = True
         elif choicePython == "HB39":
             ModulePython = 'Python39Brew'
+            HBPythonIs39 = True
             NonOSStdLang = True
         elif choicePython == "HBAuto":
             ModulePython = 'PythonAutoBrew'
+            HBPythonIs39 = (HBPythonAutoVersion == "3.9")
             NonOSStdLang = True
     if ModulePython == '':
         print("")
@@ -654,6 +483,7 @@ def Parse_CLI_Args(config):
     BuildPymod   = opt.build_pymod
     NoQtBindings = opt.no_qt_binding
     NoQtUiTools  = opt.no_qt_uitools
+    NoLibGit2    = opt.no_libgit2
     MakeOptions  = opt.make_option
     DebugMode    = opt.debug_build
     CheckComOnly = opt.check_command
@@ -685,6 +515,7 @@ def Parse_CLI_Args(config):
         print("")
         print( message % (target, modules, pymodbuild) )
     else:
+        okHWdmg = True
         message = "### You are going to make "
         if DeploymentP:
             PackagePrefix = "LW-"
@@ -693,18 +524,24 @@ def Parse_CLI_Args(config):
             else:
                 message += "a lightweight (LW-) package with Pymod excluding Qt5, Ruby, and Python..."
         elif DeploymentF:
-            if (ModuleRuby in RubySys) and (ModulePython in PythonSys):
+            if (ModuleRuby in RubySys) and (ModulePython in PythonSys): # won't meet this condition any more!
                 PackagePrefix = "ST-"
                 message      += "a standard (ST-) package including Qt[5|6] and using OS-bundled Ruby and Python..."
-            elif ModulePython in ['Python38Brew', 'Python39Brew', 'PythonAutoBrew']:
+            elif ModulePython in ['Python311Brew', 'Python39Brew', 'PythonAutoBrew']:
                 PackagePrefix = "HW-"
-                message      += "a heavyweight (HW-) package including Qt[5|6] and Python3.8~ from Homebrew..."
+                message      += "a heavyweight (HW-) package including Qt[5|6] and Python3.[11|9] from Homebrew..."
+                okHWdmg = (ModulePython == 'Python311Brew') or \
+                          (ModulePython == 'Python39Brew')  or \
+                          (ModulePython == 'PythonAutoBrew' and HBPythonAutoVersion in ["3.11", "3.9"] )
             else:
                 PackagePrefix = "EX-"
                 message      += "a package with exceptional (EX-) combinations of different modules..."
         print( "" )
         print( message )
         print( "" )
+        if not okHWdmg:
+            print( "!!! HW-dmg package assumes either python@3.11 or python@3.9" )
+            sys.exit(1)
         if CheckComOnly:
             sys.exit(0)
 
@@ -720,6 +557,7 @@ def Parse_CLI_Args(config):
     config['NonOSStdLang']  = NonOSStdLang
     config['NoQtBindings']  = NoQtBindings
     config['NoQtUiTools']   = NoQtUiTools
+    config['NoLibGit2']     = NoLibGit2
     config['MakeOptions']   = MakeOptions
     config['DebugMode']     = DebugMode
     config['CheckComOnly']  = CheckComOnly
@@ -729,6 +567,7 @@ def Parse_CLI_Args(config):
     config['DeployVerbose'] = DeployVerbose
     config['ModuleSet']     = ModuleSet
     config['ToolDebug']     = ToolDebug
+    config['HBPythonIs39']  = HBPythonIs39
 
     if CheckComOnly:
         pp = pprint.PrettyPrinter( indent=4, width=140 )
@@ -760,6 +599,7 @@ def Get_Build_Parameters(config):
     ModuleSet     = config['ModuleSet']
     NoQtBindings  = config['NoQtBindings']
     NoQtUiTools   = config['NoQtUiTools']
+    NoLibGit2     = config['NoLibGit2']
     MakeOptions   = config['MakeOptions']
     DebugMode     = config['DebugMode']
     CheckComOnly  = config['CheckComOnly']
@@ -833,7 +673,6 @@ def Get_Build_Parameters(config):
 
     # (H) about Ruby
     if ModuleRuby != "nil":
-        ApplyPatch2KLayoutQtPri4Ruby3( config )
         parameters['ruby']  = RubyDictionary[ModuleRuby]['exe']
         parameters['rbinc'] = RubyDictionary[ModuleRuby]['inc']
         parameters['rblib'] = RubyDictionary[ModuleRuby]['lib']
@@ -858,21 +697,22 @@ def Get_Build_Parameters(config):
     # (K) Extra parameters needed for <pymod>
     #     <pymod> will be built if:
     #       BuildPymod   = True
-    #       Platform     = [ 'Monterey', 'BigSur', 'Catalina' ]
-    #       ModuleRuby   = [ 'Ruby31MacPorts', 'Ruby31Brew', 'RubyAnaconda3' ]
-    #       ModulePython = [ 'Python38MacPorts', 'Python38Brew', 'Python39Brew',
-    #                        'PythonAnaconda3',  'PythonAutoBrew' ]
+    #       Platform     = [ 'Sonoma', 'Ventura', 'Monterey']
+    #       ModuleRuby   = [ 'Ruby32MacPorts', 'Ruby32Brew', 'RubyAnaconda3' ]
+    #       ModulePython = [ 'Python311MacPorts', 'Python39MacPorts',
+    #                        'Python311Brew', Python39Brew', 'PythonAutoBrew',
+    #                        'PythonAnaconda3' ]
     parameters['BuildPymod']   = BuildPymod
     parameters['Platform']     = Platform
     parameters['ModuleRuby']   = ModuleRuby
     parameters['ModulePython'] = ModulePython
 
     PymodDistDir = dict()
-    if Platform in [ 'Ventura', 'Monterey', 'BigSur', 'Catalina' ]:
-        if ModuleRuby in [ 'Ruby31MacPorts', 'Ruby31Brew', 'RubyAnaconda3', 'Ruby32MacPorts', 'Ruby32Brew' ]:
-            if ModulePython in [ 'Python38MacPorts', 'Python39MacPorts' ]:
+    if Platform in [ 'Sonoma', 'Ventura', 'Monterey' ]:
+        if ModuleRuby in [ 'Ruby32MacPorts', 'Ruby32Brew', 'RubyAnaconda3' ]:
+            if ModulePython in [ 'Python311MacPorts', 'Python39MacPorts' ]:
                 PymodDistDir[ModulePython] = 'dist-MP3'
-            elif ModulePython in [ 'Python38Brew', 'Python39Brew', 'PythonAutoBrew' ]:
+            elif ModulePython in [ 'Python311Brew', 'Python39Brew', 'PythonAutoBrew' ]:
                 PymodDistDir[ModulePython] = 'dist-HB3'
             elif ModulePython in [ 'PythonAnaconda3' ]:
                 PymodDistDir[ModulePython] = 'dist-ana3'
@@ -888,27 +728,27 @@ def Get_Build_Parameters(config):
 # @return 0 on success; non-zero (1), otherwise
 #------------------------------------------------------------------------------
 def Build_pymod(parameters):
-    #---------------------------------------------------------------------------
+    #-----------------------------------------------------------------------------------------------------------
     # [1] <pymod> will be built if:
     #       BuildPymod   = True
-    #       Platform     = [ 'Ventura', 'Monterey', 'BigSur', 'Catalina' ]
-    #       ModuleRuby   = [ 'Ruby31MacPorts', 'Ruby31Brew', 'RubyAnaconda3',
-    #                        'Ruby32MacPorts', 'Ruby32Brew' ]
-    #       ModulePython = [ 'Python38MacPorts', 'Python38Brew', 'PythonAnaconda3',
-    #                        'Python39MacPorts', 'Python39Brew', 'PythonAutoBrew' ]
-    #---------------------------------------------------------------------------
+    #       Platform     = [ 'Sonoma', 'Ventura', 'Monterey']
+    #       ModuleRuby   = [ 'Ruby32MacPorts', 'Ruby32Brew', 'RubyAnaconda3' ]
+    #       ModulePython = [ 'Python311MacPorts', 'Python39MacPorts',
+    #                        'Python311Brew', Python39Brew', 'PythonAutoBrew',
+    #                        'PythonAnaconda3' ]
+    #-----------------------------------------------------------------------------------------------------------
     BuildPymod   = parameters['BuildPymod']
     Platform     = parameters['Platform']
     ModuleRuby   = parameters['ModuleRuby']
     ModulePython = parameters['ModulePython']
     if not BuildPymod:
         return 0
-    if not Platform in [ 'Ventura', 'Monterey', 'BigSur', 'Catalina' ]:
+    if not Platform in [ 'Sonoma', 'Ventura', 'Monterey' ]:
         return 0
-    elif not ModuleRuby in [ 'Ruby31MacPorts', 'Ruby31Brew', 'RubyAnaconda3', 'Ruby32MacPorts', 'Ruby32Brew' ]:
+    elif not ModuleRuby in [ 'Ruby32MacPorts', 'Ruby32Brew', 'RubyAnaconda3' ]:
         return 0
-    elif not ModulePython in [ 'Python38MacPorts', 'Python38Brew', 'PythonAnaconda3', \
-                               'Python39MacPorts', 'Python39Brew', 'PythonAutoBrew' ]:
+    elif not ModulePython in [ 'Python311MacPorts', 'Python39MacPorts', 'PythonAnaconda3', \
+                               'Python311Brew',     'Python39Brew',     'PythonAutoBrew' ]:
         return 0
 
     #--------------------------------------------------------------------
@@ -927,6 +767,7 @@ def Build_pymod(parameters):
         addBinPath = "%s/bin"     % DefaultHomebrewRoot  # defined in "build4mac_env.py"
         addIncPath = "%s/include" % DefaultHomebrewRoot  # -- ditto --
         addLibPath = "%s/lib"     % DefaultHomebrewRoot  # -- ditto --
+    # Using Anaconda3
     elif  PymodDistDir[ModulePython] == 'dist-ana3':
         addBinPath = "/Applications/anaconda3/bin"
         addIncPath = "/Applications/anaconda3/include"
@@ -1081,16 +922,54 @@ def Build_pymod(parameters):
 #------------------------------------------------------------------------------
 ## To run the main Bash script "build.sh" with appropriate options
 #
-# @param[in] parameters     dictionary containing the build parameters
+# @param[in] config     the build configuration
+# @param[in] parameters the build parameters
 #
 # @return 0 on success; non-zero (1), otherwise
 #------------------------------------------------------------------------------
-def Run_Build_Command(parameters):
-    jump2pymod = False  # default=False; set True to jump into pymod-build for debugging
+def Run_Build_Command(config, parameters):
+    ModuleQt  = config['ModuleQt']
+    NoLibGit2 = config['NoLibGit2']
+    ToolDebug = config['ToolDebug']
+    if 100 not in ToolDebug: # default
+        jump2pymod = False
+    else:
+        jump2pymod = True
+
+    #-----------------------------------------------------
+    # [1] Set two environment variables to use libgit2
+    #-----------------------------------------------------
+    if not NoLibGit2:
+        # Using MacPorts
+        if ModuleQt.upper() in [ 'QT5MACPORTS', 'QT6MACPORTS' ]:
+            addIncPath = "/opt/local/include"
+            addLibPath = "/opt/local/lib"
+        # Using Homebrew
+        elif ModuleQt.upper() in [ 'QT5BREW', 'QT6BREW' ]:
+            addIncPath = "%s/include" % DefaultHomebrewRoot  # defined in "build4mac_env.py"
+            addLibPath = "%s/lib"     % DefaultHomebrewRoot  # -- ditto --
+        # Using Anaconda3
+        elif ModuleQt.upper() in [ 'QT5ANA3' ]:
+            addIncPath = "/Applications/anaconda3/include"
+            addLibPath = "/Applications/anaconda3/lib"
+        else:
+            addIncPath = ""
+            addLibPath = ""
+
+        # These environment variables are expanded on the fly in ../src/klayout.pri.
+        if not addIncPath == "":
+            os.environ['MAC_LIBGIT2_INC'] = "%s" % addIncPath
+        else:
+            os.environ['MAC_LIBGIT2_INC'] = "_invalid_MAC_LIBGIT2_INC_" # compile should fail
+
+        if not addLibPath == "":
+            os.environ['MAC_LIBGIT2_LIB'] = "%s" % addLibPath
+        else:
+            os.environ['MAC_LIBGIT2_LIB'] = "_invalid_MAC_LIBGIT2_LIB_" # link should fail
 
     if not jump2pymod:
         #-----------------------------------------------------
-        # [1] Set parameters passed to the main Bash script
+        # [2] Set parameters passed to the main Bash script
         #-----------------------------------------------------
         cmd_args = ""
 
@@ -1122,11 +1001,15 @@ def Run_Build_Command(parameters):
         if parameters['no_qt_uitools']:
             cmd_args += " \\\n  -without-qt-uitools"
 
-        # (G) options to `make` tool
+        # (G) don't want to use libgit2?
+        if NoLibGit2:
+            cmd_args += " \\\n  -libgit2"
+
+        # (H) options to `make` tool
         if 'make_options' in parameters:
             cmd_args += " \\\n  -option %s" % parameters['make_options']
 
-        # (H) about Ruby
+        # (I) about Ruby
         if 'ruby' in parameters:
             cmd_args += " \\\n  -ruby   %s" % parameters['ruby']
             cmd_args += " \\\n  -rbinc  %s" % parameters['rbinc']
@@ -1136,7 +1019,7 @@ def Run_Build_Command(parameters):
         else:
             cmd_args += " \\\n  -noruby"
 
-        # (I) about Python
+        # (J) about Python
         if 'python' in parameters:
             cmd_args += " \\\n  -python %s" % parameters['python']
             cmd_args += " \\\n  -pyinc  %s" % parameters['pyinc']
@@ -1145,7 +1028,7 @@ def Run_Build_Command(parameters):
             cmd_args += " \\\n  -nopython"
 
         #-----------------------------------------------------
-        # [2] Make the consolidated command line
+        # [3] Make the consolidated command line
         #-----------------------------------------------------
         command  = "time"
         command += " \\\n  %s" % parameters['build_cmd']
@@ -1158,7 +1041,7 @@ def Run_Build_Command(parameters):
             sys.exit(0)
 
         #-----------------------------------------------------
-        # [3] Invoke the main Bash script; takes time:-)
+        # [4] Invoke the main Bash script; takes time:-)
         #-----------------------------------------------------
         myscript = os.path.basename(__file__)
         ret = subprocess.call( command, shell=True )
@@ -1177,7 +1060,7 @@ def Run_Build_Command(parameters):
         print( "", file=sys.stderr )
 
         #------------------------------------------------------------------------
-        # [4] Prepare "*.macQAT/" directory for the QATest.
+        # [5] Prepare "*.macQAT/" directory for the QATest.
         #     Binaries under "*.macQAT/" such as *.dylib will be touched later.
         #------------------------------------------------------------------------
         print( "### Preparing <%s>" % MacBuildDirQAT )
@@ -1209,7 +1092,6 @@ def Run_Build_Command(parameters):
 
         os.remove( tarFile )
         os.chdir( "../" )
-        shutil.copy2( "macbuild/macQAT.sh", MacBuildDirQAT )
         shutil.copy2( "macbuild/macQAT.py", MacBuildDirQAT )
         print( "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", file=sys.stderr )
         print( "### <%s>: prepared the initial *.macQAT/" % myscript, file=sys.stderr )
@@ -1217,7 +1099,7 @@ def Run_Build_Command(parameters):
         print( "", file=sys.stderr )
 
     #------------------------------------------------------------------------
-    # [5] Build <pymod> for some predetermined environments on demand
+    # [6] Build <pymod> for some predetermined environments on demand
     #------------------------------------------------------------------------
     BuildPymod = parameters['BuildPymod']
     if BuildPymod:
@@ -1250,6 +1132,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     ModuleRuby     = config['ModuleRuby']
     ModulePython   = config['ModulePython']
     ToolDebug      = config['ToolDebug']
+    HBPythonIs39   = config['HBPythonIs39']
 
     BuildPymod     = parameters['BuildPymod']
     ProjectDir     = parameters['project_dir']
@@ -1325,7 +1208,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     #                             +-- Frameworks/+
     #                             |              +-- '*.framework'
     #                             |              +-- '*.dylib'
-    #                             |              +-- 'db_plugins' --slink--> ../MacOS/db_plugins/
+    #                             |              +-- 'db_plugins' --sym.link--> ../MacOS/db_plugins/
     #                             +-- MacOS/+
     #                             |         +-- 'klayout'
     #                             |         +-- db_plugins/
@@ -1336,12 +1219,10 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     #                             |         :
     #                             |         +-- 'strmxor'
     #                             |
-    #                             +-- pymod-dist/+ (created only if *.whl and *.egg are available)
+    #                             +-- pymod-dist/+ (created only if *.whl is available)
     #                                            +-- klayout-0.27.8-cp38-cp38-macosx_10_9_x86_64.whl (example)(1)
-    #                                            +-- klayout-0.27.8-py3.8-macosx-10.9-x86_64.egg (example)(2)
     #
-    #                                            (1) *.whl is recommended to install with 'pip3'
-    #                                            (2) *.egg is for 'easy_install' users
+    #                                            (1) *.whl is install with 'pip3'
     #--------------------------------------------------------------------------------------------------------------
     targetDir0 = "%s/klayout.app/Contents" % AbsMacPkgDir
     targetDirR = targetDir0 + "/Resources"
@@ -1468,7 +1349,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     #             +-- Frameworks/+
     #             |              +-- '*.framework'
     #             |              +-- '*.dylib'
-    #             |              +-- 'db_plugins' --slink--> ../MacOS/db_plugins/
+    #             |              +-- 'db_plugins' --sym.link--> ../MacOS/db_plugins/
     #             +-- MacOS/+
     #             |         +-- 'klayout'
     #             |         +-- db_plugins/
@@ -1531,8 +1412,6 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     # (C) the Pymod
     if BuildPymod and not pymodDistDir == "":
         for item in glob.glob( pymodDistDir + "/*.whl" ):
-            shutil.copy2( item,  targetDirP )
-        for item in glob.glob( pymodDistDir + "/*.egg" ):
             shutil.copy2( item,  targetDirP )
 
     print( " [7] Setting and changing the identification names of KLayout's libraries in each executable ..." )
@@ -1621,16 +1500,16 @@ def Deploy_Binaries_For_Bundle(config, parameters):
         #    [*] lrwxr-xr-x 1 kazzz-s admin  27 12 16 21:40 Resources -> Versions/Current/Resources/
         #        drwxr-xr-x 4 kazzz-s admin 128 12 16 21:40 Versions
         #-----------------------------------------------------------------------------------------------
-        deploymentPython38HB   = (ModulePython == 'Python38Brew')
+        deploymentPython311HB  = (ModulePython == 'Python311Brew')
         deploymentPython39HB   = (ModulePython == 'Python39Brew')
         deploymentPythonAutoHB = (ModulePython == 'PythonAutoBrew')
-        if (deploymentPython38HB or deploymentPython39HB or deploymentPythonAutoHB) and NonOSStdLang:
+        if (deploymentPython311HB or deploymentPython39HB or deploymentPythonAutoHB) and NonOSStdLang:
             # from build4mac_util import WalkFrameworkPaths, PerformChanges
             # from build4mac_util import Change_Python_LibPath_RelativeToAbsolute, DumpDependencyDic
 
-            if deploymentPython38HB:
-                HBPythonFrameworkPath = HBPython38FrameworkPath
-                pythonHBVer           = "3.8" # 'pinned' to this version as of KLayout version 0.26.7 (2020-09-13)
+            if deploymentPython311HB:
+                HBPythonFrameworkPath = HBPython311FrameworkPath
+                pythonHBVer           = "3.11" # 'pinned' to this version as of KLayout version 0.28.12 (2020-10-27)
             elif deploymentPython39HB:
                 HBPythonFrameworkPath = HBPython39FrameworkPath
                 pythonHBVer           = "3.9" # 'pinned' to this version as of KLayout version 0.28.2 (2023-01-02)
@@ -1684,7 +1563,16 @@ def Deploy_Binaries_For_Bundle(config, parameters):
                     print( msg % command, file=sys.stderr )
                     sys.exit(1)
 
-            shutil.copy2( sourceDir2 + "/start-console.py", targetDirM )
+            if HBPythonIs39 == None or HBPythonIs39 == True:
+                shutil.copy2( sourceDir2 + "/start-console.py", targetDirM )
+            else:
+                ret = Generate_Start_Console_Py( sourceDir2 + "/template-start-console.py",
+                                                 pythonHBVer,
+                                                 targetDirM + "/start-console.py" )
+                if ret == False:
+                    print( "! Generate_Start_Console_Py() failed", file=sys.stderr )
+                    return 1
+
             shutil.copy2( sourceDir2 + "/klayout_console",  targetDirM )
             os.chmod( targetDirM + "/start-console.py", 0o0755 )
             os.chmod( targetDirM + "/klayout_console",  0o0755 )
@@ -1724,28 +1612,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             PerformChanges( depdict, replacePairs, bundleExecPathAbs, debug_level=dbglevel )
 
             #---------------------------------------------------------------------------------------------------
-            # As of 2023-07-09 (KLayout 0.28.10),
-            #   python@3.9 (Python 3.9.17) in [ 'Ventura', 'Monterey', 'BigSur' ] depends on openssl@3
-            #     % brew deps python@3.9
-            #     ca-certificates
-            #     gdbm
-            #     mpdecimal
-            #     openssl@3 <===
-            #     readline
-            #     sqlite
-            #     xz
-            #
-            #   python@3.9 (Python 3.9.16; already stopped upgrading) in ['Catalina'] depends on openssl@1.1
-            #     ca-certificates
-            #     gdbm
-            #     gettext
-            #     mpdecimal
-            #     openssl@1.1 <===
-            #     readline
-            #     sqlite
-            #     xz
-            #---------------------------------------------------------------------------------------------------
-            # https://formulae.brew.sh/formula/python@3.9#default
+            # https://formulae.brew.sh/formula/python@3.9
             #   as of 2023-09-22, python@3.9 depends on:
             #     gdbm        1.23    GNU database manager
             #     mpdecimal   2.5.1   Library for decimal floating point arithmetic
@@ -1754,46 +1621,32 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             #     sqlite      3.43.1  Command-line interface for SQLite
             #     xz          5.4.4   General-purpose data compression with high compression ratio
             #---------------------------------------------------------------------------------------------------
-            if Platform in ['Catalina']:
-                print( "   [9.2.4] Patching [openssl@1.1, gdbm, mpdecimal, readline, sqlite, xz]" )
-                if 924 in ToolDebug:
-                    dbglevel = 924
-                else:
-                    dbglevel = 0
-                usrLocalPath    = '%s/opt/' % DefaultHomebrewRoot
-                appUsrLocalPath = '@executable_path/../Frameworks/'
-                replacePairs    = [ (usrLocalPath, appUsrLocalPath, True) ]
-                replacePairs.extend( [ (openssl_version, '@executable_path/../Frameworks/openssl@1.1', True)
-                    for openssl_version in glob.glob( '%s/Cellar/openssl@1.1/*' % DefaultHomebrewRoot ) ] )
-                filterreg = r'\t+%s/(opt|Cellar)' % DefaultHomebrewRoot
-                depdict   = WalkFrameworkPaths( [pythonFrameworkPath + '/../openssl@1.1',
-                                                 pythonFrameworkPath + '/../gdbm',
-                                                 pythonFrameworkPath + '/../mpdecimal',
-                                                 pythonFrameworkPath + '/../readline',
-                                                 pythonFrameworkPath + '/../sqlite',
-                                                 pythonFrameworkPath + '/../xz'],
-                                                 search_path_filter=filterreg,
-                                                 debug_level=dbglevel )
-            else: # [ 'Ventura', 'Monterey', 'BigSur' ]
-                print( "   [9.2.4] Patching [openssl@3, gdbm, mpdecimal, readline, sqlite, xz]" )
-                if 924 in ToolDebug:
-                    dbglevel = 924
-                else:
-                    dbglevel = 0
-                usrLocalPath    = '%s/opt/' % DefaultHomebrewRoot
-                appUsrLocalPath = '@executable_path/../Frameworks/'
-                replacePairs    = [ (usrLocalPath, appUsrLocalPath, True) ]
-                replacePairs.extend( [ (openssl_version, '@executable_path/../Frameworks/openssl@3', True)
-                    for openssl_version in glob.glob( '%s/Cellar/openssl@3/*' % DefaultHomebrewRoot ) ] )
-                filterreg = r'\t+%s/(opt|Cellar)' % DefaultHomebrewRoot
-                depdict   = WalkFrameworkPaths( [pythonFrameworkPath + '/../openssl@3',
-                                                 pythonFrameworkPath + '/../gdbm',
-                                                 pythonFrameworkPath + '/../mpdecimal',
-                                                 pythonFrameworkPath + '/../readline',
-                                                 pythonFrameworkPath + '/../sqlite',
-                                                 pythonFrameworkPath + '/../xz'],
-                                                 search_path_filter=filterreg,
-                                                 debug_level=dbglevel )
+            # https://formulae.brew.sh/formula/python@3.11
+            #   as of 2023-10-24, python@3.11 depends on:
+            #     mpdecimal   2.5.1   Library for decimal floating point arithmetic
+            #     openssl@3   3.1.3   Cryptography and SSL/TLS Toolkit
+            #     sqlite      3.43.2  Command-line interface for SQLite
+            #     xz          5.4.4   General-purpose data compression with high compression ratio
+            #---------------------------------------------------------------------------------------------------
+            print( "   [9.2.4] Patching [mpdecimal, openssl@3, sqlite, xz(, gdbm, readline)]" )
+            if 924 in ToolDebug:
+                dbglevel = 924
+            else:
+                dbglevel = 0
+            usrLocalPath    = '%s/opt/' % DefaultHomebrewRoot
+            appUsrLocalPath = '@executable_path/../Frameworks/'
+            replacePairs    = [ (usrLocalPath, appUsrLocalPath, True) ]
+            replacePairs.extend( [ (openssl_version, '@executable_path/../Frameworks/openssl@3', True)
+                for openssl_version in glob.glob( '%s/Cellar/openssl@3/*' % DefaultHomebrewRoot ) ] )
+            filterreg = r'\t+%s/(opt|Cellar)' % DefaultHomebrewRoot
+            depdict   = WalkFrameworkPaths( [pythonFrameworkPath + '/../mpdecimal',
+                                             pythonFrameworkPath + '/../openssl@3',
+                                             pythonFrameworkPath + '/../sqlite',
+                                             pythonFrameworkPath + '/../xz',
+                                             pythonFrameworkPath + '/../gdbm',
+                                             pythonFrameworkPath + '/../readline'],
+                                             search_path_filter=filterreg,
+                                             debug_level=dbglevel )
 
             DumpDependencyDic( "[9.2.4]", depdict, debug_level=dbglevel )
             PerformChanges( depdict, replacePairs, bundleExecPathAbs, debug_level=dbglevel )
@@ -1819,27 +1672,58 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             replacePairs = [ (HBPythonFrameworkPath, appPythonFrameworkPath, False) ]
             PerformChanges( depdict, replacePairs, bundleExecPathAbs, debug_level=dbglevel )
 
-            print( "  [9.4] Patching site.py, pip/, and distutils/" )
+            print( "  [9.4] Patching site.py and pip/" )
             if 940 in ToolDebug:
                 dbglevel = 940
             else:
                 dbglevel = 0
             site_module = "%s/Versions/%s/lib/python%s/site.py" % (pythonFrameworkPath, pythonHBVer, pythonHBVer)
+            #-----------------------------------------------------------------------------------------
+            # Rewrite the above <site.py> file.
+            #     :
+            #     # Prefixes for site-packages; add additional prefixes like /usr/local here
+            #     PREFIXES = [sys.prefix, sys.exec_prefix]
+            # (1) sys.real_prefix = sys.prefix <=== (1) add
+            #     # Enable per user site-packages directory
+            #     # set it to False to disable the feature or True to force the feature
+            # (2) ENABLE_USER_SITE = False <=== (2) modify
+            #     :
+            #
+            # This will fool pip into thinking it's inside a virtual environment
+            # and install new packages to the correct site-packages.
+            #-----------------------------------------------------------------------------------------
+            # It looks like the technique of modifying <site.py> works when Python<=3.9 as follows.
+            # However, it doesn't when 3.11<=Python.
+            #
+            # In </home/kazzz-s/GitWork/cpython-39/Lib/site.py> (Linux source code build)
+            #    :
+            #    # Prefixes for site-packages; add additional prefixes like /usr/local here
+            #    PREFIXES = [sys.prefix, sys.exec_prefix]
+            #    # Enable per user site-packages directory
+            #    # set it to False to disable the feature or True to force the feature
+            #    ENABLE_USER_SITE = None
+            #    print( "### I have imported the modified <%s>" % __file__ ) <=== (3) added
+            #    :
+            #
+            #  MyLinux{kazzz-s}(1)$ ./python
+            #  ### I have imported the modified </home/kazzz-s/GitWork/cpython-39/Lib/site.py> ---(3)
+            #  Python 3.9.18+ (heads/3.9:43a6e4fa49, Oct 27 2023, 12:51:17)
+            #  [GCC 9.4.0] on linux
+            #  Type "help", "copyright", "credits" or "license" for more information.
+            #  >>>
+            #-----------------------------------------------------------------------------------------
             with open(site_module, 'r') as site:
                 buf = site.readlines()
             with open(site_module, 'w') as site:
-                import re
                 for line in buf:
-                    # This will fool pip into thinking it's inside a virtual environment
-                    # and install new packages to the correct site-packages
                     if re.match("^PREFIXES", line) is not None:
-                        line = line + "sys.real_prefix = sys.prefix\n"
+                        line = line + "sys.real_prefix = sys.prefix\n" # --- (1)
                     # do not allow installation in the user folder.
                     if re.match("^ENABLE_USER_SITE", line) is not None:
-                        line = "ENABLE_USER_SITE = False\n"
+                        line = "ENABLE_USER_SITE = False\n" # --- (2)
                     site.write(line)
 
-            #----------------------------------------------------------------------------------
+            #-----------------------------------------------------------------------------------------
             # Typical usage of 'pip' after installation of the DMG package
             #
             # $ cd /Applications/klayout.app/Contents/MacOS/
@@ -1857,29 +1741,61 @@ def Deploy_Binaries_For_Bundle(config, parameters):
             # >>> quit()
             #
             # 'pandas' depends on many modules including 'numpy'. They are also installed.
-            #----------------------------------------------------------------------------------
+            #-----------------------------------------------------------------------------------------
             pip_module = "%s/Versions/%s/lib/python%s/site-packages/pip/__init__.py" % \
                                      (pythonFrameworkPath, pythonHBVer, pythonHBVer)
             with open(pip_module, 'r') as pip:
                 buf = pip.readlines()
             with open(pip_module, 'w') as pip:
-                import re
                 for line in buf:
                     # this will reject user's configuration of pip, forcing the isolated mode
                     line = re.sub("return isolated$", "return isolated or True", line)
                     pip.write(line)
 
-            distutilsconfig = "%s/Versions/%s/lib/python%s/distutils/distutils.cfg" % \
+            #----------------------------------------------------------------------------------------------------
+            # Patch distutils/ in older versions of Python.
+            # However, newer versions of Python deprecate the distutils.cfg file and the distutils module itself.
+            #   Ref. https://github.com/Homebrew/homebrew-core/issues/76621
+            #----------------------------------------------------------------------------------------------------
+            if deploymentPython39HB or (HBPythonAutoVersion == "3.9"): # Python == 3.9
+                print( deploymentPython39HB, HBPythonAutoVersion )
+                print( "  [9.5.1] Patching distutils/" )
+                if 951 in ToolDebug:
+                    dbglevel = 951
+                else:
+                    dbglevel = 0
+                distutilsconfig = "%s/Versions/%s/lib/python%s/distutils/distutils.cfg" % \
                                                 (pythonFrameworkPath, pythonHBVer, pythonHBVer)
-            with open(distutilsconfig, 'r') as file:
-                buf = file.readlines()
-            with open(distutilsconfig, 'w') as file:
-                import re
-                for line in buf:
-                    # This will cause all packages to be installed to sys.prefix
-                    if re.match('prefix=', line) is not None:
-                        continue
-                    file.write(line)
+                #-----------------------------------------------------------------------------------------
+                # Rewrite the above <distutils.cfg> file in Homebrew python@3.9.18.
+                #    [install]
+                #    prefix=/usr/local <=== remove this line
+                #    [build_ext]
+                #    include_dirs=/usr/local/include:/usr/local/opt/openssl@3/include:\
+                #                 /usr/local/opt/sqlite/include
+                #    library_dirs=/usr/local/lib:/usr/local/opt/openssl@3/lib:/usr/local/opt/sqlite/lib
+                #
+                # This will cause all packages to be installed to sys.prefix
+                #-----------------------------------------------------------------------------------------
+                with open(distutilsconfig, 'r') as file:
+                    buf = file.readlines()
+                with open(distutilsconfig, 'w') as file:
+                    for line in buf:
+                        if re.match('prefix=', line) is not None:
+                            continue
+                        file.write(line)
+
+            elif deploymentPython311HB or (HBPythonAutoVersion == "3.11"): # Python == 3.11
+                # The above 'distutils.cfg' file does not exist in the distutils/ directory of Python 3.11.
+                # Use a different technique.
+                print( "  [9.5.2] In the Python3.11 environment, use an alternative method of patching distutils/" )
+                print( "          See Contents/MacOS/start-console.py in /Applications/klayout.app/" )
+            else: # other than ["3.11", "3.9"]; "3.12" <= Python is yet to be tested
+                print( "!!! HW-dmg package assumes either python@3.11 or python@3.9" )
+                print( "!!! 'distutils' has been deprecated in 3.12 <= Python" )
+                print("")
+                os.chdir(ProjectDir)
+                return 1
 
         #-------------------------------------------------------------
         # [10] Special deployment of Ruby3.2 from Homebrew?
@@ -1921,7 +1837,7 @@ def Main():
     pp.pprint(parameters)
 
     if not config['DeploymentF'] and not config['DeploymentP']:
-        ret = Run_Build_Command(parameters)
+        ret = Run_Build_Command(config, parameters)
         pp.pprint(config)
         if not ret == 0:
             sys.exit(1)

@@ -1345,7 +1345,7 @@ bbox_for_circuit (const db::Layout *layout, const db::Circuit *circuit)
 void
 NetlistBrowserPage::adjust_view ()
 {
-  if (! mp_database.get () || ! mp_view) {
+  if (! mp_database.get () || ! mp_database->netlist () || ! mp_view) {
     return;
   }
 
@@ -1666,7 +1666,7 @@ NetlistBrowserPage::update_highlights ()
   }
 
   clear_markers ();
-  if (! mp_database.get () || ! mp_view) {
+  if (! mp_database.get () || ! mp_database->netlist () || ! mp_view) {
     return;
   }
 

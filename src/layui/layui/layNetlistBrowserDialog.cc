@@ -677,7 +677,13 @@ NetlistBrowserDialog::l2ndbs_changed ()
 
   for (unsigned int i = 0; i < view ()->num_l2ndbs (); ++i) {
     const db::LayoutToNetlist *l2ndb = view ()->get_l2ndb (i);
-    mp_ui->l2ndb_cb->addItem (tl::to_qstring (l2ndb->name ()));
+    std::string text = l2ndb->name ();
+    if (! l2ndb->description ().empty ()) {
+      text += " (";
+      text += l2ndb->description ();
+      text += ")";
+    }
+    mp_ui->l2ndb_cb->addItem (tl::to_qstring (text));
     if (l2ndb->name () == m_l2ndb_name) {
       l2n_index = i;
     }

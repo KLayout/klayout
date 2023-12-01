@@ -1337,7 +1337,7 @@ BEGIN_PROTECTED
   db::Technology tech = *db::Technologies::instance ()->technology_by_name (tech_name);
 
   //  call the dialog and if successful, install the new technology
-  lay::TechComponentSetupDialog dialog (this, &tech, db::net_tracer_component_name ());
+  lay::TechComponentSetupDialog dialog (isVisible () ? this : parentWidget (), &tech, db::net_tracer_component_name ());
   if (dialog.exec ()) {
     *db::Technologies::instance ()->technology_by_name (tech.name ()) = tech;
     update_list_of_stacks ();

@@ -378,8 +378,10 @@ NetTracerData::configure_l2n (db::LayoutToNetlist &l2n)
 
   //  make all connections (intra and inter-layer)
   for (std::map<unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder> >::const_iterator r = m_l2n_regions.begin (); r != m_l2n_regions.end (); ++r) {
-    l2n.connect (*r->second->get ());
     const std::set<unsigned int> &connections_to = log_connections (r->first);
+    if (! connections_to.empty ()) {
+      l2n.connect (*r->second->get ());
+    }
     for (std::set<unsigned int>::const_iterator c = connections_to.begin (); c != connections_to.end (); ++c) {
       std::map<unsigned int, tl::shared_ptr<NetTracerLayerExpression::RegionHolder> >::const_iterator rc = m_l2n_regions.find (*c);
       if (rc != m_l2n_regions.end ()) {

@@ -237,7 +237,7 @@ echo ']' >>$target/.python-paths.txt
 
 pushd $target
 
-new_libs=$(find . -name "*.dll" -or -name "*.so")
+new_libs=$(find . -name "*.dll" -or -name "*.pyd" -or -name "*.so")
 
 while [ "$new_libs" != "" ]; do
 

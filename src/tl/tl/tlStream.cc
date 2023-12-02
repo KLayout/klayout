@@ -747,18 +747,20 @@ InputFile::filename () const
 InputZLibFile::InputZLibFile (const std::string &path)
   : mp_d (new ZLibFilePrivate ())
 {
-  m_source = tl::absolute_file_path (path);
+  m_source = path;
+  std::string source = tl::absolute_file_path (path);
+
 #if defined(_WIN32)
-  int fd = _wopen (tl::to_wstring (m_source).c_str (), _O_BINARY | _O_RDONLY | _O_SEQUENTIAL);
+  int fd = _wopen (tl::to_wstring (source).c_str (), _O_BINARY | _O_RDONLY | _O_SEQUENTIAL);
   if (fd < 0) {
-    throw FileOpenErrorException (m_source, errno);
+    throw FileOpenErrorException (source, errno);
   }
   mp_d->zs = gzdopen (fd, "rb");
 #else
-  mp_d->zs = gzopen (tl::string_to_system (m_source).c_str (), "rb");
+  mp_d->zs = gzopen (tl::string_to_system (source).c_str (), "rb");
 #endif
   if (mp_d->zs == NULL) {
-    throw FileOpenErrorException (m_source, errno);
+    throw FileOpenErrorException (source, errno);
   }
 }
 

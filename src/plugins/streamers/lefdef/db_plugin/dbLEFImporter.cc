@@ -695,6 +695,80 @@ LEFImporter::read_viadef (Layout &layout, const std::string &nondefaultrule)
   expect (n);
 }
 
+static void
+read_width_property (const std::string &name, const std::string &value, double &w, double &w_wrongdir, double &wmin, double &wmin_wrongdir)
+{
+  if (name == "LEF58_MINWIDTH") {
+
+    //  Cadence extension
+    tl::Extractor ex (value.c_str ());
+    double v = 0.0;
+    if (ex.test ("MINWIDTH") && ex.try_read (v)) {
+      if (ex.test ("WRONGDIRECTION")) {
+        wmin_wrongdir = v;
+      } else {
+        wmin = v;
+      }
+    }
+
+  } else if (name == "LEF58_WIDTH") {
+
+    //  Cadence extension
+    tl::Extractor ex (value.c_str ());
+    double v = 0.0;
+    if (ex.test ("WIDTH") && ex.try_read (v)) {
+      if (ex.test ("WRONGDIRECTION")) {
+        w_wrongdir = v;
+      } else {
+        w = v;
+      }
+    }
+
+  } else if (name == "LEF58_WIDTHTABLE") {
+
+    //  Cadence extension
+    tl::Extractor ex (value.c_str ());
+    while (! ex.at_end ()) {
+
+      if (ex.test ("WIDTHTABLE")) {
+
+        bool wrongdirection = false;
+        double v = 0.0;
+        double vv;
+        while (! ex.at_end () && *ex != ';') {
+          if (ex.try_read (vv)) {
+            if (v == 0.0 || vv < v) {
+              v = vv;
+            }
+          } else if (ex.test ("WRONGDIRECTION")) {
+            wrongdirection = true;
+          } else if (ex.test ("ORTHOGONAL")) {
+            //  .. nothing yet ..
+          } else {
+            break;
+          }
+        }
+
+        if (v > 0.0) {
+          if (wrongdirection) {
+            w_wrongdir = wmin_wrongdir = v;
+          } else {
+            w = wmin = v;
+          }
+        }
+
+      }
+
+      while (! ex.at_end () && *ex != ';') {
+        ++ex;
+      }
+      ex.test (";");
+
+    }
+
+  }
+}
+
 void
 LEFImporter::read_layer (Layout & /*layout*/)
 {
@@ -771,38 +845,9 @@ LEFImporter::read_layer (Layout & /*layout*/)
     } else if (test ("PROPERTY")) {
 
       while (! test (";") && ! at_end ()) {
-
         std::string name = get ();
-        tl::Variant value = get ();
-
-        if (name == "LEF58_MINWIDTH") {
-
-          //  Cadence extension
-          tl::Extractor ex (value.to_string ());
-          double v = 0.0;
-          if (ex.test ("MINWIDTH") && ex.try_read (v)) {
-            if (ex.test ("WRONGDIRECTION")) {
-              wmin_wrongdir = v;
-            } else {
-              wmin = v;
-            }
-          }
-
-        } else if (name == "LEF58_WIDTH") {
-
-          //  Cadence extension
-          tl::Extractor ex (value.to_string ());
-          double v = 0.0;
-          if (ex.test ("WIDTH") && ex.try_read (v)) {
-            if (ex.test ("WRONGDIRECTION")) {
-              w_wrongdir = v;
-            } else {
-              w = v;
-            }
-          }
-
-        }
-
+        std::string value = get ();
+        read_width_property (name, value, w, w_wrongdir, wmin, wmin_wrongdir);
       }
 
     } else {

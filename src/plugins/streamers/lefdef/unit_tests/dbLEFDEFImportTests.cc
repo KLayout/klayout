@@ -1018,3 +1018,9 @@ TEST(210_overlaps)
 }
 
 
+//  issue-1528
+TEST(212_widthtable)
+{
+  run_test (_this, "issue-1528", "map:gds.map+lef:tech.lef+def:routed.def", "au.oas", default_options (), false);
+}
+

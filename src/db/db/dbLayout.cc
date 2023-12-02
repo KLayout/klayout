@@ -812,7 +812,7 @@ Layout::delete_cells (const std::set<cell_index_type> &cells_to_delete)
     //  will disable us saving undo data with reference to them.
     if (manager () && manager ()->transacting ()) {
       for (unsigned int i = 0; i < layers (); ++i) {
-        if (is_valid_layer (i)) {
+        if (is_valid_layer (i) || is_special_layer (i)) {
           cref.clear (i);
         }
       }
@@ -880,7 +880,7 @@ Layout::delete_cell (cell_index_type id)
   //  will disable us saving undo data with reference to them.
   if (manager () && manager ()->transacting ()) {
     for (unsigned int i = 0; i < layers (); ++i) {
-      if (is_valid_layer (i)) {
+      if (is_valid_layer (i) || is_special_layer (i)) {
         cref.clear (i);
       }
     }

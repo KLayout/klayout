@@ -803,7 +803,7 @@ static void set_shape_layer_index (db::Shape *s, unsigned int layer)
     throw tl::Exception (tl::to_string (tr ("Shape does not belong to a layout")));
   }
 
-  if (! layout->is_valid_layer (layer)) {
+  if (! layout->is_valid_layer (layer) && ! layout->is_special_layer (layer)) {
     throw tl::Exception (tl::to_string (tr ("Layer index does not point to a valid layer")));
   }
 

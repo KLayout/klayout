@@ -60,33 +60,52 @@ private:
 
 }
 
+static void check_layer (const db::Layout &layout, unsigned int layer)
+{
+  if (! layout.is_valid_layer (layer) && ! layout.is_special_layer (layer)) {
+    throw tl::Exception (tl::to_string (tr ("Invalid layer index %d")), int (layer));
+  }
+}
+
 static db::RecursiveShapeIterator *new_si1 (const db::Layout &layout, const db::Cell &cell, unsigned int layer)
 {
+  check_layer (layout, layer);
   return new db::RecursiveShapeIterator (layout, cell, layer);
 }
 
 static db::RecursiveShapeIterator *new_si2 (const db::Layout &layout, const db::Cell &cell, const std::vector<unsigned int> &layers)
 {
+  for (auto l = layers.begin (); l != layers.end (); ++l) {
+    check_layer (layout, *l);
+  }
   return new db::RecursiveShapeIterator (layout, cell, layers);
 }
 
 static db::RecursiveShapeIterator *new_si3 (const db::Layout &layout, const db::Cell &cell, unsigned int layer, const db::Box &box, bool overlapping)
 {
+  check_layer (layout, layer);
   return new db::RecursiveShapeIterator (layout, cell, layer, box, overlapping);
 }
 
 static db::RecursiveShapeIterator *new_si3a (const db::Layout &layout, const db::Cell &cell, unsigned int layer, const db::Region &region, bool overlapping)
 {
+  check_layer (layout, layer);
   return new db::RecursiveShapeIterator (layout, cell, layer, region, overlapping);
 }
 
 static db::RecursiveShapeIterator *new_si4 (const db::Layout &layout, const db::Cell &cell, const std::vector<unsigned int> &layers, const db::Box &box, bool overlapping)
 {
+  for (auto l = layers.begin (); l != layers.end (); ++l) {
+    check_layer (layout, *l);
+  }
   return new db::RecursiveShapeIterator (layout, cell, layers, box, overlapping);
 }
 
 static db::RecursiveShapeIterator *new_si4a (const db::Layout &layout, const db::Cell &cell, const std::vector<unsigned int> &layers, const db::Region &region, bool overlapping)
 {
+  for (auto l = layers.begin (); l != layers.end (); ++l) {
+    check_layer (layout, *l);
+  }
   return new db::RecursiveShapeIterator (layout, cell, layers, region, overlapping);
 }
 

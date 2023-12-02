@@ -681,15 +681,20 @@ write_options2 (db::Layout *layout, const std::string &filename, bool /*gzip*/, 
   write_options1 (layout, filename, options);
 }
 
-static db::RecursiveShapeIterator 
+static void check_layer (const db::Layout *layout, unsigned int layer)
+{
+  if (! layout->is_valid_layer (layer) && ! layout->is_special_layer (layer)) {
+    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
+  }
+}
+
+static db::RecursiveShapeIterator
 begin_shapes (const db::Layout *layout, db::cell_index_type starting_cell, unsigned int layer)
 {
   if (! layout->is_valid_layer (layer)) {
     throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
   }
-  if (! layout->is_valid_cell_index (starting_cell)) {
-    throw tl::Exception (tl::to_string (tr ("Invalid cell index")));
-  }
+  check_layer (layout, layer);
   return db::RecursiveShapeIterator (*layout, layout->cell (starting_cell), layer);
 }
 
@@ -702,9 +707,7 @@ begin_shapes2 (const db::Layout *layout, const db::Cell *cell, unsigned int laye
 static db::RecursiveShapeIterator 
 begin_shapes_touching (const db::Layout *layout, db::cell_index_type starting_cell, unsigned int layer, db::Box region)
 {
-  if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
-  }
+  check_layer (layout, layer);
   if (! layout->is_valid_cell_index (starting_cell)) {
     throw tl::Exception (tl::to_string (tr ("Invalid cell index")));
   }
@@ -720,9 +723,7 @@ begin_shapes_touching2 (const db::Layout *layout, const db::Cell *cell, unsigned
 static db::RecursiveShapeIterator 
 begin_shapes_overlapping (const db::Layout *layout, db::cell_index_type starting_cell, unsigned int layer, db::Box region)
 {
-  if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
-  }
+  check_layer (layout, layer);
   if (! layout->is_valid_cell_index (starting_cell)) {
     throw tl::Exception (tl::to_string (tr ("Invalid cell index")));
   }
@@ -738,9 +739,7 @@ begin_shapes_overlapping2 (const db::Layout *layout, const db::Cell *cell, unsig
 static db::RecursiveShapeIterator
 begin_shapes_touching_um (const db::Layout *layout, db::cell_index_type starting_cell, unsigned int layer, db::DBox region)
 {
-  if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
-  }
+  check_layer (layout, layer);
   if (! layout->is_valid_cell_index (starting_cell)) {
     throw tl::Exception (tl::to_string (tr ("Invalid cell index")));
   }
@@ -756,9 +755,7 @@ begin_shapes_touching2_um (const db::Layout *layout, const db::Cell *cell, unsig
 static db::RecursiveShapeIterator
 begin_shapes_overlapping_um (const db::Layout *layout, db::cell_index_type starting_cell, unsigned int layer, db::DBox region)
 {
-  if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
-  }
+  check_layer (layout, layer);
   if (! layout->is_valid_cell_index (starting_cell)) {
     throw tl::Exception (tl::to_string (tr ("Invalid cell index")));
   }

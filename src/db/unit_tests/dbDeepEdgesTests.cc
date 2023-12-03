@@ -29,6 +29,7 @@
 #include "dbEdgesUtils.h"
 #include "dbDeepShapeStore.h"
 #include "dbCellGraphUtils.h"
+#include "dbDeepEdges.h"
 #include "tlUnitTest.h"
 #include "tlStream.h"
 
@@ -1292,3 +1293,140 @@ TEST(20_in_and_out)
   db::compare_layouts (_this, target, tl::testdata () + "/algo/deep_edges_au20.gds");
 }
 
+TEST(deep_edges_and_cheats)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/cheats.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l10 = ly.get_layer (db::LayerProperties (10, 0));
+  unsigned int l11 = ly.get_layer (db::LayerProperties (11, 0));
+  unsigned int l12 = ly.get_layer (db::LayerProperties (12, 0));
+  unsigned int l13 = ly.get_layer (db::LayerProperties (13, 0));
+  unsigned int l14 = ly.get_layer (db::LayerProperties (14, 0));
+  unsigned int l19 = ly.get_layer (db::LayerProperties (19, 0));
+  unsigned int l20 = ly.get_layer (db::LayerProperties (20, 0));
+  unsigned int l21 = ly.get_layer (db::LayerProperties (21, 0));
+  unsigned int l22 = ly.get_layer (db::LayerProperties (22, 0));
+  unsigned int l23 = ly.get_layer (db::LayerProperties (23, 0));
+  unsigned int l24 = ly.get_layer (db::LayerProperties (24, 0));
+  unsigned int l29 = ly.get_layer (db::LayerProperties (29, 0));
+  unsigned int l30 = ly.get_layer (db::LayerProperties (30, 0));
+  unsigned int l31 = ly.get_layer (db::LayerProperties (31, 0));
+  unsigned int l32 = ly.get_layer (db::LayerProperties (32, 0));
+  unsigned int l33 = ly.get_layer (db::LayerProperties (33, 0));
+  unsigned int l34 = ly.get_layer (db::LayerProperties (34, 0));
+  unsigned int l39 = ly.get_layer (db::LayerProperties (39, 0));
+
+  db::DeepShapeStore dss;
+
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+  db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+
+  (r1.edges () - r2).insert_into (&ly, top_cell_index, l10);
+
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("A").second);
+
+  (r1.edges () - r2).insert_into (&ly, top_cell_index, l11);
+
+  dss.clear_breakout_cells (0);
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("B").second);
+
+  (r1.edges () - r2).insert_into (&ly, top_cell_index, l12);
+
+  dss.clear_breakout_cells (0);
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("C").second);
+
+  (r1.edges () - r2).insert_into (&ly, top_cell_index, l13);
+
+  dss.clear_breakout_cells (0);
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("D").second);
+
+  (r1.edges () - r2).insert_into (&ly, top_cell_index, l14);
+
+  dss.clear_breakout_cells (0);
+  (r1.edges () - r2).insert_into (&ly, top_cell_index, l19);
+
+  (r1.edges () - r2.edges ()).insert_into (&ly, top_cell_index, l20);
+
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("A").second);
+
+  (r1.edges () - r2.edges ()).insert_into (&ly, top_cell_index, l21);
+
+  dss.clear_breakout_cells (0);
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("B").second);
+
+  (r1.edges () - r2.edges ()).insert_into (&ly, top_cell_index, l22);
+
+  dss.clear_breakout_cells (0);
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("C").second);
+
+  (r1.edges () - r2.edges ()).insert_into (&ly, top_cell_index, l23);
+
+  dss.clear_breakout_cells (0);
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("D").second);
+
+  (r1.edges () - r2.edges ()).insert_into (&ly, top_cell_index, l24);
+
+  dss.clear_breakout_cells (0);
+  (r1.edges () - r2.edges ()).insert_into (&ly, top_cell_index, l29);
+
+  db::Region eo;
+  db::Edges e1;
+
+  e1 = r2.edges ();
+  e1.extended (eo, 0, 0, 500, 0);
+  eo.insert_into (&ly, top_cell_index, l30);
+  EXPECT_EQ (dynamic_cast<const db::DeepEdges *> (e1.delegate ())->merged_edges_available (), true);
+
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("A").second);
+
+  e1 = r2.edges ();
+  e1.extended (eo, 0, 0, 500, 0);
+  eo.insert_into (&ly, top_cell_index, l31);
+  EXPECT_EQ (dynamic_cast<const db::DeepEdges *> (e1.delegate ())->merged_edges_available (), true);
+
+  dss.clear_breakout_cells (0);
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("B").second);
+
+  e1 = r2.edges ();
+  e1.extended (eo, 0, 0, 500, 0);
+  eo.insert_into (&ly, top_cell_index, l32);
+  EXPECT_EQ (dynamic_cast<const db::DeepEdges *> (e1.delegate ())->merged_edges_available (), true);
+
+  dss.clear_breakout_cells (0);
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("C").second);
+
+  e1 = r2.edges ();
+  e1.extended (eo, 0, 0, 500, 0);
+  eo.insert_into (&ly, top_cell_index, l33);
+  EXPECT_EQ (dynamic_cast<const db::DeepEdges *> (e1.delegate ())->merged_edges_available (), true);
+
+  dss.clear_breakout_cells (0);
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("D").second);
+
+  e1 = r2.edges ();
+  e1.extended (eo, 0, 0, 500, 0);
+  eo.insert_into (&ly, top_cell_index, l34);
+  EXPECT_EQ (dynamic_cast<const db::DeepEdges *> (e1.delegate ())->merged_edges_available (), true);
+
+  dss.clear_breakout_cells (0);
+
+  e1 = r2.edges ();
+  e1.extended (eo, 0, 0, 500, 0);
+  eo.insert_into (&ly, top_cell_index, l39);
+  EXPECT_EQ (dynamic_cast<const db::DeepEdges *> (e1.delegate ())->merged_edges_available (), true);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/cheats_edges_au.gds");
+}

@@ -166,6 +166,11 @@ public:
   const std::set<db::cell_index_type> *breakout_cells () const;
 
   /**
+   *  @brief Gets a hash value representing the breakout cells
+   */
+  size_t breakout_cells_hash () const;
+
+  /**
    *  @brief Inserts the layer into the given layout, starting from the given cell and into the given layer
    */
   void insert_into (Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer) const;
@@ -251,6 +256,7 @@ public:
   bool reject_odd_polygons () const;
 
   const std::set<db::cell_index_type> *breakout_cells (unsigned int layout_index) const;
+  size_t breakout_cells_hash (unsigned int layout_index) const;
   void clear_breakout_cells (unsigned int layout_index);
   void set_breakout_cells (unsigned int layout_index, const std::set<db::cell_index_type> &boc);
   void add_breakout_cell (unsigned int layout_index, db::cell_index_type ci);
@@ -265,14 +271,14 @@ private:
   size_t m_max_vertex_count;
   bool m_reject_odd_polygons;
   tl::Variant m_text_property_name;
-  std::vector<std::set<db::cell_index_type> > m_breakout_cells;
+  std::vector<std::pair<std::set<db::cell_index_type>, size_t> > m_breakout_cells;
   int m_text_enlargement;
   bool m_subcircuit_hierarchy_for_nets;
 
-  std::set<db::cell_index_type> &ensure_breakout_cells (unsigned int layout_index)
+  std::pair<std::set<db::cell_index_type>, size_t> &ensure_breakout_cells (unsigned int layout_index)
   {
     if (m_breakout_cells.size () <= size_t (layout_index)) {
-      m_breakout_cells.resize (layout_index + 1, std::set<db::cell_index_type> ());
+      m_breakout_cells.resize (layout_index + 1, std::pair<std::set<db::cell_index_type>, size_t> ());
     }
     return m_breakout_cells [layout_index];
   }
@@ -781,6 +787,11 @@ public:
    *  Returns 0 if there are no breakout cells for this layout.
    */
   const std::set<db::cell_index_type> *breakout_cells (unsigned int layout_index) const;
+
+  /**
+   *  @brief Gets a hash value representing the breakout cells
+   */
+  size_t breakout_cells_hash (unsigned int layout_index) const;
 
   /**
    *  @brief Clears the breakout cell list for a given layout

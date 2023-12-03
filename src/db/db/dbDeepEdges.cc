@@ -176,6 +176,7 @@ DeepEdges::~DeepEdges ()
 DeepEdges::DeepEdges (const DeepEdges &other)
   : MutableEdges (other), DeepShapeCollectionDelegateBase (other),
     m_merged_edges_valid (other.m_merged_edges_valid),
+    m_merged_edges_boc_hash (other.m_merged_edges_boc_hash),
     m_is_merged (other.m_is_merged)
 {
   if (m_merged_edges_valid) {
@@ -192,6 +193,7 @@ DeepEdges::operator= (const DeepEdges &other)
     DeepShapeCollectionDelegateBase::operator= (other);
 
     m_merged_edges_valid = other.m_merged_edges_valid;
+    m_merged_edges_boc_hash = other.m_merged_edges_boc_hash;
     m_is_merged = other.m_is_merged;
     if (m_merged_edges_valid) {
       m_merged_edges = other.m_merged_edges.copy ();
@@ -205,6 +207,7 @@ DeepEdges::operator= (const DeepEdges &other)
 void DeepEdges::init ()
 {
   m_merged_edges_valid = false;
+  m_merged_edges_boc_hash = 0;
   m_merged_edges = db::DeepLayer ();
   m_is_merged = false;
 }
@@ -458,6 +461,7 @@ void DeepEdges::apply_property_translator (const db::PropertiesTranslator &pt)
   DeepShapeCollectionDelegateBase::apply_property_translator (pt);
 
   m_merged_edges_valid = false;
+  m_merged_edges_boc_hash = 0;
   m_merged_edges = db::DeepLayer ();
 }
 
@@ -637,10 +641,16 @@ DeepEdges::merged_deep_layer () const
   }
 }
 
+bool
+DeepEdges::merged_edges_available () const
+{
+  return m_is_merged || (m_merged_edges_valid && m_merged_edges_boc_hash == deep_layer ().breakout_cells_hash ());
+}
+
 void
 DeepEdges::ensure_merged_edges_valid () const
 {
-  if (! m_merged_edges_valid) {
+  if (! m_merged_edges_valid || (! m_is_merged && m_merged_edges_boc_hash != deep_layer ().breakout_cells_hash ())) {
 
     if (m_is_merged) {
 
@@ -659,7 +669,7 @@ DeepEdges::ensure_merged_edges_valid () const
       db::Connectivity conn;
       conn.connect (deep_layer ());
       hc.set_base_verbosity (base_verbosity() + 10);
-      hc.build (layout, deep_layer ().initial_cell (), conn);
+      hc.build (layout, deep_layer ().initial_cell (), conn, 0, deep_layer ().breakout_cells ());
 
       //  collect the clusters and merge them into larger edges
       //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is
@@ -683,6 +693,7 @@ DeepEdges::ensure_merged_edges_valid () const
     }
 
     m_merged_edges_valid = true;
+    m_merged_edges_boc_hash = deep_layer ().breakout_cells_hash ();
 
   }
 }
@@ -692,6 +703,7 @@ DeepEdges::set_is_merged (bool f)
 {
   m_is_merged = f;
   m_merged_edges_valid = false;
+  m_merged_edges_boc_hash = 0;
   m_merged_edges = db::DeepLayer ();
 }
 
@@ -909,7 +921,7 @@ DeepEdges::and_or_not_with (const DeepEdges *other, EdgeBoolOp op) const
 
   db::EdgeBoolAndOrNotLocalOperation local_op (op);
 
-  db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell ());
+  db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (deep_layer ().store ()->threads ());
   proc.set_area_ratio (deep_layer ().store ()->max_area_ratio ());
@@ -936,7 +948,7 @@ DeepEdges::edge_region_op (const DeepRegion *other, EdgePolygonOp::mode_t mode, 
 
   db::EdgeToPolygonLocalOperation op (mode, include_borders);
 
-  db::local_processor<db::Edge, db::PolygonRef, db::Edge> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell ());
+  db::local_processor<db::Edge, db::PolygonRef, db::Edge> proc (const_cast<db::Layout *> (&deep_layer ().layout ()), const_cast<db::Cell *> (&deep_layer ().initial_cell ()), &other->deep_layer ().layout (), &other->deep_layer ().initial_cell (), deep_layer ().breakout_cells (), other->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (deep_layer ().store ()->threads ());
   proc.set_area_ratio (deep_layer ().store ()->max_area_ratio ());
@@ -1253,7 +1265,6 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
   std::unique_ptr<db::DeepRegion> res (new db::DeepRegion (edges.derived ()));
 
   db::Layout &layout = const_cast<db::Layout &> (edges.layout ());
-  db::Cell &top_cell = const_cast<db::Cell &> (edges.initial_cell ());
 
   //  TODO: there is a special case when we'd need a MagnificationAndOrientationReducer:
   //  dots formally don't have an orientation, hence the interpretation is x and y.
@@ -1271,7 +1282,7 @@ RegionDelegate *DeepEdges::extended (coord_type ext_b, coord_type ext_e, coord_t
     db::Connectivity conn (db::Connectivity::EdgesConnectByPoints);
     conn.connect (edges);
     hc.set_base_verbosity (base_verbosity () + 10);
-    hc.build (layout, edges.initial_cell (), conn);
+    hc.build (layout, edges.initial_cell (), conn, 0, edges.breakout_cells ());
 
     //  TODO: iterate only over the called cells?
     for (db::Layout::iterator c = layout.begin (); c != layout.end (); ++c) {
@@ -1714,7 +1725,7 @@ DeepEdges::selected_interacting_generic (const Region &other, EdgeInteractionMod
 
   db::Edge2PolygonInteractingLocalOperation op (mode, inverse ? db::Edge2PolygonInteractingLocalOperation::Inverse : db::Edge2PolygonInteractingLocalOperation::Normal);
 
-  db::local_processor<db::Edge, db::PolygonRef, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
+  db::local_processor<db::Edge, db::PolygonRef, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), edges.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (edges.store ()->threads ());
 
@@ -1746,7 +1757,7 @@ DeepEdges::selected_interacting_pair_generic (const Region &other, EdgeInteracti
 
   db::Edge2PolygonInteractingLocalOperation op (mode, db::Edge2PolygonInteractingLocalOperation::Both);
 
-  db::local_processor<db::Edge, db::PolygonRef, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
+  db::local_processor<db::Edge, db::PolygonRef, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), edges.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (edges.store ()->threads ());
 
@@ -1772,7 +1783,7 @@ DeepEdges::selected_interacting_generic (const Edges &other, EdgeInteractionMode
 
   db::Edge2EdgeInteractingLocalOperation op (mode, inverse ? db::Edge2EdgeInteractingLocalOperation::Inverse : db::Edge2EdgeInteractingLocalOperation::Normal);
 
-  db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
+  db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), edges.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (edges.store ()->threads ());
 
@@ -1804,7 +1815,7 @@ DeepEdges::selected_interacting_pair_generic (const Edges &other, EdgeInteractio
 
   db::Edge2EdgeInteractingLocalOperation op (mode, db::Edge2EdgeInteractingLocalOperation::Both);
 
-  db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
+  db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), edges.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (edges.store ()->threads ());
 
@@ -1830,7 +1841,7 @@ RegionDelegate *DeepEdges::pull_generic (const Region &other) const
 
   db::Edge2PolygonPullLocalOperation op;
 
-  db::local_processor<db::Edge, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell ());
+  db::local_processor<db::Edge, db::PolygonRef, db::PolygonRef> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_polygons.layout (), &other_polygons.initial_cell (), edges.breakout_cells (), other_polygons.breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (edges.store ()->threads ());
 
@@ -1856,7 +1867,7 @@ EdgesDelegate *DeepEdges::pull_generic (const Edges &other) const
 
   db::Edge2EdgePullLocalOperation op;
 
-  db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_edges.layout (), &other_edges.initial_cell ());
+  db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_edges.layout (), &other_edges.initial_cell (), edges.breakout_cells (), other_edges.breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (edges.store ()->threads ());
 
@@ -1885,7 +1896,7 @@ EdgesDelegate *DeepEdges::in (const Edges &other, bool invert) const
 
   db::ContainedEdgesLocalOperation op (invert ? Negative : Positive);
 
-  db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
+  db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), edges.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (edges.store ()->threads ());
 
@@ -1916,7 +1927,7 @@ std::pair<EdgesDelegate *, EdgesDelegate *> DeepEdges::in_and_out (const Edges &
 
   db::ContainedEdgesLocalOperation op (PositiveAndNegative);
 
-  db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell ());
+  db::local_processor<db::Edge, db::Edge, db::Edge> proc (const_cast<db::Layout *> (&edges.layout ()), const_cast<db::Cell *> (&edges.initial_cell ()), &other_deep->deep_layer ().layout (), &other_deep->deep_layer ().initial_cell (), edges.breakout_cells (), other_deep->deep_layer ().breakout_cells ());
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (edges.store ()->threads ());
 
@@ -2049,7 +2060,9 @@ DeepEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Coord 
   db::local_processor<db::Edge, db::Edge, db::EdgePair> proc (const_cast<db::Layout *> (&edges.layout ()),
                                                               const_cast<db::Cell *> (&edges.initial_cell ()),
                                                               other_deep ? &other_deep->deep_layer ().layout () : const_cast<db::Layout *> (&edges.layout ()),
-                                                              other_deep ? &other_deep->deep_layer ().initial_cell () : const_cast<db::Cell *> (&edges.initial_cell ()));
+                                                              other_deep ? &other_deep->deep_layer ().initial_cell () : const_cast<db::Cell *> (&edges.initial_cell ()),
+                                                              edges.breakout_cells (),
+                                                              other_deep ? other_deep->deep_layer ().breakout_cells () : 0);
 
   proc.set_base_verbosity (base_verbosity ());
   proc.set_threads (edges.store ()->threads ());

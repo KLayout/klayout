@@ -2092,7 +2092,6 @@ MacroEditorDialog::search_editing ()
   }
 
   apply_search ();
-  page->find_reset (); //  search from the initial position
   if (! page->has_multi_block_selection ()) {
     page->find_next ();
   }
@@ -2119,7 +2118,6 @@ MacroEditorDialog::search_edited ()
   }
 
   apply_search ();
-  page->find_reset (); //  search from the initial position
   if (! page->has_multi_block_selection ()) {
     page->find_next ();
   }

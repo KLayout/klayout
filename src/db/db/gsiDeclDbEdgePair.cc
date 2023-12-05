@@ -169,6 +169,14 @@ struct edge_pair_defs
     method ("bbox", &C::bbox,
       "@brief Gets the bounding box of the edge pair\n"
     ) +
+    method ("distance", &C::distance,
+      "@brief Gets the distance of the edges in the edge pair\n"
+      "\n"
+      "The distance between the two edges is defined as the minimum distance between any "
+      "two points on the two edges.\n"
+      "\n"
+      "This attribute has been introduced in version 0.28.14."
+    ) +
     method ("perimeter", &C::perimeter,
       "@brief Gets the perimeter of the edge pair\n"
       "\n"

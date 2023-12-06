@@ -523,6 +523,9 @@ SaltDownloadManager::execute (lay::SaltManagerDialog *parent, lay::Salt &salt)
 
     dialog->start ();
 
+    //  Stop other events to interfere with the download, specifically not macro controller updates
+    tl::NoDeferredMethods silent_section;
+
     std::sort (m_registry.begin (), m_registry.end ());
 
     for (std::vector<Descriptor>::const_iterator p = m_registry.begin (); p != m_registry.end (); ++p) {

@@ -1213,12 +1213,12 @@ private:
 void
 SaltManagerDialog::get_remote_grain_info (lay::SaltGrain *g, SaltGrainDetailsTextWidget *details)
 {
-  if (! g) {
+  //  NOTE: we don't want to interfere with download here, so refuse to do update
+  //  the info while a package is downloaded.
+  if (! g || m_downloaded_grain.get ()) {
     details->setHtml (QString ());
     return;
   }
-
-  tl_assert (m_downloaded_grain.get () == 0);
 
   m_downloaded_grain.reset (0);
 

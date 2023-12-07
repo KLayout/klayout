@@ -261,7 +261,7 @@ Service::snap_marker_to_grid (const db::DVector &v, bool &snapped) const
 
   if (snapped) {
     vr += vv;
-    return db::DVector (vr.x () * snapped_to.x (), vr.y () * snapped_to.y ());
+    return db::DVector (vr.x () * fabs (snapped_to.x ()), vr.y () * fabs (snapped_to.y ()));
   } else {
     return db::DVector ();
   }

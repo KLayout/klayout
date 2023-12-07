@@ -16,6 +16,7 @@ SOURCES = \
   tlDataMappingTests.cc \
   tlDeferredExecutionTests.cc \
   tlDeflateTests.cc \
+  tlEnvTests.cc \
   tlEventsTests.cc \
   tlExpressionTests.cc \
   tlFileSystemWatcherTests.cc \

@@ -39,12 +39,16 @@
 namespace tl
 {
 
-static tl::Mutex s_env_lock;
+static tl::Mutex *s_env_lock = 0;
 static std::map<std::string, std::string> s_env_map;
 
 std::string get_env (const std::string &name, const std::string &def_value)
 {
-  tl::MutexLocker env_locker (&s_env_lock);
+  if (! s_env_lock) {
+    s_env_lock = new tl::Mutex ();
+  }
+
+  tl::MutexLocker env_locker (s_env_lock);
 
 #ifdef _WIN32
   std::wstring wname = tl::to_wstring (name);
@@ -66,7 +70,11 @@ std::string get_env (const std::string &name, const std::string &def_value)
 
 void set_env (const std::string &name, const std::string &value)
 {
-  tl::MutexLocker env_locker (&s_env_lock);
+  if (! s_env_lock) {
+    s_env_lock = new tl::Mutex ();
+  }
+
+  tl::MutexLocker env_locker (s_env_lock);
 
   s_env_map [name] = name + "=" + value;
   const std::string &s = s_env_map [name];
@@ -80,7 +88,11 @@ void set_env (const std::string &name, const std::string &value)
 
 void unset_env (const std::string &name)
 {
-  tl::MutexLocker env_locker (&s_env_lock);
+  if (! s_env_lock) {
+    s_env_lock = new tl::Mutex ();
+  }
+
+  tl::MutexLocker env_locker (s_env_lock);
 
 #if defined(_WIN32)
   s_env_map [name] = name + "=";
@@ -98,6 +110,12 @@ void unset_env (const std::string &name)
 
 bool has_env (const std::string &name)
 {
+  if (! s_env_lock) {
+    s_env_lock = new tl::Mutex ();
+  }
+
+  tl::MutexLocker env_locker (s_env_lock);
+
 #ifdef _WIN32
   std::wstring wname = tl::to_wstring (name);
   wchar_t *env = _wgetenv (wname.c_str ());

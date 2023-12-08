@@ -32,19 +32,12 @@
 
 #include "tlUnitTest.h"
 #include "tlStream.h"
+#include "tlEnv.h"
 
 int run_pymodtest (tl::TestBase *_this, const std::string &fn)
 {
-  static std::string pypath;
-  if (pypath.empty ()) {
-    pypath = "PYTHONPATH=";
-    pypath += STRINGIFY (PYTHONPATH);
-  }
-#if defined(_WIN32)
-  _putenv (const_cast<char *> (pypath.c_str ()));
-#else
-  putenv (const_cast<char *> (pypath.c_str ()));
-#endif
+  std::string pypath = STRINGIFY (PYTHONPATH);
+  tl::set_env ("PYTHONPATH", pypath);
   tl::info << pypath;
 
   std::string fp (tl::testdata ());

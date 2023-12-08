@@ -555,7 +555,7 @@ struct edge_defs
       "This method has been introduced in version 0.26.2.\n"
     ) +
     method ("distance", &C::distance, gsi::arg ("p"),
-      "@brief Distance between the edge and a point.\n"
+      "@brief Gets the distance of the point from the line through the edge.\n"
       "\n"
       "Returns the distance between the edge and the point. The \n"
       "distance is signed which is negative if the point is to the\n"
@@ -563,6 +563,11 @@ struct edge_defs
       "The distance is measured by projecting the point onto the\n"
       "line through the edge. If the edge is degenerated, the distance\n"
       "is not defined.\n"
+      "\n"
+      "This method considers the edge to define an infinite line running through it.\n"
+      "\\distance returns the distance of 'p' to this line.\n"
+      "A similar method is \\euclidian_distance, but the latter regards\n"
+      "the edge a finite set of points between the endpoints.\n"
       "\n"
       "@param p The point to test.\n"
       "\n"
@@ -577,6 +582,19 @@ struct edge_defs
       "@param p The point to test.\n"
       "\n"
       "@return The side value\n"
+    ) +
+    method ("euclidian_distance", &C::euclidian_distance, gsi::arg ("p"),
+      "@brief Gets the distance of the point from the the edge.\n"
+      "\n"
+      "Returns the minimum distance of the point to any point on the edge.\n"
+      "Unlike \\distance, the edge is considered a finite set of points between\n"
+      "the endpoints. The result is also not signed like it is the case for \\distance.\n"
+      "\n"
+      "This method has been introduced in version 0.28.14.\n"
+      "\n"
+      "@param p The point to test.\n"
+      "\n"
+      "@return The distance\n"
     ) +
     method ("distance_abs", &C::distance_abs, gsi::arg ("p"),
       "@brief Absolute distance between the edge and a point.\n"

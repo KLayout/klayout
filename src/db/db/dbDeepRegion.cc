@@ -179,6 +179,7 @@ DeepRegion::~DeepRegion ()
 DeepRegion::DeepRegion (const DeepRegion &other)
   : MutableRegion (other), DeepShapeCollectionDelegateBase (other),
     m_merged_polygons_valid (other.m_merged_polygons_valid),
+    m_merged_polygons_boc_hash (other.m_merged_polygons_boc_hash),
     m_is_merged (other.m_is_merged)
 {
   if (m_merged_polygons_valid) {
@@ -195,6 +196,7 @@ DeepRegion::operator= (const DeepRegion &other)
     DeepShapeCollectionDelegateBase::operator= (other);
 
     m_merged_polygons_valid = other.m_merged_polygons_valid;
+    m_merged_polygons_boc_hash = other.m_merged_polygons_boc_hash;
     m_is_merged = other.m_is_merged;
     if (m_merged_polygons_valid) {
       m_merged_polygons = other.m_merged_polygons.copy ();
@@ -208,6 +210,7 @@ DeepRegion::operator= (const DeepRegion &other)
 void DeepRegion::init ()
 {
   m_merged_polygons_valid = false;
+  m_merged_polygons_boc_hash = 0;
   m_merged_polygons = db::DeepLayer ();
   m_is_merged = false;
 }
@@ -484,6 +487,7 @@ void DeepRegion::apply_property_translator (const db::PropertiesTranslator &pt)
   DeepShapeCollectionDelegateBase::apply_property_translator (pt);
 
   m_merged_polygons_valid = false;
+  m_merged_polygons_boc_hash = 0;
   m_merged_polygons = db::DeepLayer ();
 }
 
@@ -683,13 +687,13 @@ DeepRegion::merged_deep_layer () const
 bool
 DeepRegion::merged_polygons_available () const
 {
-  return m_is_merged || m_merged_polygons_valid;
+  return m_is_merged || (m_merged_polygons_valid && m_merged_polygons_boc_hash == deep_layer ().breakout_cells_hash ());
 }
 
 void
 DeepRegion::ensure_merged_polygons_valid () const
 {
-  if (! m_merged_polygons_valid) {
+  if (! m_merged_polygons_valid || (! m_is_merged && m_merged_polygons_boc_hash != deep_layer ().breakout_cells_hash ())) {
 
     if (m_is_merged) {
 
@@ -708,7 +712,7 @@ DeepRegion::ensure_merged_polygons_valid () const
       db::Connectivity conn;
       conn.connect (deep_layer ());
       hc.set_base_verbosity (base_verbosity () + 10);
-      hc.build (layout, deep_layer ().initial_cell (), conn, 0, 0, true /*separate_attributes*/);
+      hc.build (layout, deep_layer ().initial_cell (), conn, 0, deep_layer ().breakout_cells (), true /*separate_attributes*/);
 
       //  collect the clusters and merge them into big polygons
       //  NOTE: using the ClusterMerger we merge bottom-up forming bigger and bigger polygons. This is
@@ -732,6 +736,7 @@ DeepRegion::ensure_merged_polygons_valid () const
     }
 
     m_merged_polygons_valid = true;
+    m_merged_polygons_boc_hash = deep_layer ().breakout_cells_hash ();
 
   }
 }
@@ -741,6 +746,7 @@ DeepRegion::set_is_merged (bool f)
 {
   m_is_merged = f;
   m_merged_polygons_valid = false;
+  m_merged_polygons_boc_hash = 0;
   m_merged_polygons = db::DeepLayer ();
 }
 

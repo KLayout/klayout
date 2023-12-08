@@ -64,6 +64,7 @@
 #include "tlHttpStream.h"
 #include "tlArch.h"
 #include "tlFileUtils.h"
+#include "tlEnv.h"
 
 #include <QIcon>
 #include <QDir>
@@ -567,6 +568,19 @@ ApplicationBase::init_app ()
     as.resize (2);
   }
   std::string short_arch_string = tl::join (as, "-");
+
+#if defined(_WIN32)
+  //  Set SSL_CERT_FILE for Windows installation and libcrypto.
+
+  std::string cert_file = "cert.pem";
+  std::string cert_env_var = "SSL_CERT_FILE";
+  if (! tl::has_env (cert_env_var)) {
+    std::string cert_path = tl::combine_path (m_inst_path, cert_file);
+    if (tl::file_exists (cert_path)) {
+      tl::set_env (cert_env_var, cert_path);
+    }
+  }
+#endif
 
   std::vector<std::string> klp_paths;
 

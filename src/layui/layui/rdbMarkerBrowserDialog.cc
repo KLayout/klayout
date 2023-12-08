@@ -582,7 +582,13 @@ MarkerBrowserDialog::rdbs_changed ()
 
   for (unsigned int i = 0; i < view ()->num_rdbs (); ++i) {
     const rdb::Database *rdb = view ()->get_rdb (i);
-    mp_ui->rdb_cb->addItem (tl::to_qstring (rdb->name ()));
+    std::string text = rdb->name ();
+    if (! rdb->description ().empty ()) {
+      text += " (";
+      text += rdb->description ();
+      text += ")";
+    }
+    mp_ui->rdb_cb->addItem (tl::to_qstring (text));
     if (rdb->name () == m_rdb_name) {
       rdb_index = i;
     }
@@ -761,22 +767,34 @@ MarkerBrowserDialog::scan_layer ()
 
   std::string desc;
   for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-    if (!(*l)->has_children () && (*l)->cellview_index () >= 0 && layout.is_valid_layer ((*l)->layer_index ())) {
+    if (!(*l)->has_children () && (*l)->cellview_index () == cv_index && layout.is_valid_layer ((*l)->layer_index ())) {
       if (! desc.empty ()) {
         desc += ", ";
       }
       desc += layout.get_properties ((*l)->layer_index ()).to_string ();
     }
   }
-  rdb->set_description ("Shapes of layer(s) " + desc);
+  desc = tl::to_string (tr ("Hierarchical shapes of layer(s) ")) + desc;
+  desc += " ";
+  desc += tl::to_string (tr ("from cell "));
+  desc += cv->layout ().cell_name (cv.cell_index ());
+  rdb->set_description (desc);
+
+  std::set<db::cell_index_type> called_cells;
+  called_cells.insert (cv.cell_index ());
+  cv->layout ().cell (cv.cell_index ()).collect_called_cells (called_cells);
 
   for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
 
-    if (!(*l)->has_children () && (*l)->cellview_index () >= 0 && layout.is_valid_layer ((*l)->layer_index ())) {
+    if (!(*l)->has_children () && (*l)->cellview_index () == cv_index && layout.is_valid_layer ((*l)->layer_index ())) {
 
-      rdb::Category *cat = rdb->create_category (layout.get_properties ((*l)->layer_index ()).to_string ()); 
+      rdb::Category *cat = rdb->create_category (layout.get_properties ((*l)->layer_index ()).to_string ());
 
       for (db::Layout::const_iterator cid = layout.begin (); cid != layout.end (); ++cid) {
+
+        if (called_cells.find (cid->cell_index ()) == called_cells.end ()) {
+          continue;
+        }
 
         const db::Cell &cell = *cid;
         if (cell.shapes ((*l)->layer_index ()).size () > 0) {
@@ -855,18 +873,22 @@ MarkerBrowserDialog::scan_layer_flat ()
 
   std::string desc;
   for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
-    if (!(*l)->has_children () && (*l)->cellview_index () >= 0 && layout.is_valid_layer ((*l)->layer_index ())) {
+    if (!(*l)->has_children () && (*l)->cellview_index () == cv_index && layout.is_valid_layer ((*l)->layer_index ())) {
       if (! desc.empty ()) {
         desc += ", ";
       }
       desc += layout.get_properties ((*l)->layer_index ()).to_string ();
     }
   }
-  rdb->set_description ("Shapes of layer(s) " + desc);
+  desc = tl::to_string (tr ("Flat shapes of layer(s) ")) + desc;
+  desc += " ";
+  desc += tl::to_string (tr ("from cell "));
+  desc += cv->layout ().cell_name (cv.cell_index ());
+  rdb->set_description (desc);
 
   for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = layers.begin (); l != layers.end (); ++l) {
 
-    if (!(*l)->has_children () && (*l)->cellview_index () >= 0 && layout.is_valid_layer ((*l)->layer_index ())) {
+    if (!(*l)->has_children () && (*l)->cellview_index () == cv_index && layout.is_valid_layer ((*l)->layer_index ())) {
 
       rdb::Category *cat = rdb->create_category (layout.get_properties ((*l)->layer_index ()).to_string ()); 
 

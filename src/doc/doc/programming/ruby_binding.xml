@@ -408,6 +408,61 @@ A::new.f(x)
   omitted, the default value is used instead.
   </p>
 
+  <h2>Implicit conversions</h2>
+
+  <h3>String arguments</h3>
+
+  <p>
+  If a method expects a string argument, other types are converted to strings
+  using the "to_s" method. In Python, the equivalent is "str(...)".
+  </p>
+
+  <p>
+  Example:
+  </p>
+
+  <pre># Also accepts a float value for the first string argument - 
+# it is converted to "2.5"
+t = RBA::Text::new(2.5, RBA::Trans::new)</pre>
+
+  <h3>Conversion constructors</h3>
+
+  <p>Conversion constructors are constructors that take an object of a 
+different class and convert it to the target class.
+Conversion constructors are used implicitly in applicable cases
+to convert one type to the type requested by the argument.</p>
+
+  <p>
+  For example, in the following code, the Region object's "+" operator
+  is used. This expects a Region object as the second parameter, but as
+  there is conversion constructor available which converts a Box to
+  a Region, it is possible to use a Box directly:
+  </p>
+
+  <pre>r = RBA::Region::new(RBA::Box::new(0, 0, 1000, 2000))
+r += RBA::Box::new(3000, 0, 4000, 2000)</pre>
+
+  <h3>Implicit constructor from lists</h3>
+
+  <p>
+  When an object is expected for an argument and a list is given,
+  the object constructor is called with the arguments from the list.
+  This specifically allows using size-2 lists instead of Point or
+  Vector arguments. In Python, a "list" can also be a tuple.
+  </p>
+
+  <p>
+  In the following example, this mechanism is used for 
+  the polygon point list which is expected to be an array
+  of Point objects, but can use size-2 arrays instead. 
+  Also, the "moved" method expects a Vector, but here 
+  as well, size-2 arrays can be used instead:
+  </p>
+
+  <pre>pts = [ [ 0, 0 ], [ 0, 1000 ], [ 1000, 0 ] ]
+poly = RBA::Polygon::new(pts)
+poly = poly.moved([ 100, 200 ])</pre>
+
   <h2>Constness</h2>
 
   <p>

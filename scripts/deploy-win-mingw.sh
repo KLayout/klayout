@@ -135,6 +135,13 @@ if ! [ -e $target/klayout.exe ]; then
 fi
 
 # ----------------------------------------------------------
+# cert.pem
+
+echo "Installing cert.pem .."
+
+cp $mingw_inst/etc/ssl/cert.pem $target
+
+# ----------------------------------------------------------
 # Plugins
 
 echo "Installing plugins .."

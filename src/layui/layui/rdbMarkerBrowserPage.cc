@@ -2148,7 +2148,7 @@ MarkerBrowserPage::do_update_markers ()
 
       lay::CellView cv = mp_view->cellview (m_cv_index);
       if (! current_cell && cv.is_valid ()) {
-        current_cell = mp_database->cell_by_qname (cv->layout ().cell_name (cv.cell_index ()));
+        current_cell = mp_database->cell_by_qname (cv->layout ().cell_name (cv.ctx_cell_index ()));
       }
 
       std::vector<db::DCplxTrans> tv = mp_view->cv_transform_variants (m_cv_index);
@@ -2182,7 +2182,7 @@ MarkerBrowserPage::do_update_markers ()
           //  If we could not find a transformation in the RDB, try to find one in the layout DB:
           std::pair<bool, db::cell_index_type> cc = cv->layout ().cell_by_name (c->name ().c_str ());
           if (cc.first) {
-            std::pair <bool, db::ICplxTrans> ic = db::find_layout_context (cv->layout (), cc.second, cv.cell_index ());
+            std::pair <bool, db::ICplxTrans> ic = db::find_layout_context (cv->layout (), cc.second, cv.ctx_cell_index ());
             if (ic.first) {
               context.first = true;
               context.second = db::DCplxTrans (cv->layout ().dbu ()) * db::DCplxTrans (ic.second) * db::DCplxTrans (1.0 / cv->layout ().dbu ());
@@ -2197,7 +2197,7 @@ MarkerBrowserPage::do_update_markers ()
             context = std::pair <bool, db::DCplxTrans> (true, db::DCplxTrans ());
           } else if (! current_cell) {
             m_error_text = tl::sprintf (tl::to_string (QObject::tr ("Current layout cell '%s' not found in marker database and no path found from marker's cell '%s' to current cell in the layout database.")),
-                                        cv->layout ().cell_name (cv.cell_index ()), c->name ());
+                                        cv->layout ().cell_name (cv.ctx_cell_index ()), c->name ());
           } else {
             m_error_text = tl::sprintf (tl::to_string (QObject::tr ("No example instantiation given in marker database for marker's cell '%s' to current cell '%s' and no such path in the layout database either.")),
                                         c->name (), current_cell->name ());

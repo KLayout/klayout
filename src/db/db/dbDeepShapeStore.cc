@@ -184,6 +184,12 @@ DeepLayer::breakout_cells () const
   return store ()->breakout_cells (layout_index ());
 }
 
+size_t
+DeepLayer::breakout_cells_hash () const
+{
+  return store ()->breakout_cells_hash (layout_index ());
+}
+
 void
 DeepLayer::insert_into (db::Layout *into_layout, db::cell_index_type into_cell, unsigned int into_layer) const
 {
@@ -409,36 +415,51 @@ DeepShapeStoreState::text_property_name () const
 const std::set<db::cell_index_type> *
 DeepShapeStoreState::breakout_cells (unsigned int layout_index) const
 {
-  const std::set<db::cell_index_type> &boc = (const_cast<DeepShapeStoreState *> (this))->ensure_breakout_cells (layout_index);
-  if (boc.empty ()) {
+  const std::pair<std::set<db::cell_index_type>, size_t> &boc = (const_cast<DeepShapeStoreState *> (this))->ensure_breakout_cells (layout_index);
+  if (boc.first.empty ()) {
     return 0;
   } else {
-    return &boc;
+    return &boc.first;
   }
+}
+
+size_t
+DeepShapeStoreState::breakout_cells_hash (unsigned int layout_index) const
+{
+  const std::pair<std::set<db::cell_index_type>, size_t> &boc = (const_cast<DeepShapeStoreState *> (this))->ensure_breakout_cells (layout_index);
+  return boc.second;
 }
 
 void
 DeepShapeStoreState::clear_breakout_cells (unsigned int layout_index)
 {
-  ensure_breakout_cells (layout_index).clear ();
+  std::pair<std::set<db::cell_index_type>, size_t> &boc = ensure_breakout_cells (layout_index);
+  boc.first.clear ();
+  boc.second = std::hash<std::set<db::cell_index_type> >() (boc.first);
 }
 
 void
-DeepShapeStoreState::set_breakout_cells (unsigned int layout_index, const std::set<db::cell_index_type> &boc)
+DeepShapeStoreState::set_breakout_cells (unsigned int layout_index, const std::set<db::cell_index_type> &boc_in)
 {
-  ensure_breakout_cells (layout_index) = boc;
+  std::pair<std::set<db::cell_index_type>, size_t> &boc = ensure_breakout_cells (layout_index);
+  boc.first = boc_in;
+  boc.second = std::hash<std::set<db::cell_index_type> >() (boc.first);
 }
 
 void
 DeepShapeStoreState::add_breakout_cell (unsigned int layout_index, db::cell_index_type ci)
 {
-  ensure_breakout_cells (layout_index).insert (ci);
+  std::pair<std::set<db::cell_index_type>, size_t> &boc = ensure_breakout_cells (layout_index);
+  boc.first.insert (ci);
+  boc.second = std::hash<std::set<db::cell_index_type> >() (boc.first);
 }
 
 void
 DeepShapeStoreState::add_breakout_cells (unsigned int layout_index, const std::set<db::cell_index_type> &cc)
 {
-  ensure_breakout_cells (layout_index).insert (cc.begin (), cc.end ());
+  std::pair<std::set<db::cell_index_type>, size_t> &boc = ensure_breakout_cells (layout_index);
+  boc.first.insert (cc.begin (), cc.end ());
+  boc.second = std::hash<std::set<db::cell_index_type> >() (boc.first);
 }
 
 void
@@ -724,6 +745,12 @@ const std::set<db::cell_index_type> *
 DeepShapeStore::breakout_cells (unsigned int layout_index) const
 {
   return m_state.breakout_cells (layout_index);
+}
+
+size_t
+DeepShapeStore::breakout_cells_hash (unsigned int layout_index) const
+{
+  return m_state.breakout_cells_hash (layout_index);
 }
 
 void

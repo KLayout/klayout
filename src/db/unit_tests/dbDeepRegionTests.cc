@@ -30,6 +30,7 @@
 #include "dbRegionProcessors.h"
 #include "dbEdgesUtils.h"
 #include "dbDeepShapeStore.h"
+#include "dbDeepRegion.h"
 #include "dbOriginalLayerRegion.h"
 #include "dbCellGraphUtils.h"
 #include "dbTestSupport.h"
@@ -2845,4 +2846,98 @@ TEST(issue_663_separation_from_inside)
 
   CHECKPOINT();
   db::compare_layouts (_this, ly, tl::testdata () + "/algo/deep_region_au663.gds");
+}
+
+TEST(deep_region_and_cheats)
+{
+  db::Layout ly;
+  {
+    std::string fn (tl::testdata ());
+    fn += "/algo/cheats.gds";
+    tl::InputStream stream (fn);
+    db::Reader reader (stream);
+    reader.read (ly);
+  }
+
+  db::cell_index_type top_cell_index = *ly.begin_top_down ();
+  db::Cell &top_cell = ly.cell (top_cell_index);
+
+  unsigned int l1 = ly.get_layer (db::LayerProperties (1, 0));
+  unsigned int l2 = ly.get_layer (db::LayerProperties (2, 0));
+  unsigned int l10 = ly.get_layer (db::LayerProperties (10, 0));
+  unsigned int l11 = ly.get_layer (db::LayerProperties (11, 0));
+  unsigned int l12 = ly.get_layer (db::LayerProperties (12, 0));
+  unsigned int l13 = ly.get_layer (db::LayerProperties (13, 0));
+  unsigned int l14 = ly.get_layer (db::LayerProperties (14, 0));
+  unsigned int l19 = ly.get_layer (db::LayerProperties (19, 0));
+  unsigned int l20 = ly.get_layer (db::LayerProperties (20, 0));
+  unsigned int l21 = ly.get_layer (db::LayerProperties (21, 0));
+  unsigned int l22 = ly.get_layer (db::LayerProperties (22, 0));
+  unsigned int l23 = ly.get_layer (db::LayerProperties (23, 0));
+  unsigned int l24 = ly.get_layer (db::LayerProperties (24, 0));
+  unsigned int l29 = ly.get_layer (db::LayerProperties (29, 0));
+
+  db::DeepShapeStore dss;
+
+  db::Region r1 (db::RecursiveShapeIterator (ly, top_cell, l1), dss);
+  db::Region r2 (db::RecursiveShapeIterator (ly, top_cell, l2), dss);
+
+  (r1 - r2).insert_into (&ly, top_cell_index, l10);
+
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("A").second);
+
+  (r1 - r2).insert_into (&ly, top_cell_index, l11);
+
+  dss.clear_breakout_cells (0);
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("B").second);
+
+  (r1 - r2).insert_into (&ly, top_cell_index, l12);
+
+  dss.clear_breakout_cells (0);
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("C").second);
+
+  (r1 - r2).insert_into (&ly, top_cell_index, l13);
+
+  dss.clear_breakout_cells (0);
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("D").second);
+
+  (r1 - r2).insert_into (&ly, top_cell_index, l14);
+
+  dss.clear_breakout_cells (0);
+  (r1 - r2).insert_into (&ly, top_cell_index, l19);
+
+  EXPECT_EQ (dynamic_cast<const db::DeepRegion *> (r1.delegate ())->merged_polygons_available (), false);
+
+  r1.sized (-1000).insert_into (&ly, top_cell_index, l20);
+  EXPECT_EQ (dynamic_cast<const db::DeepRegion *> (r1.delegate ())->merged_polygons_available (), true);
+
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("A").second);
+
+  r1.sized (-1000).insert_into (&ly, top_cell_index, l21);
+  EXPECT_EQ (dynamic_cast<const db::DeepRegion *> (r1.delegate ())->merged_polygons_available (), true);
+
+  dss.clear_breakout_cells (0);
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("B").second);
+
+  r1.sized (-1000).insert_into (&ly, top_cell_index, l22);
+  EXPECT_EQ (dynamic_cast<const db::DeepRegion *> (r1.delegate ())->merged_polygons_available (), true);
+
+  dss.clear_breakout_cells (0);
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("C").second);
+
+  r1.sized (-1000).insert_into (&ly, top_cell_index, l23);
+  EXPECT_EQ (dynamic_cast<const db::DeepRegion *> (r1.delegate ())->merged_polygons_available (), true);
+
+  dss.clear_breakout_cells (0);
+  dss.add_breakout_cell (0, dss.layout (0).cell_by_name ("D").second);
+
+  r1.sized (-1000).insert_into (&ly, top_cell_index, l24);
+  EXPECT_EQ (dynamic_cast<const db::DeepRegion *> (r1.delegate ())->merged_polygons_available (), true);
+
+  dss.clear_breakout_cells (0);
+  r1.sized (-1000).insert_into (&ly, top_cell_index, l29);
+  EXPECT_EQ (dynamic_cast<const db::DeepRegion *> (r1.delegate ())->merged_polygons_available (), true);
+
+  CHECKPOINT();
+  db::compare_layouts (_this, ly, tl::testdata () + "/algo/cheats_au.gds");
 }

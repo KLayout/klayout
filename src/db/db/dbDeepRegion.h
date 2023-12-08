@@ -173,6 +173,7 @@ private:
 
   mutable DeepLayer m_merged_polygons;
   mutable bool m_merged_polygons_valid;
+  mutable size_t m_merged_polygons_boc_hash;
   bool m_is_merged;
 
   void init ();

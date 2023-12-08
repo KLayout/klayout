@@ -348,10 +348,10 @@ END_PROTECTED
 }
 
 bool
-NetTracerDialog::get_net_tracer_setup (const lay::CellView &cv, db::NetTracerData &data)
+NetTracerDialog::get_net_tracer_setup_from_tech (const std::string &tech_name, const std::string &stack_name, const db::Layout &layout, db::NetTracerData &data)
 {
   //  fetch the net tracer data from the technology and apply to the current layout
-  const db::Technology *tech = cv->technology ();
+  const db::Technology *tech = db::Technologies::instance ()->technology_by_name (tech_name);
   if (! tech) {
     return false;
   }
@@ -360,8 +360,6 @@ NetTracerDialog::get_net_tracer_setup (const lay::CellView &cv, db::NetTracerDat
   if (! tech_component) {
     return false;
   }
-
-  std::string stack_name = tl::to_string (stack_selector->itemData (stack_selector->currentIndex ()).toString ());
 
   const db::NetTracerConnectivity *connectivity = 0;
   for (auto d = tech_component->begin (); d != tech_component->end () && ! connectivity; ++d) {
@@ -375,8 +373,23 @@ NetTracerDialog::get_net_tracer_setup (const lay::CellView &cv, db::NetTracerDat
   }
 
   //  Set up the net tracer environment
-  data = connectivity->get_tracer_data (cv->layout ());
+  data = connectivity->get_tracer_data (layout);
   return true;
+}
+
+bool
+NetTracerDialog::get_net_tracer_setup (const lay::CellView &cv, db::NetTracerData &data)
+{
+  //  fetch the net tracer data from the technology and apply to the current layout
+  const db::Technology *tech = cv->technology ();
+  if (! tech) {
+    return false;
+  }
+
+  const std::string &tech_name = tech->name ();
+  std::string stack_name = tl::to_string (stack_selector->itemData (stack_selector->currentIndex ()).toString ());
+
+  return get_net_tracer_setup_from_tech (tech_name, stack_name, cv->layout (), data);
 }
 
 db::NetTracerNet *
@@ -652,11 +665,16 @@ NetTracerDialog::menu_activated (const std::string &symbol)
 
     const lay::CellView &cv = view ()->cellview (view ()->active_cellview_index ());
     if (cv.is_valid ()) {
+
       db::RecursiveShapeIterator si (cv->layout (), *cv.cell (), std::vector<unsigned int> ());
       std::unique_ptr <db::LayoutToNetlist> l2ndb (new db::LayoutToNetlist (si));
       trace_all_nets (l2ndb.get (), cv, flat);
-      unsigned int l2ndb_index = view ()->add_l2ndb (l2ndb.release ());
-      view ()->open_l2ndb_browser (l2ndb_index, view ()->index_of_cellview (&cv));
+
+      if (l2ndb->netlist ()) {
+        unsigned int l2ndb_index = view ()->add_l2ndb (l2ndb.release ());
+        view ()->open_l2ndb_browser (l2ndb_index, view ()->index_of_cellview (&cv));
+      }
+
     }
 
   } else {
@@ -1319,7 +1337,7 @@ BEGIN_PROTECTED
   db::Technology tech = *db::Technologies::instance ()->technology_by_name (tech_name);
 
   //  call the dialog and if successful, install the new technology
-  lay::TechComponentSetupDialog dialog (this, &tech, db::net_tracer_component_name ());
+  lay::TechComponentSetupDialog dialog (isVisible () ? this : parentWidget (), &tech, db::net_tracer_component_name ());
   if (dialog.exec ()) {
     *db::Technologies::instance ()->technology_by_name (tech.name ()) = tech;
     update_list_of_stacks ();
@@ -1781,12 +1799,78 @@ NetTracerDialog::clear_markers ()
 void
 NetTracerDialog::trace_all_nets (db::LayoutToNetlist *l2ndb, const lay::CellView &cv, bool flat)
 {
+  const db::Technology *tech = cv->technology ();
+  if (! tech) {
+    return;
+  }
+
+  static std::string current_stack;
+
+  QStringList stacks;
+  std::vector<std::string> raw_stacks;
+  int current = 0;
+
+  const db::NetTracerTechnologyComponent *tech_component = dynamic_cast <const db::NetTracerTechnologyComponent *> (tech->component_by_name (db::net_tracer_component_name ()));
+  if (tech_component) {
+    for (auto d = tech_component->begin (); d != tech_component->end (); ++d) {
+      raw_stacks.push_back (d->name ());
+      if (d->name () == current_stack) {
+        current = stacks.size ();
+      }
+      if (d->name ().empty ()) {
+        stacks.push_back (tr ("(default)"));
+      } else {
+        stacks.push_back (tl::to_qstring (d->name ()));
+      }
+    }
+  }
+
+  if (raw_stacks.empty ()) {
+    return;
+  }
+
+  current_stack = raw_stacks.front ();
+
+  if (stacks.size () >= 2) {
+    bool ok = true;
+    QString sel = QInputDialog::getItem (parentWidget (), tr ("Select Stack for Net Tracing (All Nets)"), tr ("Stack"), stacks, current, false, &ok);
+    if (! ok) {
+      return;
+    }
+    current = stacks.indexOf (sel);
+    if (current < 0) {
+      return;
+    }
+    current_stack = raw_stacks [current];
+  }
+
   db::NetTracerData tracer_data;
-  if (! get_net_tracer_setup (cv, tracer_data)) {
+  if (! get_net_tracer_setup_from_tech (tech->name (), current_stack, cv->layout (), tracer_data)) {
     return;
   }
 
   tracer_data.configure_l2n (*l2ndb);
+
+  std::string description = flat ? tl::to_string (tr ("Flat nets")) : tl::to_string (tr ("Hierarchical nets"));
+  std::string name = flat ? "Flat_Nets" : "Hierarchical_Nets";
+  if (! tech->name ().empty ()) {
+    description += ", ";
+    description += tl::to_string (tr ("Technology"));
+    description += ": ";
+    description += tech->name ();
+    name += "_";
+    name += tech->name ();
+  }
+  if (! current_stack.empty ()) {
+    description += ", ";
+    description += tl::to_string (tr ("Stack"));
+    description += ": ";
+    description += current_stack;
+    name += "_";
+    name += current_stack;
+  }
+  l2ndb->set_description (description);
+  l2ndb->set_name (name);
 
   l2ndb->clear_join_nets ();
   l2ndb->clear_join_net_names ();

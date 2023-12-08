@@ -73,6 +73,16 @@ END
     RBA::Technology::remove_technology("MINE2")
     assert_equal(RBA::Technology::technology_names.inspect, '[""]')
 
+    # registration
+    tech = RBA::Technology::new
+    tech.name = "NEW"
+    tech.dbu = 0.5
+    tech_new = RBA::Technology::register_technology(tech)
+    tech._destroy
+    assert_equal(RBA::Technology::technology_names.inspect, '["", "NEW"]')
+    assert_equal(tech_new.dbu, 0.5)
+    assert_equal(tech_new.name, "NEW")
+
   end
 
   def test_2

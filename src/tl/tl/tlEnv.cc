@@ -23,6 +23,7 @@
 
 #include "tlEnv.h"
 #include "tlString.h"
+#include "tlThreads.h"
 
 #include <string>
 
@@ -38,8 +39,17 @@
 namespace tl
 {
 
+static tl::Mutex *s_env_lock = 0;
+static std::map<std::string, std::string> s_env_map;
+
 std::string get_env (const std::string &name, const std::string &def_value)
 {
+  if (! s_env_lock) {
+    s_env_lock = new tl::Mutex ();
+  }
+
+  tl::MutexLocker env_locker (s_env_lock);
+
 #ifdef _WIN32
   std::wstring wname = tl::to_wstring (name);
   wchar_t *env = _wgetenv (wname.c_str ());
@@ -58,8 +68,54 @@ std::string get_env (const std::string &name, const std::string &def_value)
 #endif
 }
 
+void set_env (const std::string &name, const std::string &value)
+{
+  if (! s_env_lock) {
+    s_env_lock = new tl::Mutex ();
+  }
+
+  tl::MutexLocker env_locker (s_env_lock);
+
+  s_env_map [name] = name + "=" + value;
+  const std::string &s = s_env_map [name];
+
+#if defined(_WIN32)
+  _putenv (const_cast<char *> (s.c_str ()));
+#else
+  putenv (const_cast<char *> (s.c_str ()));
+#endif
+}
+
+void unset_env (const std::string &name)
+{
+  if (! s_env_lock) {
+    s_env_lock = new tl::Mutex ();
+  }
+
+  tl::MutexLocker env_locker (s_env_lock);
+
+#if defined(_WIN32)
+  s_env_map [name] = name + "=";
+#else
+  s_env_map [name] = name;
+#endif
+  const std::string &s = s_env_map [name];
+
+#if defined(_WIN32)
+  _putenv (const_cast<char *> (s.c_str ()));
+#else
+  putenv (const_cast<char *> (s.c_str ()));
+#endif
+}
+
 bool has_env (const std::string &name)
 {
+  if (! s_env_lock) {
+    s_env_lock = new tl::Mutex ();
+  }
+
+  tl::MutexLocker env_locker (s_env_lock);
+
 #ifdef _WIN32
   std::wstring wname = tl::to_wstring (name);
   wchar_t *env = _wgetenv (wname.c_str ());

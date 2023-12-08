@@ -3926,12 +3926,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -3956,12 +3956,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -4012,12 +4012,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -4110,12 +4110,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -4140,12 +4140,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -4200,12 +4200,12 @@ class CompoundRegionOperationNode:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -4320,12 +4320,12 @@ class CompoundRegionOperationNode:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -8384,7 +8384,7 @@ class DEdge:
         """
     def distance(self, p: DPoint) -> float:
         r"""
-        @brief Distance between the edge and a point.
+        @brief Gets the distance of the point from the line through the edge.
 
         Returns the distance between the edge and the point. The 
         distance is signed which is negative if the point is to the
@@ -8392,6 +8392,11 @@ class DEdge:
         The distance is measured by projecting the point onto the
         line through the edge. If the edge is degenerated, the distance
         is not defined.
+
+        This method considers the edge to define an infinite line running through it.
+        \distance returns the distance of 'p' to this line.
+        A similar method is \euclidian_distance, but the latter regards
+        the edge a finite set of points between the endpoints.
 
         @param p The point to test.
 
@@ -8451,6 +8456,20 @@ class DEdge:
         @param p The distance to move the edge points.
 
         @return The enlarged edge.
+        """
+    def euclidian_distance(self, p: DPoint) -> float:
+        r"""
+        @brief Gets the distance of the point from the the edge.
+
+        Returns the minimum distance of the point to any point on the edge.
+        Unlike \distance, the edge is considered a finite set of points between
+        the endpoints. The result is also not signed like it is the case for \distance.
+
+        This method has been introduced in version 0.28.14.
+
+        @param p The point to test.
+
+        @return The distance
         """
     def extend(self, d: float) -> DEdge:
         r"""
@@ -8946,6 +8965,14 @@ class DEdgePair:
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def distance(self) -> float:
+        r"""
+        @brief Gets the distance of the edges in the edge pair
+
+        The distance between the two edges is defined as the minimum distance between any two points on the two edges.
+
+        This attribute has been introduced in version 0.28.14.
         """
     def dup(self) -> DEdgePair:
         r"""
@@ -11320,8 +11347,7 @@ class DText:
     Setter:
     @brief Sets the vertical alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     x: float
     r"""
@@ -16303,7 +16329,7 @@ class Edge:
         """
     def distance(self, p: Point) -> int:
         r"""
-        @brief Distance between the edge and a point.
+        @brief Gets the distance of the point from the line through the edge.
 
         Returns the distance between the edge and the point. The 
         distance is signed which is negative if the point is to the
@@ -16311,6 +16337,11 @@ class Edge:
         The distance is measured by projecting the point onto the
         line through the edge. If the edge is degenerated, the distance
         is not defined.
+
+        This method considers the edge to define an infinite line running through it.
+        \distance returns the distance of 'p' to this line.
+        A similar method is \euclidian_distance, but the latter regards
+        the edge a finite set of points between the endpoints.
 
         @param p The point to test.
 
@@ -16370,6 +16401,20 @@ class Edge:
         @param p The distance to move the edge points.
 
         @return The enlarged edge.
+        """
+    def euclidian_distance(self, p: Point) -> int:
+        r"""
+        @brief Gets the distance of the point from the the edge.
+
+        Returns the minimum distance of the point to any point on the edge.
+        Unlike \distance, the edge is considered a finite set of points between
+        the endpoints. The result is also not signed like it is the case for \distance.
+
+        This method has been introduced in version 0.28.14.
+
+        @param p The point to test.
+
+        @return The distance
         """
     def extend(self, d: int) -> Edge:
         r"""
@@ -16869,6 +16914,14 @@ class EdgePair:
         @brief Returns a value indicating whether the object was already destroyed
         This method returns true, if the object was destroyed, either explicitly or by the C++ side.
         The latter may happen, if the object is owned by a C++ object which got destroyed itself.
+        """
+    def distance(self) -> int:
+        r"""
+        @brief Gets the distance of the edges in the edge pair
+
+        The distance between the two edges is defined as the minimum distance between any two points on the two edges.
+
+        This attribute has been introduced in version 0.28.14.
         """
     def dup(self) -> EdgePair:
         r"""
@@ -23825,10 +23878,10 @@ class Instance:
     Getter:
     @brief Gets the basic \CellInstArray object associated with this instance reference.
     Setter:
-    @brief Returns the basic cell instance array object by giving a micrometer unit object.
-    This method replaces the instance by the given CellInstArray object and it internally transformed into database units.
+    @brief Changes the \CellInstArray object to the given one.
+    This method replaces the instance by the given CellInstArray object.
 
-    This method has been introduced in version 0.25
+    This method has been introduced in version 0.22
     """
     cplx_trans: ICplxTrans
     r"""
@@ -23836,9 +23889,10 @@ class Instance:
     @brief Gets the complex transformation of the instance or the first instance in the array
     This method is always valid compared to \trans, since simple transformations can be expressed as complex transformations as well.
     Setter:
-    @brief Sets the complex transformation of the instance or the first instance in the array
+    @brief Sets the complex transformation of the instance or the first instance in the array (in micrometer units)
+    This method sets the transformation the same way as \cplx_trans=, but the displacement of this transformation is given in micrometer units. It is internally translated into database units.
 
-    This method has been introduced in version 0.23.
+    This method has been introduced in version 0.25.
     """
     da: DVector
     r"""
@@ -28990,12 +29044,12 @@ class LayoutToNetlist:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -29020,12 +29074,12 @@ class LayoutToNetlist:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -30309,12 +30363,12 @@ class LoadLayoutOptions:
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -33275,16 +33329,16 @@ class NetTerminalRef:
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference (non-const version).
+        @brief Gets the device reference.
         Gets the device object that this connection is made to.
-
-        This constness variant has been introduced in version 0.26.8
         """
     @overload
     def device(self) -> Device:
         r"""
-        @brief Gets the device reference.
+        @brief Gets the device reference (non-const version).
         Gets the device object that this connection is made to.
+
+        This constness variant has been introduced in version 0.26.8
         """
     def device_class(self) -> DeviceClass:
         r"""
@@ -34073,16 +34127,16 @@ class Netlist:
     @overload
     def circuit_by_cell_index(self, cell_index: int) -> Circuit:
         r"""
-        @brief Gets the circuit object for a given cell index.
-        If the cell index is not valid or no circuit is registered with this index, nil is returned.
-        """
-    @overload
-    def circuit_by_cell_index(self, cell_index: int) -> Circuit:
-        r"""
         @brief Gets the circuit object for a given cell index (const version).
         If the cell index is not valid or no circuit is registered with this index, nil is returned.
 
         This constness variant has been introduced in version 0.26.8.
+        """
+    @overload
+    def circuit_by_cell_index(self, cell_index: int) -> Circuit:
+        r"""
+        @brief Gets the circuit object for a given cell index.
+        If the cell index is not valid or no circuit is registered with this index, nil is returned.
         """
     @overload
     def circuit_by_name(self, name: str) -> Circuit:
@@ -34141,16 +34195,16 @@ class Netlist:
     @overload
     def device_class_by_name(self, name: str) -> DeviceClass:
         r"""
-        @brief Gets the device class for a given name.
-        If the name is not a valid device class name, nil is returned.
-        """
-    @overload
-    def device_class_by_name(self, name: str) -> DeviceClass:
-        r"""
         @brief Gets the device class for a given name (const version).
         If the name is not a valid device class name, nil is returned.
 
         This constness variant has been introduced in version 0.26.8.
+        """
+    @overload
+    def device_class_by_name(self, name: str) -> DeviceClass:
+        r"""
+        @brief Gets the device class for a given name.
+        If the name is not a valid device class name, nil is returned.
         """
     def dup(self) -> Netlist:
         r"""
@@ -34171,16 +34225,16 @@ class Netlist:
     @overload
     def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits bottom-up (const version)
+        @brief Iterates over the circuits bottom-up
         Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
-
-        This constness variant has been introduced in version 0.26.8.
         """
     @overload
     def each_circuit_bottom_up(self) -> Iterator[Circuit]:
         r"""
-        @brief Iterates over the circuits bottom-up
+        @brief Iterates over the circuits bottom-up (const version)
         Iterating bottom-up means the parent circuits come after the child circuits. This is the basically the reverse order as delivered by \each_circuit_top_down.
+
+        This constness variant has been introduced in version 0.26.8.
         """
     @overload
     def each_circuit_top_down(self) -> Iterator[Circuit]:
@@ -36645,12 +36699,12 @@ class PCellParameterState:
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -39452,12 +39506,12 @@ class PropertyConstraint:
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares two enums for inequality
+        @brief Compares an enum with an integer for inequality
         """
     @overload
     def __ne__(self, other: object) -> bool:
         r"""
-        @brief Compares an enum with an integer for inequality
+        @brief Compares two enums for inequality
         """
     def __repr__(self) -> str:
         r"""
@@ -40890,12 +40944,12 @@ class Region(ShapeCollection):
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -40920,12 +40974,12 @@ class Region(ShapeCollection):
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer for inequality
+            @brief Compares two enums for inequality
             """
         @overload
         def __ne__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums for inequality
+            @brief Compares an enum with an integer for inequality
             """
         def __repr__(self) -> str:
             r"""
@@ -40996,12 +41050,12 @@ class Region(ShapeCollection):
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares two enums
+            @brief Compares an enum with an integer value
             """
         @overload
         def __eq__(self, other: object) -> bool:
             r"""
-            @brief Compares an enum with an integer value
+            @brief Compares two enums
             """
         @overload
         def __init__(self, i: int) -> None:
@@ -45217,11 +45271,10 @@ class Shape:
 
     Starting with version 0.23, this method returns nil, if the shape does not represent a path.
     Setter:
-    @brief Replaces the shape by the given path object
-    This method replaces the shape by the given path object. This method can only be called for editable layouts. It does not change the user properties of the shape.
-    Calling this method will invalidate any iterators. It should not be called inside a loop iterating over shapes.
+    @brief Replaces the shape by the given path (in micrometer units)
+    This method replaces the shape by the given path, like \path= with a \Path argument does. This version translates the path from micrometer units to database units internally.
 
-    This method has been introduced in version 0.22.
+    This method has been introduced in version 0.25.
     """
     path_bgnext: int
     r"""
@@ -48596,15 +48649,15 @@ class SubCircuit(NetlistObject):
     @overload
     def circuit_ref(self) -> Circuit:
         r"""
-        @brief Gets the circuit referenced by the subcircuit.
-        """
-    @overload
-    def circuit_ref(self) -> Circuit:
-        r"""
         @brief Gets the circuit referenced by the subcircuit (non-const version).
 
 
         This constness variant has been introduced in version 0.26.8
+        """
+    @overload
+    def circuit_ref(self) -> Circuit:
+        r"""
+        @brief Gets the circuit referenced by the subcircuit.
         """
     @overload
     def connect_pin(self, pin: Pin, net: Net) -> None:
@@ -48660,6 +48713,15 @@ class Technology:
     @brief Represents a technology
 
     This class represents one technology from a set of technologies. The set of technologies available in the system can be obtained with \technology_names. Individual technology definitions are returned with \technology_by_name. Use \create_technology to register new technologies and \remove_technology to delete technologies.
+
+    Note that a Technology object needs to be registered in the system, before its name can be used to specify a technology, for example in \Layout#technology_name. Technology objects created by \create_technology are automatically registered. If you create a Technology object directly, you need to register it explicitly:
+    @code
+    tech = RBA::Technology::new
+    tech.load("mytech.lyt")
+    RBA::Technology::register_technology(tech)
+    @/code
+
+    Note that in the latter example, an exception will be thrown if a technology with the same name already exists. Also note, that \Technology#register will register a copy of the object, so modifying it after registration will not have any effect.
 
     The Technology class has been introduced in version 0.25.
     """
@@ -48796,6 +48858,8 @@ class Technology:
         r"""
         @brief Creates a new (empty) technology with the given name
 
+        The new technology is already registered in the system.
+
         This method returns a reference to the new technology.
         """
     @classmethod
@@ -48809,16 +48873,27 @@ class Technology:
         @brief Creates a new object of this class
         """
     @classmethod
+    def register_technology(cls, tech: Technology) -> Technology:
+        r"""
+        @brief Registers a technology in the system
+
+        Only after a technology is registered, it can be used in the system, e.g. by specifying its name in \Layout#technology_name. While \create_technology already registers the technology, this method allows registering a Technology object that has created in other ways.
+
+        This method returns a reference to the new technology object, which is a copy of the argument. \remove_technology can be used to remove a technology registered by this method.
+
+        This method has been introduced in version 0.28.14.
+        """
+    @classmethod
     def remove_technology(cls, name: str) -> None:
         r"""
-        @brief Removes the technology with the given name
+        @brief Removes the technology with the given name from the system
         """
     @classmethod
     def technologies_from_xml(cls, xml: str) -> None:
         r"""
         @brief Loads the technologies from a XML representation
 
-        See \technologies_to_xml for details. This method is the corresponding setter.
+        See \technologies_to_xml for details.
         """
     @classmethod
     def technologies_to_xml(cls) -> str:
@@ -48837,7 +48912,7 @@ class Technology:
         r"""
         @brief Loads the technology from a XML representation
 
-        See \technology_to_xml for details.
+        See \technology_to_xml for details. Note that this function will create a new Technology object which is not registered in the system. See \Technology#register for details.
         """
     @classmethod
     def technology_names(cls) -> List[str]:
@@ -49129,8 +49204,7 @@ class Text:
     Setter:
     @brief Sets the horizontal alignment
 
-    This property specifies how the text is aligned relative to the anchor point. 
-    This property has been introduced in version 0.22 and extended to enums in 0.28.
+    This is the version accepting integer values. It's provided for backward compatibility.
     """
     size: int
     r"""

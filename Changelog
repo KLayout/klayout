@@ -1,3 +1,34 @@
+0.28.14          (2023-12-08):
+* Bugfix: %GITHUB%/issues/1563 Duplicated Tabs in the Macro Development Tool
+* Bugfix: %GITHUB%/issues/1560 git+https package installation on windows fails
+* Bugfix: %GITHUB%/issues/1559 (partial) Move function not respecting some diagonals
+* Bugfix: %GITHUB%/issues/1549 Layout.error_layer now available in recursive shape search
+* Bugfix: %GITHUB%/issues/1542 KLayout crashes on exit
+* Enhancement: %GITHUB%/issues/1535 Support pathlib.Path in Python API
+  Implicitly converts objects to strings using "str(object)" (Python) or "object.to_s" (Ruby).
+* Bugfix: %GITHUB%/issues/1533 KLayout crashing with two consecutive calls of the same LayoutView::show_layout command
+* Bugfix: %GITHUB%/issues/1531 When symlinking a .def to a target without .def suffix, file can't be loaded
+* Enhancement: %GITHUB%/issues/1530 polygon from 2 size tuple points
+  The effect of this feature is pretty basic: tuples or lists are used as constructor
+  arguments for implicitly creating an object in place of them. Hence, "(x,y)" can be
+  used instead of a vector or a point. In some cases, this leads to ambiguities and
+  the implicit resolution will fail however.
+  Specifically a list of size-2 tuples can be passed to the "points" arguments of 
+  Polygon and Path.
+* Enhancement: %GITHUB%/issues/1528 LEF: Implement LEF58_WIDTHTABLE
+* Enhancement: new methods (D)Edge#euclidian_distance and (D)EdgePair#distance
+* Bugfix: package download dialog: mute an assertion, less questions for re-running macros
+* Enhancement: reading $KLAYOUT_GIT_PROXY_HTTP for proxy URL in Git downloads
+* Bugfix: cheats were not enabled for edges and (implicit) polygon merges such as for "sized"
+* Bugfix: more consistent behavior for Marker Browser / Scan Shapes
+  - Scan Shapes Hierarchical will scan from current cell, not all cells
+  - Marker browser shows markers propertly also in descended mode
+  - Marker database description of shown in selection box
+* Bugfix: Search feature in macro editor does not jump back to first position
+* Bugfix: "Trace All Nets"
+  - Asks for stack now in case of multiple stacks (previously: took that from "Trace Nets" dialog)
+  - Skips symbols which are not used (previously: extracted them as disconnected layers)
+  
 0.28.13          (2023-11-20):
 * Bugfix: %GITHUB%/issues/1534 Layout::dup does not copy properties
 * Bugfix: %GITHUB%/issues/1533 KLayout crashing with two consecutive calls of the same LayoutView::show_layout command 

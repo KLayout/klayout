@@ -1,3 +1,10 @@
+klayout (0.28.14-1) unstable; urgency=low
+
+  * New features and bugfixes
+    - See changelog
+
+ -- Matthias Köfferlein <matthias@koefferlein.de>  Fri, 08 Dec 2023 17:45:32 +0100
+
 klayout (0.28.13-1) unstable; urgency=low
 
   * New features and bugfixes

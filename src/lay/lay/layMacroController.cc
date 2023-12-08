@@ -56,6 +56,15 @@ MacroController::add_macro_category (const std::string &name, const std::string 
   cat.name = name;
   cat.description = description;
   cat.folders = folders;
+
+  //  replace an existing category or add to back
+  for (auto c = m_macro_categories.begin (); c != m_macro_categories.end (); ++c) {
+    if (c->name == name) {
+      *c = cat;
+      return;
+    }
+  }
+
   m_macro_categories.push_back (cat);
 }
 

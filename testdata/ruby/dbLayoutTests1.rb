@@ -2139,6 +2139,107 @@ class DBLayoutTests1_TestClass < TestBase
 
   end
 
+  # Error layer
+  def test_issue1549
+
+    ly = RBA::Layout::new
+    top = ly.create_cell("TOP")
+
+    ll = ly.layer(1, 0)
+    el = ly.error_layer
+    gs = ly.guiding_shape_layer
+    il = 100
+
+    assert_equal(true, ly.is_special_layer?(el))
+    assert_equal(false, ly.is_valid_layer?(el))
+    assert_equal(true, ly.is_special_layer?(gs))
+    assert_equal(false, ly.is_valid_layer?(gs))
+    assert_equal(false, ly.is_special_layer?(ll))
+    assert_equal(true, ly.is_valid_layer?(ll))
+    assert_equal(false, ly.is_special_layer?(il))
+    assert_equal(false, ly.is_valid_layer?(il))
+
+    top.shapes(gs).insert(RBA::Box::new(0, 0, 100, 200))
+    top.shapes(el).insert(RBA::Box::new(1, 2, 101, 202))
+    top.shapes(ll).insert(RBA::Box::new(10, 20, 110, 220))
+
+    s = RBA::RecursiveShapeIterator::new(ly, top, gs).each.collect { |it| it.shape.to_s }.join("/")
+    assert_equal("box (0,0;100,200)", s)
+
+    s = RBA::RecursiveShapeIterator::new(ly, top, [gs]).each.collect { |it| it.shape.to_s }.join("/")
+    assert_equal("box (0,0;100,200)", s)
+
+    s = top.begin_shapes_rec(gs).each.collect { |it| it.shape.to_s }.join("/")
+    assert_equal("box (0,0;100,200)", s)
+
+    s = top.begin_shapes_rec_touching(gs, RBA::Box::world).each.collect { |it| it.shape.to_s }.join("/")
+    assert_equal("box (0,0;100,200)", s)
+
+    s = top.begin_shapes_rec_overlapping(gs, RBA::Box::world).each.collect { |it| it.shape.to_s }.join("/")
+    assert_equal("box (0,0;100,200)", s)
+
+    s = RBA::RecursiveShapeIterator::new(ly, top, el).each.collect { |it| it.shape.to_s }.join("/")
+    assert_equal("box (1,2;101,202)", s)
+
+    s = RBA::RecursiveShapeIterator::new(ly, top, [el]).each.collect { |it| it.shape.to_s }.join("/")
+    assert_equal("box (1,2;101,202)", s)
+
+    s = top.begin_shapes_rec(el).each.collect { |it| it.shape.to_s }.join("/")
+    assert_equal("box (1,2;101,202)", s)
+
+    s = top.begin_shapes_rec_touching(el, RBA::Box::world).each.collect { |it| it.shape.to_s }.join("/")
+    assert_equal("box (1,2;101,202)", s)
+
+    s = top.begin_shapes_rec_overlapping(el, RBA::Box::world).each.collect { |it| it.shape.to_s }.join("/")
+    assert_equal("box (1,2;101,202)", s)
+
+    s = RBA::RecursiveShapeIterator::new(ly, top, ll).each.collect { |it| it.shape.to_s }.join("/")
+    assert_equal("box (10,20;110,220)", s)
+
+    s = RBA::RecursiveShapeIterator::new(ly, top, [ll]).each.collect { |it| it.shape.to_s }.join("/")
+    assert_equal("box (10,20;110,220)", s)
+
+    s = top.begin_shapes_rec(ll).each.collect { |it| it.shape.to_s }.join("/")
+    assert_equal("box (10,20;110,220)", s)
+
+    s = top.begin_shapes_rec_touching(ll, RBA::Box::world).each.collect { |it| it.shape.to_s }.join("/")
+    assert_equal("box (10,20;110,220)", s)
+
+    s = top.begin_shapes_rec_overlapping(ll, RBA::Box::world).each.collect { |it| it.shape.to_s }.join("/")
+    assert_equal("box (10,20;110,220)", s)
+
+    begin
+      s = RBA::RecursiveShapeIterator::new(ly, top, il).each.collect { |it| it.shape.to_s }.join("/")
+      assert_equal(true, false)
+    rescue => ex
+    end
+
+    begin
+      s = RBA::RecursiveShapeIterator::new(ly, top, [il]).each.collect { |it| it.shape.to_s }.join("/")
+      assert_equal(true, false)
+    rescue => ex
+    end
+
+    begin
+      s = top.begin_shapes_rec(il).each.collect { |it| it.shape.to_s }.join("/")
+      assert_equal(true, false)
+    rescue => ex
+    end
+
+    begin
+      s = top.begin_shapes_rec_touching(il, RBA::Box::world).each.collect { |it| it.shape.to_s }.join("/")
+      assert_equal(true, false)
+    rescue => ex
+    end
+
+    begin
+      s = top.begin_shapes_rec_overlapping(il, RBA::Box::world).each.collect { |it| it.shape.to_s }.join("/")
+      assert_equal(true, false)
+    rescue => ex
+    end
+
+  end
+
 end
 
 load("test_epilogue.rb")

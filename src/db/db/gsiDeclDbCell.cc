@@ -1369,6 +1369,13 @@ flatten1 (db::Cell *cell, bool prune)
   flatten (cell, -1, prune);
 }
 
+static void check_layer (const db::Layout *layout, unsigned int layer)
+{
+  if (! layout->is_valid_layer (layer) && ! layout->is_special_layer (layer)) {
+    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
+  }
+}
+
 static db::RecursiveShapeIterator 
 begin_shapes_rec (const db::Cell *cell, unsigned int layer)
 {
@@ -1376,9 +1383,7 @@ begin_shapes_rec (const db::Cell *cell, unsigned int layer)
   if (! layout) {
     throw tl::Exception (tl::to_string (tr ("Cell is not inside layout")));
   }
-  if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
-  }
+  check_layer (layout, layer);
   return db::RecursiveShapeIterator (*layout, *cell, layer);
 }
 
@@ -1389,9 +1394,7 @@ begin_shapes_rec_touching (const db::Cell *cell, unsigned int layer, db::Box reg
   if (! layout) {
     throw tl::Exception (tl::to_string (tr ("Cell is not inside layout")));
   }
-  if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
-  }
+  check_layer (layout, layer);
   return db::RecursiveShapeIterator (*layout, *cell, layer, region, false);
 }
 
@@ -1402,9 +1405,7 @@ begin_shapes_rec_touching_um (const db::Cell *cell, unsigned int layer, db::DBox
   if (! layout) {
     throw tl::Exception (tl::to_string (tr ("Cell is not inside layout")));
   }
-  if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
-  }
+  check_layer (layout, layer);
   return db::RecursiveShapeIterator (*layout, *cell, layer, db::CplxTrans (layout->dbu ()).inverted () * region, false);
 }
 
@@ -1415,9 +1416,7 @@ begin_shapes_rec_overlapping (const db::Cell *cell, unsigned int layer, db::Box 
   if (! layout) {
     throw tl::Exception (tl::to_string (tr ("Cell is not inside layout")));
   }
-  if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
-  }
+  check_layer (layout, layer);
   return db::RecursiveShapeIterator (*layout, *cell, layer, region, true);
 }
 
@@ -1428,9 +1427,7 @@ begin_shapes_rec_overlapping_um (const db::Cell *cell, unsigned int layer, db::D
   if (! layout) {
     throw tl::Exception (tl::to_string (tr ("Cell is not inside layout")));
   }
-  if (! layout->is_valid_layer (layer)) {
-    throw tl::Exception (tl::to_string (tr ("Invalid layer index")));
-  }
+  check_layer (layout, layer);
   return db::RecursiveShapeIterator (*layout, *cell, layer, db::CplxTrans (layout->dbu ()).inverted () * region, true);
 }
 

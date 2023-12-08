@@ -1,0 +1,13 @@
+VERSION 5.8 ;
+DIVIDERCHAR "/" ;
+BUSBITCHARS "[]" ;
+DESIGN block ;
+UNITS DISTANCE MICRONS 2000 ;
+DIEAREA ( 0 0 ) ( 3000 1000 ) ;
+NETS 1 ;
+    - n1 + USE SIGNAL
+      + ROUTED mx ( 1000 520 ) ( 2500 * )
+           NEW mx ( 1000 520 ) ( * 880 )
+  ;
+END NETS
+END DESIGN

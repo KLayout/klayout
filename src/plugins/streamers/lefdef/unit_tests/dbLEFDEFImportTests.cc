@@ -1017,6 +1017,32 @@ TEST(210_overlaps)
   run_test (_this, "issue-1499", "map:tech.map+lef:tech.lef+lef:blocks.lef+def:top.def", "au.oas", default_options (), false);
 }
 
+//  issue-1531
+TEST(211_symlinks)
+{
+  db::Layout ly;
+
+  std::string fn_path (tl::testdata ());
+  fn_path += "/lefdef/issue-1531/";
+
+  db::LEFDEFReaderOptions lefdef_opt = default_options ();
+  lefdef_opt.set_map_file ("tech.map");
+  std::vector<std::string> lf;
+  lf.push_back ("tech.lef");
+  lf.push_back ("blocks.lef");
+  lefdef_opt.set_lef_files (lf);
+  lefdef_opt.set_read_lef_with_def (false);
+  db::LoadLayoutOptions opt;
+  opt.set_options (lefdef_opt);
+
+  {
+    tl::InputStream is (fn_path + "top.def");
+    db::Reader reader (is);
+    reader.read (ly, opt);
+  }
+
+  db::compare_layouts (_this, ly, fn_path + "au.oas", db::WriteOAS);
+}
 
 //  issue-1528
 TEST(212_widthtable)

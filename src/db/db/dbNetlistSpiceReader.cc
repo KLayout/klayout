@@ -183,7 +183,7 @@ SpiceReaderStream::line_number () const
 std::string
 SpiceReaderStream::source () const
 {
-  return mp_stream->source ();
+  return mp_stream->absolute_path ();
 }
 
 bool
@@ -495,7 +495,7 @@ SpiceCircuitDict::read (tl::InputStream &stream)
     m_global_net_names.clear ();
     m_global_nets.clear ();
 
-    m_file_id = file_id (stream.source ());
+    m_file_id = file_id (stream.absolute_path ());
 
     while (! at_end ()) {
       read_card ();

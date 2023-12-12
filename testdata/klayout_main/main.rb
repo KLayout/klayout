@@ -201,6 +201,14 @@ class KLayoutMain_TestClass < TestBase
     out = `#{self.klayout_bin} -z -r #{File.join(File.dirname(__FILE__), "test12.rb")} 2>&1`
     assert_equal(out, "Before exit()\n")
 
+    # sys.exit(0) - Python
+    out = `#{self.klayout_bin} -z -r #{File.join(File.dirname(__FILE__), "test12s.py")} 2>&1`
+    assert_equal(out, "Before exit()\n")
+
+    # quit() - Python (issue #1565)
+    out = `#{self.klayout_bin} -z -r #{File.join(File.dirname(__FILE__), "test12q.py")} 2>&1`
+    assert_equal(out, "Before quit()\n")
+
   end
 
 end

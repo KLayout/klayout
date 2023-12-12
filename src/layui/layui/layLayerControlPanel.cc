@@ -885,7 +885,27 @@ LayerControlPanel::cm_show ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void 
+void
+LayerControlPanel::cm_toggle_visibility ()
+{
+  BEGIN_PROTECTED_CLEANUP
+
+  transaction (tl::to_string (QObject::tr ("Toggle visibility")));
+
+  std::vector<lay::LayerPropertiesConstIterator> sel = mp_view->selected_layers ();
+
+  for (std::vector<lay::LayerPropertiesConstIterator>::const_iterator l = sel.begin (); l != sel.end (); ++l) {
+    lay::LayerProperties props (**l);
+    props.set_visible (! props.visible (false));
+    mp_view->set_properties (*l, props);
+  }
+
+  commit ();
+
+  END_PROTECTED_CLEANUP { recover (); }
+}
+
+void
 LayerControlPanel::cm_show_all ()
 {
   BEGIN_PROTECTED_CLEANUP
@@ -1061,7 +1081,44 @@ LayerControlPanel::cm_select_all ()
   END_PROTECTED_CLEANUP { recover (); }
 }
 
-void 
+void
+LayerControlPanel::cm_invert_selection ()
+{
+  BEGIN_PROTECTED_CLEANUP
+
+  std::vector<lay::LayerPropertiesConstIterator> sel = mp_view->selected_layers ();
+
+  std::set<size_t> ids;
+  for (auto s = sel.begin (); s != sel.end (); ++s) {
+    ids.insert (s->uint ());
+  }
+
+  std::vector<lay::LayerPropertiesConstIterator> new_sel;
+
+  for (lay::LayerPropertiesConstIterator l = mp_view->begin_layers (); ! l.at_end (); ) {
+    if (ids.find (l.uint ()) == ids.end ()) {
+      new_sel.push_back (l);
+      ++l;
+    } else if (l->has_children ()) {
+      while (! l.at_end ()) {
+        l.next_sibling ();
+        if (l.at_end () && ! l.at_top ()) {
+          l.up ();
+        } else {
+          break;
+        }
+      }
+    } else {
+      ++l;
+    }
+  }
+
+  mp_layer_list->set_selection (new_sel);
+
+  END_PROTECTED_CLEANUP { recover (); }
+}
+
+void
 LayerControlPanel::set_selection (const std::vector<lay::LayerPropertiesConstIterator> &new_sel)
 {
   //  If the tree has changed we need to delay the selection update until the model has been updated.
@@ -2291,6 +2348,7 @@ public:
     at = "@lcp_context_menu.end";
 
     menu_entries.push_back (lay::menu_item ("cm_lv_select_all", "select_all", at, tl::to_string (QObject::tr ("Select All"))));
+    menu_entries.push_back (lay::menu_item ("cm_lv_invert_selection", "invert_selection", at, tl::to_string (QObject::tr ("Invert Selection"))));
     //  It is not sure, whether "expandAll" destabilizes the tree widget:
     //  menu_entries.push_back (lay::menu_item ("cm_lv_expand_all", "expand_all", at, tl::to_string (QObject::tr ("Expand All"))));
     menu_entries.push_back (lay::separator ("tab_group", at));
@@ -2309,6 +2367,7 @@ public:
     menu_entries.push_back (lay::menu_item ("cm_lv_show", "show", at, tl::to_string (QObject::tr ("Show"))));
     menu_entries.push_back (lay::menu_item ("cm_lv_show_all", "show_all", at, tl::to_string (QObject::tr ("Show All"))));
     menu_entries.push_back (lay::menu_item ("cm_lv_show_only", "show_only", at, tl::to_string (QObject::tr ("Show Only Selected"))));
+    menu_entries.push_back (lay::menu_item ("cm_lv_toggle_visibility", "toggle_visibility", at, tl::to_string (QObject::tr ("Toggle Visibility"))));
     menu_entries.push_back (lay::menu_item ("cm_lv_make_valid", "valid", at, tl::to_string (QObject::tr ("Make Valid"))));
     menu_entries.push_back (lay::menu_item ("cm_lv_make_invalid", "invvalid", at, tl::to_string (QObject::tr ("Make Invalid"))));
     menu_entries.push_back (lay::menu_item ("cm_lv_rename", "rename", at, tl::to_string (QObject::tr ("Rename"))));

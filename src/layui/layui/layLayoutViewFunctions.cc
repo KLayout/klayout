@@ -367,6 +367,8 @@ LayoutViewFunctions::menu_activated (const std::string &symbol)
     }
   } else if (symbol == "cm_lv_select_all") {
     cm_select_all ();
+  } else if (symbol == "cm_lv_invert_selection") {
+    cm_invert_selection ();
   } else if (symbol == "cm_lv_new_tab") {
     cm_new_tab ();
   } else if (symbol == "cm_lv_rename_tab") {
@@ -387,6 +389,8 @@ LayoutViewFunctions::menu_activated (const std::string &symbol)
     cm_show_all ();
   } else if (symbol == "cm_lv_show") {
     cm_show ();
+  } else if (symbol == "cm_lv_toggle_visibility") {
+    cm_toggle_visibility ();
   } else if (symbol == "cm_lv_rename") {
     cm_rename ();
   } else if (symbol == "cm_lv_delete") {
@@ -947,6 +951,14 @@ LayoutViewFunctions::cm_select_all ()
 }
 
 void
+LayoutViewFunctions::cm_invert_selection ()
+{
+  if (view ()->control_panel ()) {
+    view ()->control_panel ()->cm_invert_selection ();
+  }
+}
+
+void
 LayoutViewFunctions::cm_new_tab ()
 {
   if (view ()->control_panel ()) {
@@ -1023,6 +1035,14 @@ LayoutViewFunctions::cm_show ()
 {
   if (view ()->control_panel ()) {
     view ()->control_panel ()->cm_show ();
+  }
+}
+
+void
+LayoutViewFunctions::cm_toggle_visibility ()
+{
+  if (view ()->control_panel ()) {
+    view ()->control_panel ()->cm_toggle_visibility ();
   }
 }
 

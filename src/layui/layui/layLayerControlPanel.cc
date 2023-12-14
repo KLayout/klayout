@@ -2413,7 +2413,6 @@ public:
     menu_entries.push_back (lay::separator ("visibility_group", at));
     menu_entries.push_back (lay::config_menu_item ("visibility_follows_selection", at, tl::to_string (QObject::tr ("Visibility Follows Selection")), cfg_layer_visibility_follows_selection, "?"));
     menu_entries.push_back (lay::menu_item ("cm_lv_hide", "hide", at, tl::to_string (QObject::tr ("Hide"))));
-    menu_entries.push_back (lay::menu_item ("cm_lv_hide", "hide", at, tl::to_string (QObject::tr ("Hide"))));
     menu_entries.push_back (lay::menu_item ("cm_lv_hide_all", "hide_all", at, tl::to_string (QObject::tr ("Hide All"))));
     menu_entries.push_back (lay::menu_item ("cm_lv_show", "show", at, tl::to_string (QObject::tr ("Show"))));
     menu_entries.push_back (lay::menu_item ("cm_lv_show_all", "show_all", at, tl::to_string (QObject::tr ("Show All"))));

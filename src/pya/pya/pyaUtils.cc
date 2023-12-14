@@ -119,7 +119,9 @@ void check_error ()
       int status = 0;
       if (exc_value) {
         tl::Variant st = python2c<tl::Variant> (exc_value.get ());
-        status = st.to_int ();
+        if (st.can_convert_to_int ()) {
+          status = st.to_int ();
+        }
       }
 
       throw tl::ExitException (status);

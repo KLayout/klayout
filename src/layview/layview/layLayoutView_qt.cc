@@ -960,6 +960,24 @@ LayoutView::configure (const std::string &name, const std::string &value)
     }
     return true;
 
+  } else if (name == cfg_layer_visibility_follows_selection) {
+
+    bool f;
+    tl::from_string (value, f);
+    if (mp_control_panel) {
+      mp_control_panel->set_layer_visibility_follows_selection (f);
+    }
+    return true;
+
+  } else if (name == cfg_test_shapes_in_view) {
+
+    bool f;
+    tl::from_string (value, f);
+    if (mp_control_panel) {
+      mp_control_panel->set_test_shapes_in_view (f);
+    }
+    return true;
+
   } else if (name == cfg_test_shapes_in_view) {
 
     bool f;

@@ -213,7 +213,9 @@ LayerControlPanel::LayerControlPanel (lay::LayoutViewBase *view, db::Manager *ma
     m_oversampling (1),
     m_hrm (false),
     m_do_update_content_dm (this, &LayerControlPanel::do_update_content),
-    m_no_stipples (false)
+    m_do_update_visibility_dm (this, &LayerControlPanel::do_update_visibility),
+    m_no_stipples (false),
+    m_layer_visibility_follows_selection (false)
 {
   setObjectName (QString::fromUtf8 (name));
 
@@ -315,6 +317,7 @@ LayerControlPanel::LayerControlPanel (lay::LayoutViewBase *view, db::Manager *ma
   connect (mp_layer_list, SIGNAL (expanded (const QModelIndex &)), this, SLOT (group_expanded (const QModelIndex &)));
   connect (mp_layer_list, SIGNAL (search_triggered (const QString &)), this, SLOT (search_triggered (const QString &)));
   connect (mp_layer_list->selectionModel (), SIGNAL (currentChanged (const QModelIndex &, const QModelIndex &)), this, SLOT (current_index_changed (const QModelIndex &)));
+  connect (mp_layer_list->selectionModel (), SIGNAL (selectionChanged (const QItemSelection &, const QItemSelection &)), this, SLOT (selection_changed (const QItemSelection &, const QItemSelection &)));
   mp_layer_list->setContextMenuPolicy (Qt::CustomContextMenu);
   connect (mp_layer_list, SIGNAL(customContextMenuRequested (const QPoint &)), this, SLOT (context_menu (const QPoint &)));
   mp_layer_list->header ()->hide ();
@@ -1700,6 +1703,21 @@ LayerControlPanel::update_hidden_flags ()
 }
 
 void
+LayerControlPanel::set_layer_visibility_follows_selection (bool f)
+{
+  if (f != m_layer_visibility_follows_selection) {
+    m_layer_visibility_follows_selection = f;
+    m_do_update_visibility_dm ();
+  }
+}
+
+bool
+LayerControlPanel::layer_visibility_follows_selection ()
+{
+  return m_layer_visibility_follows_selection;
+}
+
+void
 LayerControlPanel::set_hide_empty_layers (bool f)
 {
   mp_model->set_hide_empty_layers (f);
@@ -1844,6 +1862,29 @@ LayerControlPanel::do_update_hidden_flags ()
         mp_layer_list->scrollTo (current, QAbstractItemView::PositionAtCenter);
       }
     }
+  }
+}
+
+void
+LayerControlPanel::do_update_visibility ()
+{
+  if (! m_layer_visibility_follows_selection) {
+    return;
+  }
+
+  std::set<size_t> sel_uints;
+
+  QModelIndexList selected = mp_layer_list->selectionModel ()->selectedIndexes ();
+  for (QModelIndexList::const_iterator i = selected.begin (); i != selected.end (); ++i) {
+    if (i->column () == 0) {
+      sel_uints.insert (mp_model->iterator (*i).uint ());
+    }
+  }
+
+  for (lay::LayerPropertiesConstIterator l = mp_view->begin_layers (); ! l.at_end (); ++l) {
+    lay::LayerProperties props (*l);
+    props.set_visible (sel_uints.find (l.uint ()) != sel_uints.end () || l->has_children ());
+    mp_view->set_properties (l, props);
   }
 }
 
@@ -2109,6 +2150,14 @@ LayerControlPanel::current_index_changed (const QModelIndex &index)
 }
 
 void
+LayerControlPanel::selection_changed (const QItemSelection &, const QItemSelection &)
+{
+  if (m_layer_visibility_follows_selection) {
+    m_do_update_visibility_dm ();
+  }
+}
+
+void
 LayerControlPanel::group_collapsed (const QModelIndex &index)
 {
   auto iter = mp_model->iterator_nc (index);
@@ -2362,6 +2411,8 @@ public:
     }
 
     menu_entries.push_back (lay::separator ("visibility_group", at));
+    menu_entries.push_back (lay::config_menu_item ("visibility_follows_selection", at, tl::to_string (QObject::tr ("Visibility Follows Selection")), cfg_layer_visibility_follows_selection, "?"));
+    menu_entries.push_back (lay::menu_item ("cm_lv_hide", "hide", at, tl::to_string (QObject::tr ("Hide"))));
     menu_entries.push_back (lay::menu_item ("cm_lv_hide", "hide", at, tl::to_string (QObject::tr ("Hide"))));
     menu_entries.push_back (lay::menu_item ("cm_lv_hide_all", "hide_all", at, tl::to_string (QObject::tr ("Hide All"))));
     menu_entries.push_back (lay::menu_item ("cm_lv_show", "show", at, tl::to_string (QObject::tr ("Show"))));

@@ -81,6 +81,7 @@ fi
 if [ "$MSYSTEM" == "UCRT64" ]; then
   arch=win64-ucrt
   ucrt_inst=/ucrt64
+  ucrt_vssdk="C:/Program Files (x86)/Windows Kits/10/Redist/10.0.22621.0/ucrt/DLLs/x64"
 else
   echo "ERROR: not in ucrt64 system."
 fi
@@ -247,6 +248,12 @@ while [ "$new_libs" != "" ]; do
       echo "Copying binary installation partial $ucrt_inst/bin/$l -> $target/$l"
       cp $ucrt_inst/bin/$l $l
       new_libs="$new_libs $l"
+    elif [ -e "${ucrt_vssdk}/$l" ] && ! [ -e "$target/$l" ]; then
+      echo "Copying binary installation partial $ucrt_inst/bin/$l -> $target/$l"
+      cp "${ucrt_vssdk}/${l}" "$target/$l"
+      new_libs="$new_libs $l"
+    elif ! [ -e C:/windows/system32/$l ] && ! [ -e "$pwd/bin/$l" ]; then
+      echo "NOT FOUND $l"
     fi  
   done
 

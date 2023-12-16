@@ -1,6 +1,6 @@
-Relevant KLayout version: 0.28.13<br>
+Relevant KLayout version: 0.28.14<br>
 Author: Kazzz-S<br>
-Last modified: 2023-11-11<br>
+Last modified: 2023-12-10<br>
 
 # 1. Introduction
 This directory **`macbuild`** contains various files required for building KLayout (http://www.klayout.de/) version 0.28.13 or later for different 64-bit macOS, including:
@@ -249,6 +249,16 @@ export PYTHONHOME=$HOME/opt/anaconda3
 ### 6F. Other combinations
 Logically, several module combinations other than 6B through 6E are possible, including `nil` choice.<br>
 The resultant package directory name will begin with **`EX-`** (exceptional) if you choose such a combination.
+
+### 6G. Using the git-based Salt Package Manager through a proxy server
+If you use the git-based Salt Package Manager through a proxy server, you need to set the `KLAYOUT_GIT_HTTP_PROXY` environment variable. For example,
+```
+$ export KLAYOUT_GIT_HTTP_PROXY="http://111.222.333.444:5678"
+```
+Ask your system administrator for the actual IP address and port number of your proxy server.
+
+It is highly recommended that this setting is included in a launching service script bundle.<br>
+A sample content (`*.app.Bash`) of the script bundle can be found in `Resources/script-bundle-[A|B|H|P].zip`.
 
 ----
 

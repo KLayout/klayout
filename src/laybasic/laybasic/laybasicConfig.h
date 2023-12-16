@@ -117,6 +117,7 @@ static const std::string cfg_drop_small_cells_value ("drop-small-cells-value");
 static const std::string cfg_array_border_instances ("draw-array-border-instances");
 static const std::string cfg_default_lyp_file ("default-layer-properties");
 static const std::string cfg_default_add_other_layers ("default-add-other-layers");
+static const std::string cfg_layer_visibility_follows_selection ("layer-visibility-follows-selection");
 static const std::string cfg_layers_always_show_source ("layers-always-show-source");
 static const std::string cfg_layers_always_show_ld ("layers-always-show-ld");
 static const std::string cfg_layers_always_show_layout_index ("layers-always-show-layout-index");

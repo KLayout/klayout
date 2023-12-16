@@ -43,6 +43,7 @@ public:
     lay::ColorConverter cc;
     options.push_back (std::pair<std::string, std::string> (cfg_default_lyp_file, ""));
     options.push_back (std::pair<std::string, std::string> (cfg_default_add_other_layers, "false"));
+    options.push_back (std::pair<std::string, std::string> (cfg_layer_visibility_follows_selection, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_layers_always_show_source, "false"));
     options.push_back (std::pair<std::string, std::string> (cfg_layers_always_show_ld, "true"));
     options.push_back (std::pair<std::string, std::string> (cfg_layers_always_show_layout_index, "false"));

@@ -254,8 +254,9 @@ while [ "$new_libs" != "" ]; do
     objdump -p $l | grep "DLL Name:" | sed 's/.*DLL Name: *//' >>$tmp_libs
   done
   echo ""
-  new_libs=$(cat $tmp_libs | sort -u)
+  libs=$(cat $tmp_libs | sort -u)
   rm -f $tmp_libs
+  new_libs=""
 
   for l in $libs; do
     if [ -e $ucrt_inst/bin/$l ] && ! [ -e $l ]; then

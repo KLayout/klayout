@@ -246,24 +246,26 @@ while [ "$new_libs" != "" ]; do
   echo "Analyzing dependencies of $new_libs .."
 
   # Analyze the dependencies of our components and add the corresponding libraries from $ucrt_inst/bin
-  libs=""
+  tmp_libs=.tmp-libs.txt
+  rm -f $tmp_libs
+  echo "" >$tmp_libs
   for l in $new_libs; do
-    libs1=$(objdump -p $l | grep "DLL Name:" | sort -u | sed 's/.*DLL Name: *//')
-    libs="$libs $libs1"
+    echo -n "."
+    objdump -p $l | grep "DLL Name:" | sed 's/.*DLL Name: *//' >>$tmp_libs
   done
-  new_libs=""
+  echo ""
+  new_libs=$(cat $tmp_libs | sort -u)
+  rm -f $tmp_libs
 
   for l in $libs; do
     if [ -e $ucrt_inst/bin/$l ] && ! [ -e $l ]; then
-      echo "Copying binary installation partial $ucrt_inst/bin/$l -> $target/$l"
+      echo "Copying binary installation partial $ucrt_inst/bin/$l -> $l"
       cp $ucrt_inst/bin/$l $l
       new_libs="$new_libs $l"
     elif [ -e "${ucrt_vssdk}/$l" ] && ! [ -e "$target/$l" ]; then
-      echo "Copying binary installation partial $ucrt_inst/bin/$l -> $target/$l"
-      cp "${ucrt_vssdk}/${l}" "$target/$l"
+      echo "Copying binary installation partial $ucrt_inst/bin/$l -> $l"
+      cp "${ucrt_vssdk}/${l}" "$l"
       new_libs="$new_libs $l"
-    elif ! [ -e C:/windows/system32/$l ] && ! [ -e "$pwd/bin/$l" ]; then
-      echo "NOT FOUND $l"
     fi  
   done
 

@@ -88,7 +88,7 @@ if [ "$MSYSTEM" == "UCRT64" ]; then
     echo "ERROR: ucrt64 DLLs not found"
     exit 1
   fi
-  ucrt_vssdk=$(cygpath -w "${a[0]}")
+  ucrt_vssdk=$(cygpath -w "$ucrt_vssdk")
 
 else
   echo "ERROR: not in ucrt64 system."

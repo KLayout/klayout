@@ -263,7 +263,7 @@ while [ "$new_libs" != "" ]; do
       echo "Copying binary installation partial $ucrt_inst/bin/$l -> $l"
       cp $ucrt_inst/bin/$l $l
       new_libs="$new_libs $l"
-    elif [ -e "${ucrt_vssdk}/$l" ] && ! [ -e "$target/$l" ]; then
+    elif [ -e "${ucrt_vssdk}/$l" ] && ! [ -e $l ]; then
       echo "Copying binary installation partial $ucrt_inst/bin/$l -> $l"
       cp "${ucrt_vssdk}/${l}" "$l"
       new_libs="$new_libs $l"

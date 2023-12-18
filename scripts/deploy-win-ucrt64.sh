@@ -252,7 +252,7 @@ while [ "$new_libs" != "" ]; do
       echo "Copying binary installation partial $ucrt_inst/bin/$l -> $target/$l"
       cp "${ucrt_vssdk}/${l}" "$target/$l"
       new_libs="$new_libs $l"
-    elif ! [ -e C:/windows/system32/$l ] && ! [ -e "$pwd/bin/$l" ]; then
+    elif ! [ -e C:/windows/system32/$l ] && ! [ -e "$target/$l" ]; then
       echo "NOT FOUND $l"
     fi  
   done

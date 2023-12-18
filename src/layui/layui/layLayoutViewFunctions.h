@@ -87,12 +87,14 @@ public:
   void cm_rename_tab ();
   void cm_remove_tab ();
   void cm_select_all ();
+  void cm_invert_selection ();
   void cm_make_valid ();
   void cm_make_invalid ();
   void cm_hide ();
   void cm_hide_all ();
   void cm_show ();
   void cm_show_all ();
+  void cm_toggle_visibility ();
   void cm_show_only ();
   void cm_rename ();
   void cm_delete ();

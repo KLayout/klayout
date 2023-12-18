@@ -189,6 +189,18 @@ public:
   bool hide_empty_layers ();
 
   /**
+   *  @brief Set the "layer visibility follows selection" flag
+   *
+   *  If this flag is set, only the selected layers are made visible.
+   */
+  void set_layer_visibility_follows_selection (bool f);
+
+  /**
+   *  @brief Get the "layer visibility follows selection" flag
+   */
+  bool layer_visibility_follows_selection ();
+
+  /**
    *  @brief Set the "test_shapes_in_view" flag
    *
    *  If this flag is set, layers without a shape in the viewport are shown "empty".
@@ -300,12 +312,14 @@ public slots:
   void cm_remove_tab ();
   void cm_rename_tab ();
   void cm_select_all ();
+  void cm_invert_selection ();
   void cm_make_valid ();
   void cm_make_invalid ();
   void cm_hide ();
   void cm_hide_all ();
   void cm_show ();
   void cm_show_all ();
+  void cm_toggle_visibility ();
   void cm_show_only ();
   void cm_rename ();
   void cm_delete ();
@@ -332,6 +346,7 @@ public slots:
   void group_collapsed (const QModelIndex &index);
   void group_expanded (const QModelIndex &index);
   void current_index_changed (const QModelIndex &index);
+  void selection_changed (const QItemSelection &, const QItemSelection &);
   void up_clicked ();
   void upup_clicked ();
   void down_clicked ();
@@ -361,7 +376,9 @@ private:
   int m_oversampling;
   bool m_hrm;
   tl::DeferredMethod<LayerControlPanel> m_do_update_content_dm;
+  tl::DeferredMethod<LayerControlPanel> m_do_update_visibility_dm;
   bool m_no_stipples;
+  bool m_layer_visibility_follows_selection;
   QLabel *m_no_stipples_label;
   lay::DecoratedLineEdit *mp_search_edit_box;
   QAction *mp_case_sensitive;
@@ -382,6 +399,7 @@ private:
   void signal_vp_changed ();
 
   void do_update_content ();
+  void do_update_visibility ();
   void do_update_hidden_flags ();
   void do_delete ();
   void do_copy ();

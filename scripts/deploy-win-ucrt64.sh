@@ -26,7 +26,6 @@ fi
 
 pwd=$(pwd)
 
-enable64bit=1
 args=""
 suffix=""
 
@@ -42,7 +41,7 @@ while [ "$1" != "" ]; do
     echo "Options:"
     echo "  -s <suffix>  Binary suffix"
     echo ""
-    echo "By default, both 32 and 64 bit builds are performed"
+    echo "Only 64 bit builds are performed."
     exit 0
   elif [ "$1" = "-s" ]; then
     shift
@@ -67,9 +66,7 @@ if [ "$KLAYOUT_BUILD_IN_PROGRESS" == "" ]; then
 
 
   # Run ourself in UCRT64 system for the win64 build
-  if [ "$enable64bit" != "0" ]; then
-    MSYSTEM=UCRT64 bash --login -c "cd $pwd ; $self"
-  fi
+  MSYSTEM=UCRT64 bash --login -c "cd $pwd ; $self"
 
   exit 0
 
@@ -79,9 +76,20 @@ fi
 # Actual build branch
 
 if [ "$MSYSTEM" == "UCRT64" ]; then
+
   arch=win64-ucrt
   ucrt_inst=/ucrt64
-  ucrt_vssdk="C:/Program Files (x86)/Windows Kits/10/Redist/10.0.22621.0/ucrt/DLLs/x64"
+
+  shopt -s nullglob
+  ucrt_vssdk=(/c/Program\ Files\ \(x86\)/Windows\ Kits/10/Redist/10.0.*)
+  shopt -u nullglob
+  ucrt_vssdk=${ucrt_vssdk[0]}
+  if [ "$ucrt_vssdk" = "" ]; then
+    echo "ERROR: ucrt64 DLLs not found"
+    exit 1
+  fi
+  ucrt_vssdk=$(cygpath -w "$ucrt_vssdk")
+
 else
   echo "ERROR: not in ucrt64 system."
 fi
@@ -104,6 +112,8 @@ echo "  build      = $build"
 echo "  version    = $KLAYOUT_VERSION"
 echo "  build args = $KLAYOUT_BUILD_ARGS"
 echo "  suffix     = $KLAYOUT_BUILD_SUFFIX"
+echo ""
+echo "  UCRT libs  = $ucrt_vssdk"
 echo ""
 
 rm -rf $target
@@ -236,24 +246,27 @@ while [ "$new_libs" != "" ]; do
   echo "Analyzing dependencies of $new_libs .."
 
   # Analyze the dependencies of our components and add the corresponding libraries from $ucrt_inst/bin
-  libs=""
+  tmp_libs=.tmp-libs.txt
+  rm -f $tmp_libs
+  echo "" >$tmp_libs
   for l in $new_libs; do
-    libs1=$(objdump -p $l | grep "DLL Name:" | sort -u | sed 's/.*DLL Name: *//')
-    libs="$libs $libs1"
+    echo -n "."
+    objdump -p $l | grep "DLL Name:" | sed 's/.*DLL Name: *//' >>$tmp_libs
   done
+  echo ""
+  libs=$(cat $tmp_libs | sort -u)
+  rm -f $tmp_libs
   new_libs=""
 
   for l in $libs; do
     if [ -e $ucrt_inst/bin/$l ] && ! [ -e $l ]; then
-      echo "Copying binary installation partial $ucrt_inst/bin/$l -> $target/$l"
+      echo "Copying binary installation partial $ucrt_inst/bin/$l -> $l"
       cp $ucrt_inst/bin/$l $l
       new_libs="$new_libs $l"
-    elif [ -e "${ucrt_vssdk}/$l" ] && ! [ -e "$target/$l" ]; then
-      echo "Copying binary installation partial $ucrt_inst/bin/$l -> $target/$l"
-      cp "${ucrt_vssdk}/${l}" "$target/$l"
+    elif [ -e "${ucrt_vssdk}/$l" ] && ! [ -e $l ]; then
+      echo "Copying binary installation partial $ucrt_inst/bin/$l -> $l"
+      cp "${ucrt_vssdk}/${l}" "$l"
       new_libs="$new_libs $l"
-    elif ! [ -e C:/windows/system32/$l ] && ! [ -e "$pwd/bin/$l" ]; then
-      echo "NOT FOUND $l"
     fi  
   done
 

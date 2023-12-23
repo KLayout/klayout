@@ -35,10 +35,6 @@
 #define STRINGIFY(s) _STRINGIFY(s)
 #define _STRINGIFY(s) #s
 
-#include "tlUnitTest.h"
-#include "tlStream.h"
-#include "tlEnv.h"
-
 int run_pymodtest (tl::TestBase *_this, const std::string &fn)
 {
   std::string pypath = STRINGIFY (PYTHONPATH);

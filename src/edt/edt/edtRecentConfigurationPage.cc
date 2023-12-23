@@ -27,6 +27,7 @@
 #include "layDispatcher.h"
 #include "layLayoutViewBase.h"
 #include "layLayerTreeModel.h"
+#include "layBusy.h"
 #include "dbLibraryManager.h"
 #include "dbLibrary.h"
 #include "tlLog.h"
@@ -275,7 +276,12 @@ RecentConfigurationPage::render_to (QTreeWidgetItem *item, int column, const std
         if (pcid.first) {
           const db::PCellDeclaration *pc_decl = lib->layout ().pcell_declaration (pcid.second);
           if (pc_decl) {
-            item->setText (column, tl::to_qstring (pc_decl->get_display_name (pc_decl->map_parameters (pcp))));
+            lay::BusySection busy;  //  do not trigger macro IDE breakpoints and exception handling
+            try {
+              item->setText (column, tl::to_qstring (pc_decl->get_display_name (pc_decl->map_parameters (pcp))));
+            } catch (tl::Exception &ex) {
+              item->setText (column, tl::to_qstring (std::string ("ERROR: ") + tl::to_quoted_string (ex.msg ())));
+            }
             break;
           }
         }

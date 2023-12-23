@@ -124,7 +124,7 @@ static void _init_f_feature_c2967 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("name");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
   decl->add_arg<bool * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -134,7 +134,7 @@ static void _call_f_feature_c2967 (const qt_gsi::GenericMethod * /*decl*/, void 
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<bool > ((bool)((QXmlReader *)cls)->feature (arg1, arg2));
 }
 
@@ -218,7 +218,7 @@ static void _init_f_property_c2967 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("name");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
   decl->add_arg<bool * > (argspec_1);
   decl->set_return<void * > ();
 }
@@ -228,7 +228,7 @@ static void _call_f_property_c2967 (const qt_gsi::GenericMethod * /*decl*/, void
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<void * > ((void *)((QXmlReader *)cls)->property (arg1, arg2));
 }
 

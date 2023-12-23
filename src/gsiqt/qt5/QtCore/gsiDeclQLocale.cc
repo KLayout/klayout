@@ -326,6 +326,31 @@ static void _call_f_firstDayOfWeek_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
+// QString QLocale::formattedDataSize(qint64 bytes, int precision, QFlags<QLocale::DataSizeFormat> format)
+
+
+static void _init_f_formattedDataSize_4864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("bytes");
+  decl->add_arg<qint64 > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("precision", true, "2");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("format", true, "QLocale::DataSizeIecFormat");
+  decl->add_arg<QFlags<QLocale::DataSizeFormat> > (argspec_2);
+  decl->set_return<QString > ();
+}
+
+static void _call_f_formattedDataSize_4864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
+  int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (2, heap);
+  QFlags<QLocale::DataSizeFormat> arg3 = args ? gsi::arg_reader<QFlags<QLocale::DataSizeFormat> >() (args, heap) : gsi::arg_maker<QFlags<QLocale::DataSizeFormat> >() (QLocale::DataSizeIecFormat, heap);
+  ret.write<QString > ((QString)((QLocale *)cls)->formattedDataSize (arg1, arg2, arg3));
+}
+
+
 // QChar QLocale::groupSeparator()
 
 
@@ -671,6 +696,26 @@ static void _call_f_standaloneMonthName_c2919 (const qt_gsi::GenericMethod * /*d
 }
 
 
+// void QLocale::swap(QLocale &other)
+
+
+static void _init_f_swap_1291 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<QLocale & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_swap_1291 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QLocale &arg1 = gsi::arg_reader<QLocale & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QLocale *)cls)->swap (arg1);
+}
+
+
 // Qt::LayoutDirection QLocale::textDirection()
 
 
@@ -859,12 +904,37 @@ static void _call_f_toCurrencyString_c2988 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// QString QLocale::toCurrencyString(float, const QString &symbol)
+// QString QLocale::toCurrencyString(double, const QString &symbol, int precision)
+
+
+static void _init_f_toCurrencyString_c3647 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<double > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("symbol");
+  decl->add_arg<const QString & > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("precision");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return<QString > ();
+}
+
+static void _call_f_toCurrencyString_c3647 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ret.write<QString > ((QString)((QLocale *)cls)->toCurrencyString (arg1, arg2, arg3));
+}
+
+
+// QString QLocale::toCurrencyString(float i, const QString &symbol)
 
 
 static void _init_f_toCurrencyString_c2887 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("i");
   decl->add_arg<float > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("symbol", true, "QString()");
   decl->add_arg<const QString & > (argspec_1);
@@ -878,6 +948,31 @@ static void _call_f_toCurrencyString_c2887 (const qt_gsi::GenericMethod * /*decl
   float arg1 = gsi::arg_reader<float >() (args, heap);
   const QString &arg2 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toCurrencyString (arg1, arg2));
+}
+
+
+// QString QLocale::toCurrencyString(float i, const QString &symbol, int precision)
+
+
+static void _init_f_toCurrencyString_c3546 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("i");
+  decl->add_arg<float > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("symbol");
+  decl->add_arg<const QString & > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("precision");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return<QString > ();
+}
+
+static void _call_f_toCurrencyString_c3546 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ret.write<QString > ((QString)((QLocale *)cls)->toCurrencyString (arg1, arg2, arg3));
 }
 
 
@@ -976,7 +1071,7 @@ static void _init_f_toDouble_c2967 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("s");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
   decl->add_arg<bool * > (argspec_1);
   decl->set_return<double > ();
 }
@@ -986,7 +1081,7 @@ static void _call_f_toDouble_c2967 (const qt_gsi::GenericMethod * /*decl*/, void
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<double > ((double)((QLocale *)cls)->toDouble (arg1, arg2));
 }
 
@@ -998,7 +1093,7 @@ static void _init_f_toFloat_c2967 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("s");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
   decl->add_arg<bool * > (argspec_1);
   decl->set_return<float > ();
 }
@@ -1008,7 +1103,7 @@ static void _call_f_toFloat_c2967 (const qt_gsi::GenericMethod * /*decl*/, void 
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<float > ((float)((QLocale *)cls)->toFloat (arg1, arg2));
 }
 
@@ -1020,7 +1115,7 @@ static void _init_f_toInt_c2967 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("s");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
   decl->add_arg<bool * > (argspec_1);
   decl->set_return<int > ();
 }
@@ -1030,7 +1125,7 @@ static void _call_f_toInt_c2967 (const qt_gsi::GenericMethod * /*decl*/, void *c
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<int > ((int)((QLocale *)cls)->toInt (arg1, arg2));
 }
 
@@ -1042,7 +1137,7 @@ static void _init_f_toLongLong_c2967 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("s");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
   decl->add_arg<bool * > (argspec_1);
   decl->set_return<qlonglong > ();
 }
@@ -1052,7 +1147,7 @@ static void _call_f_toLongLong_c2967 (const qt_gsi::GenericMethod * /*decl*/, vo
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<qlonglong > ((qlonglong)((QLocale *)cls)->toLongLong (arg1, arg2));
 }
 
@@ -1083,7 +1178,7 @@ static void _init_f_toShort_c2967 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("s");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
   decl->add_arg<bool * > (argspec_1);
   decl->set_return<short int > ();
 }
@@ -1093,7 +1188,7 @@ static void _call_f_toShort_c2967 (const qt_gsi::GenericMethod * /*decl*/, void 
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<short int > ((short int)((QLocale *)cls)->toShort (arg1, arg2));
 }
 
@@ -1284,28 +1379,6 @@ static void _call_f_toString_c3693 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// QString QLocale::toString(const QDate &date, QLocale::FormatType format)
-
-
-static void _init_f_toString_c3928 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("date");
-  decl->add_arg<const QDate & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format", true, "QLocale::LongFormat");
-  decl->add_arg<const qt_gsi::Converter<QLocale::FormatType>::target_type & > (argspec_1);
-  decl->set_return<QString > ();
-}
-
-static void _call_f_toString_c3928 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
-  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat), heap);
-  ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, qt_gsi::QtToCppAdaptor<QLocale::FormatType>(arg2).cref()));
-}
-
-
 // QString QLocale::toString(const QTime &time, const QString &formatStr)
 
 
@@ -1325,6 +1398,50 @@ static void _call_f_toString_c3710 (const qt_gsi::GenericMethod * /*decl*/, void
   const QTime &arg1 = gsi::arg_reader<const QTime & >() (args, heap);
   const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, arg2));
+}
+
+
+// QString QLocale::toString(const QDateTime &dateTime, const QString &format)
+
+
+static void _init_f_toString_c4092 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("dateTime");
+  decl->add_arg<const QDateTime & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("format");
+  decl->add_arg<const QString & > (argspec_1);
+  decl->set_return<QString > ();
+}
+
+static void _call_f_toString_c4092 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, arg2));
+}
+
+
+// QString QLocale::toString(const QDate &date, QLocale::FormatType format)
+
+
+static void _init_f_toString_c3928 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("date");
+  decl->add_arg<const QDate & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("format", true, "QLocale::LongFormat");
+  decl->add_arg<const qt_gsi::Converter<QLocale::FormatType>::target_type & > (argspec_1);
+  decl->set_return<QString > ();
+}
+
+static void _call_f_toString_c3928 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
+  const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat), heap);
+  ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, qt_gsi::QtToCppAdaptor<QLocale::FormatType>(arg2).cref()));
 }
 
 
@@ -1369,28 +1486,6 @@ static void _call_f_toString_c4327 (const qt_gsi::GenericMethod * /*decl*/, void
   const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
   const qt_gsi::Converter<QLocale::FormatType>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QLocale::FormatType>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QLocale::FormatType>(heap, QLocale::LongFormat), heap);
   ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, qt_gsi::QtToCppAdaptor<QLocale::FormatType>(arg2).cref()));
-}
-
-
-// QString QLocale::toString(const QDateTime &dateTime, const QString &format)
-
-
-static void _init_f_toString_c4092 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("dateTime");
-  decl->add_arg<const QDateTime & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format");
-  decl->add_arg<const QString & > (argspec_1);
-  decl->set_return<QString > ();
-}
-
-static void _call_f_toString_c4092 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
-  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
-  ret.write<QString > ((QString)((QLocale *)cls)->toString (arg1, arg2));
 }
 
 
@@ -1445,7 +1540,7 @@ static void _init_f_toUInt_c2967 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("s");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
   decl->add_arg<bool * > (argspec_1);
   decl->set_return<unsigned int > ();
 }
@@ -1455,7 +1550,7 @@ static void _call_f_toUInt_c2967 (const qt_gsi::GenericMethod * /*decl*/, void *
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<unsigned int > ((unsigned int)((QLocale *)cls)->toUInt (arg1, arg2));
 }
 
@@ -1467,7 +1562,7 @@ static void _init_f_toULongLong_c2967 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("s");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
   decl->add_arg<bool * > (argspec_1);
   decl->set_return<qulonglong > ();
 }
@@ -1477,7 +1572,7 @@ static void _call_f_toULongLong_c2967 (const qt_gsi::GenericMethod * /*decl*/, v
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<qulonglong > ((qulonglong)((QLocale *)cls)->toULongLong (arg1, arg2));
 }
 
@@ -1489,7 +1584,7 @@ static void _init_f_toUShort_c2967 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("s");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
   decl->add_arg<bool * > (argspec_1);
   decl->set_return<unsigned short int > ();
 }
@@ -1499,7 +1594,7 @@ static void _call_f_toUShort_c2967 (const qt_gsi::GenericMethod * /*decl*/, void
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<unsigned short int > ((unsigned short int)((QLocale *)cls)->toUShort (arg1, arg2));
 }
 
@@ -1741,6 +1836,7 @@ static gsi::Methods methods_QLocale () {
   methods += new qt_gsi::GenericMethod ("decimalPoint", "@brief Method QChar QLocale::decimalPoint()\n", true, &_init_f_decimalPoint_c0, &_call_f_decimalPoint_c0);
   methods += new qt_gsi::GenericMethod ("exponential", "@brief Method QChar QLocale::exponential()\n", true, &_init_f_exponential_c0, &_call_f_exponential_c0);
   methods += new qt_gsi::GenericMethod ("firstDayOfWeek", "@brief Method Qt::DayOfWeek QLocale::firstDayOfWeek()\n", true, &_init_f_firstDayOfWeek_c0, &_call_f_firstDayOfWeek_c0);
+  methods += new qt_gsi::GenericMethod ("formattedDataSize", "@brief Method QString QLocale::formattedDataSize(qint64 bytes, int precision, QFlags<QLocale::DataSizeFormat> format)\n", false, &_init_f_formattedDataSize_4864, &_call_f_formattedDataSize_4864);
   methods += new qt_gsi::GenericMethod ("groupSeparator", "@brief Method QChar QLocale::groupSeparator()\n", true, &_init_f_groupSeparator_c0, &_call_f_groupSeparator_c0);
   methods += new qt_gsi::GenericMethod ("language", "@brief Method QLocale::Language QLocale::language()\n", true, &_init_f_language_c0, &_call_f_language_c0);
   methods += new qt_gsi::GenericMethod ("measurementSystem", "@brief Method QLocale::MeasurementSystem QLocale::measurementSystem()\n", true, &_init_f_measurementSystem_c0, &_call_f_measurementSystem_c0);
@@ -1761,6 +1857,7 @@ static gsi::Methods methods_QLocale () {
   methods += new qt_gsi::GenericMethod ("setNumberOptions|numberOptions=", "@brief Method void QLocale::setNumberOptions(QFlags<QLocale::NumberOption> options)\n", false, &_init_f_setNumberOptions_3171, &_call_f_setNumberOptions_3171);
   methods += new qt_gsi::GenericMethod ("standaloneDayName", "@brief Method QString QLocale::standaloneDayName(int, QLocale::FormatType format)\n", true, &_init_f_standaloneDayName_c2919, &_call_f_standaloneDayName_c2919);
   methods += new qt_gsi::GenericMethod ("standaloneMonthName", "@brief Method QString QLocale::standaloneMonthName(int, QLocale::FormatType format)\n", true, &_init_f_standaloneMonthName_c2919, &_call_f_standaloneMonthName_c2919);
+  methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QLocale::swap(QLocale &other)\n", false, &_init_f_swap_1291, &_call_f_swap_1291);
   methods += new qt_gsi::GenericMethod ("textDirection", "@brief Method Qt::LayoutDirection QLocale::textDirection()\n", true, &_init_f_textDirection_c0, &_call_f_textDirection_c0);
   methods += new qt_gsi::GenericMethod ("timeFormat", "@brief Method QString QLocale::timeFormat(QLocale::FormatType format)\n", true, &_init_f_timeFormat_c2260, &_call_f_timeFormat_c2260);
   methods += new qt_gsi::GenericMethod ("toCurrencyString", "@brief Method QString QLocale::toCurrencyString(qlonglong, const QString &symbol)\n", true, &_init_f_toCurrencyString_c3330, &_call_f_toCurrencyString_c3330);
@@ -1770,7 +1867,9 @@ static gsi::Methods methods_QLocale () {
   methods += new qt_gsi::GenericMethod ("toCurrencyString", "@brief Method QString QLocale::toCurrencyString(int, const QString &symbol)\n", true, &_init_f_toCurrencyString_c2684, &_call_f_toCurrencyString_c2684);
   methods += new qt_gsi::GenericMethod ("toCurrencyString", "@brief Method QString QLocale::toCurrencyString(unsigned int, const QString &symbol)\n", true, &_init_f_toCurrencyString_c3689, &_call_f_toCurrencyString_c3689);
   methods += new qt_gsi::GenericMethod ("toCurrencyString", "@brief Method QString QLocale::toCurrencyString(double, const QString &symbol)\n", true, &_init_f_toCurrencyString_c2988, &_call_f_toCurrencyString_c2988);
-  methods += new qt_gsi::GenericMethod ("toCurrencyString", "@brief Method QString QLocale::toCurrencyString(float, const QString &symbol)\n", true, &_init_f_toCurrencyString_c2887, &_call_f_toCurrencyString_c2887);
+  methods += new qt_gsi::GenericMethod ("toCurrencyString", "@brief Method QString QLocale::toCurrencyString(double, const QString &symbol, int precision)\n", true, &_init_f_toCurrencyString_c3647, &_call_f_toCurrencyString_c3647);
+  methods += new qt_gsi::GenericMethod ("toCurrencyString", "@brief Method QString QLocale::toCurrencyString(float i, const QString &symbol)\n", true, &_init_f_toCurrencyString_c2887, &_call_f_toCurrencyString_c2887);
+  methods += new qt_gsi::GenericMethod ("toCurrencyString", "@brief Method QString QLocale::toCurrencyString(float i, const QString &symbol, int precision)\n", true, &_init_f_toCurrencyString_c3546, &_call_f_toCurrencyString_c3546);
   methods += new qt_gsi::GenericMethod ("toDate", "@brief Method QDate QLocale::toDate(const QString &string, QLocale::FormatType)\n", true, &_init_f_toDate_c4177, &_call_f_toDate_c4177);
   methods += new qt_gsi::GenericMethod ("toDate", "@brief Method QDate QLocale::toDate(const QString &string, const QString &format)\n", true, &_init_f_toDate_c3942, &_call_f_toDate_c3942);
   methods += new qt_gsi::GenericMethod ("toDateTime", "@brief Method QDateTime QLocale::toDateTime(const QString &string, QLocale::FormatType format)\n", true, &_init_f_toDateTime_c4177, &_call_f_toDateTime_c4177);
@@ -1790,11 +1889,11 @@ static gsi::Methods methods_QLocale () {
   methods += new qt_gsi::GenericMethod ("toString_d", "@brief Method QString QLocale::toString(double i, char f, int prec)\n", true, &_init_f_toString_c2472, &_call_f_toString_c2472);
   methods += new qt_gsi::GenericMethod ("toString_f", "@brief Method QString QLocale::toString(float i, char f, int prec)\n", true, &_init_f_toString_c2371, &_call_f_toString_c2371);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(const QDate &date, const QString &formatStr)\n", true, &_init_f_toString_c3693, &_call_f_toString_c3693);
-  methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(const QDate &date, QLocale::FormatType format)\n", true, &_init_f_toString_c3928, &_call_f_toString_c3928);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(const QTime &time, const QString &formatStr)\n", true, &_init_f_toString_c3710, &_call_f_toString_c3710);
+  methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(const QDateTime &dateTime, const QString &format)\n", true, &_init_f_toString_c4092, &_call_f_toString_c4092);
+  methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(const QDate &date, QLocale::FormatType format)\n", true, &_init_f_toString_c3928, &_call_f_toString_c3928);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(const QTime &time, QLocale::FormatType format)\n", true, &_init_f_toString_c3945, &_call_f_toString_c3945);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(const QDateTime &dateTime, QLocale::FormatType format)\n", true, &_init_f_toString_c4327, &_call_f_toString_c4327);
-  methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QLocale::toString(const QDateTime &dateTime, const QString &format)\n", true, &_init_f_toString_c4092, &_call_f_toString_c4092);
   methods += new qt_gsi::GenericMethod ("toTime", "@brief Method QTime QLocale::toTime(const QString &string, QLocale::FormatType)\n", true, &_init_f_toTime_c4177, &_call_f_toTime_c4177);
   methods += new qt_gsi::GenericMethod ("toTime", "@brief Method QTime QLocale::toTime(const QString &string, const QString &format)\n", true, &_init_f_toTime_c3942, &_call_f_toTime_c3942);
   methods += new qt_gsi::GenericMethod ("toUInt", "@brief Method unsigned int QLocale::toUInt(const QString &s, bool *ok)\n", true, &_init_f_toUInt_c2967, &_call_f_toUInt_c2967);
@@ -2043,14 +2142,14 @@ static gsi::Enum<QLocale::Country> decl_QLocale_Country_Enum ("QtCore", "QLocale
     gsi::enum_const ("Tanzania", QLocale::Tanzania, "@brief Enum constant QLocale::Tanzania") +
     gsi::enum_const ("Thailand", QLocale::Thailand, "@brief Enum constant QLocale::Thailand") +
     gsi::enum_const ("Togo", QLocale::Togo, "@brief Enum constant QLocale::Togo") +
-    gsi::enum_const ("Tokelau", QLocale::Tokelau, "@brief Enum constant QLocale::Tokelau") +
+    gsi::enum_const ("TokelauCountry", QLocale::TokelauCountry, "@brief Enum constant QLocale::TokelauCountry") +
     gsi::enum_const ("Tonga", QLocale::Tonga, "@brief Enum constant QLocale::Tonga") +
     gsi::enum_const ("TrinidadAndTobago", QLocale::TrinidadAndTobago, "@brief Enum constant QLocale::TrinidadAndTobago") +
     gsi::enum_const ("Tunisia", QLocale::Tunisia, "@brief Enum constant QLocale::Tunisia") +
     gsi::enum_const ("Turkey", QLocale::Turkey, "@brief Enum constant QLocale::Turkey") +
     gsi::enum_const ("Turkmenistan", QLocale::Turkmenistan, "@brief Enum constant QLocale::Turkmenistan") +
     gsi::enum_const ("TurksAndCaicosIslands", QLocale::TurksAndCaicosIslands, "@brief Enum constant QLocale::TurksAndCaicosIslands") +
-    gsi::enum_const ("Tuvalu", QLocale::Tuvalu, "@brief Enum constant QLocale::Tuvalu") +
+    gsi::enum_const ("TuvaluCountry", QLocale::TuvaluCountry, "@brief Enum constant QLocale::TuvaluCountry") +
     gsi::enum_const ("Uganda", QLocale::Uganda, "@brief Enum constant QLocale::Uganda") +
     gsi::enum_const ("Ukraine", QLocale::Ukraine, "@brief Enum constant QLocale::Ukraine") +
     gsi::enum_const ("UnitedArabEmirates", QLocale::UnitedArabEmirates, "@brief Enum constant QLocale::UnitedArabEmirates") +
@@ -2076,7 +2175,7 @@ static gsi::Enum<QLocale::Country> decl_QLocale_Country_Enum ("QtCore", "QLocale
     gsi::enum_const ("Serbia", QLocale::Serbia, "@brief Enum constant QLocale::Serbia") +
     gsi::enum_const ("SaintBarthelemy", QLocale::SaintBarthelemy, "@brief Enum constant QLocale::SaintBarthelemy") +
     gsi::enum_const ("SaintMartin", QLocale::SaintMartin, "@brief Enum constant QLocale::SaintMartin") +
-    gsi::enum_const ("LatinAmericaAndTheCaribbean", QLocale::LatinAmericaAndTheCaribbean, "@brief Enum constant QLocale::LatinAmericaAndTheCaribbean") +
+    gsi::enum_const ("LatinAmerica", QLocale::LatinAmerica, "@brief Enum constant QLocale::LatinAmerica") +
     gsi::enum_const ("AscensionIsland", QLocale::AscensionIsland, "@brief Enum constant QLocale::AscensionIsland") +
     gsi::enum_const ("AlandIslands", QLocale::AlandIslands, "@brief Enum constant QLocale::AlandIslands") +
     gsi::enum_const ("DiegoGarcia", QLocale::DiegoGarcia, "@brief Enum constant QLocale::DiegoGarcia") +
@@ -2088,12 +2187,19 @@ static gsi::Enum<QLocale::Country> decl_QLocale_Country_Enum ("QtCore", "QLocale
     gsi::enum_const ("Bonaire", QLocale::Bonaire, "@brief Enum constant QLocale::Bonaire") +
     gsi::enum_const ("SintMaarten", QLocale::SintMaarten, "@brief Enum constant QLocale::SintMaarten") +
     gsi::enum_const ("Kosovo", QLocale::Kosovo, "@brief Enum constant QLocale::Kosovo") +
+    gsi::enum_const ("EuropeanUnion", QLocale::EuropeanUnion, "@brief Enum constant QLocale::EuropeanUnion") +
+    gsi::enum_const ("OutlyingOceania", QLocale::OutlyingOceania, "@brief Enum constant QLocale::OutlyingOceania") +
+    gsi::enum_const ("World", QLocale::World, "@brief Enum constant QLocale::World") +
+    gsi::enum_const ("Europe", QLocale::Europe, "@brief Enum constant QLocale::Europe") +
     gsi::enum_const ("DemocraticRepublicOfCongo", QLocale::DemocraticRepublicOfCongo, "@brief Enum constant QLocale::DemocraticRepublicOfCongo") +
-    gsi::enum_const ("PeoplesRepublicOfCongo", QLocale::PeoplesRepublicOfCongo, "@brief Enum constant QLocale::PeoplesRepublicOfCongo") +
     gsi::enum_const ("DemocraticRepublicOfKorea", QLocale::DemocraticRepublicOfKorea, "@brief Enum constant QLocale::DemocraticRepublicOfKorea") +
+    gsi::enum_const ("LatinAmericaAndTheCaribbean", QLocale::LatinAmericaAndTheCaribbean, "@brief Enum constant QLocale::LatinAmericaAndTheCaribbean") +
+    gsi::enum_const ("PeoplesRepublicOfCongo", QLocale::PeoplesRepublicOfCongo, "@brief Enum constant QLocale::PeoplesRepublicOfCongo") +
     gsi::enum_const ("RepublicOfKorea", QLocale::RepublicOfKorea, "@brief Enum constant QLocale::RepublicOfKorea") +
     gsi::enum_const ("RussianFederation", QLocale::RussianFederation, "@brief Enum constant QLocale::RussianFederation") +
     gsi::enum_const ("SyrianArabRepublic", QLocale::SyrianArabRepublic, "@brief Enum constant QLocale::SyrianArabRepublic") +
+    gsi::enum_const ("Tokelau", QLocale::Tokelau, "@brief Enum constant QLocale::Tokelau") +
+    gsi::enum_const ("Tuvalu", QLocale::Tuvalu, "@brief Enum constant QLocale::Tuvalu") +
     gsi::enum_const ("LastCountry", QLocale::LastCountry, "@brief Enum constant QLocale::LastCountry"),
   "@qt\n@brief This class represents the QLocale::Country enum");
 
@@ -2125,6 +2231,29 @@ static gsi::QFlagsClass<QLocale::CurrencySymbolFormat > decl_QLocale_CurrencySym
 static gsi::ClassExt<QLocale> inject_QLocale_CurrencySymbolFormat_Enum_in_parent (decl_QLocale_CurrencySymbolFormat_Enum.defs ());
 static gsi::ClassExt<QLocale> decl_QLocale_CurrencySymbolFormat_Enum_as_child (decl_QLocale_CurrencySymbolFormat_Enum, "CurrencySymbolFormat");
 static gsi::ClassExt<QLocale> decl_QLocale_CurrencySymbolFormat_Enums_as_child (decl_QLocale_CurrencySymbolFormat_Enums, "QFlags_CurrencySymbolFormat");
+
+}
+
+
+//  Implementation of the enum wrapper class for QLocale::DataSizeFormat
+namespace qt_gsi
+{
+
+static gsi::Enum<QLocale::DataSizeFormat> decl_QLocale_DataSizeFormat_Enum ("QtCore", "QLocale_DataSizeFormat",
+    gsi::enum_const ("DataSizeBase1000", QLocale::DataSizeBase1000, "@brief Enum constant QLocale::DataSizeBase1000") +
+    gsi::enum_const ("DataSizeSIQuantifiers", QLocale::DataSizeSIQuantifiers, "@brief Enum constant QLocale::DataSizeSIQuantifiers") +
+    gsi::enum_const ("DataSizeIecFormat", QLocale::DataSizeIecFormat, "@brief Enum constant QLocale::DataSizeIecFormat") +
+    gsi::enum_const ("DataSizeTraditionalFormat", QLocale::DataSizeTraditionalFormat, "@brief Enum constant QLocale::DataSizeTraditionalFormat") +
+    gsi::enum_const ("DataSizeSIFormat", QLocale::DataSizeSIFormat, "@brief Enum constant QLocale::DataSizeSIFormat"),
+  "@qt\n@brief This class represents the QLocale::DataSizeFormat enum");
+
+static gsi::QFlagsClass<QLocale::DataSizeFormat > decl_QLocale_DataSizeFormat_Enums ("QtCore", "QLocale_QFlags_DataSizeFormat",
+  "@qt\n@brief This class represents the QFlags<QLocale::DataSizeFormat> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<QLocale> inject_QLocale_DataSizeFormat_Enum_in_parent (decl_QLocale_DataSizeFormat_Enum.defs ());
+static gsi::ClassExt<QLocale> decl_QLocale_DataSizeFormat_Enum_as_child (decl_QLocale_DataSizeFormat_Enum, "DataSizeFormat");
+static gsi::ClassExt<QLocale> decl_QLocale_DataSizeFormat_Enums_as_child (decl_QLocale_DataSizeFormat_Enums, "QFlags_DataSizeFormat");
 
 }
 
@@ -2495,19 +2624,39 @@ static gsi::Enum<QLocale::Language> decl_QLocale_Language_Enum ("QtCore", "QLoca
     gsi::enum_const ("Mono", QLocale::Mono, "@brief Enum constant QLocale::Mono") +
     gsi::enum_const ("TedimChin", QLocale::TedimChin, "@brief Enum constant QLocale::TedimChin") +
     gsi::enum_const ("Maithili", QLocale::Maithili, "@brief Enum constant QLocale::Maithili") +
-    gsi::enum_const ("Norwegian", QLocale::Norwegian, "@brief Enum constant QLocale::Norwegian") +
+    gsi::enum_const ("Ahom", QLocale::Ahom, "@brief Enum constant QLocale::Ahom") +
+    gsi::enum_const ("AmericanSignLanguage", QLocale::AmericanSignLanguage, "@brief Enum constant QLocale::AmericanSignLanguage") +
+    gsi::enum_const ("ArdhamagadhiPrakrit", QLocale::ArdhamagadhiPrakrit, "@brief Enum constant QLocale::ArdhamagadhiPrakrit") +
+    gsi::enum_const ("Bhojpuri", QLocale::Bhojpuri, "@brief Enum constant QLocale::Bhojpuri") +
+    gsi::enum_const ("HieroglyphicLuwian", QLocale::HieroglyphicLuwian, "@brief Enum constant QLocale::HieroglyphicLuwian") +
+    gsi::enum_const ("LiteraryChinese", QLocale::LiteraryChinese, "@brief Enum constant QLocale::LiteraryChinese") +
+    gsi::enum_const ("Mazanderani", QLocale::Mazanderani, "@brief Enum constant QLocale::Mazanderani") +
+    gsi::enum_const ("Mru", QLocale::Mru, "@brief Enum constant QLocale::Mru") +
+    gsi::enum_const ("Newari", QLocale::Newari, "@brief Enum constant QLocale::Newari") +
+    gsi::enum_const ("NorthernLuri", QLocale::NorthernLuri, "@brief Enum constant QLocale::NorthernLuri") +
+    gsi::enum_const ("Palauan", QLocale::Palauan, "@brief Enum constant QLocale::Palauan") +
+    gsi::enum_const ("Papiamento", QLocale::Papiamento, "@brief Enum constant QLocale::Papiamento") +
+    gsi::enum_const ("Saraiki", QLocale::Saraiki, "@brief Enum constant QLocale::Saraiki") +
+    gsi::enum_const ("TokelauLanguage", QLocale::TokelauLanguage, "@brief Enum constant QLocale::TokelauLanguage") +
+    gsi::enum_const ("TokPisin", QLocale::TokPisin, "@brief Enum constant QLocale::TokPisin") +
+    gsi::enum_const ("TuvaluLanguage", QLocale::TuvaluLanguage, "@brief Enum constant QLocale::TuvaluLanguage") +
+    gsi::enum_const ("UncodedLanguages", QLocale::UncodedLanguages, "@brief Enum constant QLocale::UncodedLanguages") +
+    gsi::enum_const ("Cantonese", QLocale::Cantonese, "@brief Enum constant QLocale::Cantonese") +
+    gsi::enum_const ("Osage", QLocale::Osage, "@brief Enum constant QLocale::Osage") +
+    gsi::enum_const ("Tangut", QLocale::Tangut, "@brief Enum constant QLocale::Tangut") +
+    gsi::enum_const ("Afan", QLocale::Afan, "@brief Enum constant QLocale::Afan") +
+    gsi::enum_const ("Bhutani", QLocale::Bhutani, "@brief Enum constant QLocale::Bhutani") +
+    gsi::enum_const ("Byelorussian", QLocale::Byelorussian, "@brief Enum constant QLocale::Byelorussian") +
+    gsi::enum_const ("Cambodian", QLocale::Cambodian, "@brief Enum constant QLocale::Cambodian") +
+    gsi::enum_const ("Chewa", QLocale::Chewa, "@brief Enum constant QLocale::Chewa") +
+    gsi::enum_const ("Frisian", QLocale::Frisian, "@brief Enum constant QLocale::Frisian") +
+    gsi::enum_const ("Kurundi", QLocale::Kurundi, "@brief Enum constant QLocale::Kurundi") +
     gsi::enum_const ("Moldavian", QLocale::Moldavian, "@brief Enum constant QLocale::Moldavian") +
+    gsi::enum_const ("Norwegian", QLocale::Norwegian, "@brief Enum constant QLocale::Norwegian") +
+    gsi::enum_const ("RhaetoRomance", QLocale::RhaetoRomance, "@brief Enum constant QLocale::RhaetoRomance") +
     gsi::enum_const ("SerboCroatian", QLocale::SerboCroatian, "@brief Enum constant QLocale::SerboCroatian") +
     gsi::enum_const ("Tagalog", QLocale::Tagalog, "@brief Enum constant QLocale::Tagalog") +
     gsi::enum_const ("Twi", QLocale::Twi, "@brief Enum constant QLocale::Twi") +
-    gsi::enum_const ("Afan", QLocale::Afan, "@brief Enum constant QLocale::Afan") +
-    gsi::enum_const ("Byelorussian", QLocale::Byelorussian, "@brief Enum constant QLocale::Byelorussian") +
-    gsi::enum_const ("Bhutani", QLocale::Bhutani, "@brief Enum constant QLocale::Bhutani") +
-    gsi::enum_const ("Cambodian", QLocale::Cambodian, "@brief Enum constant QLocale::Cambodian") +
-    gsi::enum_const ("Kurundi", QLocale::Kurundi, "@brief Enum constant QLocale::Kurundi") +
-    gsi::enum_const ("RhaetoRomance", QLocale::RhaetoRomance, "@brief Enum constant QLocale::RhaetoRomance") +
-    gsi::enum_const ("Chewa", QLocale::Chewa, "@brief Enum constant QLocale::Chewa") +
-    gsi::enum_const ("Frisian", QLocale::Frisian, "@brief Enum constant QLocale::Frisian") +
     gsi::enum_const ("Uigur", QLocale::Uigur, "@brief Enum constant QLocale::Uigur") +
     gsi::enum_const ("LastLanguage", QLocale::LastLanguage, "@brief Enum constant QLocale::LastLanguage"),
   "@qt\n@brief This class represents the QLocale::Language enum");
@@ -2550,8 +2699,13 @@ namespace qt_gsi
 {
 
 static gsi::Enum<QLocale::NumberOption> decl_QLocale_NumberOption_Enum ("QtCore", "QLocale_NumberOption",
+    gsi::enum_const ("DefaultNumberOptions", QLocale::DefaultNumberOptions, "@brief Enum constant QLocale::DefaultNumberOptions") +
     gsi::enum_const ("OmitGroupSeparator", QLocale::OmitGroupSeparator, "@brief Enum constant QLocale::OmitGroupSeparator") +
-    gsi::enum_const ("RejectGroupSeparator", QLocale::RejectGroupSeparator, "@brief Enum constant QLocale::RejectGroupSeparator"),
+    gsi::enum_const ("RejectGroupSeparator", QLocale::RejectGroupSeparator, "@brief Enum constant QLocale::RejectGroupSeparator") +
+    gsi::enum_const ("OmitLeadingZeroInExponent", QLocale::OmitLeadingZeroInExponent, "@brief Enum constant QLocale::OmitLeadingZeroInExponent") +
+    gsi::enum_const ("RejectLeadingZeroInExponent", QLocale::RejectLeadingZeroInExponent, "@brief Enum constant QLocale::RejectLeadingZeroInExponent") +
+    gsi::enum_const ("IncludeTrailingZeroesAfterDot", QLocale::IncludeTrailingZeroesAfterDot, "@brief Enum constant QLocale::IncludeTrailingZeroesAfterDot") +
+    gsi::enum_const ("RejectTrailingZeroesAfterDot", QLocale::RejectTrailingZeroesAfterDot, "@brief Enum constant QLocale::RejectTrailingZeroesAfterDot"),
   "@qt\n@brief This class represents the QLocale::NumberOption enum");
 
 static gsi::QFlagsClass<QLocale::NumberOption > decl_QLocale_NumberOption_Enums ("QtCore", "QLocale_QFlags_NumberOption",
@@ -2718,6 +2872,20 @@ static gsi::Enum<QLocale::Script> decl_QLocale_Script_Enum ("QtCore", "QLocale_S
     gsi::enum_const ("KhudawadiScript", QLocale::KhudawadiScript, "@brief Enum constant QLocale::KhudawadiScript") +
     gsi::enum_const ("TirhutaScript", QLocale::TirhutaScript, "@brief Enum constant QLocale::TirhutaScript") +
     gsi::enum_const ("VarangKshitiScript", QLocale::VarangKshitiScript, "@brief Enum constant QLocale::VarangKshitiScript") +
+    gsi::enum_const ("AhomScript", QLocale::AhomScript, "@brief Enum constant QLocale::AhomScript") +
+    gsi::enum_const ("AnatolianHieroglyphsScript", QLocale::AnatolianHieroglyphsScript, "@brief Enum constant QLocale::AnatolianHieroglyphsScript") +
+    gsi::enum_const ("HatranScript", QLocale::HatranScript, "@brief Enum constant QLocale::HatranScript") +
+    gsi::enum_const ("MultaniScript", QLocale::MultaniScript, "@brief Enum constant QLocale::MultaniScript") +
+    gsi::enum_const ("OldHungarianScript", QLocale::OldHungarianScript, "@brief Enum constant QLocale::OldHungarianScript") +
+    gsi::enum_const ("SignWritingScript", QLocale::SignWritingScript, "@brief Enum constant QLocale::SignWritingScript") +
+    gsi::enum_const ("AdlamScript", QLocale::AdlamScript, "@brief Enum constant QLocale::AdlamScript") +
+    gsi::enum_const ("BhaiksukiScript", QLocale::BhaiksukiScript, "@brief Enum constant QLocale::BhaiksukiScript") +
+    gsi::enum_const ("MarchenScript", QLocale::MarchenScript, "@brief Enum constant QLocale::MarchenScript") +
+    gsi::enum_const ("NewaScript", QLocale::NewaScript, "@brief Enum constant QLocale::NewaScript") +
+    gsi::enum_const ("OsageScript", QLocale::OsageScript, "@brief Enum constant QLocale::OsageScript") +
+    gsi::enum_const ("TangutScript", QLocale::TangutScript, "@brief Enum constant QLocale::TangutScript") +
+    gsi::enum_const ("HanWithBopomofoScript", QLocale::HanWithBopomofoScript, "@brief Enum constant QLocale::HanWithBopomofoScript") +
+    gsi::enum_const ("JamoScript", QLocale::JamoScript, "@brief Enum constant QLocale::JamoScript") +
     gsi::enum_const ("SimplifiedChineseScript", QLocale::SimplifiedChineseScript, "@brief Enum constant QLocale::SimplifiedChineseScript") +
     gsi::enum_const ("TraditionalChineseScript", QLocale::TraditionalChineseScript, "@brief Enum constant QLocale::TraditionalChineseScript") +
     gsi::enum_const ("LastScript", QLocale::LastScript, "@brief Enum constant QLocale::LastScript"),

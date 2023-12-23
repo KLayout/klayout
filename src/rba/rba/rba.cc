@@ -1552,11 +1552,15 @@ struct RubyConstDescriptor
 extern "C" void ruby_prog_init();
 
 static void
-rba_add_path (const std::string &path)
+rba_add_path (const std::string &path, bool prepend)
 {
   VALUE pv = rb_gv_get ("$:");
   if (pv != Qnil && TYPE (pv) == T_ARRAY) {
-    rb_ary_push (pv, rb_str_new (path.c_str (), long (path.size ())));
+    if (prepend) {
+      rb_ary_unshift (pv, rb_str_new (path.c_str (), long (path.size ())));
+    } else {
+      rb_ary_push (pv, rb_str_new (path.c_str (), long (path.size ())));
+    }
   }
 }
 
@@ -2036,7 +2040,7 @@ RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) 
 
             if (v.is_list ()) {
               for (tl::Variant::iterator i = v.begin (); i != v.end (); ++i) {
-                rba_add_path (i->to_string ());
+                rba_add_path (i->to_string (), false);
               }
             }
 
@@ -2133,9 +2137,9 @@ RubyInterpreter::remove_package_location (const std::string & /*package_path*/)
 }
 
 void
-RubyInterpreter::add_path (const std::string &path)
+RubyInterpreter::add_path (const std::string &path, bool prepend)
 {
-  rba_add_path (path);
+  rba_add_path (path, prepend);
 }
 
 void

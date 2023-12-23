@@ -28,6 +28,7 @@
 #include "dbRegionDelegate.h"
 #include "dbPolygonTools.h"
 #include "dbEdgesUtils.h"
+#include "dbTriangles.h"
 
 namespace db
 {
@@ -404,6 +405,28 @@ private:
   TransformationReducer *m_vars;
   db::Coord m_dx, m_dy;
   unsigned int m_mode;
+};
+
+/**
+ *  @brief A triangulation processor
+ */
+class DB_PUBLIC TriangulationProcessor
+  : public db::PolygonProcessorBase
+{
+public:
+  TriangulationProcessor (double max_area = 0.0, double min_b = 1.0);
+
+  void process (const db::Polygon &poly, std::vector<db::Polygon> &result) const;
+
+  virtual const TransformationReducer *vars () const { return &m_vars; }
+  virtual bool result_is_merged () const { return false; }
+  virtual bool result_must_not_be_merged () const { return false; }
+  virtual bool requires_raw_input () const { return false; }
+  virtual bool wants_variants () const { return true; }
+
+private:
+  db::Triangles::TriangulateParameters m_param;
+  db::MagnificationReducer m_vars;
 };
 
 /**

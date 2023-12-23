@@ -174,6 +174,21 @@ static void _call_f_angleTo_c1856 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
+// QPointF QLineF::center()
+
+
+static void _init_f_center_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QPointF > ();
+}
+
+static void _call_f_center_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QPointF > ((QPointF)((QLineF *)cls)->center ());
+}
+
+
 // double QLineF::dx()
 
 
@@ -699,6 +714,7 @@ static gsi::Methods methods_QLineF () {
   methods += new qt_gsi::GenericMethod (":angle", "@brief Method double QLineF::angle()\n", true, &_init_f_angle_c0, &_call_f_angle_c0);
   methods += new qt_gsi::GenericMethod ("angle", "@brief Method double QLineF::angle(const QLineF &l)\n", true, &_init_f_angle_c1856, &_call_f_angle_c1856);
   methods += new qt_gsi::GenericMethod ("angleTo", "@brief Method double QLineF::angleTo(const QLineF &l)\n", true, &_init_f_angleTo_c1856, &_call_f_angleTo_c1856);
+  methods += new qt_gsi::GenericMethod ("center", "@brief Method QPointF QLineF::center()\n", true, &_init_f_center_c0, &_call_f_center_c0);
   methods += new qt_gsi::GenericMethod ("dx", "@brief Method double QLineF::dx()\n", true, &_init_f_dx_c0, &_call_f_dx_c0);
   methods += new qt_gsi::GenericMethod ("dy", "@brief Method double QLineF::dy()\n", true, &_init_f_dy_c0, &_call_f_dy_c0);
   methods += new qt_gsi::GenericMethod ("intersect", "@brief Method QLineF::IntersectType QLineF::intersect(const QLineF &l, QPointF *intersectionPoint)\n", true, &_init_f_intersect_c3043, &_call_f_intersect_c3043);

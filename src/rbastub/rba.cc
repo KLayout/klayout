@@ -63,7 +63,7 @@ RubyInterpreter::remove_package_location (const std::string &)
 }
 
 void
-RubyInterpreter::add_path (const std::string &)
+RubyInterpreter::add_path (const std::string &, bool)
 {
   // .. nothing ..
 }

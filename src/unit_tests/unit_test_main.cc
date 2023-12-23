@@ -80,6 +80,40 @@
 #  include "lvsForceLink.h"
 #endif
 
+#if defined(HAVE_QTBINDINGS)
+
+//  pulls in the Qt GSI binding modules - need to be force loaded so they are available
+//  the pya Python module (Python >= 3.8 does not recognize DLL paths on Windows)
+# include "gsiQtGuiExternals.h"
+# include "gsiQtWidgetsExternals.h"
+# include "gsiQtCoreExternals.h"
+# include "gsiQtMultimediaExternals.h"
+# include "gsiQtPrintSupportExternals.h"
+# include "gsiQtXmlExternals.h"
+# include "gsiQtXmlPatternsExternals.h"
+# include "gsiQtSqlExternals.h"
+# include "gsiQtSvgExternals.h"
+# include "gsiQtNetworkExternals.h"
+# include "gsiQtDesignerExternals.h"
+# include "gsiQtUiToolsExternals.h"
+
+FORCE_LINK_GSI_QTCORE
+FORCE_LINK_GSI_QTGUI
+FORCE_LINK_GSI_QTWIDGETS
+FORCE_LINK_GSI_QTMULTIMEDIA
+FORCE_LINK_GSI_QTPRINTSUPPORT
+FORCE_LINK_GSI_QTXML
+FORCE_LINK_GSI_QTXMLPATTERNS
+FORCE_LINK_GSI_QTDESIGNER
+FORCE_LINK_GSI_QTNETWORK
+FORCE_LINK_GSI_QTSQL
+FORCE_LINK_GSI_QTSVG
+FORCE_LINK_GSI_QTUITOOLS
+
+#else
+# define QT_EXTERNAL_BASE(x)
+#endif
+
 static int main_cont (int &argc, char **argv);
 
 #ifdef _WIN32 // for VC++
@@ -456,7 +490,6 @@ main_cont (int &argc, char **argv)
 
   try {
 
-    pya::PythonInterpreter::initialize ();
     gsi::initialize_external ();
 
     //  Search and initialize plugin unit tests

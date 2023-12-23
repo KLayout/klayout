@@ -960,7 +960,7 @@ static void _init_f_itemTransform_c3556 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("other");
   decl->add_arg<const QGraphicsItem * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("ok", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("ok", true, "nullptr");
   decl->add_arg<bool * > (argspec_1);
   decl->set_return<QTransform > ();
 }
@@ -970,7 +970,7 @@ static void _call_f_itemTransform_c3556 (const qt_gsi::GenericMethod * /*decl*/,
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QGraphicsItem *arg1 = gsi::arg_reader<const QGraphicsItem * >() (args, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<QTransform > ((QTransform)((QGraphicsItem *)cls)->itemTransform (arg1, arg2));
 }
 
@@ -2138,7 +2138,7 @@ static void _init_f_paint_6301 (qt_gsi::GenericMethod *decl)
   decl->add_arg<QPainter * > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("option");
   decl->add_arg<const QStyleOptionGraphicsItem * > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("widget", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("widget", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_2);
   decl->set_return<void > ();
 }
@@ -2149,7 +2149,7 @@ static void _call_f_paint_6301 (const qt_gsi::GenericMethod * /*decl*/, void *cl
   tl::Heap heap;
   QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   const QStyleOptionGraphicsItem *arg2 = gsi::arg_reader<const QStyleOptionGraphicsItem * >() (args, heap);
-  QWidget *arg3 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QWidget *arg3 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsItem *)cls)->paint (arg1, arg2, arg3);
 }
@@ -4340,7 +4340,7 @@ QGraphicsItem_Adaptor::~QGraphicsItem_Adaptor() { }
 
 static void _init_ctor_QGraphicsItem_Adaptor_1919 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QGraphicsItem * > (argspec_0);
   decl->set_return_new<QGraphicsItem_Adaptor> ();
 }
@@ -4349,7 +4349,7 @@ static void _call_ctor_QGraphicsItem_Adaptor_1919 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
+  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (nullptr, heap);
   ret.write<QGraphicsItem_Adaptor *> (new QGraphicsItem_Adaptor (arg1));
 }
 

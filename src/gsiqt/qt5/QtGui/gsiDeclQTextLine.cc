@@ -115,7 +115,7 @@ static void _init_f_draw_c6879 (qt_gsi::GenericMethod *decl)
   decl->add_arg<QPainter * > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("point");
   decl->add_arg<const QPointF & > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("selection", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("selection", true, "nullptr");
   decl->add_arg<const QTextLayout::FormatRange * > (argspec_2);
   decl->set_return<void > ();
 }
@@ -126,7 +126,7 @@ static void _call_f_draw_c6879 (const qt_gsi::GenericMethod * /*decl*/, void *cl
   tl::Heap heap;
   QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
-  const QTextLayout::FormatRange *arg3 = args ? gsi::arg_reader<const QTextLayout::FormatRange * >() (args, heap) : gsi::arg_maker<const QTextLayout::FormatRange * >() (0, heap);
+  const QTextLayout::FormatRange *arg3 = args ? gsi::arg_reader<const QTextLayout::FormatRange * >() (args, heap) : gsi::arg_maker<const QTextLayout::FormatRange * >() (nullptr, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QTextLine *)cls)->draw (arg1, arg2, arg3);
 }

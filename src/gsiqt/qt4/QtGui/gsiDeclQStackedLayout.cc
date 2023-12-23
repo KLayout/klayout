@@ -95,6 +95,7 @@ static void _call_f_addWidget_1315 (const qt_gsi::GenericMethod * /*decl*/, void
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   ret.write<int > ((int)((QStackedLayout *)cls)->addWidget (arg1));
 }
 
@@ -162,6 +163,7 @@ static void _call_f_insertWidget_1974 (const qt_gsi::GenericMethod * /*decl*/, v
   tl::Heap heap;
   int arg1 = gsi::arg_reader<int >() (args, heap);
   QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg2);
   ret.write<int > ((int)((QStackedLayout *)cls)->insertWidget (arg1, arg2));
 }
 

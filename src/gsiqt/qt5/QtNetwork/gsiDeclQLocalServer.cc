@@ -269,6 +269,21 @@ static void _call_f_setSocketOptions_3701 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
+// QIntegerForSizeof<void*>::Signed QLocalServer::socketDescriptor()
+
+
+static void _init_f_socketDescriptor_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QIntegerForSizeof<void*>::Signed > ();
+}
+
+static void _call_f_socketDescriptor_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QIntegerForSizeof<void*>::Signed > ((QIntegerForSizeof<void*>::Signed)((QLocalServer *)cls)->socketDescriptor ());
+}
+
+
 // QFlags<QLocalServer::SocketOption> QLocalServer::socketOptions()
 
 
@@ -291,7 +306,7 @@ static void _init_f_waitForNewConnection_1709 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("msec", true, "0");
   decl->add_arg<int > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("timedOut", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("timedOut", true, "nullptr");
   decl->add_arg<bool * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -301,7 +316,7 @@ static void _call_f_waitForNewConnection_1709 (const qt_gsi::GenericMethod * /*d
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (0, heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<bool > ((bool)((QLocalServer *)cls)->waitForNewConnection (arg1, arg2));
 }
 
@@ -394,6 +409,7 @@ static gsi::Methods methods_QLocalServer () {
   methods += new qt_gsi::GenericMethod ("serverName", "@brief Method QString QLocalServer::serverName()\n", true, &_init_f_serverName_c0, &_call_f_serverName_c0);
   methods += new qt_gsi::GenericMethod ("setMaxPendingConnections|maxPendingConnections=", "@brief Method void QLocalServer::setMaxPendingConnections(int numConnections)\n", false, &_init_f_setMaxPendingConnections_767, &_call_f_setMaxPendingConnections_767);
   methods += new qt_gsi::GenericMethod ("setSocketOptions|socketOptions=", "@brief Method void QLocalServer::setSocketOptions(QFlags<QLocalServer::SocketOption> options)\n", false, &_init_f_setSocketOptions_3701, &_call_f_setSocketOptions_3701);
+  methods += new qt_gsi::GenericMethod ("socketDescriptor", "@brief Method QIntegerForSizeof<void*>::Signed QLocalServer::socketDescriptor()\n", true, &_init_f_socketDescriptor_c0, &_call_f_socketDescriptor_c0);
   methods += new qt_gsi::GenericMethod (":socketOptions", "@brief Method QFlags<QLocalServer::SocketOption> QLocalServer::socketOptions()\n", true, &_init_f_socketOptions_c0, &_call_f_socketOptions_c0);
   methods += new qt_gsi::GenericMethod ("waitForNewConnection", "@brief Method bool QLocalServer::waitForNewConnection(int msec, bool *timedOut)\n", false, &_init_f_waitForNewConnection_1709, &_call_f_waitForNewConnection_1709);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QLocalServer::destroyed(QObject *)\nYou can bind a procedure to this signal.");
@@ -460,33 +476,33 @@ public:
     emit QLocalServer::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QLocalServer::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QLocalServer::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QLocalServer::event(arg1);
+    return QLocalServer::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QLocalServer_Adaptor, bool, QEvent *>(&QLocalServer_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QLocalServer_Adaptor, bool, QEvent *>(&QLocalServer_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QLocalServer::event(arg1);
+      return QLocalServer::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QLocalServer::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QLocalServer::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QLocalServer::eventFilter(arg1, arg2);
+    return QLocalServer::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QLocalServer_Adaptor, bool, QObject *, QEvent *>(&QLocalServer_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QLocalServer_Adaptor, bool, QObject *, QEvent *>(&QLocalServer_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QLocalServer::eventFilter(arg1, arg2);
+      return QLocalServer::eventFilter(watched, event);
     }
   }
 
@@ -533,33 +549,33 @@ public:
     throw tl::Exception ("Can't emit private signal 'void QLocalServer::objectNameChanged(const QString &objectName)'");
   }
 
-  //  [adaptor impl] void QLocalServer::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QLocalServer::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QLocalServer::childEvent(arg1);
+    QLocalServer::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QLocalServer_Adaptor, QChildEvent *>(&QLocalServer_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QLocalServer_Adaptor, QChildEvent *>(&QLocalServer_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QLocalServer::childEvent(arg1);
+      QLocalServer::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QLocalServer::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QLocalServer::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QLocalServer::customEvent(arg1);
+    QLocalServer::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QLocalServer_Adaptor, QEvent *>(&QLocalServer_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QLocalServer_Adaptor, QEvent *>(&QLocalServer_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QLocalServer::customEvent(arg1);
+      QLocalServer::customEvent(event);
     }
   }
 
@@ -593,18 +609,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QLocalServer::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QLocalServer::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QLocalServer::timerEvent(arg1);
+    QLocalServer::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QLocalServer_Adaptor, QTimerEvent *>(&QLocalServer_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QLocalServer_Adaptor, QTimerEvent *>(&QLocalServer_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QLocalServer::timerEvent(arg1);
+      QLocalServer::timerEvent(event);
     }
   }
 
@@ -625,7 +641,7 @@ QLocalServer_Adaptor::~QLocalServer_Adaptor() { }
 
 static void _init_ctor_QLocalServer_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QLocalServer_Adaptor> ();
 }
@@ -634,16 +650,16 @@ static void _call_ctor_QLocalServer_Adaptor_1302 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QLocalServer_Adaptor *> (new QLocalServer_Adaptor (arg1));
 }
 
 
-// void QLocalServer::childEvent(QChildEvent *)
+// void QLocalServer::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -663,11 +679,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QLocalServer::customEvent(QEvent *)
+// void QLocalServer::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -691,7 +707,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -700,7 +716,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QLocalServer_Adaptor *)cls)->emitter_QLocalServer_destroyed_1302 (arg1);
 }
 
@@ -729,11 +745,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QLocalServer::event(QEvent *)
+// bool QLocalServer::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -752,13 +768,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QLocalServer::eventFilter(QObject *, QEvent *)
+// bool QLocalServer::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -936,11 +952,11 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QLocalServer::timerEvent(QTimerEvent *)
+// void QLocalServer::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -968,16 +984,16 @@ gsi::Class<QLocalServer> &qtdecl_QLocalServer ();
 static gsi::Methods methods_QLocalServer_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QLocalServer::QLocalServer(QObject *parent)\nThis method creates an object of class QLocalServer.", &_init_ctor_QLocalServer_Adaptor_1302, &_call_ctor_QLocalServer_Adaptor_1302);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QLocalServer::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QLocalServer::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QLocalServer::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QLocalServer::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QLocalServer::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QLocalServer::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QLocalServer::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QLocalServer::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QLocalServer::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QLocalServer::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("hasPendingConnections", "@brief Virtual method bool QLocalServer::hasPendingConnections()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_hasPendingConnections_c0_0, &_call_cbs_hasPendingConnections_c0_0);
   methods += new qt_gsi::GenericMethod ("hasPendingConnections", "@hide", true, &_init_cbs_hasPendingConnections_c0_0, &_call_cbs_hasPendingConnections_c0_0, &_set_callback_cbs_hasPendingConnections_c0_0);
@@ -991,7 +1007,7 @@ static gsi::Methods methods_QLocalServer_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QLocalServer::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QLocalServer::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QLocalServer::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QLocalServer::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QLocalServer::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

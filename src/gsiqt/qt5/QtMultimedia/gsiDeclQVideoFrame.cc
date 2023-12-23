@@ -816,6 +816,7 @@ static gsi::Enum<QVideoFrame::PixelFormat> decl_QVideoFrame_PixelFormat_Enum ("Q
     gsi::enum_const ("Format_Jpeg", QVideoFrame::Format_Jpeg, "@brief Enum constant QVideoFrame::Format_Jpeg") +
     gsi::enum_const ("Format_CameraRaw", QVideoFrame::Format_CameraRaw, "@brief Enum constant QVideoFrame::Format_CameraRaw") +
     gsi::enum_const ("Format_AdobeDng", QVideoFrame::Format_AdobeDng, "@brief Enum constant QVideoFrame::Format_AdobeDng") +
+    gsi::enum_const ("NPixelFormats", QVideoFrame::NPixelFormats, "@brief Enum constant QVideoFrame::NPixelFormats") +
     gsi::enum_const ("Format_User", QVideoFrame::Format_User, "@brief Enum constant QVideoFrame::Format_User"),
   "@qt\n@brief This class represents the QVideoFrame::PixelFormat enum");
 

@@ -492,11 +492,11 @@ static void _init_f_setContent_5697 (qt_gsi::GenericMethod *decl)
   decl->add_arg<const QString & > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("namespaceProcessing");
   decl->add_arg<bool > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("errorMsg", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("errorMsg", true, "nullptr");
   decl->add_arg<QString * > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("errorLine", true, "0");
+  static gsi::ArgSpecBase argspec_3 ("errorLine", true, "nullptr");
   decl->add_arg<int * > (argspec_3);
-  static gsi::ArgSpecBase argspec_4 ("errorColumn", true, "0");
+  static gsi::ArgSpecBase argspec_4 ("errorColumn", true, "nullptr");
   decl->add_arg<int * > (argspec_4);
   decl->set_return<bool > ();
 }
@@ -507,9 +507,9 @@ static void _call_f_setContent_5697 (const qt_gsi::GenericMethod * /*decl*/, voi
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   bool arg2 = gsi::arg_reader<bool >() (args, heap);
-  QString *arg3 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (0, heap);
-  int *arg4 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
-  int *arg5 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
+  QString *arg3 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (nullptr, heap);
+  int *arg4 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
+  int *arg5 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
   ret.write<bool > ((bool)((QDomDocument *)cls)->setContent (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -523,11 +523,11 @@ static void _init_f_setContent_5119 (qt_gsi::GenericMethod *decl)
   decl->add_arg<QIODevice * > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("namespaceProcessing");
   decl->add_arg<bool > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("errorMsg", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("errorMsg", true, "nullptr");
   decl->add_arg<QString * > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("errorLine", true, "0");
+  static gsi::ArgSpecBase argspec_3 ("errorLine", true, "nullptr");
   decl->add_arg<int * > (argspec_3);
-  static gsi::ArgSpecBase argspec_4 ("errorColumn", true, "0");
+  static gsi::ArgSpecBase argspec_4 ("errorColumn", true, "nullptr");
   decl->add_arg<int * > (argspec_4);
   decl->set_return<bool > ();
 }
@@ -538,9 +538,9 @@ static void _call_f_setContent_5119 (const qt_gsi::GenericMethod * /*decl*/, voi
   tl::Heap heap;
   QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   bool arg2 = gsi::arg_reader<bool >() (args, heap);
-  QString *arg3 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (0, heap);
-  int *arg4 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
-  int *arg5 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
+  QString *arg3 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (nullptr, heap);
+  int *arg4 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
+  int *arg5 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
   ret.write<bool > ((bool)((QDomDocument *)cls)->setContent (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -554,11 +554,11 @@ static void _init_f_setContent_5833 (qt_gsi::GenericMethod *decl)
   decl->add_arg<QXmlInputSource * > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("namespaceProcessing");
   decl->add_arg<bool > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("errorMsg", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("errorMsg", true, "nullptr");
   decl->add_arg<QString * > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("errorLine", true, "0");
+  static gsi::ArgSpecBase argspec_3 ("errorLine", true, "nullptr");
   decl->add_arg<int * > (argspec_3);
-  static gsi::ArgSpecBase argspec_4 ("errorColumn", true, "0");
+  static gsi::ArgSpecBase argspec_4 ("errorColumn", true, "nullptr");
   decl->add_arg<int * > (argspec_4);
   decl->set_return<bool > ();
 }
@@ -569,9 +569,9 @@ static void _call_f_setContent_5833 (const qt_gsi::GenericMethod * /*decl*/, voi
   tl::Heap heap;
   QXmlInputSource *arg1 = gsi::arg_reader<QXmlInputSource * >() (args, heap);
   bool arg2 = gsi::arg_reader<bool >() (args, heap);
-  QString *arg3 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (0, heap);
-  int *arg4 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
-  int *arg5 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
+  QString *arg3 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (nullptr, heap);
+  int *arg4 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
+  int *arg5 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
   ret.write<bool > ((bool)((QDomDocument *)cls)->setContent (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -583,11 +583,11 @@ static void _init_f_setContent_4941 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("text");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("errorMsg", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("errorMsg", true, "nullptr");
   decl->add_arg<QString * > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("errorLine", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("errorLine", true, "nullptr");
   decl->add_arg<int * > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("errorColumn", true, "0");
+  static gsi::ArgSpecBase argspec_3 ("errorColumn", true, "nullptr");
   decl->add_arg<int * > (argspec_3);
   decl->set_return<bool > ();
 }
@@ -597,9 +597,9 @@ static void _call_f_setContent_4941 (const qt_gsi::GenericMethod * /*decl*/, voi
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  QString *arg2 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (0, heap);
-  int *arg3 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
-  int *arg4 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
+  QString *arg2 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (nullptr, heap);
+  int *arg3 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
+  int *arg4 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
   ret.write<bool > ((bool)((QDomDocument *)cls)->setContent (arg1, arg2, arg3, arg4));
 }
 
@@ -611,11 +611,11 @@ static void _init_f_setContent_4363 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("dev");
   decl->add_arg<QIODevice * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("errorMsg", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("errorMsg", true, "nullptr");
   decl->add_arg<QString * > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("errorLine", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("errorLine", true, "nullptr");
   decl->add_arg<int * > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("errorColumn", true, "0");
+  static gsi::ArgSpecBase argspec_3 ("errorColumn", true, "nullptr");
   decl->add_arg<int * > (argspec_3);
   decl->set_return<bool > ();
 }
@@ -625,9 +625,9 @@ static void _call_f_setContent_4363 (const qt_gsi::GenericMethod * /*decl*/, voi
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
-  QString *arg2 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (0, heap);
-  int *arg3 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
-  int *arg4 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
+  QString *arg2 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (nullptr, heap);
+  int *arg3 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
+  int *arg4 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
   ret.write<bool > ((bool)((QDomDocument *)cls)->setContent (arg1, arg2, arg3, arg4));
 }
 
@@ -641,11 +641,11 @@ static void _init_f_setContent_6572 (qt_gsi::GenericMethod *decl)
   decl->add_arg<QXmlInputSource * > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("reader");
   decl->add_arg<QXmlReader * > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("errorMsg", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("errorMsg", true, "nullptr");
   decl->add_arg<QString * > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("errorLine", true, "0");
+  static gsi::ArgSpecBase argspec_3 ("errorLine", true, "nullptr");
   decl->add_arg<int * > (argspec_3);
-  static gsi::ArgSpecBase argspec_4 ("errorColumn", true, "0");
+  static gsi::ArgSpecBase argspec_4 ("errorColumn", true, "nullptr");
   decl->add_arg<int * > (argspec_4);
   decl->set_return<bool > ();
 }
@@ -656,9 +656,9 @@ static void _call_f_setContent_6572 (const qt_gsi::GenericMethod * /*decl*/, voi
   tl::Heap heap;
   QXmlInputSource *arg1 = gsi::arg_reader<QXmlInputSource * >() (args, heap);
   QXmlReader *arg2 = gsi::arg_reader<QXmlReader * >() (args, heap);
-  QString *arg3 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (0, heap);
-  int *arg4 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
-  int *arg5 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (0, heap);
+  QString *arg3 = args ? gsi::arg_reader<QString * >() (args, heap) : gsi::arg_maker<QString * >() (nullptr, heap);
+  int *arg4 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
+  int *arg5 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
   ret.write<bool > ((bool)((QDomDocument *)cls)->setContent (arg1, arg2, arg3, arg4, arg5));
 }
 

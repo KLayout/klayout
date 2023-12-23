@@ -259,11 +259,11 @@ grammar CPP
   end
 
   rule pointer 
-    cvspec:( cv:cv s )? "*" itspec:( s it:inner_type )? <PPointer>
+    "*" itspec:( s it:inner_type_with_cv )? <PPointer>
   end
     
   rule reference 
-    cvspec:( cv:cv s )? "&" itspec:( s it:inner_type )? <PReference>
+    "&" itspec:( s it:inner_type_with_cv )? <PReference>
   end
 
   rule array_spec
@@ -293,35 +293,43 @@ grammar CPP
   end
 
   rule member_pointer
-    cspec:( qid:qualified_id s "::*" s ) itspec:( it:inner_type )? cvspec:( s cv:cv )? refspec:( s ref:( "&" !"&" / "&&" ) )? <PMemberPointer> 
+    cspec:( qid:qualified_id s "::*" s ) itspec:( it:inner_type_with_cv )? refspec:( s ref:( "&" !"&" / "&&" ) )? <PMemberPointer> 
   end
 
-  rule inner_type_with_cv
-    cvspec:cv s it:inner_type <PInnerTypeWithCV>
+  rule inner_type_part
+    "(" s inner_type s ")" /
+    pointer /
+    reference /
+    member_pointer /
+    ( "__restrict" ![a-zA-Z0-9_] s / "..." s )* qualified_id  
+  end
+
+  rule inner_type_part_with_cv_post
+    it:inner_type_part cvspec:( s cv:cv )? <PInnerTypeWithCV>
   end
 
   rule inner_type
-    it:( 
-      "(" s inner_type s ")" /
-      inner_type_with_cv /
-      pointer /
-      reference /
-      member_pointer /
-      ( "__restrict" ![a-zA-Z0-9_] s / "..." s )* qualified_id  
-    ) 
+    it:inner_type_part_with_cv_post
+    s
     pfx:( s spec:( array_spec / func_spec ) )* 
     <PInnerType>
+  end
+
+  rule inner_type_with_cv
+    cvspec:( cv:cv s )? it:inner_type <PInnerTypeWithCV>
   end
 
   rule init_spec
     block_wo_comma / "default" / "delete" / "0"
   end
 
+  rule tn
+    "typename" ![a-zA-Z0-9_] s 
+  end
+
   rule type
-    cvspec:( cv:cv s )? 
-    a
-    ( "typename" ![a-zA-Z0-9_] s )? 
-    ct:concrete_type 
+    a 
+    dct:( cvspec:( cv:cv s ) a tn? ct:concrete_type / tn? ct:concrete_type a cvspec:( cv:cv s )? ) 
     a
     il:( s t1:inner_type i1:(s "=" s is1:init_spec)? tt:( s "," s t2:inner_type i2:(s "=" s is2:init_spec)? )* )? 
     # alternative initialization if only a concrete type is given:
@@ -330,21 +338,23 @@ grammar CPP
   end
 
   rule type_wo_comma
-    cvspec:( cv:cv s )? 
+    a 
+    dct:( cvspec:( cv:cv s ) a tn? ct:concrete_type / tn? ct:concrete_type a cvspec:( cv:cv s )? ) 
     a
-    ( "typename" ![a-zA-Z0-9_] s )? 
-    ct:concrete_type 
     il:( s t:inner_type i:(s "=" s is:init_spec)? )? 
     # alternative initialization if only a concrete type is given:
     pi:( s "=" s is:init_spec )? 
     <PTypeWoComma>
   end
 
+  rule tnt
+    ( "typename" / "class" ) ![a-zA-Z0-9_] s ( "..." s )?
+  end
+
   rule type_for_template
-    cvspec:( cv:cv s )? 
+    a 
+    dct:( cvspec:( cv:cv s ) a tnt? ct:concrete_type / tnt? ct:concrete_type a cvspec:( cv:cv s )? ) 
     a
-    ( ( "typename" / "class" ) ![a-zA-Z0-9_] s ( "..." s )? )? 
-    ct:concrete_type 
     il:( s t:inner_type )? 
     <PTypeForTemplate>
   end

@@ -101,6 +101,25 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
+// QString QTabBar::accessibleTabName(int index)
+
+
+static void _init_f_accessibleTabName_c767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("index");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<QString > ();
+}
+
+static void _call_f_accessibleTabName_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ret.write<QString > ((QString)((QTabBar *)cls)->accessibleTabName (arg1));
+}
+
+
 // int QTabBar::addTab(const QString &text)
 
 
@@ -428,6 +447,29 @@ static void _call_f_selectionBehaviorOnRemove_c0 (const qt_gsi::GenericMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qt_gsi::Converter<QTabBar::SelectionBehavior>::target_type > ((qt_gsi::Converter<QTabBar::SelectionBehavior>::target_type)qt_gsi::CppToQtAdaptor<QTabBar::SelectionBehavior>(((QTabBar *)cls)->selectionBehaviorOnRemove ()));
+}
+
+
+// void QTabBar::setAccessibleTabName(int index, const QString &name)
+
+
+static void _init_f_setAccessibleTabName_2684 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("index");
+  decl->add_arg<int > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("name");
+  decl->add_arg<const QString & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setAccessibleTabName_2684 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QTabBar *)cls)->setAccessibleTabName (arg1, arg2);
 }
 
 
@@ -1168,6 +1210,7 @@ namespace gsi
 static gsi::Methods methods_QTabBar () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
+  methods += new qt_gsi::GenericMethod ("accessibleTabName", "@brief Method QString QTabBar::accessibleTabName(int index)\n", true, &_init_f_accessibleTabName_c767, &_call_f_accessibleTabName_c767);
   methods += new qt_gsi::GenericMethod ("addTab", "@brief Method int QTabBar::addTab(const QString &text)\n", false, &_init_f_addTab_2025, &_call_f_addTab_2025);
   methods += new qt_gsi::GenericMethod ("addTab", "@brief Method int QTabBar::addTab(const QIcon &icon, const QString &text)\n", false, &_init_f_addTab_3704, &_call_f_addTab_3704);
   methods += new qt_gsi::GenericMethod (":autoHide", "@brief Method bool QTabBar::autoHide()\n", true, &_init_f_autoHide_c0, &_call_f_autoHide_c0);
@@ -1187,6 +1230,7 @@ static gsi::Methods methods_QTabBar () {
   methods += new qt_gsi::GenericMethod ("moveTab", "@brief Method void QTabBar::moveTab(int from, int to)\n", false, &_init_f_moveTab_1426, &_call_f_moveTab_1426);
   methods += new qt_gsi::GenericMethod ("removeTab", "@brief Method void QTabBar::removeTab(int index)\n", false, &_init_f_removeTab_767, &_call_f_removeTab_767);
   methods += new qt_gsi::GenericMethod (":selectionBehaviorOnRemove", "@brief Method QTabBar::SelectionBehavior QTabBar::selectionBehaviorOnRemove()\n", true, &_init_f_selectionBehaviorOnRemove_c0, &_call_f_selectionBehaviorOnRemove_c0);
+  methods += new qt_gsi::GenericMethod ("setAccessibleTabName", "@brief Method void QTabBar::setAccessibleTabName(int index, const QString &name)\n", false, &_init_f_setAccessibleTabName_2684, &_call_f_setAccessibleTabName_2684);
   methods += new qt_gsi::GenericMethod ("setAutoHide|autoHide=", "@brief Method void QTabBar::setAutoHide(bool hide)\n", false, &_init_f_setAutoHide_864, &_call_f_setAutoHide_864);
   methods += new qt_gsi::GenericMethod ("setChangeCurrentOnDrag|changeCurrentOnDrag=", "@brief Method void QTabBar::setChangeCurrentOnDrag(bool change)\n", false, &_init_f_setChangeCurrentOnDrag_864, &_call_f_setChangeCurrentOnDrag_864);
   methods += new qt_gsi::GenericMethod ("setCurrentIndex|currentIndex=", "@brief Method void QTabBar::setCurrentIndex(int index)\n", false, &_init_f_setCurrentIndex_767, &_call_f_setCurrentIndex_767);
@@ -1334,18 +1378,18 @@ public:
     emit QTabBar::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QTabBar::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QTabBar::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QTabBar::eventFilter(arg1, arg2);
+    return QTabBar::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QTabBar_Adaptor, bool, QObject *, QEvent *>(&QTabBar_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QTabBar_Adaptor, bool, QObject *, QEvent *>(&QTabBar_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QTabBar::eventFilter(arg1, arg2);
+      return QTabBar::eventFilter(watched, event);
     }
   }
 
@@ -1503,18 +1547,18 @@ public:
     emit QTabBar::windowTitleChanged(title);
   }
 
-  //  [adaptor impl] void QTabBar::actionEvent(QActionEvent *)
-  void cbs_actionEvent_1823_0(QActionEvent *arg1)
+  //  [adaptor impl] void QTabBar::actionEvent(QActionEvent *event)
+  void cbs_actionEvent_1823_0(QActionEvent *event)
   {
-    QTabBar::actionEvent(arg1);
+    QTabBar::actionEvent(event);
   }
 
-  virtual void actionEvent(QActionEvent *arg1)
+  virtual void actionEvent(QActionEvent *event)
   {
     if (cb_actionEvent_1823_0.can_issue()) {
-      cb_actionEvent_1823_0.issue<QTabBar_Adaptor, QActionEvent *>(&QTabBar_Adaptor::cbs_actionEvent_1823_0, arg1);
+      cb_actionEvent_1823_0.issue<QTabBar_Adaptor, QActionEvent *>(&QTabBar_Adaptor::cbs_actionEvent_1823_0, event);
     } else {
-      QTabBar::actionEvent(arg1);
+      QTabBar::actionEvent(event);
     }
   }
 
@@ -1533,63 +1577,63 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTabBar::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QTabBar::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QTabBar::childEvent(arg1);
+    QTabBar::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QTabBar_Adaptor, QChildEvent *>(&QTabBar_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QTabBar_Adaptor, QChildEvent *>(&QTabBar_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QTabBar::childEvent(arg1);
+      QTabBar::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QTabBar::closeEvent(QCloseEvent *)
-  void cbs_closeEvent_1719_0(QCloseEvent *arg1)
+  //  [adaptor impl] void QTabBar::closeEvent(QCloseEvent *event)
+  void cbs_closeEvent_1719_0(QCloseEvent *event)
   {
-    QTabBar::closeEvent(arg1);
+    QTabBar::closeEvent(event);
   }
 
-  virtual void closeEvent(QCloseEvent *arg1)
+  virtual void closeEvent(QCloseEvent *event)
   {
     if (cb_closeEvent_1719_0.can_issue()) {
-      cb_closeEvent_1719_0.issue<QTabBar_Adaptor, QCloseEvent *>(&QTabBar_Adaptor::cbs_closeEvent_1719_0, arg1);
+      cb_closeEvent_1719_0.issue<QTabBar_Adaptor, QCloseEvent *>(&QTabBar_Adaptor::cbs_closeEvent_1719_0, event);
     } else {
-      QTabBar::closeEvent(arg1);
+      QTabBar::closeEvent(event);
     }
   }
 
-  //  [adaptor impl] void QTabBar::contextMenuEvent(QContextMenuEvent *)
-  void cbs_contextMenuEvent_2363_0(QContextMenuEvent *arg1)
+  //  [adaptor impl] void QTabBar::contextMenuEvent(QContextMenuEvent *event)
+  void cbs_contextMenuEvent_2363_0(QContextMenuEvent *event)
   {
-    QTabBar::contextMenuEvent(arg1);
+    QTabBar::contextMenuEvent(event);
   }
 
-  virtual void contextMenuEvent(QContextMenuEvent *arg1)
+  virtual void contextMenuEvent(QContextMenuEvent *event)
   {
     if (cb_contextMenuEvent_2363_0.can_issue()) {
-      cb_contextMenuEvent_2363_0.issue<QTabBar_Adaptor, QContextMenuEvent *>(&QTabBar_Adaptor::cbs_contextMenuEvent_2363_0, arg1);
+      cb_contextMenuEvent_2363_0.issue<QTabBar_Adaptor, QContextMenuEvent *>(&QTabBar_Adaptor::cbs_contextMenuEvent_2363_0, event);
     } else {
-      QTabBar::contextMenuEvent(arg1);
+      QTabBar::contextMenuEvent(event);
     }
   }
 
-  //  [adaptor impl] void QTabBar::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QTabBar::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QTabBar::customEvent(arg1);
+    QTabBar::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QTabBar_Adaptor, QEvent *>(&QTabBar_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QTabBar_Adaptor, QEvent *>(&QTabBar_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QTabBar::customEvent(arg1);
+      QTabBar::customEvent(event);
     }
   }
 
@@ -1608,78 +1652,78 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTabBar::dragEnterEvent(QDragEnterEvent *)
-  void cbs_dragEnterEvent_2109_0(QDragEnterEvent *arg1)
+  //  [adaptor impl] void QTabBar::dragEnterEvent(QDragEnterEvent *event)
+  void cbs_dragEnterEvent_2109_0(QDragEnterEvent *event)
   {
-    QTabBar::dragEnterEvent(arg1);
+    QTabBar::dragEnterEvent(event);
   }
 
-  virtual void dragEnterEvent(QDragEnterEvent *arg1)
+  virtual void dragEnterEvent(QDragEnterEvent *event)
   {
     if (cb_dragEnterEvent_2109_0.can_issue()) {
-      cb_dragEnterEvent_2109_0.issue<QTabBar_Adaptor, QDragEnterEvent *>(&QTabBar_Adaptor::cbs_dragEnterEvent_2109_0, arg1);
+      cb_dragEnterEvent_2109_0.issue<QTabBar_Adaptor, QDragEnterEvent *>(&QTabBar_Adaptor::cbs_dragEnterEvent_2109_0, event);
     } else {
-      QTabBar::dragEnterEvent(arg1);
+      QTabBar::dragEnterEvent(event);
     }
   }
 
-  //  [adaptor impl] void QTabBar::dragLeaveEvent(QDragLeaveEvent *)
-  void cbs_dragLeaveEvent_2092_0(QDragLeaveEvent *arg1)
+  //  [adaptor impl] void QTabBar::dragLeaveEvent(QDragLeaveEvent *event)
+  void cbs_dragLeaveEvent_2092_0(QDragLeaveEvent *event)
   {
-    QTabBar::dragLeaveEvent(arg1);
+    QTabBar::dragLeaveEvent(event);
   }
 
-  virtual void dragLeaveEvent(QDragLeaveEvent *arg1)
+  virtual void dragLeaveEvent(QDragLeaveEvent *event)
   {
     if (cb_dragLeaveEvent_2092_0.can_issue()) {
-      cb_dragLeaveEvent_2092_0.issue<QTabBar_Adaptor, QDragLeaveEvent *>(&QTabBar_Adaptor::cbs_dragLeaveEvent_2092_0, arg1);
+      cb_dragLeaveEvent_2092_0.issue<QTabBar_Adaptor, QDragLeaveEvent *>(&QTabBar_Adaptor::cbs_dragLeaveEvent_2092_0, event);
     } else {
-      QTabBar::dragLeaveEvent(arg1);
+      QTabBar::dragLeaveEvent(event);
     }
   }
 
-  //  [adaptor impl] void QTabBar::dragMoveEvent(QDragMoveEvent *)
-  void cbs_dragMoveEvent_2006_0(QDragMoveEvent *arg1)
+  //  [adaptor impl] void QTabBar::dragMoveEvent(QDragMoveEvent *event)
+  void cbs_dragMoveEvent_2006_0(QDragMoveEvent *event)
   {
-    QTabBar::dragMoveEvent(arg1);
+    QTabBar::dragMoveEvent(event);
   }
 
-  virtual void dragMoveEvent(QDragMoveEvent *arg1)
+  virtual void dragMoveEvent(QDragMoveEvent *event)
   {
     if (cb_dragMoveEvent_2006_0.can_issue()) {
-      cb_dragMoveEvent_2006_0.issue<QTabBar_Adaptor, QDragMoveEvent *>(&QTabBar_Adaptor::cbs_dragMoveEvent_2006_0, arg1);
+      cb_dragMoveEvent_2006_0.issue<QTabBar_Adaptor, QDragMoveEvent *>(&QTabBar_Adaptor::cbs_dragMoveEvent_2006_0, event);
     } else {
-      QTabBar::dragMoveEvent(arg1);
+      QTabBar::dragMoveEvent(event);
     }
   }
 
-  //  [adaptor impl] void QTabBar::dropEvent(QDropEvent *)
-  void cbs_dropEvent_1622_0(QDropEvent *arg1)
+  //  [adaptor impl] void QTabBar::dropEvent(QDropEvent *event)
+  void cbs_dropEvent_1622_0(QDropEvent *event)
   {
-    QTabBar::dropEvent(arg1);
+    QTabBar::dropEvent(event);
   }
 
-  virtual void dropEvent(QDropEvent *arg1)
+  virtual void dropEvent(QDropEvent *event)
   {
     if (cb_dropEvent_1622_0.can_issue()) {
-      cb_dropEvent_1622_0.issue<QTabBar_Adaptor, QDropEvent *>(&QTabBar_Adaptor::cbs_dropEvent_1622_0, arg1);
+      cb_dropEvent_1622_0.issue<QTabBar_Adaptor, QDropEvent *>(&QTabBar_Adaptor::cbs_dropEvent_1622_0, event);
     } else {
-      QTabBar::dropEvent(arg1);
+      QTabBar::dropEvent(event);
     }
   }
 
-  //  [adaptor impl] void QTabBar::enterEvent(QEvent *)
-  void cbs_enterEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QTabBar::enterEvent(QEvent *event)
+  void cbs_enterEvent_1217_0(QEvent *event)
   {
-    QTabBar::enterEvent(arg1);
+    QTabBar::enterEvent(event);
   }
 
-  virtual void enterEvent(QEvent *arg1)
+  virtual void enterEvent(QEvent *event)
   {
     if (cb_enterEvent_1217_0.can_issue()) {
-      cb_enterEvent_1217_0.issue<QTabBar_Adaptor, QEvent *>(&QTabBar_Adaptor::cbs_enterEvent_1217_0, arg1);
+      cb_enterEvent_1217_0.issue<QTabBar_Adaptor, QEvent *>(&QTabBar_Adaptor::cbs_enterEvent_1217_0, event);
     } else {
-      QTabBar::enterEvent(arg1);
+      QTabBar::enterEvent(event);
     }
   }
 
@@ -1698,18 +1742,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTabBar::focusInEvent(QFocusEvent *)
-  void cbs_focusInEvent_1729_0(QFocusEvent *arg1)
+  //  [adaptor impl] void QTabBar::focusInEvent(QFocusEvent *event)
+  void cbs_focusInEvent_1729_0(QFocusEvent *event)
   {
-    QTabBar::focusInEvent(arg1);
+    QTabBar::focusInEvent(event);
   }
 
-  virtual void focusInEvent(QFocusEvent *arg1)
+  virtual void focusInEvent(QFocusEvent *event)
   {
     if (cb_focusInEvent_1729_0.can_issue()) {
-      cb_focusInEvent_1729_0.issue<QTabBar_Adaptor, QFocusEvent *>(&QTabBar_Adaptor::cbs_focusInEvent_1729_0, arg1);
+      cb_focusInEvent_1729_0.issue<QTabBar_Adaptor, QFocusEvent *>(&QTabBar_Adaptor::cbs_focusInEvent_1729_0, event);
     } else {
-      QTabBar::focusInEvent(arg1);
+      QTabBar::focusInEvent(event);
     }
   }
 
@@ -1728,18 +1772,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTabBar::focusOutEvent(QFocusEvent *)
-  void cbs_focusOutEvent_1729_0(QFocusEvent *arg1)
+  //  [adaptor impl] void QTabBar::focusOutEvent(QFocusEvent *event)
+  void cbs_focusOutEvent_1729_0(QFocusEvent *event)
   {
-    QTabBar::focusOutEvent(arg1);
+    QTabBar::focusOutEvent(event);
   }
 
-  virtual void focusOutEvent(QFocusEvent *arg1)
+  virtual void focusOutEvent(QFocusEvent *event)
   {
     if (cb_focusOutEvent_1729_0.can_issue()) {
-      cb_focusOutEvent_1729_0.issue<QTabBar_Adaptor, QFocusEvent *>(&QTabBar_Adaptor::cbs_focusOutEvent_1729_0, arg1);
+      cb_focusOutEvent_1729_0.issue<QTabBar_Adaptor, QFocusEvent *>(&QTabBar_Adaptor::cbs_focusOutEvent_1729_0, event);
     } else {
-      QTabBar::focusOutEvent(arg1);
+      QTabBar::focusOutEvent(event);
     }
   }
 
@@ -1803,33 +1847,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTabBar::keyReleaseEvent(QKeyEvent *)
-  void cbs_keyReleaseEvent_1514_0(QKeyEvent *arg1)
+  //  [adaptor impl] void QTabBar::keyReleaseEvent(QKeyEvent *event)
+  void cbs_keyReleaseEvent_1514_0(QKeyEvent *event)
   {
-    QTabBar::keyReleaseEvent(arg1);
+    QTabBar::keyReleaseEvent(event);
   }
 
-  virtual void keyReleaseEvent(QKeyEvent *arg1)
+  virtual void keyReleaseEvent(QKeyEvent *event)
   {
     if (cb_keyReleaseEvent_1514_0.can_issue()) {
-      cb_keyReleaseEvent_1514_0.issue<QTabBar_Adaptor, QKeyEvent *>(&QTabBar_Adaptor::cbs_keyReleaseEvent_1514_0, arg1);
+      cb_keyReleaseEvent_1514_0.issue<QTabBar_Adaptor, QKeyEvent *>(&QTabBar_Adaptor::cbs_keyReleaseEvent_1514_0, event);
     } else {
-      QTabBar::keyReleaseEvent(arg1);
+      QTabBar::keyReleaseEvent(event);
     }
   }
 
-  //  [adaptor impl] void QTabBar::leaveEvent(QEvent *)
-  void cbs_leaveEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QTabBar::leaveEvent(QEvent *event)
+  void cbs_leaveEvent_1217_0(QEvent *event)
   {
-    QTabBar::leaveEvent(arg1);
+    QTabBar::leaveEvent(event);
   }
 
-  virtual void leaveEvent(QEvent *arg1)
+  virtual void leaveEvent(QEvent *event)
   {
     if (cb_leaveEvent_1217_0.can_issue()) {
-      cb_leaveEvent_1217_0.issue<QTabBar_Adaptor, QEvent *>(&QTabBar_Adaptor::cbs_leaveEvent_1217_0, arg1);
+      cb_leaveEvent_1217_0.issue<QTabBar_Adaptor, QEvent *>(&QTabBar_Adaptor::cbs_leaveEvent_1217_0, event);
     } else {
-      QTabBar::leaveEvent(arg1);
+      QTabBar::leaveEvent(event);
     }
   }
 
@@ -1863,18 +1907,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTabBar::mouseDoubleClickEvent(QMouseEvent *)
-  void cbs_mouseDoubleClickEvent_1738_0(QMouseEvent *arg1)
+  //  [adaptor impl] void QTabBar::mouseDoubleClickEvent(QMouseEvent *event)
+  void cbs_mouseDoubleClickEvent_1738_0(QMouseEvent *event)
   {
-    QTabBar::mouseDoubleClickEvent(arg1);
+    QTabBar::mouseDoubleClickEvent(event);
   }
 
-  virtual void mouseDoubleClickEvent(QMouseEvent *arg1)
+  virtual void mouseDoubleClickEvent(QMouseEvent *event)
   {
     if (cb_mouseDoubleClickEvent_1738_0.can_issue()) {
-      cb_mouseDoubleClickEvent_1738_0.issue<QTabBar_Adaptor, QMouseEvent *>(&QTabBar_Adaptor::cbs_mouseDoubleClickEvent_1738_0, arg1);
+      cb_mouseDoubleClickEvent_1738_0.issue<QTabBar_Adaptor, QMouseEvent *>(&QTabBar_Adaptor::cbs_mouseDoubleClickEvent_1738_0, event);
     } else {
-      QTabBar::mouseDoubleClickEvent(arg1);
+      QTabBar::mouseDoubleClickEvent(event);
     }
   }
 
@@ -1923,18 +1967,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTabBar::moveEvent(QMoveEvent *)
-  void cbs_moveEvent_1624_0(QMoveEvent *arg1)
+  //  [adaptor impl] void QTabBar::moveEvent(QMoveEvent *event)
+  void cbs_moveEvent_1624_0(QMoveEvent *event)
   {
-    QTabBar::moveEvent(arg1);
+    QTabBar::moveEvent(event);
   }
 
-  virtual void moveEvent(QMoveEvent *arg1)
+  virtual void moveEvent(QMoveEvent *event)
   {
     if (cb_moveEvent_1624_0.can_issue()) {
-      cb_moveEvent_1624_0.issue<QTabBar_Adaptor, QMoveEvent *>(&QTabBar_Adaptor::cbs_moveEvent_1624_0, arg1);
+      cb_moveEvent_1624_0.issue<QTabBar_Adaptor, QMoveEvent *>(&QTabBar_Adaptor::cbs_moveEvent_1624_0, event);
     } else {
-      QTabBar::moveEvent(arg1);
+      QTabBar::moveEvent(event);
     }
   }
 
@@ -2088,18 +2132,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTabBar::tabletEvent(QTabletEvent *)
-  void cbs_tabletEvent_1821_0(QTabletEvent *arg1)
+  //  [adaptor impl] void QTabBar::tabletEvent(QTabletEvent *event)
+  void cbs_tabletEvent_1821_0(QTabletEvent *event)
   {
-    QTabBar::tabletEvent(arg1);
+    QTabBar::tabletEvent(event);
   }
 
-  virtual void tabletEvent(QTabletEvent *arg1)
+  virtual void tabletEvent(QTabletEvent *event)
   {
     if (cb_tabletEvent_1821_0.can_issue()) {
-      cb_tabletEvent_1821_0.issue<QTabBar_Adaptor, QTabletEvent *>(&QTabBar_Adaptor::cbs_tabletEvent_1821_0, arg1);
+      cb_tabletEvent_1821_0.issue<QTabBar_Adaptor, QTabletEvent *>(&QTabBar_Adaptor::cbs_tabletEvent_1821_0, event);
     } else {
-      QTabBar::tabletEvent(arg1);
+      QTabBar::tabletEvent(event);
     }
   }
 
@@ -2191,7 +2235,7 @@ QTabBar_Adaptor::~QTabBar_Adaptor() { }
 
 static void _init_ctor_QTabBar_Adaptor_1315 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_0);
   decl->set_return_new<QTabBar_Adaptor> ();
 }
@@ -2200,16 +2244,16 @@ static void _call_ctor_QTabBar_Adaptor_1315 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
   ret.write<QTabBar_Adaptor *> (new QTabBar_Adaptor (arg1));
 }
 
 
-// void QTabBar::actionEvent(QActionEvent *)
+// void QTabBar::actionEvent(QActionEvent *event)
 
 static void _init_cbs_actionEvent_1823_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QActionEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2253,11 +2297,11 @@ static void _set_callback_cbs_changeEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
-// void QTabBar::childEvent(QChildEvent *)
+// void QTabBar::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2277,11 +2321,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QTabBar::closeEvent(QCloseEvent *)
+// void QTabBar::closeEvent(QCloseEvent *event)
 
 static void _init_cbs_closeEvent_1719_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QCloseEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2301,11 +2345,11 @@ static void _set_callback_cbs_closeEvent_1719_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QTabBar::contextMenuEvent(QContextMenuEvent *)
+// void QTabBar::contextMenuEvent(QContextMenuEvent *event)
 
 static void _init_cbs_contextMenuEvent_2363_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QContextMenuEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2386,11 +2430,11 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 }
 
 
-// void QTabBar::customEvent(QEvent *)
+// void QTabBar::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2436,7 +2480,7 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2445,7 +2489,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QTabBar_Adaptor *)cls)->emitter_QTabBar_destroyed_1302 (arg1);
 }
 
@@ -2474,11 +2518,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// void QTabBar::dragEnterEvent(QDragEnterEvent *)
+// void QTabBar::dragEnterEvent(QDragEnterEvent *event)
 
 static void _init_cbs_dragEnterEvent_2109_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDragEnterEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2498,11 +2542,11 @@ static void _set_callback_cbs_dragEnterEvent_2109_0 (void *cls, const gsi::Callb
 }
 
 
-// void QTabBar::dragLeaveEvent(QDragLeaveEvent *)
+// void QTabBar::dragLeaveEvent(QDragLeaveEvent *event)
 
 static void _init_cbs_dragLeaveEvent_2092_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDragLeaveEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2522,11 +2566,11 @@ static void _set_callback_cbs_dragLeaveEvent_2092_0 (void *cls, const gsi::Callb
 }
 
 
-// void QTabBar::dragMoveEvent(QDragMoveEvent *)
+// void QTabBar::dragMoveEvent(QDragMoveEvent *event)
 
 static void _init_cbs_dragMoveEvent_2006_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDragMoveEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2546,11 +2590,11 @@ static void _set_callback_cbs_dragMoveEvent_2006_0 (void *cls, const gsi::Callba
 }
 
 
-// void QTabBar::dropEvent(QDropEvent *)
+// void QTabBar::dropEvent(QDropEvent *event)
 
 static void _init_cbs_dropEvent_1622_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDropEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2570,11 +2614,11 @@ static void _set_callback_cbs_dropEvent_1622_0 (void *cls, const gsi::Callback &
 }
 
 
-// void QTabBar::enterEvent(QEvent *)
+// void QTabBar::enterEvent(QEvent *event)
 
 static void _init_cbs_enterEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2617,13 +2661,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QTabBar::eventFilter(QObject *, QEvent *)
+// bool QTabBar::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -2643,11 +2687,11 @@ static void _set_callback_cbs_eventFilter_2411_0 (void *cls, const gsi::Callback
 }
 
 
-// void QTabBar::focusInEvent(QFocusEvent *)
+// void QTabBar::focusInEvent(QFocusEvent *event)
 
 static void _init_cbs_focusInEvent_1729_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QFocusEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2704,11 +2748,11 @@ static void _set_callback_cbs_focusNextPrevChild_864_0 (void *cls, const gsi::Ca
 }
 
 
-// void QTabBar::focusOutEvent(QFocusEvent *)
+// void QTabBar::focusOutEvent(QFocusEvent *event)
 
 static void _init_cbs_focusOutEvent_1729_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QFocusEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2943,11 +2987,11 @@ static void _set_callback_cbs_keyPressEvent_1514_0 (void *cls, const gsi::Callba
 }
 
 
-// void QTabBar::keyReleaseEvent(QKeyEvent *)
+// void QTabBar::keyReleaseEvent(QKeyEvent *event)
 
 static void _init_cbs_keyReleaseEvent_1514_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QKeyEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2967,11 +3011,11 @@ static void _set_callback_cbs_keyReleaseEvent_1514_0 (void *cls, const gsi::Call
 }
 
 
-// void QTabBar::leaveEvent(QEvent *)
+// void QTabBar::leaveEvent(QEvent *event)
 
 static void _init_cbs_leaveEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3056,11 +3100,11 @@ static void _set_callback_cbs_minimumTabSizeHint_c767_0 (void *cls, const gsi::C
 }
 
 
-// void QTabBar::mouseDoubleClickEvent(QMouseEvent *)
+// void QTabBar::mouseDoubleClickEvent(QMouseEvent *event)
 
 static void _init_cbs_mouseDoubleClickEvent_1738_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMouseEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3152,11 +3196,11 @@ static void _set_callback_cbs_mouseReleaseEvent_1738_0 (void *cls, const gsi::Ca
 }
 
 
-// void QTabBar::moveEvent(QMoveEvent *)
+// void QTabBar::moveEvent(QMoveEvent *event)
 
 static void _init_cbs_moveEvent_1624_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMoveEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3611,11 +3655,11 @@ static void _set_callback_cbs_tabSizeHint_c767_0 (void *cls, const gsi::Callback
 }
 
 
-// void QTabBar::tabletEvent(QTabletEvent *)
+// void QTabBar::tabletEvent(QTabletEvent *event)
 
 static void _init_cbs_tabletEvent_1821_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTabletEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3760,45 +3804,45 @@ gsi::Class<QTabBar> &qtdecl_QTabBar ();
 static gsi::Methods methods_QTabBar_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTabBar::QTabBar(QWidget *parent)\nThis method creates an object of class QTabBar.", &_init_ctor_QTabBar_Adaptor_1315, &_call_ctor_QTabBar_Adaptor_1315);
-  methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QTabBar::actionEvent(QActionEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
+  methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QTabBar::actionEvent(QActionEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("*actionEvent", "@hide", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0, &_set_callback_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("*changeEvent", "@brief Virtual method void QTabBar::changeEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*changeEvent", "@hide", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0, &_set_callback_cbs_changeEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QTabBar::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QTabBar::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*closeEvent", "@brief Virtual method void QTabBar::closeEvent(QCloseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0);
+  methods += new qt_gsi::GenericMethod ("*closeEvent", "@brief Virtual method void QTabBar::closeEvent(QCloseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0);
   methods += new qt_gsi::GenericMethod ("*closeEvent", "@hide", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0, &_set_callback_cbs_closeEvent_1719_0);
-  methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QTabBar::contextMenuEvent(QContextMenuEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
+  methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QTabBar::contextMenuEvent(QContextMenuEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0, &_set_callback_cbs_contextMenuEvent_2363_0);
-  methods += new qt_gsi::GenericMethod ("*qt_create", "@brief Method void QTabBar::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
+  methods += new qt_gsi::GenericMethod ("*create|qt_create", "@brief Method void QTabBar::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
   methods += new qt_gsi::GenericMethod ("emit_currentChanged", "@brief Emitter for signal void QTabBar::currentChanged(int index)\nCall this method to emit this signal.", false, &_init_emitter_currentChanged_767, &_call_emitter_currentChanged_767);
   methods += new qt_gsi::GenericMethod ("emit_customContextMenuRequested", "@brief Emitter for signal void QTabBar::customContextMenuRequested(const QPoint &pos)\nCall this method to emit this signal.", false, &_init_emitter_customContextMenuRequested_1916, &_call_emitter_customContextMenuRequested_1916);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QTabBar::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QTabBar::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*qt_destroy", "@brief Method void QTabBar::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
+  methods += new qt_gsi::GenericMethod ("*destroy|qt_destroy", "@brief Method void QTabBar::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QTabBar::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QTabBar::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@brief Virtual method void QTabBar::dragEnterEvent(QDragEnterEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0);
+  methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@brief Virtual method void QTabBar::dragEnterEvent(QDragEnterEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0);
   methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@hide", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0, &_set_callback_cbs_dragEnterEvent_2109_0);
-  methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@brief Virtual method void QTabBar::dragLeaveEvent(QDragLeaveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0);
+  methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@brief Virtual method void QTabBar::dragLeaveEvent(QDragLeaveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0);
   methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@hide", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0, &_set_callback_cbs_dragLeaveEvent_2092_0);
-  methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@brief Virtual method void QTabBar::dragMoveEvent(QDragMoveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0);
+  methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@brief Virtual method void QTabBar::dragMoveEvent(QDragMoveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0);
   methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@hide", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0, &_set_callback_cbs_dragMoveEvent_2006_0);
-  methods += new qt_gsi::GenericMethod ("*dropEvent", "@brief Virtual method void QTabBar::dropEvent(QDropEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0);
+  methods += new qt_gsi::GenericMethod ("*dropEvent", "@brief Virtual method void QTabBar::dropEvent(QDropEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0);
   methods += new qt_gsi::GenericMethod ("*dropEvent", "@hide", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0, &_set_callback_cbs_dropEvent_1622_0);
-  methods += new qt_gsi::GenericMethod ("*enterEvent", "@brief Virtual method void QTabBar::enterEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*enterEvent", "@brief Virtual method void QTabBar::enterEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*enterEvent", "@hide", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0, &_set_callback_cbs_enterEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QTabBar::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QTabBar::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QTabBar::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("*focusInEvent", "@brief Virtual method void QTabBar::focusInEvent(QFocusEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0);
+  methods += new qt_gsi::GenericMethod ("*focusInEvent", "@brief Virtual method void QTabBar::focusInEvent(QFocusEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusInEvent", "@hide", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0, &_set_callback_cbs_focusInEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusNextChild", "@brief Method bool QTabBar::focusNextChild()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_focusNextChild_0, &_call_fp_focusNextChild_0);
   methods += new qt_gsi::GenericMethod ("*focusNextPrevChild", "@brief Virtual method bool QTabBar::focusNextPrevChild(bool next)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusNextPrevChild_864_0, &_call_cbs_focusNextPrevChild_864_0);
   methods += new qt_gsi::GenericMethod ("*focusNextPrevChild", "@hide", false, &_init_cbs_focusNextPrevChild_864_0, &_call_cbs_focusNextPrevChild_864_0, &_set_callback_cbs_focusNextPrevChild_864_0);
-  methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@brief Virtual method void QTabBar::focusOutEvent(QFocusEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0);
+  methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@brief Virtual method void QTabBar::focusOutEvent(QFocusEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@hide", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0, &_set_callback_cbs_focusOutEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusPreviousChild", "@brief Method bool QTabBar::focusPreviousChild()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_focusPreviousChild_0, &_call_fp_focusPreviousChild_0);
   methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@brief Virtual method bool QTabBar::hasHeightForWidth()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_hasHeightForWidth_c0_0, &_call_cbs_hasHeightForWidth_c0_0);
@@ -3817,9 +3861,9 @@ static gsi::Methods methods_QTabBar_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QTabBar::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("*keyPressEvent", "@brief Virtual method void QTabBar::keyPressEvent(QKeyEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyPressEvent_1514_0, &_call_cbs_keyPressEvent_1514_0);
   methods += new qt_gsi::GenericMethod ("*keyPressEvent", "@hide", false, &_init_cbs_keyPressEvent_1514_0, &_call_cbs_keyPressEvent_1514_0, &_set_callback_cbs_keyPressEvent_1514_0);
-  methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@brief Virtual method void QTabBar::keyReleaseEvent(QKeyEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0);
+  methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@brief Virtual method void QTabBar::keyReleaseEvent(QKeyEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0);
   methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@hide", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0, &_set_callback_cbs_keyReleaseEvent_1514_0);
-  methods += new qt_gsi::GenericMethod ("*leaveEvent", "@brief Virtual method void QTabBar::leaveEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*leaveEvent", "@brief Virtual method void QTabBar::leaveEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*leaveEvent", "@hide", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0, &_set_callback_cbs_leaveEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*metric", "@brief Virtual method int QTabBar::metric(QPaintDevice::PaintDeviceMetric)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0);
   methods += new qt_gsi::GenericMethod ("*metric", "@hide", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0, &_set_callback_cbs_metric_c3445_0);
@@ -3827,7 +3871,7 @@ static gsi::Methods methods_QTabBar_Adaptor () {
   methods += new qt_gsi::GenericMethod ("minimumSizeHint", "@hide", true, &_init_cbs_minimumSizeHint_c0_0, &_call_cbs_minimumSizeHint_c0_0, &_set_callback_cbs_minimumSizeHint_c0_0);
   methods += new qt_gsi::GenericMethod ("*minimumTabSizeHint", "@brief Virtual method QSize QTabBar::minimumTabSizeHint(int index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_minimumTabSizeHint_c767_0, &_call_cbs_minimumTabSizeHint_c767_0);
   methods += new qt_gsi::GenericMethod ("*minimumTabSizeHint", "@hide", true, &_init_cbs_minimumTabSizeHint_c767_0, &_call_cbs_minimumTabSizeHint_c767_0, &_set_callback_cbs_minimumTabSizeHint_c767_0);
-  methods += new qt_gsi::GenericMethod ("*mouseDoubleClickEvent", "@brief Virtual method void QTabBar::mouseDoubleClickEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseDoubleClickEvent_1738_0, &_call_cbs_mouseDoubleClickEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mouseDoubleClickEvent", "@brief Virtual method void QTabBar::mouseDoubleClickEvent(QMouseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseDoubleClickEvent_1738_0, &_call_cbs_mouseDoubleClickEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseDoubleClickEvent", "@hide", false, &_init_cbs_mouseDoubleClickEvent_1738_0, &_call_cbs_mouseDoubleClickEvent_1738_0, &_set_callback_cbs_mouseDoubleClickEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseMoveEvent", "@brief Virtual method void QTabBar::mouseMoveEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseMoveEvent_1738_0, &_call_cbs_mouseMoveEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseMoveEvent", "@hide", false, &_init_cbs_mouseMoveEvent_1738_0, &_call_cbs_mouseMoveEvent_1738_0, &_set_callback_cbs_mouseMoveEvent_1738_0);
@@ -3835,7 +3879,7 @@ static gsi::Methods methods_QTabBar_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*mousePressEvent", "@hide", false, &_init_cbs_mousePressEvent_1738_0, &_call_cbs_mousePressEvent_1738_0, &_set_callback_cbs_mousePressEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@brief Virtual method void QTabBar::mouseReleaseEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@hide", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0, &_set_callback_cbs_mouseReleaseEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*moveEvent", "@brief Virtual method void QTabBar::moveEvent(QMoveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0);
+  methods += new qt_gsi::GenericMethod ("*moveEvent", "@brief Virtual method void QTabBar::moveEvent(QMoveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*moveEvent", "@hide", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0, &_set_callback_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@brief Virtual method bool QTabBar::nativeEvent(const QByteArray &eventType, void *message, long int *result)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@hide", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0, &_set_callback_cbs_nativeEvent_4678_0);
@@ -3871,7 +3915,7 @@ static gsi::Methods methods_QTabBar_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*tabRemoved", "@hide", false, &_init_cbs_tabRemoved_767_0, &_call_cbs_tabRemoved_767_0, &_set_callback_cbs_tabRemoved_767_0);
   methods += new qt_gsi::GenericMethod ("*tabSizeHint", "@brief Virtual method QSize QTabBar::tabSizeHint(int index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_tabSizeHint_c767_0, &_call_cbs_tabSizeHint_c767_0);
   methods += new qt_gsi::GenericMethod ("*tabSizeHint", "@hide", true, &_init_cbs_tabSizeHint_c767_0, &_call_cbs_tabSizeHint_c767_0, &_set_callback_cbs_tabSizeHint_c767_0);
-  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QTabBar::tabletEvent(QTabletEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
+  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QTabBar::tabletEvent(QTabletEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
   methods += new qt_gsi::GenericMethod ("*tabletEvent", "@hide", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0, &_set_callback_cbs_tabletEvent_1821_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QTabBar::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);

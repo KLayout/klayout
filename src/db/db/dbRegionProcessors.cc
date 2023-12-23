@@ -217,4 +217,39 @@ bool PolygonSizer::result_is_merged () const
   return (m_dx < 0 && m_dy < 0);
 }
 
+// -----------------------------------------------------------------------------------
+//  TriangulationProcessor implementation
+
+//  some typical value to translate the values into "order of 1"
+const double triangulation_dbu = 0.001;
+
+TriangulationProcessor::TriangulationProcessor (double max_area, double min_b)
+{
+  m_param.max_area = max_area * triangulation_dbu * triangulation_dbu;
+  m_param.base_verbosity = 40;
+  m_param.min_length = 2 * triangulation_dbu;
+  m_param.min_b = min_b;
+}
+
+void
+TriangulationProcessor::process (const db::Polygon &poly, std::vector<db::Polygon> &result) const
+{
+  //  NOTE: we center the polygon for better numerical stability
+  db::CplxTrans trans = db::CplxTrans (triangulation_dbu) * db::ICplxTrans (db::Trans (db::Point () - poly.box ().center ()));
+
+  db::Triangles tri;
+  tri.triangulate (poly, m_param, trans);
+
+  db::Point pts [3];
+  auto trans_inv = trans.inverted ();
+
+  for (auto t = tri.begin (); t != tri.end (); ++t) {
+    for (int i = 0; i < 3; ++i) {
+      pts [i] = trans_inv * *t->vertex (i);
+    }
+    result.push_back (db::Polygon ());
+    result.back ().assign_hull (pts + 0, pts + 3);
+  }
+}
+
 }

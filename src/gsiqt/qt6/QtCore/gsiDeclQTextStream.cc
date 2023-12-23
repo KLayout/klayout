@@ -869,7 +869,7 @@ static gsi::Methods methods_QTextStream () {
   methods += new qt_gsi::GenericMethod ("atEnd", "@brief Method bool QTextStream::atEnd()\n", true, &_init_f_atEnd_c0, &_call_f_atEnd_c0);
   methods += new qt_gsi::GenericMethod (":autoDetectUnicode", "@brief Method bool QTextStream::autoDetectUnicode()\n", true, &_init_f_autoDetectUnicode_c0, &_call_f_autoDetectUnicode_c0);
   methods += new qt_gsi::GenericMethod (":device", "@brief Method QIODevice *QTextStream::device()\n", true, &_init_f_device_c0, &_call_f_device_c0);
-  methods += new qt_gsi::GenericMethod ("encoding", "@brief Method QStringConverter::Encoding QTextStream::encoding()\n", true, &_init_f_encoding_c0, &_call_f_encoding_c0);
+  methods += new qt_gsi::GenericMethod (":encoding", "@brief Method QStringConverter::Encoding QTextStream::encoding()\n", true, &_init_f_encoding_c0, &_call_f_encoding_c0);
   methods += new qt_gsi::GenericMethod (":fieldAlignment", "@brief Method QTextStream::FieldAlignment QTextStream::fieldAlignment()\n", true, &_init_f_fieldAlignment_c0, &_call_f_fieldAlignment_c0);
   methods += new qt_gsi::GenericMethod (":fieldWidth", "@brief Method int QTextStream::fieldWidth()\n", true, &_init_f_fieldWidth_c0, &_call_f_fieldWidth_c0);
   methods += new qt_gsi::GenericMethod ("flush", "@brief Method void QTextStream::flush()\n", false, &_init_f_flush_0, &_call_f_flush_0);
@@ -890,7 +890,7 @@ static gsi::Methods methods_QTextStream () {
   methods += new qt_gsi::GenericMethod ("seek", "@brief Method bool QTextStream::seek(qint64 pos)\n", false, &_init_f_seek_986, &_call_f_seek_986);
   methods += new qt_gsi::GenericMethod ("setAutoDetectUnicode|autoDetectUnicode=", "@brief Method void QTextStream::setAutoDetectUnicode(bool enabled)\n", false, &_init_f_setAutoDetectUnicode_864, &_call_f_setAutoDetectUnicode_864);
   methods += new qt_gsi::GenericMethod ("setDevice|device=", "@brief Method void QTextStream::setDevice(QIODevice *device)\n", false, &_init_f_setDevice_1447, &_call_f_setDevice_1447);
-  methods += new qt_gsi::GenericMethod ("setEncoding", "@brief Method void QTextStream::setEncoding(QStringConverter::Encoding encoding)\n", false, &_init_f_setEncoding_3023, &_call_f_setEncoding_3023);
+  methods += new qt_gsi::GenericMethod ("setEncoding|encoding=", "@brief Method void QTextStream::setEncoding(QStringConverter::Encoding encoding)\n", false, &_init_f_setEncoding_3023, &_call_f_setEncoding_3023);
   methods += new qt_gsi::GenericMethod ("setFieldAlignment|fieldAlignment=", "@brief Method void QTextStream::setFieldAlignment(QTextStream::FieldAlignment alignment)\n", false, &_init_f_setFieldAlignment_3085, &_call_f_setFieldAlignment_3085);
   methods += new qt_gsi::GenericMethod ("setFieldWidth|fieldWidth=", "@brief Method void QTextStream::setFieldWidth(int width)\n", false, &_init_f_setFieldWidth_767, &_call_f_setFieldWidth_767);
   methods += new qt_gsi::GenericMethod ("setGenerateByteOrderMark|generateByteOrderMark=", "@brief Method void QTextStream::setGenerateByteOrderMark(bool generate)\n", false, &_init_f_setGenerateByteOrderMark_864, &_call_f_setGenerateByteOrderMark_864);

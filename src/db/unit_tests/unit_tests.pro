@@ -12,6 +12,8 @@ SOURCES = \
   dbLogTests.cc \
   dbRecursiveInstanceIteratorTests.cc \
   dbRegionCheckUtilsTests.cc \
+  dbTriangleTests.cc \
+  dbTrianglesTests.cc \
   dbUtilsTests.cc \
   dbWriterTools.cc \
   dbLoadLayoutOptionsTests.cc \

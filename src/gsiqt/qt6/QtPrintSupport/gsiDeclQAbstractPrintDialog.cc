@@ -320,6 +320,15 @@ static gsi::Methods methods_QAbstractPrintDialog () {
   methods += new qt_gsi::GenericMethod ("setOptionTabs", "@brief Method void QAbstractPrintDialog::setOptionTabs(const QList<QWidget*> &tabs)\n", false, &_init_f_setOptionTabs_2663, &_call_f_setOptionTabs_2663);
   methods += new qt_gsi::GenericMethod ("setPrintRange|printRange=", "@brief Method void QAbstractPrintDialog::setPrintRange(QAbstractPrintDialog::PrintRange range)\n", false, &_init_f_setPrintRange_3588, &_call_f_setPrintRange_3588);
   methods += new qt_gsi::GenericMethod ("toPage", "@brief Method int QAbstractPrintDialog::toPage()\n", true, &_init_f_toPage_c0, &_call_f_toPage_c0);
+  methods += gsi::qt_signal ("accepted()", "accepted", "@brief Signal declaration for QAbstractPrintDialog::accepted()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QPoint & > ("customContextMenuRequested(const QPoint &)", "customContextMenuRequested", gsi::arg("pos"), "@brief Signal declaration for QAbstractPrintDialog::customContextMenuRequested(const QPoint &pos)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAbstractPrintDialog::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("finished(int)", "finished", gsi::arg("result"), "@brief Signal declaration for QAbstractPrintDialog::finished(int result)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QAbstractPrintDialog::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("rejected()", "rejected", "@brief Signal declaration for QAbstractPrintDialog::rejected()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QIcon & > ("windowIconChanged(const QIcon &)", "windowIconChanged", gsi::arg("icon"), "@brief Signal declaration for QAbstractPrintDialog::windowIconChanged(const QIcon &icon)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("windowIconTextChanged(const QString &)", "windowIconTextChanged", gsi::arg("iconText"), "@brief Signal declaration for QAbstractPrintDialog::windowIconTextChanged(const QString &iconText)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("windowTitleChanged(const QString &)", "windowTitleChanged", gsi::arg("title"), "@brief Signal declaration for QAbstractPrintDialog::windowTitleChanged(const QString &title)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QAbstractPrintDialog::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;
 }
@@ -418,6 +427,24 @@ public:
     }
   }
 
+  //  [emitter impl] void QAbstractPrintDialog::accepted()
+  void emitter_QAbstractPrintDialog_accepted_0()
+  {
+    emit QAbstractPrintDialog::accepted();
+  }
+
+  //  [emitter impl] void QAbstractPrintDialog::customContextMenuRequested(const QPoint &pos)
+  void emitter_QAbstractPrintDialog_customContextMenuRequested_1916(const QPoint &pos)
+  {
+    emit QAbstractPrintDialog::customContextMenuRequested(pos);
+  }
+
+  //  [emitter impl] void QAbstractPrintDialog::destroyed(QObject *)
+  void emitter_QAbstractPrintDialog_destroyed_1302(QObject *arg1)
+  {
+    emit QAbstractPrintDialog::destroyed(arg1);
+  }
+
   //  [adaptor impl] void QAbstractPrintDialog::done(int)
   void cbs_done_767_0(int arg1)
   {
@@ -446,6 +473,12 @@ public:
     } else {
       return QAbstractPrintDialog::exec();
     }
+  }
+
+  //  [emitter impl] void QAbstractPrintDialog::finished(int result)
+  void emitter_QAbstractPrintDialog_finished_767(int result)
+  {
+    emit QAbstractPrintDialog::finished(result);
   }
 
   //  [adaptor impl] bool QAbstractPrintDialog::hasHeightForWidth()
@@ -508,6 +541,13 @@ public:
     }
   }
 
+  //  [emitter impl] void QAbstractPrintDialog::objectNameChanged(const QString &objectName)
+  void emitter_QAbstractPrintDialog_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QAbstractPrintDialog::objectNameChanged(const QString &objectName)'");
+  }
+
   //  [adaptor impl] void QAbstractPrintDialog::open()
   void cbs_open_0_0()
   {
@@ -553,6 +593,12 @@ public:
     }
   }
 
+  //  [emitter impl] void QAbstractPrintDialog::rejected()
+  void emitter_QAbstractPrintDialog_rejected_0()
+  {
+    emit QAbstractPrintDialog::rejected();
+  }
+
   //  [adaptor impl] void QAbstractPrintDialog::setVisible(bool visible)
   void cbs_setVisible_864_0(bool visible)
   {
@@ -581,6 +627,24 @@ public:
     } else {
       return QAbstractPrintDialog::sizeHint();
     }
+  }
+
+  //  [emitter impl] void QAbstractPrintDialog::windowIconChanged(const QIcon &icon)
+  void emitter_QAbstractPrintDialog_windowIconChanged_1787(const QIcon &icon)
+  {
+    emit QAbstractPrintDialog::windowIconChanged(icon);
+  }
+
+  //  [emitter impl] void QAbstractPrintDialog::windowIconTextChanged(const QString &iconText)
+  void emitter_QAbstractPrintDialog_windowIconTextChanged_2025(const QString &iconText)
+  {
+    emit QAbstractPrintDialog::windowIconTextChanged(iconText);
+  }
+
+  //  [emitter impl] void QAbstractPrintDialog::windowTitleChanged(const QString &title)
+  void emitter_QAbstractPrintDialog_windowTitleChanged_2025(const QString &title)
+  {
+    emit QAbstractPrintDialog::windowTitleChanged(title);
   }
 
   //  [adaptor impl] void QAbstractPrintDialog::actionEvent(QActionEvent *event)
@@ -1248,6 +1312,20 @@ static void _set_callback_cbs_accept_0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
+// emitter void QAbstractPrintDialog::accepted()
+
+static void _init_emitter_accepted_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_accepted_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QAbstractPrintDialog_Adaptor *)cls)->emitter_QAbstractPrintDialog_accepted_0 ();
+}
+
+
 // void QAbstractPrintDialog::actionEvent(QActionEvent *event)
 
 static void _init_cbs_actionEvent_1823_0 (qt_gsi::GenericMethod *decl)
@@ -1412,6 +1490,24 @@ static void _call_fp_create_2208 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
+// emitter void QAbstractPrintDialog::customContextMenuRequested(const QPoint &pos)
+
+static void _init_emitter_customContextMenuRequested_1916 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("pos");
+  decl->add_arg<const QPoint & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
+  ((QAbstractPrintDialog_Adaptor *)cls)->emitter_QAbstractPrintDialog_customContextMenuRequested_1916 (arg1);
+}
+
+
 // void QAbstractPrintDialog::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
@@ -1455,6 +1551,24 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
   bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (true, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QAbstractPrintDialog_Adaptor *)cls)->fp_QAbstractPrintDialog_destroy_1620 (arg1, arg2);
+}
+
+
+// emitter void QAbstractPrintDialog::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QAbstractPrintDialog_Adaptor *)cls)->emitter_QAbstractPrintDialog_destroyed_1302 (arg1);
 }
 
 
@@ -1691,6 +1805,24 @@ static void _call_cbs_exec_0_0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 static void _set_callback_cbs_exec_0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QAbstractPrintDialog_Adaptor *)cls)->cb_exec_0_0 = cb;
+}
+
+
+// emitter void QAbstractPrintDialog::finished(int result)
+
+static void _init_emitter_finished_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("result");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_finished_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QAbstractPrintDialog_Adaptor *)cls)->emitter_QAbstractPrintDialog_finished_767 (arg1);
 }
 
 
@@ -2211,6 +2343,24 @@ static void _set_callback_cbs_nativeEvent_6949_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QAbstractPrintDialog::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QAbstractPrintDialog_Adaptor *)cls)->emitter_QAbstractPrintDialog_objectNameChanged_4567 (arg1);
+}
+
+
 // void QAbstractPrintDialog::open()
 
 static void _init_cbs_open_0_0 (qt_gsi::GenericMethod *decl)
@@ -2332,6 +2482,20 @@ static void _call_cbs_reject_0_0 (const qt_gsi::GenericMethod * /*decl*/, void *
 static void _set_callback_cbs_reject_0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QAbstractPrintDialog_Adaptor *)cls)->cb_reject_0_0 = cb;
+}
+
+
+// emitter void QAbstractPrintDialog::rejected()
+
+static void _init_emitter_rejected_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_rejected_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QAbstractPrintDialog_Adaptor *)cls)->emitter_QAbstractPrintDialog_rejected_0 ();
 }
 
 
@@ -2564,6 +2728,60 @@ static void _set_callback_cbs_wheelEvent_1718_0 (void *cls, const gsi::Callback 
 }
 
 
+// emitter void QAbstractPrintDialog::windowIconChanged(const QIcon &icon)
+
+static void _init_emitter_windowIconChanged_1787 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("icon");
+  decl->add_arg<const QIcon & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_windowIconChanged_1787 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
+  ((QAbstractPrintDialog_Adaptor *)cls)->emitter_QAbstractPrintDialog_windowIconChanged_1787 (arg1);
+}
+
+
+// emitter void QAbstractPrintDialog::windowIconTextChanged(const QString &iconText)
+
+static void _init_emitter_windowIconTextChanged_2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("iconText");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_windowIconTextChanged_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QAbstractPrintDialog_Adaptor *)cls)->emitter_QAbstractPrintDialog_windowIconTextChanged_2025 (arg1);
+}
+
+
+// emitter void QAbstractPrintDialog::windowTitleChanged(const QString &title)
+
+static void _init_emitter_windowTitleChanged_2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("title");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_windowTitleChanged_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QAbstractPrintDialog_Adaptor *)cls)->emitter_QAbstractPrintDialog_windowTitleChanged_2025 (arg1);
+}
+
+
 namespace gsi
 {
 
@@ -2574,6 +2792,7 @@ static gsi::Methods methods_QAbstractPrintDialog_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAbstractPrintDialog::QAbstractPrintDialog(QPrinter *printer, QWidget *parent)\nThis method creates an object of class QAbstractPrintDialog.", &_init_ctor_QAbstractPrintDialog_Adaptor_2650, &_call_ctor_QAbstractPrintDialog_Adaptor_2650);
   methods += new qt_gsi::GenericMethod ("accept", "@brief Virtual method void QAbstractPrintDialog::accept()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_accept_0_0, &_call_cbs_accept_0_0);
   methods += new qt_gsi::GenericMethod ("accept", "@hide", false, &_init_cbs_accept_0_0, &_call_cbs_accept_0_0, &_set_callback_cbs_accept_0_0);
+  methods += new qt_gsi::GenericMethod ("emit_accepted", "@brief Emitter for signal void QAbstractPrintDialog::accepted()\nCall this method to emit this signal.", false, &_init_emitter_accepted_0, &_call_emitter_accepted_0);
   methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QAbstractPrintDialog::actionEvent(QActionEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("*actionEvent", "@hide", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0, &_set_callback_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("*adjustPosition", "@brief Method void QAbstractPrintDialog::adjustPosition(QWidget *)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_adjustPosition_1315, &_call_fp_adjustPosition_1315);
@@ -2585,10 +2804,12 @@ static gsi::Methods methods_QAbstractPrintDialog_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*closeEvent", "@hide", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0, &_set_callback_cbs_closeEvent_1719_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QAbstractPrintDialog::contextMenuEvent(QContextMenuEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0, &_set_callback_cbs_contextMenuEvent_2363_0);
-  methods += new qt_gsi::GenericMethod ("*qt_create", "@brief Method void QAbstractPrintDialog::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
+  methods += new qt_gsi::GenericMethod ("*create|qt_create", "@brief Method void QAbstractPrintDialog::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
+  methods += new qt_gsi::GenericMethod ("emit_customContextMenuRequested", "@brief Emitter for signal void QAbstractPrintDialog::customContextMenuRequested(const QPoint &pos)\nCall this method to emit this signal.", false, &_init_emitter_customContextMenuRequested_1916, &_call_emitter_customContextMenuRequested_1916);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAbstractPrintDialog::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*qt_destroy", "@brief Method void QAbstractPrintDialog::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
+  methods += new qt_gsi::GenericMethod ("*destroy|qt_destroy", "@brief Method void QAbstractPrintDialog::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QAbstractPrintDialog::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QAbstractPrintDialog::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("done", "@brief Virtual method void QAbstractPrintDialog::done(int)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_done_767_0, &_call_cbs_done_767_0);
@@ -2609,6 +2830,7 @@ static gsi::Methods methods_QAbstractPrintDialog_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("exec", "@brief Virtual method int QAbstractPrintDialog::exec()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_exec_0_0, &_call_cbs_exec_0_0);
   methods += new qt_gsi::GenericMethod ("exec", "@hide", false, &_init_cbs_exec_0_0, &_call_cbs_exec_0_0, &_set_callback_cbs_exec_0_0);
+  methods += new qt_gsi::GenericMethod ("emit_finished", "@brief Emitter for signal void QAbstractPrintDialog::finished(int result)\nCall this method to emit this signal.", false, &_init_emitter_finished_767, &_call_emitter_finished_767);
   methods += new qt_gsi::GenericMethod ("*focusInEvent", "@brief Virtual method void QAbstractPrintDialog::focusInEvent(QFocusEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusInEvent", "@hide", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0, &_set_callback_cbs_focusInEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusNextChild", "@brief Method bool QAbstractPrintDialog::focusNextChild()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_focusNextChild_0, &_call_fp_focusNextChild_0);
@@ -2652,6 +2874,7 @@ static gsi::Methods methods_QAbstractPrintDialog_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*moveEvent", "@hide", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0, &_set_callback_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@brief Virtual method bool QAbstractPrintDialog::nativeEvent(const QByteArray &eventType, void *message, QIntegerForSizeof<void *>::Signed *result)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_nativeEvent_6949_0, &_call_cbs_nativeEvent_6949_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@hide", false, &_init_cbs_nativeEvent_6949_0, &_call_cbs_nativeEvent_6949_0, &_set_callback_cbs_nativeEvent_6949_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QAbstractPrintDialog::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("open", "@brief Virtual method void QAbstractPrintDialog::open()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_open_0_0, &_call_cbs_open_0_0);
   methods += new qt_gsi::GenericMethod ("open", "@hide", false, &_init_cbs_open_0_0, &_call_cbs_open_0_0, &_set_callback_cbs_open_0_0);
   methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Virtual method QPaintEngine *QAbstractPrintDialog::paintEngine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0);
@@ -2663,6 +2886,7 @@ static gsi::Methods methods_QAbstractPrintDialog_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*redirected", "@hide", true, &_init_cbs_redirected_c1225_0, &_call_cbs_redirected_c1225_0, &_set_callback_cbs_redirected_c1225_0);
   methods += new qt_gsi::GenericMethod ("reject", "@brief Virtual method void QAbstractPrintDialog::reject()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_reject_0_0, &_call_cbs_reject_0_0);
   methods += new qt_gsi::GenericMethod ("reject", "@hide", false, &_init_cbs_reject_0_0, &_call_cbs_reject_0_0, &_set_callback_cbs_reject_0_0);
+  methods += new qt_gsi::GenericMethod ("emit_rejected", "@brief Emitter for signal void QAbstractPrintDialog::rejected()\nCall this method to emit this signal.", false, &_init_emitter_rejected_0, &_call_emitter_rejected_0);
   methods += new qt_gsi::GenericMethod ("*resizeEvent", "@brief Virtual method void QAbstractPrintDialog::resizeEvent(QResizeEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_resizeEvent_1843_0, &_call_cbs_resizeEvent_1843_0);
   methods += new qt_gsi::GenericMethod ("*resizeEvent", "@hide", false, &_init_cbs_resizeEvent_1843_0, &_call_cbs_resizeEvent_1843_0, &_set_callback_cbs_resizeEvent_1843_0);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QAbstractPrintDialog::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
@@ -2682,6 +2906,9 @@ static gsi::Methods methods_QAbstractPrintDialog_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*updateMicroFocus", "@brief Method void QAbstractPrintDialog::updateMicroFocus(Qt::InputMethodQuery query)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_updateMicroFocus_2420, &_call_fp_updateMicroFocus_2420);
   methods += new qt_gsi::GenericMethod ("*wheelEvent", "@brief Virtual method void QAbstractPrintDialog::wheelEvent(QWheelEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0);
   methods += new qt_gsi::GenericMethod ("*wheelEvent", "@hide", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0, &_set_callback_cbs_wheelEvent_1718_0);
+  methods += new qt_gsi::GenericMethod ("emit_windowIconChanged", "@brief Emitter for signal void QAbstractPrintDialog::windowIconChanged(const QIcon &icon)\nCall this method to emit this signal.", false, &_init_emitter_windowIconChanged_1787, &_call_emitter_windowIconChanged_1787);
+  methods += new qt_gsi::GenericMethod ("emit_windowIconTextChanged", "@brief Emitter for signal void QAbstractPrintDialog::windowIconTextChanged(const QString &iconText)\nCall this method to emit this signal.", false, &_init_emitter_windowIconTextChanged_2025, &_call_emitter_windowIconTextChanged_2025);
+  methods += new qt_gsi::GenericMethod ("emit_windowTitleChanged", "@brief Emitter for signal void QAbstractPrintDialog::windowTitleChanged(const QString &title)\nCall this method to emit this signal.", false, &_init_emitter_windowTitleChanged_2025, &_call_emitter_windowTitleChanged_2025);
   return methods;
 }
 

@@ -406,33 +406,33 @@ public:
     emit QDoubleValidator::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QDoubleValidator::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QDoubleValidator::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QDoubleValidator::event(arg1);
+    return QDoubleValidator::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QDoubleValidator_Adaptor, bool, QEvent *>(&QDoubleValidator_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QDoubleValidator_Adaptor, bool, QEvent *>(&QDoubleValidator_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QDoubleValidator::event(arg1);
+      return QDoubleValidator::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QDoubleValidator::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QDoubleValidator::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QDoubleValidator::eventFilter(arg1, arg2);
+    return QDoubleValidator::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QDoubleValidator_Adaptor, bool, QObject *, QEvent *>(&QDoubleValidator_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QDoubleValidator_Adaptor, bool, QObject *, QEvent *>(&QDoubleValidator_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QDoubleValidator::eventFilter(arg1, arg2);
+      return QDoubleValidator::eventFilter(watched, event);
     }
   }
 
@@ -500,33 +500,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDoubleValidator::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QDoubleValidator::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QDoubleValidator::childEvent(arg1);
+    QDoubleValidator::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QDoubleValidator_Adaptor, QChildEvent *>(&QDoubleValidator_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QDoubleValidator_Adaptor, QChildEvent *>(&QDoubleValidator_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QDoubleValidator::childEvent(arg1);
+      QDoubleValidator::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QDoubleValidator::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QDoubleValidator::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QDoubleValidator::customEvent(arg1);
+    QDoubleValidator::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QDoubleValidator_Adaptor, QEvent *>(&QDoubleValidator_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QDoubleValidator_Adaptor, QEvent *>(&QDoubleValidator_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QDoubleValidator::customEvent(arg1);
+      QDoubleValidator::customEvent(event);
     }
   }
 
@@ -545,18 +545,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDoubleValidator::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QDoubleValidator::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QDoubleValidator::timerEvent(arg1);
+    QDoubleValidator::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QDoubleValidator_Adaptor, QTimerEvent *>(&QDoubleValidator_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QDoubleValidator_Adaptor, QTimerEvent *>(&QDoubleValidator_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QDoubleValidator::timerEvent(arg1);
+      QDoubleValidator::timerEvent(event);
     }
   }
 
@@ -577,7 +577,7 @@ QDoubleValidator_Adaptor::~QDoubleValidator_Adaptor() { }
 
 static void _init_ctor_QDoubleValidator_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QDoubleValidator_Adaptor> ();
 }
@@ -586,7 +586,7 @@ static void _call_ctor_QDoubleValidator_Adaptor_1302 (const qt_gsi::GenericStati
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QDoubleValidator_Adaptor *> (new QDoubleValidator_Adaptor (arg1));
 }
 
@@ -601,7 +601,7 @@ static void _init_ctor_QDoubleValidator_Adaptor_3887 (qt_gsi::GenericStaticMetho
   decl->add_arg<double > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("decimals");
   decl->add_arg<int > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_3 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_3);
   decl->set_return_new<QDoubleValidator_Adaptor> ();
 }
@@ -613,7 +613,7 @@ static void _call_ctor_QDoubleValidator_Adaptor_3887 (const qt_gsi::GenericStati
   double arg1 = gsi::arg_reader<double >() (args, heap);
   double arg2 = gsi::arg_reader<double >() (args, heap);
   int arg3 = gsi::arg_reader<int >() (args, heap);
-  QObject *arg4 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg4 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QDoubleValidator_Adaptor *> (new QDoubleValidator_Adaptor (arg1, arg2, arg3, arg4));
 }
 
@@ -650,11 +650,11 @@ static void _call_emitter_changed_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// void QDoubleValidator::childEvent(QChildEvent *)
+// void QDoubleValidator::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -674,11 +674,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QDoubleValidator::customEvent(QEvent *)
+// void QDoubleValidator::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -720,7 +720,7 @@ static void _call_emitter_decimalsChanged_767 (const qt_gsi::GenericMethod * /*d
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -729,7 +729,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QDoubleValidator_Adaptor *)cls)->emitter_QDoubleValidator_destroyed_1302 (arg1);
 }
 
@@ -758,11 +758,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QDoubleValidator::event(QEvent *)
+// bool QDoubleValidator::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -781,13 +781,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QDoubleValidator::eventFilter(QObject *, QEvent *)
+// bool QDoubleValidator::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -961,11 +961,11 @@ static void _set_callback_cbs_setRange_2693_1 (void *cls, const gsi::Callback &c
 }
 
 
-// void QDoubleValidator::timerEvent(QTimerEvent *)
+// void QDoubleValidator::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1040,17 +1040,17 @@ static gsi::Methods methods_QDoubleValidator_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDoubleValidator::QDoubleValidator(double bottom, double top, int decimals, QObject *parent)\nThis method creates an object of class QDoubleValidator.", &_init_ctor_QDoubleValidator_Adaptor_3887, &_call_ctor_QDoubleValidator_Adaptor_3887);
   methods += new qt_gsi::GenericMethod ("emit_bottomChanged", "@brief Emitter for signal void QDoubleValidator::bottomChanged(double bottom)\nCall this method to emit this signal.", false, &_init_emitter_bottomChanged_1071, &_call_emitter_bottomChanged_1071);
   methods += new qt_gsi::GenericMethod ("emit_changed", "@brief Emitter for signal void QDoubleValidator::changed()\nCall this method to emit this signal.", false, &_init_emitter_changed_0, &_call_emitter_changed_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QDoubleValidator::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QDoubleValidator::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QDoubleValidator::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QDoubleValidator::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_decimalsChanged", "@brief Emitter for signal void QDoubleValidator::decimalsChanged(int decimals)\nCall this method to emit this signal.", false, &_init_emitter_decimalsChanged_767, &_call_emitter_decimalsChanged_767);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QDoubleValidator::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QDoubleValidator::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QDoubleValidator::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QDoubleValidator::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QDoubleValidator::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QDoubleValidator::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("fixup", "@brief Virtual method void QDoubleValidator::fixup(QString &)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_fixup_c1330_0, &_call_cbs_fixup_c1330_0);
   methods += new qt_gsi::GenericMethod ("fixup", "@hide", true, &_init_cbs_fixup_c1330_0, &_call_cbs_fixup_c1330_0, &_set_callback_cbs_fixup_c1330_0);
@@ -1062,7 +1062,7 @@ static gsi::Methods methods_QDoubleValidator_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QDoubleValidator::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("setRange", "@brief Virtual method void QDoubleValidator::setRange(double bottom, double top, int decimals)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setRange_2693_1, &_call_cbs_setRange_2693_1);
   methods += new qt_gsi::GenericMethod ("setRange", "@hide", false, &_init_cbs_setRange_2693_1, &_call_cbs_setRange_2693_1, &_set_callback_cbs_setRange_2693_1);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QDoubleValidator::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QDoubleValidator::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("emit_topChanged", "@brief Emitter for signal void QDoubleValidator::topChanged(double top)\nCall this method to emit this signal.", false, &_init_emitter_topChanged_1071, &_call_emitter_topChanged_1071);
   methods += new qt_gsi::GenericMethod ("validate", "@brief Virtual method QValidator::State QDoubleValidator::validate(QString &, int &)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_validate_c2171_0, &_call_cbs_validate_c2171_0);

@@ -128,6 +128,52 @@ static void _call_f_close_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
+// void QIODevice::commitTransaction()
+
+
+static void _init_f_commitTransaction_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_f_commitTransaction_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QIODevice *)cls)->commitTransaction ();
+}
+
+
+// int QIODevice::currentReadChannel()
+
+
+static void _init_f_currentReadChannel_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<int > ();
+}
+
+static void _call_f_currentReadChannel_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<int > ((int)((QIODevice *)cls)->currentReadChannel ());
+}
+
+
+// int QIODevice::currentWriteChannel()
+
+
+static void _init_f_currentWriteChannel_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<int > ();
+}
+
+static void _call_f_currentWriteChannel_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<int > ((int)((QIODevice *)cls)->currentWriteChannel ());
+}
+
+
 // QString QIODevice::errorString()
 
 
@@ -200,6 +246,21 @@ static void _call_f_isTextModeEnabled_c0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<bool > ((bool)((QIODevice *)cls)->isTextModeEnabled ());
+}
+
+
+// bool QIODevice::isTransactionStarted()
+
+
+static void _init_f_isTransactionStarted_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isTransactionStarted_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QIODevice *)cls)->isTransactionStarted ());
 }
 
 
@@ -339,6 +400,21 @@ static void _call_f_readAll_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+// int QIODevice::readChannelCount()
+
+
+static void _init_f_readChannelCount_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<int > ();
+}
+
+static void _call_f_readChannelCount_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<int > ((int)((QIODevice *)cls)->readChannelCount ());
+}
+
+
 // QByteArray QIODevice::readLine(qint64 maxlen)
 
 
@@ -373,6 +449,22 @@ static void _call_f_reset_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
+// void QIODevice::rollbackTransaction()
+
+
+static void _init_f_rollbackTransaction_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_f_rollbackTransaction_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QIODevice *)cls)->rollbackTransaction ();
+}
+
+
 // bool QIODevice::seek(qint64 pos)
 
 
@@ -389,6 +481,46 @@ static void _call_f_seek_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
   tl::Heap heap;
   qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   ret.write<bool > ((bool)((QIODevice *)cls)->seek (arg1));
+}
+
+
+// void QIODevice::setCurrentReadChannel(int channel)
+
+
+static void _init_f_setCurrentReadChannel_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("channel");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setCurrentReadChannel_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QIODevice *)cls)->setCurrentReadChannel (arg1);
+}
+
+
+// void QIODevice::setCurrentWriteChannel(int channel)
+
+
+static void _init_f_setCurrentWriteChannel_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("channel");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setCurrentWriteChannel_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QIODevice *)cls)->setCurrentWriteChannel (arg1);
 }
 
 
@@ -424,6 +556,41 @@ static void _call_f_size_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qint64 > ((qint64)((QIODevice *)cls)->size ());
+}
+
+
+// qint64 QIODevice::skip(qint64 maxSize)
+
+
+static void _init_f_skip_986 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("maxSize");
+  decl->add_arg<qint64 > (argspec_0);
+  decl->set_return<qint64 > ();
+}
+
+static void _call_f_skip_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
+  ret.write<qint64 > ((qint64)((QIODevice *)cls)->skip (arg1));
+}
+
+
+// void QIODevice::startTransaction()
+
+
+static void _init_f_startTransaction_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_f_startTransaction_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QIODevice *)cls)->startTransaction ();
 }
 
 
@@ -526,6 +693,21 @@ static void _call_f_write_2309 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
+// int QIODevice::writeChannelCount()
+
+
+static void _init_f_writeChannelCount_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<int > ();
+}
+
+static void _call_f_writeChannelCount_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<int > ((int)((QIODevice *)cls)->writeChannelCount ());
+}
+
+
 // static QString QIODevice::tr(const char *s, const char *c, int n)
 
 
@@ -588,11 +770,15 @@ static gsi::Methods methods_QIODevice () {
   methods += new qt_gsi::GenericMethod ("bytesToWrite", "@brief Method qint64 QIODevice::bytesToWrite()\n", true, &_init_f_bytesToWrite_c0, &_call_f_bytesToWrite_c0);
   methods += new qt_gsi::GenericMethod ("canReadLine", "@brief Method bool QIODevice::canReadLine()\n", true, &_init_f_canReadLine_c0, &_call_f_canReadLine_c0);
   methods += new qt_gsi::GenericMethod ("close", "@brief Method void QIODevice::close()\n", false, &_init_f_close_0, &_call_f_close_0);
+  methods += new qt_gsi::GenericMethod ("commitTransaction", "@brief Method void QIODevice::commitTransaction()\n", false, &_init_f_commitTransaction_0, &_call_f_commitTransaction_0);
+  methods += new qt_gsi::GenericMethod (":currentReadChannel", "@brief Method int QIODevice::currentReadChannel()\n", true, &_init_f_currentReadChannel_c0, &_call_f_currentReadChannel_c0);
+  methods += new qt_gsi::GenericMethod (":currentWriteChannel", "@brief Method int QIODevice::currentWriteChannel()\n", true, &_init_f_currentWriteChannel_c0, &_call_f_currentWriteChannel_c0);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QIODevice::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
   methods += new qt_gsi::GenericMethod ("isOpen?", "@brief Method bool QIODevice::isOpen()\n", true, &_init_f_isOpen_c0, &_call_f_isOpen_c0);
   methods += new qt_gsi::GenericMethod ("isReadable?", "@brief Method bool QIODevice::isReadable()\n", true, &_init_f_isReadable_c0, &_call_f_isReadable_c0);
   methods += new qt_gsi::GenericMethod ("isSequential?", "@brief Method bool QIODevice::isSequential()\n", true, &_init_f_isSequential_c0, &_call_f_isSequential_c0);
   methods += new qt_gsi::GenericMethod ("isTextModeEnabled?|:textModeEnabled", "@brief Method bool QIODevice::isTextModeEnabled()\n", true, &_init_f_isTextModeEnabled_c0, &_call_f_isTextModeEnabled_c0);
+  methods += new qt_gsi::GenericMethod ("isTransactionStarted?", "@brief Method bool QIODevice::isTransactionStarted()\n", true, &_init_f_isTransactionStarted_c0, &_call_f_isTransactionStarted_c0);
   methods += new qt_gsi::GenericMethod ("isWritable?", "@brief Method bool QIODevice::isWritable()\n", true, &_init_f_isWritable_c0, &_call_f_isWritable_c0);
   methods += new qt_gsi::GenericMethod ("open", "@brief Method bool QIODevice::open(QFlags<QIODevice::OpenModeFlag> mode)\n", false, &_init_f_open_3242, &_call_f_open_3242);
   methods += new qt_gsi::GenericMethod ("openMode", "@brief Method QFlags<QIODevice::OpenModeFlag> QIODevice::openMode()\n", true, &_init_f_openMode_c0, &_call_f_openMode_c0);
@@ -601,18 +787,27 @@ static gsi::Methods methods_QIODevice () {
   methods += new qt_gsi::GenericMethod ("putChar", "@brief Method bool QIODevice::putChar(char c)\n", false, &_init_f_putChar_850, &_call_f_putChar_850);
   methods += new qt_gsi::GenericMethod ("read", "@brief Method QByteArray QIODevice::read(qint64 maxlen)\n", false, &_init_f_read_986, &_call_f_read_986);
   methods += new qt_gsi::GenericMethod ("readAll", "@brief Method QByteArray QIODevice::readAll()\n", false, &_init_f_readAll_0, &_call_f_readAll_0);
+  methods += new qt_gsi::GenericMethod ("readChannelCount", "@brief Method int QIODevice::readChannelCount()\n", true, &_init_f_readChannelCount_c0, &_call_f_readChannelCount_c0);
   methods += new qt_gsi::GenericMethod ("readLine", "@brief Method QByteArray QIODevice::readLine(qint64 maxlen)\n", false, &_init_f_readLine_986, &_call_f_readLine_986);
   methods += new qt_gsi::GenericMethod ("reset", "@brief Method bool QIODevice::reset()\n", false, &_init_f_reset_0, &_call_f_reset_0);
+  methods += new qt_gsi::GenericMethod ("rollbackTransaction", "@brief Method void QIODevice::rollbackTransaction()\n", false, &_init_f_rollbackTransaction_0, &_call_f_rollbackTransaction_0);
   methods += new qt_gsi::GenericMethod ("seek", "@brief Method bool QIODevice::seek(qint64 pos)\n", false, &_init_f_seek_986, &_call_f_seek_986);
+  methods += new qt_gsi::GenericMethod ("setCurrentReadChannel|currentReadChannel=", "@brief Method void QIODevice::setCurrentReadChannel(int channel)\n", false, &_init_f_setCurrentReadChannel_767, &_call_f_setCurrentReadChannel_767);
+  methods += new qt_gsi::GenericMethod ("setCurrentWriteChannel|currentWriteChannel=", "@brief Method void QIODevice::setCurrentWriteChannel(int channel)\n", false, &_init_f_setCurrentWriteChannel_767, &_call_f_setCurrentWriteChannel_767);
   methods += new qt_gsi::GenericMethod ("setTextModeEnabled|textModeEnabled=", "@brief Method void QIODevice::setTextModeEnabled(bool enabled)\n", false, &_init_f_setTextModeEnabled_864, &_call_f_setTextModeEnabled_864);
   methods += new qt_gsi::GenericMethod ("size", "@brief Method qint64 QIODevice::size()\n", true, &_init_f_size_c0, &_call_f_size_c0);
+  methods += new qt_gsi::GenericMethod ("skip", "@brief Method qint64 QIODevice::skip(qint64 maxSize)\n", false, &_init_f_skip_986, &_call_f_skip_986);
+  methods += new qt_gsi::GenericMethod ("startTransaction", "@brief Method void QIODevice::startTransaction()\n", false, &_init_f_startTransaction_0, &_call_f_startTransaction_0);
   methods += new qt_gsi::GenericMethod ("ungetChar", "@brief Method void QIODevice::ungetChar(char c)\n", false, &_init_f_ungetChar_850, &_call_f_ungetChar_850);
   methods += new qt_gsi::GenericMethod ("waitForBytesWritten", "@brief Method bool QIODevice::waitForBytesWritten(int msecs)\n", false, &_init_f_waitForBytesWritten_767, &_call_f_waitForBytesWritten_767);
   methods += new qt_gsi::GenericMethod ("waitForReadyRead", "@brief Method bool QIODevice::waitForReadyRead(int msecs)\n", false, &_init_f_waitForReadyRead_767, &_call_f_waitForReadyRead_767);
   methods += new qt_gsi::GenericMethod ("write", "@brief Method qint64 QIODevice::write(const char *data, qint64 len)\n", false, &_init_f_write_2609, &_call_f_write_2609);
   methods += new qt_gsi::GenericMethod ("write", "@brief Method qint64 QIODevice::write(const QByteArray &data)\n", false, &_init_f_write_2309, &_call_f_write_2309);
+  methods += new qt_gsi::GenericMethod ("writeChannelCount", "@brief Method int QIODevice::writeChannelCount()\n", true, &_init_f_writeChannelCount_c0, &_call_f_writeChannelCount_c0);
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QIODevice::aboutToClose()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64 > ("bytesWritten(qint64)", "bytesWritten", gsi::arg("bytes"), "@brief Signal declaration for QIODevice::bytesWritten(qint64 bytes)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int, qint64 > ("channelBytesWritten(int, qint64)", "channelBytesWritten", gsi::arg("channel"), gsi::arg("bytes"), "@brief Signal declaration for QIODevice::channelBytesWritten(int channel, qint64 bytes)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("channelReadyRead(int)", "channelReadyRead", gsi::arg("channel"), "@brief Signal declaration for QIODevice::channelReadyRead(int channel)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QIODevice::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QIODevice::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("readChannelFinished()", "readChannelFinished", "@brief Signal declaration for QIODevice::readChannelFinished()\nYou can bind a procedure to this signal.");
@@ -646,7 +841,9 @@ static gsi::Enum<QIODevice::OpenModeFlag> decl_QIODevice_OpenModeFlag_Enum ("QtC
     gsi::enum_const ("Append", QIODevice::Append, "@brief Enum constant QIODevice::Append") +
     gsi::enum_const ("Truncate", QIODevice::Truncate, "@brief Enum constant QIODevice::Truncate") +
     gsi::enum_const ("Text", QIODevice::Text, "@brief Enum constant QIODevice::Text") +
-    gsi::enum_const ("Unbuffered", QIODevice::Unbuffered, "@brief Enum constant QIODevice::Unbuffered"),
+    gsi::enum_const ("Unbuffered", QIODevice::Unbuffered, "@brief Enum constant QIODevice::Unbuffered") +
+    gsi::enum_const ("NewOnly", QIODevice::NewOnly, "@brief Enum constant QIODevice::NewOnly") +
+    gsi::enum_const ("ExistingOnly", QIODevice::ExistingOnly, "@brief Enum constant QIODevice::ExistingOnly"),
   "@qt\n@brief This class represents the QIODevice::OpenModeFlag enum");
 
 static gsi::QFlagsClass<QIODevice::OpenModeFlag > decl_QIODevice_OpenModeFlag_Enums ("QtCore", "QIODevice_QFlags_OpenModeFlag",

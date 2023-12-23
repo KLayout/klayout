@@ -826,7 +826,7 @@ QPaintEngine_Adaptor::~QPaintEngine_Adaptor() { }
 
 static void _init_ctor_QPaintEngine_Adaptor_4257 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("features", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("features", true, "QPaintEngine::PaintEngineFeatures()");
   decl->add_arg<QFlags<QPaintEngine::PaintEngineFeature> > (argspec_0);
   decl->set_return_new<QPaintEngine_Adaptor> ();
 }
@@ -835,7 +835,7 @@ static void _call_ctor_QPaintEngine_Adaptor_4257 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QPaintEngine::PaintEngineFeature> arg1 = args ? gsi::arg_reader<QFlags<QPaintEngine::PaintEngineFeature> >() (args, heap) : gsi::arg_maker<QFlags<QPaintEngine::PaintEngineFeature> >() (0, heap);
+  QFlags<QPaintEngine::PaintEngineFeature> arg1 = args ? gsi::arg_reader<QFlags<QPaintEngine::PaintEngineFeature> >() (args, heap) : gsi::arg_maker<QFlags<QPaintEngine::PaintEngineFeature> >() (QPaintEngine::PaintEngineFeatures(), heap);
   ret.write<QPaintEngine_Adaptor *> (new QPaintEngine_Adaptor (arg1));
 }
 

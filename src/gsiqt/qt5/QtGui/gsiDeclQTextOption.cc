@@ -217,6 +217,26 @@ static void _call_f_setTabStop_1071 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
+// void QTextOption::setTabStopDistance(double tabStopDistance)
+
+
+static void _init_f_setTabStopDistance_1071 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("tabStopDistance");
+  decl->add_arg<double > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setTabStopDistance_1071 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QTextOption *)cls)->setTabStopDistance (arg1);
+}
+
+
 // void QTextOption::setTabs(const QList<QTextOption::Tab> &tabStops)
 
 
@@ -327,6 +347,21 @@ static void _call_f_tabStop_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
+// double QTextOption::tabStopDistance()
+
+
+static void _init_f_tabStopDistance_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<double > ();
+}
+
+static void _call_f_tabStopDistance_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<double > ((double)((QTextOption *)cls)->tabStopDistance ());
+}
+
+
 // QList<QTextOption::Tab> QTextOption::tabs()
 
 
@@ -403,12 +438,14 @@ static gsi::Methods methods_QTextOption () {
   methods += new qt_gsi::GenericMethod ("setFlags|flags=", "@brief Method void QTextOption::setFlags(QFlags<QTextOption::Flag> flags)\n", false, &_init_f_setFlags_2761, &_call_f_setFlags_2761);
   methods += new qt_gsi::GenericMethod ("setTabArray|tabArray=", "@brief Method void QTextOption::setTabArray(const QList<qreal> &tabStops)\n", false, &_init_f_setTabArray_2461, &_call_f_setTabArray_2461);
   methods += new qt_gsi::GenericMethod ("setTabStop|tabStop=", "@brief Method void QTextOption::setTabStop(double tabStop)\n", false, &_init_f_setTabStop_1071, &_call_f_setTabStop_1071);
+  methods += new qt_gsi::GenericMethod ("setTabStopDistance|tabStopDistance=", "@brief Method void QTextOption::setTabStopDistance(double tabStopDistance)\n", false, &_init_f_setTabStopDistance_1071, &_call_f_setTabStopDistance_1071);
   methods += new qt_gsi::GenericMethod ("setTabs|tabs=", "@brief Method void QTextOption::setTabs(const QList<QTextOption::Tab> &tabStops)\n", false, &_init_f_setTabs_3458, &_call_f_setTabs_3458);
   methods += new qt_gsi::GenericMethod ("setTextDirection|textDirection=", "@brief Method void QTextOption::setTextDirection(Qt::LayoutDirection aDirection)\n", false, &_init_f_setTextDirection_2316, &_call_f_setTextDirection_2316);
   methods += new qt_gsi::GenericMethod ("setUseDesignMetrics|useDesignMetrics=", "@brief Method void QTextOption::setUseDesignMetrics(bool b)\n", false, &_init_f_setUseDesignMetrics_864, &_call_f_setUseDesignMetrics_864);
   methods += new qt_gsi::GenericMethod ("setWrapMode|wrapMode=", "@brief Method void QTextOption::setWrapMode(QTextOption::WrapMode wrap)\n", false, &_init_f_setWrapMode_2486, &_call_f_setWrapMode_2486);
   methods += new qt_gsi::GenericMethod (":tabArray", "@brief Method QList<qreal> QTextOption::tabArray()\n", true, &_init_f_tabArray_c0, &_call_f_tabArray_c0);
   methods += new qt_gsi::GenericMethod (":tabStop", "@brief Method double QTextOption::tabStop()\n", true, &_init_f_tabStop_c0, &_call_f_tabStop_c0);
+  methods += new qt_gsi::GenericMethod (":tabStopDistance", "@brief Method double QTextOption::tabStopDistance()\n", true, &_init_f_tabStopDistance_c0, &_call_f_tabStopDistance_c0);
   methods += new qt_gsi::GenericMethod (":tabs", "@brief Method QList<QTextOption::Tab> QTextOption::tabs()\n", true, &_init_f_tabs_c0, &_call_f_tabs_c0);
   methods += new qt_gsi::GenericMethod (":textDirection", "@brief Method Qt::LayoutDirection QTextOption::textDirection()\n", true, &_init_f_textDirection_c0, &_call_f_textDirection_c0);
   methods += new qt_gsi::GenericMethod (":useDesignMetrics", "@brief Method bool QTextOption::useDesignMetrics()\n", true, &_init_f_useDesignMetrics_c0, &_call_f_useDesignMetrics_c0);
@@ -435,6 +472,7 @@ static gsi::Enum<QTextOption::Flag> decl_QTextOption_Flag_Enum ("QtGui", "QTextO
     gsi::enum_const ("ShowLineAndParagraphSeparators", QTextOption::ShowLineAndParagraphSeparators, "@brief Enum constant QTextOption::ShowLineAndParagraphSeparators") +
     gsi::enum_const ("AddSpaceForLineAndParagraphSeparators", QTextOption::AddSpaceForLineAndParagraphSeparators, "@brief Enum constant QTextOption::AddSpaceForLineAndParagraphSeparators") +
     gsi::enum_const ("SuppressColors", QTextOption::SuppressColors, "@brief Enum constant QTextOption::SuppressColors") +
+    gsi::enum_const ("ShowDocumentTerminator", QTextOption::ShowDocumentTerminator, "@brief Enum constant QTextOption::ShowDocumentTerminator") +
     gsi::enum_const ("IncludeTrailingSpaces", QTextOption::IncludeTrailingSpaces, "@brief Enum constant QTextOption::IncludeTrailingSpaces"),
   "@qt\n@brief This class represents the QTextOption::Flag enum");
 

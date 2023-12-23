@@ -90,66 +90,6 @@ static void _call_f_map_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// void QSignalMapper::mappedInt(int)
-
-
-static void _init_f_mappedInt_767 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_mappedInt_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSignalMapper *)cls)->mappedInt (arg1);
-}
-
-
-// void QSignalMapper::mappedObject(QObject *)
-
-
-static void _init_f_mappedObject_1302 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<QObject * > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_mappedObject_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSignalMapper *)cls)->mappedObject (arg1);
-}
-
-
-// void QSignalMapper::mappedString(const QString &)
-
-
-static void _init_f_mappedString_2025 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<const QString & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_mappedString_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSignalMapper *)cls)->mappedString (arg1);
-}
-
-
 // QObject *QSignalMapper::mapping(int id)
 
 
@@ -329,9 +269,6 @@ static gsi::Methods methods_QSignalMapper () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("map", "@brief Method void QSignalMapper::map()\n", false, &_init_f_map_0, &_call_f_map_0);
   methods += new qt_gsi::GenericMethod ("map", "@brief Method void QSignalMapper::map(QObject *sender)\n", false, &_init_f_map_1302, &_call_f_map_1302);
-  methods += new qt_gsi::GenericMethod ("mappedInt", "@brief Method void QSignalMapper::mappedInt(int)\n", false, &_init_f_mappedInt_767, &_call_f_mappedInt_767);
-  methods += new qt_gsi::GenericMethod ("mappedObject", "@brief Method void QSignalMapper::mappedObject(QObject *)\n", false, &_init_f_mappedObject_1302, &_call_f_mappedObject_1302);
-  methods += new qt_gsi::GenericMethod ("mappedString", "@brief Method void QSignalMapper::mappedString(const QString &)\n", false, &_init_f_mappedString_2025, &_call_f_mappedString_2025);
   methods += new qt_gsi::GenericMethod ("mapping", "@brief Method QObject *QSignalMapper::mapping(int id)\n", true, &_init_f_mapping_c767, &_call_f_mapping_c767);
   methods += new qt_gsi::GenericMethod ("mapping", "@brief Method QObject *QSignalMapper::mapping(const QString &text)\n", true, &_init_f_mapping_c2025, &_call_f_mapping_c2025);
   methods += new qt_gsi::GenericMethod ("mapping", "@brief Method QObject *QSignalMapper::mapping(QObject *object)\n", true, &_init_f_mapping_c1302, &_call_f_mapping_c1302);
@@ -340,6 +277,9 @@ static gsi::Methods methods_QSignalMapper () {
   methods += new qt_gsi::GenericMethod ("setMapping", "@brief Method void QSignalMapper::setMapping(QObject *sender, const QString &text)\n", false, &_init_f_setMapping_3219, &_call_f_setMapping_3219);
   methods += new qt_gsi::GenericMethod ("setMapping", "@brief Method void QSignalMapper::setMapping(QObject *sender, QObject *object)\n", false, &_init_f_setMapping_2496, &_call_f_setMapping_2496);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QSignalMapper::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("mappedInt(int)", "mappedInt", gsi::arg("arg1"), "@brief Signal declaration for QSignalMapper::mappedInt(int)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("mappedObject(QObject *)", "mappedObject", gsi::arg("arg1"), "@brief Signal declaration for QSignalMapper::mappedObject(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("mappedString(const QString &)", "mappedString", gsi::arg("arg1"), "@brief Signal declaration for QSignalMapper::mappedString(const QString &)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QSignalMapper::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QSignalMapper::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;
@@ -428,6 +368,24 @@ public:
     } else {
       return QSignalMapper::eventFilter(watched, event);
     }
+  }
+
+  //  [emitter impl] void QSignalMapper::mappedInt(int)
+  void emitter_QSignalMapper_mappedInt_767(int arg1)
+  {
+    emit QSignalMapper::mappedInt(arg1);
+  }
+
+  //  [emitter impl] void QSignalMapper::mappedObject(QObject *)
+  void emitter_QSignalMapper_mappedObject_1302(QObject *arg1)
+  {
+    emit QSignalMapper::mappedObject(arg1);
+  }
+
+  //  [emitter impl] void QSignalMapper::mappedString(const QString &)
+  void emitter_QSignalMapper_mappedString_2025(const QString &arg1)
+  {
+    emit QSignalMapper::mappedString(arg1);
   }
 
   //  [emitter impl] void QSignalMapper::objectNameChanged(const QString &objectName)
@@ -682,6 +640,60 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QSignalMapper::mappedInt(int)
+
+static void _init_emitter_mappedInt_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_mappedInt_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QSignalMapper_Adaptor *)cls)->emitter_QSignalMapper_mappedInt_767 (arg1);
+}
+
+
+// emitter void QSignalMapper::mappedObject(QObject *)
+
+static void _init_emitter_mappedObject_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_mappedObject_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = gsi::arg_reader<QObject * >() (args, heap);
+  ((QSignalMapper_Adaptor *)cls)->emitter_QSignalMapper_mappedObject_1302 (arg1);
+}
+
+
+// emitter void QSignalMapper::mappedString(const QString &)
+
+static void _init_emitter_mappedString_2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_mappedString_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QSignalMapper_Adaptor *)cls)->emitter_QSignalMapper_mappedString_2025 (arg1);
+}
+
+
 // emitter void QSignalMapper::objectNameChanged(const QString &objectName)
 
 static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
@@ -790,6 +802,9 @@ static gsi::Methods methods_QSignalMapper_Adaptor () {
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QSignalMapper::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QSignalMapper::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_mappedInt", "@brief Emitter for signal void QSignalMapper::mappedInt(int)\nCall this method to emit this signal.", false, &_init_emitter_mappedInt_767, &_call_emitter_mappedInt_767);
+  methods += new qt_gsi::GenericMethod ("emit_mappedObject", "@brief Emitter for signal void QSignalMapper::mappedObject(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_mappedObject_1302, &_call_emitter_mappedObject_1302);
+  methods += new qt_gsi::GenericMethod ("emit_mappedString", "@brief Emitter for signal void QSignalMapper::mappedString(const QString &)\nCall this method to emit this signal.", false, &_init_emitter_mappedString_2025, &_call_emitter_mappedString_2025);
   methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QSignalMapper::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QSignalMapper::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QSignalMapper::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);

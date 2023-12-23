@@ -726,18 +726,18 @@ public:
     emit QMdiSubWindow::windowTitleChanged(title);
   }
 
-  //  [adaptor impl] void QMdiSubWindow::actionEvent(QActionEvent *)
-  void cbs_actionEvent_1823_0(QActionEvent *arg1)
+  //  [adaptor impl] void QMdiSubWindow::actionEvent(QActionEvent *event)
+  void cbs_actionEvent_1823_0(QActionEvent *event)
   {
-    QMdiSubWindow::actionEvent(arg1);
+    QMdiSubWindow::actionEvent(event);
   }
 
-  virtual void actionEvent(QActionEvent *arg1)
+  virtual void actionEvent(QActionEvent *event)
   {
     if (cb_actionEvent_1823_0.can_issue()) {
-      cb_actionEvent_1823_0.issue<QMdiSubWindow_Adaptor, QActionEvent *>(&QMdiSubWindow_Adaptor::cbs_actionEvent_1823_0, arg1);
+      cb_actionEvent_1823_0.issue<QMdiSubWindow_Adaptor, QActionEvent *>(&QMdiSubWindow_Adaptor::cbs_actionEvent_1823_0, event);
     } else {
-      QMdiSubWindow::actionEvent(arg1);
+      QMdiSubWindow::actionEvent(event);
     }
   }
 
@@ -801,18 +801,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMdiSubWindow::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QMdiSubWindow::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QMdiSubWindow::customEvent(arg1);
+    QMdiSubWindow::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QMdiSubWindow_Adaptor, QEvent *>(&QMdiSubWindow_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QMdiSubWindow_Adaptor, QEvent *>(&QMdiSubWindow_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QMdiSubWindow::customEvent(arg1);
+      QMdiSubWindow::customEvent(event);
     }
   }
 
@@ -831,78 +831,78 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMdiSubWindow::dragEnterEvent(QDragEnterEvent *)
-  void cbs_dragEnterEvent_2109_0(QDragEnterEvent *arg1)
+  //  [adaptor impl] void QMdiSubWindow::dragEnterEvent(QDragEnterEvent *event)
+  void cbs_dragEnterEvent_2109_0(QDragEnterEvent *event)
   {
-    QMdiSubWindow::dragEnterEvent(arg1);
+    QMdiSubWindow::dragEnterEvent(event);
   }
 
-  virtual void dragEnterEvent(QDragEnterEvent *arg1)
+  virtual void dragEnterEvent(QDragEnterEvent *event)
   {
     if (cb_dragEnterEvent_2109_0.can_issue()) {
-      cb_dragEnterEvent_2109_0.issue<QMdiSubWindow_Adaptor, QDragEnterEvent *>(&QMdiSubWindow_Adaptor::cbs_dragEnterEvent_2109_0, arg1);
+      cb_dragEnterEvent_2109_0.issue<QMdiSubWindow_Adaptor, QDragEnterEvent *>(&QMdiSubWindow_Adaptor::cbs_dragEnterEvent_2109_0, event);
     } else {
-      QMdiSubWindow::dragEnterEvent(arg1);
+      QMdiSubWindow::dragEnterEvent(event);
     }
   }
 
-  //  [adaptor impl] void QMdiSubWindow::dragLeaveEvent(QDragLeaveEvent *)
-  void cbs_dragLeaveEvent_2092_0(QDragLeaveEvent *arg1)
+  //  [adaptor impl] void QMdiSubWindow::dragLeaveEvent(QDragLeaveEvent *event)
+  void cbs_dragLeaveEvent_2092_0(QDragLeaveEvent *event)
   {
-    QMdiSubWindow::dragLeaveEvent(arg1);
+    QMdiSubWindow::dragLeaveEvent(event);
   }
 
-  virtual void dragLeaveEvent(QDragLeaveEvent *arg1)
+  virtual void dragLeaveEvent(QDragLeaveEvent *event)
   {
     if (cb_dragLeaveEvent_2092_0.can_issue()) {
-      cb_dragLeaveEvent_2092_0.issue<QMdiSubWindow_Adaptor, QDragLeaveEvent *>(&QMdiSubWindow_Adaptor::cbs_dragLeaveEvent_2092_0, arg1);
+      cb_dragLeaveEvent_2092_0.issue<QMdiSubWindow_Adaptor, QDragLeaveEvent *>(&QMdiSubWindow_Adaptor::cbs_dragLeaveEvent_2092_0, event);
     } else {
-      QMdiSubWindow::dragLeaveEvent(arg1);
+      QMdiSubWindow::dragLeaveEvent(event);
     }
   }
 
-  //  [adaptor impl] void QMdiSubWindow::dragMoveEvent(QDragMoveEvent *)
-  void cbs_dragMoveEvent_2006_0(QDragMoveEvent *arg1)
+  //  [adaptor impl] void QMdiSubWindow::dragMoveEvent(QDragMoveEvent *event)
+  void cbs_dragMoveEvent_2006_0(QDragMoveEvent *event)
   {
-    QMdiSubWindow::dragMoveEvent(arg1);
+    QMdiSubWindow::dragMoveEvent(event);
   }
 
-  virtual void dragMoveEvent(QDragMoveEvent *arg1)
+  virtual void dragMoveEvent(QDragMoveEvent *event)
   {
     if (cb_dragMoveEvent_2006_0.can_issue()) {
-      cb_dragMoveEvent_2006_0.issue<QMdiSubWindow_Adaptor, QDragMoveEvent *>(&QMdiSubWindow_Adaptor::cbs_dragMoveEvent_2006_0, arg1);
+      cb_dragMoveEvent_2006_0.issue<QMdiSubWindow_Adaptor, QDragMoveEvent *>(&QMdiSubWindow_Adaptor::cbs_dragMoveEvent_2006_0, event);
     } else {
-      QMdiSubWindow::dragMoveEvent(arg1);
+      QMdiSubWindow::dragMoveEvent(event);
     }
   }
 
-  //  [adaptor impl] void QMdiSubWindow::dropEvent(QDropEvent *)
-  void cbs_dropEvent_1622_0(QDropEvent *arg1)
+  //  [adaptor impl] void QMdiSubWindow::dropEvent(QDropEvent *event)
+  void cbs_dropEvent_1622_0(QDropEvent *event)
   {
-    QMdiSubWindow::dropEvent(arg1);
+    QMdiSubWindow::dropEvent(event);
   }
 
-  virtual void dropEvent(QDropEvent *arg1)
+  virtual void dropEvent(QDropEvent *event)
   {
     if (cb_dropEvent_1622_0.can_issue()) {
-      cb_dropEvent_1622_0.issue<QMdiSubWindow_Adaptor, QDropEvent *>(&QMdiSubWindow_Adaptor::cbs_dropEvent_1622_0, arg1);
+      cb_dropEvent_1622_0.issue<QMdiSubWindow_Adaptor, QDropEvent *>(&QMdiSubWindow_Adaptor::cbs_dropEvent_1622_0, event);
     } else {
-      QMdiSubWindow::dropEvent(arg1);
+      QMdiSubWindow::dropEvent(event);
     }
   }
 
-  //  [adaptor impl] void QMdiSubWindow::enterEvent(QEvent *)
-  void cbs_enterEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QMdiSubWindow::enterEvent(QEvent *event)
+  void cbs_enterEvent_1217_0(QEvent *event)
   {
-    QMdiSubWindow::enterEvent(arg1);
+    QMdiSubWindow::enterEvent(event);
   }
 
-  virtual void enterEvent(QEvent *arg1)
+  virtual void enterEvent(QEvent *event)
   {
     if (cb_enterEvent_1217_0.can_issue()) {
-      cb_enterEvent_1217_0.issue<QMdiSubWindow_Adaptor, QEvent *>(&QMdiSubWindow_Adaptor::cbs_enterEvent_1217_0, arg1);
+      cb_enterEvent_1217_0.issue<QMdiSubWindow_Adaptor, QEvent *>(&QMdiSubWindow_Adaptor::cbs_enterEvent_1217_0, event);
     } else {
-      QMdiSubWindow::enterEvent(arg1);
+      QMdiSubWindow::enterEvent(event);
     }
   }
 
@@ -1041,18 +1041,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMdiSubWindow::keyReleaseEvent(QKeyEvent *)
-  void cbs_keyReleaseEvent_1514_0(QKeyEvent *arg1)
+  //  [adaptor impl] void QMdiSubWindow::keyReleaseEvent(QKeyEvent *event)
+  void cbs_keyReleaseEvent_1514_0(QKeyEvent *event)
   {
-    QMdiSubWindow::keyReleaseEvent(arg1);
+    QMdiSubWindow::keyReleaseEvent(event);
   }
 
-  virtual void keyReleaseEvent(QKeyEvent *arg1)
+  virtual void keyReleaseEvent(QKeyEvent *event)
   {
     if (cb_keyReleaseEvent_1514_0.can_issue()) {
-      cb_keyReleaseEvent_1514_0.issue<QMdiSubWindow_Adaptor, QKeyEvent *>(&QMdiSubWindow_Adaptor::cbs_keyReleaseEvent_1514_0, arg1);
+      cb_keyReleaseEvent_1514_0.issue<QMdiSubWindow_Adaptor, QKeyEvent *>(&QMdiSubWindow_Adaptor::cbs_keyReleaseEvent_1514_0, event);
     } else {
-      QMdiSubWindow::keyReleaseEvent(arg1);
+      QMdiSubWindow::keyReleaseEvent(event);
     }
   }
 
@@ -1251,18 +1251,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMdiSubWindow::tabletEvent(QTabletEvent *)
-  void cbs_tabletEvent_1821_0(QTabletEvent *arg1)
+  //  [adaptor impl] void QMdiSubWindow::tabletEvent(QTabletEvent *event)
+  void cbs_tabletEvent_1821_0(QTabletEvent *event)
   {
-    QMdiSubWindow::tabletEvent(arg1);
+    QMdiSubWindow::tabletEvent(event);
   }
 
-  virtual void tabletEvent(QTabletEvent *arg1)
+  virtual void tabletEvent(QTabletEvent *event)
   {
     if (cb_tabletEvent_1821_0.can_issue()) {
-      cb_tabletEvent_1821_0.issue<QMdiSubWindow_Adaptor, QTabletEvent *>(&QMdiSubWindow_Adaptor::cbs_tabletEvent_1821_0, arg1);
+      cb_tabletEvent_1821_0.issue<QMdiSubWindow_Adaptor, QTabletEvent *>(&QMdiSubWindow_Adaptor::cbs_tabletEvent_1821_0, event);
     } else {
-      QMdiSubWindow::tabletEvent(arg1);
+      QMdiSubWindow::tabletEvent(event);
     }
   }
 
@@ -1281,18 +1281,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMdiSubWindow::wheelEvent(QWheelEvent *)
-  void cbs_wheelEvent_1718_0(QWheelEvent *arg1)
+  //  [adaptor impl] void QMdiSubWindow::wheelEvent(QWheelEvent *event)
+  void cbs_wheelEvent_1718_0(QWheelEvent *event)
   {
-    QMdiSubWindow::wheelEvent(arg1);
+    QMdiSubWindow::wheelEvent(event);
   }
 
-  virtual void wheelEvent(QWheelEvent *arg1)
+  virtual void wheelEvent(QWheelEvent *event)
   {
     if (cb_wheelEvent_1718_0.can_issue()) {
-      cb_wheelEvent_1718_0.issue<QMdiSubWindow_Adaptor, QWheelEvent *>(&QMdiSubWindow_Adaptor::cbs_wheelEvent_1718_0, arg1);
+      cb_wheelEvent_1718_0.issue<QMdiSubWindow_Adaptor, QWheelEvent *>(&QMdiSubWindow_Adaptor::cbs_wheelEvent_1718_0, event);
     } else {
-      QMdiSubWindow::wheelEvent(arg1);
+      QMdiSubWindow::wheelEvent(event);
     }
   }
 
@@ -1349,9 +1349,9 @@ QMdiSubWindow_Adaptor::~QMdiSubWindow_Adaptor() { }
 
 static void _init_ctor_QMdiSubWindow_Adaptor_3702 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("flags", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("flags", true, "Qt::WindowFlags()");
   decl->add_arg<QFlags<Qt::WindowType> > (argspec_1);
   decl->set_return_new<QMdiSubWindow_Adaptor> ();
 }
@@ -1360,8 +1360,8 @@ static void _call_ctor_QMdiSubWindow_Adaptor_3702 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
-  QFlags<Qt::WindowType> arg2 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (0, heap);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
+  QFlags<Qt::WindowType> arg2 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (Qt::WindowFlags(), heap);
   ret.write<QMdiSubWindow_Adaptor *> (new QMdiSubWindow_Adaptor (arg1, arg2));
 }
 
@@ -1380,11 +1380,11 @@ static void _call_emitter_aboutToActivate_0 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// void QMdiSubWindow::actionEvent(QActionEvent *)
+// void QMdiSubWindow::actionEvent(QActionEvent *event)
 
 static void _init_cbs_actionEvent_1823_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QActionEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1543,11 +1543,11 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 }
 
 
-// void QMdiSubWindow::customEvent(QEvent *)
+// void QMdiSubWindow::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1593,7 +1593,7 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1602,7 +1602,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QMdiSubWindow_Adaptor *)cls)->emitter_QMdiSubWindow_destroyed_1302 (arg1);
 }
 
@@ -1631,11 +1631,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// void QMdiSubWindow::dragEnterEvent(QDragEnterEvent *)
+// void QMdiSubWindow::dragEnterEvent(QDragEnterEvent *event)
 
 static void _init_cbs_dragEnterEvent_2109_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDragEnterEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1655,11 +1655,11 @@ static void _set_callback_cbs_dragEnterEvent_2109_0 (void *cls, const gsi::Callb
 }
 
 
-// void QMdiSubWindow::dragLeaveEvent(QDragLeaveEvent *)
+// void QMdiSubWindow::dragLeaveEvent(QDragLeaveEvent *event)
 
 static void _init_cbs_dragLeaveEvent_2092_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDragLeaveEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1679,11 +1679,11 @@ static void _set_callback_cbs_dragLeaveEvent_2092_0 (void *cls, const gsi::Callb
 }
 
 
-// void QMdiSubWindow::dragMoveEvent(QDragMoveEvent *)
+// void QMdiSubWindow::dragMoveEvent(QDragMoveEvent *event)
 
 static void _init_cbs_dragMoveEvent_2006_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDragMoveEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1703,11 +1703,11 @@ static void _set_callback_cbs_dragMoveEvent_2006_0 (void *cls, const gsi::Callba
 }
 
 
-// void QMdiSubWindow::dropEvent(QDropEvent *)
+// void QMdiSubWindow::dropEvent(QDropEvent *event)
 
 static void _init_cbs_dropEvent_1622_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDropEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1727,11 +1727,11 @@ static void _set_callback_cbs_dropEvent_1622_0 (void *cls, const gsi::Callback &
 }
 
 
-// void QMdiSubWindow::enterEvent(QEvent *)
+// void QMdiSubWindow::enterEvent(QEvent *event)
 
 static void _init_cbs_enterEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2078,11 +2078,11 @@ static void _set_callback_cbs_keyPressEvent_1514_0 (void *cls, const gsi::Callba
 }
 
 
-// void QMdiSubWindow::keyReleaseEvent(QKeyEvent *)
+// void QMdiSubWindow::keyReleaseEvent(QKeyEvent *event)
 
 static void _init_cbs_keyReleaseEvent_1514_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QKeyEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2557,11 +2557,11 @@ static void _set_callback_cbs_sizeHint_c0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QMdiSubWindow::tabletEvent(QTabletEvent *)
+// void QMdiSubWindow::tabletEvent(QTabletEvent *event)
 
 static void _init_cbs_tabletEvent_1821_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTabletEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2620,11 +2620,11 @@ static void _call_fp_updateMicroFocus_0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// void QMdiSubWindow::wheelEvent(QWheelEvent *)
+// void QMdiSubWindow::wheelEvent(QWheelEvent *event)
 
 static void _init_cbs_wheelEvent_1718_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QWheelEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2728,7 +2728,7 @@ static gsi::Methods methods_QMdiSubWindow_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMdiSubWindow::QMdiSubWindow(QWidget *parent, QFlags<Qt::WindowType> flags)\nThis method creates an object of class QMdiSubWindow.", &_init_ctor_QMdiSubWindow_Adaptor_3702, &_call_ctor_QMdiSubWindow_Adaptor_3702);
   methods += new qt_gsi::GenericMethod ("emit_aboutToActivate", "@brief Emitter for signal void QMdiSubWindow::aboutToActivate()\nCall this method to emit this signal.", false, &_init_emitter_aboutToActivate_0, &_call_emitter_aboutToActivate_0);
-  methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QMdiSubWindow::actionEvent(QActionEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
+  methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QMdiSubWindow::actionEvent(QActionEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("*actionEvent", "@hide", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0, &_set_callback_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("*changeEvent", "@brief Virtual method void QMdiSubWindow::changeEvent(QEvent *changeEvent)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*changeEvent", "@hide", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0, &_set_callback_cbs_changeEvent_1217_0);
@@ -2738,23 +2738,23 @@ static gsi::Methods methods_QMdiSubWindow_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*closeEvent", "@hide", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0, &_set_callback_cbs_closeEvent_1719_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QMdiSubWindow::contextMenuEvent(QContextMenuEvent *contextMenuEvent)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0, &_set_callback_cbs_contextMenuEvent_2363_0);
-  methods += new qt_gsi::GenericMethod ("*qt_create", "@brief Method void QMdiSubWindow::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
+  methods += new qt_gsi::GenericMethod ("*create|qt_create", "@brief Method void QMdiSubWindow::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
   methods += new qt_gsi::GenericMethod ("emit_customContextMenuRequested", "@brief Emitter for signal void QMdiSubWindow::customContextMenuRequested(const QPoint &pos)\nCall this method to emit this signal.", false, &_init_emitter_customContextMenuRequested_1916, &_call_emitter_customContextMenuRequested_1916);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMdiSubWindow::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMdiSubWindow::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*qt_destroy", "@brief Method void QMdiSubWindow::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
+  methods += new qt_gsi::GenericMethod ("*destroy|qt_destroy", "@brief Method void QMdiSubWindow::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QMdiSubWindow::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QMdiSubWindow::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@brief Virtual method void QMdiSubWindow::dragEnterEvent(QDragEnterEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0);
+  methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@brief Virtual method void QMdiSubWindow::dragEnterEvent(QDragEnterEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0);
   methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@hide", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0, &_set_callback_cbs_dragEnterEvent_2109_0);
-  methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@brief Virtual method void QMdiSubWindow::dragLeaveEvent(QDragLeaveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0);
+  methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@brief Virtual method void QMdiSubWindow::dragLeaveEvent(QDragLeaveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0);
   methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@hide", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0, &_set_callback_cbs_dragLeaveEvent_2092_0);
-  methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@brief Virtual method void QMdiSubWindow::dragMoveEvent(QDragMoveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0);
+  methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@brief Virtual method void QMdiSubWindow::dragMoveEvent(QDragMoveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0);
   methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@hide", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0, &_set_callback_cbs_dragMoveEvent_2006_0);
-  methods += new qt_gsi::GenericMethod ("*dropEvent", "@brief Virtual method void QMdiSubWindow::dropEvent(QDropEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0);
+  methods += new qt_gsi::GenericMethod ("*dropEvent", "@brief Virtual method void QMdiSubWindow::dropEvent(QDropEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0);
   methods += new qt_gsi::GenericMethod ("*dropEvent", "@hide", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0, &_set_callback_cbs_dropEvent_1622_0);
-  methods += new qt_gsi::GenericMethod ("*enterEvent", "@brief Virtual method void QMdiSubWindow::enterEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*enterEvent", "@brief Virtual method void QMdiSubWindow::enterEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*enterEvent", "@hide", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0, &_set_callback_cbs_enterEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QMdiSubWindow::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
@@ -2783,7 +2783,7 @@ static gsi::Methods methods_QMdiSubWindow_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QMdiSubWindow::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("*keyPressEvent", "@brief Virtual method void QMdiSubWindow::keyPressEvent(QKeyEvent *keyEvent)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyPressEvent_1514_0, &_call_cbs_keyPressEvent_1514_0);
   methods += new qt_gsi::GenericMethod ("*keyPressEvent", "@hide", false, &_init_cbs_keyPressEvent_1514_0, &_call_cbs_keyPressEvent_1514_0, &_set_callback_cbs_keyPressEvent_1514_0);
-  methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@brief Virtual method void QMdiSubWindow::keyReleaseEvent(QKeyEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0);
+  methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@brief Virtual method void QMdiSubWindow::keyReleaseEvent(QKeyEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0);
   methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@hide", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0, &_set_callback_cbs_keyReleaseEvent_1514_0);
   methods += new qt_gsi::GenericMethod ("*leaveEvent", "@brief Virtual method void QMdiSubWindow::leaveEvent(QEvent *leaveEvent)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*leaveEvent", "@hide", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0, &_set_callback_cbs_leaveEvent_1217_0);
@@ -2823,12 +2823,12 @@ static gsi::Methods methods_QMdiSubWindow_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*showEvent", "@hide", false, &_init_cbs_showEvent_1634_0, &_call_cbs_showEvent_1634_0, &_set_callback_cbs_showEvent_1634_0);
   methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Virtual method QSize QMdiSubWindow::sizeHint()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0);
   methods += new qt_gsi::GenericMethod ("sizeHint", "@hide", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0, &_set_callback_cbs_sizeHint_c0_0);
-  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QMdiSubWindow::tabletEvent(QTabletEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
+  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QMdiSubWindow::tabletEvent(QTabletEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
   methods += new qt_gsi::GenericMethod ("*tabletEvent", "@hide", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0, &_set_callback_cbs_tabletEvent_1821_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QMdiSubWindow::timerEvent(QTimerEvent *timerEvent)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*updateMicroFocus", "@brief Method void QMdiSubWindow::updateMicroFocus()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_updateMicroFocus_0, &_call_fp_updateMicroFocus_0);
-  methods += new qt_gsi::GenericMethod ("*wheelEvent", "@brief Virtual method void QMdiSubWindow::wheelEvent(QWheelEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0);
+  methods += new qt_gsi::GenericMethod ("*wheelEvent", "@brief Virtual method void QMdiSubWindow::wheelEvent(QWheelEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0);
   methods += new qt_gsi::GenericMethod ("*wheelEvent", "@hide", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0, &_set_callback_cbs_wheelEvent_1718_0);
   methods += new qt_gsi::GenericMethod ("emit_windowIconChanged", "@brief Emitter for signal void QMdiSubWindow::windowIconChanged(const QIcon &icon)\nCall this method to emit this signal.", false, &_init_emitter_windowIconChanged_1787, &_call_emitter_windowIconChanged_1787);
   methods += new qt_gsi::GenericMethod ("emit_windowIconTextChanged", "@brief Emitter for signal void QMdiSubWindow::windowIconTextChanged(const QString &iconText)\nCall this method to emit this signal.", false, &_init_emitter_windowIconTextChanged_2025, &_call_emitter_windowIconTextChanged_2025);

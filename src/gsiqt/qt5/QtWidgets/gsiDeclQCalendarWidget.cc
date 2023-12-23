@@ -1184,18 +1184,18 @@ public:
     emit QCalendarWidget::windowTitleChanged(title);
   }
 
-  //  [adaptor impl] void QCalendarWidget::actionEvent(QActionEvent *)
-  void cbs_actionEvent_1823_0(QActionEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::actionEvent(QActionEvent *event)
+  void cbs_actionEvent_1823_0(QActionEvent *event)
   {
-    QCalendarWidget::actionEvent(arg1);
+    QCalendarWidget::actionEvent(event);
   }
 
-  virtual void actionEvent(QActionEvent *arg1)
+  virtual void actionEvent(QActionEvent *event)
   {
     if (cb_actionEvent_1823_0.can_issue()) {
-      cb_actionEvent_1823_0.issue<QCalendarWidget_Adaptor, QActionEvent *>(&QCalendarWidget_Adaptor::cbs_actionEvent_1823_0, arg1);
+      cb_actionEvent_1823_0.issue<QCalendarWidget_Adaptor, QActionEvent *>(&QCalendarWidget_Adaptor::cbs_actionEvent_1823_0, event);
     } else {
-      QCalendarWidget::actionEvent(arg1);
+      QCalendarWidget::actionEvent(event);
     }
   }
 
@@ -1214,63 +1214,63 @@ public:
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QCalendarWidget::childEvent(arg1);
+    QCalendarWidget::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QCalendarWidget_Adaptor, QChildEvent *>(&QCalendarWidget_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QCalendarWidget_Adaptor, QChildEvent *>(&QCalendarWidget_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QCalendarWidget::childEvent(arg1);
+      QCalendarWidget::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::closeEvent(QCloseEvent *)
-  void cbs_closeEvent_1719_0(QCloseEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::closeEvent(QCloseEvent *event)
+  void cbs_closeEvent_1719_0(QCloseEvent *event)
   {
-    QCalendarWidget::closeEvent(arg1);
+    QCalendarWidget::closeEvent(event);
   }
 
-  virtual void closeEvent(QCloseEvent *arg1)
+  virtual void closeEvent(QCloseEvent *event)
   {
     if (cb_closeEvent_1719_0.can_issue()) {
-      cb_closeEvent_1719_0.issue<QCalendarWidget_Adaptor, QCloseEvent *>(&QCalendarWidget_Adaptor::cbs_closeEvent_1719_0, arg1);
+      cb_closeEvent_1719_0.issue<QCalendarWidget_Adaptor, QCloseEvent *>(&QCalendarWidget_Adaptor::cbs_closeEvent_1719_0, event);
     } else {
-      QCalendarWidget::closeEvent(arg1);
+      QCalendarWidget::closeEvent(event);
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::contextMenuEvent(QContextMenuEvent *)
-  void cbs_contextMenuEvent_2363_0(QContextMenuEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::contextMenuEvent(QContextMenuEvent *event)
+  void cbs_contextMenuEvent_2363_0(QContextMenuEvent *event)
   {
-    QCalendarWidget::contextMenuEvent(arg1);
+    QCalendarWidget::contextMenuEvent(event);
   }
 
-  virtual void contextMenuEvent(QContextMenuEvent *arg1)
+  virtual void contextMenuEvent(QContextMenuEvent *event)
   {
     if (cb_contextMenuEvent_2363_0.can_issue()) {
-      cb_contextMenuEvent_2363_0.issue<QCalendarWidget_Adaptor, QContextMenuEvent *>(&QCalendarWidget_Adaptor::cbs_contextMenuEvent_2363_0, arg1);
+      cb_contextMenuEvent_2363_0.issue<QCalendarWidget_Adaptor, QContextMenuEvent *>(&QCalendarWidget_Adaptor::cbs_contextMenuEvent_2363_0, event);
     } else {
-      QCalendarWidget::contextMenuEvent(arg1);
+      QCalendarWidget::contextMenuEvent(event);
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QCalendarWidget::customEvent(arg1);
+    QCalendarWidget::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QCalendarWidget_Adaptor, QEvent *>(&QCalendarWidget_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QCalendarWidget_Adaptor, QEvent *>(&QCalendarWidget_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QCalendarWidget::customEvent(arg1);
+      QCalendarWidget::customEvent(event);
     }
   }
 
@@ -1289,78 +1289,78 @@ public:
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::dragEnterEvent(QDragEnterEvent *)
-  void cbs_dragEnterEvent_2109_0(QDragEnterEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::dragEnterEvent(QDragEnterEvent *event)
+  void cbs_dragEnterEvent_2109_0(QDragEnterEvent *event)
   {
-    QCalendarWidget::dragEnterEvent(arg1);
+    QCalendarWidget::dragEnterEvent(event);
   }
 
-  virtual void dragEnterEvent(QDragEnterEvent *arg1)
+  virtual void dragEnterEvent(QDragEnterEvent *event)
   {
     if (cb_dragEnterEvent_2109_0.can_issue()) {
-      cb_dragEnterEvent_2109_0.issue<QCalendarWidget_Adaptor, QDragEnterEvent *>(&QCalendarWidget_Adaptor::cbs_dragEnterEvent_2109_0, arg1);
+      cb_dragEnterEvent_2109_0.issue<QCalendarWidget_Adaptor, QDragEnterEvent *>(&QCalendarWidget_Adaptor::cbs_dragEnterEvent_2109_0, event);
     } else {
-      QCalendarWidget::dragEnterEvent(arg1);
+      QCalendarWidget::dragEnterEvent(event);
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::dragLeaveEvent(QDragLeaveEvent *)
-  void cbs_dragLeaveEvent_2092_0(QDragLeaveEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::dragLeaveEvent(QDragLeaveEvent *event)
+  void cbs_dragLeaveEvent_2092_0(QDragLeaveEvent *event)
   {
-    QCalendarWidget::dragLeaveEvent(arg1);
+    QCalendarWidget::dragLeaveEvent(event);
   }
 
-  virtual void dragLeaveEvent(QDragLeaveEvent *arg1)
+  virtual void dragLeaveEvent(QDragLeaveEvent *event)
   {
     if (cb_dragLeaveEvent_2092_0.can_issue()) {
-      cb_dragLeaveEvent_2092_0.issue<QCalendarWidget_Adaptor, QDragLeaveEvent *>(&QCalendarWidget_Adaptor::cbs_dragLeaveEvent_2092_0, arg1);
+      cb_dragLeaveEvent_2092_0.issue<QCalendarWidget_Adaptor, QDragLeaveEvent *>(&QCalendarWidget_Adaptor::cbs_dragLeaveEvent_2092_0, event);
     } else {
-      QCalendarWidget::dragLeaveEvent(arg1);
+      QCalendarWidget::dragLeaveEvent(event);
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::dragMoveEvent(QDragMoveEvent *)
-  void cbs_dragMoveEvent_2006_0(QDragMoveEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::dragMoveEvent(QDragMoveEvent *event)
+  void cbs_dragMoveEvent_2006_0(QDragMoveEvent *event)
   {
-    QCalendarWidget::dragMoveEvent(arg1);
+    QCalendarWidget::dragMoveEvent(event);
   }
 
-  virtual void dragMoveEvent(QDragMoveEvent *arg1)
+  virtual void dragMoveEvent(QDragMoveEvent *event)
   {
     if (cb_dragMoveEvent_2006_0.can_issue()) {
-      cb_dragMoveEvent_2006_0.issue<QCalendarWidget_Adaptor, QDragMoveEvent *>(&QCalendarWidget_Adaptor::cbs_dragMoveEvent_2006_0, arg1);
+      cb_dragMoveEvent_2006_0.issue<QCalendarWidget_Adaptor, QDragMoveEvent *>(&QCalendarWidget_Adaptor::cbs_dragMoveEvent_2006_0, event);
     } else {
-      QCalendarWidget::dragMoveEvent(arg1);
+      QCalendarWidget::dragMoveEvent(event);
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::dropEvent(QDropEvent *)
-  void cbs_dropEvent_1622_0(QDropEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::dropEvent(QDropEvent *event)
+  void cbs_dropEvent_1622_0(QDropEvent *event)
   {
-    QCalendarWidget::dropEvent(arg1);
+    QCalendarWidget::dropEvent(event);
   }
 
-  virtual void dropEvent(QDropEvent *arg1)
+  virtual void dropEvent(QDropEvent *event)
   {
     if (cb_dropEvent_1622_0.can_issue()) {
-      cb_dropEvent_1622_0.issue<QCalendarWidget_Adaptor, QDropEvent *>(&QCalendarWidget_Adaptor::cbs_dropEvent_1622_0, arg1);
+      cb_dropEvent_1622_0.issue<QCalendarWidget_Adaptor, QDropEvent *>(&QCalendarWidget_Adaptor::cbs_dropEvent_1622_0, event);
     } else {
-      QCalendarWidget::dropEvent(arg1);
+      QCalendarWidget::dropEvent(event);
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::enterEvent(QEvent *)
-  void cbs_enterEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::enterEvent(QEvent *event)
+  void cbs_enterEvent_1217_0(QEvent *event)
   {
-    QCalendarWidget::enterEvent(arg1);
+    QCalendarWidget::enterEvent(event);
   }
 
-  virtual void enterEvent(QEvent *arg1)
+  virtual void enterEvent(QEvent *event)
   {
     if (cb_enterEvent_1217_0.can_issue()) {
-      cb_enterEvent_1217_0.issue<QCalendarWidget_Adaptor, QEvent *>(&QCalendarWidget_Adaptor::cbs_enterEvent_1217_0, arg1);
+      cb_enterEvent_1217_0.issue<QCalendarWidget_Adaptor, QEvent *>(&QCalendarWidget_Adaptor::cbs_enterEvent_1217_0, event);
     } else {
-      QCalendarWidget::enterEvent(arg1);
+      QCalendarWidget::enterEvent(event);
     }
   }
 
@@ -1394,18 +1394,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::focusInEvent(QFocusEvent *)
-  void cbs_focusInEvent_1729_0(QFocusEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::focusInEvent(QFocusEvent *event)
+  void cbs_focusInEvent_1729_0(QFocusEvent *event)
   {
-    QCalendarWidget::focusInEvent(arg1);
+    QCalendarWidget::focusInEvent(event);
   }
 
-  virtual void focusInEvent(QFocusEvent *arg1)
+  virtual void focusInEvent(QFocusEvent *event)
   {
     if (cb_focusInEvent_1729_0.can_issue()) {
-      cb_focusInEvent_1729_0.issue<QCalendarWidget_Adaptor, QFocusEvent *>(&QCalendarWidget_Adaptor::cbs_focusInEvent_1729_0, arg1);
+      cb_focusInEvent_1729_0.issue<QCalendarWidget_Adaptor, QFocusEvent *>(&QCalendarWidget_Adaptor::cbs_focusInEvent_1729_0, event);
     } else {
-      QCalendarWidget::focusInEvent(arg1);
+      QCalendarWidget::focusInEvent(event);
     }
   }
 
@@ -1424,33 +1424,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::focusOutEvent(QFocusEvent *)
-  void cbs_focusOutEvent_1729_0(QFocusEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::focusOutEvent(QFocusEvent *event)
+  void cbs_focusOutEvent_1729_0(QFocusEvent *event)
   {
-    QCalendarWidget::focusOutEvent(arg1);
+    QCalendarWidget::focusOutEvent(event);
   }
 
-  virtual void focusOutEvent(QFocusEvent *arg1)
+  virtual void focusOutEvent(QFocusEvent *event)
   {
     if (cb_focusOutEvent_1729_0.can_issue()) {
-      cb_focusOutEvent_1729_0.issue<QCalendarWidget_Adaptor, QFocusEvent *>(&QCalendarWidget_Adaptor::cbs_focusOutEvent_1729_0, arg1);
+      cb_focusOutEvent_1729_0.issue<QCalendarWidget_Adaptor, QFocusEvent *>(&QCalendarWidget_Adaptor::cbs_focusOutEvent_1729_0, event);
     } else {
-      QCalendarWidget::focusOutEvent(arg1);
+      QCalendarWidget::focusOutEvent(event);
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::hideEvent(QHideEvent *)
-  void cbs_hideEvent_1595_0(QHideEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::hideEvent(QHideEvent *event)
+  void cbs_hideEvent_1595_0(QHideEvent *event)
   {
-    QCalendarWidget::hideEvent(arg1);
+    QCalendarWidget::hideEvent(event);
   }
 
-  virtual void hideEvent(QHideEvent *arg1)
+  virtual void hideEvent(QHideEvent *event)
   {
     if (cb_hideEvent_1595_0.can_issue()) {
-      cb_hideEvent_1595_0.issue<QCalendarWidget_Adaptor, QHideEvent *>(&QCalendarWidget_Adaptor::cbs_hideEvent_1595_0, arg1);
+      cb_hideEvent_1595_0.issue<QCalendarWidget_Adaptor, QHideEvent *>(&QCalendarWidget_Adaptor::cbs_hideEvent_1595_0, event);
     } else {
-      QCalendarWidget::hideEvent(arg1);
+      QCalendarWidget::hideEvent(event);
     }
   }
 
@@ -1499,33 +1499,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::keyReleaseEvent(QKeyEvent *)
-  void cbs_keyReleaseEvent_1514_0(QKeyEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::keyReleaseEvent(QKeyEvent *event)
+  void cbs_keyReleaseEvent_1514_0(QKeyEvent *event)
   {
-    QCalendarWidget::keyReleaseEvent(arg1);
+    QCalendarWidget::keyReleaseEvent(event);
   }
 
-  virtual void keyReleaseEvent(QKeyEvent *arg1)
+  virtual void keyReleaseEvent(QKeyEvent *event)
   {
     if (cb_keyReleaseEvent_1514_0.can_issue()) {
-      cb_keyReleaseEvent_1514_0.issue<QCalendarWidget_Adaptor, QKeyEvent *>(&QCalendarWidget_Adaptor::cbs_keyReleaseEvent_1514_0, arg1);
+      cb_keyReleaseEvent_1514_0.issue<QCalendarWidget_Adaptor, QKeyEvent *>(&QCalendarWidget_Adaptor::cbs_keyReleaseEvent_1514_0, event);
     } else {
-      QCalendarWidget::keyReleaseEvent(arg1);
+      QCalendarWidget::keyReleaseEvent(event);
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::leaveEvent(QEvent *)
-  void cbs_leaveEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::leaveEvent(QEvent *event)
+  void cbs_leaveEvent_1217_0(QEvent *event)
   {
-    QCalendarWidget::leaveEvent(arg1);
+    QCalendarWidget::leaveEvent(event);
   }
 
-  virtual void leaveEvent(QEvent *arg1)
+  virtual void leaveEvent(QEvent *event)
   {
     if (cb_leaveEvent_1217_0.can_issue()) {
-      cb_leaveEvent_1217_0.issue<QCalendarWidget_Adaptor, QEvent *>(&QCalendarWidget_Adaptor::cbs_leaveEvent_1217_0, arg1);
+      cb_leaveEvent_1217_0.issue<QCalendarWidget_Adaptor, QEvent *>(&QCalendarWidget_Adaptor::cbs_leaveEvent_1217_0, event);
     } else {
-      QCalendarWidget::leaveEvent(arg1);
+      QCalendarWidget::leaveEvent(event);
     }
   }
 
@@ -1544,33 +1544,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::mouseDoubleClickEvent(QMouseEvent *)
-  void cbs_mouseDoubleClickEvent_1738_0(QMouseEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::mouseDoubleClickEvent(QMouseEvent *event)
+  void cbs_mouseDoubleClickEvent_1738_0(QMouseEvent *event)
   {
-    QCalendarWidget::mouseDoubleClickEvent(arg1);
+    QCalendarWidget::mouseDoubleClickEvent(event);
   }
 
-  virtual void mouseDoubleClickEvent(QMouseEvent *arg1)
+  virtual void mouseDoubleClickEvent(QMouseEvent *event)
   {
     if (cb_mouseDoubleClickEvent_1738_0.can_issue()) {
-      cb_mouseDoubleClickEvent_1738_0.issue<QCalendarWidget_Adaptor, QMouseEvent *>(&QCalendarWidget_Adaptor::cbs_mouseDoubleClickEvent_1738_0, arg1);
+      cb_mouseDoubleClickEvent_1738_0.issue<QCalendarWidget_Adaptor, QMouseEvent *>(&QCalendarWidget_Adaptor::cbs_mouseDoubleClickEvent_1738_0, event);
     } else {
-      QCalendarWidget::mouseDoubleClickEvent(arg1);
+      QCalendarWidget::mouseDoubleClickEvent(event);
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::mouseMoveEvent(QMouseEvent *)
-  void cbs_mouseMoveEvent_1738_0(QMouseEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::mouseMoveEvent(QMouseEvent *event)
+  void cbs_mouseMoveEvent_1738_0(QMouseEvent *event)
   {
-    QCalendarWidget::mouseMoveEvent(arg1);
+    QCalendarWidget::mouseMoveEvent(event);
   }
 
-  virtual void mouseMoveEvent(QMouseEvent *arg1)
+  virtual void mouseMoveEvent(QMouseEvent *event)
   {
     if (cb_mouseMoveEvent_1738_0.can_issue()) {
-      cb_mouseMoveEvent_1738_0.issue<QCalendarWidget_Adaptor, QMouseEvent *>(&QCalendarWidget_Adaptor::cbs_mouseMoveEvent_1738_0, arg1);
+      cb_mouseMoveEvent_1738_0.issue<QCalendarWidget_Adaptor, QMouseEvent *>(&QCalendarWidget_Adaptor::cbs_mouseMoveEvent_1738_0, event);
     } else {
-      QCalendarWidget::mouseMoveEvent(arg1);
+      QCalendarWidget::mouseMoveEvent(event);
     }
   }
 
@@ -1589,33 +1589,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::mouseReleaseEvent(QMouseEvent *)
-  void cbs_mouseReleaseEvent_1738_0(QMouseEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::mouseReleaseEvent(QMouseEvent *event)
+  void cbs_mouseReleaseEvent_1738_0(QMouseEvent *event)
   {
-    QCalendarWidget::mouseReleaseEvent(arg1);
+    QCalendarWidget::mouseReleaseEvent(event);
   }
 
-  virtual void mouseReleaseEvent(QMouseEvent *arg1)
+  virtual void mouseReleaseEvent(QMouseEvent *event)
   {
     if (cb_mouseReleaseEvent_1738_0.can_issue()) {
-      cb_mouseReleaseEvent_1738_0.issue<QCalendarWidget_Adaptor, QMouseEvent *>(&QCalendarWidget_Adaptor::cbs_mouseReleaseEvent_1738_0, arg1);
+      cb_mouseReleaseEvent_1738_0.issue<QCalendarWidget_Adaptor, QMouseEvent *>(&QCalendarWidget_Adaptor::cbs_mouseReleaseEvent_1738_0, event);
     } else {
-      QCalendarWidget::mouseReleaseEvent(arg1);
+      QCalendarWidget::mouseReleaseEvent(event);
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::moveEvent(QMoveEvent *)
-  void cbs_moveEvent_1624_0(QMoveEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::moveEvent(QMoveEvent *event)
+  void cbs_moveEvent_1624_0(QMoveEvent *event)
   {
-    QCalendarWidget::moveEvent(arg1);
+    QCalendarWidget::moveEvent(event);
   }
 
-  virtual void moveEvent(QMoveEvent *arg1)
+  virtual void moveEvent(QMoveEvent *event)
   {
     if (cb_moveEvent_1624_0.can_issue()) {
-      cb_moveEvent_1624_0.issue<QCalendarWidget_Adaptor, QMoveEvent *>(&QCalendarWidget_Adaptor::cbs_moveEvent_1624_0, arg1);
+      cb_moveEvent_1624_0.issue<QCalendarWidget_Adaptor, QMoveEvent *>(&QCalendarWidget_Adaptor::cbs_moveEvent_1624_0, event);
     } else {
-      QCalendarWidget::moveEvent(arg1);
+      QCalendarWidget::moveEvent(event);
     }
   }
 
@@ -1649,18 +1649,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::paintEvent(QPaintEvent *)
-  void cbs_paintEvent_1725_0(QPaintEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::paintEvent(QPaintEvent *event)
+  void cbs_paintEvent_1725_0(QPaintEvent *event)
   {
-    QCalendarWidget::paintEvent(arg1);
+    QCalendarWidget::paintEvent(event);
   }
 
-  virtual void paintEvent(QPaintEvent *arg1)
+  virtual void paintEvent(QPaintEvent *event)
   {
     if (cb_paintEvent_1725_0.can_issue()) {
-      cb_paintEvent_1725_0.issue<QCalendarWidget_Adaptor, QPaintEvent *>(&QCalendarWidget_Adaptor::cbs_paintEvent_1725_0, arg1);
+      cb_paintEvent_1725_0.issue<QCalendarWidget_Adaptor, QPaintEvent *>(&QCalendarWidget_Adaptor::cbs_paintEvent_1725_0, event);
     } else {
-      QCalendarWidget::paintEvent(arg1);
+      QCalendarWidget::paintEvent(event);
     }
   }
 
@@ -1709,63 +1709,63 @@ public:
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::showEvent(QShowEvent *)
-  void cbs_showEvent_1634_0(QShowEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::showEvent(QShowEvent *event)
+  void cbs_showEvent_1634_0(QShowEvent *event)
   {
-    QCalendarWidget::showEvent(arg1);
+    QCalendarWidget::showEvent(event);
   }
 
-  virtual void showEvent(QShowEvent *arg1)
+  virtual void showEvent(QShowEvent *event)
   {
     if (cb_showEvent_1634_0.can_issue()) {
-      cb_showEvent_1634_0.issue<QCalendarWidget_Adaptor, QShowEvent *>(&QCalendarWidget_Adaptor::cbs_showEvent_1634_0, arg1);
+      cb_showEvent_1634_0.issue<QCalendarWidget_Adaptor, QShowEvent *>(&QCalendarWidget_Adaptor::cbs_showEvent_1634_0, event);
     } else {
-      QCalendarWidget::showEvent(arg1);
+      QCalendarWidget::showEvent(event);
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::tabletEvent(QTabletEvent *)
-  void cbs_tabletEvent_1821_0(QTabletEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::tabletEvent(QTabletEvent *event)
+  void cbs_tabletEvent_1821_0(QTabletEvent *event)
   {
-    QCalendarWidget::tabletEvent(arg1);
+    QCalendarWidget::tabletEvent(event);
   }
 
-  virtual void tabletEvent(QTabletEvent *arg1)
+  virtual void tabletEvent(QTabletEvent *event)
   {
     if (cb_tabletEvent_1821_0.can_issue()) {
-      cb_tabletEvent_1821_0.issue<QCalendarWidget_Adaptor, QTabletEvent *>(&QCalendarWidget_Adaptor::cbs_tabletEvent_1821_0, arg1);
+      cb_tabletEvent_1821_0.issue<QCalendarWidget_Adaptor, QTabletEvent *>(&QCalendarWidget_Adaptor::cbs_tabletEvent_1821_0, event);
     } else {
-      QCalendarWidget::tabletEvent(arg1);
+      QCalendarWidget::tabletEvent(event);
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QCalendarWidget::timerEvent(arg1);
+    QCalendarWidget::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QCalendarWidget_Adaptor, QTimerEvent *>(&QCalendarWidget_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QCalendarWidget_Adaptor, QTimerEvent *>(&QCalendarWidget_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QCalendarWidget::timerEvent(arg1);
+      QCalendarWidget::timerEvent(event);
     }
   }
 
-  //  [adaptor impl] void QCalendarWidget::wheelEvent(QWheelEvent *)
-  void cbs_wheelEvent_1718_0(QWheelEvent *arg1)
+  //  [adaptor impl] void QCalendarWidget::wheelEvent(QWheelEvent *event)
+  void cbs_wheelEvent_1718_0(QWheelEvent *event)
   {
-    QCalendarWidget::wheelEvent(arg1);
+    QCalendarWidget::wheelEvent(event);
   }
 
-  virtual void wheelEvent(QWheelEvent *arg1)
+  virtual void wheelEvent(QWheelEvent *event)
   {
     if (cb_wheelEvent_1718_0.can_issue()) {
-      cb_wheelEvent_1718_0.issue<QCalendarWidget_Adaptor, QWheelEvent *>(&QCalendarWidget_Adaptor::cbs_wheelEvent_1718_0, arg1);
+      cb_wheelEvent_1718_0.issue<QCalendarWidget_Adaptor, QWheelEvent *>(&QCalendarWidget_Adaptor::cbs_wheelEvent_1718_0, event);
     } else {
-      QCalendarWidget::wheelEvent(arg1);
+      QCalendarWidget::wheelEvent(event);
     }
   }
 
@@ -1823,7 +1823,7 @@ QCalendarWidget_Adaptor::~QCalendarWidget_Adaptor() { }
 
 static void _init_ctor_QCalendarWidget_Adaptor_1315 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_0);
   decl->set_return_new<QCalendarWidget_Adaptor> ();
 }
@@ -1832,16 +1832,16 @@ static void _call_ctor_QCalendarWidget_Adaptor_1315 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
   ret.write<QCalendarWidget_Adaptor *> (new QCalendarWidget_Adaptor (arg1));
 }
 
 
-// void QCalendarWidget::actionEvent(QActionEvent *)
+// void QCalendarWidget::actionEvent(QActionEvent *event)
 
 static void _init_cbs_actionEvent_1823_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QActionEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1903,11 +1903,11 @@ static void _set_callback_cbs_changeEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
-// void QCalendarWidget::childEvent(QChildEvent *)
+// void QCalendarWidget::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1945,11 +1945,11 @@ static void _call_emitter_clicked_1776 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// void QCalendarWidget::closeEvent(QCloseEvent *)
+// void QCalendarWidget::closeEvent(QCloseEvent *event)
 
 static void _init_cbs_closeEvent_1719_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QCloseEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1969,11 +1969,11 @@ static void _set_callback_cbs_closeEvent_1719_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QCalendarWidget::contextMenuEvent(QContextMenuEvent *)
+// void QCalendarWidget::contextMenuEvent(QContextMenuEvent *event)
 
 static void _init_cbs_contextMenuEvent_2363_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QContextMenuEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2057,11 +2057,11 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 }
 
 
-// void QCalendarWidget::customEvent(QEvent *)
+// void QCalendarWidget::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2107,7 +2107,7 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2116,7 +2116,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QCalendarWidget_Adaptor *)cls)->emitter_QCalendarWidget_destroyed_1302 (arg1);
 }
 
@@ -2145,11 +2145,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// void QCalendarWidget::dragEnterEvent(QDragEnterEvent *)
+// void QCalendarWidget::dragEnterEvent(QDragEnterEvent *event)
 
 static void _init_cbs_dragEnterEvent_2109_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDragEnterEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2169,11 +2169,11 @@ static void _set_callback_cbs_dragEnterEvent_2109_0 (void *cls, const gsi::Callb
 }
 
 
-// void QCalendarWidget::dragLeaveEvent(QDragLeaveEvent *)
+// void QCalendarWidget::dragLeaveEvent(QDragLeaveEvent *event)
 
 static void _init_cbs_dragLeaveEvent_2092_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDragLeaveEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2193,11 +2193,11 @@ static void _set_callback_cbs_dragLeaveEvent_2092_0 (void *cls, const gsi::Callb
 }
 
 
-// void QCalendarWidget::dragMoveEvent(QDragMoveEvent *)
+// void QCalendarWidget::dragMoveEvent(QDragMoveEvent *event)
 
 static void _init_cbs_dragMoveEvent_2006_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDragMoveEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2217,11 +2217,11 @@ static void _set_callback_cbs_dragMoveEvent_2006_0 (void *cls, const gsi::Callba
 }
 
 
-// void QCalendarWidget::dropEvent(QDropEvent *)
+// void QCalendarWidget::dropEvent(QDropEvent *event)
 
 static void _init_cbs_dropEvent_1622_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDropEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2241,11 +2241,11 @@ static void _set_callback_cbs_dropEvent_1622_0 (void *cls, const gsi::Callback &
 }
 
 
-// void QCalendarWidget::enterEvent(QEvent *)
+// void QCalendarWidget::enterEvent(QEvent *event)
 
 static void _init_cbs_enterEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2314,11 +2314,11 @@ static void _set_callback_cbs_eventFilter_2411_0 (void *cls, const gsi::Callback
 }
 
 
-// void QCalendarWidget::focusInEvent(QFocusEvent *)
+// void QCalendarWidget::focusInEvent(QFocusEvent *event)
 
 static void _init_cbs_focusInEvent_1729_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QFocusEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2375,11 +2375,11 @@ static void _set_callback_cbs_focusNextPrevChild_864_0 (void *cls, const gsi::Ca
 }
 
 
-// void QCalendarWidget::focusOutEvent(QFocusEvent *)
+// void QCalendarWidget::focusOutEvent(QFocusEvent *event)
 
 static void _init_cbs_focusOutEvent_1729_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QFocusEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2455,11 +2455,11 @@ static void _set_callback_cbs_heightForWidth_c767_0 (void *cls, const gsi::Callb
 }
 
 
-// void QCalendarWidget::hideEvent(QHideEvent *)
+// void QCalendarWidget::hideEvent(QHideEvent *event)
 
 static void _init_cbs_hideEvent_1595_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QHideEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2592,11 +2592,11 @@ static void _set_callback_cbs_keyPressEvent_1514_0 (void *cls, const gsi::Callba
 }
 
 
-// void QCalendarWidget::keyReleaseEvent(QKeyEvent *)
+// void QCalendarWidget::keyReleaseEvent(QKeyEvent *event)
 
 static void _init_cbs_keyReleaseEvent_1514_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QKeyEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2616,11 +2616,11 @@ static void _set_callback_cbs_keyReleaseEvent_1514_0 (void *cls, const gsi::Call
 }
 
 
-// void QCalendarWidget::leaveEvent(QEvent *)
+// void QCalendarWidget::leaveEvent(QEvent *event)
 
 static void _init_cbs_leaveEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2682,11 +2682,11 @@ static void _set_callback_cbs_minimumSizeHint_c0_0 (void *cls, const gsi::Callba
 }
 
 
-// void QCalendarWidget::mouseDoubleClickEvent(QMouseEvent *)
+// void QCalendarWidget::mouseDoubleClickEvent(QMouseEvent *event)
 
 static void _init_cbs_mouseDoubleClickEvent_1738_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMouseEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2706,11 +2706,11 @@ static void _set_callback_cbs_mouseDoubleClickEvent_1738_0 (void *cls, const gsi
 }
 
 
-// void QCalendarWidget::mouseMoveEvent(QMouseEvent *)
+// void QCalendarWidget::mouseMoveEvent(QMouseEvent *event)
 
 static void _init_cbs_mouseMoveEvent_1738_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMouseEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2754,11 +2754,11 @@ static void _set_callback_cbs_mousePressEvent_1738_0 (void *cls, const gsi::Call
 }
 
 
-// void QCalendarWidget::mouseReleaseEvent(QMouseEvent *)
+// void QCalendarWidget::mouseReleaseEvent(QMouseEvent *event)
 
 static void _init_cbs_mouseReleaseEvent_1738_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMouseEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2778,11 +2778,11 @@ static void _set_callback_cbs_mouseReleaseEvent_1738_0 (void *cls, const gsi::Ca
 }
 
 
-// void QCalendarWidget::moveEvent(QMoveEvent *)
+// void QCalendarWidget::moveEvent(QMoveEvent *event)
 
 static void _init_cbs_moveEvent_1624_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMoveEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2898,11 +2898,11 @@ static void _set_callback_cbs_paintEngine_c0_0 (void *cls, const gsi::Callback &
 }
 
 
-// void QCalendarWidget::paintEvent(QPaintEvent *)
+// void QCalendarWidget::paintEvent(QPaintEvent *event)
 
 static void _init_cbs_paintEvent_1725_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QPaintEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3072,11 +3072,11 @@ static void _set_callback_cbs_sharedPainter_c0_0 (void *cls, const gsi::Callback
 }
 
 
-// void QCalendarWidget::showEvent(QShowEvent *)
+// void QCalendarWidget::showEvent(QShowEvent *event)
 
 static void _init_cbs_showEvent_1634_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QShowEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3115,11 +3115,11 @@ static void _set_callback_cbs_sizeHint_c0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QCalendarWidget::tabletEvent(QTabletEvent *)
+// void QCalendarWidget::tabletEvent(QTabletEvent *event)
 
 static void _init_cbs_tabletEvent_1821_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTabletEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3139,11 +3139,11 @@ static void _set_callback_cbs_tabletEvent_1821_0 (void *cls, const gsi::Callback
 }
 
 
-// void QCalendarWidget::timerEvent(QTimerEvent *)
+// void QCalendarWidget::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3212,11 +3212,11 @@ static void _call_fp_updateMicroFocus_0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// void QCalendarWidget::wheelEvent(QWheelEvent *)
+// void QCalendarWidget::wheelEvent(QWheelEvent *event)
 
 static void _init_cbs_wheelEvent_1718_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QWheelEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3298,54 +3298,54 @@ gsi::Class<QCalendarWidget> &qtdecl_QCalendarWidget ();
 static gsi::Methods methods_QCalendarWidget_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCalendarWidget::QCalendarWidget(QWidget *parent)\nThis method creates an object of class QCalendarWidget.", &_init_ctor_QCalendarWidget_Adaptor_1315, &_call_ctor_QCalendarWidget_Adaptor_1315);
-  methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QCalendarWidget::actionEvent(QActionEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
+  methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QCalendarWidget::actionEvent(QActionEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("*actionEvent", "@hide", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0, &_set_callback_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("emit_activated", "@brief Emitter for signal void QCalendarWidget::activated(const QDate &date)\nCall this method to emit this signal.", false, &_init_emitter_activated_1776, &_call_emitter_activated_1776);
   methods += new qt_gsi::GenericMethod ("*changeEvent", "@brief Virtual method void QCalendarWidget::changeEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*changeEvent", "@hide", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0, &_set_callback_cbs_changeEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QCalendarWidget::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QCalendarWidget::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("emit_clicked", "@brief Emitter for signal void QCalendarWidget::clicked(const QDate &date)\nCall this method to emit this signal.", false, &_init_emitter_clicked_1776, &_call_emitter_clicked_1776);
-  methods += new qt_gsi::GenericMethod ("*closeEvent", "@brief Virtual method void QCalendarWidget::closeEvent(QCloseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0);
+  methods += new qt_gsi::GenericMethod ("*closeEvent", "@brief Virtual method void QCalendarWidget::closeEvent(QCloseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0);
   methods += new qt_gsi::GenericMethod ("*closeEvent", "@hide", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0, &_set_callback_cbs_closeEvent_1719_0);
-  methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QCalendarWidget::contextMenuEvent(QContextMenuEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
+  methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QCalendarWidget::contextMenuEvent(QContextMenuEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0, &_set_callback_cbs_contextMenuEvent_2363_0);
-  methods += new qt_gsi::GenericMethod ("*qt_create", "@brief Method void QCalendarWidget::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
+  methods += new qt_gsi::GenericMethod ("*create|qt_create", "@brief Method void QCalendarWidget::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
   methods += new qt_gsi::GenericMethod ("emit_currentPageChanged", "@brief Emitter for signal void QCalendarWidget::currentPageChanged(int year, int month)\nCall this method to emit this signal.", false, &_init_emitter_currentPageChanged_1426, &_call_emitter_currentPageChanged_1426);
   methods += new qt_gsi::GenericMethod ("emit_customContextMenuRequested", "@brief Emitter for signal void QCalendarWidget::customContextMenuRequested(const QPoint &pos)\nCall this method to emit this signal.", false, &_init_emitter_customContextMenuRequested_1916, &_call_emitter_customContextMenuRequested_1916);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QCalendarWidget::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QCalendarWidget::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*qt_destroy", "@brief Method void QCalendarWidget::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
+  methods += new qt_gsi::GenericMethod ("*destroy|qt_destroy", "@brief Method void QCalendarWidget::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QCalendarWidget::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QCalendarWidget::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@brief Virtual method void QCalendarWidget::dragEnterEvent(QDragEnterEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0);
+  methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@brief Virtual method void QCalendarWidget::dragEnterEvent(QDragEnterEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0);
   methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@hide", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0, &_set_callback_cbs_dragEnterEvent_2109_0);
-  methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@brief Virtual method void QCalendarWidget::dragLeaveEvent(QDragLeaveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0);
+  methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@brief Virtual method void QCalendarWidget::dragLeaveEvent(QDragLeaveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0);
   methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@hide", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0, &_set_callback_cbs_dragLeaveEvent_2092_0);
-  methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@brief Virtual method void QCalendarWidget::dragMoveEvent(QDragMoveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0);
+  methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@brief Virtual method void QCalendarWidget::dragMoveEvent(QDragMoveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0);
   methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@hide", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0, &_set_callback_cbs_dragMoveEvent_2006_0);
-  methods += new qt_gsi::GenericMethod ("*dropEvent", "@brief Virtual method void QCalendarWidget::dropEvent(QDropEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0);
+  methods += new qt_gsi::GenericMethod ("*dropEvent", "@brief Virtual method void QCalendarWidget::dropEvent(QDropEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0);
   methods += new qt_gsi::GenericMethod ("*dropEvent", "@hide", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0, &_set_callback_cbs_dropEvent_1622_0);
-  methods += new qt_gsi::GenericMethod ("*enterEvent", "@brief Virtual method void QCalendarWidget::enterEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*enterEvent", "@brief Virtual method void QCalendarWidget::enterEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*enterEvent", "@hide", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0, &_set_callback_cbs_enterEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QCalendarWidget::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*eventFilter", "@brief Virtual method bool QCalendarWidget::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
-  methods += new qt_gsi::GenericMethod ("*focusInEvent", "@brief Virtual method void QCalendarWidget::focusInEvent(QFocusEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0);
+  methods += new qt_gsi::GenericMethod ("*focusInEvent", "@brief Virtual method void QCalendarWidget::focusInEvent(QFocusEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusInEvent", "@hide", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0, &_set_callback_cbs_focusInEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusNextChild", "@brief Method bool QCalendarWidget::focusNextChild()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_focusNextChild_0, &_call_fp_focusNextChild_0);
   methods += new qt_gsi::GenericMethod ("*focusNextPrevChild", "@brief Virtual method bool QCalendarWidget::focusNextPrevChild(bool next)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusNextPrevChild_864_0, &_call_cbs_focusNextPrevChild_864_0);
   methods += new qt_gsi::GenericMethod ("*focusNextPrevChild", "@hide", false, &_init_cbs_focusNextPrevChild_864_0, &_call_cbs_focusNextPrevChild_864_0, &_set_callback_cbs_focusNextPrevChild_864_0);
-  methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@brief Virtual method void QCalendarWidget::focusOutEvent(QFocusEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0);
+  methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@brief Virtual method void QCalendarWidget::focusOutEvent(QFocusEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@hide", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0, &_set_callback_cbs_focusOutEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusPreviousChild", "@brief Method bool QCalendarWidget::focusPreviousChild()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_focusPreviousChild_0, &_call_fp_focusPreviousChild_0);
   methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@brief Virtual method bool QCalendarWidget::hasHeightForWidth()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_hasHeightForWidth_c0_0, &_call_cbs_hasHeightForWidth_c0_0);
   methods += new qt_gsi::GenericMethod ("hasHeightForWidth", "@hide", true, &_init_cbs_hasHeightForWidth_c0_0, &_call_cbs_hasHeightForWidth_c0_0, &_set_callback_cbs_hasHeightForWidth_c0_0);
   methods += new qt_gsi::GenericMethod ("heightForWidth", "@brief Virtual method int QCalendarWidget::heightForWidth(int)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_heightForWidth_c767_0, &_call_cbs_heightForWidth_c767_0);
   methods += new qt_gsi::GenericMethod ("heightForWidth", "@hide", true, &_init_cbs_heightForWidth_c767_0, &_call_cbs_heightForWidth_c767_0, &_set_callback_cbs_heightForWidth_c767_0);
-  methods += new qt_gsi::GenericMethod ("*hideEvent", "@brief Virtual method void QCalendarWidget::hideEvent(QHideEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_hideEvent_1595_0, &_call_cbs_hideEvent_1595_0);
+  methods += new qt_gsi::GenericMethod ("*hideEvent", "@brief Virtual method void QCalendarWidget::hideEvent(QHideEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_hideEvent_1595_0, &_call_cbs_hideEvent_1595_0);
   methods += new qt_gsi::GenericMethod ("*hideEvent", "@hide", false, &_init_cbs_hideEvent_1595_0, &_call_cbs_hideEvent_1595_0, &_set_callback_cbs_hideEvent_1595_0);
   methods += new qt_gsi::GenericMethod ("*initPainter", "@brief Virtual method void QCalendarWidget::initPainter(QPainter *painter)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0);
   methods += new qt_gsi::GenericMethod ("*initPainter", "@hide", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0, &_set_callback_cbs_initPainter_c1426_0);
@@ -3356,23 +3356,23 @@ static gsi::Methods methods_QCalendarWidget_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QCalendarWidget::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("*keyPressEvent", "@brief Virtual method void QCalendarWidget::keyPressEvent(QKeyEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyPressEvent_1514_0, &_call_cbs_keyPressEvent_1514_0);
   methods += new qt_gsi::GenericMethod ("*keyPressEvent", "@hide", false, &_init_cbs_keyPressEvent_1514_0, &_call_cbs_keyPressEvent_1514_0, &_set_callback_cbs_keyPressEvent_1514_0);
-  methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@brief Virtual method void QCalendarWidget::keyReleaseEvent(QKeyEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0);
+  methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@brief Virtual method void QCalendarWidget::keyReleaseEvent(QKeyEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0);
   methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@hide", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0, &_set_callback_cbs_keyReleaseEvent_1514_0);
-  methods += new qt_gsi::GenericMethod ("*leaveEvent", "@brief Virtual method void QCalendarWidget::leaveEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*leaveEvent", "@brief Virtual method void QCalendarWidget::leaveEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*leaveEvent", "@hide", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0, &_set_callback_cbs_leaveEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*metric", "@brief Virtual method int QCalendarWidget::metric(QPaintDevice::PaintDeviceMetric)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0);
   methods += new qt_gsi::GenericMethod ("*metric", "@hide", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0, &_set_callback_cbs_metric_c3445_0);
   methods += new qt_gsi::GenericMethod ("minimumSizeHint", "@brief Virtual method QSize QCalendarWidget::minimumSizeHint()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_minimumSizeHint_c0_0, &_call_cbs_minimumSizeHint_c0_0);
   methods += new qt_gsi::GenericMethod ("minimumSizeHint", "@hide", true, &_init_cbs_minimumSizeHint_c0_0, &_call_cbs_minimumSizeHint_c0_0, &_set_callback_cbs_minimumSizeHint_c0_0);
-  methods += new qt_gsi::GenericMethod ("*mouseDoubleClickEvent", "@brief Virtual method void QCalendarWidget::mouseDoubleClickEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseDoubleClickEvent_1738_0, &_call_cbs_mouseDoubleClickEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mouseDoubleClickEvent", "@brief Virtual method void QCalendarWidget::mouseDoubleClickEvent(QMouseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseDoubleClickEvent_1738_0, &_call_cbs_mouseDoubleClickEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseDoubleClickEvent", "@hide", false, &_init_cbs_mouseDoubleClickEvent_1738_0, &_call_cbs_mouseDoubleClickEvent_1738_0, &_set_callback_cbs_mouseDoubleClickEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*mouseMoveEvent", "@brief Virtual method void QCalendarWidget::mouseMoveEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseMoveEvent_1738_0, &_call_cbs_mouseMoveEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mouseMoveEvent", "@brief Virtual method void QCalendarWidget::mouseMoveEvent(QMouseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseMoveEvent_1738_0, &_call_cbs_mouseMoveEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseMoveEvent", "@hide", false, &_init_cbs_mouseMoveEvent_1738_0, &_call_cbs_mouseMoveEvent_1738_0, &_set_callback_cbs_mouseMoveEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mousePressEvent", "@brief Virtual method void QCalendarWidget::mousePressEvent(QMouseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mousePressEvent_1738_0, &_call_cbs_mousePressEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mousePressEvent", "@hide", false, &_init_cbs_mousePressEvent_1738_0, &_call_cbs_mousePressEvent_1738_0, &_set_callback_cbs_mousePressEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@brief Virtual method void QCalendarWidget::mouseReleaseEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@brief Virtual method void QCalendarWidget::mouseReleaseEvent(QMouseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@hide", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0, &_set_callback_cbs_mouseReleaseEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*moveEvent", "@brief Virtual method void QCalendarWidget::moveEvent(QMoveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0);
+  methods += new qt_gsi::GenericMethod ("*moveEvent", "@brief Virtual method void QCalendarWidget::moveEvent(QMoveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*moveEvent", "@hide", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0, &_set_callback_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@brief Virtual method bool QCalendarWidget::nativeEvent(const QByteArray &eventType, void *message, long int *result)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@hide", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0, &_set_callback_cbs_nativeEvent_4678_0);
@@ -3381,7 +3381,7 @@ static gsi::Methods methods_QCalendarWidget_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*paintCell", "@hide", true, &_init_cbs_paintCell_c4778_0, &_call_cbs_paintCell_c4778_0, &_set_callback_cbs_paintCell_c4778_0);
   methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Virtual method QPaintEngine *QCalendarWidget::paintEngine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0);
   methods += new qt_gsi::GenericMethod ("paintEngine", "@hide", true, &_init_cbs_paintEngine_c0_0, &_call_cbs_paintEngine_c0_0, &_set_callback_cbs_paintEngine_c0_0);
-  methods += new qt_gsi::GenericMethod ("*paintEvent", "@brief Virtual method void QCalendarWidget::paintEvent(QPaintEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_paintEvent_1725_0, &_call_cbs_paintEvent_1725_0);
+  methods += new qt_gsi::GenericMethod ("*paintEvent", "@brief Virtual method void QCalendarWidget::paintEvent(QPaintEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_paintEvent_1725_0, &_call_cbs_paintEvent_1725_0);
   methods += new qt_gsi::GenericMethod ("*paintEvent", "@hide", false, &_init_cbs_paintEvent_1725_0, &_call_cbs_paintEvent_1725_0, &_set_callback_cbs_paintEvent_1725_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QCalendarWidget::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*redirected", "@brief Virtual method QPaintDevice *QCalendarWidget::redirected(QPoint *offset)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_redirected_c1225_0, &_call_cbs_redirected_c1225_0);
@@ -3395,18 +3395,18 @@ static gsi::Methods methods_QCalendarWidget_Adaptor () {
   methods += new qt_gsi::GenericMethod ("setVisible", "@hide", false, &_init_cbs_setVisible_864_0, &_call_cbs_setVisible_864_0, &_set_callback_cbs_setVisible_864_0);
   methods += new qt_gsi::GenericMethod ("*sharedPainter", "@brief Virtual method QPainter *QCalendarWidget::sharedPainter()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_sharedPainter_c0_0, &_call_cbs_sharedPainter_c0_0);
   methods += new qt_gsi::GenericMethod ("*sharedPainter", "@hide", true, &_init_cbs_sharedPainter_c0_0, &_call_cbs_sharedPainter_c0_0, &_set_callback_cbs_sharedPainter_c0_0);
-  methods += new qt_gsi::GenericMethod ("*showEvent", "@brief Virtual method void QCalendarWidget::showEvent(QShowEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_showEvent_1634_0, &_call_cbs_showEvent_1634_0);
+  methods += new qt_gsi::GenericMethod ("*showEvent", "@brief Virtual method void QCalendarWidget::showEvent(QShowEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_showEvent_1634_0, &_call_cbs_showEvent_1634_0);
   methods += new qt_gsi::GenericMethod ("*showEvent", "@hide", false, &_init_cbs_showEvent_1634_0, &_call_cbs_showEvent_1634_0, &_set_callback_cbs_showEvent_1634_0);
   methods += new qt_gsi::GenericMethod ("sizeHint", "@brief Virtual method QSize QCalendarWidget::sizeHint()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0);
   methods += new qt_gsi::GenericMethod ("sizeHint", "@hide", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0, &_set_callback_cbs_sizeHint_c0_0);
-  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QCalendarWidget::tabletEvent(QTabletEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
+  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QCalendarWidget::tabletEvent(QTabletEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
   methods += new qt_gsi::GenericMethod ("*tabletEvent", "@hide", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0, &_set_callback_cbs_tabletEvent_1821_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QCalendarWidget::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QCalendarWidget::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*updateCell", "@brief Method void QCalendarWidget::updateCell(const QDate &date)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_updateCell_1776, &_call_fp_updateCell_1776);
   methods += new qt_gsi::GenericMethod ("*updateCells", "@brief Method void QCalendarWidget::updateCells()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_updateCells_0, &_call_fp_updateCells_0);
   methods += new qt_gsi::GenericMethod ("*updateMicroFocus", "@brief Method void QCalendarWidget::updateMicroFocus()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_updateMicroFocus_0, &_call_fp_updateMicroFocus_0);
-  methods += new qt_gsi::GenericMethod ("*wheelEvent", "@brief Virtual method void QCalendarWidget::wheelEvent(QWheelEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0);
+  methods += new qt_gsi::GenericMethod ("*wheelEvent", "@brief Virtual method void QCalendarWidget::wheelEvent(QWheelEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0);
   methods += new qt_gsi::GenericMethod ("*wheelEvent", "@hide", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0, &_set_callback_cbs_wheelEvent_1718_0);
   methods += new qt_gsi::GenericMethod ("emit_windowIconChanged", "@brief Emitter for signal void QCalendarWidget::windowIconChanged(const QIcon &icon)\nCall this method to emit this signal.", false, &_init_emitter_windowIconChanged_1787, &_call_emitter_windowIconChanged_1787);
   methods += new qt_gsi::GenericMethod ("emit_windowIconTextChanged", "@brief Emitter for signal void QCalendarWidget::windowIconTextChanged(const QString &iconText)\nCall this method to emit this signal.", false, &_init_emitter_windowIconTextChanged_2025, &_call_emitter_windowIconTextChanged_2025);

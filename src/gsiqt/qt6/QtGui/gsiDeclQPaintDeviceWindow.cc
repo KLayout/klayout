@@ -277,6 +277,7 @@ static gsi::Methods methods_QPaintDeviceWindow () {
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QPaintDeviceWindow::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<double > ("opacityChanged(double)", "opacityChanged", gsi::arg("opacity"), "@brief Signal declaration for QPaintDeviceWindow::opacityChanged(double opacity)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QScreen * > ("screenChanged(QScreen *)", "screenChanged", gsi::arg("screen"), "@brief Signal declaration for QPaintDeviceWindow::screenChanged(QScreen *screen)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QWindow * > ("transientParentChanged(QWindow *)", "transientParentChanged", gsi::arg("transientParent"), "@brief Signal declaration for QPaintDeviceWindow::transientParentChanged(QWindow *transientParent)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<QWindow::Visibility>::target_type & > ("visibilityChanged(QWindow::Visibility)", "visibilityChanged", gsi::arg("visibility"), "@brief Signal declaration for QPaintDeviceWindow::visibilityChanged(QWindow::Visibility visibility)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<bool > ("visibleChanged(bool)", "visibleChanged", gsi::arg("arg"), "@brief Signal declaration for QPaintDeviceWindow::visibleChanged(bool arg)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("widthChanged(int)", "widthChanged", gsi::arg("arg"), "@brief Signal declaration for QPaintDeviceWindow::widthChanged(int arg)\nYou can bind a procedure to this signal.");
@@ -507,6 +508,12 @@ public:
     } else {
       return QPaintDeviceWindow::surfaceType();
     }
+  }
+
+  //  [emitter impl] void QPaintDeviceWindow::transientParentChanged(QWindow *transientParent)
+  void emitter_QPaintDeviceWindow_transientParentChanged_1335(QWindow *transientParent)
+  {
+    emit QPaintDeviceWindow::transientParentChanged(transientParent);
   }
 
   //  [emitter impl] void QPaintDeviceWindow::visibilityChanged(QWindow::Visibility visibility)
@@ -2090,6 +2097,24 @@ static void _set_callback_cbs_touchEvent_1732_0 (void *cls, const gsi::Callback 
 }
 
 
+// emitter void QPaintDeviceWindow::transientParentChanged(QWindow *transientParent)
+
+static void _init_emitter_transientParentChanged_1335 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("transientParent");
+  decl->add_arg<QWindow * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_transientParentChanged_1335 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QWindow *arg1 = gsi::arg_reader<QWindow * >() (args, heap);
+  ((QPaintDeviceWindow_Adaptor *)cls)->emitter_QPaintDeviceWindow_transientParentChanged_1335 (arg1);
+}
+
+
 // emitter void QPaintDeviceWindow::visibilityChanged(QWindow::Visibility visibility)
 
 static void _init_emitter_visibilityChanged_2329 (qt_gsi::GenericMethod *decl)
@@ -2331,6 +2356,7 @@ static gsi::Methods methods_QPaintDeviceWindow_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*touchEvent", "@brief Virtual method void QPaintDeviceWindow::touchEvent(QTouchEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_touchEvent_1732_0, &_call_cbs_touchEvent_1732_0);
   methods += new qt_gsi::GenericMethod ("*touchEvent", "@hide", false, &_init_cbs_touchEvent_1732_0, &_call_cbs_touchEvent_1732_0, &_set_callback_cbs_touchEvent_1732_0);
+  methods += new qt_gsi::GenericMethod ("emit_transientParentChanged", "@brief Emitter for signal void QPaintDeviceWindow::transientParentChanged(QWindow *transientParent)\nCall this method to emit this signal.", false, &_init_emitter_transientParentChanged_1335, &_call_emitter_transientParentChanged_1335);
   methods += new qt_gsi::GenericMethod ("emit_visibilityChanged", "@brief Emitter for signal void QPaintDeviceWindow::visibilityChanged(QWindow::Visibility visibility)\nCall this method to emit this signal.", false, &_init_emitter_visibilityChanged_2329, &_call_emitter_visibilityChanged_2329);
   methods += new qt_gsi::GenericMethod ("emit_visibleChanged", "@brief Emitter for signal void QPaintDeviceWindow::visibleChanged(bool arg)\nCall this method to emit this signal.", false, &_init_emitter_visibleChanged_864, &_call_emitter_visibleChanged_864);
   methods += new qt_gsi::GenericMethod ("*wheelEvent", "@brief Virtual method void QPaintDeviceWindow::wheelEvent(QWheelEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_wheelEvent_1718_0, &_call_cbs_wheelEvent_1718_0);

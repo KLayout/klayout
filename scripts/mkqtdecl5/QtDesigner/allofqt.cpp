@@ -1,13 +1,16 @@
+#if 0
+//  No designer support, except QFormBuilder
 #include "QtDesigner/QAbstractExtensionFactory"
 #include "QtDesigner/QAbstractExtensionManager"
 #include "QtDesigner/QAbstractFormBuilder"
-#if 0
-//  No designer support, except QFormBuilder
 #include "QtDesigner/QDesignerActionEditorInterface"
 #include "QtDesigner/QDesignerComponents"
 #include "QtDesigner/QDesignerContainerExtension"
+#include "QtDesigner/QDesignerCustomWidgetCollectionInterface"
+#include "QtDesigner/QDesignerCustomWidgetInterface"
 #include "QtDesigner/QDesignerDnDItemInterface"
 #include "QtDesigner/QDesignerDynamicPropertySheetExtension"
+#include "QtDesigner/QDesignerExportWidget"
 #include "QtDesigner/QDesignerExtraInfoExtension"
 #include "QtDesigner/QDesignerFormEditorInterface"
 #include "QtDesigner/QDesignerFormEditorPluginInterface"

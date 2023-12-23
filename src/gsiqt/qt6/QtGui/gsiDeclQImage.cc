@@ -1946,8 +1946,8 @@ static gsi::Methods methods_QImage () {
   methods += new qt_gsi::GenericMethod ("cacheKey", "@brief Method qint64 QImage::cacheKey()\n", true, &_init_f_cacheKey_c0, &_call_f_cacheKey_c0);
   methods += new qt_gsi::GenericMethod ("color", "@brief Method unsigned int QImage::color(int i)\n", true, &_init_f_color_c767, &_call_f_color_c767);
   methods += new qt_gsi::GenericMethod (":colorCount", "@brief Method int QImage::colorCount()\n", true, &_init_f_colorCount_c0, &_call_f_colorCount_c0);
-  methods += new qt_gsi::GenericMethod ("colorSpace", "@brief Method QColorSpace QImage::colorSpace()\n", true, &_init_f_colorSpace_c0, &_call_f_colorSpace_c0);
-  methods += new qt_gsi::GenericMethod ("colorTable", "@brief Method QList<QRgb> QImage::colorTable()\n", true, &_init_f_colorTable_c0, &_call_f_colorTable_c0);
+  methods += new qt_gsi::GenericMethod (":colorSpace", "@brief Method QColorSpace QImage::colorSpace()\n", true, &_init_f_colorSpace_c0, &_call_f_colorSpace_c0);
+  methods += new qt_gsi::GenericMethod (":colorTable", "@brief Method QList<QRgb> QImage::colorTable()\n", true, &_init_f_colorTable_c0, &_call_f_colorTable_c0);
   methods += new qt_gsi::GenericMethod ("constBits", "@brief Method const unsigned char *QImage::constBits()\n", true, &_init_f_constBits_c0, &_call_f_constBits_c0);
   methods += new qt_gsi::GenericMethod ("constScanLine", "@brief Method const unsigned char *QImage::constScanLine(int)\n", true, &_init_f_constScanLine_c767, &_call_f_constScanLine_c767);
   methods += new qt_gsi::GenericMethod ("convertTo", "@brief Method void QImage::convertTo(QImage::Format f, QFlags<Qt::ImageConversionFlag> flags)\n", false, &_init_f_convertTo_4993, &_call_f_convertTo_4993);
@@ -2007,11 +2007,11 @@ static gsi::Methods methods_QImage () {
   methods += new qt_gsi::GenericMethod ("scaledToHeight", "@brief Method QImage QImage::scaledToHeight(int h, Qt::TransformationMode mode)\n", true, &_init_f_scaledToHeight_c3292, &_call_f_scaledToHeight_c3292);
   methods += new qt_gsi::GenericMethod ("scaledToWidth", "@brief Method QImage QImage::scaledToWidth(int w, Qt::TransformationMode mode)\n", true, &_init_f_scaledToWidth_c3292, &_call_f_scaledToWidth_c3292);
   methods += new qt_gsi::GenericMethod ("scanLine", "@brief Method const unsigned char *QImage::scanLine(int)\n", true, &_init_f_scanLine_c767, &_call_f_scanLine_c767);
-  methods += new qt_gsi::GenericMethod ("setAlphaChannel|alphaChannel=", "@brief Method void QImage::setAlphaChannel(const QImage &alphaChannel)\n", false, &_init_f_setAlphaChannel_1877, &_call_f_setAlphaChannel_1877);
+  methods += new qt_gsi::GenericMethod ("setAlphaChannel", "@brief Method void QImage::setAlphaChannel(const QImage &alphaChannel)\n", false, &_init_f_setAlphaChannel_1877, &_call_f_setAlphaChannel_1877);
   methods += new qt_gsi::GenericMethod ("setColor", "@brief Method void QImage::setColor(int i, unsigned int c)\n", false, &_init_f_setColor_2431, &_call_f_setColor_2431);
   methods += new qt_gsi::GenericMethod ("setColorCount|colorCount=", "@brief Method void QImage::setColorCount(int)\n", false, &_init_f_setColorCount_767, &_call_f_setColorCount_767);
-  methods += new qt_gsi::GenericMethod ("setColorSpace", "@brief Method void QImage::setColorSpace(const QColorSpace &)\n", false, &_init_f_setColorSpace_2397, &_call_f_setColorSpace_2397);
-  methods += new qt_gsi::GenericMethod ("setColorTable", "@brief Method void QImage::setColorTable(const QList<QRgb> &colors)\n", false, &_init_f_setColorTable_2292, &_call_f_setColorTable_2292);
+  methods += new qt_gsi::GenericMethod ("setColorSpace|colorSpace=", "@brief Method void QImage::setColorSpace(const QColorSpace &)\n", false, &_init_f_setColorSpace_2397, &_call_f_setColorSpace_2397);
+  methods += new qt_gsi::GenericMethod ("setColorTable|colorTable=", "@brief Method void QImage::setColorTable(const QList<QRgb> &colors)\n", false, &_init_f_setColorTable_2292, &_call_f_setColorTable_2292);
   methods += new qt_gsi::GenericMethod ("setDevicePixelRatio|devicePixelRatio=", "@brief Method void QImage::setDevicePixelRatio(double scaleFactor)\n", false, &_init_f_setDevicePixelRatio_1071, &_call_f_setDevicePixelRatio_1071);
   methods += new qt_gsi::GenericMethod ("setDotsPerMeterX|dotsPerMeterX=", "@brief Method void QImage::setDotsPerMeterX(int)\n", false, &_init_f_setDotsPerMeterX_767, &_call_f_setDotsPerMeterX_767);
   methods += new qt_gsi::GenericMethod ("setDotsPerMeterY|dotsPerMeterY=", "@brief Method void QImage::setDotsPerMeterY(int)\n", false, &_init_f_setDotsPerMeterY_767, &_call_f_setDotsPerMeterY_767);
@@ -2052,6 +2052,59 @@ GSI_QTGUI_PUBLIC gsi::Class<QImage> &qtdecl_QImage () { return decl_QImage; }
 class QImage_Adaptor : public QImage, public qt_gsi::QtObjectBase
 {
 public:
+
+  //  NOTE: QImage does not take ownership of the data, so 
+  //  we will provide a buffer to do so. This requires an additional 
+  //  copy, but as GSI is not guaranteeing the lifetime of the 
+  //  data, this is required here.
+  class DataHolder
+  {
+  public:
+
+    DataHolder() : mp_data(0) { }
+    DataHolder(unsigned char *data) : mp_data(data) { }
+
+    ~DataHolder() 
+    { 
+      if (mp_data) {
+        delete[](mp_data); 
+      }
+      mp_data = 0;
+    }
+
+    static unsigned char *alloc(const std::string &data)
+    {
+      unsigned char *ptr = new unsigned char[data.size()];
+      memcpy(ptr, data.c_str(), data.size());
+      return ptr;
+    }
+
+  private:
+    unsigned char *mp_data;
+  };
+
+  static QImage_Adaptor *new_qimage_from_data1(const std::string &data, int width, int height, int bytesPerLine, QImage::Format format) 
+  {
+    return new QImage_Adaptor(DataHolder::alloc(data), width, height, bytesPerLine, format);
+  }
+
+  static QImage_Adaptor *new_qimage_from_data2(const std::string &data, int width, int height, QImage::Format format) 
+  {
+    return new QImage_Adaptor(DataHolder::alloc(data), width, height, format);
+  }
+
+  QImage_Adaptor(unsigned char *data, int width, int height, int bytesPerLine, QImage::Format format)
+    : QImage(data, width, height, bytesPerLine, format), m_holder(data)
+  {
+  }
+
+  QImage_Adaptor(unsigned char *data, int width, int height, QImage::Format format)
+    : QImage (data, width, height, format), m_holder(data)
+  {
+  }
+
+  DataHolder m_holder;
+
 
   virtual ~QImage_Adaptor();
 
@@ -2584,6 +2637,15 @@ static gsi::Methods methods_QImage_Adaptor () {
 }
 
 gsi::Class<QImage_Adaptor> decl_QImage_Adaptor (qtdecl_QImage (), "QtGui", "QImage",
+  gsi::constructor("new", &QImage_Adaptor::new_qimage_from_data1, gsi::arg ("data"), gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("bytesPerLine"), gsi::arg ("format"),
+    "@brief QImage::QImage(const uchar *data, int width, int height, int bytesPerLine)\n"
+    "The cleanupFunction parameter is available currently."
+  ) +
+  gsi::constructor("new", &QImage_Adaptor::new_qimage_from_data2, gsi::arg ("data"), gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("format"),
+    "@brief QImage::QImage(const uchar *data, int width, int height)\n"
+    "The cleanupFunction parameter is available currently."
+  )
++
   methods_QImage_Adaptor (),
   "@qt\n@brief Binding of QImage");
 

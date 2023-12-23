@@ -93,7 +93,7 @@ namespace gsi
 static gsi::Methods methods_QPainter_PixmapFragment () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPainter::PixmapFragment::PixmapFragment()\nThis method creates an object of class QPainter::PixmapFragment.", &_init_ctor_QPainter_PixmapFragment_0, &_call_ctor_QPainter_PixmapFragment_0);
-  methods += new qt_gsi::GenericStaticMethod ("qt_create", "@brief Static method QPainter::PixmapFragment QPainter::PixmapFragment::create(const QPointF &pos, const QRectF &sourceRect, double scaleX, double scaleY, double rotation, double opacity)\nThis method is static and can be called without an instance.", &_init_f_create_7592, &_call_f_create_7592);
+  methods += new qt_gsi::GenericStaticMethod ("create|qt_create", "@brief Static method QPainter::PixmapFragment QPainter::PixmapFragment::create(const QPointF &pos, const QRectF &sourceRect, double scaleX, double scaleY, double rotation, double opacity)\nThis method is static and can be called without an instance.", &_init_f_create_7592, &_call_f_create_7592);
   return methods;
 }
 

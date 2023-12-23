@@ -635,6 +635,9 @@ ApplicationBase::init_app ()
   mp_ruby_interpreter = new rba::RubyInterpreter ();
   mp_python_interpreter = new pya::PythonInterpreter ();
 
+  //  initialize the Python interpreter - load the pya module
+  pya::PythonInterpreter::initialize ();
+
   //  Read some configuration values that we need early
   bool editable_from_config = false;
 

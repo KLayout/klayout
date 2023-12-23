@@ -183,8 +183,9 @@ class LAYLayoutView_TestClass < TestBase
     assert_equal(view.has_selection?, false)
     assert_equal(view.selection_size, 0)
 
-    view.set_config("search-range-box", "5")
-    view.select_from(RBA::DBox::new(-1.0, -1.0, 1.0, 1.0))
+    view.set_config("search-range-box", "0")  # so the selection becomes independent from resolution and size
+    view.set_config("search-range", "0")
+    view.select_from(RBA::DBox::new(-2.5, -2.5, 2.5, 2.5))
     assert_equal(selection_changed, 1)
     assert_equal(view.selection_size, 2)
     assert_equal(view.has_selection?, true)

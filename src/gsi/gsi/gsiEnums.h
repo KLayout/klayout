@@ -275,6 +275,7 @@ public:
       gsi::method_ext ("to_s", &enum_to_string_ext, "@brief Gets the symbolic string from an enum") +
       gsi::method_ext ("inspect", &enum_to_string_inspect_ext, "@brief Converts an enum to a visual string") +
       gsi::method_ext ("to_i", &enum_to_int, "@brief Gets the integer value from the enum") +
+      gsi::method_ext ("hash", &enum_to_int, "@brief Gets the hash value from the enum") +
       gsi::method_ext ("==", &enum_eq, gsi::arg("other"), "@brief Compares two enums") +
       gsi::method_ext ("==", &enum_eq_with_int, gsi::arg("other"), "@brief Compares an enum with an integer value") +
       gsi::method_ext ("!=", &enum_ne, gsi::arg("other"), "@brief Compares two enums for inequality") +

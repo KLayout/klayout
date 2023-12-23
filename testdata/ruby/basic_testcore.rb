@@ -1400,11 +1400,55 @@ class Basic_TestClass < TestBase
     assert_equal( 2, n0 )
 
     # using lambda
+    n0 = 0
     p = lambda { n0 += 2 }
     e.e0(&p)
     e.s1
-    assert_equal( 4, n0 )
+    assert_equal( 2, n0 )
 
+    # remove event handler -> no events triggered anymore
+    n0 = 0
+    e.e0 -= p
+    e.s1
+    assert_equal( 0, n0 )
+
+    # adding again will re-activate it
+    e.e0 += p
+    n0 = 0
+    e.s1
+    assert_equal( 2, n0 )
+
+    # two events at once
+    pp = lambda { n0 += 10 }
+    n0 = 0
+    e.e0 += pp
+    e.s1
+    assert_equal( 12, n0 )
+
+    # clearing events
+    e.e0.clear
+    e.s1
+    n0 = 0
+    assert_equal( 0, n0 )
+
+    # synonyms: add, connect
+    e.e0.add(p)
+    e.e0.connect(pp)
+    n0 = 0
+    e.s1
+    assert_equal( 12, n0 )
+
+    # synonyms: remove, disconnect
+    e.e0.disconnect(p)
+    n0 = 0
+    e.s1
+    assert_equal( 10, n0 )
+    n0 = 0
+    e.e0.remove(pp)
+    e.s1
+    assert_equal( 0, n0 )
+
+    # another signal
     e.s2
     assert_equal( 100, n1 )
     e.m = 1

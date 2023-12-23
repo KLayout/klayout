@@ -222,26 +222,6 @@ static void _call_f_error_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// void QLocalSocket::errorOccurred(QLocalSocket::LocalSocketError socketError)
-
-
-static void _init_f_errorOccurred_3371 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("socketError");
-  decl->add_arg<const qt_gsi::Converter<QLocalSocket::LocalSocketError>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_errorOccurred_3371 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QLocalSocket::LocalSocketError>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QLocalSocket::LocalSocketError>::target_type & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QLocalSocket *)cls)->errorOccurred (qt_gsi::QtToCppAdaptor<QLocalSocket::LocalSocketError>(arg1).cref());
-}
-
-
 // bool QLocalSocket::flush()
 
 
@@ -599,7 +579,6 @@ static gsi::Methods methods_QLocalSocket () {
   methods += new qt_gsi::GenericMethod ("connectToServer", "@brief Method void QLocalSocket::connectToServer(const QString &name, QFlags<QIODeviceBase::OpenModeFlag> openMode)\n", false, &_init_f_connectToServer_5538, &_call_f_connectToServer_5538);
   methods += new qt_gsi::GenericMethod ("disconnectFromServer", "@brief Method void QLocalSocket::disconnectFromServer()\n", false, &_init_f_disconnectFromServer_0, &_call_f_disconnectFromServer_0);
   methods += new qt_gsi::GenericMethod ("error", "@brief Method QLocalSocket::LocalSocketError QLocalSocket::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
-  methods += new qt_gsi::GenericMethod ("errorOccurred", "@brief Method void QLocalSocket::errorOccurred(QLocalSocket::LocalSocketError socketError)\n", false, &_init_f_errorOccurred_3371, &_call_f_errorOccurred_3371);
   methods += new qt_gsi::GenericMethod ("flush", "@brief Method bool QLocalSocket::flush()\n", false, &_init_f_flush_0, &_call_f_flush_0);
   methods += new qt_gsi::GenericMethod ("fullServerName", "@brief Method QString QLocalSocket::fullServerName()\n", true, &_init_f_fullServerName_c0, &_call_f_fullServerName_c0);
   methods += new qt_gsi::GenericMethod ("isSequential?", "@brief Method bool QLocalSocket::isSequential()\nThis is a reimplementation of QIODevice::isSequential", true, &_init_f_isSequential_c0, &_call_f_isSequential_c0);
@@ -610,9 +589,9 @@ static gsi::Methods methods_QLocalSocket () {
   methods += new qt_gsi::GenericMethod ("setReadBufferSize|readBufferSize=", "@brief Method void QLocalSocket::setReadBufferSize(qint64 size)\n", false, &_init_f_setReadBufferSize_986, &_call_f_setReadBufferSize_986);
   methods += new qt_gsi::GenericMethod ("setServerName|serverName=", "@brief Method void QLocalSocket::setServerName(const QString &name)\n", false, &_init_f_setServerName_2025, &_call_f_setServerName_2025);
   methods += new qt_gsi::GenericMethod ("setSocketDescriptor", "@brief Method bool QLocalSocket::setSocketDescriptor(QIntegerForSizeof<void *>::Signed socketDescriptor, QLocalSocket::LocalSocketState socketState, QFlags<QIODeviceBase::OpenModeFlag> openMode)\n", false, &_init_f_setSocketDescriptor_10381, &_call_f_setSocketDescriptor_10381);
-  methods += new qt_gsi::GenericMethod ("setSocketOptions", "@brief Method void QLocalSocket::setSocketOptions(QFlags<QLocalSocket::SocketOption> option)\n", false, &_init_f_setSocketOptions_3687, &_call_f_setSocketOptions_3687);
+  methods += new qt_gsi::GenericMethod ("setSocketOptions|socketOptions=", "@brief Method void QLocalSocket::setSocketOptions(QFlags<QLocalSocket::SocketOption> option)\n", false, &_init_f_setSocketOptions_3687, &_call_f_setSocketOptions_3687);
   methods += new qt_gsi::GenericMethod ("socketDescriptor", "@brief Method QIntegerForSizeof<void *>::Signed QLocalSocket::socketDescriptor()\n", true, &_init_f_socketDescriptor_c0, &_call_f_socketDescriptor_c0);
-  methods += new qt_gsi::GenericMethod ("socketOptions", "@brief Method QFlags<QLocalSocket::SocketOption> QLocalSocket::socketOptions()\n", true, &_init_f_socketOptions_c0, &_call_f_socketOptions_c0);
+  methods += new qt_gsi::GenericMethod (":socketOptions", "@brief Method QFlags<QLocalSocket::SocketOption> QLocalSocket::socketOptions()\n", true, &_init_f_socketOptions_c0, &_call_f_socketOptions_c0);
   methods += new qt_gsi::GenericMethod ("state", "@brief Method QLocalSocket::LocalSocketState QLocalSocket::state()\n", true, &_init_f_state_c0, &_call_f_state_c0);
   methods += new qt_gsi::GenericMethod ("waitForBytesWritten", "@brief Method bool QLocalSocket::waitForBytesWritten(int msecs)\nThis is a reimplementation of QIODevice::waitForBytesWritten", false, &_init_f_waitForBytesWritten_767, &_call_f_waitForBytesWritten_767);
   methods += new qt_gsi::GenericMethod ("waitForConnected", "@brief Method bool QLocalSocket::waitForConnected(int msecs)\n", false, &_init_f_waitForConnected_767, &_call_f_waitForConnected_767);
@@ -625,6 +604,7 @@ static gsi::Methods methods_QLocalSocket () {
   methods += gsi::qt_signal ("connected()", "connected", "@brief Signal declaration for QLocalSocket::connected()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QLocalSocket::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("disconnected()", "disconnected", "@brief Signal declaration for QLocalSocket::disconnected()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QLocalSocket::LocalSocketError>::target_type & > ("errorOccurred(QLocalSocket::LocalSocketError)", "errorOccurred", gsi::arg("socketError"), "@brief Signal declaration for QLocalSocket::errorOccurred(QLocalSocket::LocalSocketError socketError)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QLocalSocket::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("readChannelFinished()", "readChannelFinished", "@brief Signal declaration for QLocalSocket::readChannelFinished()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("readyRead()", "readyRead", "@brief Signal declaration for QLocalSocket::readyRead()\nYou can bind a procedure to this signal.");

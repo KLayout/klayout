@@ -1629,14 +1629,14 @@ static gsi::Methods methods_QStandardItem () {
   methods += new qt_gsi::GenericMethod ("insertRow", "@brief Method void QStandardItem::insertRow(int row, QStandardItem *item)\n", false, &_init_f_insertRow_2578, &_call_f_insertRow_2578);
   methods += new qt_gsi::GenericMethod ("insertRows", "@brief Method void QStandardItem::insertRows(int row, const QList<QStandardItem*> &items)\n", false, &_init_f_insertRows_3926, &_call_f_insertRows_3926);
   methods += new qt_gsi::GenericMethod ("insertRows", "@brief Method void QStandardItem::insertRows(int row, int count)\n", false, &_init_f_insertRows_1426, &_call_f_insertRows_1426);
-  methods += new qt_gsi::GenericMethod ("isAutoTristate?", "@brief Method bool QStandardItem::isAutoTristate()\n", true, &_init_f_isAutoTristate_c0, &_call_f_isAutoTristate_c0);
+  methods += new qt_gsi::GenericMethod ("isAutoTristate?|:autoTristate", "@brief Method bool QStandardItem::isAutoTristate()\n", true, &_init_f_isAutoTristate_c0, &_call_f_isAutoTristate_c0);
   methods += new qt_gsi::GenericMethod ("isCheckable?|:checkable", "@brief Method bool QStandardItem::isCheckable()\n", true, &_init_f_isCheckable_c0, &_call_f_isCheckable_c0);
   methods += new qt_gsi::GenericMethod ("isDragEnabled?|:dragEnabled", "@brief Method bool QStandardItem::isDragEnabled()\n", true, &_init_f_isDragEnabled_c0, &_call_f_isDragEnabled_c0);
   methods += new qt_gsi::GenericMethod ("isDropEnabled?|:dropEnabled", "@brief Method bool QStandardItem::isDropEnabled()\n", true, &_init_f_isDropEnabled_c0, &_call_f_isDropEnabled_c0);
   methods += new qt_gsi::GenericMethod ("isEditable?|:editable", "@brief Method bool QStandardItem::isEditable()\n", true, &_init_f_isEditable_c0, &_call_f_isEditable_c0);
   methods += new qt_gsi::GenericMethod ("isEnabled?|:enabled", "@brief Method bool QStandardItem::isEnabled()\n", true, &_init_f_isEnabled_c0, &_call_f_isEnabled_c0);
   methods += new qt_gsi::GenericMethod ("isSelectable?|:selectable", "@brief Method bool QStandardItem::isSelectable()\n", true, &_init_f_isSelectable_c0, &_call_f_isSelectable_c0);
-  methods += new qt_gsi::GenericMethod ("isUserTristate?", "@brief Method bool QStandardItem::isUserTristate()\n", true, &_init_f_isUserTristate_c0, &_call_f_isUserTristate_c0);
+  methods += new qt_gsi::GenericMethod ("isUserTristate?|:userTristate", "@brief Method bool QStandardItem::isUserTristate()\n", true, &_init_f_isUserTristate_c0, &_call_f_isUserTristate_c0);
   methods += new qt_gsi::GenericMethod ("model", "@brief Method QStandardItemModel *QStandardItem::model()\n", true, &_init_f_model_c0, &_call_f_model_c0);
   methods += new qt_gsi::GenericMethod ("multiData", "@brief Method void QStandardItem::multiData(QModelRoleDataSpan roleDataSpan)\n", true, &_init_f_multiData_c2196, &_call_f_multiData_c2196);
   methods += new qt_gsi::GenericMethod ("<", "@brief Method bool QStandardItem::operator<(const QStandardItem &other)\n", true, &_init_f_operator_lt__c2610, &_call_f_operator_lt__c2610);
@@ -1650,7 +1650,7 @@ static gsi::Methods methods_QStandardItem () {
   methods += new qt_gsi::GenericMethod (":rowCount", "@brief Method int QStandardItem::rowCount()\n", true, &_init_f_rowCount_c0, &_call_f_rowCount_c0);
   methods += new qt_gsi::GenericMethod ("setAccessibleDescription|accessibleDescription=", "@brief Method void QStandardItem::setAccessibleDescription(const QString &accessibleDescription)\n", false, &_init_f_setAccessibleDescription_2025, &_call_f_setAccessibleDescription_2025);
   methods += new qt_gsi::GenericMethod ("setAccessibleText|accessibleText=", "@brief Method void QStandardItem::setAccessibleText(const QString &accessibleText)\n", false, &_init_f_setAccessibleText_2025, &_call_f_setAccessibleText_2025);
-  methods += new qt_gsi::GenericMethod ("setAutoTristate", "@brief Method void QStandardItem::setAutoTristate(bool tristate)\n", false, &_init_f_setAutoTristate_864, &_call_f_setAutoTristate_864);
+  methods += new qt_gsi::GenericMethod ("setAutoTristate|autoTristate=", "@brief Method void QStandardItem::setAutoTristate(bool tristate)\n", false, &_init_f_setAutoTristate_864, &_call_f_setAutoTristate_864);
   methods += new qt_gsi::GenericMethod ("setBackground|background=", "@brief Method void QStandardItem::setBackground(const QBrush &brush)\n", false, &_init_f_setBackground_1910, &_call_f_setBackground_1910);
   methods += new qt_gsi::GenericMethod ("setCheckState|checkState=", "@brief Method void QStandardItem::setCheckState(Qt::CheckState checkState)\n", false, &_init_f_setCheckState_1740, &_call_f_setCheckState_1740);
   methods += new qt_gsi::GenericMethod ("setCheckable|checkable=", "@brief Method void QStandardItem::setCheckable(bool checkable)\n", false, &_init_f_setCheckable_864, &_call_f_setCheckable_864);
@@ -1673,7 +1673,7 @@ static gsi::Methods methods_QStandardItem () {
   methods += new qt_gsi::GenericMethod ("setText|text=", "@brief Method void QStandardItem::setText(const QString &text)\n", false, &_init_f_setText_2025, &_call_f_setText_2025);
   methods += new qt_gsi::GenericMethod ("setTextAlignment|textAlignment=", "@brief Method void QStandardItem::setTextAlignment(QFlags<Qt::AlignmentFlag> textAlignment)\n", false, &_init_f_setTextAlignment_2750, &_call_f_setTextAlignment_2750);
   methods += new qt_gsi::GenericMethod ("setToolTip|toolTip=", "@brief Method void QStandardItem::setToolTip(const QString &toolTip)\n", false, &_init_f_setToolTip_2025, &_call_f_setToolTip_2025);
-  methods += new qt_gsi::GenericMethod ("setUserTristate", "@brief Method void QStandardItem::setUserTristate(bool tristate)\n", false, &_init_f_setUserTristate_864, &_call_f_setUserTristate_864);
+  methods += new qt_gsi::GenericMethod ("setUserTristate|userTristate=", "@brief Method void QStandardItem::setUserTristate(bool tristate)\n", false, &_init_f_setUserTristate_864, &_call_f_setUserTristate_864);
   methods += new qt_gsi::GenericMethod ("setWhatsThis|whatsThis=", "@brief Method void QStandardItem::setWhatsThis(const QString &whatsThis)\n", false, &_init_f_setWhatsThis_2025, &_call_f_setWhatsThis_2025);
   methods += new qt_gsi::GenericMethod (":sizeHint", "@brief Method QSize QStandardItem::sizeHint()\n", true, &_init_f_sizeHint_c0, &_call_f_sizeHint_c0);
   methods += new qt_gsi::GenericMethod ("sortChildren", "@brief Method void QStandardItem::sortChildren(int column, Qt::SortOrder order)\n", false, &_init_f_sortChildren_2340, &_call_f_sortChildren_2340);

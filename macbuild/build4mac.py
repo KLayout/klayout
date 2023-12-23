@@ -1213,6 +1213,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     #                             |         +-- 'klayout'
     #                             |         +-- db_plugins/
     #                             |         +-- lay_plugins/
+    #                             |         +-- pymod/
     #                             +-- Buddy/+
     #                             |         +-- 'strm2cif'
     #                             |         +-- 'strm2dxf'
@@ -1304,7 +1305,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     # Copy the contents of the plugin directories to a place next to
     # the application binary
     #-------------------------------------------------------------------
-    for piDir in [ "db_plugins", "lay_plugins" ]:
+    for piDir in [ "db_plugins", "lay_plugins", "pymod" ]:
         os.makedirs( os.path.join( targetDirM, piDir ))
         dynamicLinkLibs = glob.glob( os.path.join( MacBinDir, piDir, "*.dylib" ) )
         for item in dynamicLinkLibs:
@@ -1354,6 +1355,7 @@ def Deploy_Binaries_For_Bundle(config, parameters):
     #             |         +-- 'klayout'
     #             |         +-- db_plugins/
     #             |         +-- lay_plugins/
+    #             |         +-- pymod/
     #             :
     #----------------------------------------------------------------------------------
     os.chdir( targetDirF )

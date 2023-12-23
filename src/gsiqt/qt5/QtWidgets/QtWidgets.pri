@@ -47,6 +47,7 @@ SOURCES += \
   $$PWD/gsiDeclQFontComboBox.cc \
   $$PWD/gsiDeclQFontDialog.cc \
   $$PWD/gsiDeclQFormLayout.cc \
+  $$PWD/gsiDeclQFormLayout_TakeRowResult.cc \
   $$PWD/gsiDeclQFrame.cc \
   $$PWD/gsiDeclQGesture.cc \
   $$PWD/gsiDeclQGestureEvent.cc \

@@ -71,6 +71,7 @@ section
   file cert.pem
   file /r db_plugins
   file /r lay_plugins
+  file /r pymod
   file /r audio
   file /r generic
   file /r iconengines

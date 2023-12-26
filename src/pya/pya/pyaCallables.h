@@ -39,12 +39,13 @@ PyObject *object_default_le_impl (PyObject *self, PyObject *args);
 PyObject *object_default_gt_impl (PyObject *self, PyObject *args);
 PyObject *object_default_deepcopy_impl (PyObject *self, PyObject *args);
 
+typedef PyObject *(*py_func_with_kw_ptr_t) (PyObject *, PyObject *, PyObject *);
 typedef PyObject *(*py_func_ptr_t) (PyObject *, PyObject *);
 
-py_func_ptr_t get_method_adaptor (int n);
+py_func_with_kw_ptr_t get_method_adaptor (int n);
 py_func_ptr_t get_property_getter_adaptor (int n);
 py_func_ptr_t get_property_setter_adaptor (int n);
-py_func_ptr_t get_method_init_adaptor (int n);
+py_func_with_kw_ptr_t get_method_init_adaptor (int n);
 
 inline void *make_closure (int mid_getter, int mid_setter)
 {

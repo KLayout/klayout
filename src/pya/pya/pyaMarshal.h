@@ -58,7 +58,7 @@ push_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, PyObject *arg, tl
  *  @param self The self object of the method call (for shortcut evaluation to return self if possible)
  *  @return The deserialized object (a new reference)
  */
-PythonRef pop_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, PYAObjectBase *self, tl::Heap &heap);
+PythonRef pull_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, PYAObjectBase *self, tl::Heap &heap);
 
 /**
  *  @brief Tests whether the given object is compatible with the given type

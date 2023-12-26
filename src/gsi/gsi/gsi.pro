@@ -22,6 +22,7 @@ SOURCES = \
   gsiTypes.cc \
   gsiSignals.cc \
   gsiObjectHolder.cc \
+  gsiVariantArgs.cc
 
 HEADERS = \
   gsiCallback.h \
@@ -43,7 +44,8 @@ HEADERS = \
   gsiSignals.h \
   gsiTypes.h \
   gsiObjectHolder.h \
-  gsiCommon.h
+  gsiCommon.h \
+  gsiVariantArgs.h
 
 # Note: unlike other modules, the tl declarations have to go here
 # since gsi is dependent on tl

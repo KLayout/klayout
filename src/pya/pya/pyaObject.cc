@@ -145,7 +145,7 @@ Callee::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
 
         //  TODO: callbacks with default arguments?
         for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); args && a != meth->end_arguments (); ++a) {
-          PyTuple_SetItem (argv.get (), arg4self + (a - meth->begin_arguments ()), pop_arg (*a, args, 0, heap).release ());
+          PyTuple_SetItem (argv.get (), arg4self + (a - meth->begin_arguments ()), pull_arg (*a, args, 0, heap).release ());
         }
 
         PythonRef result (PyObject_CallObject (callable.get (), argv.get ()));

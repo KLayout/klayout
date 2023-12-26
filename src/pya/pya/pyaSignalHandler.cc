@@ -130,7 +130,7 @@ void SignalHandler::call (const gsi::MethodBase *meth, gsi::SerialArgs &args, gs
     int args_avail = int (std::distance (meth->begin_arguments (), meth->end_arguments ()));
     PythonRef argv (PyTuple_New (args_avail));
     for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); args && a != meth->end_arguments (); ++a) {
-      PyTuple_SetItem (argv.get (), int (a - meth->begin_arguments ()), pop_arg (*a, args, 0, heap).release ());
+      PyTuple_SetItem (argv.get (), int (a - meth->begin_arguments ()), pull_arg (*a, args, 0, heap).release ());
     }
 
     //  NOTE: in case one event handler deletes the object, it's safer to first collect the handlers and

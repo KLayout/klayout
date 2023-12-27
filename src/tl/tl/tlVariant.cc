@@ -1815,9 +1815,21 @@ Variant::to_string () const
     } else if (m_type == t_id)  {
       r = "[id" + tl::to_string (m_var.m_id) + "]";
     } else if (m_type == t_user) {
-      r = m_var.mp_user.cls->to_string (m_var.mp_user.object);
+      void *obj = m_var.mp_user.object;
+      if (obj) {
+        r = m_var.mp_user.cls->to_string (obj);
+      } else {
+        r = "[class ";
+        r += m_var.mp_user.cls->name ();
+        r += "]";
+      }
     } else if (m_type == t_user_ref) {
-      r = m_var.mp_user_ref.cls->to_string (m_var.mp_user_ref.cls->deref_proxy_const (reinterpret_cast <const tl::WeakOrSharedPtr *> (m_var.mp_user_ref.ptr)->get ()));
+      const void *obj = m_var.mp_user_ref.cls->deref_proxy_const (reinterpret_cast <const tl::WeakOrSharedPtr *> (m_var.mp_user_ref.ptr)->get ());
+      if (obj) {
+        r = m_var.mp_user_ref.cls->to_string (obj);
+      } else {
+        r = "[null]";
+      }
     } else {
       r = "[unknown]";
     }

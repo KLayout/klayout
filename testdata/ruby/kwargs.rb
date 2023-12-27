@@ -181,6 +181,15 @@ class KWArgs_TestClass < TestBase
     end
 
     begin
+      t = RBA::CplxTrans::new(1.5, 2.5)
+      tt = RBA::CplxTrans::new
+      tt.assign(other: t)
+      assert_equal(true, false)
+    rescue => ex
+      assert_equal(ex.to_s, "Keyword arguments not permitted in CplxTrans::assign")
+    end
+
+    begin
       t = RBA::CplxTrans::new("17")
       assert_equal(true, false)
     rescue => ex

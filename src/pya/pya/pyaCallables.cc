@@ -708,7 +708,7 @@ push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, PyObject *args
           tl::Variant def_value = a->spec ()->default_value ();
           gsi::push_arg (arglist, *a, def_value, &heap);
         } else {
-          throw tl::Exception (tl::to_string ("No argument provided (positional or keyword) and no default value available"));
+          throw tl::Exception (tl::to_string (tr ("No argument provided (positional or keyword) and no default value available")));
         }
       } else {
         if (iarg >= argc) {
@@ -808,6 +808,10 @@ method_adaptor (int mid, PyObject *self, PyObject *args, PyObject *kwargs)
 
     //  handle special methods
     if (meth->smt () != gsi::MethodBase::None) {
+
+      if (kwargs != NULL && PyDict_Size (kwargs) > 0) {
+        throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted")));
+      }
 
       ret = special_method_impl (meth->smt (), self, args);
 
@@ -935,6 +939,10 @@ method_init_adaptor (int mid, PyObject *self, PyObject *args, PyObject *kwargs)
       }
 
     } else {
+
+      if (kwargs != NULL && PyDict_Size (kwargs) > 0) {
+        throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted")));
+      }
 
       //  No action required - the object is default-created later once it is really required.
       if (! PyArg_ParseTuple (args, "")) {

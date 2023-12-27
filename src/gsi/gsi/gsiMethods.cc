@@ -195,7 +195,7 @@ type_to_s (const gsi::ArgType &a, bool for_return)
     s += "[]";
     break;
   case gsi::T_map:
-    s += "map&lt;";
+    s += "map<";
     if (a.inner_k ()) {
       s += type_to_s (*a.inner_k (), false);
     }
@@ -203,7 +203,7 @@ type_to_s (const gsi::ArgType &a, bool for_return)
     if (a.inner ()) {
       s += type_to_s (*a.inner (), false);
     }
-    s += "&gt;";
+    s += ">";
     break;
   }
   if (a.is_cptr () || a.is_ptr ()) {

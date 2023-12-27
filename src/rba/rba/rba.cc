@@ -176,9 +176,9 @@ static VALUE
 get_kwarg (const gsi::ArgType &atype, VALUE kwargs)
 {
   if (kwargs != Qnil) {
-    return rb_hash_lookup2 (kwargs, rb_id2sym (rb_intern (atype.spec ()->name ().c_str ())), Qnil);
+    return rb_hash_lookup2 (kwargs, rb_id2sym (rb_intern (atype.spec ()->name ().c_str ())), Qundef);
   } else {
-    return Qnil;
+    return Qundef;
   }
 }
 
@@ -477,7 +477,7 @@ private:
           int i = 0;
           for (gsi::MethodBase::argument_iterator a = (*m)->begin_arguments (); is_valid && a != (*m)->end_arguments (); ++a, ++i) {
             VALUE arg = i >= argc ? get_kwarg (*a, kwargs) : argv[i];
-            if (arg == Qnil) {
+            if (arg == Qundef) {
               is_valid = a->spec ()->has_default ();
             } else if (test_arg (*a, arg, false /*strict*/)) {
               ++sc;
@@ -1060,7 +1060,7 @@ push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, i
     for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments (); ++a, ++iarg) {
 
       VALUE arg = iarg >= argc ? get_kwarg (*a, kwargs) : argv[iarg];
-      if (arg == Qnil) {
+      if (arg == Qundef) {
         if (a->spec ()->has_default ()) {
           if (kwargs_taken == nkwargs) {
             //  leave it to the consumer to establish the default values (that is faster)
@@ -1069,7 +1069,7 @@ push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, i
           tl::Variant def_value = a->spec ()->default_value ();
           gsi::push_arg (arglist, *a, def_value, &heap);
         } else {
-          throw tl::Exception (tl::to_string ("No argument provided (positional or keyword) and no default value available"));
+          throw tl::Exception (tl::to_string (tr ("No argument provided (positional or keyword) and no default value available")));
         }
       } else {
         if (iarg >= argc) {
@@ -1195,9 +1195,17 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
     } else if (meth->smt () != gsi::MethodBase::None) {
 
+      if (kwargs != Qnil && rb_hash_size_num (kwargs) > 0) {
+        throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted")));
+      }
+
       ret = special_method_impl (meth, argc, argv, self, ctor);
 
     } else if (meth->is_signal ()) {
+
+      if (kwargs != Qnil && rb_hash_size_num (kwargs) > 0) {
+        throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted on events")));
+      }
 
       if (p) {
 
@@ -1244,6 +1252,10 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
     } else if (meth->ret_type ().is_iter () && ! rb_block_given_p ()) {
 
       //  calling an iterator method without block -> deliver an enumerator using "to_enum"
+
+      if (kwargs != Qnil && rb_hash_size_num (kwargs) > 0) {
+        throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted on enumerators")));
+      }
 
       static ID id_to_enum = rb_intern ("to_enum");
 

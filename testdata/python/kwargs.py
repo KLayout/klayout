@@ -173,6 +173,14 @@ class KWArgsTest(unittest.TestCase):
       self.assertEqual(str(ex), "Value cannot be converted to a floating-point value for argument #2 ('dbu') in CplxTrans.to_s")
 
     try:
+      t = pya.CplxTrans(1.5, 2.5)
+      tt = pya.CplxTrans()
+      tt.assign(other = t)
+      self.assertEqual(True, False)
+    except Exception as ex:
+      self.assertEqual(str(ex), "Keyword arguments not permitted in CplxTrans.assign")
+
+    try:
       t = pya.CplxTrans("17")
       self.assertEqual(True, False)
     except Exception as ex:

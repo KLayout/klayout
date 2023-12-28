@@ -1085,7 +1085,7 @@ push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, i
       //  check if there are any left-over keyword parameters with unknown names
 
       std::set<std::string> invalid_names;
-      rb_hash_foreach (kwargs, &get_kwargs_keys, reinterpret_cast<VALUE> (&invalid_names));
+      rb_hash_foreach (kwargs, (int (*)(...)) &get_kwargs_keys, (VALUE) &invalid_names);
 
       for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments (); ++a) {
         invalid_names.erase (a->spec ()->name ());

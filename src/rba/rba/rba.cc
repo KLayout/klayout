@@ -176,7 +176,7 @@ static VALUE
 get_kwarg (const gsi::ArgType &atype, VALUE kwargs)
 {
   if (kwargs != Qnil) {
-    return rb_hash_lookup2 (kwargs, rb_id2sym (rb_intern (atype.spec ()->name ().c_str ())), Qundef);
+    return rb_hash_lookup2 (kwargs, ID2SYM (rb_intern (atype.spec ()->name ().c_str ())), Qundef);
   } else {
     return Qundef;
   }
@@ -332,17 +332,17 @@ private:
 
     if (argc >= nargs) {
       //  no more arguments to consider
-      return argc == nargs && (kwargs == Qnil || rb_hash_size_num (kwargs) == 0);
+      return argc == nargs && (kwargs == Qnil || RHASH_SIZE (kwargs) == 0);
     }
 
     if (kwargs != Qnil) {
 
-      int nkwargs = int (rb_hash_size_num (kwargs));
+      int nkwargs = int (RHASH_SIZE (kwargs));
       int kwargs_taken = 0;
 
       while (argc < nargs) {
         const gsi::ArgType &atype = m->begin_arguments () [argc];
-        VALUE rb_arg = rb_hash_lookup2 (kwargs, rb_id2sym (rb_intern (atype.spec ()->name ().c_str ())), Qnil);
+        VALUE rb_arg = rb_hash_lookup2 (kwargs, ID2SYM (rb_intern (atype.spec ()->name ().c_str ())), Qnil);
         if (rb_arg == Qnil) {
           if (! atype.spec ()->has_default ()) {
             return false;
@@ -1053,7 +1053,7 @@ push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, i
 {
   int iarg = 0;
   int kwargs_taken = 0;
-  int nkwargs = kwargs == Qnil ? 0 : int (rb_hash_size_num (kwargs));
+  int nkwargs = kwargs == Qnil ? 0 : int (RHASH_SIZE (kwargs));
 
   try {
 
@@ -1195,7 +1195,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
     } else if (meth->smt () != gsi::MethodBase::None) {
 
-      if (kwargs != Qnil && rb_hash_size_num (kwargs) > 0) {
+      if (kwargs != Qnil && RHASH_SIZE (kwargs) > 0) {
         throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted")));
       }
 
@@ -1203,7 +1203,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
     } else if (meth->is_signal ()) {
 
-      if (kwargs != Qnil && rb_hash_size_num (kwargs) > 0) {
+      if (kwargs != Qnil && RHASH_SIZE (kwargs) > 0) {
         throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted on events")));
       }
 
@@ -1253,7 +1253,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
       //  calling an iterator method without block -> deliver an enumerator using "to_enum"
 
-      if (kwargs != Qnil && rb_hash_size_num (kwargs) > 0) {
+      if (kwargs != Qnil && RHASH_SIZE (kwargs) > 0) {
         throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted on enumerators")));
       }
 

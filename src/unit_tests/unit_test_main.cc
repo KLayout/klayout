@@ -222,6 +222,7 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
   std::vector <tl::TestBase *> failed_tests_e, failed_tests_ne;
   int skipped_ne = 0, skipped_e = 0;
   std::vector <tl::TestBase *> skipped_tests_e, skipped_tests_ne;
+  int successful_ne = 0, successful_e = 0;
 
   for (int e = 0; e < 2; ++e) {
 
@@ -242,6 +243,7 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
       std::vector <tl::TestBase *> failed_tests;
       int skipped = 0;
       std::vector <tl::TestBase *> skipped_tests;
+      int successful = 0;
 
       tl::Timer timer;
 
@@ -292,6 +294,8 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
             ut::noctrl << "Memory: " << timer.memory_size () / 1024 << "k";
             ut::ctrl << "<x-testcase-times wall=\"" << timer.sec_wall () << "\" user=\"" << timer.sec_user () << "\" sys=\"" << timer.sec_sys () << "\" memory=\"" << timer.memory_size () << "\"/>";
 
+            ++successful;
+
           } catch (tl::CancelException &) {
 
             ut::ctrl << "</system-out>";
@@ -335,6 +339,8 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
       ut::noctrl << tl::replicate ("=", ut::TestConsole::instance ()->real_columns ());
       ut::noctrl << "Summary";
 
+      tl::info << "Executed " << (successful + failed) << " test(s) in " << mode << " mode.";
+
       if (skipped > 0) {
         if (e == 0) {
           skipped_tests_ne = skipped_tests;
@@ -357,6 +363,12 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
         tl::warn << failed << " test(s) failed";
       } else {
         tl::info << "All tests passed in " << mode << " mode.";
+      }
+
+      if (e == 0) {
+        successful_ne = successful;
+      } else {
+        successful_e = successful;
       }
 
       ut::ctrl << "</x-summary>";
@@ -420,6 +432,8 @@ run_tests (const std::vector<tl::TestBase *> &selected_tests, bool editable, boo
   ut::noctrl << "Grand Summary";
 
   ut::ctrl << "<x-grand-summary>";
+
+  tl::info << "Executed " << (successful_e + failed_e + successful_ne + failed_ne) << " test(s)";
 
   if (skipped_e + skipped_ne > 0) {
     if (non_editable) {

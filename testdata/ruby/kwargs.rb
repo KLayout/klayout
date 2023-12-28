@@ -210,13 +210,6 @@ class KWArgs_TestClass < TestBase
       assert_equal(ex.to_s.index("No overload with matching arguments."), 0)
     end
 
-    begin
-      t = RBA::Trans::new("17")
-      assert_equal(true, false)
-    rescue => ex
-      assert_equal(ex.to_s.index("No overload with matching arguments."), 0)
-    end
-
   end
 
 end

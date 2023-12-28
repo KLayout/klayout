@@ -651,4 +651,124 @@ TEST(12)
   EXPECT_EQ (v.to_string (), std::string ("r0 *1 1,2"));
   v = e.parse ("var t = CplxTrans.new(mag=1.5)").execute ();
   EXPECT_EQ (v.to_string (), std::string ("r0 *1.5 0,0"));
+  v = e.parse ("var t = CplxTrans.new(1.5, 45, true, 1, 2)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m22.5 *1.5 1,2"));
+  v = e.parse ("var t = CplxTrans.new(1.5, 45, true, DVector.new(1, 2))").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m22.5 *1.5 1,2"));
+  v = e.parse ("var t = CplxTrans.new(1.5, x=1, y=2, mirrx=true, rot=45)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m22.5 *1.5 1,2"));
+  v = e.parse ("var t = CplxTrans.new(CplxTrans.M0)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 *1 0,0"));
+  v = e.parse ("var t = CplxTrans.new(CplxTrans.M0, u=DVector.new(1, 2))").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 *1 1,2"));
+  v = e.parse ("var t = CplxTrans.new(CplxTrans.M0, mag=1.5, u=DVector.new(1, 2))").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 *1.5 1,2"));
+  v = e.parse ("var t = CplxTrans.new(CplxTrans.M0, 1.5, DVector.new(1, 2))").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 *1.5 1,2"));
+  v = e.parse ("var t = CplxTrans.new(CplxTrans.M0, mag=1.5, x=1, y=2)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 *1.5 1,2"));
+  v = e.parse ("var t = CplxTrans.new(CplxTrans.M0, 1.5, 1, 2)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 *1.5 1,2"));
+  v = e.parse ("var t = CplxTrans.new(VCplxTrans.M0)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 *1 0,0"));
+  v = e.parse ("var t = CplxTrans.new(ICplxTrans.M0)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 *1 0,0"));
+  v = e.parse ("var t = CplxTrans.new(DCplxTrans.M0)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 *1 0,0"));
+  v = e.parse ("var t = CplxTrans.new(Trans.M0)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 *1 0,0"));
+  v = e.parse ("var t = CplxTrans.new(Trans.M0, 1.5)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 *1.5 0,0"));
+  v = e.parse ("var t = CplxTrans.new(Trans.M0, mag=1.5)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 *1.5 0,0"));
+  v = e.parse ("var t = CplxTrans.new(t = Trans.M0, mag=1.5)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 *1.5 0,0"));
+  v = e.parse ("var t = CplxTrans.new(); t.disp=[1,2]; t").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("r0 *1 1,2"));
+  v = e.parse ("var t = ICplxTrans.new(15, 25); t.to_s(dbu=0.01)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("r0 *1 0.15000,0.25000"));
+}
+
+TEST(13)
+{
+  //  Keyword arguments are best tested on transformations, here Trans
+
+  tl::Eval e;
+  tl::Variant v;
+
+  v = e.parse ("var t = Trans.new(Trans.M0, 1, 2)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 1,2"));
+  v = e.parse ("var t = Trans.new(Trans.M0, x = 1, y = 2)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 1,2"));
+  v = e.parse ("var t = Trans.new(Trans.M0, Vector.new(1, 2))").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 1,2"));
+  v = e.parse ("var t = Trans.new(Trans.M0, u=Vector.new(1, 2))").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 1,2"));
+  v = e.parse ("var t = Trans.new(rot=3, mirrx=true)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m135 0,0"));
+  v = e.parse ("var t = Trans.new(rot=3, mirrx=true, x=1, y=2)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m135 1,2"));
+  v = e.parse ("var t = Trans.new(3, true, 1, 2)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m135 1,2"));
+  v = e.parse ("var t = Trans.new(3, true, Vector.new(1, 2))").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m135 1,2"));
+  v = e.parse ("var t = Trans.new(rot=3, mirrx=true, u=Vector.new(1, 2))").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m135 1,2"));
+  v = e.parse ("var t = Trans.new()").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("r0 0,0"));
+  v = e.parse ("var t = Trans.new(DTrans.M0)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 0,0"));
+  v = e.parse ("var t = Trans.new(DTrans.M0, 1, 2)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 1,2"));
+  v = e.parse ("var t = Trans.new(DTrans.M0, x=1, y=2)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 1,2"));
+  v = e.parse ("var t = Trans.new(c = DTrans.M0, x=1, y=2)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("m0 1,2"));
+  v = e.parse ("var t = Trans.new(Vector.new(1, 2))").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("r0 1,2"));
+  v = e.parse ("var t = Trans.new(1, 2)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("r0 1,2"));
+}
+
+TEST(14)
+{
+  //  Keyword arguments and errors
+
+  tl::Eval e;
+  tl::Variant v;
+
+  try {
+    v = e.parse("var t = CplxTrans.new(1.5, 2.5); t.to_s(dbu='abc')").execute();
+    EXPECT_EQ (true, false);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg (), "Unexpected text after numeric value: '...abc' (argument 'dbu') at position 34 (...to_s(dbu='abc'))");
+  }
+
+  try {
+    v = e.parse("var t = CplxTrans.new(1.5, 2.5); var tt = CplxTrans.new(); t.assign(other=t)").execute();
+    EXPECT_EQ (true, false);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg ().find ("Keyword arguments not permitted at position 60 (...assign(other=t))"), 0);
+  }
+
+  try {
+    v = e.parse("var t = CplxTrans.new('abc');").execute();
+    EXPECT_EQ (true, false);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg ().find ("No overload with matching arguments. Variants are:"), 0);
+  }
+
+  try {
+    v = e.parse("var t = CplxTrans.new(uu=17);").execute();
+    EXPECT_EQ (true, false);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg ().find ("Can't match arguments. Variants are:"), 0);
+  }
+
+  try {
+    v = e.parse("var t = CplxTrans.new(u='17');").execute();
+    EXPECT_EQ (true, false);
+  } catch (tl::Exception &ex) {
+    EXPECT_EQ (ex.msg ().find ("No overload with matching arguments. Variants are:"), 0);
+  }
 }

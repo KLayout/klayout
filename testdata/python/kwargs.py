@@ -198,12 +198,6 @@ class KWArgsTest(unittest.TestCase):
     except Exception as ex:
       self.assertEqual(str(ex).find("No overload with matching arguments."), 0)
 
-    try:
-      t = pya.Trans("17")
-      self.assertEqual(True, False)
-    except Exception as ex:
-      self.assertEqual(str(ex).find("No overload with matching arguments."), 0)
-
 
 # run unit tests
 if __name__ == '__main__':

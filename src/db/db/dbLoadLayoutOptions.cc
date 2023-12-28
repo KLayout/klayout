@@ -133,7 +133,7 @@ namespace db
         args.push_back (value);
       }
       tl::ExpressionParserContext context;
-      ref.user_cls ()->eval_cls ()->execute (context, out, ref, m, args);
+      ref.user_cls ()->eval_cls ()->execute (context, out, ref, m, args, 0);
 
       ref = out;
 
@@ -160,7 +160,7 @@ namespace db
 
       std::vector<tl::Variant> args;
       tl::ExpressionParserContext context;
-      ref.user_cls ()->eval_cls ()->execute (context, out, ref, m, args);
+      ref.user_cls ()->eval_cls ()->execute (context, out, ref, m, args, 0);
 
       ref = out;
 

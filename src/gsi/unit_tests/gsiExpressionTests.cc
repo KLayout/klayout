@@ -564,7 +564,7 @@ class CollectFunction
   : public tl::EvalFunction
 {
 public:
-  virtual void execute (const tl::ExpressionParserContext & /*context*/, tl::Variant &out, const std::vector<tl::Variant> &args) const
+  virtual void execute (const tl::ExpressionParserContext & /*context*/, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
   {
     out = tl::Variant ();
     if (args.size () > 0) {
@@ -622,4 +622,33 @@ TEST(11)
   //  mapping of *! to *:
   v = e.parse ("var b = Trans.new(1)*Trans.new(Vector.new(10, 20))").execute ();
   EXPECT_EQ (v.to_string (), std::string ("r90 -20,10"));
+}
+
+TEST(12)
+{
+  //  Keyword arguments are best tested on transformations, here CplxTrans
+
+  tl::Eval e;
+  tl::Variant v;
+
+  v = e.parse ("var t = CplxTrans.new()").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("r0 *1 0,0"));
+  v = e.parse ("var t = CplxTrans.new(1.5)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("r0 *1.5 0,0"));
+  v = e.parse ("var t = CplxTrans.new(1, 2)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("r0 *1 1,2"));
+  v = e.parse ("var t = CplxTrans.new(1, y=2)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("r0 *1 1,2"));
+  v = e.parse ("var t = CplxTrans.new(x=1, y=2)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("r0 *1 1,2"));
+  v = e.parse ("var t = CplxTrans.new(u=DVector.new(1, 2))").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("r0 *1 1,2"));
+  v = e.parse ("var t = CplxTrans.new(DVector.new(1, 2))").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("r0 *1 1,2"));
+  v = e.parse ("var t = CplxTrans.new(u=Vector.new(1, 2))").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("r0 *1 1,2"));
+  v = e.parse ("var t = CplxTrans.new(u=[1, 2])").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("r0 *1 1,2"));
+  v = e.parse ("var t = CplxTrans.new(mag=1.5)").execute ();
+  EXPECT_EQ (v.to_string (), std::string ("r0 *1.5 0,0"));
 }

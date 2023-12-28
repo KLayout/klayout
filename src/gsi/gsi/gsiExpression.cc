@@ -266,9 +266,15 @@ public:
     //  .. nothing yet ..
   }
 
-  void execute (const tl::ExpressionParserContext & /*context*/, tl::Variant &out, const std::vector<tl::Variant> &args) const 
+  bool supports_keyword_parameters () const
   {
-    if (! args.empty ()) {
+    //  for future extensions
+    return true;
+  }
+
+  void execute (const tl::ExpressionParserContext & /*context*/, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const
+  {
+    if (! args.empty () || kwargs) {
       throw tl::Exception (tl::to_string (tr ("Class '%s' is not a function - use 'new' to create a new object")), mp_var_cls->name ());
     }
     out = tl::Variant ((void *) 0, mp_var_cls, false);
@@ -532,12 +538,12 @@ VariantUserClassImpl::to_double_impl (void *obj) const
 }
 
 void
-VariantUserClassImpl::execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args) const
+VariantUserClassImpl::execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const
 {
   if (mp_object_cls == 0 && method == "is_a") {
 
-    if (args.size () != 1) {
-      throw tl::EvalError (tl::to_string (tr ("'is_a' method requires exactly one argument")), context);
+    if (args.size () != 1 || kwargs) {
+      throw tl::EvalError (tl::to_string (tr ("'is_a' method requires exactly one argument (no keyword arguments)")), context);
     }
 
     bool ret = false;
@@ -550,7 +556,7 @@ VariantUserClassImpl::execute (const tl::ExpressionParserContext &context, tl::V
 
     out = ret;
 
-  } else if (mp_object_cls != 0 && method == "new" && args.size () == 0) {
+  } else if (mp_object_cls != 0 && method == "new" && args.size () == 0 && ! kwargs) {
 
     void *obj = mp_cls->create ();
     if (obj) {
@@ -574,8 +580,8 @@ VariantUserClassImpl::execute (const tl::ExpressionParserContext &context, tl::V
 
   } else if (mp_object_cls == 0 && method == "dup") {
 
-    if (args.size () != 0) {
-      throw tl::EvalError (tl::to_string (tr ("'dup' method does not allow arguments")), context);
+    if (args.size () != 0 || kwargs) {
+      throw tl::EvalError (tl::to_string (tr ("'dup' method does not allow arguments (no keyword arguments)")), context);
     }
 
     void *obj = mp_cls->create ();
@@ -602,7 +608,7 @@ VariantUserClassImpl::execute (const tl::ExpressionParserContext &context, tl::V
 
   } else {
     try {
-      execute_gsi (context, out, object, method, args);
+      execute_gsi (context, out, object, method, args, kwargs);
     } catch (tl::EvalError &) {
       throw;
     } catch (tl::Exception &ex) {
@@ -709,8 +715,92 @@ static const gsi::ClassBase *find_class_scope (const gsi::ClassBase *cls, const 
   return 0;
 }
 
+inline int
+num_args (const gsi::MethodBase *m)
+{
+  return int (m->end_arguments () - m->begin_arguments ());
+}
+
+static bool
+compatible_with_args (const gsi::MethodBase *m, int argc, const std::map<std::string, tl::Variant> *kwargs)
+{
+  int nargs = num_args (m);
+
+  if (argc >= nargs) {
+    //  no more arguments to consider
+    return argc == nargs && (! kwargs || kwargs->empty ());
+  }
+
+  if (kwargs) {
+
+    int nkwargs = int (kwargs->size ());
+    int kwargs_taken = 0;
+
+    while (argc < nargs) {
+      const gsi::ArgType &atype = m->begin_arguments () [argc];
+      auto i = kwargs->find (atype.spec ()->name ());
+      if (i == kwargs->end ()) {
+        if (! atype.spec ()->has_default ()) {
+          return false;
+        }
+      } else {
+        ++kwargs_taken;
+      }
+      ++argc;
+    }
+
+    //  matches if all keyword arguments are taken
+    return kwargs_taken == nkwargs;
+
+  } else {
+
+    while (argc < nargs) {
+      const gsi::ArgType &atype = m->begin_arguments () [argc];
+      if (! atype.spec ()->has_default ()) {
+        return false;
+      }
+      ++argc;
+    }
+
+    return true;
+
+  }
+}
+
+static std::string
+describe_overload (const gsi::MethodBase *m, int argc, const std::map<std::string, tl::Variant> *kwargs)
+{
+  std::string res = m->to_string ();
+  if (compatible_with_args (m, argc, kwargs)) {
+    res += " " + tl::to_string (tr ("[match candidate]"));
+  }
+  return res;
+}
+
+static std::string
+describe_overloads (const ExpressionMethodTable *mt, int mid, int argc, const std::map<std::string, tl::Variant> *kwargs)
+{
+  std::string res;
+  for (auto m = mt->begin (mid); m != mt->end (mid); ++m) {
+    res += std::string ("  ") + describe_overload (*m, argc, kwargs) + "\n";
+  }
+  return res;
+}
+
+static const tl::Variant *
+get_kwarg (const gsi::ArgType &atype, const std::map<std::string, tl::Variant> *kwargs)
+{
+  if (kwargs) {
+    auto i = kwargs->find (atype.spec ()->name ());
+    if (i != kwargs->end ()) {
+      return &i->second;
+    }
+  }
+  return 0;
+}
+
 void
-VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context*/, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args) const
+VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context*/, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const
 {
   tl_assert (object.is_user ());
 
@@ -762,7 +852,7 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
       throw tl::Exception (tl::sprintf (tl::to_string (tr ("Signals are not supported inside expressions (event %s)")), method.c_str ()));
     } else if ((*m)->is_callback()) {
       //  ignore callbacks
-    } else if ((*m)->compatible_with_num_args ((unsigned int) args.size ())) {
+    } else if (compatible_with_args (*m, int (args.size ()), kwargs)) {
       ++candidates;
       meth = *m;
     }
@@ -771,20 +861,7 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
 
   //  no candidate -> error
   if (! meth) {
-
-    std::set<unsigned int> nargs;
-    for (ExpressionMethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
-      nargs.insert (std::distance ((*m)->begin_arguments (), (*m)->end_arguments ()));
-    }
-    std::string nargs_s;
-    for (std::set<unsigned int>::const_iterator na = nargs.begin (); na != nargs.end (); ++na) {
-      if (na != nargs.begin ()) {
-        nargs_s += "/";
-      }
-      nargs_s += tl::to_string (*na);
-    }
-
-    throw tl::Exception (tl::sprintf (tl::to_string (tr ("Invalid number of arguments for method %s, class %s (got %d, expected %s)")), method.c_str (), mp_cls->name (), int (args.size ()), nargs_s));
+    throw tl::Exception (tl::to_string (tr ("Can't match arguments. Variants are:\n")) + describe_overloads (mt, mid, int (args.size ()), kwargs));
   }
 
   //  more than one candidate -> refine by checking the arguments
@@ -800,13 +877,16 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
       if (! (*m)->is_callback () && ! (*m)->is_signal ()) {
 
         //  check arguments (count and type)
-        bool is_valid = (*m)->compatible_with_num_args ((unsigned int) args.size ());
+        bool is_valid = compatible_with_args (*m, (int) args.size (), kwargs);
         int sc = 0;
         int i = 0;
-        for (gsi::MethodBase::argument_iterator a = (*m)->begin_arguments (); is_valid && i < int (args.size ()) && a != (*m)->end_arguments (); ++a, ++i) {
-          if (gsi::test_arg (*a, args [i], false /*strict*/)) {
+        for (gsi::MethodBase::argument_iterator a = (*m)->begin_arguments (); is_valid && a != (*m)->end_arguments (); ++a, ++i) {
+          const tl::Variant *arg = i >= int (args.size ()) ? get_kwarg (*a, kwargs) : &args[i];
+          if (! arg) {
+            is_valid = a->spec ()->has_default ();
+          } else if (gsi::test_arg (*a, *arg, false /*strict*/)) {
             ++sc;
-          } else if (test_arg (*a, args [i], true /*loose*/)) {
+          } else if (test_arg (*a, *arg, true /*loose*/)) {
             //  non-scoring match
           } else {
             is_valid = false;
@@ -831,12 +911,17 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
 
         if (is_valid) {
 
-          //  otherwise take the candidate with the better score
-          if (candidates > 0 && sc > score) {
-            candidates = 1;
-            meth = *m;
-            score = sc;
-          } else if (candidates == 0 || sc == score) {
+          //  otherwise take the candidate with the better score or the least number of arguments (faster)
+          if (candidates > 0) {
+            if (sc > score || (sc == score && num_args (meth) > num_args (*m))) {
+              candidates = 1;
+              meth = *m;
+              score = sc;
+            } else if (sc == score && num_args (meth) == num_args (*m)) {
+              ++candidates;
+              meth = *m;
+            }
+          } else {
             ++candidates;
             meth = *m;
             score = sc;
@@ -851,11 +936,11 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
   }
 
   if (! meth) {
-    throw tl::Exception (tl::sprintf (tl::to_string (tr ("No method with matching arguments for method %s, class %s")), method.c_str (), mp_cls->name ()));
+    throw tl::Exception (tl::to_string (tr ("No overload with matching arguments. Variants are:\n")) + describe_overloads (mt, mid, int (args.size ()), kwargs));
   }
 
   if (candidates > 1) {
-    throw tl::Exception (tl::sprintf (tl::to_string (tr ("Ambiguous overload variants for method %s, class %s - multiple method declarations match arguments")), method.c_str (), mp_cls->name ()));
+    throw tl::Exception (tl::to_string (tr ("Ambiguous overload variants - multiple method declarations match arguments. Variants are:\n")) + describe_overloads (mt, mid, int (args.size ()), kwargs));
   }
 
   if (m_is_const && ! meth->is_const ()) {
@@ -869,22 +954,76 @@ VariantUserClassImpl::execute_gsi (const tl::ExpressionParserContext & /*context
 
   } else if (meth->smt () != gsi::MethodBase::None) {
 
+    if (kwargs) {
+      throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted")));
+    }
+
     out = special_method_impl (meth->smt (), object, args);
 
   } else {
 
     gsi::SerialArgs arglist (meth->argsize ());
     tl::Heap heap;
-    size_t narg = 0;
-    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && narg < args.size (); ++a, ++narg) {
+
+    int iarg = 0;
+    int kwargs_taken = 0;
+    int nkwargs = kwargs ? int (kwargs->size ()) : 0;
+
+    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments (); ++a, ++iarg) {
+
       try {
-        //  Note: this const_cast is ugly, but it will basically enable "out" parameters
-        //  TODO: clean this up.
-        gsi::push_arg (arglist, *a, const_cast<tl::Variant &> (args [narg]), &heap);
+
+        const tl::Variant *arg = iarg >= int (args.size ()) ? get_kwarg (*a, kwargs) : &args[iarg];
+        if (! arg) {
+          if (a->spec ()->has_default ()) {
+            if (kwargs_taken == nkwargs) {
+              //  leave it to the consumer to establish the default values (that is faster)
+              break;
+            }
+            tl::Variant def_value = a->spec ()->default_value ();
+            gsi::push_arg (arglist, *a, def_value, &heap);
+          } else {
+            throw tl::Exception (tl::to_string ("No argument provided (positional or keyword) and no default value available"));
+          }
+        } else {
+          if (iarg >= int (args.size ())) {
+            ++kwargs_taken;
+          }
+          //  Note: this const_cast is ugly, but it will basically enable "out" parameters
+          //  TODO: clean this up.
+          gsi::push_arg (arglist, *a, const_cast<tl::Variant &> (*arg), &heap);
+        }
+
       } catch (tl::Exception &ex) {
         std::string msg = ex.msg () + tl::sprintf (tl::to_string (tr (" (argument '%s')")), a->spec ()->name ());
         throw tl::Exception (msg);
       }
+
+    }
+
+    if (kwargs_taken != nkwargs) {
+
+      //  check if there are any left-over keyword parameters with unknown names
+
+      std::set<std::string> valid_names;
+      for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments (); ++a) {
+        valid_names.insert (a->spec ()->name ());
+      }
+
+      std::set<std::string> invalid_names;
+      for (auto i = kwargs->begin (); i != kwargs->end (); ++i) {
+        if (valid_names.find (i->first) == valid_names.end ()) {
+          invalid_names.insert (i->first);
+        }
+      }
+
+      if (invalid_names.size () > 1) {
+        std::string names_str = tl::join (invalid_names.begin (), invalid_names.end (), ", ");
+        throw tl::Exception (tl::to_string (tr ("Unknown keyword parameters: ")) + names_str);
+      } else if (invalid_names.size () == 1) {
+        throw tl::Exception (tl::to_string (tr ("Unknown keyword parameter: ")) + *invalid_names.begin ());
+      }
+
     }
 
     SerialArgs retlist (meth->retsize ());

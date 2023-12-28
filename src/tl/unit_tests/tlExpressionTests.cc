@@ -445,7 +445,7 @@ private:
 class BoxClassClass : public tl::VariantUserClassBase, private tl::EvalClass
 {
 public:
-  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args) const;
+  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const;
 
   virtual void *create () const { tl_assert (false); }
   virtual void destroy (void *) const { tl_assert (false); }
@@ -473,7 +473,7 @@ BoxClassClass BoxClassClass::instance;
 class BoxClass : public tl::VariantUserClassImpl<Box>, private tl::EvalClass
 {
 public:
-  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args) const;
+  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const;
 
   virtual const tl::EvalClass *eval_cls () const { return this; }
   static BoxClass instance;
@@ -481,7 +481,7 @@ public:
 
 BoxClass BoxClass::instance;
 
-void BoxClass::execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args) const 
+void BoxClass::execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
 {
   if (method == "width") {
     out = object.to_user<Box> ().width ();
@@ -501,7 +501,7 @@ void BoxClass::execute (const tl::ExpressionParserContext &context, tl::Variant 
   }
 }
 
-void BoxClassClass::execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant & /*object*/, const std::string &method, const std::vector<tl::Variant> &args) const 
+void BoxClassClass::execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant & /*object*/, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
 {
   if (method == "new") {
     out = tl::Variant (new Box (args[0].to_long(), args[1].to_long(), args[2].to_long(), args[3].to_long()), &BoxClass::instance, true);
@@ -513,7 +513,7 @@ void BoxClassClass::execute (const tl::ExpressionParserContext &context, tl::Var
 class EdgeClassClass : public tl::VariantUserClassBase, private tl::EvalClass
 {
 public:
-  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args) const;
+  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const;
 
   virtual void *create () const { tl_assert (false); }
   virtual void destroy (void *) const { tl_assert (false); }
@@ -541,7 +541,7 @@ EdgeClassClass EdgeClassClass::instance;
 class EdgeClass : public tl::VariantUserClassImpl<Edge>,  private tl::EvalClass
 {
 public:
-  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args) const 
+  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
   {
     if (method == "dx") {
       out = object.to_user<Edge> ().dx ();
@@ -566,7 +566,7 @@ public:
 EdgeClass EdgeClass::instance;
 
 void 
-EdgeClassClass::execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant & /*object*/, const std::string &method, const std::vector<tl::Variant> &args) const 
+EdgeClassClass::execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant & /*object*/, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
 {
   if (method == "new") {
     out = tl::Variant (new Edge (args[0].to_long(), args[1].to_long(), args[2].to_long(), args[3].to_long()), &EdgeClass::instance, true);
@@ -996,7 +996,7 @@ class F0
   : public tl::EvalFunction
 {
 public:
-  void execute (const tl::ExpressionParserContext &, tl::Variant &out, const std::vector <tl::Variant> &) const
+  void execute (const tl::ExpressionParserContext &, tl::Variant &out, const std::vector <tl::Variant> &, const std::map<std::string, tl::Variant> *) const
   {
     out = tl::Variant (17);
   }
@@ -1006,7 +1006,7 @@ class F1
   : public tl::EvalFunction
 {
 public:
-  void execute (const tl::ExpressionParserContext &, tl::Variant &out, const std::vector <tl::Variant> &vv) const
+  void execute (const tl::ExpressionParserContext &, tl::Variant &out, const std::vector <tl::Variant> &vv, const std::map<std::string, tl::Variant> *) const
   {
     out = tl::Variant (vv[0].to_long() + 1);
   }
@@ -1016,7 +1016,7 @@ class F2
   : public tl::EvalFunction
 {
 public:
-  void execute (const tl::ExpressionParserContext &, tl::Variant &out, const std::vector <tl::Variant> &vv) const
+  void execute (const tl::ExpressionParserContext &, tl::Variant &out, const std::vector <tl::Variant> &vv, const std::map<std::string, tl::Variant> *) const
   {
     out = tl::Variant (vv[0].to_long() + 2);
   }
@@ -1026,7 +1026,7 @@ class F3
   : public tl::EvalFunction
 {
 public:
-  void execute (const tl::ExpressionParserContext &, tl::Variant &out, const std::vector <tl::Variant> &vv) const
+  void execute (const tl::ExpressionParserContext &, tl::Variant &out, const std::vector <tl::Variant> &vv, const std::map<std::string, tl::Variant> *) const
   {
     out = tl::Variant (vv[0].to_long() + 3);
   }

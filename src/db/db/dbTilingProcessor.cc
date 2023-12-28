@@ -487,7 +487,7 @@ public:
     //  .. nothing yet ..
   }
 
-  void execute (const tl::ExpressionParserContext & /*context*/, tl::Variant &out, const std::vector<tl::Variant> &args) const
+  void execute (const tl::ExpressionParserContext & /*context*/, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
   {
     out = mp_proc->receiver (args);
   }
@@ -506,7 +506,7 @@ public:
     //  .. nothing yet ..
   }
 
-  void execute (const tl::ExpressionParserContext & /*context*/, tl::Variant & /*out*/, const std::vector<tl::Variant> &args) const 
+  void execute (const tl::ExpressionParserContext & /*context*/, tl::Variant & /*out*/, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
   {
     mp_proc->put (m_ix, m_iy, m_tile_box, args);
   }
@@ -526,7 +526,7 @@ public:
     //  .. nothing yet ..
   }
 
-  void execute (const tl::ExpressionParserContext & /*context*/, tl::Variant & /*out*/, const std::vector<tl::Variant> & /*args*/) const 
+  void execute (const tl::ExpressionParserContext & /*context*/, tl::Variant & /*out*/, const std::vector<tl::Variant> & /*args*/, const std::map<std::string, tl::Variant> * /*kwargs*/) const
   {
     // TODO: ... implement ..
   }

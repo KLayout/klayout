@@ -531,11 +531,11 @@ private:
     }
 
     if (! meth) {
-      throw tl::TypeError (tl::to_string (tr ("No overload with matching arguments. Variants are:\n")) + describe_overloads (argc, kwargs));
+      throw tl::Exception (tl::to_string (tr ("No overload with matching arguments. Variants are:\n")) + describe_overloads (argc, kwargs));
     }
 
     if (candidates > 1) {
-      throw tl::TypeError (tl::to_string (tr ("Ambiguous overload variants - multiple method declarations match arguments. Variants are:\n")) + describe_overloads (argc, kwargs));
+      throw tl::Exception (tl::to_string (tr ("Ambiguous overload variants - multiple method declarations match arguments. Variants are:\n")) + describe_overloads (argc, kwargs));
     }
 
     if (is_const && ! meth->is_const ()) {

@@ -55,7 +55,7 @@ public:
   int to_int_impl (void *) const;
   double to_double_impl (void *) const;
 
-  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args) const;
+  virtual void execute (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const;
 
   void initialize (const gsi::ClassBase *cls, const tl::VariantUserClassBase *self, const tl::VariantUserClassBase *object_cls, bool is_const);
 
@@ -64,7 +64,7 @@ private:
   const tl::VariantUserClassBase *mp_self, *mp_object_cls;
   bool m_is_const;
 
-  virtual void execute_gsi (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args) const;
+  virtual void execute_gsi (const tl::ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs = 0) const;
 
   bool has_method (const std::string &method) const;
 };

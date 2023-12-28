@@ -84,7 +84,7 @@ template<class T, bool> struct _var_user_to_string_impl;
 template<class T>
 struct _var_user_to_string_impl<T, true>
 {
-  static std::string call (const T *a, const VariantUserClassImpl * /*delegate*/) { return a->to_string (); }
+  static std::string call (const T *a, const VariantUserClassImpl * /*delegate*/) { return a ? a->to_string () : std::string (); }
 };
 
 template<class T>

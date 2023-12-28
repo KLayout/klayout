@@ -92,7 +92,7 @@ module D25
       macro = RBA::Macro::macro_by_path(script)
       macro || raise("Can't find D25 script #{script} - unable to re-run")
 
-      D25Executable::new(macro, @interpreter, self.generator("script" => script))
+      D25Executable::new(macro, @interpreter, self.generator({ "script" => script }, 0))
       
     end
 
@@ -129,7 +129,7 @@ module D25
     
     # Implements the execute method
     def executable(macro)
-      D25Executable::new(macro, self, @recipe.generator("script" => macro.path))
+      D25Executable::new(macro, self, @recipe.generator({ "script" => macro.path }, 0))
     end
     
   end
@@ -156,7 +156,7 @@ module D25
     
     # Implements the execute method
     def executable(macro)
-      D25Executable::new(macro, self, @recipe.generator("script" => macro.path))
+      D25Executable::new(macro, self, @recipe.generator({ "script" => macro.path }, 0))
     end
     
   end

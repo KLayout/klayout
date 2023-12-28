@@ -91,7 +91,7 @@ module LVS
       macro = RBA::Macro::macro_by_path(script)
       macro || raise("Can't find LVS script #{script} - unable to re-run")
 
-      LVSExecutable::new(macro, @interpreter, self.generator("script" => script), params["l2ndb_index"])
+      LVSExecutable::new(macro, @interpreter, self.generator({ "script" => script }, 0), params["l2ndb_index"])
       
     end
 
@@ -128,7 +128,7 @@ module LVS
     
     # Implements the execute method
     def executable(macro)
-      LVSExecutable::new(macro, self, @recipe.generator("script" => macro.path))
+      LVSExecutable::new(macro, self, @recipe.generator({ "script" => macro.path }, 0))
     end
     
   end
@@ -155,7 +155,7 @@ module LVS
     
     # Implements the execute method
     def executable(macro)
-      LVSExecutable::new(macro, self, @recipe.generator("script" => macro.path))
+      LVSExecutable::new(macro, self, @recipe.generator({ "script" => macro.path }, 0))
     end
     
   end

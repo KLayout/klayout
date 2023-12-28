@@ -301,10 +301,10 @@ class Tl_TestClass < TestBase
     assert_equal(my_recipe.name, "rba_test_recipe")
     assert_equal(my_recipe.description, "description")
 
-    g = my_recipe.generator({ "A" => 6, "B" => 7.0 })
+    g = my_recipe.generator({ "A" => 6, "B" => 7.0 }, 0)
     assert_equal(g, "rba_test_recipe: A=#6,B=##7")
     assert_equal("%g" % RBA::Recipe::make(g), "42")
-    assert_equal("%g" % RBA::Recipe::make(g, { "C" => 1.5 }).to_s, "63")
+    assert_equal("%g" % RBA::Recipe::make(g, { "C" => 1.5 }, 0).to_s, "63")
 
     my_recipe._destroy
     my_recipe = nil

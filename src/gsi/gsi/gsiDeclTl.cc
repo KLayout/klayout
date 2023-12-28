@@ -693,9 +693,9 @@ static Recipe_Impl *make_recipe (const std::string &name, const std::string &des
   return new Recipe_Impl (name, description);
 }
 
-static tl::Variant make_impl (Recipe_Impl *recipe, const std::string &generator, const std::map<std::string, tl::Variant> &add_params, int /*dummy*/)
+static tl::Variant make_impl (const std::string &generator, const std::map<std::string, tl::Variant> &add_params, int /*dummy*/)
 {
-  return recipe->make (generator, add_params);
+  return Recipe_Impl::make (generator, add_params);
 }
 
 std::string generator_impl (Recipe_Impl *recipe, const std::map<std::string, tl::Variant> &params, int /*dummy*/)
@@ -713,7 +713,7 @@ Class<Recipe_Impl> decl_Recipe_Impl ("tl", "Recipe",
   gsi::method ("description", &Recipe_Impl::description,
     "@brief Gets the description of the recipe."
   ) +
-  gsi::method_ext ("make", &make_impl, gsi::arg ("generator"), gsi::arg ("add_params", std::map<std::string, tl::Variant> (), "{}"), gsi::arg ("dummy", 0),
+  gsi::method ("make", &make_impl, gsi::arg ("generator"), gsi::arg ("add_params", std::map<std::string, tl::Variant> (), "{}"), gsi::arg ("dummy", 0),
     "@brief Executes the recipe given by the generator string.\n"
     "The generator string is the one delivered with \\generator.\n"
     "Additional parameters can be passed in \"add_params\". They have lower priority than the parameters "

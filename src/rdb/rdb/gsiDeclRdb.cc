@@ -819,7 +819,7 @@ Class<rdb::Item> decl_RdbItem ("rdb", "RdbItem",
     "\n"
     "This method has been added in version 0.28."
   ) +
-  gsi::method ("image=", static_cast<void (rdb::Item::*) (const tl::PixelBuffer &)> (&rdb::Item::set_image),
+  gsi::method ("image=", static_cast<void (rdb::Item::*) (const tl::PixelBuffer &)> (&rdb::Item::set_image), gsi::arg ("buffer"),
     "@brief Sets the attached image from a PixelBuffer object\n"
     "\n"
     "This method has been added in version 0.28."

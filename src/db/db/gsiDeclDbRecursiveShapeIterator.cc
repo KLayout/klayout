@@ -396,7 +396,7 @@ Class<db::RecursiveShapeIterator> decl_RecursiveShapeIterator ("db", "RecursiveS
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
-  gsi::method_ext ("global_dtrans=", &si_set_global_dtrans,
+  gsi::method_ext ("global_dtrans=", &si_set_global_dtrans, gsi::arg ("t"),
     "@brief Sets the global transformation to apply to all shapes delivered (transformation in micrometer units)\n"
     "The global transformation will be applied to all shapes delivered by biasing the \"trans\" attribute.\n"
     "The search regions apply to the coordinate space after global transformation.\n"

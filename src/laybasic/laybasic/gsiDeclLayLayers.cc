@@ -1028,7 +1028,7 @@ Class<lay::LayerProperties> decl_LayerProperties ("lay", "LayerProperties",
     "\n"
     "This method has been introduced in version 0.22."
   ) +
-  method_ext ("lower_hier_level_mode", &get_lower_hier_level_mode, 
+  method_ext ("lower_hier_level_mode", &get_lower_hier_level_mode, gsi::arg ("real"),
     "@brief Gets the mode for the lower hierarchy level.\n"
     "@param real If true, the computed value is returned, otherwise the local node value\n"
     "\n"
@@ -1036,7 +1036,7 @@ Class<lay::LayerProperties> decl_LayerProperties ("lay", "LayerProperties",
     "\n"
     "This method has been introduced in version 0.20.\n"
   ) +
-  method_ext ("lower_hier_level_mode", &get_lower_hier_level_mode_1, 
+  method_ext ("lower_hier_level_mode", &get_lower_hier_level_mode_1,
     "@brief Gets the mode for the lower hierarchy level.\n"
     "\n"
     "This method is a convenience method for \"lower_hier_level_mode(true)\"\n"

@@ -319,7 +319,7 @@ namespace gsi
     gsi::method ("clear", &db::LayerMap::clear, 
       "@brief Clears the map\n"
     ) +
-    gsi::method ("from_string", &db::LayerMap::from_string_file_format,
+    gsi::method ("from_string", &db::LayerMap::from_string_file_format, gsi::arg ("s"),
       "@brief Creates a layer map from the given string\n"
       "The format of the string is that used in layer mapping files: one mapping entry "
       "per line, comments are allowed using '#' or '//'. The format of each line is that "

@@ -158,10 +158,10 @@ Class<ArgType> decl_ArgType ("tl", "ArgType",
     "@brief Returns the name for this argument or an empty string if the argument is not named\n"
     "Applies to arguments only. This method has been introduced in version 0.24."
   ) +
-  gsi::method ("==", &ArgType::operator==,
+  gsi::method ("==", &ArgType::operator==, gsi::arg ("other"),
     "@brief Equality of two types\n"
   ) +
-  gsi::method ("!=", &ArgType::operator!=,
+  gsi::method ("!=", &ArgType::operator!=, gsi::arg ("other"),
     "@brief Inequality of two types\n"
   ),
   "@hide"
@@ -230,7 +230,7 @@ Class<MethodBase> decl_Method ("tl", "Method",
     "\n"
     "This method has been introduced in version 0.24."
   ) +
-  gsi::method ("accepts_num_args", &MethodBase::compatible_with_num_args,
+  gsi::method ("accepts_num_args", &MethodBase::compatible_with_num_args, gsi::arg ("n"),
     "@brief True, if this method is compatible with the given number of arguments\n"
     "\n"
     "This method has been introduced in version 0.24."
@@ -275,6 +275,12 @@ Class<MethodBase> decl_Method ("tl", "Method",
     "The primary name is the first name of a sequence of aliases.\n"
     "\n"
     "This method has been introduced in version 0.24."
+  ) +
+  gsi::method ("to_s", &MethodBase::to_string,
+    "@brief Describes the method\n"
+    "This attribute returns a string description of the method and its signature.\n"
+    "\n"
+    "This method has been introduced in version 0.29."
   ) +
   gsi::method ("doc", &MethodBase::doc,
     "@brief The documentation string for this method\n"

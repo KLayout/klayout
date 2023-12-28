@@ -276,7 +276,7 @@ Class<db::Device> decl_dbDevice (decl_dbNetlistObject, "db", "Device",
     "@brief Gets the device abstract for this device instance.\n"
     "See \\DeviceAbstract for more details.\n"
   ) +
-  gsi::method ("device_abstract=", &db::Device::set_device_abstract,
+  gsi::method ("device_abstract=", &db::Device::set_device_abstract, gsi::arg ("device_abstract"),
     "@hide\n"
     "Provided for test purposes mainly. Be careful with pointers!"
   ) +
@@ -838,7 +838,7 @@ Class<db::DeviceParameterDefinition> decl_dbDeviceParameterDefinition ("db", "De
     "For parameters in micrometers - for example W and L of MOS devices - this factor can be set to 1e-6 to reflect "
     "the unit."
   ) +
-  gsi::method ("si_scaling=", &db::DeviceParameterDefinition::set_si_scaling,
+  gsi::method ("si_scaling=", &db::DeviceParameterDefinition::set_si_scaling, gsi::arg ("flag"),
     "@brief Sets the scaling factor to SI units.\n"
     "\n"
     "This setter has been added in version 0.28.6."
@@ -850,7 +850,7 @@ Class<db::DeviceParameterDefinition> decl_dbDeviceParameterDefinition ("db", "De
     "\n"
     "This attribute has been added in version 0.28.6."
   ) +
-  gsi::method ("geo_scaling_exponent=", &db::DeviceParameterDefinition::set_geo_scaling_exponent,
+  gsi::method ("geo_scaling_exponent=", &db::DeviceParameterDefinition::set_geo_scaling_exponent, gsi::arg ("expo"),
     "@brief Sets the geometry scaling exponent.\n"
     "See \\geo_scaling_exponent for details.\n"
     "\n"
@@ -1979,7 +1979,7 @@ Class<db::Netlist> decl_dbNetlist ("db", "Netlist",
     "@brief Flattens all circuits of the netlist\n"
     "After calling this method, only the top circuits will remain."
   ) +
-  gsi::method ("flatten_circuits", &db::Netlist::flatten_circuits,
+  gsi::method ("flatten_circuits", &db::Netlist::flatten_circuits, gsi::arg ("circuits"),
     "@brief Flattens all given circuits of the netlist\n"
     "This method is equivalent to calling \\flatten_circuit for all given circuits, but more efficient.\n"
     "\n"
@@ -2333,7 +2333,7 @@ Class<db::NetlistSpiceWriter> db_NetlistSpiceWriter (db_NetlistWriter, "db", "Ne
   gsi::constructor ("new", &new_spice_writer,
     "@brief Creates a new writer without delegate.\n"
   ) +
-  gsi::constructor ("new", &new_spice_writer2,
+  gsi::constructor ("new", &new_spice_writer2, gsi::arg ("delegate"),
     "@brief Creates a new writer with a delegate.\n"
   ) +
   gsi::method ("use_net_names=", &db::NetlistSpiceWriter::set_use_net_names, gsi::arg ("f"),

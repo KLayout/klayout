@@ -597,6 +597,7 @@ TEST(Bug_1474)
     EXPECT_EQ (false, true);
   } catch (tl::CancelException &ex) {
     //  Seen when private test data is not installed
+    throw;
   } catch (tl::Exception &ex) {
     EXPECT_EQ (ex.msg (), "Cell named ADDHX2 with ID 4 was already given name SEDFFTRX2 (position=763169, cell=)");
   }

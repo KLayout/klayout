@@ -1147,15 +1147,6 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
   RBA_TRY
 
-    VALUE kwargs = Qnil;
-    bool check_last = true;
-#if HAVE_RUBY_VERSION_CODE>=20700
-    check_last = rb_keyword_given_p ();
-#endif
-    if (check_last && argc > 0 && RB_TYPE_P (argv[argc - 1], T_HASH)) {
-      kwargs = argv[--argc];
-    }
-
     tl::Heap heap;
 
     const gsi::ClassBase *cls_decl;
@@ -1186,6 +1177,36 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
       tl_assert (mt);
 
     }
+
+    //  Check for keyword arguments ..
+
+    VALUE kwargs = Qnil;
+    bool check_last = true;
+#if HAVE_RUBY_VERSION_CODE>=20700
+    check_last = rb_keyword_given_p ();
+#endif
+
+    //  This is a heuristics to distinguish methods that are potential candidates for
+    //  accepting a keyword argument. Problem is that Ruby confuses function calls with
+    //  keyword arguments with arguments that take a single hash argument.
+    //  We accept only methods here as candidates that do not have a last argument which
+    //  is a map.
+    //  For compatibility we do this check also for Ruby >=2.7 which supports rb_keyword_given_p.
+    if (check_last) {
+      const MethodTableEntry &e = mt->entry (mid);
+      for (auto m = e.begin (); m != e.end () && check_last; ++m) {
+        auto a = (*m)->end_arguments ();
+        if (a != (*m)->begin_arguments () && (--a)->type () == gsi::T_map) {
+          check_last = false;
+        }
+      }
+    }
+
+    if (check_last && argc > 0 && RB_TYPE_P (argv[argc - 1], T_HASH)) {
+      kwargs = argv[--argc];
+    }
+
+    //  Identify the matching variant
 
     const gsi::MethodBase *meth = mt->entry (mid).get_variant (argc, argv, kwargs, rb_block_given_p (), ctor, p == 0, p != 0 && p->const_ref ());
 

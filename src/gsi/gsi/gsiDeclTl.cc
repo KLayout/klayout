@@ -693,12 +693,12 @@ static Recipe_Impl *make_recipe (const std::string &name, const std::string &des
   return new Recipe_Impl (name, description);
 }
 
-static tl::Variant make_impl (const std::string &generator, const std::map<std::string, tl::Variant> &add_params, int /*dummy*/)
+static tl::Variant make_impl (const std::string &generator, const std::map<std::string, tl::Variant> &add_params)
 {
   return Recipe_Impl::make (generator, add_params);
 }
 
-std::string generator_impl (Recipe_Impl *recipe, const std::map<std::string, tl::Variant> &params, int /*dummy*/)
+std::string generator_impl (Recipe_Impl *recipe, const std::map<std::string, tl::Variant> &params)
 {
   return recipe->generator (params);
 }
@@ -713,23 +713,15 @@ Class<Recipe_Impl> decl_Recipe_Impl ("tl", "Recipe",
   gsi::method ("description", &Recipe_Impl::description,
     "@brief Gets the description of the recipe."
   ) +
-  gsi::method ("make", &make_impl, gsi::arg ("generator"), gsi::arg ("add_params", std::map<std::string, tl::Variant> (), "{}"), gsi::arg ("dummy", 0),
+  gsi::method ("make", &make_impl, gsi::arg ("generator"), gsi::arg ("add_params", std::map<std::string, tl::Variant> (), "{}"),
     "@brief Executes the recipe given by the generator string.\n"
     "The generator string is the one delivered with \\generator.\n"
     "Additional parameters can be passed in \"add_params\". They have lower priority than the parameters "
     "kept inside the generator string."
-    "\n"
-    "The dummy argument has been added in version 0.29 and disambiguates between keyword parameters "
-    "and a single hash argument in Ruby. This is required for Ruby versions before 'real keywords'. Simply "
-    "add this parameter with any value.\n"
   ) +
-  gsi::method_ext ("generator", &generator_impl, gsi::arg ("params"), gsi::arg ("dummy", 0),
+  gsi::method_ext ("generator", &generator_impl, gsi::arg ("params"),
     "@brief Delivers the generator string from the given parameters.\n"
     "The generator string can be used with \\make to re-run the recipe."
-    "\n"
-    "The dummy argument has been added in version 0.29 and disambiguates between keyword parameters "
-    "and a single hash argument in Ruby. This is required for Ruby versions before 'real keywords'. Simply "
-    "add this parameter with any value.\n"
   ) +
   gsi::callback ("executable", &Recipe_Impl::executable, &Recipe_Impl::executable_cb, gsi::arg ("params"),
     "@brief Reimplement this method to provide an executable object for the actual implementation.\n"

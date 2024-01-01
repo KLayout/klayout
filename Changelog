@@ -1,3 +1,12 @@
+0.28.15          (2023-01-02):
+* Bugfix: %GITHUB%/issues/1578 Missing strm2*.exe in the Windows portable binary package (*.zip)
+* Enhancement: %GITHUB%/issues/1569 Make "toggle (selected) layer" key-bindable
+  Plus feature: "visibility follows selection"
+* Bugfix: %GITHUB%/issues/1565 quit() raises an error in KLayout Python Console
+* Bugfix: %GITHUB%/issues/1556 Cannot shrink Marker Browser window
+* Bugfix: %GITHUB%/issues/1539 Misleading description in 'Flatten Cell'
+* Enhancement: Supporting UCRT runtime option in MSYS2 deployment
+  
 0.28.14          (2023-12-08):
 * Bugfix: %GITHUB%/issues/1563 Duplicated Tabs in the Macro Development Tool
 * Bugfix: %GITHUB%/issues/1560 git+https package installation on windows fails

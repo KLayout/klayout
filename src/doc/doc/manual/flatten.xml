@@ -8,28 +8,36 @@
   <keyword name="Editing"/>
 
   <p>
-  The "flatten cell" operation flattens a cell into all of its parents.
-  This basically removes a cell by promoting her shapes and instances up in the hierarchy.
+  A "flat" cell is a cell without hierarchy. This means that the cell contains
+  only shapes, but no instances of child cells. Flat cells are disconnected from
+  other cells, hence flattening is a way to "freeze" the contents of a cell: when
+  a cell is flat, changing any other cell does not have an effect on this cell or
+  in other places of the cell. On the other hand, flat cells store each shape
+  individually, hence cannot make use of data compression be reuse of geometry.
   </p>
 
   <p>
-  Cell flattening can be applied to single instances or cells as a whole.
-  When applied to an instance, the individual instance is resolved into shapes. The 
-  instantiated cell will still exist afterwards. When applied to a cell, the cell 
-  will disappear and replaced by its contents in all places it is used.
-  </p>
-
-  <p>
-  Instance-wise flattening is available by choosing "Edit/Selection/Flatten Instances". 
-  Cell-wise flattening is available by choosing "Edit/Cell/Flatten Cell" or "Flatten Cell" 
-  from the cell list's context menu.
-  </p>
-
-  <p>
-  The flatten operation offers some options, i.e. the number of hierarchy levels to 
-  flatten and how to deal with child cells which become obsolete through this operation.
+  A hierarchical cell can be flattened by choosing "Edit/Cell/Flatten Cell" or "Flatten Cell"
+  from the cell list context menu.
+  The flatten operation offers some options, i.e. the number of hierarchy levels to
+  flatten and how to deal with child cells which become obsolete through this operation ("orphan cells").
   By enabling this "prune" option, all child cells are removed when they are no longer needed.
-  Otherwise, new top level cells will appear - these are the cells which are not longer instantiated.
+  Otherwise, new top level cells will appear in that case - these are the cells which are not longer instantiated.
+  </p>
+
+  <p>
+  "Flatten" can also be applied to instances. In that case, the cell instance is removed
+  and replaced by the objects inside this cell. So instance flattening is a way to pull
+  the contents of a cell into the parent cell. One reason for doing so is to make the
+  cell contents accessible for editing, without having to change the child cell itself.
+  This prevents potential side effects when editing a cell would make the edits visible
+  in other places.
+  </p>
+
+  <p>
+  Instance-wise flattening is available by choosing "Edit/Selection/Flatten Instances".
+  Again, options are available to choose the number of hierarchy levels to flatten and
+  how to treat orphan cells.
   </p>
 
 </doc>

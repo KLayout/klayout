@@ -3185,19 +3185,35 @@ TEST(21)
   s = shapes.begin_touching (db::Box (-500, -500, 500, 500), db::ShapeIterator::All);
   size_t qid = s.quad_id ();
   EXPECT_EQ (qid != 0, true);
+#if defined(HAVE_64BIT_COORD)
+  EXPECT_EQ (s.quad_box ().to_string (), "(0,0;9007199254740992,9007199254740992)");
+#else
   EXPECT_EQ (s.quad_box ().to_string (), "(0,0;2147483647,2147483647)");
+#endif
   EXPECT_EQ (s->to_string (), "box (100,100;200,200)");
   ++s;
   EXPECT_EQ (qid == s.quad_id (), true);
+#if defined(HAVE_64BIT_COORD)
+  EXPECT_EQ (s.quad_box ().to_string (), "(0,0;9007199254740992,9007199254740992)");
+#else
   EXPECT_EQ (s.quad_box ().to_string (), "(0,0;2147483647,2147483647)");
+#endif
   EXPECT_EQ (s->to_string (), "box (100,100;200,200)");
   s.skip_quad ();
   EXPECT_EQ (qid != s.quad_id (), true);
+#if defined(HAVE_64BIT_COORD)
+  EXPECT_EQ (s.quad_box ().to_string (), "(-9007199254740992,0;0,9007199254740992)");
+#else
   EXPECT_EQ (s.quad_box ().to_string (), "(-2147483648,0;0,2147483647)");
+#endif
   EXPECT_EQ (s->to_string (), "box (-200,100;-100,200)");
   s.skip_quad ();
   EXPECT_EQ (qid != s.quad_id (), true);
+#if defined(HAVE_64BIT_COORD)
+  EXPECT_EQ (s.quad_box ().to_string (), "(0,-9007199254740992;9007199254740992,0)");
+#else
   EXPECT_EQ (s.quad_box ().to_string (), "(0,-2147483648;2147483647,0)");
+#endif
   EXPECT_EQ (s->to_string (), "box (100,-200;200,-100)");
   s.skip_quad ();
   EXPECT_EQ (s.at_end (), true);

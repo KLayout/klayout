@@ -158,7 +158,7 @@ mkdir -p %{buildroot}%{_libdir}/klayout/lay_plugins
 cp -pd %{_builddir}/bin.$TARGET/lib*.so* %{buildroot}%{_libdir}/klayout
 cp -pd %{_builddir}/bin.$TARGET/db_plugins/lib*.so* %{buildroot}%{_libdir}/klayout/db_plugins
 cp -pd %{_builddir}/bin.$TARGET/lay_plugins/lib*.so* %{buildroot}%{_libdir}/klayout/lay_plugins
-%if "%{copylibs}" != ""
+%if %{defined copylibs}
   cp -pd %{copylibs} %{buildroot}%{_libdir}/klayout
 %endif
 chmod 644 %{buildroot}%{_libdir}/klayout/*.so*

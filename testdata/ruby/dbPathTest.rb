@@ -119,14 +119,14 @@ class DBPath_TestClass < TestBase
 
     a = RBA::Path::new
     assert_equal( a.to_s, "() w=0 bx=0 ex=0 r=false" )
-    assert_equal( a.area.to_s, "0" )
+    assert_equal( a.area.to_f.to_s, "0.0" )
     assert_equal( a.length.to_s, "0" )
     assert_equal( RBA::Path::from_s(a.to_s).to_s, a.to_s )
 
     b = a.dup 
     a = RBA::Path::new( [ RBA::Point::new( 0, 10 ), RBA::Point::new( 10, 50 ) ], 25 )
     assert_equal( a.to_s, "(0,10;10,50) w=25 bx=0 ex=0 r=false" )
-    assert_equal( a.area.to_s, "1025" )
+    assert_equal( a.area.to_f.to_s, "1025.0" )
     assert_equal( a.length.to_s, "41" )
     assert_equal( RBA::Path::from_s(a.to_s).to_s, a.to_s )
     c = a.dup 

@@ -20,8 +20,8 @@ AutoReqProv: 	no
 
 # RockyLinux9 requirements
 %if "%{target_system}" == "rockylinux9"
-Requires:	ruby >= 3.0.0
-Requires:	python3 >= 3.9.0
+Requires: ruby >= 3.0.0
+Requires: python3 >= 3.9.0
 Requires: qt5-qtbase >= 5.15.9
 Requires: qt5-qtmultimedia >= 5.15.9
 Requires: qt5-qtxmlpatterns >= 5.15.9
@@ -30,18 +30,20 @@ Requires: qt5-qttools >= 5.15.9
 # NOTE: this package is required for libQt5Designer and pulls in a lot of devel stuff.
 # Maybe it's worth considering to drop designer support and replace by QUiLoader.
 Requires: qt5-qttools-devel >= 5.15.9
+# Needed by something else (still?)
+Requires: http-parser >= 2.9.4
 
 %define buildopt -j2
 # libgit2 is not available as standard package, but through EPEL
 # So we include it explicitly
-%define copylibs /usr/lib64/libgit2.so
+%define copylibs /usr/lib64/libgit2.so*
 %define __python /usr/bin/python3
 %endif
 
 # CentOS8 requirements
 %if "%{target_system}" == "centos8"
-Requires:	ruby >= 2.5.5
-Requires:	python3 >= 3.6.0
+Requires: ruby >= 2.5.5
+Requires: python3 >= 3.6.0
 Requires: libgit2 >= 0.26.8
 Requires: qt5-qtbase >= 5.11.1
 Requires: qt5-qtmultimedia >= 5.11.1
@@ -58,8 +60,8 @@ Requires: qt5-qttools-devel >= 5.11.1
 
 # CentOS7 requirements
 %if "%{target_system}" == "centos7"
-Requires:	ruby >= 2.0.0
-Requires:	python3 >= 3.6.0
+Requires: ruby >= 2.0.0
+Requires: python3 >= 3.6.0
 Requires: qt-x11 >= 4.8.5
 Requires: libgit2 >= 0.26.8
 %define buildopt -j2
@@ -76,25 +78,25 @@ Requires: qt-x11 >= 4.6.2
 
 %if "%{target_system}" == "opensuse42_2"
 # OpenSuSE 42.2 requirements
-Requires:	ruby2.3 >= 2.3.1
-Requires:	python3 >= 3.4.6
+Requires: ruby2.3 >= 2.3.1
+Requires: python3 >= 3.4.6
 Requires: libqt4-x11 >= 4.8.6
 %define buildopt -j2 -nolibgit2
 %endif
 
 %if "%{target_system}" == "opensuse42_3"
 # OpenSuSE 42.3 requirements
-Requires:	ruby2.3 >= 2.3.1
-Requires:	python3 >= 3.4.6
+Requires: ruby2.3 >= 2.3.1
+Requires: python3 >= 3.4.6
 Requires: libqt4-x11 >= 4.8.6
 %define buildopt -j2 -nolibgit2
 %endif
 
 %if "%{target_system}" == "opensuse15"
 # OpenSuSE Leap 15 requirements
-Requires:	ruby >= 2.5
-Requires:	python3 >= 3.6
-Requires:	libgit2-1_3 >= 1.3.0
+Requires: ruby >= 2.5
+Requires: python3 >= 3.6
+Requires: libgit2-1_3 >= 1.3.0
 Requires: libqt5-qtbase >= 5.15.2
 Requires: libQt5PrintSupport5 >= 5.15.2
 Requires: libQt5Designer5 >= 5.15.2

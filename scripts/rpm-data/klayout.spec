@@ -1,19 +1,6 @@
 #
 # spec file for package klayout
 #
-# Copyright (c) 2017 SUSE LINUX Products GmbH, Nuernberg, Germany.
-#
-# All modifications and additions to the file contributed by third parties
-# remain the property of their copyright owners, unless otherwise agreed
-# upon. The license for this file, and modifications and additions to the
-# file, is the same license as for the pristine package itself (unless the
-# license for the pristine package is not an Open Source License, in which
-# case the license is the MIT License). An "Open Source License" is a
-# license that conforms to the Open Source Definition (Version 1.9)
-# published by the Open Source Initiative.
-
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
-#
 
 Name:           klayout
 Version:        %{git_version}
@@ -30,6 +17,26 @@ Source0:        http://www.klayout.de/downloads/%{name}-%{version}.tar.gz
 # Disable auto-detection of dependencies (to prevent including the
 # so's of klayout itself)
 AutoReqProv: 	no
+
+# RockyLinux9 requirements
+%if "%{target_system}" == "rockylinux9"
+Requires:	ruby >= 3.0.0
+Requires:	python3 >= 3.9.0
+Requires: qt5-qtbase >= 5.15.9
+Requires: qt5-qtmultimedia >= 5.15.9
+Requires: qt5-qtxmlpatterns >= 5.15.9
+Requires: qt5-qtsvg >= 5.15.9
+Requires: qt5-qttools >= 5.15.9
+# NOTE: this package is required for libQt5Designer and pulls in a lot of devel stuff.
+# Maybe it's worth considering to drop designer support and replace by QUiLoader.
+Requires: qt5-qttools-devel >= 5.15.9
+
+%define buildopt -j2
+# libgit2 is not available as standard package, but through EPEL
+# So we include it explicitly
+%define copylibs /usr/lib64/libgit2.so
+%define __python /usr/bin/python3
+%endif
 
 # CentOS8 requirements
 %if "%{target_system}" == "centos8"
@@ -149,6 +156,9 @@ mkdir -p %{buildroot}%{_libdir}/klayout/lay_plugins
 cp -pd %{_builddir}/bin.$TARGET/lib*.so* %{buildroot}%{_libdir}/klayout
 cp -pd %{_builddir}/bin.$TARGET/db_plugins/lib*.so* %{buildroot}%{_libdir}/klayout/db_plugins
 cp -pd %{_builddir}/bin.$TARGET/lay_plugins/lib*.so* %{buildroot}%{_libdir}/klayout/lay_plugins
+%if "%{copylibs}" != ""
+  cp -pd %{copylibs} %{buildroot}%{_libdir}/klayout
+%endif
 chmod 644 %{buildroot}%{_libdir}/klayout/*.so*
 chmod 644 %{buildroot}%{_libdir}/klayout/db_plugins/*.so*
 chmod 644 %{buildroot}%{_libdir}/klayout/lay_plugins/*.so*

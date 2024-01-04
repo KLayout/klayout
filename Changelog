@@ -1,13 +1,16 @@
-0.28.15          (2023-01-02):
+0.28.15          (2023-01-04):
 * Bugfix: %GITHUB%/issues/1578 Missing strm2*.exe in the Windows portable binary package (*.zip)
 * Enhancement: %GITHUB%/issues/1569 Make "toggle (selected) layer" key-bindable
-  Plus feature: "visibility follows selection"
+  - Plus feature: "visibility follows selection"
 * Bugfix: %GITHUB%/issues/1565 quit() raises an error in KLayout Python Console
 * Bugfix: %GITHUB%/issues/1556 Cannot shrink Marker Browser window
 * Bugfix: %GITHUB%/issues/1539 Misleading description in 'Flatten Cell'
 * Enhancement: Supporting UCRT runtime option in MSYS2 deployment
 * Bugfix: DRC, LVS and other higher-level functionality now supported on 64 bit coordinate builds
-* Enhancement: Windows binaries now include UCRT (64 bit) and 64 bit coordinate versions
+* Bugfix: initial tip dialogs appear on same screen than application
+* New binaries: 
+  - Windows binaries now include UCRT (64 bit) and 64 bit coordinate versions
+  - RockyLinux 9 RPMs included
   
 0.28.14          (2023-12-08):
 * Bugfix: %GITHUB%/issues/1563 Duplicated Tabs in the Macro Development Tool

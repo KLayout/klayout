@@ -1730,7 +1730,7 @@ TEST(7)
       "box (150,150;2150,1050) #12\n"
     );
 
-  } else if (sizeof (db::ShortBox::coord_type) > 2) {
+  } else if (sizeof (db::ShortBox) > 8) {
 
     EXPECT_EQ (shapes_to_string (_this, copy),
       "box (0,100;2000,1000) #0\n"
@@ -1767,6 +1767,7 @@ TEST(7)
 
   } else {
 
+    //  16 bit coordinate overflow happens during ShortBox array expansion
     EXPECT_EQ (shapes_to_string (_this, copy),
       "box (0,100;2000,1000) #0\n"
       "box (100,200;2100,1100) #0\n"
@@ -1843,7 +1844,7 @@ TEST(7)
       "box (150,150;2150,1050) #12\n"
     );
 
-  } else if (sizeof (db::ShortBox::coord_type) > 2) {
+  } else if (sizeof (db::ShortBox) > 8) {
 
     EXPECT_EQ (shapes_to_string (_this, sa_copy),
       "box (0,100;2000,1000) #0\n"
@@ -1880,6 +1881,7 @@ TEST(7)
 
   } else {
 
+    //  16 bit coordinate overflow happens during ShortBox array expansion
     EXPECT_EQ (shapes_to_string (_this, sa_copy),
       "box (0,100;2000,1000) #0\n"
       "box (100,200;2100,1100) #0\n"

@@ -101,8 +101,8 @@ else
   echo "ERROR: not in mingw32 or mingw64 system."
 fi
 
-target=$pwd/bin-release-$arch
-build=$pwd/build-release-$arch
+target=$pwd/bin-release-$arch$KLAYOUT_BUILD_SUFFIX
+build=$pwd/build-release-$arch$KLAYOUT_BUILD_SUFFIX
 src=$pwd/src
 scripts=$pwd/scripts
 # Update in NSIS script too:

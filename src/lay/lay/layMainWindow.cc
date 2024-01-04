@@ -713,12 +713,17 @@ MainWindow::close_all ()
 void
 MainWindow::about_to_exec ()
 {
+  //  NOTE: empirically by using "0" for the parent of the TipDialogs (not "this"),
+  //  these dialog appear on the same screen than the application window. With "this"
+  //  they usually appear somewhere else. Maybe because this method is called before
+  //  the main window is properly set up.
+
   bool f;
 
   f = false;
   dispatcher ()->config_get (cfg_full_hier_new_cell, f);
   if (!f) {
-    TipDialog td (this,
+    TipDialog td (0,
                   tl::to_string (QObject::tr ("<html><body>"
                                               "<p>With the current settings, only the top cell's content is shown initially, but the child cells are not drawn.</p>"
                                               "<p>This can be confusing, since the full layout becomes visible only after selecting "
@@ -744,7 +749,7 @@ MainWindow::about_to_exec ()
 
   //  TODO: later, each view may get its own editable flag
   if (lay::ApplicationBase::instance () && !lay::ApplicationBase::instance ()->is_editable ()) {
-    TipDialog td (this,
+    TipDialog td (0,
                   tl::to_string (QObject::tr ("KLayout has been started in viewer mode. In this mode, editor functions are not available.\n\nTo enable these functions, start KLayout in editor mode by using the \"-e\" command line switch or select it as the default mode in the setup dialog. Choose \"Setup\" in the \"File\" menu and check \"Use editing mode by default\" on the \"Editing Mode\" page in the \"Application\" section.")),
                   "editor-mode");
     if (td.exec_dialog ()) {
@@ -756,7 +761,7 @@ MainWindow::about_to_exec ()
   f = false;
   dispatcher ()->config_get (cfg_no_stipple, f);
   if (f) {
-    TipDialog td (this,
+    TipDialog td (0,
                   tl::to_string (QObject::tr ("Layers are shown without fill because fill has been intentionally turned off. This can be confusing since selecting a stipple does not have an effect in this case.\n\nTo turn this feature off, uncheck \"Show Layers Without Fill\" in the \"View\" menu.")),
                   "no-stipple");
     if (td.exec_dialog ()) {
@@ -768,7 +773,7 @@ MainWindow::about_to_exec ()
   f = false;
   dispatcher ()->config_get (cfg_markers_visible, f);
   if (! f) {
-    TipDialog td (this,
+    TipDialog td (0,
                   tl::to_string (QObject::tr ("Markers are not visible because they have been turned off.\nYou may not see markers when using the marker browser feature.\n\nTo turn markers on, check \"Show Markers\" in the \"View\" menu.")),
                   "show-markers");
     if (td.exec_dialog ()) {
@@ -780,7 +785,7 @@ MainWindow::about_to_exec ()
   f = false;
   dispatcher ()->config_get (cfg_hide_empty_layers, f);
   if (f) {
-    TipDialog td (this,
+    TipDialog td (0,
                   tl::to_string (QObject::tr ("The \"Hide Empty Layers\" feature is enabled. This can be confusing, in particular in edit mode, because layers are not shown although they are actually present.\n\nTo disable this feature, uncheck \"Hide Empty Layers\" in the layer panel's context menu.")),
                   "hide-empty-layers");
     if (td.exec_dialog ()) {

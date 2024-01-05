@@ -427,6 +427,22 @@ public:
   }
 
   /**
+   *  @brief Sets the title string
+   *
+   *  If empty, the default title will be created. Otherwise this string will
+   *  be used. It is subject to expression interpolation.
+   */
+  void set_title (const std::string &title);
+
+  /**
+   *  @brief Gets the title string
+   */
+  const std::string &title () const
+  {
+    return m_title;
+  }
+
+  /**
    *  @brief Returns true, if the edit functions of the current view are enabled
    */
   bool edits_enabled () const;
@@ -760,6 +776,7 @@ private:
   std::string m_message;
   std::unique_ptr<QPrinter> mp_printer;
   std::vector<QString> m_changed_files;
+  std::string m_title;
 
   //  the object manager (undo/redo mechanism and others)
   db::Manager m_manager;

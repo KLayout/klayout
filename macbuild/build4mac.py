@@ -63,7 +63,7 @@ def GenerateUsage(platform):
     usage += "                        :    Sys: use [Sonoma|Ventura|Monterey]-bundled Ruby 2.6         |\n"
     usage += "                        :   MP32: use Ruby 3.2 from MacPorts                             |\n"
     usage += "                        :   HB32: use Ruby 3.2 from Homebrew                             |\n"
-    usage += "                        :   Ana3: use Ruby 3.1 from Anaconda3                            |\n"
+    usage += "                        :   Ana3: use Ruby 3.2 from Anaconda3                            |\n"
     usage += "   [-p|--python <type>] : case-insensitive type=['nil', 'MP311', 'HB311', 'Ana3',        | %s\n" % myPython
     usage += "                        :                        'MP39', 'HB39', 'HBAuto']               |\n"
     usage += "                        :    nil: don't bind Python                                      |\n"

@@ -40,6 +40,21 @@ namespace db {
 template <class Coord> class generic_repository;
 class ArrayRepository;
 
+template <class C>
+inline  C box_world_min () { return std::numeric_limits<C>::min (); }
+
+template <class C>
+inline  C box_world_max () { return std::numeric_limits<C>::max (); }
+
+//  NOTE: for 64bit coordinates the world coordinates do not fully exploit the coordinate
+//  range but only as much as can represented exactly by double (64bit) values.
+
+template <>
+inline int64_t box_world_min<int64_t> () { return -(int64_t (1) << 53); }
+
+template <>
+inline int64_t box_world_max<int64_t> () { return (int64_t (1) << 53); }
+
 /**
  *  @brief A box class
  *
@@ -134,7 +149,7 @@ struct DB_PUBLIC_TEMPLATE box
    */
   static box world () 
   {
-    return box (std::numeric_limits<C>::min (), std::numeric_limits<C>::min (), std::numeric_limits<C>::max (), std::numeric_limits<C>::max ());
+    return box (box_world_min<C> (), box_world_min<C> (), box_world_max<C> (), box_world_max<C> ());
   }
 
   /**

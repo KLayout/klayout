@@ -245,3 +245,15 @@ TEST(13)
   EXPECT_EQ (b.perimeter (), 8000000000.0);
 }
 
+TEST(14)
+{
+  //  world, specifically with 64bit coordinates and
+  //  transfer via double coordinates
+
+  db::Box b = db::Box::world ();
+
+  EXPECT_EQ (b == db::Box::world (), true);
+  db::ICplxTrans t;
+  EXPECT_EQ (t * b == db::Box::world (), true);
+  EXPECT_EQ (t.inverted () * b == db::Box::world (), true);
+}

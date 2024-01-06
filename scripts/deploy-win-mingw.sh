@@ -101,8 +101,8 @@ else
   echo "ERROR: not in mingw32 or mingw64 system."
 fi
 
-target=$pwd/bin-release-$arch
-build=$pwd/build-release-$arch
+target=$pwd/bin-release-$arch$KLAYOUT_BUILD_SUFFIX
+build=$pwd/build-release-$arch$KLAYOUT_BUILD_SUFFIX
 src=$pwd/src
 scripts=$pwd/scripts
 # Update in NSIS script too:
@@ -284,7 +284,7 @@ echo "Making .zip file $zipname.zip .."
 
 rm -rf $zipname $zipname.zip
 mkdir $zipname
-cp -Rv *.dll cert.pem .*-paths.txt db_plugins lay_plugins pymod $plugins lib $zipname | sed -u 's/.*/echo -n ./' | sh
+cp -Rv strm*.exe *.dll cert.pem .*-paths.txt db_plugins lay_plugins pymod $plugins lib $zipname | sed -u 's/.*/echo -n ./' | sh
 cp klayout.exe $zipname/klayout_app.exe
 cp klayout.exe $zipname/klayout_vo_app.exe
 echo ""

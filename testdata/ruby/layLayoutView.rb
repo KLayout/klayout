@@ -570,6 +570,30 @@ class LAYLayoutView_TestClass < TestBase
 
   end
 
+  def test_9
+
+    if !RBA.constants.member?(:Application)
+      return
+    end
+
+    app = RBA::Application.instance
+    mw = app.main_window
+    mw.close_all
+
+    mw.create_layout(1)
+    assert_equal(false, mw.current_view.is_dirty?)
+
+    cv = mw.current_view.cellview(0)
+    cv.cell = cv.layout.create_cell("TOP")
+
+    assert_equal(true, mw.current_view.cellview(0).is_dirty?)
+
+    if cv.layout.is_editable?
+      assert_equal(true, mw.current_view.is_dirty?)
+    end
+    
+  end
+
 end
 
 load("test_epilogue.rb")

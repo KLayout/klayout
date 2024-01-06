@@ -474,6 +474,12 @@ static lay::AbstractMenu *menu (lay::LayoutViewBase *view)
   return view->menu ();
 }
 
+static bool view_is_dirty (lay::LayoutViewBase *view)
+{
+  view->refresh ();
+  return view->is_dirty ();
+}
+
 LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutViewBase",
   gsi::constant ("LV_NoLayers", (unsigned int) lay::LayoutViewBase::LV_NoLayers,
     "@brief With this option, no layers view will be provided (see \\layer_control_frame)\n"
@@ -1135,6 +1141,13 @@ LAYBASIC_PUBLIC Class<lay::LayoutViewBase> decl_LayoutViewBase ("lay", "LayoutVi
     "\n"
     "Show the layout in full depth down to the deepest level of hierarchy. "
     "This method may cause a redraw."
+  ) +
+  gsi::method_ext ("is_dirty?", &view_is_dirty,
+    "@brief Gets a flag indicating whether one of the layouts displayed needs saving\n"
+    "A layout is 'dirty' if it is modified and needs saving. This method returns "
+    "true if this is the case for at least one of the layouts shown in the view.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
   ) +
   gsi::method ("resize", static_cast<void (lay::LayoutViewBase::*) (unsigned int, unsigned int)> (&lay::LayoutViewBase::resize),
     "@brief Resizes the layout view to the given dimension\n"

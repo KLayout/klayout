@@ -1,6 +1,6 @@
-Relevant KLayout version: 0.28.14<br>
+Relevant KLayout version: 0.28.15<br>
 Author: Kazzz-S<br>
-Last modified: 2023-12-10<br>
+Last modified: 2024-01-05<br>
 
 # 1. Introduction
 This directory **`macbuild`** contains various files required for building KLayout (http://www.klayout.de/) version 0.28.13 or later for different 64-bit macOS, including:
@@ -81,7 +81,7 @@ $ [python] ./build4mac.py
                         :    Sys: use [Sonoma|Ventura|Monterey]-bundled Ruby 2.6         |
                         :   MP32: use Ruby 3.2 from MacPorts                             |
                         :   HB32: use Ruby 3.2 from Homebrew                             |
-                        :   Ana3: use Ruby 3.1 from Anaconda3                            |
+                        :   Ana3: use Ruby 3.2 from Anaconda3                            |
    [-p|--python <type>] : case-insensitive type=['nil', 'MP311', 'HB311', 'Ana3',        | hb311
                         :                        'MP39', 'hb311', 'HBAuto']              |
                         :    nil: don't bind Python                                      |
@@ -215,10 +215,10 @@ $ ./build4mac.py -q qt5macports -r mp32 -p mp311 -Y
 * "Rmp32Pmp311" means that Ruby is 3.2 from MacPorts; Python is 3.11 from MacPorts.
 4. Copy/move the generated application bundle **`klayout.app`** to your **`/Applications`** directory for installation.
 
-### 6E. Fully Anaconda3-flavored build with Anaconda3 Ruby 3.1 and Anaconda3 Python 3.11
-0. Install Anaconda3 (Anaconda3-2023.09-0-MacOSX-x86_64.pkg), then install Ruby 3.1 and libgit2 by
+### 6E. Fully Anaconda3-flavored build with Anaconda3 Ruby 3.2 and Anaconda3 Python 3.11
+0. Install Anaconda3 (Anaconda3-2023.09-0-MacOSX-x86_64.pkg), then install Ruby 3.2 and libgit2 by
 ```
-$ conda install ruby=3.1.4
+$ conda install ruby=3.2.2
 $ conda install -c conda-forge libgit2
 ```
 
@@ -239,7 +239,7 @@ $ ./build4mac.py -q qt5ana3 -r ana3 -p ana3 -Y
   **`LW-qt5Ana3.pkg.macos-Monterey-release-Rana3Pana3`** directory, where
 * "LW-"        means this is a lightweight package.
 * "qt5Ana3"    means that Qt5 from Anaconda3 is used.
-* "Rana3Pana3" means that Ruby (3.1) is from Anaconda3; Python (3.11) is from Anaconda3.
+* "Rana3Pana3" means that Ruby (3.2) is from Anaconda3; Python (3.11) is from Anaconda3.
 4. Copy/move the generated application bundle **`klayout.app`** to your **`/Applications`** directory for installation.
 5. You may have to set the `PYTHONHOME` environment variable like:
 ```

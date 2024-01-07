@@ -2749,6 +2749,11 @@ public:
     return m_options;
   }
 
+  /**
+   *  @brief Calls deferred methods and updates view ops, provided for GSI bindings mainly
+   */
+  void refresh ();
+
 private:
   //  event handlers used to connect to the layout object's events
   void signal_hier_changed ();
@@ -2916,8 +2921,6 @@ private:
   void finish_cellviews_changed ();
   void init_layer_properties (LayerProperties &props, const LayerPropertiesList &lp_list) const;
   void merge_dither_pattern (lay::LayerPropertiesList &props);
-
-  void refresh ();
 
 protected:
   /**

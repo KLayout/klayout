@@ -626,6 +626,37 @@ class DBTrans_TestClass < TestBase
 
   end
 
+  # Complex trans conversions, issue #1586
+  def test_6_CplxTransConversions
+
+    itrans = RBA::ICplxTrans::new(1.0, 0.0, false, RBA::Vector::new(1, 2))
+    vtrans = RBA::VCplxTrans::new(1000.0, 0.0, false, RBA::Vector::new(1, 2))
+    dtrans = RBA::DCplxTrans::new(1.0, 0.0, false, RBA::DVector::new(1, 2))
+    ctrans = RBA::CplxTrans::new(0.001, 0.0, false, RBA::DVector::new(1, 2))
+
+    assert_equal(RBA::ICplxTrans::new(vtrans, 0.001).to_s, "r0 *1 1,2")
+    assert_equal(RBA::ICplxTrans::new(dtrans, 0.001).to_s, "r0 *1 1000,2000")
+    assert_equal(RBA::ICplxTrans::new(ctrans, 0.001).to_s, "r0 *1 1000,2000")
+
+    assert_equal(RBA::VCplxTrans::new(itrans, 0.001).to_s, "r0 *1000 1,2")
+    assert_equal(RBA::VCplxTrans::new(dtrans, 0.001).to_s, "r0 *1000 1000,2000")
+    assert_equal(RBA::VCplxTrans::new(ctrans, 0.001).to_s, "r0 *1000 1000,2000")
+
+    assert_equal(RBA::DCplxTrans::new(itrans, 0.001).to_s, "r0 *1 0.001,0.002")
+    assert_equal(RBA::DCplxTrans::new(vtrans, 0.001).to_s, "r0 *1 0.001,0.002")
+    assert_equal(RBA::DCplxTrans::new(ctrans, 0.001).to_s, "r0 *1 1,2")
+
+    assert_equal(RBA::CplxTrans::new(itrans, 0.001).to_s, "r0 *0.001 0.001,0.002")
+    assert_equal(RBA::CplxTrans::new(vtrans, 0.001).to_s, "r0 *0.001 0.001,0.002")
+    assert_equal(RBA::CplxTrans::new(dtrans, 0.001).to_s, "r0 *0.001 1,2")
+
+    # issue #1586 (NOTE: to_itrans is deprecated)
+    t = RBA::DCplxTrans::new(1.0, 45.0, false, 12.345678, 20.000000)
+    assert_equal(t.to_itrans(0.001).to_s, "r45 *1 12345.678,20000")
+    assert_equal(RBA::ICplxTrans::new(t, 0.001).to_s, "r45 *1 12345.678,20000")
+
+  end
+
 end
 
 load("test_epilogue.rb")

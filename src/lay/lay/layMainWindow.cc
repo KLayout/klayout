@@ -3598,17 +3598,34 @@ MainWindow::view_title_changed (lay::LayoutView *view)
 }
 
 void
+MainWindow::set_title (const std::string &title)
+{
+  if (title != m_title) {
+    m_title = title;
+    update_window_title ();
+  }
+}
+
+void
 MainWindow::update_window_title ()
 {
-  if (current_view ()) {
-    std::string sep = " - ";
-    if (current_view ()->is_dirty ()) {
-      sep += "[+] ";
-    }
-    setWindowTitle (tl::to_qstring (lay::ApplicationBase::version () + sep + current_view ()->title ()));
+  std::string title = m_title;
+
+  if (! title.empty ()) {
+    tl::Eval eval;
+    title = eval.interpolate (title);
   } else {
-    setWindowTitle (tl::to_qstring (lay::ApplicationBase::version ()));
+    title = lay::ApplicationBase::version ();
+    if (current_view ()) {
+      std::string sep = " - ";
+      if (current_view ()->is_dirty ()) {
+        sep += "[+] ";
+      }
+      title += sep + current_view ()->title ();
+    }
   }
+
+  setWindowTitle (tl::to_qstring (title));
 }
 
 void
@@ -3616,7 +3633,6 @@ MainWindow::current_view_changed ()
 {
   update_window_title ();
   current_view_changed_event ();
-  //  TODO: required?  current_view_changed_event (int (view_index_org));
 }
 
 double

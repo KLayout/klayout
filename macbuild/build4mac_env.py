@@ -167,13 +167,13 @@ Ruby32Brew      = { 'exe': '%s/bin/ruby' % HBRuby32Path,
                     'lib': '%s/lib/libruby.3.2.dylib' % HBRuby32Path
                   }
 
-# Ruby 3.1 bundled with anaconda3 installed under /Applications/anaconda3/
+# Ruby 3.2 bundled with anaconda3 installed under /Applications/anaconda3/
 # The standard installation deploys the tool under $HOME/opt/anaconda3/.
 # If so, you need to make a symbolic link: /Applications/anaconda3 ---> $HOME/opt/anaconda3/
 # [Key Type Name] = 'Ana3'
 RubyAnaconda3   = { 'exe': '/Applications/anaconda3/bin/ruby',
-                    'inc': '/Applications/anaconda3/include/ruby-3.1.0',
-                    'lib': '/Applications/anaconda3/lib/libruby.3.1.dylib'
+                    'inc': '/Applications/anaconda3/include/ruby-3.2.0',
+                    'lib': '/Applications/anaconda3/lib/libruby.3.2.dylib'
                   }
 
 # Consolidated dictionary kit for Ruby

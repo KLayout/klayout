@@ -1,4 +1,4 @@
-0.28.15          (2023-01-04):
+0.28.15          (2024-01-04):
 * Bugfix: %GITHUB%/issues/1578 Missing strm2*.exe in the Windows portable binary package (*.zip)
 * Enhancement: %GITHUB%/issues/1569 Make "toggle (selected) layer" key-bindable
   - Plus feature: "visibility follows selection"

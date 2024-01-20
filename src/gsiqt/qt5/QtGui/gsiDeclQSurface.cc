@@ -163,7 +163,10 @@ namespace qt_gsi
 static gsi::Enum<QSurface::SurfaceType> decl_QSurface_SurfaceType_Enum ("QtGui", "QSurface_SurfaceType",
     gsi::enum_const ("RasterSurface", QSurface::RasterSurface, "@brief Enum constant QSurface::RasterSurface") +
     gsi::enum_const ("OpenGLSurface", QSurface::OpenGLSurface, "@brief Enum constant QSurface::OpenGLSurface") +
-    gsi::enum_const ("RasterGLSurface", QSurface::RasterGLSurface, "@brief Enum constant QSurface::RasterGLSurface"),
+    gsi::enum_const ("RasterGLSurface", QSurface::RasterGLSurface, "@brief Enum constant QSurface::RasterGLSurface") +
+    gsi::enum_const ("OpenVGSurface", QSurface::OpenVGSurface, "@brief Enum constant QSurface::OpenVGSurface") +
+    gsi::enum_const ("VulkanSurface", QSurface::VulkanSurface, "@brief Enum constant QSurface::VulkanSurface") +
+    gsi::enum_const ("MetalSurface", QSurface::MetalSurface, "@brief Enum constant QSurface::MetalSurface"),
   "@qt\n@brief This class represents the QSurface::SurfaceType enum");
 
 static gsi::QFlagsClass<QSurface::SurfaceType > decl_QSurface_SurfaceType_Enums ("QtGui", "QSurface_QFlags_SurfaceType",

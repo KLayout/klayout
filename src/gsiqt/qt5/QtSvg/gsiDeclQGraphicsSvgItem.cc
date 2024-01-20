@@ -150,7 +150,7 @@ static void _init_f_paint_6301 (qt_gsi::GenericMethod *decl)
   decl->add_arg<QPainter * > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("option");
   decl->add_arg<const QStyleOptionGraphicsItem * > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("widget", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("widget", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_2);
   decl->set_return<void > ();
 }
@@ -161,7 +161,7 @@ static void _call_f_paint_6301 (const qt_gsi::GenericMethod * /*decl*/, void *cl
   tl::Heap heap;
   QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   const QStyleOptionGraphicsItem *arg2 = gsi::arg_reader<const QStyleOptionGraphicsItem * >() (args, heap);
-  QWidget *arg3 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QWidget *arg3 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSvgItem *)cls)->paint (arg1, arg2, arg3);
 }
@@ -344,6 +344,20 @@ static gsi::Methods methods_QGraphicsSvgItem () {
   methods += new qt_gsi::GenericMethod ("setMaximumCacheSize|maximumCacheSize=", "@brief Method void QGraphicsSvgItem::setMaximumCacheSize(const QSize &size)\n", false, &_init_f_setMaximumCacheSize_1805, &_call_f_setMaximumCacheSize_1805);
   methods += new qt_gsi::GenericMethod ("setSharedRenderer", "@brief Method void QGraphicsSvgItem::setSharedRenderer(QSvgRenderer *renderer)\n", false, &_init_f_setSharedRenderer_1830, &_call_f_setSharedRenderer_1830);
   methods += new qt_gsi::GenericMethod ("type", "@brief Method int QGraphicsSvgItem::type()\nThis is a reimplementation of QGraphicsItem::type", true, &_init_f_type_c0, &_call_f_type_c0);
+  methods += gsi::qt_signal ("childrenChanged()", "childrenChanged", "@brief Signal declaration for QGraphicsSvgItem::childrenChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QGraphicsSvgItem::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("enabledChanged()", "enabledChanged", "@brief Signal declaration for QGraphicsSvgItem::enabledChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("heightChanged()", "heightChanged", "@brief Signal declaration for QGraphicsSvgItem::heightChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QGraphicsSvgItem::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("opacityChanged()", "opacityChanged", "@brief Signal declaration for QGraphicsSvgItem::opacityChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("parentChanged()", "parentChanged", "@brief Signal declaration for QGraphicsSvgItem::parentChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("rotationChanged()", "rotationChanged", "@brief Signal declaration for QGraphicsSvgItem::rotationChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("scaleChanged()", "scaleChanged", "@brief Signal declaration for QGraphicsSvgItem::scaleChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("visibleChanged()", "visibleChanged", "@brief Signal declaration for QGraphicsSvgItem::visibleChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("widthChanged()", "widthChanged", "@brief Signal declaration for QGraphicsSvgItem::widthChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("xChanged()", "xChanged", "@brief Signal declaration for QGraphicsSvgItem::xChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("yChanged()", "yChanged", "@brief Signal declaration for QGraphicsSvgItem::yChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("zChanged()", "zChanged", "@brief Signal declaration for QGraphicsSvgItem::zChanged()\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QGraphicsSvgItem::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QGraphicsSvgItem::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -460,6 +474,12 @@ public:
     }
   }
 
+  //  [emitter impl] void QGraphicsSvgItem::childrenChanged()
+  void emitter_QGraphicsSvgItem_childrenChanged_0()
+  {
+    emit QGraphicsSvgItem::childrenChanged();
+  }
+
   //  [adaptor impl] bool QGraphicsSvgItem::collidesWithItem(const QGraphicsItem *other, Qt::ItemSelectionMode mode)
   bool cbs_collidesWithItem_c4977_1(const QGraphicsItem *other, const qt_gsi::Converter<Qt::ItemSelectionMode>::target_type & mode) const
   {
@@ -505,19 +525,37 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QGraphicsSvgItem::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [emitter impl] void QGraphicsSvgItem::destroyed(QObject *)
+  void emitter_QGraphicsSvgItem_destroyed_1302(QObject *arg1)
   {
-    return QGraphicsSvgItem::eventFilter(arg1, arg2);
+    emit QGraphicsSvgItem::destroyed(arg1);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  //  [emitter impl] void QGraphicsSvgItem::enabledChanged()
+  void emitter_QGraphicsSvgItem_enabledChanged_0()
+  {
+    emit QGraphicsSvgItem::enabledChanged();
+  }
+
+  //  [adaptor impl] bool QGraphicsSvgItem::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
+  {
+    return QGraphicsSvgItem::eventFilter(watched, event);
+  }
+
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QGraphicsSvgItem_Adaptor, bool, QObject *, QEvent *>(&QGraphicsSvgItem_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QGraphicsSvgItem_Adaptor, bool, QObject *, QEvent *>(&QGraphicsSvgItem_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QGraphicsSvgItem::eventFilter(arg1, arg2);
+      return QGraphicsSvgItem::eventFilter(watched, event);
     }
+  }
+
+  //  [emitter impl] void QGraphicsSvgItem::heightChanged()
+  void emitter_QGraphicsSvgItem_heightChanged_0()
+  {
+    emit QGraphicsSvgItem::heightChanged();
   }
 
   //  [adaptor impl] bool QGraphicsSvgItem::isObscuredBy(const QGraphicsItem *item)
@@ -533,6 +571,19 @@ public:
     } else {
       return QGraphicsSvgItem::isObscuredBy(item);
     }
+  }
+
+  //  [emitter impl] void QGraphicsSvgItem::objectNameChanged(const QString &objectName)
+  void emitter_QGraphicsSvgItem_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QGraphicsSvgItem::objectNameChanged(const QString &objectName)'");
+  }
+
+  //  [emitter impl] void QGraphicsSvgItem::opacityChanged()
+  void emitter_QGraphicsSvgItem_opacityChanged_0()
+  {
+    emit QGraphicsSvgItem::opacityChanged();
   }
 
   //  [adaptor impl] QPainterPath QGraphicsSvgItem::opaqueArea()
@@ -565,6 +616,24 @@ public:
     }
   }
 
+  //  [emitter impl] void QGraphicsSvgItem::parentChanged()
+  void emitter_QGraphicsSvgItem_parentChanged_0()
+  {
+    emit QGraphicsSvgItem::parentChanged();
+  }
+
+  //  [emitter impl] void QGraphicsSvgItem::rotationChanged()
+  void emitter_QGraphicsSvgItem_rotationChanged_0()
+  {
+    emit QGraphicsSvgItem::rotationChanged();
+  }
+
+  //  [emitter impl] void QGraphicsSvgItem::scaleChanged()
+  void emitter_QGraphicsSvgItem_scaleChanged_0()
+  {
+    emit QGraphicsSvgItem::scaleChanged();
+  }
+
   //  [adaptor impl] QPainterPath QGraphicsSvgItem::shape()
   QPainterPath cbs_shape_c0_0() const
   {
@@ -595,18 +664,48 @@ public:
     }
   }
 
-  //  [adaptor impl] void QGraphicsSvgItem::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [emitter impl] void QGraphicsSvgItem::visibleChanged()
+  void emitter_QGraphicsSvgItem_visibleChanged_0()
   {
-    QGraphicsSvgItem::childEvent(arg1);
+    emit QGraphicsSvgItem::visibleChanged();
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  //  [emitter impl] void QGraphicsSvgItem::widthChanged()
+  void emitter_QGraphicsSvgItem_widthChanged_0()
+  {
+    emit QGraphicsSvgItem::widthChanged();
+  }
+
+  //  [emitter impl] void QGraphicsSvgItem::xChanged()
+  void emitter_QGraphicsSvgItem_xChanged_0()
+  {
+    emit QGraphicsSvgItem::xChanged();
+  }
+
+  //  [emitter impl] void QGraphicsSvgItem::yChanged()
+  void emitter_QGraphicsSvgItem_yChanged_0()
+  {
+    emit QGraphicsSvgItem::yChanged();
+  }
+
+  //  [emitter impl] void QGraphicsSvgItem::zChanged()
+  void emitter_QGraphicsSvgItem_zChanged_0()
+  {
+    emit QGraphicsSvgItem::zChanged();
+  }
+
+  //  [adaptor impl] void QGraphicsSvgItem::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
+  {
+    QGraphicsSvgItem::childEvent(event);
+  }
+
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QGraphicsSvgItem_Adaptor, QChildEvent *>(&QGraphicsSvgItem_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QGraphicsSvgItem_Adaptor, QChildEvent *>(&QGraphicsSvgItem_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QGraphicsSvgItem::childEvent(arg1);
+      QGraphicsSvgItem::childEvent(event);
     }
   }
 
@@ -625,18 +724,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QGraphicsSvgItem::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QGraphicsSvgItem::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QGraphicsSvgItem::customEvent(arg1);
+    QGraphicsSvgItem::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QGraphicsSvgItem_Adaptor, QEvent *>(&QGraphicsSvgItem_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QGraphicsSvgItem_Adaptor, QEvent *>(&QGraphicsSvgItem_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QGraphicsSvgItem::customEvent(arg1);
+      QGraphicsSvgItem::customEvent(event);
     }
   }
 
@@ -1015,18 +1114,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QGraphicsSvgItem::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QGraphicsSvgItem::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QGraphicsSvgItem::timerEvent(arg1);
+    QGraphicsSvgItem::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QGraphicsSvgItem_Adaptor, QTimerEvent *>(&QGraphicsSvgItem_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QGraphicsSvgItem_Adaptor, QTimerEvent *>(&QGraphicsSvgItem_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QGraphicsSvgItem::timerEvent(arg1);
+      QGraphicsSvgItem::timerEvent(event);
     }
   }
 
@@ -1094,7 +1193,7 @@ QGraphicsSvgItem_Adaptor::~QGraphicsSvgItem_Adaptor() { }
 
 static void _init_ctor_QGraphicsSvgItem_Adaptor_1919 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parentItem", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parentItem", true, "nullptr");
   decl->add_arg<QGraphicsItem * > (argspec_0);
   decl->set_return_new<QGraphicsSvgItem_Adaptor> ();
 }
@@ -1103,7 +1202,7 @@ static void _call_ctor_QGraphicsSvgItem_Adaptor_1919 (const qt_gsi::GenericStati
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
+  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (nullptr, heap);
   ret.write<QGraphicsSvgItem_Adaptor *> (new QGraphicsSvgItem_Adaptor (arg1));
 }
 
@@ -1114,7 +1213,7 @@ static void _init_ctor_QGraphicsSvgItem_Adaptor_3836 (qt_gsi::GenericStaticMetho
 {
   static gsi::ArgSpecBase argspec_0 ("fileName");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parentItem", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parentItem", true, "nullptr");
   decl->add_arg<QGraphicsItem * > (argspec_1);
   decl->set_return_new<QGraphicsSvgItem_Adaptor> ();
 }
@@ -1124,7 +1223,7 @@ static void _call_ctor_QGraphicsSvgItem_Adaptor_3836 (const qt_gsi::GenericStati
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  QGraphicsItem *arg2 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
+  QGraphicsItem *arg2 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (nullptr, heap);
   ret.write<QGraphicsSvgItem_Adaptor *> (new QGraphicsSvgItem_Adaptor (arg1, arg2));
 }
 
@@ -1187,11 +1286,11 @@ static void _set_callback_cbs_boundingRect_c0_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QGraphicsSvgItem::childEvent(QChildEvent *)
+// void QGraphicsSvgItem::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1208,6 +1307,20 @@ static void _call_cbs_childEvent_1701_0 (const qt_gsi::GenericMethod * /*decl*/,
 static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback &cb)
 {
   ((QGraphicsSvgItem_Adaptor *)cls)->cb_childEvent_1701_0 = cb;
+}
+
+
+// emitter void QGraphicsSvgItem::childrenChanged()
+
+static void _init_emitter_childrenChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_childrenChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QGraphicsSvgItem_Adaptor *)cls)->emitter_QGraphicsSvgItem_childrenChanged_0 ();
 }
 
 
@@ -1310,11 +1423,11 @@ static void _set_callback_cbs_contextMenuEvent_3674_0 (void *cls, const gsi::Cal
 }
 
 
-// void QGraphicsSvgItem::customEvent(QEvent *)
+// void QGraphicsSvgItem::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1331,6 +1444,24 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QGraphicsSvgItem_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
+}
+
+
+// emitter void QGraphicsSvgItem::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QGraphicsSvgItem_Adaptor *)cls)->emitter_QGraphicsSvgItem_destroyed_1302 (arg1);
 }
 
 
@@ -1454,6 +1585,20 @@ static void _set_callback_cbs_dropEvent_3315_0 (void *cls, const gsi::Callback &
 }
 
 
+// emitter void QGraphicsSvgItem::enabledChanged()
+
+static void _init_emitter_enabledChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_enabledChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QGraphicsSvgItem_Adaptor *)cls)->emitter_QGraphicsSvgItem_enabledChanged_0 ();
+}
+
+
 // bool QGraphicsSvgItem::event(QEvent *ev)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
@@ -1477,13 +1622,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QGraphicsSvgItem::eventFilter(QObject *, QEvent *)
+// bool QGraphicsSvgItem::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -1571,6 +1716,20 @@ static void _call_cbs_focusOutEvent_1729_0 (const qt_gsi::GenericMethod * /*decl
 static void _set_callback_cbs_focusOutEvent_1729_0 (void *cls, const gsi::Callback &cb)
 {
   ((QGraphicsSvgItem_Adaptor *)cls)->cb_focusOutEvent_1729_0 = cb;
+}
+
+
+// emitter void QGraphicsSvgItem::heightChanged()
+
+static void _init_emitter_heightChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_heightChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QGraphicsSvgItem_Adaptor *)cls)->emitter_QGraphicsSvgItem_heightChanged_0 ();
 }
 
 
@@ -1904,6 +2063,38 @@ static void _set_callback_cbs_mouseReleaseEvent_3049_0 (void *cls, const gsi::Ca
 }
 
 
+// emitter void QGraphicsSvgItem::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QGraphicsSvgItem_Adaptor *)cls)->emitter_QGraphicsSvgItem_objectNameChanged_4567 (arg1);
+}
+
+
+// emitter void QGraphicsSvgItem::opacityChanged()
+
+static void _init_emitter_opacityChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_opacityChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QGraphicsSvgItem_Adaptor *)cls)->emitter_QGraphicsSvgItem_opacityChanged_0 ();
+}
+
+
 // QPainterPath QGraphicsSvgItem::opaqueArea()
 
 static void _init_cbs_opaqueArea_c0_0 (qt_gsi::GenericMethod *decl)
@@ -1953,6 +2144,20 @@ static void _set_callback_cbs_paint_6301_1 (void *cls, const gsi::Callback &cb)
 }
 
 
+// emitter void QGraphicsSvgItem::parentChanged()
+
+static void _init_emitter_parentChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_parentChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QGraphicsSvgItem_Adaptor *)cls)->emitter_QGraphicsSvgItem_parentChanged_0 ();
+}
+
+
 // exposed void QGraphicsSvgItem::prepareGeometryChange()
 
 static void _init_fp_prepareGeometryChange_0 (qt_gsi::GenericMethod *decl)
@@ -1998,6 +2203,34 @@ static void _call_fp_removeFromIndex_0 (const qt_gsi::GenericMethod * /*decl*/, 
   __SUPPRESS_UNUSED_WARNING(args);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsSvgItem_Adaptor *)cls)->fp_QGraphicsSvgItem_removeFromIndex_0 ();
+}
+
+
+// emitter void QGraphicsSvgItem::rotationChanged()
+
+static void _init_emitter_rotationChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_rotationChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QGraphicsSvgItem_Adaptor *)cls)->emitter_QGraphicsSvgItem_rotationChanged_0 ();
+}
+
+
+// emitter void QGraphicsSvgItem::scaleChanged()
+
+static void _init_emitter_scaleChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_scaleChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QGraphicsSvgItem_Adaptor *)cls)->emitter_QGraphicsSvgItem_scaleChanged_0 ();
 }
 
 
@@ -2147,11 +2380,11 @@ static void _set_callback_cbs_supportsExtension_c2806_0 (void *cls, const gsi::C
 }
 
 
-// void QGraphicsSvgItem::timerEvent(QTimerEvent *)
+// void QGraphicsSvgItem::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2205,6 +2438,20 @@ static void _call_fp_updateMicroFocus_0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
+// emitter void QGraphicsSvgItem::visibleChanged()
+
+static void _init_emitter_visibleChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_visibleChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QGraphicsSvgItem_Adaptor *)cls)->emitter_QGraphicsSvgItem_visibleChanged_0 ();
+}
+
+
 // void QGraphicsSvgItem::wheelEvent(QGraphicsSceneWheelEvent *event)
 
 static void _init_cbs_wheelEvent_3029_0 (qt_gsi::GenericMethod *decl)
@@ -2229,6 +2476,62 @@ static void _set_callback_cbs_wheelEvent_3029_0 (void *cls, const gsi::Callback 
 }
 
 
+// emitter void QGraphicsSvgItem::widthChanged()
+
+static void _init_emitter_widthChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_widthChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QGraphicsSvgItem_Adaptor *)cls)->emitter_QGraphicsSvgItem_widthChanged_0 ();
+}
+
+
+// emitter void QGraphicsSvgItem::xChanged()
+
+static void _init_emitter_xChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_xChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QGraphicsSvgItem_Adaptor *)cls)->emitter_QGraphicsSvgItem_xChanged_0 ();
+}
+
+
+// emitter void QGraphicsSvgItem::yChanged()
+
+static void _init_emitter_yChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_yChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QGraphicsSvgItem_Adaptor *)cls)->emitter_QGraphicsSvgItem_yChanged_0 ();
+}
+
+
+// emitter void QGraphicsSvgItem::zChanged()
+
+static void _init_emitter_zChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_zChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QGraphicsSvgItem_Adaptor *)cls)->emitter_QGraphicsSvgItem_zChanged_0 ();
+}
+
+
 namespace gsi
 {
 
@@ -2243,8 +2546,9 @@ static gsi::Methods methods_QGraphicsSvgItem_Adaptor () {
   methods += new qt_gsi::GenericMethod ("advance", "@hide", false, &_init_cbs_advance_767_0, &_call_cbs_advance_767_0, &_set_callback_cbs_advance_767_0);
   methods += new qt_gsi::GenericMethod ("boundingRect", "@brief Virtual method QRectF QGraphicsSvgItem::boundingRect()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_boundingRect_c0_0, &_call_cbs_boundingRect_c0_0);
   methods += new qt_gsi::GenericMethod ("boundingRect", "@hide", true, &_init_cbs_boundingRect_c0_0, &_call_cbs_boundingRect_c0_0, &_set_callback_cbs_boundingRect_c0_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QGraphicsSvgItem::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QGraphicsSvgItem::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("emit_childrenChanged", "@brief Emitter for signal void QGraphicsSvgItem::childrenChanged()\nCall this method to emit this signal.", false, &_init_emitter_childrenChanged_0, &_call_emitter_childrenChanged_0);
   methods += new qt_gsi::GenericMethod ("collidesWithItem", "@brief Virtual method bool QGraphicsSvgItem::collidesWithItem(const QGraphicsItem *other, Qt::ItemSelectionMode mode)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_collidesWithItem_c4977_1, &_call_cbs_collidesWithItem_c4977_1);
   methods += new qt_gsi::GenericMethod ("collidesWithItem", "@hide", true, &_init_cbs_collidesWithItem_c4977_1, &_call_cbs_collidesWithItem_c4977_1, &_set_callback_cbs_collidesWithItem_c4977_1);
   methods += new qt_gsi::GenericMethod ("collidesWithPath", "@brief Virtual method bool QGraphicsSvgItem::collidesWithPath(const QPainterPath &path, Qt::ItemSelectionMode mode)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_collidesWithPath_c4877_1, &_call_cbs_collidesWithPath_c4877_1);
@@ -2253,8 +2557,9 @@ static gsi::Methods methods_QGraphicsSvgItem_Adaptor () {
   methods += new qt_gsi::GenericMethod ("contains", "@hide", true, &_init_cbs_contains_c1986_0, &_call_cbs_contains_c1986_0, &_set_callback_cbs_contains_c1986_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QGraphicsSvgItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_3674_0, &_call_cbs_contextMenuEvent_3674_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_3674_0, &_call_cbs_contextMenuEvent_3674_0, &_set_callback_cbs_contextMenuEvent_3674_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QGraphicsSvgItem::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QGraphicsSvgItem::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QGraphicsSvgItem::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QGraphicsSvgItem::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@brief Virtual method void QGraphicsSvgItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragEnterEvent_3315_0, &_call_cbs_dragEnterEvent_3315_0);
@@ -2265,9 +2570,10 @@ static gsi::Methods methods_QGraphicsSvgItem_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@hide", false, &_init_cbs_dragMoveEvent_3315_0, &_call_cbs_dragMoveEvent_3315_0, &_set_callback_cbs_dragMoveEvent_3315_0);
   methods += new qt_gsi::GenericMethod ("*dropEvent", "@brief Virtual method void QGraphicsSvgItem::dropEvent(QGraphicsSceneDragDropEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dropEvent_3315_0, &_call_cbs_dropEvent_3315_0);
   methods += new qt_gsi::GenericMethod ("*dropEvent", "@hide", false, &_init_cbs_dropEvent_3315_0, &_call_cbs_dropEvent_3315_0, &_set_callback_cbs_dropEvent_3315_0);
+  methods += new qt_gsi::GenericMethod ("emit_enabledChanged", "@brief Emitter for signal void QGraphicsSvgItem::enabledChanged()\nCall this method to emit this signal.", false, &_init_emitter_enabledChanged_0, &_call_emitter_enabledChanged_0);
   methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QGraphicsSvgItem::event(QEvent *ev)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QGraphicsSvgItem::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QGraphicsSvgItem::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*extension", "@brief Virtual method QVariant QGraphicsSvgItem::extension(const QVariant &variant)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_extension_c2119_0, &_call_cbs_extension_c2119_0);
   methods += new qt_gsi::GenericMethod ("*extension", "@hide", true, &_init_cbs_extension_c2119_0, &_call_cbs_extension_c2119_0, &_set_callback_cbs_extension_c2119_0);
@@ -2275,6 +2581,7 @@ static gsi::Methods methods_QGraphicsSvgItem_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*focusInEvent", "@hide", false, &_init_cbs_focusInEvent_1729_0, &_call_cbs_focusInEvent_1729_0, &_set_callback_cbs_focusInEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@brief Virtual method void QGraphicsSvgItem::focusOutEvent(QFocusEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0);
   methods += new qt_gsi::GenericMethod ("*focusOutEvent", "@hide", false, &_init_cbs_focusOutEvent_1729_0, &_call_cbs_focusOutEvent_1729_0, &_set_callback_cbs_focusOutEvent_1729_0);
+  methods += new qt_gsi::GenericMethod ("emit_heightChanged", "@brief Emitter for signal void QGraphicsSvgItem::heightChanged()\nCall this method to emit this signal.", false, &_init_emitter_heightChanged_0, &_call_emitter_heightChanged_0);
   methods += new qt_gsi::GenericMethod ("*hoverEnterEvent", "@brief Virtual method void QGraphicsSvgItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_hoverEnterEvent_3044_0, &_call_cbs_hoverEnterEvent_3044_0);
   methods += new qt_gsi::GenericMethod ("*hoverEnterEvent", "@hide", false, &_init_cbs_hoverEnterEvent_3044_0, &_call_cbs_hoverEnterEvent_3044_0, &_set_callback_cbs_hoverEnterEvent_3044_0);
   methods += new qt_gsi::GenericMethod ("*hoverLeaveEvent", "@brief Virtual method void QGraphicsSvgItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_hoverLeaveEvent_3044_0, &_call_cbs_hoverLeaveEvent_3044_0);
@@ -2302,13 +2609,18 @@ static gsi::Methods methods_QGraphicsSvgItem_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*mousePressEvent", "@hide", false, &_init_cbs_mousePressEvent_3049_0, &_call_cbs_mousePressEvent_3049_0, &_set_callback_cbs_mousePressEvent_3049_0);
   methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@brief Virtual method void QGraphicsSvgItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseReleaseEvent_3049_0, &_call_cbs_mouseReleaseEvent_3049_0);
   methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@hide", false, &_init_cbs_mouseReleaseEvent_3049_0, &_call_cbs_mouseReleaseEvent_3049_0, &_set_callback_cbs_mouseReleaseEvent_3049_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QGraphicsSvgItem::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
+  methods += new qt_gsi::GenericMethod ("emit_opacityChanged", "@brief Emitter for signal void QGraphicsSvgItem::opacityChanged()\nCall this method to emit this signal.", false, &_init_emitter_opacityChanged_0, &_call_emitter_opacityChanged_0);
   methods += new qt_gsi::GenericMethod ("opaqueArea", "@brief Virtual method QPainterPath QGraphicsSvgItem::opaqueArea()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_opaqueArea_c0_0, &_call_cbs_opaqueArea_c0_0);
   methods += new qt_gsi::GenericMethod ("opaqueArea", "@hide", true, &_init_cbs_opaqueArea_c0_0, &_call_cbs_opaqueArea_c0_0, &_set_callback_cbs_opaqueArea_c0_0);
   methods += new qt_gsi::GenericMethod ("paint", "@brief Virtual method void QGraphicsSvgItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_paint_6301_1, &_call_cbs_paint_6301_1);
   methods += new qt_gsi::GenericMethod ("paint", "@hide", false, &_init_cbs_paint_6301_1, &_call_cbs_paint_6301_1, &_set_callback_cbs_paint_6301_1);
+  methods += new qt_gsi::GenericMethod ("emit_parentChanged", "@brief Emitter for signal void QGraphicsSvgItem::parentChanged()\nCall this method to emit this signal.", false, &_init_emitter_parentChanged_0, &_call_emitter_parentChanged_0);
   methods += new qt_gsi::GenericMethod ("*prepareGeometryChange", "@brief Method void QGraphicsSvgItem::prepareGeometryChange()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_prepareGeometryChange_0, &_call_fp_prepareGeometryChange_0);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QGraphicsSvgItem::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*removeFromIndex", "@brief Method void QGraphicsSvgItem::removeFromIndex()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_removeFromIndex_0, &_call_fp_removeFromIndex_0);
+  methods += new qt_gsi::GenericMethod ("emit_rotationChanged", "@brief Emitter for signal void QGraphicsSvgItem::rotationChanged()\nCall this method to emit this signal.", false, &_init_emitter_rotationChanged_0, &_call_emitter_rotationChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_scaleChanged", "@brief Emitter for signal void QGraphicsSvgItem::scaleChanged()\nCall this method to emit this signal.", false, &_init_emitter_scaleChanged_0, &_call_emitter_scaleChanged_0);
   methods += new qt_gsi::GenericMethod ("*sceneEvent", "@brief Virtual method bool QGraphicsSvgItem::sceneEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_sceneEvent_1217_0, &_call_cbs_sceneEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*sceneEvent", "@hide", false, &_init_cbs_sceneEvent_1217_0, &_call_cbs_sceneEvent_1217_0, &_set_callback_cbs_sceneEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*sceneEventFilter", "@brief Virtual method bool QGraphicsSvgItem::sceneEventFilter(QGraphicsItem *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_sceneEventFilter_3028_0, &_call_cbs_sceneEventFilter_3028_0);
@@ -2321,13 +2633,18 @@ static gsi::Methods methods_QGraphicsSvgItem_Adaptor () {
   methods += new qt_gsi::GenericMethod ("shape", "@hide", true, &_init_cbs_shape_c0_0, &_call_cbs_shape_c0_0, &_set_callback_cbs_shape_c0_0);
   methods += new qt_gsi::GenericMethod ("*supportsExtension", "@brief Virtual method bool QGraphicsSvgItem::supportsExtension(QGraphicsItem::Extension extension)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_supportsExtension_c2806_0, &_call_cbs_supportsExtension_c2806_0);
   methods += new qt_gsi::GenericMethod ("*supportsExtension", "@hide", true, &_init_cbs_supportsExtension_c2806_0, &_call_cbs_supportsExtension_c2806_0, &_set_callback_cbs_supportsExtension_c2806_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QGraphicsSvgItem::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QGraphicsSvgItem::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("type", "@brief Virtual method int QGraphicsSvgItem::type()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_type_c0_0, &_call_cbs_type_c0_0);
   methods += new qt_gsi::GenericMethod ("type", "@hide", true, &_init_cbs_type_c0_0, &_call_cbs_type_c0_0, &_set_callback_cbs_type_c0_0);
   methods += new qt_gsi::GenericMethod ("*updateMicroFocus", "@brief Method void QGraphicsSvgItem::updateMicroFocus()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_updateMicroFocus_0, &_call_fp_updateMicroFocus_0);
+  methods += new qt_gsi::GenericMethod ("emit_visibleChanged", "@brief Emitter for signal void QGraphicsSvgItem::visibleChanged()\nCall this method to emit this signal.", false, &_init_emitter_visibleChanged_0, &_call_emitter_visibleChanged_0);
   methods += new qt_gsi::GenericMethod ("*wheelEvent", "@brief Virtual method void QGraphicsSvgItem::wheelEvent(QGraphicsSceneWheelEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_wheelEvent_3029_0, &_call_cbs_wheelEvent_3029_0);
   methods += new qt_gsi::GenericMethod ("*wheelEvent", "@hide", false, &_init_cbs_wheelEvent_3029_0, &_call_cbs_wheelEvent_3029_0, &_set_callback_cbs_wheelEvent_3029_0);
+  methods += new qt_gsi::GenericMethod ("emit_widthChanged", "@brief Emitter for signal void QGraphicsSvgItem::widthChanged()\nCall this method to emit this signal.", false, &_init_emitter_widthChanged_0, &_call_emitter_widthChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_xChanged", "@brief Emitter for signal void QGraphicsSvgItem::xChanged()\nCall this method to emit this signal.", false, &_init_emitter_xChanged_0, &_call_emitter_xChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_yChanged", "@brief Emitter for signal void QGraphicsSvgItem::yChanged()\nCall this method to emit this signal.", false, &_init_emitter_yChanged_0, &_call_emitter_yChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_zChanged", "@brief Emitter for signal void QGraphicsSvgItem::zChanged()\nCall this method to emit this signal.", false, &_init_emitter_zChanged_0, &_call_emitter_zChanged_0);
   return methods;
 }
 

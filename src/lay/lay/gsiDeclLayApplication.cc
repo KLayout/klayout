@@ -98,8 +98,8 @@ template <class C>
 static gsi::Methods application_methods ()
 {
   return
-    method<int> ("crash_me", &crash_me, "@hide") +
-    method<QString, const QString &, size_t> ("symname", &lay::get_symbol_name_from_address, "@hide") +
+    method<int> ("crash_me", &crash_me, gsi::arg ("mode"), "@hide") +
+    method<QString, const QString &, size_t> ("symname", &lay::get_symbol_name_from_address, gsi::arg ("mod_name"), gsi::arg ("addr"), "@hide") +
     method<C, bool> ("is_editable?", &C::is_editable,
       "@brief Returns true if the application is in editable mode\n"
     ) +

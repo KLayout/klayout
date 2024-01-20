@@ -677,28 +677,6 @@ static void _call_f_toString_c3228 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// QString QDate::toString(QStringView format, QCalendar cal)
-
-
-static void _init_f_toString_c2762 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("format");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("cal", true, "QCalendar()");
-  decl->add_arg<QCalendar > (argspec_1);
-  decl->set_return<QString > ();
-}
-
-static void _call_f_toString_c2762 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  QCalendar arg2 = args ? gsi::arg_reader<QCalendar >() (args, heap) : gsi::arg_maker<QCalendar >() (QCalendar(), heap);
-  ret.write<QString > ((QString)((QDate *)cls)->toString (arg1, arg2));
-}
-
-
 // int QDate::weekNumber(int *yearNum)
 
 
@@ -783,78 +761,6 @@ static void _call_f_fromJulianDay_986 (const qt_gsi::GenericStaticMethod * /*dec
   tl::Heap heap;
   qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
   ret.write<QDate > ((QDate)QDate::fromJulianDay (arg1));
-}
-
-
-// static QDate QDate::fromString(QStringView string, Qt::DateFormat format)
-
-
-static void _init_f_fromString_3199 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("string");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format", true, "Qt::TextDate");
-  decl->add_arg<const qt_gsi::Converter<Qt::DateFormat>::target_type & > (argspec_1);
-  decl->set_return<QDate > ();
-}
-
-static void _call_f_fromString_3199 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  const qt_gsi::Converter<Qt::DateFormat>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::DateFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::DateFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::DateFormat>(heap, Qt::TextDate), heap);
-  ret.write<QDate > ((QDate)QDate::fromString (arg1, qt_gsi::QtToCppAdaptor<Qt::DateFormat>(arg2).cref()));
-}
-
-
-// static QDate QDate::fromString(QStringView string, QStringView format, QCalendar cal)
-
-
-static void _init_f_fromString_4213 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("string");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format");
-  decl->add_arg<QStringView > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("cal", true, "QCalendar()");
-  decl->add_arg<QCalendar > (argspec_2);
-  decl->set_return<QDate > ();
-}
-
-static void _call_f_fromString_4213 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  QStringView arg2 = gsi::arg_reader<QStringView >() (args, heap);
-  QCalendar arg3 = args ? gsi::arg_reader<QCalendar >() (args, heap) : gsi::arg_maker<QCalendar >() (QCalendar(), heap);
-  ret.write<QDate > ((QDate)QDate::fromString (arg1, arg2, arg3));
-}
-
-
-// static QDate QDate::fromString(const QString &string, QStringView format, QCalendar cal)
-
-
-static void _init_f_fromString_4679 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("string");
-  decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format");
-  decl->add_arg<QStringView > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("cal", true, "QCalendar()");
-  decl->add_arg<QCalendar > (argspec_2);
-  decl->set_return<QDate > ();
-}
-
-static void _call_f_fromString_4679 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  QStringView arg2 = gsi::arg_reader<QStringView >() (args, heap);
-  QCalendar arg3 = args ? gsi::arg_reader<QCalendar >() (args, heap) : gsi::arg_maker<QCalendar >() (QCalendar(), heap);
-  ret.write<QDate > ((QDate)QDate::fromString (arg1, arg2, arg3));
 }
 
 
@@ -988,15 +894,11 @@ static gsi::Methods methods_QDate () {
   methods += new qt_gsi::GenericMethod ("toJulianDay", "@brief Method qint64 QDate::toJulianDay()\n", true, &_init_f_toJulianDay_c0, &_call_f_toJulianDay_c0);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QDate::toString(Qt::DateFormat format)\n", true, &_init_f_toString_c1748, &_call_f_toString_c1748);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QDate::toString(const QString &format, QCalendar cal)\n", true, &_init_f_toString_c3228, &_call_f_toString_c3228);
-  methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QDate::toString(QStringView format, QCalendar cal)\n", true, &_init_f_toString_c2762, &_call_f_toString_c2762);
   methods += new qt_gsi::GenericMethod ("weekNumber", "@brief Method int QDate::weekNumber(int *yearNum)\n", true, &_init_f_weekNumber_c953, &_call_f_weekNumber_c953);
   methods += new qt_gsi::GenericMethod ("year", "@brief Method int QDate::year()\n", true, &_init_f_year_c0, &_call_f_year_c0);
   methods += new qt_gsi::GenericMethod ("year", "@brief Method int QDate::year(QCalendar cal)\n", true, &_init_f_year_c1311, &_call_f_year_c1311);
   methods += new qt_gsi::GenericStaticMethod ("currentDate", "@brief Static method QDate QDate::currentDate()\nThis method is static and can be called without an instance.", &_init_f_currentDate_0, &_call_f_currentDate_0);
   methods += new qt_gsi::GenericStaticMethod ("fromJulianDay", "@brief Static method QDate QDate::fromJulianDay(qint64 jd_)\nThis method is static and can be called without an instance.", &_init_f_fromJulianDay_986, &_call_f_fromJulianDay_986);
-  methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QDate QDate::fromString(QStringView string, Qt::DateFormat format)\nThis method is static and can be called without an instance.", &_init_f_fromString_3199, &_call_f_fromString_3199);
-  methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QDate QDate::fromString(QStringView string, QStringView format, QCalendar cal)\nThis method is static and can be called without an instance.", &_init_f_fromString_4213, &_call_f_fromString_4213);
-  methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QDate QDate::fromString(const QString &string, QStringView format, QCalendar cal)\nThis method is static and can be called without an instance.", &_init_f_fromString_4679, &_call_f_fromString_4679);
   methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QDate QDate::fromString(const QString &string, Qt::DateFormat format)\nThis method is static and can be called without an instance.", &_init_f_fromString_3665, &_call_f_fromString_3665);
   methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QDate QDate::fromString(const QString &string, const QString &format, QCalendar cal)\nThis method is static and can be called without an instance.", &_init_f_fromString_5145, &_call_f_fromString_5145);
   methods += new qt_gsi::GenericStaticMethod ("isLeapYear?", "@brief Static method bool QDate::isLeapYear(int year)\nThis method is static and can be called without an instance.", &_init_f_isLeapYear_767, &_call_f_isLeapYear_767);

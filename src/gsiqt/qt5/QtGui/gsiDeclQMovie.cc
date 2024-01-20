@@ -259,6 +259,36 @@ static void _call_f_jumpToNextFrame_0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
+// QImageReader::ImageReaderError QMovie::lastError()
+
+
+static void _init_f_lastError_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<qt_gsi::Converter<QImageReader::ImageReaderError>::target_type > ();
+}
+
+static void _call_f_lastError_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<qt_gsi::Converter<QImageReader::ImageReaderError>::target_type > ((qt_gsi::Converter<QImageReader::ImageReaderError>::target_type)qt_gsi::CppToQtAdaptor<QImageReader::ImageReaderError>(((QMovie *)cls)->lastError ()));
+}
+
+
+// QString QMovie::lastErrorString()
+
+
+static void _init_f_lastErrorString_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QString > ();
+}
+
+static void _call_f_lastErrorString_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QString > ((QString)((QMovie *)cls)->lastErrorString ());
+}
+
+
 // int QMovie::loopCount()
 
 
@@ -610,6 +640,8 @@ static gsi::Methods methods_QMovie () {
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QMovie::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("jumpToFrame", "@brief Method bool QMovie::jumpToFrame(int frameNumber)\n", false, &_init_f_jumpToFrame_767, &_call_f_jumpToFrame_767);
   methods += new qt_gsi::GenericMethod ("jumpToNextFrame", "@brief Method bool QMovie::jumpToNextFrame()\n", false, &_init_f_jumpToNextFrame_0, &_call_f_jumpToNextFrame_0);
+  methods += new qt_gsi::GenericMethod ("lastError", "@brief Method QImageReader::ImageReaderError QMovie::lastError()\n", true, &_init_f_lastError_c0, &_call_f_lastError_c0);
+  methods += new qt_gsi::GenericMethod ("lastErrorString", "@brief Method QString QMovie::lastErrorString()\n", true, &_init_f_lastErrorString_c0, &_call_f_lastErrorString_c0);
   methods += new qt_gsi::GenericMethod ("loopCount", "@brief Method int QMovie::loopCount()\n", true, &_init_f_loopCount_c0, &_call_f_loopCount_c0);
   methods += new qt_gsi::GenericMethod ("nextFrameDelay", "@brief Method int QMovie::nextFrameDelay()\n", true, &_init_f_nextFrameDelay_c0, &_call_f_nextFrameDelay_c0);
   methods += new qt_gsi::GenericMethod (":scaledSize", "@brief Method QSize QMovie::scaledSize()\n", false, &_init_f_scaledSize_0, &_call_f_scaledSize_0);
@@ -737,33 +769,33 @@ public:
     emit QMovie::error(_error);
   }
 
-  //  [adaptor impl] bool QMovie::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QMovie::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QMovie::event(arg1);
+    return QMovie::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QMovie_Adaptor, bool, QEvent *>(&QMovie_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QMovie_Adaptor, bool, QEvent *>(&QMovie_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QMovie::event(arg1);
+      return QMovie::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QMovie::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QMovie::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QMovie::eventFilter(arg1, arg2);
+    return QMovie::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QMovie_Adaptor, bool, QObject *, QEvent *>(&QMovie_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QMovie_Adaptor, bool, QObject *, QEvent *>(&QMovie_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QMovie::eventFilter(arg1, arg2);
+      return QMovie::eventFilter(watched, event);
     }
   }
 
@@ -810,33 +842,33 @@ public:
     emit QMovie::updated(rect);
   }
 
-  //  [adaptor impl] void QMovie::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QMovie::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QMovie::childEvent(arg1);
+    QMovie::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QMovie_Adaptor, QChildEvent *>(&QMovie_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QMovie_Adaptor, QChildEvent *>(&QMovie_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QMovie::childEvent(arg1);
+      QMovie::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QMovie::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QMovie::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QMovie::customEvent(arg1);
+    QMovie::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QMovie_Adaptor, QEvent *>(&QMovie_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QMovie_Adaptor, QEvent *>(&QMovie_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QMovie::customEvent(arg1);
+      QMovie::customEvent(event);
     }
   }
 
@@ -855,18 +887,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMovie::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QMovie::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QMovie::timerEvent(arg1);
+    QMovie::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QMovie_Adaptor, QTimerEvent *>(&QMovie_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QMovie_Adaptor, QTimerEvent *>(&QMovie_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QMovie::timerEvent(arg1);
+      QMovie::timerEvent(event);
     }
   }
 
@@ -884,7 +916,7 @@ QMovie_Adaptor::~QMovie_Adaptor() { }
 
 static void _init_ctor_QMovie_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QMovie_Adaptor> ();
 }
@@ -893,7 +925,7 @@ static void _call_ctor_QMovie_Adaptor_1302 (const qt_gsi::GenericStaticMethod * 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QMovie_Adaptor *> (new QMovie_Adaptor (arg1));
 }
 
@@ -906,7 +938,7 @@ static void _init_ctor_QMovie_Adaptor_4842 (qt_gsi::GenericStaticMethod *decl)
   decl->add_arg<QIODevice * > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("format", true, "QByteArray()");
   decl->add_arg<const QByteArray & > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_2);
   decl->set_return_new<QMovie_Adaptor> ();
 }
@@ -917,7 +949,7 @@ static void _call_ctor_QMovie_Adaptor_4842 (const qt_gsi::GenericStaticMethod * 
   tl::Heap heap;
   QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
   const QByteArray &arg2 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
-  QObject *arg3 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg3 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QMovie_Adaptor *> (new QMovie_Adaptor (arg1, arg2, arg3));
 }
 
@@ -930,7 +962,7 @@ static void _init_ctor_QMovie_Adaptor_5420 (qt_gsi::GenericStaticMethod *decl)
   decl->add_arg<const QString & > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("format", true, "QByteArray()");
   decl->add_arg<const QByteArray & > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_2);
   decl->set_return_new<QMovie_Adaptor> ();
 }
@@ -941,16 +973,16 @@ static void _call_ctor_QMovie_Adaptor_5420 (const qt_gsi::GenericStaticMethod * 
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   const QByteArray &arg2 = args ? gsi::arg_reader<const QByteArray & >() (args, heap) : gsi::arg_maker<const QByteArray & >() (QByteArray(), heap);
-  QObject *arg3 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg3 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QMovie_Adaptor *> (new QMovie_Adaptor (arg1, arg2, arg3));
 }
 
 
-// void QMovie::childEvent(QChildEvent *)
+// void QMovie::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -970,11 +1002,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QMovie::customEvent(QEvent *)
+// void QMovie::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -998,7 +1030,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1007,7 +1039,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QMovie_Adaptor *)cls)->emitter_QMovie_destroyed_1302 (arg1);
 }
 
@@ -1054,11 +1086,11 @@ static void _call_emitter_error_3311 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// bool QMovie::event(QEvent *)
+// bool QMovie::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -1077,13 +1109,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QMovie::eventFilter(QObject *, QEvent *)
+// bool QMovie::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -1267,11 +1299,11 @@ static void _call_emitter_stateChanged_2170 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// void QMovie::timerEvent(QTimerEvent *)
+// void QMovie::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1319,17 +1351,17 @@ static gsi::Methods methods_QMovie_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMovie::QMovie(QObject *parent)\nThis method creates an object of class QMovie.", &_init_ctor_QMovie_Adaptor_1302, &_call_ctor_QMovie_Adaptor_1302);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMovie::QMovie(QIODevice *device, const QByteArray &format, QObject *parent)\nThis method creates an object of class QMovie.", &_init_ctor_QMovie_Adaptor_4842, &_call_ctor_QMovie_Adaptor_4842);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMovie::QMovie(const QString &fileName, const QByteArray &format, QObject *parent)\nThis method creates an object of class QMovie.", &_init_ctor_QMovie_Adaptor_5420, &_call_ctor_QMovie_Adaptor_5420);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QMovie::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QMovie::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMovie::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMovie::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QMovie::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QMovie::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("emit_error", "@brief Emitter for signal void QMovie::error(QImageReader::ImageReaderError error)\nCall this method to emit this signal.", false, &_init_emitter_error_3311, &_call_emitter_error_3311);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMovie::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMovie::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QMovie::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QMovie::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("emit_finished", "@brief Emitter for signal void QMovie::finished()\nCall this method to emit this signal.", false, &_init_emitter_finished_0, &_call_emitter_finished_0);
   methods += new qt_gsi::GenericMethod ("emit_frameChanged", "@brief Emitter for signal void QMovie::frameChanged(int frameNumber)\nCall this method to emit this signal.", false, &_init_emitter_frameChanged_767, &_call_emitter_frameChanged_767);
@@ -1341,7 +1373,7 @@ static gsi::Methods methods_QMovie_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QMovie::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("emit_started", "@brief Emitter for signal void QMovie::started()\nCall this method to emit this signal.", false, &_init_emitter_started_0, &_call_emitter_started_0);
   methods += new qt_gsi::GenericMethod ("emit_stateChanged", "@brief Emitter for signal void QMovie::stateChanged(QMovie::MovieState state)\nCall this method to emit this signal.", false, &_init_emitter_stateChanged_2170, &_call_emitter_stateChanged_2170);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QMovie::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QMovie::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("emit_updated", "@brief Emitter for signal void QMovie::updated(const QRect &rect)\nCall this method to emit this signal.", false, &_init_emitter_updated_1792, &_call_emitter_updated_1792);
   return methods;

@@ -72,21 +72,6 @@ static void _call_ctor_QXmlStreamNamespaceDeclaration_3942 (const qt_gsi::Generi
 }
 
 
-// QStringView QXmlStreamNamespaceDeclaration::namespaceUri()
-
-
-static void _init_f_namespaceUri_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_namespaceUri_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamNamespaceDeclaration *)cls)->namespaceUri ());
-}
-
-
 // bool QXmlStreamNamespaceDeclaration::operator!=(const QXmlStreamNamespaceDeclaration &other)
 
 
@@ -125,21 +110,6 @@ static void _call_f_operator_eq__eq__c4354 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// QStringView QXmlStreamNamespaceDeclaration::prefix()
-
-
-static void _init_f_prefix_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_prefix_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamNamespaceDeclaration *)cls)->prefix ());
-}
-
-
 
 namespace gsi
 {
@@ -148,10 +118,8 @@ static gsi::Methods methods_QXmlStreamNamespaceDeclaration () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamNamespaceDeclaration::QXmlStreamNamespaceDeclaration()\nThis method creates an object of class QXmlStreamNamespaceDeclaration.", &_init_ctor_QXmlStreamNamespaceDeclaration_0, &_call_ctor_QXmlStreamNamespaceDeclaration_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamNamespaceDeclaration::QXmlStreamNamespaceDeclaration(const QString &prefix, const QString &namespaceUri)\nThis method creates an object of class QXmlStreamNamespaceDeclaration.", &_init_ctor_QXmlStreamNamespaceDeclaration_3942, &_call_ctor_QXmlStreamNamespaceDeclaration_3942);
-  methods += new qt_gsi::GenericMethod ("namespaceUri", "@brief Method QStringView QXmlStreamNamespaceDeclaration::namespaceUri()\n", true, &_init_f_namespaceUri_c0, &_call_f_namespaceUri_c0);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QXmlStreamNamespaceDeclaration::operator!=(const QXmlStreamNamespaceDeclaration &other)\n", true, &_init_f_operator_excl__eq__c4354, &_call_f_operator_excl__eq__c4354);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QXmlStreamNamespaceDeclaration::operator==(const QXmlStreamNamespaceDeclaration &other)\n", true, &_init_f_operator_eq__eq__c4354, &_call_f_operator_eq__eq__c4354);
-  methods += new qt_gsi::GenericMethod ("prefix", "@brief Method QStringView QXmlStreamNamespaceDeclaration::prefix()\n", true, &_init_f_prefix_c0, &_call_f_prefix_c0);
   return methods;
 }
 

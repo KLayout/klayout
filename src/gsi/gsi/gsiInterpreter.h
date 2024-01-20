@@ -187,7 +187,7 @@ public:
   /**
    *  @brief Add the given path to the search path ($: in ruby)
    */
-  virtual void add_path (const std::string &path) = 0;
+  virtual void add_path (const std::string &path, bool prepend = false) = 0;
 
   /**
    *  @brief Requires the given module (ruby "require")

@@ -124,26 +124,6 @@ static void _call_f_error_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// void QNetworkReply::errorOccurred(QNetworkReply::NetworkError)
-
-
-static void _init_f_errorOccurred_3171 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<const qt_gsi::Converter<QNetworkReply::NetworkError>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_errorOccurred_3171 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QNetworkReply::NetworkError>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QNetworkReply::NetworkError>::target_type & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QNetworkReply *)cls)->errorOccurred (qt_gsi::QtToCppAdaptor<QNetworkReply::NetworkError>(arg1).cref());
-}
-
-
 // bool QNetworkReply::hasRawHeader(const QByteArray &headerName)
 
 
@@ -478,7 +458,6 @@ static gsi::Methods methods_QNetworkReply () {
   methods += new qt_gsi::GenericMethod ("attribute", "@brief Method QVariant QNetworkReply::attribute(QNetworkRequest::Attribute code)\n", true, &_init_f_attribute_c3072, &_call_f_attribute_c3072);
   methods += new qt_gsi::GenericMethod ("close", "@brief Method void QNetworkReply::close()\nThis is a reimplementation of QIODevice::close", false, &_init_f_close_0, &_call_f_close_0);
   methods += new qt_gsi::GenericMethod ("error", "@brief Method QNetworkReply::NetworkError QNetworkReply::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
-  methods += new qt_gsi::GenericMethod ("errorOccurred", "@brief Method void QNetworkReply::errorOccurred(QNetworkReply::NetworkError)\n", false, &_init_f_errorOccurred_3171, &_call_f_errorOccurred_3171);
   methods += new qt_gsi::GenericMethod ("hasRawHeader", "@brief Method bool QNetworkReply::hasRawHeader(const QByteArray &headerName)\n", true, &_init_f_hasRawHeader_c2309, &_call_f_hasRawHeader_c2309);
   methods += new qt_gsi::GenericMethod ("header", "@brief Method QVariant QNetworkReply::header(QNetworkRequest::KnownHeaders header)\n", true, &_init_f_header_c3349, &_call_f_header_c3349);
   methods += new qt_gsi::GenericMethod ("ignoreSslErrors", "@brief Method void QNetworkReply::ignoreSslErrors(const QList<QSslError> &errors)\n", false, &_init_f_ignoreSslErrors_2837, &_call_f_ignoreSslErrors_2837);
@@ -504,6 +483,7 @@ static gsi::Methods methods_QNetworkReply () {
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QNetworkReply::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64, qint64 > ("downloadProgress(qint64, qint64)", "downloadProgress", gsi::arg("bytesReceived"), gsi::arg("bytesTotal"), "@brief Signal declaration for QNetworkReply::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("encrypted()", "encrypted", "@brief Signal declaration for QNetworkReply::encrypted()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QNetworkReply::NetworkError>::target_type & > ("errorOccurred(QNetworkReply::NetworkError)", "errorOccurred", gsi::arg("arg1"), "@brief Signal declaration for QNetworkReply::errorOccurred(QNetworkReply::NetworkError)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("finished()", "finished", "@brief Signal declaration for QNetworkReply::finished()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("metaDataChanged()", "metaDataChanged", "@brief Signal declaration for QNetworkReply::metaDataChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QNetworkReply::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");

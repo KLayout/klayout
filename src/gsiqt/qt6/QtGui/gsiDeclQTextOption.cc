@@ -402,13 +402,13 @@ static gsi::Methods methods_QTextOption () {
   methods += new qt_gsi::GenericMethod ("setAlignment|alignment=", "@brief Method void QTextOption::setAlignment(QFlags<Qt::AlignmentFlag> alignment)\n", false, &_init_f_setAlignment_2750, &_call_f_setAlignment_2750);
   methods += new qt_gsi::GenericMethod ("setFlags|flags=", "@brief Method void QTextOption::setFlags(QFlags<QTextOption::Flag> flags)\n", false, &_init_f_setFlags_2761, &_call_f_setFlags_2761);
   methods += new qt_gsi::GenericMethod ("setTabArray|tabArray=", "@brief Method void QTextOption::setTabArray(const QList<qreal> &tabStops)\n", false, &_init_f_setTabArray_2461, &_call_f_setTabArray_2461);
-  methods += new qt_gsi::GenericMethod ("setTabStopDistance", "@brief Method void QTextOption::setTabStopDistance(double tabStopDistance)\n", false, &_init_f_setTabStopDistance_1071, &_call_f_setTabStopDistance_1071);
+  methods += new qt_gsi::GenericMethod ("setTabStopDistance|tabStopDistance=", "@brief Method void QTextOption::setTabStopDistance(double tabStopDistance)\n", false, &_init_f_setTabStopDistance_1071, &_call_f_setTabStopDistance_1071);
   methods += new qt_gsi::GenericMethod ("setTabs|tabs=", "@brief Method void QTextOption::setTabs(const QList<QTextOption::Tab> &tabStops)\n", false, &_init_f_setTabs_3458, &_call_f_setTabs_3458);
   methods += new qt_gsi::GenericMethod ("setTextDirection|textDirection=", "@brief Method void QTextOption::setTextDirection(Qt::LayoutDirection aDirection)\n", false, &_init_f_setTextDirection_2316, &_call_f_setTextDirection_2316);
   methods += new qt_gsi::GenericMethod ("setUseDesignMetrics|useDesignMetrics=", "@brief Method void QTextOption::setUseDesignMetrics(bool b)\n", false, &_init_f_setUseDesignMetrics_864, &_call_f_setUseDesignMetrics_864);
   methods += new qt_gsi::GenericMethod ("setWrapMode|wrapMode=", "@brief Method void QTextOption::setWrapMode(QTextOption::WrapMode wrap)\n", false, &_init_f_setWrapMode_2486, &_call_f_setWrapMode_2486);
   methods += new qt_gsi::GenericMethod (":tabArray", "@brief Method QList<qreal> QTextOption::tabArray()\n", true, &_init_f_tabArray_c0, &_call_f_tabArray_c0);
-  methods += new qt_gsi::GenericMethod ("tabStopDistance", "@brief Method double QTextOption::tabStopDistance()\n", true, &_init_f_tabStopDistance_c0, &_call_f_tabStopDistance_c0);
+  methods += new qt_gsi::GenericMethod (":tabStopDistance", "@brief Method double QTextOption::tabStopDistance()\n", true, &_init_f_tabStopDistance_c0, &_call_f_tabStopDistance_c0);
   methods += new qt_gsi::GenericMethod (":tabs", "@brief Method QList<QTextOption::Tab> QTextOption::tabs()\n", true, &_init_f_tabs_c0, &_call_f_tabs_c0);
   methods += new qt_gsi::GenericMethod (":textDirection", "@brief Method Qt::LayoutDirection QTextOption::textDirection()\n", true, &_init_f_textDirection_c0, &_call_f_textDirection_c0);
   methods += new qt_gsi::GenericMethod (":useDesignMetrics", "@brief Method bool QTextOption::useDesignMetrics()\n", true, &_init_f_useDesignMetrics_c0, &_call_f_useDesignMetrics_c0);

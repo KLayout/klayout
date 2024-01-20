@@ -351,6 +351,64 @@ static void _call_f_operator_eq__eq__c2313 (const qt_gsi::GenericMethod * /*decl
 }
 
 
+// const QJsonValue QJsonValue::operator[](const QString &key)
+
+
+static void _init_f_operator_index__c2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("key");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<const QJsonValue > ();
+}
+
+static void _call_f_operator_index__c2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ret.write<const QJsonValue > ((const QJsonValue)((QJsonValue *)cls)->operator[] (arg1));
+}
+
+
+// const QJsonValue QJsonValue::operator[](int i)
+
+
+static void _init_f_operator_index__c767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("i");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<const QJsonValue > ();
+}
+
+static void _call_f_operator_index__c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ret.write<const QJsonValue > ((const QJsonValue)((QJsonValue *)cls)->operator[] (arg1));
+}
+
+
+// void QJsonValue::swap(QJsonValue &other)
+
+
+static void _init_f_swap_1618 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<QJsonValue & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_swap_1618 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QJsonValue &arg1 = gsi::arg_reader<QJsonValue & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QJsonValue *)cls)->swap (arg1);
+}
+
+
 // QJsonArray QJsonValue::toArray()
 
 
@@ -476,12 +534,27 @@ static void _call_f_toObject_c2403 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
+// QString QJsonValue::toString()
+
+
+static void _init_f_toString_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QString > ();
+}
+
+static void _call_f_toString_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QString > ((QString)((QJsonValue *)cls)->toString ());
+}
+
+
 // QString QJsonValue::toString(const QString &defaultValue)
 
 
 static void _init_f_toString_c2025 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("defaultValue", true, "QString()");
+  static gsi::ArgSpecBase argspec_0 ("defaultValue");
   decl->add_arg<const QString & > (argspec_0);
   decl->set_return<QString > ();
 }
@@ -490,7 +563,7 @@ static void _call_f_toString_c2025 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  const QString &arg1 = args ? gsi::arg_reader<const QString & >() (args, heap) : gsi::arg_maker<const QString & >() (QString(), heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)((QJsonValue *)cls)->toString (arg1));
 }
 
@@ -568,6 +641,9 @@ static gsi::Methods methods_QJsonValue () {
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QJsonValue &QJsonValue::operator =(const QJsonValue &other)\n", false, &_init_f_operator_eq__2313, &_call_f_operator_eq__2313);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QJsonValue::operator!=(const QJsonValue &other)\n", true, &_init_f_operator_excl__eq__c2313, &_call_f_operator_excl__eq__c2313);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QJsonValue::operator==(const QJsonValue &other)\n", true, &_init_f_operator_eq__eq__c2313, &_call_f_operator_eq__eq__c2313);
+  methods += new qt_gsi::GenericMethod ("[]", "@brief Method const QJsonValue QJsonValue::operator[](const QString &key)\n", true, &_init_f_operator_index__c2025, &_call_f_operator_index__c2025);
+  methods += new qt_gsi::GenericMethod ("[]", "@brief Method const QJsonValue QJsonValue::operator[](int i)\n", true, &_init_f_operator_index__c767, &_call_f_operator_index__c767);
+  methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QJsonValue::swap(QJsonValue &other)\n", false, &_init_f_swap_1618, &_call_f_swap_1618);
   methods += new qt_gsi::GenericMethod ("toArray", "@brief Method QJsonArray QJsonValue::toArray()\n", true, &_init_f_toArray_c0, &_call_f_toArray_c0);
   methods += new qt_gsi::GenericMethod ("toArray", "@brief Method QJsonArray QJsonValue::toArray(const QJsonArray &defaultValue)\n", true, &_init_f_toArray_c2315, &_call_f_toArray_c2315);
   methods += new qt_gsi::GenericMethod ("toBool", "@brief Method bool QJsonValue::toBool(bool defaultValue)\n", true, &_init_f_toBool_c864, &_call_f_toBool_c864);
@@ -575,6 +651,7 @@ static gsi::Methods methods_QJsonValue () {
   methods += new qt_gsi::GenericMethod ("toInt", "@brief Method int QJsonValue::toInt(int defaultValue)\n", true, &_init_f_toInt_c767, &_call_f_toInt_c767);
   methods += new qt_gsi::GenericMethod ("toObject", "@brief Method QJsonObject QJsonValue::toObject()\n", true, &_init_f_toObject_c0, &_call_f_toObject_c0);
   methods += new qt_gsi::GenericMethod ("toObject", "@brief Method QJsonObject QJsonValue::toObject(const QJsonObject &defaultValue)\n", true, &_init_f_toObject_c2403, &_call_f_toObject_c2403);
+  methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QJsonValue::toString()\n", true, &_init_f_toString_c0, &_call_f_toString_c0);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QJsonValue::toString(const QString &defaultValue)\n", true, &_init_f_toString_c2025, &_call_f_toString_c2025);
   methods += new qt_gsi::GenericMethod ("toVariant", "@brief Method QVariant QJsonValue::toVariant()\n", true, &_init_f_toVariant_c0, &_call_f_toVariant_c0);
   methods += new qt_gsi::GenericMethod ("type", "@brief Method QJsonValue::Type QJsonValue::type()\n", true, &_init_f_type_c0, &_call_f_type_c0);

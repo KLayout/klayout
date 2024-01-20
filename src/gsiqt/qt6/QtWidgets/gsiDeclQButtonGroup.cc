@@ -176,89 +176,6 @@ static void _call_f_id_c2159 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// void QButtonGroup::idClicked(int)
-
-
-static void _init_f_idClicked_767 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_idClicked_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QButtonGroup *)cls)->idClicked (arg1);
-}
-
-
-// void QButtonGroup::idPressed(int)
-
-
-static void _init_f_idPressed_767 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_idPressed_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QButtonGroup *)cls)->idPressed (arg1);
-}
-
-
-// void QButtonGroup::idReleased(int)
-
-
-static void _init_f_idReleased_767 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_idReleased_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QButtonGroup *)cls)->idReleased (arg1);
-}
-
-
-// void QButtonGroup::idToggled(int, bool)
-
-
-static void _init_f_idToggled_1523 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<int > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
-  decl->add_arg<bool > (argspec_1);
-  decl->set_return<void > ();
-}
-
-static void _call_f_idToggled_1523 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  bool arg2 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QButtonGroup *)cls)->idToggled (arg1, arg2);
-}
-
-
 // void QButtonGroup::removeButton(QAbstractButton *)
 
 
@@ -360,10 +277,6 @@ static gsi::Methods methods_QButtonGroup () {
   methods += new qt_gsi::GenericMethod ("checkedId", "@brief Method int QButtonGroup::checkedId()\n", true, &_init_f_checkedId_c0, &_call_f_checkedId_c0);
   methods += new qt_gsi::GenericMethod (":exclusive", "@brief Method bool QButtonGroup::exclusive()\n", true, &_init_f_exclusive_c0, &_call_f_exclusive_c0);
   methods += new qt_gsi::GenericMethod ("id", "@brief Method int QButtonGroup::id(QAbstractButton *button)\n", true, &_init_f_id_c2159, &_call_f_id_c2159);
-  methods += new qt_gsi::GenericMethod ("idClicked", "@brief Method void QButtonGroup::idClicked(int)\n", false, &_init_f_idClicked_767, &_call_f_idClicked_767);
-  methods += new qt_gsi::GenericMethod ("idPressed", "@brief Method void QButtonGroup::idPressed(int)\n", false, &_init_f_idPressed_767, &_call_f_idPressed_767);
-  methods += new qt_gsi::GenericMethod ("idReleased", "@brief Method void QButtonGroup::idReleased(int)\n", false, &_init_f_idReleased_767, &_call_f_idReleased_767);
-  methods += new qt_gsi::GenericMethod ("idToggled", "@brief Method void QButtonGroup::idToggled(int, bool)\n", false, &_init_f_idToggled_1523, &_call_f_idToggled_1523);
   methods += new qt_gsi::GenericMethod ("removeButton", "@brief Method void QButtonGroup::removeButton(QAbstractButton *)\n", false, &_init_f_removeButton_2159, &_call_f_removeButton_2159);
   methods += new qt_gsi::GenericMethod ("setExclusive|exclusive=", "@brief Method void QButtonGroup::setExclusive(bool)\n", false, &_init_f_setExclusive_864, &_call_f_setExclusive_864);
   methods += new qt_gsi::GenericMethod ("setId", "@brief Method void QButtonGroup::setId(QAbstractButton *button, int id)\n", false, &_init_f_setId_2818, &_call_f_setId_2818);
@@ -372,6 +285,10 @@ static gsi::Methods methods_QButtonGroup () {
   methods += gsi::qt_signal<QAbstractButton * > ("buttonReleased(QAbstractButton *)", "buttonReleased_qab", gsi::arg("arg1"), "@brief Signal declaration for QButtonGroup::buttonReleased(QAbstractButton *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QAbstractButton *, bool > ("buttonToggled(QAbstractButton *, bool)", "buttonToggled_object", gsi::arg("arg1"), gsi::arg("arg2"), "@brief Signal declaration for QButtonGroup::buttonToggled(QAbstractButton *, bool)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QButtonGroup::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("idClicked(int)", "idClicked", gsi::arg("arg1"), "@brief Signal declaration for QButtonGroup::idClicked(int)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("idPressed(int)", "idPressed", gsi::arg("arg1"), "@brief Signal declaration for QButtonGroup::idPressed(int)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("idReleased(int)", "idReleased", gsi::arg("arg1"), "@brief Signal declaration for QButtonGroup::idReleased(int)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int, bool > ("idToggled(int, bool)", "idToggled", gsi::arg("arg1"), gsi::arg("arg2"), "@brief Signal declaration for QButtonGroup::idToggled(int, bool)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QButtonGroup::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QButtonGroup::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;
@@ -484,6 +401,30 @@ public:
     } else {
       return QButtonGroup::eventFilter(watched, event);
     }
+  }
+
+  //  [emitter impl] void QButtonGroup::idClicked(int)
+  void emitter_QButtonGroup_idClicked_767(int arg1)
+  {
+    emit QButtonGroup::idClicked(arg1);
+  }
+
+  //  [emitter impl] void QButtonGroup::idPressed(int)
+  void emitter_QButtonGroup_idPressed_767(int arg1)
+  {
+    emit QButtonGroup::idPressed(arg1);
+  }
+
+  //  [emitter impl] void QButtonGroup::idReleased(int)
+  void emitter_QButtonGroup_idReleased_767(int arg1)
+  {
+    emit QButtonGroup::idReleased(arg1);
+  }
+
+  //  [emitter impl] void QButtonGroup::idToggled(int, bool)
+  void emitter_QButtonGroup_idToggled_1523(int arg1, bool arg2)
+  {
+    emit QButtonGroup::idToggled(arg1, arg2);
   }
 
   //  [emitter impl] void QButtonGroup::objectNameChanged(const QString &objectName)
@@ -795,6 +736,81 @@ static void _set_callback_cbs_eventFilter_2411_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QButtonGroup::idClicked(int)
+
+static void _init_emitter_idClicked_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_idClicked_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QButtonGroup_Adaptor *)cls)->emitter_QButtonGroup_idClicked_767 (arg1);
+}
+
+
+// emitter void QButtonGroup::idPressed(int)
+
+static void _init_emitter_idPressed_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_idPressed_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QButtonGroup_Adaptor *)cls)->emitter_QButtonGroup_idPressed_767 (arg1);
+}
+
+
+// emitter void QButtonGroup::idReleased(int)
+
+static void _init_emitter_idReleased_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_idReleased_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QButtonGroup_Adaptor *)cls)->emitter_QButtonGroup_idReleased_767 (arg1);
+}
+
+
+// emitter void QButtonGroup::idToggled(int, bool)
+
+static void _init_emitter_idToggled_1523 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<int > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("arg2");
+  decl->add_arg<bool > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_idToggled_1523 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  bool arg2 = gsi::arg_reader<bool >() (args, heap);
+  ((QButtonGroup_Adaptor *)cls)->emitter_QButtonGroup_idToggled_1523 (arg1, arg2);
+}
+
+
 // exposed bool QButtonGroup::isSignalConnected(const QMetaMethod &signal)
 
 static void _init_fp_isSignalConnected_c2394 (qt_gsi::GenericMethod *decl)
@@ -924,6 +940,10 @@ static gsi::Methods methods_QButtonGroup_Adaptor () {
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QButtonGroup::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("emit_idClicked", "@brief Emitter for signal void QButtonGroup::idClicked(int)\nCall this method to emit this signal.", false, &_init_emitter_idClicked_767, &_call_emitter_idClicked_767);
+  methods += new qt_gsi::GenericMethod ("emit_idPressed", "@brief Emitter for signal void QButtonGroup::idPressed(int)\nCall this method to emit this signal.", false, &_init_emitter_idPressed_767, &_call_emitter_idPressed_767);
+  methods += new qt_gsi::GenericMethod ("emit_idReleased", "@brief Emitter for signal void QButtonGroup::idReleased(int)\nCall this method to emit this signal.", false, &_init_emitter_idReleased_767, &_call_emitter_idReleased_767);
+  methods += new qt_gsi::GenericMethod ("emit_idToggled", "@brief Emitter for signal void QButtonGroup::idToggled(int, bool)\nCall this method to emit this signal.", false, &_init_emitter_idToggled_1523, &_call_emitter_idToggled_1523);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QButtonGroup::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QButtonGroup::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QButtonGroup::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);

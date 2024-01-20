@@ -167,7 +167,7 @@ gsi::ClassExt<db::LoadLayoutOptions> cif_reader_options (
       "\n"
       "This method has been added in version 0.25.3."
     ) +
-    gsi::method_ext ("cif_wire_mode=", &set_cif_wire_mode,
+    gsi::method_ext ("cif_wire_mode=", &set_cif_wire_mode, gsi::arg ("mode"),
     "@brief How to read 'W' objects\n"
     "\n"
     "This property specifies how to read 'W' (wire) objects.\n"
@@ -179,7 +179,7 @@ gsi::ClassExt<db::LoadLayoutOptions> cif_reader_options (
     "See \\cif_wire_mode= method for a description of this mode."
     "\nThis property has been added in version 0.21 and was renamed to cif_wire_mode in 0.25.\n"
   ) +
-  gsi::method_ext ("cif_dbu=", &set_cif_dbu,
+  gsi::method_ext ("cif_dbu=", &set_cif_dbu, gsi::arg ("dbu"),
     "@brief Specifies the database unit which the reader uses and produces\n"
     "\nThis property has been added in version 0.21.\n"
   ) +
@@ -217,7 +217,7 @@ static bool get_cif_blank_separator (const db::SaveLayoutOptions *options)
 //  extend lay::SaveLayoutOptions with the CIF options
 static
 gsi::ClassExt<db::SaveLayoutOptions> cif_writer_options (
-  gsi::method_ext ("cif_dummy_calls=", &set_cif_dummy_calls,
+  gsi::method_ext ("cif_dummy_calls=", &set_cif_dummy_calls, gsi::arg ("flag"),
     "@brief Sets a flag indicating whether dummy calls shall be written\n"
     "If this property is set to true, dummy calls will be written in the top level entity "
     "of the CIF file calling every top cell.\n"
@@ -230,7 +230,7 @@ gsi::ClassExt<db::SaveLayoutOptions> cif_writer_options (
     "\nThis property has been added in version 0.23.10.\n"
     "\nThe predicate version (cif_blank_separator?) has been added in version 0.25.1.\n"
   ) +
-  gsi::method_ext ("cif_blank_separator=", &set_cif_blank_separator,
+  gsi::method_ext ("cif_blank_separator=", &set_cif_blank_separator, gsi::arg ("flag"),
     "@brief Sets a flag indicating whether blanks shall be used as x/y separator characters\n"
     "If this property is set to true, the x and y coordinates are separated with blank characters "
     "rather than comma characters."

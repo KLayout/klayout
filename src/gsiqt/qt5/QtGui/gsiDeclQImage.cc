@@ -663,7 +663,7 @@ static void _init_f_load_3648 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("fileName");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("format", true, "nullptr");
   decl->add_arg<const char * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -673,7 +673,7 @@ static void _call_f_load_3648 (const qt_gsi::GenericMethod * /*decl*/, void *cls
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
   ret.write<bool > ((bool)((QImage *)cls)->load (arg1, arg2));
 }
 
@@ -687,7 +687,7 @@ static void _init_f_loadFromData_5018 (qt_gsi::GenericMethod *decl)
   decl->add_arg<const unsigned char * > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("len");
   decl->add_arg<int > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("format", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("format", true, "nullptr");
   decl->add_arg<const char * > (argspec_2);
   decl->set_return<bool > ();
 }
@@ -698,7 +698,7 @@ static void _call_f_loadFromData_5018 (const qt_gsi::GenericMethod * /*decl*/, v
   tl::Heap heap;
   const unsigned char *arg1 = gsi::arg_reader<const unsigned char * >() (args, heap);
   int arg2 = gsi::arg_reader<int >() (args, heap);
-  const char *arg3 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  const char *arg3 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
   ret.write<bool > ((bool)((QImage *)cls)->loadFromData (arg1, arg2, arg3));
 }
 
@@ -710,7 +710,7 @@ static void _init_f_loadFromData_3932 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("data");
   decl->add_arg<const QByteArray & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("aformat", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("aformat", true, "nullptr");
   decl->add_arg<const char * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -720,7 +720,7 @@ static void _call_f_loadFromData_3932 (const qt_gsi::GenericMethod * /*decl*/, v
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
-  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
   ret.write<bool > ((bool)((QImage *)cls)->loadFromData (arg1, arg2));
 }
 
@@ -875,6 +875,47 @@ static void _call_f_pixel_c1916 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
+// QColor QImage::pixelColor(int x, int y)
+
+
+static void _init_f_pixelColor_c1426 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("x");
+  decl->add_arg<int > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("y");
+  decl->add_arg<int > (argspec_1);
+  decl->set_return<QColor > ();
+}
+
+static void _call_f_pixelColor_c1426 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  ret.write<QColor > ((QColor)((QImage *)cls)->pixelColor (arg1, arg2));
+}
+
+
+// QColor QImage::pixelColor(const QPoint &pt)
+
+
+static void _init_f_pixelColor_c1916 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("pt");
+  decl->add_arg<const QPoint & > (argspec_0);
+  decl->set_return<QColor > ();
+}
+
+static void _call_f_pixelColor_c1916 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
+  ret.write<QColor > ((QColor)((QImage *)cls)->pixelColor (arg1));
+}
+
+
 // QPixelFormat QImage::pixelFormat()
 
 
@@ -946,6 +987,25 @@ static void _call_f_rect_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
+// bool QImage::reinterpretAsFormat(QImage::Format f)
+
+
+static void _init_f_reinterpretAsFormat_1733 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("f");
+  decl->add_arg<const qt_gsi::Converter<QImage::Format>::target_type & > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_reinterpretAsFormat_1733 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QImage::Format>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QImage::Format>::target_type & >() (args, heap);
+  ret.write<bool > ((bool)((QImage *)cls)->reinterpretAsFormat (qt_gsi::QtToCppAdaptor<QImage::Format>(arg1).cref()));
+}
+
+
 // QImage QImage::rgbSwapped()
 
 
@@ -968,7 +1028,7 @@ static void _init_f_save_c4307 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("fileName");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("format", true, "nullptr");
   decl->add_arg<const char * > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("quality", true, "-1");
   decl->add_arg<int > (argspec_2);
@@ -980,7 +1040,7 @@ static void _call_f_save_c4307 (const qt_gsi::GenericMethod * /*decl*/, void *cl
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
   int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<bool > ((bool)((QImage *)cls)->save (arg1, arg2, arg3));
 }
@@ -993,7 +1053,7 @@ static void _init_f_save_c3729 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("device");
   decl->add_arg<QIODevice * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("format", true, "nullptr");
   decl->add_arg<const char * > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("quality", true, "-1");
   decl->add_arg<int > (argspec_2);
@@ -1005,7 +1065,7 @@ static void _call_f_save_c3729 (const qt_gsi::GenericMethod * /*decl*/, void *cl
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QIODevice *arg1 = gsi::arg_reader<QIODevice * >() (args, heap);
-  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
   int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<bool > ((bool)((QImage *)cls)->save (arg1, arg2, arg3));
 }
@@ -1339,6 +1399,55 @@ static void _call_f_setPixel_3580 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
+// void QImage::setPixelColor(int x, int y, const QColor &c)
+
+
+static void _init_f_setPixelColor_3223 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("x");
+  decl->add_arg<int > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("y");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("c");
+  decl->add_arg<const QColor & > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setPixelColor_3223 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QColor &arg3 = gsi::arg_reader<const QColor & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QImage *)cls)->setPixelColor (arg1, arg2, arg3);
+}
+
+
+// void QImage::setPixelColor(const QPoint &pt, const QColor &c)
+
+
+static void _init_f_setPixelColor_3713 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("pt");
+  decl->add_arg<const QPoint & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("c");
+  decl->add_arg<const QColor & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setPixelColor_3713 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
+  const QColor &arg2 = gsi::arg_reader<const QColor & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QImage *)cls)->setPixelColor (arg1, arg2);
+}
+
+
 // void QImage::setText(const QString &key, const QString &value)
 
 
@@ -1374,6 +1483,21 @@ static void _call_f_size_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QSize > ((QSize)((QImage *)cls)->size ());
+}
+
+
+// qsizetype QImage::sizeInBytes()
+
+
+static void _init_f_sizeInBytes_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<qsizetype > ();
+}
+
+static void _call_f_sizeInBytes_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<qsizetype > ((qsizetype)((QImage *)cls)->sizeInBytes ());
 }
 
 
@@ -1521,7 +1645,7 @@ static void _init_f_fromData_5018 (qt_gsi::GenericStaticMethod *decl)
   decl->add_arg<const unsigned char * > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("size");
   decl->add_arg<int > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("format", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("format", true, "nullptr");
   decl->add_arg<const char * > (argspec_2);
   decl->set_return<QImage > ();
 }
@@ -1532,7 +1656,7 @@ static void _call_f_fromData_5018 (const qt_gsi::GenericStaticMethod * /*decl*/,
   tl::Heap heap;
   const unsigned char *arg1 = gsi::arg_reader<const unsigned char * >() (args, heap);
   int arg2 = gsi::arg_reader<int >() (args, heap);
-  const char *arg3 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  const char *arg3 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
   ret.write<QImage > ((QImage)QImage::fromData (arg1, arg2, arg3));
 }
 
@@ -1544,7 +1668,7 @@ static void _init_f_fromData_3932 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("data");
   decl->add_arg<const QByteArray & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("format", true, "nullptr");
   decl->add_arg<const char * > (argspec_1);
   decl->set_return<QImage > ();
 }
@@ -1554,7 +1678,7 @@ static void _call_f_fromData_3932 (const qt_gsi::GenericStaticMethod * /*decl*/,
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
-  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
   ret.write<QImage > ((QImage)QImage::fromData (arg1, arg2));
 }
 
@@ -1698,10 +1822,13 @@ static gsi::Methods methods_QImage () {
   methods += new qt_gsi::GenericMethod ("paintEngine", "@brief Method QPaintEngine *QImage::paintEngine()\nThis is a reimplementation of QPaintDevice::paintEngine", true, &_init_f_paintEngine_c0, &_call_f_paintEngine_c0);
   methods += new qt_gsi::GenericMethod ("pixel", "@brief Method unsigned int QImage::pixel(int x, int y)\n", true, &_init_f_pixel_c1426, &_call_f_pixel_c1426);
   methods += new qt_gsi::GenericMethod ("pixel", "@brief Method unsigned int QImage::pixel(const QPoint &pt)\n", true, &_init_f_pixel_c1916, &_call_f_pixel_c1916);
+  methods += new qt_gsi::GenericMethod ("pixelColor", "@brief Method QColor QImage::pixelColor(int x, int y)\n", true, &_init_f_pixelColor_c1426, &_call_f_pixelColor_c1426);
+  methods += new qt_gsi::GenericMethod ("pixelColor", "@brief Method QColor QImage::pixelColor(const QPoint &pt)\n", true, &_init_f_pixelColor_c1916, &_call_f_pixelColor_c1916);
   methods += new qt_gsi::GenericMethod ("pixelFormat", "@brief Method QPixelFormat QImage::pixelFormat()\n", true, &_init_f_pixelFormat_c0, &_call_f_pixelFormat_c0);
   methods += new qt_gsi::GenericMethod ("pixelIndex", "@brief Method int QImage::pixelIndex(int x, int y)\n", true, &_init_f_pixelIndex_c1426, &_call_f_pixelIndex_c1426);
   methods += new qt_gsi::GenericMethod ("pixelIndex", "@brief Method int QImage::pixelIndex(const QPoint &pt)\n", true, &_init_f_pixelIndex_c1916, &_call_f_pixelIndex_c1916);
   methods += new qt_gsi::GenericMethod ("rect", "@brief Method QRect QImage::rect()\n", true, &_init_f_rect_c0, &_call_f_rect_c0);
+  methods += new qt_gsi::GenericMethod ("reinterpretAsFormat", "@brief Method bool QImage::reinterpretAsFormat(QImage::Format f)\n", false, &_init_f_reinterpretAsFormat_1733, &_call_f_reinterpretAsFormat_1733);
   methods += new qt_gsi::GenericMethod ("rgbSwapped", "@brief Method QImage QImage::rgbSwapped()\n", true, &_init_f_rgbSwapped_cr0, &_call_f_rgbSwapped_cr0);
   methods += new qt_gsi::GenericMethod ("save", "@brief Method bool QImage::save(const QString &fileName, const char *format, int quality)\n", true, &_init_f_save_c4307, &_call_f_save_c4307);
   methods += new qt_gsi::GenericMethod ("save", "@brief Method bool QImage::save(QIODevice *device, const char *format, int quality)\n", true, &_init_f_save_c3729, &_call_f_save_c3729);
@@ -1720,8 +1847,11 @@ static gsi::Methods methods_QImage () {
   methods += new qt_gsi::GenericMethod ("setOffset|offset=", "@brief Method void QImage::setOffset(const QPoint &)\n", false, &_init_f_setOffset_1916, &_call_f_setOffset_1916);
   methods += new qt_gsi::GenericMethod ("setPixel", "@brief Method void QImage::setPixel(int x, int y, unsigned int index_or_rgb)\n", false, &_init_f_setPixel_3090, &_call_f_setPixel_3090);
   methods += new qt_gsi::GenericMethod ("setPixel", "@brief Method void QImage::setPixel(const QPoint &pt, unsigned int index_or_rgb)\n", false, &_init_f_setPixel_3580, &_call_f_setPixel_3580);
+  methods += new qt_gsi::GenericMethod ("setPixelColor", "@brief Method void QImage::setPixelColor(int x, int y, const QColor &c)\n", false, &_init_f_setPixelColor_3223, &_call_f_setPixelColor_3223);
+  methods += new qt_gsi::GenericMethod ("setPixelColor", "@brief Method void QImage::setPixelColor(const QPoint &pt, const QColor &c)\n", false, &_init_f_setPixelColor_3713, &_call_f_setPixelColor_3713);
   methods += new qt_gsi::GenericMethod ("setText", "@brief Method void QImage::setText(const QString &key, const QString &value)\n", false, &_init_f_setText_3942, &_call_f_setText_3942);
   methods += new qt_gsi::GenericMethod ("size", "@brief Method QSize QImage::size()\n", true, &_init_f_size_c0, &_call_f_size_c0);
+  methods += new qt_gsi::GenericMethod ("sizeInBytes", "@brief Method qsizetype QImage::sizeInBytes()\n", true, &_init_f_sizeInBytes_c0, &_call_f_sizeInBytes_c0);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QImage::swap(QImage &other)\n", false, &_init_f_swap_1182, &_call_f_swap_1182);
   methods += new qt_gsi::GenericMethod ("textKeys", "@brief Method QStringList QImage::textKeys()\n", true, &_init_f_textKeys_c0, &_call_f_textKeys_c0);
   methods += new qt_gsi::GenericMethod ("transformed", "@brief Method QImage QImage::transformed(const QMatrix &matrix, Qt::TransformationMode mode)\n", true, &_init_f_transformed_c4548, &_call_f_transformed_c4548);
@@ -1752,6 +1882,59 @@ GSI_QTGUI_PUBLIC gsi::Class<QImage> &qtdecl_QImage () { return decl_QImage; }
 class QImage_Adaptor : public QImage, public qt_gsi::QtObjectBase
 {
 public:
+
+  //  NOTE: QImage does not take ownership of the data, so 
+  //  we will provide a buffer to do so. This requires an additional 
+  //  copy, but as GSI is not guaranteeing the lifetime of the 
+  //  data, this is required here.
+  class DataHolder
+  {
+  public:
+
+    DataHolder() : mp_data(0) { }
+    DataHolder(unsigned char *data) : mp_data(data) { }
+
+    ~DataHolder() 
+    { 
+      if (mp_data) {
+        delete[](mp_data); 
+      }
+      mp_data = 0;
+    }
+
+    static unsigned char *alloc(const std::string &data)
+    {
+      unsigned char *ptr = new unsigned char[data.size()];
+      memcpy(ptr, data.c_str(), data.size());
+      return ptr;
+    }
+
+  private:
+    unsigned char *mp_data;
+  };
+
+  static QImage_Adaptor *new_qimage_from_data1(const std::string &data, int width, int height, int bytesPerLine, QImage::Format format) 
+  {
+    return new QImage_Adaptor(DataHolder::alloc(data), width, height, bytesPerLine, format);
+  }
+
+  static QImage_Adaptor *new_qimage_from_data2(const std::string &data, int width, int height, QImage::Format format) 
+  {
+    return new QImage_Adaptor(DataHolder::alloc(data), width, height, format);
+  }
+
+  QImage_Adaptor(unsigned char *data, int width, int height, int bytesPerLine, QImage::Format format)
+    : QImage(data, width, height, bytesPerLine, format), m_holder(data)
+  {
+  }
+
+  QImage_Adaptor(unsigned char *data, int width, int height, QImage::Format format)
+    : QImage (data, width, height, format), m_holder(data)
+  {
+  }
+
+  DataHolder m_holder;
+
 
   virtual ~QImage_Adaptor();
 
@@ -1975,7 +2158,7 @@ static void _init_ctor_QImage_Adaptor_3648 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("fileName");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("format", true, "nullptr");
   decl->add_arg<const char * > (argspec_1);
   decl->set_return_new<QImage_Adaptor> ();
 }
@@ -1985,7 +2168,7 @@ static void _call_ctor_QImage_Adaptor_3648 (const qt_gsi::GenericStaticMethod * 
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
   ret.write<QImage_Adaptor *> (new QImage_Adaptor (arg1, arg2));
 }
 
@@ -2284,6 +2467,15 @@ static gsi::Methods methods_QImage_Adaptor () {
 }
 
 gsi::Class<QImage_Adaptor> decl_QImage_Adaptor (qtdecl_QImage (), "QtGui", "QImage",
+  gsi::constructor("new", &QImage_Adaptor::new_qimage_from_data1, gsi::arg ("data"), gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("bytesPerLine"), gsi::arg ("format"),
+    "@brief QImage::QImage(const uchar *data, int width, int height, int bytesPerLine)\n"
+    "The cleanupFunction parameter is available currently."
+  ) +
+  gsi::constructor("new", &QImage_Adaptor::new_qimage_from_data2, gsi::arg ("data"), gsi::arg ("width"), gsi::arg ("height"), gsi::arg ("format"),
+    "@brief QImage::QImage(const uchar *data, int width, int height)\n"
+    "The cleanupFunction parameter is available currently."
+  )
++
   methods_QImage_Adaptor (),
   "@qt\n@brief Binding of QImage");
 
@@ -2320,6 +2512,9 @@ static gsi::Enum<QImage::Format> decl_QImage_Format_Enum ("QtGui", "QImage_Forma
     gsi::enum_const ("Format_A2RGB30_Premultiplied", QImage::Format_A2RGB30_Premultiplied, "@brief Enum constant QImage::Format_A2RGB30_Premultiplied") +
     gsi::enum_const ("Format_Alpha8", QImage::Format_Alpha8, "@brief Enum constant QImage::Format_Alpha8") +
     gsi::enum_const ("Format_Grayscale8", QImage::Format_Grayscale8, "@brief Enum constant QImage::Format_Grayscale8") +
+    gsi::enum_const ("Format_RGBX64", QImage::Format_RGBX64, "@brief Enum constant QImage::Format_RGBX64") +
+    gsi::enum_const ("Format_RGBA64", QImage::Format_RGBA64, "@brief Enum constant QImage::Format_RGBA64") +
+    gsi::enum_const ("Format_RGBA64_Premultiplied", QImage::Format_RGBA64_Premultiplied, "@brief Enum constant QImage::Format_RGBA64_Premultiplied") +
     gsi::enum_const ("NImageFormats", QImage::NImageFormats, "@brief Enum constant QImage::NImageFormats"),
   "@qt\n@brief This class represents the QImage::Format enum");
 

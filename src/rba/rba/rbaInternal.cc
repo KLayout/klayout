@@ -250,7 +250,7 @@ Proxy::call (int id, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
 
     //  TODO: callbacks with default arguments?
     for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); args && a != meth->end_arguments (); ++a) {
-      rb_ary_push (argv, pop_arg (*a, 0, args, heap));
+      rb_ary_push (argv, pull_arg (*a, 0, args, heap));
     }
 
     VALUE rb_ret = rba_funcall2_checked (m_self, mid, RARRAY_LEN (argv), RARRAY_PTR (argv));
@@ -811,7 +811,11 @@ SignalHandler::define_class (VALUE module, const char *name)
   rb_define_method (klass, "set", (ruby_func) &SignalHandler::static_assign, 1);
   rb_define_method (klass, "clear", (ruby_func) &SignalHandler::static_clear, 0);
   rb_define_method (klass, "+", (ruby_func) &SignalHandler::static_add, 1);
+  rb_define_method (klass, "add", (ruby_func) &SignalHandler::static_add, 1);
+  rb_define_method (klass, "connect", (ruby_func) &SignalHandler::static_add, 1);
   rb_define_method (klass, "-", (ruby_func) &SignalHandler::static_remove, 1);
+  rb_define_method (klass, "remove", (ruby_func) &SignalHandler::static_remove, 1);
+  rb_define_method (klass, "disconnect", (ruby_func) &SignalHandler::static_remove, 1);
 }
 
 void SignalHandler::call (const gsi::MethodBase *meth, gsi::SerialArgs &args, gsi::SerialArgs &ret) const
@@ -823,7 +827,7 @@ void SignalHandler::call (const gsi::MethodBase *meth, gsi::SerialArgs &args, gs
 
   //  TODO: signals with default arguments?
   for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); args && a != meth->end_arguments (); ++a) {
-    rb_ary_push (argv, pop_arg (*a, 0, args, heap));
+    rb_ary_push (argv, pull_arg (*a, 0, args, heap));
   }
 
   //  call the signal handlers ... the last one will deliver the return value

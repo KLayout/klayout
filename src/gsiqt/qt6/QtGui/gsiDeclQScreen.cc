@@ -655,9 +655,9 @@ static gsi::Methods methods_QScreen () {
   methods += new qt_gsi::GenericMethod (":logicalDotsPerInch", "@brief Method double QScreen::logicalDotsPerInch()\n", true, &_init_f_logicalDotsPerInch_c0, &_call_f_logicalDotsPerInch_c0);
   methods += new qt_gsi::GenericMethod (":logicalDotsPerInchX", "@brief Method double QScreen::logicalDotsPerInchX()\n", true, &_init_f_logicalDotsPerInchX_c0, &_call_f_logicalDotsPerInchX_c0);
   methods += new qt_gsi::GenericMethod (":logicalDotsPerInchY", "@brief Method double QScreen::logicalDotsPerInchY()\n", true, &_init_f_logicalDotsPerInchY_c0, &_call_f_logicalDotsPerInchY_c0);
-  methods += new qt_gsi::GenericMethod ("manufacturer", "@brief Method QString QScreen::manufacturer()\n", true, &_init_f_manufacturer_c0, &_call_f_manufacturer_c0);
+  methods += new qt_gsi::GenericMethod (":manufacturer", "@brief Method QString QScreen::manufacturer()\n", true, &_init_f_manufacturer_c0, &_call_f_manufacturer_c0);
   methods += new qt_gsi::GenericMethod ("mapBetween", "@brief Method QRect QScreen::mapBetween(Qt::ScreenOrientation a, Qt::ScreenOrientation b, const QRect &rect)\n", true, &_init_f_mapBetween_c6618, &_call_f_mapBetween_c6618);
-  methods += new qt_gsi::GenericMethod ("model", "@brief Method QString QScreen::model()\n", true, &_init_f_model_c0, &_call_f_model_c0);
+  methods += new qt_gsi::GenericMethod (":model", "@brief Method QString QScreen::model()\n", true, &_init_f_model_c0, &_call_f_model_c0);
   methods += new qt_gsi::GenericMethod (":name", "@brief Method QString QScreen::name()\n", true, &_init_f_name_c0, &_call_f_name_c0);
   methods += new qt_gsi::GenericMethod (":nativeOrientation", "@brief Method Qt::ScreenOrientation QScreen::nativeOrientation()\n", true, &_init_f_nativeOrientation_c0, &_call_f_nativeOrientation_c0);
   methods += new qt_gsi::GenericMethod (":orientation", "@brief Method Qt::ScreenOrientation QScreen::orientation()\n", true, &_init_f_orientation_c0, &_call_f_orientation_c0);
@@ -667,7 +667,7 @@ static gsi::Methods methods_QScreen () {
   methods += new qt_gsi::GenericMethod (":physicalSize", "@brief Method QSizeF QScreen::physicalSize()\n", true, &_init_f_physicalSize_c0, &_call_f_physicalSize_c0);
   methods += new qt_gsi::GenericMethod (":primaryOrientation", "@brief Method Qt::ScreenOrientation QScreen::primaryOrientation()\n", true, &_init_f_primaryOrientation_c0, &_call_f_primaryOrientation_c0);
   methods += new qt_gsi::GenericMethod (":refreshRate", "@brief Method double QScreen::refreshRate()\n", true, &_init_f_refreshRate_c0, &_call_f_refreshRate_c0);
-  methods += new qt_gsi::GenericMethod ("serialNumber", "@brief Method QString QScreen::serialNumber()\n", true, &_init_f_serialNumber_c0, &_call_f_serialNumber_c0);
+  methods += new qt_gsi::GenericMethod (":serialNumber", "@brief Method QString QScreen::serialNumber()\n", true, &_init_f_serialNumber_c0, &_call_f_serialNumber_c0);
   methods += new qt_gsi::GenericMethod (":size", "@brief Method QSize QScreen::size()\n", true, &_init_f_size_c0, &_call_f_size_c0);
   methods += new qt_gsi::GenericMethod ("transformBetween", "@brief Method QTransform QScreen::transformBetween(Qt::ScreenOrientation a, Qt::ScreenOrientation b, const QRect &target)\n", true, &_init_f_transformBetween_c6618, &_call_f_transformBetween_c6618);
   methods += new qt_gsi::GenericMethod (":virtualGeometry", "@brief Method QRect QScreen::virtualGeometry()\n", true, &_init_f_virtualGeometry_c0, &_call_f_virtualGeometry_c0);

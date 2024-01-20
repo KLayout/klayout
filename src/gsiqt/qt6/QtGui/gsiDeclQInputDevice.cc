@@ -70,26 +70,6 @@ static void _call_f_availableVirtualGeometry_c0 (const qt_gsi::GenericMethod * /
 }
 
 
-// void QInputDevice::availableVirtualGeometryChanged(QRect area)
-
-
-static void _init_f_availableVirtualGeometryChanged_915 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("area");
-  decl->add_arg<QRect > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_availableVirtualGeometryChanged_915 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QRect arg1 = gsi::arg_reader<QRect >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QInputDevice *)cls)->availableVirtualGeometryChanged (arg1);
-}
-
-
 // QFlags<QInputDevice::Capability> QInputDevice::capabilities()
 
 
@@ -268,15 +248,17 @@ namespace gsi
 static gsi::Methods methods_QInputDevice () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("availableVirtualGeometry", "@brief Method QRect QInputDevice::availableVirtualGeometry()\n", true, &_init_f_availableVirtualGeometry_c0, &_call_f_availableVirtualGeometry_c0);
-  methods += new qt_gsi::GenericMethod ("availableVirtualGeometryChanged", "@brief Method void QInputDevice::availableVirtualGeometryChanged(QRect area)\n", false, &_init_f_availableVirtualGeometryChanged_915, &_call_f_availableVirtualGeometryChanged_915);
-  methods += new qt_gsi::GenericMethod ("capabilities", "@brief Method QFlags<QInputDevice::Capability> QInputDevice::capabilities()\n", true, &_init_f_capabilities_c0, &_call_f_capabilities_c0);
+  methods += new qt_gsi::GenericMethod (":availableVirtualGeometry", "@brief Method QRect QInputDevice::availableVirtualGeometry()\n", true, &_init_f_availableVirtualGeometry_c0, &_call_f_availableVirtualGeometry_c0);
+  methods += new qt_gsi::GenericMethod (":capabilities", "@brief Method QFlags<QInputDevice::Capability> QInputDevice::capabilities()\n", true, &_init_f_capabilities_c0, &_call_f_capabilities_c0);
   methods += new qt_gsi::GenericMethod ("hasCapability", "@brief Method bool QInputDevice::hasCapability(QInputDevice::Capability cap)\n", true, &_init_f_hasCapability_c2779, &_call_f_hasCapability_c2779);
-  methods += new qt_gsi::GenericMethod ("name", "@brief Method QString QInputDevice::name()\n", true, &_init_f_name_c0, &_call_f_name_c0);
+  methods += new qt_gsi::GenericMethod (":name", "@brief Method QString QInputDevice::name()\n", true, &_init_f_name_c0, &_call_f_name_c0);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QInputDevice::operator==(const QInputDevice &other)\n", true, &_init_f_operator_eq__eq__c2514, &_call_f_operator_eq__eq__c2514);
-  methods += new qt_gsi::GenericMethod ("seatName", "@brief Method QString QInputDevice::seatName()\n", true, &_init_f_seatName_c0, &_call_f_seatName_c0);
-  methods += new qt_gsi::GenericMethod ("systemId", "@brief Method qint64 QInputDevice::systemId()\n", true, &_init_f_systemId_c0, &_call_f_systemId_c0);
-  methods += new qt_gsi::GenericMethod ("type", "@brief Method QInputDevice::DeviceType QInputDevice::type()\n", true, &_init_f_type_c0, &_call_f_type_c0);
+  methods += new qt_gsi::GenericMethod (":seatName", "@brief Method QString QInputDevice::seatName()\n", true, &_init_f_seatName_c0, &_call_f_seatName_c0);
+  methods += new qt_gsi::GenericMethod (":systemId", "@brief Method qint64 QInputDevice::systemId()\n", true, &_init_f_systemId_c0, &_call_f_systemId_c0);
+  methods += new qt_gsi::GenericMethod (":type", "@brief Method QInputDevice::DeviceType QInputDevice::type()\n", true, &_init_f_type_c0, &_call_f_type_c0);
+  methods += gsi::qt_signal<QRect > ("availableVirtualGeometryChanged(QRect)", "availableVirtualGeometryChanged", gsi::arg("area"), "@brief Signal declaration for QInputDevice::availableVirtualGeometryChanged(QRect area)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QInputDevice::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QInputDevice::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("devices", "@brief Static method QList<const QInputDevice *> QInputDevice::devices()\nThis method is static and can be called without an instance.", &_init_f_devices_0, &_call_f_devices_0);
   methods += new qt_gsi::GenericStaticMethod ("primaryKeyboard", "@brief Static method const QInputDevice *QInputDevice::primaryKeyboard(const QString &seatName)\nThis method is static and can be called without an instance.", &_init_f_primaryKeyboard_2025, &_call_f_primaryKeyboard_2025);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QInputDevice::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
@@ -350,6 +332,18 @@ public:
     return QInputDevice::senderSignalIndex();
   }
 
+  //  [emitter impl] void QInputDevice::availableVirtualGeometryChanged(QRect area)
+  void emitter_QInputDevice_availableVirtualGeometryChanged_915(QRect area)
+  {
+    emit QInputDevice::availableVirtualGeometryChanged(area);
+  }
+
+  //  [emitter impl] void QInputDevice::destroyed(QObject *)
+  void emitter_QInputDevice_destroyed_1302(QObject *arg1)
+  {
+    emit QInputDevice::destroyed(arg1);
+  }
+
   //  [adaptor impl] bool QInputDevice::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -378,6 +372,13 @@ public:
     } else {
       return QInputDevice::eventFilter(watched, event);
     }
+  }
+
+  //  [emitter impl] void QInputDevice::objectNameChanged(const QString &objectName)
+  void emitter_QInputDevice_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QInputDevice::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] void QInputDevice::childEvent(QChildEvent *event)
@@ -498,6 +499,24 @@ static void _call_ctor_QInputDevice_Adaptor_8669 (const qt_gsi::GenericStaticMet
 }
 
 
+// emitter void QInputDevice::availableVirtualGeometryChanged(QRect area)
+
+static void _init_emitter_availableVirtualGeometryChanged_915 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("area");
+  decl->add_arg<QRect > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_availableVirtualGeometryChanged_915 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QRect arg1 = gsi::arg_reader<QRect >() (args, heap);
+  ((QInputDevice_Adaptor *)cls)->emitter_QInputDevice_availableVirtualGeometryChanged_915 (arg1);
+}
+
+
 // void QInputDevice::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
@@ -543,6 +562,24 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QInputDevice_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
+}
+
+
+// emitter void QInputDevice::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QInputDevice_Adaptor *)cls)->emitter_QInputDevice_destroyed_1302 (arg1);
 }
 
 
@@ -637,6 +674,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QInputDevice::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QInputDevice_Adaptor *)cls)->emitter_QInputDevice_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QInputDevice::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -716,10 +771,12 @@ static gsi::Methods methods_QInputDevice_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QInputDevice::QInputDevice(QObject *parent)\nThis method creates an object of class QInputDevice.", &_init_ctor_QInputDevice_Adaptor_1302, &_call_ctor_QInputDevice_Adaptor_1302);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QInputDevice::QInputDevice(const QString &name, qint64 systemId, QInputDevice::DeviceType type, const QString &seatName, QObject *parent)\nThis method creates an object of class QInputDevice.", &_init_ctor_QInputDevice_Adaptor_8669, &_call_ctor_QInputDevice_Adaptor_8669);
+  methods += new qt_gsi::GenericMethod ("emit_availableVirtualGeometryChanged", "@brief Emitter for signal void QInputDevice::availableVirtualGeometryChanged(QRect area)\nCall this method to emit this signal.", false, &_init_emitter_availableVirtualGeometryChanged_915, &_call_emitter_availableVirtualGeometryChanged_915);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QInputDevice::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QInputDevice::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QInputDevice::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QInputDevice::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QInputDevice::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
@@ -727,6 +784,7 @@ static gsi::Methods methods_QInputDevice_Adaptor () {
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QInputDevice::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QInputDevice::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QInputDevice::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QInputDevice::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QInputDevice::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QInputDevice::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);

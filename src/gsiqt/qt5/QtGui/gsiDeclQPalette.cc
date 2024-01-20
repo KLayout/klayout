@@ -668,6 +668,21 @@ static void _call_f_operator_eq__eq__c2113 (const qt_gsi::GenericMethod * /*decl
 }
 
 
+// const QBrush &QPalette::placeholderText()
+
+
+static void _init_f_placeholderText_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<const QBrush & > ();
+}
+
+static void _call_f_placeholderText_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<const QBrush & > ((const QBrush &)((QPalette *)cls)->placeholderText ());
+}
+
+
 // QPalette QPalette::resolve(const QPalette &)
 
 
@@ -1002,6 +1017,7 @@ static gsi::Methods methods_QPalette () {
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QPalette::operator!=(const QPalette &p)\n", true, &_init_f_operator_excl__eq__c2113, &_call_f_operator_excl__eq__c2113);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QPalette &QPalette::operator=(const QPalette &palette)\n", false, &_init_f_operator_eq__2113, &_call_f_operator_eq__2113);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QPalette::operator==(const QPalette &p)\n", true, &_init_f_operator_eq__eq__c2113, &_call_f_operator_eq__eq__c2113);
+  methods += new qt_gsi::GenericMethod ("placeholderText", "@brief Method const QBrush &QPalette::placeholderText()\n", true, &_init_f_placeholderText_c0, &_call_f_placeholderText_c0);
   methods += new qt_gsi::GenericMethod ("resolve", "@brief Method QPalette QPalette::resolve(const QPalette &)\n", true, &_init_f_resolve_c2113, &_call_f_resolve_c2113);
   methods += new qt_gsi::GenericMethod ("setBrush", "@brief Method void QPalette::setBrush(QPalette::ColorRole cr, const QBrush &brush)\n", false, &_init_f_setBrush_4067, &_call_f_setBrush_4067);
   methods += new qt_gsi::GenericMethod ("setBrush", "@brief Method void QPalette::setBrush(QPalette::ColorGroup cg, QPalette::ColorRole cr, const QBrush &brush)\n", false, &_init_f_setBrush_6347, &_call_f_setBrush_6347);
@@ -1079,6 +1095,7 @@ static gsi::Enum<QPalette::ColorRole> decl_QPalette_ColorRole_Enum ("QtGui", "QP
     gsi::enum_const ("NoRole", QPalette::NoRole, "@brief Enum constant QPalette::NoRole") +
     gsi::enum_const ("ToolTipBase", QPalette::ToolTipBase, "@brief Enum constant QPalette::ToolTipBase") +
     gsi::enum_const ("ToolTipText", QPalette::ToolTipText, "@brief Enum constant QPalette::ToolTipText") +
+    gsi::enum_const ("PlaceholderText", QPalette::PlaceholderText, "@brief Enum constant QPalette::PlaceholderText") +
     gsi::enum_const ("NColorRoles", QPalette::NColorRoles, "@brief Enum constant QPalette::NColorRoles") +
     gsi::enum_const ("Foreground", QPalette::Foreground, "@brief Enum constant QPalette::Foreground") +
     gsi::enum_const ("Background", QPalette::Background, "@brief Enum constant QPalette::Background"),

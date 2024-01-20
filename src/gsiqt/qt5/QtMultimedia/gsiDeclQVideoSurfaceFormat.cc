@@ -171,6 +171,21 @@ static void _call_f_handleType_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
+// bool QVideoSurfaceFormat::isMirrored()
+
+
+static void _init_f_isMirrored_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isMirrored_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QVideoSurfaceFormat *)cls)->isMirrored ());
+}
+
+
 // bool QVideoSurfaceFormat::isValid()
 
 
@@ -385,6 +400,26 @@ static void _call_f_setFrameSize_1426 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
+// void QVideoSurfaceFormat::setMirrored(bool mirrored)
+
+
+static void _init_f_setMirrored_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("mirrored");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setMirrored_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QVideoSurfaceFormat *)cls)->setMirrored (arg1);
+}
+
+
 // void QVideoSurfaceFormat::setPixelAspectRatio(const QSize &ratio)
 
 
@@ -570,6 +605,7 @@ static gsi::Methods methods_QVideoSurfaceFormat () {
   methods += new qt_gsi::GenericMethod (":frameSize", "@brief Method QSize QVideoSurfaceFormat::frameSize()\n", true, &_init_f_frameSize_c0, &_call_f_frameSize_c0);
   methods += new qt_gsi::GenericMethod ("frameWidth", "@brief Method int QVideoSurfaceFormat::frameWidth()\n", true, &_init_f_frameWidth_c0, &_call_f_frameWidth_c0);
   methods += new qt_gsi::GenericMethod ("handleType", "@brief Method QAbstractVideoBuffer::HandleType QVideoSurfaceFormat::handleType()\n", true, &_init_f_handleType_c0, &_call_f_handleType_c0);
+  methods += new qt_gsi::GenericMethod ("isMirrored?|:mirrored", "@brief Method bool QVideoSurfaceFormat::isMirrored()\n", true, &_init_f_isMirrored_c0, &_call_f_isMirrored_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QVideoSurfaceFormat::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QVideoSurfaceFormat::operator !=(const QVideoSurfaceFormat &format)\n", true, &_init_f_operator_excl__eq__c3227, &_call_f_operator_excl__eq__c3227);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QVideoSurfaceFormat &QVideoSurfaceFormat::operator =(const QVideoSurfaceFormat &format)\n", false, &_init_f_operator_eq__3227, &_call_f_operator_eq__3227);
@@ -582,6 +618,7 @@ static gsi::Methods methods_QVideoSurfaceFormat () {
   methods += new qt_gsi::GenericMethod ("setFrameRate|frameRate=", "@brief Method void QVideoSurfaceFormat::setFrameRate(double rate)\n", false, &_init_f_setFrameRate_1071, &_call_f_setFrameRate_1071);
   methods += new qt_gsi::GenericMethod ("setFrameSize|frameSize=", "@brief Method void QVideoSurfaceFormat::setFrameSize(const QSize &size)\n", false, &_init_f_setFrameSize_1805, &_call_f_setFrameSize_1805);
   methods += new qt_gsi::GenericMethod ("setFrameSize", "@brief Method void QVideoSurfaceFormat::setFrameSize(int width, int height)\n", false, &_init_f_setFrameSize_1426, &_call_f_setFrameSize_1426);
+  methods += new qt_gsi::GenericMethod ("setMirrored|mirrored=", "@brief Method void QVideoSurfaceFormat::setMirrored(bool mirrored)\n", false, &_init_f_setMirrored_864, &_call_f_setMirrored_864);
   methods += new qt_gsi::GenericMethod ("setPixelAspectRatio|pixelAspectRatio=", "@brief Method void QVideoSurfaceFormat::setPixelAspectRatio(const QSize &ratio)\n", false, &_init_f_setPixelAspectRatio_1805, &_call_f_setPixelAspectRatio_1805);
   methods += new qt_gsi::GenericMethod ("setPixelAspectRatio", "@brief Method void QVideoSurfaceFormat::setPixelAspectRatio(int width, int height)\n", false, &_init_f_setPixelAspectRatio_1426, &_call_f_setPixelAspectRatio_1426);
   methods += new qt_gsi::GenericMethod ("setProperty", "@brief Method void QVideoSurfaceFormat::setProperty(const char *name, const QVariant &value)\n", false, &_init_f_setProperty_3742, &_call_f_setProperty_3742);

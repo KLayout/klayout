@@ -189,18 +189,18 @@ public:
     throw tl::Exception ("Can't emit private signal 'void QFinalState::entered()'");
   }
 
-  //  [adaptor impl] bool QFinalState::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QFinalState::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QFinalState::eventFilter(arg1, arg2);
+    return QFinalState::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QFinalState_Adaptor, bool, QObject *, QEvent *>(&QFinalState_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QFinalState_Adaptor, bool, QObject *, QEvent *>(&QFinalState_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QFinalState::eventFilter(arg1, arg2);
+      return QFinalState::eventFilter(watched, event);
     }
   }
 
@@ -217,33 +217,33 @@ public:
     throw tl::Exception ("Can't emit private signal 'void QFinalState::objectNameChanged(const QString &objectName)'");
   }
 
-  //  [adaptor impl] void QFinalState::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QFinalState::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QFinalState::childEvent(arg1);
+    QFinalState::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QFinalState_Adaptor, QChildEvent *>(&QFinalState_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QFinalState_Adaptor, QChildEvent *>(&QFinalState_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QFinalState::childEvent(arg1);
+      QFinalState::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QFinalState::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QFinalState::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QFinalState::customEvent(arg1);
+    QFinalState::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QFinalState_Adaptor, QEvent *>(&QFinalState_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QFinalState_Adaptor, QEvent *>(&QFinalState_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QFinalState::customEvent(arg1);
+      QFinalState::customEvent(event);
     }
   }
 
@@ -307,18 +307,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QFinalState::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QFinalState::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QFinalState::timerEvent(arg1);
+    QFinalState::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QFinalState_Adaptor, QTimerEvent *>(&QFinalState_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QFinalState_Adaptor, QTimerEvent *>(&QFinalState_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QFinalState::timerEvent(arg1);
+      QFinalState::timerEvent(event);
     }
   }
 
@@ -338,7 +338,7 @@ QFinalState_Adaptor::~QFinalState_Adaptor() { }
 
 static void _init_ctor_QFinalState_Adaptor_1216 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QState * > (argspec_0);
   decl->set_return_new<QFinalState_Adaptor> ();
 }
@@ -347,7 +347,7 @@ static void _call_ctor_QFinalState_Adaptor_1216 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QState *arg1 = args ? gsi::arg_reader<QState * >() (args, heap) : gsi::arg_maker<QState * >() (0, heap);
+  QState *arg1 = args ? gsi::arg_reader<QState * >() (args, heap) : gsi::arg_maker<QState * >() (nullptr, heap);
   ret.write<QFinalState_Adaptor *> (new QFinalState_Adaptor (arg1));
 }
 
@@ -370,11 +370,11 @@ static void _call_emitter_activeChanged_864 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// void QFinalState::childEvent(QChildEvent *)
+// void QFinalState::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -394,11 +394,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QFinalState::customEvent(QEvent *)
+// void QFinalState::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -422,7 +422,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -431,7 +431,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QFinalState_Adaptor *)cls)->emitter_QFinalState_destroyed_1302 (arg1);
 }
 
@@ -497,13 +497,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QFinalState::eventFilter(QObject *, QEvent *)
+// bool QFinalState::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -667,11 +667,11 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QFinalState::timerEvent(QTimerEvent *)
+// void QFinalState::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -700,9 +700,9 @@ static gsi::Methods methods_QFinalState_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QFinalState::QFinalState(QState *parent)\nThis method creates an object of class QFinalState.", &_init_ctor_QFinalState_Adaptor_1216, &_call_ctor_QFinalState_Adaptor_1216);
   methods += new qt_gsi::GenericMethod ("emit_activeChanged", "@brief Emitter for signal void QFinalState::activeChanged(bool active)\nCall this method to emit this signal.", false, &_init_emitter_activeChanged_864, &_call_emitter_activeChanged_864);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QFinalState::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QFinalState::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QFinalState::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QFinalState::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QFinalState::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QFinalState::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
@@ -710,7 +710,7 @@ static gsi::Methods methods_QFinalState_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_entered", "@brief Emitter for signal void QFinalState::entered()\nCall this method to emit this signal.", false, &_init_emitter_entered_3384, &_call_emitter_entered_3384);
   methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QFinalState::event(QEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QFinalState::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QFinalState::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("emit_exited", "@brief Emitter for signal void QFinalState::exited()\nCall this method to emit this signal.", false, &_init_emitter_exited_3384, &_call_emitter_exited_3384);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QFinalState::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
@@ -722,7 +722,7 @@ static gsi::Methods methods_QFinalState_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QFinalState::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QFinalState::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QFinalState::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QFinalState::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QFinalState::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

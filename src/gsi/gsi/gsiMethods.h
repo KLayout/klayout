@@ -620,81 +620,29 @@ class GSI_PUBLIC Methods
 public:
   typedef std::vector<MethodBase *>::const_iterator iterator;
 
-  Methods ()
-    : m_methods ()
-  {
-    // .. nothing yet ..
-  }
+  Methods ();
+  explicit Methods (MethodBase *m);
+  Methods (const Methods &d);
 
-  explicit Methods (MethodBase *m)
-    : m_methods ()
-  {
-    m_methods.push_back (m);
-  }
+  Methods &operator= (const Methods &d);
 
-  Methods (const Methods &d)
-  {
-    operator= (d);
-  }
+  ~Methods ();
 
-  Methods &operator= (const Methods &d)
-  {
-    if (this != &d) {
-      clear ();
-      m_methods.reserve (d.m_methods.size ());
-      for (std::vector<MethodBase *>::const_iterator m = d.m_methods.begin (); m != d.m_methods.end (); ++m) {
-        m_methods.push_back ((*m)->clone ());
-      }
-    }
-    return *this;
-  }
-
-  ~Methods ()
-  {
-    clear ();
-  }
-
-  void initialize ()
-  {
-    for (std::vector<MethodBase *>::iterator m = m_methods.begin (); m != m_methods.end (); ++m) {
-      (*m)->initialize ();
-    }
-  }
-
-  void clear ()
-  {
-    for (std::vector<MethodBase *>::iterator m = m_methods.begin (); m != m_methods.end (); ++m) {
-      delete *m;
-    }
-    m_methods.clear ();
-  }
+  void initialize ();
+  void clear ();
 
   //  HINT: this is not the usual + semantics but this is more effective
-  Methods &operator+ (const Methods &m)
-  {
-    return operator+= (m);
-  }
+  Methods &operator+ (const Methods &m);
 
   //  HINT: this is not the usual + semantics but this is more effective
-  Methods &operator+ (MethodBase *m)
-  {
-    return operator+= (m);
-  }
+  Methods &operator+ (MethodBase *m);
 
-  Methods &operator+= (const Methods &m)
-  {
-    for (std::vector<MethodBase *>::const_iterator mm = m.m_methods.begin (); mm != m.m_methods.end (); ++mm) 
-    {
-      add_method ((*mm)->clone ());
-    }
-    return *this;
-  }
+  Methods &operator+= (const Methods &m);
+  Methods &operator+= (MethodBase *m);
 
-  Methods &operator+= (MethodBase *m)
-  {
-    add_method (m);
-    return *this;
-  }
+  void add_method (MethodBase *method);
+
+  void swap (Methods &other);
 
   iterator begin () const
   {
@@ -706,19 +654,9 @@ public:
     return m_methods.end ();
   }
 
-  void add_method (MethodBase *method)
-  {
-    m_methods.push_back (method);
-  }
-
   size_t size () const
   {
     return m_methods.size ();
-  }
-
-  void swap (Methods &other) 
-  {
-    m_methods.swap (other.m_methods);
   }
 
 public:

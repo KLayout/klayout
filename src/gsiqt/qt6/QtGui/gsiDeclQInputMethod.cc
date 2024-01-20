@@ -426,12 +426,12 @@ namespace gsi
 static gsi::Methods methods_QInputMethod () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("anchorRectangle", "@brief Method QRectF QInputMethod::anchorRectangle()\n", true, &_init_f_anchorRectangle_c0, &_call_f_anchorRectangle_c0);
+  methods += new qt_gsi::GenericMethod (":anchorRectangle", "@brief Method QRectF QInputMethod::anchorRectangle()\n", true, &_init_f_anchorRectangle_c0, &_call_f_anchorRectangle_c0);
   methods += new qt_gsi::GenericMethod ("commit", "@brief Method void QInputMethod::commit()\n", false, &_init_f_commit_0, &_call_f_commit_0);
   methods += new qt_gsi::GenericMethod (":cursorRectangle", "@brief Method QRectF QInputMethod::cursorRectangle()\n", true, &_init_f_cursorRectangle_c0, &_call_f_cursorRectangle_c0);
   methods += new qt_gsi::GenericMethod ("hide", "@brief Method void QInputMethod::hide()\n", false, &_init_f_hide_0, &_call_f_hide_0);
   methods += new qt_gsi::GenericMethod (":inputDirection", "@brief Method Qt::LayoutDirection QInputMethod::inputDirection()\n", true, &_init_f_inputDirection_c0, &_call_f_inputDirection_c0);
-  methods += new qt_gsi::GenericMethod ("inputItemClipRectangle", "@brief Method QRectF QInputMethod::inputItemClipRectangle()\n", true, &_init_f_inputItemClipRectangle_c0, &_call_f_inputItemClipRectangle_c0);
+  methods += new qt_gsi::GenericMethod (":inputItemClipRectangle", "@brief Method QRectF QInputMethod::inputItemClipRectangle()\n", true, &_init_f_inputItemClipRectangle_c0, &_call_f_inputItemClipRectangle_c0);
   methods += new qt_gsi::GenericMethod (":inputItemRectangle", "@brief Method QRectF QInputMethod::inputItemRectangle()\n", true, &_init_f_inputItemRectangle_c0, &_call_f_inputItemRectangle_c0);
   methods += new qt_gsi::GenericMethod (":inputItemTransform", "@brief Method QTransform QInputMethod::inputItemTransform()\n", true, &_init_f_inputItemTransform_c0, &_call_f_inputItemTransform_c0);
   methods += new qt_gsi::GenericMethod ("invokeAction", "@brief Method void QInputMethod::invokeAction(QInputMethod::Action a, int cursorPosition)\n", false, &_init_f_invokeAction_3035, &_call_f_invokeAction_3035);

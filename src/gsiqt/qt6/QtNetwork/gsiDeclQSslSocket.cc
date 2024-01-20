@@ -80,58 +80,6 @@ static void _call_ctor_QSslSocket_1302 (const qt_gsi::GenericStaticMethod * /*de
 }
 
 
-// void QSslSocket::alertReceived(QSsl::AlertLevel level, QSsl::AlertType type, const QString &description)
-
-
-static void _init_f_alertReceived_5617 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("level");
-  decl->add_arg<const qt_gsi::Converter<QSsl::AlertLevel>::target_type & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("type");
-  decl->add_arg<const qt_gsi::Converter<QSsl::AlertType>::target_type & > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("description");
-  decl->add_arg<const QString & > (argspec_2);
-  decl->set_return<void > ();
-}
-
-static void _call_f_alertReceived_5617 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QSsl::AlertLevel>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSsl::AlertLevel>::target_type & >() (args, heap);
-  const qt_gsi::Converter<QSsl::AlertType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QSsl::AlertType>::target_type & >() (args, heap);
-  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSslSocket *)cls)->alertReceived (qt_gsi::QtToCppAdaptor<QSsl::AlertLevel>(arg1).cref(), qt_gsi::QtToCppAdaptor<QSsl::AlertType>(arg2).cref(), arg3);
-}
-
-
-// void QSslSocket::alertSent(QSsl::AlertLevel level, QSsl::AlertType type, const QString &description)
-
-
-static void _init_f_alertSent_5617 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("level");
-  decl->add_arg<const qt_gsi::Converter<QSsl::AlertLevel>::target_type & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("type");
-  decl->add_arg<const qt_gsi::Converter<QSsl::AlertType>::target_type & > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("description");
-  decl->add_arg<const QString & > (argspec_2);
-  decl->set_return<void > ();
-}
-
-static void _call_f_alertSent_5617 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QSsl::AlertLevel>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSsl::AlertLevel>::target_type & >() (args, heap);
-  const qt_gsi::Converter<QSsl::AlertType>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QSsl::AlertType>::target_type & >() (args, heap);
-  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSslSocket *)cls)->alertSent (qt_gsi::QtToCppAdaptor<QSsl::AlertLevel>(arg1).cref(), qt_gsi::QtToCppAdaptor<QSsl::AlertType>(arg2).cref(), arg3);
-}
-
-
 // bool QSslSocket::atEnd()
 
 
@@ -386,26 +334,6 @@ static void _call_f_encryptedBytesToWrite_c0 (const qt_gsi::GenericMethod * /*de
 }
 
 
-// void QSslSocket::handshakeInterruptedOnError(const QSslError &error)
-
-
-static void _init_f_handshakeInterruptedOnError_2222 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("error");
-  decl->add_arg<const QSslError & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_handshakeInterruptedOnError_2222 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QSslError &arg1 = gsi::arg_reader<const QSslError & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSslSocket *)cls)->handshakeInterruptedOnError (arg1);
-}
-
-
 // void QSslSocket::ignoreSslErrors(const QList<QSslError> &errors)
 
 
@@ -499,22 +427,6 @@ static void _call_f_mode_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qt_gsi::Converter<QSslSocket::SslMode>::target_type > ((qt_gsi::Converter<QSslSocket::SslMode>::target_type)qt_gsi::CppToQtAdaptor<QSslSocket::SslMode>(((QSslSocket *)cls)->mode ()));
-}
-
-
-// void QSslSocket::newSessionTicketReceived()
-
-
-static void _init_f_newSessionTicketReceived_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_newSessionTicketReceived_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSslSocket *)cls)->newSessionTicketReceived ();
 }
 
 
@@ -1405,8 +1317,6 @@ static gsi::Methods methods_QSslSocket () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSslSocket::QSslSocket(QObject *parent)\nThis method creates an object of class QSslSocket.", &_init_ctor_QSslSocket_1302, &_call_ctor_QSslSocket_1302);
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("alertReceived", "@brief Method void QSslSocket::alertReceived(QSsl::AlertLevel level, QSsl::AlertType type, const QString &description)\n", false, &_init_f_alertReceived_5617, &_call_f_alertReceived_5617);
-  methods += new qt_gsi::GenericMethod ("alertSent", "@brief Method void QSslSocket::alertSent(QSsl::AlertLevel level, QSsl::AlertType type, const QString &description)\n", false, &_init_f_alertSent_5617, &_call_f_alertSent_5617);
   methods += new qt_gsi::GenericMethod ("atEnd", "@brief Method bool QSslSocket::atEnd()\nThis is a reimplementation of QIODevice::atEnd", true, &_init_f_atEnd_c0, &_call_f_atEnd_c0);
   methods += new qt_gsi::GenericMethod ("bytesAvailable", "@brief Method qint64 QSslSocket::bytesAvailable()\nThis is a reimplementation of QAbstractSocket::bytesAvailable", true, &_init_f_bytesAvailable_c0, &_call_f_bytesAvailable_c0);
   methods += new qt_gsi::GenericMethod ("bytesToWrite", "@brief Method qint64 QSslSocket::bytesToWrite()\nThis is a reimplementation of QAbstractSocket::bytesToWrite", true, &_init_f_bytesToWrite_c0, &_call_f_bytesToWrite_c0);
@@ -1420,14 +1330,12 @@ static gsi::Methods methods_QSslSocket () {
   methods += new qt_gsi::GenericMethod ("disconnectFromHost", "@brief Method void QSslSocket::disconnectFromHost()\nThis is a reimplementation of QAbstractSocket::disconnectFromHost", false, &_init_f_disconnectFromHost_0, &_call_f_disconnectFromHost_0);
   methods += new qt_gsi::GenericMethod ("encryptedBytesAvailable", "@brief Method qint64 QSslSocket::encryptedBytesAvailable()\n", true, &_init_f_encryptedBytesAvailable_c0, &_call_f_encryptedBytesAvailable_c0);
   methods += new qt_gsi::GenericMethod ("encryptedBytesToWrite", "@brief Method qint64 QSslSocket::encryptedBytesToWrite()\n", true, &_init_f_encryptedBytesToWrite_c0, &_call_f_encryptedBytesToWrite_c0);
-  methods += new qt_gsi::GenericMethod ("handshakeInterruptedOnError", "@brief Method void QSslSocket::handshakeInterruptedOnError(const QSslError &error)\n", false, &_init_f_handshakeInterruptedOnError_2222, &_call_f_handshakeInterruptedOnError_2222);
   methods += new qt_gsi::GenericMethod ("ignoreSslErrors", "@brief Method void QSslSocket::ignoreSslErrors(const QList<QSslError> &errors)\n", false, &_init_f_ignoreSslErrors_2837, &_call_f_ignoreSslErrors_2837);
   methods += new qt_gsi::GenericMethod ("ignoreSslErrors", "@brief Method void QSslSocket::ignoreSslErrors()\n", false, &_init_f_ignoreSslErrors_0, &_call_f_ignoreSslErrors_0);
   methods += new qt_gsi::GenericMethod ("isEncrypted?", "@brief Method bool QSslSocket::isEncrypted()\n", true, &_init_f_isEncrypted_c0, &_call_f_isEncrypted_c0);
   methods += new qt_gsi::GenericMethod (":localCertificate", "@brief Method QSslCertificate QSslSocket::localCertificate()\n", true, &_init_f_localCertificate_c0, &_call_f_localCertificate_c0);
   methods += new qt_gsi::GenericMethod (":localCertificateChain", "@brief Method QList<QSslCertificate> QSslSocket::localCertificateChain()\n", true, &_init_f_localCertificateChain_c0, &_call_f_localCertificateChain_c0);
   methods += new qt_gsi::GenericMethod ("mode", "@brief Method QSslSocket::SslMode QSslSocket::mode()\n", true, &_init_f_mode_c0, &_call_f_mode_c0);
-  methods += new qt_gsi::GenericMethod ("newSessionTicketReceived", "@brief Method void QSslSocket::newSessionTicketReceived()\n", false, &_init_f_newSessionTicketReceived_0, &_call_f_newSessionTicketReceived_0);
   methods += new qt_gsi::GenericMethod ("peerCertificate", "@brief Method QSslCertificate QSslSocket::peerCertificate()\n", true, &_init_f_peerCertificate_c0, &_call_f_peerCertificate_c0);
   methods += new qt_gsi::GenericMethod ("peerCertificateChain", "@brief Method QList<QSslCertificate> QSslSocket::peerCertificateChain()\n", true, &_init_f_peerCertificateChain_c0, &_call_f_peerCertificateChain_c0);
   methods += new qt_gsi::GenericMethod (":peerVerifyDepth", "@brief Method int QSslSocket::peerVerifyDepth()\n", true, &_init_f_peerVerifyDepth_c0, &_call_f_peerVerifyDepth_c0);
@@ -1462,6 +1370,8 @@ static gsi::Methods methods_QSslSocket () {
   methods += new qt_gsi::GenericMethod ("waitForEncrypted", "@brief Method bool QSslSocket::waitForEncrypted(int msecs)\n", false, &_init_f_waitForEncrypted_767, &_call_f_waitForEncrypted_767);
   methods += new qt_gsi::GenericMethod ("waitForReadyRead", "@brief Method bool QSslSocket::waitForReadyRead(int msecs)\nThis is a reimplementation of QAbstractSocket::waitForReadyRead", false, &_init_f_waitForReadyRead_767, &_call_f_waitForReadyRead_767);
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QSslSocket::aboutToClose()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QSsl::AlertLevel>::target_type &, const qt_gsi::Converter<QSsl::AlertType>::target_type &, const QString & > ("alertReceived(QSsl::AlertLevel, QSsl::AlertType, const QString &)", "alertReceived", gsi::arg("level"), gsi::arg("type"), gsi::arg("description"), "@brief Signal declaration for QSslSocket::alertReceived(QSsl::AlertLevel level, QSsl::AlertType type, const QString &description)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QSsl::AlertLevel>::target_type &, const qt_gsi::Converter<QSsl::AlertType>::target_type &, const QString & > ("alertSent(QSsl::AlertLevel, QSsl::AlertType, const QString &)", "alertSent", gsi::arg("level"), gsi::arg("type"), gsi::arg("description"), "@brief Signal declaration for QSslSocket::alertSent(QSsl::AlertLevel level, QSsl::AlertType type, const QString &description)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64 > ("bytesWritten(qint64)", "bytesWritten", gsi::arg("bytes"), "@brief Signal declaration for QSslSocket::bytesWritten(qint64 bytes)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int, qint64 > ("channelBytesWritten(int, qint64)", "channelBytesWritten", gsi::arg("channel"), gsi::arg("bytes"), "@brief Signal declaration for QSslSocket::channelBytesWritten(int channel, qint64 bytes)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("channelReadyRead(int)", "channelReadyRead", gsi::arg("channel"), "@brief Signal declaration for QSslSocket::channelReadyRead(int channel)\nYou can bind a procedure to this signal.");
@@ -1470,8 +1380,11 @@ static gsi::Methods methods_QSslSocket () {
   methods += gsi::qt_signal ("disconnected()", "disconnected", "@brief Signal declaration for QSslSocket::disconnected()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("encrypted()", "encrypted", "@brief Signal declaration for QSslSocket::encrypted()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64 > ("encryptedBytesWritten(qint64)", "encryptedBytesWritten", gsi::arg("totalBytes"), "@brief Signal declaration for QSslSocket::encryptedBytesWritten(qint64 totalBytes)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QAbstractSocket::SocketError>::target_type & > ("errorOccurred(QAbstractSocket::SocketError)", "errorOccurred", gsi::arg("arg1"), "@brief Signal declaration for QSslSocket::errorOccurred(QAbstractSocket::SocketError)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QSslError & > ("handshakeInterruptedOnError(const QSslError &)", "handshakeInterruptedOnError", gsi::arg("error"), "@brief Signal declaration for QSslSocket::handshakeInterruptedOnError(const QSslError &error)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("hostFound()", "hostFound", "@brief Signal declaration for QSslSocket::hostFound()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<QSslSocket::SslMode>::target_type & > ("modeChanged(QSslSocket::SslMode)", "modeChanged", gsi::arg("newMode"), "@brief Signal declaration for QSslSocket::modeChanged(QSslSocket::SslMode newMode)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("newSessionTicketReceived()", "newSessionTicketReceived", "@brief Signal declaration for QSslSocket::newSessionTicketReceived()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QSslSocket::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QSslError & > ("peerVerifyError(const QSslError &)", "peerVerifyError", gsi::arg("error"), "@brief Signal declaration for QSslSocket::peerVerifyError(const QSslError &error)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QSslPreSharedKeyAuthenticator * > ("preSharedKeyAuthenticationRequired(QSslPreSharedKeyAuthenticator *)", "preSharedKeyAuthenticationRequired", gsi::arg("authenticator"), "@brief Signal declaration for QSslSocket::preSharedKeyAuthenticationRequired(QSslPreSharedKeyAuthenticator *authenticator)\nYou can bind a procedure to this signal.");

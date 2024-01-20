@@ -143,48 +143,6 @@ static void _call_f_error_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// void QImageCapture::errorChanged()
-
-
-static void _init_f_errorChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_errorChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QImageCapture *)cls)->errorChanged ();
-}
-
-
-// void QImageCapture::errorOccurred(int id, QImageCapture::Error error, const QString &errorString)
-
-
-static void _init_f_errorOccurred_4938 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("id");
-  decl->add_arg<int > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("error");
-  decl->add_arg<const qt_gsi::Converter<QImageCapture::Error>::target_type & > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("errorString");
-  decl->add_arg<const QString & > (argspec_2);
-  decl->set_return<void > ();
-}
-
-static void _call_f_errorOccurred_4938 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  const qt_gsi::Converter<QImageCapture::Error>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QImageCapture::Error>::target_type & >() (args, heap);
-  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QImageCapture *)cls)->errorOccurred (arg1, qt_gsi::QtToCppAdaptor<QImageCapture::Error>(arg2).cref(), arg3);
-}
-
-
 // QString QImageCapture::errorString()
 
 
@@ -212,134 +170,6 @@ static void _call_f_fileFormat_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qt_gsi::Converter<QImageCapture::FileFormat>::target_type > ((qt_gsi::Converter<QImageCapture::FileFormat>::target_type)qt_gsi::CppToQtAdaptor<QImageCapture::FileFormat>(((QImageCapture *)cls)->fileFormat ()));
-}
-
-
-// void QImageCapture::fileFormatChanged()
-
-
-static void _init_f_fileFormatChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_fileFormatChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QImageCapture *)cls)->fileFormatChanged ();
-}
-
-
-// void QImageCapture::imageAvailable(int id, const QVideoFrame &frame)
-
-
-static void _init_f_imageAvailable_3047 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("id");
-  decl->add_arg<int > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("frame");
-  decl->add_arg<const QVideoFrame & > (argspec_1);
-  decl->set_return<void > ();
-}
-
-static void _call_f_imageAvailable_3047 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  const QVideoFrame &arg2 = gsi::arg_reader<const QVideoFrame & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QImageCapture *)cls)->imageAvailable (arg1, arg2);
-}
-
-
-// void QImageCapture::imageCaptured(int id, const QImage &preview)
-
-
-static void _init_f_imageCaptured_2536 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("id");
-  decl->add_arg<int > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("preview");
-  decl->add_arg<const QImage & > (argspec_1);
-  decl->set_return<void > ();
-}
-
-static void _call_f_imageCaptured_2536 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  const QImage &arg2 = gsi::arg_reader<const QImage & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QImageCapture *)cls)->imageCaptured (arg1, arg2);
-}
-
-
-// void QImageCapture::imageExposed(int id)
-
-
-static void _init_f_imageExposed_767 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("id");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_imageExposed_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QImageCapture *)cls)->imageExposed (arg1);
-}
-
-
-// void QImageCapture::imageMetadataAvailable(int id, const QMediaMetaData &metaData)
-
-
-static void _init_f_imageMetadataAvailable_3302 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("id");
-  decl->add_arg<int > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("metaData");
-  decl->add_arg<const QMediaMetaData & > (argspec_1);
-  decl->set_return<void > ();
-}
-
-static void _call_f_imageMetadataAvailable_3302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  const QMediaMetaData &arg2 = gsi::arg_reader<const QMediaMetaData & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QImageCapture *)cls)->imageMetadataAvailable (arg1, arg2);
-}
-
-
-// void QImageCapture::imageSaved(int id, const QString &fileName)
-
-
-static void _init_f_imageSaved_2684 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("id");
-  decl->add_arg<int > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("fileName");
-  decl->add_arg<const QString & > (argspec_1);
-  decl->set_return<void > ();
-}
-
-static void _call_f_imageSaved_2684 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QImageCapture *)cls)->imageSaved (arg1, arg2);
 }
 
 
@@ -388,22 +218,6 @@ static void _call_f_metaData_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// void QImageCapture::metaDataChanged()
-
-
-static void _init_f_metaDataChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_metaDataChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QImageCapture *)cls)->metaDataChanged ();
-}
-
-
 // QImageCapture::Quality QImageCapture::quality()
 
 
@@ -419,42 +233,6 @@ static void _call_f_quality_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
-// void QImageCapture::qualityChanged()
-
-
-static void _init_f_qualityChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_qualityChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QImageCapture *)cls)->qualityChanged ();
-}
-
-
-// void QImageCapture::readyForCaptureChanged(bool ready)
-
-
-static void _init_f_readyForCaptureChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("ready");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_readyForCaptureChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QImageCapture *)cls)->readyForCaptureChanged (arg1);
-}
-
-
 // QSize QImageCapture::resolution()
 
 
@@ -467,22 +245,6 @@ static void _call_f_resolution_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QSize > ((QSize)((QImageCapture *)cls)->resolution ());
-}
-
-
-// void QImageCapture::resolutionChanged()
-
-
-static void _init_f_resolutionChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_resolutionChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QImageCapture *)cls)->resolutionChanged ();
 }
 
 
@@ -677,31 +439,33 @@ static gsi::Methods methods_QImageCapture () {
   methods += new qt_gsi::GenericMethod ("capture", "@brief Method int QImageCapture::capture()\n", false, &_init_f_capture_0, &_call_f_capture_0);
   methods += new qt_gsi::GenericMethod ("captureSession", "@brief Method QMediaCaptureSession *QImageCapture::captureSession()\n", true, &_init_f_captureSession_c0, &_call_f_captureSession_c0);
   methods += new qt_gsi::GenericMethod ("captureToFile", "@brief Method int QImageCapture::captureToFile(const QString &location)\n", false, &_init_f_captureToFile_2025, &_call_f_captureToFile_2025);
-  methods += new qt_gsi::GenericMethod ("error", "@brief Method QImageCapture::Error QImageCapture::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
-  methods += new qt_gsi::GenericMethod ("errorChanged", "@brief Method void QImageCapture::errorChanged()\n", false, &_init_f_errorChanged_0, &_call_f_errorChanged_0);
-  methods += new qt_gsi::GenericMethod ("errorOccurred", "@brief Method void QImageCapture::errorOccurred(int id, QImageCapture::Error error, const QString &errorString)\n", false, &_init_f_errorOccurred_4938, &_call_f_errorOccurred_4938);
-  methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QImageCapture::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
-  methods += new qt_gsi::GenericMethod ("fileFormat", "@brief Method QImageCapture::FileFormat QImageCapture::fileFormat()\n", true, &_init_f_fileFormat_c0, &_call_f_fileFormat_c0);
-  methods += new qt_gsi::GenericMethod ("fileFormatChanged", "@brief Method void QImageCapture::fileFormatChanged()\n", false, &_init_f_fileFormatChanged_0, &_call_f_fileFormatChanged_0);
-  methods += new qt_gsi::GenericMethod ("imageAvailable", "@brief Method void QImageCapture::imageAvailable(int id, const QVideoFrame &frame)\n", false, &_init_f_imageAvailable_3047, &_call_f_imageAvailable_3047);
-  methods += new qt_gsi::GenericMethod ("imageCaptured", "@brief Method void QImageCapture::imageCaptured(int id, const QImage &preview)\n", false, &_init_f_imageCaptured_2536, &_call_f_imageCaptured_2536);
-  methods += new qt_gsi::GenericMethod ("imageExposed", "@brief Method void QImageCapture::imageExposed(int id)\n", false, &_init_f_imageExposed_767, &_call_f_imageExposed_767);
-  methods += new qt_gsi::GenericMethod ("imageMetadataAvailable", "@brief Method void QImageCapture::imageMetadataAvailable(int id, const QMediaMetaData &metaData)\n", false, &_init_f_imageMetadataAvailable_3302, &_call_f_imageMetadataAvailable_3302);
-  methods += new qt_gsi::GenericMethod ("imageSaved", "@brief Method void QImageCapture::imageSaved(int id, const QString &fileName)\n", false, &_init_f_imageSaved_2684, &_call_f_imageSaved_2684);
+  methods += new qt_gsi::GenericMethod (":error", "@brief Method QImageCapture::Error QImageCapture::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
+  methods += new qt_gsi::GenericMethod (":errorString", "@brief Method QString QImageCapture::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
+  methods += new qt_gsi::GenericMethod (":fileFormat", "@brief Method QImageCapture::FileFormat QImageCapture::fileFormat()\n", true, &_init_f_fileFormat_c0, &_call_f_fileFormat_c0);
   methods += new qt_gsi::GenericMethod ("isAvailable?", "@brief Method bool QImageCapture::isAvailable()\n", true, &_init_f_isAvailable_c0, &_call_f_isAvailable_c0);
-  methods += new qt_gsi::GenericMethod ("isReadyForCapture?", "@brief Method bool QImageCapture::isReadyForCapture()\n", true, &_init_f_isReadyForCapture_c0, &_call_f_isReadyForCapture_c0);
-  methods += new qt_gsi::GenericMethod ("metaData", "@brief Method QMediaMetaData QImageCapture::metaData()\n", true, &_init_f_metaData_c0, &_call_f_metaData_c0);
-  methods += new qt_gsi::GenericMethod ("metaDataChanged", "@brief Method void QImageCapture::metaDataChanged()\n", false, &_init_f_metaDataChanged_0, &_call_f_metaDataChanged_0);
-  methods += new qt_gsi::GenericMethod ("quality", "@brief Method QImageCapture::Quality QImageCapture::quality()\n", true, &_init_f_quality_c0, &_call_f_quality_c0);
-  methods += new qt_gsi::GenericMethod ("qualityChanged", "@brief Method void QImageCapture::qualityChanged()\n", false, &_init_f_qualityChanged_0, &_call_f_qualityChanged_0);
-  methods += new qt_gsi::GenericMethod ("readyForCaptureChanged", "@brief Method void QImageCapture::readyForCaptureChanged(bool ready)\n", false, &_init_f_readyForCaptureChanged_864, &_call_f_readyForCaptureChanged_864);
-  methods += new qt_gsi::GenericMethod ("resolution", "@brief Method QSize QImageCapture::resolution()\n", true, &_init_f_resolution_c0, &_call_f_resolution_c0);
-  methods += new qt_gsi::GenericMethod ("resolutionChanged", "@brief Method void QImageCapture::resolutionChanged()\n", false, &_init_f_resolutionChanged_0, &_call_f_resolutionChanged_0);
+  methods += new qt_gsi::GenericMethod ("isReadyForCapture?|:readyForCapture", "@brief Method bool QImageCapture::isReadyForCapture()\n", true, &_init_f_isReadyForCapture_c0, &_call_f_isReadyForCapture_c0);
+  methods += new qt_gsi::GenericMethod (":metaData", "@brief Method QMediaMetaData QImageCapture::metaData()\n", true, &_init_f_metaData_c0, &_call_f_metaData_c0);
+  methods += new qt_gsi::GenericMethod (":quality", "@brief Method QImageCapture::Quality QImageCapture::quality()\n", true, &_init_f_quality_c0, &_call_f_quality_c0);
+  methods += new qt_gsi::GenericMethod (":resolution", "@brief Method QSize QImageCapture::resolution()\n", true, &_init_f_resolution_c0, &_call_f_resolution_c0);
   methods += new qt_gsi::GenericMethod ("setFileFormat", "@brief Method void QImageCapture::setFileFormat(QImageCapture::FileFormat format)\n", false, &_init_f_setFileFormat_2841, &_call_f_setFileFormat_2841);
-  methods += new qt_gsi::GenericMethod ("setMetaData", "@brief Method void QImageCapture::setMetaData(const QMediaMetaData &metaData)\n", false, &_init_f_setMetaData_2643, &_call_f_setMetaData_2643);
+  methods += new qt_gsi::GenericMethod ("setMetaData|metaData=", "@brief Method void QImageCapture::setMetaData(const QMediaMetaData &metaData)\n", false, &_init_f_setMetaData_2643, &_call_f_setMetaData_2643);
   methods += new qt_gsi::GenericMethod ("setQuality", "@brief Method void QImageCapture::setQuality(QImageCapture::Quality quality)\n", false, &_init_f_setQuality_2585, &_call_f_setQuality_2585);
-  methods += new qt_gsi::GenericMethod ("setResolution", "@brief Method void QImageCapture::setResolution(const QSize &)\n", false, &_init_f_setResolution_1805, &_call_f_setResolution_1805);
+  methods += new qt_gsi::GenericMethod ("setResolution|resolution=", "@brief Method void QImageCapture::setResolution(const QSize &)\n", false, &_init_f_setResolution_1805, &_call_f_setResolution_1805);
   methods += new qt_gsi::GenericMethod ("setResolution", "@brief Method void QImageCapture::setResolution(int width, int height)\n", false, &_init_f_setResolution_1426, &_call_f_setResolution_1426);
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QImageCapture::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("errorChanged()", "errorChanged", "@brief Signal declaration for QImageCapture::errorChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int, const qt_gsi::Converter<QImageCapture::Error>::target_type &, const QString & > ("errorOccurred(int, QImageCapture::Error, const QString &)", "errorOccurred", gsi::arg("id"), gsi::arg("error"), gsi::arg("errorString"), "@brief Signal declaration for QImageCapture::errorOccurred(int id, QImageCapture::Error error, const QString &errorString)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("fileFormatChanged()", "fileFormatChanged", "@brief Signal declaration for QImageCapture::fileFormatChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int, const QVideoFrame & > ("imageAvailable(int, const QVideoFrame &)", "imageAvailable", gsi::arg("id"), gsi::arg("frame"), "@brief Signal declaration for QImageCapture::imageAvailable(int id, const QVideoFrame &frame)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int, const QImage & > ("imageCaptured(int, const QImage &)", "imageCaptured", gsi::arg("id"), gsi::arg("preview"), "@brief Signal declaration for QImageCapture::imageCaptured(int id, const QImage &preview)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("imageExposed(int)", "imageExposed", gsi::arg("id"), "@brief Signal declaration for QImageCapture::imageExposed(int id)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int, const QMediaMetaData & > ("imageMetadataAvailable(int, const QMediaMetaData &)", "imageMetadataAvailable", gsi::arg("id"), gsi::arg("metaData"), "@brief Signal declaration for QImageCapture::imageMetadataAvailable(int id, const QMediaMetaData &metaData)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int, const QString & > ("imageSaved(int, const QString &)", "imageSaved", gsi::arg("id"), gsi::arg("fileName"), "@brief Signal declaration for QImageCapture::imageSaved(int id, const QString &fileName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("metaDataChanged()", "metaDataChanged", "@brief Signal declaration for QImageCapture::metaDataChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QImageCapture::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("qualityChanged()", "qualityChanged", "@brief Signal declaration for QImageCapture::qualityChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("readyForCaptureChanged(bool)", "readyForCaptureChanged", gsi::arg("ready"), "@brief Signal declaration for QImageCapture::readyForCaptureChanged(bool ready)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("resolutionChanged()", "resolutionChanged", "@brief Signal declaration for QImageCapture::resolutionChanged()\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("fileFormatDescription", "@brief Static method QString QImageCapture::fileFormatDescription(QImageCapture::FileFormat c)\nThis method is static and can be called without an instance.", &_init_f_fileFormatDescription_2841, &_call_f_fileFormatDescription_2841);
   methods += new qt_gsi::GenericStaticMethod ("fileFormatName", "@brief Static method QString QImageCapture::fileFormatName(QImageCapture::FileFormat c)\nThis method is static and can be called without an instance.", &_init_f_fileFormatName_2841, &_call_f_fileFormatName_2841);
   methods += new qt_gsi::GenericStaticMethod ("supportedFormats", "@brief Static method QList<QImageCapture::FileFormat> QImageCapture::supportedFormats()\nThis method is static and can be called without an instance.", &_init_f_supportedFormats_0, &_call_f_supportedFormats_0);
@@ -758,6 +522,24 @@ public:
     return QImageCapture::senderSignalIndex();
   }
 
+  //  [emitter impl] void QImageCapture::destroyed(QObject *)
+  void emitter_QImageCapture_destroyed_1302(QObject *arg1)
+  {
+    emit QImageCapture::destroyed(arg1);
+  }
+
+  //  [emitter impl] void QImageCapture::errorChanged()
+  void emitter_QImageCapture_errorChanged_0()
+  {
+    emit QImageCapture::errorChanged();
+  }
+
+  //  [emitter impl] void QImageCapture::errorOccurred(int id, QImageCapture::Error error, const QString &errorString)
+  void emitter_QImageCapture_errorOccurred_4938(int id, QImageCapture::Error error, const QString &errorString)
+  {
+    emit QImageCapture::errorOccurred(id, error, errorString);
+  }
+
   //  [adaptor impl] bool QImageCapture::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -786,6 +568,73 @@ public:
     } else {
       return QImageCapture::eventFilter(watched, event);
     }
+  }
+
+  //  [emitter impl] void QImageCapture::fileFormatChanged()
+  void emitter_QImageCapture_fileFormatChanged_0()
+  {
+    emit QImageCapture::fileFormatChanged();
+  }
+
+  //  [emitter impl] void QImageCapture::imageAvailable(int id, const QVideoFrame &frame)
+  void emitter_QImageCapture_imageAvailable_3047(int id, const QVideoFrame &frame)
+  {
+    emit QImageCapture::imageAvailable(id, frame);
+  }
+
+  //  [emitter impl] void QImageCapture::imageCaptured(int id, const QImage &preview)
+  void emitter_QImageCapture_imageCaptured_2536(int id, const QImage &preview)
+  {
+    emit QImageCapture::imageCaptured(id, preview);
+  }
+
+  //  [emitter impl] void QImageCapture::imageExposed(int id)
+  void emitter_QImageCapture_imageExposed_767(int id)
+  {
+    emit QImageCapture::imageExposed(id);
+  }
+
+  //  [emitter impl] void QImageCapture::imageMetadataAvailable(int id, const QMediaMetaData &metaData)
+  void emitter_QImageCapture_imageMetadataAvailable_3302(int id, const QMediaMetaData &metaData)
+  {
+    emit QImageCapture::imageMetadataAvailable(id, metaData);
+  }
+
+  //  [emitter impl] void QImageCapture::imageSaved(int id, const QString &fileName)
+  void emitter_QImageCapture_imageSaved_2684(int id, const QString &fileName)
+  {
+    emit QImageCapture::imageSaved(id, fileName);
+  }
+
+  //  [emitter impl] void QImageCapture::metaDataChanged()
+  void emitter_QImageCapture_metaDataChanged_0()
+  {
+    emit QImageCapture::metaDataChanged();
+  }
+
+  //  [emitter impl] void QImageCapture::objectNameChanged(const QString &objectName)
+  void emitter_QImageCapture_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QImageCapture::objectNameChanged(const QString &objectName)'");
+  }
+
+  //  [emitter impl] void QImageCapture::qualityChanged()
+  void emitter_QImageCapture_qualityChanged_0()
+  {
+    emit QImageCapture::qualityChanged();
+  }
+
+  //  [emitter impl] void QImageCapture::readyForCaptureChanged(bool ready)
+  void emitter_QImageCapture_readyForCaptureChanged_864(bool ready)
+  {
+    emit QImageCapture::readyForCaptureChanged(ready);
+  }
+
+  //  [emitter impl] void QImageCapture::resolutionChanged()
+  void emitter_QImageCapture_resolutionChanged_0()
+  {
+    emit QImageCapture::resolutionChanged();
   }
 
   //  [adaptor impl] void QImageCapture::childEvent(QChildEvent *event)
@@ -924,6 +773,24 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QImageCapture::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QImageCapture_Adaptor *)cls)->emitter_QImageCapture_destroyed_1302 (arg1);
+}
+
+
 // void QImageCapture::disconnectNotify(const QMetaMethod &signal)
 
 static void _init_cbs_disconnectNotify_2394_0 (qt_gsi::GenericMethod *decl)
@@ -945,6 +812,44 @@ static void _call_cbs_disconnectNotify_2394_0 (const qt_gsi::GenericMethod * /*d
 static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Callback &cb)
 {
   ((QImageCapture_Adaptor *)cls)->cb_disconnectNotify_2394_0 = cb;
+}
+
+
+// emitter void QImageCapture::errorChanged()
+
+static void _init_emitter_errorChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_errorChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QImageCapture_Adaptor *)cls)->emitter_QImageCapture_errorChanged_0 ();
+}
+
+
+// emitter void QImageCapture::errorOccurred(int id, QImageCapture::Error error, const QString &errorString)
+
+static void _init_emitter_errorOccurred_4938 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("id");
+  decl->add_arg<int > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("error");
+  decl->add_arg<const qt_gsi::Converter<QImageCapture::Error>::target_type & > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("errorString");
+  decl->add_arg<const QString & > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_errorOccurred_4938 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const qt_gsi::Converter<QImageCapture::Error>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<QImageCapture::Error>::target_type & >() (args, heap);
+  const QString &arg3 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QImageCapture_Adaptor *)cls)->emitter_QImageCapture_errorOccurred_4938 (arg1, arg2, arg3);
 }
 
 
@@ -997,6 +902,122 @@ static void _set_callback_cbs_eventFilter_2411_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QImageCapture::fileFormatChanged()
+
+static void _init_emitter_fileFormatChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_fileFormatChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QImageCapture_Adaptor *)cls)->emitter_QImageCapture_fileFormatChanged_0 ();
+}
+
+
+// emitter void QImageCapture::imageAvailable(int id, const QVideoFrame &frame)
+
+static void _init_emitter_imageAvailable_3047 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("id");
+  decl->add_arg<int > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("frame");
+  decl->add_arg<const QVideoFrame & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_imageAvailable_3047 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QVideoFrame &arg2 = gsi::arg_reader<const QVideoFrame & >() (args, heap);
+  ((QImageCapture_Adaptor *)cls)->emitter_QImageCapture_imageAvailable_3047 (arg1, arg2);
+}
+
+
+// emitter void QImageCapture::imageCaptured(int id, const QImage &preview)
+
+static void _init_emitter_imageCaptured_2536 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("id");
+  decl->add_arg<int > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("preview");
+  decl->add_arg<const QImage & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_imageCaptured_2536 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QImage &arg2 = gsi::arg_reader<const QImage & >() (args, heap);
+  ((QImageCapture_Adaptor *)cls)->emitter_QImageCapture_imageCaptured_2536 (arg1, arg2);
+}
+
+
+// emitter void QImageCapture::imageExposed(int id)
+
+static void _init_emitter_imageExposed_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("id");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_imageExposed_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QImageCapture_Adaptor *)cls)->emitter_QImageCapture_imageExposed_767 (arg1);
+}
+
+
+// emitter void QImageCapture::imageMetadataAvailable(int id, const QMediaMetaData &metaData)
+
+static void _init_emitter_imageMetadataAvailable_3302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("id");
+  decl->add_arg<int > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("metaData");
+  decl->add_arg<const QMediaMetaData & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_imageMetadataAvailable_3302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QMediaMetaData &arg2 = gsi::arg_reader<const QMediaMetaData & >() (args, heap);
+  ((QImageCapture_Adaptor *)cls)->emitter_QImageCapture_imageMetadataAvailable_3302 (arg1, arg2);
+}
+
+
+// emitter void QImageCapture::imageSaved(int id, const QString &fileName)
+
+static void _init_emitter_imageSaved_2684 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("id");
+  decl->add_arg<int > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("fileName");
+  decl->add_arg<const QString & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_imageSaved_2684 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QImageCapture_Adaptor *)cls)->emitter_QImageCapture_imageSaved_2684 (arg1, arg2);
+}
+
+
 // exposed bool QImageCapture::isSignalConnected(const QMetaMethod &signal)
 
 static void _init_fp_isSignalConnected_c2394 (qt_gsi::GenericMethod *decl)
@@ -1015,6 +1036,70 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QImageCapture::metaDataChanged()
+
+static void _init_emitter_metaDataChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_metaDataChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QImageCapture_Adaptor *)cls)->emitter_QImageCapture_metaDataChanged_0 ();
+}
+
+
+// emitter void QImageCapture::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QImageCapture_Adaptor *)cls)->emitter_QImageCapture_objectNameChanged_4567 (arg1);
+}
+
+
+// emitter void QImageCapture::qualityChanged()
+
+static void _init_emitter_qualityChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_qualityChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QImageCapture_Adaptor *)cls)->emitter_QImageCapture_qualityChanged_0 ();
+}
+
+
+// emitter void QImageCapture::readyForCaptureChanged(bool ready)
+
+static void _init_emitter_readyForCaptureChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("ready");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_readyForCaptureChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QImageCapture_Adaptor *)cls)->emitter_QImageCapture_readyForCaptureChanged_864 (arg1);
+}
+
+
 // exposed int QImageCapture::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -1030,6 +1115,20 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
   tl::Heap heap;
   const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QImageCapture_Adaptor *)cls)->fp_QImageCapture_receivers_c1731 (arg1));
+}
+
+
+// emitter void QImageCapture::resolutionChanged()
+
+static void _init_emitter_resolutionChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_resolutionChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QImageCapture_Adaptor *)cls)->emitter_QImageCapture_resolutionChanged_0 ();
 }
 
 
@@ -1097,14 +1196,28 @@ static gsi::Methods methods_QImageCapture_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QImageCapture::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QImageCapture::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QImageCapture::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("emit_errorChanged", "@brief Emitter for signal void QImageCapture::errorChanged()\nCall this method to emit this signal.", false, &_init_emitter_errorChanged_0, &_call_emitter_errorChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_errorOccurred", "@brief Emitter for signal void QImageCapture::errorOccurred(int id, QImageCapture::Error error, const QString &errorString)\nCall this method to emit this signal.", false, &_init_emitter_errorOccurred_4938, &_call_emitter_errorOccurred_4938);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QImageCapture::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QImageCapture::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("emit_fileFormatChanged", "@brief Emitter for signal void QImageCapture::fileFormatChanged()\nCall this method to emit this signal.", false, &_init_emitter_fileFormatChanged_0, &_call_emitter_fileFormatChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_imageAvailable", "@brief Emitter for signal void QImageCapture::imageAvailable(int id, const QVideoFrame &frame)\nCall this method to emit this signal.", false, &_init_emitter_imageAvailable_3047, &_call_emitter_imageAvailable_3047);
+  methods += new qt_gsi::GenericMethod ("emit_imageCaptured", "@brief Emitter for signal void QImageCapture::imageCaptured(int id, const QImage &preview)\nCall this method to emit this signal.", false, &_init_emitter_imageCaptured_2536, &_call_emitter_imageCaptured_2536);
+  methods += new qt_gsi::GenericMethod ("emit_imageExposed", "@brief Emitter for signal void QImageCapture::imageExposed(int id)\nCall this method to emit this signal.", false, &_init_emitter_imageExposed_767, &_call_emitter_imageExposed_767);
+  methods += new qt_gsi::GenericMethod ("emit_imageMetadataAvailable", "@brief Emitter for signal void QImageCapture::imageMetadataAvailable(int id, const QMediaMetaData &metaData)\nCall this method to emit this signal.", false, &_init_emitter_imageMetadataAvailable_3302, &_call_emitter_imageMetadataAvailable_3302);
+  methods += new qt_gsi::GenericMethod ("emit_imageSaved", "@brief Emitter for signal void QImageCapture::imageSaved(int id, const QString &fileName)\nCall this method to emit this signal.", false, &_init_emitter_imageSaved_2684, &_call_emitter_imageSaved_2684);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QImageCapture::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_metaDataChanged", "@brief Emitter for signal void QImageCapture::metaDataChanged()\nCall this method to emit this signal.", false, &_init_emitter_metaDataChanged_0, &_call_emitter_metaDataChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QImageCapture::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
+  methods += new qt_gsi::GenericMethod ("emit_qualityChanged", "@brief Emitter for signal void QImageCapture::qualityChanged()\nCall this method to emit this signal.", false, &_init_emitter_qualityChanged_0, &_call_emitter_qualityChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_readyForCaptureChanged", "@brief Emitter for signal void QImageCapture::readyForCaptureChanged(bool ready)\nCall this method to emit this signal.", false, &_init_emitter_readyForCaptureChanged_864, &_call_emitter_readyForCaptureChanged_864);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QImageCapture::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
+  methods += new qt_gsi::GenericMethod ("emit_resolutionChanged", "@brief Emitter for signal void QImageCapture::resolutionChanged()\nCall this method to emit this signal.", false, &_init_emitter_resolutionChanged_0, &_call_emitter_resolutionChanged_0);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QImageCapture::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QImageCapture::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QImageCapture::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);

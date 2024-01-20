@@ -157,7 +157,7 @@ static gsi::Methods methods_QImageIOPlugin () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("capabilities", "@brief Method QFlags<QImageIOPlugin::Capability> QImageIOPlugin::capabilities(QIODevice *device, const QByteArray &format)\n", true, &_init_f_capabilities_c3648, &_call_f_capabilities_c3648);
-  methods += new qt_gsi::GenericMethod ("qt_create", "@brief Method QImageIOHandler *QImageIOPlugin::create(QIODevice *device, const QByteArray &format)\n", true, &_init_f_create_c3648, &_call_f_create_c3648);
+  methods += new qt_gsi::GenericMethod ("create|qt_create", "@brief Method QImageIOHandler *QImageIOPlugin::create(QIODevice *device, const QByteArray &format)\n", true, &_init_f_create_c3648, &_call_f_create_c3648);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QImageIOPlugin::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QImageIOPlugin::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QImageIOPlugin::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
@@ -254,33 +254,33 @@ public:
     emit QImageIOPlugin::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QImageIOPlugin::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QImageIOPlugin::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QImageIOPlugin::event(arg1);
+    return QImageIOPlugin::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QImageIOPlugin_Adaptor, bool, QEvent *>(&QImageIOPlugin_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QImageIOPlugin_Adaptor, bool, QEvent *>(&QImageIOPlugin_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QImageIOPlugin::event(arg1);
+      return QImageIOPlugin::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QImageIOPlugin::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QImageIOPlugin::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QImageIOPlugin::eventFilter(arg1, arg2);
+    return QImageIOPlugin::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QImageIOPlugin_Adaptor, bool, QObject *, QEvent *>(&QImageIOPlugin_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QImageIOPlugin_Adaptor, bool, QObject *, QEvent *>(&QImageIOPlugin_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QImageIOPlugin::eventFilter(arg1, arg2);
+      return QImageIOPlugin::eventFilter(watched, event);
     }
   }
 
@@ -291,33 +291,33 @@ public:
     throw tl::Exception ("Can't emit private signal 'void QImageIOPlugin::objectNameChanged(const QString &objectName)'");
   }
 
-  //  [adaptor impl] void QImageIOPlugin::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QImageIOPlugin::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QImageIOPlugin::childEvent(arg1);
+    QImageIOPlugin::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QImageIOPlugin_Adaptor, QChildEvent *>(&QImageIOPlugin_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QImageIOPlugin_Adaptor, QChildEvent *>(&QImageIOPlugin_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QImageIOPlugin::childEvent(arg1);
+      QImageIOPlugin::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QImageIOPlugin::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QImageIOPlugin::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QImageIOPlugin::customEvent(arg1);
+    QImageIOPlugin::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QImageIOPlugin_Adaptor, QEvent *>(&QImageIOPlugin_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QImageIOPlugin_Adaptor, QEvent *>(&QImageIOPlugin_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QImageIOPlugin::customEvent(arg1);
+      QImageIOPlugin::customEvent(event);
     }
   }
 
@@ -336,18 +336,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QImageIOPlugin::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QImageIOPlugin::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QImageIOPlugin::timerEvent(arg1);
+    QImageIOPlugin::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QImageIOPlugin_Adaptor, QTimerEvent *>(&QImageIOPlugin_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QImageIOPlugin_Adaptor, QTimerEvent *>(&QImageIOPlugin_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QImageIOPlugin::timerEvent(arg1);
+      QImageIOPlugin::timerEvent(event);
     }
   }
 
@@ -367,7 +367,7 @@ QImageIOPlugin_Adaptor::~QImageIOPlugin_Adaptor() { }
 
 static void _init_ctor_QImageIOPlugin_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QImageIOPlugin_Adaptor> ();
 }
@@ -376,7 +376,7 @@ static void _call_ctor_QImageIOPlugin_Adaptor_1302 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QImageIOPlugin_Adaptor *> (new QImageIOPlugin_Adaptor (arg1));
 }
 
@@ -407,11 +407,11 @@ static void _set_callback_cbs_capabilities_c3648_0 (void *cls, const gsi::Callba
 }
 
 
-// void QImageIOPlugin::childEvent(QChildEvent *)
+// void QImageIOPlugin::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -457,11 +457,11 @@ static void _set_callback_cbs_create_c3648_1 (void *cls, const gsi::Callback &cb
 }
 
 
-// void QImageIOPlugin::customEvent(QEvent *)
+// void QImageIOPlugin::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -485,7 +485,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -494,7 +494,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QImageIOPlugin_Adaptor *)cls)->emitter_QImageIOPlugin_destroyed_1302 (arg1);
 }
 
@@ -523,11 +523,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QImageIOPlugin::event(QEvent *)
+// bool QImageIOPlugin::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -546,13 +546,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QImageIOPlugin::eventFilter(QObject *, QEvent *)
+// bool QImageIOPlugin::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -654,11 +654,11 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QImageIOPlugin::timerEvent(QTimerEvent *)
+// void QImageIOPlugin::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -688,25 +688,25 @@ static gsi::Methods methods_QImageIOPlugin_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QImageIOPlugin::QImageIOPlugin(QObject *parent)\nThis method creates an object of class QImageIOPlugin.", &_init_ctor_QImageIOPlugin_Adaptor_1302, &_call_ctor_QImageIOPlugin_Adaptor_1302);
   methods += new qt_gsi::GenericMethod ("capabilities", "@brief Virtual method QFlags<QImageIOPlugin::Capability> QImageIOPlugin::capabilities(QIODevice *device, const QByteArray &format)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_capabilities_c3648_0, &_call_cbs_capabilities_c3648_0);
   methods += new qt_gsi::GenericMethod ("capabilities", "@hide", true, &_init_cbs_capabilities_c3648_0, &_call_cbs_capabilities_c3648_0, &_set_callback_cbs_capabilities_c3648_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QImageIOPlugin::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QImageIOPlugin::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("qt_create", "@brief Virtual method QImageIOHandler *QImageIOPlugin::create(QIODevice *device, const QByteArray &format)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_create_c3648_1, &_call_cbs_create_c3648_1);
-  methods += new qt_gsi::GenericMethod ("qt_create", "@hide", true, &_init_cbs_create_c3648_1, &_call_cbs_create_c3648_1, &_set_callback_cbs_create_c3648_1);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QImageIOPlugin::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("create|qt_create", "@brief Virtual method QImageIOHandler *QImageIOPlugin::create(QIODevice *device, const QByteArray &format)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_create_c3648_1, &_call_cbs_create_c3648_1);
+  methods += new qt_gsi::GenericMethod ("create|qt_create", "@hide", true, &_init_cbs_create_c3648_1, &_call_cbs_create_c3648_1, &_set_callback_cbs_create_c3648_1);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QImageIOPlugin::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QImageIOPlugin::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QImageIOPlugin::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QImageIOPlugin::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QImageIOPlugin::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QImageIOPlugin::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QImageIOPlugin::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QImageIOPlugin::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QImageIOPlugin::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QImageIOPlugin::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QImageIOPlugin::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QImageIOPlugin::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QImageIOPlugin::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QImageIOPlugin::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

@@ -215,8 +215,8 @@ TEST(4_distance)
   db::Edge e4 (db::Point (200, 0), db::Point (300, 0));
   db::Edge e5 (db::Point (200, 100), db::Point (300, 100));
 
-  EXPECT_EQ (db::EdgePair (e1, e1).distance (), 0);
-  EXPECT_EQ (db::EdgePair (e1, e2).distance (), 200);
-  EXPECT_EQ (db::EdgePair (e3, e2).distance (), 100);
-  EXPECT_EQ (db::EdgePair (e3, e5).distance (), 141);
+  EXPECT_EQ (db::EdgePair (e1, e1).distance (), 0u);
+  EXPECT_EQ (db::EdgePair (e1, e2).distance (), 200u);
+  EXPECT_EQ (db::EdgePair (e3, e2).distance (), 100u);
+  EXPECT_EQ (db::EdgePair (e3, e5).distance (), 141u);
 }

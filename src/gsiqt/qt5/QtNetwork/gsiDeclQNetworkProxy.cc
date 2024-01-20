@@ -627,7 +627,9 @@ static gsi::Enum<QNetworkProxy::Capability> decl_QNetworkProxy_Capability_Enum (
     gsi::enum_const ("ListeningCapability", QNetworkProxy::ListeningCapability, "@brief Enum constant QNetworkProxy::ListeningCapability") +
     gsi::enum_const ("UdpTunnelingCapability", QNetworkProxy::UdpTunnelingCapability, "@brief Enum constant QNetworkProxy::UdpTunnelingCapability") +
     gsi::enum_const ("CachingCapability", QNetworkProxy::CachingCapability, "@brief Enum constant QNetworkProxy::CachingCapability") +
-    gsi::enum_const ("HostNameLookupCapability", QNetworkProxy::HostNameLookupCapability, "@brief Enum constant QNetworkProxy::HostNameLookupCapability"),
+    gsi::enum_const ("HostNameLookupCapability", QNetworkProxy::HostNameLookupCapability, "@brief Enum constant QNetworkProxy::HostNameLookupCapability") +
+    gsi::enum_const ("SctpTunnelingCapability", QNetworkProxy::SctpTunnelingCapability, "@brief Enum constant QNetworkProxy::SctpTunnelingCapability") +
+    gsi::enum_const ("SctpListeningCapability", QNetworkProxy::SctpListeningCapability, "@brief Enum constant QNetworkProxy::SctpListeningCapability"),
   "@qt\n@brief This class represents the QNetworkProxy::Capability enum");
 
 static gsi::QFlagsClass<QNetworkProxy::Capability > decl_QNetworkProxy_Capability_Enums ("QtNetwork", "QNetworkProxy_QFlags_Capability",

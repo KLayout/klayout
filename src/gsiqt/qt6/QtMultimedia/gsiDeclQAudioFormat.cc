@@ -398,7 +398,7 @@ static gsi::Methods methods_QAudioFormat () {
   methods += new qt_gsi::GenericMethod ("bytesForFrames", "@brief Method qint32 QAudioFormat::bytesForFrames(qint32 frameCount)\n", true, &_init_f_bytesForFrames_c981, &_call_f_bytesForFrames_c981);
   methods += new qt_gsi::GenericMethod ("bytesPerFrame", "@brief Method int QAudioFormat::bytesPerFrame()\n", true, &_init_f_bytesPerFrame_c0, &_call_f_bytesPerFrame_c0);
   methods += new qt_gsi::GenericMethod ("bytesPerSample", "@brief Method int QAudioFormat::bytesPerSample()\n", true, &_init_f_bytesPerSample_c0, &_call_f_bytesPerSample_c0);
-  methods += new qt_gsi::GenericMethod ("channelConfig", "@brief Method QAudioFormat::ChannelConfig QAudioFormat::channelConfig()\n", true, &_init_f_channelConfig_c0, &_call_f_channelConfig_c0);
+  methods += new qt_gsi::GenericMethod (":channelConfig", "@brief Method QAudioFormat::ChannelConfig QAudioFormat::channelConfig()\n", true, &_init_f_channelConfig_c0, &_call_f_channelConfig_c0);
   methods += new qt_gsi::GenericMethod (":channelCount", "@brief Method int QAudioFormat::channelCount()\n", true, &_init_f_channelCount_c0, &_call_f_channelCount_c0);
   methods += new qt_gsi::GenericMethod ("channelOffset", "@brief Method int QAudioFormat::channelOffset(QAudioFormat::AudioChannelPosition channel)\n", true, &_init_f_channelOffset_c3796, &_call_f_channelOffset_c3796);
   methods += new qt_gsi::GenericMethod ("durationForBytes", "@brief Method qint64 QAudioFormat::durationForBytes(qint32 byteCount)\n", true, &_init_f_durationForBytes_c981, &_call_f_durationForBytes_c981);
@@ -407,11 +407,11 @@ static gsi::Methods methods_QAudioFormat () {
   methods += new qt_gsi::GenericMethod ("framesForDuration", "@brief Method qint32 QAudioFormat::framesForDuration(qint64 microseconds)\n", true, &_init_f_framesForDuration_c986, &_call_f_framesForDuration_c986);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QAudioFormat::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("normalizedSampleValue", "@brief Method float QAudioFormat::normalizedSampleValue(const void *sample)\n", true, &_init_f_normalizedSampleValue_c1751, &_call_f_normalizedSampleValue_c1751);
-  methods += new qt_gsi::GenericMethod ("sampleFormat", "@brief Method QAudioFormat::SampleFormat QAudioFormat::sampleFormat()\n", true, &_init_f_sampleFormat_c0, &_call_f_sampleFormat_c0);
+  methods += new qt_gsi::GenericMethod (":sampleFormat", "@brief Method QAudioFormat::SampleFormat QAudioFormat::sampleFormat()\n", true, &_init_f_sampleFormat_c0, &_call_f_sampleFormat_c0);
   methods += new qt_gsi::GenericMethod (":sampleRate", "@brief Method int QAudioFormat::sampleRate()\n", true, &_init_f_sampleRate_c0, &_call_f_sampleRate_c0);
-  methods += new qt_gsi::GenericMethod ("setChannelConfig", "@brief Method void QAudioFormat::setChannelConfig(QAudioFormat::ChannelConfig config)\n", false, &_init_f_setChannelConfig_3043, &_call_f_setChannelConfig_3043);
+  methods += new qt_gsi::GenericMethod ("setChannelConfig|channelConfig=", "@brief Method void QAudioFormat::setChannelConfig(QAudioFormat::ChannelConfig config)\n", false, &_init_f_setChannelConfig_3043, &_call_f_setChannelConfig_3043);
   methods += new qt_gsi::GenericMethod ("setChannelCount|channelCount=", "@brief Method void QAudioFormat::setChannelCount(int channelCount)\n", false, &_init_f_setChannelCount_767, &_call_f_setChannelCount_767);
-  methods += new qt_gsi::GenericMethod ("setSampleFormat", "@brief Method void QAudioFormat::setSampleFormat(QAudioFormat::SampleFormat f)\n", false, &_init_f_setSampleFormat_2975, &_call_f_setSampleFormat_2975);
+  methods += new qt_gsi::GenericMethod ("setSampleFormat|sampleFormat=", "@brief Method void QAudioFormat::setSampleFormat(QAudioFormat::SampleFormat f)\n", false, &_init_f_setSampleFormat_2975, &_call_f_setSampleFormat_2975);
   methods += new qt_gsi::GenericMethod ("setSampleRate|sampleRate=", "@brief Method void QAudioFormat::setSampleRate(int sampleRate)\n", false, &_init_f_setSampleRate_767, &_call_f_setSampleRate_767);
   return methods;
 }

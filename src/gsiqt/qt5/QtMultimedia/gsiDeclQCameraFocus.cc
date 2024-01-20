@@ -84,26 +84,6 @@ static void _call_f_digitalZoom_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// void QCameraFocus::digitalZoomChanged(double)
-
-
-static void _init_f_digitalZoomChanged_1071 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<double > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_digitalZoomChanged_1071 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  double arg1 = gsi::arg_reader<double >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCameraFocus *)cls)->digitalZoomChanged (arg1);
-}
-
-
 // QFlags<QCameraFocus::FocusMode> QCameraFocus::focusMode()
 
 
@@ -146,22 +126,6 @@ static void _call_f_focusZones_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QList<QCameraFocusZone> > ((QList<QCameraFocusZone>)((QCameraFocus *)cls)->focusZones ());
-}
-
-
-// void QCameraFocus::focusZonesChanged()
-
-
-static void _init_f_focusZonesChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_focusZonesChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCameraFocus *)cls)->focusZonesChanged ();
 }
 
 
@@ -233,26 +197,6 @@ static void _call_f_maximumDigitalZoom_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QCameraFocus::maximumDigitalZoomChanged(double)
-
-
-static void _init_f_maximumDigitalZoomChanged_1071 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<double > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_maximumDigitalZoomChanged_1071 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  double arg1 = gsi::arg_reader<double >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCameraFocus *)cls)->maximumDigitalZoomChanged (arg1);
-}
-
-
 // double QCameraFocus::maximumOpticalZoom()
 
 
@@ -268,26 +212,6 @@ static void _call_f_maximumOpticalZoom_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QCameraFocus::maximumOpticalZoomChanged(double)
-
-
-static void _init_f_maximumOpticalZoomChanged_1071 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<double > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_maximumOpticalZoomChanged_1071 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  double arg1 = gsi::arg_reader<double >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCameraFocus *)cls)->maximumOpticalZoomChanged (arg1);
-}
-
-
 // double QCameraFocus::opticalZoom()
 
 
@@ -300,26 +224,6 @@ static void _call_f_opticalZoom_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<double > ((double)((QCameraFocus *)cls)->opticalZoom ());
-}
-
-
-// void QCameraFocus::opticalZoomChanged(double)
-
-
-static void _init_f_opticalZoomChanged_1071 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<double > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_opticalZoomChanged_1071 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  double arg1 = gsi::arg_reader<double >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCameraFocus *)cls)->opticalZoomChanged (arg1);
 }
 
 
@@ -465,24 +369,26 @@ static gsi::Methods methods_QCameraFocus () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":customFocusPoint", "@brief Method QPointF QCameraFocus::customFocusPoint()\n", true, &_init_f_customFocusPoint_c0, &_call_f_customFocusPoint_c0);
   methods += new qt_gsi::GenericMethod (":digitalZoom", "@brief Method double QCameraFocus::digitalZoom()\n", true, &_init_f_digitalZoom_c0, &_call_f_digitalZoom_c0);
-  methods += new qt_gsi::GenericMethod ("digitalZoomChanged", "@brief Method void QCameraFocus::digitalZoomChanged(double)\n", false, &_init_f_digitalZoomChanged_1071, &_call_f_digitalZoomChanged_1071);
   methods += new qt_gsi::GenericMethod (":focusMode", "@brief Method QFlags<QCameraFocus::FocusMode> QCameraFocus::focusMode()\n", true, &_init_f_focusMode_c0, &_call_f_focusMode_c0);
   methods += new qt_gsi::GenericMethod (":focusPointMode", "@brief Method QCameraFocus::FocusPointMode QCameraFocus::focusPointMode()\n", true, &_init_f_focusPointMode_c0, &_call_f_focusPointMode_c0);
   methods += new qt_gsi::GenericMethod (":focusZones", "@brief Method QList<QCameraFocusZone> QCameraFocus::focusZones()\n", true, &_init_f_focusZones_c0, &_call_f_focusZones_c0);
-  methods += new qt_gsi::GenericMethod ("focusZonesChanged", "@brief Method void QCameraFocus::focusZonesChanged()\n", false, &_init_f_focusZonesChanged_0, &_call_f_focusZonesChanged_0);
   methods += new qt_gsi::GenericMethod ("isAvailable?", "@brief Method bool QCameraFocus::isAvailable()\n", true, &_init_f_isAvailable_c0, &_call_f_isAvailable_c0);
   methods += new qt_gsi::GenericMethod ("isFocusModeSupported?", "@brief Method bool QCameraFocus::isFocusModeSupported(QFlags<QCameraFocus::FocusMode> mode)\n", true, &_init_f_isFocusModeSupported_c3327, &_call_f_isFocusModeSupported_c3327);
   methods += new qt_gsi::GenericMethod ("isFocusPointModeSupported?", "@brief Method bool QCameraFocus::isFocusPointModeSupported(QCameraFocus::FocusPointMode)\n", true, &_init_f_isFocusPointModeSupported_c3153, &_call_f_isFocusPointModeSupported_c3153);
   methods += new qt_gsi::GenericMethod ("maximumDigitalZoom", "@brief Method double QCameraFocus::maximumDigitalZoom()\n", true, &_init_f_maximumDigitalZoom_c0, &_call_f_maximumDigitalZoom_c0);
-  methods += new qt_gsi::GenericMethod ("maximumDigitalZoomChanged", "@brief Method void QCameraFocus::maximumDigitalZoomChanged(double)\n", false, &_init_f_maximumDigitalZoomChanged_1071, &_call_f_maximumDigitalZoomChanged_1071);
   methods += new qt_gsi::GenericMethod ("maximumOpticalZoom", "@brief Method double QCameraFocus::maximumOpticalZoom()\n", true, &_init_f_maximumOpticalZoom_c0, &_call_f_maximumOpticalZoom_c0);
-  methods += new qt_gsi::GenericMethod ("maximumOpticalZoomChanged", "@brief Method void QCameraFocus::maximumOpticalZoomChanged(double)\n", false, &_init_f_maximumOpticalZoomChanged_1071, &_call_f_maximumOpticalZoomChanged_1071);
   methods += new qt_gsi::GenericMethod (":opticalZoom", "@brief Method double QCameraFocus::opticalZoom()\n", true, &_init_f_opticalZoom_c0, &_call_f_opticalZoom_c0);
-  methods += new qt_gsi::GenericMethod ("opticalZoomChanged", "@brief Method void QCameraFocus::opticalZoomChanged(double)\n", false, &_init_f_opticalZoomChanged_1071, &_call_f_opticalZoomChanged_1071);
   methods += new qt_gsi::GenericMethod ("setCustomFocusPoint|customFocusPoint=", "@brief Method void QCameraFocus::setCustomFocusPoint(const QPointF &point)\n", false, &_init_f_setCustomFocusPoint_1986, &_call_f_setCustomFocusPoint_1986);
   methods += new qt_gsi::GenericMethod ("setFocusMode|focusMode=", "@brief Method void QCameraFocus::setFocusMode(QFlags<QCameraFocus::FocusMode> mode)\n", false, &_init_f_setFocusMode_3327, &_call_f_setFocusMode_3327);
   methods += new qt_gsi::GenericMethod ("setFocusPointMode|focusPointMode=", "@brief Method void QCameraFocus::setFocusPointMode(QCameraFocus::FocusPointMode mode)\n", false, &_init_f_setFocusPointMode_3153, &_call_f_setFocusPointMode_3153);
   methods += new qt_gsi::GenericMethod ("zoomTo", "@brief Method void QCameraFocus::zoomTo(double opticalZoom, double digitalZoom)\n", false, &_init_f_zoomTo_2034, &_call_f_zoomTo_2034);
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QCameraFocus::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<double > ("digitalZoomChanged(double)", "digitalZoomChanged", gsi::arg("arg1"), "@brief Signal declaration for QCameraFocus::digitalZoomChanged(double)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("focusZonesChanged()", "focusZonesChanged", "@brief Signal declaration for QCameraFocus::focusZonesChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<double > ("maximumDigitalZoomChanged(double)", "maximumDigitalZoomChanged", gsi::arg("arg1"), "@brief Signal declaration for QCameraFocus::maximumDigitalZoomChanged(double)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<double > ("maximumOpticalZoomChanged(double)", "maximumOpticalZoomChanged", gsi::arg("arg1"), "@brief Signal declaration for QCameraFocus::maximumOpticalZoomChanged(double)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QCameraFocus::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<double > ("opticalZoomChanged(double)", "opticalZoomChanged", gsi::arg("arg1"), "@brief Signal declaration for QCameraFocus::opticalZoomChanged(double)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QCameraFocus::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QCameraFocus::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;

@@ -97,7 +97,7 @@ struct edge_pair_defs
       "\n"
       "Symmetric edge pairs have been introduced in version 0.27.\n"
     ) +
-    method ("symmetric=", &C::set_symmetric,
+    method ("symmetric=", &C::set_symmetric, gsi::arg ("flag"),
       "@brief Sets a value indicating whether the edge pair is symmetric\n"
       "See \\symmetric? for a description of this attribute.\n"
       "\n"

@@ -118,65 +118,6 @@ static void _call_f_metaData_c2025 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// void QMetaDataWriterControl::metaDataAvailableChanged(bool available)
-
-
-static void _init_f_metaDataAvailableChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("available");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_metaDataAvailableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMetaDataWriterControl *)cls)->metaDataAvailableChanged (arg1);
-}
-
-
-// void QMetaDataWriterControl::metaDataChanged()
-
-
-static void _init_f_metaDataChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_metaDataChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMetaDataWriterControl *)cls)->metaDataChanged ();
-}
-
-
-// void QMetaDataWriterControl::metaDataChanged(const QString &key, const QVariant &value)
-
-
-static void _init_f_metaDataChanged_4036 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("value");
-  decl->add_arg<const QVariant & > (argspec_1);
-  decl->set_return<void > ();
-}
-
-static void _call_f_metaDataChanged_4036 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMetaDataWriterControl *)cls)->metaDataChanged (arg1, arg2);
-}
-
-
 // void QMetaDataWriterControl::setMetaData(const QString &key, const QVariant &value)
 
 
@@ -197,26 +138,6 @@ static void _call_f_setMetaData_4036 (const qt_gsi::GenericMethod * /*decl*/, vo
   const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMetaDataWriterControl *)cls)->setMetaData (arg1, arg2);
-}
-
-
-// void QMetaDataWriterControl::writableChanged(bool writable)
-
-
-static void _init_f_writableChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("writable");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_writableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMetaDataWriterControl *)cls)->writableChanged (arg1);
 }
 
 
@@ -280,11 +201,13 @@ static gsi::Methods methods_QMetaDataWriterControl () {
   methods += new qt_gsi::GenericMethod ("isMetaDataAvailable?", "@brief Method bool QMetaDataWriterControl::isMetaDataAvailable()\n", true, &_init_f_isMetaDataAvailable_c0, &_call_f_isMetaDataAvailable_c0);
   methods += new qt_gsi::GenericMethod ("isWritable?", "@brief Method bool QMetaDataWriterControl::isWritable()\n", true, &_init_f_isWritable_c0, &_call_f_isWritable_c0);
   methods += new qt_gsi::GenericMethod ("metaData", "@brief Method QVariant QMetaDataWriterControl::metaData(const QString &key)\n", true, &_init_f_metaData_c2025, &_call_f_metaData_c2025);
-  methods += new qt_gsi::GenericMethod ("metaDataAvailableChanged", "@brief Method void QMetaDataWriterControl::metaDataAvailableChanged(bool available)\n", false, &_init_f_metaDataAvailableChanged_864, &_call_f_metaDataAvailableChanged_864);
-  methods += new qt_gsi::GenericMethod ("metaDataChanged", "@brief Method void QMetaDataWriterControl::metaDataChanged()\n", false, &_init_f_metaDataChanged_0, &_call_f_metaDataChanged_0);
-  methods += new qt_gsi::GenericMethod ("metaDataChanged_kv", "@brief Method void QMetaDataWriterControl::metaDataChanged(const QString &key, const QVariant &value)\n", false, &_init_f_metaDataChanged_4036, &_call_f_metaDataChanged_4036);
   methods += new qt_gsi::GenericMethod ("setMetaData", "@brief Method void QMetaDataWriterControl::setMetaData(const QString &key, const QVariant &value)\n", false, &_init_f_setMetaData_4036, &_call_f_setMetaData_4036);
-  methods += new qt_gsi::GenericMethod ("writableChanged", "@brief Method void QMetaDataWriterControl::writableChanged(bool writable)\n", false, &_init_f_writableChanged_864, &_call_f_writableChanged_864);
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QMetaDataWriterControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("metaDataAvailableChanged(bool)", "metaDataAvailableChanged", gsi::arg("available"), "@brief Signal declaration for QMetaDataWriterControl::metaDataAvailableChanged(bool available)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("metaDataChanged()", "metaDataChanged", "@brief Signal declaration for QMetaDataWriterControl::metaDataChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString &, const QVariant & > ("metaDataChanged(const QString &, const QVariant &)", "metaDataChanged_kv", gsi::arg("key"), gsi::arg("value"), "@brief Signal declaration for QMetaDataWriterControl::metaDataChanged(const QString &key, const QVariant &value)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QMetaDataWriterControl::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("writableChanged(bool)", "writableChanged", gsi::arg("writable"), "@brief Signal declaration for QMetaDataWriterControl::writableChanged(bool writable)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QMetaDataWriterControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QMetaDataWriterControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -348,33 +271,39 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QMetaDataWriterControl::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [emitter impl] void QMetaDataWriterControl::destroyed(QObject *)
+  void emitter_QMetaDataWriterControl_destroyed_1302(QObject *arg1)
   {
-    return QMetaDataWriterControl::event(arg1);
+    emit QMetaDataWriterControl::destroyed(arg1);
   }
 
-  virtual bool event(QEvent *arg1)
+  //  [adaptor impl] bool QMetaDataWriterControl::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
+  {
+    return QMetaDataWriterControl::event(_event);
+  }
+
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QMetaDataWriterControl_Adaptor, bool, QEvent *>(&QMetaDataWriterControl_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QMetaDataWriterControl_Adaptor, bool, QEvent *>(&QMetaDataWriterControl_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QMetaDataWriterControl::event(arg1);
+      return QMetaDataWriterControl::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QMetaDataWriterControl::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QMetaDataWriterControl::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QMetaDataWriterControl::eventFilter(arg1, arg2);
+    return QMetaDataWriterControl::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QMetaDataWriterControl_Adaptor, bool, QObject *, QEvent *>(&QMetaDataWriterControl_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QMetaDataWriterControl_Adaptor, bool, QObject *, QEvent *>(&QMetaDataWriterControl_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QMetaDataWriterControl::eventFilter(arg1, arg2);
+      return QMetaDataWriterControl::eventFilter(watched, event);
     }
   }
 
@@ -424,6 +353,31 @@ public:
     }
   }
 
+  //  [emitter impl] void QMetaDataWriterControl::metaDataAvailableChanged(bool available)
+  void emitter_QMetaDataWriterControl_metaDataAvailableChanged_864(bool available)
+  {
+    emit QMetaDataWriterControl::metaDataAvailableChanged(available);
+  }
+
+  //  [emitter impl] void QMetaDataWriterControl::metaDataChanged()
+  void emitter_QMetaDataWriterControl_metaDataChanged_0()
+  {
+    emit QMetaDataWriterControl::metaDataChanged();
+  }
+
+  //  [emitter impl] void QMetaDataWriterControl::metaDataChanged(const QString &key, const QVariant &value)
+  void emitter_QMetaDataWriterControl_metaDataChanged_4036(const QString &key, const QVariant &value)
+  {
+    emit QMetaDataWriterControl::metaDataChanged(key, value);
+  }
+
+  //  [emitter impl] void QMetaDataWriterControl::objectNameChanged(const QString &objectName)
+  void emitter_QMetaDataWriterControl_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QMetaDataWriterControl::objectNameChanged(const QString &objectName)'");
+  }
+
   //  [adaptor impl] void QMetaDataWriterControl::setMetaData(const QString &key, const QVariant &value)
   void cbs_setMetaData_4036_0(const QString &key, const QVariant &value)
   {
@@ -441,33 +395,39 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMetaDataWriterControl::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [emitter impl] void QMetaDataWriterControl::writableChanged(bool writable)
+  void emitter_QMetaDataWriterControl_writableChanged_864(bool writable)
   {
-    QMetaDataWriterControl::childEvent(arg1);
+    emit QMetaDataWriterControl::writableChanged(writable);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  //  [adaptor impl] void QMetaDataWriterControl::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
+  {
+    QMetaDataWriterControl::childEvent(event);
+  }
+
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QMetaDataWriterControl_Adaptor, QChildEvent *>(&QMetaDataWriterControl_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QMetaDataWriterControl_Adaptor, QChildEvent *>(&QMetaDataWriterControl_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QMetaDataWriterControl::childEvent(arg1);
+      QMetaDataWriterControl::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QMetaDataWriterControl::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QMetaDataWriterControl::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QMetaDataWriterControl::customEvent(arg1);
+    QMetaDataWriterControl::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QMetaDataWriterControl_Adaptor, QEvent *>(&QMetaDataWriterControl_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QMetaDataWriterControl_Adaptor, QEvent *>(&QMetaDataWriterControl_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QMetaDataWriterControl::customEvent(arg1);
+      QMetaDataWriterControl::customEvent(event);
     }
   }
 
@@ -486,18 +446,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMetaDataWriterControl::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QMetaDataWriterControl::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QMetaDataWriterControl::timerEvent(arg1);
+    QMetaDataWriterControl::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QMetaDataWriterControl_Adaptor, QTimerEvent *>(&QMetaDataWriterControl_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QMetaDataWriterControl_Adaptor, QTimerEvent *>(&QMetaDataWriterControl_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QMetaDataWriterControl::timerEvent(arg1);
+      QMetaDataWriterControl::timerEvent(event);
     }
   }
 
@@ -549,11 +509,11 @@ static void _set_callback_cbs_availableMetaData_c0_0 (void *cls, const gsi::Call
 }
 
 
-// void QMetaDataWriterControl::childEvent(QChildEvent *)
+// void QMetaDataWriterControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -573,11 +533,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QMetaDataWriterControl::customEvent(QEvent *)
+// void QMetaDataWriterControl::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -594,6 +554,24 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QMetaDataWriterControl_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
+}
+
+
+// emitter void QMetaDataWriterControl::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QMetaDataWriterControl_Adaptor *)cls)->emitter_QMetaDataWriterControl_destroyed_1302 (arg1);
 }
 
 
@@ -621,11 +599,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QMetaDataWriterControl::event(QEvent *)
+// bool QMetaDataWriterControl::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -644,13 +622,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QMetaDataWriterControl::eventFilter(QObject *, QEvent *)
+// bool QMetaDataWriterControl::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -749,6 +727,77 @@ static void _set_callback_cbs_metaData_c2025_0 (void *cls, const gsi::Callback &
 }
 
 
+// emitter void QMetaDataWriterControl::metaDataAvailableChanged(bool available)
+
+static void _init_emitter_metaDataAvailableChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("available");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_metaDataAvailableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QMetaDataWriterControl_Adaptor *)cls)->emitter_QMetaDataWriterControl_metaDataAvailableChanged_864 (arg1);
+}
+
+
+// emitter void QMetaDataWriterControl::metaDataChanged()
+
+static void _init_emitter_metaDataChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_metaDataChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QMetaDataWriterControl_Adaptor *)cls)->emitter_QMetaDataWriterControl_metaDataChanged_0 ();
+}
+
+
+// emitter void QMetaDataWriterControl::metaDataChanged(const QString &key, const QVariant &value)
+
+static void _init_emitter_metaDataChanged_4036 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("key");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("value");
+  decl->add_arg<const QVariant & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_metaDataChanged_4036 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
+  ((QMetaDataWriterControl_Adaptor *)cls)->emitter_QMetaDataWriterControl_metaDataChanged_4036 (arg1, arg2);
+}
+
+
+// emitter void QMetaDataWriterControl::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QMetaDataWriterControl_Adaptor *)cls)->emitter_QMetaDataWriterControl_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QMetaDataWriterControl::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -822,11 +871,11 @@ static void _set_callback_cbs_setMetaData_4036_0 (void *cls, const gsi::Callback
 }
 
 
-// void QMetaDataWriterControl::timerEvent(QTimerEvent *)
+// void QMetaDataWriterControl::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -846,6 +895,24 @@ static void _set_callback_cbs_timerEvent_1730_0 (void *cls, const gsi::Callback 
 }
 
 
+// emitter void QMetaDataWriterControl::writableChanged(bool writable)
+
+static void _init_emitter_writableChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("writable");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_writableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QMetaDataWriterControl_Adaptor *)cls)->emitter_QMetaDataWriterControl_writableChanged_864 (arg1);
+}
+
+
 namespace gsi
 {
 
@@ -856,15 +923,16 @@ static gsi::Methods methods_QMetaDataWriterControl_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMetaDataWriterControl::QMetaDataWriterControl()\nThis method creates an object of class QMetaDataWriterControl.", &_init_ctor_QMetaDataWriterControl_Adaptor_0, &_call_ctor_QMetaDataWriterControl_Adaptor_0);
   methods += new qt_gsi::GenericMethod ("availableMetaData", "@brief Virtual method QStringList QMetaDataWriterControl::availableMetaData()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_availableMetaData_c0_0, &_call_cbs_availableMetaData_c0_0);
   methods += new qt_gsi::GenericMethod ("availableMetaData", "@hide", true, &_init_cbs_availableMetaData_c0_0, &_call_cbs_availableMetaData_c0_0, &_set_callback_cbs_availableMetaData_c0_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QMetaDataWriterControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QMetaDataWriterControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMetaDataWriterControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMetaDataWriterControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QMetaDataWriterControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QMetaDataWriterControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMetaDataWriterControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMetaDataWriterControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QMetaDataWriterControl::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QMetaDataWriterControl::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("isMetaDataAvailable", "@brief Virtual method bool QMetaDataWriterControl::isMetaDataAvailable()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isMetaDataAvailable_c0_0, &_call_cbs_isMetaDataAvailable_c0_0);
   methods += new qt_gsi::GenericMethod ("isMetaDataAvailable", "@hide", true, &_init_cbs_isMetaDataAvailable_c0_0, &_call_cbs_isMetaDataAvailable_c0_0, &_set_callback_cbs_isMetaDataAvailable_c0_0);
@@ -873,13 +941,18 @@ static gsi::Methods methods_QMetaDataWriterControl_Adaptor () {
   methods += new qt_gsi::GenericMethod ("isWritable", "@hide", true, &_init_cbs_isWritable_c0_0, &_call_cbs_isWritable_c0_0, &_set_callback_cbs_isWritable_c0_0);
   methods += new qt_gsi::GenericMethod ("metaData", "@brief Virtual method QVariant QMetaDataWriterControl::metaData(const QString &key)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_metaData_c2025_0, &_call_cbs_metaData_c2025_0);
   methods += new qt_gsi::GenericMethod ("metaData", "@hide", true, &_init_cbs_metaData_c2025_0, &_call_cbs_metaData_c2025_0, &_set_callback_cbs_metaData_c2025_0);
+  methods += new qt_gsi::GenericMethod ("emit_metaDataAvailableChanged", "@brief Emitter for signal void QMetaDataWriterControl::metaDataAvailableChanged(bool available)\nCall this method to emit this signal.", false, &_init_emitter_metaDataAvailableChanged_864, &_call_emitter_metaDataAvailableChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_metaDataChanged", "@brief Emitter for signal void QMetaDataWriterControl::metaDataChanged()\nCall this method to emit this signal.", false, &_init_emitter_metaDataChanged_0, &_call_emitter_metaDataChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_metaDataChanged_kv", "@brief Emitter for signal void QMetaDataWriterControl::metaDataChanged(const QString &key, const QVariant &value)\nCall this method to emit this signal.", false, &_init_emitter_metaDataChanged_4036, &_call_emitter_metaDataChanged_4036);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QMetaDataWriterControl::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QMetaDataWriterControl::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QMetaDataWriterControl::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QMetaDataWriterControl::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("setMetaData", "@brief Virtual method void QMetaDataWriterControl::setMetaData(const QString &key, const QVariant &value)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setMetaData_4036_0, &_call_cbs_setMetaData_4036_0);
   methods += new qt_gsi::GenericMethod ("setMetaData", "@hide", false, &_init_cbs_setMetaData_4036_0, &_call_cbs_setMetaData_4036_0, &_set_callback_cbs_setMetaData_4036_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QMetaDataWriterControl::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QMetaDataWriterControl::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("emit_writableChanged", "@brief Emitter for signal void QMetaDataWriterControl::writableChanged(bool writable)\nCall this method to emit this signal.", false, &_init_emitter_writableChanged_864, &_call_emitter_writableChanged_864);
   return methods;
 }
 

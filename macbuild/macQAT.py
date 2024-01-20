@@ -203,11 +203,11 @@ def ExportEnvVariables():
     MyEnviron[ 'TESTSRC' ] = ".."
     MyEnviron[ 'TESTTMP' ] = WorkDir
     if System == "Darwin":
-        MyEnviron[ 'DYLD_LIBRARY_PATH' ] = "%s:%s/db_plugins:%s/lay_plugins" % (ProjectDir, ProjectDir, ProjectDir)
+        MyEnviron[ 'DYLD_LIBRARY_PATH' ] = "%s:%s/db_plugins:%s/lay_plugins:%s/pymod" % (ProjectDir, ProjectDir, ProjectDir, ProjectDir)
         for env in [ 'TESTSRC', 'TESTTMP', 'DYLD_LIBRARY_PATH' ]:
             os.environ[env] = MyEnviron[env]
     else:
-        MyEnviron[ 'LD_LIBRARY_PATH' ] = "%s:%s/db_plugins:%s/lay_plugins" % (ProjectDir, ProjectDir, ProjectDir)
+        MyEnviron[ 'LD_LIBRARY_PATH' ] = "%s:%s/db_plugins:%s/lay_plugins:%s/pymod" % (ProjectDir, ProjectDir, ProjectDir, ProjectDir)
         for env in [ 'TESTSRC', 'TESTTMP', 'LD_LIBRARY_PATH' ]:
             os.environ[env] = MyEnviron[env]
 

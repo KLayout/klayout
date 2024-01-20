@@ -95,7 +95,7 @@ namespace gsi
 static gsi::Methods methods_QGenericPluginFactory () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QGenericPluginFactory::QGenericPluginFactory()\nThis method creates an object of class QGenericPluginFactory.", &_init_ctor_QGenericPluginFactory_0, &_call_ctor_QGenericPluginFactory_0);
-  methods += new qt_gsi::GenericStaticMethod ("qt_create", "@brief Static method QObject *QGenericPluginFactory::create(const QString &, const QString &)\nThis method is static and can be called without an instance.", &_init_f_create_3942, &_call_f_create_3942);
+  methods += new qt_gsi::GenericStaticMethod ("create|qt_create", "@brief Static method QObject *QGenericPluginFactory::create(const QString &, const QString &)\nThis method is static and can be called without an instance.", &_init_f_create_3942, &_call_f_create_3942);
   methods += new qt_gsi::GenericStaticMethod ("keys", "@brief Static method QStringList QGenericPluginFactory::keys()\nThis method is static and can be called without an instance.", &_init_f_keys_0, &_call_f_keys_0);
   return methods;
 }

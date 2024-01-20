@@ -380,7 +380,7 @@ static void _call_f_frustum_5280 (const qt_gsi::GenericMethod * /*decl*/, void *
 
 static void _init_f_inverted_c1050 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("invertible", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("invertible", true, "nullptr");
   decl->add_arg<bool * > (argspec_0);
   decl->set_return<QMatrix4x4 > ();
 }
@@ -389,7 +389,7 @@ static void _call_f_inverted_c1050 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool *arg1 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg1 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<QMatrix4x4 > ((QMatrix4x4)((QMatrix4x4 *)cls)->inverted (arg1));
 }
 

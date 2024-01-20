@@ -22,24 +22,5 @@
 
 #include "../pymodHelper.h"
 
-//  To force linking of the QtXml module
-#include "../../gsiqt/qtbasic/gsiQtXmlExternals.h"
-FORCE_LINK_GSI_QTXML
-
-//  To force linking of the QtCore module (some arguments
-//  are QIODevice or QTextStream)
-#include "../../gsiqt/qtbasic/gsiQtCoreExternals.h"
-FORCE_LINK_GSI_QTCORE
-
-//  And because will pull in QtCore:
-//  This is *only* required because of QSignalMapper which takes a QWidget argument from
-//  the QtGui library and we need to supply the GSI binding for this ...
-#include "../../gsiqt/qtbasic/gsiQtGuiExternals.h"
-FORCE_LINK_GSI_QTGUI
-
-//  And because we pull in QtGui, we also need to pull in QtWidgets because QtGui bindings
-//  use QAction and QWidget which are itself in QtWidgets
-#include "../../gsiqt/qtbasic/gsiQtWidgetsExternals.h"
-FORCE_LINK_GSI_QTWIDGETS
-
+#include "QtXmlMain.h"
 DEFINE_PYMOD(QtXml, "QtXml", "KLayout/Qt module 'QtXml'")

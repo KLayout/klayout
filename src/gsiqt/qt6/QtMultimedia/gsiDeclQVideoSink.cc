@@ -111,26 +111,6 @@ static void _call_f_subtitleText_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// void QVideoSink::subtitleTextChanged(const QString &subtitleText)
-
-
-static void _init_f_subtitleTextChanged_c2025 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("subtitleText");
-  decl->add_arg<const QString & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_subtitleTextChanged_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QVideoSink *)cls)->subtitleTextChanged (arg1);
-}
-
-
 // QVideoFrame QVideoSink::videoFrame()
 
 
@@ -146,26 +126,6 @@ static void _call_f_videoFrame_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// void QVideoSink::videoFrameChanged(const QVideoFrame &frame)
-
-
-static void _init_f_videoFrameChanged_c2388 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("frame");
-  decl->add_arg<const QVideoFrame & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_videoFrameChanged_c2388 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QVideoFrame &arg1 = gsi::arg_reader<const QVideoFrame & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QVideoSink *)cls)->videoFrameChanged (arg1);
-}
-
-
 // QSize QVideoSink::videoSize()
 
 
@@ -178,22 +138,6 @@ static void _call_f_videoSize_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QSize > ((QSize)((QVideoSink *)cls)->videoSize ());
-}
-
-
-// void QVideoSink::videoSizeChanged()
-
-
-static void _init_f_videoSizeChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_videoSizeChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QVideoSink *)cls)->videoSizeChanged ();
 }
 
 
@@ -228,14 +172,16 @@ namespace gsi
 static gsi::Methods methods_QVideoSink () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("setSubtitleText", "@brief Method void QVideoSink::setSubtitleText(const QString &subtitle)\n", false, &_init_f_setSubtitleText_2025, &_call_f_setSubtitleText_2025);
-  methods += new qt_gsi::GenericMethod ("setVideoFrame", "@brief Method void QVideoSink::setVideoFrame(const QVideoFrame &frame)\n", false, &_init_f_setVideoFrame_2388, &_call_f_setVideoFrame_2388);
-  methods += new qt_gsi::GenericMethod ("subtitleText", "@brief Method QString QVideoSink::subtitleText()\n", true, &_init_f_subtitleText_c0, &_call_f_subtitleText_c0);
-  methods += new qt_gsi::GenericMethod ("subtitleTextChanged", "@brief Method void QVideoSink::subtitleTextChanged(const QString &subtitleText)\n", true, &_init_f_subtitleTextChanged_c2025, &_call_f_subtitleTextChanged_c2025);
-  methods += new qt_gsi::GenericMethod ("videoFrame", "@brief Method QVideoFrame QVideoSink::videoFrame()\n", true, &_init_f_videoFrame_c0, &_call_f_videoFrame_c0);
-  methods += new qt_gsi::GenericMethod ("videoFrameChanged", "@brief Method void QVideoSink::videoFrameChanged(const QVideoFrame &frame)\n", true, &_init_f_videoFrameChanged_c2388, &_call_f_videoFrameChanged_c2388);
+  methods += new qt_gsi::GenericMethod ("setSubtitleText|subtitleText=", "@brief Method void QVideoSink::setSubtitleText(const QString &subtitle)\n", false, &_init_f_setSubtitleText_2025, &_call_f_setSubtitleText_2025);
+  methods += new qt_gsi::GenericMethod ("setVideoFrame|videoFrame=", "@brief Method void QVideoSink::setVideoFrame(const QVideoFrame &frame)\n", false, &_init_f_setVideoFrame_2388, &_call_f_setVideoFrame_2388);
+  methods += new qt_gsi::GenericMethod (":subtitleText", "@brief Method QString QVideoSink::subtitleText()\n", true, &_init_f_subtitleText_c0, &_call_f_subtitleText_c0);
+  methods += new qt_gsi::GenericMethod (":videoFrame", "@brief Method QVideoFrame QVideoSink::videoFrame()\n", true, &_init_f_videoFrame_c0, &_call_f_videoFrame_c0);
   methods += new qt_gsi::GenericMethod ("videoSize", "@brief Method QSize QVideoSink::videoSize()\n", true, &_init_f_videoSize_c0, &_call_f_videoSize_c0);
-  methods += new qt_gsi::GenericMethod ("videoSizeChanged", "@brief Method void QVideoSink::videoSizeChanged()\n", false, &_init_f_videoSizeChanged_0, &_call_f_videoSizeChanged_0);
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QVideoSink::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QVideoSink::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("subtitleTextChanged(const QString &)", "subtitleTextChanged", gsi::arg("subtitleText"), "@brief Signal declaration for QVideoSink::subtitleTextChanged(const QString &subtitleText)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QVideoFrame & > ("videoFrameChanged(const QVideoFrame &)", "videoFrameChanged", gsi::arg("frame"), "@brief Signal declaration for QVideoSink::videoFrameChanged(const QVideoFrame &frame)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("videoSizeChanged()", "videoSizeChanged", "@brief Signal declaration for QVideoSink::videoSizeChanged()\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QVideoSink::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;
 }
@@ -289,6 +235,12 @@ public:
     return QVideoSink::senderSignalIndex();
   }
 
+  //  [emitter impl] void QVideoSink::destroyed(QObject *)
+  void emitter_QVideoSink_destroyed_1302(QObject *arg1)
+  {
+    emit QVideoSink::destroyed(arg1);
+  }
+
   //  [adaptor impl] bool QVideoSink::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -317,6 +269,31 @@ public:
     } else {
       return QVideoSink::eventFilter(watched, event);
     }
+  }
+
+  //  [emitter impl] void QVideoSink::objectNameChanged(const QString &objectName)
+  void emitter_QVideoSink_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QVideoSink::objectNameChanged(const QString &objectName)'");
+  }
+
+  //  [emitter impl] void QVideoSink::subtitleTextChanged(const QString &subtitleText)
+  void emitter_QVideoSink_subtitleTextChanged_c2025(const QString &subtitleText)
+  {
+    emit QVideoSink::subtitleTextChanged(subtitleText);
+  }
+
+  //  [emitter impl] void QVideoSink::videoFrameChanged(const QVideoFrame &frame)
+  void emitter_QVideoSink_videoFrameChanged_c2388(const QVideoFrame &frame)
+  {
+    emit QVideoSink::videoFrameChanged(frame);
+  }
+
+  //  [emitter impl] void QVideoSink::videoSizeChanged()
+  void emitter_QVideoSink_videoSizeChanged_0()
+  {
+    emit QVideoSink::videoSizeChanged();
   }
 
   //  [adaptor impl] void QVideoSink::childEvent(QChildEvent *event)
@@ -455,6 +432,24 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QVideoSink::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QVideoSink_Adaptor *)cls)->emitter_QVideoSink_destroyed_1302 (arg1);
+}
+
+
 // void QVideoSink::disconnectNotify(const QMetaMethod &signal)
 
 static void _init_cbs_disconnectNotify_2394_0 (qt_gsi::GenericMethod *decl)
@@ -546,6 +541,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QVideoSink::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QVideoSink_Adaptor *)cls)->emitter_QVideoSink_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QVideoSink::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -592,6 +605,24 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
+// emitter void QVideoSink::subtitleTextChanged(const QString &subtitleText)
+
+static void _init_emitter_subtitleTextChanged_c2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("subtitleText");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_subtitleTextChanged_c2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QVideoSink_Adaptor *)cls)->emitter_QVideoSink_subtitleTextChanged_c2025 (arg1);
+}
+
+
 // void QVideoSink::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
@@ -616,6 +647,38 @@ static void _set_callback_cbs_timerEvent_1730_0 (void *cls, const gsi::Callback 
 }
 
 
+// emitter void QVideoSink::videoFrameChanged(const QVideoFrame &frame)
+
+static void _init_emitter_videoFrameChanged_c2388 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("frame");
+  decl->add_arg<const QVideoFrame & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_videoFrameChanged_c2388 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QVideoFrame &arg1 = gsi::arg_reader<const QVideoFrame & >() (args, heap);
+  ((QVideoSink_Adaptor *)cls)->emitter_QVideoSink_videoFrameChanged_c2388 (arg1);
+}
+
+
+// emitter void QVideoSink::videoSizeChanged()
+
+static void _init_emitter_videoSizeChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_videoSizeChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QVideoSink_Adaptor *)cls)->emitter_QVideoSink_videoSizeChanged_0 ();
+}
+
+
 namespace gsi
 {
 
@@ -628,6 +691,7 @@ static gsi::Methods methods_QVideoSink_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QVideoSink::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QVideoSink::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QVideoSink::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QVideoSink::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
@@ -635,11 +699,15 @@ static gsi::Methods methods_QVideoSink_Adaptor () {
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QVideoSink::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QVideoSink::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QVideoSink::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QVideoSink::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QVideoSink::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QVideoSink::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
+  methods += new qt_gsi::GenericMethod ("emit_subtitleTextChanged", "@brief Emitter for signal void QVideoSink::subtitleTextChanged(const QString &subtitleText)\nCall this method to emit this signal.", true, &_init_emitter_subtitleTextChanged_c2025, &_call_emitter_subtitleTextChanged_c2025);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QVideoSink::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("emit_videoFrameChanged", "@brief Emitter for signal void QVideoSink::videoFrameChanged(const QVideoFrame &frame)\nCall this method to emit this signal.", true, &_init_emitter_videoFrameChanged_c2388, &_call_emitter_videoFrameChanged_c2388);
+  methods += new qt_gsi::GenericMethod ("emit_videoSizeChanged", "@brief Emitter for signal void QVideoSink::videoSizeChanged()\nCall this method to emit this signal.", false, &_init_emitter_videoSizeChanged_0, &_call_emitter_videoSizeChanged_0);
   return methods;
 }
 

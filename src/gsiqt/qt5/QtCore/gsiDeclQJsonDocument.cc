@@ -31,6 +31,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonParseError>
+#include <QJsonValue>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
 #include <memory>
@@ -257,6 +258,44 @@ static void _call_f_operator_eq__eq__c2635 (const qt_gsi::GenericMethod * /*decl
 }
 
 
+// const QJsonValue QJsonDocument::operator[](const QString &key)
+
+
+static void _init_f_operator_index__c2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("key");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<const QJsonValue > ();
+}
+
+static void _call_f_operator_index__c2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ret.write<const QJsonValue > ((const QJsonValue)((QJsonDocument *)cls)->operator[] (arg1));
+}
+
+
+// const QJsonValue QJsonDocument::operator[](int i)
+
+
+static void _init_f_operator_index__c767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("i");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<const QJsonValue > ();
+}
+
+static void _call_f_operator_index__c767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ret.write<const QJsonValue > ((const QJsonValue)((QJsonDocument *)cls)->operator[] (arg1));
+}
+
+
 // const char *QJsonDocument::rawData(int *size)
 
 
@@ -313,6 +352,26 @@ static void _call_f_setObject_2403 (const qt_gsi::GenericMethod * /*decl*/, void
   const QJsonObject &arg1 = gsi::arg_reader<const QJsonObject & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QJsonDocument *)cls)->setObject (arg1);
+}
+
+
+// void QJsonDocument::swap(QJsonDocument &other)
+
+
+static void _init_f_swap_1940 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<QJsonDocument & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_swap_1940 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QJsonDocument &arg1 = gsi::arg_reader<QJsonDocument & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QJsonDocument *)cls)->swap (arg1);
 }
 
 
@@ -409,7 +468,7 @@ static void _init_f_fromJson_4343 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("json");
   decl->add_arg<const QByteArray & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("error", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("error", true, "nullptr");
   decl->add_arg<QJsonParseError * > (argspec_1);
   decl->set_return<QJsonDocument > ();
 }
@@ -419,7 +478,7 @@ static void _call_f_fromJson_4343 (const qt_gsi::GenericStaticMethod * /*decl*/,
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
-  QJsonParseError *arg2 = args ? gsi::arg_reader<QJsonParseError * >() (args, heap) : gsi::arg_maker<QJsonParseError * >() (0, heap);
+  QJsonParseError *arg2 = args ? gsi::arg_reader<QJsonParseError * >() (args, heap) : gsi::arg_maker<QJsonParseError * >() (nullptr, heap);
   ret.write<QJsonDocument > ((QJsonDocument)QJsonDocument::fromJson (arg1, arg2));
 }
 
@@ -487,9 +546,12 @@ static gsi::Methods methods_QJsonDocument () {
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QJsonDocument &QJsonDocument::operator =(const QJsonDocument &other)\n", false, &_init_f_operator_eq__2635, &_call_f_operator_eq__2635);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QJsonDocument::operator!=(const QJsonDocument &other)\n", true, &_init_f_operator_excl__eq__c2635, &_call_f_operator_excl__eq__c2635);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QJsonDocument::operator==(const QJsonDocument &other)\n", true, &_init_f_operator_eq__eq__c2635, &_call_f_operator_eq__eq__c2635);
+  methods += new qt_gsi::GenericMethod ("[]", "@brief Method const QJsonValue QJsonDocument::operator[](const QString &key)\n", true, &_init_f_operator_index__c2025, &_call_f_operator_index__c2025);
+  methods += new qt_gsi::GenericMethod ("[]", "@brief Method const QJsonValue QJsonDocument::operator[](int i)\n", true, &_init_f_operator_index__c767, &_call_f_operator_index__c767);
   methods += new qt_gsi::GenericMethod ("rawData", "@brief Method const char *QJsonDocument::rawData(int *size)\n", true, &_init_f_rawData_c953, &_call_f_rawData_c953);
   methods += new qt_gsi::GenericMethod ("setArray|array=", "@brief Method void QJsonDocument::setArray(const QJsonArray &array)\n", false, &_init_f_setArray_2315, &_call_f_setArray_2315);
   methods += new qt_gsi::GenericMethod ("setObject", "@brief Method void QJsonDocument::setObject(const QJsonObject &object)\n", false, &_init_f_setObject_2403, &_call_f_setObject_2403);
+  methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QJsonDocument::swap(QJsonDocument &other)\n", false, &_init_f_swap_1940, &_call_f_swap_1940);
   methods += new qt_gsi::GenericMethod ("toBinaryData", "@brief Method QByteArray QJsonDocument::toBinaryData()\n", true, &_init_f_toBinaryData_c0, &_call_f_toBinaryData_c0);
   methods += new qt_gsi::GenericMethod ("toJson", "@brief Method QByteArray QJsonDocument::toJson()\n", true, &_init_f_toJson_c0, &_call_f_toJson_c0);
   methods += new qt_gsi::GenericMethod ("toJson", "@brief Method QByteArray QJsonDocument::toJson(QJsonDocument::JsonFormat format)\n", true, &_init_f_toJson_c2901, &_call_f_toJson_c2901);

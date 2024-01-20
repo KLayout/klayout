@@ -217,6 +217,21 @@ for edge in edges:
 </pre>
     </li>
 
+    <li><b>Keyword arguments:</b>
+
+    <p>Most methods support keyword arguments, for example:</p>
+
+    <pre># a 45 degree rotation
+t = pya.CplxTrans(rot = 45)</pre>
+
+    <p>
+    Exceptions are some built-in methods like "assign". Keyword arguments can be used
+    when the non-optional arguments are specified either as positional or other keyword
+    arguments.
+    </p>
+
+    </li>
+
     <li><b>Standard protocols:</b>
 
     <p>"x.to_s()" is available as "str(x)" too.</p>

@@ -355,9 +355,6 @@ klayout_main_cont (int &argc, char **argv)
 
   try {
 
-    //  initialize the Python interpreter
-    pya::PythonInterpreter::initialize ();
-
     //  this registers the gsi definitions
     gsi::initialize_external ();
 

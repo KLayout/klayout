@@ -354,6 +354,26 @@ static void _call_f_setApplicationDescription_2025 (const qt_gsi::GenericMethod 
 }
 
 
+// void QCommandLineParser::setOptionsAfterPositionalArgumentsMode(QCommandLineParser::OptionsAfterPositionalArgumentsMode mode)
+
+
+static void _init_f_setOptionsAfterPositionalArgumentsMode_5992 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("mode");
+  decl->add_arg<const qt_gsi::Converter<QCommandLineParser::OptionsAfterPositionalArgumentsMode>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setOptionsAfterPositionalArgumentsMode_5992 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QCommandLineParser::OptionsAfterPositionalArgumentsMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCommandLineParser::OptionsAfterPositionalArgumentsMode>::target_type & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QCommandLineParser *)cls)->setOptionsAfterPositionalArgumentsMode (qt_gsi::QtToCppAdaptor<QCommandLineParser::OptionsAfterPositionalArgumentsMode>(arg1).cref());
+}
+
+
 // void QCommandLineParser::setSingleDashWordOptionMode(QCommandLineParser::SingleDashWordOptionMode parsingMode)
 
 
@@ -508,7 +528,7 @@ static void _init_f_tr_4013 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("sourceText");
   decl->add_arg<const char * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("disambiguation", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("disambiguation", true, "nullptr");
   decl->add_arg<const char * > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("n", true, "-1");
   decl->add_arg<int > (argspec_2);
@@ -520,7 +540,7 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
-  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
   int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QCommandLineParser::tr (arg1, arg2, arg3));
 }
@@ -533,7 +553,7 @@ static void _init_f_trUtf8_4013 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("sourceText");
   decl->add_arg<const char * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("disambiguation", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("disambiguation", true, "nullptr");
   decl->add_arg<const char * > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("n", true, "-1");
   decl->add_arg<int > (argspec_2);
@@ -545,7 +565,7 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
-  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
   int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QCommandLineParser::trUtf8 (arg1, arg2, arg3));
 }
@@ -575,6 +595,7 @@ static gsi::Methods methods_QCommandLineParser () {
   methods += new qt_gsi::GenericMethod ("process", "@brief Method void QCommandLineParser::process(const QStringList &arguments)\n", false, &_init_f_process_2437, &_call_f_process_2437);
   methods += new qt_gsi::GenericMethod ("process", "@brief Method void QCommandLineParser::process(const QCoreApplication &app)\n", false, &_init_f_process_2927, &_call_f_process_2927);
   methods += new qt_gsi::GenericMethod ("setApplicationDescription|applicationDescription=", "@brief Method void QCommandLineParser::setApplicationDescription(const QString &description)\n", false, &_init_f_setApplicationDescription_2025, &_call_f_setApplicationDescription_2025);
+  methods += new qt_gsi::GenericMethod ("setOptionsAfterPositionalArgumentsMode", "@brief Method void QCommandLineParser::setOptionsAfterPositionalArgumentsMode(QCommandLineParser::OptionsAfterPositionalArgumentsMode mode)\n", false, &_init_f_setOptionsAfterPositionalArgumentsMode_5992, &_call_f_setOptionsAfterPositionalArgumentsMode_5992);
   methods += new qt_gsi::GenericMethod ("setSingleDashWordOptionMode", "@brief Method void QCommandLineParser::setSingleDashWordOptionMode(QCommandLineParser::SingleDashWordOptionMode parsingMode)\n", false, &_init_f_setSingleDashWordOptionMode_4777, &_call_f_setSingleDashWordOptionMode_4777);
   methods += new qt_gsi::GenericMethod ("showHelp", "@brief Method void QCommandLineParser::showHelp(int exitCode)\n", false, &_init_f_showHelp_767, &_call_f_showHelp_767);
   methods += new qt_gsi::GenericMethod ("showVersion", "@brief Method void QCommandLineParser::showVersion()\n", false, &_init_f_showVersion_0, &_call_f_showVersion_0);
@@ -594,6 +615,26 @@ gsi::Class<QCommandLineParser> decl_QCommandLineParser ("QtCore", "QCommandLineP
 
 
 GSI_QTCORE_PUBLIC gsi::Class<QCommandLineParser> &qtdecl_QCommandLineParser () { return decl_QCommandLineParser; }
+
+}
+
+
+//  Implementation of the enum wrapper class for QCommandLineParser::OptionsAfterPositionalArgumentsMode
+namespace qt_gsi
+{
+
+static gsi::Enum<QCommandLineParser::OptionsAfterPositionalArgumentsMode> decl_QCommandLineParser_OptionsAfterPositionalArgumentsMode_Enum ("QtCore", "QCommandLineParser_OptionsAfterPositionalArgumentsMode",
+    gsi::enum_const ("ParseAsOptions", QCommandLineParser::ParseAsOptions, "@brief Enum constant QCommandLineParser::ParseAsOptions") +
+    gsi::enum_const ("ParseAsPositionalArguments", QCommandLineParser::ParseAsPositionalArguments, "@brief Enum constant QCommandLineParser::ParseAsPositionalArguments"),
+  "@qt\n@brief This class represents the QCommandLineParser::OptionsAfterPositionalArgumentsMode enum");
+
+static gsi::QFlagsClass<QCommandLineParser::OptionsAfterPositionalArgumentsMode > decl_QCommandLineParser_OptionsAfterPositionalArgumentsMode_Enums ("QtCore", "QCommandLineParser_QFlags_OptionsAfterPositionalArgumentsMode",
+  "@qt\n@brief This class represents the QFlags<QCommandLineParser::OptionsAfterPositionalArgumentsMode> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<QCommandLineParser> inject_QCommandLineParser_OptionsAfterPositionalArgumentsMode_Enum_in_parent (decl_QCommandLineParser_OptionsAfterPositionalArgumentsMode_Enum.defs ());
+static gsi::ClassExt<QCommandLineParser> decl_QCommandLineParser_OptionsAfterPositionalArgumentsMode_Enum_as_child (decl_QCommandLineParser_OptionsAfterPositionalArgumentsMode_Enum, "OptionsAfterPositionalArgumentsMode");
+static gsi::ClassExt<QCommandLineParser> decl_QCommandLineParser_OptionsAfterPositionalArgumentsMode_Enums_as_child (decl_QCommandLineParser_OptionsAfterPositionalArgumentsMode_Enums, "QFlags_OptionsAfterPositionalArgumentsMode");
 
 }
 

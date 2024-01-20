@@ -29,6 +29,7 @@
 
 #include <QSaveFile>
 #include <QChildEvent>
+#include <QDateTime>
 #include <QEvent>
 #include <QMetaMethod>
 #include <QObject>
@@ -239,6 +240,8 @@ static gsi::Methods methods_QSaveFile () {
   methods += new qt_gsi::GenericMethod ("setFileName|fileName=", "@brief Method void QSaveFile::setFileName(const QString &name)\n", false, &_init_f_setFileName_2025, &_call_f_setFileName_2025);
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QSaveFile::aboutToClose()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64 > ("bytesWritten(qint64)", "bytesWritten", gsi::arg("bytes"), "@brief Signal declaration for QSaveFile::bytesWritten(qint64 bytes)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int, qint64 > ("channelBytesWritten(int, qint64)", "channelBytesWritten", gsi::arg("channel"), gsi::arg("bytes"), "@brief Signal declaration for QSaveFile::channelBytesWritten(int channel, qint64 bytes)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("channelReadyRead(int)", "channelReadyRead", gsi::arg("channel"), "@brief Signal declaration for QSaveFile::channelReadyRead(int channel)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QSaveFile::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QSaveFile::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("readChannelFinished()", "readChannelFinished", "@brief Signal declaration for QSaveFile::readChannelFinished()\nYou can bind a procedure to this signal.");
@@ -391,39 +394,51 @@ public:
     }
   }
 
+  //  [emitter impl] void QSaveFile::channelBytesWritten(int channel, qint64 bytes)
+  void emitter_QSaveFile_channelBytesWritten_1645(int channel, qint64 bytes)
+  {
+    emit QSaveFile::channelBytesWritten(channel, bytes);
+  }
+
+  //  [emitter impl] void QSaveFile::channelReadyRead(int channel)
+  void emitter_QSaveFile_channelReadyRead_767(int channel)
+  {
+    emit QSaveFile::channelReadyRead(channel);
+  }
+
   //  [emitter impl] void QSaveFile::destroyed(QObject *)
   void emitter_QSaveFile_destroyed_1302(QObject *arg1)
   {
     emit QSaveFile::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QSaveFile::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QSaveFile::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QSaveFile::event(arg1);
+    return QSaveFile::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QSaveFile_Adaptor, bool, QEvent *>(&QSaveFile_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QSaveFile_Adaptor, bool, QEvent *>(&QSaveFile_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QSaveFile::event(arg1);
+      return QSaveFile::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QSaveFile::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QSaveFile::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QSaveFile::eventFilter(arg1, arg2);
+    return QSaveFile::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QSaveFile_Adaptor, bool, QObject *, QEvent *>(&QSaveFile_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QSaveFile_Adaptor, bool, QObject *, QEvent *>(&QSaveFile_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QSaveFile::eventFilter(arg1, arg2);
+      return QSaveFile::eventFilter(watched, event);
     }
   }
 
@@ -626,33 +641,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QSaveFile::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QSaveFile::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QSaveFile::childEvent(arg1);
+    QSaveFile::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QSaveFile_Adaptor, QChildEvent *>(&QSaveFile_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QSaveFile_Adaptor, QChildEvent *>(&QSaveFile_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QSaveFile::childEvent(arg1);
+      QSaveFile::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QSaveFile::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QSaveFile::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QSaveFile::customEvent(arg1);
+    QSaveFile::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QSaveFile_Adaptor, QEvent *>(&QSaveFile_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QSaveFile_Adaptor, QEvent *>(&QSaveFile_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QSaveFile::customEvent(arg1);
+      QSaveFile::customEvent(event);
     }
   }
 
@@ -671,18 +686,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QSaveFile::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QSaveFile::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QSaveFile::timerEvent(arg1);
+    QSaveFile::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QSaveFile_Adaptor, QTimerEvent *>(&QSaveFile_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QSaveFile_Adaptor, QTimerEvent *>(&QSaveFile_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QSaveFile::timerEvent(arg1);
+      QSaveFile::timerEvent(event);
     }
   }
 
@@ -750,7 +765,7 @@ static void _call_ctor_QSaveFile_Adaptor_2025 (const qt_gsi::GenericStaticMethod
 
 static void _init_ctor_QSaveFile_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QSaveFile_Adaptor> ();
 }
@@ -759,7 +774,7 @@ static void _call_ctor_QSaveFile_Adaptor_1302 (const qt_gsi::GenericStaticMethod
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QSaveFile_Adaptor *> (new QSaveFile_Adaptor (arg1));
 }
 
@@ -893,11 +908,50 @@ static void _set_callback_cbs_canReadLine_c0_0 (void *cls, const gsi::Callback &
 }
 
 
-// void QSaveFile::childEvent(QChildEvent *)
+// emitter void QSaveFile::channelBytesWritten(int channel, qint64 bytes)
+
+static void _init_emitter_channelBytesWritten_1645 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("channel");
+  decl->add_arg<int > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("bytes");
+  decl->add_arg<qint64 > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_channelBytesWritten_1645 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  qint64 arg2 = gsi::arg_reader<qint64 >() (args, heap);
+  ((QSaveFile_Adaptor *)cls)->emitter_QSaveFile_channelBytesWritten_1645 (arg1, arg2);
+}
+
+
+// emitter void QSaveFile::channelReadyRead(int channel)
+
+static void _init_emitter_channelReadyRead_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("channel");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_channelReadyRead_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QSaveFile_Adaptor *)cls)->emitter_QSaveFile_channelReadyRead_767 (arg1);
+}
+
+
+// void QSaveFile::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -917,11 +971,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QSaveFile::customEvent(QEvent *)
+// void QSaveFile::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -945,7 +999,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -954,7 +1008,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QSaveFile_Adaptor *)cls)->emitter_QSaveFile_destroyed_1302 (arg1);
 }
 
@@ -983,11 +1037,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QSaveFile::event(QEvent *)
+// bool QSaveFile::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -1006,13 +1060,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QSaveFile::eventFilter(QObject *, QEvent *)
+// bool QSaveFile::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -1386,11 +1440,11 @@ static void _set_callback_cbs_size_c0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QSaveFile::timerEvent(QTimerEvent *)
+// void QSaveFile::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1502,16 +1556,18 @@ static gsi::Methods methods_QSaveFile_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_bytesWritten", "@brief Emitter for signal void QSaveFile::bytesWritten(qint64 bytes)\nCall this method to emit this signal.", false, &_init_emitter_bytesWritten_986, &_call_emitter_bytesWritten_986);
   methods += new qt_gsi::GenericMethod ("canReadLine", "@brief Virtual method bool QSaveFile::canReadLine()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_canReadLine_c0_0, &_call_cbs_canReadLine_c0_0);
   methods += new qt_gsi::GenericMethod ("canReadLine", "@hide", true, &_init_cbs_canReadLine_c0_0, &_call_cbs_canReadLine_c0_0, &_set_callback_cbs_canReadLine_c0_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QSaveFile::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("emit_channelBytesWritten", "@brief Emitter for signal void QSaveFile::channelBytesWritten(int channel, qint64 bytes)\nCall this method to emit this signal.", false, &_init_emitter_channelBytesWritten_1645, &_call_emitter_channelBytesWritten_1645);
+  methods += new qt_gsi::GenericMethod ("emit_channelReadyRead", "@brief Emitter for signal void QSaveFile::channelReadyRead(int channel)\nCall this method to emit this signal.", false, &_init_emitter_channelReadyRead_767, &_call_emitter_channelReadyRead_767);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QSaveFile::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QSaveFile::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QSaveFile::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QSaveFile::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QSaveFile::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QSaveFile::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QSaveFile::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QSaveFile::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QSaveFile::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("fileName", "@brief Virtual method QString QSaveFile::fileName()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_fileName_c0_0, &_call_cbs_fileName_c0_0);
   methods += new qt_gsi::GenericMethod ("fileName", "@hide", true, &_init_cbs_fileName_c0_0, &_call_cbs_fileName_c0_0, &_set_callback_cbs_fileName_c0_0);
@@ -1542,7 +1598,7 @@ static gsi::Methods methods_QSaveFile_Adaptor () {
   methods += new qt_gsi::GenericMethod ("setPermissions", "@hide", false, &_init_cbs_setPermissions_3370_0, &_call_cbs_setPermissions_3370_0, &_set_callback_cbs_setPermissions_3370_0);
   methods += new qt_gsi::GenericMethod ("size", "@brief Virtual method qint64 QSaveFile::size()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_size_c0_0, &_call_cbs_size_c0_0);
   methods += new qt_gsi::GenericMethod ("size", "@hide", true, &_init_cbs_size_c0_0, &_call_cbs_size_c0_0, &_set_callback_cbs_size_c0_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QSaveFile::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QSaveFile::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("waitForBytesWritten", "@brief Virtual method bool QSaveFile::waitForBytesWritten(int msecs)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_waitForBytesWritten_767_0, &_call_cbs_waitForBytesWritten_767_0);
   methods += new qt_gsi::GenericMethod ("waitForBytesWritten", "@hide", false, &_init_cbs_waitForBytesWritten_767_0, &_call_cbs_waitForBytesWritten_767_0, &_set_callback_cbs_waitForBytesWritten_767_0);

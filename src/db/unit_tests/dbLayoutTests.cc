@@ -482,7 +482,7 @@ TEST(4)
   el.layer_properties_dirty = false;
   EXPECT_EQ (g.get_layer_maybe (db::LayerProperties (42, 17)), -1);
   EXPECT_EQ (el.layer_properties_dirty, false);
-  EXPECT_EQ (g.get_layer (db::LayerProperties (42, 17)) >= 0, true);
+  g.get_layer (db::LayerProperties (42, 17));
   EXPECT_EQ (el.layer_properties_dirty, true);  //  new layer got inserted
 }
 

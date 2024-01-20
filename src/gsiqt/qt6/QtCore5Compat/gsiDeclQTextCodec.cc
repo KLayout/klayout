@@ -90,25 +90,6 @@ static void _call_f_canEncode_c2025 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// bool QTextCodec::canEncode(QStringView)
-
-
-static void _init_f_canEncode_c1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<bool > ();
-}
-
-static void _call_f_canEncode_c1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<bool > ((bool)((QTextCodec *)cls)->canEncode (arg1));
-}
-
-
 // QByteArray QTextCodec::fromUnicode(const QString &uc)
 
 
@@ -124,25 +105,6 @@ static void _call_f_fromUnicode_c2025 (const qt_gsi::GenericMethod * /*decl*/, v
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  ret.write<QByteArray > ((QByteArray)((QTextCodec *)cls)->fromUnicode (arg1));
-}
-
-
-// QByteArray QTextCodec::fromUnicode(QStringView uc)
-
-
-static void _init_f_fromUnicode_c1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("uc");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<QByteArray > ();
-}
-
-static void _call_f_fromUnicode_c1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
   ret.write<QByteArray > ((QByteArray)((QTextCodec *)cls)->fromUnicode (arg1));
 }
 
@@ -467,9 +429,7 @@ static gsi::Methods methods_QTextCodec () {
   methods += new qt_gsi::GenericMethod ("aliases", "@brief Method QList<QByteArray> QTextCodec::aliases()\n", true, &_init_f_aliases_c0, &_call_f_aliases_c0);
   methods += new qt_gsi::GenericMethod ("canEncode", "@brief Method bool QTextCodec::canEncode(QChar)\n", true, &_init_f_canEncode_c899, &_call_f_canEncode_c899);
   methods += new qt_gsi::GenericMethod ("canEncode", "@brief Method bool QTextCodec::canEncode(const QString &)\n", true, &_init_f_canEncode_c2025, &_call_f_canEncode_c2025);
-  methods += new qt_gsi::GenericMethod ("canEncode", "@brief Method bool QTextCodec::canEncode(QStringView)\n", true, &_init_f_canEncode_c1559, &_call_f_canEncode_c1559);
   methods += new qt_gsi::GenericMethod ("fromUnicode", "@brief Method QByteArray QTextCodec::fromUnicode(const QString &uc)\n", true, &_init_f_fromUnicode_c2025, &_call_f_fromUnicode_c2025);
-  methods += new qt_gsi::GenericMethod ("fromUnicode", "@brief Method QByteArray QTextCodec::fromUnicode(QStringView uc)\n", true, &_init_f_fromUnicode_c1559, &_call_f_fromUnicode_c1559);
   methods += new qt_gsi::GenericMethod ("makeDecoder", "@brief Method QTextDecoder *QTextCodec::makeDecoder(QTextCodec::ConversionFlags flags)\n", true, &_init_f_makeDecoder_c3087, &_call_f_makeDecoder_c3087);
   methods += new qt_gsi::GenericMethod ("makeEncoder", "@brief Method QTextEncoder *QTextCodec::makeEncoder(QTextCodec::ConversionFlags flags)\n", true, &_init_f_makeEncoder_c3087, &_call_f_makeEncoder_c3087);
   methods += new qt_gsi::GenericMethod ("mibEnum", "@brief Method int QTextCodec::mibEnum()\n", true, &_init_f_mibEnum_c0, &_call_f_mibEnum_c0);
@@ -480,13 +440,13 @@ static gsi::Methods methods_QTextCodec () {
   methods += new qt_gsi::GenericStaticMethod ("availableMibs", "@brief Static method QList<int> QTextCodec::availableMibs()\nThis method is static and can be called without an instance.", &_init_f_availableMibs_0, &_call_f_availableMibs_0);
   methods += new qt_gsi::GenericStaticMethod ("codecForHtml", "@brief Static method QTextCodec *QTextCodec::codecForHtml(const QByteArray &ba)\nThis method is static and can be called without an instance.", &_init_f_codecForHtml_2309, &_call_f_codecForHtml_2309);
   methods += new qt_gsi::GenericStaticMethod ("codecForHtml", "@brief Static method QTextCodec *QTextCodec::codecForHtml(const QByteArray &ba, QTextCodec *defaultCodec)\nThis method is static and can be called without an instance.", &_init_f_codecForHtml_3803, &_call_f_codecForHtml_3803);
-  methods += new qt_gsi::GenericStaticMethod (":codecForLocale", "@brief Static method QTextCodec *QTextCodec::codecForLocale()\nThis method is static and can be called without an instance.", &_init_f_codecForLocale_0, &_call_f_codecForLocale_0);
+  methods += new qt_gsi::GenericStaticMethod ("codecForLocale", "@brief Static method QTextCodec *QTextCodec::codecForLocale()\nThis method is static and can be called without an instance.", &_init_f_codecForLocale_0, &_call_f_codecForLocale_0);
   methods += new qt_gsi::GenericStaticMethod ("codecForMib", "@brief Static method QTextCodec *QTextCodec::codecForMib(int mib)\nThis method is static and can be called without an instance.", &_init_f_codecForMib_767, &_call_f_codecForMib_767);
   methods += new qt_gsi::GenericStaticMethod ("codecForName", "@brief Static method QTextCodec *QTextCodec::codecForName(const char *name)\nThis method is static and can be called without an instance.", &_init_f_codecForName_1731, &_call_f_codecForName_1731);
   methods += new qt_gsi::GenericStaticMethod ("codecForTr", "@brief Static method QTextCodec *QTextCodec::codecForTr()\nThis method is static and can be called without an instance.", &_init_f_codecForTr_0, &_call_f_codecForTr_0);
   methods += new qt_gsi::GenericStaticMethod ("codecForUtfText", "@brief Static method QTextCodec *QTextCodec::codecForUtfText(const QByteArray &ba)\nThis method is static and can be called without an instance.", &_init_f_codecForUtfText_2309, &_call_f_codecForUtfText_2309);
   methods += new qt_gsi::GenericStaticMethod ("codecForUtfText", "@brief Static method QTextCodec *QTextCodec::codecForUtfText(const QByteArray &ba, QTextCodec *defaultCodec)\nThis method is static and can be called without an instance.", &_init_f_codecForUtfText_3803, &_call_f_codecForUtfText_3803);
-  methods += new qt_gsi::GenericStaticMethod ("setCodecForLocale|codecForLocale=", "@brief Static method void QTextCodec::setCodecForLocale(QTextCodec *c)\nThis method is static and can be called without an instance.", &_init_f_setCodecForLocale_1602, &_call_f_setCodecForLocale_1602);
+  methods += new qt_gsi::GenericStaticMethod ("setCodecForLocale", "@brief Static method void QTextCodec::setCodecForLocale(QTextCodec *c)\nThis method is static and can be called without an instance.", &_init_f_setCodecForLocale_1602, &_call_f_setCodecForLocale_1602);
   return methods;
 }
 

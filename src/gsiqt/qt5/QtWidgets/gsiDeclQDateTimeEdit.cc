@@ -1257,18 +1257,18 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QDateTimeEdit::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QDateTimeEdit::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QDateTimeEdit::eventFilter(arg1, arg2);
+    return QDateTimeEdit::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QDateTimeEdit_Adaptor, bool, QObject *, QEvent *>(&QDateTimeEdit_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QDateTimeEdit_Adaptor, bool, QObject *, QEvent *>(&QDateTimeEdit_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QDateTimeEdit::eventFilter(arg1, arg2);
+      return QDateTimeEdit::eventFilter(watched, event);
     }
   }
 
@@ -1423,18 +1423,18 @@ public:
     emit QDateTimeEdit::windowTitleChanged(title);
   }
 
-  //  [adaptor impl] void QDateTimeEdit::actionEvent(QActionEvent *)
-  void cbs_actionEvent_1823_0(QActionEvent *arg1)
+  //  [adaptor impl] void QDateTimeEdit::actionEvent(QActionEvent *event)
+  void cbs_actionEvent_1823_0(QActionEvent *event)
   {
-    QDateTimeEdit::actionEvent(arg1);
+    QDateTimeEdit::actionEvent(event);
   }
 
-  virtual void actionEvent(QActionEvent *arg1)
+  virtual void actionEvent(QActionEvent *event)
   {
     if (cb_actionEvent_1823_0.can_issue()) {
-      cb_actionEvent_1823_0.issue<QDateTimeEdit_Adaptor, QActionEvent *>(&QDateTimeEdit_Adaptor::cbs_actionEvent_1823_0, arg1);
+      cb_actionEvent_1823_0.issue<QDateTimeEdit_Adaptor, QActionEvent *>(&QDateTimeEdit_Adaptor::cbs_actionEvent_1823_0, event);
     } else {
-      QDateTimeEdit::actionEvent(arg1);
+      QDateTimeEdit::actionEvent(event);
     }
   }
 
@@ -1453,18 +1453,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDateTimeEdit::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QDateTimeEdit::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QDateTimeEdit::childEvent(arg1);
+    QDateTimeEdit::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QDateTimeEdit_Adaptor, QChildEvent *>(&QDateTimeEdit_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QDateTimeEdit_Adaptor, QChildEvent *>(&QDateTimeEdit_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QDateTimeEdit::childEvent(arg1);
+      QDateTimeEdit::childEvent(event);
     }
   }
 
@@ -1498,18 +1498,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDateTimeEdit::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QDateTimeEdit::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QDateTimeEdit::customEvent(arg1);
+    QDateTimeEdit::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QDateTimeEdit_Adaptor, QEvent *>(&QDateTimeEdit_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QDateTimeEdit_Adaptor, QEvent *>(&QDateTimeEdit_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QDateTimeEdit::customEvent(arg1);
+      QDateTimeEdit::customEvent(event);
     }
   }
 
@@ -1543,78 +1543,78 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDateTimeEdit::dragEnterEvent(QDragEnterEvent *)
-  void cbs_dragEnterEvent_2109_0(QDragEnterEvent *arg1)
+  //  [adaptor impl] void QDateTimeEdit::dragEnterEvent(QDragEnterEvent *event)
+  void cbs_dragEnterEvent_2109_0(QDragEnterEvent *event)
   {
-    QDateTimeEdit::dragEnterEvent(arg1);
+    QDateTimeEdit::dragEnterEvent(event);
   }
 
-  virtual void dragEnterEvent(QDragEnterEvent *arg1)
+  virtual void dragEnterEvent(QDragEnterEvent *event)
   {
     if (cb_dragEnterEvent_2109_0.can_issue()) {
-      cb_dragEnterEvent_2109_0.issue<QDateTimeEdit_Adaptor, QDragEnterEvent *>(&QDateTimeEdit_Adaptor::cbs_dragEnterEvent_2109_0, arg1);
+      cb_dragEnterEvent_2109_0.issue<QDateTimeEdit_Adaptor, QDragEnterEvent *>(&QDateTimeEdit_Adaptor::cbs_dragEnterEvent_2109_0, event);
     } else {
-      QDateTimeEdit::dragEnterEvent(arg1);
+      QDateTimeEdit::dragEnterEvent(event);
     }
   }
 
-  //  [adaptor impl] void QDateTimeEdit::dragLeaveEvent(QDragLeaveEvent *)
-  void cbs_dragLeaveEvent_2092_0(QDragLeaveEvent *arg1)
+  //  [adaptor impl] void QDateTimeEdit::dragLeaveEvent(QDragLeaveEvent *event)
+  void cbs_dragLeaveEvent_2092_0(QDragLeaveEvent *event)
   {
-    QDateTimeEdit::dragLeaveEvent(arg1);
+    QDateTimeEdit::dragLeaveEvent(event);
   }
 
-  virtual void dragLeaveEvent(QDragLeaveEvent *arg1)
+  virtual void dragLeaveEvent(QDragLeaveEvent *event)
   {
     if (cb_dragLeaveEvent_2092_0.can_issue()) {
-      cb_dragLeaveEvent_2092_0.issue<QDateTimeEdit_Adaptor, QDragLeaveEvent *>(&QDateTimeEdit_Adaptor::cbs_dragLeaveEvent_2092_0, arg1);
+      cb_dragLeaveEvent_2092_0.issue<QDateTimeEdit_Adaptor, QDragLeaveEvent *>(&QDateTimeEdit_Adaptor::cbs_dragLeaveEvent_2092_0, event);
     } else {
-      QDateTimeEdit::dragLeaveEvent(arg1);
+      QDateTimeEdit::dragLeaveEvent(event);
     }
   }
 
-  //  [adaptor impl] void QDateTimeEdit::dragMoveEvent(QDragMoveEvent *)
-  void cbs_dragMoveEvent_2006_0(QDragMoveEvent *arg1)
+  //  [adaptor impl] void QDateTimeEdit::dragMoveEvent(QDragMoveEvent *event)
+  void cbs_dragMoveEvent_2006_0(QDragMoveEvent *event)
   {
-    QDateTimeEdit::dragMoveEvent(arg1);
+    QDateTimeEdit::dragMoveEvent(event);
   }
 
-  virtual void dragMoveEvent(QDragMoveEvent *arg1)
+  virtual void dragMoveEvent(QDragMoveEvent *event)
   {
     if (cb_dragMoveEvent_2006_0.can_issue()) {
-      cb_dragMoveEvent_2006_0.issue<QDateTimeEdit_Adaptor, QDragMoveEvent *>(&QDateTimeEdit_Adaptor::cbs_dragMoveEvent_2006_0, arg1);
+      cb_dragMoveEvent_2006_0.issue<QDateTimeEdit_Adaptor, QDragMoveEvent *>(&QDateTimeEdit_Adaptor::cbs_dragMoveEvent_2006_0, event);
     } else {
-      QDateTimeEdit::dragMoveEvent(arg1);
+      QDateTimeEdit::dragMoveEvent(event);
     }
   }
 
-  //  [adaptor impl] void QDateTimeEdit::dropEvent(QDropEvent *)
-  void cbs_dropEvent_1622_0(QDropEvent *arg1)
+  //  [adaptor impl] void QDateTimeEdit::dropEvent(QDropEvent *event)
+  void cbs_dropEvent_1622_0(QDropEvent *event)
   {
-    QDateTimeEdit::dropEvent(arg1);
+    QDateTimeEdit::dropEvent(event);
   }
 
-  virtual void dropEvent(QDropEvent *arg1)
+  virtual void dropEvent(QDropEvent *event)
   {
     if (cb_dropEvent_1622_0.can_issue()) {
-      cb_dropEvent_1622_0.issue<QDateTimeEdit_Adaptor, QDropEvent *>(&QDateTimeEdit_Adaptor::cbs_dropEvent_1622_0, arg1);
+      cb_dropEvent_1622_0.issue<QDateTimeEdit_Adaptor, QDropEvent *>(&QDateTimeEdit_Adaptor::cbs_dropEvent_1622_0, event);
     } else {
-      QDateTimeEdit::dropEvent(arg1);
+      QDateTimeEdit::dropEvent(event);
     }
   }
 
-  //  [adaptor impl] void QDateTimeEdit::enterEvent(QEvent *)
-  void cbs_enterEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QDateTimeEdit::enterEvent(QEvent *event)
+  void cbs_enterEvent_1217_0(QEvent *event)
   {
-    QDateTimeEdit::enterEvent(arg1);
+    QDateTimeEdit::enterEvent(event);
   }
 
-  virtual void enterEvent(QEvent *arg1)
+  virtual void enterEvent(QEvent *event)
   {
     if (cb_enterEvent_1217_0.can_issue()) {
-      cb_enterEvent_1217_0.issue<QDateTimeEdit_Adaptor, QEvent *>(&QDateTimeEdit_Adaptor::cbs_enterEvent_1217_0, arg1);
+      cb_enterEvent_1217_0.issue<QDateTimeEdit_Adaptor, QEvent *>(&QDateTimeEdit_Adaptor::cbs_enterEvent_1217_0, event);
     } else {
-      QDateTimeEdit::enterEvent(arg1);
+      QDateTimeEdit::enterEvent(event);
     }
   }
 
@@ -1753,18 +1753,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDateTimeEdit::leaveEvent(QEvent *)
-  void cbs_leaveEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QDateTimeEdit::leaveEvent(QEvent *event)
+  void cbs_leaveEvent_1217_0(QEvent *event)
   {
-    QDateTimeEdit::leaveEvent(arg1);
+    QDateTimeEdit::leaveEvent(event);
   }
 
-  virtual void leaveEvent(QEvent *arg1)
+  virtual void leaveEvent(QEvent *event)
   {
     if (cb_leaveEvent_1217_0.can_issue()) {
-      cb_leaveEvent_1217_0.issue<QDateTimeEdit_Adaptor, QEvent *>(&QDateTimeEdit_Adaptor::cbs_leaveEvent_1217_0, arg1);
+      cb_leaveEvent_1217_0.issue<QDateTimeEdit_Adaptor, QEvent *>(&QDateTimeEdit_Adaptor::cbs_leaveEvent_1217_0, event);
     } else {
-      QDateTimeEdit::leaveEvent(arg1);
+      QDateTimeEdit::leaveEvent(event);
     }
   }
 
@@ -1783,18 +1783,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDateTimeEdit::mouseDoubleClickEvent(QMouseEvent *)
-  void cbs_mouseDoubleClickEvent_1738_0(QMouseEvent *arg1)
+  //  [adaptor impl] void QDateTimeEdit::mouseDoubleClickEvent(QMouseEvent *event)
+  void cbs_mouseDoubleClickEvent_1738_0(QMouseEvent *event)
   {
-    QDateTimeEdit::mouseDoubleClickEvent(arg1);
+    QDateTimeEdit::mouseDoubleClickEvent(event);
   }
 
-  virtual void mouseDoubleClickEvent(QMouseEvent *arg1)
+  virtual void mouseDoubleClickEvent(QMouseEvent *event)
   {
     if (cb_mouseDoubleClickEvent_1738_0.can_issue()) {
-      cb_mouseDoubleClickEvent_1738_0.issue<QDateTimeEdit_Adaptor, QMouseEvent *>(&QDateTimeEdit_Adaptor::cbs_mouseDoubleClickEvent_1738_0, arg1);
+      cb_mouseDoubleClickEvent_1738_0.issue<QDateTimeEdit_Adaptor, QMouseEvent *>(&QDateTimeEdit_Adaptor::cbs_mouseDoubleClickEvent_1738_0, event);
     } else {
-      QDateTimeEdit::mouseDoubleClickEvent(arg1);
+      QDateTimeEdit::mouseDoubleClickEvent(event);
     }
   }
 
@@ -1843,18 +1843,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDateTimeEdit::moveEvent(QMoveEvent *)
-  void cbs_moveEvent_1624_0(QMoveEvent *arg1)
+  //  [adaptor impl] void QDateTimeEdit::moveEvent(QMoveEvent *event)
+  void cbs_moveEvent_1624_0(QMoveEvent *event)
   {
-    QDateTimeEdit::moveEvent(arg1);
+    QDateTimeEdit::moveEvent(event);
   }
 
-  virtual void moveEvent(QMoveEvent *arg1)
+  virtual void moveEvent(QMoveEvent *event)
   {
     if (cb_moveEvent_1624_0.can_issue()) {
-      cb_moveEvent_1624_0.issue<QDateTimeEdit_Adaptor, QMoveEvent *>(&QDateTimeEdit_Adaptor::cbs_moveEvent_1624_0, arg1);
+      cb_moveEvent_1624_0.issue<QDateTimeEdit_Adaptor, QMoveEvent *>(&QDateTimeEdit_Adaptor::cbs_moveEvent_1624_0, event);
     } else {
-      QDateTimeEdit::moveEvent(arg1);
+      QDateTimeEdit::moveEvent(event);
     }
   }
 
@@ -1963,18 +1963,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDateTimeEdit::tabletEvent(QTabletEvent *)
-  void cbs_tabletEvent_1821_0(QTabletEvent *arg1)
+  //  [adaptor impl] void QDateTimeEdit::tabletEvent(QTabletEvent *event)
+  void cbs_tabletEvent_1821_0(QTabletEvent *event)
   {
-    QDateTimeEdit::tabletEvent(arg1);
+    QDateTimeEdit::tabletEvent(event);
   }
 
-  virtual void tabletEvent(QTabletEvent *arg1)
+  virtual void tabletEvent(QTabletEvent *event)
   {
     if (cb_tabletEvent_1821_0.can_issue()) {
-      cb_tabletEvent_1821_0.issue<QDateTimeEdit_Adaptor, QTabletEvent *>(&QDateTimeEdit_Adaptor::cbs_tabletEvent_1821_0, arg1);
+      cb_tabletEvent_1821_0.issue<QDateTimeEdit_Adaptor, QTabletEvent *>(&QDateTimeEdit_Adaptor::cbs_tabletEvent_1821_0, event);
     } else {
-      QDateTimeEdit::tabletEvent(arg1);
+      QDateTimeEdit::tabletEvent(event);
     }
   }
 
@@ -2098,7 +2098,7 @@ QDateTimeEdit_Adaptor::~QDateTimeEdit_Adaptor() { }
 
 static void _init_ctor_QDateTimeEdit_Adaptor_1315 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_0);
   decl->set_return_new<QDateTimeEdit_Adaptor> ();
 }
@@ -2107,7 +2107,7 @@ static void _call_ctor_QDateTimeEdit_Adaptor_1315 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QWidget *arg1 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
   ret.write<QDateTimeEdit_Adaptor *> (new QDateTimeEdit_Adaptor (arg1));
 }
 
@@ -2118,7 +2118,7 @@ static void _init_ctor_QDateTimeEdit_Adaptor_3382 (qt_gsi::GenericStaticMethod *
 {
   static gsi::ArgSpecBase argspec_0 ("dt");
   decl->add_arg<const QDateTime & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_1);
   decl->set_return_new<QDateTimeEdit_Adaptor> ();
 }
@@ -2128,7 +2128,7 @@ static void _call_ctor_QDateTimeEdit_Adaptor_3382 (const qt_gsi::GenericStaticMe
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QDateTime &arg1 = gsi::arg_reader<const QDateTime & >() (args, heap);
-  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
   ret.write<QDateTimeEdit_Adaptor *> (new QDateTimeEdit_Adaptor (arg1, arg2));
 }
 
@@ -2139,7 +2139,7 @@ static void _init_ctor_QDateTimeEdit_Adaptor_2983 (qt_gsi::GenericStaticMethod *
 {
   static gsi::ArgSpecBase argspec_0 ("d");
   decl->add_arg<const QDate & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_1);
   decl->set_return_new<QDateTimeEdit_Adaptor> ();
 }
@@ -2149,7 +2149,7 @@ static void _call_ctor_QDateTimeEdit_Adaptor_2983 (const qt_gsi::GenericStaticMe
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QDate &arg1 = gsi::arg_reader<const QDate & >() (args, heap);
-  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
   ret.write<QDateTimeEdit_Adaptor *> (new QDateTimeEdit_Adaptor (arg1, arg2));
 }
 
@@ -2160,7 +2160,7 @@ static void _init_ctor_QDateTimeEdit_Adaptor_3000 (qt_gsi::GenericStaticMethod *
 {
   static gsi::ArgSpecBase argspec_0 ("t");
   decl->add_arg<const QTime & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_1);
   decl->set_return_new<QDateTimeEdit_Adaptor> ();
 }
@@ -2170,16 +2170,16 @@ static void _call_ctor_QDateTimeEdit_Adaptor_3000 (const qt_gsi::GenericStaticMe
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QTime &arg1 = gsi::arg_reader<const QTime & >() (args, heap);
-  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QWidget *arg2 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
   ret.write<QDateTimeEdit_Adaptor *> (new QDateTimeEdit_Adaptor (arg1, arg2));
 }
 
 
-// void QDateTimeEdit::actionEvent(QActionEvent *)
+// void QDateTimeEdit::actionEvent(QActionEvent *event)
 
 static void _init_cbs_actionEvent_1823_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QActionEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2223,11 +2223,11 @@ static void _set_callback_cbs_changeEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
-// void QDateTimeEdit::childEvent(QChildEvent *)
+// void QDateTimeEdit::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2358,11 +2358,11 @@ static void _call_emitter_customContextMenuRequested_1916 (const qt_gsi::Generic
 }
 
 
-// void QDateTimeEdit::customEvent(QEvent *)
+// void QDateTimeEdit::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2467,7 +2467,7 @@ static void _call_fp_destroy_1620 (const qt_gsi::GenericMethod * /*decl*/, void 
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2476,7 +2476,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QDateTimeEdit_Adaptor *)cls)->emitter_QDateTimeEdit_destroyed_1302 (arg1);
 }
 
@@ -2505,11 +2505,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// void QDateTimeEdit::dragEnterEvent(QDragEnterEvent *)
+// void QDateTimeEdit::dragEnterEvent(QDragEnterEvent *event)
 
 static void _init_cbs_dragEnterEvent_2109_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDragEnterEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2529,11 +2529,11 @@ static void _set_callback_cbs_dragEnterEvent_2109_0 (void *cls, const gsi::Callb
 }
 
 
-// void QDateTimeEdit::dragLeaveEvent(QDragLeaveEvent *)
+// void QDateTimeEdit::dragLeaveEvent(QDragLeaveEvent *event)
 
 static void _init_cbs_dragLeaveEvent_2092_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDragLeaveEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2553,11 +2553,11 @@ static void _set_callback_cbs_dragLeaveEvent_2092_0 (void *cls, const gsi::Callb
 }
 
 
-// void QDateTimeEdit::dragMoveEvent(QDragMoveEvent *)
+// void QDateTimeEdit::dragMoveEvent(QDragMoveEvent *event)
 
 static void _init_cbs_dragMoveEvent_2006_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDragMoveEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2577,11 +2577,11 @@ static void _set_callback_cbs_dragMoveEvent_2006_0 (void *cls, const gsi::Callba
 }
 
 
-// void QDateTimeEdit::dropEvent(QDropEvent *)
+// void QDateTimeEdit::dropEvent(QDropEvent *event)
 
 static void _init_cbs_dropEvent_1622_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QDropEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2615,11 +2615,11 @@ static void _call_emitter_editingFinished_0 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// void QDateTimeEdit::enterEvent(QEvent *)
+// void QDateTimeEdit::enterEvent(QEvent *event)
 
 static void _init_cbs_enterEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2662,13 +2662,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QDateTimeEdit::eventFilter(QObject *, QEvent *)
+// bool QDateTimeEdit::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -3033,11 +3033,11 @@ static void _set_callback_cbs_keyReleaseEvent_1514_0 (void *cls, const gsi::Call
 }
 
 
-// void QDateTimeEdit::leaveEvent(QEvent *)
+// void QDateTimeEdit::leaveEvent(QEvent *event)
 
 static void _init_cbs_leaveEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3113,11 +3113,11 @@ static void _set_callback_cbs_minimumSizeHint_c0_0 (void *cls, const gsi::Callba
 }
 
 
-// void QDateTimeEdit::mouseDoubleClickEvent(QMouseEvent *)
+// void QDateTimeEdit::mouseDoubleClickEvent(QMouseEvent *event)
 
 static void _init_cbs_mouseDoubleClickEvent_1738_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMouseEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3209,11 +3209,11 @@ static void _set_callback_cbs_mouseReleaseEvent_1738_0 (void *cls, const gsi::Ca
 }
 
 
-// void QDateTimeEdit::moveEvent(QMoveEvent *)
+// void QDateTimeEdit::moveEvent(QMoveEvent *event)
 
 static void _init_cbs_moveEvent_1624_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QMoveEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3564,11 +3564,11 @@ static void _set_callback_cbs_stepEnabled_c0_0 (void *cls, const gsi::Callback &
 }
 
 
-// void QDateTimeEdit::tabletEvent(QTabletEvent *)
+// void QDateTimeEdit::tabletEvent(QTabletEvent *event)
 
 static void _init_cbs_tabletEvent_1821_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTabletEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3783,11 +3783,11 @@ static gsi::Methods methods_QDateTimeEdit_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDateTimeEdit::QDateTimeEdit(const QDateTime &dt, QWidget *parent)\nThis method creates an object of class QDateTimeEdit.", &_init_ctor_QDateTimeEdit_Adaptor_3382, &_call_ctor_QDateTimeEdit_Adaptor_3382);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDateTimeEdit::QDateTimeEdit(const QDate &d, QWidget *parent)\nThis method creates an object of class QDateTimeEdit.", &_init_ctor_QDateTimeEdit_Adaptor_2983, &_call_ctor_QDateTimeEdit_Adaptor_2983);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDateTimeEdit::QDateTimeEdit(const QTime &t, QWidget *parent)\nThis method creates an object of class QDateTimeEdit.", &_init_ctor_QDateTimeEdit_Adaptor_3000, &_call_ctor_QDateTimeEdit_Adaptor_3000);
-  methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QDateTimeEdit::actionEvent(QActionEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
+  methods += new qt_gsi::GenericMethod ("*actionEvent", "@brief Virtual method void QDateTimeEdit::actionEvent(QActionEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("*actionEvent", "@hide", false, &_init_cbs_actionEvent_1823_0, &_call_cbs_actionEvent_1823_0, &_set_callback_cbs_actionEvent_1823_0);
   methods += new qt_gsi::GenericMethod ("*changeEvent", "@brief Virtual method void QDateTimeEdit::changeEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*changeEvent", "@hide", false, &_init_cbs_changeEvent_1217_0, &_call_cbs_changeEvent_1217_0, &_set_callback_cbs_changeEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QDateTimeEdit::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QDateTimeEdit::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Virtual method void QDateTimeEdit::clear()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_clear_0_0, &_call_cbs_clear_0_0);
   methods += new qt_gsi::GenericMethod ("clear", "@hide", false, &_init_cbs_clear_0_0, &_call_cbs_clear_0_0, &_set_callback_cbs_clear_0_0);
@@ -3795,32 +3795,32 @@ static gsi::Methods methods_QDateTimeEdit_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*closeEvent", "@hide", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0, &_set_callback_cbs_closeEvent_1719_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QDateTimeEdit::contextMenuEvent(QContextMenuEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0, &_set_callback_cbs_contextMenuEvent_2363_0);
-  methods += new qt_gsi::GenericMethod ("*qt_create", "@brief Method void QDateTimeEdit::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
+  methods += new qt_gsi::GenericMethod ("*create|qt_create", "@brief Method void QDateTimeEdit::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
   methods += new qt_gsi::GenericMethod ("emit_customContextMenuRequested", "@brief Emitter for signal void QDateTimeEdit::customContextMenuRequested(const QPoint &pos)\nCall this method to emit this signal.", false, &_init_emitter_customContextMenuRequested_1916, &_call_emitter_customContextMenuRequested_1916);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QDateTimeEdit::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QDateTimeEdit::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_dateChanged", "@brief Emitter for signal void QDateTimeEdit::dateChanged(const QDate &date)\nCall this method to emit this signal.", false, &_init_emitter_dateChanged_1776, &_call_emitter_dateChanged_1776);
   methods += new qt_gsi::GenericMethod ("emit_dateTimeChanged", "@brief Emitter for signal void QDateTimeEdit::dateTimeChanged(const QDateTime &dateTime)\nCall this method to emit this signal.", false, &_init_emitter_dateTimeChanged_2175, &_call_emitter_dateTimeChanged_2175);
   methods += new qt_gsi::GenericMethod ("*dateTimeFromText", "@brief Virtual method QDateTime QDateTimeEdit::dateTimeFromText(const QString &text)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_dateTimeFromText_c2025_0, &_call_cbs_dateTimeFromText_c2025_0);
   methods += new qt_gsi::GenericMethod ("*dateTimeFromText", "@hide", true, &_init_cbs_dateTimeFromText_c2025_0, &_call_cbs_dateTimeFromText_c2025_0, &_set_callback_cbs_dateTimeFromText_c2025_0);
-  methods += new qt_gsi::GenericMethod ("*qt_destroy", "@brief Method void QDateTimeEdit::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
+  methods += new qt_gsi::GenericMethod ("*destroy|qt_destroy", "@brief Method void QDateTimeEdit::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QDateTimeEdit::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QDateTimeEdit::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@brief Virtual method void QDateTimeEdit::dragEnterEvent(QDragEnterEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0);
+  methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@brief Virtual method void QDateTimeEdit::dragEnterEvent(QDragEnterEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0);
   methods += new qt_gsi::GenericMethod ("*dragEnterEvent", "@hide", false, &_init_cbs_dragEnterEvent_2109_0, &_call_cbs_dragEnterEvent_2109_0, &_set_callback_cbs_dragEnterEvent_2109_0);
-  methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@brief Virtual method void QDateTimeEdit::dragLeaveEvent(QDragLeaveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0);
+  methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@brief Virtual method void QDateTimeEdit::dragLeaveEvent(QDragLeaveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0);
   methods += new qt_gsi::GenericMethod ("*dragLeaveEvent", "@hide", false, &_init_cbs_dragLeaveEvent_2092_0, &_call_cbs_dragLeaveEvent_2092_0, &_set_callback_cbs_dragLeaveEvent_2092_0);
-  methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@brief Virtual method void QDateTimeEdit::dragMoveEvent(QDragMoveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0);
+  methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@brief Virtual method void QDateTimeEdit::dragMoveEvent(QDragMoveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0);
   methods += new qt_gsi::GenericMethod ("*dragMoveEvent", "@hide", false, &_init_cbs_dragMoveEvent_2006_0, &_call_cbs_dragMoveEvent_2006_0, &_set_callback_cbs_dragMoveEvent_2006_0);
-  methods += new qt_gsi::GenericMethod ("*dropEvent", "@brief Virtual method void QDateTimeEdit::dropEvent(QDropEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0);
+  methods += new qt_gsi::GenericMethod ("*dropEvent", "@brief Virtual method void QDateTimeEdit::dropEvent(QDropEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0);
   methods += new qt_gsi::GenericMethod ("*dropEvent", "@hide", false, &_init_cbs_dropEvent_1622_0, &_call_cbs_dropEvent_1622_0, &_set_callback_cbs_dropEvent_1622_0);
   methods += new qt_gsi::GenericMethod ("emit_editingFinished", "@brief Emitter for signal void QDateTimeEdit::editingFinished()\nCall this method to emit this signal.", false, &_init_emitter_editingFinished_0, &_call_emitter_editingFinished_0);
-  methods += new qt_gsi::GenericMethod ("*enterEvent", "@brief Virtual method void QDateTimeEdit::enterEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*enterEvent", "@brief Virtual method void QDateTimeEdit::enterEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*enterEvent", "@hide", false, &_init_cbs_enterEvent_1217_0, &_call_cbs_enterEvent_1217_0, &_set_callback_cbs_enterEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QDateTimeEdit::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QDateTimeEdit::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QDateTimeEdit::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*fixup", "@brief Virtual method void QDateTimeEdit::fixup(QString &input)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_fixup_c1330_0, &_call_cbs_fixup_c1330_0);
   methods += new qt_gsi::GenericMethod ("*fixup", "@hide", true, &_init_cbs_fixup_c1330_0, &_call_cbs_fixup_c1330_0, &_set_callback_cbs_fixup_c1330_0);
@@ -3850,14 +3850,14 @@ static gsi::Methods methods_QDateTimeEdit_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*keyPressEvent", "@hide", false, &_init_cbs_keyPressEvent_1514_0, &_call_cbs_keyPressEvent_1514_0, &_set_callback_cbs_keyPressEvent_1514_0);
   methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@brief Virtual method void QDateTimeEdit::keyReleaseEvent(QKeyEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0);
   methods += new qt_gsi::GenericMethod ("*keyReleaseEvent", "@hide", false, &_init_cbs_keyReleaseEvent_1514_0, &_call_cbs_keyReleaseEvent_1514_0, &_set_callback_cbs_keyReleaseEvent_1514_0);
-  methods += new qt_gsi::GenericMethod ("*leaveEvent", "@brief Virtual method void QDateTimeEdit::leaveEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*leaveEvent", "@brief Virtual method void QDateTimeEdit::leaveEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*leaveEvent", "@hide", false, &_init_cbs_leaveEvent_1217_0, &_call_cbs_leaveEvent_1217_0, &_set_callback_cbs_leaveEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*lineEdit", "@brief Method QLineEdit *QDateTimeEdit::lineEdit()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_lineEdit_c0, &_call_fp_lineEdit_c0);
   methods += new qt_gsi::GenericMethod ("*metric", "@brief Virtual method int QDateTimeEdit::metric(QPaintDevice::PaintDeviceMetric)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0);
   methods += new qt_gsi::GenericMethod ("*metric", "@hide", true, &_init_cbs_metric_c3445_0, &_call_cbs_metric_c3445_0, &_set_callback_cbs_metric_c3445_0);
   methods += new qt_gsi::GenericMethod ("minimumSizeHint", "@brief Virtual method QSize QDateTimeEdit::minimumSizeHint()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_minimumSizeHint_c0_0, &_call_cbs_minimumSizeHint_c0_0);
   methods += new qt_gsi::GenericMethod ("minimumSizeHint", "@hide", true, &_init_cbs_minimumSizeHint_c0_0, &_call_cbs_minimumSizeHint_c0_0, &_set_callback_cbs_minimumSizeHint_c0_0);
-  methods += new qt_gsi::GenericMethod ("*mouseDoubleClickEvent", "@brief Virtual method void QDateTimeEdit::mouseDoubleClickEvent(QMouseEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseDoubleClickEvent_1738_0, &_call_cbs_mouseDoubleClickEvent_1738_0);
+  methods += new qt_gsi::GenericMethod ("*mouseDoubleClickEvent", "@brief Virtual method void QDateTimeEdit::mouseDoubleClickEvent(QMouseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseDoubleClickEvent_1738_0, &_call_cbs_mouseDoubleClickEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseDoubleClickEvent", "@hide", false, &_init_cbs_mouseDoubleClickEvent_1738_0, &_call_cbs_mouseDoubleClickEvent_1738_0, &_set_callback_cbs_mouseDoubleClickEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseMoveEvent", "@brief Virtual method void QDateTimeEdit::mouseMoveEvent(QMouseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseMoveEvent_1738_0, &_call_cbs_mouseMoveEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseMoveEvent", "@hide", false, &_init_cbs_mouseMoveEvent_1738_0, &_call_cbs_mouseMoveEvent_1738_0, &_set_callback_cbs_mouseMoveEvent_1738_0);
@@ -3865,7 +3865,7 @@ static gsi::Methods methods_QDateTimeEdit_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*mousePressEvent", "@hide", false, &_init_cbs_mousePressEvent_1738_0, &_call_cbs_mousePressEvent_1738_0, &_set_callback_cbs_mousePressEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@brief Virtual method void QDateTimeEdit::mouseReleaseEvent(QMouseEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0);
   methods += new qt_gsi::GenericMethod ("*mouseReleaseEvent", "@hide", false, &_init_cbs_mouseReleaseEvent_1738_0, &_call_cbs_mouseReleaseEvent_1738_0, &_set_callback_cbs_mouseReleaseEvent_1738_0);
-  methods += new qt_gsi::GenericMethod ("*moveEvent", "@brief Virtual method void QDateTimeEdit::moveEvent(QMoveEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0);
+  methods += new qt_gsi::GenericMethod ("*moveEvent", "@brief Virtual method void QDateTimeEdit::moveEvent(QMoveEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*moveEvent", "@hide", false, &_init_cbs_moveEvent_1624_0, &_call_cbs_moveEvent_1624_0, &_set_callback_cbs_moveEvent_1624_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@brief Virtual method bool QDateTimeEdit::nativeEvent(const QByteArray &eventType, void *message, long int *result)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0);
   methods += new qt_gsi::GenericMethod ("*nativeEvent", "@hide", false, &_init_cbs_nativeEvent_4678_0, &_call_cbs_nativeEvent_4678_0, &_set_callback_cbs_nativeEvent_4678_0);
@@ -3894,7 +3894,7 @@ static gsi::Methods methods_QDateTimeEdit_Adaptor () {
   methods += new qt_gsi::GenericMethod ("stepBy", "@hide", false, &_init_cbs_stepBy_767_0, &_call_cbs_stepBy_767_0, &_set_callback_cbs_stepBy_767_0);
   methods += new qt_gsi::GenericMethod ("*stepEnabled", "@brief Virtual method QFlags<QAbstractSpinBox::StepEnabledFlag> QDateTimeEdit::stepEnabled()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_stepEnabled_c0_0, &_call_cbs_stepEnabled_c0_0);
   methods += new qt_gsi::GenericMethod ("*stepEnabled", "@hide", true, &_init_cbs_stepEnabled_c0_0, &_call_cbs_stepEnabled_c0_0, &_set_callback_cbs_stepEnabled_c0_0);
-  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QDateTimeEdit::tabletEvent(QTabletEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
+  methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QDateTimeEdit::tabletEvent(QTabletEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
   methods += new qt_gsi::GenericMethod ("*tabletEvent", "@hide", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0, &_set_callback_cbs_tabletEvent_1821_0);
   methods += new qt_gsi::GenericMethod ("*textFromDateTime", "@brief Virtual method QString QDateTimeEdit::textFromDateTime(const QDateTime &dt)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_textFromDateTime_c2175_0, &_call_cbs_textFromDateTime_c2175_0);
   methods += new qt_gsi::GenericMethod ("*textFromDateTime", "@hide", true, &_init_cbs_textFromDateTime_c2175_0, &_call_cbs_textFromDateTime_c2175_0, &_set_callback_cbs_textFromDateTime_c2175_0);

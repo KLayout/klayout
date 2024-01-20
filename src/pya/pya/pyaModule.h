@@ -33,6 +33,7 @@
 #include <list>
 #include <vector>
 #include <string>
+#include <set>
 
 namespace gsi
 {
@@ -155,6 +156,15 @@ public:
   void register_class (const gsi::ClassBase *cls)
   {
     m_classes.push_back (cls);
+    m_class_set.insert (cls);
+  }
+
+  /**
+   *  @brief Returns a value indicating whether the class is member of this module
+   */
+  bool is_class_of_module (const gsi::ClassBase *cls)
+  {
+    return m_class_set.find (cls) != m_class_set.end ();
   }
 
 private:
@@ -168,6 +178,8 @@ private:
 
   static std::map<const gsi::MethodBase *, std::string> m_python_doc;
   static std::vector<const gsi::ClassBase *> m_classes;
+  static std::map<PyTypeObject *, const gsi::ClassBase *> m_class_by_type;
+  std::set<const gsi::ClassBase *> m_class_set;
 };
 
 }

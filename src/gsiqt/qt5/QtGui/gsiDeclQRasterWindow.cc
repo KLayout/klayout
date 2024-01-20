@@ -242,18 +242,18 @@ public:
     emit QRasterWindow::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QRasterWindow::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QRasterWindow::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QRasterWindow::eventFilter(arg1, arg2);
+    return QRasterWindow::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QRasterWindow_Adaptor, bool, QObject *, QEvent *>(&QRasterWindow_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QRasterWindow_Adaptor, bool, QObject *, QEvent *>(&QRasterWindow_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QRasterWindow::eventFilter(arg1, arg2);
+      return QRasterWindow::eventFilter(watched, event);
     }
   }
 
@@ -420,33 +420,33 @@ public:
     emit QRasterWindow::yChanged(arg);
   }
 
-  //  [adaptor impl] void QRasterWindow::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QRasterWindow::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QRasterWindow::childEvent(arg1);
+    QRasterWindow::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QRasterWindow_Adaptor, QChildEvent *>(&QRasterWindow_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QRasterWindow_Adaptor, QChildEvent *>(&QRasterWindow_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QRasterWindow::childEvent(arg1);
+      QRasterWindow::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QRasterWindow::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QRasterWindow::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QRasterWindow::customEvent(arg1);
+    QRasterWindow::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QRasterWindow_Adaptor, QEvent *>(&QRasterWindow_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QRasterWindow_Adaptor, QEvent *>(&QRasterWindow_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QRasterWindow::customEvent(arg1);
+      QRasterWindow::customEvent(event);
     }
   }
 
@@ -780,18 +780,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QRasterWindow::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QRasterWindow::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QRasterWindow::timerEvent(arg1);
+    QRasterWindow::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QRasterWindow_Adaptor, QTimerEvent *>(&QRasterWindow_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QRasterWindow_Adaptor, QTimerEvent *>(&QRasterWindow_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QRasterWindow::timerEvent(arg1);
+      QRasterWindow::timerEvent(event);
     }
   }
 
@@ -866,7 +866,7 @@ QRasterWindow_Adaptor::~QRasterWindow_Adaptor() { }
 
 static void _init_ctor_QRasterWindow_Adaptor_1335 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QWindow * > (argspec_0);
   decl->set_return_new<QRasterWindow_Adaptor> ();
 }
@@ -875,7 +875,7 @@ static void _call_ctor_QRasterWindow_Adaptor_1335 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QWindow *arg1 = args ? gsi::arg_reader<QWindow * >() (args, heap) : gsi::arg_maker<QWindow * >() (0, heap);
+  QWindow *arg1 = args ? gsi::arg_reader<QWindow * >() (args, heap) : gsi::arg_maker<QWindow * >() (nullptr, heap);
   ret.write<QRasterWindow_Adaptor *> (new QRasterWindow_Adaptor (arg1));
 }
 
@@ -913,11 +913,11 @@ static void _call_emitter_activeChanged_0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QRasterWindow::childEvent(QChildEvent *)
+// void QRasterWindow::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -955,11 +955,11 @@ static void _call_emitter_contentOrientationChanged_2521 (const qt_gsi::GenericM
 }
 
 
-// void QRasterWindow::customEvent(QEvent *)
+// void QRasterWindow::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -983,7 +983,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -992,7 +992,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QRasterWindow_Adaptor *)cls)->emitter_QRasterWindow_destroyed_1302 (arg1);
 }
 
@@ -1044,13 +1044,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QRasterWindow::eventFilter(QObject *, QEvent *)
+// bool QRasterWindow::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -1868,11 +1868,11 @@ static void _set_callback_cbs_tabletEvent_1821_0 (void *cls, const gsi::Callback
 }
 
 
-// void QRasterWindow::timerEvent(QTimerEvent *)
+// void QRasterWindow::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2077,17 +2077,17 @@ static gsi::Methods methods_QRasterWindow_Adaptor () {
   methods += new qt_gsi::GenericMethod ("accessibleRoot", "@brief Virtual method QAccessibleInterface *QRasterWindow::accessibleRoot()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_accessibleRoot_c0_0, &_call_cbs_accessibleRoot_c0_0);
   methods += new qt_gsi::GenericMethod ("accessibleRoot", "@hide", true, &_init_cbs_accessibleRoot_c0_0, &_call_cbs_accessibleRoot_c0_0, &_set_callback_cbs_accessibleRoot_c0_0);
   methods += new qt_gsi::GenericMethod ("emit_activeChanged", "@brief Emitter for signal void QRasterWindow::activeChanged()\nCall this method to emit this signal.", false, &_init_emitter_activeChanged_0, &_call_emitter_activeChanged_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QRasterWindow::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QRasterWindow::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("emit_contentOrientationChanged", "@brief Emitter for signal void QRasterWindow::contentOrientationChanged(Qt::ScreenOrientation orientation)\nCall this method to emit this signal.", false, &_init_emitter_contentOrientationChanged_2521, &_call_emitter_contentOrientationChanged_2521);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QRasterWindow::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QRasterWindow::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QRasterWindow::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QRasterWindow::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QRasterWindow::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QRasterWindow::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QRasterWindow::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*exposeEvent", "@brief Virtual method void QRasterWindow::exposeEvent(QExposeEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_exposeEvent_1845_0, &_call_cbs_exposeEvent_1845_0);
   methods += new qt_gsi::GenericMethod ("*exposeEvent", "@hide", false, &_init_cbs_exposeEvent_1845_0, &_call_cbs_exposeEvent_1845_0, &_set_callback_cbs_exposeEvent_1845_0);
@@ -2151,7 +2151,7 @@ static gsi::Methods methods_QRasterWindow_Adaptor () {
   methods += new qt_gsi::GenericMethod ("surfaceType", "@hide", true, &_init_cbs_surfaceType_c0_0, &_call_cbs_surfaceType_c0_0, &_set_callback_cbs_surfaceType_c0_0);
   methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QRasterWindow::tabletEvent(QTabletEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
   methods += new qt_gsi::GenericMethod ("*tabletEvent", "@hide", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0, &_set_callback_cbs_tabletEvent_1821_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QRasterWindow::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QRasterWindow::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*touchEvent", "@brief Virtual method void QRasterWindow::touchEvent(QTouchEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_touchEvent_1732_0, &_call_cbs_touchEvent_1732_0);
   methods += new qt_gsi::GenericMethod ("*touchEvent", "@hide", false, &_init_cbs_touchEvent_1732_0, &_call_cbs_touchEvent_1732_0, &_set_callback_cbs_touchEvent_1732_0);

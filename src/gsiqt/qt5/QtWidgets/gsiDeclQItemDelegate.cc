@@ -499,18 +499,18 @@ public:
     emit QItemDelegate::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QItemDelegate::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QItemDelegate::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QItemDelegate::event(arg1);
+    return QItemDelegate::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QItemDelegate_Adaptor, bool, QEvent *>(&QItemDelegate_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QItemDelegate_Adaptor, bool, QEvent *>(&QItemDelegate_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QItemDelegate::event(arg1);
+      return QItemDelegate::event(_event);
     }
   }
 
@@ -632,33 +632,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QItemDelegate::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QItemDelegate::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QItemDelegate::childEvent(arg1);
+    QItemDelegate::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QItemDelegate_Adaptor, QChildEvent *>(&QItemDelegate_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QItemDelegate_Adaptor, QChildEvent *>(&QItemDelegate_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QItemDelegate::childEvent(arg1);
+      QItemDelegate::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QItemDelegate::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QItemDelegate::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QItemDelegate::customEvent(arg1);
+    QItemDelegate::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QItemDelegate_Adaptor, QEvent *>(&QItemDelegate_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QItemDelegate_Adaptor, QEvent *>(&QItemDelegate_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QItemDelegate::customEvent(arg1);
+      QItemDelegate::customEvent(event);
     }
   }
 
@@ -767,18 +767,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QItemDelegate::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QItemDelegate::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QItemDelegate::timerEvent(arg1);
+    QItemDelegate::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QItemDelegate_Adaptor, QTimerEvent *>(&QItemDelegate_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QItemDelegate_Adaptor, QTimerEvent *>(&QItemDelegate_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QItemDelegate::timerEvent(arg1);
+      QItemDelegate::timerEvent(event);
     }
   }
 
@@ -810,7 +810,7 @@ QItemDelegate_Adaptor::~QItemDelegate_Adaptor() { }
 
 static void _init_ctor_QItemDelegate_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QItemDelegate_Adaptor> ();
 }
@@ -819,16 +819,16 @@ static void _call_ctor_QItemDelegate_Adaptor_1302 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QItemDelegate_Adaptor *> (new QItemDelegate_Adaptor (arg1));
 }
 
 
-// void QItemDelegate::childEvent(QChildEvent *)
+// void QItemDelegate::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -916,11 +916,11 @@ static void _set_callback_cbs_createEditor_c6860_0 (void *cls, const gsi::Callba
 }
 
 
-// void QItemDelegate::customEvent(QEvent *)
+// void QItemDelegate::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -992,7 +992,7 @@ static void _set_callback_cbs_destroyEditor_c3602_0 (void *cls, const gsi::Callb
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1001,7 +1001,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QItemDelegate_Adaptor *)cls)->emitter_QItemDelegate_destroyed_1302 (arg1);
 }
 
@@ -1271,11 +1271,11 @@ static void _set_callback_cbs_editorEvent_9073_0 (void *cls, const gsi::Callback
 }
 
 
-// bool QItemDelegate::event(QEvent *)
+// bool QItemDelegate::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -1680,11 +1680,11 @@ static void _call_fp_textRectangle_c6720 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// void QItemDelegate::timerEvent(QTimerEvent *)
+// void QItemDelegate::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1742,13 +1742,13 @@ gsi::Class<QItemDelegate> &qtdecl_QItemDelegate ();
 static gsi::Methods methods_QItemDelegate_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QItemDelegate::QItemDelegate(QObject *parent)\nThis method creates an object of class QItemDelegate.", &_init_ctor_QItemDelegate_Adaptor_1302, &_call_ctor_QItemDelegate_Adaptor_1302);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QItemDelegate::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QItemDelegate::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("emit_closeEditor", "@brief Emitter for signal void QItemDelegate::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint)\nCall this method to emit this signal.", false, &_init_emitter_closeEditor_4926, &_call_emitter_closeEditor_4926);
   methods += new qt_gsi::GenericMethod ("emit_commitData", "@brief Emitter for signal void QItemDelegate::commitData(QWidget *editor)\nCall this method to emit this signal.", false, &_init_emitter_commitData_1315, &_call_emitter_commitData_1315);
   methods += new qt_gsi::GenericMethod ("createEditor", "@brief Virtual method QWidget *QItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_createEditor_c6860_0, &_call_cbs_createEditor_c6860_0);
   methods += new qt_gsi::GenericMethod ("createEditor", "@hide", true, &_init_cbs_createEditor_c6860_0, &_call_cbs_createEditor_c6860_0, &_set_callback_cbs_createEditor_c6860_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QItemDelegate::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QItemDelegate::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*decoration", "@brief Method QPixmap QItemDelegate::decoration(const QStyleOptionViewItem &option, const QVariant &variant)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_decoration_c5377, &_call_fp_decoration_c5377);
   methods += new qt_gsi::GenericMethod ("destroyEditor", "@brief Virtual method void QItemDelegate::destroyEditor(QWidget *editor, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_destroyEditor_c3602_0, &_call_cbs_destroyEditor_c3602_0);
@@ -1769,7 +1769,7 @@ static gsi::Methods methods_QItemDelegate_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*drawFocus", "@hide", true, &_init_cbs_drawFocus_c6368_0, &_call_cbs_drawFocus_c6368_0, &_set_callback_cbs_drawFocus_c6368_0);
   methods += new qt_gsi::GenericMethod ("*editorEvent", "@brief Virtual method bool QItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_editorEvent_9073_0, &_call_cbs_editorEvent_9073_0);
   methods += new qt_gsi::GenericMethod ("*editorEvent", "@hide", false, &_init_cbs_editorEvent_9073_0, &_call_cbs_editorEvent_9073_0, &_set_callback_cbs_editorEvent_9073_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QItemDelegate::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QItemDelegate::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*eventFilter", "@brief Virtual method bool QItemDelegate::eventFilter(QObject *object, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
@@ -1795,7 +1795,7 @@ static gsi::Methods methods_QItemDelegate_Adaptor () {
   methods += new qt_gsi::GenericMethod ("sizeHint", "@hide", true, &_init_cbs_sizeHint_c5653_0, &_call_cbs_sizeHint_c5653_0, &_set_callback_cbs_sizeHint_c5653_0);
   methods += new qt_gsi::GenericMethod ("emit_sizeHintChanged", "@brief Emitter for signal void QItemDelegate::sizeHintChanged(const QModelIndex &)\nCall this method to emit this signal.", false, &_init_emitter_sizeHintChanged_2395, &_call_emitter_sizeHintChanged_2395);
   methods += new qt_gsi::GenericMethod ("*textRectangle", "@brief Method QRect QItemDelegate::textRectangle(QPainter *painter, const QRect &rect, const QFont &font, const QString &text)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_textRectangle_c6720, &_call_fp_textRectangle_c6720);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QItemDelegate::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QItemDelegate::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("updateEditorGeometry", "@brief Virtual method void QItemDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_updateEditorGeometry_c6860_0, &_call_cbs_updateEditorGeometry_c6860_0);
   methods += new qt_gsi::GenericMethod ("updateEditorGeometry", "@hide", true, &_init_cbs_updateEditorGeometry_c6860_0, &_call_cbs_updateEditorGeometry_c6860_0, &_set_callback_cbs_updateEditorGeometry_c6860_0);

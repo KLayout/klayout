@@ -141,7 +141,7 @@ static void _init_f_paint_6301 (qt_gsi::GenericMethod *decl)
   decl->add_arg<QPainter * > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("option");
   decl->add_arg<const QStyleOptionGraphicsItem * > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("widget", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("widget", true, "nullptr");
   decl->add_arg<QWidget * > (argspec_2);
   decl->set_return<void > ();
 }
@@ -152,7 +152,7 @@ static void _call_f_paint_6301 (const qt_gsi::GenericMethod * /*decl*/, void *cl
   tl::Heap heap;
   QPainter *arg1 = gsi::arg_reader<QPainter * >() (args, heap);
   const QStyleOptionGraphicsItem *arg2 = gsi::arg_reader<const QStyleOptionGraphicsItem * >() (args, heap);
-  QWidget *arg3 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (0, heap);
+  QWidget *arg3 = args ? gsi::arg_reader<QWidget * >() (args, heap) : gsi::arg_maker<QWidget * >() (nullptr, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsEllipseItem *)cls)->paint (arg1, arg2, arg3);
 }
@@ -985,7 +985,7 @@ QGraphicsEllipseItem_Adaptor::~QGraphicsEllipseItem_Adaptor() { }
 
 static void _init_ctor_QGraphicsEllipseItem_Adaptor_1919 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QGraphicsItem * > (argspec_0);
   decl->set_return_new<QGraphicsEllipseItem_Adaptor> ();
 }
@@ -994,7 +994,7 @@ static void _call_ctor_QGraphicsEllipseItem_Adaptor_1919 (const qt_gsi::GenericS
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
+  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (nullptr, heap);
   ret.write<QGraphicsEllipseItem_Adaptor *> (new QGraphicsEllipseItem_Adaptor (arg1));
 }
 
@@ -1005,7 +1005,7 @@ static void _init_ctor_QGraphicsEllipseItem_Adaptor_3673 (qt_gsi::GenericStaticM
 {
   static gsi::ArgSpecBase argspec_0 ("rect");
   decl->add_arg<const QRectF & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
   decl->add_arg<QGraphicsItem * > (argspec_1);
   decl->set_return_new<QGraphicsEllipseItem_Adaptor> ();
 }
@@ -1015,7 +1015,7 @@ static void _call_ctor_QGraphicsEllipseItem_Adaptor_3673 (const qt_gsi::GenericS
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
-  QGraphicsItem *arg2 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
+  QGraphicsItem *arg2 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (nullptr, heap);
   ret.write<QGraphicsEllipseItem_Adaptor *> (new QGraphicsEllipseItem_Adaptor (arg1, arg2));
 }
 
@@ -1032,7 +1032,7 @@ static void _init_ctor_QGraphicsEllipseItem_Adaptor_5771 (qt_gsi::GenericStaticM
   decl->add_arg<double > (argspec_2);
   static gsi::ArgSpecBase argspec_3 ("h");
   decl->add_arg<double > (argspec_3);
-  static gsi::ArgSpecBase argspec_4 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_4 ("parent", true, "nullptr");
   decl->add_arg<QGraphicsItem * > (argspec_4);
   decl->set_return_new<QGraphicsEllipseItem_Adaptor> ();
 }
@@ -1045,7 +1045,7 @@ static void _call_ctor_QGraphicsEllipseItem_Adaptor_5771 (const qt_gsi::GenericS
   double arg2 = gsi::arg_reader<double >() (args, heap);
   double arg3 = gsi::arg_reader<double >() (args, heap);
   double arg4 = gsi::arg_reader<double >() (args, heap);
-  QGraphicsItem *arg5 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
+  QGraphicsItem *arg5 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (nullptr, heap);
   ret.write<QGraphicsEllipseItem_Adaptor *> (new QGraphicsEllipseItem_Adaptor (arg1, arg2, arg3, arg4, arg5));
 }
 

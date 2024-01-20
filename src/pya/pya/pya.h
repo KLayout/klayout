@@ -108,7 +108,7 @@ public:
   /**
    *  @brief Add the given path to the search path
    */
-  void add_path (const std::string &path);
+  void add_path (const std::string &path, bool prepend = false);
 
   /**
    *  @brief Adds a package location to this interpreter
@@ -248,6 +248,7 @@ public:
 
   /**
    *  @brief Provide a first (basic) initialization
+   *  Calling this method will load all Python functions and plugins and provide the pya module.
    */
   static void initialize ();
 

@@ -697,28 +697,6 @@ static void _call_f_toString_c3228 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// QString QDateTime::toString(QStringView format, QCalendar cal)
-
-
-static void _init_f_toString_c2762 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("format");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("cal", true, "QCalendar()");
-  decl->add_arg<QCalendar > (argspec_1);
-  decl->set_return<QString > ();
-}
-
-static void _call_f_toString_c2762 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  QCalendar arg2 = args ? gsi::arg_reader<QCalendar >() (args, heap) : gsi::arg_maker<QCalendar >() (QCalendar(), heap);
-  ret.write<QString > ((QString)((QDateTime *)cls)->toString (arg1, arg2));
-}
-
-
 // QDateTime QDateTime::toTimeSpec(Qt::TimeSpec spec)
 
 
@@ -926,78 +904,6 @@ static void _call_f_fromSecsSinceEpoch_3083 (const qt_gsi::GenericStaticMethod *
 }
 
 
-// static QDateTime QDateTime::fromString(QStringView string, Qt::DateFormat format)
-
-
-static void _init_f_fromString_3199 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("string");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format", true, "Qt::TextDate");
-  decl->add_arg<const qt_gsi::Converter<Qt::DateFormat>::target_type & > (argspec_1);
-  decl->set_return<QDateTime > ();
-}
-
-static void _call_f_fromString_3199 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  const qt_gsi::Converter<Qt::DateFormat>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::DateFormat>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::DateFormat>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::DateFormat>(heap, Qt::TextDate), heap);
-  ret.write<QDateTime > ((QDateTime)QDateTime::fromString (arg1, qt_gsi::QtToCppAdaptor<Qt::DateFormat>(arg2).cref()));
-}
-
-
-// static QDateTime QDateTime::fromString(QStringView string, QStringView format, QCalendar cal)
-
-
-static void _init_f_fromString_4213 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("string");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format");
-  decl->add_arg<QStringView > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("cal", true, "QCalendar()");
-  decl->add_arg<QCalendar > (argspec_2);
-  decl->set_return<QDateTime > ();
-}
-
-static void _call_f_fromString_4213 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  QStringView arg2 = gsi::arg_reader<QStringView >() (args, heap);
-  QCalendar arg3 = args ? gsi::arg_reader<QCalendar >() (args, heap) : gsi::arg_maker<QCalendar >() (QCalendar(), heap);
-  ret.write<QDateTime > ((QDateTime)QDateTime::fromString (arg1, arg2, arg3));
-}
-
-
-// static QDateTime QDateTime::fromString(const QString &string, QStringView format, QCalendar cal)
-
-
-static void _init_f_fromString_4679 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("string");
-  decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("format");
-  decl->add_arg<QStringView > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("cal", true, "QCalendar()");
-  decl->add_arg<QCalendar > (argspec_2);
-  decl->set_return<QDateTime > ();
-}
-
-static void _call_f_fromString_4679 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  QStringView arg2 = gsi::arg_reader<QStringView >() (args, heap);
-  QCalendar arg3 = args ? gsi::arg_reader<QCalendar >() (args, heap) : gsi::arg_maker<QCalendar >() (QCalendar(), heap);
-  ret.write<QDateTime > ((QDateTime)QDateTime::fromString (arg1, arg2, arg3));
-}
-
-
 // static QDateTime QDateTime::fromString(const QString &string, Qt::DateFormat format)
 
 
@@ -1087,7 +993,6 @@ static gsi::Methods methods_QDateTime () {
   methods += new qt_gsi::GenericMethod ("toSecsSinceEpoch", "@brief Method qint64 QDateTime::toSecsSinceEpoch()\n", true, &_init_f_toSecsSinceEpoch_c0, &_call_f_toSecsSinceEpoch_c0);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QDateTime::toString(Qt::DateFormat format)\n", true, &_init_f_toString_c1748, &_call_f_toString_c1748);
   methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QDateTime::toString(const QString &format, QCalendar cal)\n", true, &_init_f_toString_c3228, &_call_f_toString_c3228);
-  methods += new qt_gsi::GenericMethod ("toString", "@brief Method QString QDateTime::toString(QStringView format, QCalendar cal)\n", true, &_init_f_toString_c2762, &_call_f_toString_c2762);
   methods += new qt_gsi::GenericMethod ("toTimeSpec", "@brief Method QDateTime QDateTime::toTimeSpec(Qt::TimeSpec spec)\n", true, &_init_f_toTimeSpec_c1543, &_call_f_toTimeSpec_c1543);
   methods += new qt_gsi::GenericMethod ("toTimeZone", "@brief Method QDateTime QDateTime::toTimeZone(const QTimeZone &toZone)\n", true, &_init_f_toTimeZone_c2205, &_call_f_toTimeZone_c2205);
   methods += new qt_gsi::GenericMethod ("toUTC", "@brief Method QDateTime QDateTime::toUTC()\n", true, &_init_f_toUTC_c0, &_call_f_toUTC_c0);
@@ -1099,9 +1004,6 @@ static gsi::Methods methods_QDateTime () {
   methods += new qt_gsi::GenericStaticMethod ("fromMSecsSinceEpoch", "@brief Static method QDateTime QDateTime::fromMSecsSinceEpoch(qint64 msecs, const QTimeZone &timeZone)\nThis method is static and can be called without an instance.", &_init_f_fromMSecsSinceEpoch_3083, &_call_f_fromMSecsSinceEpoch_3083);
   methods += new qt_gsi::GenericStaticMethod ("fromSecsSinceEpoch", "@brief Static method QDateTime QDateTime::fromSecsSinceEpoch(qint64 secs, Qt::TimeSpec spec, int offsetFromUtc)\nThis method is static and can be called without an instance.", &_init_f_fromSecsSinceEpoch_3080, &_call_f_fromSecsSinceEpoch_3080);
   methods += new qt_gsi::GenericStaticMethod ("fromSecsSinceEpoch", "@brief Static method QDateTime QDateTime::fromSecsSinceEpoch(qint64 secs, const QTimeZone &timeZone)\nThis method is static and can be called without an instance.", &_init_f_fromSecsSinceEpoch_3083, &_call_f_fromSecsSinceEpoch_3083);
-  methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QDateTime QDateTime::fromString(QStringView string, Qt::DateFormat format)\nThis method is static and can be called without an instance.", &_init_f_fromString_3199, &_call_f_fromString_3199);
-  methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QDateTime QDateTime::fromString(QStringView string, QStringView format, QCalendar cal)\nThis method is static and can be called without an instance.", &_init_f_fromString_4213, &_call_f_fromString_4213);
-  methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QDateTime QDateTime::fromString(const QString &string, QStringView format, QCalendar cal)\nThis method is static and can be called without an instance.", &_init_f_fromString_4679, &_call_f_fromString_4679);
   methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QDateTime QDateTime::fromString(const QString &string, Qt::DateFormat format)\nThis method is static and can be called without an instance.", &_init_f_fromString_3665, &_call_f_fromString_3665);
   methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QDateTime QDateTime::fromString(const QString &string, const QString &format, QCalendar cal)\nThis method is static and can be called without an instance.", &_init_f_fromString_5145, &_call_f_fromString_5145);
   return methods;

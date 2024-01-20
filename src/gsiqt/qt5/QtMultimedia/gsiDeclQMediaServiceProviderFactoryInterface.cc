@@ -36,13 +36,13 @@
 // -----------------------------------------------------------------------
 // struct QMediaServiceProviderFactoryInterface
 
-// QMediaService *QMediaServiceProviderFactoryInterface::create(QString const &key)
+// QMediaService *QMediaServiceProviderFactoryInterface::create(const QString &key)
 
 
 static void _init_f_create_2025 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QString const & > (argspec_0);
+  decl->add_arg<const QString & > (argspec_0);
   decl->set_return<QMediaService * > ();
 }
 
@@ -50,7 +50,7 @@ static void _call_f_create_2025 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QString const &arg1 = gsi::arg_reader<QString const & >() (args, heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QMediaService * > ((QMediaService *)((QMediaServiceProviderFactoryInterface *)cls)->create (arg1));
 }
 
@@ -80,7 +80,7 @@ namespace gsi
 
 static gsi::Methods methods_QMediaServiceProviderFactoryInterface () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("qt_create", "@brief Method QMediaService *QMediaServiceProviderFactoryInterface::create(QString const &key)\n", false, &_init_f_create_2025, &_call_f_create_2025);
+  methods += new qt_gsi::GenericMethod ("create|qt_create", "@brief Method QMediaService *QMediaServiceProviderFactoryInterface::create(const QString &key)\n", false, &_init_f_create_2025, &_call_f_create_2025);
   methods += new qt_gsi::GenericMethod ("release", "@brief Method void QMediaServiceProviderFactoryInterface::release(QMediaService *service)\n", false, &_init_f_release_1904, &_call_f_release_1904);
   return methods;
 }
@@ -106,17 +106,17 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [adaptor impl] QMediaService *QMediaServiceProviderFactoryInterface::create(QString const &key)
-  QMediaService * cbs_create_2025_0(QString const &key)
+  //  [adaptor impl] QMediaService *QMediaServiceProviderFactoryInterface::create(const QString &key)
+  QMediaService * cbs_create_2025_0(const QString &key)
   {
     __SUPPRESS_UNUSED_WARNING (key);
     throw qt_gsi::AbstractMethodCalledException("create");
   }
 
-  virtual QMediaService * create(QString const &key)
+  virtual QMediaService * create(const QString &key)
   {
     if (cb_create_2025_0.can_issue()) {
-      return cb_create_2025_0.issue<QMediaServiceProviderFactoryInterface_Adaptor, QMediaService *, QString const &>(&QMediaServiceProviderFactoryInterface_Adaptor::cbs_create_2025_0, key);
+      return cb_create_2025_0.issue<QMediaServiceProviderFactoryInterface_Adaptor, QMediaService *, const QString &>(&QMediaServiceProviderFactoryInterface_Adaptor::cbs_create_2025_0, key);
     } else {
       throw qt_gsi::AbstractMethodCalledException("create");
     }
@@ -158,12 +158,12 @@ static void _call_ctor_QMediaServiceProviderFactoryInterface_Adaptor_0 (const qt
 }
 
 
-// QMediaService *QMediaServiceProviderFactoryInterface::create(QString const &key)
+// QMediaService *QMediaServiceProviderFactoryInterface::create(const QString &key)
 
 static void _init_cbs_create_2025_0 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<QString const & > (argspec_0);
+  decl->add_arg<const QString & > (argspec_0);
   decl->set_return<QMediaService * > ();
 }
 
@@ -171,7 +171,7 @@ static void _call_cbs_create_2025_0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QString const &arg1 = args.read<QString const & > (heap);
+  const QString &arg1 = args.read<const QString & > (heap);
   ret.write<QMediaService * > ((QMediaService *)((QMediaServiceProviderFactoryInterface_Adaptor *)cls)->cbs_create_2025_0 (arg1));
 }
 
@@ -213,8 +213,8 @@ gsi::Class<QMediaServiceProviderFactoryInterface> &qtdecl_QMediaServiceProviderF
 static gsi::Methods methods_QMediaServiceProviderFactoryInterface_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMediaServiceProviderFactoryInterface::QMediaServiceProviderFactoryInterface()\nThis method creates an object of class QMediaServiceProviderFactoryInterface.", &_init_ctor_QMediaServiceProviderFactoryInterface_Adaptor_0, &_call_ctor_QMediaServiceProviderFactoryInterface_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("qt_create", "@brief Virtual method QMediaService *QMediaServiceProviderFactoryInterface::create(QString const &key)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_create_2025_0, &_call_cbs_create_2025_0);
-  methods += new qt_gsi::GenericMethod ("qt_create", "@hide", false, &_init_cbs_create_2025_0, &_call_cbs_create_2025_0, &_set_callback_cbs_create_2025_0);
+  methods += new qt_gsi::GenericMethod ("create|qt_create", "@brief Virtual method QMediaService *QMediaServiceProviderFactoryInterface::create(const QString &key)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_create_2025_0, &_call_cbs_create_2025_0);
+  methods += new qt_gsi::GenericMethod ("create|qt_create", "@hide", false, &_init_cbs_create_2025_0, &_call_cbs_create_2025_0, &_set_callback_cbs_create_2025_0);
   methods += new qt_gsi::GenericMethod ("release", "@brief Virtual method void QMediaServiceProviderFactoryInterface::release(QMediaService *service)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_release_1904_0, &_call_cbs_release_1904_0);
   methods += new qt_gsi::GenericMethod ("release", "@hide", false, &_init_cbs_release_1904_0, &_call_cbs_release_1904_0, &_set_callback_cbs_release_1904_0);
   return methods;

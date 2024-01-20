@@ -529,6 +529,7 @@ static gsi::Enum<QAccessible::Role> decl_QAccessible_Role_Enum ("QtGui", "QAcces
     gsi::enum_const ("Paragraph", QAccessible::Paragraph, "@brief Enum constant QAccessible::Paragraph") +
     gsi::enum_const ("WebDocument", QAccessible::WebDocument, "@brief Enum constant QAccessible::WebDocument") +
     gsi::enum_const ("Section", QAccessible::Section, "@brief Enum constant QAccessible::Section") +
+    gsi::enum_const ("Notification", QAccessible::Notification, "@brief Enum constant QAccessible::Notification") +
     gsi::enum_const ("ColorChooser", QAccessible::ColorChooser, "@brief Enum constant QAccessible::ColorChooser") +
     gsi::enum_const ("Footer", QAccessible::Footer, "@brief Enum constant QAccessible::Footer") +
     gsi::enum_const ("Form", QAccessible::Form, "@brief Enum constant QAccessible::Form") +

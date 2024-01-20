@@ -289,13 +289,13 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
   gsi::method ("name", (const std::string &(db::LayoutToNetlist::*) () const) &db::LayoutToNetlist::name,
     "@brief Gets the name of the database\n"
   ) +
-  gsi::method ("name=", &db::LayoutToNetlist::set_name,
+  gsi::method ("name=", &db::LayoutToNetlist::set_name, gsi::arg ("name"),
     "@brief Sets the name of the database\n"
   ) +
   gsi::method ("description", (const std::string &(db::LayoutToNetlist::*) () const) &db::LayoutToNetlist::name,
     "@brief Gets the description of the database\n"
   ) +
-  gsi::method ("description=", &db::LayoutToNetlist::set_name,
+  gsi::method ("description=", &db::LayoutToNetlist::set_name, gsi::arg ("description"),
     "@brief Sets the description of the database\n"
   ) +
   gsi::method ("filename", &db::LayoutToNetlist::filename,
@@ -306,7 +306,7 @@ Class<db::LayoutToNetlist> decl_dbLayoutToNetlist ("db", "LayoutToNetlist",
     "@brief Gets the original file name of the database\n"
     "The original filename is the layout file from which the netlist DB was created."
   ) +
-  gsi::method ("original_file=", &db::LayoutToNetlist::set_original_file,
+  gsi::method ("original_file=", &db::LayoutToNetlist::set_original_file, gsi::arg ("path"),
     "@brief Sets the original file name of the database\n"
   ) +
   gsi::method ("layer_name", (std::string (db::LayoutToNetlist::*) (const db::ShapeCollection &region) const) &db::LayoutToNetlist::name, gsi::arg ("l"),

@@ -29,6 +29,7 @@
 
 #include <QHistoryState>
 #include <QAbstractState>
+#include <QAbstractTransition>
 #include <QChildEvent>
 #include <QEvent>
 #include <QMetaMethod>
@@ -72,6 +73,21 @@ static void _call_f_defaultState_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
+// QAbstractTransition *QHistoryState::defaultTransition()
+
+
+static void _init_f_defaultTransition_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QAbstractTransition * > ();
+}
+
+static void _call_f_defaultTransition_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QAbstractTransition * > ((QAbstractTransition *)((QHistoryState *)cls)->defaultTransition ());
+}
+
+
 // QHistoryState::HistoryType QHistoryState::historyType()
 
 
@@ -104,6 +120,26 @@ static void _call_f_setDefaultState_2036 (const qt_gsi::GenericMethod * /*decl*/
   QAbstractState *arg1 = gsi::arg_reader<QAbstractState * >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QHistoryState *)cls)->setDefaultState (arg1);
+}
+
+
+// void QHistoryState::setDefaultTransition(QAbstractTransition *transition)
+
+
+static void _init_f_setDefaultTransition_2590 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("transition");
+  decl->add_arg<QAbstractTransition * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setDefaultTransition_2590 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QAbstractTransition *arg1 = gsi::arg_reader<QAbstractTransition * >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QHistoryState *)cls)->setDefaultTransition (arg1);
 }
 
 
@@ -184,11 +220,14 @@ static gsi::Methods methods_QHistoryState () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":defaultState", "@brief Method QAbstractState *QHistoryState::defaultState()\n", true, &_init_f_defaultState_c0, &_call_f_defaultState_c0);
+  methods += new qt_gsi::GenericMethod (":defaultTransition", "@brief Method QAbstractTransition *QHistoryState::defaultTransition()\n", true, &_init_f_defaultTransition_c0, &_call_f_defaultTransition_c0);
   methods += new qt_gsi::GenericMethod (":historyType", "@brief Method QHistoryState::HistoryType QHistoryState::historyType()\n", true, &_init_f_historyType_c0, &_call_f_historyType_c0);
   methods += new qt_gsi::GenericMethod ("setDefaultState|defaultState=", "@brief Method void QHistoryState::setDefaultState(QAbstractState *state)\n", false, &_init_f_setDefaultState_2036, &_call_f_setDefaultState_2036);
+  methods += new qt_gsi::GenericMethod ("setDefaultTransition|defaultTransition=", "@brief Method void QHistoryState::setDefaultTransition(QAbstractTransition *transition)\n", false, &_init_f_setDefaultTransition_2590, &_call_f_setDefaultTransition_2590);
   methods += new qt_gsi::GenericMethod ("setHistoryType|historyType=", "@brief Method void QHistoryState::setHistoryType(QHistoryState::HistoryType type)\n", false, &_init_f_setHistoryType_3072, &_call_f_setHistoryType_3072);
   methods += gsi::qt_signal<bool > ("activeChanged(bool)", "activeChanged", gsi::arg("active"), "@brief Signal declaration for QHistoryState::activeChanged(bool active)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("defaultStateChanged()", "defaultStateChanged", "@brief Signal declaration for QHistoryState::defaultStateChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("defaultTransitionChanged()", "defaultTransitionChanged", "@brief Signal declaration for QHistoryState::defaultTransitionChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QHistoryState::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("entered()", "entered", "@brief Signal declaration for QHistoryState::entered()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("exited()", "exited", "@brief Signal declaration for QHistoryState::exited()\nYou can bind a procedure to this signal.");
@@ -272,6 +311,12 @@ public:
     throw tl::Exception ("Can't emit private signal 'void QHistoryState::defaultStateChanged()'");
   }
 
+  //  [emitter impl] void QHistoryState::defaultTransitionChanged()
+  void emitter_QHistoryState_defaultTransitionChanged_3318()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QHistoryState::defaultTransitionChanged()'");
+  }
+
   //  [emitter impl] void QHistoryState::destroyed(QObject *)
   void emitter_QHistoryState_destroyed_1302(QObject *arg1)
   {
@@ -284,18 +329,18 @@ public:
     throw tl::Exception ("Can't emit private signal 'void QHistoryState::entered()'");
   }
 
-  //  [adaptor impl] bool QHistoryState::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QHistoryState::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QHistoryState::eventFilter(arg1, arg2);
+    return QHistoryState::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QHistoryState_Adaptor, bool, QObject *, QEvent *>(&QHistoryState_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QHistoryState_Adaptor, bool, QObject *, QEvent *>(&QHistoryState_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QHistoryState::eventFilter(arg1, arg2);
+      return QHistoryState::eventFilter(watched, event);
     }
   }
 
@@ -318,33 +363,33 @@ public:
     throw tl::Exception ("Can't emit private signal 'void QHistoryState::objectNameChanged(const QString &objectName)'");
   }
 
-  //  [adaptor impl] void QHistoryState::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QHistoryState::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QHistoryState::childEvent(arg1);
+    QHistoryState::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QHistoryState_Adaptor, QChildEvent *>(&QHistoryState_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QHistoryState_Adaptor, QChildEvent *>(&QHistoryState_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QHistoryState::childEvent(arg1);
+      QHistoryState::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QHistoryState::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QHistoryState::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QHistoryState::customEvent(arg1);
+    QHistoryState::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QHistoryState_Adaptor, QEvent *>(&QHistoryState_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QHistoryState_Adaptor, QEvent *>(&QHistoryState_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QHistoryState::customEvent(arg1);
+      QHistoryState::customEvent(event);
     }
   }
 
@@ -408,18 +453,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QHistoryState::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QHistoryState::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QHistoryState::timerEvent(arg1);
+    QHistoryState::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QHistoryState_Adaptor, QTimerEvent *>(&QHistoryState_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QHistoryState_Adaptor, QTimerEvent *>(&QHistoryState_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QHistoryState::timerEvent(arg1);
+      QHistoryState::timerEvent(event);
     }
   }
 
@@ -439,7 +484,7 @@ QHistoryState_Adaptor::~QHistoryState_Adaptor() { }
 
 static void _init_ctor_QHistoryState_Adaptor_1216 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QState * > (argspec_0);
   decl->set_return_new<QHistoryState_Adaptor> ();
 }
@@ -448,7 +493,7 @@ static void _call_ctor_QHistoryState_Adaptor_1216 (const qt_gsi::GenericStaticMe
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QState *arg1 = args ? gsi::arg_reader<QState * >() (args, heap) : gsi::arg_maker<QState * >() (0, heap);
+  QState *arg1 = args ? gsi::arg_reader<QState * >() (args, heap) : gsi::arg_maker<QState * >() (nullptr, heap);
   ret.write<QHistoryState_Adaptor *> (new QHistoryState_Adaptor (arg1));
 }
 
@@ -459,7 +504,7 @@ static void _init_ctor_QHistoryState_Adaptor_4180 (qt_gsi::GenericStaticMethod *
 {
   static gsi::ArgSpecBase argspec_0 ("type");
   decl->add_arg<const qt_gsi::Converter<QHistoryState::HistoryType>::target_type & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
   decl->add_arg<QState * > (argspec_1);
   decl->set_return_new<QHistoryState_Adaptor> ();
 }
@@ -469,7 +514,7 @@ static void _call_ctor_QHistoryState_Adaptor_4180 (const qt_gsi::GenericStaticMe
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const qt_gsi::Converter<QHistoryState::HistoryType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QHistoryState::HistoryType>::target_type & >() (args, heap);
-  QState *arg2 = args ? gsi::arg_reader<QState * >() (args, heap) : gsi::arg_maker<QState * >() (0, heap);
+  QState *arg2 = args ? gsi::arg_reader<QState * >() (args, heap) : gsi::arg_maker<QState * >() (nullptr, heap);
   ret.write<QHistoryState_Adaptor *> (new QHistoryState_Adaptor (qt_gsi::QtToCppAdaptor<QHistoryState::HistoryType>(arg1).cref(), arg2));
 }
 
@@ -492,11 +537,11 @@ static void _call_emitter_activeChanged_864 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// void QHistoryState::childEvent(QChildEvent *)
+// void QHistoryState::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -516,11 +561,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QHistoryState::customEvent(QEvent *)
+// void QHistoryState::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -554,11 +599,25 @@ static void _call_emitter_defaultStateChanged_3318 (const qt_gsi::GenericMethod 
 }
 
 
+// emitter void QHistoryState::defaultTransitionChanged()
+
+static void _init_emitter_defaultTransitionChanged_3318 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_defaultTransitionChanged_3318 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QHistoryState_Adaptor *)cls)->emitter_QHistoryState_defaultTransitionChanged_3318 ();
+}
+
+
 // emitter void QHistoryState::destroyed(QObject *)
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -567,7 +626,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QHistoryState_Adaptor *)cls)->emitter_QHistoryState_destroyed_1302 (arg1);
 }
 
@@ -633,13 +692,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QHistoryState::eventFilter(QObject *, QEvent *)
+// bool QHistoryState::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -817,11 +876,11 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QHistoryState::timerEvent(QTimerEvent *)
+// void QHistoryState::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -851,18 +910,19 @@ static gsi::Methods methods_QHistoryState_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QHistoryState::QHistoryState(QState *parent)\nThis method creates an object of class QHistoryState.", &_init_ctor_QHistoryState_Adaptor_1216, &_call_ctor_QHistoryState_Adaptor_1216);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QHistoryState::QHistoryState(QHistoryState::HistoryType type, QState *parent)\nThis method creates an object of class QHistoryState.", &_init_ctor_QHistoryState_Adaptor_4180, &_call_ctor_QHistoryState_Adaptor_4180);
   methods += new qt_gsi::GenericMethod ("emit_activeChanged", "@brief Emitter for signal void QHistoryState::activeChanged(bool active)\nCall this method to emit this signal.", false, &_init_emitter_activeChanged_864, &_call_emitter_activeChanged_864);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QHistoryState::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QHistoryState::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QHistoryState::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QHistoryState::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_defaultStateChanged", "@brief Emitter for signal void QHistoryState::defaultStateChanged()\nCall this method to emit this signal.", false, &_init_emitter_defaultStateChanged_3318, &_call_emitter_defaultStateChanged_3318);
+  methods += new qt_gsi::GenericMethod ("emit_defaultTransitionChanged", "@brief Emitter for signal void QHistoryState::defaultTransitionChanged()\nCall this method to emit this signal.", false, &_init_emitter_defaultTransitionChanged_3318, &_call_emitter_defaultTransitionChanged_3318);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QHistoryState::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QHistoryState::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("emit_entered", "@brief Emitter for signal void QHistoryState::entered()\nCall this method to emit this signal.", false, &_init_emitter_entered_3384, &_call_emitter_entered_3384);
   methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QHistoryState::event(QEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QHistoryState::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QHistoryState::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("emit_exited", "@brief Emitter for signal void QHistoryState::exited()\nCall this method to emit this signal.", false, &_init_emitter_exited_3384, &_call_emitter_exited_3384);
   methods += new qt_gsi::GenericMethod ("emit_historyTypeChanged", "@brief Emitter for signal void QHistoryState::historyTypeChanged()\nCall this method to emit this signal.", false, &_init_emitter_historyTypeChanged_3318, &_call_emitter_historyTypeChanged_3318);
@@ -875,7 +935,7 @@ static gsi::Methods methods_QHistoryState_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QHistoryState::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QHistoryState::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QHistoryState::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QHistoryState::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QHistoryState::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

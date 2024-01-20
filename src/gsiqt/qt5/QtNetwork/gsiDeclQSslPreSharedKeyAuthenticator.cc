@@ -203,12 +203,12 @@ static void _call_f_setPreSharedKey_2309 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// void QSslPreSharedKeyAuthenticator::swap(QSslPreSharedKeyAuthenticator &authenticator)
+// void QSslPreSharedKeyAuthenticator::swap(QSslPreSharedKeyAuthenticator &other)
 
 
 static void _init_f_swap_3567 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("authenticator");
+  static gsi::ArgSpecBase argspec_0 ("other");
   decl->add_arg<QSslPreSharedKeyAuthenticator & > (argspec_0);
   decl->set_return<void > ();
 }
@@ -244,7 +244,7 @@ static gsi::Methods methods_QSslPreSharedKeyAuthenticator () {
   methods += new qt_gsi::GenericMethod (":preSharedKey", "@brief Method QByteArray QSslPreSharedKeyAuthenticator::preSharedKey()\n", true, &_init_f_preSharedKey_c0, &_call_f_preSharedKey_c0);
   methods += new qt_gsi::GenericMethod ("setIdentity|identity=", "@brief Method void QSslPreSharedKeyAuthenticator::setIdentity(const QByteArray &identity)\n", false, &_init_f_setIdentity_2309, &_call_f_setIdentity_2309);
   methods += new qt_gsi::GenericMethod ("setPreSharedKey|preSharedKey=", "@brief Method void QSslPreSharedKeyAuthenticator::setPreSharedKey(const QByteArray &preSharedKey)\n", false, &_init_f_setPreSharedKey_2309, &_call_f_setPreSharedKey_2309);
-  methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QSslPreSharedKeyAuthenticator::swap(QSslPreSharedKeyAuthenticator &authenticator)\n", false, &_init_f_swap_3567, &_call_f_swap_3567);
+  methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QSslPreSharedKeyAuthenticator::swap(QSslPreSharedKeyAuthenticator &other)\n", false, &_init_f_swap_3567, &_call_f_swap_3567);
   methods += gsi::method_ext("!=", &::op_QSslPreSharedKeyAuthenticator_operator_excl__eq__8416, gsi::arg ("rhs"), "@brief Operator bool ::operator!=(const QSslPreSharedKeyAuthenticator &lhs, const QSslPreSharedKeyAuthenticator &rhs)\nThis is the mapping of the global operator to the instance method.");
   return methods;
 }

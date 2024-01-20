@@ -511,33 +511,33 @@ public:
     emit QDnsLookup::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QDnsLookup::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QDnsLookup::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QDnsLookup::event(arg1);
+    return QDnsLookup::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QDnsLookup_Adaptor, bool, QEvent *>(&QDnsLookup_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QDnsLookup_Adaptor, bool, QEvent *>(&QDnsLookup_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QDnsLookup::event(arg1);
+      return QDnsLookup::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QDnsLookup::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QDnsLookup::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QDnsLookup::eventFilter(arg1, arg2);
+    return QDnsLookup::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QDnsLookup_Adaptor, bool, QObject *, QEvent *>(&QDnsLookup_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QDnsLookup_Adaptor, bool, QObject *, QEvent *>(&QDnsLookup_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QDnsLookup::eventFilter(arg1, arg2);
+      return QDnsLookup::eventFilter(watched, event);
     }
   }
 
@@ -572,33 +572,33 @@ public:
     emit QDnsLookup::typeChanged(type);
   }
 
-  //  [adaptor impl] void QDnsLookup::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QDnsLookup::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QDnsLookup::childEvent(arg1);
+    QDnsLookup::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QDnsLookup_Adaptor, QChildEvent *>(&QDnsLookup_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QDnsLookup_Adaptor, QChildEvent *>(&QDnsLookup_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QDnsLookup::childEvent(arg1);
+      QDnsLookup::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QDnsLookup::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QDnsLookup::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QDnsLookup::customEvent(arg1);
+    QDnsLookup::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QDnsLookup_Adaptor, QEvent *>(&QDnsLookup_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QDnsLookup_Adaptor, QEvent *>(&QDnsLookup_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QDnsLookup::customEvent(arg1);
+      QDnsLookup::customEvent(event);
     }
   }
 
@@ -617,18 +617,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QDnsLookup::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QDnsLookup::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QDnsLookup::timerEvent(arg1);
+    QDnsLookup::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QDnsLookup_Adaptor, QTimerEvent *>(&QDnsLookup_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QDnsLookup_Adaptor, QTimerEvent *>(&QDnsLookup_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QDnsLookup::timerEvent(arg1);
+      QDnsLookup::timerEvent(event);
     }
   }
 
@@ -646,7 +646,7 @@ QDnsLookup_Adaptor::~QDnsLookup_Adaptor() { }
 
 static void _init_ctor_QDnsLookup_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QDnsLookup_Adaptor> ();
 }
@@ -655,7 +655,7 @@ static void _call_ctor_QDnsLookup_Adaptor_1302 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QDnsLookup_Adaptor *> (new QDnsLookup_Adaptor (arg1));
 }
 
@@ -668,7 +668,7 @@ static void _init_ctor_QDnsLookup_Adaptor_5089 (qt_gsi::GenericStaticMethod *dec
   decl->add_arg<const qt_gsi::Converter<QDnsLookup::Type>::target_type & > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("name");
   decl->add_arg<const QString & > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_2);
   decl->set_return_new<QDnsLookup_Adaptor> ();
 }
@@ -679,7 +679,7 @@ static void _call_ctor_QDnsLookup_Adaptor_5089 (const qt_gsi::GenericStaticMetho
   tl::Heap heap;
   const qt_gsi::Converter<QDnsLookup::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QDnsLookup::Type>::target_type & >() (args, heap);
   const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
-  QObject *arg3 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg3 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QDnsLookup_Adaptor *> (new QDnsLookup_Adaptor (qt_gsi::QtToCppAdaptor<QDnsLookup::Type>(arg1).cref(), arg2, arg3));
 }
 
@@ -694,7 +694,7 @@ static void _init_ctor_QDnsLookup_Adaptor_7499 (qt_gsi::GenericStaticMethod *dec
   decl->add_arg<const QString & > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("nameserver");
   decl->add_arg<const QHostAddress & > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_3 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_3);
   decl->set_return_new<QDnsLookup_Adaptor> ();
 }
@@ -706,16 +706,16 @@ static void _call_ctor_QDnsLookup_Adaptor_7499 (const qt_gsi::GenericStaticMetho
   const qt_gsi::Converter<QDnsLookup::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QDnsLookup::Type>::target_type & >() (args, heap);
   const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
   const QHostAddress &arg3 = gsi::arg_reader<const QHostAddress & >() (args, heap);
-  QObject *arg4 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg4 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QDnsLookup_Adaptor *> (new QDnsLookup_Adaptor (qt_gsi::QtToCppAdaptor<QDnsLookup::Type>(arg1).cref(), arg2, arg3, arg4));
 }
 
 
-// void QDnsLookup::childEvent(QChildEvent *)
+// void QDnsLookup::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -735,11 +735,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QDnsLookup::customEvent(QEvent *)
+// void QDnsLookup::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -763,7 +763,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -772,7 +772,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QDnsLookup_Adaptor *)cls)->emitter_QDnsLookup_destroyed_1302 (arg1);
 }
 
@@ -801,11 +801,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QDnsLookup::event(QEvent *)
+// bool QDnsLookup::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -824,13 +824,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QDnsLookup::eventFilter(QObject *, QEvent *)
+// bool QDnsLookup::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -982,11 +982,11 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QDnsLookup::timerEvent(QTimerEvent *)
+// void QDnsLookup::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1034,16 +1034,16 @@ static gsi::Methods methods_QDnsLookup_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDnsLookup::QDnsLookup(QObject *parent)\nThis method creates an object of class QDnsLookup.", &_init_ctor_QDnsLookup_Adaptor_1302, &_call_ctor_QDnsLookup_Adaptor_1302);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDnsLookup::QDnsLookup(QDnsLookup::Type type, const QString &name, QObject *parent)\nThis method creates an object of class QDnsLookup.", &_init_ctor_QDnsLookup_Adaptor_5089, &_call_ctor_QDnsLookup_Adaptor_5089);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QDnsLookup::QDnsLookup(QDnsLookup::Type type, const QString &name, const QHostAddress &nameserver, QObject *parent)\nThis method creates an object of class QDnsLookup.", &_init_ctor_QDnsLookup_Adaptor_7499, &_call_ctor_QDnsLookup_Adaptor_7499);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QDnsLookup::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QDnsLookup::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QDnsLookup::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QDnsLookup::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QDnsLookup::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QDnsLookup::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QDnsLookup::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QDnsLookup::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QDnsLookup::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QDnsLookup::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("emit_finished", "@brief Emitter for signal void QDnsLookup::finished()\nCall this method to emit this signal.", false, &_init_emitter_finished_0, &_call_emitter_finished_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QDnsLookup::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
@@ -1053,7 +1053,7 @@ static gsi::Methods methods_QDnsLookup_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QDnsLookup::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QDnsLookup::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QDnsLookup::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QDnsLookup::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QDnsLookup::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("emit_typeChanged", "@brief Emitter for signal void QDnsLookup::typeChanged(QDnsLookup::Type type)\nCall this method to emit this signal.", false, &_init_emitter_typeChanged_1978, &_call_emitter_typeChanged_1978);
   return methods;

@@ -955,7 +955,7 @@ get_app_path_internal ()
   int ret = proc_pidpath (getpid (), buffer, sizeof (buffer));
   if (ret > 0) {
     //  TODO: does this correctly translate paths? (MacOS uses UTF-8 encoding with D-like normalization)
-    return buffer;
+    return std::string (buffer);
   }
 
 #elif defined (__FreeBSD__)

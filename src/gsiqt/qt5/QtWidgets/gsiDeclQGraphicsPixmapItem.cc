@@ -1003,7 +1003,7 @@ QGraphicsPixmapItem_Adaptor::~QGraphicsPixmapItem_Adaptor() { }
 
 static void _init_ctor_QGraphicsPixmapItem_Adaptor_1919 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QGraphicsItem * > (argspec_0);
   decl->set_return_new<QGraphicsPixmapItem_Adaptor> ();
 }
@@ -1012,7 +1012,7 @@ static void _call_ctor_QGraphicsPixmapItem_Adaptor_1919 (const qt_gsi::GenericSt
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
+  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (nullptr, heap);
   ret.write<QGraphicsPixmapItem_Adaptor *> (new QGraphicsPixmapItem_Adaptor (arg1));
 }
 
@@ -1023,7 +1023,7 @@ static void _init_ctor_QGraphicsPixmapItem_Adaptor_3828 (qt_gsi::GenericStaticMe
 {
   static gsi::ArgSpecBase argspec_0 ("pixmap");
   decl->add_arg<const QPixmap & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
   decl->add_arg<QGraphicsItem * > (argspec_1);
   decl->set_return_new<QGraphicsPixmapItem_Adaptor> ();
 }
@@ -1033,7 +1033,7 @@ static void _call_ctor_QGraphicsPixmapItem_Adaptor_3828 (const qt_gsi::GenericSt
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QPixmap &arg1 = gsi::arg_reader<const QPixmap & >() (args, heap);
-  QGraphicsItem *arg2 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
+  QGraphicsItem *arg2 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (nullptr, heap);
   ret.write<QGraphicsPixmapItem_Adaptor *> (new QGraphicsPixmapItem_Adaptor (arg1, arg2));
 }
 

@@ -290,11 +290,11 @@ static void _init_ctor_QTouchEvent_Adaptor_13206 (qt_gsi::GenericStaticMethod *d
 {
   static gsi::ArgSpecBase argspec_0 ("eventType");
   decl->add_arg<const qt_gsi::Converter<QEvent::Type>::target_type & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("device", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("device", true, "nullptr");
   decl->add_arg<QTouchDevice * > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("modifiers", true, "Qt::NoModifier");
   decl->add_arg<QFlags<Qt::KeyboardModifier> > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("touchPointStates", true, "0");
+  static gsi::ArgSpecBase argspec_3 ("touchPointStates", true, "Qt::TouchPointStates()");
   decl->add_arg<QFlags<Qt::TouchPointState> > (argspec_3);
   static gsi::ArgSpecBase argspec_4 ("touchPoints", true, "QList<QTouchEvent::TouchPoint>()");
   decl->add_arg<const QList<QTouchEvent::TouchPoint> & > (argspec_4);
@@ -306,9 +306,9 @@ static void _call_ctor_QTouchEvent_Adaptor_13206 (const qt_gsi::GenericStaticMet
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap);
-  QTouchDevice *arg2 = args ? gsi::arg_reader<QTouchDevice * >() (args, heap) : gsi::arg_maker<QTouchDevice * >() (0, heap);
+  QTouchDevice *arg2 = args ? gsi::arg_reader<QTouchDevice * >() (args, heap) : gsi::arg_maker<QTouchDevice * >() (nullptr, heap);
   QFlags<Qt::KeyboardModifier> arg3 = args ? gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap) : gsi::arg_maker<QFlags<Qt::KeyboardModifier> >() (Qt::NoModifier, heap);
-  QFlags<Qt::TouchPointState> arg4 = args ? gsi::arg_reader<QFlags<Qt::TouchPointState> >() (args, heap) : gsi::arg_maker<QFlags<Qt::TouchPointState> >() (0, heap);
+  QFlags<Qt::TouchPointState> arg4 = args ? gsi::arg_reader<QFlags<Qt::TouchPointState> >() (args, heap) : gsi::arg_maker<QFlags<Qt::TouchPointState> >() (Qt::TouchPointStates(), heap);
   const QList<QTouchEvent::TouchPoint> &arg5 = args ? gsi::arg_reader<const QList<QTouchEvent::TouchPoint> & >() (args, heap) : gsi::arg_maker<const QList<QTouchEvent::TouchPoint> & >() (QList<QTouchEvent::TouchPoint>(), heap);
   ret.write<QTouchEvent_Adaptor *> (new QTouchEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), arg2, arg3, arg4, arg5));
 }

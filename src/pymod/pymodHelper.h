@@ -27,7 +27,7 @@
  *  Use this helper file this way:
  *
  *  #include "pymodHelper.h"
- *  DEFINE_PYMOD(mymod, "mymod", "KLayout Test module klayout.mymod")
+ *  DEFINE_PYMOD(klayout.mymod, "mymod", "KLayout Test module klayout.mymod")
  */
 
 #include <Python.h>

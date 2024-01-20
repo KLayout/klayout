@@ -137,9 +137,9 @@ static gsi::Methods methods_QTouchEvent () {
   methods += new qt_gsi::GenericMethod ("isBeginEvent?", "@brief Method bool QTouchEvent::isBeginEvent()\nThis is a reimplementation of QPointerEvent::isBeginEvent", true, &_init_f_isBeginEvent_c0, &_call_f_isBeginEvent_c0);
   methods += new qt_gsi::GenericMethod ("isEndEvent?", "@brief Method bool QTouchEvent::isEndEvent()\nThis is a reimplementation of QPointerEvent::isEndEvent", true, &_init_f_isEndEvent_c0, &_call_f_isEndEvent_c0);
   methods += new qt_gsi::GenericMethod ("isUpdateEvent?", "@brief Method bool QTouchEvent::isUpdateEvent()\nThis is a reimplementation of QPointerEvent::isUpdateEvent", true, &_init_f_isUpdateEvent_c0, &_call_f_isUpdateEvent_c0);
-  methods += new qt_gsi::GenericMethod (":target", "@brief Method QObject *QTouchEvent::target()\n", true, &_init_f_target_c0, &_call_f_target_c0);
-  methods += new qt_gsi::GenericMethod (":touchPointStates", "@brief Method QFlags<QEventPoint::State> QTouchEvent::touchPointStates()\n", true, &_init_f_touchPointStates_c0, &_call_f_touchPointStates_c0);
-  methods += new qt_gsi::GenericMethod (":touchPoints", "@brief Method const QList<QEventPoint> &QTouchEvent::touchPoints()\n", true, &_init_f_touchPoints_c0, &_call_f_touchPoints_c0);
+  methods += new qt_gsi::GenericMethod ("target", "@brief Method QObject *QTouchEvent::target()\n", true, &_init_f_target_c0, &_call_f_target_c0);
+  methods += new qt_gsi::GenericMethod ("touchPointStates", "@brief Method QFlags<QEventPoint::State> QTouchEvent::touchPointStates()\n", true, &_init_f_touchPointStates_c0, &_call_f_touchPointStates_c0);
+  methods += new qt_gsi::GenericMethod ("touchPoints", "@brief Method const QList<QEventPoint> &QTouchEvent::touchPoints()\n", true, &_init_f_touchPoints_c0, &_call_f_touchPoints_c0);
   return methods;
 }
 

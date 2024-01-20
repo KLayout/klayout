@@ -288,18 +288,18 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QSequentialAnimationGroup::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QSequentialAnimationGroup::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QSequentialAnimationGroup::eventFilter(arg1, arg2);
+    return QSequentialAnimationGroup::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QSequentialAnimationGroup_Adaptor, bool, QObject *, QEvent *>(&QSequentialAnimationGroup_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QSequentialAnimationGroup_Adaptor, bool, QObject *, QEvent *>(&QSequentialAnimationGroup_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QSequentialAnimationGroup::eventFilter(arg1, arg2);
+      return QSequentialAnimationGroup::eventFilter(watched, event);
     }
   }
 
@@ -322,33 +322,33 @@ public:
     emit QSequentialAnimationGroup::stateChanged(newState, oldState);
   }
 
-  //  [adaptor impl] void QSequentialAnimationGroup::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QSequentialAnimationGroup::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QSequentialAnimationGroup::childEvent(arg1);
+    QSequentialAnimationGroup::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QSequentialAnimationGroup_Adaptor, QChildEvent *>(&QSequentialAnimationGroup_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QSequentialAnimationGroup_Adaptor, QChildEvent *>(&QSequentialAnimationGroup_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QSequentialAnimationGroup::childEvent(arg1);
+      QSequentialAnimationGroup::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QSequentialAnimationGroup::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QSequentialAnimationGroup::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QSequentialAnimationGroup::customEvent(arg1);
+    QSequentialAnimationGroup::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QSequentialAnimationGroup_Adaptor, QEvent *>(&QSequentialAnimationGroup_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QSequentialAnimationGroup_Adaptor, QEvent *>(&QSequentialAnimationGroup_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QSequentialAnimationGroup::customEvent(arg1);
+      QSequentialAnimationGroup::customEvent(event);
     }
   }
 
@@ -382,18 +382,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QSequentialAnimationGroup::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QSequentialAnimationGroup::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QSequentialAnimationGroup::timerEvent(arg1);
+    QSequentialAnimationGroup::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QSequentialAnimationGroup_Adaptor, QTimerEvent *>(&QSequentialAnimationGroup_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QSequentialAnimationGroup_Adaptor, QTimerEvent *>(&QSequentialAnimationGroup_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QSequentialAnimationGroup::timerEvent(arg1);
+      QSequentialAnimationGroup::timerEvent(event);
     }
   }
 
@@ -460,7 +460,7 @@ QSequentialAnimationGroup_Adaptor::~QSequentialAnimationGroup_Adaptor() { }
 
 static void _init_ctor_QSequentialAnimationGroup_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QSequentialAnimationGroup_Adaptor> ();
 }
@@ -469,16 +469,16 @@ static void _call_ctor_QSequentialAnimationGroup_Adaptor_1302 (const qt_gsi::Gen
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QSequentialAnimationGroup_Adaptor *> (new QSequentialAnimationGroup_Adaptor (arg1));
 }
 
 
-// void QSequentialAnimationGroup::childEvent(QChildEvent *)
+// void QSequentialAnimationGroup::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -534,11 +534,11 @@ static void _call_emitter_currentLoopChanged_767 (const qt_gsi::GenericMethod * 
 }
 
 
-// void QSequentialAnimationGroup::customEvent(QEvent *)
+// void QSequentialAnimationGroup::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -562,7 +562,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -571,7 +571,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QSequentialAnimationGroup_Adaptor *)cls)->emitter_QSequentialAnimationGroup_destroyed_1302 (arg1);
 }
 
@@ -660,13 +660,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QSequentialAnimationGroup::eventFilter(QObject *, QEvent *)
+// bool QSequentialAnimationGroup::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -803,11 +803,11 @@ static void _call_emitter_stateChanged_5680 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// void QSequentialAnimationGroup::timerEvent(QTimerEvent *)
+// void QSequentialAnimationGroup::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -910,11 +910,11 @@ gsi::Class<QSequentialAnimationGroup> &qtdecl_QSequentialAnimationGroup ();
 static gsi::Methods methods_QSequentialAnimationGroup_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSequentialAnimationGroup::QSequentialAnimationGroup(QObject *parent)\nThis method creates an object of class QSequentialAnimationGroup.", &_init_ctor_QSequentialAnimationGroup_Adaptor_1302, &_call_ctor_QSequentialAnimationGroup_Adaptor_1302);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QSequentialAnimationGroup::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QSequentialAnimationGroup::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("emit_currentAnimationChanged", "@brief Emitter for signal void QSequentialAnimationGroup::currentAnimationChanged(QAbstractAnimation *current)\nCall this method to emit this signal.", false, &_init_emitter_currentAnimationChanged_2451, &_call_emitter_currentAnimationChanged_2451);
   methods += new qt_gsi::GenericMethod ("emit_currentLoopChanged", "@brief Emitter for signal void QSequentialAnimationGroup::currentLoopChanged(int currentLoop)\nCall this method to emit this signal.", false, &_init_emitter_currentLoopChanged_767, &_call_emitter_currentLoopChanged_767);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QSequentialAnimationGroup::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QSequentialAnimationGroup::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QSequentialAnimationGroup::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("emit_directionChanged", "@brief Emitter for signal void QSequentialAnimationGroup::directionChanged(QAbstractAnimation::Direction)\nCall this method to emit this signal.", false, &_init_emitter_directionChanged_3310, &_call_emitter_directionChanged_3310);
@@ -924,7 +924,7 @@ static gsi::Methods methods_QSequentialAnimationGroup_Adaptor () {
   methods += new qt_gsi::GenericMethod ("duration", "@hide", true, &_init_cbs_duration_c0_0, &_call_cbs_duration_c0_0, &_set_callback_cbs_duration_c0_0);
   methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QSequentialAnimationGroup::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QSequentialAnimationGroup::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QSequentialAnimationGroup::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("emit_finished", "@brief Emitter for signal void QSequentialAnimationGroup::finished()\nCall this method to emit this signal.", false, &_init_emitter_finished_0, &_call_emitter_finished_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QSequentialAnimationGroup::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
@@ -933,7 +933,7 @@ static gsi::Methods methods_QSequentialAnimationGroup_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QSequentialAnimationGroup::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QSequentialAnimationGroup::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("emit_stateChanged", "@brief Emitter for signal void QSequentialAnimationGroup::stateChanged(QAbstractAnimation::State newState, QAbstractAnimation::State oldState)\nCall this method to emit this signal.", false, &_init_emitter_stateChanged_5680, &_call_emitter_stateChanged_5680);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QSequentialAnimationGroup::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QSequentialAnimationGroup::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*updateCurrentTime", "@brief Virtual method void QSequentialAnimationGroup::updateCurrentTime(int)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_updateCurrentTime_767_0, &_call_cbs_updateCurrentTime_767_0);
   methods += new qt_gsi::GenericMethod ("*updateCurrentTime", "@hide", false, &_init_cbs_updateCurrentTime_767_0, &_call_cbs_updateCurrentTime_767_0, &_set_callback_cbs_updateCurrentTime_767_0);

@@ -96,6 +96,7 @@ void run_pythontest (tl::TestBase *_this, const std::string &fn)
 #define PYTHONTEST(n, file) \
   TEST(n) { run_pythontest(_this, file); }
 
+PYTHONTEST (kwargs, "kwargs.py")
 PYTHONTEST (dbLayoutTest, "dbLayoutTest.py")
 PYTHONTEST (dbRegionTest, "dbRegionTest.py")
 PYTHONTEST (dbReaders, "dbReaders.py")
@@ -106,6 +107,7 @@ PYTHONTEST (dbLayoutToNetlist, "dbLayoutToNetlist.py")
 PYTHONTEST (dbLayoutVsSchematic, "dbLayoutVsSchematic.py")
 PYTHONTEST (dbNetlistCrossReference, "dbNetlistCrossReference.py")
 PYTHONTEST (layLayers, "layLayers.py")
+PYTHONTEST (layObjects, "layObjects.py")
 PYTHONTEST (layPixelBuffer, "layPixelBuffer.py")
 PYTHONTEST (tlTest, "tlTest.py")
 #if defined(HAVE_QT) && defined(HAVE_QTBINDINGS)

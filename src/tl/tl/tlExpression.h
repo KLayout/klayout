@@ -186,7 +186,25 @@ public:
   /**
    *  @brief Add a child node
    */
-  void add_child (ExpressionNode *node); 
+  void add_child (ExpressionNode *node);
+
+  /**
+   *  @brief Gets the name
+   *
+   *  The name is used for named arguments for example.
+   */
+  const std::string &name () const
+  {
+    return m_name;
+  }
+
+  /**
+   *  @brief Sets the name
+   */
+  void set_name (const std::string &name)
+  {
+    m_name = name;
+  }
 
   /**
    *  @brief Execute the node
@@ -201,6 +219,7 @@ public:
 protected:
   std::vector <ExpressionNode *> m_c;
   ExpressionParserContext m_context;
+  std::string m_name;
 
   /**
    *  @brief Sets the expression parent
@@ -244,7 +263,7 @@ public:
    *
    *  If no method of this kind exists, the implementation may throw a NoMethodError.
    */
-  virtual void execute (const ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args) const = 0;
+  virtual void execute (const ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const = 0;
 };
 
 /**
@@ -264,13 +283,18 @@ public:
   virtual ~EvalFunction () { }
 
   /**
+   *  @brief Specifies whether keyword parameters are supported
+   */
+  virtual bool supports_keyword_parameters () const { return false; }
+
+  /**
    *  @brief The actual execution method
    *
    *  @param ex The position inside the current expression
    *  @param args The arguments of the method
    *  @return The return value 
    */
-  virtual void execute (const ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args) const = 0;
+  virtual void execute (const ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const = 0;
 };
 
 /**

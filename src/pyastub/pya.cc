@@ -53,7 +53,7 @@ PythonInterpreter *PythonInterpreter::instance ()
 }
 
 void 
-PythonInterpreter::add_path (const std::string &)
+PythonInterpreter::add_path (const std::string &, bool prepend)
 {
   // .. nothing ..
 }

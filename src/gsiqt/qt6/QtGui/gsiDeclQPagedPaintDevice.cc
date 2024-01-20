@@ -194,12 +194,12 @@ static gsi::Methods methods_QPagedPaintDevice () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericMethod ("newPage", "@brief Method bool QPagedPaintDevice::newPage()\n", false, &_init_f_newPage_0, &_call_f_newPage_0);
   methods += new qt_gsi::GenericMethod ("pageLayout", "@brief Method QPageLayout QPagedPaintDevice::pageLayout()\n", true, &_init_f_pageLayout_c0, &_call_f_pageLayout_c0);
-  methods += new qt_gsi::GenericMethod ("pageRanges", "@brief Method QPageRanges QPagedPaintDevice::pageRanges()\n", true, &_init_f_pageRanges_c0, &_call_f_pageRanges_c0);
+  methods += new qt_gsi::GenericMethod (":pageRanges", "@brief Method QPageRanges QPagedPaintDevice::pageRanges()\n", true, &_init_f_pageRanges_c0, &_call_f_pageRanges_c0);
   methods += new qt_gsi::GenericMethod ("setPageLayout", "@brief Method bool QPagedPaintDevice::setPageLayout(const QPageLayout &pageLayout)\n", false, &_init_f_setPageLayout_2413, &_call_f_setPageLayout_2413);
   methods += new qt_gsi::GenericMethod ("setPageMargins", "@brief Method bool QPagedPaintDevice::setPageMargins(const QMarginsF &margins, QPageLayout::Unit units)\n", false, &_init_f_setPageMargins_4145, &_call_f_setPageMargins_4145);
   methods += new qt_gsi::GenericMethod ("setPageOrientation", "@brief Method bool QPagedPaintDevice::setPageOrientation(QPageLayout::Orientation orientation)\n", false, &_init_f_setPageOrientation_2816, &_call_f_setPageOrientation_2816);
-  methods += new qt_gsi::GenericMethod ("setPageRanges", "@brief Method void QPagedPaintDevice::setPageRanges(const QPageRanges &ranges)\n", false, &_init_f_setPageRanges_2383, &_call_f_setPageRanges_2383);
-  methods += new qt_gsi::GenericMethod ("setPageSize|pageSize=", "@brief Method bool QPagedPaintDevice::setPageSize(const QPageSize &pageSize)\n", false, &_init_f_setPageSize_2186, &_call_f_setPageSize_2186);
+  methods += new qt_gsi::GenericMethod ("setPageRanges|pageRanges=", "@brief Method void QPagedPaintDevice::setPageRanges(const QPageRanges &ranges)\n", false, &_init_f_setPageRanges_2383, &_call_f_setPageRanges_2383);
+  methods += new qt_gsi::GenericMethod ("setPageSize", "@brief Method bool QPagedPaintDevice::setPageSize(const QPageSize &pageSize)\n", false, &_init_f_setPageSize_2186, &_call_f_setPageSize_2186);
   return methods;
 }
 

@@ -210,6 +210,21 @@ static void _call_f_clipboard_0 (const qt_gsi::GenericStaticMethod * /*decl*/, g
 }
 
 
+// static QString QGuiApplication::desktopFileName()
+
+
+static void _init_f_desktopFileName_0 (qt_gsi::GenericStaticMethod *decl)
+{
+  decl->set_return<QString > ();
+}
+
+static void _call_f_desktopFileName_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QString > ((QString)QGuiApplication::desktopFileName ());
+}
+
+
 // static bool QGuiApplication::desktopSettingsAware()
 
 
@@ -297,6 +312,21 @@ static void _call_f_inputMethod_0 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QInputMethod * > ((QInputMethod *)QGuiApplication::inputMethod ());
+}
+
+
+// static bool QGuiApplication::isFallbackSessionManagementEnabled()
+
+
+static void _init_f_isFallbackSessionManagementEnabled_0 (qt_gsi::GenericStaticMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isFallbackSessionManagementEnabled_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)QGuiApplication::isFallbackSessionManagementEnabled ());
 }
 
 
@@ -496,6 +526,25 @@ static void _call_f_restoreOverrideCursor_0 (const qt_gsi::GenericStaticMethod *
 }
 
 
+// static QScreen *QGuiApplication::screenAt(const QPoint &point)
+
+
+static void _init_f_screenAt_1916 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("point");
+  decl->add_arg<const QPoint & > (argspec_0);
+  decl->set_return<QScreen * > ();
+}
+
+static void _call_f_screenAt_1916 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QPoint &arg1 = gsi::arg_reader<const QPoint & >() (args, heap);
+  ret.write<QScreen * > ((QScreen *)QGuiApplication::screenAt (arg1));
+}
+
+
 // static QList<QScreen *> QGuiApplication::screens()
 
 
@@ -531,6 +580,26 @@ static void _call_f_setApplicationDisplayName_2025 (const qt_gsi::GenericStaticM
 }
 
 
+// static void QGuiApplication::setDesktopFileName(const QString &name)
+
+
+static void _init_f_setDesktopFileName_2025 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("name");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setDesktopFileName_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  QGuiApplication::setDesktopFileName (arg1);
+}
+
+
 // static void QGuiApplication::setDesktopSettingsAware(bool on)
 
 
@@ -548,6 +617,26 @@ static void _call_f_setDesktopSettingsAware_864 (const qt_gsi::GenericStaticMeth
   bool arg1 = gsi::arg_reader<bool >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QGuiApplication::setDesktopSettingsAware (arg1);
+}
+
+
+// static void QGuiApplication::setFallbackSessionManagementEnabled(bool)
+
+
+static void _init_f_setFallbackSessionManagementEnabled_864 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setFallbackSessionManagementEnabled_864 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  QGuiApplication::setFallbackSessionManagementEnabled (arg1);
 }
 
 
@@ -813,6 +902,7 @@ static gsi::Methods methods_QGuiApplication () {
   methods += new qt_gsi::GenericMethod ("sessionId", "@brief Method QString QGuiApplication::sessionId()\n", true, &_init_f_sessionId_c0, &_call_f_sessionId_c0);
   methods += new qt_gsi::GenericMethod ("sessionKey", "@brief Method QString QGuiApplication::sessionKey()\n", true, &_init_f_sessionKey_c0, &_call_f_sessionKey_c0);
   methods += gsi::qt_signal ("aboutToQuit()", "aboutToQuit", "@brief Signal declaration for QGuiApplication::aboutToQuit()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("applicationDisplayNameChanged()", "applicationDisplayNameChanged", "@brief Signal declaration for QGuiApplication::applicationDisplayNameChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("applicationNameChanged()", "applicationNameChanged", "@brief Signal declaration for QGuiApplication::applicationNameChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<Qt::ApplicationState>::target_type & > ("applicationStateChanged(Qt::ApplicationState)", "applicationStateChanged", gsi::arg("state"), "@brief Signal declaration for QGuiApplication::applicationStateChanged(Qt::ApplicationState state)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("applicationVersionChanged()", "applicationVersionChanged", "@brief Signal declaration for QGuiApplication::applicationVersionChanged()\nYou can bind a procedure to this signal.");
@@ -820,6 +910,7 @@ static gsi::Methods methods_QGuiApplication () {
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QGuiApplication::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("focusObjectChanged(QObject *)", "focusObjectChanged", gsi::arg("focusObject"), "@brief Signal declaration for QGuiApplication::focusObjectChanged(QObject *focusObject)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QWindow * > ("focusWindowChanged(QWindow *)", "focusWindowChanged", gsi::arg("focusWindow"), "@brief Signal declaration for QGuiApplication::focusWindowChanged(QWindow *focusWindow)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QFont & > ("fontChanged(const QFont &)", "fontChanged", gsi::arg("font"), "@brief Signal declaration for QGuiApplication::fontChanged(const QFont &font)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("fontDatabaseChanged()", "fontDatabaseChanged", "@brief Signal declaration for QGuiApplication::fontDatabaseChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("lastWindowClosed()", "lastWindowClosed", "@brief Signal declaration for QGuiApplication::lastWindowClosed()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const qt_gsi::Converter<Qt::LayoutDirection>::target_type & > ("layoutDirectionChanged(Qt::LayoutDirection)", "layoutDirectionChanged", gsi::arg("direction"), "@brief Signal declaration for QGuiApplication::layoutDirectionChanged(Qt::LayoutDirection direction)\nYou can bind a procedure to this signal.");
@@ -827,6 +918,7 @@ static gsi::Methods methods_QGuiApplication () {
   methods += gsi::qt_signal ("organizationDomainChanged()", "organizationDomainChanged", "@brief Signal declaration for QGuiApplication::organizationDomainChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("organizationNameChanged()", "organizationNameChanged", "@brief Signal declaration for QGuiApplication::organizationNameChanged()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QPalette & > ("paletteChanged(const QPalette &)", "paletteChanged", gsi::arg("pal"), "@brief Signal declaration for QGuiApplication::paletteChanged(const QPalette &pal)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QScreen * > ("primaryScreenChanged(QScreen *)", "primaryScreenChanged", gsi::arg("screen"), "@brief Signal declaration for QGuiApplication::primaryScreenChanged(QScreen *screen)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QSessionManager & > ("saveStateRequest(QSessionManager &)", "saveStateRequest", gsi::arg("sessionManager"), "@brief Signal declaration for QGuiApplication::saveStateRequest(QSessionManager &sessionManager)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QScreen * > ("screenAdded(QScreen *)", "screenAdded", gsi::arg("screen"), "@brief Signal declaration for QGuiApplication::screenAdded(QScreen *screen)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QScreen * > ("screenRemoved(QScreen *)", "screenRemoved", gsi::arg("screen"), "@brief Signal declaration for QGuiApplication::screenRemoved(QScreen *screen)\nYou can bind a procedure to this signal.");
@@ -835,12 +927,14 @@ static gsi::Methods methods_QGuiApplication () {
   methods += new qt_gsi::GenericStaticMethod ("applicationState", "@brief Static method Qt::ApplicationState QGuiApplication::applicationState()\nThis method is static and can be called without an instance.", &_init_f_applicationState_0, &_call_f_applicationState_0);
   methods += new qt_gsi::GenericStaticMethod ("changeOverrideCursor", "@brief Static method void QGuiApplication::changeOverrideCursor(const QCursor &)\nThis method is static and can be called without an instance.", &_init_f_changeOverrideCursor_2032, &_call_f_changeOverrideCursor_2032);
   methods += new qt_gsi::GenericStaticMethod ("clipboard", "@brief Static method QClipboard *QGuiApplication::clipboard()\nThis method is static and can be called without an instance.", &_init_f_clipboard_0, &_call_f_clipboard_0);
+  methods += new qt_gsi::GenericStaticMethod (":desktopFileName", "@brief Static method QString QGuiApplication::desktopFileName()\nThis method is static and can be called without an instance.", &_init_f_desktopFileName_0, &_call_f_desktopFileName_0);
   methods += new qt_gsi::GenericStaticMethod (":desktopSettingsAware", "@brief Static method bool QGuiApplication::desktopSettingsAware()\nThis method is static and can be called without an instance.", &_init_f_desktopSettingsAware_0, &_call_f_desktopSettingsAware_0);
   methods += new qt_gsi::GenericStaticMethod ("exec", "@brief Static method int QGuiApplication::exec()\nThis method is static and can be called without an instance.", &_init_f_exec_0, &_call_f_exec_0);
   methods += new qt_gsi::GenericStaticMethod ("focusObject", "@brief Static method QObject *QGuiApplication::focusObject()\nThis method is static and can be called without an instance.", &_init_f_focusObject_0, &_call_f_focusObject_0);
   methods += new qt_gsi::GenericStaticMethod ("focusWindow", "@brief Static method QWindow *QGuiApplication::focusWindow()\nThis method is static and can be called without an instance.", &_init_f_focusWindow_0, &_call_f_focusWindow_0);
   methods += new qt_gsi::GenericStaticMethod (":font", "@brief Static method QFont QGuiApplication::font()\nThis method is static and can be called without an instance.", &_init_f_font_0, &_call_f_font_0);
   methods += new qt_gsi::GenericStaticMethod ("inputMethod", "@brief Static method QInputMethod *QGuiApplication::inputMethod()\nThis method is static and can be called without an instance.", &_init_f_inputMethod_0, &_call_f_inputMethod_0);
+  methods += new qt_gsi::GenericStaticMethod ("isFallbackSessionManagementEnabled?|:fallbackSessionManagementEnabled", "@brief Static method bool QGuiApplication::isFallbackSessionManagementEnabled()\nThis method is static and can be called without an instance.", &_init_f_isFallbackSessionManagementEnabled_0, &_call_f_isFallbackSessionManagementEnabled_0);
   methods += new qt_gsi::GenericStaticMethod ("isLeftToRight?", "@brief Static method bool QGuiApplication::isLeftToRight()\nThis method is static and can be called without an instance.", &_init_f_isLeftToRight_0, &_call_f_isLeftToRight_0);
   methods += new qt_gsi::GenericStaticMethod ("isRightToLeft?", "@brief Static method bool QGuiApplication::isRightToLeft()\nThis method is static and can be called without an instance.", &_init_f_isRightToLeft_0, &_call_f_isRightToLeft_0);
   methods += new qt_gsi::GenericStaticMethod ("keyboardModifiers", "@brief Static method QFlags<Qt::KeyboardModifier> QGuiApplication::keyboardModifiers()\nThis method is static and can be called without an instance.", &_init_f_keyboardModifiers_0, &_call_f_keyboardModifiers_0);
@@ -850,13 +944,16 @@ static gsi::Methods methods_QGuiApplication () {
   methods += new qt_gsi::GenericStaticMethod ("overrideCursor", "@brief Static method QCursor *QGuiApplication::overrideCursor()\nThis method is static and can be called without an instance.", &_init_f_overrideCursor_0, &_call_f_overrideCursor_0);
   methods += new qt_gsi::GenericStaticMethod (":palette", "@brief Static method QPalette QGuiApplication::palette()\nThis method is static and can be called without an instance.", &_init_f_palette_0, &_call_f_palette_0);
   methods += new qt_gsi::GenericStaticMethod (":platformName", "@brief Static method QString QGuiApplication::platformName()\nThis method is static and can be called without an instance.", &_init_f_platformName_0, &_call_f_platformName_0);
-  methods += new qt_gsi::GenericStaticMethod ("primaryScreen", "@brief Static method QScreen *QGuiApplication::primaryScreen()\nThis method is static and can be called without an instance.", &_init_f_primaryScreen_0, &_call_f_primaryScreen_0);
+  methods += new qt_gsi::GenericStaticMethod (":primaryScreen", "@brief Static method QScreen *QGuiApplication::primaryScreen()\nThis method is static and can be called without an instance.", &_init_f_primaryScreen_0, &_call_f_primaryScreen_0);
   methods += new qt_gsi::GenericStaticMethod ("queryKeyboardModifiers", "@brief Static method QFlags<Qt::KeyboardModifier> QGuiApplication::queryKeyboardModifiers()\nThis method is static and can be called without an instance.", &_init_f_queryKeyboardModifiers_0, &_call_f_queryKeyboardModifiers_0);
   methods += new qt_gsi::GenericStaticMethod (":quitOnLastWindowClosed", "@brief Static method bool QGuiApplication::quitOnLastWindowClosed()\nThis method is static and can be called without an instance.", &_init_f_quitOnLastWindowClosed_0, &_call_f_quitOnLastWindowClosed_0);
   methods += new qt_gsi::GenericStaticMethod ("restoreOverrideCursor", "@brief Static method void QGuiApplication::restoreOverrideCursor()\nThis method is static and can be called without an instance.", &_init_f_restoreOverrideCursor_0, &_call_f_restoreOverrideCursor_0);
+  methods += new qt_gsi::GenericStaticMethod ("screenAt", "@brief Static method QScreen *QGuiApplication::screenAt(const QPoint &point)\nThis method is static and can be called without an instance.", &_init_f_screenAt_1916, &_call_f_screenAt_1916);
   methods += new qt_gsi::GenericStaticMethod ("screens", "@brief Static method QList<QScreen *> QGuiApplication::screens()\nThis method is static and can be called without an instance.", &_init_f_screens_0, &_call_f_screens_0);
   methods += new qt_gsi::GenericStaticMethod ("setApplicationDisplayName|applicationDisplayName=", "@brief Static method void QGuiApplication::setApplicationDisplayName(const QString &name)\nThis method is static and can be called without an instance.", &_init_f_setApplicationDisplayName_2025, &_call_f_setApplicationDisplayName_2025);
+  methods += new qt_gsi::GenericStaticMethod ("setDesktopFileName|desktopFileName=", "@brief Static method void QGuiApplication::setDesktopFileName(const QString &name)\nThis method is static and can be called without an instance.", &_init_f_setDesktopFileName_2025, &_call_f_setDesktopFileName_2025);
   methods += new qt_gsi::GenericStaticMethod ("setDesktopSettingsAware|desktopSettingsAware=", "@brief Static method void QGuiApplication::setDesktopSettingsAware(bool on)\nThis method is static and can be called without an instance.", &_init_f_setDesktopSettingsAware_864, &_call_f_setDesktopSettingsAware_864);
+  methods += new qt_gsi::GenericStaticMethod ("setFallbackSessionManagementEnabled|fallbackSessionManagementEnabled=", "@brief Static method void QGuiApplication::setFallbackSessionManagementEnabled(bool)\nThis method is static and can be called without an instance.", &_init_f_setFallbackSessionManagementEnabled_864, &_call_f_setFallbackSessionManagementEnabled_864);
   methods += new qt_gsi::GenericStaticMethod ("setFont|font=", "@brief Static method void QGuiApplication::setFont(const QFont &)\nThis method is static and can be called without an instance.", &_init_f_setFont_1801, &_call_f_setFont_1801);
   methods += new qt_gsi::GenericStaticMethod ("setLayoutDirection|layoutDirection=", "@brief Static method void QGuiApplication::setLayoutDirection(Qt::LayoutDirection direction)\nThis method is static and can be called without an instance.", &_init_f_setLayoutDirection_2316, &_call_f_setLayoutDirection_2316);
   methods += new qt_gsi::GenericStaticMethod ("setOverrideCursor", "@brief Static method void QGuiApplication::setOverrideCursor(const QCursor &)\nThis method is static and can be called without an instance.", &_init_f_setOverrideCursor_2032, &_call_f_setOverrideCursor_2032);
@@ -937,6 +1034,12 @@ public:
     throw tl::Exception ("Can't emit private signal 'void QGuiApplication::aboutToQuit()'");
   }
 
+  //  [emitter impl] void QGuiApplication::applicationDisplayNameChanged()
+  void emitter_QGuiApplication_applicationDisplayNameChanged_0()
+  {
+    emit QGuiApplication::applicationDisplayNameChanged();
+  }
+
   //  [emitter impl] void QGuiApplication::applicationNameChanged()
   void emitter_QGuiApplication_applicationNameChanged_0()
   {
@@ -967,18 +1070,18 @@ public:
     emit QGuiApplication::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QGuiApplication::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QGuiApplication::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QGuiApplication::eventFilter(arg1, arg2);
+    return QGuiApplication::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QGuiApplication_Adaptor, bool, QObject *, QEvent *>(&QGuiApplication_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QGuiApplication_Adaptor, bool, QObject *, QEvent *>(&QGuiApplication_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QGuiApplication::eventFilter(arg1, arg2);
+      return QGuiApplication::eventFilter(watched, event);
     }
   }
 
@@ -992,6 +1095,12 @@ public:
   void emitter_QGuiApplication_focusWindowChanged_1335(QWindow *focusWindow)
   {
     emit QGuiApplication::focusWindowChanged(focusWindow);
+  }
+
+  //  [emitter impl] void QGuiApplication::fontChanged(const QFont &font)
+  void emitter_QGuiApplication_fontChanged_1801(const QFont &font)
+  {
+    emit QGuiApplication::fontChanged(font);
   }
 
   //  [emitter impl] void QGuiApplication::fontDatabaseChanged()
@@ -1037,6 +1146,12 @@ public:
     emit QGuiApplication::paletteChanged(pal);
   }
 
+  //  [emitter impl] void QGuiApplication::primaryScreenChanged(QScreen *screen)
+  void emitter_QGuiApplication_primaryScreenChanged_1311(QScreen *screen)
+  {
+    emit QGuiApplication::primaryScreenChanged(screen);
+  }
+
   //  [emitter impl] void QGuiApplication::saveStateRequest(QSessionManager &sessionManager)
   void emitter_QGuiApplication_saveStateRequest_2138(QSessionManager &sessionManager)
   {
@@ -1055,33 +1170,33 @@ public:
     emit QGuiApplication::screenRemoved(screen);
   }
 
-  //  [adaptor impl] void QGuiApplication::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QGuiApplication::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QGuiApplication::childEvent(arg1);
+    QGuiApplication::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QGuiApplication_Adaptor, QChildEvent *>(&QGuiApplication_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QGuiApplication_Adaptor, QChildEvent *>(&QGuiApplication_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QGuiApplication::childEvent(arg1);
+      QGuiApplication::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QGuiApplication::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QGuiApplication::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QGuiApplication::customEvent(arg1);
+    QGuiApplication::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QGuiApplication_Adaptor, QEvent *>(&QGuiApplication_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QGuiApplication_Adaptor, QEvent *>(&QGuiApplication_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QGuiApplication::customEvent(arg1);
+      QGuiApplication::customEvent(event);
     }
   }
 
@@ -1115,18 +1230,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QGuiApplication::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QGuiApplication::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QGuiApplication::timerEvent(arg1);
+    QGuiApplication::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QGuiApplication_Adaptor, QTimerEvent *>(&QGuiApplication_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QGuiApplication_Adaptor, QTimerEvent *>(&QGuiApplication_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QGuiApplication::timerEvent(arg1);
+      QGuiApplication::timerEvent(event);
     }
   }
 
@@ -1151,6 +1266,20 @@ static void _call_emitter_aboutToQuit_3584 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ((QGuiApplication_Adaptor *)cls)->emitter_QGuiApplication_aboutToQuit_3584 ();
+}
+
+
+// emitter void QGuiApplication::applicationDisplayNameChanged()
+
+static void _init_emitter_applicationDisplayNameChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_applicationDisplayNameChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QGuiApplication_Adaptor *)cls)->emitter_QGuiApplication_applicationDisplayNameChanged_0 ();
 }
 
 
@@ -1200,11 +1329,11 @@ static void _call_emitter_applicationVersionChanged_0 (const qt_gsi::GenericMeth
 }
 
 
-// void QGuiApplication::childEvent(QChildEvent *)
+// void QGuiApplication::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1242,11 +1371,11 @@ static void _call_emitter_commitDataRequest_2138 (const qt_gsi::GenericMethod * 
 }
 
 
-// void QGuiApplication::customEvent(QEvent *)
+// void QGuiApplication::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1270,7 +1399,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1279,7 +1408,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QGuiApplication_Adaptor *)cls)->emitter_QGuiApplication_destroyed_1302 (arg1);
 }
 
@@ -1331,13 +1460,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QGuiApplication::eventFilter(QObject *, QEvent *)
+// bool QGuiApplication::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -1390,6 +1519,24 @@ static void _call_emitter_focusWindowChanged_1335 (const qt_gsi::GenericMethod *
   tl::Heap heap;
   QWindow *arg1 = gsi::arg_reader<QWindow * >() (args, heap);
   ((QGuiApplication_Adaptor *)cls)->emitter_QGuiApplication_focusWindowChanged_1335 (arg1);
+}
+
+
+// emitter void QGuiApplication::fontChanged(const QFont &font)
+
+static void _init_emitter_fontChanged_1801 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("font");
+  decl->add_arg<const QFont & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_fontChanged_1801 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QFont &arg1 = gsi::arg_reader<const QFont & >() (args, heap);
+  ((QGuiApplication_Adaptor *)cls)->emitter_QGuiApplication_fontChanged_1801 (arg1);
 }
 
 
@@ -1521,6 +1668,24 @@ static void _call_emitter_paletteChanged_2113 (const qt_gsi::GenericMethod * /*d
 }
 
 
+// emitter void QGuiApplication::primaryScreenChanged(QScreen *screen)
+
+static void _init_emitter_primaryScreenChanged_1311 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("screen");
+  decl->add_arg<QScreen * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_primaryScreenChanged_1311 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QScreen *arg1 = gsi::arg_reader<QScreen * >() (args, heap);
+  ((QGuiApplication_Adaptor *)cls)->emitter_QGuiApplication_primaryScreenChanged_1311 (arg1);
+}
+
+
 // exposed int QGuiApplication::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -1621,11 +1786,11 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QGuiApplication::timerEvent(QTimerEvent *)
+// void QGuiApplication::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1653,23 +1818,25 @@ gsi::Class<QGuiApplication> &qtdecl_QGuiApplication ();
 static gsi::Methods methods_QGuiApplication_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericMethod ("emit_aboutToQuit", "@brief Emitter for signal void QGuiApplication::aboutToQuit()\nCall this method to emit this signal.", false, &_init_emitter_aboutToQuit_3584, &_call_emitter_aboutToQuit_3584);
+  methods += new qt_gsi::GenericMethod ("emit_applicationDisplayNameChanged", "@brief Emitter for signal void QGuiApplication::applicationDisplayNameChanged()\nCall this method to emit this signal.", false, &_init_emitter_applicationDisplayNameChanged_0, &_call_emitter_applicationDisplayNameChanged_0);
   methods += new qt_gsi::GenericMethod ("emit_applicationNameChanged", "@brief Emitter for signal void QGuiApplication::applicationNameChanged()\nCall this method to emit this signal.", false, &_init_emitter_applicationNameChanged_0, &_call_emitter_applicationNameChanged_0);
   methods += new qt_gsi::GenericMethod ("emit_applicationStateChanged", "@brief Emitter for signal void QGuiApplication::applicationStateChanged(Qt::ApplicationState state)\nCall this method to emit this signal.", false, &_init_emitter_applicationStateChanged_2402, &_call_emitter_applicationStateChanged_2402);
   methods += new qt_gsi::GenericMethod ("emit_applicationVersionChanged", "@brief Emitter for signal void QGuiApplication::applicationVersionChanged()\nCall this method to emit this signal.", false, &_init_emitter_applicationVersionChanged_0, &_call_emitter_applicationVersionChanged_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QGuiApplication::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QGuiApplication::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("emit_commitDataRequest", "@brief Emitter for signal void QGuiApplication::commitDataRequest(QSessionManager &sessionManager)\nCall this method to emit this signal.", false, &_init_emitter_commitDataRequest_2138, &_call_emitter_commitDataRequest_2138);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QGuiApplication::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QGuiApplication::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QGuiApplication::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QGuiApplication::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QGuiApplication::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QGuiApplication::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QGuiApplication::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("emit_focusObjectChanged", "@brief Emitter for signal void QGuiApplication::focusObjectChanged(QObject *focusObject)\nCall this method to emit this signal.", false, &_init_emitter_focusObjectChanged_1302, &_call_emitter_focusObjectChanged_1302);
   methods += new qt_gsi::GenericMethod ("emit_focusWindowChanged", "@brief Emitter for signal void QGuiApplication::focusWindowChanged(QWindow *focusWindow)\nCall this method to emit this signal.", false, &_init_emitter_focusWindowChanged_1335, &_call_emitter_focusWindowChanged_1335);
+  methods += new qt_gsi::GenericMethod ("emit_fontChanged", "@brief Emitter for signal void QGuiApplication::fontChanged(const QFont &font)\nCall this method to emit this signal.", false, &_init_emitter_fontChanged_1801, &_call_emitter_fontChanged_1801);
   methods += new qt_gsi::GenericMethod ("emit_fontDatabaseChanged", "@brief Emitter for signal void QGuiApplication::fontDatabaseChanged()\nCall this method to emit this signal.", false, &_init_emitter_fontDatabaseChanged_0, &_call_emitter_fontDatabaseChanged_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QGuiApplication::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("emit_lastWindowClosed", "@brief Emitter for signal void QGuiApplication::lastWindowClosed()\nCall this method to emit this signal.", false, &_init_emitter_lastWindowClosed_0, &_call_emitter_lastWindowClosed_0);
@@ -1678,13 +1845,14 @@ static gsi::Methods methods_QGuiApplication_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_organizationDomainChanged", "@brief Emitter for signal void QGuiApplication::organizationDomainChanged()\nCall this method to emit this signal.", false, &_init_emitter_organizationDomainChanged_0, &_call_emitter_organizationDomainChanged_0);
   methods += new qt_gsi::GenericMethod ("emit_organizationNameChanged", "@brief Emitter for signal void QGuiApplication::organizationNameChanged()\nCall this method to emit this signal.", false, &_init_emitter_organizationNameChanged_0, &_call_emitter_organizationNameChanged_0);
   methods += new qt_gsi::GenericMethod ("emit_paletteChanged", "@brief Emitter for signal void QGuiApplication::paletteChanged(const QPalette &pal)\nCall this method to emit this signal.", false, &_init_emitter_paletteChanged_2113, &_call_emitter_paletteChanged_2113);
+  methods += new qt_gsi::GenericMethod ("emit_primaryScreenChanged", "@brief Emitter for signal void QGuiApplication::primaryScreenChanged(QScreen *screen)\nCall this method to emit this signal.", false, &_init_emitter_primaryScreenChanged_1311, &_call_emitter_primaryScreenChanged_1311);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QGuiApplication::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("emit_saveStateRequest", "@brief Emitter for signal void QGuiApplication::saveStateRequest(QSessionManager &sessionManager)\nCall this method to emit this signal.", false, &_init_emitter_saveStateRequest_2138, &_call_emitter_saveStateRequest_2138);
   methods += new qt_gsi::GenericMethod ("emit_screenAdded", "@brief Emitter for signal void QGuiApplication::screenAdded(QScreen *screen)\nCall this method to emit this signal.", false, &_init_emitter_screenAdded_1311, &_call_emitter_screenAdded_1311);
   methods += new qt_gsi::GenericMethod ("emit_screenRemoved", "@brief Emitter for signal void QGuiApplication::screenRemoved(QScreen *screen)\nCall this method to emit this signal.", false, &_init_emitter_screenRemoved_1311, &_call_emitter_screenRemoved_1311);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QGuiApplication::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QGuiApplication::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QGuiApplication::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QGuiApplication::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

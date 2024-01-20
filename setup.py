@@ -942,6 +942,42 @@ lay = Extension(config.root + '.laycore',
                 sources=list(lay_sources))
 
 # ------------------------------------------------------------------
+# pya extension library (all inclusive, basis of pya module)
+
+pyacore_path = os.path.join("src", "pymod", "pya")
+pyacore_sources = set(glob.glob(os.path.join(pyacore_path, "*.cc")))
+
+pya = Extension(config.root + '.pyacore',
+                define_macros=config.macros(),
+                include_dirs=[_laybasic_path,
+                              _layview_path,
+                              _lib_path,
+                              _db_path,
+                              _rdb_path,
+                              _img_path,
+                              _ant_path,
+                              _edt_path,
+                              _lym_path,
+                              _tl_path,
+                              _gsi_path,
+                              _pya_path],
+                extra_objects=[config.path_of('_laybasic', _laybasic_path),
+                               config.path_of('_layview', _layview_path),
+                               config.path_of('_lib', _lib_path),
+                               config.path_of('_db', _db_path),
+                               config.path_of('_rdb', _rdb_path),
+                               config.path_of('_img', _img_path),
+                               config.path_of('_ant', _ant_path),
+                               config.path_of('_edt', _edt_path),
+                               config.path_of('_lym', _lym_path),
+                               config.path_of('_tl', _tl_path),
+                               config.path_of('_gsi', _gsi_path),
+                               config.path_of('_pya', _pya_path)],
+                extra_link_args=config.link_args('pyacore'),
+                extra_compile_args=config.compile_args('pyacore'),
+                sources=list(pyacore_sources))
+
+# ------------------------------------------------------------------
 # Core setup function
 
 if __name__ == "__main__":
@@ -977,6 +1013,6 @@ if __name__ == "__main__":
         include_package_data=True,
         ext_modules=[_tl, _gsi, _pya, _rba, _db, _lib, _rdb, _lym, _laybasic, _layview, _ant, _edt, _img]
             + db_plugins
-            + [tl, db, lib, rdb, lay],
+            + [tl, db, lib, rdb, lay, pya],
         cmdclass={'build_ext': klayout_build_ext}
     )

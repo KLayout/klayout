@@ -132,7 +132,7 @@ static gsi::Methods methods_QImageIOPlugin () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("capabilities", "@brief Method QFlags<QImageIOPlugin::Capability> QImageIOPlugin::capabilities(QIODevice *device, const QByteArray &format)\n", true, &_init_f_capabilities_c3648, &_call_f_capabilities_c3648);
-  methods += new qt_gsi::GenericMethod ("qt_create", "@brief Method QImageIOHandler *QImageIOPlugin::create(QIODevice *device, const QByteArray &format)\n", true, &_init_f_create_c3648, &_call_f_create_c3648);
+  methods += new qt_gsi::GenericMethod ("create|qt_create", "@brief Method QImageIOHandler *QImageIOPlugin::create(QIODevice *device, const QByteArray &format)\n", true, &_init_f_create_c3648, &_call_f_create_c3648);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QImageIOPlugin::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QImageIOPlugin::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QImageIOPlugin::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
@@ -664,8 +664,8 @@ static gsi::Methods methods_QImageIOPlugin_Adaptor () {
   methods += new qt_gsi::GenericMethod ("capabilities", "@hide", true, &_init_cbs_capabilities_c3648_0, &_call_cbs_capabilities_c3648_0, &_set_callback_cbs_capabilities_c3648_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QImageIOPlugin::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("qt_create", "@brief Virtual method QImageIOHandler *QImageIOPlugin::create(QIODevice *device, const QByteArray &format)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_create_c3648_1, &_call_cbs_create_c3648_1);
-  methods += new qt_gsi::GenericMethod ("qt_create", "@hide", true, &_init_cbs_create_c3648_1, &_call_cbs_create_c3648_1, &_set_callback_cbs_create_c3648_1);
+  methods += new qt_gsi::GenericMethod ("create|qt_create", "@brief Virtual method QImageIOHandler *QImageIOPlugin::create(QIODevice *device, const QByteArray &format)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_create_c3648_1, &_call_cbs_create_c3648_1);
+  methods += new qt_gsi::GenericMethod ("create|qt_create", "@hide", true, &_init_cbs_create_c3648_1, &_call_cbs_create_c3648_1, &_set_callback_cbs_create_c3648_1);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QImageIOPlugin::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QImageIOPlugin::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);

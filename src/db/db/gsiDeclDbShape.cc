@@ -1151,7 +1151,7 @@ Class<db::Shape> decl_Shape ("db", "Shape",
     "\n"
     "The \\Layout object can be used to retrieve the actual properties associated with the ID."
   ) +
-  gsi::method_ext ("prop_id=", &set_prop_id,
+  gsi::method_ext ("prop_id=", &set_prop_id, gsi::arg ("id"),
     "@brief Sets the properties ID of this shape\n"
     "\n"
     "The \\Layout object can be used to retrieve an ID for a given set of properties. "

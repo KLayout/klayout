@@ -136,6 +136,25 @@ static void _call_f_clear_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
+// bool QStandardItemModel::clearItemData(const QModelIndex &index)
+
+
+static void _init_f_clearItemData_2395 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("index");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_clearItemData_2395 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  ret.write<bool > ((bool)((QStandardItemModel *)cls)->clearItemData (arg1));
+}
+
+
 // int QStandardItemModel::columnCount(const QModelIndex &parent)
 
 
@@ -1314,6 +1333,7 @@ static gsi::Methods methods_QStandardItemModel () {
   methods += new qt_gsi::GenericMethod ("appendRow", "@brief Method void QStandardItemModel::appendRow(const QList<QStandardItem*> &items)\n", false, &_init_f_appendRow_3267, &_call_f_appendRow_3267);
   methods += new qt_gsi::GenericMethod ("appendRow", "@brief Method void QStandardItemModel::appendRow(QStandardItem *item)\n", false, &_init_f_appendRow_1919, &_call_f_appendRow_1919);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QStandardItemModel::clear()\n", false, &_init_f_clear_0, &_call_f_clear_0);
+  methods += new qt_gsi::GenericMethod ("clearItemData", "@brief Method bool QStandardItemModel::clearItemData(const QModelIndex &index)\n", false, &_init_f_clearItemData_2395, &_call_f_clearItemData_2395);
   methods += new qt_gsi::GenericMethod ("columnCount", "@brief Method int QStandardItemModel::columnCount(const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::columnCount", true, &_init_f_columnCount_c2395, &_call_f_columnCount_c2395);
   methods += new qt_gsi::GenericMethod ("data", "@brief Method QVariant QStandardItemModel::data(const QModelIndex &index, int role)\nThis is a reimplementation of QAbstractItemModel::data", true, &_init_f_data_c3054, &_call_f_data_c3054);
   methods += new qt_gsi::GenericMethod ("dropMimeData", "@brief Method bool QStandardItemModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::dropMimeData", false, &_init_f_dropMimeData_7425, &_call_f_dropMimeData_7425);
@@ -1724,33 +1744,33 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QStandardItemModel::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QStandardItemModel::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QStandardItemModel::event(arg1);
+    return QStandardItemModel::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QStandardItemModel_Adaptor, bool, QEvent *>(&QStandardItemModel_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QStandardItemModel_Adaptor, bool, QEvent *>(&QStandardItemModel_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QStandardItemModel::event(arg1);
+      return QStandardItemModel::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QStandardItemModel::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QStandardItemModel::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QStandardItemModel::eventFilter(arg1, arg2);
+    return QStandardItemModel::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QStandardItemModel_Adaptor, bool, QObject *, QEvent *>(&QStandardItemModel_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QStandardItemModel_Adaptor, bool, QObject *, QEvent *>(&QStandardItemModel_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QStandardItemModel::eventFilter(arg1, arg2);
+      return QStandardItemModel::eventFilter(watched, event);
     }
   }
 
@@ -2275,33 +2295,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QStandardItemModel::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QStandardItemModel::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QStandardItemModel::childEvent(arg1);
+    QStandardItemModel::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QStandardItemModel_Adaptor, QChildEvent *>(&QStandardItemModel_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QStandardItemModel_Adaptor, QChildEvent *>(&QStandardItemModel_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QStandardItemModel::childEvent(arg1);
+      QStandardItemModel::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QStandardItemModel::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QStandardItemModel::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QStandardItemModel::customEvent(arg1);
+    QStandardItemModel::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QStandardItemModel_Adaptor, QEvent *>(&QStandardItemModel_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QStandardItemModel_Adaptor, QEvent *>(&QStandardItemModel_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QStandardItemModel::customEvent(arg1);
+      QStandardItemModel::customEvent(event);
     }
   }
 
@@ -2320,18 +2340,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QStandardItemModel::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QStandardItemModel::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QStandardItemModel::timerEvent(arg1);
+    QStandardItemModel::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QStandardItemModel_Adaptor, QTimerEvent *>(&QStandardItemModel_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QStandardItemModel_Adaptor, QTimerEvent *>(&QStandardItemModel_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QStandardItemModel::timerEvent(arg1);
+      QStandardItemModel::timerEvent(event);
     }
   }
 
@@ -2383,7 +2403,7 @@ QStandardItemModel_Adaptor::~QStandardItemModel_Adaptor() { }
 
 static void _init_ctor_QStandardItemModel_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QStandardItemModel_Adaptor> ();
 }
@@ -2392,7 +2412,7 @@ static void _call_ctor_QStandardItemModel_Adaptor_1302 (const qt_gsi::GenericSta
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QStandardItemModel_Adaptor *> (new QStandardItemModel_Adaptor (arg1));
 }
 
@@ -2405,7 +2425,7 @@ static void _init_ctor_QStandardItemModel_Adaptor_2620 (qt_gsi::GenericStaticMet
   decl->add_arg<int > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("columns");
   decl->add_arg<int > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_2);
   decl->set_return_new<QStandardItemModel_Adaptor> ();
 }
@@ -2416,7 +2436,7 @@ static void _call_ctor_QStandardItemModel_Adaptor_2620 (const qt_gsi::GenericSta
   tl::Heap heap;
   int arg1 = gsi::arg_reader<int >() (args, heap);
   int arg2 = gsi::arg_reader<int >() (args, heap);
-  QObject *arg3 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg3 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QStandardItemModel_Adaptor *> (new QStandardItemModel_Adaptor (arg1, arg2, arg3));
 }
 
@@ -2721,11 +2741,11 @@ static void _call_fp_changePersistentIndexList_5912 (const qt_gsi::GenericMethod
 }
 
 
-// void QStandardItemModel::childEvent(QChildEvent *)
+// void QStandardItemModel::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2932,7 +2952,7 @@ static void _init_fp_createIndex_c2374 (qt_gsi::GenericMethod *decl)
   decl->add_arg<int > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("column");
   decl->add_arg<int > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("data", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("data", true, "nullptr");
   decl->add_arg<void * > (argspec_2);
   decl->set_return<QModelIndex > ();
 }
@@ -2943,7 +2963,7 @@ static void _call_fp_createIndex_c2374 (const qt_gsi::GenericMethod * /*decl*/, 
   tl::Heap heap;
   int arg1 = gsi::arg_reader<int >() (args, heap);
   int arg2 = gsi::arg_reader<int >() (args, heap);
-  void *arg3 = args ? gsi::arg_reader<void * >() (args, heap) : gsi::arg_maker<void * >() (0, heap);
+  void *arg3 = args ? gsi::arg_reader<void * >() (args, heap) : gsi::arg_maker<void * >() (nullptr, heap);
   ret.write<QModelIndex > ((QModelIndex)((QStandardItemModel_Adaptor *)cls)->fp_QStandardItemModel_createIndex_c2374 (arg1, arg2, arg3));
 }
 
@@ -2972,11 +2992,11 @@ static void _call_fp_createIndex_c2657 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// void QStandardItemModel::customEvent(QEvent *)
+// void QStandardItemModel::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3077,7 +3097,7 @@ static void _call_fp_decodeData_5302 (const qt_gsi::GenericMethod * /*decl*/, vo
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3086,7 +3106,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QStandardItemModel_Adaptor *)cls)->emitter_QStandardItemModel_destroyed_1302 (arg1);
 }
 
@@ -3277,11 +3297,11 @@ static void _call_fp_endResetModel_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// bool QStandardItemModel::event(QEvent *)
+// bool QStandardItemModel::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -3300,13 +3320,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QStandardItemModel::eventFilter(QObject *, QEvent *)
+// bool QStandardItemModel::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -4427,11 +4447,11 @@ static void _set_callback_cbs_supportedDropActions_c0_0 (void *cls, const gsi::C
 }
 
 
-// void QStandardItemModel::timerEvent(QTimerEvent *)
+// void QStandardItemModel::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -4475,7 +4495,7 @@ static gsi::Methods methods_QStandardItemModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("canFetchMore", "@hide", true, &_init_cbs_canFetchMore_c2395_0, &_call_cbs_canFetchMore_c2395_0, &_set_callback_cbs_canFetchMore_c2395_0);
   methods += new qt_gsi::GenericMethod ("*changePersistentIndex", "@brief Method void QStandardItemModel::changePersistentIndex(const QModelIndex &from, const QModelIndex &to)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_changePersistentIndex_4682, &_call_fp_changePersistentIndex_4682);
   methods += new qt_gsi::GenericMethod ("*changePersistentIndexList", "@brief Method void QStandardItemModel::changePersistentIndexList(const QList<QModelIndex> &from, const QList<QModelIndex> &to)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_changePersistentIndexList_5912, &_call_fp_changePersistentIndexList_5912);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QStandardItemModel::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QStandardItemModel::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("columnCount", "@brief Virtual method int QStandardItemModel::columnCount(const QModelIndex &parent)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_columnCount_c2395_1, &_call_cbs_columnCount_c2395_1);
   methods += new qt_gsi::GenericMethod ("columnCount", "@hide", true, &_init_cbs_columnCount_c2395_1, &_call_cbs_columnCount_c2395_1, &_set_callback_cbs_columnCount_c2395_1);
@@ -4487,7 +4507,7 @@ static gsi::Methods methods_QStandardItemModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_columnsRemoved", "@brief Emitter for signal void QStandardItemModel::columnsRemoved(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_columnsRemoved_7372, &_call_emitter_columnsRemoved_7372);
   methods += new qt_gsi::GenericMethod ("*createIndex", "@brief Method QModelIndex QStandardItemModel::createIndex(int row, int column, void *data)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_createIndex_c2374, &_call_fp_createIndex_c2374);
   methods += new qt_gsi::GenericMethod ("*createIndex", "@brief Method QModelIndex QStandardItemModel::createIndex(int row, int column, quintptr id)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_createIndex_c2657, &_call_fp_createIndex_c2657);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QStandardItemModel::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QStandardItemModel::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("data", "@brief Virtual method QVariant QStandardItemModel::data(const QModelIndex &index, int role)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_data_c3054_1, &_call_cbs_data_c3054_1);
   methods += new qt_gsi::GenericMethod ("data", "@hide", true, &_init_cbs_data_c3054_1, &_call_cbs_data_c3054_1, &_set_callback_cbs_data_c3054_1);
@@ -4506,9 +4526,9 @@ static gsi::Methods methods_QStandardItemModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*endRemoveColumns", "@brief Method void QStandardItemModel::endRemoveColumns()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_endRemoveColumns_0, &_call_fp_endRemoveColumns_0);
   methods += new qt_gsi::GenericMethod ("*endRemoveRows", "@brief Method void QStandardItemModel::endRemoveRows()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_endRemoveRows_0, &_call_fp_endRemoveRows_0);
   methods += new qt_gsi::GenericMethod ("*endResetModel", "@brief Method void QStandardItemModel::endResetModel()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_endResetModel_0, &_call_fp_endResetModel_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QStandardItemModel::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QStandardItemModel::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QStandardItemModel::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QStandardItemModel::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("fetchMore", "@brief Virtual method void QStandardItemModel::fetchMore(const QModelIndex &parent)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_fetchMore_2395_0, &_call_cbs_fetchMore_2395_0);
   methods += new qt_gsi::GenericMethod ("fetchMore", "@hide", false, &_init_cbs_fetchMore_2395_0, &_call_cbs_fetchMore_2395_0, &_set_callback_cbs_fetchMore_2395_0);
@@ -4585,7 +4605,7 @@ static gsi::Methods methods_QStandardItemModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("supportedDragActions", "@hide", true, &_init_cbs_supportedDragActions_c0_0, &_call_cbs_supportedDragActions_c0_0, &_set_callback_cbs_supportedDragActions_c0_0);
   methods += new qt_gsi::GenericMethod ("supportedDropActions", "@brief Virtual method QFlags<Qt::DropAction> QStandardItemModel::supportedDropActions()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_supportedDropActions_c0_0, &_call_cbs_supportedDropActions_c0_0);
   methods += new qt_gsi::GenericMethod ("supportedDropActions", "@hide", true, &_init_cbs_supportedDropActions_c0_0, &_call_cbs_supportedDropActions_c0_0, &_set_callback_cbs_supportedDropActions_c0_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QStandardItemModel::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QStandardItemModel::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

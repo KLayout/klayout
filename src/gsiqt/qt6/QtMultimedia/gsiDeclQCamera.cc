@@ -51,42 +51,6 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// void QCamera::activeChanged(bool)
-
-
-static void _init_f_activeChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_activeChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->activeChanged (arg1);
-}
-
-
-// void QCamera::brightnessChanged()
-
-
-static void _init_f_brightnessChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_brightnessChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->brightnessChanged ();
-}
-
-
 // QCameraDevice QCamera::cameraDevice()
 
 
@@ -102,22 +66,6 @@ static void _call_f_cameraDevice_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// void QCamera::cameraDeviceChanged()
-
-
-static void _init_f_cameraDeviceChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_cameraDeviceChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->cameraDeviceChanged ();
-}
-
-
 // QCameraFormat QCamera::cameraFormat()
 
 
@@ -130,22 +78,6 @@ static void _call_f_cameraFormat_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QCameraFormat > ((QCameraFormat)((QCamera *)cls)->cameraFormat ());
-}
-
-
-// void QCamera::cameraFormatChanged()
-
-
-static void _init_f_cameraFormatChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_cameraFormatChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->cameraFormatChanged ();
 }
 
 
@@ -179,38 +111,6 @@ static void _call_f_colorTemperature_c0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// void QCamera::colorTemperatureChanged()
-
-
-static void _init_f_colorTemperatureChanged_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_colorTemperatureChanged_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->colorTemperatureChanged ();
-}
-
-
-// void QCamera::contrastChanged()
-
-
-static void _init_f_contrastChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_contrastChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->contrastChanged ();
-}
-
-
 // QPointF QCamera::customFocusPoint()
 
 
@@ -226,22 +126,6 @@ static void _call_f_customFocusPoint_c0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// void QCamera::customFocusPointChanged()
-
-
-static void _init_f_customFocusPointChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_customFocusPointChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->customFocusPointChanged ();
-}
-
-
 // QCamera::Error QCamera::error()
 
 
@@ -254,45 +138,6 @@ static void _call_f_error_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qt_gsi::Converter<QCamera::Error>::target_type > ((qt_gsi::Converter<QCamera::Error>::target_type)qt_gsi::CppToQtAdaptor<QCamera::Error>(((QCamera *)cls)->error ()));
-}
-
-
-// void QCamera::errorChanged()
-
-
-static void _init_f_errorChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_errorChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->errorChanged ();
-}
-
-
-// void QCamera::errorOccurred(QCamera::Error error, const QString &errorString)
-
-
-static void _init_f_errorOccurred_3657 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("error");
-  decl->add_arg<const qt_gsi::Converter<QCamera::Error>::target_type & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("errorString");
-  decl->add_arg<const QString & > (argspec_1);
-  decl->set_return<void > ();
-}
-
-static void _call_f_errorOccurred_3657 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QCamera::Error>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCamera::Error>::target_type & >() (args, heap);
-  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->errorOccurred (qt_gsi::QtToCppAdaptor<QCamera::Error>(arg1).cref(), arg2);
 }
 
 
@@ -326,26 +171,6 @@ static void _call_f_exposureCompensation_c0 (const qt_gsi::GenericMethod * /*dec
 }
 
 
-// void QCamera::exposureCompensationChanged(float)
-
-
-static void _init_f_exposureCompensationChanged_970 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<float > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_exposureCompensationChanged_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  float arg1 = gsi::arg_reader<float >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->exposureCompensationChanged (arg1);
-}
-
-
 // QCamera::ExposureMode QCamera::exposureMode()
 
 
@@ -358,22 +183,6 @@ static void _call_f_exposureMode_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qt_gsi::Converter<QCamera::ExposureMode>::target_type > ((qt_gsi::Converter<QCamera::ExposureMode>::target_type)qt_gsi::CppToQtAdaptor<QCamera::ExposureMode>(((QCamera *)cls)->exposureMode ()));
-}
-
-
-// void QCamera::exposureModeChanged()
-
-
-static void _init_f_exposureModeChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_exposureModeChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->exposureModeChanged ();
 }
 
 
@@ -392,26 +201,6 @@ static void _call_f_exposureTime_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// void QCamera::exposureTimeChanged(float speed)
-
-
-static void _init_f_exposureTimeChanged_970 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("speed");
-  decl->add_arg<float > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_exposureTimeChanged_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  float arg1 = gsi::arg_reader<float >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->exposureTimeChanged (arg1);
-}
-
-
 // QCamera::FlashMode QCamera::flashMode()
 
 
@@ -424,42 +213,6 @@ static void _call_f_flashMode_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qt_gsi::Converter<QCamera::FlashMode>::target_type > ((qt_gsi::Converter<QCamera::FlashMode>::target_type)qt_gsi::CppToQtAdaptor<QCamera::FlashMode>(((QCamera *)cls)->flashMode ()));
-}
-
-
-// void QCamera::flashModeChanged()
-
-
-static void _init_f_flashModeChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_flashModeChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->flashModeChanged ();
-}
-
-
-// void QCamera::flashReady(bool)
-
-
-static void _init_f_flashReady_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_flashReady_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->flashReady (arg1);
 }
 
 
@@ -478,26 +231,6 @@ static void _call_f_focusDistance_c0 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// void QCamera::focusDistanceChanged(float)
-
-
-static void _init_f_focusDistanceChanged_970 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<float > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_focusDistanceChanged_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  float arg1 = gsi::arg_reader<float >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->focusDistanceChanged (arg1);
-}
-
-
 // QCamera::FocusMode QCamera::focusMode()
 
 
@@ -513,22 +246,6 @@ static void _call_f_focusMode_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// void QCamera::focusModeChanged()
-
-
-static void _init_f_focusModeChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_focusModeChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->focusModeChanged ();
-}
-
-
 // QPointF QCamera::focusPoint()
 
 
@@ -541,38 +258,6 @@ static void _call_f_focusPoint_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QPointF > ((QPointF)((QCamera *)cls)->focusPoint ());
-}
-
-
-// void QCamera::focusPointChanged()
-
-
-static void _init_f_focusPointChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_focusPointChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->focusPointChanged ();
-}
-
-
-// void QCamera::hueChanged()
-
-
-static void _init_f_hueChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_hueChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->hueChanged ();
 }
 
 
@@ -731,26 +416,6 @@ static void _call_f_isoSensitivity_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// void QCamera::isoSensitivityChanged(int)
-
-
-static void _init_f_isoSensitivityChanged_767 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_isoSensitivityChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->isoSensitivityChanged (arg1);
-}
-
-
 // float QCamera::manualExposureTime()
 
 
@@ -766,26 +431,6 @@ static void _call_f_manualExposureTime_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QCamera::manualExposureTimeChanged(float speed)
-
-
-static void _init_f_manualExposureTimeChanged_970 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("speed");
-  decl->add_arg<float > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_manualExposureTimeChanged_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  float arg1 = gsi::arg_reader<float >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->manualExposureTimeChanged (arg1);
-}
-
-
 // int QCamera::manualIsoSensitivity()
 
 
@@ -798,26 +443,6 @@ static void _call_f_manualIsoSensitivity_c0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<int > ((int)((QCamera *)cls)->manualIsoSensitivity ());
-}
-
-
-// void QCamera::manualIsoSensitivityChanged(int)
-
-
-static void _init_f_manualIsoSensitivityChanged_767 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_manualIsoSensitivityChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->manualIsoSensitivityChanged (arg1);
 }
 
 
@@ -866,26 +491,6 @@ static void _call_f_maximumZoomFactor_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// void QCamera::maximumZoomFactorChanged(float)
-
-
-static void _init_f_maximumZoomFactorChanged_970 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<float > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_maximumZoomFactorChanged_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  float arg1 = gsi::arg_reader<float >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->maximumZoomFactorChanged (arg1);
-}
-
-
 // float QCamera::minimumExposureTime()
 
 
@@ -928,42 +533,6 @@ static void _call_f_minimumZoomFactor_c0 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<float > ((float)((QCamera *)cls)->minimumZoomFactor ());
-}
-
-
-// void QCamera::minimumZoomFactorChanged(float)
-
-
-static void _init_f_minimumZoomFactorChanged_970 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<float > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_minimumZoomFactorChanged_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  float arg1 = gsi::arg_reader<float >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->minimumZoomFactorChanged (arg1);
-}
-
-
-// void QCamera::saturationChanged()
-
-
-static void _init_f_saturationChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_saturationChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->saturationChanged ();
 }
 
 
@@ -1346,22 +915,6 @@ static void _call_f_supportedFeatures_c0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// void QCamera::supportedFeaturesChanged()
-
-
-static void _init_f_supportedFeaturesChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_supportedFeaturesChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->supportedFeaturesChanged ();
-}
-
-
 // QCamera::TorchMode QCamera::torchMode()
 
 
@@ -1374,22 +927,6 @@ static void _call_f_torchMode_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qt_gsi::Converter<QCamera::TorchMode>::target_type > ((qt_gsi::Converter<QCamera::TorchMode>::target_type)qt_gsi::CppToQtAdaptor<QCamera::TorchMode>(((QCamera *)cls)->torchMode ()));
-}
-
-
-// void QCamera::torchModeChanged()
-
-
-static void _init_f_torchModeChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_torchModeChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->torchModeChanged ();
 }
 
 
@@ -1408,22 +945,6 @@ static void _call_f_whiteBalanceMode_c0 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
-// void QCamera::whiteBalanceModeChanged()
-
-
-static void _init_f_whiteBalanceModeChanged_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_whiteBalanceModeChanged_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->whiteBalanceModeChanged ();
-}
-
-
 // float QCamera::zoomFactor()
 
 
@@ -1436,26 +957,6 @@ static void _call_f_zoomFactor_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<float > ((float)((QCamera *)cls)->zoomFactor ());
-}
-
-
-// void QCamera::zoomFactorChanged(float)
-
-
-static void _init_f_zoomFactorChanged_970 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<float > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_zoomFactorChanged_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  float arg1 = gsi::arg_reader<float >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCamera *)cls)->zoomFactorChanged (arg1);
 }
 
 
@@ -1513,39 +1014,21 @@ namespace gsi
 static gsi::Methods methods_QCamera () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("activeChanged", "@brief Method void QCamera::activeChanged(bool)\n", false, &_init_f_activeChanged_864, &_call_f_activeChanged_864);
-  methods += new qt_gsi::GenericMethod ("brightnessChanged", "@brief Method void QCamera::brightnessChanged()\n", false, &_init_f_brightnessChanged_0, &_call_f_brightnessChanged_0);
-  methods += new qt_gsi::GenericMethod ("cameraDevice", "@brief Method QCameraDevice QCamera::cameraDevice()\n", true, &_init_f_cameraDevice_c0, &_call_f_cameraDevice_c0);
-  methods += new qt_gsi::GenericMethod ("cameraDeviceChanged", "@brief Method void QCamera::cameraDeviceChanged()\n", false, &_init_f_cameraDeviceChanged_0, &_call_f_cameraDeviceChanged_0);
-  methods += new qt_gsi::GenericMethod ("cameraFormat", "@brief Method QCameraFormat QCamera::cameraFormat()\n", true, &_init_f_cameraFormat_c0, &_call_f_cameraFormat_c0);
-  methods += new qt_gsi::GenericMethod ("cameraFormatChanged", "@brief Method void QCamera::cameraFormatChanged()\n", false, &_init_f_cameraFormatChanged_0, &_call_f_cameraFormatChanged_0);
+  methods += new qt_gsi::GenericMethod (":cameraDevice", "@brief Method QCameraDevice QCamera::cameraDevice()\n", true, &_init_f_cameraDevice_c0, &_call_f_cameraDevice_c0);
+  methods += new qt_gsi::GenericMethod (":cameraFormat", "@brief Method QCameraFormat QCamera::cameraFormat()\n", true, &_init_f_cameraFormat_c0, &_call_f_cameraFormat_c0);
   methods += new qt_gsi::GenericMethod ("captureSession", "@brief Method QMediaCaptureSession *QCamera::captureSession()\n", true, &_init_f_captureSession_c0, &_call_f_captureSession_c0);
-  methods += new qt_gsi::GenericMethod ("colorTemperature", "@brief Method int QCamera::colorTemperature()\n", true, &_init_f_colorTemperature_c0, &_call_f_colorTemperature_c0);
-  methods += new qt_gsi::GenericMethod ("colorTemperatureChanged", "@brief Method void QCamera::colorTemperatureChanged()\n", true, &_init_f_colorTemperatureChanged_c0, &_call_f_colorTemperatureChanged_c0);
-  methods += new qt_gsi::GenericMethod ("contrastChanged", "@brief Method void QCamera::contrastChanged()\n", false, &_init_f_contrastChanged_0, &_call_f_contrastChanged_0);
-  methods += new qt_gsi::GenericMethod ("customFocusPoint", "@brief Method QPointF QCamera::customFocusPoint()\n", true, &_init_f_customFocusPoint_c0, &_call_f_customFocusPoint_c0);
-  methods += new qt_gsi::GenericMethod ("customFocusPointChanged", "@brief Method void QCamera::customFocusPointChanged()\n", false, &_init_f_customFocusPointChanged_0, &_call_f_customFocusPointChanged_0);
-  methods += new qt_gsi::GenericMethod ("error", "@brief Method QCamera::Error QCamera::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
-  methods += new qt_gsi::GenericMethod ("errorChanged", "@brief Method void QCamera::errorChanged()\n", false, &_init_f_errorChanged_0, &_call_f_errorChanged_0);
-  methods += new qt_gsi::GenericMethod ("errorOccurred", "@brief Method void QCamera::errorOccurred(QCamera::Error error, const QString &errorString)\n", false, &_init_f_errorOccurred_3657, &_call_f_errorOccurred_3657);
-  methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QCamera::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
-  methods += new qt_gsi::GenericMethod ("exposureCompensation", "@brief Method float QCamera::exposureCompensation()\n", true, &_init_f_exposureCompensation_c0, &_call_f_exposureCompensation_c0);
-  methods += new qt_gsi::GenericMethod ("exposureCompensationChanged", "@brief Method void QCamera::exposureCompensationChanged(float)\n", false, &_init_f_exposureCompensationChanged_970, &_call_f_exposureCompensationChanged_970);
-  methods += new qt_gsi::GenericMethod ("exposureMode", "@brief Method QCamera::ExposureMode QCamera::exposureMode()\n", true, &_init_f_exposureMode_c0, &_call_f_exposureMode_c0);
-  methods += new qt_gsi::GenericMethod ("exposureModeChanged", "@brief Method void QCamera::exposureModeChanged()\n", false, &_init_f_exposureModeChanged_0, &_call_f_exposureModeChanged_0);
-  methods += new qt_gsi::GenericMethod ("exposureTime", "@brief Method float QCamera::exposureTime()\n", true, &_init_f_exposureTime_c0, &_call_f_exposureTime_c0);
-  methods += new qt_gsi::GenericMethod ("exposureTimeChanged", "@brief Method void QCamera::exposureTimeChanged(float speed)\n", false, &_init_f_exposureTimeChanged_970, &_call_f_exposureTimeChanged_970);
-  methods += new qt_gsi::GenericMethod ("flashMode", "@brief Method QCamera::FlashMode QCamera::flashMode()\n", true, &_init_f_flashMode_c0, &_call_f_flashMode_c0);
-  methods += new qt_gsi::GenericMethod ("flashModeChanged", "@brief Method void QCamera::flashModeChanged()\n", false, &_init_f_flashModeChanged_0, &_call_f_flashModeChanged_0);
-  methods += new qt_gsi::GenericMethod ("flashReady", "@brief Method void QCamera::flashReady(bool)\n", false, &_init_f_flashReady_864, &_call_f_flashReady_864);
-  methods += new qt_gsi::GenericMethod ("focusDistance", "@brief Method float QCamera::focusDistance()\n", true, &_init_f_focusDistance_c0, &_call_f_focusDistance_c0);
-  methods += new qt_gsi::GenericMethod ("focusDistanceChanged", "@brief Method void QCamera::focusDistanceChanged(float)\n", false, &_init_f_focusDistanceChanged_970, &_call_f_focusDistanceChanged_970);
-  methods += new qt_gsi::GenericMethod ("focusMode", "@brief Method QCamera::FocusMode QCamera::focusMode()\n", true, &_init_f_focusMode_c0, &_call_f_focusMode_c0);
-  methods += new qt_gsi::GenericMethod ("focusModeChanged", "@brief Method void QCamera::focusModeChanged()\n", false, &_init_f_focusModeChanged_0, &_call_f_focusModeChanged_0);
-  methods += new qt_gsi::GenericMethod ("focusPoint", "@brief Method QPointF QCamera::focusPoint()\n", true, &_init_f_focusPoint_c0, &_call_f_focusPoint_c0);
-  methods += new qt_gsi::GenericMethod ("focusPointChanged", "@brief Method void QCamera::focusPointChanged()\n", false, &_init_f_focusPointChanged_0, &_call_f_focusPointChanged_0);
-  methods += new qt_gsi::GenericMethod ("hueChanged", "@brief Method void QCamera::hueChanged()\n", false, &_init_f_hueChanged_0, &_call_f_hueChanged_0);
-  methods += new qt_gsi::GenericMethod ("isActive?", "@brief Method bool QCamera::isActive()\n", true, &_init_f_isActive_c0, &_call_f_isActive_c0);
+  methods += new qt_gsi::GenericMethod (":colorTemperature", "@brief Method int QCamera::colorTemperature()\n", true, &_init_f_colorTemperature_c0, &_call_f_colorTemperature_c0);
+  methods += new qt_gsi::GenericMethod (":customFocusPoint", "@brief Method QPointF QCamera::customFocusPoint()\n", true, &_init_f_customFocusPoint_c0, &_call_f_customFocusPoint_c0);
+  methods += new qt_gsi::GenericMethod (":error", "@brief Method QCamera::Error QCamera::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
+  methods += new qt_gsi::GenericMethod (":errorString", "@brief Method QString QCamera::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
+  methods += new qt_gsi::GenericMethod (":exposureCompensation", "@brief Method float QCamera::exposureCompensation()\n", true, &_init_f_exposureCompensation_c0, &_call_f_exposureCompensation_c0);
+  methods += new qt_gsi::GenericMethod (":exposureMode", "@brief Method QCamera::ExposureMode QCamera::exposureMode()\n", true, &_init_f_exposureMode_c0, &_call_f_exposureMode_c0);
+  methods += new qt_gsi::GenericMethod (":exposureTime", "@brief Method float QCamera::exposureTime()\n", true, &_init_f_exposureTime_c0, &_call_f_exposureTime_c0);
+  methods += new qt_gsi::GenericMethod (":flashMode", "@brief Method QCamera::FlashMode QCamera::flashMode()\n", true, &_init_f_flashMode_c0, &_call_f_flashMode_c0);
+  methods += new qt_gsi::GenericMethod (":focusDistance", "@brief Method float QCamera::focusDistance()\n", true, &_init_f_focusDistance_c0, &_call_f_focusDistance_c0);
+  methods += new qt_gsi::GenericMethod (":focusMode", "@brief Method QCamera::FocusMode QCamera::focusMode()\n", true, &_init_f_focusMode_c0, &_call_f_focusMode_c0);
+  methods += new qt_gsi::GenericMethod (":focusPoint", "@brief Method QPointF QCamera::focusPoint()\n", true, &_init_f_focusPoint_c0, &_call_f_focusPoint_c0);
+  methods += new qt_gsi::GenericMethod ("isActive?|:active", "@brief Method bool QCamera::isActive()\n", true, &_init_f_isActive_c0, &_call_f_isActive_c0);
   methods += new qt_gsi::GenericMethod ("isAvailable?", "@brief Method bool QCamera::isAvailable()\n", true, &_init_f_isAvailable_c0, &_call_f_isAvailable_c0);
   methods += new qt_gsi::GenericMethod ("isExposureModeSupported?", "@brief Method bool QCamera::isExposureModeSupported(QCamera::ExposureMode mode)\n", true, &_init_f_isExposureModeSupported_c2466, &_call_f_isExposureModeSupported_c2466);
   methods += new qt_gsi::GenericMethod ("isFlashModeSupported?", "@brief Method bool QCamera::isFlashModeSupported(QCamera::FlashMode mode)\n", true, &_init_f_isFlashModeSupported_c2101, &_call_f_isFlashModeSupported_c2101);
@@ -1553,49 +1036,69 @@ static gsi::Methods methods_QCamera () {
   methods += new qt_gsi::GenericMethod ("isFocusModeSupported?", "@brief Method bool QCamera::isFocusModeSupported(QCamera::FocusMode mode)\n", true, &_init_f_isFocusModeSupported_c2119, &_call_f_isFocusModeSupported_c2119);
   methods += new qt_gsi::GenericMethod ("isTorchModeSupported?", "@brief Method bool QCamera::isTorchModeSupported(QCamera::TorchMode mode)\n", true, &_init_f_isTorchModeSupported_c2119, &_call_f_isTorchModeSupported_c2119);
   methods += new qt_gsi::GenericMethod ("isWhiteBalanceModeSupported?", "@brief Method bool QCamera::isWhiteBalanceModeSupported(QCamera::WhiteBalanceMode mode)\n", true, &_init_f_isWhiteBalanceModeSupported_c2798, &_call_f_isWhiteBalanceModeSupported_c2798);
-  methods += new qt_gsi::GenericMethod ("isoSensitivity", "@brief Method int QCamera::isoSensitivity()\n", true, &_init_f_isoSensitivity_c0, &_call_f_isoSensitivity_c0);
-  methods += new qt_gsi::GenericMethod ("isoSensitivityChanged", "@brief Method void QCamera::isoSensitivityChanged(int)\n", false, &_init_f_isoSensitivityChanged_767, &_call_f_isoSensitivityChanged_767);
-  methods += new qt_gsi::GenericMethod ("manualExposureTime", "@brief Method float QCamera::manualExposureTime()\n", true, &_init_f_manualExposureTime_c0, &_call_f_manualExposureTime_c0);
-  methods += new qt_gsi::GenericMethod ("manualExposureTimeChanged", "@brief Method void QCamera::manualExposureTimeChanged(float speed)\n", false, &_init_f_manualExposureTimeChanged_970, &_call_f_manualExposureTimeChanged_970);
-  methods += new qt_gsi::GenericMethod ("manualIsoSensitivity", "@brief Method int QCamera::manualIsoSensitivity()\n", true, &_init_f_manualIsoSensitivity_c0, &_call_f_manualIsoSensitivity_c0);
-  methods += new qt_gsi::GenericMethod ("manualIsoSensitivityChanged", "@brief Method void QCamera::manualIsoSensitivityChanged(int)\n", false, &_init_f_manualIsoSensitivityChanged_767, &_call_f_manualIsoSensitivityChanged_767);
+  methods += new qt_gsi::GenericMethod (":isoSensitivity", "@brief Method int QCamera::isoSensitivity()\n", true, &_init_f_isoSensitivity_c0, &_call_f_isoSensitivity_c0);
+  methods += new qt_gsi::GenericMethod (":manualExposureTime", "@brief Method float QCamera::manualExposureTime()\n", true, &_init_f_manualExposureTime_c0, &_call_f_manualExposureTime_c0);
+  methods += new qt_gsi::GenericMethod (":manualIsoSensitivity", "@brief Method int QCamera::manualIsoSensitivity()\n", true, &_init_f_manualIsoSensitivity_c0, &_call_f_manualIsoSensitivity_c0);
   methods += new qt_gsi::GenericMethod ("maximumExposureTime", "@brief Method float QCamera::maximumExposureTime()\n", true, &_init_f_maximumExposureTime_c0, &_call_f_maximumExposureTime_c0);
   methods += new qt_gsi::GenericMethod ("maximumIsoSensitivity", "@brief Method int QCamera::maximumIsoSensitivity()\n", true, &_init_f_maximumIsoSensitivity_c0, &_call_f_maximumIsoSensitivity_c0);
-  methods += new qt_gsi::GenericMethod ("maximumZoomFactor", "@brief Method float QCamera::maximumZoomFactor()\n", true, &_init_f_maximumZoomFactor_c0, &_call_f_maximumZoomFactor_c0);
-  methods += new qt_gsi::GenericMethod ("maximumZoomFactorChanged", "@brief Method void QCamera::maximumZoomFactorChanged(float)\n", false, &_init_f_maximumZoomFactorChanged_970, &_call_f_maximumZoomFactorChanged_970);
+  methods += new qt_gsi::GenericMethod (":maximumZoomFactor", "@brief Method float QCamera::maximumZoomFactor()\n", true, &_init_f_maximumZoomFactor_c0, &_call_f_maximumZoomFactor_c0);
   methods += new qt_gsi::GenericMethod ("minimumExposureTime", "@brief Method float QCamera::minimumExposureTime()\n", true, &_init_f_minimumExposureTime_c0, &_call_f_minimumExposureTime_c0);
   methods += new qt_gsi::GenericMethod ("minimumIsoSensitivity", "@brief Method int QCamera::minimumIsoSensitivity()\n", true, &_init_f_minimumIsoSensitivity_c0, &_call_f_minimumIsoSensitivity_c0);
-  methods += new qt_gsi::GenericMethod ("minimumZoomFactor", "@brief Method float QCamera::minimumZoomFactor()\n", true, &_init_f_minimumZoomFactor_c0, &_call_f_minimumZoomFactor_c0);
-  methods += new qt_gsi::GenericMethod ("minimumZoomFactorChanged", "@brief Method void QCamera::minimumZoomFactorChanged(float)\n", false, &_init_f_minimumZoomFactorChanged_970, &_call_f_minimumZoomFactorChanged_970);
-  methods += new qt_gsi::GenericMethod ("saturationChanged", "@brief Method void QCamera::saturationChanged()\n", false, &_init_f_saturationChanged_0, &_call_f_saturationChanged_0);
-  methods += new qt_gsi::GenericMethod ("setActive", "@brief Method void QCamera::setActive(bool active)\n", false, &_init_f_setActive_864, &_call_f_setActive_864);
+  methods += new qt_gsi::GenericMethod (":minimumZoomFactor", "@brief Method float QCamera::minimumZoomFactor()\n", true, &_init_f_minimumZoomFactor_c0, &_call_f_minimumZoomFactor_c0);
+  methods += new qt_gsi::GenericMethod ("setActive|active=", "@brief Method void QCamera::setActive(bool active)\n", false, &_init_f_setActive_864, &_call_f_setActive_864);
   methods += new qt_gsi::GenericMethod ("setAutoExposureTime", "@brief Method void QCamera::setAutoExposureTime()\n", false, &_init_f_setAutoExposureTime_0, &_call_f_setAutoExposureTime_0);
   methods += new qt_gsi::GenericMethod ("setAutoIsoSensitivity", "@brief Method void QCamera::setAutoIsoSensitivity()\n", false, &_init_f_setAutoIsoSensitivity_0, &_call_f_setAutoIsoSensitivity_0);
-  methods += new qt_gsi::GenericMethod ("setCameraDevice", "@brief Method void QCamera::setCameraDevice(const QCameraDevice &cameraDevice)\n", false, &_init_f_setCameraDevice_2571, &_call_f_setCameraDevice_2571);
-  methods += new qt_gsi::GenericMethod ("setCameraFormat", "@brief Method void QCamera::setCameraFormat(const QCameraFormat &format)\n", false, &_init_f_setCameraFormat_2596, &_call_f_setCameraFormat_2596);
-  methods += new qt_gsi::GenericMethod ("setColorTemperature", "@brief Method void QCamera::setColorTemperature(int colorTemperature)\n", false, &_init_f_setColorTemperature_767, &_call_f_setColorTemperature_767);
-  methods += new qt_gsi::GenericMethod ("setCustomFocusPoint", "@brief Method void QCamera::setCustomFocusPoint(const QPointF &point)\n", false, &_init_f_setCustomFocusPoint_1986, &_call_f_setCustomFocusPoint_1986);
-  methods += new qt_gsi::GenericMethod ("setExposureCompensation", "@brief Method void QCamera::setExposureCompensation(float ev)\n", false, &_init_f_setExposureCompensation_970, &_call_f_setExposureCompensation_970);
-  methods += new qt_gsi::GenericMethod ("setExposureMode", "@brief Method void QCamera::setExposureMode(QCamera::ExposureMode mode)\n", false, &_init_f_setExposureMode_2466, &_call_f_setExposureMode_2466);
-  methods += new qt_gsi::GenericMethod ("setFlashMode", "@brief Method void QCamera::setFlashMode(QCamera::FlashMode mode)\n", false, &_init_f_setFlashMode_2101, &_call_f_setFlashMode_2101);
-  methods += new qt_gsi::GenericMethod ("setFocusDistance", "@brief Method void QCamera::setFocusDistance(float d)\n", false, &_init_f_setFocusDistance_970, &_call_f_setFocusDistance_970);
-  methods += new qt_gsi::GenericMethod ("setFocusMode", "@brief Method void QCamera::setFocusMode(QCamera::FocusMode mode)\n", false, &_init_f_setFocusMode_2119, &_call_f_setFocusMode_2119);
-  methods += new qt_gsi::GenericMethod ("setManualExposureTime", "@brief Method void QCamera::setManualExposureTime(float seconds)\n", false, &_init_f_setManualExposureTime_970, &_call_f_setManualExposureTime_970);
-  methods += new qt_gsi::GenericMethod ("setManualIsoSensitivity", "@brief Method void QCamera::setManualIsoSensitivity(int iso)\n", false, &_init_f_setManualIsoSensitivity_767, &_call_f_setManualIsoSensitivity_767);
-  methods += new qt_gsi::GenericMethod ("setTorchMode", "@brief Method void QCamera::setTorchMode(QCamera::TorchMode mode)\n", false, &_init_f_setTorchMode_2119, &_call_f_setTorchMode_2119);
-  methods += new qt_gsi::GenericMethod ("setWhiteBalanceMode", "@brief Method void QCamera::setWhiteBalanceMode(QCamera::WhiteBalanceMode mode)\n", false, &_init_f_setWhiteBalanceMode_2798, &_call_f_setWhiteBalanceMode_2798);
-  methods += new qt_gsi::GenericMethod ("setZoomFactor", "@brief Method void QCamera::setZoomFactor(float factor)\n", false, &_init_f_setZoomFactor_970, &_call_f_setZoomFactor_970);
+  methods += new qt_gsi::GenericMethod ("setCameraDevice|cameraDevice=", "@brief Method void QCamera::setCameraDevice(const QCameraDevice &cameraDevice)\n", false, &_init_f_setCameraDevice_2571, &_call_f_setCameraDevice_2571);
+  methods += new qt_gsi::GenericMethod ("setCameraFormat|cameraFormat=", "@brief Method void QCamera::setCameraFormat(const QCameraFormat &format)\n", false, &_init_f_setCameraFormat_2596, &_call_f_setCameraFormat_2596);
+  methods += new qt_gsi::GenericMethod ("setColorTemperature|colorTemperature=", "@brief Method void QCamera::setColorTemperature(int colorTemperature)\n", false, &_init_f_setColorTemperature_767, &_call_f_setColorTemperature_767);
+  methods += new qt_gsi::GenericMethod ("setCustomFocusPoint|customFocusPoint=", "@brief Method void QCamera::setCustomFocusPoint(const QPointF &point)\n", false, &_init_f_setCustomFocusPoint_1986, &_call_f_setCustomFocusPoint_1986);
+  methods += new qt_gsi::GenericMethod ("setExposureCompensation|exposureCompensation=", "@brief Method void QCamera::setExposureCompensation(float ev)\n", false, &_init_f_setExposureCompensation_970, &_call_f_setExposureCompensation_970);
+  methods += new qt_gsi::GenericMethod ("setExposureMode|exposureMode=", "@brief Method void QCamera::setExposureMode(QCamera::ExposureMode mode)\n", false, &_init_f_setExposureMode_2466, &_call_f_setExposureMode_2466);
+  methods += new qt_gsi::GenericMethod ("setFlashMode|flashMode=", "@brief Method void QCamera::setFlashMode(QCamera::FlashMode mode)\n", false, &_init_f_setFlashMode_2101, &_call_f_setFlashMode_2101);
+  methods += new qt_gsi::GenericMethod ("setFocusDistance|focusDistance=", "@brief Method void QCamera::setFocusDistance(float d)\n", false, &_init_f_setFocusDistance_970, &_call_f_setFocusDistance_970);
+  methods += new qt_gsi::GenericMethod ("setFocusMode|focusMode=", "@brief Method void QCamera::setFocusMode(QCamera::FocusMode mode)\n", false, &_init_f_setFocusMode_2119, &_call_f_setFocusMode_2119);
+  methods += new qt_gsi::GenericMethod ("setManualExposureTime|manualExposureTime=", "@brief Method void QCamera::setManualExposureTime(float seconds)\n", false, &_init_f_setManualExposureTime_970, &_call_f_setManualExposureTime_970);
+  methods += new qt_gsi::GenericMethod ("setManualIsoSensitivity|manualIsoSensitivity=", "@brief Method void QCamera::setManualIsoSensitivity(int iso)\n", false, &_init_f_setManualIsoSensitivity_767, &_call_f_setManualIsoSensitivity_767);
+  methods += new qt_gsi::GenericMethod ("setTorchMode|torchMode=", "@brief Method void QCamera::setTorchMode(QCamera::TorchMode mode)\n", false, &_init_f_setTorchMode_2119, &_call_f_setTorchMode_2119);
+  methods += new qt_gsi::GenericMethod ("setWhiteBalanceMode|whiteBalanceMode=", "@brief Method void QCamera::setWhiteBalanceMode(QCamera::WhiteBalanceMode mode)\n", false, &_init_f_setWhiteBalanceMode_2798, &_call_f_setWhiteBalanceMode_2798);
+  methods += new qt_gsi::GenericMethod ("setZoomFactor|zoomFactor=", "@brief Method void QCamera::setZoomFactor(float factor)\n", false, &_init_f_setZoomFactor_970, &_call_f_setZoomFactor_970);
   methods += new qt_gsi::GenericMethod ("start", "@brief Method void QCamera::start()\n", false, &_init_f_start_0, &_call_f_start_0);
   methods += new qt_gsi::GenericMethod ("stop", "@brief Method void QCamera::stop()\n", false, &_init_f_stop_0, &_call_f_stop_0);
-  methods += new qt_gsi::GenericMethod ("supportedFeatures", "@brief Method QFlags<QCamera::Feature> QCamera::supportedFeatures()\n", true, &_init_f_supportedFeatures_c0, &_call_f_supportedFeatures_c0);
-  methods += new qt_gsi::GenericMethod ("supportedFeaturesChanged", "@brief Method void QCamera::supportedFeaturesChanged()\n", false, &_init_f_supportedFeaturesChanged_0, &_call_f_supportedFeaturesChanged_0);
-  methods += new qt_gsi::GenericMethod ("torchMode", "@brief Method QCamera::TorchMode QCamera::torchMode()\n", true, &_init_f_torchMode_c0, &_call_f_torchMode_c0);
-  methods += new qt_gsi::GenericMethod ("torchModeChanged", "@brief Method void QCamera::torchModeChanged()\n", false, &_init_f_torchModeChanged_0, &_call_f_torchModeChanged_0);
-  methods += new qt_gsi::GenericMethod ("whiteBalanceMode", "@brief Method QCamera::WhiteBalanceMode QCamera::whiteBalanceMode()\n", true, &_init_f_whiteBalanceMode_c0, &_call_f_whiteBalanceMode_c0);
-  methods += new qt_gsi::GenericMethod ("whiteBalanceModeChanged", "@brief Method void QCamera::whiteBalanceModeChanged()\n", true, &_init_f_whiteBalanceModeChanged_c0, &_call_f_whiteBalanceModeChanged_c0);
-  methods += new qt_gsi::GenericMethod ("zoomFactor", "@brief Method float QCamera::zoomFactor()\n", true, &_init_f_zoomFactor_c0, &_call_f_zoomFactor_c0);
-  methods += new qt_gsi::GenericMethod ("zoomFactorChanged", "@brief Method void QCamera::zoomFactorChanged(float)\n", false, &_init_f_zoomFactorChanged_970, &_call_f_zoomFactorChanged_970);
+  methods += new qt_gsi::GenericMethod (":supportedFeatures", "@brief Method QFlags<QCamera::Feature> QCamera::supportedFeatures()\n", true, &_init_f_supportedFeatures_c0, &_call_f_supportedFeatures_c0);
+  methods += new qt_gsi::GenericMethod (":torchMode", "@brief Method QCamera::TorchMode QCamera::torchMode()\n", true, &_init_f_torchMode_c0, &_call_f_torchMode_c0);
+  methods += new qt_gsi::GenericMethod (":whiteBalanceMode", "@brief Method QCamera::WhiteBalanceMode QCamera::whiteBalanceMode()\n", true, &_init_f_whiteBalanceMode_c0, &_call_f_whiteBalanceMode_c0);
+  methods += new qt_gsi::GenericMethod (":zoomFactor", "@brief Method float QCamera::zoomFactor()\n", true, &_init_f_zoomFactor_c0, &_call_f_zoomFactor_c0);
   methods += new qt_gsi::GenericMethod ("zoomTo", "@brief Method void QCamera::zoomTo(float zoom, float rate)\n", false, &_init_f_zoomTo_1832, &_call_f_zoomTo_1832);
+  methods += gsi::qt_signal<bool > ("activeChanged(bool)", "activeChanged", gsi::arg("arg1"), "@brief Signal declaration for QCamera::activeChanged(bool)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("brightnessChanged()", "brightnessChanged", "@brief Signal declaration for QCamera::brightnessChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("cameraDeviceChanged()", "cameraDeviceChanged", "@brief Signal declaration for QCamera::cameraDeviceChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("cameraFormatChanged()", "cameraFormatChanged", "@brief Signal declaration for QCamera::cameraFormatChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("colorTemperatureChanged()", "colorTemperatureChanged", "@brief Signal declaration for QCamera::colorTemperatureChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("contrastChanged()", "contrastChanged", "@brief Signal declaration for QCamera::contrastChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("customFocusPointChanged()", "customFocusPointChanged", "@brief Signal declaration for QCamera::customFocusPointChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QCamera::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("errorChanged()", "errorChanged", "@brief Signal declaration for QCamera::errorChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QCamera::Error>::target_type &, const QString & > ("errorOccurred(QCamera::Error, const QString &)", "errorOccurred", gsi::arg("error"), gsi::arg("errorString"), "@brief Signal declaration for QCamera::errorOccurred(QCamera::Error error, const QString &errorString)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<float > ("exposureCompensationChanged(float)", "exposureCompensationChanged", gsi::arg("arg1"), "@brief Signal declaration for QCamera::exposureCompensationChanged(float)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("exposureModeChanged()", "exposureModeChanged", "@brief Signal declaration for QCamera::exposureModeChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<float > ("exposureTimeChanged(float)", "exposureTimeChanged", gsi::arg("speed"), "@brief Signal declaration for QCamera::exposureTimeChanged(float speed)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("flashModeChanged()", "flashModeChanged", "@brief Signal declaration for QCamera::flashModeChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("flashReady(bool)", "flashReady", gsi::arg("arg1"), "@brief Signal declaration for QCamera::flashReady(bool)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<float > ("focusDistanceChanged(float)", "focusDistanceChanged", gsi::arg("arg1"), "@brief Signal declaration for QCamera::focusDistanceChanged(float)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("focusModeChanged()", "focusModeChanged", "@brief Signal declaration for QCamera::focusModeChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("focusPointChanged()", "focusPointChanged", "@brief Signal declaration for QCamera::focusPointChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("hueChanged()", "hueChanged", "@brief Signal declaration for QCamera::hueChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("isoSensitivityChanged(int)", "isoSensitivityChanged", gsi::arg("arg1"), "@brief Signal declaration for QCamera::isoSensitivityChanged(int)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<float > ("manualExposureTimeChanged(float)", "manualExposureTimeChanged", gsi::arg("speed"), "@brief Signal declaration for QCamera::manualExposureTimeChanged(float speed)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("manualIsoSensitivityChanged(int)", "manualIsoSensitivityChanged", gsi::arg("arg1"), "@brief Signal declaration for QCamera::manualIsoSensitivityChanged(int)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<float > ("maximumZoomFactorChanged(float)", "maximumZoomFactorChanged", gsi::arg("arg1"), "@brief Signal declaration for QCamera::maximumZoomFactorChanged(float)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<float > ("minimumZoomFactorChanged(float)", "minimumZoomFactorChanged", gsi::arg("arg1"), "@brief Signal declaration for QCamera::minimumZoomFactorChanged(float)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QCamera::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("saturationChanged()", "saturationChanged", "@brief Signal declaration for QCamera::saturationChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("supportedFeaturesChanged()", "supportedFeaturesChanged", "@brief Signal declaration for QCamera::supportedFeaturesChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("torchModeChanged()", "torchModeChanged", "@brief Signal declaration for QCamera::torchModeChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("whiteBalanceModeChanged()", "whiteBalanceModeChanged", "@brief Signal declaration for QCamera::whiteBalanceModeChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<float > ("zoomFactorChanged(float)", "zoomFactorChanged", gsi::arg("arg1"), "@brief Signal declaration for QCamera::zoomFactorChanged(float)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QCamera::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;
 }
@@ -1673,6 +1176,66 @@ public:
     return QCamera::senderSignalIndex();
   }
 
+  //  [emitter impl] void QCamera::activeChanged(bool)
+  void emitter_QCamera_activeChanged_864(bool arg1)
+  {
+    emit QCamera::activeChanged(arg1);
+  }
+
+  //  [emitter impl] void QCamera::brightnessChanged()
+  void emitter_QCamera_brightnessChanged_0()
+  {
+    emit QCamera::brightnessChanged();
+  }
+
+  //  [emitter impl] void QCamera::cameraDeviceChanged()
+  void emitter_QCamera_cameraDeviceChanged_0()
+  {
+    emit QCamera::cameraDeviceChanged();
+  }
+
+  //  [emitter impl] void QCamera::cameraFormatChanged()
+  void emitter_QCamera_cameraFormatChanged_0()
+  {
+    emit QCamera::cameraFormatChanged();
+  }
+
+  //  [emitter impl] void QCamera::colorTemperatureChanged()
+  void emitter_QCamera_colorTemperatureChanged_c0()
+  {
+    emit QCamera::colorTemperatureChanged();
+  }
+
+  //  [emitter impl] void QCamera::contrastChanged()
+  void emitter_QCamera_contrastChanged_0()
+  {
+    emit QCamera::contrastChanged();
+  }
+
+  //  [emitter impl] void QCamera::customFocusPointChanged()
+  void emitter_QCamera_customFocusPointChanged_0()
+  {
+    emit QCamera::customFocusPointChanged();
+  }
+
+  //  [emitter impl] void QCamera::destroyed(QObject *)
+  void emitter_QCamera_destroyed_1302(QObject *arg1)
+  {
+    emit QCamera::destroyed(arg1);
+  }
+
+  //  [emitter impl] void QCamera::errorChanged()
+  void emitter_QCamera_errorChanged_0()
+  {
+    emit QCamera::errorChanged();
+  }
+
+  //  [emitter impl] void QCamera::errorOccurred(QCamera::Error error, const QString &errorString)
+  void emitter_QCamera_errorOccurred_3657(QCamera::Error error, const QString &errorString)
+  {
+    emit QCamera::errorOccurred(error, errorString);
+  }
+
   //  [adaptor impl] bool QCamera::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -1701,6 +1264,127 @@ public:
     } else {
       return QCamera::eventFilter(watched, event);
     }
+  }
+
+  //  [emitter impl] void QCamera::exposureCompensationChanged(float)
+  void emitter_QCamera_exposureCompensationChanged_970(float arg1)
+  {
+    emit QCamera::exposureCompensationChanged(arg1);
+  }
+
+  //  [emitter impl] void QCamera::exposureModeChanged()
+  void emitter_QCamera_exposureModeChanged_0()
+  {
+    emit QCamera::exposureModeChanged();
+  }
+
+  //  [emitter impl] void QCamera::exposureTimeChanged(float speed)
+  void emitter_QCamera_exposureTimeChanged_970(float speed)
+  {
+    emit QCamera::exposureTimeChanged(speed);
+  }
+
+  //  [emitter impl] void QCamera::flashModeChanged()
+  void emitter_QCamera_flashModeChanged_0()
+  {
+    emit QCamera::flashModeChanged();
+  }
+
+  //  [emitter impl] void QCamera::flashReady(bool)
+  void emitter_QCamera_flashReady_864(bool arg1)
+  {
+    emit QCamera::flashReady(arg1);
+  }
+
+  //  [emitter impl] void QCamera::focusDistanceChanged(float)
+  void emitter_QCamera_focusDistanceChanged_970(float arg1)
+  {
+    emit QCamera::focusDistanceChanged(arg1);
+  }
+
+  //  [emitter impl] void QCamera::focusModeChanged()
+  void emitter_QCamera_focusModeChanged_0()
+  {
+    emit QCamera::focusModeChanged();
+  }
+
+  //  [emitter impl] void QCamera::focusPointChanged()
+  void emitter_QCamera_focusPointChanged_0()
+  {
+    emit QCamera::focusPointChanged();
+  }
+
+  //  [emitter impl] void QCamera::hueChanged()
+  void emitter_QCamera_hueChanged_0()
+  {
+    emit QCamera::hueChanged();
+  }
+
+  //  [emitter impl] void QCamera::isoSensitivityChanged(int)
+  void emitter_QCamera_isoSensitivityChanged_767(int arg1)
+  {
+    emit QCamera::isoSensitivityChanged(arg1);
+  }
+
+  //  [emitter impl] void QCamera::manualExposureTimeChanged(float speed)
+  void emitter_QCamera_manualExposureTimeChanged_970(float speed)
+  {
+    emit QCamera::manualExposureTimeChanged(speed);
+  }
+
+  //  [emitter impl] void QCamera::manualIsoSensitivityChanged(int)
+  void emitter_QCamera_manualIsoSensitivityChanged_767(int arg1)
+  {
+    emit QCamera::manualIsoSensitivityChanged(arg1);
+  }
+
+  //  [emitter impl] void QCamera::maximumZoomFactorChanged(float)
+  void emitter_QCamera_maximumZoomFactorChanged_970(float arg1)
+  {
+    emit QCamera::maximumZoomFactorChanged(arg1);
+  }
+
+  //  [emitter impl] void QCamera::minimumZoomFactorChanged(float)
+  void emitter_QCamera_minimumZoomFactorChanged_970(float arg1)
+  {
+    emit QCamera::minimumZoomFactorChanged(arg1);
+  }
+
+  //  [emitter impl] void QCamera::objectNameChanged(const QString &objectName)
+  void emitter_QCamera_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QCamera::objectNameChanged(const QString &objectName)'");
+  }
+
+  //  [emitter impl] void QCamera::saturationChanged()
+  void emitter_QCamera_saturationChanged_0()
+  {
+    emit QCamera::saturationChanged();
+  }
+
+  //  [emitter impl] void QCamera::supportedFeaturesChanged()
+  void emitter_QCamera_supportedFeaturesChanged_0()
+  {
+    emit QCamera::supportedFeaturesChanged();
+  }
+
+  //  [emitter impl] void QCamera::torchModeChanged()
+  void emitter_QCamera_torchModeChanged_0()
+  {
+    emit QCamera::torchModeChanged();
+  }
+
+  //  [emitter impl] void QCamera::whiteBalanceModeChanged()
+  void emitter_QCamera_whiteBalanceModeChanged_c0()
+  {
+    emit QCamera::whiteBalanceModeChanged();
+  }
+
+  //  [emitter impl] void QCamera::zoomFactorChanged(float)
+  void emitter_QCamera_zoomFactorChanged_970(float arg1)
+  {
+    emit QCamera::zoomFactorChanged(arg1);
   }
 
   //  [adaptor impl] void QCamera::childEvent(QChildEvent *event)
@@ -1833,6 +1517,66 @@ static void _call_ctor_QCamera_Adaptor_3857 (const qt_gsi::GenericStaticMethod *
 }
 
 
+// emitter void QCamera::activeChanged(bool)
+
+static void _init_emitter_activeChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_activeChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_activeChanged_864 (arg1);
+}
+
+
+// emitter void QCamera::brightnessChanged()
+
+static void _init_emitter_brightnessChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_brightnessChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_brightnessChanged_0 ();
+}
+
+
+// emitter void QCamera::cameraDeviceChanged()
+
+static void _init_emitter_cameraDeviceChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_cameraDeviceChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_cameraDeviceChanged_0 ();
+}
+
+
+// emitter void QCamera::cameraFormatChanged()
+
+static void _init_emitter_cameraFormatChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_cameraFormatChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_cameraFormatChanged_0 ();
+}
+
+
 // void QCamera::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
@@ -1854,6 +1598,34 @@ static void _call_cbs_childEvent_1701_0 (const qt_gsi::GenericMethod * /*decl*/,
 static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback &cb)
 {
   ((QCamera_Adaptor *)cls)->cb_childEvent_1701_0 = cb;
+}
+
+
+// emitter void QCamera::colorTemperatureChanged()
+
+static void _init_emitter_colorTemperatureChanged_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_colorTemperatureChanged_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_colorTemperatureChanged_c0 ();
+}
+
+
+// emitter void QCamera::contrastChanged()
+
+static void _init_emitter_contrastChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_contrastChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_contrastChanged_0 ();
 }
 
 
@@ -1881,6 +1653,38 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QCamera::customFocusPointChanged()
+
+static void _init_emitter_customFocusPointChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_customFocusPointChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_customFocusPointChanged_0 ();
+}
+
+
+// emitter void QCamera::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_destroyed_1302 (arg1);
+}
+
+
 // void QCamera::disconnectNotify(const QMetaMethod &signal)
 
 static void _init_cbs_disconnectNotify_2394_0 (qt_gsi::GenericMethod *decl)
@@ -1902,6 +1706,41 @@ static void _call_cbs_disconnectNotify_2394_0 (const qt_gsi::GenericMethod * /*d
 static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Callback &cb)
 {
   ((QCamera_Adaptor *)cls)->cb_disconnectNotify_2394_0 = cb;
+}
+
+
+// emitter void QCamera::errorChanged()
+
+static void _init_emitter_errorChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_errorChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_errorChanged_0 ();
+}
+
+
+// emitter void QCamera::errorOccurred(QCamera::Error error, const QString &errorString)
+
+static void _init_emitter_errorOccurred_3657 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("error");
+  decl->add_arg<const qt_gsi::Converter<QCamera::Error>::target_type & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("errorString");
+  decl->add_arg<const QString & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_errorOccurred_3657 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QCamera::Error>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCamera::Error>::target_type & >() (args, heap);
+  const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_errorOccurred_3657 (arg1, arg2);
 }
 
 
@@ -1954,6 +1793,148 @@ static void _set_callback_cbs_eventFilter_2411_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QCamera::exposureCompensationChanged(float)
+
+static void _init_emitter_exposureCompensationChanged_970 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<float > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_exposureCompensationChanged_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_exposureCompensationChanged_970 (arg1);
+}
+
+
+// emitter void QCamera::exposureModeChanged()
+
+static void _init_emitter_exposureModeChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_exposureModeChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_exposureModeChanged_0 ();
+}
+
+
+// emitter void QCamera::exposureTimeChanged(float speed)
+
+static void _init_emitter_exposureTimeChanged_970 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("speed");
+  decl->add_arg<float > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_exposureTimeChanged_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_exposureTimeChanged_970 (arg1);
+}
+
+
+// emitter void QCamera::flashModeChanged()
+
+static void _init_emitter_flashModeChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_flashModeChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_flashModeChanged_0 ();
+}
+
+
+// emitter void QCamera::flashReady(bool)
+
+static void _init_emitter_flashReady_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_flashReady_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_flashReady_864 (arg1);
+}
+
+
+// emitter void QCamera::focusDistanceChanged(float)
+
+static void _init_emitter_focusDistanceChanged_970 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<float > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_focusDistanceChanged_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_focusDistanceChanged_970 (arg1);
+}
+
+
+// emitter void QCamera::focusModeChanged()
+
+static void _init_emitter_focusModeChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_focusModeChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_focusModeChanged_0 ();
+}
+
+
+// emitter void QCamera::focusPointChanged()
+
+static void _init_emitter_focusPointChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_focusPointChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_focusPointChanged_0 ();
+}
+
+
+// emitter void QCamera::hueChanged()
+
+static void _init_emitter_hueChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_hueChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_hueChanged_0 ();
+}
+
+
 // exposed bool QCamera::isSignalConnected(const QMetaMethod &signal)
 
 static void _init_fp_isSignalConnected_c2394 (qt_gsi::GenericMethod *decl)
@@ -1972,6 +1953,114 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QCamera::isoSensitivityChanged(int)
+
+static void _init_emitter_isoSensitivityChanged_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_isoSensitivityChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_isoSensitivityChanged_767 (arg1);
+}
+
+
+// emitter void QCamera::manualExposureTimeChanged(float speed)
+
+static void _init_emitter_manualExposureTimeChanged_970 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("speed");
+  decl->add_arg<float > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_manualExposureTimeChanged_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_manualExposureTimeChanged_970 (arg1);
+}
+
+
+// emitter void QCamera::manualIsoSensitivityChanged(int)
+
+static void _init_emitter_manualIsoSensitivityChanged_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_manualIsoSensitivityChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_manualIsoSensitivityChanged_767 (arg1);
+}
+
+
+// emitter void QCamera::maximumZoomFactorChanged(float)
+
+static void _init_emitter_maximumZoomFactorChanged_970 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<float > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_maximumZoomFactorChanged_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_maximumZoomFactorChanged_970 (arg1);
+}
+
+
+// emitter void QCamera::minimumZoomFactorChanged(float)
+
+static void _init_emitter_minimumZoomFactorChanged_970 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<float > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_minimumZoomFactorChanged_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_minimumZoomFactorChanged_970 (arg1);
+}
+
+
+// emitter void QCamera::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QCamera::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -1987,6 +2076,20 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
   tl::Heap heap;
   const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
   ret.write<int > ((int)((QCamera_Adaptor *)cls)->fp_QCamera_receivers_c1731 (arg1));
+}
+
+
+// emitter void QCamera::saturationChanged()
+
+static void _init_emitter_saturationChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_saturationChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_saturationChanged_0 ();
 }
 
 
@@ -2018,6 +2121,20 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
+// emitter void QCamera::supportedFeaturesChanged()
+
+static void _init_emitter_supportedFeaturesChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_supportedFeaturesChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_supportedFeaturesChanged_0 ();
+}
+
+
 // void QCamera::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
@@ -2042,6 +2159,52 @@ static void _set_callback_cbs_timerEvent_1730_0 (void *cls, const gsi::Callback 
 }
 
 
+// emitter void QCamera::torchModeChanged()
+
+static void _init_emitter_torchModeChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_torchModeChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_torchModeChanged_0 ();
+}
+
+
+// emitter void QCamera::whiteBalanceModeChanged()
+
+static void _init_emitter_whiteBalanceModeChanged_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_whiteBalanceModeChanged_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_whiteBalanceModeChanged_c0 ();
+}
+
+
+// emitter void QCamera::zoomFactorChanged(float)
+
+static void _init_emitter_zoomFactorChanged_970 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<float > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_zoomFactorChanged_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  ((QCamera_Adaptor *)cls)->emitter_QCamera_zoomFactorChanged_970 (arg1);
+}
+
+
 namespace gsi
 {
 
@@ -2052,22 +2215,52 @@ static gsi::Methods methods_QCamera_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCamera::QCamera(QObject *parent)\nThis method creates an object of class QCamera.", &_init_ctor_QCamera_Adaptor_1302, &_call_ctor_QCamera_Adaptor_1302);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCamera::QCamera(const QCameraDevice &cameraDevice, QObject *parent)\nThis method creates an object of class QCamera.", &_init_ctor_QCamera_Adaptor_3765, &_call_ctor_QCamera_Adaptor_3765);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCamera::QCamera(QCameraDevice::Position position, QObject *parent)\nThis method creates an object of class QCamera.", &_init_ctor_QCamera_Adaptor_3857, &_call_ctor_QCamera_Adaptor_3857);
+  methods += new qt_gsi::GenericMethod ("emit_activeChanged", "@brief Emitter for signal void QCamera::activeChanged(bool)\nCall this method to emit this signal.", false, &_init_emitter_activeChanged_864, &_call_emitter_activeChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_brightnessChanged", "@brief Emitter for signal void QCamera::brightnessChanged()\nCall this method to emit this signal.", false, &_init_emitter_brightnessChanged_0, &_call_emitter_brightnessChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_cameraDeviceChanged", "@brief Emitter for signal void QCamera::cameraDeviceChanged()\nCall this method to emit this signal.", false, &_init_emitter_cameraDeviceChanged_0, &_call_emitter_cameraDeviceChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_cameraFormatChanged", "@brief Emitter for signal void QCamera::cameraFormatChanged()\nCall this method to emit this signal.", false, &_init_emitter_cameraFormatChanged_0, &_call_emitter_cameraFormatChanged_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QCamera::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("emit_colorTemperatureChanged", "@brief Emitter for signal void QCamera::colorTemperatureChanged()\nCall this method to emit this signal.", true, &_init_emitter_colorTemperatureChanged_c0, &_call_emitter_colorTemperatureChanged_c0);
+  methods += new qt_gsi::GenericMethod ("emit_contrastChanged", "@brief Emitter for signal void QCamera::contrastChanged()\nCall this method to emit this signal.", false, &_init_emitter_contrastChanged_0, &_call_emitter_contrastChanged_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QCamera::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_customFocusPointChanged", "@brief Emitter for signal void QCamera::customFocusPointChanged()\nCall this method to emit this signal.", false, &_init_emitter_customFocusPointChanged_0, &_call_emitter_customFocusPointChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QCamera::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QCamera::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("emit_errorChanged", "@brief Emitter for signal void QCamera::errorChanged()\nCall this method to emit this signal.", false, &_init_emitter_errorChanged_0, &_call_emitter_errorChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_errorOccurred", "@brief Emitter for signal void QCamera::errorOccurred(QCamera::Error error, const QString &errorString)\nCall this method to emit this signal.", false, &_init_emitter_errorOccurred_3657, &_call_emitter_errorOccurred_3657);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QCamera::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QCamera::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("emit_exposureCompensationChanged", "@brief Emitter for signal void QCamera::exposureCompensationChanged(float)\nCall this method to emit this signal.", false, &_init_emitter_exposureCompensationChanged_970, &_call_emitter_exposureCompensationChanged_970);
+  methods += new qt_gsi::GenericMethod ("emit_exposureModeChanged", "@brief Emitter for signal void QCamera::exposureModeChanged()\nCall this method to emit this signal.", false, &_init_emitter_exposureModeChanged_0, &_call_emitter_exposureModeChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_exposureTimeChanged", "@brief Emitter for signal void QCamera::exposureTimeChanged(float speed)\nCall this method to emit this signal.", false, &_init_emitter_exposureTimeChanged_970, &_call_emitter_exposureTimeChanged_970);
+  methods += new qt_gsi::GenericMethod ("emit_flashModeChanged", "@brief Emitter for signal void QCamera::flashModeChanged()\nCall this method to emit this signal.", false, &_init_emitter_flashModeChanged_0, &_call_emitter_flashModeChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_flashReady", "@brief Emitter for signal void QCamera::flashReady(bool)\nCall this method to emit this signal.", false, &_init_emitter_flashReady_864, &_call_emitter_flashReady_864);
+  methods += new qt_gsi::GenericMethod ("emit_focusDistanceChanged", "@brief Emitter for signal void QCamera::focusDistanceChanged(float)\nCall this method to emit this signal.", false, &_init_emitter_focusDistanceChanged_970, &_call_emitter_focusDistanceChanged_970);
+  methods += new qt_gsi::GenericMethod ("emit_focusModeChanged", "@brief Emitter for signal void QCamera::focusModeChanged()\nCall this method to emit this signal.", false, &_init_emitter_focusModeChanged_0, &_call_emitter_focusModeChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_focusPointChanged", "@brief Emitter for signal void QCamera::focusPointChanged()\nCall this method to emit this signal.", false, &_init_emitter_focusPointChanged_0, &_call_emitter_focusPointChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_hueChanged", "@brief Emitter for signal void QCamera::hueChanged()\nCall this method to emit this signal.", false, &_init_emitter_hueChanged_0, &_call_emitter_hueChanged_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QCamera::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_isoSensitivityChanged", "@brief Emitter for signal void QCamera::isoSensitivityChanged(int)\nCall this method to emit this signal.", false, &_init_emitter_isoSensitivityChanged_767, &_call_emitter_isoSensitivityChanged_767);
+  methods += new qt_gsi::GenericMethod ("emit_manualExposureTimeChanged", "@brief Emitter for signal void QCamera::manualExposureTimeChanged(float speed)\nCall this method to emit this signal.", false, &_init_emitter_manualExposureTimeChanged_970, &_call_emitter_manualExposureTimeChanged_970);
+  methods += new qt_gsi::GenericMethod ("emit_manualIsoSensitivityChanged", "@brief Emitter for signal void QCamera::manualIsoSensitivityChanged(int)\nCall this method to emit this signal.", false, &_init_emitter_manualIsoSensitivityChanged_767, &_call_emitter_manualIsoSensitivityChanged_767);
+  methods += new qt_gsi::GenericMethod ("emit_maximumZoomFactorChanged", "@brief Emitter for signal void QCamera::maximumZoomFactorChanged(float)\nCall this method to emit this signal.", false, &_init_emitter_maximumZoomFactorChanged_970, &_call_emitter_maximumZoomFactorChanged_970);
+  methods += new qt_gsi::GenericMethod ("emit_minimumZoomFactorChanged", "@brief Emitter for signal void QCamera::minimumZoomFactorChanged(float)\nCall this method to emit this signal.", false, &_init_emitter_minimumZoomFactorChanged_970, &_call_emitter_minimumZoomFactorChanged_970);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QCamera::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QCamera::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
+  methods += new qt_gsi::GenericMethod ("emit_saturationChanged", "@brief Emitter for signal void QCamera::saturationChanged()\nCall this method to emit this signal.", false, &_init_emitter_saturationChanged_0, &_call_emitter_saturationChanged_0);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QCamera::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QCamera::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
+  methods += new qt_gsi::GenericMethod ("emit_supportedFeaturesChanged", "@brief Emitter for signal void QCamera::supportedFeaturesChanged()\nCall this method to emit this signal.", false, &_init_emitter_supportedFeaturesChanged_0, &_call_emitter_supportedFeaturesChanged_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QCamera::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("emit_torchModeChanged", "@brief Emitter for signal void QCamera::torchModeChanged()\nCall this method to emit this signal.", false, &_init_emitter_torchModeChanged_0, &_call_emitter_torchModeChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_whiteBalanceModeChanged", "@brief Emitter for signal void QCamera::whiteBalanceModeChanged()\nCall this method to emit this signal.", true, &_init_emitter_whiteBalanceModeChanged_c0, &_call_emitter_whiteBalanceModeChanged_c0);
+  methods += new qt_gsi::GenericMethod ("emit_zoomFactorChanged", "@brief Emitter for signal void QCamera::zoomFactorChanged(float)\nCall this method to emit this signal.", false, &_init_emitter_zoomFactorChanged_970, &_call_emitter_zoomFactorChanged_970);
   return methods;
 }
 

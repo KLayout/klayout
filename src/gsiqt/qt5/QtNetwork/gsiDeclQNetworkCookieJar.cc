@@ -317,33 +317,33 @@ public:
     emit QNetworkCookieJar::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QNetworkCookieJar::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QNetworkCookieJar::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QNetworkCookieJar::event(arg1);
+    return QNetworkCookieJar::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QNetworkCookieJar_Adaptor, bool, QEvent *>(&QNetworkCookieJar_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QNetworkCookieJar_Adaptor, bool, QEvent *>(&QNetworkCookieJar_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QNetworkCookieJar::event(arg1);
+      return QNetworkCookieJar::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QNetworkCookieJar::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QNetworkCookieJar::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QNetworkCookieJar::eventFilter(arg1, arg2);
+    return QNetworkCookieJar::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QNetworkCookieJar_Adaptor, bool, QObject *, QEvent *>(&QNetworkCookieJar_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QNetworkCookieJar_Adaptor, bool, QObject *, QEvent *>(&QNetworkCookieJar_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QNetworkCookieJar::eventFilter(arg1, arg2);
+      return QNetworkCookieJar::eventFilter(watched, event);
     }
   }
 
@@ -399,33 +399,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QNetworkCookieJar::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QNetworkCookieJar::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QNetworkCookieJar::childEvent(arg1);
+    QNetworkCookieJar::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QNetworkCookieJar_Adaptor, QChildEvent *>(&QNetworkCookieJar_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QNetworkCookieJar_Adaptor, QChildEvent *>(&QNetworkCookieJar_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QNetworkCookieJar::childEvent(arg1);
+      QNetworkCookieJar::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QNetworkCookieJar::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QNetworkCookieJar::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QNetworkCookieJar::customEvent(arg1);
+    QNetworkCookieJar::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QNetworkCookieJar_Adaptor, QEvent *>(&QNetworkCookieJar_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QNetworkCookieJar_Adaptor, QEvent *>(&QNetworkCookieJar_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QNetworkCookieJar::customEvent(arg1);
+      QNetworkCookieJar::customEvent(event);
     }
   }
 
@@ -444,18 +444,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QNetworkCookieJar::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QNetworkCookieJar::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QNetworkCookieJar::timerEvent(arg1);
+    QNetworkCookieJar::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QNetworkCookieJar_Adaptor, QTimerEvent *>(&QNetworkCookieJar_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QNetworkCookieJar_Adaptor, QTimerEvent *>(&QNetworkCookieJar_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QNetworkCookieJar::timerEvent(arg1);
+      QNetworkCookieJar::timerEvent(event);
     }
   }
 
@@ -494,7 +494,7 @@ QNetworkCookieJar_Adaptor::~QNetworkCookieJar_Adaptor() { }
 
 static void _init_ctor_QNetworkCookieJar_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QNetworkCookieJar_Adaptor> ();
 }
@@ -503,7 +503,7 @@ static void _call_ctor_QNetworkCookieJar_Adaptor_1302 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QNetworkCookieJar_Adaptor *> (new QNetworkCookieJar_Adaptor (arg1));
 }
 
@@ -522,11 +522,11 @@ static void _call_fp_allCookies_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// void QNetworkCookieJar::childEvent(QChildEvent *)
+// void QNetworkCookieJar::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -569,11 +569,11 @@ static void _set_callback_cbs_cookiesForUrl_c1701_0 (void *cls, const gsi::Callb
 }
 
 
-// void QNetworkCookieJar::customEvent(QEvent *)
+// void QNetworkCookieJar::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -620,7 +620,7 @@ static void _set_callback_cbs_deleteCookie_2742_0 (void *cls, const gsi::Callbac
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -629,7 +629,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QNetworkCookieJar_Adaptor *)cls)->emitter_QNetworkCookieJar_destroyed_1302 (arg1);
 }
 
@@ -658,11 +658,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QNetworkCookieJar::event(QEvent *)
+// bool QNetworkCookieJar::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -681,13 +681,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QNetworkCookieJar::eventFilter(QObject *, QEvent *)
+// bool QNetworkCookieJar::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -857,11 +857,11 @@ static void _set_callback_cbs_setCookiesFromUrl_4950_0 (void *cls, const gsi::Ca
 }
 
 
-// void QNetworkCookieJar::timerEvent(QTimerEvent *)
+// void QNetworkCookieJar::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -939,20 +939,20 @@ static gsi::Methods methods_QNetworkCookieJar_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QNetworkCookieJar::QNetworkCookieJar(QObject *parent)\nThis method creates an object of class QNetworkCookieJar.", &_init_ctor_QNetworkCookieJar_Adaptor_1302, &_call_ctor_QNetworkCookieJar_Adaptor_1302);
   methods += new qt_gsi::GenericMethod ("*allCookies", "@brief Method QList<QNetworkCookie> QNetworkCookieJar::allCookies()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_allCookies_c0, &_call_fp_allCookies_c0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QNetworkCookieJar::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QNetworkCookieJar::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("cookiesForUrl", "@brief Virtual method QList<QNetworkCookie> QNetworkCookieJar::cookiesForUrl(const QUrl &url)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_cookiesForUrl_c1701_0, &_call_cbs_cookiesForUrl_c1701_0);
   methods += new qt_gsi::GenericMethod ("cookiesForUrl", "@hide", true, &_init_cbs_cookiesForUrl_c1701_0, &_call_cbs_cookiesForUrl_c1701_0, &_set_callback_cbs_cookiesForUrl_c1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QNetworkCookieJar::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QNetworkCookieJar::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("deleteCookie", "@brief Virtual method bool QNetworkCookieJar::deleteCookie(const QNetworkCookie &cookie)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_deleteCookie_2742_0, &_call_cbs_deleteCookie_2742_0);
   methods += new qt_gsi::GenericMethod ("deleteCookie", "@hide", false, &_init_cbs_deleteCookie_2742_0, &_call_cbs_deleteCookie_2742_0, &_set_callback_cbs_deleteCookie_2742_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QNetworkCookieJar::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QNetworkCookieJar::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QNetworkCookieJar::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QNetworkCookieJar::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QNetworkCookieJar::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QNetworkCookieJar::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("insertCookie", "@brief Virtual method bool QNetworkCookieJar::insertCookie(const QNetworkCookie &cookie)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_insertCookie_2742_0, &_call_cbs_insertCookie_2742_0);
   methods += new qt_gsi::GenericMethod ("insertCookie", "@hide", false, &_init_cbs_insertCookie_2742_0, &_call_cbs_insertCookie_2742_0, &_set_callback_cbs_insertCookie_2742_0);
@@ -964,7 +964,7 @@ static gsi::Methods methods_QNetworkCookieJar_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*setAllCookies", "@brief Method void QNetworkCookieJar::setAllCookies(const QList<QNetworkCookie> &cookieList)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_setAllCookies_3357, &_call_fp_setAllCookies_3357);
   methods += new qt_gsi::GenericMethod ("setCookiesFromUrl", "@brief Virtual method bool QNetworkCookieJar::setCookiesFromUrl(const QList<QNetworkCookie> &cookieList, const QUrl &url)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setCookiesFromUrl_4950_0, &_call_cbs_setCookiesFromUrl_4950_0);
   methods += new qt_gsi::GenericMethod ("setCookiesFromUrl", "@hide", false, &_init_cbs_setCookiesFromUrl_4950_0, &_call_cbs_setCookiesFromUrl_4950_0, &_set_callback_cbs_setCookiesFromUrl_4950_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QNetworkCookieJar::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QNetworkCookieJar::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("updateCookie", "@brief Virtual method bool QNetworkCookieJar::updateCookie(const QNetworkCookie &cookie)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_updateCookie_2742_0, &_call_cbs_updateCookie_2742_0);
   methods += new qt_gsi::GenericMethod ("updateCookie", "@hide", false, &_init_cbs_updateCookie_2742_0, &_call_cbs_updateCookie_2742_0, &_set_callback_cbs_updateCookie_2742_0);

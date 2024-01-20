@@ -300,6 +300,21 @@ static void _call_f_logicalDotsPerInchY_c0 (const qt_gsi::GenericMethod * /*decl
 }
 
 
+// QString QScreen::manufacturer()
+
+
+static void _init_f_manufacturer_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QString > ();
+}
+
+static void _call_f_manufacturer_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QString > ((QString)((QScreen *)cls)->manufacturer ());
+}
+
+
 // QRect QScreen::mapBetween(Qt::ScreenOrientation a, Qt::ScreenOrientation b, const QRect &rect)
 
 
@@ -322,6 +337,21 @@ static void _call_f_mapBetween_c6618 (const qt_gsi::GenericMethod * /*decl*/, vo
   const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & arg2 = gsi::arg_reader<const qt_gsi::Converter<Qt::ScreenOrientation>::target_type & >() (args, heap);
   const QRect &arg3 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<QRect > ((QRect)((QScreen *)cls)->mapBetween (qt_gsi::QtToCppAdaptor<Qt::ScreenOrientation>(arg1).cref(), qt_gsi::QtToCppAdaptor<Qt::ScreenOrientation>(arg2).cref(), arg3));
+}
+
+
+// QString QScreen::model()
+
+
+static void _init_f_model_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QString > ();
+}
+
+static void _call_f_model_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QString > ((QString)((QScreen *)cls)->model ());
 }
 
 
@@ -472,6 +502,21 @@ static void _call_f_refreshRate_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<double > ((double)((QScreen *)cls)->refreshRate ());
+}
+
+
+// QString QScreen::serialNumber()
+
+
+static void _init_f_serialNumber_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QString > ();
+}
+
+static void _call_f_serialNumber_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QString > ((QString)((QScreen *)cls)->serialNumber ());
 }
 
 
@@ -650,7 +695,9 @@ static gsi::Methods methods_QScreen () {
   methods += new qt_gsi::GenericMethod (":logicalDotsPerInch", "@brief Method double QScreen::logicalDotsPerInch()\n", true, &_init_f_logicalDotsPerInch_c0, &_call_f_logicalDotsPerInch_c0);
   methods += new qt_gsi::GenericMethod (":logicalDotsPerInchX", "@brief Method double QScreen::logicalDotsPerInchX()\n", true, &_init_f_logicalDotsPerInchX_c0, &_call_f_logicalDotsPerInchX_c0);
   methods += new qt_gsi::GenericMethod (":logicalDotsPerInchY", "@brief Method double QScreen::logicalDotsPerInchY()\n", true, &_init_f_logicalDotsPerInchY_c0, &_call_f_logicalDotsPerInchY_c0);
+  methods += new qt_gsi::GenericMethod (":manufacturer", "@brief Method QString QScreen::manufacturer()\n", true, &_init_f_manufacturer_c0, &_call_f_manufacturer_c0);
   methods += new qt_gsi::GenericMethod ("mapBetween", "@brief Method QRect QScreen::mapBetween(Qt::ScreenOrientation a, Qt::ScreenOrientation b, const QRect &rect)\n", true, &_init_f_mapBetween_c6618, &_call_f_mapBetween_c6618);
+  methods += new qt_gsi::GenericMethod (":model", "@brief Method QString QScreen::model()\n", true, &_init_f_model_c0, &_call_f_model_c0);
   methods += new qt_gsi::GenericMethod (":name", "@brief Method QString QScreen::name()\n", true, &_init_f_name_c0, &_call_f_name_c0);
   methods += new qt_gsi::GenericMethod (":nativeOrientation", "@brief Method Qt::ScreenOrientation QScreen::nativeOrientation()\n", true, &_init_f_nativeOrientation_c0, &_call_f_nativeOrientation_c0);
   methods += new qt_gsi::GenericMethod (":orientation", "@brief Method Qt::ScreenOrientation QScreen::orientation()\n", true, &_init_f_orientation_c0, &_call_f_orientation_c0);
@@ -661,6 +708,7 @@ static gsi::Methods methods_QScreen () {
   methods += new qt_gsi::GenericMethod (":physicalSize", "@brief Method QSizeF QScreen::physicalSize()\n", true, &_init_f_physicalSize_c0, &_call_f_physicalSize_c0);
   methods += new qt_gsi::GenericMethod (":primaryOrientation", "@brief Method Qt::ScreenOrientation QScreen::primaryOrientation()\n", true, &_init_f_primaryOrientation_c0, &_call_f_primaryOrientation_c0);
   methods += new qt_gsi::GenericMethod (":refreshRate", "@brief Method double QScreen::refreshRate()\n", true, &_init_f_refreshRate_c0, &_call_f_refreshRate_c0);
+  methods += new qt_gsi::GenericMethod (":serialNumber", "@brief Method QString QScreen::serialNumber()\n", true, &_init_f_serialNumber_c0, &_call_f_serialNumber_c0);
   methods += new qt_gsi::GenericMethod ("setOrientationUpdateMask|orientationUpdateMask=", "@brief Method void QScreen::setOrientationUpdateMask(QFlags<Qt::ScreenOrientation> mask)\n", false, &_init_f_setOrientationUpdateMask_3217, &_call_f_setOrientationUpdateMask_3217);
   methods += new qt_gsi::GenericMethod (":size", "@brief Method QSize QScreen::size()\n", true, &_init_f_size_c0, &_call_f_size_c0);
   methods += new qt_gsi::GenericMethod ("transformBetween", "@brief Method QTransform QScreen::transformBetween(Qt::ScreenOrientation a, Qt::ScreenOrientation b, const QRect &target)\n", true, &_init_f_transformBetween_c6618, &_call_f_transformBetween_c6618);
@@ -732,33 +780,33 @@ public:
     emit QScreen::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QScreen::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QScreen::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QScreen::event(arg1);
+    return QScreen::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QScreen_Adaptor, bool, QEvent *>(&QScreen_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QScreen_Adaptor, bool, QEvent *>(&QScreen_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QScreen::event(arg1);
+      return QScreen::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QScreen::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QScreen::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QScreen::eventFilter(arg1, arg2);
+    return QScreen::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QScreen_Adaptor, bool, QObject *, QEvent *>(&QScreen_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QScreen_Adaptor, bool, QObject *, QEvent *>(&QScreen_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QScreen::eventFilter(arg1, arg2);
+      return QScreen::eventFilter(watched, event);
     }
   }
 
@@ -817,33 +865,33 @@ public:
     emit QScreen::virtualGeometryChanged(rect);
   }
 
-  //  [adaptor impl] void QScreen::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QScreen::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QScreen::childEvent(arg1);
+    QScreen::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QScreen_Adaptor, QChildEvent *>(&QScreen_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QScreen_Adaptor, QChildEvent *>(&QScreen_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QScreen::childEvent(arg1);
+      QScreen::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QScreen::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QScreen::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QScreen::customEvent(arg1);
+    QScreen::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QScreen_Adaptor, QEvent *>(&QScreen_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QScreen_Adaptor, QEvent *>(&QScreen_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QScreen::customEvent(arg1);
+      QScreen::customEvent(event);
     }
   }
 
@@ -862,18 +910,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QScreen::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QScreen::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QScreen::timerEvent(arg1);
+    QScreen::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QScreen_Adaptor, QTimerEvent *>(&QScreen_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QScreen_Adaptor, QTimerEvent *>(&QScreen_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QScreen::timerEvent(arg1);
+      QScreen::timerEvent(event);
     }
   }
 
@@ -905,11 +953,11 @@ static void _call_emitter_availableGeometryChanged_1792 (const qt_gsi::GenericMe
 }
 
 
-// void QScreen::childEvent(QChildEvent *)
+// void QScreen::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -929,11 +977,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QScreen::customEvent(QEvent *)
+// void QScreen::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -957,7 +1005,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -966,7 +1014,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QScreen_Adaptor *)cls)->emitter_QScreen_destroyed_1302 (arg1);
 }
 
@@ -995,11 +1043,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QScreen::event(QEvent *)
+// bool QScreen::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -1018,13 +1066,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QScreen::eventFilter(QObject *, QEvent *)
+// bool QScreen::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -1252,11 +1300,11 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QScreen::timerEvent(QTimerEvent *)
+// void QScreen::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1302,16 +1350,16 @@ gsi::Class<QScreen> &qtdecl_QScreen ();
 static gsi::Methods methods_QScreen_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericMethod ("emit_availableGeometryChanged", "@brief Emitter for signal void QScreen::availableGeometryChanged(const QRect &geometry)\nCall this method to emit this signal.", false, &_init_emitter_availableGeometryChanged_1792, &_call_emitter_availableGeometryChanged_1792);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QScreen::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QScreen::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QScreen::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QScreen::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QScreen::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QScreen::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QScreen::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QScreen::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QScreen::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QScreen::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("emit_geometryChanged", "@brief Emitter for signal void QScreen::geometryChanged(const QRect &geometry)\nCall this method to emit this signal.", false, &_init_emitter_geometryChanged_1792, &_call_emitter_geometryChanged_1792);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QScreen::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
@@ -1325,7 +1373,7 @@ static gsi::Methods methods_QScreen_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_refreshRateChanged", "@brief Emitter for signal void QScreen::refreshRateChanged(double refreshRate)\nCall this method to emit this signal.", false, &_init_emitter_refreshRateChanged_1071, &_call_emitter_refreshRateChanged_1071);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QScreen::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QScreen::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QScreen::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QScreen::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("emit_virtualGeometryChanged", "@brief Emitter for signal void QScreen::virtualGeometryChanged(const QRect &rect)\nCall this method to emit this signal.", false, &_init_emitter_virtualGeometryChanged_1792, &_call_emitter_virtualGeometryChanged_1792);
   return methods;

@@ -287,8 +287,8 @@ namespace gsi
 static gsi::Methods methods_QOffscreenSurface () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("qt_create", "@brief Method void QOffscreenSurface::create()\n", false, &_init_f_create_0, &_call_f_create_0);
-  methods += new qt_gsi::GenericMethod ("qt_destroy", "@brief Method void QOffscreenSurface::destroy()\n", false, &_init_f_destroy_0, &_call_f_destroy_0);
+  methods += new qt_gsi::GenericMethod ("create|qt_create", "@brief Method void QOffscreenSurface::create()\n", false, &_init_f_create_0, &_call_f_create_0);
+  methods += new qt_gsi::GenericMethod ("destroy|qt_destroy", "@brief Method void QOffscreenSurface::destroy()\n", false, &_init_f_destroy_0, &_call_f_destroy_0);
   methods += new qt_gsi::GenericMethod (":format", "@brief Method QSurfaceFormat QOffscreenSurface::format()\nThis is a reimplementation of QSurface::format", true, &_init_f_format_c0, &_call_f_format_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QOffscreenSurface::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("requestedFormat", "@brief Method QSurfaceFormat QOffscreenSurface::requestedFormat()\n", true, &_init_f_requestedFormat_c0, &_call_f_requestedFormat_c0);

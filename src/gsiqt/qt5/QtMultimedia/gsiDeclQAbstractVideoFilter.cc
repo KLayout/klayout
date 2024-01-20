@@ -55,22 +55,6 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// void QAbstractVideoFilter::activeChanged()
-
-
-static void _init_f_activeChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_activeChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAbstractVideoFilter *)cls)->activeChanged ();
-}
-
-
 // QVideoFilterRunnable *QAbstractVideoFilter::createFilterRunnable()
 
 
@@ -177,10 +161,12 @@ namespace gsi
 static gsi::Methods methods_QAbstractVideoFilter () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("activeChanged", "@brief Method void QAbstractVideoFilter::activeChanged()\n", false, &_init_f_activeChanged_0, &_call_f_activeChanged_0);
   methods += new qt_gsi::GenericMethod ("createFilterRunnable", "@brief Method QVideoFilterRunnable *QAbstractVideoFilter::createFilterRunnable()\n", false, &_init_f_createFilterRunnable_0, &_call_f_createFilterRunnable_0);
   methods += new qt_gsi::GenericMethod ("isActive?|:active", "@brief Method bool QAbstractVideoFilter::isActive()\n", true, &_init_f_isActive_c0, &_call_f_isActive_c0);
   methods += new qt_gsi::GenericMethod ("setActive|active=", "@brief Method void QAbstractVideoFilter::setActive(bool v)\n", false, &_init_f_setActive_864, &_call_f_setActive_864);
+  methods += gsi::qt_signal ("activeChanged()", "activeChanged", "@brief Signal declaration for QAbstractVideoFilter::activeChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAbstractVideoFilter::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QAbstractVideoFilter::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QAbstractVideoFilter::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QAbstractVideoFilter::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -235,6 +221,12 @@ public:
     return QAbstractVideoFilter::senderSignalIndex();
   }
 
+  //  [emitter impl] void QAbstractVideoFilter::activeChanged()
+  void emitter_QAbstractVideoFilter_activeChanged_0()
+  {
+    emit QAbstractVideoFilter::activeChanged();
+  }
+
   //  [adaptor impl] QVideoFilterRunnable *QAbstractVideoFilter::createFilterRunnable()
   QVideoFilterRunnable * cbs_createFilterRunnable_0_0()
   {
@@ -250,63 +242,76 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QAbstractVideoFilter::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [emitter impl] void QAbstractVideoFilter::destroyed(QObject *)
+  void emitter_QAbstractVideoFilter_destroyed_1302(QObject *arg1)
   {
-    return QAbstractVideoFilter::event(arg1);
+    emit QAbstractVideoFilter::destroyed(arg1);
   }
 
-  virtual bool event(QEvent *arg1)
+  //  [adaptor impl] bool QAbstractVideoFilter::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
+  {
+    return QAbstractVideoFilter::event(_event);
+  }
+
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QAbstractVideoFilter_Adaptor, bool, QEvent *>(&QAbstractVideoFilter_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QAbstractVideoFilter_Adaptor, bool, QEvent *>(&QAbstractVideoFilter_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QAbstractVideoFilter::event(arg1);
+      return QAbstractVideoFilter::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QAbstractVideoFilter::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QAbstractVideoFilter::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QAbstractVideoFilter::eventFilter(arg1, arg2);
+    return QAbstractVideoFilter::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QAbstractVideoFilter_Adaptor, bool, QObject *, QEvent *>(&QAbstractVideoFilter_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QAbstractVideoFilter_Adaptor, bool, QObject *, QEvent *>(&QAbstractVideoFilter_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QAbstractVideoFilter::eventFilter(arg1, arg2);
+      return QAbstractVideoFilter::eventFilter(watched, event);
     }
   }
 
-  //  [adaptor impl] void QAbstractVideoFilter::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [emitter impl] void QAbstractVideoFilter::objectNameChanged(const QString &objectName)
+  void emitter_QAbstractVideoFilter_objectNameChanged_4567(const QString &objectName)
   {
-    QAbstractVideoFilter::childEvent(arg1);
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QAbstractVideoFilter::objectNameChanged(const QString &objectName)'");
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  //  [adaptor impl] void QAbstractVideoFilter::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
+  {
+    QAbstractVideoFilter::childEvent(event);
+  }
+
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QAbstractVideoFilter_Adaptor, QChildEvent *>(&QAbstractVideoFilter_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QAbstractVideoFilter_Adaptor, QChildEvent *>(&QAbstractVideoFilter_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QAbstractVideoFilter::childEvent(arg1);
+      QAbstractVideoFilter::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QAbstractVideoFilter::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QAbstractVideoFilter::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QAbstractVideoFilter::customEvent(arg1);
+    QAbstractVideoFilter::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QAbstractVideoFilter_Adaptor, QEvent *>(&QAbstractVideoFilter_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QAbstractVideoFilter_Adaptor, QEvent *>(&QAbstractVideoFilter_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QAbstractVideoFilter::customEvent(arg1);
+      QAbstractVideoFilter::customEvent(event);
     }
   }
 
@@ -325,18 +330,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QAbstractVideoFilter::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QAbstractVideoFilter::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QAbstractVideoFilter::timerEvent(arg1);
+    QAbstractVideoFilter::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QAbstractVideoFilter_Adaptor, QTimerEvent *>(&QAbstractVideoFilter_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QAbstractVideoFilter_Adaptor, QTimerEvent *>(&QAbstractVideoFilter_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QAbstractVideoFilter::timerEvent(arg1);
+      QAbstractVideoFilter::timerEvent(event);
     }
   }
 
@@ -355,7 +360,7 @@ QAbstractVideoFilter_Adaptor::~QAbstractVideoFilter_Adaptor() { }
 
 static void _init_ctor_QAbstractVideoFilter_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QAbstractVideoFilter_Adaptor> ();
 }
@@ -364,16 +369,30 @@ static void _call_ctor_QAbstractVideoFilter_Adaptor_1302 (const qt_gsi::GenericS
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QAbstractVideoFilter_Adaptor *> (new QAbstractVideoFilter_Adaptor (arg1));
 }
 
 
-// void QAbstractVideoFilter::childEvent(QChildEvent *)
+// emitter void QAbstractVideoFilter::activeChanged()
+
+static void _init_emitter_activeChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_activeChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QAbstractVideoFilter_Adaptor *)cls)->emitter_QAbstractVideoFilter_activeChanged_0 ();
+}
+
+
+// void QAbstractVideoFilter::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -412,11 +431,11 @@ static void _set_callback_cbs_createFilterRunnable_0_0 (void *cls, const gsi::Ca
 }
 
 
-// void QAbstractVideoFilter::customEvent(QEvent *)
+// void QAbstractVideoFilter::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -433,6 +452,24 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QAbstractVideoFilter_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
+}
+
+
+// emitter void QAbstractVideoFilter::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QAbstractVideoFilter_Adaptor *)cls)->emitter_QAbstractVideoFilter_destroyed_1302 (arg1);
 }
 
 
@@ -460,11 +497,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QAbstractVideoFilter::event(QEvent *)
+// bool QAbstractVideoFilter::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -483,13 +520,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QAbstractVideoFilter::eventFilter(QObject *, QEvent *)
+// bool QAbstractVideoFilter::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -524,6 +561,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
   tl::Heap heap;
   const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QAbstractVideoFilter_Adaptor *)cls)->fp_QAbstractVideoFilter_isSignalConnected_c2394 (arg1));
+}
+
+
+// emitter void QAbstractVideoFilter::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QAbstractVideoFilter_Adaptor *)cls)->emitter_QAbstractVideoFilter_objectNameChanged_4567 (arg1);
 }
 
 
@@ -573,11 +628,11 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QAbstractVideoFilter::timerEvent(QTimerEvent *)
+// void QAbstractVideoFilter::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -605,23 +660,26 @@ gsi::Class<QAbstractVideoFilter> &qtdecl_QAbstractVideoFilter ();
 static gsi::Methods methods_QAbstractVideoFilter_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAbstractVideoFilter::QAbstractVideoFilter(QObject *parent)\nThis method creates an object of class QAbstractVideoFilter.", &_init_ctor_QAbstractVideoFilter_Adaptor_1302, &_call_ctor_QAbstractVideoFilter_Adaptor_1302);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QAbstractVideoFilter::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("emit_activeChanged", "@brief Emitter for signal void QAbstractVideoFilter::activeChanged()\nCall this method to emit this signal.", false, &_init_emitter_activeChanged_0, &_call_emitter_activeChanged_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QAbstractVideoFilter::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("createFilterRunnable", "@brief Virtual method QVideoFilterRunnable *QAbstractVideoFilter::createFilterRunnable()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_createFilterRunnable_0_0, &_call_cbs_createFilterRunnable_0_0);
   methods += new qt_gsi::GenericMethod ("createFilterRunnable", "@hide", false, &_init_cbs_createFilterRunnable_0_0, &_call_cbs_createFilterRunnable_0_0, &_set_callback_cbs_createFilterRunnable_0_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAbstractVideoFilter::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAbstractVideoFilter::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QAbstractVideoFilter::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QAbstractVideoFilter::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAbstractVideoFilter::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAbstractVideoFilter::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QAbstractVideoFilter::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QAbstractVideoFilter::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QAbstractVideoFilter::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QAbstractVideoFilter::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QAbstractVideoFilter::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QAbstractVideoFilter::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QAbstractVideoFilter::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QAbstractVideoFilter::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QAbstractVideoFilter::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

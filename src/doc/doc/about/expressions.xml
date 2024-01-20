@@ -4,9 +4,11 @@
 <doc>
 
   <title>About Expressions</title>
+  <keyword>Expressions</keyword>
+  <keyword>Expression Syntax</keyword>
 
   <p>
-  Beside a ruby programming API, KLayout provides support for simple expressions in some places.
+  Beside a ruby and Python programming API, KLayout provides support for simple expressions in some places.
   In particular this feature is employed to generate dynamic strings, for example when deriving the
   label text for a ruler.
   </p>
@@ -161,22 +163,37 @@ Box.new(-10, 0, 90, 60).width
   mentioned in the class documentation. Setter methods like "box_with=" can be used as targets in assignments, i.e.
   </p>
 
-  <pre>
-shape.box_width = 20
-</pre>
+  <pre>shape.box_width = 20</pre>
 
-  <p>Boolean predicates (like "is_box?") are used <b>without</b> the question mark because that is reserved
+  <p>
+  Boolean predicates (like "is_box?") are used <b>without</b> the question mark because that is reserved
   for the decision operator (".. ? .. : .."):
   </p>
 
-  <pre>
-shape.is_box
-</pre>
+  <pre>shape.is_box</pre>
 
   <h2>Concatenation of expressions</h2>
 
   <p>
   The semicolon separates two expressions. The value of that compound expression is the value of the last one.
+  </p>
+
+  <h2>Keyword arguments</h2>
+
+  <p>
+  Most methods support keyword arguments similar to Python. For example you can write:
+  </p>
+
+  <pre>CplxTrans.new(rot = 45.0)</pre>
+
+  <p>
+  This is more explicit than writing the individual arguments and allows giving
+  one argument without having to insert the default values for the previous ones.
+  </p>
+
+  <p>
+  Keyword arguments are not supported for the built-in functions such as "sqrt" and
+  a few built-in methods.
   </p>
 
   <h2>Variables</h2>

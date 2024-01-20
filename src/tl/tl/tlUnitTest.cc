@@ -104,6 +104,7 @@ std::string testdata_private ()
   std::string pp = tl::combine_path (tl::testsrc (), "private");
   pp = tl::combine_path (pp, "testdata");
   if (! tl::file_exists (pp)) {
+    tl::warn << "Cancelling test as private test data is not available.";
     throw tl::CancelException ();
   }
   return pp;

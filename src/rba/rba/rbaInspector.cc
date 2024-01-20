@@ -416,7 +416,7 @@ public:
         meth->call (obj, arglist, retlist);
 
         tl::Heap heap;
-        return pop_arg (meth->ret_type (), p, retlist, heap);
+        return pull_arg (meth->ret_type (), p, retlist, heap);
 
       }
 

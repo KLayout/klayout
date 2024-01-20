@@ -534,6 +534,26 @@ static gsi::Methods methods_QConcatenateTablesProxyModel () {
   methods += new qt_gsi::GenericMethod ("setItemData", "@brief Method bool QConcatenateTablesProxyModel::setItemData(const QModelIndex &index, const QMap<int, QVariant> &roles)\nThis is a reimplementation of QAbstractItemModel::setItemData", false, &_init_f_setItemData_5414, &_call_f_setItemData_5414);
   methods += new qt_gsi::GenericMethod ("sourceModels", "@brief Method QList<QAbstractItemModel *> QConcatenateTablesProxyModel::sourceModels()\n", true, &_init_f_sourceModels_c0, &_call_f_sourceModels_c0);
   methods += new qt_gsi::GenericMethod ("span", "@brief Method QSize QConcatenateTablesProxyModel::span(const QModelIndex &index)\nThis is a reimplementation of QAbstractItemModel::span", true, &_init_f_span_c2395, &_call_f_span_c2395);
+  methods += gsi::qt_signal<const QModelIndex &, int, int > ("columnsAboutToBeInserted(const QModelIndex &, int, int)", "columnsAboutToBeInserted", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QConcatenateTablesProxyModel::columnsAboutToBeInserted(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int, const QModelIndex &, int > ("columnsAboutToBeMoved(const QModelIndex &, int, int, const QModelIndex &, int)", "columnsAboutToBeMoved", gsi::arg("sourceParent"), gsi::arg("sourceStart"), gsi::arg("sourceEnd"), gsi::arg("destinationParent"), gsi::arg("destinationColumn"), "@brief Signal declaration for QConcatenateTablesProxyModel::columnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int > ("columnsAboutToBeRemoved(const QModelIndex &, int, int)", "columnsAboutToBeRemoved", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QConcatenateTablesProxyModel::columnsAboutToBeRemoved(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int > ("columnsInserted(const QModelIndex &, int, int)", "columnsInserted", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QConcatenateTablesProxyModel::columnsInserted(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int, const QModelIndex &, int > ("columnsMoved(const QModelIndex &, int, int, const QModelIndex &, int)", "columnsMoved", gsi::arg("parent"), gsi::arg("start"), gsi::arg("end"), gsi::arg("destination"), gsi::arg("column"), "@brief Signal declaration for QConcatenateTablesProxyModel::columnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int > ("columnsRemoved(const QModelIndex &, int, int)", "columnsRemoved", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QConcatenateTablesProxyModel::columnsRemoved(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, const QModelIndex &, const QList<int> & > ("dataChanged(const QModelIndex &, const QModelIndex &, const QList<int> &)", "dataChanged", gsi::arg("topLeft"), gsi::arg("bottomRight"), gsi::arg("roles"), "@brief Signal declaration for QConcatenateTablesProxyModel::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QConcatenateTablesProxyModel::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<Qt::Orientation>::target_type &, int, int > ("headerDataChanged(Qt::Orientation, int, int)", "headerDataChanged", gsi::arg("orientation"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QConcatenateTablesProxyModel::headerDataChanged(Qt::Orientation orientation, int first, int last)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QList<QPersistentModelIndex> &, const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & > ("layoutAboutToBeChanged(const QList<QPersistentModelIndex> &, QAbstractItemModel::LayoutChangeHint)", "layoutAboutToBeChanged", gsi::arg("parents"), gsi::arg("hint"), "@brief Signal declaration for QConcatenateTablesProxyModel::layoutAboutToBeChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QList<QPersistentModelIndex> &, const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & > ("layoutChanged(const QList<QPersistentModelIndex> &, QAbstractItemModel::LayoutChangeHint)", "layoutChanged", gsi::arg("parents"), gsi::arg("hint"), "@brief Signal declaration for QConcatenateTablesProxyModel::layoutChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("modelAboutToBeReset()", "modelAboutToBeReset", "@brief Signal declaration for QConcatenateTablesProxyModel::modelAboutToBeReset()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("modelReset()", "modelReset", "@brief Signal declaration for QConcatenateTablesProxyModel::modelReset()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QConcatenateTablesProxyModel::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int > ("rowsAboutToBeInserted(const QModelIndex &, int, int)", "rowsAboutToBeInserted", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QConcatenateTablesProxyModel::rowsAboutToBeInserted(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int, const QModelIndex &, int > ("rowsAboutToBeMoved(const QModelIndex &, int, int, const QModelIndex &, int)", "rowsAboutToBeMoved", gsi::arg("sourceParent"), gsi::arg("sourceStart"), gsi::arg("sourceEnd"), gsi::arg("destinationParent"), gsi::arg("destinationRow"), "@brief Signal declaration for QConcatenateTablesProxyModel::rowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int > ("rowsAboutToBeRemoved(const QModelIndex &, int, int)", "rowsAboutToBeRemoved", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QConcatenateTablesProxyModel::rowsAboutToBeRemoved(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int > ("rowsInserted(const QModelIndex &, int, int)", "rowsInserted", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QConcatenateTablesProxyModel::rowsInserted(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int, const QModelIndex &, int > ("rowsMoved(const QModelIndex &, int, int, const QModelIndex &, int)", "rowsMoved", gsi::arg("parent"), gsi::arg("start"), gsi::arg("end"), gsi::arg("destination"), gsi::arg("row"), "@brief Signal declaration for QConcatenateTablesProxyModel::rowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QModelIndex &, int, int > ("rowsRemoved(const QModelIndex &, int, int)", "rowsRemoved", gsi::arg("parent"), gsi::arg("first"), gsi::arg("last"), "@brief Signal declaration for QConcatenateTablesProxyModel::rowsRemoved(const QModelIndex &parent, int first, int last)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QConcatenateTablesProxyModel::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;
 }
@@ -767,6 +787,64 @@ public:
     }
   }
 
+  //  [emitter impl] void QConcatenateTablesProxyModel::columnsAboutToBeInserted(const QModelIndex &parent, int first, int last)
+  void emitter_QConcatenateTablesProxyModel_columnsAboutToBeInserted_7372(const QModelIndex &parent, int first, int last)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (first);
+    __SUPPRESS_UNUSED_WARNING (last);
+    throw tl::Exception ("Can't emit private signal 'void QConcatenateTablesProxyModel::columnsAboutToBeInserted(const QModelIndex &parent, int first, int last)'");
+  }
+
+  //  [emitter impl] void QConcatenateTablesProxyModel::columnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)
+  void emitter_QConcatenateTablesProxyModel_columnsAboutToBeMoved_10318(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)
+  {
+    __SUPPRESS_UNUSED_WARNING (sourceParent);
+    __SUPPRESS_UNUSED_WARNING (sourceStart);
+    __SUPPRESS_UNUSED_WARNING (sourceEnd);
+    __SUPPRESS_UNUSED_WARNING (destinationParent);
+    __SUPPRESS_UNUSED_WARNING (destinationColumn);
+    throw tl::Exception ("Can't emit private signal 'void QConcatenateTablesProxyModel::columnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)'");
+  }
+
+  //  [emitter impl] void QConcatenateTablesProxyModel::columnsAboutToBeRemoved(const QModelIndex &parent, int first, int last)
+  void emitter_QConcatenateTablesProxyModel_columnsAboutToBeRemoved_7372(const QModelIndex &parent, int first, int last)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (first);
+    __SUPPRESS_UNUSED_WARNING (last);
+    throw tl::Exception ("Can't emit private signal 'void QConcatenateTablesProxyModel::columnsAboutToBeRemoved(const QModelIndex &parent, int first, int last)'");
+  }
+
+  //  [emitter impl] void QConcatenateTablesProxyModel::columnsInserted(const QModelIndex &parent, int first, int last)
+  void emitter_QConcatenateTablesProxyModel_columnsInserted_7372(const QModelIndex &parent, int first, int last)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (first);
+    __SUPPRESS_UNUSED_WARNING (last);
+    throw tl::Exception ("Can't emit private signal 'void QConcatenateTablesProxyModel::columnsInserted(const QModelIndex &parent, int first, int last)'");
+  }
+
+  //  [emitter impl] void QConcatenateTablesProxyModel::columnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)
+  void emitter_QConcatenateTablesProxyModel_columnsMoved_10318(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (start);
+    __SUPPRESS_UNUSED_WARNING (end);
+    __SUPPRESS_UNUSED_WARNING (destination);
+    __SUPPRESS_UNUSED_WARNING (column);
+    throw tl::Exception ("Can't emit private signal 'void QConcatenateTablesProxyModel::columnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)'");
+  }
+
+  //  [emitter impl] void QConcatenateTablesProxyModel::columnsRemoved(const QModelIndex &parent, int first, int last)
+  void emitter_QConcatenateTablesProxyModel_columnsRemoved_7372(const QModelIndex &parent, int first, int last)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (first);
+    __SUPPRESS_UNUSED_WARNING (last);
+    throw tl::Exception ("Can't emit private signal 'void QConcatenateTablesProxyModel::columnsRemoved(const QModelIndex &parent, int first, int last)'");
+  }
+
   //  [adaptor impl] QVariant QConcatenateTablesProxyModel::data(const QModelIndex &index, int role)
   QVariant cbs_data_c3054_1(const QModelIndex &index, int role) const
   {
@@ -780,6 +858,18 @@ public:
     } else {
       return QConcatenateTablesProxyModel::data(index, role);
     }
+  }
+
+  //  [emitter impl] void QConcatenateTablesProxyModel::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
+  void emitter_QConcatenateTablesProxyModel_dataChanged_6833(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
+  {
+    emit QConcatenateTablesProxyModel::dataChanged(topLeft, bottomRight, roles);
+  }
+
+  //  [emitter impl] void QConcatenateTablesProxyModel::destroyed(QObject *)
+  void emitter_QConcatenateTablesProxyModel_destroyed_1302(QObject *arg1)
+  {
+    emit QConcatenateTablesProxyModel::destroyed(arg1);
   }
 
   //  [adaptor impl] bool QConcatenateTablesProxyModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
@@ -887,6 +977,12 @@ public:
     }
   }
 
+  //  [emitter impl] void QConcatenateTablesProxyModel::headerDataChanged(Qt::Orientation orientation, int first, int last)
+  void emitter_QConcatenateTablesProxyModel_headerDataChanged_3231(Qt::Orientation orientation, int first, int last)
+  {
+    emit QConcatenateTablesProxyModel::headerDataChanged(orientation, first, last);
+  }
+
   //  [adaptor impl] QModelIndex QConcatenateTablesProxyModel::index(int row, int column, const QModelIndex &parent)
   QModelIndex cbs_index_c3713_1(int row, int column, const QModelIndex &parent) const
   {
@@ -947,6 +1043,18 @@ public:
     }
   }
 
+  //  [emitter impl] void QConcatenateTablesProxyModel::layoutAboutToBeChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
+  void emitter_QConcatenateTablesProxyModel_layoutAboutToBeChanged_7947(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
+  {
+    emit QConcatenateTablesProxyModel::layoutAboutToBeChanged(parents, hint);
+  }
+
+  //  [emitter impl] void QConcatenateTablesProxyModel::layoutChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
+  void emitter_QConcatenateTablesProxyModel_layoutChanged_7947(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
+  {
+    emit QConcatenateTablesProxyModel::layoutChanged(parents, hint);
+  }
+
   //  [adaptor impl] QList<QModelIndex> QConcatenateTablesProxyModel::match(const QModelIndex &start, int role, const QVariant &value, int hits, QFlags<Qt::MatchFlag> flags)
   QList<QModelIndex> cbs_match_c7932_2(const QModelIndex &start, int role, const QVariant &value, int hits, QFlags<Qt::MatchFlag> flags) const
   {
@@ -992,6 +1100,18 @@ public:
     }
   }
 
+  //  [emitter impl] void QConcatenateTablesProxyModel::modelAboutToBeReset()
+  void emitter_QConcatenateTablesProxyModel_modelAboutToBeReset_3767()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QConcatenateTablesProxyModel::modelAboutToBeReset()'");
+  }
+
+  //  [emitter impl] void QConcatenateTablesProxyModel::modelReset()
+  void emitter_QConcatenateTablesProxyModel_modelReset_3767()
+  {
+    throw tl::Exception ("Can't emit private signal 'void QConcatenateTablesProxyModel::modelReset()'");
+  }
+
   //  [adaptor impl] bool QConcatenateTablesProxyModel::moveColumns(const QModelIndex &sourceParent, int sourceColumn, int count, const QModelIndex &destinationParent, int destinationChild)
   bool cbs_moveColumns_6659_0(const QModelIndex &sourceParent, int sourceColumn, int count, const QModelIndex &destinationParent, int destinationChild)
   {
@@ -1035,6 +1155,13 @@ public:
     } else {
       QConcatenateTablesProxyModel::multiData(index, roleDataSpan);
     }
+  }
+
+  //  [emitter impl] void QConcatenateTablesProxyModel::objectNameChanged(const QString &objectName)
+  void emitter_QConcatenateTablesProxyModel_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QConcatenateTablesProxyModel::objectNameChanged(const QString &objectName)'");
   }
 
   //  [adaptor impl] QModelIndex QConcatenateTablesProxyModel::parent(const QModelIndex &index)
@@ -1125,6 +1252,64 @@ public:
     } else {
       return QConcatenateTablesProxyModel::rowCount(parent);
     }
+  }
+
+  //  [emitter impl] void QConcatenateTablesProxyModel::rowsAboutToBeInserted(const QModelIndex &parent, int first, int last)
+  void emitter_QConcatenateTablesProxyModel_rowsAboutToBeInserted_7372(const QModelIndex &parent, int first, int last)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (first);
+    __SUPPRESS_UNUSED_WARNING (last);
+    throw tl::Exception ("Can't emit private signal 'void QConcatenateTablesProxyModel::rowsAboutToBeInserted(const QModelIndex &parent, int first, int last)'");
+  }
+
+  //  [emitter impl] void QConcatenateTablesProxyModel::rowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)
+  void emitter_QConcatenateTablesProxyModel_rowsAboutToBeMoved_10318(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)
+  {
+    __SUPPRESS_UNUSED_WARNING (sourceParent);
+    __SUPPRESS_UNUSED_WARNING (sourceStart);
+    __SUPPRESS_UNUSED_WARNING (sourceEnd);
+    __SUPPRESS_UNUSED_WARNING (destinationParent);
+    __SUPPRESS_UNUSED_WARNING (destinationRow);
+    throw tl::Exception ("Can't emit private signal 'void QConcatenateTablesProxyModel::rowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)'");
+  }
+
+  //  [emitter impl] void QConcatenateTablesProxyModel::rowsAboutToBeRemoved(const QModelIndex &parent, int first, int last)
+  void emitter_QConcatenateTablesProxyModel_rowsAboutToBeRemoved_7372(const QModelIndex &parent, int first, int last)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (first);
+    __SUPPRESS_UNUSED_WARNING (last);
+    throw tl::Exception ("Can't emit private signal 'void QConcatenateTablesProxyModel::rowsAboutToBeRemoved(const QModelIndex &parent, int first, int last)'");
+  }
+
+  //  [emitter impl] void QConcatenateTablesProxyModel::rowsInserted(const QModelIndex &parent, int first, int last)
+  void emitter_QConcatenateTablesProxyModel_rowsInserted_7372(const QModelIndex &parent, int first, int last)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (first);
+    __SUPPRESS_UNUSED_WARNING (last);
+    throw tl::Exception ("Can't emit private signal 'void QConcatenateTablesProxyModel::rowsInserted(const QModelIndex &parent, int first, int last)'");
+  }
+
+  //  [emitter impl] void QConcatenateTablesProxyModel::rowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)
+  void emitter_QConcatenateTablesProxyModel_rowsMoved_10318(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (start);
+    __SUPPRESS_UNUSED_WARNING (end);
+    __SUPPRESS_UNUSED_WARNING (destination);
+    __SUPPRESS_UNUSED_WARNING (row);
+    throw tl::Exception ("Can't emit private signal 'void QConcatenateTablesProxyModel::rowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)'");
+  }
+
+  //  [emitter impl] void QConcatenateTablesProxyModel::rowsRemoved(const QModelIndex &parent, int first, int last)
+  void emitter_QConcatenateTablesProxyModel_rowsRemoved_7372(const QModelIndex &parent, int first, int last)
+  {
+    __SUPPRESS_UNUSED_WARNING (parent);
+    __SUPPRESS_UNUSED_WARNING (first);
+    __SUPPRESS_UNUSED_WARNING (last);
+    throw tl::Exception ("Can't emit private signal 'void QConcatenateTablesProxyModel::rowsRemoved(const QModelIndex &parent, int first, int last)'");
   }
 
   //  [adaptor impl] bool QConcatenateTablesProxyModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -1772,6 +1957,162 @@ static void _set_callback_cbs_columnCount_c2395_1 (void *cls, const gsi::Callbac
 }
 
 
+// emitter void QConcatenateTablesProxyModel::columnsAboutToBeInserted(const QModelIndex &parent, int first, int last)
+
+static void _init_emitter_columnsAboutToBeInserted_7372 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("first");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("last");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_columnsAboutToBeInserted_7372 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_columnsAboutToBeInserted_7372 (arg1, arg2, arg3);
+}
+
+
+// emitter void QConcatenateTablesProxyModel::columnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)
+
+static void _init_emitter_columnsAboutToBeMoved_10318 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("sourceParent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("sourceStart");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("sourceEnd");
+  decl->add_arg<int > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("destinationParent");
+  decl->add_arg<const QModelIndex & > (argspec_3);
+  static gsi::ArgSpecBase argspec_4 ("destinationColumn");
+  decl->add_arg<int > (argspec_4);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_columnsAboutToBeMoved_10318 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg4 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_columnsAboutToBeMoved_10318 (arg1, arg2, arg3, arg4, arg5);
+}
+
+
+// emitter void QConcatenateTablesProxyModel::columnsAboutToBeRemoved(const QModelIndex &parent, int first, int last)
+
+static void _init_emitter_columnsAboutToBeRemoved_7372 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("first");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("last");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_columnsAboutToBeRemoved_7372 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_columnsAboutToBeRemoved_7372 (arg1, arg2, arg3);
+}
+
+
+// emitter void QConcatenateTablesProxyModel::columnsInserted(const QModelIndex &parent, int first, int last)
+
+static void _init_emitter_columnsInserted_7372 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("first");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("last");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_columnsInserted_7372 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_columnsInserted_7372 (arg1, arg2, arg3);
+}
+
+
+// emitter void QConcatenateTablesProxyModel::columnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)
+
+static void _init_emitter_columnsMoved_10318 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("start");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("end");
+  decl->add_arg<int > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("destination");
+  decl->add_arg<const QModelIndex & > (argspec_3);
+  static gsi::ArgSpecBase argspec_4 ("column");
+  decl->add_arg<int > (argspec_4);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_columnsMoved_10318 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg4 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_columnsMoved_10318 (arg1, arg2, arg3, arg4, arg5);
+}
+
+
+// emitter void QConcatenateTablesProxyModel::columnsRemoved(const QModelIndex &parent, int first, int last)
+
+static void _init_emitter_columnsRemoved_7372 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("first");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("last");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_columnsRemoved_7372 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_columnsRemoved_7372 (arg1, arg2, arg3);
+}
+
+
 // exposed QModelIndex QConcatenateTablesProxyModel::createIndex(int row, int column, const void *data)
 
 static void _init_fp_createIndex_c3069 (qt_gsi::GenericMethod *decl)
@@ -1870,6 +2211,30 @@ static void _set_callback_cbs_data_c3054_1 (void *cls, const gsi::Callback &cb)
 }
 
 
+// emitter void QConcatenateTablesProxyModel::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
+
+static void _init_emitter_dataChanged_6833 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("topLeft");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("bottomRight");
+  decl->add_arg<const QModelIndex & > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("roles", true, "QList<int>()");
+  decl->add_arg<const QList<int> & > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_dataChanged_6833 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  const QModelIndex &arg2 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  const QList<int> &arg3 = args ? gsi::arg_reader<const QList<int> & >() (args, heap) : gsi::arg_maker<const QList<int> & >() (QList<int>(), heap);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_dataChanged_6833 (arg1, arg2, arg3);
+}
+
+
 // exposed bool QConcatenateTablesProxyModel::decodeData(int row, int column, const QModelIndex &parent, QDataStream &stream)
 
 static void _init_fp_decodeData_5302 (qt_gsi::GenericMethod *decl)
@@ -1894,6 +2259,24 @@ static void _call_fp_decodeData_5302 (const qt_gsi::GenericMethod * /*decl*/, vo
   const QModelIndex &arg3 = gsi::arg_reader<const QModelIndex & >() (args, heap);
   QDataStream &arg4 = gsi::arg_reader<QDataStream & >() (args, heap);
   ret.write<bool > ((bool)((QConcatenateTablesProxyModel_Adaptor *)cls)->fp_QConcatenateTablesProxyModel_decodeData_5302 (arg1, arg2, arg3, arg4));
+}
+
+
+// emitter void QConcatenateTablesProxyModel::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_destroyed_1302 (arg1);
 }
 
 
@@ -2231,6 +2614,30 @@ static void _set_callback_cbs_headerData_c3231_1 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QConcatenateTablesProxyModel::headerDataChanged(Qt::Orientation orientation, int first, int last)
+
+static void _init_emitter_headerDataChanged_3231 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("orientation");
+  decl->add_arg<const qt_gsi::Converter<Qt::Orientation>::target_type & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("first");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("last");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_headerDataChanged_3231 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<Qt::Orientation>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::Orientation>::target_type & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_headerDataChanged_3231 (arg1, arg2, arg3);
+}
+
+
 // QModelIndex QConcatenateTablesProxyModel::index(int row, int column, const QModelIndex &parent)
 
 static void _init_cbs_index_c3713_1 (qt_gsi::GenericMethod *decl)
@@ -2359,6 +2766,48 @@ static void _set_callback_cbs_itemData_c2395_0 (void *cls, const gsi::Callback &
 }
 
 
+// emitter void QConcatenateTablesProxyModel::layoutAboutToBeChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
+
+static void _init_emitter_layoutAboutToBeChanged_7947 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parents", true, "QList<QPersistentModelIndex>()");
+  decl->add_arg<const QList<QPersistentModelIndex> & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("hint", true, "QAbstractItemModel::NoLayoutChangeHint");
+  decl->add_arg<const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_layoutAboutToBeChanged_7947 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QList<QPersistentModelIndex> &arg1 = args ? gsi::arg_reader<const QList<QPersistentModelIndex> & >() (args, heap) : gsi::arg_maker<const QList<QPersistentModelIndex> & >() (QList<QPersistentModelIndex>(), heap);
+  const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QAbstractItemModel::LayoutChangeHint>(heap, QAbstractItemModel::NoLayoutChangeHint), heap);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_layoutAboutToBeChanged_7947 (arg1, arg2);
+}
+
+
+// emitter void QConcatenateTablesProxyModel::layoutChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
+
+static void _init_emitter_layoutChanged_7947 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parents", true, "QList<QPersistentModelIndex>()");
+  decl->add_arg<const QList<QPersistentModelIndex> & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("hint", true, "QAbstractItemModel::NoLayoutChangeHint");
+  decl->add_arg<const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_layoutChanged_7947 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QList<QPersistentModelIndex> &arg1 = args ? gsi::arg_reader<const QList<QPersistentModelIndex> & >() (args, heap) : gsi::arg_maker<const QList<QPersistentModelIndex> & >() (QList<QPersistentModelIndex>(), heap);
+  const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<QAbstractItemModel::LayoutChangeHint>::target_type & >() (qt_gsi::CppToQtReadAdaptor<QAbstractItemModel::LayoutChangeHint>(heap, QAbstractItemModel::NoLayoutChangeHint), heap);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_layoutChanged_7947 (arg1, arg2);
+}
+
+
 // QList<QModelIndex> QConcatenateTablesProxyModel::match(const QModelIndex &start, int role, const QVariant &value, int hits, QFlags<Qt::MatchFlag> flags)
 
 static void _init_cbs_match_c7932_2 (qt_gsi::GenericMethod *decl)
@@ -2433,6 +2882,34 @@ static void _call_cbs_mimeTypes_c0_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 static void _set_callback_cbs_mimeTypes_c0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QConcatenateTablesProxyModel_Adaptor *)cls)->cb_mimeTypes_c0_0 = cb;
+}
+
+
+// emitter void QConcatenateTablesProxyModel::modelAboutToBeReset()
+
+static void _init_emitter_modelAboutToBeReset_3767 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_modelAboutToBeReset_3767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_modelAboutToBeReset_3767 ();
+}
+
+
+// emitter void QConcatenateTablesProxyModel::modelReset()
+
+static void _init_emitter_modelReset_3767 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_modelReset_3767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_modelReset_3767 ();
 }
 
 
@@ -2530,6 +3007,24 @@ static void _call_cbs_multiData_c4483_0 (const qt_gsi::GenericMethod * /*decl*/,
 static void _set_callback_cbs_multiData_c4483_0 (void *cls, const gsi::Callback &cb)
 {
   ((QConcatenateTablesProxyModel_Adaptor *)cls)->cb_multiData_c4483_0 = cb;
+}
+
+
+// emitter void QConcatenateTablesProxyModel::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_objectNameChanged_4567 (arg1);
 }
 
 
@@ -2725,6 +3220,162 @@ static void _call_cbs_rowCount_c2395_1 (const qt_gsi::GenericMethod * /*decl*/, 
 static void _set_callback_cbs_rowCount_c2395_1 (void *cls, const gsi::Callback &cb)
 {
   ((QConcatenateTablesProxyModel_Adaptor *)cls)->cb_rowCount_c2395_1 = cb;
+}
+
+
+// emitter void QConcatenateTablesProxyModel::rowsAboutToBeInserted(const QModelIndex &parent, int first, int last)
+
+static void _init_emitter_rowsAboutToBeInserted_7372 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("first");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("last");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_rowsAboutToBeInserted_7372 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_rowsAboutToBeInserted_7372 (arg1, arg2, arg3);
+}
+
+
+// emitter void QConcatenateTablesProxyModel::rowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)
+
+static void _init_emitter_rowsAboutToBeMoved_10318 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("sourceParent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("sourceStart");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("sourceEnd");
+  decl->add_arg<int > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("destinationParent");
+  decl->add_arg<const QModelIndex & > (argspec_3);
+  static gsi::ArgSpecBase argspec_4 ("destinationRow");
+  decl->add_arg<int > (argspec_4);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_rowsAboutToBeMoved_10318 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg4 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_rowsAboutToBeMoved_10318 (arg1, arg2, arg3, arg4, arg5);
+}
+
+
+// emitter void QConcatenateTablesProxyModel::rowsAboutToBeRemoved(const QModelIndex &parent, int first, int last)
+
+static void _init_emitter_rowsAboutToBeRemoved_7372 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("first");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("last");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_rowsAboutToBeRemoved_7372 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_rowsAboutToBeRemoved_7372 (arg1, arg2, arg3);
+}
+
+
+// emitter void QConcatenateTablesProxyModel::rowsInserted(const QModelIndex &parent, int first, int last)
+
+static void _init_emitter_rowsInserted_7372 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("first");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("last");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_rowsInserted_7372 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_rowsInserted_7372 (arg1, arg2, arg3);
+}
+
+
+// emitter void QConcatenateTablesProxyModel::rowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)
+
+static void _init_emitter_rowsMoved_10318 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("start");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("end");
+  decl->add_arg<int > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("destination");
+  decl->add_arg<const QModelIndex & > (argspec_3);
+  static gsi::ArgSpecBase argspec_4 ("row");
+  decl->add_arg<int > (argspec_4);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_rowsMoved_10318 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg4 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg5 = gsi::arg_reader<int >() (args, heap);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_rowsMoved_10318 (arg1, arg2, arg3, arg4, arg5);
+}
+
+
+// emitter void QConcatenateTablesProxyModel::rowsRemoved(const QModelIndex &parent, int first, int last)
+
+static void _init_emitter_rowsRemoved_7372 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("parent");
+  decl->add_arg<const QModelIndex & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("first");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("last");
+  decl->add_arg<int > (argspec_2);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_rowsRemoved_7372 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QModelIndex &arg1 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  int arg3 = gsi::arg_reader<int >() (args, heap);
+  ((QConcatenateTablesProxyModel_Adaptor *)cls)->emitter_QConcatenateTablesProxyModel_rowsRemoved_7372 (arg1, arg2, arg3);
 }
 
 
@@ -3032,13 +3683,21 @@ static gsi::Methods methods_QConcatenateTablesProxyModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("clearItemData", "@hide", false, &_init_cbs_clearItemData_2395_0, &_call_cbs_clearItemData_2395_0, &_set_callback_cbs_clearItemData_2395_0);
   methods += new qt_gsi::GenericMethod ("columnCount", "@brief Virtual method int QConcatenateTablesProxyModel::columnCount(const QModelIndex &parent)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_columnCount_c2395_1, &_call_cbs_columnCount_c2395_1);
   methods += new qt_gsi::GenericMethod ("columnCount", "@hide", true, &_init_cbs_columnCount_c2395_1, &_call_cbs_columnCount_c2395_1, &_set_callback_cbs_columnCount_c2395_1);
+  methods += new qt_gsi::GenericMethod ("emit_columnsAboutToBeInserted", "@brief Emitter for signal void QConcatenateTablesProxyModel::columnsAboutToBeInserted(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_columnsAboutToBeInserted_7372, &_call_emitter_columnsAboutToBeInserted_7372);
+  methods += new qt_gsi::GenericMethod ("emit_columnsAboutToBeMoved", "@brief Emitter for signal void QConcatenateTablesProxyModel::columnsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)\nCall this method to emit this signal.", false, &_init_emitter_columnsAboutToBeMoved_10318, &_call_emitter_columnsAboutToBeMoved_10318);
+  methods += new qt_gsi::GenericMethod ("emit_columnsAboutToBeRemoved", "@brief Emitter for signal void QConcatenateTablesProxyModel::columnsAboutToBeRemoved(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_columnsAboutToBeRemoved_7372, &_call_emitter_columnsAboutToBeRemoved_7372);
+  methods += new qt_gsi::GenericMethod ("emit_columnsInserted", "@brief Emitter for signal void QConcatenateTablesProxyModel::columnsInserted(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_columnsInserted_7372, &_call_emitter_columnsInserted_7372);
+  methods += new qt_gsi::GenericMethod ("emit_columnsMoved", "@brief Emitter for signal void QConcatenateTablesProxyModel::columnsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int column)\nCall this method to emit this signal.", false, &_init_emitter_columnsMoved_10318, &_call_emitter_columnsMoved_10318);
+  methods += new qt_gsi::GenericMethod ("emit_columnsRemoved", "@brief Emitter for signal void QConcatenateTablesProxyModel::columnsRemoved(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_columnsRemoved_7372, &_call_emitter_columnsRemoved_7372);
   methods += new qt_gsi::GenericMethod ("*createIndex", "@brief Method QModelIndex QConcatenateTablesProxyModel::createIndex(int row, int column, const void *data)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_createIndex_c3069, &_call_fp_createIndex_c3069);
   methods += new qt_gsi::GenericMethod ("*createIndex", "@brief Method QModelIndex QConcatenateTablesProxyModel::createIndex(int row, int column, quintptr id)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_createIndex_c2657, &_call_fp_createIndex_c2657);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QConcatenateTablesProxyModel::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("data", "@brief Virtual method QVariant QConcatenateTablesProxyModel::data(const QModelIndex &index, int role)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_data_c3054_1, &_call_cbs_data_c3054_1);
   methods += new qt_gsi::GenericMethod ("data", "@hide", true, &_init_cbs_data_c3054_1, &_call_cbs_data_c3054_1, &_set_callback_cbs_data_c3054_1);
+  methods += new qt_gsi::GenericMethod ("emit_dataChanged", "@brief Emitter for signal void QConcatenateTablesProxyModel::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)\nCall this method to emit this signal.", false, &_init_emitter_dataChanged_6833, &_call_emitter_dataChanged_6833);
   methods += new qt_gsi::GenericMethod ("*decodeData", "@brief Method bool QConcatenateTablesProxyModel::decodeData(int row, int column, const QModelIndex &parent, QDataStream &stream)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_decodeData_5302, &_call_fp_decodeData_5302);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QConcatenateTablesProxyModel::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QConcatenateTablesProxyModel::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("dropMimeData", "@brief Virtual method bool QConcatenateTablesProxyModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_dropMimeData_7425_0, &_call_cbs_dropMimeData_7425_0);
@@ -3063,6 +3722,7 @@ static gsi::Methods methods_QConcatenateTablesProxyModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("hasChildren", "@hide", true, &_init_cbs_hasChildren_c2395_1, &_call_cbs_hasChildren_c2395_1, &_set_callback_cbs_hasChildren_c2395_1);
   methods += new qt_gsi::GenericMethod ("headerData", "@brief Virtual method QVariant QConcatenateTablesProxyModel::headerData(int section, Qt::Orientation orientation, int role)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_headerData_c3231_1, &_call_cbs_headerData_c3231_1);
   methods += new qt_gsi::GenericMethod ("headerData", "@hide", true, &_init_cbs_headerData_c3231_1, &_call_cbs_headerData_c3231_1, &_set_callback_cbs_headerData_c3231_1);
+  methods += new qt_gsi::GenericMethod ("emit_headerDataChanged", "@brief Emitter for signal void QConcatenateTablesProxyModel::headerDataChanged(Qt::Orientation orientation, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_headerDataChanged_3231, &_call_emitter_headerDataChanged_3231);
   methods += new qt_gsi::GenericMethod ("index", "@brief Virtual method QModelIndex QConcatenateTablesProxyModel::index(int row, int column, const QModelIndex &parent)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_index_c3713_1, &_call_cbs_index_c3713_1);
   methods += new qt_gsi::GenericMethod ("index", "@hide", true, &_init_cbs_index_c3713_1, &_call_cbs_index_c3713_1, &_set_callback_cbs_index_c3713_1);
   methods += new qt_gsi::GenericMethod ("insertColumns", "@brief Virtual method bool QConcatenateTablesProxyModel::insertColumns(int column, int count, const QModelIndex &parent)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_insertColumns_3713_1, &_call_cbs_insertColumns_3713_1);
@@ -3072,18 +3732,23 @@ static gsi::Methods methods_QConcatenateTablesProxyModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QConcatenateTablesProxyModel::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("itemData", "@brief Virtual method QMap<int, QVariant> QConcatenateTablesProxyModel::itemData(const QModelIndex &proxyIndex)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_itemData_c2395_0, &_call_cbs_itemData_c2395_0);
   methods += new qt_gsi::GenericMethod ("itemData", "@hide", true, &_init_cbs_itemData_c2395_0, &_call_cbs_itemData_c2395_0, &_set_callback_cbs_itemData_c2395_0);
+  methods += new qt_gsi::GenericMethod ("emit_layoutAboutToBeChanged", "@brief Emitter for signal void QConcatenateTablesProxyModel::layoutAboutToBeChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)\nCall this method to emit this signal.", false, &_init_emitter_layoutAboutToBeChanged_7947, &_call_emitter_layoutAboutToBeChanged_7947);
+  methods += new qt_gsi::GenericMethod ("emit_layoutChanged", "@brief Emitter for signal void QConcatenateTablesProxyModel::layoutChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)\nCall this method to emit this signal.", false, &_init_emitter_layoutChanged_7947, &_call_emitter_layoutChanged_7947);
   methods += new qt_gsi::GenericMethod ("match", "@brief Virtual method QList<QModelIndex> QConcatenateTablesProxyModel::match(const QModelIndex &start, int role, const QVariant &value, int hits, QFlags<Qt::MatchFlag> flags)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_match_c7932_2, &_call_cbs_match_c7932_2);
   methods += new qt_gsi::GenericMethod ("match", "@hide", true, &_init_cbs_match_c7932_2, &_call_cbs_match_c7932_2, &_set_callback_cbs_match_c7932_2);
   methods += new qt_gsi::GenericMethod ("mimeData", "@brief Virtual method QMimeData *QConcatenateTablesProxyModel::mimeData(const QList<QModelIndex> &indexes)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_mimeData_c3010_0, &_call_cbs_mimeData_c3010_0);
   methods += new qt_gsi::GenericMethod ("mimeData", "@hide", true, &_init_cbs_mimeData_c3010_0, &_call_cbs_mimeData_c3010_0, &_set_callback_cbs_mimeData_c3010_0);
   methods += new qt_gsi::GenericMethod ("mimeTypes", "@brief Virtual method QStringList QConcatenateTablesProxyModel::mimeTypes()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_mimeTypes_c0_0, &_call_cbs_mimeTypes_c0_0);
   methods += new qt_gsi::GenericMethod ("mimeTypes", "@hide", true, &_init_cbs_mimeTypes_c0_0, &_call_cbs_mimeTypes_c0_0, &_set_callback_cbs_mimeTypes_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_modelAboutToBeReset", "@brief Emitter for signal void QConcatenateTablesProxyModel::modelAboutToBeReset()\nCall this method to emit this signal.", false, &_init_emitter_modelAboutToBeReset_3767, &_call_emitter_modelAboutToBeReset_3767);
+  methods += new qt_gsi::GenericMethod ("emit_modelReset", "@brief Emitter for signal void QConcatenateTablesProxyModel::modelReset()\nCall this method to emit this signal.", false, &_init_emitter_modelReset_3767, &_call_emitter_modelReset_3767);
   methods += new qt_gsi::GenericMethod ("moveColumns", "@brief Virtual method bool QConcatenateTablesProxyModel::moveColumns(const QModelIndex &sourceParent, int sourceColumn, int count, const QModelIndex &destinationParent, int destinationChild)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveColumns_6659_0, &_call_cbs_moveColumns_6659_0);
   methods += new qt_gsi::GenericMethod ("moveColumns", "@hide", false, &_init_cbs_moveColumns_6659_0, &_call_cbs_moveColumns_6659_0, &_set_callback_cbs_moveColumns_6659_0);
   methods += new qt_gsi::GenericMethod ("moveRows", "@brief Virtual method bool QConcatenateTablesProxyModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_moveRows_6659_0, &_call_cbs_moveRows_6659_0);
   methods += new qt_gsi::GenericMethod ("moveRows", "@hide", false, &_init_cbs_moveRows_6659_0, &_call_cbs_moveRows_6659_0, &_set_callback_cbs_moveRows_6659_0);
   methods += new qt_gsi::GenericMethod ("multiData", "@brief Virtual method void QConcatenateTablesProxyModel::multiData(const QModelIndex &index, QModelRoleDataSpan roleDataSpan)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_multiData_c4483_0, &_call_cbs_multiData_c4483_0);
   methods += new qt_gsi::GenericMethod ("multiData", "@hide", true, &_init_cbs_multiData_c4483_0, &_call_cbs_multiData_c4483_0, &_set_callback_cbs_multiData_c4483_0);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QConcatenateTablesProxyModel::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("parent", "@brief Virtual method QModelIndex QConcatenateTablesProxyModel::parent(const QModelIndex &index)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_parent_c2395_0, &_call_cbs_parent_c2395_0);
   methods += new qt_gsi::GenericMethod ("parent", "@hide", true, &_init_cbs_parent_c2395_0, &_call_cbs_parent_c2395_0, &_set_callback_cbs_parent_c2395_0);
   methods += new qt_gsi::GenericMethod ("*persistentIndexList", "@brief Method QList<QModelIndex> QConcatenateTablesProxyModel::persistentIndexList()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_persistentIndexList_c0, &_call_fp_persistentIndexList_c0);
@@ -3100,6 +3765,12 @@ static gsi::Methods methods_QConcatenateTablesProxyModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("roleNames", "@hide", true, &_init_cbs_roleNames_c0_0, &_call_cbs_roleNames_c0_0, &_set_callback_cbs_roleNames_c0_0);
   methods += new qt_gsi::GenericMethod ("rowCount", "@brief Virtual method int QConcatenateTablesProxyModel::rowCount(const QModelIndex &parent)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_rowCount_c2395_1, &_call_cbs_rowCount_c2395_1);
   methods += new qt_gsi::GenericMethod ("rowCount", "@hide", true, &_init_cbs_rowCount_c2395_1, &_call_cbs_rowCount_c2395_1, &_set_callback_cbs_rowCount_c2395_1);
+  methods += new qt_gsi::GenericMethod ("emit_rowsAboutToBeInserted", "@brief Emitter for signal void QConcatenateTablesProxyModel::rowsAboutToBeInserted(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_rowsAboutToBeInserted_7372, &_call_emitter_rowsAboutToBeInserted_7372);
+  methods += new qt_gsi::GenericMethod ("emit_rowsAboutToBeMoved", "@brief Emitter for signal void QConcatenateTablesProxyModel::rowsAboutToBeMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)\nCall this method to emit this signal.", false, &_init_emitter_rowsAboutToBeMoved_10318, &_call_emitter_rowsAboutToBeMoved_10318);
+  methods += new qt_gsi::GenericMethod ("emit_rowsAboutToBeRemoved", "@brief Emitter for signal void QConcatenateTablesProxyModel::rowsAboutToBeRemoved(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_rowsAboutToBeRemoved_7372, &_call_emitter_rowsAboutToBeRemoved_7372);
+  methods += new qt_gsi::GenericMethod ("emit_rowsInserted", "@brief Emitter for signal void QConcatenateTablesProxyModel::rowsInserted(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_rowsInserted_7372, &_call_emitter_rowsInserted_7372);
+  methods += new qt_gsi::GenericMethod ("emit_rowsMoved", "@brief Emitter for signal void QConcatenateTablesProxyModel::rowsMoved(const QModelIndex &parent, int start, int end, const QModelIndex &destination, int row)\nCall this method to emit this signal.", false, &_init_emitter_rowsMoved_10318, &_call_emitter_rowsMoved_10318);
+  methods += new qt_gsi::GenericMethod ("emit_rowsRemoved", "@brief Emitter for signal void QConcatenateTablesProxyModel::rowsRemoved(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_rowsRemoved_7372, &_call_emitter_rowsRemoved_7372);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QConcatenateTablesProxyModel::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QConcatenateTablesProxyModel::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("setData", "@brief Virtual method bool QConcatenateTablesProxyModel::setData(const QModelIndex &index, const QVariant &value, int role)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setData_5065_1, &_call_cbs_setData_5065_1);

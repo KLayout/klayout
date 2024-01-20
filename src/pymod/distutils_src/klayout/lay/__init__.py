@@ -1,6 +1,6 @@
-import klayout.dbcore  # enables stream reader plugins
-import klayout.laycore
 
-from klayout.laycore import *
+from ..dbcore import Layout  # enables stream reader plugins
 
-__all__ = klayout.laycore.__all__
+from ..laycore import __all__
+from ..laycore import *
+

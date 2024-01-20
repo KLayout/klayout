@@ -1011,7 +1011,7 @@ QListWidgetItem_Adaptor::~QListWidgetItem_Adaptor() { }
 
 static void _init_ctor_QListWidgetItem_Adaptor_2386 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("view", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("view", true, "nullptr");
   decl->add_arg<QListWidget * > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("type", true, "QListWidgetItem::Type");
   decl->add_arg<int > (argspec_1);
@@ -1022,7 +1022,7 @@ static void _call_ctor_QListWidgetItem_Adaptor_2386 (const qt_gsi::GenericStatic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QListWidget *arg1 = args ? gsi::arg_reader<QListWidget * >() (args, heap) : gsi::arg_maker<QListWidget * >() (0, heap);
+  QListWidget *arg1 = args ? gsi::arg_reader<QListWidget * >() (args, heap) : gsi::arg_maker<QListWidget * >() (nullptr, heap);
   int arg2 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (QListWidgetItem::Type, heap);
   QListWidgetItem_Adaptor *obj = new QListWidgetItem_Adaptor (arg1, arg2);
   if (arg1) {
@@ -1040,7 +1040,7 @@ static void _init_ctor_QListWidgetItem_Adaptor_4303 (qt_gsi::GenericStaticMethod
 {
   static gsi::ArgSpecBase argspec_0 ("text");
   decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("view", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("view", true, "nullptr");
   decl->add_arg<QListWidget * > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("type", true, "QListWidgetItem::Type");
   decl->add_arg<int > (argspec_2);
@@ -1052,7 +1052,7 @@ static void _call_ctor_QListWidgetItem_Adaptor_4303 (const qt_gsi::GenericStatic
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  QListWidget *arg2 = args ? gsi::arg_reader<QListWidget * >() (args, heap) : gsi::arg_maker<QListWidget * >() (0, heap);
+  QListWidget *arg2 = args ? gsi::arg_reader<QListWidget * >() (args, heap) : gsi::arg_maker<QListWidget * >() (nullptr, heap);
   int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (QListWidgetItem::Type, heap);
   ret.write<QListWidgetItem_Adaptor *> (new QListWidgetItem_Adaptor (arg1, arg2, arg3));
 }
@@ -1066,7 +1066,7 @@ static void _init_ctor_QListWidgetItem_Adaptor_5982 (qt_gsi::GenericStaticMethod
   decl->add_arg<const QIcon & > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("text");
   decl->add_arg<const QString & > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("view", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("view", true, "nullptr");
   decl->add_arg<QListWidget * > (argspec_2);
   static gsi::ArgSpecBase argspec_3 ("type", true, "QListWidgetItem::Type");
   decl->add_arg<int > (argspec_3);
@@ -1079,7 +1079,7 @@ static void _call_ctor_QListWidgetItem_Adaptor_5982 (const qt_gsi::GenericStatic
   tl::Heap heap;
   const QIcon &arg1 = gsi::arg_reader<const QIcon & >() (args, heap);
   const QString &arg2 = gsi::arg_reader<const QString & >() (args, heap);
-  QListWidget *arg3 = args ? gsi::arg_reader<QListWidget * >() (args, heap) : gsi::arg_maker<QListWidget * >() (0, heap);
+  QListWidget *arg3 = args ? gsi::arg_reader<QListWidget * >() (args, heap) : gsi::arg_maker<QListWidget * >() (nullptr, heap);
   int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (QListWidgetItem::Type, heap);
   ret.write<QListWidgetItem_Adaptor *> (new QListWidgetItem_Adaptor (arg1, arg2, arg3, arg4));
 }

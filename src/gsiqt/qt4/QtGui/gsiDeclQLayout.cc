@@ -110,6 +110,7 @@ static void _call_f_addWidget_1315 (const qt_gsi::GenericMethod * /*decl*/, void
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QLayout *)cls)->addWidget (arg1);
 }

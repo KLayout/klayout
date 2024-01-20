@@ -277,6 +277,8 @@ static gsi::Methods methods_QFontComboBox () {
   methods += gsi::qt_signal<const QString & > ("editTextChanged(const QString &)", "editTextChanged", gsi::arg("arg1"), "@brief Signal declaration for QFontComboBox::editTextChanged(const QString &)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<int > ("highlighted(int)", "highlighted", gsi::arg("index"), "@brief Signal declaration for QFontComboBox::highlighted(int index)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QFontComboBox::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("textActivated(const QString &)", "textActivated", gsi::arg("arg1"), "@brief Signal declaration for QFontComboBox::textActivated(const QString &)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("textHighlighted(const QString &)", "textHighlighted", gsi::arg("arg1"), "@brief Signal declaration for QFontComboBox::textHighlighted(const QString &)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QIcon & > ("windowIconChanged(const QIcon &)", "windowIconChanged", gsi::arg("icon"), "@brief Signal declaration for QFontComboBox::windowIconChanged(const QIcon &icon)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("windowIconTextChanged(const QString &)", "windowIconTextChanged", gsi::arg("iconText"), "@brief Signal declaration for QFontComboBox::windowIconTextChanged(const QString &iconText)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("windowTitleChanged(const QString &)", "windowTitleChanged", gsi::arg("title"), "@brief Signal declaration for QFontComboBox::windowTitleChanged(const QString &title)\nYou can bind a procedure to this signal.");
@@ -576,6 +578,18 @@ public:
     } else {
       return QFontComboBox::sizeHint();
     }
+  }
+
+  //  [emitter impl] void QFontComboBox::textActivated(const QString &)
+  void emitter_QFontComboBox_textActivated_2025(const QString &arg1)
+  {
+    emit QFontComboBox::textActivated(arg1);
+  }
+
+  //  [emitter impl] void QFontComboBox::textHighlighted(const QString &)
+  void emitter_QFontComboBox_textHighlighted_2025(const QString &arg1)
+  {
+    emit QFontComboBox::textHighlighted(arg1);
   }
 
   //  [emitter impl] void QFontComboBox::windowIconChanged(const QIcon &icon)
@@ -2634,6 +2648,42 @@ static void _set_callback_cbs_tabletEvent_1821_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QFontComboBox::textActivated(const QString &)
+
+static void _init_emitter_textActivated_2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_textActivated_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QFontComboBox_Adaptor *)cls)->emitter_QFontComboBox_textActivated_2025 (arg1);
+}
+
+
+// emitter void QFontComboBox::textHighlighted(const QString &)
+
+static void _init_emitter_textHighlighted_2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_textHighlighted_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QFontComboBox_Adaptor *)cls)->emitter_QFontComboBox_textHighlighted_2025 (arg1);
+}
+
+
 // void QFontComboBox::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
@@ -2774,14 +2824,14 @@ static gsi::Methods methods_QFontComboBox_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*closeEvent", "@hide", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0, &_set_callback_cbs_closeEvent_1719_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QFontComboBox::contextMenuEvent(QContextMenuEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0, &_set_callback_cbs_contextMenuEvent_2363_0);
-  methods += new qt_gsi::GenericMethod ("*qt_create", "@brief Method void QFontComboBox::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
+  methods += new qt_gsi::GenericMethod ("*create|qt_create", "@brief Method void QFontComboBox::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
   methods += new qt_gsi::GenericMethod ("emit_currentFontChanged", "@brief Emitter for signal void QFontComboBox::currentFontChanged(const QFont &f)\nCall this method to emit this signal.", false, &_init_emitter_currentFontChanged_1801, &_call_emitter_currentFontChanged_1801);
   methods += new qt_gsi::GenericMethod ("emit_currentIndexChanged", "@brief Emitter for signal void QFontComboBox::currentIndexChanged(int index)\nCall this method to emit this signal.", false, &_init_emitter_currentIndexChanged_767, &_call_emitter_currentIndexChanged_767);
   methods += new qt_gsi::GenericMethod ("emit_currentTextChanged", "@brief Emitter for signal void QFontComboBox::currentTextChanged(const QString &)\nCall this method to emit this signal.", false, &_init_emitter_currentTextChanged_2025, &_call_emitter_currentTextChanged_2025);
   methods += new qt_gsi::GenericMethod ("emit_customContextMenuRequested", "@brief Emitter for signal void QFontComboBox::customContextMenuRequested(const QPoint &pos)\nCall this method to emit this signal.", false, &_init_emitter_customContextMenuRequested_1916, &_call_emitter_customContextMenuRequested_1916);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QFontComboBox::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*qt_destroy", "@brief Method void QFontComboBox::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
+  methods += new qt_gsi::GenericMethod ("*destroy|qt_destroy", "@brief Method void QFontComboBox::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QFontComboBox::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QFontComboBox::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
@@ -2874,6 +2924,8 @@ static gsi::Methods methods_QFontComboBox_Adaptor () {
   methods += new qt_gsi::GenericMethod ("sizeHint", "@hide", true, &_init_cbs_sizeHint_c0_0, &_call_cbs_sizeHint_c0_0, &_set_callback_cbs_sizeHint_c0_0);
   methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QFontComboBox::tabletEvent(QTabletEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
   methods += new qt_gsi::GenericMethod ("*tabletEvent", "@hide", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0, &_set_callback_cbs_tabletEvent_1821_0);
+  methods += new qt_gsi::GenericMethod ("emit_textActivated", "@brief Emitter for signal void QFontComboBox::textActivated(const QString &)\nCall this method to emit this signal.", false, &_init_emitter_textActivated_2025, &_call_emitter_textActivated_2025);
+  methods += new qt_gsi::GenericMethod ("emit_textHighlighted", "@brief Emitter for signal void QFontComboBox::textHighlighted(const QString &)\nCall this method to emit this signal.", false, &_init_emitter_textHighlighted_2025, &_call_emitter_textHighlighted_2025);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QFontComboBox::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*updateMicroFocus", "@brief Method void QFontComboBox::updateMicroFocus(Qt::InputMethodQuery query)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_updateMicroFocus_2420, &_call_fp_updateMicroFocus_2420);

@@ -793,7 +793,7 @@ static gsi::Methods methods_QEventPoint () {
   methods += new qt_gsi::GenericMethod ("globalPressPosition", "@brief Method QPointF QEventPoint::globalPressPosition()\n", true, &_init_f_globalPressPosition_c0, &_call_f_globalPressPosition_c0);
   methods += new qt_gsi::GenericMethod ("grabPosition", "@brief Method QPointF QEventPoint::grabPosition()\n", true, &_init_f_grabPosition_c0, &_call_f_grabPosition_c0);
   methods += new qt_gsi::GenericMethod ("id", "@brief Method int QEventPoint::id()\n", true, &_init_f_id_c0, &_call_f_id_c0);
-  methods += new qt_gsi::GenericMethod ("isAccepted?", "@brief Method bool QEventPoint::isAccepted()\n", true, &_init_f_isAccepted_c0, &_call_f_isAccepted_c0);
+  methods += new qt_gsi::GenericMethod ("isAccepted?|:accepted", "@brief Method bool QEventPoint::isAccepted()\n", true, &_init_f_isAccepted_c0, &_call_f_isAccepted_c0);
   methods += new qt_gsi::GenericMethod ("lastNormalizedPos", "@brief Method QPointF QEventPoint::lastNormalizedPos()\n", true, &_init_f_lastNormalizedPos_c0, &_call_f_lastNormalizedPos_c0);
   methods += new qt_gsi::GenericMethod ("lastPos", "@brief Method QPointF QEventPoint::lastPos()\n", true, &_init_f_lastPos_c0, &_call_f_lastPos_c0);
   methods += new qt_gsi::GenericMethod ("lastPosition", "@brief Method QPointF QEventPoint::lastPosition()\n", true, &_init_f_lastPosition_c0, &_call_f_lastPosition_c0);
@@ -817,7 +817,7 @@ static gsi::Methods methods_QEventPoint () {
   methods += new qt_gsi::GenericMethod ("scenePosition", "@brief Method QPointF QEventPoint::scenePosition()\n", true, &_init_f_scenePosition_c0, &_call_f_scenePosition_c0);
   methods += new qt_gsi::GenericMethod ("scenePressPosition", "@brief Method QPointF QEventPoint::scenePressPosition()\n", true, &_init_f_scenePressPosition_c0, &_call_f_scenePressPosition_c0);
   methods += new qt_gsi::GenericMethod ("screenPos", "@brief Method QPointF QEventPoint::screenPos()\n", true, &_init_f_screenPos_c0, &_call_f_screenPos_c0);
-  methods += new qt_gsi::GenericMethod ("setAccepted", "@brief Method void QEventPoint::setAccepted(bool accepted)\n", false, &_init_f_setAccepted_864, &_call_f_setAccepted_864);
+  methods += new qt_gsi::GenericMethod ("setAccepted|accepted=", "@brief Method void QEventPoint::setAccepted(bool accepted)\n", false, &_init_f_setAccepted_864, &_call_f_setAccepted_864);
   methods += new qt_gsi::GenericMethod ("startNormalizedPos", "@brief Method QPointF QEventPoint::startNormalizedPos()\n", true, &_init_f_startNormalizedPos_c0, &_call_f_startNormalizedPos_c0);
   methods += new qt_gsi::GenericMethod ("startPos", "@brief Method QPointF QEventPoint::startPos()\n", true, &_init_f_startPos_c0, &_call_f_startPos_c0);
   methods += new qt_gsi::GenericMethod ("startScenePos", "@brief Method QPointF QEventPoint::startScenePos()\n", true, &_init_f_startScenePos_c0, &_call_f_startScenePos_c0);

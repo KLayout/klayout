@@ -1577,6 +1577,7 @@ static gsi::Enum<QFont::StyleStrategy> decl_QFont_StyleStrategy_Enum ("QtGui", "
     gsi::enum_const ("OpenGLCompatible", QFont::OpenGLCompatible, "@brief Enum constant QFont::OpenGLCompatible") +
     gsi::enum_const ("ForceIntegerMetrics", QFont::ForceIntegerMetrics, "@brief Enum constant QFont::ForceIntegerMetrics") +
     gsi::enum_const ("NoSubpixelAntialias", QFont::NoSubpixelAntialias, "@brief Enum constant QFont::NoSubpixelAntialias") +
+    gsi::enum_const ("PreferNoShaping", QFont::PreferNoShaping, "@brief Enum constant QFont::PreferNoShaping") +
     gsi::enum_const ("NoFontMerging", QFont::NoFontMerging, "@brief Enum constant QFont::NoFontMerging"),
   "@qt\n@brief This class represents the QFont::StyleStrategy enum");
 

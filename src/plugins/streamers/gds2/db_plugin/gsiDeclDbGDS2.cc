@@ -300,7 +300,7 @@ static bool get_gds2_allow_big_records (const db::LoadLayoutOptions *options)
 //  extend lay::LoadLayoutOptions with the GDS2 options 
 static
 gsi::ClassExt<db::LoadLayoutOptions> gds2_reader_options (
-  gsi::method_ext ("gds2_box_mode=", &set_gds2_box_mode,
+  gsi::method_ext ("gds2_box_mode=", &set_gds2_box_mode, gsi::arg ("mode"),
     "@brief Sets a value specifying how to treat BOX records\n"
     "This property specifies how BOX records are treated.\n"
     "Allowed values are 0 (ignore), 1 (treat as rectangles), 2 (treat as boundaries) or 3 (treat as errors). The default is 1.\n"
@@ -311,7 +311,7 @@ gsi::ClassExt<db::LoadLayoutOptions> gds2_reader_options (
     "See \\gds2_box_mode= method for a description of this mode."
     "\nThis property has been added in version 0.18.\n"
   ) +
-  gsi::method_ext ("gds2_allow_multi_xy_records=", &set_gds2_allow_multi_xy_records,
+  gsi::method_ext ("gds2_allow_multi_xy_records=", &set_gds2_allow_multi_xy_records, gsi::arg ("flag"),
     "@brief Allows the use of multiple XY records in BOUNDARY elements for unlimited large polygons\n"
     "\n"
     "Setting this property to true allows big polygons that span over multiple XY records.\n"
@@ -323,7 +323,7 @@ gsi::ClassExt<db::LoadLayoutOptions> gds2_reader_options (
     "See \\gds2_allow_multi_xy_records= method for a description of this property."
     "\nThis property has been added in version 0.18.\n"
   ) +
-  gsi::method_ext ("gds2_allow_big_records=", &set_gds2_allow_big_records,
+  gsi::method_ext ("gds2_allow_big_records=", &set_gds2_allow_big_records, gsi::arg ("flag"),
     "@brief Allows big records with more than 32767 bytes\n"
     "\n"
     "Setting this property to true allows larger records by treating the record length as unsigned short, which for example "

@@ -374,50 +374,6 @@ static void _call_f_fromString_2870 (const qt_gsi::GenericStaticMethod * /*decl*
 }
 
 
-// static QVersionNumber QVersionNumber::fromString(QLatin1String string, int *suffixIndex)
-
-
-static void _init_f_fromString_2546 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("string");
-  decl->add_arg<QLatin1String > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("suffixIndex", true, "nullptr");
-  decl->add_arg<int * > (argspec_1);
-  decl->set_return<QVersionNumber > ();
-}
-
-static void _call_f_fromString_2546 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
-  int *arg2 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
-  ret.write<QVersionNumber > ((QVersionNumber)QVersionNumber::fromString (arg1, arg2));
-}
-
-
-// static QVersionNumber QVersionNumber::fromString(QStringView string, int *suffixIndex)
-
-
-static void _init_f_fromString_2404 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("string");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("suffixIndex", true, "nullptr");
-  decl->add_arg<int * > (argspec_1);
-  decl->set_return<QVersionNumber > ();
-}
-
-static void _call_f_fromString_2404 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  int *arg2 = args ? gsi::arg_reader<int * >() (args, heap) : gsi::arg_maker<int * >() (nullptr, heap);
-  ret.write<QVersionNumber > ((QVersionNumber)QVersionNumber::fromString (arg1, arg2));
-}
-
-
 
 namespace gsi
 {
@@ -443,8 +399,6 @@ static gsi::Methods methods_QVersionNumber () {
   methods += new qt_gsi::GenericStaticMethod ("commonPrefix", "@brief Static method QVersionNumber QVersionNumber::commonPrefix(const QVersionNumber &v1, const QVersionNumber &v2)\nThis method is static and can be called without an instance.", &_init_f_commonPrefix_5398, &_call_f_commonPrefix_5398);
   methods += new qt_gsi::GenericStaticMethod ("compare", "@brief Static method int QVersionNumber::compare(const QVersionNumber &v1, const QVersionNumber &v2)\nThis method is static and can be called without an instance.", &_init_f_compare_5398, &_call_f_compare_5398);
   methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QVersionNumber QVersionNumber::fromString(const QString &string, int *suffixIndex)\nThis method is static and can be called without an instance.", &_init_f_fromString_2870, &_call_f_fromString_2870);
-  methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QVersionNumber QVersionNumber::fromString(QLatin1String string, int *suffixIndex)\nThis method is static and can be called without an instance.", &_init_f_fromString_2546, &_call_f_fromString_2546);
-  methods += new qt_gsi::GenericStaticMethod ("fromString", "@brief Static method QVersionNumber QVersionNumber::fromString(QStringView string, int *suffixIndex)\nThis method is static and can be called without an instance.", &_init_f_fromString_2404, &_call_f_fromString_2404);
   return methods;
 }
 

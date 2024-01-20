@@ -8,6 +8,7 @@ SUBDIRS = \
   rdb \
   lib \
   lay \
+  pya \
 
 !equals(HAVE_QT, "0") {
 

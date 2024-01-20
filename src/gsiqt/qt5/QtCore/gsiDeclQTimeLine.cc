@@ -717,33 +717,33 @@ public:
     emit QTimeLine::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QTimeLine::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QTimeLine::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QTimeLine::event(arg1);
+    return QTimeLine::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QTimeLine_Adaptor, bool, QEvent *>(&QTimeLine_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QTimeLine_Adaptor, bool, QEvent *>(&QTimeLine_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QTimeLine::event(arg1);
+      return QTimeLine::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QTimeLine::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QTimeLine::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QTimeLine::eventFilter(arg1, arg2);
+    return QTimeLine::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QTimeLine_Adaptor, bool, QObject *, QEvent *>(&QTimeLine_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QTimeLine_Adaptor, bool, QObject *, QEvent *>(&QTimeLine_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QTimeLine::eventFilter(arg1, arg2);
+      return QTimeLine::eventFilter(watched, event);
     }
   }
 
@@ -796,33 +796,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QTimeLine::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QTimeLine::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QTimeLine::childEvent(arg1);
+    QTimeLine::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QTimeLine_Adaptor, QChildEvent *>(&QTimeLine_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QTimeLine_Adaptor, QChildEvent *>(&QTimeLine_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QTimeLine::childEvent(arg1);
+      QTimeLine::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QTimeLine::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QTimeLine::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QTimeLine::customEvent(arg1);
+    QTimeLine::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QTimeLine_Adaptor, QEvent *>(&QTimeLine_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QTimeLine_Adaptor, QEvent *>(&QTimeLine_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QTimeLine::customEvent(arg1);
+      QTimeLine::customEvent(event);
     }
   }
 
@@ -873,7 +873,7 @@ static void _init_ctor_QTimeLine_Adaptor_1961 (qt_gsi::GenericStaticMethod *decl
 {
   static gsi::ArgSpecBase argspec_0 ("duration", true, "1000");
   decl->add_arg<int > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_1);
   decl->set_return_new<QTimeLine_Adaptor> ();
 }
@@ -883,16 +883,16 @@ static void _call_ctor_QTimeLine_Adaptor_1961 (const qt_gsi::GenericStaticMethod
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   int arg1 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1000, heap);
-  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QTimeLine_Adaptor *> (new QTimeLine_Adaptor (arg1, arg2));
 }
 
 
-// void QTimeLine::childEvent(QChildEvent *)
+// void QTimeLine::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -912,11 +912,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QTimeLine::customEvent(QEvent *)
+// void QTimeLine::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -940,7 +940,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -949,7 +949,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QTimeLine_Adaptor *)cls)->emitter_QTimeLine_destroyed_1302 (arg1);
 }
 
@@ -978,11 +978,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QTimeLine::event(QEvent *)
+// bool QTimeLine::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -1001,13 +1001,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QTimeLine::eventFilter(QObject *, QEvent *)
+// bool QTimeLine::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -1232,16 +1232,16 @@ gsi::Class<QTimeLine> &qtdecl_QTimeLine ();
 static gsi::Methods methods_QTimeLine_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTimeLine::QTimeLine(int duration, QObject *parent)\nThis method creates an object of class QTimeLine.", &_init_ctor_QTimeLine_Adaptor_1961, &_call_ctor_QTimeLine_Adaptor_1961);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QTimeLine::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QTimeLine::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QTimeLine::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QTimeLine::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QTimeLine::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QTimeLine::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QTimeLine::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QTimeLine::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QTimeLine::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QTimeLine::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("emit_finished", "@brief Emitter for signal void QTimeLine::finished()\nCall this method to emit this signal.", false, &_init_emitter_finished_2842, &_call_emitter_finished_2842);
   methods += new qt_gsi::GenericMethod ("emit_frameChanged", "@brief Emitter for signal void QTimeLine::frameChanged(int)\nCall this method to emit this signal.", false, &_init_emitter_frameChanged_3501, &_call_emitter_frameChanged_3501);

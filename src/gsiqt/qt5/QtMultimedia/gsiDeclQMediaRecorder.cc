@@ -74,26 +74,6 @@ static void _call_f_actualLocation_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// void QMediaRecorder::actualLocationChanged(const QUrl &location)
-
-
-static void _init_f_actualLocationChanged_1701 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("location");
-  decl->add_arg<const QUrl & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_actualLocationChanged_1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaRecorder *)cls)->actualLocationChanged (arg1);
-}
-
-
 // QString QMediaRecorder::audioCodecDescription(const QString &codecName)
 
 
@@ -140,46 +120,6 @@ static void _call_f_availability_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type > ((qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type)qt_gsi::CppToQtAdaptor<QMultimedia::AvailabilityStatus>(((QMediaRecorder *)cls)->availability ()));
-}
-
-
-// void QMediaRecorder::availabilityChanged(bool available)
-
-
-static void _init_f_availabilityChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("available");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_availabilityChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaRecorder *)cls)->availabilityChanged (arg1);
-}
-
-
-// void QMediaRecorder::availabilityChanged(QMultimedia::AvailabilityStatus availability)
-
-
-static void _init_f_availabilityChanged_3555 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("availability");
-  decl->add_arg<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_availabilityChanged_3555 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaRecorder *)cls)->availabilityChanged (qt_gsi::QtToCppAdaptor<QMultimedia::AvailabilityStatus>(arg1).cref());
 }
 
 
@@ -247,26 +187,6 @@ static void _call_f_duration_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// void QMediaRecorder::durationChanged(qint64 duration)
-
-
-static void _init_f_durationChanged_986 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("duration");
-  decl->add_arg<qint64 > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_durationChanged_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaRecorder *)cls)->durationChanged (arg1);
-}
-
-
 // QMediaRecorder::Error QMediaRecorder::error()
 
 
@@ -279,26 +199,6 @@ static void _call_f_error_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qt_gsi::Converter<QMediaRecorder::Error>::target_type > ((qt_gsi::Converter<QMediaRecorder::Error>::target_type)qt_gsi::CppToQtAdaptor<QMediaRecorder::Error>(((QMediaRecorder *)cls)->error ()));
-}
-
-
-// void QMediaRecorder::error(QMediaRecorder::Error error)
-
-
-static void _init_f_error_2457 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("error");
-  decl->add_arg<const qt_gsi::Converter<QMediaRecorder::Error>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_error_2457 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QMediaRecorder::Error>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMediaRecorder::Error>::target_type & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaRecorder *)cls)->error (qt_gsi::QtToCppAdaptor<QMediaRecorder::Error>(arg1).cref());
 }
 
 
@@ -408,105 +308,6 @@ static void _call_f_metaData_c2025 (const qt_gsi::GenericMethod * /*decl*/, void
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QVariant > ((QVariant)((QMediaRecorder *)cls)->metaData (arg1));
-}
-
-
-// void QMediaRecorder::metaDataAvailableChanged(bool available)
-
-
-static void _init_f_metaDataAvailableChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("available");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_metaDataAvailableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaRecorder *)cls)->metaDataAvailableChanged (arg1);
-}
-
-
-// void QMediaRecorder::metaDataChanged()
-
-
-static void _init_f_metaDataChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_metaDataChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaRecorder *)cls)->metaDataChanged ();
-}
-
-
-// void QMediaRecorder::metaDataChanged(const QString &key, const QVariant &value)
-
-
-static void _init_f_metaDataChanged_4036 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("key");
-  decl->add_arg<const QString & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("value");
-  decl->add_arg<const QVariant & > (argspec_1);
-  decl->set_return<void > ();
-}
-
-static void _call_f_metaDataChanged_4036 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaRecorder *)cls)->metaDataChanged (arg1, arg2);
-}
-
-
-// void QMediaRecorder::metaDataWritableChanged(bool writable)
-
-
-static void _init_f_metaDataWritableChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("writable");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_metaDataWritableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaRecorder *)cls)->metaDataWritableChanged (arg1);
-}
-
-
-// void QMediaRecorder::mutedChanged(bool muted)
-
-
-static void _init_f_mutedChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("muted");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_mutedChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaRecorder *)cls)->mutedChanged (arg1);
 }
 
 
@@ -740,26 +541,6 @@ static void _call_f_state_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// void QMediaRecorder::stateChanged(QMediaRecorder::State state)
-
-
-static void _init_f_stateChanged_2448 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("state");
-  decl->add_arg<const qt_gsi::Converter<QMediaRecorder::State>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_stateChanged_2448 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QMediaRecorder::State>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMediaRecorder::State>::target_type & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaRecorder *)cls)->stateChanged (qt_gsi::QtToCppAdaptor<QMediaRecorder::State>(arg1).cref());
-}
-
-
 // QMediaRecorder::Status QMediaRecorder::status()
 
 
@@ -772,26 +553,6 @@ static void _call_f_status_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qt_gsi::Converter<QMediaRecorder::Status>::target_type > ((qt_gsi::Converter<QMediaRecorder::Status>::target_type)qt_gsi::CppToQtAdaptor<QMediaRecorder::Status>(((QMediaRecorder *)cls)->status ()));
-}
-
-
-// void QMediaRecorder::statusChanged(QMediaRecorder::Status status)
-
-
-static void _init_f_statusChanged_2579 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("status");
-  decl->add_arg<const qt_gsi::Converter<QMediaRecorder::Status>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_statusChanged_2579 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QMediaRecorder::Status>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMediaRecorder::Status>::target_type & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaRecorder *)cls)->statusChanged (qt_gsi::QtToCppAdaptor<QMediaRecorder::Status>(arg1).cref());
 }
 
 
@@ -833,7 +594,7 @@ static void _init_f_supportedAudioSampleRates_c4387 (qt_gsi::GenericMethod *decl
 {
   static gsi::ArgSpecBase argspec_0 ("settings", true, "QAudioEncoderSettings()");
   decl->add_arg<const QAudioEncoderSettings & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("continuous", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("continuous", true, "nullptr");
   decl->add_arg<bool * > (argspec_1);
   decl->set_return<QList<int> > ();
 }
@@ -843,7 +604,7 @@ static void _call_f_supportedAudioSampleRates_c4387 (const qt_gsi::GenericMethod
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QAudioEncoderSettings &arg1 = args ? gsi::arg_reader<const QAudioEncoderSettings & >() (args, heap) : gsi::arg_maker<const QAudioEncoderSettings & >() (QAudioEncoderSettings(), heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<QList<int> > ((QList<int>)((QMediaRecorder *)cls)->supportedAudioSampleRates (arg1, arg2));
 }
 
@@ -870,7 +631,7 @@ static void _init_f_supportedFrameRates_c4392 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("settings", true, "QVideoEncoderSettings()");
   decl->add_arg<const QVideoEncoderSettings & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("continuous", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("continuous", true, "nullptr");
   decl->add_arg<bool * > (argspec_1);
   decl->set_return<QList<qreal> > ();
 }
@@ -880,7 +641,7 @@ static void _call_f_supportedFrameRates_c4392 (const qt_gsi::GenericMethod * /*d
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QVideoEncoderSettings &arg1 = args ? gsi::arg_reader<const QVideoEncoderSettings & >() (args, heap) : gsi::arg_maker<const QVideoEncoderSettings & >() (QVideoEncoderSettings(), heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<QList<qreal> > ((QList<qreal>)((QMediaRecorder *)cls)->supportedFrameRates (arg1, arg2));
 }
 
@@ -892,7 +653,7 @@ static void _init_f_supportedResolutions_c4392 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("settings", true, "QVideoEncoderSettings()");
   decl->add_arg<const QVideoEncoderSettings & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("continuous", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("continuous", true, "nullptr");
   decl->add_arg<bool * > (argspec_1);
   decl->set_return<QList<QSize> > ();
 }
@@ -902,7 +663,7 @@ static void _call_f_supportedResolutions_c4392 (const qt_gsi::GenericMethod * /*
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QVideoEncoderSettings &arg1 = args ? gsi::arg_reader<const QVideoEncoderSettings & >() (args, heap) : gsi::arg_maker<const QVideoEncoderSettings & >() (QVideoEncoderSettings(), heap);
-  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (0, heap);
+  bool *arg2 = args ? gsi::arg_reader<bool * >() (args, heap) : gsi::arg_maker<bool * >() (nullptr, heap);
   ret.write<QList<QSize> > ((QList<QSize>)((QMediaRecorder *)cls)->supportedResolutions (arg1, arg2));
 }
 
@@ -968,26 +729,6 @@ static void _call_f_volume_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<double > ((double)((QMediaRecorder *)cls)->volume ());
-}
-
-
-// void QMediaRecorder::volumeChanged(double volume)
-
-
-static void _init_f_volumeChanged_1071 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("volume");
-  decl->add_arg<double > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_volumeChanged_1071 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  double arg1 = gsi::arg_reader<double >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaRecorder *)cls)->volumeChanged (arg1);
 }
 
 
@@ -1093,19 +834,14 @@ static gsi::Methods methods_QMediaRecorder () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":actualLocation", "@brief Method QUrl QMediaRecorder::actualLocation()\n", true, &_init_f_actualLocation_c0, &_call_f_actualLocation_c0);
-  methods += new qt_gsi::GenericMethod ("actualLocationChanged", "@brief Method void QMediaRecorder::actualLocationChanged(const QUrl &location)\n", false, &_init_f_actualLocationChanged_1701, &_call_f_actualLocationChanged_1701);
   methods += new qt_gsi::GenericMethod ("audioCodecDescription", "@brief Method QString QMediaRecorder::audioCodecDescription(const QString &codecName)\n", true, &_init_f_audioCodecDescription_c2025, &_call_f_audioCodecDescription_c2025);
   methods += new qt_gsi::GenericMethod (":audioSettings", "@brief Method QAudioEncoderSettings QMediaRecorder::audioSettings()\n", true, &_init_f_audioSettings_c0, &_call_f_audioSettings_c0);
   methods += new qt_gsi::GenericMethod ("availability", "@brief Method QMultimedia::AvailabilityStatus QMediaRecorder::availability()\n", true, &_init_f_availability_c0, &_call_f_availability_c0);
-  methods += new qt_gsi::GenericMethod ("availabilityChanged_bool", "@brief Method void QMediaRecorder::availabilityChanged(bool available)\n", false, &_init_f_availabilityChanged_864, &_call_f_availabilityChanged_864);
-  methods += new qt_gsi::GenericMethod ("availabilityChanged_status", "@brief Method void QMediaRecorder::availabilityChanged(QMultimedia::AvailabilityStatus availability)\n", false, &_init_f_availabilityChanged_3555, &_call_f_availabilityChanged_3555);
   methods += new qt_gsi::GenericMethod ("availableMetaData", "@brief Method QStringList QMediaRecorder::availableMetaData()\n", true, &_init_f_availableMetaData_c0, &_call_f_availableMetaData_c0);
   methods += new qt_gsi::GenericMethod ("containerDescription", "@brief Method QString QMediaRecorder::containerDescription(const QString &format)\n", true, &_init_f_containerDescription_c2025, &_call_f_containerDescription_c2025);
   methods += new qt_gsi::GenericMethod (":containerFormat", "@brief Method QString QMediaRecorder::containerFormat()\n", true, &_init_f_containerFormat_c0, &_call_f_containerFormat_c0);
   methods += new qt_gsi::GenericMethod (":duration", "@brief Method qint64 QMediaRecorder::duration()\n", true, &_init_f_duration_c0, &_call_f_duration_c0);
-  methods += new qt_gsi::GenericMethod ("durationChanged", "@brief Method void QMediaRecorder::durationChanged(qint64 duration)\n", false, &_init_f_durationChanged_986, &_call_f_durationChanged_986);
   methods += new qt_gsi::GenericMethod ("error", "@brief Method QMediaRecorder::Error QMediaRecorder::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
-  methods += new qt_gsi::GenericMethod ("error_sig", "@brief Method void QMediaRecorder::error(QMediaRecorder::Error error)\n", false, &_init_f_error_2457, &_call_f_error_2457);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QMediaRecorder::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
   methods += new qt_gsi::GenericMethod ("isAvailable?", "@brief Method bool QMediaRecorder::isAvailable()\n", true, &_init_f_isAvailable_c0, &_call_f_isAvailable_c0);
   methods += new qt_gsi::GenericMethod ("isMetaDataAvailable?|:metaDataAvailable", "@brief Method bool QMediaRecorder::isMetaDataAvailable()\n", true, &_init_f_isMetaDataAvailable_c0, &_call_f_isMetaDataAvailable_c0);
@@ -1113,11 +849,6 @@ static gsi::Methods methods_QMediaRecorder () {
   methods += new qt_gsi::GenericMethod ("isMuted?|:muted", "@brief Method bool QMediaRecorder::isMuted()\n", true, &_init_f_isMuted_c0, &_call_f_isMuted_c0);
   methods += new qt_gsi::GenericMethod ("mediaObject", "@brief Method QMediaObject *QMediaRecorder::mediaObject()\nThis is a reimplementation of QMediaBindableInterface::mediaObject", true, &_init_f_mediaObject_c0, &_call_f_mediaObject_c0);
   methods += new qt_gsi::GenericMethod ("metaData", "@brief Method QVariant QMediaRecorder::metaData(const QString &key)\n", true, &_init_f_metaData_c2025, &_call_f_metaData_c2025);
-  methods += new qt_gsi::GenericMethod ("metaDataAvailableChanged", "@brief Method void QMediaRecorder::metaDataAvailableChanged(bool available)\n", false, &_init_f_metaDataAvailableChanged_864, &_call_f_metaDataAvailableChanged_864);
-  methods += new qt_gsi::GenericMethod ("metaDataChanged", "@brief Method void QMediaRecorder::metaDataChanged()\n", false, &_init_f_metaDataChanged_0, &_call_f_metaDataChanged_0);
-  methods += new qt_gsi::GenericMethod ("metaDataChanged_kv", "@brief Method void QMediaRecorder::metaDataChanged(const QString &key, const QVariant &value)\n", false, &_init_f_metaDataChanged_4036, &_call_f_metaDataChanged_4036);
-  methods += new qt_gsi::GenericMethod ("metaDataWritableChanged", "@brief Method void QMediaRecorder::metaDataWritableChanged(bool writable)\n", false, &_init_f_metaDataWritableChanged_864, &_call_f_metaDataWritableChanged_864);
-  methods += new qt_gsi::GenericMethod ("mutedChanged", "@brief Method void QMediaRecorder::mutedChanged(bool muted)\n", false, &_init_f_mutedChanged_864, &_call_f_mutedChanged_864);
   methods += new qt_gsi::GenericMethod (":outputLocation", "@brief Method QUrl QMediaRecorder::outputLocation()\n", true, &_init_f_outputLocation_c0, &_call_f_outputLocation_c0);
   methods += new qt_gsi::GenericMethod ("pause", "@brief Method void QMediaRecorder::pause()\n", false, &_init_f_pause_0, &_call_f_pause_0);
   methods += new qt_gsi::GenericMethod ("record", "@brief Method void QMediaRecorder::record()\n", false, &_init_f_record_0, &_call_f_record_0);
@@ -1130,9 +861,7 @@ static gsi::Methods methods_QMediaRecorder () {
   methods += new qt_gsi::GenericMethod ("setVideoSettings|videoSettings=", "@brief Method void QMediaRecorder::setVideoSettings(const QVideoEncoderSettings &videoSettings)\n", false, &_init_f_setVideoSettings_3450, &_call_f_setVideoSettings_3450);
   methods += new qt_gsi::GenericMethod ("setVolume|volume=", "@brief Method void QMediaRecorder::setVolume(double volume)\n", false, &_init_f_setVolume_1071, &_call_f_setVolume_1071);
   methods += new qt_gsi::GenericMethod (":state", "@brief Method QMediaRecorder::State QMediaRecorder::state()\n", true, &_init_f_state_c0, &_call_f_state_c0);
-  methods += new qt_gsi::GenericMethod ("stateChanged", "@brief Method void QMediaRecorder::stateChanged(QMediaRecorder::State state)\n", false, &_init_f_stateChanged_2448, &_call_f_stateChanged_2448);
   methods += new qt_gsi::GenericMethod (":status", "@brief Method QMediaRecorder::Status QMediaRecorder::status()\n", true, &_init_f_status_c0, &_call_f_status_c0);
-  methods += new qt_gsi::GenericMethod ("statusChanged", "@brief Method void QMediaRecorder::statusChanged(QMediaRecorder::Status status)\n", false, &_init_f_statusChanged_2579, &_call_f_statusChanged_2579);
   methods += new qt_gsi::GenericMethod ("stop", "@brief Method void QMediaRecorder::stop()\n", false, &_init_f_stop_0, &_call_f_stop_0);
   methods += new qt_gsi::GenericMethod ("supportedAudioCodecs", "@brief Method QStringList QMediaRecorder::supportedAudioCodecs()\n", true, &_init_f_supportedAudioCodecs_c0, &_call_f_supportedAudioCodecs_c0);
   methods += new qt_gsi::GenericMethod ("supportedAudioSampleRates", "@brief Method QList<int> QMediaRecorder::supportedAudioSampleRates(const QAudioEncoderSettings &settings, bool *continuous)\n", true, &_init_f_supportedAudioSampleRates_c4387, &_call_f_supportedAudioSampleRates_c4387);
@@ -1143,7 +872,21 @@ static gsi::Methods methods_QMediaRecorder () {
   methods += new qt_gsi::GenericMethod ("videoCodecDescription", "@brief Method QString QMediaRecorder::videoCodecDescription(const QString &codecName)\n", true, &_init_f_videoCodecDescription_c2025, &_call_f_videoCodecDescription_c2025);
   methods += new qt_gsi::GenericMethod (":videoSettings", "@brief Method QVideoEncoderSettings QMediaRecorder::videoSettings()\n", true, &_init_f_videoSettings_c0, &_call_f_videoSettings_c0);
   methods += new qt_gsi::GenericMethod (":volume", "@brief Method double QMediaRecorder::volume()\n", true, &_init_f_volume_c0, &_call_f_volume_c0);
-  methods += new qt_gsi::GenericMethod ("volumeChanged", "@brief Method void QMediaRecorder::volumeChanged(double volume)\n", false, &_init_f_volumeChanged_1071, &_call_f_volumeChanged_1071);
+  methods += gsi::qt_signal<const QUrl & > ("actualLocationChanged(const QUrl &)", "actualLocationChanged", gsi::arg("location"), "@brief Signal declaration for QMediaRecorder::actualLocationChanged(const QUrl &location)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("availabilityChanged(bool)", "availabilityChanged_bool", gsi::arg("available"), "@brief Signal declaration for QMediaRecorder::availabilityChanged(bool available)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & > ("availabilityChanged(QMultimedia::AvailabilityStatus)", "availabilityChanged_status", gsi::arg("availability"), "@brief Signal declaration for QMediaRecorder::availabilityChanged(QMultimedia::AvailabilityStatus availability)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QMediaRecorder::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<qint64 > ("durationChanged(qint64)", "durationChanged", gsi::arg("duration"), "@brief Signal declaration for QMediaRecorder::durationChanged(qint64 duration)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QMediaRecorder::Error>::target_type & > ("error(QMediaRecorder::Error)", "error_sig", gsi::arg("error"), "@brief Signal declaration for QMediaRecorder::error(QMediaRecorder::Error error)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("metaDataAvailableChanged(bool)", "metaDataAvailableChanged", gsi::arg("available"), "@brief Signal declaration for QMediaRecorder::metaDataAvailableChanged(bool available)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("metaDataChanged()", "metaDataChanged", "@brief Signal declaration for QMediaRecorder::metaDataChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString &, const QVariant & > ("metaDataChanged(const QString &, const QVariant &)", "metaDataChanged_kv", gsi::arg("key"), gsi::arg("value"), "@brief Signal declaration for QMediaRecorder::metaDataChanged(const QString &key, const QVariant &value)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("metaDataWritableChanged(bool)", "metaDataWritableChanged", gsi::arg("writable"), "@brief Signal declaration for QMediaRecorder::metaDataWritableChanged(bool writable)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("mutedChanged(bool)", "mutedChanged", gsi::arg("muted"), "@brief Signal declaration for QMediaRecorder::mutedChanged(bool muted)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QMediaRecorder::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QMediaRecorder::State>::target_type & > ("stateChanged(QMediaRecorder::State)", "stateChanged", gsi::arg("state"), "@brief Signal declaration for QMediaRecorder::stateChanged(QMediaRecorder::State state)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QMediaRecorder::Status>::target_type & > ("statusChanged(QMediaRecorder::Status)", "statusChanged", gsi::arg("status"), "@brief Signal declaration for QMediaRecorder::statusChanged(QMediaRecorder::Status status)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<double > ("volumeChanged(double)", "volumeChanged", gsi::arg("volume"), "@brief Signal declaration for QMediaRecorder::volumeChanged(double volume)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QMediaRecorder::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QMediaRecorder::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   methods += new qt_gsi::GenericMethod ("asQObject", "@brief Delivers the base class interface QObject of QMediaRecorder\nClass QMediaRecorder is derived from multiple base classes. This method delivers the QObject base class aspect.", false, &_init_f_QMediaRecorder_as_QObject, &_call_f_QMediaRecorder_as_QObject);
@@ -1208,33 +951,69 @@ public:
     return QMediaRecorder::senderSignalIndex();
   }
 
-  //  [adaptor impl] bool QMediaRecorder::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [emitter impl] void QMediaRecorder::actualLocationChanged(const QUrl &location)
+  void emitter_QMediaRecorder_actualLocationChanged_1701(const QUrl &location)
   {
-    return QMediaRecorder::event(arg1);
+    emit QMediaRecorder::actualLocationChanged(location);
   }
 
-  virtual bool event(QEvent *arg1)
+  //  [emitter impl] void QMediaRecorder::availabilityChanged(bool available)
+  void emitter_QMediaRecorder_availabilityChanged_864(bool available)
+  {
+    emit QMediaRecorder::availabilityChanged(available);
+  }
+
+  //  [emitter impl] void QMediaRecorder::availabilityChanged(QMultimedia::AvailabilityStatus availability)
+  void emitter_QMediaRecorder_availabilityChanged_3555(QMultimedia::AvailabilityStatus availability)
+  {
+    emit QMediaRecorder::availabilityChanged(availability);
+  }
+
+  //  [emitter impl] void QMediaRecorder::destroyed(QObject *)
+  void emitter_QMediaRecorder_destroyed_1302(QObject *arg1)
+  {
+    emit QMediaRecorder::destroyed(arg1);
+  }
+
+  //  [emitter impl] void QMediaRecorder::durationChanged(qint64 duration)
+  void emitter_QMediaRecorder_durationChanged_986(qint64 duration)
+  {
+    emit QMediaRecorder::durationChanged(duration);
+  }
+
+  //  [emitter impl] void QMediaRecorder::error(QMediaRecorder::Error error)
+  void emitter_QMediaRecorder_error_2457(QMediaRecorder::Error _error)
+  {
+    emit QMediaRecorder::error(_error);
+  }
+
+  //  [adaptor impl] bool QMediaRecorder::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
+  {
+    return QMediaRecorder::event(_event);
+  }
+
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QMediaRecorder_Adaptor, bool, QEvent *>(&QMediaRecorder_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QMediaRecorder_Adaptor, bool, QEvent *>(&QMediaRecorder_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QMediaRecorder::event(arg1);
+      return QMediaRecorder::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QMediaRecorder::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QMediaRecorder::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QMediaRecorder::eventFilter(arg1, arg2);
+    return QMediaRecorder::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QMediaRecorder_Adaptor, bool, QObject *, QEvent *>(&QMediaRecorder_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QMediaRecorder_Adaptor, bool, QObject *, QEvent *>(&QMediaRecorder_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QMediaRecorder::eventFilter(arg1, arg2);
+      return QMediaRecorder::eventFilter(watched, event);
     }
   }
 
@@ -1253,33 +1032,88 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMediaRecorder::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [emitter impl] void QMediaRecorder::metaDataAvailableChanged(bool available)
+  void emitter_QMediaRecorder_metaDataAvailableChanged_864(bool available)
   {
-    QMediaRecorder::childEvent(arg1);
+    emit QMediaRecorder::metaDataAvailableChanged(available);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  //  [emitter impl] void QMediaRecorder::metaDataChanged()
+  void emitter_QMediaRecorder_metaDataChanged_0()
+  {
+    emit QMediaRecorder::metaDataChanged();
+  }
+
+  //  [emitter impl] void QMediaRecorder::metaDataChanged(const QString &key, const QVariant &value)
+  void emitter_QMediaRecorder_metaDataChanged_4036(const QString &key, const QVariant &value)
+  {
+    emit QMediaRecorder::metaDataChanged(key, value);
+  }
+
+  //  [emitter impl] void QMediaRecorder::metaDataWritableChanged(bool writable)
+  void emitter_QMediaRecorder_metaDataWritableChanged_864(bool writable)
+  {
+    emit QMediaRecorder::metaDataWritableChanged(writable);
+  }
+
+  //  [emitter impl] void QMediaRecorder::mutedChanged(bool muted)
+  void emitter_QMediaRecorder_mutedChanged_864(bool muted)
+  {
+    emit QMediaRecorder::mutedChanged(muted);
+  }
+
+  //  [emitter impl] void QMediaRecorder::objectNameChanged(const QString &objectName)
+  void emitter_QMediaRecorder_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QMediaRecorder::objectNameChanged(const QString &objectName)'");
+  }
+
+  //  [emitter impl] void QMediaRecorder::stateChanged(QMediaRecorder::State state)
+  void emitter_QMediaRecorder_stateChanged_2448(QMediaRecorder::State state)
+  {
+    emit QMediaRecorder::stateChanged(state);
+  }
+
+  //  [emitter impl] void QMediaRecorder::statusChanged(QMediaRecorder::Status status)
+  void emitter_QMediaRecorder_statusChanged_2579(QMediaRecorder::Status status)
+  {
+    emit QMediaRecorder::statusChanged(status);
+  }
+
+  //  [emitter impl] void QMediaRecorder::volumeChanged(double volume)
+  void emitter_QMediaRecorder_volumeChanged_1071(double volume)
+  {
+    emit QMediaRecorder::volumeChanged(volume);
+  }
+
+  //  [adaptor impl] void QMediaRecorder::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
+  {
+    QMediaRecorder::childEvent(event);
+  }
+
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QMediaRecorder_Adaptor, QChildEvent *>(&QMediaRecorder_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QMediaRecorder_Adaptor, QChildEvent *>(&QMediaRecorder_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QMediaRecorder::childEvent(arg1);
+      QMediaRecorder::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QMediaRecorder::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QMediaRecorder::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QMediaRecorder::customEvent(arg1);
+    QMediaRecorder::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QMediaRecorder_Adaptor, QEvent *>(&QMediaRecorder_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QMediaRecorder_Adaptor, QEvent *>(&QMediaRecorder_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QMediaRecorder::customEvent(arg1);
+      QMediaRecorder::customEvent(event);
     }
   }
 
@@ -1313,18 +1147,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMediaRecorder::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QMediaRecorder::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QMediaRecorder::timerEvent(arg1);
+    QMediaRecorder::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QMediaRecorder_Adaptor, QTimerEvent *>(&QMediaRecorder_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QMediaRecorder_Adaptor, QTimerEvent *>(&QMediaRecorder_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QMediaRecorder::timerEvent(arg1);
+      QMediaRecorder::timerEvent(event);
     }
   }
 
@@ -1346,7 +1180,7 @@ static void _init_ctor_QMediaRecorder_Adaptor_2976 (qt_gsi::GenericStaticMethod 
 {
   static gsi::ArgSpecBase argspec_0 ("mediaObject");
   decl->add_arg<QMediaObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_1);
   decl->set_return_new<QMediaRecorder_Adaptor> ();
 }
@@ -1356,16 +1190,70 @@ static void _call_ctor_QMediaRecorder_Adaptor_2976 (const qt_gsi::GenericStaticM
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QMediaObject *arg1 = gsi::arg_reader<QMediaObject * >() (args, heap);
-  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QMediaRecorder_Adaptor *> (new QMediaRecorder_Adaptor (arg1, arg2));
 }
 
 
-// void QMediaRecorder::childEvent(QChildEvent *)
+// emitter void QMediaRecorder::actualLocationChanged(const QUrl &location)
+
+static void _init_emitter_actualLocationChanged_1701 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("location");
+  decl->add_arg<const QUrl & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_actualLocationChanged_1701 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QUrl &arg1 = gsi::arg_reader<const QUrl & >() (args, heap);
+  ((QMediaRecorder_Adaptor *)cls)->emitter_QMediaRecorder_actualLocationChanged_1701 (arg1);
+}
+
+
+// emitter void QMediaRecorder::availabilityChanged(bool available)
+
+static void _init_emitter_availabilityChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("available");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_availabilityChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QMediaRecorder_Adaptor *)cls)->emitter_QMediaRecorder_availabilityChanged_864 (arg1);
+}
+
+
+// emitter void QMediaRecorder::availabilityChanged(QMultimedia::AvailabilityStatus availability)
+
+static void _init_emitter_availabilityChanged_3555 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("availability");
+  decl->add_arg<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_availabilityChanged_3555 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & >() (args, heap);
+  ((QMediaRecorder_Adaptor *)cls)->emitter_QMediaRecorder_availabilityChanged_3555 (arg1);
+}
+
+
+// void QMediaRecorder::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1385,11 +1273,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QMediaRecorder::customEvent(QEvent *)
+// void QMediaRecorder::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1406,6 +1294,24 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QMediaRecorder_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
+}
+
+
+// emitter void QMediaRecorder::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QMediaRecorder_Adaptor *)cls)->emitter_QMediaRecorder_destroyed_1302 (arg1);
 }
 
 
@@ -1433,11 +1339,47 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QMediaRecorder::event(QEvent *)
+// emitter void QMediaRecorder::durationChanged(qint64 duration)
+
+static void _init_emitter_durationChanged_986 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("duration");
+  decl->add_arg<qint64 > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_durationChanged_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
+  ((QMediaRecorder_Adaptor *)cls)->emitter_QMediaRecorder_durationChanged_986 (arg1);
+}
+
+
+// emitter void QMediaRecorder::error(QMediaRecorder::Error error)
+
+static void _init_emitter_error_2457 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("error");
+  decl->add_arg<const qt_gsi::Converter<QMediaRecorder::Error>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_error_2457 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QMediaRecorder::Error>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMediaRecorder::Error>::target_type & >() (args, heap);
+  ((QMediaRecorder_Adaptor *)cls)->emitter_QMediaRecorder_error_2457 (arg1);
+}
+
+
+// bool QMediaRecorder::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -1456,13 +1398,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QMediaRecorder::eventFilter(QObject *, QEvent *)
+// bool QMediaRecorder::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -1516,6 +1458,113 @@ static void _call_cbs_mediaObject_c0_0 (const qt_gsi::GenericMethod * /*decl*/, 
 static void _set_callback_cbs_mediaObject_c0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QMediaRecorder_Adaptor *)cls)->cb_mediaObject_c0_0 = cb;
+}
+
+
+// emitter void QMediaRecorder::metaDataAvailableChanged(bool available)
+
+static void _init_emitter_metaDataAvailableChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("available");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_metaDataAvailableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QMediaRecorder_Adaptor *)cls)->emitter_QMediaRecorder_metaDataAvailableChanged_864 (arg1);
+}
+
+
+// emitter void QMediaRecorder::metaDataChanged()
+
+static void _init_emitter_metaDataChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_metaDataChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QMediaRecorder_Adaptor *)cls)->emitter_QMediaRecorder_metaDataChanged_0 ();
+}
+
+
+// emitter void QMediaRecorder::metaDataChanged(const QString &key, const QVariant &value)
+
+static void _init_emitter_metaDataChanged_4036 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("key");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("value");
+  decl->add_arg<const QVariant & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_metaDataChanged_4036 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
+  ((QMediaRecorder_Adaptor *)cls)->emitter_QMediaRecorder_metaDataChanged_4036 (arg1, arg2);
+}
+
+
+// emitter void QMediaRecorder::metaDataWritableChanged(bool writable)
+
+static void _init_emitter_metaDataWritableChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("writable");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_metaDataWritableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QMediaRecorder_Adaptor *)cls)->emitter_QMediaRecorder_metaDataWritableChanged_864 (arg1);
+}
+
+
+// emitter void QMediaRecorder::mutedChanged(bool muted)
+
+static void _init_emitter_mutedChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("muted");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_mutedChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QMediaRecorder_Adaptor *)cls)->emitter_QMediaRecorder_mutedChanged_864 (arg1);
+}
+
+
+// emitter void QMediaRecorder::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QMediaRecorder_Adaptor *)cls)->emitter_QMediaRecorder_objectNameChanged_4567 (arg1);
 }
 
 
@@ -1588,11 +1637,47 @@ static void _set_callback_cbs_setMediaObject_1782_0 (void *cls, const gsi::Callb
 }
 
 
-// void QMediaRecorder::timerEvent(QTimerEvent *)
+// emitter void QMediaRecorder::stateChanged(QMediaRecorder::State state)
+
+static void _init_emitter_stateChanged_2448 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("state");
+  decl->add_arg<const qt_gsi::Converter<QMediaRecorder::State>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_stateChanged_2448 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QMediaRecorder::State>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMediaRecorder::State>::target_type & >() (args, heap);
+  ((QMediaRecorder_Adaptor *)cls)->emitter_QMediaRecorder_stateChanged_2448 (arg1);
+}
+
+
+// emitter void QMediaRecorder::statusChanged(QMediaRecorder::Status status)
+
+static void _init_emitter_statusChanged_2579 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("status");
+  decl->add_arg<const qt_gsi::Converter<QMediaRecorder::Status>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_statusChanged_2579 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QMediaRecorder::Status>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMediaRecorder::Status>::target_type & >() (args, heap);
+  ((QMediaRecorder_Adaptor *)cls)->emitter_QMediaRecorder_statusChanged_2579 (arg1);
+}
+
+
+// void QMediaRecorder::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1612,6 +1697,24 @@ static void _set_callback_cbs_timerEvent_1730_0 (void *cls, const gsi::Callback 
 }
 
 
+// emitter void QMediaRecorder::volumeChanged(double volume)
+
+static void _init_emitter_volumeChanged_1071 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("volume");
+  decl->add_arg<double > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_volumeChanged_1071 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  ((QMediaRecorder_Adaptor *)cls)->emitter_QMediaRecorder_volumeChanged_1071 (arg1);
+}
+
+
 namespace gsi
 {
 
@@ -1620,26 +1723,41 @@ gsi::Class<QMediaRecorder> &qtdecl_QMediaRecorder ();
 static gsi::Methods methods_QMediaRecorder_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMediaRecorder::QMediaRecorder(QMediaObject *mediaObject, QObject *parent)\nThis method creates an object of class QMediaRecorder.", &_init_ctor_QMediaRecorder_Adaptor_2976, &_call_ctor_QMediaRecorder_Adaptor_2976);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QMediaRecorder::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("emit_actualLocationChanged", "@brief Emitter for signal void QMediaRecorder::actualLocationChanged(const QUrl &location)\nCall this method to emit this signal.", false, &_init_emitter_actualLocationChanged_1701, &_call_emitter_actualLocationChanged_1701);
+  methods += new qt_gsi::GenericMethod ("emit_availabilityChanged_bool", "@brief Emitter for signal void QMediaRecorder::availabilityChanged(bool available)\nCall this method to emit this signal.", false, &_init_emitter_availabilityChanged_864, &_call_emitter_availabilityChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_availabilityChanged_status", "@brief Emitter for signal void QMediaRecorder::availabilityChanged(QMultimedia::AvailabilityStatus availability)\nCall this method to emit this signal.", false, &_init_emitter_availabilityChanged_3555, &_call_emitter_availabilityChanged_3555);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QMediaRecorder::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMediaRecorder::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMediaRecorder::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QMediaRecorder::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QMediaRecorder::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMediaRecorder::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_durationChanged", "@brief Emitter for signal void QMediaRecorder::durationChanged(qint64 duration)\nCall this method to emit this signal.", false, &_init_emitter_durationChanged_986, &_call_emitter_durationChanged_986);
+  methods += new qt_gsi::GenericMethod ("emit_error_sig", "@brief Emitter for signal void QMediaRecorder::error(QMediaRecorder::Error error)\nCall this method to emit this signal.", false, &_init_emitter_error_2457, &_call_emitter_error_2457);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMediaRecorder::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QMediaRecorder::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QMediaRecorder::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QMediaRecorder::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("mediaObject", "@brief Virtual method QMediaObject *QMediaRecorder::mediaObject()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_mediaObject_c0_0, &_call_cbs_mediaObject_c0_0);
   methods += new qt_gsi::GenericMethod ("mediaObject", "@hide", true, &_init_cbs_mediaObject_c0_0, &_call_cbs_mediaObject_c0_0, &_set_callback_cbs_mediaObject_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_metaDataAvailableChanged", "@brief Emitter for signal void QMediaRecorder::metaDataAvailableChanged(bool available)\nCall this method to emit this signal.", false, &_init_emitter_metaDataAvailableChanged_864, &_call_emitter_metaDataAvailableChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_metaDataChanged", "@brief Emitter for signal void QMediaRecorder::metaDataChanged()\nCall this method to emit this signal.", false, &_init_emitter_metaDataChanged_0, &_call_emitter_metaDataChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_metaDataChanged_kv", "@brief Emitter for signal void QMediaRecorder::metaDataChanged(const QString &key, const QVariant &value)\nCall this method to emit this signal.", false, &_init_emitter_metaDataChanged_4036, &_call_emitter_metaDataChanged_4036);
+  methods += new qt_gsi::GenericMethod ("emit_metaDataWritableChanged", "@brief Emitter for signal void QMediaRecorder::metaDataWritableChanged(bool writable)\nCall this method to emit this signal.", false, &_init_emitter_metaDataWritableChanged_864, &_call_emitter_metaDataWritableChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_mutedChanged", "@brief Emitter for signal void QMediaRecorder::mutedChanged(bool muted)\nCall this method to emit this signal.", false, &_init_emitter_mutedChanged_864, &_call_emitter_mutedChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QMediaRecorder::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QMediaRecorder::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QMediaRecorder::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QMediaRecorder::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("*setMediaObject", "@brief Virtual method bool QMediaRecorder::setMediaObject(QMediaObject *object)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setMediaObject_1782_0, &_call_cbs_setMediaObject_1782_0);
   methods += new qt_gsi::GenericMethod ("*setMediaObject", "@hide", false, &_init_cbs_setMediaObject_1782_0, &_call_cbs_setMediaObject_1782_0, &_set_callback_cbs_setMediaObject_1782_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QMediaRecorder::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("emit_stateChanged", "@brief Emitter for signal void QMediaRecorder::stateChanged(QMediaRecorder::State state)\nCall this method to emit this signal.", false, &_init_emitter_stateChanged_2448, &_call_emitter_stateChanged_2448);
+  methods += new qt_gsi::GenericMethod ("emit_statusChanged", "@brief Emitter for signal void QMediaRecorder::statusChanged(QMediaRecorder::Status status)\nCall this method to emit this signal.", false, &_init_emitter_statusChanged_2579, &_call_emitter_statusChanged_2579);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QMediaRecorder::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("emit_volumeChanged", "@brief Emitter for signal void QMediaRecorder::volumeChanged(double volume)\nCall this method to emit this signal.", false, &_init_emitter_volumeChanged_1071, &_call_emitter_volumeChanged_1071);
   return methods;
 }
 

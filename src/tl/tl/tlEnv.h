@@ -40,6 +40,8 @@ std::string TL_PUBLIC get_env (const std::string &name, const std::string &def_v
 
 /**
  *  @brief Sets the value for the given environment variable
+ *
+ *  On Windows, the variable is removed when the value is an empty string.
  */
 void TL_PUBLIC set_env (const std::string &name, const std::string &value);
 

@@ -568,6 +568,21 @@ static void _call_f_parent_c2395 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
+// QObject *QFileSystemModel::parent()
+
+
+static void _init_f_parent_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QObject * > ();
+}
+
+static void _call_f_parent_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QObject * > ((QObject *)((QFileSystemModel *)cls)->parent ());
+}
+
+
 // QFlags<QFileDevice::Permission> QFileSystemModel::permissions(const QModelIndex &index)
 
 
@@ -853,6 +868,31 @@ static void _call_f_setRootPath_2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
+// QModelIndex QFileSystemModel::sibling(int row, int column, const QModelIndex &idx)
+
+
+static void _init_f_sibling_c3713 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("row");
+  decl->add_arg<int > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("column");
+  decl->add_arg<int > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("idx");
+  decl->add_arg<const QModelIndex & > (argspec_2);
+  decl->set_return<QModelIndex > ();
+}
+
+static void _call_f_sibling_c3713 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  int arg2 = gsi::arg_reader<int >() (args, heap);
+  const QModelIndex &arg3 = gsi::arg_reader<const QModelIndex & >() (args, heap);
+  ret.write<QModelIndex > ((QModelIndex)((QFileSystemModel *)cls)->sibling (arg1, arg2, arg3));
+}
+
+
 // qint64 QFileSystemModel::size(const QModelIndex &index)
 
 
@@ -1011,6 +1051,7 @@ static gsi::Methods methods_QFileSystemModel () {
   methods += new qt_gsi::GenericMethod (":nameFilterDisables", "@brief Method bool QFileSystemModel::nameFilterDisables()\n", true, &_init_f_nameFilterDisables_c0, &_call_f_nameFilterDisables_c0);
   methods += new qt_gsi::GenericMethod (":nameFilters", "@brief Method QStringList QFileSystemModel::nameFilters()\n", true, &_init_f_nameFilters_c0, &_call_f_nameFilters_c0);
   methods += new qt_gsi::GenericMethod ("parent", "@brief Method QModelIndex QFileSystemModel::parent(const QModelIndex &child)\nThis is a reimplementation of QAbstractItemModel::parent", true, &_init_f_parent_c2395, &_call_f_parent_c2395);
+  methods += new qt_gsi::GenericMethod (":parent", "@brief Method QObject *QFileSystemModel::parent()\n", true, &_init_f_parent_c0, &_call_f_parent_c0);
   methods += new qt_gsi::GenericMethod ("permissions", "@brief Method QFlags<QFileDevice::Permission> QFileSystemModel::permissions(const QModelIndex &index)\n", true, &_init_f_permissions_c2395, &_call_f_permissions_c2395);
   methods += new qt_gsi::GenericMethod ("remove", "@brief Method bool QFileSystemModel::remove(const QModelIndex &index)\n", false, &_init_f_remove_2395, &_call_f_remove_2395);
   methods += new qt_gsi::GenericMethod (":resolveSymlinks", "@brief Method bool QFileSystemModel::resolveSymlinks()\n", true, &_init_f_resolveSymlinks_c0, &_call_f_resolveSymlinks_c0);
@@ -1026,6 +1067,7 @@ static gsi::Methods methods_QFileSystemModel () {
   methods += new qt_gsi::GenericMethod ("setReadOnly|readOnly=", "@brief Method void QFileSystemModel::setReadOnly(bool enable)\n", false, &_init_f_setReadOnly_864, &_call_f_setReadOnly_864);
   methods += new qt_gsi::GenericMethod ("setResolveSymlinks|resolveSymlinks=", "@brief Method void QFileSystemModel::setResolveSymlinks(bool enable)\n", false, &_init_f_setResolveSymlinks_864, &_call_f_setResolveSymlinks_864);
   methods += new qt_gsi::GenericMethod ("setRootPath", "@brief Method QModelIndex QFileSystemModel::setRootPath(const QString &path)\n", false, &_init_f_setRootPath_2025, &_call_f_setRootPath_2025);
+  methods += new qt_gsi::GenericMethod ("sibling", "@brief Method QModelIndex QFileSystemModel::sibling(int row, int column, const QModelIndex &idx)\nThis is a reimplementation of QAbstractItemModel::sibling", true, &_init_f_sibling_c3713, &_call_f_sibling_c3713);
   methods += new qt_gsi::GenericMethod ("size", "@brief Method qint64 QFileSystemModel::size(const QModelIndex &index)\n", true, &_init_f_size_c2395, &_call_f_size_c2395);
   methods += new qt_gsi::GenericMethod ("sort", "@brief Method void QFileSystemModel::sort(int column, Qt::SortOrder order)\nThis is a reimplementation of QAbstractItemModel::sort", false, &_init_f_sort_2340, &_call_f_sort_2340);
   methods += new qt_gsi::GenericMethod ("supportedDropActions", "@brief Method QFlags<Qt::DropAction> QFileSystemModel::supportedDropActions()\nThis is a reimplementation of QAbstractItemModel::supportedDropActions", true, &_init_f_supportedDropActions_c0, &_call_f_supportedDropActions_c0);
@@ -1383,18 +1425,18 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QFileSystemModel::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QFileSystemModel::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QFileSystemModel::eventFilter(arg1, arg2);
+    return QFileSystemModel::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QFileSystemModel_Adaptor, bool, QObject *, QEvent *>(&QFileSystemModel_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QFileSystemModel_Adaptor, bool, QObject *, QEvent *>(&QFileSystemModel_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QFileSystemModel::eventFilter(arg1, arg2);
+      return QFileSystemModel::eventFilter(watched, event);
     }
   }
 
@@ -1925,33 +1967,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QFileSystemModel::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QFileSystemModel::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QFileSystemModel::childEvent(arg1);
+    QFileSystemModel::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QFileSystemModel_Adaptor, QChildEvent *>(&QFileSystemModel_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QFileSystemModel_Adaptor, QChildEvent *>(&QFileSystemModel_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QFileSystemModel::childEvent(arg1);
+      QFileSystemModel::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QFileSystemModel::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QFileSystemModel::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QFileSystemModel::customEvent(arg1);
+    QFileSystemModel::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QFileSystemModel_Adaptor, QEvent *>(&QFileSystemModel_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QFileSystemModel_Adaptor, QEvent *>(&QFileSystemModel_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QFileSystemModel::customEvent(arg1);
+      QFileSystemModel::customEvent(event);
     }
   }
 
@@ -2048,7 +2090,7 @@ QFileSystemModel_Adaptor::~QFileSystemModel_Adaptor() { }
 
 static void _init_ctor_QFileSystemModel_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QFileSystemModel_Adaptor> ();
 }
@@ -2057,7 +2099,7 @@ static void _call_ctor_QFileSystemModel_Adaptor_1302 (const qt_gsi::GenericStati
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QFileSystemModel_Adaptor *> (new QFileSystemModel_Adaptor (arg1));
 }
 
@@ -2362,11 +2404,11 @@ static void _call_fp_changePersistentIndexList_5912 (const qt_gsi::GenericMethod
 }
 
 
-// void QFileSystemModel::childEvent(QChildEvent *)
+// void QFileSystemModel::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2573,7 +2615,7 @@ static void _init_fp_createIndex_c2374 (qt_gsi::GenericMethod *decl)
   decl->add_arg<int > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("column");
   decl->add_arg<int > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("data", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("data", true, "nullptr");
   decl->add_arg<void * > (argspec_2);
   decl->set_return<QModelIndex > ();
 }
@@ -2584,7 +2626,7 @@ static void _call_fp_createIndex_c2374 (const qt_gsi::GenericMethod * /*decl*/, 
   tl::Heap heap;
   int arg1 = gsi::arg_reader<int >() (args, heap);
   int arg2 = gsi::arg_reader<int >() (args, heap);
-  void *arg3 = args ? gsi::arg_reader<void * >() (args, heap) : gsi::arg_maker<void * >() (0, heap);
+  void *arg3 = args ? gsi::arg_reader<void * >() (args, heap) : gsi::arg_maker<void * >() (nullptr, heap);
   ret.write<QModelIndex > ((QModelIndex)((QFileSystemModel_Adaptor *)cls)->fp_QFileSystemModel_createIndex_c2374 (arg1, arg2, arg3));
 }
 
@@ -2613,11 +2655,11 @@ static void _call_fp_createIndex_c2657 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// void QFileSystemModel::customEvent(QEvent *)
+// void QFileSystemModel::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2718,7 +2760,7 @@ static void _call_fp_decodeData_5302 (const qt_gsi::GenericMethod * /*decl*/, vo
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2727,7 +2769,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QFileSystemModel_Adaptor *)cls)->emitter_QFileSystemModel_destroyed_1302 (arg1);
 }
 
@@ -2959,13 +3001,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QFileSystemModel::eventFilter(QObject *, QEvent *)
+// bool QFileSystemModel::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -4157,7 +4199,7 @@ static gsi::Methods methods_QFileSystemModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("canFetchMore", "@hide", true, &_init_cbs_canFetchMore_c2395_0, &_call_cbs_canFetchMore_c2395_0, &_set_callback_cbs_canFetchMore_c2395_0);
   methods += new qt_gsi::GenericMethod ("*changePersistentIndex", "@brief Method void QFileSystemModel::changePersistentIndex(const QModelIndex &from, const QModelIndex &to)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_changePersistentIndex_4682, &_call_fp_changePersistentIndex_4682);
   methods += new qt_gsi::GenericMethod ("*changePersistentIndexList", "@brief Method void QFileSystemModel::changePersistentIndexList(const QList<QModelIndex> &from, const QList<QModelIndex> &to)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_changePersistentIndexList_5912, &_call_fp_changePersistentIndexList_5912);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QFileSystemModel::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QFileSystemModel::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("columnCount", "@brief Virtual method int QFileSystemModel::columnCount(const QModelIndex &parent)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_columnCount_c2395_1, &_call_cbs_columnCount_c2395_1);
   methods += new qt_gsi::GenericMethod ("columnCount", "@hide", true, &_init_cbs_columnCount_c2395_1, &_call_cbs_columnCount_c2395_1, &_set_callback_cbs_columnCount_c2395_1);
@@ -4169,7 +4211,7 @@ static gsi::Methods methods_QFileSystemModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_columnsRemoved", "@brief Emitter for signal void QFileSystemModel::columnsRemoved(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_columnsRemoved_7372, &_call_emitter_columnsRemoved_7372);
   methods += new qt_gsi::GenericMethod ("*createIndex", "@brief Method QModelIndex QFileSystemModel::createIndex(int row, int column, void *data)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_createIndex_c2374, &_call_fp_createIndex_c2374);
   methods += new qt_gsi::GenericMethod ("*createIndex", "@brief Method QModelIndex QFileSystemModel::createIndex(int row, int column, quintptr id)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_createIndex_c2657, &_call_fp_createIndex_c2657);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QFileSystemModel::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QFileSystemModel::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("data", "@brief Virtual method QVariant QFileSystemModel::data(const QModelIndex &index, int role)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_data_c3054_1, &_call_cbs_data_c3054_1);
   methods += new qt_gsi::GenericMethod ("data", "@hide", true, &_init_cbs_data_c3054_1, &_call_cbs_data_c3054_1, &_set_callback_cbs_data_c3054_1);
@@ -4191,7 +4233,7 @@ static gsi::Methods methods_QFileSystemModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*endResetModel", "@brief Method void QFileSystemModel::endResetModel()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_endResetModel_0, &_call_fp_endResetModel_0);
   methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QFileSystemModel::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QFileSystemModel::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QFileSystemModel::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("fetchMore", "@brief Virtual method void QFileSystemModel::fetchMore(const QModelIndex &parent)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_fetchMore_2395_0, &_call_cbs_fetchMore_2395_0);
   methods += new qt_gsi::GenericMethod ("fetchMore", "@hide", false, &_init_cbs_fetchMore_2395_0, &_call_cbs_fetchMore_2395_0, &_set_callback_cbs_fetchMore_2395_0);

@@ -814,7 +814,7 @@ static gsi::Methods methods_QLabel () {
   methods += new qt_gsi::GenericMethod (":movie", "@brief Method QMovie *QLabel::movie()\n", true, &_init_f_movie_c0, &_call_f_movie_c0);
   methods += new qt_gsi::GenericMethod (":openExternalLinks", "@brief Method bool QLabel::openExternalLinks()\n", true, &_init_f_openExternalLinks_c0, &_call_f_openExternalLinks_c0);
   methods += new qt_gsi::GenericMethod ("picture", "@brief Method QPicture QLabel::picture(Qt::ReturnByValueConstant)\n", true, &_init_f_picture_c2927, &_call_f_picture_c2927);
-  methods += new qt_gsi::GenericMethod ("picture", "@brief Method QPicture QLabel::picture()\n", true, &_init_f_picture_c0, &_call_f_picture_c0);
+  methods += new qt_gsi::GenericMethod (":picture", "@brief Method QPicture QLabel::picture()\n", true, &_init_f_picture_c0, &_call_f_picture_c0);
   methods += new qt_gsi::GenericMethod ("pixmap", "@brief Method QPixmap QLabel::pixmap(Qt::ReturnByValueConstant)\n", true, &_init_f_pixmap_c2927, &_call_f_pixmap_c2927);
   methods += new qt_gsi::GenericMethod (":pixmap", "@brief Method QPixmap QLabel::pixmap()\n", true, &_init_f_pixmap_c0, &_call_f_pixmap_c0);
   methods += new qt_gsi::GenericMethod (":selectedText", "@brief Method QString QLabel::selectedText()\n", true, &_init_f_selectedText_c0, &_call_f_selectedText_c0);
@@ -827,7 +827,7 @@ static gsi::Methods methods_QLabel () {
   methods += new qt_gsi::GenericMethod ("setNum", "@brief Method void QLabel::setNum(int)\n", false, &_init_f_setNum_767, &_call_f_setNum_767);
   methods += new qt_gsi::GenericMethod ("setNum", "@brief Method void QLabel::setNum(double)\n", false, &_init_f_setNum_1071, &_call_f_setNum_1071);
   methods += new qt_gsi::GenericMethod ("setOpenExternalLinks|openExternalLinks=", "@brief Method void QLabel::setOpenExternalLinks(bool open)\n", false, &_init_f_setOpenExternalLinks_864, &_call_f_setOpenExternalLinks_864);
-  methods += new qt_gsi::GenericMethod ("setPicture", "@brief Method void QLabel::setPicture(const QPicture &)\n", false, &_init_f_setPicture_2126, &_call_f_setPicture_2126);
+  methods += new qt_gsi::GenericMethod ("setPicture|picture=", "@brief Method void QLabel::setPicture(const QPicture &)\n", false, &_init_f_setPicture_2126, &_call_f_setPicture_2126);
   methods += new qt_gsi::GenericMethod ("setPixmap|pixmap=", "@brief Method void QLabel::setPixmap(const QPixmap &)\n", false, &_init_f_setPixmap_2017, &_call_f_setPixmap_2017);
   methods += new qt_gsi::GenericMethod ("setScaledContents|scaledContents=", "@brief Method void QLabel::setScaledContents(bool)\n", false, &_init_f_setScaledContents_864, &_call_f_setScaledContents_864);
   methods += new qt_gsi::GenericMethod ("setSelection", "@brief Method void QLabel::setSelection(int, int)\n", false, &_init_f_setSelection_1426, &_call_f_setSelection_1426);
@@ -3209,11 +3209,11 @@ static gsi::Methods methods_QLabel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*closeEvent", "@hide", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0, &_set_callback_cbs_closeEvent_1719_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QLabel::contextMenuEvent(QContextMenuEvent *ev)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0, &_set_callback_cbs_contextMenuEvent_2363_0);
-  methods += new qt_gsi::GenericMethod ("*qt_create", "@brief Method void QLabel::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
+  methods += new qt_gsi::GenericMethod ("*create|qt_create", "@brief Method void QLabel::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
   methods += new qt_gsi::GenericMethod ("emit_customContextMenuRequested", "@brief Emitter for signal void QLabel::customContextMenuRequested(const QPoint &pos)\nCall this method to emit this signal.", false, &_init_emitter_customContextMenuRequested_1916, &_call_emitter_customContextMenuRequested_1916);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QLabel::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*qt_destroy", "@brief Method void QLabel::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
+  methods += new qt_gsi::GenericMethod ("*destroy|qt_destroy", "@brief Method void QLabel::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QLabel::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QLabel::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);

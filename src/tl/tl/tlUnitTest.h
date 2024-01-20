@@ -188,6 +188,54 @@ inline bool equals (const char *a, const std::string &b)
 }
 
 /**
+ *  @brief A generic compare operator
+ */
+template <class X, class Y>
+inline bool is_less (const X &a, const Y &b)
+{
+  return a < b;
+}
+
+/**
+ *  @brief A specialization of the compare operator for doubles
+ */
+inline bool is_less (double a, double b)
+{
+  if (equals (a, b)) {
+    return false;
+  } else {
+    return a < b;
+  }
+}
+
+/**
+ *  @brief Specialization of comparison of pointers vs. integers (specifically "0")
+ */
+template <class X>
+inline bool is_less (X *a, int b)
+{
+  return a == (X *) size_t (b);
+}
+
+/**
+ *  @brief A specialization of comparison of double vs "anything"
+ */
+template <class Y>
+inline bool is_less (double a, const Y &b)
+{
+  return is_less (a, double (b));
+}
+
+/**
+ *  @brief A specialization of comparison of "anything" vs. double
+ */
+template <class X>
+inline bool is_less (const X &a, double b)
+{
+  return is_less (double (a), b);
+}
+
+/**
  *  @brief A utility class to capture the warning, error and info channels
  *
  *  Instantiate this class inside a test. Then run the test and finally
@@ -447,6 +495,20 @@ public:
     }
   }
 
+  /**
+   *  @brief Main entry point for the compare feature (EXPECT_LE, _LT, _GE, _GT)
+   */
+  template <class T1, class T2>
+  void cmp_helper (bool less, bool eq, const T1 &a, const T2 &b, const char *what_expr, const char *equals_expr, const char *file, int line)
+  {
+    bool res = (less ? tl::is_less (a, b) : tl::is_less (b, a)) || (eq && tl::equals (a, b));
+    if (! res) {
+      std::ostringstream sstr;
+      sstr << what_expr << " is not " << (less ? "less" : "greater") << (eq ? " or equal" : "") << " than " << equals_expr;
+      diff (file, line, sstr.str (), a, b);
+    }
+  }
+
 protected:
   /**
    *  @brief Returns a value indicating whether the test runs in editable mode
@@ -510,6 +572,22 @@ struct TestImpl##NAME \
     static TestImpl##NAME TestImpl_Inst##NAME; \
   } \
   void TestImpl##NAME::execute (tl::TestBase *_this)
+
+#define EXPECT_LE(WHAT,EQUALS) \
+  _this->checkpoint (__FILE__, __LINE__); \
+  _this->cmp_helper (true, true, (WHAT), (EQUALS), #WHAT, #EQUALS, __FILE__, __LINE__);
+
+#define EXPECT_LT(WHAT,EQUALS) \
+  _this->checkpoint (__FILE__, __LINE__); \
+  _this->cmp_helper (true, false, (WHAT), (EQUALS), #WHAT, #EQUALS, __FILE__, __LINE__);
+
+#define EXPECT_GE(WHAT,EQUALS) \
+  _this->checkpoint (__FILE__, __LINE__); \
+  _this->cmp_helper (false, true, (WHAT), (EQUALS), #WHAT, #EQUALS, __FILE__, __LINE__);
+
+#define EXPECT_GT(WHAT,EQUALS) \
+  _this->checkpoint (__FILE__, __LINE__); \
+  _this->cmp_helper (false, false, (WHAT), (EQUALS), #WHAT, #EQUALS, __FILE__, __LINE__);
 
 #define EXPECT_EQ(WHAT,EQUALS) \
   _this->checkpoint (__FILE__, __LINE__); \

@@ -433,7 +433,7 @@ Class<lay::MainWindow> decl_MainWindow (QT_EXTERNAL_BASE (QMainWindow) "lay", "M
     "\n"
     "This method has been introduced in version 0.27.\n"
   ) +
-  gsi::method_ext ("set_menu_items_hidden", &set_menu_items_hidden,
+  gsi::method_ext ("set_menu_items_hidden", &set_menu_items_hidden, gsi::arg ("flags"),
     "@brief sets the flags indicating whether menu items are hidden\n"
     "This method allows hiding certain menu items. It takes a hash with hidden flags vs. menu item paths. "
     "\n"

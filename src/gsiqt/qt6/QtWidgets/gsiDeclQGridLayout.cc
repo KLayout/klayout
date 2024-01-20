@@ -86,6 +86,7 @@ static void _call_f_addItem_7018 (const qt_gsi::GenericMethod * /*decl*/, void *
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QLayoutItem *arg1 = gsi::arg_reader<QLayoutItem * >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   int arg2 = gsi::arg_reader<int >() (args, heap);
   int arg3 = gsi::arg_reader<int >() (args, heap);
   int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (1, heap);
@@ -177,6 +178,7 @@ static void _call_f_addWidget_1315 (const qt_gsi::GenericMethod * /*decl*/, void
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGridLayout *)cls)->addWidget (arg1);
 }
@@ -203,6 +205,7 @@ static void _call_f_addWidget_5275 (const qt_gsi::GenericMethod * /*decl*/, void
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   int arg2 = gsi::arg_reader<int >() (args, heap);
   int arg3 = gsi::arg_reader<int >() (args, heap);
   QFlags<Qt::AlignmentFlag> arg4 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (Qt::Alignment(), heap);
@@ -236,6 +239,7 @@ static void _call_f_addWidget_6593 (const qt_gsi::GenericMethod * /*decl*/, void
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
+  qt_gsi::qt_keep (arg1);
   int arg2 = gsi::arg_reader<int >() (args, heap);
   int arg3 = gsi::arg_reader<int >() (args, heap);
   int arg4 = gsi::arg_reader<int >() (args, heap);

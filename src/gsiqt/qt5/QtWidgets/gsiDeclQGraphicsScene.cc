@@ -409,7 +409,7 @@ static void _init_f_addWidget_3702 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("widget");
   decl->add_arg<QWidget * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("wFlags", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("wFlags", true, "Qt::WindowFlags()");
   decl->add_arg<QFlags<Qt::WindowType> > (argspec_1);
   decl->set_return<QGraphicsProxyWidget * > ();
 }
@@ -419,7 +419,7 @@ static void _call_f_addWidget_3702 (const qt_gsi::GenericMethod * /*decl*/, void
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   QWidget *arg1 = gsi::arg_reader<QWidget * >() (args, heap);
-  QFlags<Qt::WindowType> arg2 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (0, heap);
+  QFlags<Qt::WindowType> arg2 = args ? gsi::arg_reader<QFlags<Qt::WindowType> >() (args, heap) : gsi::arg_maker<QFlags<Qt::WindowType> >() (Qt::WindowFlags(), heap);
   ret.write<QGraphicsProxyWidget * > ((QGraphicsProxyWidget *)((QGraphicsScene *)cls)->addWidget (arg1, arg2));
 }
 
@@ -591,6 +591,21 @@ static void _call_f_focusItem_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QGraphicsItem * > ((QGraphicsItem *)((QGraphicsScene *)cls)->focusItem ());
+}
+
+
+// bool QGraphicsScene::focusOnTouch()
+
+
+static void _init_f_focusOnTouch_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_focusOnTouch_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QGraphicsScene *)cls)->focusOnTouch ());
 }
 
 
@@ -1287,6 +1302,26 @@ static void _call_f_setFocusItem_3688 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
+// void QGraphicsScene::setFocusOnTouch(bool enabled)
+
+
+static void _init_f_setFocusOnTouch_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("enabled");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setFocusOnTouch_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QGraphicsScene *)cls)->setFocusOnTouch (arg1);
+}
+
+
 // void QGraphicsScene::setFont(const QFont &font)
 
 
@@ -1764,6 +1799,7 @@ static gsi::Methods methods_QGraphicsScene () {
   methods += new qt_gsi::GenericMethod ("createItemGroup", "@brief Method QGraphicsItemGroup *QGraphicsScene::createItemGroup(const QList<QGraphicsItem *> &items)\n", false, &_init_f_createItemGroup_3411, &_call_f_createItemGroup_3411);
   methods += new qt_gsi::GenericMethod ("destroyItemGroup", "@brief Method void QGraphicsScene::destroyItemGroup(QGraphicsItemGroup *group)\n", false, &_init_f_destroyItemGroup_2444, &_call_f_destroyItemGroup_2444);
   methods += new qt_gsi::GenericMethod (":focusItem", "@brief Method QGraphicsItem *QGraphicsScene::focusItem()\n", true, &_init_f_focusItem_c0, &_call_f_focusItem_c0);
+  methods += new qt_gsi::GenericMethod (":focusOnTouch", "@brief Method bool QGraphicsScene::focusOnTouch()\n", true, &_init_f_focusOnTouch_c0, &_call_f_focusOnTouch_c0);
   methods += new qt_gsi::GenericMethod (":font", "@brief Method QFont QGraphicsScene::font()\n", true, &_init_f_font_c0, &_call_f_font_c0);
   methods += new qt_gsi::GenericMethod (":foregroundBrush", "@brief Method QBrush QGraphicsScene::foregroundBrush()\n", true, &_init_f_foregroundBrush_c0, &_call_f_foregroundBrush_c0);
   methods += new qt_gsi::GenericMethod ("hasFocus", "@brief Method bool QGraphicsScene::hasFocus()\n", true, &_init_f_hasFocus_c0, &_call_f_hasFocus_c0);
@@ -1798,6 +1834,7 @@ static gsi::Methods methods_QGraphicsScene () {
   methods += new qt_gsi::GenericMethod ("setBspTreeDepth|bspTreeDepth=", "@brief Method void QGraphicsScene::setBspTreeDepth(int depth)\n", false, &_init_f_setBspTreeDepth_767, &_call_f_setBspTreeDepth_767);
   methods += new qt_gsi::GenericMethod ("setFocus", "@brief Method void QGraphicsScene::setFocus(Qt::FocusReason focusReason)\n", false, &_init_f_setFocus_1877, &_call_f_setFocus_1877);
   methods += new qt_gsi::GenericMethod ("setFocusItem", "@brief Method void QGraphicsScene::setFocusItem(QGraphicsItem *item, Qt::FocusReason focusReason)\n", false, &_init_f_setFocusItem_3688, &_call_f_setFocusItem_3688);
+  methods += new qt_gsi::GenericMethod ("setFocusOnTouch|focusOnTouch=", "@brief Method void QGraphicsScene::setFocusOnTouch(bool enabled)\n", false, &_init_f_setFocusOnTouch_864, &_call_f_setFocusOnTouch_864);
   methods += new qt_gsi::GenericMethod ("setFont|font=", "@brief Method void QGraphicsScene::setFont(const QFont &font)\n", false, &_init_f_setFont_1801, &_call_f_setFont_1801);
   methods += new qt_gsi::GenericMethod ("setForegroundBrush|foregroundBrush=", "@brief Method void QGraphicsScene::setForegroundBrush(const QBrush &brush)\n", false, &_init_f_setForegroundBrush_1910, &_call_f_setForegroundBrush_1910);
   methods += new qt_gsi::GenericMethod ("setItemIndexMethod|itemIndexMethod=", "@brief Method void QGraphicsScene::setItemIndexMethod(QGraphicsScene::ItemIndexMethod method)\n", false, &_init_f_setItemIndexMethod_3456, &_call_f_setItemIndexMethod_3456);
@@ -1958,18 +1995,18 @@ public:
     emit QGraphicsScene::selectionChanged();
   }
 
-  //  [adaptor impl] void QGraphicsScene::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QGraphicsScene::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QGraphicsScene::childEvent(arg1);
+    QGraphicsScene::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QGraphicsScene_Adaptor, QChildEvent *>(&QGraphicsScene_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QGraphicsScene_Adaptor, QChildEvent *>(&QGraphicsScene_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QGraphicsScene::childEvent(arg1);
+      QGraphicsScene::childEvent(event);
     }
   }
 
@@ -1988,18 +2025,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QGraphicsScene::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QGraphicsScene::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QGraphicsScene::customEvent(arg1);
+    QGraphicsScene::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QGraphicsScene_Adaptor, QEvent *>(&QGraphicsScene_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QGraphicsScene_Adaptor, QEvent *>(&QGraphicsScene_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QGraphicsScene::customEvent(arg1);
+      QGraphicsScene::customEvent(event);
     }
   }
 
@@ -2288,18 +2325,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QGraphicsScene::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QGraphicsScene::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QGraphicsScene::timerEvent(arg1);
+    QGraphicsScene::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QGraphicsScene_Adaptor, QTimerEvent *>(&QGraphicsScene_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QGraphicsScene_Adaptor, QTimerEvent *>(&QGraphicsScene_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QGraphicsScene::timerEvent(arg1);
+      QGraphicsScene::timerEvent(event);
     }
   }
 
@@ -2351,7 +2388,7 @@ QGraphicsScene_Adaptor::~QGraphicsScene_Adaptor() { }
 
 static void _init_ctor_QGraphicsScene_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QGraphicsScene_Adaptor> ();
 }
@@ -2360,7 +2397,7 @@ static void _call_ctor_QGraphicsScene_Adaptor_1302 (const qt_gsi::GenericStaticM
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QGraphicsScene_Adaptor *> (new QGraphicsScene_Adaptor (arg1));
 }
 
@@ -2371,7 +2408,7 @@ static void _init_ctor_QGraphicsScene_Adaptor_3056 (qt_gsi::GenericStaticMethod 
 {
   static gsi::ArgSpecBase argspec_0 ("sceneRect");
   decl->add_arg<const QRectF & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_1);
   decl->set_return_new<QGraphicsScene_Adaptor> ();
 }
@@ -2381,7 +2418,7 @@ static void _call_ctor_QGraphicsScene_Adaptor_3056 (const qt_gsi::GenericStaticM
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QRectF &arg1 = gsi::arg_reader<const QRectF & >() (args, heap);
-  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg2 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QGraphicsScene_Adaptor *> (new QGraphicsScene_Adaptor (arg1, arg2));
 }
 
@@ -2398,7 +2435,7 @@ static void _init_ctor_QGraphicsScene_Adaptor_5154 (qt_gsi::GenericStaticMethod 
   decl->add_arg<double > (argspec_2);
   static gsi::ArgSpecBase argspec_3 ("height");
   decl->add_arg<double > (argspec_3);
-  static gsi::ArgSpecBase argspec_4 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_4 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_4);
   decl->set_return_new<QGraphicsScene_Adaptor> ();
 }
@@ -2411,7 +2448,7 @@ static void _call_ctor_QGraphicsScene_Adaptor_5154 (const qt_gsi::GenericStaticM
   double arg2 = gsi::arg_reader<double >() (args, heap);
   double arg3 = gsi::arg_reader<double >() (args, heap);
   double arg4 = gsi::arg_reader<double >() (args, heap);
-  QObject *arg5 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg5 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QGraphicsScene_Adaptor *> (new QGraphicsScene_Adaptor (arg1, arg2, arg3, arg4, arg5));
 }
 
@@ -2434,11 +2471,11 @@ static void _call_emitter_changed_2477 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// void QGraphicsScene::childEvent(QChildEvent *)
+// void QGraphicsScene::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2482,11 +2519,11 @@ static void _set_callback_cbs_contextMenuEvent_3674_0 (void *cls, const gsi::Cal
 }
 
 
-// void QGraphicsScene::customEvent(QEvent *)
+// void QGraphicsScene::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2510,7 +2547,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2519,7 +2556,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QGraphicsScene_Adaptor *)cls)->emitter_QGraphicsScene_destroyed_1302 (arg1);
 }
 
@@ -3166,11 +3203,11 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QGraphicsScene::timerEvent(QTimerEvent *)
+// void QGraphicsScene::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3225,11 +3262,11 @@ static gsi::Methods methods_QGraphicsScene_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QGraphicsScene::QGraphicsScene(const QRectF &sceneRect, QObject *parent)\nThis method creates an object of class QGraphicsScene.", &_init_ctor_QGraphicsScene_Adaptor_3056, &_call_ctor_QGraphicsScene_Adaptor_3056);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QGraphicsScene::QGraphicsScene(double x, double y, double width, double height, QObject *parent)\nThis method creates an object of class QGraphicsScene.", &_init_ctor_QGraphicsScene_Adaptor_5154, &_call_ctor_QGraphicsScene_Adaptor_5154);
   methods += new qt_gsi::GenericMethod ("emit_changed", "@brief Emitter for signal void QGraphicsScene::changed(const QList<QRectF> &region)\nCall this method to emit this signal.", false, &_init_emitter_changed_2477, &_call_emitter_changed_2477);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QGraphicsScene::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QGraphicsScene::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QGraphicsScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_3674_0, &_call_cbs_contextMenuEvent_3674_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_3674_0, &_call_cbs_contextMenuEvent_3674_0, &_set_callback_cbs_contextMenuEvent_3674_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QGraphicsScene::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QGraphicsScene::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QGraphicsScene::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QGraphicsScene::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
@@ -3281,7 +3318,7 @@ static gsi::Methods methods_QGraphicsScene_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_selectionChanged", "@brief Emitter for signal void QGraphicsScene::selectionChanged()\nCall this method to emit this signal.", false, &_init_emitter_selectionChanged_0, &_call_emitter_selectionChanged_0);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QGraphicsScene::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QGraphicsScene::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QGraphicsScene::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QGraphicsScene::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*wheelEvent", "@brief Virtual method void QGraphicsScene::wheelEvent(QGraphicsSceneWheelEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_wheelEvent_3029_0, &_call_cbs_wheelEvent_3029_0);
   methods += new qt_gsi::GenericMethod ("*wheelEvent", "@hide", false, &_init_cbs_wheelEvent_3029_0, &_call_cbs_wheelEvent_3029_0, &_set_callback_cbs_wheelEvent_3029_0);

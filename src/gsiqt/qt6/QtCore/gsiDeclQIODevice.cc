@@ -791,8 +791,8 @@ static gsi::Methods methods_QIODevice () {
   methods += new qt_gsi::GenericMethod ("canReadLine", "@brief Method bool QIODevice::canReadLine()\n", true, &_init_f_canReadLine_c0, &_call_f_canReadLine_c0);
   methods += new qt_gsi::GenericMethod ("close", "@brief Method void QIODevice::close()\n", false, &_init_f_close_0, &_call_f_close_0);
   methods += new qt_gsi::GenericMethod ("commitTransaction", "@brief Method void QIODevice::commitTransaction()\n", false, &_init_f_commitTransaction_0, &_call_f_commitTransaction_0);
-  methods += new qt_gsi::GenericMethod ("currentReadChannel", "@brief Method int QIODevice::currentReadChannel()\n", true, &_init_f_currentReadChannel_c0, &_call_f_currentReadChannel_c0);
-  methods += new qt_gsi::GenericMethod ("currentWriteChannel", "@brief Method int QIODevice::currentWriteChannel()\n", true, &_init_f_currentWriteChannel_c0, &_call_f_currentWriteChannel_c0);
+  methods += new qt_gsi::GenericMethod (":currentReadChannel", "@brief Method int QIODevice::currentReadChannel()\n", true, &_init_f_currentReadChannel_c0, &_call_f_currentReadChannel_c0);
+  methods += new qt_gsi::GenericMethod (":currentWriteChannel", "@brief Method int QIODevice::currentWriteChannel()\n", true, &_init_f_currentWriteChannel_c0, &_call_f_currentWriteChannel_c0);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QIODevice::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
   methods += new qt_gsi::GenericMethod ("isOpen?", "@brief Method bool QIODevice::isOpen()\n", true, &_init_f_isOpen_c0, &_call_f_isOpen_c0);
   methods += new qt_gsi::GenericMethod ("isReadable?", "@brief Method bool QIODevice::isReadable()\n", true, &_init_f_isReadable_c0, &_call_f_isReadable_c0);
@@ -812,8 +812,8 @@ static gsi::Methods methods_QIODevice () {
   methods += new qt_gsi::GenericMethod ("reset", "@brief Method bool QIODevice::reset()\n", false, &_init_f_reset_0, &_call_f_reset_0);
   methods += new qt_gsi::GenericMethod ("rollbackTransaction", "@brief Method void QIODevice::rollbackTransaction()\n", false, &_init_f_rollbackTransaction_0, &_call_f_rollbackTransaction_0);
   methods += new qt_gsi::GenericMethod ("seek", "@brief Method bool QIODevice::seek(qint64 pos)\n", false, &_init_f_seek_986, &_call_f_seek_986);
-  methods += new qt_gsi::GenericMethod ("setCurrentReadChannel", "@brief Method void QIODevice::setCurrentReadChannel(int channel)\n", false, &_init_f_setCurrentReadChannel_767, &_call_f_setCurrentReadChannel_767);
-  methods += new qt_gsi::GenericMethod ("setCurrentWriteChannel", "@brief Method void QIODevice::setCurrentWriteChannel(int channel)\n", false, &_init_f_setCurrentWriteChannel_767, &_call_f_setCurrentWriteChannel_767);
+  methods += new qt_gsi::GenericMethod ("setCurrentReadChannel|currentReadChannel=", "@brief Method void QIODevice::setCurrentReadChannel(int channel)\n", false, &_init_f_setCurrentReadChannel_767, &_call_f_setCurrentReadChannel_767);
+  methods += new qt_gsi::GenericMethod ("setCurrentWriteChannel|currentWriteChannel=", "@brief Method void QIODevice::setCurrentWriteChannel(int channel)\n", false, &_init_f_setCurrentWriteChannel_767, &_call_f_setCurrentWriteChannel_767);
   methods += new qt_gsi::GenericMethod ("setTextModeEnabled|textModeEnabled=", "@brief Method void QIODevice::setTextModeEnabled(bool enabled)\n", false, &_init_f_setTextModeEnabled_864, &_call_f_setTextModeEnabled_864);
   methods += new qt_gsi::GenericMethod ("size", "@brief Method qint64 QIODevice::size()\n", true, &_init_f_size_c0, &_call_f_size_c0);
   methods += new qt_gsi::GenericMethod ("skip", "@brief Method qint64 QIODevice::skip(qint64 maxSize)\n", false, &_init_f_skip_986, &_call_f_skip_986);

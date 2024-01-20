@@ -26,6 +26,7 @@
 #include "gsiExpression.h"
 #include "gsiSignals.h"
 #include "gsiInspector.h"
+#include "gsiVariantArgs.h"
 #include "tlString.h"
 #include "tlInternational.h"
 #include "tlException.h"
@@ -164,6 +165,24 @@ RubyStackTraceProvider::stack_depth ()
 #endif
 
 // -------------------------------------------------------------------
+
+static inline int
+num_args (const gsi::MethodBase *m)
+{
+  return int (m->end_arguments () - m->begin_arguments ());
+}
+
+static VALUE
+get_kwarg (const gsi::ArgType &atype, VALUE kwargs)
+{
+  if (kwargs != Qnil) {
+    return rb_hash_lookup2 (kwargs, ID2SYM (rb_intern (atype.spec ()->name ().c_str ())), Qundef);
+  } else {
+    return Qundef;
+  }
+}
+
+// -------------------------------------------------------------------
 //  The lookup table for the method overload resolution
 
 /**
@@ -277,15 +296,19 @@ public:
     return m_methods.end ();
   }
 
-  const gsi::MethodBase *get_variant (int argc, VALUE *argv, bool block_given, bool is_ctor, bool is_static, bool is_const) const
+  const gsi::MethodBase *get_variant (int argc, VALUE *argv, VALUE kwargs, bool block_given, bool is_ctor, bool is_static, bool is_const) const
   {
     //  caching can't work for arrays or hashes - in this case, give up
 
-    for (int i = 0; i < argc; ++i) {
+    bool nocache = (kwargs != Qnil);
+
+    for (int i = 0; i < argc && ! nocache; ++i) {
       int t = TYPE (argv[i]);
-      if (t == T_ARRAY || t == T_HASH) {
-        return find_variant (argc, argv, block_given, is_ctor, is_static, is_const);
-      }
+      nocache = (t == T_ARRAY || t == T_HASH);
+    }
+
+    if (nocache) {
+      return find_variant (argc, argv, kwargs, block_given, is_ctor, is_static, is_const);
     }
 
     //  try to find the variant in the cache
@@ -296,13 +319,79 @@ public:
       return v->second;
     }
 
-    const gsi::MethodBase *meth = find_variant (argc, argv, block_given, is_ctor, is_static, is_const);
+    const gsi::MethodBase *meth = find_variant (argc, argv, kwargs, block_given, is_ctor, is_static, is_const);
     m_variants[key] = meth;
     return meth;
   }
 
 private:
-  const gsi::MethodBase *find_variant (int argc, VALUE *argv, bool block_given, bool is_ctor, bool is_static, bool is_const) const
+  static bool
+  compatible_with_args (const gsi::MethodBase *m, int argc, VALUE kwargs)
+  {
+    int nargs = num_args (m);
+
+    if (argc >= nargs) {
+      //  no more arguments to consider
+      return argc == nargs && (kwargs == Qnil || RHASH_SIZE (kwargs) == 0);
+    }
+
+    if (kwargs != Qnil) {
+
+      int nkwargs = int (RHASH_SIZE (kwargs));
+      int kwargs_taken = 0;
+
+      while (argc < nargs) {
+        const gsi::ArgType &atype = m->begin_arguments () [argc];
+        VALUE rb_arg = rb_hash_lookup2 (kwargs, ID2SYM (rb_intern (atype.spec ()->name ().c_str ())), Qnil);
+        if (rb_arg == Qnil) {
+          if (! atype.spec ()->has_default ()) {
+            return false;
+          }
+        } else {
+          ++kwargs_taken;
+        }
+        ++argc;
+      }
+
+      //  matches if all keyword arguments are taken
+      return kwargs_taken == nkwargs;
+
+    } else {
+
+      while (argc < nargs) {
+        const gsi::ArgType &atype = m->begin_arguments () [argc];
+        if (! atype.spec ()->has_default ()) {
+          return false;
+        }
+        ++argc;
+      }
+
+      return true;
+
+    }
+  }
+
+  static std::string
+  describe_overload (const gsi::MethodBase *m, int argc, VALUE kwargs)
+  {
+    std::string res = m->to_string ();
+    if (compatible_with_args (m, argc, kwargs)) {
+      res += " " + tl::to_string (tr ("[match candidate]"));
+    }
+    return res;
+  }
+
+  std::string
+  describe_overloads (int argc, VALUE kwargs) const
+  {
+    std::string res;
+    for (auto m = begin (); m != end (); ++m) {
+      res += std::string ("  ") + describe_overload (*m, argc, kwargs) + "\n";
+    }
+    return res;
+  }
+
+  const gsi::MethodBase *find_variant (int argc, VALUE *argv, VALUE kwargs, bool block_given, bool is_ctor, bool is_static, bool is_const) const
   {
     //  get number of candidates by argument count
     const gsi::MethodBase *meth = 0;
@@ -334,7 +423,7 @@ private:
 
         //  ignore callbacks
 
-      } else if ((*m)->compatible_with_num_args (argc)) {
+      } else if (compatible_with_args (*m, argc, kwargs)) {
 
         ++candidates;
         meth = *m;
@@ -344,7 +433,7 @@ private:
     }
 
     //  no method found, but the ctor was requested - implement that method as replacement for the default "initialize"
-    if (! meth && argc == 0 && is_ctor) {
+    if (! meth && argc == 0 && is_ctor && kwargs == Qnil) {
       return 0;
     }
 
@@ -366,7 +455,7 @@ private:
         nargs_s += tl::to_string (*na);
       }
 
-      throw tl::Exception (tl::sprintf (tl::to_string (tr ("Invalid number of arguments (got %d, expected %s)")), argc, nargs_s));
+      throw tl::Exception (tl::to_string (tr ("Can't match arguments. Variants are:\n")) + describe_overloads (argc, kwargs));
 
     }
 
@@ -383,13 +472,16 @@ private:
         if (! (*m)->is_callback () && ! (*m)->is_signal ()) {
 
           //  check arguments (count and type)
-          bool is_valid = (*m)->compatible_with_num_args (argc);
+          bool is_valid = compatible_with_args (*m, argc, kwargs);
           int sc = 0;
-          VALUE *av = argv;
-          for (gsi::MethodBase::argument_iterator a = (*m)->begin_arguments (); is_valid && av < argv + argc && a != (*m)->end_arguments (); ++a, ++av) {
-            if (test_arg (*a, *av, false /*strict*/)) {
+          int i = 0;
+          for (gsi::MethodBase::argument_iterator a = (*m)->begin_arguments (); is_valid && a != (*m)->end_arguments (); ++a, ++i) {
+            VALUE arg = i >= argc ? get_kwarg (*a, kwargs) : argv[i];
+            if (arg == Qundef) {
+              is_valid = a->spec ()->has_default ();
+            } else if (test_arg (*a, arg, false /*strict*/)) {
               ++sc;
-            } else if (test_arg (*a, *av, true /*loose*/)) {
+            } else if (test_arg (*a, arg, true /*loose*/)) {
               //  non-scoring match
             } else {
               is_valid = false;
@@ -414,12 +506,17 @@ private:
 
           if (is_valid) {
 
-            //  otherwise take the candidate with the better score
-            if (candidates > 0 && sc > score) {
-              candidates = 1;
-              meth = *m;
-              score = sc;
-            } else if (candidates == 0 || sc == score) {
+            //  otherwise take the candidate with the better score or the least number of arguments (faster)
+            if (candidates > 0) {
+              if (sc > score || (sc == score && num_args (meth) > num_args (*m))) {
+                candidates = 1;
+                meth = *m;
+                score = sc;
+              } else if (sc == score && num_args (meth) == num_args (*m)) {
+                ++candidates;
+                meth = *m;
+              }
+            } else {
               ++candidates;
               meth = *m;
               score = sc;
@@ -434,11 +531,11 @@ private:
     }
 
     if (! meth) {
-      throw tl::Exception (tl::to_string (tr ("No overload with matching arguments")));
+      throw tl::Exception (tl::to_string (tr ("No overload with matching arguments. Variants are:\n")) + describe_overloads (argc, kwargs));
     }
 
     if (candidates > 1) {
-      throw tl::Exception (tl::to_string (tr ("Ambiguous overload variants - multiple method declarations match arguments")));
+      throw tl::Exception (tl::to_string (tr ("Ambiguous overload variants - multiple method declarations match arguments. Variants are:\n")) + describe_overloads (argc, kwargs));
     }
 
     if (is_const && ! meth->is_const ()) {
@@ -943,16 +1040,64 @@ static gsi::ArgType create_void_type ()
 
 static gsi::ArgType s_void_type = create_void_type ();
 
-void
-push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, int argc, tl::Heap &heap)
+static int get_kwargs_keys (VALUE key, VALUE, VALUE arg)
 {
-  int i = 0;
+  std::set<std::string> *names = reinterpret_cast<std::set<std::string> *> (arg);
+  names->insert (ruby2c<std::string> (key));
+
+  return ST_CONTINUE;
+}
+
+void
+push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, int argc, VALUE kwargs, tl::Heap &heap)
+{
+  int iarg = 0;
+  int kwargs_taken = 0;
+  int nkwargs = kwargs == Qnil ? 0 : int (RHASH_SIZE (kwargs));
 
   try {
 
-    VALUE *av = argv;
-    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && av < argv + argc; ++a, ++av, ++i) {
-      push_arg (*a, arglist, *av, heap);
+    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments (); ++a, ++iarg) {
+
+      VALUE arg = iarg >= argc ? get_kwarg (*a, kwargs) : argv[iarg];
+      if (arg == Qundef) {
+        if (a->spec ()->has_default ()) {
+          if (kwargs_taken == nkwargs) {
+            //  leave it to the consumer to establish the default values (that is faster)
+            break;
+          }
+          tl::Variant def_value = a->spec ()->default_value ();
+          gsi::push_arg (arglist, *a, def_value, &heap);
+        } else {
+          throw tl::Exception (tl::to_string (tr ("No argument provided (positional or keyword) and no default value available")));
+        }
+      } else {
+        if (iarg >= argc) {
+          ++kwargs_taken;
+        }
+        push_arg (*a, arglist, arg, heap);
+      }
+
+    }
+
+    if (kwargs_taken != nkwargs) {
+
+      //  check if there are any left-over keyword parameters with unknown names
+
+      std::set<std::string> invalid_names;
+      rb_hash_foreach (kwargs, (int (*)(...)) &get_kwargs_keys, (VALUE) &invalid_names);
+
+      for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments (); ++a) {
+        invalid_names.erase (a->spec ()->name ());
+      }
+
+      if (invalid_names.size () > 1) {
+        std::string names_str = tl::join (invalid_names.begin (), invalid_names.end (), ", ");
+        throw tl::Exception (tl::to_string (tr ("Unknown keyword parameters: ")) + names_str);
+      } else if (invalid_names.size () == 1) {
+        throw tl::Exception (tl::to_string (tr ("Unknown keyword parameter: ")) + *invalid_names.begin ());
+      }
+
     }
 
   } catch (tl::Exception &ex) {
@@ -960,28 +1105,34 @@ push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, i
     //  In case of an error upon write, pop the arguments to clean them up.
     //  Without this, there is a risk to keep dead objects on the stack.
     for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
-      pop_arg (*a, 0, arglist, heap);
+      pull_arg (*a, 0, arglist, heap);
     }
 
-    const gsi::ArgSpecBase *arg_spec = meth->begin_arguments () [i].spec ();
+    if (iarg < num_args (meth)) {
 
-    std::string msg;
-    if (arg_spec && ! arg_spec->name ().empty ()) {
-      msg = tl::sprintf (tl::to_string (tr ("%s for argument #%d ('%s')")), ex.basic_msg (), i + 1, arg_spec->name ());
+      const gsi::ArgSpecBase *arg_spec = meth->begin_arguments () [iarg].spec ();
+
+      std::string msg;
+      if (arg_spec && ! arg_spec->name ().empty ()) {
+        msg = tl::sprintf (tl::to_string (tr ("%s for argument #%d ('%s')")), ex.basic_msg (), iarg + 1, arg_spec->name ());
+      } else {
+        msg = tl::sprintf (tl::to_string (tr ("%s for argument #%d")), ex.basic_msg (), iarg + 1);
+      }
+
+      tl::Exception new_ex (msg);
+      new_ex.set_first_chance (ex.first_chance ());
+      throw new_ex;
+
     } else {
-      msg = tl::sprintf (tl::to_string (tr ("%s for argument #%d")), ex.basic_msg (), i + 1);
+      throw;
     }
-
-    tl::Exception new_ex (msg);
-    new_ex.set_first_chance (ex.first_chance ());
-    throw new_ex;
 
   } catch (...) {
 
     //  In case of an error upon write, pop the arguments to clean them up.
     //  Without this, there is a risk to keep dead objects on the stack.
     for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
-      pop_arg (*a, 0, arglist, heap);
+      pull_arg (*a, 0, arglist, heap);
     }
 
     throw;
@@ -1027,7 +1178,37 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
     }
 
-    const gsi::MethodBase *meth = mt->entry (mid).get_variant (argc, argv, rb_block_given_p (), ctor, p == 0, p != 0 && p->const_ref ());
+    //  Check for keyword arguments ..
+
+    VALUE kwargs = Qnil;
+    bool check_last = true;
+#if HAVE_RUBY_VERSION_CODE>=20700
+    check_last = rb_keyword_given_p ();
+#endif
+
+    //  This is a heuristics to distinguish methods that are potential candidates for
+    //  accepting a keyword argument. Problem is that Ruby confuses function calls with
+    //  keyword arguments with arguments that take a single hash argument.
+    //  We accept only methods here as candidates that do not have a last argument which
+    //  is a map.
+    //  For compatibility we do this check also for Ruby >=2.7 which supports rb_keyword_given_p.
+    if (check_last) {
+      const MethodTableEntry &e = mt->entry (mid);
+      for (auto m = e.begin (); m != e.end () && check_last; ++m) {
+        auto a = (*m)->end_arguments ();
+        if (a != (*m)->begin_arguments () && (--a)->type () == gsi::T_map) {
+          check_last = false;
+        }
+      }
+    }
+
+    if (check_last && argc > 0 && RB_TYPE_P (argv[argc - 1], T_HASH)) {
+      kwargs = argv[--argc];
+    }
+
+    //  Identify the matching variant
+
+    const gsi::MethodBase *meth = mt->entry (mid).get_variant (argc, argv, kwargs, rb_block_given_p (), ctor, p == 0, p != 0 && p->const_ref ());
 
     if (! meth) {
 
@@ -1035,9 +1216,17 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
     } else if (meth->smt () != gsi::MethodBase::None) {
 
+      if (kwargs != Qnil && RHASH_SIZE (kwargs) > 0) {
+        throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted")));
+      }
+
       ret = special_method_impl (meth, argc, argv, self, ctor);
 
     } else if (meth->is_signal ()) {
+
+      if (kwargs != Qnil && RHASH_SIZE (kwargs) > 0) {
+        throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted on events")));
+      }
 
       if (p) {
 
@@ -1070,7 +1259,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
       {
         gsi::SerialArgs arglist (meth->argsize ());
-        push_args (arglist, meth, argv, argc, heap);
+        push_args (arglist, meth, argv, argc, kwargs, heap);
         meth->call (0, arglist, retlist);
       }
 
@@ -1084,6 +1273,10 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
     } else if (meth->ret_type ().is_iter () && ! rb_block_given_p ()) {
 
       //  calling an iterator method without block -> deliver an enumerator using "to_enum"
+
+      if (kwargs != Qnil && RHASH_SIZE (kwargs) > 0) {
+        throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted on enumerators")));
+      }
 
       static ID id_to_enum = rb_intern ("to_enum");
 
@@ -1124,7 +1317,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
       {
         gsi::SerialArgs arglist (meth->argsize ());
-        push_args (arglist, meth, argv, argc, heap);
+        push_args (arglist, meth, argv, argc, kwargs, heap);
         meth->call (obj, arglist, retlist);
       }
 
@@ -1143,7 +1336,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
               rr.reset ();
               iter->get (rr);
 
-              VALUE value = pop_arg (meth->ret_type (), p, rr, heap);
+              VALUE value = pull_arg (meth->ret_type (), p, rr, heap);
               rba_yield_checked (value);
 
               iter->inc ();
@@ -1163,7 +1356,7 @@ method_adaptor (int mid, int argc, VALUE *argv, VALUE self, bool ctor)
 
       } else {
 
-        ret = pop_arg (meth->ret_type (), p, retlist, heap);
+        ret = pull_arg (meth->ret_type (), p, retlist, heap);
 
       }
 
@@ -1552,11 +1745,15 @@ struct RubyConstDescriptor
 extern "C" void ruby_prog_init();
 
 static void
-rba_add_path (const std::string &path)
+rba_add_path (const std::string &path, bool prepend)
 {
   VALUE pv = rb_gv_get ("$:");
   if (pv != Qnil && TYPE (pv) == T_ARRAY) {
-    rb_ary_push (pv, rb_str_new (path.c_str (), long (path.size ())));
+    if (prepend) {
+      rb_ary_unshift (pv, rb_str_new (path.c_str (), long (path.size ())));
+    } else {
+      rb_ary_push (pv, rb_str_new (path.c_str (), long (path.size ())));
+    }
   }
 }
 
@@ -1830,7 +2027,7 @@ public:
         gsi::SerialArgs arglist (c->meth->argsize ());
         c->meth->call (0, arglist, retlist);
         tl::Heap heap;
-        VALUE ret = pop_arg (c->meth->ret_type (), 0, retlist, heap);
+        VALUE ret = pull_arg (c->meth->ret_type (), 0, retlist, heap);
         rb_define_const (c->klass, c->name.c_str (), ret);
 
       } catch (tl::Exception &ex) {
@@ -2036,7 +2233,7 @@ RubyInterpreter::initialize (int &main_argc, char **main_argv, int (*main_func) 
 
             if (v.is_list ()) {
               for (tl::Variant::iterator i = v.begin (); i != v.end (); ++i) {
-                rba_add_path (i->to_string ());
+                rba_add_path (i->to_string (), false);
               }
             }
 
@@ -2133,9 +2330,9 @@ RubyInterpreter::remove_package_location (const std::string & /*package_path*/)
 }
 
 void
-RubyInterpreter::add_path (const std::string &path)
+RubyInterpreter::add_path (const std::string &path, bool prepend)
 {
-  rba_add_path (path);
+  rba_add_path (path, prepend);
 }
 
 void

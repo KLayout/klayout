@@ -28,6 +28,7 @@
 */
 
 #include <QFile>
+#include <QDateTime>
 #include <QEvent>
 #include <QMetaMethod>
 #include <QObject>
@@ -686,6 +687,8 @@ static gsi::Methods methods_QFile () {
   methods += new qt_gsi::GenericMethod ("symLinkTarget", "@brief Method QString QFile::symLinkTarget()\n", true, &_init_f_symLinkTarget_c0, &_call_f_symLinkTarget_c0);
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QFile::aboutToClose()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64 > ("bytesWritten(qint64)", "bytesWritten", gsi::arg("bytes"), "@brief Signal declaration for QFile::bytesWritten(qint64 bytes)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int, qint64 > ("channelBytesWritten(int, qint64)", "channelBytesWritten", gsi::arg("channel"), gsi::arg("bytes"), "@brief Signal declaration for QFile::channelBytesWritten(int channel, qint64 bytes)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("channelReadyRead(int)", "channelReadyRead", gsi::arg("channel"), "@brief Signal declaration for QFile::channelReadyRead(int channel)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QFile::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QFile::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("readChannelFinished()", "readChannelFinished", "@brief Signal declaration for QFile::readChannelFinished()\nYou can bind a procedure to this signal.");

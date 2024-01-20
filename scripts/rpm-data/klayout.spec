@@ -155,15 +155,19 @@ TARGET="linux-release"
 mkdir -p %{buildroot}%{_libdir}/klayout
 mkdir -p %{buildroot}%{_libdir}/klayout/db_plugins
 mkdir -p %{buildroot}%{_libdir}/klayout/lay_plugins
+mkdir -p %{buildroot}%{_libdir}/klayout/pymod
 cp -pd %{_builddir}/bin.$TARGET/lib*.so* %{buildroot}%{_libdir}/klayout
 cp -pd %{_builddir}/bin.$TARGET/db_plugins/lib*.so* %{buildroot}%{_libdir}/klayout/db_plugins
 cp -pd %{_builddir}/bin.$TARGET/lay_plugins/lib*.so* %{buildroot}%{_libdir}/klayout/lay_plugins
+cp -rpd %{_builddir}/bin.$TARGET/pymod/* %{buildroot}%{_libdir}/klayout/pymod
 %if %{defined copylibs}
   cp -pd %{copylibs} %{buildroot}%{_libdir}/klayout
 %endif
 chmod 644 %{buildroot}%{_libdir}/klayout/*.so*
 chmod 644 %{buildroot}%{_libdir}/klayout/db_plugins/*.so*
 chmod 644 %{buildroot}%{_libdir}/klayout/lay_plugins/*.so*
+find %{buildroot}%{_libdir}/klayout/pymod -type f -exec chmod 644 {} +
+find %{buildroot}%{_libdir}/klayout/pymod -type d -exec chmod 755 {} +
 
 # create and populate bindir
 mkdir -p %{buildroot}%{_bindir}

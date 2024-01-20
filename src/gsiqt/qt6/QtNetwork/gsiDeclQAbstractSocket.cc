@@ -272,26 +272,6 @@ static void _call_f_error_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// void QAbstractSocket::errorOccurred(QAbstractSocket::SocketError)
-
-
-static void _init_f_errorOccurred_3209 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<const qt_gsi::Converter<QAbstractSocket::SocketError>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_errorOccurred_3209 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QAbstractSocket::SocketError>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAbstractSocket::SocketError>::target_type & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAbstractSocket *)cls)->errorOccurred (qt_gsi::QtToCppAdaptor<QAbstractSocket::SocketError>(arg1).cref());
-}
-
-
 // bool QAbstractSocket::flush()
 
 
@@ -799,7 +779,6 @@ static gsi::Methods methods_QAbstractSocket () {
   methods += new qt_gsi::GenericMethod ("connectToHost", "@brief Method void QAbstractSocket::connectToHost(const QHostAddress &address, quint16 port, QFlags<QIODeviceBase::OpenModeFlag> mode)\n", false, &_init_f_connectToHost_7023, &_call_f_connectToHost_7023);
   methods += new qt_gsi::GenericMethod ("disconnectFromHost", "@brief Method void QAbstractSocket::disconnectFromHost()\n", false, &_init_f_disconnectFromHost_0, &_call_f_disconnectFromHost_0);
   methods += new qt_gsi::GenericMethod ("error", "@brief Method QAbstractSocket::SocketError QAbstractSocket::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
-  methods += new qt_gsi::GenericMethod ("errorOccurred", "@brief Method void QAbstractSocket::errorOccurred(QAbstractSocket::SocketError)\n", false, &_init_f_errorOccurred_3209, &_call_f_errorOccurred_3209);
   methods += new qt_gsi::GenericMethod ("flush", "@brief Method bool QAbstractSocket::flush()\n", false, &_init_f_flush_0, &_call_f_flush_0);
   methods += new qt_gsi::GenericMethod ("isSequential?", "@brief Method bool QAbstractSocket::isSequential()\nThis is a reimplementation of QIODevice::isSequential", true, &_init_f_isSequential_c0, &_call_f_isSequential_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QAbstractSocket::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
@@ -809,12 +788,12 @@ static gsi::Methods methods_QAbstractSocket () {
   methods += new qt_gsi::GenericMethod ("peerAddress", "@brief Method QHostAddress QAbstractSocket::peerAddress()\n", true, &_init_f_peerAddress_c0, &_call_f_peerAddress_c0);
   methods += new qt_gsi::GenericMethod ("peerName", "@brief Method QString QAbstractSocket::peerName()\n", true, &_init_f_peerName_c0, &_call_f_peerName_c0);
   methods += new qt_gsi::GenericMethod ("peerPort", "@brief Method quint16 QAbstractSocket::peerPort()\n", true, &_init_f_peerPort_c0, &_call_f_peerPort_c0);
-  methods += new qt_gsi::GenericMethod ("protocolTag", "@brief Method QString QAbstractSocket::protocolTag()\n", true, &_init_f_protocolTag_c0, &_call_f_protocolTag_c0);
+  methods += new qt_gsi::GenericMethod (":protocolTag", "@brief Method QString QAbstractSocket::protocolTag()\n", true, &_init_f_protocolTag_c0, &_call_f_protocolTag_c0);
   methods += new qt_gsi::GenericMethod (":proxy", "@brief Method QNetworkProxy QAbstractSocket::proxy()\n", true, &_init_f_proxy_c0, &_call_f_proxy_c0);
   methods += new qt_gsi::GenericMethod (":readBufferSize", "@brief Method qint64 QAbstractSocket::readBufferSize()\n", true, &_init_f_readBufferSize_c0, &_call_f_readBufferSize_c0);
   methods += new qt_gsi::GenericMethod ("resume", "@brief Method void QAbstractSocket::resume()\n", false, &_init_f_resume_0, &_call_f_resume_0);
   methods += new qt_gsi::GenericMethod ("setPauseMode|pauseMode=", "@brief Method void QAbstractSocket::setPauseMode(QFlags<QAbstractSocket::PauseMode> pauseMode)\n", false, &_init_f_setPauseMode_3665, &_call_f_setPauseMode_3665);
-  methods += new qt_gsi::GenericMethod ("setProtocolTag", "@brief Method void QAbstractSocket::setProtocolTag(const QString &tag)\n", false, &_init_f_setProtocolTag_2025, &_call_f_setProtocolTag_2025);
+  methods += new qt_gsi::GenericMethod ("setProtocolTag|protocolTag=", "@brief Method void QAbstractSocket::setProtocolTag(const QString &tag)\n", false, &_init_f_setProtocolTag_2025, &_call_f_setProtocolTag_2025);
   methods += new qt_gsi::GenericMethod ("setProxy|proxy=", "@brief Method void QAbstractSocket::setProxy(const QNetworkProxy &networkProxy)\n", false, &_init_f_setProxy_2686, &_call_f_setProxy_2686);
   methods += new qt_gsi::GenericMethod ("setReadBufferSize|readBufferSize=", "@brief Method void QAbstractSocket::setReadBufferSize(qint64 size)\n", false, &_init_f_setReadBufferSize_986, &_call_f_setReadBufferSize_986);
   methods += new qt_gsi::GenericMethod ("setSocketDescriptor", "@brief Method bool QAbstractSocket::setSocketDescriptor(QIntegerForSizeof<void *>::Signed socketDescriptor, QAbstractSocket::SocketState state, QFlags<QIODeviceBase::OpenModeFlag> openMode)\n", false, &_init_f_setSocketDescriptor_10219, &_call_f_setSocketDescriptor_10219);
@@ -834,6 +813,7 @@ static gsi::Methods methods_QAbstractSocket () {
   methods += gsi::qt_signal ("connected()", "connected", "@brief Signal declaration for QAbstractSocket::connected()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAbstractSocket::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("disconnected()", "disconnected", "@brief Signal declaration for QAbstractSocket::disconnected()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QAbstractSocket::SocketError>::target_type & > ("errorOccurred(QAbstractSocket::SocketError)", "errorOccurred", gsi::arg("arg1"), "@brief Signal declaration for QAbstractSocket::errorOccurred(QAbstractSocket::SocketError)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("hostFound()", "hostFound", "@brief Signal declaration for QAbstractSocket::hostFound()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QAbstractSocket::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QNetworkProxy &, QAuthenticator * > ("proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)", "proxyAuthenticationRequired", gsi::arg("proxy"), gsi::arg("authenticator"), "@brief Signal declaration for QAbstractSocket::proxyAuthenticationRequired(const QNetworkProxy &proxy, QAuthenticator *authenticator)\nYou can bind a procedure to this signal.");

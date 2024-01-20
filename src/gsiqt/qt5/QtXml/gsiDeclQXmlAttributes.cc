@@ -170,6 +170,25 @@ static void _call_f_localName_c767 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
+// QXmlAttributes &QXmlAttributes::operator=(const QXmlAttributes &)
+
+
+static void _init_f_operator_eq__2762 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<const QXmlAttributes & > (argspec_0);
+  decl->set_return<QXmlAttributes & > ();
+}
+
+static void _call_f_operator_eq__2762 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QXmlAttributes &arg1 = gsi::arg_reader<const QXmlAttributes & >() (args, heap);
+  ret.write<QXmlAttributes & > ((QXmlAttributes &)((QXmlAttributes *)cls)->operator= (arg1));
+}
+
+
 // QString QXmlAttributes::qName(int index)
 
 
@@ -186,6 +205,26 @@ static void _call_f_qName_c767 (const qt_gsi::GenericMethod * /*decl*/, void *cl
   tl::Heap heap;
   int arg1 = gsi::arg_reader<int >() (args, heap);
   ret.write<QString > ((QString)((QXmlAttributes *)cls)->qName (arg1));
+}
+
+
+// void QXmlAttributes::swap(QXmlAttributes &other)
+
+
+static void _init_f_swap_2067 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<QXmlAttributes & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_swap_2067 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QXmlAttributes &arg1 = gsi::arg_reader<QXmlAttributes & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QXmlAttributes *)cls)->swap (arg1);
 }
 
 
@@ -340,7 +379,9 @@ static gsi::Methods methods_QXmlAttributes () {
   methods += new qt_gsi::GenericMethod ("index", "@brief Method int QXmlAttributes::index(const QString &uri, const QString &localPart)\n", true, &_init_f_index_c3942, &_call_f_index_c3942);
   methods += new qt_gsi::GenericMethod ("length", "@brief Method int QXmlAttributes::length()\n", true, &_init_f_length_c0, &_call_f_length_c0);
   methods += new qt_gsi::GenericMethod ("localName", "@brief Method QString QXmlAttributes::localName(int index)\n", true, &_init_f_localName_c767, &_call_f_localName_c767);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QXmlAttributes &QXmlAttributes::operator=(const QXmlAttributes &)\n", false, &_init_f_operator_eq__2762, &_call_f_operator_eq__2762);
   methods += new qt_gsi::GenericMethod ("qName", "@brief Method QString QXmlAttributes::qName(int index)\n", true, &_init_f_qName_c767, &_call_f_qName_c767);
+  methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QXmlAttributes::swap(QXmlAttributes &other)\n", false, &_init_f_swap_2067, &_call_f_swap_2067);
   methods += new qt_gsi::GenericMethod ("type", "@brief Method QString QXmlAttributes::type(int index)\n", true, &_init_f_type_c767, &_call_f_type_c767);
   methods += new qt_gsi::GenericMethod ("type", "@brief Method QString QXmlAttributes::type(const QString &qName)\n", true, &_init_f_type_c2025, &_call_f_type_c2025);
   methods += new qt_gsi::GenericMethod ("type", "@brief Method QString QXmlAttributes::type(const QString &uri, const QString &localName)\n", true, &_init_f_type_c3942, &_call_f_type_c3942);
@@ -372,6 +413,12 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
+  //  [adaptor ctor] QXmlAttributes::QXmlAttributes(const QXmlAttributes &)
+  QXmlAttributes_Adaptor(const QXmlAttributes &arg1) : QXmlAttributes(arg1)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
   
 };
 
@@ -391,6 +438,24 @@ static void _call_ctor_QXmlAttributes_Adaptor_0 (const qt_gsi::GenericStaticMeth
 }
 
 
+//  Constructor QXmlAttributes::QXmlAttributes(const QXmlAttributes &) (adaptor class)
+
+static void _init_ctor_QXmlAttributes_Adaptor_2762 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<const QXmlAttributes & > (argspec_0);
+  decl->set_return_new<QXmlAttributes_Adaptor> ();
+}
+
+static void _call_ctor_QXmlAttributes_Adaptor_2762 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QXmlAttributes &arg1 = gsi::arg_reader<const QXmlAttributes & >() (args, heap);
+  ret.write<QXmlAttributes_Adaptor *> (new QXmlAttributes_Adaptor (arg1));
+}
+
+
 namespace gsi
 {
 
@@ -399,6 +464,7 @@ gsi::Class<QXmlAttributes> &qtdecl_QXmlAttributes ();
 static gsi::Methods methods_QXmlAttributes_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlAttributes::QXmlAttributes()\nThis method creates an object of class QXmlAttributes.", &_init_ctor_QXmlAttributes_Adaptor_0, &_call_ctor_QXmlAttributes_Adaptor_0);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlAttributes::QXmlAttributes(const QXmlAttributes &)\nThis method creates an object of class QXmlAttributes.", &_init_ctor_QXmlAttributes_Adaptor_2762, &_call_ctor_QXmlAttributes_Adaptor_2762);
   return methods;
 }
 

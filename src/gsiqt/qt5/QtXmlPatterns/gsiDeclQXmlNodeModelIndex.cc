@@ -164,6 +164,25 @@ static void _call_f_operator_excl__eq__c3090 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// QXmlNodeModelIndex &QXmlNodeModelIndex::operator=(const QXmlNodeModelIndex &)
+
+
+static void _init_f_operator_eq__3090 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<const QXmlNodeModelIndex & > (argspec_0);
+  decl->set_return<QXmlNodeModelIndex & > ();
+}
+
+static void _call_f_operator_eq__3090 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QXmlNodeModelIndex &arg1 = gsi::arg_reader<const QXmlNodeModelIndex & >() (args, heap);
+  ret.write<QXmlNodeModelIndex & > ((QXmlNodeModelIndex &)((QXmlNodeModelIndex *)cls)->operator= (arg1));
+}
+
+
 // bool QXmlNodeModelIndex::operator==(const QXmlNodeModelIndex &other)
 
 
@@ -213,6 +232,7 @@ static gsi::Methods methods_QXmlNodeModelIndex () {
   methods += new qt_gsi::GenericMethod ("isNull?", "@brief Method bool QXmlNodeModelIndex::isNull()\n", true, &_init_f_isNull_c0, &_call_f_isNull_c0);
   methods += new qt_gsi::GenericMethod ("model", "@brief Method const QAbstractXmlNodeModel *QXmlNodeModelIndex::model()\n", true, &_init_f_model_c0, &_call_f_model_c0);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QXmlNodeModelIndex::operator!=(const QXmlNodeModelIndex &other)\n", true, &_init_f_operator_excl__eq__c3090, &_call_f_operator_excl__eq__c3090);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QXmlNodeModelIndex &QXmlNodeModelIndex::operator=(const QXmlNodeModelIndex &)\n", false, &_init_f_operator_eq__3090, &_call_f_operator_eq__3090);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QXmlNodeModelIndex::operator==(const QXmlNodeModelIndex &other)\n", true, &_init_f_operator_eq__eq__c3090, &_call_f_operator_eq__eq__c3090);
   methods += new qt_gsi::GenericMethod ("reset", "@brief Method void QXmlNodeModelIndex::reset()\n", false, &_init_f_reset_0, &_call_f_reset_0);
   return methods;

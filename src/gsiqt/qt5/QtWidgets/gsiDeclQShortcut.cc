@@ -423,18 +423,18 @@ public:
     emit QShortcut::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QShortcut::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QShortcut::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QShortcut::eventFilter(arg1, arg2);
+    return QShortcut::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QShortcut_Adaptor, bool, QObject *, QEvent *>(&QShortcut_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QShortcut_Adaptor, bool, QObject *, QEvent *>(&QShortcut_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QShortcut::eventFilter(arg1, arg2);
+      return QShortcut::eventFilter(watched, event);
     }
   }
 
@@ -445,33 +445,33 @@ public:
     throw tl::Exception ("Can't emit private signal 'void QShortcut::objectNameChanged(const QString &objectName)'");
   }
 
-  //  [adaptor impl] void QShortcut::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QShortcut::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QShortcut::childEvent(arg1);
+    QShortcut::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QShortcut_Adaptor, QChildEvent *>(&QShortcut_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QShortcut_Adaptor, QChildEvent *>(&QShortcut_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QShortcut::childEvent(arg1);
+      QShortcut::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QShortcut::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QShortcut::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QShortcut::customEvent(arg1);
+    QShortcut::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QShortcut_Adaptor, QEvent *>(&QShortcut_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QShortcut_Adaptor, QEvent *>(&QShortcut_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QShortcut::customEvent(arg1);
+      QShortcut::customEvent(event);
     }
   }
 
@@ -505,18 +505,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QShortcut::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QShortcut::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QShortcut::timerEvent(arg1);
+    QShortcut::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QShortcut_Adaptor, QTimerEvent *>(&QShortcut_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QShortcut_Adaptor, QTimerEvent *>(&QShortcut_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QShortcut::timerEvent(arg1);
+      QShortcut::timerEvent(event);
     }
   }
 
@@ -556,9 +556,9 @@ static void _init_ctor_QShortcut_Adaptor_9211 (qt_gsi::GenericStaticMethod *decl
   decl->add_arg<const QKeySequence & > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("parent");
   decl->add_arg<QWidget * > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("member", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("member", true, "nullptr");
   decl->add_arg<const char * > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("ambiguousMember", true, "0");
+  static gsi::ArgSpecBase argspec_3 ("ambiguousMember", true, "nullptr");
   decl->add_arg<const char * > (argspec_3);
   static gsi::ArgSpecBase argspec_4 ("context", true, "Qt::WindowShortcut");
   decl->add_arg<const qt_gsi::Converter<Qt::ShortcutContext>::target_type & > (argspec_4);
@@ -571,8 +571,8 @@ static void _call_ctor_QShortcut_Adaptor_9211 (const qt_gsi::GenericStaticMethod
   tl::Heap heap;
   const QKeySequence &arg1 = gsi::arg_reader<const QKeySequence & >() (args, heap);
   QWidget *arg2 = gsi::arg_reader<QWidget * >() (args, heap);
-  const char *arg3 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
-  const char *arg4 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  const char *arg3 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
+  const char *arg4 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
   const qt_gsi::Converter<Qt::ShortcutContext>::target_type & arg5 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::ShortcutContext>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::ShortcutContext>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::ShortcutContext>(heap, Qt::WindowShortcut), heap);
   ret.write<QShortcut_Adaptor *> (new QShortcut_Adaptor (arg1, arg2, arg3, arg4, qt_gsi::QtToCppAdaptor<Qt::ShortcutContext>(arg5).cref()));
 }
@@ -606,11 +606,11 @@ static void _call_emitter_activatedAmbiguously_0 (const qt_gsi::GenericMethod * 
 }
 
 
-// void QShortcut::childEvent(QChildEvent *)
+// void QShortcut::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -630,11 +630,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QShortcut::customEvent(QEvent *)
+// void QShortcut::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -658,7 +658,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -667,7 +667,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QShortcut_Adaptor *)cls)->emitter_QShortcut_destroyed_1302 (arg1);
 }
 
@@ -719,13 +719,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QShortcut::eventFilter(QObject *, QEvent *)
+// bool QShortcut::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -827,11 +827,11 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
-// void QShortcut::timerEvent(QTimerEvent *)
+// void QShortcut::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -862,23 +862,23 @@ static gsi::Methods methods_QShortcut_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QShortcut::QShortcut(const QKeySequence &key, QWidget *parent, const char *member, const char *ambiguousMember, Qt::ShortcutContext context)\nThis method creates an object of class QShortcut.", &_init_ctor_QShortcut_Adaptor_9211, &_call_ctor_QShortcut_Adaptor_9211);
   methods += new qt_gsi::GenericMethod ("emit_activated", "@brief Emitter for signal void QShortcut::activated()\nCall this method to emit this signal.", false, &_init_emitter_activated_0, &_call_emitter_activated_0);
   methods += new qt_gsi::GenericMethod ("emit_activatedAmbiguously", "@brief Emitter for signal void QShortcut::activatedAmbiguously()\nCall this method to emit this signal.", false, &_init_emitter_activatedAmbiguously_0, &_call_emitter_activatedAmbiguously_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QShortcut::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QShortcut::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QShortcut::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QShortcut::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QShortcut::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QShortcut::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*event", "@brief Virtual method bool QShortcut::event(QEvent *e)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("*event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QShortcut::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QShortcut::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QShortcut::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
   methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QShortcut::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QShortcut::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QShortcut::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QShortcut::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QShortcut::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QShortcut::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

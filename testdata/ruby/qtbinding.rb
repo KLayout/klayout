@@ -272,21 +272,21 @@ class QtBinding_TestClass < TestBase
     label = RBA::QLabel::new(dialog)
     layout = RBA::QHBoxLayout::new(dialog)
     layout.addWidget(label)
-    label.destroy
+    label._destroy
     GC.start
 
     dialog = RBA::QDialog::new(mw)
     label = RBA::QLabel::new(dialog)
     layout = RBA::QHBoxLayout::new(dialog)
     layout.addWidget(label)
-    layout.destroy
+    layout._destroy
     GC.start
 
     dialog = RBA::QDialog::new(mw)
     label = RBA::QLabel::new(dialog)
     layout = RBA::QHBoxLayout::new(dialog)
     layout.addWidget(label)
-    dialog.destroy
+    dialog._destroy
     GC.start
 
     dialog = RBA::QDialog::new(mw)
@@ -740,7 +740,7 @@ class QtBinding_TestClass < TestBase
     img.save(buf, "PNG")
 
     assert_equal(buf.data.size > 100, true)
-    assert_equal(buf.data[0..7].inspect, "\"\\x89PNG\\r\\n\\x1A\\n\"")
+    assert_equal(buf.data[0..7].unpack("C*"), [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
 
   end
 
@@ -764,6 +764,91 @@ class QtBinding_TestClass < TestBase
     assert_equal(item.background(0).color.red, 255)
     assert_equal(item.background(0).color.green, 255)
     assert_equal(item.background(0).color.blue, 0)
+
+  end
+
+  def test_55
+
+    # addWidget to QHBoxLayout keeps object managed
+    window = RBA::QDialog::new
+    layout = RBA::QHBoxLayout::new(window)
+
+    w = RBA::QPushButton::new
+    oid = w.object_id
+    layout.addWidget(w)
+    assert_equal(layout.itemAt(0).widget.object_id, oid)
+
+    # try to kill the object
+    w = nil
+    GC.start
+
+    # still there
+    w = layout.itemAt(0).widget
+    assert_equal(w._destroyed?, false)
+    assert_equal(w.object_id, oid)
+
+    # killing the window kills the layout kills the widget
+    window._destroy
+    assert_equal(window._destroyed?, true)
+    assert_equal(layout._destroyed?, true)
+    assert_equal(w._destroyed?, true)
+
+  end
+
+  def test_56
+
+    # Creating QImage from binary data
+
+    bytes = [ 0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14, 0x21, 0x22, 0x33, 0x34,
+              0x31, 0x32, 0x33, 0x34, 0x41, 0x42, 0x43, 0x44, 0x51, 0x52, 0x53, 0x54,
+              0x61, 0x62, 0x63, 0x64, 0x71, 0x72, 0x73, 0x74, 0x81, 0x82, 0x83, 0x84,
+              0x91, 0x92, 0x93, 0x94, 0xa1, 0xa2, 0xa3, 0xa4, 0xb1, 0xb2, 0xb3, 0xb4 ].pack("C*")
+
+    image = RBA::QImage::new(bytes, 3, 4, RBA::QImage::Format_ARGB32)
+    assert_equal("%08x" % image.pixel(0, 0), "04030201")
+    assert_equal("%08x" % image.pixel(1, 0), "14131211")
+    assert_equal("%08x" % image.pixel(0, 2), "64636261")
+
+  end
+
+  def test_57
+
+    # QColor with string parameter (suppressing QLatin1String)
+
+    color = RBA::QColor::new("blue")
+    assert_equal(color.name(), "#0000ff")
+
+  end
+
+  def test_58
+
+    # The various ways to refer to enums
+
+    assert_equal(RBA::Qt::MouseButton::new(4).to_i, 4)
+    assert_equal(RBA::Qt_MouseButton::new(4).to_i, 4)
+    assert_equal(RBA::Qt_MouseButton::new(4).hash, 4)
+    assert_equal(RBA::Qt_MouseButton::new(1).to_s, "LeftButton")
+    assert_equal(RBA::Qt_MouseButton::LeftButton.to_i, 1)
+    assert_equal(RBA::Qt::LeftButton.to_i, 1)
+    assert_equal((RBA::Qt_MouseButton::LeftButton | RBA::Qt_MouseButton::RightButton).to_i, 3)
+    assert_equal((RBA::Qt_MouseButton::LeftButton | RBA::Qt_MouseButton::RightButton).class.to_s, "RBA::Qt_QFlags_MouseButton")
+    assert_equal((RBA::Qt::MouseButton::LeftButton | RBA::Qt::MouseButton::RightButton).to_i, 3)
+    assert_equal((RBA::Qt::MouseButton::LeftButton | RBA::Qt::MouseButton::RightButton).class.to_s, "RBA::Qt_QFlags_MouseButton")
+    assert_equal((RBA::Qt::LeftButton | RBA::Qt::RightButton).to_i, 3)
+    assert_equal((RBA::Qt::LeftButton | RBA::Qt::RightButton).class.to_s, "RBA::Qt_QFlags_MouseButton")
+
+  end
+
+  def test_59
+
+    # Enums can act as hash keys
+
+    h = {}
+    h[RBA::Qt::MouseButton::LeftButton] = "left"
+    h[RBA::Qt::MouseButton::RightButton] = "right"
+    assert_equal(h[RBA::Qt::MouseButton::LeftButton], "left")
+    assert_equal(h[RBA::Qt::MouseButton::RightButton], "right")
+    assert_equal(h[RBA::Qt::MouseButton::NoButton], nil)
 
   end
 

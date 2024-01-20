@@ -91,6 +91,7 @@ void run_rubytest (tl::TestBase * /*_this*/, const std::string &fn)
 #define RUBYTEST(n, file) \
   TEST(n) { run_rubytest(_this, file); }
 
+RUBYTEST (kwargsTest, "kwargs.rb")
 RUBYTEST (antTest, "antTest.rb")
 RUBYTEST (dbBooleanTest, "dbBooleanTest.rb")
 RUBYTEST (dbBoxTest, "dbBoxTest.rb")

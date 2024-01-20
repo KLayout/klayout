@@ -1247,7 +1247,7 @@ static gsi::Methods methods_QTextCharFormat () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTextCharFormat::QTextCharFormat()\nThis method creates an object of class QTextCharFormat.", &_init_ctor_QTextCharFormat_0, &_call_ctor_QTextCharFormat_0);
   methods += new qt_gsi::GenericMethod (":anchorHref", "@brief Method QString QTextCharFormat::anchorHref()\n", true, &_init_f_anchorHref_c0, &_call_f_anchorHref_c0);
   methods += new qt_gsi::GenericMethod (":anchorNames", "@brief Method QStringList QTextCharFormat::anchorNames()\n", true, &_init_f_anchorNames_c0, &_call_f_anchorNames_c0);
-  methods += new qt_gsi::GenericMethod ("baselineOffset", "@brief Method double QTextCharFormat::baselineOffset()\n", true, &_init_f_baselineOffset_c0, &_call_f_baselineOffset_c0);
+  methods += new qt_gsi::GenericMethod (":baselineOffset", "@brief Method double QTextCharFormat::baselineOffset()\n", true, &_init_f_baselineOffset_c0, &_call_f_baselineOffset_c0);
   methods += new qt_gsi::GenericMethod (":font", "@brief Method QFont QTextCharFormat::font()\n", true, &_init_f_font_c0, &_call_f_font_c0);
   methods += new qt_gsi::GenericMethod (":fontCapitalization", "@brief Method QFont::Capitalization QTextCharFormat::fontCapitalization()\n", true, &_init_f_fontCapitalization_c0, &_call_f_fontCapitalization_c0);
   methods += new qt_gsi::GenericMethod ("fontFamilies", "@brief Method QVariant QTextCharFormat::fontFamilies()\n", true, &_init_f_fontFamilies_c0, &_call_f_fontFamilies_c0);
@@ -1273,7 +1273,7 @@ static gsi::Methods methods_QTextCharFormat () {
   methods += new qt_gsi::GenericMethod ("setAnchor|anchor=", "@brief Method void QTextCharFormat::setAnchor(bool anchor)\n", false, &_init_f_setAnchor_864, &_call_f_setAnchor_864);
   methods += new qt_gsi::GenericMethod ("setAnchorHref|anchorHref=", "@brief Method void QTextCharFormat::setAnchorHref(const QString &value)\n", false, &_init_f_setAnchorHref_2025, &_call_f_setAnchorHref_2025);
   methods += new qt_gsi::GenericMethod ("setAnchorNames|anchorNames=", "@brief Method void QTextCharFormat::setAnchorNames(const QStringList &names)\n", false, &_init_f_setAnchorNames_2437, &_call_f_setAnchorNames_2437);
-  methods += new qt_gsi::GenericMethod ("setBaselineOffset", "@brief Method void QTextCharFormat::setBaselineOffset(double baseline)\n", false, &_init_f_setBaselineOffset_1071, &_call_f_setBaselineOffset_1071);
+  methods += new qt_gsi::GenericMethod ("setBaselineOffset|baselineOffset=", "@brief Method void QTextCharFormat::setBaselineOffset(double baseline)\n", false, &_init_f_setBaselineOffset_1071, &_call_f_setBaselineOffset_1071);
   methods += new qt_gsi::GenericMethod ("setFont", "@brief Method void QTextCharFormat::setFont(const QFont &font, QTextCharFormat::FontPropertiesInheritanceBehavior behavior)\n", false, &_init_f_setFont_7168, &_call_f_setFont_7168);
   methods += new qt_gsi::GenericMethod ("setFontCapitalization|fontCapitalization=", "@brief Method void QTextCharFormat::setFontCapitalization(QFont::Capitalization capitalization)\n", false, &_init_f_setFontCapitalization_2508, &_call_f_setFontCapitalization_2508);
   methods += new qt_gsi::GenericMethod ("setFontFamilies", "@brief Method void QTextCharFormat::setFontFamilies(const QStringList &families)\n", false, &_init_f_setFontFamilies_2437, &_call_f_setFontFamilies_2437);
@@ -1294,8 +1294,8 @@ static gsi::Methods methods_QTextCharFormat () {
   methods += new qt_gsi::GenericMethod ("setFontUnderline|fontUnderline=", "@brief Method void QTextCharFormat::setFontUnderline(bool underline)\n", false, &_init_f_setFontUnderline_864, &_call_f_setFontUnderline_864);
   methods += new qt_gsi::GenericMethod ("setFontWeight|fontWeight=", "@brief Method void QTextCharFormat::setFontWeight(int weight)\n", false, &_init_f_setFontWeight_767, &_call_f_setFontWeight_767);
   methods += new qt_gsi::GenericMethod ("setFontWordSpacing|fontWordSpacing=", "@brief Method void QTextCharFormat::setFontWordSpacing(double spacing)\n", false, &_init_f_setFontWordSpacing_1071, &_call_f_setFontWordSpacing_1071);
-  methods += new qt_gsi::GenericMethod ("setSubScriptBaseline", "@brief Method void QTextCharFormat::setSubScriptBaseline(double baseline)\n", false, &_init_f_setSubScriptBaseline_1071, &_call_f_setSubScriptBaseline_1071);
-  methods += new qt_gsi::GenericMethod ("setSuperScriptBaseline", "@brief Method void QTextCharFormat::setSuperScriptBaseline(double baseline)\n", false, &_init_f_setSuperScriptBaseline_1071, &_call_f_setSuperScriptBaseline_1071);
+  methods += new qt_gsi::GenericMethod ("setSubScriptBaseline|subScriptBaseline=", "@brief Method void QTextCharFormat::setSubScriptBaseline(double baseline)\n", false, &_init_f_setSubScriptBaseline_1071, &_call_f_setSubScriptBaseline_1071);
+  methods += new qt_gsi::GenericMethod ("setSuperScriptBaseline|superScriptBaseline=", "@brief Method void QTextCharFormat::setSuperScriptBaseline(double baseline)\n", false, &_init_f_setSuperScriptBaseline_1071, &_call_f_setSuperScriptBaseline_1071);
   methods += new qt_gsi::GenericMethod ("setTableCellColumnSpan|tableCellColumnSpan=", "@brief Method void QTextCharFormat::setTableCellColumnSpan(int tableCellColumnSpan)\n", false, &_init_f_setTableCellColumnSpan_767, &_call_f_setTableCellColumnSpan_767);
   methods += new qt_gsi::GenericMethod ("setTableCellRowSpan|tableCellRowSpan=", "@brief Method void QTextCharFormat::setTableCellRowSpan(int tableCellRowSpan)\n", false, &_init_f_setTableCellRowSpan_767, &_call_f_setTableCellRowSpan_767);
   methods += new qt_gsi::GenericMethod ("setTextOutline|textOutline=", "@brief Method void QTextCharFormat::setTextOutline(const QPen &pen)\n", false, &_init_f_setTextOutline_1685, &_call_f_setTextOutline_1685);
@@ -1303,8 +1303,8 @@ static gsi::Methods methods_QTextCharFormat () {
   methods += new qt_gsi::GenericMethod ("setUnderlineColor|underlineColor=", "@brief Method void QTextCharFormat::setUnderlineColor(const QColor &color)\n", false, &_init_f_setUnderlineColor_1905, &_call_f_setUnderlineColor_1905);
   methods += new qt_gsi::GenericMethod ("setUnderlineStyle|underlineStyle=", "@brief Method void QTextCharFormat::setUnderlineStyle(QTextCharFormat::UnderlineStyle style)\n", false, &_init_f_setUnderlineStyle_3516, &_call_f_setUnderlineStyle_3516);
   methods += new qt_gsi::GenericMethod ("setVerticalAlignment|verticalAlignment=", "@brief Method void QTextCharFormat::setVerticalAlignment(QTextCharFormat::VerticalAlignment alignment)\n", false, &_init_f_setVerticalAlignment_3806, &_call_f_setVerticalAlignment_3806);
-  methods += new qt_gsi::GenericMethod ("subScriptBaseline", "@brief Method double QTextCharFormat::subScriptBaseline()\n", true, &_init_f_subScriptBaseline_c0, &_call_f_subScriptBaseline_c0);
-  methods += new qt_gsi::GenericMethod ("superScriptBaseline", "@brief Method double QTextCharFormat::superScriptBaseline()\n", true, &_init_f_superScriptBaseline_c0, &_call_f_superScriptBaseline_c0);
+  methods += new qt_gsi::GenericMethod (":subScriptBaseline", "@brief Method double QTextCharFormat::subScriptBaseline()\n", true, &_init_f_subScriptBaseline_c0, &_call_f_subScriptBaseline_c0);
+  methods += new qt_gsi::GenericMethod (":superScriptBaseline", "@brief Method double QTextCharFormat::superScriptBaseline()\n", true, &_init_f_superScriptBaseline_c0, &_call_f_superScriptBaseline_c0);
   methods += new qt_gsi::GenericMethod (":tableCellColumnSpan", "@brief Method int QTextCharFormat::tableCellColumnSpan()\n", true, &_init_f_tableCellColumnSpan_c0, &_call_f_tableCellColumnSpan_c0);
   methods += new qt_gsi::GenericMethod (":tableCellRowSpan", "@brief Method int QTextCharFormat::tableCellRowSpan()\n", true, &_init_f_tableCellRowSpan_c0, &_call_f_tableCellRowSpan_c0);
   methods += new qt_gsi::GenericMethod (":textOutline", "@brief Method QPen QTextCharFormat::textOutline()\n", true, &_init_f_textOutline_c0, &_call_f_textOutline_c0);

@@ -30,6 +30,7 @@
 #include <QSslConfiguration>
 #include <QSslCertificate>
 #include <QSslCipher>
+#include <QSslDiffieHellmanParameters>
 #include <QSslEllipticCurve>
 #include <QSslKey>
 #include "gsiQt.h"
@@ -88,6 +89,21 @@ static void _call_f_allowedNextProtocols_c0 (const qt_gsi::GenericMethod * /*dec
 }
 
 
+// QMap<QByteArray, QVariant> QSslConfiguration::backendConfiguration()
+
+
+static void _init_f_backendConfiguration_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QMap<QByteArray, QVariant> > ();
+}
+
+static void _call_f_backendConfiguration_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QMap<QByteArray, QVariant> > ((QMap<QByteArray, QVariant>)((QSslConfiguration *)cls)->backendConfiguration ());
+}
+
+
 // QList<QSslCertificate> QSslConfiguration::caCertificates()
 
 
@@ -118,6 +134,36 @@ static void _call_f_ciphers_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
+// QSslDiffieHellmanParameters QSslConfiguration::diffieHellmanParameters()
+
+
+static void _init_f_diffieHellmanParameters_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QSslDiffieHellmanParameters > ();
+}
+
+static void _call_f_diffieHellmanParameters_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QSslDiffieHellmanParameters > ((QSslDiffieHellmanParameters)((QSslConfiguration *)cls)->diffieHellmanParameters ());
+}
+
+
+// bool QSslConfiguration::dtlsCookieVerificationEnabled()
+
+
+static void _init_f_dtlsCookieVerificationEnabled_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_dtlsCookieVerificationEnabled_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QSslConfiguration *)cls)->dtlsCookieVerificationEnabled ());
+}
+
+
 // QVector<QSslEllipticCurve> QSslConfiguration::ellipticCurves()
 
 
@@ -130,6 +176,21 @@ static void _call_f_ellipticCurves_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QVector<QSslEllipticCurve> > ((QVector<QSslEllipticCurve>)((QSslConfiguration *)cls)->ellipticCurves ());
+}
+
+
+// QSslKey QSslConfiguration::ephemeralServerKey()
+
+
+static void _init_f_ephemeralServerKey_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QSslKey > ();
+}
+
+static void _call_f_ephemeralServerKey_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QSslKey > ((QSslKey)((QSslConfiguration *)cls)->ephemeralServerKey ());
 }
 
 
@@ -325,6 +386,21 @@ static void _call_f_peerVerifyMode_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
+// QByteArray QSslConfiguration::preSharedKeyIdentityHint()
+
+
+static void _init_f_preSharedKeyIdentityHint_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QByteArray > ();
+}
+
+static void _call_f_preSharedKeyIdentityHint_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QByteArray > ((QByteArray)((QSslConfiguration *)cls)->preSharedKeyIdentityHint ());
+}
+
+
 // QSslKey QSslConfiguration::privateKey()
 
 
@@ -435,6 +511,49 @@ static void _call_f_setAllowedNextProtocols_2047 (const qt_gsi::GenericMethod * 
 }
 
 
+// void QSslConfiguration::setBackendConfiguration(const QMap<QByteArray, QVariant> &backendConfiguration)
+
+
+static void _init_f_setBackendConfiguration_3792 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("backendConfiguration", true, "QMap<QByteArray, QVariant>()");
+  decl->add_arg<const QMap<QByteArray, QVariant> & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setBackendConfiguration_3792 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QMap<QByteArray, QVariant> &arg1 = args ? gsi::arg_reader<const QMap<QByteArray, QVariant> & >() (args, heap) : gsi::arg_maker<const QMap<QByteArray, QVariant> & >() (QMap<QByteArray, QVariant>(), heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QSslConfiguration *)cls)->setBackendConfiguration (arg1);
+}
+
+
+// void QSslConfiguration::setBackendConfigurationOption(const QByteArray &name, const QVariant &value)
+
+
+static void _init_f_setBackendConfigurationOption_4320 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("name");
+  decl->add_arg<const QByteArray & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("value");
+  decl->add_arg<const QVariant & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setBackendConfigurationOption_4320 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QSslConfiguration *)cls)->setBackendConfigurationOption (arg1, arg2);
+}
+
+
 // void QSslConfiguration::setCaCertificates(const QList<QSslCertificate> &certificates)
 
 
@@ -472,6 +591,46 @@ static void _call_f_setCiphers_2918 (const qt_gsi::GenericMethod * /*decl*/, voi
   const QList<QSslCipher> &arg1 = gsi::arg_reader<const QList<QSslCipher> & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslConfiguration *)cls)->setCiphers (arg1);
+}
+
+
+// void QSslConfiguration::setDiffieHellmanParameters(const QSslDiffieHellmanParameters &dhparams)
+
+
+static void _init_f_setDiffieHellmanParameters_4032 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("dhparams");
+  decl->add_arg<const QSslDiffieHellmanParameters & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setDiffieHellmanParameters_4032 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QSslDiffieHellmanParameters &arg1 = gsi::arg_reader<const QSslDiffieHellmanParameters & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QSslConfiguration *)cls)->setDiffieHellmanParameters (arg1);
+}
+
+
+// void QSslConfiguration::setDtlsCookieVerificationEnabled(bool enable)
+
+
+static void _init_f_setDtlsCookieVerificationEnabled_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("enable");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setDtlsCookieVerificationEnabled_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QSslConfiguration *)cls)->setDtlsCookieVerificationEnabled (arg1);
 }
 
 
@@ -572,6 +731,26 @@ static void _call_f_setPeerVerifyMode_2970 (const qt_gsi::GenericMethod * /*decl
   const qt_gsi::Converter<QSslSocket::PeerVerifyMode>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QSslSocket::PeerVerifyMode>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSslConfiguration *)cls)->setPeerVerifyMode (qt_gsi::QtToCppAdaptor<QSslSocket::PeerVerifyMode>(arg1).cref());
+}
+
+
+// void QSslConfiguration::setPreSharedKeyIdentityHint(const QByteArray &hint)
+
+
+static void _init_f_setPreSharedKeyIdentityHint_2309 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("hint");
+  decl->add_arg<const QByteArray & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setPreSharedKeyIdentityHint_2309 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QSslConfiguration *)cls)->setPreSharedKeyIdentityHint (arg1);
 }
 
 
@@ -712,6 +891,21 @@ static void _call_f_defaultConfiguration_0 (const qt_gsi::GenericStaticMethod * 
 }
 
 
+// static QSslConfiguration QSslConfiguration::defaultDtlsConfiguration()
+
+
+static void _init_f_defaultDtlsConfiguration_0 (qt_gsi::GenericStaticMethod *decl)
+{
+  decl->set_return<QSslConfiguration > ();
+}
+
+static void _call_f_defaultDtlsConfiguration_0 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QSslConfiguration > ((QSslConfiguration)QSslConfiguration::defaultDtlsConfiguration ());
+}
+
+
 // static void QSslConfiguration::setDefaultConfiguration(const QSslConfiguration &configuration)
 
 
@@ -729,6 +923,26 @@ static void _call_f_setDefaultConfiguration_3068 (const qt_gsi::GenericStaticMet
   const QSslConfiguration &arg1 = gsi::arg_reader<const QSslConfiguration & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   QSslConfiguration::setDefaultConfiguration (arg1);
+}
+
+
+// static void QSslConfiguration::setDefaultDtlsConfiguration(const QSslConfiguration &configuration)
+
+
+static void _init_f_setDefaultDtlsConfiguration_3068 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("configuration");
+  decl->add_arg<const QSslConfiguration & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setDefaultDtlsConfiguration_3068 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QSslConfiguration &arg1 = gsi::arg_reader<const QSslConfiguration & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  QSslConfiguration::setDefaultDtlsConfiguration (arg1);
 }
 
 
@@ -786,9 +1000,13 @@ static gsi::Methods methods_QSslConfiguration () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSslConfiguration::QSslConfiguration()\nThis method creates an object of class QSslConfiguration.", &_init_ctor_QSslConfiguration_0, &_call_ctor_QSslConfiguration_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSslConfiguration::QSslConfiguration(const QSslConfiguration &other)\nThis method creates an object of class QSslConfiguration.", &_init_ctor_QSslConfiguration_3068, &_call_ctor_QSslConfiguration_3068);
   methods += new qt_gsi::GenericMethod (":allowedNextProtocols", "@brief Method QList<QByteArray> QSslConfiguration::allowedNextProtocols()\n", true, &_init_f_allowedNextProtocols_c0, &_call_f_allowedNextProtocols_c0);
+  methods += new qt_gsi::GenericMethod (":backendConfiguration", "@brief Method QMap<QByteArray, QVariant> QSslConfiguration::backendConfiguration()\n", true, &_init_f_backendConfiguration_c0, &_call_f_backendConfiguration_c0);
   methods += new qt_gsi::GenericMethod (":caCertificates", "@brief Method QList<QSslCertificate> QSslConfiguration::caCertificates()\n", true, &_init_f_caCertificates_c0, &_call_f_caCertificates_c0);
   methods += new qt_gsi::GenericMethod (":ciphers", "@brief Method QList<QSslCipher> QSslConfiguration::ciphers()\n", true, &_init_f_ciphers_c0, &_call_f_ciphers_c0);
+  methods += new qt_gsi::GenericMethod (":diffieHellmanParameters", "@brief Method QSslDiffieHellmanParameters QSslConfiguration::diffieHellmanParameters()\n", true, &_init_f_diffieHellmanParameters_c0, &_call_f_diffieHellmanParameters_c0);
+  methods += new qt_gsi::GenericMethod (":dtlsCookieVerificationEnabled", "@brief Method bool QSslConfiguration::dtlsCookieVerificationEnabled()\n", true, &_init_f_dtlsCookieVerificationEnabled_c0, &_call_f_dtlsCookieVerificationEnabled_c0);
   methods += new qt_gsi::GenericMethod (":ellipticCurves", "@brief Method QVector<QSslEllipticCurve> QSslConfiguration::ellipticCurves()\n", true, &_init_f_ellipticCurves_c0, &_call_f_ellipticCurves_c0);
+  methods += new qt_gsi::GenericMethod ("ephemeralServerKey", "@brief Method QSslKey QSslConfiguration::ephemeralServerKey()\n", true, &_init_f_ephemeralServerKey_c0, &_call_f_ephemeralServerKey_c0);
   methods += new qt_gsi::GenericMethod ("isNull?", "@brief Method bool QSslConfiguration::isNull()\n", true, &_init_f_isNull_c0, &_call_f_isNull_c0);
   methods += new qt_gsi::GenericMethod (":localCertificate", "@brief Method QSslCertificate QSslConfiguration::localCertificate()\n", true, &_init_f_localCertificate_c0, &_call_f_localCertificate_c0);
   methods += new qt_gsi::GenericMethod (":localCertificateChain", "@brief Method QList<QSslCertificate> QSslConfiguration::localCertificateChain()\n", true, &_init_f_localCertificateChain_c0, &_call_f_localCertificateChain_c0);
@@ -801,6 +1019,7 @@ static gsi::Methods methods_QSslConfiguration () {
   methods += new qt_gsi::GenericMethod ("peerCertificateChain", "@brief Method QList<QSslCertificate> QSslConfiguration::peerCertificateChain()\n", true, &_init_f_peerCertificateChain_c0, &_call_f_peerCertificateChain_c0);
   methods += new qt_gsi::GenericMethod (":peerVerifyDepth", "@brief Method int QSslConfiguration::peerVerifyDepth()\n", true, &_init_f_peerVerifyDepth_c0, &_call_f_peerVerifyDepth_c0);
   methods += new qt_gsi::GenericMethod (":peerVerifyMode", "@brief Method QSslSocket::PeerVerifyMode QSslConfiguration::peerVerifyMode()\n", true, &_init_f_peerVerifyMode_c0, &_call_f_peerVerifyMode_c0);
+  methods += new qt_gsi::GenericMethod (":preSharedKeyIdentityHint", "@brief Method QByteArray QSslConfiguration::preSharedKeyIdentityHint()\n", true, &_init_f_preSharedKeyIdentityHint_c0, &_call_f_preSharedKeyIdentityHint_c0);
   methods += new qt_gsi::GenericMethod (":privateKey", "@brief Method QSslKey QSslConfiguration::privateKey()\n", true, &_init_f_privateKey_c0, &_call_f_privateKey_c0);
   methods += new qt_gsi::GenericMethod (":protocol", "@brief Method QSsl::SslProtocol QSslConfiguration::protocol()\n", true, &_init_f_protocol_c0, &_call_f_protocol_c0);
   methods += new qt_gsi::GenericMethod ("sessionCipher", "@brief Method QSslCipher QSslConfiguration::sessionCipher()\n", true, &_init_f_sessionCipher_c0, &_call_f_sessionCipher_c0);
@@ -808,13 +1027,18 @@ static gsi::Methods methods_QSslConfiguration () {
   methods += new qt_gsi::GenericMethod (":sessionTicket", "@brief Method QByteArray QSslConfiguration::sessionTicket()\n", true, &_init_f_sessionTicket_c0, &_call_f_sessionTicket_c0);
   methods += new qt_gsi::GenericMethod ("sessionTicketLifeTimeHint", "@brief Method int QSslConfiguration::sessionTicketLifeTimeHint()\n", true, &_init_f_sessionTicketLifeTimeHint_c0, &_call_f_sessionTicketLifeTimeHint_c0);
   methods += new qt_gsi::GenericMethod ("setAllowedNextProtocols|allowedNextProtocols=", "@brief Method void QSslConfiguration::setAllowedNextProtocols(QList<QByteArray> protocols)\n", false, &_init_f_setAllowedNextProtocols_2047, &_call_f_setAllowedNextProtocols_2047);
+  methods += new qt_gsi::GenericMethod ("setBackendConfiguration|backendConfiguration=", "@brief Method void QSslConfiguration::setBackendConfiguration(const QMap<QByteArray, QVariant> &backendConfiguration)\n", false, &_init_f_setBackendConfiguration_3792, &_call_f_setBackendConfiguration_3792);
+  methods += new qt_gsi::GenericMethod ("setBackendConfigurationOption", "@brief Method void QSslConfiguration::setBackendConfigurationOption(const QByteArray &name, const QVariant &value)\n", false, &_init_f_setBackendConfigurationOption_4320, &_call_f_setBackendConfigurationOption_4320);
   methods += new qt_gsi::GenericMethod ("setCaCertificates|caCertificates=", "@brief Method void QSslConfiguration::setCaCertificates(const QList<QSslCertificate> &certificates)\n", false, &_init_f_setCaCertificates_3438, &_call_f_setCaCertificates_3438);
   methods += new qt_gsi::GenericMethod ("setCiphers|ciphers=", "@brief Method void QSslConfiguration::setCiphers(const QList<QSslCipher> &ciphers)\n", false, &_init_f_setCiphers_2918, &_call_f_setCiphers_2918);
+  methods += new qt_gsi::GenericMethod ("setDiffieHellmanParameters|diffieHellmanParameters=", "@brief Method void QSslConfiguration::setDiffieHellmanParameters(const QSslDiffieHellmanParameters &dhparams)\n", false, &_init_f_setDiffieHellmanParameters_4032, &_call_f_setDiffieHellmanParameters_4032);
+  methods += new qt_gsi::GenericMethod ("setDtlsCookieVerificationEnabled|dtlsCookieVerificationEnabled=", "@brief Method void QSslConfiguration::setDtlsCookieVerificationEnabled(bool enable)\n", false, &_init_f_setDtlsCookieVerificationEnabled_864, &_call_f_setDtlsCookieVerificationEnabled_864);
   methods += new qt_gsi::GenericMethod ("setEllipticCurves|ellipticCurves=", "@brief Method void QSslConfiguration::setEllipticCurves(const QVector<QSslEllipticCurve> &curves)\n", false, &_init_f_setEllipticCurves_3869, &_call_f_setEllipticCurves_3869);
   methods += new qt_gsi::GenericMethod ("setLocalCertificate|localCertificate=", "@brief Method void QSslConfiguration::setLocalCertificate(const QSslCertificate &certificate)\n", false, &_init_f_setLocalCertificate_2823, &_call_f_setLocalCertificate_2823);
   methods += new qt_gsi::GenericMethod ("setLocalCertificateChain|localCertificateChain=", "@brief Method void QSslConfiguration::setLocalCertificateChain(const QList<QSslCertificate> &localChain)\n", false, &_init_f_setLocalCertificateChain_3438, &_call_f_setLocalCertificateChain_3438);
   methods += new qt_gsi::GenericMethod ("setPeerVerifyDepth|peerVerifyDepth=", "@brief Method void QSslConfiguration::setPeerVerifyDepth(int depth)\n", false, &_init_f_setPeerVerifyDepth_767, &_call_f_setPeerVerifyDepth_767);
   methods += new qt_gsi::GenericMethod ("setPeerVerifyMode|peerVerifyMode=", "@brief Method void QSslConfiguration::setPeerVerifyMode(QSslSocket::PeerVerifyMode mode)\n", false, &_init_f_setPeerVerifyMode_2970, &_call_f_setPeerVerifyMode_2970);
+  methods += new qt_gsi::GenericMethod ("setPreSharedKeyIdentityHint|preSharedKeyIdentityHint=", "@brief Method void QSslConfiguration::setPreSharedKeyIdentityHint(const QByteArray &hint)\n", false, &_init_f_setPreSharedKeyIdentityHint_2309, &_call_f_setPreSharedKeyIdentityHint_2309);
   methods += new qt_gsi::GenericMethod ("setPrivateKey|privateKey=", "@brief Method void QSslConfiguration::setPrivateKey(const QSslKey &key)\n", false, &_init_f_setPrivateKey_1997, &_call_f_setPrivateKey_1997);
   methods += new qt_gsi::GenericMethod ("setProtocol|protocol=", "@brief Method void QSslConfiguration::setProtocol(QSsl::SslProtocol protocol)\n", false, &_init_f_setProtocol_2095, &_call_f_setProtocol_2095);
   methods += new qt_gsi::GenericMethod ("setSessionTicket|sessionTicket=", "@brief Method void QSslConfiguration::setSessionTicket(const QByteArray &sessionTicket)\n", false, &_init_f_setSessionTicket_2309, &_call_f_setSessionTicket_2309);
@@ -822,7 +1046,9 @@ static gsi::Methods methods_QSslConfiguration () {
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QSslConfiguration::swap(QSslConfiguration &other)\n", false, &_init_f_swap_2373, &_call_f_swap_2373);
   methods += new qt_gsi::GenericMethod ("testSslOption", "@brief Method bool QSslConfiguration::testSslOption(QSsl::SslOption option)\n", true, &_init_f_testSslOption_c1878, &_call_f_testSslOption_c1878);
   methods += new qt_gsi::GenericStaticMethod (":defaultConfiguration", "@brief Static method QSslConfiguration QSslConfiguration::defaultConfiguration()\nThis method is static and can be called without an instance.", &_init_f_defaultConfiguration_0, &_call_f_defaultConfiguration_0);
+  methods += new qt_gsi::GenericStaticMethod (":defaultDtlsConfiguration", "@brief Static method QSslConfiguration QSslConfiguration::defaultDtlsConfiguration()\nThis method is static and can be called without an instance.", &_init_f_defaultDtlsConfiguration_0, &_call_f_defaultDtlsConfiguration_0);
   methods += new qt_gsi::GenericStaticMethod ("setDefaultConfiguration|defaultConfiguration=", "@brief Static method void QSslConfiguration::setDefaultConfiguration(const QSslConfiguration &configuration)\nThis method is static and can be called without an instance.", &_init_f_setDefaultConfiguration_3068, &_call_f_setDefaultConfiguration_3068);
+  methods += new qt_gsi::GenericStaticMethod ("setDefaultDtlsConfiguration|defaultDtlsConfiguration=", "@brief Static method void QSslConfiguration::setDefaultDtlsConfiguration(const QSslConfiguration &configuration)\nThis method is static and can be called without an instance.", &_init_f_setDefaultDtlsConfiguration_3068, &_call_f_setDefaultDtlsConfiguration_3068);
   methods += new qt_gsi::GenericStaticMethod ("supportedCiphers", "@brief Static method QList<QSslCipher> QSslConfiguration::supportedCiphers()\nThis method is static and can be called without an instance.", &_init_f_supportedCiphers_0, &_call_f_supportedCiphers_0);
   methods += new qt_gsi::GenericStaticMethod ("supportedEllipticCurves", "@brief Static method QVector<QSslEllipticCurve> QSslConfiguration::supportedEllipticCurves()\nThis method is static and can be called without an instance.", &_init_f_supportedEllipticCurves_0, &_call_f_supportedEllipticCurves_0);
   methods += new qt_gsi::GenericStaticMethod ("systemCaCertificates", "@brief Static method QList<QSslCertificate> QSslConfiguration::systemCaCertificates()\nThis method is static and can be called without an instance.", &_init_f_systemCaCertificates_0, &_call_f_systemCaCertificates_0);

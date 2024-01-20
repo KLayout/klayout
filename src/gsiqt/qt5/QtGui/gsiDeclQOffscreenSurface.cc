@@ -111,6 +111,21 @@ static void _call_f_isValid_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
+// void *QOffscreenSurface::nativeHandle()
+
+
+static void _init_f_nativeHandle_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void * > ();
+}
+
+static void _call_f_nativeHandle_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<void * > ((void *)((QOffscreenSurface *)cls)->nativeHandle ());
+}
+
+
 // QSurfaceFormat QOffscreenSurface::requestedFormat()
 
 
@@ -158,6 +173,26 @@ static void _call_f_setFormat_2724 (const qt_gsi::GenericMethod * /*decl*/, void
   const QSurfaceFormat &arg1 = gsi::arg_reader<const QSurfaceFormat & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QOffscreenSurface *)cls)->setFormat (arg1);
+}
+
+
+// void QOffscreenSurface::setNativeHandle(void *handle)
+
+
+static void _init_f_setNativeHandle_1056 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("handle");
+  decl->add_arg<void * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setNativeHandle_1056 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  void *arg1 = gsi::arg_reader<void * >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QOffscreenSurface *)cls)->setNativeHandle (arg1);
 }
 
 
@@ -312,13 +347,15 @@ namespace gsi
 static gsi::Methods methods_QOffscreenSurface () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("qt_create", "@brief Method void QOffscreenSurface::create()\n", false, &_init_f_create_0, &_call_f_create_0);
-  methods += new qt_gsi::GenericMethod ("qt_destroy", "@brief Method void QOffscreenSurface::destroy()\n", false, &_init_f_destroy_0, &_call_f_destroy_0);
+  methods += new qt_gsi::GenericMethod ("create|qt_create", "@brief Method void QOffscreenSurface::create()\n", false, &_init_f_create_0, &_call_f_create_0);
+  methods += new qt_gsi::GenericMethod ("destroy|qt_destroy", "@brief Method void QOffscreenSurface::destroy()\n", false, &_init_f_destroy_0, &_call_f_destroy_0);
   methods += new qt_gsi::GenericMethod (":format", "@brief Method QSurfaceFormat QOffscreenSurface::format()\nThis is a reimplementation of QSurface::format", true, &_init_f_format_c0, &_call_f_format_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QOffscreenSurface::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
+  methods += new qt_gsi::GenericMethod (":nativeHandle", "@brief Method void *QOffscreenSurface::nativeHandle()\n", true, &_init_f_nativeHandle_c0, &_call_f_nativeHandle_c0);
   methods += new qt_gsi::GenericMethod ("requestedFormat", "@brief Method QSurfaceFormat QOffscreenSurface::requestedFormat()\n", true, &_init_f_requestedFormat_c0, &_call_f_requestedFormat_c0);
   methods += new qt_gsi::GenericMethod (":screen", "@brief Method QScreen *QOffscreenSurface::screen()\n", true, &_init_f_screen_c0, &_call_f_screen_c0);
   methods += new qt_gsi::GenericMethod ("setFormat|format=", "@brief Method void QOffscreenSurface::setFormat(const QSurfaceFormat &format)\n", false, &_init_f_setFormat_2724, &_call_f_setFormat_2724);
+  methods += new qt_gsi::GenericMethod ("setNativeHandle|nativeHandle=", "@brief Method void QOffscreenSurface::setNativeHandle(void *handle)\n", false, &_init_f_setNativeHandle_1056, &_call_f_setNativeHandle_1056);
   methods += new qt_gsi::GenericMethod ("setScreen|screen=", "@brief Method void QOffscreenSurface::setScreen(QScreen *screen)\n", false, &_init_f_setScreen_1311, &_call_f_setScreen_1311);
   methods += new qt_gsi::GenericMethod ("size", "@brief Method QSize QOffscreenSurface::size()\nThis is a reimplementation of QSurface::size", true, &_init_f_size_c0, &_call_f_size_c0);
   methods += new qt_gsi::GenericMethod ("surfaceType", "@brief Method QSurface::SurfaceType QOffscreenSurface::surfaceType()\nThis is a reimplementation of QSurface::surfaceType", true, &_init_f_surfaceType_c0, &_call_f_surfaceType_c0);
@@ -356,6 +393,12 @@ class QOffscreenSurface_Adaptor : public QOffscreenSurface, public qt_gsi::QtObj
 public:
 
   virtual ~QOffscreenSurface_Adaptor();
+
+  //  [adaptor ctor] QOffscreenSurface::QOffscreenSurface(QScreen *screen, QObject *parent)
+  QOffscreenSurface_Adaptor(QScreen *screen, QObject *parent) : QOffscreenSurface(screen, parent)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
 
   //  [adaptor ctor] QOffscreenSurface::QOffscreenSurface(QScreen *screen)
   QOffscreenSurface_Adaptor() : QOffscreenSurface()
@@ -395,33 +438,33 @@ public:
     emit QOffscreenSurface::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QOffscreenSurface::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QOffscreenSurface::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QOffscreenSurface::event(arg1);
+    return QOffscreenSurface::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QOffscreenSurface_Adaptor, bool, QEvent *>(&QOffscreenSurface_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QOffscreenSurface_Adaptor, bool, QEvent *>(&QOffscreenSurface_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QOffscreenSurface::event(arg1);
+      return QOffscreenSurface::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QOffscreenSurface::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QOffscreenSurface::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QOffscreenSurface::eventFilter(arg1, arg2);
+    return QOffscreenSurface::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QOffscreenSurface_Adaptor, bool, QObject *, QEvent *>(&QOffscreenSurface_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QOffscreenSurface_Adaptor, bool, QObject *, QEvent *>(&QOffscreenSurface_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QOffscreenSurface::eventFilter(arg1, arg2);
+      return QOffscreenSurface::eventFilter(watched, event);
     }
   }
 
@@ -483,33 +526,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QOffscreenSurface::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QOffscreenSurface::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QOffscreenSurface::childEvent(arg1);
+    QOffscreenSurface::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QOffscreenSurface_Adaptor, QChildEvent *>(&QOffscreenSurface_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QOffscreenSurface_Adaptor, QChildEvent *>(&QOffscreenSurface_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QOffscreenSurface::childEvent(arg1);
+      QOffscreenSurface::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QOffscreenSurface::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QOffscreenSurface::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QOffscreenSurface::customEvent(arg1);
+    QOffscreenSurface::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QOffscreenSurface_Adaptor, QEvent *>(&QOffscreenSurface_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QOffscreenSurface_Adaptor, QEvent *>(&QOffscreenSurface_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QOffscreenSurface::customEvent(arg1);
+      QOffscreenSurface::customEvent(event);
     }
   }
 
@@ -528,18 +571,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QOffscreenSurface::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QOffscreenSurface::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QOffscreenSurface::timerEvent(arg1);
+    QOffscreenSurface::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QOffscreenSurface_Adaptor, QTimerEvent *>(&QOffscreenSurface_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QOffscreenSurface_Adaptor, QTimerEvent *>(&QOffscreenSurface_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QOffscreenSurface::timerEvent(arg1);
+      QOffscreenSurface::timerEvent(event);
     }
   }
 
@@ -556,11 +599,32 @@ public:
 
 QOffscreenSurface_Adaptor::~QOffscreenSurface_Adaptor() { }
 
+//  Constructor QOffscreenSurface::QOffscreenSurface(QScreen *screen, QObject *parent) (adaptor class)
+
+static void _init_ctor_QOffscreenSurface_Adaptor_2505 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("screen");
+  decl->add_arg<QScreen * > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("parent");
+  decl->add_arg<QObject * > (argspec_1);
+  decl->set_return_new<QOffscreenSurface_Adaptor> ();
+}
+
+static void _call_ctor_QOffscreenSurface_Adaptor_2505 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QScreen *arg1 = gsi::arg_reader<QScreen * >() (args, heap);
+  QObject *arg2 = gsi::arg_reader<QObject * >() (args, heap);
+  ret.write<QOffscreenSurface_Adaptor *> (new QOffscreenSurface_Adaptor (arg1, arg2));
+}
+
+
 //  Constructor QOffscreenSurface::QOffscreenSurface(QScreen *screen) (adaptor class)
 
 static void _init_ctor_QOffscreenSurface_Adaptor_1311 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("screen", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("screen", true, "nullptr");
   decl->add_arg<QScreen * > (argspec_0);
   decl->set_return_new<QOffscreenSurface_Adaptor> ();
 }
@@ -569,16 +633,16 @@ static void _call_ctor_QOffscreenSurface_Adaptor_1311 (const qt_gsi::GenericStat
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QScreen *arg1 = args ? gsi::arg_reader<QScreen * >() (args, heap) : gsi::arg_maker<QScreen * >() (0, heap);
+  QScreen *arg1 = args ? gsi::arg_reader<QScreen * >() (args, heap) : gsi::arg_maker<QScreen * >() (nullptr, heap);
   ret.write<QOffscreenSurface_Adaptor *> (new QOffscreenSurface_Adaptor (arg1));
 }
 
 
-// void QOffscreenSurface::childEvent(QChildEvent *)
+// void QOffscreenSurface::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -598,11 +662,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QOffscreenSurface::customEvent(QEvent *)
+// void QOffscreenSurface::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -626,7 +690,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -635,7 +699,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QOffscreenSurface_Adaptor *)cls)->emitter_QOffscreenSurface_destroyed_1302 (arg1);
 }
 
@@ -664,11 +728,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QOffscreenSurface::event(QEvent *)
+// bool QOffscreenSurface::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -687,13 +751,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QOffscreenSurface::eventFilter(QObject *, QEvent *)
+// bool QOffscreenSurface::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -870,11 +934,11 @@ static void _set_callback_cbs_surfaceType_c0_0 (void *cls, const gsi::Callback &
 }
 
 
-// void QOffscreenSurface::timerEvent(QTimerEvent *)
+// void QOffscreenSurface::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -901,17 +965,18 @@ gsi::Class<QOffscreenSurface> &qtdecl_QOffscreenSurface ();
 
 static gsi::Methods methods_QOffscreenSurface_Adaptor () {
   gsi::Methods methods;
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QOffscreenSurface::QOffscreenSurface(QScreen *screen, QObject *parent)\nThis method creates an object of class QOffscreenSurface.", &_init_ctor_QOffscreenSurface_Adaptor_2505, &_call_ctor_QOffscreenSurface_Adaptor_2505);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QOffscreenSurface::QOffscreenSurface(QScreen *screen)\nThis method creates an object of class QOffscreenSurface.", &_init_ctor_QOffscreenSurface_Adaptor_1311, &_call_ctor_QOffscreenSurface_Adaptor_1311);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QOffscreenSurface::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QOffscreenSurface::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QOffscreenSurface::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QOffscreenSurface::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QOffscreenSurface::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QOffscreenSurface::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QOffscreenSurface::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QOffscreenSurface::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QOffscreenSurface::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QOffscreenSurface::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("format", "@brief Virtual method QSurfaceFormat QOffscreenSurface::format()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_format_c0_0, &_call_cbs_format_c0_0);
   methods += new qt_gsi::GenericMethod ("format", "@hide", true, &_init_cbs_format_c0_0, &_call_cbs_format_c0_0, &_set_callback_cbs_format_c0_0);
@@ -925,7 +990,7 @@ static gsi::Methods methods_QOffscreenSurface_Adaptor () {
   methods += new qt_gsi::GenericMethod ("size", "@hide", true, &_init_cbs_size_c0_0, &_call_cbs_size_c0_0, &_set_callback_cbs_size_c0_0);
   methods += new qt_gsi::GenericMethod ("surfaceType", "@brief Virtual method QSurface::SurfaceType QOffscreenSurface::surfaceType()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_surfaceType_c0_0, &_call_cbs_surfaceType_c0_0);
   methods += new qt_gsi::GenericMethod ("surfaceType", "@hide", true, &_init_cbs_surfaceType_c0_0, &_call_cbs_surfaceType_c0_0, &_set_callback_cbs_surfaceType_c0_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QOffscreenSurface::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QOffscreenSurface::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

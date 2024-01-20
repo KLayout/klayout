@@ -877,25 +877,6 @@ static void _call_f_nullDevice_0 (const qt_gsi::GenericStaticMethod * /*decl*/, 
 }
 
 
-// static QStringList QProcess::splitCommand(QStringView command)
-
-
-static void _init_f_splitCommand_1559 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("command");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<QStringList > ();
-}
-
-static void _call_f_splitCommand_1559 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QStringList > ((QStringList)QProcess::splitCommand (arg1));
-}
-
-
 // static bool QProcess::startDetached(const QString &program, const QStringList &arguments, const QString &workingDirectory, qint64 *pid)
 
 
@@ -1031,7 +1012,6 @@ static gsi::Methods methods_QProcess () {
   methods += gsi::qt_signal<const qt_gsi::Converter<QProcess::ProcessState>::target_type & > ("stateChanged(QProcess::ProcessState)", "stateChanged", gsi::arg("state"), "@brief Signal declaration for QProcess::stateChanged(QProcess::ProcessState state)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("execute", "@brief Static method int QProcess::execute(const QString &program, const QStringList &arguments)\nThis method is static and can be called without an instance.", &_init_f_execute_4354, &_call_f_execute_4354);
   methods += new qt_gsi::GenericStaticMethod ("nullDevice", "@brief Static method QString QProcess::nullDevice()\nThis method is static and can be called without an instance.", &_init_f_nullDevice_0, &_call_f_nullDevice_0);
-  methods += new qt_gsi::GenericStaticMethod ("splitCommand", "@brief Static method QStringList QProcess::splitCommand(QStringView command)\nThis method is static and can be called without an instance.", &_init_f_splitCommand_1559, &_call_f_splitCommand_1559);
   methods += new qt_gsi::GenericStaticMethod ("startDetached", "@brief Static method bool QProcess::startDetached(const QString &program, const QStringList &arguments, const QString &workingDirectory, qint64 *pid)\nThis method is static and can be called without an instance.", &_init_f_startDetached_7335, &_call_f_startDetached_7335);
   methods += new qt_gsi::GenericStaticMethod ("systemEnvironment", "@brief Static method QStringList QProcess::systemEnvironment()\nThis method is static and can be called without an instance.", &_init_f_systemEnvironment_0, &_call_f_systemEnvironment_0);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QProcess::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);

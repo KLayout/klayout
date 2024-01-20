@@ -88,6 +88,25 @@ static void _call_ctor_QXmlStreamStringRef_2025 (const qt_gsi::GenericStaticMeth
 }
 
 
+//  Constructor QXmlStreamStringRef::QXmlStreamStringRef(const QXmlStreamStringRef &other)
+
+
+static void _init_ctor_QXmlStreamStringRef_3235 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<const QXmlStreamStringRef & > (argspec_0);
+  decl->set_return_new<QXmlStreamStringRef> ();
+}
+
+static void _call_ctor_QXmlStreamStringRef_3235 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QXmlStreamStringRef &arg1 = gsi::arg_reader<const QXmlStreamStringRef & >() (args, heap);
+  ret.write<QXmlStreamStringRef *> (new QXmlStreamStringRef (arg1));
+}
+
+
 // void QXmlStreamStringRef::clear()
 
 
@@ -101,6 +120,25 @@ static void _call_f_clear_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
   __SUPPRESS_UNUSED_WARNING(args);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QXmlStreamStringRef *)cls)->clear ();
+}
+
+
+// QXmlStreamStringRef &QXmlStreamStringRef::operator=(const QXmlStreamStringRef &other)
+
+
+static void _init_f_operator_eq__3235 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<const QXmlStreamStringRef & > (argspec_0);
+  decl->set_return<QXmlStreamStringRef & > ();
+}
+
+static void _call_f_operator_eq__3235 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QXmlStreamStringRef &arg1 = gsi::arg_reader<const QXmlStreamStringRef & >() (args, heap);
+  ret.write<QXmlStreamStringRef & > ((QXmlStreamStringRef &)((QXmlStreamStringRef *)cls)->operator= (arg1));
 }
 
 
@@ -149,6 +187,26 @@ static void _call_f_string_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+// void QXmlStreamStringRef::swap(QXmlStreamStringRef &other)
+
+
+static void _init_f_swap_2540 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<QXmlStreamStringRef & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_swap_2540 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QXmlStreamStringRef &arg1 = gsi::arg_reader<QXmlStreamStringRef & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QXmlStreamStringRef *)cls)->swap (arg1);
+}
+
+
 
 namespace gsi
 {
@@ -158,10 +216,13 @@ static gsi::Methods methods_QXmlStreamStringRef () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamStringRef::QXmlStreamStringRef()\nThis method creates an object of class QXmlStreamStringRef.", &_init_ctor_QXmlStreamStringRef_0, &_call_ctor_QXmlStreamStringRef_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamStringRef::QXmlStreamStringRef(const QStringRef &aString)\nThis method creates an object of class QXmlStreamStringRef.", &_init_ctor_QXmlStreamStringRef_2310, &_call_ctor_QXmlStreamStringRef_2310);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamStringRef::QXmlStreamStringRef(const QString &aString)\nThis method creates an object of class QXmlStreamStringRef.", &_init_ctor_QXmlStreamStringRef_2025, &_call_ctor_QXmlStreamStringRef_2025);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamStringRef::QXmlStreamStringRef(const QXmlStreamStringRef &other)\nThis method creates an object of class QXmlStreamStringRef.", &_init_ctor_QXmlStreamStringRef_3235, &_call_ctor_QXmlStreamStringRef_3235);
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QXmlStreamStringRef::clear()\n", false, &_init_f_clear_0, &_call_f_clear_0);
+  methods += new qt_gsi::GenericMethod ("assign", "@brief Method QXmlStreamStringRef &QXmlStreamStringRef::operator=(const QXmlStreamStringRef &other)\n", false, &_init_f_operator_eq__3235, &_call_f_operator_eq__3235);
   methods += new qt_gsi::GenericMethod ("position", "@brief Method int QXmlStreamStringRef::position()\n", true, &_init_f_position_c0, &_call_f_position_c0);
   methods += new qt_gsi::GenericMethod ("size", "@brief Method int QXmlStreamStringRef::size()\n", true, &_init_f_size_c0, &_call_f_size_c0);
   methods += new qt_gsi::GenericMethod ("string", "@brief Method const QString *QXmlStreamStringRef::string()\n", true, &_init_f_string_c0, &_call_f_string_c0);
+  methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QXmlStreamStringRef::swap(QXmlStreamStringRef &other)\n", false, &_init_f_swap_2540, &_call_f_swap_2540);
   return methods;
 }
 

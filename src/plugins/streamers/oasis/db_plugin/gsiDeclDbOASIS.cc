@@ -56,7 +56,7 @@ static int get_oasis_expect_strict_mode (const db::LoadLayoutOptions *options)
 //  extend lay::LoadLayoutOptions with the OASIS options
 static
 gsi::ClassExt<db::LoadLayoutOptions> oasis_reader_options (
-  gsi::method_ext ("oasis_read_all_properties=", &set_oasis_read_all_properties,
+  gsi::method_ext ("oasis_read_all_properties=", &set_oasis_read_all_properties, gsi::arg ("flag"),
     //  this method is mainly provided as access point for the generic interface
     "@hide"
   ) +
@@ -64,7 +64,7 @@ gsi::ClassExt<db::LoadLayoutOptions> oasis_reader_options (
     //  this method is mainly provided as access point for the generic interface
     "@hide"
   ) +
-  gsi::method_ext ("oasis_expect_strict_mode=", &set_oasis_expect_strict_mode,
+  gsi::method_ext ("oasis_expect_strict_mode=", &set_oasis_expect_strict_mode, gsi::arg ("flag"),
     //  this method is mainly provided as access point for the generic interface
     "@hide"
   ) +
@@ -270,7 +270,7 @@ gsi::ClassExt<db::SaveLayoutOptions> oasis_writer_options (
     "\n"
     "This method has been introduced in version 0.24."
   ) +
-  gsi::method_ext ("oasis_write_std_properties_ext=", &set_oasis_write_std_properties_ext,
+  gsi::method_ext ("oasis_write_std_properties_ext=", &set_oasis_write_std_properties_ext, gsi::arg ("flag"),
     //  this method is mainly provided as access point for the generic interface
     "@hide"
   ) +

@@ -39,6 +39,7 @@
 #include <QObject>
 #include <QPersistentModelIndex>
 #include <QRegExp>
+#include <QRegularExpression>
 #include <QSize>
 #include <QThread>
 #include <QTimerEvent>
@@ -268,6 +269,21 @@ static void _call_f_filterRegExp_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
+// QRegularExpression QSortFilterProxyModel::filterRegularExpression()
+
+
+static void _init_f_filterRegularExpression_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QRegularExpression > ();
+}
+
+static void _call_f_filterRegularExpression_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QRegularExpression > ((QRegularExpression)((QSortFilterProxyModel *)cls)->filterRegularExpression ());
+}
+
+
 // int QSortFilterProxyModel::filterRole()
 
 
@@ -434,6 +450,21 @@ static void _call_f_invalidate_0 (const qt_gsi::GenericMethod * /*decl*/, void *
   __SUPPRESS_UNUSED_WARNING(args);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QSortFilterProxyModel *)cls)->invalidate ();
+}
+
+
+// bool QSortFilterProxyModel::isRecursiveFilteringEnabled()
+
+
+static void _init_f_isRecursiveFilteringEnabled_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isRecursiveFilteringEnabled_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QSortFilterProxyModel *)cls)->isRecursiveFilteringEnabled ());
 }
 
 
@@ -801,6 +832,26 @@ static void _call_f_setFilterKeyColumn_767 (const qt_gsi::GenericMethod * /*decl
 }
 
 
+// void QSortFilterProxyModel::setFilterRegExp(const QString &pattern)
+
+
+static void _init_f_setFilterRegExp_2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("pattern");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setFilterRegExp_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QSortFilterProxyModel *)cls)->setFilterRegExp (arg1);
+}
+
+
 // void QSortFilterProxyModel::setFilterRegExp(const QRegExp &regExp)
 
 
@@ -821,23 +872,43 @@ static void _call_f_setFilterRegExp_1981 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// void QSortFilterProxyModel::setFilterRegExp(const QString &pattern)
+// void QSortFilterProxyModel::setFilterRegularExpression(const QString &pattern)
 
 
-static void _init_f_setFilterRegExp_2025 (qt_gsi::GenericMethod *decl)
+static void _init_f_setFilterRegularExpression_2025 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("pattern");
   decl->add_arg<const QString & > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_setFilterRegExp_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_setFilterRegularExpression_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
-  ((QSortFilterProxyModel *)cls)->setFilterRegExp (arg1);
+  ((QSortFilterProxyModel *)cls)->setFilterRegularExpression (arg1);
+}
+
+
+// void QSortFilterProxyModel::setFilterRegularExpression(const QRegularExpression &regularExpression)
+
+
+static void _init_f_setFilterRegularExpression_3188 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("regularExpression");
+  decl->add_arg<const QRegularExpression & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setFilterRegularExpression_3188 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QRegularExpression &arg1 = gsi::arg_reader<const QRegularExpression & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QSortFilterProxyModel *)cls)->setFilterRegularExpression (arg1);
 }
 
 
@@ -906,6 +977,26 @@ static void _call_f_setHeaderData_5242 (const qt_gsi::GenericMethod * /*decl*/, 
   const QVariant &arg3 = gsi::arg_reader<const QVariant & >() (args, heap);
   int arg4 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (Qt::EditRole, heap);
   ret.write<bool > ((bool)((QSortFilterProxyModel *)cls)->setHeaderData (arg1, qt_gsi::QtToCppAdaptor<Qt::Orientation>(arg2).cref(), arg3, arg4));
+}
+
+
+// void QSortFilterProxyModel::setRecursiveFilteringEnabled(bool recursive)
+
+
+static void _init_f_setRecursiveFilteringEnabled_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("recursive");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setRecursiveFilteringEnabled_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QSortFilterProxyModel *)cls)->setRecursiveFilteringEnabled (arg1);
 }
 
 
@@ -1198,6 +1289,7 @@ static gsi::Methods methods_QSortFilterProxyModel () {
   methods += new qt_gsi::GenericMethod (":filterCaseSensitivity", "@brief Method Qt::CaseSensitivity QSortFilterProxyModel::filterCaseSensitivity()\n", true, &_init_f_filterCaseSensitivity_c0, &_call_f_filterCaseSensitivity_c0);
   methods += new qt_gsi::GenericMethod (":filterKeyColumn", "@brief Method int QSortFilterProxyModel::filterKeyColumn()\n", true, &_init_f_filterKeyColumn_c0, &_call_f_filterKeyColumn_c0);
   methods += new qt_gsi::GenericMethod (":filterRegExp", "@brief Method QRegExp QSortFilterProxyModel::filterRegExp()\n", true, &_init_f_filterRegExp_c0, &_call_f_filterRegExp_c0);
+  methods += new qt_gsi::GenericMethod (":filterRegularExpression", "@brief Method QRegularExpression QSortFilterProxyModel::filterRegularExpression()\n", true, &_init_f_filterRegularExpression_c0, &_call_f_filterRegularExpression_c0);
   methods += new qt_gsi::GenericMethod (":filterRole", "@brief Method int QSortFilterProxyModel::filterRole()\n", true, &_init_f_filterRole_c0, &_call_f_filterRole_c0);
   methods += new qt_gsi::GenericMethod ("flags", "@brief Method QFlags<Qt::ItemFlag> QSortFilterProxyModel::flags(const QModelIndex &index)\nThis is a reimplementation of QAbstractProxyModel::flags", true, &_init_f_flags_c2395, &_call_f_flags_c2395);
   methods += new qt_gsi::GenericMethod ("hasChildren", "@brief Method bool QSortFilterProxyModel::hasChildren(const QModelIndex &parent)\nThis is a reimplementation of QAbstractProxyModel::hasChildren", true, &_init_f_hasChildren_c2395, &_call_f_hasChildren_c2395);
@@ -1206,6 +1298,7 @@ static gsi::Methods methods_QSortFilterProxyModel () {
   methods += new qt_gsi::GenericMethod ("insertColumns", "@brief Method bool QSortFilterProxyModel::insertColumns(int column, int count, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::insertColumns", false, &_init_f_insertColumns_3713, &_call_f_insertColumns_3713);
   methods += new qt_gsi::GenericMethod ("insertRows", "@brief Method bool QSortFilterProxyModel::insertRows(int row, int count, const QModelIndex &parent)\nThis is a reimplementation of QAbstractItemModel::insertRows", false, &_init_f_insertRows_3713, &_call_f_insertRows_3713);
   methods += new qt_gsi::GenericMethod ("invalidate", "@brief Method void QSortFilterProxyModel::invalidate()\n", false, &_init_f_invalidate_0, &_call_f_invalidate_0);
+  methods += new qt_gsi::GenericMethod ("isRecursiveFilteringEnabled?|:recursiveFilteringEnabled", "@brief Method bool QSortFilterProxyModel::isRecursiveFilteringEnabled()\n", true, &_init_f_isRecursiveFilteringEnabled_c0, &_call_f_isRecursiveFilteringEnabled_c0);
   methods += new qt_gsi::GenericMethod ("isSortLocaleAware?|:isSortLocaleAware", "@brief Method bool QSortFilterProxyModel::isSortLocaleAware()\n", true, &_init_f_isSortLocaleAware_c0, &_call_f_isSortLocaleAware_c0);
   methods += new qt_gsi::GenericMethod ("mapFromSource", "@brief Method QModelIndex QSortFilterProxyModel::mapFromSource(const QModelIndex &sourceIndex)\nThis is a reimplementation of QAbstractProxyModel::mapFromSource", true, &_init_f_mapFromSource_c2395, &_call_f_mapFromSource_c2395);
   methods += new qt_gsi::GenericMethod ("mapSelectionFromSource", "@brief Method QItemSelection QSortFilterProxyModel::mapSelectionFromSource(const QItemSelection &sourceSelection)\nThis is a reimplementation of QAbstractProxyModel::mapSelectionFromSource", true, &_init_f_mapSelectionFromSource_c2727, &_call_f_mapSelectionFromSource_c2727);
@@ -1224,11 +1317,14 @@ static gsi::Methods methods_QSortFilterProxyModel () {
   methods += new qt_gsi::GenericMethod ("setFilterCaseSensitivity|filterCaseSensitivity=", "@brief Method void QSortFilterProxyModel::setFilterCaseSensitivity(Qt::CaseSensitivity cs)\n", false, &_init_f_setFilterCaseSensitivity_2324, &_call_f_setFilterCaseSensitivity_2324);
   methods += new qt_gsi::GenericMethod ("setFilterFixedString", "@brief Method void QSortFilterProxyModel::setFilterFixedString(const QString &pattern)\n", false, &_init_f_setFilterFixedString_2025, &_call_f_setFilterFixedString_2025);
   methods += new qt_gsi::GenericMethod ("setFilterKeyColumn|filterKeyColumn=", "@brief Method void QSortFilterProxyModel::setFilterKeyColumn(int column)\n", false, &_init_f_setFilterKeyColumn_767, &_call_f_setFilterKeyColumn_767);
-  methods += new qt_gsi::GenericMethod ("setFilterRegExp|filterRegExp=", "@brief Method void QSortFilterProxyModel::setFilterRegExp(const QRegExp &regExp)\n", false, &_init_f_setFilterRegExp_1981, &_call_f_setFilterRegExp_1981);
   methods += new qt_gsi::GenericMethod ("setFilterRegExp|filterRegExp=", "@brief Method void QSortFilterProxyModel::setFilterRegExp(const QString &pattern)\n", false, &_init_f_setFilterRegExp_2025, &_call_f_setFilterRegExp_2025);
+  methods += new qt_gsi::GenericMethod ("setFilterRegExp|filterRegExp=", "@brief Method void QSortFilterProxyModel::setFilterRegExp(const QRegExp &regExp)\n", false, &_init_f_setFilterRegExp_1981, &_call_f_setFilterRegExp_1981);
+  methods += new qt_gsi::GenericMethod ("setFilterRegularExpression|filterRegularExpression=", "@brief Method void QSortFilterProxyModel::setFilterRegularExpression(const QString &pattern)\n", false, &_init_f_setFilterRegularExpression_2025, &_call_f_setFilterRegularExpression_2025);
+  methods += new qt_gsi::GenericMethod ("setFilterRegularExpression|filterRegularExpression=", "@brief Method void QSortFilterProxyModel::setFilterRegularExpression(const QRegularExpression &regularExpression)\n", false, &_init_f_setFilterRegularExpression_3188, &_call_f_setFilterRegularExpression_3188);
   methods += new qt_gsi::GenericMethod ("setFilterRole|filterRole=", "@brief Method void QSortFilterProxyModel::setFilterRole(int role)\n", false, &_init_f_setFilterRole_767, &_call_f_setFilterRole_767);
   methods += new qt_gsi::GenericMethod ("setFilterWildcard", "@brief Method void QSortFilterProxyModel::setFilterWildcard(const QString &pattern)\n", false, &_init_f_setFilterWildcard_2025, &_call_f_setFilterWildcard_2025);
   methods += new qt_gsi::GenericMethod ("setHeaderData", "@brief Method bool QSortFilterProxyModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role)\nThis is a reimplementation of QAbstractProxyModel::setHeaderData", false, &_init_f_setHeaderData_5242, &_call_f_setHeaderData_5242);
+  methods += new qt_gsi::GenericMethod ("setRecursiveFilteringEnabled|recursiveFilteringEnabled=", "@brief Method void QSortFilterProxyModel::setRecursiveFilteringEnabled(bool recursive)\n", false, &_init_f_setRecursiveFilteringEnabled_864, &_call_f_setRecursiveFilteringEnabled_864);
   methods += new qt_gsi::GenericMethod ("setSortCaseSensitivity|sortCaseSensitivity=", "@brief Method void QSortFilterProxyModel::setSortCaseSensitivity(Qt::CaseSensitivity cs)\n", false, &_init_f_setSortCaseSensitivity_2324, &_call_f_setSortCaseSensitivity_2324);
   methods += new qt_gsi::GenericMethod ("setSortLocaleAware", "@brief Method void QSortFilterProxyModel::setSortLocaleAware(bool on)\n", false, &_init_f_setSortLocaleAware_864, &_call_f_setSortLocaleAware_864);
   methods += new qt_gsi::GenericMethod ("setSortRole|sortRole=", "@brief Method void QSortFilterProxyModel::setSortRole(int role)\n", false, &_init_f_setSortRole_767, &_call_f_setSortRole_767);
@@ -1596,33 +1692,33 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QSortFilterProxyModel::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QSortFilterProxyModel::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QSortFilterProxyModel::event(arg1);
+    return QSortFilterProxyModel::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QSortFilterProxyModel_Adaptor, bool, QEvent *>(&QSortFilterProxyModel_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QSortFilterProxyModel_Adaptor, bool, QEvent *>(&QSortFilterProxyModel_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QSortFilterProxyModel::event(arg1);
+      return QSortFilterProxyModel::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QSortFilterProxyModel::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QSortFilterProxyModel::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QSortFilterProxyModel::eventFilter(arg1, arg2);
+    return QSortFilterProxyModel::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QSortFilterProxyModel_Adaptor, bool, QObject *, QEvent *>(&QSortFilterProxyModel_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QSortFilterProxyModel_Adaptor, bool, QObject *, QEvent *>(&QSortFilterProxyModel_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QSortFilterProxyModel::eventFilter(arg1, arg2);
+      return QSortFilterProxyModel::eventFilter(watched, event);
     }
   }
 
@@ -2222,33 +2318,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QSortFilterProxyModel::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QSortFilterProxyModel::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QSortFilterProxyModel::childEvent(arg1);
+    QSortFilterProxyModel::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QSortFilterProxyModel_Adaptor, QChildEvent *>(&QSortFilterProxyModel_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QSortFilterProxyModel_Adaptor, QChildEvent *>(&QSortFilterProxyModel_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QSortFilterProxyModel::childEvent(arg1);
+      QSortFilterProxyModel::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QSortFilterProxyModel::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QSortFilterProxyModel::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QSortFilterProxyModel::customEvent(arg1);
+    QSortFilterProxyModel::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QSortFilterProxyModel_Adaptor, QEvent *>(&QSortFilterProxyModel_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QSortFilterProxyModel_Adaptor, QEvent *>(&QSortFilterProxyModel_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QSortFilterProxyModel::customEvent(arg1);
+      QSortFilterProxyModel::customEvent(event);
     }
   }
 
@@ -2312,18 +2408,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QSortFilterProxyModel::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QSortFilterProxyModel::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QSortFilterProxyModel::timerEvent(arg1);
+    QSortFilterProxyModel::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QSortFilterProxyModel_Adaptor, QTimerEvent *>(&QSortFilterProxyModel_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QSortFilterProxyModel_Adaptor, QTimerEvent *>(&QSortFilterProxyModel_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QSortFilterProxyModel::timerEvent(arg1);
+      QSortFilterProxyModel::timerEvent(event);
     }
   }
 
@@ -2383,7 +2479,7 @@ QSortFilterProxyModel_Adaptor::~QSortFilterProxyModel_Adaptor() { }
 
 static void _init_ctor_QSortFilterProxyModel_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QSortFilterProxyModel_Adaptor> ();
 }
@@ -2392,7 +2488,7 @@ static void _call_ctor_QSortFilterProxyModel_Adaptor_1302 (const qt_gsi::Generic
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QSortFilterProxyModel_Adaptor *> (new QSortFilterProxyModel_Adaptor (arg1));
 }
 
@@ -2697,11 +2793,11 @@ static void _call_fp_changePersistentIndexList_5912 (const qt_gsi::GenericMethod
 }
 
 
-// void QSortFilterProxyModel::childEvent(QChildEvent *)
+// void QSortFilterProxyModel::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2908,7 +3004,7 @@ static void _init_fp_createIndex_c2374 (qt_gsi::GenericMethod *decl)
   decl->add_arg<int > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("column");
   decl->add_arg<int > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("data", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("data", true, "nullptr");
   decl->add_arg<void * > (argspec_2);
   decl->set_return<QModelIndex > ();
 }
@@ -2919,7 +3015,7 @@ static void _call_fp_createIndex_c2374 (const qt_gsi::GenericMethod * /*decl*/, 
   tl::Heap heap;
   int arg1 = gsi::arg_reader<int >() (args, heap);
   int arg2 = gsi::arg_reader<int >() (args, heap);
-  void *arg3 = args ? gsi::arg_reader<void * >() (args, heap) : gsi::arg_maker<void * >() (0, heap);
+  void *arg3 = args ? gsi::arg_reader<void * >() (args, heap) : gsi::arg_maker<void * >() (nullptr, heap);
   ret.write<QModelIndex > ((QModelIndex)((QSortFilterProxyModel_Adaptor *)cls)->fp_QSortFilterProxyModel_createIndex_c2374 (arg1, arg2, arg3));
 }
 
@@ -2948,11 +3044,11 @@ static void _call_fp_createIndex_c2657 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// void QSortFilterProxyModel::customEvent(QEvent *)
+// void QSortFilterProxyModel::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3053,7 +3149,7 @@ static void _call_fp_decodeData_5302 (const qt_gsi::GenericMethod * /*decl*/, vo
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -3062,7 +3158,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QSortFilterProxyModel_Adaptor *)cls)->emitter_QSortFilterProxyModel_destroyed_1302 (arg1);
 }
 
@@ -3253,11 +3349,11 @@ static void _call_fp_endResetModel_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// bool QSortFilterProxyModel::event(QEvent *)
+// bool QSortFilterProxyModel::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -3276,13 +3372,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QSortFilterProxyModel::eventFilter(QObject *, QEvent *)
+// bool QSortFilterProxyModel::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -4623,11 +4719,11 @@ static void _set_callback_cbs_supportedDropActions_c0_0 (void *cls, const gsi::C
 }
 
 
-// void QSortFilterProxyModel::timerEvent(QTimerEvent *)
+// void QSortFilterProxyModel::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -4670,7 +4766,7 @@ static gsi::Methods methods_QSortFilterProxyModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("canFetchMore", "@hide", true, &_init_cbs_canFetchMore_c2395_0, &_call_cbs_canFetchMore_c2395_0, &_set_callback_cbs_canFetchMore_c2395_0);
   methods += new qt_gsi::GenericMethod ("*changePersistentIndex", "@brief Method void QSortFilterProxyModel::changePersistentIndex(const QModelIndex &from, const QModelIndex &to)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_changePersistentIndex_4682, &_call_fp_changePersistentIndex_4682);
   methods += new qt_gsi::GenericMethod ("*changePersistentIndexList", "@brief Method void QSortFilterProxyModel::changePersistentIndexList(const QList<QModelIndex> &from, const QList<QModelIndex> &to)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_changePersistentIndexList_5912, &_call_fp_changePersistentIndexList_5912);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QSortFilterProxyModel::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QSortFilterProxyModel::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("columnCount", "@brief Virtual method int QSortFilterProxyModel::columnCount(const QModelIndex &parent)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_columnCount_c2395_1, &_call_cbs_columnCount_c2395_1);
   methods += new qt_gsi::GenericMethod ("columnCount", "@hide", true, &_init_cbs_columnCount_c2395_1, &_call_cbs_columnCount_c2395_1, &_set_callback_cbs_columnCount_c2395_1);
@@ -4682,7 +4778,7 @@ static gsi::Methods methods_QSortFilterProxyModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("emit_columnsRemoved", "@brief Emitter for signal void QSortFilterProxyModel::columnsRemoved(const QModelIndex &parent, int first, int last)\nCall this method to emit this signal.", false, &_init_emitter_columnsRemoved_7372, &_call_emitter_columnsRemoved_7372);
   methods += new qt_gsi::GenericMethod ("*createIndex", "@brief Method QModelIndex QSortFilterProxyModel::createIndex(int row, int column, void *data)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_createIndex_c2374, &_call_fp_createIndex_c2374);
   methods += new qt_gsi::GenericMethod ("*createIndex", "@brief Method QModelIndex QSortFilterProxyModel::createIndex(int row, int column, quintptr id)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_createIndex_c2657, &_call_fp_createIndex_c2657);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QSortFilterProxyModel::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QSortFilterProxyModel::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("data", "@brief Virtual method QVariant QSortFilterProxyModel::data(const QModelIndex &index, int role)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_data_c3054_1, &_call_cbs_data_c3054_1);
   methods += new qt_gsi::GenericMethod ("data", "@hide", true, &_init_cbs_data_c3054_1, &_call_cbs_data_c3054_1, &_set_callback_cbs_data_c3054_1);
@@ -4701,9 +4797,9 @@ static gsi::Methods methods_QSortFilterProxyModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*endRemoveColumns", "@brief Method void QSortFilterProxyModel::endRemoveColumns()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_endRemoveColumns_0, &_call_fp_endRemoveColumns_0);
   methods += new qt_gsi::GenericMethod ("*endRemoveRows", "@brief Method void QSortFilterProxyModel::endRemoveRows()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_endRemoveRows_0, &_call_fp_endRemoveRows_0);
   methods += new qt_gsi::GenericMethod ("*endResetModel", "@brief Method void QSortFilterProxyModel::endResetModel()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_endResetModel_0, &_call_fp_endResetModel_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QSortFilterProxyModel::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QSortFilterProxyModel::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QSortFilterProxyModel::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QSortFilterProxyModel::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("fetchMore", "@brief Virtual method void QSortFilterProxyModel::fetchMore(const QModelIndex &parent)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_fetchMore_2395_0, &_call_cbs_fetchMore_2395_0);
   methods += new qt_gsi::GenericMethod ("fetchMore", "@hide", false, &_init_cbs_fetchMore_2395_0, &_call_cbs_fetchMore_2395_0, &_set_callback_cbs_fetchMore_2395_0);
@@ -4798,7 +4894,7 @@ static gsi::Methods methods_QSortFilterProxyModel_Adaptor () {
   methods += new qt_gsi::GenericMethod ("supportedDragActions", "@hide", true, &_init_cbs_supportedDragActions_c0_0, &_call_cbs_supportedDragActions_c0_0, &_set_callback_cbs_supportedDragActions_c0_0);
   methods += new qt_gsi::GenericMethod ("supportedDropActions", "@brief Virtual method QFlags<Qt::DropAction> QSortFilterProxyModel::supportedDropActions()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_supportedDropActions_c0_0, &_call_cbs_supportedDropActions_c0_0);
   methods += new qt_gsi::GenericMethod ("supportedDropActions", "@hide", true, &_init_cbs_supportedDropActions_c0_0, &_call_cbs_supportedDropActions_c0_0, &_set_callback_cbs_supportedDropActions_c0_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QSortFilterProxyModel::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QSortFilterProxyModel::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

@@ -2194,7 +2194,7 @@ public:
     //  .. nothing yet ..
   }
 
-  void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args) const 
+  void execute (const tl::ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
   {
     if (args.size () > 0) {
       throw tl::EvalError (tl::to_string (tr ("Query function does not allow parameters")), context);

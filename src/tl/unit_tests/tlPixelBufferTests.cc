@@ -85,8 +85,8 @@ static bool compare_images (const tl::BitmapBuffer &img, const tl::BitmapBuffer 
 TEST(1)
 {
   tl::PixelBuffer img (15, 25);
-  EXPECT_EQ (img.width (), 15);
-  EXPECT_EQ (img.height (), 25);
+  EXPECT_EQ (img.width (), 15u);
+  EXPECT_EQ (img.height (), 25u);
   EXPECT_EQ (img.stride (), 15 * sizeof (tl::color_t));
 
   EXPECT_EQ (img.transparent (), false);
@@ -94,69 +94,69 @@ TEST(1)
   EXPECT_EQ (img.transparent (), true);
 
   img.fill (0x112233);
-  EXPECT_EQ (img.scan_line (5)[10], 0x112233);
+  EXPECT_EQ (img.scan_line (5)[10], 0x112233u);
 
   tl::PixelBuffer img2;
   EXPECT_EQ (img2.transparent (), false);
   img2 = img;
   EXPECT_EQ (img2.transparent (), true);
-  EXPECT_EQ (img2.width (), 15);
-  EXPECT_EQ (img2.height (), 25);
+  EXPECT_EQ (img2.width (), 15u);
+  EXPECT_EQ (img2.height (), 25u);
 
-  EXPECT_EQ (img.scan_line (5)[10], 0x112233);
-  EXPECT_EQ (img2.scan_line (5)[10], 0x112233);
+  EXPECT_EQ (img.scan_line (5)[10], 0x112233u);
+  EXPECT_EQ (img2.scan_line (5)[10], 0x112233u);
 
   img2.fill (0x332211);
-  EXPECT_EQ (img.scan_line (5)[10], 0x112233);
-  EXPECT_EQ (img2.scan_line (5)[10], 0x332211);
+  EXPECT_EQ (img.scan_line (5)[10], 0x112233u);
+  EXPECT_EQ (img2.scan_line (5)[10], 0x332211u);
 
   img.set_transparent (false);
   img2.swap (img);
   EXPECT_EQ (img2.transparent (), false);
-  EXPECT_EQ (img2.scan_line (5)[10], 0x112233);
-  EXPECT_EQ (img.scan_line (5)[10], 0x332211);
+  EXPECT_EQ (img2.scan_line (5)[10], 0x112233u);
+  EXPECT_EQ (img.scan_line (5)[10], 0x332211u);
 
   img2 = img;
   EXPECT_EQ (compare_images (img, img2), true);
-  EXPECT_EQ (img.scan_line (5)[10], 0x332211);
-  EXPECT_EQ (img2.scan_line (5)[10], 0x332211);
+  EXPECT_EQ (img.scan_line (5)[10], 0x332211u);
+  EXPECT_EQ (img2.scan_line (5)[10], 0x332211u);
 
   img2 = tl::PixelBuffer (10, 16);
-  EXPECT_EQ (img.width (), 15);
-  EXPECT_EQ (img.height (), 25);
-  EXPECT_EQ (img2.width (), 10);
-  EXPECT_EQ (img2.height (), 16);
+  EXPECT_EQ (img.width (), 15u);
+  EXPECT_EQ (img.height (), 25u);
+  EXPECT_EQ (img2.width (), 10u);
+  EXPECT_EQ (img2.height (), 16u);
   img2.fill (0x010203);
   EXPECT_EQ (compare_images (img, img2), false);
 
-  EXPECT_EQ (img.scan_line (5)[10], 0x332211);
-  EXPECT_EQ (img2.scan_line (5)[8], 0xff010203);
+  EXPECT_EQ (img.scan_line (5)[10], 0x332211u);
+  EXPECT_EQ (img2.scan_line (5)[8], 0xff010203u);
 
   img = std::move (img2);
   EXPECT_EQ (compare_images (img, img2), false);
-  EXPECT_EQ (img.width (), 10);
-  EXPECT_EQ (img.height (), 16);
-  EXPECT_EQ (img.scan_line (5)[8], 0xff010203);
+  EXPECT_EQ (img.width (), 10u);
+  EXPECT_EQ (img.height (), 16u);
+  EXPECT_EQ (img.scan_line (5)[8], 0xff010203u);
 
   tl::PixelBuffer img3 (img);
   EXPECT_EQ (compare_images (img, img3), true);
-  EXPECT_EQ (img3.width (), 10);
-  EXPECT_EQ (img3.height (), 16);
-  EXPECT_EQ (img3.scan_line (5)[8], 0xff010203);
+  EXPECT_EQ (img3.width (), 10u);
+  EXPECT_EQ (img3.height (), 16u);
+  EXPECT_EQ (img3.scan_line (5)[8], 0xff010203u);
 
   img.fill (0x102030);
   EXPECT_EQ (compare_images (img, img3), false);
-  EXPECT_EQ (img3.width (), 10);
-  EXPECT_EQ (img3.height (), 16);
-  EXPECT_EQ (img3.scan_line (5)[8], 0xff010203);
-  EXPECT_EQ (img.width (), 10);
-  EXPECT_EQ (img.height (), 16);
-  EXPECT_EQ (img.scan_line (5)[8], 0xff102030);
+  EXPECT_EQ (img3.width (), 10u);
+  EXPECT_EQ (img3.height (), 16u);
+  EXPECT_EQ (img3.scan_line (5)[8], 0xff010203u);
+  EXPECT_EQ (img.width (), 10u);
+  EXPECT_EQ (img.height (), 16u);
+  EXPECT_EQ (img.scan_line (5)[8], 0xff102030u);
 
   tl::PixelBuffer img4 (std::move (img));
-  EXPECT_EQ (img4.width (), 10);
-  EXPECT_EQ (img4.height (), 16);
-  EXPECT_EQ (img4.scan_line (5)[8], 0xff102030);
+  EXPECT_EQ (img4.width (), 10u);
+  EXPECT_EQ (img4.height (), 16u);
+  EXPECT_EQ (img4.scan_line (5)[8], 0xff102030u);
 
   //  other constructors
   EXPECT_EQ (compare_images (tl::PixelBuffer (img4.width (), img4.height (), (const tl::color_t *) img4.data ()), img4), true);
@@ -495,17 +495,17 @@ TEST(7)
 TEST(11)
 {
   tl::BitmapBuffer img (15, 25);
-  EXPECT_EQ (img.width (), 15);
-  EXPECT_EQ (img.height (), 25);
-  EXPECT_EQ (img.stride (), 4);
+  EXPECT_EQ (img.width (), 15u);
+  EXPECT_EQ (img.height (), 25u);
+  EXPECT_EQ (img.stride (), 4u);
 
   img.fill (true);
   EXPECT_EQ (img.scan_line (5)[1], 0xff);
 
   tl::BitmapBuffer img2;
   img2 = img;
-  EXPECT_EQ (img2.width (), 15);
-  EXPECT_EQ (img2.height (), 25);
+  EXPECT_EQ (img2.width (), 15u);
+  EXPECT_EQ (img2.height (), 25u);
 
   EXPECT_EQ (img.scan_line (5)[1], 0xff);
   EXPECT_EQ (img2.scan_line (5)[1], 0xff);
@@ -524,10 +524,10 @@ TEST(11)
   EXPECT_EQ (img2.scan_line (5)[1], 0);
 
   img2 = tl::BitmapBuffer (10, 16);
-  EXPECT_EQ (img.width (), 15);
-  EXPECT_EQ (img.height (), 25);
-  EXPECT_EQ (img2.width (), 10);
-  EXPECT_EQ (img2.height (), 16);
+  EXPECT_EQ (img.width (), 15u);
+  EXPECT_EQ (img.height (), 25u);
+  EXPECT_EQ (img2.width (), 10u);
+  EXPECT_EQ (img2.height (), 16u);
   img2.fill (true);
   EXPECT_EQ (compare_images (img, img2), false);
 
@@ -536,28 +536,28 @@ TEST(11)
 
   img = std::move (img2);
   EXPECT_EQ (compare_images (img, img2), false);
-  EXPECT_EQ (img.width (), 10);
-  EXPECT_EQ (img.height (), 16);
+  EXPECT_EQ (img.width (), 10u);
+  EXPECT_EQ (img.height (), 16u);
   EXPECT_EQ (img.scan_line (5)[0], 0xff);
 
   tl::BitmapBuffer img3 (img);
   EXPECT_EQ (compare_images (img, img3), true);
-  EXPECT_EQ (img3.width (), 10);
-  EXPECT_EQ (img3.height (), 16);
+  EXPECT_EQ (img3.width (), 10u);
+  EXPECT_EQ (img3.height (), 16u);
   EXPECT_EQ (img3.scan_line (5)[1], 0xff);
 
   img.fill (false);
   EXPECT_EQ (compare_images (img, img3), false);
-  EXPECT_EQ (img3.width (), 10);
-  EXPECT_EQ (img3.height (), 16);
+  EXPECT_EQ (img3.width (), 10u);
+  EXPECT_EQ (img3.height (), 16u);
   EXPECT_EQ (img3.scan_line (5)[1], 0xff);
-  EXPECT_EQ (img.width (), 10);
-  EXPECT_EQ (img.height (), 16);
+  EXPECT_EQ (img.width (), 10u);
+  EXPECT_EQ (img.height (), 16u);
   EXPECT_EQ (img.scan_line (5)[1], 0);
 
   tl::BitmapBuffer img4 (std::move (img));
-  EXPECT_EQ (img4.width (), 10);
-  EXPECT_EQ (img4.height (), 16);
+  EXPECT_EQ (img4.width (), 10u);
+  EXPECT_EQ (img4.height (), 16u);
   EXPECT_EQ (img4.scan_line (5)[1], 0);
 
   //  other constructors

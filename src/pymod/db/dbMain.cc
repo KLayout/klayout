@@ -24,8 +24,7 @@
 
 #include "../../db/db/dbInit.h"
 
-//  to force linking of the db module
-#include "../../db/db/dbForceLink.h"
+#include "dbMain.h"
 
 static PyObject *db_module_init (const char *pymod_name, const char *mod_name, const char *mod_description)
 {

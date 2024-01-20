@@ -309,6 +309,7 @@ struct PythonClassClientData
   MethodTable method_table;
 
   static PyTypeObject *py_type (const gsi::ClassBase &cls_decl, bool as_static);
+  static const gsi::ClassBase *cls_for_type (PyTypeObject *);
   static void initialize (const gsi::ClassBase &cls_decl, PyTypeObject *py_type, bool as_static, PythonModule *module);
 };
 

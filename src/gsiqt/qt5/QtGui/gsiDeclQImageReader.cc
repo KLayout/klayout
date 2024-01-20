@@ -294,6 +294,21 @@ static void _call_f_format_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+// float QImageReader::gamma()
+
+
+static void _init_f_gamma_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<float > ();
+}
+
+static void _call_f_gamma_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<float > ((float)((QImageReader *)cls)->gamma ());
+}
+
+
 // int QImageReader::imageCount()
 
 
@@ -627,6 +642,26 @@ static void _call_f_setFormat_2309 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
+// void QImageReader::setGamma(float gamma)
+
+
+static void _init_f_setGamma_970 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("gamma");
+  decl->add_arg<float > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setGamma_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QImageReader *)cls)->setGamma (arg1);
+}
+
+
 // void QImageReader::setQuality(int quality)
 
 
@@ -853,6 +888,25 @@ static void _call_f_imageFormat_1447 (const qt_gsi::GenericStaticMethod * /*decl
 }
 
 
+// static QList<QByteArray> QImageReader::imageFormatsForMimeType(const QByteArray &mimeType)
+
+
+static void _init_f_imageFormatsForMimeType_2309 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("mimeType");
+  decl->add_arg<const QByteArray & > (argspec_0);
+  decl->set_return<QList<QByteArray> > ();
+}
+
+static void _call_f_imageFormatsForMimeType_2309 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
+  ret.write<QList<QByteArray> > ((QList<QByteArray>)QImageReader::imageFormatsForMimeType (arg1));
+}
+
+
 // static QList<QByteArray> QImageReader::supportedImageFormats()
 
 
@@ -890,7 +944,7 @@ static void _init_f_tr_4013 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("sourceText");
   decl->add_arg<const char * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("disambiguation", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("disambiguation", true, "nullptr");
   decl->add_arg<const char * > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("n", true, "-1");
   decl->add_arg<int > (argspec_2);
@@ -902,7 +956,7 @@ static void _call_f_tr_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
-  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
   int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QImageReader::tr (arg1, arg2, arg3));
 }
@@ -915,7 +969,7 @@ static void _init_f_trUtf8_4013 (qt_gsi::GenericStaticMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("sourceText");
   decl->add_arg<const char * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("disambiguation", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("disambiguation", true, "nullptr");
   decl->add_arg<const char * > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("n", true, "-1");
   decl->add_arg<int > (argspec_2);
@@ -927,7 +981,7 @@ static void _call_f_trUtf8_4013 (const qt_gsi::GenericStaticMethod * /*decl*/, g
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const char *arg1 = gsi::arg_reader<const char * >() (args, heap);
-  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (0, heap);
+  const char *arg2 = args ? gsi::arg_reader<const char * >() (args, heap) : gsi::arg_maker<const char * >() (nullptr, heap);
   int arg3 = args ? gsi::arg_reader<int >() (args, heap) : gsi::arg_maker<int >() (-1, heap);
   ret.write<QString > ((QString)QImageReader::trUtf8 (arg1, arg2, arg3));
 }
@@ -955,6 +1009,7 @@ static gsi::Methods methods_QImageReader () {
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QImageReader::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
   methods += new qt_gsi::GenericMethod (":fileName", "@brief Method QString QImageReader::fileName()\n", true, &_init_f_fileName_c0, &_call_f_fileName_c0);
   methods += new qt_gsi::GenericMethod (":format", "@brief Method QByteArray QImageReader::format()\n", true, &_init_f_format_c0, &_call_f_format_c0);
+  methods += new qt_gsi::GenericMethod (":gamma", "@brief Method float QImageReader::gamma()\n", true, &_init_f_gamma_c0, &_call_f_gamma_c0);
   methods += new qt_gsi::GenericMethod ("imageCount", "@brief Method int QImageReader::imageCount()\n", true, &_init_f_imageCount_c0, &_call_f_imageCount_c0);
   methods += new qt_gsi::GenericMethod ("imageFormat", "@brief Method QImage::Format QImageReader::imageFormat()\n", true, &_init_f_imageFormat_c0, &_call_f_imageFormat_c0);
   methods += new qt_gsi::GenericMethod ("jumpToImage", "@brief Method bool QImageReader::jumpToImage(int imageNumber)\n", false, &_init_f_jumpToImage_767, &_call_f_jumpToImage_767);
@@ -974,6 +1029,7 @@ static gsi::Methods methods_QImageReader () {
   methods += new qt_gsi::GenericMethod ("setDevice|device=", "@brief Method void QImageReader::setDevice(QIODevice *device)\n", false, &_init_f_setDevice_1447, &_call_f_setDevice_1447);
   methods += new qt_gsi::GenericMethod ("setFileName|fileName=", "@brief Method void QImageReader::setFileName(const QString &fileName)\n", false, &_init_f_setFileName_2025, &_call_f_setFileName_2025);
   methods += new qt_gsi::GenericMethod ("setFormat|format=", "@brief Method void QImageReader::setFormat(const QByteArray &format)\n", false, &_init_f_setFormat_2309, &_call_f_setFormat_2309);
+  methods += new qt_gsi::GenericMethod ("setGamma|gamma=", "@brief Method void QImageReader::setGamma(float gamma)\n", false, &_init_f_setGamma_970, &_call_f_setGamma_970);
   methods += new qt_gsi::GenericMethod ("setQuality|quality=", "@brief Method void QImageReader::setQuality(int quality)\n", false, &_init_f_setQuality_767, &_call_f_setQuality_767);
   methods += new qt_gsi::GenericMethod ("setScaledClipRect|scaledClipRect=", "@brief Method void QImageReader::setScaledClipRect(const QRect &rect)\n", false, &_init_f_setScaledClipRect_1792, &_call_f_setScaledClipRect_1792);
   methods += new qt_gsi::GenericMethod ("setScaledSize|scaledSize=", "@brief Method void QImageReader::setScaledSize(const QSize &size)\n", false, &_init_f_setScaledSize_1805, &_call_f_setScaledSize_1805);
@@ -987,6 +1043,7 @@ static gsi::Methods methods_QImageReader () {
   methods += new qt_gsi::GenericMethod ("transformation", "@brief Method QFlags<QImageIOHandler::Transformation> QImageReader::transformation()\n", true, &_init_f_transformation_c0, &_call_f_transformation_c0);
   methods += new qt_gsi::GenericStaticMethod ("imageFormat", "@brief Static method QByteArray QImageReader::imageFormat(const QString &fileName)\nThis method is static and can be called without an instance.", &_init_f_imageFormat_2025, &_call_f_imageFormat_2025);
   methods += new qt_gsi::GenericStaticMethod ("imageFormat", "@brief Static method QByteArray QImageReader::imageFormat(QIODevice *device)\nThis method is static and can be called without an instance.", &_init_f_imageFormat_1447, &_call_f_imageFormat_1447);
+  methods += new qt_gsi::GenericStaticMethod ("imageFormatsForMimeType", "@brief Static method QList<QByteArray> QImageReader::imageFormatsForMimeType(const QByteArray &mimeType)\nThis method is static and can be called without an instance.", &_init_f_imageFormatsForMimeType_2309, &_call_f_imageFormatsForMimeType_2309);
   methods += new qt_gsi::GenericStaticMethod ("supportedImageFormats", "@brief Static method QList<QByteArray> QImageReader::supportedImageFormats()\nThis method is static and can be called without an instance.", &_init_f_supportedImageFormats_0, &_call_f_supportedImageFormats_0);
   methods += new qt_gsi::GenericStaticMethod ("supportedMimeTypes", "@brief Static method QList<QByteArray> QImageReader::supportedMimeTypes()\nThis method is static and can be called without an instance.", &_init_f_supportedMimeTypes_0, &_call_f_supportedMimeTypes_0);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QImageReader::tr(const char *sourceText, const char *disambiguation, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);

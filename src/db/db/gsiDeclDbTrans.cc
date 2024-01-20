@@ -159,7 +159,7 @@ struct trans_defs
       "@param c The original transformation\n"
       "@param u The Additional displacement\n"
     ) +
-    constructor ("new", &new_cxy, arg ("c"), arg ("x"), arg ("y"),
+    constructor ("new", &new_cxy, arg ("c"), arg ("x", 0), arg ("y", 0),
       "@brief Creates a transformation from another transformation plus a displacement\n"
       "\n"
       "Creates a new transformation from a existing transformation. This constructor is provided for creating duplicates "
@@ -172,7 +172,7 @@ struct trans_defs
       "@param x The Additional displacement (x)\n"
       "@param y The Additional displacement (y)\n"
     ) +
-    constructor ("new", &new_rmu, arg ("rot"), arg ("mirr", false), arg ("u", displacement_type ()),
+    constructor ("new", &new_rmu, arg ("rot", 0), arg ("mirrx", false), arg ("u", displacement_type ()),
       "@brief Creates a transformation using angle and mirror flag\n"
       "\n"
       "The sequence of operations is: mirroring at x axis,\n"
@@ -182,7 +182,7 @@ struct trans_defs
       "@param mirrx True, if mirrored at x axis\n"
       "@param u The displacement\n"
     ) +
-    constructor ("new", &new_rmxy, arg ("rot"), arg ("mirr"), arg ("x"), arg ("y"),
+    constructor ("new", &new_rmxy, arg ("rot", 0), arg ("mirrx", false), arg ("x", 0), arg ("y", 0),
       "@brief Creates a transformation using angle and mirror flag and two coordinate values for displacement\n"
       "\n"
       "The sequence of operations is: mirroring at x axis,\n"
@@ -569,7 +569,7 @@ struct cplx_trans_defs
     return new C (C (u) * C (mag) * c);
   }
 
-  static C *new_cmxy (const C &c, double mag, coord_type x, coord_type y)
+  static C *new_cmxy (const C &c, double mag, target_coord_type x, target_coord_type y)
   {
     return new C (C (displacement_type (x, y)) * C (mag) * c);
   }
@@ -584,29 +584,24 @@ struct cplx_trans_defs
     return new C (u);
   }
 
-  static C *new_t (const simple_trans_type &t)
+  static C *new_tm (const simple_trans_type &t, double mag)
   {
-    return new C (t, 1.0, 1.0);
+    return new C (t, 1.0, mag);
   }
 
-  static C *new_tm (const simple_trans_type &t, double m)
+  static C *new_m (double mag)
   {
-    return new C (t, 1.0, m);
+    return new C (mag);
   }
 
-  static C *new_m (double m)
+  static C *new_mrmu (double mag, double r, bool mirrx, const displacement_type &u)
   {
-    return new C (m);
+    return new C (mag, r, mirrx, u);
   }
 
-  static C *new_mrmu (double mag, double r, bool m, const displacement_type &u)
+  static C *new_mrmxy (double mag, double r, bool mirrx, target_coord_type x, target_coord_type y)
   {
-    return new C (mag, r, m, u);
-  }
-
-  static C *new_mrmxy (double mag, double r, bool m, target_coord_type x, target_coord_type y)
-  {
-    return new C (mag, r, m, displacement_type (x, y));
+    return new C (mag, r, mirrx, displacement_type (x, y));
   }
 
   static simple_trans_type s_trans (const C *cplx_trans)
@@ -650,7 +645,7 @@ struct cplx_trans_defs
     constructor ("new", &new_v, 
       "@brief Creates a unit transformation\n"
     ) +
-    constructor ("new", &new_cmu, arg ("c"), arg ("m", 1.0), arg ("u", displacement_type ()),
+    constructor ("new", &new_cmu, arg ("c"), arg ("mag", 1.0), arg ("u", displacement_type ()),
       "@brief Creates a transformation from another transformation plus a magnification and displacement\n"
       "\n"
       "Creates a new transformation from a existing transformation. This constructor is provided for creating duplicates "
@@ -662,7 +657,7 @@ struct cplx_trans_defs
       "@param c The original transformation\n"
       "@param u The Additional displacement\n"
     ) +
-    constructor ("new", &new_cmxy, arg ("c"), arg ("m"), arg ("x"), arg ("y"),
+    constructor ("new", &new_cmxy, arg ("c"), arg ("mag", 1.0), arg ("x", 0), arg ("y", 0),
       "@brief Creates a transformation from another transformation plus a magnification and displacement\n"
       "\n"
       "Creates a new transformation from a existing transformation. This constructor is provided for creating duplicates "
@@ -684,20 +679,10 @@ struct cplx_trans_defs
       "@param x The x displacement\n"
       "@param y The y displacement\n"
     ) +
-    constructor ("new", &new_m, arg ("m"),
-      "@brief Creates a transformation from a magnification\n"
-      "\n"
-      "Creates a magnifying transformation without displacement and rotation given the magnification m."
-    ) +
-    constructor ("new", &new_tm, arg ("t"), arg ("m"),
+    constructor ("new", &new_tm, arg ("t"), arg ("mag", 1.0),
       "@brief Creates a transformation from a simple transformation and a magnification\n"
       "\n"
       "Creates a magnifying transformation from a simple transformation and a magnification."
-    ) +
-    constructor ("new", &new_t, arg ("t"),
-      "@brief Creates a transformation from a simple transformation alone\n"
-      "\n"
-      "Creates a magnifying transformation from a simple transformation and a magnification of 1.0."
     ) +
     constructor ("new", &new_u, arg ("u"),
       "@brief Creates a transformation from a displacement\n"
@@ -706,7 +691,7 @@ struct cplx_trans_defs
       "\n"
       "This method has been added in version 0.25."
     ) +
-    constructor ("new", &new_mrmu, arg ("mag"), arg ("rot"), arg ("mirrx"), arg ("u"),
+    constructor ("new", &new_mrmu, arg ("mag", 1.0), arg ("rot", 0.0), arg ("mirrx", false), arg ("u", displacement_type ()),
       "@brief Creates a transformation using magnification, angle, mirror flag and displacement\n"
       "\n"
       "The sequence of operations is: magnification, mirroring at x axis,\n"
@@ -717,7 +702,7 @@ struct cplx_trans_defs
       "@param mirrx True, if mirrored at x axis\n"
       "@param u The displacement\n"
     ) +
-    constructor ("new", &new_mrmxy, arg ("mag"), arg ("rot"), arg ("mirrx"), arg ("x"), arg ("y"),
+    constructor ("new", &new_mrmxy, arg ("mag", 1.0), arg ("rot", 0.0), arg ("mirrx", false), arg ("x", 0), arg ("y", 0),
       "@brief Creates a transformation using magnification, angle, mirror flag and displacement\n"
       "\n"
       "The sequence of operations is: magnification, mirroring at x axis,\n"

@@ -257,8 +257,8 @@ static gsi::Methods methods_QSqlError () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSqlError::QSqlError(const QString &driverText, const QString &databaseText, QSqlError::ErrorType type, const QString &errorCode)\nThis method creates an object of class QSqlError.", &_init_ctor_QSqlError_8150, &_call_ctor_QSqlError_8150);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QSqlError::QSqlError(const QSqlError &other)\nThis method creates an object of class QSqlError.", &_init_ctor_QSqlError_2220, &_call_ctor_QSqlError_2220);
-  methods += new qt_gsi::GenericMethod (":databaseText", "@brief Method QString QSqlError::databaseText()\n", true, &_init_f_databaseText_c0, &_call_f_databaseText_c0);
-  methods += new qt_gsi::GenericMethod (":driverText", "@brief Method QString QSqlError::driverText()\n", true, &_init_f_driverText_c0, &_call_f_driverText_c0);
+  methods += new qt_gsi::GenericMethod ("databaseText", "@brief Method QString QSqlError::databaseText()\n", true, &_init_f_databaseText_c0, &_call_f_databaseText_c0);
+  methods += new qt_gsi::GenericMethod ("driverText", "@brief Method QString QSqlError::driverText()\n", true, &_init_f_driverText_c0, &_call_f_driverText_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QSqlError::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
   methods += new qt_gsi::GenericMethod ("nativeErrorCode", "@brief Method QString QSqlError::nativeErrorCode()\n", true, &_init_f_nativeErrorCode_c0, &_call_f_nativeErrorCode_c0);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QSqlError::operator!=(const QSqlError &other)\n", true, &_init_f_operator_excl__eq__c2220, &_call_f_operator_excl__eq__c2220);
@@ -266,7 +266,7 @@ static gsi::Methods methods_QSqlError () {
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QSqlError::operator==(const QSqlError &other)\n", true, &_init_f_operator_eq__eq__c2220, &_call_f_operator_eq__eq__c2220);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QSqlError::swap(QSqlError &other)\n", false, &_init_f_swap_1525, &_call_f_swap_1525);
   methods += new qt_gsi::GenericMethod ("text", "@brief Method QString QSqlError::text()\n", true, &_init_f_text_c0, &_call_f_text_c0);
-  methods += new qt_gsi::GenericMethod (":type", "@brief Method QSqlError::ErrorType QSqlError::type()\n", true, &_init_f_type_c0, &_call_f_type_c0);
+  methods += new qt_gsi::GenericMethod ("type", "@brief Method QSqlError::ErrorType QSqlError::type()\n", true, &_init_f_type_c0, &_call_f_type_c0);
   return methods;
 }
 

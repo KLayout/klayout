@@ -69,26 +69,6 @@ static void _call_f_flashMode_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-// void QCameraFlashControl::flashReady(bool)
-
-
-static void _init_f_flashReady_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_flashReady_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QCameraFlashControl *)cls)->flashReady (arg1);
-}
-
-
 // bool QCameraFlashControl::isFlashModeSupported(QFlags<QCameraExposure::FlashMode> mode)
 
 
@@ -200,10 +180,12 @@ static gsi::Methods methods_QCameraFlashControl () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":flashMode", "@brief Method QFlags<QCameraExposure::FlashMode> QCameraFlashControl::flashMode()\n", true, &_init_f_flashMode_c0, &_call_f_flashMode_c0);
-  methods += new qt_gsi::GenericMethod ("flashReady", "@brief Method void QCameraFlashControl::flashReady(bool)\n", false, &_init_f_flashReady_864, &_call_f_flashReady_864);
   methods += new qt_gsi::GenericMethod ("isFlashModeSupported?", "@brief Method bool QCameraFlashControl::isFlashModeSupported(QFlags<QCameraExposure::FlashMode> mode)\n", true, &_init_f_isFlashModeSupported_c3656, &_call_f_isFlashModeSupported_c3656);
   methods += new qt_gsi::GenericMethod ("isFlashReady?", "@brief Method bool QCameraFlashControl::isFlashReady()\n", true, &_init_f_isFlashReady_c0, &_call_f_isFlashReady_c0);
   methods += new qt_gsi::GenericMethod ("setFlashMode|flashMode=", "@brief Method void QCameraFlashControl::setFlashMode(QFlags<QCameraExposure::FlashMode> mode)\n", false, &_init_f_setFlashMode_3656, &_call_f_setFlashMode_3656);
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QCameraFlashControl::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("flashReady(bool)", "flashReady", gsi::arg("arg1"), "@brief Signal declaration for QCameraFlashControl::flashReady(bool)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QCameraFlashControl::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QCameraFlashControl::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   methods += new qt_gsi::GenericStaticMethod ("trUtf8", "@brief Static method QString QCameraFlashControl::trUtf8(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_trUtf8_4013, &_call_f_trUtf8_4013);
   return methods;
@@ -252,33 +234,39 @@ public:
     return QCameraFlashControl::senderSignalIndex();
   }
 
-  //  [adaptor impl] bool QCameraFlashControl::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [emitter impl] void QCameraFlashControl::destroyed(QObject *)
+  void emitter_QCameraFlashControl_destroyed_1302(QObject *arg1)
   {
-    return QCameraFlashControl::event(arg1);
+    emit QCameraFlashControl::destroyed(arg1);
   }
 
-  virtual bool event(QEvent *arg1)
+  //  [adaptor impl] bool QCameraFlashControl::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
+  {
+    return QCameraFlashControl::event(_event);
+  }
+
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QCameraFlashControl_Adaptor, bool, QEvent *>(&QCameraFlashControl_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QCameraFlashControl_Adaptor, bool, QEvent *>(&QCameraFlashControl_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QCameraFlashControl::event(arg1);
+      return QCameraFlashControl::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QCameraFlashControl::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QCameraFlashControl::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QCameraFlashControl::eventFilter(arg1, arg2);
+    return QCameraFlashControl::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QCameraFlashControl_Adaptor, bool, QObject *, QEvent *>(&QCameraFlashControl_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QCameraFlashControl_Adaptor, bool, QObject *, QEvent *>(&QCameraFlashControl_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QCameraFlashControl::eventFilter(arg1, arg2);
+      return QCameraFlashControl::eventFilter(watched, event);
     }
   }
 
@@ -295,6 +283,12 @@ public:
     } else {
       throw qt_gsi::AbstractMethodCalledException("flashMode");
     }
+  }
+
+  //  [emitter impl] void QCameraFlashControl::flashReady(bool)
+  void emitter_QCameraFlashControl_flashReady_864(bool arg1)
+  {
+    emit QCameraFlashControl::flashReady(arg1);
   }
 
   //  [adaptor impl] bool QCameraFlashControl::isFlashModeSupported(QFlags<QCameraExposure::FlashMode> mode)
@@ -328,6 +322,13 @@ public:
     }
   }
 
+  //  [emitter impl] void QCameraFlashControl::objectNameChanged(const QString &objectName)
+  void emitter_QCameraFlashControl_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QCameraFlashControl::objectNameChanged(const QString &objectName)'");
+  }
+
   //  [adaptor impl] void QCameraFlashControl::setFlashMode(QFlags<QCameraExposure::FlashMode> mode)
   void cbs_setFlashMode_3656_0(QFlags<QCameraExposure::FlashMode> mode)
   {
@@ -344,33 +345,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QCameraFlashControl::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QCameraFlashControl::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QCameraFlashControl::childEvent(arg1);
+    QCameraFlashControl::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QCameraFlashControl_Adaptor, QChildEvent *>(&QCameraFlashControl_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QCameraFlashControl_Adaptor, QChildEvent *>(&QCameraFlashControl_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QCameraFlashControl::childEvent(arg1);
+      QCameraFlashControl::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QCameraFlashControl::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QCameraFlashControl::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QCameraFlashControl::customEvent(arg1);
+    QCameraFlashControl::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QCameraFlashControl_Adaptor, QEvent *>(&QCameraFlashControl_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QCameraFlashControl_Adaptor, QEvent *>(&QCameraFlashControl_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QCameraFlashControl::customEvent(arg1);
+      QCameraFlashControl::customEvent(event);
     }
   }
 
@@ -389,18 +390,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QCameraFlashControl::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QCameraFlashControl::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QCameraFlashControl::timerEvent(arg1);
+    QCameraFlashControl::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QCameraFlashControl_Adaptor, QTimerEvent *>(&QCameraFlashControl_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QCameraFlashControl_Adaptor, QTimerEvent *>(&QCameraFlashControl_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QCameraFlashControl::timerEvent(arg1);
+      QCameraFlashControl::timerEvent(event);
     }
   }
 
@@ -432,11 +433,11 @@ static void _call_ctor_QCameraFlashControl_Adaptor_0 (const qt_gsi::GenericStati
 }
 
 
-// void QCameraFlashControl::childEvent(QChildEvent *)
+// void QCameraFlashControl::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -456,11 +457,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QCameraFlashControl::customEvent(QEvent *)
+// void QCameraFlashControl::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -477,6 +478,24 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QCameraFlashControl_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
+}
+
+
+// emitter void QCameraFlashControl::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QCameraFlashControl_Adaptor *)cls)->emitter_QCameraFlashControl_destroyed_1302 (arg1);
 }
 
 
@@ -504,11 +523,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QCameraFlashControl::event(QEvent *)
+// bool QCameraFlashControl::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -527,13 +546,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QCameraFlashControl::eventFilter(QObject *, QEvent *)
+// bool QCameraFlashControl::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -569,6 +588,24 @@ static void _call_cbs_flashMode_c0_0 (const qt_gsi::GenericMethod * /*decl*/, vo
 static void _set_callback_cbs_flashMode_c0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QCameraFlashControl_Adaptor *)cls)->cb_flashMode_c0_0 = cb;
+}
+
+
+// emitter void QCameraFlashControl::flashReady(bool)
+
+static void _init_emitter_flashReady_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_flashReady_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QCameraFlashControl_Adaptor *)cls)->emitter_QCameraFlashControl_flashReady_864 (arg1);
 }
 
 
@@ -629,6 +666,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
   tl::Heap heap;
   const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QCameraFlashControl_Adaptor *)cls)->fp_QCameraFlashControl_isSignalConnected_c2394 (arg1));
+}
+
+
+// emitter void QCameraFlashControl::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QCameraFlashControl_Adaptor *)cls)->emitter_QCameraFlashControl_objectNameChanged_4567 (arg1);
 }
 
 
@@ -702,11 +757,11 @@ static void _set_callback_cbs_setFlashMode_3656_0 (void *cls, const gsi::Callbac
 }
 
 
-// void QCameraFlashControl::timerEvent(QTimerEvent *)
+// void QCameraFlashControl::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -734,29 +789,32 @@ gsi::Class<QCameraFlashControl> &qtdecl_QCameraFlashControl ();
 static gsi::Methods methods_QCameraFlashControl_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCameraFlashControl::QCameraFlashControl()\nThis method creates an object of class QCameraFlashControl.", &_init_ctor_QCameraFlashControl_Adaptor_0, &_call_ctor_QCameraFlashControl_Adaptor_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QCameraFlashControl::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QCameraFlashControl::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QCameraFlashControl::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QCameraFlashControl::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QCameraFlashControl::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QCameraFlashControl::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QCameraFlashControl::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QCameraFlashControl::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QCameraFlashControl::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QCameraFlashControl::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("flashMode", "@brief Virtual method QFlags<QCameraExposure::FlashMode> QCameraFlashControl::flashMode()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_flashMode_c0_0, &_call_cbs_flashMode_c0_0);
   methods += new qt_gsi::GenericMethod ("flashMode", "@hide", true, &_init_cbs_flashMode_c0_0, &_call_cbs_flashMode_c0_0, &_set_callback_cbs_flashMode_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_flashReady", "@brief Emitter for signal void QCameraFlashControl::flashReady(bool)\nCall this method to emit this signal.", false, &_init_emitter_flashReady_864, &_call_emitter_flashReady_864);
   methods += new qt_gsi::GenericMethod ("isFlashModeSupported", "@brief Virtual method bool QCameraFlashControl::isFlashModeSupported(QFlags<QCameraExposure::FlashMode> mode)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isFlashModeSupported_c3656_0, &_call_cbs_isFlashModeSupported_c3656_0);
   methods += new qt_gsi::GenericMethod ("isFlashModeSupported", "@hide", true, &_init_cbs_isFlashModeSupported_c3656_0, &_call_cbs_isFlashModeSupported_c3656_0, &_set_callback_cbs_isFlashModeSupported_c3656_0);
   methods += new qt_gsi::GenericMethod ("isFlashReady", "@brief Virtual method bool QCameraFlashControl::isFlashReady()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isFlashReady_c0_0, &_call_cbs_isFlashReady_c0_0);
   methods += new qt_gsi::GenericMethod ("isFlashReady", "@hide", true, &_init_cbs_isFlashReady_c0_0, &_call_cbs_isFlashReady_c0_0, &_set_callback_cbs_isFlashReady_c0_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QCameraFlashControl::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QCameraFlashControl::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QCameraFlashControl::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QCameraFlashControl::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QCameraFlashControl::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("setFlashMode", "@brief Virtual method void QCameraFlashControl::setFlashMode(QFlags<QCameraExposure::FlashMode> mode)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_setFlashMode_3656_0, &_call_cbs_setFlashMode_3656_0);
   methods += new qt_gsi::GenericMethod ("setFlashMode", "@hide", false, &_init_cbs_setFlashMode_3656_0, &_call_cbs_setFlashMode_3656_0, &_set_callback_cbs_setFlashMode_3656_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QCameraFlashControl::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QCameraFlashControl::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

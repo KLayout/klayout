@@ -362,14 +362,14 @@ static gsi::Methods methods_QActionGroup () {
   methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QActionGroup::addAction(const QString &text)\n", false, &_init_f_addAction_2025, &_call_f_addAction_2025);
   methods += new qt_gsi::GenericMethod ("addAction", "@brief Method QAction *QActionGroup::addAction(const QIcon &icon, const QString &text)\n", false, &_init_f_addAction_3704, &_call_f_addAction_3704);
   methods += new qt_gsi::GenericMethod ("checkedAction", "@brief Method QAction *QActionGroup::checkedAction()\n", true, &_init_f_checkedAction_c0, &_call_f_checkedAction_c0);
-  methods += new qt_gsi::GenericMethod ("exclusionPolicy", "@brief Method QActionGroup::ExclusionPolicy QActionGroup::exclusionPolicy()\n", true, &_init_f_exclusionPolicy_c0, &_call_f_exclusionPolicy_c0);
+  methods += new qt_gsi::GenericMethod (":exclusionPolicy", "@brief Method QActionGroup::ExclusionPolicy QActionGroup::exclusionPolicy()\n", true, &_init_f_exclusionPolicy_c0, &_call_f_exclusionPolicy_c0);
   methods += new qt_gsi::GenericMethod ("isEnabled?|:enabled", "@brief Method bool QActionGroup::isEnabled()\n", true, &_init_f_isEnabled_c0, &_call_f_isEnabled_c0);
   methods += new qt_gsi::GenericMethod ("isExclusive?|:exclusive", "@brief Method bool QActionGroup::isExclusive()\n", true, &_init_f_isExclusive_c0, &_call_f_isExclusive_c0);
   methods += new qt_gsi::GenericMethod ("isVisible?|:visible", "@brief Method bool QActionGroup::isVisible()\n", true, &_init_f_isVisible_c0, &_call_f_isVisible_c0);
   methods += new qt_gsi::GenericMethod ("removeAction", "@brief Method void QActionGroup::removeAction(QAction *a)\n", false, &_init_f_removeAction_1309, &_call_f_removeAction_1309);
   methods += new qt_gsi::GenericMethod ("setDisabled", "@brief Method void QActionGroup::setDisabled(bool b)\n", false, &_init_f_setDisabled_864, &_call_f_setDisabled_864);
   methods += new qt_gsi::GenericMethod ("setEnabled|enabled=", "@brief Method void QActionGroup::setEnabled(bool)\n", false, &_init_f_setEnabled_864, &_call_f_setEnabled_864);
-  methods += new qt_gsi::GenericMethod ("setExclusionPolicy", "@brief Method void QActionGroup::setExclusionPolicy(QActionGroup::ExclusionPolicy policy)\n", false, &_init_f_setExclusionPolicy_3342, &_call_f_setExclusionPolicy_3342);
+  methods += new qt_gsi::GenericMethod ("setExclusionPolicy|exclusionPolicy=", "@brief Method void QActionGroup::setExclusionPolicy(QActionGroup::ExclusionPolicy policy)\n", false, &_init_f_setExclusionPolicy_3342, &_call_f_setExclusionPolicy_3342);
   methods += new qt_gsi::GenericMethod ("setExclusive|exclusive=", "@brief Method void QActionGroup::setExclusive(bool)\n", false, &_init_f_setExclusive_864, &_call_f_setExclusive_864);
   methods += new qt_gsi::GenericMethod ("setVisible|visible=", "@brief Method void QActionGroup::setVisible(bool)\n", false, &_init_f_setVisible_864, &_call_f_setVisible_864);
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QActionGroup::destroyed(QObject *)\nYou can bind a procedure to this signal.");

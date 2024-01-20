@@ -46,7 +46,7 @@ logfile=QATest_${gitSHA1}_${timestamp}__${presentDir}.log
 #----------------------------------------------------------------
 export TESTSRC=..
 export TESTTMP=QATest_${gitSHA1}_${timestamp}__${presentDir}
-export DYLD_LIBRARY_PATH=$(pwd):$(pwd)/db_plugins:$(pwd)/lay_plugins
+export DYLD_LIBRARY_PATH=$(pwd):$(pwd)/db_plugins:$(pwd)/lay_plugins:$(pwd)/pymod
 
 #----------------------------------------------------------------
 # Environment variables for "ut_runner"

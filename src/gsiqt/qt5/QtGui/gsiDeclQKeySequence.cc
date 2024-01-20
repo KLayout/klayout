@@ -655,7 +655,8 @@ static gsi::Enum<QKeySequence::StandardKey> decl_QKeySequence_StandardKey_Enum (
     gsi::enum_const ("FullScreen", QKeySequence::FullScreen, "@brief Enum constant QKeySequence::FullScreen") +
     gsi::enum_const ("Deselect", QKeySequence::Deselect, "@brief Enum constant QKeySequence::Deselect") +
     gsi::enum_const ("DeleteCompleteLine", QKeySequence::DeleteCompleteLine, "@brief Enum constant QKeySequence::DeleteCompleteLine") +
-    gsi::enum_const ("Backspace", QKeySequence::Backspace, "@brief Enum constant QKeySequence::Backspace"),
+    gsi::enum_const ("Backspace", QKeySequence::Backspace, "@brief Enum constant QKeySequence::Backspace") +
+    gsi::enum_const ("Cancel", QKeySequence::Cancel, "@brief Enum constant QKeySequence::Cancel"),
   "@qt\n@brief This class represents the QKeySequence::StandardKey enum");
 
 static gsi::QFlagsClass<QKeySequence::StandardKey > decl_QKeySequence_StandardKey_Enums ("QtGui", "QKeySequence_QFlags_StandardKey",

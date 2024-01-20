@@ -138,7 +138,7 @@ SaveLayoutOptions::set_option_by_name (const std::string &method, const tl::Vari
   tl::Variant out;
   std::vector<tl::Variant> args;
   args.push_back (value);
-  eval_cls->execute (context, out, options_ref, method + "=", args);
+  eval_cls->execute (context, out, options_ref, method + "=", args, 0);
 }
 
 tl::Variant
@@ -151,7 +151,7 @@ SaveLayoutOptions::get_option_by_name (const std::string &method)
 
   tl::Variant out;
   std::vector<tl::Variant> args;
-  eval_cls->execute (context, out, options_ref, method, args);
+  eval_cls->execute (context, out, options_ref, method, args, 0);
 
   return out;
 }

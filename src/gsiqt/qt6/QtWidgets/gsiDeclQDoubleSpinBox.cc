@@ -427,26 +427,6 @@ static void _call_f_suffix_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// void QDoubleSpinBox::textChanged(const QString &)
-
-
-static void _init_f_textChanged_2025 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<const QString & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_textChanged_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QDoubleSpinBox *)cls)->textChanged (arg1);
-}
-
-
 // QString QDoubleSpinBox::textFromValue(double val)
 
 
@@ -565,13 +545,12 @@ static gsi::Methods methods_QDoubleSpinBox () {
   methods += new qt_gsi::GenericMethod ("setPrefix|prefix=", "@brief Method void QDoubleSpinBox::setPrefix(const QString &prefix)\n", false, &_init_f_setPrefix_2025, &_call_f_setPrefix_2025);
   methods += new qt_gsi::GenericMethod ("setRange", "@brief Method void QDoubleSpinBox::setRange(double min, double max)\n", false, &_init_f_setRange_2034, &_call_f_setRange_2034);
   methods += new qt_gsi::GenericMethod ("setSingleStep|singleStep=", "@brief Method void QDoubleSpinBox::setSingleStep(double val)\n", false, &_init_f_setSingleStep_1071, &_call_f_setSingleStep_1071);
-  methods += new qt_gsi::GenericMethod ("setStepType", "@brief Method void QDoubleSpinBox::setStepType(QAbstractSpinBox::StepType stepType)\n", false, &_init_f_setStepType_2990, &_call_f_setStepType_2990);
+  methods += new qt_gsi::GenericMethod ("setStepType|stepType=", "@brief Method void QDoubleSpinBox::setStepType(QAbstractSpinBox::StepType stepType)\n", false, &_init_f_setStepType_2990, &_call_f_setStepType_2990);
   methods += new qt_gsi::GenericMethod ("setSuffix|suffix=", "@brief Method void QDoubleSpinBox::setSuffix(const QString &suffix)\n", false, &_init_f_setSuffix_2025, &_call_f_setSuffix_2025);
   methods += new qt_gsi::GenericMethod ("setValue|value=", "@brief Method void QDoubleSpinBox::setValue(double val)\n", false, &_init_f_setValue_1071, &_call_f_setValue_1071);
   methods += new qt_gsi::GenericMethod (":singleStep", "@brief Method double QDoubleSpinBox::singleStep()\n", true, &_init_f_singleStep_c0, &_call_f_singleStep_c0);
-  methods += new qt_gsi::GenericMethod ("stepType", "@brief Method QAbstractSpinBox::StepType QDoubleSpinBox::stepType()\n", true, &_init_f_stepType_c0, &_call_f_stepType_c0);
+  methods += new qt_gsi::GenericMethod (":stepType", "@brief Method QAbstractSpinBox::StepType QDoubleSpinBox::stepType()\n", true, &_init_f_stepType_c0, &_call_f_stepType_c0);
   methods += new qt_gsi::GenericMethod (":suffix", "@brief Method QString QDoubleSpinBox::suffix()\n", true, &_init_f_suffix_c0, &_call_f_suffix_c0);
-  methods += new qt_gsi::GenericMethod ("textChanged", "@brief Method void QDoubleSpinBox::textChanged(const QString &)\n", false, &_init_f_textChanged_2025, &_call_f_textChanged_2025);
   methods += new qt_gsi::GenericMethod ("textFromValue", "@brief Method QString QDoubleSpinBox::textFromValue(double val)\n", true, &_init_f_textFromValue_c1071, &_call_f_textFromValue_c1071);
   methods += new qt_gsi::GenericMethod ("validate", "@brief Method QValidator::State QDoubleSpinBox::validate(QString &input, int &pos)\nThis is a reimplementation of QAbstractSpinBox::validate", true, &_init_f_validate_c2171, &_call_f_validate_c2171);
   methods += new qt_gsi::GenericMethod (":value", "@brief Method double QDoubleSpinBox::value()\n", true, &_init_f_value_c0, &_call_f_value_c0);
@@ -580,6 +559,7 @@ static gsi::Methods methods_QDoubleSpinBox () {
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QDoubleSpinBox::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("editingFinished()", "editingFinished", "@brief Signal declaration for QDoubleSpinBox::editingFinished()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QDoubleSpinBox::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("textChanged(const QString &)", "textChanged", gsi::arg("arg1"), "@brief Signal declaration for QDoubleSpinBox::textChanged(const QString &)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<double > ("valueChanged(double)", "valueChanged", gsi::arg("arg1"), "@brief Signal declaration for QDoubleSpinBox::valueChanged(double)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QIcon & > ("windowIconChanged(const QIcon &)", "windowIconChanged", gsi::arg("icon"), "@brief Signal declaration for QDoubleSpinBox::windowIconChanged(const QIcon &icon)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("windowIconTextChanged(const QString &)", "windowIconTextChanged", gsi::arg("iconText"), "@brief Signal declaration for QDoubleSpinBox::windowIconTextChanged(const QString &iconText)\nYou can bind a procedure to this signal.");
@@ -875,6 +855,12 @@ public:
     } else {
       QDoubleSpinBox::stepBy(steps);
     }
+  }
+
+  //  [emitter impl] void QDoubleSpinBox::textChanged(const QString &)
+  void emitter_QDoubleSpinBox_textChanged_2025(const QString &arg1)
+  {
+    emit QDoubleSpinBox::textChanged(arg1);
   }
 
   //  [adaptor impl] QString QDoubleSpinBox::textFromValue(double val)
@@ -2950,6 +2936,24 @@ static void _set_callback_cbs_tabletEvent_1821_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QDoubleSpinBox::textChanged(const QString &)
+
+static void _init_emitter_textChanged_2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_textChanged_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QDoubleSpinBox_Adaptor *)cls)->emitter_QDoubleSpinBox_textChanged_2025 (arg1);
+}
+
+
 // QString QDoubleSpinBox::textFromValue(double val)
 
 static void _init_cbs_textFromValue_c1071_0 (qt_gsi::GenericMethod *decl)
@@ -3181,11 +3185,11 @@ static gsi::Methods methods_QDoubleSpinBox_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*closeEvent", "@hide", false, &_init_cbs_closeEvent_1719_0, &_call_cbs_closeEvent_1719_0, &_set_callback_cbs_closeEvent_1719_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@brief Virtual method void QDoubleSpinBox::contextMenuEvent(QContextMenuEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0);
   methods += new qt_gsi::GenericMethod ("*contextMenuEvent", "@hide", false, &_init_cbs_contextMenuEvent_2363_0, &_call_cbs_contextMenuEvent_2363_0, &_set_callback_cbs_contextMenuEvent_2363_0);
-  methods += new qt_gsi::GenericMethod ("*qt_create", "@brief Method void QDoubleSpinBox::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
+  methods += new qt_gsi::GenericMethod ("*create|qt_create", "@brief Method void QDoubleSpinBox::create(WId, bool initializeWindow, bool destroyOldWindow)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_create_2208, &_call_fp_create_2208);
   methods += new qt_gsi::GenericMethod ("emit_customContextMenuRequested", "@brief Emitter for signal void QDoubleSpinBox::customContextMenuRequested(const QPoint &pos)\nCall this method to emit this signal.", false, &_init_emitter_customContextMenuRequested_1916, &_call_emitter_customContextMenuRequested_1916);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QDoubleSpinBox::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
-  methods += new qt_gsi::GenericMethod ("*qt_destroy", "@brief Method void QDoubleSpinBox::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
+  methods += new qt_gsi::GenericMethod ("*destroy|qt_destroy", "@brief Method void QDoubleSpinBox::destroy(bool destroyWindow, bool destroySubWindows)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_destroy_1620, &_call_fp_destroy_1620);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QDoubleSpinBox::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QDoubleSpinBox::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
@@ -3279,6 +3283,7 @@ static gsi::Methods methods_QDoubleSpinBox_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*stepEnabled", "@hide", true, &_init_cbs_stepEnabled_c0_0, &_call_cbs_stepEnabled_c0_0, &_set_callback_cbs_stepEnabled_c0_0);
   methods += new qt_gsi::GenericMethod ("*tabletEvent", "@brief Virtual method void QDoubleSpinBox::tabletEvent(QTabletEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0);
   methods += new qt_gsi::GenericMethod ("*tabletEvent", "@hide", false, &_init_cbs_tabletEvent_1821_0, &_call_cbs_tabletEvent_1821_0, &_set_callback_cbs_tabletEvent_1821_0);
+  methods += new qt_gsi::GenericMethod ("emit_textChanged", "@brief Emitter for signal void QDoubleSpinBox::textChanged(const QString &)\nCall this method to emit this signal.", false, &_init_emitter_textChanged_2025, &_call_emitter_textChanged_2025);
   methods += new qt_gsi::GenericMethod ("textFromValue", "@brief Virtual method QString QDoubleSpinBox::textFromValue(double val)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_textFromValue_c1071_0, &_call_cbs_textFromValue_c1071_0);
   methods += new qt_gsi::GenericMethod ("textFromValue", "@hide", true, &_init_cbs_textFromValue_c1071_0, &_call_cbs_textFromValue_c1071_0, &_set_callback_cbs_textFromValue_c1071_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QDoubleSpinBox::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);

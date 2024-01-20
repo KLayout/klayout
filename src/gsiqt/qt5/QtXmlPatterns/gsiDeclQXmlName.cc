@@ -79,6 +79,25 @@ static void _call_ctor_QXmlName_7550 (const qt_gsi::GenericStaticMethod * /*decl
 }
 
 
+//  Constructor QXmlName::QXmlName(const QXmlName &other)
+
+
+static void _init_ctor_QXmlName_2084 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<const QXmlName & > (argspec_0);
+  decl->set_return_new<QXmlName> ();
+}
+
+static void _call_ctor_QXmlName_2084 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QXmlName &arg1 = gsi::arg_reader<const QXmlName & >() (args, heap);
+  ret.write<QXmlName *> (new QXmlName (arg1));
+}
+
+
 // bool QXmlName::isNull()
 
 
@@ -238,6 +257,7 @@ static gsi::Methods methods_QXmlName () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlName::QXmlName()\nThis method creates an object of class QXmlName.", &_init_ctor_QXmlName_0, &_call_ctor_QXmlName_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlName::QXmlName(QXmlNamePool &namePool, const QString &localName, const QString &namespaceURI, const QString &prefix)\nThis method creates an object of class QXmlName.", &_init_ctor_QXmlName_7550, &_call_ctor_QXmlName_7550);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlName::QXmlName(const QXmlName &other)\nThis method creates an object of class QXmlName.", &_init_ctor_QXmlName_2084, &_call_ctor_QXmlName_2084);
   methods += new qt_gsi::GenericMethod ("isNull?", "@brief Method bool QXmlName::isNull()\n", true, &_init_f_isNull_c0, &_call_f_isNull_c0);
   methods += new qt_gsi::GenericMethod ("namespaceUri", "@brief Method QString QXmlName::namespaceUri(const QXmlNamePool &query)\n", true, &_init_f_namespaceUri_c2494, &_call_f_namespaceUri_c2494);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QXmlName::operator!=(const QXmlName &other)\n", true, &_init_f_operator_excl__eq__c2084, &_call_f_operator_excl__eq__c2084);

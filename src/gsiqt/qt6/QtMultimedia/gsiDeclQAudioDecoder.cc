@@ -88,42 +88,6 @@ static void _call_f_bufferAvailable_c0 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
-// void QAudioDecoder::bufferAvailableChanged(bool)
-
-
-static void _init_f_bufferAvailableChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_bufferAvailableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAudioDecoder *)cls)->bufferAvailableChanged (arg1);
-}
-
-
-// void QAudioDecoder::bufferReady()
-
-
-static void _init_f_bufferReady_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_bufferReady_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAudioDecoder *)cls)->bufferReady ();
-}
-
-
 // qint64 QAudioDecoder::duration()
 
 
@@ -136,26 +100,6 @@ static void _call_f_duration_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qint64 > ((qint64)((QAudioDecoder *)cls)->duration ());
-}
-
-
-// void QAudioDecoder::durationChanged(qint64 duration)
-
-
-static void _init_f_durationChanged_986 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("duration");
-  decl->add_arg<qint64 > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_durationChanged_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAudioDecoder *)cls)->durationChanged (arg1);
 }
 
 
@@ -174,26 +118,6 @@ static void _call_f_error_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// void QAudioDecoder::error(QAudioDecoder::Error error)
-
-
-static void _init_f_error_2347 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("error");
-  decl->add_arg<const qt_gsi::Converter<QAudioDecoder::Error>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_error_2347 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QAudioDecoder::Error>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAudioDecoder::Error>::target_type & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAudioDecoder *)cls)->error (qt_gsi::QtToCppAdaptor<QAudioDecoder::Error>(arg1).cref());
-}
-
-
 // QString QAudioDecoder::errorString()
 
 
@@ -209,42 +133,6 @@ static void _call_f_errorString_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// void QAudioDecoder::finished()
-
-
-static void _init_f_finished_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_finished_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAudioDecoder *)cls)->finished ();
-}
-
-
-// void QAudioDecoder::formatChanged(const QAudioFormat &format)
-
-
-static void _init_f_formatChanged_2509 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("format");
-  decl->add_arg<const QAudioFormat & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_formatChanged_2509 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QAudioFormat &arg1 = gsi::arg_reader<const QAudioFormat & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAudioDecoder *)cls)->formatChanged (arg1);
-}
-
-
 // bool QAudioDecoder::isDecoding()
 
 
@@ -257,26 +145,6 @@ static void _call_f_isDecoding_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<bool > ((bool)((QAudioDecoder *)cls)->isDecoding ());
-}
-
-
-// void QAudioDecoder::isDecodingChanged(bool)
-
-
-static void _init_f_isDecodingChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("arg1");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_isDecodingChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAudioDecoder *)cls)->isDecodingChanged (arg1);
 }
 
 
@@ -307,26 +175,6 @@ static void _call_f_position_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qint64 > ((qint64)((QAudioDecoder *)cls)->position ());
-}
-
-
-// void QAudioDecoder::positionChanged(qint64 position)
-
-
-static void _init_f_positionChanged_986 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("position");
-  decl->add_arg<qint64 > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_positionChanged_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAudioDecoder *)cls)->positionChanged (arg1);
 }
 
 
@@ -420,22 +268,6 @@ static void _call_f_source_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// void QAudioDecoder::sourceChanged()
-
-
-static void _init_f_sourceChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_sourceChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAudioDecoder *)cls)->sourceChanged ();
-}
-
-
 // QIODevice *QAudioDecoder::sourceDevice()
 
 
@@ -516,29 +348,31 @@ static gsi::Methods methods_QAudioDecoder () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":audioFormat", "@brief Method QAudioFormat QAudioDecoder::audioFormat()\n", true, &_init_f_audioFormat_c0, &_call_f_audioFormat_c0);
   methods += new qt_gsi::GenericMethod (":bufferAvailable", "@brief Method bool QAudioDecoder::bufferAvailable()\n", true, &_init_f_bufferAvailable_c0, &_call_f_bufferAvailable_c0);
-  methods += new qt_gsi::GenericMethod ("bufferAvailableChanged", "@brief Method void QAudioDecoder::bufferAvailableChanged(bool)\n", false, &_init_f_bufferAvailableChanged_864, &_call_f_bufferAvailableChanged_864);
-  methods += new qt_gsi::GenericMethod ("bufferReady", "@brief Method void QAudioDecoder::bufferReady()\n", false, &_init_f_bufferReady_0, &_call_f_bufferReady_0);
   methods += new qt_gsi::GenericMethod ("duration", "@brief Method qint64 QAudioDecoder::duration()\n", true, &_init_f_duration_c0, &_call_f_duration_c0);
-  methods += new qt_gsi::GenericMethod ("durationChanged", "@brief Method void QAudioDecoder::durationChanged(qint64 duration)\n", false, &_init_f_durationChanged_986, &_call_f_durationChanged_986);
-  methods += new qt_gsi::GenericMethod (":error", "@brief Method QAudioDecoder::Error QAudioDecoder::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
-  methods += new qt_gsi::GenericMethod ("error_sig", "@brief Method void QAudioDecoder::error(QAudioDecoder::Error error)\n", false, &_init_f_error_2347, &_call_f_error_2347);
+  methods += new qt_gsi::GenericMethod ("error", "@brief Method QAudioDecoder::Error QAudioDecoder::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QAudioDecoder::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
-  methods += new qt_gsi::GenericMethod ("finished", "@brief Method void QAudioDecoder::finished()\n", false, &_init_f_finished_0, &_call_f_finished_0);
-  methods += new qt_gsi::GenericMethod ("formatChanged", "@brief Method void QAudioDecoder::formatChanged(const QAudioFormat &format)\n", false, &_init_f_formatChanged_2509, &_call_f_formatChanged_2509);
-  methods += new qt_gsi::GenericMethod ("isDecoding?", "@brief Method bool QAudioDecoder::isDecoding()\n", true, &_init_f_isDecoding_c0, &_call_f_isDecoding_c0);
-  methods += new qt_gsi::GenericMethod ("isDecodingChanged?", "@brief Method void QAudioDecoder::isDecodingChanged(bool)\n", false, &_init_f_isDecodingChanged_864, &_call_f_isDecodingChanged_864);
+  methods += new qt_gsi::GenericMethod ("isDecoding?|:isDecoding", "@brief Method bool QAudioDecoder::isDecoding()\n", true, &_init_f_isDecoding_c0, &_call_f_isDecoding_c0);
   methods += new qt_gsi::GenericMethod ("isSupported?", "@brief Method bool QAudioDecoder::isSupported()\n", true, &_init_f_isSupported_c0, &_call_f_isSupported_c0);
   methods += new qt_gsi::GenericMethod ("position", "@brief Method qint64 QAudioDecoder::position()\n", true, &_init_f_position_c0, &_call_f_position_c0);
-  methods += new qt_gsi::GenericMethod ("positionChanged", "@brief Method void QAudioDecoder::positionChanged(qint64 position)\n", false, &_init_f_positionChanged_986, &_call_f_positionChanged_986);
   methods += new qt_gsi::GenericMethod ("read", "@brief Method QAudioBuffer QAudioDecoder::read()\n", true, &_init_f_read_c0, &_call_f_read_c0);
   methods += new qt_gsi::GenericMethod ("setAudioFormat|audioFormat=", "@brief Method void QAudioDecoder::setAudioFormat(const QAudioFormat &format)\n", false, &_init_f_setAudioFormat_2509, &_call_f_setAudioFormat_2509);
-  methods += new qt_gsi::GenericMethod ("setSource", "@brief Method void QAudioDecoder::setSource(const QUrl &fileName)\n", false, &_init_f_setSource_1701, &_call_f_setSource_1701);
+  methods += new qt_gsi::GenericMethod ("setSource|source=", "@brief Method void QAudioDecoder::setSource(const QUrl &fileName)\n", false, &_init_f_setSource_1701, &_call_f_setSource_1701);
   methods += new qt_gsi::GenericMethod ("setSourceDevice|sourceDevice=", "@brief Method void QAudioDecoder::setSourceDevice(QIODevice *device)\n", false, &_init_f_setSourceDevice_1447, &_call_f_setSourceDevice_1447);
-  methods += new qt_gsi::GenericMethod ("source", "@brief Method QUrl QAudioDecoder::source()\n", true, &_init_f_source_c0, &_call_f_source_c0);
-  methods += new qt_gsi::GenericMethod ("sourceChanged", "@brief Method void QAudioDecoder::sourceChanged()\n", false, &_init_f_sourceChanged_0, &_call_f_sourceChanged_0);
+  methods += new qt_gsi::GenericMethod (":source", "@brief Method QUrl QAudioDecoder::source()\n", true, &_init_f_source_c0, &_call_f_source_c0);
   methods += new qt_gsi::GenericMethod (":sourceDevice", "@brief Method QIODevice *QAudioDecoder::sourceDevice()\n", true, &_init_f_sourceDevice_c0, &_call_f_sourceDevice_c0);
   methods += new qt_gsi::GenericMethod ("start", "@brief Method void QAudioDecoder::start()\n", false, &_init_f_start_0, &_call_f_start_0);
   methods += new qt_gsi::GenericMethod ("stop", "@brief Method void QAudioDecoder::stop()\n", false, &_init_f_stop_0, &_call_f_stop_0);
+  methods += gsi::qt_signal<bool > ("bufferAvailableChanged(bool)", "bufferAvailableChanged", gsi::arg("arg1"), "@brief Signal declaration for QAudioDecoder::bufferAvailableChanged(bool)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("bufferReady()", "bufferReady", "@brief Signal declaration for QAudioDecoder::bufferReady()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAudioDecoder::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<qint64 > ("durationChanged(qint64)", "durationChanged", gsi::arg("duration"), "@brief Signal declaration for QAudioDecoder::durationChanged(qint64 duration)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QAudioDecoder::Error>::target_type & > ("error(QAudioDecoder::Error)", "error_sig", gsi::arg("error"), "@brief Signal declaration for QAudioDecoder::error(QAudioDecoder::Error error)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("finished()", "finished", "@brief Signal declaration for QAudioDecoder::finished()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QAudioFormat & > ("formatChanged(const QAudioFormat &)", "formatChanged", gsi::arg("format"), "@brief Signal declaration for QAudioDecoder::formatChanged(const QAudioFormat &format)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("isDecodingChanged(bool)", "isDecodingChanged?", gsi::arg("arg1"), "@brief Signal declaration for QAudioDecoder::isDecodingChanged(bool)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QAudioDecoder::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<qint64 > ("positionChanged(qint64)", "positionChanged", gsi::arg("position"), "@brief Signal declaration for QAudioDecoder::positionChanged(qint64 position)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("sourceChanged()", "sourceChanged", "@brief Signal declaration for QAudioDecoder::sourceChanged()\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QAudioDecoder::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;
 }
@@ -592,6 +426,36 @@ public:
     return QAudioDecoder::senderSignalIndex();
   }
 
+  //  [emitter impl] void QAudioDecoder::bufferAvailableChanged(bool)
+  void emitter_QAudioDecoder_bufferAvailableChanged_864(bool arg1)
+  {
+    emit QAudioDecoder::bufferAvailableChanged(arg1);
+  }
+
+  //  [emitter impl] void QAudioDecoder::bufferReady()
+  void emitter_QAudioDecoder_bufferReady_0()
+  {
+    emit QAudioDecoder::bufferReady();
+  }
+
+  //  [emitter impl] void QAudioDecoder::destroyed(QObject *)
+  void emitter_QAudioDecoder_destroyed_1302(QObject *arg1)
+  {
+    emit QAudioDecoder::destroyed(arg1);
+  }
+
+  //  [emitter impl] void QAudioDecoder::durationChanged(qint64 duration)
+  void emitter_QAudioDecoder_durationChanged_986(qint64 duration)
+  {
+    emit QAudioDecoder::durationChanged(duration);
+  }
+
+  //  [emitter impl] void QAudioDecoder::error(QAudioDecoder::Error error)
+  void emitter_QAudioDecoder_error_2347(QAudioDecoder::Error _error)
+  {
+    emit QAudioDecoder::error(_error);
+  }
+
   //  [adaptor impl] bool QAudioDecoder::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -620,6 +484,43 @@ public:
     } else {
       return QAudioDecoder::eventFilter(watched, event);
     }
+  }
+
+  //  [emitter impl] void QAudioDecoder::finished()
+  void emitter_QAudioDecoder_finished_0()
+  {
+    emit QAudioDecoder::finished();
+  }
+
+  //  [emitter impl] void QAudioDecoder::formatChanged(const QAudioFormat &format)
+  void emitter_QAudioDecoder_formatChanged_2509(const QAudioFormat &format)
+  {
+    emit QAudioDecoder::formatChanged(format);
+  }
+
+  //  [emitter impl] void QAudioDecoder::isDecodingChanged(bool)
+  void emitter_QAudioDecoder_isDecodingChanged_864(bool arg1)
+  {
+    emit QAudioDecoder::isDecodingChanged(arg1);
+  }
+
+  //  [emitter impl] void QAudioDecoder::objectNameChanged(const QString &objectName)
+  void emitter_QAudioDecoder_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QAudioDecoder::objectNameChanged(const QString &objectName)'");
+  }
+
+  //  [emitter impl] void QAudioDecoder::positionChanged(qint64 position)
+  void emitter_QAudioDecoder_positionChanged_986(qint64 position)
+  {
+    emit QAudioDecoder::positionChanged(position);
+  }
+
+  //  [emitter impl] void QAudioDecoder::sourceChanged()
+  void emitter_QAudioDecoder_sourceChanged_0()
+  {
+    emit QAudioDecoder::sourceChanged();
   }
 
   //  [adaptor impl] void QAudioDecoder::childEvent(QChildEvent *event)
@@ -710,6 +611,38 @@ static void _call_ctor_QAudioDecoder_Adaptor_1302 (const qt_gsi::GenericStaticMe
 }
 
 
+// emitter void QAudioDecoder::bufferAvailableChanged(bool)
+
+static void _init_emitter_bufferAvailableChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_bufferAvailableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QAudioDecoder_Adaptor *)cls)->emitter_QAudioDecoder_bufferAvailableChanged_864 (arg1);
+}
+
+
+// emitter void QAudioDecoder::bufferReady()
+
+static void _init_emitter_bufferReady_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_bufferReady_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QAudioDecoder_Adaptor *)cls)->emitter_QAudioDecoder_bufferReady_0 ();
+}
+
+
 // void QAudioDecoder::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
@@ -758,6 +691,24 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QAudioDecoder::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QAudioDecoder_Adaptor *)cls)->emitter_QAudioDecoder_destroyed_1302 (arg1);
+}
+
+
 // void QAudioDecoder::disconnectNotify(const QMetaMethod &signal)
 
 static void _init_cbs_disconnectNotify_2394_0 (qt_gsi::GenericMethod *decl)
@@ -779,6 +730,42 @@ static void _call_cbs_disconnectNotify_2394_0 (const qt_gsi::GenericMethod * /*d
 static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Callback &cb)
 {
   ((QAudioDecoder_Adaptor *)cls)->cb_disconnectNotify_2394_0 = cb;
+}
+
+
+// emitter void QAudioDecoder::durationChanged(qint64 duration)
+
+static void _init_emitter_durationChanged_986 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("duration");
+  decl->add_arg<qint64 > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_durationChanged_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
+  ((QAudioDecoder_Adaptor *)cls)->emitter_QAudioDecoder_durationChanged_986 (arg1);
+}
+
+
+// emitter void QAudioDecoder::error(QAudioDecoder::Error error)
+
+static void _init_emitter_error_2347 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("error");
+  decl->add_arg<const qt_gsi::Converter<QAudioDecoder::Error>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_error_2347 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QAudioDecoder::Error>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAudioDecoder::Error>::target_type & >() (args, heap);
+  ((QAudioDecoder_Adaptor *)cls)->emitter_QAudioDecoder_error_2347 (arg1);
 }
 
 
@@ -831,6 +818,56 @@ static void _set_callback_cbs_eventFilter_2411_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QAudioDecoder::finished()
+
+static void _init_emitter_finished_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_finished_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QAudioDecoder_Adaptor *)cls)->emitter_QAudioDecoder_finished_0 ();
+}
+
+
+// emitter void QAudioDecoder::formatChanged(const QAudioFormat &format)
+
+static void _init_emitter_formatChanged_2509 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("format");
+  decl->add_arg<const QAudioFormat & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_formatChanged_2509 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QAudioFormat &arg1 = gsi::arg_reader<const QAudioFormat & >() (args, heap);
+  ((QAudioDecoder_Adaptor *)cls)->emitter_QAudioDecoder_formatChanged_2509 (arg1);
+}
+
+
+// emitter void QAudioDecoder::isDecodingChanged(bool)
+
+static void _init_emitter_isDecodingChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_isDecodingChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QAudioDecoder_Adaptor *)cls)->emitter_QAudioDecoder_isDecodingChanged_864 (arg1);
+}
+
+
 // exposed bool QAudioDecoder::isSignalConnected(const QMetaMethod &signal)
 
 static void _init_fp_isSignalConnected_c2394 (qt_gsi::GenericMethod *decl)
@@ -846,6 +883,42 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
   tl::Heap heap;
   const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QAudioDecoder_Adaptor *)cls)->fp_QAudioDecoder_isSignalConnected_c2394 (arg1));
+}
+
+
+// emitter void QAudioDecoder::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QAudioDecoder_Adaptor *)cls)->emitter_QAudioDecoder_objectNameChanged_4567 (arg1);
+}
+
+
+// emitter void QAudioDecoder::positionChanged(qint64 position)
+
+static void _init_emitter_positionChanged_986 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("position");
+  decl->add_arg<qint64 > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_positionChanged_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
+  ((QAudioDecoder_Adaptor *)cls)->emitter_QAudioDecoder_positionChanged_986 (arg1);
 }
 
 
@@ -895,6 +968,20 @@ static void _call_fp_senderSignalIndex_c0 (const qt_gsi::GenericMethod * /*decl*
 }
 
 
+// emitter void QAudioDecoder::sourceChanged()
+
+static void _init_emitter_sourceChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_sourceChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QAudioDecoder_Adaptor *)cls)->emitter_QAudioDecoder_sourceChanged_0 ();
+}
+
+
 // void QAudioDecoder::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
@@ -927,20 +1014,31 @@ gsi::Class<QAudioDecoder> &qtdecl_QAudioDecoder ();
 static gsi::Methods methods_QAudioDecoder_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAudioDecoder::QAudioDecoder(QObject *parent)\nThis method creates an object of class QAudioDecoder.", &_init_ctor_QAudioDecoder_Adaptor_1302, &_call_ctor_QAudioDecoder_Adaptor_1302);
+  methods += new qt_gsi::GenericMethod ("emit_bufferAvailableChanged", "@brief Emitter for signal void QAudioDecoder::bufferAvailableChanged(bool)\nCall this method to emit this signal.", false, &_init_emitter_bufferAvailableChanged_864, &_call_emitter_bufferAvailableChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_bufferReady", "@brief Emitter for signal void QAudioDecoder::bufferReady()\nCall this method to emit this signal.", false, &_init_emitter_bufferReady_0, &_call_emitter_bufferReady_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QAudioDecoder::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAudioDecoder::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QAudioDecoder::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QAudioDecoder::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
+  methods += new qt_gsi::GenericMethod ("emit_durationChanged", "@brief Emitter for signal void QAudioDecoder::durationChanged(qint64 duration)\nCall this method to emit this signal.", false, &_init_emitter_durationChanged_986, &_call_emitter_durationChanged_986);
+  methods += new qt_gsi::GenericMethod ("emit_error_sig", "@brief Emitter for signal void QAudioDecoder::error(QAudioDecoder::Error error)\nCall this method to emit this signal.", false, &_init_emitter_error_2347, &_call_emitter_error_2347);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAudioDecoder::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QAudioDecoder::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("emit_finished", "@brief Emitter for signal void QAudioDecoder::finished()\nCall this method to emit this signal.", false, &_init_emitter_finished_0, &_call_emitter_finished_0);
+  methods += new qt_gsi::GenericMethod ("emit_formatChanged", "@brief Emitter for signal void QAudioDecoder::formatChanged(const QAudioFormat &format)\nCall this method to emit this signal.", false, &_init_emitter_formatChanged_2509, &_call_emitter_formatChanged_2509);
+  methods += new qt_gsi::GenericMethod ("emit_isDecodingChanged", "@brief Emitter for signal void QAudioDecoder::isDecodingChanged(bool)\nCall this method to emit this signal.", false, &_init_emitter_isDecodingChanged_864, &_call_emitter_isDecodingChanged_864);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QAudioDecoder::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QAudioDecoder::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
+  methods += new qt_gsi::GenericMethod ("emit_positionChanged", "@brief Emitter for signal void QAudioDecoder::positionChanged(qint64 position)\nCall this method to emit this signal.", false, &_init_emitter_positionChanged_986, &_call_emitter_positionChanged_986);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QAudioDecoder::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QAudioDecoder::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QAudioDecoder::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
+  methods += new qt_gsi::GenericMethod ("emit_sourceChanged", "@brief Emitter for signal void QAudioDecoder::sourceChanged()\nCall this method to emit this signal.", false, &_init_emitter_sourceChanged_0, &_call_emitter_sourceChanged_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QAudioDecoder::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;

@@ -841,7 +841,7 @@ QGraphicsLayoutItem_Adaptor::~QGraphicsLayoutItem_Adaptor() { }
 
 static void _init_ctor_QGraphicsLayoutItem_Adaptor_3313 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QGraphicsLayoutItem * > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("isLayout", true, "false");
   decl->add_arg<bool > (argspec_1);
@@ -852,7 +852,7 @@ static void _call_ctor_QGraphicsLayoutItem_Adaptor_3313 (const qt_gsi::GenericSt
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args ? gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap) : gsi::arg_maker<QGraphicsLayoutItem * >() (0, heap);
+  QGraphicsLayoutItem *arg1 = args ? gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap) : gsi::arg_maker<QGraphicsLayoutItem * >() (nullptr, heap);
   bool arg2 = args ? gsi::arg_reader<bool >() (args, heap) : gsi::arg_maker<bool >() (false, heap);
   ret.write<QGraphicsLayoutItem_Adaptor *> (new QGraphicsLayoutItem_Adaptor (arg1, arg2));
 }

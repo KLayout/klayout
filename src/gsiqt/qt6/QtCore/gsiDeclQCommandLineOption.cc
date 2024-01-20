@@ -375,13 +375,13 @@ static gsi::Methods methods_QCommandLineOption () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCommandLineOption::QCommandLineOption(const QCommandLineOption &other)\nThis method creates an object of class QCommandLineOption.", &_init_ctor_QCommandLineOption_3122, &_call_ctor_QCommandLineOption_3122);
   methods += new qt_gsi::GenericMethod (":defaultValues", "@brief Method QStringList QCommandLineOption::defaultValues()\n", true, &_init_f_defaultValues_c0, &_call_f_defaultValues_c0);
   methods += new qt_gsi::GenericMethod (":description", "@brief Method QString QCommandLineOption::description()\n", true, &_init_f_description_c0, &_call_f_description_c0);
-  methods += new qt_gsi::GenericMethod ("flags", "@brief Method QFlags<QCommandLineOption::Flag> QCommandLineOption::flags()\n", true, &_init_f_flags_c0, &_call_f_flags_c0);
+  methods += new qt_gsi::GenericMethod (":flags", "@brief Method QFlags<QCommandLineOption::Flag> QCommandLineOption::flags()\n", true, &_init_f_flags_c0, &_call_f_flags_c0);
   methods += new qt_gsi::GenericMethod ("names", "@brief Method QStringList QCommandLineOption::names()\n", true, &_init_f_names_c0, &_call_f_names_c0);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QCommandLineOption &QCommandLineOption::operator=(const QCommandLineOption &other)\n", false, &_init_f_operator_eq__3122, &_call_f_operator_eq__3122);
   methods += new qt_gsi::GenericMethod ("setDefaultValue", "@brief Method void QCommandLineOption::setDefaultValue(const QString &defaultValue)\n", false, &_init_f_setDefaultValue_2025, &_call_f_setDefaultValue_2025);
   methods += new qt_gsi::GenericMethod ("setDefaultValues|defaultValues=", "@brief Method void QCommandLineOption::setDefaultValues(const QStringList &defaultValues)\n", false, &_init_f_setDefaultValues_2437, &_call_f_setDefaultValues_2437);
   methods += new qt_gsi::GenericMethod ("setDescription|description=", "@brief Method void QCommandLineOption::setDescription(const QString &description)\n", false, &_init_f_setDescription_2025, &_call_f_setDescription_2025);
-  methods += new qt_gsi::GenericMethod ("setFlags", "@brief Method void QCommandLineOption::setFlags(QFlags<QCommandLineOption::Flag> aflags)\n", false, &_init_f_setFlags_3435, &_call_f_setFlags_3435);
+  methods += new qt_gsi::GenericMethod ("setFlags|flags=", "@brief Method void QCommandLineOption::setFlags(QFlags<QCommandLineOption::Flag> aflags)\n", false, &_init_f_setFlags_3435, &_call_f_setFlags_3435);
   methods += new qt_gsi::GenericMethod ("setValueName|valueName=", "@brief Method void QCommandLineOption::setValueName(const QString &name)\n", false, &_init_f_setValueName_2025, &_call_f_setValueName_2025);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QCommandLineOption::swap(QCommandLineOption &other)\n", false, &_init_f_swap_2427, &_call_f_swap_2427);
   methods += new qt_gsi::GenericMethod (":valueName", "@brief Method QString QCommandLineOption::valueName()\n", true, &_init_f_valueName_c0, &_call_f_valueName_c0);

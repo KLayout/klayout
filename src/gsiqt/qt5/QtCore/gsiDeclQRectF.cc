@@ -1390,6 +1390,21 @@ static void _call_f_translated_c1986 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
+// QRectF QRectF::transposed()
+
+
+static void _init_f_transposed_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QRectF > ();
+}
+
+static void _call_f_transposed_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QRectF > ((QRectF)((QRectF *)cls)->transposed ());
+}
+
+
 // QRectF QRectF::united(const QRectF &other)
 
 
@@ -1549,6 +1564,7 @@ static gsi::Methods methods_QRectF () {
   methods += new qt_gsi::GenericMethod ("translate", "@brief Method void QRectF::translate(const QPointF &p)\n", false, &_init_f_translate_1986, &_call_f_translate_1986);
   methods += new qt_gsi::GenericMethod ("translated", "@brief Method QRectF QRectF::translated(double dx, double dy)\n", true, &_init_f_translated_c2034, &_call_f_translated_c2034);
   methods += new qt_gsi::GenericMethod ("translated", "@brief Method QRectF QRectF::translated(const QPointF &p)\n", true, &_init_f_translated_c1986, &_call_f_translated_c1986);
+  methods += new qt_gsi::GenericMethod ("transposed", "@brief Method QRectF QRectF::transposed()\n", true, &_init_f_transposed_c0, &_call_f_transposed_c0);
   methods += new qt_gsi::GenericMethod ("united", "@brief Method QRectF QRectF::united(const QRectF &other)\n", true, &_init_f_united_c1862, &_call_f_united_c1862);
   methods += new qt_gsi::GenericMethod (":width", "@brief Method double QRectF::width()\n", true, &_init_f_width_c0, &_call_f_width_c0);
   methods += new qt_gsi::GenericMethod (":x", "@brief Method double QRectF::x()\n", true, &_init_f_x_c0, &_call_f_x_c0);

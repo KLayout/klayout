@@ -29,9 +29,7 @@
 
 #include <QCalendar>
 #include <QDate>
-#include <QDateTime>
 #include <QLocale>
-#include <QTime>
 #include "gsiQt.h"
 #include "gsiQtCoreCommon.h"
 #include <memory>
@@ -70,44 +68,6 @@ static void _call_ctor_QCalendar_2072 (const qt_gsi::GenericStaticMethod * /*dec
   tl::Heap heap;
   const qt_gsi::Converter<QCalendar::System>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QCalendar::System>::target_type & >() (args, heap);
   ret.write<QCalendar *> (new QCalendar (qt_gsi::QtToCppAdaptor<QCalendar::System>(arg1).cref()));
-}
-
-
-//  Constructor QCalendar::QCalendar(QLatin1String name)
-
-
-static void _init_ctor_QCalendar_1701 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("name");
-  decl->add_arg<QLatin1String > (argspec_0);
-  decl->set_return_new<QCalendar> ();
-}
-
-static void _call_ctor_QCalendar_1701 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QLatin1String arg1 = gsi::arg_reader<QLatin1String >() (args, heap);
-  ret.write<QCalendar *> (new QCalendar (arg1));
-}
-
-
-//  Constructor QCalendar::QCalendar(QStringView name)
-
-
-static void _init_ctor_QCalendar_1559 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("name");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return_new<QCalendar> ();
-}
-
-static void _call_ctor_QCalendar_1559 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QCalendar *> (new QCalendar (arg1));
 }
 
 
@@ -171,37 +131,6 @@ static void _call_f_dateFromParts_c3509 (const qt_gsi::GenericMethod * /*decl*/,
   tl::Heap heap;
   const QCalendar::YearMonthDay &arg1 = gsi::arg_reader<const QCalendar::YearMonthDay & >() (args, heap);
   ret.write<QDate > ((QDate)((QCalendar *)cls)->dateFromParts (arg1));
-}
-
-
-// QString QCalendar::dateTimeToString(QStringView format, const QDateTime &datetime, QDate dateOnly, QTime timeOnly, const QLocale &locale)
-
-
-static void _init_f_dateTimeToString_c7103 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("format");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("datetime");
-  decl->add_arg<const QDateTime & > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("dateOnly");
-  decl->add_arg<QDate > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("timeOnly");
-  decl->add_arg<QTime > (argspec_3);
-  static gsi::ArgSpecBase argspec_4 ("locale");
-  decl->add_arg<const QLocale & > (argspec_4);
-  decl->set_return<QString > ();
-}
-
-static void _call_f_dateTimeToString_c7103 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  const QDateTime &arg2 = gsi::arg_reader<const QDateTime & >() (args, heap);
-  QDate arg3 = gsi::arg_reader<QDate >() (args, heap);
-  QTime arg4 = gsi::arg_reader<QTime >() (args, heap);
-  const QLocale &arg5 = gsi::arg_reader<const QLocale & >() (args, heap);
-  ret.write<QString > ((QString)((QCalendar *)cls)->dateTimeToString (arg1, arg2, arg3, arg4, arg5));
 }
 
 
@@ -641,12 +570,9 @@ static gsi::Methods methods_QCalendar () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCalendar::QCalendar()\nThis method creates an object of class QCalendar.", &_init_ctor_QCalendar_0, &_call_ctor_QCalendar_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCalendar::QCalendar(QCalendar::System system)\nThis method creates an object of class QCalendar.", &_init_ctor_QCalendar_2072, &_call_ctor_QCalendar_2072);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCalendar::QCalendar(QLatin1String name)\nThis method creates an object of class QCalendar.", &_init_ctor_QCalendar_1701, &_call_ctor_QCalendar_1701);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCalendar::QCalendar(QStringView name)\nThis method creates an object of class QCalendar.", &_init_ctor_QCalendar_1559, &_call_ctor_QCalendar_1559);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCalendar::QCalendar(QCalendar::SystemId id)\nThis method creates an object of class QCalendar.", &_init_ctor_QCalendar_2245, &_call_ctor_QCalendar_2245);
   methods += new qt_gsi::GenericMethod ("dateFromParts", "@brief Method QDate QCalendar::dateFromParts(int year, int month, int day)\n", true, &_init_f_dateFromParts_c2085, &_call_f_dateFromParts_c2085);
   methods += new qt_gsi::GenericMethod ("dateFromParts", "@brief Method QDate QCalendar::dateFromParts(const QCalendar::YearMonthDay &parts)\n", true, &_init_f_dateFromParts_c3509, &_call_f_dateFromParts_c3509);
-  methods += new qt_gsi::GenericMethod ("dateTimeToString", "@brief Method QString QCalendar::dateTimeToString(QStringView format, const QDateTime &datetime, QDate dateOnly, QTime timeOnly, const QLocale &locale)\n", true, &_init_f_dateTimeToString_c7103, &_call_f_dateTimeToString_c7103);
   methods += new qt_gsi::GenericMethod ("dayOfWeek", "@brief Method int QCalendar::dayOfWeek(QDate date)\n", true, &_init_f_dayOfWeek_c899, &_call_f_dayOfWeek_c899);
   methods += new qt_gsi::GenericMethod ("daysInMonth", "@brief Method int QCalendar::daysInMonth(int month, int year)\n", true, &_init_f_daysInMonth_c1426, &_call_f_daysInMonth_c1426);
   methods += new qt_gsi::GenericMethod ("daysInYear", "@brief Method int QCalendar::daysInYear(int year)\n", true, &_init_f_daysInYear_c767, &_call_f_daysInYear_c767);

@@ -22,6 +22,7 @@
 
 
 #include "dbPoint.h"
+#include "dbVector.h"
 
 // ----------------------------------------------------------------
 //  Implementation of the custom extractors
@@ -52,6 +53,15 @@ namespace {
       ex.error (tl::to_string (tr ("Expected a point specification")));
     }
   }
+
+}
+
+namespace db
+{
+
+//  instantiations
+template class point<Coord>;
+template class point<DCoord>;
 
 }
 

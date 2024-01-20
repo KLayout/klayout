@@ -22,8 +22,5 @@
 
 #include "../pymodHelper.h"
 
-//  To force linking of the QtCore5Compat module
-#include "../../gsiqt/qtbasic/gsiQtCore5CompatExternals.h"
-FORCE_LINK_GSI_QTCORE5COMPAT
-
+#include "QtCore5CompatMain.h"
 DEFINE_PYMOD(QtCore5Compat, "QtCore5Compat", "KLayout/Qt module 'QtCore5Compat'")

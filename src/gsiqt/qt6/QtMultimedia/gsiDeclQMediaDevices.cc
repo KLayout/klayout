@@ -56,54 +56,6 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// void QMediaDevices::audioInputsChanged()
-
-
-static void _init_f_audioInputsChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_audioInputsChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaDevices *)cls)->audioInputsChanged ();
-}
-
-
-// void QMediaDevices::audioOutputsChanged()
-
-
-static void _init_f_audioOutputsChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_audioOutputsChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaDevices *)cls)->audioOutputsChanged ();
-}
-
-
-// void QMediaDevices::videoInputsChanged()
-
-
-static void _init_f_videoInputsChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_videoInputsChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaDevices *)cls)->videoInputsChanged ();
-}
-
-
 // static QList<QAudioDevice> QMediaDevices::audioInputs()
 
 
@@ -225,16 +177,18 @@ namespace gsi
 static gsi::Methods methods_QMediaDevices () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("audioInputsChanged", "@brief Method void QMediaDevices::audioInputsChanged()\n", false, &_init_f_audioInputsChanged_0, &_call_f_audioInputsChanged_0);
-  methods += new qt_gsi::GenericMethod ("audioOutputsChanged", "@brief Method void QMediaDevices::audioOutputsChanged()\n", false, &_init_f_audioOutputsChanged_0, &_call_f_audioOutputsChanged_0);
-  methods += new qt_gsi::GenericMethod ("videoInputsChanged", "@brief Method void QMediaDevices::videoInputsChanged()\n", false, &_init_f_videoInputsChanged_0, &_call_f_videoInputsChanged_0);
-  methods += new qt_gsi::GenericStaticMethod ("audioInputs", "@brief Static method QList<QAudioDevice> QMediaDevices::audioInputs()\nThis method is static and can be called without an instance.", &_init_f_audioInputs_0, &_call_f_audioInputs_0);
-  methods += new qt_gsi::GenericStaticMethod ("audioOutputs", "@brief Static method QList<QAudioDevice> QMediaDevices::audioOutputs()\nThis method is static and can be called without an instance.", &_init_f_audioOutputs_0, &_call_f_audioOutputs_0);
-  methods += new qt_gsi::GenericStaticMethod ("defaultAudioInput", "@brief Static method QAudioDevice QMediaDevices::defaultAudioInput()\nThis method is static and can be called without an instance.", &_init_f_defaultAudioInput_0, &_call_f_defaultAudioInput_0);
-  methods += new qt_gsi::GenericStaticMethod ("defaultAudioOutput", "@brief Static method QAudioDevice QMediaDevices::defaultAudioOutput()\nThis method is static and can be called without an instance.", &_init_f_defaultAudioOutput_0, &_call_f_defaultAudioOutput_0);
-  methods += new qt_gsi::GenericStaticMethod ("defaultVideoInput", "@brief Static method QCameraDevice QMediaDevices::defaultVideoInput()\nThis method is static and can be called without an instance.", &_init_f_defaultVideoInput_0, &_call_f_defaultVideoInput_0);
+  methods += gsi::qt_signal ("audioInputsChanged()", "audioInputsChanged", "@brief Signal declaration for QMediaDevices::audioInputsChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("audioOutputsChanged()", "audioOutputsChanged", "@brief Signal declaration for QMediaDevices::audioOutputsChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QMediaDevices::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QMediaDevices::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("videoInputsChanged()", "videoInputsChanged", "@brief Signal declaration for QMediaDevices::videoInputsChanged()\nYou can bind a procedure to this signal.");
+  methods += new qt_gsi::GenericStaticMethod (":audioInputs", "@brief Static method QList<QAudioDevice> QMediaDevices::audioInputs()\nThis method is static and can be called without an instance.", &_init_f_audioInputs_0, &_call_f_audioInputs_0);
+  methods += new qt_gsi::GenericStaticMethod (":audioOutputs", "@brief Static method QList<QAudioDevice> QMediaDevices::audioOutputs()\nThis method is static and can be called without an instance.", &_init_f_audioOutputs_0, &_call_f_audioOutputs_0);
+  methods += new qt_gsi::GenericStaticMethod (":defaultAudioInput", "@brief Static method QAudioDevice QMediaDevices::defaultAudioInput()\nThis method is static and can be called without an instance.", &_init_f_defaultAudioInput_0, &_call_f_defaultAudioInput_0);
+  methods += new qt_gsi::GenericStaticMethod (":defaultAudioOutput", "@brief Static method QAudioDevice QMediaDevices::defaultAudioOutput()\nThis method is static and can be called without an instance.", &_init_f_defaultAudioOutput_0, &_call_f_defaultAudioOutput_0);
+  methods += new qt_gsi::GenericStaticMethod (":defaultVideoInput", "@brief Static method QCameraDevice QMediaDevices::defaultVideoInput()\nThis method is static and can be called without an instance.", &_init_f_defaultVideoInput_0, &_call_f_defaultVideoInput_0);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QMediaDevices::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
-  methods += new qt_gsi::GenericStaticMethod ("videoInputs", "@brief Static method QList<QCameraDevice> QMediaDevices::videoInputs()\nThis method is static and can be called without an instance.", &_init_f_videoInputs_0, &_call_f_videoInputs_0);
+  methods += new qt_gsi::GenericStaticMethod (":videoInputs", "@brief Static method QList<QCameraDevice> QMediaDevices::videoInputs()\nThis method is static and can be called without an instance.", &_init_f_videoInputs_0, &_call_f_videoInputs_0);
   return methods;
 }
 
@@ -287,6 +241,24 @@ public:
     return QMediaDevices::senderSignalIndex();
   }
 
+  //  [emitter impl] void QMediaDevices::audioInputsChanged()
+  void emitter_QMediaDevices_audioInputsChanged_0()
+  {
+    emit QMediaDevices::audioInputsChanged();
+  }
+
+  //  [emitter impl] void QMediaDevices::audioOutputsChanged()
+  void emitter_QMediaDevices_audioOutputsChanged_0()
+  {
+    emit QMediaDevices::audioOutputsChanged();
+  }
+
+  //  [emitter impl] void QMediaDevices::destroyed(QObject *)
+  void emitter_QMediaDevices_destroyed_1302(QObject *arg1)
+  {
+    emit QMediaDevices::destroyed(arg1);
+  }
+
   //  [adaptor impl] bool QMediaDevices::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -315,6 +287,19 @@ public:
     } else {
       return QMediaDevices::eventFilter(watched, event);
     }
+  }
+
+  //  [emitter impl] void QMediaDevices::objectNameChanged(const QString &objectName)
+  void emitter_QMediaDevices_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QMediaDevices::objectNameChanged(const QString &objectName)'");
+  }
+
+  //  [emitter impl] void QMediaDevices::videoInputsChanged()
+  void emitter_QMediaDevices_videoInputsChanged_0()
+  {
+    emit QMediaDevices::videoInputsChanged();
   }
 
   //  [adaptor impl] void QMediaDevices::childEvent(QChildEvent *event)
@@ -405,6 +390,34 @@ static void _call_ctor_QMediaDevices_Adaptor_1302 (const qt_gsi::GenericStaticMe
 }
 
 
+// emitter void QMediaDevices::audioInputsChanged()
+
+static void _init_emitter_audioInputsChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_audioInputsChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QMediaDevices_Adaptor *)cls)->emitter_QMediaDevices_audioInputsChanged_0 ();
+}
+
+
+// emitter void QMediaDevices::audioOutputsChanged()
+
+static void _init_emitter_audioOutputsChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_audioOutputsChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QMediaDevices_Adaptor *)cls)->emitter_QMediaDevices_audioOutputsChanged_0 ();
+}
+
+
 // void QMediaDevices::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
@@ -450,6 +463,24 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QMediaDevices_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
+}
+
+
+// emitter void QMediaDevices::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QMediaDevices_Adaptor *)cls)->emitter_QMediaDevices_destroyed_1302 (arg1);
 }
 
 
@@ -544,6 +575,24 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QMediaDevices::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QMediaDevices_Adaptor *)cls)->emitter_QMediaDevices_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QMediaDevices::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -614,6 +663,20 @@ static void _set_callback_cbs_timerEvent_1730_0 (void *cls, const gsi::Callback 
 }
 
 
+// emitter void QMediaDevices::videoInputsChanged()
+
+static void _init_emitter_videoInputsChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_videoInputsChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QMediaDevices_Adaptor *)cls)->emitter_QMediaDevices_videoInputsChanged_0 ();
+}
+
+
 namespace gsi
 {
 
@@ -622,10 +685,13 @@ gsi::Class<QMediaDevices> &qtdecl_QMediaDevices ();
 static gsi::Methods methods_QMediaDevices_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMediaDevices::QMediaDevices(QObject *parent)\nThis method creates an object of class QMediaDevices.", &_init_ctor_QMediaDevices_Adaptor_1302, &_call_ctor_QMediaDevices_Adaptor_1302);
+  methods += new qt_gsi::GenericMethod ("emit_audioInputsChanged", "@brief Emitter for signal void QMediaDevices::audioInputsChanged()\nCall this method to emit this signal.", false, &_init_emitter_audioInputsChanged_0, &_call_emitter_audioInputsChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_audioOutputsChanged", "@brief Emitter for signal void QMediaDevices::audioOutputsChanged()\nCall this method to emit this signal.", false, &_init_emitter_audioOutputsChanged_0, &_call_emitter_audioOutputsChanged_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QMediaDevices::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMediaDevices::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QMediaDevices::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QMediaDevices::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMediaDevices::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
@@ -633,11 +699,13 @@ static gsi::Methods methods_QMediaDevices_Adaptor () {
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QMediaDevices::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QMediaDevices::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QMediaDevices::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QMediaDevices::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QMediaDevices::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QMediaDevices::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QMediaDevices::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("emit_videoInputsChanged", "@brief Emitter for signal void QMediaDevices::videoInputsChanged()\nCall this method to emit this signal.", false, &_init_emitter_videoInputsChanged_0, &_call_emitter_videoInputsChanged_0);
   return methods;
 }
 

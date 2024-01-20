@@ -50,36 +50,6 @@ static void _call_ctor_QXmlStreamEntityDeclaration_0 (const qt_gsi::GenericStati
 }
 
 
-// QStringView QXmlStreamEntityDeclaration::name()
-
-
-static void _init_f_name_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_name_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamEntityDeclaration *)cls)->name ());
-}
-
-
-// QStringView QXmlStreamEntityDeclaration::notationName()
-
-
-static void _init_f_notationName_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_notationName_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamEntityDeclaration *)cls)->notationName ());
-}
-
-
 // bool QXmlStreamEntityDeclaration::operator!=(const QXmlStreamEntityDeclaration &other)
 
 
@@ -118,51 +88,6 @@ static void _call_f_operator_eq__eq__c4082 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// QStringView QXmlStreamEntityDeclaration::publicId()
-
-
-static void _init_f_publicId_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_publicId_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamEntityDeclaration *)cls)->publicId ());
-}
-
-
-// QStringView QXmlStreamEntityDeclaration::systemId()
-
-
-static void _init_f_systemId_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_systemId_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamEntityDeclaration *)cls)->systemId ());
-}
-
-
-// QStringView QXmlStreamEntityDeclaration::value()
-
-
-static void _init_f_value_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_value_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamEntityDeclaration *)cls)->value ());
-}
-
-
 
 namespace gsi
 {
@@ -170,13 +95,8 @@ namespace gsi
 static gsi::Methods methods_QXmlStreamEntityDeclaration () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QXmlStreamEntityDeclaration::QXmlStreamEntityDeclaration()\nThis method creates an object of class QXmlStreamEntityDeclaration.", &_init_ctor_QXmlStreamEntityDeclaration_0, &_call_ctor_QXmlStreamEntityDeclaration_0);
-  methods += new qt_gsi::GenericMethod ("name", "@brief Method QStringView QXmlStreamEntityDeclaration::name()\n", true, &_init_f_name_c0, &_call_f_name_c0);
-  methods += new qt_gsi::GenericMethod ("notationName", "@brief Method QStringView QXmlStreamEntityDeclaration::notationName()\n", true, &_init_f_notationName_c0, &_call_f_notationName_c0);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QXmlStreamEntityDeclaration::operator!=(const QXmlStreamEntityDeclaration &other)\n", true, &_init_f_operator_excl__eq__c4082, &_call_f_operator_excl__eq__c4082);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QXmlStreamEntityDeclaration::operator==(const QXmlStreamEntityDeclaration &other)\n", true, &_init_f_operator_eq__eq__c4082, &_call_f_operator_eq__eq__c4082);
-  methods += new qt_gsi::GenericMethod ("publicId", "@brief Method QStringView QXmlStreamEntityDeclaration::publicId()\n", true, &_init_f_publicId_c0, &_call_f_publicId_c0);
-  methods += new qt_gsi::GenericMethod ("systemId", "@brief Method QStringView QXmlStreamEntityDeclaration::systemId()\n", true, &_init_f_systemId_c0, &_call_f_systemId_c0);
-  methods += new qt_gsi::GenericMethod ("value", "@brief Method QStringView QXmlStreamEntityDeclaration::value()\n", true, &_init_f_value_c0, &_call_f_value_c0);
   return methods;
 }
 

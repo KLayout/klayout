@@ -92,6 +92,21 @@ static void _call_f_newPage_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+// QPagedPaintDevice::PdfVersion QPdfWriter::pdfVersion()
+
+
+static void _init_f_pdfVersion_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<qt_gsi::Converter<QPagedPaintDevice::PdfVersion>::target_type > ();
+}
+
+static void _call_f_pdfVersion_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<qt_gsi::Converter<QPagedPaintDevice::PdfVersion>::target_type > ((qt_gsi::Converter<QPagedPaintDevice::PdfVersion>::target_type)qt_gsi::CppToQtAdaptor<QPagedPaintDevice::PdfVersion>(((QPdfWriter *)cls)->pdfVersion ()));
+}
+
+
 // int QPdfWriter::resolution()
 
 
@@ -184,6 +199,26 @@ static void _call_f_setPageSizeMM_1875 (const qt_gsi::GenericMethod * /*decl*/, 
   const QSizeF &arg1 = gsi::arg_reader<const QSizeF & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QPdfWriter *)cls)->setPageSizeMM (arg1);
+}
+
+
+// void QPdfWriter::setPdfVersion(QPagedPaintDevice::PdfVersion version)
+
+
+static void _init_f_setPdfVersion_3238 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("version");
+  decl->add_arg<const qt_gsi::Converter<QPagedPaintDevice::PdfVersion>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setPdfVersion_3238 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QPagedPaintDevice::PdfVersion>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QPagedPaintDevice::PdfVersion>::target_type & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QPdfWriter *)cls)->setPdfVersion (qt_gsi::QtToCppAdaptor<QPagedPaintDevice::PdfVersion>(arg1).cref());
 }
 
 
@@ -345,11 +380,13 @@ static gsi::Methods methods_QPdfWriter () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod (":creator", "@brief Method QString QPdfWriter::creator()\n", true, &_init_f_creator_c0, &_call_f_creator_c0);
   methods += new qt_gsi::GenericMethod ("newPage", "@brief Method bool QPdfWriter::newPage()\nThis is a reimplementation of QPagedPaintDevice::newPage", false, &_init_f_newPage_0, &_call_f_newPage_0);
+  methods += new qt_gsi::GenericMethod (":pdfVersion", "@brief Method QPagedPaintDevice::PdfVersion QPdfWriter::pdfVersion()\n", true, &_init_f_pdfVersion_c0, &_call_f_pdfVersion_c0);
   methods += new qt_gsi::GenericMethod (":resolution", "@brief Method int QPdfWriter::resolution()\n", true, &_init_f_resolution_c0, &_call_f_resolution_c0);
   methods += new qt_gsi::GenericMethod ("setCreator|creator=", "@brief Method void QPdfWriter::setCreator(const QString &creator)\n", false, &_init_f_setCreator_2025, &_call_f_setCreator_2025);
   methods += new qt_gsi::GenericMethod ("setMargins", "@brief Method void QPdfWriter::setMargins(const QPagedPaintDevice::Margins &m)\nThis is a reimplementation of QPagedPaintDevice::setMargins", false, &_init_f_setMargins_3812, &_call_f_setMargins_3812);
   methods += new qt_gsi::GenericMethod ("setPageSize|pageSize=", "@brief Method void QPdfWriter::setPageSize(QPagedPaintDevice::PageSize size)\nThis is a reimplementation of QPagedPaintDevice::setPageSize", false, &_init_f_setPageSize_3006, &_call_f_setPageSize_3006);
   methods += new qt_gsi::GenericMethod ("setPageSizeMM", "@brief Method void QPdfWriter::setPageSizeMM(const QSizeF &size)\nThis is a reimplementation of QPagedPaintDevice::setPageSizeMM", false, &_init_f_setPageSizeMM_1875, &_call_f_setPageSizeMM_1875);
+  methods += new qt_gsi::GenericMethod ("setPdfVersion|pdfVersion=", "@brief Method void QPdfWriter::setPdfVersion(QPagedPaintDevice::PdfVersion version)\n", false, &_init_f_setPdfVersion_3238, &_call_f_setPdfVersion_3238);
   methods += new qt_gsi::GenericMethod ("setResolution|resolution=", "@brief Method void QPdfWriter::setResolution(int resolution)\n", false, &_init_f_setResolution_767, &_call_f_setResolution_767);
   methods += new qt_gsi::GenericMethod ("setTitle|title=", "@brief Method void QPdfWriter::setTitle(const QString &title)\n", false, &_init_f_setTitle_2025, &_call_f_setTitle_2025);
   methods += new qt_gsi::GenericMethod (":title", "@brief Method QString QPdfWriter::title()\n", true, &_init_f_title_c0, &_call_f_title_c0);
@@ -435,33 +472,33 @@ public:
     emit QPdfWriter::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QPdfWriter::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QPdfWriter::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QPdfWriter::event(arg1);
+    return QPdfWriter::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QPdfWriter_Adaptor, bool, QEvent *>(&QPdfWriter_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QPdfWriter_Adaptor, bool, QEvent *>(&QPdfWriter_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QPdfWriter::event(arg1);
+      return QPdfWriter::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QPdfWriter::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QPdfWriter::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QPdfWriter::eventFilter(arg1, arg2);
+    return QPdfWriter::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QPdfWriter_Adaptor, bool, QObject *, QEvent *>(&QPdfWriter_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QPdfWriter_Adaptor, bool, QObject *, QEvent *>(&QPdfWriter_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QPdfWriter::eventFilter(arg1, arg2);
+      return QPdfWriter::eventFilter(watched, event);
     }
   }
 
@@ -532,33 +569,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QPdfWriter::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QPdfWriter::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QPdfWriter::childEvent(arg1);
+    QPdfWriter::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QPdfWriter_Adaptor, QChildEvent *>(&QPdfWriter_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QPdfWriter_Adaptor, QChildEvent *>(&QPdfWriter_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QPdfWriter::childEvent(arg1);
+      QPdfWriter::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QPdfWriter::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QPdfWriter::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QPdfWriter::customEvent(arg1);
+    QPdfWriter::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QPdfWriter_Adaptor, QEvent *>(&QPdfWriter_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QPdfWriter_Adaptor, QEvent *>(&QPdfWriter_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QPdfWriter::customEvent(arg1);
+      QPdfWriter::customEvent(event);
     }
   }
 
@@ -652,18 +689,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QPdfWriter::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QPdfWriter::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QPdfWriter::timerEvent(arg1);
+    QPdfWriter::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QPdfWriter_Adaptor, QTimerEvent *>(&QPdfWriter_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QPdfWriter_Adaptor, QTimerEvent *>(&QPdfWriter_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QPdfWriter::timerEvent(arg1);
+      QPdfWriter::timerEvent(event);
     }
   }
 
@@ -722,11 +759,11 @@ static void _call_ctor_QPdfWriter_Adaptor_1447 (const qt_gsi::GenericStaticMetho
 }
 
 
-// void QPdfWriter::childEvent(QChildEvent *)
+// void QPdfWriter::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -746,11 +783,11 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QPdfWriter::customEvent(QEvent *)
+// void QPdfWriter::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -774,7 +811,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -783,7 +820,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QPdfWriter_Adaptor *)cls)->emitter_QPdfWriter_destroyed_1302 (arg1);
 }
 
@@ -840,11 +877,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QPdfWriter::event(QEvent *)
+// bool QPdfWriter::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -863,13 +900,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QPdfWriter::eventFilter(QObject *, QEvent *)
+// bool QPdfWriter::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -1170,11 +1207,11 @@ static void _set_callback_cbs_sharedPainter_c0_0 (void *cls, const gsi::Callback
 }
 
 
-// void QPdfWriter::timerEvent(QTimerEvent *)
+// void QPdfWriter::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1203,18 +1240,18 @@ static gsi::Methods methods_QPdfWriter_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPdfWriter::QPdfWriter(const QString &filename)\nThis method creates an object of class QPdfWriter.", &_init_ctor_QPdfWriter_Adaptor_2025, &_call_ctor_QPdfWriter_Adaptor_2025);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QPdfWriter::QPdfWriter(QIODevice *device)\nThis method creates an object of class QPdfWriter.", &_init_ctor_QPdfWriter_Adaptor_1447, &_call_ctor_QPdfWriter_Adaptor_1447);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QPdfWriter::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QPdfWriter::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QPdfWriter::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QPdfWriter::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QPdfWriter::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*devicePageLayout", "@brief Method QPageLayout QPdfWriter::devicePageLayout()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_devicePageLayout_c0, &_call_fp_devicePageLayout_c0);
   methods += new qt_gsi::GenericMethod ("*devicePageLayout", "@brief Method QPageLayout &QPdfWriter::devicePageLayout()\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_devicePageLayout_0, &_call_fp_devicePageLayout_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QPdfWriter::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QPdfWriter::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QPdfWriter::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QPdfWriter::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QPdfWriter::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*initPainter", "@brief Virtual method void QPdfWriter::initPainter(QPainter *painter)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0);
   methods += new qt_gsi::GenericMethod ("*initPainter", "@hide", true, &_init_cbs_initPainter_c1426_0, &_call_cbs_initPainter_c1426_0, &_set_callback_cbs_initPainter_c1426_0);
@@ -1239,7 +1276,7 @@ static gsi::Methods methods_QPdfWriter_Adaptor () {
   methods += new qt_gsi::GenericMethod ("setPageSizeMM", "@hide", false, &_init_cbs_setPageSizeMM_1875_0, &_call_cbs_setPageSizeMM_1875_0, &_set_callback_cbs_setPageSizeMM_1875_0);
   methods += new qt_gsi::GenericMethod ("*sharedPainter", "@brief Virtual method QPainter *QPdfWriter::sharedPainter()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_sharedPainter_c0_0, &_call_cbs_sharedPainter_c0_0);
   methods += new qt_gsi::GenericMethod ("*sharedPainter", "@hide", true, &_init_cbs_sharedPainter_c0_0, &_call_cbs_sharedPainter_c0_0, &_set_callback_cbs_sharedPainter_c0_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QPdfWriter::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QPdfWriter::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   return methods;
 }

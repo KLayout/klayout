@@ -28,6 +28,7 @@
 */
 
 #include <QWaitCondition>
+#include <QDeadlineTimer>
 #include <QMutex>
 #include <QReadWriteLock>
 #include "gsiQt.h"
@@ -49,6 +50,38 @@ static void _call_ctor_QWaitCondition_0 (const qt_gsi::GenericStaticMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QWaitCondition *> (new QWaitCondition ());
+}
+
+
+// void QWaitCondition::notify_all()
+
+
+static void _init_f_notify_all_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_f_notify_all_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QWaitCondition *)cls)->notify_all ();
+}
+
+
+// void QWaitCondition::notify_one()
+
+
+static void _init_f_notify_one_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_f_notify_one_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QWaitCondition *)cls)->notify_one ();
 }
 
 
@@ -74,6 +107,28 @@ static void _call_f_wait_3474 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+// bool QWaitCondition::wait(QMutex *lockedMutex, QDeadlineTimer deadline)
+
+
+static void _init_f_wait_2946 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("lockedMutex");
+  decl->add_arg<QMutex * > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("deadline");
+  decl->add_arg<QDeadlineTimer > (argspec_1);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_wait_2946 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QMutex *arg1 = gsi::arg_reader<QMutex * >() (args, heap);
+  QDeadlineTimer arg2 = gsi::arg_reader<QDeadlineTimer >() (args, heap);
+  ret.write<bool > ((bool)((QWaitCondition *)cls)->wait (arg1, arg2));
+}
+
+
 // bool QWaitCondition::wait(QReadWriteLock *lockedReadWriteLock, unsigned long int time)
 
 
@@ -92,6 +147,28 @@ static void _call_f_wait_4239 (const qt_gsi::GenericMethod * /*decl*/, void *cls
   tl::Heap heap;
   QReadWriteLock *arg1 = gsi::arg_reader<QReadWriteLock * >() (args, heap);
   unsigned long int arg2 = args ? gsi::arg_reader<unsigned long int >() (args, heap) : gsi::arg_maker<unsigned long int >() (ULONG_MAX, heap);
+  ret.write<bool > ((bool)((QWaitCondition *)cls)->wait (arg1, arg2));
+}
+
+
+// bool QWaitCondition::wait(QReadWriteLock *lockedReadWriteLock, QDeadlineTimer deadline)
+
+
+static void _init_f_wait_3711 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("lockedReadWriteLock");
+  decl->add_arg<QReadWriteLock * > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("deadline");
+  decl->add_arg<QDeadlineTimer > (argspec_1);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_wait_3711 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QReadWriteLock *arg1 = gsi::arg_reader<QReadWriteLock * >() (args, heap);
+  QDeadlineTimer arg2 = gsi::arg_reader<QDeadlineTimer >() (args, heap);
   ret.write<bool > ((bool)((QWaitCondition *)cls)->wait (arg1, arg2));
 }
 
@@ -135,8 +212,12 @@ namespace gsi
 static gsi::Methods methods_QWaitCondition () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QWaitCondition::QWaitCondition()\nThis method creates an object of class QWaitCondition.", &_init_ctor_QWaitCondition_0, &_call_ctor_QWaitCondition_0);
+  methods += new qt_gsi::GenericMethod ("notify_all", "@brief Method void QWaitCondition::notify_all()\n", false, &_init_f_notify_all_0, &_call_f_notify_all_0);
+  methods += new qt_gsi::GenericMethod ("notify_one", "@brief Method void QWaitCondition::notify_one()\n", false, &_init_f_notify_one_0, &_call_f_notify_one_0);
   methods += new qt_gsi::GenericMethod ("wait", "@brief Method bool QWaitCondition::wait(QMutex *lockedMutex, unsigned long int time)\n", false, &_init_f_wait_3474, &_call_f_wait_3474);
+  methods += new qt_gsi::GenericMethod ("wait", "@brief Method bool QWaitCondition::wait(QMutex *lockedMutex, QDeadlineTimer deadline)\n", false, &_init_f_wait_2946, &_call_f_wait_2946);
   methods += new qt_gsi::GenericMethod ("wait", "@brief Method bool QWaitCondition::wait(QReadWriteLock *lockedReadWriteLock, unsigned long int time)\n", false, &_init_f_wait_4239, &_call_f_wait_4239);
+  methods += new qt_gsi::GenericMethod ("wait", "@brief Method bool QWaitCondition::wait(QReadWriteLock *lockedReadWriteLock, QDeadlineTimer deadline)\n", false, &_init_f_wait_3711, &_call_f_wait_3711);
   methods += new qt_gsi::GenericMethod ("wakeAll", "@brief Method void QWaitCondition::wakeAll()\n", false, &_init_f_wakeAll_0, &_call_f_wakeAll_0);
   methods += new qt_gsi::GenericMethod ("wakeOne", "@brief Method void QWaitCondition::wakeOne()\n", false, &_init_f_wakeOne_0, &_call_f_wakeOne_0);
   return methods;

@@ -33,6 +33,16 @@
 namespace db {
 
 /**
+ *  @brief A generic constant describing the "fuzzyness" of a double comparison of a value around 1
+ */
+const double epsilon = 1e-10;
+
+/**
+ *  @brief A generic constant describing the "fuzzyness" of a float comparison of a value around 1
+ */
+const double fepsilon = 1e-6;
+
+/**
  *  @brief The standard integer coordinate type
  */
 #if defined(HAVE_64BIT_COORD)
@@ -424,7 +434,7 @@ struct coord_traits<double>
   {
     double dx1 = ax - cx, dy1 = ay - cy;
     double dx2 = bx - cx, dy2 = by - cy;
-    double pa = (sqrt (dx1 * dx1 + dy1 * dy1) + sqrt (dx2 * dx2 + dy2 * dy2)) * prec ();
+    double pa = (sqrt (dx1 * dx1 + dy1 * dy1) + sqrt (dx2 * dx2 + dy2 * dy2)) * db::epsilon;
     area_type p1 = dx1 * dx2;
     area_type p2 = -dy1 * dy2;
     if (p1 <= p2 - pa) {
@@ -440,7 +450,7 @@ struct coord_traits<double>
   {
     double dx1 = ax - cx, dy1 = ay - cy;
     double dx2 = bx - cx, dy2 = by - cy;
-    double pa = (sqrt (dx1 * dx1 + dy1 * dy1) + sqrt (dx2 * dx2 + dy2 * dy2)) * prec ();
+    double pa = (sqrt (dx1 * dx1 + dy1 * dy1) + sqrt (dx2 * dx2 + dy2 * dy2)) * db::epsilon;
     area_type p1 = dx1 * dx2;
     area_type p2 = -dy1 * dy2;
     if (p1 <= p2 - pa) {
@@ -463,7 +473,7 @@ struct coord_traits<double>
   {
     double dx1 = ax - cx, dy1 = ay - cy;
     double dx2 = bx - cx, dy2 = by - cy;
-    double pa = (sqrt (dx1 * dx1 + dy1 * dy1) + sqrt (dx2 * dx2 + dy2 * dy2)) * prec ();
+    double pa = (sqrt (dx1 * dx1 + dy1 * dy1) + sqrt (dx2 * dx2 + dy2 * dy2)) * db::epsilon;
     area_type p1 = dx1 * dy2;
     area_type p2 = dy1 * dx2;
     if (p1 <= p2 - pa) {
@@ -479,7 +489,7 @@ struct coord_traits<double>
   {
     double dx1 = ax - cx, dy1 = ay - cy;
     double dx2 = bx - cx, dy2 = by - cy;
-    double pa = (sqrt (dx1 * dx1 + dy1 * dy1) + sqrt (dx2 * dx2 + dy2 * dy2)) * prec ();
+    double pa = (sqrt (dx1 * dx1 + dy1 * dy1) + sqrt (dx2 * dx2 + dy2 * dy2)) * db::epsilon;
     area_type p1 = dx1 * dy2;
     area_type p2 = dy1 * dx2;
     if (p1 <= p2 - pa) {
@@ -536,16 +546,6 @@ struct cast_op
     return U (t);
   }
 };
-
-/**
- *  @brief A generic constant describing the "fuzzyness" of a double comparison of a value around 1
- */
-const double epsilon = 1e-10;
-
-/**
- *  @brief A generic constant describing the "fuzzyness" of a float comparison of a value around 1
- */
-const double fepsilon = 1e-6;
 
 /**
  *  @brief A functor wrapping the epsilon constant in a templatized form

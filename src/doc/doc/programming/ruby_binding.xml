@@ -408,6 +408,22 @@ A::new.f(x)
   omitted, the default value is used instead.
   </p>
 
+  <h3>Keyword arguments</h3>
+
+  <p>
+  Starting with version 3, Ruby supports "real" keyword arguments.
+  Keyword arguments are supported for most methods with the exception of a few built-in ones such as "assign".
+  Keyword arguments can be used when the other, non-optional arguments are given either by
+  positional arguments or other keyword arguments.
+  </p>
+
+  <p>
+  Keyword arguments are somewhat more expressive and allow a shorter notation. For example,
+  to instantiate a 45 degree rotation, you can write:
+  </p>
+
+  <pre>t = RBA::CplxTrans::new(rot: 45)</pre>
+
   <h2>Implicit conversions</h2>
 
   <h3>String arguments</h3>

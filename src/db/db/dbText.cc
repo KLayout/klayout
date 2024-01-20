@@ -121,8 +121,8 @@ std::string text<C>::to_string (double dbu) const
   return s;
 }
 
-template class DB_PUBLIC text<Coord>;
-template class DB_PUBLIC text<DCoord>;
+template class text<Coord>;
+template class text<DCoord>;
 
 }
 

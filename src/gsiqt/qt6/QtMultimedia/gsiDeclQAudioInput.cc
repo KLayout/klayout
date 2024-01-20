@@ -70,22 +70,6 @@ static void _call_f_device_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// void QAudioInput::deviceChanged()
-
-
-static void _init_f_deviceChanged_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_deviceChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAudioInput *)cls)->deviceChanged ();
-}
-
-
 // bool QAudioInput::isMuted()
 
 
@@ -98,26 +82,6 @@ static void _call_f_isMuted_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<bool > ((bool)((QAudioInput *)cls)->isMuted ());
-}
-
-
-// void QAudioInput::mutedChanged(bool muted)
-
-
-static void _init_f_mutedChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("muted");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_mutedChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAudioInput *)cls)->mutedChanged (arg1);
 }
 
 
@@ -196,26 +160,6 @@ static void _call_f_volume_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// void QAudioInput::volumeChanged(float volume)
-
-
-static void _init_f_volumeChanged_970 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("volume");
-  decl->add_arg<float > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_volumeChanged_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  float arg1 = gsi::arg_reader<float >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QAudioInput *)cls)->volumeChanged (arg1);
-}
-
-
 // static QString QAudioInput::tr(const char *s, const char *c, int n)
 
 
@@ -247,15 +191,17 @@ namespace gsi
 static gsi::Methods methods_QAudioInput () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("device", "@brief Method QAudioDevice QAudioInput::device()\n", true, &_init_f_device_c0, &_call_f_device_c0);
-  methods += new qt_gsi::GenericMethod ("deviceChanged", "@brief Method void QAudioInput::deviceChanged()\n", false, &_init_f_deviceChanged_0, &_call_f_deviceChanged_0);
-  methods += new qt_gsi::GenericMethod ("isMuted?", "@brief Method bool QAudioInput::isMuted()\n", true, &_init_f_isMuted_c0, &_call_f_isMuted_c0);
-  methods += new qt_gsi::GenericMethod ("mutedChanged", "@brief Method void QAudioInput::mutedChanged(bool muted)\n", false, &_init_f_mutedChanged_864, &_call_f_mutedChanged_864);
-  methods += new qt_gsi::GenericMethod ("setDevice", "@brief Method void QAudioInput::setDevice(const QAudioDevice &device)\n", false, &_init_f_setDevice_2484, &_call_f_setDevice_2484);
-  methods += new qt_gsi::GenericMethod ("setMuted", "@brief Method void QAudioInput::setMuted(bool muted)\n", false, &_init_f_setMuted_864, &_call_f_setMuted_864);
+  methods += new qt_gsi::GenericMethod (":device", "@brief Method QAudioDevice QAudioInput::device()\n", true, &_init_f_device_c0, &_call_f_device_c0);
+  methods += new qt_gsi::GenericMethod ("isMuted?|:muted", "@brief Method bool QAudioInput::isMuted()\n", true, &_init_f_isMuted_c0, &_call_f_isMuted_c0);
+  methods += new qt_gsi::GenericMethod ("setDevice|device=", "@brief Method void QAudioInput::setDevice(const QAudioDevice &device)\n", false, &_init_f_setDevice_2484, &_call_f_setDevice_2484);
+  methods += new qt_gsi::GenericMethod ("setMuted|muted=", "@brief Method void QAudioInput::setMuted(bool muted)\n", false, &_init_f_setMuted_864, &_call_f_setMuted_864);
   methods += new qt_gsi::GenericMethod ("setVolume|volume=", "@brief Method void QAudioInput::setVolume(float volume)\n", false, &_init_f_setVolume_970, &_call_f_setVolume_970);
   methods += new qt_gsi::GenericMethod (":volume", "@brief Method float QAudioInput::volume()\n", true, &_init_f_volume_c0, &_call_f_volume_c0);
-  methods += new qt_gsi::GenericMethod ("volumeChanged", "@brief Method void QAudioInput::volumeChanged(float volume)\n", false, &_init_f_volumeChanged_970, &_call_f_volumeChanged_970);
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QAudioInput::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("deviceChanged()", "deviceChanged", "@brief Signal declaration for QAudioInput::deviceChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("mutedChanged(bool)", "mutedChanged", gsi::arg("muted"), "@brief Signal declaration for QAudioInput::mutedChanged(bool muted)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QAudioInput::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<float > ("volumeChanged(float)", "volumeChanged", gsi::arg("volume"), "@brief Signal declaration for QAudioInput::volumeChanged(float volume)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QAudioInput::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;
 }
@@ -321,6 +267,18 @@ public:
     return QAudioInput::senderSignalIndex();
   }
 
+  //  [emitter impl] void QAudioInput::destroyed(QObject *)
+  void emitter_QAudioInput_destroyed_1302(QObject *arg1)
+  {
+    emit QAudioInput::destroyed(arg1);
+  }
+
+  //  [emitter impl] void QAudioInput::deviceChanged()
+  void emitter_QAudioInput_deviceChanged_0()
+  {
+    emit QAudioInput::deviceChanged();
+  }
+
   //  [adaptor impl] bool QAudioInput::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -349,6 +307,25 @@ public:
     } else {
       return QAudioInput::eventFilter(watched, event);
     }
+  }
+
+  //  [emitter impl] void QAudioInput::mutedChanged(bool muted)
+  void emitter_QAudioInput_mutedChanged_864(bool muted)
+  {
+    emit QAudioInput::mutedChanged(muted);
+  }
+
+  //  [emitter impl] void QAudioInput::objectNameChanged(const QString &objectName)
+  void emitter_QAudioInput_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QAudioInput::objectNameChanged(const QString &objectName)'");
+  }
+
+  //  [emitter impl] void QAudioInput::volumeChanged(float volume)
+  void emitter_QAudioInput_volumeChanged_970(float volume)
+  {
+    emit QAudioInput::volumeChanged(volume);
   }
 
   //  [adaptor impl] void QAudioInput::childEvent(QChildEvent *event)
@@ -508,6 +485,38 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QAudioInput::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QAudioInput_Adaptor *)cls)->emitter_QAudioInput_destroyed_1302 (arg1);
+}
+
+
+// emitter void QAudioInput::deviceChanged()
+
+static void _init_emitter_deviceChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_deviceChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QAudioInput_Adaptor *)cls)->emitter_QAudioInput_deviceChanged_0 ();
+}
+
+
 // void QAudioInput::disconnectNotify(const QMetaMethod &signal)
 
 static void _init_cbs_disconnectNotify_2394_0 (qt_gsi::GenericMethod *decl)
@@ -599,6 +608,42 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QAudioInput::mutedChanged(bool muted)
+
+static void _init_emitter_mutedChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("muted");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_mutedChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QAudioInput_Adaptor *)cls)->emitter_QAudioInput_mutedChanged_864 (arg1);
+}
+
+
+// emitter void QAudioInput::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QAudioInput_Adaptor *)cls)->emitter_QAudioInput_objectNameChanged_4567 (arg1);
+}
+
+
 // exposed int QAudioInput::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -669,6 +714,24 @@ static void _set_callback_cbs_timerEvent_1730_0 (void *cls, const gsi::Callback 
 }
 
 
+// emitter void QAudioInput::volumeChanged(float volume)
+
+static void _init_emitter_volumeChanged_970 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("volume");
+  decl->add_arg<float > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_volumeChanged_970 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  float arg1 = gsi::arg_reader<float >() (args, heap);
+  ((QAudioInput_Adaptor *)cls)->emitter_QAudioInput_volumeChanged_970 (arg1);
+}
+
+
 namespace gsi
 {
 
@@ -682,6 +745,8 @@ static gsi::Methods methods_QAudioInput_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAudioInput::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QAudioInput::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
+  methods += new qt_gsi::GenericMethod ("emit_deviceChanged", "@brief Emitter for signal void QAudioInput::deviceChanged()\nCall this method to emit this signal.", false, &_init_emitter_deviceChanged_0, &_call_emitter_deviceChanged_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QAudioInput::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAudioInput::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
@@ -689,11 +754,14 @@ static gsi::Methods methods_QAudioInput_Adaptor () {
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QAudioInput::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QAudioInput::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_mutedChanged", "@brief Emitter for signal void QAudioInput::mutedChanged(bool muted)\nCall this method to emit this signal.", false, &_init_emitter_mutedChanged_864, &_call_emitter_mutedChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QAudioInput::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QAudioInput::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QAudioInput::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QAudioInput::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QAudioInput::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("emit_volumeChanged", "@brief Emitter for signal void QAudioInput::volumeChanged(float volume)\nCall this method to emit this signal.", false, &_init_emitter_volumeChanged_970, &_call_emitter_volumeChanged_970);
   return methods;
 }
 

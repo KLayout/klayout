@@ -34,7 +34,7 @@
 namespace rba
 {
 
-void push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, int argc, tl::Heap &heap);
+void push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, VALUE *argv, int argc, VALUE kwargs, tl::Heap &heap);
 
 // -------------------------------------------------------------------
 //  Serialization adaptors for strings, variants, vectors and maps
@@ -521,7 +521,7 @@ struct writer <gsi::ObjectType>
       gsi::SerialArgs retlist (meth->retsize ());
       gsi::SerialArgs arglist (meth->argsize ());
 
-      push_args (arglist, meth, RARRAY_PTR (arg), n, *heap);
+      push_args (arglist, meth, RARRAY_PTR (arg), n, Qnil, *heap);
 
       meth->call (0, arglist, retlist);
 
@@ -1026,10 +1026,10 @@ size_t RubyBasedMapAdaptor::serial_size () const
 }
 
 // -------------------------------------------------------------------
-//  Pops an argument from the call or return stack
+//  Pulls an argument from the front of an argument queue
 
 VALUE
-pop_arg (const gsi::ArgType &atype, Proxy *self, gsi::SerialArgs &aserial, tl::Heap &heap)
+pull_arg (const gsi::ArgType &atype, Proxy *self, gsi::SerialArgs &aserial, tl::Heap &heap)
 {
   VALUE ret = Qnil;
   gsi::do_on_type<reader> () (atype.type (), &aserial, &ret, self, atype, &heap);

@@ -173,6 +173,26 @@ static void _call_f_screenPos_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
+// void QMouseEvent::setLocalPos(const QPointF &localPosition)
+
+
+static void _init_f_setLocalPos_1986 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("localPosition");
+  decl->add_arg<const QPointF & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setLocalPos_1986 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QPointF &arg1 = gsi::arg_reader<const QPointF & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QMouseEvent *)cls)->setLocalPos (arg1);
+}
+
+
 // Qt::MouseEventSource QMouseEvent::source()
 
 
@@ -244,9 +264,10 @@ static gsi::Methods methods_QMouseEvent () {
   methods += new qt_gsi::GenericMethod ("globalPos", "@brief Method QPoint QMouseEvent::globalPos()\n", true, &_init_f_globalPos_c0, &_call_f_globalPos_c0);
   methods += new qt_gsi::GenericMethod ("globalX", "@brief Method int QMouseEvent::globalX()\n", true, &_init_f_globalX_c0, &_call_f_globalX_c0);
   methods += new qt_gsi::GenericMethod ("globalY", "@brief Method int QMouseEvent::globalY()\n", true, &_init_f_globalY_c0, &_call_f_globalY_c0);
-  methods += new qt_gsi::GenericMethod ("localPos", "@brief Method const QPointF &QMouseEvent::localPos()\n", true, &_init_f_localPos_c0, &_call_f_localPos_c0);
+  methods += new qt_gsi::GenericMethod (":localPos", "@brief Method const QPointF &QMouseEvent::localPos()\n", true, &_init_f_localPos_c0, &_call_f_localPos_c0);
   methods += new qt_gsi::GenericMethod ("pos", "@brief Method QPoint QMouseEvent::pos()\n", true, &_init_f_pos_c0, &_call_f_pos_c0);
   methods += new qt_gsi::GenericMethod ("screenPos", "@brief Method const QPointF &QMouseEvent::screenPos()\n", true, &_init_f_screenPos_c0, &_call_f_screenPos_c0);
+  methods += new qt_gsi::GenericMethod ("setLocalPos|localPos=", "@brief Method void QMouseEvent::setLocalPos(const QPointF &localPosition)\n", false, &_init_f_setLocalPos_1986, &_call_f_setLocalPos_1986);
   methods += new qt_gsi::GenericMethod ("source", "@brief Method Qt::MouseEventSource QMouseEvent::source()\n", true, &_init_f_source_c0, &_call_f_source_c0);
   methods += new qt_gsi::GenericMethod ("windowPos", "@brief Method const QPointF &QMouseEvent::windowPos()\n", true, &_init_f_windowPos_c0, &_call_f_windowPos_c0);
   methods += new qt_gsi::GenericMethod ("x", "@brief Method int QMouseEvent::x()\n", true, &_init_f_x_c0, &_call_f_x_c0);
@@ -285,6 +306,12 @@ public:
 
   //  [adaptor ctor] QMouseEvent::QMouseEvent(QEvent::Type type, const QPointF &localPos, const QPointF &windowPos, const QPointF &screenPos, Qt::MouseButton button, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers)
   QMouseEvent_Adaptor(QEvent::Type type, const QPointF &localPos, const QPointF &windowPos, const QPointF &screenPos, Qt::MouseButton button, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers) : QMouseEvent(type, localPos, windowPos, screenPos, button, buttons, modifiers)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
+  //  [adaptor ctor] QMouseEvent::QMouseEvent(QEvent::Type type, const QPointF &localPos, const QPointF &windowPos, const QPointF &screenPos, Qt::MouseButton button, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::MouseEventSource source)
+  QMouseEvent_Adaptor(QEvent::Type type, const QPointF &localPos, const QPointF &windowPos, const QPointF &screenPos, Qt::MouseButton button, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::MouseEventSource source) : QMouseEvent(type, localPos, windowPos, screenPos, button, buttons, modifiers, source)
   {
     qt_gsi::QtObjectBase::init (this);
   }
@@ -393,6 +420,45 @@ static void _call_ctor_QMouseEvent_Adaptor_14460 (const qt_gsi::GenericStaticMet
 }
 
 
+//  Constructor QMouseEvent::QMouseEvent(QEvent::Type type, const QPointF &localPos, const QPointF &windowPos, const QPointF &screenPos, Qt::MouseButton button, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::MouseEventSource source) (adaptor class)
+
+static void _init_ctor_QMouseEvent_Adaptor_16761 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("type");
+  decl->add_arg<const qt_gsi::Converter<QEvent::Type>::target_type & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("localPos");
+  decl->add_arg<const QPointF & > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("windowPos");
+  decl->add_arg<const QPointF & > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("screenPos");
+  decl->add_arg<const QPointF & > (argspec_3);
+  static gsi::ArgSpecBase argspec_4 ("button");
+  decl->add_arg<const qt_gsi::Converter<Qt::MouseButton>::target_type & > (argspec_4);
+  static gsi::ArgSpecBase argspec_5 ("buttons");
+  decl->add_arg<QFlags<Qt::MouseButton> > (argspec_5);
+  static gsi::ArgSpecBase argspec_6 ("modifiers");
+  decl->add_arg<QFlags<Qt::KeyboardModifier> > (argspec_6);
+  static gsi::ArgSpecBase argspec_7 ("source");
+  decl->add_arg<const qt_gsi::Converter<Qt::MouseEventSource>::target_type & > (argspec_7);
+  decl->set_return_new<QMouseEvent_Adaptor> ();
+}
+
+static void _call_ctor_QMouseEvent_Adaptor_16761 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QEvent::Type>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QEvent::Type>::target_type & >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg3 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg4 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const qt_gsi::Converter<Qt::MouseButton>::target_type & arg5 = gsi::arg_reader<const qt_gsi::Converter<Qt::MouseButton>::target_type & >() (args, heap);
+  QFlags<Qt::MouseButton> arg6 = gsi::arg_reader<QFlags<Qt::MouseButton> >() (args, heap);
+  QFlags<Qt::KeyboardModifier> arg7 = gsi::arg_reader<QFlags<Qt::KeyboardModifier> >() (args, heap);
+  const qt_gsi::Converter<Qt::MouseEventSource>::target_type & arg8 = gsi::arg_reader<const qt_gsi::Converter<Qt::MouseEventSource>::target_type & >() (args, heap);
+  ret.write<QMouseEvent_Adaptor *> (new QMouseEvent_Adaptor (qt_gsi::QtToCppAdaptor<QEvent::Type>(arg1).cref(), arg2, arg3, arg4, qt_gsi::QtToCppAdaptor<Qt::MouseButton>(arg5).cref(), arg6, arg7, qt_gsi::QtToCppAdaptor<Qt::MouseEventSource>(arg8).cref()));
+}
+
+
 namespace gsi
 {
 
@@ -403,6 +469,7 @@ static gsi::Methods methods_QMouseEvent_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMouseEvent::QMouseEvent(QEvent::Type type, const QPointF &localPos, Qt::MouseButton button, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers)\nThis method creates an object of class QMouseEvent.", &_init_ctor_QMouseEvent_Adaptor_10704, &_call_ctor_QMouseEvent_Adaptor_10704);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMouseEvent::QMouseEvent(QEvent::Type type, const QPointF &localPos, const QPointF &screenPos, Qt::MouseButton button, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers)\nThis method creates an object of class QMouseEvent.", &_init_ctor_QMouseEvent_Adaptor_12582, &_call_ctor_QMouseEvent_Adaptor_12582);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMouseEvent::QMouseEvent(QEvent::Type type, const QPointF &localPos, const QPointF &windowPos, const QPointF &screenPos, Qt::MouseButton button, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers)\nThis method creates an object of class QMouseEvent.", &_init_ctor_QMouseEvent_Adaptor_14460, &_call_ctor_QMouseEvent_Adaptor_14460);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMouseEvent::QMouseEvent(QEvent::Type type, const QPointF &localPos, const QPointF &windowPos, const QPointF &screenPos, Qt::MouseButton button, QFlags<Qt::MouseButton> buttons, QFlags<Qt::KeyboardModifier> modifiers, Qt::MouseEventSource source)\nThis method creates an object of class QMouseEvent.", &_init_ctor_QMouseEvent_Adaptor_16761, &_call_ctor_QMouseEvent_Adaptor_16761);
   return methods;
 }
 

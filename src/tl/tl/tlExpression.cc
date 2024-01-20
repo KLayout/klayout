@@ -306,12 +306,12 @@ class TL_PUBLIC ListClass
   : public EvalClass
 {
 public:
-  void execute (const ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args) const
+  void execute (const ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const
   {
     if (method == "push") {
 
-      if (args.size () != 1) {
-        throw EvalError (tl::to_string (tr ("'push' method expects one argument")), context);
+      if (args.size () != 1 || kwargs) {
+        throw EvalError (tl::to_string (tr ("'push' method expects one argument (keyword arguments not permitted)")), context);
       }
 
       object.push (args [0]);
@@ -319,7 +319,7 @@ public:
 
     } else if (method == "size") {
       
-      if (args.size () != 0) {
+      if (args.size () != 0 || kwargs) {
         throw EvalError (tl::to_string (tr ("'size' method does not accept an argument")), context);
       }
 
@@ -343,12 +343,12 @@ class TL_PUBLIC ArrayClass
   : public EvalClass
 {
 public:
-  void execute (const ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args) const
+  void execute (const ExpressionParserContext &context, tl::Variant &out, tl::Variant &object, const std::string &method, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> *kwargs) const
   {
     if (method == "insert") {
 
-      if (args.size () != 2) {
-        throw EvalError (tl::to_string (tr ("'insert' method expects two arguments")), context);
+      if (args.size () != 2 || kwargs) {
+        throw EvalError (tl::to_string (tr ("'insert' method expects two arguments (keyword arguments not permitted)")), context);
       }
 
       object.insert (args [0], args [1]);
@@ -356,7 +356,7 @@ public:
 
     } else if (method == "size") {
       
-      if (args.size () != 0) {
+      if (args.size () != 0 || kwargs) {
         throw EvalError (tl::to_string (tr ("'size' method does not accept an argument")), context);
       }
 
@@ -364,7 +364,7 @@ public:
     
     } else if (method == "keys") {
 
-      if (args.size () != 0) {
+      if (args.size () != 0 || kwargs) {
         throw EvalError (tl::to_string (tr ("'keys' method does not accept an argument")), context);
       }
 
@@ -375,7 +375,7 @@ public:
 
     } else if (method == "values") {
 
-      if (args.size () != 0) {
+      if (args.size () != 0 || kwargs) {
         throw EvalError (tl::to_string (tr ("'keys' method does not accept an argument")), context);
       }
 
@@ -411,7 +411,7 @@ ExpressionNode::ExpressionNode (const ExpressionParserContext &context, size_t c
 }
 
 ExpressionNode::ExpressionNode (const ExpressionNode &other, const tl::Expression *expr)
-  : m_context (other.m_context)
+  : m_context (other.m_context), m_name (other.m_name)
 {
   m_context.set_expr (expr);
   m_c.reserve (other.m_c.size ());
@@ -517,7 +517,7 @@ public:
       tl::Variant o;
       std::vector <tl::Variant> vv;
       vv.push_back (*b);
-      c->execute (m_context, o, v.get (), "<", vv);
+      c->execute (m_context, o, v.get (), "<", vv, 0);
       v.swap (o);
 
     } else {
@@ -567,7 +567,7 @@ public:
       tl::Variant o;
       std::vector <tl::Variant> vv;
       vv.push_back (*b);
-      c->execute (m_context, o, v.get (), "<=", vv);
+      c->execute (m_context, o, v.get (), "<=", vv, 0);
       v.swap (o);
 
     } else {
@@ -617,7 +617,7 @@ public:
       tl::Variant o;
       std::vector <tl::Variant> vv;
       vv.push_back (*b);
-      c->execute (m_context, o, v.get (), ">", vv);
+      c->execute (m_context, o, v.get (), ">", vv, 0);
       v.swap (o);
 
     } else {
@@ -667,7 +667,7 @@ public:
       tl::Variant o;
       std::vector <tl::Variant> vv;
       vv.push_back (*b);
-      c->execute (m_context, o, v.get (), ">=", vv);
+      c->execute (m_context, o, v.get (), ">=", vv, 0);
       v.swap (o);
 
     } else {
@@ -717,7 +717,7 @@ public:
       tl::Variant o;
       std::vector <tl::Variant> vv;
       vv.push_back (*b);
-      c->execute (m_context, o, v.get (), "==", vv);
+      c->execute (m_context, o, v.get (), "==", vv, 0);
       v.swap (o);
 
     } else {
@@ -767,7 +767,7 @@ public:
       tl::Variant o;
       std::vector <tl::Variant> vv;
       vv.push_back (*b);
-      c->execute (m_context, o, v.get (), "!=", vv);
+      c->execute (m_context, o, v.get (), "!=", vv, 0);
       v.swap (o);
 
     } else {
@@ -817,7 +817,7 @@ public:
       tl::Variant o;
       std::vector <tl::Variant> vv;
       vv.push_back (*b);
-      c->execute (m_context, o, v.get (), "~", vv);
+      c->execute (m_context, o, v.get (), "~", vv, 0);
       v.swap (o);
 
       mp_eval->match_substrings ().clear ();
@@ -914,7 +914,7 @@ public:
       tl::Variant o;
       std::vector <tl::Variant> vv;
       vv.push_back (*b);
-      c->execute (m_context, o, v.get (), "!~", vv);
+      c->execute (m_context, o, v.get (), "!~", vv, 0);
       v.swap (o);
 
     } else {
@@ -1085,7 +1085,7 @@ public:
       tl::Variant o;
       std::vector <tl::Variant> vv;
       vv.push_back (*b);
-      c->execute (m_context, o, v.get (), "<<", vv);
+      c->execute (m_context, o, v.get (), "<<", vv, 0);
       v.swap (o);
 
     } else if (v->is_longlong ()) {
@@ -1141,7 +1141,7 @@ public:
       tl::Variant o;
       std::vector <tl::Variant> vv;
       vv.push_back (*b);
-      c->execute (m_context, o, v.get (), ">>", vv);
+      c->execute (m_context, o, v.get (), ">>", vv, 0);
       v.swap (o);
 
     } else if (v->is_longlong ()) {
@@ -1197,7 +1197,7 @@ public:
       tl::Variant o;
       std::vector <tl::Variant> vv;
       vv.push_back (*b);
-      c->execute (m_context, o, v.get (), "+", vv);
+      c->execute (m_context, o, v.get (), "+", vv, 0);
       v.swap (o);
 
     } else if (v->is_a_string () || b->is_a_string ()) {
@@ -1259,7 +1259,7 @@ public:
       tl::Variant o;
       std::vector <tl::Variant> vv;
       vv.push_back (*b);
-      c->execute (m_context, o, v.get (), "-", vv);
+      c->execute (m_context, o, v.get (), "-", vv, 0);
       v.swap (o);
 
     } else if (v->is_double () || b->is_double ()) {
@@ -1319,7 +1319,7 @@ public:
       tl::Variant o;
       std::vector <tl::Variant> vv;
       vv.push_back (*b);
-      c->execute (m_context, o, v.get (), "*", vv);
+      c->execute (m_context, o, v.get (), "*", vv, 0);
       v.swap (o);
 
     } else if (v->is_a_string ()) {
@@ -1409,7 +1409,7 @@ public:
       tl::Variant o;
       std::vector <tl::Variant> vv;
       vv.push_back (*b);
-      c->execute (m_context, o, v.get (), "/", vv);
+      c->execute (m_context, o, v.get (), "/", vv, 0);
       v.swap (o);
 
     } else if (v->is_double () || b->is_double ()) {
@@ -1493,7 +1493,7 @@ public:
       tl::Variant o;
       std::vector <tl::Variant> vv;
       vv.push_back (*b);
-      c->execute (m_context, o, v.get (), "%", vv);
+      c->execute (m_context, o, v.get (), "%", vv, 0);
       v.swap (o);
 
     } else if (v->is_ulonglong () || b->is_ulonglong ()) {
@@ -1565,7 +1565,7 @@ public:
       tl::Variant o;
       std::vector <tl::Variant> vv;
       vv.push_back (*b);
-      c->execute (m_context, o, v.get (), "&", vv);
+      c->execute (m_context, o, v.get (), "&", vv, 0);
       v.swap (o);
 
     } else if (v->is_ulonglong () || b->is_ulonglong ()) {
@@ -1621,7 +1621,7 @@ public:
       tl::Variant o;
       std::vector <tl::Variant> vv;
       vv.push_back (*b);
-      c->execute (m_context, o, v.get (), "|", vv);
+      c->execute (m_context, o, v.get (), "|", vv, 0);
       v.swap (o);
 
     } else if (v->is_ulonglong () || b->is_ulonglong ()) {
@@ -1677,7 +1677,7 @@ public:
       tl::Variant o;
       std::vector <tl::Variant> vv;
       vv.push_back (*b);
-      c->execute (m_context, o, v.get (), "^", vv);
+      c->execute (m_context, o, v.get (), "^", vv, 0);
       v.swap (o);
 
     } else if (v->is_ulonglong () || b->is_ulonglong ()) {
@@ -1733,7 +1733,7 @@ public:
       tl::Variant o;
       std::vector <tl::Variant> vv;
       vv.push_back (*e);
-      c->execute (m_context, o, v.get (), "[]", vv);
+      c->execute (m_context, o, v.get (), "[]", vv, 0);
       v.swap (o);
 
     } else if (v->is_list ()) {
@@ -2025,11 +2025,17 @@ public:
     m_c[0]->execute (v);
 
     std::vector <tl::Variant> vv;
+    std::map <std::string, tl::Variant> kwargs;
+
     vv.reserve (m_c.size () - 1);
     for (std::vector<ExpressionNode *>::const_iterator c = m_c.begin () + 1; c != m_c.end (); ++c) {
       EvalTarget a;
       (*c)->execute (a);
-      vv.push_back (*a);
+      if (! (*c)->name ().empty ()) {
+        kwargs [(*c)->name ()] = *a;
+      } else {
+        vv.push_back (*a);
+      }
     }
 
     const EvalClass *c = 0;
@@ -2048,7 +2054,7 @@ public:
     }
 
     tl::Variant o;
-    c->execute (m_context, o, v.get (), m_method, vv);
+    c->execute (m_context, o, v.get (), m_method, vv, kwargs.empty () ? 0 : &kwargs);
     v.swap (o);
   }
 
@@ -2188,16 +2194,26 @@ public:
   void execute (EvalTarget &v) const 
   {
     std::vector<tl::Variant> vv;
+    std::map<std::string, tl::Variant> kwargs;
+
     vv.reserve (m_c.size ());
 
     for (std::vector<ExpressionNode *>::const_iterator c = m_c.begin (); c != m_c.end (); ++c) {
       EvalTarget a;
       (*c)->execute (a);
-      vv.push_back (*a);
+      if ((*c)->name ().empty ()) {
+        vv.push_back (*a);
+      } else {
+        kwargs[(*c)->name ()] = *a;
+      }
+    }
+
+    if (! kwargs.empty () && ! mp_func->supports_keyword_parameters ()) {
+      throw EvalError (tl::to_string (tr ("Keyword parameters not permitted")), m_context);
     }
 
     tl::Variant o;
-    mp_func->execute (m_context, o, vv);
+    mp_func->execute (m_context, o, vv, kwargs.empty () ? 0 : &kwargs);
     v.swap (o);
   }
 
@@ -2939,7 +2955,7 @@ public:
     ms_functions.erase (m_name);
   }
 
-  void execute (const ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args) const 
+  void execute (const ExpressionParserContext &context, tl::Variant &out, const std::vector<tl::Variant> &args, const std::map<std::string, tl::Variant> * /*kwargs*/) const
   {
     m_func (context, out, args);
   }
@@ -3556,8 +3572,19 @@ Eval::eval_suffix (ExpressionParserContext &ex, std::unique_ptr<ExpressionNode> 
 
           do {
 
+            tl::Extractor exn = ex;
+            std::string n;
+            if (exn.try_read_word (n, "_") && exn.test ("=")) {
+              //  keyword parameter -> read name again to skip it
+              ex.read_word (n, "_");
+              ex.expect ("=");
+            } else {
+              n.clear ();
+            }
+
             std::unique_ptr<ExpressionNode> a;
             eval_assign (ex, a);
+            a->set_name (n);
             m->add_child (a.release ());
 
             if (ex.test (")")) {

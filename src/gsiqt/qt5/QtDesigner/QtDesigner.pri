@@ -7,8 +7,6 @@
 
 SOURCES += \
   gsiQtDesignerMain.cc \
-  $$PWD/gsiDeclQAbstractExtensionFactory.cc \
-  $$PWD/gsiDeclQAbstractExtensionManager.cc \
   $$PWD/gsiDeclQAbstractFormBuilder.cc \
   $$PWD/gsiDeclQFormBuilder.cc
 

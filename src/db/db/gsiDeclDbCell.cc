@@ -4036,7 +4036,7 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "This const version of the \\parent_cell method has been introduced in version 0.25.\n"
   ) +
-  gsi::method_ext ("parent_cell=", &set_parent_cell_ptr,
+  gsi::method_ext ("parent_cell=", &set_parent_cell_ptr, gsi::arg ("new_parent"),
     "@brief Moves the instance to a different cell\n"
     "\n"
     "Both the current and the target cell must live in the same layout.\n"
@@ -4343,7 +4343,7 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "@brief Gets the complex transformation of the instance or the first instance in the array\n"
     "This method is always valid compared to \\trans, since simple transformations can be expressed as complex transformations as well."
   ) +
-  gsi::method_ext ("cplx_trans=", &inst_set_cplx_trans,
+  gsi::method_ext ("cplx_trans=", &inst_set_cplx_trans, gsi::arg ("t"),
     "@brief Sets the complex transformation of the instance or the first instance in the array\n"
     "\n"
     "This method has been introduced in version 0.23."
@@ -4352,7 +4352,7 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "@brief Gets the transformation of the instance or the first instance in the array\n"
     "The transformation returned is only valid if the array does not represent a complex transformation array"
   ) +
-  gsi::method_ext ("trans=", &inst_set_trans,
+  gsi::method_ext ("trans=", &inst_set_trans, gsi::arg ("t"),
     "@brief Sets the transformation of the instance or the first instance in the array\n"
     "\n"
     "This method has been introduced in version 0.23."
@@ -4364,7 +4364,7 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "This method has been introduced in version 0.25.\n"
   ) +
-  gsi::method_ext ("dcplx_trans=|cplx_trans=", &inst_set_dcplx_trans,
+  gsi::method_ext ("dcplx_trans=|cplx_trans=", &inst_set_dcplx_trans, gsi::arg ("t"),
     "@brief Sets the complex transformation of the instance or the first instance in the array (in micrometer units)\n"
     "This method sets the transformation the same way as \\cplx_trans=, but the displacement of this transformation is given in "
     "micrometer units. It is internally translated into database units.\n"
@@ -4378,7 +4378,7 @@ Class<db::Instance> decl_Instance ("db", "Instance",
     "\n"
     "This method has been introduced in version 0.25.\n"
   ) +
-  gsi::method_ext ("dtrans=|trans=", &inst_set_dtrans,
+  gsi::method_ext ("dtrans=|trans=", &inst_set_dtrans, gsi::arg ("t"),
     "@brief Sets the transformation of the instance or the first instance in the array (in micrometer units)\n"
     "This method sets the transformation the same way as \\cplx_trans=, but the displacement of this transformation is given in "
     "micrometer units. It is internally translated into database units.\n"

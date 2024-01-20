@@ -615,7 +615,7 @@ QLayoutItem_Adaptor::~QLayoutItem_Adaptor() { }
 
 static void _init_ctor_QLayoutItem_Adaptor_2750 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("alignment", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("alignment", true, "Qt::Alignment()");
   decl->add_arg<QFlags<Qt::AlignmentFlag> > (argspec_0);
   decl->set_return_new<QLayoutItem_Adaptor> ();
 }
@@ -624,7 +624,7 @@ static void _call_ctor_QLayoutItem_Adaptor_2750 (const qt_gsi::GenericStaticMeth
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<Qt::AlignmentFlag> arg1 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (0, heap);
+  QFlags<Qt::AlignmentFlag> arg1 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (Qt::Alignment(), heap);
   ret.write<QLayoutItem_Adaptor *> (new QLayoutItem_Adaptor (arg1));
 }
 

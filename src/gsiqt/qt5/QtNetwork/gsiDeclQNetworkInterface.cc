@@ -161,6 +161,21 @@ static void _call_f_isValid_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cl
 }
 
 
+// int QNetworkInterface::maximumTransmissionUnit()
+
+
+static void _init_f_maximumTransmissionUnit_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<int > ();
+}
+
+static void _call_f_maximumTransmissionUnit_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<int > ((int)((QNetworkInterface *)cls)->maximumTransmissionUnit ());
+}
+
+
 // QString QNetworkInterface::name()
 
 
@@ -212,6 +227,21 @@ static void _call_f_swap_2358 (const qt_gsi::GenericMethod * /*decl*/, void *cls
   QNetworkInterface &arg1 = gsi::arg_reader<QNetworkInterface & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QNetworkInterface *)cls)->swap (arg1);
+}
+
+
+// QNetworkInterface::InterfaceType QNetworkInterface::type()
+
+
+static void _init_f_type_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<qt_gsi::Converter<QNetworkInterface::InterfaceType>::target_type > ();
+}
+
+static void _call_f_type_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<qt_gsi::Converter<QNetworkInterface::InterfaceType>::target_type > ((qt_gsi::Converter<QNetworkInterface::InterfaceType>::target_type)qt_gsi::CppToQtAdaptor<QNetworkInterface::InterfaceType>(((QNetworkInterface *)cls)->type ()));
 }
 
 
@@ -283,6 +313,44 @@ static void _call_f_interfaceFromName_2025 (const qt_gsi::GenericStaticMethod * 
 }
 
 
+// static int QNetworkInterface::interfaceIndexFromName(const QString &name)
+
+
+static void _init_f_interfaceIndexFromName_2025 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("name");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<int > ();
+}
+
+static void _call_f_interfaceIndexFromName_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ret.write<int > ((int)QNetworkInterface::interfaceIndexFromName (arg1));
+}
+
+
+// static QString QNetworkInterface::interfaceNameFromIndex(int index)
+
+
+static void _init_f_interfaceNameFromIndex_767 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("index");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<QString > ();
+}
+
+static void _call_f_interfaceNameFromIndex_767 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ret.write<QString > ((QString)QNetworkInterface::interfaceNameFromIndex (arg1));
+}
+
+
 
 namespace gsi
 {
@@ -297,13 +365,17 @@ static gsi::Methods methods_QNetworkInterface () {
   methods += new qt_gsi::GenericMethod ("humanReadableName", "@brief Method QString QNetworkInterface::humanReadableName()\n", true, &_init_f_humanReadableName_c0, &_call_f_humanReadableName_c0);
   methods += new qt_gsi::GenericMethod ("index", "@brief Method int QNetworkInterface::index()\n", true, &_init_f_index_c0, &_call_f_index_c0);
   methods += new qt_gsi::GenericMethod ("isValid?", "@brief Method bool QNetworkInterface::isValid()\n", true, &_init_f_isValid_c0, &_call_f_isValid_c0);
+  methods += new qt_gsi::GenericMethod ("maximumTransmissionUnit", "@brief Method int QNetworkInterface::maximumTransmissionUnit()\n", true, &_init_f_maximumTransmissionUnit_c0, &_call_f_maximumTransmissionUnit_c0);
   methods += new qt_gsi::GenericMethod ("name", "@brief Method QString QNetworkInterface::name()\n", true, &_init_f_name_c0, &_call_f_name_c0);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QNetworkInterface &QNetworkInterface::operator=(const QNetworkInterface &other)\n", false, &_init_f_operator_eq__3053, &_call_f_operator_eq__3053);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QNetworkInterface::swap(QNetworkInterface &other)\n", false, &_init_f_swap_2358, &_call_f_swap_2358);
+  methods += new qt_gsi::GenericMethod ("type", "@brief Method QNetworkInterface::InterfaceType QNetworkInterface::type()\n", true, &_init_f_type_c0, &_call_f_type_c0);
   methods += new qt_gsi::GenericStaticMethod ("allAddresses", "@brief Static method QList<QHostAddress> QNetworkInterface::allAddresses()\nThis method is static and can be called without an instance.", &_init_f_allAddresses_0, &_call_f_allAddresses_0);
   methods += new qt_gsi::GenericStaticMethod ("allInterfaces", "@brief Static method QList<QNetworkInterface> QNetworkInterface::allInterfaces()\nThis method is static and can be called without an instance.", &_init_f_allInterfaces_0, &_call_f_allInterfaces_0);
   methods += new qt_gsi::GenericStaticMethod ("interfaceFromIndex", "@brief Static method QNetworkInterface QNetworkInterface::interfaceFromIndex(int index)\nThis method is static and can be called without an instance.", &_init_f_interfaceFromIndex_767, &_call_f_interfaceFromIndex_767);
   methods += new qt_gsi::GenericStaticMethod ("interfaceFromName", "@brief Static method QNetworkInterface QNetworkInterface::interfaceFromName(const QString &name)\nThis method is static and can be called without an instance.", &_init_f_interfaceFromName_2025, &_call_f_interfaceFromName_2025);
+  methods += new qt_gsi::GenericStaticMethod ("interfaceIndexFromName", "@brief Static method int QNetworkInterface::interfaceIndexFromName(const QString &name)\nThis method is static and can be called without an instance.", &_init_f_interfaceIndexFromName_2025, &_call_f_interfaceIndexFromName_2025);
+  methods += new qt_gsi::GenericStaticMethod ("interfaceNameFromIndex", "@brief Static method QString QNetworkInterface::interfaceNameFromIndex(int index)\nThis method is static and can be called without an instance.", &_init_f_interfaceNameFromIndex_767, &_call_f_interfaceNameFromIndex_767);
   return methods;
 }
 
@@ -337,6 +409,39 @@ static gsi::QFlagsClass<QNetworkInterface::InterfaceFlag > decl_QNetworkInterfac
 static gsi::ClassExt<QNetworkInterface> inject_QNetworkInterface_InterfaceFlag_Enum_in_parent (decl_QNetworkInterface_InterfaceFlag_Enum.defs ());
 static gsi::ClassExt<QNetworkInterface> decl_QNetworkInterface_InterfaceFlag_Enum_as_child (decl_QNetworkInterface_InterfaceFlag_Enum, "InterfaceFlag");
 static gsi::ClassExt<QNetworkInterface> decl_QNetworkInterface_InterfaceFlag_Enums_as_child (decl_QNetworkInterface_InterfaceFlag_Enums, "QFlags_InterfaceFlag");
+
+}
+
+
+//  Implementation of the enum wrapper class for QNetworkInterface::InterfaceType
+namespace qt_gsi
+{
+
+static gsi::Enum<QNetworkInterface::InterfaceType> decl_QNetworkInterface_InterfaceType_Enum ("QtNetwork", "QNetworkInterface_InterfaceType",
+    gsi::enum_const ("Loopback", QNetworkInterface::Loopback, "@brief Enum constant QNetworkInterface::Loopback") +
+    gsi::enum_const ("Virtual", QNetworkInterface::Virtual, "@brief Enum constant QNetworkInterface::Virtual") +
+    gsi::enum_const ("Ethernet", QNetworkInterface::Ethernet, "@brief Enum constant QNetworkInterface::Ethernet") +
+    gsi::enum_const ("Slip", QNetworkInterface::Slip, "@brief Enum constant QNetworkInterface::Slip") +
+    gsi::enum_const ("CanBus", QNetworkInterface::CanBus, "@brief Enum constant QNetworkInterface::CanBus") +
+    gsi::enum_const ("Ppp", QNetworkInterface::Ppp, "@brief Enum constant QNetworkInterface::Ppp") +
+    gsi::enum_const ("Fddi", QNetworkInterface::Fddi, "@brief Enum constant QNetworkInterface::Fddi") +
+    gsi::enum_const ("Wifi", QNetworkInterface::Wifi, "@brief Enum constant QNetworkInterface::Wifi") +
+    gsi::enum_const ("Ieee80211", QNetworkInterface::Ieee80211, "@brief Enum constant QNetworkInterface::Ieee80211") +
+    gsi::enum_const ("Phonet", QNetworkInterface::Phonet, "@brief Enum constant QNetworkInterface::Phonet") +
+    gsi::enum_const ("Ieee802154", QNetworkInterface::Ieee802154, "@brief Enum constant QNetworkInterface::Ieee802154") +
+    gsi::enum_const ("SixLoWPAN", QNetworkInterface::SixLoWPAN, "@brief Enum constant QNetworkInterface::SixLoWPAN") +
+    gsi::enum_const ("Ieee80216", QNetworkInterface::Ieee80216, "@brief Enum constant QNetworkInterface::Ieee80216") +
+    gsi::enum_const ("Ieee1394", QNetworkInterface::Ieee1394, "@brief Enum constant QNetworkInterface::Ieee1394") +
+    gsi::enum_const ("Unknown", QNetworkInterface::Unknown, "@brief Enum constant QNetworkInterface::Unknown"),
+  "@qt\n@brief This class represents the QNetworkInterface::InterfaceType enum");
+
+static gsi::QFlagsClass<QNetworkInterface::InterfaceType > decl_QNetworkInterface_InterfaceType_Enums ("QtNetwork", "QNetworkInterface_QFlags_InterfaceType",
+  "@qt\n@brief This class represents the QFlags<QNetworkInterface::InterfaceType> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<QNetworkInterface> inject_QNetworkInterface_InterfaceType_Enum_in_parent (decl_QNetworkInterface_InterfaceType_Enum.defs ());
+static gsi::ClassExt<QNetworkInterface> decl_QNetworkInterface_InterfaceType_Enum_as_child (decl_QNetworkInterface_InterfaceType_Enum, "InterfaceType");
+static gsi::ClassExt<QNetworkInterface> decl_QNetworkInterface_InterfaceType_Enums_as_child (decl_QNetworkInterface_InterfaceType_Enums, "QFlags_InterfaceType");
 
 }
 

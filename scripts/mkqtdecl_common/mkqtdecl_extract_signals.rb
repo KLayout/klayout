@@ -29,6 +29,8 @@ RBA::Class::each_class do |cls|
   classes[cls.name] = true
 end
 
+output = $output ? File.open($output, "w") : stdout
+
 RBA::Class::each_class do |cls|
 
   if cls.name =~ /^Q/ && (cls.name =~ /_Native$/ || !classes[cls.name + "_Native"])
@@ -160,9 +162,9 @@ RBA::Class::each_class do |cls|
               match += ".*int"
             end
           end
-          puts "event(\"#{c}\", /#{match}/, \"#{s}\")"
+          output.puts "event(\"#{c}\", /#{match}/, \"#{s}\")"
           if renamed
-            puts "rename(\"#{c}\", /#{match}/, \"#{renamed}\")"
+            output.puts "rename(\"#{c}\", /#{match}/, \"#{renamed}\")"
           end
         end
       end
@@ -172,4 +174,6 @@ RBA::Class::each_class do |cls|
 
 end
 
-
+if $output
+  output.close
+end

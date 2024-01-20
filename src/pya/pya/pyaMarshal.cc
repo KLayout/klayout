@@ -32,7 +32,7 @@
 namespace pya
 {
 
-void push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, PyObject *args, tl::Heap &heap);
+void push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, PyObject *args, PyObject *kwargs, tl::Heap &heap);
 
 // -------------------------------------------------------------------
 //  Serialization adaptors for strings, variants, vectors and maps
@@ -508,7 +508,7 @@ struct writer<gsi::ObjectType>
       gsi::SerialArgs retlist (meth->retsize ());
       gsi::SerialArgs arglist (meth->argsize ());
 
-      push_args (arglist, meth, arg, *heap);
+      push_args (arglist, meth, arg, NULL, *heap);
 
       meth->call (0, arglist, retlist);
 
@@ -862,7 +862,7 @@ struct reader<gsi::VoidType>
 };
 
 PythonRef
-pop_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, PYAObjectBase *self, tl::Heap &heap)
+pull_arg (const gsi::ArgType &atype, gsi::SerialArgs &aserial, PYAObjectBase *self, tl::Heap &heap)
 {
   PythonRef ret;
   gsi::do_on_type<reader> () (atype.type (), &aserial, &ret, self, atype, &heap);

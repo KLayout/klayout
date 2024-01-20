@@ -284,81 +284,6 @@ static void _call_f_device_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// QStringView QXmlStreamReader::documentEncoding()
-
-
-static void _init_f_documentEncoding_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_documentEncoding_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamReader *)cls)->documentEncoding ());
-}
-
-
-// QStringView QXmlStreamReader::documentVersion()
-
-
-static void _init_f_documentVersion_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_documentVersion_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamReader *)cls)->documentVersion ());
-}
-
-
-// QStringView QXmlStreamReader::dtdName()
-
-
-static void _init_f_dtdName_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_dtdName_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamReader *)cls)->dtdName ());
-}
-
-
-// QStringView QXmlStreamReader::dtdPublicId()
-
-
-static void _init_f_dtdPublicId_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_dtdPublicId_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamReader *)cls)->dtdPublicId ());
-}
-
-
-// QStringView QXmlStreamReader::dtdSystemId()
-
-
-static void _init_f_dtdSystemId_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_dtdSystemId_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamReader *)cls)->dtdSystemId ());
-}
-
-
 // QList<QXmlStreamEntityDeclaration> QXmlStreamReader::entityDeclarations()
 
 
@@ -644,21 +569,6 @@ static void _call_f_lineNumber_c0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// QStringView QXmlStreamReader::name()
-
-
-static void _init_f_name_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_name_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamReader *)cls)->name ());
-}
-
-
 // QList<QXmlStreamNamespaceDeclaration> QXmlStreamReader::namespaceDeclarations()
 
 
@@ -689,21 +599,6 @@ static void _call_f_namespaceProcessing_c0 (const qt_gsi::GenericMethod * /*decl
 }
 
 
-// QStringView QXmlStreamReader::namespaceUri()
-
-
-static void _init_f_namespaceUri_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_namespaceUri_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamReader *)cls)->namespaceUri ());
-}
-
-
 // QList<QXmlStreamNotationDeclaration> QXmlStreamReader::notationDeclarations()
 
 
@@ -716,66 +611,6 @@ static void _call_f_notationDeclarations_c0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QList<QXmlStreamNotationDeclaration> > ((QList<QXmlStreamNotationDeclaration>)((QXmlStreamReader *)cls)->notationDeclarations ());
-}
-
-
-// QStringView QXmlStreamReader::prefix()
-
-
-static void _init_f_prefix_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_prefix_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamReader *)cls)->prefix ());
-}
-
-
-// QStringView QXmlStreamReader::processingInstructionData()
-
-
-static void _init_f_processingInstructionData_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_processingInstructionData_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamReader *)cls)->processingInstructionData ());
-}
-
-
-// QStringView QXmlStreamReader::processingInstructionTarget()
-
-
-static void _init_f_processingInstructionTarget_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_processingInstructionTarget_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamReader *)cls)->processingInstructionTarget ());
-}
-
-
-// QStringView QXmlStreamReader::qualifiedName()
-
-
-static void _init_f_qualifiedName_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_qualifiedName_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamReader *)cls)->qualifiedName ());
 }
 
 
@@ -944,21 +779,6 @@ static void _call_f_skipCurrentElement_0 (const qt_gsi::GenericMethod * /*decl*/
 }
 
 
-// QStringView QXmlStreamReader::text()
-
-
-static void _init_f_text_c0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<QStringView > ();
-}
-
-static void _call_f_text_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  ret.write<QStringView > ((QStringView)((QXmlStreamReader *)cls)->text ());
-}
-
-
 // QString QXmlStreamReader::tokenString()
 
 
@@ -1009,13 +829,8 @@ static gsi::Methods methods_QXmlStreamReader () {
   methods += new qt_gsi::GenericMethod ("clear", "@brief Method void QXmlStreamReader::clear()\n", false, &_init_f_clear_0, &_call_f_clear_0);
   methods += new qt_gsi::GenericMethod ("columnNumber", "@brief Method qint64 QXmlStreamReader::columnNumber()\n", true, &_init_f_columnNumber_c0, &_call_f_columnNumber_c0);
   methods += new qt_gsi::GenericMethod (":device", "@brief Method QIODevice *QXmlStreamReader::device()\n", true, &_init_f_device_c0, &_call_f_device_c0);
-  methods += new qt_gsi::GenericMethod ("documentEncoding", "@brief Method QStringView QXmlStreamReader::documentEncoding()\n", true, &_init_f_documentEncoding_c0, &_call_f_documentEncoding_c0);
-  methods += new qt_gsi::GenericMethod ("documentVersion", "@brief Method QStringView QXmlStreamReader::documentVersion()\n", true, &_init_f_documentVersion_c0, &_call_f_documentVersion_c0);
-  methods += new qt_gsi::GenericMethod ("dtdName", "@brief Method QStringView QXmlStreamReader::dtdName()\n", true, &_init_f_dtdName_c0, &_call_f_dtdName_c0);
-  methods += new qt_gsi::GenericMethod ("dtdPublicId", "@brief Method QStringView QXmlStreamReader::dtdPublicId()\n", true, &_init_f_dtdPublicId_c0, &_call_f_dtdPublicId_c0);
-  methods += new qt_gsi::GenericMethod ("dtdSystemId", "@brief Method QStringView QXmlStreamReader::dtdSystemId()\n", true, &_init_f_dtdSystemId_c0, &_call_f_dtdSystemId_c0);
   methods += new qt_gsi::GenericMethod ("entityDeclarations", "@brief Method QList<QXmlStreamEntityDeclaration> QXmlStreamReader::entityDeclarations()\n", true, &_init_f_entityDeclarations_c0, &_call_f_entityDeclarations_c0);
-  methods += new qt_gsi::GenericMethod ("entityExpansionLimit", "@brief Method int QXmlStreamReader::entityExpansionLimit()\n", true, &_init_f_entityExpansionLimit_c0, &_call_f_entityExpansionLimit_c0);
+  methods += new qt_gsi::GenericMethod (":entityExpansionLimit", "@brief Method int QXmlStreamReader::entityExpansionLimit()\n", true, &_init_f_entityExpansionLimit_c0, &_call_f_entityExpansionLimit_c0);
   methods += new qt_gsi::GenericMethod (":entityResolver", "@brief Method QXmlStreamEntityResolver *QXmlStreamReader::entityResolver()\n", true, &_init_f_entityResolver_c0, &_call_f_entityResolver_c0);
   methods += new qt_gsi::GenericMethod ("error", "@brief Method QXmlStreamReader::Error QXmlStreamReader::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QXmlStreamReader::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
@@ -1033,25 +848,18 @@ static gsi::Methods methods_QXmlStreamReader () {
   methods += new qt_gsi::GenericMethod ("isStartElement?", "@brief Method bool QXmlStreamReader::isStartElement()\n", true, &_init_f_isStartElement_c0, &_call_f_isStartElement_c0);
   methods += new qt_gsi::GenericMethod ("isWhitespace?", "@brief Method bool QXmlStreamReader::isWhitespace()\n", true, &_init_f_isWhitespace_c0, &_call_f_isWhitespace_c0);
   methods += new qt_gsi::GenericMethod ("lineNumber", "@brief Method qint64 QXmlStreamReader::lineNumber()\n", true, &_init_f_lineNumber_c0, &_call_f_lineNumber_c0);
-  methods += new qt_gsi::GenericMethod ("name", "@brief Method QStringView QXmlStreamReader::name()\n", true, &_init_f_name_c0, &_call_f_name_c0);
   methods += new qt_gsi::GenericMethod ("namespaceDeclarations", "@brief Method QList<QXmlStreamNamespaceDeclaration> QXmlStreamReader::namespaceDeclarations()\n", true, &_init_f_namespaceDeclarations_c0, &_call_f_namespaceDeclarations_c0);
   methods += new qt_gsi::GenericMethod (":namespaceProcessing", "@brief Method bool QXmlStreamReader::namespaceProcessing()\n", true, &_init_f_namespaceProcessing_c0, &_call_f_namespaceProcessing_c0);
-  methods += new qt_gsi::GenericMethod ("namespaceUri", "@brief Method QStringView QXmlStreamReader::namespaceUri()\n", true, &_init_f_namespaceUri_c0, &_call_f_namespaceUri_c0);
   methods += new qt_gsi::GenericMethod ("notationDeclarations", "@brief Method QList<QXmlStreamNotationDeclaration> QXmlStreamReader::notationDeclarations()\n", true, &_init_f_notationDeclarations_c0, &_call_f_notationDeclarations_c0);
-  methods += new qt_gsi::GenericMethod ("prefix", "@brief Method QStringView QXmlStreamReader::prefix()\n", true, &_init_f_prefix_c0, &_call_f_prefix_c0);
-  methods += new qt_gsi::GenericMethod ("processingInstructionData", "@brief Method QStringView QXmlStreamReader::processingInstructionData()\n", true, &_init_f_processingInstructionData_c0, &_call_f_processingInstructionData_c0);
-  methods += new qt_gsi::GenericMethod ("processingInstructionTarget", "@brief Method QStringView QXmlStreamReader::processingInstructionTarget()\n", true, &_init_f_processingInstructionTarget_c0, &_call_f_processingInstructionTarget_c0);
-  methods += new qt_gsi::GenericMethod ("qualifiedName", "@brief Method QStringView QXmlStreamReader::qualifiedName()\n", true, &_init_f_qualifiedName_c0, &_call_f_qualifiedName_c0);
   methods += new qt_gsi::GenericMethod ("raiseError", "@brief Method void QXmlStreamReader::raiseError(const QString &message)\n", false, &_init_f_raiseError_2025, &_call_f_raiseError_2025);
   methods += new qt_gsi::GenericMethod ("readElementText", "@brief Method QString QXmlStreamReader::readElementText(QXmlStreamReader::ReadElementTextBehaviour behaviour)\n", false, &_init_f_readElementText_4601, &_call_f_readElementText_4601);
   methods += new qt_gsi::GenericMethod ("readNext", "@brief Method QXmlStreamReader::TokenType QXmlStreamReader::readNext()\n", false, &_init_f_readNext_0, &_call_f_readNext_0);
   methods += new qt_gsi::GenericMethod ("readNextStartElement", "@brief Method bool QXmlStreamReader::readNextStartElement()\n", false, &_init_f_readNextStartElement_0, &_call_f_readNextStartElement_0);
   methods += new qt_gsi::GenericMethod ("setDevice|device=", "@brief Method void QXmlStreamReader::setDevice(QIODevice *device)\n", false, &_init_f_setDevice_1447, &_call_f_setDevice_1447);
-  methods += new qt_gsi::GenericMethod ("setEntityExpansionLimit", "@brief Method void QXmlStreamReader::setEntityExpansionLimit(int limit)\n", false, &_init_f_setEntityExpansionLimit_767, &_call_f_setEntityExpansionLimit_767);
+  methods += new qt_gsi::GenericMethod ("setEntityExpansionLimit|entityExpansionLimit=", "@brief Method void QXmlStreamReader::setEntityExpansionLimit(int limit)\n", false, &_init_f_setEntityExpansionLimit_767, &_call_f_setEntityExpansionLimit_767);
   methods += new qt_gsi::GenericMethod ("setEntityResolver|entityResolver=", "@brief Method void QXmlStreamReader::setEntityResolver(QXmlStreamEntityResolver *resolver)\n", false, &_init_f_setEntityResolver_3115, &_call_f_setEntityResolver_3115);
   methods += new qt_gsi::GenericMethod ("setNamespaceProcessing|namespaceProcessing=", "@brief Method void QXmlStreamReader::setNamespaceProcessing(bool)\n", false, &_init_f_setNamespaceProcessing_864, &_call_f_setNamespaceProcessing_864);
   methods += new qt_gsi::GenericMethod ("skipCurrentElement", "@brief Method void QXmlStreamReader::skipCurrentElement()\n", false, &_init_f_skipCurrentElement_0, &_call_f_skipCurrentElement_0);
-  methods += new qt_gsi::GenericMethod ("text", "@brief Method QStringView QXmlStreamReader::text()\n", true, &_init_f_text_c0, &_call_f_text_c0);
   methods += new qt_gsi::GenericMethod ("tokenString", "@brief Method QString QXmlStreamReader::tokenString()\n", true, &_init_f_tokenString_c0, &_call_f_tokenString_c0);
   methods += new qt_gsi::GenericMethod ("tokenType", "@brief Method QXmlStreamReader::TokenType QXmlStreamReader::tokenType()\n", true, &_init_f_tokenType_c0, &_call_f_tokenType_c0);
   return methods;

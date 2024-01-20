@@ -22,8 +22,5 @@
 
 #include "../pymodHelper.h"
 
-//  To force linking of the QtSvg module
-#include "../../gsiqt/qtbasic/gsiQtSvgExternals.h"
-FORCE_LINK_GSI_QTSVG
-
+#include "QtSvgMain.h"
 DEFINE_PYMOD(QtSvg, "QtSvg", "KLayout/Qt module 'QtSvg'")

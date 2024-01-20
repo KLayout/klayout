@@ -56,7 +56,7 @@ static void _init_f_addItem_7835 (qt_gsi::GenericMethod *decl)
   decl->add_arg<int > (argspec_3);
   static gsi::ArgSpecBase argspec_4 ("columnSpan");
   decl->add_arg<int > (argspec_4);
-  static gsi::ArgSpecBase argspec_5 ("alignment", true, "0");
+  static gsi::ArgSpecBase argspec_5 ("alignment", true, "Qt::Alignment()");
   decl->add_arg<QFlags<Qt::AlignmentFlag> > (argspec_5);
   decl->set_return<void > ();
 }
@@ -70,7 +70,7 @@ static void _call_f_addItem_7835 (const qt_gsi::GenericMethod * /*decl*/, void *
   int arg3 = gsi::arg_reader<int >() (args, heap);
   int arg4 = gsi::arg_reader<int >() (args, heap);
   int arg5 = gsi::arg_reader<int >() (args, heap);
-  QFlags<Qt::AlignmentFlag> arg6 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (0, heap);
+  QFlags<Qt::AlignmentFlag> arg6 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (Qt::Alignment(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->addItem (arg1, arg2, arg3, arg4, arg5, arg6);
 }
@@ -87,7 +87,7 @@ static void _init_f_addItem_6517 (qt_gsi::GenericMethod *decl)
   decl->add_arg<int > (argspec_1);
   static gsi::ArgSpecBase argspec_2 ("column");
   decl->add_arg<int > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("alignment", true, "0");
+  static gsi::ArgSpecBase argspec_3 ("alignment", true, "Qt::Alignment()");
   decl->add_arg<QFlags<Qt::AlignmentFlag> > (argspec_3);
   decl->set_return<void > ();
 }
@@ -99,7 +99,7 @@ static void _call_f_addItem_6517 (const qt_gsi::GenericMethod * /*decl*/, void *
   QGraphicsLayoutItem *arg1 = gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap);
   int arg2 = gsi::arg_reader<int >() (args, heap);
   int arg3 = gsi::arg_reader<int >() (args, heap);
-  QFlags<Qt::AlignmentFlag> arg4 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (0, heap);
+  QFlags<Qt::AlignmentFlag> arg4 = args ? gsi::arg_reader<QFlags<Qt::AlignmentFlag> >() (args, heap) : gsi::arg_maker<QFlags<Qt::AlignmentFlag> >() (Qt::Alignment(), heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QGraphicsGridLayout *)cls)->addItem (arg1, arg2, arg3, arg4);
 }
@@ -1220,7 +1220,7 @@ QGraphicsGridLayout_Adaptor::~QGraphicsGridLayout_Adaptor() { }
 
 static void _init_ctor_QGraphicsGridLayout_Adaptor_2557 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QGraphicsLayoutItem * > (argspec_0);
   decl->set_return_new<QGraphicsGridLayout_Adaptor> ();
 }
@@ -1229,7 +1229,7 @@ static void _call_ctor_QGraphicsGridLayout_Adaptor_2557 (const qt_gsi::GenericSt
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsLayoutItem *arg1 = args ? gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap) : gsi::arg_maker<QGraphicsLayoutItem * >() (0, heap);
+  QGraphicsLayoutItem *arg1 = args ? gsi::arg_reader<QGraphicsLayoutItem * >() (args, heap) : gsi::arg_maker<QGraphicsLayoutItem * >() (nullptr, heap);
   ret.write<QGraphicsGridLayout_Adaptor *> (new QGraphicsGridLayout_Adaptor (arg1));
 }
 

@@ -387,7 +387,7 @@ Class<lay::BrowserSource> decl_BrowserSource ("lay", "BrowserSource_Native",
 #endif
   gsi::method ("next_topic", &lay::BrowserSource::next_topic, gsi::arg ("url")) +
   gsi::method ("prev_topic", &lay::BrowserSource::prev_topic, gsi::arg ("url")) +
-  gsi::method ("get", &lay::BrowserSource::get),
+  gsi::method ("get", &lay::BrowserSource::get, gsi::arg ("url")),
   "@hide\n@alias BrowserSource"
 );
 
@@ -398,7 +398,7 @@ Class<lay::BrowserSource> &laybasicdecl_BrowserSource ()
 }
 
 Class<BrowserSource_Stub> decl_BrowserSourceStub ("lay", "BrowserSource",
-  gsi::constructor ("new|#new_html", &new_html,
+  gsi::constructor ("new|#new_html", &new_html, gsi::arg ("html"),
     "@brief Constructs a BrowserSource object with a default HTML string\n"
     "\n"
     "The default HTML string is sent when no specific implementation is provided.\n"

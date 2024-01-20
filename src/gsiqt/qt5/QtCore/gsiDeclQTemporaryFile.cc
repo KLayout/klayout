@@ -28,6 +28,7 @@
 */
 
 #include <QTemporaryFile>
+#include <QDateTime>
 #include <QEvent>
 #include <QFile>
 #include <QMetaMethod>
@@ -185,6 +186,25 @@ static void _call_f_open_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<bool > ((bool)((QTemporaryFile *)cls)->open ());
+}
+
+
+// bool QTemporaryFile::rename(const QString &newName)
+
+
+static void _init_f_rename_2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("newName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<bool > ();
+}
+
+static void _call_f_rename_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ret.write<bool > ((bool)((QTemporaryFile *)cls)->rename (arg1));
 }
 
 
@@ -369,10 +389,13 @@ static gsi::Methods methods_QTemporaryFile () {
   methods += new qt_gsi::GenericMethod (":fileName", "@brief Method QString QTemporaryFile::fileName()\nThis is a reimplementation of QFile::fileName", true, &_init_f_fileName_c0, &_call_f_fileName_c0);
   methods += new qt_gsi::GenericMethod (":fileTemplate", "@brief Method QString QTemporaryFile::fileTemplate()\n", true, &_init_f_fileTemplate_c0, &_call_f_fileTemplate_c0);
   methods += new qt_gsi::GenericMethod ("open", "@brief Method bool QTemporaryFile::open()\n", false, &_init_f_open_0, &_call_f_open_0);
+  methods += new qt_gsi::GenericMethod ("rename", "@brief Method bool QTemporaryFile::rename(const QString &newName)\n", false, &_init_f_rename_2025, &_call_f_rename_2025);
   methods += new qt_gsi::GenericMethod ("setAutoRemove|autoRemove=", "@brief Method void QTemporaryFile::setAutoRemove(bool b)\n", false, &_init_f_setAutoRemove_864, &_call_f_setAutoRemove_864);
   methods += new qt_gsi::GenericMethod ("setFileTemplate|fileTemplate=", "@brief Method void QTemporaryFile::setFileTemplate(const QString &name)\n", false, &_init_f_setFileTemplate_2025, &_call_f_setFileTemplate_2025);
   methods += gsi::qt_signal ("aboutToClose()", "aboutToClose", "@brief Signal declaration for QTemporaryFile::aboutToClose()\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<qint64 > ("bytesWritten(qint64)", "bytesWritten", gsi::arg("bytes"), "@brief Signal declaration for QTemporaryFile::bytesWritten(qint64 bytes)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int, qint64 > ("channelBytesWritten(int, qint64)", "channelBytesWritten", gsi::arg("channel"), gsi::arg("bytes"), "@brief Signal declaration for QTemporaryFile::channelBytesWritten(int channel, qint64 bytes)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("channelReadyRead(int)", "channelReadyRead", gsi::arg("channel"), "@brief Signal declaration for QTemporaryFile::channelReadyRead(int channel)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QTemporaryFile::destroyed(QObject *)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QTemporaryFile::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
   methods += gsi::qt_signal ("readChannelFinished()", "readChannelFinished", "@brief Signal declaration for QTemporaryFile::readChannelFinished()\nYou can bind a procedure to this signal.");

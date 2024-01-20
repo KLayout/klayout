@@ -44,6 +44,9 @@ initialize ()
 
   //  Do a first initialization of the new classes because they might add more classes
   for (gsi::ClassBase::class_iterator c = gsi::ClassBase::begin_new_classes (); c != gsi::ClassBase::end_new_classes (); ++c) {
+    if (tl::verbosity () >= 50 && c->begin_methods () != c->end_methods ()) {
+      tl::info << "GSI: initializing class " << c->module () << "::" << c->name ();
+    }
     //  TODO: get rid of that const cast
     (const_cast<gsi::ClassBase *> (&*c))->initialize ();
   }

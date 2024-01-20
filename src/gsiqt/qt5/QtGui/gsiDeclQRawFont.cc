@@ -293,6 +293,21 @@ static void _call_f_boundingRect_c1098 (const qt_gsi::GenericMethod * /*decl*/, 
 }
 
 
+// double QRawFont::capHeight()
+
+
+static void _init_f_capHeight_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<double > ();
+}
+
+static void _call_f_capHeight_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<double > ((double)((QRawFont *)cls)->capHeight ());
+}
+
+
 // double QRawFont::descent()
 
 
@@ -830,6 +845,7 @@ static gsi::Methods methods_QRawFont () {
   methods += new qt_gsi::GenericMethod ("ascent", "@brief Method double QRawFont::ascent()\n", true, &_init_f_ascent_c0, &_call_f_ascent_c0);
   methods += new qt_gsi::GenericMethod ("averageCharWidth", "@brief Method double QRawFont::averageCharWidth()\n", true, &_init_f_averageCharWidth_c0, &_call_f_averageCharWidth_c0);
   methods += new qt_gsi::GenericMethod ("boundingRect", "@brief Method QRectF QRawFont::boundingRect(quint32 glyphIndex)\n", true, &_init_f_boundingRect_c1098, &_call_f_boundingRect_c1098);
+  methods += new qt_gsi::GenericMethod ("capHeight", "@brief Method double QRawFont::capHeight()\n", true, &_init_f_capHeight_c0, &_call_f_capHeight_c0);
   methods += new qt_gsi::GenericMethod ("descent", "@brief Method double QRawFont::descent()\n", true, &_init_f_descent_c0, &_call_f_descent_c0);
   methods += new qt_gsi::GenericMethod ("familyName", "@brief Method QString QRawFont::familyName()\n", true, &_init_f_familyName_c0, &_call_f_familyName_c0);
   methods += new qt_gsi::GenericMethod ("fontTable", "@brief Method QByteArray QRawFont::fontTable(const char *tagName)\n", true, &_init_f_fontTable_c1731, &_call_f_fontTable_c1731);

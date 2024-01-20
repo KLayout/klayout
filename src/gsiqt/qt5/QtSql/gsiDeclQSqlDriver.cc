@@ -775,33 +775,33 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QSqlDriver::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QSqlDriver::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QSqlDriver::event(arg1);
+    return QSqlDriver::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QSqlDriver_Adaptor, bool, QEvent *>(&QSqlDriver_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QSqlDriver_Adaptor, bool, QEvent *>(&QSqlDriver_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QSqlDriver::event(arg1);
+      return QSqlDriver::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QSqlDriver::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QSqlDriver::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QSqlDriver::eventFilter(arg1, arg2);
+    return QSqlDriver::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QSqlDriver_Adaptor, bool, QObject *, QEvent *>(&QSqlDriver_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QSqlDriver_Adaptor, bool, QObject *, QEvent *>(&QSqlDriver_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QSqlDriver::eventFilter(arg1, arg2);
+      return QSqlDriver::eventFilter(watched, event);
     }
   }
 
@@ -1056,33 +1056,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QSqlDriver::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QSqlDriver::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QSqlDriver::childEvent(arg1);
+    QSqlDriver::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QSqlDriver_Adaptor, QChildEvent *>(&QSqlDriver_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QSqlDriver_Adaptor, QChildEvent *>(&QSqlDriver_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QSqlDriver::childEvent(arg1);
+      QSqlDriver::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QSqlDriver::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QSqlDriver::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QSqlDriver::customEvent(arg1);
+    QSqlDriver::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QSqlDriver_Adaptor, QEvent *>(&QSqlDriver_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QSqlDriver_Adaptor, QEvent *>(&QSqlDriver_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QSqlDriver::customEvent(arg1);
+      QSqlDriver::customEvent(event);
     }
   }
 
@@ -1146,18 +1146,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QSqlDriver::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QSqlDriver::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QSqlDriver::timerEvent(arg1);
+    QSqlDriver::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QSqlDriver_Adaptor, QTimerEvent *>(&QSqlDriver_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QSqlDriver_Adaptor, QTimerEvent *>(&QSqlDriver_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QSqlDriver::timerEvent(arg1);
+      QSqlDriver::timerEvent(event);
     }
   }
 
@@ -1199,7 +1199,7 @@ QSqlDriver_Adaptor::~QSqlDriver_Adaptor() { }
 
 static void _init_ctor_QSqlDriver_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QSqlDriver_Adaptor> ();
 }
@@ -1208,7 +1208,7 @@ static void _call_ctor_QSqlDriver_Adaptor_1302 (const qt_gsi::GenericStaticMetho
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QSqlDriver_Adaptor *> (new QSqlDriver_Adaptor (arg1));
 }
 
@@ -1251,11 +1251,11 @@ static void _set_callback_cbs_cancelQuery_0_0 (void *cls, const gsi::Callback &c
 }
 
 
-// void QSqlDriver::childEvent(QChildEvent *)
+// void QSqlDriver::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1333,11 +1333,11 @@ static void _set_callback_cbs_createResult_c0_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QSqlDriver::customEvent(QEvent *)
+// void QSqlDriver::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1361,7 +1361,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1370,7 +1370,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QSqlDriver_Adaptor *)cls)->emitter_QSqlDriver_destroyed_1302 (arg1);
 }
 
@@ -1425,11 +1425,11 @@ static void _set_callback_cbs_escapeIdentifier_c4919_0 (void *cls, const gsi::Ca
 }
 
 
-// bool QSqlDriver::event(QEvent *)
+// bool QSqlDriver::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -1448,13 +1448,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QSqlDriver::eventFilter(QObject *, QEvent *)
+// bool QSqlDriver::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -2009,11 +2009,11 @@ static void _set_callback_cbs_tables_c1843_0 (void *cls, const gsi::Callback &cb
 }
 
 
-// void QSqlDriver::timerEvent(QTimerEvent *)
+// void QSqlDriver::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -2068,7 +2068,7 @@ static gsi::Methods methods_QSqlDriver_Adaptor () {
   methods += new qt_gsi::GenericMethod ("beginTransaction", "@hide", false, &_init_cbs_beginTransaction_0_0, &_call_cbs_beginTransaction_0_0, &_set_callback_cbs_beginTransaction_0_0);
   methods += new qt_gsi::GenericMethod ("cancelQuery", "@brief Virtual method bool QSqlDriver::cancelQuery()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_cancelQuery_0_0, &_call_cbs_cancelQuery_0_0);
   methods += new qt_gsi::GenericMethod ("cancelQuery", "@hide", false, &_init_cbs_cancelQuery_0_0, &_call_cbs_cancelQuery_0_0, &_set_callback_cbs_cancelQuery_0_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QSqlDriver::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QSqlDriver::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("close", "@brief Virtual method void QSqlDriver::close()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_close_0_0, &_call_cbs_close_0_0);
   methods += new qt_gsi::GenericMethod ("close", "@hide", false, &_init_cbs_close_0_0, &_call_cbs_close_0_0, &_set_callback_cbs_close_0_0);
@@ -2076,16 +2076,16 @@ static gsi::Methods methods_QSqlDriver_Adaptor () {
   methods += new qt_gsi::GenericMethod ("commitTransaction", "@hide", false, &_init_cbs_commitTransaction_0_0, &_call_cbs_commitTransaction_0_0, &_set_callback_cbs_commitTransaction_0_0);
   methods += new qt_gsi::GenericMethod ("createResult", "@brief Virtual method QSqlResult *QSqlDriver::createResult()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_createResult_c0_0, &_call_cbs_createResult_c0_0);
   methods += new qt_gsi::GenericMethod ("createResult", "@hide", true, &_init_cbs_createResult_c0_0, &_call_cbs_createResult_c0_0, &_set_callback_cbs_createResult_c0_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QSqlDriver::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QSqlDriver::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QSqlDriver::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QSqlDriver::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("escapeIdentifier", "@brief Virtual method QString QSqlDriver::escapeIdentifier(const QString &identifier, QSqlDriver::IdentifierType type)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_escapeIdentifier_c4919_0, &_call_cbs_escapeIdentifier_c4919_0);
   methods += new qt_gsi::GenericMethod ("escapeIdentifier", "@hide", true, &_init_cbs_escapeIdentifier_c4919_0, &_call_cbs_escapeIdentifier_c4919_0, &_set_callback_cbs_escapeIdentifier_c4919_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QSqlDriver::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QSqlDriver::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QSqlDriver::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QSqlDriver::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("formatValue", "@brief Virtual method QString QSqlDriver::formatValue(const QSqlField &field, bool trimStrings)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_formatValue_c2938_1, &_call_cbs_formatValue_c2938_1);
   methods += new qt_gsi::GenericMethod ("formatValue", "@hide", true, &_init_cbs_formatValue_c2938_1, &_call_cbs_formatValue_c2938_1, &_set_callback_cbs_formatValue_c2938_1);
@@ -2128,7 +2128,7 @@ static gsi::Methods methods_QSqlDriver_Adaptor () {
   methods += new qt_gsi::GenericMethod ("subscribedToNotifications", "@hide", true, &_init_cbs_subscribedToNotifications_c0_0, &_call_cbs_subscribedToNotifications_c0_0, &_set_callback_cbs_subscribedToNotifications_c0_0);
   methods += new qt_gsi::GenericMethod ("tables", "@brief Virtual method QStringList QSqlDriver::tables(QSql::TableType tableType)\nThis method can be reimplemented in a derived class.", true, &_init_cbs_tables_c1843_0, &_call_cbs_tables_c1843_0);
   methods += new qt_gsi::GenericMethod ("tables", "@hide", true, &_init_cbs_tables_c1843_0, &_call_cbs_tables_c1843_0, &_set_callback_cbs_tables_c1843_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QSqlDriver::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QSqlDriver::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("unsubscribeFromNotification", "@brief Virtual method bool QSqlDriver::unsubscribeFromNotification(const QString &name)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_unsubscribeFromNotification_2025_0, &_call_cbs_unsubscribeFromNotification_2025_0);
   methods += new qt_gsi::GenericMethod ("unsubscribeFromNotification", "@hide", false, &_init_cbs_unsubscribeFromNotification_2025_0, &_call_cbs_unsubscribeFromNotification_2025_0, &_set_callback_cbs_unsubscribeFromNotification_2025_0);

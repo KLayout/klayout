@@ -901,3 +901,24 @@ static gsi::ClassExt<QPagedPaintDevice> decl_QPagedPaintDevice_PageSize_Enums_as
 
 }
 
+
+//  Implementation of the enum wrapper class for QPagedPaintDevice::PdfVersion
+namespace qt_gsi
+{
+
+static gsi::Enum<QPagedPaintDevice::PdfVersion> decl_QPagedPaintDevice_PdfVersion_Enum ("QtGui", "QPagedPaintDevice_PdfVersion",
+    gsi::enum_const ("PdfVersion_1_4", QPagedPaintDevice::PdfVersion_1_4, "@brief Enum constant QPagedPaintDevice::PdfVersion_1_4") +
+    gsi::enum_const ("PdfVersion_A1b", QPagedPaintDevice::PdfVersion_A1b, "@brief Enum constant QPagedPaintDevice::PdfVersion_A1b") +
+    gsi::enum_const ("PdfVersion_1_6", QPagedPaintDevice::PdfVersion_1_6, "@brief Enum constant QPagedPaintDevice::PdfVersion_1_6"),
+  "@qt\n@brief This class represents the QPagedPaintDevice::PdfVersion enum");
+
+static gsi::QFlagsClass<QPagedPaintDevice::PdfVersion > decl_QPagedPaintDevice_PdfVersion_Enums ("QtGui", "QPagedPaintDevice_QFlags_PdfVersion",
+  "@qt\n@brief This class represents the QFlags<QPagedPaintDevice::PdfVersion> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<QPagedPaintDevice> inject_QPagedPaintDevice_PdfVersion_Enum_in_parent (decl_QPagedPaintDevice_PdfVersion_Enum.defs ());
+static gsi::ClassExt<QPagedPaintDevice> decl_QPagedPaintDevice_PdfVersion_Enum_as_child (decl_QPagedPaintDevice_PdfVersion_Enum, "PdfVersion");
+static gsi::ClassExt<QPagedPaintDevice> decl_QPagedPaintDevice_PdfVersion_Enums_as_child (decl_QPagedPaintDevice_PdfVersion_Enums, "QFlags_PdfVersion");
+
+}
+

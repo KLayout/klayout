@@ -410,7 +410,7 @@ static void _call_f_wakeUp_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 
 static void _init_f_instance_1303 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("thread", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("thread", true, "nullptr");
   decl->add_arg<QThread * > (argspec_0);
   decl->set_return<QAbstractEventDispatcher * > ();
 }
@@ -419,7 +419,7 @@ static void _call_f_instance_1303 (const qt_gsi::GenericStaticMethod * /*decl*/,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QThread *arg1 = args ? gsi::arg_reader<QThread * >() (args, heap) : gsi::arg_maker<QThread * >() (0, heap);
+  QThread *arg1 = args ? gsi::arg_reader<QThread * >() (args, heap) : gsi::arg_maker<QThread * >() (nullptr, heap);
   ret.write<QAbstractEventDispatcher * > ((QAbstractEventDispatcher *)QAbstractEventDispatcher::instance (arg1));
 }
 
@@ -594,33 +594,33 @@ public:
     emit QAbstractEventDispatcher::destroyed(arg1);
   }
 
-  //  [adaptor impl] bool QAbstractEventDispatcher::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [adaptor impl] bool QAbstractEventDispatcher::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
   {
-    return QAbstractEventDispatcher::event(arg1);
+    return QAbstractEventDispatcher::event(_event);
   }
 
-  virtual bool event(QEvent *arg1)
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QAbstractEventDispatcher_Adaptor, bool, QEvent *>(&QAbstractEventDispatcher_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QAbstractEventDispatcher_Adaptor, bool, QEvent *>(&QAbstractEventDispatcher_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QAbstractEventDispatcher::event(arg1);
+      return QAbstractEventDispatcher::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QAbstractEventDispatcher::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QAbstractEventDispatcher::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QAbstractEventDispatcher::eventFilter(arg1, arg2);
+    return QAbstractEventDispatcher::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QAbstractEventDispatcher_Adaptor, bool, QObject *, QEvent *>(&QAbstractEventDispatcher_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QAbstractEventDispatcher_Adaptor, bool, QObject *, QEvent *>(&QAbstractEventDispatcher_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QAbstractEventDispatcher::eventFilter(arg1, arg2);
+      return QAbstractEventDispatcher::eventFilter(watched, event);
     }
   }
 
@@ -837,33 +837,33 @@ public:
     }
   }
 
-  //  [adaptor impl] void QAbstractEventDispatcher::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [adaptor impl] void QAbstractEventDispatcher::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
   {
-    QAbstractEventDispatcher::childEvent(arg1);
+    QAbstractEventDispatcher::childEvent(event);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QAbstractEventDispatcher_Adaptor, QChildEvent *>(&QAbstractEventDispatcher_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QAbstractEventDispatcher_Adaptor, QChildEvent *>(&QAbstractEventDispatcher_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QAbstractEventDispatcher::childEvent(arg1);
+      QAbstractEventDispatcher::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QAbstractEventDispatcher::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QAbstractEventDispatcher::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QAbstractEventDispatcher::customEvent(arg1);
+    QAbstractEventDispatcher::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QAbstractEventDispatcher_Adaptor, QEvent *>(&QAbstractEventDispatcher_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QAbstractEventDispatcher_Adaptor, QEvent *>(&QAbstractEventDispatcher_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QAbstractEventDispatcher::customEvent(arg1);
+      QAbstractEventDispatcher::customEvent(event);
     }
   }
 
@@ -882,18 +882,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QAbstractEventDispatcher::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QAbstractEventDispatcher::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QAbstractEventDispatcher::timerEvent(arg1);
+    QAbstractEventDispatcher::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QAbstractEventDispatcher_Adaptor, QTimerEvent *>(&QAbstractEventDispatcher_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QAbstractEventDispatcher_Adaptor, QTimerEvent *>(&QAbstractEventDispatcher_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QAbstractEventDispatcher::timerEvent(arg1);
+      QAbstractEventDispatcher::timerEvent(event);
     }
   }
 
@@ -925,7 +925,7 @@ QAbstractEventDispatcher_Adaptor::~QAbstractEventDispatcher_Adaptor() { }
 
 static void _init_ctor_QAbstractEventDispatcher_Adaptor_1302 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return_new<QAbstractEventDispatcher_Adaptor> ();
 }
@@ -934,7 +934,7 @@ static void _call_ctor_QAbstractEventDispatcher_Adaptor_1302 (const qt_gsi::Gene
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ret.write<QAbstractEventDispatcher_Adaptor *> (new QAbstractEventDispatcher_Adaptor (arg1));
 }
 
@@ -967,11 +967,11 @@ static void _call_emitter_awake_0 (const qt_gsi::GenericMethod * /*decl*/, void 
 }
 
 
-// void QAbstractEventDispatcher::childEvent(QChildEvent *)
+// void QAbstractEventDispatcher::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1011,11 +1011,11 @@ static void _set_callback_cbs_closingDown_0_0 (void *cls, const gsi::Callback &c
 }
 
 
-// void QAbstractEventDispatcher::customEvent(QEvent *)
+// void QAbstractEventDispatcher::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1039,7 +1039,7 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 
 static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1048,7 +1048,7 @@ static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
   ((QAbstractEventDispatcher_Adaptor *)cls)->emitter_QAbstractEventDispatcher_destroyed_1302 (arg1);
 }
 
@@ -1077,11 +1077,11 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QAbstractEventDispatcher::event(QEvent *)
+// bool QAbstractEventDispatcher::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -1100,13 +1100,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QAbstractEventDispatcher::eventFilter(QObject *, QEvent *)
+// bool QAbstractEventDispatcher::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -1413,11 +1413,11 @@ static void _set_callback_cbs_startingUp_0_0 (void *cls, const gsi::Callback &cb
 }
 
 
-// void QAbstractEventDispatcher::timerEvent(QTimerEvent *)
+// void QAbstractEventDispatcher::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1537,18 +1537,18 @@ static gsi::Methods methods_QAbstractEventDispatcher_Adaptor () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QAbstractEventDispatcher::QAbstractEventDispatcher(QObject *parent)\nThis method creates an object of class QAbstractEventDispatcher.", &_init_ctor_QAbstractEventDispatcher_Adaptor_1302, &_call_ctor_QAbstractEventDispatcher_Adaptor_1302);
   methods += new qt_gsi::GenericMethod ("emit_aboutToBlock", "@brief Emitter for signal void QAbstractEventDispatcher::aboutToBlock()\nCall this method to emit this signal.", false, &_init_emitter_aboutToBlock_0, &_call_emitter_aboutToBlock_0);
   methods += new qt_gsi::GenericMethod ("emit_awake", "@brief Emitter for signal void QAbstractEventDispatcher::awake()\nCall this method to emit this signal.", false, &_init_emitter_awake_0, &_call_emitter_awake_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QAbstractEventDispatcher::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QAbstractEventDispatcher::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("closingDown", "@brief Virtual method void QAbstractEventDispatcher::closingDown()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_closingDown_0_0, &_call_cbs_closingDown_0_0);
   methods += new qt_gsi::GenericMethod ("closingDown", "@hide", false, &_init_cbs_closingDown_0_0, &_call_cbs_closingDown_0_0, &_set_callback_cbs_closingDown_0_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAbstractEventDispatcher::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QAbstractEventDispatcher::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QAbstractEventDispatcher::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QAbstractEventDispatcher::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAbstractEventDispatcher::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QAbstractEventDispatcher::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QAbstractEventDispatcher::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QAbstractEventDispatcher::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("flush", "@brief Virtual method void QAbstractEventDispatcher::flush()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_flush_0_0, &_call_cbs_flush_0_0);
   methods += new qt_gsi::GenericMethod ("flush", "@hide", false, &_init_cbs_flush_0_0, &_call_cbs_flush_0_0, &_set_callback_cbs_flush_0_0);
@@ -1573,7 +1573,7 @@ static gsi::Methods methods_QAbstractEventDispatcher_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QAbstractEventDispatcher::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("startingUp", "@brief Virtual method void QAbstractEventDispatcher::startingUp()\nThis method can be reimplemented in a derived class.", false, &_init_cbs_startingUp_0_0, &_call_cbs_startingUp_0_0);
   methods += new qt_gsi::GenericMethod ("startingUp", "@hide", false, &_init_cbs_startingUp_0_0, &_call_cbs_startingUp_0_0, &_set_callback_cbs_startingUp_0_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QAbstractEventDispatcher::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QAbstractEventDispatcher::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("unregisterSocketNotifier", "@brief Virtual method void QAbstractEventDispatcher::unregisterSocketNotifier(QSocketNotifier *notifier)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_unregisterSocketNotifier_2152_0, &_call_cbs_unregisterSocketNotifier_2152_0);
   methods += new qt_gsi::GenericMethod ("unregisterSocketNotifier", "@hide", false, &_init_cbs_unregisterSocketNotifier_2152_0, &_call_cbs_unregisterSocketNotifier_2152_0, &_set_callback_cbs_unregisterSocketNotifier_2152_0);

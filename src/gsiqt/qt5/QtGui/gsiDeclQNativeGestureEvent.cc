@@ -31,6 +31,7 @@
 #include <QEvent>
 #include <QPoint>
 #include <QPointF>
+#include <QTouchDevice>
 #include "gsiQt.h"
 #include "gsiQtGuiCommon.h"
 #include <memory>
@@ -38,40 +39,18 @@
 // -----------------------------------------------------------------------
 // class QNativeGestureEvent
 
-//  Constructor QNativeGestureEvent::QNativeGestureEvent(Qt::NativeGestureType type, const QPointF &localPos, const QPointF &windowPos, const QPointF &screenPos, double value, unsigned long int sequenceId, quint64 intArgument)
+// const QTouchDevice *QNativeGestureEvent::device()
 
 
-static void _init_ctor_QNativeGestureEvent_12349 (qt_gsi::GenericStaticMethod *decl)
+static void _init_f_device_c0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("type");
-  decl->add_arg<const qt_gsi::Converter<Qt::NativeGestureType>::target_type & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("localPos");
-  decl->add_arg<const QPointF & > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("windowPos");
-  decl->add_arg<const QPointF & > (argspec_2);
-  static gsi::ArgSpecBase argspec_3 ("screenPos");
-  decl->add_arg<const QPointF & > (argspec_3);
-  static gsi::ArgSpecBase argspec_4 ("value");
-  decl->add_arg<double > (argspec_4);
-  static gsi::ArgSpecBase argspec_5 ("sequenceId");
-  decl->add_arg<unsigned long int > (argspec_5);
-  static gsi::ArgSpecBase argspec_6 ("intArgument");
-  decl->add_arg<quint64 > (argspec_6);
-  decl->set_return_new<QNativeGestureEvent> ();
+  decl->set_return<const QTouchDevice * > ();
 }
 
-static void _call_ctor_QNativeGestureEvent_12349 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_device_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<Qt::NativeGestureType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::NativeGestureType>::target_type & >() (args, heap);
-  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
-  const QPointF &arg3 = gsi::arg_reader<const QPointF & >() (args, heap);
-  const QPointF &arg4 = gsi::arg_reader<const QPointF & >() (args, heap);
-  double arg5 = gsi::arg_reader<double >() (args, heap);
-  unsigned long int arg6 = gsi::arg_reader<unsigned long int >() (args, heap);
-  quint64 arg7 = gsi::arg_reader<quint64 >() (args, heap);
-  ret.write<QNativeGestureEvent *> (new QNativeGestureEvent (qt_gsi::QtToCppAdaptor<Qt::NativeGestureType>(arg1).cref(), arg2, arg3, arg4, arg5, arg6, arg7));
+  ret.write<const QTouchDevice * > ((const QTouchDevice *)((QNativeGestureEvent *)cls)->device ());
 }
 
 
@@ -180,13 +159,12 @@ static void _call_f_windowPos_c0 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
-
 namespace gsi
 {
 
 static gsi::Methods methods_QNativeGestureEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QNativeGestureEvent::QNativeGestureEvent(Qt::NativeGestureType type, const QPointF &localPos, const QPointF &windowPos, const QPointF &screenPos, double value, unsigned long int sequenceId, quint64 intArgument)\nThis method creates an object of class QNativeGestureEvent.", &_init_ctor_QNativeGestureEvent_12349, &_call_ctor_QNativeGestureEvent_12349);
+  methods += new qt_gsi::GenericMethod ("device", "@brief Method const QTouchDevice *QNativeGestureEvent::device()\n", true, &_init_f_device_c0, &_call_f_device_c0);
   methods += new qt_gsi::GenericMethod ("gestureType", "@brief Method Qt::NativeGestureType QNativeGestureEvent::gestureType()\n", true, &_init_f_gestureType_c0, &_call_f_gestureType_c0);
   methods += new qt_gsi::GenericMethod ("globalPos", "@brief Method const QPoint QNativeGestureEvent::globalPos()\n", true, &_init_f_globalPos_c0, &_call_f_globalPos_c0);
   methods += new qt_gsi::GenericMethod ("localPos", "@brief Method const QPointF &QNativeGestureEvent::localPos()\n", true, &_init_f_localPos_c0, &_call_f_localPos_c0);
@@ -199,12 +177,128 @@ static gsi::Methods methods_QNativeGestureEvent () {
 
 gsi::Class<QInputEvent> &qtdecl_QInputEvent ();
 
-gsi::Class<QNativeGestureEvent> decl_QNativeGestureEvent (qtdecl_QInputEvent (), "QtGui", "QNativeGestureEvent",
+gsi::Class<QNativeGestureEvent> decl_QNativeGestureEvent (qtdecl_QInputEvent (), "QtGui", "QNativeGestureEvent_Native",
   methods_QNativeGestureEvent (),
-  "@qt\n@brief Binding of QNativeGestureEvent");
-
+  "@hide\n@alias QNativeGestureEvent");
 
 GSI_QTGUI_PUBLIC gsi::Class<QNativeGestureEvent> &qtdecl_QNativeGestureEvent () { return decl_QNativeGestureEvent; }
+
+}
+
+
+class QNativeGestureEvent_Adaptor : public QNativeGestureEvent, public qt_gsi::QtObjectBase
+{
+public:
+
+  virtual ~QNativeGestureEvent_Adaptor();
+
+  //  [adaptor ctor] QNativeGestureEvent::QNativeGestureEvent(Qt::NativeGestureType type, const QPointF &localPos, const QPointF &windowPos, const QPointF &screenPos, double value, unsigned long int sequenceId, quint64 intArgument)
+  QNativeGestureEvent_Adaptor(Qt::NativeGestureType type, const QPointF &localPos, const QPointF &windowPos, const QPointF &screenPos, double value, unsigned long int sequenceId, quint64 intArgument) : QNativeGestureEvent(type, localPos, windowPos, screenPos, value, sequenceId, intArgument)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
+  //  [adaptor ctor] QNativeGestureEvent::QNativeGestureEvent(Qt::NativeGestureType type, const QTouchDevice *dev, const QPointF &localPos, const QPointF &windowPos, const QPointF &screenPos, double value, unsigned long int sequenceId, quint64 intArgument)
+  QNativeGestureEvent_Adaptor(Qt::NativeGestureType type, const QTouchDevice *dev, const QPointF &localPos, const QPointF &windowPos, const QPointF &screenPos, double value, unsigned long int sequenceId, quint64 intArgument) : QNativeGestureEvent(type, dev, localPos, windowPos, screenPos, value, sequenceId, intArgument)
+  {
+    qt_gsi::QtObjectBase::init (this);
+  }
+
+  
+};
+
+QNativeGestureEvent_Adaptor::~QNativeGestureEvent_Adaptor() { }
+
+//  Constructor QNativeGestureEvent::QNativeGestureEvent(Qt::NativeGestureType type, const QPointF &localPos, const QPointF &windowPos, const QPointF &screenPos, double value, unsigned long int sequenceId, quint64 intArgument) (adaptor class)
+
+static void _init_ctor_QNativeGestureEvent_Adaptor_12349 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("type");
+  decl->add_arg<const qt_gsi::Converter<Qt::NativeGestureType>::target_type & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("localPos");
+  decl->add_arg<const QPointF & > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("windowPos");
+  decl->add_arg<const QPointF & > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("screenPos");
+  decl->add_arg<const QPointF & > (argspec_3);
+  static gsi::ArgSpecBase argspec_4 ("value");
+  decl->add_arg<double > (argspec_4);
+  static gsi::ArgSpecBase argspec_5 ("sequenceId");
+  decl->add_arg<unsigned long int > (argspec_5);
+  static gsi::ArgSpecBase argspec_6 ("intArgument");
+  decl->add_arg<quint64 > (argspec_6);
+  decl->set_return_new<QNativeGestureEvent_Adaptor> ();
+}
+
+static void _call_ctor_QNativeGestureEvent_Adaptor_12349 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<Qt::NativeGestureType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::NativeGestureType>::target_type & >() (args, heap);
+  const QPointF &arg2 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg3 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg4 = gsi::arg_reader<const QPointF & >() (args, heap);
+  double arg5 = gsi::arg_reader<double >() (args, heap);
+  unsigned long int arg6 = gsi::arg_reader<unsigned long int >() (args, heap);
+  quint64 arg7 = gsi::arg_reader<quint64 >() (args, heap);
+  ret.write<QNativeGestureEvent_Adaptor *> (new QNativeGestureEvent_Adaptor (qt_gsi::QtToCppAdaptor<Qt::NativeGestureType>(arg1).cref(), arg2, arg3, arg4, arg5, arg6, arg7));
+}
+
+
+//  Constructor QNativeGestureEvent::QNativeGestureEvent(Qt::NativeGestureType type, const QTouchDevice *dev, const QPointF &localPos, const QPointF &windowPos, const QPointF &screenPos, double value, unsigned long int sequenceId, quint64 intArgument) (adaptor class)
+
+static void _init_ctor_QNativeGestureEvent_Adaptor_14746 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("type");
+  decl->add_arg<const qt_gsi::Converter<Qt::NativeGestureType>::target_type & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("dev");
+  decl->add_arg<const QTouchDevice * > (argspec_1);
+  static gsi::ArgSpecBase argspec_2 ("localPos");
+  decl->add_arg<const QPointF & > (argspec_2);
+  static gsi::ArgSpecBase argspec_3 ("windowPos");
+  decl->add_arg<const QPointF & > (argspec_3);
+  static gsi::ArgSpecBase argspec_4 ("screenPos");
+  decl->add_arg<const QPointF & > (argspec_4);
+  static gsi::ArgSpecBase argspec_5 ("value");
+  decl->add_arg<double > (argspec_5);
+  static gsi::ArgSpecBase argspec_6 ("sequenceId");
+  decl->add_arg<unsigned long int > (argspec_6);
+  static gsi::ArgSpecBase argspec_7 ("intArgument");
+  decl->add_arg<quint64 > (argspec_7);
+  decl->set_return_new<QNativeGestureEvent_Adaptor> ();
+}
+
+static void _call_ctor_QNativeGestureEvent_Adaptor_14746 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<Qt::NativeGestureType>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<Qt::NativeGestureType>::target_type & >() (args, heap);
+  const QTouchDevice *arg2 = gsi::arg_reader<const QTouchDevice * >() (args, heap);
+  const QPointF &arg3 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg4 = gsi::arg_reader<const QPointF & >() (args, heap);
+  const QPointF &arg5 = gsi::arg_reader<const QPointF & >() (args, heap);
+  double arg6 = gsi::arg_reader<double >() (args, heap);
+  unsigned long int arg7 = gsi::arg_reader<unsigned long int >() (args, heap);
+  quint64 arg8 = gsi::arg_reader<quint64 >() (args, heap);
+  ret.write<QNativeGestureEvent_Adaptor *> (new QNativeGestureEvent_Adaptor (qt_gsi::QtToCppAdaptor<Qt::NativeGestureType>(arg1).cref(), arg2, arg3, arg4, arg5, arg6, arg7, arg8));
+}
+
+
+namespace gsi
+{
+
+gsi::Class<QNativeGestureEvent> &qtdecl_QNativeGestureEvent ();
+
+static gsi::Methods methods_QNativeGestureEvent_Adaptor () {
+  gsi::Methods methods;
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QNativeGestureEvent::QNativeGestureEvent(Qt::NativeGestureType type, const QPointF &localPos, const QPointF &windowPos, const QPointF &screenPos, double value, unsigned long int sequenceId, quint64 intArgument)\nThis method creates an object of class QNativeGestureEvent.", &_init_ctor_QNativeGestureEvent_Adaptor_12349, &_call_ctor_QNativeGestureEvent_Adaptor_12349);
+  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QNativeGestureEvent::QNativeGestureEvent(Qt::NativeGestureType type, const QTouchDevice *dev, const QPointF &localPos, const QPointF &windowPos, const QPointF &screenPos, double value, unsigned long int sequenceId, quint64 intArgument)\nThis method creates an object of class QNativeGestureEvent.", &_init_ctor_QNativeGestureEvent_Adaptor_14746, &_call_ctor_QNativeGestureEvent_Adaptor_14746);
+  return methods;
+}
+
+gsi::Class<QNativeGestureEvent_Adaptor> decl_QNativeGestureEvent_Adaptor (qtdecl_QNativeGestureEvent (), "QtGui", "QNativeGestureEvent",
+  methods_QNativeGestureEvent_Adaptor (),
+  "@qt\n@brief Binding of QNativeGestureEvent");
 
 }
 

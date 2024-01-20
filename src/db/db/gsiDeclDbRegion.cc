@@ -235,6 +235,22 @@ static void insert_si2 (db::Region *r, db::RecursiveShapeIterator si, db::ICplxT
   }
 }
 
+static db::Region delaunay (const db::Region *r)
+{
+  db::TriangulationProcessor tri (0.0, 0.0);
+  db::Region res = r->processed (tri);
+  res.set_merged_semantics (false);
+  return res;
+}
+
+static db::Region refined_delaunay (const db::Region *r, double max_area, double min_b)
+{
+  db::TriangulationProcessor tri (max_area, min_b);
+  db::Region res = r->processed (tri);
+  res.set_merged_semantics (false);
+  return res;
+}
+
 static db::Region minkowski_sum_pe (const db::Region *r, const db::Edge &e)
 {
   return r->processed (db::minkowski_sum_computation<db::Edge> (e));
@@ -2353,6 +2369,37 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The only goal is to achieve parts within the given limits.\n"
     "\n"
     "This method has been introduced in version 0.26."
+  ) +
+  method_ext ("delaunay", &delaunay,
+    "@brief Computes a constrained Delaunay triangulation from the given region\n"
+    "\n"
+    "@return A new region holding the triangles of the constrained Delaunay triangulation.\n"
+    "\n"
+    "Note that the result is a region in raw mode as otherwise the triangles are likely to get "
+    "merged later on.\n"
+    "\n"
+    "This method has been introduced in version 0.29."
+  ) +
+  method_ext ("delaunay", &refined_delaunay, gsi::arg ("max_area"), gsi::arg ("min_b", 1.0),
+    "@brief Computes a refined, constrained Delaunay triangulation from the given region\n"
+    "\n"
+    "@return A new region holding the triangles of the refined, constrained Delaunay triangulation.\n"
+    "\n"
+    "Refinement is implemented by Chew's second algorithm. A maximum area can be given. Triangles "
+    "larger than this area will be split. In addition 'skinny' triangles will be resolved where "
+    "possible. 'skinny' is defined in terms of shortest edge to circumcircle radius ratio (b). "
+    "A minimum number for b can be given. The default of 1.0 corresponds to a minimum angle of 30 degree "
+    "and is usually a good choice. The algorithm is stable up to roughly 1.2 which corresponds to "
+    "a minimum angle of abouth 37 degree.\n"
+    "\n"
+    "The area value is given in terms of DBU units. Picking a value of 0.0 for area and min b will "
+    "make the implementation skip the refinement step. In that case, the results are identical to "
+    "the standard constrained Delaunay triangulation.\n"
+    "\n"
+    "Note that the result is a region in raw mode as otherwise the triangles are likely to get "
+    "merged later on.\n"
+    "\n"
+    "This method has been introduced in version 0.29."
   ) +
   method_ext ("minkowski_sum|#minkowsky_sum", &minkowski_sum_pe, gsi::arg ("e"),
     "@brief Compute the Minkowski sum of the region and an edge\n"

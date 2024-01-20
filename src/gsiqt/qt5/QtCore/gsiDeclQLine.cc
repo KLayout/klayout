@@ -101,6 +101,21 @@ static void _call_ctor_QLine_2744 (const qt_gsi::GenericStaticMethod * /*decl*/,
 }
 
 
+// QPoint QLine::center()
+
+
+static void _init_f_center_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QPoint > ();
+}
+
+static void _call_f_center_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QPoint > ((QPoint)((QLine *)cls)->center ());
+}
+
+
 // int QLine::dx()
 
 
@@ -459,6 +474,7 @@ static gsi::Methods methods_QLine () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QLine::QLine()\nThis method creates an object of class QLine.", &_init_ctor_QLine_0, &_call_ctor_QLine_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QLine::QLine(const QPoint &pt1, const QPoint &pt2)\nThis method creates an object of class QLine.", &_init_ctor_QLine_3724, &_call_ctor_QLine_3724);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QLine::QLine(int x1, int y1, int x2, int y2)\nThis method creates an object of class QLine.", &_init_ctor_QLine_2744, &_call_ctor_QLine_2744);
+  methods += new qt_gsi::GenericMethod ("center", "@brief Method QPoint QLine::center()\n", true, &_init_f_center_c0, &_call_f_center_c0);
   methods += new qt_gsi::GenericMethod ("dx", "@brief Method int QLine::dx()\n", true, &_init_f_dx_c0, &_call_f_dx_c0);
   methods += new qt_gsi::GenericMethod ("dy", "@brief Method int QLine::dy()\n", true, &_init_f_dy_c0, &_call_f_dy_c0);
   methods += new qt_gsi::GenericMethod ("isNull?", "@brief Method bool QLine::isNull()\n", true, &_init_f_isNull_c0, &_call_f_isNull_c0);

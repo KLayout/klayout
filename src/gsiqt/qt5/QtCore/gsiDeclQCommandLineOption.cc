@@ -178,6 +178,36 @@ static void _call_f_description_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
+// QFlags<QCommandLineOption::Flag> QCommandLineOption::flags()
+
+
+static void _init_f_flags_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QFlags<QCommandLineOption::Flag> > ();
+}
+
+static void _call_f_flags_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QFlags<QCommandLineOption::Flag> > ((QFlags<QCommandLineOption::Flag>)((QCommandLineOption *)cls)->flags ());
+}
+
+
+// bool QCommandLineOption::isHidden()
+
+
+static void _init_f_isHidden_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<bool > ();
+}
+
+static void _call_f_isHidden_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<bool > ((bool)((QCommandLineOption *)cls)->isHidden ());
+}
+
+
 // QStringList QCommandLineOption::names()
 
 
@@ -272,6 +302,46 @@ static void _call_f_setDescription_2025 (const qt_gsi::GenericMethod * /*decl*/,
 }
 
 
+// void QCommandLineOption::setFlags(QFlags<QCommandLineOption::Flag> aflags)
+
+
+static void _init_f_setFlags_3435 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("aflags");
+  decl->add_arg<QFlags<QCommandLineOption::Flag> > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setFlags_3435 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QFlags<QCommandLineOption::Flag> arg1 = gsi::arg_reader<QFlags<QCommandLineOption::Flag> >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QCommandLineOption *)cls)->setFlags (arg1);
+}
+
+
+// void QCommandLineOption::setHidden(bool hidden)
+
+
+static void _init_f_setHidden_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("hidden");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setHidden_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QCommandLineOption *)cls)->setHidden (arg1);
+}
+
+
 // void QCommandLineOption::setValueName(const QString &name)
 
 
@@ -340,11 +410,15 @@ static gsi::Methods methods_QCommandLineOption () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QCommandLineOption::QCommandLineOption(const QCommandLineOption &other)\nThis method creates an object of class QCommandLineOption.", &_init_ctor_QCommandLineOption_3122, &_call_ctor_QCommandLineOption_3122);
   methods += new qt_gsi::GenericMethod (":defaultValues", "@brief Method QStringList QCommandLineOption::defaultValues()\n", true, &_init_f_defaultValues_c0, &_call_f_defaultValues_c0);
   methods += new qt_gsi::GenericMethod (":description", "@brief Method QString QCommandLineOption::description()\n", true, &_init_f_description_c0, &_call_f_description_c0);
+  methods += new qt_gsi::GenericMethod (":flags", "@brief Method QFlags<QCommandLineOption::Flag> QCommandLineOption::flags()\n", true, &_init_f_flags_c0, &_call_f_flags_c0);
+  methods += new qt_gsi::GenericMethod ("isHidden?|:hidden", "@brief Method bool QCommandLineOption::isHidden()\n", true, &_init_f_isHidden_c0, &_call_f_isHidden_c0);
   methods += new qt_gsi::GenericMethod ("names", "@brief Method QStringList QCommandLineOption::names()\n", true, &_init_f_names_c0, &_call_f_names_c0);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QCommandLineOption &QCommandLineOption::operator=(const QCommandLineOption &other)\n", false, &_init_f_operator_eq__3122, &_call_f_operator_eq__3122);
   methods += new qt_gsi::GenericMethod ("setDefaultValue", "@brief Method void QCommandLineOption::setDefaultValue(const QString &defaultValue)\n", false, &_init_f_setDefaultValue_2025, &_call_f_setDefaultValue_2025);
   methods += new qt_gsi::GenericMethod ("setDefaultValues|defaultValues=", "@brief Method void QCommandLineOption::setDefaultValues(const QStringList &defaultValues)\n", false, &_init_f_setDefaultValues_2437, &_call_f_setDefaultValues_2437);
   methods += new qt_gsi::GenericMethod ("setDescription|description=", "@brief Method void QCommandLineOption::setDescription(const QString &description)\n", false, &_init_f_setDescription_2025, &_call_f_setDescription_2025);
+  methods += new qt_gsi::GenericMethod ("setFlags|flags=", "@brief Method void QCommandLineOption::setFlags(QFlags<QCommandLineOption::Flag> aflags)\n", false, &_init_f_setFlags_3435, &_call_f_setFlags_3435);
+  methods += new qt_gsi::GenericMethod ("setHidden|hidden=", "@brief Method void QCommandLineOption::setHidden(bool hidden)\n", false, &_init_f_setHidden_864, &_call_f_setHidden_864);
   methods += new qt_gsi::GenericMethod ("setValueName|valueName=", "@brief Method void QCommandLineOption::setValueName(const QString &name)\n", false, &_init_f_setValueName_2025, &_call_f_setValueName_2025);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QCommandLineOption::swap(QCommandLineOption &other)\n", false, &_init_f_swap_2427, &_call_f_swap_2427);
   methods += new qt_gsi::GenericMethod (":valueName", "@brief Method QString QCommandLineOption::valueName()\n", true, &_init_f_valueName_c0, &_call_f_valueName_c0);
@@ -357,6 +431,26 @@ gsi::Class<QCommandLineOption> decl_QCommandLineOption ("QtCore", "QCommandLineO
 
 
 GSI_QTCORE_PUBLIC gsi::Class<QCommandLineOption> &qtdecl_QCommandLineOption () { return decl_QCommandLineOption; }
+
+}
+
+
+//  Implementation of the enum wrapper class for QCommandLineOption::Flag
+namespace qt_gsi
+{
+
+static gsi::Enum<QCommandLineOption::Flag> decl_QCommandLineOption_Flag_Enum ("QtCore", "QCommandLineOption_Flag",
+    gsi::enum_const ("HiddenFromHelp", QCommandLineOption::HiddenFromHelp, "@brief Enum constant QCommandLineOption::HiddenFromHelp") +
+    gsi::enum_const ("ShortOptionStyle", QCommandLineOption::ShortOptionStyle, "@brief Enum constant QCommandLineOption::ShortOptionStyle"),
+  "@qt\n@brief This class represents the QCommandLineOption::Flag enum");
+
+static gsi::QFlagsClass<QCommandLineOption::Flag > decl_QCommandLineOption_Flag_Enums ("QtCore", "QCommandLineOption_QFlags_Flag",
+  "@qt\n@brief This class represents the QFlags<QCommandLineOption::Flag> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<QCommandLineOption> inject_QCommandLineOption_Flag_Enum_in_parent (decl_QCommandLineOption_Flag_Enum.defs ());
+static gsi::ClassExt<QCommandLineOption> decl_QCommandLineOption_Flag_Enum_as_child (decl_QCommandLineOption_Flag_Enum, "Flag");
+static gsi::ClassExt<QCommandLineOption> decl_QCommandLineOption_Flag_Enums_as_child (decl_QCommandLineOption_Flag_Enums, "QFlags_Flag");
 
 }
 

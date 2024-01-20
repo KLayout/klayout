@@ -20,6 +20,11 @@
 
 */
 
+#include "tlUnitTest.h"
+#include "tlStream.h"
+#include "tlFileUtils.h"
+#include "tlEnv.h"
+
 //  Oh my god ... STRINGIFY(s) will get the argument with MACROS REPLACED.
 //  So if the PYTHONPATH is something like build.linux-released, the "linux" macro
 //  set to 1 will make this "build.1-release". So STRINGIFY isn't a real solution.
@@ -30,19 +35,17 @@
 #define STRINGIFY(s) _STRINGIFY(s)
 #define _STRINGIFY(s) #s
 
-#include "tlUnitTest.h"
-#include "tlStream.h"
-#include "tlEnv.h"
-
 int run_pymodtest (tl::TestBase *_this, const std::string &fn)
 {
-  std::string pypath = STRINGIFY (PYTHONPATH);
+  static std::string pypath = tl::combine_path (tl::get_inst_path (), "pymod");
   tl::set_env ("PYTHONPATH", pypath);
-  tl::info << pypath;
+  tl::info << "PYTHONPATH=" << pypath;
 
   std::string fp (tl::testdata ());
   fp += "/pymod/";
   fp += fn;
+
+  int status = 0;
 
   std::string text;
   {
@@ -65,14 +68,13 @@ int run_pymodtest (tl::TestBase *_this, const std::string &fn)
     tl::InputStream is (pipe);
     text = is.read_all ();
 
-    //  subprocess exits without error
-    EXPECT_EQ (pipe.wait(), 0);
+    status = pipe.wait ();
   }
 
   tl::info << text;
   EXPECT_EQ (text.find ("OK") != std::string::npos, true);
 
-  return 0;
+  return status;
 }
 
 #define PYMODTEST(n, file) \
@@ -82,8 +84,11 @@ PYMODTEST (bridge, "bridge.py")
 
 PYMODTEST (import_tl, "import_tl.py")
 PYMODTEST (import_db, "import_db.py")
+PYMODTEST (klayout_db_tests, "klayout_db_tests.py")
 PYMODTEST (import_rdb, "import_rdb.py")
 PYMODTEST (import_lay, "import_lay.py")
+PYMODTEST (import_lib, "import_lib.py")
+PYMODTEST (pya_tests, "pya_tests.py")
 
 //  others
 PYMODTEST (issue1327, "issue1327.py")
@@ -141,7 +146,5 @@ PYMODTEST (import_QtCore5Compat, "import_QtCore5Compat.py")
 #endif
 
 #endif
-
-PYMODTEST (import_pya, "pya_tests.py")
 
 #endif

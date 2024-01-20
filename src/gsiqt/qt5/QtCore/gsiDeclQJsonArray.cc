@@ -692,6 +692,26 @@ static void _call_f_size_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, 
 }
 
 
+// void QJsonArray::swap(QJsonArray &other)
+
+
+static void _init_f_swap_1620 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("other");
+  decl->add_arg<QJsonArray & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_swap_1620 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QJsonArray &arg1 = gsi::arg_reader<QJsonArray & >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QJsonArray *)cls)->swap (arg1);
+}
+
+
 // QJsonValue QJsonArray::takeAt(int i)
 
 
@@ -807,6 +827,7 @@ static gsi::Methods methods_QJsonArray () {
   methods += new qt_gsi::GenericMethod ("removeLast", "@brief Method void QJsonArray::removeLast()\n", false, &_init_f_removeLast_0, &_call_f_removeLast_0);
   methods += new qt_gsi::GenericMethod ("replace", "@brief Method void QJsonArray::replace(int i, const QJsonValue &value)\n", false, &_init_f_replace_2972, &_call_f_replace_2972);
   methods += new qt_gsi::GenericMethod ("size", "@brief Method int QJsonArray::size()\n", true, &_init_f_size_c0, &_call_f_size_c0);
+  methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QJsonArray::swap(QJsonArray &other)\n", false, &_init_f_swap_1620, &_call_f_swap_1620);
   methods += new qt_gsi::GenericMethod ("takeAt", "@brief Method QJsonValue QJsonArray::takeAt(int i)\n", false, &_init_f_takeAt_767, &_call_f_takeAt_767);
   methods += new qt_gsi::GenericMethod ("toVariantList", "@brief Method QList<QVariant> QJsonArray::toVariantList()\n", true, &_init_f_toVariantList_c0, &_call_f_toVariantList_c0);
   methods += new qt_gsi::GenericStaticMethod ("fromStringList", "@brief Static method QJsonArray QJsonArray::fromStringList(const QStringList &list)\nThis method is static and can be called without an instance.", &_init_f_fromStringList_2437, &_call_f_fromStringList_2437);

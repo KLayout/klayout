@@ -348,7 +348,7 @@ static gsi::Methods methods_QSharedMemory () {
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
   methods += new qt_gsi::GenericMethod ("attach", "@brief Method bool QSharedMemory::attach(QSharedMemory::AccessMode mode)\n", false, &_init_f_attach_2848, &_call_f_attach_2848);
   methods += new qt_gsi::GenericMethod ("constData", "@brief Method const void *QSharedMemory::constData()\n", true, &_init_f_constData_c0, &_call_f_constData_c0);
-  methods += new qt_gsi::GenericMethod ("qt_create", "@brief Method bool QSharedMemory::create(qsizetype size, QSharedMemory::AccessMode mode)\n", false, &_init_f_create_4182, &_call_f_create_4182);
+  methods += new qt_gsi::GenericMethod ("create|qt_create", "@brief Method bool QSharedMemory::create(qsizetype size, QSharedMemory::AccessMode mode)\n", false, &_init_f_create_4182, &_call_f_create_4182);
   methods += new qt_gsi::GenericMethod ("data", "@brief Method void *QSharedMemory::data()\n", false, &_init_f_data_0, &_call_f_data_0);
   methods += new qt_gsi::GenericMethod ("data", "@brief Method const void *QSharedMemory::data()\n", true, &_init_f_data_c0, &_call_f_data_c0);
   methods += new qt_gsi::GenericMethod ("detach", "@brief Method bool QSharedMemory::detach()\n", false, &_init_f_detach_0, &_call_f_detach_0);

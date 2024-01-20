@@ -173,6 +173,21 @@ static void _call_ctor_QRegion_1999 (const qt_gsi::GenericStaticMethod * /*decl*
 }
 
 
+// const QRect *QRegion::begin()
+
+
+static void _init_f_begin_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<const QRect * > ();
+}
+
+static void _call_f_begin_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<const QRect * > ((const QRect *)((QRegion *)cls)->begin ());
+}
+
+
 // QRect QRegion::boundingRect()
 
 
@@ -185,6 +200,36 @@ static void _call_f_boundingRect_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QRect > ((QRect)((QRegion *)cls)->boundingRect ());
+}
+
+
+// const QRect *QRegion::cbegin()
+
+
+static void _init_f_cbegin_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<const QRect * > ();
+}
+
+static void _call_f_cbegin_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<const QRect * > ((const QRect *)((QRegion *)cls)->cbegin ());
+}
+
+
+// const QRect *QRegion::cend()
+
+
+static void _init_f_cend_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<const QRect * > ();
+}
+
+static void _call_f_cend_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<const QRect * > ((const QRect *)((QRegion *)cls)->cend ());
 }
 
 
@@ -223,6 +268,21 @@ static void _call_f_contains_c1792 (const qt_gsi::GenericMethod * /*decl*/, void
   tl::Heap heap;
   const QRect &arg1 = gsi::arg_reader<const QRect & >() (args, heap);
   ret.write<bool > ((bool)((QRegion *)cls)->contains (arg1));
+}
+
+
+// const QRect *QRegion::end()
+
+
+static void _init_f_end_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<const QRect * > ();
+}
+
+static void _call_f_end_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<const QRect * > ((const QRect *)((QRegion *)cls)->end ());
 }
 
 
@@ -887,9 +947,13 @@ static gsi::Methods methods_QRegion () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QRegion::QRegion(const QPolygon &pa, Qt::FillRule fillRule)\nThis method creates an object of class QRegion.", &_init_ctor_QRegion_3578, &_call_ctor_QRegion_3578);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QRegion::QRegion(const QRegion &region)\nThis method creates an object of class QRegion.", &_init_ctor_QRegion_2006, &_call_ctor_QRegion_2006);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QRegion::QRegion(const QBitmap &bitmap)\nThis method creates an object of class QRegion.", &_init_ctor_QRegion_1999, &_call_ctor_QRegion_1999);
+  methods += new qt_gsi::GenericMethod ("begin", "@brief Method const QRect *QRegion::begin()\n", true, &_init_f_begin_c0, &_call_f_begin_c0);
   methods += new qt_gsi::GenericMethod ("boundingRect", "@brief Method QRect QRegion::boundingRect()\n", true, &_init_f_boundingRect_c0, &_call_f_boundingRect_c0);
+  methods += new qt_gsi::GenericMethod ("cbegin", "@brief Method const QRect *QRegion::cbegin()\n", true, &_init_f_cbegin_c0, &_call_f_cbegin_c0);
+  methods += new qt_gsi::GenericMethod ("cend", "@brief Method const QRect *QRegion::cend()\n", true, &_init_f_cend_c0, &_call_f_cend_c0);
   methods += new qt_gsi::GenericMethod ("contains", "@brief Method bool QRegion::contains(const QPoint &p)\n", true, &_init_f_contains_c1916, &_call_f_contains_c1916);
   methods += new qt_gsi::GenericMethod ("contains", "@brief Method bool QRegion::contains(const QRect &r)\n", true, &_init_f_contains_c1792, &_call_f_contains_c1792);
+  methods += new qt_gsi::GenericMethod ("end", "@brief Method const QRect *QRegion::end()\n", true, &_init_f_end_c0, &_call_f_end_c0);
   methods += new qt_gsi::GenericMethod ("intersected", "@brief Method QRegion QRegion::intersected(const QRegion &r)\n", true, &_init_f_intersected_c2006, &_call_f_intersected_c2006);
   methods += new qt_gsi::GenericMethod ("intersected", "@brief Method QRegion QRegion::intersected(const QRect &r)\n", true, &_init_f_intersected_c1792, &_call_f_intersected_c1792);
   methods += new qt_gsi::GenericMethod ("intersects", "@brief Method bool QRegion::intersects(const QRegion &r)\n", true, &_init_f_intersects_c2006, &_call_f_intersects_c2006);

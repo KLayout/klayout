@@ -217,22 +217,6 @@ static void _call_f_handshakeState_c0 (const qt_gsi::GenericMethod * /*decl*/, v
 }
 
 
-// void QDtls::handshakeTimeout()
-
-
-static void _init_f_handshakeTimeout_0 (qt_gsi::GenericMethod *decl)
-{
-  decl->set_return<void > ();
-}
-
-static void _call_f_handshakeTimeout_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QDtls *)cls)->handshakeTimeout ();
-}
-
-
 // void QDtls::ignoreVerificationErrors(const QList<QSslError> &errorsToIgnore)
 
 
@@ -340,26 +324,6 @@ static void _call_f_peerVerificationName_c0 (const qt_gsi::GenericMethod * /*dec
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QString > ((QString)((QDtls *)cls)->peerVerificationName ());
-}
-
-
-// void QDtls::pskRequired(QSslPreSharedKeyAuthenticator *authenticator)
-
-
-static void _init_f_pskRequired_3571 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("authenticator");
-  decl->add_arg<QSslPreSharedKeyAuthenticator * > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_pskRequired_3571 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QSslPreSharedKeyAuthenticator *arg1 = gsi::arg_reader<QSslPreSharedKeyAuthenticator * >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QDtls *)cls)->pskRequired (arg1);
 }
 
 
@@ -610,26 +574,28 @@ static gsi::Methods methods_QDtls () {
   methods += new qt_gsi::GenericMethod ("dtlsErrorString", "@brief Method QString QDtls::dtlsErrorString()\n", true, &_init_f_dtlsErrorString_c0, &_call_f_dtlsErrorString_c0);
   methods += new qt_gsi::GenericMethod ("handleTimeout", "@brief Method bool QDtls::handleTimeout(QUdpSocket *socket)\n", false, &_init_f_handleTimeout_1617, &_call_f_handleTimeout_1617);
   methods += new qt_gsi::GenericMethod ("handshakeState", "@brief Method QDtls::HandshakeState QDtls::handshakeState()\n", true, &_init_f_handshakeState_c0, &_call_f_handshakeState_c0);
-  methods += new qt_gsi::GenericMethod ("handshakeTimeout", "@brief Method void QDtls::handshakeTimeout()\n", false, &_init_f_handshakeTimeout_0, &_call_f_handshakeTimeout_0);
   methods += new qt_gsi::GenericMethod ("ignoreVerificationErrors", "@brief Method void QDtls::ignoreVerificationErrors(const QList<QSslError> &errorsToIgnore)\n", false, &_init_f_ignoreVerificationErrors_2837, &_call_f_ignoreVerificationErrors_2837);
   methods += new qt_gsi::GenericMethod ("isConnectionEncrypted?", "@brief Method bool QDtls::isConnectionEncrypted()\n", true, &_init_f_isConnectionEncrypted_c0, &_call_f_isConnectionEncrypted_c0);
-  methods += new qt_gsi::GenericMethod ("mtuHint", "@brief Method quint16 QDtls::mtuHint()\n", true, &_init_f_mtuHint_c0, &_call_f_mtuHint_c0);
+  methods += new qt_gsi::GenericMethod (":mtuHint", "@brief Method quint16 QDtls::mtuHint()\n", true, &_init_f_mtuHint_c0, &_call_f_mtuHint_c0);
   methods += new qt_gsi::GenericMethod ("peerAddress", "@brief Method QHostAddress QDtls::peerAddress()\n", true, &_init_f_peerAddress_c0, &_call_f_peerAddress_c0);
   methods += new qt_gsi::GenericMethod ("peerPort", "@brief Method quint16 QDtls::peerPort()\n", true, &_init_f_peerPort_c0, &_call_f_peerPort_c0);
   methods += new qt_gsi::GenericMethod ("peerVerificationErrors", "@brief Method QList<QSslError> QDtls::peerVerificationErrors()\n", true, &_init_f_peerVerificationErrors_c0, &_call_f_peerVerificationErrors_c0);
   methods += new qt_gsi::GenericMethod ("peerVerificationName", "@brief Method QString QDtls::peerVerificationName()\n", true, &_init_f_peerVerificationName_c0, &_call_f_peerVerificationName_c0);
-  methods += new qt_gsi::GenericMethod ("pskRequired", "@brief Method void QDtls::pskRequired(QSslPreSharedKeyAuthenticator *authenticator)\n", false, &_init_f_pskRequired_3571, &_call_f_pskRequired_3571);
   methods += new qt_gsi::GenericMethod ("resumeHandshake", "@brief Method bool QDtls::resumeHandshake(QUdpSocket *socket)\n", false, &_init_f_resumeHandshake_1617, &_call_f_resumeHandshake_1617);
   methods += new qt_gsi::GenericMethod ("sessionCipher", "@brief Method QSslCipher QDtls::sessionCipher()\n", true, &_init_f_sessionCipher_c0, &_call_f_sessionCipher_c0);
   methods += new qt_gsi::GenericMethod ("sessionProtocol", "@brief Method QSsl::SslProtocol QDtls::sessionProtocol()\n", true, &_init_f_sessionProtocol_c0, &_call_f_sessionProtocol_c0);
   methods += new qt_gsi::GenericMethod ("setCookieGeneratorParameters", "@brief Method bool QDtls::setCookieGeneratorParameters(const QDtls::GeneratorParameters &params)\n", false, &_init_f_setCookieGeneratorParameters_3896, &_call_f_setCookieGeneratorParameters_3896);
   methods += new qt_gsi::GenericMethod ("setDtlsConfiguration", "@brief Method bool QDtls::setDtlsConfiguration(const QSslConfiguration &configuration)\n", false, &_init_f_setDtlsConfiguration_3068, &_call_f_setDtlsConfiguration_3068);
-  methods += new qt_gsi::GenericMethod ("setMtuHint", "@brief Method void QDtls::setMtuHint(quint16 mtuHint)\n", false, &_init_f_setMtuHint_1100, &_call_f_setMtuHint_1100);
+  methods += new qt_gsi::GenericMethod ("setMtuHint|mtuHint=", "@brief Method void QDtls::setMtuHint(quint16 mtuHint)\n", false, &_init_f_setMtuHint_1100, &_call_f_setMtuHint_1100);
   methods += new qt_gsi::GenericMethod ("setPeer", "@brief Method bool QDtls::setPeer(const QHostAddress &address, quint16 port, const QString &verificationName)\n", false, &_init_f_setPeer_5427, &_call_f_setPeer_5427);
   methods += new qt_gsi::GenericMethod ("setPeerVerificationName", "@brief Method bool QDtls::setPeerVerificationName(const QString &name)\n", false, &_init_f_setPeerVerificationName_2025, &_call_f_setPeerVerificationName_2025);
   methods += new qt_gsi::GenericMethod ("shutdown", "@brief Method bool QDtls::shutdown(QUdpSocket *socket)\n", false, &_init_f_shutdown_1617, &_call_f_shutdown_1617);
   methods += new qt_gsi::GenericMethod ("sslMode", "@brief Method QSslSocket::SslMode QDtls::sslMode()\n", true, &_init_f_sslMode_c0, &_call_f_sslMode_c0);
   methods += new qt_gsi::GenericMethod ("writeDatagramEncrypted", "@brief Method qint64 QDtls::writeDatagramEncrypted(QUdpSocket *socket, const QByteArray &dgram)\n", false, &_init_f_writeDatagramEncrypted_3818, &_call_f_writeDatagramEncrypted_3818);
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QDtls::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("handshakeTimeout()", "handshakeTimeout", "@brief Signal declaration for QDtls::handshakeTimeout()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QDtls::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QSslPreSharedKeyAuthenticator * > ("pskRequired(QSslPreSharedKeyAuthenticator *)", "pskRequired", gsi::arg("authenticator"), "@brief Signal declaration for QDtls::pskRequired(QSslPreSharedKeyAuthenticator *authenticator)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QDtls::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
   return methods;
 }
@@ -683,6 +649,12 @@ public:
     return QDtls::senderSignalIndex();
   }
 
+  //  [emitter impl] void QDtls::destroyed(QObject *)
+  void emitter_QDtls_destroyed_1302(QObject *arg1)
+  {
+    emit QDtls::destroyed(arg1);
+  }
+
   //  [adaptor impl] bool QDtls::event(QEvent *event)
   bool cbs_event_1217_0(QEvent *_event)
   {
@@ -711,6 +683,25 @@ public:
     } else {
       return QDtls::eventFilter(watched, event);
     }
+  }
+
+  //  [emitter impl] void QDtls::handshakeTimeout()
+  void emitter_QDtls_handshakeTimeout_0()
+  {
+    emit QDtls::handshakeTimeout();
+  }
+
+  //  [emitter impl] void QDtls::objectNameChanged(const QString &objectName)
+  void emitter_QDtls_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QDtls::objectNameChanged(const QString &objectName)'");
+  }
+
+  //  [emitter impl] void QDtls::pskRequired(QSslPreSharedKeyAuthenticator *authenticator)
+  void emitter_QDtls_pskRequired_3571(QSslPreSharedKeyAuthenticator *authenticator)
+  {
+    emit QDtls::pskRequired(authenticator);
   }
 
   //  [adaptor impl] void QDtls::childEvent(QChildEvent *event)
@@ -852,6 +843,24 @@ static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QDtls::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QDtls_Adaptor *)cls)->emitter_QDtls_destroyed_1302 (arg1);
+}
+
+
 // void QDtls::disconnectNotify(const QMetaMethod &signal)
 
 static void _init_cbs_disconnectNotify_2394_0 (qt_gsi::GenericMethod *decl)
@@ -925,6 +934,20 @@ static void _set_callback_cbs_eventFilter_2411_0 (void *cls, const gsi::Callback
 }
 
 
+// emitter void QDtls::handshakeTimeout()
+
+static void _init_emitter_handshakeTimeout_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_handshakeTimeout_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QDtls_Adaptor *)cls)->emitter_QDtls_handshakeTimeout_0 ();
+}
+
+
 // exposed bool QDtls::isSignalConnected(const QMetaMethod &signal)
 
 static void _init_fp_isSignalConnected_c2394 (qt_gsi::GenericMethod *decl)
@@ -940,6 +963,42 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
   tl::Heap heap;
   const QMetaMethod &arg1 = gsi::arg_reader<const QMetaMethod & >() (args, heap);
   ret.write<bool > ((bool)((QDtls_Adaptor *)cls)->fp_QDtls_isSignalConnected_c2394 (arg1));
+}
+
+
+// emitter void QDtls::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QDtls_Adaptor *)cls)->emitter_QDtls_objectNameChanged_4567 (arg1);
+}
+
+
+// emitter void QDtls::pskRequired(QSslPreSharedKeyAuthenticator *authenticator)
+
+static void _init_emitter_pskRequired_3571 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("authenticator");
+  decl->add_arg<QSslPreSharedKeyAuthenticator * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_pskRequired_3571 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QSslPreSharedKeyAuthenticator *arg1 = gsi::arg_reader<QSslPreSharedKeyAuthenticator * >() (args, heap);
+  ((QDtls_Adaptor *)cls)->emitter_QDtls_pskRequired_3571 (arg1);
 }
 
 
@@ -1025,13 +1084,17 @@ static gsi::Methods methods_QDtls_Adaptor () {
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QDtls::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QDtls::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QDtls::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QDtls::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QDtls::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("emit_handshakeTimeout", "@brief Emitter for signal void QDtls::handshakeTimeout()\nCall this method to emit this signal.", false, &_init_emitter_handshakeTimeout_0, &_call_emitter_handshakeTimeout_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QDtls::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QDtls::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
+  methods += new qt_gsi::GenericMethod ("emit_pskRequired", "@brief Emitter for signal void QDtls::pskRequired(QSslPreSharedKeyAuthenticator *authenticator)\nCall this method to emit this signal.", false, &_init_emitter_pskRequired_3571, &_call_emitter_pskRequired_3571);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QDtls::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QDtls::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QDtls::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);

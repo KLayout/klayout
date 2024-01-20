@@ -96,25 +96,6 @@ static void _call_f_fromUnicode_2025 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// QByteArray QTextEncoder::fromUnicode(QStringView str)
-
-
-static void _init_f_fromUnicode_1559 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("str");
-  decl->add_arg<QStringView > (argspec_0);
-  decl->set_return<QByteArray > ();
-}
-
-static void _call_f_fromUnicode_1559 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  ret.write<QByteArray > ((QByteArray)((QTextEncoder *)cls)->fromUnicode (arg1));
-}
-
-
 // bool QTextEncoder::hasFailure()
 
 
@@ -139,7 +120,6 @@ static gsi::Methods methods_QTextEncoder () {
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTextEncoder::QTextEncoder(const QTextCodec *codec)\nThis method creates an object of class QTextEncoder.", &_init_ctor_QTextEncoder_2297, &_call_ctor_QTextEncoder_2297);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QTextEncoder::QTextEncoder(const QTextCodec *codec, QTextCodec::ConversionFlags flags)\nThis method creates an object of class QTextEncoder.", &_init_ctor_QTextEncoder_5276, &_call_ctor_QTextEncoder_5276);
   methods += new qt_gsi::GenericMethod ("fromUnicode", "@brief Method QByteArray QTextEncoder::fromUnicode(const QString &str)\n", false, &_init_f_fromUnicode_2025, &_call_f_fromUnicode_2025);
-  methods += new qt_gsi::GenericMethod ("fromUnicode", "@brief Method QByteArray QTextEncoder::fromUnicode(QStringView str)\n", false, &_init_f_fromUnicode_1559, &_call_f_fromUnicode_1559);
   methods += new qt_gsi::GenericMethod ("hasFailure", "@brief Method bool QTextEncoder::hasFailure()\n", true, &_init_f_hasFailure_c0, &_call_f_hasFailure_c0);
   return methods;
 }

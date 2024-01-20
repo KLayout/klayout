@@ -72,28 +72,6 @@ static void _call_ctor_QStringMatcher_4241 (const qt_gsi::GenericStaticMethod * 
 }
 
 
-//  Constructor QStringMatcher::QStringMatcher(QStringView pattern, Qt::CaseSensitivity cs)
-
-
-static void _init_ctor_QStringMatcher_3775 (qt_gsi::GenericStaticMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("pattern");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("cs", true, "Qt::CaseSensitive");
-  decl->add_arg<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & > (argspec_1);
-  decl->set_return_new<QStringMatcher> ();
-}
-
-static void _call_ctor_QStringMatcher_3775 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
-  const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & arg2 = args ? gsi::arg_reader<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & >() (args, heap) : gsi::arg_maker<const qt_gsi::Converter<Qt::CaseSensitivity>::target_type & >() (qt_gsi::CppToQtReadAdaptor<Qt::CaseSensitivity>(heap, Qt::CaseSensitive), heap);
-  ret.write<QStringMatcher *> (new QStringMatcher (arg1, qt_gsi::QtToCppAdaptor<Qt::CaseSensitivity>(arg2).cref()));
-}
-
-
 //  Constructor QStringMatcher::QStringMatcher(const QStringMatcher &other)
 
 
@@ -145,28 +123,6 @@ static void _call_f_indexIn_c3359 (const qt_gsi::GenericMethod * /*decl*/, void 
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
-  qsizetype arg2 = args ? gsi::arg_reader<qsizetype >() (args, heap) : gsi::arg_maker<qsizetype >() (0, heap);
-  ret.write<qsizetype > ((qsizetype)((QStringMatcher *)cls)->indexIn (arg1, arg2));
-}
-
-
-// qsizetype QStringMatcher::indexIn(QStringView str, qsizetype from)
-
-
-static void _init_f_indexIn_c2893 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("str");
-  decl->add_arg<QStringView > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("from", true, "0");
-  decl->add_arg<qsizetype > (argspec_1);
-  decl->set_return<qsizetype > ();
-}
-
-static void _call_f_indexIn_c2893 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  QStringView arg1 = gsi::arg_reader<QStringView >() (args, heap);
   qsizetype arg2 = args ? gsi::arg_reader<qsizetype >() (args, heap) : gsi::arg_maker<qsizetype >() (0, heap);
   ret.write<qsizetype > ((qsizetype)((QStringMatcher *)cls)->indexIn (arg1, arg2));
 }
@@ -254,11 +210,9 @@ static gsi::Methods methods_QStringMatcher () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStringMatcher::QStringMatcher()\nThis method creates an object of class QStringMatcher.", &_init_ctor_QStringMatcher_0, &_call_ctor_QStringMatcher_0);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStringMatcher::QStringMatcher(const QString &pattern, Qt::CaseSensitivity cs)\nThis method creates an object of class QStringMatcher.", &_init_ctor_QStringMatcher_4241, &_call_ctor_QStringMatcher_4241);
-  methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStringMatcher::QStringMatcher(QStringView pattern, Qt::CaseSensitivity cs)\nThis method creates an object of class QStringMatcher.", &_init_ctor_QStringMatcher_3775, &_call_ctor_QStringMatcher_3775);
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QStringMatcher::QStringMatcher(const QStringMatcher &other)\nThis method creates an object of class QStringMatcher.", &_init_ctor_QStringMatcher_2733, &_call_ctor_QStringMatcher_2733);
   methods += new qt_gsi::GenericMethod (":caseSensitivity", "@brief Method Qt::CaseSensitivity QStringMatcher::caseSensitivity()\n", true, &_init_f_caseSensitivity_c0, &_call_f_caseSensitivity_c0);
   methods += new qt_gsi::GenericMethod ("indexIn", "@brief Method qsizetype QStringMatcher::indexIn(const QString &str, qsizetype from)\n", true, &_init_f_indexIn_c3359, &_call_f_indexIn_c3359);
-  methods += new qt_gsi::GenericMethod ("indexIn", "@brief Method qsizetype QStringMatcher::indexIn(QStringView str, qsizetype from)\n", true, &_init_f_indexIn_c2893, &_call_f_indexIn_c2893);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QStringMatcher &QStringMatcher::operator=(const QStringMatcher &other)\n", false, &_init_f_operator_eq__2733, &_call_f_operator_eq__2733);
   methods += new qt_gsi::GenericMethod (":pattern", "@brief Method QString QStringMatcher::pattern()\n", true, &_init_f_pattern_c0, &_call_f_pattern_c0);
   methods += new qt_gsi::GenericMethod ("setCaseSensitivity|caseSensitivity=", "@brief Method void QStringMatcher::setCaseSensitivity(Qt::CaseSensitivity cs)\n", false, &_init_f_setCaseSensitivity_2324, &_call_f_setCaseSensitivity_2324);

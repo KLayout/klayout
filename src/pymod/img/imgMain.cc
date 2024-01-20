@@ -22,7 +22,5 @@
 
 #include "../pymodHelper.h"
 
-//  to force linking of the img module
-#  include "../../img/img/imgForceLink.h"
-
+#include "imgMain.h"
 DEFINE_PYMOD(imgcore, "img", "KLayout core module 'img'")

@@ -617,10 +617,10 @@ static gsi::Methods methods_QVideoFrame () {
   methods += new qt_gsi::GenericMethod ("planeCount", "@brief Method int QVideoFrame::planeCount()\n", true, &_init_f_planeCount_c0, &_call_f_planeCount_c0);
   methods += new qt_gsi::GenericMethod ("setEndTime|endTime=", "@brief Method void QVideoFrame::setEndTime(qint64 time)\n", false, &_init_f_setEndTime_986, &_call_f_setEndTime_986);
   methods += new qt_gsi::GenericMethod ("setStartTime|startTime=", "@brief Method void QVideoFrame::setStartTime(qint64 time)\n", false, &_init_f_setStartTime_986, &_call_f_setStartTime_986);
-  methods += new qt_gsi::GenericMethod ("setSubtitleText", "@brief Method void QVideoFrame::setSubtitleText(const QString &text)\n", false, &_init_f_setSubtitleText_2025, &_call_f_setSubtitleText_2025);
+  methods += new qt_gsi::GenericMethod ("setSubtitleText|subtitleText=", "@brief Method void QVideoFrame::setSubtitleText(const QString &text)\n", false, &_init_f_setSubtitleText_2025, &_call_f_setSubtitleText_2025);
   methods += new qt_gsi::GenericMethod ("size", "@brief Method QSize QVideoFrame::size()\n", true, &_init_f_size_c0, &_call_f_size_c0);
   methods += new qt_gsi::GenericMethod (":startTime", "@brief Method qint64 QVideoFrame::startTime()\n", true, &_init_f_startTime_c0, &_call_f_startTime_c0);
-  methods += new qt_gsi::GenericMethod ("subtitleText", "@brief Method QString QVideoFrame::subtitleText()\n", true, &_init_f_subtitleText_c0, &_call_f_subtitleText_c0);
+  methods += new qt_gsi::GenericMethod (":subtitleText", "@brief Method QString QVideoFrame::subtitleText()\n", true, &_init_f_subtitleText_c0, &_call_f_subtitleText_c0);
   methods += new qt_gsi::GenericMethod ("surfaceFormat", "@brief Method QVideoFrameFormat QVideoFrame::surfaceFormat()\n", true, &_init_f_surfaceFormat_c0, &_call_f_surfaceFormat_c0);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QVideoFrame::swap(QVideoFrame &other)\n", false, &_init_f_swap_1693, &_call_f_swap_1693);
   methods += new qt_gsi::GenericMethod ("toImage", "@brief Method QImage QVideoFrame::toImage()\n", true, &_init_f_toImage_c0, &_call_f_toImage_c0);

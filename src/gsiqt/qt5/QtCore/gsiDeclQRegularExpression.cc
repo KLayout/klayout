@@ -387,6 +387,25 @@ static void _call_f_swap_2493 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
+// static QString QRegularExpression::anchoredPattern(const QString &expression)
+
+
+static void _init_f_anchoredPattern_2025 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("expression");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<QString > ();
+}
+
+static void _call_f_anchoredPattern_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ret.write<QString > ((QString)QRegularExpression::anchoredPattern (arg1));
+}
+
+
 // static QString QRegularExpression::escape(const QString &str)
 
 
@@ -403,6 +422,25 @@ static void _call_f_escape_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, g
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   ret.write<QString > ((QString)QRegularExpression::escape (arg1));
+}
+
+
+// static QString QRegularExpression::wildcardToRegularExpression(const QString &str)
+
+
+static void _init_f_wildcardToRegularExpression_2025 (qt_gsi::GenericStaticMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("str");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<QString > ();
+}
+
+static void _call_f_wildcardToRegularExpression_2025 (const qt_gsi::GenericStaticMethod * /*decl*/, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ret.write<QString > ((QString)QRegularExpression::wildcardToRegularExpression (arg1));
 }
 
 
@@ -431,7 +469,9 @@ static gsi::Methods methods_QRegularExpression () {
   methods += new qt_gsi::GenericMethod ("setPattern|pattern=", "@brief Method void QRegularExpression::setPattern(const QString &pattern)\n", false, &_init_f_setPattern_2025, &_call_f_setPattern_2025);
   methods += new qt_gsi::GenericMethod ("setPatternOptions|patternOptions=", "@brief Method void QRegularExpression::setPatternOptions(QFlags<QRegularExpression::PatternOption> options)\n", false, &_init_f_setPatternOptions_4490, &_call_f_setPatternOptions_4490);
   methods += new qt_gsi::GenericMethod ("swap", "@brief Method void QRegularExpression::swap(QRegularExpression &other)\n", false, &_init_f_swap_2493, &_call_f_swap_2493);
+  methods += new qt_gsi::GenericStaticMethod ("anchoredPattern", "@brief Static method QString QRegularExpression::anchoredPattern(const QString &expression)\nThis method is static and can be called without an instance.", &_init_f_anchoredPattern_2025, &_call_f_anchoredPattern_2025);
   methods += new qt_gsi::GenericStaticMethod ("escape", "@brief Static method QString QRegularExpression::escape(const QString &str)\nThis method is static and can be called without an instance.", &_init_f_escape_2025, &_call_f_escape_2025);
+  methods += new qt_gsi::GenericStaticMethod ("wildcardToRegularExpression", "@brief Static method QString QRegularExpression::wildcardToRegularExpression(const QString &str)\nThis method is static and can be called without an instance.", &_init_f_wildcardToRegularExpression_2025, &_call_f_wildcardToRegularExpression_2025);
   return methods;
 }
 

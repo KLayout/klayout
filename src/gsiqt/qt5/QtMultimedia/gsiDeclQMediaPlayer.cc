@@ -53,23 +53,18 @@ static void _call_smo (const qt_gsi::GenericStaticMethod *, gsi::SerialArgs &, g
 }
 
 
-// void QMediaPlayer::audioAvailableChanged(bool available)
+// QAudio::Role QMediaPlayer::audioRole()
 
 
-static void _init_f_audioAvailableChanged_864 (qt_gsi::GenericMethod *decl)
+static void _init_f_audioRole_c0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("available");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
+  decl->set_return<qt_gsi::Converter<QAudio::Role>::target_type > ();
 }
 
-static void _call_f_audioAvailableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_audioRole_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaPlayer *)cls)->audioAvailableChanged (arg1);
+  ret.write<qt_gsi::Converter<QAudio::Role>::target_type > ((qt_gsi::Converter<QAudio::Role>::target_type)qt_gsi::CppToQtAdaptor<QAudio::Role>(((QMediaPlayer *)cls)->audioRole ()));
 }
 
 
@@ -122,26 +117,6 @@ static void _call_f_bufferStatus_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// void QMediaPlayer::bufferStatusChanged(int percentFilled)
-
-
-static void _init_f_bufferStatusChanged_767 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("percentFilled");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_bufferStatusChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaPlayer *)cls)->bufferStatusChanged (arg1);
-}
-
-
 // QMediaContent QMediaPlayer::currentMedia()
 
 
@@ -154,26 +129,6 @@ static void _call_f_currentMedia_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<QMediaContent > ((QMediaContent)((QMediaPlayer *)cls)->currentMedia ());
-}
-
-
-// void QMediaPlayer::currentMediaChanged(const QMediaContent &media)
-
-
-static void _init_f_currentMediaChanged_2605 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("media");
-  decl->add_arg<const QMediaContent & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_currentMediaChanged_2605 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QMediaContent &arg1 = gsi::arg_reader<const QMediaContent & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaPlayer *)cls)->currentMediaChanged (arg1);
 }
 
 
@@ -192,6 +147,21 @@ static void _call_f_currentNetworkConfiguration_c0 (const qt_gsi::GenericMethod 
 }
 
 
+// QString QMediaPlayer::customAudioRole()
+
+
+static void _init_f_customAudioRole_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QString > ();
+}
+
+static void _call_f_customAudioRole_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QString > ((QString)((QMediaPlayer *)cls)->customAudioRole ());
+}
+
+
 // qint64 QMediaPlayer::duration()
 
 
@@ -207,26 +177,6 @@ static void _call_f_duration_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// void QMediaPlayer::durationChanged(qint64 duration)
-
-
-static void _init_f_durationChanged_986 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("duration");
-  decl->add_arg<qint64 > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_durationChanged_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaPlayer *)cls)->durationChanged (arg1);
-}
-
-
 // QMediaPlayer::Error QMediaPlayer::error()
 
 
@@ -239,26 +189,6 @@ static void _call_f_error_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<qt_gsi::Converter<QMediaPlayer::Error>::target_type > ((qt_gsi::Converter<QMediaPlayer::Error>::target_type)qt_gsi::CppToQtAdaptor<QMediaPlayer::Error>(((QMediaPlayer *)cls)->error ()));
-}
-
-
-// void QMediaPlayer::error(QMediaPlayer::Error error)
-
-
-static void _init_f_error_2256 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("error");
-  decl->add_arg<const qt_gsi::Converter<QMediaPlayer::Error>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_error_2256 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QMediaPlayer::Error>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMediaPlayer::Error>::target_type & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaPlayer *)cls)->error (qt_gsi::QtToCppAdaptor<QMediaPlayer::Error>(arg1).cref());
 }
 
 
@@ -352,26 +282,6 @@ static void _call_f_media_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// void QMediaPlayer::mediaChanged(const QMediaContent &media)
-
-
-static void _init_f_mediaChanged_2605 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("media");
-  decl->add_arg<const QMediaContent & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_mediaChanged_2605 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QMediaContent &arg1 = gsi::arg_reader<const QMediaContent & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaPlayer *)cls)->mediaChanged (arg1);
-}
-
-
 // QMediaPlayer::MediaStatus QMediaPlayer::mediaStatus()
 
 
@@ -387,26 +297,6 @@ static void _call_f_mediaStatus_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
-// void QMediaPlayer::mediaStatusChanged(QMediaPlayer::MediaStatus status)
-
-
-static void _init_f_mediaStatusChanged_2858 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("status");
-  decl->add_arg<const qt_gsi::Converter<QMediaPlayer::MediaStatus>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_mediaStatusChanged_2858 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QMediaPlayer::MediaStatus>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMediaPlayer::MediaStatus>::target_type & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaPlayer *)cls)->mediaStatusChanged (qt_gsi::QtToCppAdaptor<QMediaPlayer::MediaStatus>(arg1).cref());
-}
-
-
 // const QIODevice *QMediaPlayer::mediaStream()
 
 
@@ -419,46 +309,6 @@ static void _call_f_mediaStream_c0 (const qt_gsi::GenericMethod * /*decl*/, void
 {
   __SUPPRESS_UNUSED_WARNING(args);
   ret.write<const QIODevice * > ((const QIODevice *)((QMediaPlayer *)cls)->mediaStream ());
-}
-
-
-// void QMediaPlayer::mutedChanged(bool muted)
-
-
-static void _init_f_mutedChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("muted");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_mutedChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaPlayer *)cls)->mutedChanged (arg1);
-}
-
-
-// void QMediaPlayer::networkConfigurationChanged(const QNetworkConfiguration &configuration)
-
-
-static void _init_f_networkConfigurationChanged_3508 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("configuration");
-  decl->add_arg<const QNetworkConfiguration & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_networkConfigurationChanged_3508 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const QNetworkConfiguration &arg1 = gsi::arg_reader<const QNetworkConfiguration & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaPlayer *)cls)->networkConfigurationChanged (arg1);
 }
 
 
@@ -509,26 +359,6 @@ static void _call_f_playbackRate_c0 (const qt_gsi::GenericMethod * /*decl*/, voi
 }
 
 
-// void QMediaPlayer::playbackRateChanged(double rate)
-
-
-static void _init_f_playbackRateChanged_1071 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("rate");
-  decl->add_arg<double > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_playbackRateChanged_1071 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  double arg1 = gsi::arg_reader<double >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaPlayer *)cls)->playbackRateChanged (arg1);
-}
-
-
 // QMediaPlaylist *QMediaPlayer::playlist()
 
 
@@ -559,43 +389,43 @@ static void _call_f_position_c0 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// void QMediaPlayer::positionChanged(qint64 position)
+// void QMediaPlayer::setAudioRole(QAudio::Role audioRole)
 
 
-static void _init_f_positionChanged_986 (qt_gsi::GenericMethod *decl)
+static void _init_f_setAudioRole_1533 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("position");
-  decl->add_arg<qint64 > (argspec_0);
+  static gsi::ArgSpecBase argspec_0 ("audioRole");
+  decl->add_arg<const qt_gsi::Converter<QAudio::Role>::target_type & > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_positionChanged_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_setAudioRole_1533 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
+  const qt_gsi::Converter<QAudio::Role>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAudio::Role>::target_type & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaPlayer *)cls)->positionChanged (arg1);
+  ((QMediaPlayer *)cls)->setAudioRole (qt_gsi::QtToCppAdaptor<QAudio::Role>(arg1).cref());
 }
 
 
-// void QMediaPlayer::seekableChanged(bool seekable)
+// void QMediaPlayer::setCustomAudioRole(const QString &audioRole)
 
 
-static void _init_f_seekableChanged_864 (qt_gsi::GenericMethod *decl)
+static void _init_f_setCustomAudioRole_2025 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("seekable");
-  decl->add_arg<bool > (argspec_0);
+  static gsi::ArgSpecBase argspec_0 ("audioRole");
+  decl->add_arg<const QString & > (argspec_0);
   decl->set_return<void > ();
 }
 
-static void _call_f_seekableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+static void _call_f_setCustomAudioRole_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaPlayer *)cls)->seekableChanged (arg1);
+  ((QMediaPlayer *)cls)->setCustomAudioRole (arg1);
 }
 
 
@@ -606,7 +436,7 @@ static void _init_f_setMedia_3944 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("media");
   decl->add_arg<const QMediaContent & > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("stream", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("stream", true, "nullptr");
   decl->add_arg<QIODevice * > (argspec_1);
   decl->set_return<void > ();
 }
@@ -616,7 +446,7 @@ static void _call_f_setMedia_3944 (const qt_gsi::GenericMethod * /*decl*/, void 
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
   const QMediaContent &arg1 = gsi::arg_reader<const QMediaContent & >() (args, heap);
-  QIODevice *arg2 = args ? gsi::arg_reader<QIODevice * >() (args, heap) : gsi::arg_maker<QIODevice * >() (0, heap);
+  QIODevice *arg2 = args ? gsi::arg_reader<QIODevice * >() (args, heap) : gsi::arg_maker<QIODevice * >() (nullptr, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaPlayer *)cls)->setMedia (arg1, arg2);
 }
@@ -817,26 +647,6 @@ static void _call_f_state_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls,
 }
 
 
-// void QMediaPlayer::stateChanged(QMediaPlayer::State newState)
-
-
-static void _init_f_stateChanged_2247 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("newState");
-  decl->add_arg<const qt_gsi::Converter<QMediaPlayer::State>::target_type & > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_stateChanged_2247 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  const qt_gsi::Converter<QMediaPlayer::State>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMediaPlayer::State>::target_type & >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaPlayer *)cls)->stateChanged (qt_gsi::QtToCppAdaptor<QMediaPlayer::State>(arg1).cref());
-}
-
-
 // void QMediaPlayer::stop()
 
 
@@ -850,6 +660,36 @@ static void _call_f_stop_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, g
   __SUPPRESS_UNUSED_WARNING(args);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaPlayer *)cls)->stop ();
+}
+
+
+// QList<QAudio::Role> QMediaPlayer::supportedAudioRoles()
+
+
+static void _init_f_supportedAudioRoles_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QList<QAudio::Role> > ();
+}
+
+static void _call_f_supportedAudioRoles_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QList<QAudio::Role> > ((QList<QAudio::Role>)((QMediaPlayer *)cls)->supportedAudioRoles ());
+}
+
+
+// QStringList QMediaPlayer::supportedCustomAudioRoles()
+
+
+static void _init_f_supportedCustomAudioRoles_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<QStringList > ();
+}
+
+static void _call_f_supportedCustomAudioRoles_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<QStringList > ((QStringList)((QMediaPlayer *)cls)->supportedCustomAudioRoles ());
 }
 
 
@@ -873,26 +713,6 @@ static void _call_f_unbind_1302 (const qt_gsi::GenericMethod * /*decl*/, void *c
 }
 
 
-// void QMediaPlayer::videoAvailableChanged(bool videoAvailable)
-
-
-static void _init_f_videoAvailableChanged_864 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("videoAvailable");
-  decl->add_arg<bool > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_videoAvailableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  bool arg1 = gsi::arg_reader<bool >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaPlayer *)cls)->videoAvailableChanged (arg1);
-}
-
-
 // int QMediaPlayer::volume()
 
 
@@ -908,26 +728,6 @@ static void _call_f_volume_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls
 }
 
 
-// void QMediaPlayer::volumeChanged(int volume)
-
-
-static void _init_f_volumeChanged_767 (qt_gsi::GenericMethod *decl)
-{
-  static gsi::ArgSpecBase argspec_0 ("volume");
-  decl->add_arg<int > (argspec_0);
-  decl->set_return<void > ();
-}
-
-static void _call_f_volumeChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
-{
-  __SUPPRESS_UNUSED_WARNING(args);
-  tl::Heap heap;
-  int arg1 = gsi::arg_reader<int >() (args, heap);
-  __SUPPRESS_UNUSED_WARNING(ret);
-  ((QMediaPlayer *)cls)->volumeChanged (arg1);
-}
-
-
 // static QMultimedia::SupportEstimate QMediaPlayer::hasSupport(const QString &mimeType, const QStringList &codecs, QFlags<QMediaPlayer::Flag> flags)
 
 
@@ -937,7 +737,7 @@ static void _init_f_hasSupport_7054 (qt_gsi::GenericStaticMethod *decl)
   decl->add_arg<const QString & > (argspec_0);
   static gsi::ArgSpecBase argspec_1 ("codecs", true, "QStringList()");
   decl->add_arg<const QStringList & > (argspec_1);
-  static gsi::ArgSpecBase argspec_2 ("flags", true, "0");
+  static gsi::ArgSpecBase argspec_2 ("flags", true, "QMediaPlayer::Flags()");
   decl->add_arg<QFlags<QMediaPlayer::Flag> > (argspec_2);
   decl->set_return<qt_gsi::Converter<QMultimedia::SupportEstimate>::target_type > ();
 }
@@ -948,7 +748,7 @@ static void _call_f_hasSupport_7054 (const qt_gsi::GenericStaticMethod * /*decl*
   tl::Heap heap;
   const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
   const QStringList &arg2 = args ? gsi::arg_reader<const QStringList & >() (args, heap) : gsi::arg_maker<const QStringList & >() (QStringList(), heap);
-  QFlags<QMediaPlayer::Flag> arg3 = args ? gsi::arg_reader<QFlags<QMediaPlayer::Flag> >() (args, heap) : gsi::arg_maker<QFlags<QMediaPlayer::Flag> >() (0, heap);
+  QFlags<QMediaPlayer::Flag> arg3 = args ? gsi::arg_reader<QFlags<QMediaPlayer::Flag> >() (args, heap) : gsi::arg_maker<QFlags<QMediaPlayer::Flag> >() (QMediaPlayer::Flags(), heap);
   ret.write<qt_gsi::Converter<QMultimedia::SupportEstimate>::target_type > ((qt_gsi::Converter<QMultimedia::SupportEstimate>::target_type)qt_gsi::CppToQtAdaptor<QMultimedia::SupportEstimate>(QMediaPlayer::hasSupport (arg1, arg2, arg3)));
 }
 
@@ -958,7 +758,7 @@ static void _call_f_hasSupport_7054 (const qt_gsi::GenericStaticMethod * /*decl*
 
 static void _init_f_supportedMimeTypes_2808 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("flags", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("flags", true, "QMediaPlayer::Flags()");
   decl->add_arg<QFlags<QMediaPlayer::Flag> > (argspec_0);
   decl->set_return<QStringList > ();
 }
@@ -967,7 +767,7 @@ static void _call_f_supportedMimeTypes_2808 (const qt_gsi::GenericStaticMethod *
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QFlags<QMediaPlayer::Flag> arg1 = args ? gsi::arg_reader<QFlags<QMediaPlayer::Flag> >() (args, heap) : gsi::arg_maker<QFlags<QMediaPlayer::Flag> >() (0, heap);
+  QFlags<QMediaPlayer::Flag> arg1 = args ? gsi::arg_reader<QFlags<QMediaPlayer::Flag> >() (args, heap) : gsi::arg_maker<QFlags<QMediaPlayer::Flag> >() (QMediaPlayer::Flags(), heap);
   ret.write<QStringList > ((QStringList)QMediaPlayer::supportedMimeTypes (arg1));
 }
 
@@ -1028,38 +828,30 @@ namespace gsi
 static gsi::Methods methods_QMediaPlayer () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("staticMetaObject", "@brief Obtains the static MetaObject for this class.", &_init_smo, &_call_smo);
-  methods += new qt_gsi::GenericMethod ("audioAvailableChanged", "@brief Method void QMediaPlayer::audioAvailableChanged(bool available)\n", false, &_init_f_audioAvailableChanged_864, &_call_f_audioAvailableChanged_864);
+  methods += new qt_gsi::GenericMethod (":audioRole", "@brief Method QAudio::Role QMediaPlayer::audioRole()\n", true, &_init_f_audioRole_c0, &_call_f_audioRole_c0);
   methods += new qt_gsi::GenericMethod ("availability", "@brief Method QMultimedia::AvailabilityStatus QMediaPlayer::availability()\nThis is a reimplementation of QMediaObject::availability", true, &_init_f_availability_c0, &_call_f_availability_c0);
   methods += new qt_gsi::GenericMethod ("bind", "@brief Method bool QMediaPlayer::bind(QObject *)\nThis is a reimplementation of QMediaObject::bind", false, &_init_f_bind_1302, &_call_f_bind_1302);
   methods += new qt_gsi::GenericMethod (":bufferStatus", "@brief Method int QMediaPlayer::bufferStatus()\n", true, &_init_f_bufferStatus_c0, &_call_f_bufferStatus_c0);
-  methods += new qt_gsi::GenericMethod ("bufferStatusChanged", "@brief Method void QMediaPlayer::bufferStatusChanged(int percentFilled)\n", false, &_init_f_bufferStatusChanged_767, &_call_f_bufferStatusChanged_767);
   methods += new qt_gsi::GenericMethod (":currentMedia", "@brief Method QMediaContent QMediaPlayer::currentMedia()\n", true, &_init_f_currentMedia_c0, &_call_f_currentMedia_c0);
-  methods += new qt_gsi::GenericMethod ("currentMediaChanged", "@brief Method void QMediaPlayer::currentMediaChanged(const QMediaContent &media)\n", false, &_init_f_currentMediaChanged_2605, &_call_f_currentMediaChanged_2605);
   methods += new qt_gsi::GenericMethod ("currentNetworkConfiguration", "@brief Method QNetworkConfiguration QMediaPlayer::currentNetworkConfiguration()\n", true, &_init_f_currentNetworkConfiguration_c0, &_call_f_currentNetworkConfiguration_c0);
+  methods += new qt_gsi::GenericMethod (":customAudioRole", "@brief Method QString QMediaPlayer::customAudioRole()\n", true, &_init_f_customAudioRole_c0, &_call_f_customAudioRole_c0);
   methods += new qt_gsi::GenericMethod (":duration", "@brief Method qint64 QMediaPlayer::duration()\n", true, &_init_f_duration_c0, &_call_f_duration_c0);
-  methods += new qt_gsi::GenericMethod ("durationChanged", "@brief Method void QMediaPlayer::durationChanged(qint64 duration)\n", false, &_init_f_durationChanged_986, &_call_f_durationChanged_986);
-  methods += new qt_gsi::GenericMethod (":error", "@brief Method QMediaPlayer::Error QMediaPlayer::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
-  methods += new qt_gsi::GenericMethod ("error_sig", "@brief Method void QMediaPlayer::error(QMediaPlayer::Error error)\n", false, &_init_f_error_2256, &_call_f_error_2256);
+  methods += new qt_gsi::GenericMethod ("error", "@brief Method QMediaPlayer::Error QMediaPlayer::error()\n", true, &_init_f_error_c0, &_call_f_error_c0);
   methods += new qt_gsi::GenericMethod ("errorString", "@brief Method QString QMediaPlayer::errorString()\n", true, &_init_f_errorString_c0, &_call_f_errorString_c0);
   methods += new qt_gsi::GenericMethod ("isAudioAvailable?|:audioAvailable", "@brief Method bool QMediaPlayer::isAudioAvailable()\n", true, &_init_f_isAudioAvailable_c0, &_call_f_isAudioAvailable_c0);
   methods += new qt_gsi::GenericMethod ("isMuted?|:muted", "@brief Method bool QMediaPlayer::isMuted()\n", true, &_init_f_isMuted_c0, &_call_f_isMuted_c0);
   methods += new qt_gsi::GenericMethod ("isSeekable?|:seekable", "@brief Method bool QMediaPlayer::isSeekable()\n", true, &_init_f_isSeekable_c0, &_call_f_isSeekable_c0);
   methods += new qt_gsi::GenericMethod ("isVideoAvailable?|:videoAvailable", "@brief Method bool QMediaPlayer::isVideoAvailable()\n", true, &_init_f_isVideoAvailable_c0, &_call_f_isVideoAvailable_c0);
   methods += new qt_gsi::GenericMethod (":media", "@brief Method QMediaContent QMediaPlayer::media()\n", true, &_init_f_media_c0, &_call_f_media_c0);
-  methods += new qt_gsi::GenericMethod ("mediaChanged", "@brief Method void QMediaPlayer::mediaChanged(const QMediaContent &media)\n", false, &_init_f_mediaChanged_2605, &_call_f_mediaChanged_2605);
   methods += new qt_gsi::GenericMethod (":mediaStatus", "@brief Method QMediaPlayer::MediaStatus QMediaPlayer::mediaStatus()\n", true, &_init_f_mediaStatus_c0, &_call_f_mediaStatus_c0);
-  methods += new qt_gsi::GenericMethod ("mediaStatusChanged", "@brief Method void QMediaPlayer::mediaStatusChanged(QMediaPlayer::MediaStatus status)\n", false, &_init_f_mediaStatusChanged_2858, &_call_f_mediaStatusChanged_2858);
   methods += new qt_gsi::GenericMethod ("mediaStream", "@brief Method const QIODevice *QMediaPlayer::mediaStream()\n", true, &_init_f_mediaStream_c0, &_call_f_mediaStream_c0);
-  methods += new qt_gsi::GenericMethod ("mutedChanged", "@brief Method void QMediaPlayer::mutedChanged(bool muted)\n", false, &_init_f_mutedChanged_864, &_call_f_mutedChanged_864);
-  methods += new qt_gsi::GenericMethod ("networkConfigurationChanged", "@brief Method void QMediaPlayer::networkConfigurationChanged(const QNetworkConfiguration &configuration)\n", false, &_init_f_networkConfigurationChanged_3508, &_call_f_networkConfigurationChanged_3508);
   methods += new qt_gsi::GenericMethod ("pause", "@brief Method void QMediaPlayer::pause()\n", false, &_init_f_pause_0, &_call_f_pause_0);
   methods += new qt_gsi::GenericMethod ("play", "@brief Method void QMediaPlayer::play()\n", false, &_init_f_play_0, &_call_f_play_0);
   methods += new qt_gsi::GenericMethod (":playbackRate", "@brief Method double QMediaPlayer::playbackRate()\n", true, &_init_f_playbackRate_c0, &_call_f_playbackRate_c0);
-  methods += new qt_gsi::GenericMethod ("playbackRateChanged", "@brief Method void QMediaPlayer::playbackRateChanged(double rate)\n", false, &_init_f_playbackRateChanged_1071, &_call_f_playbackRateChanged_1071);
   methods += new qt_gsi::GenericMethod (":playlist", "@brief Method QMediaPlaylist *QMediaPlayer::playlist()\n", true, &_init_f_playlist_c0, &_call_f_playlist_c0);
   methods += new qt_gsi::GenericMethod (":position", "@brief Method qint64 QMediaPlayer::position()\n", true, &_init_f_position_c0, &_call_f_position_c0);
-  methods += new qt_gsi::GenericMethod ("positionChanged", "@brief Method void QMediaPlayer::positionChanged(qint64 position)\n", false, &_init_f_positionChanged_986, &_call_f_positionChanged_986);
-  methods += new qt_gsi::GenericMethod ("seekableChanged", "@brief Method void QMediaPlayer::seekableChanged(bool seekable)\n", false, &_init_f_seekableChanged_864, &_call_f_seekableChanged_864);
+  methods += new qt_gsi::GenericMethod ("setAudioRole|audioRole=", "@brief Method void QMediaPlayer::setAudioRole(QAudio::Role audioRole)\n", false, &_init_f_setAudioRole_1533, &_call_f_setAudioRole_1533);
+  methods += new qt_gsi::GenericMethod ("setCustomAudioRole|customAudioRole=", "@brief Method void QMediaPlayer::setCustomAudioRole(const QString &audioRole)\n", false, &_init_f_setCustomAudioRole_2025, &_call_f_setCustomAudioRole_2025);
   methods += new qt_gsi::GenericMethod ("setMedia", "@brief Method void QMediaPlayer::setMedia(const QMediaContent &media, QIODevice *stream)\n", false, &_init_f_setMedia_3944, &_call_f_setMedia_3944);
   methods += new qt_gsi::GenericMethod ("setMuted|muted=", "@brief Method void QMediaPlayer::setMuted(bool muted)\n", false, &_init_f_setMuted_864, &_call_f_setMuted_864);
   methods += new qt_gsi::GenericMethod ("setNetworkConfigurations", "@brief Method void QMediaPlayer::setNetworkConfigurations(const QList<QNetworkConfiguration> &configurations)\n", false, &_init_f_setNetworkConfigurations_4123, &_call_f_setNetworkConfigurations_4123);
@@ -1071,12 +863,36 @@ static gsi::Methods methods_QMediaPlayer () {
   methods += new qt_gsi::GenericMethod ("setVideoOutput", "@brief Method void QMediaPlayer::setVideoOutput(QAbstractVideoSurface *surface)\n", false, &_init_f_setVideoOutput_2739, &_call_f_setVideoOutput_2739);
   methods += new qt_gsi::GenericMethod ("setVolume|volume=", "@brief Method void QMediaPlayer::setVolume(int volume)\n", false, &_init_f_setVolume_767, &_call_f_setVolume_767);
   methods += new qt_gsi::GenericMethod (":state", "@brief Method QMediaPlayer::State QMediaPlayer::state()\n", true, &_init_f_state_c0, &_call_f_state_c0);
-  methods += new qt_gsi::GenericMethod ("stateChanged", "@brief Method void QMediaPlayer::stateChanged(QMediaPlayer::State newState)\n", false, &_init_f_stateChanged_2247, &_call_f_stateChanged_2247);
   methods += new qt_gsi::GenericMethod ("stop", "@brief Method void QMediaPlayer::stop()\n", false, &_init_f_stop_0, &_call_f_stop_0);
+  methods += new qt_gsi::GenericMethod ("supportedAudioRoles", "@brief Method QList<QAudio::Role> QMediaPlayer::supportedAudioRoles()\n", true, &_init_f_supportedAudioRoles_c0, &_call_f_supportedAudioRoles_c0);
+  methods += new qt_gsi::GenericMethod ("supportedCustomAudioRoles", "@brief Method QStringList QMediaPlayer::supportedCustomAudioRoles()\n", true, &_init_f_supportedCustomAudioRoles_c0, &_call_f_supportedCustomAudioRoles_c0);
   methods += new qt_gsi::GenericMethod ("unbind", "@brief Method void QMediaPlayer::unbind(QObject *)\nThis is a reimplementation of QMediaObject::unbind", false, &_init_f_unbind_1302, &_call_f_unbind_1302);
-  methods += new qt_gsi::GenericMethod ("videoAvailableChanged", "@brief Method void QMediaPlayer::videoAvailableChanged(bool videoAvailable)\n", false, &_init_f_videoAvailableChanged_864, &_call_f_videoAvailableChanged_864);
   methods += new qt_gsi::GenericMethod (":volume", "@brief Method int QMediaPlayer::volume()\n", true, &_init_f_volume_c0, &_call_f_volume_c0);
-  methods += new qt_gsi::GenericMethod ("volumeChanged", "@brief Method void QMediaPlayer::volumeChanged(int volume)\n", false, &_init_f_volumeChanged_767, &_call_f_volumeChanged_767);
+  methods += gsi::qt_signal<bool > ("audioAvailableChanged(bool)", "audioAvailableChanged", gsi::arg("available"), "@brief Signal declaration for QMediaPlayer::audioAvailableChanged(bool available)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QAudio::Role>::target_type & > ("audioRoleChanged(QAudio::Role)", "audioRoleChanged", gsi::arg("role"), "@brief Signal declaration for QMediaPlayer::audioRoleChanged(QAudio::Role role)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("availabilityChanged(bool)", "availabilityChanged_bool", gsi::arg("available"), "@brief Signal declaration for QMediaPlayer::availabilityChanged(bool available)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & > ("availabilityChanged(QMultimedia::AvailabilityStatus)", "availabilityChanged_status", gsi::arg("availability"), "@brief Signal declaration for QMediaPlayer::availabilityChanged(QMultimedia::AvailabilityStatus availability)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("bufferStatusChanged(int)", "bufferStatusChanged", gsi::arg("percentFilled"), "@brief Signal declaration for QMediaPlayer::bufferStatusChanged(int percentFilled)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QMediaContent & > ("currentMediaChanged(const QMediaContent &)", "currentMediaChanged", gsi::arg("media"), "@brief Signal declaration for QMediaPlayer::currentMediaChanged(const QMediaContent &media)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("customAudioRoleChanged(const QString &)", "customAudioRoleChanged", gsi::arg("role"), "@brief Signal declaration for QMediaPlayer::customAudioRoleChanged(const QString &role)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<QObject * > ("destroyed(QObject *)", "destroyed", gsi::arg("arg1"), "@brief Signal declaration for QMediaPlayer::destroyed(QObject *)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<qint64 > ("durationChanged(qint64)", "durationChanged", gsi::arg("duration"), "@brief Signal declaration for QMediaPlayer::durationChanged(qint64 duration)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QMediaPlayer::Error>::target_type & > ("error(QMediaPlayer::Error)", "error_sig", gsi::arg("error"), "@brief Signal declaration for QMediaPlayer::error(QMediaPlayer::Error error)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QMediaContent & > ("mediaChanged(const QMediaContent &)", "mediaChanged", gsi::arg("media"), "@brief Signal declaration for QMediaPlayer::mediaChanged(const QMediaContent &media)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QMediaPlayer::MediaStatus>::target_type & > ("mediaStatusChanged(QMediaPlayer::MediaStatus)", "mediaStatusChanged", gsi::arg("status"), "@brief Signal declaration for QMediaPlayer::mediaStatusChanged(QMediaPlayer::MediaStatus status)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("metaDataAvailableChanged(bool)", "metaDataAvailableChanged", gsi::arg("available"), "@brief Signal declaration for QMediaPlayer::metaDataAvailableChanged(bool available)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal ("metaDataChanged()", "metaDataChanged", "@brief Signal declaration for QMediaPlayer::metaDataChanged()\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString &, const QVariant & > ("metaDataChanged(const QString &, const QVariant &)", "metaDataChanged_kv", gsi::arg("key"), gsi::arg("value"), "@brief Signal declaration for QMediaPlayer::metaDataChanged(const QString &key, const QVariant &value)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("mutedChanged(bool)", "mutedChanged", gsi::arg("muted"), "@brief Signal declaration for QMediaPlayer::mutedChanged(bool muted)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QNetworkConfiguration & > ("networkConfigurationChanged(const QNetworkConfiguration &)", "networkConfigurationChanged", gsi::arg("configuration"), "@brief Signal declaration for QMediaPlayer::networkConfigurationChanged(const QNetworkConfiguration &configuration)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("notifyIntervalChanged(int)", "notifyIntervalChanged", gsi::arg("milliSeconds"), "@brief Signal declaration for QMediaPlayer::notifyIntervalChanged(int milliSeconds)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const QString & > ("objectNameChanged(const QString &)", "objectNameChanged", gsi::arg("objectName"), "@brief Signal declaration for QMediaPlayer::objectNameChanged(const QString &objectName)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<double > ("playbackRateChanged(double)", "playbackRateChanged", gsi::arg("rate"), "@brief Signal declaration for QMediaPlayer::playbackRateChanged(double rate)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<qint64 > ("positionChanged(qint64)", "positionChanged", gsi::arg("position"), "@brief Signal declaration for QMediaPlayer::positionChanged(qint64 position)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("seekableChanged(bool)", "seekableChanged", gsi::arg("seekable"), "@brief Signal declaration for QMediaPlayer::seekableChanged(bool seekable)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<const qt_gsi::Converter<QMediaPlayer::State>::target_type & > ("stateChanged(QMediaPlayer::State)", "stateChanged", gsi::arg("newState"), "@brief Signal declaration for QMediaPlayer::stateChanged(QMediaPlayer::State newState)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<bool > ("videoAvailableChanged(bool)", "videoAvailableChanged", gsi::arg("videoAvailable"), "@brief Signal declaration for QMediaPlayer::videoAvailableChanged(bool videoAvailable)\nYou can bind a procedure to this signal.");
+  methods += gsi::qt_signal<int > ("volumeChanged(int)", "volumeChanged", gsi::arg("volume"), "@brief Signal declaration for QMediaPlayer::volumeChanged(int volume)\nYou can bind a procedure to this signal.");
   methods += new qt_gsi::GenericStaticMethod ("hasSupport", "@brief Static method QMultimedia::SupportEstimate QMediaPlayer::hasSupport(const QString &mimeType, const QStringList &codecs, QFlags<QMediaPlayer::Flag> flags)\nThis method is static and can be called without an instance.", &_init_f_hasSupport_7054, &_call_f_hasSupport_7054);
   methods += new qt_gsi::GenericStaticMethod ("supportedMimeTypes", "@brief Static method QStringList QMediaPlayer::supportedMimeTypes(QFlags<QMediaPlayer::Flag> flags)\nThis method is static and can be called without an instance.", &_init_f_supportedMimeTypes_2808, &_call_f_supportedMimeTypes_2808);
   methods += new qt_gsi::GenericStaticMethod ("tr", "@brief Static method QString QMediaPlayer::tr(const char *s, const char *c, int n)\nThis method is static and can be called without an instance.", &_init_f_tr_4013, &_call_f_tr_4013);
@@ -1119,8 +935,8 @@ public:
     qt_gsi::QtObjectBase::init (this);
   }
 
-  //  [expose] void QMediaPlayer::addPropertyWatch(QByteArray const &name)
-  void fp_QMediaPlayer_addPropertyWatch_2309 (QByteArray const &name) {
+  //  [expose] void QMediaPlayer::addPropertyWatch(const QByteArray &name)
+  void fp_QMediaPlayer_addPropertyWatch_2309 (const QByteArray &name) {
     QMediaPlayer::addPropertyWatch(name);
   }
 
@@ -1134,8 +950,8 @@ public:
     return QMediaPlayer::receivers(signal);
   }
 
-  //  [expose] void QMediaPlayer::removePropertyWatch(QByteArray const &name)
-  void fp_QMediaPlayer_removePropertyWatch_2309 (QByteArray const &name) {
+  //  [expose] void QMediaPlayer::removePropertyWatch(const QByteArray &name)
+  void fp_QMediaPlayer_removePropertyWatch_2309 (const QByteArray &name) {
     QMediaPlayer::removePropertyWatch(name);
   }
 
@@ -1147,6 +963,18 @@ public:
   //  [expose] int QMediaPlayer::senderSignalIndex()
   int fp_QMediaPlayer_senderSignalIndex_c0 () const {
     return QMediaPlayer::senderSignalIndex();
+  }
+
+  //  [emitter impl] void QMediaPlayer::audioAvailableChanged(bool available)
+  void emitter_QMediaPlayer_audioAvailableChanged_864(bool available)
+  {
+    emit QMediaPlayer::audioAvailableChanged(available);
+  }
+
+  //  [emitter impl] void QMediaPlayer::audioRoleChanged(QAudio::Role role)
+  void emitter_QMediaPlayer_audioRoleChanged_1533(QAudio::Role role)
+  {
+    emit QMediaPlayer::audioRoleChanged(role);
   }
 
   //  [adaptor impl] QMultimedia::AvailabilityStatus QMediaPlayer::availability()
@@ -1164,6 +992,18 @@ public:
     }
   }
 
+  //  [emitter impl] void QMediaPlayer::availabilityChanged(bool available)
+  void emitter_QMediaPlayer_availabilityChanged_864(bool available)
+  {
+    emit QMediaPlayer::availabilityChanged(available);
+  }
+
+  //  [emitter impl] void QMediaPlayer::availabilityChanged(QMultimedia::AvailabilityStatus availability)
+  void emitter_QMediaPlayer_availabilityChanged_3555(QMultimedia::AvailabilityStatus availability)
+  {
+    emit QMediaPlayer::availabilityChanged(availability);
+  }
+
   //  [adaptor impl] bool QMediaPlayer::bind(QObject *)
   bool cbs_bind_1302_0(QObject *arg1)
   {
@@ -1179,33 +1019,69 @@ public:
     }
   }
 
-  //  [adaptor impl] bool QMediaPlayer::event(QEvent *)
-  bool cbs_event_1217_0(QEvent *arg1)
+  //  [emitter impl] void QMediaPlayer::bufferStatusChanged(int percentFilled)
+  void emitter_QMediaPlayer_bufferStatusChanged_767(int percentFilled)
   {
-    return QMediaPlayer::event(arg1);
+    emit QMediaPlayer::bufferStatusChanged(percentFilled);
   }
 
-  virtual bool event(QEvent *arg1)
+  //  [emitter impl] void QMediaPlayer::currentMediaChanged(const QMediaContent &media)
+  void emitter_QMediaPlayer_currentMediaChanged_2605(const QMediaContent &media)
+  {
+    emit QMediaPlayer::currentMediaChanged(media);
+  }
+
+  //  [emitter impl] void QMediaPlayer::customAudioRoleChanged(const QString &role)
+  void emitter_QMediaPlayer_customAudioRoleChanged_2025(const QString &role)
+  {
+    emit QMediaPlayer::customAudioRoleChanged(role);
+  }
+
+  //  [emitter impl] void QMediaPlayer::destroyed(QObject *)
+  void emitter_QMediaPlayer_destroyed_1302(QObject *arg1)
+  {
+    emit QMediaPlayer::destroyed(arg1);
+  }
+
+  //  [emitter impl] void QMediaPlayer::durationChanged(qint64 duration)
+  void emitter_QMediaPlayer_durationChanged_986(qint64 duration)
+  {
+    emit QMediaPlayer::durationChanged(duration);
+  }
+
+  //  [emitter impl] void QMediaPlayer::error(QMediaPlayer::Error error)
+  void emitter_QMediaPlayer_error_2256(QMediaPlayer::Error _error)
+  {
+    emit QMediaPlayer::error(_error);
+  }
+
+  //  [adaptor impl] bool QMediaPlayer::event(QEvent *event)
+  bool cbs_event_1217_0(QEvent *_event)
+  {
+    return QMediaPlayer::event(_event);
+  }
+
+  virtual bool event(QEvent *_event)
   {
     if (cb_event_1217_0.can_issue()) {
-      return cb_event_1217_0.issue<QMediaPlayer_Adaptor, bool, QEvent *>(&QMediaPlayer_Adaptor::cbs_event_1217_0, arg1);
+      return cb_event_1217_0.issue<QMediaPlayer_Adaptor, bool, QEvent *>(&QMediaPlayer_Adaptor::cbs_event_1217_0, _event);
     } else {
-      return QMediaPlayer::event(arg1);
+      return QMediaPlayer::event(_event);
     }
   }
 
-  //  [adaptor impl] bool QMediaPlayer::eventFilter(QObject *, QEvent *)
-  bool cbs_eventFilter_2411_0(QObject *arg1, QEvent *arg2)
+  //  [adaptor impl] bool QMediaPlayer::eventFilter(QObject *watched, QEvent *event)
+  bool cbs_eventFilter_2411_0(QObject *watched, QEvent *event)
   {
-    return QMediaPlayer::eventFilter(arg1, arg2);
+    return QMediaPlayer::eventFilter(watched, event);
   }
 
-  virtual bool eventFilter(QObject *arg1, QEvent *arg2)
+  virtual bool eventFilter(QObject *watched, QEvent *event)
   {
     if (cb_eventFilter_2411_0.can_issue()) {
-      return cb_eventFilter_2411_0.issue<QMediaPlayer_Adaptor, bool, QObject *, QEvent *>(&QMediaPlayer_Adaptor::cbs_eventFilter_2411_0, arg1, arg2);
+      return cb_eventFilter_2411_0.issue<QMediaPlayer_Adaptor, bool, QObject *, QEvent *>(&QMediaPlayer_Adaptor::cbs_eventFilter_2411_0, watched, event);
     } else {
-      return QMediaPlayer::eventFilter(arg1, arg2);
+      return QMediaPlayer::eventFilter(watched, event);
     }
   }
 
@@ -1224,6 +1100,79 @@ public:
     }
   }
 
+  //  [emitter impl] void QMediaPlayer::mediaChanged(const QMediaContent &media)
+  void emitter_QMediaPlayer_mediaChanged_2605(const QMediaContent &media)
+  {
+    emit QMediaPlayer::mediaChanged(media);
+  }
+
+  //  [emitter impl] void QMediaPlayer::mediaStatusChanged(QMediaPlayer::MediaStatus status)
+  void emitter_QMediaPlayer_mediaStatusChanged_2858(QMediaPlayer::MediaStatus status)
+  {
+    emit QMediaPlayer::mediaStatusChanged(status);
+  }
+
+  //  [emitter impl] void QMediaPlayer::metaDataAvailableChanged(bool available)
+  void emitter_QMediaPlayer_metaDataAvailableChanged_864(bool available)
+  {
+    emit QMediaPlayer::metaDataAvailableChanged(available);
+  }
+
+  //  [emitter impl] void QMediaPlayer::metaDataChanged()
+  void emitter_QMediaPlayer_metaDataChanged_0()
+  {
+    emit QMediaPlayer::metaDataChanged();
+  }
+
+  //  [emitter impl] void QMediaPlayer::metaDataChanged(const QString &key, const QVariant &value)
+  void emitter_QMediaPlayer_metaDataChanged_4036(const QString &key, const QVariant &value)
+  {
+    emit QMediaPlayer::metaDataChanged(key, value);
+  }
+
+  //  [emitter impl] void QMediaPlayer::mutedChanged(bool muted)
+  void emitter_QMediaPlayer_mutedChanged_864(bool muted)
+  {
+    emit QMediaPlayer::mutedChanged(muted);
+  }
+
+  //  [emitter impl] void QMediaPlayer::networkConfigurationChanged(const QNetworkConfiguration &configuration)
+  void emitter_QMediaPlayer_networkConfigurationChanged_3508(const QNetworkConfiguration &configuration)
+  {
+    emit QMediaPlayer::networkConfigurationChanged(configuration);
+  }
+
+  //  [emitter impl] void QMediaPlayer::notifyIntervalChanged(int milliSeconds)
+  void emitter_QMediaPlayer_notifyIntervalChanged_767(int milliSeconds)
+  {
+    emit QMediaPlayer::notifyIntervalChanged(milliSeconds);
+  }
+
+  //  [emitter impl] void QMediaPlayer::objectNameChanged(const QString &objectName)
+  void emitter_QMediaPlayer_objectNameChanged_4567(const QString &objectName)
+  {
+    __SUPPRESS_UNUSED_WARNING (objectName);
+    throw tl::Exception ("Can't emit private signal 'void QMediaPlayer::objectNameChanged(const QString &objectName)'");
+  }
+
+  //  [emitter impl] void QMediaPlayer::playbackRateChanged(double rate)
+  void emitter_QMediaPlayer_playbackRateChanged_1071(double rate)
+  {
+    emit QMediaPlayer::playbackRateChanged(rate);
+  }
+
+  //  [emitter impl] void QMediaPlayer::positionChanged(qint64 position)
+  void emitter_QMediaPlayer_positionChanged_986(qint64 position)
+  {
+    emit QMediaPlayer::positionChanged(position);
+  }
+
+  //  [emitter impl] void QMediaPlayer::seekableChanged(bool seekable)
+  void emitter_QMediaPlayer_seekableChanged_864(bool seekable)
+  {
+    emit QMediaPlayer::seekableChanged(seekable);
+  }
+
   //  [adaptor impl] QMediaService *QMediaPlayer::service()
   QMediaService * cbs_service_c0_0() const
   {
@@ -1237,6 +1186,12 @@ public:
     } else {
       return QMediaPlayer::service();
     }
+  }
+
+  //  [emitter impl] void QMediaPlayer::stateChanged(QMediaPlayer::State newState)
+  void emitter_QMediaPlayer_stateChanged_2247(QMediaPlayer::State newState)
+  {
+    emit QMediaPlayer::stateChanged(newState);
   }
 
   //  [adaptor impl] void QMediaPlayer::unbind(QObject *)
@@ -1254,33 +1209,45 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMediaPlayer::childEvent(QChildEvent *)
-  void cbs_childEvent_1701_0(QChildEvent *arg1)
+  //  [emitter impl] void QMediaPlayer::videoAvailableChanged(bool videoAvailable)
+  void emitter_QMediaPlayer_videoAvailableChanged_864(bool videoAvailable)
   {
-    QMediaPlayer::childEvent(arg1);
+    emit QMediaPlayer::videoAvailableChanged(videoAvailable);
   }
 
-  virtual void childEvent(QChildEvent *arg1)
+  //  [emitter impl] void QMediaPlayer::volumeChanged(int volume)
+  void emitter_QMediaPlayer_volumeChanged_767(int volume)
+  {
+    emit QMediaPlayer::volumeChanged(volume);
+  }
+
+  //  [adaptor impl] void QMediaPlayer::childEvent(QChildEvent *event)
+  void cbs_childEvent_1701_0(QChildEvent *event)
+  {
+    QMediaPlayer::childEvent(event);
+  }
+
+  virtual void childEvent(QChildEvent *event)
   {
     if (cb_childEvent_1701_0.can_issue()) {
-      cb_childEvent_1701_0.issue<QMediaPlayer_Adaptor, QChildEvent *>(&QMediaPlayer_Adaptor::cbs_childEvent_1701_0, arg1);
+      cb_childEvent_1701_0.issue<QMediaPlayer_Adaptor, QChildEvent *>(&QMediaPlayer_Adaptor::cbs_childEvent_1701_0, event);
     } else {
-      QMediaPlayer::childEvent(arg1);
+      QMediaPlayer::childEvent(event);
     }
   }
 
-  //  [adaptor impl] void QMediaPlayer::customEvent(QEvent *)
-  void cbs_customEvent_1217_0(QEvent *arg1)
+  //  [adaptor impl] void QMediaPlayer::customEvent(QEvent *event)
+  void cbs_customEvent_1217_0(QEvent *event)
   {
-    QMediaPlayer::customEvent(arg1);
+    QMediaPlayer::customEvent(event);
   }
 
-  virtual void customEvent(QEvent *arg1)
+  virtual void customEvent(QEvent *event)
   {
     if (cb_customEvent_1217_0.can_issue()) {
-      cb_customEvent_1217_0.issue<QMediaPlayer_Adaptor, QEvent *>(&QMediaPlayer_Adaptor::cbs_customEvent_1217_0, arg1);
+      cb_customEvent_1217_0.issue<QMediaPlayer_Adaptor, QEvent *>(&QMediaPlayer_Adaptor::cbs_customEvent_1217_0, event);
     } else {
-      QMediaPlayer::customEvent(arg1);
+      QMediaPlayer::customEvent(event);
     }
   }
 
@@ -1299,18 +1266,18 @@ public:
     }
   }
 
-  //  [adaptor impl] void QMediaPlayer::timerEvent(QTimerEvent *)
-  void cbs_timerEvent_1730_0(QTimerEvent *arg1)
+  //  [adaptor impl] void QMediaPlayer::timerEvent(QTimerEvent *event)
+  void cbs_timerEvent_1730_0(QTimerEvent *event)
   {
-    QMediaPlayer::timerEvent(arg1);
+    QMediaPlayer::timerEvent(event);
   }
 
-  virtual void timerEvent(QTimerEvent *arg1)
+  virtual void timerEvent(QTimerEvent *event)
   {
     if (cb_timerEvent_1730_0.can_issue()) {
-      cb_timerEvent_1730_0.issue<QMediaPlayer_Adaptor, QTimerEvent *>(&QMediaPlayer_Adaptor::cbs_timerEvent_1730_0, arg1);
+      cb_timerEvent_1730_0.issue<QMediaPlayer_Adaptor, QTimerEvent *>(&QMediaPlayer_Adaptor::cbs_timerEvent_1730_0, event);
     } else {
-      QMediaPlayer::timerEvent(arg1);
+      QMediaPlayer::timerEvent(event);
     }
   }
 
@@ -1333,9 +1300,9 @@ QMediaPlayer_Adaptor::~QMediaPlayer_Adaptor() { }
 
 static void _init_ctor_QMediaPlayer_Adaptor_4002 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("flags", true, "0");
+  static gsi::ArgSpecBase argspec_1 ("flags", true, "QMediaPlayer::Flags()");
   decl->add_arg<QFlags<QMediaPlayer::Flag> > (argspec_1);
   decl->set_return_new<QMediaPlayer_Adaptor> ();
 }
@@ -1344,18 +1311,18 @@ static void _call_ctor_QMediaPlayer_Adaptor_4002 (const qt_gsi::GenericStaticMet
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (0, heap);
-  QFlags<QMediaPlayer::Flag> arg2 = args ? gsi::arg_reader<QFlags<QMediaPlayer::Flag> >() (args, heap) : gsi::arg_maker<QFlags<QMediaPlayer::Flag> >() (0, heap);
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  QFlags<QMediaPlayer::Flag> arg2 = args ? gsi::arg_reader<QFlags<QMediaPlayer::Flag> >() (args, heap) : gsi::arg_maker<QFlags<QMediaPlayer::Flag> >() (QMediaPlayer::Flags(), heap);
   ret.write<QMediaPlayer_Adaptor *> (new QMediaPlayer_Adaptor (arg1, arg2));
 }
 
 
-// exposed void QMediaPlayer::addPropertyWatch(QByteArray const &name)
+// exposed void QMediaPlayer::addPropertyWatch(const QByteArray &name)
 
 static void _init_fp_addPropertyWatch_2309 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("name");
-  decl->add_arg<QByteArray const & > (argspec_0);
+  decl->add_arg<const QByteArray & > (argspec_0);
   decl->set_return<void > ();
 }
 
@@ -1363,9 +1330,45 @@ static void _call_fp_addPropertyWatch_2309 (const qt_gsi::GenericMethod * /*decl
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QByteArray const &arg1 = gsi::arg_reader<QByteArray const & >() (args, heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaPlayer_Adaptor *)cls)->fp_QMediaPlayer_addPropertyWatch_2309 (arg1);
+}
+
+
+// emitter void QMediaPlayer::audioAvailableChanged(bool available)
+
+static void _init_emitter_audioAvailableChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("available");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_audioAvailableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_audioAvailableChanged_864 (arg1);
+}
+
+
+// emitter void QMediaPlayer::audioRoleChanged(QAudio::Role role)
+
+static void _init_emitter_audioRoleChanged_1533 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("role");
+  decl->add_arg<const qt_gsi::Converter<QAudio::Role>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_audioRoleChanged_1533 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QAudio::Role>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QAudio::Role>::target_type & >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_audioRoleChanged_1533 (arg1);
 }
 
 
@@ -1385,6 +1388,42 @@ static void _call_cbs_availability_c0_0 (const qt_gsi::GenericMethod * /*decl*/,
 static void _set_callback_cbs_availability_c0_0 (void *cls, const gsi::Callback &cb)
 {
   ((QMediaPlayer_Adaptor *)cls)->cb_availability_c0_0 = cb;
+}
+
+
+// emitter void QMediaPlayer::availabilityChanged(bool available)
+
+static void _init_emitter_availabilityChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("available");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_availabilityChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_availabilityChanged_864 (arg1);
+}
+
+
+// emitter void QMediaPlayer::availabilityChanged(QMultimedia::AvailabilityStatus availability)
+
+static void _init_emitter_availabilityChanged_3555 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("availability");
+  decl->add_arg<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_availabilityChanged_3555 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMultimedia::AvailabilityStatus>::target_type & >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_availabilityChanged_3555 (arg1);
 }
 
 
@@ -1411,11 +1450,29 @@ static void _set_callback_cbs_bind_1302_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QMediaPlayer::childEvent(QChildEvent *)
+// emitter void QMediaPlayer::bufferStatusChanged(int percentFilled)
+
+static void _init_emitter_bufferStatusChanged_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("percentFilled");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_bufferStatusChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_bufferStatusChanged_767 (arg1);
+}
+
+
+// void QMediaPlayer::childEvent(QChildEvent *event)
 
 static void _init_cbs_childEvent_1701_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QChildEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1435,11 +1492,47 @@ static void _set_callback_cbs_childEvent_1701_0 (void *cls, const gsi::Callback 
 }
 
 
-// void QMediaPlayer::customEvent(QEvent *)
+// emitter void QMediaPlayer::currentMediaChanged(const QMediaContent &media)
+
+static void _init_emitter_currentMediaChanged_2605 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("media");
+  decl->add_arg<const QMediaContent & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_currentMediaChanged_2605 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QMediaContent &arg1 = gsi::arg_reader<const QMediaContent & >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_currentMediaChanged_2605 (arg1);
+}
+
+
+// emitter void QMediaPlayer::customAudioRoleChanged(const QString &role)
+
+static void _init_emitter_customAudioRoleChanged_2025 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("role");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_customAudioRoleChanged_2025 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_customAudioRoleChanged_2025 (arg1);
+}
+
+
+// void QMediaPlayer::customEvent(QEvent *event)
 
 static void _init_cbs_customEvent_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1456,6 +1549,24 @@ static void _call_cbs_customEvent_1217_0 (const qt_gsi::GenericMethod * /*decl*/
 static void _set_callback_cbs_customEvent_1217_0 (void *cls, const gsi::Callback &cb)
 {
   ((QMediaPlayer_Adaptor *)cls)->cb_customEvent_1217_0 = cb;
+}
+
+
+// emitter void QMediaPlayer::destroyed(QObject *)
+
+static void _init_emitter_destroyed_1302 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("arg1", true, "nullptr");
+  decl->add_arg<QObject * > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_destroyed_1302 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  QObject *arg1 = args ? gsi::arg_reader<QObject * >() (args, heap) : gsi::arg_maker<QObject * >() (nullptr, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_destroyed_1302 (arg1);
 }
 
 
@@ -1483,11 +1594,47 @@ static void _set_callback_cbs_disconnectNotify_2394_0 (void *cls, const gsi::Cal
 }
 
 
-// bool QMediaPlayer::event(QEvent *)
+// emitter void QMediaPlayer::durationChanged(qint64 duration)
+
+static void _init_emitter_durationChanged_986 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("duration");
+  decl->add_arg<qint64 > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_durationChanged_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_durationChanged_986 (arg1);
+}
+
+
+// emitter void QMediaPlayer::error(QMediaPlayer::Error error)
+
+static void _init_emitter_error_2256 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("error");
+  decl->add_arg<const qt_gsi::Converter<QMediaPlayer::Error>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_error_2256 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QMediaPlayer::Error>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMediaPlayer::Error>::target_type & >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_error_2256 (arg1);
+}
+
+
+// bool QMediaPlayer::event(QEvent *event)
 
 static void _init_cbs_event_1217_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QEvent * > (argspec_0);
   decl->set_return<bool > ();
 }
@@ -1506,13 +1653,13 @@ static void _set_callback_cbs_event_1217_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// bool QMediaPlayer::eventFilter(QObject *, QEvent *)
+// bool QMediaPlayer::eventFilter(QObject *watched, QEvent *event)
 
 static void _init_cbs_eventFilter_2411_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("watched");
   decl->add_arg<QObject * > (argspec_0);
-  static gsi::ArgSpecBase argspec_1 ("arg2");
+  static gsi::ArgSpecBase argspec_1 ("event");
   decl->add_arg<QEvent * > (argspec_1);
   decl->set_return<bool > ();
 }
@@ -1569,6 +1716,203 @@ static void _call_fp_isSignalConnected_c2394 (const qt_gsi::GenericMethod * /*de
 }
 
 
+// emitter void QMediaPlayer::mediaChanged(const QMediaContent &media)
+
+static void _init_emitter_mediaChanged_2605 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("media");
+  decl->add_arg<const QMediaContent & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_mediaChanged_2605 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QMediaContent &arg1 = gsi::arg_reader<const QMediaContent & >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_mediaChanged_2605 (arg1);
+}
+
+
+// emitter void QMediaPlayer::mediaStatusChanged(QMediaPlayer::MediaStatus status)
+
+static void _init_emitter_mediaStatusChanged_2858 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("status");
+  decl->add_arg<const qt_gsi::Converter<QMediaPlayer::MediaStatus>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_mediaStatusChanged_2858 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QMediaPlayer::MediaStatus>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMediaPlayer::MediaStatus>::target_type & >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_mediaStatusChanged_2858 (arg1);
+}
+
+
+// emitter void QMediaPlayer::metaDataAvailableChanged(bool available)
+
+static void _init_emitter_metaDataAvailableChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("available");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_metaDataAvailableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_metaDataAvailableChanged_864 (arg1);
+}
+
+
+// emitter void QMediaPlayer::metaDataChanged()
+
+static void _init_emitter_metaDataChanged_0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_metaDataChanged_0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_metaDataChanged_0 ();
+}
+
+
+// emitter void QMediaPlayer::metaDataChanged(const QString &key, const QVariant &value)
+
+static void _init_emitter_metaDataChanged_4036 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("key");
+  decl->add_arg<const QString & > (argspec_0);
+  static gsi::ArgSpecBase argspec_1 ("value");
+  decl->add_arg<const QVariant & > (argspec_1);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_metaDataChanged_4036 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  const QVariant &arg2 = gsi::arg_reader<const QVariant & >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_metaDataChanged_4036 (arg1, arg2);
+}
+
+
+// emitter void QMediaPlayer::mutedChanged(bool muted)
+
+static void _init_emitter_mutedChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("muted");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_mutedChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_mutedChanged_864 (arg1);
+}
+
+
+// emitter void QMediaPlayer::networkConfigurationChanged(const QNetworkConfiguration &configuration)
+
+static void _init_emitter_networkConfigurationChanged_3508 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("configuration");
+  decl->add_arg<const QNetworkConfiguration & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_networkConfigurationChanged_3508 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QNetworkConfiguration &arg1 = gsi::arg_reader<const QNetworkConfiguration & >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_networkConfigurationChanged_3508 (arg1);
+}
+
+
+// emitter void QMediaPlayer::notifyIntervalChanged(int milliSeconds)
+
+static void _init_emitter_notifyIntervalChanged_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("milliSeconds");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_notifyIntervalChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_notifyIntervalChanged_767 (arg1);
+}
+
+
+// emitter void QMediaPlayer::objectNameChanged(const QString &objectName)
+
+static void _init_emitter_objectNameChanged_4567 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("objectName");
+  decl->add_arg<const QString & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_objectNameChanged_4567 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const QString &arg1 = gsi::arg_reader<const QString & >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_objectNameChanged_4567 (arg1);
+}
+
+
+// emitter void QMediaPlayer::playbackRateChanged(double rate)
+
+static void _init_emitter_playbackRateChanged_1071 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("rate");
+  decl->add_arg<double > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_playbackRateChanged_1071 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  double arg1 = gsi::arg_reader<double >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_playbackRateChanged_1071 (arg1);
+}
+
+
+// emitter void QMediaPlayer::positionChanged(qint64 position)
+
+static void _init_emitter_positionChanged_986 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("position");
+  decl->add_arg<qint64 > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_positionChanged_986 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  qint64 arg1 = gsi::arg_reader<qint64 >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_positionChanged_986 (arg1);
+}
+
+
 // exposed int QMediaPlayer::receivers(const char *signal)
 
 static void _init_fp_receivers_c1731 (qt_gsi::GenericMethod *decl)
@@ -1587,12 +1931,12 @@ static void _call_fp_receivers_c1731 (const qt_gsi::GenericMethod * /*decl*/, vo
 }
 
 
-// exposed void QMediaPlayer::removePropertyWatch(QByteArray const &name)
+// exposed void QMediaPlayer::removePropertyWatch(const QByteArray &name)
 
 static void _init_fp_removePropertyWatch_2309 (qt_gsi::GenericMethod *decl)
 {
   static gsi::ArgSpecBase argspec_0 ("name");
-  decl->add_arg<QByteArray const & > (argspec_0);
+  decl->add_arg<const QByteArray & > (argspec_0);
   decl->set_return<void > ();
 }
 
@@ -1600,9 +1944,27 @@ static void _call_fp_removePropertyWatch_2309 (const qt_gsi::GenericMethod * /*d
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QByteArray const &arg1 = gsi::arg_reader<QByteArray const & >() (args, heap);
+  const QByteArray &arg1 = gsi::arg_reader<const QByteArray & >() (args, heap);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QMediaPlayer_Adaptor *)cls)->fp_QMediaPlayer_removePropertyWatch_2309 (arg1);
+}
+
+
+// emitter void QMediaPlayer::seekableChanged(bool seekable)
+
+static void _init_emitter_seekableChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("seekable");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_seekableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_seekableChanged_864 (arg1);
 }
 
 
@@ -1653,11 +2015,29 @@ static void _set_callback_cbs_service_c0_0 (void *cls, const gsi::Callback &cb)
 }
 
 
-// void QMediaPlayer::timerEvent(QTimerEvent *)
+// emitter void QMediaPlayer::stateChanged(QMediaPlayer::State newState)
+
+static void _init_emitter_stateChanged_2247 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("newState");
+  decl->add_arg<const qt_gsi::Converter<QMediaPlayer::State>::target_type & > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_stateChanged_2247 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  const qt_gsi::Converter<QMediaPlayer::State>::target_type & arg1 = gsi::arg_reader<const qt_gsi::Converter<QMediaPlayer::State>::target_type & >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_stateChanged_2247 (arg1);
+}
+
+
+// void QMediaPlayer::timerEvent(QTimerEvent *event)
 
 static void _init_cbs_timerEvent_1730_0 (qt_gsi::GenericMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("arg1");
+  static gsi::ArgSpecBase argspec_0 ("event");
   decl->add_arg<QTimerEvent * > (argspec_0);
   decl->set_return<void > ();
 }
@@ -1701,6 +2081,42 @@ static void _set_callback_cbs_unbind_1302_0 (void *cls, const gsi::Callback &cb)
 }
 
 
+// emitter void QMediaPlayer::videoAvailableChanged(bool videoAvailable)
+
+static void _init_emitter_videoAvailableChanged_864 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("videoAvailable");
+  decl->add_arg<bool > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_videoAvailableChanged_864 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  bool arg1 = gsi::arg_reader<bool >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_videoAvailableChanged_864 (arg1);
+}
+
+
+// emitter void QMediaPlayer::volumeChanged(int volume)
+
+static void _init_emitter_volumeChanged_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("volume");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_emitter_volumeChanged_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs & /*ret*/) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  ((QMediaPlayer_Adaptor *)cls)->emitter_QMediaPlayer_volumeChanged_767 (arg1);
+}
+
+
 namespace gsi
 {
 
@@ -1709,34 +2125,59 @@ gsi::Class<QMediaPlayer> &qtdecl_QMediaPlayer ();
 static gsi::Methods methods_QMediaPlayer_Adaptor () {
   gsi::Methods methods;
   methods += new qt_gsi::GenericStaticMethod ("new", "@brief Constructor QMediaPlayer::QMediaPlayer(QObject *parent, QFlags<QMediaPlayer::Flag> flags)\nThis method creates an object of class QMediaPlayer.", &_init_ctor_QMediaPlayer_Adaptor_4002, &_call_ctor_QMediaPlayer_Adaptor_4002);
-  methods += new qt_gsi::GenericMethod ("*addPropertyWatch", "@brief Method void QMediaPlayer::addPropertyWatch(QByteArray const &name)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_addPropertyWatch_2309, &_call_fp_addPropertyWatch_2309);
+  methods += new qt_gsi::GenericMethod ("*addPropertyWatch", "@brief Method void QMediaPlayer::addPropertyWatch(const QByteArray &name)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_addPropertyWatch_2309, &_call_fp_addPropertyWatch_2309);
+  methods += new qt_gsi::GenericMethod ("emit_audioAvailableChanged", "@brief Emitter for signal void QMediaPlayer::audioAvailableChanged(bool available)\nCall this method to emit this signal.", false, &_init_emitter_audioAvailableChanged_864, &_call_emitter_audioAvailableChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_audioRoleChanged", "@brief Emitter for signal void QMediaPlayer::audioRoleChanged(QAudio::Role role)\nCall this method to emit this signal.", false, &_init_emitter_audioRoleChanged_1533, &_call_emitter_audioRoleChanged_1533);
   methods += new qt_gsi::GenericMethod ("availability", "@brief Virtual method QMultimedia::AvailabilityStatus QMediaPlayer::availability()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_availability_c0_0, &_call_cbs_availability_c0_0);
   methods += new qt_gsi::GenericMethod ("availability", "@hide", true, &_init_cbs_availability_c0_0, &_call_cbs_availability_c0_0, &_set_callback_cbs_availability_c0_0);
+  methods += new qt_gsi::GenericMethod ("emit_availabilityChanged_bool", "@brief Emitter for signal void QMediaPlayer::availabilityChanged(bool available)\nCall this method to emit this signal.", false, &_init_emitter_availabilityChanged_864, &_call_emitter_availabilityChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_availabilityChanged_status", "@brief Emitter for signal void QMediaPlayer::availabilityChanged(QMultimedia::AvailabilityStatus availability)\nCall this method to emit this signal.", false, &_init_emitter_availabilityChanged_3555, &_call_emitter_availabilityChanged_3555);
   methods += new qt_gsi::GenericMethod ("bind", "@brief Virtual method bool QMediaPlayer::bind(QObject *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_bind_1302_0, &_call_cbs_bind_1302_0);
   methods += new qt_gsi::GenericMethod ("bind", "@hide", false, &_init_cbs_bind_1302_0, &_call_cbs_bind_1302_0, &_set_callback_cbs_bind_1302_0);
-  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QMediaPlayer::childEvent(QChildEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
+  methods += new qt_gsi::GenericMethod ("emit_bufferStatusChanged", "@brief Emitter for signal void QMediaPlayer::bufferStatusChanged(int percentFilled)\nCall this method to emit this signal.", false, &_init_emitter_bufferStatusChanged_767, &_call_emitter_bufferStatusChanged_767);
+  methods += new qt_gsi::GenericMethod ("*childEvent", "@brief Virtual method void QMediaPlayer::childEvent(QChildEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0);
   methods += new qt_gsi::GenericMethod ("*childEvent", "@hide", false, &_init_cbs_childEvent_1701_0, &_call_cbs_childEvent_1701_0, &_set_callback_cbs_childEvent_1701_0);
-  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMediaPlayer::customEvent(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_currentMediaChanged", "@brief Emitter for signal void QMediaPlayer::currentMediaChanged(const QMediaContent &media)\nCall this method to emit this signal.", false, &_init_emitter_currentMediaChanged_2605, &_call_emitter_currentMediaChanged_2605);
+  methods += new qt_gsi::GenericMethod ("emit_customAudioRoleChanged", "@brief Emitter for signal void QMediaPlayer::customAudioRoleChanged(const QString &role)\nCall this method to emit this signal.", false, &_init_emitter_customAudioRoleChanged_2025, &_call_emitter_customAudioRoleChanged_2025);
+  methods += new qt_gsi::GenericMethod ("*customEvent", "@brief Virtual method void QMediaPlayer::customEvent(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0);
   methods += new qt_gsi::GenericMethod ("*customEvent", "@hide", false, &_init_cbs_customEvent_1217_0, &_call_cbs_customEvent_1217_0, &_set_callback_cbs_customEvent_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_destroyed", "@brief Emitter for signal void QMediaPlayer::destroyed(QObject *)\nCall this method to emit this signal.", false, &_init_emitter_destroyed_1302, &_call_emitter_destroyed_1302);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@brief Virtual method void QMediaPlayer::disconnectNotify(const QMetaMethod &signal)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0);
   methods += new qt_gsi::GenericMethod ("*disconnectNotify", "@hide", false, &_init_cbs_disconnectNotify_2394_0, &_call_cbs_disconnectNotify_2394_0, &_set_callback_cbs_disconnectNotify_2394_0);
-  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMediaPlayer::event(QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
+  methods += new qt_gsi::GenericMethod ("emit_durationChanged", "@brief Emitter for signal void QMediaPlayer::durationChanged(qint64 duration)\nCall this method to emit this signal.", false, &_init_emitter_durationChanged_986, &_call_emitter_durationChanged_986);
+  methods += new qt_gsi::GenericMethod ("emit_error_sig", "@brief Emitter for signal void QMediaPlayer::error(QMediaPlayer::Error error)\nCall this method to emit this signal.", false, &_init_emitter_error_2256, &_call_emitter_error_2256);
+  methods += new qt_gsi::GenericMethod ("event", "@brief Virtual method bool QMediaPlayer::event(QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0);
   methods += new qt_gsi::GenericMethod ("event", "@hide", false, &_init_cbs_event_1217_0, &_call_cbs_event_1217_0, &_set_callback_cbs_event_1217_0);
-  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QMediaPlayer::eventFilter(QObject *, QEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
+  methods += new qt_gsi::GenericMethod ("eventFilter", "@brief Virtual method bool QMediaPlayer::eventFilter(QObject *watched, QEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("eventFilter", "@hide", false, &_init_cbs_eventFilter_2411_0, &_call_cbs_eventFilter_2411_0, &_set_callback_cbs_eventFilter_2411_0);
   methods += new qt_gsi::GenericMethod ("isAvailable", "@brief Virtual method bool QMediaPlayer::isAvailable()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_isAvailable_c0_0, &_call_cbs_isAvailable_c0_0);
   methods += new qt_gsi::GenericMethod ("isAvailable", "@hide", true, &_init_cbs_isAvailable_c0_0, &_call_cbs_isAvailable_c0_0, &_set_callback_cbs_isAvailable_c0_0);
   methods += new qt_gsi::GenericMethod ("*isSignalConnected", "@brief Method bool QMediaPlayer::isSignalConnected(const QMetaMethod &signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_isSignalConnected_c2394, &_call_fp_isSignalConnected_c2394);
+  methods += new qt_gsi::GenericMethod ("emit_mediaChanged", "@brief Emitter for signal void QMediaPlayer::mediaChanged(const QMediaContent &media)\nCall this method to emit this signal.", false, &_init_emitter_mediaChanged_2605, &_call_emitter_mediaChanged_2605);
+  methods += new qt_gsi::GenericMethod ("emit_mediaStatusChanged", "@brief Emitter for signal void QMediaPlayer::mediaStatusChanged(QMediaPlayer::MediaStatus status)\nCall this method to emit this signal.", false, &_init_emitter_mediaStatusChanged_2858, &_call_emitter_mediaStatusChanged_2858);
+  methods += new qt_gsi::GenericMethod ("emit_metaDataAvailableChanged", "@brief Emitter for signal void QMediaPlayer::metaDataAvailableChanged(bool available)\nCall this method to emit this signal.", false, &_init_emitter_metaDataAvailableChanged_864, &_call_emitter_metaDataAvailableChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_metaDataChanged", "@brief Emitter for signal void QMediaPlayer::metaDataChanged()\nCall this method to emit this signal.", false, &_init_emitter_metaDataChanged_0, &_call_emitter_metaDataChanged_0);
+  methods += new qt_gsi::GenericMethod ("emit_metaDataChanged_kv", "@brief Emitter for signal void QMediaPlayer::metaDataChanged(const QString &key, const QVariant &value)\nCall this method to emit this signal.", false, &_init_emitter_metaDataChanged_4036, &_call_emitter_metaDataChanged_4036);
+  methods += new qt_gsi::GenericMethod ("emit_mutedChanged", "@brief Emitter for signal void QMediaPlayer::mutedChanged(bool muted)\nCall this method to emit this signal.", false, &_init_emitter_mutedChanged_864, &_call_emitter_mutedChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_networkConfigurationChanged", "@brief Emitter for signal void QMediaPlayer::networkConfigurationChanged(const QNetworkConfiguration &configuration)\nCall this method to emit this signal.", false, &_init_emitter_networkConfigurationChanged_3508, &_call_emitter_networkConfigurationChanged_3508);
+  methods += new qt_gsi::GenericMethod ("emit_notifyIntervalChanged", "@brief Emitter for signal void QMediaPlayer::notifyIntervalChanged(int milliSeconds)\nCall this method to emit this signal.", false, &_init_emitter_notifyIntervalChanged_767, &_call_emitter_notifyIntervalChanged_767);
+  methods += new qt_gsi::GenericMethod ("emit_objectNameChanged", "@brief Emitter for signal void QMediaPlayer::objectNameChanged(const QString &objectName)\nCall this method to emit this signal.", false, &_init_emitter_objectNameChanged_4567, &_call_emitter_objectNameChanged_4567);
+  methods += new qt_gsi::GenericMethod ("emit_playbackRateChanged", "@brief Emitter for signal void QMediaPlayer::playbackRateChanged(double rate)\nCall this method to emit this signal.", false, &_init_emitter_playbackRateChanged_1071, &_call_emitter_playbackRateChanged_1071);
+  methods += new qt_gsi::GenericMethod ("emit_positionChanged", "@brief Emitter for signal void QMediaPlayer::positionChanged(qint64 position)\nCall this method to emit this signal.", false, &_init_emitter_positionChanged_986, &_call_emitter_positionChanged_986);
   methods += new qt_gsi::GenericMethod ("*receivers", "@brief Method int QMediaPlayer::receivers(const char *signal)\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_receivers_c1731, &_call_fp_receivers_c1731);
-  methods += new qt_gsi::GenericMethod ("*removePropertyWatch", "@brief Method void QMediaPlayer::removePropertyWatch(QByteArray const &name)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_removePropertyWatch_2309, &_call_fp_removePropertyWatch_2309);
+  methods += new qt_gsi::GenericMethod ("*removePropertyWatch", "@brief Method void QMediaPlayer::removePropertyWatch(const QByteArray &name)\nThis method is protected and can only be called from inside a derived class.", false, &_init_fp_removePropertyWatch_2309, &_call_fp_removePropertyWatch_2309);
+  methods += new qt_gsi::GenericMethod ("emit_seekableChanged", "@brief Emitter for signal void QMediaPlayer::seekableChanged(bool seekable)\nCall this method to emit this signal.", false, &_init_emitter_seekableChanged_864, &_call_emitter_seekableChanged_864);
   methods += new qt_gsi::GenericMethod ("*sender", "@brief Method QObject *QMediaPlayer::sender()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_sender_c0, &_call_fp_sender_c0);
   methods += new qt_gsi::GenericMethod ("*senderSignalIndex", "@brief Method int QMediaPlayer::senderSignalIndex()\nThis method is protected and can only be called from inside a derived class.", true, &_init_fp_senderSignalIndex_c0, &_call_fp_senderSignalIndex_c0);
   methods += new qt_gsi::GenericMethod ("service", "@brief Virtual method QMediaService *QMediaPlayer::service()\nThis method can be reimplemented in a derived class.", true, &_init_cbs_service_c0_0, &_call_cbs_service_c0_0);
   methods += new qt_gsi::GenericMethod ("service", "@hide", true, &_init_cbs_service_c0_0, &_call_cbs_service_c0_0, &_set_callback_cbs_service_c0_0);
-  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QMediaPlayer::timerEvent(QTimerEvent *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
+  methods += new qt_gsi::GenericMethod ("emit_stateChanged", "@brief Emitter for signal void QMediaPlayer::stateChanged(QMediaPlayer::State newState)\nCall this method to emit this signal.", false, &_init_emitter_stateChanged_2247, &_call_emitter_stateChanged_2247);
+  methods += new qt_gsi::GenericMethod ("*timerEvent", "@brief Virtual method void QMediaPlayer::timerEvent(QTimerEvent *event)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("*timerEvent", "@hide", false, &_init_cbs_timerEvent_1730_0, &_call_cbs_timerEvent_1730_0, &_set_callback_cbs_timerEvent_1730_0);
   methods += new qt_gsi::GenericMethod ("unbind", "@brief Virtual method void QMediaPlayer::unbind(QObject *)\nThis method can be reimplemented in a derived class.", false, &_init_cbs_unbind_1302_0, &_call_cbs_unbind_1302_0);
   methods += new qt_gsi::GenericMethod ("unbind", "@hide", false, &_init_cbs_unbind_1302_0, &_call_cbs_unbind_1302_0, &_set_callback_cbs_unbind_1302_0);
+  methods += new qt_gsi::GenericMethod ("emit_videoAvailableChanged", "@brief Emitter for signal void QMediaPlayer::videoAvailableChanged(bool videoAvailable)\nCall this method to emit this signal.", false, &_init_emitter_videoAvailableChanged_864, &_call_emitter_videoAvailableChanged_864);
+  methods += new qt_gsi::GenericMethod ("emit_volumeChanged", "@brief Emitter for signal void QMediaPlayer::volumeChanged(int volume)\nCall this method to emit this signal.", false, &_init_emitter_volumeChanged_767, &_call_emitter_volumeChanged_767);
   return methods;
 }
 

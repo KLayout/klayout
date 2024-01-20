@@ -112,9 +112,9 @@ namespace gsi
 
 static gsi::Methods methods_QGraphicsSceneEvent () {
   gsi::Methods methods;
-  methods += new qt_gsi::GenericMethod ("setTimestamp", "@brief Method void QGraphicsSceneEvent::setTimestamp(quint64 ts)\n", false, &_init_f_setTimestamp_1103, &_call_f_setTimestamp_1103);
+  methods += new qt_gsi::GenericMethod ("setTimestamp|timestamp=", "@brief Method void QGraphicsSceneEvent::setTimestamp(quint64 ts)\n", false, &_init_f_setTimestamp_1103, &_call_f_setTimestamp_1103);
   methods += new qt_gsi::GenericMethod ("setWidget|widget=", "@brief Method void QGraphicsSceneEvent::setWidget(QWidget *widget)\n", false, &_init_f_setWidget_1315, &_call_f_setWidget_1315);
-  methods += new qt_gsi::GenericMethod ("timestamp", "@brief Method quint64 QGraphicsSceneEvent::timestamp()\n", true, &_init_f_timestamp_c0, &_call_f_timestamp_c0);
+  methods += new qt_gsi::GenericMethod (":timestamp", "@brief Method quint64 QGraphicsSceneEvent::timestamp()\n", true, &_init_f_timestamp_c0, &_call_f_timestamp_c0);
   methods += new qt_gsi::GenericMethod (":widget", "@brief Method QWidget *QGraphicsSceneEvent::widget()\n", true, &_init_f_widget_c0, &_call_f_widget_c0);
   return methods;
 }

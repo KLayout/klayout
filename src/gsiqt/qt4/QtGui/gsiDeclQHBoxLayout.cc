@@ -1033,6 +1033,7 @@ static void _call_fp_insertItem_2399 (const qt_gsi::GenericMethod * /*decl*/, vo
   tl::Heap heap;
   int arg1 = gsi::arg_reader<int >() (args, heap);
   QLayoutItem *arg2 = gsi::arg_reader<QLayoutItem * >() (args, heap);
+  qt_gsi::qt_keep (arg2);
   __SUPPRESS_UNUSED_WARNING(ret);
   ((QHBoxLayout_Adaptor *)cls)->fp_QHBoxLayout_insertItem_2399 (arg1, arg2);
 }

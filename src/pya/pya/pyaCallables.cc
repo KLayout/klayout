@@ -27,7 +27,9 @@
 #include "pyaMarshal.h"
 #include "pyaConvert.h"
 #include "pyaUtils.h"
+
 #include "gsiMethods.h"
+#include "gsiVariantArgs.h"
 
 namespace pya
 {
@@ -178,15 +180,97 @@ get_return_value (PYAObjectBase *self, gsi::SerialArgs &retlist, const gsi::Meth
 
   } else {
 
-    ret = pop_arg (meth->ret_type (), retlist, self, heap).release ();
+    ret = pull_arg (meth->ret_type (), retlist, self, heap).release ();
 
   }
 
   return ret;
 }
 
+inline int
+num_args (const gsi::MethodBase *m)
+{
+  return int (m->end_arguments () - m->begin_arguments ());
+}
+
+static bool
+compatible_with_args (const gsi::MethodBase *m, int argc, PyObject *kwargs)
+{
+  int nargs = num_args (m);
+
+  if (argc >= nargs) {
+    //  no more arguments to consider
+    return argc == nargs && (kwargs == NULL || PyDict_Size (kwargs) == 0);
+  }
+
+  if (kwargs != NULL) {
+
+    int nkwargs = int (PyDict_Size (kwargs));
+    int kwargs_taken = 0;
+
+    while (argc < nargs) {
+      const gsi::ArgType &atype = m->begin_arguments () [argc];
+      pya::PythonPtr py_arg = PyDict_GetItemString (kwargs, atype.spec ()->name ().c_str ());
+      if (! py_arg) {
+        if (! atype.spec ()->has_default ()) {
+          return false;
+        }
+      } else {
+        ++kwargs_taken;
+      }
+      ++argc;
+    }
+
+    //  matches if all keyword arguments are taken
+    return kwargs_taken == nkwargs;
+
+  } else {
+
+    while (argc < nargs) {
+      const gsi::ArgType &atype = m->begin_arguments () [argc];
+      if (! atype.spec ()->has_default ()) {
+        return false;
+      }
+      ++argc;
+    }
+
+    return true;
+
+  }
+}
+
+static std::string
+describe_overload (const gsi::MethodBase *m, int argc, PyObject *kwargs)
+{
+  std::string res = m->to_string ();
+  if (compatible_with_args (m, argc, kwargs)) {
+    res += " " + tl::to_string (tr ("[match candidate]"));
+  }
+  return res;
+}
+
+static std::string
+describe_overloads (const MethodTable *mt, int mid, int argc, PyObject *kwargs)
+{
+  std::string res;
+  for (auto m = mt->begin (mid); m != mt->end (mid); ++m) {
+    res += std::string ("  ") + describe_overload (*m, argc, kwargs) + "\n";
+  }
+  return res;
+}
+
+static PyObject *
+get_kwarg (const gsi::ArgType &atype, PyObject *kwargs)
+{
+  if (kwargs != NULL) {
+    return PyDict_GetItemString (kwargs, atype.spec ()->name ().c_str ());
+  } else {
+    return NULL;
+  }
+}
+
 static const gsi::MethodBase *
-match_method (int mid, PyObject *self, PyObject *args, bool strict)
+match_method (int mid, PyObject *self, PyObject *args, PyObject *kwargs, bool strict)
 {
   const gsi::ClassBase *cls_decl = 0;
 
@@ -226,7 +310,7 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
 
       //  ignore callbacks
 
-    } else if ((*m)->compatible_with_num_args (argc)) {
+    } else if (compatible_with_args (*m, argc, kwargs)) {
 
       ++candidates;
       meth = *m;
@@ -237,28 +321,11 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
 
   //  no candidate -> error
   if (! meth) {
-
     if (! strict) {
       return 0;
+    } else {
+      throw tl::TypeError (tl::to_string (tr ("Can't match arguments. Variants are:\n")) + describe_overloads (mt, mid, argc, kwargs));
     }
-
-    std::set<unsigned int> nargs;
-    for (MethodTableEntry::method_iterator m = mt->begin (mid); m != mt->end (mid); ++m) {
-      if (! (*m)->is_callback ()) {
-        nargs.insert (std::distance ((*m)->begin_arguments (), (*m)->end_arguments ()));
-      }
-    }
-
-    std::string nargs_s;
-    for (std::set<unsigned int>::const_iterator na = nargs.begin (); na != nargs.end (); ++na) {
-      if (na != nargs.begin ()) {
-        nargs_s += "/";
-      }
-      nargs_s += tl::to_string (*na);
-    }
-
-    throw tl::Exception (tl::sprintf (tl::to_string (tr ("Invalid number of arguments (got %d, expected %s)")), argc, nargs_s));
-
   }
 
   //  more than one candidate -> refine by checking the arguments
@@ -274,14 +341,18 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
       if (! (*m)->is_callback ()) {
 
         //  check arguments (count and type)
-        bool is_valid = (*m)->compatible_with_num_args (argc);
+
+        bool is_valid = compatible_with_args (*m, argc, kwargs);
+
         int sc = 0;
         int i = 0;
-        for (gsi::MethodBase::argument_iterator a = (*m)->begin_arguments (); is_valid && i < argc && a != (*m)->end_arguments (); ++a, ++i) {
-          PyObject *arg = is_tuple ? PyTuple_GetItem (args, i) : PyList_GetItem (args, i);
-          if (test_arg (*a, arg, false /*strict*/)) {
+        for (gsi::MethodBase::argument_iterator a = (*m)->begin_arguments (); is_valid && a != (*m)->end_arguments (); ++a, ++i) {
+          PythonPtr arg (i >= argc ? get_kwarg (*a, kwargs) : (is_tuple ? PyTuple_GetItem (args, i) : PyList_GetItem (args, i)));
+          if (! arg) {
+            is_valid = a->spec ()->has_default ();
+          } else if (test_arg (*a, arg.get (), false /*strict*/)) {
             ++sc;
-          } else if (test_arg (*a, arg, true /*loose*/)) {
+          } else if (test_arg (*a, arg.get (), true /*loose*/)) {
             //  non-scoring match
           } else {
             is_valid = false;
@@ -306,12 +377,17 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
 
         if (is_valid) {
 
-          //  otherwise take the candidate with the better score
-          if (candidates > 0 && sc > score) {
-            candidates = 1;
-            meth = *m;
-            score = sc;
-          } else if (candidates == 0 || sc == score) {
+          //  otherwise take the candidate with the better score or the least number of arguments (faster)
+          if (candidates > 0) {
+            if (sc > score || (sc == score && num_args (meth) > num_args (*m))) {
+              candidates = 1;
+              meth = *m;
+              score = sc;
+            } else if (sc == score && num_args (meth) == num_args (*m)) {
+              ++candidates;
+              meth = *m;
+            }
+          } else {
             ++candidates;
             meth = *m;
             score = sc;
@@ -327,9 +403,9 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
 
     //  one candidate, but needs checking whether compatibility is given - this avoid having to route NotImplemented over TypeError exceptions later
     int i = 0;
-    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); i < argc && a != meth->end_arguments (); ++a, ++i) {
-      PyObject *arg = is_tuple ? PyTuple_GetItem (args, i) : PyList_GetItem (args, i);
-      if (! test_arg (*a, arg, true /*loose*/)) {
+    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments (); ++a, ++i) {
+      PythonPtr arg (i >= argc ? get_kwarg (*a, kwargs) : (is_tuple ? PyTuple_GetItem (args, i) : PyList_GetItem (args, i)));
+      if (arg && ! test_arg (*a, arg.get (), true /*loose*/)) {
         return 0;
       }
     }
@@ -340,7 +416,7 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
     if (! strict || mt->fallback_not_implemented (mid)) {
       return 0;
     } else {
-      throw tl::TypeError (tl::to_string (tr ("No overload with matching arguments")));
+      throw tl::TypeError (tl::to_string (tr ("No overload with matching arguments. Variants are:\n")) + describe_overloads (mt, mid, argc, kwargs));
     }
   }
 
@@ -348,7 +424,7 @@ match_method (int mid, PyObject *self, PyObject *args, bool strict)
     if (! strict || mt->fallback_not_implemented (mid)) {
       return 0;
     } else {
-      throw tl::TypeError (tl::to_string (tr ("Ambiguous overload variants - multiple method declarations match arguments")));
+      throw tl::TypeError (tl::to_string (tr ("Ambiguous overload variants - multiple method declarations match arguments. Variants are:\n")) + describe_overloads (mt, mid, argc, kwargs));
     }
   }
 
@@ -611,16 +687,64 @@ special_method_impl (gsi::MethodBase::special_method_type smt, PyObject *self, P
 }
 
 void
-push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, PyObject *args, tl::Heap &heap)
+push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, PyObject *args, PyObject *kwargs, tl::Heap &heap)
 {
   bool is_tuple = PyTuple_Check (args);
-  int i = 0;
+  int iarg = 0;
   int argc = args == NULL ? 0 : (is_tuple ? int (PyTuple_Size (args)) : int (PyList_Size (args)));
+  int kwargs_taken = 0;
+  int nkwargs = kwargs == NULL ? 0 : int (PyDict_Size (kwargs));
 
   try {
 
-    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); i < argc && a != meth->end_arguments (); ++a, ++i) {
-      push_arg (*a, arglist, is_tuple ? PyTuple_GetItem (args, i) : PyList_GetItem (args, i), heap);
+    for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments (); ++a, ++iarg) {
+      PythonPtr arg (iarg >= argc ? get_kwarg (*a, kwargs) : (is_tuple ? PyTuple_GetItem (args, iarg) : PyList_GetItem (args, iarg)));
+      if (! arg) {
+        if (a->spec ()->has_default ()) {
+          if (kwargs_taken == nkwargs) {
+            //  leave it to the consumer to establish the default values (that is faster)
+            break;
+          }
+          tl::Variant def_value = a->spec ()->default_value ();
+          gsi::push_arg (arglist, *a, def_value, &heap);
+        } else {
+          throw tl::Exception (tl::to_string (tr ("No argument provided (positional or keyword) and no default value available")));
+        }
+      } else {
+        if (iarg >= argc) {
+          ++kwargs_taken;
+        }
+        push_arg (*a, arglist, arg.get (), heap);
+      }
+    }
+
+    if (kwargs_taken != nkwargs) {
+
+      //  check if there are any left-over keyword parameters with unknown names
+
+      pya::PythonRef keys (PyDict_Keys (kwargs));
+
+      std::set<std::string> valid_names;
+      for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments (); ++a) {
+        valid_names.insert (a->spec ()->name ());
+      }
+
+      std::set<std::string> invalid_names;
+      for (int i = int (PyList_Size (keys.get ())); i > 0; ) {
+        --i;
+        std::string k = python2c<std::string> (PyList_GetItem (keys.get (), i));
+        if (valid_names.find (k) == valid_names.end ()) {
+          invalid_names.insert (k);
+        }
+      }
+
+      if (invalid_names.size () > 1) {
+        std::string names_str = tl::join (invalid_names.begin (), invalid_names.end (), ", ");
+        throw tl::Exception (tl::to_string (tr ("Unknown keyword parameters: ")) + names_str);
+      } else if (invalid_names.size () == 1) {
+        throw tl::Exception (tl::to_string (tr ("Unknown keyword parameter: ")) + *invalid_names.begin ());
+      }
+
     }
 
   } catch (tl::Exception &ex) {
@@ -628,19 +752,26 @@ push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, PyObject *args
     //  In case of an error upon write, pop the arguments to clean them up.
     //  Without this, there is a risk to keep dead objects on the stack.
     for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
-      pop_arg (*a, arglist, 0, heap);
+      pull_arg (*a, arglist, 0, heap);
     }
 
-    std::string msg;
-    const gsi::ArgSpecBase *arg_spec = meth->begin_arguments () [i].spec ();
+    if (iarg < num_args (meth)) {
 
-    if (arg_spec && ! arg_spec->name ().empty ()) {
-      msg = tl::sprintf (tl::to_string (tr ("%s for argument #%d ('%s')")), ex.basic_msg (), i + 1, arg_spec->name ());
-    } else {
-      msg = tl::sprintf (tl::to_string (tr ("%s for argument #%d")), ex.basic_msg (), i + 1);
+      //  attach argument information to the error message if available
+
+      std::string msg;
+      const gsi::ArgSpecBase *arg_spec = meth->begin_arguments () [iarg].spec ();
+
+      if (arg_spec && ! arg_spec->name ().empty ()) {
+        msg = tl::sprintf (tl::to_string (tr ("%s for argument #%d ('%s')")), ex.basic_msg (), iarg + 1, arg_spec->name ());
+      } else {
+        msg = tl::sprintf (tl::to_string (tr ("%s for argument #%d")), ex.basic_msg (), iarg + 1);
+      }
+
+      ex.set_basic_msg (msg);
+
     }
 
-    ex.set_basic_msg (msg);
     throw;
 
   } catch (...) {
@@ -648,7 +779,7 @@ push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, PyObject *args
     //  In case of an error upon write, pop the arguments to clean them up.
     //  Without this, there is a risk to keep dead objects on the stack.
     for (gsi::MethodBase::argument_iterator a = meth->begin_arguments (); a != meth->end_arguments () && arglist; ++a) {
-      pop_arg (*a, arglist, 0, heap);
+      pull_arg (*a, arglist, 0, heap);
     }
 
     throw;
@@ -657,13 +788,13 @@ push_args (gsi::SerialArgs &arglist, const gsi::MethodBase *meth, PyObject *args
 }
 
 static PyObject *
-method_adaptor (int mid, PyObject *self, PyObject *args)
+method_adaptor (int mid, PyObject *self, PyObject *args, PyObject *kwargs)
 {
   PyObject *ret = NULL;
 
   PYA_TRY
 
-    const gsi::MethodBase *meth = match_method (mid, self, args, true);
+    const gsi::MethodBase *meth = match_method (mid, self, args, kwargs, true);
 
     //  method is not implemented
     if (! meth) {
@@ -677,6 +808,10 @@ method_adaptor (int mid, PyObject *self, PyObject *args)
 
     //  handle special methods
     if (meth->smt () != gsi::MethodBase::None) {
+
+      if (kwargs != NULL && PyDict_Size (kwargs) > 0) {
+        throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted")));
+      }
 
       ret = special_method_impl (meth->smt (), self, args);
 
@@ -703,7 +838,7 @@ method_adaptor (int mid, PyObject *self, PyObject *args)
       gsi::SerialArgs retlist (meth->retsize ());
       gsi::SerialArgs arglist (meth->argsize ());
 
-      push_args (arglist, meth, args, heap);
+      push_args (arglist, meth, args, kwargs, heap);
 
       meth->call (obj, arglist, retlist);
 
@@ -770,7 +905,7 @@ property_setter_adaptor (int mid, PyObject *self, PyObject *args)
  *  @brief __init__ implementation (bound to method ith id 'mid')
  */
 static PyObject *
-method_init_adaptor (int mid, PyObject *self, PyObject *args)
+method_init_adaptor (int mid, PyObject *self, PyObject *args, PyObject *kwargs)
 {
   PYA_TRY
 
@@ -782,7 +917,10 @@ method_init_adaptor (int mid, PyObject *self, PyObject *args)
     }
 
     int argc = PyTuple_Check (args) ? int (PyTuple_Size (args)) : int (PyList_Size (args));
-    const gsi::MethodBase *meth = match_method (mid, self, args, argc > 0 || ! p->cls_decl ()->can_default_create ());
+    bool has_kwargs = kwargs != NULL && PyDict_Size (kwargs) > 0;
+    bool strict_matching = argc > 0 || has_kwargs || ! p->cls_decl ()->can_default_create ();
+
+    const gsi::MethodBase *meth = match_method (mid, self, args, kwargs, strict_matching);
 
     if (meth && meth->smt () == gsi::MethodBase::None) {
 
@@ -791,7 +929,7 @@ method_init_adaptor (int mid, PyObject *self, PyObject *args)
       gsi::SerialArgs retlist (meth->retsize ());
       gsi::SerialArgs arglist (meth->argsize ());
 
-      push_args (arglist, meth, args, heap);
+      push_args (arglist, meth, args, kwargs, heap);
 
       meth->call (0, arglist, retlist);
 
@@ -801,6 +939,10 @@ method_init_adaptor (int mid, PyObject *self, PyObject *args)
       }
 
     } else {
+
+      if (kwargs != NULL && PyDict_Size (kwargs) > 0) {
+        throw tl::Exception (tl::to_string (tr ("Keyword arguments not permitted")));
+      }
 
       //  No action required - the object is default-created later once it is really required.
       if (! PyArg_ParseTuple (args, "")) {
@@ -979,8 +1121,8 @@ property_setter_impl (int mid, PyObject *self, PyObject *value)
         }
 
         if (is_valid) {
-          ++candidates;
           meth = *m;
+          ++candidates;
         }
 
       }
@@ -1075,12 +1217,12 @@ property_setter_func (PyObject *self, PyObject *value, void *closure)
 //  Adaptor arrays
 
 template <int N>
-PyObject *method_adaptor (PyObject *self, PyObject *args)
+PyObject *method_adaptor (PyObject *self, PyObject *args, PyObject *kwargs)
 {
-  return method_adaptor (N, self, args);
+  return method_adaptor (N, self, args, kwargs);
 }
 
-static py_func_ptr_t method_adaptors [] =
+static py_func_with_kw_ptr_t method_adaptors [] =
 {
   &method_adaptor<0x000>, &method_adaptor<0x001>, &method_adaptor<0x002>, &method_adaptor<0x003>, &method_adaptor<0x004>, &method_adaptor<0x005>, &method_adaptor<0x006>, &method_adaptor<0x007>,
   &method_adaptor<0x008>, &method_adaptor<0x009>, &method_adaptor<0x00a>, &method_adaptor<0x00b>, &method_adaptor<0x00c>, &method_adaptor<0x00d>, &method_adaptor<0x00e>, &method_adaptor<0x00f>,
@@ -1244,7 +1386,7 @@ static py_func_ptr_t method_adaptors [] =
   &method_adaptor<0x4f8>, &method_adaptor<0x4f9>, &method_adaptor<0x4fa>, &method_adaptor<0x4fb>, &method_adaptor<0x4fc>, &method_adaptor<0x4fd>, &method_adaptor<0x4fe>, &method_adaptor<0x4ff>,
 };
 
-py_func_ptr_t get_method_adaptor (int n)
+py_func_with_kw_ptr_t get_method_adaptor (int n)
 {
   tl_assert (n >= 0 && n < int (sizeof (method_adaptors) / sizeof (method_adaptors [0])));
   return method_adaptors [n];
@@ -1603,12 +1745,12 @@ py_func_ptr_t get_property_setter_adaptor (int n)
 }
 
 template <int N>
-PyObject *method_init_adaptor (PyObject *self, PyObject *args)
+PyObject *method_init_adaptor (PyObject *self, PyObject *args, PyObject *kwargs)
 {
-  return method_init_adaptor (N, self, args);
+  return method_init_adaptor (N, self, args, kwargs);
 }
 
-static py_func_ptr_t method_init_adaptors [] =
+static py_func_with_kw_ptr_t method_init_adaptors [] =
 {
   &method_init_adaptor<0x000>, &method_init_adaptor<0x001>, &method_init_adaptor<0x002>, &method_init_adaptor<0x003>, &method_init_adaptor<0x004>, &method_init_adaptor<0x005>, &method_init_adaptor<0x006>, &method_init_adaptor<0x007>,
   &method_init_adaptor<0x008>, &method_init_adaptor<0x009>, &method_init_adaptor<0x00a>, &method_init_adaptor<0x00b>, &method_init_adaptor<0x00c>, &method_init_adaptor<0x00d>, &method_init_adaptor<0x00e>, &method_init_adaptor<0x00f>,
@@ -1740,7 +1882,7 @@ static py_func_ptr_t method_init_adaptors [] =
   &method_init_adaptor<0x3f8>, &method_init_adaptor<0x3f9>, &method_init_adaptor<0x3fa>, &method_init_adaptor<0x3fb>, &method_init_adaptor<0x3fc>, &method_init_adaptor<0x3fd>, &method_init_adaptor<0x3fe>, &method_init_adaptor<0x3ff>,
 };
 
-py_func_ptr_t get_method_init_adaptor (int n)
+py_func_with_kw_ptr_t get_method_init_adaptor (int n)
 {
   tl_assert (n >= 0 && n < int (sizeof (method_init_adaptors) / sizeof (method_init_adaptors [0])));
   return method_init_adaptors [n];

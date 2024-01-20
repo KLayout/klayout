@@ -802,7 +802,7 @@ QAbstractGraphicsShapeItem_Adaptor::~QAbstractGraphicsShapeItem_Adaptor() { }
 
 static void _init_ctor_QAbstractGraphicsShapeItem_Adaptor_1919 (qt_gsi::GenericStaticMethod *decl)
 {
-  static gsi::ArgSpecBase argspec_0 ("parent", true, "0");
+  static gsi::ArgSpecBase argspec_0 ("parent", true, "nullptr");
   decl->add_arg<QGraphicsItem * > (argspec_0);
   decl->set_return_new<QAbstractGraphicsShapeItem_Adaptor> ();
 }
@@ -811,7 +811,7 @@ static void _call_ctor_QAbstractGraphicsShapeItem_Adaptor_1919 (const qt_gsi::Ge
 {
   __SUPPRESS_UNUSED_WARNING(args);
   tl::Heap heap;
-  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (0, heap);
+  QGraphicsItem *arg1 = args ? gsi::arg_reader<QGraphicsItem * >() (args, heap) : gsi::arg_maker<QGraphicsItem * >() (nullptr, heap);
   ret.write<QAbstractGraphicsShapeItem_Adaptor *> (new QAbstractGraphicsShapeItem_Adaptor (arg1));
 }
 

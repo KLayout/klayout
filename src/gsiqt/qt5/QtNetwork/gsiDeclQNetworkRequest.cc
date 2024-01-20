@@ -136,6 +136,21 @@ static void _call_f_header_c3349 (const qt_gsi::GenericMethod * /*decl*/, void *
 }
 
 
+// int QNetworkRequest::maximumRedirectsAllowed()
+
+
+static void _init_f_maximumRedirectsAllowed_c0 (qt_gsi::GenericMethod *decl)
+{
+  decl->set_return<int > ();
+}
+
+static void _call_f_maximumRedirectsAllowed_c0 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  ret.write<int > ((int)((QNetworkRequest *)cls)->maximumRedirectsAllowed ());
+}
+
+
 // bool QNetworkRequest::operator!=(const QNetworkRequest &other)
 
 
@@ -303,6 +318,26 @@ static void _call_f_setHeader_5360 (const qt_gsi::GenericMethod * /*decl*/, void
 }
 
 
+// void QNetworkRequest::setMaximumRedirectsAllowed(int maximumRedirectsAllowed)
+
+
+static void _init_f_setMaximumRedirectsAllowed_767 (qt_gsi::GenericMethod *decl)
+{
+  static gsi::ArgSpecBase argspec_0 ("maximumRedirectsAllowed");
+  decl->add_arg<int > (argspec_0);
+  decl->set_return<void > ();
+}
+
+static void _call_f_setMaximumRedirectsAllowed_767 (const qt_gsi::GenericMethod * /*decl*/, void *cls, gsi::SerialArgs &args, gsi::SerialArgs &ret) 
+{
+  __SUPPRESS_UNUSED_WARNING(args);
+  tl::Heap heap;
+  int arg1 = gsi::arg_reader<int >() (args, heap);
+  __SUPPRESS_UNUSED_WARNING(ret);
+  ((QNetworkRequest *)cls)->setMaximumRedirectsAllowed (arg1);
+}
+
+
 // void QNetworkRequest::setOriginatingObject(QObject *object)
 
 
@@ -467,6 +502,7 @@ static gsi::Methods methods_QNetworkRequest () {
   methods += new qt_gsi::GenericMethod ("attribute", "@brief Method QVariant QNetworkRequest::attribute(QNetworkRequest::Attribute code, const QVariant &defaultValue)\n", true, &_init_f_attribute_c5083, &_call_f_attribute_c5083);
   methods += new qt_gsi::GenericMethod ("hasRawHeader", "@brief Method bool QNetworkRequest::hasRawHeader(const QByteArray &headerName)\n", true, &_init_f_hasRawHeader_c2309, &_call_f_hasRawHeader_c2309);
   methods += new qt_gsi::GenericMethod ("header", "@brief Method QVariant QNetworkRequest::header(QNetworkRequest::KnownHeaders header)\n", true, &_init_f_header_c3349, &_call_f_header_c3349);
+  methods += new qt_gsi::GenericMethod (":maximumRedirectsAllowed", "@brief Method int QNetworkRequest::maximumRedirectsAllowed()\n", true, &_init_f_maximumRedirectsAllowed_c0, &_call_f_maximumRedirectsAllowed_c0);
   methods += new qt_gsi::GenericMethod ("!=", "@brief Method bool QNetworkRequest::operator!=(const QNetworkRequest &other)\n", true, &_init_f_operator_excl__eq__c2885, &_call_f_operator_excl__eq__c2885);
   methods += new qt_gsi::GenericMethod ("assign", "@brief Method QNetworkRequest &QNetworkRequest::operator=(const QNetworkRequest &other)\n", false, &_init_f_operator_eq__2885, &_call_f_operator_eq__2885);
   methods += new qt_gsi::GenericMethod ("==", "@brief Method bool QNetworkRequest::operator==(const QNetworkRequest &other)\n", true, &_init_f_operator_eq__eq__c2885, &_call_f_operator_eq__eq__c2885);
@@ -476,6 +512,7 @@ static gsi::Methods methods_QNetworkRequest () {
   methods += new qt_gsi::GenericMethod ("rawHeaderList", "@brief Method QList<QByteArray> QNetworkRequest::rawHeaderList()\n", true, &_init_f_rawHeaderList_c0, &_call_f_rawHeaderList_c0);
   methods += new qt_gsi::GenericMethod ("setAttribute", "@brief Method void QNetworkRequest::setAttribute(QNetworkRequest::Attribute code, const QVariant &value)\n", false, &_init_f_setAttribute_5083, &_call_f_setAttribute_5083);
   methods += new qt_gsi::GenericMethod ("setHeader", "@brief Method void QNetworkRequest::setHeader(QNetworkRequest::KnownHeaders header, const QVariant &value)\n", false, &_init_f_setHeader_5360, &_call_f_setHeader_5360);
+  methods += new qt_gsi::GenericMethod ("setMaximumRedirectsAllowed|maximumRedirectsAllowed=", "@brief Method void QNetworkRequest::setMaximumRedirectsAllowed(int maximumRedirectsAllowed)\n", false, &_init_f_setMaximumRedirectsAllowed_767, &_call_f_setMaximumRedirectsAllowed_767);
   methods += new qt_gsi::GenericMethod ("setOriginatingObject|originatingObject=", "@brief Method void QNetworkRequest::setOriginatingObject(QObject *object)\n", false, &_init_f_setOriginatingObject_1302, &_call_f_setOriginatingObject_1302);
   methods += new qt_gsi::GenericMethod ("setPriority|priority=", "@brief Method void QNetworkRequest::setPriority(QNetworkRequest::Priority priority)\n", false, &_init_f_setPriority_2990, &_call_f_setPriority_2990);
   methods += new qt_gsi::GenericMethod ("setRawHeader", "@brief Method void QNetworkRequest::setRawHeader(const QByteArray &headerName, const QByteArray &value)\n", false, &_init_f_setRawHeader_4510, &_call_f_setRawHeader_4510);
@@ -523,6 +560,13 @@ static gsi::Enum<QNetworkRequest::Attribute> decl_QNetworkRequest_Attribute_Enum
     gsi::enum_const ("SpdyAllowedAttribute", QNetworkRequest::SpdyAllowedAttribute, "@brief Enum constant QNetworkRequest::SpdyAllowedAttribute") +
     gsi::enum_const ("SpdyWasUsedAttribute", QNetworkRequest::SpdyWasUsedAttribute, "@brief Enum constant QNetworkRequest::SpdyWasUsedAttribute") +
     gsi::enum_const ("EmitAllUploadProgressSignalsAttribute", QNetworkRequest::EmitAllUploadProgressSignalsAttribute, "@brief Enum constant QNetworkRequest::EmitAllUploadProgressSignalsAttribute") +
+    gsi::enum_const ("FollowRedirectsAttribute", QNetworkRequest::FollowRedirectsAttribute, "@brief Enum constant QNetworkRequest::FollowRedirectsAttribute") +
+    gsi::enum_const ("HTTP2AllowedAttribute", QNetworkRequest::HTTP2AllowedAttribute, "@brief Enum constant QNetworkRequest::HTTP2AllowedAttribute") +
+    gsi::enum_const ("HTTP2WasUsedAttribute", QNetworkRequest::HTTP2WasUsedAttribute, "@brief Enum constant QNetworkRequest::HTTP2WasUsedAttribute") +
+    gsi::enum_const ("OriginalContentLengthAttribute", QNetworkRequest::OriginalContentLengthAttribute, "@brief Enum constant QNetworkRequest::OriginalContentLengthAttribute") +
+    gsi::enum_const ("RedirectPolicyAttribute", QNetworkRequest::RedirectPolicyAttribute, "@brief Enum constant QNetworkRequest::RedirectPolicyAttribute") +
+    gsi::enum_const ("Http2DirectAttribute", QNetworkRequest::Http2DirectAttribute, "@brief Enum constant QNetworkRequest::Http2DirectAttribute") +
+    gsi::enum_const ("ResourceTypeAttribute", QNetworkRequest::ResourceTypeAttribute, "@brief Enum constant QNetworkRequest::ResourceTypeAttribute") +
     gsi::enum_const ("User", QNetworkRequest::User, "@brief Enum constant QNetworkRequest::User") +
     gsi::enum_const ("UserMax", QNetworkRequest::UserMax, "@brief Enum constant QNetworkRequest::UserMax"),
   "@qt\n@brief This class represents the QNetworkRequest::Attribute enum");
@@ -551,7 +595,11 @@ static gsi::Enum<QNetworkRequest::KnownHeaders> decl_QNetworkRequest_KnownHeader
     gsi::enum_const ("SetCookieHeader", QNetworkRequest::SetCookieHeader, "@brief Enum constant QNetworkRequest::SetCookieHeader") +
     gsi::enum_const ("ContentDispositionHeader", QNetworkRequest::ContentDispositionHeader, "@brief Enum constant QNetworkRequest::ContentDispositionHeader") +
     gsi::enum_const ("UserAgentHeader", QNetworkRequest::UserAgentHeader, "@brief Enum constant QNetworkRequest::UserAgentHeader") +
-    gsi::enum_const ("ServerHeader", QNetworkRequest::ServerHeader, "@brief Enum constant QNetworkRequest::ServerHeader"),
+    gsi::enum_const ("ServerHeader", QNetworkRequest::ServerHeader, "@brief Enum constant QNetworkRequest::ServerHeader") +
+    gsi::enum_const ("IfModifiedSinceHeader", QNetworkRequest::IfModifiedSinceHeader, "@brief Enum constant QNetworkRequest::IfModifiedSinceHeader") +
+    gsi::enum_const ("ETagHeader", QNetworkRequest::ETagHeader, "@brief Enum constant QNetworkRequest::ETagHeader") +
+    gsi::enum_const ("IfMatchHeader", QNetworkRequest::IfMatchHeader, "@brief Enum constant QNetworkRequest::IfMatchHeader") +
+    gsi::enum_const ("IfNoneMatchHeader", QNetworkRequest::IfNoneMatchHeader, "@brief Enum constant QNetworkRequest::IfNoneMatchHeader"),
   "@qt\n@brief This class represents the QNetworkRequest::KnownHeaders enum");
 
 static gsi::QFlagsClass<QNetworkRequest::KnownHeaders > decl_QNetworkRequest_KnownHeaders_Enums ("QtNetwork", "QNetworkRequest_QFlags_KnownHeaders",
@@ -582,6 +630,28 @@ static gsi::QFlagsClass<QNetworkRequest::Priority > decl_QNetworkRequest_Priorit
 static gsi::ClassExt<QNetworkRequest> inject_QNetworkRequest_Priority_Enum_in_parent (decl_QNetworkRequest_Priority_Enum.defs ());
 static gsi::ClassExt<QNetworkRequest> decl_QNetworkRequest_Priority_Enum_as_child (decl_QNetworkRequest_Priority_Enum, "Priority");
 static gsi::ClassExt<QNetworkRequest> decl_QNetworkRequest_Priority_Enums_as_child (decl_QNetworkRequest_Priority_Enums, "QFlags_Priority");
+
+}
+
+
+//  Implementation of the enum wrapper class for QNetworkRequest::RedirectPolicy
+namespace qt_gsi
+{
+
+static gsi::Enum<QNetworkRequest::RedirectPolicy> decl_QNetworkRequest_RedirectPolicy_Enum ("QtNetwork", "QNetworkRequest_RedirectPolicy",
+    gsi::enum_const ("ManualRedirectPolicy", QNetworkRequest::ManualRedirectPolicy, "@brief Enum constant QNetworkRequest::ManualRedirectPolicy") +
+    gsi::enum_const ("NoLessSafeRedirectPolicy", QNetworkRequest::NoLessSafeRedirectPolicy, "@brief Enum constant QNetworkRequest::NoLessSafeRedirectPolicy") +
+    gsi::enum_const ("SameOriginRedirectPolicy", QNetworkRequest::SameOriginRedirectPolicy, "@brief Enum constant QNetworkRequest::SameOriginRedirectPolicy") +
+    gsi::enum_const ("UserVerifiedRedirectPolicy", QNetworkRequest::UserVerifiedRedirectPolicy, "@brief Enum constant QNetworkRequest::UserVerifiedRedirectPolicy"),
+  "@qt\n@brief This class represents the QNetworkRequest::RedirectPolicy enum");
+
+static gsi::QFlagsClass<QNetworkRequest::RedirectPolicy > decl_QNetworkRequest_RedirectPolicy_Enums ("QtNetwork", "QNetworkRequest_QFlags_RedirectPolicy",
+  "@qt\n@brief This class represents the QFlags<QNetworkRequest::RedirectPolicy> flag set");
+
+//  Inject the declarations into the parent
+static gsi::ClassExt<QNetworkRequest> inject_QNetworkRequest_RedirectPolicy_Enum_in_parent (decl_QNetworkRequest_RedirectPolicy_Enum.defs ());
+static gsi::ClassExt<QNetworkRequest> decl_QNetworkRequest_RedirectPolicy_Enum_as_child (decl_QNetworkRequest_RedirectPolicy_Enum, "RedirectPolicy");
+static gsi::ClassExt<QNetworkRequest> decl_QNetworkRequest_RedirectPolicy_Enums_as_child (decl_QNetworkRequest_RedirectPolicy_Enums, "QFlags_RedirectPolicy");
 
 }
 

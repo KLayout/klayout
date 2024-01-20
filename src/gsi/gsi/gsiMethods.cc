@@ -22,6 +22,7 @@
 
 
 #include "gsiDecl.h"
+#include "tlLog.h"
 
 #include <cctype>
 
@@ -131,16 +132,132 @@ void MethodBase::parse_name (const std::string &name)
   }
 }
 
+static std::string
+type_to_s (const gsi::ArgType &a, bool for_return)
+{
+  std::string s;
+  switch (a.type ()) {
+  case gsi::T_void_ptr:
+    s += "void *"; break;
+  case gsi::T_void:
+    s += "void"; break;
+  case gsi::T_bool:
+    s += "bool"; break;
+  case gsi::T_char:
+    s += "char"; break;
+  case gsi::T_schar:
+    s += "signed char"; break;
+  case gsi::T_uchar:
+    s += "unsigned char"; break;
+  case gsi::T_short:
+    s += "short"; break;
+  case gsi::T_ushort:
+    s += "unsigned short"; break;
+  case gsi::T_int:
+    s += "int"; break;
+#if defined(HAVE_64BIT_COORD)
+  case gsi::T_int128:
+    s += "int128"; break;
+#endif
+  case gsi::T_uint:
+    s += "unsigned int"; break;
+  case gsi::T_long:
+    s += "long"; break;
+  case gsi::T_ulong:
+    s += "unsigned long"; break;
+  case gsi::T_longlong:
+    s += "long long"; break;
+  case gsi::T_ulonglong:
+    s += "unsigned long long"; break;
+  case gsi::T_double:
+    s += "double"; break;
+  case gsi::T_float:
+    s += "float"; break;
+  case gsi::T_string:
+    s += "string"; break;
+  case gsi::T_byte_array:
+    s += "bytes"; break;
+  case gsi::T_var:
+    s += "variant"; break;
+  case gsi::T_object:
+    if (a.is_cptr () || (! for_return && a.is_cref ())) {
+      s = "const ";
+    }
+    if (a.pass_obj ()) {
+      s += "new ";
+    }
+    s += a.cls () ? a.cls ()->qname () : "?";
+    break;
+  case gsi::T_vector:
+    if (a.inner ()) {
+      s += type_to_s (*a.inner (), false);
+    }
+    s += "[]";
+    break;
+  case gsi::T_map:
+    s += "map<";
+    if (a.inner_k ()) {
+      s += type_to_s (*a.inner_k (), false);
+    }
+    s += ",";
+    if (a.inner ()) {
+      s += type_to_s (*a.inner (), false);
+    }
+    s += ">";
+    break;
+  }
+  if (a.is_cptr () || a.is_ptr ()) {
+    s += " ptr";
+  }
+  return s;
+}
+
+static std::string
+method_attributes (const gsi::MethodBase *method)
+{
+  std::string r;
+  if (method->is_signal ()) {
+    if (! r.empty ()) {
+      r += ",";
+    }
+    r += "signal";
+  }
+  if (method->is_callback ()) {
+    if (! r.empty ()) {
+      r += ",";
+    }
+    r += "virtual";
+  }
+  if (method->is_static ()) {
+    if (! r.empty ()) {
+      r += ",";
+    }
+    r += "static";
+  }
+  if (method->is_const ()) {
+    if (! r.empty ()) {
+      r += ",";
+    }
+    r += "const";
+  }
+  if (method->ret_type ().is_iter ()) {
+    if (! r.empty ()) {
+      r += ",";
+    }
+    r += "iter";
+  }
+  return r;
+}
+
 std::string
 MethodBase::to_string () const
 {
-  std::string res;
-
-  if (is_static ()) {
-    res += "static ";
+  std::string res = method_attributes (this);
+  if (! res.empty ()) {
+    res += " ";
   }
 
-  res += ret_type ().to_string ();
+  res += type_to_s (ret_type (), true);
   res += " ";
 
   if (m_method_synonyms.size () == 1) {
@@ -154,7 +271,24 @@ MethodBase::to_string () const
     if (a != begin_arguments ()) {
       res += ", ";
     }
-    res += a->to_string ();
+    res += type_to_s (*a, false);
+    if (! a->spec ()->name ().empty ()) {
+      res += " ";
+      res += a->spec ()->name ();
+    }
+    if (a->spec ()->has_default ()) {
+      res += " = ";
+      if (! a->spec ()->init_doc ().empty ()) {
+        res += a->spec ()->init_doc ();
+      } else {
+        try {
+          res += a->spec ()->default_value ().to_string ();
+        } catch (tl::Exception &) {
+          res += "?";
+        }
+      }
+
+    }
   }
 
   res += ")";
@@ -229,6 +363,107 @@ MethodBase::primary_name () const
   } else {
     return m_method_synonyms.front ().name;
   }
+}
+
+// --------------------------------------------------------------------------------
+//  Implementation of MethodBase
+
+Methods::Methods ()
+  : m_methods ()
+{
+  // .. nothing yet ..
+}
+
+Methods::Methods (MethodBase *m)
+  : m_methods ()
+{
+  m_methods.push_back (m);
+}
+
+Methods::Methods (const Methods &d)
+{
+  operator= (d);
+}
+
+Methods &
+Methods::operator= (const Methods &d)
+{
+  if (this != &d) {
+    clear ();
+    m_methods.reserve (d.m_methods.size ());
+    for (std::vector<MethodBase *>::const_iterator m = d.m_methods.begin (); m != d.m_methods.end (); ++m) {
+      m_methods.push_back ((*m)->clone ());
+    }
+  }
+  return *this;
+}
+
+Methods::~Methods ()
+{
+  clear ();
+}
+
+void
+Methods::initialize ()
+{
+  for (std::vector<MethodBase *>::iterator m = m_methods.begin (); m != m_methods.end (); ++m) {
+    if (tl::verbosity () >= 60) {
+      tl::info << "GSI: initializing method " << (*m)->to_string ();
+    }
+    (*m)->initialize ();
+  }
+}
+
+void
+Methods::clear ()
+{
+  for (std::vector<MethodBase *>::iterator m = m_methods.begin (); m != m_methods.end (); ++m) {
+    delete *m;
+  }
+  m_methods.clear ();
+}
+
+//  HINT: this is not the usual + semantics but this is more effective
+Methods &
+Methods::operator+ (const Methods &m)
+{
+  return operator+= (m);
+}
+
+//  HINT: this is not the usual + semantics but this is more effective
+Methods &
+Methods::operator+ (MethodBase *m)
+{
+  return operator+= (m);
+}
+
+Methods &
+Methods::operator+= (const Methods &m)
+{
+  for (std::vector<MethodBase *>::const_iterator mm = m.m_methods.begin (); mm != m.m_methods.end (); ++mm)
+  {
+    add_method ((*mm)->clone ());
+  }
+  return *this;
+}
+
+Methods &
+Methods::operator+= (MethodBase *m)
+{
+  add_method (m);
+  return *this;
+}
+
+void
+Methods::add_method (MethodBase *method)
+{
+  m_methods.push_back (method);
+}
+
+void
+Methods::swap (Methods &other)
+{
+  m_methods.swap (other.m_methods);
 }
 
 }

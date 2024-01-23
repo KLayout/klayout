@@ -491,7 +491,7 @@ Triangles::find_closest_edge (const db::DPoint &p, db::Vertex *vstart, bool insi
           db::DVector r = p - *cv;
           double edge_sp = db::sprod (r, edge_d) / edge_d.length ();
           double s_sp = db::sprod (r, e_d) / e_d.length ();
-          if (s_sp > edge_sp) {
+          if (s_sp > edge_sp + db::epsilon) {
             edge = *e;
             vnext = edge->other (v);
           }

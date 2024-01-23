@@ -222,6 +222,8 @@ PythonInterpreter::PythonInterpreter (bool embedded)
   //  If set, use $KLAYOUT_PYTHONHOME to initialize the path.
   //  Otherwise there may be some conflict between external installations and KLayout.
 
+  bool has_klayout_pythonhome = false;
+
   //  Python is not easily convinced to use an external path properly.
   //  So we simply redirect PYTHONHOME
   std::string pythonhome_name ("PYTHONHOME");
@@ -230,12 +232,29 @@ PythonInterpreter::PythonInterpreter (bool embedded)
     tl::unset_env (pythonhome_name);
   }
   if (tl::has_env (klayout_pythonhome_name)) {
+    has_klayout_pythonhome = true;
     tl::set_env (pythonhome_name, tl::get_env (klayout_pythonhome_name));
   }
 
 #if defined(_WIN32) && PY_MAJOR_VERSION >= 3
 
   tl_assert (sizeof (wchar_t) == 2);
+
+  std::string inst_dir;
+
+  wchar_t buffer[MAX_PATH];
+  int len;
+
+  if ((len = GetModuleFileNameW (NULL, buffer, MAX_PATH)) > 0) {
+    inst_dir = tl::absolute_path (tl::to_string (std::wstring (buffer, len)));
+  }
+
+  if (! has_klayout_pythonhome) {
+
+    //  Use our own installation path for PYTHOHOME unless given
+    Py_SetPythonHome (tl::to_wstring (inst_dir).c_str ());
+
+  }
 
   if (! has_klayout_pythonpath) {
 
@@ -247,34 +266,27 @@ PythonInterpreter::PythonInterpreter (bool embedded)
 
       std::string path;
 
-      wchar_t buffer[MAX_PATH];
-      int len;
-      if ((len = GetModuleFileNameW (NULL, buffer, MAX_PATH)) > 0) {
+      std::string path_file = tl::combine_path (inst_dir, ".python-paths.txt");
+      if (tl::file_exists (path_file)) {
 
-        std::string inst_dir = tl::absolute_path (tl::to_string (std::wstring (buffer, len)));
-        std::string path_file = tl::combine_path (inst_dir, ".python-paths.txt");
-        if (tl::file_exists (path_file)) {
+        tl::log << tl::to_string (tr ("Reading Python path from ")) << path_file;
 
-          tl::log << tl::to_string (tr ("Reading Python path from ")) << path_file;
+        tl::InputStream path_file_stream (path_file);
+        std::string path_file_text = path_file_stream.read_all ();
 
-          tl::InputStream path_file_stream (path_file);
-          std::string path_file_text = path_file_stream.read_all ();
+        tl::Eval eval;
+        eval.set_global_var ("inst_path", tl::Variant (inst_dir));
+        tl::Expression ex;
+        eval.parse (ex, path_file_text.c_str ());
+        tl::Variant v = ex.execute ();
 
-          tl::Eval eval;
-          eval.set_global_var ("inst_path", tl::Variant (inst_dir));
-          tl::Expression ex;
-          eval.parse (ex, path_file_text.c_str ());
-          tl::Variant v = ex.execute ();
-
-          if (v.is_list ()) {
-            for (tl::Variant::iterator i = v.begin (); i != v.end (); ++i) {
-              if (! path.empty ()) {
-                path += ";";
-              }
-              path += i->to_string ();
+        if (v.is_list ()) {
+          for (tl::Variant::iterator i = v.begin (); i != v.end (); ++i) {
+            if (! path.empty ()) {
+              path += ";";
             }
+            path += i->to_string ();
           }
-
         }
 
       }

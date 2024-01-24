@@ -342,7 +342,7 @@ EdgeRelationFilter::EdgeRelationFilter (edge_relation_type r, distance_type d, m
 }
 
 EdgeRelationFilter::EdgeRelationFilter (edge_relation_type r, distance_type d, const EdgesCheckOptions &options)
-  : m_whole_edges (false), m_include_zero (options.include_zero), m_r (r), m_d (d), m_metrics (options.metrics), m_ignore_angle (0), m_min_projection (options.min_projection), m_max_projection (options.max_projection)
+  : m_whole_edges (options.whole_edges), m_include_zero (options.include_zero), m_r (r), m_d (d), m_metrics (options.metrics), m_ignore_angle (0), m_min_projection (options.min_projection), m_max_projection (options.max_projection)
 {
   set_ignore_angle (options.ignore_angle);
 }

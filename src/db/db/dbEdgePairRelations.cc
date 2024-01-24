@@ -49,6 +49,37 @@ db::Edge::distance_type edge_projection (const db::Edge &a, const db::Edge &b)
 }
 
 /**
+ *  @brief Gets a flag indicating whether zero distance is included in the checks
+ */
+static bool include_zero_flag (collinear_mode_type coll_mode, const db::Edge &a, const db::Edge &b)
+{
+  if (coll_mode == AlwaysIncludeCollinear) {
+
+    return true;
+
+  } else if (coll_mode == AlwaysIncludeCollinear) {
+
+    return false;
+
+  } else {
+
+    int s1 = a.side_of (b.p1 ());
+    int s2 = a.side_of (b.p2 ());
+
+    if (s1 == 0 && s2 == 0) {
+      if (coll_mode == IncludeCollinearWhenTouch) {
+        return a.intersect (b);
+      } else if (coll_mode == IncludeCollinearWhenOverlap) {
+        return a.coincident (b);
+      }
+    }
+
+    return false;
+
+  }
+}
+
+/**
  *  @brief Returns the part of the "other" edge which is on the inside side of e and within distance d
  *
  *  This function applies Euclidian metrics.
@@ -67,12 +98,7 @@ bool euclidian_near_part_of_edge (collinear_mode_type coll_mode, db::coord_trait
   int s1 = e.side_of (g.p1 ());
   int s2 = e.side_of (g.p2 ());
 
-  //  "kissing corner" issue: force include zero if the edges are collinear and overlap.
-  bool include_zero = (coll_mode == AlwaysIncludeCollinear);
-  if (coll_mode == IncludeCollinearWhenTouch && s1 == 0 && s2 == 0 && e.intersect (g)) {
-    include_zero = true;
-  }
-
+  bool include_zero = include_zero_flag (coll_mode, e, g);
   int thr = include_zero ? 0 : -1;
 
   //  keep only part of other which is on the "inside" side of e
@@ -211,12 +237,7 @@ static bool var_near_part_of_edge (collinear_mode_type coll_mode, db::coord_trai
   int s1 = e.side_of (g.p1 ());
   int s2 = e.side_of (g.p2 ());
 
-  //  "kissing corner" issue: force include zero if the edges are collinear and overlap
-  bool include_zero = (coll_mode == AlwaysIncludeCollinear);
-  if (coll_mode == IncludeCollinearWhenTouch && s1 == 0 && s2 == 0 && e.intersect (g)) {
-    include_zero = true;
-  }
-
+  bool include_zero = include_zero_flag (coll_mode, e, g);
   int thr = include_zero ? 0 : -1;
 
   //  keep only part of other which is on the "inside" side of e

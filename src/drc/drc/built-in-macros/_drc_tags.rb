@@ -95,6 +95,16 @@ module DRC
     end
   end
   
+  # A wrapper for the "collinear mode" for
+  # the DRC functions. The purpose of this class
+  # is to identify the value by the class.
+  class DRCCollinearMode
+    attr_accessor :value
+    def initialize(v)
+      self.value = v
+    end
+  end
+  
   # A wrapper for the "as_dots" or "as_boxes" flag for
   # some DRC functions. The purpose of this class
   # is to identify the value by the class.

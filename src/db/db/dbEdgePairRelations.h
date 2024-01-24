@@ -108,14 +108,19 @@ enum collinear_mode_type {
   NeverIncludeCollinear = 0,
 
   /**
-   *  @brief include collinear edges when they touch (e.g. kissing corner case)
+   *  @brief include collinear edges when they share at least one common point
    */
   IncludeCollinearWhenTouch = 1,
 
   /**
+   *  @brief include collinear edges when they share more than a single common point
+   */
+  IncludeCollinearWhenOverlap = 2,
+
+  /**
    *  @brief always include collinear edges
    */
-  AlwaysIncludeCollinear = 2
+  AlwaysIncludeCollinear = 3
 };
 
 /**

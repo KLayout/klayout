@@ -3687,10 +3687,12 @@ CODE
     #         but is more intuitive, as "projecting" is written with a condition, like
     #         "projecting < 2.um". Available operators are: "==", "<", "<=", ">" and ">=". 
     #         Double-bounded ranges are also available, like: "0.5 <= projecting < 2.0". @/li
-    #   @li @b transparent @/b: performs the check without shielding (polygon layers only) @/li
-    #   @li @b shielded @/b: performs the check with shielding (polygon layers only) @/li
+    #   @li @b without_touching @/b: With this option present, touching corners (aka "kissing
+    #         corners") will not yield errors. The default is to produce errors in these cases. @/li
+    #   @li @b transparent @/b: Performs the check without shielding (polygon layers only) @/li
+    #   @li @b shielded @/b: Performs the check with shielding (polygon layers only) @/li
     #   @li @b props_eq @/b, @b props_ne @/b, @b props_copy @/b: (only props_copy applies to width check) -
-    #         see "Properties constraints" below. @/li
+    #         See "Properties constraints" below. @/li
     # @/ul
     #
     # Note that without the angle_limit, acute corners will always be reported, since two 
@@ -3791,6 +3793,22 @@ CODE
     # space_not_connected = metal1_nets.space(0.4.um, props_ne + props_copy)
     # space_connected     = metal1_nets.space(0.4.um, props_eq + props_copy)
     # @/code
+    #
+    # @h3 Touching shapes @/h3
+    #
+    # The \without_touching option will turn off errors that arise due to 
+    # the "kissing corner" configuration (or "checkerboard pattern"). Formally
+    # this is a width violation across the diagonal, but when considering this
+    # configuration as disconnected boxes, no error should be reported.
+    #
+    # The following images illustrate the effect of the \without_touching option:
+    # 
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_width5.png) @/td
+    #     @td @img(/images/drc_width6.png) @/td
+    #   @/tr
+    # @/table
     #
     
     # %DRC%
@@ -3912,7 +3930,25 @@ CODE
     #   @/tr
     # @/table
     #
-    # @h3 opposite and rectangle error filtering @/h3
+    # @h3 Touching shapes @/h3
+    #
+    # Like \width and \space, the separation check also supports the \without_touching option.
+    #
+    # This option will turn off errors that arise due to 
+    # collinear edges touching in one corner (the "kissing corners" configuration). 
+    # By default, such edges will yield an error, as they
+    # form a zero-distance situation. With this option in place, no errors will be reported.
+    #
+    # The following images illustrate the effect of the \without_touching option:
+    # 
+    # @table
+    #   @tr 
+    #     @td @img(/images/drc_separation12.png) @/td
+    #     @td @img(/images/drc_separation13.png) @/td
+    #   @/tr
+    # @/table
+    #
+    # @h3 Opposite and rectangle error filtering @/h3
     #
     # The options for the separation check are those available for the \width or \space
     # method plus opposite and rectangle error filtering. 
@@ -4121,6 +4157,7 @@ CODE
           opposite_filter = RBA::Region::NoOppositeFilter
           rect_filter = RBA::Region::NoRectFilter
           prop_constraint = RBA::Region::IgnoreProperties
+          collinear_mode = RBA::Region::IncludeCollinearWhenTouch
 
           n = 1
           args.each do |a|
@@ -4132,6 +4169,8 @@ CODE
               negative = true
             elsif a.is_a?(DRCPropertiesConstraint)
               prop_constraint = a.value
+            elsif a.is_a?(DRCCollinearMode)
+              collinear_mode = a.value
             elsif a.is_a?(DRCOppositeErrorFilter)
               opposite_filter = a.value
             elsif a.is_a?(DRCRectangleErrorFilter)
@@ -4185,6 +4224,8 @@ CODE
             raise("A rectangle error filter can only be used for polygon layers")
           end
           
+          args << collinear_mode
+
           border = (metrics == RBA::Region::Square ? value * 1.5 : value)
           
           if :#{f} == :width || :#{f} == :space || :#{f} == :notch || :#{f} == :isolated

@@ -382,6 +382,22 @@ TEST(8_KissingCornerProblem)
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 100)), db::Edge (db::Point (0, -1), db::Point (0, -100)), &output);
   EXPECT_EQ (res, false);
 
+  f.set_collinear_mode (db::IncludeCollinearWhenOverlap);
+
+  res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 100)), db::Edge (db::Point (0, 201), db::Point (0, 101)), &output);
+  EXPECT_EQ (res, false);
+  res = f.check (db::Edge (db::Point (1, 0), db::Point (1, 100)), db::Edge (db::Point (0, 201), db::Point (0, 0)), &output);
+  EXPECT_EQ (res, false);
+  res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 100)), db::Edge (db::Point (0, 200), db::Point (0, 100)), &output);
+  EXPECT_EQ (res, false);
+  res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 100)), db::Edge (db::Point (0, 200), db::Point (0, 50)), &output);
+  EXPECT_EQ (res, true);
+  EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(0,40;0,100):(0,110;0,50)");
+  res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 100)), db::Edge (db::Point (0, 0), db::Point (0, -100)), &output);
+  EXPECT_EQ (res, false);
+  res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 100)), db::Edge (db::Point (0, -1), db::Point (0, -100)), &output);
+  EXPECT_EQ (res, false);
+
   f.set_collinear_mode (db::NeverIncludeCollinear);
 
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 100)), db::Edge (db::Point (0, 201), db::Point (0, 101)), &output);
@@ -414,6 +430,22 @@ TEST(8_KissingCornerProblem)
   res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, -100), db::Point (0, 0)), &output);
   EXPECT_EQ (res, true);
   EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(0,10;0,0):(0,-10;0,0)");
+  res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, -100), db::Point (0, -1)), &output);
+  EXPECT_EQ (res, false);
+
+  f.set_collinear_mode (db::IncludeCollinearWhenOverlap);
+
+  res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, 101), db::Point (0, 201)), &output);
+  EXPECT_EQ (res, false);
+  res = f.check (db::Edge (db::Point (1, 100), db::Point (1, 0)), db::Edge (db::Point (0, 0), db::Point (0, 200)), &output);
+  EXPECT_EQ (res, false);
+  res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, 100), db::Point (0, 200)), &output);
+  EXPECT_EQ (res, false);
+  res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, 50), db::Point (0, 200)), &output);
+  EXPECT_EQ (res, true);
+  EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(0,100;0,40):(0,50;0,110)");
+  res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, -100), db::Point (0, 0)), &output);
+  EXPECT_EQ (res, false);
   res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, -100), db::Point (0, -1)), &output);
   EXPECT_EQ (res, false);
 

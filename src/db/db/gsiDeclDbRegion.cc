@@ -3274,7 +3274,12 @@ gsi::Enum<db::collinear_mode_type> decl_CollinearMode ("db", "CollinearMode",
   ) +
   gsi::enum_const ("IncludeCollinearWhenTouch", db::IncludeCollinearWhenTouch,
     "@brief Specifies that check functions should include collinear edges when they touch\n"
-    "With this specification, the check functions will also check edges which are collinear, but only if they touch in at least one point. "
+    "With this specification, the check functions will also check edges which are collinear, but only if they share at least one point. "
+    "This is the mode that allows checking the 'kissing corner' cases."
+  ) +
+  gsi::enum_const ("IncludeCollinearWhenOverlap", db::IncludeCollinearWhenOverlap,
+    "@brief Specifies that check functions should include collinear edges when they overlap\n"
+    "With this specification, the check functions will also check edges which are collinear, but only if they share more than a single point. "
     "This is the mode that allows checking the 'kissing corner' cases."
   ),
   "@brief This class represents the collinear_mode type for \\Region#width and related checks.\n"

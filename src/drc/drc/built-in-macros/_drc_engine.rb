@@ -322,6 +322,12 @@ module DRC
       end
     end
     
+    def without_touching(f = true)
+      self._context("without_touching") do
+        DRCCollinearMode::new(f ? RBA::Region::IncludeCollinearWhenOverlap : RBA::Region::IncludeCollinearWhenTouch)
+      end
+    end
+    
     def euclidian
       DRCMetrics::new(RBA::Region::Euclidian)
     end

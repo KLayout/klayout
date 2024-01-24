@@ -99,6 +99,100 @@ enum edge_relation_type
 };
 
 /**
+ *  @brief An enum specifying whether the edge relation includes zero distance
+ */
+enum zero_distance_type {
+  /**
+   *  @brief Never include zero distance
+   */
+  NeverIncludeZeroDistance = 0,
+
+  /**
+   *  @brief include zero distance when edges touch (e.g. kissing corner case)
+   */
+  IncludeZeroDistanceWhenTouch = 1,
+
+  /**
+   *  @brief always include zero distance
+   */
+  AlwaysIncludeZeroDistance = 2
+};
+
+/**
+ *  @brief A structure holding the options for the region checks (space, width, ...)
+ */
+struct DB_PUBLIC EdgesCheckOptions
+{
+  typedef db::coord_traits<db::Coord>::distance_type distance_type;
+
+  /**
+   *  @brief Constructor
+   */
+  EdgesCheckOptions (bool _whole_edges = false,
+                      metrics_type _metrics = db::Euclidian,
+                      double _ignore_angle = 90,
+                      distance_type _min_projection = 0,
+                      distance_type _max_projection = std::numeric_limits<distance_type>::max (),
+                      zero_distance_type _include_zero = IncludeZeroDistanceWhenTouch)
+    : whole_edges (_whole_edges),
+      metrics (_metrics),
+      ignore_angle (_ignore_angle),
+      min_projection (_min_projection),
+      max_projection (_max_projection),
+      include_zero (_include_zero)
+  { }
+
+  /**
+   *  @brief Specifies is whole edges are to be delivered
+   *
+   *  Without "whole_edges", the parts of
+   *  the edges are returned which violate the condition. If "whole_edges" is true, the
+   *  result will contain the complete edges participating in the result.
+   */
+  bool whole_edges;
+
+  /**
+   *  @brief Measurement metrics
+   *
+   *  The metrics parameter specifies which metrics to use. "Euclidian", "Square" and "Projected"
+   *  metrics are available.
+   */
+  metrics_type metrics;
+
+  /**
+   *  @brief Specifies the obtuse angle threshold
+   *
+   *  "ignore_angle" allows specification of a maximum angle that connected edges can have to not participate
+   *  in the check. By choosing 90 degree, edges with angles of 90 degree and larger are not checked,
+   *  but acute corners are for example.
+   */
+  double ignore_angle;
+
+  /**
+   *  @brief Specifies the projection limit's minimum value
+   *
+   *  With min_projection and max_projection it is possible to specify how edges must be related
+   *  to each other. If the length of the projection of either edge on the other is >= min_projection
+   *  or < max_projection, the edges are considered for the check.
+   */
+  distance_type min_projection;
+
+  /**
+   *  @brief Specifies the projection limit's maximum value
+   */
+  distance_type max_projection;
+
+  /**
+   *  @brief Specifies zero distance handling
+   *
+   *  This allows implementing the "kissing corners" case. When set to "WhenTouch", kissing corners will
+   *  be reported as errors, when set to "Never", they won't. Note that with merged inputs, edges
+   *  will not overlap except at the corners.
+   */
+  zero_distance_type include_zero;
+};
+
+/**
  *  @brief A filter based on the edge pair relation
  *
  *  This filter supports distance filtering (less than a certain value) plus 
@@ -123,9 +217,14 @@ struct DB_PUBLIC EdgeRelationFilter
    *  to each other. If the length of the projection of either edge on the other is >= min_projection
    *  or < max_projection, the edges are considered for the check.
    */
-  EdgeRelationFilter (edge_relation_type r, distance_type d, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max ());
+  EdgeRelationFilter (edge_relation_type r, distance_type d, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max (), zero_distance_type include_zero = AlwaysIncludeZeroDistance);
 
-  /** 
+  /**
+   *  Constructs an edge relation filter from a CheckOptions structure
+   */
+  EdgeRelationFilter (edge_relation_type r, distance_type d, const EdgesCheckOptions &options);
+
+  /**
    *  @brief Tests whether two edges fulfil the check fail criterion 
    *
    *  If the output pointer is non-null, the object will receive the edge pair that
@@ -150,17 +249,17 @@ struct DB_PUBLIC EdgeRelationFilter
   }
 
   /**
-   *  @brief Sets a flag indicating whether zero distance shall be included in the check
+   *  @brief Sets a value indicating whether zero distance shall be included in the check
    */
-  void set_include_zero (bool f)
+  void set_include_zero (zero_distance_type f)
   {
     m_include_zero = f;
   }
 
   /**
-   *  @brief Gets a flag indicating whether zero distance shall be included in the check
+   *  @brief Gets a value indicating whether zero distance shall be included in the check
    */
-  bool include_zero () const
+  zero_distance_type include_zero () const
   {
     return m_include_zero;
   }
@@ -262,7 +361,7 @@ struct DB_PUBLIC EdgeRelationFilter
 
 private:
   bool m_whole_edges;
-  bool m_include_zero;
+  zero_distance_type m_include_zero;
   edge_relation_type m_r;
   distance_type m_d;
   metrics_type m_metrics;
@@ -273,9 +372,9 @@ private:
 
 //  Internal methods exposed for testing purposes
 
-DB_PUBLIC bool projected_near_part_of_edge (bool include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
-DB_PUBLIC bool square_near_part_of_edge (bool include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
-DB_PUBLIC bool euclidian_near_part_of_edge (bool include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
+DB_PUBLIC bool projected_near_part_of_edge (zero_distance_type include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
+DB_PUBLIC bool square_near_part_of_edge (zero_distance_type include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
+DB_PUBLIC bool euclidian_near_part_of_edge (zero_distance_type include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
 DB_PUBLIC db::Edge::distance_type edge_projection (const db::Edge &a, const db::Edge &b);
 
 }

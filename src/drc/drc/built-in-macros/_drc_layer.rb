@@ -3941,7 +3941,9 @@ CODE
     # By default, such edges will yield an error, as they
     # form a zero-distance situation. With this option in place, no errors will be reported.
     #
-    # The following images illustrate the effect of the "without_touching" option:
+    # The following images illustrate the effect of the "without_touching" option.
+    # The white line at the top of the bottom red shape is actually an edge pair indicating 
+    # the zero-distance violation of the separation check:
     # 
     # @table
     #   @tr 
@@ -3963,8 +3965,8 @@ CODE
     # 
     # @table
     #   @tr 
+    #     @td @img(/images/drc_separation12.png) @/td
     #     @td @img(/images/drc_separation14.png) @/td
-    #     @td @img(/images/drc_separation15.png) @/td
     #   @/tr
     # @/table
     #

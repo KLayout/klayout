@@ -54,7 +54,7 @@ db::Edge::distance_type edge_projection (const db::Edge &a, const db::Edge &b)
  *  This function applies Euclidian metrics.
  *  If no such part is found, this function returns false.
  */
-bool euclidian_near_part_of_edge (zero_distance_type zero_distance, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &other, db::Edge *output)
+bool euclidian_near_part_of_edge (collinear_mode_type coll_mode, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &other, db::Edge *output)
 {
   //  Handle the case of point-like basic edge: cannot determine
   //  orientation
@@ -68,8 +68,8 @@ bool euclidian_near_part_of_edge (zero_distance_type zero_distance, db::coord_tr
   int s2 = e.side_of (g.p2 ());
 
   //  "kissing corner" issue: force include zero if the edges are collinear and overlap.
-  bool include_zero = (zero_distance == AlwaysIncludeZeroDistance);
-  if (zero_distance == IncludeZeroDistanceWhenTouch && s1 == 0 && s2 == 0 && e.intersect (g)) {
+  bool include_zero = (coll_mode == AlwaysIncludeCollinear);
+  if (coll_mode == IncludeCollinearWhenTouch && s1 == 0 && s2 == 0 && e.intersect (g)) {
     include_zero = true;
   }
 
@@ -198,7 +198,7 @@ bool euclidian_near_part_of_edge (zero_distance_type zero_distance, db::coord_tr
  *  This function applies Square metrics.
  *  If no such part is found, this function returns false.
  */
-static bool var_near_part_of_edge (zero_distance_type zero_distance, db::coord_traits<db::Coord>::distance_type d, db::coord_traits<db::Coord>::distance_type dd, const db::Edge &e, const db::Edge &other, db::Edge *output)
+static bool var_near_part_of_edge (collinear_mode_type coll_mode, db::coord_traits<db::Coord>::distance_type d, db::coord_traits<db::Coord>::distance_type dd, const db::Edge &e, const db::Edge &other, db::Edge *output)
 {
   //  Handle the case of point-like basic edge: cannot determine
   //  orientation
@@ -212,8 +212,8 @@ static bool var_near_part_of_edge (zero_distance_type zero_distance, db::coord_t
   int s2 = e.side_of (g.p2 ());
 
   //  "kissing corner" issue: force include zero if the edges are collinear and overlap
-  bool include_zero = (zero_distance == AlwaysIncludeZeroDistance);
-  if (zero_distance == IncludeZeroDistanceWhenTouch && s1 == 0 && s2 == 0 && e.intersect (g)) {
+  bool include_zero = (coll_mode == AlwaysIncludeCollinear);
+  if (coll_mode == IncludeCollinearWhenTouch && s1 == 0 && s2 == 0 && e.intersect (g)) {
     include_zero = true;
   }
 
@@ -316,9 +316,9 @@ static bool var_near_part_of_edge (zero_distance_type zero_distance, db::coord_t
  *  This function applies Projected metrics.
  *  If no such part is found, this function returns false.
  */
-bool projected_near_part_of_edge (zero_distance_type zero_distance, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &other, db::Edge *output)
+bool projected_near_part_of_edge (collinear_mode_type coll_mode, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &other, db::Edge *output)
 {
-  return var_near_part_of_edge (zero_distance, d, 0, e, other, output);
+  return var_near_part_of_edge (coll_mode, d, 0, e, other, output);
 }
 
 /**
@@ -327,22 +327,22 @@ bool projected_near_part_of_edge (zero_distance_type zero_distance, db::coord_tr
  *  This function applies Square metrics.
  *  If no such part is found, this function returns false.
  */
-bool square_near_part_of_edge (zero_distance_type zero_distance, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &other, db::Edge *output)
+bool square_near_part_of_edge (collinear_mode_type coll_mode, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &other, db::Edge *output)
 {
-  return var_near_part_of_edge (zero_distance, d, d, e, other, output);
+  return var_near_part_of_edge (coll_mode, d, d, e, other, output);
 }
 
 // ---------------------------------------------------------------------------------
 //  Implementation of EdgeRelationFilter
 
-EdgeRelationFilter::EdgeRelationFilter (edge_relation_type r, distance_type d, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, zero_distance_type include_zero)
-  : m_whole_edges (false), m_include_zero (include_zero), m_r (r), m_d (d), m_metrics (metrics), m_ignore_angle (0), m_min_projection (min_projection), m_max_projection (max_projection)
+EdgeRelationFilter::EdgeRelationFilter (edge_relation_type r, distance_type d, metrics_type metrics, double ignore_angle, distance_type min_projection, distance_type max_projection, collinear_mode_type collinear_mode)
+  : m_whole_edges (false), m_collinear_mode (collinear_mode), m_r (r), m_d (d), m_metrics (metrics), m_ignore_angle (0), m_min_projection (min_projection), m_max_projection (max_projection)
 {
   set_ignore_angle (ignore_angle);
 }
 
 EdgeRelationFilter::EdgeRelationFilter (edge_relation_type r, distance_type d, const EdgesCheckOptions &options)
-  : m_whole_edges (options.whole_edges), m_include_zero (options.include_zero), m_r (r), m_d (d), m_metrics (options.metrics), m_ignore_angle (0), m_min_projection (options.min_projection), m_max_projection (options.max_projection)
+  : m_whole_edges (options.whole_edges), m_collinear_mode (options.collinear_mode), m_r (r), m_d (d), m_metrics (options.metrics), m_ignore_angle (0), m_min_projection (options.min_projection), m_max_projection (options.max_projection)
 {
   set_ignore_angle (options.ignore_angle);
 }
@@ -407,14 +407,14 @@ EdgeRelationFilter::check (const db::Edge &a, const db::Edge &b, db::EdgePair *o
   bool in1, in2;
 
   if (m_metrics == Euclidian) {
-    in2 = euclidian_near_part_of_edge (m_include_zero, m_d, an, bn, ! m_whole_edges && output ? &output->second () : 0);
-    in1 = euclidian_near_part_of_edge (m_include_zero, m_d, bn, an, ! m_whole_edges && output ? &output->first () : 0);
+    in2 = euclidian_near_part_of_edge (m_collinear_mode, m_d, an, bn, ! m_whole_edges && output ? &output->second () : 0);
+    in1 = euclidian_near_part_of_edge (m_collinear_mode, m_d, bn, an, ! m_whole_edges && output ? &output->first () : 0);
   } else if (m_metrics == Square) {
-    in2 = square_near_part_of_edge (m_include_zero, m_d, an, bn, ! m_whole_edges && output ? &output->second () : 0);
-    in1 = square_near_part_of_edge (m_include_zero, m_d, bn, an, ! m_whole_edges && output ? &output->first () : 0);
+    in2 = square_near_part_of_edge (m_collinear_mode, m_d, an, bn, ! m_whole_edges && output ? &output->second () : 0);
+    in1 = square_near_part_of_edge (m_collinear_mode, m_d, bn, an, ! m_whole_edges && output ? &output->first () : 0);
   } else {
-    in2 = projected_near_part_of_edge (m_include_zero, m_d, an, bn, ! m_whole_edges && output ? &output->second () : 0);
-    in1 = projected_near_part_of_edge (m_include_zero, m_d, bn, an, ! m_whole_edges && output ? &output->first () : 0);
+    in2 = projected_near_part_of_edge (m_collinear_mode, m_d, an, bn, ! m_whole_edges && output ? &output->second () : 0);
+    in1 = projected_near_part_of_edge (m_collinear_mode, m_d, bn, an, ! m_whole_edges && output ? &output->first () : 0);
   }
 
   if (in1 && in2) {

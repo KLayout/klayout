@@ -99,23 +99,23 @@ enum edge_relation_type
 };
 
 /**
- *  @brief An enum specifying whether the edge relation includes zero distance
+ *  @brief An enum specifying whether how collinear edges are handled
  */
-enum zero_distance_type {
+enum collinear_mode_type {
   /**
-   *  @brief Never include zero distance
+   *  @brief Never include collinear edges
    */
-  NeverIncludeZeroDistance = 0,
+  NeverIncludeCollinear = 0,
 
   /**
-   *  @brief include zero distance when edges touch (e.g. kissing corner case)
+   *  @brief include collinear edges when they touch (e.g. kissing corner case)
    */
-  IncludeZeroDistanceWhenTouch = 1,
+  IncludeCollinearWhenTouch = 1,
 
   /**
-   *  @brief always include zero distance
+   *  @brief always include collinear edges
    */
-  AlwaysIncludeZeroDistance = 2
+  AlwaysIncludeCollinear = 2
 };
 
 /**
@@ -133,13 +133,13 @@ struct DB_PUBLIC EdgesCheckOptions
                       double _ignore_angle = 90,
                       distance_type _min_projection = 0,
                       distance_type _max_projection = std::numeric_limits<distance_type>::max (),
-                      zero_distance_type _include_zero = IncludeZeroDistanceWhenTouch)
+                      collinear_mode_type _collinear_mode = IncludeCollinearWhenTouch)
     : whole_edges (_whole_edges),
       metrics (_metrics),
       ignore_angle (_ignore_angle),
       min_projection (_min_projection),
       max_projection (_max_projection),
-      include_zero (_include_zero)
+      collinear_mode (_collinear_mode)
   { }
 
   /**
@@ -183,13 +183,13 @@ struct DB_PUBLIC EdgesCheckOptions
   distance_type max_projection;
 
   /**
-   *  @brief Specifies zero distance handling
+   *  @brief Specifies collinear edge handling
    *
-   *  This allows implementing the "kissing corners" case. When set to "WhenTouch", kissing corners will
-   *  be reported as errors, when set to "Never", they won't. Note that with merged inputs, edges
+   *  This allows implementing the "kissing corners" case. When set to "IncludeCollinearWhenTouch", kissing corners will
+   *  be reported as errors, when set to "NeverIncludeCollinear", they won't. Note that with merged inputs, edges
    *  will not overlap except at the corners.
    */
-  zero_distance_type include_zero;
+  collinear_mode_type collinear_mode;
 };
 
 /**
@@ -217,7 +217,7 @@ struct DB_PUBLIC EdgeRelationFilter
    *  to each other. If the length of the projection of either edge on the other is >= min_projection
    *  or < max_projection, the edges are considered for the check.
    */
-  EdgeRelationFilter (edge_relation_type r, distance_type d, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max (), zero_distance_type include_zero = AlwaysIncludeZeroDistance);
+  EdgeRelationFilter (edge_relation_type r, distance_type d, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max (), collinear_mode_type include_zero = AlwaysIncludeCollinear);
 
   /**
    *  Constructs an edge relation filter from a CheckOptions structure
@@ -249,19 +249,19 @@ struct DB_PUBLIC EdgeRelationFilter
   }
 
   /**
-   *  @brief Sets a value indicating whether zero distance shall be included in the check
+   *  @brief Sets a value indicating whether collinear edges shall be included in the check
    */
-  void set_include_zero (zero_distance_type f)
+  void set_collinear_mode (collinear_mode_type f)
   {
-    m_include_zero = f;
+    m_collinear_mode = f;
   }
 
   /**
-   *  @brief Gets a value indicating whether zero distance shall be included in the check
+   *  @brief Gets a value indicating whether collinear edges shall be included in the check
    */
-  zero_distance_type include_zero () const
+  collinear_mode_type collinear_mode () const
   {
-    return m_include_zero;
+    return m_collinear_mode;
   }
 
   /**
@@ -361,7 +361,7 @@ struct DB_PUBLIC EdgeRelationFilter
 
 private:
   bool m_whole_edges;
-  zero_distance_type m_include_zero;
+  collinear_mode_type m_collinear_mode;
   edge_relation_type m_r;
   distance_type m_d;
   metrics_type m_metrics;
@@ -372,9 +372,9 @@ private:
 
 //  Internal methods exposed for testing purposes
 
-DB_PUBLIC bool projected_near_part_of_edge (zero_distance_type include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
-DB_PUBLIC bool square_near_part_of_edge (zero_distance_type include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
-DB_PUBLIC bool euclidian_near_part_of_edge (zero_distance_type include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
+DB_PUBLIC bool projected_near_part_of_edge (collinear_mode_type include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
+DB_PUBLIC bool square_near_part_of_edge (collinear_mode_type include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
+DB_PUBLIC bool euclidian_near_part_of_edge (collinear_mode_type include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
 DB_PUBLIC db::Edge::distance_type edge_projection (const db::Edge &a, const db::Edge &b);
 
 }

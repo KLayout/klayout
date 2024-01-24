@@ -51,139 +51,139 @@ TEST(1)
 TEST(2)
 {
   db::Edge output;
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 10), db::Point (100, 200)), &output), false);
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 200), db::Point (100, 200)), &output), false);
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 50), db::Point (100, 50)), &output), false);
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, -50), db::Point (100, -50)), &output), true);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 10), db::Point (100, 200)), &output), false);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 200), db::Point (100, 200)), &output), false);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 50), db::Point (100, 50)), &output), false);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, -50), db::Point (100, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(0,-50;100,-50)");
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, -50), db::Point (300, -50)), &output), true);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, -50), db::Point (300, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(0,-50;187,-50)");
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, -50), db::Point (300, -50)), &output), true);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, -50), db::Point (300, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(100,-50;187,-50)");
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, -50), db::Point (300, -50)), &output), true);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, -50), db::Point (300, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(-87,-50;187,-50)");
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, -50), db::Point (0, -50)), &output), true);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, -50), db::Point (0, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(-87,-50;0,-50)");
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, -100), db::Point (300, -100)), &output), false);
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, 0), db::Point (300, -100)), &output), true);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, -100), db::Point (300, -100)), &output), false);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, 0), db::Point (300, -100)), &output), true);
   EXPECT_EQ (output.to_string (), "(-94,-34;164,-77)");
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 0), db::Point (100, -200)), &output), true);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 0), db::Point (100, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(0,0;50,-100)");
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (40, 0), db::Point (140, -200)), &output), true);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (40, 0), db::Point (140, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(40,0;90,-100)");
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 0), db::Point (200, -200)), &output), true);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 0), db::Point (200, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(100,0;145,-89)");
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, -200), db::Point (200, -200)), &output), false);
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 200), db::Point (200, -200)), &output), true);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, -200), db::Point (200, -200)), &output), false);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 200), db::Point (200, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(100,0;145,-89)");
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (120, 200), db::Point (120, -200)), &output), true);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (120, 200), db::Point (120, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(120,0;120,-98)");
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 200), db::Point (100, -200)), &output), true);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 200), db::Point (100, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(100,0;100,-100)");
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (80, 200), db::Point (80, -200)), &output), true);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (80, 200), db::Point (80, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(80,0;80,-100)");
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-80, 200), db::Point (-80, -200)), &output), true);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-80, 200), db::Point (-80, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(-80,0;-80,-60)");
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (80, 0), db::Point (-200, -200)), &output), true);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (80, 0), db::Point (-200, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(80,0;-45,-89)");
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), false);
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), false);
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 50), db::Point (100, 50)), &output), false);
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, -50), db::Point (100, -50)), &output), true);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), false);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), false);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 50), db::Point (100, 50)), &output), false);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, -50), db::Point (100, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(100,-50;100,-50)");
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (50, -50), db::Point (50, -50)), &output), true);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (50, -50), db::Point (50, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(50,-50;50,-50)");
-  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (190, -50), db::Point (190, -50)), &output), false);
+  EXPECT_EQ (euclidian_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (190, -50), db::Point (190, -50)), &output), false);
 }
 
 TEST(3)
 {
   db::Edge output;
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 200), db::Point (100, 200)), &output), false);
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 50), db::Point (100, 50)), &output), false);
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, -50), db::Point (100, -50)), &output), true);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 200), db::Point (100, 200)), &output), false);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 50), db::Point (100, 50)), &output), false);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, -50), db::Point (100, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(0,-50;100,-50)");
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, -50), db::Point (300, -50)), &output), true);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, -50), db::Point (300, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(0,-50;200,-50)");
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, -50), db::Point (300, -50)), &output), true);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, -50), db::Point (300, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(100,-50;200,-50)");
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, -50), db::Point (300, -50)), &output), true);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, -50), db::Point (300, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(-100,-50;200,-50)");
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, -50), db::Point (0, -50)), &output), true);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, -50), db::Point (0, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(-100,-50;0,-50)");
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, -100), db::Point (300, -100)), &output), false);
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, 0), db::Point (300, -100)), &output), true);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, -100), db::Point (300, -100)), &output), false);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, 0), db::Point (300, -100)), &output), true);
   EXPECT_EQ (output.to_string (), "(-100,-33;200,-83)");
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 0), db::Point (100, -200)), &output), true);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 0), db::Point (100, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(0,0;50,-100)");
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (40, 0), db::Point (140, -200)), &output), true);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (40, 0), db::Point (140, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(40,0;90,-100)");
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 0), db::Point (200, -200)), &output), true);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 0), db::Point (200, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(100,0;150,-100)");
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, -200), db::Point (200, -200)), &output), false);
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 200), db::Point (200, -200)), &output), true);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, -200), db::Point (200, -200)), &output), false);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 200), db::Point (200, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(100,0;150,-100)");
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (120, 200), db::Point (120, -200)), &output), true);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (120, 200), db::Point (120, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(120,0;120,-100)");
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 200), db::Point (100, -200)), &output), true);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 200), db::Point (100, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(100,0;100,-100)");
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (80, 200), db::Point (80, -200)), &output), true);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (80, 200), db::Point (80, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(80,0;80,-100)");
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-80, 200), db::Point (-80, -200)), &output), true);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-80, 200), db::Point (-80, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(-80,0;-80,-100)");
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (80, 0), db::Point (-200, -200)), &output), true);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (80, 0), db::Point (-200, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(80,0;-60,-100)");
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), true);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(-100,0;-100,-100)");
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), false);
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 50), db::Point (100, 50)), &output), false);
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, -50), db::Point (100, -50)), &output), true);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), false);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 50), db::Point (100, 50)), &output), false);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, -50), db::Point (100, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(100,-50;100,-50)");
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (50, -50), db::Point (50, -50)), &output), true);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (50, -50), db::Point (50, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(50,-50;50,-50)");
-  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (190, -50), db::Point (190, -50)), &output), true);
+  EXPECT_EQ (square_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (190, -50), db::Point (190, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(190,-50;190,-50)");
 }
 
 TEST(4)
 {
   db::Edge output;
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 200), db::Point (100, 200)), &output), false);
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 50), db::Point (100, 50)), &output), false);
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, -50), db::Point (100, -50)), &output), true);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 200), db::Point (100, 200)), &output), false);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 50), db::Point (100, 50)), &output), false);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, -50), db::Point (100, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(0,-50;100,-50)");
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, -50), db::Point (300, -50)), &output), true);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, -50), db::Point (300, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(0,-50;100,-50)");
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, -50), db::Point (300, -50)), &output), false);
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, -50), db::Point (300, -50)), &output), true);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, -50), db::Point (300, -50)), &output), false);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, -50), db::Point (300, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(0,-50;100,-50)");
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, -50), db::Point (0, -50)), &output), false);
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, -100), db::Point (300, -100)), &output), false);
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, 0), db::Point (300, -100)), &output), true);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, -50), db::Point (0, -50)), &output), false);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, -100), db::Point (300, -100)), &output), false);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-300, 0), db::Point (300, -100)), &output), true);
   EXPECT_EQ (output.to_string (), "(0,-50;100,-67)");
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 0), db::Point (100, -200)), &output), true);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 0), db::Point (100, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(0,0;50,-100)");
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (40, 0), db::Point (140, -200)), &output), true);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (40, 0), db::Point (140, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(40,0;90,-100)");
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 0), db::Point (200, -200)), &output), false);
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, -200), db::Point (200, -200)), &output), false);
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 200), db::Point (200, -200)), &output), false);
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (120, 200), db::Point (120, -200)), &output), false);
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 200), db::Point (100, -200)), &output), true);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 0), db::Point (200, -200)), &output), false);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, -200), db::Point (200, -200)), &output), false);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (0, 200), db::Point (200, -200)), &output), false);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (120, 200), db::Point (120, -200)), &output), false);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 200), db::Point (100, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(100,0;100,-100)");
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (80, 200), db::Point (80, -200)), &output), true);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (80, 200), db::Point (80, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(80,0;80,-100)");
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-80, 200), db::Point (-80, -200)), &output), false);
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (80, 0), db::Point (-200, -200)), &output), true);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-80, 200), db::Point (-80, -200)), &output), false);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (80, 0), db::Point (-200, -200)), &output), true);
   EXPECT_EQ (output.to_string (), "(80,0;0,-57)");
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), false);
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), false);
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 50), db::Point (100, 50)), &output), false);
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, -50), db::Point (100, -50)), &output), true);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), false);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (), db::Edge (db::Point (-100, 200), db::Point (-100, -200)), &output), false);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, 50), db::Point (100, 50)), &output), false);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (100, -50), db::Point (100, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(100,-50;100,-50)");
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (50, -50), db::Point (50, -50)), &output), true);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (50, -50), db::Point (50, -50)), &output), true);
   EXPECT_EQ (output.to_string (), "(50,-50;50,-50)");
-  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeZeroDistance, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (190, -50), db::Point (190, -50)), &output), false);
+  EXPECT_EQ (projected_near_part_of_edge (db::AlwaysIncludeCollinear, 100, db::Edge (db::Point (0, 0), db::Point (100, 0)), db::Edge (db::Point (190, -50), db::Point (190, -50)), &output), false);
 }
 
 TEST(5)
@@ -291,7 +291,7 @@ TEST(7)
   EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(0,0;0,10):(1,30;1,20)");
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 10)), db::Edge (db::Point (-1, 30), db::Point (-1, 20)), &output);
   EXPECT_EQ (res, false);
-  f.set_include_zero (db::IncludeZeroDistanceWhenTouch);
+  f.set_collinear_mode (db::IncludeCollinearWhenTouch);
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 10)), db::Edge (db::Point (0, 30), db::Point (0, 20)), &output);
   EXPECT_EQ (res, false);
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 10)), db::Edge (db::Point (1, 30), db::Point (1, 20)), &output);
@@ -300,7 +300,7 @@ TEST(7)
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 10)), db::Edge (db::Point (-1, 30), db::Point (-1, 20)), &output);
   EXPECT_EQ (res, false);
 
-  f.set_include_zero (db::AlwaysIncludeZeroDistance);
+  f.set_collinear_mode (db::AlwaysIncludeCollinear);
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 10)), db::Edge (db::Point (0, 300), db::Point (0, -200)), &output);
   EXPECT_EQ (res, true);
   EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(0,0;0,10):(0,110;0,-100)");
@@ -309,7 +309,7 @@ TEST(7)
   EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(0,0;0,10):(1,110;1,-100)");
 
   f.set_metrics (db::Square);
-  f.set_include_zero (db::AlwaysIncludeZeroDistance);
+  f.set_collinear_mode (db::AlwaysIncludeCollinear);
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 10)), db::Edge (db::Point (0, 30), db::Point (0, 20)), &output);
   EXPECT_EQ (res, true);
   EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(0,0;0,10):(0,30;0,20)");
@@ -318,7 +318,7 @@ TEST(7)
   EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(0,0;0,10):(1,30;1,20)");
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 10)), db::Edge (db::Point (-1, 30), db::Point (-1, 20)), &output);
   EXPECT_EQ (res, false);
-  f.set_include_zero (db::IncludeZeroDistanceWhenTouch);
+  f.set_collinear_mode (db::IncludeCollinearWhenTouch);
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 10)), db::Edge (db::Point (0, 30), db::Point (0, 20)), &output);
   EXPECT_EQ (res, false);
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 10)), db::Edge (db::Point (1, 30), db::Point (1, 20)), &output);
@@ -327,7 +327,7 @@ TEST(7)
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 10)), db::Edge (db::Point (-1, 30), db::Point (-1, 20)), &output);
   EXPECT_EQ (res, false);
 
-  f.set_include_zero (db::AlwaysIncludeZeroDistance);
+  f.set_collinear_mode (db::AlwaysIncludeCollinear);
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 10)), db::Edge (db::Point (0, 300), db::Point (0, -200)), &output);
   EXPECT_EQ (res, true);
   EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(0,0;0,10):(0,110;0,-100)");
@@ -336,7 +336,7 @@ TEST(7)
   EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(0,0;0,10):(1,110;1,-100)");
 
   f.set_metrics (db::Projection);
-  f.set_include_zero (db::AlwaysIncludeZeroDistance);
+  f.set_collinear_mode (db::AlwaysIncludeCollinear);
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 10)), db::Edge (db::Point (0, 30), db::Point (0, -20)), &output);
   EXPECT_EQ (res, true);
   EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(0,0;0,10):(0,10;0,0)");
@@ -345,7 +345,7 @@ TEST(7)
   EXPECT_EQ (output.first ().to_string () + ":" + output.second ().to_string (), "(0,0;0,10):(1,10;1,0)");
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 10)), db::Edge (db::Point (-1, 30), db::Point (-1, -20)), &output);
   EXPECT_EQ (res, false);
-  f.set_include_zero (db::IncludeZeroDistanceWhenTouch);
+  f.set_collinear_mode (db::IncludeCollinearWhenTouch);
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 10)), db::Edge (db::Point (0, 30), db::Point (0, 11)), &output);
   EXPECT_EQ (res, false);
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 10)), db::Edge (db::Point (1, 30), db::Point (1, -20)), &output);
@@ -361,7 +361,7 @@ TEST(8_KissingCornerProblem)
   //  if the projection is >0.
 
   db::EdgeRelationFilter f (db::WidthRelation, 10);
-  f.set_include_zero (db::IncludeZeroDistanceWhenTouch);
+  f.set_collinear_mode (db::IncludeCollinearWhenTouch);
   db::EdgePair output;
   bool res;
 
@@ -382,7 +382,7 @@ TEST(8_KissingCornerProblem)
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 100)), db::Edge (db::Point (0, -1), db::Point (0, -100)), &output);
   EXPECT_EQ (res, false);
 
-  f.set_include_zero (db::NeverIncludeZeroDistance);
+  f.set_collinear_mode (db::NeverIncludeCollinear);
 
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 100)), db::Edge (db::Point (0, 201), db::Point (0, 101)), &output);
   EXPECT_EQ (res, false);
@@ -398,7 +398,7 @@ TEST(8_KissingCornerProblem)
   EXPECT_EQ (res, false);
 
   f = db::EdgeRelationFilter (db::SpaceRelation, 10);
-  f.set_include_zero (db::IncludeZeroDistanceWhenTouch);
+  f.set_collinear_mode (db::IncludeCollinearWhenTouch);
 
   f.set_metrics (db::Euclidian);
   res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, 101), db::Point (0, 201)), &output);
@@ -417,7 +417,7 @@ TEST(8_KissingCornerProblem)
   res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, -100), db::Point (0, -1)), &output);
   EXPECT_EQ (res, false);
 
-  f.set_include_zero (db::NeverIncludeZeroDistance);
+  f.set_collinear_mode (db::NeverIncludeCollinear);
 
   f.set_metrics (db::Euclidian);
   res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, 101), db::Point (0, 201)), &output);
@@ -440,7 +440,7 @@ TEST(9_KissingCornerProblemSquareMetrics)
   //  if the projection is >0.
 
   db::EdgeRelationFilter f (db::WidthRelation, 10);
-  f.set_include_zero (db::IncludeZeroDistanceWhenTouch);
+  f.set_collinear_mode (db::IncludeCollinearWhenTouch);
   db::EdgePair output;
   bool res;
 
@@ -461,7 +461,7 @@ TEST(9_KissingCornerProblemSquareMetrics)
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 100)), db::Edge (db::Point (0, -1), db::Point (0, -100)), &output);
   EXPECT_EQ (res, false);
 
-  f.set_include_zero (db::NeverIncludeZeroDistance);
+  f.set_collinear_mode (db::NeverIncludeCollinear);
 
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 100)), db::Edge (db::Point (0, 201), db::Point (0, 101)), &output);
   EXPECT_EQ (res, false);
@@ -477,7 +477,7 @@ TEST(9_KissingCornerProblemSquareMetrics)
   EXPECT_EQ (res, false);
 
   f = db::EdgeRelationFilter (db::SpaceRelation, 10);
-  f.set_include_zero (db::IncludeZeroDistanceWhenTouch);
+  f.set_collinear_mode (db::IncludeCollinearWhenTouch);
 
   f.set_metrics (db::Square);
   res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, 101), db::Point (0, 201)), &output);
@@ -496,7 +496,7 @@ TEST(9_KissingCornerProblemSquareMetrics)
   res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, -100), db::Point (0, -1)), &output);
   EXPECT_EQ (res, false);
 
-  f.set_include_zero (db::NeverIncludeZeroDistance);
+  f.set_collinear_mode (db::NeverIncludeCollinear);
 
   res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, 101), db::Point (0, 201)), &output);
   EXPECT_EQ (res, false);
@@ -518,7 +518,7 @@ TEST(10_KissingCornerProblemProjectionMetrics)
   //  if the projection is >0. It is not effective in projection metrics as there is no overlap.
 
   db::EdgeRelationFilter f (db::WidthRelation, 10);
-  f.set_include_zero (db::IncludeZeroDistanceWhenTouch);
+  f.set_collinear_mode (db::IncludeCollinearWhenTouch);
   db::EdgePair output;
   bool res;
 
@@ -537,7 +537,7 @@ TEST(10_KissingCornerProblemProjectionMetrics)
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 100)), db::Edge (db::Point (0, -1), db::Point (0, -100)), &output);
   EXPECT_EQ (res, false);
 
-  f.set_include_zero (db::NeverIncludeZeroDistance);
+  f.set_collinear_mode (db::NeverIncludeCollinear);
 
   res = f.check (db::Edge (db::Point (0, 0), db::Point (0, 100)), db::Edge (db::Point (0, 201), db::Point (0, 101)), &output);
   EXPECT_EQ (res, false);
@@ -553,7 +553,7 @@ TEST(10_KissingCornerProblemProjectionMetrics)
   EXPECT_EQ (res, false);
 
   f = db::EdgeRelationFilter (db::SpaceRelation, 10);
-  f.set_include_zero (db::IncludeZeroDistanceWhenTouch);
+  f.set_collinear_mode (db::IncludeCollinearWhenTouch);
 
   f.set_metrics (db::Projection);
   res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, 101), db::Point (0, 201)), &output);
@@ -570,7 +570,7 @@ TEST(10_KissingCornerProblemProjectionMetrics)
   res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, -100), db::Point (0, -1)), &output);
   EXPECT_EQ (res, false);
 
-  f.set_include_zero (db::NeverIncludeZeroDistance);
+  f.set_collinear_mode (db::NeverIncludeCollinear);
 
   res = f.check (db::Edge (db::Point (0, 100), db::Point (0, 0)), db::Edge (db::Point (0, 101), db::Point (0, 201)), &output);
   EXPECT_EQ (res, false);

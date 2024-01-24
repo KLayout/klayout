@@ -3234,6 +3234,30 @@ gsi::Enum<db::metrics_type> decl_Metrics ("db", "Metrics",
   "This enum has been introduced in version 0.27."
 );
 
+gsi::Enum<db::collinear_mode_type> decl_CollinearMode ("db", "CollinearMode",
+  gsi::enum_const ("NeverIncludeCollinear", db::NeverIncludeCollinear,
+    "@brief Specifies that check functions should never include collinear edges.\n"
+    "With this specification, the check functions will ignore edges which are collinear."
+  ) +
+  gsi::enum_const ("AlwaysIncludeCollinear", db::AlwaysIncludeCollinear,
+    "@brief Specifies that check functions should always include collinear edges\n"
+    "With this specification, the check functions will also check edges which are collinear."
+  ) +
+  gsi::enum_const ("IncludeCollinearWhenTouch", db::IncludeCollinearWhenTouch,
+    "@brief Specifies that check functions should include collinear edges when they touch\n"
+    "With this specification, the check functions will also check edges which are collinear, but only if they touch in at least one point. "
+    "This is the mode that allows checking the 'kissing corner' cases."
+  ),
+  "@brief This class represents the collinear_mode type for \\Region#width and related checks.\n"
+  "This mode determines how collinear edges are treated in the DRC checks. Formally these edges do neither represent "
+  "a space other other relation as they do not face each other. There are three modes available to treat this boundary case: "
+  "Ignore collinear edges (\\NeverIncludeCollinear), always include them (\\AlwaysIncludeCollinear) or only include them "
+  "if they share at least one common point (\\IncludeCollinearWhenTouch). The latter mode allows activating checks for "
+  "the 'kissing corner' case and is the default mode in most checks."
+  "\n"
+  "This enum has been introduced in version 0.29."
+);
+
 //  Inject the Region::Metrics declarations into Region and Edges:
 //  (Edges injection has to be done here because only here defs() is available)
 gsi::ClassExt<db::Region> inject_Metrics_in_Region (decl_Metrics.defs ());

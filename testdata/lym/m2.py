@@ -1,6 +1,7 @@
 
 import os
 import inspect
+import pya
 
 def lineno():
   return inspect.currentframe().f_back.f_lineno

@@ -47,6 +47,192 @@
 namespace gsi
 {
 
+// ---------------------------------------------------------------------------------
+//  PolygonFilter binding
+
+class PolygonFilterImpl
+  : public db::AllMustMatchFilter
+{
+public:
+  PolygonFilterImpl ()
+  {
+    mp_vars = &m_mag_and_orient;
+    m_wants_variants = true;
+    m_requires_raw_input = false;
+  }
+
+  bool issue_selected (const db::Polygon &) const
+  {
+    return false;
+  }
+
+  virtual bool selected (const db::Polygon &polygon) const
+  {
+    if (f_selected.can_issue ()) {
+      return f_selected.issue<PolygonFilterImpl, bool, const db::Polygon &> (&PolygonFilterImpl::issue_selected, polygon);
+    } else {
+      return db::AllMustMatchFilter::selected (polygon);
+    }
+  }
+
+  virtual bool selected (const db::PolygonRef &polygon) const
+  {
+    db::Polygon p;
+    polygon.instantiate (p);
+    return selected (p);
+  }
+
+  virtual const db::TransformationReducer *vars () const
+  {
+    return mp_vars;
+  }
+
+  virtual bool requires_raw_input () const
+  {
+    return m_requires_raw_input;
+  }
+
+  void set_requires_raw_input (bool f)
+  {
+    m_requires_raw_input = f;
+  }
+
+  virtual bool wants_variants () const
+  {
+    return m_wants_variants;
+  }
+
+  void set_wants_variants (bool f)
+  {
+    m_wants_variants = f;
+  }
+
+  void is_isotropic ()
+  {
+    mp_vars = &m_mag;
+  }
+
+  void is_scale_invariant ()
+  {
+    mp_vars = &m_orientation;
+  }
+
+  void is_isotropic_and_scale_invariant ()
+  {
+    mp_vars = 0;
+  }
+
+public:
+  const db::TransformationReducer *mp_vars;
+  db::OrientationReducer m_orientation;
+  db::MagnificationReducer m_mag;
+  db::MagnificationAndOrientationReducer m_mag_and_orient;
+  bool m_requires_raw_input;
+  bool m_wants_variants;
+
+  gsi::Callback f_selected;
+};
+
+Class<gsi::PolygonFilterImpl> decl_PluginFactory ("db", "PolygonFilter",
+  method ("requires_raw_input?", &PolygonFilterImpl::requires_raw_input,
+    "@brief Gets a value indicating whether the filter needs raw (unmerged) input\n"
+    "See \\requires_raw_input= for details.\n"
+  ) +
+  method ("requires_raw_input=", &PolygonFilterImpl::set_requires_raw_input, gsi::arg ("flag"),
+    "@brief Sets a value indicating whether the filter needs raw (unmerged) input\n"
+    "This flag must be set before using this filter. It tells the filter implementation whether the "
+    "filter wants to have raw input (unmerged). The default value is 'false', meaning that\n"
+    "the filter will receive merged polygons. Setting this value to false potentially saves some\n"
+    "CPU time needed for merging the polygons.\n"
+  ) +
+  method ("wants_variants?", &PolygonFilterImpl::wants_variants,
+    "@brief Gets a value indicating whether the filter prefers cell variants\n"
+    "See \\wants_variants= for details.\n"
+  ) +
+  method ("wants_variants=", &PolygonFilterImpl::set_wants_variants, gsi::arg ("flag"),
+    "@brief Sets a value indicating whether the filter prefers cell variants\n"
+    "This flag must be set before using this filter. It tells the filter implementation whether cell "
+    "variants should be created (true, the default) or shape propagation will be applied (false).\n"
+    "\n"
+    "This decision needs to be make if the filter indicates that it will deliver different results\n"
+    "for scaled or rotated versions of the cell (see \\is_isotropic and the other hints). If a cell\n"
+    "is present with different respective qualities - as seen from the top cell - these instances\n"
+    "need to be differentiated. Cell variant formation is one way, shape propagation the other way.\n"
+    "Typically, cell variant formation is less expensive, but the hierarchy will be modified internally."
+  ) +
+  method ("is_isotropic", &PolygonFilterImpl::is_isotropic,
+    "@brief Indicates that the filter has isotropic properties\n"
+    "Call this method before using the filter to indicate that the selection is independent of "
+    "the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
+    "hierarchical mode.\n"
+    "\n"
+    "Examples for isotropic filters are area or perimeter filters."
+  ) +
+  method ("is_scale_invariant", &PolygonFilterImpl::is_scale_invariant,
+    "@brief Indicates that the filter is scale invariant\n"
+    "Call this method before using the filter to indicate that the selection is independent of "
+    "the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
+    "hierarchical mode.\n"
+    "\n"
+    "An example for a scale invariant filter is the bounding box aspect ratio (height/width) filter."
+  ) +
+  method ("is_isotropic_and_scale_invariant", &PolygonFilterImpl::is_isotropic_and_scale_invariant,
+    "@brief Indicates that the filter is isotropic and scale invariant\n"
+    "Call this method before using the filter to indicate that the selection is independent of "
+    "the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
+    "hierarchical mode.\n"
+    "\n"
+    "An example for such a filter is the rectangle selector."
+  ) +
+  callback ("selected", &PolygonFilterImpl::issue_selected, &PolygonFilterImpl::f_selected, gsi::arg ("polygon"),
+    "@brief Selects a polygon\n"
+    "This method is the actual payload. It needs to be reimplemented in a derived class.\n"
+    "It needs to analyze the polygon and return 'true' if it should be kept and 'false' if it should be discarded."
+  ),
+  "@brief A generic polygon filter adaptor\n"
+  "\n"
+  "Polygon filters are an efficient way to filter polygons from a Region. To apply a filter, derive your own "
+  "filter class and pass an instance to \\Region#filter or \\Region#filtered method.\n"
+  "\n"
+  "Conceptually, these methods take each polygon from the region and present it to the filter's 'selected' method.\n"
+  "Based on the result of this evaluation, the polygon is kept or discarded.\n"
+  "\n"
+  "The magic happens when deep mode regions are involved. In that case, the filter will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the filter behaves. You "
+  "need to configure the filter by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using the filter.\n"
+  "\n"
+  "You can skip this step, but the filter algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "Here is some example that filters triangles:"
+  "\n"
+  "@code\n"
+  "class TriangleFilter < RBA::PolygonFilter\n"
+  "\n"
+  "  # Constructor\n"
+  "  def initialize\n"
+  "    self.is_isotropic_and_scale_invariant   # the triangle nature is not dependent on the scale or orientation\n"
+  "  end\n"
+  "  \n"
+  "  # Select only triangles\n"
+  "  def selected(polygon)\n"
+  "    return polygon.holes == 0 && polygon.num_points == 3\n"
+  "  end\n"
+  "\n"
+  "end\n"
+  "\n"
+  "region = ... # some Region\n"
+  "triangles_only = region.filtered(TriangleFilter::new)\n"
+  "@/code\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+
+// ---------------------------------------------------------------------------------
+//  Region binding
+
 static inline std::vector<db::Region> as_2region_vector (const std::pair<db::Region, db::Region> &rp)
 {
   std::vector<db::Region> res;
@@ -316,6 +502,16 @@ static db::Region extent_refs (const db::Region *r, double fx1, double fy1, doub
 static db::Edges extent_refs_edges (const db::Region *r, double fx1, double fy1, double fx2, double fy2)
 {
   return r->processed (db::RelativeExtentsAsEdges (fx1, fy1, fx2, fy2));
+}
+
+static db::Region filtered (const db::Region *r, const PolygonFilterImpl *f)
+{
+  return r->filtered (*f);
+}
+
+static void filter (db::Region *r, const PolygonFilterImpl *f)
+{
+  r->filter (*f);
 }
 
 static db::Region with_perimeter1 (const db::Region *r, db::Region::perimeter_type perimeter, bool inverse)
@@ -2320,6 +2516,18 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "The first element returned is the \\members_of part, the second is the \\not_members_of part.\n"
     "\n"
     "This method has been introduced in version 0.28.\n"
+  ) +
+  method_ext ("filter", &filter, gsi::arg ("filter"),
+    "@brief Applies a generic filter in place (replacing the polygons from the Region)\n"
+    "See \\PolygonFilter for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("filtered", &filtered, gsi::arg ("filtered"),
+    "@brief Applies a generic filter and returns a filtered copy\n"
+    "See \\PolygonFilter for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
   ) +
   method_ext ("rectangles", &rectangles,
     "@brief Returns all polygons which are rectangles\n"

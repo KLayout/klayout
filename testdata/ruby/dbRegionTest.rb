@@ -30,6 +30,20 @@ def csort(s)
   s.split(/(?<=\));(?=\()/).sort.join(";")
 end
 
+class TriangleFilter < RBA::PolygonFilter
+
+  # Constructor
+  def initialize
+    self.is_isotropic_and_scale_invariant   # the triangle nature is not dependent on the scale or orientation
+  end
+  
+  # Select only triangles
+  def selected(polygon)
+    return polygon.holes == 0 && polygon.num_points == 3
+  end
+
+end
+
 class DBRegion_TestClass < TestBase
 
   # Basics
@@ -1185,6 +1199,34 @@ class DBRegion_TestClass < TestBase
     r.remove_properties
     rr.remove_properties
     assert_equal(csort(r.separation_check(rr, 100, false, RBA::Region::Projection, nil, nil, nil, false, RBA::Region::NoOppositeFilter, RBA::Region::NoRectFilter, false, RBA::Region::SamePropertiesConstraint).to_s), csort("(0,200;100,200)/(100,250;0,250);(200,200;300,200)/(300,250;200,250);(400,200;500,200)/(500,250;400,250)"))
+
+  end
+
+  # Generic filters
+  def test_generic_filters
+
+    # Some basic tests for the filter class
+
+    f = TriangleFilter::new
+    assert_equal(f.wants_variants?, true)
+    f.wants_variants = false
+    assert_equal(f.wants_variants?, false)
+    assert_equal(f.requires_raw_input, false)
+    f.requires_raw_input = false
+    assert_equal(f.requires_raw_input, false)
+
+    # Smoke test
+    f.is_isotropic
+    f.is_scale_invariant
+
+    # Some application
+
+    region = RBA::Region::new
+
+    region.insert(RBA::Polygon::new([[0,0], [100, 100], [100,0]]))
+    region.insert(RBA::Box::new(200, 0, 300, 100))
+
+    assert_equal(region.filtered(TriangleFilter::new).to_s, "(0,0;100,100;100,0)")
 
   end
 

@@ -61,7 +61,7 @@ struct simple_polygon_defs
     }
   }
 
-  static point_type point (C *c, size_t p)
+  static point_type point (const C *c, size_t p)
   {
     if (c->hull ().size () > p) {
       return c->hull ()[p];
@@ -70,12 +70,12 @@ struct simple_polygon_defs
     }
   }
 
-  static size_t num_points (C *c)
+  static size_t num_points (const C *c)
   {
     return c->hull ().size ();
   }
 
-  static bool is_empty (C *c)
+  static bool is_empty (const C *c)
   {
     return c->hull ().size () == 0;
   }
@@ -868,17 +868,17 @@ struct polygon_defs
     }
   }
 
-  static size_t num_points (C *c)
+  static size_t num_points (const C *c)
   {
     return c->vertices ();
   }
 
-  static bool is_empty (C *c)
+  static bool is_empty (const C *c)
   {
     return c->vertices () == 0;
   }
 
-  static point_type point_hull (C *c, size_t p)
+  static point_type point_hull (const C *c, size_t p)
   {
     if (c->hull ().size () > p) {
       return c->hull ()[p];
@@ -887,7 +887,7 @@ struct polygon_defs
     }
   }
 
-  static point_type point_hole (C *c, unsigned int n, size_t p)
+  static point_type point_hole (const C *c, unsigned int n, size_t p)
   {
     if (c->holes () > n && c->contour (n + 1).size () > p) {
       return c->contour (n + 1)[p];
@@ -896,12 +896,12 @@ struct polygon_defs
     }
   }
 
-  static size_t num_points_hull (C *c)
+  static size_t num_points_hull (const C *c)
   {
     return c->hull ().size ();
   }
 
-  static size_t num_points_hole (C *c, unsigned int n)
+  static size_t num_points_hole (const C *c, unsigned int n)
   {
     return c->contour (n + 1).size ();
   }

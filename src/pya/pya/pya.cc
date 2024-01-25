@@ -251,8 +251,9 @@ PythonInterpreter::PythonInterpreter (bool embedded)
 
   if (! has_klayout_pythonhome) {
 
-    //  Use our own installation path for PYTHOHOME unless given
-    Py_SetPythonHome (tl::to_wstring (inst_dir).c_str ());
+    //  Use our own installation path for PYTHONHOME unless given
+    //  (Our Windows installation comes with its own copy of the libraries)
+    tl::set_env (pythonhome_name, inst_dir);
 
   }
 

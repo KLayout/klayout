@@ -247,7 +247,7 @@ TEST(102_PythonInclude)
     throw;
   }
 
-  EXPECT_EQ (console.text (), "Stop 1: m2.py:8\nf: a_inc.py:5\nStop 2: m2.py:14\n");
+  EXPECT_EQ (console.text (), "Stop 1: m2.py:9\nf: a_inc.py:5\nStop 2: m2.py:15\n");
 }
 
 #endif

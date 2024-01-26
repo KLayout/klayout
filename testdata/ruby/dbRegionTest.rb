@@ -44,6 +44,21 @@ class TriangleFilter < RBA::PolygonFilter
 
 end
 
+class ShrinkToHalfProcessor < RBA::PolygonProcessor
+
+  # Constructor
+  def initialize
+    self.is_isotropic_and_scale_invariant   # scale or orientation do not matter
+  end
+  
+  # Shrink to half size
+  def process(polygon)
+    shift = polygon.bbox.center - RBA::Point::new   # shift vector
+    return [ (polygon.moved(-shift) * 0.5).moved(shift) ]
+  end
+
+end
+
 class DBRegion_TestClass < TestBase
 
   # Basics
@@ -1212,8 +1227,8 @@ class DBRegion_TestClass < TestBase
     f.wants_variants = false
     assert_equal(f.wants_variants?, false)
     assert_equal(f.requires_raw_input, false)
-    f.requires_raw_input = false
-    assert_equal(f.requires_raw_input, false)
+    f.requires_raw_input = true
+    assert_equal(f.requires_raw_input, true)
 
     # Smoke test
     f.is_isotropic
@@ -1230,6 +1245,43 @@ class DBRegion_TestClass < TestBase
     assert_equal(region.to_s, "(0,0;100,100;100,0);(200,0;200,100;300,100;300,0)")
     region.filter(TriangleFilter::new)
     assert_equal(region.to_s, "(0,0;100,100;100,0)")
+
+  end
+
+  # Generic processors
+  def test_generic_processors
+
+    # Some basic tests for the filter class
+
+    f = ShrinkToHalfProcessor::new
+    assert_equal(f.wants_variants?, true)
+    f.wants_variants = false
+    assert_equal(f.wants_variants?, false)
+    assert_equal(f.requires_raw_input, false)
+    f.requires_raw_input = true
+    assert_equal(f.requires_raw_input, true)
+    assert_equal(f.result_is_merged, false)
+    f.result_is_merged = true
+    assert_equal(f.result_is_merged, true)
+    assert_equal(f.result_must_not_be_merged, false)
+    f.result_must_not_be_merged = true
+    assert_equal(f.result_must_not_be_merged, true)
+
+    # Smoke test
+    f.is_isotropic
+    f.is_scale_invariant
+
+    # Some application
+
+    region = RBA::Region::new
+
+    region.insert(RBA::Polygon::new([[0,0], [100, 100], [100,0]]))
+    region.insert(RBA::Box::new(200, 0, 300, 100))
+
+    assert_equal(region.processed(ShrinkToHalfProcessor::new).to_s, "(25,25;75,75;75,25);(225,25;225,75;275,75;275,25)")
+    assert_equal(region.to_s, "(0,0;100,100;100,0);(200,0;200,100;300,100;300,0)")
+    region.process(ShrinkToHalfProcessor::new)
+    assert_equal(region.to_s, "(25,25;75,75;75,25);(225,25;225,75;275,75;275,25)")
 
   end
 

@@ -128,6 +128,102 @@ Class<gsi::PolygonFilterImpl> decl_PolygonFilterImpl ("db", "PolygonFilter",
 );
 
 // ---------------------------------------------------------------------------------
+//  PolygonProcessor binding
+
+Class<shape_processor_impl<db::PolygonProcessorBase> > decl_PolygonProcessor ("db", "PolygonProcessor",
+  shape_processor_impl<db::PolygonProcessorBase>::method_decls (true),
+  "@brief A generic polygon processor adaptor\n"
+  "\n"
+  "Polygon processors are an efficient way to process polygons from a Region. To apply a processors, derive your own "
+  "processors class and pass an instance to \\Region#process or \\Region#processed method.\n"
+  "\n"
+  "Conceptually, these methods take each polygon from the region and present it to the processor's 'process' method.\n"
+  "The result of this call is a list of zero to many output polygons derived from the input polygon.\n"
+  "The output region is the sum over all these individual results.\n"
+  "\n"
+  "The magic happens when deep mode regions are involved. In that case, the processor will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the processor behaves. You "
+  "need to configure the processor by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using it.\n"
+  "\n"
+  "You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "Here is some example that shrinks every polygon to half of the size but does not change the position.\n"
+  "In this example the 'position' is defined by the center of the bounding box:"
+  "\n"
+  "@code\n"
+  "class ShrinkToHalfProcessor < RBA::PolygonProcessor\n"
+  "\n"
+  "  # Constructor\n"
+  "  def initialize\n"
+  "    self.is_isotropic_and_scale_invariant   # scale or orientation do not matter\n"
+  "  end\n"
+  "  \n"
+  "  # Shrink to half size\n"
+  "  def process(polygon)\n"
+  "    shift = polygon.bbox.center - RBA::Point::new   # shift vector\n"
+  "    return [ (polygon.moved(-shift) * 0.5).moved(shift) ]\n"
+  "  end\n"
+  "\n"
+  "end\n"
+  "\n"
+  "region = ... # some Region\n"
+  "shrinked_to_half = region.processed(ShrinkToHalf::new)\n"
+  "@/code\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+Class<shape_processor_impl<db::PolygonToEdgeProcessorBase> > decl_PolygonToEdgeProcessor ("db", "PolygonToEdgeProcessor",
+  shape_processor_impl<db::PolygonToEdgeProcessorBase>::method_decls (true),
+  "@brief A generic polygon-to-edge processor adaptor\n"
+  "\n"
+  "Polygon processors are an efficient way to process polygons from a Region. To apply a processors, derive your own "
+  "processors class and pass an instance to \\Region#processed method.\n"
+  "\n"
+  "Conceptually, these methods take each polygon from the region and present it to the processor's 'process' method.\n"
+  "The result of this call is a list of zero to many output edges derived from the input polygon.\n"
+  "The output edge collection is the sum over all these individual results.\n"
+  "\n"
+  "The magic happens when deep mode regions are involved. In that case, the processor will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the processor behaves. You "
+  "need to configure the processor by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using it.\n"
+  "\n"
+  "You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "For a basic example see the \\PolygonProcessor class, with the exception that this incarnation has to deliver edges.\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+Class<shape_processor_impl<db::PolygonToEdgePairProcessorBase> > decl_PolygonToEdgePairProcessor ("db", "PolygonToEdgePairProcessor",
+  shape_processor_impl<db::PolygonToEdgePairProcessorBase>::method_decls (true),
+  "@brief A generic polygon-to-edge-pair processor adaptor\n"
+  "\n"
+  "Polygon processors are an efficient way to process polygons from a Region. To apply a processors, derive your own "
+  "processors class and pass an instance to \\Region#processed method.\n"
+  "\n"
+  "Conceptually, these methods take each polygon from the region and present it to the processor's 'process' method.\n"
+  "The result of this call is a list of zero to many output edge pairs derived from the input polygon.\n"
+  "The output edge pair collection is the sum over all these individual results.\n"
+  "\n"
+  "The magic happens when deep mode regions are involved. In that case, the processor will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the processor behaves. You "
+  "need to configure the processor by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using it.\n"
+  "\n"
+  "You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "For a basic example see the \\PolygonProcessor class, with the exception that this incarnation has to deliver edge pairs.\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+// ---------------------------------------------------------------------------------
 //  Region binding
 
 static inline std::vector<db::Region> as_2region_vector (const std::pair<db::Region, db::Region> &rp)
@@ -409,6 +505,26 @@ static db::Region filtered (const db::Region *r, const PolygonFilterImpl *f)
 static void filter (db::Region *r, const PolygonFilterImpl *f)
 {
   r->filter (*f);
+}
+
+static db::Region processed_pp (const db::Region *r, const shape_processor_impl<db::PolygonProcessorBase> *f)
+{
+  return r->processed (*f);
+}
+
+static void process_pp (db::Region *r, const shape_processor_impl<db::PolygonProcessorBase> *f)
+{
+  r->process (*f);
+}
+
+static db::EdgePairs processed_pep (const db::Region *r, const shape_processor_impl<db::PolygonToEdgePairProcessorBase> *f)
+{
+  return r->processed (*f);
+}
+
+static db::Edges processed_pe (const db::Region *r, const shape_processor_impl<db::PolygonToEdgeProcessorBase> *f)
+{
+  return r->processed (*f);
 }
 
 static db::Region with_perimeter1 (const db::Region *r, db::Region::perimeter_type perimeter, bool inverse)
@@ -2423,6 +2539,30 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
   method_ext ("filtered", &filtered, gsi::arg ("filtered"),
     "@brief Applies a generic filter and returns a filtered copy\n"
     "See \\PolygonFilter for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("process", &process_pp, gsi::arg ("process"),
+    "@brief Applies a generic polygon processor in place (replacing the polygons from the Region)\n"
+    "See \\PolygonProcessor for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("processed", &processed_pp, gsi::arg ("processed"),
+    "@brief Applies a generic polygon processor and returns a processed copy\n"
+    "See \\PolygonProcessor for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("processed", &processed_pep, gsi::arg ("processed"),
+    "@brief Applies a generic polygon-to-edge-pair processor and returns an edge pair collection with the results\n"
+    "See \\PolygonToEdgePairProcessor for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("processed", &processed_pe, gsi::arg ("processed"),
+    "@brief Applies a generic polygon-to-edge processor and returns an edge collection with the results\n"
+    "See \\PolygonToEdgeProcessor for a description of this feature.\n"
     "\n"
     "This method has been introduced in version 0.29.\n"
   ) +

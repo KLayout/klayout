@@ -169,14 +169,19 @@ EdgePairs::properties_repository ()
   return *r;
 }
 
-void EdgePairs::processed (Region &output, const EdgePairToPolygonProcessorBase &filter) const
+EdgePairs EdgePairs::processed (const EdgePairProcessorBase &proc) const
 {
-  output = Region (mp_delegate->processed_to_polygons (filter));
+  return EdgePairs (mp_delegate->processed (proc));
 }
 
-void EdgePairs::processed (Edges &output, const EdgePairToEdgeProcessorBase &filter) const
+void EdgePairs::processed (Region &output, const EdgePairToPolygonProcessorBase &proc) const
 {
-  output = Edges (mp_delegate->processed_to_edges (filter));
+  output = Region (mp_delegate->processed_to_polygons (proc));
+}
+
+void EdgePairs::processed (Edges &output, const EdgePairToEdgeProcessorBase &proc) const
+{
+  output = Edges (mp_delegate->processed_to_edges (proc));
 }
 
 void EdgePairs::polygons (Region &output, db::Coord e) const

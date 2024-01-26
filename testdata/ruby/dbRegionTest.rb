@@ -59,6 +59,34 @@ class ShrinkToHalfProcessor < RBA::PolygonProcessor
 
 end
 
+class SomePolygonToEdgePairProcessor < RBA::PolygonToEdgePairProcessor
+
+  # Constructor
+  def initialize
+    self.is_isotropic_and_scale_invariant   # scale or orientation do not matter
+  end
+  
+  def process(polygon)
+    box = polygon.bbox
+    return [ RBA::EdgePair::new([ box.left, box.bottom, box.left, box.top ], [ box.right, box.bottom, box.right, box.top ]) ]
+  end
+
+end
+
+class SomePolygonToEdgeProcessor < RBA::PolygonToEdgeProcessor
+
+  # Constructor
+  def initialize
+    self.is_isotropic_and_scale_invariant   # scale or orientation do not matter
+  end
+  
+  def process(polygon)
+    box = polygon.bbox
+    return [ RBA::Edge::new(box.p1, box.p2) ]
+  end
+
+end
+
 class DBRegion_TestClass < TestBase
 
   # Basics
@@ -1249,9 +1277,9 @@ class DBRegion_TestClass < TestBase
   end
 
   # Generic processors
-  def test_generic_processors
+  def test_generic_processors_pp
 
-    # Some basic tests for the filter class
+    # Some basic tests for the processor class
 
     f = ShrinkToHalfProcessor::new
     assert_equal(f.wants_variants?, true)
@@ -1282,6 +1310,36 @@ class DBRegion_TestClass < TestBase
     assert_equal(region.to_s, "(0,0;100,100;100,0);(200,0;200,100;300,100;300,0)")
     region.process(ShrinkToHalfProcessor::new)
     assert_equal(region.to_s, "(25,25;75,75;75,25);(225,25;225,75;275,75;275,25)")
+
+  end
+
+  # Generic processors
+  def test_generic_processors_pep
+
+    p = SomePolygonToEdgePairProcessor::new
+
+    region = RBA::Region::new
+
+    region.insert(RBA::Polygon::new([[0,0], [100, 100], [100,0]]))
+    region.insert(RBA::Box::new(200, 0, 300, 100))
+
+    assert_equal(region.processed(p).to_s, "(0,0;0,100)/(100,0;100,100);(200,0;200,100)/(300,0;300,100)")
+    assert_equal(region.to_s, "(0,0;100,100;100,0);(200,0;200,100;300,100;300,0)")
+
+  end
+
+  # Generic processors
+  def test_generic_processors_pe
+
+    p = SomePolygonToEdgeProcessor::new
+
+    region = RBA::Region::new
+
+    region.insert(RBA::Polygon::new([[0,0], [100, 100], [100,0]]))
+    region.insert(RBA::Box::new(200, 0, 300, 100))
+
+    assert_equal(region.processed(p).to_s, "(0,0;100,100);(200,0;300,100)")
+    assert_equal(region.to_s, "(0,0;100,100;100,0);(200,0;200,100;300,100;300,0)")
 
   end
 

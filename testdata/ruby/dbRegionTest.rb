@@ -1227,6 +1227,9 @@ class DBRegion_TestClass < TestBase
     region.insert(RBA::Box::new(200, 0, 300, 100))
 
     assert_equal(region.filtered(TriangleFilter::new).to_s, "(0,0;100,100;100,0)")
+    assert_equal(region.to_s, "(0,0;100,100;100,0);(200,0;200,100;300,100;300,0)")
+    region.filter(TriangleFilter::new)
+    assert_equal(region.to_s, "(0,0;100,100;100,0)")
 
   end
 

@@ -30,6 +30,21 @@ def csort(s)
   s.split(/(?<=\));(?=\()/).sort.join(";")
 end
 
+class ParallelFilter < RBA::EdgeFilter
+
+  # Constructor
+  def initialize(ref_edge)
+    self.is_scale_invariant   # orientation matters, but scale does not
+    @ref_edge = ref_edge
+  end
+  
+  # Select only parallel ones
+  def selected(edge)
+    return edge.is_parallel?(@ref_edge)
+  end
+
+end
+
 class DBEdges_TestClass < TestBase
 
   # Basics
@@ -746,6 +761,38 @@ class DBEdges_TestClass < TestBase
     rr = r.dup
     rr.select_not_outside(g2)
     assert_equal(rr.to_s, "(0,0;100,0)")
+
+  end
+
+  # Generic filters
+  def test_generic_filters
+
+    # Some basic tests for the filter class
+
+    f = ParallelFilter::new(RBA::Edge::new(0, 0, 100, 100))
+    assert_equal(f.wants_variants?, true)
+    f.wants_variants = false
+    assert_equal(f.wants_variants?, false)
+    assert_equal(f.requires_raw_input, false)
+    f.requires_raw_input = false
+    assert_equal(f.requires_raw_input, false)
+
+    # Smoke test
+    f.is_isotropic
+    f.is_scale_invariant
+
+    # Some application
+
+    f = ParallelFilter::new(RBA::Edge::new(0, 0, 100, 100))
+
+    edges = RBA::Edges::new
+    edges.insert(RBA::Edge::new(100, 0, 200, 100))
+    edges.insert(RBA::Edge::new(100, 100, 100, 200))
+
+    assert_equal(edges.filtered(f).to_s, "(100,0;200,100)")
+    assert_equal(edges.to_s, "(100,0;200,100);(100,100;100,200)")
+    edges.filter(f)
+    assert_equal(edges.to_s, "(100,0;200,100)")
 
   end
 

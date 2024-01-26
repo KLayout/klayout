@@ -33,6 +33,83 @@
 namespace gsi
 {
 
+// ---------------------------------------------------------------------------------
+//  TextFilter binding
+
+class TextFilterImpl
+  : public shape_filter_impl<db::TextFilterBase>
+{
+public:
+  TextFilterImpl () { }
+
+  bool issue_selected (const db::Text &) const
+  {
+    return false;
+  }
+
+  virtual bool selected (const db::Text &text) const
+  {
+    if (f_selected.can_issue ()) {
+      return f_selected.issue<TextFilterImpl, bool, const db::Text &> (&TextFilterImpl::issue_selected, text);
+    } else {
+      return db::TextFilterBase::selected (text);
+    }
+  }
+
+  gsi::Callback f_selected;
+};
+
+Class<gsi::TextFilterImpl> decl_TextFilterImpl ("db", "TextFilter",
+  TextFilterImpl::method_decls (false) +
+  callback ("selected", &TextFilterImpl::issue_selected, &TextFilterImpl::f_selected, gsi::arg ("text"),
+    "@brief Selects a text\n"
+    "This method is the actual payload. It needs to be reimplemented in a derived class.\n"
+    "It needs to analyze the text and return 'true' if it should be kept and 'false' if it should be discarded."
+  ),
+  "@brief A generic text filter adaptor\n"
+  "\n"
+  "Text filters are an efficient way to filter texts from a Texts collection. To apply a filter, derive your own "
+  "filter class and pass an instance to \\Texts#filter or \\Texts#filtered method.\n"
+  "\n"
+  "Conceptually, these methods take each text from the collection and present it to the filter's 'selected' method.\n"
+  "Based on the result of this evaluation, the text is kept or discarded.\n"
+  "\n"
+  "The magic happens when deep mode text collections are involved. In that case, the filter will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the filter behaves. You "
+  "need to configure the filter by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using the filter.\n"
+  "\n"
+  "You can skip this step, but the filter algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "Here is some example that filters texts with a given string length:"
+  "\n"
+  "@code\n"
+  "class TextStringLengthFilter < RBA::TextFilter\n"
+  "\n"
+  "  # Constructor\n"
+  "  def initialize(string_length)\n"
+  "    self.is_isotropic_and_scale_invariant   # orientation and scale do not matter\n"
+  "    @string_length = string_length\n"
+  "  end\n"
+  "  \n"
+  "  # Select texts with given string length\n"
+  "  def selected(text)\n"
+  "    return text.string.size == @string_length\n"
+  "  end\n"
+  "\n"
+  "end\n"
+  "\n"
+  "texts = ... # some Texts object\n"
+  "with_length_3 = edges.filtered(TextStringLengthFilter::new(3))\n"
+  "@/code\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+// ---------------------------------------------------------------------------------
+//  Texts binding
+
 static db::Texts *new_v ()
 {
   return new db::Texts ();
@@ -150,6 +227,16 @@ static bool is_deep (const db::Texts *t)
 static size_t id (const db::Texts *t)
 {
   return tl::id_of (t->delegate ());
+}
+
+static db::Texts filtered (const db::Texts *r, const TextFilterImpl *f)
+{
+  return r->filtered (*f);
+}
+
+static void filter (db::Texts *r, const TextFilterImpl *f)
+{
+  r->filter (*f);
 }
 
 static db::Texts with_text (const db::Texts *r, const std::string &text, bool inverse)
@@ -400,6 +487,18 @@ Class<db::Texts> decl_Texts (decl_dbShapeCollection, "db", "Texts",
   method_ext ("polygons", &polygons0, gsi::arg ("e", db::Coord (1)),
     "@brief Converts the edge pairs to polygons\n"
     "This method creates polygons from the texts. This is equivalent to calling \\extents."
+  ) +
+  method_ext ("filter", &filter, gsi::arg ("filter"),
+    "@brief Applies a generic filter in place (replacing the texts from the Texts collection)\n"
+    "See \\TextFilter for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("filtered", &filtered, gsi::arg ("filtered"),
+    "@brief Applies a generic filter and returns a filtered copy\n"
+    "See \\TextFilter for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
   ) +
   method_ext ("with_text", with_text, gsi::arg ("text"), gsi::arg ("inverse"),
     "@brief Filter the text by text string\n"

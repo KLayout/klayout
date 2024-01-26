@@ -25,6 +25,7 @@
 #define HDR_gsiDeclDbContainerHelpers
 
 #include "dbPropertiesRepository.h"
+#include "dbCellVariants.h"
 #include "tlVariant.h"
 #include "gsiDecl.h"
 
@@ -99,6 +100,143 @@ make_property_methods ()
     "This method has been introduced in version 0.28.4."
   );
 }
+
+// ---------------------------------------------------------------------------------
+//  Generic shape filter declarations
+
+template <class FilterBase>
+class shape_filter_impl
+  : public FilterBase
+{
+public:
+  shape_filter_impl ()
+  {
+    mp_vars = &m_mag_and_orient;
+    m_wants_variants = true;
+    m_requires_raw_input = false;
+  }
+
+  //  overrides virtual method
+  virtual const db::TransformationReducer *vars () const
+  {
+    return mp_vars;
+  }
+
+  //  maybe overrides virtual method
+  virtual bool requires_raw_input () const
+  {
+    return m_requires_raw_input;
+  }
+
+  void set_requires_raw_input (bool f)
+  {
+    m_requires_raw_input = f;
+  }
+
+  //  overrides virtual method
+  virtual bool wants_variants () const
+  {
+    return m_wants_variants;
+  }
+
+  void set_wants_variants (bool f)
+  {
+    m_wants_variants = f;
+  }
+
+  void is_isotropic ()
+  {
+    mp_vars = &m_mag;
+  }
+
+  void is_scale_invariant ()
+  {
+    mp_vars = &m_orientation;
+  }
+
+  void is_isotropic_and_scale_invariant ()
+  {
+    mp_vars = 0;
+  }
+
+  static gsi::Methods method_decls (bool with_requires_raw_input)
+  {
+    gsi::Methods decls;
+
+    if (with_requires_raw_input) {
+      decls =
+        method ("requires_raw_input?", &shape_filter_impl::requires_raw_input,
+          "@brief Gets a value indicating whether the filter needs raw (unmerged) input\n"
+          "See \\requires_raw_input= for details.\n"
+        ) +
+        method ("requires_raw_input=", &shape_filter_impl::set_requires_raw_input, gsi::arg ("flag"),
+          "@brief Sets a value indicating whether the filter needs raw (unmerged) input\n"
+          "This flag must be set before using this filter. It tells the filter implementation whether the "
+          "filter wants to have raw input (unmerged). The default value is 'false', meaning that\n"
+          "the filter will receive merged polygons ('merged semantics').\n"
+          "\n"
+          "Setting this value to false potentially saves some CPU time needed for merging the polygons.\n"
+          "Also, raw input means that strange shapes such as dot-like edges, self-overlapping polygons, "
+          "empty or degenerated polygons are preserved."
+        );
+    }
+
+    decls +=
+      method ("wants_variants?", &shape_filter_impl::wants_variants,
+        "@brief Gets a value indicating whether the filter prefers cell variants\n"
+        "See \\wants_variants= for details.\n"
+      ) +
+      method ("wants_variants=", &shape_filter_impl::set_wants_variants, gsi::arg ("flag"),
+        "@brief Sets a value indicating whether the filter prefers cell variants\n"
+        "This flag must be set before using this filter for hierarchical applications (deep mode). "
+        "It tells the filter implementation whether cell variants should be created (true, the default) "
+        "or shape propagation will be applied (false).\n"
+        "\n"
+        "This decision needs to be made, if the filter indicates that it will deliver different results\n"
+        "for scaled or rotated versions of the shape (see \\is_isotropic and the other hints). If a cell\n"
+        "is present with different qualities - as seen from the top cell - the respective instances\n"
+        "need to be differentiated. Cell variant formation is one way, shape propagation the other way.\n"
+        "Typically, cell variant formation is less expensive, but the hierarchy will be modified."
+      ) +
+      method ("is_isotropic", &shape_filter_impl::is_isotropic,
+        "@brief Indicates that the filter has isotropic properties\n"
+        "Call this method before using the filter to indicate that the selection is independent of "
+        "the orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
+        "hierarchical mode.\n"
+        "\n"
+        "Examples for isotropic (polygon) filters are area or perimeter filters. The area or perimeter of a polygon "
+        "depends on the scale, but not on the orientation of the polygon."
+      ) +
+      method ("is_scale_invariant", &shape_filter_impl::is_scale_invariant,
+        "@brief Indicates that the filter is scale invariant\n"
+        "Call this method before using the filter to indicate that the selection is independent of "
+        "the scale of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
+        "hierarchical mode.\n"
+        "\n"
+        "An example for a scale invariant (polygon) filter is the bounding box aspect ratio (height/width) filter. "
+        "The definition of heigh and width depends on the orientation, but the ratio is independent on scale."
+      ) +
+      method ("is_isotropic_and_scale_invariant", &shape_filter_impl::is_isotropic_and_scale_invariant,
+        "@brief Indicates that the filter is isotropic and scale invariant\n"
+        "Call this method before using the filter to indicate that the selection is independent of "
+        "the scale and orientation of the shape. This helps the filter algorithm optimizing the filter run, specifically in "
+        "hierarchical mode.\n"
+        "\n"
+        "An example for such a (polygon) filter is the square selector. Whether a polygon is a square or not does not depend on "
+        "the polygon's orientation nor scale."
+      );
+
+    return decls;
+  }
+
+private:
+  const db::TransformationReducer *mp_vars;
+  db::OrientationReducer m_orientation;
+  db::MagnificationReducer m_mag;
+  db::MagnificationAndOrientationReducer m_mag_and_orient;
+  bool m_requires_raw_input;
+  bool m_wants_variants;
+};
 
 }
 

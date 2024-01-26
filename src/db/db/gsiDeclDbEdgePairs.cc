@@ -36,7 +36,83 @@
 namespace gsi
 {
 
-static db::EdgePairs *new_v () 
+// ---------------------------------------------------------------------------------
+//  EdgePairFilter binding
+
+class EdgePairFilterImpl
+  : public shape_filter_impl<db::EdgePairFilterBase>
+{
+public:
+  EdgePairFilterImpl () { }
+
+  bool issue_selected (const db::EdgePair &) const
+  {
+    return false;
+  }
+
+  virtual bool selected (const db::EdgePair &edge_pair) const
+  {
+    if (f_selected.can_issue ()) {
+      return f_selected.issue<EdgePairFilterImpl, bool, const db::EdgePair &> (&EdgePairFilterImpl::issue_selected, edge_pair);
+    } else {
+      return db::EdgePairFilterBase::selected (edge_pair);
+    }
+  }
+
+  gsi::Callback f_selected;
+};
+
+Class<gsi::EdgePairFilterImpl> decl_EdgePairFilterImpl ("db", "EdgePairFilter",
+  EdgePairFilterImpl::method_decls (false) +
+  callback ("selected", &EdgePairFilterImpl::issue_selected, &EdgePairFilterImpl::f_selected, gsi::arg ("text"),
+    "@brief Selects an edge pair\n"
+    "This method is the actual payload. It needs to be reimplemented in a derived class.\n"
+    "It needs to analyze the edge pair and return 'true' if it should be kept and 'false' if it should be discarded."
+  ),
+  "@brief A generic edge pair filter adaptor\n"
+  "\n"
+  "EdgePair filters are an efficient way to filter edge pairs from a EdgePairs collection. To apply a filter, derive your own "
+  "filter class and pass an instance to \\EdgePairs#filter or \\EdgePairs#filtered method.\n"
+  "\n"
+  "Conceptually, these methods take each edge pair from the collection and present it to the filter's 'selected' method.\n"
+  "Based on the result of this evaluation, the edge pair is kept or discarded.\n"
+  "\n"
+  "The magic happens when deep mode edge pair collections are involved. In that case, the filter will use as few calls as possible "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the filter behaves. You "
+  "need to configure the filter by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "before using the filter.\n"
+  "\n"
+  "You can skip this step, but the filter algorithm will assume the worst case then. This usually leads to cell variant "
+  "formation which is not always desired and blows up the hierarchy.\n"
+  "\n"
+  "Here is some example that filters edge pairs where the edges are perpendicular:"
+  "\n"
+  "@code\n"
+  "class PerpendicularEdgesFilter < RBA::EdgePairFilter\n"
+  "\n"
+  "  # Constructor\n"
+  "  def initialize\n"
+  "    self.is_isotropic_and_scale_invariant   # orientation and scale do not matter\n"
+  "  end\n"
+  "  \n"
+  "  # Select edge pairs where the edges are perpendicular\n"
+  "  def selected(edge_pair)\n"
+  "    return edge_pair.first.d.sprod_sign(edge_pair.second.d) == 0\n"
+  "  end\n"
+  "\n"
+  "end\n"
+  "\n"
+  "edge_pairs = ... # some EdgePairs object\n"
+  "perpendicular_only = edge_pairs.filtered(PerpendicularEdgesFilter::new)\n"
+  "@/code\n"
+  "\n"
+  "This class has been introduced in version 0.29.\n"
+);
+
+// ---------------------------------------------------------------------------------
+//  EdgePairs binding
+
+static db::EdgePairs *new_v ()
 {
   return new db::EdgePairs ();
 }
@@ -179,6 +255,16 @@ static bool is_deep (const db::EdgePairs *ep)
 static size_t id (const db::EdgePairs *ep)
 {
   return tl::id_of (ep->delegate ());
+}
+
+static db::EdgePairs filtered (const db::EdgePairs *r, const EdgePairFilterImpl *f)
+{
+  return r->filtered (*f);
+}
+
+static void filter (db::EdgePairs *r, const EdgePairFilterImpl *f)
+{
+  r->filter (*f);
 }
 
 static db::EdgePairs with_distance1 (const db::EdgePairs *r, db::EdgePairs::distance_type length, bool inverse)
@@ -619,6 +705,18 @@ Class<db::EdgePairs> decl_EdgePairs (decl_dbShapeCollection, "db", "EdgePairs",
     "The boxes will not be merged, so it is possible to determine overlaps "
     "of these boxes for example.\n"
   ) + 
+  method_ext ("filter", &filter, gsi::arg ("filter"),
+    "@brief Applies a generic filter in place (replacing the edge pairs from the EdgePair collection)\n"
+    "See \\EdgePairFilter for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
+  method_ext ("filtered", &filtered, gsi::arg ("filtered"),
+    "@brief Applies a generic filter and returns a filtered copy\n"
+    "See \\EdgePairFilter for a description of this feature.\n"
+    "\n"
+    "This method has been introduced in version 0.29.\n"
+  ) +
   method_ext ("with_length", with_length1, gsi::arg ("length"), gsi::arg ("inverse"),
     "@brief Filters the edge pairs by length of one of their edges\n"
     "Filters the edge pairs in the edge pair collection by length of at least one of their edges. If \"inverse\" is false, only "

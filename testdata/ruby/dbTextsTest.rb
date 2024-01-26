@@ -30,6 +30,21 @@ def csort(s)
   s.split(/(?<=\));(?=\()/).sort.join(";")
 end
 
+class TextStringLengthFilter < RBA::TextFilter
+
+  # Constructor
+  def initialize(string_length)
+    self.is_isotropic_and_scale_invariant   # orientation and scale do not matter
+    @string_length = string_length
+  end
+  
+  # Select texts with given string length
+  def selected(text)
+    return text.string.size == @string_length
+  end
+
+end
+
 class DBTexts_TestClass < TestBase
 
   # Basics
@@ -321,6 +336,36 @@ class DBTexts_TestClass < TestBase
 
     assert_equal(r.pull_interacting(g2).to_s, "(0,100;0,200;200,200;200,100)")
     assert_equal(g2.pull_interacting(r).to_s, "('abc',r0 100,200)")
+
+  end
+
+  # Generic filters
+  def test_generic_filters
+
+    # Some basic tests for the filter class
+
+    f = TextStringLengthFilter::new(3)
+    assert_equal(f.wants_variants?, true)
+    f.wants_variants = false
+    assert_equal(f.wants_variants?, false)
+
+    # Smoke test
+    f.is_isotropic
+    f.is_scale_invariant
+
+    # Some application
+
+    f = TextStringLengthFilter::new(3)
+
+    texts = RBA::Texts::new
+    texts.insert(RBA::Text::new("long", [ RBA::Trans::M45, 10, 0 ]))
+    texts.insert(RBA::Text::new("tla", [ RBA::Trans::R0, 0, 0 ]))
+    texts.insert(RBA::Text::new("00", [ RBA::Trans::R90, 0, 20 ]))
+
+    assert_equal(texts.filtered(f).to_s, "('tla',r0 0,0)")
+    assert_equal(texts.to_s, "('long',m45 10,0);('tla',r0 0,0);('00',r90 0,20)")
+    texts.filter(f)
+    assert_equal(texts.to_s, "('tla',r0 0,0)")
 
   end
 

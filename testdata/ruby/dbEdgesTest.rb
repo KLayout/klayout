@@ -45,6 +45,49 @@ class ParallelFilter < RBA::EdgeFilter
 
 end
 
+class ShrinkToHalfEdgeOperator < RBA::EdgeOperator
+
+  # Constructor
+  def initialize
+    self.is_isotropic_and_scale_invariant   # scale or orientation do not matter
+  end
+  
+  # Shrink to half size
+  def process(edge)
+    shift = edge.bbox.center - RBA::Point::new   # shift vector
+    return [ (edge.moved(-shift) * 0.5).moved(shift) ]
+  end
+
+end
+
+class SomeEdgeToEdgePairOperator < RBA::EdgeToEdgePairOperator
+
+  # Constructor
+  def initialize
+    self.is_isotropic_and_scale_invariant   # scale or orientation do not matter
+  end
+  
+  def process(edge)
+    box = edge.bbox
+    return [ RBA::EdgePair::new([ box.left, box.bottom, box.left, box.top ], [ box.right, box.bottom, box.right, box.top ]) ]
+  end
+
+end
+
+class SomeEdgeToPolygonOperator < RBA::EdgeToPolygonOperator
+
+  # Constructor
+  def initialize
+    self.is_isotropic_and_scale_invariant   # scale or orientation do not matter
+  end
+  
+  def process(edge)
+    box = edge.bbox
+    return [ RBA::Polygon::new(box) ]
+  end
+
+end
+
 class DBEdges_TestClass < TestBase
 
   # Basics
@@ -793,6 +836,73 @@ class DBEdges_TestClass < TestBase
     assert_equal(edges.to_s, "(100,0;200,100);(100,100;100,200)")
     edges.filter(f)
     assert_equal(edges.to_s, "(100,0;200,100)")
+
+  end
+
+  # Generic processors
+  def test_generic_processors_ee
+
+    # Some basic tests for the processor class
+
+    f = ShrinkToHalfEdgeOperator::new
+    assert_equal(f.wants_variants?, true)
+    f.wants_variants = false
+    assert_equal(f.wants_variants?, false)
+    assert_equal(f.requires_raw_input, false)
+    f.requires_raw_input = true
+    assert_equal(f.requires_raw_input, true)
+    assert_equal(f.result_is_merged, false)
+    f.result_is_merged = true
+    assert_equal(f.result_is_merged, true)
+    assert_equal(f.result_must_not_be_merged, false)
+    f.result_must_not_be_merged = true
+    assert_equal(f.result_must_not_be_merged, true)
+
+    # Smoke test
+    f.is_isotropic
+    f.is_scale_invariant
+
+    # Some application
+
+    edges = RBA::Edges::new
+
+    edges.insert(RBA::Edge::new(0, 0, 100, 100))
+    edges.insert(RBA::Edge::new(200, 300, 200, 500))
+
+    assert_equal(edges.processed(ShrinkToHalfEdgeOperator::new).to_s, "(25,25;75,75);(200,350;200,450)")
+    assert_equal(edges.to_s, "(0,0;100,100);(200,300;200,500)")
+    edges.process(ShrinkToHalfEdgeOperator::new)
+    assert_equal(edges.to_s, "(25,25;75,75);(200,350;200,450)")
+
+  end
+
+  # Generic processors
+  def test_generic_processors_eep
+
+    p = SomeEdgeToEdgePairOperator::new
+
+    edges = RBA::Edges::new
+
+    edges.insert(RBA::Edge::new(0, 0, 100, 100))
+    edges.insert(RBA::Edge::new(200, 300, 200, 500))
+
+    assert_equal(edges.processed(p).to_s, "(0,0;0,100)/(100,0;100,100);(200,300;200,500)/(200,300;200,500)")
+    assert_equal(edges.to_s, "(0,0;100,100);(200,300;200,500)")
+
+  end
+
+  # Generic processors
+  def test_generic_processors_ep
+
+    p = SomeEdgeToPolygonOperator::new
+
+    edges = RBA::Edges::new
+
+    edges.insert(RBA::Edge::new(0, 0, 100, 100))
+    edges.insert(RBA::Edge::new(200, 300, 200, 500))
+
+    assert_equal(edges.processed(p).to_s, "(0,0;0,100;100,100;100,0);(200,300;200,300;200,500;200,500)")
+    assert_equal(edges.to_s, "(0,0;100,100);(200,300;200,500)")
 
   end
 

@@ -44,7 +44,7 @@ class TriangleFilter < RBA::PolygonFilter
 
 end
 
-class ShrinkToHalfProcessor < RBA::PolygonProcessor
+class ShrinkToHalfOperator < RBA::PolygonOperator
 
   # Constructor
   def initialize
@@ -59,7 +59,7 @@ class ShrinkToHalfProcessor < RBA::PolygonProcessor
 
 end
 
-class SomePolygonToEdgePairProcessor < RBA::PolygonToEdgePairProcessor
+class SomePolygonToEdgePairOperator < RBA::PolygonToEdgePairOperator
 
   # Constructor
   def initialize
@@ -73,7 +73,7 @@ class SomePolygonToEdgePairProcessor < RBA::PolygonToEdgePairProcessor
 
 end
 
-class SomePolygonToEdgeProcessor < RBA::PolygonToEdgeProcessor
+class SomePolygonToEdgeOperator < RBA::PolygonToEdgeOperator
 
   # Constructor
   def initialize
@@ -1281,7 +1281,7 @@ class DBRegion_TestClass < TestBase
 
     # Some basic tests for the processor class
 
-    f = ShrinkToHalfProcessor::new
+    f = ShrinkToHalfOperator::new
     assert_equal(f.wants_variants?, true)
     f.wants_variants = false
     assert_equal(f.wants_variants?, false)
@@ -1306,9 +1306,9 @@ class DBRegion_TestClass < TestBase
     region.insert(RBA::Polygon::new([[0,0], [100, 100], [100,0]]))
     region.insert(RBA::Box::new(200, 0, 300, 100))
 
-    assert_equal(region.processed(ShrinkToHalfProcessor::new).to_s, "(25,25;75,75;75,25);(225,25;225,75;275,75;275,25)")
+    assert_equal(region.processed(ShrinkToHalfOperator::new).to_s, "(25,25;75,75;75,25);(225,25;225,75;275,75;275,25)")
     assert_equal(region.to_s, "(0,0;100,100;100,0);(200,0;200,100;300,100;300,0)")
-    region.process(ShrinkToHalfProcessor::new)
+    region.process(ShrinkToHalfOperator::new)
     assert_equal(region.to_s, "(25,25;75,75;75,25);(225,25;225,75;275,75;275,25)")
 
   end
@@ -1316,7 +1316,7 @@ class DBRegion_TestClass < TestBase
   # Generic processors
   def test_generic_processors_pep
 
-    p = SomePolygonToEdgePairProcessor::new
+    p = SomePolygonToEdgePairOperator::new
 
     region = RBA::Region::new
 
@@ -1331,7 +1331,7 @@ class DBRegion_TestClass < TestBase
   # Generic processors
   def test_generic_processors_pe
 
-    p = SomePolygonToEdgeProcessor::new
+    p = SomePolygonToEdgeOperator::new
 
     region = RBA::Region::new
 

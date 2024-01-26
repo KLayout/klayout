@@ -130,20 +130,20 @@ Class<gsi::PolygonFilterImpl> decl_PolygonFilterImpl ("db", "PolygonFilter",
 // ---------------------------------------------------------------------------------
 //  PolygonProcessor binding
 
-Class<shape_processor_impl<db::PolygonProcessorBase> > decl_PolygonProcessor ("db", "PolygonProcessor",
+Class<shape_processor_impl<db::PolygonProcessorBase> > decl_PolygonOperator ("db", "PolygonOperator",
   shape_processor_impl<db::PolygonProcessorBase>::method_decls (true),
-  "@brief A generic polygon processor adaptor\n"
+  "@brief A generic polygon operator\n"
   "\n"
-  "Polygon processors are an efficient way to process polygons from a Region. To apply a processors, derive your own "
-  "processors class and pass an instance to \\Region#process or \\Region#processed method.\n"
+  "Polygon processors are an efficient way to process polygons from a Region. To apply a processor, derive your own "
+  "operator class and pass an instance to \\Region#process or \\Region#processed method.\n"
   "\n"
-  "Conceptually, these methods take each polygon from the region and present it to the processor's 'process' method.\n"
+  "Conceptually, these methods take each polygon from the region and present it to the operators' 'process' method.\n"
   "The result of this call is a list of zero to many output polygons derived from the input polygon.\n"
   "The output region is the sum over all these individual results.\n"
   "\n"
   "The magic happens when deep mode regions are involved. In that case, the processor will use as few calls as possible "
-  "and exploit the hierarchical compression if possible. It needs to know however, how the processor behaves. You "
-  "need to configure the processor by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You "
+  "need to configure the operator by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
   "before using it.\n"
   "\n"
   "You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant "
@@ -153,7 +153,7 @@ Class<shape_processor_impl<db::PolygonProcessorBase> > decl_PolygonProcessor ("d
   "In this example the 'position' is defined by the center of the bounding box:"
   "\n"
   "@code\n"
-  "class ShrinkToHalfProcessor < RBA::PolygonProcessor\n"
+  "class ShrinkToHalf < RBA::PolygonOperator\n"
   "\n"
   "  # Constructor\n"
   "  def initialize\n"
@@ -175,50 +175,50 @@ Class<shape_processor_impl<db::PolygonProcessorBase> > decl_PolygonProcessor ("d
   "This class has been introduced in version 0.29.\n"
 );
 
-Class<shape_processor_impl<db::PolygonToEdgeProcessorBase> > decl_PolygonToEdgeProcessor ("db", "PolygonToEdgeProcessor",
+Class<shape_processor_impl<db::PolygonToEdgeProcessorBase> > decl_PolygonToEdgeProcessor ("db", "PolygonToEdgeOperator",
   shape_processor_impl<db::PolygonToEdgeProcessorBase>::method_decls (true),
-  "@brief A generic polygon-to-edge processor adaptor\n"
+  "@brief A generic polygon-to-edge operator\n"
   "\n"
-  "Polygon processors are an efficient way to process polygons from a Region. To apply a processors, derive your own "
-  "processors class and pass an instance to \\Region#processed method.\n"
+  "Polygon processors are an efficient way to process polygons from a Region. To apply a processor, derive your own "
+  "operator class and pass an instance to \\Region#processed method.\n"
   "\n"
-  "Conceptually, these methods take each polygon from the region and present it to the processor's 'process' method.\n"
+  "Conceptually, these methods take each polygon from the region and present it to the operator's 'process' method.\n"
   "The result of this call is a list of zero to many output edges derived from the input polygon.\n"
   "The output edge collection is the sum over all these individual results.\n"
   "\n"
   "The magic happens when deep mode regions are involved. In that case, the processor will use as few calls as possible "
-  "and exploit the hierarchical compression if possible. It needs to know however, how the processor behaves. You "
-  "need to configure the processor by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You "
+  "need to configure the operator by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
   "before using it.\n"
   "\n"
   "You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant "
   "formation which is not always desired and blows up the hierarchy.\n"
   "\n"
-  "For a basic example see the \\PolygonProcessor class, with the exception that this incarnation has to deliver edges.\n"
+  "For a basic example see the \\PolygonOperator class, with the exception that this incarnation has to deliver edges.\n"
   "\n"
   "This class has been introduced in version 0.29.\n"
 );
 
-Class<shape_processor_impl<db::PolygonToEdgePairProcessorBase> > decl_PolygonToEdgePairProcessor ("db", "PolygonToEdgePairProcessor",
+Class<shape_processor_impl<db::PolygonToEdgePairProcessorBase> > decl_PolygonToEdgePairProcessor ("db", "PolygonToEdgePairOperator",
   shape_processor_impl<db::PolygonToEdgePairProcessorBase>::method_decls (true),
-  "@brief A generic polygon-to-edge-pair processor adaptor\n"
+  "@brief A generic polygon-to-edge-pair operator\n"
   "\n"
-  "Polygon processors are an efficient way to process polygons from a Region. To apply a processors, derive your own "
-  "processors class and pass an instance to \\Region#processed method.\n"
+  "Polygon processors are an efficient way to process polygons from a Region. To apply a processor, derive your own "
+  "operator class and pass an instance to \\Region#processed method.\n"
   "\n"
-  "Conceptually, these methods take each polygon from the region and present it to the processor's 'process' method.\n"
+  "Conceptually, these methods take each polygon from the region and present it to the operator's 'process' method.\n"
   "The result of this call is a list of zero to many output edge pairs derived from the input polygon.\n"
   "The output edge pair collection is the sum over all these individual results.\n"
   "\n"
   "The magic happens when deep mode regions are involved. In that case, the processor will use as few calls as possible "
-  "and exploit the hierarchical compression if possible. It needs to know however, how the processor behaves. You "
-  "need to configure the processor by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
+  "and exploit the hierarchical compression if possible. It needs to know however, how the operator behaves. You "
+  "need to configure the operator by calling \\is_isotropic, \\is_scale_invariant or \\is_isotropic_and_scale_invariant "
   "before using it.\n"
   "\n"
   "You can skip this step, but the processor algorithm will assume the worst case then. This usually leads to cell variant "
   "formation which is not always desired and blows up the hierarchy.\n"
   "\n"
-  "For a basic example see the \\PolygonProcessor class, with the exception that this incarnation has to deliver edge pairs.\n"
+  "For a basic example see the \\PolygonOperator class, with the exception that this incarnation has to deliver edge pairs.\n"
   "\n"
   "This class has been introduced in version 0.29.\n"
 );

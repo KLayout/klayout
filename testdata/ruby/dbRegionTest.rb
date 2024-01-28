@@ -1192,7 +1192,7 @@ class DBRegion_TestClass < TestBase
   def test_rasterize
 
     r = RBA::Region::new()
-    r.insert(RBA::Polygon::new([[0, 0], [100, 100], [200, 0]]))
+    r.insert(RBA::Polygon::new([[0, 0], [100, 100], [150, 0]]))
     r.insert(RBA::Polygon::new(RBA::Box::new([0, 200], [100, 300])))
 
     pd = RBA::Vector::new(50, 50)
@@ -1206,7 +1206,7 @@ class DBRegion_TestClass < TestBase
       end
     end
 
-    assert_equal(sum, 8.0 * pd.x * pd.y)
+    assert_equal("%.12g" % sum, "%.12g" % (7.0 * pd.x * pd.y))
 
     tot = 0.0
     pd = RBA::Vector::new(50, 50)
@@ -1214,7 +1214,7 @@ class DBRegion_TestClass < TestBase
     am = r.rasterize(RBA::Point::new(-50, -20), pd, 7, 7)
     sum = am.collect { |r| r.sum }.sum
 
-    assert_equal(sum, 8.0 * pd.x * pd.y)
+    assert_equal("%.12g" % sum, "%.12g" % (7.0 * pd.x * pd.y))
 
   end
 

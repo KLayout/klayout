@@ -783,14 +783,15 @@ size_dvm (db::Region *region, const db::Vector &dv, unsigned int mode)
 static std::vector<std::vector<double> >
 rasterize2 (const db::Region *region, const db::Point &origin, const db::Vector &pixel_distance, const db::Vector &pixel_size, unsigned int nx, unsigned int ny)
 {
-  db::AreaMap am (origin, pixel_distance, pixel_size, nx, ny);
+  db::DAreaMap am (db::DPoint (origin), db::DVector (pixel_distance), db::DVector (pixel_size), nx, ny);
 
-  auto si = region->begin ();
-  si = si.confined (am.bbox (), false /*not overlapping*/);
+  auto pi = region->begin ();
+  pi = pi.confined (db::Box (am.bbox ()), false /*not overlapping*/);
 
-  while (! si.at_end ()) {
-    db::rasterize (*si, am);
-    ++si;
+  while (! pi.at_end ()) {
+    db::DPolygon dp (*pi);
+    db::rasterize (dp, am);
+    ++pi;
   }
 
   std::vector<std::vector<double> > result;
@@ -3119,9 +3120,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "times, so the actual values may be larger. If you want overlaps removed, you have to\n"
     "merge the region before. Merge semantics does not apply for the 'rasterize' method.\n"
     "\n"
-    "Although the resulting area values are floating-point, internal computation is done with integer precision currently.\n"
-    "This implies a certain area error when skew angle edges are involved. The pixel area is precise for Manhattan and\n""
-    "half-Manhattan (45 degree multiples) input geometries.\n"
+    "The resulting area values are precise within the limits of double-precision floating point arithmetics.\n"
     "\n"
     "A second version exists that allows specifying an active pixel size which is smaller than the\n"
     "pixel distance hence allowing pixels samples that do not cover the full area, but leave gaps between the pixels.\n"

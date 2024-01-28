@@ -72,6 +72,11 @@ public:
   }
 
   gsi::Callback f_selected;
+
+private:
+  //  No copying
+  EdgeFilterImpl &operator= (const EdgeFilterImpl &);
+  EdgeFilterImpl (const EdgeFilterImpl &);
 };
 
 Class<gsi::EdgeFilterImpl> decl_EdgeFilterImpl ("db", "EdgeFilter",

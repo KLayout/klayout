@@ -450,6 +450,10 @@ private:
   bool m_wants_variants;
   bool m_result_is_merged;
   bool m_result_must_not_be_merged;
+
+  //  No copying
+  shape_processor_impl &operator= (const shape_processor_impl &);
+  shape_processor_impl (const shape_processor_impl &);
 };
 
 }

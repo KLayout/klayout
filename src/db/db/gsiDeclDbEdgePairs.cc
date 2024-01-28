@@ -60,6 +60,11 @@ public:
   }
 
   gsi::Callback f_selected;
+
+private:
+  //  No copying
+  EdgePairFilterImpl &operator= (const EdgePairFilterImpl &);
+  EdgePairFilterImpl (const EdgePairFilterImpl &);
 };
 
 Class<gsi::EdgePairFilterImpl> decl_EdgePairFilterImpl ("db", "EdgePairFilter",

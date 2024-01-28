@@ -57,6 +57,11 @@ public:
   }
 
   gsi::Callback f_selected;
+
+private:
+  //  No copying
+  TextFilterImpl &operator= (const TextFilterImpl &);
+  TextFilterImpl (const TextFilterImpl &);
 };
 
 Class<gsi::TextFilterImpl> decl_TextFilterImpl ("db", "TextFilter",

@@ -78,6 +78,11 @@ public:
   }
 
   gsi::Callback f_selected;
+
+private:
+  //  No copying
+  PolygonFilterImpl &operator= (const PolygonFilterImpl &);
+  PolygonFilterImpl (const PolygonFilterImpl &);
 };
 
 Class<gsi::PolygonFilterImpl> decl_PolygonFilterImpl ("db", "PolygonFilter",

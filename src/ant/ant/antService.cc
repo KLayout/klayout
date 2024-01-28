@@ -1910,6 +1910,29 @@ Service::mouse_click_event (const db::DPoint &p, unsigned int buttons, bool prio
 
         }
 
+      } else if (tpl.mode () == ant::Template::RulerAutoMetricEdge) {
+
+        lay::PointSnapToObjectResult snap_details = snap1_details (p, true);
+        if (snap_details.object_snap == lay::PointSnapToObjectResult::ObjectEdge) {
+
+          //  begin the transaction
+          if (manager ()) {
+            tl_assert (! manager ()->transacting ());
+            manager ()->transaction (tl::to_string (tr ("Create ruler")));
+          }
+
+          m_current = ant::Object (snap_details.object_ref.p1 (), snap_details.object_ref.p2 (), 0, tpl);
+          show_message ();
+
+          insert_ruler (m_current, true);
+
+          //  end the transaction
+          if (manager ()) {
+            manager ()->commit ();
+          }
+
+        }
+
       } else {
 
         m_p1 = snap1 (p, m_obj_snap && tpl.snap ()).second;
@@ -2006,7 +2029,7 @@ Service::mouse_move_event (const db::DPoint &p, unsigned int buttons, bool prio)
     snap_details = snap2_details (m_p1, p, mp_active_ruler->ruler (), ac_from_buttons (buttons));
   } else {
     const ant::Template &tpl = current_template ();
-    snap_details = snap1_details (p, m_obj_snap && tpl.snap ());
+    snap_details = snap1_details (p, m_obj_snap && tpl.snap () && (tpl.mode () != ant::Template::RulerAutoMetricEdge || ! view ()->transient_selection_mode ()));
   }
 
   mouse_cursor_from_snap_details (snap_details);
@@ -2356,24 +2379,38 @@ Service::timeout ()
 
   //  transiently create an auto-metric ruler if requested
 
+  ant::Object *ruler = 0;
+
   const ant::Template &tpl = current_template ();
   if (tpl.mode () == ant::Template::RulerAutoMetric) {
 
     lay::TwoPointSnapToObjectResult ee = auto_measure (m_hover_point, ac_from_buttons (m_hover_buttons), tpl);
     if (ee.any) {
-
       m_current = ant::Object (ee.first, ee.second, 0, tpl);
+      ruler = &m_current;
+    }
 
-      //  HINT: there is no special style for "transient selection on rulers"
-      mp_transient_ruler = new ant::View (this, &m_current, true /*not selected*/);
+  } else if (tpl.mode () == ant::Template::RulerAutoMetricEdge) {
 
-      if (! editables ()->has_selection ()) {
-        display_status (true);
-      }
-
+    lay::PointSnapToObjectResult snap_details = snap1_details (m_hover_point, true);
+    if (snap_details.object_snap == lay::PointSnapToObjectResult::ObjectEdge) {
+      m_current = ant::Object (snap_details.object_ref.p1 (), snap_details.object_ref.p2 (), 0, tpl);
+      ruler = &m_current;
     }
 
   }
+
+  if (ruler) {
+
+    //  HINT: there is no special style for "transient selection on rulers"
+    mp_transient_ruler = new ant::View (this, ruler, true /*not selected*/);
+
+    if (! editables ()->has_selection ()) {
+      display_status (true);
+    }
+
+  }
+
 }
 #endif
 

@@ -65,14 +65,19 @@ public:
     RulerAutoMetric = 2,
 
     /**
+     *  @brief The ruler is auto-metric along an edge: a single click will place a ruler and the ruler will extend to the edge below
+     */
+    RulerAutoMetricEdge = 3,
+
+    /**
      *  @brief The ruler an angle type (two segments, three mouse clicks) for angle and circle radius measurements
      */
-    RulerThreeClicks = 3,
+    RulerThreeClicks = 4,
 
     /**
      *  @brief The ruler is a multi-segment type
      */
-    RulerMultiSegment = 4
+    RulerMultiSegment = 5
   };
 
   /**

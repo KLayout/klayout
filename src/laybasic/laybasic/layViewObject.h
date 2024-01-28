@@ -148,6 +148,17 @@ public:
 #endif
 
   /**
+   *  @brief Hover reset request
+   *
+   *  This event is issued for services providing some "hover" mode - i.e. capture
+   *  mouse move events and start a timer on them.
+   *
+   *  The implementation of this event should cancel this timer and
+   *  not raise a hover condition.
+   */
+  virtual void hover_reset () { }
+
+  /**
    *  @brief Mouse press event handler
    *
    *  This method will be called by the ViewObjectWidget object to
@@ -604,6 +615,11 @@ public:
    *  @brief Cancel all drag operations
    */
   void drag_cancel ();
+
+  /**
+   *  @brief Calls hover_reset on all services
+   */
+  void hover_reset ();
 
   /**
    *  @brief CanvasPlane rendering 

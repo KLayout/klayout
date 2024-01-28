@@ -1051,7 +1051,15 @@ ViewObjectUI::drag_cancel ()
   }
 }
 
-namespace 
+void
+ViewObjectUI::hover_reset ()
+{
+  for (service_iterator svc = begin_services (); svc != end_services (); ++svc) {
+    (*svc)->hover_reset ();
+  }
+}
+
+namespace
 {
   struct z_order_compare_f
   {

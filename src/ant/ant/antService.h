@@ -39,6 +39,11 @@
 #include <map>
 #include <vector>
 
+#if defined (HAVE_QT)
+#  include <QTimer>
+#  include <QObject>
+#endif
+
 namespace ant {
 
 class LayoutViewBase;
@@ -177,12 +182,19 @@ private:
 
 // -------------------------------------------------------------
 
-class ANT_PUBLIC Service
-  : public lay::EditorServiceBase,
+class ANT_PUBLIC Service :
+#if defined (HAVE_QT)
+    public QObject,
+#endif
+    public lay::EditorServiceBase,
     public lay::Drawing,
     public db::Object
 {
-public: 
+#if defined (HAVE_QT)
+Q_OBJECT
+#endif
+
+public:
   typedef lay::AnnotationShapes::iterator obj_iterator;
 
   /**
@@ -340,6 +352,21 @@ public:
    *  @brief Return the bbox of the selection (reimplementation of lay::Editable interface)
    */
   virtual db::DBox selection_bbox ();
+
+  /**
+   *  @brief Implementation of the editables API
+   */
+  virtual bool enter_event (bool);
+
+  /**
+   *  @brief Implementation of the editables API
+   */
+  virtual bool leave_event (bool);
+
+  /**
+   *  @brief Implementation of the editables API
+   */
+  virtual void hover_reset ();
 
   /**
    *  @brief Transform the selection (reimplementation of lay::Editable interface)
@@ -506,6 +533,11 @@ public:
    */
   tl::Event annotation_selection_changed_event;
 
+#if defined (HAVE_QT)
+public slots:
+  void timeout ();
+#endif
+
 private:
   //  Ruler display and snapping configuration
   tl::Color m_color;
@@ -551,10 +583,22 @@ private:
   std::vector<ant::Template> m_ruler_templates;
   unsigned int m_current_template;
 
+  //  Hover detector
+  bool m_hover;
+  bool m_hover_wait;
+  db::DPoint m_hover_point;
+  unsigned int m_hover_buttons;
+#if defined (HAVE_QT)
+  QTimer m_timer;
+#endif
+
+  bool m_mouse_in_window;
+
   std::pair<bool, db::DPoint> snap1 (const db::DPoint &p, bool obj_snap);
   lay::PointSnapToObjectResult snap1_details (const db::DPoint &p, bool obj_snap);
   std::pair<bool, db::DPoint> snap2 (const db::DPoint &p1, const db::DPoint &p2, const ant::Object *obj, lay::angle_constraint_type ac);
   lay::PointSnapToObjectResult snap2_details (const db::DPoint &p1, const db::DPoint &p2, const ant::Object *obj, lay::angle_constraint_type ac);
+  lay::TwoPointSnapToObjectResult auto_measure (const db::DPoint &p, lay::angle_constraint_type ac, const ant::Template &tpl);
 
   const ant::Template &current_template () const;
 

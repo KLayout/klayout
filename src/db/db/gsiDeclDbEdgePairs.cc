@@ -120,7 +120,7 @@ Class<shape_processor_impl<db::EdgePairProcessorBase> > decl_EdgePairProcessor (
   "operator class and pass an instance to the \\EdgePairs#processed or \\EdgePairs#process method.\n"
   "\n"
   "Conceptually, these methods take each edge pair from the edge pair collection and present it to the operator's 'process' method.\n"
-  "The result of this call is a list of zero to many output edge_pairs derived from the input edge pair.\n"
+  "The result of this call is a list of zero to many output edge pairs derived from the input edge pair.\n"
   "The output edge pair collection is the sum over all these individual results.\n"
   "\n"
   "The magic happens when deep mode edge pair collections are involved. In that case, the processor will use as few calls as possible "

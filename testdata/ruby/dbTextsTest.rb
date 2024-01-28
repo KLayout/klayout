@@ -29,7 +29,7 @@ def csort(s)
   # splits at ");(" without consuming the brackets
   s.split(/(?<=\));(?=\()/).sort.join(";")
 end
-
+ 
 class TextStringLengthFilter < RBA::TextFilter
 
   # Constructor
@@ -41,6 +41,37 @@ class TextStringLengthFilter < RBA::TextFilter
   # Select texts with given string length
   def selected(text)
     return text.string.size == @string_length
+  end
+
+end
+
+class ReplaceTextString < RBA::TextOperator
+
+  # Constructor
+  def initialize
+    self.is_isotropic_and_scale_invariant   # orientation and scale do not matter
+  end
+  
+  # Replaces the string by a number representing the string length
+  def process(text)
+    new_text = text.dup   # need a copy as we cannot modify the text passed
+    new_text.string = text.string.size.to_s
+    return [ new_text ]
+  end
+
+end
+
+class SomeTextToPolygonOperator < RBA::TextToPolygonOperator
+
+  # Constructor
+  def initialize
+    self.is_isotropic_and_scale_invariant   # orientation and scale do not matter
+  end
+  
+  # Replaces the string by a number representing the string length
+  def process(text)
+    s = text.string.size * 10
+    return [ RBA::Polygon::new(text.bbox.enlarged(s)) ]
   end
 
 end
@@ -366,6 +397,49 @@ class DBTexts_TestClass < TestBase
     assert_equal(texts.to_s, "('long',m45 10,0);('tla',r0 0,0);('00',r90 0,20)")
     texts.filter(f)
     assert_equal(texts.to_s, "('tla',r0 0,0)")
+
+  end
+
+  # Generic processors
+  def test_generic_processors_tt
+
+    # Some basic tests for the processor class
+
+    f = ReplaceTextString::new
+    assert_equal(f.wants_variants?, true)
+    f.wants_variants = false
+    assert_equal(f.wants_variants?, false)
+
+    # Smoke test
+    f.is_isotropic
+    f.is_scale_invariant
+
+    # Some application
+
+    texts = RBA::Texts::new
+
+    texts.insert(RBA::Text::new("abc", RBA::Trans::new))
+    texts.insert(RBA::Text::new("a long text", RBA::Trans::M45))
+
+    assert_equal(texts.processed(ReplaceTextString::new).to_s, "('3',r0 0,0);('11',m45 0,0)")
+    assert_equal(texts.to_s, "('abc',r0 0,0);('a long text',m45 0,0)")
+    texts.process(ReplaceTextString::new)
+    assert_equal(texts.to_s, "('3',r0 0,0);('11',m45 0,0)")
+
+  end
+
+  # Generic processors
+  def test_generic_processors_tp
+
+    p = SomeTextToPolygonOperator::new
+
+    texts = RBA::Texts::new
+
+    texts.insert(RBA::Text::new("abc", RBA::Trans::new))
+    texts.insert(RBA::Text::new("a long text", RBA::Trans::M45))
+
+    assert_equal(texts.processed(p).to_s, "(-30,-30;-30,30;30,30;30,-30);(-110,-110;-110,110;110,110;110,-110)")
+    assert_equal(texts.to_s, "('abc',r0 0,0);('a long text',m45 0,0)")
 
   end
 

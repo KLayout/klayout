@@ -40,6 +40,7 @@ class RegionDelegate;
 class EdgesDelegate;
 class Layout;
 
+typedef shape_collection_processor<db::Text, db::Text> TextProcessorBase;
 typedef shape_collection_processor<db::Text, db::Polygon> TextToPolygonProcessorBase;
 
 typedef db::generic_shape_iterator_delegate_base <db::Text> TextsIteratorDelegate;
@@ -94,7 +95,9 @@ public:
 
   virtual TextsDelegate *filter_in_place (const TextFilterBase &filter) = 0;
   virtual TextsDelegate *filtered (const TextFilterBase &filter) const = 0;
-  virtual RegionDelegate *processed_to_polygons (const TextToPolygonProcessorBase &filter) const = 0;
+  virtual TextsDelegate *process_in_place (const TextProcessorBase &proc) = 0;
+  virtual TextsDelegate *processed (const TextProcessorBase &proc) const = 0;
+  virtual RegionDelegate *processed_to_polygons (const TextToPolygonProcessorBase &proc) const = 0;
 
   virtual RegionDelegate *polygons (db::Coord e) const = 0;
   virtual EdgesDelegate *edges () const = 0;

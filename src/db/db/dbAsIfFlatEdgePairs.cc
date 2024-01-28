@@ -152,10 +152,6 @@ AsIfFlatEdgePairs::processed (const EdgePairProcessorBase &filter) const
 {
   std::unique_ptr<FlatEdgePairs> edge_pairs (new FlatEdgePairs ());
 
-  if (filter.result_must_not_be_merged ()) {
-    edge_pairs->set_merged_semantics (false);
-  }
-
   std::vector<db::EdgePair> res_edge_pairs;
 
   for (EdgePairsIterator e = begin (); ! e.at_end (); ++e) {

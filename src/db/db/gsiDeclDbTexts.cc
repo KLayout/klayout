@@ -52,7 +52,7 @@ public:
     if (f_selected.can_issue ()) {
       return f_selected.issue<TextFilterImpl, bool, const db::Text &> (&TextFilterImpl::issue_selected, text);
     } else {
-      return db::TextFilterBase::selected (text);
+      return issue_selected (text);
     }
   }
 

@@ -55,7 +55,7 @@ public:
     if (f_selected.can_issue ()) {
       return f_selected.issue<EdgePairFilterImpl, bool, const db::EdgePair &> (&EdgePairFilterImpl::issue_selected, edge_pair);
     } else {
-      return db::EdgePairFilterBase::selected (edge_pair);
+      return issue_selected (edge_pair);
     }
   }
 

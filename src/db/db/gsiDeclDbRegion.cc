@@ -66,7 +66,7 @@ public:
     if (f_selected.can_issue ()) {
       return f_selected.issue<PolygonFilterImpl, bool, const db::Polygon &> (&PolygonFilterImpl::issue_selected, polygon);
     } else {
-      return db::AllMustMatchFilter::selected (polygon);
+      return issue_selected (polygon);
     }
   }
 

@@ -105,15 +105,22 @@ MouseTracker::mouse_move_event (const db::DPoint &p, unsigned int /*buttons*/, b
 
       double max_coord = 1e30;  //  big enough I guess
 
-      mp_markers.push_back (new lay::DMarker (mp_view));
-      mp_markers.back ()->set_line_style (m_cursor_line_style);
-      mp_markers.back ()->set_color (m_cursor_color);
-      mp_markers.back ()->set (db::DEdge (db::DPoint (tp.x (), -max_coord), db::DPoint (tp.x (), max_coord)));
+      for (int i = 0; i < 2; ++i) {
 
-      mp_markers.push_back (new lay::DMarker (mp_view));
-      mp_markers.back ()->set_line_style (m_cursor_line_style);
-      mp_markers.back ()->set_color (m_cursor_color);
-      mp_markers.back ()->set (db::DEdge (db::DPoint (-max_coord, tp.y ()), db::DPoint (max_coord, tp.y ())));
+        mp_markers.push_back (new lay::DMarker (mp_view));
+        mp_markers.back ()->set_line_style (m_cursor_line_style);
+        mp_markers.back ()->set_line_width (1);
+        mp_markers.back ()->set_halo (false);
+        mp_markers.back ()->set_dither_pattern (1);
+        mp_markers.back ()->set_color (m_cursor_color.is_valid () ? m_cursor_color : mp_view->canvas ()->foreground_color ());
+
+        if (i == 0) {
+          mp_markers.back ()->set (db::DEdge (db::DPoint (tp.x (), -max_coord), db::DPoint (tp.x (), max_coord)));
+        } else {
+          mp_markers.back ()->set (db::DEdge (db::DPoint (-max_coord, tp.y ()), db::DPoint (max_coord, tp.y ())));
+        }
+
+      }
 
     }
 

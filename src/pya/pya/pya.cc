@@ -290,9 +290,9 @@ PythonInterpreter::PythonInterpreter (bool embedded)
           }
         }
 
-      }
+        Py_SetPath (tl::to_wstring (path).c_str ());
 
-      Py_SetPath (tl::to_wstring (path).c_str ());
+      }
 
     } catch (tl::Exception &ex) {
       tl::error << tl::to_string (tr ("Evaluation of Python path expression failed")) << ": " << ex.msg ();

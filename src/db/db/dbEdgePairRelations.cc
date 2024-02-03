@@ -57,7 +57,7 @@ static bool include_zero_flag (collinear_mode_type coll_mode, const db::Edge &a,
 
     return true;
 
-  } else if (coll_mode == AlwaysIncludeCollinear) {
+  } else if (coll_mode == NeverIncludeCollinear) {
 
     return false;
 
@@ -72,6 +72,11 @@ static bool include_zero_flag (collinear_mode_type coll_mode, const db::Edge &a,
       } else if (coll_mode == IncludeCollinearWhenOverlap) {
         return a.coincident (b);
       }
+    //  @@@
+    } else if ((s1 == 0 || s2 == 0) && a.p1 () != b.p2 () && a.p2 () != b.p1 ()) {
+      if (coll_mode == IncludeCollinearWhenTouch) {
+        return a.intersect (b);
+      }
     }
 
     return false;
@@ -84,12 +89,13 @@ static bool include_zero_flag (collinear_mode_type coll_mode, const db::Edge &a,
  *
  *  This function applies Euclidian metrics.
  *  If no such part is found, this function returns false.
+ *
+ *  The input edges are normalized to "width" orientation.
  */
 bool euclidian_near_part_of_edge (collinear_mode_type coll_mode, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &other, db::Edge *output)
 {
   //  Handle the case of point-like basic edge: cannot determine
   //  orientation
-
   if (e.is_degenerate ()) {
     return false;
   }
@@ -116,18 +122,19 @@ bool euclidian_near_part_of_edge (collinear_mode_type coll_mode, db::coord_trait
 
     db::Point o = g.p1 ();
 
-    if (e.side_of (o) >= 0) {
+    int eso = e.side_of (o);
+    if (eso > thr) {
       return false;
     }
 
     double a = e.double_sq_length ();
-    double b = db::sprod (db::Vector (e.p1 () - o), e.d ());
-    double c = e.p1 ().sq_double_distance (o) - d * d;
+    double b = db::sprod (db::Vector (e.p1 () - o), e.d ()) / a;
+    double c = (e.p1 ().sq_double_distance (o) - double (d) * double (d)) / a;
 
-    double s = b * b - a * c;
-    if (s >= 0) {
-      double l1 = std::max (0.0, (-b - sqrt (s)) / a);
-      double l2 = std::min (1.0, (-b + sqrt (s)) / a);
+    double s = b * b - c;
+    if (s >= -db::epsilon) {
+      double l1 = std::max (0.0, (-b - sqrt (s)));
+      double l2 = std::min (1.0, (-b + sqrt (s)));
       if (l1 <= l2) {
         if (output) {
           *output = g;
@@ -194,13 +201,13 @@ bool euclidian_near_part_of_edge (collinear_mode_type coll_mode, db::coord_trait
     db::Point o = i ? e.p2 () : e.p1 ();
 
     double a = g.double_sq_length ();
-    double b = db::sprod (db::Vector (g.p1 () - o), g.d ());
-    double c = g.p1 ().sq_double_distance (o) - double (d) * double (d);
+    double b = db::sprod (db::Vector (g.p1 () - o), g.d ()) / a;
+    double c = (g.p1 ().sq_double_distance (o) - double (d) * double (d)) / a;
 
-    double s = b * b - a * c;
-    if (s >= 0) {
-      l1 = std::min (l1, (-b - sqrt (s)) / a);
-      l2 = std::max (l2, (-b + sqrt (s)) / a);
+    double s = b * b - c;
+    if (s >= -db::epsilon) {
+      l1 = std::min (l1, -b - sqrt (s));
+      l2 = std::max (l2, -b + sqrt (s));
     }
 
   }
@@ -208,7 +215,7 @@ bool euclidian_near_part_of_edge (collinear_mode_type coll_mode, db::coord_trait
   l1 = std::max (0.0, l1);
   l2 = std::min (1.0, l2);
 
-  if (l1 >= l2) {
+  if (l1 > l2 - db::epsilon) {
     return false;
   } else {
     if (output) {

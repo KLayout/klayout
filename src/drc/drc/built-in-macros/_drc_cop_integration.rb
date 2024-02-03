@@ -1485,7 +1485,7 @@ CODE
         shielded = nil
         opposite_filter = RBA::Region::NoOppositeFilter
         rect_filter = RBA::Region::NoRectFilter
-        collinear_mode = RBA::Region::IncludeCollinearWhenTouch
+        zd_mode = RBA::Region::IncludeZeroDistanceWhenTouching
     
         n = 1
         args.each do |a|
@@ -1495,8 +1495,8 @@ CODE
             whole_edges = a.value
           elsif a.is_a?(DRCPropertiesConstraint)
             prop_constraint = a.value
-          elsif a.is_a?(DRCCollinearMode)
-            collinear_mode = a.value
+          elsif a.is_a?(DRCZeroDistanceMode)
+            zd_mode = a.value
           elsif a.is_a?(DRCOppositeErrorFilter)
             opposite_filter = a.value
           elsif a.is_a?(DRCRectangleErrorFilter)
@@ -1529,7 +1529,7 @@ CODE
           raise("A rectangle error filter cannot be used with this check")
         end
 
-        args << collinear_mode
+        args << zd_mode
         
         if :#{f} == :width || :#{f} == :space || :#{f} == :notch || :#{f} == :isolated
           other && raise("No other layer must be specified for a single-layer check")

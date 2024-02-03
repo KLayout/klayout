@@ -324,13 +324,13 @@ module DRC
     
     def without_touching(f = true)
       self._context("without_touching") do
-        DRCCollinearMode::new(f ? RBA::Region::IncludeCollinearWhenOverlap : RBA::Region::IncludeCollinearWhenTouch)
+        DRCZeroDistanceMode::new(f ? RBA::Region::IncludeZeroDistanceWhenOverlapping : RBA::Region::IncludeZeroDistanceWhenTouching)
       end
     end
     
     def without_coincident(f = true)
       self._context("without_coincident") do
-        DRCCollinearMode::new(f ? RBA::Region::NeverIncludeCollinear : RBA::Region::IncludeCollinearWhenTouch)
+        DRCZeroDistanceMode::new(f ? RBA::Region::NeverIncludeZeroDistance : RBA::Region::IncludeZeroDistanceWhenTouching)
       end
     end
     

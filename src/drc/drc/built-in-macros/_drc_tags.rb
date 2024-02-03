@@ -95,10 +95,10 @@ module DRC
     end
   end
   
-  # A wrapper for the "collinear mode" for
+  # A wrapper for the "zero distance mode" for
   # the DRC functions. The purpose of this class
   # is to identify the value by the class.
-  class DRCCollinearMode
+  class DRCZeroDistanceMode
     attr_accessor :value
     def initialize(v)
       self.value = v

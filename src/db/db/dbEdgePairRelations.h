@@ -99,28 +99,34 @@ enum edge_relation_type
 };
 
 /**
- *  @brief An enum specifying whether how collinear edges are handled
+ *  @brief An enum specifying whether how edges with zero distance are handled in checks
  */
-enum collinear_mode_type {
-  /**
-   *  @brief Never include collinear edges
-   */
-  NeverIncludeCollinear = 0,
+enum zero_distance_mode {
 
   /**
-   *  @brief include collinear edges when they share at least one common point
+   *  @brief Never include zero-distance edges
    */
-  IncludeCollinearWhenTouch = 1,
+  NeverIncludeZeroDistance = 0,
 
   /**
-   *  @brief include collinear edges when they share more than a single common point
+   *  @brief Include zero-distance edges when they share at least one common point
    */
-  IncludeCollinearWhenOverlap = 2,
+  IncludeZeroDistanceWhenTouching = 1,
 
   /**
-   *  @brief always include collinear edges
+   *  @brief Include zero-distance edges when they share at least one common point and are collinear
    */
-  AlwaysIncludeCollinear = 3
+  IncludeZeroDistanceWhenCollinearAndTouching = 2,
+
+  /**
+   *  @brief Include zero-distance edges when they share more than a single common point (this implies that they are collinear)
+   */
+  IncludeZeroDistanceWhenOverlapping = 3,
+
+  /**
+   *  @brief Always include zero-distance edges (hardly useful)
+   */
+  AlwaysIncludeZeroDistance = 4
 };
 
 /**
@@ -138,13 +144,13 @@ struct DB_PUBLIC EdgesCheckOptions
                       double _ignore_angle = 90,
                       distance_type _min_projection = 0,
                       distance_type _max_projection = std::numeric_limits<distance_type>::max (),
-                      collinear_mode_type _collinear_mode = IncludeCollinearWhenTouch)
+                      zero_distance_mode _zd_mode = IncludeZeroDistanceWhenTouching)
     : whole_edges (_whole_edges),
       metrics (_metrics),
       ignore_angle (_ignore_angle),
       min_projection (_min_projection),
       max_projection (_max_projection),
-      collinear_mode (_collinear_mode)
+      zd_mode (_zd_mode)
   { }
 
   /**
@@ -188,13 +194,13 @@ struct DB_PUBLIC EdgesCheckOptions
   distance_type max_projection;
 
   /**
-   *  @brief Specifies collinear edge handling
+   *  @brief Specifies zero-distance edge handling
    *
-   *  This allows implementing the "kissing corners" case. When set to "IncludeCollinearWhenTouch", kissing corners will
-   *  be reported as errors, when set to "NeverIncludeCollinear", they won't. Note that with merged inputs, edges
+   *  This allows implementing the "kissing corners" case. When set to "IncludeZeroDistanceWhenTouching", kissing corners will
+   *  be reported as errors, when set to "NeverIncludeZeroDistance", they won't. Note that with merged inputs, edges
    *  will not overlap except at the corners.
    */
-  collinear_mode_type collinear_mode;
+  zero_distance_mode zd_mode;
 };
 
 /**
@@ -222,7 +228,7 @@ struct DB_PUBLIC EdgeRelationFilter
    *  to each other. If the length of the projection of either edge on the other is >= min_projection
    *  or < max_projection, the edges are considered for the check.
    */
-  EdgeRelationFilter (edge_relation_type r, distance_type d, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max (), collinear_mode_type include_zero = AlwaysIncludeCollinear);
+  EdgeRelationFilter (edge_relation_type r, distance_type d, metrics_type metrics = db::Euclidian, double ignore_angle = 90, distance_type min_projection = 0, distance_type max_projection = std::numeric_limits<distance_type>::max (), zero_distance_mode include_zero = AlwaysIncludeZeroDistance);
 
   /**
    *  Constructs an edge relation filter from a CheckOptions structure
@@ -254,19 +260,19 @@ struct DB_PUBLIC EdgeRelationFilter
   }
 
   /**
-   *  @brief Sets a value indicating whether collinear edges shall be included in the check
+   *  @brief Sets a value indicating whether zero-distance edges shall be included in the check
    */
-  void set_collinear_mode (collinear_mode_type f)
+  void set_zero_distance_mode (zero_distance_mode f)
   {
-    m_collinear_mode = f;
+    m_zero_distance_mode = f;
   }
 
   /**
-   *  @brief Gets a value indicating whether collinear edges shall be included in the check
+   *  @brief Gets a value indicating whether zero-distance edges shall be included in the check
    */
-  collinear_mode_type collinear_mode () const
+  zero_distance_mode get_zero_distance_mode () const
   {
-    return m_collinear_mode;
+    return m_zero_distance_mode;
   }
 
   /**
@@ -366,7 +372,7 @@ struct DB_PUBLIC EdgeRelationFilter
 
 private:
   bool m_whole_edges;
-  collinear_mode_type m_collinear_mode;
+  zero_distance_mode m_zero_distance_mode;
   edge_relation_type m_r;
   distance_type m_d;
   metrics_type m_metrics;
@@ -377,9 +383,9 @@ private:
 
 //  Internal methods exposed for testing purposes
 
-DB_PUBLIC bool projected_near_part_of_edge (collinear_mode_type include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
-DB_PUBLIC bool square_near_part_of_edge (collinear_mode_type include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
-DB_PUBLIC bool euclidian_near_part_of_edge (collinear_mode_type include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
+DB_PUBLIC bool projected_near_part_of_edge (zero_distance_mode include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
+DB_PUBLIC bool square_near_part_of_edge (zero_distance_mode include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
+DB_PUBLIC bool euclidian_near_part_of_edge (zero_distance_mode include_zero, db::coord_traits<db::Coord>::distance_type d, const db::Edge &e, const db::Edge &g, db::Edge *output);
 DB_PUBLIC db::Edge::distance_type edge_projection (const db::Edge &a, const db::Edge &b);
 
 }

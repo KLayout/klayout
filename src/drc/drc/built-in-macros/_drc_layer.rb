@@ -3937,7 +3937,7 @@ CODE
     # Like \width and \space, the separation check also supports the "without_touching" option.
     #
     # This option will turn off errors that arise due to 
-    # collinear edges touching in one corner (the "kissing corners" configuration). 
+    # edges touching in one corner (the "kissing corners" configuration). 
     # By default, such edges will yield an error, as they
     # form a zero-distance situation. With this option in place, no errors will be reported.
     #
@@ -4179,7 +4179,7 @@ CODE
           opposite_filter = RBA::Region::NoOppositeFilter
           rect_filter = RBA::Region::NoRectFilter
           prop_constraint = RBA::Region::IgnoreProperties
-          collinear_mode = RBA::Region::IncludeCollinearWhenTouch
+          zd_mode = RBA::Region::IncludeZeroDistanceWhenTouching
 
           n = 1
           args.each do |a|
@@ -4191,8 +4191,8 @@ CODE
               negative = true
             elsif a.is_a?(DRCPropertiesConstraint)
               prop_constraint = a.value
-            elsif a.is_a?(DRCCollinearMode)
-              collinear_mode = a.value
+            elsif a.is_a?(DRCZeroDistanceMode)
+              zd_mode = a.value
             elsif a.is_a?(DRCOppositeErrorFilter)
               opposite_filter = a.value
             elsif a.is_a?(DRCRectangleErrorFilter)
@@ -4246,7 +4246,7 @@ CODE
             raise("A rectangle error filter can only be used for polygon layers")
           end
           
-          args << collinear_mode
+          args << zd_mode
 
           border = (metrics == RBA::Region::Square ? value * 1.5 : value)
           

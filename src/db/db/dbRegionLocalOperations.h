@@ -130,8 +130,8 @@ struct DB_PUBLIC RegionCheckOptions
                       RectFilter _rect_filter = NoRectFilter,
                       bool _negative = false,
                       PropertyConstraint _prop_constraint = IgnoreProperties,
-                      collinear_mode_type _coll_mode = IncludeCollinearWhenTouch)
-    : EdgesCheckOptions (_whole_edges, _metrics, _ignore_angle, _min_projection, _max_projection, _coll_mode),
+                      zero_distance_mode _zd_mode = IncludeZeroDistanceWhenTouching)
+    : EdgesCheckOptions (_whole_edges, _metrics, _ignore_angle, _min_projection, _max_projection, _zd_mode),
       shielded (_shielded),
       opposite_filter (_opposite_filter),
       rect_filter (_rect_filter),

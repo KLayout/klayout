@@ -697,6 +697,7 @@ protected slots:
   void message_timer ();
   void edits_enabled_changed ();
   void menu_needs_update ();
+  void technology_changed ();
 
   void file_changed_timer ();
   void file_changed (const QString &path);

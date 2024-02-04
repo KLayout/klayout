@@ -548,6 +548,23 @@
    <header>layWidgets.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>lib_cbx</tabstop>
+  <tabstop>browse_pb</tabstop>
+  <tabstop>cell_le</tabstop>
+  <tabstop>place_origin_cb</tabstop>
+  <tabstop>scale_le</tabstop>
+  <tabstop>angle_le</tabstop>
+  <tabstop>mirror_cbx</tabstop>
+  <tabstop>array_grp</tabstop>
+  <tabstop>rows_le</tabstop>
+  <tabstop>columns_le</tabstop>
+  <tabstop>row_x_le</tabstop>
+  <tabstop>row_y_le</tabstop>
+  <tabstop>column_x_le</tabstop>
+  <tabstop>column_y_le</tabstop>
+ </tabstops>
  <resources>
   <include location="../../icons/icons.qrc"/>
  </resources>

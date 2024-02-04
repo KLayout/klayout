@@ -28,7 +28,7 @@
 #include "lymMacro.h"
 #include "tlFileUtils.h"
 
-void run_test (tl::TestBase *_this, const std::string &suffix, const std::string &layout, bool with_l2n = false, const std::string &top = std::string (), bool change_case = false)
+void run_test (tl::TestBase *_this, const std::string &suffix, const std::string &layout, bool with_l2n = false, bool with_lvs = true, const std::string &top = std::string (), bool change_case = false)
 {
   std::string rs = tl::testdata ();
   rs += "/lvs/" + suffix + ".lvs";
@@ -70,7 +70,9 @@ void run_test (tl::TestBase *_this, const std::string &suffix, const std::string
   lvs.load_from (rs);
   EXPECT_EQ (lvs.run (), 0);
 
-  _this->compare_text_files (output_lvsdb, au_lvsdb);
+  if (with_lvs) {
+    _this->compare_text_files (output_lvsdb, au_lvsdb);
+  }
   _this->compare_text_files (output_cir, au_cir);
   if (with_l2n) {
     _this->compare_text_files (output_l2n, au_l2n);
@@ -121,14 +123,14 @@ TEST(6_simple_pin_swapping)
 {
   run_test (_this, "ringo_simple_pin_swapping", "ringo.gds");
   //  change case
-  run_test (_this, "ringo_simple_pin_swapping", "ringo.gds", false, std::string (), true);
+  run_test (_this, "ringo_simple_pin_swapping", "ringo.gds", false, true, std::string (), true);
 }
 
 TEST(7_net_and_circuit_equivalence)
 {
   run_test (_this, "ringo_simple_net_and_circuit_equivalence", "ringo_renamed.gds");
   //  change case
-  run_test (_this, "ringo_simple_net_and_circuit_equivalence", "ringo_renamed.gds", false, std::string (), true);
+  run_test (_this, "ringo_simple_net_and_circuit_equivalence", "ringo_renamed.gds", false, true, std::string (), true);
 }
 
 TEST(8_simplification)
@@ -166,7 +168,7 @@ TEST(13_simple_ringo_device_subcircuits)
 {
   run_test (_this, "ringo_device_subcircuits", "ringo.gds");
   //  change case
-  run_test (_this, "ringo_device_subcircuits", "ringo.gds", false, std::string (), true);
+  run_test (_this, "ringo_device_subcircuits", "ringo.gds", false, true, std::string (), true);
 }
 
 TEST(14_simple_ringo_mixed_hierarchy)
@@ -181,7 +183,7 @@ TEST(15_simple_dummy_device)
 
 TEST(16_floating)
 {
-  run_test (_this, "floating", "floating.gds", false, "TOP");
+  run_test (_this, "floating", "floating.gds", false, true, "TOP");
 }
 
 TEST(17_layout_variants)
@@ -285,5 +287,11 @@ TEST(30_MustConnect1)
 TEST(31_MustConnect2)
 {
   run_test (_this, "must_connect2", "must_connect2.gds");
+}
+
+//  issue 1609
+TEST(40_DeviceExtractorErrors)
+{
+  run_test (_this, "custom_resistors", "custom_resistors.gds", true, false /*no LVS*/);
 }
 

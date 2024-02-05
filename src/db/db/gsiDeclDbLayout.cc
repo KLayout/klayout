@@ -1105,11 +1105,53 @@ Class<db::Layout> decl_Layout ("db", "Layout",
     "\n"
     "This method has been introduced in version 0.25."
   ) +
+  gsi::method ("merge_meta_info", static_cast<void (db::Layout::*) (const db::Layout &)> (&db::Layout::merge_meta_info), gsi::arg ("other"),
+    "@brief Merges the meta information from the other layout into this layout\n"
+    "See \\LayoutMetaInfo for details about cells and meta information.\n"
+    "Existing keys in this layout will be overwritten by the respective values from the other layout.\n"
+    "New keys will be added.\n"
+    "\n"
+    "This method has been introduced in version 0.28.16."
+  ) +
+  gsi::method ("merge_meta_info", static_cast<void (db::Layout::*) (const db::Layout &, const db::CellMapping &cm)> (&db::Layout::merge_meta_info), gsi::arg ("other"), gsi::arg ("cm"),
+    "@brief Merges the meta information from the other layout into this layout for the cells given by the cell mapping\n"
+    "See \\LayoutMetaInfo for details about cells and meta information.\n"
+    "This method will use the source/target cell pairs from the cell mapping object and merge the meta information "
+    "from each source cell from the 'other' layout into the mapped cell inside self.\n"
+    "This method can be used with '\\copy_tree_shapes' and similar to copy meta information in addition to the shapes.\n"
+    "Existing cell-specific keys in this layout will be overwritten by the respective values from the other layout.\n"
+    "New keys will be added.\n"
+    "\n"
+    "This method has been introduced in version 0.28.16."
+  ) +
+  gsi::method ("copy_meta_info", static_cast<void (db::Layout::*) (const db::Layout &)> (&db::Layout::copy_meta_info), gsi::arg ("other"),
+    "@brief Copies the meta information from the other layout into this layout\n"
+    "See \\LayoutMetaInfo for details about cells and meta information.\n"
+    "The meta information from this layout will be replaced by the meta information from the other layout.\n"
+    "\n"
+    "This method has been introduced in version 0.28.16."
+  ) +
+  gsi::method ("copy_meta_info", static_cast<void (db::Layout::*) (const db::Layout &, const db::CellMapping &cm)> (&db::Layout::copy_meta_info), gsi::arg ("other"), gsi::arg ("cm"),
+    "@brief Copies the meta information from the other layout into this layout for the cells given by the cell mapping\n"
+    "See \\LayoutMetaInfo for details about cells and meta information.\n"
+    "This method will use the source/target cell pairs from the cell mapping object and merge the meta information "
+    "from each source cell from the 'other' layout into the mapped cell inside self.\n"
+    "This method can be used with '\\copy_tree_shapes' and similar to copy meta information in addition to the shapes.\n"
+    "All cell-specific keys in this layout will be replaced by the respective values from the other layout.\n"
+    "\n"
+    "This method has been introduced in version 0.28.16."
+  ) +
   gsi::method ("clear_meta_info", static_cast<void (db::Layout::*) ()> (&db::Layout::clear_meta),
     "@brief Clears the meta information of the layout\n"
     "See \\LayoutMetaInfo for details about layouts and meta information."
     "\n"
     "This method has been introduced in version 0.28.8."
+  ) +
+  gsi::method ("clear_all_meta_info", static_cast<void (db::Layout::*) ()> (&db::Layout::clear_all_meta),
+    "@brief Clears all meta information of the layout (cell specific and global)\n"
+    "See \\LayoutMetaInfo for details about layouts and meta information."
+    "\n"
+    "This method has been introduced in version 0.28.16."
   ) +
   gsi::method ("remove_meta_info", static_cast<void (db::Layout::*) (const std::string &name)> (&db::Layout::remove_meta_info), gsi::arg ("name"),
     "@brief Removes meta information from the layout\n"

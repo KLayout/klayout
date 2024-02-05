@@ -1905,6 +1905,13 @@ Layout::clear_meta (db::cell_index_type ci)
 }
 
 void
+Layout::clear_all_meta ()
+{
+  m_meta_info.clear ();
+  m_meta_info_by_cell.clear ();
+}
+
+void
 Layout::add_meta_info (db::cell_index_type ci, meta_info_name_id_type name_id, const MetaInfo &i)
 {
   m_meta_info_by_cell[ci][name_id] = i;
@@ -1942,6 +1949,40 @@ Layout::has_meta_info (db::cell_index_type ci, meta_info_name_id_type name_id) c
     return c->second.find (name_id) != c->second.end ();
   } else {
     return false;
+  }
+}
+
+void
+Layout::merge_meta_info (const db::Layout &other)
+{
+  for (auto mi = other.begin_meta (); mi != other.end_meta (); ++mi) {
+    add_meta_info (other.meta_info_name (mi->first), mi->second);
+  }
+}
+
+void
+Layout::merge_meta_info (db::cell_index_type into_cell, const db::Layout &other, db::cell_index_type other_cell)
+{
+  auto mi_begin = other.begin_meta (other_cell);
+  auto mi_end = other.end_meta (other_cell);
+  for (auto mi = mi_begin; mi != mi_end; ++mi) {
+    add_meta_info (into_cell, other.meta_info_name (mi->first), mi->second);
+  }
+}
+
+void
+Layout::merge_meta_info (const db::Layout &other, const db::CellMapping &cm)
+{
+  for (auto i = cm.begin (); i != cm.end (); ++i) {
+    merge_meta_info (i->second, other, i->first);
+  }
+}
+
+void
+Layout::copy_meta_info (const db::Layout &other, const db::CellMapping &cm)
+{
+  for (auto i = cm.begin (); i != cm.end (); ++i) {
+    copy_meta_info (i->second, other, i->first);
   }
 }
 

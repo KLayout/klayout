@@ -38,6 +38,7 @@ public:
   std::string text () const { return m_os.str (); }
   void clear () { m_os.str (std::string ()); }
   void dbu_differs (double dbu_a, double dbu_b);
+  void layout_meta_info_differs (const std::string &, const tl::Variant &, const tl::Variant &);
   void layer_in_a_only (const db::LayerProperties &la);
   void layer_in_b_only (const db::LayerProperties &lb);
   void layer_name_differs (const db::LayerProperties &la, const db::LayerProperties &lb);
@@ -45,6 +46,7 @@ public:
   void cell_in_b_only (const std::string &cellname, db::cell_index_type ci);
   void cell_name_differs (const std::string &cellname_a, db::cell_index_type cia, const std::string &cellname_b, db::cell_index_type cib);
   void begin_cell (const std::string &cellname, db::cell_index_type cia, db::cell_index_type cib);
+  void cell_meta_info_differs (const std::string &, const tl::Variant &, const tl::Variant &);
   void bbox_differs (const db::Box &ba, const db::Box &bb);
   void begin_inst_differences ();
   void instances_in_a (const std::vector <db::CellInstArrayWithProperties> &insts_a, const std::vector <std::string> &cell_names, const db::PropertiesRepository &props);
@@ -155,6 +157,12 @@ TestDifferenceReceiver::dbu_differs (double dbu_a, double dbu_b)
   m_os << "layout_diff: database units differ " << dbu_a << " vs. " << dbu_b << std::endl;
 }
 
+void
+TestDifferenceReceiver::layout_meta_info_differs (const std::string &name, const tl::Variant &va, const tl::Variant &vb)
+{
+  m_os << "layout_diff: global meta info differs " << name << ": " << va.to_string () << " vs. " << vb.to_string () << std::endl;
+}
+
 void 
 TestDifferenceReceiver::layer_in_a_only (const db::LayerProperties &la)
 {
@@ -202,6 +210,12 @@ void
 TestDifferenceReceiver::begin_cell (const std::string &cellname, db::cell_index_type /*cia*/, db::cell_index_type /*cib*/)
 {
   m_cellname = cellname;
+}
+
+void
+TestDifferenceReceiver::cell_meta_info_differs (const std::string &name, const tl::Variant &va, const tl::Variant &vb)
+{
+  m_os << "layout_diff: cell meta info differs for cell " << m_cellname << " - " << name << ": " << va.to_string () << " vs. " << vb.to_string () << std::endl;
 }
 
 void
@@ -1704,4 +1718,46 @@ TEST(8)
   );
 }
 
+//  meta info
+TEST(9)
+{
+  db::Layout a;
+  db::cell_index_type caa = a.add_cell ("A");
+  db::cell_index_type cab = a.add_cell ("B");
 
+  db::Layout b;
+  db::cell_index_type cba = b.add_cell ("A");
+  db::cell_index_type cbb = b.add_cell ("B");
+
+  a.add_meta_info ("x", db::MetaInfo ("", 17.0, true));
+  a.add_meta_info ("y", db::MetaInfo ("", -1.0, false));  // not persisted
+  a.add_meta_info ("z", db::MetaInfo ("", -1.0, true));
+  a.add_meta_info (caa, "a1", db::MetaInfo ("", "a", true));
+  a.add_meta_info (caa, "a2", db::MetaInfo ("", 42, false));  // not persisted
+  a.add_meta_info (caa, "a3", db::MetaInfo ("", 41, true));
+  a.add_meta_info (cab, "b1", db::MetaInfo ("", "b", true));
+  a.add_meta_info (cab, "b2", db::MetaInfo ("", 3, false));  // not persisted
+  a.add_meta_info (cab, "b3", db::MetaInfo ("", "q", true));
+
+  b.add_meta_info ("x", db::MetaInfo ("", 21.0, true));
+  b.add_meta_info ("y", db::MetaInfo ("", -1.0, true));
+  b.add_meta_info (cba, "a1", db::MetaInfo ("", "aa", true));
+  b.add_meta_info (cba, "a2", db::MetaInfo ("", 42, true));
+  b.add_meta_info (cbb, "b1", db::MetaInfo ("", "bb", true));
+  b.add_meta_info (cbb, "b2", db::MetaInfo ("", 3, true));
+
+  TestDifferenceReceiver r;
+  bool eq = db::compare_layouts (a, b, db::layout_diff::f_verbose | db::layout_diff::f_with_meta, 0, r);
+  EXPECT_EQ (eq, false);
+  EXPECT_EQ (r.text (),
+    "layout_diff: global meta info differs x: 17 vs. 21\n"
+    "layout_diff: global meta info differs y: nil vs. -1\n"
+    "layout_diff: global meta info differs z: -1 vs. nil\n"
+    "layout_diff: cell meta info differs for cell A - a1: a vs. aa\n"
+    "layout_diff: cell meta info differs for cell A - a2: nil vs. 42\n"
+    "layout_diff: cell meta info differs for cell A - a3: 41 vs. nil\n"
+    "layout_diff: cell meta info differs for cell B - b1: b vs. bb\n"
+    "layout_diff: cell meta info differs for cell B - b2: nil vs. 3\n"
+    "layout_diff: cell meta info differs for cell B - b3: q vs. nil\n"
+  );
+}

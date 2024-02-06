@@ -3687,10 +3687,10 @@ CODE
     #         but is more intuitive, as "projecting" is written with a condition, like
     #         "projecting < 2.um". Available operators are: "==", "<", "<=", ">" and ">=". 
     #         Double-bounded ranges are also available, like: "0.5 <= projecting < 2.0". @/li
-    #   @li @b without_touching @/b: With this option present, touching corners (aka "kissing
+    #   @li @b without_touching_corners @/b: With this option present, touching corners (aka "kissing
     #         corners") will not yield errors. The default is to produce errors in these cases. @/li
-    #   @li @b without_coincident @/b: With this option present, coincident edges will not yield errors.
-    #         This is a stronger version of "without_touching" and makes sense only for two-layer checks
+    #   @li @b without_touching_edges @/b: With this option present, coincident edges will not yield errors.
+    #         This is a stronger version of "without_touching_corners" and makes sense only for two-layer checks
     #         or raw-mode input layers. It is listed here for completeness. @/li
     #   @li @b transparent @/b: Performs the check without shielding (polygon layers only) @/li
     #   @li @b shielded @/b: Performs the check with shielding (polygon layers only) @/li
@@ -3799,12 +3799,12 @@ CODE
     #
     # @h3 Touching shapes @/h3
     #
-    # The "without_touching" option will turn off errors that arise due to 
+    # The "without_touching_corners" option will turn off errors that arise due to 
     # the "kissing corner" configuration (or "checkerboard pattern"). Formally
     # this is a width violation across the diagonal, but when considering this
     # configuration as disconnected boxes, no error should be reported.
     #
-    # The following images illustrate the effect of the "without_touching" option:
+    # The following images illustrate the effect of the "without_touching_corners" option:
     # 
     # @table
     #   @tr 
@@ -3934,14 +3934,14 @@ CODE
     #
     # @h3 Touching shapes @/h3
     #
-    # Like \width and \space, the separation check also supports the "without_touching" option.
+    # Like \width and \space, the separation check also supports the "without_touching_corners" option.
     #
     # This option will turn off errors that arise due to 
     # edges touching in one corner (the "kissing corners" configuration). 
     # By default, such edges will yield an error, as they
     # form a zero-distance situation. With this option in place, no errors will be reported.
     #
-    # The following images illustrate the effect of the "without_touching" option.
+    # The following images illustrate the effect of the "without_touching_corners" option.
     # The white line at the top of the bottom red shape is actually an edge pair indicating 
     # the zero-distance violation of the separation check:
     # 
@@ -3952,16 +3952,16 @@ CODE
     #   @/tr
     # @/table
     #
-    # Another option is "without_coincident" which turns off errors that arise
+    # Another option is "without_touching_edges" which turns off errors that arise
     # at coincident edges. Formally such edges represent a zero-distance situation, hence
     # are flagged by default. Turning off the check in this case can be helpful when
     # separating a layer into two parts (e.g. thin/wide metal separation) and an error
     # between touching regions is not desired.
     #
-    # The "without_coincident" option is a stronger version of "without_touching" and 
+    # The "without_touching_edges" option is a stronger version of "without_touching_corners" and 
     # makes sense only for two-layer checks.
     #
-    # The following images illustrate the effect of the "without_coincident" option:
+    # The following images illustrate the effect of the "without_touching_edges" option:
     # 
     # @table
     #   @tr 

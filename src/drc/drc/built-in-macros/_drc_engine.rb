@@ -322,14 +322,14 @@ module DRC
       end
     end
     
-    def without_touching(f = true)
-      self._context("without_touching") do
+    def without_touching_corners(f = true)
+      self._context("without_touching_corners") do
         DRCZeroDistanceMode::new(f ? RBA::Region::IncludeZeroDistanceWhenOverlapping : RBA::Region::IncludeZeroDistanceWhenTouching)
       end
     end
     
-    def without_coincident(f = true)
-      self._context("without_coincident") do
+    def without_touching_edges(f = true)
+      self._context("without_touching_edges") do
         DRCZeroDistanceMode::new(f ? RBA::Region::NeverIncludeZeroDistance : RBA::Region::IncludeZeroDistanceWhenTouching)
       end
     end

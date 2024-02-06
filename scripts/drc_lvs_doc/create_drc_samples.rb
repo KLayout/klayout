@@ -206,7 +206,7 @@ end
 gen = Gen::new
 
 run_demo gen, "input.width(1.0)", "drc_width5.png"
-run_demo gen, "input.width(1.0, without_touching)", "drc_width6.png"
+run_demo gen, "input.width(1.0, without_touching_corners)", "drc_width6.png"
 
 class Gen
   def produce(s1, s2)
@@ -448,8 +448,8 @@ end
 gen = Gen::new
 
 run_demo gen, "input1.sep(input2, 1.0)", "drc_separation12.png"
-run_demo gen, "input1.sep(input2, 1.0, without_touching)", "drc_separation13.png"
-run_demo gen, "input1.sep(input2, 1.0, without_coincident)", "drc_separation14.png"
+run_demo gen, "input1.sep(input2, 1.0, without_touching_corners)", "drc_separation13.png"
+run_demo gen, "input1.sep(input2, 1.0, without_touching_edges)", "drc_separation14.png"
 
 # ...
 

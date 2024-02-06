@@ -1405,7 +1405,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "This variant has been introduced in version 0.27."
   ) +
-  method_ext ("width_check", &width2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching),
+  method_ext ("width_check", &width2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs a width check with options\n"
     "@param d The minimum width for which the edges are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -1434,7 +1434,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "'zero_distance_mode' has been added in version 0.29."
   ) +
-  method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching),
+  method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs a space check with options\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -1463,7 +1463,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "'zero_distance_mode' has been added in version 0.29."
   ) +
-  method_ext ("inside_check|enclosed_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching),
+  method_ext ("inside_check|enclosed_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs an inside check with options\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
@@ -1494,7 +1494,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "The 'enclosed_check' alias was introduced in version 0.27.5.\n"
     "'zero_distance_mode' has been added in version 0.29."
   ) +
-  method_ext ("enclosing_check", &enclosing2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching),
+  method_ext ("enclosing_check", &enclosing2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs an enclosing check with options\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
@@ -1524,7 +1524,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "'zero_distance_mode' has been added in version 0.29."
   ) +
-  method_ext ("overlap_check", &overlap2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching),
+  method_ext ("overlap_check", &overlap2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs an overlap check with options\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"
@@ -1554,7 +1554,7 @@ Class<db::Edges> decl_Edges (decl_dbShapeCollection, "db", "Edges",
     "\n"
     "'zero_distance_mode' has been added in version 0.29."
   ) +
-  method_ext ("separation_check", &separation2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching),
+  method_ext ("separation_check", &separation2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs an overlap check with options\n"
     "@param d The minimum distance for which the edges are checked\n"
     "@param other The other edge collection against which to check\n"

@@ -2597,7 +2597,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "\n"
     "This variant was introduced in version 0.27.\n"
   ) +
-  method_ext ("width_check", &width2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("negative", false), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching),
+  method_ext ("width_check", &width2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("negative", false), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs a width check with options\n"
     "@param d The minimum width for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -2642,7 +2642,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "'property_constraint' has been added in version 0.28.4.\n"
     "'zero_distance_mode' has been added in version 0.29."
   ) +
-  method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoRectFilter, "NoRectFilter"), gsi::arg ("negative", false), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching),
+  method_ext ("space_check", &space2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoRectFilter, "NoRectFilter"), gsi::arg ("negative", false), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs a space check with options\n"
     "@param d The minimum space for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -2687,7 +2687,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "'property_constraint' has been added in version 0.28.4.\n"
     "'zero_distance_mode' has been added in version 0.29."
   ) +
-  method_ext ("notch_check", &notch2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("negative", false), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching),
+  method_ext ("notch_check", &notch2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("negative", false), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs a space check between edges of the same polygon with options\n"
     "@param d The minimum space for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -2732,7 +2732,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "'property_constraint' has been added in version 0.28.4.\n"
     "'zero_distance_mode' has been added in version 0.29."
   ) +
-  method_ext ("isolated_check", &isolated2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoRectFilter, "NoRectFilter"), gsi::arg ("negative", false), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching),
+  method_ext ("isolated_check", &isolated2, gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoRectFilter, "NoRectFilter"), gsi::arg ("negative", false), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs a space check between edges of different polygons with options\n"
     "@param d The minimum space for which the polygons are checked\n"
     "@param whole_edges If true, deliver the whole edges\n"
@@ -2777,7 +2777,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "'property_constraint' has been added in version 0.28.4.\n"
     "'zero_distance_mode' has been added in version 0.29."
   ) +
-  method_ext ("inside_check|enclosed_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoRectFilter, "NoRectFilter"), gsi::arg ("negative", false), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching),
+  method_ext ("inside_check|enclosed_check", &inside2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoRectFilter, "NoRectFilter"), gsi::arg ("negative", false), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs an inside check with options\n"
     "@param d The minimum distance for which the polygons are checked\n"
     "@param other The other region against which to check\n"
@@ -2830,7 +2830,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "'property_constraint' has been added in version 0.28.4.\n"
     "'zero_distance_mode' has been added in version 0.29."
   ) +
-  method_ext ("overlap_check", &overlap2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoRectFilter, "NoRectFilter"), gsi::arg ("negative", false), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching),
+  method_ext ("overlap_check", &overlap2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoRectFilter, "NoRectFilter"), gsi::arg ("negative", false), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs an overlap check with options\n"
     "@param d The minimum overlap for which the polygons are checked\n"
     "@param other The other region against which to check\n"
@@ -2882,7 +2882,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "'property_constraint' has been added in version 0.28.4.\n"
     "'zero_distance_mode' has been added in version 0.29."
   ) +
-  method_ext ("enclosing_check", &enclosing2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoRectFilter, "NoRectFilter"), gsi::arg ("negative", false), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching),
+  method_ext ("enclosing_check", &enclosing2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoRectFilter, "NoRectFilter"), gsi::arg ("negative", false), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs an enclosing check with options\n"
     "@param d The minimum enclosing distance for which the polygons are checked\n"
     "@param other The other region against which to check\n"
@@ -2934,7 +2934,7 @@ Class<db::Region> decl_Region (decl_dbShapeCollection, "db", "Region",
     "'property_constraint' has been added in version 0.28.4.\n"
     "'zero_distance_mode' has been added in version 0.29."
   ) +
-  method_ext ("separation_check", &separation2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoRectFilter, "NoRectFilter"), gsi::arg ("negative", false), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching),
+  method_ext ("separation_check", &separation2, gsi::arg ("other"), gsi::arg ("d"), gsi::arg ("whole_edges", false), gsi::arg ("metrics", db::metrics_type::Euclidian, "Euclidian"), gsi::arg ("ignore_angle", tl::Variant (), "default"), gsi::arg ("min_projection", tl::Variant (), "0"), gsi::arg ("max_projection", tl::Variant (), "max"), gsi::arg ("shielded", true), gsi::arg ("opposite_filter", db::NoOppositeFilter, "NoOppositeFilter"), gsi::arg ("rect_filter", db::NoRectFilter, "NoRectFilter"), gsi::arg ("negative", false), gsi::arg ("property_constraint", db::IgnoreProperties, "IgnoreProperties"), gsi::arg ("zero_distance_mode", db::IncludeZeroDistanceWhenTouching, "IncludeZeroDistanceWhenTouching"),
     "@brief Performs a separation check with options\n"
     "@param d The minimum separation for which the polygons are checked\n"
     "@param other The other region against which to check\n"

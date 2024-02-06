@@ -1317,14 +1317,72 @@ class DBLayoutTests2_TestClass < TestBase
   # Layout, meta info diverse
   def test_17
 
-    ly = RBA::Layout::new
+    manager = RBA::Manager::new
+
+    ly = RBA::Layout::new(manager)
     a = ly.create_cell("A")
+
+    manager.transaction("trans")
     ly.add_meta_info(RBA::LayoutMetaInfo::new("lm1", 17))
     a.add_meta_info(RBA::LayoutMetaInfo::new("am1", "u"))
+    manager.commit
+
     assert_equal(mi2s(ly), "lm1:17")
     assert_equal(mi2s(a), "am1:u")
 
+    manager.undo
+    assert_equal(mi2s(ly), "")
+    assert_equal(mi2s(a), "")
+
+    manager.redo
+    assert_equal(mi2s(ly), "lm1:17")
+    assert_equal(mi2s(a), "am1:u")
+
+    manager.transaction("trans")
+    ly.add_meta_info(RBA::LayoutMetaInfo::new("lm1", 117))
+    a.add_meta_info(RBA::LayoutMetaInfo::new("am1", "v"))
+    manager.commit
+
+    assert_equal(mi2s(ly), "lm1:117")
+    assert_equal(mi2s(a), "am1:v")
+
+    manager.undo
+    assert_equal(mi2s(ly), "lm1:17")
+    assert_equal(mi2s(a), "am1:u")
+
+    manager.redo
+    assert_equal(mi2s(ly), "lm1:117")
+    assert_equal(mi2s(a), "am1:v")
+
+    manager.undo
+    assert_equal(mi2s(ly), "lm1:17")
+    assert_equal(mi2s(a), "am1:u")
+
+    manager.transaction("trans")
+    ly.remove_meta_info("lm1")
+    a.remove_meta_info("am1")
+    a.remove_meta_info("doesnotexist")
+    manager.commit
+
+    assert_equal(mi2s(ly), "")
+    assert_equal(mi2s(a), "")
+
+    manager.undo
+    assert_equal(mi2s(ly), "lm1:17")
+    assert_equal(mi2s(a), "am1:u")
+
+    manager.transaction("trans")
     ly.clear_all_meta_info
+    manager.commit
+
+    assert_equal(mi2s(ly), "")
+    assert_equal(mi2s(a), "")
+
+    manager.undo
+    assert_equal(mi2s(ly), "lm1:17")
+    assert_equal(mi2s(a), "am1:u")
+
+    manager.redo
     assert_equal(mi2s(ly), "")
     assert_equal(mi2s(a), "")
 

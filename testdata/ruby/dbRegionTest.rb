@@ -1202,7 +1202,7 @@ class DBRegion_TestClass < TestBase
     2.times do |ix|
       2.times do |iy|
         am = r.rasterize(RBA::Point::new(-50 + ix * ps.x, -20 + iy * ps.y), pd, ps, 7, 7)
-        sum += am.collect { |r| r.sum }.sum
+        sum += am.collect { |r| r.inject(:+) }.inject(:+)
       end
     end
 
@@ -1212,7 +1212,7 @@ class DBRegion_TestClass < TestBase
     pd = RBA::Vector::new(50, 50)
 
     am = r.rasterize(RBA::Point::new(-50, -20), pd, 7, 7)
-    sum = am.collect { |r| r.sum }.sum
+    sum = am.collect { |r| r.inject(:+) }.inject(:+)
 
     assert_equal("%.12g" % sum, "%.12g" % (7.0 * pd.x * pd.y))
 

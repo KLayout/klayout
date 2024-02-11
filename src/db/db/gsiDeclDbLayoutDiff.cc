@@ -90,6 +90,11 @@ public:
     dbu_differs_event (dbu_a, dbu_b);
   }
 
+  virtual void layout_meta_info_differs (const std::string &name, const tl::Variant &value_a, const tl::Variant &value_b)
+  {
+    layout_meta_info_differs_event (name, value_a, value_b);
+  }
+
   virtual void layer_in_a_only (const db::LayerProperties &la)
   {
     layer_in_a_only_event (la);
@@ -130,6 +135,11 @@ public:
     mp_cell_a = &mp_layout_a->cell (cia);
     mp_cell_b = &mp_layout_b->cell (cib);
     begin_cell_event (mp_cell_a, mp_cell_b);
+  }
+
+  virtual void cell_meta_info_differs (const std::string &name, const tl::Variant &value_a, const tl::Variant &value_b)
+  {
+    cell_meta_info_differs_event (name, value_a, value_b);
   }
 
   virtual void begin_inst_differences ()
@@ -343,6 +353,7 @@ public:
   }
 
   tl::event<double /*dbu_a*/, double /*dbu_a*/> dbu_differs_event;
+  tl::event<const std::string & /*name*/, const tl::Variant & /*value_a*/, const tl::Variant & /*value_b*/> layout_meta_info_differs_event;
   tl::event<const db::LayerProperties & /*a*/> layer_in_a_only_event;
   tl::event<const db::LayerProperties & /*b*/> layer_in_b_only_event;
   tl::event<const db::LayerProperties & /*a*/, const db::LayerProperties & /*b*/> layer_name_differs_event;
@@ -351,6 +362,7 @@ public:
   tl::event<const db::Cell * /*c*/> cell_in_b_only_event;
   tl::event<const db::Box & /*ba*/, const db::Box & /*bb*/> bbox_differs_event;
   tl::event<const db::Cell * /*ca*/, const db::Cell * /*cb*/> begin_cell_event;
+  tl::event<const std::string & /*name*/, const tl::Variant & /*value_a*/, const tl::Variant & /*value_b*/> cell_meta_info_differs_event;
   tl::Event begin_inst_differences_event;
   tl::event<const db::CellInstArray & /*anotb*/, db::properties_id_type /*prop_id*/> instance_in_a_only_event;
   tl::event<const db::CellInstArray & /*bnota*/, db::properties_id_type /*prop_id*/> instance_in_b_only_event;
@@ -409,6 +421,10 @@ static unsigned int f_no_properties () {
   return db::layout_diff::f_no_properties;
 }
 
+static unsigned int f_with_meta () {
+  return db::layout_diff::f_with_meta;
+}
+
 static unsigned int f_no_layer_names () {
   return db::layout_diff::f_no_layer_names;
 }
@@ -450,7 +466,7 @@ gsi::Class<LayoutDiff> decl_LayoutDiff ("db", "LayoutDiff",
     "full compare.\n"
     "\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other constants to form a flag set."
+    "combined with other constants to form a flag set."
   ) +
   gsi::constant ("IgnoreDuplicates", &f_ignore_duplicates,
     "@brief Ignore duplicate instances or shapes\n"
@@ -462,17 +478,25 @@ gsi::Class<LayoutDiff> decl_LayoutDiff ("db", "LayoutDiff",
   gsi::constant ("NoTextOrientation", &f_no_text_orientation,
     "@brief Ignore text orientation\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other constants to form a flag set."
+    "combined with other constants to form a flag set."
   ) +
   gsi::constant ("NoProperties", &f_no_properties,
     "@brief Ignore properties\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other constants to form a flag set."
+    "combined with other constants to form a flag set."
+  ) +
+  gsi::constant ("WithMetaInfo", &f_with_meta,
+    "@brief Ignore meta info\n"
+    "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
+    "combined with other constants to form a flag set. If present, this option tells the compare algorithm "
+    "to include persisted meta info in the compare.\n"
+    "\n"
+    "This flag has been introduced in version 0.28.16."
   ) +
   gsi::constant ("NoLayerNames", &f_no_layer_names,
     "@brief Do not compare layer names\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other constants to form a flag set."
+    "combined with other constants to form a flag set."
   ) +
   gsi::constant ("Verbose", &f_verbose,
     "@brief Enables verbose mode (gives details about the differences)\n"
@@ -480,22 +504,22 @@ gsi::Class<LayoutDiff> decl_LayoutDiff ("db", "LayoutDiff",
     "See the event descriptions for details about the differences in verbose and non-verbose mode.\n"
     "\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other constants to form a flag set."
+    "combined with other constants to form a flag set."
   ) +
   gsi::constant ("BoxesAsPolygons", &f_boxes_as_polygons,
     "@brief Compare boxes to polygons\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other constants to form a flag set."
+    "combined with other constants to form a flag set."
   ) +
   gsi::constant ("FlattenArrayInsts", &f_flatten_array_insts,
     "@brief Compare array instances instance by instance\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other constants to form a flag set."
+    "combined with other constants to form a flag set."
   ) +
   gsi::constant ("PathsAsPolygons", &f_paths_as_polygons,
     "@brief Compare paths to polygons\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other constants to form a flag set."
+    "combined with other constants to form a flag set."
   ) +
   gsi::constant ("SmartCellMapping", &f_smart_cell_mapping,
     "@brief Derive smart cell mapping instead of name mapping (available only if top cells are specified)\n"
@@ -503,7 +527,7 @@ gsi::Class<LayoutDiff> decl_LayoutDiff ("db", "LayoutDiff",
     "cells are compared (with \\LayoutDiff#compare with cells instead of layout objects).\n"
     "\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other constants to form a flag set.\n"
+    "combined with other constants to form a flag set.\n"
   ) +
   gsi::constant ("DontSummarizeMissingLayers", &f_dont_summarize_missing_layers,
     "@brief Don't summarize missing layers\n"
@@ -511,12 +535,12 @@ gsi::Class<LayoutDiff> decl_LayoutDiff ("db", "LayoutDiff",
     "layer will be reported as difference.\n"
     "\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other constants to form a flag set."
+    "combined with other constants to form a flag set."
   ) +
   gsi::constant ("NoTextDetails", &f_no_text_details,
     "@brief Ignore text details (font, size, presentation)\n"
     "This constant can be used for the flags parameter of \\compare_layouts and \\compare_cells. It can be "
-    "compared with other constants to form a flag set."
+    "combined with other constants to form a flag set."
   ) +
   gsi::method ("compare", &LayoutDiff::compare_layouts,
     gsi::arg("a"),
@@ -593,6 +617,14 @@ gsi::Class<LayoutDiff> decl_LayoutDiff ("db", "LayoutDiff",
   gsi::event ("on_dbu_differs", &LayoutDiff::dbu_differs_event, gsi::arg ("dbu_a"), gsi::arg ("dbu_b"),
     "@brief This signal indicates a difference in the database units of the layouts\n"
   ) +
+  gsi::event ("on_layout_meta_info_differs", &LayoutDiff::layout_meta_info_differs_event, gsi::arg ("name"), gsi::arg ("a"), gsi::arg ("b"),
+    "@brief This signal indicates that global meta info differs\n"
+    "Meta information is only compared when \\WithMetaInfo is added to the compare flags.\n"
+    "'a' and 'b' are the values for the first and second layout. 'nil' is passed to these values to indicate "
+    "missing meta information on one side.\n"
+    "\n"
+    "This event has been added in version 0.28.16."
+  ) +
   gsi::event ("on_layer_in_a_only", &LayoutDiff::layer_in_a_only_event, gsi::arg ("a"),
     "@brief This signal indicates a layer that is present only in the first layout\n"
   ) +
@@ -619,8 +651,16 @@ gsi::Class<LayoutDiff> decl_LayoutDiff ("db", "LayoutDiff",
     "In verbose mode detailed events will be issued indicating the differences.\n"
   ) +
   gsi::event ("on_begin_cell", &LayoutDiff::begin_cell_event, gsi::arg ("ca"), gsi::arg ("cb"),
-    "@brief This signal initiates the sequence of events for a cell pair\n"
+    "@brief This signal indicates the sequence of events for a cell pair\n"
     "All cell specific events happen between \\begin_cell_event and \\end_cell_event signals."
+  ) +
+  gsi::event ("on_cell_meta_info_differs", &LayoutDiff::cell_meta_info_differs_event, gsi::arg ("name"), gsi::arg ("a"), gsi::arg ("b"),
+    "@brief This signal indicates that meta info between the current cells differs\n"
+    "Meta information is only compared when \\WithMetaInfo is added to the compare flags.\n"
+    "'a' and 'b' are the values for the first and second layout. 'nil' is passed to these values to indicate "
+    "missing meta information on one side.\n"
+    "\n"
+    "This event has been added in version 0.28.16."
   ) +
   gsi::event ("on_begin_inst_differences", &LayoutDiff::begin_inst_differences_event,
     "@brief This signal indicates differences in the cell instances\n"

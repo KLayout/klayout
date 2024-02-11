@@ -1,0 +1,86 @@
+
+source($lvs_test_source, "TOP")
+
+report_netlist($lvs_test_target_l2n)
+target_netlist($lvs_test_target_cir)
+
+deep
+
+# -------------------------------------------------------------------
+# Layers
+
+poly_dg     = input(13, 0)
+cont        = input(15, 0)
+met1_dg     = input(16, 0)
+sblk        = input(34, 0)
+rp_1        = sblk & poly_dg
+p1trm       = poly_dg - rp_1 
+
+class ResistorExtractor < RBA::GenericDeviceExtractor
+
+  def initialize(name, sheet_rho)
+    self.name = name
+    @sheet_rho = sheet_rho
+  end
+
+  def setup
+    define_layer("C", "Conductor")
+    define_layer("R", "Resistor")
+    register_device_class(RBA::DeviceClassResistor::new)
+  end
+
+  def get_connectivity(layout, layers)
+    # this "connectivity" forms the shape clusters that make up the device
+    conn = RBA::Connectivity::new
+    conn.connect(layers[0], layers[1])   # collect touching contacts
+    conn.connect(layers[1], layers[1])   # combine resistor shapes into one area
+    conn
+  end
+  
+  def extract_devices(layer_geometry)
+    # layer_geometry provides the input layers in the order they are defined with "define_layer"
+    conductor = layer_geometry[0]
+    resistor  = layer_geometry[1]
+    
+    resistor_regions = resistor.merged
+
+    resistor_regions.each do |r|
+      terminals = conductor.interacting(RBA::Region::new(r))
+      if terminals.size != 2
+        error("Resistor shape does not touch marker border in exactly two places", r)
+      else
+        double_width = 0
+        (terminals.edges & resistor.edges).merged.each do |e|
+          double_width += e.length
+        end
+        # A = L*W
+        # -> L = A/W
+        a = r.area*dbu*dbu
+        w = (double_width / 2.0)*dbu
+        l = a / w
+
+        device = create_device
+        device.set_parameter(RBA::DeviceClassResistor::PARAM_R, @sheet_rho * l / w);
+        
+        device.set_parameter(RBA::DeviceClassResistor::PARAM_A, a)
+        device.set_parameter(RBA::DeviceClassResistor::PARAM_L, l)
+        device.set_parameter(RBA::DeviceClassResistor::PARAM_P, 2*l+2*w)
+        device.set_parameter(RBA::DeviceClassResistor::PARAM_W, w)
+        define_terminal(device, "A", "C", terminals[0]);
+        define_terminal(device, "B", "C", terminals[1]);
+      end
+    end
+  end
+end
+
+extract_devices(ResistorExtractor::new("RPP1", 0.5), # intentionally wrong: 1565.15/5
+  { "C" => p1trm, "R" => rp_1 })
+
+connect(met1_dg,      cont)
+connect(p1trm,        cont)
+
+begin 
+  netlist
+rescue => ex
+end
+

@@ -1098,7 +1098,7 @@ LEFDEFReaderState::read_single_map_file (const std::string &path, std::map<std::
 
   //  List of purposes corresponding to ALL
   LayerPurpose all_purposes[] = {
-    LEFPins, Pins, Fills, FillsOPC, Obstructions, SpecialRouting, Routing, ViaGeometry
+    LEFPins, Pins, SpecialRouting, Routing, ViaGeometry
   };
 
   while (! ts.at_end ()) {

@@ -538,7 +538,7 @@ TEST(4_CollectModeRename)
   }
 
   std::string fn_au (tl::testdata () + "/gds/collect_rename_au.gds");
-  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+  db::compare_layouts (_this, layout, fn_au, db::NormalizationMode (db::WriteGDS2 | db::WithMeta), 1);
 }
 
 TEST(4_CollectModeRenameWithGhost)
@@ -634,7 +634,7 @@ TEST(4_CollectModeOverwrite)
   }
 
   std::string fn_au (tl::testdata () + "/gds/collect_overwrite_au.gds");
-  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+  db::compare_layouts (_this, layout, fn_au, db::NormalizationMode (db::WriteGDS2 | db::WithMeta), 1);
 }
 
 TEST(4_CollectModeSkip)
@@ -658,7 +658,7 @@ TEST(4_CollectModeSkip)
   }
 
   std::string fn_au (tl::testdata () + "/gds/collect_skip_au.gds");
-  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+  db::compare_layouts (_this, layout, fn_au, db::NormalizationMode (db::WriteGDS2 | db::WithMeta), 1);
 }
 
 TEST(4_CollectModeAdd)
@@ -682,7 +682,7 @@ TEST(4_CollectModeAdd)
   }
 
   std::string fn_au (tl::testdata () + "/gds/collect_add_au.gds");
-  db::compare_layouts (_this, layout, fn_au, db::WriteGDS2, 1);
+  db::compare_layouts (_this, layout, fn_au, db::NormalizationMode (db::WriteGDS2 | db::WithMeta), 1);
 }
 
 //  border case with multiple padding 0 for SNAME and STRING records

@@ -1617,3 +1617,39 @@ TEST(89_deep_with_mag_cop_size_aniso)
   run_test (_this, "89", true);
 }
 
+TEST(90_issue1594_dual_top)
+{
+  std::string rs = tl::testdata ();
+  rs += "/drc/issue_1594.drc";
+
+  std::string input = tl::testdata ();
+  input += "/drc/issue_1594.gds";
+
+  std::string au = tl::testdata ();
+  au += "/drc/issue_1594_au.cir";
+
+  std::string output = this->tmp_file ("tmp.cir");
+
+  {
+    //  Set some variables
+    lym::Macro config;
+    config.set_text (tl::sprintf (
+        "$drc_force_gc = true\n"
+        "$drc_test_source = '%s'\n"
+        "$drc_test_target = '%s'\n"
+      , input, output)
+    );
+    config.set_interpreter (lym::Macro::Ruby);
+    EXPECT_EQ (config.run (), 0);
+  }
+
+  lym::Macro drc;
+  drc.load_from (rs);
+  EXPECT_EQ (drc.run (), 0);
+
+  //  verify
+
+  CHECKPOINT ();
+  compare_netlists (_this, output, au);
+}
+

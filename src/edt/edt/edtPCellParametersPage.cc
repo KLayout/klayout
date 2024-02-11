@@ -41,6 +41,8 @@
 #include <QHBoxLayout>
 #include <QGroupBox>
 #include <QScrollBar>
+#include <QScrollArea>
+#include <QToolButton>
 
 namespace edt
 {
@@ -294,31 +296,31 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
 
   mp_parameters_area = new QScrollArea (this);
   mp_parameters_area->setFrameShape (QFrame::NoFrame);
+  mp_parameters_area->setWidgetResizable (true);
   QGridLayout *frame_layout = dynamic_cast<QGridLayout *> (QFrame::layout ());
   frame_layout->addWidget (mp_parameters_area, 2, 0, 1, 1);
   frame_layout->setRowStretch (2, 1);
 
-  QFrame *fi = new QFrame (mp_parameters_area);
-  QWidget *inner_frame = fi;
-  fi->setFrameShape (QFrame::NoFrame);
+  mp_main_frame = new QFrame (mp_parameters_area);
+  mp_main_frame->setFrameShape (QFrame::NoFrame);
   setFrameShape (QFrame::NoFrame);
 
-  QGridLayout *inner_grid = new QGridLayout (inner_frame);
-  inner_frame->setLayout (inner_grid);
+  QGridLayout *main_grid = new QGridLayout (mp_main_frame);
+  mp_main_frame->setLayout (main_grid);
   if (m_dense) {
-    inner_grid->setContentsMargins (4, 4, 4, 4);
-    inner_grid->setHorizontalSpacing (6);
-    inner_grid->setVerticalSpacing (2);
+    main_grid->setContentsMargins (4, 4, 4, 4);
+    main_grid->setHorizontalSpacing (6);
+    main_grid->setVerticalSpacing (2);
   }
 
-  QWidget *main_frame = inner_frame;
-  QGridLayout *main_grid = inner_grid;
-
   if (! mp_pcell_decl) {
-    mp_parameters_area->setWidget (main_frame);
+    mp_parameters_area->setWidget (mp_main_frame);
     update_current_parameters ();
     return;
   }
+
+  QWidget *inner_frame = mp_main_frame;
+  QGridLayout *inner_grid = main_grid;
 
   int main_row = 0;
   int row = 0;
@@ -362,7 +364,8 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
       if (! gt.empty ()) {
 
         //  create a new group
-        QGroupBox *gb = new QGroupBox (main_frame);
+        QGroupBox *gb = new QGroupBox (mp_main_frame);
+        mp_groups.push_back (gb);
         gb->setTitle (tl::to_qstring (gt));
         main_grid->addWidget (gb, main_row, 0, 1, 3);
         
@@ -382,7 +385,7 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
 
         //  back to the main group
         inner_grid = main_grid;
-        inner_frame = main_frame;
+        inner_frame = mp_main_frame;
         row = main_row;
 
       }
@@ -427,6 +430,9 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
           hb->setContentsMargins (0, 0, 0, 0);
           f->setLayout (hb);
           f->setFrameShape (QFrame::NoFrame);
+          QSizePolicy sp = f->sizePolicy ();
+          sp.setHorizontalStretch (1);
+          f->setSizePolicy (sp);
 
           QLineEdit *le = new QLineEdit (f);
           hb->addWidget (le);
@@ -434,9 +440,13 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
           le->setObjectName (tl::to_qstring (p->get_name ()));
           m_widgets.push_back (le);
 
-          QLabel *ul = new QLabel (f);
-          hb->addWidget (ul, 1);
-          ul->setText (tl::to_qstring (p->get_unit ()));
+          if (! p->get_unit ().empty ()) {
+            QLabel *ul = new QLabel (f);
+            hb->addWidget (ul, 1);
+            ul->setText (tl::to_qstring (p->get_unit ()));
+          }
+
+          hb->addStretch (1);
 
           inner_grid->addWidget (f, row, 2);
           m_all_widgets.back ().push_back (f);
@@ -450,7 +460,10 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
           QPushButton *pb = new QPushButton (inner_frame);
           pb->setObjectName (tl::to_qstring (p->get_name ()));
           pb->setText (tl::to_qstring (description));
-          pb->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Preferred);
+          QSizePolicy sp = pb->sizePolicy ();
+          sp.setHorizontalPolicy (QSizePolicy::Fixed);
+          sp.setHorizontalStretch (1);
+          pb->setSizePolicy (sp);
           m_widgets.push_back (pb);
 
           inner_grid->addWidget (pb, row, 2);
@@ -466,6 +479,9 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
         {
           QLineEdit *le = new QLineEdit (inner_frame);
           le->setObjectName (tl::to_qstring (p->get_name ()));
+          QSizePolicy sp = le->sizePolicy ();
+          sp.setHorizontalStretch (1);
+          le->setSizePolicy (sp);
           m_widgets.push_back (le);
           inner_grid->addWidget (le, row, 2);
           m_all_widgets.back ().push_back (le);
@@ -476,13 +492,29 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
 
       case db::PCellParameterDeclaration::t_layer:
         {
-          lay::LayerSelectionComboBox *ly = new lay::LayerSelectionComboBox (inner_frame);
+          QFrame *f = new QFrame (inner_frame);
+          QHBoxLayout *hb = new QHBoxLayout (f);
+          hb->setContentsMargins (0, 0, 0, 0);
+          f->setLayout (hb);
+          f->setFrameShape (QFrame::NoFrame);
+          QSizePolicy sp = f->sizePolicy ();
+          sp.setHorizontalStretch (1);
+          f->setSizePolicy (sp);
+
+          lay::LayerSelectionComboBox *ly = new lay::LayerSelectionComboBox (f);
+          hb->addWidget (ly);
           ly->set_no_layer_available (true);
           ly->set_view (mp_view, m_cv_index, true /*all layers*/);
           ly->setObjectName (tl::to_qstring (p->get_name ()));
+          sp = ly->sizePolicy ();
+          sp.setHorizontalPolicy (QSizePolicy::Fixed);
+          ly->setSizePolicy (sp);
           m_widgets.push_back (ly);
-          inner_grid->addWidget (ly, row, 2);
-          m_all_widgets.back ().push_back (ly);
+
+          hb->addStretch (1);
+
+          inner_grid->addWidget (f, row, 2);
+          m_all_widgets.back ().push_back (f);
 
           connect (ly, SIGNAL (activated (int)), this, SLOT (parameter_changed ()));
         }
@@ -492,7 +524,9 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
         {
           QCheckBox *cbx = new QCheckBox (inner_frame);
           //  this makes the checkbox not stretch over the full width - better when navigating with tab
-          cbx->setSizePolicy (QSizePolicy (QSizePolicy::Fixed, QSizePolicy::Preferred));
+          QSizePolicy sp = cbx->sizePolicy ();
+          sp.setHorizontalStretch (1);
+          cbx->setSizePolicy (sp);
           cbx->setObjectName (tl::to_qstring (p->get_name ()));
           m_widgets.push_back (cbx);
           inner_grid->addWidget (cbx, row, 2);
@@ -509,8 +543,20 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
 
     } else {
 
-      QComboBox *cb = new QComboBox (inner_frame);
+      QFrame *f = new QFrame (inner_frame);
+      QHBoxLayout *hb = new QHBoxLayout (f);
+      hb->setContentsMargins (0, 0, 0, 0);
+      f->setLayout (hb);
+      f->setFrameShape (QFrame::NoFrame);
+      QSizePolicy sp = f->sizePolicy ();
+      sp.setHorizontalStretch (1);
+      f->setSizePolicy (sp);
+
+      QComboBox *cb = new QComboBox (f);
+      hb->addWidget (cb);
       cb->setObjectName (tl::to_qstring (p->get_name ()));
+      cb->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Preferred);
+      cb->setSizeAdjustPolicy (QComboBox::AdjustToContents);
 
       int i = 0;
       for (std::vector<tl::Variant>::const_iterator c = p->get_choices ().begin (); c != p->get_choices ().end (); ++c, ++i) {
@@ -523,20 +569,24 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
 
       connect (cb, SIGNAL (activated (int)), this, SLOT (parameter_changed ()));
 
-      cb->setMinimumContentsLength (30);
-      cb->setSizeAdjustPolicy (QComboBox::AdjustToMinimumContentsLengthWithIcon);
       m_widgets.push_back (cb);
-      inner_grid->addWidget (cb, row, 2);
-      m_all_widgets.back ().push_back (cb);
+
+      hb->addStretch (1);
+
+      inner_grid->addWidget (f, row, 2);
+      m_all_widgets.back ().push_back (f);
 
     }
 
     ++row;
-    if (inner_frame == main_frame) {
+    if (inner_frame == mp_main_frame) {
       ++main_row;
     }
 
   }
+
+  //  adds some default buffer space
+  main_grid->setRowStretch (main_row, 1);
 
   //  initial callback
 
@@ -556,8 +606,8 @@ PCellParametersPage::setup (lay::LayoutViewBase *view, int cv_index, const db::P
 
   update_widgets_from_states (m_states);
 
-  mp_parameters_area->setWidget (main_frame);
-  main_frame->show ();
+  mp_parameters_area->setWidget (mp_main_frame);
+  mp_main_frame->show ();
 
   update_current_parameters ();
 }
@@ -944,15 +994,15 @@ PCellParametersPage::update_widgets_from_states (const db::ParameterStates &stat
         break;
       case db::ParameterState::InfoIcon:
         m_icon_widgets [i]->setPixmap (info);
-        m_icon_widgets [i]->show ();
+        m_icon_widgets [i]->setVisible (ps.is_visible ());
         break;
       case db::ParameterState::WarningIcon:
         m_icon_widgets [i]->setPixmap (warning);
-        m_icon_widgets [i]->show ();
+        m_icon_widgets [i]->setVisible (ps.is_visible ());
         break;
       case db::ParameterState::ErrorIcon:
         m_icon_widgets [i]->setPixmap (error);
-        m_icon_widgets [i]->show ();
+        m_icon_widgets [i]->setVisible (ps.is_visible ());
         break;
       }
 
@@ -961,6 +1011,12 @@ PCellParametersPage::update_widgets_from_states (const db::ParameterStates &stat
   }
 
   set_parameters_internal (states, lazy_evaluation ());
+
+  //  QGridLayouts are bad in handling nested QFrame (or QGroupBox) with their own layouts,
+  //  so we help a little here:
+  for (auto g = mp_groups.begin (); g != mp_groups.end (); ++g) {
+    (*g)->resize (QSize ((*g)->width (), (*g)->sizeHint ().height ()));
+  }
 }
 
 void

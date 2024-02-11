@@ -287,18 +287,36 @@ void NetlistDeviceExtractor::extract_without_initialize (db::Layout &layout, db:
       extractor_cache_type::const_iterator ec = extractor_cache.find (layer_geometry);
       if (ec == extractor_cache.end ()) {
 
+        log_entry_list log_entries;
+        m_log_entries.swap (log_entries);
+
         //  do the actual device extraction
         extract_devices (layer_geometry);
 
         //  push the new devices to the layout
         push_new_devices (disp);
 
-        ExtractorCacheValueType &ecv = extractor_cache [layer_geometry];
-        ecv.disp = disp;
+        if (m_log_entries.empty ()) {
 
-        for (std::map<size_t, std::pair<db::Device *, geometry_per_terminal_type> >::const_iterator d = m_new_devices.begin (); d != m_new_devices.end (); ++d) {
-          ecv.devices.push_back (d->second.first);
+          //  cache unless log entries are produced
+          ExtractorCacheValueType &ecv = extractor_cache [layer_geometry];
+          ecv.disp = disp;
+
+          for (std::map<size_t, std::pair<db::Device *, geometry_per_terminal_type> >::const_iterator d = m_new_devices.begin (); d != m_new_devices.end (); ++d) {
+            ecv.devices.push_back (d->second.first);
+          }
+
+        } else {
+
+          //  transform the marker geometries from the log entries to match the device
+          db::DVector disp_dbu = db::CplxTrans (dbu ()) * disp;
+          for (auto l = m_log_entries.begin (); l != m_log_entries.end (); ++l) {
+            l->set_geometry (l->geometry ().moved (disp_dbu));
+          }
+
         }
+
+        m_log_entries.splice (m_log_entries.begin (), log_entries);
 
         m_new_devices.clear ();
 

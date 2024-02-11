@@ -277,7 +277,7 @@ private:
   std::string m_debugger_scope;
   PyFrameObject *mp_current_frame;
   std::map<PyObject *, size_t> m_file_id_map;
-  wchar_t *mp_py3_app_name;
+  std::wstring mp_py3_app_name;
   bool m_embedded;
   std::unique_ptr<pya::PythonModule> m_pya_module;
 };

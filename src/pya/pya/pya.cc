@@ -107,6 +107,7 @@ public:
   PythonStackTraceProvider (PyFrameObject *frame, const std::string &scope)
     : m_scope (scope)
   {
+    PythonRef frame_object_ref;
     while (frame != NULL) {
 
 #if PY_VERSION_HEX >= 0x030A0000
@@ -127,6 +128,8 @@ public:
 
 #if PY_VERSION_HEX >= 0x030A0000
       frame = PyFrame_GetBack(frame);
+      //  PyFrame_GetBack returns a strong reference, hence we need to make sure it is released
+      frame_object_ref = (PyObject *) frame;
 #else
       frame = frame->f_back;
 #endif

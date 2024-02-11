@@ -327,7 +327,7 @@ PythonInterpreter::PythonInterpreter (bool embedded)
   //  Python 3 requires a unicode string for the application name
 
   mp_py3_app_name = tl::to_wstring (app_path);
-  Py_SetProgramName (mp_py3_app_name.c_str ());
+  Py_SetProgramName (const_cast<wchar_t *> (mp_py3_app_name.c_str ()));
 
   Py_InitializeEx (0 /*don't set signals*/);
 

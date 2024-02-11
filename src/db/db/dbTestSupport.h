@@ -58,7 +58,8 @@ enum NormalizationMode
   NormFileMask = 7,       //  bits the extract for file mode
   NoContext = 8,          //  write tmp file without context
   AsPolygons = 16,        //  paths and boxes are treated as polygons
-  WithArrays = 32         //  do not flatten arrays
+  WithArrays = 32,        //  do not flatten arrays
+  WithMeta = 64           //  with meta info
 };
 
 /**

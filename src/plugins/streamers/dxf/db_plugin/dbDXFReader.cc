@@ -884,12 +884,6 @@ spline_interpolate (std::list<db::DPoint> &curve_points,
 
   db::DPoint s1 = b_spline_point (t_start + 0.5 * dt, control_points, degree, knots, k1);
   db::DPoint s2 = b_spline_point (t_start + 1.5 * dt, control_points, degree, knots, k2);
-if (s1.to_string () == "-2.60657790172,-1.78843428245") {
-  tl::info << "@@@ BANG!";
-}
-if (s2.to_string () == "-2.60657790172,-1.78843428245") {
-  tl::info << "@@@ BANG!";
-}
 
   db::DVector p1 (s1, *current_curve_point);
   db::DVector p2 (*pm, s1);

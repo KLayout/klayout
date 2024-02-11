@@ -9,6 +9,10 @@
 * Bugfix: %GITHUB%/issues/1602 [Qt6] Cannot normally quit the main application window
 * Bugfix: %GITHUB%/issues/1594 "connect" (in flat mode) + multiple top cells give an error message
 * Bugfix: %GITHUB%/issues/1592 DXF file parsing error, about spline curve
+* Enhancement: DRC enhancements related to touching edges
+  * New DRC function switches: "without_touching_corners", "without_touching_edges"
+    to skip width and space errors at kissing corners and touching-edge configurations
+  * Kissing corners are now detected also in non-collinear edge configurations
 * Bugfix: fixed rendering of color selection buttons on High-DPI screens
 * Bugfix: cross-hair cursor should not use selection default line width and styles
 * Enhancement: OASIS reader errors out on broken OASIS with duplicate CELLNAMEs

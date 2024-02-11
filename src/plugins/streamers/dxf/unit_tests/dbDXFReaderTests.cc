@@ -536,3 +536,20 @@ TEST(35c)
   db::DXFReaderOptions opt;
   run_test_public (_this, "issue_1422c.dxf", "issue_1422c_au.gds.gz", opt);
 }
+
+//  issue #1592, polyline mode 2
+TEST(36a)
+{
+  db::DXFReaderOptions opt;
+  opt.dbu = 1e-5;
+  opt.polyline_mode = 2;
+  run_test_public (_this, "issue_1592.dxf.gz", "issue_1592a_au.oas.gz", opt, true);
+}
+
+//  issue #1592
+TEST(36b)
+{
+  db::DXFReaderOptions opt;
+  opt.dbu = 1e-5;
+  run_test_public (_this, "issue_1592.dxf.gz", "issue_1592b_au.oas.gz", opt, true);
+}

@@ -1,3 +1,18 @@
+0.28.16          (2023-02-12):
+* Bugfix: %GITHUB%/issues/1619 Segfault on Fedora-39 with Python 3.12.1
+* Bugfix: %GITHUB%/issues/1618 Leaking Python reference causing trouble with iterators
+* Bugfix: %GITHUB%/issues/1616 DRC doc typo
+* Bugfix: %GITHUB%/issues/1614 LEF/DEF .map should not map boundaries and fill to ALL purpose
+* Bugfix: %GITHUB%/issues/1609 Cell.read doesn't read LayoutMetaInfo
+* Bugfix: %GITHUB%/issues/1608 CustomResistorExtraction: show faulty device in GUI
+* Bugfix: %GITHUB%/issues/1603 Weird parameter dialog resizing when hiding / showing many parameters at once with callback_impl
+* Bugfix: %GITHUB%/issues/1602 [Qt6] Cannot normally quit the main application window
+* Bugfix: %GITHUB%/issues/1594 "connect" (in flat mode) + multiple top cells give an error message
+* Bugfix: %GITHUB%/issues/1592 DXF file parsing error, about spline curve
+* Bugfix: fixed rendering of color selection buttons on High-DPI screens
+* Bugfix: cross-hair cursor should not use selection default line width and styles
+* Enhancement: OASIS reader errors out on broken OASIS with duplicate CELLNAMEs
+  
 0.28.15          (2023-01-04):
 * Bugfix: %GITHUB%/issues/1578 Missing strm2*.exe in the Windows portable binary package (*.zip)
 * Enhancement: %GITHUB%/issues/1569 Make "toggle (selected) layer" key-bindable

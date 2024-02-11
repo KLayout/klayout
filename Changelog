@@ -1,4 +1,4 @@
-0.28.16          (2023-02-12):
+0.28.16          (2024-02-12):
 * Bugfix: %GITHUB%/issues/1619 Segfault on Fedora-39 with Python 3.12.1
 * Bugfix: %GITHUB%/issues/1618 Leaking Python reference causing trouble with iterators
 * Bugfix: %GITHUB%/issues/1616 DRC doc typo
@@ -17,7 +17,7 @@
 * Bugfix: cross-hair cursor should not use selection default line width and styles
 * Enhancement: OASIS reader errors out on broken OASIS with duplicate CELLNAMEs
   
-0.28.15          (2023-01-04):
+0.28.15          (2024-01-04):
 * Bugfix: %GITHUB%/issues/1578 Missing strm2*.exe in the Windows portable binary package (*.zip)
 * Enhancement: %GITHUB%/issues/1569 Make "toggle (selected) layer" key-bindable
   - Plus feature: "visibility follows selection"

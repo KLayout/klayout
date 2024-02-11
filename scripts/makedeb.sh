@@ -20,6 +20,10 @@ buildopts=
 
 # TODO: derive this list automatically?
 case $target in
+
+debian12)
+  depends="python3-dev, libc6-dev, libgcc-s1, libgit2-1.5, libqt6core5compat6, libqt6designer6, libqt6gui6, libqt6multimedia6, libqt6multimediaquick6, libqt6network6, libqt6printsupport6, libqt6sql6, libqt6svg6, libqt6widgets6, libqt6xml6, libruby3.1, libstdc++6, zlib1g" 
+  ;;
 ubuntu16)
   depends="libqt4-designer (>= 4.8.6), libqt4-xml (>= 4.8.6), libqt4-sql (>= 4.8.6), libqt4-network (>= 4.8.6), libqtcore4 (>= 4.8.6), libqtgui4 (>= 4.8.6), zlib1g (>= 1.2.8), libgit2-24 (>= 0.24.0), libruby2.3 (>= 2.3.1), python3 (>= 3.5.1), libpython3.5 (>= 3.5.1), libstdc++6 (>= 4.6.3), libc6 (>= 2.15)"
   # No HTTPS support - that is somewhat useless
@@ -63,7 +67,7 @@ libdir="usr/lib/klayout"
 rm -rf $bininstdir
 
 # do the actual build
-./build.sh -j2 \
+./build.sh -j$(nproc) \
            -bin $bininstdir \
            -build $builddir \
            -rpath /$libdir \

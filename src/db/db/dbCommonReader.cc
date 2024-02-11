@@ -160,7 +160,7 @@ CommonReaderBase::rename_cell (db::Layout &layout, size_t id, const std::string 
 
       //  Both cells already exist and are not identical: merge ID-declared cell into the name-declared one
       layout.force_update ();
-      merge_cell (layout, iname->second.second, iid->second.second);
+      merge_cell (layout, iname->second.second, iid->second.second, true);
       iid->second.second = iname->second.second;
 
     }
@@ -235,7 +235,7 @@ CommonReaderBase::cell_for_instance (db::Layout &layout, const std::string &cn)
 }
 
 void
-CommonReaderBase::merge_cell (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index) const
+CommonReaderBase::merge_cell (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta) const
 {
   const db::Cell &src_cell = layout.cell (src_cell_index);
   db::Cell &target_cell = layout.cell (target_cell_index);
@@ -249,11 +249,11 @@ CommonReaderBase::merge_cell (db::Layout &layout, db::cell_index_type target_cel
     }
   }
 
-  merge_cell_without_instances (layout, target_cell_index, src_cell_index);
+  merge_cell_without_instances (layout, target_cell_index, src_cell_index, with_meta);
 }
 
 void
-CommonReaderBase::merge_cell_without_instances (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index) const
+CommonReaderBase::merge_cell_without_instances (db::Layout &layout, db::cell_index_type target_cell_index, db::cell_index_type src_cell_index, bool with_meta) const
 {
   const db::Cell &src_cell = layout.cell (src_cell_index);
   db::Cell &target_cell = layout.cell (target_cell_index);
@@ -267,6 +267,16 @@ CommonReaderBase::merge_cell_without_instances (db::Layout &layout, db::cell_ind
 
   //  replace all instances of the new cell with the original one
   layout.replace_instances_of (src_cell.cell_index (), target_cell.cell_index ());
+
+  //  merge meta info
+  if (with_meta) {
+    auto ib = layout.begin_meta (src_cell.cell_index ());
+    auto ie = layout.end_meta (src_cell.cell_index ());
+    for (auto i = ib; i != ie; ++i) {
+      layout.add_meta_info (target_cell.cell_index (), i->first, i->second);
+    }
+  }
+  layout.clear_meta (src_cell.cell_index ());
 
   //  finally delete the new cell
   layout.delete_cell (src_cell.cell_index ());
@@ -371,7 +381,7 @@ CommonReaderBase::finish (db::Layout &layout)
 
         layout.cell (ci_org).clear_shapes ();
 
-        merge_cell (layout, ci_org, ci_new);
+        merge_cell (layout, ci_org, ci_new, true);
 
       } else if (m_cc_resolution == SkipNewCell && ! layout.cell (ci_org).is_ghost_cell ()) {
 
@@ -379,11 +389,11 @@ CommonReaderBase::finish (db::Layout &layout)
         layout.cell (ci_new).clear_shapes ();
 
         //  NOTE: ignore instances -> this saves us a layout update
-        merge_cell_without_instances (layout, ci_org, ci_new);
+        merge_cell_without_instances (layout, ci_org, ci_new, false);
 
       } else {
 
-        merge_cell (layout, ci_org, ci_new);
+        merge_cell (layout, ci_org, ci_new, m_cc_resolution != SkipNewCell);
 
       }
 

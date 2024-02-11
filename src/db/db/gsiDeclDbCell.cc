@@ -1004,6 +1004,22 @@ static void cell_add_meta_info (db::Cell *cell, const MetaInfo &mi)
   }
 }
 
+static void cell_merge_meta_info (db::Cell *cell, const db::Cell *source)
+{
+  if (! source || ! cell->layout () || ! source->layout ()) {
+    return;
+  }
+  cell->layout ()->merge_meta_info (cell->cell_index (), *source->layout (), source->cell_index ());
+}
+
+static void cell_copy_meta_info (db::Cell *cell, const db::Cell *source)
+{
+  if (! source || ! cell->layout () || ! source->layout ()) {
+    return;
+  }
+  cell->layout ()->copy_meta_info (cell->cell_index (), *source->layout (), source->cell_index ());
+}
+
 static const tl::Variant &cell_meta_info_value (db::Cell *cell, const std::string &name)
 {
   if (! cell->layout ()) {
@@ -1755,6 +1771,7 @@ read_options (db::Cell *cell, const std::string &path, const db::LoadLayoutOptio
   db::CellMapping cm;
   std::vector<db::cell_index_type> new_cells = cm.create_single_mapping_full (*cell->layout (), cell->cell_index (), tmp, *tmp.begin_top_down ());
   cell->move_tree_shapes (tmp.cell (*tmp.begin_top_down ()), cm);
+  cell->layout ()->merge_meta_info (tmp, cm);
 
   return new_cells;
 }
@@ -1833,6 +1850,21 @@ Class<db::Cell> decl_Cell ("db", "Cell",
     "See \\LayoutMetaInfo for details about cells and meta information.\n"
     "\n"
     "This method has been introduced in version 0.28.8."
+  ) +
+  gsi::method_ext ("merge_meta_info", &cell_merge_meta_info, gsi::arg ("other"),
+    "@brief Merges the meta information from the other cell into this cell\n"
+    "See \\LayoutMetaInfo for details about cells and meta information.\n"
+    "Existing keys in this cell will be overwritten by the respective values from the other cell.\n"
+    "New keys will be added.\n"
+    "\n"
+    "This method has been introduced in version 0.28.16."
+  ) +
+  gsi::method_ext ("copy_meta_info", &cell_copy_meta_info, gsi::arg ("other"),
+    "@brief Copies the meta information from the other cell into this cell\n"
+    "See \\LayoutMetaInfo for details about cells and meta information.\n"
+    "The meta information from this cell will be replaced by the meta information from the other cell.\n"
+    "\n"
+    "This method has been introduced in version 0.28.16."
   ) +
   gsi::method_ext ("clear_meta_info", &cell_clear_meta_info,
     "@brief Clears the meta information of the cell\n"

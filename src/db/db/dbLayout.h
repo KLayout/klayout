@@ -1994,6 +1994,11 @@ public:
   void clear_meta (db::cell_index_type ci);
 
   /**
+   *  @brief Clears all meta information (cells and layout)
+   */
+  void clear_all_meta ();
+
+  /**
    *  @brief Adds meta information for a given cell
    *  The given meta information object is to the meta information list for the given cell.
    *  If a meta info object with the same name already exists it is overwritten.
@@ -2020,6 +2025,50 @@ public:
       m_meta_info_by_cell [ci].insert (b, e);
     }
   }
+
+  /**
+   *  @brief Merges meta information from the other layout into self
+   *  This applies to the layout-only meta information. Same keys get overwritten, new ones are added.
+   */
+  void merge_meta_info (const db::Layout &other);
+
+  /**
+   *  @brief Copies meta information from the other layout into self
+   *  This applies to the layout-only meta information. All keys are replaced.
+   */
+  void copy_meta_info (const db::Layout &other)
+  {
+    clear_meta ();
+    merge_meta_info (other);
+  }
+
+  /**
+   *  @brief Merges meta information from the other cell into the target cell from sel.
+   *  This applies to the cell-specific meta information. Same keys get overwritten, new ones are added.
+   */
+  void merge_meta_info (db::cell_index_type into_cell, const db::Layout &other, db::cell_index_type other_cell);
+
+  /**
+   *  @brief Copies meta information from the other cell into the target cell from sel.
+   *  This applies to the cell-specific meta information. All keys are replaced.
+   */
+  void copy_meta_info (db::cell_index_type into_cell, const db::Layout &other, db::cell_index_type other_cell)
+  {
+    clear_meta (into_cell);
+    merge_meta_info (into_cell, other, other_cell);
+  }
+
+  /**
+   *  @brief Merges meta information from the other cell into the target cell from sel using the given cell mapping.
+   *  The cell mapping specifies which meta information to merge from which cell into which cell.
+   */
+  void merge_meta_info (const db::Layout &other, const db::CellMapping &cm);
+
+  /**
+   *  @brief Copies meta information from the other cell into the target cell from sel using the given cell mapping.
+   *  The cell mapping specifies which meta information to copy from which cell into which cell.
+   */
+  void copy_meta_info (const db::Layout &other, const db::CellMapping &cm);
 
   /**
    *  @brief Gets a value indicating whether a meta info with the given name is present for the given cell

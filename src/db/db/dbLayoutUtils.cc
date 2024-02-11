@@ -252,6 +252,9 @@ merge_layouts (db::Layout &target,
     const db::Cell &source_cell = source.cell (*c);
     db::Cell &target_cell = target.cell (target_cell_index);
 
+    //  merge meta info
+    target.merge_meta_info (target_cell_index, source, *c);
+
     //  NOTE: this implementation employs the safe but cumbersome "local transformation" feature.
     //  This means, all cells are transformed according to the given transformation and their
     //  references are transformed to account for that effect. This will lead to somewhat strange

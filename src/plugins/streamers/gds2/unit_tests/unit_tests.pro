@@ -6,8 +6,8 @@ TARGET = gds2_tests
 include($$PWD/../../../../lib_ut.pri)
 
 SOURCES = \
-  dbGDS2Reader.cc \
-  dbGDS2Writer.cc \
+  dbGDS2ReaderTests.cc \
+  dbGDS2WriterTests.cc
 
 INCLUDEPATH += $$LAY_INC $$TL_INC $$DB_INC $$GSI_INC $$PWD/../db_plugin $$PWD/../../../common
 DEPENDPATH += $$LAY_INC $$TL_INC $$DB_INC $$GSI_INC $$PWD/../db_plugin $$PWD/../../../common

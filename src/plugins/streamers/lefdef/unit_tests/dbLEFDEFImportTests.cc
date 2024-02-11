@@ -420,7 +420,7 @@ TEST(def15)
 {
   db::LEFDEFReaderOptions opt = default_options ();
   opt.set_macro_resolution_mode (1);
-  run_test (_this, "def15", "map:test.map+lef:tech.lef+def:test.def", "au2.oas.gz", opt);
+  run_test (_this, "def15", "map:test.map+lef:tech.lef+def:test.def", "au2_2.oas.gz", opt);
 }
 
 TEST(def16)
@@ -814,7 +814,7 @@ TEST(117_mapfile_all)
       "'+M1.LEFOBS;M1.LEFPIN;M1.NET;M1.PIN;M1.SPNET;M1.VIA : \\'M1.NET/PIN/SPNET/...\\' (1/5)';"
       "'+M1.NET;M1.SPNET : \\'M1.NET/SPNET\\' (16/0)';"
       "'+M1.NET : M1.NET (18/0)';"
-      "'+M1.FILL;M1.FILLOPC;M1.LEFOBS;M1.LEFPIN;M1.NET;M1.PIN;M1.SPNET;M1.VIA : \\'M1.NET/PIN/FILL/...\\' (22/2)';"
+      "'+M1.LEFPIN;M1.NET;M1.PIN;M1.SPNET;M1.VIA : \\'M1.NET/PIN/SPNET/...\\' (22/2)';"
       "'+\\'M1.NET:1\\';\\'M1.PIN:1\\';\\'M1.SPNET:1\\';\\'M1.VIA:1\\' : \\'M1.NET:1/PIN:1/...\\' (6/0)';"
       "'+\\'M1.NET:1\\' : \\'M1.NET:1\\' (7/0)';"
       "'+M1.PIN : M1.PIN (3/0)';"
@@ -822,7 +822,7 @@ TEST(117_mapfile_all)
       "'+M1.FILL : M1.FILL (14/0)';"
       "'+M1.FILL : M1.FILL (15/0)';"
       "'+M1.FILL : M1.FILL (17/0)';"
-      "'+M1.FILLOPC : M1.FILLOPC (9/0)';"
+      "'M1.FILLOPC : M1.FILLOPC (9/0)';"
       "'\\'M1.FILLOPC:1\\' : \\'M1.FILLOPC:1\\' (10/0)';"
       "'\\'M1.FILLOPC:2\\' : \\'M1.FILLOPC:2\\' (11/0)';"
       "'\\'M1.VIA:SIZE0.05X0.05\\' : \\'M1.VIA:SIZE0.05X0.05\\' (20/0)';"

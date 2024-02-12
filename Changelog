@@ -1,4 +1,5 @@
 0.28.16          (2024-02-12):
+* Bugfix: %GITHUB%/issues/1623 Package installation with "-y" from command line does not work for URL or file
 * Bugfix: %GITHUB%/issues/1619 Segfault on Fedora-39 with Python 3.12.1
 * Bugfix: %GITHUB%/issues/1618 Leaking Python reference causing trouble with iterators
 * Bugfix: %GITHUB%/issues/1616 DRC doc typo

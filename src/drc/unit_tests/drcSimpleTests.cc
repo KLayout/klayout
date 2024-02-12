@@ -1617,7 +1617,27 @@ TEST(89_deep_with_mag_cop_size_aniso)
   run_test (_this, "89", true);
 }
 
-TEST(90_issue1594_dual_top)
+TEST(90_zero_distance_mode)
+{
+  run_test (_this, "90", false);
+}
+
+TEST(90d_zero_distance_mode)
+{
+  run_test (_this, "90", true);
+}
+
+TEST(91_zero_distance_mode)
+{
+  run_test (_this, "91", false);
+}
+
+TEST(91d_zero_distance_mode)
+{
+  run_test (_this, "91", true);
+}
+
+TEST(92_issue1594_dual_top)
 {
   std::string rs = tl::testdata ();
   rs += "/drc/issue_1594.drc";
@@ -1652,4 +1672,3 @@ TEST(90_issue1594_dual_top)
   CHECKPOINT ();
   compare_netlists (_this, output, au);
 }
-

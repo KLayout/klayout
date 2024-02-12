@@ -1940,12 +1940,7 @@ DeepRegion::run_check (db::edge_relation_type rel, bool different_polygons, cons
 
   const db::DeepLayer &polygons = needs_merged_primary ? merged_deep_layer () : deep_layer ();
 
-  EdgeRelationFilter check (rel, d, options.metrics);
-  check.set_include_zero (false);
-  check.set_whole_edges (options.whole_edges);
-  check.set_ignore_angle (options.ignore_angle);
-  check.set_min_projection (options.min_projection);
-  check.set_max_projection (options.max_projection);
+  EdgeRelationFilter check (rel, d, options);
 
   std::unique_ptr<db::DeepEdgePairs> res (new db::DeepEdgePairs (polygons.derived ()));
 
@@ -2008,12 +2003,7 @@ DeepRegion::run_single_polygon_check (db::edge_relation_type rel, db::Coord d, c
     double mag = tr.mag ();
     db::Coord d_with_mag = db::coord_traits<db::Coord>::rounded (d / mag);
 
-    EdgeRelationFilter check (rel, d_with_mag, options.metrics);
-    check.set_include_zero (false);
-    check.set_whole_edges (options.whole_edges);
-    check.set_ignore_angle (options.ignore_angle);
-    check.set_min_projection (options.min_projection);
-    check.set_max_projection (options.max_projection);
+    EdgeRelationFilter check (rel, d_with_mag, options);
 
     const db::Shapes &shapes = c->shapes (polygons.layer ());
     db::Shapes &result = c->shapes (res->deep_layer ().layer ());

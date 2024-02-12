@@ -359,12 +359,7 @@ SinglePolygonCheck::process (const db::Polygon &polygon, std::vector<db::EdgePai
 {
   std::unordered_set<db::EdgePair> result;
 
-  EdgeRelationFilter check (m_relation, m_d, m_options.metrics);
-  check.set_include_zero (false);
-  check.set_whole_edges (m_options.whole_edges);
-  check.set_ignore_angle (m_options.ignore_angle);
-  check.set_min_projection (m_options.min_projection);
-  check.set_max_projection (m_options.max_projection);
+  EdgeRelationFilter check (m_relation, m_d, m_options);
 
   edge2edge_check_negative_or_positive <std::unordered_set<db::EdgePair> > edge_check (check, result, m_options.negative, false /*=same polygons*/, false /*=same layers*/, m_options.shielded, true /*=symmetric*/);
   poly2poly_check<db::Polygon> poly_check (edge_check);

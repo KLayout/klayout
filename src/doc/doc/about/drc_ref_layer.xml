@@ -2894,7 +2894,45 @@ The following image shows the effect of the separation check (input1: red, input
 </tr>
 </table>
 </p><p>
-<h3>opposite and rectangle error filtering </h3>
+<h3>Touching shapes </h3>
+</p><p>
+Like <a href="#width">width</a> and <a href="#space">space</a>, the separation check also supports the "without_touching_corners" option.
+</p><p>
+This option will turn off errors that arise due to 
+edges touching in one corner (the "kissing corners" configuration). 
+By default, such edges will yield an error, as they
+form a zero-distance situation. With this option in place, no errors will be reported.
+</p><p>
+The following images illustrate the effect of the "without_touching_corners" option.
+The white line at the top of the bottom red shape is actually an edge pair indicating 
+the zero-distance violation of the separation check:
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_separation12.png"/></td>
+<td><img src="/images/drc_separation13.png"/></td>
+</tr>
+</table>
+</p><p>
+Another option is "without_touching_edges" which turns off errors that arise
+at coincident edges. Formally such edges represent a zero-distance situation, hence
+are flagged by default. Turning off the check in this case can be helpful when
+separating a layer into two parts (e.g. thin/wide metal separation) and an error
+between touching regions is not desired.
+</p><p>
+The "without_touching_edges" option is a stronger version of "without_touching_corners" and 
+makes sense only for two-layer checks.
+</p><p>
+The following images illustrate the effect of the "without_touching_edges" option:
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_separation12.png"/></td>
+<td><img src="/images/drc_separation14.png"/></td>
+</tr>
+</table>
+</p><p>
+<h3>Opposite and rectangle error filtering </h3>
 </p><p>
 The options for the separation check are those available for the <a href="#width">width</a> or <a href="#space">space</a>
 method plus opposite and rectangle error filtering. 
@@ -3405,10 +3443,15 @@ each other is more or equal than min and less than max </li>
 but is more intuitive, as "projecting" is written with a condition, like
 "projecting &lt; 2.um". Available operators are: "==", "&lt;", "&lt;=", "&gt;" and "&gt;=". 
 Double-bounded ranges are also available, like: "0.5 &lt;= projecting &lt; 2.0". </li>
-<li><b>transparent </b>: performs the check without shielding (polygon layers only) </li>
-<li><b>shielded </b>: performs the check with shielding (polygon layers only) </li>
+<li><b>without_touching_corners </b>: With this option present, touching corners (aka "kissing
+corners") will not yield errors. The default is to produce errors in these cases. </li>
+<li><b>without_touching_edges </b>: With this option present, coincident edges will not yield errors.
+This is a stronger version of "without_touching_corners" and makes sense only for two-layer checks
+or raw-mode input layers. It is listed here for completeness. </li>
+<li><b>transparent </b>: Performs the check without shielding (polygon layers only) </li>
+<li><b>shielded </b>: Performs the check with shielding (polygon layers only) </li>
 <li><b>props_eq </b>, <b>props_ne </b>, <b>props_copy </b>: (only props_copy applies to width check) -
-see "Properties constraints" below. </li>
+See "Properties constraints" below. </li>
 </ul>
 </p><p>
 Note that without the angle_limit, acute corners will always be reported, since two 
@@ -3509,6 +3552,22 @@ shape's properties to the output too:
 space_not_connected = metal1_nets.space(0.4.um, props_ne + props_copy)
 space_connected     = metal1_nets.space(0.4.um, props_eq + props_copy)
 </pre>
+</p><p>
+<h3>Touching shapes </h3>
+</p><p>
+The "without_touching_corners" option will turn off errors that arise due to 
+the "kissing corner" configuration (or "checkerboard pattern"). Formally
+this is a width violation across the diagonal, but when considering this
+configuration as disconnected boxes, no error should be reported.
+</p><p>
+The following images illustrate the effect of the "without_touching_corners" option:
+</p><p>
+<table>
+<tr>
+<td><img src="/images/drc_width5.png"/></td>
+<td><img src="/images/drc_width6.png"/></td>
+</tr>
+</table>
 </p>
 <a name="with_angle"/><h2>"with_angle" - Selects edges by their angle</h2>
 <keyword name="with_angle"/>

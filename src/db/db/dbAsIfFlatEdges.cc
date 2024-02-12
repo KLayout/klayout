@@ -761,12 +761,7 @@ AsIfFlatEdges::run_check (db::edge_relation_type rel, const Edges *other, db::Co
     }
   }
 
-  EdgeRelationFilter check (rel, d, options.metrics);
-  check.set_include_zero (false);
-  check.set_whole_edges (options.whole_edges);
-  check.set_ignore_angle (options.ignore_angle);
-  check.set_min_projection (options.min_projection);
-  check.set_max_projection (options.max_projection);
+  EdgeRelationFilter check (rel, d, options);
 
   edge2edge_check_for_edges<db::FlatEdgePairs> edge_check (check, *result, other != 0);
   scanner.process (edge_check, d, db::box_convert<db::Edge> ());

@@ -179,6 +179,10 @@ SaltController::install_packages (const std::vector<std::string> &packages, bool
 {
   lay::SaltDownloadManager manager;
 
+  //  This method is used for command-line installation ignoring the package index.
+  //  Hence we have to download package information here:
+  manager.set_always_download_package_information (true);
+
   lay::Salt salt_mine;
   if (! m_salt_mine_url.empty ()) {
     tl::log << tl::to_string (tr ("Downloading package repository from %1").arg (tl::to_qstring (m_salt_mine_url)));

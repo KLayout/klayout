@@ -104,6 +104,22 @@ public:
   SaltDownloadManager ();
 
   /**
+   *  @brief Gets a flag indicating whether to always download package information
+   */
+  bool always_download_package_information () const
+  {
+    return m_always_download_package_information;
+  }
+
+  /**
+   *  @brief Sets a flag indicating whether to always download package information
+   */
+  void set_always_download_package_information (bool f)
+  {
+    m_always_download_package_information = f;
+  }
+
+  /**
    *  @brief Registers an URL (with version) for download in the given target directory
    *
    *  The target directory can be empty. In this case, the downloader will pick an appropriate one.
@@ -176,6 +192,7 @@ private:
   };
 
   std::vector<Descriptor> m_registry;
+  bool m_always_download_package_information;
 
   bool needs_iteration ();
   void fetch_missing (const lay::Salt &salt, const lay::Salt &salt_mine, tl::AbsoluteProgress &progress);

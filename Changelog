@@ -1,3 +1,6 @@
+0.28.17          (2024-02-16):
+* Enhancement: %GITHUB%/issues/1626 Technology specific grids
+
 0.28.16          (2024-02-12):
 * Bugfix: %GITHUB%/issues/1623 Package installation with "-y" from command line does not work for URL or file
 * Bugfix: %GITHUB%/issues/1619 Segfault on Fedora-39 with Python 3.12.1

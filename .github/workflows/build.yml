@@ -34,7 +34,7 @@ jobs:
           android: true
           dotnet: true
           haskell: true
-          large-packages: false # not working currently
+          large-packages: true
       - uses: hmarr/debug-action@v2
       - name: Cancel Workflow Action
         uses: styfle/cancel-workflow-action@0.12.1

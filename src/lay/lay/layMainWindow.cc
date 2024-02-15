@@ -458,6 +458,12 @@ MainWindow::MainWindow (QApplication *app, const char *name, bool undo_enabled)
   connect (&lay::LayoutHandle::file_watcher (), SIGNAL (fileChanged (const QString &)), this, SLOT (file_changed (const QString &)));
   connect (&lay::LayoutHandle::file_watcher (), SIGNAL (fileRemoved (const QString &)), this, SLOT (file_removed (const QString &)));
 
+  lay::TechnologyController *tc = lay::TechnologyController::instance ();
+  if (tc) {
+    connect (tc, SIGNAL (active_technology_changed ()), this, SLOT (technology_changed ()));
+    connect (tc, SIGNAL (technologies_edited ()), this, SLOT (technology_changed ()));
+  }
+
   //  make the main window accept drops
   setAcceptDrops (true);
 }
@@ -553,6 +559,31 @@ MainWindow::init_menu ()
   for (std::vector<std::string>::const_iterator g = view_mode_grp.begin (); g != view_mode_grp.end (); ++g) {
     menu ()->action (*g)->set_visible (view_mode);
   }
+}
+
+static std::string tech_string_from_name (const std::string &tn)
+{
+  if (tn.empty ()) {
+    return tl::to_string (QObject::tr ("(Default)"));
+  } else {
+    return tn;
+  }
+}
+
+void
+MainWindow::technology_changed ()
+{
+  lay::TechnologyController *tc = lay::TechnologyController::instance ();
+  if (tc) {
+    if (tc->active_technology ()) {
+      tech_message (tech_string_from_name (tc->active_technology ()->name ()));
+    } else {
+      tech_message (std::string ());
+    }
+  }
+
+  m_default_grids_updated = true;  //  potentially ...
+  dm_do_update_menu ();
 }
 
 void
@@ -908,36 +939,7 @@ MainWindow::config_finalize ()
 
   // Update the default grids menu if necessary
   if (m_default_grids_updated) {
-
-    m_default_grids_updated = false;
-
-    std::vector<std::string> group = menu ()->group ("default_grids_group");
-
-    for (std::vector<std::string>::const_iterator t = group.begin (); t != group.end (); ++t) {
-      std::vector<std::string> items = menu ()->items (*t);
-      for (std::vector<std::string>::const_iterator i = items.begin (); i != items.end (); ++i) {
-        menu ()->delete_item (*i);
-      }
-    }
-
-    int i = 1;
-    for (std::vector<double>::const_iterator g = m_default_grids.begin (); g != m_default_grids.end (); ++g, ++i) {
-
-      std::string name = "default_grid_" + tl::to_string (i);
-
-      lay::Action *ga = new lay::ConfigureAction (tl::to_string (*g) + tl::to_string (QObject::tr (" um")), cfg_grid, tl::to_string (*g));
-      ga->set_checkable (true);
-      ga->set_checked (fabs (*g - m_grid_micron) < 1e-10);
-
-      for (std::vector<std::string>::const_iterator t = group.begin (); t != group.end (); ++t) {
-        menu ()->insert_item (*t + ".end", name, ga);
-      }
-
-    }
-
-    //  re-apply key bindings for the default grids
-    apply_key_bindings ();
-
+    dm_do_update_menu ();
   }
 
   //  make the changes visible in the setup form if the form is visible
@@ -4042,6 +4044,57 @@ MainWindow::menu_changed ()
 void
 MainWindow::do_update_menu ()
 {
+  if (m_default_grids_updated) {
+
+    m_default_grids_updated = false;
+
+    const std::vector<double> *grids = &m_default_grids;
+    std::vector<double> tech_grids;
+    lay::TechnologyController *tc = lay::TechnologyController::instance ();
+    if (tc && tc->active_technology ()) {
+      tech_grids = tc->active_technology ()->default_grid_list ();
+      if (! tech_grids.empty ()) {
+        grids = &tech_grids;
+      }
+    }
+
+    std::vector<std::string> group = menu ()->group ("default_grids_group");
+
+    for (std::vector<std::string>::const_iterator t = group.begin (); t != group.end (); ++t) {
+      std::vector<std::string> items = menu ()->items (*t);
+      for (std::vector<std::string>::const_iterator i = items.begin (); i != items.end (); ++i) {
+        menu ()->delete_item (*i);
+      }
+    }
+
+    int i = 1;
+    for (std::vector<double>::const_iterator g = grids->begin (); g != grids->end (); ++g, ++i) {
+
+      std::string name = "default_grid_" + tl::to_string (i);
+
+      std::string gs;
+      if (*g < 0.4) {
+        //  pick nm units below 400nm
+        gs = tl::to_string (*g * 1000.0) + tl::to_string (QObject::tr (" nm"));
+      } else {
+        gs = tl::to_string (*g) + tl::to_string (QObject::tr (" um"));
+      }
+
+      lay::Action *ga = new lay::ConfigureAction (gs, cfg_grid, tl::to_string (*g));
+      ga->set_checkable (true);
+      ga->set_checked (fabs (*g - m_grid_micron) < 1e-10);
+
+      for (std::vector<std::string>::const_iterator t = group.begin (); t != group.end (); ++t) {
+        menu ()->insert_item (*t + ".end", name, ga);
+      }
+
+    }
+
+    //  re-apply key bindings for the default grids
+    apply_key_bindings ();
+
+  }
+
   menu ()->build (menuBar (), mp_tool_bar);
   lay::GuiApplication *app = dynamic_cast<lay::GuiApplication *> (qApp);
   if (app) {

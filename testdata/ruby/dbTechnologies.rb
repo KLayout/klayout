@@ -103,6 +103,13 @@ END
     tech.dbu = 5.0
     assert_equal(tech.dbu, 5.0)
 
+    tech.default_grids = []
+    assert_equal(tech.default_grids.collect { |g| "%.12g" % g }.join(","), "")
+    tech.default_grids = [0.001, 0.01, 0.2]
+    assert_equal(tech.default_grids.collect { |g| "%.12g" % g }.join(","), "0.001,0.01,0.2")
+    tech.default_grids = [1]
+    assert_equal(tech.default_grids.collect { |g| "%.12g" % g }.join(","), "1")
+
     tech.default_base_path = "/default/path"
     assert_equal(tech.default_base_path, "/default/path")
     assert_equal(tech.base_path, "/default/path")

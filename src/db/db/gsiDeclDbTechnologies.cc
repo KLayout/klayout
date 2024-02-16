@@ -135,6 +135,19 @@ gsi::Class<db::TechnologyComponent> technology_component_decl ("db", "Technology
 
 DB_PUBLIC gsi::Class<db::TechnologyComponent> &decl_dbTechnologyComponent () { return technology_component_decl; }
 
+static void
+set_default_grid_list (db::Technology *tech, const std::vector<double> &grids)
+{
+  std::string r;
+  for (auto g = grids.begin (); g != grids.end (); ++g) {
+    if (! r.empty ()) {
+      r += ",";
+    }
+    r += tl::micron_to_string (*g);
+  }
+  tech->set_default_grids (r);
+}
+
 gsi::Class<db::Technology> technology_decl ("db", "Technology",
   gsi::method ("name", &db::Technology::name,
     "@brief Gets the name of the technology"
@@ -217,6 +230,19 @@ gsi::Class<db::Technology> technology_decl ("db", "Technology",
   ) +
   gsi::method ("dbu=", &db::Technology::set_dbu, gsi::arg ("dbu"),
     "@brief Sets the default database unit\n"
+  ) +
+  gsi::method ("default_grids", &db::Technology::default_grid_list,
+    "@brief Gets the default grids\n"
+    "\n"
+    "See \\default_grids for details.\n"
+    "\n"
+    "This property has been introduced in version 0.28.17."
+  ) +
+  gsi::method_ext ("default_grids=", &set_default_grid_list, gsi::arg ("grids"),
+    "@brief Sets the default grids\n"
+    "If not empty, this list replaces the global grid list for this technology.\n"
+    "\n"
+    "This property has been introduced in version 0.28.17."
   ) +
   gsi::method ("layer_properties_file", &db::Technology::layer_properties_file,
     "@brief Gets the path of the layer properties file\n"
